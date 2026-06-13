@@ -117,7 +117,11 @@ No PPU/I/O needed (the assert reads WRAM) — keeps them minimal and codegen-foc
    **PASS** (2026-06-14): funcs expected → `0xDEAD` → `funcs FAIL got=0x011E want=0xDEAD`, `6/7
    passed`, exit 1 (and `len=2` correctly auto-derived from the map). Restored.
 5. **Reproducible** — `dev/run.sh repro` runs build+corpus green from a clean HEAD checkout; manual CI
-   (`workflow_dispatch`) runs `corpus` green. *(Run after committing — see commit + CI dispatch below.)*
+   (`workflow_dispatch`) runs `corpus` green.
+   **PASS** (2026-06-14): local `repro` → `corpus: 7/7 passed`, `repro OK` from committed `HEAD`.
+   Manual CI run [27475871789](https://github.com/wbniv/llvm-mos-65816/actions/runs/27475871789)
+   green — the `Corpus — boot each program in MAME, assert results` step **executed** (not skipped)
+   on a clean GH-runner checkout, BIOS from the `SNES_SPC700_ROM_B64` secret.
 
 ## Risks
 

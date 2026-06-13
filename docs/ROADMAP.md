@@ -154,7 +154,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    result the host checks against `expected.tsv`; exercises ALU, control flow, arrays/`.rodata`,
    structs/pointers, calls/recursion, and the crt0 `.data`/`.bss` init. `dev/run.sh corpus` → **7/7
    passed** (incl. the `hello` liveness row); negative control (corrupt one expected) → that row
-   FAILs, exit 1; clean-room `dev/run.sh repro` green from committed `HEAD`. Harness + design:
+   FAILs, exit 1; clean-room `dev/run.sh repro` green from committed `HEAD`; manual CI run
+   [27475871789](https://github.com/wbniv/llvm-mos-65816/actions/runs/27475871789) green (corpus step
+   executed on a clean runner). Harness + design:
    [corpus plan](plans/2026-06-14-m0-regression-corpus-5-self-contained-c-programs.md).
    ```
    hello   PASS sentinel=0x42   arith PASS 0xA9E9   control PASS 0x1DFB   arrays PASS 0x03E1
