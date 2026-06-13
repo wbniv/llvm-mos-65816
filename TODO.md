@@ -19,9 +19,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
+- [wip] **Phase 0 — from-source llvm-mos toolchain + green baseline.** The bench uses a prebuilt,
+  immutable toolchain; codegen work needs llvm-mos built from source. Stand up `dev/run.sh toolchain`
+  (clone + `MOS.cmake` Release build, RAM-tuned), make the bench toolchain selectable (`MOS_TOOLCHAIN`),
+  prove the corpus stays 7/7 on the self-built compiler. Non-design-gated prerequisite for all of M1.
+  [plan](docs/plans/2026-06-14-m1-from-source-toolchain.md).
 - [ ] **#320 — 24-bit address space / far pointers**, registers stay 8-bit. Five-address-space
   data layout; default 32-bit pointer, 24-bit packed as a size option; near/far calls (JSR/JSL).
-  Deliverable: a working multi-bank unoptimized 65816 C compiler. ROADMAP steps 3–4.
+  Deliverable: a working multi-bank unoptimized 65816 C compiler. ROADMAP steps 3–4. Upstream-gated
+  ABI design — coordinate on the llvm-mos Discord (@asiekierka/@mysterymath) before large PRs.
 - [ ] **Cross-check emulator (bsnes-jg / Mesen2)** added to the bench for fidelity once codegen
   correctness depends on it.
 
