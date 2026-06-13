@@ -7,7 +7,7 @@ not a change to drdevtools. The work lands in `llvm-mos/llvm-mos` (compiler) and
 `llvm-mos/llvm-mos-sdk` (platform target). drdevtools' stake: an optimizing open-source 65816 C
 compiler that emits DWARF (spec landed Dec 2025) closes the loop *compile → optimized SNES ROM →
 DWARF symbols → source-level debug in drmon* on fully-open tooling. See the
-[investigation](../investigations/2026-06-13-llvm-mos-65816-backend.md) for the full status,
+[investigation](INVESTIGATION.md) for the full status,
 players, and rival/dead efforts; this plan is the **execution order** distilled from it.
 
 **Current state (verified 2026-06-13):**
@@ -89,14 +89,14 @@ pipe dream with our current resources").
 Undecided in #320/#321 and gating. Three candidates:
 
 - **PHD/TCD direct-page frame** — what Zardoz / WDC816CC / ORCA-C all did
-  ([Zardoz ABI](../investigations/2026-06-12-zardoz-65816-compiler.md#the-wdc816cc-abi-high-confidence)):
+  (Zardoz ABI (drdevtools research)):
   fast (8-bit DP offsets) but hard 256-byte frame cap.
 - **Hardware-stack-relative frame** — now viable on the 65816 (16-bit SP, S-indexed modes).
 - **llvm-mos soft static stack** — carried over from the 6502.
 
 The prior-art reference for this decision is the **documented** WDC816CC/ORCA-C ABI (from the WDC
 compiler manual + ORCA/C source, captured in the
-[Zardoz investigation](../investigations/2026-06-12-zardoz-65816-compiler.md#the-wdc816cc-abi-high-confidence))
+Zardoz investigation (drdevtools research))
 — a manual, not anyone's memory. Zardoz shipped real commercial SNES titles (Will Norris among its
 users), which establishes the ABI *worked in production*; but the codegen internals were the
 compiler author's domain, not the game developers', so don't expect first-hand recall of the frame
@@ -164,8 +164,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
 
 ## Links
 
-- [Investigation: status, players, rivals](../investigations/2026-06-13-llvm-mos-65816-backend.md)
-- [Zardoz / WDC816CC ABI (calling-convention prior art)](../investigations/2026-06-12-zardoz-65816-compiler.md)
+- [Investigation: status, players, rivals](INVESTIGATION.md)
+- Zardoz / WDC816CC ABI (calling-convention prior art) (drdevtools research)
 - Upstream: [#32 umbrella](https://github.com/llvm-mos/llvm-mos/issues/32) ·
   [#320 24-bit addr](https://github.com/llvm-mos/llvm-mos/issues/320) ·
   [#321 16-bit regs](https://github.com/llvm-mos/llvm-mos/issues/321) ·

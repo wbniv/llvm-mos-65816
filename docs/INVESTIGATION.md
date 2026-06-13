@@ -7,7 +7,7 @@ API — full comment threads of issues [#32](https://github.com/llvm-mos/llvm-mo
 [#321](https://github.com/llvm-mos/llvm-mos/issues/321),
 [#454](https://github.com/llvm-mos/llvm-mos/issues/454) read verbatim; rival/abandoned forks
 inspected directly. Supersedes the time-bounded llvm-mos section of the
-[Zardoz investigation](2026-06-12-zardoz-65816-compiler.md) (which was anchored to Oct 2024 / Jan 2026).
+Zardoz investigation (drdevtools research) (which was anchored to Oct 2024 / Jan 2026).
 
 ---
 
@@ -204,8 +204,8 @@ heads and in #320/#321.
 816-tcc works but doesn't optimize; Calypsi optimizes but is closed and hobby-licensed; WDC816CC
 is commercial. An llvm-mos 65816 backend would be the first *open-source, optimizing, actively
 maintained* 65816 C compiler — and it would emit DWARF (spec landed Dec 2025), which a source-level
-debugger can consume. (See [toolchain survey](2026-06-11-snes-65816-toolchains.md) and
-[Zardoz investigation](2026-06-12-zardoz-65816-compiler.md) for the full landscape.)
+debugger can consume. (See toolchain survey (drdevtools research) and
+Zardoz investigation (drdevtools research) for the full landscape.)
 
 **How big is it?** Not a weekend project — johnwbyrd says so repeatedly, and @mysterymath's
 own experience building the 6502 backend was "considerably more work than anticipated." His
@@ -221,7 +221,7 @@ years, given the head start, but specialist months.
 1. **Bring documented ABI prior art to the design discussion.** The calling-convention question
    (PHD/TCD direct-page frame, A+X split return values) is live and undecided in #320/#321. The
    highest-value artifact is the *documented* 1990s prior art — the
-   [WDC816CC/ORCA-C ABI](2026-06-12-zardoz-65816-compiler.md#the-wdc816cc-abi-high-confidence) drawn
+   WDC816CC/ORCA-C ABI (drdevtools research) drawn
    from the WDC compiler manual and ORCA/C source — already captured in the Zardoz investigation.
    That is the durable reference to surface, not anyone's recollection: Zardoz users (Will Norris
    among them) shipped commercial SNES titles on it, which confirms the *gap was filled and the
