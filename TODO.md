@@ -17,7 +17,9 @@ Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TOD
   MAME's `snes` driver headless, with a programmatic assert (`sentinel == 0x42` in WRAM),
   driven by `dev/run.sh smoke` and CI. Closes the run-half of ROADMAP step 1. MAME chosen so
   the CI bench shares drmon's emulation core (green-in-CI == attachable-in-drmon).
-  [Plan](docs/plans/2026-06-14-emulator-smoke-loop.md).
+  **Local smoke green (verification steps 1–4 PASS, 2026-06-14)**; remaining: set the
+  `SNES_SPC700_ROM_B64` GitHub secret (SPC700 IPL, gitignored) + push so the `snes-smoke`
+  workflow goes green (step 5). [Plan](docs/plans/2026-06-14-emulator-smoke-loop.md).
 - [ ] **Regression corpus (≥5 programs).** Small C programs with known-correct output, green
   in CI from a clean checkout. ROADMAP step 2. Builds on the smoke harness above.
 

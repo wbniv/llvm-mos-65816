@@ -50,10 +50,22 @@ Everything runs in a throwaway container; nothing is installed on the host.
 dev/run.sh build      # vendor the SDK, build it + our platform, build the smoke ROM
 dev/run.sh validate   # structural checks on build/hello.sfc
 dev/run.sh compile    # fast recompile after editing the linker script / headers
+dev/run.sh smoke      # boot build/hello.sfc headless in MAME, assert it ran
 ```
 
 The first `build` clones upstream `llvm-mos-sdk` into `vendor/` and compiles the
 SDK against the pinned llvm-mos toolchain baked into the image (~1–2 min).
+
+`smoke` boots the ROM in MAME's `snes` driver (the same emulation core drdevtools'
+`drmon` debugs against) and asserts the `sentinel == 0x42` byte in WRAM — closing the
+"it actually runs" half of the M0 acceptance test, headless and in CI. See
+[docs/plans/2026-06-14-emulator-smoke-loop.md](docs/plans/2026-06-14-emulator-smoke-loop.md).
+
+**One prerequisite (supplied, not committed):** MAME's `snes` driver needs the 64-byte
+SPC700 APU IPL ROM. It is Nintendo content, so it is **gitignored** — drop your copy at
+`dev/roms/s_smp/spc700.rom` (sha1 `97e352553e94242ae823547cd853eecda55c20f0`), or point
+`SNES_ROMPATH` elsewhere. In CI it is materialized from the `SNES_SPC700_ROM_B64` secret.
+`dev/run.sh smoke` prints exactly what to do if it is missing.
 
 ## Upstream contribution
 

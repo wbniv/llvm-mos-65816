@@ -1,0 +1,52 @@
+# M0 SNES smoke loop — build the platform + ROM, then boot it headless in MAME
+# and assert the `sentinel` byte. Closes the run-half of ROADMAP verification step 1.
+# Everything runs in the dev container (dev/run.sh), so CI mirrors local exactly.
+#
+# The smoke step needs the SPC700 IPL ROM, which is Nintendo content and is never
+# committed. Set it as a repo secret to enable the smoke step:
+#   gh secret set SNES_SPC700_ROM_B64 < <(base64 -w0 dev/roms/s_smp/spc700.rom)
+# Without the secret the build still runs and the smoke step is skipped with a warning.
+name: snes-smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      # Builds the dev image (toolchain + MAME), vendors llvm-mos-sdk, injects
+      # platforms/snes, and compiles examples/snes/hello.c -> build/hello.sfc.
+      - name: Build SDK + smoke ROM
+        run: dev/run.sh build
+
+      # Materialize the SPC700 IPL from a secret (gitignored, never committed).
+      # has_bios gates the smoke step so forks/PRs without the secret aren't failed.
+      - name: Provide SNES SPC700 IPL (from secret)
+        id: bios
+        env:
+          ROM_B64: ${{ secrets.SNES_SPC700_ROM_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ROM_B64:-}" ]; then
+            mkdir -p dev/roms/s_smp
+            printf '%s' "$ROM_B64" | base64 -d > dev/roms/s_smp/spc700.rom
+            echo "has_bios=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_bios=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SNES_SPC700_ROM_B64 secret not set — skipping the MAME smoke step (build still validated)."
+          fi
+
+      # Boots build/hello.sfc in MAME's snes driver headless and asserts
+      # sentinel == 0x42 in WRAM (dev/smoke.sh greps the Lua's SMOKE: line).
+      - name: Smoke — boot in MAME, assert sentinel
+        if: steps.bios.outputs.has_bios == 'true'
+        run: dev/run.sh smoke
