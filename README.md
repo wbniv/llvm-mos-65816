@@ -24,7 +24,10 @@ follow; the codegen they'd share is the prize.
 bootable 32 KiB LoROM `.sfc` from C using llvm-mos's existing 6502 backend — the
 65816 boots in 6502-emulation mode, so no 65816 codegen is needed yet. Reset
 vector → `_start`, the boot path is the crt0, `main()` is real compiled C, header
-+ checksum well-formed. Remaining: live emulator boot test + a regression corpus.
++ checksum well-formed. **And it runs:** `dev/run.sh smoke` boots the ROM headless
+in MAME and the C-written `sentinel` reads back `0x42` from WRAM (verified
+2026-06-14). Remaining: the smoke loop green in CI (needs the BIOS secret) + a
+regression corpus.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the full M0 → M1 → M2 plan and
 [docs/INVESTIGATION.md](docs/INVESTIGATION.md) for the upstream status, players,

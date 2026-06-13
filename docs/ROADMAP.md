@@ -116,10 +116,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    (`sentinel == 0x42` in WRAM). CI runs the smoke headless. A bsnes-jg/Mesen2 cross-check is added
    at M1. (Evidence: build log + emulator value dump.)
 
-   **Build + structural half: PASS** (2026-06-13). Emulator-run half: pending (needs an emulator in
-   the container). Raw evidence:
+   **Build + structural half: PASS** (2026-06-13). **Emulator-run half: PASS** (2026-06-14) —
+   headless via `dev/run.sh smoke` (MAME 0.285, `snes` driver). Local smoke green; CI run pending
+   the `SNES_SPC700_ROM_B64` secret + push. See the
+   [smoke loop plan](plans/2026-06-14-emulator-smoke-loop.md) for the full implementation +
+   verification (incl. negative control and `mame -verifyroms snes` → "romset snes is good"). Raw evidence:
 
    ```
+   # --- structural (2026-06-13) ---
    $ mos-snes-clang -Os -o hello.sfc examples/hello.c   # in-container, snes-target SDK
    $ stat -c%s hello.sfc
    32768
@@ -131,11 +135,17 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    $ # reset bytes: 78 d8 a2 ff 9a a9 00 8d 00 42 a9 8f 8d 00 21
    $ #   = SEI / CLD / LDX #$FF / TXS / LDA #$00 / STA $4200 / LDA #$8F / STA $2100  (== crt0)
    $ # linker map: _start=$8000  __do_init_stack=$800F  main=$8036 (real C)  sentinel=$20
+
+   # --- emulator run (2026-06-14), dev/run.sh smoke ---
+   ==> smoke: ROM=hello.sfc  sentinel@$20 -> WRAM 0x7E0020  (expect 0x42)
+   SMOKE: PASS addr=0x7E0020 got=0x42 (ran 60 ticks)      # exit 0
+   # negative control (SMOKE_WANT=0x99): SMOKE: FAIL got=0x42 want=0x99  # exit 1
    ```
 
-   So: a valid bootable 32 KiB LoROM `.sfc` is produced from C by the existing 6502 backend; the
-   reset path is exactly the crt0 and `main()` is compiled and placed. Only the live emulator run
-   remains to fully close step 1.
+   So: a valid bootable 32 KiB LoROM `.sfc` is produced from C by the existing 6502 backend, the
+   reset path is exactly the crt0, `main()` is compiled and placed — **and it boots and runs**: the
+   C-written `sentinel` reads back `0x42` from WRAM in MAME. The only piece left to fully close
+   step 1 is the same run going green in CI (needs the BIOS secret).
 
 2. **M0 — bench reproducible.** The regression corpus (≥5 programs) builds and runs green in CI from
    a clean checkout. (Evidence: CI run.)
