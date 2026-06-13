@@ -54,6 +54,7 @@ dev/run.sh build      # vendor the SDK, build it + our platform, build the smoke
 dev/run.sh validate   # structural checks on build/hello.sfc
 dev/run.sh compile    # fast recompile after editing the linker script / headers
 dev/run.sh smoke      # boot build/hello.sfc headless in MAME, assert it ran
+dev/run.sh repro      # clean-room: export HEAD, build + smoke from scratch (no local state)
 ```
 
 The first `build` clones upstream `llvm-mos-sdk` into `vendor/` and compiles the
@@ -61,8 +62,14 @@ SDK against the pinned llvm-mos toolchain baked into the image (~1–2 min).
 
 `smoke` boots the ROM in MAME's `snes` driver (the same emulation core drdevtools'
 `drmon` debugs against) and asserts the `sentinel == 0x42` byte in WRAM — closing the
-"it actually runs" half of the M0 acceptance test, headless and in CI. See
+"it actually runs" half of the M0 acceptance test, headless. See
 [docs/plans/2026-06-14-emulator-smoke-loop.md](docs/plans/2026-06-14-emulator-smoke-loop.md).
+
+`repro` is the reproducibility gate: it exports the committed `HEAD` to a temp dir
+(no `build/`, no caches, no uncommitted edits), supplies the BIOS, and runs the full
+build + smoke there — proving the bench rebuilds from the repo alone. The same check
+exists as a manual-only GitHub Actions workflow (`snes-smoke`, `workflow_dispatch`),
+parked until the repo goes public / the upstream PR is cut.
 
 **One prerequisite (supplied, not committed):** MAME's `snes` driver needs the 64-byte
 SPC700 APU IPL ROM. It is Nintendo content, so it is **gitignored** — drop your copy at

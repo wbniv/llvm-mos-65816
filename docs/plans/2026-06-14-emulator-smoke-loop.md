@@ -1,8 +1,9 @@
 # M0 — emulator smoke loop (MAME, headless)
 
 **Date:** 2026-06-14
-**Status:** Implemented — smoke green locally via `dev/run.sh smoke` (verification steps 1–4 PASS,
-2026-06-14). Step 5 (CI) authored; **pending** the `SNES_SPC700_ROM_B64` GitHub secret + a push.
+**Status:** Done (2026-06-14) — all verification steps PASS. `dev/run.sh smoke` green; negative
+control green; clean-room `dev/run.sh repro` green; GitHub CI proven green once
+(run 27475012894) then parked at manual-only for a solo private repo. ROADMAP step 1 run-half closed.
 **Milestone:** M0 (test bench). Closes the *run-half* of ROADMAP verification step 1.
 **Predecessor:** structural verification PASS (2026-06-13) — `examples/snes/hello.c` →
 valid 32 KiB LoROM `.sfc`, reset path byte-exact to crt0, `main()` placed. See
@@ -102,9 +103,10 @@ the PPU and writes a byte in 6502-emulation mode; any solid 65816 core nails tha
 | `dev/smoke.sh` | **NEW** | runs in-container: BIOS preflight (exit 2 if missing) → grep `sentinel` addr from `build/hello.map` → launch MAME headless with `-rompath` → exit 0 iff `SMOKE: PASS` |
 | `dev/roms/s_smp/spc700.rom` | **user-supplied, gitignored** | the SPC700 IPL; never committed |
 | `.gitignore` | add `/dev/roms/` | keep the copyrighted BIOS out of the repo |
-| `dev/run.sh` | usage comment only | already generic: `dev/run.sh smoke` execs `dev/smoke.sh` |
-| `.github/workflows/smoke.yml` | **NEW** | `dev/run.sh build` then `dev/run.sh smoke`; `@v6`; materializes the BIOS from a repo secret before the smoke step |
-| `README.md` | doc the `smoke` target + BIOS prerequisite | under Build |
+| `dev/run.sh` | usage comment + host-side `repro` branch | `smoke` execs `dev/smoke.sh` in-container; `repro` runs on the host |
+| `dev/repro.sh` | **NEW** (host-side) | clean-room gate: `git archive HEAD` → temp dir → supply BIOS → `run.sh build` + `run.sh smoke` |
+| `.github/workflows/smoke.yml` | **NEW**, manual-only | `dev/run.sh build` then `dev/run.sh smoke`; `@v6`; BIOS from `SNES_SPC700_ROM_B64` secret. `workflow_dispatch` only (parked) |
+| `README.md` | doc `smoke` + `repro` + BIOS prerequisite | under Build |
 
 ## Implementation steps
 
@@ -174,9 +176,22 @@ write back here, then promote the TODO item.
    === exit code: 1 (expect nonzero) ===
    ```
 
-5. **CI green from clean checkout.** The `smoke.yml` workflow runs build + smoke green on a fresh
-   clone (BIOS materialized from the `SNES_SPC700_ROM_B64` secret). (Evidence: GH Actions run URL/log.)
-   **PENDING** — needs the secret set on the GitHub repo + a push.
+5. **Reproducible from a clean checkout.** The full build + smoke runs green from a fresh checkout
+   with no local machine state — proving "everything reproducible from code + a handful of secrets."
+   (Evidence: clean-room run.)
+
+   **PASS** (2026-06-14), two ways:
+   - **GitHub CI** — run [27475012894](https://github.com/wbniv/llvm-mos-65816/actions/runs/27475012894)
+     green on a clean GH-runner clone, smoke step **executed** (not skipped) with the BIOS from the
+     `SNES_SPC700_ROM_B64` secret: `Build SDK + smoke ROM` ✓ · `Provide SNES SPC700 IPL` ✓ ·
+     `Smoke — boot in MAME, assert sentinel` ✓.
+   - **Local** — `dev/run.sh repro` exports HEAD to a temp dir (committed files only), supplies the
+     gitignored IPL, and runs build + smoke there.
+
+   **Decision (2026-06-14):** for a solo private repo the routine gate is the local `dev/run.sh repro`;
+   the GitHub workflow is **parked at manual-only** (`workflow_dispatch`) to avoid per-push minutes /
+   uploading the ROM on every run. Re-enable `push`/`pull_request` triggers when the repo goes public,
+   the upstream `llvm-mos-sdk` PR is cut, or collaborators start pushing.
 
 ## Risks & open questions
 

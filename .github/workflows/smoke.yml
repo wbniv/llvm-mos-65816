@@ -2,17 +2,21 @@
 # and assert the `sentinel` byte. Closes the run-half of ROADMAP verification step 1.
 # Everything runs in the dev container (dev/run.sh), so CI mirrors local exactly.
 #
-# The smoke step needs the SPC700 IPL ROM, which is Nintendo content and is never
-# committed. Set it as a repo secret to enable the smoke step:
+# MANUAL-ONLY (workflow_dispatch). For a solo private repo the routine reproducibility
+# gate is the local `dev/run.sh repro` (clean-room build + smoke, no GitHub minutes,
+# no ROM upload). This workflow is the same check on a clean GH runner — kept parked
+# for when the repo goes public / the upstream llvm-mos-sdk PR is cut (a green run is
+# the credibility artifact) or collaborators start pushing. Re-add `push:`/`pull_request:`
+# triggers then. Proven green once: run 27475012894 (2026-06-14).
+#
+# The smoke step needs the SPC700 IPL ROM (Nintendo content, never committed). Set it
+# as a repo secret to enable the smoke step:
 #   gh secret set SNES_SPC700_ROM_B64 < <(base64 -w0 dev/roms/s_smp/spc700.rom)
 # Without the secret the build still runs and the smoke step is skipped with a warning.
 name: snes-smoke
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-  workflow_dispatch:   # manual re-run (e.g. after setting the BIOS secret)
+  workflow_dispatch:   # manual only — see header
 
 concurrency:
   group: smoke-${{ github.ref }}

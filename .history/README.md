@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/18189b6) | docs: record M0 emulator-run PASS (MAME smoke) in ROADMAP + README |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/982b6f3) | M0: implement headless MAME smoke loop (dev/run.sh smoke) |
 | [2026-06-13](https://github.com/wbniv/llvm-mos-65816/commit/2fb154f) | Initial commit: llvm-mos 65816 effort + SNES platform (M0) |
 
 <!--history-meta v1
+18189b6	author	Will Norris
+18189b6	added	4
+18189b6	deleted	1
+18189b6	files	1
+18189b6	body	The smoke loop is implemented and green locally, so the docs that still\ndescribed the emulator-run half as "pending" are now stale.\n\n- ROADMAP step 1: Emulator-run half PASS (2026-06-14, MAME 0.285) with the\n  SMOKE: PASS + negative-control evidence; only the CI run remains (BIOS\n  secret). Cross-links the smoke loop plan.\n- README Status: "And it runs" — dev/run.sh smoke boots the ROM in MAME and\n  reads sentinel==0x42 back from WRAM.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 982b6f3	author	Will Norris
 982b6f3	added	12
 982b6f3	deleted	0
