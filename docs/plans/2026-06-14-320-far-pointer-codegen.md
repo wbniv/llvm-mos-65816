@@ -1,7 +1,29 @@
-# M1 / #320 — Increment 1: far-pointer codegen (24-bit), non-breaking, disassembly-verified
+# M1 / #320 — Increment 1: far-pointer codegen (32-bit far), non-breaking, disassembly-verified
 
-**Date:** 2026-06-14 · **Status:** Planned · **Milestone:** M1 (ROADMAP steps 3–4), first real 65816 codegen.
+**Date:** 2026-06-14 · **Status:** In progress — step 1 (far address space) done + verified.
+· **Milestone:** M1 (ROADMAP steps 3–4), first real 65816 codegen.
 **Builds on:** [M1 Phase 0](2026-06-14-m1-from-source-toolchain.md) (from-source editable toolchain + corpus).
+
+## Progress (2026-06-14)
+
+- **Reproducible-codegen workflow established.** `vendor/llvm-mos` is gitignored, so backend edits are
+  captured as a tracked patch `patches/llvm-mos/0001-320-far-addrspace.patch` (verified it applies
+  cleanly to a pristine clone) and `dev/toolchain.sh` applies all `patches/llvm-mos/*.patch` after a
+  fresh clone. The patch *is* the eventual upstream PR diff. Dev loop: edit `vendor/llvm-mos` →
+  `dev/run.sh toolchain` (incremental relink) → regenerate the patch.
+- **Correction: 32-bit far, not 24-bit.** LLVM requires power-of-two pointer sizes (asiekierka's "lie
+  and claim 32-bit"), so addrspace 2 is **32-bit** (`p2:32:8`); only the low 24 bits are emitted as
+  65816 absolute-long. (The body below still says "24-bit" in places — read as 32-bit.)
+- **Finding: the data-layout string is duplicated in THREE places** that must stay byte-identical, or
+  the build dies with *"backend data layout … does not match expected target description"*:
+  `llvm/lib/Target/MOS/MOSTargetMachine.cpp` (backend), `clang/lib/Basic/Targets/MOS.cpp` (frontend),
+  and `llvm/lib/TargetParser/TargetDataLayout.cpp` (the centralized `Triple::mos` source the base
+  `CodeGenTargetMachineImpl` checks against). Also: changing the layout invalidates all old-layout
+  bitcode, so the toolchain runtimes must be rebuilt — a **clean** toolchain rebuild, not incremental.
+- **Step 1 done + verified (non-breaking):** `AS_Far=2` enum + `p2:32:8` in all three layouts. Clean
+  toolchain rebuild + `MOS_TOOLCHAIN=…self build && corpus` → **corpus 7/7**: the far address space is
+  inert for 6502 codegen. Next: step 2 (legalize the 32-bit far pointer) → step 3 (`case 32` →
+  `LDA/STA AbsoluteLong`).
 
 ## Context
 

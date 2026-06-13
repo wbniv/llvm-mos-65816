@@ -1,0 +1,65 @@
+diff --git a/clang/lib/Basic/Targets/MOS.cpp b/clang/lib/Basic/Targets/MOS.cpp
+index dfe99d8f2..c9e4c2f2f 100644
+--- a/clang/lib/Basic/Targets/MOS.cpp
++++ b/clang/lib/Basic/Targets/MOS.cpp
+@@ -18,8 +18,10 @@ using namespace clang::targets;
+ 
+ MOSTargetInfo::MOSTargetInfo(const llvm::Triple &Triple, const TargetOptions &)
+     : TargetInfo(Triple) {
++  // Must match the backend's MOSDataLayout (MOSTargetMachine.cpp). p2:32:8 =
++  // addrspace 2 "far" (32-bit ptr; low 24 bits emitted as 65816 absolute-long). #320.
+   static const char Layout[] =
+-      "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
++      "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
+   resetDataLayout(Layout);
+ 
+   PointerWidth = 16;
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
+index a19b69cd0..be5daff8f 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.h
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
+@@ -152,7 +152,11 @@ private:
+ 
+ namespace MOS {
+ 
+-enum AddressSpace { AS_Memory, AS_ZeroPage, NumAddrSpaces };
++// AS_Memory  (0): 16-bit absolute pointer (6502 default; data-bank-relative on 65816).
++// AS_ZeroPage(1): 8-bit direct-page pointer.
++// AS_Far     (2): 32-bit "far" pointer — 65816 24-bit address in the low 3 bytes,
++//                 top byte unused (LLVM wants power-of-two pointer sizes). #320 Increment 1.
++enum AddressSpace { AS_Memory, AS_ZeroPage, AS_Far, NumAddrSpaces };
+ 
+ enum TargetIndex {
+   TI_STATIC_STACK,
+diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+index 3bb679dac..ceb0afe8a 100644
+--- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
++++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+@@ -72,8 +72,11 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeMOSZeroPageAllocPass(PR);
+ }
+ 
++// p2:32:8 — addrspace 2 ("far"): 32-bit pointer (only the low 24 bits are emitted as
++// 65816 absolute-long; LLVM requires a power-of-two pointer size, so 32 not 24). Inert
++// for 6502 — nothing creates addrspace-2 pointers unless built for the 65816. #320.
+ static const char *MOSDataLayout =
+-    "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
++    "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
+ 
+ /// Processes a CPU name.
+ static StringRef getCPU(StringRef CPU) {
+diff --git a/llvm/lib/TargetParser/TargetDataLayout.cpp b/llvm/lib/TargetParser/TargetDataLayout.cpp
+index 8837d2f91..1d9acf78c 100644
+--- a/llvm/lib/TargetParser/TargetDataLayout.cpp
++++ b/llvm/lib/TargetParser/TargetDataLayout.cpp
+@@ -579,7 +579,9 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {
+   case Triple::mips64el:
+     return computeMipsDataLayout(*this, ABIName);
+   case Triple::mos:
+-    return "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
++    // p2:32:8 = addrspace 2 "far" (32-bit ptr, low 24 bits → 65816 absolute-long). #320.
++    // Must stay identical to MOSTargetMachine.cpp and clang Targets/MOS.cpp.
++    return "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
+   case Triple::msp430:
+     return "e-m:e-p:16:16-i32:16-i64:16-f32:16-f64:16-a:8-n8:16-S16";
+   case Triple::ppc:

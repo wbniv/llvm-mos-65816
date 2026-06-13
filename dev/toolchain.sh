@@ -35,8 +35,17 @@ export PATH="/usr/bin:$PATH"
 echo "==> clone llvm-mos (shallow main) into vendor/ (gitignored)"
 if [ ! -d "$SRC/.git" ]; then
   git clone --depth 1 https://github.com/llvm-mos/llvm-mos.git "$SRC"
+  # Apply our tracked backend patches (#320 far-pointer codegen, …) to the fresh clone.
+  # These ARE the eventual upstream PR diffs — kept in-repo so a clean build reproduces
+  # our compiler. Applied only on a fresh clone; during dev you edit vendor/llvm-mos
+  # directly and regenerate the patch (see patches/llvm-mos/README or the commit log).
+  for p in "$ROOT"/patches/llvm-mos/*.patch; do
+    [ -e "$p" ] || continue
+    echo "    applying patch $(basename "$p")"
+    git -C "$SRC" apply "$p"
+  done
 fi
-echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')"
+echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 
 # Trim the upstream MOS distribution to just clang + lld + the mos builtins. The
 # stock cache also builds clang-tools-extra (clangd, clang-tidy, include-fixer, …) —
