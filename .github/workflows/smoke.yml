@@ -12,6 +12,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:   # manual re-run (e.g. after setting the BIOS secret)
 
 concurrency:
   group: smoke-${{ github.ref }}
