@@ -56,11 +56,26 @@ dev/run.sh compile    # fast recompile after editing the linker script / headers
 dev/run.sh smoke      # boot build/hello.sfc headless in MAME, assert it ran (quick)
 dev/run.sh corpus     # run the regression corpus: assert every program vs expected.tsv
 dev/run.sh repro      # clean-room: export HEAD, build + corpus from scratch (no local state)
+dev/run.sh toolchain  # build llvm-mos (clang/lld) FROM SOURCE -> build/llvm-mos-install (for M1 codegen)
 ```
 
 The first `build` clones upstream `llvm-mos-sdk` into `vendor/` and compiles the
 SDK against the pinned llvm-mos toolchain baked into the image (~1–2 min), then builds
 every `examples/snes/**/*.c` to its own `.sfc`.
+
+By default the bench uses a **prebuilt** llvm-mos toolchain (immutable). Codegen work
+(M1+) needs the compiler built from source: `dev/run.sh toolchain` clones llvm-mos and
+builds a lean `clang`+`lld` (dropping `clang-tools-extra`; ~26 min cold) into
+`build/llvm-mos-install`. Point the bench at it with `MOS_TOOLCHAIN`:
+
+```sh
+MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build && dev/run.sh corpus
+```
+
+The self-built compiler is byte-equivalent to the prebuilt, so the corpus stays 7/7 —
+that's the green baseline every codegen change is measured against. `build.sh` wipes the
+SDK build tree automatically when the toolchain changes. See
+[the M1 Phase 0 plan](docs/plans/2026-06-14-m1-from-source-toolchain.md).
 
 `smoke` boots `hello.sfc` in MAME's `snes` driver (the same emulation core drdevtools'
 `drmon` debugs against) and asserts the `sentinel == 0x42` byte in WRAM — the fast

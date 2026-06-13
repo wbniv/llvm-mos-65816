@@ -1,6 +1,8 @@
 # M1 Phase 0 — from-source llvm-mos toolchain + green baseline
 
-**Date:** 2026-06-14 · **Status:** Planned · **Milestone:** M1 prerequisite (gates ROADMAP steps 3–4).
+**Date:** 2026-06-14 · **Status:** Done (2026-06-14) — lean (clang+lld) from-source toolchain builds
+in 26.1 min; corpus 7/7 on the self-built compiler; prebuilt↔self-built switching wired.
+· **Milestone:** M1 prerequisite (gates ROADMAP steps 3–4).
 **Builds on:** M0 bench — [smoke loop](2026-06-14-emulator-smoke-loop.md),
 [regression corpus](2026-06-14-m0-regression-corpus-5-self-contained-c-programs.md).
 
@@ -90,15 +92,37 @@ baseline; not required for the value check, but tidy — note it.)
 
 ## Verification
 
-1. **Toolchain builds from source** — `dev/run.sh toolchain` then
-   `build/llvm-mos-install/bin/mos-clang --version` prints a clang version. (Evidence: version string,
-   commit, "built from source".)
-2. **Baseline parity (the deliverable)** — `MOS_TOOLCHAIN=…install/bin dev/run.sh build && … corpus`
-   → `corpus: 7/7 passed`, identical expected values to the prebuilt run. (Evidence: corpus table.)
-3. **Default path unchanged** — plain `dev/run.sh corpus` (prebuilt) still 7/7; `dev/run.sh repro`
-   still green. (Evidence: corpus table + `repro OK`.)
-4. **Incremental rebuild** — editing one backend file triggers a relink, not a full rebuild.
-   (Evidence: ninja build log shows a handful of recompiles.)
+1. **Toolchain builds from source** — `dev/run.sh toolchain` →
+   `build/llvm-mos-install/bin/mos-clang --version` prints a clang version.
+   **PASS** (2026-06-14): `clang version 23.0.0git (…/llvm-mos c798c31)`, `Target: mos`, 603 MB install.
+   (Shallow `main` landed on `c798c31` — the same commit as the prebuilt, so an exact baseline.)
+2. **Baseline parity (the deliverable)** — `MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build
+   && … corpus` → `7/7`, identical expected values to the prebuilt run.
+   **PASS** (2026-06-14): wipe fired (`toolchain changed /opt/llvm-mos -> …llvm-mos-install`), then
+   `corpus: 7/7 passed` (arith 0xA9E9 · control 0x1DFB · arrays 0x03E1 · structs 0x0340 · funcs 0x011E
+   · globals 0xAB55 · hello 0x42) — byte-identical to the prebuilt.
+3. **Default path unchanged + round-trips** — plain `dev/run.sh build && corpus` (prebuilt) still 7/7.
+   **PASS** (2026-06-14): switching back (`…llvm-mos-install -> /opt/llvm-mos`) wiped + rebuilt, 7/7.
+4. **Incremental rebuild** — editing a backend file relinks (not a full rebuild). *Not separately
+   timed yet*; ccache + the persistent `build/llvm-mos` tree make this the expected behaviour and it's
+   exercised the first time #320 codegen edits land.
+
+## Key findings (2026-06-14)
+
+- **Lean build (your call): drop `clang-tools-extra`.** The stock `MOS.cmake` builds clangd/clang-tidy/
+  include-fixer/etc. — heavy and irrelevant to codegen. Trimming `LLVM_ENABLE_PROJECTS` to `clang;lld`
+  (+ the matching distribution components) cut the **cold** build from **39.2 min → 26.1 min (~33%)**
+  for only ~15% fewer ninja edges (4821 → 4083): the dropped targets (clangd above all) are the
+  heaviest TUs and slowest serial links. `dev/toolchain.sh` applies this as an idempotent `sed` patch
+  to the (gitignored, disposable) vendored cache.
+- **The self-built toolchain is byte-equivalent to the prebuilt.** Identical `libclang_rt.builtins.a`
+  for `mos-unknown-unknown`; both fail a bare `mos-clang t.c -o t` the same way (mos has no default
+  platform — crt0/libc/link.ld come from the SDK, not the compiler). So baseline parity is real, and
+  swapping in self-built changes nothing but the bytes of the compiler we can now edit.
+- **Why the first baseline failed (and the fix).** CMake can't change the cross-compiler on an
+  already-configured build tree — it re-runs the compiler check and bails. `dev/build.sh` now records
+  the toolchain in `build/.mos-toolchain` and wipes only the SDK build artifacts (never the llvm-mos
+  build/install/ccache) when it changes. Verified both directions (prebuilt↔self-built).
 
 ## Risks
 

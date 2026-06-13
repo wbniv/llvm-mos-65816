@@ -29,5 +29,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       mame \
     && rm -rf /var/lib/apt/lists/*
 
+# Host toolchain for building llvm-mos FROM SOURCE (M1 codegen work; see
+# docs/plans/2026-06-14-m1-from-source-toolchain.md). clang+lld keep peak link
+# memory well below gcc/ld — the 14 GiB host is the binding constraint when linking
+# the clang binary; ccache makes incremental backend rebuilds cheap; zlib is an
+# optional LLVM dep we provide to avoid a mid-build configure surprise. Own layer
+# (after the toolchain + mame) so it never re-triggers those.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      clang lld ccache zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV PATH=/opt/llvm-mos/bin:/usr/games:$PATH
 WORKDIR /work

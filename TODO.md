@@ -19,11 +19,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [wip] **Phase 0 — from-source llvm-mos toolchain + green baseline.** The bench uses a prebuilt,
-  immutable toolchain; codegen work needs llvm-mos built from source. Stand up `dev/run.sh toolchain`
-  (clone + `MOS.cmake` Release build, RAM-tuned), make the bench toolchain selectable (`MOS_TOOLCHAIN`),
-  prove the corpus stays 7/7 on the self-built compiler. Non-design-gated prerequisite for all of M1.
-  [plan](docs/plans/2026-06-14-m1-from-source-toolchain.md).
 - [ ] **#320 — 24-bit address space / far pointers**, registers stay 8-bit. Five-address-space
   data layout; default 32-bit pointer, 24-bit packed as a size option; near/far calls (JSR/JSL).
   Deliverable: a working multi-bank unoptimized 65816 C compiler. ROADMAP steps 3–4. Upstream-gated
@@ -58,6 +53,11 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [m1-phase0-toolchain] llvm-mos built FROM SOURCE in the dev container
+  (`dev/run.sh toolchain`), lean (clang+lld, dropped clang-tools-extra → 39.2→26.1 min cold). Bench
+  toolchain selectable via `MOS_TOOLCHAIN`; `build.sh` wipes the SDK tree on toolchain change. Corpus
+  7/7 on the self-built compiler (byte-equiv to prebuilt). M1 codegen prerequisite.
+  [plan](docs/plans/2026-06-14-m1-from-source-toolchain.md).
 - 2026-06-14 — [regression-corpus] 6 self-contained C programs (`examples/snes/corpus/`) exercising
   ALU / control flow / arrays+.rodata / structs+pointers / calls+recursion / crt0 init; host-checked
   vs `expected.tsv`. `dev/run.sh corpus` 7/7 PASS, negative control + clean-room `repro` green.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -23,10 +23,13 @@ Targets:
              (needs the SPC700 IPL at dev/roms/s_smp/spc700.rom)
   corpus     run the regression corpus headless in MAME: assert each program in
              examples/snes/corpus/ against examples/snes/corpus/expected.tsv
+  toolchain  build llvm-mos (clang/lld) FROM SOURCE -> build/llvm-mos-install
+             (for M1 codegen; long first build — see dev/toolchain.sh)
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).
-Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH.
+Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH,
+MOS_TOOLCHAIN (toolchain install prefix to build the bench with), BUILD_JOBS.
 USAGE
   exit 0
 fi
@@ -48,4 +51,6 @@ exec docker run --rm \
   ${SMOKE_WANT:+-e SMOKE_WANT} \
   ${SMOKE_SETTLE:+-e SMOKE_SETTLE} \
   ${SNES_ROMPATH:+-e SNES_ROMPATH} \
+  ${MOS_TOOLCHAIN:+-e MOS_TOOLCHAIN} \
+  ${BUILD_JOBS:+-e BUILD_JOBS} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh"
