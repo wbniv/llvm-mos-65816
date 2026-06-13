@@ -1,3 +1,6 @@
+# Python bytecode cache (e.g. from tools/snes-checksum.py).
+__pycache__/
+*.pyc
 # Upstream SDK, cloned at build time by dev/build.sh.
 /vendor/
 # Build output: SDK build tree, install prefix, ROMs, maps.

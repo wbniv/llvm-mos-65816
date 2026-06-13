@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -33,6 +33,10 @@ Targets:
              into a bootable .sfc, boot headless in MAME, and assert the byte
              produced by a far LOAD and written by a far STORE reads back == 0xF3
              (needs `toolchain` + `build` on the from-source toolchain first)
+  far-bank1  #320 Increment 2b: build examples/65816/far-bank1.c against the
+             snes-far 64 KiB platform (banks $00+$01), assert the far global lands
+             in bank $01 ($018xxx), boot in MAME, and check the cross-bank far read
+             round-trips == 0xF3 (needs `toolchain` + `build` first)
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

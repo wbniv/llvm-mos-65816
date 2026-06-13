@@ -19,10 +19,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [ ] **#320 Increment 2b — multi-bank ROM far-read (emulation mode).** A >32 KiB LoROM placing far
-  rodata in bank $01; prove a far read crosses a real ROM bank boundary (header ROM-size byte, LoROM
-  bank mapping, checksum over the larger image). Completes ROADMAP step 3's "≥2 banks". Still no native
-  mode. Builds on Increment 2.
 - [ ] **#320 full model + upstream.** Five-address-space layout (asiekierka's 32-bit-default, packed
   24-bit, zero-bank, abs-16) after maintainer ABI blessing; open the PR. Upstream-gated — coordinate
   on the llvm-mos Discord (@asiekierka/@mysterymath) with the running slice in hand.
@@ -58,6 +54,13 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [320-increment-2b-multi-bank-far-read] far read now **crosses a real ROM bank
+  boundary**: a 64 KiB LoROM (`snes-far` child platform, banks $00+$01) places a far global in bank
+  $01 ($018000), far-read via `lda $018000` (`af 00 80 01`); the cross-bank result round-trips in MAME
+  (`SMOKE: PASS got=0xF3`). No codegen/native-mode change (section attr + linker rule; `snes-checksum.py`
+  now owns the ROM-size byte). New `dev/run.sh far-bank1` + `examples/65816/far-bank1.c`; 5/5 PASS,
+  default snes platform untouched (corpus 7/7, far-run PASS). Completes ROADMAP step 3.
+  [plan](docs/plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md).
 - 2026-06-14 — [320-increment-2-far-emulator-run] far-pointer codegen now **executes in MAME**: a
   `-mcpu=mosw65816` program far-LOADs a ROM constant and far-STOREs the result to WRAM; the byte
   reads back `0xF3` (`SMOKE: PASS`) on the existing single-bank emulation-mode crt0. Finding:

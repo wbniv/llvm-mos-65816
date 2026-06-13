@@ -168,11 +168,20 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    8-bit-register codegen still passes the full M0 corpus (no regression). (Evidence: program output
    + corpus green.)
 
-   _Delivered in two increments (absolute-long carries the full 24-bit address and ignores the DBR, so
-   far accesses run in plain **emulation mode** — no native-mode crt0 needed; that's an M2/#321
-   concern): **Increment 2** — a single-bank far load+store round-trip executes in MAME (the execution
-   half); **Increment 2b** — a >32 KiB ROM proves a far read crosses a real bank boundary (the "≥2
-   banks" half). Second emulator (bsnes-jg/Mesen2) cross-check follows once correctness depends on it._
+   **PASS** (2026-06-14, single emulator) — delivered in two increments (absolute-long carries the full
+   24-bit address and ignores the DBR, so far accesses run in plain **emulation mode** — no native-mode
+   crt0 needed; that's an M2/#321 concern): **Increment 2** — a single-bank far load+store round-trip
+   executes in MAME (`SMOKE: PASS got=0xF3`); **Increment 2b** — a 64 KiB LoROM (`snes-far` platform)
+   places a far global in bank $01 and `lda $018000` (`af 00 80 01`) reads it across the bank boundary,
+   round-tripping correctly in MAME. `dev/run.sh far-run` + `far-bank1`; 6502 corpus still 7/7.
+   ```
+   far-run  (bank $00)  SMOKE: PASS got=0xF3      far-bank1 (bank $01)  SMOKE: PASS got=0xF3
+   far_src @ $018000   linked far load: af 00 80 01 (lda $018000)   corpus 7/7
+   ```
+   _Remaining for the full gate: the second-emulator (bsnes-jg/Mesen2) cross-check, once codegen
+   correctness depends on it._
+   [Inc 2 plan](plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md) ·
+   [Inc 2b plan](plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md).
 
 4. **M1 — address-space model honored.** Spot-check disassembly: near calls emit `JSR`, far calls
    emit `JSL`; direct-page vs absolute vs long accesses match the addrspace of the pointer.
