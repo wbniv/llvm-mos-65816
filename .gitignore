@@ -1,0 +1,4 @@
+# Upstream SDK, cloned at build time by dev/build.sh.
+/vendor/
+# Build output: SDK build tree, install prefix, ROMs, maps.
+/build/
