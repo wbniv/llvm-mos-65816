@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -29,6 +29,10 @@ Targets:
              from-source toolchain and assert (at the disassembly level) that a
              far (addrspace 2) access lowers to 65816 absolute-long (LDA/STA
              $xxxxxx) while a near access stays 16-bit (needs `toolchain` first)
+  far-run    #320 Increment 2: build examples/65816/far-run.c with -mcpu=mosw65816
+             into a bootable .sfc, boot headless in MAME, and assert the byte
+             produced by a far LOAD and written by a far STORE reads back == 0xF3
+             (needs `toolchain` + `build` on the from-source toolchain first)
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

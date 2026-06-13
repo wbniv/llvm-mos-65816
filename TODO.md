@@ -19,8 +19,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [ ] **#320 Increment 2 — emulator end-to-end far pointers.** 65816 native-mode crt0 (XCE/DBR/reg
-  widths) + multi-bank ROM; a far-pointer corpus program boots and runs correctly in MAME. ROADMAP step 3.
+- [ ] **#320 Increment 2b — multi-bank ROM far-read (emulation mode).** A >32 KiB LoROM placing far
+  rodata in bank $01; prove a far read crosses a real ROM bank boundary (header ROM-size byte, LoROM
+  bank mapping, checksum over the larger image). Completes ROADMAP step 3's "≥2 banks". Still no native
+  mode. Builds on Increment 2.
 - [ ] **#320 full model + upstream.** Five-address-space layout (asiekierka's 32-bit-default, packed
   24-bit, zero-bank, abs-16) after maintainer ABI blessing; open the PR. Upstream-gated — coordinate
   on the llvm-mos Discord (@asiekierka/@mysterymath) with the running slice in hand.
@@ -30,7 +32,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 ### M2 — Optimizing Payoff
 
 - [ ] **#321 stage 1 — 16-bit accumulator + REP/SEP** late-stage insertion; X/Y 16-bit (xy16).
-  Then hardware-stack ABI + calling convention. ROADMAP step 5.
+  Includes **native-mode crt0** (XCE + native vectors + DBR) — the prerequisite for 16-bit registers,
+  moved here from #320 Increment 2 (far pointers don't need it; see Increment 2 note). Then
+  hardware-stack ABI + calling convention. ROADMAP step 5.
 - [ ] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
   with correct line/variable mapping. ROADMAP step 6; drdevtools `mame-65816-gdbstub` pre-wires it.
 
@@ -54,6 +58,13 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [320-increment-2-far-emulator-run] far-pointer codegen now **executes in MAME**: a
+  `-mcpu=mosw65816` program far-LOADs a ROM constant and far-STOREs the result to WRAM; the byte
+  reads back `0xF3` (`SMOKE: PASS`) on the existing single-bank emulation-mode crt0. Finding:
+  absolute-long ignores the DBR → no native mode needed (XCE/DBR/16-bit regs re-scoped to M2/#321);
+  multi-bank far-read split to Increment 2b. New `dev/run.sh far-run` + `examples/65816/far-run.c`;
+  5/5 verification steps PASS, corpus still 7/7. ROADMAP step 3 (execution half).
+  [plan](docs/plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md).
 - 2026-06-14 — [320-increment-1-far-codegen] far (addrspace 2) load/store now lowers to 65816
   absolute-long (`LDA/STA $xxxxxx`, AF/8F, 4-byte incl. bank), gated on `W65816`; near stays 16-bit,
   far global → `R_MOS_ADDR24`. GISel `G_LOAD/STORE_FAR_ABS` → `LDAbsLong/STAbsLong` MC wrappers.

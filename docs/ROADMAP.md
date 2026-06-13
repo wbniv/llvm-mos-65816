@@ -168,6 +168,12 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    8-bit-register codegen still passes the full M0 corpus (no regression). (Evidence: program output
    + corpus green.)
 
+   _Delivered in two increments (absolute-long carries the full 24-bit address and ignores the DBR, so
+   far accesses run in plain **emulation mode** — no native-mode crt0 needed; that's an M2/#321
+   concern): **Increment 2** — a single-bank far load+store round-trip executes in MAME (the execution
+   half); **Increment 2b** — a >32 KiB ROM proves a far read crosses a real bank boundary (the "≥2
+   banks" half). Second emulator (bsnes-jg/Mesen2) cross-check follows once correctness depends on it._
+
 4. **M1 — address-space model honored.** Spot-check disassembly: near calls emit `JSR`, far calls
    emit `JSL`; direct-page vs absolute vs long accesses match the addrspace of the pointer.
    (Evidence: `llvm-objdump` excerpt.)
