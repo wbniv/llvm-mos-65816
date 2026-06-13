@@ -4,8 +4,8 @@
 # Proves the bench rebuilds from a fresh checkout with NO local machine state. It
 # exports the committed HEAD into a temp dir (so build/, vendor/, dev/roms/, and any
 # uncommitted edits are excluded), supplies the gitignored SPC700 IPL, then runs the
-# full build + smoke from there. This catches "works on my machine" drift that
-# `dev/run.sh smoke` can hide — that reuses your existing build/ artifacts and Docker
+# full build + corpus from there. This catches "works on my machine" drift that
+# `dev/run.sh corpus` can hide — that reuses your existing build/ artifacts and Docker
 # image cache, this does not. It's the local stand-in for CI; the GitHub workflow is
 # parked at manual-only until the repo goes public/upstream.
 #
@@ -39,7 +39,7 @@ cp "$BIOS_SRC" "$WORK/dev/roms/s_smp/spc700.rom"
 echo "==> build from the clean checkout (vendors llvm-mos-sdk fresh)"
 "$WORK/dev/run.sh" build
 
-echo "==> smoke from the clean checkout"
-"$WORK/dev/run.sh" smoke
+echo "==> corpus from the clean checkout"
+"$WORK/dev/run.sh" corpus
 
-echo "==> repro OK — bench rebuilt + smoked from a clean HEAD checkout, no local state"
+echo "==> repro OK — bench rebuilt + corpus green from a clean HEAD checkout, no local state"

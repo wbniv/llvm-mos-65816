@@ -32,8 +32,16 @@ cmake -S "$VENDOR" -B "$BUILD" -G Ninja \
 cmake --build "$BUILD"
 cmake --install "$BUILD"
 
-echo "==> build + checksum the M0 smoke ROM"
-/opt/llvm-mos/bin/mos-clang --config "$INSTALL/bin/mos-snes.cfg" \
-  -Os -Wl,-Map="$BUILD/hello.map" -o "$BUILD/hello.sfc" "$ROOT/examples/snes/hello.c"
-python3 "$ROOT/tools/snes-checksum.py" "$BUILD/hello.sfc"
-ls -l "$BUILD/hello.sfc"
+echo "==> build + checksum every SNES program (examples/snes/**/*.c)"
+shopt -s globstar nullglob
+count=0
+for src in "$ROOT"/examples/snes/**/*.c; do
+  name="$(basename "$src" .c)"
+  rom="$BUILD/$name.sfc"
+  /opt/llvm-mos/bin/mos-clang --config "$INSTALL/bin/mos-snes.cfg" \
+    -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src"
+  python3 "$ROOT/tools/snes-checksum.py" "$rom"
+  printf '    %-14s %6s bytes\n' "$name" "$(stat -c%s "$rom")"
+  count=$((count + 1))
+done
+echo "==> built $count program(s)"

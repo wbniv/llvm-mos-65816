@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/025be2f) | M0: add clean-room repro gate; park CI to manual-only |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/18189b6) | docs: record M0 emulator-run PASS (MAME smoke) in ROADMAP + README |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/982b6f3) | M0: implement headless MAME smoke loop (dev/run.sh smoke) |
 | [2026-06-13](https://github.com/wbniv/llvm-mos-65816/commit/2fb154f) | Initial commit: llvm-mos 65816 effort + SNES platform (M0) |
 
 <!--history-meta v1
+025be2f	author	Will Norris
+025be2f	added	8
+025be2f	deleted	1
+025be2f	files	1
+025be2f	body	For a solo private repo, the routine reproducibility gate is local, not\nGitHub minutes + a per-push ROM upload. CI's unique value (from-scratch\nreproducibility) isn't GitHub-specific — it's "fresh checkout, no machine\nstate", which a local script delivers.\n\n- dev/repro.sh (host-side): git archive HEAD -> temp dir (committed files\n  only, no build/ or caches), supply the gitignored SPC700 IPL, then\n  run.sh build + run.sh smoke there. Proven green: "repro OK".\n- dev/run.sh: route `repro` host-side (not an in-container target).\n- .github/workflows/smoke.yml: triggers -> workflow_dispatch only. Proven\n  green once on a clean GH runner (run 27475012894, smoke step executed\n  with BIOS from secret); re-enable push/pull_request when public/upstream\n  or collaborators arrive.\n- README/plan: document repro + the manual-CI decision. Plan verification\n  step 5 (reproducible from clean checkout) -> PASS (both CI + local).\n- TODO: smoke loop -> Done (all 5 steps green); section structure refresh.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 18189b6	author	Will Norris
 18189b6	added	4
 18189b6	deleted	1

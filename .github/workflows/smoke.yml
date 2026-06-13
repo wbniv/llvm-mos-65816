@@ -50,8 +50,9 @@ jobs:
             echo "::warning::SNES_SPC700_ROM_B64 secret not set — skipping the MAME smoke step (build still validated)."
           fi
 
-      # Boots build/hello.sfc in MAME's snes driver headless and asserts
-      # sentinel == 0x42 in WRAM (dev/smoke.sh greps the Lua's SMOKE: line).
-      - name: Smoke — boot in MAME, assert sentinel
+      # Runs the regression corpus in MAME headless: asserts each program in
+      # examples/snes/corpus/ against examples/snes/corpus/expected.tsv (includes
+      # the hello liveness row, so this subsumes the old smoke step).
+      - name: Corpus — boot each program in MAME, assert results
         if: steps.bios.outputs.has_bios == 'true'
-        run: dev/run.sh smoke
+        run: dev/run.sh corpus

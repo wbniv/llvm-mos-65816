@@ -15,9 +15,7 @@ Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TOD
 
 ### M0 — Test Bench
 
-- [ ] **Regression corpus (≥5 programs).** Small C programs with known-correct output, green via
-  `dev/run.sh repro` (clean-room) and the manual `snes-smoke` CI. ROADMAP step 2. Builds on the
-  smoke harness above.
+_M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
@@ -54,6 +52,10 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [regression-corpus] 6 self-contained C programs (`examples/snes/corpus/`) exercising
+  ALU / control flow / arrays+.rodata / structs+pointers / calls+recursion / crt0 init; host-checked
+  vs `expected.tsv`. `dev/run.sh corpus` 7/7 PASS, negative control + clean-room `repro` green.
+  ROADMAP step 2. [plan](docs/plans/2026-06-14-m0-regression-corpus-5-self-contained-c-programs.md).
 - 2026-06-14 — [emulator-smoke-loop] `dev/run.sh smoke` boots hello.sfc headless in MAME's `snes`
   driver, asserts `sentinel==0x42` in WRAM. Negative control + clean-room `dev/run.sh repro` +
   manual GitHub CI (run 27475012894) all green. Closes ROADMAP step 1 (run-half).

@@ -147,8 +147,19 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    C-written `sentinel` reads back `0x42` from WRAM in MAME. The only piece left to fully close
    step 1 is the same run going green in CI (needs the BIOS secret).
 
-2. **M0 — bench reproducible.** The regression corpus (≥5 programs) builds and runs green in CI from
-   a clean checkout. (Evidence: CI run.)
+2. **M0 — bench reproducible.** The regression corpus (≥5 programs) builds and runs green from a
+   clean checkout. (Evidence: corpus run + clean-room `repro`.)
+
+   **PASS** (2026-06-14) — 6 self-contained C programs (`examples/snes/corpus/`), each computing a
+   result the host checks against `expected.tsv`; exercises ALU, control flow, arrays/`.rodata`,
+   structs/pointers, calls/recursion, and the crt0 `.data`/`.bss` init. `dev/run.sh corpus` → **7/7
+   passed** (incl. the `hello` liveness row); negative control (corrupt one expected) → that row
+   FAILs, exit 1; clean-room `dev/run.sh repro` green from committed `HEAD`. Harness + design:
+   [corpus plan](plans/2026-06-14-m0-regression-corpus-5-self-contained-c-programs.md).
+   ```
+   hello   PASS sentinel=0x42   arith PASS 0xA9E9   control PASS 0x1DFB   arrays PASS 0x03E1
+   structs PASS 0x0340          funcs PASS 0x011E   globals PASS 0xAB55   => corpus: 7/7 passed
+   ```
 
 3. **M1 — far pointers work.** A C program that reads/writes data across ≥2 banks (far pointer
    dereference, a `>64 KB` data table) compiles and produces correct output in both emulators.

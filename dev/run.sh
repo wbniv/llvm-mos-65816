@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|repro]  (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -21,9 +21,12 @@ Targets:
   validate   structural validation of build/hello.sfc (reset path, checksum)
   smoke      boot build/hello.sfc headless in MAME, assert sentinel==0x42
              (needs the SPC700 IPL at dev/roms/s_smp/spc700.rom)
-  repro      clean-room: fresh checkout, then build + smoke in it (host-side)
+  corpus     run the regression corpus headless in MAME: assert each program in
+             examples/snes/corpus/ against examples/snes/corpus/expected.tsv
+  repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).
+Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH.
 USAGE
   exit 0
 fi
@@ -36,8 +39,13 @@ fi
 
 docker build -t "$IMAGE" "$HERE" >/dev/null
 mkdir -p "$ROOT/build"
+# Forward the optional knobs into the container when set (name-only -e reads the
+# value from this script's environment — safe under `set -u` via :+).
 exec docker run --rm \
   -v "$ROOT":/work \
   --user "$(id -u):$(id -g)" \
   -e HOME=/work/build \
+  ${SMOKE_WANT:+-e SMOKE_WANT} \
+  ${SMOKE_SETTLE:+-e SMOKE_SETTLE} \
+  ${SNES_ROMPATH:+-e SNES_ROMPATH} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh"

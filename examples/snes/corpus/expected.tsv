@@ -1,0 +1,14 @@
+# M0 regression corpus manifest. One row per program; columns are whitespace-separated,
+# the description is the rest of the line. dev/corpus.sh asserts each program's result
+# symbol (read from build/<name>.map at the size the map records) against `expected`.
+# Add a program: drop a .c in examples/snes/corpus/ that writes `corpus_result`, build,
+# run it, and record the value here with its derivation commented in the source.
+#
+# cfile             symbol         expected  description
+hello.c             sentinel       0x42      liveness: main runs (the smoke ROM)
+corpus/arith.c      corpus_result  0xA9E9    8/16/32-bit integer ALU
+corpus/control.c    corpus_result  0x1DFB    loops / if / switch
+corpus/arrays.c     corpus_result  0x03E1    arrays + .rodata lookup table
+corpus/structs.c    corpus_result  0x0340    struct layout + pointer deref
+corpus/funcs.c      corpus_result  0x011E    calls + recursion (soft stack)
+corpus/globals.c    corpus_result  0xAB55    crt0 .data copy + .bss clear

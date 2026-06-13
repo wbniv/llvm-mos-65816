@@ -53,21 +53,31 @@ Everything runs in a throwaway container; nothing is installed on the host.
 dev/run.sh build      # vendor the SDK, build it + our platform, build the smoke ROM
 dev/run.sh validate   # structural checks on build/hello.sfc
 dev/run.sh compile    # fast recompile after editing the linker script / headers
-dev/run.sh smoke      # boot build/hello.sfc headless in MAME, assert it ran
-dev/run.sh repro      # clean-room: export HEAD, build + smoke from scratch (no local state)
+dev/run.sh smoke      # boot build/hello.sfc headless in MAME, assert it ran (quick)
+dev/run.sh corpus     # run the regression corpus: assert every program vs expected.tsv
+dev/run.sh repro      # clean-room: export HEAD, build + corpus from scratch (no local state)
 ```
 
 The first `build` clones upstream `llvm-mos-sdk` into `vendor/` and compiles the
-SDK against the pinned llvm-mos toolchain baked into the image (~1–2 min).
+SDK against the pinned llvm-mos toolchain baked into the image (~1–2 min), then builds
+every `examples/snes/**/*.c` to its own `.sfc`.
 
-`smoke` boots the ROM in MAME's `snes` driver (the same emulation core drdevtools'
-`drmon` debugs against) and asserts the `sentinel == 0x42` byte in WRAM — closing the
-"it actually runs" half of the M0 acceptance test, headless. See
-[docs/plans/2026-06-14-emulator-smoke-loop.md](docs/plans/2026-06-14-emulator-smoke-loop.md).
+`smoke` boots `hello.sfc` in MAME's `snes` driver (the same emulation core drdevtools'
+`drmon` debugs against) and asserts the `sentinel == 0x42` byte in WRAM — the fast
+liveness check. `corpus` is the **correctness baseline**: each program in
+`examples/snes/corpus/` computes a result that the host checks against
+`examples/snes/corpus/expected.tsv`, exercising a distinct slice of codegen (ALU,
+control flow, arrays/`.rodata`, structs/pointers, calls/recursion, crt0 init). It is
+the regression net for when M1/M2 change codegen — same source must keep producing the
+same bytes. *Add a program:* drop a `.c` in `corpus/` that writes `volatile uint16_t
+corpus_result`, run `build`, then record its value (and how you derived it) in
+`expected.tsv`. See
+[docs/plans/2026-06-14-emulator-smoke-loop.md](docs/plans/2026-06-14-emulator-smoke-loop.md)
+and [the corpus plan](docs/plans/2026-06-14-m0-regression-corpus-5-self-contained-c-programs.md).
 
 `repro` is the reproducibility gate: it exports the committed `HEAD` to a temp dir
 (no `build/`, no caches, no uncommitted edits), supplies the BIOS, and runs the full
-build + smoke there — proving the bench rebuilds from the repo alone. The same check
+build + corpus there — proving the bench rebuilds from the repo alone. The same check
 exists as a manual-only GitHub Actions workflow (`snes-smoke`, `workflow_dispatch`),
 parked until the repo goes public / the upstream PR is cut.
 
