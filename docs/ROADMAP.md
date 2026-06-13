@@ -51,8 +51,12 @@ Stand up the infrastructure every later milestone needs, using the *existing* 65
   headerless `.sfc`. **Structural verification PASS**: reset `$FFFC`→`_start` (`$8000`); boot path
   disassembles byte-exact to the crt0; `main()` compiled + placed (`$8036`); header well-formed;
   checksum `0x3986 + 0xC679 = 0xFFFF`. (See verification step 1 evidence below.)
-- **TODO — emulator smoke loop:** a bank-0 C "hello world" **boots and runs in Mesen/bsnes**, driven
-  headless from CI. Needs an emulator added to the dev container (next sub-step).
+- **TODO — emulator smoke loop:** a bank-0 C "hello world" **boots and runs in MAME's `snes`
+  driver**, headless, with a programmatic assert (`sentinel == 0x42` in WRAM), driven from
+  `dev/run.sh smoke` and CI. MAME is the chosen core so the CI bench matches drdevtools `drmon`'s
+  emulation backend (green-in-CI == attachable-in-drmon); a bsnes-jg/Mesen2 cross-check is deferred
+  to M1 when codegen fidelity matters. See
+  [plan](plans/2026-06-14-emulator-smoke-loop.md). Needs `mame` added to the dev container.
 - **TODO — regression corpus:** a handful of small C programs with known-correct output.
 
 Build is fully containerized (host stays clean) — Dockerfile + `build.sh`/`compile.sh`/`validate.sh`
@@ -108,8 +112,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
 (build log, emulator screenshot/value dump) under each step as it's met, mark PASS/FAIL.
 
 1. **M0 — target boots.** `mos-snes-clang hello.c -o hello.sfc` produces a valid ROM; the ROM boots
-   in Mesen **and** bsnes and produces the known-correct output (value/tilemap). CI runs the smoke
-   headless. (Evidence: build log + emulator dump.)
+   in **MAME's `snes` driver** (drmon's emulation core) and produces the known-correct output
+   (`sentinel == 0x42` in WRAM). CI runs the smoke headless. A bsnes-jg/Mesen2 cross-check is added
+   at M1. (Evidence: build log + emulator value dump.)
 
    **Build + structural half: PASS** (2026-06-13). Emulator-run half: pending (needs an emulator in
    the container). Raw evidence:
