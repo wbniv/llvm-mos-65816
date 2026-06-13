@@ -1,0 +1,45 @@
+version: '3'
+
+# Shared cross-project tasks (md, shot, pr-preview, memory-viz, …) from the
+# python-tui-lib library. flatten: true exposes them at top level so
+# `task md -- TODO.md` works; optional: true keeps `task` usable if the
+# sibling repo isn't checked out next to this one.
+includes:
+  shared:
+    taskfile: ../python-tui-lib/Taskfile.shared.yml
+    optional: true
+    flatten: true
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  # --- Dev image / build pipeline (thin wrappers over dev/run.sh) ---
+
+  build:
+    desc: "(re)build the dev image, vendor llvm-mos-sdk + platforms/snes, compile examples/snes/hello.c -> build/hello.sfc"
+    cmds:
+      - dev/run.sh build
+
+  compile:
+    desc: "Compile the SNES example inside the dev container (assumes the image is already built)"
+    cmds:
+      - dev/run.sh compile
+
+  validate:
+    desc: "Structural validation of build/hello.sfc (reset->crt0 byte-exact, main() placed, checksum 0xFFFF)"
+    cmds:
+      - dev/run.sh validate
+
+  smoke:
+    desc: "Boot build/hello.sfc headless in MAME's snes driver, assert sentinel==0x42 in WRAM (needs the SPC700 IPL)"
+    cmds:
+      - dev/run.sh smoke
+
+  repro:
+    desc: "Clean-room: fresh checkout, then build + smoke inside it (host-side orchestration)"
+    cmds:
+      - dev/run.sh repro {{.CLI_ARGS}}
