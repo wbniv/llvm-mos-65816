@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -25,6 +25,10 @@ Targets:
              examples/snes/corpus/ against examples/snes/corpus/expected.tsv
   toolchain  build llvm-mos (clang/lld) FROM SOURCE -> build/llvm-mos-install
              (for M1 codegen; long first build — see dev/toolchain.sh)
+  far        #320 Increment 1: compile examples/65816/far-deref.c with the
+             from-source toolchain and assert (at the disassembly level) that a
+             far (addrspace 2) access lowers to 65816 absolute-long (LDA/STA
+             $xxxxxx) while a near access stays 16-bit (needs `toolchain` first)
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

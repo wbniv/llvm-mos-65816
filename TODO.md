@@ -19,11 +19,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [wip] **#320 Increment 1 — far-pointer codegen (24-bit), non-breaking.** Wire GlobalISel to the
-  existing 65816 MC instructions (`LDA/STA AbsoluteLong`) for a new additive addrspace 2 = 24-bit far,
-  gated on `W65816`; 6502 untouched. Verified at disassembly level (ROADMAP step 4). Codegen captured
-  as a tracked patch applied by `dev/toolchain.sh`.
-  [plan](docs/plans/2026-06-14-320-far-pointer-codegen.md).
 - [ ] **#320 Increment 2 — emulator end-to-end far pointers.** 65816 native-mode crt0 (XCE/DBR/reg
   widths) + multi-bank ROM; a far-pointer corpus program boots and runs correctly in MAME. ROADMAP step 3.
 - [ ] **#320 full model + upstream.** Five-address-space layout (asiekierka's 32-bit-default, packed
@@ -59,6 +54,11 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [320-increment-1-far-codegen] far (addrspace 2) load/store now lowers to 65816
+  absolute-long (`LDA/STA $xxxxxx`, AF/8F, 4-byte incl. bank), gated on `W65816`; near stays 16-bit,
+  far global → `R_MOS_ADDR24`. GISel `G_LOAD/STORE_FAR_ABS` → `LDAbsLong/STAbsLong` MC wrappers.
+  `dev/run.sh far` 5/5 PASS + corpus 7/7 on the patched from-source toolchain. ROADMAP step 4.
+  Tracked patch `0001-320-far-addrspace.patch`. [plan](docs/plans/2026-06-14-320-far-pointer-codegen.md).
 - 2026-06-14 — [m1-phase0-toolchain] llvm-mos built FROM SOURCE in the dev container
   (`dev/run.sh toolchain`), lean (clang+lld, dropped clang-tools-extra → 39.2→26.1 min cold). Bench
   toolchain selectable via `MOS_TOOLCHAIN`; `build.sh` wipes the SDK tree on toolchain change. Corpus

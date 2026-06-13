@@ -1,6 +1,7 @@
 # M1 / #320 — Increment 1: far-pointer codegen (32-bit far), non-breaking, disassembly-verified
 
-**Date:** 2026-06-14 · **Status:** In progress — step 1 (far address space) done + verified.
+**Date:** 2026-06-14 · **Status:** Complete — steps 1–4 done; all four verification steps PASS
+(far → absolute-long, near stays 16-bit, far global → R_MOS_ADDR24, corpus 7/7).
 · **Milestone:** M1 (ROADMAP steps 3–4), first real 65816 codegen.
 **Builds on:** [M1 Phase 0](2026-06-14-m1-from-source-toolchain.md) (from-source editable toolchain + corpus).
 
@@ -24,6 +25,15 @@
   toolchain rebuild + `MOS_TOOLCHAIN=…self build && corpus` → **corpus 7/7**: the far address space is
   inert for 6502 codegen. Next: step 2 (legalize the 32-bit far pointer) → step 3 (`case 32` →
   `LDA/STA AbsoluteLong`).
+- **Steps 2–4 done + verified — Increment 1 complete.** Legalizer: `LLT::pointer(2,32)` legal for
+  `G_GLOBAL_VALUE`/`G_LOAD`/`G_STORE`; `selectAddressingMode` `case 32` → new `tryFarAbsoluteAddressing`
+  (matches a constant/global far address, rewrites to the far pseudo, fails loudly on a runtime far
+  pointer — indirect-long `[dp]` is a later increment). New GISel pseudos `G_LOAD_FAR_ABS` /
+  `G_STORE_FAR_ABS` (`[HasW65816]`) → MC pseudos `LDAbsLong` / `STAbsLong` wrapping the existing
+  `LDA_AbsoluteLong` / `STA_AbsoluteLong`; instruction selector routes both through `selectGeneric`
+  (the far store bypasses `selectStore`'s 16-bit RMW/STZ folds). **`dev/run.sh far` → all 5 assertions
+  PASS** (far → `af`/`8f` 4-byte incl. bank byte; near stays 3-byte `ad`/`8e`; far global →
+  `R_MOS_ADDR24`), **corpus 7/7** on the same patched toolchain. Disassembly evidence below.
 
 ## Context
 
@@ -90,6 +100,11 @@ in the upstream note so it's a conscious divergence, not an accident.
 
 ## Implementation steps (iterate via the Phase-0 from-source toolchain: edit → `dev/run.sh toolchain` (incremental relink) → test)
 
+**Status: steps 1–5 all complete (2026-06-14).** Captured in `patches/llvm-mos/0001-320-far-addrspace.patch`;
+evidence in Progress + Verification above. (Step 4 narrowed: far accesses route around the 16-bit-only
+selector paths via `selectGeneric` rather than touching `MOSCallLowering`/`MOSIndexIV` — no far ptr
+reaches calling-conv/IV code in this constant/global-address slice, so no guard was needed there yet.)
+
 1. **Enum + data layout** (`AS_Far24`, `p2:24:8`). Rebuild; confirm the 6502 corpus is still 7/7 (the
    added addrspace spec is inert) — regression guard.
 2. **Legalizer**: make `LLT::pointer(2,24)` legal + load/store lowering for it.
@@ -101,15 +116,75 @@ in the upstream note so it's a conscious divergence, not an accident.
 
 ## Verification (compiler-only — no emulator/native-mode bench needed this increment)
 
+Steps 2–4 are driven by `dev/run.sh far` (harness `dev/far.sh`, test `examples/65816/far-deref.c`);
+step 1 by `MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh corpus`. Run 2026-06-14, full patch
+(steps 1–4) applied to the from-source toolchain.
+
 1. **6502 unaffected** — full corpus still 7/7 on both prebuilt and from-source toolchains (the new
    addrspace is inert). (Evidence: corpus table.)
+
+   ```
+   ==> corpus: expected.tsv
+     hello      PASS  sentinel=0x42  liveness: main runs (the smoke ROM)
+     arith      PASS  corpus_result=0xA9E9  8/16/32-bit integer ALU
+     control    PASS  corpus_result=0x1DFB  loops / if / switch
+     arrays     PASS  corpus_result=0x03E1  arrays + .rodata lookup table
+     structs    PASS  corpus_result=0x0340  struct layout + pointer deref
+     funcs      PASS  corpus_result=0x011E  calls + recursion (soft stack)
+     globals    PASS  corpus_result=0xAB55  crt0 .data copy + .bss clear
+   ==> corpus: 7/7 passed
+   ```
+   **PASS** — from-source toolchain with the full far patch: 6502 corpus 7/7, far codegen inert.
+   (Prebuilt toolchain 7/7 already recorded in [M1 Phase 0](2026-06-14-m1-from-source-toolchain.md).)
+
 2. **Far load/store lowers correctly (the deliverable)** — compile the address-space-2 test
    `-mcpu=mosw65816`, then `llvm-objdump -d` the object shows **`lda $xxxxxx` / `sta $xxxxxx`
    (absolute-long, 4-byte)** — not 16-bit absolute — for the far accesses. (Evidence: disasm excerpt.)
    This is ROADMAP step 4 ("addrspace → addressing mode").
+
+   ```
+   00000000 <load_far>:
+          0: af 34 12 7e  	lda	$7e1234
+   00000000 <store_far>:
+          0: a9 42        	lda	#$42
+          2: 8f 34 12 7e  	sta	$7e1234
+   00000000 <load_far_global>:
+          0: af 00 00 00  	lda	$0
+   			00000001:  R_MOS_ADDR24	farbyte
+   00000000 <store_far_global>:
+          2: 8f 00 00 00  	sta	$0
+   			00000003:  R_MOS_ADDR24	farbyte
+     PASS: far load  0x7E1234 -> LDA AbsoluteLong (af 34 12 7e)
+     PASS: far store 0x7E1234 -> STA AbsoluteLong (8f 34 12 7e)
+     PASS: far global -> 24-bit relocation (R_MOS_ADDR24)
+   ```
+   **PASS** — far constant 0x7E1234 → opcode `af`/`8f` + 3 address bytes incl. bank `7e` (true 24-bit
+   absolute-long); far global → `R_MOS_ADDR24` relocation (not 16-bit Addr16).
+
 3. **Near vs far** — a 16-bit (addrspace 0) access in the same program still emits 16-bit absolute;
    only the addrspace-2 access goes long. (Evidence: side-by-side disasm.)
+
+   ```
+   00000000 <load_near>:    0: ad 34 12       lda $1234      ; 16-bit absolute (3 bytes)
+   00000000 <store_near>:   2: 8e 34 12       stx $1234      ; 16-bit absolute (3 bytes)
+   00000000 <load_far>:     0: af 34 12 7e    lda $7e1234    ; absolute-long  (4 bytes)
+   00000000 <store_far>:    2: 8f 34 12 7e    sta $7e1234    ; absolute-long  (4 bytes)
+     PASS: near load  0x1234 -> LDA Absolute (ad 34 12)
+     PASS: near store 0x1234 -> ST{A,X} Absolute (8[de] 34 12)
+   ```
+   **PASS** — identical source shape, addrspace alone decides: near → 3-byte `ad`/`8e`, far → 4-byte
+   `af`/`8f`. The far path is purely additive; 6502 addressing is untouched.
+
 4. **`-verify-machineinstrs` / no GISel fallback abort** on the test. (Evidence: clean compile.)
+
+   ```
+   ==> compile /work/examples/65816/far-deref.c  (--target=mos -mcpu=mosw65816 -Os)
+   ==> assertions
+   ...
+   RESULT: PASS — addrspace 2 -> absolute-long (24-bit), addrspace 0 -> absolute (16-bit)
+   ```
+   **PASS** — both `-S` and `-c` compiles succeed at `-Os` (GISel abort-on-fallback is on by default
+   via `setGlobalISel(true)`); a fallback would have aborted the compile. All 5 assertions PASS, rc 0.
 
 ## Risks
 

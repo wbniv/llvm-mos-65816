@@ -14,6 +14,46 @@ index dfe99d8f2..c9e4c2f2f 100644
    resetDataLayout(Layout);
  
    PointerWidth = 16;
+diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
+index 70e8bb0d4..e81487e9c 100644
+--- a/llvm/lib/Target/MOS/MOSInstrGISel.td
++++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
+@@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
+   let mayLoad = true;
+ }
+ 
++// #320: Generalized 8-bit load using 65816 absolute-long (24-bit) addressing,
++// for far (addrspace 2) pointers. The address argument is a global value or a
++// 24-bit immediate. Selects to LDA AbsoluteLong (accumulator only). Additionally
++// expects a MachineMemOperand.
++def G_LOAD_FAR_ABS : MOSGenericInstruction {
++  let Predicates = [HasW65816];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins unknown:$addr);
++  let mayLoad = true;
++}
++
+ // Generalized 8-bit load using the absolute indexed addressing mode. The base
+ // argument isn't a pointer; it's either a global value or a 16-bit immediate.
+ // The index argument is an 8-bit scalar. Additionally expects a
+@@ -114,6 +125,17 @@ def G_STORE_ABS : MOSGenericInstruction {
+   let mayStore = true;
+ }
+ 
++// #320: Generalized 8-bit store using 65816 absolute-long (24-bit) addressing,
++// for far (addrspace 2) pointers. The address argument is a global value or a
++// 24-bit immediate. Selects to STA AbsoluteLong (accumulator only). Additionally
++// expects a MachineMemOperand.
++def G_STORE_FAR_ABS : MOSGenericInstruction {
++  let Predicates = [HasW65816];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, unknown:$addr);
++  let mayStore = true;
++}
++
+ // Generalized 8-bit store using the absolute indexed addressing mode. The base
+ // argument isn't a pointer; it's either a global value or a 16-bit immediate.
+ // The index argument is an 8-bit scalar. Additionally expects a
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
 index a19b69cd0..be5daff8f 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.h
@@ -31,6 +71,167 @@ index a19b69cd0..be5daff8f 100644
  
  enum TargetIndex {
    TI_STATIC_STACK,
+diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
+index 6b8158ca0..f3eb9549f 100644
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
+@@ -537,6 +537,13 @@ def LDIndirIdx : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)>
+   dag InOperandList = (ins Imag16:$addr, Yc:$offset);
+ }
+ 
++// #320: LDA long ($xxxxxx) — far (24-bit absolute) load, accumulator only.
++def LDAbsLong : MOSLoad, PseudoInstExpansion<(LDA_AbsoluteLong addr24:$src)> {
++  let Predicates = [HasW65816];
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList = (ins addr24:$src);
++}
++
+ class MOSStore : MOSLogicalInstr {
+   let mayStore = true;
+ }
+@@ -564,6 +571,12 @@ def STIndirIdx : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)
+   dag InOperandList = (ins Ac:$src, Imag16:$addr, Yc:$offset);
+ }
+ 
++// #320: STA long ($xxxxxx) — far (24-bit absolute) store, accumulator only.
++def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
++  let Predicates = [HasW65816];
++  dag InOperandList = (ins Ac:$src, addr24:$dst);
++}
++
+ let Predicates = [Has65C02] in {
+   // STZ abs
+   def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+index d4936aabf..cbdd54ab2 100644
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -253,6 +253,10 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+   case MOS::G_LOAD_ABS_IDX:
+   case MOS::G_LOAD_INDIR:
+   case MOS::G_LOAD_INDIR_IDX:
++  // #320: far load/store go straight to selectGeneric (LDA/STA AbsoluteLong);
++  // the far store must bypass selectStore's 16-bit RMW/STZ folds.
++  case MOS::G_LOAD_FAR_ABS:
++  case MOS::G_STORE_FAR_ABS:
+   case MOS::G_PHI:
+   case MOS::G_STORE_INDIR:
+   case MOS::G_STORE_INDIR_IDX:
+@@ -1944,6 +1948,9 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+   case MOS::G_LOAD_ABS:
+     Opcode = MOS::LDAbs;
+     break;
++  case MOS::G_LOAD_FAR_ABS: // #320: 65816 far load -> LDA AbsoluteLong.
++    Opcode = MOS::LDAbsLong;
++    break;
+   case MOS::G_LOAD_ABS_IDX:
+     Opcode = MOS::LDAbsIdx;
+     break;
+@@ -1962,6 +1969,9 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+   case MOS::G_STORE_ABS:
+     Opcode = MOS::STAbs;
+     break;
++  case MOS::G_STORE_FAR_ABS: // #320: 65816 far store -> STA AbsoluteLong.
++    Opcode = MOS::STAbsLong;
++    break;
+   case MOS::G_STORE_ABS_IDX:
+     Opcode = MOS::STAbsIdx;
+     break;
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 8ba6b0b13..212ede1a0 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -67,6 +67,10 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   LLT S64 = LLT::scalar(64);
+   LLT P = LLT::pointer(0, 16);
+   LLT PZ = LLT::pointer(1, 8);
++  // #320: 65816 "far" pointer — addrspace 2, 32-bit (low 24 bits are the
++  // 65816 long address; LLVM requires power-of-two pointer sizes). Legal only
++  // where it appears; far load/store select to absolute-long addressing.
++  LLT PF = LLT::pointer(2, 32);
+ 
+   // Constants
+ 
+@@ -83,7 +87,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+       .unsupported();
+ 
+   getActionDefinitionsBuilder({G_GLOBAL_VALUE, G_FRAME_INDEX, G_BLOCK_ADDR})
+-      .legalFor({P, PZ})
++      .legalFor({P, PZ, PF})
+       .unsupported();
+ 
+   // Integer Extension and Truncation
+@@ -322,8 +326,8 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   getActionDefinitionsBuilder({G_LOAD, G_STORE})
+       // Convert to int to load/store; that way the operation can be narrowed to
+       // 8 bits. Once 8-bit, select an addressing mode to replace the generic
+-      // G_LOAD and G_STORE.
+-      .customForCartesianProduct({S8, PZ, P}, {PZ, P})
++      // G_LOAD and G_STORE. PF (far) pointers select to absolute-long. (#320)
++      .customForCartesianProduct({S8, PZ, P}, {PZ, P, PF})
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+       .unsupported();
+@@ -1685,6 +1689,13 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
+       return true;
+     return selectIndirectAddressing(Helper, MRI, MI);
+   }
++  case 32: {
++    // #320: 32-bit far pointer. This increment supports absolute-long only
++    // (constant/global far addresses); runtime far pointers (indirect-long
++    // [dp]) are a later increment. A non-absolute far access fails to
++    // legalize rather than silently miscompiling.
++    return tryFarAbsoluteAddressing(Helper, MRI, MI);
++  }
+   default:
+     llvm_unreachable("unknown pointer size");
+   }
+@@ -1750,6 +1761,31 @@ bool MOSLegalizerInfo::tryAbsoluteAddressing(LegalizerHelper &Helper,
+   return false;
+ }
+ 
++// #320: select 65816 absolute-long addressing for a 32-bit far pointer whose
++// address is a compile-time constant or (far) global. Replaces the generic
++// G_LOAD/G_STORE with G_LOAD_FAR_ABS/G_STORE_FAR_ABS carrying the 24-bit
++// address operand; the instruction selector lowers those to LDA/STA
++// AbsoluteLong. Returns false for non-absolute far addresses (e.g. a runtime
++// far pointer needing indirect-long) so legalization fails loudly.
++bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
++                                                MachineRegisterInfo &MRI,
++                                                GLoadStore &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++
++  unsigned Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS : MOS::G_STORE_FAR_ABS;
++  auto Operand = matchAbsoluteAddressing(MRI, MI.getPointerReg());
++
++  if (!Operand.has_value())
++    return false;
++
++  Helper.Observer.changingInstr(MI);
++  MI.setDesc(Builder.getTII().get(Opcode));
++  MI.removeOperand(1);
++  MI.addOperand(*Operand);
++  Helper.Observer.changedInstr(MI);
++  return true;
++}
++
+ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+                                                     MachineRegisterInfo &MRI,
+                                                     GLoadStore &MI,
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+index 6c1f0987d..48cb1f356 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -85,6 +85,9 @@ private:
+   matchAbsoluteAddressing(MachineRegisterInfo &MRI, Register Addr) const;
+   bool tryAbsoluteAddressing(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                              GLoadStore &MI, bool ZP) const;
++  // #320: 65816 far (24-bit) absolute-long addressing for 32-bit far pointers.
++  bool tryFarAbsoluteAddressing(LegalizerHelper &Helper,
++                                MachineRegisterInfo &MRI, GLoadStore &MI) const;
+   bool tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+                                     MachineRegisterInfo &MRI, GLoadStore &MI,
+                                     bool ZP) const;
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 index 3bb679dac..ceb0afe8a 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
