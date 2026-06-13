@@ -21,7 +21,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 - [ ] **#320 full model + upstream.** Five-address-space layout (asiekierka's 32-bit-default, packed
   24-bit, zero-bank, abs-16) after maintainer ABI blessing; open the PR. Upstream-gated — coordinate
-  on the llvm-mos Discord (@asiekierka/@mysterymath) with the running slice in hand.
+  on the llvm-mos Discord (@asiekierka/@mysterymath) with the running slice in hand. **Design note
+  drafted + ready to post** ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md));
+  posting to #320/Discord is the next (user-triggered) step.
 - [ ] **Cross-check emulator (bsnes-jg / Mesen2)** added to the bench for fidelity once codegen
   correctness depends on it.
 
@@ -37,7 +39,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 ### Upstream / Contribution
 
 - [ ] **Surface WDC816CC/ORCA-C ABI prior art in #320/#321** — low-effort, no-code contribution
-  documenting the calling-convention prior art (DP frame vs hardware-stack frame).
+  documenting the calling-convention prior art (DP frame vs hardware-stack frame). Summarized in the
+  [#320 design note](docs/320-upstream-far-pointer-note.md) (open ABI decisions §3) with an offer to
+  expand into a standalone prior-art writeup if the maintainers want it; promote when that's done.
 
 
 ## Watch
@@ -54,6 +58,12 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [320-upstream-design-note] drafted the upstream #320 design note
+  ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)): leads with the
+  verified running slice (Inc 1/2/2b, by commit), the addrspace-numbering divergence (slice `2`=far
+  additive vs proposal `0`=far-default) + a reconciliation path, the open ABI decisions, and the
+  WDC816CC/ORCA-C calling-convention prior art. Code-first artifact to anchor the #320 discussion;
+  posting upstream is user-triggered. [plan](docs/plans/2026-06-14-320-upstream-design-note.md).
 - 2026-06-14 — [320-increment-2b-multi-bank-far-read] far read now **crosses a real ROM bank
   boundary**: a 64 KiB LoROM (`snes-far` child platform, banks $00+$01) places a far global in bank
   $01 ($018000), far-read via `lda $018000` (`af 00 80 01`); the cross-bank result round-trips in MAME
