@@ -19,10 +19,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [ ] **#320 — 24-bit address space / far pointers**, registers stay 8-bit. Five-address-space
-  data layout; default 32-bit pointer, 24-bit packed as a size option; near/far calls (JSR/JSL).
-  Deliverable: a working multi-bank unoptimized 65816 C compiler. ROADMAP steps 3–4. Upstream-gated
-  ABI design — coordinate on the llvm-mos Discord (@asiekierka/@mysterymath) before large PRs.
+- [wip] **#320 Increment 1 — far-pointer codegen (24-bit), non-breaking.** Wire GlobalISel to the
+  existing 65816 MC instructions (`LDA/STA AbsoluteLong`) for a new additive addrspace 2 = 24-bit far,
+  gated on `W65816`; 6502 untouched. Verified at disassembly level (ROADMAP step 4). Codegen captured
+  as a tracked patch applied by `dev/toolchain.sh`.
+  [plan](docs/plans/2026-06-14-320-far-pointer-codegen.md).
+- [ ] **#320 Increment 2 — emulator end-to-end far pointers.** 65816 native-mode crt0 (XCE/DBR/reg
+  widths) + multi-bank ROM; a far-pointer corpus program boots and runs correctly in MAME. ROADMAP step 3.
+- [ ] **#320 full model + upstream.** Five-address-space layout (asiekierka's 32-bit-default, packed
+  24-bit, zero-bank, abs-16) after maintainer ABI blessing; open the PR. Upstream-gated — coordinate
+  on the llvm-mos Discord (@asiekierka/@mysterymath) with the running slice in hand.
 - [ ] **Cross-check emulator (bsnes-jg / Mesen2)** added to the bench for fidelity once codegen
   correctness depends on it.
 
