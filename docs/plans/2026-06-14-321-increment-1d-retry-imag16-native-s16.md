@@ -144,14 +144,16 @@ a16localbit: 3 brackets lda;and|ora|eor zp;sta                          -> 0x000
 Non-breaking: corpus **7/7**; all 10 a16* tests PASS (6 peephole + a16local/x/sub/bit native).
 `dev/run.sh a16localsub|a16localbit`.
 
-**Immediate operands:** functionally complete — a `G_CONSTANT` s16 operand is already materialized into
-an `Imag16` pair by constant selection, so `selectAlu16Native` sees two `Imag16` operands and produces
-correct code (`a16localimm.c`: `t = a + 0x0345` → `0x1545`). Using the `*Imm16` forms (`adc #imm`) to
-avoid materializing the constant is a **size optimization only**, deferred (not a correctness gap).
+**Immediate operands (DONE 2026-06-14):** `selectAlu16Native` folds a constant operand into the
+`*Imm16` form (`adc #$0345`) instead of materializing it into an `Imag16` pair. Handles both constant
+shapes (direct, and the common `G_MERGE_VALUES` of two byte-constants) via a `getImm16Operand` helper;
+commutative ops fold either operand (swap); SUB never folds (no `SBCImm16`; `x-C` canonicalized to
+`x+(-C)` upstream). The now-dead constant is auto-erased by `isTriviallyDead`. `a16localimm.c`:
+`t = a + 0x0345` → `clc; lda; adc #$0345; sta`, **no materialization**, `0x1545` on both emulators (main
+drops ~4 instructions). See [its own plan](2026-06-14-321-native-s16-immediate-operand-optimization-adc.md).
 
 ### Remaining (future) — beyond this increment
 
-- Immediate-operand optimization (`*Imm16` forms instead of materializing the constant into `Imag16`).
 - Loops + cross-block REP/SEP mode-tracking; the hardware-stack ABI / 16-bit calling convention.
 
 ## Out of scope (later)

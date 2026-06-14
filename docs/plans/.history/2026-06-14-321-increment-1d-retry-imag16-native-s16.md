@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/e9b2221) | #321 Increment 1d-retry step 5: native s16 sub + bitwise via Imag16 |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/88994fb) | #321 Increment 1d-retry steps 1-4: GISel-native s16 in Imag16 — coalescer crash SOLVED |
 
 <!--history-meta v1
+e9b2221	author	Will Norris
+e9b2221	added	27
+e9b2221	deleted	11
+e9b2221	files	1
+e9b2221	body	Generalize selectAdd16Native -> selectAlu16Native to handle the full basic 16-bit\nALU natively (value resident in Imag16, accumulator entered/left only via the\n*Imag16 load/store ops — no Ac16<->8-bit COPY):\n\n  G_ADD -> clc; lda zp; adc zp; sta zp\n  G_SUB -> sec; lda zp; sbc zp; sta zp\n  G_AND/G_OR/G_XOR -> lda zp; and|ora|eor zp; sta zp\n\nLegalizer gate widened under +mos-a16: the G_ADD-only restriction on native s16\nadd/sub is lifted (G_SUB now native too), and s16 G_AND/G_OR/G_XOR are made\nlegalFor({S16}) (clamped to S16). All gated on hasAccum16 so default 8-bit codegen\nis untouched; the 1b combiner still fast-paths all-global shapes.\n\nThis makes locals / multi-use intermediates use the 16-bit accumulator for the\nwhole basic ALU, not just the all-global peephole.\n\nVerified on both MAME and bsnes-jg:\n- a16localsub.c: t = a - b (multi-use local) -> sec/sbc, corpus_result==0x1222\n- a16localbit.c: t=a&b; u=t|c; w=u^a (reused locals) -> and/ora/eor, ==0x000F\n\nImmediate operands already work (a G_CONSTANT is materialized into Imag16 by\nconstant selection, so selectAlu16Native sees two Imag16 operands) — using the\n*Imm16 forms (adc #imm) to skip materializing is a deferred size optimization,\nnot a correctness gap.\n\nNon-breaking: corpus 7/7; all 10 a16* tests PASS (6 peephole + a16local/x/sub/bit\nnative); SDK builds; patch 0002 round-trips (applies on 0001, reproduces vendor).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 88994fb	author	Will Norris
 88994fb	added	145
 88994fb	deleted	0

@@ -796,7 +796,7 @@ index f3eb9549f..54e98e07c 100644
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..1b9762611 100644
+index cbdd54ab2..94de5d5f9 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -96,6 +96,14 @@ private:
@@ -861,7 +861,7 @@ index cbdd54ab2..1b9762611 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -1928,6 +1963,221 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +1963,274 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -1009,6 +1009,29 @@ index cbdd54ab2..1b9762611 100644
 +  return true;
 +}
 +
++// #321 native s16: extract a 16-bit compile-time constant from an operand, if it
++// is one. Handles both forms a 16-bit literal takes by the time it reaches the
++// selector: a direct (look-through) constant, and — the common case — a
++// G_MERGE_VALUES of two byte constants (a 16-bit immediate is split into lo/hi
++// bytes before selection; getIConstantVRegValWithLookThrough does NOT look
++// through the merge, so reconstruct it here). Used to fold `var OP const` into
++// the *Imm16 forms instead of materializing the constant into an Imag16 pair.
++static std::optional<int64_t> getImm16Operand(Register R,
++                                              MachineRegisterInfo &MRI) {
++  if (auto C = getIConstantVRegValWithLookThrough(R, MRI))
++    return C->Value.getZExtValue() & 0xFFFF;
++  MachineInstr *Def = getDefIgnoringCopies(R, MRI);
++  if (Def && Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
++      Def->getNumOperands() == 3) {
++    auto Lo = getIConstantVRegValWithLookThrough(Def->getOperand(1).getReg(), MRI);
++    auto Hi = getIConstantVRegValWithLookThrough(Def->getOperand(2).getReg(), MRI);
++    if (Lo && Hi)
++      return ((Hi->Value.getZExtValue() & 0xFF) << 8) |
++             (Lo->Value.getZExtValue() & 0xFF);
++  }
++  return std::nullopt;
++}
++
 +// #321 Increment 1d-retry: select a native s16 ALU op `%dst = G_OP %a, %b` whose
 +// value lives in an Imag16 zero-page pair — the case the 1b/1c combiner peephole
 +// can't reach (locals, multi-use intermediates). Mirrors selectAlu16Abs but with
@@ -1023,8 +1046,15 @@ index cbdd54ab2..1b9762611 100644
 +// vregs Lo/Res) is entered only by LDAImag16 and left only by STAImag16 (which
 +// DEFS the dst Imag16) — there is NO COPY between Ac16 and an 8-bit reg, so the
 +// register coalescer cannot merge an 8-bit value into A16 (the exact crash that
-+// sank the first 1d prototype). Constant operands are already materialized into
-+// Imag16 by G_CONSTANT selection, so both operands are plain Imag16 vregs here.
++// sank the first 1d prototype).
++//
++// Immediate fold: if an operand is a compile-time constant, the ALU op uses the
++// *Imm16 form (`adc #$0345`) instead of materializing the constant into an Imag16
++// pair — for the commutative ops (add/and/or/xor) either operand may be the
++// constant (swap so the register is loaded). SUB has no SBCImm16 (and `x - C` is
++// canonicalized to `x + (-C)` upstream), so it never folds an immediate. The now-
++// dead constant def is removed automatically by isTriviallyDead in the generic
++// InstructionSelect pass.
 +bool MOSInstructionSelector::selectAlu16Native(MachineInstr &MI) {
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
@@ -1033,17 +1063,31 @@ index cbdd54ab2..1b9762611 100644
 +  Register A = MI.getOperand(1).getReg();
 +  Register B = MI.getOperand(2).getReg();
 +
-+  // Map the generic opcode to (zp ALU opcode, carry-init: -1 none / 0 clc / 1 sec).
-+  unsigned AluOpc;
++  // Map the generic opcode to (zp ALU opcode, imm ALU opcode [0 = none],
++  // carry-init: -1 none / 0 clc / 1 sec, commutative).
++  unsigned AluOpc, ImmOpc;
 +  int CarryInit;
++  bool Commutative;
 +  switch (MI.getOpcode()) {
-+  case MOS::G_ADD: AluOpc = MOS::ADCImag16; CarryInit = 0;  break;
-+  case MOS::G_SUB: AluOpc = MOS::SBCImag16; CarryInit = 1;  break;
-+  case MOS::G_AND: AluOpc = MOS::ANDImag16; CarryInit = -1; break;
-+  case MOS::G_OR:  AluOpc = MOS::ORAImag16; CarryInit = -1; break;
-+  default:         AluOpc = MOS::EORImag16; CarryInit = -1; break; // G_XOR
++  case MOS::G_ADD: AluOpc = MOS::ADCImag16; ImmOpc = MOS::ADCImm16; CarryInit = 0;  Commutative = true;  break;
++  case MOS::G_SUB: AluOpc = MOS::SBCImag16; ImmOpc = 0;             CarryInit = 1;  Commutative = false; break;
++  case MOS::G_AND: AluOpc = MOS::ANDImag16; ImmOpc = MOS::ANDImm16; CarryInit = -1; Commutative = true;  break;
++  case MOS::G_OR:  AluOpc = MOS::ORAImag16; ImmOpc = MOS::ORAImm16; CarryInit = -1; Commutative = true;  break;
++  default:         AluOpc = MOS::EORImag16; ImmOpc = MOS::EORImm16; CarryInit = -1; Commutative = true;  break; // G_XOR
 +  }
 +  const bool IsArith = CarryInit >= 0;
++
++  // Fold a constant operand into the immediate form (not for SUB: no SBCImm16).
++  // After the (optional) swap, A is the register loaded into A16 and Imm (if set)
++  // is the second operand; otherwise B is the register second operand.
++  std::optional<int64_t> Imm;
++  if (ImmOpc) {
++    if ((Imm = getImm16Operand(B, MRI))) {
++      // B is the immediate; A stays the loaded register.
++    } else if (Commutative && (Imm = getImm16Operand(A, MRI))) {
++      std::swap(A, B); // load the old-B register; the old-A constant is the imm.
++    }
++  }
 +
 +  SmallVector<MachineInstrBuilder, 4> New;
 +
@@ -1058,15 +1102,24 @@ index cbdd54ab2..1b9762611 100644
 +    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(CarryInit));
 +  }
 +
-+  // the ALU op (16-bit): A16 = a OP b (+carry for add/sub).
++  // the ALU op (16-bit): A16 = a OP (b | #imm) (+carry for add/sub).
 +  Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+  auto Alu = Builder.buildInstr(AluOpc).addDef(Res);
++  auto Alu = Builder.buildInstr(Imm ? ImmOpc : AluOpc).addDef(Res);
 +  if (IsArith) {
 +    Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
 +    Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
-+    Alu.addDef(CarryOut).addDef(VOut).addUse(Lo).addUse(B).addUse(Carry);
++    Alu.addDef(CarryOut).addDef(VOut).addUse(Lo);
++    if (Imm)
++      Alu.addImm(*Imm);
++    else
++      Alu.addUse(B);
++    Alu.addUse(Carry);
 +  } else {
-+    Alu.addUse(Lo).addUse(B);
++    Alu.addUse(Lo);
++    if (Imm)
++      Alu.addImm(*Imm);
++    else
++      Alu.addUse(B);
 +  }
 +  New.push_back(Alu);
 +

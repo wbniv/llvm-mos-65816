@@ -271,9 +271,12 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    generalized the selector to native s16 **sub** (`sec/sbc` → `a16localsub` 0x1222) and **bitwise**
    (`and/ora/eor` → `a16localbit` 0x000F), widening the legalizer gate to s16 `G_SUB` + `G_AND/OR/XOR`
    under `+mos-a16`. So the full basic 16-bit ALU now flows through `Imag16` for locals/multi-use, not
-   just the all-global peephole. Immediate operands work (constant materialized into `Imag16`); the
-   `adc #imm` form is a deferred size optimization. Non-breaking (corpus 7/7, all 10 a16* tests green).
-   [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md)._
+   just the all-global peephole. A follow-up **immediate fold** makes `selectAlu16Native` use the
+   `*Imm16` forms (`adc #$0345`) instead of materializing a constant operand into `Imag16` (the constant
+   arrives as a `G_MERGE` of two byte-constants → reconstructed; dead def auto-erased) — `a16localimm`
+   reads 0x1545 with no materialization. Non-breaking (corpus 7/7, all 11 a16* tests green).
+   [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
+   [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
