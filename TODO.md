@@ -30,12 +30,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 Increment 1c continued — the general 16-bit path** (after 1c first slice, done): the
-  `a+b+c` chain proves a value can stay live in `A16` across ops, but it's still a combiner peephole
-  (all-load ADD chains → memory). Next: sub/bitwise chains + immediates-in-chains (easy follow-ons),
-  then the real general step — **GISel-native s16 register allocation** (keep s16 un-narrowed, allocate
-  across `A16` ⊕ `Imag16` with spilling) so arbitrary 16-bit dataflow / locals work, then loops +
-  cross-block REP/SEP mode-tracking. [plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md).
+- [ ] **#321 Increment 1d continued — extend the GISel-native s16 path** (after the 1d core, done):
+  native s16 **G_ADD** now works (value resident in `Imag16`, allocator-managed — locals/multi-use).
+  Next, outward from the core: native s16 **G_SUB / G_AND/OR/XOR** (mirror selectAdd16Native), then
+  **load-folding** (m_FoldedLdAbs → ADCAbs16 to skip the Imag16 round-trip), redundant `sta`/`lda`
+  elimination (keep the hot value in `A16` via `Anyi16`), then loops + cross-block REP/SEP
+  mode-tracking, and finally the hardware-stack ABI / 16-bit calling convention (16-bit args/returns —
+  the upstream-gated part). [plan](docs/plans/2026-06-14-321-increment-1d-gisel-native-s16.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
   mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
   + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
@@ -64,6 +65,19 @@ starting, or blocked on an external factor)._
 
 
 ## Done
+
+- 2026-06-14 — [321-increment-1d-gisel-native-s16] **GISel-native 16-bit ADD — the allocator manages a
+  16-bit value (the general path)** — beyond the fixed peephole shapes: under `+mos-a16` the legalizer
+  keeps an s16 `G_ADD` un-narrowed (gated on `hasAccum16`, so the corpus's 8-bit path is untouched),
+  and `selectAdd16Native` lowers it to one 16-bit `adc` on an `Imag16` pair (the value lives in
+  zero-page `Imag16`, `A16` transient; `copyPhysReg` moves between them via new `LDAImag16`/`STAImag16`,
+  the 16-bit analog of `LD/STImag8`). A **multi-use local** `t = a+b; g=t; h=t;` (which the peephole
+  can't fuse — result not single-use) reads `corpus_result == 0x1122` on **both** MAME and bsnes-jg.
+  Foundation: the `Anyi16` (`A16 ⊕ Imag16`) sum-type class. Non-breaking: corpus 7/7, all six peephole
+  tests green (paths coexist), SDK builds. Finding: a MachineLICM `getRegClassWeight` crash traced to
+  the result vreg landing in the unconstrained `any` regbank class — fixed by constraining it to
+  `Imag16`. `dev/run.sh a16local`; patch `0002-321-accum16.patch`. First codegen where the GISel
+  allocator carries a 16-bit value across code. [plan](docs/plans/2026-06-14-321-increment-1d-gisel-native-s16.md).
 
 - 2026-06-14 — [321-increment-1c-chained-16bit-alu] **chained 16-bit ADD — a value stays live in A16
   across ops** (first general-path slice): `g = a + b + c` fuses (pre-legalizer combiner, recursive

@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/2eef05c) | #321 Inc 1d: core started + de-risked; turnkey continuation mapped |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/3e00947) | #321 Inc 1d: de-risk the GISel-native core (design + mechanism map) |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/0169001) | #321 Inc 1d step 1: Anyi16 register class (A16 + Imag16), the s16 sum type |
 
 <!--history-meta v1
+2eef05c	author	Will Norris
+2eef05c	added	26
+2eef05c	deleted	5
+2eef05c	files	1
+2eef05c	body	Went deep into the GISel-native core and confirmed: (1) it's tractable —\nthe copyPhysReg B-register fear dissolves because one 16-bit lda/sta zp\nmoves both bytes of A16=B:A atomically (A16<->Imag16 = LDAImag16/STAImag16,\nthe 16-bit analog of LD/STImag8); (2) it's corpus-safe — gated on\nSTI.hasAccum16() so default builds keep the 8-bit narrowing. Reverted the\npartial WIP to keep the tree green (a half-built big-bang would leave\n+mos-a16 adds that escape the peephole unselectable). The plan now lists\nthe exact remaining pieces (new transfer instrs + their MC lowering,\nlegalizer gate, copyPhysReg Ac16<->Imag16, selectAdd16Native) as a\nturnkey continuation.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3e00947	author	Will Norris
 3e00947	added	37
 3e00947	deleted	0
