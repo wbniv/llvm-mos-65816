@@ -290,8 +290,13 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    (ordering) path, the Z flag can't be a plain i1 (it must fuse into a terminator), so the legalizer
    keeps an s16 `ICMP_EQ` un-narrowed only when its result feeds a branch, and a fused 16-bit
    compare-branch (`CmpBrImag16`/`CmpBrImm16`) expands to `lda; cmp` (`MLow=1`, so REP/SEP brackets it)
-   + `beq/bne` reading Z — `a16eq` reads 0x0011, no 8-bit `cpx/cpy` chain. Signed/select compares are
-   follow-ups. Non-breaking (corpus 7/7, all 13 a16* tests green). **Cross-block REP/SEP mode-tracking** then makes the per-op
+   + `beq/bne` reading Z — `a16eq` reads 0x0011, no 8-bit `cpx/cpy` chain. **Native 16-bit signed
+   ordering** (`< <= > >=` on `short`) then reuses both: signed order equals unsigned order after
+   flipping the sign bit (`a <ₛ b ⟺ (a^0x8000) <ᵤ (b^0x8000)`), so `legalizeICmp` rewrites s16 `SLT`
+   to `ULT` on the XOR'd operands — the XORs are the native EOR and the compare re-legalizes through the
+   native UGE carry path, with no new flag handling (`a16scmp` reads 0x0111 incl. negative operands).
+   Compare→select/stored-bool compares are follow-ups. Non-breaking (corpus 7/7, all 13 a16* tests
+   green). **Cross-block REP/SEP mode-tracking** then makes the per-op
    16-bit features pay off across control flow: `MOSInsertREPSEP` was per-block and 8-bit-anchored, so
    a loop with a 16-bit body re-ran `rep … sep` every iteration; it now runs a forward dataflow over
    the M-width lattice (`{None, M8, M16, Conflict}`) and places switches only at genuine transitions —
@@ -321,7 +326,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [cross-block REP/SEP plan](plans/2026-06-15-321-cross-block-repsep-mode-tracking.md) ·
    [constant-shifts plan](plans/2026-06-15-321-native-16bit-constant-shifts.md) ·
    [signed-shift plan](plans/2026-06-15-321-native-16bit-signed-shift-ashr.md) ·
-   [equality-compares plan](plans/2026-06-15-321-native-16bit-equality-compares.md)._
+   [equality-compares plan](plans/2026-06-15-321-native-16bit-equality-compares.md) ·
+   [signed-compares plan](plans/2026-06-15-321-native-16bit-signed-compares.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

@@ -43,13 +43,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (one global load + one `Imag16` register — dispatch addressing mode per operand); (b) single-use-non-
   store results (the `>1 use` guard skips these today); (c) chained multi-use load expressions (extend
   `add_chain16`).
-- [ ] **#321 native s16 — 16-bit comparison follow-ups** (slice 1 unsigned ordering `< <= > >=` and
-  ~~(a) equality `== !=`~~ both landed — see Done). Remaining, same approach: (b) **signed**
-  (`slt/sle/sgt/sge`) — the N^V 16-bit lowering in `legalizeICmp`; (c) compare feeding a
-  **select**/bool value (equality producing a stored bool, not a branch, still narrows to 8-bit);
-  (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
+- [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
+  and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) compare feeding a
+  **select**/bool value (equality/signed producing a stored bool, not a branch, still narrows to
+  8-bit); (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
   [plan](docs/plans/2026-06-14-321-native-16bit-compares.md) ·
-  [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md).
+  [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
+  [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; inc/dec already native via adc #±1; remaining: variable shifts, amount
@@ -121,6 +121,17 @@ llvm-mos change to track) rather than active work._
 
 
 ## Done
+
+- 2026-06-15 — [321-native-16bit-signed-compares] **native 16-bit signed ordering compares
+  (`< <= > >=` on `short`).** Signed order equals unsigned order after flipping the sign bit, so
+  `legalizeICmp` rewrites an s16 `SLT` (the canonical signed primitive — the other three reduce to it)
+  to `ULT` on `(a^0x8000, b^0x8000)`: the XORs are the already-native 16-bit EOR and the compare
+  re-legalizes through the already-native unsigned UGE carry path (`rep; eor #$8000; …; cmp; sep;
+  bcc/bcs`). No new flag handling (no V/N^V), no selector/pseudo changes — a one-block hook. `a16scmp`
+  reads 0x0111 with negative operands (an unsigned misread would get every ordering wrong);
+  `-verify-machineinstrs` clean; both MAME + bsnes-jg. Non-breaking: corpus 7/7, all 19 a16* tests
+  green, patch `0002` round-trips. Compare→stored-bool is the remaining compare follow-up.
+  [plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md).
 
 - 2026-06-15 — [321-native-16bit-equality-compares] **native 16-bit equality compares (`== !=`).**
   An s16 `a == b`/`a != b` narrowed to a two-block 8-bit `cmp/cpx` chain; now each `==`/`!=` feeding a

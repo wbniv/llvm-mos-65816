@@ -2013,7 +2013,7 @@ index cbdd54ab2..dba54c841 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..fc2fffa57 100644
+index 212ede1a0..1ce2093bd 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -2115,7 +2115,36 @@ index 212ede1a0..fc2fffa57 100644
    Register Partial;
    Register NewAmt;
    // Shift by one multiples of one byte.
-@@ -1270,7 +1312,26 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1252,6 +1294,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+ 
+   LLT Type = MRI.getType(LHS);
+ 
++  // #321 native s16 signed ordering: signed order equals unsigned order after
++  // flipping the sign bit, a <ₛ b ⟺ (a ^ 0x8000) <ᵤ (b ^ 0x8000). Under +mos-a16
++  // rewrite the canonical signed primitive (SLT) to an unsigned ULT on the
++  // sign-flipped operands, reusing the already-native 16-bit EOR (the XORs) and the
++  // native unsigned UGE carry path (ULT re-legalizes to !UGE). No new flag handling.
++  // A constant RHS stays constant (b ^ 0x8000) and folds into cmp #imm.
++  {
++    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
++    if (STI.hasAccum16() && Type == LLT::scalar(16) &&
++        Pred == CmpInst::ICMP_SLT) {
++      auto Mask = Builder.buildConstant(Type, 0x8000);
++      Register LHSf = Builder.buildXor(Type, LHS, Mask).getReg(0);
++      Register RHSf = Builder.buildXor(Type, RHS, Mask).getReg(0);
++      Helper.Observer.changingInstr(MI);
++      MI.getOperand(1).setPredicate(CmpInst::ICMP_ULT);
++      MI.getOperand(2).setReg(LHSf);
++      MI.getOperand(3).setReg(RHSf);
++      Helper.Observer.changedInstr(MI);
++      return true;
++    }
++  }
++
+   // Compare pointers by first converting to integer. This allows the
+   // comparison to be reduced to 8-bit comparisons.
+   if (Type.isPointer()) {
+@@ -1270,7 +1334,26 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -2143,7 +2172,7 @@ index 212ede1a0..fc2fffa57 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,25 +1402,31 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,25 +1424,31 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
