@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/3e00947) | #321 Inc 1d: de-risk the GISel-native core (design + mechanism map) |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/0169001) | #321 Inc 1d step 1: Anyi16 register class (A16 + Imag16), the s16 sum type |
 
 <!--history-meta v1
+3e00947	author	Will Norris
+3e00947	added	37
+3e00947	deleted	0
+3e00947	files	1
+3e00947	body	Record the key design decision from investigating copyPhysReg: keep s16\nVALUES in Imag16 (zero-page pairs, already fully supported) and use A16\nonly transiently within each selected op (lda zp; adc zp; sta zp) — this\nsidesteps the B-register problem (A16's high byte isn't independently\naddressable). Map the cohesive core to exact files/functions: the\nlegalizer must keep s16 G_LOAD/G_STORE/G_ADD un-narrowed together, and\nselectAddSub's load-folding (m_FoldedLdAbs/...) gets s16 mirrors\n(ADCAbs16 + a new ADCImag16). Flag the corpus as the non-negotiable\nguard since this re-routes ALL s16 codegen (unsigned short is s16\neverywhere), making the core a big-bang.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0169001	author	Will Norris
 0169001	added	61
 0169001	deleted	0

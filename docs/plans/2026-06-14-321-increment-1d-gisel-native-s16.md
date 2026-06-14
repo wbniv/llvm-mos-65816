@@ -79,11 +79,32 @@ All edits extend `patches/llvm-mos/0002-321-accum16.patch`.
 
 ## Status note (2026-06-14)
 
-Step 1 (`Anyi16`) is landed and green. Steps 2-5 (the cohesive core) are mapped above to the exact
-files/functions. Because the core is an all-at-once legalizer+selector change that re-routes every
-s16 memory/ALU op and can perturb the green corpus, it is the **dedicated next effort** — implemented
-behind the corpus guard, committed only when add (local intermediate) compiles native AND corpus
-stays 7/7 — rather than rushed. The foundation + this de-risked map are this session's 1d deliverable.
+Step 1 (`Anyi16`) is landed and green. The core (steps 2-5) was **started and de-risked, then the
+partial WIP was reverted to keep the tree green** (committing a half-built big-bang would leave
+`+mos-a16` adds that escape the peephole unselectable). Confirmed by going deep:
+
+- **Tractable** — the feared `copyPhysReg` `B`-register problem **dissolves**: a single 16-bit
+  `lda`/`sta` zp moves both bytes of `A16 = B:A` atomically, so `A16 ↔ Imag16` copies are just
+  `LDAImag16`/`STAImag16` (the 16-bit analog of `LDImag8`/`STImag8`, which are `MOSTransfer<dst,src>`
+  with the imaginary reg as the **def**).
+- **Corpus-safe** — the native path is gated on `STI.hasAccum16()` (the legalizer ctor has `STI`), so
+  default (corpus) builds keep the 8-bit narrowing untouched.
+
+**Turnkey continuation (the exact remaining pieces):**
+1. `LDAImag16`/`STAImag16` = `MOSTransfer<Ac16,Imag16>` / `<Imag16,Ac16>` + `MLow=1`; `ADCImag16` =
+   `ADC_ZeroPage`-expanding, `Ac16`/`Imag16` operands. **Open Q:** their MC lowering — `STImag8`/
+   `LDImag8` are custom-lowered (no `PseudoInstExpansion`); check whether the imaginary-reg→zp-address
+   lowering generalizes to 16-bit or needs a `MOSMCInstLower` case.
+2. Legalizer: `getActionDefinitionsBuilder(G_ADD)` → `if (STI.hasAccum16()) .legalFor({S16})` (split
+   from `G_SUB`).
+3. `copyPhysReg` (`MOSInstrInfo.cpp:~667`, by the `Imag16↔Imag16` case): add `Ac16↔Imag16` →
+   `LDAImag16`/`STAImag16`.
+4. Selector: `selectAdd16Native` mirroring `selectAddSub` (`:456`) — fold a near-abs load via the
+   existing `m_FoldedLdAbs` → `ADCAbs16` (1b), else `ADCImag16`; result in `Ac16`.
+5. Test `examples/65816/a16local.c` — a multi-use s16 intermediate (forces the native path past the
+   peephole) → both emulators; corpus 7/7.
+
+This is mechanical given the map, but multi-step with GISel iteration — a focused continuation.
 
 ## Verification (per step + final)
 
