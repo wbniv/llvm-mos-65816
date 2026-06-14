@@ -1465,7 +1465,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..9a49fb896 100644
+index cbdd54ab2..a913e3fbe 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1478,7 +1478,7 @@ index cbdd54ab2..9a49fb896 100644
    bool selectFrameIndex(MachineInstr &MI);
    std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
    bool selectAddr(MachineInstr &MI);
-@@ -96,6 +99,29 @@ private:
+@@ -96,6 +99,38 @@ private:
    bool selectIncDecMB(MachineInstr &MI);
    bool selectUnMergeValues(MachineInstr &MI);
    bool selectBrIndirect(MachineInstr &MI);
@@ -1505,10 +1505,19 @@ index cbdd54ab2..9a49fb896 100644
 +  // #321 native s16 global-to-global copy (G_COPY16_ABS): lda src; sta dst in M=0,
 +  // no Imag16 temp round-trip, one rep/sep.
 +  bool selectCopy16Abs(MachineInstr &MI);
++  // #321 native s16: bring a 16-bit store's value into A16, folding a single-use
++  // G_LOAD16_ABS/INDIR (an indirect/mixed copy) directly into the accumulator load
++  // when safe (shouldFoldMemAccess) — else LDAImag16 from the value's Imag16. The
++  // emitted instr is appended to New; the folded load (to erase) is returned in
++  // FoldedLoad. Used by the store paths of selectMem16Indir/selectMem16Abs.
++  Register loadStoreValueIntoA16(MachineIRBuilder &Builder, MachineInstr &StoreMI,
++                                 Register Value,
++                                 SmallVectorImpl<MachineInstrBuilder> &New,
++                                 MachineInstr *&FoldedLoad);
  
    // Select instructions that correspond 1:1 to a target instruction.
    bool selectGeneric(MachineInstr &MI);
-@@ -195,15 +221,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -195,15 +230,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    switch (MI.getOpcode()) {
    case MOS::G_ADD:
    case MOS::G_SUB:
@@ -1555,7 +1564,7 @@ index cbdd54ab2..9a49fb896 100644
    }
  
    if (selectImpl(MI, *CoverageInfo))
-@@ -247,6 +304,34 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -247,6 +313,34 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -1590,7 +1599,7 @@ index cbdd54ab2..9a49fb896 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -777,6 +862,11 @@ struct CmpNZ_match {
+@@ -777,6 +871,11 @@ struct CmpNZ_match {
      CondMI = DefSrcReg->MI;
      if (CondMI->getOpcode() != MOS::G_SBC)
        return false;
@@ -1602,7 +1611,7 @@ index cbdd54ab2..9a49fb896 100644
  
      auto CInConst =
          getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
-@@ -789,6 +879,68 @@ struct CmpNZ_match {
+@@ -789,6 +888,68 @@ struct CmpNZ_match {
    }
  };
  
@@ -1671,7 +1680,7 @@ index cbdd54ab2..9a49fb896 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -991,6 +1143,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -991,6 +1152,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
@@ -1706,7 +1715,7 @@ index cbdd54ab2..9a49fb896 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1091,12 +1271,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1280,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -1764,7 +1773,7 @@ index cbdd54ab2..9a49fb896 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2153,513 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2162,545 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -2178,6 +2187,34 @@ index cbdd54ab2..9a49fb896 100644
 +  return true;
 +}
 +
++Register MOSInstructionSelector::loadStoreValueIntoA16(
++    MachineIRBuilder &Builder, MachineInstr &StoreMI, Register Value,
++    SmallVectorImpl<MachineInstrBuilder> &New, MachineInstr *&FoldedLoad) {
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++  FoldedLoad = nullptr;
++  Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  MachineInstr *Def = MRI.getVRegDef(Value);
++  if (Def && MRI.hasOneNonDBGUse(Value) &&
++      (Def->getOpcode() == MOS::G_LOAD16_ABS ||
++       Def->getOpcode() == MOS::G_LOAD16_INDIR) &&
++      shouldFoldMemAccess(StoreMI, *Def, AA)) {
++    // Indirect/mixed copy: fold the load directly into A16 (no Imag16 temp). The
++    // load's operand 1 is its address (abs operand or pointer); operand 0 is the
++    // value vreg this store consumes.
++    const bool LdAbs = Def->getOpcode() == MOS::G_LOAD16_ABS;
++    auto Ld = Builder.buildInstr(LdAbs ? MOS::LDAbs16 : MOS::LDAIndir16)
++                  .addDef(A16)
++                  .add(Def->getOperand(1));
++    Ld.cloneMemRefs(*Def);
++    New.push_back(Ld);
++    FoldedLoad = Def;
++  } else {
++    // Value is already a 16-bit register (Imag16): load it into A16.
++    New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(A16).addUse(Value));
++  }
++  return A16;
++}
++
 +// #321 native s16 indirect load/store: a 16-bit value through a runtime pointer.
 +//  G_LOAD16_INDIR  (dst s16, ptr) -> lda (zp)16 -> A16; sta zp16 -> Imag16 dst
 +//  G_STORE16_INDIR (val s16, ptr) -> lda zp16 (val -> A16); sta (zp)16
@@ -2197,14 +2234,15 @@ index cbdd54ab2..9a49fb896 100644
 +  // the memref there. The Imag16 load/store that moves the value to/from A16 is an
 +  // internal zp register transfer with no memref (mirrors selectAlu16AbsLd).
 +  SmallVector<MachineInstrBuilder, 2> New;
-+  Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  MachineInstr *FoldedLoad = nullptr;
 +  if (IsLoad) {
++    Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
 +    auto Ld = Builder.buildInstr(MOS::LDAIndir16).addDef(A16).addUse(Ptr);
 +    Ld.cloneMemRefs(MI);
 +    New.push_back(Ld);
 +    New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
 +  } else {
-+    New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(A16).addUse(ValOrDst));
++    Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
 +    auto St = Builder.buildInstr(MOS::STAIndir16).addUse(A16).addUse(Ptr);
 +    St.cloneMemRefs(MI);
 +    New.push_back(St);
@@ -2212,7 +2250,8 @@ index cbdd54ab2..9a49fb896 100644
 +
 +  for (MachineInstrBuilder &Bld : New)
 +    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
-+
++  if (FoldedLoad)
++    FoldedLoad->eraseFromParent();
 +  MI.eraseFromParent();
 +  return true;
 +}
@@ -2232,14 +2271,15 @@ index cbdd54ab2..9a49fb896 100644
 +  const MachineOperand &AbsOp = MI.getOperand(1);
 +
 +  SmallVector<MachineInstrBuilder, 2> New;
-+  Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  MachineInstr *FoldedLoad = nullptr;
 +  if (IsLoad) {
++    Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
 +    auto Ld = Builder.buildInstr(MOS::LDAbs16).addDef(A16).add(AbsOp);
 +    Ld.cloneMemRefs(MI);
 +    New.push_back(Ld);
 +    New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
 +  } else {
-+    New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(A16).addUse(ValOrDst));
++    Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
 +    auto St = Builder.buildInstr(MOS::STAbs16).addUse(A16).add(AbsOp);
 +    St.cloneMemRefs(MI);
 +    New.push_back(St);
@@ -2247,7 +2287,8 @@ index cbdd54ab2..9a49fb896 100644
 +
 +  for (MachineInstrBuilder &Bld : New)
 +    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
-+
++  if (FoldedLoad)
++    FoldedLoad->eraseFromParent();
 +  MI.eraseFromParent();
 +  return true;
 +}

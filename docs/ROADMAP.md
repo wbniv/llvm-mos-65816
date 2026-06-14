@@ -332,9 +332,11 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    STZ-fusion/byte path. A `copy16abs` combiner then fuses the pure global-to-global copy — `g = gg`
    was `lda gg; sta tmp; lda tmp; sta g` (an Imag16 temp round-trip from independent load/store
    selection); `G_STORE(single-use G_LOAD(absSrc), absDst)` now folds to `G_COPY16_ABS` →
-   `lda gg; sta g` (2 ops, no temp). The indexed `abs,x` form is moot (llvm-mos is fully pointer-based)
-   and the X-flag dimension remains an optional follow-up. Non-breaking (corpus 7/7, all 21 a16* tests
-   green, patch `0002` round-trips).
+   `lda gg; sta g` (2 ops, no temp), and a selection-time fold (`loadStoreValueIntoA16`, gated by
+   `shouldFoldMemAccess`) extends this to the **indirect** copy — `g = *p` is `lda (p); sta g` instead
+   of the Imag16 round-trip (`a16copy` reads 0x3456). The indexed `abs,x` form is moot (llvm-mos is
+   fully pointer-based) and the X-flag dimension remains an optional follow-up. Non-breaking (corpus
+   7/7, all 22 a16* tests green, patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·

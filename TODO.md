@@ -61,13 +61,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
   ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
-- [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)`, absolute, ~~and the abs→abs copy
-  fusion~~ all landed — see Done). Remaining: (a) extend the copy fusion to **indirect/mixed** copies
-  (`*q = *p`, `g = *p`, `*p = gg` still round-trip through an Imag16 temp; only abs←abs is fused);
-  (b) the indexed `abs,x`/`(zp),y` forms are **moot** (llvm-mos is fully pointer-based — even array-sum
-  loops emit native `lda (zp)`); (c) **re-evaluate the X-flag (xy16) mode dimension** — 16-bit index
-  registers via `rep/sep #$10` (a new dimension in `MOSInsertREPSEP`); NOT required for array access,
-  so assess whether it pays off at all before building it.
+- [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)`, absolute, the abs→abs copy fusion,
+  ~~and the indirect copy fusion~~ all landed — see Done). Remaining: (a) the indir-**dst** copy fold
+  (`*p = gg`, `*q = *p`) only fires when the dst-pointer load doesn't sit between the value-load and the
+  store as an ordered (volatile) memref — for a volatile pointer it conservatively stays a round-trip;
+  consider loading the dst pointer first so the value-load is adjacent to the store; (b) the indexed
+  `abs,x`/`(zp),y` forms are **moot** (llvm-mos is fully pointer-based); (c) **re-evaluate the X-flag
+  (xy16) mode dimension** — NOT required for array access; assess whether it pays off before building.
   [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
   [absolute plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). From the 1c
@@ -132,6 +132,18 @@ llvm-mos change to track) rather than active work._
 
 
 ## Done
+
+- 2026-06-15 — [321-native-s16-copy16-fold] **fuse the 16-bit indirect copy (`g = *p`).** Extends the
+  abs→abs copy fusion to indirect/mixed copies at selection: a single-use 16-bit `G_LOAD16_ABS`/
+  `G_LOAD16_INDIR` feeding a 16-bit store folds the load directly into the accumulator (new helper
+  `loadStoreValueIntoA16` in the store paths of `selectMem16Abs`/`selectMem16Indir`), gated by
+  `shouldFoldMemAccess` (same block, non-volatile load, no aliasing/ordered op between) — so `g = *p`
+  is `lda (p); sta g` instead of `lda (p); sta tmp; lda tmp; sta g`. `a16copy` (abs←indir) folds with
+  no Imag16 round-trip and reads 0x3456; `-verify-machineinstrs` clean; both MAME + bsnes-jg.
+  Non-breaking: corpus 7/7, all 22 a16* tests green, patch `0002` round-trips. The indir-dst direction
+  folds only when the dst-pointer load doesn't intervene as an ordered memref (volatile-pointer copies
+  conservatively stay a round-trip — correct).
+  [plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
 
 - 2026-06-15 — [321-native-s16-copy16abs] **fuse the 16-bit global-to-global copy (`g = gg`).** The
   absolute load/store landed `g = gg` as `lda gg; sta tmp; lda tmp; sta g` — the value round-tripped
