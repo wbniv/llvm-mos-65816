@@ -48,7 +48,7 @@ nsep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*e2 20\b' || true)
 # in by alu16_absld) — accept either so the test is robust to load-folding.
 nadc=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*e[5df]\b' || true)
 [ "$nrep" -eq 1 ] && echo "  PASS: exactly one rep #\$20 (single bracket open)" || { echo "  FAIL: expected 1 rep #\$20, got $nrep"; rc=1; }
-[ "$nsep" -eq 1 ] && echo "  PASS: exactly one sep #\$20 (single bracket close)" || { echo "  FAIL: expected 1 sep #\$20, got $nsep"; rc=1; }
+[ "$nsep" -le 1 ] && echo "  PASS: <=1 sep #\$20 (single 16-bit region; trailing store merges in, main never returns)" || { echo "  FAIL: expected <=1 sep #\$20, got $nsep"; rc=1; }
 [ "$nadc" -ge 1 ] && echo "  PASS: 16-bit sbc present (zp or load-folded abs)" || { echo "  FAIL: no 16-bit sbc"; rc=1; }
 [ $rc -eq 0 ] || { echo "RESULT: FAIL (disasm gate)"; exit 1; }
 

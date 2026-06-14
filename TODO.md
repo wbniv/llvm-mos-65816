@@ -61,14 +61,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
   ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
-- [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)` load/store landed — see Done).
-  Same combiner/legalizer+selector style: (a) **indexed** 16-bit load/store — `abs,x` (array-sum loops
-  `ldy a,x; lda a+1,x` → `rep; lda a,x; sep`) and `(zp),y`; (b) **plain 16-bit absolute** load/store of
-  a standalone global (`g = gg`) where no ALU fold applies; (c) **re-evaluate the X-flag (xy16) mode
-  dimension** — 16-bit index registers via `rep/sep #$10` (a new dimension in `MOSInsertREPSEP`
-  enabling `lda abs,x` with a 16-bit index). The X-flag is NOT required for array access (llvm-mos is
-  pointer-based); assess whether it pays off at all before building it.
-  [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md).
+- [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)` ~~and absolute~~ load/store both
+  landed — see Done). Remaining: (a) **fuse a 16-bit load→store copy** (`g = gg` currently round-trips
+  the value through an Imag16 temp: `lda gg; sta tmp; lda tmp; sta g` — a peephole could emit
+  `lda gg; sta g` directly); (b) the indexed `abs,x`/`(zp),y` forms are **moot** (llvm-mos is fully
+  pointer-based — even array-sum loops emit native `lda (zp)`); (c) **re-evaluate the X-flag (xy16)
+  mode dimension** — 16-bit index registers via `rep/sep #$10` (a new dimension in `MOSInsertREPSEP`);
+  NOT required for array access, so assess whether it pays off at all before building it.
+  [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
+  [absolute plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). From the 1c
   "out of scope": SUB chains (order-sensitive) and AND/OR/XOR chains, immediates *within* chains (1c
   requires all terms be loads), and **spilling when >1 16-bit value is live at once**.
@@ -131,6 +132,20 @@ llvm-mos change to track) rather than active work._
 
 
 ## Done
+
+- 2026-06-15 — [321-native-16bit-absolute-load-store] **native 16-bit absolute load/store (`g = gg`).**
+  A 16-bit global-to-global copy / global store of a computed value did a 4-op 8-bit X/Y byte shuffle
+  with no rep/sep; now `legalizeLoadStore16` routes a global-addressed s16 access (via
+  `matchAbsoluteAddressing`) to `G_LOAD16_ABS`/`G_STORE16_ABS`, selected (`selectMem16Abs`) to
+  `lda abs`/`sta abs` via the existing `LDAbs16`/`STAbs16` `MLow=1` forms. `a16abs` reads 0x5A3D, no
+  byte shuffle; register-valued `corpus_result = …` stores across the suite go native and merge into
+  the preceding bracket (fewer rep/sep). **Constant-valued stores are gated out** (kept on the
+  STZ-fusion/byte path — `g16 = 0` stays `rep; stz; sep`). The merge changed the rep/sep shape of 11
+  existing tests; all were emulator-verified still correct before the stale exact-count gates were
+  relaxed. `-verify-machineinstrs` clean; both MAME + bsnes-jg. Non-breaking: corpus 7/7, all 21 a16*
+  tests green, patch `0002` round-trips. Follow-up: fuse the load→store copy (drop the Imag16 temp
+  round-trip).
+  [plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
 
 - 2026-06-15 — [321-native-16bit-indirect-load-store] **native 16-bit indirect load/store (`*p`,
   `a[i]`, `a[i]=v`).** Scope correction: indexed/array access does NOT need the X-flag dimension —

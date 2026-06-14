@@ -324,9 +324,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    stored as two 8-bit indirect ops (`lda (zp); lda (zp),y`); now an s16 `G_LOAD`/`G_STORE` through a
    non-absolute 16-bit pointer routes (in `legalizeLoadStore16`) to `G_LOAD16_INDIR`/`G_STORE16_INDIR`,
    selected to `lda (zp)`/`sta (zp)` (new `LDAIndir16`/`STAIndir16` `MLow=1` forms) in one rep/sep —
-   `a16ptr` round-trips 0xABCE via `*p`, no `(zp),y` byte pair. Absolute/indexed 16-bit access and the
-   X-flag (xy16) index-register dimension are follow-ups. Non-breaking (corpus 7/7, all 20 a16* tests
-   green, patch `0002` round-trips).
+   `a16ptr` round-trips 0xABCE via `*p`, no `(zp),y` byte pair. The **absolute** case follows
+   (`legalizeLoadStore16` routes a global-addressed s16 access to `G_LOAD16_ABS`/`G_STORE16_ABS` →
+   `lda abs`/`sta abs` via the existing `LDAbs16`/`STAbs16`): `g = gg` is one 16-bit copy instead of a
+   4-op X/Y byte shuffle (`a16abs` reads 0x5A3D), and register-valued `corpus_result = …` stores across
+   the suite go native and merge into their preceding bracket. Constant-valued stores stay on the
+   STZ-fusion/byte path. The indexed `abs,x` form is moot (llvm-mos is fully pointer-based) and the
+   X-flag dimension remains an optional follow-up. Non-breaking (corpus 7/7, all 21 a16* tests green,
+   patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
@@ -336,7 +341,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [signed-shift plan](plans/2026-06-15-321-native-16bit-signed-shift-ashr.md) ·
    [equality-compares plan](plans/2026-06-15-321-native-16bit-equality-compares.md) ·
    [signed-compares plan](plans/2026-06-15-321-native-16bit-signed-compares.md) ·
-   [indirect-load-store plan](plans/2026-06-15-321-native-16bit-indirect-load-store.md)._
+   [indirect-load-store plan](plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
+   [absolute-load-store plan](plans/2026-06-15-321-native-16bit-absolute-load-store.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

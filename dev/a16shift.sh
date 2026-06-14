@@ -47,7 +47,7 @@ nlsr=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*4a\b' || true)  # lsr 
 nrot=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(2a|6a)\b' || true)  # rol/ror a (8-bit chain)
 nlib=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(20|22)\b' || true)  # jsr/jsl (shift libcall)
 [ "$nrep" -ge 1 ] && echo "  PASS: $nrep rep #\$20 bracket(s)" || { echo "  FAIL: no rep #\$20"; rc=1; }
-[ "$nsep" -ge 1 ] && echo "  PASS: $nsep sep #\$20" || { echo "  FAIL: no sep #\$20"; rc=1; }
+[ "$nsep" -le 1 ] && echo "  PASS: $nsep sep #\$20 (<=1; trailing store merges in, main never returns)" || { echo "  FAIL: expected <=1 sep #\$20, got $nsep"; rc=1; }
 [ "$nasl" -eq 4 ] && echo "  PASS: 4 asl a (x << 4, one per bit, 16-bit)" || { echo "  FAIL: expected 4 asl a, got $nasl"; rc=1; }
 [ "$nlsr" -eq 2 ] && echo "  PASS: 2 lsr a (x >> 2, one per bit, 16-bit)" || { echo "  FAIL: expected 2 lsr a, got $nlsr"; rc=1; }
 [ "$nrot" -eq 0 ] && echo "  PASS: no 8-bit rol/ror (not the byte-pair chain)" || { echo "  FAIL: found $nrot rol/ror — shift narrowed to 8-bit pairs"; rc=1; }

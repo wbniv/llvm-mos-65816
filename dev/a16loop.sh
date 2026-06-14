@@ -59,14 +59,16 @@ for ln in open(sys.argv[1]):
 reps = [a for (a, b, *_ ) in insns if b.startswith("c2 20")]
 seps = [a for (a, b, *_ ) in insns if b.startswith("e2 20")]
 rc = 0
-if len(reps) == 1:
-    print("  PASS: exactly one rep #$20 (hoisted to the preheader)")
+# >=1 each (the trailing `corpus_result = acc` store is now a native 16-bit absolute
+# store in its own bracket); the must-win check below is "none inside the loop body".
+if len(reps) >= 1:
+    print(f"  PASS: {len(reps)} rep #$20 (>=1; loop rep hoisted to the preheader)")
 else:
-    print(f"  FAIL: expected 1 rep #$20, got {len(reps)}"); rc = 1
-if len(seps) == 1:
-    print("  PASS: exactly one sep #$20 (sunk to the loop exit)")
+    print(f"  FAIL: expected >=1 rep #$20, got {len(reps)}"); rc = 1
+if len(seps) >= 1:
+    print(f"  PASS: {len(seps)} sep #$20 (>=1; loop sep sunk to the exit)")
 else:
-    print(f"  FAIL: expected 1 sep #$20, got {len(seps)}"); rc = 1
+    print(f"  FAIL: expected >=1 sep #$20, got {len(seps)}"); rc = 1
 
 # Find loop bodies via backward branches and assert no rep/sep inside.
 modes = set(reps) | set(seps)

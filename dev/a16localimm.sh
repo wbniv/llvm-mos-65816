@@ -48,7 +48,7 @@ nimm=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*69\b' || true)   # 69 
 nzp=$(printf '%s\n'  "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*65\b' || true)   # 65 = adc zp  (un-folded)
 fsz=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:' || true)
 [ "$nrep" -eq 1 ] && echo "  PASS: exactly one rep #\$20 (single bracket open)" || { echo "  FAIL: expected 1 rep #\$20, got $nrep"; rc=1; }
-[ "$nsep" -eq 1 ] && echo "  PASS: exactly one sep #\$20 (single bracket close)" || { echo "  FAIL: expected 1 sep #\$20, got $nsep"; rc=1; }
+[ "$nsep" -le 1 ] && echo "  PASS: <=1 sep #\$20 (single 16-bit region; trailing store merges in, main never returns)" || { echo "  FAIL: expected <=1 sep #\$20, got $nsep"; rc=1; }
 [ "$nimm" -ge 1 ] && echo "  PASS: adc #imm present (immediate folded, opcode 69)" || { echo "  FAIL: no adc #imm — constant not folded"; rc=1; }
 [ "$nzp"  -eq 0 ] && echo "  PASS: no adc zp — constant is NOT materialized into Imag16" || { echo "  FAIL: found adc zp ($nzp) — constant still materialized"; rc=1; }
 echo "  (main is $fsz instructions — the immediate fold drops the ~4-instr constant materialization)"

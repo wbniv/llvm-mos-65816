@@ -44,7 +44,7 @@ nrep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b' || true)
 neor=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*49 00 80\b' || true)       # eor #$8000 (sign flip)
 ncmp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c[59d]\b' || true)         # cmp zp/imm/abs
 ncpxy=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(e4|ec|c4|cc)\b' || true) # 8-bit cpx/cpy chain
-[ "$nrep" -ge 4 ] && echo "  PASS: $nrep rep #\$20 bracket(s) — native 16-bit signed compares" || { echo "  FAIL: expected >=4 rep #\$20, got $nrep"; rc=1; }
+[ "$nrep" -ge 3 ] && echo "  PASS: $nrep rep #\$20 bracket(s) — native 16-bit signed compares" || { echo "  FAIL: expected >=3 rep #\$20, got $nrep"; rc=1; }
 [ "$neor" -ge 4 ] && echo "  PASS: $neor eor #\$8000 (sign-flip to unsigned order)" || { echo "  FAIL: expected >=4 eor #\$8000, got $neor"; rc=1; }
 [ "$ncmp" -ge 4 ] && echo "  PASS: $ncmp 16-bit cmp ops" || { echo "  FAIL: expected >=4 16-bit cmp, got $ncmp"; rc=1; }
 [ "$ncpxy" -eq 0 ] && echo "  PASS: no 8-bit cpx/cpy chain (fully native 16-bit)" || { echo "  FAIL: found $ncpxy cpx/cpy — signed compare narrowed to 8-bit"; rc=1; }
