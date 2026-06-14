@@ -44,9 +44,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   store results (the `>1 use` guard skips these today); (c) chained multi-use load expressions (extend
   `add_chain16`).
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
-  and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) compare feeding a
-  **select**/bool value (equality/signed producing a stored bool, not a branch, still narrows to
-  8-bit); (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
+  and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality** feeding a
+  stored bool/value (`b = (a == c)`) still narrows to the 8-bit cpx/cpy chain — ordering-as-value
+  (`b = (a < c)`) ALREADY goes native (C is a plain i1, materialized via branch), but the Z-flag value
+  path narrows in the **select lowering** (relaxing the EQ branch-gate + `buildNZSelect` did NOT fold
+  the s16 compare back to native — investigated 2026-06-15, reverted; needs the select/NZ lowering to
+  fold an s16 `G_SBC`); (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
   [plan](docs/plans/2026-06-14-321-native-16bit-compares.md) ·
   [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
   [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md).
