@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/57f55c0) | #321 Inc 1b: 16-bit SUBTRACT through A16 (reuses the add path) |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/a6123d1) | #321 Inc 1b COMPLETE: a running 16-bit ADD through the dual-width A16 accumulator |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/6736297) | #321 Inc 1b step 1: model the dual-width 16-bit accumulator register |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/d34a89d) | #321 Inc 1b: plan + grounding investigation (cheap-fusion well is dry) |
 
 <!--history-meta v1
+57f55c0	author	Will Norris
+57f55c0	added	9
+57f55c0	deleted	6
+57f55c0	files	1
+57f55c0	body	g16 = a16v - b16v (0x1234 - 0x1111) now compiles under +mos-a16 to\nsec; rep #$20; lda; sbc; sta; sep #$20 and reads corpus_result == 0x0123\non BOTH MAME and bsnes-jg. Completes the basic 16-bit arithmetic pair.\n\nReuses the entire add path: the combiner matcher now accepts G_ADD or\nG_SUB; a parallel G_SUB16_ABS op + SBCAbs16 logical instr; and\nselectAdd16Abs branches on the opcode (sec + sbc, carry-in 1, and\norder-sensitive: $a is the minuend, $b the subtrahend). The carry-init\n(sec) sits outside the REP/SEP run like clc does for add.\n\nNon-breaking: add still 0x2345, corpus 7/7, far xcheck green, SDK builds.\nNew dev/run.sh a16sub + examples/65816/a16sub.c. Patch 0002 regenerated\n(round-trip verified: pristine -> 0001 -> 0002 reproduces the tree).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a6123d1	author	Will Norris
 a6123d1	added	97
 a6123d1	deleted	17

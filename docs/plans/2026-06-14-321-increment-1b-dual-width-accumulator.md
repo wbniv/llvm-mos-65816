@@ -8,6 +8,12 @@ by the native-mode crt0. `dev/run.sh a16add` / `a16sub`. The real value flows th
 `A16` accumulator — the genuine hard core of #321. Subtract reuses the whole add path: same combiner
 matcher (now `G_ADD`|`G_SUB`), a parallel `G_SUB16_ABS` op + `SBCAbs16`, and `selectAdd16Abs` branches
 on the opcode for `sec`/`sbc` (carry-in 1, order-sensitive: `$a` minuend, `$b` subtrahend).
+The full 16-bit ALU set landed the same way: **`& | ^`** (AND/ORA/EOR, no carry) also compile through
+`A16` — `g = a16v & b16v` → `0x0F00` on both emulators (`dev/run.sh a16bit`), and three consecutive
+bitwise ops **merge into a single `rep #$20 … sep #$20` bracket** (no carry-init breaks the MLow=1
+run — better amortization than add/sub, which each carry a `clc`/`sec`). The combiner matcher accepts
+`G_ADD|G_SUB|G_AND|G_OR|G_XOR`; `selectAlu16Abs` maps each to its logical op (`ADC/SBC/AND/ORA/EOR
+Abs16`) and emits the carry-init only for arithmetic.
 Non-breaking: corpus 7/7, Inc 1a (0x0042) and far xcheck green, SDK builds. · **Milestone:** M2
 (ROADMAP step 5). **Builds on:** Increment 1a (the `MOSInsertREPSEP`
 pass + opt-in `+mos-a16` feature, [plan](2026-06-14-321-increment-1-16bit-accumulator.md)) and the

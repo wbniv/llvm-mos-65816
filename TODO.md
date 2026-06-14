@@ -59,16 +59,17 @@ starting, or blocked on an external factor)._
 
 ## Done
 
-- 2026-06-14 — [321-increment-1b-dual-width-accumulator] **a running 16-bit ADD through the dual-width
-  A16 accumulator** — modeled the 65816's 16-bit accumulator `A16 = B:A` (class `Ac16`, aliasing `A`;
-  named A16 not WDC's "C" to avoid the carry-flag footgun), then fused `g16 = a16v + b16v` via a
-  pre-legalizer combiner rule → a `G_ADD16_ABS` op → `selectAdd16Abs` emitting
-  `clc; rep #$20; lda; adc; sta; sep #$20` (one bracket). Reads `corpus_result == 0x2345` on **both**
-  MAME and bsnes-jg, 31 B vs 48 B for the 8-bit carry chain. Non-breaking: corpus 7/7, Inc 1a + far
-  xcheck green, SDK builds. Findings: a legalizer rule for a MOS-specific *generic* opcode corrupts
-  the legalizer tables (skip by opcode-range instead); the `clc` must sit outside the REP/SEP run.
-  `dev/run.sh a16add`; patch `0002-321-accum16.patch`. The genuine hard core of #321.
-  [plan](docs/plans/2026-06-14-321-increment-1b-dual-width-accumulator.md).
+- 2026-06-14 — [321-increment-1b-dual-width-accumulator] **a running 16-bit ALU (add/sub/and/or/xor)
+  through the dual-width A16 accumulator** — modeled the 65816's 16-bit accumulator `A16 = B:A` (class
+  `Ac16`, aliasing `A`; named A16 not WDC's "C" to avoid the carry-flag footgun), then a pre-legalizer
+  combiner fuses `g = a OP b` (near abs globals) → a `G_{ADD,SUB,AND,OR,XOR}16_ABS` op → `selectAlu16Abs`
+  emitting one REP/SEP-bracketed 16-bit sequence: `clc;lda;adc;sta` (0x2345), `sec;lda;sbc;sta` (0x0123),
+  and `lda;and|ora|eor;sta` (AND→0x0F00; three bitwise ops merge into ONE bracket). All read back correct
+  on **both** MAME and bsnes-jg; add is 31 B vs 48 B for the 8-bit carry chain. Non-breaking: corpus 7/7,
+  Inc 1a + far xcheck green, SDK builds. Findings: a legalizer rule for a MOS-specific *generic* opcode
+  corrupts the legalizer tables (skip by opcode-range instead); the carry-init must sit outside the
+  REP/SEP run. `dev/run.sh a16add|a16sub|a16bit`; patch `0002-321-accum16.patch`. The genuine hard core
+  of #321. [plan](docs/plans/2026-06-14-321-increment-1b-dual-width-accumulator.md).
 
 - 2026-06-14 — [321-native-mode-crt0] **SNES platform now boots 65816 native mode** — crt0 `.init.50`
   does `clc; xce` + a 16-bit `ldx #$01ff; txs` (page-1 stack) + `sep #$30` (8-bit A/X default), so
