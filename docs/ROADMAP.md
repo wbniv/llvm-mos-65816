@@ -257,6 +257,20 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    fix needs allocator/coalescer-level work to keep `A16` and 8-bit `A` from entangling.
    [Inc 1d plan](plans/2026-06-14-321-increment-1d-gisel-native-s16.md)._
 
+   _**Increment 1d-retry (2026-06-14): GISel-native s16 — the coalescer crash SOLVED; native add ships.**
+   Re-diagnosed from the code: the crash wasn't the `A16=A` aliasing (the peephole creates `Ac16` vregs
+   and is fine; the aliasing is needed for transient-`A16` soundness) — it was the prototype keeping the
+   s16 value resident *in* `Ac16` and shuffling it to/from `Imag16` with `copyPhysReg` (COPY-like), so an
+   8-bit `LDImm` coalesced into that COPY. The fix mirrors the proven peephole: the s16 **value lives in
+   `Imag16`** and the native add selects to a self-contained `lda zp; clc; adc zp; sta zp` on the
+   transient `A16` (new `LDAImag16`/`ADCImag16`/`STAImag16` ops) — the accumulator is entered/left **only
+   via load/store, never a COPY to/from 8-bit**, so nothing for the coalescer to corrupt. A multi-use
+   **local** add (`a16local.c`, peephole-impossible) runs `0x1122`, and the exact complex multi-op shape
+   that crashed the prototype (`a16localx.c`: 5 native adds + reused locals) now **compiles clean
+   (`-verify-machineinstrs`)** and runs `0x33A0` — both on **both** MAME and bsnes-jg. Non-breaking
+   (corpus 7/7, all six 1a-1c a16* tests green). Remaining: native sub/bitwise/immediates (step 5).
+   [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md)._
+
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
    the ROM's symbols.)
