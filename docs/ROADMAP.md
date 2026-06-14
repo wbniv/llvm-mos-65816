@@ -10,15 +10,20 @@ DWARF symbols → source-level debug in drmon* on fully-open tooling. See the
 [investigation](INVESTIGATION.md) for the full status,
 players, and rival/dead efforts; this plan is the **execution order** distilled from it.
 
-**Current state (verified 2026-06-13):**
+**Upstream baseline at project start (verified 2026-06-13)** — what `llvm-mos`/`llvm-mos-sdk`
+shipped before this work; our progress against it is tracked in the milestone + verification
+sections below:
 
 - 65816 **assembler + linker**: shipped. `FeatureW65816` subtarget exists in `MOSDevices.td`.
-- 65816 **C code generation**: does not exist. Two open, design-only issues:
+- 65816 **C code generation**: did not exist upstream. Two open, design-only issues:
   [#320](https://github.com/llvm-mos/llvm-mos/issues/320) (24-bit address space) and
-  [#321](https://github.com/llvm-mos/llvm-mos/issues/321) (16-bit register mode).
-- **SNES SDK target**: does not exist — open issue
+  [#321](https://github.com/llvm-mos/llvm-mos/issues/321) (16-bit register mode). _This fork now
+  has both, in slice form: #320 far-pointer load/store (M1, PASS) and #321 16-bit-accumulator
+  Inc 1a + native-mode crt0 (M2, in progress) — none upstreamed yet._
+- **SNES SDK target**: did not exist upstream — open issue
   [llvm-mos-sdk#415](https://github.com/llvm-mos/llvm-mos-sdk/issues/415). SDK ships 46 platforms
-  (8 NES variants, C64, …) but no SNES.
+  (8 NES variants, C64, …) but no SNES. _This fork's `mos-platform/snes` (+ `snes-far`) target is
+  built and green (M0, PASS)._
 - **No active implementer** since @asiekierka stepped away (his design notes in #320/#321 stand).
 
 ## Goal
@@ -51,13 +56,16 @@ Stand up the infrastructure every later milestone needs, using the *existing* 65
   headerless `.sfc`. **Structural verification PASS**: reset `$FFFC`→`_start` (`$8000`); boot path
   disassembles byte-exact to the crt0; `main()` compiled + placed (`$8036`); header well-formed;
   checksum `0x3986 + 0xC679 = 0xFFFF`. (See verification step 1 evidence below.)
-- **TODO — emulator smoke loop:** a bank-0 C "hello world" **boots and runs in MAME's `snes`
-  driver**, headless, with a programmatic assert (`sentinel == 0x42` in WRAM), driven from
-  `dev/run.sh smoke` and CI. MAME is the chosen core so the CI bench matches drdevtools `drmon`'s
-  emulation backend (green-in-CI == attachable-in-drmon); a bsnes-jg/Mesen2 cross-check is deferred
-  to M1 when codegen fidelity matters. See
-  [plan](plans/2026-06-14-emulator-smoke-loop.md). Needs `mame` added to the dev container.
-- **TODO — regression corpus:** a handful of small C programs with known-correct output.
+- ~~Emulator smoke loop: a bank-0 C "hello world" **boots and runs in MAME's `snes` driver**,
+  headless, with a programmatic assert (`sentinel == 0x42` in WRAM).~~ **Done** (2026-06-14) —
+  `dev/run.sh smoke` (MAME 0.285, `snes` driver) green; negative control + clean-room `repro` +
+  manual CI all pass. MAME chosen so the CI bench matches drdevtools `drmon`'s emulation backend
+  (green-in-CI == attachable-in-drmon); the bsnes-jg cross-check landed at M1.
+  [plan](plans/2026-06-14-emulator-smoke-loop.md).
+- ~~Regression corpus: a handful of small C programs with known-correct output.~~ **Done**
+  (2026-06-14) — 6 self-contained C programs (`examples/snes/corpus/`), host-checked vs
+  `expected.tsv`; `dev/run.sh corpus` → 7/7.
+  [plan](plans/2026-06-14-m0-regression-corpus-5-self-contained-c-programs.md).
 
 Build is fully containerized (host stays clean) — Dockerfile + `build.sh`/`compile.sh`/`validate.sh`
 in the `~/SRC/llvm-mos-snes` workspace.
