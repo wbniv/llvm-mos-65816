@@ -199,6 +199,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    emit `JSL`; direct-page vs absolute vs long accesses match the addrspace of the pointer.
    (Evidence: `llvm-objdump` excerpt.)
 
+   _**PARTIAL** (2026-06-14). **Data-access half: PASS** — far loads/stores lower to absolute-long
+   (`af`/`8f`, see step 3's `lda $018000` = `af 00 80 01`) and near data stays 16-bit absolute, so
+   accesses match the pointer's addrspace. **Far-call half (JSR vs JSL): DEFERRED** — far *function*
+   calls have no codegen yet; emitting `JSL`/`RTL` requires the compiler to know a callee's bank,
+   which is the calling-convention decision (open, ABI-gating — see "Calling-convention decision"
+   above) and is upstream-coordinated. It lands with the full #320 model + ABI, not the #320
+   far-data slice. Tracked as TODO "#320 full model + upstream"._
+
 5. **M2 — 16-bit A + REP/SEP.** A 16-bit arithmetic kernel (e.g. fixed-point multiply-add loop)
    compiles with correct `REP`/`SEP` placement, produces correct results, and is **smaller/faster**
    than the M1 8-bit-mode output for the same source. The M0+M1 corpus stays green. (Evidence:
