@@ -9,6 +9,11 @@ API — full comment threads of issues [#32](https://github.com/llvm-mos/llvm-mo
 inspected directly. Supersedes the time-bounded llvm-mos section of the
 Zardoz investigation (drdevtools research) (which was anchored to Oct 2024 / Jan 2026).
 
+**Supplement (2026-06-15):** "Rival & dead-end efforts" extended with non-llvm-mos / academic 65816
+prior art surfaced via public web search (luizperes/llvm-to-snes, Peppar/llvm-C65-sfc-example, the
+CSUN MS thesis). The llvm-mos **Discord still was not read** — it has no public mirror and no
+connector is available to this session; the Discord caveat below stands unchanged.
+
 ---
 
 ## Bottom line
@@ -194,7 +199,29 @@ heads and in #320/#321.
   the machine has 32-bit or better registers even if I have indicated that the native bit width is
   16."* Historical reference only — predates llvm-mos entirely.
 - **[jackoalan/llvm-mos](https://github.com/jackoalan/llvm-mos)** (2022) — the REP/SEP POC pass
-  noted above. The only real codegen prototype; stale but worth reading.
+  noted above. The only real codegen prototype *on llvm-mos*; stale but worth reading.
+
+**Pre-/non-llvm-mos 65816 LLVM attempts (all on mainline LLVM, all hit the same wall).** These
+predate or sidestep llvm-mos and reinforce the jeremysrand lesson — mainline LLVM fights a
+sub-32-bit target, and none produced an *optimizing, maintained* compiler:
+
+- **[luizperes/llvm-to-snes](https://github.com/luizperes/llvm-to-snes)** — a backend living in
+  `lib/Target/SNES/` of a full LLVM source fork, lowering LLVM IR → WLA DX (65c816 asm) → SNES ROM.
+  Explicitly 16-bit-only ("does not support 32 or 64 bit"). ~56 commits, no release, a standing
+  `lib/Target/SNES/TODO.md` of unfinished work — early-stage and abandoned. A separate translator
+  path, not built on llvm-mos's imaginary-register/soft-stack machinery.
+- **[Peppar/llvm-C65-sfc-example](https://github.com/Peppar/llvm-C65-sfc-example)** — an example
+  SFC/SNES "game" built on a custom **"C65" LLVM backend** (the separate `llvm-C65` backend, not
+  llvm-mos), emitting WLA library format and linked with `wla-65816`/`wlalink`. ~5 commits, POC; the
+  backend is experimental (e.g. "Global variables have to be defined in boot.asm for now"). Useful
+  only as a worked example of the IR→WLA approach.
+- **[CSUN MS thesis — "LLVM IR To SNES-Compatible 65c816 ASM Compiler"](https://scholarworks.calstate.edu/concern/theses/sb397g46r)**
+  ([PDF](https://scholarworks.calstate.edu/downloads/3197xv589)) — academic prior art from California
+  State University, Northridge (addendum dated 2024-06-12). Compiles a **subset** of LLVM IR to
+  **unoptimized** 65c816 assembly — i.e. it confirms the IR→65816 path is tractable but stops well
+  short of an optimizing compiler, which is exactly the gap llvm-mos's #320/#321 would close. (Author
+  name not recorded here — the ScholarWorks record page returns 403 to automated fetch; cite the PDF
+  directly.)
 
 ---
 
