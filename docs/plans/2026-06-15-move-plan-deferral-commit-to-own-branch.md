@@ -99,3 +99,29 @@ The seeded ledger commit (`eca2c8d` in llvm-mos-65816) is unaffected.
 - **Check out the feature branch** — `git checkout feat/plan-deferral-audit` (live, but parks the
   md-history work and runs the shared lib off a feature branch).
 - **Leave it** — keep it isolated for review; activate later by merging.
+
+## Update — landed on `main` via cherry-pick (chosen: make it live)
+
+A plain merge/FF of `feat/plan-deferral-audit` would NOT have been clean: that branch carries my
+commit **stacked on 3 unmerged md-to-html commits** (`df7dd15`, `c2ff278`, `162cfa5` — the
+`fix/md-history-footer-all-docs` work), so merging would drag them onto `main` — re-entangling
+exactly what this plan isolated. Instead I **cherry-picked only `9eb66c3`** onto `main` (the 3 files
+it touches — `Taskfile.shared.yml`, `git-hooks/pre-commit`, `scripts/audit-plan-deferrals.sh` — are
+identical between `main` and the md work, so it applied with zero conflict).
+
+Final state (verified):
+```
+main                            →  ● b99dc74  (cherry-pick of my feature) — CHECKED OUT, hook LIVE
+                                   ● 90f7146  (origin/main)
+feat/plan-deferral-audit        →  ● 9eb66c3  (original, still on top of the md work) — now redundant
+fix/md-history-footer-all-docs   →  ● df7dd15  (md-to-html work, untouched, off main)
+```
+- `git branch --contains df7dd15` → `feat`, `fix` only (NOT `main`) — md work correctly excluded.
+- `origin/main...main` → `0  1` — main is origin/main + exactly my one commit.
+- Feature live: `scripts/audit-plan-deferrals.sh` present on main, hook block count 1,
+  `task audit-plans` runs from llvm-mos-65816.
+- The unrelated working-tree edit (`docs/transcripts/…`) was stashed across the switch and restored.
+
+**Not pushed** (`main` is 1 ahead of `origin/main`) — push is a separate, user-triggered step.
+`feat/plan-deferral-audit` is now redundant (its unique content is on main via cherry-pick); safe to
+delete once you're satisfied — left in place pending your call (branch deletion is destructive).
