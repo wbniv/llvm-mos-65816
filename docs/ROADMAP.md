@@ -287,11 +287,23 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `selectSbc16` emits one `rep; lda; cmp; sep; bcc` (new `CMPImag16`/`CMPAbs16`/`CMPImm16`) instead of
    the old multi-block 8-bit `cpx/cpy` chain — `a16cmp` reads 0x1103 (incl. a high-byte-differs case
    proving the full 16 bits compare). Equality/signed/select compares are follow-ups. Non-breaking
-   (corpus 7/7, all 13 a16* tests green).
+   (corpus 7/7, all 13 a16* tests green). **Cross-block REP/SEP mode-tracking** then makes the per-op
+   16-bit features pay off across control flow: `MOSInsertREPSEP` was per-block and 8-bit-anchored, so
+   a loop with a 16-bit body re-ran `rep … sep` every iteration; it now runs a forward dataflow over
+   the M-width lattice (`{None, M8, M16, Conflict}`) and places switches only at genuine transitions —
+   inside a block (seeded with the block's entry width, no forced 8-bit at exit) and on CFG edges
+   `P→B` where `Out[P]≠In[B]`. Function entry, calls, and returns stay 8-bit (the ABI boundary); v1
+   conservatively falls back to the old per-block anchoring for any switch on a true critical edge. The
+   must-win case lands: a 16-bit loop body holds 16-bit mode across iterations — `rep` hoists to the
+   preheader, `sep` sinks to the exit, none in the body (`a16loop` reads 0x2340), and a call inside a
+   16-bit region executes 8-bit (`a16call` reads 0x4456). The X-flag (xy16) and a 16-bit calling
+   convention remain follow-ups. Non-breaking (corpus 7/7, all 13 a16* tests green, patch `0002`
+   round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
-   [compares plan](plans/2026-06-14-321-native-16bit-compares.md)._
+   [compares plan](plans/2026-06-14-321-native-16bit-compares.md) ·
+   [cross-block REP/SEP plan](plans/2026-06-15-321-cross-block-repsep-mode-tracking.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

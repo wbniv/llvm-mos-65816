@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# dev/regen-patch.sh — regenerate patches/llvm-mos/0002-321-accum16.patch from the
+# live (directly-edited) vendor/llvm-mos tree, via the isolated-worktree method.
+#
+# vendor/llvm-mos is gitignored and edited in place; its HEAD is pristine upstream
+# (dev/toolchain.sh clones pristine then `git apply`s the patches WITHOUT
+# committing). So the tracked source of truth for our backend changes is the patch
+# series, which must be regenerated whenever the live tree changes.
+#
+# Method (baseline = pristine vendor HEAD + 0001 committed):
+#   1. fresh detached worktree at pristine HEAD;
+#   2. apply 0001 (the #320 far-pointer patch) and commit it — this becomes the
+#      baseline so the regenerated 0002 captures ONLY the accum16 delta, even for
+#      the few files both patches touch;
+#   3. mirror the live llvm/lib/Target/MOS dir over the worktree (all 0002 files
+#      live there) with rsync --delete;
+#   4. `git diff --cached` against the 0001 baseline -> 0002.
+# Then round-trip verify: apply 0001+the new 0002 to another pristine worktree and
+# `diff -rq` its MOS dir against the live vendor MOS dir — they must be identical.
+#
+# Runs on the HOST (needs git + rsync; no container). See the #321 plans.
+set -euo pipefail
+
+usage() { echo "Usage: dev/regen-patch.sh   # regenerate + round-trip-verify patches/llvm-mos/0002-321-accum16.patch"; exit 0; }
+[ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VENDOR="$ROOT/vendor/llvm-mos"
+PATCHES="$ROOT/patches/llvm-mos"
+P1="$PATCHES/0001-320-far-addrspace.patch"
+P2="$PATCHES/0002-321-accum16.patch"
+MOSREL="llvm/lib/Target/MOS"
+
+[ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
+command -v rsync >/dev/null || { echo "FATAL: rsync not found"; exit 1; }
+
+PRISTINE="$(git -C "$VENDOR" rev-parse HEAD)"
+echo "==> pristine vendor HEAD: $(git -C "$VENDOR" rev-parse --short HEAD)"
+
+WT_GEN="$(mktemp -d)"; WT_VFY="$(mktemp -d)"
+cleanup() {
+  git -C "$VENDOR" worktree remove --force "$WT_GEN" 2>/dev/null || true
+  git -C "$VENDOR" worktree remove --force "$WT_VFY" 2>/dev/null || true
+  rm -rf "$WT_GEN" "$WT_VFY"
+}
+trap cleanup EXIT
+
+GIT_ID=(-c user.email=patchgen@local -c user.name=patchgen)
+
+echo "==> [gen] worktree @ pristine + commit 0001 as baseline"
+git -C "$VENDOR" worktree add --detach "$WT_GEN" "$PRISTINE" >/dev/null
+git -C "$WT_GEN" apply "$P1"
+git -C "$WT_GEN" add -A
+git "${GIT_ID[@]}" -C "$WT_GEN" commit -q -m "0001 baseline"
+
+echo "==> [gen] mirror live $MOSREL over the baseline, diff -> 0002"
+rsync -a --delete "$VENDOR/$MOSREL/" "$WT_GEN/$MOSREL/"
+git -C "$WT_GEN" add -A
+git -C "$WT_GEN" diff --cached > "$P2"
+echo "    wrote $P2 ($(wc -l < "$P2") lines, $(grep -c '^diff --git' "$P2") files)"
+
+echo "==> [verify] apply 0001 + new 0002 to a fresh pristine worktree"
+git -C "$VENDOR" worktree add --detach "$WT_VFY" "$PRISTINE" >/dev/null
+git -C "$WT_VFY" apply "$P1"
+git -C "$WT_VFY" apply "$P2"
+
+echo "==> [verify] diff -rq reapplied MOS dir vs live vendor MOS dir"
+if diff -rq "$WT_VFY/$MOSREL" "$VENDOR/$MOSREL"; then
+  echo "RESULT: PASS — 0002 round-trips (reapplied MOS dir == live vendor)"
+else
+  echo "RESULT: FAIL — round-trip mismatch (see diff above)"; exit 1
+fi

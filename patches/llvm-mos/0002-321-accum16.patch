@@ -444,10 +444,10 @@ index 76d7409c1..34747d30c 100644
 +    "16-bit accumulator mode (insert REP/SEP) on the WDC 65816.">;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000..0bf3786a5
+index 000000000..24dba6a48
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,163 @@
+@@ -0,0 +1,371 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -459,14 +459,31 @@ index 000000000..0bf3786a5
 +// #321: a late pass that inserts the 65816's REP/SEP to set the M (accumulator
 +// width) status flag where an instruction requires 16-bit mode. Each
 +// instruction's required M width is carried by the MLow/MHigh TSFlags — the same
-+// signal MOSMCELFStreamer reads to emit the $ml/$mh ELF mapping symbols. The pass
-+// tracks the current M mode through each basic block and inserts `REP #$20`
-+// (M->16-bit) / `SEP #$20` (M->8-bit) at transitions.
++// signal MOSMCELFStreamer reads to emit the $ml/$mh ELF mapping symbols.
 +//
-+// Increment 1a (minimal): straight-line per block; each block begins and ends in
-+// 8-bit accumulator mode (the leaf-function convention). Cross-block mode
-+// propagation, REP/SEP churn minimization, and the X-flag (xy16) are later
-+// increments. Gated on FeatureAccum16 (-mattr=+mos-a16); a no-op otherwise.
++// Increment 2 (cross-block churn minimization): a forward dataflow that
++// propagates the M mode across the CFG and places REP/SEP only at genuine mode
++// *transitions*, hoisting them out of loops. The earlier Increment 1a was
++// per-block and 8-bit-anchored (every block began and ended in 8-bit mode), so a
++// loop with a 16-bit body re-ran `rep … sep` every iteration. Now the mode is
++// held across edges: a 16-bit loop body gets `rep` in the preheader and `sep` in
++// the exit, with no per-iteration toggle.
++//
++// Correctness invariants (a wrong mode is a silent miscompile):
++//   * each instruction runs in the width it requires (MLow ⇒ 16-bit; ordinary
++//     8-bit ops ⇒ 8-bit);
++//   * function entry is 8-bit (ABI), and every call/return boundary is 8-bit
++//     (the 6502 calling convention and 8-bit hardware ABI);
++//   * width-agnostic ops (clc/sec carry-init; plain branches) impose no
++//     constraint and may sit inside a run of either width.
++//
++// v1 is conservative: when a mode switch would land on a true critical edge (the
++// source has multiple successors and the target multiple predecessors), the whole
++// function falls back to the old per-block 8-bit anchoring — always correct, just
++// not optimal. The must-win natural-loop case never hits that.
++//
++// The STZ store-of-zero fusion (Increment 1a) is independent and kept as-is.
++// Gated on FeatureAccum16 (-mattr=+mos-a16); a no-op otherwise.
 +//
 +//===----------------------------------------------------------------------===//
 +
@@ -476,6 +493,7 @@ index 000000000..0bf3786a5
 +#include "MOS.h"
 +#include "MOSSubtarget.h"
 +
++#include "llvm/ADT/DenseMap.h"
 +#include "llvm/ADT/SmallPtrSet.h"
 +#include "llvm/ADT/SmallVector.h"
 +#include "llvm/CodeGen/MachineBasicBlock.h"
@@ -513,6 +531,50 @@ index 000000000..0bf3786a5
 +
 +namespace {
 +
++// Accumulator-width lattice. MW_None is the lattice bottom (an unvisited block,
++// or — for a single instruction — "imposes no width requirement"); MW_Conflict is
++// the top (predecessors disagree). The meet of two definite, differing widths is
++// MW_Conflict.
++enum MWidth { MW_None, MW_M8, MW_M16, MW_Conflict };
++
++static MWidth meet(MWidth A, MWidth B) {
++  if (A == MW_None)
++    return B;
++  if (B == MW_None)
++    return A;
++  if (A == B)
++    return A;
++  return MW_Conflict;
++}
++
++// Resolve a lattice value to the concrete width to materialize. M16 stays M16;
++// everything else (None/Conflict/M8) resolves to 8-bit — the always-correct
++// canonical default that matches the ABI entry/boundary state.
++static bool resolveIsM16(MWidth W) { return W == MW_M16; }
++
++// The accumulator width a single instruction requires, or MW_None if it is
++// width-agnostic (carry-init, plain branches/jumps) and so imposes no constraint.
++static MWidth requiredWidth(const MachineInstr &MI) {
++  // ABI: the accumulator is 8-bit across a return and across a call boundary
++  // (the callee assumes 8-bit). Checked before the MLow test — these never carry
++  // MLow, but being explicit documents the invariant.
++  if (MI.isReturn())
++    return MW_M8;
++  if (MI.getDesc().TSFlags & MOS::TSFlagMLow)
++    return MW_M16;
++  if (isMWidthAgnostic(MI))
++    return MW_None;
++  // A plain branch/jump works in either width; the mode it leaves is set by the
++  // CFG dataflow, not by the branch itself. (Returns were handled above.)
++  if (MI.isBranch())
++    return MW_None;
++  if (MI.isCall())
++    return MW_M8;
++  // Every other instruction (ordinary 8-bit ops, our own inserted REP/SEP) runs
++  // 8-bit.
++  return MW_M8;
++}
++
 +class MOSInsertREPSEP : public MachineFunctionPass {
 +public:
 +  static char ID;
@@ -522,9 +584,73 @@ index 000000000..0bf3786a5
 +  bool runOnMachineFunction(MachineFunction &MF) override;
 +
 +  StringRef getPassName() const override { return "MOS Insert REP/SEP"; }
++
++private:
++  const TargetInstrInfo *TII = nullptr;
++
++  void insertSwitch(MachineBasicBlock &MBB,
++                    MachineBasicBlock::iterator Pos, bool ToM16) {
++    BuildMI(MBB, Pos, DebugLoc(),
++            TII->get(ToM16 ? MOS::REP_Immediate : MOS::SEP_Immediate))
++        .addImm(MFlagBit);
++  }
++
++  // Seed a block at `EntryIsM16` and walk it, inserting a REP/SEP only where the
++  // next width-requiring instruction disagrees with the running width. Does NOT
++  // force a width at the block exit — the running width flows out to successors.
++  bool placeIntraBlock(MachineBasicBlock &MBB, bool EntryIsM16);
++
++  // The original Increment-1a behavior: each block begins and ends 8-bit. Always
++  // correct; used as the conservative whole-function fallback.
++  bool placeLegacy(MachineFunction &MF);
 +};
 +
 +} // namespace
++
++bool MOSInsertREPSEP::placeIntraBlock(MachineBasicBlock &MBB, bool EntryIsM16) {
++  bool Changed = false;
++  bool M16 = EntryIsM16;
++  for (MachineInstr &MI : MBB) {
++    MWidth W = requiredWidth(MI);
++    if (W == MW_None)
++      continue;
++    const bool WantM16 = (W == MW_M16);
++    if (WantM16 && !M16) {
++      insertSwitch(MBB, MI, /*ToM16=*/true);
++      M16 = true;
++      Changed = true;
++    } else if (!WantM16 && M16) {
++      insertSwitch(MBB, MI, /*ToM16=*/false);
++      M16 = false;
++      Changed = true;
++    }
++  }
++  return Changed;
++}
++
++bool MOSInsertREPSEP::placeLegacy(MachineFunction &MF) {
++  bool Changed = false;
++  for (MachineBasicBlock &MBB : MF) {
++    // Determine whether a 16-bit run reaches the block exit, from the ORIGINAL
++    // instructions (before placeIntraBlock inserts REP/SEP — those would skew a
++    // replay, since an inserted SEP reads as an 8-bit op).
++    bool EndM16 = false;
++    for (MachineInstr &MI : MBB) {
++      MWidth W = requiredWidth(MI);
++      if (W == MW_None)
++        continue;
++      EndM16 = (W == MW_M16);
++    }
++    // Each block starts 8-bit; bracket any 16-bit run, then restore 8-bit before
++    // the terminator so every branch/return runs 8-bit.
++    Changed |= placeIntraBlock(MBB, /*EntryIsM16=*/false);
++    if (EndM16) {
++      insertSwitch(MBB, MBB.getFirstTerminator(), /*ToM16=*/false);
++      Changed = true;
++    }
++  }
++  return Changed;
++}
 +
 +bool MOSInsertREPSEP::runOnMachineFunction(MachineFunction &MF) {
 +  const MOSSubtarget &STI = MF.getSubtarget<MOSSubtarget>();
@@ -532,7 +658,7 @@ index 000000000..0bf3786a5
 +  // (6502, plain mosw65816 far-pointer) codegen is untouched.
 +  if (!STI.hasAccum16())
 +    return false;
-+  const TargetInstrInfo &TII = *STI.getInstrInfo();
++  TII = STI.getInstrInfo();
 +
 +  bool Changed = false;
 +
@@ -563,44 +689,126 @@ index 000000000..0bf3786a5
 +  for (auto &F : Fusions) {
 +    MachineInstr *Lo = F.first, *Hi = F.second;
 +    MachineBasicBlock &MBB = *Lo->getParent();
-+    BuildMI(MBB, *Lo, Lo->getDebugLoc(), TII.get(MOS::REP_Immediate))
++    BuildMI(MBB, *Lo, Lo->getDebugLoc(), TII->get(MOS::REP_Immediate))
 +        .addImm(MFlagBit);
-+    BuildMI(MBB, *Hi, Lo->getDebugLoc(), TII.get(MOS::SEP_Immediate))
++    BuildMI(MBB, *Hi, Lo->getDebugLoc(), TII->get(MOS::SEP_Immediate))
 +        .addImm(MFlagBit);
 +    Hi->eraseFromParent(); // the kept Lo STZ stores both bytes in 16-bit mode
 +    Changed = true;
 +  }
++
++  // ---- Cross-block mode propagation (the Increment 2 core) ----
++  //
++  // Step 1 — per-block transfer facts. First[B] is the width the first
++  // width-requiring instruction needs (MW_None if the block is "passthrough":
++  // it has no width-requiring instruction and merely forwards its entry width).
++  // Last[B] is the width the last width-requiring instruction leaves.
++  DenseMap<MachineBasicBlock *, MWidth> First, Last;
 +  for (MachineBasicBlock &MBB : MF) {
-+    bool M16 = false; // current accumulator width: false = 8-bit (the convention)
++    MWidth Fst = MW_None, Lst = MW_None;
 +    for (MachineInstr &MI : MBB) {
-+      // M-agnostic ops (clc/sec/clv carry-init) keep the current width — they may
-+      // live inside a 16-bit run without splitting the REP/SEP bracket.
-+      if (isMWidthAgnostic(MI))
++      MWidth W = requiredWidth(MI);
++      if (W == MW_None)
 +        continue;
-+      const bool WantM16 = MI.getDesc().TSFlags & MOS::TSFlagMLow;
-+      if (WantM16 && !M16) {
-+        // Enter 16-bit A mode before this instruction.
-+        BuildMI(MBB, MI, MI.getDebugLoc(), TII.get(MOS::REP_Immediate))
-+            .addImm(MFlagBit);
-+        M16 = true;
-+        Changed = true;
-+      } else if (!WantM16 && M16) {
-+        // Any width-agnostic / 8-bit instruction returns us to 8-bit A first.
-+        BuildMI(MBB, MI, MI.getDebugLoc(), TII.get(MOS::SEP_Immediate))
-+            .addImm(MFlagBit);
-+        M16 = false;
-+        Changed = true;
++      if (Fst == MW_None)
++        Fst = W;
++      Lst = W;
++    }
++    First[&MBB] = Fst;
++    Last[&MBB] = Lst;
++  }
++  auto isPassthrough = [&](MachineBasicBlock *B) { return First[B] == MW_None; };
++
++  MachineBasicBlock *Entry = &MF.front();
++
++  // Step 2 — fixpoint for entry modes In[B]. A non-passthrough block's entry
++  // width is pinned to First[B]: the block will start in exactly the width its
++  // first op needs, and entering edges are fixed up to deliver that width. So the
++  // only blocks whose In must be propagated are passthrough ones, whose Out
++  // equals their In (they forward the meet of their predecessors' Out). The entry
++  // block is 8-bit by ABI regardless of its first op.
++  DenseMap<MachineBasicBlock *, MWidth> In, Out;
++  for (MachineBasicBlock &MBB : MF) {
++    if (&MBB == Entry)
++      In[&MBB] = MW_M8;
++    else if (!isPassthrough(&MBB))
++      In[&MBB] = First[&MBB];
++    else
++      In[&MBB] = MW_None; // resolved by the fixpoint below
++  }
++  auto outOf = [&](MachineBasicBlock *B) -> MWidth {
++    return isPassthrough(B) ? In[B] : Last[B];
++  };
++  bool Stable = false;
++  while (!Stable) {
++    Stable = true;
++    for (MachineBasicBlock &MBB : MF) {
++      if (&MBB == Entry || !isPassthrough(&MBB))
++        continue;
++      MWidth NewIn = MW_None;
++      for (MachineBasicBlock *Pred : MBB.predecessors())
++        NewIn = meet(NewIn, outOf(Pred));
++      if (NewIn != In[&MBB]) {
++        In[&MBB] = NewIn;
++        Stable = false;
 +      }
 +    }
-+    // Restore 8-bit A at block exit if a trailing 16-bit instruction left us in
-+    // 16-bit mode (insert before the terminator so the branch/return runs 8-bit).
-+    if (M16) {
-+      BuildMI(MBB, MBB.getFirstTerminator(), DebugLoc(),
-+              TII.get(MOS::SEP_Immediate))
-+          .addImm(MFlagBit);
-+      Changed = true;
-+    }
 +  }
++  for (MachineBasicBlock &MBB : MF)
++    Out[&MBB] = outOf(&MBB);
++
++  // Step 3a — decide where each mode transition lands, and bail the whole
++  // function to the legacy anchoring if any switch would fall on a true critical
++  // edge (source has >1 successor AND target has >1 predecessor). v1 does not
++  // split critical edges.
++  struct Placement {
++    MachineBasicBlock *MBB;
++    bool AtEnd;   // true: before the terminator of MBB; false: at MBB.begin()
++    bool ToM16;
++  };
++  SmallVector<Placement, 8> Placements;
++  bool Bail = false;
++  for (MachineBasicBlock &B : MF) {
++    if (&B == Entry)
++      continue; // entry has no CFG predecessor edges; its In=M8 is the ABI state
++    const bool NeedM16 = resolveIsM16(In[&B]);
++    for (MachineBasicBlock *P : B.predecessors()) {
++      if (resolveIsM16(Out[P]) == NeedM16)
++        continue; // edge already delivers the right width
++      if (P->succ_size() == 1)
++        Placements.push_back({P, /*AtEnd=*/true, NeedM16});
++      else if (B.pred_size() == 1)
++        Placements.push_back({&B, /*AtEnd=*/false, NeedM16});
++      else {
++        Bail = true; // critical edge — conservative whole-function fallback
++        break;
++      }
++    }
++    if (Bail)
++      break;
++  }
++
++  if (Bail) {
++    Changed |= placeLegacy(MF);
++    return Changed;
++  }
++
++  // Step 3b — intra-block placement, each block seeded with its entry width and
++  // with NO forced 8-bit at exit (the running width flows out to successors).
++  for (MachineBasicBlock &MBB : MF)
++    Changed |= placeIntraBlock(MBB, /*EntryIsM16=*/resolveIsM16(In[&MBB]));
++
++  // Step 3c — materialize the edge transitions. Anchors (terminator / begin) are
++  // stable across 3b: a seeded non-passthrough block starts in its first op's
++  // width, so 3b never inserts at the block's front, and the edge inserts here
++  // are the only ones touching these boundaries.
++  for (const Placement &Pl : Placements) {
++    MachineBasicBlock::iterator Pos =
++        Pl.AtEnd ? Pl.MBB->getFirstTerminator() : Pl.MBB->begin();
++    insertSwitch(*Pl.MBB, Pos, Pl.ToM16);
++    Changed = true;
++  }
++
 +  return Changed;
 +}
 +

@@ -29,6 +29,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (asiekierka's 32-bit-default, packed 24-bit, zero-bank, abs-16) after maintainer ABI blessing, then
   open the PR. Upstream-gated — coordinate on Discord with the running slice + design note in hand.
   Blocked on the posting step above.
+- [ ] **#320 runtime far-pointer operations** (the far-pointer *codegen* deferred past the static
+  far load/store slice). From the Inc 2 / 2b "out of scope": near→far casts, far-pointer arithmetic,
+  indirect-long `[dp]` load/store, far *code* / `JSL` across banks, automatic bank assignment, and
+  far data spanning >2 banks. The address-space layout above is the prerequisite.
+  [Inc 2 plan](docs/plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md),
+  [Inc 2b plan](docs/plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md).
 
 ### M2 — Optimizing Payoff
 
@@ -43,18 +49,40 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   the N^V 16-bit lowering in `legalizeICmp`; (c) compare feeding a **select**/bool value (not a branch);
   (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
   [plan](docs/plans/2026-06-14-321-native-16bit-compares.md).
-- [ ] **#321 native s16 — agreed optimization order (after load-fold).** (2) 16-bit compares/branches
-  (currently narrow to 8-bit chains); (3) inc/dec + 16-bit shifts; (4) indexed/array access; (5)
+- [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
+  (slice 1, unsigned ordering — done); (3) inc/dec + 16-bit shifts; (4) indexed/array access; (5)
   A16-threading (value stays live in the accumulator across ops — biggest win but reintroduces the
-  coalescer-crash risk, so deferred behind a broad corpus); (6) cross-block REP/SEP mode-tracking; (7)
-  hardware-stack ABI / 16-bit calling convention (upstream-gated). ROADMAP step 5 frontier.
+  coalescer-crash risk, so deferred behind a broad corpus); ~~(6) cross-block REP/SEP mode-tracking~~
+  (M-flag done — see Done; X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling
+  convention (upstream-gated). ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
-- [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
-  mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
-  + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
-  then hardware-stack ABI + calling convention. ROADMAP step 5.
+- [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). From the 1c
+  "out of scope": SUB chains (order-sensitive) and AND/OR/XOR chains, immediates *within* chains (1c
+  requires all terms be loads), and **spilling when >1 16-bit value is live at once**.
+  [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md).
+- [ ] **#321 unify the 1b/1c peephole into the GISel-native path** (cleanup, once the native path is
+  proven on a broad corpus). The all-global-shape peephole currently coexists as a proven fast-path;
+  fold it into the native path to retire the dual codegen path.
+  [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+- [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit;
+  ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
+  X-flag is a separate mode dimension still to add to the dataflow); 16-bit arithmetic; **native-mode
+  crt0** (XCE + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320
+  Increment 2); then hardware-stack ABI + calling convention. ROADMAP step 5.
 - [ ] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
   with correct line/variable mapping. ROADMAP step 6; drdevtools `mame-65816-gdbstub` pre-wires it.
+
+### Test Bench / CI
+
+- [ ] **Wire the bsnes-jg `xcheck` into CI.** `smoke.yml` runs build + corpus on **MAME only**
+  (manual `workflow_dispatch`). Add the dual-emulator `xcheck` target (and optionally cross-check the
+  full 6502 corpus on bsnes-jg, currently only the fidelity-critical far tests are). This is the
+  "dual-emulator CI bench" promised in the #415 reconciliation.
+  [second-emulator plan](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
+- [verify] **M1 toolchain incremental-rebuild time not yet measured** — the from-source plan's
+  verification step 4 ("editing a backend file relinks fast") is "not separately timed yet"; measure
+  once the first #320 codegen edits land.
+  [m1 plan](docs/plans/2026-06-14-m1-from-source-toolchain.md).
 
 ### Upstream / Contribution
 
@@ -79,11 +107,30 @@ llvm-mos change to track) rather than active work._
 
 ## Parked
 
-_Nothing parked yet — items move here when intentionally shelved (feasibility done but not
-starting, or blocked on an external factor)._
+- [ ] **Mesen2 as a third emulator** — abandoned for now: the prebuilt crashes on 26.04
+  (glibc-2.43) and headless `--testrunner` won't run Lua; would need a source build against 26.04.
+  MAME + bsnes-jg already give a two-emulator cross-check, so this is shelved unless a third opinion
+  is needed. [second-emulator plan](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
+- [ ] **Formal #320/#321 psABI document** — deferred as premature: llvm-mos is implementation-first
+  (@mysterymath won't bless an ABI ahead of a high-quality implementation). Promote once a credible
+  implementation exists or the maintainers ask. Overlaps the WDC816CC/ORCA-C prior-art item above.
+  [upstream design-note plan](docs/plans/2026-06-14-320-upstream-design-note.md).
 
 
 ## Done
+
+- 2026-06-15 — [321-cross-block-repsep] **cross-block REP/SEP mode-tracking.** `MOSInsertREPSEP` was
+  per-block and 8-bit-anchored, so a loop with a 16-bit body re-ran `rep … sep` every iteration. It now
+  runs a forward dataflow over the M-width lattice (`{None, M8, M16, Conflict}`) and places switches
+  only at genuine transitions — inside a block (seeded with the block's `In` width, no forced 8-bit at
+  exit) and on CFG edges `P→B` where `Out[P]≠In[B]`. `requiredWidth()` keeps entry/calls/returns 8-bit
+  (the ABI boundary) and branches/carry-init agnostic; v1 bails the whole function to legacy per-block
+  anchoring on any switch that would hit a true critical edge. Must-win lands: a 16-bit loop body holds
+  16-bit mode across iterations — `rep` hoisted to the preheader, `sep` sunk to the exit, none in the
+  body (`a16loop` 0x2340); a call inside a 16-bit region runs 8-bit (`a16call` 0x4456). Both on MAME +
+  bsnes-jg. New `dev/regen-patch.sh` captures the isolated-worktree patch-regen method. Non-breaking:
+  corpus 7/7, all 13 a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-15-321-cross-block-repsep-mode-tracking.md).
 
 - 2026-06-14 — [321-native-16bit-compares] **native 16-bit unsigned-ordering compares (slice 1).**
   `if (a16v < b16v)` (and `<= > >=`) compiled to a verbose multi-block 8-bit `cpx/cpy` chain; now it's
