@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -41,6 +41,10 @@ Targets:
              (cycle-accurate, independent of MAME) headless and assert the same
              WRAM results — confirms the bank-$01 far read isn't a MAME quirk
              (fetches+builds bsnes-jg once; needs `toolchain` + `build` first)
+  a16        #321 Increment 1a: build examples/65816/a16.c with +mos-a16, assert a
+             16-bit store-of-zero fuses to `rep #$20; stz; sep #$20` (disasm) and
+             reads back correct (corpus_result==0x0042) on MAME + bsnes-jg
+             (needs `toolchain` + `build`; `xcheck` first for the bsnes-jg leg)
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

@@ -52,9 +52,36 @@ the milestone is "hard"), not a minimal first step.
   are implemented and captured as `patches/llvm-mos/0002-321-accum16.patch`. Toolchain rebuilt clean;
   **6502 corpus 7/7** — the pass is inert by default (early-returns unless `hasAccum16()`, and a no-op
   until a 16-bit instruction exists), so it's non-breaking by construction.
-- **Next (1a part 2):** the 16-bit `STZ` selection so the pass has something to bracket — a 16-bit
-  `STZ` form tagged `MLow=1` + a feature-gated legalizer/selector path for `*g16 = 0`. Then verify
-  `REP #$20; stz; SEP #$20` at disasm + correct on both emulators + smaller than the 8-bit build.
+- **1a part 2 — APPROACH SIMPLIFIED (no new MC form / no legalizer-selector surgery).** Investigation
+  (`a16.c`, MIR dump) shows a 16-bit `g16 = 0` already lowers to two consecutive `STZAbs @g16` /
+  `STZAbs @g16 + 1` MachineInstrs (same global, offsets N and N+1). So instead of a 16-bit STZ form +
+  legalizer/selector path, the **`MOSInsertREPSEP` pass itself fuses the pair**: replace
+  `STZAbs @g16` + `STZAbs @g16+1` with `REP #$20; STZAbs @g16; SEP #$20` — in 16-bit-A mode one `stz`
+  writes 2 bytes, so the second store is dropped. Entirely self-contained (one pass, gated on
+  `hasAccum16()`); no tablegen, legalizer, or selector changes. Matching rule: two adjacent `MOS::STZAbs`
+  whose operand-0 is a `GlobalAddress` to the same global with offsets differing by 1.
+  - **Feature flag:** the clang driver rejects `-mattr`; enable via
+    `-Xclang -target-feature -Xclang +mos-a16` (the cc1 target-feature path). The bench `a16` target
+    passes it that way.
+  - **Test (`examples/65816/a16.c`):** `g16 = 0;` then `corpus_result = g16 + 0x42;` → `0x0042`, read
+    back by the harness — proving `g16` was zeroed by the fused 16-bit store. Verify: disasm shows
+    `c2 20` (rep) + one `stz` + `e2 20` (sep) (vs two `stz` without the flag); `corpus_result == 0x0042`
+    on **both** MAME and bsnes-jg; and the `+mos-a16` object is smaller (one fewer `stz`).
+  - **Process:** this phase's plan recorded here before implementing (per the per-phase-plan rule).
+- **1a part 2 RESULT (2026-06-14): codegen done + disasm-verified; emulator run gated on native mode.**
+  `dev/run.sh a16` → disasm gate **PASS**: `c2 20` (rep #$20) + a single `9c` (stz) + `e2 20` (sep #$20)
+  (two `stz` without the flag). Non-breaking confirmed: corpus **7/7**, far `xcheck` still PASS. **But
+  the emulator assert FAILs `got=0xBE42 want=0x0042` on BOTH MAME and bsnes-jg** — and that's the
+  expected, correct finding: the SNES boots in 65816 **emulation mode**, where M/X are forced 8-bit, so
+  `REP #$20` is ignored and the `stz` writes only the low byte (high byte stays `0xBE` from g16's
+  `0xBEEF` init). Both emulators agreeing on `0xBE42` is itself a consistency cross-check. **Conclusion:
+  16-bit-accumulator mode requires 65816 *native* mode (`XCE`)** — the prerequisite the ROADMAP/#320
+  deferred to M2. The codegen (the compiler deliverable) is correct and committed; the emulator run is
+  the next phase.
+- **Next phase — native-mode crt0 (planned before implementing).** A SNES crt0 that does `CLC; XCE`
+  (enter native mode, E=0) keeping M/X = 8-bit as the default (so the existing 8-bit + far-pointer
+  codegen is unchanged), so `REP #$20` can transiently widen A. Then `dev/run.sh a16` reads `0x0042` on
+  both emulators, and corpus + far must stay green in native 8-bit mode.
 
 ## Scope — Increment 1a (minimal, opt-in, non-breaking)
 

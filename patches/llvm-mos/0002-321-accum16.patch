@@ -40,10 +40,10 @@ index 76d7409c1..34747d30c 100644
 +    "16-bit accumulator mode (insert REP/SEP) on the WDC 65816.">;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000..a67bddf1d
+index 000000000..936f20605
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,101 @@
+@@ -0,0 +1,138 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -72,6 +72,8 @@ index 000000000..a67bddf1d
 +#include "MOS.h"
 +#include "MOSSubtarget.h"
 +
++#include "llvm/ADT/SmallPtrSet.h"
++#include "llvm/ADT/SmallVector.h"
 +#include "llvm/CodeGen/MachineBasicBlock.h"
 +#include "llvm/CodeGen/MachineFunction.h"
 +#include "llvm/CodeGen/MachineInstrBuilder.h"
@@ -108,6 +110,41 @@ index 000000000..a67bddf1d
 +  const TargetInstrInfo &TII = *STI.getInstrInfo();
 +
 +  bool Changed = false;
++
++  // #321 Increment 1a: fuse a 16-bit store-of-zero. A `uint16_t g = 0` lowers to
++  // two adjacent 8-bit `STZAbs @g` / `STZAbs @g+1`; in 16-bit-A mode a single STZ
++  // writes both bytes, so replace the pair with `REP #$20; STZAbs @g; SEP #$20`
++  // (drop the second). The reusable demonstration of REP/SEP-bracketed 16-bit
++  // codegen — no new instruction form, legalizer, or selector needed.
++  SmallVector<std::pair<MachineInstr *, MachineInstr *>, 4> Fusions;
++  SmallPtrSet<MachineInstr *, 8> Consumed;
++  for (MachineBasicBlock &MBB : MF) {
++    for (MachineInstr &MI : MBB) {
++      if (MI.getOpcode() != MOS::STZAbs || Consumed.count(&MI))
++        continue;
++      MachineInstr *Next = MI.getNextNode();
++      if (!Next || Next->getOpcode() != MOS::STZAbs || Consumed.count(Next))
++        continue;
++      const MachineOperand &Lo = MI.getOperand(0);
++      const MachineOperand &Hi = Next->getOperand(0);
++      if (!Lo.isGlobal() || !Hi.isGlobal() || Lo.getGlobal() != Hi.getGlobal() ||
++          Hi.getOffset() != Lo.getOffset() + 1)
++        continue;
++      Fusions.push_back({&MI, Next});
++      Consumed.insert(&MI);
++      Consumed.insert(Next);
++    }
++  }
++  for (auto &F : Fusions) {
++    MachineInstr *Lo = F.first, *Hi = F.second;
++    MachineBasicBlock &MBB = *Lo->getParent();
++    BuildMI(MBB, *Lo, Lo->getDebugLoc(), TII.get(MOS::REP_Immediate))
++        .addImm(MFlagBit);
++    BuildMI(MBB, *Hi, Lo->getDebugLoc(), TII.get(MOS::SEP_Immediate))
++        .addImm(MFlagBit);
++    Hi->eraseFromParent(); // the kept Lo STZ stores both bytes in 16-bit mode
++    Changed = true;
++  }
 +  for (MachineBasicBlock &MBB : MF) {
 +    bool M16 = false; // current accumulator width: false = 8-bit (the convention)
 +    for (MachineInstr &MI : MBB) {
