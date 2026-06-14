@@ -387,14 +387,3 @@ llvm-mos change to track) rather than active work._
 - 2026-06-13 — [snes-sdk-platform] SNES SDK platform (crt0, header, link.ld, snes.h, clang.cfg)
   builds a valid 32 KiB LoROM `.sfc` from C via the 6502 backend; structural verification PASS
   (reset→crt0 byte-exact, `main()` placed, checksum 0xFFFF). ROADMAP step 1, structural half.
-
-
-## Inbox — auto-captured plan deferrals
-
-_Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
-
-<!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
-- [ ] **(triage)** **Indexed 16-bit load/store**: `abs,x` (array-sum loops: `ldy a,x; lda a+1,x` → — _from [2026-06-15-321-native-16bit-indirect-load-store.md](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md)_  <!-- fp:cd70a5c296b18586 -->
-- [ ] **(triage)** **Plain 16-bit absolute** load/store of a standalone global (`g = gg`) where no — _from [2026-06-15-321-native-16bit-indirect-load-store.md](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md)_  <!-- fp:62210b5e25291677 -->
-- [ ] **(triage)** **X-flag (xy16) mode dimension** — 16-bit index registers (`rep/sep #$10`); a — _from [2026-06-15-321-native-16bit-indirect-load-store.md](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md)_  <!-- fp:f0052fe04cbaf719 -->
-<!-- END auto-captured-deferrals -->
