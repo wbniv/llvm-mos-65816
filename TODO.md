@@ -53,12 +53,22 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; inc/dec already native via adc #±1; remaining: variable shifts, amount
-  ≥8, 1-byte `inc a`/`dec a`, memory-RMW `inc abs`); (4) indexed/array access; (5) A16-threading (value
-  stays live in the accumulator across ops — biggest win but reintroduces the coalescer-crash risk, so
+  ≥8, 1-byte `inc a`/`dec a`, memory-RMW `inc abs`); ~~(4) indexed/array access~~ (indirect `(zp)` load/
+  store done — see Done; the X-flag dimension is NOT needed for arrays — llvm-mos is pointer-based;
+  remaining: 16-bit absolute & indexed `abs,x`/`(zp),y` load/store); (5) A16-threading (value stays
+  live in the accumulator across ops — biggest win but reintroduces the coalescer-crash risk, so
   deferred behind a broad corpus); ~~(6) cross-block REP/SEP mode-tracking~~ (M-flag done — see Done;
   X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
   ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+- [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)` load/store landed — see Done).
+  Same combiner/legalizer+selector style: (a) **indexed** 16-bit load/store — `abs,x` (array-sum loops
+  `ldy a,x; lda a+1,x` → `rep; lda a,x; sep`) and `(zp),y`; (b) **plain 16-bit absolute** load/store of
+  a standalone global (`g = gg`) where no ALU fold applies; (c) **re-evaluate the X-flag (xy16) mode
+  dimension** — 16-bit index registers via `rep/sep #$10` (a new dimension in `MOSInsertREPSEP`
+  enabling `lda abs,x` with a 16-bit index). The X-flag is NOT required for array access (llvm-mos is
+  pointer-based); assess whether it pays off at all before building it.
+  [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). From the 1c
   "out of scope": SUB chains (order-sensitive) and AND/OR/XOR chains, immediates *within* chains (1c
   requires all terms be loads), and **spilling when >1 16-bit value is live at once**.
@@ -325,3 +335,14 @@ llvm-mos change to track) rather than active work._
 - 2026-06-13 — [snes-sdk-platform] SNES SDK platform (crt0, header, link.ld, snes.h, clang.cfg)
   builds a valid 32 KiB LoROM `.sfc` from C via the 6502 backend; structural verification PASS
   (reset→crt0 byte-exact, `main()` placed, checksum 0xFFFF). ROADMAP step 1, structural half.
+
+
+## Inbox — auto-captured plan deferrals
+
+_Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
+
+<!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
+- [ ] **(triage)** **Indexed 16-bit load/store**: `abs,x` (array-sum loops: `ldy a,x; lda a+1,x` → — _from [2026-06-15-321-native-16bit-indirect-load-store.md](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md)_  <!-- fp:cd70a5c296b18586 -->
+- [ ] **(triage)** **Plain 16-bit absolute** load/store of a standalone global (`g = gg`) where no — _from [2026-06-15-321-native-16bit-indirect-load-store.md](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md)_  <!-- fp:62210b5e25291677 -->
+- [ ] **(triage)** **X-flag (xy16) mode dimension** — 16-bit index registers (`rep/sep #$10`); a — _from [2026-06-15-321-native-16bit-indirect-load-store.md](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md)_  <!-- fp:f0052fe04cbaf719 -->
+<!-- END auto-captured-deferrals -->
