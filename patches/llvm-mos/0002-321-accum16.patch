@@ -942,7 +942,7 @@ index 868f6c712..7b5100bfe 100644
 +// register class on the selected ops, not by the bank (banks are unused here).
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index 94e229944..253663616 100644
+index 94e229944..7aed65b18 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 @@ -90,6 +90,24 @@ def P : MOSReg<12, "P"> {
@@ -982,6 +982,20 @@ index 94e229944..253663616 100644
  // Instruction-specific register classes.
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
  let isPressureFineGrained = true in {
+@@ -205,6 +228,13 @@ def MOSAsmParamRegClass : MOSReg8Class<(add X, Y, S)>;
+ def Anyi1 : MOSReg1Class<(add (sequence "RC%uLSB", 0, !add(MaxImag8Regs, -1)), CV_GPR_LSB)>;
+ def Anyi8 : MOSReg8Class<(add Imag8, GPR)>;
+ 
++// #321 Increment 1d: the sum type of all 16-bit storage — the 16-bit accumulator
++// A16 plus the zero-page Imag16 pointer-pairs. The s16 analog of Anyi8; a generic
++// s16 value lives here, in A16 while it is the ALU operand/result and spilled to
++// an Imag16 pair otherwise (there is only one A16). Inert until the s16-native
++// legalizer/selector emit Anyi16 vregs (gated on +mos-a16).
++def Anyi16 : MOSReg16Class<(add Imag16, Ac16)>;
++
+ def Fake : MOSReg<13, "Fake">;
+ let isAllocatable = false in {
+   def Fakei32 : MOSRegClass<[i32], 8, (add Fake)>;
 diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
 index 6d303255c..017b60efb 100644
 --- a/llvm/lib/Target/MOS/MOSSubtarget.h
