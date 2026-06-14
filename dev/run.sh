@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -67,6 +67,10 @@ Targets:
   a16localx  #321 Increment 1d-retry step 4: the COMPLEX multi-op case that crashed the
              first prototype's coalescer (5 native s16 adds, reused locals) now compiles
              clean (-verify-machineinstrs) and reads corpus_result==0x33A0 both emus
+  a16localsub #321 Increment 1d-retry step 5: a multi-use LOCAL s16 SUBTRACT goes native
+             (sec; rep; lda; sbc; sta; sep in Imag16); corpus_result==0x1222 both emus
+  a16localbit #321 Increment 1d-retry step 5: three native s16 bitwise ops on reused locals
+             (lda; and|ora|eor zp; sta) compile clean; corpus_result==0x000F both emus
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

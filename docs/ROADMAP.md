@@ -267,8 +267,12 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    via load/store, never a COPY to/from 8-bit**, so nothing for the coalescer to corrupt. A multi-use
    **local** add (`a16local.c`, peephole-impossible) runs `0x1122`, and the exact complex multi-op shape
    that crashed the prototype (`a16localx.c`: 5 native adds + reused locals) now **compiles clean
-   (`-verify-machineinstrs`)** and runs `0x33A0` — both on **both** MAME and bsnes-jg. Non-breaking
-   (corpus 7/7, all six 1a-1c a16* tests green). Remaining: native sub/bitwise/immediates (step 5).
+   (`-verify-machineinstrs`)** and runs `0x33A0` — both on **both** MAME and bsnes-jg. **Step 5**
+   generalized the selector to native s16 **sub** (`sec/sbc` → `a16localsub` 0x1222) and **bitwise**
+   (`and/ora/eor` → `a16localbit` 0x000F), widening the legalizer gate to s16 `G_SUB` + `G_AND/OR/XOR`
+   under `+mos-a16`. So the full basic 16-bit ALU now flows through `Imag16` for locals/multi-use, not
+   just the all-global peephole. Immediate operands work (constant materialized into `Imag16`); the
+   `adc #imm` form is a deferred size optimization. Non-breaking (corpus 7/7, all 10 a16* tests green).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level

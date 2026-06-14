@@ -1,10 +1,11 @@
 # M2 / #321 — Increment 1d-retry: GISel-native s16, value resident in Imag16 (no Ac16↔8-bit COPY)
 
-**Date:** 2026-06-14 · **Status:** **STEPS 1–4 DONE — the coalescer crash is SOLVED.** Native s16 add
-runs in `Imag16` on both emulators; the exact complex multi-op shape that crashed the prototype now
-compiles clean. Step 5 (sub/bitwise/immediate native) is the remaining extension. Supersedes the
-reverted [1d prototype](2026-06-14-321-increment-1d-gisel-native-s16.md). · **Milestone:** M2
-(ROADMAP step 5). **Builds on:** 1b (`A16` accumulator + `Ac16` + `MOSInsertREPSEP`) and 1c (chains).
+**Date:** 2026-06-14 · **Status:** **STEPS 1–5 DONE — the coalescer crash is SOLVED; native s16
+add/sub/and/or/xor all ship.** The value lives in `Imag16`; the exact complex multi-op shape that
+crashed the prototype now compiles clean. Immediate operands work (materialized into `Imag16`); the
+`adc #imm` form is a remaining optimization only. Supersedes the reverted
+[1d prototype](2026-06-14-321-increment-1d-gisel-native-s16.md). · **Milestone:** M2 (ROADMAP step 5).
+**Builds on:** 1b (`A16` accumulator + `Ac16` + `MOSInsertREPSEP`) and 1c (chains).
 
 ## The corrected root-cause (why 1d crashed, and why this won't)
 
@@ -130,13 +131,28 @@ SMOKE: PASS got=0x33A0 (MAME)   SMOKE: PASS got=0x33A0 (bsnes-jg)
 **Non-breaking guard:** corpus **7/7**; a16/a16add/a16sub/a16bit/a16imm/a16chain all PASS on both
 emulators. Patch `0002-321-accum16.patch` round-trips (applies on 0001, reproduces vendor exactly). ✅
 
-### Step 5 (remaining) — extend native to sub / bitwise / immediates
+### Step 5 (DONE 2026-06-14) — native sub + bitwise
 
-`selectAdd16Native` handles ADD with two `Imag16` operands. Still narrowed (so still peephole-only or
-8-bit): native s16 **sub** (`SBCImag16`, carry-in set), **bitwise** (`AND/ORA/EORImag16`), and the
-**immediate-operand** native case (one operand a `G_CONSTANT` → `ADCImm16`/`ANDImm16`, mirroring the
-1b immediate path; `selectAdd16Native` currently assumes both operands are `Imag16`). The legalizer
-gate is deliberately restricted to non-±1 s16 **G_ADD** with register operands until these land.
+`selectAdd16Native` generalized to `selectAlu16Native` handling **G_ADD/G_SUB/G_AND/G_OR/G_XOR** via
+the matching `*Imag16` op + carry-init (clc add / sec sub / none bitwise). Legalizer gate widened: s16
+`G_SUB` un-narrowed (G_ADD-only restriction lifted), and s16 `G_AND/G_OR/G_XOR` made `legalFor({S16})`
+under `hasAccum16` (clamped to S16; gated so default codegen is untouched). Evidence:
+```
+a16localsub: sec; rep #$20; lda __rc2; sbc __rc4; sta __rc2; sep #$20  -> 0x1222 (MAME + bsnes-jg)
+a16localbit: 3 brackets lda;and|ora|eor zp;sta                          -> 0x000F (MAME + bsnes-jg)
+```
+Non-breaking: corpus **7/7**; all 10 a16* tests PASS (6 peephole + a16local/x/sub/bit native).
+`dev/run.sh a16localsub|a16localbit`.
+
+**Immediate operands:** functionally complete — a `G_CONSTANT` s16 operand is already materialized into
+an `Imag16` pair by constant selection, so `selectAlu16Native` sees two `Imag16` operands and produces
+correct code (`a16localimm.c`: `t = a + 0x0345` → `0x1545`). Using the `*Imm16` forms (`adc #imm`) to
+avoid materializing the constant is a **size optimization only**, deferred (not a correctness gap).
+
+### Remaining (future) — beyond this increment
+
+- Immediate-operand optimization (`*Imm16` forms instead of materializing the constant into `Imag16`).
+- Loops + cross-block REP/SEP mode-tracking; the hardware-stack ABI / 16-bit calling convention.
 
 ## Out of scope (later)
 

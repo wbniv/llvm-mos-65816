@@ -796,10 +796,10 @@ index f3eb9549f..54e98e07c 100644
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..d0563cbbf 100644
+index cbdd54ab2..1b9762611 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-@@ -96,6 +96,13 @@ private:
+@@ -96,6 +96,14 @@ private:
    bool selectIncDecMB(MachineInstr &MI);
    bool selectUnMergeValues(MachineInstr &MI);
    bool selectBrIndirect(MachineInstr &MI);
@@ -807,29 +807,44 @@ index cbdd54ab2..d0563cbbf 100644
 +  bool selectAlu16Abs(MachineInstr &MI);
 +  // #321 Increment 1c: lower a fused 16-bit ADD chain (g = t0 + t1 + ... + tN).
 +  bool selectAddChain16(MachineInstr &MI);
-+  // #321 Increment 1d-retry: select a native s16 G_ADD whose value lives in an
-+  // Imag16 zero-page pair (locals/multi-use, not just the all-global peephole).
-+  bool selectAdd16Native(MachineInstr &MI);
++  // #321 Increment 1d-retry: select a native s16 ALU op (G_ADD/G_SUB/G_AND/G_OR/
++  // G_XOR) whose value lives in an Imag16 zero-page pair (locals/multi-use, not
++  // just the all-global peephole).
++  bool selectAlu16Native(MachineInstr &MI);
  
    // Select instructions that correspond 1:1 to a target instruction.
    bool selectGeneric(MachineInstr &MI);
-@@ -195,6 +202,15 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -195,12 +203,29 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    switch (MI.getOpcode()) {
    case MOS::G_ADD:
    case MOS::G_SUB:
-+    // #321 Increment 1d-retry: a native s16 add (left un-narrowed by the
++    // #321 Increment 1d-retry: a native s16 add/sub (left un-narrowed by the
 +    // legalizer under +mos-a16) carries its value in an Imag16 pair.
-+    if (STI.hasAccum16() && MI.getOpcode() == MOS::G_ADD &&
++    if (STI.hasAccum16() &&
 +        MI.getMF()->getRegInfo().getType(MI.getOperand(0).getReg()) ==
 +            LLT::scalar(16)) {
-+      if (selectAdd16Native(MI))
++      if (selectAlu16Native(MI))
 +        return true;
 +      break;
 +    }
      if (selectAddSub(MI))
        return true;
      break;
-@@ -247,6 +263,16 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+   case MOS::G_AND:
+   case MOS::G_OR:
+   case MOS::G_XOR:
++    // #321 Increment 1d-retry: native s16 bitwise lives in an Imag16 pair too.
++    if (STI.hasAccum16() &&
++        MI.getMF()->getRegInfo().getType(MI.getOperand(0).getReg()) ==
++            LLT::scalar(16)) {
++      if (selectAlu16Native(MI))
++        return true;
++      break;
++    }
+     if (selectLogical(MI))
+       return true;
+     break;
+@@ -247,6 +272,16 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -846,7 +861,7 @@ index cbdd54ab2..d0563cbbf 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -1928,6 +1954,200 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +1963,221 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -994,19 +1009,23 @@ index cbdd54ab2..d0563cbbf 100644
 +  return true;
 +}
 +
-+// #321 Increment 1d-retry: select a native s16 add `%dst = G_ADD %a, %b` whose
++// #321 Increment 1d-retry: select a native s16 ALU op `%dst = G_OP %a, %b` whose
 +// value lives in an Imag16 zero-page pair — the case the 1b/1c combiner peephole
-+// can't reach (locals, multi-use intermediates). Mirrors selectAddChain16/
-+// selectAlu16Abs but with Imag16 operands instead of absolute globals:
++// can't reach (locals, multi-use intermediates). Mirrors selectAlu16Abs but with
++// Imag16 operands instead of absolute globals:
 +//
-+//   clc ; lda <a:zp> ; adc <b:zp> ; sta <dst:zp>     (all MLow=1 -> one rep/sep)
++//   add:        clc ; lda <a:zp> ; adc <b:zp> ; sta <dst:zp>
++//   sub:        sec ; lda <a:zp> ; sbc <b:zp> ; sta <dst:zp>   (a minuend)
++//   and/or/xor:       lda <a:zp> ; and|ora|eor <b:zp> ; sta <dst:zp>
 +//
-+// The accumulator A16 (Ac16 vregs Lo/Res) is entered only by LDAImag16 and left
-+// only by STAImag16 (which DEFS the dst Imag16) — there is NO COPY between Ac16
-+// and an 8-bit reg, so the register coalescer cannot merge an 8-bit value into
-+// A16 (the exact crash that sank the first 1d prototype). The carry-init (clc)
-+// is M-width-agnostic (MOSInsertREPSEP), so it sits outside the 16-bit run.
-+bool MOSInstructionSelector::selectAdd16Native(MachineInstr &MI) {
++// all MLow=1 -> one rep/sep bracket; the carry-init (clc/sec) is M-width-agnostic
++// (MOSInsertREPSEP) so it sits outside the 16-bit run. The accumulator A16 (Ac16
++// vregs Lo/Res) is entered only by LDAImag16 and left only by STAImag16 (which
++// DEFS the dst Imag16) — there is NO COPY between Ac16 and an 8-bit reg, so the
++// register coalescer cannot merge an 8-bit value into A16 (the exact crash that
++// sank the first 1d prototype). Constant operands are already materialized into
++// Imag16 by G_CONSTANT selection, so both operands are plain Imag16 vregs here.
++bool MOSInstructionSelector::selectAlu16Native(MachineInstr &MI) {
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
 +
@@ -1014,28 +1033,45 @@ index cbdd54ab2..d0563cbbf 100644
 +  Register A = MI.getOperand(1).getReg();
 +  Register B = MI.getOperand(2).getReg();
 +
++  // Map the generic opcode to (zp ALU opcode, carry-init: -1 none / 0 clc / 1 sec).
++  unsigned AluOpc;
++  int CarryInit;
++  switch (MI.getOpcode()) {
++  case MOS::G_ADD: AluOpc = MOS::ADCImag16; CarryInit = 0;  break;
++  case MOS::G_SUB: AluOpc = MOS::SBCImag16; CarryInit = 1;  break;
++  case MOS::G_AND: AluOpc = MOS::ANDImag16; CarryInit = -1; break;
++  case MOS::G_OR:  AluOpc = MOS::ORAImag16; CarryInit = -1; break;
++  default:         AluOpc = MOS::EORImag16; CarryInit = -1; break; // G_XOR
++  }
++  const bool IsArith = CarryInit >= 0;
++
 +  SmallVector<MachineInstrBuilder, 4> New;
 +
 +  // lda a (16-bit) -> A16
 +  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
 +  New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(A));
-+  // clc — carry-in 0 for ADC, outside the 16-bit run.
-+  Register Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
-+  New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(0));
-+  // adc b (16-bit): A16 = a + b + 0
++
++  Register Carry;
++  if (IsArith) {
++    // clc (add) / sec (sub) — outside the 16-bit run (carry-init is M-agnostic).
++    Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
++    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(CarryInit));
++  }
++
++  // the ALU op (16-bit): A16 = a OP b (+carry for add/sub).
 +  Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+  Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
-+  Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
-+  New.push_back(Builder.buildInstr(MOS::ADCImag16)
-+                    .addDef(Res)
-+                    .addDef(CarryOut)
-+                    .addDef(VOut)
-+                    .addUse(Lo)
-+                    .addUse(B)
-+                    .addUse(Carry));
++  auto Alu = Builder.buildInstr(AluOpc).addDef(Res);
++  if (IsArith) {
++    Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
++    Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
++    Alu.addDef(CarryOut).addDef(VOut).addUse(Lo).addUse(B).addUse(Carry);
++  } else {
++    Alu.addUse(Lo).addUse(B);
++  }
++  New.push_back(Alu);
++
 +  // sta dst (16-bit): the Imag16 dst is DEF'd by the store (imaginary-reg write).
-+  New.push_back(
-+      Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Res));
++  New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Res));
 +
 +  for (MachineInstrBuilder &Bld : New)
 +    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
@@ -1048,7 +1084,7 @@ index cbdd54ab2..d0563cbbf 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..afe55ebb3 100644
+index 212ede1a0..cca1921a8 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -1064,7 +1100,43 @@ index 212ede1a0..afe55ebb3 100644
    // Constants
  
    getActionDefinitionsBuilder(G_CONSTANT)
-@@ -670,11 +676,24 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -150,18 +156,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+       .widenScalarToNextMultipleOf(0, 8)
+       .custom();
+ 
+-  getActionDefinitionsBuilder({G_AND, G_OR})
+-      .legalFor({S8})
+-      .widenScalarToNextMultipleOf(0, 8)
+-      .maxScalar(0, S8)
+-      .unsupported();
++  // #321 Increment 1d-retry: under +mos-a16, s16 bitwise stays native (legal,
++  // selected by selectAlu16Native into an Imag16 pair) instead of narrowing to
++  // S8; larger scalars clamp to S16. Gated on hasAccum16 so default codegen is
++  // untouched. The 1b combiner still fast-paths all-global `g = a & b` shapes.
++  const LLT MaxBitwise = STI.hasAccum16() ? S16 : S8;
++  {
++    auto &B = getActionDefinitionsBuilder({G_AND, G_OR}).legalFor({S8});
++    if (STI.hasAccum16())
++      B.legalFor({S16});
++    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
++  }
+ 
+-  getActionDefinitionsBuilder(G_XOR)
+-      .legalFor({S8})
+-      .customFor({S1})
+-      .widenScalarToNextMultipleOf(0, 8)
+-      .maxScalar(0, S8)
+-      .unsupported();
++  {
++    auto &B = getActionDefinitionsBuilder(G_XOR).legalFor({S8}).customFor({S1});
++    if (STI.hasAccum16())
++      B.legalFor({S16});
++    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
++  }
+ 
+   getActionDefinitionsBuilder(G_MUL)
+       .libcallFor({S8, S16, S32, S64})
+@@ -670,11 +682,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    auto [Dst, Src] = MI.getFirst2Regs();
    assert(MRI.getType(Dst).isByteSized());
  
@@ -1080,10 +1152,9 @@ index 212ede1a0..afe55ebb3 100644
        getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
 -  if (!RHSConst || std::abs(RHSConst->Value.getSExtValue()) != 1)
 +  if (!RHSConst || std::abs(RHSConst->Value.getSExtValue()) != 1) {
-+    // Step 3 handles native s16 ADD only; SUB stays narrowed until step 5.
-+    if (STI.hasAccum16() && Ty == LLT::scalar(16) &&
-+        MI.getOpcode() == MOS::G_ADD)
-+      return true; // legal as-is; selected by selectAdd16Native
++    // Native s16 add/sub: left un-narrowed for selectAlu16Native (value in Imag16).
++    if (STI.hasAccum16() && Ty == LLT::scalar(16))
++      return true; // legal as-is; selected natively
      return Helper.narrowScalarAddSub(MI, 0, S8) !=
             LegalizerHelper::UnableToLegalize;
 +  }

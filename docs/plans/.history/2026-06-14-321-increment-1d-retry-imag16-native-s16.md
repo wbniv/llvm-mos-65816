@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/88994fb) | #321 Increment 1d-retry steps 1-4: GISel-native s16 in Imag16 — coalescer crash SOLVED |
+
+<!--history-meta v1
+88994fb	author	Will Norris
+88994fb	added	145
+88994fb	deleted	0
+88994fb	files	1
+88994fb	body	The reverted 1d prototype crashed the register coalescer on complex multi-op\nfunctions: an 8-bit constant LDImm coalesced into A16 (whose sublo is the 8-bit\nA), yielding a malformed `$a16 = LDImm`. Re-diagnosed from the code, the cause was\nNOT the A16=A aliasing — the 1b/1c peephole creates Ac16 vregs and never crashes,\nand the aliasing is load-bearing for transient-A16 soundness. The real cause: the\nprototype kept the s16 value resident IN Ac16 and shuffled it to/from Imag16 with\ncopyPhysReg (COPY-like), so an 8-bit value coalesced into that COPY.\n\nFix mirrors the proven peephole: the s16 value's home is Imag16 (zero-page pair),\nand the native add selects to a self-contained `lda zp; clc; adc zp; sta zp` on\nthe transient A16. New Imag16-operand ops LDAImag16/ADCImag16/SBCImag16/AND|ORA|\nEORImag16/STAImag16 (STAImag16 DEFs its Imag16, like STImag8). The accumulator is\nentered/left ONLY via these load/store instructions — never a COPY between Ac16\nand an 8-bit reg — so the coalescer has nothing to corrupt. No register-model\nchange; A16=B:A aliasing stays.\n\n- Step 1: inert Imag16-operand ALU ops (corpus 7/7, six a16* peephole tests green).\n- Step 2: legalizer keeps non-±1 s16 G_ADD un-narrowed under hasAccum16.\n- Step 3: selectAdd16Native. a16local.c (multi-use LOCAL, peephole can't fold) ->\n  one rep/sep bracket in Imag16, corpus_result==0x1122 on MAME + bsnes-jg.\n- Step 4 (the proof): a16localx.c — 5 native adds + reused locals, the exact shape\n  that crashed the prototype — compiles clean (-verify-machineinstrs) and runs\n  corpus_result==0x33A0 on both emulators. No `$a16 = LDImm`, no Ac16<->8-bit COPY.\n\nNon-breaking: corpus 7/7; a16/a16add/a16sub/a16bit/a16imm/a16chain all PASS on both\nemulators; SDK builds; patch 0002 round-trips (applies on 0001, reproduces vendor).\nRemaining: native sub/bitwise/immediates (step 5, TODO).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

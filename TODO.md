@@ -32,14 +32,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 Increment 1d-retry step 5 — extend native s16 to sub / bitwise / immediates.** The crash
-  is solved and native **add** ships (steps 1-4 done, see Done); `selectAdd16Native` handles two-`Imag16`-
-  operand ADD. Remaining: native s16 **sub** (`SBCImag16`, carry-in set), **bitwise** (`AND/ORA/EORImag16`),
-  and the **immediate-operand** case (one operand a `G_CONSTANT` → `ADCImm16`/`ANDImm16`, mirroring the
-  1b immediate path — `selectAdd16Native` currently assumes both operands are `Imag16`). Then widen the
-  legalizer gate (currently restricted to non-±1 s16 **G_ADD** with register operands). Same guard:
-  corpus 7/7 + the a16* suite + no `Ac16`↔8-bit COPY in post-isel MIR.
-  [plan §step 5](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+- [ ] **#321 native s16 — deferred optimizations + frontier.** The basic 16-bit ALU (add/sub/bitwise)
+  is native via `Imag16` (1d-retry done, see Done). Next, in rough order: (a) immediate-operand
+  optimization — use the `*Imm16` forms (`adc #imm`) instead of materializing a `G_CONSTANT` into
+  `Imag16` (correct today, just larger); (b) loops + cross-block REP/SEP mode-tracking; (c) the
+  hardware-stack ABI / 16-bit calling convention (16-bit args/returns — upstream-gated). ROADMAP step 5
+  frontier. [plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
   mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
   + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
@@ -70,7 +68,7 @@ starting, or blocked on an external factor)._
 ## Done
 
 - 2026-06-14 — [321-increment-1d-retry] **GISel-native s16 — the A16-aliasing coalescer crash SOLVED;
-  native 16-bit add ships** (steps 1-4 of 5). Re-diagnosed from the code: the crash was NOT the `A16=A`
+  native 16-bit add/sub/and/or/xor all ship** (steps 1-5). Re-diagnosed from the code: the crash was NOT the `A16=A`
   aliasing (the peephole makes `Ac16` vregs and is fine; aliasing is needed for transient-`A16`
   soundness) — it was the reverted prototype keeping the value resident *in* `Ac16` and shuffling it
   to/from `Imag16` with `copyPhysReg` (COPY-like), so an 8-bit `LDImm` coalesced into that COPY →
@@ -80,9 +78,12 @@ starting, or blocked on an external factor)._
   via load/store, never a COPY to/from 8-bit**. A multi-use **local** add (`a16local.c`, peephole-
   impossible) runs `0x1122`; the exact complex case that crashed the prototype (`a16localx.c`: 5 native
   adds, reused locals, heavy `Imag16` pressure) **compiles clean** (`-verify-machineinstrs`) and runs
-  `0x33A0` — both on **both** MAME and bsnes-jg. Non-breaking: corpus 7/7, all six 1a-1c a16* tests
-  green, SDK builds, patch `0002` round-trips. `dev/run.sh a16local|a16localx`. Remaining: native
-  sub/bitwise/immediates (step 5, open). [plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+  `0x33A0` — both on **both** MAME and bsnes-jg. Step 5 generalized `selectAdd16Native` → `selectAlu16Native`
+  for native s16 **sub** (`sec/sbc`, `a16localsub` 0x1222) and **bitwise** (`and/ora/eor`, `a16localbit`
+  0x000F), widening the legalizer gate to s16 `G_SUB` + `G_AND/OR/XOR` under `+mos-a16`. Immediate operands
+  work (constant materialized into `Imag16`; `adc #imm` deferred as a size opt). Non-breaking: corpus 7/7,
+  all 10 a16* tests green, SDK builds, patch `0002` round-trips. `dev/run.sh a16local|a16localx|a16localsub|a16localbit`.
+  [plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
 
 - 2026-06-14 — [321-increment-1c-chained-16bit-alu] **chained 16-bit ADD — a value stays live in A16
   across ops** (first general-path slice): `g = a + b + c` fuses (pre-legalizer combiner, recursive
