@@ -969,6 +969,81 @@ index e81487e9c..b78b62625 100644
  // Generalized 8-bit store using the absolute indexed addressing mode. The base
  // argument isn't a pointer; it's either a global value or a 16-bit immediate.
  // The index argument is an 8-bit scalar. Additionally expects a
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index 42a94c356..4393283eb 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+@@ -352,6 +352,8 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
+   case MOS::CmpBrAbsIdx:
+   case MOS::CmpBrIndir:
+   case MOS::CmpBrIndirIdx:
++  case MOS::CmpBrImag16:
++  case MOS::CmpBrImm16:
+     return MI.getOperand(0).getMBB();
+   case MOS::JMPIndir:
+   case MOS::JMPIdxIndir:
+@@ -1035,6 +1037,10 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
+   case MOS::CmpBrIndirIdx:
+     expandCmpBr(Builder);
+     break;
++  case MOS::CmpBrImag16:
++  case MOS::CmpBrImm16:
++    expandCmpBr16(Builder);
++    break;
+ 
+   // Control flow
+   case MOS::GBR:
+@@ -1355,6 +1361,38 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
+   MI.eraseFromParent();
+ }
+ 
++// #321 native s16 equality: expand a fused 16-bit compare-branch (CmpBrImag16 /
++// CmpBrImm16) to `LDAImag16 $l; CMPImag16/CMPImm16 $r; BR`. The LDA/CMP are MLow=1
++// logical pseudos, so the late REP/SEP pass brackets them with rep/sep; the cmp
++// sets Z (modeled as an implicit def), and the inserted `sep` doesn't touch Z, so
++// the BR reads it correctly. Operands: (0)=tgt (1)=Flag=Z (2)=flag_val (3)=$l Imag16
++// (4)=$r Imag16-or-imm16.
++void MOSInstrInfo::expandCmpBr16(MachineIRBuilder &Builder) const {
++  MachineInstr &MI = *Builder.getInsertPt();
++  const Register Flag = MI.getOperand(1).getReg();
++  const bool IsImm = MI.getOpcode() == MOS::CmpBrImm16;
++
++  // Post-RA: use the physical 16-bit accumulator A16 (the pseudo declares it in
++  // Defs so regalloc kept nothing live across it). lda $l (16-bit) -> A16.
++  Builder.buildInstr(MOS::LDAImag16)
++      .addDef(MOS::A16)
++      .add(MI.getOperand(3));
++
++  // cmp $r (16-bit): defs C (dead) and Z (the live flag the branch reads).
++  auto CMP = Builder.buildInstr(IsImm ? MOS::CMPImm16 : MOS::CMPImag16)
++                 .addDef(MOS::C, RegState::Dead)
++                 .addUse(MOS::A16)
++                 .add(MI.getOperand(4));
++  CMP.addDef(Flag, RegState::Implicit);
++
++  Builder.buildInstr(MOS::BR)
++      .add(MI.getOperand(0))
++      .addUse(Flag, RegState::Kill)
++      .add(MI.getOperand(2));
++
++  MI.eraseFromParent();
++}
++
+ bool MOSInstrInfo::reverseBranchCondition(
+     SmallVectorImpl<MachineOperand> &Cond) const {
+   // Condition includes all arguments except the branch target.
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
+index be5daff8f..c39c4be70 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.h
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
+@@ -146,6 +146,7 @@ private:
+   // Control flow pseudos
+   void expandGBR(MachineIRBuilder &Builder) const;
+   void expandCmpBr(MachineIRBuilder &Builder) const;
++  void expandCmpBr16(MachineIRBuilder &Builder) const;
+ 
+   bool shouldRematPhysRegCopy() const override { return false; }
+ };
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
 index f3eb9549f..c554e41ba 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
@@ -1213,8 +1288,35 @@ index f3eb9549f..c554e41ba 100644
  let Predicates = [Has65C02] in {
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
+diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
+index 21910cfea..6adc3c035 100644
+--- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
++++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
+@@ -359,4 +359,22 @@ let mayLoad = true in {
+   def CmpBrIndirIdx : MOSCmpBr {
+     dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, Ac:$l, Imag16:$addr, Yc:$idx);
+   }
++  // #321 native s16 equality (== / !=): a fused 16-bit compare-and-branch. The LHS
++  // is an Imag16 pair (loaded into A16 at expansion, unlike the 8-bit forms whose
++  // LHS is already in a GPR); the RHS is an Imag16 pair or a 16-bit immediate.
++  // expandCmpBr lowers these to `LDAImag16; CMPImag16/CMPImm16` (both MLow=1, so the
++  // REP/SEP pass brackets the lda/cmp) + BR reading Z (sep doesn't touch Z).
++  // Defs A16 + NZ: the expansion loads $l into the 16-bit accumulator and the cmp
++  // sets N/Z, so regalloc must treat both as clobbered across the pseudo (C is in
++  // the MOSCmpBr base).
++  def CmpBrImag16 : MOSCmpBr {
++    let Predicates = [HasAccum16];
++    let Defs = [C, A16, NZ];
++    dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, Imag16:$l, Imag16:$r);
++  }
++  def CmpBrImm16 : MOSCmpBr {
++    let Predicates = [HasAccum16];
++    let Defs = [C, A16, NZ];
++    dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, Imag16:$l, i16imm:$r);
++  }
+ }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..a9d6c6c12 100644
+index cbdd54ab2..dba54c841 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1319,7 +1421,123 @@ index cbdd54ab2..a9d6c6c12 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -1091,12 +1156,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -777,6 +842,11 @@ struct CmpNZ_match {
+     CondMI = DefSrcReg->MI;
+     if (CondMI->getOpcode() != MOS::G_SBC)
+       return false;
++    // #321 native s16: a 16-bit G_SBC is the native equality form (handled by the
++    // s16 matchers + selectBrCondImm's CmpBrImag16/Imm16). Keep the 8-bit CmpNZ
++    // matchers from ever folding a 16-bit G_SBC into an 8-bit compare-branch.
++    if (MRI.getType(CondMI->getOperand(0).getReg()) != LLT::scalar(8))
++      return false;
+ 
+     auto CInConst =
+         getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
+@@ -789,6 +859,68 @@ struct CmpNZ_match {
+   }
+ };
+ 
++// #321 native s16 equality: match a 16-bit G_SBC whose live flag is Z (the ==/!=
++// form left un-narrowed by legalizeICmp when the result feeds a branch). LHS/RHS are
++// the s16 operands (5/6); selectBrCondImm emits a CmpBrImag16/Imm16 fused branch.
++struct CmpNZ16_match {
++  Register &LHS;
++  Register &Flag;
++  MachineInstr *CondMI = nullptr;
++
++  CmpNZ16_match(Register &LHS, Register &Flag) : LHS(LHS), Flag(Flag) {}
++
++  bool match(const MachineRegisterInfo &MRI, Register CondReg) {
++    auto DefSrcReg = getDefSrcRegIgnoringCopies(CondReg, MRI);
++    CondMI = DefSrcReg->MI;
++    if (CondMI->getOpcode() != MOS::G_SBC)
++      return false;
++    if (MRI.getType(CondMI->getOperand(0).getReg()) != LLT::scalar(16))
++      return false;
++    auto CInConst =
++        getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
++    if (!CInConst || CInConst->Value.isZero())
++      return false;
++    LHS = CondMI->getOperand(5).getReg();
++    Flag = getSbcFlagForRegister(*CondMI, DefSrcReg->Reg);
++    return Flag == MOS::Z; // only equality (Z); native s16 ordering uses C, not NZ
++  }
++};
++
++struct CmpNZImm16_match : public CmpNZ16_match {
++  int64_t &RHS;
++  CmpNZImm16_match(Register &LHS, int64_t &RHS, Register &Flag)
++      : CmpNZ16_match(LHS, Flag), RHS(RHS) {}
++  bool match(const MachineRegisterInfo &MRI, Register CondReg) {
++    if (!CmpNZ16_match::match(MRI, CondReg))
++      return false;
++    auto RHSConst =
++        getIConstantVRegValWithLookThrough(CondMI->getOperand(6).getReg(), MRI);
++    if (!RHSConst)
++      return false;
++    RHS = RHSConst->Value.getZExtValue() & 0xFFFF;
++    return true;
++  }
++};
++inline CmpNZImm16_match m_CmpNZImm16(Register &LHS, int64_t &RHS, Register &Flag) {
++  return {LHS, RHS, Flag};
++}
++
++struct CmpNZImag16_match : public CmpNZ16_match {
++  Register &RHS;
++  CmpNZImag16_match(Register &LHS, Register &RHS, Register &Flag)
++      : CmpNZ16_match(LHS, Flag), RHS(RHS) {}
++  bool match(const MachineRegisterInfo &MRI, Register CondReg) {
++    if (!CmpNZ16_match::match(MRI, CondReg))
++      return false;
++    RHS = CondMI->getOperand(6).getReg();
++    return true;
++  }
++};
++inline CmpNZImag16_match m_CmpNZImag16(Register &LHS, Register &RHS,
++                                       Register &Flag) {
++  return {LHS, RHS, Flag};
++}
++
+ struct CmpNZZero_match : public CmpNZ_match {
+   CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
+ 
+@@ -991,6 +1123,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+     MI.eraseFromParent();
+     return true;
+   }
++  // #321 native s16 equality: a 16-bit G_SBC (Z) feeding this branch -> a fused
++  // 16-bit compare-branch. Matched first (type-discriminated) so the 8-bit CmpNZ
++  // cases below never see a 16-bit G_SBC. expandCmpBr lowers these to
++  // LDAImag16; CMPImag16/CMPImm16 (MLow=1 -> rep/sep bracket) + BR reading Z.
++  Register RHS16;
++  int64_t RHS16Const;
++  if (mi_match(CondReg, MRI, m_CmpNZImm16(LHS, RHS16Const, Flag))) {
++    auto Branch = Builder.buildInstr(MOS::CmpBrImm16)
++                      .addMBB(Tgt)
++                      .addUse(Flag, RegState::Undef)
++                      .addImm(FlagVal)
++                      .addUse(LHS)
++                      .addImm(RHS16Const);
++    constrainSelectedInstRegOperands(*Branch, TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++  if (mi_match(CondReg, MRI, m_CmpNZImag16(LHS, RHS16, Flag))) {
++    auto Branch = Builder.buildInstr(MOS::CmpBrImag16)
++                      .addMBB(Tgt)
++                      .addUse(Flag, RegState::Undef)
++                      .addImm(FlagVal)
++                      .addUse(LHS)
++                      .addUse(RHS16);
++    constrainSelectedInstRegOperands(*Branch, TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
+   if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
+     auto Branch = Builder.buildInstr(MOS::CmpBrZero)
+                       .addMBB(Tgt)
+@@ -1091,12 +1251,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -1377,7 +1595,7 @@ index cbdd54ab2..a9d6c6c12 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2038,416 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2133,416 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -1795,7 +2013,7 @@ index cbdd54ab2..a9d6c6c12 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..8e8f034f3 100644
+index 212ede1a0..fc2fffa57 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -1897,7 +2115,7 @@ index 212ede1a0..8e8f034f3 100644
    Register Partial;
    Register NewAmt;
    // Shift by one multiples of one byte.
-@@ -1270,7 +1312,16 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1270,7 +1312,26 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -1908,14 +2126,24 @@ index 212ede1a0..8e8f034f3 100644
 +  // narrow to the 8-bit byte chain (deferred follow-ups). UGE is the slice that
 +  // needs no terminator-fusion (C is a plain i1), so the branch reads it directly.
 +  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
++  // #321 native s16 equality: take the native EQ path only when the result feeds a
++  // branch (every use is G_BRCOND_IMM) — the Z flag it produces must be fused into a
++  // terminator (selectSbc asserts N/Z are never plain values), so an EQ whose result
++  // is a stored bool must stay on the 8-bit chain. Mirrors the zero-compare guard.
++  const bool NativeS16EqBranch =
++      STI.hasAccum16() && Type == LLT::scalar(16) && Pred == CmpInst::ICMP_EQ &&
++      !RHSIsZero && all_of(MRI.use_instructions(Dst), [](const MachineInstr &U) {
++        return U.getOpcode() == MOS::G_BRCOND_IMM;
++      });
 +  const bool NativeS16 =
-+      STI.hasAccum16() && Type == LLT::scalar(16) && Pred == CmpInst::ICMP_UGE;
++      STI.hasAccum16() && Type == LLT::scalar(16) &&
++      (Pred == CmpInst::ICMP_UGE || NativeS16EqBranch);
 +
 +  if (Type != S8 && !NativeS16) {
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,7 +1392,7 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,25 +1402,31 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -1924,7 +2152,21 @@ index 212ede1a0..8e8f034f3 100644
  
    // Lower 8-bit comparisons to a generic G_SBC instruction with similar
    // capabilities to the 6502's SBC and CMP instructions.  See
-@@ -1358,8 +1409,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+   // www.6502.org/tutorials/compare_beyond.html.
+   switch (Pred) {
+   case CmpInst::ICMP_EQ: {
++    // #321 native s16 equality (branch-fused): one 16-bit G_SBC -> selectBrCondImm
++    // emits rep/lda/cmp/sep/beq. Z (getReg(4)) is the live flag; the branch reads it.
++    LLT CmpTy = NativeS16 ? LLT::scalar(16) : S8;
+     auto Sbc =
+-        Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1}, {LHS, RHS, CIn});
++        Builder.buildInstr(MOS::G_SBC, {CmpTy, S1, S1, S1, S1}, {LHS, RHS, CIn});
+     Register Z = Sbc.getReg(4);
+-    if (!isNZUseLegal(Dst, MRI))
++    if (!NativeS16 && !isNZUseLegal(Dst, MRI))
+       Z = buildNZSelect(Z, Builder);
+     Builder.buildCopy(Dst, Z);
+     MI.eraseFromParent();
      break;
    }
    case CmpInst::ICMP_UGE: {

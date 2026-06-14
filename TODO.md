@@ -43,12 +43,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (one global load + one `Imag16` register — dispatch addressing mode per operand); (b) single-use-non-
   store results (the `>1 use` guard skips these today); (c) chained multi-use load expressions (extend
   `add_chain16`).
-- [ ] **#321 native s16 — 16-bit comparison follow-ups** (slice 1, unsigned ordering `< <= > >=`,
-  landed — see Done). Remaining, same approach: (a) **equality** (`== !=`) — the Z flag must fuse into
-  the branch terminator (a 16-bit `CmpBr` in `selectBrCondImm`); (b) **signed** (`slt/sle/sgt/sge`) —
-  the N^V 16-bit lowering in `legalizeICmp`; (c) compare feeding a **select**/bool value (not a branch);
+- [ ] **#321 native s16 — 16-bit comparison follow-ups** (slice 1 unsigned ordering `< <= > >=` and
+  ~~(a) equality `== !=`~~ both landed — see Done). Remaining, same approach: (b) **signed**
+  (`slt/sle/sgt/sge`) — the N^V 16-bit lowering in `legalizeICmp`; (c) compare feeding a
+  **select**/bool value (equality producing a stored bool, not a branch, still narrows to 8-bit);
   (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
-  [plan](docs/plans/2026-06-14-321-native-16bit-compares.md).
+  [plan](docs/plans/2026-06-14-321-native-16bit-compares.md) ·
+  [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; inc/dec already native via adc #±1; remaining: variable shifts, amount
@@ -120,6 +121,19 @@ llvm-mos change to track) rather than active work._
 
 
 ## Done
+
+- 2026-06-15 — [321-native-16bit-equality-compares] **native 16-bit equality compares (`== !=`).**
+  An s16 `a == b`/`a != b` narrowed to a two-block 8-bit `cmp/cpx` chain; now each `==`/`!=` feeding a
+  branch is one fused 16-bit compare-branch `rep; lda; cmp; sep; beq/bne`. Unlike the carry (ordering)
+  path, Z can't be a plain i1 (selectSbc asserts N/Z must fuse into a terminator), so: the legalizer
+  keeps s16 `ICMP_EQ` un-narrowed only when every use is `G_BRCOND_IMM`; new `CmpBrImag16`/`CmpBrImm16`
+  pseudos (Defs `[C,A16,NZ]`) carry it; type-discriminated `CmpNZ16` matchers + new `selectBrCondImm`
+  cases (handled before the 8-bit ones, with an s8 guard added to the 8-bit matcher); and `expandCmpBr16`
+  lowers post-RA to `LDAImag16; CMPImag16/CMPImm16` (both `MLow=1`, so REP/SEP brackets the `lda;cmp`)
+  + `BR` reading Z (sep preserves Z). `a16eq` reads 0x0011 (operands differ in both bytes), no 8-bit
+  cpx/cpy; `-verify-machineinstrs` clean; both MAME + bsnes-jg. Non-breaking: corpus 7/7, all 18 a16*
+  tests green, patch `0002` round-trips. Equality→stored-bool and signed compares are follow-ups.
+  [plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md).
 
 - 2026-06-15 — [321-native-16bit-signed-shift-ashr] **native 16-bit signed (arithmetic) right shift
   (`>>` on `short`).** Completes the constant-shift family. The 65816 has no native ASR, so
