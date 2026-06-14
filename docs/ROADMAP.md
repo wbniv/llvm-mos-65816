@@ -304,15 +304,19 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    un-narrowed and `selectShift16Native` emits one `lda; (asl|lsr)×k; sta` run on the `Imag16` value
    (new `ASLAcc16`/`LSRAcc16` `MLow=1` forms) — `a16shift` reads 0x1278 with 4× `asl` + 2× `lsr` under
    a single rep/sep (the mode tracker even folds a following add into the same bracket), no `rol/ror`
-   pairs and no `__ashlhi3` libcall. Signed `>>` (ASHR), variable shifts, amount ≥ 8, and the 1-byte
-   `inc a`/`dec a` form are follow-ups. Non-breaking (corpus 7/7, all 16 a16* tests green, patch
-   `0002` round-trips).
+   pairs and no `__ashlhi3` libcall. **Signed** `>>` (ASHR) follows: the 65816 has no native ASR, so
+   `selectShift16Native` emits `cmp #$8000; ror a` per bit (the compare sets carry from the sign bit,
+   `ror` replicates it into bit 15) via a carry-threaded `RORAcc16` — `a16ashift` sign-extends
+   0xF000 >> 3 to 0xFE00 (reads 0xFE01), no 8-bit byte chain, no libcall. Variable shifts, amount ≥ 8,
+   and the 1-byte `inc a`/`dec a` form are follow-ups. Non-breaking (corpus 7/7, all 17 a16* tests
+   green, patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
    [compares plan](plans/2026-06-14-321-native-16bit-compares.md) ·
    [cross-block REP/SEP plan](plans/2026-06-15-321-cross-block-repsep-mode-tracking.md) ·
-   [constant-shifts plan](plans/2026-06-15-321-native-16bit-constant-shifts.md)._
+   [constant-shifts plan](plans/2026-06-15-321-native-16bit-constant-shifts.md) ·
+   [signed-shift plan](plans/2026-06-15-321-native-16bit-signed-shift-ashr.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

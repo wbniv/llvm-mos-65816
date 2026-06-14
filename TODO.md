@@ -50,9 +50,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
   [plan](docs/plans/2026-06-14-321-native-16bit-compares.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
-  (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts done — see
-  Done; inc/dec already native via adc #±1; remaining: signed `>>`/ASHR, variable shifts, amount ≥8,
-  1-byte `inc a`/`dec a`, memory-RMW `inc abs`); (4) indexed/array access; (5) A16-threading (value
+  (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
+  `>>`/ASHR done — see Done; inc/dec already native via adc #±1; remaining: variable shifts, amount
+  ≥8, 1-byte `inc a`/`dec a`, memory-RMW `inc abs`); (4) indexed/array access; (5) A16-threading (value
   stays live in the accumulator across ops — biggest win but reintroduces the coalescer-crash risk, so
   deferred behind a broad corpus); ~~(6) cross-block REP/SEP mode-tracking~~ (M-flag done — see Done;
   X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
@@ -120,6 +120,15 @@ llvm-mos change to track) rather than active work._
 
 
 ## Done
+
+- 2026-06-15 — [321-native-16bit-signed-shift-ashr] **native 16-bit signed (arithmetic) right shift
+  (`>>` on `short`).** Completes the constant-shift family. The 65816 has no native ASR, so
+  `selectShift16Native` emits `cmp #$8000; ror a` per bit (the compare sets carry = the sign bit, the
+  rotate replicates it into bit 15) via a new carry-threaded `RORAcc16` `MLow=1` form; the legalizer
+  gate adds `G_ASHR` to the [1,7] native passthrough. `a16ashift` sign-extends 0xF000 >> 3 = 0xFE00
+  (reads 0xFE01) under one rep/sep, no 8-bit lsr/ror byte chain, no libcall; both MAME + bsnes-jg.
+  Non-breaking: corpus 7/7, all 17 a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-15-321-native-16bit-signed-shift-ashr.md).
 
 - 2026-06-15 — [321-native-16bit-constant-shifts] **native 16-bit constant shifts (`<<`, unsigned
   `>>`).** `x << k` / unsigned `x >> k` (k a compile-time constant) had narrowed to the 8-bit
