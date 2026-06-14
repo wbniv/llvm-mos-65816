@@ -61,13 +61,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
   ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
-- [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)` ~~and absolute~~ load/store both
-  landed — see Done). Remaining: (a) **fuse a 16-bit load→store copy** (`g = gg` currently round-trips
-  the value through an Imag16 temp: `lda gg; sta tmp; lda tmp; sta g` — a peephole could emit
-  `lda gg; sta g` directly); (b) the indexed `abs,x`/`(zp),y` forms are **moot** (llvm-mos is fully
-  pointer-based — even array-sum loops emit native `lda (zp)`); (c) **re-evaluate the X-flag (xy16)
-  mode dimension** — 16-bit index registers via `rep/sep #$10` (a new dimension in `MOSInsertREPSEP`);
-  NOT required for array access, so assess whether it pays off at all before building it.
+- [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)`, absolute, ~~and the abs→abs copy
+  fusion~~ all landed — see Done). Remaining: (a) extend the copy fusion to **indirect/mixed** copies
+  (`*q = *p`, `g = *p`, `*p = gg` still round-trip through an Imag16 temp; only abs←abs is fused);
+  (b) the indexed `abs,x`/`(zp),y` forms are **moot** (llvm-mos is fully pointer-based — even array-sum
+  loops emit native `lda (zp)`); (c) **re-evaluate the X-flag (xy16) mode dimension** — 16-bit index
+  registers via `rep/sep #$10` (a new dimension in `MOSInsertREPSEP`); NOT required for array access,
+  so assess whether it pays off at all before building it.
   [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
   [absolute plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). From the 1c
@@ -132,6 +132,17 @@ llvm-mos change to track) rather than active work._
 
 
 ## Done
+
+- 2026-06-15 — [321-native-s16-copy16abs] **fuse the 16-bit global-to-global copy (`g = gg`).** The
+  absolute load/store landed `g = gg` as `lda gg; sta tmp; lda tmp; sta g` — the value round-tripped
+  through an Imag16 temp because the load and store were selected independently. A new pre-legalizer
+  combiner `copy16abs` (`matchCopy16Abs`/`applyCopy16Abs`) folds `G_STORE(single-use near-abs
+  G_LOAD(absSrc), absDst)` into `G_COPY16_ABS`, which `selectCopy16Abs` lowers to `lda src; sta dst`
+  (LDAbs16+STAbs16, both MLow=1, no temp) in one rep/sep. Disjoint from alu16_abs/add_chain16 (those
+  need a G_ALU value). `g = gg` is now 2 ops; `a16abs` still reads 0x5A3D; `-verify-machineinstrs`
+  clean; both MAME + bsnes-jg. Non-breaking: corpus 7/7, all 21 a16* tests green, patch `0002`
+  round-trips. Follow-up: extend to indirect/mixed copies (`*q = *p`, `g = *p`).
+  [plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
 
 - 2026-06-15 — [321-native-16bit-absolute-load-store] **native 16-bit absolute load/store (`g = gg`).**
   A 16-bit global-to-global copy / global store of a computed value did a 4-op 8-bit X/Y byte shuffle

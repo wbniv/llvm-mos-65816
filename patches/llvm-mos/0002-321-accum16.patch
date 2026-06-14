@@ -23,10 +23,10 @@ index 66964b1fe..e2cb062d6 100644
  void initializeMOSLateOptimizationPass(PassRegistry &);
  void initializeMOSLowerSelectPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSCombine.td b/llvm/lib/Target/MOS/MOSCombine.td
-index 7a064aa35..60a60870a 100644
+index 7a064aa35..2f8c0ec6a 100644
 --- a/llvm/lib/Target/MOS/MOSCombine.td
 +++ b/llvm/lib/Target/MOS/MOSCombine.td
-@@ -58,6 +58,37 @@ def store_to_memset : GICombineRule<
+@@ -58,6 +58,48 @@ def store_to_memset : GICombineRule<
            [{ return matchStoreToMemset(*${root}, ${matchinfo}); }]),
    (apply [{ applyStoreToMemset(*${root}, ${matchinfo}); }])>;
  
@@ -61,24 +61,36 @@ index 7a064aa35..60a60870a 100644
 +          [{ return matchAlu16AbsLd(*${root}); }]),
 +  (apply [{ applyAlu16AbsLd(*${root}); }])>;
 +
++// #321 native s16: a fused 16-bit global-to-global copy. DAG
++// G_STORE(single-use G_LOAD(absSrc), absDst) => G_COPY16_ABS, dropping the Imag16
++// temp round-trip the independent load/store selection would otherwise emit. Gated
++// on +mos-a16; both addresses near-abs globals. Disjoint from alu16_abs/add_chain16
++// (those need a G_ALU value, this needs a plain G_LOAD value).
++def copy16abs : GICombineRule<
++  (defs root:$root),
++  (match (wip_match_opcode G_STORE):$root,
++          [{ return matchCopy16Abs(*${root}); }]),
++  (apply [{ applyCopy16Abs(*${root}); }])>;
++
  def fold_adde : GICombineRule<
    (defs root:$root, build_fn_matchinfo:$matchinfo),
    (match (wip_match_opcode G_UADDE, G_SADDE):$root,
-@@ -96,6 +127,9 @@ def MOSCombiner : GICombiner<"MOSCombinerImpl", [
+@@ -96,6 +138,10 @@ def MOSCombiner : GICombiner<"MOSCombinerImpl", [
    cmpz_zero,
    load_store_to_memcpy,
    store_to_memset,
 +  alu16_abs,
 +  add_chain16,
 +  alu16_absld,
++  copy16abs,
    fold_adde,
    fold_sbc,
    sbc_equal,
 diff --git a/llvm/lib/Target/MOS/MOSCombiner.cpp b/llvm/lib/Target/MOS/MOSCombiner.cpp
-index bff8495ed..7474f2833 100644
+index bff8495ed..f5e62ac47 100644
 --- a/llvm/lib/Target/MOS/MOSCombiner.cpp
 +++ b/llvm/lib/Target/MOS/MOSCombiner.cpp
-@@ -110,6 +110,19 @@ public:
+@@ -110,6 +110,24 @@ public:
    bool matchStoreToMemset(MachineInstr &MI, uint8_t &Value) const;
    void applyStoreToMemset(MachineInstr &MI, uint8_t &Value) const;
  
@@ -95,10 +107,15 @@ index bff8495ed..7474f2833 100644
 +  bool matchAlu16AbsLd(MachineInstr &MI) const;
 +  void applyAlu16AbsLd(MachineInstr &MI) const;
 +
++  // #321 native s16: fuse a 16-bit global-to-global copy (G_STORE of a single-use
++  // near-abs G_LOAD) into G_COPY16_ABS, dropping the Imag16 temp round-trip.
++  bool matchCopy16Abs(MachineInstr &MI) const;
++  void applyCopy16Abs(MachineInstr &MI) const;
++
    bool matchFoldAddE(MachineInstr &MI, BuildFnTy &MatchInfo) const;
    bool matchFoldSbc(MachineInstr &MI, BuildFnTy &MatchInfo) const;
    bool matchFoldShift(MachineInstr &MI, BuildFnTy &MatchInfo) const;
-@@ -443,6 +456,327 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
+@@ -443,6 +461,358 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
    MI.eraseFromParent();
  }
  
@@ -419,6 +436,37 @@ index bff8495ed..7474f2833 100644
 +      .addImm(Imm)
 +      .addMemOperand(&Load->getMMO());
 +  MRI.replaceRegWith(Dst, NewDst);
++  MI.eraseFromParent();
++  Load->eraseFromParent();
++}
++
++// #321 native s16: G_STORE(single-use G_LOAD(absSrc), absDst), both near-abs
++// globals, is a plain 16-bit global-to-global copy. Independent load/store selection
++// would hand the value off through an Imag16 temp (lda src; sta tmp; lda tmp; sta
++// dst); fuse to G_COPY16_ABS so the selector emits lda src; sta dst directly.
++bool MOSCombinerImpl::matchCopy16Abs(MachineInstr &MI) const {
++  if (!B.getMF().getSubtarget<MOSSubtarget>().hasAccum16())
++    return false;
++  auto &Store = cast<GStore>(MI);
++  if (!nearAbsGlobalDef(Store.getPointerReg(), MRI))
++    return false; // destination must be a near-abs global (absolute store)
++  // The stored value must be a single-use near-abs 16-bit load (the source copy).
++  return nearAbsLoad(Store.getValueReg(), MRI) != nullptr;
++}
++
++void MOSCombinerImpl::applyCopy16Abs(MachineInstr &MI) const {
++  auto &Store = cast<GStore>(MI);
++  B.setInstrAndDebugLoc(MI);
++  GLoad *Load = nearAbsLoad(Store.getValueReg(), MRI);
++  const MachineOperand &Src =
++      nearAbsGlobalDef(Load->getPointerReg(), MRI)->getOperand(1);
++  const MachineOperand &Dst =
++      nearAbsGlobalDef(Store.getPointerReg(), MRI)->getOperand(1);
++  B.buildInstr(MOS::G_COPY16_ABS)
++      .add(Src)
++      .add(Dst)
++      .addMemOperand(&Load->getMMO())
++      .addMemOperand(&Store.getMMO());
 +  MI.eraseFromParent();
 +  Load->eraseFromParent();
 +}
@@ -871,7 +919,7 @@ index 12d05bed4..01b3f7a7e 100644
                  AssemblerPredicate<(all_of Feature65EL02), "65EL02"> {
    let PredicateName = "Feature65EL02";
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
-index e81487e9c..503c3a37b 100644
+index e81487e9c..8f2bfd943 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
 +++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
 @@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
@@ -910,7 +958,7 @@ index e81487e9c..503c3a37b 100644
  // Generalized 8-bit load using the indirect indexed addressing mode. The index
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_LOAD_INDIR_IDX : MOSGenericInstruction {
-@@ -125,6 +147,16 @@ def G_STORE_ABS : MOSGenericInstruction {
+@@ -125,6 +147,29 @@ def G_STORE_ABS : MOSGenericInstruction {
    let mayStore = true;
  }
  
@@ -924,10 +972,23 @@ index e81487e9c..503c3a37b 100644
 +  let mayStore = true;
 +}
 +
++// #321 native s16: a fused 16-bit global-to-global copy `g = gg` — load src, store
++// dst, with NO Imag16 temp round-trip. The copy16abs combiner folds
++// G_STORE(single-use G_LOAD(absSrc), absDst) into this; selectCopy16Abs lowers it to
++// LDAbs16 (src -> A16) -> STAbs16 (A16 -> dst), one rep/sep. Operands are the two
++// global addresses (src, dst); carries the load + store memoperands.
++def G_COPY16_ABS : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs);
++  let InOperandList = (ins unknown:$src, unknown:$dst);
++  let mayLoad = true;
++  let mayStore = true;
++}
++
  // #320: Generalized 8-bit store using 65816 absolute-long (24-bit) addressing,
  // for far (addrspace 2) pointers. The address argument is a global value or a
  // 24-bit immediate. Selects to STA AbsoluteLong (accumulator only). Additionally
-@@ -136,6 +168,94 @@ def G_STORE_FAR_ABS : MOSGenericInstruction {
+@@ -136,6 +181,94 @@ def G_STORE_FAR_ABS : MOSGenericInstruction {
    let mayStore = true;
  }
  
@@ -1022,7 +1083,7 @@ index e81487e9c..503c3a37b 100644
  // Generalized 8-bit store using the absolute indexed addressing mode. The base
  // argument isn't a pointer; it's either a global value or a 16-bit immediate.
  // The index argument is an 8-bit scalar. Additionally expects a
-@@ -155,6 +275,16 @@ def G_STORE_INDIR : MOSGenericInstruction {
+@@ -155,6 +288,16 @@ def G_STORE_INDIR : MOSGenericInstruction {
    let mayStore = true;
  }
  
@@ -1404,7 +1465,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..5ce00bb2a 100644
+index cbdd54ab2..9a49fb896 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1417,7 +1478,7 @@ index cbdd54ab2..5ce00bb2a 100644
    bool selectFrameIndex(MachineInstr &MI);
    std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
    bool selectAddr(MachineInstr &MI);
-@@ -96,6 +99,26 @@ private:
+@@ -96,6 +99,29 @@ private:
    bool selectIncDecMB(MachineInstr &MI);
    bool selectUnMergeValues(MachineInstr &MI);
    bool selectBrIndirect(MachineInstr &MI);
@@ -1441,10 +1502,13 @@ index cbdd54ab2..5ce00bb2a 100644
 +  // #321 native s16 absolute load/store (G_LOAD16_ABS / G_STORE16_ABS):
 +  // lda abs/sta abs in M=0 to a global/static address, one rep/sep.
 +  bool selectMem16Abs(MachineInstr &MI);
++  // #321 native s16 global-to-global copy (G_COPY16_ABS): lda src; sta dst in M=0,
++  // no Imag16 temp round-trip, one rep/sep.
++  bool selectCopy16Abs(MachineInstr &MI);
  
    // Select instructions that correspond 1:1 to a target instruction.
    bool selectGeneric(MachineInstr &MI);
-@@ -195,15 +218,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -195,15 +221,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    switch (MI.getOpcode()) {
    case MOS::G_ADD:
    case MOS::G_SUB:
@@ -1491,7 +1555,7 @@ index cbdd54ab2..5ce00bb2a 100644
    }
  
    if (selectImpl(MI, *CoverageInfo))
-@@ -247,6 +301,31 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -247,6 +304,34 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -1517,13 +1581,16 @@ index cbdd54ab2..5ce00bb2a 100644
 +  case MOS::G_STORE16_ABS:
 +    return selectMem16Abs(MI);
 +
++  case MOS::G_COPY16_ABS:
++    return selectCopy16Abs(MI);
++
 +  case MOS::G_ADDCHAIN16_ABS:
 +    return selectAddChain16(MI);
 +
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -777,6 +856,11 @@ struct CmpNZ_match {
+@@ -777,6 +862,11 @@ struct CmpNZ_match {
      CondMI = DefSrcReg->MI;
      if (CondMI->getOpcode() != MOS::G_SBC)
        return false;
@@ -1535,7 +1602,7 @@ index cbdd54ab2..5ce00bb2a 100644
  
      auto CInConst =
          getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
-@@ -789,6 +873,68 @@ struct CmpNZ_match {
+@@ -789,6 +879,68 @@ struct CmpNZ_match {
    }
  };
  
@@ -1604,7 +1671,7 @@ index cbdd54ab2..5ce00bb2a 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -991,6 +1137,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -991,6 +1143,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
@@ -1639,7 +1706,7 @@ index cbdd54ab2..5ce00bb2a 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1091,12 +1265,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1271,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -1697,7 +1764,7 @@ index cbdd54ab2..5ce00bb2a 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2147,490 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2153,513 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -2181,6 +2248,29 @@ index cbdd54ab2..5ce00bb2a 100644
 +  for (MachineInstrBuilder &Bld : New)
 +    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
 +
++  MI.eraseFromParent();
++  return true;
++}
++
++// #321 native s16 global-to-global copy: G_COPY16_ABS (src global, dst global, ld
++// memref, st memref) -> lda src(16-bit) -> A16; sta dst(16-bit). No Imag16 temp; both
++// MLow=1 -> one rep/sep. The fused form of a plain `g = gg` copy.
++bool MOSInstructionSelector::selectCopy16Abs(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  const MachineOperand &Src = MI.getOperand(0);
++  const MachineOperand &Dst = MI.getOperand(1);
++  const unsigned NumMMO = MI.getNumMemOperands();
++  MachineMemOperand *LdMMO = *MI.memoperands_begin();
++  MachineMemOperand *StMMO = *(MI.memoperands_begin() + (NumMMO - 1));
++
++  Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  auto Ld = Builder.buildInstr(MOS::LDAbs16).addDef(A16).add(Src).addMemOperand(LdMMO);
++  auto St = Builder.buildInstr(MOS::STAbs16).addUse(A16).add(Dst).addMemOperand(StMMO);
++
++  constrainSelectedInstRegOperands(*Ld.getInstr(), TII, TRI, RBI);
++  constrainSelectedInstRegOperands(*St.getInstr(), TII, TRI, RBI);
 +  MI.eraseFromParent();
 +  return true;
 +}

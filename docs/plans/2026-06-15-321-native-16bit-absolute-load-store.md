@@ -27,6 +27,10 @@ before the now-stale exact-count disasm gates were relaxed to match the improved
 codegen. Non-breaking: corpus 7/7, all 21 a16* tests green, patch `0002`
 round-trips (2623 lines).
 
+**Follow-up landed (same day):** the load→store copy round-trip noted below was fused
+by a `copy16abs` combiner — `G_STORE(single-use near-abs G_LOAD, absDst)` →
+`G_COPY16_ABS` → `lda src; sta dst` (no Imag16 temp). `g = gg` is now 2 ops.
+
 ## Original plan
 
 **Date:** 2026-06-15 · **Status:** planning

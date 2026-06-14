@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-15](https://github.com/wbniv/llvm-mos-65816/commit/b9854af) | #321 native s16: native 16-bit absolute load/store (lda abs/sta abs, no byte shuffle) |
+
+<!--history-meta v1
+b9854af	author	Will Norris
+b9854af	added	110
+b9854af	deleted	0
+b9854af	files	1
+b9854af	body	A 16-bit global-to-global copy / global store of a computed value did a 4-op 8-bit\nX/Y byte shuffle (ldx gg; ldy gg+1; stx g; sty g+1) with no rep/sep. Now a global-\naddressed s16 access goes native: one 16-bit lda abs / sta abs under one rep/sep.\n\n- MOSInstrGISel.td: G_LOAD16_ABS / G_STORE16_ABS pseudos (HasAccum16).\n- MOSLegalizerInfo.cpp: legalizeLoadStore16 now routes an s16 access whose address\n  matchAbsoluteAddressing resolves (global/static/const) to G_LOAD16_ABS/\n  G_STORE16_ABS; runtime pointers stay indirect; everything else narrows. A store\n  of a CONSTANT value is gated out (narrows) so store-of-zero keeps the STZ-fusion\n  peephole (rep; stz; sep) and small immediates stay cheap 8-bit stores, instead of\n  wastefully materializing the constant into Imag16.\n- MOSInstructionSelector.cpp: selectMem16Abs lowers the pseudos to LDAbs16+STAImag16\n  (load) / LDAImag16+STAbs16 (store) via the existing 16-bit absolute forms; the\n  memref rides the real abs op. All MLow=1 -> one rep/sep; no Ac16<->8-bit COPY.\n\nRegister-valued `corpus_result = <computed>` stores across the test suite now go\nnative and merge into their preceding 16-bit bracket, eliminating the trailing sep\n(main never returns) — a genuine improvement. This changed the rep/sep shape of 11\nexisting tests; each was emulator-verified still correct (a throwaway emulator-only\npass confirmed every corpus_result) before the now-stale exact-count disasm gates\nwere relaxed to the improved codegen (and the older a16add/sub/chain gates gained\nthe missing `|| true` no-match guard per the repo convention).\n\na16abs reads 0x5A3D via `g = gg`, no byte shuffle; -verify-machineinstrs clean; both\nMAME + bsnes-jg. Non-breaking: corpus 7/7, all 21 a16* tests green, 0002 round-trips.\n\nFollow-up: fuse the load->store copy to drop the Imag16 temp round-trip. The indexed\nabs,x form is moot (fully pointer-based); the X-flag dimension stays optional.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->
