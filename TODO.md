@@ -27,11 +27,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 Increment 1b — dual-width accumulator register** (after 1a, done): model `A` as the low
-  half of a 16-bit `C` that aliases the same physical bits (8- or 16-bit by the runtime M flag) + a
-  register bank, so 16-bit `lda`/`sta` flow a real 16-bit value (not just the register-free STZ of 1a).
-  The genuine hard core of #321. Reuses the 1a `MOSInsertREPSEP` pass + `+mos-a16` feature.
-  [plan](docs/plans/2026-06-14-321-increment-1-16bit-accumulator.md).
+- [wip] **#321 Increment 1b — dual-width accumulator register** (after 1a, done): model `A` as the
+  low half of a 16-bit `C` aliasing the same physical bits (sized by the runtime M flag) + a register
+  bank, so a 16-bit op flows a real value. **Grounding investigation done** (2026-06-14): the natural
+  16-bit cases (copy/const-store/inc) route bytes through X/Y, *not* `A`, so there's **no 1a-style
+  fusion shortcut**; a const-store peephole is only break-even. The first slice that actually wins
+  (smaller + correct) is the **16-bit `add`**, which needs the real register modeling. Approach
+  decision (full register modeling vs an interim INC-absolute idiom) captured in the plan; MC layer
+  (`LDA/ADC_Immediate16`, `MLow` TSFlags) already exists, so the gap is GISel + regalloc.
+  [plan](docs/plans/2026-06-14-321-increment-1b-dual-width-accumulator.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
   mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
   + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
