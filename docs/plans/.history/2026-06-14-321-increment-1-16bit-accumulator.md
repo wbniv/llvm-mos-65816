@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/bf402b9) | #321 Increment 1a part 2: 16-bit store-of-zero fuses to rep/stz/sep (disasm-verified) |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/f62f8c6) | #321 Increment 1a: REP/SEP-insertion pass + opt-in 16-bit-A feature (non-breaking) |
 
 <!--history-meta v1
+bf402b9	author	Will Norris
+bf402b9	added	30
+bf402b9	deleted	3
+bf402b9	files	1
+bf402b9	body	The MOSInsertREPSEP pass now fuses a 16-bit store-of-zero (`uint16_t g = 0`,\nwhich lowers to two adjacent 8-bit `STZAbs @g` / `STZAbs @g+1`) into one STZ run\nin 16-bit-A mode: `REP #$20; stz g; SEP #$20`. Self-contained — no new\ninstruction form, legalizer, or selector change; matches two adjacent STZAbs to\nthe same global at offsets N/N+1. The reusable demonstration of REP/SEP-bracketed\n16-bit codegen. Captured in patches/llvm-mos/0002-321-accum16.patch.\n\nexamples/65816/a16.c + `dev/run.sh a16`: build with +mos-a16 (via cc1\n-target-feature; the driver rejects -mattr), assert the fusion at disasm and the\nresult on both emulators.\n\nVerification:\n- Disasm PASS: c2 20 (rep) + single 9c (stz) + e2 20 (sep) — vs two stz without\n  +mos-a16.\n- Non-breaking PASS: 6502 corpus 7/7, far-pointer xcheck still PASS (the fusion\n  is gated on hasAccum16()).\n- Emulator run FAILs got=0xBE42 (both MAME and bsnes-jg agree) — EXPECTED: the\n  SNES boots in 65816 emulation mode, where M/X are forced 8-bit, so REP #$20 is\n  ignored and the stz writes only the low byte. This confirms 16-bit registers\n  require native mode (XCE) — the deferred prerequisite, next phase. The codegen\n  (the compiler deliverable) is correct; the emulator round-trip needs\n  native-mode crt0.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f62f8c6	author	Will Norris
 f62f8c6	added	159
 f62f8c6	deleted	0

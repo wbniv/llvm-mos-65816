@@ -1,7 +1,10 @@
 # M2 / #321 — Increment 1: minimal 16-bit-accumulator slice (REP/SEP insertion), opt-in, dual-emulator-verified
 
-**Date:** 2026-06-14 · **Status:** In progress — implementation started; first slice re-scoped (see
-Implementation finding). · **Milestone:** M2 (ROADMAP step 5, first 16-bit-register codegen). **Builds on:** the #320 far-pointer slice (Increments
+**Date:** 2026-06-14 · **Status:** **Increment 1a COMPLETE** — a 16-bit store-of-zero fuses to
+`rep #$20; stz; sep #$20` (`+mos-a16`) and, run in 65816 native mode, fully zeroes the 16-bit value:
+`corpus_result == 0x0042` on **both** MAME and bsnes-jg. First real 16-bit-accumulator codegen, dual-
+emulator-verified, non-breaking (corpus 7/7). Next: 1b (dual-width accumulator register) + a proper
+native-mode crt0. · **Milestone:** M2 (ROADMAP step 5, first 16-bit-register codegen). **Builds on:** the #320 far-pointer slice (Increments
 [1](2026-06-14-320-far-pointer-codegen.md) / [2](2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md)
 / [2b](2026-06-14-320-increment-2b-multi-bank-rom-far-read.md)) + the dual-emulator bench
 ([xcheck](2026-06-14-second-emulator-cross-check-bsnes-jg.md)).
@@ -78,10 +81,25 @@ the milestone is "hard"), not a minimal first step.
   16-bit-accumulator mode requires 65816 *native* mode (`XCE`)** — the prerequisite the ROADMAP/#320
   deferred to M2. The codegen (the compiler deliverable) is correct and committed; the emulator run is
   the next phase.
-- **Next phase — native-mode crt0 (planned before implementing).** A SNES crt0 that does `CLC; XCE`
-  (enter native mode, E=0) keeping M/X = 8-bit as the default (so the existing 8-bit + far-pointer
-  codegen is unchanged), so `REP #$20` can transiently widen A. Then `dev/run.sh a16` reads `0x0042` on
-  both emulators, and corpus + far must stay green in native 8-bit mode.
+- **Next phase — native-mode entry to verify the codegen (planned before implementing).** 16-bit A
+  needs native mode (E=0). Rather than build a full native crt0 now (a broader M2 task — it changes the
+  whole platform's mode and must keep corpus + far green in native 8-bit), the minimal honest
+  verification of the 1a *codegen* is a **test-local native-mode entry**: `a16.c`'s `main` does
+  `asm("clc; xce")` (E=0) before the 16-bit store. Safe for this test — `main` never returns (spins)
+  and runs no interrupts (crt0 already `sei` + NMITIMEN=0), and g16/corpus_result are bank-$00 WRAM
+  (DBR=0). Then `dev/run.sh a16` reads `0x0042` on both emulators — proving the `rep/stz/sep` codegen
+  is correct when actually run in native mode. The **proper native-mode crt0** (so *all* programs run
+  native, the eventual M2 platform mode) stays deferred.
+- **RESULT (2026-06-14) — 1a COMPLETE.** `dev/run.sh a16` with the inline `clc; xce`:
+  ```
+  disasm: c2 20 (rep #$20) · 9c 00 00 (stz, single) · e2 20 (sep #$20)
+  MAME:     SMOKE: PASS addr=0x7E0202 len=2 got=0x0042
+  bsnes-jg: SMOKE: PASS off=0x202 len=2 got=0x0042
+  RESULT: PASS — 16-bit STZ zeroes g16; both emulators read 0x0042
+  ```
+  The fused 16-bit STZ, run in native mode, writes both bytes (g16 0xBEEF → 0x0000), so
+  corpus_result = 0x0042 — confirmed independently by MAME and bsnes-jg. The REP/SEP-insertion pass +
+  opt-in feature are the reusable core for the rest of #321.
 
 ## Scope — Increment 1a (minimal, opt-in, non-breaking)
 

@@ -196,6 +196,16 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    than the M1 8-bit-mode output for the same source. The M0+M1 corpus stays green. (Evidence:
    size/cycle comparison + corpus green.)
 
+   _**Increment 1a in progress (2026-06-14): first 16-bit-accumulator codegen, dual-emulator-verified.**
+   The new `MOSInsertREPSEP` pass (opt-in `+mos-a16`, reusing the MC `MLow/MHigh` width TSFlags) fuses a
+   16-bit store-of-zero to `rep #$20; stz; sep #$20`; run in 65816 native mode it fully zeroes the
+   16-bit value → `corpus_result == 0x0042` on **both** MAME and bsnes-jg (`dev/run.sh a16`).
+   Non-breaking (corpus 7/7). Findings: (a) 16-bit registers need native mode (XCE) — a 1a `clc;xce`
+   test-entry stands in for the deferred native-mode crt0; (b) the size win needs amortization (one
+   STZ under REP/SEP is +1 byte) — churn-minimization + the dual-width accumulator register (16-bit
+   `lda`/`sta`, not just STZ) are the next increments._
+   [Inc 1 plan](plans/2026-06-14-321-increment-1-16bit-accumulator.md).
+
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
    the ROM's symbols.)

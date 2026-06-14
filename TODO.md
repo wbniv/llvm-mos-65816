@@ -27,12 +27,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 Increment 1 — minimal 16-bit-accumulator slice (REP/SEP insertion), opt-in.** Get one
-  16-bit-A load+store to compile to `REP #$20 / lda·sta / SEP #$20` behind a new opt-in `+mos-a16`
-  feature (non-breaking); the reusable core is a `MOSInsertREPSEP` pass that reuses the existing MC
-  `MLow/MHigh` width TSFlags. Disasm + dual-emulator (MAME + bsnes-jg) verified, smaller than the
-  8-bit build. Tracked patch `0002-321-accum16.patch`, like #320. ROADMAP step 5 (first slice).
+- [ ] **#321 Increment 1b — dual-width accumulator register** (after 1a, done): model `A` as the low
+  half of a 16-bit `C` that aliases the same physical bits (8- or 16-bit by the runtime M flag) + a
+  register bank, so 16-bit `lda`/`sta` flow a real 16-bit value (not just the register-free STZ of 1a).
+  The genuine hard core of #321. Reuses the 1a `MOSInsertREPSEP` pass + `+mos-a16` feature.
   [plan](docs/plans/2026-06-14-321-increment-1-16bit-accumulator.md).
+- [ ] **#321 — proper native-mode crt0** (XCE + native vectors, M/X default 8-bit) so *all* SNES
+  programs run in native mode (the eventual M2 platform mode) — replaces the 1a test-local `clc; xce`.
+  Corpus + far must stay green in native 8-bit. Enables the emulator run for all 16-bit codegen.
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
   mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
   + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
@@ -62,6 +64,13 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [321-increment-1a-16bit-accumulator] **first real 16-bit-accumulator codegen** — a
+  16-bit store-of-zero fuses (under opt-in `+mos-a16`) to `rep #$20; stz; sep #$20` via the new
+  `MOSInsertREPSEP` pass (reuses the MC `MLow/MHigh` width TSFlags), and — run in 65816 native mode —
+  fully zeroes the 16-bit value: `corpus_result == 0x0042` on **both** MAME and bsnes-jg. Non-breaking
+  (corpus 7/7, far/xcheck unaffected; feature not implied by W65816). Tracked patch
+  `0002-321-accum16.patch`; `dev/run.sh a16`. Finding: 16-bit registers need native mode (XCE) — the
+  deferred prerequisite. ROADMAP step 5 (first slice). [plan](docs/plans/2026-06-14-321-increment-1-16bit-accumulator.md).
 - 2026-06-14 — [second-emulator-xcheck] **second-emulator fidelity cross-check** — `dev/run.sh xcheck`
   boots the far ROMs in **bsnes-jg** (cycle-accurate, independent of MAME) headless and reads WRAM via
   `Bsnes::getMemoryRaw(MainRAM)` (a small `dev/jgxcheck.cpp` harness, no SDL/X/save-state): far-run
