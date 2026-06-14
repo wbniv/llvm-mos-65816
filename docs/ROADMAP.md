@@ -236,9 +236,16 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    builds). The genuine hard core of #321 — real values flow through a 16-bit register.
    Findings: a legalizer rule for a MOS-specific generic opcode corrupts the legalizer tables (skip by
    opcode-range instead); the carry-init must not split the REP/SEP run.
-   [Inc 1b plan](plans/2026-06-14-321-increment-1b-dual-width-accumulator.md). Next (the general
-   path): chained ops / values staying live in A16, then xy16 + the hardware-stack ABI/calling
-   convention (step continues)._
+   [Inc 1b plan](plans/2026-06-14-321-increment-1b-dual-width-accumulator.md)._
+
+   _**Increment 1c (2026-06-14): a value stays live in A16 across ops — the general path begins.**
+   `g = a + b + c` fuses to one bracket `rep #$20; lda b; clc; adc a; clc; adc c; sta g; sep #$20`,
+   threading the running sum through A16 (the intermediate `a+b` survives in the accumulator for the
+   `+c`) → `corpus_result == 0x1230` on **both** MAME and bsnes-jg (`dev/run.sh a16chain`). First
+   codegen where a 16-bit value survives across operations in the register, not just within one fused
+   op. Still a combiner peephole (all-load ADD chains); the full general path is GISel-native s16
+   register allocation (A16 ⊕ Imag16 + spilling) + loops + cross-block mode-tracking.
+   [Inc 1c plan](plans/2026-06-14-321-increment-1c-chained-16bit-alu.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

@@ -30,6 +30,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
+- [ ] **#321 Increment 1c continued — the general 16-bit path** (after 1c first slice, done): the
+  `a+b+c` chain proves a value can stay live in `A16` across ops, but it's still a combiner peephole
+  (all-load ADD chains → memory). Next: sub/bitwise chains + immediates-in-chains (easy follow-ons),
+  then the real general step — **GISel-native s16 register allocation** (keep s16 un-narrowed, allocate
+  across `A16` ⊕ `Imag16` with spilling) so arbitrary 16-bit dataflow / locals work, then loops +
+  cross-block REP/SEP mode-tracking. [plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
   mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
   + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
@@ -58,6 +64,17 @@ starting, or blocked on an external factor)._
 
 
 ## Done
+
+- 2026-06-14 — [321-increment-1c-chained-16bit-alu] **chained 16-bit ADD — a value stays live in A16
+  across ops** (first general-path slice): `g = a + b + c` fuses (pre-legalizer combiner, recursive
+  `collectAddChain` over the G_ADD tree → variadic `G_ADDCHAIN16_ABS` → `selectAddChain16`) to one
+  bracket `rep #$20; lda b; clc; adc a; clc; adc c; sta g; sep #$20`, threading the running sum
+  through A16 (the intermediate `a+b` survives in the accumulator for `+c`). Reads
+  `corpus_result == 0x1230` on **both** MAME and bsnes-jg. Disjoint from 1b's `alu16_abs` (fires only
+  on ≥3-term load chains). Non-breaking: 1b (add/sub/bitwise/imm) + 1a + corpus 7/7 green, SDK builds.
+  `dev/run.sh a16chain`; patch `0002-321-accum16.patch`. First codegen where a 16-bit value survives
+  across operations in the register — the start of the general path.
+  [plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md).
 
 - 2026-06-14 — [321-increment-1b-dual-width-accumulator] **a running 16-bit ALU (add/sub/and/or/xor)
   through the dual-width A16 accumulator** — modeled the 65816's 16-bit accumulator `A16 = B:A` (class
