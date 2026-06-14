@@ -20,10 +20,13 @@ sections below:
   [#321](https://github.com/llvm-mos/llvm-mos/issues/321) (16-bit register mode). _This fork now
   has both, in slice form: #320 far-pointer load/store (M1, PASS) and #321 16-bit-accumulator
   Inc 1a + native-mode crt0 (M2, in progress) — none upstreamed yet._
-- **SNES SDK target**: did not exist upstream — open issue
-  [llvm-mos-sdk#415](https://github.com/llvm-mos/llvm-mos-sdk/issues/415). SDK ships 46 platforms
-  (8 NES variants, C64, …) but no SNES. _This fork's `mos-platform/snes` (+ `snes-far`) target is
-  built and green (M0, PASS)._
+- **SNES SDK target**: none merged in the SDK; a **draft PR is open** —
+  [llvm-mos-sdk#415 "[SNES] Add target"](https://github.com/llvm-mos/llvm-mos-sdk/pull/415) by
+  @Phillip-May (opened 2025-10-29, stalled since; reviewed once by @asiekierka). It is
+  **8-bit / emulation-mode only** (no `-mcpu=mosw65816`, no native mode) — SDK scaffolding, not
+  codegen. SDK ships 46 platforms (8 NES variants, C64, …) but no merged SNES. _This fork's
+  `mos-platform/snes` (+ `snes-far`) target is built and green (M0, PASS); reconciliation with #415
+  in [415-snes-target-reconciliation](415-snes-target-reconciliation.md)._
 - **No active implementer** since @asiekierka stepped away (his design notes in #320/#321 stand).
 
 ## Goal
@@ -45,7 +48,7 @@ regression baseline already in hand.
 
 Stand up the infrastructure every later milestone needs, using the *existing* 6502 backend.
 
-- ~~Create the SNES SDK target in llvm-mos-sdk ([#415](https://github.com/llvm-mos/llvm-mos-sdk/issues/415)):
+- ~~Create the SNES SDK target in llvm-mos-sdk ([#415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415)):
   crt0, LoROM linker scripts, interrupt/reset vectors, memory map, ROM header.~~ **Done** —
   `mos-platform/snes` authored (LoROM 32 KiB, `PARENT common`, `COMPLETE`): `crt0.c`, `header.s`,
   `link.ld`, `snes.h`, `clang.cfg`. On the `snes-target` branch of the SDK clone.
@@ -310,4 +313,4 @@ Acceptance test per milestone — each step is the bar that milestone must clear
 - Upstream: [#32 umbrella](https://github.com/llvm-mos/llvm-mos/issues/32) ·
   [#320 24-bit addr](https://github.com/llvm-mos/llvm-mos/issues/320) ·
   [#321 16-bit regs](https://github.com/llvm-mos/llvm-mos/issues/321) ·
-  [sdk#415 SNES target](https://github.com/llvm-mos/llvm-mos-sdk/issues/415)
+  [sdk#415 SNES target](https://github.com/llvm-mos/llvm-mos-sdk/pull/415)

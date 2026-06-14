@@ -58,6 +58,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Upstream / Contribution
 
+- [ ] **Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR).** Build ON @Phillip-May's
+  stalled-but-working SDK scaffolding, don't replace it: reuse his `snesxc` register lib + multi-bank
+  linker (with credit); contribute on top our native-mode crt0 (unlocks 16-bit codegen) + the
+  dual-emulator CI bench his PR lacks; keep the backend codegen (#320/#321) entirely separate (it
+  lands in `llvm-mos`, targets any `-mcpu=mosw65816` platform). Strategy + the tier-1/tier-2
+  positioning note for engaging @asiekierka on #321 are drafted in
+  [415-snes-target-reconciliation](docs/415-snes-target-reconciliation.md). User-triggered (posting).
 - [ ] **Surface WDC816CC/ORCA-C ABI prior art in #320/#321** — low-effort, no-code contribution
   documenting the calling-convention prior art (DP frame vs hardware-stack frame). Summarized in the
   [#320 design note](docs/320-upstream-far-pointer-note.md) (open ABI decisions §3) with an offer to

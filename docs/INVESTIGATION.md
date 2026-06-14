@@ -229,11 +229,13 @@ years, given the head start, but specialist months.
    the game developers'. Low effort, real value — but it's pointing at a manual, not a memory.
 2. **Land the cheap intermediate.** Patch llvm-mos-sdk crt0 to `SP = $01FF` and stand up a minimal
    SNES target running 8-bit-mode codegen. Unblocks 65816 *targets* now; small, self-contained PR.
-   Note: **there is no SNES SDK target yet** — it's open issue
-   [llvm-mos-sdk#415 "[SNES] Add target"](https://github.com/llvm-mos/llvm-mos-sdk/issues/415);
-   the SDK ships 46 platforms (8 NES variants, C64, …) but no SNES. So this path *is* building
-   that target (crt0, LoROM/HiROM linker scripts, vectors, memory map) — which the real codegen
-   path needs anyway (see sequencing below).
+   Note: **no SNES SDK target is merged yet** — a draft PR
+   [llvm-mos-sdk#415 "[SNES] Add target"](https://github.com/llvm-mos/llvm-mos-sdk/pull/415) (by
+   @Phillip-May, Oct 2025, 8-bit/emulation-mode only, no `-mcpu=mosw65816`) is open but stalled,
+   reviewed once by @asiekierka; the SDK ships 46 platforms (8 NES variants, C64, …) but no merged
+   SNES. So this path *is* building that target (crt0, LoROM/HiROM linker scripts, vectors, memory
+   map) — which the real codegen path needs anyway (see sequencing below). Reconciliation with #415:
+   [415-snes-target-reconciliation](415-snes-target-reconciliation.md).
 3. **Fund the people who already did the design.** A sponsorship targeting @asiekierka or
    @mysterymath to resume #320 → #321 is the highest-leverage spend — the design is done, the
    implementer is identified, the blocker is time, not knowledge.
