@@ -38,9 +38,11 @@ else
   echo "  FAIL: compile crashed/failed"; sed -n '1,12p' "$BUILD/a16localbit.cc.err"; exit 1
 fi
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-nbit=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(25|05|45)\b')  # 25/05/45 = and/ora/eor zp
-nbra=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b')        # rep #$20 brackets
-[ "$nbit" -ge 3 ] && echo "  PASS: $nbit native bitwise-zp ops present (and/ora/eor, 3 s16 ops)" || { echo "  FAIL: expected >=3 bitwise zp, got $nbit"; rc=1; }
+# and/ora/eor in zp (25/05/45, native) OR abs/long (2d/2f, 0d/0f, 4d/4f, with a
+# global operand folded in by alu16_absld) — accept either, robust to load-folding.
+nbit=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(2[5df]|0[5df]|4[5df])\b' || true)
+nbra=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b' || true)        # rep #$20 brackets
+[ "$nbit" -ge 3 ] && echo "  PASS: $nbit native 16-bit bitwise ops present (and/ora/eor, zp or folded abs)" || { echo "  FAIL: expected >=3 bitwise ops, got $nbit"; rc=1; }
 echo "  ($nbra rep #\$20 brackets — one per native bitwise op)"
 
 echo "==> compile+link -> $(basename "$ROM")"

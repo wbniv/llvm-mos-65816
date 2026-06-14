@@ -274,9 +274,15 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    just the all-global peephole. A follow-up **immediate fold** makes `selectAlu16Native` use the
    `*Imm16` forms (`adc #$0345`) instead of materializing a constant operand into `Imag16` (the constant
    arrives as a `G_MERGE` of two byte-constants → reconstructed; dead def auto-erased) — `a16localimm`
-   reads 0x1545 with no materialization. Non-breaking (corpus 7/7, all 11 a16* tests green).
+   reads 0x1545 with no materialization. A further **load-fold** (combiner rule `alu16_absld` + the
+   register-result `G_{...}16_ABSLD` pseudos + `selectAlu16AbsLd`) reads near-abs **global** operands
+   directly via the 16-bit absolute forms for the multi-use case the store-fused peephole can't reach:
+   `t = a16v + b16v` (reused) → `clc; rep; lda b16v; adc a16v; sta __rc; sep`, dropping the ~8-instr
+   byte-wise Imag16 materialization (`a16loadfold` reads 0x2345). The `>1 use` guard keeps the
+   single-store peephole (`alu16_abs`) firing. Non-breaking (corpus 7/7, all 12 a16* tests green).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
-   [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md)._
+   [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
+   [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

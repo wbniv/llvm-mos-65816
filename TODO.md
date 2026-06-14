@@ -32,12 +32,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 native s16 — deferred optimizations + frontier.** The basic 16-bit ALU (add/sub/bitwise)
-  is native via `Imag16` (1d-retry done, see Done). Next, in rough order: (a) immediate-operand
-  optimization — use the `*Imm16` forms (`adc #imm`) instead of materializing a `G_CONSTANT` into
-  `Imag16` (correct today, just larger); (b) loops + cross-block REP/SEP mode-tracking; (c) the
-  hardware-stack ABI / 16-bit calling convention (16-bit args/returns — upstream-gated). ROADMAP step 5
-  frontier. [plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+- [ ] **#321 native s16 — load-fold follow-ups** (the [load-fold](docs/plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md)
+  core landed — see Done). Remaining same-machinery extensions: (a) **mixed operand** `t = a16v + local`
+  (one global load + one `Imag16` register — dispatch addressing mode per operand); (b) single-use-non-
+  store results (the `>1 use` guard skips these today); (c) chained multi-use load expressions (extend
+  `add_chain16`).
+- [ ] **#321 native s16 — agreed optimization order (after load-fold).** (2) 16-bit compares/branches
+  (currently narrow to 8-bit chains); (3) inc/dec + 16-bit shifts; (4) indexed/array access; (5)
+  A16-threading (value stays live in the accumulator across ops — biggest win but reintroduces the
+  coalescer-crash risk, so deferred behind a broad corpus); (6) cross-block REP/SEP mode-tracking; (7)
+  hardware-stack ABI / 16-bit calling convention (upstream-gated). ROADMAP step 5 frontier.
+  [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
   mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
   + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
@@ -66,6 +71,30 @@ starting, or blocked on an external factor)._
 
 
 ## Done
+
+- 2026-06-14 — [321-native-s16-load-fold] **fold near-abs global operands into the 16-bit ALU.** For a
+  multi-use `t = a16v OP b16v` (the store-fused peephole can't reach a multi-use result), the new
+  combiner rule `alu16_absld` reads both globals directly via the 16-bit absolute forms instead of
+  copying each byte-wise into an `Imag16` pair (~8 instrs dropped): `clc; rep; lda b16v; adc a16v; sta
+  __rc2; sep`. New register-result pseudos `G_{ADD,SUB,AND,OR,XOR}16_ABSLD` (skipped by the legalizer
+  opcode-range, no rule) + `selectAlu16AbsLd` (clone of `selectAlu16Abs` ending in `STAImag16`); reuses
+  `nearAbsLoad`/`nearAbsGlobalDef`. The `>1-use` guard means single-store globals still fuse via
+  `alu16_abs` (a16add/sub/bit stay green). `a16loadfold.c` reads 0x2345 (lda/adc abs, no `adc zp`) on
+  both MAME and bsnes-jg; with `volatile` operands a16local/sub/bit fold too (gates widened, results
+  unchanged), pure-native `adc zp` stays covered by a16localx. Non-breaking: corpus 7/7, all 12 a16*
+  tests green, patch `0002` round-trips. Mixed load+register + single-use-non-store cases are follow-ups.
+  [plan](docs/plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md).
+
+- 2026-06-14 — [321-native-s16-imm-fold] **fold a constant operand into the immediate ALU form
+  (`adc #imm`).** `selectAlu16Native` folds a compile-time-constant operand into `ADCImm16`/`ANDImm16`/
+  `ORAImm16`/`EORImm16` instead of materializing it into an `Imag16` pair — `t = a16v + 0x0345` →
+  `clc; rep; lda a16v; adc #$0345; sta; sep`, dropping the ~4-instr `ldx #lo;stx;ldx #hi;stx`. A
+  `getImm16Operand` helper handles both shapes (direct constant, and a `G_MERGE` of two byte constants
+  → `lo|hi<<8`); commutative ops fold either operand (swap); SUB never folds (no `SBCImm16`; `x-C`
+  canonicalized to `x+(-C)` upstream); the dead constant is auto-erased by `isTriviallyDead`.
+  `a16localimm.c` asserts `adc #` (opcode 69, not 65), no materialization, 0x1545 on both emulators.
+  Non-breaking: corpus 7/7, all a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md).
 
 - 2026-06-14 — [321-increment-1d-retry] **GISel-native s16 — the A16-aliasing coalescer crash SOLVED;
   native 16-bit add/sub/and/or/xor all ship** (steps 1-5). Re-diagnosed from the code: the crash was NOT the `A16=A`

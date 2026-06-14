@@ -41,13 +41,15 @@ rc=0
 echo "==> disasm gate: 16-bit sub fuses to sec / rep #\$20 / lda / sbc / sta / sep #\$20 (one bracket)"
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-printf '%s\n' "$DIS" | grep -iE '^\s*[0-9a-f]+:\s*(38|c2 20|e2 20|e5|a5|85)\b' | head
-nrep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b')
-nsep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*e2 20\b')
-nadc=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*e5\b')   # e5 = sbc zp (native Imag16)
+printf '%s\n' "$DIS" | grep -iE '^\s*[0-9a-f]+:\s*(38|c2 20|e2 20|e[5df]|a[5df]|85)\b' | head
+nrep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b' || true)
+nsep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*e2 20\b' || true)
+# 16-bit sbc in zp (e5, native Imag16) OR abs/long (ed/ef, global operand folded
+# in by alu16_absld) — accept either so the test is robust to load-folding.
+nadc=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*e[5df]\b' || true)
 [ "$nrep" -eq 1 ] && echo "  PASS: exactly one rep #\$20 (single bracket open)" || { echo "  FAIL: expected 1 rep #\$20, got $nrep"; rc=1; }
 [ "$nsep" -eq 1 ] && echo "  PASS: exactly one sep #\$20 (single bracket close)" || { echo "  FAIL: expected 1 sep #\$20, got $nsep"; rc=1; }
-[ "$nadc" -ge 1 ] && echo "  PASS: 16-bit sbc zp present (native Imag16 path)" || { echo "  FAIL: no sbc zp"; rc=1; }
+[ "$nadc" -ge 1 ] && echo "  PASS: 16-bit sbc present (zp or load-folded abs)" || { echo "  FAIL: no 16-bit sbc"; rc=1; }
 [ $rc -eq 0 ] || { echo "RESULT: FAIL (disasm gate)"; exit 1; }
 
 echo "==> MAME: assert corpus_result == $WANT (native s16 local: 0x1000 + 0x0122)"

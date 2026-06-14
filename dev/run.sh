@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -73,6 +73,8 @@ Targets:
              (lda; and|ora|eor zp; sta) compile clean; corpus_result==0x000F both emus
   a16localimm #321 native s16 immediate fold: a multi-use local `a + 0x0345` folds the
              constant to `adc #$0345` (no Imag16 materialization); corpus_result==0x1545 both emus
+  a16loadfold #321 native s16 load-fold: multi-use `t = a16v + b16v` reads both globals
+             directly (lda/adc abs, no Imag16 materialization); corpus_result==0x2345 both emus
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).
