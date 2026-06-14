@@ -298,12 +298,21 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    preheader, `sep` sinks to the exit, none in the body (`a16loop` reads 0x2340), and a call inside a
    16-bit region executes 8-bit (`a16call` reads 0x4456). The X-flag (xy16) and a 16-bit calling
    convention remain follow-ups. Non-breaking (corpus 7/7, all 13 a16* tests green, patch `0002`
-   round-trips).
+   round-trips). **Native 16-bit constant shifts** then close the next per-op gap: `x << k` /
+   unsigned `x >> k` (k constant) had been narrowing to the 8-bit `asl/rol` (or `lsr/ror`) byte-pair
+   chain even under `+mos-a16`. The legalizer now leaves a small s16 `G_SHL`/`G_LSHR` (amount 1–7)
+   un-narrowed and `selectShift16Native` emits one `lda; (asl|lsr)×k; sta` run on the `Imag16` value
+   (new `ASLAcc16`/`LSRAcc16` `MLow=1` forms) — `a16shift` reads 0x1278 with 4× `asl` + 2× `lsr` under
+   a single rep/sep (the mode tracker even folds a following add into the same bracket), no `rol/ror`
+   pairs and no `__ashlhi3` libcall. Signed `>>` (ASHR), variable shifts, amount ≥ 8, and the 1-byte
+   `inc a`/`dec a` form are follow-ups. Non-breaking (corpus 7/7, all 16 a16* tests green, patch
+   `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
    [compares plan](plans/2026-06-14-321-native-16bit-compares.md) ·
-   [cross-block REP/SEP plan](plans/2026-06-15-321-cross-block-repsep-mode-tracking.md)._
+   [cross-block REP/SEP plan](plans/2026-06-15-321-cross-block-repsep-mode-tracking.md) ·
+   [constant-shifts plan](plans/2026-06-15-321-native-16bit-constant-shifts.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

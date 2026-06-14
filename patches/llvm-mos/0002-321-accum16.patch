@@ -970,7 +970,7 @@ index e81487e9c..b78b62625 100644
  // argument isn't a pointer; it's either a global value or a 16-bit immediate.
  // The index argument is an 8-bit scalar. Additionally expects a
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..a600b04c6 100644
+index f3eb9549f..976ece9c3 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
@@ -988,7 +988,7 @@ index f3eb9549f..a600b04c6 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,6 +585,190 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -577,6 +585,210 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -1173,6 +1173,26 @@ index f3eb9549f..a600b04c6 100644
 +  dag InOperandList = (ins Ac16:$l, imm16:$r);
 +}
 +
++// #321 native 16-bit constant shifts: in 16-bit-accumulator mode a single `asl a`
++// / `lsr a` shifts all 16 bits at once, so `x << k` / `x >> k` (k a compile-time
++// constant) selects to one `lda; (asl|lsr)*k; sta` run instead of the 8-bit
++// asl/rol byte-pair chain. MLow=1 so MOSInsertREPSEP brackets the run; the value
++// enters A16 only via LDAImag16 and leaves only via STAImag16 — never a COPY
++// between Ac16 and an 8-bit reg (the 1d-prototype coalescer crash). No carry
++// operand in v1: each shift self-fills 0 and consecutive shifts don't thread the
++// carry. Used by selectShift16Native. ASL covers `<<`; LSR covers unsigned `>>`;
++// signed `>>` (ASHR, needs ror+sign), rotates, and the memory forms are follow-ups.
++class MOSShiftAcc16<Instruction real> : MOSLogicalInstr,
++    PseudoInstExpansion<(real)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let Constraints = "$dst = $src";
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Ac16:$src);
++}
++def ASLAcc16 : MOSShiftAcc16<ASL_Accumulator>;
++def LSRAcc16 : MOSShiftAcc16<LSR_Accumulator>;
++
 +// The fused 16-bit add (g = a + b) is defined as the target-generic G_ADD16_ABS
 +// in MOSInstrGISel.td (so InstructionSelect lowers it via selectAdd16Abs).
 +
@@ -1180,7 +1200,7 @@ index f3eb9549f..a600b04c6 100644
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..a7f24bae7 100644
+index cbdd54ab2..5b16507cd 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1193,7 +1213,7 @@ index cbdd54ab2..a7f24bae7 100644
    bool selectFrameIndex(MachineInstr &MI);
    std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
    bool selectAddr(MachineInstr &MI);
-@@ -96,6 +99,17 @@ private:
+@@ -96,6 +99,20 @@ private:
    bool selectIncDecMB(MachineInstr &MI);
    bool selectUnMergeValues(MachineInstr &MI);
    bool selectBrIndirect(MachineInstr &MI);
@@ -1208,10 +1228,13 @@ index cbdd54ab2..a7f24bae7 100644
 +  // G_XOR) whose value lives in an Imag16 zero-page pair (locals/multi-use, not
 +  // just the all-global peephole).
 +  bool selectAlu16Native(MachineInstr &MI);
++  // #321 native s16 constant shift (G_SHL / unsigned G_LSHR, amount in [1,7]):
++  // `lda; (asl|lsr)*k; sta` on the Imag16 value, bracketed by one rep/sep.
++  bool selectShift16Native(MachineInstr &MI);
  
    // Select instructions that correspond 1:1 to a target instruction.
    bool selectGeneric(MachineInstr &MI);
-@@ -195,12 +209,29 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -195,15 +212,45 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    switch (MI.getOpcode()) {
    case MOS::G_ADD:
    case MOS::G_SUB:
@@ -1241,7 +1264,23 @@ index cbdd54ab2..a7f24bae7 100644
      if (selectLogical(MI))
        return true;
      break;
-@@ -247,6 +278,23 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
++  case MOS::G_SHL:
++  case MOS::G_LSHR:
++    // #321 native s16 constant shift: the legalizer leaves a small s16 left /
++    // unsigned-right shift un-narrowed under +mos-a16; select it to one
++    // `lda; (asl|lsr)*k; sta` run on the Imag16 value.
++    if (STI.hasAccum16() &&
++        MI.getMF()->getRegInfo().getType(MI.getOperand(0).getReg()) ==
++            LLT::scalar(16)) {
++      if (selectShift16Native(MI))
++        return true;
++      break;
++    }
++    break;
+   }
+ 
+   if (selectImpl(MI, *CoverageInfo))
+@@ -247,6 +294,23 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -1265,7 +1304,7 @@ index cbdd54ab2..a7f24bae7 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -1091,12 +1139,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1155,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -1323,7 +1362,7 @@ index cbdd54ab2..a7f24bae7 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2021,351 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2037,397 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -1672,11 +1711,57 @@ index cbdd54ab2..a7f24bae7 100644
 +  return true;
 +}
 +
++// #321 native s16 constant shift: `dst = src << k` / `dst = src >> k` (unsigned),
++// k a compile-time constant in [1,7] left un-narrowed by the legalizer under
++// +mos-a16. In 16-bit-accumulator mode one `asl a` / `lsr a` shifts all 16 bits,
++// so emit `lda src; (asl|lsr)*k; sta dst` — all MLow=1, so MOSInsertREPSEP wraps
++// the run in one rep/sep. The value enters A16 only via LDAImag16 and leaves only
++// via STAImag16 (no Ac16<->8-bit COPY). No carry-init: each shift self-fills 0.
++bool MOSInstructionSelector::selectShift16Native(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  Register Dst = MI.getOperand(0).getReg();
++  Register Src = MI.getOperand(1).getReg();
++  Register AmtReg = MI.getOperand(2).getReg();
++
++  auto AmtVal = getIConstantVRegValWithLookThrough(AmtReg, MRI);
++  if (!AmtVal)
++    return false; // legalizer only leaves constant amounts native; be defensive
++  uint64_t Amt = AmtVal->Value.getZExtValue();
++
++  const unsigned ShOpc =
++      MI.getOpcode() == MOS::G_SHL ? MOS::ASLAcc16 : MOS::LSRAcc16;
++
++  SmallVector<MachineInstrBuilder, 8> New;
++
++  // lda src (16-bit) -> A16
++  Register Cur = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Cur).addUse(Src));
++
++  // Amt x (asl|lsr) on A16: each shift defs a fresh Ac16 from the previous (the
++  // tied $dst=$src collapses the chain onto A16 in regalloc).
++  for (uint64_t I = 0; I < Amt; ++I) {
++    Register Next = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++    New.push_back(Builder.buildInstr(ShOpc).addDef(Next).addUse(Cur));
++    Cur = Next;
++  }
++
++  // sta dst (16-bit): the Imag16 dst is DEF'd by the store (imaginary-reg write).
++  New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Cur));
++
++  for (MachineInstrBuilder &Bld : New)
++    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++
++  MI.eraseFromParent();
++  return true;
++}
++
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..8e37d10f6 100644
+index 212ede1a0..36b19cdc6 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -1753,7 +1838,29 @@ index 212ede1a0..8e37d10f6 100644
  
    // Handle multi-byte increments and decrements.
  
-@@ -1270,7 +1294,16 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -862,6 +886,21 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+     return true;
+   }
+ 
++  // #321 native 16-bit constant shifts: under +mos-a16 a small s16 left shift or
++  // unsigned right shift is one `lda; (asl|lsr)*Amt; sta` run in 16-bit-A mode, far
++  // cheaper than the 8-bit byte-pair decomposition below. Leave the s16 G_SHL/G_LSHR
++  // un-narrowed (mirrors legalizeAddSub's native passthrough) for selectShift16Native.
++  // Gated to Amt in [1,7]: Amt>=8 keeps the byte path (it relabels bytes with a zero
++  // fill — free for byte-aligned shifts), and G_ASHR (signed) needs ror+sign and is
++  // a follow-up. Placed after the Amt==0 copy and before the byte/over-correct paths.
++  {
++    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
++    if (STI.hasAccum16() && Ty == LLT::scalar(16) &&
++        (MI.getOpcode() == MOS::G_SHL || MI.getOpcode() == MOS::G_LSHR) &&
++        Amt >= 1 && Amt <= 7)
++      return true; // native; selected by selectShift16Native
++  }
++
+   Register Partial;
+   Register NewAmt;
+   // Shift by one multiples of one byte.
+@@ -1270,7 +1309,16 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -1771,7 +1878,7 @@ index 212ede1a0..8e37d10f6 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,7 +1374,7 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,7 +1389,7 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -1780,7 +1887,7 @@ index 212ede1a0..8e37d10f6 100644
  
    // Lower 8-bit comparisons to a generic G_SBC instruction with similar
    // capabilities to the 6502's SBC and CMP instructions.  See
-@@ -1358,8 +1391,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1358,8 +1406,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {

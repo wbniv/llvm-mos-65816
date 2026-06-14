@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -82,6 +82,9 @@ Targets:
              corpus_result==0x2340 both emus
   a16call    #321 cross-block REP/SEP: a call inside a 16-bit region runs 8-bit at the call
              boundary (sep before jsl/jsr, rep after); corpus_result==0x4456 both emus
+  a16shift   #321 native s16 constant shifts: x<<k / x>>k (unsigned) select to native 16-bit
+             asl/lsr under one rep/sep (no 8-bit rol/ror pairs, no libcall);
+             corpus_result==0x1278 both emus
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

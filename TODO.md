@@ -50,11 +50,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
   [plan](docs/plans/2026-06-14-321-native-16bit-compares.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
-  (slice 1, unsigned ordering — done); (3) inc/dec + 16-bit shifts; (4) indexed/array access; (5)
-  A16-threading (value stays live in the accumulator across ops — biggest win but reintroduces the
-  coalescer-crash risk, so deferred behind a broad corpus); ~~(6) cross-block REP/SEP mode-tracking~~
-  (M-flag done — see Done; X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling
-  convention (upstream-gated). ROADMAP step 5 frontier.
+  (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts done — see
+  Done; inc/dec already native via adc #±1; remaining: signed `>>`/ASHR, variable shifts, amount ≥8,
+  1-byte `inc a`/`dec a`, memory-RMW `inc abs`); (4) indexed/array access; (5) A16-threading (value
+  stays live in the accumulator across ops — biggest win but reintroduces the coalescer-crash risk, so
+  deferred behind a broad corpus); ~~(6) cross-block REP/SEP mode-tracking~~ (M-flag done — see Done;
+  X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
+  ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). From the 1c
   "out of scope": SUB chains (order-sensitive) and AND/OR/XOR chains, immediates *within* chains (1c
@@ -118,6 +120,20 @@ llvm-mos change to track) rather than active work._
 
 
 ## Done
+
+- 2026-06-15 — [321-native-16bit-constant-shifts] **native 16-bit constant shifts (`<<`, unsigned
+  `>>`).** `x << k` / unsigned `x >> k` (k a compile-time constant) had narrowed to the 8-bit
+  `asl/rol` (or `lsr/ror`) byte-pair chain even under `+mos-a16`. The legalizer now leaves a small s16
+  `G_SHL`/`G_LSHR` (amount 1–7) un-narrowed (`legalizeShiftRotate`, after the `Amt==0` base case) and
+  `selectShift16Native` emits one `lda; (asl|lsr)×k; sta` run on the `Imag16` value via new
+  `ASLAcc16`/`LSRAcc16` `MLow=1` pseudos (expand onto `ASL_Accumulator`/`LSR_Accumulator`; no carry
+  operand — each shift self-fills 0). The value enters A16 only via LDAImag16 and leaves via STAImag16
+  (no Ac16↔8-bit COPY). `a16shift` reads 0x1278 with 4× `asl` + 2× `lsr` under one rep/sep (the mode
+  tracker folds a following add into the same bracket), no `rol/ror` pairs, no `__ashlhi3` libcall;
+  both MAME + bsnes-jg. Follow-ups: signed `>>` (ASHR needs ror+sign), variable shifts, amount ≥8 /
+  `xba`, 1-byte `inc a`/`dec a`, memory-RMW `inc abs`, shift-into-store fusion. Non-breaking: corpus
+  7/7, all 16 a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-15-321-native-16bit-constant-shifts.md).
 
 - 2026-06-15 — [321-cross-block-repsep] **cross-block REP/SEP mode-tracking.** `MOSInsertREPSEP` was
   per-block and 8-bit-anchored, so a loop with a 16-bit body re-ran `rep … sep` every iteration. It now
