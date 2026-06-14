@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16ptr|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -92,6 +92,8 @@ Targets:
              rep/lda/cmp/sep/beq|bne (no 8-bit cmp/cpx chain); corpus_result==0x0011 both emus
   a16scmp    #321 native s16 signed ordering (< <= > >=): sign-flip to unsigned (eor #$8000) +
              native 16-bit cmp (no 8-bit N^V chain); corpus_result==0x0111 both emus
+  a16ptr     #321 native s16 indirect load/store: *p / a[i] use one 16-bit lda (zp)/sta (zp) in M16
+             (no (zp),y byte pair); corpus_result==0xABCE both emus
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

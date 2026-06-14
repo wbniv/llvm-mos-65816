@@ -871,10 +871,28 @@ index 12d05bed4..01b3f7a7e 100644
                  AssemblerPredicate<(all_of Feature65EL02), "65EL02"> {
    let PredicateName = "Feature65EL02";
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
-index e81487e9c..b78b62625 100644
+index e81487e9c..9b53ecd4a 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
 +++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
-@@ -136,6 +136,94 @@ def G_STORE_FAR_ABS : MOSGenericInstruction {
+@@ -98,6 +98,17 @@ def G_LOAD_INDIR : MOSGenericInstruction {
+   let mayLoad = true;
+ }
+ 
++// #321 native s16: a 16-bit indirect load `lda (zp)` in 16-bit-accumulator mode —
++// loads a 16-bit value through a runtime pointer (the plain-indirect leaf, no
++// index). The legalizer emits this for an s16 G_LOAD whose address is a non-absolute
++// 16-bit pointer; the selector lowers it to LDAIndir16 -> STAImag16 (one rep/sep).
++def G_LOAD16_INDIR : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins ptype1:$base);
++  let mayLoad = true;
++}
++
+ // Generalized 8-bit load using the indirect indexed addressing mode. The index
+ // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
+ def G_LOAD_INDIR_IDX : MOSGenericInstruction {
+@@ -136,6 +147,94 @@ def G_STORE_FAR_ABS : MOSGenericInstruction {
    let mayStore = true;
  }
  
@@ -969,6 +987,23 @@ index e81487e9c..b78b62625 100644
  // Generalized 8-bit store using the absolute indexed addressing mode. The base
  // argument isn't a pointer; it's either a global value or a 16-bit immediate.
  // The index argument is an 8-bit scalar. Additionally expects a
+@@ -155,6 +254,16 @@ def G_STORE_INDIR : MOSGenericInstruction {
+   let mayStore = true;
+ }
+ 
++// #321 native s16: a 16-bit indirect store `sta (zp)` in 16-bit-accumulator mode —
++// stores a 16-bit value through a runtime pointer. Mirror of G_LOAD16_INDIR; the
++// selector lowers it to LDAImag16 (value -> A16) -> STAIndir16 (one rep/sep).
++def G_STORE16_INDIR : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, ptype1:$base);
++  let mayStore = true;
++}
++
+ // Generalized 8-bit store using the indirect indexed addressing mode. The index
+ // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
+ def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 index 42a94c356..4393283eb 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
@@ -1045,7 +1080,7 @@ index be5daff8f..c39c4be70 100644
    bool shouldRematPhysRegCopy() const override { return false; }
  };
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..c554e41ba 100644
+index f3eb9549f..e07e6756a 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
@@ -1063,7 +1098,7 @@ index f3eb9549f..c554e41ba 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,6 +585,224 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -577,6 +585,242 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -1222,6 +1257,24 @@ index f3eb9549f..c554e41ba 100644
 +  dag InOperandList = (ins Ac16:$src);
 +}
 +
++// #321 native s16 indirect memory: LDA (zp) / STA (zp) in 16-bit-accumulator mode —
++// load/store a 16-bit value through a runtime pointer held in a zero-page Imag16
++// pair. Mirror the 8-bit LDIndir/STIndir (LDA_Indirect=$B2 / STA_Indirect=$92,
++// 65C02+; the w65816 has them) with MLow=1 so MOSInsertREPSEP brackets the access.
++// The value enters/leaves A16 only via these / the Imag16 load-store — no Ac16<->
++// 8-bit COPY. Used by selectMem16Indir for *p, a[i], a[i]=v, p[i].
++def LDAIndir16 : MOSLoad, PseudoInstExpansion<(LDA_Indirect addr8:$addr)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Imag16:$addr);
++}
++def STAIndir16 : MOSStore, PseudoInstExpansion<(STA_Indirect addr8:$addr)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, Imag16:$addr);
++}
++
 +// #321 native 16-bit compares: A16 - operand, discard the result, keep the flags
 +// (Cc = carry; N/Z set implicitly). MLow=1 so MOSInsertREPSEP brackets `lda; cmp`
 +// in one rep/sep run; SEP doesn't touch C/Z/N, so a following branch reads them.
@@ -1316,7 +1369,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..dba54c841 100644
+index cbdd54ab2..32862f17e 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1329,7 +1382,7 @@ index cbdd54ab2..dba54c841 100644
    bool selectFrameIndex(MachineInstr &MI);
    std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
    bool selectAddr(MachineInstr &MI);
-@@ -96,6 +99,20 @@ private:
+@@ -96,6 +99,23 @@ private:
    bool selectIncDecMB(MachineInstr &MI);
    bool selectUnMergeValues(MachineInstr &MI);
    bool selectBrIndirect(MachineInstr &MI);
@@ -1347,10 +1400,13 @@ index cbdd54ab2..dba54c841 100644
 +  // #321 native s16 constant shift (G_SHL / unsigned G_LSHR, amount in [1,7]):
 +  // `lda; (asl|lsr)*k; sta` on the Imag16 value, bracketed by one rep/sep.
 +  bool selectShift16Native(MachineInstr &MI);
++  // #321 native s16 indirect load/store (G_LOAD16_INDIR / G_STORE16_INDIR):
++  // lda (zp)/sta (zp) in M=0 through a runtime pointer, one rep/sep.
++  bool selectMem16Indir(MachineInstr &MI);
  
    // Select instructions that correspond 1:1 to a target instruction.
    bool selectGeneric(MachineInstr &MI);
-@@ -195,15 +212,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -195,15 +215,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    switch (MI.getOpcode()) {
    case MOS::G_ADD:
    case MOS::G_SUB:
@@ -1397,7 +1453,7 @@ index cbdd54ab2..dba54c841 100644
    }
  
    if (selectImpl(MI, *CoverageInfo))
-@@ -247,6 +295,23 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -247,6 +298,27 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -1415,13 +1471,17 @@ index cbdd54ab2..dba54c841 100644
 +  case MOS::G_XOR16_ABSLD:
 +    return selectAlu16AbsLd(MI);
 +
++  case MOS::G_LOAD16_INDIR:
++  case MOS::G_STORE16_INDIR:
++    return selectMem16Indir(MI);
++
 +  case MOS::G_ADDCHAIN16_ABS:
 +    return selectAddChain16(MI);
 +
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -777,6 +842,11 @@ struct CmpNZ_match {
+@@ -777,6 +849,11 @@ struct CmpNZ_match {
      CondMI = DefSrcReg->MI;
      if (CondMI->getOpcode() != MOS::G_SBC)
        return false;
@@ -1433,7 +1493,7 @@ index cbdd54ab2..dba54c841 100644
  
      auto CInConst =
          getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
-@@ -789,6 +859,68 @@ struct CmpNZ_match {
+@@ -789,6 +866,68 @@ struct CmpNZ_match {
    }
  };
  
@@ -1502,7 +1562,7 @@ index cbdd54ab2..dba54c841 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -991,6 +1123,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -991,6 +1130,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
@@ -1537,7 +1597,7 @@ index cbdd54ab2..dba54c841 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1091,12 +1251,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1258,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -1595,7 +1655,7 @@ index cbdd54ab2..dba54c841 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2133,416 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2140,455 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -2009,11 +2069,50 @@ index cbdd54ab2..dba54c841 100644
 +  return true;
 +}
 +
++// #321 native s16 indirect load/store: a 16-bit value through a runtime pointer.
++//  G_LOAD16_INDIR  (dst s16, ptr) -> lda (zp)16 -> A16; sta zp16 -> Imag16 dst
++//  G_STORE16_INDIR (val s16, ptr) -> lda zp16 (val -> A16); sta (zp)16
++// The pointer operand is constrained to the Imag16 zero-page pair (same as the
++// 8-bit LDIndir/STIndir); the value enters/leaves A16 only via the Imag16 load/
++// store -> no Ac16<->8-bit COPY. Both ops are MLow=1, so MOSInsertREPSEP brackets
++// the pair with one rep/sep.
++bool MOSInstructionSelector::selectMem16Indir(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_INDIR;
++
++  Register ValOrDst = MI.getOperand(0).getReg();
++  Register Ptr = MI.getOperand(1).getReg();
++
++  // The user's memory access is the indirect op (LDAIndir16 / STAIndir16); carry
++  // the memref there. The Imag16 load/store that moves the value to/from A16 is an
++  // internal zp register transfer with no memref (mirrors selectAlu16AbsLd).
++  SmallVector<MachineInstrBuilder, 2> New;
++  Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  if (IsLoad) {
++    auto Ld = Builder.buildInstr(MOS::LDAIndir16).addDef(A16).addUse(Ptr);
++    Ld.cloneMemRefs(MI);
++    New.push_back(Ld);
++    New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
++  } else {
++    New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(A16).addUse(ValOrDst));
++    auto St = Builder.buildInstr(MOS::STAIndir16).addUse(A16).addUse(Ptr);
++    St.cloneMemRefs(MI);
++    New.push_back(St);
++  }
++
++  for (MachineInstrBuilder &Bld : New)
++    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++
++  MI.eraseFromParent();
++  return true;
++}
++
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..1ce2093bd 100644
+index 212ede1a0..05abf4918 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -2065,7 +2164,36 @@ index 212ede1a0..1ce2093bd 100644
  
    getActionDefinitionsBuilder(G_MUL)
        .libcallFor({S8, S16, S32, S64})
-@@ -670,11 +682,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -323,14 +335,20 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+ 
+   // Memory Operations
+ 
+-  getActionDefinitionsBuilder({G_LOAD, G_STORE})
+-      // Convert to int to load/store; that way the operation can be narrowed to
+-      // 8 bits. Once 8-bit, select an addressing mode to replace the generic
+-      // G_LOAD and G_STORE. PF (far) pointers select to absolute-long. (#320)
+-      .customForCartesianProduct({S8, PZ, P}, {PZ, P, PF})
+-      .widenScalarToNextMultipleOf(0, 8)
+-      .maxScalar(0, S8)
+-      .unsupported();
++  {
++    // Convert to int to load/store; that way the operation can be narrowed to
++    // 8 bits. Once 8-bit, select an addressing mode to replace the generic
++    // G_LOAD and G_STORE. PF (far) pointers select to absolute-long. (#320)
++    // #321 native s16: under +mos-a16 an s16 data load/store is ALSO custom, so it
++    // reaches legalizeLoad/legalizeStore, which routes a non-absolute 16-bit-pointer
++    // access to a native 16-bit indirect op (else narrows to two 8-bit ops as before).
++    auto &B = getActionDefinitionsBuilder({G_LOAD, G_STORE});
++    if (STI.hasAccum16())
++      B.customForCartesianProduct({S8, S16, PZ, P}, {PZ, P, PF});
++    else
++      B.customForCartesianProduct({S8, PZ, P}, {PZ, P, PF});
++    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, S8).unsupported();
++  }
+ 
+   getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD}).custom();
+ 
+@@ -670,11 +688,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    auto [Dst, Src] = MI.getFirst2Regs();
    assert(MRI.getType(Dst).isByteSized());
  
@@ -2090,7 +2218,7 @@ index 212ede1a0..1ce2093bd 100644
  
    // Handle multi-byte increments and decrements.
  
-@@ -862,6 +886,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -862,6 +892,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      return true;
    }
  
@@ -2115,7 +2243,7 @@ index 212ede1a0..1ce2093bd 100644
    Register Partial;
    Register NewAmt;
    // Shift by one multiples of one byte.
-@@ -1252,6 +1294,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1252,6 +1300,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
  
    LLT Type = MRI.getType(LHS);
  
@@ -2144,7 +2272,7 @@ index 212ede1a0..1ce2093bd 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1270,7 +1334,26 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1270,7 +1340,26 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -2172,7 +2300,7 @@ index 212ede1a0..1ce2093bd 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,25 +1424,31 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,25 +1430,31 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -2208,6 +2336,85 @@ index 212ede1a0..1ce2093bd 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
+@@ -1601,14 +1696,52 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+ // Memory Operations
+ //===----------------------------------------------------------------------===//
+ 
++// #321 native s16 indirect memory: route an s16 G_LOAD/G_STORE through a
++// non-absolute 16-bit pointer to a single native 16-bit indirect op
++// (G_LOAD16_INDIR/G_STORE16_INDIR -> lda (zp)/sta (zp) in M=0). The whole pointer
++// (incl. any G_PTR_ADD for a[i]) is materialized into the zero-page Imag16 pair, so
++// the plain-indirect form is always correct — just occasionally less optimal than
++// (zp),y, which (with absolute/abs-indexed s16 access) stays on the byte-pair path
++// as a follow-up. Absolute addresses (globals) narrow here so they keep their
++// byte-wise lowering for now.
++bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
++                                           MachineRegisterInfo &MRI,
++                                           GLoadStore &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
++  Register Ptr = MI.getPointerReg();
++
++  const bool Native = STI.hasAccum16() && STI.has65C02() &&
++                      MRI.getType(Ptr).getScalarSizeInBits() == 16 &&
++                      !matchAbsoluteAddressing(MRI, Ptr).has_value();
++  if (Native) {
++    unsigned Opcode =
++        isa<GLoad>(MI) ? MOS::G_LOAD16_INDIR : MOS::G_STORE16_INDIR;
++    Builder.buildInstr(Opcode)
++        .add(MI.getOperand(0)) // dst (load) / value (store)
++        .addUse(Ptr)
++        .addMemOperand(*MI.memoperands_begin());
++    MI.eraseFromParent();
++    return true;
++  }
++  // Not the native indirect case: fall back to the 8-bit byte-pair lowering.
++  return Helper.narrowScalar(MI, 0, LLT::scalar(8)) ==
++         LegalizerHelper::Legalized;
++}
++
+ // Load pointers by loading a 16-bit integer, then converting to pointer. This
+ // allows the 16-bit loads to be reduced to a pair of 8-bit loads.
+ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
+                                     MachineRegisterInfo &MRI,
+                                     GAnyLoad &MI) const {
+-  if (auto *Load = dyn_cast<GLoad>(&MI))
++  if (auto *Load = dyn_cast<GLoad>(&MI)) {
+     if (MRI.getType(Load->getDstReg()) == LLT::scalar(8))
+       return selectAddressingMode(Helper, MRI, MI);
++    // #321 native s16: a 16-bit value through a non-absolute 16-bit pointer ->
++    // one native indirect load (else narrow to two 8-bit, as before).
++    if (MRI.getType(Load->getDstReg()) == LLT::scalar(16))
++      return legalizeLoadStore16(Helper, MRI, MI);
++  }
+ 
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+   Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
+@@ -1645,6 +1778,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+                                      GStore &MI) const {
+   if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
+     return selectAddressingMode(Helper, MRI, MI);
++  // #321 native s16: a 16-bit value through a non-absolute 16-bit pointer -> one
++  // native indirect store (else narrow to two 8-bit, as before).
++  if (MRI.getType(MI.getValueReg()) == LLT::scalar(16))
++    return legalizeLoadStore16(Helper, MRI, MI);
+ 
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+   auto ValueType = MRI.getType(MI.getValueReg());
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+index 48cb1f356..2f3f18311 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -79,6 +79,9 @@ private:
+                     GAnyLoad &MI) const;
+   bool legalizeStore(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                      GStore &MI) const;
++  // #321 native s16 indirect load/store (one 16-bit op vs two 8-bit).
++  bool legalizeLoadStore16(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                           GLoadStore &MI) const;
+   bool selectAddressingMode(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                             GLoadStore &MI) const;
+   std::optional<MachineOperand>
 diff --git a/llvm/lib/Target/MOS/MOSRegisterBanks.td b/llvm/lib/Target/MOS/MOSRegisterBanks.td
 index 868f6c712..7b5100bfe 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterBanks.td

@@ -318,6 +318,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `ror` replicates it into bit 15) via a carry-threaded `RORAcc16` — `a16ashift` sign-extends
    0xF000 >> 3 to 0xFE00 (reads 0xFE01), no 8-bit byte chain, no libcall. Variable shifts, amount ≥ 8,
    and the 1-byte `inc a`/`dec a` form are follow-ups. Non-breaking (corpus 7/7, all 17 a16* tests
+   green, patch `0002` round-trips). **Native 16-bit indirect load/store** then closes the
+   indexed/array-access gap (no X-flag dimension needed — llvm-mos lowers arrays via computed pointers
+   whose arithmetic is already native 16-bit): a 16-bit value through a runtime pointer had loaded/
+   stored as two 8-bit indirect ops (`lda (zp); lda (zp),y`); now an s16 `G_LOAD`/`G_STORE` through a
+   non-absolute 16-bit pointer routes (in `legalizeLoadStore16`) to `G_LOAD16_INDIR`/`G_STORE16_INDIR`,
+   selected to `lda (zp)`/`sta (zp)` (new `LDAIndir16`/`STAIndir16` `MLow=1` forms) in one rep/sep —
+   `a16ptr` round-trips 0xABCE via `*p`, no `(zp),y` byte pair. Absolute/indexed 16-bit access and the
+   X-flag (xy16) index-register dimension are follow-ups. Non-breaking (corpus 7/7, all 20 a16* tests
    green, patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
@@ -327,7 +335,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [constant-shifts plan](plans/2026-06-15-321-native-16bit-constant-shifts.md) ·
    [signed-shift plan](plans/2026-06-15-321-native-16bit-signed-shift-ashr.md) ·
    [equality-compares plan](plans/2026-06-15-321-native-16bit-equality-compares.md) ·
-   [signed-compares plan](plans/2026-06-15-321-native-16bit-signed-compares.md)._
+   [signed-compares plan](plans/2026-06-15-321-native-16bit-signed-compares.md) ·
+   [indirect-load-store plan](plans/2026-06-15-321-native-16bit-indirect-load-store.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

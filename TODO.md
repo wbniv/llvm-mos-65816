@@ -132,6 +132,20 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-15 — [321-native-16bit-indirect-load-store] **native 16-bit indirect load/store (`*p`,
+  `a[i]`, `a[i]=v`).** Scope correction: indexed/array access does NOT need the X-flag dimension —
+  llvm-mos lowers arrays via computed pointers whose arithmetic is already native 16-bit; only the
+  16-bit VALUE was loaded/stored as two 8-bit indirect ops (`lda (zp); lda (zp),y`). Now an s16
+  `G_LOAD`/`G_STORE` through a non-absolute 16-bit pointer routes (new `legalizeLoadStore16`, gated on
+  `!matchAbsoluteAddressing`) to `G_LOAD16_INDIR`/`G_STORE16_INDIR`, selected (`selectMem16Indir`) to
+  `lda (zp)`/`sta (zp)` via new `LDAIndir16`/`STAIndir16` `MLow=1` forms in one rep/sep; the whole
+  pointer (incl. `a[i]`'s G_PTR_ADD) materializes into the Imag16 pair so plain-indirect is always
+  correct. Absolute/indexed s16 access falls back to byte-pair narrowing (follow-ups). `a16ptr`
+  round-trips 0xABCE via `*p`, no `(zp),y`; `-verify-machineinstrs` clean (it caught a misplaced load
+  memref on `STAImag16` — moved to the real `LDAIndir16`); both MAME + bsnes-jg. Non-breaking: corpus
+  7/7 (default pointer/array codegen untouched), all 20 a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md).
+
 - 2026-06-15 — [321-native-16bit-signed-compares] **native 16-bit signed ordering compares
   (`< <= > >=` on `short`).** Signed order equals unsigned order after flipping the sign bit, so
   `legalizeICmp` rewrites an s16 `SLT` (the canonical signed primitive — the other three reduce to it)
