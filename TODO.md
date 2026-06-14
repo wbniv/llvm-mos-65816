@@ -37,6 +37,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (one global load + one `Imag16` register — dispatch addressing mode per operand); (b) single-use-non-
   store results (the `>1 use` guard skips these today); (c) chained multi-use load expressions (extend
   `add_chain16`).
+- [ ] **#321 native s16 — 16-bit comparison follow-ups** (slice 1, unsigned ordering `< <= > >=`,
+  landed — see Done). Remaining, same approach: (a) **equality** (`== !=`) — the Z flag must fuse into
+  the branch terminator (a 16-bit `CmpBr` in `selectBrCondImm`); (b) **signed** (`slt/sle/sgt/sge`) —
+  the N^V 16-bit lowering in `legalizeICmp`; (c) compare feeding a **select**/bool value (not a branch);
+  (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
+  [plan](docs/plans/2026-06-14-321-native-16bit-compares.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** (2) 16-bit compares/branches
   (currently narrow to 8-bit chains); (3) inc/dec + 16-bit shifts; (4) indexed/array access; (5)
   A16-threading (value stays live in the accumulator across ops — biggest win but reintroduces the
@@ -71,6 +77,19 @@ starting, or blocked on an external factor)._
 
 
 ## Done
+
+- 2026-06-14 — [321-native-16bit-compares] **native 16-bit unsigned-ordering compares (slice 1).**
+  `if (a16v < b16v)` (and `<= > >=`) compiled to a verbose multi-block 8-bit `cpx/cpy` chain; now it's
+  one 16-bit compare: `rep #$20; lda; cmp; sep #$20; bcc/bcs`. The legalizer keeps s16 **UGE**
+  un-narrowed under `hasAccum16` (all four orderings canonicalize to UGE = the C flag, no terminator-
+  fusion) by emitting a width-flexible 16-bit `G_SBC`; `selectSbc16` lowers it to `lda lhs; cmp rhs`
+  (new `CMPImag16`/`CMPAbs16`/`CMPImm16`, `MLow=1` → one rep/sep bracket) producing C, which the branch
+  reads. A constant RHS folds to `cmp #imm16` (`CMP_Immediate16` exists via the `CC1_All` multiclass).
+  `a16cmp.c` (four orderings + a high-byte-differs case: low byte bigger, high byte smaller) shows 5
+  16-bit `cmp`, **zero** 8-bit `cpx/cpy`, and `corpus_result==0x1103` on both MAME and bsnes-jg.
+  Non-breaking: corpus 7/7, all 13 a16* tests green, patch `0002` round-trips. Equality (`== !=`, Z →
+  CmpBr fusion), signed (N^V), and compare→select are follow-ups.
+  [plan](docs/plans/2026-06-14-321-native-16bit-compares.md).
 
 - 2026-06-14 — [321-native-s16-load-fold] **fold near-abs global operands into the 16-bit ALU.** For a
   multi-use `t = a16v OP b16v` (the store-fused peephole can't reach a multi-use result), the new

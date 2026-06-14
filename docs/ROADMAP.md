@@ -279,10 +279,16 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    directly via the 16-bit absolute forms for the multi-use case the store-fused peephole can't reach:
    `t = a16v + b16v` (reused) → `clc; rep; lda b16v; adc a16v; sta __rc; sep`, dropping the ~8-instr
    byte-wise Imag16 materialization (`a16loadfold` reads 0x2345). The `>1 use` guard keeps the
-   single-store peephole (`alu16_abs`) firing. Non-breaking (corpus 7/7, all 12 a16* tests green).
+   single-store peephole (`alu16_abs`) firing. **Native 16-bit comparisons** (slice 1: unsigned
+   ordering `< <= > >=`) follow: the legalizer keeps s16 UGE un-narrowed (a 16-bit `G_SBC`) and
+   `selectSbc16` emits one `rep; lda; cmp; sep; bcc` (new `CMPImag16`/`CMPAbs16`/`CMPImm16`) instead of
+   the old multi-block 8-bit `cpx/cpy` chain — `a16cmp` reads 0x1103 (incl. a high-byte-differs case
+   proving the full 16 bits compare). Equality/signed/select compares are follow-ups. Non-breaking
+   (corpus 7/7, all 13 a16* tests green).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
-   [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md)._
+   [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
+   [compares plan](plans/2026-06-14-321-native-16bit-compares.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
