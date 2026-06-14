@@ -32,9 +32,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   register bank, so 16-bit `lda`/`sta` flow a real 16-bit value (not just the register-free STZ of 1a).
   The genuine hard core of #321. Reuses the 1a `MOSInsertREPSEP` pass + `+mos-a16` feature.
   [plan](docs/plans/2026-06-14-321-increment-1-16bit-accumulator.md).
-- [ ] **#321 — proper native-mode crt0** (XCE + native vectors, M/X default 8-bit) so *all* SNES
-  programs run in native mode (the eventual M2 platform mode) — replaces the 1a test-local `clc; xce`.
-  Corpus + far must stay green in native 8-bit. Enables the emulator run for all 16-bit codegen.
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
   mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
   + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
@@ -64,6 +61,13 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [321-native-mode-crt0] **SNES platform now boots 65816 native mode** — crt0 `.init.50`
+  does `clc; xce` + a 16-bit `ldx #$01ff; txs` (page-1 stack) + `sep #$30` (8-bit A/X default), so
+  *every* program runs native; the four 65816-only opcodes are emitted as `.byte` (SDK assembles crt0
+  as 6502). a16 drops its test-local `clc; xce` and still reads `0x0042` on both emulators — driven
+  solely by the crt0. Non-breaking: corpus 7/7, far-run/far-bank1/xcheck all green in native 8-bit.
+  Platform-only change (no backend/patch). Enables all future 16-bit codegen to run unmodified.
+  [plan](docs/plans/2026-06-14-321-native-mode-crt0.md).
 - 2026-06-14 — [321-increment-1a-16bit-accumulator] **first real 16-bit-accumulator codegen** — a
   16-bit store-of-zero fuses (under opt-in `+mos-a16`) to `rep #$20; stz; sep #$20` via the new
   `MOSInsertREPSEP` pass (reuses the MC `MLow/MHigh` width TSFlags), and — run in 65816 native mode —

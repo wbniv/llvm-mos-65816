@@ -16,11 +16,9 @@ volatile unsigned short g16 = 0xBEEF;
 volatile unsigned short corpus_result;
 
 int main(void) {
-  // 16-bit accumulator mode needs 65816 NATIVE mode (E=0); the SNES boots in
-  // emulation mode (M/X forced 8-bit, REP ignored). Enter native mode here.
-  // Test-local: main never returns (spins) and interrupts are masked (crt0 sei +
-  // NMITIMEN=0), so a full native-mode crt0 isn't needed for this codegen check.
-  __asm__ volatile("clc\n\txce");  // CLC; XCE -> exchange carry/emulation, E=0
+  // 16-bit accumulator mode needs 65816 NATIVE mode (E=0). The crt0 now enters
+  // native mode for every program (docs/plans/2026-06-14-321-native-mode-crt0.md),
+  // so no test-local `clc; xce` is needed — this is plain C.
   g16 = 0;                         // fused 16-bit store -> rep #$20; stz; sep #$20
   corpus_result = g16 + 0x42;      // 0x0000 + 0x42 = 0x0042 iff g16 fully zeroed
   for (;;) {
