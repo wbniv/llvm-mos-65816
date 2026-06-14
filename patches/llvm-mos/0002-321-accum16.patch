@@ -1,0 +1,235 @@
+diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
+index 584cc0c4c..51f92653c 100644
+--- a/llvm/lib/Target/MOS/CMakeLists.txt
++++ b/llvm/lib/Target/MOS/CMakeLists.txt
+@@ -31,6 +31,7 @@ add_llvm_target(MOSCodeGen
+   MOSIndexIV.cpp
+   MOSInlineAsmLowering.cpp
+   MOSInsertCopies.cpp
++  MOSInsertREPSEP.cpp
+   MOSInstrCost.cpp
+   MOSInstrInfo.cpp
+   MOSInstructionSelector.cpp
+diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
+index 66964b1fe..e2cb062d6 100644
+--- a/llvm/lib/Target/MOS/MOS.h
++++ b/llvm/lib/Target/MOS/MOS.h
+@@ -23,6 +23,7 @@ void initializeMOSCombinerPass(PassRegistry &);
+ void initializeMOSCopyOptPass(PassRegistry &);
+ void initializeMOSIndexIVPass(PassRegistry &);
+ void initializeMOSInsertCopiesPass(PassRegistry &);
++void initializeMOSInsertREPSEPPass(PassRegistry &);
+ void initializeMOSInternalizePass(PassRegistry &);
+ void initializeMOSLateOptimizationPass(PassRegistry &);
+ void initializeMOSLowerSelectPass(PassRegistry &);
+diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
+index 76d7409c1..34747d30c 100644
+--- a/llvm/lib/Target/MOS/MOSFeatures.td
++++ b/llvm/lib/Target/MOS/MOSFeatures.td
+@@ -19,3 +19,11 @@ def FeatureStaticStack :
+   SubtargetFeature<
+     "static-stack", "StaticStack", "true",
+     "Whether to use statically-allocated stack frames if possible.">;
++
++// #321: opt-in 16-bit accumulator mode for the WDC 65816 (REP/SEP-bracketed
++// 16-bit-A codegen). Enable with -mattr=+mos-a16; NOT implied by FamilyW65816,
++// so default mosw65816 (far-pointer) codegen is unaffected.
++def FeatureAccum16 :
++  SubtargetFeature<
++    "mos-a16", "HasAccum16", "true",
++    "16-bit accumulator mode (insert REP/SEP) on the WDC 65816.">;
+diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
+new file mode 100644
+index 000000000..a67bddf1d
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
+@@ -0,0 +1,101 @@
++//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// #321: a late pass that inserts the 65816's REP/SEP to set the M (accumulator
++// width) status flag where an instruction requires 16-bit mode. Each
++// instruction's required M width is carried by the MLow/MHigh TSFlags — the same
++// signal MOSMCELFStreamer reads to emit the $ml/$mh ELF mapping symbols. The pass
++// tracks the current M mode through each basic block and inserts `REP #$20`
++// (M->16-bit) / `SEP #$20` (M->8-bit) at transitions.
++//
++// Increment 1a (minimal): straight-line per block; each block begins and ends in
++// 8-bit accumulator mode (the leaf-function convention). Cross-block mode
++// propagation, REP/SEP churn minimization, and the X-flag (xy16) are later
++// increments. Gated on FeatureAccum16 (-mattr=+mos-a16); a no-op otherwise.
++//
++//===----------------------------------------------------------------------===//
++
++#include "MOSInsertREPSEP.h"
++
++#include "MCTargetDesc/MOSMCTargetDesc.h"
++#include "MOS.h"
++#include "MOSSubtarget.h"
++
++#include "llvm/CodeGen/MachineBasicBlock.h"
++#include "llvm/CodeGen/MachineFunction.h"
++#include "llvm/CodeGen/MachineInstrBuilder.h"
++#include "llvm/CodeGen/TargetInstrInfo.h"
++
++using namespace llvm;
++
++#define DEBUG_TYPE "mos-insert-rep-sep"
++
++// REP/SEP operand bit selecting the M (accumulator) status flag.
++static constexpr int64_t MFlagBit = 0x20;
++
++namespace {
++
++class MOSInsertREPSEP : public MachineFunctionPass {
++public:
++  static char ID;
++
++  MOSInsertREPSEP() : MachineFunctionPass(ID) {}
++
++  bool runOnMachineFunction(MachineFunction &MF) override;
++
++  StringRef getPassName() const override { return "MOS Insert REP/SEP"; }
++};
++
++} // namespace
++
++bool MOSInsertREPSEP::runOnMachineFunction(MachineFunction &MF) {
++  const MOSSubtarget &STI = MF.getSubtarget<MOSSubtarget>();
++  // Opt-in only: inert unless 16-bit accumulator mode was requested. Default
++  // (6502, plain mosw65816 far-pointer) codegen is untouched.
++  if (!STI.hasAccum16())
++    return false;
++  const TargetInstrInfo &TII = *STI.getInstrInfo();
++
++  bool Changed = false;
++  for (MachineBasicBlock &MBB : MF) {
++    bool M16 = false; // current accumulator width: false = 8-bit (the convention)
++    for (MachineInstr &MI : MBB) {
++      const bool WantM16 = MI.getDesc().TSFlags & MOS::TSFlagMLow;
++      if (WantM16 && !M16) {
++        // Enter 16-bit A mode before this instruction.
++        BuildMI(MBB, MI, MI.getDebugLoc(), TII.get(MOS::REP_Immediate))
++            .addImm(MFlagBit);
++        M16 = true;
++        Changed = true;
++      } else if (!WantM16 && M16) {
++        // Any width-agnostic / 8-bit instruction returns us to 8-bit A first.
++        BuildMI(MBB, MI, MI.getDebugLoc(), TII.get(MOS::SEP_Immediate))
++            .addImm(MFlagBit);
++        M16 = false;
++        Changed = true;
++      }
++    }
++    // Restore 8-bit A at block exit if a trailing 16-bit instruction left us in
++    // 16-bit mode (insert before the terminator so the branch/return runs 8-bit).
++    if (M16) {
++      BuildMI(MBB, MBB.getFirstTerminator(), DebugLoc(),
++              TII.get(MOS::SEP_Immediate))
++          .addImm(MFlagBit);
++      Changed = true;
++    }
++  }
++  return Changed;
++}
++
++char MOSInsertREPSEP::ID = 0;
++
++INITIALIZE_PASS(MOSInsertREPSEP, DEBUG_TYPE, "MOS Insert REP/SEP", false, false)
++
++MachineFunctionPass *llvm::createMOSInsertREPSEPPass() {
++  return new MOSInsertREPSEP;
++}
+diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.h b/llvm/lib/Target/MOS/MOSInsertREPSEP.h
+new file mode 100644
+index 000000000..34f7e16f3
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.h
+@@ -0,0 +1,25 @@
++//===-- MOSInsertREPSEP.h - Insert 65816 REP/SEP for 16-bit mode -*- C++ -*-===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// This file declares the MOS REP/SEP insertion pass (#321 — 16-bit register
++// mode for the WDC 65816).
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
++#define LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
++
++#include "llvm/CodeGen/MachineFunctionPass.h"
++
++namespace llvm {
++
++MachineFunctionPass *createMOSInsertREPSEPPass();
++
++} // namespace llvm
++
++#endif // LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
+diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
+index 6d303255c..017b60efb 100644
+--- a/llvm/lib/Target/MOS/MOSSubtarget.h
++++ b/llvm/lib/Target/MOS/MOSSubtarget.h
+@@ -115,6 +115,9 @@ public:
+   bool hasJMPIdxIndir() const { return has65C02() || hasSPC700(); }
+   bool staticStack() const { return StaticStack; }
+ 
++  // #321: opt-in 16-bit accumulator mode (REP/SEP-bracketed 16-bit-A codegen).
++  bool hasAccum16() const { return HasAccum16; }
++
+   bool hasW65816Or65EL02() const { return HasW65816Insns || Has65EL02Insns; }
+ 
+ private:
+@@ -140,6 +143,7 @@ private:
+ 
+   bool LongRegisterNames = false;
+   bool StaticStack = false;
++  bool HasAccum16 = false;
+ 
+   // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
+   // no variable, so we instead bind pseudo features to this variable.
+diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+index 3bb679dac..5ebd7b205 100644
+--- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
++++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+@@ -39,6 +39,7 @@
+ #include "MOSIndexIV.h"
+ #include "MOSInsertCopies.h"
+ #include "MOSInternalize.h"
++#include "MOSInsertREPSEP.h"
+ #include "MOSLateOptimization.h"
+ #include "MOSLowerSelect.h"
+ #include "MOSMachineFunctionInfo.h"
+@@ -62,6 +63,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeMOSCombinerPass(PR);
+   initializeMOSCopyOptPass(PR);
+   initializeMOSInsertCopiesPass(PR);
++  initializeMOSInsertREPSEPPass(PR);
+   initializeMOSInternalizePass(PR);
+   initializeMOSLateOptimizationPass(PR);
+   initializeMOSLowerSelectPass(PR);
+@@ -322,7 +324,13 @@ void MOSPassConfig::addPreSched2() {
+     addPass(createMOSStaticStackAllocPass());
+ }
+ 
+-void MOSPassConfig::addPreEmitPass() { addPass(&BranchRelaxationPassID); }
++void MOSPassConfig::addPreEmitPass() {
++  // #321: insert REP/SEP for 16-bit-accumulator instructions (opt-in, +mos-a16;
++  // a no-op otherwise). Runs before branch relaxation so the added REP/SEP are
++  // accounted for in branch distances.
++  addPass(createMOSInsertREPSEPPass());
++  addPass(&BranchRelaxationPassID);
++}
+ 
+ namespace {
+ 

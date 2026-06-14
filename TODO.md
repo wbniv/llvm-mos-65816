@@ -27,10 +27,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 stage 1 — 16-bit accumulator + REP/SEP** late-stage insertion; X/Y 16-bit (xy16).
-  Includes **native-mode crt0** (XCE + native vectors + DBR) — the prerequisite for 16-bit registers,
-  moved here from #320 Increment 2 (far pointers don't need it; see Increment 2 note). Then
-  hardware-stack ABI + calling convention. ROADMAP step 5.
+- [ ] **#321 Increment 1 — minimal 16-bit-accumulator slice (REP/SEP insertion), opt-in.** Get one
+  16-bit-A load+store to compile to `REP #$20 / lda·sta / SEP #$20` behind a new opt-in `+mos-a16`
+  feature (non-breaking); the reusable core is a `MOSInsertREPSEP` pass that reuses the existing MC
+  `MLow/MHigh` width TSFlags. Disasm + dual-emulator (MAME + bsnes-jg) verified, smaller than the
+  8-bit build. Tracked patch `0002-321-accum16.patch`, like #320. ROADMAP step 5 (first slice).
+  [plan](docs/plans/2026-06-14-321-increment-1-16bit-accumulator.md).
+- [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
+  mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
+  + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
+  then hardware-stack ABI + calling convention. ROADMAP step 5.
 - [ ] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
   with correct line/variable mapping. ROADMAP step 6; drdevtools `mame-65816-gdbstub` pre-wires it.
 
