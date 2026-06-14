@@ -1,12 +1,15 @@
 # M2 / #321 — Increment 1b: dual-width accumulator register (the hard core)
 
-**Date:** 2026-06-14 · **Status:** **COMPLETE — a running 16-bit add, verified on both emulators.**
+**Date:** 2026-06-14 · **Status:** **COMPLETE — a running 16-bit add *and subtract*, both emulators.**
 `g16 = a16v + b16v` (0x1234 + 0x1111) compiles under `+mos-a16` to one bracket
-`clc; rep #$20; lda; adc; sta; sep #$20` and computes **`corpus_result == 0x2345`** on **both** MAME
-and bsnes-jg, driven solely by the native-mode crt0. Non-breaking: corpus 7/7, Inc 1a (0x0042) and far
-xcheck all green. `dev/run.sh a16add`. The real value flows through the dual-width `A16` accumulator —
-the genuine hard core of #321. · **Milestone:** M2 (ROADMAP step 5). **Builds on:** Increment 1a (the
-`MOSInsertREPSEP`
+`clc; rep #$20; lda; adc; sta; sep #$20` → **`0x2345`**; `g16 = a16v - b16v` →
+`sec; rep #$20; lda; sbc; sta; sep #$20` → **`0x0123`** — both on **MAME and bsnes-jg**, driven solely
+by the native-mode crt0. `dev/run.sh a16add` / `a16sub`. The real value flows through the dual-width
+`A16` accumulator — the genuine hard core of #321. Subtract reuses the whole add path: same combiner
+matcher (now `G_ADD`|`G_SUB`), a parallel `G_SUB16_ABS` op + `SBCAbs16`, and `selectAdd16Abs` branches
+on the opcode for `sec`/`sbc` (carry-in 1, order-sensitive: `$a` minuend, `$b` subtrahend).
+Non-breaking: corpus 7/7, Inc 1a (0x0042) and far xcheck green, SDK builds. · **Milestone:** M2
+(ROADMAP step 5). **Builds on:** Increment 1a (the `MOSInsertREPSEP`
 pass + opt-in `+mos-a16` feature, [plan](2026-06-14-321-increment-1-16bit-accumulator.md)) and the
 native-mode crt0 ([plan](2026-06-14-321-native-mode-crt0.md)) that lets 16-bit codegen run on the
 emulators with no per-test mode entry.
