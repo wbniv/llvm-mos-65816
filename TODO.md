@@ -24,8 +24,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   on the llvm-mos Discord (@asiekierka/@mysterymath) with the running slice in hand. **Design note
   drafted + ready to post** ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md));
   posting to #320/Discord is the next (user-triggered) step.
-- [ ] **Cross-check emulator (bsnes-jg / Mesen2)** added to the bench for fidelity once codegen
-  correctness depends on it.
 
 ### M2 — Optimizing Payoff
 
@@ -58,6 +56,13 @@ starting, or blocked on an external factor)._
 
 ## Done
 
+- 2026-06-14 — [second-emulator-xcheck] **second-emulator fidelity cross-check** — `dev/run.sh xcheck`
+  boots the far ROMs in **bsnes-jg** (cycle-accurate, independent of MAME) headless and reads WRAM via
+  `Bsnes::getMemoryRaw(MainRAM)` (a small `dev/jgxcheck.cpp` harness, no SDL/X/save-state): far-run
+  (bank $00) + far-bank1 (bank $01) both `got=0xF3`, agreeing with MAME — the bank-$01 far read isn't a
+  MAME quirk. Mesen2 abandoned (prebuilt crashes on 26.04 glibc-2.43; headless `--testrunner` won't run
+  Lua). Completes ROADMAP step 3's "both emulators".
+  [plan](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
 - 2026-06-14 — [320-upstream-design-note] drafted the upstream #320 design note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)): leads with the
   verified running slice (Inc 1/2/2b, by commit), the addrspace-numbering divergence (slice `2`=far

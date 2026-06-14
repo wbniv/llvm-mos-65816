@@ -168,20 +168,24 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    8-bit-register codegen still passes the full M0 corpus (no regression). (Evidence: program output
    + corpus green.)
 
-   **PASS** (2026-06-14, single emulator) — delivered in two increments (absolute-long carries the full
+   **PASS** (2026-06-14, both emulators) — delivered in two increments (absolute-long carries the full
    24-bit address and ignores the DBR, so far accesses run in plain **emulation mode** — no native-mode
    crt0 needed; that's an M2/#321 concern): **Increment 2** — a single-bank far load+store round-trip
    executes in MAME (`SMOKE: PASS got=0xF3`); **Increment 2b** — a 64 KiB LoROM (`snes-far` platform)
    places a far global in bank $01 and `lda $018000` (`af 00 80 01`) reads it across the bank boundary,
    round-tripping correctly in MAME. `dev/run.sh far-run` + `far-bank1`; 6502 corpus still 7/7.
+   **Both emulators** — a second, independent emulator (**bsnes-jg**, cycle-accurate) cross-checks the
+   same far ROMs headless via `dev/run.sh xcheck` and reads back the same WRAM bytes, so the bank-$01
+   far read isn't a MAME-specific quirk. (Mesen2 was abandoned: its prebuilt crashes on the 26.04
+   glibc-2.43 base; see the xcheck plan.)
    ```
-   far-run  (bank $00)  SMOKE: PASS got=0xF3      far-bank1 (bank $01)  SMOKE: PASS got=0xF3
-   far_src @ $018000   linked far load: af 00 80 01 (lda $018000)   corpus 7/7
+   bank $00  far-run:    MAME PASS got=0xF3   bsnes-jg PASS got=0xF3   -> AGREE
+   bank $01  far-bank1:  MAME PASS got=0xF3   bsnes-jg PASS got=0xF3   -> AGREE   (lda $018000)
+   far_src @ $018000   linked far load: af 00 80 01   corpus 7/7
    ```
-   _Remaining for the full gate: the second-emulator (bsnes-jg/Mesen2) cross-check, once codegen
-   correctness depends on it._
    [Inc 2 plan](plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md) ·
-   [Inc 2b plan](plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md).
+   [Inc 2b plan](plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md) ·
+   [xcheck plan](plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
 
 4. **M1 — address-space model honored.** Spot-check disassembly: near calls emit `JSR`, far calls
    emit `JSL`; direct-page vs absolute vs long accesses match the addrspace of the pointer.

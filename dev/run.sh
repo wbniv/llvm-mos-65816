@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -37,6 +37,10 @@ Targets:
              snes-far 64 KiB platform (banks $00+$01), assert the far global lands
              in bank $01 ($018xxx), boot in MAME, and check the cross-bank far read
              round-trips == 0xF3 (needs `toolchain` + `build` first)
+  xcheck     second-emulator fidelity cross-check: boot the far ROMs in bsnes-jg
+             (cycle-accurate, independent of MAME) headless and assert the same
+             WRAM results — confirms the bank-$01 far read isn't a MAME quirk
+             (fetches+builds bsnes-jg once; needs `toolchain` + `build` first)
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

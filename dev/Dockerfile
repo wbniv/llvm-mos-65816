@@ -39,5 +39,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       clang lld ccache zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Second-emulator cross-check (dev/run.sh xcheck): build the bsnes-jg core +
+# the headless dev/jgxcheck.cpp harness. bsnes-jg's C++ API exposes WRAM
+# directly, so the harness reads results like MAME's Lua does — no SDL/X
+# needed (the core links only libsamplerate). g++/make come from build-essential
+# above; pkg-config + libsamplerate are the only extra build deps. The bsnes-jg
+# source is fetched (pinned) at run time by dev/xcheck.sh. Own layer so it never
+# re-triggers the toolchain/mame layers.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      pkg-config libsamplerate0-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV PATH=/opt/llvm-mos/bin:/usr/games:$PATH
 WORKDIR /work
