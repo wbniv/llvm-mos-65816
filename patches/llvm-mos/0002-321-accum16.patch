@@ -270,3 +270,44 @@ index 3bb679dac..5ebd7b205 100644
  
  namespace {
  
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+index 94e229944..253663616 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+@@ -90,6 +90,24 @@ def P : MOSReg<12, "P"> {
+   let SubRegIndices = [subcarry, subnz, subv];
+ }
+ 
++// #321 Increment 1b: the 65816's 16-bit accumulator, modeled as A16 = B:A. WDC
++// calls this combined register "C", but we deliberately do NOT use that name —
++// `def C` (register 7, a subreg of P) is the *carry flag*, and conflating the
++// 16-bit accumulator with carry is a classic 65816 footgun. So the 16-bit
++// accumulator is `A16` (low byte A, high byte B), unrelated to carry.
++//
++// `B` is the accumulator's hidden high byte (swapped with A via XBA), only live
++// as the high half of A16 in native 16-bit-accumulator mode (M=0); 8-bit ops
++// never name it. A16 aliases A as its low byte so the register allocator knows a
++// 16-bit accumulator op clobbers A. Numbers 14/15 are free (reals end at
++// Fake=13, imaginaries start at 0x10). Used only under +mos-a16; inert otherwise.
++def B : MOSReg<14, "b">;
++def A16 : MOSReg<15, "a16"> {
++  let SubRegs = [A, B];
++  let SubRegIndices = [sublo, subhi];
++  let CoveredBySubRegs = 1;
++}
++
+ //===----------------------------------------------------------------------===//
+ //  Imaginary registers
+ //===----------------------------------------------------------------------===//
+@@ -180,6 +198,11 @@ let isPressureFineGrained = true in {
+ def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
+ def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
+ 
++// #321 Increment 1b: the 16-bit accumulator as a register class (single member,
++// A16 = B:A — NOT the carry flag C). Target of 16-bit-accumulator load/add/store
++// under +mos-a16. Named Ac16 to parallel the 8-bit accumulator class `Ac`.
++def Ac16 : MOSReg16Class<(add A16)>;
++
+ // Instruction-specific register classes.
+ def AImag8 : MOSReg8Class<(add Imag8, A)>;
+ let isPressureFineGrained = true in {

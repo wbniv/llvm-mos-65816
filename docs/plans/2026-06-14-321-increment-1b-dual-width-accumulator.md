@@ -1,7 +1,10 @@
 # M2 / #321 — Increment 1b: dual-width accumulator register (the hard core)
 
-**Date:** 2026-06-14 · **Status:** **PLANNING — grounding investigation done, approach decision
-pending.** · **Milestone:** M2 (ROADMAP step 5). **Builds on:** Increment 1a (the `MOSInsertREPSEP`
+**Date:** 2026-06-14 · **Status:** **IN PROGRESS (Option A chosen).** Step 1 of 5 done — the
+dual-width accumulator register is modeled (`A16 = B:A`, class `Ac16`) and verified non-breaking
+(toolchain rebuilds, corpus 7/7; the register is inert until the selector targets it). Steps 2-5
+(legalizer keep-16-bit → selector/reg-bank → REP/SEP bracketing → calling-convention pin) ahead. ·
+**Milestone:** M2 (ROADMAP step 5). **Builds on:** Increment 1a (the `MOSInsertREPSEP`
 pass + opt-in `+mos-a16` feature, [plan](2026-06-14-321-increment-1-16bit-accumulator.md)) and the
 native-mode crt0 ([plan](2026-06-14-321-native-mode-crt0.md)) that lets 16-bit codegen run on the
 emulators with no per-test mode entry.
@@ -71,9 +74,12 @@ modeling, with the **16-bit `add`** as the first target that both runs correctly
 Model `A` as the low half of a 16-bit accumulator `C` aliasing the same physical bits, sized by the
 runtime M flag. Decomposed into buildable sub-steps, each kept non-breaking (inert without `+mos-a16`):
 
-1. **Register class + aliasing (tablegen).** Add a 16-bit accumulator register (e.g. `def C16` with
-   `A` as its `sublo` sub-register) and an `Anyi16`/accumulator-16 register class; a register bank
-   entry. Builds inert; nothing selects it yet. *Verify: toolchain builds, corpus 7/7.*
+1. ~~**Register class + aliasing (tablegen).**~~ **DONE** (2026-06-14). Added `def A16` (= `B`:`A`,
+   `A` as `sublo`) + the high-byte `def B` + class `def Ac16` in `MOSRegisterInfo.td`. Named `A16`
+   (not the WDC name `C`) on purpose — `def C` is the *carry flag*; conflating them is a 65816
+   footgun, called out in a comment at the definition. Verified non-breaking: toolchain rebuilds
+   clean (87 targets, `MOSGenRegisterInfo.inc` regen), corpus **7/7** — the register is inert (nothing
+   selects it yet). In `patches/llvm-mos/0002-321-accum16.patch`.
 2. **Legalizer (feature-gated).** Under `HasAccum16`, keep a 16-bit `G_ADD`/`G_LOAD`/`G_STORE` as a
    single 16-bit op instead of `narrowScalar`→S8 pairs, for the straight-line leaf case. *Verify: MIR
    shows un-narrowed 16-bit ops; 8-bit path unchanged.*
