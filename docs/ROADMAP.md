@@ -225,6 +225,18 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    (16-bit `lda`/`sta`, not just STZ) are the next increments._
    [Inc 1 plan](plans/2026-06-14-321-increment-1-16bit-accumulator.md).
 
+   _**Increment 1b DONE (2026-06-14): a real 16-bit ADD through the dual-width A16 accumulator —
+   this step's "smaller/faster" bar met.** Modeled the 65816 16-bit accumulator `A16 = B:A` (class
+   `Ac16`), then a pre-legalizer combiner fuses `g16 = a16v + b16v` to one bracket
+   `clc; rep #$20; lda; adc; sta; sep #$20` (via a `G_ADD16_ABS` op + `selectAdd16Abs`). Computes
+   `corpus_result == 0x2345` on **both** MAME and bsnes-jg (`dev/run.sh a16add`), **31 B vs 48 B**
+   for the 8-bit ADC carry chain. Non-breaking (corpus 7/7, Inc 1a + far green, SDK builds). The
+   genuine hard core of #321 — a real value now flows through a 16-bit register, not just STZ's zero.
+   Findings: a legalizer rule for a MOS-specific generic opcode corrupts the legalizer tables (skip by
+   opcode-range instead); the `clc` must sit outside the REP/SEP run.
+   [Inc 1b plan](plans/2026-06-14-321-increment-1b-dual-width-accumulator.md). Next: xy16 + the
+   hardware-stack ABI/calling convention (step continues)._
+
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
    the ROM's symbols.)
