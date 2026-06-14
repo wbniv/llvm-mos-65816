@@ -14,6 +14,14 @@ bitwise ops **merge into a single `rep #$20 … sep #$20` bracket** (no carry-in
 run — better amortization than add/sub, which each carry a `clc`/`sec`). The combiner matcher accepts
 `G_ADD|G_SUB|G_AND|G_OR|G_XOR`; `selectAlu16Abs` maps each to its logical op (`ADC/SBC/AND/ORA/EOR
 Abs16`) and emits the carry-init only for arithmetic.
+**Immediate operands** also landed: `g = a OP #imm16` (`g = a16v + 0x0345` → `0x1545`,
+`dev/run.sh a16imm`) selects to `adc/and/ora/eor #imm16` — the combiner now accepts one operand being
+a 16-bit constant (commutative ops; subtract-by-constant already folds to add of the negated
+constant), and the selector keys on `MachineOperand::isImm()` to pick the immediate vs absolute form.
+This needed a **REP/SEP-pass refinement**: the carry-init (`LDCImm` = clc/sec) is now treated as
+**M-width-agnostic**, so it no longer forces a SEP when it lands between `lda` and `adc` — all three
+immediate ops in `a16imm` now share **one** `rep/sep` bracket (the "width-agnostic instrs" item the
+plan had deferred, now partly done for flag ops).
 Non-breaking: corpus 7/7, Inc 1a (0x0042) and far xcheck green, SDK builds. · **Milestone:** M2
 (ROADMAP step 5). **Builds on:** Increment 1a (the `MOSInsertREPSEP`
 pass + opt-in `+mos-a16` feature, [plan](2026-06-14-321-increment-1-16bit-accumulator.md)) and the

@@ -53,7 +53,7 @@ index 7a064aa35..f767ce0c6 100644
    fold_sbc,
    sbc_equal,
 diff --git a/llvm/lib/Target/MOS/MOSCombiner.cpp b/llvm/lib/Target/MOS/MOSCombiner.cpp
-index bff8495ed..bc2b83ad7 100644
+index bff8495ed..dce4f39da 100644
 --- a/llvm/lib/Target/MOS/MOSCombiner.cpp
 +++ b/llvm/lib/Target/MOS/MOSCombiner.cpp
 @@ -110,6 +110,10 @@ public:
@@ -67,7 +67,7 @@ index bff8495ed..bc2b83ad7 100644
    bool matchFoldAddE(MachineInstr &MI, BuildFnTy &MatchInfo) const;
    bool matchFoldSbc(MachineInstr &MI, BuildFnTy &MatchInfo) const;
    bool matchFoldShift(MachineInstr &MI, BuildFnTy &MatchInfo) const;
-@@ -443,6 +447,112 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
+@@ -443,6 +447,153 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
    MI.eraseFromParent();
  }
  
@@ -85,9 +85,29 @@ index bff8495ed..bc2b83ad7 100644
 +  return Def;
 +}
 +
-+// #321 Increment 1b: match g = a + b where a, b, g are 16-bit near (bank 0)
-+// absolute globals, i.e. G_STORE(G_ADD(G_LOAD a, G_LOAD b), g), all single-use.
-+// Only under +mos-a16. The add (carrying the two loads) is returned for apply.
++// #321 Increment 1b: a single-use 16-bit plain G_LOAD from a near abs global, or
++// null. (The kind of operand the 16-bit lda/ALU-abs forms can take directly.)
++static GLoad *nearAbsLoad(Register R, const MachineRegisterInfo &MRI) {
++  if (MRI.getType(R) != LLT::scalar(16) || !MRI.hasOneNonDBGUse(R))
++    return nullptr;
++  auto *Ld = dyn_cast_or_null<GLoad>(MRI.getVRegDef(R));
++  if (!Ld || Ld->getOpcode() != TargetOpcode::G_LOAD ||
++      !nearAbsGlobalDef(Ld->getPointerReg(), MRI))
++    return nullptr;
++  return Ld;
++}
++
++// #321 Increment 1b: is this a commutative 16-bit ALU op (operands may be
++// swapped freely)? Subtract is excluded — order-sensitive.
++static bool isCommutativeAlu(unsigned Opc) {
++  using namespace TargetOpcode;
++  return Opc == G_ADD || Opc == G_AND || Opc == G_OR || Opc == G_XOR;
++}
++
++// #321 Increment 1b: match g = a OP b, all 16-bit near (bank 0) absolute, i.e.
++// G_STORE(G_<alu>(x, y), g) where {x,y} are either two near-abs-global loads
++// (memory form) or one such load + one 16-bit constant (immediate form, for the
++// commutative ops). Only under +mos-a16. The ALU instr is returned for apply.
 +bool MOSCombinerImpl::matchAlu16Abs(MachineInstr &MI, MachineInstr *&Add) const {
 +  using namespace TargetOpcode;
 +  if (!B.getMF().getSubtarget<MOSSubtarget>().hasAccum16())
@@ -120,19 +140,21 @@ index bff8495ed..bc2b83ad7 100644
 +    return false;
 +  }
 +
-+  // Both operands must be single-use 16-bit plain loads from near abs globals.
-+  for (unsigned I : {1, 2}) {
-+    Register R = AddMI->getOperand(I).getReg();
-+    if (MRI.getType(R) != S16 || !MRI.hasOneNonDBGUse(R))
-+      return false;
-+    MachineInstr *LdMI = MRI.getVRegDef(R);
-+    if (!LdMI || LdMI->getOpcode() != G_LOAD)
-+      return false;
-+    if (LdMI->getOpcode() == G_LOAD &&
-+        !nearAbsGlobalDef(cast<GLoad>(LdMI)->getPointerReg(), MRI))
-+      return false;
++  Register R1 = AddMI->getOperand(1).getReg();
++  Register R2 = AddMI->getOperand(2).getReg();
++  GLoad *L1 = nearAbsLoad(R1, MRI), *L2 = nearAbsLoad(R2, MRI);
++  if (L1 && L2) { // memory form: both operands are near-abs loads
++    Add = AddMI;
++    return true;
 +  }
-+
++  // Immediate form (commutative ops only): exactly one near-abs load + one 16-bit
++  // constant. selectAlu16Abs puts the load in A16 and the constant in the op.
++  if (!isCommutativeAlu(AddMI->getOpcode()) || (bool)L1 == (bool)L2)
++    return false;
++  Register CReg = L1 ? R2 : R1;
++  if (MRI.getType(CReg) != S16 ||
++      !getIConstantVRegValWithLookThrough(CReg, MRI))
++    return false;
 +  Add = AddMI;
 +  return true;
 +}
@@ -140,17 +162,6 @@ index bff8495ed..bc2b83ad7 100644
 +void MOSCombinerImpl::applyAlu16Abs(MachineInstr &MI, MachineInstr *&Add) const {
 +  auto &Store = cast<GStore>(MI);
 +  B.setInstrAndDebugLoc(MI);
-+
-+  auto *LoadA = cast<GLoad>(MRI.getVRegDef(Add->getOperand(1).getReg()));
-+  auto *LoadB = cast<GLoad>(MRI.getVRegDef(Add->getOperand(2).getReg()));
-+
-+  // Global-address operands (GlobalValue + offset + target flags) for a, b, g.
-+  const MachineOperand &GA =
-+      nearAbsGlobalDef(LoadA->getPointerReg(), MRI)->getOperand(1);
-+  const MachineOperand &GB =
-+      nearAbsGlobalDef(LoadB->getPointerReg(), MRI)->getOperand(1);
-+  const MachineOperand &GG =
-+      nearAbsGlobalDef(Store.getPointerReg(), MRI)->getOperand(1);
 +
 +  unsigned Pseudo;
 +  switch (Add->getOpcode()) {
@@ -160,21 +171,51 @@ index bff8495ed..bc2b83ad7 100644
 +  case TargetOpcode::G_OR:  Pseudo = MOS::G_OR16_ABS;  break;
 +  default:                  Pseudo = MOS::G_XOR16_ABS; break; // G_XOR
 +  }
++
++  Register R1 = Add->getOperand(1).getReg();
++  Register R2 = Add->getOperand(2).getReg();
++  GLoad *LoadA = nearAbsLoad(R1, MRI), *LoadB = nearAbsLoad(R2, MRI);
++  const MachineOperand &GG =
++      nearAbsGlobalDef(Store.getPointerReg(), MRI)->getOperand(1);
++
++  if (LoadA && LoadB) {
++    // Memory form: g = a OP b. Operands a/b/g + 3 memoperands (load a/b, store g).
++    const MachineOperand &GA =
++        nearAbsGlobalDef(LoadA->getPointerReg(), MRI)->getOperand(1);
++    const MachineOperand &GB =
++        nearAbsGlobalDef(LoadB->getPointerReg(), MRI)->getOperand(1);
++    B.buildInstr(Pseudo)
++        .add(GA)
++        .add(GB)
++        .add(GG)
++        .addMemOperand(&LoadA->getMMO())
++        .addMemOperand(&LoadB->getMMO())
++        .addMemOperand(&Store.getMMO());
++    MI.eraseFromParent();
++    Add->eraseFromParent();
++    LoadA->eraseFromParent();
++    LoadB->eraseFromParent();
++    return;
++  }
++
++  // Immediate form: g = load OP const. Pseudo operand 1 is the immediate (the
++  // selector keys on isImm()); only 2 memoperands (load a, store g).
++  GLoad *Load = LoadA ? LoadA : LoadB;
++  Register CReg = LoadA ? R2 : R1;
++  int64_t Imm =
++      getIConstantVRegValWithLookThrough(CReg, MRI)->Value.getZExtValue() &
++      0xFFFF;
++  const MachineOperand &GA =
++      nearAbsGlobalDef(Load->getPointerReg(), MRI)->getOperand(1);
 +  B.buildInstr(Pseudo)
 +      .add(GA)
-+      .add(GB)
++      .addImm(Imm)
 +      .add(GG)
-+      .addMemOperand(&LoadA->getMMO())
-+      .addMemOperand(&LoadB->getMMO())
++      .addMemOperand(&Load->getMMO())
 +      .addMemOperand(&Store.getMMO());
-+
-+  // Erase store (uses add), then add (uses loads), then the now-dead loads;
-+  // single-use was verified in the matcher. Dead G_GLOBAL_VALUEs are cleaned up
-+  // by later DCE.
 +  MI.eraseFromParent();
 +  Add->eraseFromParent();
-+  LoadA->eraseFromParent();
-+  LoadB->eraseFromParent();
++  Load->eraseFromParent();
 +}
 +
  bool MOSCombinerImpl::matchFoldAddE(MachineInstr &MI,
@@ -198,10 +239,10 @@ index 76d7409c1..34747d30c 100644
 +    "16-bit accumulator mode (insert REP/SEP) on the WDC 65816.">;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000..936f20605
+index 000000000..0bf3786a5
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,138 @@
+@@ -0,0 +1,163 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -243,6 +284,27 @@ index 000000000..936f20605
 +
 +// REP/SEP operand bit selecting the M (accumulator) status flag.
 +static constexpr int64_t MFlagBit = 0x20;
++
++// #321 Increment 1b: is this instruction M-width-agnostic — its behavior does not
++// depend on the accumulator (M) width, so it may sit inside a 16-bit run without
++// forcing a SEP back to 8-bit? Conservative: the carry load (LDCImm, i.e. clc/sec)
++// that the ALU selection emits as the carry-in for adc/sbc, plus an LDImm1 that
++// targets only a flag (C/V). Without this, that carry-init landing between `lda`
++// and `adc` splits the REP/SEP bracket. Extend the set as more agnostic ops appear.
++static bool isMWidthAgnostic(const MachineInstr &MI) {
++  switch (MI.getOpcode()) {
++  case MOS::LDCImm: // clc / sec — always defines only the carry flag
++    return true;
++  case MOS::LDImm1:
++    if (MI.getOperand(0).isReg()) {
++      Register D = MI.getOperand(0).getReg();
++      return D == MOS::C || D == MOS::V;
++    }
++    return false;
++  default:
++    return false;
++  }
++}
 +
 +namespace {
 +
@@ -306,6 +368,10 @@ index 000000000..936f20605
 +  for (MachineBasicBlock &MBB : MF) {
 +    bool M16 = false; // current accumulator width: false = 8-bit (the convention)
 +    for (MachineInstr &MI : MBB) {
++      // M-agnostic ops (clc/sec/clv carry-init) keep the current width — they may
++      // live inside a 16-bit run without splitting the REP/SEP bracket.
++      if (isMWidthAgnostic(MI))
++        continue;
 +      const bool WantM16 = MI.getDesc().TSFlags & MOS::TSFlagMLow;
 +      if (WantM16 && !M16) {
 +        // Enter 16-bit A mode before this instruction.
@@ -446,7 +512,7 @@ index e81487e9c..3376e5836 100644
  // argument isn't a pointer; it's either a global value or a 16-bit immediate.
  // The index argument is an 8-bit scalar. Additionally expects a
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..131678b55 100644
+index f3eb9549f..17a41642c 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
@@ -464,7 +530,7 @@ index f3eb9549f..131678b55 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,6 +585,74 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -577,6 +585,97 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -526,6 +592,29 @@ index f3eb9549f..131678b55 100644
 +def ORAAbs16 : MOSBitAbs16<ORA_Absolute>;
 +def EORAbs16 : MOSBitAbs16<EOR_Absolute>;
 +
++// Immediate-operand 16-bit forms: A16 = A16 OP #imm16. Same accumulator shape as
++// the *Abs16 ops but the second operand is a 16-bit immediate (no memory). Used
++// for `g = a OP constant` (the combiner routes one constant operand here).
++def ADCImm16 : MOSLogicalInstr, PseudoInstExpansion<(ADC_Immediate16 imm16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let isAdd = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout, Vc:$vout);
++  dag InOperandList = (ins Ac16:$l, imm16:$r, Cc:$carryin);
++}
++class MOSBitImm16<Instruction real> : MOSLogicalInstr,
++    PseudoInstExpansion<(real imm16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Ac16:$l, imm16:$r);
++}
++def ANDImm16 : MOSBitImm16<AND_Immediate16>;
++def ORAImm16 : MOSBitImm16<ORA_Immediate16>;
++def EORImm16 : MOSBitImm16<EOR_Immediate16>;
++
 +// STA abs (16-bit) — store A16 to a 16-bit absolute global.
 +def STAbs16 : MOSStore, PseudoInstExpansion<(STA_Absolute addr16:$dst)> {
 +  let Predicates = [HasAccum16];
@@ -540,7 +629,7 @@ index f3eb9549f..131678b55 100644
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..668c7b398 100644
+index cbdd54ab2..65d21b535 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -96,6 +96,8 @@ private:
@@ -566,7 +655,7 @@ index cbdd54ab2..668c7b398 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -1928,6 +1937,80 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +1937,97 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -587,26 +676,33 @@ index cbdd54ab2..668c7b398 100644
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
 +
-+  // Map the pseudo to (ALU logical opcode, carry-init: -1 none / 0 clc / 1 sec).
-+  unsigned AluOpc;
++  // Operand 1 is the second ALU operand: a global (memory form) or an immediate
++  // (immediate form, g = a OP #const). The latter has no load-b memoperand.
++  const MachineOperand &GA = MI.getOperand(0);
++  const MachineOperand &Rhs = MI.getOperand(1);
++  const MachineOperand &GG = MI.getOperand(2);
++  const bool IsImm = Rhs.isImm();
++
++  // Map the pseudo to (abs ALU opcode, imm ALU opcode, carry-init: -1/0/1).
++  unsigned AbsOpc, ImmOpc;
 +  int CarryInit;
 +  switch (MI.getOpcode()) {
-+  case MOS::G_ADD16_ABS: AluOpc = MOS::ADCAbs16; CarryInit = 0;  break;
-+  case MOS::G_SUB16_ABS: AluOpc = MOS::SBCAbs16; CarryInit = 1;  break;
-+  case MOS::G_AND16_ABS: AluOpc = MOS::ANDAbs16; CarryInit = -1; break;
-+  case MOS::G_OR16_ABS:  AluOpc = MOS::ORAAbs16; CarryInit = -1; break;
-+  default:               AluOpc = MOS::EORAbs16; CarryInit = -1; break; // XOR
++  case MOS::G_ADD16_ABS: AbsOpc = MOS::ADCAbs16; ImmOpc = MOS::ADCImm16; CarryInit = 0;  break;
++  case MOS::G_SUB16_ABS: AbsOpc = MOS::SBCAbs16; ImmOpc = MOS::SBCAbs16; CarryInit = 1;  break;
++  case MOS::G_AND16_ABS: AbsOpc = MOS::ANDAbs16; ImmOpc = MOS::ANDImm16; CarryInit = -1; break;
++  case MOS::G_OR16_ABS:  AbsOpc = MOS::ORAAbs16; ImmOpc = MOS::ORAImm16; CarryInit = -1; break;
++  default:               AbsOpc = MOS::EORAbs16; ImmOpc = MOS::EORImm16; CarryInit = -1; break; // XOR
 +  }
++  const unsigned AluOpc = IsImm ? ImmOpc : AbsOpc;
 +  const bool IsArith = CarryInit >= 0;
 +
-+  const MachineOperand &GA = MI.getOperand(0);
-+  const MachineOperand &GB = MI.getOperand(1);
-+  const MachineOperand &GG = MI.getOperand(2);
-+  assert(MI.getNumMemOperands() == 3 && "ALU16Abs wants 3 mem operands");
-+  auto MMO = MI.memoperands_begin();
-+  MachineMemOperand *MMOA = *MMO++;
-+  MachineMemOperand *MMOB = *MMO++;
-+  MachineMemOperand *MMOG = *MMO;
++  // load-a is the first memoperand, store-g the last; load-b (memory form only)
++  // is in between.
++  unsigned NumMMO = MI.getNumMemOperands();
++  assert(NumMMO == (IsImm ? 2u : 3u) && "ALU16Abs mem-operand count");
++  MachineMemOperand *MMOA = *MI.memoperands_begin();
++  MachineMemOperand *MMOG = *(MI.memoperands_begin() + (NumMMO - 1));
++  MachineMemOperand *MMOB = IsImm ? nullptr : *(MI.memoperands_begin() + 1);
 +
 +  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
 +  Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
@@ -622,16 +718,26 @@ index cbdd54ab2..668c7b398 100644
 +  // lda a  (16-bit) -> A16
 +  New.push_back(
 +      Builder.buildInstr(MOS::LDAbs16).addDef(Lo).add(GA).addMemOperand(MMOA));
-+  // the ALU op (16-bit): A16 = Lo OP [b].
++  // the ALU op (16-bit): A16 = Lo OP (#imm | [b]).
 +  auto Alu = Builder.buildInstr(AluOpc).addDef(Res);
 +  if (IsArith) {
 +    Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
 +    Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
-+    Alu.addDef(CarryOut).addDef(VOut).addUse(Lo).add(GB).addUse(Carry);
++    Alu.addDef(CarryOut).addDef(VOut).addUse(Lo);
++    if (IsImm)
++      Alu.addImm(Rhs.getImm());
++    else
++      Alu.add(Rhs);
++    Alu.addUse(Carry);
 +  } else {
-+    Alu.addUse(Lo).add(GB);
++    Alu.addUse(Lo);
++    if (IsImm)
++      Alu.addImm(Rhs.getImm());
++    else
++      Alu.add(Rhs);
 +  }
-+  Alu.addMemOperand(MMOB);
++  if (!IsImm)
++    Alu.addMemOperand(MMOB);
 +  New.push_back(Alu);
 +  // sta g  (16-bit)
 +  New.push_back(

@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/f46103d) | #321 Inc 1b: 16-bit bitwise AND/OR/XOR through A16 (completes the ALU set) |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/57f55c0) | #321 Inc 1b: 16-bit SUBTRACT through A16 (reuses the add path) |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/a6123d1) | #321 Inc 1b COMPLETE: a running 16-bit ADD through the dual-width A16 accumulator |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/6736297) | #321 Inc 1b step 1: model the dual-width 16-bit accumulator register |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/d34a89d) | #321 Inc 1b: plan + grounding investigation (cheap-fusion well is dry) |
 
 <!--history-meta v1
+f46103d	author	Will Norris
+f46103d	added	6
+f46103d	deleted	0
+f46103d	files	1
+f46103d	body	g = a16v {& | ^} b16v now compiles under +mos-a16 to lda; and|ora|eor;\nsta on the A16 accumulator. The AND result reads corpus_result == 0x0F00\n(0xFF0F & 0x0FF0) on BOTH MAME and bsnes-jg. Three consecutive bitwise\nops merge into ONE rep #$20 ... sep #$20 bracket — no carry-init breaks\nthe MLow=1 run, so the amortization is even better than add/sub.\n\nGeneralizes the add/sub path: the combiner matcher accepts\nG_ADD|G_SUB|G_AND|G_OR|G_XOR; parallel G_{AND,OR,XOR}16_ABS ops +\nAND/ORA/EOR Abs16 logical instrs; and selectAlu16Abs (renamed from\nselectAdd16Abs) maps each pseudo to its ALU op and emits the carry-init\nonly for arithmetic. This completes the basic 16-bit ALU set.\n\nNon-breaking: add 0x2345, sub 0x0123, corpus 7/7, far xcheck green, SDK\nbuilds. New dev/run.sh a16bit + examples/65816/a16bit.c. Patch 0002\nregenerated (round-trip verified).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 57f55c0	author	Will Norris
 57f55c0	added	9
 57f55c0	deleted	6
