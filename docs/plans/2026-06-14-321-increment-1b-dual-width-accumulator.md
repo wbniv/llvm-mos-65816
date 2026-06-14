@@ -1,10 +1,12 @@
 # M2 / #321 — Increment 1b: dual-width accumulator register (the hard core)
 
-**Date:** 2026-06-14 · **Status:** **IN PROGRESS (Option A chosen).** Step 1 of 5 done — the
-dual-width accumulator register is modeled (`A16 = B:A`, class `Ac16`) and verified non-breaking
-(toolchain rebuilds, corpus 7/7; the register is inert until the selector targets it). Steps 2-5
-(legalizer keep-16-bit → selector/reg-bank → REP/SEP bracketing → calling-convention pin) ahead. ·
-**Milestone:** M2 (ROADMAP step 5). **Builds on:** Increment 1a (the `MOSInsertREPSEP`
+**Date:** 2026-06-14 · **Status:** **COMPLETE — a running 16-bit add, verified on both emulators.**
+`g16 = a16v + b16v` (0x1234 + 0x1111) compiles under `+mos-a16` to one bracket
+`clc; rep #$20; lda; adc; sta; sep #$20` and computes **`corpus_result == 0x2345`** on **both** MAME
+and bsnes-jg, driven solely by the native-mode crt0. Non-breaking: corpus 7/7, Inc 1a (0x0042) and far
+xcheck all green. `dev/run.sh a16add`. The real value flows through the dual-width `A16` accumulator —
+the genuine hard core of #321. · **Milestone:** M2 (ROADMAP step 5). **Builds on:** Increment 1a (the
+`MOSInsertREPSEP`
 pass + opt-in `+mos-a16` feature, [plan](2026-06-14-321-increment-1-16bit-accumulator.md)) and the
 native-mode crt0 ([plan](2026-06-14-321-native-mode-crt0.md)) that lets 16-bit codegen run on the
 emulators with no per-test mode entry.
@@ -121,18 +123,96 @@ build cycles — or do **Option B** (INC idiom) first as a smaller real win whil
 recommendation is **Option A**: the cheap wins are exhausted, A is the actual #321 deliverable, and
 the MC layer is already in place so the work is GISel/regalloc, not encoding.
 
-## Verification (Option A, when implemented)
+## Implementation design (grounded 2026-06-14)
 
-1. **Non-breaking** — without `+mos-a16`: 6502 corpus 7/7, far/xcheck unchanged (the feature and the
-   pass are inert by default). (Evidence: corpus + xcheck tables.)
-2. **16-bit add lowering** — `a16add.c` with `+mos-a16`: `llvm-objdump` shows one `rep #$20` … `adc`
-   … `sep #$20` bracket (a single 16-bit add), not the 8-bit carry chain. (Evidence: disasm.)
-3. **Correct on both emulators** — the 16-bit sum reads back correctly in **MAME** *and* **bsnes-jg**
-   (native-mode crt0, no inline XCE). (Evidence: SMOKE lines from both.)
-4. **Smaller than 8-bit mode** — the `+mos-a16` `add` function is fewer bytes than the 8-bit build
-   (ROADMAP step 5's "smaller/faster", now actually met because the bracket amortizes). (Evidence:
-   `size` compare.)
-5. **No GISel fallback / `-verify-machineinstrs` clean.** (Evidence: clean compile.)
+Decisive findings from reading the GISel pipeline:
+- **Register banks are unused** — one `AnyRegBank`; allocation is driven by the *register class* of
+  the selected instruction's operands. So `A16` is forced purely by selecting ops with `Ac16`
+  operands (the class has only `A16`); just add `Ac16` to `AnyRegBank`.
+- **The pre-legalizer combiner** (`createMOSCombiner` at `addPreLegalizeMachineIR`) sees the clean
+  generic DAG `G_STORE(G_ADD(G_LOAD a, G_LOAD b), g)` (confirmed: `int` is 16-bit, so the add is a
+  real `s16 G_ADD`). Matching here avoids the race with per-instruction narrowing in the legalizer.
+- **`MOSInsertREPSEP` reads `MLow` TSFlags at `addPreEmitPass`**, on the *logical* instructions
+  (before MCInst expansion). So if the 16-bit logical ops carry `MLow=1`, the existing mode-walk
+  brackets the run with one `rep #$20 … sep #$20` pair — step 4 is essentially free.
+
+The pieces (mirroring #320's far-pointer custom-pseudo style) — **all shipped:**
+1. ✅ `Ac16` register class added to `AnyRegBank` (`MOSRegisterBanks.td`).
+2. ✅ `MLow` bit on `MOSLogicalInstr` (TSFlags{0}, matching the MC `Inst` base) + three logical
+   ops `LDAbs16`/`ADCAbs16`/`STAbs16` (`MLow=1`, `Ac16` operands, `PseudoInstExpansion` to the
+   width-agnostic `LDA/ADC/STA_Absolute`) + a `HasAccum16` tablegen `Predicate` (the feature only had
+   a C++ accessor before).
+3. ✅ `G_ADD16_ABS` op (`MOSInstrGISel.td`, `[HasAccum16]`): three global-address operands + three
+   memoperands.
+4. ✅ Combiner rule `add16_abs` (`MOSCombine.td` + `MOSCombiner.cpp`): match `G_STORE(G_ADD(load,
+   load))` (s16, near abs globals, single uses, `HasAccum16`) → build `G_ADD16_ABS`, erase the
+   store/add/loads.
+5. ✅ Legalizer: **NO rule** (see gotcha below) — `G_ADD16_ABS` is a target-specific opcode the
+   legalizer skips by range.
+6. ✅ Selector: `selectAdd16Abs` emits `clc (LDImm1, first/outside the run); lda a; adc b; sta g`
+   with vregs constrained to `Ac16`; the REP/SEP pass brackets the three `MLow=1` ops.
+
+**Two gotchas hit and fixed:**
+- **A legalizer rule for a MOS-specific *generic* opcode corrupts the legalizer tables** (heap
+  bad-free at TargetMachine teardown — crashed the SDK's LTO link of `crt0`, code unrelated to
+  `+mos-a16`). Fix: register no rule. `G_ADD16_ABS`'s opcode is above `PRE_ISEL_GENERIC_OPCODE_END`,
+  so the legalizer skips it by range, while `MOSGenericInstruction` still sets `isPreISelOpcode` so
+  InstructionSelect selects it — exactly how #320's far pseudos work. (A brief detour making it a
+  *non-generic* pseudo cured the crash but then InstructionSelect skipped it, silently dropping the
+  add — generic-without-rule is the correct combination.)
+- **The `clc` must be emitted *before* the 16-bit run, not between `lda` and `adc`.** The REP/SEP
+  mode-walk toggles back to 8-bit on any `MLow=0` instruction, so a `clc` inside the run would split
+  it into three brackets. `lda` doesn't touch carry, so `clc; lda; adc; sta` is correct and keeps one
+  bracket.
+- Note: near-global absolute accesses encode as absolute-**long** (`af/6f/8f`) on W65816 — pre-existing
+  behavior (the 8-bit accumulator `LDAbs` does the same); correct in native mode (DBR=0) and the M
+  flag still governs width. An `af→ad` size tweak is orthogonal and out of scope.
+
+## Verification — all PASS (2026-06-14, from-source toolchain + rebuilt SDK)
+
+1. **Non-breaking** — without `+mos-a16`: 6502 corpus 7/7, Inc 1a still 0x0042, far xcheck both
+   emulators agree. The feature/combiner/pass are inert by default; the SDK builds (the LTO link that
+   the legalizer-rule bug crashed). PASS.
+
+```
+==> corpus: 7/7 passed
+a16:     RESULT: PASS — 16-bit STZ (rep/stz/sep) zeroes g16; both emulators read 0x0042
+xcheck:  far-run + far-bank1 both got=0xF3 — bsnes-jg agrees with MAME
+SDK:     SDK OK
+```
+
+2. **16-bit add lowering (the deliverable)** — `a16add.c` with `+mos-a16`: one `rep #$20` … `sep #$20`
+   bracket around `lda`/`adc`/`sta`, `clc` outside it. PASS.
+
+```
+       0: 18           	clc
+       1: c2 20        	rep	#$20
+       3: af 00 00 00  	lda	$0
+       7: 6f 00 00 00  	adc	$0
+       b: 8f 00 00 00  	sta	$0
+       f: e2 20        	sep	#$20
+  PASS: exactly one rep #$20 / one sep #$20 / 16-bit adc present
+```
+
+3. **Correct on both emulators** — `g16 = a16v + b16v` = 0x1234 + 0x1111 = 0x2345, driven solely by
+   the native-mode crt0 (no inline XCE). PASS.
+
+```
+MAME:     SMOKE: PASS addr=0x7E0206 len=2 got=0x2345 (ran 60 ticks)
+bsnes-jg: SMOKE: PASS off=0x206 len=2 got=0x2345 (ran 180 frames, bsnes-jg)
+RESULT: PASS — 16-bit add computes 0x2345; both emulators agree
+```
+
+4. **Smaller than 8-bit mode** — `main` is 31 bytes with `+mos-a16` vs 48 without (the carry chain),
+   meeting ROADMAP step 5's "smaller/faster". PASS.
+
+```
+  a16add.o    main = 31 bytes   (+mos-a16: clc/rep/lda/adc/sta/sep)
+  a16add_8.o  main = 48 bytes   (8-bit ADC carry chain)
+```
+
+5. **No GISel fallback / clean compile** — `a16add.c` compiles and links with no fallback or verifier
+   error; the SDK (LTO) builds clean. PASS.
 
 ## Out of scope (later)
 

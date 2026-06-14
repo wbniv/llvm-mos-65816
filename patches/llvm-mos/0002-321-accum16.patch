@@ -22,6 +22,146 @@ index 66964b1fe..e2cb062d6 100644
  void initializeMOSInternalizePass(PassRegistry &);
  void initializeMOSLateOptimizationPass(PassRegistry &);
  void initializeMOSLowerSelectPass(PassRegistry &);
+diff --git a/llvm/lib/Target/MOS/MOSCombine.td b/llvm/lib/Target/MOS/MOSCombine.td
+index 7a064aa35..adc351efa 100644
+--- a/llvm/lib/Target/MOS/MOSCombine.td
++++ b/llvm/lib/Target/MOS/MOSCombine.td
+@@ -58,6 +58,17 @@ def store_to_memset : GICombineRule<
+           [{ return matchStoreToMemset(*${root}, ${matchinfo}); }]),
+   (apply [{ applyStoreToMemset(*${root}, ${matchinfo}); }])>;
+ 
++// #321 Increment 1b: g = a + b (all 16-bit absolute near globals) =>
++// ADD16Abs, a single 16-bit-accumulator add. Matches the clean pre-legalizer
++// DAG G_STORE(G_ADD(G_LOAD a, G_LOAD b), g); gated on +mos-a16. The matchinfo
++// carries the G_ADD so apply can re-derive the loads.
++def add16_abs_matchdata : GIDefMatchData<"MachineInstr*">;
++def add16_abs : GICombineRule<
++  (defs root:$root, add16_abs_matchdata:$matchinfo),
++  (match (wip_match_opcode G_STORE):$root,
++          [{ return matchAdd16Abs(*${root}, ${matchinfo}); }]),
++  (apply [{ applyAdd16Abs(*${root}, ${matchinfo}); }])>;
++
+ def fold_adde : GICombineRule<
+   (defs root:$root, build_fn_matchinfo:$matchinfo),
+   (match (wip_match_opcode G_UADDE, G_SADDE):$root,
+@@ -96,6 +107,7 @@ def MOSCombiner : GICombiner<"MOSCombinerImpl", [
+   cmpz_zero,
+   load_store_to_memcpy,
+   store_to_memset,
++  add16_abs,
+   fold_adde,
+   fold_sbc,
+   sbc_equal,
+diff --git a/llvm/lib/Target/MOS/MOSCombiner.cpp b/llvm/lib/Target/MOS/MOSCombiner.cpp
+index bff8495ed..c4874d5d2 100644
+--- a/llvm/lib/Target/MOS/MOSCombiner.cpp
++++ b/llvm/lib/Target/MOS/MOSCombiner.cpp
+@@ -110,6 +110,10 @@ public:
+   bool matchStoreToMemset(MachineInstr &MI, uint8_t &Value) const;
+   void applyStoreToMemset(MachineInstr &MI, uint8_t &Value) const;
+ 
++  // #321 Increment 1b: G_STORE(G_ADD(G_LOAD a, G_LOAD b), g) => G_ADD16_ABS.
++  bool matchAdd16Abs(MachineInstr &MI, MachineInstr *&Add) const;
++  void applyAdd16Abs(MachineInstr &MI, MachineInstr *&Add) const;
++
+   bool matchFoldAddE(MachineInstr &MI, BuildFnTy &MatchInfo) const;
+   bool matchFoldSbc(MachineInstr &MI, BuildFnTy &MatchInfo) const;
+   bool matchFoldShift(MachineInstr &MI, BuildFnTy &MatchInfo) const;
+@@ -443,6 +447,94 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
+   MI.eraseFromParent();
+ }
+ 
++// #321 Increment 1b: returns the G_GLOBAL_VALUE def of `Ptr` iff `Ptr` is a
++// plain near (addrspace 0) global address — the addressing mode the 16-bit
++// LDA/ADC/STA absolute forms can take directly. Null otherwise.
++static MachineInstr *nearAbsGlobalDef(Register Ptr,
++                                      const MachineRegisterInfo &MRI) {
++  using namespace TargetOpcode;
++  if (!Ptr.isVirtual() || MRI.getType(Ptr).getAddressSpace() != 0)
++    return nullptr;
++  MachineInstr *Def = MRI.getVRegDef(Ptr);
++  if (!Def || Def->getOpcode() != G_GLOBAL_VALUE)
++    return nullptr;
++  return Def;
++}
++
++// #321 Increment 1b: match g = a + b where a, b, g are 16-bit near (bank 0)
++// absolute globals, i.e. G_STORE(G_ADD(G_LOAD a, G_LOAD b), g), all single-use.
++// Only under +mos-a16. The add (carrying the two loads) is returned for apply.
++bool MOSCombinerImpl::matchAdd16Abs(MachineInstr &MI, MachineInstr *&Add) const {
++  using namespace TargetOpcode;
++  if (!B.getMF().getSubtarget<MOSSubtarget>().hasAccum16())
++    return false;
++
++  const LLT S16 = LLT::scalar(16);
++  auto *Store = dyn_cast<GStore>(&MI);
++  if (!Store || Store->isAtomic())
++    return false;
++  if (MRI.getType(Store->getValueReg()) != S16)
++    return false;
++  if (!nearAbsGlobalDef(Store->getPointerReg(), MRI))
++    return false;
++
++  // The stored value must be a single-use 16-bit G_ADD.
++  Register ValReg = Store->getValueReg();
++  if (!MRI.hasOneNonDBGUse(ValReg))
++    return false;
++  MachineInstr *AddMI = MRI.getVRegDef(ValReg);
++  if (!AddMI || AddMI->getOpcode() != G_ADD)
++    return false;
++
++  // Both addends must be single-use 16-bit plain loads from near abs globals.
++  for (unsigned I : {1, 2}) {
++    Register R = AddMI->getOperand(I).getReg();
++    if (MRI.getType(R) != S16 || !MRI.hasOneNonDBGUse(R))
++      return false;
++    MachineInstr *LdMI = MRI.getVRegDef(R);
++    if (!LdMI || LdMI->getOpcode() != G_LOAD)
++      return false;
++    if (LdMI->getOpcode() == G_LOAD &&
++        !nearAbsGlobalDef(cast<GLoad>(LdMI)->getPointerReg(), MRI))
++      return false;
++  }
++
++  Add = AddMI;
++  return true;
++}
++
++void MOSCombinerImpl::applyAdd16Abs(MachineInstr &MI, MachineInstr *&Add) const {
++  auto &Store = cast<GStore>(MI);
++  B.setInstrAndDebugLoc(MI);
++
++  auto *LoadA = cast<GLoad>(MRI.getVRegDef(Add->getOperand(1).getReg()));
++  auto *LoadB = cast<GLoad>(MRI.getVRegDef(Add->getOperand(2).getReg()));
++
++  // Global-address operands (GlobalValue + offset + target flags) for a, b, g.
++  const MachineOperand &GA =
++      nearAbsGlobalDef(LoadA->getPointerReg(), MRI)->getOperand(1);
++  const MachineOperand &GB =
++      nearAbsGlobalDef(LoadB->getPointerReg(), MRI)->getOperand(1);
++  const MachineOperand &GG =
++      nearAbsGlobalDef(Store.getPointerReg(), MRI)->getOperand(1);
++
++  B.buildInstr(MOS::G_ADD16_ABS)
++      .add(GA)
++      .add(GB)
++      .add(GG)
++      .addMemOperand(&LoadA->getMMO())
++      .addMemOperand(&LoadB->getMMO())
++      .addMemOperand(&Store.getMMO());
++
++  // Erase store (uses add), then add (uses loads), then the now-dead loads;
++  // single-use was verified in the matcher. Dead G_GLOBAL_VALUEs are cleaned up
++  // by later DCE.
++  MI.eraseFromParent();
++  Add->eraseFromParent();
++  LoadA->eraseFromParent();
++  LoadB->eraseFromParent();
++}
++
+ bool MOSCombinerImpl::matchFoldAddE(MachineInstr &MI,
+                                     BuildFnTy &MatchInfo) const {
+   auto LHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
 diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
 index 76d7409c1..34747d30c 100644
 --- a/llvm/lib/Target/MOS/MOSFeatures.td
@@ -213,63 +353,236 @@ index 000000000..34f7e16f3
 +} // namespace llvm
 +
 +#endif // LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
-diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
-index 6d303255c..017b60efb 100644
---- a/llvm/lib/Target/MOS/MOSSubtarget.h
-+++ b/llvm/lib/Target/MOS/MOSSubtarget.h
-@@ -115,6 +115,9 @@ public:
-   bool hasJMPIdxIndir() const { return has65C02() || hasSPC700(); }
-   bool staticStack() const { return StaticStack; }
- 
-+  // #321: opt-in 16-bit accumulator mode (REP/SEP-bracketed 16-bit-A codegen).
-+  bool hasAccum16() const { return HasAccum16; }
-+
-   bool hasW65816Or65EL02() const { return HasW65816Insns || Has65EL02Insns; }
- 
- private:
-@@ -140,6 +143,7 @@ private:
- 
-   bool LongRegisterNames = false;
-   bool StaticStack = false;
-+  bool HasAccum16 = false;
- 
-   // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
-   // no variable, so we instead bind pseudo features to this variable.
-diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index 3bb679dac..5ebd7b205 100644
---- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-+++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-@@ -39,6 +39,7 @@
- #include "MOSIndexIV.h"
- #include "MOSInsertCopies.h"
- #include "MOSInternalize.h"
-+#include "MOSInsertREPSEP.h"
- #include "MOSLateOptimization.h"
- #include "MOSLowerSelect.h"
- #include "MOSMachineFunctionInfo.h"
-@@ -62,6 +63,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
-   initializeMOSCombinerPass(PR);
-   initializeMOSCopyOptPass(PR);
-   initializeMOSInsertCopiesPass(PR);
-+  initializeMOSInsertREPSEPPass(PR);
-   initializeMOSInternalizePass(PR);
-   initializeMOSLateOptimizationPass(PR);
-   initializeMOSLowerSelectPass(PR);
-@@ -322,7 +324,13 @@ void MOSPassConfig::addPreSched2() {
-     addPass(createMOSStaticStackAllocPass());
+diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
+index 12d05bed4..01b3f7a7e 100644
+--- a/llvm/lib/Target/MOS/MOSInstrFormats.td
++++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
+@@ -57,6 +57,15 @@ def HasW65816 : Predicate<"Subtarget->hasW65816()">,
+   let PredicateName = "FeatureW65816";
  }
  
--void MOSPassConfig::addPreEmitPass() { addPass(&BranchRelaxationPassID); }
-+void MOSPassConfig::addPreEmitPass() {
-+  // #321: insert REP/SEP for 16-bit-accumulator instructions (opt-in, +mos-a16;
-+  // a no-op otherwise). Runs before branch relaxation so the added REP/SEP are
-+  // accounted for in branch distances.
-+  addPass(createMOSInsertREPSEPPass());
-+  addPass(&BranchRelaxationPassID);
++// #321 Increment 1b: opt-in 16-bit-accumulator codegen (FeatureAccum16 / +mos-a16).
++// The SubtargetFeature defines the hasAccum16() accessor; this Predicate exposes it
++// to tablegen `let Predicates = [HasAccum16]` so the 16-bit logical ops / pseudos
++// are only available when the feature is on.
++def HasAccum16 : Predicate<"Subtarget->hasAccum16()">,
++                AssemblerPredicate<(all_of FeatureAccum16), "Accum16"> {
++  let PredicateName = "FeatureAccum16";
 +}
++
+ def Has65EL02 : Predicate<"Subtarget->has65EL02()">,
+                 AssemblerPredicate<(all_of Feature65EL02), "65EL02"> {
+   let PredicateName = "Feature65EL02";
+diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
+index e81487e9c..7eb2066a0 100644
+--- a/llvm/lib/Target/MOS/MOSInstrGISel.td
++++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
+@@ -136,6 +136,25 @@ def G_STORE_FAR_ABS : MOSGenericInstruction {
+   let mayStore = true;
+ }
  
- namespace {
++// #321 Increment 1b: a whole 16-bit memory-to-memory add, g = a + b, fused by the
++// pre-legalizer combiner from G_STORE(G_ADD(G_LOAD a, G_LOAD b), g). The three
++// operands are absolute global addresses (a, b, g); the op carries three
++// MachineMemOperands (load a, load b, store g). selectAdd16Abs lowers it to
++// LDAbs16/ADCAbs16/STAbs16 in 16-bit-accumulator mode.
++//
++// It is a MOS target-generic op: a target-specific opcode (so the legalizer skips
++// it by opcode-range — and must NOT get a getActionDefinitionsBuilder rule, which
++// corrupts the legalizer tables), yet isPreISelOpcode=true so InstructionSelect
++// still calls select() on it (same model as #320's G_LOAD_FAR_ABS). Gated on
++// HasAccum16.
++def G_ADD16_ABS : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs);
++  let InOperandList = (ins unknown:$a, unknown:$b, unknown:$g);
++  let mayLoad = true;
++  let mayStore = true;
++}
++
+ // Generalized 8-bit store using the absolute indexed addressing mode. The base
+ // argument isn't a pointer; it's either a global value or a 16-bit immediate.
+ // The index argument is an 8-bit scalar. Additionally expects a
+diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
+index f3eb9549f..68ea5cadf 100644
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
+@@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
+   let isPseudo = true;
+   let isCodeGenOnly = true;
+   let isReMaterializable = true;
++
++  // #321 Increment 1b: the M (accumulator width) TSFlag, mirroring the MC `Inst`
++  // base (MOSInstrFormats.td) at the same bit position (TSFlagMLow = bit 0). The
++  // MOSInsertREPSEP pass runs at addPreEmitPass — before MCInst expansion — so it
++  // reads this flag off the *logical* instruction to bracket 16-bit-accumulator
++  // ops with REP/SEP. Defaults to 0 (8-bit); set to 1 on the 16-bit forms.
++  bit MLow = 0;
++  let TSFlags{0} = MLow;
+ }
  
+ //===---------------------------------------------------------------------===//
+@@ -577,6 +585,48 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+   dag InOperandList = (ins Ac:$src, addr24:$dst);
+ }
+ 
++//===---------------------------------------------------------------------===//
++// #321 Increment 1b: 16-bit-accumulator load/add/store (native M=0 mode)
++//===---------------------------------------------------------------------===//
++//
++// These three logical ops carry a 16-bit value through the A16 accumulator
++// (class Ac16, which holds only A16 = B:A). The MC opcodes are width-agnostic —
++// the same LDA/ADC/STA absolute bytes the M flag governs at runtime — so they
++// PseudoInstExpand to the plain _Absolute forms. MLow=1 tags them so the
++// MOSInsertREPSEP pass wraps the run in one `rep #$20 … sep #$20`. Gated on
++// HasAccum16 (+mos-a16); only ever produced by the selectAdd16Abs selection of
++// the G_ADD16_ABS pseudo, so the default 8-bit codegen never sees them.
++
++// LDA abs (16-bit) — load a 16-bit absolute global into A16.
++def LDAbs16 : MOSLoad, PseudoInstExpansion<(LDA_Absolute addr16:$src)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins addr16:$src);
++}
++
++// ADC abs (16-bit) — A16 = A16 + [abs] + carry. Mirrors the 8-bit MOSAddSub
++// shape (carry in/out + overflow), but on Ac16 and reading absolute memory.
++def ADCAbs16 : MOSLogicalInstr, PseudoInstExpansion<(ADC_Absolute addr16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let mayLoad = true;
++  let isAdd = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout, Vc:$vout);
++  dag InOperandList = (ins Ac16:$l, addr16:$r, Cc:$carryin);
++}
++
++// STA abs (16-bit) — store A16 to a 16-bit absolute global.
++def STAbs16 : MOSStore, PseudoInstExpansion<(STA_Absolute addr16:$dst)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, addr16:$dst);
++}
++
++// The fused 16-bit add (g = a + b) is defined as the target-generic G_ADD16_ABS
++// in MOSInstrGISel.td (so InstructionSelect lowers it via selectAdd16Abs).
++
+ let Predicates = [Has65C02] in {
+   // STZ abs
+   def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+index cbdd54ab2..575ecaa1f 100644
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -96,6 +96,8 @@ private:
+   bool selectIncDecMB(MachineInstr &MI);
+   bool selectUnMergeValues(MachineInstr &MI);
+   bool selectBrIndirect(MachineInstr &MI);
++  // #321 Increment 1b: lower ADD16Abs to a 16-bit-accumulator add sequence.
++  bool selectAdd16Abs(MachineInstr &MI);
+ 
+   // Select instructions that correspond 1:1 to a target instruction.
+   bool selectGeneric(MachineInstr &MI);
+@@ -247,6 +249,9 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+   case MOS::G_BRINDIRECT:
+     return selectBrIndirect(MI);
+ 
++  case MOS::G_ADD16_ABS:
++    return selectAdd16Abs(MI);
++
+   case MOS::G_IMPLICIT_DEF:
+   case MOS::G_LOAD_ZP_IDX:
+   case MOS::G_LOAD_ABS:
+@@ -1928,6 +1933,58 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+   return selectGeneric(MI);
+ }
+ 
++// #321 Increment 1b: lower the fused ADD16Abs (g = a + b, near abs globals)
++// to a 16-bit-accumulator add. Operands 0/1/2 are the global addresses a/b/g;
++// the three MachineMemOperands are load-a, load-b, store-g (in that order).
++// Emits:  clc ; lda a ; adc b ; sta g  — all on the A16 register class. The clc
++// (LDImm1, width-agnostic) goes FIRST, outside the 16-bit run, so MOSInsertREPSEP
++// brackets the three MLow=1 ops (lda/adc/sta) with a single rep #$20 … sep #$20
++// (a clc between lda and adc would split the bracket). lda doesn't touch carry,
++// so ordering clc before it is correct.
++bool MOSInstructionSelector::selectAdd16Abs(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  const MachineOperand &GA = MI.getOperand(0);
++  const MachineOperand &GB = MI.getOperand(1);
++  const MachineOperand &GG = MI.getOperand(2);
++  assert(MI.getNumMemOperands() == 3 && "ADD16Abs wants 3 mem operands");
++  auto MMO = MI.memoperands_begin();
++  MachineMemOperand *MMOA = *MMO++;
++  MachineMemOperand *MMOB = *MMO++;
++  MachineMemOperand *MMOG = *MMO;
++
++  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  Register Sum = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  Register Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
++  Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
++  Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
++
++  // clc (carry-in = 0 for a plain add); emitted first, outside the 16-bit run.
++  auto Clc = Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(0);
++  // lda a  (16-bit) -> A16
++  auto Ld =
++      Builder.buildInstr(MOS::LDAbs16).addDef(Lo).add(GA).addMemOperand(MMOA);
++  // adc b  (16-bit): A16 = Lo + [b] + carry
++  auto Adc = Builder.buildInstr(MOS::ADCAbs16)
++                 .addDef(Sum)
++                 .addDef(CarryOut)
++                 .addDef(VOut)
++                 .addUse(Lo)
++                 .add(GB)
++                 .addUse(Carry)
++                 .addMemOperand(MMOB);
++  // sta g  (16-bit)
++  auto St =
++      Builder.buildInstr(MOS::STAbs16).addUse(Sum).add(GG).addMemOperand(MMOG);
++
++  for (MachineInstrBuilder *B : {&Clc, &Ld, &Adc, &St})
++    constrainSelectedInstRegOperands(*B->getInstr(), TII, TRI, RBI);
++
++  MI.eraseFromParent();
++  return true;
++}
++
+ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+   unsigned Opcode;
+   switch (MI.getOpcode()) {
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 212ede1a0..74709fcd1 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   // where it appears; far load/store select to absolute-long addressing.
+   LLT PF = LLT::pointer(2, 32);
+ 
++  // #321 Increment 1b: G_ADD16_ABS (the fused 16-bit add) deliberately gets NO
++  // rule here. It is a MOS target-specific opcode, so the legalizer skips it by
++  // opcode-range (isPreISelGenericOpcode is false) and needs none. Adding a
++  // getActionDefinitionsBuilder rule for such an opcode corrupts the legalizer's
++  // tables (heap bad-free at teardown) — same reason #320's far pseudos have none.
++
+   // Constants
+ 
+   getActionDefinitionsBuilder(G_CONSTANT)
+diff --git a/llvm/lib/Target/MOS/MOSRegisterBanks.td b/llvm/lib/Target/MOS/MOSRegisterBanks.td
+index 868f6c712..7b5100bfe 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterBanks.td
++++ b/llvm/lib/Target/MOS/MOSRegisterBanks.td
+@@ -11,4 +11,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ // Register banks are unused, so place everything in one big bank.
+-def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Fakei32, Fakei64]>;
++// #321 Increment 1b: Ac16 (the 16-bit accumulator A16) joins the bank so 16-bit
++// accumulator ops can be allocated. Allocation to A16 is forced by the Ac16
++// register class on the selected ops, not by the bank (banks are unused here).
++def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 index 94e229944..253663616 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
@@ -311,3 +624,60 @@ index 94e229944..253663616 100644
  // Instruction-specific register classes.
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
  let isPressureFineGrained = true in {
+diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
+index 6d303255c..017b60efb 100644
+--- a/llvm/lib/Target/MOS/MOSSubtarget.h
++++ b/llvm/lib/Target/MOS/MOSSubtarget.h
+@@ -115,6 +115,9 @@ public:
+   bool hasJMPIdxIndir() const { return has65C02() || hasSPC700(); }
+   bool staticStack() const { return StaticStack; }
+ 
++  // #321: opt-in 16-bit accumulator mode (REP/SEP-bracketed 16-bit-A codegen).
++  bool hasAccum16() const { return HasAccum16; }
++
+   bool hasW65816Or65EL02() const { return HasW65816Insns || Has65EL02Insns; }
+ 
+ private:
+@@ -140,6 +143,7 @@ private:
+ 
+   bool LongRegisterNames = false;
+   bool StaticStack = false;
++  bool HasAccum16 = false;
+ 
+   // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
+   // no variable, so we instead bind pseudo features to this variable.
+diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+index ceb0afe8a..e12e57622 100644
+--- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
++++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+@@ -39,6 +39,7 @@
+ #include "MOSIndexIV.h"
+ #include "MOSInsertCopies.h"
+ #include "MOSInternalize.h"
++#include "MOSInsertREPSEP.h"
+ #include "MOSLateOptimization.h"
+ #include "MOSLowerSelect.h"
+ #include "MOSMachineFunctionInfo.h"
+@@ -62,6 +63,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeMOSCombinerPass(PR);
+   initializeMOSCopyOptPass(PR);
+   initializeMOSInsertCopiesPass(PR);
++  initializeMOSInsertREPSEPPass(PR);
+   initializeMOSInternalizePass(PR);
+   initializeMOSLateOptimizationPass(PR);
+   initializeMOSLowerSelectPass(PR);
+@@ -325,7 +327,13 @@ void MOSPassConfig::addPreSched2() {
+     addPass(createMOSStaticStackAllocPass());
+ }
+ 
+-void MOSPassConfig::addPreEmitPass() { addPass(&BranchRelaxationPassID); }
++void MOSPassConfig::addPreEmitPass() {
++  // #321: insert REP/SEP for 16-bit-accumulator instructions (opt-in, +mos-a16;
++  // a no-op otherwise). Runs before branch relaxation so the added REP/SEP are
++  // accounted for in branch distances.
++  addPass(createMOSInsertREPSEPPass());
++  addPass(&BranchRelaxationPassID);
++}
+ 
+ namespace {
+ 

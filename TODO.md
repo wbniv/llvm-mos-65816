@@ -19,23 +19,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [ ] **#320 full model + upstream.** Five-address-space layout (asiekierka's 32-bit-default, packed
-  24-bit, zero-bank, abs-16) after maintainer ABI blessing; open the PR. Upstream-gated — coordinate
-  on the llvm-mos Discord (@asiekierka/@mysterymath) with the running slice in hand. **Design note
-  drafted + ready to post** ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md));
-  posting to #320/Discord is the next (user-triggered) step.
+- [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
+  ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
+  llvm-mos Discord (@asiekierka/@mysterymath) to open the ABI-blessing discussion. Note is drafted &
+  ready; this is the manual step that unblocks the full model below.
+- [ ] **#320 full five-address-space model + PR.** Implement the five-address-space layout
+  (asiekierka's 32-bit-default, packed 24-bit, zero-bank, abs-16) after maintainer ABI blessing, then
+  open the PR. Upstream-gated — coordinate on Discord with the running slice + design note in hand.
+  Blocked on the posting step above.
 
 ### M2 — Optimizing Payoff
 
-- [wip] **#321 Increment 1b — dual-width accumulator register** (after 1a, done): model `A` as the
-  low half of a 16-bit `C` aliasing the same physical bits (sized by the runtime M flag) + a register
-  bank, so a 16-bit op flows a real value. **Grounding investigation done** (2026-06-14): the natural
-  16-bit cases (copy/const-store/inc) route bytes through X/Y, *not* `A`, so there's **no 1a-style
-  fusion shortcut**; a const-store peephole is only break-even. The first slice that actually wins
-  (smaller + correct) is the **16-bit `add`**, which needs the real register modeling. Approach
-  decision (full register modeling vs an interim INC-absolute idiom) captured in the plan; MC layer
-  (`LDA/ADC_Immediate16`, `MLow` TSFlags) already exists, so the gap is GISel + regalloc.
-  [plan](docs/plans/2026-06-14-321-increment-1b-dual-width-accumulator.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit; REP/SEP
   mode-tracking across control flow + churn minimization; 16-bit arithmetic; **native-mode crt0** (XCE
   + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320 Increment 2);
@@ -64,6 +58,17 @@ starting, or blocked on an external factor)._
 
 
 ## Done
+
+- 2026-06-14 — [321-increment-1b-dual-width-accumulator] **a running 16-bit ADD through the dual-width
+  A16 accumulator** — modeled the 65816's 16-bit accumulator `A16 = B:A` (class `Ac16`, aliasing `A`;
+  named A16 not WDC's "C" to avoid the carry-flag footgun), then fused `g16 = a16v + b16v` via a
+  pre-legalizer combiner rule → a `G_ADD16_ABS` op → `selectAdd16Abs` emitting
+  `clc; rep #$20; lda; adc; sta; sep #$20` (one bracket). Reads `corpus_result == 0x2345` on **both**
+  MAME and bsnes-jg, 31 B vs 48 B for the 8-bit carry chain. Non-breaking: corpus 7/7, Inc 1a + far
+  xcheck green, SDK builds. Findings: a legalizer rule for a MOS-specific *generic* opcode corrupts
+  the legalizer tables (skip by opcode-range instead); the `clc` must sit outside the REP/SEP run.
+  `dev/run.sh a16add`; patch `0002-321-accum16.patch`. The genuine hard core of #321.
+  [plan](docs/plans/2026-06-14-321-increment-1b-dual-width-accumulator.md).
 
 - 2026-06-14 — [321-native-mode-crt0] **SNES platform now boots 65816 native mode** — crt0 `.init.50`
   does `clc; xce` + a 16-bit `ldx #$01ff; txs` (page-1 stack) + `sep #$30` (8-bit A/X default), so
