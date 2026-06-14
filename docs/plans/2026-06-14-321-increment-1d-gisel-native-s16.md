@@ -1,14 +1,17 @@
 # M2 / #321 — Increment 1d: GISel-native 16-bit values (s16 lives in A16 ⊕ Imag16)
 
-**Date:** 2026-06-14 · **Status:** **CORE WORKING — GISel-native 16-bit add lands.** A multi-use
-16-bit **local** intermediate (`t = a + b; g = t; h = t;` — which the peephole *cannot* fuse) now
-compiles under `+mos-a16` to a real 16-bit `adc` on a resident `Imag16` pair (`rep #$20; lda __rc4;
-clc; adc __rc2; sta __rc2; sep #$20`) and computes `corpus_result == 0x1122` on **both** MAME and
-bsnes-jg (`dev/run.sh a16local`). The s16 value lives in `Imag16`, `A16` is transient, and
-`copyPhysReg` moves between them via `LDAImag16`/`STAImag16`. Gating held: **corpus 7/7** and all six
-peephole tests (a16add/sub/bit/imm/chain + 1a) still green — the native and peephole paths coexist.
-The first codegen where the GISel allocator manages a 16-bit value across code, not a fixed peephole
-shape. · **Milestone:** M2 (ROADMAP step 5).
+**Date:** 2026-06-14 · **Status:** **PROTOTYPED, THEN REVERTED — the A16-aliasing coalescer crash is
+the blocker.** The full native path (legalizer keeps s16 `G_ADD`/sub/bitwise un-narrowed under
+`+mos-a16`; `selectAlu16Native` → one 16-bit op on a resident `Imag16` pair; `A16` transient;
+`LDAImag16`/`STAImag16` copies via `copyPhysReg`) was implemented and **compiled correct code for
+simple cases** — a multi-use local add (`t = a+b; g=t; h=t;`) read `0x1122` on both emulators. But it
+**crashes the register coalescer on complex multi-op functions** (e.g. three 16-bit ops + a select):
+an 8-bit constant `LDImm` gets coalesced into `A16`, whose sublo *is* the 8-bit `A`, producing a
+malformed `$a16 = LDImm` that downstream passes choke on. This `A16`-aliases-`A` entanglement is the
+genuine hard core of #321. **Reverted** to keep the tree green (1a-1c peephole stands; corpus 7/7).
+The retry needs allocator-level work: stop `A16`↔`A` coalescing (e.g. mark the copies un-coalescable,
+or model the 16-bit accumulator as a register that does *not* sub-alias the 8-bit `A`). The full
+design + mechanism map below stays valid. · **Milestone:** M2 (ROADMAP step 5).
 **Builds on:** 1b (the `A16` accumulator + `Ac16` + `MOSInsertREPSEP`) and 1c (chained adds,
 [plan](2026-06-14-321-increment-1c-chained-16bit-alu.md)).
 

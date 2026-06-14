@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -61,9 +61,6 @@ Targets:
   a16chain   #321 Increment 1c: build examples/65816/a16chain.c with +mos-a16, assert
              g = a + b + c fuses to one rep/sep bracket threading A16 (lda + 2 adc)
              and reads back correct (corpus_result==0x1230) on MAME + bsnes-jg
-  a16local   #321 Increment 1d: build examples/65816/a16local.c with +mos-a16, assert a
-             multi-use 16-bit local (peephole can't fuse) selects to a native 16-bit
-             adc (Imag16) and reads back correct (corpus_result==0x1122) on MAME + bsnes-jg
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).

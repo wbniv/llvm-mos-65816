@@ -611,26 +611,8 @@ index e81487e9c..6ffb1a0b9 100644
  // Generalized 8-bit store using the absolute indexed addressing mode. The base
  // argument isn't a pointer; it's either a global value or a 16-bit immediate.
  // The index argument is an 8-bit scalar. Additionally expects a
-diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 42a94c356..80b67dd97 100644
---- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-+++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-@@ -664,6 +664,13 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
-       copyPhysRegImpl(Builder, DestReg,
-                       getRegWithVal(Builder, SrcReg, MOS::GPRRegClass));
-     }
-+  } else if (AreClasses(MOS::Imag16RegClass, MOS::Ac16RegClass)) {
-+    // #321 Increment 1d: A16 -> Imag16 zero-page pair. A single 16-bit sta moves
-+    // both bytes of A16 = B:A atomically (no need to address the hidden B byte).
-+    Builder.buildInstr(MOS::STAImag16).addDef(DestReg).addUse(SrcReg);
-+  } else if (AreClasses(MOS::Ac16RegClass, MOS::Imag16RegClass)) {
-+    // #321 Increment 1d: Imag16 pair -> A16 via a single 16-bit lda.
-+    Builder.buildInstr(MOS::LDAImag16).addDef(DestReg).addUse(SrcReg);
-   } else if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
-     assert(SrcReg.isPhysical() && DestReg.isPhysical());
-     copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::sublo),
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..dcf87ca51 100644
+index f3eb9549f..17a41642c 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
@@ -648,7 +630,7 @@ index f3eb9549f..dcf87ca51 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,6 +585,123 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -577,6 +585,97 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -733,32 +715,6 @@ index f3eb9549f..dcf87ca51 100644
 +def ORAImm16 : MOSBitImm16<ORA_Immediate16>;
 +def EORImm16 : MOSBitImm16<EOR_Immediate16>;
 +
-+// #321 Increment 1d: 16-bit zero-page ops for s16 values resident in an Imag16
-+// pair (two contiguous zero-page bytes). The M flag makes these zp opcodes
-+// 16-bit; MLow=1 so the REP/SEP pass brackets them. The Imag16 operand lowers to
-+// its zp symbol (MOSMCInstLower lowerOperand). LDAImag16/STAImag16 move a 16-bit
-+// value between A16 and an Imag16 pair (the 16-bit analog of LD/STImag8, modeling
-+// the imaginary reg as the def); ADCImag16 adds a resident pair into A16.
-+def LDAImag16 : MOSTransfer<Ac16, Imag16>,
-+    PseudoInstExpansion<(LDA_ZeroPage addr8:$src)> {
-+  let Predicates = [HasAccum16];
-+  let MLow = 1;
-+}
-+def STAImag16 : MOSTransfer<Imag16, Ac16>,
-+    PseudoInstExpansion<(STA_ZeroPage addr8:$dst)> {
-+  let Predicates = [HasAccum16];
-+  let MLow = 1;
-+}
-+def ADCImag16 : MOSLogicalInstr, PseudoInstExpansion<(ADC_ZeroPage addr8:$r)> {
-+  let Predicates = [HasAccum16];
-+  let MLow = 1;
-+  let mayLoad = true;
-+  let isAdd = true;
-+  let Constraints = "$dst = $l";
-+  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout, Vc:$vout);
-+  dag InOperandList = (ins Ac16:$l, Imag16:$r, Cc:$carryin);
-+}
-+
 +// STA abs (16-bit) — store A16 to a 16-bit absolute global.
 +def STAbs16 : MOSStore, PseudoInstExpansion<(STA_Absolute addr16:$dst)> {
 +  let Predicates = [HasAccum16];
@@ -773,10 +729,10 @@ index f3eb9549f..dcf87ca51 100644
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..e8e3ce8ba 100644
+index cbdd54ab2..bd36ea20f 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-@@ -96,6 +96,12 @@ private:
+@@ -96,6 +96,10 @@ private:
    bool selectIncDecMB(MachineInstr &MI);
    bool selectUnMergeValues(MachineInstr &MI);
    bool selectBrIndirect(MachineInstr &MI);
@@ -784,25 +740,10 @@ index cbdd54ab2..e8e3ce8ba 100644
 +  bool selectAlu16Abs(MachineInstr &MI);
 +  // #321 Increment 1c: lower a fused 16-bit ADD chain (g = t0 + t1 + ... + tN).
 +  bool selectAddChain16(MachineInstr &MI);
-+  // #321 Increment 1d: lower a GISel-native 16-bit G_ADD (value resident in Imag16).
-+  bool selectAdd16Native(MachineInstr &MI);
  
    // Select instructions that correspond 1:1 to a target instruction.
    bool selectGeneric(MachineInstr &MI);
-@@ -195,6 +201,12 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
-   switch (MI.getOpcode()) {
-   case MOS::G_ADD:
-   case MOS::G_SUB:
-+    // #321 Increment 1d: a 16-bit G_ADD kept un-narrowed by the legalizer (under
-+    // +mos-a16) selects to a single 16-bit ADC on a resident Imag16 pair.
-+    if (MI.getOpcode() == MOS::G_ADD && STI.hasAccum16() &&
-+        MI.getMF()->getRegInfo().getType(MI.getOperand(0).getReg()) ==
-+            LLT::scalar(16))
-+      return selectAdd16Native(MI);
-     if (selectAddSub(MI))
-       return true;
-     break;
-@@ -247,6 +259,16 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -247,6 +251,16 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -819,7 +760,7 @@ index cbdd54ab2..e8e3ce8ba 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -1928,6 +1950,188 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +1942,150 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -967,49 +908,11 @@ index cbdd54ab2..e8e3ce8ba 100644
 +  return true;
 +}
 +
-+// #321 Increment 1d: lower a 16-bit G_ADD (kept un-narrowed under +mos-a16) to a
-+// single 16-bit ADC on a resident Imag16 pair. The s16 value lives in Imag16 (two
-+// contiguous zp bytes); A16 is the transient accumulator. We copy LHS into A16,
-+// add the Imag16 RHS in 16-bit mode, then copy the result out — the COPYs lower
-+// (copyPhysReg) to LDAImag16/STAImag16, no-ops when a value is already in A16.
-+bool MOSInstructionSelector::selectAdd16Native(MachineInstr &MI) {
-+  MachineIRBuilder Builder(MI);
-+  MachineRegisterInfo &MRI = *Builder.getMRI();
-+  const LLT S1 = LLT::scalar(1);
-+
-+  Register Dst = MI.getOperand(0).getReg();
-+  Register LHS = MI.getOperand(1).getReg();
-+  Register RHS = MI.getOperand(2).getReg();
-+
-+  // LHS -> A16 (copyPhysReg emits LDAImag16 if LHS is in an Imag16 pair).
-+  Register LhsAcc = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+  Builder.buildCopy(LhsAcc, LHS);
-+  // clc (carry-in 0); M-agnostic, kept in the REP/SEP bracket.
-+  Register CIn = Builder.buildInstr(MOS::LDCImm, {S1}, {INT64_C(0)}).getReg(0);
-+  // A16 = LhsAcc + [RHS] (16-bit adc on the Imag16 pair).
-+  Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+  auto Adc = Builder.buildInstr(MOS::ADCImag16)
-+                 .addDef(Res)
-+                 .addDef(MRI.createGenericVirtualRegister(S1))
-+                 .addDef(MRI.createGenericVirtualRegister(S1))
-+                 .addUse(LhsAcc)
-+                 .addUse(RHS)
-+                 .addUse(CIn);
-+  constrainSelectedInstRegOperands(*Adc, TII, TRI, RBI);
-+  // The 16-bit result lives in an Imag16 pair (byte-addressable for downstream
-+  // narrowed stores); the A16 -> Imag16 COPY lowers (copyPhysReg) to STAImag16.
-+  RBI.constrainGenericRegister(Dst, MOS::Imag16RegClass, MRI);
-+  Builder.buildCopy(Dst, Res);
-+
-+  MI.eraseFromParent();
-+  return true;
-+}
-+
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..af9644d5a 100644
+index 212ede1a0..74709fcd1 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -1025,25 +928,6 @@ index 212ede1a0..af9644d5a 100644
    // Constants
  
    getActionDefinitionsBuilder(G_CONSTANT)
-@@ -145,7 +151,17 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
- 
-   // Integer Operations
- 
--  getActionDefinitionsBuilder({G_ADD, G_SUB})
-+  // #321 Increment 1d: under +mos-a16, keep a 16-bit G_ADD un-narrowed so it
-+  // selects to a single 16-bit ADC on a resident Imag16 pair (selectAdd16Native),
-+  // instead of the byte-wise S8 carry chain. Gated on hasAccum16 so default
-+  // (6502 / plain mosw65816) codegen is unchanged. G_SUB stays 8-bit for now.
-+  {
-+    auto &AddRule = getActionDefinitionsBuilder(G_ADD).legalFor({S8});
-+    if (STI.hasAccum16())
-+      AddRule.legalFor({S16});
-+    AddRule.widenScalarToNextMultipleOf(0, 8).custom();
-+  }
-+  getActionDefinitionsBuilder(G_SUB)
-       .legalFor({S8})
-       .widenScalarToNextMultipleOf(0, 8)
-       .custom();
 diff --git a/llvm/lib/Target/MOS/MOSRegisterBanks.td b/llvm/lib/Target/MOS/MOSRegisterBanks.td
 index 868f6c712..7b5100bfe 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterBanks.td
@@ -1058,7 +942,7 @@ index 868f6c712..7b5100bfe 100644
 +// register class on the selected ops, not by the bank (banks are unused here).
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index 94e229944..7aed65b18 100644
+index 94e229944..253663616 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 @@ -90,6 +90,24 @@ def P : MOSReg<12, "P"> {
@@ -1098,20 +982,6 @@ index 94e229944..7aed65b18 100644
  // Instruction-specific register classes.
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
  let isPressureFineGrained = true in {
-@@ -205,6 +228,13 @@ def MOSAsmParamRegClass : MOSReg8Class<(add X, Y, S)>;
- def Anyi1 : MOSReg1Class<(add (sequence "RC%uLSB", 0, !add(MaxImag8Regs, -1)), CV_GPR_LSB)>;
- def Anyi8 : MOSReg8Class<(add Imag8, GPR)>;
- 
-+// #321 Increment 1d: the sum type of all 16-bit storage — the 16-bit accumulator
-+// A16 plus the zero-page Imag16 pointer-pairs. The s16 analog of Anyi8; a generic
-+// s16 value lives here, in A16 while it is the ALU operand/result and spilled to
-+// an Imag16 pair otherwise (there is only one A16). Inert until the s16-native
-+// legalizer/selector emit Anyi16 vregs (gated on +mos-a16).
-+def Anyi16 : MOSReg16Class<(add Imag16, Ac16)>;
-+
- def Fake : MOSReg<13, "Fake">;
- let isAllocatable = false in {
-   def Fakei32 : MOSRegClass<[i32], 8, (add Fake)>;
 diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
 index 6d303255c..017b60efb 100644
 --- a/llvm/lib/Target/MOS/MOSSubtarget.h

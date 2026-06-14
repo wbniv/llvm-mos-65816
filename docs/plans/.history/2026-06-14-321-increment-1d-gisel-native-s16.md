@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/95df784) | #321 Inc 1d core: GISel-native 16-bit ADD — the allocator carries an s16 value |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/2eef05c) | #321 Inc 1d: core started + de-risked; turnkey continuation mapped |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/3e00947) | #321 Inc 1d: de-risk the GISel-native core (design + mechanism map) |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/0169001) | #321 Inc 1d step 1: Anyi16 register class (A16 + Imag16), the s16 sum type |
 
 <!--history-meta v1
+95df784	author	Will Norris
+95df784	added	9
+95df784	deleted	1
+95df784	files	1
+95df784	body	Beyond the fixed peephole shapes: under +mos-a16 the legalizer keeps an\ns16 G_ADD un-narrowed (gated on hasAccum16, so the corpus's 8-bit path is\nuntouched), and selectAdd16Native lowers it to ONE 16-bit adc on an\nImag16 pair. The s16 value lives in zero-page Imag16, A16 is transient,\nand copyPhysReg moves between them via new LDAImag16/STAImag16 (the\n16-bit analog of LD/STImag8, modeling the imaginary reg as the def). A\nmulti-use local intermediate — t = a+b; g=t; h=t; — which no peephole can\nfuse (result not single-use) compiles to a native 16-bit adc and reads\ncorpus_result == 0x1122 on BOTH MAME and bsnes-jg.\n\nPieces: Anyi16 (A16+Imag16) sum-type class (foundation, prior commit);\nLDAImag16/STAImag16/ADCImag16 zero-page 16-bit ops; the legalizer gate;\ncopyPhysReg Ac16<->Imag16; the selectAdd16Native dispatch+impl.\n\nNon-breaking: corpus 7/7, all six peephole tests (add/sub/bit/imm/chain +\n1a) green — the native and peephole paths coexist; SDK builds. Finding:\na MachineLICM getRegClassWeight crash traced to the result vreg landing\nin the unconstrained 'any' regbank class — fixed by constraining it to\nImag16. New dev/run.sh a16local + examples/65816/a16local.c. Patch 0002\nregenerated (round-trip verified).\n\nThis is the first codegen where the GISel allocator manages a 16-bit\nvalue across code, not a fixed peephole shape — the general path works.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2eef05c	author	Will Norris
 2eef05c	added	26
 2eef05c	deleted	5

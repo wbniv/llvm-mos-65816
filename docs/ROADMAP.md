@@ -247,14 +247,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    register allocation (A16 ⊕ Imag16 + spilling) + loops + cross-block mode-tracking.
    [Inc 1c plan](plans/2026-06-14-321-increment-1c-chained-16bit-alu.md)._
 
-   _**Increment 1d (2026-06-14): the GISel-native path — the allocator carries a 16-bit value across
-   code.** Under `+mos-a16` the legalizer keeps an s16 `G_ADD` un-narrowed (gated on `hasAccum16`, so
-   the 8-bit corpus is untouched) and `selectAdd16Native` lowers it to one 16-bit `adc` on a resident
-   `Imag16` pair (value in zero-page `Imag16`, `A16` transient; `copyPhysReg` bridges via new
-   `LDAImag16`/`STAImag16`). A **multi-use 16-bit local** — `t = a+b; g=t; h=t;`, which no peephole can
-   fuse — reads `0x1122` on **both** emulators (`dev/run.sh a16local`). Non-breaking: corpus 7/7, all
-   six peephole tests green (native + peephole coexist), SDK builds. The first codegen where the GISel
-   allocator manages a 16-bit value, not a fixed shape — the start of the general optimizing path.
+   _**Increment 1d (2026-06-14): GISel-native s16 — attempted, reverted, blocker isolated.** A prototype
+   kept s16 `G_ADD`/sub/bitwise un-narrowed (gated on `hasAccum16`) and selected to one 16-bit op on a
+   resident `Imag16` pair; it compiled **correct** code for simple cases (a multi-use local add read
+   `0x1122` on both emulators) but **crashes the register coalescer on complex multi-op functions**: an
+   8-bit constant `LDImm` gets coalesced into `A16` (which aliases the 8-bit `A` as its sublo),
+   producing a malformed `$a16 = LDImm`. That `A16`-aliases-`A` allocator entanglement is the genuine
+   hard core of #321; the prototype was reverted to keep the tree green (1a-1c peephole stands). The
+   fix needs allocator/coalescer-level work to keep `A16` and 8-bit `A` from entangling.
    [Inc 1d plan](plans/2026-06-14-321-increment-1d-gisel-native-s16.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
