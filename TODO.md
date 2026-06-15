@@ -73,14 +73,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (xy16) mode dimension** — NOT required for array access; assess whether it pays off before building.
   [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
   [absolute plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
-- [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done so far:
-  ~~the multi-use add chain~~ (`add_chain16_ld`) and ~~immediates *within* add chains~~ (`a+b+c+K` folds
-  the const into the threaded chain as `adc #imm`) — see Done. Remaining: **AND/OR/XOR chains**
-  (homogeneous, no carry-init — generalize `collectAddChain`/the chain pseudo to the bitwise ops); SUB
-  chains are **moot** (the optimizer reassociates `a-b-c` to `a-(b+c)`, not a homogeneous chain); and
-  **spilling when >1 16-bit value is live at once**.
+- [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
+  ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
+  `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
+  **moot** (the optimizer reassociates `a-b-c` to `a-(b+c)`, not a homogeneous chain). Remaining:
+  **spilling when >1 16-bit value is live at once** (the deeper register-allocation work).
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
-  [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md).
+  [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
+  [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
 - [ ] **#321 unify the 1b/1c peephole into the GISel-native path** (cleanup, once the native path is
   proven on a broad corpus). The all-global-shape peephole currently coexists as a proven fast-path;
   fold it into the native path to retire the dual codegen path.
@@ -95,10 +95,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [ ] **Wire the bsnes-jg `xcheck` into CI.** `smoke.yml` runs build + corpus on **MAME only**
-  (manual `workflow_dispatch`). Add the dual-emulator `xcheck` target (and optionally cross-check the
-  full 6502 corpus on bsnes-jg, currently only the fidelity-critical far tests are). This is the
-  "dual-emulator CI bench" promised in the #415 reconciliation.
+- [verify] **Wire the bsnes-jg `xcheck` into CI** — implemented + YAML-validated; a green CI dispatch
+  is the remaining confirmation (heavy, user-triggered: the from-source toolchain build is ~30–90 min).
+  Added an `xcheck` job to `smoke.yml` (parallel to `smoke`): builds the from-source patched toolchain
+  (cached via `actions/cache@v5`, keyed on the backend patches; skipped on hit) + the snes-far SDK,
+  then `dev/run.sh xcheck` on bsnes-jg. Runs unconditionally (no SPC700 secret needed). Verify with
+  `gh workflow run snes-smoke && gh run watch` (cold then warm).
+  [plan](docs/plans/2026-06-15-wire-bsnes-jg-xcheck-into-ci.md) ·
   [second-emulator plan](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
 - [verify] **M1 toolchain incremental-rebuild time not yet measured** — the from-source plan's
   verification step 4 ("editing a backend file relinks fast") is "not separately timed yet"; measure
@@ -398,3 +401,12 @@ llvm-mos change to track) rather than active work._
 - 2026-06-13 — [snes-sdk-platform] SNES SDK platform (crt0, header, link.ld, snes.h, clang.cfg)
   builds a valid 32 KiB LoROM `.sfc` from C via the 6502 backend; structural verification PASS
   (reset→crt0 byte-exact, `main()` placed, checksum 0xFFFF). ROADMAP step 1, structural half.
+
+
+## Inbox — auto-captured plan deferrals
+
+_Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
+
+<!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
+- [ ] **(triage)** ~~**CI wiring** — follows once the local `xcheck` target is green.~~ **Done** — an `xcheck` job was — _from [2026-06-14-second-emulator-cross-check-bsnes-jg.md](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md)_  <!-- fp:152a039b887e2530 -->
+<!-- END auto-captured-deferrals -->

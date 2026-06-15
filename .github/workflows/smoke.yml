@@ -1,6 +1,15 @@
-# M0 SNES smoke loop — build the platform + ROM, then boot it headless in MAME
-# and assert the `sentinel` byte. Closes the run-half of ROADMAP verification step 1.
-# Everything runs in the dev container (dev/run.sh), so CI mirrors local exactly.
+# SNES CI bench — two jobs, both running in the dev container (dev/run.sh) so CI
+# mirrors local exactly:
+#   * smoke  — build the SDK + ROMs and boot the regression corpus headless in
+#              MAME (ROADMAP step 1/2). Uses the stock toolchain; the corpus step
+#              needs the SPC700 IPL secret (below).
+#   * xcheck — second-emulator fidelity cross-check (ROADMAP step 3): boot the
+#              far-pointer ROMs in bsnes-jg (cycle-accurate, independent of MAME)
+#              and assert the same WRAM bytes. Needs the FROM-SOURCE patched
+#              toolchain (build/llvm-mos-install), so it builds that (cached) and
+#              the snes-far SDK first. No SPC700 secret needed (bsnes-jg reads its
+#              vendored Database/), so xcheck runs unconditionally — even without
+#              secrets. See docs/plans/2026-06-15-wire-bsnes-jg-xcheck-into-ci.md.
 #
 # MANUAL-ONLY (workflow_dispatch). For a solo private repo the routine reproducibility
 # gate is the local `dev/run.sh repro` (clean-room build + smoke, no GitHub minutes,
@@ -9,10 +18,10 @@
 # the credibility artifact) or collaborators start pushing. Re-add `push:`/`pull_request:`
 # triggers then. Proven green once: run 27475012894 (2026-06-14).
 #
-# The smoke step needs the SPC700 IPL ROM (Nintendo content, never committed). Set it
-# as a repo secret to enable the smoke step:
+# The smoke corpus step needs the SPC700 IPL ROM (Nintendo content, never committed).
+# Set it as a repo secret to enable that step:
 #   gh secret set SNES_SPC700_ROM_B64 < <(base64 -w0 dev/roms/s_smp/spc700.rom)
-# Without the secret the build still runs and the smoke step is skipped with a warning.
+# Without the secret the build still runs and the corpus step is skipped with a warning.
 name: snes-smoke
 
 on:
@@ -56,3 +65,43 @@ jobs:
       - name: Corpus — boot each program in MAME, assert results
         if: steps.bios.outputs.has_bios == 'true'
         run: dev/run.sh corpus
+
+  # Second-emulator fidelity cross-check on bsnes-jg. Independent of the smoke job
+  # (different, heavier toolchain), runs in parallel, needs no secret.
+  xcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      # Cache the from-source llvm-mos toolchain (clang/lld -> build/llvm-mos-install)
+      # + its ccache. Keyed on the backend patches and the build recipe, so a patch or
+      # recipe change re-keys; restore-keys lets a re-key still reuse the prior ccache
+      # to speed the rebuild. actions/cache@v5 runs on Node 24.
+      - name: Cache from-source toolchain
+        id: toolchain-cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            build/llvm-mos-install
+            build/.ccache
+          key: llvm-mos-toolchain-${{ runner.os }}-${{ hashFiles('patches/llvm-mos/*.patch', 'dev/toolchain.sh', 'dev/Dockerfile') }}
+          restore-keys: |
+            llvm-mos-toolchain-${{ runner.os }}-
+
+      # Build llvm-mos clang/lld from source (~30-90 min). Skipped on an exact cache
+      # hit (build/llvm-mos-install was restored); on a re-key the restored ccache
+      # accelerates this rebuild.
+      - name: Build from-source toolchain (cache miss only)
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        run: dev/run.sh toolchain
+
+      # Build the SDK incl. the snes-far platform against the from-source toolchain.
+      # MOS_TOOLCHAIN is the in-container path (the repo is mounted at /work).
+      - name: Build SDK against the from-source toolchain
+        env:
+          MOS_TOOLCHAIN: /work/build/llvm-mos-install
+        run: dev/run.sh build
+
+      # Build bsnes-jg + the far ROMs and assert hello/far-run/far-bank1 == expected.
+      - name: bsnes-jg cross-check
+        run: dev/run.sh xcheck

@@ -132,4 +132,7 @@ toolchain; bsnes-jg 2.1.0 core built headless in the dev container.
   headless testrunner) — abandoned per Pivot; revisit only if a 26.04-native Mesen build appears.
 - **Cross-checking the full 6502 corpus** on bsnes-jg — cheap to add (same `jgxcheck`), but the corpus
   is standard 6502-in-bank-$00, not the fidelity-critical surface.
-- **CI wiring** — follows once the local `xcheck` target is green.
+- ~~**CI wiring** — follows once the local `xcheck` target is green.~~ **Done** — an `xcheck` job was
+  added to `.github/workflows/smoke.yml` (from-source toolchain cached via `actions/cache@v5`, then
+  the snes-far SDK, then `dev/run.sh xcheck`). See
+  [docs/plans/2026-06-15-wire-bsnes-jg-xcheck-into-ci.md](2026-06-15-wire-bsnes-jg-xcheck-into-ci.md).
