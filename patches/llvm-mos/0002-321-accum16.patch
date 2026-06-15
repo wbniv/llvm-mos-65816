@@ -98,7 +98,7 @@ index 7a064aa35..9fecee3f9 100644
    fold_sbc,
    sbc_equal,
 diff --git a/llvm/lib/Target/MOS/MOSCombiner.cpp b/llvm/lib/Target/MOS/MOSCombiner.cpp
-index bff8495ed..9e9f2c660 100644
+index bff8495ed..20d92df64 100644
 --- a/llvm/lib/Target/MOS/MOSCombiner.cpp
 +++ b/llvm/lib/Target/MOS/MOSCombiner.cpp
 @@ -110,6 +110,29 @@ public:
@@ -131,7 +131,7 @@ index bff8495ed..9e9f2c660 100644
    bool matchFoldAddE(MachineInstr &MI, BuildFnTy &MatchInfo) const;
    bool matchFoldSbc(MachineInstr &MI, BuildFnTy &MatchInfo) const;
    bool matchFoldShift(MachineInstr &MI, BuildFnTy &MatchInfo) const;
-@@ -443,6 +466,414 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
+@@ -443,6 +466,446 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
    MI.eraseFromParent();
  }
  
@@ -284,18 +284,32 @@ index bff8495ed..9e9f2c660 100644
 +
 +// #321 Increment 1c: walk a 16-bit ADD tree rooted at R, gathering its leaf terms
 +// (each a single-use near-abs load) into Terms and the interior G_ADD nodes into
-+// Adds (pre-order, so erasing front-to-back is use-before-def safe). Returns false
-+// if any node is neither a single-use 16-bit G_ADD nor a near-abs load.
++// Adds (pre-order, so erasing front-to-back is use-before-def safe). A constant leaf
++// folds into ConstSum (HasConst set) — rematerializable, so its use-count is
++// irrelevant and it is never erased; the const check precedes the single-use gate
++// that loads/adds require. Returns false if any node is neither a single-use 16-bit
++// G_ADD, a near-abs load, nor a 16-bit constant.
 +static bool collectAddChain(Register R, const MachineRegisterInfo &MRI,
 +                            SmallVectorImpl<GLoad *> &Terms,
-+                            SmallVectorImpl<MachineInstr *> &Adds) {
-+  if (MRI.getType(R) != LLT::scalar(16) || !MRI.hasOneNonDBGUse(R))
++                            SmallVectorImpl<MachineInstr *> &Adds,
++                            int64_t &ConstSum, bool &HasConst) {
++  if (MRI.getType(R) != LLT::scalar(16))
++    return false;
++  // The combiner runs pre-legalize, so a 16-bit literal is a single G_CONSTANT.
++  if (auto C = getIConstantVRegValWithLookThrough(R, MRI)) {
++    ConstSum += C->Value.getSExtValue();
++    HasConst = true;
++    return true;
++  }
++  if (!MRI.hasOneNonDBGUse(R))
 +    return false;
 +  MachineInstr *Def = MRI.getVRegDef(R);
 +  if (Def && Def->getOpcode() == TargetOpcode::G_ADD) {
 +    Adds.push_back(Def);
-+    return collectAddChain(Def->getOperand(1).getReg(), MRI, Terms, Adds) &&
-+           collectAddChain(Def->getOperand(2).getReg(), MRI, Terms, Adds);
++    return collectAddChain(Def->getOperand(1).getReg(), MRI, Terms, Adds, ConstSum,
++                           HasConst) &&
++           collectAddChain(Def->getOperand(2).getReg(), MRI, Terms, Adds, ConstSum,
++                           HasConst);
 +  }
 +  if (GLoad *Ld = nearAbsLoad(R, MRI)) {
 +    Terms.push_back(Ld);
@@ -324,10 +338,13 @@ index bff8495ed..9e9f2c660 100644
 +
 +  SmallVector<GLoad *, 8> Terms;
 +  SmallVector<MachineInstr *, 8> Adds;
-+  if (!collectAddChain(Store->getValueReg(), MRI, Terms, Adds))
++  int64_t ConstSum = 0;
++  bool HasConst = false;
++  if (!collectAddChain(Store->getValueReg(), MRI, Terms, Adds, ConstSum, HasConst))
 +    return false;
-+  // >=3 terms is a real chain; 2 terms is matchAlu16Abs's job (avoid double-fire).
-+  return Terms.size() >= 3;
++  // >=3 chain terms (loads + an optional folded constant) is a real chain; the
++  // 2-operand cases (a+b, a+const) are matchAlu16Abs's job (avoid double-fire).
++  return Terms.size() + (HasConst ? 1 : 0) >= 3;
 +}
 +
 +void MOSCombinerImpl::applyAddChain16(MachineInstr &MI) const {
@@ -336,13 +353,18 @@ index bff8495ed..9e9f2c660 100644
 +
 +  SmallVector<GLoad *, 8> Terms;
 +  SmallVector<MachineInstr *, 8> Adds;
-+  collectAddChain(Store.getValueReg(), MRI, Terms, Adds); // re-derive (matched)
++  int64_t ConstSum = 0;
++  bool HasConst = false;
++  collectAddChain(Store.getValueReg(), MRI, Terms, Adds, ConstSum,
++                  HasConst); // re-derive (matched)
 +
 +  const MachineOperand &GG =
 +      nearAbsGlobalDef(Store.getPointerReg(), MRI)->getOperand(1);
 +  auto MIB = B.buildInstr(MOS::G_ADDCHAIN16_ABS).add(GG); // op 0 = store global
 +  for (GLoad *T : Terms)
 +    MIB.add(nearAbsGlobalDef(T->getPointerReg(), MRI)->getOperand(1));
++  if (HasConst) // trailing immediate term: selector folds it to `adc #imm`
++    MIB.addImm(ConstSum & 0xFFFF);
 +  for (GLoad *T : Terms) // memoperands: the N loads, then the store
 +    MIB.addMemOperand(&T->getMMO());
 +  MIB.addMemOperand(&Store.getMMO());
@@ -378,11 +400,16 @@ index bff8495ed..9e9f2c660 100644
 +
 +  SmallVector<GLoad *, 8> Terms;
 +  SmallVector<MachineInstr *, 8> Adds;
-+  if (!collectAddChain(MI.getOperand(1).getReg(), MRI, Terms, Adds) ||
-+      !collectAddChain(MI.getOperand(2).getReg(), MRI, Terms, Adds))
++  int64_t ConstSum = 0;
++  bool HasConst = false;
++  if (!collectAddChain(MI.getOperand(1).getReg(), MRI, Terms, Adds, ConstSum,
++                       HasConst) ||
++      !collectAddChain(MI.getOperand(2).getReg(), MRI, Terms, Adds, ConstSum,
++                       HasConst))
 +    return false;
-+  // >=3 terms is a real chain; 2 terms is matchAlu16AbsLd's job (avoid double-fire).
-+  return Terms.size() >= 3;
++  // >=3 chain terms (loads + an optional folded constant); the 2-operand cases are
++  // matchAlu16AbsLd's job (avoid double-fire).
++  return Terms.size() + (HasConst ? 1 : 0) >= 3;
 +}
 +
 +void MOSCombinerImpl::applyAddChain16Ld(MachineInstr &MI) const {
@@ -390,14 +417,19 @@ index bff8495ed..9e9f2c660 100644
 +
 +  SmallVector<GLoad *, 8> Terms;
 +  SmallVector<MachineInstr *, 8> Adds;
-+  collectAddChain(MI.getOperand(1).getReg(), MRI, Terms, Adds); // re-derive (matched)
-+  collectAddChain(MI.getOperand(2).getReg(), MRI, Terms, Adds);
++  int64_t ConstSum = 0;
++  bool HasConst = false;
++  collectAddChain(MI.getOperand(1).getReg(), MRI, Terms, Adds, ConstSum,
++                  HasConst); // re-derive (matched)
++  collectAddChain(MI.getOperand(2).getReg(), MRI, Terms, Adds, ConstSum, HasConst);
 +
 +  Register Dst = MI.getOperand(0).getReg();
 +  Register NewDst = MRI.createGenericVirtualRegister(LLT::scalar(16));
 +  auto MIB = B.buildInstr(MOS::G_ADDCHAIN16_ABSLD).addDef(NewDst); // op 0 = result
 +  for (GLoad *T : Terms)
 +    MIB.add(nearAbsGlobalDef(T->getPointerReg(), MRI)->getOperand(1));
++  if (HasConst) // trailing immediate term: selector folds it to `adc #imm`
++    MIB.addImm(ConstSum & 0xFFFF);
 +  for (GLoad *T : Terms) // memoperands: the N loads (no store)
 +    MIB.addMemOperand(&T->getMMO());
 +
@@ -1567,7 +1599,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..d01ff2441 100644
+index cbdd54ab2..56f9f0e88 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1921,7 +1953,7 @@ index cbdd54ab2..d01ff2441 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2208,695 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2208,733 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -2127,11 +2159,14 @@ index cbdd54ab2..d01ff2441 100644
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
 +
-+  const unsigned NumTerms = MI.getNumOperands() - 1; // operand 0 is the store
++  // Operands: 0 = store global, 1..G = term globals, then an OPTIONAL trailing
++  // immediate (the folded constant term). Memoperands: G loads, then the store.
 +  const MachineOperand &GG = MI.getOperand(0);
-+  assert(NumTerms >= 3 && MI.getNumMemOperands() == NumTerms + 1 &&
++  const bool HasConst = MI.getOperand(MI.getNumOperands() - 1).isImm();
++  const unsigned NumGlobals = MI.getNumOperands() - 1 - (HasConst ? 1 : 0);
++  assert(NumGlobals >= 2 && MI.getNumMemOperands() == NumGlobals + 1 &&
 +         "ADDCHAIN16 shape");
-+  auto MMO = MI.memoperands_begin(); // [0..N-1] loads, [N] store
++  auto MMO = MI.memoperands_begin(); // [0..G-1] loads, [G] store
 +
 +  SmallVector<MachineInstrBuilder, 8> New;
 +  // lda t0 -> A16
@@ -2140,8 +2175,8 @@ index cbdd54ab2..d01ff2441 100644
 +                    .addDef(Acc)
 +                    .add(MI.getOperand(1))
 +                    .addMemOperand(MMO[0]));
-+  // clc; adc tI  for each remaining term, threading A16.
-+  for (unsigned I = 1; I < NumTerms; ++I) {
++  // clc; adc tI  for each remaining global term, threading A16.
++  for (unsigned I = 1; I < NumGlobals; ++I) {
 +    Register Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
 +    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(0)); // clc
 +    Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
@@ -2157,11 +2192,27 @@ index cbdd54ab2..d01ff2441 100644
 +                      .addMemOperand(MMO[I]));
 +    Acc = Res;
 +  }
++  // clc; adc #imm  for the folded constant term (if any).
++  if (HasConst) {
++    Register Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
++    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(0)); // clc
++    Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++    Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
++    Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
++    New.push_back(Builder.buildInstr(MOS::ADCImm16)
++                      .addDef(Res)
++                      .addDef(CarryOut)
++                      .addDef(VOut)
++                      .addUse(Acc)
++                      .addImm(MI.getOperand(MI.getNumOperands() - 1).getImm())
++                      .addUse(Carry));
++    Acc = Res;
++  }
 +  // sta g
 +  New.push_back(Builder.buildInstr(MOS::STAbs16)
 +                    .addUse(Acc)
 +                    .add(GG)
-+                    .addMemOperand(MMO[NumTerms]));
++                    .addMemOperand(MMO[NumGlobals]));
 +
 +  for (MachineInstrBuilder &B : New)
 +    constrainSelectedInstRegOperands(*B.getInstr(), TII, TRI, RBI);
@@ -2178,11 +2229,14 @@ index cbdd54ab2..d01ff2441 100644
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
 +
-+  Register Dst = MI.getOperand(0).getReg();          // result (Imag16)
-+  const unsigned NumTerms = MI.getNumOperands() - 1; // operand 0 is the result def
-+  assert(NumTerms >= 3 && MI.getNumMemOperands() == NumTerms &&
++  Register Dst = MI.getOperand(0).getReg(); // result (Imag16)
++  // Operands: 0 = result def, 1..G = term globals, then an OPTIONAL trailing immediate
++  // (the folded constant term). Memoperands: G loads (no store).
++  const bool HasConst = MI.getOperand(MI.getNumOperands() - 1).isImm();
++  const unsigned NumGlobals = MI.getNumOperands() - 1 - (HasConst ? 1 : 0);
++  assert(NumGlobals >= 2 && MI.getNumMemOperands() == NumGlobals &&
 +         "ADDCHAIN16LD shape");
-+  auto MMO = MI.memoperands_begin(); // [0..N-1] loads (no store)
++  auto MMO = MI.memoperands_begin(); // [0..G-1] loads (no store)
 +
 +  SmallVector<MachineInstrBuilder, 8> New;
 +  // lda t0 -> A16
@@ -2191,8 +2245,8 @@ index cbdd54ab2..d01ff2441 100644
 +                    .addDef(Acc)
 +                    .add(MI.getOperand(1))
 +                    .addMemOperand(MMO[0]));
-+  // clc; adc tI  for each remaining term, threading A16.
-+  for (unsigned I = 1; I < NumTerms; ++I) {
++  // clc; adc tI  for each remaining global term, threading A16.
++  for (unsigned I = 1; I < NumGlobals; ++I) {
 +    Register Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
 +    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(0)); // clc
 +    Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
@@ -2206,6 +2260,22 @@ index cbdd54ab2..d01ff2441 100644
 +                      .add(MI.getOperand(1 + I))
 +                      .addUse(Carry)
 +                      .addMemOperand(MMO[I]));
++    Acc = Res;
++  }
++  // clc; adc #imm  for the folded constant term (if any).
++  if (HasConst) {
++    Register Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
++    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(0)); // clc
++    Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++    Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
++    Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
++    New.push_back(Builder.buildInstr(MOS::ADCImm16)
++                      .addDef(Res)
++                      .addDef(CarryOut)
++                      .addDef(VOut)
++                      .addUse(Acc)
++                      .addImm(MI.getOperand(MI.getNumOperands() - 1).getImm())
++                      .addUse(Carry));
 +    Acc = Res;
 +  }
 +  // sta dst (16-bit): the Imag16 dst is DEF'd by the store (imaginary-reg write).

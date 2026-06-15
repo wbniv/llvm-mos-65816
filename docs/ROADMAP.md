@@ -377,8 +377,12 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    couldn't reach — now threads the running sum through A16 via `add_chain16_ld` → `G_ADDCHAIN16_ABSLD`
    (`lda a; clc; adc b; clc; adc c; clc; adc d; sta t`), dropping the N−2 intermediate `sta tmp; lda
    tmp` Imag16 round-trips the per-add path left. `a16chainld` reads 0x1234 with the sum staying in A16
-   (one `sta zp`, not three). Non-breaking (corpus 7/7, all 29 a16* tests green, patch `0002`
-   round-trips).
+   (one `sta zp`, not three). **Immediate chain terms** then extend both chain forms: a constant in the
+   chain (`a + b + c + K`) had broken the match (every leaf had to be a load), dropping the whole chain
+   to the round-tripping per-add path; `collectAddChain` now folds constant leaves into one running
+   immediate and the chain ends in `adc #imm` (`lda a; clc; adc b; clc; adc c; clc; adc #K; sta`) —
+   `a16chainimm` reads 0x2569 (store + multi-use forms, each `+ K`). Non-breaking (corpus 7/7, all 30
+   a16* tests green, patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
@@ -395,7 +399,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [single-use-non-store-fold plan](plans/2026-06-15-321-native-s16-single-use-non-store-fold.md) ·
    [inc/dec plan](plans/2026-06-15-321-native-s16-inc-dec-accumulator.md) ·
    [inc/dec abs plan](plans/2026-06-15-321-native-s16-inc-dec-memory-rmw.md) ·
-   [multi-use-add-chain plan](plans/2026-06-15-321-native-s16-add-chain-multiuse.md)._
+   [multi-use-add-chain plan](plans/2026-06-15-321-native-s16-add-chain-multiuse.md) ·
+   [add-chain-immediate plan](plans/2026-06-15-321-native-s16-add-chain-immediate.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
