@@ -1479,7 +1479,7 @@ index be5daff8f..c39c4be70 100644
    bool shouldRematPhysRegCopy() const override { return false; }
  };
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..06cb6e7dc 100644
+index f3eb9549f..4166c9aa8 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
@@ -1497,7 +1497,7 @@ index f3eb9549f..06cb6e7dc 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,6 +585,260 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -577,6 +585,267 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -1717,8 +1717,15 @@ index f3eb9549f..06cb6e7dc 100644
 +  dag OutOperandList = (outs Ac16:$dst);
 +  dag InOperandList = (ins Ac16:$src);
 +}
-+def ASLAcc16 : MOSShiftAcc16<ASL_Accumulator>;
-+def LSRAcc16 : MOSShiftAcc16<LSR_Accumulator>;
++// asl a / lsr a CLOBBER the carry (shifted-out bit), even though selectShift16Native
++// leaves the carry-out dead. Model that with Defs=[C] so the scheduler/regalloc never
++// places one inside a live-carry interval — e.g. between a `cmp` and the `bcs` that
++// reads its carry (a CRC `if (crc & 0x8000) ... crc <<= 1` hoists the common shift
++// across the test; without this the asl corrupts the branch carry -> miscompile, found
++// by the Tier-1 differential fuzzer). RORAcc16 models its carry as an operand already;
++// INCAcc16/DECAcc16 correctly do NOT clobber C (inc/dec a set only N/Z), so they stay.
++def ASLAcc16 : MOSShiftAcc16<ASL_Accumulator> { let Defs = [C]; }
++def LSRAcc16 : MOSShiftAcc16<LSR_Accumulator> { let Defs = [C]; }
 +
 +// #321 native s16 inc/dec: in 16-bit-accumulator mode one `inc a` / `dec a` steps all
 +// 16 bits, so a 16-bit `x + 1` / `x - 1` selects to a single accumulator inc/dec
@@ -2951,7 +2958,7 @@ index cbdd54ab2..15a59a157 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..773f37ff6 100644
+index 212ede1a0..f6b8d8884 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -3082,7 +3089,29 @@ index 212ede1a0..773f37ff6 100644
    Register Partial;
    Register NewAmt;
    // Shift by one multiples of one byte.
-@@ -1252,6 +1300,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -878,11 +926,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+     case MOS::G_ROTR:
+       break;
+     case MOS::G_ASHR: {
+-      Register Sign = Builder
+-                          .buildICmp(ICmpInst::ICMP_SLT, S1, Src,
+-                                     Builder.buildConstant(Ty, 0))
+-                          .getReg(0);
+-      Fill = Builder.buildSExt(S8, Sign).getReg(0);
++      // Sign-fill byte = the high byte's sign bit broadcast across all 8 bits
++      // (arithmetic-shift-right by 7). The previous formulation built an s16
++      // ICMP_SLT(Src, 0); under +mos-a16 that re-enters the native signed-compare
++      // legalization (the SLT -> ULT sign-flip rewrite) as a compare-result-AS-VALUE
++      // and the legalizer loops — a signed (arithmetic) right shift by >= 8 hung the
++      // compiler. The pure 8-bit sign broadcast is equivalent and never builds an s16
++      // compare. (Found + minimized by the Tier-1 differential fuzzer; see
++      // docs/plans/2026-06-15-321-tier1-broaden-corpus.md and examples/65816/known.)
++      Fill = Builder.buildAShr(S8, DstBytes.back(), Builder.buildConstant(S8, 7))
++                 .getReg(0);
+       break;
+     }
+     case MOS::G_LSHR:
+@@ -1252,6 +1305,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
  
    LLT Type = MRI.getType(LHS);
  
@@ -3111,7 +3140,7 @@ index 212ede1a0..773f37ff6 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1270,7 +1340,29 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1270,7 +1345,29 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -3142,7 +3171,7 @@ index 212ede1a0..773f37ff6 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,25 +1433,31 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,25 +1438,31 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -3178,7 +3207,7 @@ index 212ede1a0..773f37ff6 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1601,14 +1699,70 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1601,14 +1704,70 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
  
@@ -3250,7 +3279,7 @@ index 212ede1a0..773f37ff6 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1645,6 +1799,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1645,6 +1804,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);

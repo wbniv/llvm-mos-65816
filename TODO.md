@@ -45,7 +45,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   path narrows in the **select lowering** (relaxing the EQ branch-gate + `buildNZSelect` did NOT fold
   the s16 compare back to native — investigated 2026-06-15, reverted; needs the select/NZ lowering to
   fold an s16 `G_SBC`); ~~(d) fold a near-abs global RHS into `CMPAbs16`~~ (landed — see Done; also
-  folds the LHS via `lda abs`).
+  folds the LHS via `lda abs`). **⚠ Tier-1 fuzzer finding (2026-06-16): this isn't just suboptimal —
+  in branchy control flow a compare result consumed as a cross-block i1 VALUE materializes via
+  `SelectImm $a16,…` (a GPR where a Flag reg is required) → invalid MIR / backend segfault. Minimized
+  repro `examples/65816/known/a16-cmp-value-selectimm.c`; the fuzzer XFAIL-classifies the signature.
+  The select/NZ-lowering fix here resolves it.**
   [plan](docs/plans/2026-06-14-321-native-16bit-compares.md) ·
   [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
   [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md) ·
@@ -60,7 +64,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   store done — see Done; the X-flag dimension is NOT needed for arrays — llvm-mos is pointer-based;
   remaining: 16-bit absolute & indexed `abs,x`/`(zp),y` load/store); (5) A16-threading (value stays
   live in the accumulator across ops — biggest win but reintroduces the coalescer-crash risk, so
-  deferred behind a broad corpus); ~~(6) cross-block REP/SEP mode-tracking~~ (M-flag done — see Done;
+  deferred behind a broad corpus — **the corpus now exists: Tier 1 landed 2026-06-16 (differential
+  fuzzer + 6 kernels + 2 combinatorial tests; it already found+fixed 2 backend bugs), so this is
+  de-risked and unblocked**); ~~(6) cross-block REP/SEP mode-tracking~~ (M-flag done — see Done;
   X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
   ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
@@ -82,9 +88,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
 - [ ] **#321 unify the 1b/1c peephole into the GISel-native path** (cleanup, once the native path is
-  proven on a broad corpus). The all-global-shape peephole currently coexists as a proven fast-path;
-  fold it into the native path to retire the dual codegen path.
-  [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+  proven on a broad corpus — **that corpus now exists: Tier 1, 2026-06-16, so this is unblocked**). The
+  all-global-shape peephole currently coexists as a proven fast-path; fold it into the native path to
+  retire the dual codegen path.
+  [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
+  [Tier-1 plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit;
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   X-flag is a separate mode dimension still to add to the dataflow); 16-bit arithmetic; **native-mode
@@ -95,6 +103,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
+- [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
+  `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the
+  full `+mos-a16` operator set; compiles each DEFAULT + `+mos-a16`, runs both on MAME + bsnes-jg, and
+  asserts host==default==a16 + `-verify-machineinstrs`. Delta-reduced triage (`build/fuzz-triage/`),
+  reproducible seeds, XFAIL-classified known issues. Run on a quiet box (concurrent load flakes MAME).
+  Re-run before/after any A16-threading (Tier 2) or peephole-unification (Tier 3) change.
+  [Tier-1 plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md). _(See Done for the landing + bugs.)_
 - [verify] **Wire the bsnes-jg `xcheck` into CI** — implemented + YAML-validated; a green CI dispatch
   is the remaining confirmation (heavy, user-triggered: the from-source toolchain build is ~30–90 min).
   Added an `xcheck` job to `smoke.yml` (parallel to `smoke`): builds the from-source patched toolchain
@@ -139,6 +154,9 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-16 — [321-tier1-broaden-corpus] **Tier 1: broaden the test corpus — the safety net that de-risks A16-threading (Tier 2) + peephole unification (Tier 3).** A **differential** corpus: each program's `corpus_result` must agree across host-computed == default(trusted 8-bit) == `+mos-a16` on **both** MAME and bsnes-jg, plus `-verify-machineinstrs`. (1) Seeded **fuzzer** `tools/a16_fuzz.py` + `dev/run.sh fuzz [N] [seed]` — random UB-free C over mixed 16/8-bit vars and the full operator set, with a Python evaluator validated 500/500 against host gcc, delta-reduced triage, XFAIL-classified known issues; `fuzz 50 1` → 42/50 PASS + 8 xfail, **0 mismatch/crash/error**. (2) Six **kernels** (`k_crc16` 0x29B1, `k_fxmul`, `k_prng`, `k_bits`, `k_satadd`, `k_isort`). (3) Two **combinatorial** tests (`a16mix1/2`). It immediately found **3** real defects (next two entries + the deferred SelectImm crash). Non-breaking: a16 suite + kernels + combinatorial = **40/40** on a quiet box, corpus 7/7. [plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md).
+- 2026-06-16 — [321-fix-asl-lsr-carry-clobber] **backend fix (found by Tier-1 `k_crc16`): 16-bit `asl`/`lsr` must model the carry clobber.** A CRC16 differential FAIL (`+mos-a16` 0x036D ≠ correct 0x29B1, both emulators agreeing → deterministic miscompile) minimized to `if (crc & 0x8000) crc=(crc<<1)^P; else crc=crc<<1;`: the hoisted common `crc<<1` (`ASLAcc16`) was scheduled **between** the `cmp` and its `bcs`, clobbering the branch carry (carry := bit 15). `ASLAcc16`/`LSRAcc16` declared no carry def, so the scheduler placed them in a live-carry interval. Fix: `let Defs = [C]` on both (`MOSInstrLogical.td`); `RORAcc16` already modeled carry, `INC/DECAcc16` correctly don't clobber C. Regression `k_crc16` → 0x29B1 both emus; native shifts unaffected; `0002` round-trips. [plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md).
+- 2026-06-16 — [321-fix-ashr-ge8-hang] **backend fix (found by Tier-1 fuzzer): signed `>>` by ≥ 8 hung the compiler.** 5 fuzz seeds timed out the `+mos-a16` compile; minimized to a 2-line `(short)g >> 8` that never terminates (`>> 7` is fine — the native ASHR path covers 1–7; unsigned `>>` is fine; default build compiles in 0.04 s). The `Amt >= 8` byte-decomposition path computed the ASHR sign-fill with an s16 `ICMP_SLT(Src,0)`; under `+mos-a16` that re-enters the native signed-compare legalization as a compare-result-as-VALUE and loops. Fix: 8-bit `AShr(highByte, 7)` sign broadcast — no s16 compare (`MOSLegalizerInfo.cpp`). Regression `a16ashift8` → 0x001F both emus (amounts 8 & 13, neg + pos); `0002` round-trips. Harness hardened too: `_run` retries an environmental timeout, a *persistent* one is surfaced as a triaged CRASH. [plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md).
 - 2026-06-15 — [321-native-s16-bitwise-chains] **ALU-chain ext: 16-bit AND/OR/XOR chains.** A homogeneous ≥3-term bitwise chain of near-abs globals now threads the running value through A16 (`lda a; and b; and c; sta`) with **no carry-init**, the bitwise analogue of the add chain. `collectAddChain` generalized to `collectAluChain` (parameterized by the chain operator + per-op constant fold); new `bit_chain16`/`bit_chain16_ld` combiners + `G_BITCHAIN16_ABS{,LD}` pseudos (opcode-parameterized) + `selectBitChain16`. ADD path left untouched (only the shared walk generalized). SUB chains moot (reassociated to `a-(b+c)`). `a16bitchain` reads 0x6261 (AND/OR/XOR, store + multi-use). 31 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
 - 2026-06-15 — [321-native-s16-add-chain-immediate] **ALU-chain ext: immediate term in an add chain (`a+b+c+K`).** A constant in a ≥3-term add chain had broken the chain match (every leaf had to be a load), dropping the whole chain to the round-tripping per-add path. `collectAddChain` now folds constant leaves into one running immediate (rematerializable, never erased), and both chain forms end in `adc #imm` (`lda a; clc; adc b; clc; adc c; clc; adc #K; sta`). Threshold is `loads + (const?1:0) >= 3`, keeping the 2-operand cases (`a+b`, `a+K`) on the `alu16_abs`/`absld` immediate path. `a16chainimm` reads 0x2569 (store + multi-use forms). 30 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md).
 - 2026-06-15 — [320-321-c-abi-prior-art] **standalone 65816 C calling-convention prior-art note (WDC816CC / ORCA-C).** Documented prior art for the #320/#321 calling-convention decision, read **firsthand** from primary sources: WDC816CC manual pp.21–26 + ORCA/C `Gen.pas` (`GenEnt` emits `tsc/phd/tcd`; `A_X` return class). Both shipped-in-production compilers converge on a **hybrid** frame — args on the hardware stack, then `PHD`/`TCD` remap the Direct Page onto the frame for fast 8-bit-offset locals (hard **256-byte frame cap**, "partly done for speed"), return in **A** (low)/**X** (high); the `near`/`far` keyword model maps onto #320's addrspaces. Surfacing upstream rides the user-triggered #320 posting. Sources vendored (gitignored — redistribution-restricted) at `docs/refs/65816-c-abi/` + `dev/fetch-refs.sh` (sha256-verified). [note](docs/320-321-65816-c-abi-prior-art.md) · [plan](docs/plans/2026-06-15-wdc816cc-orca-c-65816-c-abi-prior-art-note-primary.md).
@@ -402,3 +420,13 @@ llvm-mos change to track) rather than active work._
 - 2026-06-13 — [snes-sdk-platform] SNES SDK platform (crt0, header, link.ld, snes.h, clang.cfg)
   builds a valid 32 KiB LoROM `.sfc` from C via the 6502 backend; structural verification PASS
   (reset→crt0 byte-exact, `main()` placed, checksum 0xFFFF). ROADMAP step 1, structural half.
+
+
+## Inbox — auto-captured plan deferrals
+
+_Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
+
+<!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
+- [ ] **(triage)** A Python fault-injection mode beyond the negative control (not needed — the seed corpus is the — _from [2026-06-15-321-tier1-broaden-corpus.md](docs/plans/2026-06-15-321-tier1-broaden-corpus.md)_  <!-- fp:1562dbbad8b528d7 -->
+- [ ] **(triage)** Backend fixes: if the corpus surfaces a crash/miscompile, minimize → root-cause → fix with the repro — _from [2026-06-15-321-tier1-broaden-corpus.md](docs/plans/2026-06-15-321-tier1-broaden-corpus.md)_  <!-- fp:940edc1e183ba962 -->
+<!-- END auto-captured-deferrals -->

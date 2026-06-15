@@ -125,9 +125,19 @@ Targets:
              (no X/Y byte shuffle); corpus_result==0x5A3D both emus
   a16copy    #321 native s16 fused indirect copy: g = *p folds the indirect load into the store
              (lda (p); sta g, no Imag16 round-trip); corpus_result==0x3456 both emus
+  fuzz       #321 Tier-1 differential fuzzer: generate N random valid C programs (from
+             `seed`, default 25 from seed 1), compile each DEFAULT and +mos-a16, and assert
+             host-expected == default@MAME == a16@MAME == a16@bsnes-jg + a clean
+             -verify-machineinstrs. Mismatches/crashes land in build/fuzz-triage/.
+             Usage: dev/run.sh fuzz [N] [seed]   (e.g. dev/run.sh fuzz 1 1234 to repro a seed)
+  k_*        #321 Tier-1 realistic kernels (CRC16, fixed-point mul, PRNG, popcount/bit-reverse,
+             saturating add, insertion sort): each asserts host==default==+mos-a16 on both emus
+  a16mix*    #321 Tier-1 combinatorial mixing: many s16 features in one body (compares + shifts
+             + chains + calls + spills); asserts host==default==+mos-a16 on both emus
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
-Extra ARGS are forwarded to repro.sh (only meaningful for `repro`).
+Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for
+`repro`, to repro.sh.
 Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH,
 MOS_TOOLCHAIN (toolchain install prefix to build the bench with), BUILD_JOBS.
 USAGE
@@ -153,4 +163,4 @@ exec docker run --rm \
   ${SNES_ROMPATH:+-e SNES_ROMPATH} \
   ${MOS_TOOLCHAIN:+-e MOS_TOOLCHAIN} \
   ${BUILD_JOBS:+-e BUILD_JOBS} \
-  "$IMAGE" bash "/work/dev/${TARGET}.sh"
+  "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}"

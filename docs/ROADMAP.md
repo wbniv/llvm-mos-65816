@@ -408,6 +408,29 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [add-chain-immediate plan](plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
    [bitwise-chains plan](plans/2026-06-15-321-native-s16-bitwise-chains.md)._
 
+   _**Tier 1 — broaden the test corpus (2026-06-16): the safety net that de-risks the two biggest
+   remaining wins.** The per-op micro-tests prove each optimization in isolation but can't surface the
+   crashes/miscompiles that volume + 8/16-bit-width pressure expose — exactly what A16-threading (Tier 2,
+   the coalescer-crash risk) and the 1b/1c→native peephole unification (Tier 3) are gated behind. Tier 1
+   builds a **differential** corpus that triangulates four independent values per program —
+   host-computed == default(trusted 8-bit) == `+mos-a16`, on **both** MAME and bsnes-jg — plus
+   `-verify-machineinstrs`. (1) A seeded **fuzzer** (`tools/a16_fuzz.py`, `dev/run.sh fuzz [N] [seed]`)
+   generates random, strictly-UB-free C over mixed-width 16/8-bit vars and the full `+mos-a16` operator
+   set, compiles each twice, runs both on both emulators, and asserts all agree — unbounded volume that
+   catches crashes AND miscompiles automatically, with delta-reduced triage + reproducible seeds. (2) Six
+   realistic **kernels** (`k_crc16`, `k_fxmul`, `k_prng`, `k_bits`, `k_satadd`, `k_isort`) and (3) two
+   **combinatorial** tests (`a16mix1/2`) commit deterministic regressions that hold many 16-bit values
+   live at once. The corpus immediately did its job — it found **three** distinct real `+mos-a16`
+   defects: a signed-shift-by-≥8 **compile hang** (s16 `ICMP_SLT` in the ASHR byte path loops the
+   legalizer — **fixed**, sign-fill via 8-bit broadcast; regression `a16ashift8`), a 16-bit `asl`/`lsr`
+   **carry-clobber miscompile** (CRC16 read 0x036D≠0x29B1 because `ASLAcc16`/`LSRAcc16` didn't model
+   their carry def and were scheduled between a `cmp` and its `bcs` — **fixed**, `Defs=[C]`; regression
+   `k_crc16`), and a compare-result-as-value `SelectImm`-flag **crash** (**deferred** to the tracked
+   compare→stored-bool follow-up; XFAIL-classified with a committed repro). Both fixes carry committed
+   regression tests; patch `0002` round-trips; the full a16 suite + 6 kernels + 2 combinatorial = 40/40
+   green and corpus 7/7. A16-threading is now de-risked.
+   [Tier-1 plan](plans/2026-06-15-321-tier1-broaden-corpus.md)._
+
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
    the ROM's symbols.)
