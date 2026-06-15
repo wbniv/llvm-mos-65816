@@ -39,9 +39,14 @@ else
   echo "  FAIL: compile crashed/failed"; sed -n '1,12p' "$BUILD/a16localx.cc.err"; exit 1
 fi
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-nadc=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*65\b')   # 65 = adc zp (native)
+# Native s16 adds appear as adc zp (65, Imag16 operand) OR adc abs/long (6f, a near-abs
+# global operand read directly — the mixed-operand load-fold turns t+c16v's global into
+# adc abs). Count both: the 5 source adds map to 5 native adc ops across the two forms.
+nadczp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*65\b')   # adc zp
+nadcabs=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*6f\b')  # adc abs/long
+nadc=$((nadczp + nadcabs))
 nbra=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b') # rep #$20 brackets
-[ "$nadc" -ge 4 ] && echo "  PASS: $nadc native adc-zp ops present (5 s16 adds)" || { echo "  FAIL: expected >=4 adc zp, got $nadc"; rc=1; }
+[ "$nadc" -ge 4 ] && echo "  PASS: $nadc native adc ops present ($nadczp adc-zp + $nadcabs adc-abs, 5 s16 adds)" || { echo "  FAIL: expected >=4 native adc (zp+abs), got $nadc"; rc=1; }
 echo "  ($nbra rep #\$20 brackets — multiple, as expected for spilled multi-op)"
 
 echo "==> compile+link -> $(basename "$ROM")"

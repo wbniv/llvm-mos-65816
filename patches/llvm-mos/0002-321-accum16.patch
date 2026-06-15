@@ -1465,7 +1465,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..652953f2b 100644
+index cbdd54ab2..12d01e7f0 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1815,7 +1815,7 @@ index cbdd54ab2..652953f2b 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2204,545 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2204,583 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -2086,6 +2086,14 @@ index cbdd54ab2..652953f2b 100644
 +// canonicalized to `x + (-C)` upstream), so it never folds an immediate. The now-
 +// dead constant def is removed automatically by isTriviallyDead in the generic
 +// InstructionSelect pass.
++//
++// Mixed-operand fold: a single near-abs global operand (the other being an Imag16
++// register — a local/multi-use value, the case the both-global combiner peephole
++// can't reach) is read directly instead of being materialized into an Imag16 pair.
++// Two independent fold sites: operand A folds into the LHS `lda abs` (LDAbs16);
++// operand B folds into the absolute ALU form (`adc|sbc|and|ora|eor abs`). SUB stays
++// correct without a swap — the minuend is always A (loaded), the subtrahend B. Same
++// 1-to-1 volatile-safe single-use fold as the compare-operand fold (selectSbc16).
 +bool MOSInstructionSelector::selectAlu16Native(MachineInstr &MI) {
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
@@ -2094,17 +2102,18 @@ index cbdd54ab2..652953f2b 100644
 +  Register A = MI.getOperand(1).getReg();
 +  Register B = MI.getOperand(2).getReg();
 +
-+  // Map the generic opcode to (zp ALU opcode, imm ALU opcode [0 = none],
-+  // carry-init: -1 none / 0 clc / 1 sec, commutative).
-+  unsigned AluOpc, ImmOpc;
++  // Map the generic opcode to (zp ALU opcode, abs ALU opcode, imm ALU opcode
++  // [0 = none], carry-init: -1 none / 0 clc / 1 sec, commutative). AbsOpc reads a
++  // near-abs global operand directly (the mixed-operand fold below).
++  unsigned AluOpc, AbsOpc, ImmOpc;
 +  int CarryInit;
 +  bool Commutative;
 +  switch (MI.getOpcode()) {
-+  case MOS::G_ADD: AluOpc = MOS::ADCImag16; ImmOpc = MOS::ADCImm16; CarryInit = 0;  Commutative = true;  break;
-+  case MOS::G_SUB: AluOpc = MOS::SBCImag16; ImmOpc = 0;             CarryInit = 1;  Commutative = false; break;
-+  case MOS::G_AND: AluOpc = MOS::ANDImag16; ImmOpc = MOS::ANDImm16; CarryInit = -1; Commutative = true;  break;
-+  case MOS::G_OR:  AluOpc = MOS::ORAImag16; ImmOpc = MOS::ORAImm16; CarryInit = -1; Commutative = true;  break;
-+  default:         AluOpc = MOS::EORImag16; ImmOpc = MOS::EORImm16; CarryInit = -1; Commutative = true;  break; // G_XOR
++  case MOS::G_ADD: AluOpc = MOS::ADCImag16; AbsOpc = MOS::ADCAbs16; ImmOpc = MOS::ADCImm16; CarryInit = 0;  Commutative = true;  break;
++  case MOS::G_SUB: AluOpc = MOS::SBCImag16; AbsOpc = MOS::SBCAbs16; ImmOpc = 0;             CarryInit = 1;  Commutative = false; break;
++  case MOS::G_AND: AluOpc = MOS::ANDImag16; AbsOpc = MOS::ANDAbs16; ImmOpc = MOS::ANDImm16; CarryInit = -1; Commutative = true;  break;
++  case MOS::G_OR:  AluOpc = MOS::ORAImag16; AbsOpc = MOS::ORAAbs16; ImmOpc = MOS::ORAImm16; CarryInit = -1; Commutative = true;  break;
++  default:         AluOpc = MOS::EORImag16; AbsOpc = MOS::EORAbs16; ImmOpc = MOS::EORImm16; CarryInit = -1; Commutative = true;  break; // G_XOR
 +  }
 +  const bool IsArith = CarryInit >= 0;
 +
@@ -2120,11 +2129,25 @@ index cbdd54ab2..652953f2b 100644
 +    }
 +  }
 +
++  // Mixed-operand fold sites: a single-use near-abs global A folds into `lda abs`;
++  // a single-use near-abs global B (no immediate) folds into the `OP abs` form.
++  SmallVector<MachineInstr *, 2> Folded;
++  MachineInstr *LdA = foldableAbsLoad16(A, MI, MRI);
++  MachineInstr *LdB = Imm ? nullptr : foldableAbsLoad16(B, MI, MRI);
++
 +  SmallVector<MachineInstrBuilder, 4> New;
 +
-+  // lda a (16-bit) -> A16
++  // lda a (16-bit) -> A16. Fold a near-abs global LHS straight into `lda abs`.
 +  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+  New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(A));
++  if (LdA) {
++    New.push_back(Builder.buildInstr(MOS::LDAbs16)
++                      .addDef(Lo)
++                      .add(LdA->getOperand(1))
++                      .cloneMemRefs(*LdA));
++    Folded.push_back(LdA);
++  } else {
++    New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(A));
++  }
 +
 +  Register Carry;
 +  if (IsArith) {
@@ -2133,15 +2156,19 @@ index cbdd54ab2..652953f2b 100644
 +    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(CarryInit));
 +  }
 +
-+  // the ALU op (16-bit): A16 = a OP (b | #imm) (+carry for add/sub).
++  // the ALU op (16-bit): A16 = a OP (b | [b:abs] | #imm) (+carry for add/sub). The
++  // second operand is an immediate, a near-abs global (abs form), or an Imag16 reg.
 +  Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+  auto Alu = Builder.buildInstr(Imm ? ImmOpc : AluOpc).addDef(Res);
++  unsigned EffAluOpc = Imm ? ImmOpc : (LdB ? AbsOpc : AluOpc);
++  auto Alu = Builder.buildInstr(EffAluOpc).addDef(Res);
 +  if (IsArith) {
 +    Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
 +    Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
 +    Alu.addDef(CarryOut).addDef(VOut).addUse(Lo);
 +    if (Imm)
 +      Alu.addImm(*Imm);
++    else if (LdB)
++      Alu.add(LdB->getOperand(1));
 +    else
 +      Alu.addUse(B);
 +    Alu.addUse(Carry);
@@ -2149,8 +2176,14 @@ index cbdd54ab2..652953f2b 100644
 +    Alu.addUse(Lo);
 +    if (Imm)
 +      Alu.addImm(*Imm);
++    else if (LdB)
++      Alu.add(LdB->getOperand(1));
 +    else
 +      Alu.addUse(B);
++  }
++  if (LdB) {
++    Alu.cloneMemRefs(*LdB);
++    Folded.push_back(LdB);
 +  }
 +  New.push_back(Alu);
 +
@@ -2159,6 +2192,11 @@ index cbdd54ab2..652953f2b 100644
 +
 +  for (MachineInstrBuilder &Bld : New)
 +    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++
++  // Erase the folded loads (single-use; this op was their only consumer, and
++  // selection is bottom-up so they are not yet selected).
++  for (MachineInstr *F : Folded)
++    F->eraseFromParent();
 +
 +  MI.eraseFromParent();
 +  return true;
