@@ -550,19 +550,19 @@ class CompileError(Exception):
 def _run(cmd, timeout=120, retries=2):
     """Run a fast, deterministic toolchain command (compile / verify / objdump / checksum).
 
-    A TimeoutExpired here is ENVIRONMENTAL: host load + swap occasionally stretch a
-    normally-sub-second compile past the budget (observed in the Tier-1 50-seed run — 4
-    seeds timed out under contention, yet all compiled in <1s standalone and PASSed on
-    re-run, 48/48). A *real* backend hang (e.g. a register-coalescer infinite loop — the
-    gating defect this suite hunts) times out on EVERY attempt, so retry a few times: a
-    flake clears, a true hang persists across all attempts and is surfaced by the raise."""
+    A *persistent* timeout is a REAL defect, not noise: the gating bug this suite hunts is a
+    backend pass that loops forever (e.g. F1, the `(short)>>8` legalizer hang) — that times
+    out on EVERY attempt, survives the retries, and is surfaced by the final raise. Retries
+    exist only to absorb a *transient* stretch: under heavy concurrent load (a parallel
+    toolchain rebuild + emulator runs) a normally-sub-second compile can blow the budget
+    once and pass immediately on retry. So: a flake clears, a true hang persists."""
     for attempt in range(retries + 1):
         try:
             return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
         except subprocess.TimeoutExpired:
             if attempt == retries:
                 raise
-            sys.stderr.write("  (toolchain timed out >%ss, retry %d/%d — environmental)\n"
+            sys.stderr.write("  (toolchain timed out >%ss, retry %d/%d — transient load?)\n"
                              % (timeout, attempt + 1, retries))
 
 
