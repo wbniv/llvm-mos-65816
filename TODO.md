@@ -402,12 +402,3 @@ llvm-mos change to track) rather than active work._
 - 2026-06-13 — [snes-sdk-platform] SNES SDK platform (crt0, header, link.ld, snes.h, clang.cfg)
   builds a valid 32 KiB LoROM `.sfc` from C via the 6502 backend; structural verification PASS
   (reset→crt0 byte-exact, `main()` placed, checksum 0xFFFF). ROADMAP step 1, structural half.
-
-
-## Inbox — auto-captured plan deferrals
-
-_Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
-
-<!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
-- [ ] **(triage)** ~~**CI wiring** — follows once the local `xcheck` target is green.~~ **Done** — an `xcheck` job was — _from [2026-06-14-second-emulator-cross-check-bsnes-jg.md](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md)_  <!-- fp:152a039b887e2530 -->
-<!-- END auto-captured-deferrals -->
