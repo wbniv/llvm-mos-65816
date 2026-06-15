@@ -23,10 +23,10 @@ index 66964b1fe..e2cb062d6 100644
  void initializeMOSLateOptimizationPass(PassRegistry &);
  void initializeMOSLowerSelectPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSCombine.td b/llvm/lib/Target/MOS/MOSCombine.td
-index 7a064aa35..2f8c0ec6a 100644
+index 7a064aa35..9fecee3f9 100644
 --- a/llvm/lib/Target/MOS/MOSCombine.td
 +++ b/llvm/lib/Target/MOS/MOSCombine.td
-@@ -58,6 +58,48 @@ def store_to_memset : GICombineRule<
+@@ -58,6 +58,58 @@ def store_to_memset : GICombineRule<
            [{ return matchStoreToMemset(*${root}, ${matchinfo}); }]),
    (apply [{ applyStoreToMemset(*${root}, ${matchinfo}); }])>;
  
@@ -49,6 +49,16 @@ index 7a064aa35..2f8c0ec6a 100644
 +  (match (wip_match_opcode G_STORE):$root,
 +          [{ return matchAddChain16(*${root}); }]),
 +  (apply [{ applyAddChain16(*${root}); }])>;
++
++// #321 load-fold (c): the MULTI-USE-result form of add_chain16 — t = t0+...+tN
++// (>=3 near-abs loads) where t is reused => G_ADDCHAIN16_ABSLD (result in Imag16),
++// threading the sum through A16 with no intermediate round-trips. Rooted at the G_ADD;
++// disjoint from add_chain16 (single-store result) and alu16_absld (2-operand).
++def add_chain16_ld : GICombineRule<
++  (defs root:$root),
++  (match (wip_match_opcode G_ADD):$root,
++          [{ return matchAddChain16Ld(*${root}); }]),
++  (apply [{ applyAddChain16Ld(*${root}); }])>;
 +
 +// #321 native s16 load-fold: dst = a OP b (near-abs-global loads, or load + const)
 +// where dst is MULTI-USE => G_{...}16_ABSLD, reading the globals directly via the
@@ -75,22 +85,23 @@ index 7a064aa35..2f8c0ec6a 100644
  def fold_adde : GICombineRule<
    (defs root:$root, build_fn_matchinfo:$matchinfo),
    (match (wip_match_opcode G_UADDE, G_SADDE):$root,
-@@ -96,6 +138,10 @@ def MOSCombiner : GICombiner<"MOSCombinerImpl", [
+@@ -96,6 +148,11 @@ def MOSCombiner : GICombiner<"MOSCombinerImpl", [
    cmpz_zero,
    load_store_to_memcpy,
    store_to_memset,
 +  alu16_abs,
 +  add_chain16,
++  add_chain16_ld,
 +  alu16_absld,
 +  copy16abs,
    fold_adde,
    fold_sbc,
    sbc_equal,
 diff --git a/llvm/lib/Target/MOS/MOSCombiner.cpp b/llvm/lib/Target/MOS/MOSCombiner.cpp
-index bff8495ed..f5e62ac47 100644
+index bff8495ed..9e9f2c660 100644
 --- a/llvm/lib/Target/MOS/MOSCombiner.cpp
 +++ b/llvm/lib/Target/MOS/MOSCombiner.cpp
-@@ -110,6 +110,24 @@ public:
+@@ -110,6 +110,29 @@ public:
    bool matchStoreToMemset(MachineInstr &MI, uint8_t &Value) const;
    void applyStoreToMemset(MachineInstr &MI, uint8_t &Value) const;
  
@@ -101,6 +112,11 @@ index bff8495ed..f5e62ac47 100644
 +  // #321 Increment 1c: g = t0 + t1 + ... + tN (>=3 near-abs loads) => G_ADDCHAIN16_ABS.
 +  bool matchAddChain16(MachineInstr &MI) const;
 +  void applyAddChain16(MachineInstr &MI) const;
++
++  // #321 load-fold (c): the MULTI-USE-result add chain (t = t0+...+tN, t reused) =>
++  // G_ADDCHAIN16_ABSLD (result in Imag16). Rooted at the G_ADD, not a store.
++  bool matchAddChain16Ld(MachineInstr &MI) const;
++  void applyAddChain16Ld(MachineInstr &MI) const;
 +
 +  // #321 native s16 load-fold: G_ALU(G_LOAD a, G_LOAD b | const) with a MULTI-USE
 +  // result => G_{...}16_ABSLD (result in Imag16) — the case alu16_abs can't reach.
@@ -115,7 +131,7 @@ index bff8495ed..f5e62ac47 100644
    bool matchFoldAddE(MachineInstr &MI, BuildFnTy &MatchInfo) const;
    bool matchFoldSbc(MachineInstr &MI, BuildFnTy &MatchInfo) const;
    bool matchFoldShift(MachineInstr &MI, BuildFnTy &MatchInfo) const;
-@@ -443,6 +461,358 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
+@@ -443,6 +466,414 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
    MI.eraseFromParent();
  }
  
@@ -332,6 +348,62 @@ index bff8495ed..f5e62ac47 100644
 +  MIB.addMemOperand(&Store.getMMO());
 +
 +  // Erase store, then the adds (pre-order: parent before child), then the loads.
++  MI.eraseFromParent();
++  for (MachineInstr *A : Adds)
++    A->eraseFromParent();
++  for (GLoad *T : Terms)
++    T->eraseFromParent();
++}
++
++// #321 load-fold (c): match a MULTI-USE 16-bit add chain t = t0 + t1 + ... + tN
++// (>=3 near-abs-global loads) rooted at the G_ADD itself (not a store) — the case
++// add_chain16 (store-rooted) can't reach. Threads the running sum through A16 with the
++// result in an Imag16 pair (selectAddChain16Ld). Disjoint from add_chain16 (single-use
++// store result) and alu16_absld (2-operand: a >=3 chain root has an interior-G_ADD
++// operand, so its both-loads test fails). collectAddChain over the root's two operands
++// requires single-use interior nodes + leaves; only the root may be multi-use.
++bool MOSCombinerImpl::matchAddChain16Ld(MachineInstr &MI) const {
++  using namespace TargetOpcode;
++  if (!B.getMF().getSubtarget<MOSSubtarget>().hasAccum16())
++    return false;
++  if (MI.getOpcode() != G_ADD)
++    return false;
++  Register Dst = MI.getOperand(0).getReg();
++  if (MRI.getType(Dst) != LLT::scalar(16))
++    return false;
++  // Multi-use result ONLY: a single-use result is add_chain16's (store) or stays on the
++  // per-add native path. (Mirrors matchAlu16AbsLd's guard.)
++  if (MRI.hasOneNonDBGUse(Dst))
++    return false;
++
++  SmallVector<GLoad *, 8> Terms;
++  SmallVector<MachineInstr *, 8> Adds;
++  if (!collectAddChain(MI.getOperand(1).getReg(), MRI, Terms, Adds) ||
++      !collectAddChain(MI.getOperand(2).getReg(), MRI, Terms, Adds))
++    return false;
++  // >=3 terms is a real chain; 2 terms is matchAlu16AbsLd's job (avoid double-fire).
++  return Terms.size() >= 3;
++}
++
++void MOSCombinerImpl::applyAddChain16Ld(MachineInstr &MI) const {
++  B.setInstrAndDebugLoc(MI);
++
++  SmallVector<GLoad *, 8> Terms;
++  SmallVector<MachineInstr *, 8> Adds;
++  collectAddChain(MI.getOperand(1).getReg(), MRI, Terms, Adds); // re-derive (matched)
++  collectAddChain(MI.getOperand(2).getReg(), MRI, Terms, Adds);
++
++  Register Dst = MI.getOperand(0).getReg();
++  Register NewDst = MRI.createGenericVirtualRegister(LLT::scalar(16));
++  auto MIB = B.buildInstr(MOS::G_ADDCHAIN16_ABSLD).addDef(NewDst); // op 0 = result
++  for (GLoad *T : Terms)
++    MIB.add(nearAbsGlobalDef(T->getPointerReg(), MRI)->getOperand(1));
++  for (GLoad *T : Terms) // memoperands: the N loads (no store)
++    MIB.addMemOperand(&T->getMMO());
++
++  // Redirect the chain's uses to the new result, then erase the root add, the interior
++  // adds (pre-order: parent before child), and the loads.
++  MRI.replaceRegWith(Dst, NewDst);
 +  MI.eraseFromParent();
 +  for (MachineInstr *A : Adds)
 +    A->eraseFromParent();
@@ -919,7 +991,7 @@ index 12d05bed4..01b3f7a7e 100644
                  AssemblerPredicate<(all_of Feature65EL02), "65EL02"> {
    let PredicateName = "Feature65EL02";
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
-index e81487e9c..8f2bfd943 100644
+index e81487e9c..1758ac09d 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
 +++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
 @@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
@@ -988,7 +1060,7 @@ index e81487e9c..8f2bfd943 100644
  // #320: Generalized 8-bit store using 65816 absolute-long (24-bit) addressing,
  // for far (addrspace 2) pointers. The address argument is a global value or a
  // 24-bit immediate. Selects to STA AbsoluteLong (accumulator only). Additionally
-@@ -136,6 +181,94 @@ def G_STORE_FAR_ABS : MOSGenericInstruction {
+@@ -136,6 +181,106 @@ def G_STORE_FAR_ABS : MOSGenericInstruction {
    let mayStore = true;
  }
  
@@ -1080,10 +1152,22 @@ index e81487e9c..8f2bfd943 100644
 +  let mayStore = true;
 +}
 +
++// #321 load-fold (c): the MULTI-USE-result form of G_ADDCHAIN16_ABS — the add tree's
++// result is a register (Imag16 pair via STAImag16), not a fused store, so it serves a
++// chain whose sum is reused. Operand 0 is the s16 result; operands 1..N are the term
++// globals; it carries N load memoperands (no store). selectAddChain16Ld threads the sum
++// through A16 (lda t0; clc; adc t1; ...; sta dst). Gated on HasAccum16.
++def G_ADDCHAIN16_ABSLD : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins variable_ops);
++  let mayLoad = true;
++}
++
  // Generalized 8-bit store using the absolute indexed addressing mode. The base
  // argument isn't a pointer; it's either a global value or a 16-bit immediate.
  // The index argument is an 8-bit scalar. Additionally expects a
-@@ -155,6 +288,16 @@ def G_STORE_INDIR : MOSGenericInstruction {
+@@ -155,6 +300,16 @@ def G_STORE_INDIR : MOSGenericInstruction {
    let mayStore = true;
  }
  
@@ -1483,7 +1567,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..b614db17c 100644
+index cbdd54ab2..d01ff2441 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1496,7 +1580,7 @@ index cbdd54ab2..b614db17c 100644
    bool selectFrameIndex(MachineInstr &MI);
    std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
    bool selectAddr(MachineInstr &MI);
-@@ -96,6 +99,38 @@ private:
+@@ -96,6 +99,40 @@ private:
    bool selectIncDecMB(MachineInstr &MI);
    bool selectUnMergeValues(MachineInstr &MI);
    bool selectBrIndirect(MachineInstr &MI);
@@ -1507,6 +1591,8 @@ index cbdd54ab2..b614db17c 100644
 +  bool selectAlu16AbsLd(MachineInstr &MI);
 +  // #321 Increment 1c: lower a fused 16-bit ADD chain (g = t0 + t1 + ... + tN).
 +  bool selectAddChain16(MachineInstr &MI);
++  // #321 load-fold (c): the multi-use-result form (t = t0+...+tN, result in Imag16).
++  bool selectAddChain16Ld(MachineInstr &MI);
 +  // #321 Increment 1d-retry: select a native s16 ALU op (G_ADD/G_SUB/G_AND/G_OR/
 +  // G_XOR) whose value lives in an Imag16 zero-page pair (locals/multi-use, not
 +  // just the all-global peephole).
@@ -1535,7 +1621,7 @@ index cbdd54ab2..b614db17c 100644
  
    // Select instructions that correspond 1:1 to a target instruction.
    bool selectGeneric(MachineInstr &MI);
-@@ -195,15 +230,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -195,15 +232,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    switch (MI.getOpcode()) {
    case MOS::G_ADD:
    case MOS::G_SUB:
@@ -1582,7 +1668,7 @@ index cbdd54ab2..b614db17c 100644
    }
  
    if (selectImpl(MI, *CoverageInfo))
-@@ -247,6 +313,34 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -247,6 +315,36 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -1613,11 +1699,13 @@ index cbdd54ab2..b614db17c 100644
 +
 +  case MOS::G_ADDCHAIN16_ABS:
 +    return selectAddChain16(MI);
++  case MOS::G_ADDCHAIN16_ABSLD:
++    return selectAddChain16Ld(MI);
 +
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -777,6 +871,11 @@ struct CmpNZ_match {
+@@ -777,6 +875,11 @@ struct CmpNZ_match {
      CondMI = DefSrcReg->MI;
      if (CondMI->getOpcode() != MOS::G_SBC)
        return false;
@@ -1629,7 +1717,7 @@ index cbdd54ab2..b614db17c 100644
  
      auto CInConst =
          getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
-@@ -789,6 +888,68 @@ struct CmpNZ_match {
+@@ -789,6 +892,68 @@ struct CmpNZ_match {
    }
  };
  
@@ -1698,7 +1786,7 @@ index cbdd54ab2..b614db17c 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -991,6 +1152,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -991,6 +1156,34 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
@@ -1733,7 +1821,7 @@ index cbdd54ab2..b614db17c 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1091,12 +1280,99 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1284,99 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -1833,7 +1921,7 @@ index cbdd54ab2..b614db17c 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2204,647 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2208,695 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -2074,6 +2162,54 @@ index cbdd54ab2..b614db17c 100644
 +                    .addUse(Acc)
 +                    .add(GG)
 +                    .addMemOperand(MMO[NumTerms]));
++
++  for (MachineInstrBuilder &B : New)
++    constrainSelectedInstRegOperands(*B.getInstr(), TII, TRI, RBI);
++
++  MI.eraseFromParent();
++  return true;
++}
++
++// #321 load-fold (c): lower the MULTI-USE add chain t = t0 + ... + tN. Like
++// selectAddChain16 but operand 0 is the s16 RESULT (register) and there is no store
++// global: N term globals (operands 1..N) + N load memoperands. Threads the running sum
++// through A16 and leaves it in an Imag16 pair: lda t0; (clc; adc tI)...; sta dst.
++bool MOSInstructionSelector::selectAddChain16Ld(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  Register Dst = MI.getOperand(0).getReg();          // result (Imag16)
++  const unsigned NumTerms = MI.getNumOperands() - 1; // operand 0 is the result def
++  assert(NumTerms >= 3 && MI.getNumMemOperands() == NumTerms &&
++         "ADDCHAIN16LD shape");
++  auto MMO = MI.memoperands_begin(); // [0..N-1] loads (no store)
++
++  SmallVector<MachineInstrBuilder, 8> New;
++  // lda t0 -> A16
++  Register Acc = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  New.push_back(Builder.buildInstr(MOS::LDAbs16)
++                    .addDef(Acc)
++                    .add(MI.getOperand(1))
++                    .addMemOperand(MMO[0]));
++  // clc; adc tI  for each remaining term, threading A16.
++  for (unsigned I = 1; I < NumTerms; ++I) {
++    Register Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
++    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(0)); // clc
++    Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++    Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
++    Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
++    New.push_back(Builder.buildInstr(MOS::ADCAbs16)
++                      .addDef(Res)
++                      .addDef(CarryOut)
++                      .addDef(VOut)
++                      .addUse(Acc)
++                      .add(MI.getOperand(1 + I))
++                      .addUse(Carry)
++                      .addMemOperand(MMO[I]));
++    Acc = Res;
++  }
++  // sta dst (16-bit): the Imag16 dst is DEF'd by the store (imaginary-reg write).
++  New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Acc));
 +
 +  for (MachineInstrBuilder &B : New)
 +    constrainSelectedInstRegOperands(*B.getInstr(), TII, TRI, RBI);
