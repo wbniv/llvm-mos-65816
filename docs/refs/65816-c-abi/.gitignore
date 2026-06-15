@@ -1,0 +1,7 @@
+# Redistribution-restricted third-party reference docs — vendored locally for
+# primary-source verification, NOT committed (the WDC manual is copyrighted; the
+# ORCA/C source is source-available but not redistributable). Re-fetch with
+# `dev/fetch-refs.sh` (verifies sha256 against SOURCES.md). Provenance + license
+# notes: SOURCES.md (tracked).
+816cc.pdf
+ORCA-C-Gen.pas

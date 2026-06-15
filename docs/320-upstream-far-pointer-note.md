@@ -132,13 +132,14 @@ Flagging it here so the divergence reads as conscious, not accidental.
    slice is built to make flipping it a contained change rather than a leap.
 2. **The five-space layout + final numbering** — including packed-24 (`3`) and zero-bank (`4`), which
    this slice doesn't touch yet.
-3. **Calling convention** (still open in #320/#321). Worth putting documented prior art on the table
-   rather than recollections: the **WDC816CC / ORCA-C** ABI — a PHD/TCD **direct-page frame** with
-   A+X split return values — is captured from the WDC compiler manual and ORCA/C sources. It's the
-   1990s commercial 65816 C ABI that actually shipped games, so it's a concrete reference point for
-   "DP-frame vs the now-viable hardware-stack-relative frame vs the 6502 soft static stack." I can
-   write that up as a standalone prior-art note if it's useful to the discussion. (Bringing the
-   *documented* ABI, not a memory, is the point.)
+3. **Calling convention** (still open in #320/#321). Documented prior art, read firsthand from the
+   WDC816CC manual (pp.21–26) and ORCA/C `Gen.pas`: both shipped-in-production compilers use a
+   **hybrid** frame — arguments on the hardware stack, then `PHD`/`TCD` remap the Direct Page onto the
+   frame for fast 8-bit-offset local access (with a hard **256-byte frame cap**), and return values in
+   **A** (low) / **X** (high). A concrete reference point for "DP-window hybrid vs. the now-viable
+   pure hardware-stack-relative frame vs. the 6502 soft static stack," and its `near`/`far` keyword
+   model maps directly onto #320's address-space layout. Written up standalone (primary-sourced,
+   sources vendored): [docs/320-321-65816-c-abi-prior-art.md](320-321-65816-c-abi-prior-art.md).
 
 ---
 

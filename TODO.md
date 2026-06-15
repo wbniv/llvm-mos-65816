@@ -73,10 +73,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (xy16) mode dimension** — NOT required for array access; assess whether it pays off before building.
   [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
   [absolute plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
-- [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). From the 1c
-  "out of scope": SUB chains (order-sensitive) and AND/OR/XOR chains, immediates *within* chains (1c
-  requires all terms be loads), and **spilling when >1 16-bit value is live at once**.
-  [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md).
+- [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done so far:
+  ~~the multi-use add chain~~ (`add_chain16_ld`) and ~~immediates *within* add chains~~ (`a+b+c+K` folds
+  the const into the threaded chain as `adc #imm`) — see Done. Remaining: **AND/OR/XOR chains**
+  (homogeneous, no carry-init — generalize `collectAddChain`/the chain pseudo to the bitwise ops); SUB
+  chains are **moot** (the optimizer reassociates `a-b-c` to `a-(b+c)`, not a homogeneous chain); and
+  **spilling when >1 16-bit value is live at once**.
+  [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
+  [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md).
 - [ ] **#321 unify the 1b/1c peephole into the GISel-native path** (cleanup, once the native path is
   proven on a broad corpus). The all-global-shape peephole currently coexists as a proven fast-path;
   fold it into the native path to retire the dual codegen path.
@@ -110,10 +114,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   lands in `llvm-mos`, targets any `-mcpu=mosw65816` platform). Strategy + the tier-1/tier-2
   positioning note for engaging @asiekierka on #321 are drafted in
   [415-snes-target-reconciliation](docs/415-snes-target-reconciliation.md). User-triggered (posting).
-- [ ] **Surface WDC816CC/ORCA-C ABI prior art in #320/#321** — low-effort, no-code contribution
-  documenting the calling-convention prior art (DP frame vs hardware-stack frame). Summarized in the
-  [#320 design note](docs/320-upstream-far-pointer-note.md) (open ABI decisions §3) with an offer to
-  expand into a standalone prior-art writeup if the maintainers want it; promote when that's done.
 
 
 ## Watch
@@ -136,6 +136,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-15 — [320-321-c-abi-prior-art] **standalone 65816 C calling-convention prior-art note (WDC816CC / ORCA-C).** Documented prior art for the #320/#321 calling-convention decision, read **firsthand** from primary sources (not the secondary drdevtools capture): WDC816CC manual pp.21–26 + ORCA/C `Gen.pas` (`GenEnt` emits `tsc/phd/tcd`; `A_X` return class). Both shipped-in-production compilers converge on a **hybrid** frame — args on the hardware stack, then `PHD`/`TCD` remap the Direct Page onto the frame for fast 8-bit-offset locals (hard **256-byte frame cap**, "partly done for speed"), return in **A** (low)/**X** (high); the `near`/`far` keyword model maps onto #320's addrspaces. Surfacing upstream rides the user-triggered #320 posting. Sources vendored (gitignored — redistribution-restricted) at `docs/refs/65816-c-abi/` + `dev/fetch-refs.sh` (sha256-verified). [note](docs/320-321-65816-c-abi-prior-art.md) · [plan](docs/plans/2026-06-15-wdc816cc-orca-c-65816-c-abi-prior-art-note-primary.md).
 - 2026-06-15 — [321-native-s16-add-chain-multiuse] **load-fold (c): multi-use add chain (`t = a+b+c+d`, reused).** A ≥3-term add chain of near-abs globals whose result is reused — which `add_chain16` (store-rooted) couldn't reach — now threads the running sum through A16 via a new `add_chain16_ld` combiner → `G_ADDCHAIN16_ABSLD` → `lda a; clc; adc b; clc; adc c; clc; adc d; sta t`, dropping the N−2 intermediate `sta tmp; lda tmp` Imag16 round-trips. Mirrors how `alu16_absld` extended `alu16_abs`; reuses `collectAddChain` over the root's operands (multi-use root, single-use interior). `a16chainld` reads 0x1234 (sum stays in A16: 1 `sta zp`, not 3). **Completes all load-fold follow-ups (a/b/c).** 29 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-add-chain-multiuse.md).
 - 2026-06-15 — [321-native-s16-inc-dec-abs] **`inc a`/`dec a` for global `g ± 1` (+ `inc abs` rejected).** `selectAlu16Abs` now emits `lda <g>; inc/dec a; sta <g>` for a global ±1 instead of `clc; lda; adc #$0001; sta` (3 instrs vs 4), keeping the compiler's 24-bit long addressing. A single `inc abs`/`dec abs` memory-RMW was prototyped and **reverted**: the 65816 has no `inc long`, `inc abs` is DBR-relative, and this platform addresses all data via DBR-independent long loads/stores — the RMW only works via the low-8KB WRAM mirror (DBR=0 + bank-0 LoRAM), a latent miscompile for any high global. `a16incabs` reads 0x3502 (3 inc + 1 dec, no adc #1, no ee/ce). 28 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-inc-dec-memory-rmw.md).
 - 2026-06-15 — [321-native-s16-inc-dec] **1-byte `inc a` / `dec a` (register ±1).** A 16-bit register/local `x ± 1` had dropped to an 8-bit byte inc/dec-with-carry chain (sep/ldx/inc-zp/bne/inc-zp/rep) thrashing M-mode in a 16-bit region. `legalizeAddSub` now keeps s16 ±1 un-narrowed under +mos-a16 and `selectAlu16Native` emits one `inc a`/`dec a` (new `INCAcc16`/`DECAcc16` MLow=1 pseudos; ADD+1/SUB-1→inc, ADD-1/SUB+1→dec). `a16incdec` reads 0x2668 (2 inc + 2 dec, no byte chain); `a16loopred` guards that a counted `while(i){x++;i--}` still strength-reduces to a native 16-bit add (0x1239). Bonus: the now-native trailing `+1` removes a forced mode switch in a16ashift (drops a sep) and a16ptr (merges 2 rep brackets); both gates updated. Variable/≥8 shifts intentionally left (libcall / byte-relabel already optimal); memory-RMW `inc abs` is the follow-up. 27 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-inc-dec-accumulator.md).
