@@ -1176,7 +1176,7 @@ index be5daff8f..c39c4be70 100644
    bool shouldRematPhysRegCopy() const override { return false; }
  };
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..e07e6756a 100644
+index f3eb9549f..01974dd9f 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
@@ -1194,7 +1194,7 @@ index f3eb9549f..e07e6756a 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,6 +585,242 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -577,6 +585,253 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -1417,6 +1417,17 @@ index f3eb9549f..e07e6756a 100644
 +def ASLAcc16 : MOSShiftAcc16<ASL_Accumulator>;
 +def LSRAcc16 : MOSShiftAcc16<LSR_Accumulator>;
 +
++// #321 native s16 inc/dec: in 16-bit-accumulator mode one `inc a` / `dec a` steps all
++// 16 bits, so a 16-bit `x + 1` / `x - 1` selects to a single accumulator inc/dec
++// (1 byte, no carry-init) instead of `(clc;) adc #$0001` — and far better than the
++// 8-bit byte inc/dec-with-carry chain the default path emits. Same accumulator-RMW
++// shape as ASLAcc16 (MLow=1, $dst=$src, no extra operands); inc a / dec a set N/Z but
++// not C/V, which is correct for a plain ±1 (G_ADD/G_SUB carry out is unused here). The
++// value enters A16 only via LDAImag16/LDAbs16 and leaves only via STAImag16 (no Ac16<->
++// 8-bit COPY). Used by selectAlu16Native. Memory-RMW `inc abs` is a follow-up.
++def INCAcc16 : MOSShiftAcc16<INC_Accumulator>;
++def DECAcc16 : MOSShiftAcc16<DEC_Accumulator>;
++
 +// #321 native s16 arithmetic right shift (signed `>>`): the 65816 has no native
 +// ASR, but in 16-bit mode `cmp #$8000` sets carry = the sign bit (A >= 0x8000) and
 +// `ror a` rotates that carry back into bit 15 while shifting right — so the sign
@@ -1465,7 +1476,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..12d01e7f0 100644
+index cbdd54ab2..35e5cc8cc 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1815,7 +1826,7 @@ index cbdd54ab2..12d01e7f0 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2204,583 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2204,623 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -2117,6 +2128,46 @@ index cbdd54ab2..12d01e7f0 100644
 +  }
 +  const bool IsArith = CarryInit >= 0;
 +
++  // #321 native 16-bit inc/dec: a 16-bit ±1 is one `inc a`/`dec a` on A16 (1 byte, no
++  // carry-init), not `(clc;) adc #$0001`. Compute the signed step from a constant
++  // operand: ADD by +1 / SUB by -1 -> inc; ADD by -1 (0xFFFF) / SUB by +1 -> dec. For
++  // ADD (commutative) the constant may be either operand; for SUB it must be the
++  // subtrahend B (`1 - x` is not a decrement). The value loads via the LHS abs-fold
++  // (lda abs near-abs global, else lda zp); inc/dec a sets N/Z (carry-out unused). All
++  // MLow=1 -> one rep/sep bracket, value enters/leaves A16 only via the load/store.
++  if (MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB) {
++    auto stepOf = [](int64_t C) -> int { return C == 1 ? 1 : (C == 0xFFFF ? -1 : 0); };
++    int Step = 0;
++    Register Val;
++    if (MI.getOpcode() == MOS::G_ADD) {
++      if (auto C = getImm16Operand(B, MRI)) { Step = stepOf(*C); Val = A; }
++      if (!Step)
++        if (auto C = getImm16Operand(A, MRI)) { Step = stepOf(*C); Val = B; }
++    } else { // G_SUB: only the subtrahend (B) as a constant is an inc/dec
++      if (auto C = getImm16Operand(B, MRI)) { Step = -stepOf(*C); Val = A; }
++    }
++    if (Step) {
++      SmallVector<MachineInstrBuilder, 3> New;
++      MachineInstr *LdV = foldableAbsLoad16(Val, MI, MRI);
++      Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++      if (LdV)
++        New.push_back(Builder.buildInstr(MOS::LDAbs16).addDef(Lo)
++                          .add(LdV->getOperand(1)).cloneMemRefs(*LdV));
++      else
++        New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(Val));
++      Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++      New.push_back(Builder.buildInstr(Step > 0 ? MOS::INCAcc16 : MOS::DECAcc16)
++                        .addDef(Res).addUse(Lo));
++      New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Res));
++      for (MachineInstrBuilder &Bld : New)
++        constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++      if (LdV)
++        LdV->eraseFromParent();
++      MI.eraseFromParent();
++      return true;
++    }
++  }
++
 +  // Fold a constant operand into the immediate form (not for SUB: no SBCImm16).
 +  // After the (optional) swap, A is the register loaded into A16 and Imm (if set)
 +  // is the second operand; otherwise B is the register second operand.
@@ -2400,7 +2451,7 @@ index cbdd54ab2..12d01e7f0 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..bb803bb71 100644
+index 212ede1a0..773f37ff6 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -2485,21 +2536,21 @@ index 212ede1a0..bb803bb71 100644
    auto [Dst, Src] = MI.getFirst2Regs();
    assert(MRI.getType(Dst).isByteSized());
  
-+  // #321 Increment 1d-retry: under +mos-a16, leave a non-±1 s16 add/sub
-+  // UN-narrowed for the selector (selectAdd16Native), which carries the value in
-+  // an Imag16 zero-page pair and emits a single 16-bit lda/adc/sta on the
-+  // transient A16. ±1 still uses the inc/dec path below (smaller, no accumulator
-+  // needed). Gated on hasAccum16 so default 8-bit codegen keeps narrowing.
++  // #321 Increment 1d-retry: under +mos-a16, leave an s16 add/sub UN-narrowed for the
++  // selector (selectAlu16Native), which carries the value in an Imag16 zero-page pair
++  // and emits a single 16-bit lda/adc/sta on the transient A16. This now includes ±1:
++  // selectAlu16Native turns a 16-bit ±1 into one `inc a`/`dec a` (the 8-bit byte
++  // inc/dec-with-carry chain below thrashes M-mode inside a 16-bit region). Gated on
++  // hasAccum16 so default 8-bit codegen keeps narrowing (incl. the byte inc/dec path).
 +  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
 +  const LLT Ty = MRI.getType(Dst);
++  if (STI.hasAccum16() && Ty == LLT::scalar(16))
++    return true; // legal as-is; selected natively (selectAlu16Native)
 +
    auto RHSConst =
        getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
 -  if (!RHSConst || std::abs(RHSConst->Value.getSExtValue()) != 1)
 +  if (!RHSConst || std::abs(RHSConst->Value.getSExtValue()) != 1) {
-+    // Native s16 add/sub: left un-narrowed for selectAlu16Native (value in Imag16).
-+    if (STI.hasAccum16() && Ty == LLT::scalar(16))
-+      return true; // legal as-is; selected natively
      return Helper.narrowScalarAddSub(MI, 0, S8) !=
             LegalizerHelper::UnableToLegalize;
 +  }

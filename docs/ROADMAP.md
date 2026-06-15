@@ -357,7 +357,17 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `alu16_absld` skips via its `>1 use` guard and `alu16_abs` skips as a non-store) now folds both
    operands in `selectAlu16Native` (`lda abs a; OP abs b`), identical to the `alu16_absld` output;
    `a16sunfold` reads 0x3480 with zero globals materialized into Imag16 pairs (a regression guard — no
-   new codegen). Non-breaking (corpus 7/7, all 25 a16* tests green, patch `0002` round-trips).
+   new codegen). **Native 16-bit `inc a`/`dec a`** then closes the inc/dec gap: a register/local 16-bit
+   `x ± 1` had dropped to an 8-bit byte inc/dec-with-carry chain (`sep; ldx; stx; inc zp; bne; inc zp;
+   rep`) even under `+mos-a16`, thrashing M-mode inside a 16-bit region. `legalizeAddSub` now keeps s16
+   `±1` un-narrowed and `selectAlu16Native` emits one `inc a`/`dec a` on A16 (new `INCAcc16`/`DECAcc16`
+   `MLow=1` forms; `G_ADD +1` / `G_SUB -1` → inc, `G_ADD -1` / `G_SUB +1` → dec) — `a16incdec` reads
+   0x2668 with 2× inc + 2× dec, no byte chain. As a bonus the now-native trailing `+1` lets two existing
+   tests stay in one M16 region (`a16ashift` drops a `sep`, `a16ptr` merges two `rep` brackets — fewer
+   mode switches), and `a16loopred` guards that a counted `while(i){x++;i--}` still strength-reduces to a
+   single native 16-bit add (0x1239). Variable shifts (libcall) and amount-≥8 shifts (byte-relabel
+   already optimal) are intentionally left; the memory-RMW `inc abs` is a follow-up. Non-breaking
+   (corpus 7/7, all 27 a16* tests green, patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
@@ -371,7 +381,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [absolute-load-store plan](plans/2026-06-15-321-native-16bit-absolute-load-store.md) ·
    [compare-operand-fold plan](plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md) ·
    [mixed-operand-fold plan](plans/2026-06-15-321-native-s16-mixed-operand-load-fold.md) ·
-   [single-use-non-store-fold plan](plans/2026-06-15-321-native-s16-single-use-non-store-fold.md)._
+   [single-use-non-store-fold plan](plans/2026-06-15-321-native-s16-single-use-non-store-fold.md) ·
+   [inc/dec plan](plans/2026-06-15-321-native-s16-inc-dec-accumulator.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

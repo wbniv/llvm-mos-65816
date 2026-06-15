@@ -46,8 +46,11 @@ ncmp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c9 00 80\b' || true)  
 nror=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*6a\b' || true)        # ror a
 nlsr=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*4a\b' || true)        # lsr a (8-bit chain)
 nlib=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(20|22)\b' || true)   # jsr/jsl (shift libcall)
+ninca=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*1a\b' || true)       # inc a (the trailing +1)
 [ "$nrep" -ge 1 ] && echo "  PASS: $nrep rep #\$20 bracket(s)" || { echo "  FAIL: no rep #\$20"; rc=1; }
-[ "$nsep" -ge 1 ] && echo "  PASS: $nsep sep #\$20" || { echo "  FAIL: no sep #\$20"; rc=1; }
+# The trailing `+1` is now a native `inc a` (not an 8-bit byte inc), so the whole run
+# stays in one M16 region — no `sep` is forced mid-function (nsep may legitimately be 0).
+[ "$ninca" -ge 1 ] && echo "  PASS: trailing +1 is native inc a — stays M16, no forced sep (nsep=$nsep)" || { echo "  FAIL: trailing +1 not native inc a (nsep=$nsep)"; rc=1; }
 [ "$ncmp" -eq 3 ] && echo "  PASS: 3 cmp #\$8000 (sign probe, one per bit)" || { echo "  FAIL: expected 3 cmp #\$8000, got $ncmp"; rc=1; }
 [ "$nror" -eq 3 ] && echo "  PASS: 3 ror a (sign rotate, one per bit, 16-bit)" || { echo "  FAIL: expected 3 ror a, got $nror"; rc=1; }
 [ "$nlsr" -eq 0 ] && echo "  PASS: no 8-bit lsr a (not the byte chain)" || { echo "  FAIL: found $nlsr lsr a — shift narrowed to 8-bit"; rc=1; }

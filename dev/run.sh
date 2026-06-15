@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16ptr|a16abs|a16copy|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16incdec|a16loopred|a16ptr|a16abs|a16copy|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -101,6 +101,12 @@ Targets:
   a16sunfold #321 native s16 load-fold (b): a both-global ALU op with a single-use non-store
              result folds both operands directly (selectAlu16Native) — no global materialized
              into an Imag16 pair; corpus_result==0x3480 both emus
+  a16incdec  #321 native s16 inc/dec: a register/local 16-bit x+1 / x-1 selects to one inc a
+             (1a) / dec a (3a) in M16, not the 8-bit byte inc/dec carry chain;
+             corpus_result==0x2668 both emus
+  a16loopred #321 native s16 loop strength-reduction: a counted `while(i){x++;i--}` combines to
+             a single native 16-bit add (x += n), not a per-iteration inc loop or libcall;
+             corpus_result==0x1239 both emus
   a16ptr     #321 native s16 indirect load/store: *p / a[i] use one 16-bit lda (zp)/sta (zp) in M16
              (no (zp),y byte pair); corpus_result==0xABCE both emus
   a16abs     #321 native s16 absolute load/store: g = gg uses one 16-bit lda abs/sta abs in M16

@@ -43,7 +43,10 @@ nrep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b' || true)
 nldai=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*b2\b' || true)        # lda (zp)
 nstai=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*92\b' || true)        # sta (zp)
 nidxy=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(b1|91)\b' || true)   # lda/sta (zp),y byte pair
-[ "$nrep" -ge 2 ] && echo "  PASS: $nrep rep #\$20 bracket(s) — native 16-bit indirect access" || { echo "  FAIL: expected >=2 rep #\$20, got $nrep"; rc=1; }
+# One or more rep brackets: the indirect ops are 16-bit (the real check is the b2/92
+# below). With the native trailing `+1` (inc a) the whole body can stay in one M16 run,
+# so the bracket count merged from 2 to 1 — fewer mode switches, still fully native.
+[ "$nrep" -ge 1 ] && echo "  PASS: $nrep rep #\$20 bracket(s) — native 16-bit indirect access" || { echo "  FAIL: expected >=1 rep #\$20, got $nrep"; rc=1; }
 [ "$nldai" -ge 1 ] && echo "  PASS: $nldai lda (zp) (16-bit indirect load)" || { echo "  FAIL: no lda (zp) (b2)"; rc=1; }
 [ "$nstai" -ge 1 ] && echo "  PASS: $nstai sta (zp) (16-bit indirect store)" || { echo "  FAIL: no sta (zp) (92)"; rc=1; }
 [ "$nidxy" -eq 0 ] && echo "  PASS: no (zp),y byte pair (fully native 16-bit)" || { echo "  FAIL: found $nidxy (zp),y ops — access narrowed to 8-bit"; rc=1; }
