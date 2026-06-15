@@ -2,8 +2,8 @@
 
 *A reference for the llvm-mos #320/#321 calling-convention decision: documented 1990s commercial
 65816 C ABIs, read from **primary sources** — the WDC816CC compiler manual and the ORCA/C compiler
-source — not from recollection or a secondary summary. Every claim below cites the manual page or the
-`Gen.pas` line it came from.*
+source — not recollection. Every claim below cites the manual page or the `Gen.pas` line it came
+from.*
 
 *Sources are vendored locally under `docs/refs/65816-c-abi/` (gitignored — they are
 redistribution-restricted third-party docs; see `docs/refs/65816-c-abi/SOURCES.md` for URLs, sha256,
@@ -143,9 +143,6 @@ prior art, not memory.
   an ABI reference (its `Gen.pas` is the authority cited here), not as a portable codebase.
 - This is prior art, not a constraint. The value is that two independent commercial compilers, read
   firsthand, converged on the same stack-pass + DP-window frame and the same A/X return.
-- A secondary capture exists (drdevtools Zardoz investigation,
-  `drdevtools/docs/investigations/2026-06-12-zardoz-65816-compiler.md`) — **see also only**; it is a
-  provisional AI-assisted summary, superseded here by the primary sources.
 
 ## Sources
 

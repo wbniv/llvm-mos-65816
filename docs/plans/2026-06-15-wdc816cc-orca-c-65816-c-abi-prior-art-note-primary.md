@@ -3,12 +3,10 @@
 ## Context
 
 The #320/#321 calling-convention question is open upstream. The highest-value thing to bring is
-**documented** 1990s commercial 65816 C ABI prior art — not recollection, and not a secondary
-capture. The existing summary in `docs/320-upstream-far-pointer-note.md` (§3) leans on the drdevtools
-Zardoz investigation, which is a **provisional, AI-assisted secondary doc** (it carries its own
-confidence ratings + "Refuted Claims"). The user (correctly) flagged that as over-reliance. This plan
-rebuilds the prior art from **primary sources I can actually read**, vendors those sources for
-reproducibility, and demotes the drdevtools doc to "see also."
+**documented** 1990s commercial 65816 C ABI prior art — read from the actual primary sources, not
+recollection. This plan builds the prior-art note **only from primary sources I can read firsthand**
+(the WDC816CC manual + ORCA/C `Gen.pas`), and vendors those sources for reproducibility. Every claim
+cites a manual page or a `Gen.pas` line; no secondary summary is cited or relied on.
 
 **Probe results (done):**
 - **WDC `816cc.pdf`** ("W65C816S C Compiler/Optimizer User Guide", 2013) is **readable via the Read
@@ -33,7 +31,7 @@ binaries must NOT be committed. Concretely:
 - Commit `dev/fetch-refs.sh` to re-download them (verifying the manifest sha256).
 Reproducible without redistributing third-party material.
 
-### 2. Verify claims from the primaries (no claim sourced only to drdevtools)
+### 2. Verify claims from the primaries (every claim cites a WDC page or `Gen.pas` line)
 - Read WDC `816cc.pdf` **pp.21–23 + 27**: confirm verbatim — argument passing on the hardware stack;
   the `PHD`/`TCD` Direct-Page-window prologue; the 256-byte frame cap (the "Path Size Limitation" /
   Stack Frame text); return values in **A** (low) / **X** (high); the four memory models. Record exact
@@ -51,7 +49,7 @@ Reproducible without redistributing third-party material.
   existing 6502 soft static stack — pros/cons, **no recommendation** (maturity = implementation-first).
 - Caveats: the **Zardoz-vs-WDC816CC ABI identity is genuinely open** (WDC manual is the surviving
   primary source; whether the Zardoz-era compiler that shipped SNES games used the *exact* ABI is
-  undocumented). drdevtools investigation cited only as "see also," explicitly secondary.
+  undocumented).
 
 ### 4. Wire it in
 - `TODO.md` — link this note from the "Surface WDC816CC/ORCA-C ABI prior art" item; mark `[wip]`→done.
@@ -65,13 +63,12 @@ Reproducible without redistributing third-party material.
 
 ## Verification
 
-### 1. Every factual claim in the note cites a primary source I read (WDC page # or `Gen.pas` line); drdevtools only as "see also".
+### 1. Every factual claim in the note cites a primary source I read (WDC page # or `Gen.pas` line); no secondary summary cited.
 ```
-$ grep -n drdevtools docs/320-321-65816-c-abi-prior-art.md
-146:- A secondary capture exists (drdevtools Zardoz investigation,
-147:  `drdevtools/docs/investigations/2026-06-12-zardoz-65816-compiler.md`) — **see also only**; it is a
+$ grep -c drdevtools docs/320-321-65816-c-abi-prior-art.md
+0
 ```
-**PASS** — sole mention is the "see also only" caveat; all factual claims cite WDC pp.21–26 or `Gen.pas` lines read firsthand.
+**PASS** — zero secondary citations; every factual claim cites WDC pp.21–26 or `Gen.pas` lines read firsthand.
 
 ### 2. `SOURCES.md` sha256 matches the vendored files; `dev/fetch-refs.sh` re-downloads them.
 ```
