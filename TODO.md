@@ -427,6 +427,8 @@ llvm-mos change to track) rather than active work._
 _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
 
 <!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
-- [ ] **(triage)** A Python fault-injection mode beyond the negative control (not needed — the seed corpus is the — _from [2026-06-15-321-tier1-broaden-corpus.md](docs/plans/2026-06-15-321-tier1-broaden-corpus.md)_  <!-- fp:1562dbbad8b528d7 -->
-- [ ] **(triage)** Backend fixes: if the corpus surfaces a crash/miscompile, minimize → root-cause → fix with the repro — _from [2026-06-15-321-tier1-broaden-corpus.md](docs/plans/2026-06-15-321-tier1-broaden-corpus.md)_  <!-- fp:940edc1e183ba962 -->
+<!-- triaged 2026-06-16: both Tier-1 "out of scope" bullets are non-work — the
+     fault-injection mode is explicitly "not needed" (the seed corpus is the volume),
+     and "Backend fixes: minimize → root-cause → fix" is the PROCESS that was followed
+     and COMPLETED this increment (2 bugs fixed, 1 deferred/XFAIL). Nothing open. -->
 <!-- END auto-captured-deferrals -->
