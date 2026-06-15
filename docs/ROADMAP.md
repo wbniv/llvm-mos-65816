@@ -365,9 +365,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    0x2668 with 2× inc + 2× dec, no byte chain. As a bonus the now-native trailing `+1` lets two existing
    tests stay in one M16 region (`a16ashift` drops a `sep`, `a16ptr` merges two `rep` brackets — fewer
    mode switches), and `a16loopred` guards that a counted `while(i){x++;i--}` still strength-reduces to a
-   single native 16-bit add (0x1239). Variable shifts (libcall) and amount-≥8 shifts (byte-relabel
-   already optimal) are intentionally left; the memory-RMW `inc abs` is a follow-up. Non-breaking
-   (corpus 7/7, all 27 a16* tests green, patch `0002` round-trips).
+   single native 16-bit add (0x1239). The global `g ± 1` then extends the same win to the abs path:
+   `selectAlu16Abs` emits `lda <g>; inc/dec a; sta <g>` (3 instrs) instead of `clc; lda; adc #$0001;
+   sta` (4) — `a16incabs` reads 0x3502. A single `inc abs`/`dec abs` memory-RMW was prototyped and
+   **rejected**: the 65816 has no `inc long`, and `inc abs` is DBR-relative, so it would couple
+   correctness to DBR==0 + bank-0 LoRAM placement (it only happens to work via the low-8KB WRAM mirror)
+   — the accumulator form keeps the compiler's DBR-independent long addressing. Variable shifts
+   (libcall) and amount-≥8 shifts (byte-relabel already optimal) are intentionally left. Non-breaking
+   (corpus 7/7, all 28 a16* tests green, patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
@@ -382,7 +387,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [compare-operand-fold plan](plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md) ·
    [mixed-operand-fold plan](plans/2026-06-15-321-native-s16-mixed-operand-load-fold.md) ·
    [single-use-non-store-fold plan](plans/2026-06-15-321-native-s16-single-use-non-store-fold.md) ·
-   [inc/dec plan](plans/2026-06-15-321-native-s16-inc-dec-accumulator.md)._
+   [inc/dec plan](plans/2026-06-15-321-native-s16-inc-dec-accumulator.md) ·
+   [inc/dec abs plan](plans/2026-06-15-321-native-s16-inc-dec-memory-rmw.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

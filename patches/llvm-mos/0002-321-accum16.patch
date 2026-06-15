@@ -1176,7 +1176,7 @@ index be5daff8f..c39c4be70 100644
    bool shouldRematPhysRegCopy() const override { return false; }
  };
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..01974dd9f 100644
+index f3eb9549f..06cb6e7dc 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
@@ -1194,7 +1194,7 @@ index f3eb9549f..01974dd9f 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,6 +585,253 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -577,6 +585,260 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -1424,9 +1424,16 @@ index f3eb9549f..01974dd9f 100644
 +// shape as ASLAcc16 (MLow=1, $dst=$src, no extra operands); inc a / dec a set N/Z but
 +// not C/V, which is correct for a plain ±1 (G_ADD/G_SUB carry out is unused here). The
 +// value enters A16 only via LDAImag16/LDAbs16 and leaves only via STAImag16 (no Ac16<->
-+// 8-bit COPY). Used by selectAlu16Native. Memory-RMW `inc abs` is a follow-up.
++// 8-bit COPY). Used by selectAlu16Native (register ±1) and selectAlu16Abs (global
++// `g ± 1`, via lda/inc-a/sta — see the note below on why not `inc abs`).
 +def INCAcc16 : MOSShiftAcc16<INC_Accumulator>;
 +def DECAcc16 : MOSShiftAcc16<DEC_Accumulator>;
++// NB: a memory-RMW `inc abs`/`dec abs` for `g = g ± 1` is deliberately NOT provided.
++// The 65816 has no `inc long`, and `inc abs` is DBR-relative — but this platform
++// addresses all data via 24-bit long (DBR-independent) loads/stores, so a DBR-relative
++// RMW would couple correctness to DBR==0 + bank-0 LoRAM placement (it only happens to
++// work today via the low-8KB WRAM mirror). selectAlu16Abs uses `lda long; inc/dec a;
++// sta long` instead — the same long addressing, just dropping the clc + #imm.
 +
 +// #321 native s16 arithmetic right shift (signed `>>`): the 65816 has no native
 +// ASR, but in 16-bit mode `cmp #$8000` sets carry = the sign bit (A >= 0x8000) and
@@ -1476,7 +1483,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..35e5cc8cc 100644
+index cbdd54ab2..b614db17c 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1826,7 +1833,7 @@ index cbdd54ab2..35e5cc8cc 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2204,623 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2204,647 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -1874,6 +1881,30 @@ index cbdd54ab2..35e5cc8cc 100644
 +  MachineMemOperand *MMOA = *MI.memoperands_begin();
 +  MachineMemOperand *MMOG = *(MI.memoperands_begin() + (NumMMO - 1));
 +  MachineMemOperand *MMOB = IsImm ? nullptr : *(MI.memoperands_begin() + 1);
++
++  // #321 native 16-bit inc/dec: a ±1 immediate ADD is `inc a`/`dec a` on A16 instead of
++  // `clc; adc #$0001` — `lda <g>; inc/dec a; sta <g>` (3 instrs vs 4), reusing the same
++  // long (24-bit) load/store addressing. Only G_ADD16_ABS is ever the immediate form
++  // (SUB is non-commutative, so `g - 1` canonicalizes to `g + 0xFFFF`). A DBR-relative
++  // `inc abs` memory-RMW is deliberately avoided (see MOSInstrLogical.td: no `inc long`;
++  // would couple correctness to DBR==0 + bank-0 placement).
++  if (IsImm && MI.getOpcode() == MOS::G_ADD16_ABS) {
++    int64_t I = Rhs.getImm() & 0xFFFF;
++    int Step = I == 1 ? 1 : (I == 0xFFFF ? -1 : 0);
++    if (Step) {
++      Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++      Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++      SmallVector<MachineInstrBuilder, 3> New;
++      New.push_back(Builder.buildInstr(MOS::LDAbs16).addDef(Lo).add(GA).addMemOperand(MMOA));
++      New.push_back(Builder.buildInstr(Step > 0 ? MOS::INCAcc16 : MOS::DECAcc16)
++                        .addDef(Res).addUse(Lo));
++      New.push_back(Builder.buildInstr(MOS::STAbs16).addUse(Res).add(GG).addMemOperand(MMOG));
++      for (MachineInstrBuilder &B : New)
++        constrainSelectedInstRegOperands(*B.getInstr(), TII, TRI, RBI);
++      MI.eraseFromParent();
++      return true;
++    }
++  }
 +
 +  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
 +  Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
