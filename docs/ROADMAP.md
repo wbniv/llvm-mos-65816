@@ -381,8 +381,13 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    chain (`a + b + c + K`) had broken the match (every leaf had to be a load), dropping the whole chain
    to the round-tripping per-add path; `collectAddChain` now folds constant leaves into one running
    immediate and the chain ends in `adc #imm` (`lda a; clc; adc b; clc; adc c; clc; adc #K; sta`) —
-   `a16chainimm` reads 0x2569 (store + multi-use forms, each `+ K`). Non-breaking (corpus 7/7, all 30
-   a16* tests green, patch `0002` round-trips).
+   `a16chainimm` reads 0x2569 (store + multi-use forms, each `+ K`). **Bitwise chains** then extend the
+   same machinery to the homogeneous AND/OR/XOR ops: `collectAddChain` generalizes to `collectAluChain`
+   (parameterized by the chain operator, per-op constant fold), and `bit_chain16`/`bit_chain16_ld` →
+   `G_BITCHAIN16_ABS{,LD}` thread the value through A16 with **no carry-init** (`lda a; and b; and c;
+   sta`) — `a16bitchain` reads 0x6261 across AND/OR/XOR chains (store + multi-use). SUB chains stay moot
+   (reassociated to `a-(b+c)`). Non-breaking (corpus 7/7, all 31 a16* tests green, patch `0002`
+   round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
@@ -400,7 +405,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [inc/dec plan](plans/2026-06-15-321-native-s16-inc-dec-accumulator.md) ·
    [inc/dec abs plan](plans/2026-06-15-321-native-s16-inc-dec-memory-rmw.md) ·
    [multi-use-add-chain plan](plans/2026-06-15-321-native-s16-add-chain-multiuse.md) ·
-   [add-chain-immediate plan](plans/2026-06-15-321-native-s16-add-chain-immediate.md)._
+   [add-chain-immediate plan](plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
+   [bitwise-chains plan](plans/2026-06-15-321-native-s16-bitwise-chains.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
