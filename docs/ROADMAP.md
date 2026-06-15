@@ -351,8 +351,13 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    two sites: operand A into the LHS `lda abs` (`LDAbs16`), operand B into the absolute ALU form
    (`adc|sbc|and|ora|eor abs`) — uniform across all five ops and correct for both SUB directions with
    no commutativity swap (the minuend is always the loaded A). `a16mixfold` reads 0x2DC0 with every one
-   of its six mixed ops reading the global in place (no `lda abs; sta tmp` round-trip). Non-breaking
-   (corpus 7/7, all 24 a16* tests green, patch `0002` round-trips).
+   of its six mixed ops reading the global in place (no `lda abs; sta tmp` round-trip). Because that
+   fold is keyed on the operands (not the result's use-count or consumer), it also closes load-fold
+   follow-up **(b)** — a both-global ALU op with a **single-use non-store** result (the case
+   `alu16_absld` skips via its `>1 use` guard and `alu16_abs` skips as a non-store) now folds both
+   operands in `selectAlu16Native` (`lda abs a; OP abs b`), identical to the `alu16_absld` output;
+   `a16sunfold` reads 0x3480 with zero globals materialized into Imag16 pairs (a regression guard — no
+   new codegen). Non-breaking (corpus 7/7, all 25 a16* tests green, patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
@@ -365,7 +370,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [indirect-load-store plan](plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
    [absolute-load-store plan](plans/2026-06-15-321-native-16bit-absolute-load-store.md) ·
    [compare-operand-fold plan](plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md) ·
-   [mixed-operand-fold plan](plans/2026-06-15-321-native-s16-mixed-operand-load-fold.md)._
+   [mixed-operand-fold plan](plans/2026-06-15-321-native-s16-mixed-operand-load-fold.md) ·
+   [single-use-non-store-fold plan](plans/2026-06-15-321-native-s16-single-use-non-store-fold.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

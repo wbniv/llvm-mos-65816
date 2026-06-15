@@ -41,10 +41,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [ ] **#321 native s16 — load-fold follow-ups** (the [load-fold](docs/plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md)
   core landed — see Done). Remaining same-machinery extensions: ~~(a) **mixed operand** `t = a16v +
   local`~~ (landed — see Done; `selectAlu16Native` folds the global at the LHS-load and ALU-operand
-  sites); (b) single-use-non-store results (the `>1 use` guard skips these today — but the mixed fold
-  now also covers a single-use-non-store ALU op whose operand is a near-abs global); (c) chained
+  sites); ~~(b) single-use-non-store results~~ (covered by (a) — `selectAlu16Native`'s fold is keyed
+  on operands, not result use-count; `a16sunfold` is the regression guard — see Done); (c) chained
   multi-use load expressions (extend `add_chain16`).
-  [mixed-operand-fold plan](docs/plans/2026-06-15-321-native-s16-mixed-operand-load-fold.md).
+  [mixed-operand-fold plan](docs/plans/2026-06-15-321-native-s16-mixed-operand-load-fold.md) ·
+  [single-use-non-store-fold plan](docs/plans/2026-06-15-321-native-s16-single-use-non-store-fold.md).
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality** feeding a
   stored bool/value (`b = (a == c)`) still narrows to the 8-bit cpx/cpy chain — ordering-as-value
@@ -140,6 +141,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-15 — [321-native-s16-single-use-non-store-fold] **load-fold (b): single-use-non-store results.** A both-global ALU op whose single-use result does not feed a near-abs store (the case `alu16_absld` skips via its `>1 use` guard, `alu16_abs` as a non-store) folds both operands directly in `selectAlu16Native` — covered implicitly by the mixed-operand fold (keyed on operands, not result use-count). No new codegen; `a16sunfold` (0x3480 both emus, 0 globals materialized) is the regression guard. 25 a16* tests + corpus 7/7 green; patch `0002` unchanged + round-trips. [plan](docs/plans/2026-06-15-321-native-s16-single-use-non-store-fold.md).
 - 2026-06-15 — [321-native-s16-mixed-operand-fold] **mixed-operand load-fold (`t = a16v OP local`).** `selectAlu16Native` reads a single-use near-abs global operand directly instead of materializing it into an Imag16 pair — two fold sites: operand A → LHS `lda abs` (`LDAbs16`), operand B → absolute ALU form (`adc|sbc|and|ora|eor abs`). Uniform across ADD/SUB/AND/OR/XOR; correct for both SUB directions (minuend is always the loaded A) with no commutativity swap. Volatile-safe 1-to-1 fold (reuses `foldableAbsLoad16`). `a16mixfold` reads 0x2DC0 both emus (6 mixed ops, global read in place); 24 a16* tests + corpus 7/7 green; `0002` round-trips. (a16localx's adc-zp gate updated to also count adc-abs.) [plan](docs/plans/2026-06-15-321-native-s16-mixed-operand-load-fold.md).
 - 2026-06-15 — [321-native-s16-compare-abs-fold] **fold near-abs global operands into the 16-bit compare (`a < gv`).** `selectSbc16` reads a single-use near-abs `G_LOAD16_ABS` operand directly — LHS via `lda abs` (`LDAbs16`), RHS via `cmp abs` (`CMPAbs16`) — so a global-vs-global compare is `rep; lda abs; cmp abs; sep; bcc/bcs` (no Imag16 round-trip, no `cmp zp`). Volatile-safe 1-to-1 fold; signed/XOR'd operands stay on the Imag16 path. `a16abscmp` reads 0x4303 both emus; 23 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md).
 - 2026-06-15 — [321-native-s16-copy16-fold] **fuse the 16-bit indirect copy (`g = *p`).** Extends the
