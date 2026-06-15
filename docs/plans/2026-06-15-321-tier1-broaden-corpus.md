@@ -204,6 +204,12 @@ repro committed at `examples/65816/known/a16-cmp-value-selectimm.c`; the fuzzer 
 signature as **XFAIL** (known issue), so the suite stays green on the rest of the (vast) space while
 new/unmatched crashes and all value mismatches remain hard failures.
 
+> **Next pass → [fix F3](2026-06-16-321-fix-cmp-value-selectimm.md).** Root-caused further: the s16
+> **ordering** native gate (`MOSLegalizerInfo.cpp:1366`, `ICMP_UGE`) lacks the all-uses-are-`G_BRCOND_IMM`
+> guard the **equality** gate has (`:1361`), so an ordering compare feeding a `G_SELECT`/PHI stays native
+> and mis-materializes the C-flag i1 into `SelectImm <GPR>`. Fixing it turns the 8 XFAIL seeds green
+> (target: `fuzz 50 1` → 50/50). See the plan for the conservative (narrow-on-value-use) fix.
+
 ## Out of scope / deferred
 
 - A Python fault-injection mode beyond the negative control (not needed — the seed corpus is the

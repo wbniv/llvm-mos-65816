@@ -45,11 +45,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   path narrows in the **select lowering** (relaxing the EQ branch-gate + `buildNZSelect` did NOT fold
   the s16 compare back to native — investigated 2026-06-15, reverted; needs the select/NZ lowering to
   fold an s16 `G_SBC`); ~~(d) fold a near-abs global RHS into `CMPAbs16`~~ (landed — see Done; also
-  folds the LHS via `lda abs`). **⚠ Tier-1 fuzzer finding (2026-06-16): this isn't just suboptimal —
+  folds the LHS via `lda abs`). **⚠ NEXT PASS — Tier-1 fuzzer finding F3 (the 8 remaining fuzz XFAILs):
   in branchy control flow a compare result consumed as a cross-block i1 VALUE materializes via
-  `SelectImm $a16,…` (a GPR where a Flag reg is required) → invalid MIR / backend segfault. Minimized
-  repro `examples/65816/known/a16-cmp-value-selectimm.c`; the fuzzer XFAIL-classifies the signature.
-  The select/NZ-lowering fix here resolves it.**
+  `SelectImm $a16,…`/`$y` (a GPR where a Flag reg is required) → invalid MIR / backend segfault.
+  Root-caused: the s16 ORDERING native gate (`MOSLegalizerInfo.cpp:1366`, `ICMP_UGE`) lacks the
+  all-uses-are-`G_BRCOND_IMM` guard the EQUALITY gate has (`:1361`); fixing it (narrow ordering-as-value
+  to the 8-bit chain) turns the 8 XFAIL seeds green → `fuzz 50 1` = 50/50. Repro
+  `examples/65816/known/a16-cmp-value-selectimm.c` (seeds 1,7,9,11,22,35,41,44).**
+  [next-pass plan](docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md) ·
   [plan](docs/plans/2026-06-14-321-native-16bit-compares.md) ·
   [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
   [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md) ·

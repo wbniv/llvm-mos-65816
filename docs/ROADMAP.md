@@ -428,8 +428,11 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `k_crc16`), and a compare-result-as-value `SelectImm`-flag **crash** (**deferred** to the tracked
    compare→stored-bool follow-up; XFAIL-classified with a committed repro). Both fixes carry committed
    regression tests; patch `0002` round-trips; the full a16 suite + 6 kernels + 2 combinatorial = 40/40
-   green and corpus 7/7. A16-threading is now de-risked.
-   [Tier-1 plan](plans/2026-06-15-321-tier1-broaden-corpus.md)._
+   green and corpus 7/7. A16-threading is now de-risked. The remaining 8 fuzz XFAILs are the deferred
+   `SelectImm`-flag crash (the s16 ordering native gate lacks the all-uses-are-branches guard the
+   equality gate has) — next pass targets `fuzz 50 1` → 50/50.
+   [Tier-1 plan](plans/2026-06-15-321-tier1-broaden-corpus.md) ·
+   [F3 fix plan](plans/2026-06-16-321-fix-cmp-value-selectimm.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
