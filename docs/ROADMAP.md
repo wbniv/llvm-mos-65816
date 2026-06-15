@@ -335,8 +335,17 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `lda gg; sta g` (2 ops, no temp), and a selection-time fold (`loadStoreValueIntoA16`, gated by
    `shouldFoldMemAccess`) extends this to the **indirect** copy — `g = *p` is `lda (p); sta g` instead
    of the Imag16 round-trip (`a16copy` reads 0x3456). The indexed `abs,x` form is moot (llvm-mos is
-   fully pointer-based) and the X-flag dimension remains an optional follow-up. Non-breaking (corpus
-   7/7, all 22 a16* tests green, patch `0002` round-trips).
+   fully pointer-based) and the X-flag dimension remains an optional follow-up. A **compare-operand
+   fold** then closes the comparison's analogue of the load-fold: a global-vs-global s16 compare
+   (`a < gv`, `a >= gv`) had materialized BOTH operands into Imag16 pairs (`lda abs; sta tmp` ×2, then
+   `lda tmp; cmp tmp`); `selectSbc16` now recognizes a single-use near-abs `G_LOAD16_ABS` operand and
+   reads it directly — the LHS via `lda abs` (existing `LDAbs16`), the RHS via `cmp abs` (existing
+   `CMPAbs16`) — so each compare is just `rep; lda abs; cmp abs; sep; bcc/bcs` with no Imag16
+   round-trip (`a16abscmp` reads 0x4303, no `cmp zp`). Volatile-safe (the fold is 1-to-1: exactly one
+   read of each global, same program order — the same property `selectAlu16AbsLd` relies on); signed
+   compares feed XOR'd operands so they stay on the Imag16 path, and the equality `CmpBr*16` branch
+   path (a possible `CmpBrAbs16`) is a separate follow-up. Non-breaking (corpus
+   7/7, all 23 a16* tests green, patch `0002` round-trips).
    [Inc 1d-retry plan](plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md) ·
    [imm-fold plan](plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md) ·
    [load-fold plan](plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md) ·
@@ -347,7 +356,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [equality-compares plan](plans/2026-06-15-321-native-16bit-equality-compares.md) ·
    [signed-compares plan](plans/2026-06-15-321-native-16bit-signed-compares.md) ·
    [indirect-load-store plan](plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
-   [absolute-load-store plan](plans/2026-06-15-321-native-16bit-absolute-load-store.md)._
+   [absolute-load-store plan](plans/2026-06-15-321-native-16bit-absolute-load-store.md) ·
+   [compare-operand-fold plan](plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against

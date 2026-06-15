@@ -1465,7 +1465,7 @@ index 21910cfea..6adc3c035 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..a913e3fbe 100644
+index cbdd54ab2..652953f2b 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1715,7 +1715,7 @@ index cbdd54ab2..a913e3fbe 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1091,12 +1280,57 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1280,99 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -1723,37 +1723,79 @@ index cbdd54ab2..a913e3fbe 100644
 +static std::optional<int64_t> getImm16Operand(Register R,
 +                                              MachineRegisterInfo &MRI);
 +
++// #321 native s16 compare-operand fold: returns the defining G_LOAD16_ABS iff `R`
++// is a single-use 16-bit near-abs global load in `User`'s block — the operand the
++// absolute compare/load forms (cmp abs / lda abs) can read directly instead of
++// round-tripping the global through an Imag16 pair. Volatile-safe: the load has
++// exactly this one use, so folding preserves the single memory access in program
++// order (same 1-to-1 fold selectAlu16AbsLd does for the abs ALU operands). Same-BB
++// only (mirrors shouldFoldMemAccess's no-cross-block rule).
++static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
++                                       const MachineRegisterInfo &MRI) {
++  MachineInstr *Def = MRI.getVRegDef(R);
++  if (Def && Def->getOpcode() == MOS::G_LOAD16_ABS &&
++      MRI.hasOneNonDBGUse(R) && Def->getParent() == User.getParent())
++    return Def;
++  return nullptr;
++}
++
 +// #321 native 16-bit compares: select an s16 G_SBC that the legalizer left
 +// un-narrowed for an unsigned-ordering compare (NativeS16/UGE path). Only the
 +// carry-out flag (operand 1) is used; the s16 result and N/V/Z are dead and the
 +// carry-in is set. Emits `lda lhs; cmp rhs` (both MLow=1 -> one rep/sep bracket)
-+// producing C, which the following branch tests (bcc/bcs). Operands are Imag16
-+// (globals are materialized into Imag16 by G_MERGE selection); the accumulator is
++// producing C, which the following branch tests (bcc/bcs). A near-abs global
++// operand is read directly via lda abs / cmp abs (foldableAbsLoad16) instead of
++// being materialized into an Imag16 pair; otherwise the accumulator is
 +// entered only via LDAImag16 -> never an Ac16<->8-bit COPY (the native invariant).
-+// RHS load-folding into CMPAbs16 is a follow-up.
 +bool MOSInstructionSelector::selectSbc16(MachineInstr &MI) {
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
 +
 +  Register CarryOut = MI.getOperand(1).getReg(); // C — the only used flag (UGE)
-+  Register L = MI.getOperand(5).getReg();        // LHS (s16, in Imag16)
-+  Register R = MI.getOperand(6).getReg();        // RHS (s16, in Imag16)
++  Register L = MI.getOperand(5).getReg();        // LHS (s16, in Imag16 or abs load)
++  Register R = MI.getOperand(6).getReg();        // RHS (s16, in Imag16 or abs load)
 +
 +  SmallVector<MachineInstrBuilder, 2> New;
-+  // lda lhs (16-bit) -> A16
++  SmallVector<MachineInstr *, 2> Folded; // near-abs loads consumed by the fold
++
++  // lda lhs (16-bit) -> A16. A single-use near-abs global LHS reads via `lda abs`
++  // directly, dropping the `lda abs; sta tmp` round-trip; otherwise from its Imag16.
 +  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+  New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(L));
-+  // cmp rhs (16-bit): A16 - rhs, discard result, set C/N/Z. A constant RHS folds
-+  // to `cmp #imm16` (common loop bounds); otherwise compare the Imag16 operand.
-+  if (auto Imm = getImm16Operand(R, MRI))
++  if (MachineInstr *LdL = foldableAbsLoad16(L, MI, MRI)) {
++    New.push_back(Builder.buildInstr(MOS::LDAbs16)
++                      .addDef(Lo)
++                      .add(LdL->getOperand(1))
++                      .cloneMemRefs(*LdL));
++    Folded.push_back(LdL);
++  } else {
++    New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(L));
++  }
++
++  // cmp rhs (16-bit): A16 - rhs, discard result, set C/N/Z. A constant RHS folds to
++  // `cmp #imm16` (common loop bounds); a single-use near-abs global RHS to `cmp abs`
++  // (reading the global directly); otherwise compare the Imag16 operand.
++  if (auto Imm = getImm16Operand(R, MRI)) {
 +    New.push_back(
 +        Builder.buildInstr(MOS::CMPImm16).addDef(CarryOut).addUse(Lo).addImm(*Imm));
-+  else
++  } else if (MachineInstr *LdR = foldableAbsLoad16(R, MI, MRI)) {
++    New.push_back(Builder.buildInstr(MOS::CMPAbs16)
++                      .addDef(CarryOut)
++                      .addUse(Lo)
++                      .add(LdR->getOperand(1))
++                      .cloneMemRefs(*LdR));
++    Folded.push_back(LdR);
++  } else {
 +    New.push_back(
 +        Builder.buildInstr(MOS::CMPImag16).addDef(CarryOut).addUse(Lo).addUse(R));
++  }
 +
 +  for (MachineInstrBuilder &B : New)
 +    constrainSelectedInstRegOperands(*B.getInstr(), TII, TRI, RBI);
++
++  // Erase the folded loads (single-use; this G_SBC was their only consumer, and
++  // selection is bottom-up so they are not yet selected).
++  for (MachineInstr *F : Folded)
++    F->eraseFromParent();
 +
 +  MI.eraseFromParent();
 +  return true;
@@ -1773,7 +1815,7 @@ index cbdd54ab2..a913e3fbe 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2162,545 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2204,545 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  

@@ -49,10 +49,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (`b = (a < c)`) ALREADY goes native (C is a plain i1, materialized via branch), but the Z-flag value
   path narrows in the **select lowering** (relaxing the EQ branch-gate + `buildNZSelect` did NOT fold
   the s16 compare back to native — investigated 2026-06-15, reverted; needs the select/NZ lowering to
-  fold an s16 `G_SBC`); (d) fold a near-abs global RHS into `CMPAbs16` (mirror `selectAlu16AbsLd`).
+  fold an s16 `G_SBC`); ~~(d) fold a near-abs global RHS into `CMPAbs16`~~ (landed — see Done; also
+  folds the LHS via `lda abs`).
   [plan](docs/plans/2026-06-14-321-native-16bit-compares.md) ·
   [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
-  [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md).
+  [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md) ·
+  [compare-operand-fold plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; inc/dec already native via adc #±1; remaining: variable shifts, amount
@@ -136,6 +138,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-15 — [321-native-s16-compare-abs-fold] **fold near-abs global operands into the 16-bit compare (`a < gv`).** `selectSbc16` reads a single-use near-abs `G_LOAD16_ABS` operand directly — LHS via `lda abs` (`LDAbs16`), RHS via `cmp abs` (`CMPAbs16`) — so a global-vs-global compare is `rep; lda abs; cmp abs; sep; bcc/bcs` (no Imag16 round-trip, no `cmp zp`). Volatile-safe 1-to-1 fold; signed/XOR'd operands stay on the Imag16 path. `a16abscmp` reads 0x4303 both emus; 23 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md).
 - 2026-06-15 — [321-native-s16-copy16-fold] **fuse the 16-bit indirect copy (`g = *p`).** Extends the
   abs→abs copy fusion to indirect/mixed copies at selection: a single-use 16-bit `G_LOAD16_ABS`/
   `G_LOAD16_INDIR` feeding a 16-bit store folds the load directly into the accumulator (new helper
