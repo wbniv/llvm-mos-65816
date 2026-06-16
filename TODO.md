@@ -476,8 +476,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      (nothing built yet). Tracked by the M2 "equality-as-value" bullet. Not a missed step. -->
 - [ ] **(triage)** The other P0 follow-ups (P1 `expandLDSTStk` contract note, P2 `.ll` durability, P3 `reentrant` — _from [2026-06-16-321-f4-late-opt-txy-dead-flag.md](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md)_  <!-- fp:cb963e0cec41eae1 -->
 - [ ] **(triage)** Upstreaming the PR to llvm-mos is user-triggered (like the #320 note). — _from [2026-06-16-321-f4-late-opt-txy-dead-flag.md](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md)_  <!-- fp:5a35103736bcadd9 -->
-- [verify] **2026-06-16-321-native-s16-eq-as-value-cmpsel** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-16-321-native-s16-eq-as-value-cmpsel.md](docs/plans/2026-06-16-321-native-s16-eq-as-value-cmpsel.md)_  <!-- fp:56b6dd09f546dc3c -->
-- [ ] **(triage)** **v2 — computed/`Imag16` LHS** (`(a+b) == c`, −3 B): extend the gate to a computed-LHS operand, but only — _from [2026-06-16-321-native-s16-eq-gated-impl.md](docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md)_  <!-- fp:b384b347d53e130b -->
-- [ ] **(triage)** **v3 — abs-operand fold for globals** (`g1 == g2`): add `LDAbs16`/`CMPAbs16` operand folding to the EQ — _from [2026-06-16-321-native-s16-eq-gated-impl.md](docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md)_  <!-- fp:7753165fa978e201 -->
-- [ ] **(triage)** Re-measure all of this after **A16-threading** (ROADMAP step 5), which keeps s16 values in the — _from [2026-06-16-321-native-s16-eq-gated-impl.md](docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md)_  <!-- fp:d9467418361a52ae -->
+<!-- triaged 2026-06-17: native-s16-EQ v1 landed (commit 37674ff). All four are already curated:
+     • v2 (computed-LHS), v3 (abs-fold globals), and the post-A16-threading re-measure -> the M2
+       Open bullet "#321 native s16 equality-as-value — v2/v3 (remaining gated wins)".
+     • the cmpsel "[verify]" is a false positive: that plan is design+spike, and its Verification
+       contract was fulfilled by the gated-impl plan's recorded PASS (eq_deref native, suite 44/44,
+       corpus 7/7, fuzz 50/50, a16eqvalp both emulators). Nothing open here. -->
 <!-- END auto-captured-deferrals -->
