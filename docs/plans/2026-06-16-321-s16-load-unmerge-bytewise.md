@@ -1,7 +1,10 @@
 # #321 — s16 load consumed only as bytes: keep it byte-wise (EQ-as-value prologue fix)
 
 **Date:** 2026-06-16
-**Status:** implemented (partial win for M2 item (c)); verification in progress
+**Status:** **DONE** (2026-06-16) — landed in commit `7c0fe56`; all verification PASS (see below). A
+partial win for M2 item (c): it removes a `+mos-a16` *regression* (EQ-as-value was worse than default,
+now at parity). The full *native* EQ-as-value (beating default) remains deferred — see "Deferred" + the
+dedicated M2 TODO bullet.
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "16-bit comparison follow-ups" item (c)
 
 ## Context

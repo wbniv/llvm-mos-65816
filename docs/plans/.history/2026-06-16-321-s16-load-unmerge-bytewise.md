@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/8bce630) | #321 s16-load-unmerge: record verification PASS + triage the deferral Inbox |
 | [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/7c0fe56) | #321 native s16: load consumed only as bytes stays byte-wise (EQ-as-value prologue fix) |
 
 <!--history-meta v1
+8bce630	author	Will Norris
+8bce630	added	10
+8bce630	deleted	5
+8bce630	files	1
+8bce630	body	Record the all-PASS verification results into the plan (the audit hook flagged the\nVerification section as unrecorded): operands load byte-wise (no rep prologue) +\nverify clean; a16eqval 0x0101 host==default==a16 on MAME+bsnes; suite 42/42, corpus\n7/7, fuzz 50/50; 0002 round-trips.\n\nTriage the six auto-captured Inbox deferrals — all already live in curated M2 items\n(the full-native-EQ + indirect-load follow-ups in the EQ-as-value bullet; the three\nsoft-stack-coverage notes in the soft-stack bullet) — and clear the Inbox.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7c0fe56	author	Will Norris
 7c0fe56	added	59
 7c0fe56	deleted	0
