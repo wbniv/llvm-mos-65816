@@ -429,8 +429,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    compare→stored-bool follow-up; XFAIL-classified with a committed repro). Both fixes carry committed
    regression tests; patch `0002` round-trips; the full a16 suite + 6 kernels + 2 combinatorial = 40/40
    green and corpus 7/7. A16-threading is now de-risked. The remaining 8 fuzz XFAILs are the deferred
-   `SelectImm`-flag crash (the s16 ordering native gate lacks the all-uses-are-branches guard the
-   equality gate has) — next pass targets `fuzz 50 1` → 50/50.
+   `SelectImm`-flag crash. **Root cause corrected (2026-06-16):** it is NOT a legalizer-gate issue (the
+   first-guess "s16 ordering native gate lacks the all-uses-are-branches guard" was implemented and
+   **disproven** — clean SSA, but the crash is post-RA, and the native UGE-as-value path is valid in
+   isolation). It is the **A16↔8-bit register-coalescer crash** (this §, Increment 1d) **resurfacing via
+   spill copies**: when a 16-bit-accumulator value is forced live across a call under branchy/i1
+   pressure, `MOSInstrInfo::copyPhysRegImpl` (the `Anyi1` COPY branch) materializes the entangled
+   accumulator spill as `SelectImm $a16` — invalid MIR. **Next pass is Tier-2 register-allocator work**
+   (stop `Anyi1` from coalescing onto `ac16`, or give `ac16` a real 16-bit spill), not the legalizer.
    [Tier-1 plan](plans/2026-06-15-321-tier1-broaden-corpus.md) ·
    [F3 fix plan](plans/2026-06-16-321-fix-cmp-value-selectimm.md)._
 

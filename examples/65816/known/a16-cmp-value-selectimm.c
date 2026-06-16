@@ -13,11 +13,20 @@
 //   fatal error: error in backend: Found 2 machine code errors.
 //
 // -verify-machineinstrs reports it; a normal build SEGFAULTS in link-time codegen.
-// This is the compare->stored-bool / select-NZ-lowering follow-up already tracked in
-// TODO.md (M2, item c): "equality feeding a stored bool/value still narrows ... needs
-// the select/NZ lowering to fold an s16 G_SBC". The fuzzer shows it is not merely
-// suboptimal — in branchy contexts it produces invalid MIR. Deferred to that follow-up
-// / Tier 2; the fuzzer classifies this signature as XFAIL so the suite stays green.
+//
+// ROOT CAUSE (corrected 2026-06-16 — see docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md
+// §Outcome): this is NOT the legalizer compare-as-value path (that lowers cleanly — the
+// post-instruction-selection MIR has no SelectImm). It is a REGISTER-ALLOCATOR bug: the
+// `SelectImm $a16` first appears after `postrapseudos`, emitted by MOSInstrInfo::copyPhysRegImpl
+// (the Anyi1->Anyi1 COPY branch) because an i1 value got entangled with the 16-bit-accumulator
+// (ac16) live range during coalescing. Here `arr[in_idx & 7]` keeps a 16-bit accumulator value
+// live across the f0() call; under this branchy CFG + i1 compare-result pressure the spill/copy
+// of that accumulator routes through the i1->GPR SelectImm, reading $a16 as a flag. This is the
+// SAME A16<->8-bit coalescer crash the native-s16 add path avoided "by construction" (ROADMAP
+// step 5, Increment 1d), resurfacing via spill copies. It is Tier-2 register-allocator work;
+// the fuzzer classifies this signature as XFAIL so the suite stays green until it lands.
+// (A legalizer-gate fix — narrowing UGE/EQ-as-value to the 8-bit chain — was tried 2026-06-16
+// and reverted: it produces clean SSA but does NOT prevent the post-RA entanglement.)
 //
 // Reproduce:
 //   mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 \

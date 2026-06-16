@@ -204,11 +204,16 @@ repro committed at `examples/65816/known/a16-cmp-value-selectimm.c`; the fuzzer 
 signature as **XFAIL** (known issue), so the suite stays green on the rest of the (vast) space while
 new/unmatched crashes and all value mismatches remain hard failures.
 
-> **Next pass → [fix F3](2026-06-16-321-fix-cmp-value-selectimm.md).** Root-caused further: the s16
-> **ordering** native gate (`MOSLegalizerInfo.cpp:1366`, `ICMP_UGE`) lacks the all-uses-are-`G_BRCOND_IMM`
-> guard the **equality** gate has (`:1361`), so an ordering compare feeding a `G_SELECT`/PHI stays native
-> and mis-materializes the C-flag i1 into `SelectImm <GPR>`. Fixing it turns the 8 XFAIL seeds green
-> (target: `fuzz 50 1` → 50/50). See the plan for the conservative (narrow-on-value-use) fix.
+> **Next pass → [F3 fix plan](2026-06-16-321-fix-cmp-value-selectimm.md).** ⚠️ **Root cause CORRECTED
+> 2026-06-16.** The legalizer-gate hypothesis here (the s16 ordering native gate at
+> `MOSLegalizerInfo.cpp:1366` lacking the equality gate's all-uses-are-`G_BRCOND_IMM` guard) was
+> implemented and **DISPROVEN**: it yields clean post-isel SSA but the crash is **post-register-
+> allocation**, and a clean UGE-as-value compiles native-and-valid without the gate (so the gate only
+> pessimizes). F3 is actually the **A16↔8-bit register-coalescer crash resurfacing** — an i1 value
+> entangles with the 16-bit-accumulator (`ac16`) live range when a 16-bit accumulator value is forced
+> across a call under branchy/i1 pressure, and `MOSInstrInfo::copyPhysRegImpl` (`:743`) materializes the
+> spill copy as `SelectImm $a16` (invalid). **It is Tier-2 register-allocator work**, deferred; XFAIL
+> kept. See the F3 plan's §Outcome for the full evidence and the corrected next-pass direction.
 
 ## Out of scope / deferred
 

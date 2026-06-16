@@ -1,7 +1,8 @@
 # #321 native s16 — fix the compare-result-as-value `SelectImm` crash (F3)
 
 **Date:** 2026-06-16
-**Status:** open (next pass)
+**Status:** **candidate A DISPROVEN (2026-06-16) — F3 is a register-allocator bug, NOT a legalizer bug.**
+Reverted cleanly, XFAIL kept; the actual fix is Tier-2 register-allocation work. See **§Outcome**.
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "16-bit comparison follow-ups" item (c)
 **Predecessor:** [Tier-1 corpus plan](2026-06-15-321-tier1-broaden-corpus.md) (this is its finding **F3**)
 
@@ -12,7 +13,56 @@ Make the Tier-1 differential fuzzer go **fully green** — `dev/run.sh fuzz 50 1
 compare whose boolean result is consumed as a **cross-block i1 value** (a stored bool / `G_SELECT` / PHI
 under branchy control flow) must stop emitting invalid MIR, on both emulators, with correct values.
 
-## The bug (root-caused in the Tier-1 pass)
+## Outcome (2026-06-16): candidate A is the wrong layer — this is the Tier-2 coalescer crash
+
+**The plan's root-cause hypothesis below (the legalizer s16 ordering gate lacking the
+all-uses-are-`G_BRCOND_IMM` guard) is WRONG.** Candidate A was implemented, tested, and **disproven**;
+the change was reverted byte-exact (`0002` round-trips, `git status` clean). The crash is introduced
+**after register allocation**, not in the legalizer.
+
+**What candidate A actually did (and why it didn't fix F3):**
+- Implemented: gate the native s16 `UGE` path (and the `SLT → ULT` rewrite) on the same
+  `all_of(use == G_BRCOND_IMM)` guard the equality path uses, factored into a shared helper
+  `s16CmpResultIsBranchOnly`. This is *correct* and produces **clean SSA** — post-instruction-selection
+  MIR has no `SelectImm`; the value-consumed compare lowers via a proper control-flow PHI diamond.
+- But **all 8 XFAIL seeds (1,7,9,11,22,35,41,44) still crash identically** with the gate applied, and a
+  clean `unsigned short r = (a >= b)` (UGE-as-value, no register pressure) **already compiled native and
+  valid** without the gate (`cmp $0`, `-verify-machineinstrs` clean). So candidate A would only
+  **pessimize** correct code (force UGE/EQ-as-value to the 8-bit chain) **without fixing the crash**.
+  Reverted.
+
+**The real root cause (located by walking the pass pipeline on the committed repro):**
+- The crash — `$x = SelectImm $a16, -1, 0` / `$a16 = SelectImm $x, -1, 0`, "`$a16`/`$x` is not a Flag
+  register" — first appears **after `postrapseudos`** (post-RA pseudo expansion). The
+  post-instruction-selection (SSA) MIR is **clean**.
+- It is emitted by **`MOSInstrInfo::copyPhysRegImpl`** (`MOSInstrInfo.cpp:743`), the `Anyi1`→`Anyi1`
+  copy branch, lowering a COPY whose operands the register allocator placed on the **16-bit accumulator
+  `$a16`** and a GPR. I.e. an **i1 (`Anyi1`) value got entangled with the 16-bit-accumulator (`ac16`)
+  live range** during coalescing/allocation, so a spill/copy of the accumulator is materialized as the
+  i1→GPR `SelectImm` — reading `$a16` as a flag → invalid MIR → segfault in link-time codegen.
+- Trigger (from the Two-Address MIR): in the repro, `%128:ac16 = LDAbs16 @in_idx` (the `arr[in_idx & 7]`
+  index) is **live across the `f0()` call**. The call clobbers the accumulator, so RA must preserve a
+  16-bit accumulator value across the call — and under the **branchy CFG + i1 compare-result pressure**
+  of these programs, the spill/coalesce entangles it with an `Anyi1`. A *pure* "16-bit value live across
+  a call" reduction (no compares) compiles **clean** — so the i1/branchy pressure is a necessary
+  ingredient, but the failure is in **register allocation**, not the compare legalization.
+
+**This is exactly the A16↔8-bit coalescer crash the native-s16 work already fought** (ROADMAP §5,
+Increment 1d: "keep `A16` and 8-bit `A` from entangling … always via load/store, never a COPY to/from
+8-bit"). The add path *avoided* it by construction; F3 shows it **resurfaces via spill copies** when a
+16-bit accumulator value is forced across a call. It is **Tier-2 register-allocator work**, beyond the
+~3-attempt legalizer budget — so per the plan's own fallback it is **deferred, XFAIL kept**.
+
+**Next pass (Tier-2) should target `copyPhysRegImpl`/coalescing**, not the legalizer: either prevent an
+`Anyi1` value from coalescing/allocating onto the `ac16` accumulator, or give the `ac16` spill path a
+real 16-bit save/restore so it never routes through the `Anyi1` COPY branch. Validate with the same
+differential gate; the 8 seeds + the committed repro are the regression set.
+
+## The bug — original (INCORRECT) hypothesis, kept for the record
+
+> ⚠️ **Superseded by §Outcome.** The legalizer analysis below is the hypothesis this pass set out to
+> fix; it was **disproven** (the native UGE-as-value path is valid in isolation, and the real crash is a
+> post-RA `copyPhysRegImpl`/coalescer entanglement). Read §Outcome first.
 
 Under `+mos-a16`, a 16-bit compare result used as a VALUE (not a branch) materializes via
 `SelectImm $a16, -1, 0` (or `SelectImm $y, -1, 0`) — a GPR where the `SelectImm` pseudo requires a
@@ -47,9 +97,14 @@ tried to fold the s16 compare back to native through `buildNZSelect` (`:1267`) �
 fuzz seed 1). Bare `r = (a == b)` does NOT trigger it; the branchy CFG that turns the result into a
 cross-block value does. The 8 fuzz seeds that XFAIL today: **1, 7, 9, 11, 22, 35, 41, 44**.
 
-## Approach (two candidates — try A first)
+## Approach (two candidates — both legalizer-level; see §Outcome — A disproven)
 
-### A — conservative: narrow ordering-as-value to the 8-bit chain (correctness-first)
+> ⚠️ Both candidates below target the **legalizer**, which §Outcome shows is the **wrong layer** for F3.
+> Candidate A was implemented and reverted (it pessimizes correct code without fixing the crash).
+> Candidate B (materialize the flag into a value natively) would face the *same* post-RA coalescer
+> entanglement. The real fix is in register allocation / `copyPhysRegImpl`.
+
+### ~~A — conservative: narrow ordering-as-value to the 8-bit chain~~ (DISPROVEN — see §Outcome)
 
 Mirror the equality guard onto the ordering path: keep an s16 `UGE` (and the `SLT → ULT` rewrite)
 native **only when every use is `G_BRCOND_IMM`**; otherwise fall back to the existing 8-bit byte-compare
@@ -75,6 +130,37 @@ compare→branch→`0/1` materialization at selection. This is what the reverted
 reaching for; only pursue it after A lands green, and keep it gated/reversible.
 
 ## Verification
+
+> **Result (2026-06-16): step 1 FAILED with candidate A → steps 2–5 not reached.** The gate produced
+> clean SSA but the post-RA coalescer crash is untouched. Evidence below; full analysis in §Outcome.
+
+**Step 1 — repro compiles clean under `-verify-machineinstrs` (candidate A applied):**
+
+```
+$ mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os \
+    -mllvm -verify-machineinstrs -c examples/65816/known/a16-cmp-value-selectimm.c
+  $x = SelectImm $a16, -1, 0
+  $a16 = SelectImm $x, -1, 0
+*** Bad machine code: Illegal physical register for instruction ***
+$a16 is not a Flag register.
+fatal error: error in backend: Found 2 machine code errors.        # exit 1
+```
+**FAIL** — identical crash to pre-fix. All 8 seeds (1,7,9,11,22,35,41,44) still crash identically with
+the gate. First bad MIR appears after `postrapseudos`; SSA-Selected MIR is clean. **F3 is a register-
+allocator bug (`copyPhysRegImpl:743`), not the legalizer gate — candidate A reverted, XFAIL kept.**
+
+**Control — native UGE-as-value is already valid without the gate** (so candidate A only pessimizes):
+```
+$ printf 'volatile unsigned short a,b,corpus_result;int main(void){unsigned short r=(a>=b);corpus_result=r;for(;;){}}' \
+  | mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os \
+    -mllvm -verify-machineinstrs -x c -c -        # exit 0, disasm uses native `cmp $0`
+```
+**PASS (clean) — confirms the native path is correct in isolation; the crash needs register pressure.**
+
+**Revert is byte-exact:** `dev/regen-patch.sh` → `RESULT: PASS — 0002 round-trips`; `git status patches/`
+empty.
+
+### Original verification steps (NOT reached — for the eventual Tier-2 fix)
 
 1. `examples/65816/known/a16-cmp-value-selectimm.c` compiles clean under
    `-mllvm -verify-machineinstrs` (was: 2 machine-code errors) and the default build stays clean.
