@@ -57,6 +57,21 @@ GOT_RE = re.compile(r"got=0x([0-9A-Fa-f]+)")
 ARR_N = 8
 ARR_MASK = ARR_N - 1
 
+# Recursion knobs (P0: force the soft/reentrant stack). MOSNonReentrant marks every
+# NON-recursive function `nonreentrant` -> static frame, so genuine recursion is the
+# one soft-stack trigger the generator can emit; without it expandLDSTStk (the
+# soft-stack spill lowering, where the F3 Ac16 bug lived) is never exercised.
+# See docs/plans/2026-06-16-321-soft-stack-spill-coverage.md.
+P_RECURSIVE = 0.5      # per generated function: chance it is self-recursive
+MAX_EVAL_DEPTH = 64    # host-eval recursion safety cap (real depth is bounded to <= 4)
+# 16-bit values held live ACROSS the self-call. Being recursive only puts a function
+# on the soft stack; the soft-stack SPILL path (STStk/LDStk -> expandLDSTStk, the F3
+# bug) needs enough live-across-call pressure to exhaust the 4 hard-stack CSR slots so
+# the caller must spill to its (soft) frame. Each value is anchored by a DISTINCT
+# volatile input read so the optimizer cannot sink it past the call.
+REC_LIVE_MIN, REC_LIVE_MAX = 5, 8
+BINOPS = ["+", "-", "&", "|", "^"]
+
 # ---------------------------------------------------------------------------
 # Exact fixed-width helpers (mirror the emitted C casts)
 # ---------------------------------------------------------------------------
@@ -129,6 +144,24 @@ class Deref(Expr):
         return st.arr[st.ptr]
 
 
+def apply_bin(op, a, b):
+    """Exact u16 semantics of the C `+ - & | ^` operators (shared by Bin.eval and
+    the recursive-function combine in RecFuncDef.eval_body)."""
+    if op == "+":
+        r = a + b
+    elif op == "-":
+        r = a - b
+    elif op == "&":
+        r = a & b
+    elif op == "|":
+        r = a | b
+    elif op == "^":
+        r = a ^ b
+    else:
+        raise AssertionError(op)
+    return u16(r)
+
+
 class Bin(Expr):
     def __init__(self, op, a, b):
         self.op, self.a, self.b = op, a, b
@@ -137,20 +170,7 @@ class Bin(Expr):
         return "(unsigned short)(%s %s %s)" % (self.a.emit(), self.op, self.b.emit())
 
     def eval(self, st):
-        a, b = self.a.eval(st), self.b.eval(st)
-        if self.op == "+":
-            r = a + b
-        elif self.op == "-":
-            r = a - b
-        elif self.op == "&":
-            r = a & b
-        elif self.op == "|":
-            r = a | b
-        elif self.op == "^":
-            r = a ^ b
-        else:
-            raise AssertionError(self.op)
-        return u16(r)
+        return apply_bin(self.op, self.a.eval(st), self.b.eval(st))
 
 
 class Shift(Expr):
@@ -320,11 +340,12 @@ VARTYPE = {}  # name -> 'u16' | 's16' | 'u8'  (filled by the generator)
 
 
 class State:
-    def __init__(self, vars0, arr0, ptr, funcs):
+    def __init__(self, vars0, arr0, ptr, funcs, depth=0):
         self.vars = dict(vars0)
         self.arr = list(arr0)
         self.ptr = ptr
         self.funcs = funcs
+        self.depth = depth  # call-stack depth, for the recursion safety cap
 
     def read(self, name):
         return self.vars[name]
@@ -335,16 +356,23 @@ class State:
 
     def call(self, fname, argv):
         fd = self.funcs[fname]
+        if self.depth >= MAX_EVAL_DEPTH:
+            # Real depth is bounded to <= 4 by Gen.call_args; hitting this means a
+            # generator bug produced unbounded recursion — surface it loudly.
+            raise RuntimeError(
+                "host-eval recursion exceeded %d frames at %s (generator bug)"
+                % (MAX_EVAL_DEPTH, fname))
         env = dict(self.vars)  # input globals are read-only, so their values are valid
         for p, a in zip(fd.params, argv):
             env[p] = u16(a)
-        sub = State(env, self.arr, self.ptr, self.funcs)
-        return fd.body.eval(sub)
+        sub = State(env, self.arr, self.ptr, self.funcs, depth=self.depth + 1)
+        return fd.eval_body(sub)
 
 
 class FuncDef:
     def __init__(self, name, params, body):
         self.name, self.params, self.body = name, params, body
+        self.recursive = False
 
     def emit(self):
         plist = ", ".join("unsigned short %s" % p for p in self.params)
@@ -352,6 +380,67 @@ class FuncDef:
             "__attribute__((noinline)) static unsigned short %s(%s) {\n"
             "  return (unsigned short)(%s);\n}" % (self.name, plist, self.body.emit())
         )
+
+    def eval_body(self, st):
+        return self.body.eval(st)
+
+
+class RecFuncDef(FuncDef):
+    """A genuinely self-recursive function — the ONLY soft-stack trigger the
+    generator can emit (MOSNonReentrant spares only NON-recursive functions from
+    `nonreentrant`/static frames). Generalizes examples/65816/a16spillr.c, the proven
+    F3 soft-stack repro:
+
+        __attribute__((noinline)) static unsigned short fN(unsigned short p0,
+                                                           unsigned short p1) {
+          if (p0 == 0) return (unsigned short)(BASE);
+          unsigned short v0 = (unsigned short)(IN0 OP <pure>);   // each anchored by a
+          unsigned short v1 = (unsigned short)(IN1 OP <pure>);   // DISTINCT volatile input
+          ...                                                    // (REC_LIVE of them)
+          unsigned short r = fN((unsigned short)(p0 - 1u), (unsigned short)(ARG1));
+          return (unsigned short)(COMBINE(v0..v{k-1}, r));        // ALL live across the call
+        }
+
+    Each v_i reads a DISTINCT volatile input (so the read can't sink past the call)
+    and is consumed in COMBINE after the call, so REC_LIVE (>4) 16-bit values are live
+    ACROSS the self-call — exhausting the 4 hard-stack CSR slots and forcing the
+    caller to spill to its frame. For a reentrant function that frame is the SOFT
+    stack: STStk/LDStk -> expandLDSTStk (the F3 Ac16-spill path). The recursion is
+    non-tail (the result feeds COMBINE) and the call is `noinline`, so the optimizer
+    cannot unroll/inline it away: fN stays recursive -> reentrant -> soft stack. p0 is
+    the counter — it strictly decreases by 1 and callers pass a small bounded constant
+    (Gen.call_args) — so depth is shallow and soft-stack-safe, and host-eval terminates.
+    """
+    def __init__(self, name, params, base, lives, combine, arg1):
+        super().__init__(name, params, base)  # `body` == the p0==0 base expr
+        self.recursive = True
+        self.base, self.lives, self.combine, self.arg1 = base, lives, combine, arg1
+
+    def emit(self):
+        ctr = self.params[0]
+        plist = ", ".join("unsigned short %s" % p for p in self.params)
+        lines = [
+            "__attribute__((noinline)) static unsigned short %s(%s) {" % (self.name, plist),
+            "  if (%s == 0)" % ctr,
+            "    return (unsigned short)(%s);" % self.base.emit(),
+        ]
+        for i, e in enumerate(self.lives):
+            lines.append("  unsigned short v%d = (unsigned short)(%s);" % (i, e.emit()))
+        lines.append(
+            "  unsigned short r = %s((unsigned short)((unsigned)%s - 1u), "
+            "(unsigned short)(%s));" % (self.name, ctr, self.arg1.emit()))
+        lines.append("  return (unsigned short)(%s);" % self.combine.emit())
+        lines.append("}")
+        return "\n".join(lines)
+
+    def eval_body(self, st):
+        ctr = st.read(self.params[0])
+        if ctr == 0:
+            return u16(self.base.eval(st))
+        for i, e in enumerate(self.lives):
+            st.vars["v%d" % i] = u16(e.eval(st))  # v0.. and r live in the frame's vars,
+        st.vars["r"] = st.call(self.name, [u16(ctr - 1), u16(self.arg1.eval(st))])
+        return u16(self.combine.eval(st))         # set directly (not via VARTYPE write)
 
 
 # ---------------------------------------------------------------------------
@@ -409,7 +498,7 @@ class Gen:
             return Deref()
         # call
         fd = self.funcs[self.rng.choice(list(self.funcs))]
-        return Call(fd.name, [self.small() for _ in fd.params])
+        return Call(fd.name, self.call_args(fd))
 
     def small(self):
         """A shallow value expr (used for indices / call args)."""
@@ -417,12 +506,22 @@ class Gen:
             return Const(self.rng.randrange(0x10000))
         return Var(self.rng.choice(self.readable))
 
+    def call_args(self, fd):
+        """Argument exprs for a call to `fd`. For a recursive function the first
+        param is the recursion counter, which MUST be a small bounded constant —
+        otherwise the recursion would run away on both the soft stack (overflow)
+        and the host evaluator. Data args stay arbitrary."""
+        if fd.recursive:
+            return [Const(self.rng.randint(2, 4))] + [
+                self.small() for _ in fd.params[1:]]
+        return [self.small() for _ in fd.params]
+
     def expr(self, depth, pure=False):
         if depth <= 0 or self.rng.random() < 0.45:
             return self.leaf(pure=pure)
         r = self.rng.random()
         if r < 0.6:
-            op = self.rng.choice(["+", "-", "&", "|", "^"])
+            op = self.rng.choice(BINOPS)
             return Bin(op, self.expr(depth - 1, pure), self.expr(depth - 1, pure))
         if r < 0.85:
             kind = self.rng.choice(["shl", "shr", "sar"])
@@ -478,9 +577,29 @@ class Gen:
             name = "f%d" % k
             params = ["p0", "p1"]
             self.pure_pool = params + list(self.inputs)
-            body = self.expr(2, pure=True)
+            if self.rng.random() < P_RECURSIVE:
+                # Self-recursive -> soft stack. Hold REC_LIVE 16-bit values live across
+                # the self-call, each anchored by a distinct volatile input read, then
+                # COMBINE folds them + the recursive result -> caller spills to its soft
+                # frame (STStk/LDStk -> expandLDSTStk).
+                base = self.expr(2, pure=True)
+                arg1 = self.expr(1, pure=True)
+                k = self.rng.randint(REC_LIVE_MIN, REC_LIVE_MAX)
+                vol = list(self.inputs)
+                self.rng.shuffle(vol)
+                lives = [Bin(self.rng.choice(BINOPS),
+                             Var(vol[i % len(vol)]), self.expr(1, pure=True))
+                         for i in range(k)]
+                fold = ["v%d" % i for i in range(k)] + ["r"]
+                self.rng.shuffle(fold)
+                combine = Var(fold[0])
+                for nm in fold[1:]:
+                    combine = Bin(self.rng.choice(BINOPS), combine, Var(nm))
+                self.funcs[name] = RecFuncDef(name, params, base, lives, combine, arg1)
+            else:
+                body = self.expr(2, pure=True)
+                self.funcs[name] = FuncDef(name, params, body)
             del self.pure_pool
-            self.funcs[name] = FuncDef(name, params, body)
 
     # --- whole program ------------------------------------------------------
     def program(self):
@@ -489,6 +608,13 @@ class Gen:
         n = self.rng.randint(5, 9)
         body = self.block(n, budget=1)
         final = self.expr(2)
+        # Guarantee every recursive function is actually invoked AND value-checked:
+        # an uncalled `static` function is DCE'd (never exercising the soft stack),
+        # and folding its result into corpus_result puts it under the differential
+        # oracle. Random body/`final` calls may also hit it — this just ensures it.
+        for name, fd in self.funcs.items():
+            if fd.recursive:
+                final = Bin("^", final, Call(name, self.call_args(fd)))
         body.append(AssignVar("corpus_result", final))
         self.body = body
         self.final = final

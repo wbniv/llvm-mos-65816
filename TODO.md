@@ -56,21 +56,20 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
   [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md) ·
   [compare-operand-fold plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md).
-- [ ] **#321 native s16 equality-as-value — the full native compare (deferred from item (c)).** With the
-  prologue regression fixed, `b = (a == c)` now matches default (8-bit cpx chain + carry-materialize). A
-  *native* version would be one `rep; lda; cmp; sep` then materialize **Z**→0/1 — but the backend has
-  **no compare that produces N/Z as a value**: every flag-as-value path is carry-based (the 8-bit
-  EQ-as-value computes equality into C via `sec`/`clc`), and 16-bit Z exists only as the fused
-  compare-**branch** (`CmpBrImag16`/`CmpBrImm16`, `selectBrCondImm`). Making it native needs a new fused
-  compare-**select** pseudo (`CmpSelImag16`/`CmpSelImm16`) + expansion (mirror `expandCmpBr16` but end in
-  `beq/bne; ldx #1/stz`), folded into `SelectImm` selection via the existing `m_CmpNZ*16` matchers, plus
-  relaxing the `NativeS16EqBranch` gate. Deliberately deferred by the 2026-06-15 equality work for this
-  reason; substantial; modest win on a rare pattern. **Also:** the byte-wise-load fix gates only the
-  *absolute* s16 load — an **indirect** s16 load (`G_LOAD16_INDIR`) consumed only by `G_UNMERGE` still
-  round-trips through `A16`; the same `AllUsesUnmerge` guard would apply, but the win is unproven (the
-  byte-wise `(zp),y` form may not beat the native load+spill), so it is investigation-gated and low
-  priority. [native-EQ + byte-wise plan](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md) ·
-  [indirect-load plan](docs/plans/2026-06-16-321-indirect-s16-load-bytewise.md).
+- [ ] **#321 native s16 equality-as-value — SPIKED → blanket REJECTED; only a gated version remains (low
+  priority, shelved).** Goal was native `b = (a == c)` (one `rep; lda; cmp; sep` + materialize Z→0/1)
+  instead of the 8-bit cpx chain. **Spiked 2026-06-16** (a 2-line gate relaxation): the existing `CmpBr`
+  machinery handles it (`buildNZSelect → MOSLowerSelect → G_BRCOND_IMM → CmpBrImag16`) — `-verify-machineinstrs`
+  clean, **no new `CmpSelImag16` pseudo needed** (the sketch's heavy approach is unnecessary). BUT it is
+  **operand-residency-dependent, not a blanket win**: wins only when the LHS is already in `Imag16`
+  (local/computed −3 B, indirect `*p==c` −4 B) and **regresses** register/param operands (+8 B), globals
+  (+4 B), and global-vs-immediate (+12 B) — the native compare routes the LHS through `Imag16` + `rep`/`sep`
+  where the 8-bit `cpx;cmp` works on registers directly. A *gated* native EQ (fire only for `Imag16`-resident
+  LHS + add an abs-operand fold for globals à la `a16abscmp`) is possible but high-effort for a −3/−4 B gain
+  on a sub-pattern — defer unless EQ-of-`Imag16`-values shows up hot, or A16-threading shifts operand
+  residency. Does **not** cleanly subsume the indirect-s16-load case (helps `*p==c` −4 B but regresses most
+  other shapes). [native-EQ plan + spike results](docs/plans/2026-06-16-321-native-s16-eq-as-value-cmpsel.md) ·
+  [equality (branch) plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md).
 - [ ] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** The F3 `Ac16`
   spill fix landed on **both** stacks, but the soft-stack half was found only by a hand-written recursive
   reproducer — the **fuzzer never reaches it**: `gen_funcs` emits only leaf functions (`expr(pure=True)`
@@ -182,6 +181,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-16 — [321-indirect-s16-load-bytewise] **indirect s16 load consumed only as bytes: investigated → WON'T-IMPLEMENT.** The byte-wise-load fix (`7c0fe56`) gates only the *absolute* s16 load; the open question was whether to extend the `AllUsesUnmerge` guard to the **indirect** load (`G_LOAD16_INDIR`, `legalizeLoadStore16`). Measured native-vs-byte-wise via a scratch `!AllUsesUnmerge` gate: in isolated **leaf** functions byte-wise won −6 B (no `rep`/`sep`/spill island), BUT `+mos-a16` runs predominantly in **16-bit (M=0)** mode, and re-measuring in 16-bit-ambient code showed the win is **schedule-dependent** — byte-wise wins only when the load is *adjacent* to its byte-compare (`loop_deref` −6 B) and is a **+2 B regression** when 16-bit math is scheduled between load and compare (`mixed_deref`, the common shape), because it then carries two byte-spills across that region vs the native form's one word-spill. The blanket gate can't distinguish them, so it fails the "not meaningfully worse elsewhere" bar. The real fix is **native s16 EQ-as-value** (removes the `G_UNMERGE` entirely) — folded into the Open M2 native-EQ item. Tree left native (scratch reverted, codegen byte-identical to baseline). [plan](docs/plans/2026-06-16-321-indirect-s16-load-bytewise.md).
 - 2026-06-16 — [321-s16-load-unmerge-bytewise] **s16 equality-as-value prologue regression FIXED: an s16 load consumed only by `G_UNMERGE` now loads byte-wise.** Investigating M2 item (c) (`b = (a == c)`) surfaced a `+mos-a16` *regression*: the s16 operand loads were emitted as native 16-bit `G_LOAD16_ABS` (`lda abs → A16; sta imag16`) and then the 8-bit-narrowed compare `G_UNMERGE`d them straight back into bytes — a wasteful round-trip the default build never does. Fix (`MOSLegalizerInfo::legalizeLoadStore16`): when every use of an s16 load is `G_UNMERGE`, skip the native 16-bit load and fall to the byte-wise `narrowScalar` (matches default). `b = (a == c)` now loads operands byte-wise (no `rep`-bracketed prologue before the compare) — back to parity with default. Regression `examples/65816/a16eqval.c` + `dev/a16eqval.sh` (`corpus_result == 0x0101` host==default==a16 on both emulators + a no-prologue disasm gate). Non-breaking: suite 42/42 (now 43 w/ a16eqval), corpus 7/7, fuzz 50/50; `0002` round-trips. The FULL native equality-as-value (a fused compare-select) remains deferred — see Open M2. [plan](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md).
 - 2026-06-16 — [321-softstack-ac16-spill] **F3 follow-up FIXED: the soft-stack (reentrant) `Ac16` spill.** The static-stack F3 fix left the soft-stack spill path with the same `Imag16`-only gap — a reentrant `+mos-a16` function holding a 16-bit value in the accumulator across a call crashed (`Scavenger spill for register not yet implemented` / `SelectImm $a16`) because `MOSRegisterInfo::expandLDSTStk` fell `Ac16` through to a byte path that `COPY`ed `A16` to an 8-bit GPR (the high byte `B` isn't byte-addressable without `XBA`). Fix: spill `Ac16` with one 16-bit **indirect** `STAIndir16`/`LDAIndir16` through a slot pointer formed in the spill's reserved `Imag16:$scratch` (reusing the existing far-offset `AddrLostk`/`AddrHistk` machinery — no new post-RA allocation) — the indirect analog of the static `STAbs16`/`LDAbs16` fix. Proved the crash on the pre-fix build first (recursion forces the soft stack: `MOSNonReentrant` only marks non-recursive functions `nonreentrant`). Regression `examples/65816/a16spillr.c` + `dev/a16spillr.sh`: `corpus_result == 0x3457` host==default==+mos-a16 on MAME + bsnes-jg; the MLow=1 op is rep/sep-bracketed. Non-breaking: suite 42/42, corpus 7/7 (incl. recursive `funcs`), fuzz 50/50; `0002` round-trips. [plan](docs/plans/2-one-tracked-follow-up-glimmering-ladybug.md).
 - 2026-06-16 — [321-fix-cmp-value-selectimm] **F3 FIXED (the `SelectImm $a16` crash → `fuzz 50 1` 50/50, 0 xfail): spill the 16-bit accumulator `Ac16` via a direct 16-bit `LDAbs16`/`STAbs16`, not a COPY through an 8-bit GPR.** Root-caused to **register allocation**, not the legalizer: `MOSInstrInfo::loadStoreRegStackSlot` only special-cased `Imag16`, so an `Ac16` value spilled across a call fell through to a single-byte path that emitted `GPR = COPY A16` → `copyPhysRegImpl` (`:743`, `Anyi1` branch) → invalid `SelectImm $a16`. Added an `Ac16` case using `LDAbs16`/`STAbs16` to the frame index, restoring the native-s16 invariant ("A16 entered/left only via 16-bit load/store"). The first-guess legalizer-gate fix (the s16 ordering native gate lacking the equality gate's all-uses-are-`G_BRCOND_IMM` guard) was implemented and **disproven** first (clean SSA, but all 8 seeds still crashed post-RA; reverted). Verified: repro + 8 seeds compile clean; `fuzz 50 1` → 50/50 (seed 1 `0x525C`, seed 7 `0x9447`, all four oracles agree); a16+kernels suite 40/40, corpus 7/7; `0002` round-trips. New regression `examples/65816/a16spill.c` + `dev/a16spill.sh` (compile-time gate; the fuzzer de-XFAIL covers values). Follow-up: soft-stack `Ac16` spill (`expandLDSTStk`) has the same gap (pre-existing, corpus-unreachable). [plan](docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md).
@@ -475,4 +475,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-16: indirect-s16-load-bytewise is a PLANNED, investigation-gated item
      (Status: planned) — its "Verification (if implemented)" section is intentionally unrun
      (nothing built yet). Tracked by the M2 "equality-as-value" bullet. Not a missed step. -->
+- [ ] **(triage)** The other P0 follow-ups (P1 `expandLDSTStk` contract note, P2 `.ll` durability, P3 `reentrant` — _from [2026-06-16-321-f4-late-opt-txy-dead-flag.md](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md)_  <!-- fp:cb963e0cec41eae1 -->
+- [ ] **(triage)** Upstreaming the PR to llvm-mos is user-triggered (like the #320 note). — _from [2026-06-16-321-f4-late-opt-txy-dead-flag.md](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md)_  <!-- fp:5a35103736bcadd9 -->
 <!-- END auto-captured-deferrals -->
