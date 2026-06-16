@@ -472,5 +472,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        `reentrant`-attribute issue, interrupt/optnone alternative triggers) -> covered by
        the M2 bullet "#321 soft-stack (reentrant) spill coverage" + its plan's Out-of-scope.
      Nothing open here. -->
-- [verify] **2026-06-16-321-indirect-s16-load-bytewise** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-16-321-indirect-s16-load-bytewise.md](docs/plans/2026-06-16-321-indirect-s16-load-bytewise.md)_  <!-- fp:84cb8f768a77b50d -->
+<!-- triaged 2026-06-16: indirect-s16-load-bytewise is a PLANNED, investigation-gated item
+     (Status: planned) — its "Verification (if implemented)" section is intentionally unrun
+     (nothing built yet). Tracked by the M2 "equality-as-value" bullet. Not a missed step. -->
 <!-- END auto-captured-deferrals -->
