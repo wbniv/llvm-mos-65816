@@ -3343,6 +3343,56 @@ index 868f6c712..7b5100bfe 100644
 +// accumulator ops can be allocated. Allocation to A16 is forced by the Ac16
 +// register class on the selected ops, not by the bank (banks are unused here).
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index baf6de604..8af2979fd 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -427,10 +427,21 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+       IsLoad ? MI->getOperand(0).getReg() : MI->getOperand(1).getReg();
+   int64_t Offset = MI->getOperand(3).getImm();
+ 
+-  if (Offset >= 256) {
++  // #321: the 16-bit accumulator (Ac16 = A16) is spilled with a single 16-bit
++  // indirect load/store (see below) — never the Imag16 byte-pair split (A16's high
++  // byte B is not byte-addressable without XBA) nor the 8-bit fall-through (which
++  // would COPY A16 to a GPR -> the SelectImm $a16 / register-scavenger crash).
++  const bool IsAc16 = MOS::Ac16RegClass.contains(Loc);
++
++  // Form an exact slot pointer in the reserved scratch when the access can't use a
++  // base+index addressing mode: a far offset (>= 256), OR an Ac16 spill at a nonzero
++  // offset (STAIndir16/LDAIndir16 are (zp)-indirect with no index). After this the
++  // pointer is in operand 2 and the offset is 0, so re-entry lands in the offset-0
++  // paths below.
++  if (Offset >= 256 || (IsAc16 && Offset != 0)) {
+     Register P = MRI.createVirtualRegister(&MOS::PcRegClass);
+-    // Far stack accesses need a virtual base register, so materialize one
+-    // here using the pointer provided.
++    // These accesses need a concrete base pointer, so materialize one here using
++    // the pointer provided (the earlyclobber scratch operand).
+     Register NewBase =
+         IsLoad ? MI->getOperand(1).getReg() : MI->getOperand(0).getReg();
+     // We can't scavenge a 16-bit register, so this can't be virtual here
+@@ -461,6 +472,20 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+     return;
+   }
+ 
++  // #321: Ac16 spill/reload at offset 0 — operand 2 is now the exact slot pointer
++  // (the frame register for a near offset-0 access, or the scratch pointer the block
++  // above formed). One 16-bit indirect store/load of A16 through it; the MLow=1 op is
++  // rep/sep-bracketed by the later MOSInsertREPSEP pass.
++  if (IsAc16) {
++    assert(Offset == 0 && "Ac16 nonzero offset should have formed a pointer above");
++    Builder.buildInstr(IsLoad ? MOS::LDAIndir16 : MOS::STAIndir16)
++        .addReg(Loc, getDefRegState(IsLoad))
++        .add(MI->getOperand(2))
++        .addMemOperand(*MI->memoperands_begin());
++    MI->eraseFromParent();
++    return;
++  }
++
+   if (MOS::Imag16RegClass.contains(Loc)) {
+     if (!IsLoad) {
+       // Loc may not be fully alive at this point, which would create uses of
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 index 94e229944..253663616 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td

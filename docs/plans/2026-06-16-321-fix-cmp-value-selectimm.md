@@ -45,12 +45,16 @@ wraps the `MLow=1` op in its own `rep #$20 … sep #$20`. Confirmed in the repro
 `rep #$20; lda <slot>; … ; sta <slot>; sep #$20` for the spill, a 16-bit reload under `rep`, and **no**
 `SelectImm`/byte-COPY.
 
-**Scope / known limitation:** the fix covers the **static stack** (used by every `nonreentrant` function,
-i.e. the entire fuzz corpus + the repro). The **soft-stack** path (`expandLDSTStk`, for reentrant
-functions) likewise only special-cases `Imag16`; an `Ac16` value spilled there would hit the same crash.
-That is **pre-existing, not reachable by the corpus**, and harder (the accumulator high byte `B` can't be
-byte-addressed without `XBA`), so it is left as a tracked follow-up — it crashes **loudly** under
-`-verify-machineinstrs` (never silently miscompiles). [TODO M2].
+**Soft-stack follow-up — also FIXED (2026-06-16).** The soft-stack spill path (`expandLDSTStk`, for
+*reentrant* functions) had the identical `Imag16`-only gap: an `Ac16` value spilled there fell through to
+the byte path and crashed (`Scavenger spill for register not yet implemented` / `SelectImm $a16`). It
+cannot use the `Imag16` byte-pair split (the accumulator high byte `B` isn't byte-addressable without
+`XBA`), so it now spills `Ac16` with a single 16-bit **indirect** `STAIndir16`/`LDAIndir16` through a slot
+pointer formed in the spill's reserved `Imag16:$scratch` (reusing the existing far-offset
+`AddrLostk`/`AddrHistk` machinery) — the indirect analog of the static-stack `STAbs16`/`LDAbs16` fix.
+Regression test `examples/65816/a16spillr.c` + `dev/a16spillr.sh` (a recursive → soft-stack function;
+`corpus_result == 0x3457` host==default==+mos-a16 on MAME + bsnes-jg). See the
+[soft-stack plan](2-one-tracked-follow-up-glimmering-ladybug.md).
 
 ## Outcome (2026-06-16): the diagnosis that led to the fix — candidate A (legalizer) was the wrong layer
 
@@ -214,8 +218,9 @@ empty.
    again). `dev/run.sh fuzz 50 1` → `50/50 PASS, 0 known-issue (xfail) (0 mismatch, 0 new-crash, 0 error)`.
    Spot-checks: seed 1 → `0x525C (all agree)`, seed 7 → `0x9447 (all agree)`
    (host==default==a16@MAME==a16@bsnes). **PASS.**
-4. **Non-breaking:** `==== a16+kernels suite: 40 PASS, 0 FAIL ====` (32 a16* + 6 kernels + 2
-   combinatorial), `dev/run.sh corpus` → `7/7 passed`. **PASS.** (a16spill adds a 41st test.)
+4. **Non-breaking:** `==== suite: 42 PASS, 0 FAIL ====` (32 a16* + 6 kernels + 2 combinatorial +
+   `a16spill` + `a16spillr`), `dev/run.sh corpus` → `7/7 passed` (incl. the recursive/soft-stack
+   `funcs`), `dev/run.sh fuzz 50 1` → `50/50, 0 xfail`. **PASS.**
 5. **`dev/regen-patch.sh` round-trips** (`RESULT: PASS — 0002 round-trips`); the fix is in `0002`. **PASS.**
 
 ## The fix in one place
@@ -225,7 +230,8 @@ empty.
 frame index, instead of falling through to the single-byte path that emits `GPR = COPY A16` →
 `SelectImm $a16`. Six-line change; see §Resolution.
 
-**Follow-up (tracked, not blocking):** the soft-stack spill path (`expandLDSTStk`, reentrant functions)
-has the same `Imag16`-only gap for `Ac16` — pre-existing, unreachable by the (nonreentrant) corpus, and
-harder (the accumulator high byte needs `XBA` to byte-address). It crashes loudly under verify, never
-miscompiles. [TODO M2].
+**Soft-stack follow-up — FIXED (2026-06-16).** The soft-stack spill path (`expandLDSTStk`, reentrant
+functions) had the same `Imag16`-only gap for `Ac16`; it now spills via a 16-bit indirect
+`STAIndir16`/`LDAIndir16` through a scratch-formed slot pointer. Regression `examples/65816/a16spillr.c`
++ `dev/a16spillr.sh` (recursive → soft stack; `corpus_result == 0x3457` on MAME + bsnes-jg). See
+[the soft-stack plan](2-one-tracked-follow-up-glimmering-ladybug.md) and §Resolution above.

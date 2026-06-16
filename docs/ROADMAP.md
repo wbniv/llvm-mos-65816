@@ -439,10 +439,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `copyPhysRegImpl` lowers it (`Anyi1` branch) to the invalid `SelectImm $a16`. **Fix:** spill `Ac16`
    with a direct 16-bit `LDAbs16`/`STAbs16` to the frame index — never a COPY through an 8-bit GPR —
    restoring the native-s16 invariant. The 8 formerly-XFAIL seeds + the repro now compile clean and run
-   correct on both emulators; regression `examples/65816/a16spill.c` + `dev/a16spill.sh`. (Follow-up: the
-   soft-stack spill path has the same `Imag16`-only gap for `Ac16` — pre-existing, corpus-unreachable.)_
+   correct on both emulators; regression `examples/65816/a16spill.c` + `dev/a16spill.sh`. The **soft-stack
+   (reentrant)** spill path (`expandLDSTStk`) had the same `Imag16`-only gap and is **also FIXED** — it
+   spills `Ac16` via a 16-bit indirect `STAIndir16`/`LDAIndir16` through a scratch-formed slot pointer
+   (regression `examples/65816/a16spillr.c` + `dev/a16spillr.sh`, `corpus_result==0x3457` on both
+   emulators)._
    [Tier-1 plan](plans/2026-06-15-321-tier1-broaden-corpus.md) ·
-   [F3 fix plan](plans/2026-06-16-321-fix-cmp-value-selectimm.md)._
+   [F3 fix plan](plans/2026-06-16-321-fix-cmp-value-selectimm.md) ·
+   [soft-stack plan](plans/2-one-tracked-follow-up-glimmering-ladybug.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
