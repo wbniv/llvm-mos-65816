@@ -2984,7 +2984,7 @@ index cbdd54ab2..15a59a157 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..516d0fa07 100644
+index 212ede1a0..8b156a0f5 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -3166,7 +3166,7 @@ index 212ede1a0..516d0fa07 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1270,7 +1345,29 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1270,7 +1345,44 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -3177,27 +3177,42 @@ index 212ede1a0..516d0fa07 100644
 +  // narrow to the 8-bit byte chain (deferred follow-ups). UGE is the slice that
 +  // needs no terminator-fusion (C is a plain i1), so the branch reads it directly.
 +  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
-+  // #321 native s16 equality: take the native EQ path only when the result feeds a
-+  // branch (every use is G_BRCOND_IMM) — the Z flag it produces must be fused into a
-+  // terminator (selectSbc asserts N/Z are never plain values), so an EQ whose result
-+  // is a stored bool must stay on the 8-bit chain. (A value use via buildNZSelect ->
-+  // G_SELECT does NOT fold the s16 compare back to native — it narrows in the select
-+  // lowering — so EQ-as-value remains an 8-bit follow-up. Ordering-as-value already
-+  // goes native, as C is a plain i1.) Mirrors the zero-compare guard.
-+  const bool NativeS16EqBranch =
++  // #321 native s16 equality: take the native EQ path (one rep/lda/cmp/sep producing Z,
++  // selected via CmpBrImag16) when either (a) the result feeds a branch (every use is
++  // G_BRCOND_IMM — Z fuses into the terminator directly), or (b) an operand is a
++  // non-absolute (indirect) s16 load. Case (b) is the EQ-as-VALUE win: the loaded value
++  // already lands in Imag16, so the native 16-bit compare reads it directly instead of
++  // unmerging it back into bytes for an 8-bit chain (measured -4 B on `*p == c`); the
++  // value materializes via buildNZSelect -> MOSLowerSelect -> G_BRCOND_IMM -> CmpBrImag16.
++  // Register/global/computed operands stay 8-bit: there the native form would force an
++  // Imag16 spill the tight 8-bit `cpx;cmp` avoids (measured regressions) — see
++  // docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md (v2/v3 cover those).
++  auto isIndirectS16Load = [&](Register Reg) -> bool {
++    MachineInstr *Def = getDefIgnoringCopies(Reg, MRI);
++    if (!Def || (Def->getOpcode() != TargetOpcode::G_LOAD &&
++                 Def->getOpcode() != MOS::G_LOAD16_INDIR))
++      return false;
++    if (MRI.getType(Def->getOperand(0).getReg()) != LLT::scalar(16))
++      return false;
++    // Non-absolute pointer => indirect load => value is in Imag16 (native wins).
++    return !matchAbsoluteAddressing(MRI, Def->getOperand(1).getReg()).has_value();
++  };
++  const bool NativeS16Eq =
 +      STI.hasAccum16() && Type == LLT::scalar(16) && Pred == CmpInst::ICMP_EQ &&
-+      !RHSIsZero && all_of(MRI.use_instructions(Dst), [](const MachineInstr &U) {
-+        return U.getOpcode() == MOS::G_BRCOND_IMM;
-+      });
++      !RHSIsZero &&
++      (isIndirectS16Load(LHS) || isIndirectS16Load(RHS) ||
++       all_of(MRI.use_instructions(Dst), [](const MachineInstr &U) {
++         return U.getOpcode() == MOS::G_BRCOND_IMM;
++       }));
 +  const bool NativeS16 =
 +      STI.hasAccum16() && Type == LLT::scalar(16) &&
-+      (Pred == CmpInst::ICMP_UGE || NativeS16EqBranch);
++      (Pred == CmpInst::ICMP_UGE || NativeS16Eq);
 +
 +  if (Type != S8 && !NativeS16) {
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,25 +1438,31 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,16 +1453,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -3216,11 +3231,13 @@ index 212ede1a0..516d0fa07 100644
 -        Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1}, {LHS, RHS, CIn});
 +        Builder.buildInstr(MOS::G_SBC, {CmpTy, S1, S1, S1, S1}, {LHS, RHS, CIn});
      Register Z = Sbc.getReg(4);
--    if (!isNZUseLegal(Dst, MRI))
-+    if (!NativeS16 && !isNZUseLegal(Dst, MRI))
++    // Value use of a native 16-bit Z: wrap it in a select so MOSLowerSelect turns it into
++    // a G_BRCOND_IMM that selectBrCondImm fuses into CmpBrImag16 (the materialization
++    // diamond loads 0/1). For a branch use isNZUseLegal is true, so this is skipped.
+     if (!isNZUseLegal(Dst, MRI))
        Z = buildNZSelect(Z, Builder);
      Builder.buildCopy(Dst, Z);
-     MI.eraseFromParent();
+@@ -1358,8 +1476,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {
@@ -3233,7 +3250,7 @@ index 212ede1a0..516d0fa07 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1601,14 +1704,86 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1601,14 +1722,86 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
  
@@ -3321,7 +3338,7 @@ index 212ede1a0..516d0fa07 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1645,6 +1820,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1645,6 +1838,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);
