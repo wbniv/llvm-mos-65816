@@ -2984,7 +2984,7 @@ index cbdd54ab2..15a59a157 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..f6b8d8884 100644
+index 212ede1a0..516d0fa07 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -3233,7 +3233,7 @@ index 212ede1a0..f6b8d8884 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1601,14 +1704,70 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1601,14 +1704,86 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
  
@@ -3262,19 +3262,35 @@ index 212ede1a0..f6b8d8884 100644
 +    return Helper.narrowScalar(MI, 0, LLT::scalar(8)) ==
 +           LegalizerHelper::Legalized;
 +
++  // #321: an s16 LOAD whose result is only ever split into bytes (every use is a
++  // G_UNMERGE — e.g. an s16 global feeding an 8-bit-narrowed compare like
++  // `b = (a == c)`) should keep its byte-wise lowering. Forming the native 16-bit
++  // `lda abs -> A16; sta imag16` here only for the consumer to read the bytes straight
++  // back is a wasteful round-trip (worse than the default byte loads). Narrow it
++  // instead. (Stores always take the native form; the indirect-load-then-unmerge case
++  // is a separate follow-up — see TODO.)
++  const bool AllUsesUnmerge =
++      IsLoad && !MRI.use_nodbg_empty(MI.getOperand(0).getReg()) &&
++      all_of(MRI.use_nodbg_instructions(MI.getOperand(0).getReg()),
++             [](const MachineInstr &U) {
++               return U.getOpcode() == TargetOpcode::G_UNMERGE_VALUES;
++             });
++
 +  if (STI.hasAccum16() && MRI.getType(Ptr).getScalarSizeInBits() == 16) {
 +    // Absolute address (global/static/const) -> native 16-bit `lda abs`/`sta abs`.
 +    if (auto AbsOp = matchAbsoluteAddressing(MRI, Ptr)) {
-+      Builder
-+          .buildInstr(IsLoad ? MOS::G_LOAD16_ABS : MOS::G_STORE16_ABS)
-+          .add(MI.getOperand(0)) // dst (load) / value (store)
-+          .add(*AbsOp)
-+          .addMemOperand(*MI.memoperands_begin());
-+      MI.eraseFromParent();
-+      return true;
-+    }
-+    // Runtime 16-bit pointer -> native 16-bit `lda (zp)`/`sta (zp)`.
-+    if (STI.has65C02()) {
++      if (!AllUsesUnmerge) {
++        Builder
++            .buildInstr(IsLoad ? MOS::G_LOAD16_ABS : MOS::G_STORE16_ABS)
++            .add(MI.getOperand(0)) // dst (load) / value (store)
++            .add(*AbsOp)
++            .addMemOperand(*MI.memoperands_begin());
++        MI.eraseFromParent();
++        return true;
++      }
++      // else: all-uses-unmerge load -> fall through to the byte-wise narrowing below.
++    } else if (STI.has65C02()) {
++      // Runtime 16-bit pointer -> native 16-bit `lda (zp)`/`sta (zp)`.
 +      Builder.buildInstr(IsLoad ? MOS::G_LOAD16_INDIR : MOS::G_STORE16_INDIR)
 +          .add(MI.getOperand(0))
 +          .addUse(Ptr)
@@ -3305,7 +3321,7 @@ index 212ede1a0..f6b8d8884 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1645,6 +1804,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1645,6 +1820,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);

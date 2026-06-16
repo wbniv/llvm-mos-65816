@@ -39,12 +39,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 ### M2 — Optimizing Payoff
 
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
-  and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality** feeding a
-  stored bool/value (`b = (a == c)`) still narrows to the 8-bit cpx/cpy chain — ordering-as-value
-  (`b = (a < c)`) ALREADY goes native (C is a plain i1, materialized via branch), but the Z-flag value
-  path narrows in the **select lowering** (relaxing the EQ branch-gate + `buildNZSelect` did NOT fold
-  the s16 compare back to native — investigated 2026-06-15, reverted; needs the select/NZ lowering to
-  fold an s16 `G_SBC`); ~~(d) fold a near-abs global RHS into `CMPAbs16`~~ (landed — see Done; also
+  and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
+  (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
+  only by `G_UNMERGE` now loads byte-wise instead of a wasteful 16-bit-load→`A16`→spill→re-read —
+  `legalizeLoadStore16`; brings EQ-as-value to parity with default — see Done). The **full native
+  compare** (one `rep; lda; cmp; sep` + materialize Z→0/1, beating default) is still deferred — see the
+  dedicated bullet below; ~~(d) fold a near-abs global RHS into `CMPAbs16`~~ (landed — see Done; also
   folds the LHS via `lda abs`). **Tier-1 fuzzer finding F3 (the `SelectImm $a16` crash on a 16-bit-
   accumulator value spilled across a call) is FIXED** for BOTH stacks: static (2026-06-16, direct
   `STAbs16`/`LDAbs16`; `examples/65816/a16spill.c`) and soft/reentrant (2026-06-16, 16-bit indirect
@@ -56,6 +56,30 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
   [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md) ·
   [compare-operand-fold plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md).
+- [ ] **#321 native s16 equality-as-value — the full native compare (deferred from item (c)).** With the
+  prologue regression fixed, `b = (a == c)` now matches default (8-bit cpx chain + carry-materialize). A
+  *native* version would be one `rep; lda; cmp; sep` then materialize **Z**→0/1 — but the backend has
+  **no compare that produces N/Z as a value**: every flag-as-value path is carry-based (the 8-bit
+  EQ-as-value computes equality into C via `sec`/`clc`), and 16-bit Z exists only as the fused
+  compare-**branch** (`CmpBrImag16`/`CmpBrImm16`, `selectBrCondImm`). Making it native needs a new fused
+  compare-**select** pseudo (`CmpSelImag16`/`CmpSelImm16`) + expansion (mirror `expandCmpBr16` but end in
+  `beq/bne; ldx #1/stz`), folded into `SelectImm` selection via the existing `m_CmpNZ*16` matchers, plus
+  relaxing the `NativeS16EqBranch` gate. Deliberately deferred by the 2026-06-15 equality work for this
+  reason; substantial; modest win on a rare pattern. **Also:** the byte-wise-load fix gates only the
+  *absolute* s16 load — an **indirect** s16 load (`G_LOAD16_INDIR`) consumed only by `G_UNMERGE` still
+  round-trips through `A16`; the same `AllUsesUnmerge` guard would apply (lower priority).
+  [plan](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md).
+- [ ] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** The F3 `Ac16`
+  spill fix landed on **both** stacks, but the soft-stack half was found only by a hand-written recursive
+  reproducer — the **fuzzer never reaches it**: `gen_funcs` emits only leaf functions (`expr(pure=True)`
+  excludes the `call` leaf), so the call graph is acyclic → `MOSNonReentrant` marks every function
+  `nonreentrant` → all get static frames. P0: teach `tools/a16_fuzz.py` to emit a **recursive** function
+  (the proven soft-stack trigger) so `expandLDSTStk` spills of `Ac16`/`Imag16`/8-bit get value-level
+  differential coverage (host==default==a16, both emulators). P1: document the `expandLDSTStk` spill
+  contract at the `MOSRegisterInfo.cpp:528` assert (every spillable ≥16-bit class needs an explicit case
+  — `xy16` index-16 is the latent next one). P2: add a hermetic `.ll` crash-regression for the soft-stack
+  `Ac16` spill. P3 (optional, upstream, not #321): `__attribute__((reentrant))` can't force the soft
+  stack — file an issue. [plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
@@ -156,6 +180,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-16 — [321-s16-load-unmerge-bytewise] **s16 equality-as-value prologue regression FIXED: an s16 load consumed only by `G_UNMERGE` now loads byte-wise.** Investigating M2 item (c) (`b = (a == c)`) surfaced a `+mos-a16` *regression*: the s16 operand loads were emitted as native 16-bit `G_LOAD16_ABS` (`lda abs → A16; sta imag16`) and then the 8-bit-narrowed compare `G_UNMERGE`d them straight back into bytes — a wasteful round-trip the default build never does. Fix (`MOSLegalizerInfo::legalizeLoadStore16`): when every use of an s16 load is `G_UNMERGE`, skip the native 16-bit load and fall to the byte-wise `narrowScalar` (matches default). `b = (a == c)` now loads operands byte-wise (no `rep`-bracketed prologue before the compare) — back to parity with default. Regression `examples/65816/a16eqval.c` + `dev/a16eqval.sh` (`corpus_result == 0x0101` host==default==a16 on both emulators + a no-prologue disasm gate). Non-breaking: suite 42/42 (now 43 w/ a16eqval), corpus 7/7, fuzz 50/50; `0002` round-trips. The FULL native equality-as-value (a fused compare-select) remains deferred — see Open M2. [plan](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md).
 - 2026-06-16 — [321-softstack-ac16-spill] **F3 follow-up FIXED: the soft-stack (reentrant) `Ac16` spill.** The static-stack F3 fix left the soft-stack spill path with the same `Imag16`-only gap — a reentrant `+mos-a16` function holding a 16-bit value in the accumulator across a call crashed (`Scavenger spill for register not yet implemented` / `SelectImm $a16`) because `MOSRegisterInfo::expandLDSTStk` fell `Ac16` through to a byte path that `COPY`ed `A16` to an 8-bit GPR (the high byte `B` isn't byte-addressable without `XBA`). Fix: spill `Ac16` with one 16-bit **indirect** `STAIndir16`/`LDAIndir16` through a slot pointer formed in the spill's reserved `Imag16:$scratch` (reusing the existing far-offset `AddrLostk`/`AddrHistk` machinery — no new post-RA allocation) — the indirect analog of the static `STAbs16`/`LDAbs16` fix. Proved the crash on the pre-fix build first (recursion forces the soft stack: `MOSNonReentrant` only marks non-recursive functions `nonreentrant`). Regression `examples/65816/a16spillr.c` + `dev/a16spillr.sh`: `corpus_result == 0x3457` host==default==+mos-a16 on MAME + bsnes-jg; the MLow=1 op is rep/sep-bracketed. Non-breaking: suite 42/42, corpus 7/7 (incl. recursive `funcs`), fuzz 50/50; `0002` round-trips. [plan](docs/plans/2-one-tracked-follow-up-glimmering-ladybug.md).
 - 2026-06-16 — [321-fix-cmp-value-selectimm] **F3 FIXED (the `SelectImm $a16` crash → `fuzz 50 1` 50/50, 0 xfail): spill the 16-bit accumulator `Ac16` via a direct 16-bit `LDAbs16`/`STAbs16`, not a COPY through an 8-bit GPR.** Root-caused to **register allocation**, not the legalizer: `MOSInstrInfo::loadStoreRegStackSlot` only special-cased `Imag16`, so an `Ac16` value spilled across a call fell through to a single-byte path that emitted `GPR = COPY A16` → `copyPhysRegImpl` (`:743`, `Anyi1` branch) → invalid `SelectImm $a16`. Added an `Ac16` case using `LDAbs16`/`STAbs16` to the frame index, restoring the native-s16 invariant ("A16 entered/left only via 16-bit load/store"). The first-guess legalizer-gate fix (the s16 ordering native gate lacking the equality gate's all-uses-are-`G_BRCOND_IMM` guard) was implemented and **disproven** first (clean SSA, but all 8 seeds still crashed post-RA; reverted). Verified: repro + 8 seeds compile clean; `fuzz 50 1` → 50/50 (seed 1 `0x525C`, seed 7 `0x9447`, all four oracles agree); a16+kernels suite 40/40, corpus 7/7; `0002` round-trips. New regression `examples/65816/a16spill.c` + `dev/a16spill.sh` (compile-time gate; the fuzzer de-XFAIL covers values). Follow-up: soft-stack `Ac16` spill (`expandLDSTStk`) has the same gap (pre-existing, corpus-unreachable). [plan](docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md).
 - 2026-06-16 — [321-tier1-broaden-corpus] **Tier 1: broaden the test corpus — the safety net that de-risks A16-threading (Tier 2) + peephole unification (Tier 3).** A **differential** corpus: each program's `corpus_result` must agree across host-computed == default(trusted 8-bit) == `+mos-a16` on **both** MAME and bsnes-jg, plus `-verify-machineinstrs`. (1) Seeded **fuzzer** `tools/a16_fuzz.py` + `dev/run.sh fuzz [N] [seed]` — random UB-free C over mixed 16/8-bit vars and the full operator set, with a Python evaluator validated 500/500 against host gcc, delta-reduced triage, XFAIL-classified known issues; `fuzz 50 1` → 42/50 PASS + 8 xfail, **0 mismatch/crash/error**. (2) Six **kernels** (`k_crc16` 0x29B1, `k_fxmul`, `k_prng`, `k_bits`, `k_satadd`, `k_isort`). (3) Two **combinatorial** tests (`a16mix1/2`). It immediately found **3** real defects (next two entries + the deferred SelectImm crash). Non-breaking: a16 suite + kernels + combinatorial = **40/40** on a quiet box, corpus 7/7. [plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md).
@@ -435,4 +460,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fault-injection mode is explicitly "not needed" (the seed corpus is the volume),
      and "Backend fixes: minimize → root-cause → fix" is the PROCESS that was followed
      and COMPLETED this increment (2 bugs fixed, 1 deferred/XFAIL). Nothing open. -->
+- [ ] **(triage)** **Full native s16 EQ-as-value (the original item (c)).** A native equality-as-value would be one — _from [2026-06-16-321-s16-load-unmerge-bytewise.md](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md)_  <!-- fp:5550b931c7cfa27e -->
+- [ ] **(triage)** **Indirect s16 load consumed only as bytes.** This plan gates only the **absolute** load — _from [2026-06-16-321-s16-load-unmerge-bytewise.md](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md)_  <!-- fp:6a15b3b3fb2dd2d3 -->
+- [verify] **2026-06-16-321-s16-load-unmerge-bytewise** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-16-321-s16-load-unmerge-bytewise.md](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md)_  <!-- fp:8f971fab65b52b23 -->
+- [ ] **(triage)** The actual `xy16` 16-bit-index spill implementation — gated on the `xy16` increment (P1 only lays the — _from [2026-06-16-321-soft-stack-spill-coverage.md](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md)_  <!-- fp:ea58d6e854eb7bf1 -->
+- [ ] **(triage)** Fixing the upstream `reentrant` attribute in-fork — P3 is a documented note / upstream issue, not a — _from [2026-06-16-321-soft-stack-spill-coverage.md](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md)_  <!-- fp:da2a45f202780a1d -->
+- [ ] **(triage)** Interrupt-reachability and `optnone`/`-O0` as alternative soft-stack triggers — recursion is the one — _from [2026-06-16-321-soft-stack-spill-coverage.md](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md)_  <!-- fp:4ff7d204aad478a3 -->
 <!-- END auto-captured-deferrals -->
