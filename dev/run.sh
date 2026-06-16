@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -125,6 +125,9 @@ Targets:
              (no X/Y byte shuffle); corpus_result==0x5A3D both emus
   a16copy    #321 native s16 fused indirect copy: g = *p folds the indirect load into the store
              (lda (p); sta g, no Imag16 round-trip); corpus_result==0x3456 both emus
+  a16spill   #321 F3 regression (compile-time gate, no emulator): a 16-bit-accumulator value
+             spilled across a call must use a direct 16-bit STAbs16/LDAbs16, not a COPY through
+             an 8-bit GPR (which crashed as `SelectImm $a16`). Asserts +mos-a16 verify clean.
   fuzz       #321 Tier-1 differential fuzzer: generate N random valid C programs (from
              `seed`, default 25 from seed 1), compile each DEFAULT and +mos-a16, and assert
              host-expected == default@MAME == a16@MAME == a16@bsnes-jg + a clean

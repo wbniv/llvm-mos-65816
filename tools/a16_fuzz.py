@@ -655,14 +655,13 @@ def run_bsnes(rom, off, length, want):
 # matches one of these is reported as XFAIL (not a spurious new failure) so the suite
 # keeps exercising the rest of the space while the fix is tracked. New/unmatched crashes
 # and ALL runtime value mismatches remain hard failures. See the Tier-1 plan §Findings.
-KNOWN_ISSUES = [
-    # A 16-bit compare result consumed as a cross-block i1 VALUE (stored bool / select /
-    # PHI under branchy control flow) materializes via `SelectImm $a16,…` / `SelectImm $y,…`
-    # — a GPR where a Flag (NZ/C) register is required → invalid MIR → backend segfault.
-    # Squarely the tracked compare->stored-bool / select-NZ-lowering follow-up (TODO M2 c).
-    ("cmp-value-selectimm",
-     lambda log: "is not a Flag register" in log and "SelectImm" in log),
-]
+#
+# Empty: F3 (`cmp-value-selectimm` — the `SelectImm $a16` crash on a 16-bit-accumulator
+# value spilled across a call) was FIXED 2026-06-16 by spilling Ac16 via a direct 16-bit
+# LDAbs16/STAbs16 instead of a COPY through an 8-bit GPR (MOSInstrInfo.cpp loadStoreReg-
+# StackSlot). That signature now hard-FAILS again, so a regression cannot silently XFAIL.
+# See docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md.
+KNOWN_ISSUES = []
 
 
 def classify_known(log):

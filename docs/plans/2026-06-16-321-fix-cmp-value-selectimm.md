@@ -1,8 +1,10 @@
 # #321 native s16 — fix the compare-result-as-value `SelectImm` crash (F3)
 
 **Date:** 2026-06-16
-**Status:** **candidate A DISPROVEN (2026-06-16) — F3 is a register-allocator bug, NOT a legalizer bug.**
-Reverted cleanly, XFAIL kept; the actual fix is Tier-2 register-allocation work. See **§Outcome**.
+**Status:** **FIXED (2026-06-16).** Root cause is register allocation, NOT the legalizer (candidate A
+disproven — see §Outcome). Fixed by spilling the 16-bit accumulator (`Ac16`) via a direct 16-bit
+load/store instead of a COPY through an 8-bit GPR. `dev/run.sh fuzz 50 1` → **50/50 PASS, 0 xfail**
+(the 8 formerly-XFAIL seeds all agree host==default==a16 on MAME + bsnes). See **§Resolution**.
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "16-bit comparison follow-ups" item (c)
 **Predecessor:** [Tier-1 corpus plan](2026-06-15-321-tier1-broaden-corpus.md) (this is its finding **F3**)
 
@@ -13,7 +15,44 @@ Make the Tier-1 differential fuzzer go **fully green** — `dev/run.sh fuzz 50 1
 compare whose boolean result is consumed as a **cross-block i1 value** (a stored bool / `G_SELECT` / PHI
 under branchy control flow) must stop emitting invalid MIR, on both emulators, with correct values.
 
-## Outcome (2026-06-16): candidate A is the wrong layer — this is the Tier-2 coalescer crash
+## Resolution (2026-06-16): FIXED — spill the 16-bit accumulator via a 16-bit load/store
+
+**One-line fix in `MOSInstrInfo.cpp::loadStoreRegStackSlot`** (the spill/reload path). The static-stack
+spill code special-cased `Imag16` (two byte stores of sublo/subhi) and let **everything else fall through
+to a single-byte path** that does `GPR = COPY <reg>` then stores one byte. An **`Ac16`** value (the
+16-bit accumulator `A16`) hit that fall-through, so spilling it emitted `GPR = COPY A16` — a COPY between
+the accumulator and an 8-bit reg, which `copyPhysRegImpl` lowers via its `Anyi1` branch to
+`SelectImm $a16` (invalid: `$a16` is not a Flag register) → the F3 crash. The same happened on reload
+(`A16 = COPY GPR`), giving the two `SelectImm` errors.
+
+The fix adds an `Ac16` case **before** the `Imag16` case that spills/reloads `A16` with a **single direct
+16-bit `STAbs16`/`LDAbs16`** to the frame index — never a COPY through a GPR:
+
+```cpp
+if (Ac16 reg) {
+  Builder.buildInstr(IsLoad ? MOS::LDAbs16 : MOS::STAbs16)
+      .addReg(Reg, getDefRegState(IsLoad) | getKillRegState(IsKill))
+      .addFrameIndex(FrameIndex).addMemOperand(MMO);
+} else if (Imag16 reg) { /* existing byte-pair spill */ } else { /* existing single byte */ }
+```
+
+This restores the documented native-s16 invariant — *"the accumulator is entered/left ONLY via [16-bit]
+load/store instructions — never a COPY between Ac16 and an 8-bit reg"* (`MOSInstrLogical.td`). `Ac16`
+exists only under `+mos-a16`, so the `HasAccum16`-gated `LDAbs16`/`STAbs16` are always legal at a spill
+of an `Ac16` value; `eliminateFrameIndex` rewrites the frame index to a `mos-static-stack` target-index
+exactly like the 8-bit `STAbs`; and `MOSInsertREPSEP` (the final pass, after RA + static-stack alloc)
+wraps the `MLow=1` op in its own `rep #$20 … sep #$20`. Confirmed in the repro disasm:
+`rep #$20; lda <slot>; … ; sta <slot>; sep #$20` for the spill, a 16-bit reload under `rep`, and **no**
+`SelectImm`/byte-COPY.
+
+**Scope / known limitation:** the fix covers the **static stack** (used by every `nonreentrant` function,
+i.e. the entire fuzz corpus + the repro). The **soft-stack** path (`expandLDSTStk`, for reentrant
+functions) likewise only special-cases `Imag16`; an `Ac16` value spilled there would hit the same crash.
+That is **pre-existing, not reachable by the corpus**, and harder (the accumulator high byte `B` can't be
+byte-addressed without `XBA`), so it is left as a tracked follow-up — it crashes **loudly** under
+`-verify-machineinstrs` (never silently miscompiles). [TODO M2].
+
+## Outcome (2026-06-16): the diagnosis that led to the fix — candidate A (legalizer) was the wrong layer
 
 **The plan's root-cause hypothesis below (the legalizer s16 ordering gate lacking the
 all-uses-are-`G_BRCOND_IMM` guard) is WRONG.** Candidate A was implemented, tested, and **disproven**;
@@ -49,14 +88,13 @@ the change was reverted byte-exact (`0002` round-trips, `git status` clean). The
 
 **This is exactly the A16↔8-bit coalescer crash the native-s16 work already fought** (ROADMAP §5,
 Increment 1d: "keep `A16` and 8-bit `A` from entangling … always via load/store, never a COPY to/from
-8-bit"). The add path *avoided* it by construction; F3 shows it **resurfaces via spill copies** when a
-16-bit accumulator value is forced across a call. It is **Tier-2 register-allocator work**, beyond the
-~3-attempt legalizer budget — so per the plan's own fallback it is **deferred, XFAIL kept**.
+8-bit"). The add path *avoided* it by construction; F3 showed it **resurfaces via spill copies** when a
+16-bit accumulator value is forced across a call.
 
-**Next pass (Tier-2) should target `copyPhysRegImpl`/coalescing**, not the legalizer: either prevent an
-`Anyi1` value from coalescing/allocating onto the `ac16` accumulator, or give the `ac16` spill path a
-real 16-bit save/restore so it never routes through the `Anyi1` COPY branch. Validate with the same
-differential gate; the 8 seeds + the committed repro are the regression set.
+**→ FIXED (see §Resolution):** of the two options this diagnosis suggested — prevent the `Anyi1`↔`ac16`
+entanglement, or give the `ac16` spill a real 16-bit save/restore — the second is the surgical one. The
+`ac16` spill now uses a direct `STAbs16`/`LDAbs16` and never produces the `Anyi1` COPY. Validated on the
+full differential gate: the 8 seeds + repro compile clean and `fuzz 50 1` → 50/50, all values agreeing.
 
 ## The bug — original (INCORRECT) hypothesis, kept for the record
 
@@ -93,7 +131,7 @@ So an ordering compare feeding a `G_SELECT`/PHI stays native, and the C-flag i1 
 tried to fold the s16 compare back to native through `buildNZSelect` (`:1267`) → `G_SELECT` and it did
 **not** work — the value path narrows in the select lowering.
 
-**Minimal repro (committed):** `examples/65816/known/a16-cmp-value-selectimm.c` (delta-reduced from
+**Minimal repro (committed):** `examples/65816/a16spill.c` (was `known/a16-cmp-value-selectimm.c`; delta-reduced from
 fuzz seed 1). Bare `r = (a == b)` does NOT trigger it; the branchy CFG that turns the result into a
 cross-block value does. The 8 fuzz seeds that XFAIL today: **1, 7, 9, 11, 22, 35, 41, 44**.
 
@@ -131,14 +169,17 @@ reaching for; only pursue it after A lands green, and keep it gated/reversible.
 
 ## Verification
 
-> **Result (2026-06-16): step 1 FAILED with candidate A → steps 2–5 not reached.** The gate produced
-> clean SSA but the post-RA coalescer crash is untouched. Evidence below; full analysis in §Outcome.
+> **Two passes are recorded here.** First, the evidence that **candidate A (legalizer) FAILED** — kept
+> because it's *why* the diagnosis moved to register allocation. Then the **Ac16 spill fix verification
+> (all PASS)** below. Final results are in *Verification results — the Ac16 spill fix*.
+
+### Candidate A (legalizer gate) — DISPROVEN
 
 **Step 1 — repro compiles clean under `-verify-machineinstrs` (candidate A applied):**
 
 ```
 $ mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os \
-    -mllvm -verify-machineinstrs -c examples/65816/known/a16-cmp-value-selectimm.c
+    -mllvm -verify-machineinstrs -c examples/65816/a16spill.c   # (then known/a16-cmp-value-selectimm.c)
   $x = SelectImm $a16, -1, 0
   $a16 = SelectImm $x, -1, 0
 *** Bad machine code: Illegal physical register for instruction ***
@@ -160,30 +201,31 @@ $ printf 'volatile unsigned short a,b,corpus_result;int main(void){unsigned shor
 **Revert is byte-exact:** `dev/regen-patch.sh` → `RESULT: PASS — 0002 round-trips`; `git status patches/`
 empty.
 
-### Original verification steps (NOT reached — for the eventual Tier-2 fix)
+### Verification results — the Ac16 spill fix (all PASS, 2026-06-16, quiet box)
 
-1. `examples/65816/known/a16-cmp-value-selectimm.c` compiles clean under
-   `-mllvm -verify-machineinstrs` (was: 2 machine-code errors) and the default build stays clean.
-2. **Promote it to a passing regression test:** compute its host-expected `corpus_result`, add
-   `dev/a16cmpval.sh` (`diff_check a16cmpval 0x…`) + move the `.c` out of `examples/65816/known/` (or add
-   a fresh compare-as-value test), asserting `host == default == +mos-a16` on MAME + bsnes-jg.
-3. **De-XFAIL the fuzzer:** remove the `cmp-value-selectimm` entry from `KNOWN_ISSUES` in
-   `tools/a16_fuzz.py` so a re-crash FAILS (not silently XFAILs). Then `dev/run.sh fuzz 50 1` →
-   **50/50 PASS, 0 xfail, 0 mismatch/crash/error** (run on a quiet box — concurrent docker/MAME load
-   flakes the settle window). Spot-check a couple of the formerly-XFAIL seeds (1, 7, …) individually.
-4. **Non-breaking:** the full a16 suite + 6 kernels + 2 combinatorial = 40/40 (now 41/41 with the new
-   regression) and `dev/run.sh corpus` → 7/7.
-5. `dev/regen-patch.sh` round-trips (`0002`).
+1. **Repro + all 8 seeds compile clean under `-verify-machineinstrs`** (was: 2 machine-code errors each);
+   default build stays clean. Repro + seeds 1,7,9,11,22,35,41,44 → all exit 0. **PASS.**
+2. **Committed regression test:** the repro moved out of `known/` → `examples/65816/a16spill.c` +
+   `dev/a16spill.sh` (`dev/run.sh a16spill`). Compile-time gate (the bug is invalid MIR, not a wrong
+   value — the value side is the de-XFAIL'd fuzzer): asserts `+mos-a16 -verify-machineinstrs` clean, that
+   the body still emits the `Ac16` spill (`STAbs16/LDAbs16 $a16, %stack.0` — 2 ops found), and default
+   clean. → `RESULT: PASS`. **PASS.**
+3. **De-XFAIL'd the fuzzer** (`KNOWN_ISSUES = []` in `tools/a16_fuzz.py`, so the signature hard-FAILs
+   again). `dev/run.sh fuzz 50 1` → `50/50 PASS, 0 known-issue (xfail) (0 mismatch, 0 new-crash, 0 error)`.
+   Spot-checks: seed 1 → `0x525C (all agree)`, seed 7 → `0x9447 (all agree)`
+   (host==default==a16@MAME==a16@bsnes). **PASS.**
+4. **Non-breaking:** `==== a16+kernels suite: 40 PASS, 0 FAIL ====` (32 a16* + 6 kernels + 2
+   combinatorial), `dev/run.sh corpus` → `7/7 passed`. **PASS.** (a16spill adds a 41st test.)
+5. **`dev/regen-patch.sh` round-trips** (`RESULT: PASS — 0002 round-trips`); the fix is in `0002`. **PASS.**
 
-## Workflow notes for the next pass
+## The fix in one place
 
-- From-source toolchain + SDK + jgxcheck + BIOS are already built under `build/`. Rebuild after a
-  `vendor/` edit: `MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh toolchain` (~13 s incremental),
-  then `MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build` (SDK) if needed.
-- Fast inner loop: compile the repro with
-  `mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm
-  -verify-machineinstrs -c known/a16-cmp-value-selectimm.c` inside the dev container; clean exit = fixed.
-- Use the fuzzer to find more value-compare shapes once A lands: the 8 seeds are reproducible
-  (`dev/run.sh fuzz 1 <seed>`), and the delta reducer pattern from the Tier-1 pass
-  (`build/min/reduce.py`) generalizes.
-- Cap backend-fix hypotheses at ~3 attempts; if A doesn't converge, document and keep the XFAIL.
+`MOSInstrInfo.cpp::loadStoreRegStackSlot` (static-stack branch): add an `Ac16` case **before** the
+`Imag16` case that spills/reloads the 16-bit accumulator with a single direct `LDAbs16`/`STAbs16` to the
+frame index, instead of falling through to the single-byte path that emits `GPR = COPY A16` →
+`SelectImm $a16`. Six-line change; see §Resolution.
+
+**Follow-up (tracked, not blocking):** the soft-stack spill path (`expandLDSTStk`, reentrant functions)
+has the same `Imag16`-only gap for `Ac16` — pre-existing, unreachable by the (nonreentrant) corpus, and
+harder (the accumulator high byte needs `XBA` to byte-address). It crashes loudly under verify, never
+miscompiles. [TODO M2].

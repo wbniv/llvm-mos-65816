@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/4c603a2) | #321 fuzz F3: root-cause correction — the SelectImm crash is a coalescer bug, not the legalizer gate |
 | [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/56801ba) | docs: seed next pass — fix the cmp-value SelectImm crash (F3, 8 fuzz XFAILs) |
 
 <!--history-meta v1
+4c603a2	author	Will Norris
+4c603a2	added	90
+4c603a2	deleted	4
+4c603a2	files	1
+4c603a2	body	The Tier-1 next-pass plan hypothesized that F3 (the 8 fuzz XFAILs:\n`SelectImm $a16, -1, 0` "is not a Flag register") was a legalizer bug —\nthe s16 ordering native gate (MOSLegalizerInfo.cpp:1366, ICMP_UGE) lacking\nthe all-uses-are-G_BRCOND_IMM guard the equality gate has (:1361). I\nimplemented that fix (a shared `s16CmpResultIsBranchOnly` helper gating UGE\nand the SLT->ULT rewrite) and it is DISPROVEN:\n\n- It produces clean post-instruction-selection SSA (no SelectImm), but all\n  8 XFAIL seeds (1,7,9,11,22,35,41,44) still crash IDENTICALLY.\n- A clean `unsigned short r = (a >= b)` (UGE-as-value, no register pressure)\n  already compiles native and -verify-machineinstrs-clean WITHOUT the gate\n  (`cmp $0`). So the gate would only pessimize correct code, not fix F3.\n\nReverted byte-exact (dev/regen-patch.sh: "0002 round-trips"; git clean).\n\nReal root cause (walked the pass pipeline on the committed repro): the\n`SelectImm $a16` first appears AFTER `postrapseudos`, emitted by\nMOSInstrInfo::copyPhysRegImpl:743 (the Anyi1->Anyi1 COPY branch). An i1\nvalue gets entangled with the 16-bit-accumulator (ac16) live range during\ncoalescing: `arr[in_idx & 7]` keeps a 16-bit accumulator value live across\nthe f0() call, and under this branchy CFG + i1 compare-result pressure the\nspill/copy of that accumulator routes through the i1->GPR SelectImm, reading\n$a16 as a flag -> invalid MIR -> link-time segfault. A pure "16-bit value\nlive across a call" reduction (no compares) compiles clean, so the i1/branchy\npressure is necessary — but the failure is in register allocation, not the\ncompare legalization.\n\nThis is the SAME A16<->8-bit register-coalescer crash the native-s16 add path\navoided "by construction" (ROADMAP step 5, Increment 1d), resurfacing via\nspill copies. It is Tier-2 register-allocator work, beyond the ~3-attempt\nlegalizer budget — so per the plan's own fallback it is deferred and the\nXFAIL is kept (fuzzer KNOWN_ISSUES untouched; suite stays green).\n\nDocs re-pointed to register allocation: F3 plan gains a §Outcome with the\nfull evidence + corrected next-pass direction; Tier-1 §Findings F3 note,\nROADMAP step 5, the repro's own comment, and TODO M2 item (c) corrected.\nNo backend code ships (vendor reverted byte-exact); only docs + the repro's\nexplanatory comment change.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 56801ba	author	Will Norris
 56801ba	added	103
 56801ba	deleted	0

@@ -425,18 +425,22 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    legalizer — **fixed**, sign-fill via 8-bit broadcast; regression `a16ashift8`), a 16-bit `asl`/`lsr`
    **carry-clobber miscompile** (CRC16 read 0x036D≠0x29B1 because `ASLAcc16`/`LSRAcc16` didn't model
    their carry def and were scheduled between a `cmp` and its `bcs` — **fixed**, `Defs=[C]`; regression
-   `k_crc16`), and a compare-result-as-value `SelectImm`-flag **crash** (**deferred** to the tracked
-   compare→stored-bool follow-up; XFAIL-classified with a committed repro). Both fixes carry committed
-   regression tests; patch `0002` round-trips; the full a16 suite + 6 kernels + 2 combinatorial = 40/40
-   green and corpus 7/7. A16-threading is now de-risked. The remaining 8 fuzz XFAILs are the deferred
-   `SelectImm`-flag crash. **Root cause corrected (2026-06-16):** it is NOT a legalizer-gate issue (the
-   first-guess "s16 ordering native gate lacks the all-uses-are-branches guard" was implemented and
-   **disproven** — clean SSA, but the crash is post-RA, and the native UGE-as-value path is valid in
-   isolation). It is the **A16↔8-bit register-coalescer crash** (this §, Increment 1d) **resurfacing via
-   spill copies**: when a 16-bit-accumulator value is forced live across a call under branchy/i1
-   pressure, `MOSInstrInfo::copyPhysRegImpl` (the `Anyi1` COPY branch) materializes the entangled
-   accumulator spill as `SelectImm $a16` — invalid MIR. **Next pass is Tier-2 register-allocator work**
-   (stop `Anyi1` from coalescing onto `ac16`, or give `ac16` a real 16-bit spill), not the legalizer.
+   `k_crc16`), and a compare-result-as-value `SelectImm`-flag **crash** (now **FIXED**, see below). All
+   three carry committed regression tests; patch `0002` round-trips; the full a16 suite + 6 kernels + 2
+   combinatorial = 40/40 green and corpus 7/7. A16-threading is now de-risked.
+
+   _**F3 — the `SelectImm $a16` crash — FIXED (2026-06-16); `fuzz 50 1` → 50/50, 0 xfail.** It was NOT a
+   legalizer-gate issue (the first-guess "s16 ordering native gate lacks the all-uses-are-branches
+   guard" was implemented and **disproven** — clean post-isel SSA, but the crash is post-RA, and the
+   native UGE-as-value path is valid in isolation). It was the **A16↔8-bit register-coalescer crash**
+   (this §, Increment 1d) **resurfacing via spill copies**: when a 16-bit-accumulator value is forced
+   live across a call, the spill path (`MOSInstrInfo::loadStoreRegStackSlot`) only special-cased
+   `Imag16`, so `Ac16` fell through to a single-byte path that emitted `GPR = COPY A16` →
+   `copyPhysRegImpl` lowers it (`Anyi1` branch) to the invalid `SelectImm $a16`. **Fix:** spill `Ac16`
+   with a direct 16-bit `LDAbs16`/`STAbs16` to the frame index — never a COPY through an 8-bit GPR —
+   restoring the native-s16 invariant. The 8 formerly-XFAIL seeds + the repro now compile clean and run
+   correct on both emulators; regression `examples/65816/a16spill.c` + `dev/a16spill.sh`. (Follow-up: the
+   soft-stack spill path has the same `Imag16`-only gap for `Ac16` — pre-existing, corpus-unreachable.)_
    [Tier-1 plan](plans/2026-06-15-321-tier1-broaden-corpus.md) ·
    [F3 fix plan](plans/2026-06-16-321-fix-cmp-value-selectimm.md)._
 

@@ -200,7 +200,7 @@ is materialized via `SelectImm $a16, -1, 0` (or `$y`) — a GPR where the pseudo
 register → "Illegal physical register for instruction". This is squarely the **already-tracked**
 compare→stored-bool / select-NZ-lowering follow-up (TODO M2 item c) — a non-trivial flag-lowering
 change beyond the ~3-attempt budget, so it is **deferred** to that track, not fixed here. Minimized
-repro committed at `examples/65816/known/a16-cmp-value-selectimm.c`; the fuzzer classifies this exact
+repro committed at `examples/65816/a16spill.c` (FIXED; was `known/a16-cmp-value-selectimm.c`); the fuzzer classifies this exact
 signature as **XFAIL** (known issue), so the suite stays green on the rest of the (vast) space while
 new/unmatched crashes and all value mismatches remain hard failures.
 

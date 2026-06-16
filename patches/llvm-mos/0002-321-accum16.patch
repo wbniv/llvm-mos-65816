@@ -1404,7 +1404,7 @@ index e81487e9c..6f18c7c1a 100644
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 42a94c356..4393283eb 100644
+index 42a94c356..ace28ca20 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -352,6 +352,8 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
@@ -1416,7 +1416,33 @@ index 42a94c356..4393283eb 100644
      return MI.getOperand(0).getMBB();
    case MOS::JMPIndir:
    case MOS::JMPIdxIndir:
-@@ -1035,6 +1037,10 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
+@@ -928,7 +930,24 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+       Instr.addDef(Ptr, RegState::EarlyClobber);
+     Instr.addFrameIndex(FrameIndex).addImm(0).addMemOperand(MMO);
+   } else {
+-    if ((Reg.isPhysical() && MOS::Imag16RegClass.contains(Reg)) ||
++    if ((Reg.isPhysical() && MOS::Ac16RegClass.contains(Reg)) ||
++        (Reg.isVirtual() &&
++         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Ac16RegClass))) {
++      // #321: spill/reload the 16-bit accumulator A16 with a single 16-bit
++      // load/store (LDAbs16/STAbs16) — NEVER a COPY through an 8-bit GPR. The
++      // generic single-byte fall-through below would emit `GPR = COPY A16`,
++      // which copyPhysRegImpl lowers via its Anyi1 branch to `SelectImm $a16`
++      // ($a16 is not a Flag register) → invalid MIR / link-time segfault (the
++      // F3 fuzzer crash; seeds 1/7/9/11/22/35/41/44). This keeps the native-s16
++      // invariant that A16 is only ever entered/left via a 16-bit load/store
++      // (MOSInstrLogical.td). Ac16 exists only under +mos-a16, so the
++      // HasAccum16-gated LDAbs16/STAbs16 are always legal here; InsertREPSEP
++      // (the final pass) wraps the MLow=1 op in its own rep/sep #$20.
++      Builder.buildInstr(IsLoad ? MOS::LDAbs16 : MOS::STAbs16)
++          .addReg(Reg, getDefRegState(IsLoad) | getKillRegState(IsKill))
++          .addFrameIndex(FrameIndex)
++          .addMemOperand(MMO);
++    } else if ((Reg.isPhysical() && MOS::Imag16RegClass.contains(Reg)) ||
+         (Reg.isVirtual() &&
+          MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
+       MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
+@@ -1035,6 +1054,10 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
    case MOS::CmpBrIndirIdx:
      expandCmpBr(Builder);
      break;
@@ -1427,7 +1453,7 @@ index 42a94c356..4393283eb 100644
  
    // Control flow
    case MOS::GBR:
-@@ -1355,6 +1361,38 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
+@@ -1355,6 +1378,38 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
    MI.eraseFromParent();
  }
  
