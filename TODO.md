@@ -67,8 +67,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   relaxing the `NativeS16EqBranch` gate. Deliberately deferred by the 2026-06-15 equality work for this
   reason; substantial; modest win on a rare pattern. **Also:** the byte-wise-load fix gates only the
   *absolute* s16 load — an **indirect** s16 load (`G_LOAD16_INDIR`) consumed only by `G_UNMERGE` still
-  round-trips through `A16`; the same `AllUsesUnmerge` guard would apply (lower priority).
-  [plan](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md).
+  round-trips through `A16`; the same `AllUsesUnmerge` guard would apply, but the win is unproven (the
+  byte-wise `(zp),y` form may not beat the native load+spill), so it is investigation-gated and low
+  priority. [native-EQ + byte-wise plan](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md) ·
+  [indirect-load plan](docs/plans/2026-06-16-321-indirect-s16-load-bytewise.md).
 - [ ] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** The F3 `Ac16`
   spill fix landed on **both** stacks, but the soft-stack half was found only by a hand-written recursive
   reproducer — the **fuzzer never reaches it**: `gen_funcs` emits only leaf functions (`expr(pure=True)`
@@ -470,4 +472,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        `reentrant`-attribute issue, interrupt/optnone alternative triggers) -> covered by
        the M2 bullet "#321 soft-stack (reentrant) spill coverage" + its plan's Out-of-scope.
      Nothing open here. -->
+- [verify] **2026-06-16-321-indirect-s16-load-bytewise** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-16-321-indirect-s16-load-bytewise.md](docs/plans/2026-06-16-321-indirect-s16-load-bytewise.md)_  <!-- fp:84cb8f768a77b50d -->
 <!-- END auto-captured-deferrals -->
