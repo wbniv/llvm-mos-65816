@@ -35,12 +35,17 @@ regression); the full native compare is the separate deferred win.
 ## Verification
 
 1. `+mos-a16` `b = (a == c)` disasm: operands load byte-wise (`ldx`/`lda`/`cpx`/`cmp`), **no**
-   `rep; lda abs; sta imag16` operand round-trip; `-verify-machineinstrs` clean.
+   `rep; lda abs; sta imag16` operand round-trip; `-verify-machineinstrs` clean. **PASS** — the first
+   8-bit compare is at offset `0x11`, the first `rep #$20` is far later (the result store); verify exit 0.
 2. Value: `examples/65816/a16eqval.c` + `dev/a16eqval.sh` — `host == default == +mos-a16` on MAME +
-   bsnes-jg.
-3. Non-breaking: full a16 suite + corpus 7/7 + `fuzz 50 1` 50/50 (the change touches every
-   s16-load-then-unmerge site, so the differential corpus is the gate).
-4. `dev/regen-patch.sh` round-trips (`0002`).
+   bsnes-jg. **PASS** — `RESULT: PASS`; `corpus_result == 0x0101`, `SMOKE: PASS` default + a16 (MAME) +
+   bsnes-jg, plus the no-prologue gate ("first 8-bit compare precedes any rep #$20").
+3. Non-breaking: full a16 suite + corpus 7/7 + `fuzz 50 1` 50/50. **PASS** — `==== suite: 42 PASS, 0
+   FAIL ====` (now 43 with `a16eqval`), `==> corpus: 7/7 passed`, `==> fuzz: 50/50 PASS, 0 xfail (0
+   mismatch, 0 new-crash, 0 error)`.
+4. `dev/regen-patch.sh` round-trips (`0002`). **PASS** — `RESULT: PASS — 0002 round-trips`.
+
+**Status: all verification PASS (2026-06-16); landed in commit `7c0fe56`.**
 
 ## Deferred (TODO entries)
 

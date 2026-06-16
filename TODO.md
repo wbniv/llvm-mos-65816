@@ -460,10 +460,14 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fault-injection mode is explicitly "not needed" (the seed corpus is the volume),
      and "Backend fixes: minimize → root-cause → fix" is the PROCESS that was followed
      and COMPLETED this increment (2 bugs fixed, 1 deferred/XFAIL). Nothing open. -->
-- [ ] **(triage)** **Full native s16 EQ-as-value (the original item (c)).** A native equality-as-value would be one — _from [2026-06-16-321-s16-load-unmerge-bytewise.md](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md)_  <!-- fp:5550b931c7cfa27e -->
-- [ ] **(triage)** **Indirect s16 load consumed only as bytes.** This plan gates only the **absolute** load — _from [2026-06-16-321-s16-load-unmerge-bytewise.md](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md)_  <!-- fp:6a15b3b3fb2dd2d3 -->
-- [verify] **2026-06-16-321-s16-load-unmerge-bytewise** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-16-321-s16-load-unmerge-bytewise.md](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md)_  <!-- fp:8f971fab65b52b23 -->
-- [ ] **(triage)** The actual `xy16` 16-bit-index spill implementation — gated on the `xy16` increment (P1 only lays the — _from [2026-06-16-321-soft-stack-spill-coverage.md](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md)_  <!-- fp:ea58d6e854eb7bf1 -->
-- [ ] **(triage)** Fixing the upstream `reentrant` attribute in-fork — P3 is a documented note / upstream issue, not a — _from [2026-06-16-321-soft-stack-spill-coverage.md](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md)_  <!-- fp:da2a45f202780a1d -->
-- [ ] **(triage)** Interrupt-reachability and `optnone`/`-O0` as alternative soft-stack triggers — recursion is the one — _from [2026-06-16-321-soft-stack-spill-coverage.md](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md)_  <!-- fp:4ff7d204aad478a3 -->
+<!-- triaged 2026-06-16: all six captured deferrals already live in curated M2 items.
+     • "Full native s16 EQ-as-value" + "Indirect s16 load consumed only as bytes"
+       (s16-load-unmerge-bytewise.md) -> the M2 bullet "#321 native s16 equality-as-value
+       — the full native compare (deferred from item (c))".
+     • the [verify] flag for s16-load-unmerge-bytewise -> verification now recorded in the
+       plan (all PASS, commit 7c0fe56).
+     • the three soft-stack-spill-coverage notes (xy16 index-16 spill impl, the upstream
+       `reentrant`-attribute issue, interrupt/optnone alternative triggers) -> covered by
+       the M2 bullet "#321 soft-stack (reentrant) spill coverage" + its plan's Out-of-scope.
+     Nothing open here. -->
 <!-- END auto-captured-deferrals -->
