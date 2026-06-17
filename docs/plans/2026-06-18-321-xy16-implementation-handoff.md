@@ -1,160 +1,251 @@
 # Handoff: xy16 Implementation (`wt/321-xy16`)
 
-**Date:** 2026-06-18  
+**Date:** 2026-06-18 (revised after plan audit)  
 **Branch:** `wt/321-xy16`  
 **Worktree:** `/home/will/SRC/llvm-mos-65816-xy16`  
 **Main repo:** `/home/will/SRC/llvm-mos-65816` (branch `main`)
 
 ---
 
-## Why you're in a worktree
+## Read this before touching any code
 
-`main` is being diagnosed for a seed-42 regression bisected to patch `0002`
-(`patches/llvm-mos/0002-321-accum16.patch`) — a shared-path miscompile in the committed
-backend patches (default and `+mos-a16` both produce `0xB226`; correct is `0xEC0D`).
-That diagnostic work modifies `vendor/` in the main tree. Your xy16 work also modifies
-`vendor/` — hence the isolation.
-
-**Rule for this branch:** Never manually push to `origin/main` or rebase onto main until
-the regression is diagnosed and its fix is committed to main. When both sides are done,
-the merge-back is: `git rebase main` (from within this worktree) + verify the full suite,
-then PR or fast-forward.
+The implementation plan at
+[`docs/plans/2026-06-17-321-xy16-index-register-mode.md`](2026-06-17-321-xy16-index-register-mode.md)
+was **audited and revised** — nine design corrections total, five of them in **Layer 3**
+(three would have been silent miscompiles). The plan file is authoritative; read it in full.
+The critical Layer 3 corrections are also summarised below so you can't miss them.
 
 ---
 
-## First thing to do: build the toolchain
+## Context: why you're in a worktree
 
-`vendor/` does not exist yet in this worktree — `dev/run.sh toolchain` clones llvm-mos
-and applies all three patches automatically:
+`main` carries a seed-42 regression bisected to `0002-321-accum16.patch` — a shared-path
+miscompile (default and `+mos-a16` both produce `0xB226`; correct is `0xEC0D`). The
+fix is being committed to `main` separately. Your xy16 work also modifies `vendor/`, hence
+the isolation. **Do not push to `origin/main` from this worktree** until the regression fix is
+on main and you've rebased onto it.
+
+---
+
+## First thing: build the toolchain
+
+`vendor/` doesn't exist yet in this worktree. Bootstrap it:
 
 ```bash
 cd /home/will/SRC/llvm-mos-65816-xy16
 dev/run.sh toolchain
 ```
 
-**This should be fast** (~5-10 min, not the full 30-90 min cold build) because
-`build/.ccache` is already symlinked to the main worktree's shared ccache, and the
-patches in `wt/321-xy16` are identical to main at the branch point — near-100% cache hit.
+Should take ~5–10 min (near-100% ccache hit — `build/.ccache` is symlinked to the shared
+cache and the patches here match main at the branch point). Confirm with:
 
-Confirm the build took by checking `clang-23`'s mtime (not the stale `clang` symlink):
 ```bash
-ls -lh build/llvm-mos-install/bin/clang-23
+ls -lh build/llvm-mos-install/bin/clang-23   # mtime must be recent; the `clang` symlink is stale
 ```
 
 ---
 
-## What you're implementing
+## Implementation plan: 5 layers in order
 
-**Plan:** [`docs/plans/2026-06-17-321-xy16-index-register-mode.md`](2026-06-17-321-xy16-index-register-mode.md)
+Each layer independently builds and can be diff-tested before the next. **Build clean and run
+`-verify-machineinstrs` after each layer before starting the next.**
 
-The plan pre-audited 7 design corrections and is ready to execute. Read it in full before
-starting. Five layers, in order (each independently builds and can be diff-tested):
+| Layer | Files | Status |
+|-------|-------|--------|
+| 1 | `MOSFeatures.td`, `MOSInstrFormats.td`, `MOSSubtarget.h/.cpp`, `MOSRegisterInfo.td` | not started |
+| 2 | `MOSInstrLogical.td` | not started |
+| 3 | `MOSInsertREPSEP.cpp` | not started — **read corrections below first** |
+| 4 | `MOSInstrInfo.cpp`, `MOSRegisterInfo.cpp` | not started |
+| 5 | `MOSInstructionSelector.cpp` | not started (skeleton only; legalizer follow-on) |
 
-| Layer | What | Key files |
-|-------|------|-----------|
-| 1 | Feature flag, Xc16/Yc16 register defs | `MOSFeatures.td`, `MOSInstrFormats.td`, `MOSSubtarget.h/.cpp`, `MOSRegisterInfo.td` |
-| 2 | 16-bit index instructions + TXA16/TAX16 transfer pseudos | `MOSInstrLogical.td` |
-| 3 | X-flag lattice in `MOSInsertREPSEP` (dual-tracking `placeIntraBlock`) | `MOSInsertREPSEP.cpp` |
-| 4 | Static-stack + soft-stack spill for Xc16/Yc16 | `MOSInstrInfo.cpp`, `MOSRegisterInfo.cpp` |
-| 5 | `selectXY16` selector (minimal; fires when RA assigns to Xc16/Yc16) | `MOSInstructionSelector.cpp` |
+Start with Layer 1 — it changes only `.td` files and adds zero functionality, so it can't
+regress anything. It either compiles or fails loudly.
 
-**Start with Layer 1** — it's the smallest change, touches only `.td` files, and either
-TableGen accepts it or it fails loudly. Layer 1 success gates all later layers.
+---
+
+## Layer 3 corrections — the five bugs found in the original draft
+
+Read the corrected pseudocode in the plan. Summary of what changed and why:
+
+### Bug 1 (silent miscompile): `requiredXWidth` default must be `XW_None`, not `XW_X8`
+
+The original draft returned `XW_X8` as the catch-all default. This would force a `SEP #$10`
+(X → 8-bit) after every M16-only instruction (`LDAbs16`, `STAbs16`, `ADCAbs16`, …) — because
+those instructions have `XLow=0`, they'd fall through to the default and require X=8.
+The result: `REP #$10 … INX16 … SEP #$10 … LDAbs16 … REP #$10 … INX16 …` — an X-flag toggle
+around every accumulator op, making X16 mode nearly useless and generating wrong REP/SEP
+sequences.
+
+**Fix:** most instructions are genuinely X-agnostic (X flag doesn't affect their behavior).
+The correct default is `XW_None`. Only `XLow=1` → `XW_X16`, `XHigh=1` → `XW_X8` (for the
+existing `CPX_Immediate`/`CPY_Immediate`), and call/return → `XW_X8`.
+
+```cpp
+static XWidth requiredXWidth(const MachineInstr &MI) {
+  if (MI.isReturn() || MI.isCall())
+    return XW_X8;
+  if (MI.getDesc().TSFlags & MOS::TSFlagXLow)
+    return XW_X16;
+  if (MI.getDesc().TSFlags & MOS::TSFlagXHigh)   // CPX_Immediate / CPY_Immediate
+    return XW_X8;
+  if (MI.isBranch())
+    return XW_None;
+  return XW_None;   // NOT XW_X8 — most ops are X-agnostic
+}
+```
+
+### Bug 2 (silent miscompile): cross-block dataflow missing X-dimension maps
+
+The original draft said "parallel lattices run in the same iteration" but never showed
+`XFirst`/`XLast`/`XIn`/`XOut` being computed. Without these, the Increment 2 cross-block
+optimization (mode held across edges) only works for M — the X flag would never be hoisted
+out of loops. Full corrected pseudocode is in the plan.
+
+Key: add `bool HasIndex16 = false;` as a class member (set alongside `TII` at the start of
+`runOnMachineFunction`), rename `isPassthrough` → `isPassthroughM`, add `isPassthroughX`, and
+add the X-dimension maps to Steps 1–3c.
+
+### Bug 3 (missing functionality): `Placement` struct missing X-dimension
+
+The original `Placement` struct was `{MBB, AtEnd, ToM16}`. The edge-placement loop and Step 3c
+materialization only handled M transitions; X-flag edge transitions were never emitted. Extend:
+
+```cpp
+struct Placement {
+  MachineBasicBlock *MBB;
+  bool AtEnd;
+  bool MChanged = false, ToM16 = false;
+  bool XChanged = false, ToX16 = false;
+};
+```
+
+The edge-placement loop must compute both `M_diff` and `X_diff` for each predecessor edge and
+populate both fields. Step 3b must pass `resolveIsX16(XIn[&MBB])` to `placeIntraBlock`.
+
+### Bug 4 (silent miscompile): `placeLegacy` missing X-dimension block-end restoration
+
+`placeLegacy` tracked `EndM16` and restored M to 8-bit at block end, but had no `EndX16`
+tracking. If a block ends in X16 mode, `placeLegacy` would emit nothing for X — the next
+block inherits wrong X state. Fix: track `EndX16` and pass both to `insertSwitch`.
+
+```cpp
+// In placeLegacy:
+bool EndM16 = false, EndX16 = false;
+for (MachineInstr &MI : MBB) {
+  MWidth W = requiredWidth(MI); if (W != MW_None) EndM16 = (W == MW_M16);
+  if (HasIndex16) { XWidth XW = requiredXWidth(MI); if (XW != XW_None) EndX16 = (XW == XW_X16); }
+}
+Changed |= placeIntraBlock(MBB, false, false);
+if (EndM16 || EndX16)
+  insertSwitch(MBB, MBB.getFirstTerminator(), false, false, EndM16, EndX16);
+```
+
+### Bug 5 (compile error): `insertSwitch` call sites use old 3-arg signature
+
+The plan introduces a new 6-arg `insertSwitch(MBB, Pos, NewM16, NewX16, MChanged, XChanged)`.
+All call sites — in `placeIntraBlock`, `placeLegacy`, and Step 3c — must use the new form.
+The STZ-fusion section uses `BuildMI` directly (not `insertSwitch`), so it needs no update;
+verify this before starting Layer 3.
+
+---
+
+## All other plan content is correct
+
+Layers 1, 2, 4, and 5 are correct as written in the plan. The other design corrections (items
+1–7 in the plan's "Design notes" section) are also correct. The verification steps and key risks
+are correct, with one addition: after Layer 3, compile a **mixed-mode** test that uses both
+Ac16 and Xc16 in the same function and confirm that M16-only ops (`LDAbs16`) emit no
+surrounding `rep/sep #$10`.
 
 ---
 
 ## Build / test commands
 
-All identical to main — the worktree runs `dev/run.sh` from its own root (`/work` inside
-the container = `/home/will/SRC/llvm-mos-65816-xy16`):
-
 ```bash
-dev/run.sh toolchain          # rebuild after vendor/ edits
-dev/run.sh corpus             # Tier-1 correctness gate (expect 7/7)
-dev/run.sh fuzz 50 1          # differential fuzzer (expect 50/50, 0 mismatch)
-dev/run.sh a16local           # quick native-s16 sanity (should be unaffected by xy16)
+dev/run.sh toolchain          # rebuild after vendor/ edit (Docker; incremental)
+dev/run.sh corpus             # Tier-1 gate: expect 7/7
+dev/run.sh fuzz 50 1          # differential fuzzer: expect 50/50, 0 mismatch
 ```
 
-For xy16-specific tests (once Layer 5 exists):
+Compile + MIR-verify a single file (host, no container):
 ```bash
-dev/run.sh xy16basic          # new test: load/compare/inc loop using X16
-dev/run.sh xy16spill          # new test: forced static-stack spill of X16
-dev/run.sh xy16spillr         # new test: recursive soft-stack spill of X16
+build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 \
+  -Xclang -target-feature -Xclang +mos-a16,+mos-xy16 \
+  -Os -mllvm -verify-machineinstrs -c FILE.c -o /tmp/x.o
 ```
 
-**Always run on a quiet box** — concurrent Docker/MAME load flakes MAME timing.
+Disasm: `build/llvm-mos-install/bin/llvm-objdump -d --mcpu=mosw65816 /tmp/x.o`
 
-The correctness bar: host-computed == default == `+mos-xy16` on both MAME and bsnes-jg,
-plus `-verify-machineinstrs` clean. See `docs/agent-handoff.md` for the exact
-`mos-clang` incantation.
+**GOTCHA:** `build/llvm-mos-install/bin/clang` is a stale symlink — the real binary is
+`clang-23`. Confirm a rebuild took by checking `clang-23`'s mtime, not `clang`'s.
+
+**Run on a quiet box** — concurrent Docker/MAME load flakes MAME timing.
+
+After Layer 5, add tests:
+```bash
+dev/run.sh xy16basic          # load/compare/inc loop using X16
+dev/run.sh xy16spill          # forced static-stack spill of X16
+dev/run.sh xy16spillr         # recursive soft-stack spill of X16
+```
 
 ---
 
-## Commit discipline for this branch
+## Commit discipline
 
-- **Stage only your files.** `vendor/` is gitignored, so it never shows in `git status`.
-  Stage `.td`, `.cpp`, `.h`, plan docs, patch — nothing else.
-- **Verify `git diff --cached --name-only`** matches exactly what you touched.
-- **Don't run `dev/regen-patch.sh` until a logical checkpoint** (e.g., after each Layer).
-  The hook `regen-md-history` snapshots plan docs; `audit-plan-deferrals` writes to
-  `TODO.md`'s Inbox — triage before committing.
-- **Co-Authored-By line** at the end of every commit message:
+- **Stage only your files.** `vendor/` is gitignored; stage `.td`, `.cpp`, `.h`, plans, patch.
+- **Verify `git diff --cached --name-only`** is exactly your set — no foreign files.
+- **Regenerate the patch at each logical checkpoint** (end of each Layer):
+  ```bash
+  dev/regen-patch.sh   # run from worktree root only
+  ```
+  Sanity-check afterward: `grep -c 'Xc16\|HasIndex16' patches/llvm-mos/0002-321-accum16.patch`
+  should be non-zero, and `grep -c 'legalizeICmp\|NativeS16' ...` should be zero (no foreign hunks).
+- **Commit hooks fire automatically:** `regen-md-history` (snapshots plans),
+  `audit-plan-deferrals` (writes Inbox to `TODO.md` — triage before committing).
+- **Co-Authored-By line** on every commit:
   `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
-- **Do NOT push to `origin/main`.** This branch is isolated. When ready to merge, check
-  with the user first.
-
-### Patch regeneration
-
-When ready to regenerate `patches/llvm-mos/0002-321-accum16.patch`:
-```bash
-dev/regen-patch.sh
-```
-Run this ONLY from the worktree root (`/home/will/SRC/llvm-mos-65816-xy16`) — never from
-the main worktree while this branch has vendor/ edits, or you'll get cross-contamination
-(the exact bug documented in `docs/plans/2026-06-17-321-unify-1b-1c-peephole-into-native.md`
-§"What actually landed where").
+- **Do NOT push to `origin/main`** — check with the user first.
 
 ---
 
-## Key risks from the plan (pre-audited)
+## Key risks (full list from the plan)
 
-1. **Register numbers 0x500–0x503**: above Imag16's upper bound (0x28F). After Layer 1
-   build, verify no collision in `MOSGenRegisterInfo.inc` (`grep '0x500'`).
-2. **TXA16 PseudoInstExpansion vs MOSMCInstLower**: `T_A` is lowered in
-   `MOSMCInstLower.cpp` (not via PseudoInstExpansion). After Layer 2, confirm the new
-   `TXA16` PseudoInstExpansion path fires rather than the MCInstLower `T_A` case. If it
-   doesn't, add `TXA16`/`TAX16`/`TYA16`/`TAY16` cases to `MOSMCInstLower.cpp`.
-3. **Combined REP #$30**: only emit when `hasAccum16() && hasIndex16()` AND both flags
-   switch to the same target mode in the same `insertSwitch` call (Layer 3).
-4. **`XHigh=1` on `CPX_Immediate`**: `CPXImm16`/`CPYImm16` expand to
-   `CPX_Immediate16`/`CPY_Immediate16` (which have `XLow=1`) — orthogonal, but verify
-   the `XHigh=1` 8-bit forms don't interfere.
-5. **Layer 5 is minimal without legalizer changes**: `selectXY16` only fires when RA
-   assigns to Xc16/Yc16 (e.g., via spill). The legalizer integration that makes xy16
-   fire broadly is the follow-on task — don't attempt it in this pass.
+1. **Register numbers 0x500–0x503**: after Layer 1 build, verify no collision in
+   `MOSGenRegisterInfo.inc` (`grep -n '0x500' build/llvm-mos/lib/Target/MOS/MOSGenRegisterInfo.inc`).
+2. **TXA16 PseudoInstExpansion vs `T_A` in `MOSMCInstLower.cpp`**: after Layer 2, confirm the
+   new `TXA16` PseudoInstExpansion path fires. If `MCInstLower`'s `T_A` case intercepts it
+   first, add `TXA16`/`TAX16`/`TYA16`/`TAY16` cases to `MOSMCInstLower.cpp`.
+3. **Combined `REP #$30`**: only emit when both flags switch to the **same** mode in one
+   `insertSwitch` call (`MChanged && XChanged && NewM16 == NewX16`).
+4. **`XHigh=1` on `CPX_Immediate`**: `CPXImm16`/`CPYImm16` expand to `CPX_Immediate16`/
+   `CPY_Immediate16` (which have `XLow=1`) — orthogonal to `CPX_Immediate` (XHigh=1), but
+   `requiredXWidth` must check `TSFlagXHigh` to return `XW_X8` for the 8-bit forms.
+5. **Layer 5 scope**: `selectXY16` fires only when the RA assigns to Xc16/Yc16 (e.g., via
+   spill). Legalizer integration (making xy16 fire broadly) is the follow-on task — implement
+   the skeleton, leave a clear `// TODO: legalizer follow-on` comment, and stop there.
 
 ---
 
 ## What main is doing (don't collide)
 
-The main worktree is diagnosing the seed-42 regression. Suspect is `0001` (far-pointer
-patch — only committed patch that changes *default* 65816 codegen). Diagnostic work may
-modify files in `vendor/llvm-mos/llvm/lib/Target/MOS/` related to MOSCombiner, MOSInstrInfo.
-
-Your xy16 work touches DIFFERENT files (MOSFeatures.td, MOSRegisterInfo.td,
-MOSInstrLogical.td, MOSInsertREPSEP.cpp, new instructions). The only overlap risk is if
-the regression fix also touches MOSInsertREPSEP.cpp or MOSInstrLogical.td — check
-`git log main --oneline -5` before regenerating the patch to see if the fix landed.
+Main is fixing the seed-42 regression in `0002`. That fix touches `MOSLegalizerInfo.cpp`
+(`legalizeICmp`). Your xy16 work touches different files — `MOSFeatures.td`,
+`MOSRegisterInfo.td`, `MOSInstrLogical.td`, `MOSInsertREPSEP.cpp`, `MOSInstrInfo.cpp`,
+`MOSRegisterInfo.cpp`, `MOSInstructionSelector.cpp`. No overlap expected. Before regenerating
+the patch, run `git log main --oneline -3` to confirm the regression fix has landed and check
+that it didn't touch any file you modified.
 
 ---
 
-## Merge-back checklist (for future reference)
+## Merge-back checklist
 
-Before merging `wt/321-xy16` back to `main`:
+Before merging `wt/321-xy16` → `main`:
+
 - [ ] Regression on main diagnosed and fix committed
-- [ ] All 5 Layers built and `-verify-machineinstrs` clean
-- [ ] `xy16basic`, `xy16spill`, `xy16spillr` tests PASS on both MAME + bsnes-jg
-- [ ] Corpus 7/7, `fuzz 50 1` 50/50 (with `+mos-xy16` fuzzer track enabled)
-- [ ] `0002` regenerated and round-trips (`dev/regen-patch.sh` + round-trip check)
-- [ ] `git rebase main` clean (no conflicts)
+- [ ] All 5 layers built and `-verify-machineinstrs` clean
+- [ ] `xy16basic`, `xy16spill`, `xy16spillr` PASS on MAME + bsnes-jg
+- [ ] Mixed-mode test: Ac16+Xc16 in same function, `LDAbs16` emits no `rep/sep #$10`
+- [ ] Corpus 7/7 and `fuzz 50 1` 50/50 with `+mos-xy16` fuzzer track enabled
+- [ ] `0002` regenerated + round-trips clean; no foreign hunks
+- [ ] `git rebase main` clean
 - [ ] Full suite re-run post-rebase
