@@ -3120,6 +3120,88 @@ index cbdd54ab2..eaf9b691d 100644
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
    switch (MI.getOpcode()) {
+diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+index fbedd8d46..5078c02bc 100644
+--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
++++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+@@ -48,6 +48,7 @@ public:
+   bool lowerCmpZeros(MachineBasicBlock &MBB) const;
+   void lowerCmpZero(MachineInstr &MI) const;
+   bool combineLdImm(MachineBasicBlock &MBB) const;
++  bool threadAccum16(MachineBasicBlock &MBB) const;
+   bool tailJMP(MachineBasicBlock &MBB) const;
+ };
+ 
+@@ -56,6 +57,7 @@ bool MOSLateOptimization::runOnMachineFunction(MachineFunction &MF) {
+   for (MachineBasicBlock &MBB : MF) {
+     Changed |= lowerCmpZeros(MBB);
+     Changed |= combineLdImm(MBB);
++    Changed |= threadAccum16(MBB);
+     Changed |= tailJMP(MBB);
+   }
+   return Changed;
+@@ -398,6 +400,61 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
+   return Changed;
+ }
+ 
++// #321 A16-threading (Phase 1): drop the redundant Imag16 round-trip between two
++// dependent native-s16 ops. Each native s16 op is self-contained (LDAImag16 ->
++// OP -> STAImag16, value home = Imag16 between ops — the 1d-retry coalescer-safe
++// invariant), so a dependent chain stores each intermediate and immediately
++// reloads it:
++//     $rsN = STAImag16 $a16        ; store the value into its Imag16 home
++//     $a16 = LDAImag16 $rsN        ; reload it — but STA didn't touch $a16!
++// The reload is redundant ($a16 already holds the value); erase it, and if the
++// home is dead afterward (its only reader was that reload) erase the store too —
++// the value then threads through $a16 across the ops (e.g. lda;adc;and;sbc;sta).
++//
++// This is a POST-RA peephole on purpose: RA has already chosen $a16 for both
++// sides, so collapsing the pair cannot reintroduce the 1d coalescer crash (an
++// 8-bit value coalescing into A16). LDAImag16/STAImag16 model no NZ/flag def, so
++// erasing them is flag-safe. Strict adjacency keeps it conservative — $a16 is
++// provably unchanged between the two, and a missed non-adjacent case only forgoes
++// a win, never miscompiles.
++bool MOSLateOptimization::threadAccum16(MachineBasicBlock &MBB) const {
++  bool Changed = false;
++  MachineInstr *PrevSTA = nullptr; // the immediately-preceding STAImag16, else null
++
++  for (MachineInstr &MI : make_early_inc_range(MBB)) {
++    // Debug values don't break adjacency or touch $a16.
++    if (MI.isDebugInstr())
++      continue;
++
++    if (MI.getOpcode() == MOS::LDAImag16 && PrevSTA) {
++      Register LdVal = MI.getOperand(0).getReg();      // Ac16 def  ($a16)
++      Register LdHome = MI.getOperand(1).getReg();     // Imag16 use ($rsN)
++      Register StHome = PrevSTA->getOperand(0).getReg(); // Imag16 def ($rsN)
++      Register StVal = PrevSTA->getOperand(1).getReg();  // Ac16 use  ($a16)
++
++      if (LdHome == StHome && LdVal == StVal) {
++        // The home dies at the reload iff this load was its last use; then the
++        // store is dead too. (Post-RA kill flags are maintained by the allocator.)
++        bool HomeDead = MI.getOperand(1).isKill();
++        MI.eraseFromParent(); // the reload is always redundant
++        Changed = true;
++        if (HomeDead) {
++          PrevSTA->eraseFromParent();
++        } else {
++          // The store stays for the home's other readers, but $a16 must now stay
++          // live across it to reach the next op — drop the stale kill on its use.
++          PrevSTA->getOperand(1).setIsKill(false);
++        }
++        PrevSTA = nullptr;
++        continue;
++      }
++    }
++
++    PrevSTA = (MI.getOpcode() == MOS::STAImag16) ? &MI : nullptr;
++  }
++  return Changed;
++}
++
+ bool MOSLateOptimization::tailJMP(MachineBasicBlock &MBB) const {
+   if (MBB.size() < 2)
+     return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 index 212ede1a0..8fd6694c8 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
