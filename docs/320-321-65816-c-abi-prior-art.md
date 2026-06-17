@@ -80,6 +80,14 @@ caller-supplied pointer.
 This aligns cleanly with #321's dual-width `A16` work: a 16-bit result already lands in A, and the
 32-bit case is just "high half in X."
 
+**Adopted by #321 (2026-06-17).** This A (low) / X (high) return convention is now a locked, tested ABI
+invariant for `+mos-a16` — it is *already what llvm-mos emits* (emergent from `CC_MOS` byte-splitting), so
+adopting it cost no codegen change, only a regression guard: `examples/65816/a16ret.c` + `dev/a16ret.sh`
+(`dev/run.sh a16ret`) asserts host == default == `+mos-a16` value agreement on MAME + bsnes-jg plus a disasm
+gate that the `i16` return is `ldx <high>; lda <low>; rts` and the `i8` return is in A alone. See
+[`docs/investigations/65816-calling-convention-decision.md`](investigations/65816-calling-convention-decision.md)
+§"Return values — adopted" and [`docs/plans/2026-06-17-321-ax-return-convention.md`](plans/2026-06-17-321-ax-return-convention.md).
+
 ### Memory models / near–far (directly informs #320)
 
 WDC816CC has four models, selected by code-size × data-size (manual p.22):

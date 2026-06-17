@@ -38,7 +38,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
+- [ ] **#321 fuzzer-found codegen regression at seed 42 — current `vendor/` miscompiles in a SHARED (non-a16)
+  path; correct=`0xEC0D`, patched-toolchain=`0xB226`.** Surfaced by `dev/run.sh fuzz 50 1` (49/50) during the
+  a16ret verification (2026-06-17). Repro: `dev/run.sh fuzz 1 42`. **Decisive triage:** `host(python-16bit)
+  == upstream-unpatched-default@MAME == 0xEC0D` (two independent oracles), but the **from-source patched
+  toolchain produces `0xB226` in BOTH its default 8-bit AND `+mos-a16` builds** (and on bsnes-jg) — so the
+  defect is in a code path the **default (non-a16) build also takes**, i.e. NOT `+mos-a16`-specific and NOT
+  the A/X return convention. Appeared *after* the earlier-2026-06-17 `fuzz 50/50` baselines; the `clang-23`
+  rebuild at 19:45 carried concurrent uncommitted edits to shared MOS files (`MOSCombiner.cpp`,
+  `MOSInstrInfo.cpp`, `MOSInstrGISel.td`) — **attribute first** (bisect committed patches vs concurrent
+  `vendor/` edits) before fixing; not owned by the a16ret plan. The generated program leans on signed
+  `(short)(unsigned short) >> k` (int-promotion-before-shift) + nested `& 0xFFFF` chains — likely a combiner
+  miscompile around one of those. Triage artifact regenerated deterministically by the repro command. (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
   only by `G_UNMERGE` now loads byte-wise instead of a wasteful 16-bit-load→`A16`→spill→re-read —
@@ -133,9 +144,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [CC decision analysis](docs/investigations/65816-calling-convention-decision.md). The "one decision"
   decomposes into 4 sub-decisions; only the **frame** (TCD DP-window vs stack-relative vs keep the soft
   static stack) is hard, gated on a product steer (first-pass demonstrator vs match the WDC/ORCA commercial
-  ABI) + measurement after xy16. Does **not** block xy16 + native-mode crt0. **First piece to land — the
-  A (low) / X (high) return convention** (already emergent + prior-art-blessed + #321-aligned): lock it as a
-  tested, documented ABI invariant (codegen unchanged).
+  ABI) + measurement after xy16. Does **not** block xy16 + native-mode crt0. ~~**First piece to land — the
+  A (low) / X (high) return convention**~~ **DONE 2026-06-17** — locked as a tested, documented ABI invariant
+  (codegen unchanged); `dev/run.sh a16ret` + CC-analysis §"Return values — adopted". See Done. The remaining
+  CC sub-decisions (args, frame, recursion) stay open.
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
 - [ ] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
@@ -202,6 +214,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-17 — [321-ax-return-convention] **lock the A (low) / X (high) return convention as a tested ABI invariant (test+docs only, no codegen change).** The free, uncontroversial CC piece: `i8 → A`, `i16 → A(low):X(high)` is already emergent from `CC_MOS` byte-splitting (no `RetCC_MOS`) AND the documented prior art (WDC816CC p.21 / ORCA `A_X`). New `examples/65816/a16ret.c` + `dev/a16ret.sh` (wired into `dev/run.sh`): value differential `corpus_result==0x2387` host==default==+mos-a16 (MAME+bsnes-jg) + a byte-pinned disasm gate — i16 return is `ldx <high>; lda <low>; rts` (X reads `__rc`+1 vs A, proving high→X/low→A), i8 return delivers A alone. The value test catches miscompiles; the disasm gate catches convention drift (a value test alone can't — a consistent A↔X swap round-trips). Decision recorded in CC-analysis §"Return values — adopted" + the prior-art note. Verified: a16 suite 50/50, corpus 7/7, no `vendor/`/`0002` change. [plan](docs/plans/2026-06-17-321-ax-return-convention.md).
 - 2026-06-17 — [321-unify-1b-1c-peephole] **retire 1b/1c GISel combiner peephole — native path now handles all shapes** (~1400 lines deleted; corpus 7/7, a16 suite all PASS, -verify-machineinstrs clean). [plan](docs/plans/2026-06-17-321-unify-1b-1c-peephole-into-native.md).
 - 2026-06-17 — [321-task7-eq-residuals] **EQ-as-value task7: `computed==global` → `CmpBrImagAbs16` (`lda zp; cmp long`); items 2–7 confirmed-deferred.** New pseudo + legalizer `ComputedVsGlobal` gate + `foldableAbsLoad16(RHS16)` selector fold + canonicalization swap (`isFoldableAbsS16Load(LHS) && isImag16Resident(RHS)`) + `GlobalVsImm` guard; `a16eqvalmg` 0x0111 host==default==+mos-a16 (MAME+bsnes-jg, both orderings, 2×`cf` in-block + 2×`c5` cross-block fallback). Disasm gate: `cf` (CMP Long 24-bit, SNES global addressing), not `cd` (was a wrong gate). Spike measurements: item 2 (`x==0` as value) +5 B (native rep/sep worse than byte-OR); item 5 (indir-dst) already −13 B via 16-bit mode (selector reorder ~4 B more, corpus gain unverified → deferred); items 3/4/6/7 confirmed by prior spikes. `0002` round-trips (7×`CmpBrImagAbs16`, no TXY/TYX). [plan](docs/plans/2026-06-17-321-task7-eq-residuals-indir-dst-xflag-varshift.md).
 - 2026-06-17 — [321-a16-threading] **A16-threading Phase 1.5: relax the redundant-reload peephole beyond strict adjacency (non-adjacent + multi-reload, threads across volatile stores).** Generalized `threadAccum16` so the `STAImag16`→`LDAImag16` pair need not be adjacent: intervening instructions are allowed if none rewrites `$a16` (`modifiesRegister(MOS::A16)` catches 8-bit sub-`A` writes + `xba`; calls/inline-asm bail) or overwrites the home. A volatile *store* between is fine (it only READS `$a16` — the store stays put, only the non-volatile reload of the `Imag16` temp drops; a volatile *load* writes `$a16` and is caught). Handles the multi-reload case (a kept store reloaded more than once — its pending entry survives until the store is actually erased) and clears stale `$a16` kills across the gap. **Measurement honesty:** the opportunity was first mis-sized at "~40/300 programs"; a mode-aware scan cut the byte-assembly false positives (`sta lo; stx hi; rep #32; lda` assembles a value, not a reload), then counting *all* `lda` (not just `lda __rcN`) as A16-clobbers cut the indirect/abs-load false positives — the **true** non-adjacent opportunity was ~14, of which Phase 1.5 captures all but **1**/300. Non-breaking: suite + kernels **47/47**, corpus 7/7, **fuzz 50/50** (0 mismatch/crash/error), `-verify-machineinstrs` clean over 47 examples + 150 fuzz programs (exercising volatile-store threading), `0002` round-trips (`threadAccum16` + `isInlineAsm`, no `TXY`/`TYX`). **Phase 2 retired** (fold-while-threaded already optimal); Phase 3 (RA-level `Ac16` residency) stays deferred. [plan](docs/plans/2026-06-17-321-a16-threading.md).
