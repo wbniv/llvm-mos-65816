@@ -1,13 +1,16 @@
 # #321 — native s16 equality-as-value (`b = (a == c)`): the fused compare-select
 
 **Date:** 2026-06-16
-**Status:** **spiked (2026-06-16) → blanket REJECTED (a net regression); the GATED version is the planned
-path — worth doing.** Approach A is feasible and cheap (verify-clean, **no new pseudo needed** — Approach
-B is unnecessary). But *blanket* native EQ is **operand-residency-dependent**: it wins only when the LHS
-is already in `Imag16` (local/computed −3 B, indirect `*p==c` −4 B) and **regresses** register/param EQ
-(+8 B), globals (+4 B), global-vs-immediate (+12 B). So **gate** it to fire only where it wins — a
-no-regression modest win, and on a compiler that is worth shipping (every win is amplified across all
-compiled programs; "high-effort" is a scheduling input, not a veto). See "Spike results" + "Recommendation".
+**Status:** **spiked → blanket REJECTED → the GATED version FULLY LANDED (2026-06-17).** This spike's
+recommendation — gate native EQ-as-value by operand residency, never blanket — was realized as **four
+gated wins**: v1 indirect (`*p==c`, −4 B), v3 both-global (`g1==g2`, `lda abs; cmp abs`, −48 B chained),
+`g1==0x1234` immediate (recover the byte-split constant → `cmp #imm`), v2 computed/`Imag16`-resident
+(`(a+b)==c`, −3 B). Approach A held: **no new `CmpSel` pseudo** — the value rides
+`buildNZSelect → MOSLowerSelect → G_BRCOND_IMM → CmpBrImag16/CmpBrImm16` (v3/imm added the abs-fold
+pseudos `CmpBrAbsAbs16`/`CmpBrAbsImm16`). The spike's "+4/+12 B global regression" was an isolated-leaf
+artifact — in 16-bit-ambient code even a materialized native compare beats the 8-bit chain (v3 measured
+−48 B *with* partial folds). The original prediction below ("operand-residency-dependent; gate it") was
+correct and is the design that shipped. See the four follow-on plans (links below) for the landed work.
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "native s16 equality-as-value — the full native compare"
 **Predecessors:**
 [equality compares — the branch path](2026-06-15-321-native-16bit-equality-compares.md) (commit landed
@@ -16,6 +19,11 @@ compiled programs; "high-effort" is a scheduling input, not a veto). See "Spike 
 regression fix; the "Deferred" section sketched this) ·
 [indirect s16 load (won't-implement)](2026-06-16-321-indirect-s16-load-bytewise.md) (the follow-up this
 **subsumes** — see Context).
+**Landed follow-ons (this spike's recommendation, realized):**
+[v1 gated impl](2026-06-16-321-native-s16-eq-gated-impl.md) ·
+[v3 both-global abs-fold](2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md) ·
+[g==imm constant-through-merge](2026-06-17-321-native-s16-eq-imm-constant-through-merge.md) ·
+[v2 computed/Imag16-resident](2026-06-17-321-native-s16-eq-v2-computed-imag16-lhs.md).
 
 ## Context — the problem
 

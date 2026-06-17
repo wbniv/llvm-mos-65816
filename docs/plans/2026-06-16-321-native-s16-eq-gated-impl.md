@@ -6,8 +6,8 @@
 shape byte-identical (no regression), `-verify-machineinstrs` clean, ambient indirect-EQ native;
 `a16eqvalp` host==default==+mos-a16 (`0x0101`) on MAME + bsnes-jg; suite 44/44, corpus 7/7; **`fuzz
 50/50`** (0 mismatch / 0 crash, on the F4-fixed build); `patches/0002` round-trips (no F4 leakage). The
-earlier "48/50" was a stale pre-F4 build, not this change. **v2** (computed-LHS) + **v3** (abs-fold
-globals) remain — see TODO + "Follow-ups".
+earlier "48/50" was a stale pre-F4 build, not this change. **v2** (computed-LHS), **v3** (both-global
+abs-fold), and the **`g1==0x1234`** immediate sub-case all **landed 2026-06-17** — see "Follow-ups".
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "native s16 equality-as-value"
 **Predecessor / evidence:**
 [native-EQ design + spike results](2026-06-16-321-native-s16-eq-as-value-cmpsel.md) — the spike proved
@@ -160,12 +160,13 @@ in `dev/regen-patch.sh` (`a30f309`, which bakes `0003` into the regen baseline).
 - **Blast radius:** every indirect-s16-`==`-as-value site. The Tier-1 differential fuzzer + a quiet box
   are the safety net.
 
-## Follow-ups (documented, not in v1)
+## Follow-ups — ALL LANDED 2026-06-17
 
-- **v2 — computed/`Imag16` LHS** (`(a+b) == c`, −3 B): extend the gate to a computed-LHS operand, but only
-  after verifying the *other* operand isn't a real-register value that would force a spill (measure first).
-- **v3 — abs-operand fold for globals** (`g1 == g2`): add `LDAbs16`/`CMPAbs16` operand folding to the EQ
-  native path (mirror `selectSbc16`'s `a16abscmp`) so globals are read in place; turns the +4/+12 B
-  regression into a win.
-- Re-measure all of this after **A16-threading** (ROADMAP step 5), which keeps s16 values in the
-  accumulator and so shifts operand residency — likely widening where native EQ wins.
+- ~~**v2 — computed/`Imag16` LHS** (`(a+b) == c`, −3 B)~~ **DONE** — gate-only `ComputedEq`
+  ([v2 plan](2026-06-17-321-native-s16-eq-v2-computed-imag16-lhs.md)).
+- ~~**v3 — abs-operand fold for globals** (`g1 == g2`)~~ **DONE** — `CmpBrAbsAbs16` (−48 B chained)
+  ([v3 plan](2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md)); the `g1 == 0x1234` immediate
+  sub-case followed via `getI16Const` + `CmpBrAbsImm16`
+  ([const-merge plan](2026-06-17-321-native-s16-eq-imm-constant-through-merge.md)).
+- Re-measure after **A16-threading** (ROADMAP step 5), which keeps s16 values in the accumulator and so
+  shifts operand residency — likely widening where native EQ wins. (Still open.)

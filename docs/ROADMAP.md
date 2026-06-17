@@ -295,8 +295,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    flipping the sign bit (`a <ₛ b ⟺ (a^0x8000) <ᵤ (b^0x8000)`), so `legalizeICmp` rewrites s16 `SLT`
    to `ULT` on the XOR'd operands — the XORs are the native EOR and the compare re-legalizes through the
    native UGE carry path, with no new flag handling (`a16scmp` reads 0x0111 incl. negative operands).
-   Compare→select/stored-bool compares are follow-ups. Non-breaking (corpus 7/7, all 13 a16* tests
-   green). **Cross-block REP/SEP mode-tracking** then makes the per-op
+   Compare→select / stored-bool compares (equality **as a value**) land later as four gated wins — see
+   "Native s16 equality-AS-VALUE" below. Non-breaking (corpus 7/7, all 13 a16* tests green). **Cross-block REP/SEP mode-tracking** then makes the per-op
    16-bit features pay off across control flow: `MOSInsertREPSEP` was per-block and 8-bit-anchored, so
    a loop with a 16-bit body re-ran `rep … sep` every iteration; it now runs a forward dataflow over
    the M-width lattice (`{None, M8, M16, Conflict}`) and places switches only at genuine transitions —
@@ -447,6 +447,40 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [Tier-1 plan](plans/2026-06-15-321-tier1-broaden-corpus.md) ·
    [F3 fix plan](plans/2026-06-16-321-fix-cmp-value-selectimm.md) ·
    [soft-stack plan](plans/2-one-tracked-follow-up-glimmering-ladybug.md)._
+
+   _**Native s16 equality-AS-VALUE (2026-06-17): the four gated wins.** Equality feeding a **branch**
+   went native earlier (above), but equality consumed as a **value** (`b = (a == c)` — stored, returned,
+   or fed into arithmetic) still narrowed to the 8-bit `cpx/cmp` two-byte chain even under `+mos-a16`,
+   because the Z flag can't be a plain i1 (it only fuses into a terminator). The fix routes the value
+   through the existing diamond: `buildNZSelect` wraps Z in a `G_SELECT`, `MOSLowerSelect` lowers it to a
+   `G_BRCOND_IMM`, and the existing `CmpBrImag16`/`CmpBrImm16` fires — **no new inserter, no `CmpSel`
+   pseudo** (the original sketch proved unnecessary). A spike showed the *blanket* native form is a net
+   **regression** (register/param +8 B, global +4–12 B) — it wins only when the operand is already
+   `Imag16`-resident — so the legalizer **gates** it by operand residency, landing as four wins, each
+   measured no-regression: **v1 — indirect load** (`*p == c`): the loaded value is already in `Imag16`,
+   so the native compare reads it directly instead of unmerging to bytes (`a16eqvalp`, −4 B). **v3 —
+   both-global** (`g1 == g2`): a new fused `CmpBrAbsAbs16` reads both globals in place
+   (`rep; lda abs; cmp abs; sep; beq/bne`), mirroring `selectSbc16`'s `a16abscmp` fold — −48 B (−24 %) on
+   a chained test, confirming the spike's "+4 B" was an isolated-leaf artifact (in 16-bit-ambient code
+   even a materialized native compare beats the 8-bit chain). **`g1 == 0x1234` (immediate):** the 16-bit
+   constant is byte-split into `G_MERGE_VALUES(i8,i8)` before selection, so the EQ matcher missed it (the
+   existing `CmpBrImm16` was dormant for the same reason); a shared `getI16Const` recovers it through the
+   merge, unblocking `CmpBrAbsImm16` (`lda abs; cmp #imm`) **and** lighting up `CmpBrImm16` for v1's
+   `*p == const` + the branch `if (g == const)`. **v2 — computed/`Imag16`-resident** (`(a+b) == c`):
+   a computed native-s16 value (generic `G_ADD/…` or the load-rooted `G_*16_ABSLD` combiner pseudos) is
+   already in `Imag16`, so a gate-only `ComputedEq` fires when neither operand is a register-arg (which
+   would spill) or a global — `(a+b) == (c+d)` −3 B, a multi-use chained test −13 B, `computed == param`
+   byte-identical (gate declines). Regression guards `a16eqvalp`/`a16eqvalg`/`a16eqvalc` (each
+   `host == default == +mos-a16` on both emulators); the `a16eq`/`a16eqval` gates were updated as v3
+   improved their global compares (`cmp zp` → `cmp abs/long`, superseding `a16eqval`'s byte-wise stopgap).
+   Non-breaking throughout (a16 suite + corpus 7/7, **fuzz 50/50**, `-verify-machineinstrs` clean, `0002`
+   round-trips). Remaining micro-cases (mixed `computed == global`, `x == 0`-as-value, register operands)
+   are intentionally 8-bit — best revisited with A16-threading, which shifts operand residency._
+   [design + spike](plans/2026-06-16-321-native-s16-eq-as-value-cmpsel.md) ·
+   [v1 gated impl](plans/2026-06-16-321-native-s16-eq-gated-impl.md) ·
+   [v3 both-global](plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md) ·
+   [g==imm const-merge](plans/2026-06-17-321-native-s16-eq-imm-constant-through-merge.md) ·
+   [v2 computed](plans/2026-06-17-321-native-s16-eq-v2-computed-imag16-lhs.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
