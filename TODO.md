@@ -135,6 +135,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   X-flag is a separate mode dimension still to add to the dataflow); 16-bit arithmetic; **native-mode
   crt0** (XCE + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320
   Increment 2); then hardware-stack ABI + calling convention. ROADMAP step 5.
+- [ ] **#321 calling-convention decision (open, blocks the hardware-stack ABI).** Analysis + recommendation:
+  [CC decision analysis](docs/investigations/65816-calling-convention-decision.md). The "one decision"
+  decomposes into 4 sub-decisions; only the **frame** (TCD DP-window vs stack-relative vs keep the soft
+  static stack) is hard, gated on a product steer (first-pass demonstrator vs match the WDC/ORCA commercial
+  ABI) + measurement after xy16. Does **not** block xy16 + native-mode crt0. **First piece to land — the
+  A (low) / X (high) return convention** (already emergent + prior-art-blessed + #321-aligned): lock it as a
+  tested, documented ABI invariant (codegen unchanged).
+  [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
+  [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
 - [ ] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
   with correct line/variable mapping. ROADMAP step 6; drdevtools `mame-65816-gdbstub` pre-wires it.
 
@@ -533,4 +542,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "xy16 index-16 spill case" -> gated on the xy16 increment; covered by the curated M2 soft-stack
        bullet (P1's expandLDSTStk SPILL CONTRACT tripwire) + the M2 X-flag/xy16 re-evaluate item.
      Nothing open here. -->
+- [ ] **(triage)** The A16-aware return optimization and the xy16 32-bit-return evolution (both noted above as follow-ups). — _from [2026-06-17-321-ax-return-convention.md](docs/plans/2026-06-17-321-ax-return-convention.md)_  <!-- fp:62ef03744d8d507c -->
+- [ ] **(triage)** The argument-passing and frame-storage sub-decisions — tracked in the CC decision analysis; they need a — _from [2026-06-17-321-ax-return-convention.md](docs/plans/2026-06-17-321-ax-return-convention.md)_  <!-- fp:a47d39cc54be6d82 -->
 <!-- END auto-captured-deferrals -->
