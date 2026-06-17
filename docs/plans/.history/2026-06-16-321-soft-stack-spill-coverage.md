@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/4f607ed) | #321 P3: draft upstream issue — reentrant attr cannot force the soft stack (source-verified) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/d0f8bd7) | #321 P0: fold standalone soft-stack-fuzzer-coverage plan into the umbrella plan; reconcile status |
 | [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/7c0fe56) | #321 native s16: load consumed only as bytes stays byte-wise (EQ-as-value prologue fix) |
 
 <!--history-meta v1
+4f607ed	author	Will Norris
+4f607ed	added	5
+4f607ed	deleted	1
+4f607ed	files	1
+4f607ed	body	The soft-stack plan's P3: __attribute__((reentrant)) is accepted by clang and opts a\nfunction out of the -fnonreentrant default, but cannot force an otherwise-non-recursive\nfunction onto the soft (reentrant) stack — MOSNonReentrant re-derives nonreentrant from\nnorecurse and re-stamps it regardless. A function reentrant only via a path the IR call\ngraph can't see (asm-installed ISR, manual coroutine/stack switch, longjmp re-entry)\nsilently gets a static frame that the second activation clobbers. Not a miscompile for\nordinary single-activation C; a latent footgun otherwise.\n\nEvery claim verified against the current vendor source before drafting:\n- clang CodeGenModule.cpp: reentrant appears only as !hasAttr<ReentrantAttr>() gating the\n  AssumeNonReentrant default — emits no positive IR marker.\n- MOSNonReentrant::run(): Reentrant set seeded only from interrupts/interrupt-norecurse/\n  main/libcalls; final loop stamps nonreentrant on every doesNotRecurse() fn not in it.\n- MOSFrameLowering::usesStaticStack: staticStack() && !hasOptNone() && nonreentrant.\n\nDeliverable: docs/321-upstream-reentrant-soft-stack-issue.md (issue draft, matching the\nF4 upstream-draft style; includes a localized 2-part fix sketch — clang emits a positive\n"reentrant" IR attr, the pass seeds Reentrant from it). Filing is user-triggered; no fork\npatch (issue only, per the plan). Marked drafted in the umbrella plan §P3 + TODO.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 d0f8bd7	author	Will Norris
 d0f8bd7	added	48
 d0f8bd7	deleted	21

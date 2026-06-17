@@ -1404,7 +1404,7 @@ index e81487e9c..6f18c7c1a 100644
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 42a94c356..56b4d0cb4 100644
+index 42a94c356..f41b8afda 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -352,6 +352,10 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
@@ -1461,7 +1461,22 @@ index 42a94c356..56b4d0cb4 100644
          (Reg.isVirtual() &&
           MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
        MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
-@@ -1035,6 +1058,12 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
+@@ -961,6 +984,14 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+       if (IsLoad && Tmp != Reg)
+         Builder.buildCopy(Reg, Tmp);
+     } else {
++      // #321 SPILL CONTRACT (static-stack mirror of MOSRegisterInfo::expandLDSTStk):
++      // this single-byte fall-through is correct ONLY for 8-bit classes. Every
++      // spillable >=16-bit register class needs its OWN case above (Ac16 -> one
++      // 16-bit LDAbs16/STAbs16; Imag16 -> two byte spills) — falling through here
++      // would split/COPY the wide value through an 8-bit GPR and emit invalid MIR
++      // (the F3 `SelectImm $a16` crash class). LATENT NEXT: xy16 (native 16-bit
++      // index, the X-flag mode dimension); when it becomes spillable it must gain a
++      // case above, like Ac16. The soft-stack path (expandLDSTStk) shares this contract.
+       loadStoreByteStaticStackSlot(
+           Builder, MachineOperand::CreateReg(Reg, IsLoad), FrameIndex, 0, MMO);
+     }
+@@ -1035,6 +1066,12 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
    case MOS::CmpBrIndirIdx:
      expandCmpBr(Builder);
      break;
@@ -1474,7 +1489,7 @@ index 42a94c356..56b4d0cb4 100644
  
    // Control flow
    case MOS::GBR:
-@@ -1355,6 +1384,60 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
+@@ -1355,6 +1392,60 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
    MI.eraseFromParent();
  }
  
@@ -3735,7 +3750,7 @@ index 868f6c712..7b5100bfe 100644
 +// register class on the selected ops, not by the bank (banks are unused here).
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index baf6de604..8af2979fd 100644
+index baf6de604..f6f6da3ee 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -427,10 +427,21 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
@@ -3784,6 +3799,26 @@ index baf6de604..8af2979fd 100644
    if (MOS::Imag16RegClass.contains(Loc)) {
      if (!IsLoad) {
        // Loc may not be fully alive at this point, which would create uses of
+@@ -500,6 +525,19 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+   if (Loc8)
+     Loc = Loc8;
+ 
++  // #321 SPILL CONTRACT: everything reaching the 8-bit tail below must be C, V,
++  // or an 8-bit (Anyi8) class. Every spillable >=16-bit register class needs its
++  // OWN explicit expansion case ABOVE this point — it cannot fall through to the
++  // single-byte path, which would COPY the wide value through an 8-bit GPR and
++  // emit invalid MIR (the F3 `SelectImm $a16` crash class). Handled so far:
++  //   - Ac16   (16-bit accumulator): one 16-bit indirect STAIndir16/LDAIndir16
++  //             through a scratch-formed slot pointer (see IsAc16 above).
++  //   - Imag16 (zp pair): split into two byte spills, each re-expanded.
++  // LATENT NEXT: xy16 (native 16-bit X/Y index, the X-flag mode dimension — TODO
++  // M2 "re-evaluate the X-flag mode dimension"). The moment it becomes spillable,
++  // a 16-bit index live across a call reaches this assert and crashes exactly like
++  // F3; it must gain a case above, mirroring Ac16. The static-stack spill path
++  // (MOSInstrInfo::loadStoreRegStackSlot) carries the same contract.
+   assert(Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc));
+ 
+   Register A = Loc;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 index 94e229944..253663616 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td

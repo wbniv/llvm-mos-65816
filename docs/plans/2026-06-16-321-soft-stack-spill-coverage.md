@@ -72,7 +72,15 @@ oracle. As-built (`RecFuncDef` + `gen_funcs`):
   reentrant `+mos-a16` code), fixed as `patches/llvm-mos/0003-late-opt-txy-dead-flag.patch`. Tracked by the
   [F4 plan](2026-06-16-321-f4-late-opt-txy-dead-flag.md), not this one.
 
-### P1 — Document & guard the `expandLDSTStk` spill contract (latent xy16 tripwire)
+### P1 — Document & guard the `expandLDSTStk` spill contract (latent xy16 tripwire) — DONE (2026-06-17)
+
+**DONE:** added the SPILL CONTRACT comment at the `expandLDSTStk` tail assert (`MOSRegisterInfo.cpp`,
+above `assert(Loc == C || V || Anyi8…)`) and mirrored it at the single-byte fall-through `else` in the
+static path (`MOSInstrInfo::loadStoreRegStackSlot`). Both state: every spillable ≥16-bit class needs its
+own explicit case above (Ac16 → 16-bit indirect/`LDAbs16`-`STAbs16`; Imag16 → byte-pair split), the
+fall-through is 8-bit-only, and `xy16` (native 16-bit index, the X-flag dimension) is the latent next one
+that would hit the F3 crash class and must gain a case. Comment-only — codegen byte-identical; rebuild
+clean, `0002` round-trips. The actual index-16 spill case stays deferred to the `xy16` increment.
 
 `expandLDSTStk` (`MOSRegisterInfo.cpp:418`) handles exactly three spill classes — `Ac16` (indirect,
 :479), `Imag16` (byte-pair split, :489), and `Anyi8`/`C`/`V` (generic indirect-indexed, :523) — and
@@ -150,8 +158,10 @@ Steps 5–6 below are P1/P2 and are not yet started. The original spec follows v
    (Imag16) — i.e. proof the reentrant path ran, not just that the suite is green.
 4. **Non-breaking.** a16* suite + kernels + combinatorial green; `dev/run.sh corpus` 7/7;
    `a16spill` + `a16spillr` still green; if any backend change, `dev/regen-patch.sh` → `0002` round-trips.
-5. **P1 contract note** present at `MOSRegisterInfo.cpp:528` + the static mirror in `MOSInstrInfo.cpp`;
-   no functional change (suite unchanged).
+5. **P1 contract note — DONE (2026-06-17).** SPILL CONTRACT comment present at the `expandLDSTStk` tail
+   assert (`MOSRegisterInfo.cpp`) + the mirror at the single-byte fall-through in
+   `MOSInstrInfo::loadStoreRegStackSlot`; comment-only, codegen byte-identical, rebuild clean, `0002`
+   round-trips. **PASS.**
 6. **P2 `.ll` regression** fails on a pre-F3 backend (revert-check proves it bites) and passes now under
    `-verify-machineinstrs`.
 

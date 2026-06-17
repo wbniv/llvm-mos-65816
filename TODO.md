@@ -76,9 +76,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (the proven soft-stack trigger) so `expandLDSTStk` spills of `Ac16`/`Imag16`/8-bit get value-level
   differential coverage (host==default==a16, both emulators).~~ **P0 LANDED `0fe82ab`** (`RecFuncDef`;
   verification PROVISIONAL — steps 1–2 PASS no-box, full `fuzz 50` quiet-box re-run pending; also
-  found+fixed upstream F4, patch `0003`). P1: document the `expandLDSTStk` spill
+  found+fixed upstream F4, patch `0003`). ~~P1: document the `expandLDSTStk` spill
   contract at the `MOSRegisterInfo.cpp:528` assert (every spillable ≥16-bit class needs an explicit case
-  — `xy16` index-16 is the latent next one). P2: add a hermetic `.ll` crash-regression for the soft-stack
+  — `xy16` index-16 is the latent next one).~~ **P1 DONE 2026-06-17** (SPILL CONTRACT comment at the
+  `expandLDSTStk` tail assert + the static-path mirror in `MOSInstrInfo::loadStoreRegStackSlot`;
+  comment-only, `0002` round-trips). P2: add a hermetic `.ll` crash-regression for the soft-stack
   `Ac16` spill. P3 (optional, upstream, not #321): `__attribute__((reentrant))` can't force the soft
   stack — ~~file an issue~~ **issue DRAFTED + source-verified
   ([docs/321-upstream-reentrant-soft-stack-issue.md](docs/321-upstream-reentrant-soft-stack-issue.md));
