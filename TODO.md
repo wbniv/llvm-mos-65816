@@ -537,6 +537,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        • chained value-EQ with cross-block-hoisted loads (stays native = a win, not a regression).
        • re-measure after A16-threading                                        -> the bullet's tail.
      Nothing open here. -->
-- [ ] **(triage)** A real upstream **lit test** under `llvm/test/CodeGen/MOS/` (with `FileCheck`, `; RUN: llc … — _from [2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md](docs/plans/2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)_  <!-- fp:9cd9cabfcff28acc -->
-- [ ] **(triage)** The actual `xy16` index-16 spill case stays gated on the `xy16` increment (P1's tripwire covers it). — _from [2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md](docs/plans/2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)_  <!-- fp:bd2c7324df9e4603 -->
+<!-- triaged 2026-06-17: both P2-plan deferrals already covered.
+     • "upstream lit test under llvm/test/CodeGen/MOS/" -> belongs with the #321 UPSTREAMING work
+       (Upstream/Contribution section); the constraint (regen-patch mirrors only the lib dir, so a
+       vendor test file is lost) is documented in the P2 plan + the soft-stack plan's P2 section.
+     • "xy16 index-16 spill case" -> gated on the xy16 increment; covered by the curated M2 soft-stack
+       bullet (P1's expandLDSTStk SPILL CONTRACT tripwire) + the M2 X-flag/xy16 re-evaluate item.
+     Nothing open here. -->
 <!-- END auto-captured-deferrals -->
