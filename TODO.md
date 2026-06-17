@@ -557,6 +557,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-18: both are "Out of scope" NON-GOALS from the seed-42 fix plan (clarifying the A/X
      return convention and the +mos-a16 EQ fold are UNCHANGED) — not deferred work. The fix is complete +
      verified (a16 50/50, corpus 7/7, fuzz 50/50). fp:27bd502017f767b4 fp:5d3100a79ceeab83 -->
-- [verify] **2026-06-18-321-indir-dst-copy-fold-handoff** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-18-321-indir-dst-copy-fold-handoff.md](docs/plans/2026-06-18-321-indir-dst-copy-fold-handoff.md)_  <!-- fp:91dc9eb4b93c09c3 -->
-- [verify] **2026-06-18-321-indir-dst-copy-fold** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-18-321-indir-dst-copy-fold.md](docs/plans/2026-06-18-321-indir-dst-copy-fold.md)_  <!-- fp:ac13f5e988de2e42 -->
+<!-- triaged 2026-06-18: both plans are WON'T-DO — corpus trigger check 0/6 progs 0 B; the
+     verification sections were for the implementation (never executed). No work pending.
+     fp:91dc9eb4b93c09c3 fp:ac13f5e988de2e42 -->
 <!-- END auto-captured-deferrals -->
