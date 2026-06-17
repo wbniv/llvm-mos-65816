@@ -157,6 +157,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   lands in `llvm-mos`, targets any `-mcpu=mosw65816` platform). Strategy + the tier-1/tier-2
   positioning note for engaging @asiekierka on #321 are drafted in
   [415-snes-target-reconciliation](docs/415-snes-target-reconciliation.md). User-triggered (posting).
+- [ ] **Upstream the F4 `mos-late-opt` TXY/TYX dead-flag fix** (user-triggered). This is an **upstream
+  llvm-mos bug** (`MOSLateOptimization.cpp`, blames to `c798c3141`), carried in the fork as patch `0003`
+  as a private workaround. The upstream PR is **ready** (clean branch off upstream `main` + the 2-line
+  fix + an LLVM lit test, validated). Open it against `llvm-mos/llvm-mos`; once merged, drop `0003` and
+  bump the vendor pin. [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
 
 
 ## Watch
@@ -477,22 +482,30 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-16: indirect-s16-load-bytewise is a PLANNED, investigation-gated item
      (Status: planned) — its "Verification (if implemented)" section is intentionally unrun
      (nothing built yet). Tracked by the M2 "equality-as-value" bullet. Not a missed step. -->
-- [ ] **(triage)** The other P0 follow-ups (P1 `expandLDSTStk` contract note, P2 `.ll` durability, P3 `reentrant` — _from [2026-06-16-321-f4-late-opt-txy-dead-flag.md](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md)_  <!-- fp:cb963e0cec41eae1 -->
-- [ ] **(triage)** Upstreaming the PR to llvm-mos is user-triggered (like the #320 note). — _from [2026-06-16-321-f4-late-opt-txy-dead-flag.md](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md)_  <!-- fp:5a35103736bcadd9 -->
+<!-- triaged 2026-06-17: both F4-plan deferrals dispositioned.
+     • P1/P2/P3 (expandLDSTStk contract note, .ll durability, reentrant upstream note) -> the F4
+       plan's Out-of-scope explicitly defers these to the parent soft-stack plan; covered by the M2
+       Open bullet "#321 soft-stack (reentrant) spill coverage" (which lists exactly P1/P2/P3).
+     • "Upstreaming the PR is user-triggered" -> PROMOTED to a curated Upstream/Contribution bullet
+       ("Upstream the F4 mos-late-opt TXY/TYX dead-flag fix"). Nothing open here. -->
 <!-- triaged 2026-06-17: native-s16-EQ v1 landed (commit 37674ff). All four are already curated:
      • v2 (computed-LHS), v3 (abs-fold globals), and the post-A16-threading re-measure -> the M2
        Open bullet "#321 native s16 equality-as-value — v2/v3 (remaining gated wins)".
      • the cmpsel "[verify]" is a false positive: that plan is design+spike, and its Verification
        contract was fulfilled by the gated-impl plan's recorded PASS (eq_deref native, suite 44/44,
        corpus 7/7, fuzz 50/50, a16eqvalp both emulators). Nothing open here. -->
-- [ ] **(triage)** **Mixed global-vs-register / global-vs-computed-local** (`g1 == a`, `g1 == (b+c)`): only one operand — _from [2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md](docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md)_  <!-- fp:b5f16895b6d6633e -->
-- [ ] **(triage)** **Register / param operands** (`eq_ret`, `eq_store`): no foldable load → stays 8-bit. Unchanged. — _from [2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md](docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md)_  <!-- fp:e99c6594b89a2477 -->
-- [ ] **(triage)** **`g1 == 0`** (`RHSIsZero`): stays on the existing `G_CMPZ` zero-compare path (`!RHSIsZero` guard). — _from [2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md](docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md)_  <!-- fp:738ae9c1815b05ed -->
-- [ ] **(triage)** **Chained value-EQ where loads are hoisted cross-block** (`r = (g1==g2) | ((g3==g4)<<4) | …` deep in — _from [2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md](docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md)_  <!-- fp:50d15e8d2fae5794 -->
-- [ ] **(triage)** **`g1 == 0x1234` (global vs immediate)** — the headline that's still on 8-bit. Blocked because the — _from [2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md](docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md)_  <!-- fp:da663f7f2ca49ce1 -->
-- [ ] **(triage)** **Mixed `g == local` / chained-cross-block** — only one operand folds (or the loads are hoisted into a — _from [2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md](docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md)_  <!-- fp:6212468c3d90ca1a -->
-- [ ] **(triage)** **`g1 == 0x1234` (global vs immediate)** — ~~deferred (the 16-bit constant is byte-split before — _from [2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md](docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md)_  <!-- fp:97ee61bee5e6ff8c -->
-- [ ] **(triage)** ~~**v2 — computed/`Imag16` LHS** (`(a+b) == c`, −3 B)~~ **DONE** — gate-only `ComputedEq` — _from [2026-06-16-321-native-s16-eq-gated-impl.md](docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md)_  <!-- fp:869a2557c4ee966c -->
-- [ ] **(triage)** ~~**v3 — abs-operand fold for globals** (`g1 == g2`)~~ **DONE** — `CmpBrAbsAbs16` (−48 B chained) — _from [2026-06-16-321-native-s16-eq-gated-impl.md](docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md)_  <!-- fp:b5c11135d6a2b856 -->
-- [ ] **(triage)** Re-measure after **A16-threading** (ROADMAP step 5), which keeps s16 values in the accumulator and so — _from [2026-06-16-321-native-s16-eq-gated-impl.md](docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md)_  <!-- fp:b39a6b9a23f658a5 -->
+<!-- triaged 2026-06-17: the ten v3/gated-impl EQ-as-value deferrals all dispositioned.
+     LANDED since capture (done, not deferred):
+       • v2 computed/Imag16 LHS (a+b)==c        -> fd6b281 (plan v2-computed-imag16-lhs).
+       • v3 abs-fold both-global g1==g2          -> efce68f (plan v3-abs-fold-globals).
+       • g1==0x1234 global-vs-immediate (x3 fps) -> f8a32ae (plan eq-imm-constant-through-merge);
+         the byte-split-constant blocker is fixed (getI16Const through G_MERGE_VALUES).
+     COVERED by the curated M2 bullet "#321 native s16 equality-as-value — micro-cases"
+     (its (a)/(b)/(c) + the A16-threading re-measure) — all intentionally 8-bit today (no regression):
+       • mixed global-vs-register / global-vs-computed-local (g1==a, g1==(b+c)) -> (a).
+       • register/param operands (eq_ret, eq_store)                             -> (c).
+       • g1==0 (RHSIsZero, G_CMPZ path)                                         -> (b).
+       • chained value-EQ with cross-block-hoisted loads (stays native = a win, not a regression).
+       • re-measure after A16-threading                                        -> the bullet's tail.
+     Nothing open here. -->
 <!-- END auto-captured-deferrals -->
