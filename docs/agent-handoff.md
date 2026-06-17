@@ -9,12 +9,16 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
 | Branch | Worktree | Task | Status |
 |--------|----------|------|--------|
-| `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression diagnosis + fix (bisected to `0002`) | in progress |
-| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ready to start |
+| `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression diagnosis + fix (bisected to `0002`) | **DONE** — fixed in `0002` (`51a5bae`, `legalizeICmp` EQ-swap gated on `NativeS16Eq`); a16 50/50, corpus 7/7, fuzz 50/50. [plan](plans/2026-06-18-321-seed42-legalizeicmp-swap-fix.md) |
+| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ready to start (main regression now fixed) |
+| `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): check corpus trigger first, then ~20 LOC selector reorder | deferred — corpus check needed |
 
 **If working on `wt/321-xy16`:** read [`docs/plans/2026-06-18-321-xy16-implementation-handoff.md`](plans/2026-06-18-321-xy16-implementation-handoff.md)
 in the worktree — it covers vendor/ bootstrap, ccache, commit discipline, and the merge-back checklist.
-Do NOT push to `origin/main` from the xy16 worktree until the regression on main is fixed.
+~~Do NOT push to `origin/main` from the xy16 worktree until the regression on main is fixed.~~ The main
+regression is **fixed** (`51a5bae`); pushes follow the usual policy (push only when asked / coordinate).
+
+**If working on indir-dst copy fold:** read [`docs/plans/2026-06-18-321-indir-dst-copy-fold-handoff.md`](plans/2026-06-18-321-indir-dst-copy-fold-handoff.md) — **run the corpus trigger check first**; do not implement until ≥ 4 B aggregate confirmed.
 
 ## Build / compile / disasm / test — the exact commands
 
