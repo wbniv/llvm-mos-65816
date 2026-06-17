@@ -11,7 +11,7 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 |--------|----------|------|--------|
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression diagnosis + fix (bisected to `0002`) | **DONE** — fixed in `0002` (`51a5bae`, `legalizeICmp` EQ-swap gated on `NativeS16Eq`); a16 50/50, corpus 7/7, fuzz 50/50. [plan](plans/2026-06-18-321-seed42-legalizeicmp-swap-fix.md) |
 | `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ready to start (main regression now fixed) |
-| `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): check corpus trigger first, then ~20 LOC selector reorder | deferred — corpus check needed |
+| `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): corpus check 2026-06-18 | **CLOSED WON'T-DO** — 0/6 progs 0 B; pattern absent in corpus |
 
 **If working on `wt/321-xy16`:** read [`docs/plans/2026-06-18-321-xy16-implementation-handoff.md`](plans/2026-06-18-321-xy16-implementation-handoff.md)
 in the worktree — it covers vendor/ bootstrap, ccache, commit discipline, and the merge-back checklist.

@@ -107,15 +107,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   gain is capped by the single 65816 accumulator (two live 16-bit values must spill to `Imag16`) and it
   reopens the coalescer crash risk.
   [plan](docs/plans/2026-06-17-321-a16-threading.md).
-- [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)`, absolute, the abs→abs copy fusion,
-  ~~and the indirect copy fusion~~ all landed — see Done). Remaining: (a) the indir-**dst** copy fold
-  (`*p = gg`, `*q = *p`) only fires when the dst-pointer load doesn't sit between the value-load and the
-  store as an ordered (volatile) memref — for a volatile pointer it conservatively stays a round-trip;
-  consider loading the dst pointer first so the value-load is adjacent to the store (**spike 2026-06-17 task7:** current `+mos-a16` already −13 B vs default via natural 16-bit codegen; selector reorder would add ~4 B more — corpus gain unverified, still deferred); (b) the indexed
-  `abs,x`/`(zp),y` forms are **moot** (llvm-mos is fully pointer-based); ~~(c) **re-evaluate the X-flag
-  (xy16) mode dimension** — NOT required for array access; assess whether it pays off before building.~~ (**task7 re-eval 2026-06-17:** pointer-based ABI, X/Y in 8-bit CC — permanent 16-bit X/Y breaks ABI and provides 0 code-size benefit over the pointer model; **WON'T DO**.)
-  [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
-  [absolute plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
@@ -208,6 +199,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-18 — [321-mem-access-follow-ups] **#321 s16 memory-access follow-ups: all closed** — indirect/abs/copy-fold done; (a) indir-dst WON'T-DO: corpus check 2026-06-18 0/6 progs 0 B pattern absent; (b) moot; (c) WON'T-DO. [plan](docs/plans/2026-06-18-321-indir-dst-copy-fold.md).
 - 2026-06-18 — [321-seed42-legalizeicmp-swap] **fix #321 fuzzer-found default-build miscompile: an EQ-canonicalization operand-swap in `0002`'s `legalizeICmp` leaked into the non-a16 8-bit path.** seed-42 (`dev/run.sh fuzz 1 42`, surfaced during a16ret verification) computed `corpus_result=0xB226` vs correct `0xEC0D` in BOTH default 8-bit AND `+mos-a16` builds (host=python-16bit + unpatched-upstream@MAME both 0xEC0D). Root-caused by ~20 isolated ccache-reuse build bisections: register topology (A16/B/Ac16) **innocent** (upstream+topology=0xEC0D), as were td/feature-infra, selector, InstrInfo, LateOpt, RegisterInfo, the unconditional InsertREPSEP pass (it early-exits `!hasAccum16`), and the legalizer constructor rules — narrowed to `MOSLegalizerInfo::legalizeICmp`. The FIRST of two EQ-canonicalization swaps was guarded only by `ComputedVsGlobal` (which does NOT require `hasAccum16` and has no `Pred==EQ` check), so in the default build a non-EQ compare (`<`/`>`) with a computed-s16-vs-foldable-abs-global operand pair hit `std::swap(LHS,RHS)` → **reversed the comparison** → wrong value. (The SECOND swap was correctly gated on `NativeS16Eq`; the first was missing it — exactly governing-lesson-#2: gate so a misclassification only misses a win, never regresses.) **Fix (1 line):** gate the first swap on `NativeS16Eq` (= `hasAccum16 && Pred==EQ && S16`), so it fires only in the intended native-a16-EQ path where EQ's Z-symmetry makes the swap safe. Verified: seed-42 default+a16 → `0xEC0D`; a16 suite **50/50**, corpus **7/7**, **fuzz 50/50** (0 mismatch); `a16eqvalmg` still native (`cmp` long fold ×2) + `0x0111`, verify-clean. `0002` regenerated — only `MOSLegalizerInfo.cpp` changed, no foreign hunks, round-trips. [fix plan](docs/plans/2026-06-18-321-seed42-legalizeicmp-swap-fix.md) ·
 [found during a16ret](docs/plans/2026-06-17-321-ax-return-convention.md).
 - 2026-06-17 — [321-ax-return-convention] **lock the A (low) / X (high) return convention as a tested ABI invariant (test+docs only, no codegen change).** The free, uncontroversial CC piece: `i8 → A`, `i16 → A(low):X(high)` is already emergent from `CC_MOS` byte-splitting (no `RetCC_MOS`) AND the documented prior art (WDC816CC p.21 / ORCA `A_X`). New `examples/65816/a16ret.c` + `dev/a16ret.sh` (wired into `dev/run.sh`): value differential `corpus_result==0x2387` host==default==+mos-a16 (MAME+bsnes-jg) + a byte-pinned disasm gate — i16 return is `ldx <high>; lda <low>; rts` (X reads `__rc`+1 vs A, proving high→X/low→A), i8 return delivers A alone. The value test catches miscompiles; the disasm gate catches convention drift (a value test alone can't — a consistent A↔X swap round-trips). Decision recorded in CC-analysis §"Return values — adopted" + the prior-art note. Verified: a16 suite 50/50, corpus 7/7, no `vendor/`/`0002` change. [plan](docs/plans/2026-06-17-321-ax-return-convention.md).
@@ -565,4 +557,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-18: both are "Out of scope" NON-GOALS from the seed-42 fix plan (clarifying the A/X
      return convention and the +mos-a16 EQ fold are UNCHANGED) — not deferred work. The fix is complete +
      verified (a16 50/50, corpus 7/7, fuzz 50/50). fp:27bd502017f767b4 fp:5d3100a79ceeab83 -->
+- [verify] **2026-06-18-321-indir-dst-copy-fold-handoff** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-18-321-indir-dst-copy-fold-handoff.md](docs/plans/2026-06-18-321-indir-dst-copy-fold-handoff.md)_  <!-- fp:91dc9eb4b93c09c3 -->
+- [verify] **2026-06-18-321-indir-dst-copy-fold** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-18-321-indir-dst-copy-fold.md](docs/plans/2026-06-18-321-indir-dst-copy-fold.md)_  <!-- fp:ac13f5e988de2e42 -->
 <!-- END auto-captured-deferrals -->
