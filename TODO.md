@@ -537,6 +537,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "xy16 index-16 spill case" -> gated on the xy16 increment; covered by the curated M2 soft-stack
        bullet (P1's expandLDSTStk SPILL CONTRACT tripwire) + the M2 X-flag/xy16 re-evaluate item.
      Nothing open here. -->
-- [ ] **(triage)** The A16-aware return optimization and the xy16 32-bit-return evolution (both noted above as follow-ups). — _from [2026-06-17-321-ax-return-convention.md](docs/plans/2026-06-17-321-ax-return-convention.md)_  <!-- fp:62ef03744d8d507c -->
-- [ ] **(triage)** The argument-passing and frame-storage sub-decisions — tracked in the CC decision analysis; they need a — _from [2026-06-17-321-ax-return-convention.md](docs/plans/2026-06-17-321-ax-return-convention.md)_  <!-- fp:a47d39cc54be6d82 -->
+<!-- triaged 2026-06-17: both A/X-return-plan deferrals already covered (intentional follow-ups, not lost work).
+     • "A16-aware return optimization (drop the Imag16 round-trip) + xy16 32-bit-return evolution" -> the A/X
+       plan's Non-goals/Out-of-scope explicitly defers these; the optimization is A16-threading-adjacent
+       (curated M2 "#321 A16-threading" item) and the 16-bit-register return is gated on the curated M2 xy16 item.
+     • "argument-passing + frame-storage sub-decisions" -> the curated M2 "#321 calling-convention decision"
+       bullet + docs/investigations/65816-calling-convention-decision.md (the hard frame fork, gated on a
+       product steer + post-xy16 measurement). Nothing open here. -->
 <!-- END auto-captured-deferrals -->
