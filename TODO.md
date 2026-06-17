@@ -577,4 +577,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "Port the DMA/VRAM helpers to 16-bit codegen" -> a Phase-2 (16-bit native target) deferral documented
        in the plan's own Out-of-scope, gated behind the same #415 reconciliation + the broader #321 effort.
      Nothing open here. -->
+- [verify] **2026-06-17-321-xy16-index-register-mode** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-17-321-xy16-index-register-mode.md](docs/plans/2026-06-17-321-xy16-index-register-mode.md)_  <!-- fp:b24d6be9c36ef6e5 -->
 <!-- END auto-captured-deferrals -->
