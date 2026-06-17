@@ -95,6 +95,20 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
   ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+- [ ] **#321 A16-threading — keep the running s16 value live in the accumulator across ops** (item (5)
+  above; the ROADMAP-step-5 "biggest win", de-risked now the Tier-1 corpus exists). Today every native
+  s16 op is self-contained (`LDAImag16 → OP → STAImag16`, value home = `Imag16` between ops — the
+  1d-retry coalescer-safe invariant), so a dependent chain stores each intermediate and **immediately
+  reloads it**: measured `t=a+b; u=t&c; r=u-d` emits 3 redundant `sta __rc2; lda __rc2` round-trips
+  (0x27 B → ~0x1B threaded, **−30%**). **Key reframing (grounded in the MIR): the win is redundant
+  store/reload elimination** — each `STAImag16` result is single-use, read only by the next `LDAImag16`,
+  `A16` unchanged between — so it needs neither the coalescer nor `Ac16`-across-ops liveness. Phased,
+  each gated on measured remaining win: **(0)** measure the prize; **(1)** coalescer-safe redundant-reload
+  peephole (expected bulk of the win); **(2)** selection-time threading fusion (generalize the chain
+  machinery to heterogeneous dependent trees, for fold-while-threaded cases); **(3)** the genuine hard
+  core — RA-level `Ac16` residency via a `shouldCoalesce` barrier rejecting 8-bit↔`Ac16` coalescing
+  (the `$a16 = LDImm` 1d crash), gated behind a full fuzz sweep, **only if (1)–(2) leave significant
+  wins**. [plan](docs/plans/2026-06-17-321-a16-threading.md).
 - [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)`, absolute, the abs→abs copy fusion,
   ~~and the indirect copy fusion~~ all landed — see Done). Remaining: (a) the indir-**dst** copy fold
   (`*p = gg`, `*q = *p`) only fires when the dst-pointer load doesn't sit between the value-load and the
