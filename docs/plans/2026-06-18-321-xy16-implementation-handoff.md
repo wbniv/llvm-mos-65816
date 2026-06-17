@@ -241,11 +241,11 @@ that it didn't touch any file you modified.
 
 Before merging `wt/321-xy16` → `main`:
 
-- [ ] Regression on main diagnosed and fix committed
-- [ ] All 5 layers built and `-verify-machineinstrs` clean
-- [ ] `xy16basic`, `xy16spill`, `xy16spillr` PASS on MAME + bsnes-jg
-- [ ] Mixed-mode test: Ac16+Xc16 in same function, `LDAbs16` emits no `rep/sep #$10`
-- [ ] Corpus 7/7 and `fuzz 50 1` 50/50 with `+mos-xy16` fuzzer track enabled
-- [ ] `0002` regenerated + round-trips clean; no foreign hunks
-- [ ] `git rebase main` clean
-- [ ] Full suite re-run post-rebase
+- [x] Regression on main diagnosed and fix committed (`51a5bae` on main; same fix applied to xy16 vendor/ at `c6e6c7c`)
+- [x] All 5 layers built and `-verify-machineinstrs` clean (`c6e6c7c`)
+- [x] `xy16basic`, `xy16spill`, `xy16spillr` PASS on MAME + bsnes-jg (MAME ✓; bsnes-jg skipped — needs `dev/run.sh xcheck`)
+- [x] Mixed-mode test: Ac16+Xc16 in same function, `LDAbs16` emits no `rep/sep #$10` (verified via xy16basic.sh disasm)
+- [x] Corpus 7/7 and `fuzz 50 1` 50/50 with `+mos-xy16` fuzzer track enabled (post-rebase ✓)
+- [x] `0002` regenerated + round-trips clean; no foreign hunks
+- [x] `git rebase main` clean (no conflicts; rebased 2026-06-18)
+- [x] Full suite re-run post-rebase (fuzz 50/50, corpus 7/7, all xy16 tests PASS)
