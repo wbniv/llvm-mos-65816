@@ -9,7 +9,7 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
 | Branch | Worktree | Task | Status |
 |--------|----------|------|--------|
-| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | **ready to start** — main seed-42 regression fixed (`51a5bae`) |
+| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | **VERIFIED** `ef431c7` — fuzz 50/50, corpus 7/7; needs `git rebase main` + push (user-triggered) |
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |
 | `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): corpus trigger check | ~~CLOSED WON'T-DO~~ — 0/6 progs, 0 B, `f52d5b8` |
 
