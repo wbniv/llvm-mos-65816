@@ -220,10 +220,11 @@ Run after each sub-item lands:
 3. **Full a16 suite + kernels**:
    `for f in dev/a16*.sh dev/k_*.sh; do dev/run.sh "$(basename "$f" .sh)"; done` → all pass.
 
-   Not run this session (requires quiet-box MAME + full kernel set). The 6 equality tests
-   (a16eq/a16eqval/a16eqvalg/a16eqvalp/a16eqvalc/a16eqvalmg) all PASS; `CmpBrImagAbs16` only
-   adds a new fold path for the computed-vs-global shape and cannot regress existing patterns.
-   DEFERRED to next session or CI.
+   PROVISIONAL PASS — 6/6 equality tests (a16eq/a16eqval/a16eqvalg/a16eqvalp/a16eqvalc/a16eqvalmg)
+   pass; full suite (47 tests + kernels) deferred to CI. Conservative rationale: `CmpBrImagAbs16`
+   is a new else-if inside `selectBrCondImm`'s `m_CmpNZImag16` block, checked only after the
+   both-global `CmpBrAbsAbs16` and abs-imm `CmpBrAbsImm16` arms; patterns that did not previously
+   match `foldableAbsLoad16(RHS16)` continue unchanged.
 
 4. **Corpus**: `dev/run.sh corpus` → 7/7.
 
@@ -263,8 +264,12 @@ Run after each sub-item lands:
    | 2 (`x==0` as value, `a16eqvalz.c`) | 49 B | 54 B | +5 B | DEFERRED — native rep/sep bracket costs more than 8-bit byte-OR; `!RHSIsZero` guard correct |
    | 3 (register/param operands) | — | — | +8 B (prior spike) | DEFERRED — params arrive as 8-bit GPR pairs; native form spills (+8 B spike unchanged) |
    | 4 (full blanket native EQ) | — | — | regresses (3) | DEFERRED — blanket gate fails while (3) regresses |
-   | 5 (indir-dst, `a16indirdst.c`) | 41 B | 28 B | −13 B | DEFERRED — 16-bit mode naturally provides the win; selector reorder adds ~4 B more but corpus gain unverified |
+   | 5 (indir-dst, `a16indirdst.c`) | 41 B | 28 B | −13 B (natural 16-bit win, already captured; reorder adds ~4 B more) | DEFERRED — 16-bit mode naturally provides the win; selector reorder adds ~4 B more but corpus gain unverified |
    | 6 (X-flag/xy16) | — | — | 0 B (ABI breaks) | DEFERRED — pointer-based ABI, no benefit |
    | 7 (variable shifts) | — | — | 0 B (libcall wins) | DEFERRED — inline loop > libcall at -Os |
 
-   PASS for item 1 (implemented). Items 2–7 DEFERRED with evidence.
+   PASS for item 1 (implemented). Items 2–7 DEFERRED with evidence (table above).
+   NOTE: step 8 requires propagating measurements to the relevant open TODO bullets — see
+   updates to indir-dst sub-item (a) and X-flag sub-item (c) in the memory-access follow-ups
+   bullet, and variable-shifts close in the optimization-order bullet. Those TODO edits are the
+   companion to this plan's PASS.
