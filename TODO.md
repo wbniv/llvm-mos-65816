@@ -104,12 +104,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (2026-06-17 — see Done):** the redundant `STAImag16 R; LDAImag16 R` round-trip between dependent native
   s16 ops is eliminated by a coalescer-safe post-RA peephole (`threadAccum16` in `MOSLateOptimization`),
   so the value threads through `A16` across the chain (`lda;adc;and;sbc;…;sta`) — measured −31/−36 % on
-  dependent chains, −4..−10 B on real kernels, 0 round-trips remaining. **Remaining (Phases 2–3, each
-  gated on measured remaining win):** **(2)** selection-time threading fusion — generalize the chain
-  machinery to heterogeneous dependent trees, for the fold-while-threaded cases the peephole can't reach
-  (an immediate / near-abs operand folded into a threaded interior op); **(3)** the genuine hard core —
-  RA-level `Ac16` residency via a `shouldCoalesce` barrier rejecting 8-bit↔`Ac16` coalescing (the
-  `$a16 = LDImm` 1d crash), gated behind a full fuzz sweep, **only if (2) leaves significant wins**.
+  dependent chains, −4..−10 B on real kernels, 0 round-trips remaining. **A 300-program measurement
+  (2026-06-17) retired Phase 2:** fold-while-threaded is **already optimal** (interior immediates *and*
+  near-abs globals fold into the threaded chain today — the existing selection-time folds compose with the
+  peephole). **Remaining (both low priority):** **(1.5)** relax the peephole's strict adjacency to skip
+  non-`A16`-writing instructions, capturing the ~40/300 non-adjacent removable reloads (modest, low-risk);
+  **(3)** the genuine hard core — RA-level `Ac16` residency via a `shouldCoalesce` barrier rejecting
+  8-bit↔`Ac16` coalescing (the `$a16 = LDImm` 1d crash) — **deferred:** realizable gain is capped by the
+  single 65816 accumulator (two live 16-bit values must spill to `Imag16`) and it reopens the coalescer
+  crash risk.
   [plan](docs/plans/2026-06-17-321-a16-threading.md).
 - [ ] **#321 native s16 memory-access follow-ups** (indirect `(zp)`, absolute, the abs→abs copy fusion,
   ~~and the indirect copy fusion~~ all landed — see Done). Remaining: (a) the indir-**dst** copy fold
