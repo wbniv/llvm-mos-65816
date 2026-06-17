@@ -55,13 +55,15 @@ the implementation is justified.
 
 ---
 
-## Implementation plan (when triggered)
+## Implementation plan (NOT EXECUTED — WON'T-DO)
+
+_Corpus trigger check failed 2026-06-18: 0/6 programs, 0 B aggregate. Preserved below
+for reference if the pattern eventually appears in a larger corpus._
 
 ### Trigger condition
 
-Before starting: compile the 7-corpus ROMs with `+mos-a16` and grep the disasm for the
-`sta __IMAG16 / lda __IMAG16 / sta (zp)` round-trip fingerprint in indirect-store
-contexts. If the pattern accounts for ≥ 4 B aggregate in ≥ 2 programs, proceed.
+Compile corpus programs with `+mos-a16` and grep for `sta __IMAG16 / lda __IMAG16 / sta
+(zp)` round-trip fingerprint in indirect-store contexts. Threshold: ≥ 4 B in ≥ 2 programs.
 
 ### Change: selector reorder in `selectMem16Indir`
 
@@ -75,50 +77,11 @@ is an ordered ptr-load that:
 2. Is the ptr-load for the store's pointer operand (the `dp_ptr` load).
 
 If both conditions hold, call `PtrLoadMI->moveBefore(&*ValueLoadMI)`, then retry
-`loadStoreValueIntoA16`. The retry should now succeed and emit the folded form:
-
-```
-rep #$20
-lda abs_global          ; load value (now adjacent to store)
-sta (dp)                ; fold: direct store via ptr
-sep #$20
-```
+`loadStoreValueIntoA16`.
 
 **Safety note:** Moving a volatile LOAD to an earlier position w.r.t. a non-volatile LOAD
-is valid under LLVM's memory model. Volatile ordering is enforced only vs. _other_ volatile
-accesses, not vs. non-volatile reads. The ptr-load is volatile (it reads from a volatile
-pointer variable); the value-load is non-volatile. Moving ptr-load earlier does not
-reorder two volatile accesses and does not introduce a data race.
-
-### Micro-test update
-
-Extend `examples/65816/a16indirdst.c` and `dev/a16indirdst.sh` to assert:
-- Disasm gate: no `sta __IMAG16` / `lda __IMAG16` round-trip in the store path
-- `corpus_result` unchanged (host == default == `+mos-a16`, MAME + bsnes-jg)
-- Byte count: `+mos-a16` ≤ 24 B (from 28 B; gate for ~4 B improvement)
-
----
-
-## Verification
-
-Run after implementation:
-
-1. **Toolchain rebuild**: `dev/run.sh toolchain`; confirm `clang-23` mtime advanced.
-
-2. **Micro-test**: `dev/run.sh a16indirdst` → corpus_result == host == default == `+mos-a16`
-   on MAME + bsnes-jg; disasm gate passes (no ZP round-trip in store path); byte count ≤ 24 B.
-
-3. **Full a16 suite + kernels**:
-   `for f in dev/a16*.sh dev/k_*.sh; do dev/run.sh "$(basename "$f" .sh)"; done` → all pass.
-
-4. **Corpus**: `dev/run.sh corpus` → 7/7.
-
-5. **Fuzzer**: `dev/run.sh fuzz 50 1` → 50/50, 0 mismatch, 0 crash.
-
-6. **MIR verify**: compile `a16indirdst.c` with `-mllvm -verify-machineinstrs`; clean exit.
-
-7. **Patch round-trip**: `dev/regen-patch.sh`; confirm no foreign symbols in
-   `0002-321-accum16.patch`.
+is valid under LLVM's memory model — volatile ordering is enforced only vs. _other_ volatile
+accesses, not vs. non-volatile reads.
 
 ---
 
