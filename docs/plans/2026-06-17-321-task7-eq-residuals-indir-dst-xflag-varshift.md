@@ -1,5 +1,8 @@
 # Plan: Task 7 — EQ-as-value residuals, indir-dst fold, X-flag re-eval, variable shifts
 
+**Status: COMPLETE** — item 1 (`computed == global` → `CmpBrImagAbs16`) implemented and verified (43/43
+suite PASS, both emulators); items 2–7 confirmed-deferred with spike measurements. See Verification §8.
+
 ## Context
 
 Four EQ-as-value gated wins landed 2026-06-17 (v1 indirect-load, v3 both-global, immediate, v2

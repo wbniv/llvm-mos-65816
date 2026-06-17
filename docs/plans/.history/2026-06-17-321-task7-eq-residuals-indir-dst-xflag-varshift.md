@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/4f4e8ce) | #321 verify: task7 plan step 3 — full suite 43/43 PASS (a16* + kernels) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/11dc41b) | #321 docs: critique + fix verification labels in task7 plan (step 3 PROVISIONAL PASS, step 8 note, item 5 delta clarification) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/fd304f6) | #321 task7: CmpBrImagAbs16 — computed==global s16 EQ-as-value fold; items 2–7 deferred |
 
 <!--history-meta v1
+4f4e8ce	author	Will Norris
+4f4e8ce	added	4
+4f4e8ce	deleted	5
+4f4e8ce	files	1
+4f4e8ce	body	All 43 a16* micro-tests and 6 kernels pass on MAME + bsnes-jg. The 5 a16eqval*\ntests initially showed 'Operation not permitted' on the verify-machineinstrs\ncompile step — root-owned stale .o files from a prior Docker session, not a\ncodegen issue. Cleared via docker run rm and re-ran clean.\n\nPromotes the plan's step 3 from PROVISIONAL PASS to the full 43/43 result.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 11dc41b	author	Will Norris
 11dc41b	added	11
 11dc41b	deleted	6

@@ -61,9 +61,12 @@ Under `vendor/llvm-mos/llvm/lib/Target/MOS/`:
   `+mos-a16` gates (e.g. `NativeS16Eq`).
 - `MOSInstructionSelector.cpp` — selection: `select*`, the `m_CmpNZ*` / `CmpNZ*_match` matchers, operand-fold
   helpers (`getImm16Operand`, `foldableAbsLoad16`).
-- `MOSInstrPseudos.td` + `MOSInstrInfo.cpp` — pseudos (`CmpBrImag16`/`CmpBrImm16`, …) + their post-RA
-  expansion (`expandCmpBr16`).
+- `MOSInstrPseudos.td` + `MOSInstrInfo.cpp` — pseudos: `CmpBrImag16` (Imag16-resident LHS),
+  `CmpBrImm16` (const RHS), `CmpBrAbsAbs16` (both-global), `CmpBrAbsImm16` (global LHS + const RHS),
+  `CmpBrImagAbs16` (computed LHS + global RHS); + their post-RA expansion (`expandCmpBr16`).
 - `MOSInsertREPSEP.cpp` — M-flag (8/16-bit) mode tracking across blocks.
+- `MOSLateOptimization.cpp` — post-RA peephole: `threadAccum16` eliminates redundant `STAImag16 R;
+  LDAImag16 R` round-trips between dependent native-s16 ops (A16-threading Phases 0–1–1.5 done).
 - `MOSRegisterInfo.td` — register classes: `GPR` = {A,X,Y}, `Ac16` = {A16}, `Imag8`/`Imag16` = the
   zero-page imaginary registers (`$rc*` / `$rs*`).
 
