@@ -115,16 +115,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
-- [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): X/Y permanently 16-bit;
+- [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
-  X-flag is a separate mode dimension still to add to the dataflow); 16-bit arithmetic; **native-mode
-  crt0** (XCE + native vectors + DBR — the prerequisite for 16-bit registers, moved here from #320
-  Increment 2); then hardware-stack ABI + calling convention. ROADMAP step 5.
-  **`+mos-xy16` implementation plan (Layers 1–5: feature flag, Xc16/Yc16 register classes,
-  16-bit load/store/compare/inc/dec pseudos, X-flag lattice in `MOSInsertREPSEP`, static+soft-stack
-  spill handling, minimal `selectXY16`) is ready to execute; legalizer integration + hardware-stack ABI
-  are explicit follow-ons.**
-  [xy16 plan](docs/plans/2026-06-17-321-xy16-index-register-mode.md).
+  ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
+  — Layers 1–5 committed to `wt/321-xy16`: feature flag + Xc16/Yc16 regs + pseudos + parallel
+  X-lattice in `MOSInsertREPSEP` + static/soft-stack spills + `selectXY16` skeleton; all compile
+  clean, `xy16spill` PASS); 16-bit arithmetic; **native-mode crt0** (XCE + native vectors + DBR);
+  then hardware-stack ABI + calling convention. ROADMAP step 5.
+  **Remaining follow-ons: legalizer integration (wire Xc16/Yc16 into `selectXY16` + operand widening
+  for `abs,x`/`(zp),y`), native-mode crt0, hardware-stack ABI + calling convention.**
+  [xy16 plan](docs/plans/2026-06-17-321-xy16-index-register-mode.md) · [handoff](docs/plans/2026-06-18-321-xy16-implementation-handoff.md).
 - [ ] **#321 calling-convention decision (open, blocks the hardware-stack ABI).** Analysis + recommendation:
   [CC decision analysis](docs/investigations/65816-calling-convention-decision.md). The "one decision"
   decomposes into 4 sub-decisions; only the **frame** (TCD DP-window vs stack-relative vs keep the soft

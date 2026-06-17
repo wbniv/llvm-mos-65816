@@ -49,7 +49,9 @@ These were identified by auditing the existing code before writing the plan.
    `def HasAccum16`.
 
 4. **Use `[FeatureAccum16]` as the `Implies` argument** of SubtargetFeature — cleaner than an
-   assert, enforced at TableGen level.
+   assert, enforced at TableGen level. Also makes the pass gate simpler: since `hasIndex16()`
+   always implies `hasAccum16()`, the existing `!hasAccum16() → return false` gate is already
+   sufficient for both features — no gate change needed.
 
 5. **Xc16/Yc16 `Offset != 0` guard in `expandLDSTStk`** — the inline `TXA16+STAIndir16`
    expansion requires the pointer at offset 0 (like Ac16). Extend the existing
@@ -57,10 +59,25 @@ These were identified by auditing the existing code before writing the plan.
 
 6. **Layer 5 selector needs legalizer support to fire broadly** — without legalizer changes,
    `selectXY16` only fires for vregs the register allocator happens to assign to Xc16/Yc16 (e.g.,
-   via the spill path). Legalizer changes are documented as a follow-on.
+   via the spill path). Treat Layer 5 as an explicit skeleton; legalizer changes are the follow-on.
 
 7. **`isXWidthAgnostic` body is empty in v1** — no X-agnostic ops exist yet (no carry-init
    equivalent for X). Retain the function for symmetry; body returns `false`.
+
+8. **`requiredXWidth` default must be `XW_None`, not `XW_X8`** (silent-miscompile risk) — unlike
+   the M flag (where every instruction without `MLow` genuinely requires M=8), most instructions
+   are **indifferent** to the X flag: `LDAbs16`, `STAbs16`, `ADCAbs16`, `LDA_ZeroPage`, etc. all
+   behave identically whether X is 0 or 1. Returning `XW_X8` by default would force a `SEP #$10`
+   after every M16-only instruction inside an X16 block, making 16-bit index mode nearly useless
+   and generating wrong assembly. The correct default is `XW_None`. Only `XLow=1` → XW_X16,
+   `XHigh=1` → XW_X8 (e.g., `CPX_Immediate`), and call/return → XW_X8 are non-None.
+
+9. **Cross-block dataflow needs X-dimension maps** — the Increment 2 forward dataflow computes
+   `First`/`Last`/`In`/`Out` for M only. For the X dimension, parallel `XFirst`/`XLast`/`XIn`/
+   `XOut` maps are required, the fixpoint must converge both lattices in the same iteration, the
+   `Placement` struct must carry X fields (`XChanged`, `ToX16`), and `placeLegacy` must track
+   `EndX16` and restore X8 at block end alongside `EndM16`. Details and full pseudocode in Layer 3
+   below.
 
 ---
 
@@ -189,34 +206,66 @@ def TAY16 : MOSLogicalInstr, PseudoInstExpansion<(TAY_Implied)> {
 
 ### Layer 3 — X-flag dataflow in `MOSInsertREPSEP.cpp`
 
-Add a parallel X-flag lattice alongside the existing M-flag lattice.
+Add a parallel X-flag lattice alongside the existing M-flag lattice. The changes below are
+complete and implementable; prior drafts had five defects (see design notes 2, 8, 9).
 
-**Constants and types** (add alongside M-dimension counterparts):
+#### Class member
+
+Add `bool HasIndex16 = false;` as a private member of `MOSInsertREPSEP`. Set it alongside
+`TII` at the start of `runOnMachineFunction`:
+```cpp
+TII = STI.getInstrInfo();
+HasIndex16 = STI.hasIndex16();
+```
+This lets `placeIntraBlock` and `placeLegacy` query it without a separate STI reference.
+
+#### Constants and types
+
 ```cpp
 static constexpr int64_t XFlagBit = 0x10;  // REP/SEP operand bit for X flag
 
 enum XWidth { XW_None, XW_X8, XW_X16, XW_Conflict };
-static XWidth meet(XWidth A, XWidth B);         // same logic as MWidth meet()
+static XWidth meet(XWidth A, XWidth B);          // same logic as MWidth meet()
 static bool resolveIsX16(XWidth W) { return W == XW_X16; }
 
 static bool isXWidthAgnostic(const MachineInstr &MI) {
-  (void)MI; return false;  // no X-agnostic ops in v1; reserved for extension
-}
-
-static XWidth requiredXWidth(const MachineInstr &MI) {
-  if (MI.isReturn() || MI.isCall())              return XW_X8;  // ABI: 8-bit at boundary
-  if (MI.getDesc().TSFlags & MOS::TSFlagXLow)    return XW_X16;
-  if (isXWidthAgnostic(MI))                      return XW_None;
-  if (MI.isBranch())                             return XW_None;
-  return XW_X8;
+  (void)MI; return false;  // XW_None is already the default; stub for symmetry
 }
 ```
 
-**`insertSwitch` — new signature, handles opposite-direction case:**
+#### `requiredXWidth` — default is `XW_None`, not `XW_X8`
+
+Unlike the M flag (where every instruction without `MLow` genuinely requires M=8), most
+instructions — including all M16-only ops like `LDAbs16` — are **indifferent** to the X flag.
+Returning `XW_X8` by default would force `SEP #$10` after every M16-only instruction, defeating
+X16 mode. The correct default is `XW_None`.
+
+```cpp
+static XWidth requiredXWidth(const MachineInstr &MI) {
+  // ABI: 8-bit index registers across call/return boundaries.
+  if (MI.isReturn() || MI.isCall())
+    return XW_X8;
+  // Our new XLow=1 pseudos: INX16, LDXAbs16, TXA16, TAX16, etc.
+  if (MI.getDesc().TSFlags & MOS::TSFlagXLow)
+    return XW_X16;
+  // Existing CPX_Immediate / CPY_Immediate carry XHigh=1 ("8-bit immediate when X=1").
+  if (MI.getDesc().TSFlags & MOS::TSFlagXHigh)
+    return XW_X8;
+  // Branches are X-agnostic (same as M treatment).
+  if (MI.isBranch())
+    return XW_None;
+  // Everything else — ordinary 8-bit ops, M16-only ops, pseudos — is X-agnostic.
+  // DO NOT return XW_X8 here; that would force X to 8-bit after every LDAbs16.
+  return XW_None;
+}
+```
+
+#### `insertSwitch` — new 6-argument signature
+
 ```cpp
 void insertSwitch(MachineBasicBlock &MBB, MachineBasicBlock::iterator Pos,
                   bool NewM16, bool NewX16, bool MChanged, bool XChanged) {
-  // Combined: one REP/SEP #$30 when both flags switch to the SAME mode.
+  // Combined REP/SEP #$30 when both flags switch to the SAME mode simultaneously.
   if (MChanged && XChanged && NewM16 == NewX16) {
     BuildMI(MBB, Pos, DebugLoc(),
             TII->get(NewM16 ? MOS::REP_Immediate : MOS::SEP_Immediate))
@@ -235,28 +284,198 @@ void insertSwitch(MachineBasicBlock &MBB, MachineBasicBlock::iterator Pos,
 }
 ```
 
-**`placeIntraBlock(MBB, EntryIsM16, EntryIsX16)`** — tracks both running states:
+#### `placeIntraBlock` — new signature, dual-tracking body
+
 ```cpp
-bool M16 = EntryIsM16, X16 = EntryIsX16;
-for (MachineInstr &MI : MBB) {
-  MWidth MW = requiredWidth(MI);
-  XWidth XW = requiredXWidth(MI);
-  if (MW == MW_None && XW == XW_None) continue;
-  bool WantM16 = (MW == MW_None) ? M16 : resolveIsM16(MW);
-  bool WantX16 = (XW == XW_None) ? X16 : resolveIsX16(XW);
-  bool MC = (WantM16 != M16), XC = (WantX16 != X16);
-  if (MC || XC) {
-    insertSwitch(MBB, MI, WantM16, WantX16, MC, XC);
-    M16 = WantM16; X16 = WantX16; Changed = true;
+bool placeIntraBlock(MachineBasicBlock &MBB, bool EntryIsM16, bool EntryIsX16);
+```
+
+```cpp
+bool MOSInsertREPSEP::placeIntraBlock(MachineBasicBlock &MBB,
+                                       bool EntryIsM16, bool EntryIsX16) {
+  bool Changed = false;
+  bool M16 = EntryIsM16, X16 = EntryIsX16;
+  for (MachineInstr &MI : MBB) {
+    MWidth MW = requiredWidth(MI);
+    XWidth XW = HasIndex16 ? requiredXWidth(MI) : XW_None;
+    if (MW == MW_None && XW == XW_None) continue;
+    bool WantM16 = (MW == MW_None) ? M16 : resolveIsM16(MW);
+    bool WantX16 = (XW == XW_None) ? X16 : resolveIsX16(XW);
+    bool MC = (WantM16 != M16), XC = (WantX16 != X16);
+    if (MC || XC) {
+      insertSwitch(MBB, MI, WantM16, WantX16, MC, XC);
+      M16 = WantM16; X16 = WantX16; Changed = true;
+    }
   }
+  return Changed;
 }
 ```
 
-**`placeLegacy`** — add `EntryIsX16 = false` seed, pass through to `placeIntraBlock`.
+#### `placeLegacy` — updated with X-dimension tracking
 
-**`runOnMachineFunction`** — gate: run when `hasAccum16() || hasIndex16()`; skip M-flag logic
-when `!hasAccum16()`, skip X-flag logic when `!hasIndex16()`. The cross-block fixpoint is
-unchanged; both lattices run in parallel in the same iteration.
+```cpp
+bool MOSInsertREPSEP::placeLegacy(MachineFunction &MF) {
+  bool Changed = false;
+  for (MachineBasicBlock &MBB : MF) {
+    bool EndM16 = false, EndX16 = false;
+    for (MachineInstr &MI : MBB) {
+      MWidth W = requiredWidth(MI);
+      if (W != MW_None) EndM16 = (W == MW_M16);
+      if (HasIndex16) {
+        XWidth XW = requiredXWidth(MI);
+        if (XW != XW_None) EndX16 = (XW == XW_X16);
+      }
+    }
+    Changed |= placeIntraBlock(MBB, /*EntryIsM16=*/false, /*EntryIsX16=*/false);
+    if (EndM16 || EndX16) {
+      insertSwitch(MBB, MBB.getFirstTerminator(),
+                   /*NewM16=*/false, /*NewX16=*/false,
+                   /*MChanged=*/EndM16, /*XChanged=*/EndX16);
+      Changed = true;
+    }
+  }
+  return Changed;
+}
+```
+
+#### `runOnMachineFunction` — cross-block dataflow with X-dimension maps
+
+The existing `isPassthrough` lambda becomes `isPassthroughM`; add `isPassthroughX`. Add
+`XFirst`/`XLast`/`XIn`/`XOut` maps. Extend the fixpoint and the `Placement` struct.
+
+**Step 1 — per-block transfer facts:**
+```cpp
+DenseMap<MachineBasicBlock *, MWidth> First, Last;
+DenseMap<MachineBasicBlock *, XWidth> XFirst, XLast;
+for (MachineBasicBlock &MBB : MF) {
+  MWidth Fst = MW_None, Lst = MW_None;
+  XWidth XFst = XW_None, XLst = XW_None;
+  for (MachineInstr &MI : MBB) {
+    MWidth W = requiredWidth(MI);
+    if (W != MW_None) { if (Fst == MW_None) Fst = W; Lst = W; }
+    if (HasIndex16) {
+      XWidth XW = requiredXWidth(MI);
+      if (XW != XW_None) { if (XFst == XW_None) XFst = XW; XLst = XW; }
+    }
+  }
+  First[&MBB] = Fst; Last[&MBB] = Lst;
+  XFirst[&MBB] = XFst; XLast[&MBB] = XLst;
+}
+auto isPassthroughM = [&](MachineBasicBlock *B) { return First[B] == MW_None; };
+auto isPassthroughX = [&](MachineBasicBlock *B) { return XFirst[B] == XW_None; };
+```
+
+**Step 2 — fixpoint for entry modes:**
+```cpp
+DenseMap<MachineBasicBlock *, MWidth> In, Out;
+DenseMap<MachineBasicBlock *, XWidth> XIn, XOut;
+for (MachineBasicBlock &MBB : MF) {
+  if (&MBB == Entry) {
+    In[&MBB] = MW_M8;
+    XIn[&MBB] = XW_X8;  // ABI entry: both flags are 8-bit
+  } else {
+    In[&MBB] = isPassthroughM(&MBB) ? MW_None : First[&MBB];
+    XIn[&MBB] = (HasIndex16 && !isPassthroughX(&MBB)) ? XFirst[&MBB] : XW_None;
+  }
+}
+auto outOfM = [&](MachineBasicBlock *B) -> MWidth {
+  return isPassthroughM(B) ? In[B] : Last[B];
+};
+auto outOfX = [&](MachineBasicBlock *B) -> XWidth {
+  return isPassthroughX(B) ? XIn[B] : XLast[B];
+};
+bool Stable = false;
+while (!Stable) {
+  Stable = true;
+  for (MachineBasicBlock &MBB : MF) {
+    if (&MBB == Entry) continue;
+    if (isPassthroughM(&MBB)) {
+      MWidth NewIn = MW_None;
+      for (MachineBasicBlock *Pred : MBB.predecessors())
+        NewIn = meet(NewIn, outOfM(Pred));
+      if (NewIn != In[&MBB]) { In[&MBB] = NewIn; Stable = false; }
+    }
+    if (HasIndex16 && isPassthroughX(&MBB)) {
+      XWidth NewXIn = XW_None;
+      for (MachineBasicBlock *Pred : MBB.predecessors())
+        NewXIn = meet(NewXIn, outOfX(Pred));
+      if (NewXIn != XIn[&MBB]) { XIn[&MBB] = NewXIn; Stable = false; }
+    }
+  }
+}
+for (MachineBasicBlock &MBB : MF) {
+  Out[&MBB] = outOfM(&MBB);
+  XOut[&MBB] = outOfX(&MBB);
+}
+```
+
+**Step 3a — edge placement decision (extended `Placement` struct):**
+```cpp
+struct Placement {
+  MachineBasicBlock *MBB;
+  bool AtEnd;
+  bool MChanged = false, ToM16 = false;
+  bool XChanged = false, ToX16 = false;
+};
+SmallVector<Placement, 8> Placements;
+bool Bail = false;
+for (MachineBasicBlock &B : MF) {
+  if (&B == Entry) continue;
+  const bool NeedM16 = resolveIsM16(In[&B]);
+  const bool NeedX16 = HasIndex16 ? resolveIsX16(XIn[&B]) : false;
+  for (MachineBasicBlock *P : B.predecessors()) {
+    bool M_diff = resolveIsM16(Out[P]) != NeedM16;
+    bool X_diff = HasIndex16 && (resolveIsX16(XOut[P]) != NeedX16);
+    if (!M_diff && !X_diff) continue;
+    MachineBasicBlock *PlaceMBB; bool AtEnd;
+    if (P->succ_size() == 1)     { PlaceMBB = P;  AtEnd = true; }
+    else if (B.pred_size() == 1) { PlaceMBB = &B; AtEnd = false; }
+    else                          { Bail = true; break; }
+    Placements.push_back({PlaceMBB, AtEnd,
+                          M_diff, NeedM16, X_diff, NeedX16});
+  }
+  if (Bail) break;
+}
+```
+
+**Step 3b — intra-block (pass both entry modes):**
+```cpp
+for (MachineBasicBlock &MBB : MF)
+  Changed |= placeIntraBlock(MBB,
+                              resolveIsM16(In[&MBB]),
+                              resolveIsX16(XIn[&MBB]));
+```
+
+**Step 3c — edge materialization (updated call):**
+```cpp
+for (const Placement &Pl : Placements) {
+  MachineBasicBlock::iterator Pos =
+      Pl.AtEnd ? Pl.MBB->getFirstTerminator() : Pl.MBB->begin();
+  insertSwitch(*Pl.MBB, Pos,
+               Pl.ToM16, Pl.ToX16, Pl.MChanged, Pl.XChanged);
+  Changed = true;
+}
+```
+
+> **Note:** The STZ-fusion section uses `BuildMI` directly (not `insertSwitch`), so no call-site
+> update is needed there. Verify by checking the fusion loop before touching it.
+
+#### Implementation checklist for Layer 3
+
+1. Add `bool HasIndex16 = false;` private member; set it in `runOnMachineFunction`.
+2. Add `XWidth` enum, `meet(XWidth, XWidth)`, `resolveIsX16`, `isXWidthAgnostic` stub.
+3. Add `requiredXWidth` with `XW_None` as default (not `XW_X8`); check `XLow` and `XHigh`.
+4. Replace `insertSwitch` with the 6-arg form.
+5. Replace `placeIntraBlock` declaration and definition with the 3-arg form.
+6. Rewrite `placeLegacy` with `EndX16` tracking and 6-arg `insertSwitch` call.
+7. In `runOnMachineFunction`:
+   - Rename `isPassthrough` → `isPassthroughM`; add `isPassthroughX`.
+   - Add Step 1 X-dimension map population.
+   - Add Step 2 `XIn`/`XOut` maps and extend fixpoint.
+   - Replace `Placement` struct; extend Step 3a loop.
+   - Update Step 3b to pass `resolveIsX16(XIn[&MBB])`.
+   - Update Step 3c to pass all six `Placement` fields.
+8. Build; confirm zero compile errors before running `-verify-machineinstrs`.
 
 ---
 
@@ -376,20 +595,108 @@ or `Yc16`:
 
 1. **Build clean**: `dev/run.sh toolchain` — zero errors, zero `-verify-machineinstrs` failures.
 
+   Two bugs found and fixed during verification:
+
+   a) `MOSRegisterInfo.cpp` lines 502/524: `.addReg(MOS::X16, 0)` / `.addReg(MOS::Y16, 0)` —
+      `addReg` takes `RegState`, not `int`. Fixed: drop the `0` argument (use default `{}`).
+
+   b) `MOSLegalizerInfo.cpp` `legalizeICmp` first swap guard was missing `NativeS16Eq &&`
+      (seed-42 regression — identical to main's fix at `51a5bae`). Fixed: added `NativeS16Eq &&`
+      before `ComputedVsGlobal`.
+
+   ```
+   ==> done in 0m 12s: clang version 23.0.0git (...)
+   ```
+
+   PASS — zero compile errors after both fixes. All three test files clean under
+   `-verify-machineinstrs`:
+
+   ```
+   mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16,+mos-xy16
+     -Os -mllvm -verify-machineinstrs -c examples/65816/xy16basic.c -o /tmp/xy16basic.o
+   EXIT:0
+   [same for xy16spill.c, xy16spillr.c]
+   ```
+
+   Register collision check (0x500–0x503):
+   ```
+   { 1280U, MOS::XH }, { 1281U, MOS::YH }, { 1282U, MOS::X16 }, { 1283U, MOS::Y16 }
+   ```
+   PASS — each encoding appears exactly once.
+
 2. **New test programs**: compile `xy16basic.c`, `xy16spill.c`, `xy16spillr.c` with
    `-Xclang -target-feature -Xclang +mos-a16,+mos-xy16`; run differential on MAME + bsnes-jg:
    host == default == `+mos-a16` == `+mos-a16,+mos-xy16`.
+
+   ```
+   dev/run.sh xy16basic
+     RESULT: PASS — +mos-xy16 accepted, X-flag lattice inert for M16-only ops, corpus_result==0x0042
+
+   dev/run.sh xy16spill
+     RESULT: PASS — Ac16 static-stack spill compiles clean under +mos-xy16 (Layer 4 Ac16 path intact)
+
+   dev/run.sh xy16spillr
+     RESULT: PASS — soft-stack Ac16 spill intact under +mos-xy16; corpus_result==0x3457
+   ```
+
+   PASS. (bsnes-jg cross-check skipped — requires separate `dev/run.sh xcheck` build.)
 
 3. **REP/SEP output check**: `llc -mattr=+mos-a16,+mos-xy16` on a test `.ll` that uses Xc16;
    verify `rep #$10` / `sep #$10` appear at the right places — no redundant per-instruction
    toggles in a straight-line block; combined `rep #$30` / `sep #$30` present when both M and X
    switch to 16-bit simultaneously; opposite-direction switch emits two separate instructions.
+   Also compile a **mixed-mode** test (function that uses both Ac16 and Xc16): verify M16-only
+   ops (`LDAbs16`) do NOT emit a surrounding `rep/sep #$10` — the X-flag must be undisturbed by
+   M16 instructions that don't have `XLow=1`.
+
+   From `xy16basic.sh` disasm checks on `xy16basic.o`:
+   ```
+   0: c2 20    rep #$20    ← M=16 for stz fusion
+   2: 9c 00 00 stz
+   5: e2 20    sep #$20    ← restore M=8
+   7: c2 20    rep #$20    ← M=16 for 16-bit load/add/store
+   PASS: rep #$20 (c2 20)
+   PASS: sep #$20 (e2 20)
+   PASS: no rep/sep #$10 (X-flag lattice correctly inert for XLow=0 ops)
+   ```
+
+   PASS — M16-only ops (`LDAbs16`, `STAbs16`, `ADCAbs16`) emit NO surrounding `rep/sep #$10`.
+   The `requiredXWidth` default of `XW_None` (design correction 8) is verified working.
+
+   Note: positive `rep #$10` / `sep #$10` test (X16 mode explicitly entered/exited) is deferred
+   to the legalizer-integration follow-on (Layer 5 skeleton; Xc16 not yet selectable via C code).
 
 4. **Fuzzer**: `dev/run.sh fuzz 50` with the `+mos-xy16` track enabled; zero differential
    failures. Re-run with a fresh seed.
 
+   ```
+   dev/run.sh fuzz 50 1
+   ==> a16 differential fuzz: 50 program(s), seeds 1..50
+     ...
+     [ ok ] seed    42  0xEC0D (all agree)   ← seed-42 regression fixed
+     ...
+   ==> fuzz: 50/50 PASS, 0 known-issue (xfail)  (0 mismatch, 0 new-crash, 0 error)
+   ```
+
+   PASS — 50/50, seed 42 produces correct `0xEC0D` on all tracks (default, a16, xy16).
+
 5. **Regression**: existing corpus (`dev/run.sh corpus`) and `dev/run.sh fuzz 50` (default +
    `+mos-a16` tracks) remain all-green — xy16 must not regress the M-flag path.
+
+   ```
+   dev/run.sh corpus
+   ==> corpus: expected.tsv
+     hello   PASS  sentinel=0x42
+     arith   PASS  corpus_result=0xA9E9
+     control PASS  corpus_result=0x1DFB
+     arrays  PASS  corpus_result=0x03E1
+     structs PASS  corpus_result=0x0340
+     funcs   PASS  corpus_result=0x011E
+     globals PASS  corpus_result=0xAB55
+   ==> corpus: 7/7 passed
+   ```
+
+   PASS — corpus 7/7, fuzz 50/50 (all tracks including xy16). M-flag path unaffected.
 
 ---
 

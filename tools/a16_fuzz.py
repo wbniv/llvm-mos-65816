@@ -51,7 +51,10 @@ TRIAGE = BUILD / "fuzz-triage"
 SCRATCH = Path("/tmp/mame-scratch")
 WORK = BUILD / "fuzz-work"
 
-A16 = ["-Xclang", "-target-feature", "-Xclang", "+mos-a16"]
+A16  = ["-Xclang", "-target-feature", "-Xclang", "+mos-a16"]
+# #321 xy16: +mos-xy16 implies +mos-a16; a third differential track to ensure the
+# X-flag lattice in MOSInsertREPSEP doesn't disturb M-flag placement or values.
+XY16 = ["-Xclang", "-target-feature", "-Xclang", "+mos-xy16"]
 GOT_RE = re.compile(r"got=0x([0-9A-Fa-f]+)")
 
 ARR_N = 8
@@ -692,22 +695,29 @@ def _run(cmd, timeout=120, retries=2):
                              % (timeout, attempt + 1, retries))
 
 
-def compile_rom(src, rom, mapf, a16):
+def compile_rom(src, rom, mapf, flags):
+    """Compile src -> SNES ROM. `flags` is a list of extra clang args (e.g. A16, XY16, [])."""
+    # Legacy callers that pass a16 as a bool (True/False) → translate transparently.
+    if isinstance(flags, bool):
+        flags = A16 if flags else []
+    tag = ("+mos-xy16" if "+mos-xy16" in flags else
+           "+mos-a16"  if "+mos-a16"  in flags else "default")
     cmd = [str(TOOL / "mos-clang"), "--config", str(CFG), "-mcpu=mosw65816"]
-    if a16:
-        cmd += A16
+    cmd += flags
     cmd += ["-Os", "-Wl,-Map=%s" % mapf, "-o", str(rom), str(src)]
     p = _run(cmd)
     if p.returncode != 0:
-        raise CompileError("link (%s) rc=%d\n%s" % ("a16" if a16 else "default", p.returncode, p.stderr))
+        raise CompileError("link (%s) rc=%d\n%s" % (tag, p.returncode, p.stderr))
     c = _run([sys.executable, str(CHECKSUM), str(rom)])
     if c.returncode != 0:
         raise CompileError("checksum rc=%d\n%s" % (c.returncode, c.stderr))
 
 
-def verify_machineinstrs(src, obj):
-    """Compile +mos-a16 with -verify-machineinstrs. Returns (ok, log)."""
-    cmd = [str(TOOL / "mos-clang"), "--target=mos", "-mcpu=mosw65816", *A16,
+def verify_machineinstrs(src, obj, flags=None):
+    """Compile with -verify-machineinstrs. `flags` defaults to A16. Returns (ok, log)."""
+    if flags is None:
+        flags = A16
+    cmd = [str(TOOL / "mos-clang"), "--target=mos", "-mcpu=mosw65816", *flags,
            "-Os", "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
     try:
         p = _run(cmd)
@@ -838,21 +848,28 @@ def evaluate(src, expected, want_bsnes, on_triage):
     WORK.mkdir(parents=True, exist_ok=True)
     SCRATCH.mkdir(parents=True, exist_ok=True)
 
-    # 1) crash detector first (cheapest signal for the gating bug)
-    ok, vlog = verify_machineinstrs(src, WORK / "chk.vo")
+    # 1) crash detector first: verify-machineinstrs under +mos-a16 and +mos-xy16
+    ok, vlog = verify_machineinstrs(src, WORK / "chk.vo", flags=A16)
     if not ok:
         kid = classify_known(vlog)
         if kid:
             return "XFAIL", "known issue [%s]" % kid, None
-        on_triage("verify-machineinstrs / compiler crash", {"verify": vlog})
-        return "CRASH", "verify-machineinstrs failed", None
+        on_triage("verify-machineinstrs / compiler crash (+mos-a16)", {"verify": vlog})
+        return "CRASH", "verify-machineinstrs (+mos-a16) failed", None
+    # #321 xy16: also verify under +mos-xy16 (implies +mos-a16; catches X-lattice regressions)
+    ok_xy, vlog_xy = verify_machineinstrs(src, WORK / "chk_xy.vo", flags=XY16)
+    if not ok_xy:
+        on_triage("verify-machineinstrs / compiler crash (+mos-xy16)", {"verify": vlog_xy})
+        return "CRASH", "verify-machineinstrs (+mos-xy16) failed", None
 
-    # 2) compile both ROMs
+    # 2) compile default, +mos-a16, and +mos-xy16 ROMs
     try:
-        dft_rom, dft_map = WORK / "chk_default.sfc", WORK / "chk_default.map"
-        a16_rom, a16_map = WORK / "chk_a16.sfc", WORK / "chk_a16.map"
-        compile_rom(src, dft_rom, dft_map, a16=False)
-        compile_rom(src, a16_rom, a16_map, a16=True)
+        dft_rom, dft_map   = WORK / "chk_default.sfc", WORK / "chk_default.map"
+        a16_rom, a16_map   = WORK / "chk_a16.sfc",     WORK / "chk_a16.map"
+        xy16_rom, xy16_map = WORK / "chk_xy16.sfc",    WORK / "chk_xy16.map"
+        compile_rom(src, dft_rom, dft_map, flags=[])
+        compile_rom(src, a16_rom, a16_map, flags=A16)
+        compile_rom(src, xy16_rom, xy16_map, flags=XY16)
     except (CompileError, subprocess.TimeoutExpired) as e:
         # CompileError = link/checksum reject; TimeoutExpired = a link compile that hung
         # past every retry (environmental flakes already cleared inside _run).
@@ -861,22 +878,24 @@ def evaluate(src, expected, want_bsnes, on_triage):
 
     vma, size = map_lookup(a16_map, "corpus_result")
     dvma, _ = map_lookup(dft_map, "corpus_result")
-    if vma is None or dvma is None:
+    xvma, _ = map_lookup(xy16_map, "corpus_result")
+    if vma is None or dvma is None or xvma is None:
         on_triage("corpus_result not in map", None)
         return "ERROR", "corpus_result not in map", None
     length = max(size, 1)
 
-    # 3) run default@MAME, a16@MAME, a16@bsnes
+    # 3) run default@MAME, a16@MAME, xy16@MAME, a16@bsnes
     want = expected if expected is not None else 0
-    got_default, ml_d = run_mame(dft_rom, 0x7E0000 + dvma, want, length)
-    got_a16, ml_a = run_mame(a16_rom, 0x7E0000 + vma, want, length)
+    got_default, ml_d  = run_mame(dft_rom,  0x7E0000 + dvma, want, length)
+    got_a16, ml_a      = run_mame(a16_rom,  0x7E0000 + vma,  want, length)
+    got_xy16, ml_xy    = run_mame(xy16_rom, 0x7E0000 + xvma, want, length)
     got_jg, jl = (None, "skip")
     if want_bsnes:
         got_jg, jl = run_bsnes(a16_rom, vma, length, want)
 
     # The reference: the host/baked value if given, else the trusted default build.
     ref = expected if expected is not None else got_default
-    vals = {"default@MAME": got_default, "a16@MAME": got_a16}
+    vals = {"default@MAME": got_default, "a16@MAME": got_a16, "xy16@MAME": got_xy16}
     if expected is not None:
         vals = {"host": expected, **vals}
     if got_jg not in (None, "skip"):
@@ -887,7 +906,7 @@ def evaluate(src, expected, want_bsnes, on_triage):
         on_triage("value mismatch (ref=%s; %s)" % (ref, ", ".join(bad) or "no reference"), {
             "values": "\n".join("%-14s = %s" % (k, ("0x%04X" % v if isinstance(v, int) else v))
                                 for k, v in vals.items()),
-            "mame_default": ml_d, "mame_a16": ml_a, "bsnes_a16": jl,
+            "mame_default": ml_d, "mame_a16": ml_a, "mame_xy16": ml_xy, "bsnes_a16": jl,
         })
         return "FAIL", "mismatch: " + ", ".join(
             "%s=%s" % (k, ("0x%04X" % vals[k] if isinstance(vals[k], int) else vals[k])) for k in vals), ref

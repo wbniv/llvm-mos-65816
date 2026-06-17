@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|xy16basic|xy16spill|xy16spillr|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -148,15 +148,22 @@ Targets:
   a16eqvalmg #321 task7 native s16 equality-as-value for COMPUTED vs GLOBAL (`(a+b) == g_global`,
              `g_global == (a+b)`): CmpBrImagAbs16 fold — lda zp_computed; cmp abs_global; no
              cpx/cpy; corpus_result==0x0111 host==default==+mos-a16 on both emulators.
+  xy16basic  #321 xy16 smoke: +mos-xy16 accepted + implies +mos-a16 (rep #$20/stz/sep #$20 fires,
+             no spurious rep/sep #$10) + corpus_result==0x0042 on both emulators.
+  xy16spill  #321 xy16 static-stack Ac16 spill gate (compile-time, no emulator): Layer 4
+             Ac16 spill path (MOSInstrInfo) still fires clean under +mos-xy16 (-verify-machineinstrs).
+  xy16spillr #321 xy16 soft-stack Ac16 spill gate (value test): Layer 4 Ac16 path in expandLDSTStk
+             intact under +mos-xy16; corpus_result==0x3457 host==default==+mos-xy16 both emus.
   a16ret     #321 calling-convention: lock the A (low) / X (high) RETURN convention as a tested
              ABI invariant (test+docs only, no codegen change). Disasm gate: the i16 return is
              `ldx <high>; lda <low>; rts` (high byte->X, low byte->A, byte-pinned) and the i8 return
              delivers its result in A alone; value: corpus_result==0x2387 host==default==+mos-a16
              on MAME + bsnes-jg. Prior art: WDC816CC p.21 / ORCA `A_X`.
   fuzz       #321 Tier-1 differential fuzzer: generate N random valid C programs (from
-             `seed`, default 25 from seed 1), compile each DEFAULT and +mos-a16, and assert
-             host-expected == default@MAME == a16@MAME == a16@bsnes-jg + a clean
-             -verify-machineinstrs. Mismatches/crashes land in build/fuzz-triage/.
+             `seed`, default 25 from seed 1), compile each DEFAULT, +mos-a16, and +mos-xy16,
+             and assert host-expected == default@MAME == a16@MAME == xy16@MAME == a16@bsnes-jg
+             + clean -verify-machineinstrs under both +mos-a16 and +mos-xy16.
+             Mismatches/crashes land in build/fuzz-triage/.
              Usage: dev/run.sh fuzz [N] [seed]   (e.g. dev/run.sh fuzz 1 1234 to repro a seed)
   k_*        #321 Tier-1 realistic kernels (CRC16, fixed-point mul, PRNG, popcount/bit-reverse,
              saturating add, insertion sort): each asserts host==default==+mos-a16 on both emus
