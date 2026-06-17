@@ -80,8 +80,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   contract at the `MOSRegisterInfo.cpp:528` assert (every spillable ≥16-bit class needs an explicit case
   — `xy16` index-16 is the latent next one).~~ **P1 DONE 2026-06-17** (SPILL CONTRACT comment at the
   `expandLDSTStk` tail assert + the static-path mirror in `MOSInstrInfo::loadStoreRegStackSlot`;
-  comment-only, `0002` round-trips). P2: add a hermetic `.ll` crash-regression for the soft-stack
-  `Ac16` spill. P3 (optional, upstream, not #321): `__attribute__((reentrant))` can't force the soft
+  comment-only, `0002` round-trips). ~~P2: add a hermetic `.ll` crash-regression for the soft-stack
+  `Ac16` spill.~~ **P2 DONE 2026-06-17** — `examples/65816/a16spillir.ll` (frozen IR of `a16spillr.c`) +
+  `dev/a16spillir.sh`: an `llc` gate (verify-clean + `STStk/LDStk $a16` present), drift-immune companion
+  to `a16spillr.c`; test-only, no vendor change
+  ([P2 plan](docs/plans/2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)).
+  P3 (optional, upstream, not #321): `__attribute__((reentrant))` can't force the soft
   stack — ~~file an issue~~ **issue DRAFTED + source-verified
   ([docs/321-upstream-reentrant-soft-stack-issue.md](docs/321-upstream-reentrant-soft-stack-issue.md));
   filing is user-triggered**. [plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
@@ -533,4 +537,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        • chained value-EQ with cross-block-hoisted loads (stays native = a win, not a regression).
        • re-measure after A16-threading                                        -> the bullet's tail.
      Nothing open here. -->
+- [ ] **(triage)** A real upstream **lit test** under `llvm/test/CodeGen/MOS/` (with `FileCheck`, `; RUN: llc … — _from [2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md](docs/plans/2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)_  <!-- fp:9cd9cabfcff28acc -->
+- [ ] **(triage)** The actual `xy16` index-16 spill case stays gated on the `xy16` increment (P1's tripwire covers it). — _from [2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md](docs/plans/2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)_  <!-- fp:bd2c7324df9e4603 -->
 <!-- END auto-captured-deferrals -->

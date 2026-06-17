@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/e0f160a) | #321 soft-stack plan: mark P1 DONE in the Status line (was P1/P2/P3 OPEN) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0b855e0) | #321 soft-stack P1: document the expandLDSTStk >=16-bit spill contract (latent xy16 tripwire) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/4f607ed) | #321 P3: draft upstream issue — reentrant attr cannot force the soft stack (source-verified) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/d0f8bd7) | #321 P0: fold standalone soft-stack-fuzzer-coverage plan into the umbrella plan; reconcile status |
 | [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/7c0fe56) | #321 native s16: load consumed only as bytes stays byte-wise (EQ-as-value prologue fix) |
 
 <!--history-meta v1
+e0f160a	author	Will Norris
+e0f160a	added	2
+e0f160a	deleted	1
+e0f160a	files	1
+e0f160a	body	Doc-only follow-up to 0b855e0: the P1 section + verification step 5 were marked\ndone, but the top-of-plan Status still read "P1/P2/P3 OPEN". P1 (the expandLDSTStk\nspill-contract comment) landed; P2/P3 remain.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0b855e0	author	Will Norris
 0b855e0	added	13
 0b855e0	deleted	3

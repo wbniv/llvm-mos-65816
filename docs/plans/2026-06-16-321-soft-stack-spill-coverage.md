@@ -3,7 +3,9 @@
 **Date:** 2026-06-16 · **Updated:** 2026-06-17 (P0 landed + folded in from the standalone P0 plan)
 **Status:** **P0 IMPLEMENTED** (commit `0fe82ab`, 2026-06-16) — verification **PROVISIONAL**, a genuine
 quiet-box differential re-run is pending (see *P0 verification status* under Verification). **P1 DONE**
-(2026-06-17, comment-only — the `expandLDSTStk` spill contract + static-path mirror). **P2/P3 OPEN.**
+(2026-06-17, comment-only — the `expandLDSTStk` spill contract + static-path mirror). **P2 DONE**
+(2026-06-17 — `examples/65816/a16spillir.ll` + `dev/a16spillir.sh`; see
+[its plan](2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)). **P3 OPEN** (drafted; user-files).
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "soft-stack spill coverage" item
 **Predecessor:** [F3 plan](2026-06-16-321-fix-cmp-value-selectimm.md) — the `Ac16` spill fix (static + soft)
 this builds on · [Tier-1 fuzzer plan](2026-06-15-321-tier1-broaden-corpus.md) — the harness this extends.
@@ -97,7 +99,14 @@ lands, a 16-bit X/Y value live across a call hits :528 as a scavenger crash, the
 - Defer the actual index-16 spill case to the `xy16` increment (it cannot be built or tested until
   `xy16` exists).
 
-### P2 — Hermetic `.ll` regression for the soft-stack `Ac16` spill (durability)
+### P2 — Hermetic `.ll` regression for the soft-stack `Ac16` spill (durability) — DONE (2026-06-17)
+
+**DONE:** `examples/65816/a16spillir.ll` (frozen IR of `a16spillr.c`) + `dev/a16spillir.sh` drive
+build-tree `llc` as a compile-time gate: `-verify-machineinstrs` clean + `STStk/LDStk $a16` present
+(soft-stack `Ac16` spill exercised). Test-only, no vendor change. Lives in the project repo (not the
+vendor lit suite — `regen-patch.sh` only mirrors `llvm/lib/Target/MOS`, so a vendor test file would be
+lost). Full design + verification: [P2 plan](2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md).
+A real upstream `llvm/test/CodeGen/MOS/` lit test is deferred to the #321 upstreaming work.
 
 The current soft-stack regression (`examples/65816/a16spillr.c`) is excellent for the runtime
 differential check but depends on the front end + optimizer continuing to (a) keep the recursion and
@@ -163,7 +172,11 @@ Steps 5–6 below are P1/P2 and are not yet started. The original spec follows v
    assert (`MOSRegisterInfo.cpp`) + the mirror at the single-byte fall-through in
    `MOSInstrInfo::loadStoreRegStackSlot`; comment-only, codegen byte-identical, rebuild clean, `0002`
    round-trips. **PASS.**
-6. **P2 `.ll` regression** fails on a pre-F3 backend (revert-check proves it bites) and passes now under
+6. **P2 `.ll` regression — DONE (2026-06-17).** `dev/run.sh a16spillir` → PASS (llc `-verify-machineinstrs`
+   clean + `STStk/LDStk $a16` present); see the [P2 plan](2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)
+   for raw output. The revert-check (prove-it-bites) was skipped as optional (shared-`vendor/` risk; the
+   path-gate + the F3 plan's pre-fix-crash record already establish it guards the bug). _Original spec:_
+   fails on a pre-F3 backend (revert-check proves it bites) and passes now under
    `-verify-machineinstrs`.
 
 ## Out of scope
