@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/514bd4f) | #321 CC: lock A(low)/X(high) return convention as a tested ABI invariant |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/7ee904f) | #321 docs: calling-convention decision analysis + plan to lock the A/X return convention |
 
 <!--history-meta v1
+514bd4f	author	Will Norris
+514bd4f	added	91
+514bd4f	deleted	1
+514bd4f	files	1
+514bd4f	body	The free, uncontroversial calling-convention piece (ROADMAP step 5 / M2):\nadopt + lock the return convention WITHOUT changing codegen. `i8 -> A` and\n`i16 -> A(low):X(high)` is already emergent from CC_MOS byte-splitting (there\nis no separate RetCC_MOS) AND the documented commercial prior art (WDC816CC\nmanual p.21, ORCA/C `A_X`). "Adopt" = convert an untested emergent behavior\ninto a deliberate, differential-regression-guarded invariant.\n\n- examples/65816/a16ret.c + dev/a16ret.sh (wired into dev/run.sh): a value\n  differential (corpus_result==0x2387 host==default==+mos-a16 on MAME +\n  bsnes-jg) PLUS a byte-pinned disasm gate — the i16 return is\n  `ldx <high>; lda <low>; rts` with the X-load reading the imaginary reg one\n  byte above the A-load (proves high->X, low->A), and the i8 return delivers\n  its result in A alone. The value test catches miscompiles; the disasm gate\n  catches convention drift (a value test alone cannot — a consistent A<->X\n  swap in both production and consumption still round-trips).\n- Decision recorded: docs/investigations/65816-calling-convention-decision.md\n  (new section "Return values - adopted"; TL;DR/table/recommendation updated)\n  and docs/320-321-65816-c-abi-prior-art.md.\n\nTest + docs only, no codegen change (0002 untouched). Verified: a16ret PASS\non all legs; a16 suite 50/50; corpus 7/7. (`fuzz 50 1` surfaced an unrelated\npre-existing shared-codegen regression at seed 42 — proven via an upstream\ncross-check to affect the default 8-bit build too, not the return convention;\nfiled separately in TODO.md.)\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7ee904f	author	Will Norris
 7ee904f	added	77
 7ee904f	deleted	0

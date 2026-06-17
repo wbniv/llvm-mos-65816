@@ -148,17 +148,22 @@ SMOKE: FAIL addr=0x7E0215 len=2 got=0xEC0D want=0xDEAD   # (0xDEAD = sentinel; g
 
 So two independent oracles — the fuzzer's exact-16-bit Python model **and** the unpatched upstream MOS
 compiler on real MAME — both give **0xEC0D**; the **from-source *patched* toolchain is the outlier at
-0xB226 in BOTH its default and a16 builds**. That isolates a real codegen regression in the **current shared
-`vendor/` tree** (a path the default build also takes), introduced *after* the earlier-today `fuzz 50/50`
-baselines — most likely a concurrent agent's uncommitted edits to shared MOS files (`MOSCombiner.cpp`,
-`MOSInstrInfo.cpp`, `MOSInstrGISel.td`), rebuilt into `clang-23` at 19:45. It is **independent of this
-test+docs-only plan** (zero `vendor/`/generator edits here; would reproduce on any current checkout). Filed
-for separate triage in `TODO.md`; left untouched here per "only commit your work / leave other workers'
-in-progress `vendor/` edits."
+0xB226 in BOTH its default and a16 builds**. That isolates a real codegen regression introduced by **our
+committed patches** — corrected attribution (an earlier draft wrongly guessed "concurrent agent edits"):
+`vendor/llvm-mos` HEAD is *pristine upstream* (`c798c3141`) and `dev/toolchain.sh` git-applies the patches
+**without committing**, so the `M` files in `git -C vendor status` *are* the patch content, not a concurrent
+WIP. Proof (isolated worktree): applying `0001+0002+0003` to a fresh upstream checkout reproduces the live
+vendor codegen tree **byte-for-byte** (`diff -rq` of the MOS dir + clang `MOS.cpp` + `TargetDataLayout.cpp`
+all identical); the only non-patch diff is `clang/cmake/caches/MOS.cmake`, which is `toolchain.sh`'s own
+build-tool trim and cannot affect codegen. The bug is **independent of this test+docs-only plan** (zero
+`vendor/`/generator edits here). Which committed patch is being bisected (prime suspect `0001` #320 — the
+only committed patch that changes *default* codegen by design; the default-build divergence is plain 8-bit
+reg-alloc/scheduling with no a16 pseudos, so `0002`'s a16-gating isn't leaking). Filed in `TODO.md`.
 
 **Step 3 verdict:** non-breaking confirmed for this change — suite 50/50, corpus 7/7, no `vendor/`/`0002`
-change. The fuzzer's seed-42 mismatch is a pre-existing shared-backend regression unrelated to the return
-convention (proven by the upstream cross-check), tracked separately.
+change. The fuzzer's seed-42 mismatch is a pre-existing regression in the committed backend patches (proven
+by the upstream cross-check + the byte-for-byte patch-reproduction check), unrelated to the return
+convention, tracked separately.
 
 ## Out of scope
 

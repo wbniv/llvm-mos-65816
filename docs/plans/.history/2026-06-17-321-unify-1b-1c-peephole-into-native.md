@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/329fbff) | #321 plan: post-execution corrections to 1b/1c peephole retirement plan |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/f390a78) | #321 retire 1b/1c GISel combiner peephole — native path covers all shapes |
 
 <!--history-meta v1
+329fbff	author	Will Norris
+329fbff	added	87
+329fbff	deleted	10
+329fbff	files	1
+329fbff	body	Seven accuracy fixes after critique:\n- "four files" → "six files" (MOSInstrLogical.td + MOSLegalizerInfo.cpp were also changed)\n- "Temporary regressions" section rewritten: A16-threading was already live at time of\n  implementation, so the anticipated +4-byte regressions never materialised\n- Step 1: fix a16ops.c → a16add.c (a16ops doesn't exist); note step was not run as written\n- Step 2: add MOSInstrLogical.td subsection; document selectAlu16AbsLd comment follow-on pass\n- Step 3: replace "all 10 a16* tests" overstatement with the five in-scope tests\n- Add "What actually landed where": bulk patch reduction (−1264 lines) is in fd304f6 (task7),\n  not f390a78 (retirement), due to shared vendor/ concurrent-regen; only 2 comment lines in f390a78\n- Add "Implementation traps": three anchor-consumed-content bugs (getImm16Operand comment,\n  selectGeneric signature, G_STORE_FAR_ABS island) with fixes, for future bulk-deletion reference\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f390a78	author	Will Norris
 f390a78	added	318
 f390a78	deleted	0

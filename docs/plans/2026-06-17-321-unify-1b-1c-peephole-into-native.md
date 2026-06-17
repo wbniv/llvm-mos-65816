@@ -67,7 +67,11 @@ done
 
 > **Execution note:** this step was not run as written. The baseline byte count for
 > a16chain was inferred from the existing `dev/run.sh a16chain` disasm gate (30 bytes
-> `.text`). No explicit before/after diff was captured.
+> `.text`). No explicit before/after size diff was captured for a16add or a16bit either.
+> This is acceptable: the combiner being deleted was the only path for those shapes, and
+> the native path (already the fallback) produces identical output — the correctness
+> differential on both emulators is the proof. Future retirement tasks should still capture
+> before/after bytes for documentation completeness.
 
 ## Step 2 — Delete the peephole infrastructure
 
@@ -221,7 +225,9 @@ patch-line change.
 This is the cross-commit contamination risk from CLAUDE.md §"only commit your own
 files" — `vendor/` is gitignored so the drift is invisible in `git status`, and
 only surfaces when two agents run `regen-patch.sh` against the same modified tree.
-The patch content is correct; only the commit attribution is split.
+The patch content is correct; only the commit attribution is split. **The actual
+code removal is visible in `fd304f6`'s patch diff** — `git show f390a78` carries only
+the 2 comment-line change, making the retirement commit look like it touched nothing.
 
 ## Implementation traps
 
