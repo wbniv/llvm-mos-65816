@@ -544,6 +544,12 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "argument-passing + frame-storage sub-decisions" -> the curated M2 "#321 calling-convention decision"
        bullet + docs/investigations/65816-calling-convention-decision.md (the hard frame fork, gated on a
        product steer + post-xy16 measurement). Nothing open here. -->
-- [ ] **(triage)** Porting the DMA/VRAM helpers to 16-bit codegen (deferred per Phase-2 scope decision). — _from [2026-06-15-415-snes-target-apply-and-16bit.md](docs/plans/2026-06-15-415-snes-target-apply-and-16bit.md)_  <!-- fp:1b36c166f003e317 -->
-- [ ] **(triage)** Upstreaming: cutting the actual `llvm-mos-sdk` PR from `platforms/snes-8bit/` (README already — _from [2026-06-15-415-snes-target-apply-and-16bit.md](docs/plans/2026-06-15-415-snes-target-apply-and-16bit.md)_  <!-- fp:0cd5df3b045f033f -->
+<!-- triaged 2026-06-17: both SNES-415 plan deferrals already covered (this plan was routed in from
+     ~/.claude/plans by a housekeeping pass; its Out-of-scope/follow-ups travel with the now-tracked plan).
+     • "Upstreaming: cut the llvm-mos-sdk PR from platforms/snes-8bit/" -> the curated Open bullet
+       "Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR)" + the Upstream queue entry in
+       docs/upstream-contribution-status.md (#415 reconciliation, user-triggered posting). Already tracked.
+     • "Port the DMA/VRAM helpers to 16-bit codegen" -> a Phase-2 (16-bit native target) deferral documented
+       in the plan's own Out-of-scope, gated behind the same #415 reconciliation + the broader #321 effort.
+     Nothing open here. -->
 <!-- END auto-captured-deferrals -->
