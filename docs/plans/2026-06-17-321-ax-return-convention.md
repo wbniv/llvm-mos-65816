@@ -156,9 +156,12 @@ WIP. Proof (isolated worktree): applying `0001+0002+0003` to a fresh upstream ch
 vendor codegen tree **byte-for-byte** (`diff -rq` of the MOS dir + clang `MOS.cpp` + `TargetDataLayout.cpp`
 all identical); the only non-patch diff is `clang/cmake/caches/MOS.cmake`, which is `toolchain.sh`'s own
 build-tool trim and cannot affect codegen. The bug is **independent of this test+docs-only plan** (zero
-`vendor/`/generator edits here). Which committed patch is being bisected (prime suspect `0001` #320 — the
-only committed patch that changes *default* codegen by design; the default-build divergence is plain 8-bit
-reg-alloc/scheduling with no a16 pseudos, so `0002`'s a16-gating isn't leaking). Filed in `TODO.md`.
+`vendor/`/generator edits here). **Bisected (isolated ccache-reuse builds, seed-42 default value): the
+culprit is `0002` (the #321 accum16 patch), necessary + sufficient** — upstream `0xEC0D`, `+0001` `0xEC0D`,
+`+0001+0003` `0xEC0D`, but **`+0001+0002` `0xB226`** (full `0xB226`). So `0002` has an un-gated change
+leaking into the *default* (non-a16) 8-bit path (the prior "prime suspect `0001`" guess was wrong — `0001`
+and `0003` are both clean). Filed in `TODO.md` with the fix-search lead. (My earlier "concurrent agent"
+guess was the second wrong attribution corrected here; the bisect is now definitive.)
 
 **Step 3 verdict:** non-breaking confirmed for this change — suite 50/50, corpus 7/7, no `vendor/`/`0002`
 change. The fuzzer's seed-42 mismatch is a pre-existing regression in the committed backend patches (proven

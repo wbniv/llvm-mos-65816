@@ -50,12 +50,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   agent's WIP. Proof: applying `0001+0002+0003` to a fresh upstream worktree reproduces the live vendor
   codegen tree **byte-for-byte** (MOS dir + clang `MOS.cpp` + `TargetDataLayout.cpp` all `diff`-identical);
   the *only* non-patch difference is `clang/cmake/caches/MOS.cmake`, which is `toolchain.sh`'s own build-tool
-  trim (drops `clang-tools-extra`) and cannot affect codegen. **Which patch — bisecting** (isolated
-  ccache-reuse builds): prime suspect `0001` (#320 far-addrspace — the only committed patch that changes
-  *default* 65816 codegen by design; the default-build assembly divergence is plain 8-bit byte-wise
-  reg-alloc/scheduling with **no a16 pseudos**, so `0002`'s a16-gating is not leaking). `[bisect-0001 build
-  result pending]`. The program leans on signed `(short)(unsigned short) >> k` (int-promotion-before-shift) +
-  nested `& 0xFFFF` chains. Triage artifact regenerated deterministically by the repro command.
+  trim (drops `clang-tools-extra`) and cannot affect codegen. **Which patch — BISECTED to `0002`
+  (necessary + sufficient), isolated ccache-reuse builds, seed-42 default 8-bit value:** upstream `0xEC0D` ·
+  `+0001` `0xEC0D` · `+0001+0003` `0xEC0D` · **`+0001+0002` `0xB226`** · full(`+0001+0002+0003`) `0xB226`.
+  So `0002` (the #321 accum16 patch) alone flips it; `0001` and `0003` are clean. **`0002` therefore has an
+  un-gated change LEAKING INTO THE DEFAULT (non-a16) 8-bit path** — it must not touch default codegen at all
+  (governing lesson #2: gate so a misclassification only ever *misses a win*, never *regresses*). Symptom
+  (default-build asm diff, `+0001` clean vs full): `0002` rewrites the shared 8-bit multi-byte arithmetic —
+  materializing the carry into a GPR (`ldy #1; bcs; ldy #0; … cpy #1; adc/sbc`) and reordering add/sbc-with-
+  carry chains — producing wrong multi-precision results. The program leans on signed
+  `(short)(unsigned short) >> k` (int-promotion-before-shift) + nested `& 0xFFFF` chains. **Next: grep `0002`
+  for combiner rules / TableGen patterns / MOSInstrInfo / register-class or -bank changes NOT guarded by the
+  `+mos-a16` (`HasA16`/subtarget) predicate** — the un-gated one is the bug. Repro `dev/run.sh fuzz 1 42`;
+  isolated-build bisect result logs kept in `build/bisect-0001*.out`.
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed

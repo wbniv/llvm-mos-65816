@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/a2b9fcf) | #321 triage: correct seed-42 attribution (committed patches, not concurrent edits) + fix TODO merge break |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/514bd4f) | #321 CC: lock A(low)/X(high) return convention as a tested ABI invariant |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/7ee904f) | #321 docs: calling-convention decision analysis + plan to lock the A/X return convention |
 
 <!--history-meta v1
+a2b9fcf	author	Will Norris
+a2b9fcf	added	14
+a2b9fcf	deleted	9
+a2b9fcf	files	1
+a2b9fcf	body	Seed-42 attribution corrected in TODO.md and ax-return plan: the earlier\ndraft blamed concurrent-agent vendor/ edits, but vendor/llvm-mos HEAD is\npristine upstream (c798c3141) and toolchain.sh git-applies patches without\ncommitting — the M files in vendor/ *are* the patch content. Proof: applying\n0001+0002+0003 to a fresh upstream worktree reproduces the live vendor tree\nbyte-for-byte. Prime suspect: patch 0001 (#320 far-addrspace, the only\ncommitted patch that changes default 65816 codegen; bisect pending).\n\nAlso fixes a formatting break in TODO.md where the seed-42 bullet's closing\nsentence was merged into the opening of the native-s16 comparison follow-ups\nbullet (missing newline + list marker from a prior edit).\n\nunify-1b-1c plan: added execution note for step 1 (no before/after byte diff\ncaptured for a16add/a16bit) and clarified the cross-commit contamination\nfinding (fd304f6's patch diff carries the actual code removal).\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 514bd4f	author	Will Norris
 514bd4f	added	91
 514bd4f	deleted	1
