@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/d0f8bd7) | #321 P0: fold standalone soft-stack-fuzzer-coverage plan into the umbrella plan; reconcile status |
 | [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/7c0fe56) | #321 native s16: load consumed only as bytes stays byte-wise (EQ-as-value prologue fix) |
 
 <!--history-meta v1
+d0f8bd7	author	Will Norris
+d0f8bd7	added	48
+d0f8bd7	deleted	21
+d0f8bd7	files	1
+d0f8bd7	body	P0 (fuzzer recursion → soft-stack coverage) was committed in 0fe82ab but the umbrella\nplan still read "OPEN / not yet implemented", its Verification section had no evidence,\nand the TODO item was still open. Reconcile:\n\n- Umbrella plan 2026-06-16-321-soft-stack-spill-coverage.md: Status → "P0 IMPLEMENTED\n  (0fe82ab), verification PROVISIONAL; P1/P2/P3 OPEN"; rewrote the P0 work item as the\n  as-built design (RecFuncDef, P_RECURSIVE, REC_LIVE live-across-call pressure, bounded\n  host oracle) + the F4 byproduct; added a "P0 verification status" block — steps 1-2\n  PASS (fresh, no-box: pre-change had 0 recursion machinery; 15/24 seeds now recursive),\n  steps 3-4 PROVISIONAL pending a genuine quiet-box re-run.\n- TODO.md: struck the P0 clause with the landing note (0fe82ab; F4 fix 0003); P1/P2/P3\n  remain open.\n- Deleted the standalone docs/plans/2026-06-17-...-p0.md (content folded in).\n\nVerification could not be completed: a quiet-box run was launched but aborted when a\nconcurrent toolchain build made the box non-quiet (concurrent MAME load flakes the\nsettle window). Partial fuzz reached seed 10/50 all-agree before abort; full re-run\ndeferred to a quiet window. No backend change in this commit.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7c0fe56	author	Will Norris
 7c0fe56	added	134
 7c0fe56	deleted	0

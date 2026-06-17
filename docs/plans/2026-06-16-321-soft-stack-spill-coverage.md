@@ -97,7 +97,11 @@ differential check but depends on the front end + optimizer continuing to (a) ke
 hermetic crash-regression immune to front-end/optimizer drift. Complements, does not replace, the C
 test. (Same rationale the F3 plan used to keep both a compile-gate and the fuzzer value-check.)
 
-### P3 — Upstream note: `reentrant` cannot force the soft stack (optional, low priority, not #321)
+### P3 — Upstream note: `reentrant` cannot force the soft stack (optional, low priority, not #321) — **DRAFTED 2026-06-17**
+
+**Issue draft written + verified against the current vendor source (all four pivot points quoted from real
+code): [`docs/321-upstream-reentrant-soft-stack-issue.md`](../321-upstream-reentrant-soft-stack-issue.md).
+Filing is user-triggered; no fork patch (issue only).** The forward note (now superseded by that draft):
 
 Record the finding for upstream llvm-mos: `__attribute__((reentrant))` emits no IR marker
 (`CodeGenModule.cpp:2988` only suppresses the `-fnonreentrant` global default) and `MOSNonReentrant`

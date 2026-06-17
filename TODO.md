@@ -80,7 +80,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   contract at the `MOSRegisterInfo.cpp:528` assert (every spillable ≥16-bit class needs an explicit case
   — `xy16` index-16 is the latent next one). P2: add a hermetic `.ll` crash-regression for the soft-stack
   `Ac16` spill. P3 (optional, upstream, not #321): `__attribute__((reentrant))` can't force the soft
-  stack — file an issue. [plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
+  stack — ~~file an issue~~ **issue DRAFTED + source-verified
+  ([docs/321-upstream-reentrant-soft-stack-issue.md](docs/321-upstream-reentrant-soft-stack-issue.md));
+  filing is user-triggered**. [plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
