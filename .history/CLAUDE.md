@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0083378) | #321 docs: add project CLAUDE.md + agent-handoff guide |
+
+<!--history-meta v1
+0083378	author	Will Norris
+0083378	added	60
+0083378	deleted	0
+0083378	files	1
+0083378	body	No project-level CLAUDE.md existed (only the shared ~/SRC/CLAUDE.md cascaded down). Add a\nproject guide that auto-loads every session as the standing handoff preface, plus a\nreferenced docs/agent-handoff.md for the verbose mechanics -- so each task is just this\ngeneral context + a per-task docs/plans/ supplement.\n\nCLAUDE.md (lean, auto-loaded): what the project is; the gitignored vendor/ + patches/0002\n"edit in place, regen the patch" model and the shared-tree "only commit your files" rule;\nthe differential correctness bar; the three governing lessons (measure-don't-assume;\na native 16-bit op isn't automatically smaller -> gate conservatively where it wins;\nmodest gains are worth doing); and project commit discipline.\n\ndocs/agent-handoff.md (referenced): exact build/compile/disasm/emulator/fuzz commands plus\nthe clang-23 stale-symlink and quiet-box gotchas; the micro-test pattern; the\nnative-a16-vs-8-bit-a16 same-shape, 16-bit-ambient measurement methodology; and backend\nnavigation (grep anchors, key files, register classes).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

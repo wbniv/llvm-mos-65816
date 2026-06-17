@@ -58,3 +58,7 @@ glitch. (Exact commands + the micro-test pattern: `docs/agent-handoff.md`.)
 - End commit messages with: `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
 - **Push only when asked / coordinate.** `main` may carry other workers' commits not yet pushed (some route
   via fork PR branches deliberately); don't `git push origin main` without checking.
+- **Upstream contributions are queued in [`docs/upstream-contribution-status.md`](docs/upstream-contribution-status.md)** —
+  every PR / issue / design-note we draft for `llvm-mos`(-sdk), split ready-to-post vs future/blocked, each with its exact
+  `gh` command. Posting is **user-triggered**. **Keep it current in the same commit** whenever you draft a new upstream
+  artifact, push a PR branch, or post one (mirror the one-line pointer in TODO's *Upstream / Contribution* section).

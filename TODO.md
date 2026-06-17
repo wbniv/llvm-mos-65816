@@ -170,6 +170,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Upstream / Contribution
 
+_Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
+— keep it in sync (drafted → ready-to-post → posted) with the items in this section._
+
 - [ ] **Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR).** Build ON @Phillip-May's
   stalled-but-working SDK scaffolding, don't replace it: reuse his `snesxc` register lib + multi-bank
   linker (with credit); contribute on top our native-mode crt0 (unlocks 16-bit codegen) + the
