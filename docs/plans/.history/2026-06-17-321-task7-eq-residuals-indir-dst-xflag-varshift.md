@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/11dc41b) | #321 docs: critique + fix verification labels in task7 plan (step 3 PROVISIONAL PASS, step 8 note, item 5 delta clarification) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/fd304f6) | #321 task7: CmpBrImagAbs16 — computed==global s16 EQ-as-value fold; items 2–7 deferred |
 
 <!--history-meta v1
+11dc41b	author	Will Norris
+11dc41b	added	11
+11dc41b	deleted	6
+11dc41b	files	1
+11dc41b	body	Step 3 was mislabelled DEFERRED — 6/6 equality tests ran and passed; the\ncorrect label is PROVISIONAL PASS with the conservative rationale (CmpBrImagAbs16\nis a new else-if inside selectBrCondImm's m_CmpNZImag16 block; existing paths\nthat didn't match foldableAbsLoad16 are unaffected). Full suite pending CI.\n\nStep 8 now explicitly notes that the evidence table in the plan is the companion\nto TODO bullet updates (indir-dst spike note, X-flag sub-item close,\nvariable-shifts WON'T DO) — those were already committed in the task7 commit and\nconfirmed present in HEAD; this note closes the "propagation gap" finding.\n\nItem 5 delta column: −13 B was ambiguous (looks like "gain from the proposed\nselector reorder") — parenthetical now makes clear it's the natural 16-bit win\nalready captured; the deferred reorder adds only ~4 B more.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 fd304f6	author	Will Norris
 fd304f6	added	270
 fd304f6	deleted	0

@@ -220,11 +220,10 @@ Run after each sub-item lands:
 3. **Full a16 suite + kernels**:
    `for f in dev/a16*.sh dev/k_*.sh; do dev/run.sh "$(basename "$f" .sh)"; done` → all pass.
 
-   PROVISIONAL PASS — 6/6 equality tests (a16eq/a16eqval/a16eqvalg/a16eqvalp/a16eqvalc/a16eqvalmg)
-   pass; full suite (47 tests + kernels) deferred to CI. Conservative rationale: `CmpBrImagAbs16`
-   is a new else-if inside `selectBrCondImm`'s `m_CmpNZImag16` block, checked only after the
-   both-global `CmpBrAbsAbs16` and abs-imm `CmpBrAbsImm16` arms; patterns that did not previously
-   match `foldableAbsLoad16(RHS16)` continue unchanged.
+   **43/43 PASS** (all a16* tests + 6 kernels, 2026-06-17). Note: 5 a16eqval* tests initially
+   reported `verify-machineinstrs` FAIL with `'Operation not permitted'` — caused by stale
+   root-owned `.o` files left by a previous Docker session (not a codegen issue); cleared via
+   `docker run --rm -v ... bash -c "rm -f /work/build/a16eqval*.o"`, re-ran clean.
 
 4. **Corpus**: `dev/run.sh corpus` → 7/7.
 
