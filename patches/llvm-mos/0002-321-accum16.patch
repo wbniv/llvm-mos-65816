@@ -1089,7 +1089,7 @@ index 21910cfea..e3fece8b0 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..bbbd08be5 100644
+index cbdd54ab2..40fa86309 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1420,7 +1420,7 @@ index cbdd54ab2..bbbd08be5 100644
 +// absolute compare/load forms (cmp abs / lda abs) can read directly instead of
 +// round-tripping the global through an Imag16 pair. Volatile-safe: the load has
 +// exactly this one use, so folding preserves the single memory access in program
-+// order (same 1-to-1 fold selectAlu16AbsLd does for the abs ALU operands). Same-BB
++// order (single-use check, same as selectAlu16Native's abs operand fold). Same-BB
 +// only (mirrors shouldFoldMemAccess's no-cross-block rule).
 +static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
 +                                       const MachineRegisterInfo &MRI) {
@@ -1813,7 +1813,7 @@ index cbdd54ab2..bbbd08be5 100644
 +
 +  // The user's memory access is the indirect op (LDAIndir16 / STAIndir16); carry
 +  // the memref there. The Imag16 load/store that moves the value to/from A16 is an
-+  // internal zp register transfer with no memref (mirrors selectAlu16AbsLd).
++  // internal zp register transfer with no memref (same pattern as foldableAbsLoad16).
 +  SmallVector<MachineInstrBuilder, 2> New;
 +  MachineInstr *FoldedLoad = nullptr;
 +  if (IsLoad) {
