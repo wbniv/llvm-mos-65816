@@ -2,7 +2,8 @@
 
 **Date:** 2026-06-16 · **Updated:** 2026-06-17 (P0 landed + folded in from the standalone P0 plan)
 **Status:** **P0 IMPLEMENTED** (commit `0fe82ab`, 2026-06-16) — verification **PROVISIONAL**, a genuine
-quiet-box differential re-run is pending (see *P0 verification status* under Verification). **P1/P2/P3 OPEN.**
+quiet-box differential re-run is pending (see *P0 verification status* under Verification). **P1 DONE**
+(2026-06-17, comment-only — the `expandLDSTStk` spill contract + static-path mirror). **P2/P3 OPEN.**
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "soft-stack spill coverage" item
 **Predecessor:** [F3 plan](2026-06-16-321-fix-cmp-value-selectimm.md) — the `Ac16` spill fix (static + soft)
 this builds on · [Tier-1 fuzzer plan](2026-06-15-321-tier1-broaden-corpus.md) — the harness this extends.

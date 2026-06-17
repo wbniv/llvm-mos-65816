@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0b855e0) | #321 soft-stack P1: document the expandLDSTStk >=16-bit spill contract (latent xy16 tripwire) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/4f607ed) | #321 P3: draft upstream issue — reentrant attr cannot force the soft stack (source-verified) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/d0f8bd7) | #321 P0: fold standalone soft-stack-fuzzer-coverage plan into the umbrella plan; reconcile status |
 | [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/7c0fe56) | #321 native s16: load consumed only as bytes stays byte-wise (EQ-as-value prologue fix) |
 
 <!--history-meta v1
+0b855e0	author	Will Norris
+0b855e0	added	13
+0b855e0	deleted	3
+0b855e0	files	1
+0b855e0	body	Comment-only. Adds a SPILL CONTRACT note at the expandLDSTStk tail assert\n(MOSRegisterInfo.cpp, above `assert(Loc == C || V || Anyi8…)`) and mirrors it at\nthe single-byte fall-through `else` in the static-stack path\n(MOSInstrInfo::loadStoreRegStackSlot). Both state the invariant the F3 fix\nestablished: every spillable >=16-bit register class needs its OWN explicit case\nABOVE the 8-bit tail (Ac16 -> one 16-bit indirect/LDAbs16-STAbs16; Imag16 ->\nbyte-pair split) — falling through would COPY the wide value through an 8-bit GPR\nand emit invalid MIR (the F3 `SelectImm $a16` crash class). Flags the latent next\ntripwire: xy16 (native 16-bit index, the X-flag mode dimension); when it becomes\nspillable, a 16-bit index live across a call hits this path and must gain a case,\nmirroring Ac16. The actual index-16 spill stays deferred to the xy16 increment.\n\nCodegen byte-identical (comments are inert): rebuild clean, a16spill/a16spillr/\na16localx verify-machineinstrs clean, 0002 round-trips (carries the 2 contract\ncomments, zero TXY/TYX -- F4 stays in 0003).\n\nBackend source rides patches/llvm-mos/0002 (vendor/ gitignored; dev/regen-patch.sh).\nPlan: docs/plans/2026-06-16-321-soft-stack-spill-coverage.md (P1)\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4f607ed	author	Will Norris
 4f607ed	added	5
 4f607ed	deleted	1
