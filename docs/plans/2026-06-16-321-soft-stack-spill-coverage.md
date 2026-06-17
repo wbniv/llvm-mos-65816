@@ -1,7 +1,8 @@
 # #321 native s16 — close the soft-stack (reentrant) spill coverage gap
 
-**Date:** 2026-06-16
-**Status:** **OPEN** (forward plan; not yet implemented).
+**Date:** 2026-06-16 · **Updated:** 2026-06-17 (P0 landed + folded in from the standalone P0 plan)
+**Status:** **P0 IMPLEMENTED** (commit `0fe82ab`, 2026-06-16) — verification **PROVISIONAL**, a genuine
+quiet-box differential re-run is pending (see *P0 verification status* under Verification). **P1/P2/P3 OPEN.**
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "soft-stack spill coverage" item
 **Predecessor:** [F3 plan](2026-06-16-321-fix-cmp-value-selectimm.md) — the `Ac16` spill fix (static + soft)
 this builds on · [Tier-1 fuzzer plan](2026-06-15-321-tier1-broaden-corpus.md) — the harness this extends.
@@ -45,26 +46,31 @@ register-scavenger crash in link-time codegen.
 
 ## Work items (priority order)
 
-### P0 — Teach the fuzzer to emit recursion (the coverage fix)
+### P0 — Teach the fuzzer to emit recursion (the coverage fix) — **LANDED (commit `0fe82ab`, 2026-06-16)**
 
-The centerpiece. Make `gen_funcs` optionally emit a **recursive** function so soft-stack spills actually
-run under the differential oracle.
+The centerpiece, now implemented + committed. `tools/a16_fuzz.py` mints genuinely **recursive** functions,
+so generated programs land on the soft/reentrant stack and exercise `expandLDSTStk` under the differential
+oracle. As-built (`RecFuncDef` + `gen_funcs`):
 
-- **Generator** (`tools/a16_fuzz.py::gen_funcs`, line 475): with some probability, mark one generated
-  function recursive. Its body must be: a **base-case guard** on a parameter (`if (p0 == 0) return
-  <pure-expr>;`) followed by a body that may call **itself** (and/or the other `fN`) with a
-  **strictly-decreasing** argument (`work(p0 - 1)`), `__attribute__((noinline))`. The `noinline` +
-  volatile-seeded call depth keeps the self-call in the final call graph (so `MOSNonReentrant` leaves it
-  reentrant — exactly the `a16spillr.c` recipe). Allow the recursive body to use the **non-pure** leaf
-  set so a 16-bit value is forced live **across** the self-call (that is what spills).
-- **Evaluator** (`State.call`, line 336; it already recurses via `sub = State(...)`): mirror the emitted
-  base case and decrement so host evaluation terminates and predicts `corpus_result` exactly. Add a hard
-  recursion-depth cap in both the generator (bound the initial depth, e.g. `work(3..6)`) and the
-  evaluator (defensive, to keep the Python oracle from blowing its own stack on a generation bug). Keep
-  it **UB-free and deterministic** — same discipline as the existing generator.
-- **Effect:** soft-stack spills of `Ac16` (indirect `STAIndir16`/`LDAIndir16`), `Imag16` (byte-pair
-  split through the stack pointer), and 8-bit values across the recursive call now get **value-level**
+- **Generator** (`gen_funcs`): each generated function is recursive with probability `P_RECURSIVE = 0.5`.
+  Body = base-case guard `if (p0 == 0) return <pure>;`, then `REC_LIVE ∈ [5,8]` values `vN` — **each
+  anchored by a distinct volatile input** so the read can't sink past the call — then a non-tail
+  `__attribute__((noinline))` self-call `r = fN((unsigned short)(p0 - 1u), …)`, then
+  `return COMBINE(v0..v{k-1}, r)`. The `>4` values live across the call exhaust the 4 hard-stack CSR slots →
+  the (reentrant) caller spills to its **soft** frame: `STStk`/`LDStk` → `expandLDSTStk` (the F3 `Ac16`
+  path). `noinline` + non-tail keep `fN` recursive → reentrant → soft stack.
+- **Bounded & sound:** the recursion-counter arg is a small constant `randint(2,4)` (`call_args`), depth
+  ≤ 4; `MAX_EVAL_DEPTH = 64` guards the host oracle. `State.call` mirrors the base case + decrement so the
+  Python evaluator predicts `corpus_result` exactly; `program()` guarantees every recursive `fN` is invoked
+  and XOR-folded into `corpus_result` (no DCE; always under the oracle). UB-free + deterministic, same
+  discipline as the existing generator.
+- **Effect:** soft-stack spills of `Ac16` (indirect `STAIndir16`/`LDAIndir16`), `Imag16` (byte-pair split
+  through the stack pointer), and 8-bit values across the recursive call now get **value-level**
   differential coverage on both emulators — catching wrong-value bugs, not just the already-fixed crash.
+- **Byproduct — F4:** P0's first run surfaced a pre-existing **upstream** `mos-late-opt` crash (a
+  `LDImm`→TYX/TXY rewrite that skipped dead/kill-flag cleanup → verifier "undefined physical register" on
+  reentrant `+mos-a16` code), fixed as `patches/llvm-mos/0003-late-opt-txy-dead-flag.patch`. Tracked by the
+  [F4 plan](2026-06-16-321-f4-late-opt-txy-dead-flag.md), not this one.
 
 ### P1 — Document & guard the `expandLDSTStk` spill contract (latent xy16 tripwire)
 
@@ -106,6 +112,27 @@ file an upstream issue**, do not carry a fork patch. Out of scope for #321; trac
 re-discovered from scratch.
 
 ## Verification (the spec — run, paste raw output under each step, mark PASS/FAIL)
+
+**P0 verification status (2026-06-17) — steps 1–2 PASS (fresh, no-box); steps 3–4 PROVISIONAL, pending a
+genuine quiet-box re-run.** A first quiet-box run was launched but **aborted** when a concurrent toolchain
+build made the box non-quiet (concurrent MAME load flakes the settle window → false failures; abort-early).
+What we have so far:
+
+- **Step 1 (gap) — PASS.** `git show 0fe82ab^:tools/a16_fuzz.py | grep -cE "RecFuncDef|P_RECURSIVE"` → `0`
+  (the pre-change fuzzer had no recursion machinery; the soft stack was structurally unreachable).
+- **Step 2 (recursion generated & sound) — PASS (generation/shape).** Over seeds 1..24, **15/24** programs
+  emit a recursive function (base-case guard + `REC_LIVE` live-across-call values + non-tail self-call;
+  shape spot-checked on seed 3). Value soundness is step 3.
+- **Step 3 (soft stack exercised) — PROVISIONAL.** The aborted run reached `fuzz 50 1` **seed 10/50, all
+  "all agree"** before kill; commit `0fe82ab` claims the full `fuzz 50 1 → 50/50`
+  (host==default==+mos-a16 on MAME + bsnes-jg) with the `Ac16` soft-spill exercised. **TODO: re-run
+  `dev/run.sh fuzz 50 1` + a second seed on a quiet box, spot-check a recursive program's a16 disasm for the
+  soft-stack indirect spill, and paste here.**
+- **Step 4 (non-breaking) — PENDING.** Commit `0fe82ab` claims corpus 7/7 + a16spill/a16spillr green +
+  `0001+0002+0003` round-trip. **TODO: re-run the a16 suite + `dev/run.sh corpus` on a quiet box and paste
+  here.** (No backend delta in P0 — the patch round-trip is inherited from `0fe82ab`.)
+
+Steps 5–6 below are P1/P2 and are not yet started. The original spec follows verbatim:
 
 1. **Establish the gap (pre-change).** Generate a batch and confirm the current fuzzer emits **no**
    recursion: `python3 tools/a16_fuzz.py` over ~200 seeds, assert no generated function body contains a
