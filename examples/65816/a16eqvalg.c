@@ -16,20 +16,23 @@
 // so the compares stay independent (no expression-chaining that hoists operands away
 // from their compare-branch).
 //
-// r0 = (g0 == g1)   0x1234 == 0x1234 -> 1   (lda abs; cmp abs)
-// r1 = (g0 == g2)   0x1234 == 0x00FF -> 0
-// r2 = (g0 != g2)   0x1234 != 0x00FF -> 1   (!= as a value)
-// corpus_result = r0 | (r1<<4) | (r2<<8) = 1 | 0 | 0x100 = 0x0101 (host==default==+mos-a16)
+// r0 = (g0 == g1)     0x1234 == 0x1234 -> 1   (g1==g2: lda abs; cmp abs -> CmpBrAbsAbs16)
+// r1 = (g0 == g2)     0x1234 == 0x00FF -> 0
+// r2 = (g0 != g2)     0x1234 != 0x00FF -> 1   (!= as a value)
+// r3 = (g0 == 0x1234) 0x1234 == 0x1234 -> 1   (g==imm: lda abs; cmp #$1234 -> CmpBrAbsImm16)
+// corpus_result = r0 | (r1<<4) | (r2<<8) | (r3<<12)
+//               = 1 | 0 | 0x100 | 0x1000 = 0x1101 (host==default==+mos-a16)
 volatile unsigned short g0 = 0x1234, g1 = 0x1234, g2 = 0x00FF;
-volatile unsigned short r0, r1, r2;
+volatile unsigned short r0, r1, r2, r3;
 volatile unsigned short corpus_result;
 
 int main(void) {
   r0 = (unsigned short)(g0 == g1);
   r1 = (unsigned short)(g0 == g2);
   r2 = (unsigned short)(g0 != g2);
-  corpus_result =
-      (unsigned short)((unsigned)r0 | ((unsigned)r1 << 4) | ((unsigned)r2 << 8));
+  r3 = (unsigned short)(g0 == 0x1234);
+  corpus_result = (unsigned short)((unsigned)r0 | ((unsigned)r1 << 4) |
+                                   ((unsigned)r2 << 8) | ((unsigned)r3 << 12));
   for (;;) {
   }
 }

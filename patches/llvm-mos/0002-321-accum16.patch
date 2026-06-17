@@ -1404,20 +1404,21 @@ index e81487e9c..6f18c7c1a 100644
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 42a94c356..1347ee2cb 100644
+index 42a94c356..56b4d0cb4 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-@@ -352,6 +352,9 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
+@@ -352,6 +352,10 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
    case MOS::CmpBrAbsIdx:
    case MOS::CmpBrIndir:
    case MOS::CmpBrIndirIdx:
 +  case MOS::CmpBrImag16:
 +  case MOS::CmpBrImm16:
 +  case MOS::CmpBrAbsAbs16:
++  case MOS::CmpBrAbsImm16:
      return MI.getOperand(0).getMBB();
    case MOS::JMPIndir:
    case MOS::JMPIdxIndir:
-@@ -388,11 +391,13 @@ bool MOSInstrInfo::analyzeBranch(MachineBasicBlock &MBB,
+@@ -388,11 +392,13 @@ bool MOSInstrInfo::analyzeBranch(MachineBasicBlock &MBB,
      return true;
    if (FirstBR->isConditionalBranch()) {
      if (!FirstBR->memoperands_empty()) {
@@ -1434,7 +1435,7 @@ index 42a94c356..1347ee2cb 100644
          return true;
      }
  
-@@ -928,7 +933,24 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+@@ -928,7 +934,24 @@ void MOSInstrInfo::loadStoreRegStackSlot(
        Instr.addDef(Ptr, RegState::EarlyClobber);
      Instr.addFrameIndex(FrameIndex).addImm(0).addMemOperand(MMO);
    } else {
@@ -1460,19 +1461,20 @@ index 42a94c356..1347ee2cb 100644
          (Reg.isVirtual() &&
           MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
        MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
-@@ -1035,6 +1057,11 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
+@@ -1035,6 +1058,12 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
    case MOS::CmpBrIndirIdx:
      expandCmpBr(Builder);
      break;
 +  case MOS::CmpBrImag16:
 +  case MOS::CmpBrImm16:
 +  case MOS::CmpBrAbsAbs16:
++  case MOS::CmpBrAbsImm16:
 +    expandCmpBr16(Builder);
 +    break;
  
    // Control flow
    case MOS::GBR:
-@@ -1355,6 +1382,59 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
+@@ -1355,6 +1384,60 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
    MI.eraseFromParent();
  }
  
@@ -1490,10 +1492,11 @@ index 42a94c356..1347ee2cb 100644
 +  const Register Flag = MI.getOperand(1).getReg();
 +  const unsigned Op = MI.getOpcode();
 +
-+  const bool LhsAbs = Op == MOS::CmpBrAbsAbs16;
++  const bool LhsAbs = Op == MOS::CmpBrAbsAbs16 || Op == MOS::CmpBrAbsImm16;
 +  unsigned CmpOpc;
 +  switch (Op) {
 +  case MOS::CmpBrImm16:
++  case MOS::CmpBrAbsImm16:
 +    CmpOpc = MOS::CMPImm16;
 +    break;
 +  case MOS::CmpBrAbsAbs16:
@@ -1832,10 +1835,10 @@ index f3eb9549f..4166c9aa8 100644
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
 diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-index 21910cfea..265f80cb6 100644
+index 21910cfea..b85a4bf18 100644
 --- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
 +++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-@@ -359,4 +359,34 @@ let mayLoad = true in {
+@@ -359,4 +359,43 @@ let mayLoad = true in {
    def CmpBrIndirIdx : MOSCmpBr {
      dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, Ac:$l, Imag16:$addr, Yc:$idx);
    }
@@ -1869,9 +1872,18 @@ index 21910cfea..265f80cb6 100644
 +    let Defs = [C, A16, NZ];
 +    dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, addr16:$l, addr16:$r);
 +  }
++  // #321 `g == 0x1234`: near-abs GLOBAL LHS read by `lda abs` (LDAbs16), 16-bit
++  // immediate RHS compared by `cmp #imm` (CMPImm16). expandCmpBr16 -> `LDAbs16 $l;
++  // CMPImm16 $r; BR`. Reachable once the EQ matcher recovers a byte-split constant
++  // (getI16Const) — before that the constant materialized and this never fired.
++  def CmpBrAbsImm16 : MOSCmpBr {
++    let Predicates = [HasAccum16];
++    let Defs = [C, A16, NZ];
++    dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, addr16:$l, i16imm:$r);
++  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..ca2b168e4 100644
+index cbdd54ab2..eaf9b691d 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -2014,7 +2026,36 @@ index cbdd54ab2..ca2b168e4 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -777,6 +880,11 @@ struct CmpNZ_match {
+@@ -762,6 +865,28 @@ static Register getSbcFlagForRegister(const MachineInstr &Sbc, Register Reg) {
+   llvm_unreachable("Could not find register in G_SBC outputs.");
+ }
+ 
++// #321 native s16: recover a 16-bit constant whether it survived as a G_CONSTANT or was
++// byte-split into G_MERGE_VALUES(i8 lo, i8 hi) during legalization — how a 16-bit
++// constant operand of a native EQ/ALU op reaches selection under +mos-a16 (a
++// G_CONSTANT i16 is illegal and is narrowed to bytes). Two non-constant byte loads
++// merged together yield nullopt, so a `g == h` (both variables) is not mistaken for an
++// immediate compare. Shared by the EQ matcher (CmpNZImm16_match) and getImm16Operand.
++static std::optional<int64_t> getI16Const(Register R,
++                                          const MachineRegisterInfo &MRI) {
++  if (auto C = getIConstantVRegValWithLookThrough(R, MRI))
++    return C->Value.getZExtValue() & 0xFFFF;
++  MachineInstr *Def = getDefIgnoringCopies(R, MRI);
++  if (Def && Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
++      Def->getNumOperands() == 3) {
++    auto Lo = getIConstantVRegValWithLookThrough(Def->getOperand(1).getReg(), MRI);
++    auto Hi = getIConstantVRegValWithLookThrough(Def->getOperand(2).getReg(), MRI);
++    if (Lo && Hi)
++      return ((Hi->Value.getZExtValue() & 0xFF) << 8) |
++             (Lo->Value.getZExtValue() & 0xFF);
++  }
++  return std::nullopt;
++}
++
+ // Match criteria common to all Cmp where N or Z are used.
+ struct CmpNZ_match {
+   Register &LHS;
+@@ -777,6 +902,11 @@ struct CmpNZ_match {
      CondMI = DefSrcReg->MI;
      if (CondMI->getOpcode() != MOS::G_SBC)
        return false;
@@ -2026,7 +2067,7 @@ index cbdd54ab2..ca2b168e4 100644
  
      auto CInConst =
          getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
-@@ -789,6 +897,68 @@ struct CmpNZ_match {
+@@ -789,6 +919,70 @@ struct CmpNZ_match {
    }
  };
  
@@ -2064,11 +2105,13 @@ index cbdd54ab2..ca2b168e4 100644
 +  bool match(const MachineRegisterInfo &MRI, Register CondReg) {
 +    if (!CmpNZ16_match::match(MRI, CondReg))
 +      return false;
-+    auto RHSConst =
-+        getIConstantVRegValWithLookThrough(CondMI->getOperand(6).getReg(), MRI);
++    // Recover the constant even when legalization byte-split it into G_MERGE_VALUES
++    // (a G_CONSTANT i16 is illegal under +mos-a16) — without this `g == 0x1234` and
++    // `*p == 0x1234` fall to CmpBrImag16 and materialize the constant into Imag16.
++    auto RHSConst = getI16Const(CondMI->getOperand(6).getReg(), MRI);
 +    if (!RHSConst)
 +      return false;
-+    RHS = RHSConst->Value.getZExtValue() & 0xFFFF;
++    RHS = *RHSConst & 0xFFFF;
 +    return true;
 +  }
 +};
@@ -2095,7 +2138,7 @@ index cbdd54ab2..ca2b168e4 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -968,6 +1138,11 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
+@@ -968,6 +1162,11 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
    return {LHS, Addr, Idx, Flag, Load, AA};
  }
  
@@ -2107,7 +2150,7 @@ index cbdd54ab2..ca2b168e4 100644
  bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
  
-@@ -991,6 +1166,56 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -991,6 +1190,73 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
@@ -2118,6 +2161,23 @@ index cbdd54ab2..ca2b168e4 100644
 +  Register RHS16;
 +  int64_t RHS16Const;
 +  if (mi_match(CondReg, MRI, m_CmpNZImm16(LHS, RHS16Const, Flag))) {
++    // #321 `g == 0x1234`: fold a single-use near-abs GLOBAL LHS into `lda abs`
++    // (CmpBrAbsImm16) instead of materializing it into an Imag16 pair. Same 1-to-1
++    // volatile-safe fold as CmpBrAbsAbs16; the dead 16-bit G_SBC + COPY are cleaned by
++    // InstructionSelect's isTriviallyDead.
++    if (MachineInstr *LdL = foldableAbsLoad16(LHS, MI, MRI)) {
++      auto Branch = Builder.buildInstr(MOS::CmpBrAbsImm16)
++                        .addMBB(Tgt)
++                        .addUse(Flag, RegState::Undef)
++                        .addImm(FlagVal)
++                        .add(LdL->getOperand(1))
++                        .addImm(RHS16Const)
++                        .cloneMemRefs(*LdL);
++      constrainSelectedInstRegOperands(*Branch, TII, TRI, RBI);
++      LdL->eraseFromParent();
++      MI.eraseFromParent();
++      return true;
++    }
 +    auto Branch = Builder.buildInstr(MOS::CmpBrImm16)
 +                      .addMBB(Tgt)
 +                      .addUse(Flag, RegState::Undef)
@@ -2164,7 +2224,7 @@ index cbdd54ab2..ca2b168e4 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1091,12 +1316,99 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1357,99 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -2264,7 +2324,7 @@ index cbdd54ab2..ca2b168e4 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1928,6 +2240,804 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1928,6 +2281,795 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    return selectGeneric(MI);
  }
  
@@ -2679,18 +2739,9 @@ index cbdd54ab2..ca2b168e4 100644
 +// the *Imm16 forms instead of materializing the constant into an Imag16 pair.
 +static std::optional<int64_t> getImm16Operand(Register R,
 +                                              MachineRegisterInfo &MRI) {
-+  if (auto C = getIConstantVRegValWithLookThrough(R, MRI))
-+    return C->Value.getZExtValue() & 0xFFFF;
-+  MachineInstr *Def = getDefIgnoringCopies(R, MRI);
-+  if (Def && Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
-+      Def->getNumOperands() == 3) {
-+    auto Lo = getIConstantVRegValWithLookThrough(Def->getOperand(1).getReg(), MRI);
-+    auto Hi = getIConstantVRegValWithLookThrough(Def->getOperand(2).getReg(), MRI);
-+    if (Lo && Hi)
-+      return ((Hi->Value.getZExtValue() & 0xFF) << 8) |
-+             (Lo->Value.getZExtValue() & 0xFF);
-+  }
-+  return std::nullopt;
++  // Shared with the EQ matcher (CmpNZImm16_match): direct G_CONSTANT or a byte-split
++  // G_MERGE_VALUES(i8 lo, i8 hi). See getI16Const.
++  return getI16Const(R, MRI);
 +}
 +
 +// #321 Increment 1d-retry: select a native s16 ALU op `%dst = G_OP %a, %b` whose
@@ -3070,7 +3121,7 @@ index cbdd54ab2..ca2b168e4 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..4de6013f5 100644
+index 212ede1a0..0a31d637e 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -3252,7 +3303,7 @@ index 212ede1a0..4de6013f5 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1270,7 +1345,78 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1270,7 +1345,92 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -3307,20 +3358,28 @@ index 212ede1a0..4de6013f5 100644
 +    return matchAbsoluteAddressing(MRI, Def->getOperand(1).getReg()).has_value();
 +  };
 +  // v3: a both-global s16 equality-as-value (`g1 == g2`) goes native and folds each
-+  // operand in place via `lda abs; cmp abs` (selectBrCondImm -> CmpBrAbsAbs16),
-+  // turning the blanket-native Imag16 round-trip the spike measured into a win.
-+  // Mixed global-vs-register/local stays 8-bit (only one operand folds — the other
-+  // would force a spill). The `g1 == 0x1234` case is deferred: the 16-bit constant is
-+  // byte-split (G_MERGE_VALUES) before selection so it can't be folded into `cmp #imm`
-+  // (the same reason the existing CmpBrImm16 never fires) — see the v3 plan's
-+  // Follow-ups. Both globals single-use => the fold is the 1-to-1 volatile-safe rewrite.
++  // operand in place via `lda abs; cmp abs` (selectBrCondImm -> CmpBrAbsAbs16), and a
++  // global-vs-nonzero-immediate (`g == 0x1234`) folds the global LHS via `lda abs` and
++  // the constant via `cmp #imm` (-> CmpBrAbsImm16) — turning the blanket-native Imag16
++  // round-trip the spike measured into a win. Mixed global-vs-register/local stays
++  // 8-bit (only one operand folds — the other would force a spill); `g == 0` stays on
++  // the G_CMPZ path (!RHSIsZero / !LHSIsZero). The constant is still a plain G_CONSTANT
++  // here (it is byte-split only later), so m_ICst sees it; the selector recovers the
++  // byte-split form via getI16Const. Single-use => 1-to-1 volatile-safe fold.
++  int64_t CstTmp;
++  const bool RHSIsCst = mi_match(RHS, MRI, m_ICst(CstTmp));
++  const bool LHSIsCst = mi_match(LHS, MRI, m_ICst(CstTmp));
++  const bool LHSIsZero = mi_match(LHS, MRI, m_SpecificICst(0));
 +  const bool BothGlobal =
 +      isFoldableAbsS16Load(LHS) && isFoldableAbsS16Load(RHS);
++  const bool GlobalVsImm =
++      (isFoldableAbsS16Load(LHS) && RHSIsCst && !RHSIsZero) ||
++      (isFoldableAbsS16Load(RHS) && LHSIsCst && !LHSIsZero);
 +  const bool NativeS16Eq =
 +      STI.hasAccum16() && Type == LLT::scalar(16) && Pred == CmpInst::ICMP_EQ &&
 +      !RHSIsZero &&
 +      (isIndirectS16Load(LHS) || isIndirectS16Load(RHS) || // v1: indirect-load operand
-+       BothGlobal ||                                       // v3: abs-fold both globals
++       BothGlobal || GlobalVsImm ||                        // v3: abs-fold globals
 +       all_of(MRI.use_instructions(Dst), [](const MachineInstr &U) {
 +         return U.getOpcode() == MOS::G_BRCOND_IMM;
 +       }));
@@ -3328,11 +3387,17 @@ index 212ede1a0..4de6013f5 100644
 +      STI.hasAccum16() && Type == LLT::scalar(16) &&
 +      (Pred == CmpInst::ICMP_UGE || NativeS16Eq);
 +
++  // #321 canonicalization: put a lone foldable-abs global on the LHS (read by `lda
++  // abs`) and any constant on the RHS (`cmp #imm`), so the CmpBrAbsImm16 fold fires for
++  // `0x1234 == g` too. EQ's Z is symmetric under operand swap (a-b==0 iff b-a==0).
++  if (NativeS16Eq && isFoldableAbsS16Load(RHS) && !isFoldableAbsS16Load(LHS))
++    std::swap(LHS, RHS);
++
 +  if (Type != S8 && !NativeS16) {
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,16 +1487,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,16 +1501,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -3357,7 +3422,7 @@ index 212ede1a0..4de6013f5 100644
      if (!isNZUseLegal(Dst, MRI))
        Z = buildNZSelect(Z, Builder);
      Builder.buildCopy(Dst, Z);
-@@ -1358,8 +1510,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1358,8 +1524,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {
@@ -3370,7 +3435,7 @@ index 212ede1a0..4de6013f5 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1601,14 +1756,86 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1601,14 +1770,86 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
  
@@ -3458,7 +3523,7 @@ index 212ede1a0..4de6013f5 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1645,6 +1872,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1645,6 +1886,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);

@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/efce68f) | #321 native s16 EQ-as-value v3: fold both-global `g1 == g2` to `lda abs; cmp abs` (−48 B) |
+
+<!--history-meta v1
+efce68f	author	Will Norris
+efce68f	added	352
+efce68f	deleted	0
+efce68f	files	1
+efce68f	body	Building on v1 (indirect-load operand), an s16 `g1 == g2` consumed as a VALUE\n(and the branch `if (g1 == g2)`) now reads BOTH globals in place —\n`rep; lda abs g1; cmp abs g2; sep; beq/bne` + 0/1 — instead of round-tripping each\nthrough an Imag16 pair (the blanket-native form the v1 spike measured as +4 B in\nisolation) or narrowing to the 8-bit cpx/cmp chain.\n\nMirrors selectSbc16's a16abscmp fold on the EQ branch-pseudo path:\n- new pseudo CmpBrAbsAbs16 (MOSInstrPseudos.td)\n- gate BothGlobal via isFoldableAbsS16Load ×2 (single-use) in legalizeICmp\n- fold in selectBrCondImm's m_CmpNZImag16 block (erases the two folded\n  G_LOAD16_ABS; the dead COPY + pure G_SBC are removed by isTriviallyDead)\n- expandCmpBr16 -> LDAbs16; CMPAbs16; BR (memrefs cloned through)\n- analyzeBranch now scans ALL memrefs for volatility (CmpBrAbsAbs16 carries two)\n\nMeasured −48 B (−24%): a16eqvalg .text.main 0x9a vs the gate-disabled 8-bit\nbaseline 0xca — confirming the spike's +4/+12 "regressions" were isolated-leaf\nartifacts (in 16-bit-ambient code even the non-folded native form beats 8-bit).\n\n`g1 == 0x1234` deferred: the 16-bit constant is byte-split (G_MERGE_VALUES) before\nselection, blocking CmpBrAbsImm16 and the dormant CmpBrImm16 alike — needs a\nCmpNZ16 constant-through-merge fix (would also help v1's `*p == c`). See the plan.\n\nNew examples/65816/a16eqvalg.c + dev/a16eqvalg.sh (native disasm gate + 0x0101\nhost==default==+mos-a16 on MAME + bsnes-jg). Stale gates in a16eq (branch) and\na16eqval (value) updated — v3 improved their global compares from cmp zp to\ncmp abs/long (a16eqval's byte-wise stopgap is now superseded).\n\nBackend source rides patches/llvm-mos/0002 (vendor/ is gitignored, regenerated via\ndev/regen-patch.sh). Verified: a16 suite 36/36, corpus 7/7, fuzz 50/50\n(0 mismatch/crash/error), -verify-machineinstrs clean, 0002 round-trips.\n\nPlan: docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

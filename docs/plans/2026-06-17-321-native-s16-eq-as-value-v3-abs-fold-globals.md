@@ -333,12 +333,11 @@ Per the indirect-load / spike lesson, **measure bytes-first under `-Os`, in 16-b
 
 ## Follow-ups (deferred, documented)
 
-- **`g1 == 0x1234` (global vs immediate)** — the headline that's still on 8-bit. Blocked because the
-  16-bit constant is byte-split into `G_MERGE_VALUES(i8,i8)` before selection, so `m_CmpNZImm16` can't
-  recover it (the existing `CmpBrImm16` is dormant for the same reason — verified `*p == const` and
-  `if (g == const)` both materialize). Fix: teach the `CmpNZ16` matcher to reconstruct the i16 constant
-  through `G_MERGE_VALUES` of two byte constants — this lights up `CmpBrImm16` (helping v1's `*p == c`)
-  and unblocks a `CmpBrAbsImm16`. A self-contained follow-up worth its own plan.
+- **`g1 == 0x1234` (global vs immediate)** — ~~deferred (the 16-bit constant is byte-split before
+  selection)~~ **DONE 2026-06-17** in
+  [eq-imm constant-through-merge](2026-06-17-321-native-s16-eq-imm-constant-through-merge.md): the EQ
+  matcher now recovers the byte-split constant (`getI16Const`), `g == 0x1234` folds via `CmpBrAbsImm16`
+  (`lda abs; cmp #imm`), and the dormant `CmpBrImm16` is lit up for v1's `*p == c` + `if (g == c)`.
 - **Mixed `g == local` / chained-cross-block** — only one operand folds (or the loads are hoisted into a
   dominating block); folding a volatile load cross-block is unsafe. These stay native-but-materialized
   (a win in ambient, not a regression). v2 (computed/`Imag16`-LHS) is the natural home for the mixed shape.
