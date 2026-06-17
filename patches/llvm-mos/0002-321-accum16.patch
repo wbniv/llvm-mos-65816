@@ -3121,7 +3121,7 @@ index cbdd54ab2..eaf9b691d 100644
    unsigned Opcode;
    switch (MI.getOpcode()) {
 diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-index fbedd8d46..5078c02bc 100644
+index fbedd8d46..d329144e2 100644
 --- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 +++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 @@ -48,6 +48,7 @@ public:
@@ -3140,61 +3140,111 @@ index fbedd8d46..5078c02bc 100644
      Changed |= tailJMP(MBB);
    }
    return Changed;
-@@ -398,6 +400,61 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
+@@ -398,6 +400,111 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
    return Changed;
  }
  
-+// #321 A16-threading (Phase 1): drop the redundant Imag16 round-trip between two
-+// dependent native-s16 ops. Each native s16 op is self-contained (LDAImag16 ->
-+// OP -> STAImag16, value home = Imag16 between ops — the 1d-retry coalescer-safe
-+// invariant), so a dependent chain stores each intermediate and immediately
-+// reloads it:
++// #321 A16-threading: drop the redundant Imag16 round-trip between dependent
++// native-s16 ops. Each native s16 op is self-contained (LDAImag16 -> OP ->
++// STAImag16, value home = Imag16 between ops — the 1d-retry coalescer-safe
++// invariant), so a dependent chain stores each intermediate and reloads it:
 +//     $rsN = STAImag16 $a16        ; store the value into its Imag16 home
-+//     $a16 = LDAImag16 $rsN        ; reload it — but STA didn't touch $a16!
-+// The reload is redundant ($a16 already holds the value); erase it, and if the
-+// home is dead afterward (its only reader was that reload) erase the store too —
-+// the value then threads through $a16 across the ops (e.g. lda;adc;and;sbc;sta).
++//     $a16 = LDAImag16 $rsN        ; reload it — but $a16 still holds the value!
++// The reload is redundant; erase it, and if the home is dead afterward (only the
++// reload read it, with no reader in between) erase the store too — the value then
++// threads through $a16 across the ops (e.g. lda;adc;and;sbc;sta).
 +//
-+// This is a POST-RA peephole on purpose: RA has already chosen $a16 for both
-+// sides, so collapsing the pair cannot reintroduce the 1d coalescer crash (an
-+// 8-bit value coalescing into A16). LDAImag16/STAImag16 model no NZ/flag def, so
-+// erasing them is flag-safe. Strict adjacency keeps it conservative — $a16 is
-+// provably unchanged between the two, and a missed non-adjacent case only forgoes
-+// a win, never miscompiles.
++// POST-RA on purpose: RA has already chosen $a16 for both sides, so collapsing the
++// pair cannot reintroduce the 1d coalescer crash (an 8-bit value coalescing into
++// A16). LDAImag16/STAImag16 model no NZ/flag def, so erasing them is flag-safe.
++//
++// Phase 1.5: the store and reload need NOT be adjacent — intervening instructions
++// are allowed as long as none rewrites $a16 (modifiesRegister(A16) also catches
++// 8-bit sub-A writes and xba; calls/side-effect ops bail explicitly) or overwrites
++// the home $rsN. A *read* of $a16 between (e.g. a second `sta gg`) is fine; we just
++// clear stale $a16 kills across the gap so it stays live to the next op. A missed
++// case only forgoes a win, never miscompiles.
 +bool MOSLateOptimization::threadAccum16(MachineBasicBlock &MBB) const {
++  const auto *TRI = MBB.getParent()->getSubtarget().getRegisterInfo();
 +  bool Changed = false;
-+  MachineInstr *PrevSTA = nullptr; // the immediately-preceding STAImag16, else null
++
++  // Stores whose value still provably resides in $a16, awaiting a redundant reload.
++  struct Pend { Register Home; MachineInstr *Sta; bool HomeRead; };
++  SmallVector<Pend, 4> Pending;
++  auto indexOf = [&](Register H) -> int {
++    for (unsigned I = 0, E = Pending.size(); I != E; ++I)
++      if (Pending[I].Home == H)
++        return (int)I;
++    return -1;
++  };
 +
 +  for (MachineInstr &MI : make_early_inc_range(MBB)) {
-+    // Debug values don't break adjacency or touch $a16.
 +    if (MI.isDebugInstr())
 +      continue;
 +
-+    if (MI.getOpcode() == MOS::LDAImag16 && PrevSTA) {
-+      Register LdVal = MI.getOperand(0).getReg();      // Ac16 def  ($a16)
-+      Register LdHome = MI.getOperand(1).getReg();     // Imag16 use ($rsN)
-+      Register StHome = PrevSTA->getOperand(0).getReg(); // Imag16 def ($rsN)
-+      Register StVal = PrevSTA->getOperand(1).getReg();  // Ac16 use  ($a16)
-+
-+      if (LdHome == StHome && LdVal == StVal) {
-+        // The home dies at the reload iff this load was its last use; then the
-+        // store is dead too. (Post-RA kill flags are maintained by the allocator.)
-+        bool HomeDead = MI.getOperand(1).isKill();
-+        MI.eraseFromParent(); // the reload is always redundant
++    if (MI.getOpcode() == MOS::LDAImag16) {
++      Register Home = MI.getOperand(1).getReg();           // Imag16 use ($rsN)
++      int Idx = indexOf(Home);
++      if (Idx >= 0 &&
++          MI.getOperand(0).getReg() == Pending[Idx].Sta->getOperand(1).getReg()) {
++        // Redundant reload: $a16 already holds Home's value.
++        MachineInstr *Sta = Pending[Idx].Sta;
++        Register Acc = MI.getOperand(0).getReg();          // $a16
++        bool EraseStore = MI.getOperand(1).isKill() && !Pending[Idx].HomeRead;
++        // $a16 now stays live from the store across the gap to the next op — clear
++        // any stale kills on it so the verifier/later passes see it live throughout.
++        for (auto J = MachineBasicBlock::iterator(Sta),
++                  E = MachineBasicBlock::iterator(MI);
++             J != E; ++J)
++          J->clearRegisterKills(Acc, TRI);
++        MI.eraseFromParent();
 +        Changed = true;
-+        if (HomeDead) {
-+          PrevSTA->eraseFromParent();
-+        } else {
-+          // The store stays for the home's other readers, but $a16 must now stay
-+          // live across it to reach the next op — drop the stale kill on its use.
-+          PrevSTA->getOperand(1).setIsKill(false);
++        if (EraseStore) {
++          Sta->eraseFromParent();
++          Pending.erase(Pending.begin() + Idx); // store gone -> stop tracking
 +        }
-+        PrevSTA = nullptr;
++        // Else keep BOTH the store and the pending entry: the value still resides
++        // in $a16 *and* the home, so a later reload of the same home is also
++        // redundant (this is the multi-reload case, e.g. `sta h; <store h>; lda h;
++        // … ; lda h`). $a16 is unchanged, so other pendings stay valid too.
 +        continue;
 +      }
++      // Genuine reload: it rewrites $a16, so no resident value survives.
++      Pending.clear();
++      continue;
 +    }
 +
-+    PrevSTA = (MI.getOpcode() == MOS::STAImag16) ? &MI : nullptr;
++    if (MI.getOpcode() == MOS::STAImag16) {
++      // A store of the current $a16 value. STA reads $a16 (doesn't write it), so
++      // prior pendings keep holding the same resident value.
++      Register Home = MI.getOperand(0).getReg();           // Imag16 def ($rsN)
++      if (int Old = indexOf(Home); Old >= 0)
++        Pending.erase(Pending.begin() + Old);
++      Pending.push_back({Home, &MI, /*HomeRead=*/false});
++      continue;
++    }
++
++    // Any other instruction. Bail the whole resident set if $a16 is rewritten
++    // (incl. 8-bit sub-A / xba via aliasing -> modifiesRegister), clobbered by a
++    // call (regmask), or touched opaquely by inline asm. A volatile *store* only
++    // READS $a16, so it's fine to thread across (the store stays put; only the
++    // non-volatile reload of the Imag16 temp is dropped) — a volatile *load* would
++    // write $a16 and is caught by modifiesRegister above.
++    if (MI.modifiesRegister(MOS::A16, TRI) || MI.isCall() || MI.isInlineAsm()) {
++      Pending.clear();
++      continue;
++    }
++    // $a16 untouched: drop any home this instruction overwrites; note reads (a read
++    // means the store is still needed and may not be erased).
++    for (unsigned I = 0; I != Pending.size();) {
++      if (MI.modifiesRegister(Pending[I].Home, TRI)) {
++        Pending.erase(Pending.begin() + I);
++      } else {
++        if (MI.readsRegister(Pending[I].Home, TRI))
++          Pending[I].HomeRead = true;
++        ++I;
++      }
++    }
 +  }
 +  return Changed;
 +}
