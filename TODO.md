@@ -562,6 +562,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        in the plan's own Out-of-scope, gated behind the same #415 reconciliation + the broader #321 effort.
      Nothing open here. -->
 <!-- triaged 2026-06-17: pre-implementation plan — verification steps require the implementation to exist first; tracked as the #321 stage-1 xy16 TODO item (Open) → fp:b24d6be9c36ef6e5 -->
-- [ ] **(triage)** No change to the A/X return convention (its plan is test+docs-only and unaffected). — _from [2026-06-18-321-seed42-legalizeicmp-swap-fix.md](docs/plans/2026-06-18-321-seed42-legalizeicmp-swap-fix.md)_  <!-- fp:27bd502017f767b4 -->
-- [ ] **(triage)** The native-s16 EQ fold itself is unchanged for `+mos-a16` (the fix only stops the swap from firing when — _from [2026-06-18-321-seed42-legalizeicmp-swap-fix.md](docs/plans/2026-06-18-321-seed42-legalizeicmp-swap-fix.md)_  <!-- fp:5d3100a79ceeab83 -->
+<!-- triaged 2026-06-18: both are "Out of scope" NON-GOALS from the seed-42 fix plan (clarifying the A/X
+     return convention and the +mos-a16 EQ fold are UNCHANGED) — not deferred work. The fix is complete +
+     verified (a16 50/50, corpus 7/7, fuzz 50/50). fp:27bd502017f767b4 fp:5d3100a79ceeab83 -->
 <!-- END auto-captured-deferrals -->
