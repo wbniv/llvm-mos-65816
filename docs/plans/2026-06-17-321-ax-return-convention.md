@@ -171,8 +171,8 @@ guess was the second wrong attribution corrected here; the bisect is now definit
 `NativeS16Eq`; the first was missing it.) One-line fix: gate the first swap on `NativeS16Eq`
 (= `hasAccum16 && Pred==EQ && S16`). Verified: seed-42 default + `+mos-a16` → `0xEC0D`; a16 suite **50/50**,
 corpus **7/7**, **`fuzz 50 1` → 50/50, 0 mismatch**; `a16eqvalmg` still native + `0x0111`. `0002` regenerated
-(only `MOSLegalizerInfo.cpp` changed, no foreign hunks, round-trips). See `TODO.md` Done
-[`321-seed42-legalizeicmp-swap`].
+(only `MOSLegalizerInfo.cpp` changed, no foreign hunks, round-trips). Full write-up:
+[fix plan](2026-06-18-321-seed42-legalizeicmp-swap-fix.md); `TODO.md` Done [`321-seed42-legalizeicmp-swap`].
 
 **Step 3 verdict:** non-breaking confirmed for this change (the a16ret plan itself is test+docs-only, no
 `vendor/` change). The fuzzer's seed-42 mismatch it surfaced was a real regression in committed patch `0002`,

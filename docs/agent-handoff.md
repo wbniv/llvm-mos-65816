@@ -50,6 +50,32 @@ across host/default/a16 on both emulators, often with a disasm gate, e.g. native
 `cpx/cpy`), wired into `dev/run.sh`, and is exercised by the fuzzer (`tools/a16_fuzz.py`). Use
 `examples/65816/a16eqval*.c` + `dev/a16eqval*.sh` as templates.
 
+**Gating discipline — the fuzzer guards the DEFAULT build too.** Every `+mos-a16` change must be gated so it
+*cannot* alter non-`+mos-a16` codegen — and that includes **operand canonicalizations / helper predicates**,
+not just instruction defs and selection. A green a16 suite is **not** sufficient: the differential fuzzer
+compiles each program *both* default and `+mos-a16` and compares to the host oracle, so an a16 helper that
+leaks into the 8-bit path surfaces as a `default@MAME ≠ host` mismatch. Concrete bite (seed-42, fixed in
+`0002` 2026-06-18): an EQ-only operand swap in `legalizeICmp` was guarded by a predicate that did **not**
+check `hasAccum16` (nor `Pred==EQ`), so a non-EQ `<`/`>` compare in the *default* build hit
+`std::swap(LHS, RHS)` and reversed the comparison →
+[plan](plans/2026-06-18-321-seed42-legalizeicmp-swap-fix.md). Gate on the **same predicate that enables the
+feature behavior** (e.g. `NativeS16Eq` = `hasAccum16 && Type==S16 && Pred==ICMP_EQ`), not a looser
+operand-shape test.
+
+**Attributing a fuzzer/regression finding to a patch (or single hunk) — isolated-worktree + ccache
+bisection.** When a differential mismatch must be pinned to a specific patch/hunk and MIR diffing is
+inconclusive (state-sensitive bug, byte-identical post-legalize IR), bisect with *builds*: spin a detached
+worktree of `vendor/llvm-mos` at pristine upstream (`git -C vendor/llvm-mos worktree add --detach <dir>
+<HEAD-sha>`), `git apply` a chosen *subset* of `patches/llvm-mos/*.patch` hunks (filter a patch to specific
+files/hunks with `awk` on the `diff --git` / `@@` headers; revert one with `git apply -R`), build into a
+**separate** `build/` dir with `CCACHE_DIR=$PWD/build/.ccache` reused (each incremental rebuild is minutes,
+not the 30–90 min cold build — LLVM TUs hit ccache, only the changed MOS target recompiles + relinks), and
+run the one-program differential (`dev/run.sh fuzz 1 <seed>`) on each. The unpatched `/opt/llvm-mos` in the
+dev container is the correct-value oracle. **Never** build a subset into the shared `build/llvm-mos` (it
+clobbers the toolchain other agents use). Trust the build result over any plausible mechanism — two
+"obvious" causes (a concurrent edit; the register topology) were each refuted this way before the real
+one-line cause was found.
+
 ## Measurement methodology (size/speed claims)
 
 - Compare **native-`+mos-a16` vs 8-bit-`+mos-a16` on the *same* C shape** — toggle only the feature gate.

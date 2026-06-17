@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/51a5bae) | #321 fix: gate legalizeICmp EQ-canonicalization swap on NativeS16Eq (seed-42 default-build miscompile) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/2f9d6d1) | #321 triage: bisect seed-42 regression to patch 0002 (necessary + sufficient) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/a2b9fcf) | #321 triage: correct seed-42 attribution (committed patches, not concurrent edits) + fix TODO merge break |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/514bd4f) | #321 CC: lock A(low)/X(high) return convention as a tested ABI invariant |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/7ee904f) | #321 docs: calling-convention decision analysis + plan to lock the A/X return convention |
 
 <!--history-meta v1
+51a5bae	author	Will Norris
+51a5bae	added	14
+51a5bae	deleted	4
+51a5bae	files	1
+51a5bae	body	The Tier-1 fuzzer (dev/run.sh fuzz 1 42, surfaced during the a16ret\nverification) miscompiled corpus_result to 0xB226 (correct 0xEC0D) in BOTH\nthe default 8-bit AND +mos-a16 builds — a real regression in committed patch\n0002, in a code path the non-a16 build also takes.\n\nRoot cause: in MOSLegalizerInfo::legalizeICmp, the first of two\nEQ-canonicalization operand swaps was guarded only by `ComputedVsGlobal`:\n\n    if (ComputedVsGlobal && isFoldableAbsS16Load(LHS) && isImag16Resident(RHS))\n      std::swap(LHS, RHS);\n\n`ComputedVsGlobal` does NOT require hasAccum16 and there is no Pred==EQ check,\nso in the DEFAULT 8-bit build a non-EQ compare (`<` / `>`) whose operands are a\ncomputed-s16 value vs. a foldable absolute global hit the swap and REVERSED the\ncomparison operands -> wrong result. The swap is only valid for EQ (whose Z is\nsymmetric: a-b==0 iff b-a==0). The second swap was correctly gated on\nNativeS16Eq; the first was missing that gate (governing lesson #2: gate so a\nmisclassification only ever misses a win, never regresses).\n\nFix (one line): gate the first swap on NativeS16Eq (= hasAccum16 && S16 &&\nPred==EQ), so it fires only in the intended native-a16 EQ-canonicalization path.\n\nBisected to this line via ~20 isolated ccache-reuse builds: the register\ntopology (A16/B/Ac16) is innocent (upstream+topology -> 0xEC0D), as are the\ntd/feature-infra, selector, InstrInfo, LateOpt, RegisterInfo, the\nunconditionally-added InsertREPSEP pass (early-exits !hasAccum16), and the\nlegalizer constructor rules; only legalizeICmp flips it.\n\nVerified: seed-42 default + +mos-a16 -> 0xEC0D; a16 suite 50/50, corpus 7/7,\nfuzz 50 1 -> 50/50 (0 mismatch); a16eqvalmg still native (cmp long fold) and\n0x0111, -verify-machineinstrs clean. 0002 regenerated via dev/regen-patch.sh\n(round-trips; only MOSLegalizerInfo.cpp changed, no foreign hunks, F4 stays in\n0003).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2f9d6d1	author	Will Norris
 2f9d6d1	added	6
 2f9d6d1	deleted	3
