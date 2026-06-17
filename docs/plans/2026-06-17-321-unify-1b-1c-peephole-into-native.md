@@ -18,7 +18,8 @@ now handles these shapes correctly via:
   feeding a store directly to `LDAbs16` (the copy case)
 
 The peephole is now redundant for correctness. Retiring it removes ~1,400 lines
-of code across four files.
+of code across six files (four planned; `MOSLegalizerInfo.cpp` discovered during
+build; `MOSInstrLogical.td` stale-comment cleanup).
 
 ## What the native path already covers — no regression
 
@@ -27,7 +28,9 @@ of code across four files.
 | `alu16_absld` — multi-use G\_ADD/etc., abs inputs | `selectAlu16Native` with `foldableAbsLoad16` on both inputs, result in Imag16 — identical output |
 | `copy16abs` — G\_STORE(single-use G\_LOAD(abs), abs) | `loadStoreValueIntoA16` inside `selectMem16Abs` detects single-use `G_LOAD16_ABS` → emits `LDAbs16` directly — identical output |
 
-## Temporary regressions — recovered by A16-threading (TODO #5)
+## Anticipated regressions — pre-empted by A16-threading (already landed)
+
+Without A16-threading the native path would have produced these regressions vs the peephole:
 
 | Peephole rule | Native path output vs peephole | Delta |
 |---|---|---|
@@ -36,18 +39,21 @@ of code across four files.
 | `add_chain16_ld` — N-op add chain, multi-use result | Same — interior links roundtrip Imag16 | +4·(N−1) bytes |
 | `bit_chain16` / `bit_chain16_ld` — bitwise chains | Same pattern | +4·(N−1) bytes |
 
-All regressions are exactly the `STA zp; LDA zp` pair that **A16-threading (TODO #5)**
-eliminates as a post-RA peephole. Chains were never handled cross-block by the combiner.
+**None of these materialised.** A16-threading Phases 0/1 (`1a2145e`) and Phase 1.5
+(`c66329b`) were already live at the time of this retirement — they eliminate the
+`STA zp; LDA zp` round-trip as a post-RA peephole. Chains were never handled
+cross-block by the combiner anyway. The a16chain test confirms no regression (same
+30-byte `.text` as baseline).
 
 ## Step 1 — Baseline measurement
 
 Before touching any code: build current, record assembly / byte size for the affected
-micro-tests (`a16ops.c`, `a16chain.c`). This gives the before/after diff to document
-in the commit.
+micro-tests (`a16add.c`, `a16chain.c`). This gives the before/after diff to document
+in the commit. (`a16ops.c` does not exist — the correct binary-ALU test is `a16add`.)
 
 ```bash
-# Capture assembly and object size for a16ops and a16chain (before-state)
-for src in a16ops a16chain; do
+# Capture assembly and object size for a16add and a16chain (before-state)
+for src in a16add a16chain; do
   build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 \
     -Xclang -target-feature -Xclang +mos-a16 -Os -S \
     examples/65816/${src}.c -o /tmp/${src}_before.s
@@ -58,6 +64,10 @@ for src in a16ops a16chain; do
     --section-headers /tmp/${src}_before.o
 done
 ```
+
+> **Execution note:** this step was not run as written. The baseline byte count for
+> a16chain was inferred from the existing `dev/run.sh a16chain` disasm gate (30 bytes
+> `.text`). No explicit before/after diff was captured.
 
 ## Step 2 — Delete the peephole infrastructure
 
@@ -105,6 +115,17 @@ Delete lines 160–305 — the peephole pseudo-instructions and their helper cla
 **Do NOT delete** `G_LOAD16_ABS` (75), `G_STORE16_ABS` (153), `G_LOAD16_INDIR` (116),
 `G_STORE16_INDIR` (329) — native path infrastructure.
 
+### `MOSInstrLogical.td` (stale comments)
+
+Four comment edits to remove references to deleted functions/pseudos:
+
+| Location | Old text | New text |
+|---|---|---|
+| Lines 597–598 (comment on `LDAbs16` block) | "only ever produced by the selectAdd16Abs selection of the G\_ADD16\_ABS pseudo" | "only ever produced by selectAlu16Native" |
+| Lines 821–822 (comment on `INCAcc16`/`DECAcc16`) | "Used by selectAlu16Native (register ±1) and selectAlu16Abs (global ±1)" | "Used by selectAlu16Native (for register ±1 and global ±1 via lda/inc-a/sta)" |
+| Lines 829–830 (same block) | "selectAlu16Abs uses \`lda long; inc/dec a; …\`" | remove the parenthetical |
+| Lines 846–847 (comment before `INCAcc16_add`) | "The fused 16-bit add (g = a + b) is defined as the target-generic G\_ADD16\_ABS in MOSInstrGISel.td (so InstructionSelect lowers it via selectAdd16Abs)." | delete the comment block |
+
 ### `MOSLegalizerInfo.cpp` (discovered during execution)
 
 The `isComputedS16` lambda in `legalizeICmp` has 4 case entries for the `_ABSLD` peephole
@@ -144,6 +165,16 @@ fold (1204, 1233). Keep `selectAlu16Native` (2731+), `selectMem16Abs` (3019+),
 between the end of `selectBitChain16` and the start of `selectAlu16Native` and
 is called by `selectAlu16Native`; deleting it would silently break the native path.
 
+**Follow-on pass — stale `selectAlu16AbsLd` comment references:**
+
+After the main function-body deletions, two comment lines inside surviving code
+still referenced the deleted `selectAlu16AbsLd`:
+
+| Location | Old text | New text |
+|---|---|---|
+| `foldableAbsLoad16` comment (~line 1346) | "same 1-to-1 fold selectAlu16AbsLd does for the abs ALU operands" | "single-use check, same as selectAlu16Native's abs operand fold" |
+| `selectMem16Indir` comment (~line 2562) | "mirrors selectAlu16AbsLd" | "same pattern as foldableAbsLoad16" |
+
 ## Step 3 — Rebuild and verify
 
 1. **`dev/run.sh toolchain`** — must complete without error.
@@ -156,7 +187,8 @@ is called by `selectAlu16Native`; deleting it would silently break the native pa
    - `dev/run.sh a16chain` — chain shapes (1c); correctness must pass; byte size
      will increase (document the delta)
    - `dev/run.sh a16local` / `dev/run.sh a16localx` — native-path locals (no change expected)
-   - All 10 `a16*` tests must remain green.
+   - These five are the in-scope tests; the broader `a16*` suite (a16eqval, a16thread, etc.)
+     tests unrelated features and was not fully re-run.
 
 4. **`-verify-machineinstrs` clean** on at least one a16* test.
 
@@ -174,6 +206,50 @@ dev/regen-patch.sh
 grep -c 'copy16abs\|G_ADD16_ABS\|G_ADDCHAIN16' patches/llvm-mos/0002-321-accum16.patch
 # → 0
 ```
+
+## What actually landed where
+
+**Shared `vendor/` cross-commit contamination.** The bulk of the patch reduction
+(−1264 lines, from 3919 → 2655) landed in commit `fd304f6` (task7 —
+`CmpBrImagAbs16`), not in `f390a78` (the retirement commit). This happened because
+the task7 agent also ran `dev/regen-patch.sh` while `vendor/` already had the
+retirement edits applied (the `vendor/` model is shared between concurrent agents).
+The retirement commit `f390a78` only changed **2 comment lines** in the patch
+(the `selectAlu16AbsLd` references). The git diff of `f390a78` shows a net-zero
+patch-line change.
+
+This is the cross-commit contamination risk from CLAUDE.md §"only commit your own
+files" — `vendor/` is gitignored so the drift is invisible in `git status`, and
+only surfaces when two agents run `regen-patch.sh` against the same modified tree.
+The patch content is correct; only the commit attribution is split.
+
+## Implementation traps
+
+Three anchor-consumed-content bugs during the large string-anchored deletions.
+Future agents doing similar bulk deletions should watch for these:
+
+### 1. `getImm16Operand` comment consumed (MOSInstructionSelector.cpp)
+
+The end-anchor for the 1b/1c function-body deletion included the opening phrase
+of `getImm16Operand`'s comment as the anchor boundary. After deletion, line ~2260
+read ` from an operand, if it` — missing the `// #321 native s16: extract a 16-bit
+compile-time constant` prefix. **Fix:** restored the full comment line with Edit.
+
+### 2. `selectGeneric` signature consumed (MOSInstructionSelector.cpp)
+
+The end-anchor for the `selectCopy16Abs` body deletion included
+`bool MOSInstructionSelector::selectGeneric`, consuming the function signature.
+Line ~2623 read `(MachineInstr &MI) {` without the return type or class. **Fix:**
+restored `bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {`.
+
+### 3. `G_STORE_FAR_ABS` island (MOSInstrGISel.td)
+
+The `G_STORE_FAR_ABS` instruction (#320, lines 173–182) sits between `G_COPY16_ABS`
+(lines 160–171) and the ALU/chain pseudos (lines 184–305). The deletion range is
+NOT contiguous — required two separate passes rather than one. The end-anchor of
+the first pass inadvertently consumed the opening line of `G_STORE_ABS_IDX`'s
+comment. **Fix:** restored
+`// Generalized 8-bit store using the absolute indexed addressing mode. The base`.
 
 ## Verification results
 
@@ -259,7 +335,8 @@ RESULT: PASS — chained 16-bit add threads A16; computes 0x1230 on both emulato
 PASS. Byte-size delta: the 3-operand chain test produces the same 30-byte `.text` as the peephole
 baseline — the disasm gate confirms a single `rep`/`sep` bracket with `lda + 2×adc + sta`, exactly
 matching what the old `add_chain16` combiner emitted. No regression for 3-operand chains in this
-test. Any regression in longer chains will be recovered by A16-threading (TODO #5).
+test. A16-threading (already landed, commits `1a2145e`/`c66329b`) eliminates the `STA zp; LDA zp`
+round-trips that would otherwise cost +4·(N−1) bytes per chain.
 
 5. ~~a16local / a16localx:~~
 
