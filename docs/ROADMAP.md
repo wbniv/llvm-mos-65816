@@ -482,6 +482,28 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [g==imm const-merge](plans/2026-06-17-321-native-s16-eq-imm-constant-through-merge.md) ·
    [v2 computed](plans/2026-06-17-321-native-s16-eq-v2-computed-imag16-lhs.md)._
 
+   _**A16-threading (2026-06-17): the step-5 "biggest win" — but reframed and landed coalescer-FREE.**
+   Each native s16 op is self-contained (`LDAImag16 → OP → STAImag16`, value home = `Imag16` between ops —
+   the 1d-retry coalescer-safe invariant), so a dependent chain stores each intermediate and immediately
+   reloads it (`sta __rcN; lda __rcN`). The key reframing, grounded in the MIR: the win is **redundant
+   store/reload elimination**, not the feared RA-level `Ac16` residency — each `STAImag16` result is
+   read only by its reload, with `$a16` unchanged between, so a peephole captures it without touching the
+   coalescer. A new **post-RA** peephole `threadAccum16` (`MOSLateOptimization.cpp`) erases the redundant
+   reload (and DCEs the dead store) so the value threads through `$a16` across the chain
+   (`lda;adc;and;sbc;…;sta`); post-RA is deliberate — RA has already chosen `$a16` both sides, so this
+   cannot reintroduce the 1d crash. Phase 1 (adjacent) then Phase 1.5 (non-adjacent, incl. across volatile
+   stores + multi-reload) clear essentially every redundant reload (a corrected 300-program scan leaves
+   1). **Measured −31/−36 % on dependent chains, −4..−10 B on real kernels.** A 300-program study **retired
+   Phase 2** (fold-while-threaded is already optimal — interior immediates and near-abs globals fold into
+   the threaded chain today). The general **RA-level `Ac16` residency** (the actual coalescer-crash core,
+   Tier 2) **stays deferred**: its realizable gain is capped by the single 65816 accumulator (two live
+   16-bit values must spill to `Imag16`), so the peephole already captures what a single-accumulator
+   machine can thread. New `examples/65816/a16thread.c` + `dev/a16thread.sh` (corpus_result 0x2544 on both
+   emulators) + reusable `dev/measure-a16-threading.sh`. Non-breaking: a16 suite + kernels 47/47, corpus
+   7/7, **fuzz 50/50**, `-verify-machineinstrs` clean (incl. `a16localx`, the coalescer-crash guard),
+   `0002` round-trips._
+   [A16-threading plan](plans/2026-06-17-321-a16-threading.md)._
+
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
    the ROM's symbols.)
