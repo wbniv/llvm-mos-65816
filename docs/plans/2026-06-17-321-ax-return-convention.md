@@ -163,10 +163,20 @@ leaking into the *default* (non-a16) 8-bit path (the prior "prime suspect `0001`
 and `0003` are both clean). Filed in `TODO.md` with the fix-search lead. (My earlier "concurrent agent"
 guess was the second wrong attribution corrected here; the bisect is now definitive.)
 
-**Step 3 verdict:** non-breaking confirmed for this change — suite 50/50, corpus 7/7, no `vendor/`/`0002`
-change. The fuzzer's seed-42 mismatch is a pre-existing regression in the committed backend patches (proven
-by the upstream cross-check + the byte-for-byte patch-reproduction check), unrelated to the return
-convention, tracked separately.
+**FIXED (2026-06-18).** Narrowed within `0002` (further isolated builds) to
+`MOSLegalizerInfo::legalizeICmp`: the FIRST of two EQ-canonicalization operand swaps was guarded only by
+`ComputedVsGlobal` (which does **not** require `hasAccum16`, and has no `Pred==EQ` check), so in the default
+8-bit build a non-EQ compare (`<`/`>`) with a computed-s16-vs-foldable-abs-global operand pair hit
+`std::swap(LHS, RHS)` → reversed comparison → wrong value. (The second swap was correctly gated on
+`NativeS16Eq`; the first was missing it.) One-line fix: gate the first swap on `NativeS16Eq`
+(= `hasAccum16 && Pred==EQ && S16`). Verified: seed-42 default + `+mos-a16` → `0xEC0D`; a16 suite **50/50**,
+corpus **7/7**, **`fuzz 50 1` → 50/50, 0 mismatch**; `a16eqvalmg` still native + `0x0111`. `0002` regenerated
+(only `MOSLegalizerInfo.cpp` changed, no foreign hunks, round-trips). See `TODO.md` Done
+[`321-seed42-legalizeicmp-swap`].
+
+**Step 3 verdict:** non-breaking confirmed for this change (the a16ret plan itself is test+docs-only, no
+`vendor/` change). The fuzzer's seed-42 mismatch it surfaced was a real regression in committed patch `0002`,
+now **fixed** (above) — `fuzz 50 1` is back to 50/50.
 
 ## Out of scope
 

@@ -38,31 +38,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 fuzzer-found codegen regression at seed 42 — our COMMITTED PATCHES miscompile in a SHARED
-  (non-a16) path; correct=`0xEC0D`, patched-toolchain=`0xB226`.** Surfaced by `dev/run.sh fuzz 50 1` (49/50)
-  during the a16ret verification (2026-06-17). Repro: `dev/run.sh fuzz 1 42`. **Decisive triage:**
-  `host(python-16bit) == upstream-unpatched-default@MAME == 0xEC0D` (two independent oracles), but the
-  **from-source patched toolchain produces `0xB226` in BOTH its default 8-bit AND `+mos-a16` builds** (and on
-  bsnes-jg) — so the defect is in a path the **default (non-a16) build also takes**, i.e. NOT
-  `+mos-a16`-specific and NOT the A/X return convention. **ATTRIBUTED: committed patches, NOT concurrent
-  edits.** `vendor/llvm-mos` HEAD is *pristine upstream* (`c798c3141`) and `toolchain.sh` git-applies the
-  patches WITHOUT committing — so the `M` files in `git -C vendor status` *are* the patches, not a concurrent
-  agent's WIP. Proof: applying `0001+0002+0003` to a fresh upstream worktree reproduces the live vendor
-  codegen tree **byte-for-byte** (MOS dir + clang `MOS.cpp` + `TargetDataLayout.cpp` all `diff`-identical);
-  the *only* non-patch difference is `clang/cmake/caches/MOS.cmake`, which is `toolchain.sh`'s own build-tool
-  trim (drops `clang-tools-extra`) and cannot affect codegen. **Which patch — BISECTED to `0002`
-  (necessary + sufficient), isolated ccache-reuse builds, seed-42 default 8-bit value:** upstream `0xEC0D` ·
-  `+0001` `0xEC0D` · `+0001+0003` `0xEC0D` · **`+0001+0002` `0xB226`** · full(`+0001+0002+0003`) `0xB226`.
-  So `0002` (the #321 accum16 patch) alone flips it; `0001` and `0003` are clean. **`0002` therefore has an
-  un-gated change LEAKING INTO THE DEFAULT (non-a16) 8-bit path** — it must not touch default codegen at all
-  (governing lesson #2: gate so a misclassification only ever *misses a win*, never *regresses*). Symptom
-  (default-build asm diff, `+0001` clean vs full): `0002` rewrites the shared 8-bit multi-byte arithmetic —
-  materializing the carry into a GPR (`ldy #1; bcs; ldy #0; … cpy #1; adc/sbc`) and reordering add/sbc-with-
-  carry chains — producing wrong multi-precision results. The program leans on signed
-  `(short)(unsigned short) >> k` (int-promotion-before-shift) + nested `& 0xFFFF` chains. **Next: grep `0002`
-  for combiner rules / TableGen patterns / MOSInstrInfo / register-class or -bank changes NOT guarded by the
-  `+mos-a16` (`HasA16`/subtarget) predicate** — the un-gated one is the bug. Repro `dev/run.sh fuzz 1 42`;
-  isolated-build bisect result logs kept in `build/bisect-0001*.out`.
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
@@ -233,6 +208,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-18 — [321-seed42-legalizeicmp-swap] **fix #321 fuzzer-found default-build miscompile: an EQ-canonicalization operand-swap in `0002`'s `legalizeICmp` leaked into the non-a16 8-bit path.** seed-42 (`dev/run.sh fuzz 1 42`, surfaced during a16ret verification) computed `corpus_result=0xB226` vs correct `0xEC0D` in BOTH default 8-bit AND `+mos-a16` builds (host=python-16bit + unpatched-upstream@MAME both 0xEC0D). Root-caused by ~20 isolated ccache-reuse build bisections: register topology (A16/B/Ac16) **innocent** (upstream+topology=0xEC0D), as were td/feature-infra, selector, InstrInfo, LateOpt, RegisterInfo, the unconditional InsertREPSEP pass (it early-exits `!hasAccum16`), and the legalizer constructor rules — narrowed to `MOSLegalizerInfo::legalizeICmp`. The FIRST of two EQ-canonicalization swaps was guarded only by `ComputedVsGlobal` (which does NOT require `hasAccum16` and has no `Pred==EQ` check), so in the default build a non-EQ compare (`<`/`>`) with a computed-s16-vs-foldable-abs-global operand pair hit `std::swap(LHS,RHS)` → **reversed the comparison** → wrong value. (The SECOND swap was correctly gated on `NativeS16Eq`; the first was missing it — exactly governing-lesson-#2: gate so a misclassification only misses a win, never regresses.) **Fix (1 line):** gate the first swap on `NativeS16Eq` (= `hasAccum16 && Pred==EQ && S16`), so it fires only in the intended native-a16-EQ path where EQ's Z-symmetry makes the swap safe. Verified: seed-42 default+a16 → `0xEC0D`; a16 suite **50/50**, corpus **7/7**, **fuzz 50/50** (0 mismatch); `a16eqvalmg` still native (`cmp` long fold ×2) + `0x0111`, verify-clean. `0002` regenerated — only `MOSLegalizerInfo.cpp` changed, no foreign hunks, round-trips. [a16ret plan §step-3](docs/plans/2026-06-17-321-ax-return-convention.md).
 - 2026-06-17 — [321-ax-return-convention] **lock the A (low) / X (high) return convention as a tested ABI invariant (test+docs only, no codegen change).** The free, uncontroversial CC piece: `i8 → A`, `i16 → A(low):X(high)` is already emergent from `CC_MOS` byte-splitting (no `RetCC_MOS`) AND the documented prior art (WDC816CC p.21 / ORCA `A_X`). New `examples/65816/a16ret.c` + `dev/a16ret.sh` (wired into `dev/run.sh`): value differential `corpus_result==0x2387` host==default==+mos-a16 (MAME+bsnes-jg) + a byte-pinned disasm gate — i16 return is `ldx <high>; lda <low>; rts` (X reads `__rc`+1 vs A, proving high→X/low→A), i8 return delivers A alone. The value test catches miscompiles; the disasm gate catches convention drift (a value test alone can't — a consistent A↔X swap round-trips). Decision recorded in CC-analysis §"Return values — adopted" + the prior-art note. Verified: a16 suite 50/50, corpus 7/7, no `vendor/`/`0002` change. [plan](docs/plans/2026-06-17-321-ax-return-convention.md).
 - 2026-06-17 — [321-unify-1b-1c-peephole] **retire 1b/1c GISel combiner peephole — native path now handles all shapes** (~1400 lines deleted; corpus 7/7, 5 in-scope a16 tests PASS, full suite 43/43 confirmed by concurrent task7 run, -verify-machineinstrs clean). [plan](docs/plans/2026-06-17-321-unify-1b-1c-peephole-into-native.md).
 - 2026-06-17 — [321-task7-eq-residuals] **EQ-as-value task7: `computed==global` → `CmpBrImagAbs16` (`lda zp; cmp long`); items 2–7 confirmed-deferred.** New pseudo + legalizer `ComputedVsGlobal` gate + `foldableAbsLoad16(RHS16)` selector fold + canonicalization swap (`isFoldableAbsS16Load(LHS) && isImag16Resident(RHS)`) + `GlobalVsImm` guard; `a16eqvalmg` 0x0111 host==default==+mos-a16 (MAME+bsnes-jg, both orderings, 2×`cf` in-block + 2×`c5` cross-block fallback). Disasm gate: `cf` (CMP Long 24-bit, SNES global addressing), not `cd` (was a wrong gate). Spike measurements: item 2 (`x==0` as value) +5 B (native rep/sep worse than byte-OR); item 5 (indir-dst) already −13 B via 16-bit mode (selector reorder ~4 B more, corpus gain unverified → deferred); items 3/4/6/7 confirmed by prior spikes. `0002` round-trips (7×`CmpBrImagAbs16`, no TXY/TYX). [plan](docs/plans/2026-06-17-321-task7-eq-residuals-indir-dst-xflag-varshift.md).

@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/2f9d6d1) | #321 triage: bisect seed-42 regression to patch 0002 (necessary + sufficient) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/a2b9fcf) | #321 triage: correct seed-42 attribution (committed patches, not concurrent edits) + fix TODO merge break |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/514bd4f) | #321 CC: lock A(low)/X(high) return convention as a tested ABI invariant |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/7ee904f) | #321 docs: calling-convention decision analysis + plan to lock the A/X return convention |
 
 <!--history-meta v1
+2f9d6d1	author	Will Norris
+2f9d6d1	added	6
+2f9d6d1	deleted	3
+2f9d6d1	files	1
+2f9d6d1	body	Finishes the seed-42 attribution. Isolated ccache-reuse builds, seed-42\nDEFAULT (non-a16) 8-bit value:\n\n  upstream                       0xEC0D  clean\n  upstream + 0001                0xEC0D  clean\n  upstream + 0001 + 0003         0xEC0D  clean\n  upstream + 0001 + 0002         0xB226  BUGGY\n  full (0001 + 0002 + 0003)      0xB226  buggy   (correct = 0xEC0D)\n\nSo 0002 (the #321 accum16 patch) is the sole cause — necessary AND\nsufficient; 0001 (#320 far) and 0003 (late-opt F4 fix) are both clean. The\nearlier "prime suspect 0001" guess was wrong.\n\nBecause the failure is in the DEFAULT (non-a16) build, 0002 has a change\nthat LEAKS into the shared 8-bit codegen path instead of being gated behind\n+mos-a16 (violates governing lesson #2: gate so a misclassification only\never misses a win, never regresses). Default-build asm diff shows 0002\nrewriting shared multi-byte arithmetic — materializing carry into a GPR\n(ldy #1; bcs; ldy #0; ... cpy #1) and reordering add/sbc-with-carry chains\n— giving wrong multi-precision results.\n\nFix lead recorded in TODO: grep 0002 for combiner rules / TableGen patterns\n/ MOSInstrInfo / register-class-or-bank changes not guarded by the\n+mos-a16 (HasA16/subtarget) predicate. Repro: dev/run.sh fuzz 1 42.\n\nThis is triage only (no vendor/ or patch change); leaves the fix to a\ndedicated pass.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a2b9fcf	author	Will Norris
 a2b9fcf	added	14
 a2b9fcf	deleted	9

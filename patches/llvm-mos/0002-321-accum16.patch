@@ -2009,7 +2009,7 @@ index fbedd8d46..d329144e2 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..d10b5e1ff 100644
+index 212ede1a0..27f2471aa 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -150,18 +150,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -2178,7 +2178,7 @@ index 212ede1a0..d10b5e1ff 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1270,7 +1339,141 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1270,7 +1339,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -2307,7 +2307,8 @@ index 212ede1a0..d10b5e1ff 100644
 +  // LDAImag16) and the global on RHS (for `cmp abs` via CMPAbs16), so foldableAbsLoad16(RHS16)
 +  // fires in selectBrCondImm. Covers both `(a+b)==g` (LHS is already computed — swap is no-op
 +  // since isFoldableAbsS16Load(LHS) is false) and `g==(a+b)` (global on LHS — swaps them).
-+  if (ComputedVsGlobal && isFoldableAbsS16Load(LHS) && isImag16Resident(RHS))
++  if (NativeS16Eq && ComputedVsGlobal && isFoldableAbsS16Load(LHS) &&
++      isImag16Resident(RHS))
 +    std::swap(LHS, RHS);
 +  // GlobalVsImm: put a lone foldable-abs global on LHS (read by `lda abs`) and any constant on
 +  // RHS (`cmp #imm`), so CmpBrAbsImm16 fires for `0x1234 == g` too. Guard !isImag16Resident(LHS)
@@ -2321,7 +2322,7 @@ index 212ede1a0..d10b5e1ff 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,16 +1544,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,16 +1545,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -2346,7 +2347,7 @@ index 212ede1a0..d10b5e1ff 100644
      if (!isNZUseLegal(Dst, MRI))
        Z = buildNZSelect(Z, Builder);
      Builder.buildCopy(Dst, Z);
-@@ -1358,8 +1567,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1358,8 +1568,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {
@@ -2359,7 +2360,7 @@ index 212ede1a0..d10b5e1ff 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1601,14 +1813,86 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1601,14 +1814,86 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
  
@@ -2447,7 +2448,7 @@ index 212ede1a0..d10b5e1ff 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1645,6 +1929,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1645,6 +1930,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);
