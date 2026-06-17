@@ -5,6 +5,17 @@ three governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics
 live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
+## Active worktrees (2026-06-18)
+
+| Branch | Worktree | Task | Status |
+|--------|----------|------|--------|
+| `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression diagnosis + fix (bisected to `0002`) | in progress |
+| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ready to start |
+
+**If working on `wt/321-xy16`:** read [`docs/plans/2026-06-18-321-xy16-implementation-handoff.md`](plans/2026-06-18-321-xy16-implementation-handoff.md)
+in the worktree — it covers vendor/ bootstrap, ccache, commit discipline, and the merge-back checklist.
+Do NOT push to `origin/main` from the xy16 worktree until the regression on main is fixed.
+
 ## Build / compile / disasm / test — the exact commands
 
 - **Rebuild the toolchain after a `vendor/` edit** (Docker container; incremental): `dev/run.sh toolchain`.

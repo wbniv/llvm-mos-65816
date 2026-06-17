@@ -1,5 +1,9 @@
 # Plan: xy16 — 16-bit X/Y index mode (ROADMAP step 5, second half)
 
+**Implementation branch:** `wt/321-xy16` · **Worktree:** `/home/will/SRC/llvm-mos-65816-xy16`  
+**Handoff doc:** [`docs/plans/2026-06-18-321-xy16-implementation-handoff.md`](2026-06-18-321-xy16-implementation-handoff.md)
+(in the worktree — read it first; covers vendor/ bootstrap, ccache setup, commit discipline, merge-back checklist)
+
 ## Context
 
 ROADMAP step 5 second half: the M-flag/accumulator dimension (`+mos-a16`) is complete; the
