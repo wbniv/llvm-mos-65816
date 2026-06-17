@@ -80,7 +80,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
-  `lda; inc/dec a; sta`]; remaining: variable shifts [libcall today, low value], amount ≥8 [byte-relabel
+  `lda; inc/dec a; sta`]; remaining: ~~variable shifts~~ [**WON'T DO** — task7 spike 2026-06-17: inline counted loop costs more bytes than `__ashlhi3`/`__lsrhi3` libcall at −Os], amount ≥8 [byte-relabel
   already optimal]; ~~memory-RMW `inc abs`/`dec abs`~~ investigated + rejected — no `inc long` on the
   65816 and `inc abs` is DBR-relative, unsafe vs the platform's long (DBR-independent) data addressing;
   see Done); ~~(4) indexed/array access~~ (indirect `(zp)` load/
@@ -111,9 +111,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   ~~and the indirect copy fusion~~ all landed — see Done). Remaining: (a) the indir-**dst** copy fold
   (`*p = gg`, `*q = *p`) only fires when the dst-pointer load doesn't sit between the value-load and the
   store as an ordered (volatile) memref — for a volatile pointer it conservatively stays a round-trip;
-  consider loading the dst pointer first so the value-load is adjacent to the store; (b) the indexed
-  `abs,x`/`(zp),y` forms are **moot** (llvm-mos is fully pointer-based); (c) **re-evaluate the X-flag
-  (xy16) mode dimension** — NOT required for array access; assess whether it pays off before building.
+  consider loading the dst pointer first so the value-load is adjacent to the store (**spike 2026-06-17 task7:** current `+mos-a16` already −13 B vs default via natural 16-bit codegen; selector reorder would add ~4 B more — corpus gain unverified, still deferred); (b) the indexed
+  `abs,x`/`(zp),y` forms are **moot** (llvm-mos is fully pointer-based); ~~(c) **re-evaluate the X-flag
+  (xy16) mode dimension** — NOT required for array access; assess whether it pays off before building.~~ (**task7 re-eval 2026-06-17:** pointer-based ABI, X/Y in 8-bit CC — permanent 16-bit X/Y breaks ABI and provides 0 code-size benefit over the pointer model; **WON'T DO**.)
   [indirect plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md) ·
   [absolute plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
@@ -544,4 +544,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "argument-passing + frame-storage sub-decisions" -> the curated M2 "#321 calling-convention decision"
        bullet + docs/investigations/65816-calling-convention-decision.md (the hard frame fork, gated on a
        product steer + post-xy16 measurement). Nothing open here. -->
+- [ ] **(triage)** Porting the DMA/VRAM helpers to 16-bit codegen (deferred per Phase-2 scope decision). — _from [2026-06-15-415-snes-target-apply-and-16bit.md](docs/plans/2026-06-15-415-snes-target-apply-and-16bit.md)_  <!-- fp:1b36c166f003e317 -->
+- [ ] **(triage)** Upstreaming: cutting the actual `llvm-mos-sdk` PR from `platforms/snes-8bit/` (README already — _from [2026-06-15-415-snes-target-apply-and-16bit.md](docs/plans/2026-06-15-415-snes-target-apply-and-16bit.md)_  <!-- fp:0cd5df3b045f033f -->
 <!-- END auto-captured-deferrals -->
