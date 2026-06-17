@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16eqval|a16eqvalp|a16eqvalg|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -139,6 +139,9 @@ Targets:
   a16eqvalg  #321 v3 native s16 equality-as-value abs-fold for GLOBALS (`g1 == g2`, `g1 == 0x1234`):
              reads the globals in place (lda abs; cmp abs/#imm), no Imag16 round-trip, no 8-bit
              cpx/cpy; corpus_result==0x1101 host==default==+mos-a16 on both emulators.
+  a16eqvalc  #321 v2 native s16 equality-as-value for COMPUTED/Imag16-resident operands
+             (`(a+b) == (c+d)`, `(a+b) == 0x1234`): native 16-bit cmp (no 8-bit cpx/cpy); a
+             register operand stays 8-bit (avoids the spill); corpus_result==0x1101 both emulators.
   fuzz       #321 Tier-1 differential fuzzer: generate N random valid C programs (from
              `seed`, default 25 from seed 1), compile each DEFAULT and +mos-a16, and assert
              host-expected == default@MAME == a16@MAME == a16@bsnes-jg + a clean
