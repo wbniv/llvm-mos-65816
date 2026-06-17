@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
 # dev/a16eqval.sh — #321 native s16 equality-as-value: `b = (a == c)` stored as a VALUE.
-# examples/65816/a16eqval.c. Two assertions:
-#   1. VALUE: corpus_result == 0x0101 host == default == +mos-a16 on MAME + bsnes-jg
-#      (equality-as-value still narrows to the 8-bit chain — correct, just not native).
-#   2. NO-PROLOGUE: under +mos-a16 the s16 operands must load byte-wise for the 8-bit
-#      compare, NOT via a wasteful `rep; lda abs -> A16; sta imag16; sep` round-trip
-#      (fixed 2026-06-16 in legalizeLoadStore16). Gate: the first 8-bit compare
-#      (cmp/cpx/cpy) appears BEFORE the first `rep #$20` (so the operands are byte-loaded;
-#      the only rep brackets are the later s16 result combination + store).
+# examples/65816/a16eqval.c (a,b,c,d are globals). Two assertions:
+#   1. NATIVE: under +mos-a16 each global `==`/`!=` is a native 16-bit compare with the
+#      #321 v3 abs-fold (`cmp abs/long`), NOT the 8-bit cpx/cmp chain. (This SUPERSEDES
+#      the 2026-06-16 byte-wise stopgap, which is itself documented inline.)
+#   2. VALUE: corpus_result == 0x0101 host == default == +mos-a16 on MAME + bsnes-jg.
 #
 # Runs INSIDE the dev container; drive: dev/run.sh a16eqval. Prereqs: from-source
 # toolchain + SDK. bsnes-jg cross-check reuses build/jgxcheck.
 set -euo pipefail
 
-usage() { echo "Usage: dev/run.sh a16eqval   # s16 equality-as-value: corpus_result==0x0101, operands load byte-wise (no 16-bit prologue)"; exit 0; }
+usage() { echo "Usage: dev/run.sh a16eqval   # s16 global equality-as-value: native 16-bit cmp abs/long (v3 abs-fold), corpus_result==0x0101"; exit 0; }
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
 
 ROOT=/work
@@ -32,17 +29,19 @@ A16=(-Xclang -target-feature -Xclang +mos-a16)
 
 rc=0
 
-echo "==> 1) +mos-a16 -verify-machineinstrs clean + NO 16-bit-load prologue on the compare operands"
+echo "==> 1) +mos-a16 -verify-machineinstrs clean + NATIVE 16-bit equality (no 8-bit cpx/cpy chain)"
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC" 2>"$BUILD/a16eqval.vlog" \
   || { echo "  FAIL: verify-machineinstrs"; grep -iE "error|Bad machine" "$BUILD/a16eqval.vlog" | head -3; rc=1; }
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-firstcmp=$(printf '%s\n' "$DIS" | grep -nE '\b(cmp|cpx|cpy)\b' | head -1 | cut -d: -f1 || true)
-firstrep=$(printf '%s\n' "$DIS" | grep -nE 'rep[[:space:]]+#\$20' | head -1 | cut -d: -f1 || true)
-if [ -n "$firstcmp" ] && { [ -z "$firstrep" ] || [ "$firstcmp" -lt "$firstrep" ]; }; then
-  echo "  PASS: first 8-bit compare precedes any rep #\$20 — operands loaded byte-wise (no wasteful prologue)"
-else
-  echo "  FAIL: a rep #\$20 precedes the first compare — the wasteful 16-bit-load+spill prologue is back"; rc=1
-fi
+# #321 v3 superseded the byte-wise stopgap for GLOBAL equality-as-value: a,b,c,d are
+# globals, so each `==`/`!=` now goes NATIVE 16-bit and the abs-fold reads them via
+# `cmp abs/long` (CmpBrAbsAbs16) instead of the 8-bit cpx/cmp two-byte chain. Assert
+# native (a 16-bit cmp present, no 8-bit cpx/cpy). See
+# docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md.
+ncmp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c[59df]\b' || true)        # cmp zp/imm/abs/long
+ncpxy=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(e4|ec|c4|cc)\b' || true) # 8-bit cpx/cpy chain
+[ "$ncmp" -ge 2 ] && echo "  PASS: $ncmp native 16-bit cmp ops (globals folded via cmp abs/long)" || { echo "  FAIL: expected >=2 native 16-bit cmp, got $ncmp"; rc=1; }
+[ "$ncpxy" -eq 0 ] && echo "  PASS: no 8-bit cpx/cpy chain (fully native 16-bit equality-as-value)" || { echo "  FAIL: found $ncpxy cpx/cpy — equality narrowed to 8-bit"; rc=1; }
 
 echo "==> 2) build default + +mos-a16 ROMs"
 "$TOOL/mos-clang" --config "$INSTALL/bin/mos-snes.cfg" -mcpu=mosw65816          -Os -Wl,-Map="$DMAP" -o "$DROM" "$SRC"
@@ -66,6 +65,6 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — s16 equality-as-value computes 0x0101 (both emulators) and loads operands byte-wise" \
+[ $rc -eq 0 ] && echo "RESULT: PASS — s16 global equality-as-value is native 16-bit (v3 abs-fold) and computes 0x0101 (both emulators)" \
              || echo "RESULT: FAIL"
 exit $rc

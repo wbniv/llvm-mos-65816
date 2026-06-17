@@ -1,13 +1,13 @@
 // #321 native s16 — equality consumed as a VALUE (`b = (a == c)`), not a branch.
-// Driven by `dev/run.sh a16eqval`. See docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md.
+// Driven by `dev/run.sh a16eqval`. History: docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md
+// (byte-wise stopgap), superseded by docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md.
 //
-// Equality-as-value still narrows to the 8-bit cpx chain (the native compare is a
-// deferred follow-up — see TODO). But under +mos-a16 the operand LOADS used to be a
-// wasteful round-trip: `rep; lda abs -> A16; sta imag16; sep` then read the bytes back
-// for the 8-bit compare — strictly worse than the default build, which loads the bytes
-// directly. Fixed 2026-06-16 (MOSLegalizerInfo::legalizeLoadStore16): an s16 load whose
-// uses are all G_UNMERGE keeps its byte-wise lowering. So the compares below load their
-// operands byte-wise (no rep #$20 before the first cmp/cpx) — back to parity with default.
+// The 2026-06-16 byte-wise stopgap (load the operands byte-wise so equality-as-value
+// matched the default build instead of a wasteful 16-bit-load+spill round-trip) is now
+// SUPERSEDED for GLOBALS by v3: a,b,c,d are globals, so each `==`/`!=` goes NATIVE 16-bit
+// and the abs-fold reads them in place (`rep; lda abs; cmp abs; sep; beq/bne` + 0/1),
+// measured smaller than both the round-trip AND the 8-bit chain. (The full-native compare
+// the stopgap deferred is exactly what v1/v3 landed.) No round-trip, no 8-bit cpx/cpy.
 //
 // e0 = (a == b)  0x1234==0x1234 -> 1
 // e1 = (a == c)  0x1234==0x00FF -> 0

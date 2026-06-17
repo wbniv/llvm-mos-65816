@@ -34,17 +34,21 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM" >/dev/null
 printf '    %-12s %6s bytes\n' a16eq.sfc "$(stat -c%s "$ROM")"
 
 rc=0
-echo "==> disasm gate: each ==/!= is one 16-bit cmp under rep/sep, NOT the 8-bit cmp/cpx chain"
+echo "==> disasm gate: each ==/!= is one native 16-bit cmp (a,b,c are globals, so the"
+echo "    #321 v3 abs-fold reads them via cmp abs/long), NOT the 8-bit cmp/cpx chain"
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-printf '%s\n' "$DIS" | grep -iE '^\s*[0-9a-f]+:\s*(c2 20|e2 20|c[59d]|d0|f0)\b' | head -20
+printf '%s\n' "$DIS" | grep -iE '^\s*[0-9a-f]+:\s*(c2 20|e2 20|c[59df]|d0|f0)\b' | head -20
 nrep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b' || true)
 nsep=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*e2 20\b' || true)
-ncmp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c[59d]\b' || true)        # cmp zp/imm/abs
+ncmp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*c[59df]\b' || true)       # cmp zp/imm/abs/long
 ncpxy=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*(e4|ec|c4|cc)\b' || true) # 8-bit cpx/cpy chain
-[ "$nrep" -ge 2 ] && echo "  PASS: $nrep rep #\$20 bracket(s) — native 16-bit compares" || { echo "  FAIL: expected >=2 rep #\$20, got $nrep"; rc=1; }
-[ "$nsep" -ge 2 ] && echo "  PASS: $nsep sep #\$20" || { echo "  FAIL: expected >=2 sep #\$20, got $nsep"; rc=1; }
-[ "$ncmp" -ge 2 ] && echo "  PASS: $ncmp 16-bit cmp ops" || { echo "  FAIL: expected >=2 16-bit cmp, got $ncmp"; rc=1; }
+# 3 compares, all global==global -> v3 folds each to `cmp abs/long`. The cross-block
+# REP/SEP pass merges adjacent 16-bit regions, so the bracket count is <= the compare
+# count (e.g. 2 rep / 1 sep for 3 compares) — assert >=1, not one-per-compare.
+[ "$nrep" -ge 1 ] && echo "  PASS: $nrep rep #\$20 bracket(s) — native 16-bit compares" || { echo "  FAIL: expected >=1 rep #\$20, got $nrep"; rc=1; }
+[ "$nsep" -ge 1 ] && echo "  PASS: $nsep sep #\$20 bracket(s)" || { echo "  FAIL: expected >=1 sep #\$20, got $nsep"; rc=1; }
+[ "$ncmp" -ge 3 ] && echo "  PASS: $ncmp native 16-bit cmp ops (abs/long — globals read in place)" || { echo "  FAIL: expected >=3 16-bit cmp, got $ncmp"; rc=1; }
 [ "$ncpxy" -eq 0 ] && echo "  PASS: no 8-bit cpx/cpy chain (fully native 16-bit)" || { echo "  FAIL: found $ncpxy cpx/cpy — equality narrowed to 8-bit"; rc=1; }
 [ $rc -eq 0 ] || { echo "RESULT: FAIL (disasm gate)"; exit 1; }
 
