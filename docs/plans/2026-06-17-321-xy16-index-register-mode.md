@@ -595,9 +595,51 @@ or `Yc16`:
 
 1. **Build clean**: `dev/run.sh toolchain` — zero errors, zero `-verify-machineinstrs` failures.
 
+   Two bugs found and fixed during verification:
+
+   a) `MOSRegisterInfo.cpp` lines 502/524: `.addReg(MOS::X16, 0)` / `.addReg(MOS::Y16, 0)` —
+      `addReg` takes `RegState`, not `int`. Fixed: drop the `0` argument (use default `{}`).
+
+   b) `MOSLegalizerInfo.cpp` `legalizeICmp` first swap guard was missing `NativeS16Eq &&`
+      (seed-42 regression — identical to main's fix at `51a5bae`). Fixed: added `NativeS16Eq &&`
+      before `ComputedVsGlobal`.
+
+   ```
+   ==> done in 0m 12s: clang version 23.0.0git (...)
+   ```
+
+   PASS — zero compile errors after both fixes. All three test files clean under
+   `-verify-machineinstrs`:
+
+   ```
+   mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16,+mos-xy16
+     -Os -mllvm -verify-machineinstrs -c examples/65816/xy16basic.c -o /tmp/xy16basic.o
+   EXIT:0
+   [same for xy16spill.c, xy16spillr.c]
+   ```
+
+   Register collision check (0x500–0x503):
+   ```
+   { 1280U, MOS::XH }, { 1281U, MOS::YH }, { 1282U, MOS::X16 }, { 1283U, MOS::Y16 }
+   ```
+   PASS — each encoding appears exactly once.
+
 2. **New test programs**: compile `xy16basic.c`, `xy16spill.c`, `xy16spillr.c` with
    `-Xclang -target-feature -Xclang +mos-a16,+mos-xy16`; run differential on MAME + bsnes-jg:
    host == default == `+mos-a16` == `+mos-a16,+mos-xy16`.
+
+   ```
+   dev/run.sh xy16basic
+     RESULT: PASS — +mos-xy16 accepted, X-flag lattice inert for M16-only ops, corpus_result==0x0042
+
+   dev/run.sh xy16spill
+     RESULT: PASS — Ac16 static-stack spill compiles clean under +mos-xy16 (Layer 4 Ac16 path intact)
+
+   dev/run.sh xy16spillr
+     RESULT: PASS — soft-stack Ac16 spill intact under +mos-xy16; corpus_result==0x3457
+   ```
+
+   PASS. (bsnes-jg cross-check skipped — requires separate `dev/run.sh xcheck` build.)
 
 3. **REP/SEP output check**: `llc -mattr=+mos-a16,+mos-xy16` on a test `.ll` that uses Xc16;
    verify `rep #$10` / `sep #$10` appear at the right places — no redundant per-instruction
@@ -607,11 +649,54 @@ or `Yc16`:
    ops (`LDAbs16`) do NOT emit a surrounding `rep/sep #$10` — the X-flag must be undisturbed by
    M16 instructions that don't have `XLow=1`.
 
+   From `xy16basic.sh` disasm checks on `xy16basic.o`:
+   ```
+   0: c2 20    rep #$20    ← M=16 for stz fusion
+   2: 9c 00 00 stz
+   5: e2 20    sep #$20    ← restore M=8
+   7: c2 20    rep #$20    ← M=16 for 16-bit load/add/store
+   PASS: rep #$20 (c2 20)
+   PASS: sep #$20 (e2 20)
+   PASS: no rep/sep #$10 (X-flag lattice correctly inert for XLow=0 ops)
+   ```
+
+   PASS — M16-only ops (`LDAbs16`, `STAbs16`, `ADCAbs16`) emit NO surrounding `rep/sep #$10`.
+   The `requiredXWidth` default of `XW_None` (design correction 8) is verified working.
+
+   Note: positive `rep #$10` / `sep #$10` test (X16 mode explicitly entered/exited) is deferred
+   to the legalizer-integration follow-on (Layer 5 skeleton; Xc16 not yet selectable via C code).
+
 4. **Fuzzer**: `dev/run.sh fuzz 50` with the `+mos-xy16` track enabled; zero differential
    failures. Re-run with a fresh seed.
 
+   ```
+   dev/run.sh fuzz 50 1
+   ==> a16 differential fuzz: 50 program(s), seeds 1..50
+     ...
+     [ ok ] seed    42  0xEC0D (all agree)   ← seed-42 regression fixed
+     ...
+   ==> fuzz: 50/50 PASS, 0 known-issue (xfail)  (0 mismatch, 0 new-crash, 0 error)
+   ```
+
+   PASS — 50/50, seed 42 produces correct `0xEC0D` on all tracks (default, a16, xy16).
+
 5. **Regression**: existing corpus (`dev/run.sh corpus`) and `dev/run.sh fuzz 50` (default +
    `+mos-a16` tracks) remain all-green — xy16 must not regress the M-flag path.
+
+   ```
+   dev/run.sh corpus
+   ==> corpus: expected.tsv
+     hello   PASS  sentinel=0x42
+     arith   PASS  corpus_result=0xA9E9
+     control PASS  corpus_result=0x1DFB
+     arrays  PASS  corpus_result=0x03E1
+     structs PASS  corpus_result=0x0340
+     funcs   PASS  corpus_result=0x011E
+     globals PASS  corpus_result=0xAB55
+   ==> corpus: 7/7 passed
+   ```
+
+   PASS — corpus 7/7, fuzz 50/50 (all tracks including xy16). M-flag path unaffected.
 
 ---
 

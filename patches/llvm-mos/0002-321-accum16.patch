@@ -2790,7 +2790,7 @@ index 868f6c712..7b5100bfe 100644
 +// register class on the selected ops, not by the bank (banks are unused here).
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index baf6de604..0504e6929 100644
+index baf6de604..2194945af 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -427,10 +427,25 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
@@ -2849,7 +2849,7 @@ index baf6de604..0504e6929 100644
 +    if (!IsLoad) {
 +      Builder.buildInstr(MOS::TXA16)
 +          .addReg(MOS::A16, RegState::Define)
-+          .addReg(MOS::X16, 0);
++          .addReg(MOS::X16);
 +      Builder.buildInstr(MOS::STAIndir16)
 +          .addReg(MOS::A16, RegState::Kill)
 +          .add(MI->getOperand(2))
@@ -2871,7 +2871,7 @@ index baf6de604..0504e6929 100644
 +    if (!IsLoad) {
 +      Builder.buildInstr(MOS::TYA16)
 +          .addReg(MOS::A16, RegState::Define)
-+          .addReg(MOS::Y16, 0);
++          .addReg(MOS::Y16);
 +      Builder.buildInstr(MOS::STAIndir16)
 +          .addReg(MOS::A16, RegState::Kill)
 +          .add(MI->getOperand(2))
