@@ -102,10 +102,47 @@ prediction proven (WON'T-IMPLEMENT stands). Net < diamond ⇒ prediction wrong �
 ## Verification
 
 1. Worktree builds clean; `clang-23` mtime advances on each rebuild (stale-build guard).
+
+   ```
+   === build exit: 0 ===
+   ==> done in 0m 27s: clang version 23.0.0git (...c798c31...)
+   stale-build check: pre=1781784707 post=1781785100   (mtime advanced)
+   ```
+   **PASS** — incremental rebuild took (27 s), `clang-23` mtime advanced.
+
 2. The Option B build is `-verify-machineinstrs` clean on `a16eqval`/`a16eqvalc`/`a16eqvalp`.
+
+   ```
+   a16eqval   104 -> 120  (+16 B)  [clean]
+   a16eqvalc  121 -> 149  (+28 B)  [clean]
+   a16eqvalp  154 -> 175  (+21 B)  [clean]
+   ```
+   **PASS** — all three `-verify-machineinstrs` clean (`[clean]` = no verifier stderr).
+
 3. The rol-tail disasm shows `adc`/`rol` (not a `bcc`/`beq` 0/1 diamond) where the materialization fires —
    i.e. the experiment actually tested the rol tail, not an accidental re-diamond.
+
+   ```
+   tail check:  a16eqvalc  adc=4 rol=0 bcc=0 beq/bne=2     a16eqval  adc=1 rol=0 bcc=0
+   a16eqval main (first a==b):  rep; lda a; eor b; sta X; lda #0; cmp X; sep; txa; adc #0; sta
+   ```
+   **PASS** — materialize is `txa; adc #0` (branchless), `bcc=0` (no carry diamond). The `beq/bne=2` are
+   non-materialize branches (a branch-use compare + the `==0x1234` const path), not the rol-tail under test.
+
 4. The byte table is captured with raw `llvm-objdump --section-headers` output; the verdict (≥ or < diamond)
    follows from it.
-5. Worktree + scratch branch removed; `grep -c "SPIKE" main vendor/.../MOSLegalizerInfo.cpp` == 0 and `0002`
-   untouched (main uncontaminated), as after Phase 0.
+
+   **PASS** — table in step 2 (diamond 104/121/154 → Option B 120/149/175). Verdict: **Option B ≥ diamond on
+   every shape (a regression, worse than Option A's +14)** ⇒ prediction proven, WON'T-IMPLEMENT stands.
+
+5. Worktree + scratch branch removed; main `vendor/` has no spike edit and `0002` is untouched.
+
+   ```
+   Deleted branch wt/321-eqval-optb (was ef4e6db)
+   grep -c "OPTB-SPIKE" main vendor/.../MOSLegalizerInfo.cpp -> 0
+   git status --short patches/llvm-mos/0002-321-accum16.patch -> (empty, unmodified)
+   free: 69G -> 75G (6 GB reclaimed)
+   ```
+   **PASS** — main uncontaminated, worktree removed.
+
+**All steps PASS (2026-06-18). Verdict: Option B is a measured regression; WON'T-IMPLEMENT confirmed.**

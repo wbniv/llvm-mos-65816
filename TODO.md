@@ -603,5 +603,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "Native interrupt service" -> not active work; bare `rti` stubs are width-safe for bring-up.
        The M16/X16-entry `php`/force-width note is recorded in the plan for the future worker who
        lands real vblank/IRQ handlers. Nothing open today. fp:ba56664f75e7c2fa fp:dd5e492a20c5fd16 -->
-- [verify] **2026-06-18-prove-option-b-rol-tail-materialization-for-native** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-18-prove-option-b-rol-tail-materialization-for-native.md](docs/plans/2026-06-18-prove-option-b-rol-tail-materialization-for-native.md)_  <!-- fp:e9e161484c038906 -->
+<!-- triaged 2026-06-18: prove-option-b Verification section now has all 5 steps recorded with raw output +
+     PASS (the experiment ran: Option B measured +16..+28 B, WON'T-IMPLEMENT confirmed). The flag fired
+     because the steps were written as a contract before the run; they are now filled. Nothing open. fp:e9e161484c038906 -->
 <!-- END auto-captured-deferrals -->
