@@ -163,6 +163,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `TAY`/`TYA`/`TAX`/`TXA`/`TYX`/`TXY` in `requiredXWidth` (and/or selection) so the lattice keeps `Y`/`X`
   high bytes honest. **This BLOCKS the seed-31 critical-edge fix.** Also still latent: **PHX/PLX/PHY/PLY in
   X16 mode** (asymmetric push-X16/pull-X8 — `xy16spillr` passes today because spill is symmetric).
+  **Implementation plan APPROVED 2026-06-18** — `requiredXWidth`: `TA`/`TX` → `XW_X8` (+ `PH`/`PL` with
+  `$x`/`$y`; `T_A` stays X-agnostic), then re-land the `B.begin()` critical-edge fix.
+  [impl plan](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md) ·
   [analysis](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md) (§Why this is blocked) ·
   [origin](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md) (Deferred).
 - [ ] **#321 xy16 correctness — REPSEP critical-edge bail truncates cross-block-live X16 (seed-31). BLOCKED.**
@@ -174,14 +177,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   seed-31 and passes fuzz 50/50, **but** `fuzz 200` showed it **regresses seed-160** — removing the bail makes
   critical-edge functions use the dataflow's loop-mode-holding, which exposes the transfer-instruction bug
   above. **Blocked on that fix first**; then re-land the `B.begin()` change (vendor + `0002` currently reverted
-  to the hang-fix commit, byte-identical). [plan](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
-- [ ] **#321 xy16 — fuzz 51–200 residuals (found 2026-06-18 by the wider sweep; pre-existing, not regressions).**
-  (1) **seed-157** — `+mos-xy16` value mismatch (`host==default==a16==0xD00D`, only xy16 differs); a distinct
-  xy16 miscompile (fails on both the bail and `B.begin()` toolchains). (2) **seed-169 / 173 / 196** —
-  `+mos-a16` **compiler crash** in `-verify-machineinstrs`: *"`$p` is not a GPR register"* on `PH $p` /
-  `STImag8 $p` / `$p = LDImag8` — a register-allocation/spill bug for the `$p` (pointer) register under heavy
-  pressure. Crash is **pre-REPSEP** (the dumped MIR has zero `REP/SEP`), so independent of all REPSEP work and
-  of `+mos-a16`-vs-default. Repro: `dev/run.sh fuzz 1 <seed>`; triage in `build/fuzz-triage/seed-00<seed>.txt`.
+  to the hang-fix commit, byte-identical). Both fixes scheduled together in the approved
+  [impl plan](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md) (Commit B re-lands
+  this). [analysis](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
+- [ ] **#321 `+mos-a16` `$p`-spill compiler crash — pre-existing, pre-REPSEP (found by the wider fuzz sweeps).**
+  `-verify-machineinstrs` crash *"`$p` is not a GPR register"* on `PH $p` / `STImag8 $p` / `$p = LDImag8` — a
+  register-allocation/spill bug for the `$p` (pointer) register under heavy pressure. The crash is **pre-REPSEP**
+  (dumped MIR has zero `REP/SEP`), so independent of all REPSEP/xy16 work. Seeds (from `fuzz 500`): **169, 173,
+  196, 268, 271, 272, 306, 420** (8 of 500). Repro: `dev/run.sh fuzz 1 <seed>`; triage in
+  `build/fuzz-triage/seed-00<seed>.txt`. NOTE: ~~seed-157 (`+mos-xy16` value mismatch)~~ **FIXED 2026-06-18**
+  by the transfer-instruction X-annotation (Commit A of the impl plan) — it was a second transfer-in-held-X16
+  bug, not a distinct miscompile.
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
@@ -672,4 +678,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      in X16 mode + TAX/TXA/… transfers in mixed modes. They are speculative (no corpus/fuzz evidence
      yet), so tracked as watch items, not active work. Detail stays in the plan's Deferred section.
      fp:089392f5e8b0053d fp:9a09f71d5902e937 -->
+- [ ] **(triage)** **seed-157** — a distinct `+mos-xy16` value mismatch (fails on both bail and `B.begin()` toolchains). — _from [2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md)_  <!-- fp:e3eda71d77592d8c -->
+- [ ] **(triage)** **seed-169 / 173 / 196** — `+mos-a16` compiler crash in `-verify-machineinstrs` ("`$p` is not a GPR — _from [2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md)_  <!-- fp:d64f4a3bcd9e3615 -->
+- [ ] **(triage)** **TSX/TXS** — no compiler-pseudo path; would only matter for a future native-hardware-stack frame. — _from [2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md)_  <!-- fp:5357e60ef6ea3fea -->
 <!-- END auto-captured-deferrals -->

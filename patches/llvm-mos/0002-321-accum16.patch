@@ -92,10 +92,10 @@ index 76d7409c1..733ef7097 100644
 +    [FeatureAccum16]>;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000..7027a9e79
+index 000000000..c9c4517e1
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,512 @@
+@@ -0,0 +1,530 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -289,6 +289,24 @@ index 000000000..7027a9e79
 +    case MOS::LDXIdx: // always X dest → LDX_ZeroPageY / LDX_AbsoluteY
 +    case MOS::LDYIdx: // always Y dest → LDY_ZeroPageX / LDY_AbsoluteX
 +      return XW_X8;
++    // TA = TAX/TAY, TX = TXY/TYX — index-register transfers whose width is
++    // governed by the X flag, so an 8-bit-intent transfer run in X16 corrupts
++    // the high byte (the seed-160 miscompile). The plain pseudos are always
++    // 8-bit-intent: 16-bit transfers use the dedicated TAX16/TAY16/TXA16/TYA16
++    // (XLow=1, handled above). Unconditional X8.
++    // (T_A = TXA/TYA is intentionally NOT here: its width is M-governed and its
++    // result A is X-independent; requiredWidth's MW_M8 default already brackets it.)
++    case MOS::TA:
++    case MOS::TX:
++      return XW_X8;
++    // PH/PL of an index register (PHX/PLX/PHY/PLY) push/pull 2 bytes when X=16;
++    // the 8-bit pseudo is 1-byte-intent. Operand 0 is the reg ($a/$p → M-/flag-
++    // governed, X-agnostic). No 16-bit push/pull pseudo exists.
++    case MOS::PH:
++    case MOS::PL:
++      if (MI.getOperand(0).isReg() && isXY(MI.getOperand(0).getReg()))
++        return XW_X8;
++      break;
 +    default:
 +      break;
 +    }
