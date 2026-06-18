@@ -575,6 +575,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-18: both plans are WON'T-DO — corpus trigger check 0/6 progs 0 B; the
      verification sections were for the implementation (never executed). No work pending.
      fp:91dc9eb4b93c09c3 fp:ac13f5e988de2e42 -->
-- [ ] **(triage)** **Hardware-stack ABI / 16-bit calling convention** — the *other* genuine native-mode crt0 work, but it is — _from [2026-06-18-321-native-mode-crt0-xy16.md](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md)_  <!-- fp:ba56664f75e7c2fa -->
-- [ ] **(triage)** **Native interrupt service** — real NMI/IRQ handlers (vblank/input) replacing the `rti` stubs. The bare — _from [2026-06-18-321-native-mode-crt0-xy16.md](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md)_  <!-- fp:dd5e492a20c5fd16 -->
+<!-- triaged 2026-06-18: both crt0-xy16 plan deferrals already covered.
+     • "Hardware-stack ABI / 16-bit calling convention" -> already the curated M2 Open item
+       "#321 calling-convention decision (open, blocks the hardware-stack ABI)"; gated on the
+       same calling-convention / frame sub-decision. No new work here.
+     • "Native interrupt service" -> not active work; bare `rti` stubs are width-safe for bring-up.
+       The M16/X16-entry `php`/force-width note is recorded in the plan for the future worker who
+       lands real vblank/IRQ handlers. Nothing open today. fp:ba56664f75e7c2fa fp:dd5e492a20c5fd16 -->
 <!-- END auto-captured-deferrals -->
