@@ -3,13 +3,19 @@
 #   * smoke  — build the SDK + ROMs and boot the regression corpus headless in
 #              MAME (ROADMAP step 1/2). Uses the stock toolchain; the corpus step
 #              needs the SPC700 IPL secret (below).
-#   * xcheck — second-emulator fidelity cross-check (ROADMAP step 3): boot the
-#              far-pointer ROMs in bsnes-jg (cycle-accurate, independent of MAME)
-#              and assert the same WRAM bytes. Needs the FROM-SOURCE patched
-#              toolchain (build/llvm-mos-install), so it builds that (cached) and
-#              the snes-far SDK first. No SPC700 secret needed (bsnes-jg reads its
-#              vendored Database/), so xcheck runs unconditionally — even without
-#              secrets. See docs/plans/2026-06-15-wire-bsnes-jg-xcheck-into-ci.md.
+#   * xcheck — from-source-toolchain checks (ROADMAP step 3 + the M2 a16 gate).
+#              Needs the FROM-SOURCE patched toolchain (build/llvm-mos-install), so
+#              it builds that (cached) + the snes-far SDK first, then runs two checks:
+#              (a) second-emulator fidelity cross-check — boot the far-pointer ROMs
+#                  in bsnes-jg (cycle-accurate, independent of MAME), assert the same
+#                  WRAM bytes. No SPC700 secret needed (bsnes-jg reads its vendored
+#                  Database/), so this runs unconditionally — even without secrets.
+#              (b) corpus-a16 — the SNES corpus under +mos-a16/+mos-xy16, differential
+#                  on MAME + bsnes-jg (globals.c XFAIL). Its MAME runs need the SPC700
+#                  IPL secret, so this step is secret-gated (skipped, not failed, when
+#                  absent — like the smoke corpus step).
+#              See docs/plans/2026-06-15-wire-bsnes-jg-xcheck-into-ci.md +
+#              docs/plans/2026-06-19-321-corpus-a16-ci.md.
 #
 # MANUAL-ONLY (workflow_dispatch). For a solo private repo the routine reproducibility
 # gate is the local `dev/run.sh repro` (clean-room build + smoke, no GitHub minutes,
@@ -18,10 +24,10 @@
 # the credibility artifact) or collaborators start pushing. Re-add `push:`/`pull_request:`
 # triggers then. Proven green once: run 27475012894 (2026-06-14).
 #
-# The smoke corpus step needs the SPC700 IPL ROM (Nintendo content, never committed).
-# Set it as a repo secret to enable that step:
+# The smoke `corpus` step and the xcheck `corpus-a16` step need the SPC700 IPL ROM
+# (Nintendo content, never committed). Set it as a repo secret to enable both:
 #   gh secret set SNES_SPC700_ROM_B64 < <(base64 -w0 dev/roms/s_smp/spc700.rom)
-# Without the secret the build still runs and the corpus step is skipped with a warning.
+# Without the secret the builds still run and those MAME steps are skipped with a warning.
 name: snes-smoke
 
 on:
@@ -105,3 +111,32 @@ jobs:
       # Build bsnes-jg + the far ROMs and assert hello/far-run/far-bank1 == expected.
       - name: bsnes-jg cross-check
         run: dev/run.sh xcheck
+
+      # corpus-a16 reuses everything above (from-source toolchain, SDK, bsnes-jg built
+      # by the xcheck step into build/jgxcheck) and adds the SNES corpus under +mos-a16.
+      # Its MAME differential needs the SPC700 IPL, so materialize it from the secret and
+      # gate the step (skip, don't fail, when absent — same pattern as the smoke job).
+      - name: Provide SNES SPC700 IPL (from secret)
+        id: bios
+        env:
+          ROM_B64: ${{ secrets.SNES_SPC700_ROM_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ROM_B64:-}" ]; then
+            mkdir -p dev/roms/s_smp
+            printf '%s' "$ROM_B64" | base64 -d > dev/roms/s_smp/spc700.rom
+            echo "has_bios=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_bios=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SNES_SPC700_ROM_B64 secret not set — skipping corpus-a16 (toolchain/SDK/bsnes-jg still validated)."
+          fi
+
+      # The SNES corpus under +mos-a16/+mos-xy16: for each examples/snes/corpus/*.c,
+      # assert host == default == +mos-a16 == +mos-xy16 on MAME + bsnes-jg (globals.c
+      # XFAILs: regalloc-out-of-registers). Closes the "corpus only ever built default
+      # 8-bit" gap. MOS_TOOLCHAIN matches the SDK-build step (in-container /work path).
+      - name: corpus-a16 — corpus under +mos-a16, differential (MAME + bsnes-jg)
+        if: steps.bios.outputs.has_bios == 'true'
+        env:
+          MOS_TOOLCHAIN: /work/build/llvm-mos-install
+        run: dev/run.sh corpus-a16

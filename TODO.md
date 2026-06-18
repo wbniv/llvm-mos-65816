@@ -718,4 +718,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "New corpus programs" -> non-work scope marker: this plan deliberately added none; broadening the
        corpus (Tier-2) is open-ended future work, not a tracked deliverable here. Nothing open.
      fp:3807f2b481a45e90 fp:13cb10ca9b2122a5 fp:f1527e7e0ec4fec4 -->
+- [ ] **(triage)** Adding `push:`/`pull_request:` triggers (the workflow stays `workflow_dispatch`-only until the repo goes — _from [2026-06-19-321-corpus-a16-ci.md](docs/plans/2026-06-19-321-corpus-a16-ci.md)_  <!-- fp:5f8372d2444e1e6b -->
+- [ ] **(triage)** A separate corpus-a16 job (rejected above). — _from [2026-06-19-321-corpus-a16-ci.md](docs/plans/2026-06-19-321-corpus-a16-ci.md)_  <!-- fp:6a08cf207dd87a4b -->
 <!-- END auto-captured-deferrals -->
