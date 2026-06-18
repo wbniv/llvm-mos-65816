@@ -92,10 +92,10 @@ index 76d7409c1..733ef7097 100644
 +    [FeatureAccum16]>;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000..ffec5eed3
+index 000000000..7027a9e79
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,483 @@
+@@ -0,0 +1,512 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -261,9 +261,38 @@ index 000000000..ffec5eed3
 +  // XLow=1: our new 16-bit X/Y pseudos (INX16, LDXAbs16, TXA16, TAX16, …).
 +  if (MI.getDesc().TSFlags & MOS::TSFlagXLow)
 +    return XW_X16;
-+  // XHigh=1: CPX_Immediate / CPY_Immediate — "8-bit immediate when X=1".
++  // XHigh=1: standard LDX/STX/LDY/STY real instructions (ZeroPage, Absolute,
++  // ZeroPage+index, Absolute+index) and CPX/CPY_Immediate — all require X=8.
 +  if (MI.getDesc().TSFlags & MOS::TSFlagXHigh)
 +    return XW_X8;
++  // MC pseudos that lower to LDX/STX/LDY/STY when the relevant operand is X
++  // or Y. These survive expandPostRAPseudo (no case there) and reach REPSEP as
++  // pseudos, so their TSFlags carry no XHigh. After RA all registers are
++  // physical, so comparing against MOS::X / MOS::Y is valid.
++  //   LDAbs / LDImag8 / LDImm / STAbs  — operand 0 is the GPR
++  //   STImag8                           — operand 1 is the GPR (op0 = ZP addr)
++  //   LDXIdx / LDYIdx                   — always X / Y destination
++  {
++    auto isXY = [](Register R) { return R == MOS::X || R == MOS::Y; };
++    switch (MI.getOpcode()) {
++    case MOS::LDAbs:
++    case MOS::LDImag8:
++    case MOS::LDImm:
++    case MOS::STAbs:
++      if (MI.getOperand(0).isReg() && isXY(MI.getOperand(0).getReg()))
++        return XW_X8;
++      break;
++    case MOS::STImag8:
++      if (MI.getOperand(1).isReg() && isXY(MI.getOperand(1).getReg()))
++        return XW_X8;
++      break;
++    case MOS::LDXIdx: // always X dest → LDX_ZeroPageY / LDX_AbsoluteY
++    case MOS::LDYIdx: // always Y dest → LDY_ZeroPageX / LDY_AbsoluteX
++      return XW_X8;
++    default:
++      break;
++    }
++  }
 +  // Branches are X-agnostic (same treatment as M flag).
 +  if (MI.isBranch())
 +    return XW_None;
@@ -611,7 +640,7 @@ index 000000000..34f7e16f3
 +
 +#endif // LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
 diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
-index 12d05bed4..0e37cac4c 100644
+index 12d05bed4..ba38163ae 100644
 --- a/llvm/lib/Target/MOS/MOSInstrFormats.td
 +++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
 @@ -57,6 +57,21 @@ def HasW65816 : Predicate<"Subtarget->hasW65816()">,
@@ -636,6 +665,22 @@ index 12d05bed4..0e37cac4c 100644
  def Has65EL02 : Predicate<"Subtarget->has65EL02()">,
                  AssemblerPredicate<(all_of Feature65EL02), "65EL02"> {
    let PredicateName = "Feature65EL02";
+@@ -960,9 +975,13 @@ multiclass CC0_Regular< bits<3> aaa, string OpcodeStr = "nop"> {
+     let XLow = 1;
+   }
+ 
+-  def _ZeroPage : Inst16<OpcodeStr, OpcodeC0<aaa, 0b001>, ZeroPage>;
++  def _ZeroPage : Inst16<OpcodeStr, OpcodeC0<aaa, 0b001>, ZeroPage> {
++    let XHigh = 1;
++  }
+ 
+-  def _Absolute : Inst24<OpcodeStr, OpcodeC0<aaa, 0b011>, Absolute>;
++  def _Absolute : Inst24<OpcodeStr, OpcodeC0<aaa, 0b011>, Absolute> {
++    let XHigh = 1;
++  }
+ }
+ 
+ /// Matching CC1_NoImmediate, but with cc = 11. Common match for 6502X.
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
 index e81487e9c..6b2afb5b9 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
@@ -970,6 +1015,87 @@ index be5daff8f..c39c4be70 100644
  
    bool shouldRematPhysRegCopy() const override { return false; }
  };
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td
+index a71519559..fdd08df48 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.td
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.td
+@@ -65,24 +65,38 @@ defm INC : CC2_NonShift<0b111, "inc">;
+ /// abs,X/abs,Y	1E	3E	5E	7E      BE  DE  FE
+ 
+ def STX_ZeroPage :
+-	Inst16<"stx", OpcodeC2<0b100, 0b001>, ZeroPage>;
++	Inst16<"stx", OpcodeC2<0b100, 0b001>, ZeroPage> {
++  let XHigh = 1;
++}
+ def STX_ZeroPageY :
+-	Inst16<"stx", OpcodeC2<0b100, 0b101>, ZeroPageY>;
++	Inst16<"stx", OpcodeC2<0b100, 0b101>, ZeroPageY> {
++  let XHigh = 1;
++}
+ def STX_Absolute :
+-	Inst24<"stx", OpcodeC2<0b100, 0b011>, Absolute>;
++	Inst24<"stx", OpcodeC2<0b100, 0b011>, Absolute> {
++  let XHigh = 1;
++}
+ 
+ def LDX_Immediate :
+ 	Inst16<"ldx", OpcodeC2<0b101, 0b000>, Immediate> {
+   let XHigh = 1;
+ }
+ def LDX_ZeroPage :
+-	Inst16<"ldx", OpcodeC2<0b101, 0b001>, ZeroPage>;
++	Inst16<"ldx", OpcodeC2<0b101, 0b001>, ZeroPage> {
++  let XHigh = 1;
++}
+ def LDX_Absolute :
+-	Inst24<"ldx", OpcodeC2<0b101, 0b011>, Absolute>;
++	Inst24<"ldx", OpcodeC2<0b101, 0b011>, Absolute> {
++  let XHigh = 1;
++}
+ def LDX_ZeroPageY :
+-	Inst16<"ldx", OpcodeC2<0b101, 0b101>, ZeroPageY>;
++	Inst16<"ldx", OpcodeC2<0b101, 0b101>, ZeroPageY> {
++  let XHigh = 1;
++}
+ def LDX_AbsoluteY :
+-	Inst24<"ldx", OpcodeC2<0b101, 0b111>, AbsoluteY>;
++	Inst24<"ldx", OpcodeC2<0b101, 0b111>, AbsoluteY> {
++  let XHigh = 1;
++}
+ 
+ def DEC_AbsoluteX :
+ 	Inst24<"dec", OpcodeC2<0b110, 0b111>, AbsoluteX>;
+@@ -146,15 +160,25 @@ def JMP_Indirect16 :
+   let isIndirectBranch = true;
+ }
+ def STY_ZeroPage :
+-	Inst16<"sty", OpcodeC0<0b100, 0b001>, ZeroPage>;
++	Inst16<"sty", OpcodeC0<0b100, 0b001>, ZeroPage> {
++  let XHigh = 1;
++}
+ def STY_Absolute :
+-	Inst24<"sty", OpcodeC0<0b100, 0b011>, Absolute>;
++	Inst24<"sty", OpcodeC0<0b100, 0b011>, Absolute> {
++  let XHigh = 1;
++}
+ def STY_ZeroPageX :
+-	Inst16<"sty", OpcodeC0<0b100, 0b101>, ZeroPageX>;
++	Inst16<"sty", OpcodeC0<0b100, 0b101>, ZeroPageX> {
++  let XHigh = 1;
++}
+ def LDY_ZeroPageX :
+-	Inst16<"ldy", OpcodeC0<0b101, 0b101>, ZeroPageX>;
++	Inst16<"ldy", OpcodeC0<0b101, 0b101>, ZeroPageX> {
++  let XHigh = 1;
++}
+ def LDY_AbsoluteX :
+-	Inst24<"ldy", OpcodeC0<0b101, 0b111>, AbsoluteX>;
++	Inst24<"ldy", OpcodeC0<0b101, 0b111>, AbsoluteX> {
++  let XHigh = 1;
++}
+ 
+ /// The conditional branch instructions all have the form xxy10000. The flag
+ /// indicated by xx is compared with y, and the branch is taken if they are
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
 index f3eb9549f..f44e895be 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td

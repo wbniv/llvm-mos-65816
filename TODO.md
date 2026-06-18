@@ -130,12 +130,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
-- [ ] **#321 xy16 correctness — `xy16@MAME=0x0000` hang bug (programs stall before writing `corpus_result`).**
-  Exposed by the P0 fuzz re-run (2026-06-18): 35/50 seeds produce `xy16@MAME=0x0000` while
-  `a16@MAME==host` is correct. Root cause not yet investigated; the program appears to hang (or loop
-  forever) before reaching the `corpus_result` store. Distinct from the two `selectXY16`/`copyPhysRegImpl`
-  crash bugs fixed in the same session (those were crashes; this is a silent hang producing wrong output).
-  Not blocking `+mos-a16` work; needs investigation before `+mos-xy16` can claim value-correctness.
+- [ ] **#321 xy16 correctness — REPSEP critical-edge bail truncates cross-block-live X16 (seed-31, last fuzz mismatch).**
+  After the hang fix (49/50, all 34 hangs cleared) the lone residual is seed-31: `xy16@MAME=0x0CCC`
+  vs `0x0B1F` — a *mismatch*, not a hang. Root-caused: `MOSInsertREPSEP` bails the whole function to
+  `placeLegacy` on a true critical edge (`bb.1→bb.3`, X16→X8); `placeLegacy` forces X=8 at every block
+  terminator, but `$x16` (`LDXAbs16 @arr+8 = 0x3C7D`) is live across `bb.0→bb.1`, so the end-of-`bb.0`
+  `sep #$30` zeroes X.high → `cpx #128` takes the wrong branch. Pre-existing, independent of the XHigh
+  fix (which only un-masked it). **Fix:** replace the bail with `B.begin()` entry-switch placement
+  (correct for non-passthrough target; keep `placeLegacy` for the X-passthrough-conflict corner).
+  [plan](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
@@ -243,6 +246,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-18 — [321-xy16-hang-fix-xhigh] **#321 xy16 hang fix: byte-level `ldx/ldy/stx/sty` ran in X16 → 2-byte read/write corrupted adjacent ZP/struct bytes → soft-stack overflow → `xy16@MAME=0x0000`.** `XHigh=1` on 14 real X/Y instr defs (`MOSInstrFormats.td` CC0_Regular + `MOSInstrInfo.td`) **plus** `requiredXWidth()` register-residency for the generic load/store pseudos that only become `LDX_ZeroPage`/etc. at MC-lowering, after REPSEP (`LDAbs`/`LDImag8`/`LDImm`/`STAbs`/`STImag8`/`LDXIdx`/`LDYIdx` with `$x`/`$y` → `XW_X8`). Fuzz **16/50 → 49/50, all 34 hangs cleared**; corpus 7/7, xy16 suite green; `0002` round-trips. Lone residual = seed-31, a separate critical-edge X16-liveness bug (own open item). [plan](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md).
 - 2026-06-18 — [321-native-mode-crt0-xy16] **#321 native-mode crt0 DBR=0 contract.** `phk; plb` in `.init.50` makes DBR=0 an explicit contract; standing `crt0native` gate; fuzz 50/50 green. [plan](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md).
 - 2026-06-18 — [321-abs-x-indiry-indexed-load-store] **#321 Increment 1e: native 16-bit `abs,x` and `(zp),y` indexed load/store.** `tryIndexedAddressing16` detects `G_PTR_ADD(global, G_ZEXTLOAD(s16))` → `G_LOAD16_ABS_IDX` → `lda abs,x` (M=0); and `G_PTR_ADD(zp_ptr, G_ZEXTLOAD(s16))` → `G_LOAD16_INDIR_IDX` → `lda (zp),y` (M=0). 4 new GISel pseudos + 4 logical MC pseudos + selector helpers. G_ZEXTLOAD (not G_ZEXT) because IRTranslator fuses load+zext; safe to `buildTrunc(S8)` because G_ZEXTLOAD legalises to `G_MERGE_VALUES(lo, G_CONSTANT(0))` — RA cannot elide the explicit constant (cf. seed-56 crash where known-bits-zero path caused undefined-pair spill). `a16absidx` (BF, 0x9ABC) + `a16indiry` (B1, 0x5678) PASS on MAME + bsnes-jg; fuzz 100/100 (seeds 1–100), 0 mismatch; `0002` round-trips. [plan](docs/plans/2026-06-18-321-abs-x-indiry-16bit-indexed-load-store.md).
 - 2026-06-18 — [321-mem-access-follow-ups] **#321 s16 memory-access follow-ups: all closed** — indirect/abs/copy-fold done; (a) indir-dst WON'T-DO: corpus check 2026-06-18 0/6 progs 0 B pattern absent; (b) moot; (c) WON'T-DO. [plan](docs/plans/2026-06-18-321-indir-dst-copy-fold.md).
@@ -616,4 +620,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-18: prove-option-b Verification section now has all 5 steps recorded with raw output +
      PASS (the experiment ran: Option B measured +16..+28 B, WON'T-IMPLEMENT confirmed). The flag fired
      because the steps were written as a contract before the run; they are now filled. Nothing open. fp:e9e161484c038906 -->
+- [ ] **(triage)** **PHX/PLX/PHY/PLY in X16 mode.** Push/pull 2 bytes when X=0. The `xy16spillr` test — _from [2026-06-18-321-xy16-hang-fix-xhigh.md](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md)_  <!-- fp:089392f5e8b0053d -->
+- [ ] **(triage)** **Transfer instructions (TAX/TXA/TAY/TYA/TXY/TYX) in mixed modes.** Standard implied — _from [2026-06-18-321-xy16-hang-fix-xhigh.md](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md)_  <!-- fp:9a09f71d5902e937 -->
 <!-- END auto-captured-deferrals -->
