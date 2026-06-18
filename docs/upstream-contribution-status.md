@@ -8,7 +8,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 ## TL;DR
 
-- **Ready to post now: 1 PR + 1 issue + 1 design note** — three artifacts, all drafted, all one command/paste away.
+- **Ready to post now: 1 PR + 2 issues + 1 design note** — four artifacts, all drafted, all one command/paste away.
   Strictly *PRs*, that's **one** (F4).
 - **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
@@ -50,6 +50,22 @@ gh issue create --repo llvm-mos/llvm-mos \
 
 Drafted and ready; the manual step is posting it to the llvm-mos Discord / issue #320
 (@asiekierka / @mysterymath) to open the ABI-blessing discussion. This **unblocks** the future #320 PR below.
+
+### 4 — register-scavenger N/Z-liveness issue (an issue, **not** a PR)
+
+Source-verified + asserts-build-confirmed write-up of an **upstream** crash:
+`MOSRegisterInfo::saveScavengerRegister` asserts N/Z dead at every scavenging point, but a
+compare/ALU flag can be live across a frame-vreg spill (readily hit by 16-bit-accumulator codegen)
+→ illegal `STImag8 $p`. **No fork patch** (issue only; the fix touches the generic scavenger
+contract and is regression-sensitive — left to maintainers). Deterministic repro included. File it:
+
+```
+gh issue create --repo llvm-mos/llvm-mos \
+  --title "[MOS] Register scavenger asserts N/Z dead (saveScavengerRegister) — violated when a compare/ALU flag is live across a frame-vreg spill" \
+  --body-file docs/321-upstream-scavenger-nz-issue.md   # strip the status block first
+```
+
+Full internal analysis: [`docs/investigations/65816-a16-scavenger-nz-liveness.md`](investigations/65816-a16-scavenger-nz-liveness.md).
 
 ## Future / blocked (not yet postable — do **not** count these as pending)
 

@@ -156,14 +156,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
-- [ ] **#321 `+mos-a16` `$p`-spill compiler crash — pre-existing, pre-REPSEP (found by the wider fuzz sweeps).**
-  `-verify-machineinstrs` crash *"`$p` is not a GPR register"* on `PH $p` / `STImag8 $p` / `$p = LDImag8` — a
-  register-allocation/spill bug for the `$p` (pointer) register under heavy pressure. The crash is **pre-REPSEP**
-  (dumped MIR has zero `REP/SEP`), so independent of all REPSEP/xy16 work. Seeds (from `fuzz 500`): **169, 173,
-  196, 268, 271, 272, 306, 420** (8 of 500). Repro: `dev/run.sh fuzz 1 <seed>`; triage in
-  `build/fuzz-triage/seed-00<seed>.txt`. NOTE: ~~seed-157 (`+mos-xy16` value mismatch)~~ **FIXED 2026-06-18**
-  by the transfer-instruction X-annotation (Commit A of the impl plan) — it was a second transfer-in-held-X16
-  bug, not a distinct miscompile.
+- [ ] **#321 `+mos-a16` register-scavenger crash (`$p is not a GPR register`) — root-caused + XFAIL'd; UPSTREAM bug, fix deferred.**
+  `-verify-machineinstrs` crash on `+mos-a16 -O1/-Os` (clean at `-O0` / default 8-bit). **Asserts-build-confirmed**
+  root cause: `MOSRegisterInfo::saveScavengerRegister` (pristine UPSTREAM, *not* `0002`) asserts N/Z dead at every
+  scavenging point ("NZ cannot be live … virtual registers are never inserted into CmpBr instructions"), but a
+  16-bit compare/ALU keeps **N (or Z) live** across a frame-vreg spill → it emits the illegal `STImag8 $p`
+  P(rocessor-status)-spill. Asserts build aborts at `assertNZDeadAt`; release build → verify crash. **8/500 fuzz
+  seeds** (169/173/196/268/271/272/306/420), now **XFAIL** (`tools/a16_fuzz.py` KNOWN_ISSUES `scavenger-p-not-gpr`).
+  Deterministic repro `examples/65816/a16scavnz.c`; diagnostic `dev/asserts-build.sh`. Fix (deep, regression-
+  sensitive — save/restore N/Z/P around the scavenger spill, or keep flags dead at frame-index materialization)
+  **deferred**, same class as the `globals.c` RA failure. NOTE: ~~seed-157 (`+mos-xy16` value mismatch)~~ **FIXED
+  2026-06-18** by the transfer-instruction X-annotation — it was a second transfer-in-held-X16 bug, not distinct.
+  [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
+  [upstream issue draft](docs/321-upstream-scavenger-nz-issue.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
@@ -252,6 +257,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   as a private workaround. The upstream PR is **ready** (clean branch off upstream `main` + the 2-line
   fix + an LLVM lit test, validated). Open it against `llvm-mos/llvm-mos`; once merged, drop `0003` and
   bump the vendor pin. [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
+- [ ] **File the register-scavenger N/Z-liveness issue** (user-triggered; issue, not a PR). Upstream
+  `MOSRegisterInfo::saveScavengerRegister` asserts N/Z dead at every scavenging point; a 16-bit
+  compare/ALU flag live across a frame-vreg spill violates it → illegal `STImag8 $p` (the 8-fuzz-seed
+  `+mos-a16` crash, XFAIL'd locally). Source-verified + asserts-confirmed; no fork patch (maintainer fix).
+  Draft + exact `gh issue create` in [upstream-contribution-status](docs/upstream-contribution-status.md)
+  (item 4) · body [docs/321-upstream-scavenger-nz-issue.md](docs/321-upstream-scavenger-nz-issue.md) ·
+  [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md).
 
 
 ## Watch

@@ -807,6 +807,21 @@ KNOWN_ISSUES = [
     # see TODO.md. REMOVE this entry when fixed so the signature hard-FAILS again (regression guard).
     ("regalloc-out-of-registers",
      lambda log: "ran out of registers during register allocation" in log),
+    # scavenger-p-not-gpr: +mos-a16 at -O1/-Os crashes the register scavenger.
+    # MOSRegisterInfo::saveScavengerRegister assumes N/Z are dead at every
+    # scavenging point ("NZ cannot be live ... virtual registers are never
+    # inserted into CmpBr instructions"); under +mos-a16 a 16-bit compare/ALU
+    # keeps N (or Z) live across a frame-vreg spill point, so it emits the illegal
+    # `STImag8 $p` P-spill -> "Bad machine code: $p is not a GPR register". DEFAULT
+    # 8-bit and +mos-a16 -O0 compile clean. PRISTINE UPSTREAM bug (not #321 code),
+    # confirmed via an asserts build (aborts at assertNZDeadAt). Deterministic
+    # repro: examples/65816/a16scavnz.c (delta-debugged from seed-306; the family
+    # is seeds 169/173/196/268/271/272/306/420). Full writeup + upstream-report
+    # draft: docs/investigations/65816-a16-scavenger-nz-liveness.md. REMOVE this
+    # entry when the upstream scavenger bug is fixed so the signature hard-FAILS
+    # again (regression guard).
+    ("scavenger-p-not-gpr",
+     lambda log: "$p is not a GPR register" in log),
 ]
 
 
