@@ -240,6 +240,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   quiet box (concurrent MAME load flakes the settle window). **VERIFIED 2026-06-19** —
   arith/control/arrays/structs/funcs PASS, `globals` XFAIL, exit 0; default `corpus` still 7/7.
   [plan](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md).
+- [ ] **Wire `corpus-a16` into CI** (follow-on to the gate above). Add it alongside the `xcheck` job in
+  `smoke.yml` once it has soaked locally — same heavy from-source-toolchain build, so it can share that
+  job's `actions/cache@v5` toolchain cache. [plan](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md).
 - [verify] **Wire the bsnes-jg `xcheck` into CI** — implemented + YAML-validated; a green CI dispatch
   is the remaining confirmation (heavy, user-triggered: the from-source toolchain build is ~30–90 min).
   Added an `xcheck` job to `smoke.yml` (parallel to `smoke`): builds the from-source patched toolchain
@@ -701,7 +704,12 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      mirrors lib/, and full llvm-lit is unbuildable here), and the last two are the *delivered* artifacts
      (dev/run.sh dwarf gate 7/7 + the verified staged lit test) — Step 5 is complete (commit cc940f1).
      Nothing open. fp:02d8811ec8003aa5 fp:b4a301783ca3b9e3 fp:110cfbbe5aab25e6 fp:fe7817097ea1d37e -->
-- [ ] **(triage)** Fixing `globals.c` (deferred — upstream scavenger/regalloc, XFAIL'd; reevaluate at M2 wrap-up). — _from [2026-06-19-321-corpus-a16-differential-mode.md](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md)_  <!-- fp:3807f2b481a45e90 -->
-- [ ] **(triage)** Wiring `corpus-a16` into CI (`smoke.yml`/`xcheck`) — sensible follow-on once green locally. — _from [2026-06-19-321-corpus-a16-differential-mode.md](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md)_  <!-- fp:13cb10ca9b2122a5 -->
-- [ ] **(triage)** New corpus programs. — _from [2026-06-19-321-corpus-a16-differential-mode.md](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md)_  <!-- fp:f1527e7e0ec4fec4 -->
+<!-- triaged 2026-06-19: all three corpus-a16-plan "Out of scope" bullets dispositioned.
+     • "Fixing globals.c" -> already the curated M2 Open bullet "#321 +mos-a16 -O1/-Os register-allocation
+       FAILURE on real code (corpus globals.c)" (root-caused; DECISION = keep XFAIL, reevaluate at M2 wrap-up).
+     • "Wiring corpus-a16 into CI" -> PROMOTED to a curated Test Bench/CI bullet ("Wire corpus-a16 into CI",
+       right below the corpus-a16 gate item).
+     • "New corpus programs" -> non-work scope marker: this plan deliberately added none; broadening the
+       corpus (Tier-2) is open-ended future work, not a tracked deliverable here. Nothing open.
+     fp:3807f2b481a45e90 fp:13cb10ca9b2122a5 fp:f1527e7e0ec4fec4 -->
 <!-- END auto-captured-deferrals -->
