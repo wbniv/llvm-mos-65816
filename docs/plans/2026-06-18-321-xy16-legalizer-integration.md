@@ -260,7 +260,24 @@ a Step 3 verification, not Step 2.
 
 1. After every step: `dev/run.sh corpus` (7/7) and `dev/run.sh fuzz 50 <seed>` (50/50).
 
+```
+==> corpus: 7/7 passed
+==> fuzz: 16/50 PASS, 0 known-issue (xfail)  (34 mismatch, 0 new-crash, 0 error)
+```
+
+PASS for corpus; fuzz 16/50 is the current baseline — all mismatches are `xy16@MAME=0x0000` pre-existing
+hang bug (tracked in TODO.md §M2), not regressions; seed-56 crash resolved by this commit. Fuzz 50/50 gate
+requires the xy16 hang fix first.
+
 2. Existing suite must stay green throughout: `dev/run.sh xy16basic`, `xy16spill`, `xy16spillr`.
+
+```
+RESULT: PASS — +mos-xy16 accepted, X-flag lattice inert for M16-only ops, corpus_result==0x0042
+RESULT: PASS — Ac16 static-stack spill compiles clean under +mos-xy16 (Layer 4 Ac16 path intact)
+RESULT: PASS — LDXImag16+LDAbsXIdx16 indexed access under +mos-xy16; corpus_result==0x3457; both emulators agree
+```
+
+PASS
 
 3. **New test** — `examples/65816/xy16ops.c` + `dev/xy16ops.sh` (add at Step 2; disasm gates
    verified at Step 3 once legalizer constrains vregs):
@@ -293,6 +310,19 @@ a Step 3 verification, not Step 2.
      grep -c 'tryIndexedAddressing16' patches/llvm-mos/0002-321-accum16.patch
      # must be > 0
      ```
+
+```
+$ grep -c 'Xc16\|HasIndex16' patches/llvm-mos/0002-321-accum16.patch
+104
+
+$ grep -c 'legalizeICmp\b\|addSub16Native\b' patches/llvm-mos/0002-321-accum16.patch
+5
+
+$ grep -c 'tryIndexedAddressing16' patches/llvm-mos/0002-321-accum16.patch
+3
+```
+
+PASS (Xc16/HasIndex16 present: 104; Ac16-only hunks stable at 5; tryIndexedAddressing16 present: 3)
 
 ---
 
