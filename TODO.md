@@ -43,10 +43,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
   only by `G_UNMERGE` now loads byte-wise instead of a wasteful 16-bit-load→`A16`→spill→re-read —
   `legalizeLoadStore16`; brings EQ-as-value to parity with default — see Done). The **full native
-  compare** (one `rep; lda; cmp; sep` + materialize Z→0/1, beating default) is **WON'T-IMPLEMENT** (spike
-  2026-06-18: measured **+14 B regression** on all shapes — the backend has no branchless flag→byte path
-  [carry→byte is itself a diamond] and equality's Z isn't rotatable, so the select-diamond is near-optimal;
-  see the [full-native materialize plan §Phase 0](docs/plans/2026-06-18-321-native-s16-eq-as-value-full-native-materialize.md)); ~~(d) fold a near-abs global RHS into `CMPAbs16`~~ (landed — see Done; also
+  compare** (one `rep; lda; cmp; sep` + materialize Z→0/1, beating default) is **WON'T-IMPLEMENT** (both
+  materializations measured 2026-06-18: Option A reuse-ops **+14 B**, Option B explicit branchless `rol`/`adc`
+  tail **+16…+28 B** — worse, because branchless forgoes the `CmpBr` compare-fusion the diamond exploits, and
+  equality's Z isn't rotatable so the value must be formed first; the select-diamond is near-optimal; see the
+  [full-native materialize plan §Phase 0](docs/plans/2026-06-18-321-native-s16-eq-as-value-full-native-materialize.md)
+  + [Option B proof](docs/plans/2026-06-18-prove-option-b-rol-tail-materialization-for-native.md)); ~~(d) fold a near-abs global RHS into `CMPAbs16`~~ (landed — see Done; also
   folds the LHS via `lda abs`). **Tier-1 fuzzer finding F3 (the `SelectImm $a16` crash on a 16-bit-
   accumulator value spilled across a call) is FIXED** for BOTH stacks: static (2026-06-16, direct
   `STAbs16`/`LDAbs16`; `examples/65816/a16spill.c`) and soft/reentrant (2026-06-16, 16-bit indirect
@@ -58,7 +60,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
   [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md) ·
   [compare-operand-fold plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md) ·
-  [full-native materialize plan](docs/plans/2026-06-18-321-native-s16-eq-as-value-full-native-materialize.md).
+  [full-native materialize plan](docs/plans/2026-06-18-321-native-s16-eq-as-value-full-native-materialize.md) ·
+  [Option B rol-tail proof](docs/plans/2026-06-18-prove-option-b-rol-tail-materialization-for-native.md).
 - [ ] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** The F3 `Ac16`
   spill fix landed on **both** stacks, but the soft-stack half was found only by a hand-written recursive
   reproducer — the **fuzzer never reaches it**: `gen_funcs` emits only leaf functions (`expr(pure=True)`
@@ -600,4 +603,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "Native interrupt service" -> not active work; bare `rti` stubs are width-safe for bring-up.
        The M16/X16-entry `php`/force-width note is recorded in the plan for the future worker who
        lands real vblank/IRQ handlers. Nothing open today. fp:ba56664f75e7c2fa fp:dd5e492a20c5fd16 -->
+- [verify] **2026-06-18-prove-option-b-rol-tail-materialization-for-native** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-18-prove-option-b-rol-tail-materialization-for-native.md](docs/plans/2026-06-18-prove-option-b-rol-tail-materialization-for-native.md)_  <!-- fp:e9e161484c038906 -->
 <!-- END auto-captured-deferrals -->

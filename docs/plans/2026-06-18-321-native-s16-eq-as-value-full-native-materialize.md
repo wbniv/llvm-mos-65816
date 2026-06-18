@@ -1,11 +1,13 @@
 # #321 — native s16 equality-as-value: the full one-REP-bracket compare-and-materialize
 
 **Date:** 2026-06-18
-**Status:** **WON'T-IMPLEMENT** (Phase 0 spike, 2026-06-18) — the branchless one-REP-bracket materialization
-is a **measured +14 B regression** on every shape; the existing select-diamond is near-optimal for
-equality-as-value. Investigated in a throwaway worktree (`wt/321-eqval-spike`), no `vendor/` change shipped.
-See **§Phase 0 — RESULTS** for the table, disasm, and root cause. (Mirrors the indirect-s16-load-bytewise
-investigation that also landed WON'T-DO.)
+**Status:** **WON'T-IMPLEMENT** (Phase 0 spike, 2026-06-18) — both candidate materializations are measured
+regressions: Option A (reuse-existing-ops, carry→diamond) **+14 B** and Option B (explicit branchless
+`rol`/`adc` tail) **+16…+28 B** on every shape. The existing select-diamond is near-optimal for
+equality-as-value (it fuses the compare into a `CmpBr`, which branchless materialization forgoes).
+Investigated in throwaway worktrees (`wt/321-eqval-spike`, `wt/321-eqval-optb`), no `vendor/` change shipped.
+See **§Phase 0 — RESULTS** (both options measured, with tables, disasm, and root cause). (Mirrors the
+indirect-s16-load-bytewise investigation that also landed WON'T-DO.)
 **ROADMAP:** step 5 (M2) · **TODO:** M2 "16-bit comparison follow-ups" item (c) — the *full native compare*,
 the last deferred piece of that bullet, now dispositioned.
 
@@ -45,12 +47,32 @@ replaced `buildNZSelect(Z)` with `X = LHS ^ RHS` (native EOR → Imag16) then `C
 (`lda abs; cmp abs` / `lda zp; cmp zp`), the Z flag is read by **one** branch, and the two arms store `0`/`1`
 directly (`ldx #1; stx` / `stz`). For equality there is nothing cheaper to reduce Z to a byte.
 
-**Option B (a dedicated `CmpSel*16` pseudo with an explicit `lda #0; rol` tail) — predicted, not built.** A
-rol tail would shave the materialization (~5 B vs the diamond), but cause #2 still applies: the pseudo must
-first compute the difference/XOR value, whose cost (`eor` + stash) exceeds the rol-tail savings. Net: at best
-parity, more likely a small regression, for a **substantial** 5-pseudo change (selection + expansion +
-`analyzeBranch` plumbing). Building a guaranteed-≥-diamond mechanism to ship a regression violates governing
-lessons #2/#3 (gate only where it wins — and it wins nowhere). **Not pursued.**
+**Option B (an explicit `lda #0; rol`/`adc` branchless tail) — MEASURED 2026-06-18 (was "predicted"; the
+user asked for proof).** Built the branchless tail *without* a new pseudo by reusing existing machinery:
+`selectAddE` already lowers `G_UADDE` → `adc`, so the EQ value path emits `X = LHS^RHS`; `Ceq = C of
+SBC(0,X) = (X==0)`; `byte = G_UADDE(0,0,Ceq)` → `txa; adc #0` (carry→bit0). The tail **is** genuinely
+branchless — disasm shows `txa; adc #$0` with **no** `bcc`/`beq` 0/1 diamond (tail check: `adc` present,
+`bcc=0`). Result — a **larger** regression than even Option A:
+
+| shape | diamond | Option A (carry→diamond) | **Option B (rol/adc tail)** |
+|-------|--------:|-------------------------:|----------------------------:|
+| `a16eqval`  | 104 | 118 (+14) | **120 (+16 B)** |
+| `a16eqvalc` | 121 | 135 (+14) | **149 (+28 B)** |
+| `a16eqvalp` | 154 | 168 (+14) | **175 (+21 B)** |
+
+The disasm shows exactly why (`a16eqval`, first `a==b`): `rep; lda a; eor b; sta X; lda #0; cmp X; sep;
+txa; adc #0; sta` — the **tail `txa; adc #0` is cheap (3 B)**, but **the branchless path forgoes the `CmpBr`
+compare-fusion the diamond exploits.** The diamond fuses `lda; cmp` straight into the branch (one
+`CmpBrAbsAbs16`); the branchless path must instead form the difference value (`eor`), stash it, and run a
+*standalone* `lda #0; cmp X` to generate a carry — because equality's Z isn't rotatable (cause #2), you
+cannot branch-free without first materializing `X = LHS^RHS`. So Option B pays for **both** a non-fused
+compare **and** the value computation, while saving only ~6 B on the materialization itself. Net: a clear,
+measured regression. A hand-built `CmpSel*16` pseudo would hit the *same* two costs (it still needs `eor` +
+a carry-generating compare, and a materialize can't use the Z-branch fusion), so it was **not** built — the
+`G_UADDE` proxy + the disasm-revealed mechanism settle it. Shipping a guaranteed-≥-diamond mechanism for a
+measured regression violates governing lessons #2/#3 (gate only where it wins — it wins nowhere). **Not
+pursued.** (Proof experiment:
+[prove-option-b plan](2026-06-18-prove-option-b-rol-tail-materialization-for-native.md).)
 
 **Disposition:** equality-as-value stays on the existing select-diamond (already operand-folded and
 near-optimal). The branch-use EQ path, and the v1/v2/v3/imm/task7 gated value forms, are unchanged and remain
