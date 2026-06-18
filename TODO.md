@@ -687,8 +687,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • TSX/TXS — non-work: no compiler-pseudo path (crt0 stack init is hand-written asm); would only
        matter for a future native-hardware-stack frame. Nothing open.
      fp:e3eda71d77592d8c fp:d64f4a3bcd9e3615 fp:5357e60ef6ea3fea -->
-- [ ] **(triage)** **`dev/regen-patch.sh` mirrors only `llvm/lib/Target/MOS`** → a file under `llvm/test/` is lost on a — _from [2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md)_  <!-- fp:02d8811ec8003aa5 -->
-- [ ] **(triage)** **Full `llvm-lit` can't run here** — the container-configured `build/llvm-mos` tree lacks `count`/`not` — _from [2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md)_  <!-- fp:b4a301783ca3b9e3 -->
-- [ ] **(triage)** **`dev/dwarf.sh` + `dev/run.sh dwarf`** — the durable, tracked, in-repo regression. Runs the real — _from [2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md)_  <!-- fp:110cfbbe5aab25e6 -->
-- [ ] **(triage)** **`dev/lit/DebugInfo/MOS/dwarf-65816.ll`** (+ `dev/lit/README.md`) — the upstream-PR lit form, staged in — _from [2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md)_  <!-- fp:fe7817097ea1d37e -->
+<!-- triaged 2026-06-19: all four are FALSE POSITIVES from the DWARF step-6 plan's Step 5 "DONE" section —
+     none is deferred work. The first two are the *rationale* for a justified deviation (regen-patch only
+     mirrors lib/, and full llvm-lit is unbuildable here), and the last two are the *delivered* artifacts
+     (dev/run.sh dwarf gate 7/7 + the verified staged lit test) — Step 5 is complete (commit cc940f1).
+     Nothing open. fp:02d8811ec8003aa5 fp:b4a301783ca3b9e3 fp:110cfbbe5aab25e6 fp:fe7817097ea1d37e -->
 <!-- END auto-captured-deferrals -->
