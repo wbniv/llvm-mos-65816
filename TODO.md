@@ -678,7 +678,12 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      in X16 mode + TAX/TXA/… transfers in mixed modes. They are speculative (no corpus/fuzz evidence
      yet), so tracked as watch items, not active work. Detail stays in the plan's Deferred section.
      fp:089392f5e8b0053d fp:9a09f71d5902e937 -->
-- [ ] **(triage)** **seed-157** — a distinct `+mos-xy16` value mismatch (fails on both bail and `B.begin()` toolchains). — _from [2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md)_  <!-- fp:e3eda71d77592d8c -->
-- [ ] **(triage)** **seed-169 / 173 / 196** — `+mos-a16` compiler crash in `-verify-machineinstrs` ("`$p` is not a GPR — _from [2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md)_  <!-- fp:d64f4a3bcd9e3615 -->
-- [ ] **(triage)** **TSX/TXS** — no compiler-pseudo path; would only matter for a future native-hardware-stack frame. — _from [2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md)_  <!-- fp:5357e60ef6ea3fea -->
+<!-- triaged 2026-06-18: all three repsep-x-annotation "Out of scope" bullets dispositioned.
+     • seed-157 — NO LONGER a residual: FIXED by Commit A (transfer X-annotation); it was a second
+       transfer-in-held-X16 bug. Recorded as fixed in the curated "$p-spill compiler crash" item.
+     • seed-169/173/196 — covered by the curated "+mos-a16 $p-spill compiler crash" item (now lists all
+       8 seeds: 169/173/196/268/271/272/306/420).
+     • TSX/TXS — non-work: no compiler-pseudo path (crt0 stack init is hand-written asm); would only
+       matter for a future native-hardware-stack frame. Nothing open.
+     fp:e3eda71d77592d8c fp:d64f4a3bcd9e3615 fp:5357e60ef6ea3fea -->
 <!-- END auto-captured-deferrals -->
