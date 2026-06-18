@@ -792,12 +792,22 @@ def run_bsnes(rom, off, length, want):
 # keeps exercising the rest of the space while the fix is tracked. New/unmatched crashes
 # and ALL runtime value mismatches remain hard failures. See the Tier-1 plan §Findings.
 #
-# Empty: F3 (`cmp-value-selectimm` — the `SelectImm $a16` crash on a 16-bit-accumulator
-# value spilled across a call) was FIXED 2026-06-16 by spilling Ac16 via a direct 16-bit
+# (F3, `cmp-value-selectimm` — the `SelectImm $a16` crash on a 16-bit-accumulator value
+# spilled across a call — was FIXED 2026-06-16 by spilling Ac16 via a direct 16-bit
 # LDAbs16/STAbs16 instead of a COPY through an 8-bit GPR (MOSInstrInfo.cpp loadStoreReg-
-# StackSlot). That signature now hard-FAILS again, so a regression cannot silently XFAIL.
-# See docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md.
-KNOWN_ISSUES = []
+# StackSlot); its signature now hard-FAILS again so a regression cannot silently XFAIL.
+# See docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md.)
+KNOWN_ISSUES = [
+    # regalloc-out-of-registers: +mos-a16 at -O1/-Os exhausts the register allocator on a
+    # function holding a u16 accumulator live across a second loop alongside u16*u8 multiplies
+    # ("ran out of registers during register allocation"). DEFAULT 8-bit and +mos-a16 -O0
+    # compile clean. Deterministic repro: examples/65816/a16regpress.c (delta-debugged from
+    # the corpus program globals.c, built default 8-bit so never exercised under +mos-a16).
+    # Fix is in the F3 / soft-stack spill-coverage family (allocator / spill path), deferred —
+    # see TODO.md. REMOVE this entry when fixed so the signature hard-FAILS again (regression guard).
+    ("regalloc-out-of-registers",
+     lambda log: "ran out of registers during register allocation" in log),
+]
 
 
 def classify_known(log):
