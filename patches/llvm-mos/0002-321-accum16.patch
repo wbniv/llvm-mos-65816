@@ -2466,7 +2466,7 @@ index fbedd8d46..d329144e2 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..879eaca65 100644
+index 212ede1a0..b5c931699 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -150,18 +150,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -2919,7 +2919,7 @@ index 212ede1a0..879eaca65 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    auto ValueType = MRI.getType(MI.getValueReg());
-@@ -1671,6 +1963,125 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+@@ -1671,6 +1963,136 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
    return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
  }
  
@@ -2990,6 +2990,7 @@ index 212ede1a0..879eaca65 100644
 +        continue;
 +      }
 +      if (MachineInstr *ZExt = getOpcodeDef(G_ZEXT, Off, MRI)) {
++        // Pre-legalization: explicit G_ZEXT from a ≤8-bit source.
 +        if (VarIndex)
 +          return false;
 +        Register Src = ZExt->getOperand(1).getReg();
@@ -3001,9 +3002,19 @@ index 212ede1a0..879eaca65 100644
 +        VarIndex = Src;
 +        continue;
 +      }
-+      if (Helper.getValueTracking()->getKnownBits(Off).countMaxActiveBits() <=
-+          8) {
++      // G_ZEXTLOAD(s16, ptr): the result is a zero-extending load of an ≤8-bit
++      // memory operand.  Using G_TRUNC to s8 here is safe because after the
++      // G_ZEXTLOAD legalizes to G_MERGE_VALUES(lo_s8, G_CONSTANT(0)), the
++      // LegalizationArtifactCombiner reduces the G_TRUNC to lo_s8 directly
++      // (a standalone s8 register).  Crucially, the G_CONSTANT(0) high byte IS
++      // explicitly materialized by the legalizer — unlike a "known-zero" from
++      // bounds analysis, which the RA can elide, leaving the pair's high byte
++      // undefined and crashing the spill-around-call path (seed 56 bug).
++      if (MachineInstr *ZExtLoad = getOpcodeDef(G_ZEXTLOAD, Off, MRI)) {
 +        if (VarIndex)
++          return false;
++        LLT LoadTy = ZExtLoad->memoperands().front()->getMemoryType();
++        if (!LoadTy.isScalar() || LoadTy.getSizeInBits() > 8)
 +          return false;
 +        VarIndex = Builder.buildZExtOrTrunc(S8, Off).getReg(0);
 +        continue;

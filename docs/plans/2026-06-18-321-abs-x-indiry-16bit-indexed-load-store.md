@@ -365,14 +365,25 @@ RESULT: PASS
 
 PASS
 
-5. Non-breaking: corpus 7/7 + all existing a16\* tests green; `dev/run.sh fuzz 50 1` →
-   50/50, 0 mismatch/crash; `-verify-machineinstrs` clean over suite + fuzz set.
+5. Non-breaking: corpus 7/7 + all existing a16\* tests green; `dev/run.sh fuzz 50 1` +
+   `dev/run.sh fuzz 50 51` → 100 seeds, 0 mismatch/crash; `-verify-machineinstrs` clean
+   over suite + fuzz set.
+
+   **Seed‑56 fix (discovered post-initial-landing):** `tryIndexedAddressing16`'s original
+   known-bits path called `buildZExtOrTrunc(S8, Off_s16)` on a `G_SHL/G_AND` (s16) offset.
+   The RA elided the zero-materialisation for the high byte (known-zero from bounds analysis,
+   NOT an explicit `G_CONSTANT(0)`), then tried to spill the pair across a JSR — undefined
+   physical register crash.  Fix: replaced the known-bits block with a `G_ZEXTLOAD` handler;
+   for a `G_ZEXTLOAD(s16)` the high byte IS materialised as `G_CONSTANT(0)` by the legalizer
+   so the RA cannot elide it.  The `a16absidx.c` index (`volatile unsigned char g_off`)
+   reaches `tryIndexedAddressing16` as `G_ZEXTLOAD(s16)` (IRTranslator combines
+   `G_LOAD(s8) + G_ZEXT` into a single `G_ZEXTLOAD`), so the gate fires correctly.
 
 ```
 corpus: 7/7 passed
-a16* suite: 55/56 PASS (a16spillr pre-existing FAIL, not a regression — verified by
-            running the same test on unmodified main before changes)
-fuzz 50/50 PASS, 0 known-issue (xfail)  (0 mismatch, 0 new-crash, 0 error)
+a16* suite: 56/56 PASS (all gates pass; a16spillr + xy16spillr both PASS post-xy16 merge)
+fuzz (seeds  1–50):  50/50 PASS, 0 known-issue (0 mismatch, 0 new-crash, 0 error)
+fuzz (seeds 51–100): 50/50 PASS, 0 known-issue (0 mismatch, 0 new-crash, 0 error)
 ```
 
 PASS
@@ -381,8 +392,8 @@ PASS
    `MOSInstrGISel.td`, `MOSInstrLogical.td` changed; no foreign hunks).
 
 ```
-wrote patches/llvm-mos/0002-321-accum16.patch (2967 lines, 21 files)
 RESULT: PASS — 0002 round-trips (reapplied MOS dir == live vendor)
+3327 lines, 21 files (larger than initial: G_ZEXTLOAD handler + comments)
 ```
 
 PASS
