@@ -159,14 +159,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   no `0002`, no toolchain rebuild). The hardware-stack-ABI / DP-frame crt0 change stays gated on the open
   CC decision. **VERIFIED 2026-06-18** — `crt0native` PASS on MAME + bsnes-jg; corpus 7/7; `a16abs`/`far-run`/`far-bank1` PASS; fuzz 50/50 green.
   [plan](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md).
-- [ ] **#321 calling-convention decision (open, blocks the hardware-stack ABI).** Analysis + recommendation:
-  [CC decision analysis](docs/investigations/65816-calling-convention-decision.md). The "one decision"
-  decomposes into 4 sub-decisions; only the **frame** (TCD DP-window vs stack-relative vs keep the soft
-  static stack) is hard, gated on a product steer (first-pass demonstrator vs match the WDC/ORCA commercial
-  ABI) + measurement after xy16. Does **not** block xy16 + native-mode crt0. ~~**First piece to land — the
-  A (low) / X (high) return convention**~~ **DONE 2026-06-17** — locked as a tested, documented ABI invariant
-  (codegen unchanged); `dev/run.sh a16ret` + CC-analysis §"Return values — adopted". See Done. The remaining
-  CC sub-decisions (args, frame, recursion) stay open.
+- [ ] **#321 calling-convention — frame decision RESOLVED (phased) 2026-06-18; remaining work deferred/gated.**
+  [CC decision analysis](docs/investigations/65816-calling-convention-decision.md) ·
+  [decision record](docs/plans/2026-06-18-321-cc-frame-phased-decision.md). The "one decision" decomposes
+  into 4 sub-decisions, now all dispositioned: ~~return~~ (A low / X high — **LOCKED 2026-06-17**,
+  `dev/run.sh a16ret`, codegen unchanged; see Done); ~~args~~ (**keep imaginary-register** passing — adopted
+  for the first pass); ~~recursion~~ (the already-hardened soft static stack); and the ~~hard **frame** fork~~
+  (**RESOLVED phased 2026-06-18**: the first pass keeps the soft static stack; the **TCD DP-window** is
+  deferred behind a ZP-pressure measurement; pure stack-relative is ruled out as dominated). Never blocked
+  xy16 + native-mode crt0. **Remaining:** (1) the ZP-pressure measurement → build the DP-window *only if* the
+  imaginary-register file proves tight (deferred revival trigger; host-only, measure on corpus+kernels); (2)
+  upstream posture — post the prior-art note + a first-pass CC to #321 (user-triggered; see Upstream section).
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
 - [wip] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads

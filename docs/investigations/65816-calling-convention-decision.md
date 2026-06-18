@@ -19,9 +19,11 @@ the upstream framing (@asiekierka's three pillars) is in [`docs/INVESTIGATION.md
   boot concerns, not the call boundary.
 - Upstream **won't bless an ABI ahead of a high-quality implementation** (@mysterymath), and the CC is
   *explicitly still open* upstream. So our job is a credible **first-pass** CC, not the final ABI.
-- **Recommendation: phase it.** Cheap path now (A/X return + keep imaginary-register args + native crt0);
-  defer the frame fork until xy16 lands and we can measure; lean **TCD direct-page window layered over the
-  existing static stack**, never a rip-out.
+- **Recommendation: phase it. — ADOPTED 2026-06-18**
+  ([decision record](../plans/2026-06-18-321-cc-frame-phased-decision.md)): the first pass **keeps the soft
+  static stack** (cheap path — A/X return + imaginary-register args + native crt0); the **TCD direct-page
+  window is deferred** behind a zero-page-pressure measurement; pure stack-relative is ruled out; the static
+  stack is never ripped out.
 
 ## What llvm-mos does today (the baseline we'd depart from)
 
@@ -92,7 +94,7 @@ not change the A(low)/X(high) *convention*. Plan:
 |---|---|---|
 | **Return values** | trivial | **A (low) / X (high)** — prior art (WDC p.21 + ORCA `A_X`) *and* already emergent (above). **ADOPTED + locked** (`dev/run.sh a16ret`); see §"Return values — adopted". |
 | **Argument passing** | medium | Keep **imaginary-register** passing (`CC_MOS`, composes with the backend + #321) or push on the **hardware stack** (prior art; uncaps arg count; slower per call). |
-| **Local / frame storage** | **hard** | ZP imaginary regs (today) vs. **TCD direct-page window** (prior art; fast; 256 B cap) vs. **pure stack-relative** (`,S`; no cap; slow). |
+| **Local / frame storage** | ~~hard~~ **RESOLVED (phased) 2026-06-18** | **Keep the soft static stack / ZP imaginary regs for the first pass**; **TCD direct-page window** (prior art; fast; 256 B cap) deferred behind a ZP-pressure measurement; **pure stack-relative** (`,S`) ruled out. [Decision record](../plans/2026-06-18-321-cc-frame-phased-decision.md). |
 | **Recursion / reentrancy** | mostly solved | The soft static stack we just hardened (F3 / soft-stack P0–P2). The hardware stack *augments* it, not replaces. |
 
 ## The reframe that shrinks the hard one
@@ -128,6 +130,10 @@ ZP, freeing the imaginary-register file. If the target programs are ZP-tight, th
 
 ## Recommendation — phase it
 
+**ADOPTED 2026-06-18** (project-lead steer): the goal is a first-pass demonstrator, so the lean below is the
+**decision**, not just a recommendation. Durable record:
+[decision record](../plans/2026-06-18-321-cc-frame-phased-decision.md).
+
 1. **Now (cheap, high-consensus):** A (low) / X (high) return + keep imaginary-register arg passing +
    native-mode crt0 with `SP=$01FF`. This is @asiekierka's documented "cheap intermediate path"; it unblocks
    everything and commits nothing controversial. (The return piece is **done** — locked + tested via
@@ -138,13 +144,17 @@ ZP, freeing the imaginary-register file. If the target programs are ZP-tight, th
 3. **Never remove the soft static stack.** The hardware stack is an *addition* (ZP relief + recursion), not
    a replacement — keep llvm-mos's actual strength.
 
-## Open questions (the steer needed before committing the frame)
+## Open questions — the steer
 
-1. **Goal:** a *first-pass demonstrator* (→ minimal departure, the lean above) or *match the proven
-   commercial ABI* for interop (→ full stack-push + DP-window now)?
-2. **How tight is the zero page** in the SNES programs we care about? The swing vote between (a) and (c).
-3. **Upstream posture:** proactively drive it (post the prior-art note + a proposed first-pass CC to #321 to
-   engage @asiekierka / @mysterymath) or keep implementing and let the ABI emerge from working code?
+1. ~~**Goal:** a *first-pass demonstrator* or *match the proven commercial ABI*?~~ **RESOLVED 2026-06-18:
+   first-pass demonstrator** → the phased lean above is adopted (keep the soft static stack; defer the
+   DP-window). [Decision record](../plans/2026-06-18-321-cc-frame-phased-decision.md).
+2. **How tight is the zero page** in the SNES programs we care about? — the swing vote between (a) and (c),
+   now the **deferred revival trigger** for the DP-window: measure the imaginary-register high-water mark on
+   the corpus + kernels and build (a) only if it routinely nears the budget (≈14 sixteen-bit pairs).
+3. **Upstream posture** (still open, user-triggered): proactively drive it (post the prior-art note + a
+   proposed first-pass CC to #321 to engage @asiekierka / @mysterymath) or keep implementing and let the ABI
+   emerge from working code?
 
 ## References
 

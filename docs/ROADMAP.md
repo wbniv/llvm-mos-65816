@@ -99,9 +99,13 @@ Then: hardware-stack ABI (16-bit SP + stack-relative addressing) and the calling
 **Later / out of initial scope:** #321 stage 2 (xy8/xy16 switching — asiekierka: "may well be a
 pipe dream with our current resources").
 
-## Calling-convention decision (open, blocks the ABI)
+## Calling-convention decision — frame RESOLVED (phased) 2026-06-18
 
-Undecided in #320/#321 and gating. Three candidates:
+**RESOLVED (phased) 2026-06-18:** the first-pass ABI **keeps llvm-mos's soft static stack**; the TCD
+direct-page window is **deferred** behind a zero-page-pressure measurement; pure stack-relative is ruled out.
+Return = A (low) / X (high) (locked); args = keep imaginary-register. So the frame **no longer blocks** the
+first-pass ABI. See the [decision record](plans/2026-06-18-321-cc-frame-phased-decision.md) +
+[CC analysis](investigations/65816-calling-convention-decision.md). The three candidates that were weighed:
 
 - **PHD/TCD direct-page frame** — what Zardoz / WDC816CC / ORCA-C all did
   (Zardoz ABI (drdevtools research)):
