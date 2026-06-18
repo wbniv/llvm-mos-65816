@@ -35,13 +35,15 @@ still authored now; only the fixture/end-to-end test wait on the compiler fix.
 | 3 | **Phase B** — drmon DWARF loader + committed ELF fixture + unit tests | drdevtools | Step 1 (fixture trust) | ✅ **DONE — loadElf, 3 ELF tests PASS** |
 | 4 | **Phase C** — drmon end-to-end: breakpoint on real `-g` ROM in MAME | drdevtools | Steps 1, 3 | ✅ **DONE — 6/6, 3 runs** |
 | — | **⏸ PAUSE FOR REVIEW** — stop here; hand back for review before any `vendor/` edits | — | Steps 1–4 done | **◀ HERE** |
-| 5 | **Phase A** — vendor `.ll` regression tests + **debug-ELF emission path** (no emission *fix* needed); patch regen | llvm-mos-65816, **source edits** | review sign-off | |
+| 5 | **Phase A** — vendor `.ll` regression tests (hygiene only); patch regen | llvm-mos-65816, **source edits** | review sign-off | |
 
 (The table has a 5th "status" column now.) Steps 1–4 are the "as much drmon as possible" block. **Stop
 and hand back for review after Step 4** — do **not** begin Step 5 (the only compiler-source work) until
-the drmon work is reviewed and approved. **Step 1 came back clean**, so Step 5 is *not* an emission fix:
-it's (a) regression tests for the already-correct DWARF, and (b) the new **debug-ELF emission** deliverable
-(the SNES build currently discards the ELF — see Step 1 KEY FINDING).
+the drmon work is reviewed and approved. **Step 1 came back clean** (DWARF content correct *and* the
+build already emits a `<rom>.elf` DWARF companion — see Step 1 KEY FINDING), so Step 5 is **not** an
+emission fix and **not** a debug-ELF emission feature (both already work): it's just `.ll` regression
+tests pinning the verified shapes. Optionally, a doc note upstream that `<output>.elf` is the debugger
+artifact.
 
 ---
 
@@ -84,13 +86,10 @@ Pure read-only use of the already-built toolchain — **no `vendor/` edits.** Es
 clang 23.0.0git `c798c31`). DWARF v5 (`-dwarf-version=5`, `-debugger-tuning=gdb`, `-gkey-instructions`,
 constructor-level info — from the `-###` driver dump).
 
-**Two artifact forms (the `--config` recipe in the original plan was wrong — see finding below):**
-- **Object** (`-c -g`, no `--config`/LTO): `build/llvm-mos-install/bin/mos-clang --target=mos
-  -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -g -Os -c a16local.c -o a16local.o`
-  → real ELF object, DWARF present, **section-relative** addrs (main at 0x00).
-- **Linked ELF** (real SNES addrs): see the **debug-ELF finding** below.
-
-`--verify` on both: `No errors.` (exit 0).
+**Where the DWARF lives:** a normal `mos-clang --config mos-snes.cfg -g -o a16local.sfc` build emits the
+ROM **and** a `a16local.sfc.elf` DWARF companion (see the KEY FINDING below — `ld.lld` auto-writes
+`<output>.elf`). A bare `-c -g` object also carries DWARF (section-relative addrs) and is handy for
+inspection. `--verify` on both: `No errors.` (exit 0).
 
 `.debug_info` (object) — every check passes, incl. the **high-risk imaginary-register local**:
 ```
@@ -109,49 +108,41 @@ addr 0x0d (line 0 marker) = where `t` goes live (matches the loclist range exact
 loclist. (NB: for *value* inspection a debugger must map DWARF reg RS1 → its ZP address; not needed for
 the line-breakpoint gate, deferred per B4.)
 
-### Step 1 — KEY FINDING: the SNES build discards the debug ELF 🔑
+### Step 1 — KEY FINDING (CORRECTED): the SNES build already emits a DWARF companion ELF 🔑
 
-The original plan's `mos-clang --config mos-snes.cfg -g -o x.elf` does **not** produce a DWARF ELF — it
-produces a **raw 32 KiB SNES ROM** (`file` → "Super NES ROM image"). Cause: the SNES linker script
-`build/install/mos-platform/snes/lib/link.ld` ends with llvm-mos's custom
-```
-OUTPUT_FORMAT { FULL(rom) }     /* dumps the `rom` MEMORY region as a flat binary = the .sfc */
-```
-so `ld.lld` writes the flat ROM and the DWARF (computed during LTO codegen) is never written to disk.
-**This is the real gap for ROADMAP step 6: the round-trip needs a debug-ELF emission path.**
+⚠️ **An earlier draft of this finding claimed the SNES build "discards the debug ELF." That was WRONG —
+I named my probe output `a16local.elf` and never looked for the `<output>.elf` companion.** Corrected by
+measurement (drdevtools `2344483`):
 
-**Recovery recipe (proven):** link with the `OUTPUT_FORMAT { … }` block stripped → a normal ELF
-executable with real addresses + DWARF:
-```bash
-awk 'BEGIN{p=1} /^OUTPUT_FORMAT \{/{p=0} p{print}' \
-  build/install/mos-platform/snes/lib/link.ld > /tmp/link-elf.ld
-build/llvm-mos-install/bin/ld.lld --gc-sections --sort-section=alignment \
-  -Lbuild/install/mos-platform/snes/lib -Lbuild/install/mos-platform/common/lib \
-  -l:crt0.o a16local.o -lcrt0 -lcrt -lc -T /tmp/link-elf.ld -o a16local-debug.elf
-```
-Result: `ELF 32-bit LSB executable, *unknown arch 0x1966* (=6502/MOS), with debug_info, not stripped`,
-`--verify` clean. **Real SNES addresses** (LoROM bank $00, ROM at $8000):
+A normal `-g` build **does** emit a DWARF ELF. `mos-clang --config mos-snes.cfg -g -o a16local.sfc`
+writes **two** files:
+- `a16local.sfc` — the flat 32 KiB ROM (from `OUTPUT_FORMAT { FULL(rom) }` in `snes/lib/link.ld`)
+- **`a16local.sfc.elf`** — a full `ELF 32-bit … with debug_info, not stripped` (arch `0x1966` = 6502/MOS)
+
+llvm-mos's `ld.lld`, when the linker script uses the custom `OUTPUT_FORMAT { FULL(...) }`, writes the
+binary to `-o` **and** an ELF companion to `<output>.elf`. So **there is no debug-ELF gap** — the
+round-trip's debug artifact is produced by the stock build, automatically. The companion is byte-for-byte
+the LTO build that ships, so its addresses match the ROM exactly (no consistency dance needed).
+
+Verified companion DWARF (LTO build, `--verify` clean):
 
 | Symbol / line | Address |
 |---|---|
 | `_start` (reset) | `$8000` |
-| `main` (`DW_AT_low_pc`/line 12) | `$802f` |
-| line 13 `t = a16v + b16v` (`prologue_end`) | **`$8031`** |
-| lines 14/15/16 | `$803e` / `$8042` / `$8046` |
-| `main` end (`DW_AT_high_pc`) | `$804c` |
-| local `t` loclist (linked) | `[$803c,$804c): DW_OP_regx RS1` |
+| `main` (`DW_AT_low_pc`) | `$8059` |
+| line 13 `t = a16v + b16v` (`prologue_end`) | **`$805b`** |
+| line 17 `for (;;) {}` | **`$8074`** |
+| local `t` | `loclist … DW_OP_regx RS1` (16-bit local in Imag16 pair) |
 
-So a source breakpoint on `a16local.c:13` → PC **`$8031`** ($008031 with bank) in MAME — the Phase C
-assertion. (Caveat: this used the **non-LTO object**, so the instruction stream differs slightly from
-the shipped LTO `.sfc`; internally consistent — DWARF matches its own code — so the round-trip holds.
-Faithful-to-ROM debug ELF = emit it from the *same LTO link*, which is the proper fix below.)
+So a source breakpoint on `a16local.c:17` → PC `$8074` in MAME — the Phase C assertion (line 17, the
+infinite loop, re-executes forever so the live breakpoint is deterministic; line 13 is one-shot).
 
 **Implications folded into later steps:**
-- **B7 fixture** now has a concrete recipe (the stripped-link above); `make-fixture.sh` wraps it.
-- **New Step 5 candidate (upstreamable):** give the SNES platform a debug-ELF output — e.g. a
-  `mos-snes-debug.cfg` / linker-script variant without `OUTPUT_FORMAT{FULL(rom)}`, or a driver option
-  that emits both ROM and `.elf` from one LTO link. This is the *toolchain* deliverable for step 6
-  (the DWARF *content* is already correct). Belongs in `docs/upstream-contribution-status.md`.
+- **B7 fixture** = the auto-emitted `a16local.sfc.elf` companion (drmon loads it; MAME runs `a16local.sfc`).
+  `make-fixture.sh` is just the normal `--config -g` build. No stripped-link hack.
+- **Step 5 debug-ELF deliverable is WITHDRAWN** — it already exists in the stock toolchain. Step 5 is now
+  only `.ll` regression tests (hygiene). The single remaining upstream-worthy note: *document* that
+  `<output>.elf` is the debugger artifact (it's undocumented behavior a debugger integrator must know).
 
 ---
 
@@ -218,8 +209,10 @@ worth noting:
   `-I/usr/include/libdwarf-1` but that dir is *empty*; headers are in `/usr/include/libdwarf/`. So the
   code includes `<libdwarf/libdwarf.h>` / `<libdwarf/dwarf.h>` (resolved via default `/usr/include`),
   not `<libdwarf.h>`. (`pkg_check_modules` still supplies `-ldwarf` for linking.)
-- **fixture is the debug ELF** (`make-fixture.sh`: non-LTO `-c -g` → object → link with the
-  `OUTPUT_FORMAT` block stripped), committed alongside `a16local.c` + the matching `a16local.sfc`.
+- **fixture is the auto-emitted DWARF companion** `a16local.sfc.elf` (committed with `a16local.c` +
+  the `a16local.sfc` ROM; `make-fixture.sh` is just a normal `--config -g` build). *(Initially built via
+  a non-LTO stripped-`OUTPUT_FORMAT` link before discovering the `<rom>.elf` companion — corrected in
+  drdevtools `2344483`; see Step 1 KEY FINDING.)*
 
 Plan as executed:
 
@@ -286,18 +279,18 @@ ELF magic check lives inside `loadElf`; non-ELF files fall through to `false`. E
 ## Step 4 — Phase C: end-to-end (drdevtools; live MAME) — ✅ DONE (2026-06-18, `bdf0af0`)
 
 **Result: the full DWARF round-trip works — 6/6, 3 consecutive runs (`bash linux/test_dap.sh phasec`).**
-drmon loads `a16local-debug.elf`, `setBreakpoints a16local.c:17` resolves via the DWARF line table to
-**`$804a`** (the `for(;;)` loop), the breakpoint **fires live in MAME** running `a16local.sfc`, PC lands
-at/just past `$804a`, and a direct bridge `G` read confirms the same PC. ROADMAP step 6's debugger half
-is demonstrated end-to-end on fully-open tooling.
+drmon loads `a16local.sfc.elf` (the auto-emitted DWARF companion), `setBreakpoints a16local.c:17`
+resolves via the DWARF line table to **`$8074`** (the `for(;;)` loop), the breakpoint **fires live in
+MAME** running `a16local.sfc`, PC lands at/just past `$8074`, and a direct bridge `G` read confirms the
+same PC. ROADMAP step 6's debugger half is demonstrated end-to-end on fully-open tooling.
 
-**Address-consistency resolved via approach (b′):** `make-fixture.sh` links the **same non-LTO object**
-twice — once with the `OUTPUT_FORMAT` block stripped (→ debug ELF), once with the unmodified `link.ld`
-(→ `.sfc` ROM). Same object + same SECTIONS/MEMORY ⇒ identical addresses; only the output format differs.
-(Avoided the objcopy gymnastics of approach (a); the LTO-ROM↔non-LTO-ELF mismatch of the naïve pairing
-never arises.) Breakpoint target was **line 17** (the infinite loop) rather than line 13 — line 13 is
-one-shot (executes once before the loop), so by attach time the CPU has passed it; line 17 re-executes
-forever, making the live breakpoint deterministic.
+**Address consistency is free:** the ROM (`a16local.sfc`) and the DWARF companion (`a16local.sfc.elf`)
+come from the **same** `ld.lld` link, so their addresses are identical by construction — no objcopy, no
+LTO/non-LTO pairing. *(An initial attempt linked a non-LTO object twice with a stripped `OUTPUT_FORMAT`;
+the companion makes that unnecessary — corrected in drdevtools `2344483`/`bdf0af0`→final.)* Breakpoint
+target is **line 17** (the infinite loop), not line 13 — line 13 is one-shot (runs once before the loop),
+so by attach time the CPU has passed it; line 17 re-executes forever, making the live breakpoint
+deterministic.
 
 <details><summary>Original Phase C design notes (superseded by the above)</summary>
 
@@ -339,20 +332,15 @@ the only compiler-source work and begins only after sign-off.
 ## Step 5 — Phase A: compiler-source changes (llvm-mos-65816; deferred, gated on review)
 
 The only `vendor/llvm-mos/` edits. **Begin only after the review checkpoint above.** Step 1 came back
-clean, so this is **regression tests + the debug-ELF emission path — NOT an emission fix.**
+clean **and** the toolchain already emits a debug ELF (the `<rom>.elf` companion), so this is **just
+`.ll` regression tests (hygiene) — NOT an emission fix and NOT a debug-ELF feature.**
 
-### A1b. Debug-ELF emission path (the real step-6 toolchain deliverable) 🔑
-Step 1 found the DWARF *content* correct but the SNES build *discards* it (`OUTPUT_FORMAT{FULL(rom)}`
-emits only the flat ROM). Give the platform a way to emit a debug ELF. Options, cheapest first:
-- **Linker-script variant** — ship `snes/lib/link-debug.ld` (= `link.ld` minus the `OUTPUT_FORMAT{}`
-  block) + a `mos-snes-debug.cfg` that selects it. `mos-clang --config mos-snes-debug.cfg` → DWARF ELF.
-  Note this is in **mos-platform** (`build/mos-platform/...`), not the LLVM tree — likely an
-  **llvm-mos-sdk** contribution, separate from `0002-*.patch`.
-- **Driver/linker option** — emit both ROM and `.elf` from one (LTO) link; faithful to the shipped ROM.
-  Bigger change; the right long-term answer. Discuss upstream.
-- Until then, `make-fixture.sh` (B7) carries the strip-`OUTPUT_FORMAT` recipe for non-LTO builds.
-
-Record whichever path in `docs/upstream-contribution-status.md`.
+### A1b. Debug-ELF emission path — ❌ WITHDRAWN (already exists)
+An earlier draft proposed adding a debug-ELF output to the SNES platform. **Unnecessary:** `ld.lld`
+already writes `<output>.elf` (full DWARF) beside the ROM on every `-g` build (Step 1 KEY FINDING). The
+only residual upstream-worthy item is a **doc note** that `<output>.elf` is the debugger artifact — it is
+undocumented today, so a debugger integrator wouldn't know to look for it. Record that (not a feature) in
+`docs/upstream-contribution-status.md` if pursued.
 
 ### A2. Add `.ll` regression tests — `vendor/llvm-mos/llvm/test/DebugInfo/MOS/`
 Pin the **now-verified** shapes: `addr_size 0x04`, `DW_AT_frame_base (DW_OP_regx RS0)`, line table with
@@ -402,9 +390,9 @@ foreign patch's hunks before staging.
 | drdevtools | `devsys/tools/drmon/linux/dap/symbols.cpp` | +loadElf impl, nearest-line fallback |
 | drdevtools | `devsys/tools/drmon/linux/dap/session.cpp` | +loadElf in dispatch chain |
 | drdevtools | `devsys/tools/drmon/linux/dap/test_symbols.py` | +ELF test case |
-| drdevtools | `devsys/tools/drmon/linux/test-roms/a16local-debug.{elf,c}` + `make-fixture.sh` | **new** — committed fixture (strip-`OUTPUT_FORMAT` recipe) |
+| drdevtools | `devsys/tools/drmon/linux/test-roms/{a16local.c,a16local.sfc,a16local.sfc.elf}` + `make-fixture.sh` | **new** — committed fixtures (ROM + auto-emitted DWARF companion) |
 | llvm-mos-65816 | `vendor/llvm-mos/llvm/test/DebugInfo/MOS/dwarf-65816-*.ll` | **new** tests (Step 5/A2) |
-| llvm-mos-sdk *(or mos-platform)* | `snes/lib/link-debug.ld` + `mos-snes-debug.cfg` | **new** — debug-ELF emission (Step 5/A1b) 🔑 |
+| ~~llvm-mos-sdk~~ | ~~`snes/lib/link-debug.ld` + `mos-snes-debug.cfg`~~ | ~~debug-ELF emission~~ **withdrawn** — `<rom>.elf` companion already exists |
 | llvm-mos-65816 | ~~`MOS{LegalizerInfo,InsertREPSEP}.cpp`~~ | ~~emission fix~~ **not needed** (Step 1 clean) |
 | llvm-mos-65816 | `patches/llvm-mos/0002-321-accum16.patch` | Regenerate only if a vendor `.cpp`/`.td` changes |
 
@@ -414,15 +402,13 @@ foreign patch's hunks before staging.
 
 1. ~~**`DW_AT_location` absent** (high)~~ — **RETIRED by Step 1.** The imaginary-register local `t` gets
    a correct `DW_OP_regx RS1` loclist; `--verify` clean. No emission fix needed.
-2. **Debug-ELF/ROM address mismatch** (high — *new, from Step 1*) — the only way to get DWARF is a
-   non-`OUTPUT_FORMAT` link; that fixture is **non-LTO** and its addresses differ from the LTO `.sfc`.
-   Phase C **must** pair the debug ELF with a ROM derived from the *same* link (objcopy the ELF → `.sfc`),
-   or emit both from one LTO link (Step 5 / A1b). Pairing mismatched LTO-ROM + non-LTO-ELF → breakpoints
-   land at the wrong PC.
-3. **libdwarf API/version** (medium) — confirm the Dockerfile pulls 0.11.x and use `dwarf_init_path`.
-4. **Docker-built binary vs host-run tests** (medium) — the ELF unit test may need to run inside the
-   container, or host libdwarf installed. Resolve in B7.
-5. **Line-table gaps under `-Os`** (medium) — nearest-line fallback (B5) mitigates for breakpoints;
-   documented limitation for optimized builds.
-6. **objcopy → bootable `.sfc`** (low) — Phase C path (a) assumes `llvm-objcopy -O binary` + checksum
-   reconstructs a valid 32 KiB LoROM from the debug ELF; verify before relying on it.
+2. ~~**Debug-ELF/ROM address mismatch** (high)~~ — **RETIRED.** Premised on the (wrong) belief that the
+   debug ELF had to be a separate non-LTO link. The `<rom>.elf` companion is emitted from the *same*
+   link as the ROM, so addresses match by construction; no objcopy and no LTO/non-LTO pairing risk.
+3. ~~**libdwarf API/version** (medium)~~ — **RESOLVED.** Ubuntu 26.04 ships `0.11.1`; used
+   `dwarf_init_path`/`dwarf_finish`. (Quirk: headers are in `/usr/include/libdwarf/`, not the empty
+   pkg-config dir — `#include <libdwarf/libdwarf.h>`.)
+4. ~~**Docker-built binary vs host-run tests** (medium)~~ — **RESOLVED.** ELF test runs inside the
+   container (`task test-symbols` / `test_dap.sh` already containerized); no host libdwarf needed.
+5. **Line-table gaps under `-Os`** (medium, residual) — nearest-line fallback (B5) mitigates for
+   breakpoints; documented limitation for optimized builds. Exercised by the ELF nearest-line test.

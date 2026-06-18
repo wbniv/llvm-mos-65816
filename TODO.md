@@ -196,13 +196,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
 - [wip] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
-  with correct line/variable mapping. ROADMAP step 6; drdevtools `mame-65816-gdbstub` pre-wires it.
-  **drmon-first plan**: read-only `llvm-dwarfdump` audit (gate) → close drmon's Phase-3 DAP live-MAME
-  verification → add drmon ELF/DWARF loader (`loadElf` via libdwarf) + fixture → end-to-end MAME
-  breakpoint → **⏸ pause for review** → only then any `vendor/` edits. **Step-1 audit DONE/CLEAN
-  (2026-06-18)**: DWARF *content* is correct (16-bit local `t` → `DW_OP_regx RS1`, frame_base RS0,
-  `--verify` clean, line13→`$8031`) — **no emission fix needed**. One gap found: the SNES build discards
-  the debug ELF (`OUTPUT_FORMAT{FULL(rom)}`) → step-6 needs a debug-ELF emission path (sdk-side).
+  with correct line/variable mapping. ROADMAP step 6. **drmon block (Steps 1–4) DONE + committed
+  (2026-06-18); at the review pause before any `vendor/` edits.** Step 1 audit CLEAN: DWARF content
+  correct (16-bit local `t`→`DW_OP_regx RS1`, frame_base RS0, `--verify` clean) **and** the build already
+  emits a `<rom>.elf` DWARF companion (`ld.lld` writes it beside the ROM — *no* debug-ELF gap; an earlier
+  "discards the ELF" finding was wrong, corrected). drmon: `SymbolTable::loadElf` via libdwarf (drdevtools
+  `9b378ba`), live-MAME DAP V3–V6 PASS (`1a5c05f`), end-to-end source breakpoint fires in MAME — Phase C
+  6/6 (`bdf0af0`→`2344483`). **Remaining (Step 5, gated on review):** `.ll` regression tests in
+  `vendor/llvm-mos/llvm/test/DebugInfo/MOS/` (hygiene; no emission fix, no SDK feature needed). Optional
+  upstream doc note that `<output>.elf` is the debugger artifact.
   [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
 
 ### Test Bench / CI

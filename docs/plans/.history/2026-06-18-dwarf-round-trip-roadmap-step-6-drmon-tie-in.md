@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/98a4340) | #321 DWARF step 6: record Steps 3-4 done (Phase B loader + Phase C end-to-end) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/6ff4689) | #321 DWARF step 6: record Step 2 (drmon DAP live-MAME V3-V6 PASS) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/fdd1fd4) | #321 DWARF round-trip (step 6): drmon-first plan + Step-1 audit (CLEAN) |
 
 <!--history-meta v1
+98a4340	author	Will Norris
+98a4340	added	38
+98a4340	deleted	11
+98a4340	files	1
+98a4340	body	drmon-block (Steps 1-4) complete; now at the review pause before any vendor/ edits.\n  - Step 3 (Phase B): drmon SymbolTable::loadElf via libdwarf (drdevtools 9b378ba);\n    3 ELF tests PASS (a16local.c:13->0x8031, main->0x802f, nearest-line fallback).\n    Notes the libdwarf header-path quirk (<libdwarf/..>, pkg-config dir is empty).\n  - Step 4 (Phase C): end-to-end DWARF round-trip (drdevtools bdf0af0); 6/6 x3 runs.\n    source bp a16local.c:17 -> $804a via DWARF, fires live in MAME, PC confirmed vs\n    a direct bridge read. Address consistency solved by linking the SAME non-LTO\n    object twice (stripped OUTPUT_FORMAT -> debug ELF; normal -> .sfc); bp on the\n    for(;;) loop line (17) since line 13 is one-shot.\n\nNext (gated on review): Step 5 = vendor/llvm-mos .ll regression tests + the\ndebug-ELF emission path (sdk-side); NOT an emission fix (Step 1 was clean).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 6ff4689	author	Will Norris
 6ff4689	added	28
 6ff4689	deleted	7
