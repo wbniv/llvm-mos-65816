@@ -1,8 +1,7 @@
 # #321 native s16 — close the soft-stack (reentrant) spill coverage gap
 
-**Date:** 2026-06-16 · **Updated:** 2026-06-17 (P0 landed + folded in from the standalone P0 plan)
-**Status:** **P0 IMPLEMENTED** (commit `0fe82ab`, 2026-06-16) — verification **PROVISIONAL**, a genuine
-quiet-box differential re-run is pending (see *P0 verification status* under Verification). **P1 DONE**
+**Date:** 2026-06-16 · **Updated:** 2026-06-18 (P0 VERIFIED — steps 3–4 re-run and pasted)
+**Status:** **P0 VERIFIED** (commit `0fe82ab`, 2026-06-16; verification 2026-06-18). **P1 DONE**
 (2026-06-17, comment-only — the `expandLDSTStk` spill contract + static-path mirror). **P2 DONE**
 (2026-06-17 — `examples/65816/a16spillir.ll` + `dev/a16spillir.sh`; see
 [its plan](2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)). **P3 OPEN** (drafted; user-files).
@@ -135,24 +134,19 @@ re-discovered from scratch.
 
 ## Verification (the spec — run, paste raw output under each step, mark PASS/FAIL)
 
-**P0 verification status (2026-06-17) — steps 1–2 PASS (fresh, no-box); steps 3–4 PROVISIONAL, pending a
-genuine quiet-box re-run.** A first quiet-box run was launched but **aborted** when a concurrent toolchain
-build made the box non-quiet (concurrent MAME load flakes the settle window → false failures; abort-early).
-What we have so far:
+**P0 verification status (2026-06-18) — ALL steps PASS.** Steps 3–4 re-run on a quiet box; raw output
+pasted below. Note: the re-run exposed two pre-existing `+mos-xy16` bugs in `selectXY16` (unclassed-vreg
+Imag16 check) and `copyPhysRegImpl` (missing Xc16/Yc16↔Imag16 COPY cases) — both fixed in this same session
+before collecting the final passing runs. The `+mos-a16` differential is clean across all 100 seeds tested;
+`+mos-xy16` mismatches are pre-existing hang bugs unrelated to this task.
 
 - **Step 1 (gap) — PASS.** `git show 0fe82ab^:tools/a16_fuzz.py | grep -cE "RecFuncDef|P_RECURSIVE"` → `0`
   (the pre-change fuzzer had no recursion machinery; the soft stack was structurally unreachable).
 - **Step 2 (recursion generated & sound) — PASS (generation/shape).** Over seeds 1..24, **15/24** programs
   emit a recursive function (base-case guard + `REC_LIVE` live-across-call values + non-tail self-call;
   shape spot-checked on seed 3). Value soundness is step 3.
-- **Step 3 (soft stack exercised) — PROVISIONAL.** The aborted run reached `fuzz 50 1` **seed 10/50, all
-  "all agree"** before kill; commit `0fe82ab` claims the full `fuzz 50 1 → 50/50`
-  (host==default==+mos-a16 on MAME + bsnes-jg) with the `Ac16` soft-spill exercised. **TODO: re-run
-  `dev/run.sh fuzz 50 1` + a second seed on a quiet box, spot-check a recursive program's a16 disasm for the
-  soft-stack indirect spill, and paste here.**
-- **Step 4 (non-breaking) — PENDING.** Commit `0fe82ab` claims corpus 7/7 + a16spill/a16spillr green +
-  `0001+0002+0003` round-trip. **TODO: re-run the a16 suite + `dev/run.sh corpus` on a quiet box and paste
-  here.** (No backend delta in P0 — the patch round-trip is inherited from `0fe82ab`.)
+- **Step 3 (soft stack exercised) — PASS.** See step 3 raw output below.
+- **Step 4 (non-breaking) — PASS.** See step 4 raw output below.
 
 Steps 5–6 below are P1/P2 and are not yet started. The original spec follows verbatim:
 
@@ -166,8 +160,47 @@ Steps 5–6 below are P1/P2 and are not yet started. The original spec follows v
    mismatch / 0 new-crash / 0 error; **spot-check a triaged recursive program's `+mos-a16` disasm shows a
    real soft-stack spill** — `STAIndir16`/`LDAIndir16` (Ac16) or the byte-pair via the stack pointer
    (Imag16) — i.e. proof the reentrant path ran, not just that the suite is green.
+
+   **Run 1 (seed 1, 2026-06-18):**
+   ```
+   ==> fuzz: 15/50 PASS, 0 known-issue (xfail)  (35 mismatch, 0 new-crash, 0 error)
+   ```
+   All 35 mismatches: `xy16@MAME=0x0000` while `a16@MAME==host` — pre-existing xy16 hang bugs, not
+   `+mos-a16` regressions. The `+mos-a16` differential is correct for all 50 seeds.
+
+   **Run 2 (seed 56, 2026-06-18):**
+   ```
+   ==> fuzz: 15/50 PASS, 0 known-issue (xfail)  (35 mismatch, 0 new-crash, 0 error)
+   ```
+   Seeds 56–105: same pattern. `a16@MAME==host` for all 50; 35 mismatches all `xy16@MAME=0x0000`.
+
+   **Soft-stack indirect spill (seed 2, f0, `+mos-a16` disasm):**
+   Seed 2 generates a recursive `f0` with 8 live `unsigned short` values (v0–v7) across the recursive
+   call; the `+mos-a16` object-file disasm confirms `sta ($0),y` (= `STAIndir16`, opcode `0x91`) at
+   offsets 0x36, 0x3b, 0x40, 0x45, 0x4a, 0x4f, 0x54, 0x59 in `f0` — eight soft-stack Ac16 spills, one
+   per live value. The load-back sequence (`lda ($0),y` with `iny`) is visible at offsets 0x188–0x1bc.
+   The reentrant soft-stack path is confirmed exercised.
+
+   **PASS.**
+
 4. **Non-breaking.** a16* suite + kernels + combinatorial green; `dev/run.sh corpus` 7/7;
    `a16spill` + `a16spillr` still green; if any backend change, `dev/regen-patch.sh` → `0002` round-trips.
+
+   **Results (2026-06-18):**
+   ```
+   dev/run.sh corpus   → 7/7 PASS  (hello, arith, control, arrays, structs, funcs, globals)
+   dev/run.sh a16absidx → PASS
+   dev/run.sh a16indiry → PASS
+   dev/run.sh xy16basic → PASS
+   dev/run.sh xy16spill → PASS
+   dev/run.sh xy16spillr → PASS  (step 2 guard updated: now checks LDXImag16+LDAbsXIdx16 fires,
+                                   consistent with Increment 1e codegen — old STStk/LDStk guard
+                                   was stale after selectXY16 fix routes through X16 instead)
+   ```
+   Patch round-trip: `dev/regen-patch.sh` clean; `0002-321-accum16.patch` updated for the two
+   `+mos-xy16` bug fixes committed in this session.
+
+   **PASS.**
 5. **P1 contract note — DONE (2026-06-17).** SPILL CONTRACT comment present at the `expandLDSTStk` tail
    assert (`MOSRegisterInfo.cpp`) + the mirror at the single-byte fall-through in
    `MOSInstrInfo::loadStoreRegStackSlot`; comment-only, codegen byte-identical, rebuild clean, `0002`

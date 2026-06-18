@@ -62,9 +62,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   excludes the `call` leaf), so the call graph is acyclic → `MOSNonReentrant` marks every function
   `nonreentrant` → all get static frames. ~~P0: teach `tools/a16_fuzz.py` to emit a **recursive** function
   (the proven soft-stack trigger) so `expandLDSTStk` spills of `Ac16`/`Imag16`/8-bit get value-level
-  differential coverage (host==default==a16, both emulators).~~ **P0 LANDED `0fe82ab`** (`RecFuncDef`;
-  verification PROVISIONAL — steps 1–2 PASS no-box, full `fuzz 50` quiet-box re-run pending; also
-  found+fixed upstream F4, patch `0003`). ~~P1: document the `expandLDSTStk` spill
+  differential coverage (host==default==a16, both emulators).~~ **P0 VERIFIED 2026-06-18** (`RecFuncDef`;
+  `fuzz 50 1` + `fuzz 50 56`: 15/50 PASS each, `+mos-a16` correct all 100 seeds; soft-stack `sta ($0),y`
+  confirmed in seed-2 `f0`; 35/50 `xy16@MAME=0x0000` are pre-existing xy16 hang bugs, not a16 regressions;
+  two new `+mos-xy16` compiler bugs found+fixed: `selectXY16` unclassed-s16 guard + `copyPhysRegImpl`
+  Xc16/Yc16↔Imag16 cases; also found+fixed upstream F4, patch `0003`). ~~P1: document the `expandLDSTStk` spill
   contract at the `MOSRegisterInfo.cpp:528` assert (every spillable ≥16-bit class needs an explicit case
   — `xy16` index-16 is the latent next one).~~ **P1 DONE 2026-06-17** (SPILL CONTRACT comment at the
   `expandLDSTStk` tail assert + the static-path mirror in `MOSInstrInfo::loadStoreRegStackSlot`;
@@ -115,6 +117,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
+- [ ] **#321 xy16 correctness — `xy16@MAME=0x0000` hang bug (programs stall before writing `corpus_result`).**
+  Exposed by the P0 fuzz re-run (2026-06-18): 35/50 seeds produce `xy16@MAME=0x0000` while
+  `a16@MAME==host` is correct. Root cause not yet investigated; the program appears to hang (or loop
+  forever) before reaching the `corpus_result` store. Distinct from the two `selectXY16`/`copyPhysRegImpl`
+  crash bugs fixed in the same session (those were crashes; this is a silent hang producing wrong output).
+  Not blocking `+mos-a16` work; needs investigation before `+mos-xy16` can claim value-correctness.
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**

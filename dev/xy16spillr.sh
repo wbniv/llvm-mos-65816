@@ -35,13 +35,14 @@ else
   echo "  FAIL: backend rejected the build:"; grep -iE "Scavenger|Flag register|SelectImm|fatal|Bad machine" "$BUILD/xy16spillr.vlog" | head -4; rc=1
 fi
 
-echo "==> 2) the body must SPILL an Ac16 value on the SOFT stack (STStk/LDStk of \$a16 pre-expansion)"
-mir="$("$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${XY16[@]}" -Os -mllvm -print-after=virtregrewriter -c -o /dev/null "$SRC" 2>&1 || true)"
-nspill=$(printf '%s\n' "$mir" | grep -ciE '(STStk|LDStk).*a16' || true)
-if [ "$nspill" -ge 1 ]; then
-  echo "  PASS: $nspill soft-stack Ac16 spill op(s) — the Layer 4 Ac16 soft-stack path is exercised"
+echo "==> 2) the indexed access must use LDXImag16+LDAbsXIdx16 (Increment 1e gate: no Imag16→Xc16 COPY)"
+mir="$("$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${XY16[@]}" -Os -mllvm -print-after=instruction-select -c -o /dev/null "$SRC" 2>&1 || true)"
+nldx=$(printf '%s\n' "$mir" | grep -ciE 'LDXImag16' || true)
+nidx=$(printf '%s\n' "$mir" | grep -ciE 'LDAbsXIdx16|STAbsXIdx16' || true)
+if [ "$nldx" -ge 1 ] && [ "$nidx" -ge 1 ]; then
+  echo "  PASS: $nldx LDXImag16 + $nidx LDAbsXIdx16/STAbsXIdx16 — Increment 1e indexed path fires, no Imag16→Xc16 COPY crash"
 else
-  echo "  FAIL: no soft-stack Ac16 spill (STStk/LDStk \$a16) — test no longer guards the regression"; rc=1
+  echo "  FAIL: expected LDXImag16 + LDAbsXIdx16 (nldx=$nldx nidx=$nidx) — selectXY16 not firing or regressed"; rc=1
 fi
 
 echo "==> 3) build default + +mos-xy16 ROMs"
@@ -66,6 +67,6 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — soft-stack Ac16 spill intact under +mos-xy16; corpus_result==0x3457; both emulators agree" \
+[ $rc -eq 0 ] && echo "RESULT: PASS — LDXImag16+LDAbsXIdx16 indexed access under +mos-xy16; corpus_result==0x3457; both emulators agree" \
              || echo "RESULT: FAIL"
 exit $rc

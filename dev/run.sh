@@ -158,8 +158,8 @@ Targets:
              no spurious rep/sep #$10) + corpus_result==0x0042 on both emulators.
   xy16spill  #321 xy16 static-stack Ac16 spill gate (compile-time, no emulator): Layer 4
              Ac16 spill path (MOSInstrInfo) still fires clean under +mos-xy16 (-verify-machineinstrs).
-  xy16spillr #321 xy16 soft-stack Ac16 spill gate (value test): Layer 4 Ac16 path in expandLDSTStk
-             intact under +mos-xy16; corpus_result==0x3457 host==default==+mos-xy16 both emus.
+  xy16spillr #321 xy16 Increment 1e indexed-access gate: LDXImag16+LDAbsXIdx16 fires under
+             +mos-xy16 (no Imag16→Xc16 COPY crash); corpus_result==0x3457 both emus.
   a16ret     #321 calling-convention: lock the A (low) / X (high) RETURN convention as a tested
              ABI invariant (test+docs only, no codegen change). Disasm gate: the i16 return is
              `ldx <high>; lda <low>; rts` (high byte->X, low byte->A, byte-pinned) and the i8 return

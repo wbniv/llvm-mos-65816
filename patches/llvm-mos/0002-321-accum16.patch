@@ -637,7 +637,7 @@ index 12d05bed4..0e37cac4c 100644
                  AssemblerPredicate<(all_of Feature65EL02), "65EL02"> {
    let PredicateName = "Feature65EL02";
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
-index e81487e9c..f5527d89a 100644
+index e81487e9c..6b2afb5b9 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
 +++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
 @@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
@@ -693,7 +693,7 @@ index e81487e9c..f5527d89a 100644
  // #320: Generalized 8-bit store using 65816 absolute-long (24-bit) addressing,
  // for far (addrspace 2) pointers. The address argument is a global value or a
  // 24-bit immediate. Selects to STA AbsoluteLong (accumulator only). Additionally
-@@ -155,6 +187,50 @@ def G_STORE_INDIR : MOSGenericInstruction {
+@@ -155,6 +187,77 @@ def G_STORE_INDIR : MOSGenericInstruction {
    let mayStore = true;
  }
  
@@ -741,11 +741,38 @@ index e81487e9c..f5527d89a 100644
 +  let mayStore = true;
 +}
 +
++// #321 xy16: abs,X16 indexed load/store — lda/sta abs,X with a 16-bit X index (X=0).
++// Naming: G_LOAD_*16 = any-width data, 16-bit index (X=0). Distinct from G_LOAD16_*
++// (16-bit data, 8-bit index). Gate predicate: HasIndex16 (not HasAccum16). The
++// index type1 is s16 (Xc16 after selection); data type0 may be s8 or s16.
++def G_LOAD_ABS_IDX16 : MOSGenericInstruction {
++  let Predicates = [HasIndex16]; let mayLoad = true;
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList  = (ins  unknown:$base, type1:$index);
++}
++def G_STORE_ABS_IDX16 : MOSGenericInstruction {
++  let Predicates = [HasIndex16]; let mayStore = true;
++  let OutOperandList = (outs);
++  let InOperandList  = (ins  type0:$src, unknown:$base, type1:$index);
++}
++// #321 xy16: (zp),Y16 indirect indexed — lda/sta (zp),Y with a 16-bit Y index (X=0).
++// The base is a ZP pointer (ptype1 = Imag16 after selection); index type1 is s16 (Yc16).
++def G_LOAD_INDIR_IDX16 : MOSGenericInstruction {
++  let Predicates = [HasIndex16]; let mayLoad = true;
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList  = (ins  ptype1:$base, type1:$index);
++}
++def G_STORE_INDIR_IDX16 : MOSGenericInstruction {
++  let Predicates = [HasIndex16]; let mayStore = true;
++  let OutOperandList = (outs);
++  let InOperandList  = (ins  type0:$src, ptype1:$base, type1:$index);
++}
++
  // Generalized 8-bit store using the indirect indexed addressing mode. The index
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 42a94c356..12c9fdea5 100644
+index 42a94c356..fe19e096e 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -352,6 +352,11 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
@@ -777,7 +804,26 @@ index 42a94c356..12c9fdea5 100644
          return true;
      }
  
-@@ -928,7 +935,24 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+@@ -670,6 +677,18 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
+                     TRI.getSubReg(SrcReg, MOS::sublo));
+     copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::subhi),
+                     TRI.getSubReg(SrcReg, MOS::subhi));
++  } else if (AreClasses(MOS::Xc16RegClass, MOS::Imag16RegClass)) {
++    // #321 xy16: X16 ← Imag16 ZP pair: ldx zp
++    Builder.buildInstr(MOS::LDXImag16).addDef(DestReg).addUse(SrcReg);
++  } else if (AreClasses(MOS::Imag16RegClass, MOS::Xc16RegClass)) {
++    // #321 xy16: Imag16 ZP pair ← X16: stx zp
++    Builder.buildInstr(MOS::STXImag16).addDef(DestReg).addUse(SrcReg);
++  } else if (AreClasses(MOS::Yc16RegClass, MOS::Imag16RegClass)) {
++    // #321 xy16: Y16 ← Imag16 ZP pair: ldy zp
++    Builder.buildInstr(MOS::LDYImag16).addDef(DestReg).addUse(SrcReg);
++  } else if (AreClasses(MOS::Imag16RegClass, MOS::Yc16RegClass)) {
++    // #321 xy16: Imag16 ZP pair ← Y16: sty zp
++    Builder.buildInstr(MOS::STYImag16).addDef(DestReg).addUse(SrcReg);
+   } else if (AreClasses(MOS::Anyi1RegClass, MOS::Anyi1RegClass)) {
+     assert(SrcReg.isPhysical() && DestReg.isPhysical());
+     Register SrcReg8 =
+@@ -928,7 +947,24 @@ void MOSInstrInfo::loadStoreRegStackSlot(
        Instr.addDef(Ptr, RegState::EarlyClobber);
      Instr.addFrameIndex(FrameIndex).addImm(0).addMemOperand(MMO);
    } else {
@@ -803,7 +849,7 @@ index 42a94c356..12c9fdea5 100644
          (Reg.isVirtual() &&
           MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
        MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
-@@ -960,7 +984,30 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+@@ -960,7 +996,30 @@ void MOSInstrInfo::loadStoreRegStackSlot(
                                     MF.getMachineMemOperand(MMO, 1, 1));
        if (IsLoad && Tmp != Reg)
          Builder.buildCopy(Reg, Tmp);
@@ -834,7 +880,7 @@ index 42a94c356..12c9fdea5 100644
        loadStoreByteStaticStackSlot(
            Builder, MachineOperand::CreateReg(Reg, IsLoad), FrameIndex, 0, MMO);
      }
-@@ -1035,6 +1082,13 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
+@@ -1035,6 +1094,13 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
    case MOS::CmpBrIndirIdx:
      expandCmpBr(Builder);
      break;
@@ -848,7 +894,7 @@ index 42a94c356..12c9fdea5 100644
  
    // Control flow
    case MOS::GBR:
-@@ -1355,6 +1409,63 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
+@@ -1355,6 +1421,63 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
    MI.eraseFromParent();
  }
  
@@ -925,7 +971,7 @@ index be5daff8f..c39c4be70 100644
    bool shouldRematPhysRegCopy() const override { return false; }
  };
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..e78b208b7 100644
+index f3eb9549f..f44e895be 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,23 @@ class MOSLogicalInstr : Instruction {
@@ -952,7 +998,7 @@ index f3eb9549f..e78b208b7 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,6 +594,300 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -577,6 +594,348 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -1079,6 +1125,54 @@ index f3eb9549f..e78b208b7 100644
 +  let Predicates = [HasAccum16];
 +  let MLow = 1;
 +  dag InOperandList = (ins Ac16:$src, Imag16:$addr, Yc:$offset);
++}
++
++// #321 xy16: abs,X16 and (zp),Y16 indexed load/store with 16-bit X/Y index (X=0).
++// XLow=1 → MOSInsertREPSEP brackets with rep #$10 / sep #$10 (X mode).
++// MLow=1 additionally brackets with rep #$20 / sep #$20 (accumulator mode).
++// Combined MLow+XLow → rep #$30 / sep #$30 emitted via insertSwitch (both flags).
++// The Xc16/Yc16 operand is an extra constraint: RA assigns physical X/Y; the
++// operand is dropped during PseudoInstExpansion (hardware uses X/Y implicitly).
++//
++// abs,X with 8-bit data (M=1, X=0): rep #$10; lda abs,x; sep #$10
++def LDAbsXIdx : MOSLoad, PseudoInstExpansion<(LDA_AbsoluteX addr16:$addr)> {
++  let Predicates = [HasIndex16]; let XLow = 1;
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList  = (ins addr16:$addr, Xc16:$idx);
++}
++def STAbsXIdx : MOSStore, PseudoInstExpansion<(STA_AbsoluteX addr16:$addr)> {
++  let Predicates = [HasIndex16]; let XLow = 1;
++  dag InOperandList = (ins Ac:$src, addr16:$addr, Xc16:$idx);
++}
++// abs,X with 16-bit data (M=0, X=0): rep #$30; lda abs,x; sep #$30
++def LDAbsXIdx16 : MOSLoad, PseudoInstExpansion<(LDA_AbsoluteX addr16:$addr)> {
++  let Predicates = [HasAccum16, HasIndex16]; let MLow = 1; let XLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList  = (ins addr16:$addr, Xc16:$idx);
++}
++def STAbsXIdx16 : MOSStore, PseudoInstExpansion<(STA_AbsoluteX addr16:$addr)> {
++  let Predicates = [HasAccum16, HasIndex16]; let MLow = 1; let XLow = 1;
++  dag InOperandList = (ins Ac16:$src, addr16:$addr, Xc16:$idx);
++}
++// (zp),Y with 8-bit data (M=1, X=0): rep #$10; lda (zp),y; sep #$10
++def LDIndirYIdx : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)> {
++  let Predicates = [HasIndex16]; let XLow = 1;
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList  = (ins Imag16:$addr, Yc16:$offset);
++}
++def STIndirYIdx : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)> {
++  let Predicates = [HasIndex16]; let XLow = 1;
++  dag InOperandList = (ins Ac:$src, Imag16:$addr, Yc16:$offset);
++}
++// (zp),Y with 16-bit data (M=0, X=0): rep #$30; lda (zp),y; sep #$30
++def LDIndirYIdx16 : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)> {
++  let Predicates = [HasAccum16, HasIndex16]; let MLow = 1; let XLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList  = (ins Imag16:$addr, Yc16:$offset);
++}
++def STIndirYIdx16 : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)> {
++  let Predicates = [HasAccum16, HasIndex16]; let MLow = 1; let XLow = 1;
++  dag InOperandList = (ins Ac16:$src, Imag16:$addr, Yc16:$offset);
 +}
 +
 +// #321 Increment 1d-retry: the zero-page (Imag16) analogs of the *Abs16 ops.
@@ -1253,7 +1347,7 @@ index f3eb9549f..e78b208b7 100644
  let Predicates = [Has65C02] in {
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
-@@ -639,3 +950,134 @@ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
+@@ -639,3 +998,134 @@ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
  
  def : Pat<(i1 imm:$s), (LDImm1 imm:$s)>;
  def : Pat<(i8 imm:$s), (LDImm imm:$s)>;
@@ -1446,7 +1540,7 @@ index 21910cfea..e3fece8b0 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..18b0a096e 100644
+index cbdd54ab2..3cfd46b6b 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1551,7 +1645,7 @@ index cbdd54ab2..18b0a096e 100644
    if (selectImpl(MI, *CoverageInfo))
      return true;
  
-@@ -247,6 +317,23 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -247,6 +317,30 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -1571,11 +1665,18 @@ index cbdd54ab2..18b0a096e 100644
 +  case MOS::G_STORE16_INDIR_IDX:
 +    return selectMem16IndirIdx(MI);
 +
++  // #321 xy16: indexed addressing with 16-bit X/Y index. selectXY16 handles
++  // these at the early gate; this fallback catches any unhandled residual.
++  case MOS::G_LOAD_ABS_IDX16:
++  case MOS::G_STORE_ABS_IDX16:
++  case MOS::G_LOAD_INDIR_IDX16:
++  case MOS::G_STORE_INDIR_IDX16:
++    return selectXY16(MI);
 +
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -762,6 +849,28 @@ static Register getSbcFlagForRegister(const MachineInstr &Sbc, Register Reg) {
+@@ -762,6 +856,28 @@ static Register getSbcFlagForRegister(const MachineInstr &Sbc, Register Reg) {
    llvm_unreachable("Could not find register in G_SBC outputs.");
  }
  
@@ -1604,7 +1705,7 @@ index cbdd54ab2..18b0a096e 100644
  // Match criteria common to all Cmp where N or Z are used.
  struct CmpNZ_match {
    Register &LHS;
-@@ -777,6 +886,11 @@ struct CmpNZ_match {
+@@ -777,6 +893,11 @@ struct CmpNZ_match {
      CondMI = DefSrcReg->MI;
      if (CondMI->getOpcode() != MOS::G_SBC)
        return false;
@@ -1616,7 +1717,7 @@ index cbdd54ab2..18b0a096e 100644
  
      auto CInConst =
          getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
-@@ -789,6 +903,70 @@ struct CmpNZ_match {
+@@ -789,6 +910,70 @@ struct CmpNZ_match {
    }
  };
  
@@ -1687,7 +1788,7 @@ index cbdd54ab2..18b0a096e 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -968,6 +1146,11 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
+@@ -968,6 +1153,11 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
    return {LHS, Addr, Idx, Flag, Load, AA};
  }
  
@@ -1699,7 +1800,7 @@ index cbdd54ab2..18b0a096e 100644
  bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
  
-@@ -991,6 +1174,89 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -991,6 +1181,89 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
@@ -1789,7 +1890,7 @@ index cbdd54ab2..18b0a096e 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1091,12 +1357,99 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1364,117 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -1800,15 +1901,33 @@ index cbdd54ab2..18b0a096e 100644
 +// #321 native s16 compare-operand fold: returns the defining G_LOAD16_ABS iff `R`
 +// is a single-use 16-bit near-abs global load in `User`'s block — the operand the
 +// absolute compare/load forms (cmp abs / lda abs) can read directly instead of
++// #321 xy16: helpers to test whether a vreg is constrained to the 16-bit X or Y
++// register class. Used by selectXY16 and by foldableAbsLoad16's Xc16 guard.
++static bool isXc16Reg(Register R, const MachineRegisterInfo &MRI) {
++  if (R.isPhysical())
++    return MOS::Xc16RegClass.contains(R);
++  const TargetRegisterClass *RC = MRI.getRegClassOrNull(R);
++  return RC && RC->hasSuperClassEq(&MOS::Xc16RegClass);
++}
++static bool isYc16Reg(Register R, const MachineRegisterInfo &MRI) {
++  if (R.isPhysical())
++    return MOS::Yc16RegClass.contains(R);
++  const TargetRegisterClass *RC = MRI.getRegClassOrNull(R);
++  return RC && RC->hasSuperClassEq(&MOS::Yc16RegClass);
++}
++
 +// round-tripping the global through an Imag16 pair. Volatile-safe: the load has
 +// exactly this one use, so folding preserves the single memory access in program
 +// order (single-use check, same as selectAlu16Native's abs operand fold). Same-BB
 +// only (mirrors shouldFoldMemAccess's no-cross-block rule).
++// Guard: skip Xc16-constrained results — selectXY16 handles those via LDXAbs16
++// and must not be intercepted here (class conflict with the Ac16 LDAbs16 fold).
 +static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
 +                                       const MachineRegisterInfo &MRI) {
 +  MachineInstr *Def = MRI.getVRegDef(R);
 +  if (Def && Def->getOpcode() == MOS::G_LOAD16_ABS &&
-+      MRI.hasOneNonDBGUse(R) && Def->getParent() == User.getParent())
++      MRI.hasOneNonDBGUse(R) && Def->getParent() == User.getParent() &&
++      !isXc16Reg(R, MRI))
 +    return Def;
 +  return nullptr;
 +}
@@ -1889,7 +2008,7 @@ index cbdd54ab2..18b0a096e 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1927,6 +2280,443 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1927,6 +2305,760 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    }
    return selectGeneric(MI);
  }
@@ -2088,8 +2207,325 @@ index cbdd54ab2..18b0a096e 100644
 +// #321 xy16: skeleton selector for G_* ops whose result RA assigned to Xc16/Yc16.
 +// Returns false to fall through to selectImpl — actual X/Y-index selection is a
 +// follow-on task (M2 legalizer integration: index-operand widening, LEA forms).
++// #321 xy16: select operations that use the 16-bit X/Y index registers (Xc16/Yc16).
++// Called before selectImpl from the early gate `if (STI.hasIndex16() && selectXY16(MI))`.
++//
++// Handles:
++//  C1 — direct register ops: G_LOAD/STORE16_ABS/INDIR + dst/val∈Xc16/Yc16 → LDX/STX/LDY/STY
++//       G_ADD/SUB ±1 → INX16/DEX16/INY16/DEY16; G_SBC compare → CPX/CPY*16
++//  C2 — indexed addressing: G_LOAD/STORE_ABS/INDIR_IDX16 → LDAbsXIdx16/STAbsXIdx16 etc.
 +bool MOSInstructionSelector::selectXY16(MachineInstr &MI) {
-+  return false;
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  switch (MI.getOpcode()) {
++  default:
++    return false;
++
++  // ── C1: direct load/store ────────────────────────────────────────────────
++
++  case MOS::G_LOAD16_ABS: {
++    Register Dst = MI.getOperand(0).getReg();
++    bool IsX = isXc16Reg(Dst, MRI), IsY = isYc16Reg(Dst, MRI);
++    if (!IsX && !IsY)
++      return false;
++    auto Ld = Builder.buildInstr(IsX ? MOS::LDXAbs16 : MOS::LDYAbs16)
++                  .addDef(Dst)
++                  .add(MI.getOperand(1));
++    Ld.cloneMemRefs(MI);
++    constrainSelectedInstRegOperands(*Ld.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  case MOS::G_STORE16_ABS: {
++    Register Val = MI.getOperand(0).getReg();
++    bool IsX = isXc16Reg(Val, MRI), IsY = isYc16Reg(Val, MRI);
++    if (!IsX && !IsY)
++      return false;
++    auto St = Builder.buildInstr(IsX ? MOS::STXAbs16 : MOS::STYAbs16)
++                  .addUse(Val)
++                  .add(MI.getOperand(1));
++    St.cloneMemRefs(MI);
++    constrainSelectedInstRegOperands(*St.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  case MOS::G_LOAD16_INDIR: {
++    // Load s16 via ZP-resident pointer into X16 or Y16.
++    // A16 = lda (zp); ZP_tmp = sta zp; X/Y = ldx/ldy zp_tmp.
++    Register Dst = MI.getOperand(0).getReg();
++    bool IsX = isXc16Reg(Dst, MRI), IsY = isYc16Reg(Dst, MRI);
++    if (!IsX && !IsY)
++      return false;
++    Register BasePtr = MI.getOperand(1).getReg();
++    Register TmpA16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++    Register TmpZP = MRI.createVirtualRegister(&MOS::Imag16RegClass);
++    auto Ld = Builder.buildInstr(MOS::LDAIndir16).addDef(TmpA16).addUse(BasePtr);
++    Ld.cloneMemRefs(MI);
++    auto StZP = Builder.buildInstr(MOS::STAImag16).addDef(TmpZP).addUse(TmpA16);
++    auto LdXY = Builder.buildInstr(IsX ? MOS::LDXImag16 : MOS::LDYImag16)
++                    .addDef(Dst)
++                    .addUse(TmpZP);
++    constrainSelectedInstRegOperands(*Ld.getInstr(), TII, TRI, RBI);
++    constrainSelectedInstRegOperands(*StZP.getInstr(), TII, TRI, RBI);
++    constrainSelectedInstRegOperands(*LdXY.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  case MOS::G_STORE16_INDIR: {
++    // Store X16 or Y16 via ZP-resident pointer.
++    // stx/sty zp_tmp; A16 = lda zp_tmp; sta (zp).
++    Register Val = MI.getOperand(0).getReg();
++    bool IsX = isXc16Reg(Val, MRI), IsY = isYc16Reg(Val, MRI);
++    if (!IsX && !IsY)
++      return false;
++    Register BasePtr = MI.getOperand(1).getReg();
++    Register TmpZP = MRI.createVirtualRegister(&MOS::Imag16RegClass);
++    Register TmpA16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++    auto StXY = Builder.buildInstr(IsX ? MOS::STXImag16 : MOS::STYImag16)
++                    .addDef(TmpZP)
++                    .addUse(Val);
++    auto LdA = Builder.buildInstr(MOS::LDAImag16).addDef(TmpA16).addUse(TmpZP);
++    auto St = Builder.buildInstr(MOS::STAIndir16).addUse(TmpA16).addUse(BasePtr);
++    St.cloneMemRefs(MI);
++    constrainSelectedInstRegOperands(*StXY.getInstr(), TII, TRI, RBI);
++    constrainSelectedInstRegOperands(*LdA.getInstr(), TII, TRI, RBI);
++    constrainSelectedInstRegOperands(*St.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  // ── C1: ±1 inc/dec ───────────────────────────────────────────────────────
++
++  case MOS::G_ADD: {
++    if (MRI.getType(MI.getOperand(0).getReg()) != LLT::scalar(16))
++      return false;
++    Register Dst = MI.getOperand(0).getReg();
++    // G_ADD is commutative; constant may be on either side.
++    Register A = MI.getOperand(1).getReg(), B = MI.getOperand(2).getReg();
++    Register Src = 0;
++    std::optional<int64_t> Step;
++    if (auto C = getI16Const(B, MRI)) { Src = A; Step = C; }
++    else if (auto C = getI16Const(A, MRI)) { Src = B; Step = C; }
++    if (!Src || !Step || (*Step != 1 && *Step != 0xFFFF))
++      return false;
++    unsigned Opc;
++    if (isXc16Reg(Src, MRI))
++      Opc = (*Step == 1) ? MOS::INX16 : MOS::DEX16;
++    else if (isYc16Reg(Src, MRI))
++      Opc = (*Step == 1) ? MOS::INY16 : MOS::DEY16;
++    else
++      return false;
++    auto II = Builder.buildInstr(Opc).addDef(Dst).addUse(Src);
++    constrainSelectedInstRegOperands(*II.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  case MOS::G_SUB: {
++    if (MRI.getType(MI.getOperand(0).getReg()) != LLT::scalar(16))
++      return false;
++    Register Dst = MI.getOperand(0).getReg();
++    Register Src = MI.getOperand(1).getReg(); // G_SUB is not commutative
++    Register RHS = MI.getOperand(2).getReg();
++    auto Step = getI16Const(RHS, MRI);
++    if (!Step || (*Step != 1 && *Step != 0xFFFF))
++      return false;
++    unsigned Opc;
++    if (isXc16Reg(Src, MRI))
++      Opc = (*Step == 1) ? MOS::DEX16 : MOS::INX16; // sub 1 → dec; sub -1 → inc
++    else if (isYc16Reg(Src, MRI))
++      Opc = (*Step == 1) ? MOS::DEY16 : MOS::INY16;
++    else
++      return false;
++    auto II = Builder.buildInstr(Opc).addDef(Dst).addUse(Src);
++    constrainSelectedInstRegOperands(*II.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  // ── C1: compare (G_SBC in compare form, LHS∈Xc16 or Yc16) ───────────────
++
++  case MOS::G_SBC: {
++    if (MRI.getType(MI.getOperand(5).getReg()) != LLT::scalar(16))
++      return false;
++    Register LHS = MI.getOperand(5).getReg();
++    Register CarryOut = MI.getOperand(1).getReg();
++    Register RHS = MI.getOperand(6).getReg();
++    bool IsX = isXc16Reg(LHS, MRI), IsY = !IsX && isYc16Reg(LHS, MRI);
++    if (!IsX && !IsY)
++      return false;
++    unsigned CPAbs  = IsX ? MOS::CPXAbs16  : MOS::CPYAbs16;
++    unsigned CPImag = IsX ? MOS::CPXImag16 : MOS::CPYImag16;
++    unsigned CPImm  = IsX ? MOS::CPXImm16  : MOS::CPYImm16;
++    MachineInstrBuilder CmpI;
++    if (auto Imm = getImm16Operand(RHS, MRI)) {
++      CmpI = Builder.buildInstr(CPImm).addDef(CarryOut).addUse(LHS).addImm(*Imm);
++    } else if (MachineInstr *LdR = foldableAbsLoad16(RHS, MI, MRI)) {
++      CmpI = Builder.buildInstr(CPAbs)
++                 .addDef(CarryOut)
++                 .addUse(LHS)
++                 .add(LdR->getOperand(1))
++                 .cloneMemRefs(*LdR);
++      LdR->eraseFromParent();
++    } else {
++      CmpI = Builder.buildInstr(CPImag).addDef(CarryOut).addUse(LHS).addUse(RHS);
++    }
++    constrainSelectedInstRegOperands(*CmpI.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  // ── C2: indexed addressing (16-bit X/Y as array index) ───────────────────
++
++  case MOS::G_LOAD_ABS_IDX16: {
++    Register ValOrDst = MI.getOperand(0).getReg();
++    const MachineOperand &BaseOp = MI.getOperand(1);
++    Register IdxReg = MI.getOperand(2).getReg();
++    LLT ValTy = MRI.getType(ValOrDst);
++    SmallVector<MachineInstrBuilder, 3> New;
++    // If the index is in Imag16 (or is an unclassed s16 vreg that will land in
++    // Imag16), move it into X16 first. getRegClassOrNull returns null for vregs
++    // not yet constrained by selection (GIS selects bottom-up); those default to
++    // Imag16 later, so we must handle them here too.
++    Register XIdx = IdxReg;
++    {
++      const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
++      if ((RC && RC->hasSuperClassEq(&MOS::Imag16RegClass)) ||
++          (!RC && MRI.getType(IdxReg) == LLT::scalar(16))) {
++        XIdx = MRI.createVirtualRegister(&MOS::Xc16RegClass);
++        New.push_back(Builder.buildInstr(MOS::LDXImag16).addDef(XIdx).addUse(IdxReg));
++      }
++    }
++    if (ValTy == LLT::scalar(16)) {
++      // 16-bit data, 16-bit X: rep #$30; lda abs,X; sep #$30 → A16 → Imag16
++      Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++      auto Ld = Builder.buildInstr(MOS::LDAbsXIdx16).addDef(A16).add(BaseOp).addUse(XIdx);
++      Ld.cloneMemRefs(MI);
++      New.push_back(Ld);
++      New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
++    } else {
++      // 8-bit data, 16-bit X: rep #$10; lda abs,X; sep #$10 → Ac
++      auto Ld = Builder.buildInstr(MOS::LDAbsXIdx).addDef(ValOrDst).add(BaseOp).addUse(XIdx);
++      Ld.cloneMemRefs(MI);
++      New.push_back(Ld);
++    }
++    for (auto &Bld : New)
++      constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  case MOS::G_STORE_ABS_IDX16: {
++    Register ValOrDst = MI.getOperand(0).getReg();
++    const MachineOperand &BaseOp = MI.getOperand(1);
++    Register IdxReg = MI.getOperand(2).getReg();
++    LLT ValTy = MRI.getType(ValOrDst);
++    SmallVector<MachineInstrBuilder, 3> New;
++    MachineInstr *FoldedLoad = nullptr;
++    Register XIdx = IdxReg;
++    {
++      const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
++      if ((RC && RC->hasSuperClassEq(&MOS::Imag16RegClass)) ||
++          (!RC && MRI.getType(IdxReg) == LLT::scalar(16))) {
++        XIdx = MRI.createVirtualRegister(&MOS::Xc16RegClass);
++        New.push_back(Builder.buildInstr(MOS::LDXImag16).addDef(XIdx).addUse(IdxReg));
++      }
++    }
++    if (ValTy == LLT::scalar(16)) {
++      // 16-bit data, 16-bit X: Imag16 → A16; rep #$30; sta abs,X; sep #$30
++      Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
++      auto St = Builder.buildInstr(MOS::STAbsXIdx16).addUse(A16).add(BaseOp).addUse(XIdx);
++      St.cloneMemRefs(MI);
++      New.push_back(St);
++    } else {
++      // 8-bit data, 16-bit X: rep #$10; sta abs,X; sep #$10
++      auto St = Builder.buildInstr(MOS::STAbsXIdx).addUse(ValOrDst).add(BaseOp).addUse(XIdx);
++      St.cloneMemRefs(MI);
++      New.push_back(St);
++    }
++    for (auto &Bld : New)
++      constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++    if (FoldedLoad)
++      FoldedLoad->eraseFromParent();
++    MI.eraseFromParent();
++    return true;
++  }
++
++  case MOS::G_LOAD_INDIR_IDX16: {
++    Register ValOrDst = MI.getOperand(0).getReg();
++    Register BasePtr = MI.getOperand(1).getReg();
++    Register IdxReg = MI.getOperand(2).getReg();
++    LLT ValTy = MRI.getType(ValOrDst);
++    SmallVector<MachineInstrBuilder, 3> New;
++    // If the index is in Imag16 (or is an unclassed s16 vreg), move it into Y16.
++    Register YIdx = IdxReg;
++    {
++      const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
++      if ((RC && RC->hasSuperClassEq(&MOS::Imag16RegClass)) ||
++          (!RC && MRI.getType(IdxReg) == LLT::scalar(16))) {
++        YIdx = MRI.createVirtualRegister(&MOS::Yc16RegClass);
++        New.push_back(Builder.buildInstr(MOS::LDYImag16).addDef(YIdx).addUse(IdxReg));
++      }
++    }
++    if (ValTy == LLT::scalar(16)) {
++      // 16-bit data, 16-bit Y: rep #$30; lda (zp),Y; sep #$30 → A16 → Imag16
++      Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++      auto Ld = Builder.buildInstr(MOS::LDIndirYIdx16).addDef(A16).addUse(BasePtr).addUse(YIdx);
++      Ld.cloneMemRefs(MI);
++      New.push_back(Ld);
++      New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
++    } else {
++      // 8-bit data, 16-bit Y: rep #$10; lda (zp),Y; sep #$10 → Ac
++      auto Ld = Builder.buildInstr(MOS::LDIndirYIdx).addDef(ValOrDst).addUse(BasePtr).addUse(YIdx);
++      Ld.cloneMemRefs(MI);
++      New.push_back(Ld);
++    }
++    for (auto &Bld : New)
++      constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  case MOS::G_STORE_INDIR_IDX16: {
++    Register ValOrDst = MI.getOperand(0).getReg();
++    Register BasePtr = MI.getOperand(1).getReg();
++    Register IdxReg = MI.getOperand(2).getReg();
++    LLT ValTy = MRI.getType(ValOrDst);
++    SmallVector<MachineInstrBuilder, 3> New;
++    MachineInstr *FoldedLoad = nullptr;
++    Register YIdx = IdxReg;
++    {
++      const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
++      if ((RC && RC->hasSuperClassEq(&MOS::Imag16RegClass)) ||
++          (!RC && MRI.getType(IdxReg) == LLT::scalar(16))) {
++        YIdx = MRI.createVirtualRegister(&MOS::Yc16RegClass);
++        New.push_back(Builder.buildInstr(MOS::LDYImag16).addDef(YIdx).addUse(IdxReg));
++      }
++    }
++    if (ValTy == LLT::scalar(16)) {
++      // 16-bit data, 16-bit Y: Imag16 → A16; rep #$30; sta (zp),Y; sep #$30
++      Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
++      auto St = Builder.buildInstr(MOS::STIndirYIdx16).addUse(A16).addUse(BasePtr).addUse(YIdx);
++      St.cloneMemRefs(MI);
++      New.push_back(St);
++    } else {
++      // 8-bit data, 16-bit Y: rep #$10; sta (zp),Y; sep #$10
++      auto St = Builder.buildInstr(MOS::STIndirYIdx).addUse(ValOrDst).addUse(BasePtr).addUse(YIdx);
++      St.cloneMemRefs(MI);
++      New.push_back(St);
++    }
++    for (auto &Bld : New)
++      constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++    if (FoldedLoad)
++      FoldedLoad->eraseFromParent();
++    MI.eraseFromParent();
++    return true;
++  }
++  }
 +}
 +
 +// #321 native s16 constant shift: `dst = src << k` / `dst = src >> k` (unsigned),
@@ -2466,10 +2902,18 @@ index fbedd8d46..d329144e2 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..b5c931699 100644
+index 212ede1a0..a57cf412e 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -150,18 +150,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -25,6 +25,7 @@
+ #include "MOSSubtarget.h"
+ 
+ #include "llvm/ADT/STLExtras.h"
++#include "llvm/ADT/SmallSet.h"
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/CodeGen/GlobalISel/LegalizerHelper.h"
+ #include "llvm/CodeGen/GlobalISel/LegalizerInfo.h"
+@@ -150,18 +151,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
        .widenScalarToNextMultipleOf(0, 8)
        .custom();
  
@@ -2505,7 +2949,7 @@ index 212ede1a0..b5c931699 100644
  
    getActionDefinitionsBuilder(G_MUL)
        .libcallFor({S8, S16, S32, S64})
-@@ -323,14 +329,20 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -323,14 +330,20 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
  
    // Memory Operations
  
@@ -2534,7 +2978,7 @@ index 212ede1a0..b5c931699 100644
  
    getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD}).custom();
  
-@@ -670,11 +682,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -670,11 +683,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    auto [Dst, Src] = MI.getFirst2Regs();
    assert(MRI.getType(Dst).isByteSized());
  
@@ -2559,7 +3003,7 @@ index 212ede1a0..b5c931699 100644
  
    // Handle multi-byte increments and decrements.
  
-@@ -862,6 +886,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -862,6 +887,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      return true;
    }
  
@@ -2584,7 +3028,7 @@ index 212ede1a0..b5c931699 100644
    Register Partial;
    Register NewAmt;
    // Shift by one multiples of one byte.
-@@ -878,11 +920,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -878,11 +921,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      case MOS::G_ROTR:
        break;
      case MOS::G_ASHR: {
@@ -2606,7 +3050,7 @@ index 212ede1a0..b5c931699 100644
        break;
      }
      case MOS::G_LSHR:
-@@ -1252,6 +1299,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1252,6 +1300,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
  
    LLT Type = MRI.getType(LHS);
  
@@ -2635,7 +3079,7 @@ index 212ede1a0..b5c931699 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1270,7 +1339,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1270,7 +1340,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -2779,7 +3223,7 @@ index 212ede1a0..b5c931699 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,16 +1545,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,16 +1546,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -2804,7 +3248,7 @@ index 212ede1a0..b5c931699 100644
      if (!isNZUseLegal(Dst, MRI))
        Z = buildNZSelect(Z, Builder);
      Builder.buildCopy(Dst, Z);
-@@ -1358,8 +1568,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1358,8 +1569,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {
@@ -2817,10 +3261,87 @@ index 212ede1a0..b5c931699 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1601,14 +1814,89 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1601,14 +1815,176 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
  
++// #321 xy16 B1 gate: return true if every use of Vreg (an s16 vreg produced by
++// G_LOAD16_ABS) is compatible with the 16-bit X/Y register class — meaning it can
++// be selected without going through A16/Imag16. Compatible uses:
++//   G_STORE16_ABS       (val operand) → STXAbs16/STYAbs16
++//   G_STORE16_INDIR     (val operand) → STXImag16 + LDAImag16 + STAIndir16
++//   G_ADD/G_SUB ±1      (LHS operand) → INX16/DEX16/INY16/DEY16
++//   G_SBC compare form  (LHS=op5)     → CPX*/CPY*16
++//   G_PHI / COPY        → follow the result vreg (cycle-safe via Visited set)
++// Any other use → false (conservative; misclassification must miss a win only).
++static bool allUsesAreXY16Compatible(Register Vreg, const MachineRegisterInfo &MRI,
++                                     SmallSet<Register, 8> &Visited) {
++  if (!Visited.insert(Vreg).second)
++    return true; // already-visited (cycle from PHI/COPY chain)
++  for (const MachineInstr &Use : MRI.use_nodbg_instructions(Vreg)) {
++    switch (Use.getOpcode()) {
++    case MOS::G_STORE16_ABS:
++    case MOS::G_STORE16_INDIR:
++      if (Use.getOperand(0).getReg() != Vreg)
++        return false; // must be the stored value, not an address
++      break;
++    case TargetOpcode::G_ADD: {
++      if (MRI.getType(Use.getOperand(0).getReg()) != LLT::scalar(16))
++        return false;
++      // Either operand may be Vreg (G_ADD is commutative); the other must be ±1.
++      Register Other = (Use.getOperand(1).getReg() == Vreg)
++                           ? Use.getOperand(2).getReg()
++                           : Use.getOperand(1).getReg();
++      auto C = getIConstantVRegValWithLookThrough(Other, MRI);
++      if (!C)
++        return false;
++      uint64_t V = C->Value.getZExtValue() & 0xFFFF;
++      if (V != 1 && V != 0xFFFF)
++        return false;
++      break;
++    }
++    case TargetOpcode::G_SUB: {
++      if (MRI.getType(Use.getOperand(0).getReg()) != LLT::scalar(16))
++        return false;
++      if (Use.getOperand(1).getReg() != Vreg)
++        return false; // Vreg must be the minuend (LHS); RHS = step to subtract
++      auto C = getIConstantVRegValWithLookThrough(Use.getOperand(2).getReg(), MRI);
++      if (!C)
++        return false;
++      uint64_t V = C->Value.getZExtValue() & 0xFFFF;
++      if (V != 1 && V != 0xFFFF)
++        return false;
++      break;
++    }
++    case MOS::G_SBC: {
++      // Only compare form: LHS=op5, result (op0) dead, carryIn (op7) = 1.
++      if (MRI.getType(Use.getOperand(5).getReg()) != LLT::scalar(16))
++        return false;
++      if (Use.getOperand(5).getReg() != Vreg)
++        return false; // Vreg must be LHS; RHS stays in Imag16
++      if (!MRI.use_nodbg_empty(Use.getOperand(0).getReg()))
++        return false; // result used → arithmetic SBC, not compare
++      auto CarryIn =
++          getIConstantVRegValWithLookThrough(Use.getOperand(7).getReg(), MRI);
++      if (!CarryIn || CarryIn->Value.isZero())
++        return false; // carryIn not known 1 → not a compare form
++      break;
++    }
++    case TargetOpcode::G_PHI:
++      if (!allUsesAreXY16Compatible(Use.getOperand(0).getReg(), MRI, Visited))
++        return false;
++      break;
++    case TargetOpcode::COPY:
++      if (!allUsesAreXY16Compatible(Use.getOperand(0).getReg(), MRI, Visited))
++        return false;
++      break;
++    default:
++      return false; // unknown use — conservative
++    }
++  }
++  return true;
++}
++
 +// #321 native s16 indirect memory: route an s16 G_LOAD/G_STORE through a
 +// non-absolute 16-bit pointer to a single native 16-bit indirect op
 +// (G_LOAD16_INDIR/G_STORE16_INDIR -> lda (zp)/sta (zp) in M=0). The whole pointer
@@ -2864,11 +3385,21 @@ index 212ede1a0..b5c931699 100644
 +    // Absolute address (global/static/const) -> native 16-bit `lda abs`/`sta abs`.
 +    if (auto AbsOp = matchAbsoluteAddressing(MRI, Ptr)) {
 +      if (!AllUsesUnmerge) {
++        Register Dst = MI.getOperand(0).getReg();
 +        Builder
 +            .buildInstr(IsLoad ? MOS::G_LOAD16_ABS : MOS::G_STORE16_ABS)
 +            .add(MI.getOperand(0)) // dst (load) / value (store)
 +            .add(*AbsOp)
 +            .addMemOperand(*MI.memoperands_begin());
++        // B1: under +mos-xy16, constrain the load result to Xc16 when ALL uses
++        // are X-register-compatible (compare, ±1 inc/dec, store-abs, PHI/COPY
++        // chains). This lets selectXY16 emit LDXAbs16 instead of the A16 round-
++        // trip; a misclassification can only miss a win, never add a copy.
++        if (IsLoad && STI.hasIndex16() && !MRI.use_nodbg_empty(Dst)) {
++          SmallSet<Register, 8> Visited;
++          if (allUsesAreXY16Compatible(Dst, MRI, Visited))
++            MRI.setRegClass(Dst, &MOS::Xc16RegClass);
++        }
 +        MI.eraseFromParent();
 +        return true;
 +      }
@@ -2908,7 +3439,7 @@ index 212ede1a0..b5c931699 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1645,6 +1933,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1645,6 +2021,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);
@@ -2919,7 +3450,7 @@ index 212ede1a0..b5c931699 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    auto ValueType = MRI.getType(MI.getValueReg());
-@@ -1671,6 +1963,136 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+@@ -1671,6 +2051,150 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
    return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
  }
  
@@ -2937,6 +3468,19 @@ index 212ede1a0..b5c931699 100644
 +  Register Addr = MI.getPointerReg();
 +  int64_t ConstOffset = 0;
 +  Register VarIndex = 0;
++  // B2: set when a direct s16 offset (16-bit index) is found; switches the
++  // emitted opcode from G_LOAD16_ABS_IDX (8-bit X) to G_LOAD_ABS_IDX16 (16-bit X).
++  bool Use16BitIdx = false;
++
++  // Returns the abs-indexed or indir-indexed opcode based on data width and index width.
++  auto AbsIdxOpc  = [&]() -> unsigned {
++    return Use16BitIdx ? (IsLoad ? MOS::G_LOAD_ABS_IDX16   : MOS::G_STORE_ABS_IDX16)
++                       : (IsLoad ? MOS::G_LOAD16_ABS_IDX    : MOS::G_STORE16_ABS_IDX);
++  };
++  auto IndirIdxOpc = [&]() -> unsigned {
++    return Use16BitIdx ? (IsLoad ? MOS::G_LOAD_INDIR_IDX16  : MOS::G_STORE_INDIR_IDX16)
++                       : (IsLoad ? MOS::G_LOAD16_INDIR_IDX   : MOS::G_STORE16_INDIR_IDX);
++  };
 +
 +  while (true) {
 +    // Absolute base cases — require a VarIndex already found.
@@ -2944,7 +3488,7 @@ index 212ede1a0..b5c931699 100644
 +      if (!VarIndex)
 +        return false;
 +      int64_t Base = ConstAddr->Value.getSExtValue() + ConstOffset;
-+      unsigned Opc = IsLoad ? MOS::G_LOAD16_ABS_IDX : MOS::G_STORE16_ABS_IDX;
++      unsigned Opc = AbsIdxOpc();
 +      Builder.buildInstr(Opc)
 +          .add(MI.getOperand(0))
 +          .addImm(Base)
@@ -2957,8 +3501,7 @@ index 212ede1a0..b5c931699 100644
 +      if (!VarIndex)
 +        return false;
 +      const MachineOperand &GV = GVAddr->getOperand(1);
-+      unsigned Opc = IsLoad ? MOS::G_LOAD16_ABS_IDX : MOS::G_STORE16_ABS_IDX;
-+      Builder.buildInstr(Opc)
++      Builder.buildInstr(AbsIdxOpc())
 +          .add(MI.getOperand(0))
 +          .addGlobalAddress(GV.getGlobal(), GV.getOffset() + ConstOffset)
 +          .addUse(VarIndex)
@@ -2970,8 +3513,7 @@ index 212ede1a0..b5c931699 100644
 +      const MachineOperand &FI = FIAddr->getOperand(1);
 +      if (!VarIndex || !willBeStaticallyAllocated(FI))
 +        return false;
-+      unsigned Opc = IsLoad ? MOS::G_LOAD16_ABS_IDX : MOS::G_STORE16_ABS_IDX;
-+      Builder.buildInstr(Opc)
++      Builder.buildInstr(AbsIdxOpc())
 +          .add(MI.getOperand(0))
 +          .addFrameIndex(FI.getIndex(), FI.getOffset() + ConstOffset)
 +          .addUse(VarIndex)
@@ -3019,6 +3561,13 @@ index 212ede1a0..b5c931699 100644
 +        VarIndex = Builder.buildZExtOrTrunc(S8, Off).getReg(0);
 +        continue;
 +      }
++      // B2: under +mos-xy16, a direct s16 offset uses the widened index form.
++      // Use16BitIdx switches the emitted opcodes to G_LOAD_ABS_IDX16 etc.
++      if (STI.hasIndex16() && !VarIndex && MRI.getType(Off) == LLT::scalar(16)) {
++        VarIndex = Off;
++        Use16BitIdx = true;
++        continue;
++      }
 +      return false;
 +    }
 +    // Non-absolute base (runtime ZP pointer).
@@ -3026,9 +3575,7 @@ index 212ede1a0..b5c931699 100644
 +    // Case 2: no variable index, const offset in [1,255] → materialise as Y.
 +    // Mixed (VarIndex + ConstOffset != 0) can't be expressed in one indexed op.
 +    if (VarIndex && ConstOffset == 0) {
-+      unsigned Opc =
-+          IsLoad ? MOS::G_LOAD16_INDIR_IDX : MOS::G_STORE16_INDIR_IDX;
-+      Builder.buildInstr(Opc)
++      Builder.buildInstr(IndirIdxOpc())
 +          .add(MI.getOperand(0))
 +          .addUse(Addr)
 +          .addUse(VarIndex)
@@ -3036,11 +3583,9 @@ index 212ede1a0..b5c931699 100644
 +      MI.eraseFromParent();
 +      return true;
 +    }
-+    if (!VarIndex && ConstOffset >= 1 && ConstOffset <= 255) {
++    if (!VarIndex && ConstOffset >= 1 && ConstOffset <= 255 && !Use16BitIdx) {
 +      Register Idx = Builder.buildConstant(S8, ConstOffset).getReg(0);
-+      unsigned Opc =
-+          IsLoad ? MOS::G_LOAD16_INDIR_IDX : MOS::G_STORE16_INDIR_IDX;
-+      Builder.buildInstr(Opc)
++      Builder.buildInstr(IndirIdxOpc())
 +          .add(MI.getOperand(0))
 +          .addUse(Addr)
 +          .addUse(Idx)
@@ -3056,6 +3601,31 @@ index 212ede1a0..b5c931699 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
+@@ -1879,6 +2403,12 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+         Index = Builder.buildZExtOrTrunc(S8, NewOffset).getReg(0);
+         continue;
+       }
++      // B2: under +mos-xy16, a direct s16 offset uses the widened form.
++      if (STI.hasIndex16() && !Index && MRI.getType(NewOffset) == LLT::scalar(16)) {
++        Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_ABS_IDX16 : MOS::G_STORE_ABS_IDX16;
++        Index = NewOffset;
++        continue;
++      }
+     }
+     return false;
+   }
+@@ -1959,6 +2489,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+                    .countMaxActiveBits() <= 8) {
+       Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
+       Addr = Base;
++    } else if (STI.hasIndex16() && MRI.getType(Offset) == LLT::scalar(16)) {
++      // B2: direct s16 offset → (zp),Y16 indirect indexed (16-bit Y).
++      Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_INDIR_IDX16 : MOS::G_STORE_INDIR_IDX16;
++      Index = Offset;
++      Addr = Base;
+     }
+   }
+ 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 index 48cb1f356..583ca910d 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
