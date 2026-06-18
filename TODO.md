@@ -130,23 +130,35 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
-- [ ] **#321 xy16 correctness — REPSEP critical-edge bail truncates cross-block-live X16 (seed-31, last fuzz mismatch).**
-  After the hang fix (49/50, all 34 hangs cleared) the lone residual is seed-31: `xy16@MAME=0x0CCC`
-  vs `0x0B1F` — a *mismatch*, not a hang. Root-caused: `MOSInsertREPSEP` bails the whole function to
-  `placeLegacy` on a true critical edge (`bb.1→bb.3`, X16→X8); `placeLegacy` forces X=8 at every block
-  terminator, but `$x16` (`LDXAbs16 @arr+8 = 0x3C7D`) is live across `bb.0→bb.1`, so the end-of-`bb.0`
-  `sep #$30` zeroes X.high → `cpx #128` takes the wrong branch. Pre-existing, independent of the XHigh
-  fix (which only un-masked it). **Fix:** replace the bail with `B.begin()` entry-switch placement
-  (correct for non-passthrough target; keep `placeLegacy` for the X-passthrough-conflict corner).
-  [plan](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
-- [ ] **#321 xy16 — remaining REPSEP X-annotation gaps (watch pending fuzz evidence).** Same family as the
-  hang fix: instructions that touch X/Y but carry no X-width annotation, so the lattice can leave them in
-  the wrong mode. (1) **PHX/PLX/PHY/PLY in X16 mode** push/pull 2 bytes when X=0 — `xy16spillr` passes today
-  because spill is symmetric (push and pull share one X-mode), but an asymmetric push-X16/pull-X8 could
-  miscompile. (2) **TAX/TXA/TAY/TYA/TXY/TYX in mixed modes** — implied transfers carry no annotation; xy16
-  paths use the `TAX16`/`TXA16` pseudos (XLow=1). No evidence in the corpus yet → deferred; watch for new
-  fuzz failures that are NOT `xy16@MAME=0x0000` hangs. Detail in the hang-fix plan's *Deferred* section
-  ([plan](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md)).
+- [ ] **#321 xy16 — REPSEP transfer-instruction X-annotation (TAY/TYX/TAX/… ) — now has evidence (seed-160).**
+  On the 65816 the width of `TAY`/`TYX`/`TAX` is governed by the **X flag**, but `requiredXWidth()` treats
+  all transfers as `XW_None` (X-agnostic). When the cross-block dataflow *holds* X=16 across a loop back-edge
+  (instead of `placeLegacy`'s per-iteration 8-bit anchoring), a `TAY` with `M=8`/`X=16` drags the hidden
+  B-accumulator garbage into `Y.high`, and a following `TYX` propagates it into X → corrupt `arr` index.
+  **This was the deferred-and-now-confirmed item:** fuzz seed-160 fails the moment the function stops bailing
+  to `placeLegacy` (see the blocked critical-edge item below). **Fix:** model the X-flag dependence of
+  `TAY`/`TYA`/`TAX`/`TXA`/`TYX`/`TXY` in `requiredXWidth` (and/or selection) so the lattice keeps `Y`/`X`
+  high bytes honest. **This BLOCKS the seed-31 critical-edge fix.** Also still latent: **PHX/PLX/PHY/PLY in
+  X16 mode** (asymmetric push-X16/pull-X8 — `xy16spillr` passes today because spill is symmetric).
+  [analysis](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md) (§Why this is blocked) ·
+  [origin](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md) (Deferred).
+- [ ] **#321 xy16 correctness — REPSEP critical-edge bail truncates cross-block-live X16 (seed-31). BLOCKED.**
+  `MOSInsertREPSEP` bails the whole function to `placeLegacy` when a mode switch lands on a true critical edge
+  (`bb.1→bb.3`, X16→X8); `placeLegacy` forces X=8 at every block terminator, but `$x16` (`LDXAbs16 @arr+8 =
+  0x3C7D`) is live across `bb.0→bb.1`, so the end-of-`bb.0` `sep #$30` zeroes X.high → `cpx #128` takes the
+  wrong branch (`xy16@MAME=0x0CCC` vs `0x0B1F`). **Fix (implemented, verified-correct, then reverted):**
+  replace the bail with a single `B.begin()` entry-switch coercing every in-edge to `In`/`XIn[B]`. It fixes
+  seed-31 and passes fuzz 50/50, **but** `fuzz 200` showed it **regresses seed-160** — removing the bail makes
+  critical-edge functions use the dataflow's loop-mode-holding, which exposes the transfer-instruction bug
+  above. **Blocked on that fix first**; then re-land the `B.begin()` change (vendor + `0002` currently reverted
+  to the hang-fix commit, byte-identical). [plan](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
+- [ ] **#321 xy16 — fuzz 51–200 residuals (found 2026-06-18 by the wider sweep; pre-existing, not regressions).**
+  (1) **seed-157** — `+mos-xy16` value mismatch (`host==default==a16==0xD00D`, only xy16 differs); a distinct
+  xy16 miscompile (fails on both the bail and `B.begin()` toolchains). (2) **seed-169 / 173 / 196** —
+  `+mos-a16` **compiler crash** in `-verify-machineinstrs`: *"`$p` is not a GPR register"* on `PH $p` /
+  `STImag8 $p` / `$p = LDImag8` — a register-allocation/spill bug for the `$p` (pointer) register under heavy
+  pressure. Crash is **pre-REPSEP** (the dumped MIR has zero `REP/SEP`), so independent of all REPSEP work and
+  of `+mos-a16`-vs-default. Repro: `dev/run.sh fuzz 1 <seed>`; triage in `build/fuzz-triage/seed-00<seed>.txt`.
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
@@ -254,6 +266,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-18 — [321-repsep-critical-edge-x16-liveness] **#321 seed-31 critical-edge fix: implemented + verified-correct, then REVERTED (regresses seed-160) — investigation logged.** Root-caused seed-31 (the hang fix's lone fuzz-50 residual): `MOSInsertREPSEP` bails to `placeLegacy` on a true critical edge (`bb.1→bb.3`), which forces X=8 at every block terminator and truncates `$x16` live across `bb.0→bb.1` (`sep #$30` zeroes X.high → wrong `cpx` branch). Replaced the bail with a single `B.begin()` entry-switch (provably correct in isolation). **Fixed seed-31, fuzz 50/50, suite green** — BUT `fuzz 200` exposed a **regression at seed-160**: removing the bail makes critical-edge functions use the dataflow's loop-mode-*holding*, which surfaces a **pre-existing latent bug** — X-agnostic transfer instructions (`TAY`/`TYX`, whose width is governed by the X flag) drag B-accumulator garbage into `Y.high`/`X.high` when X16 is held across the back-edge. Per "never regress", **reverted** (vendor + `0002` byte-identical to the hang-fix commit). seed-31 is now **blocked on the transfer-instruction fix** (open). Also surfaced pre-existing 51–200 residuals: seed-157 (xy16 mismatch), seed-169/173/196 (`+mos-a16` `$p`-spill verify crash, pre-REPSEP). Lesson: a green fuzz-50 is not enough for a core-pass change — the wider sweep + bail-bisect caught it. [plan](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
 - 2026-06-18 — [321-xy16-hang-fix-xhigh] **#321 xy16 hang fix: byte-level `ldx/ldy/stx/sty` ran in X16 → 2-byte read/write corrupted adjacent ZP/struct bytes → soft-stack overflow → `xy16@MAME=0x0000`.** `XHigh=1` on 14 real X/Y instr defs (`MOSInstrFormats.td` CC0_Regular + `MOSInstrInfo.td`) **plus** `requiredXWidth()` register-residency for the generic load/store pseudos that only become `LDX_ZeroPage`/etc. at MC-lowering, after REPSEP (`LDAbs`/`LDImag8`/`LDImm`/`STAbs`/`STImag8`/`LDXIdx`/`LDYIdx` with `$x`/`$y` → `XW_X8`). Fuzz **16/50 → 49/50, all 34 hangs cleared**; corpus 7/7, xy16 suite green; `0002` round-trips. Lone residual = seed-31, a separate critical-edge X16-liveness bug (own open item). [plan](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md).
 - 2026-06-18 — [321-native-mode-crt0-xy16] **#321 native-mode crt0 DBR=0 contract.** `phk; plb` in `.init.50` makes DBR=0 an explicit contract; standing `crt0native` gate; fuzz 50/50 green. [plan](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md).
 - 2026-06-18 — [321-abs-x-indiry-indexed-load-store] **#321 Increment 1e: native 16-bit `abs,x` and `(zp),y` indexed load/store.** `tryIndexedAddressing16` detects `G_PTR_ADD(global, G_ZEXTLOAD(s16))` → `G_LOAD16_ABS_IDX` → `lda abs,x` (M=0); and `G_PTR_ADD(zp_ptr, G_ZEXTLOAD(s16))` → `G_LOAD16_INDIR_IDX` → `lda (zp),y` (M=0). 4 new GISel pseudos + 4 logical MC pseudos + selector helpers. G_ZEXTLOAD (not G_ZEXT) because IRTranslator fuses load+zext; safe to `buildTrunc(S8)` because G_ZEXTLOAD legalises to `G_MERGE_VALUES(lo, G_CONSTANT(0))` — RA cannot elide the explicit constant (cf. seed-56 crash where known-bits-zero path caused undefined-pair spill). `a16absidx` (BF, 0x9ABC) + `a16indiry` (B1, 0x5678) PASS on MAME + bsnes-jg; fuzz 100/100 (seeds 1–100), 0 mismatch; `0002` round-trips. [plan](docs/plans/2026-06-18-321-abs-x-indiry-16bit-indexed-load-store.md).
