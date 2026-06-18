@@ -112,8 +112,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
-  **moot** (the optimizer reassociates `a-b-c` to `a-(b+c)`, not a homogeneous chain). Remaining:
-  **spilling when >1 16-bit value is live at once** (the deeper register-allocation work).
+  **moot** (the optimizer reassociates `a-b-c` to `a-(b+c)`, not a homogeneous chain). Remaining —
+  **multi-value register pressure: CHARACTERIZED (measured 2026-06-18); the premise is largely already
+  solved.** There are ~14 16-bit slots (the `Imag16` pool), not one: 2–9 live s16 values already compile to
+  one `rep`/`sep` bracket with the 2nd value folded as a memory operand (`and/adc __rcN`), −58..−65 % vs
+  default, and correct (verify-clean, no crash) even at pool exhaustion. The lone genuine residual — M=16
+  fragmenting into many `rep`/`sep` brackets when a spill is emitted byte-wise-in-8-bit under **>14 live
+  s16** (pool exhaustion) — is **pathological-only** (no kernel/corpus/fuzz program hits it). The plan gates
+  any implementation on a Phase 0 trigger scan → likely DEFER-with-evidence.
+  [multi-value pressure plan](docs/plans/2026-06-18-321-16bit-alu-multivalue-register-pressure.md) ·
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
