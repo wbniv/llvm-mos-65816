@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/6fff2f1) | #321 docs: wire awareness of the upstream-contribution-status queue into CLAUDE.md + TODO |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0083378) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
+6fff2f1	author	Will Norris
+6fff2f1	added	4
+6fff2f1	deleted	0
+6fff2f1	files	1
+6fff2f1	body	So the pending-to-post queue (docs/upstream-contribution-status.md) is kept current:\n\n- CLAUDE.md (auto-loaded every session) §Commit discipline: a standing rule — upstream\n  PRs/issues/notes are queued in that doc; posting is user-triggered; keep it current in\n  the same commit when you draft an artifact, push a PR branch, or post one.\n- TODO.md §Upstream / Contribution: a back-pointer to the doc as the live queue + exact\n  post commands, to keep in sync (drafted → ready-to-post → posted).\n\nThe status doc already points back to the TODO section, so discoverability is bidirectional.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0083378	author	Will Norris
 0083378	added	60
 0083378	deleted	0

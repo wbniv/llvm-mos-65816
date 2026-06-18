@@ -50,6 +50,14 @@ glitch. (Exact commands + the micro-test pattern: `docs/agent-handoff.md`.)
 - **Stage only your files**, explicitly; then verify `git diff --cached --name-only` is exactly your set —
   never `vendor/`, a foreign patch, or `docs/transcripts/`. When regenerating `0002`, sanity-check it
   didn't absorb another patch's hunks: `grep -c <foreign-symbol> patches/llvm-mos/0002-*.patch`.
+- **Investigations go on throwaway worktrees, not `main`.** Measurements / spikes / probes (e.g. the
+  ZP-pressure scan, `dev/measure-zp-pressure.sh`) run on a `throwaway/<slug>` branch in its own worktree off
+  `main` HEAD — this repo's `main` working copy is a **hot shared tree** (concurrent agents leave `vendor/`,
+  `0002`, `TODO.md` dirty mid-edit), so a worktree gives a clean checkout + clean commits with no surgical
+  staging. The worktree has no `build/`: env-override `CLANG`/`OBJDUMP` to this checkout's
+  `build/llvm-mos-install/bin/...` rather than rebuilding. **Keep** → merge the durable artifacts (script,
+  recorded verdict) back; **dead-end** → `git worktree remove` + `git branch -D`. (Generic rule + rationale:
+  `~/SRC/CLAUDE.md` "Worktree-based feature workflow".)
 - **Commit hooks fire automatically:** `regen-md-history` snapshots edited plans into `docs/plans/.history/`;
   `audit-plan-deferrals` captures plan "Deferred"/unverified bullets into a `## Inbox` in `TODO.md` —
   **triage them** (delete a bullet already covered by a curated TODO item with a short
