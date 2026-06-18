@@ -169,8 +169,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   CC sub-decisions (args, frame, recursion) stay open.
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
-- [ ] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
+- [wip] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
   with correct line/variable mapping. ROADMAP step 6; drdevtools `mame-65816-gdbstub` pre-wires it.
+  **drmon-first plan**: read-only `llvm-dwarfdump` audit (gate) → close drmon's Phase-3 DAP live-MAME
+  verification → add drmon ELF/DWARF loader (`loadElf` via libdwarf) + fixture → end-to-end MAME
+  breakpoint → **⏸ pause for review** → only then any `vendor/` edits. **Step-1 audit DONE/CLEAN
+  (2026-06-18)**: DWARF *content* is correct (16-bit local `t` → `DW_OP_regx RS1`, frame_base RS0,
+  `--verify` clean, line13→`$8031`) — **no emission fix needed**. One gap found: the SNES build discards
+  the debug ELF (`OUTPUT_FORMAT{FULL(rom)}`) → step-6 needs a debug-ELF emission path (sdk-side).
+  [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
 
 ### Test Bench / CI
 
