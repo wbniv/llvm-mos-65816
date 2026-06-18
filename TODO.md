@@ -85,6 +85,21 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   stack — ~~file an issue~~ **issue DRAFTED + source-verified
   ([docs/321-upstream-reentrant-soft-stack-issue.md](docs/321-upstream-reentrant-soft-stack-issue.md));
   filing is user-triggered**. [plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
+- [ ] **#321 `+mos-a16 -O1/-Os` register-allocation FAILURE on real code (corpus `globals.c`).** Surfaced by
+  the ZP-pressure measurement (`dev/measure-zp-pressure.sh`): `globals.c:main` aborts RA — *"ran out of
+  registers during register allocation"* — under `+mos-a16` at `-O1`/`-Os`, while DEFAULT 8-bit `-Os` and
+  `+mos-a16 -O0` both compile clean. **Undiscovered because the corpus is built default 8-bit** (never
+  `+mos-a16`) and the fuzzer never generated the shape. ~~deterministic repro~~ + ~~fuzzer XFAIL~~ **DONE
+  `cca1694`**: delta-debugged minimal trigger `examples/65816/a16regpress.c` (a u16 accumulator held live
+  across a 2nd accumulation loop + two `u16*u8` multiplies; arrays `[4]`/`[8]` — shrinking to `[2]` removes
+  it), plus a `tools/a16_fuzz.py` `KNOWN_ISSUES` entry `regalloc-out-of-registers` (XFAIL-classified, mirrors
+  F3). **Remaining: (1) the FIX** — vendor/ allocator/spill path, the F3 / soft-stack spill-coverage family —
+  **DEFERRED** (needs a toolchain rebuild + `0002` regen, unsafe while a concurrent agent has `vendor/`/`0002`
+  dirty; do on a calm tree). When fixed: drop the `KNOWN_ISSUES` entry + convert `a16regpress.c` to a positive
+  differential gate. **(2)** optionally extend `a16_fuzz.py`'s generator to emit this two-loop / two-multiply /
+  cross-loop-live shape (validate on a quiet box).
+  [finding](docs/plans/2026-06-18-321-zp-pressure-measurement.md) ·
+  [soft-stack spill plan (sibling)](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
