@@ -60,21 +60,28 @@ registers during register allocation in function 'main'."* Triage (minimal, conc
 
 | invocation | result |
 |---|---|
-| DEFAULT 8-bit `-Os` | ✅ |
-| `+mos-a16 -O0` | ✅ |
-| **`+mos-a16 -Os`** | ❌ ran out of registers |
+| DEFAULT 8-bit (any `-O`) | ✅ |
+| `+mos-a16 -O0` / `-O2` | ✅ |
+| **`+mos-a16 -O1` / `-Os`** | ❌ ran out of registers |
 
-So it is **`+mos-a16` + `-Os`-specific**. `globals.c:main` sums ~12 live `u16` globals (`data_vals[4]` +
-`bss_vals[8]` + bytes); at `-Os` the optimizer's register pressure exhausts the a16 allocator (at `-O0`,
-heavier spilling survives). **The regression corpus is built default 8-bit, so this was never exercised
-under `+mos-a16`**, and the differential fuzzer doesn't generate this shape — hence undiscovered. This is a
-*hard crash*, a more severe class than the fragmentation the multi-value plan modeled (which produces
-correct-but-bloated code). It belongs with the F3 / soft-stack spill-coverage line of robustness work.
+So it is **`+mos-a16`-specific and confined to `-O1`/`-Os`** (`-O0` and `-O2` are clean). **Root-caused
+2026-06-18 — full record:
+[a16-regalloc-pressure-failure](../investigations/65816-a16-regalloc-pressure-failure.md).** NOT raw value
+count — it's `-Os` **over-coalescing**: pre-RA MIR shows `-Os` produces **fewer but longer-lived** `Ac16`
+ranges (8 distinct vregs) than `-O2` (14), yet only `-Os` crashes — the coalesced long ranges all need the
+*single* `A16` at once and can't be split/spilled apart, so the allocator gives up; `-O2` keeps the values in
+more, shorter vregs it *can* satisfy. **The regression corpus is built default 8-bit, so this was never
+exercised under `+mos-a16`**, and the fuzzer doesn't generate the shape — hence undiscovered. A *hard crash*,
+more severe than the fragmentation the multi-value plan modeled; it is the
+[A16-threading Phase 3](2026-06-17-321-a16-threading.md) hard core (single-`Ac16` residency).
 
-**Recommended follow-up (separate from this measurement):** (1) file/track a `#321` defect; (2) reduce to a
-hermetic `.ll` / minimal-C repro; (3) extend `tools/a16_fuzz.py` to generate many-live-`u16`-global shapes so
-the fuzzer catches this class; (4) root-cause + fix (likely allocator/spill-path, the F3 family). **Not
-fixed here** — out of scope for the measurement.
+**Follow-up status (2026-06-18):** (1) TODO defect filed ✓; (2) deterministic repro
+`examples/65816/a16regpress.c` ✓ (`cca1694`); (3) fuzzer `KNOWN_ISSUES` XFAIL `regalloc-out-of-registers` ✓
+(generator-shape extension still optional); (4) **root-caused ✓** (investigation above) — the **fix is
+deferred to [A16-threading Phase 3](2026-06-17-321-a16-threading.md)** (same `shouldCoalesce`/`Ac16`-residency
+territory; risks un-threading the Phase-1 wins / reopening the 1d crash; needs an asserts build to target
+safely). The bug is *pathological* (this measurement shows real code is slack), so the XFAIL + repro are the
+cost-justified holding state.
 
 ## Verification
 

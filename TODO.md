@@ -93,13 +93,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `cca1694`**: delta-debugged minimal trigger `examples/65816/a16regpress.c` (a u16 accumulator held live
   across a 2nd accumulation loop + two `u16*u8` multiplies; arrays `[4]`/`[8]` — shrinking to `[2]` removes
   it), plus a `tools/a16_fuzz.py` `KNOWN_ISSUES` entry `regalloc-out-of-registers` (XFAIL-classified, mirrors
-  F3). **Remaining: (1) the FIX** — vendor/ allocator/spill path, the F3 / soft-stack spill-coverage family —
-  **DEFERRED** (needs a toolchain rebuild + `0002` regen, unsafe while a concurrent agent has `vendor/`/`0002`
-  dirty; do on a calm tree). When fixed: drop the `KNOWN_ISSUES` entry + convert `a16regpress.c` to a positive
-  differential gate. **(2)** optionally extend `a16_fuzz.py`'s generator to emit this two-loop / two-multiply /
-  cross-loop-live shape (validate on a quiet box).
+  F3). ~~root-cause~~ **DONE 2026-06-18**: it's `-Os` **over-coalescing** s16 into long-lived `Ac16` ranges
+  that can't fit the single `A16` (`-O0`/`-O2` clean; `-Os` has *fewer* but longer `Ac16` vregs than the
+  passing `-O2`) — i.e. the **A16-threading Phase 3** hard core; full record:
+  [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md). **Remaining: the FIX —
+  DEFERRED, folded into A16-threading Phase 3** (same `shouldCoalesce`/`Ac16`-residency territory; risks
+  un-threading the Phase-1 wins / reopening the 1d crash; needs an asserts build to target safely — a blind
+  change is 3× worse than the XFAIL). **Pathological** (ZP measurement: real code is slack), so the XFAIL +
+  repro are the cost-justified holding state. When fixed: drop the `KNOWN_ISSUES` entry + make `a16regpress.c`
+  a positive gate (a Phase-3 acceptance case). Optional: extend `a16_fuzz.py`'s generator to emit the
+  two-loop / two-multiply / cross-loop-live shape.
+  [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
   [finding](docs/plans/2026-06-18-321-zp-pressure-measurement.md) ·
-  [soft-stack spill plan (sibling)](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
+  [A16-threading Phase 3](docs/plans/2026-06-17-321-a16-threading.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
