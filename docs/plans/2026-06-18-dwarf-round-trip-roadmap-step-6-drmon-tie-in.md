@@ -151,8 +151,16 @@ infinite loop, re-executes forever so the live breakpoint is deterministic; line
 **Result: V3–V6 automated + PASS, 3/3 runs 11/11.** New harness `task test-dap` (`linux/test_dap.sh`
 + `linux/dap/test_dap.py`); committed in drdevtools `1a5c05f`. Headless MAME + SNES Lua bridge on the
 host; `drmon-dap-snes` driven over DAP stdio in the build container (`--network=host`); every read
-cross-checked against a direct bridge connection. Only the two VS Code *GUI pane* confirmations remain
-(manual: Tier 2 disassembly pane, Tier 3 source highlight) — GUI views of protocol features now verified.
+cross-checked against a direct bridge connection.
+
+**VS Code GUI confirmation — ✅ DONE (2026-06-19, drdevtools `545723a`).** Tier 3 V6 confirmed **live**:
+the `vscode-drmon` extension loads (via `--extensionDevelopmentPath`), attaches, and a source breakpoint
+on `a16local.c:17` **fires** → CPU **halts** at PC=`$8074` → VS Code **highlights line 17** (CALL STACK
+mapped to `a16local.c:17`, `A=0x1122`). Screenshots + detail in drdevtools
+`docs/plans/2026-06-12-phase-3-drmon-dap-tier-3-symbol-loading.md` (v6). The GUI exercise found + fixed
+**two adapter bugs** — (#5) `configurationDone` now issues the bridge "go" (attach never sends a continue,
+so nothing fired/paused); (#6) `stackTrace` now reverse-maps PC → source line — both regression-tested by
+`phasec` (8/8). (Tier 2 V4 disassembly *pane* = a GUI view of an already-verified `disassemble` request.)
 
 **Three hard-won harness lessons (apply to any headless MAME+bridge automation, incl. Phase C):**
 1. **`-skip_gameinfo` is required headless** — without it MAME stalls on the disclaimer screen, emulated
