@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|xy16basic|xy16spill|xy16spillr|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16indiry|xy16basic|xy16spill|xy16spillr|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -159,6 +159,12 @@ Targets:
              `ldx <high>; lda <low>; rts` (high byte->X, low byte->A, byte-pinned) and the i8 return
              delivers its result in A alone; value: corpus_result==0x2387 host==default==+mos-a16
              on MAME + bsnes-jg. Prior art: WDC816CC p.21 / ORCA `A_X`.
+  a16absidx  #321 Increment 1e: native 16-bit abs,x indexed load (`lda abs,x` in M16, opcode BD).
+             8-bit byte offset from g_bytes[] -> one rep/sep + lda abs,x (no byte pair).
+             corpus_result==0x9ABC host==default==+mos-a16 on both emulators.
+  a16indiry  #321 Increment 1e: native 16-bit (zp),y indexed load (`lda (zp),y` in M16, opcode B1).
+             Runtime pointer + 8-bit Y offset -> one rep/sep + lda (zp),y (no iny/byte pair).
+             corpus_result==0x5678 host==default==+mos-a16 on both emulators.
   fuzz       #321 Tier-1 differential fuzzer: generate N random valid C programs (from
              `seed`, default 25 from seed 1), compile each DEFAULT, +mos-a16, and +mos-xy16,
              and assert host-expected == default@MAME == a16@MAME == xy16@MAME == a16@bsnes-jg
