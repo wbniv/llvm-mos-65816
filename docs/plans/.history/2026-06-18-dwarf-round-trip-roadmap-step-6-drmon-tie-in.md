@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/e609de4) | #321 DWARF step 6: correct the debug-ELF finding (companion exists) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/98a4340) | #321 DWARF step 6: record Steps 3-4 done (Phase B loader + Phase C end-to-end) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/6ff4689) | #321 DWARF step 6: record Step 2 (drmon DAP live-MAME V3-V6 PASS) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/fdd1fd4) | #321 DWARF round-trip (step 6): drmon-first plan + Step-1 audit (CLEAN) |
 
 <!--history-meta v1
+e609de4	author	Will Norris
+e609de4	added	72
+e609de4	deleted	86
+e609de4	files	1
+e609de4	body	Measurement correction (drmon side: drdevtools 2344483). My Step-1 "the SNES\nbuild discards the debug ELF" finding was WRONG: ld.lld writes a full DWARF ELF\ncompanion at <output>.elf beside the FULL(rom) ROM, so a normal -g build already\nproduces a16local.sfc + a16local.sfc.elf. I'd named my probe output .elf and\nnever looked for the .elf.elf companion.\n\nConsequences threaded through the plan + TODO:\n  - Step 1 KEY FINDING rewritten: no debug-ELF gap; companion is the artifact.\n  - Step 5 / A1b "debug-ELF emission path" WITHDRAWN — already exists; Step 5 is\n    now just .ll regression tests (hygiene). Optional upstream DOC note that\n    <output>.elf is the debugger artifact (undocumented today).\n  - Risks 2/3/4 retired/resolved; fixture = the committed a16local.sfc.elf\n    companion (addresses match the ROM by construction — same link).\n  - Phase C addresses updated to the LTO companion: main $8059, line 13 $805b,\n    line 17 $8074 (still 6/6).\n\nNo vendor/ edits (still at the review pause). drmon Steps 1-4 done + committed.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 98a4340	author	Will Norris
 98a4340	added	38
 98a4340	deleted	11

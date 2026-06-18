@@ -35,7 +35,7 @@ still authored now; only the fixture/end-to-end test wait on the compiler fix.
 | 3 | **Phase B** — drmon DWARF loader + committed ELF fixture + unit tests | drdevtools | Step 1 (fixture trust) | ✅ **DONE — loadElf, 3 ELF tests PASS** |
 | 4 | **Phase C** — drmon end-to-end: breakpoint on real `-g` ROM in MAME | drdevtools | Steps 1, 3 | ✅ **DONE — 6/6, 3 runs** |
 | — | **⏸ PAUSE FOR REVIEW** — stop here; hand back for review before any `vendor/` edits | — | Steps 1–4 done | **◀ HERE** |
-| 5 | **Phase A** — vendor `.ll` regression tests (hygiene only); patch regen | llvm-mos-65816, **source edits** | review sign-off | |
+| 5 | **Phase A** — DWARF regression tests (`dev/run.sh dwarf` + staged lit) | llvm-mos-65816 | review sign-off | ✅ **DONE — gate 7/7, lit verified** |
 
 (The table has a 5th "status" column now.) Steps 1–4 are the "as much drmon as possible" block. **Stop
 and hand back for review after Step 4** — do **not** begin Step 5 (the only compiler-source work) until
@@ -331,9 +331,26 @@ the only compiler-source work and begins only after sign-off.
 
 ## Step 5 — Phase A: compiler-source changes (llvm-mos-65816; deferred, gated on review)
 
-The only `vendor/llvm-mos/` edits. **Begin only after the review checkpoint above.** Step 1 came back
-clean **and** the toolchain already emits a debug ELF (the `<rom>.elf` companion), so this is **just
-`.ll` regression tests (hygiene) — NOT an emission fix and NOT a debug-ELF feature.**
+**✅ DONE (2026-06-19) — and it needed NO `vendor/` edits after all.** Step 1 came back clean and the
+toolchain already emits the `<rom>.elf` companion, so Step 5 is purely regression hygiene. The plan
+assumed vendor `.ll` lit tests, but two facts redirected the form (justified deviation — measure / fix
+forward):
+- **`dev/regen-patch.sh` mirrors only `llvm/lib/Target/MOS`** → a file under `llvm/test/` is lost on a
+  clean vendor rebuild (not patch-durable). The project already classes lit tests as an upstreaming concern.
+- **Full `llvm-lit` can't run here** — the container-configured `build/llvm-mos` tree lacks `count`/`not`
+  and can't be rebuilt host-side (`/work` paths).
+
+Delivered instead:
+- **`dev/dwarf.sh` + `dev/run.sh dwarf`** — the durable, tracked, in-repo regression. Runs the real
+  `--config -g` build and asserts SHAPES (not addresses): the `<output>.elf` companion is emitted +
+  has `.debug_info`, `--verify` clean, `addr_size 0x04`, `frame_base DW_OP_regx RS0`, the 16-bit local
+  has a `DW_OP_regx RSn` location, subprogram low/high_pc, line table + `end_sequence`. **Gate 7/7 PASS.**
+- **`dev/lit/DebugInfo/MOS/dwarf-65816.ll`** (+ `dev/lit/README.md`) — the upstream-PR lit form, staged in
+  a *tracked* dir, **verified via the manual `llc | llvm-dwarfdump | FileCheck` pipeline** (all RUN lines
+  pass). Queued in `docs/upstream-contribution-status.md` (with the `<output>.elf` doc note).
+
+No `vendor/llvm-mos/` source changed ⇒ **no `0002` patch regen needed.** The A2/A3/A4/A5 sub-steps below
+are the superseded original plan, kept for the record.
 
 ### A1b. Debug-ELF emission path — ❌ WITHDRAWN (already exists)
 An earlier draft proposed adding a debug-ELF output to the SNES platform. **Unnecessary:** `ld.lld`

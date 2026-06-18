@@ -213,9 +213,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   emits a `<rom>.elf` DWARF companion (`ld.lld` writes it beside the ROM — *no* debug-ELF gap; an earlier
   "discards the ELF" finding was wrong, corrected). drmon: `SymbolTable::loadElf` via libdwarf (drdevtools
   `9b378ba`), live-MAME DAP V3–V6 PASS (`1a5c05f`), end-to-end source breakpoint fires in MAME — Phase C
-  6/6 (`bdf0af0`→`2344483`). **Remaining (Step 5, gated on review):** `.ll` regression tests in
-  `vendor/llvm-mos/llvm/test/DebugInfo/MOS/` (hygiene; no emission fix, no SDK feature needed). Optional
-  upstream doc note that `<output>.elf` is the debugger artifact.
+  6/6 (`bdf0af0`→`2344483`). **Step 5 DONE (2026-06-19):** compiler-side regression `dev/run.sh dwarf`
+  (gate 7/7 — companion ELF emitted, `--verify` clean, frame_base RS0, 16-bit local `DW_OP_regx`, line
+  table) + tracked upstream-staged lit test `dev/lit/DebugInfo/MOS/dwarf-65816.ll` (verified via manual
+  `llc|dwarfdump|FileCheck`). **No `vendor/` edits** (regen-patch wouldn't capture `llvm/test/`; full lit
+  unbuildable here) → no `0002` regen. **Implementation complete + end-to-end verified.** Left: only
+  user-triggered upstream posting (`docs/upstream-contribution-status.md`: lit test + `<output>.elf` doc
+  note) + 2 manual VS Code GUI-pane confirmations (disasm pane, source highlight).
   [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
 
 ### Test Bench / CI
@@ -683,4 +687,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • TSX/TXS — non-work: no compiler-pseudo path (crt0 stack init is hand-written asm); would only
        matter for a future native-hardware-stack frame. Nothing open.
      fp:e3eda71d77592d8c fp:d64f4a3bcd9e3615 fp:5357e60ef6ea3fea -->
+- [ ] **(triage)** **`dev/regen-patch.sh` mirrors only `llvm/lib/Target/MOS`** → a file under `llvm/test/` is lost on a — _from [2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md)_  <!-- fp:02d8811ec8003aa5 -->
+- [ ] **(triage)** **Full `llvm-lit` can't run here** — the container-configured `build/llvm-mos` tree lacks `count`/`not` — _from [2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md)_  <!-- fp:b4a301783ca3b9e3 -->
+- [ ] **(triage)** **`dev/dwarf.sh` + `dev/run.sh dwarf`** — the durable, tracked, in-repo regression. Runs the real — _from [2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md)_  <!-- fp:110cfbbe5aab25e6 -->
+- [ ] **(triage)** **`dev/lit/DebugInfo/MOS/dwarf-65816.ll`** (+ `dev/lit/README.md`) — the upstream-PR lit form, staged in — _from [2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md)_  <!-- fp:fe7817097ea1d37e -->
 <!-- END auto-captured-deferrals -->

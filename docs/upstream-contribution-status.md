@@ -12,7 +12,8 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
   Strictly *PRs*, that's **one** (F4).
 - **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
-  llvm-mos-sdk#415 engagement (someone else's existing PR).
+  llvm-mos-sdk#415 engagement (someone else's existing PR). Plus a **drafted-and-staged** test+docs item
+  (ROADMAP step 6 DWARF: lit test in `dev/lit/` + `<output>.elf` doc note) — small, postable any time.
 - **Hygiene: 1 stale fork branch** to delete (`revert-540-…`, references an already-merged upstream PR).
 
 ## Ready to post now
@@ -76,6 +77,13 @@ Full internal analysis: [`docs/investigations/65816-a16-scavenger-nz-liveness.md
   his `snesxc` reg lib + multi-bank linker, contribute our native-mode crt0 + dual-emulator CI on top). This
   is *engaging someone else's PR*, not opening our own. Strategy in
   [`docs/415-snes-target-reconciliation.md`](415-snes-target-reconciliation.md).
+- **DWARF regression test + `<output>.elf` doc note (ROADMAP step 6).** The 65816 DWARF *content* is already
+  correct upstream (no codegen change needed — verified 2026-06-18). Two small, drafted contributions guard
+  and document it: (1) a lit test [`dev/lit/DebugInfo/MOS/dwarf-65816.ll`](../dev/lit/DebugInfo/MOS/dwarf-65816.ll)
+  — verified locally via `llc | llvm-dwarfdump | FileCheck` (full `llvm-lit` needs `count`/`not`, unbuilt
+  here) — to drop into `llvm/test/DebugInfo/MOS/`; (2) a doc note that `ld.lld` writes a `<output>.elf` DWARF
+  companion beside the `FULL(rom)` ROM (undocumented today; it's the artifact a source-level debugger loads).
+  Bundle as a test+docs PR when desired. The durable in-repo guard is `dev/run.sh dwarf`.
 
 ## Hygiene — stale fork branch
 
