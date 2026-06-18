@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/82edb10) | #321 seed-31 critical-edge fix: investigation — verified-correct but reverted (blocked on transfers) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/8961afb) | #321 xy16 hang fix: XHigh on byte-level X/Y ops + requiredXWidth pseudo residency |
 
 <!--history-meta v1
+82edb10	author	Will Norris
+82edb10	added	104
+82edb10	deleted	14
+82edb10	files	1
+82edb10	body	Implemented the seed-31 fix (replace the MOSInsertREPSEP whole-function\ncritical-edge bail with a single B.begin() entry-switch). It fixes seed-31 and\npasses fuzz 50/50 + the full suite + verify-machineinstrs, and the post-REPSEP\nMIR confirms the intended shape ($x16 no longer truncated across bb.0->bb.1).\n\nBUT a wider sweep (fuzz 200) found a REGRESSION at seed-160: removing the bail\nmakes critical-edge functions use the cross-block dataflow's loop-mode-holding\ninstead of placeLegacy's per-iteration 8-bit anchoring, which exposes a\npre-existing latent bug — the X-agnostic transfer instructions (TAY/TYX, whose\nwidth is governed by the X flag) are unmodelled in requiredXWidth, so a TAY with\nM=8/X=16 drags B-accumulator garbage into Y.high and a following TYX propagates\nit into X -> corrupt arr index.\n\nPer the prime directive (never regress), the code change is REVERTED: vendor and\n0002 are byte-identical to the hang-fix commit (this commit is docs-only). seed-31\nis now blocked on first fixing the transfer-instruction X-annotation.\n\nBisect (bail vs B.begin) attribution of all fuzz-200 failures:\n  31  fixed by B.begin; 157 pre-existing xy16 mismatch (both); 160 REGRESSED by\n  B.begin; 169/173/196 pre-existing +mos-a16 $p-spill verify crash (both,\n  pre-REPSEP). All logged as open TODO items.\n\nThis commit records the full root-cause analysis in the plan and updates TODO\n(seed-31 -> blocked; transfer-instruction item -> now has evidence + blocks\nseed-31; 51-200 residuals added). No codegen change.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8961afb	author	Will Norris
 8961afb	added	174
 8961afb	deleted	0

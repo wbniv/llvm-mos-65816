@@ -138,6 +138,22 @@ passes via `placeLegacy`):**
    path and the dataflow path agree) and seed-31 flips FAIL→PASS only with `B.begin()`.
 8. `-verify-machineinstrs` clean on seeds 31/160; `0002` round-trips, diff confined to `MOSInsertREPSEP.cpp`.
 
+> **Commit B RESULTS (2026-06-18) — PASS, payoff delivered.**
+> 5. **PASS** — `fuzz 1 31` → `0x0B1F`, `fuzz 1 160` → `0x1381`, `fuzz 1 157` → `0xD00D`, all agree.
+> 6. **PASS** — `fuzz 500` → **492/500, 0 mismatch**, 8 crash. Zero value mismatches across all 1–500
+>    (seed-31 fixed; seed-157 + seed-160 pass). The 8 residuals are exactly the pre-existing `$p`-spill
+>    crashes (169/173/196/268/271/272/306/420), out of scope.
+> 7. **PASS (bisect, decisive).** Commit A (bail + transfer fix) `fuzz 500` = 491/500 → failures {seed-31
+>    mismatch} + 8 crashes; Commit B (B.begin + transfer fix) `fuzz 500` = 492/500 → {8 crashes} only.
+>    The ONLY delta is **seed-31 FAIL→PASS**; **seed-160 PASS on both** paths (the Commit-A annotation made
+>    bail and dataflow agree) and **no new PASS→FAIL** — i.e. the seed-160 regression is gone.
+> 8. **PASS** — `-verify-machineinstrs` clean on 31 + 160; `0002` round-trips, foreign-hunks = 5, diff
+>    confined to `MOSInsertREPSEP.cpp` (Step 3a `B.begin()`).
+>
+> **Micro-test:** deferred — the fuzzer (pinned seeds 31/160/157) is the authoritative guard, as planned.
+> A dedicated `xy16xfer.c` was judged not worth the RA/dataflow-contingent fragility (the bug needs the
+> dataflow to hold X=16 across a transfer, which is exactly the RA-dependent shape that drifts).
+
 **Regression guard:** the fuzzer is authoritative — pin `dev/run.sh fuzz 1 31` and `fuzz 1 160` as the
 guards. *Best-effort companion:* attempt `examples/65816/xy16xfer.c` + frozen `.ll` (model the reduced
 `build/fuzz-triage/seed-00160.c`: a single straight loop — **no critical edge** — whose counter

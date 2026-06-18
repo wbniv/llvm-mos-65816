@@ -153,33 +153,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
-- [ ] **#321 xy16 — REPSEP transfer-instruction X-annotation (TAY/TYX/TAX/… ) — now has evidence (seed-160).**
-  On the 65816 the width of `TAY`/`TYX`/`TAX` is governed by the **X flag**, but `requiredXWidth()` treats
-  all transfers as `XW_None` (X-agnostic). When the cross-block dataflow *holds* X=16 across a loop back-edge
-  (instead of `placeLegacy`'s per-iteration 8-bit anchoring), a `TAY` with `M=8`/`X=16` drags the hidden
-  B-accumulator garbage into `Y.high`, and a following `TYX` propagates it into X → corrupt `arr` index.
-  **This was the deferred-and-now-confirmed item:** fuzz seed-160 fails the moment the function stops bailing
-  to `placeLegacy` (see the blocked critical-edge item below). **Fix:** model the X-flag dependence of
-  `TAY`/`TYA`/`TAX`/`TXA`/`TYX`/`TXY` in `requiredXWidth` (and/or selection) so the lattice keeps `Y`/`X`
-  high bytes honest. **This BLOCKS the seed-31 critical-edge fix.** Also still latent: **PHX/PLX/PHY/PLY in
-  X16 mode** (asymmetric push-X16/pull-X8 — `xy16spillr` passes today because spill is symmetric).
-  **Implementation plan APPROVED 2026-06-18** — `requiredXWidth`: `TA`/`TX` → `XW_X8` (+ `PH`/`PL` with
-  `$x`/`$y`; `T_A` stays X-agnostic), then re-land the `B.begin()` critical-edge fix.
-  [impl plan](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md) ·
-  [analysis](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md) (§Why this is blocked) ·
-  [origin](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md) (Deferred).
-- [ ] **#321 xy16 correctness — REPSEP critical-edge bail truncates cross-block-live X16 (seed-31). BLOCKED.**
-  `MOSInsertREPSEP` bails the whole function to `placeLegacy` when a mode switch lands on a true critical edge
-  (`bb.1→bb.3`, X16→X8); `placeLegacy` forces X=8 at every block terminator, but `$x16` (`LDXAbs16 @arr+8 =
-  0x3C7D`) is live across `bb.0→bb.1`, so the end-of-`bb.0` `sep #$30` zeroes X.high → `cpx #128` takes the
-  wrong branch (`xy16@MAME=0x0CCC` vs `0x0B1F`). **Fix (implemented, verified-correct, then reverted):**
-  replace the bail with a single `B.begin()` entry-switch coercing every in-edge to `In`/`XIn[B]`. It fixes
-  seed-31 and passes fuzz 50/50, **but** `fuzz 200` showed it **regresses seed-160** — removing the bail makes
-  critical-edge functions use the dataflow's loop-mode-holding, which exposes the transfer-instruction bug
-  above. **Blocked on that fix first**; then re-land the `B.begin()` change (vendor + `0002` currently reverted
-  to the hang-fix commit, byte-identical). Both fixes scheduled together in the approved
-  [impl plan](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md) (Commit B re-lands
-  this). [analysis](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
 - [ ] **#321 `+mos-a16` `$p`-spill compiler crash — pre-existing, pre-REPSEP (found by the wider fuzz sweeps).**
   `-verify-machineinstrs` crash *"`$p` is not a GPR register"* on `PH $p` / `STImag8 $p` / `$p = LDImag8` — a
   register-allocation/spill bug for the `$p` (pointer) register under heavy pressure. The crash is **pre-REPSEP**
@@ -298,6 +271,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-18 — [repsep-x-annotation-for-x-governed-transfers-push] **#321 xy16: seed-31 FIXED — REPSEP X-annotation for X-governed transfers/push-pull unblocked the critical-edge fix. fuzz 500 → 492/500, 0 mismatch.** Two commits. **Commit A** (`4d8a2bd`): `requiredXWidth` now returns `XW_X8` for `TA` (TAX/TAY), `TX` (TXY/TYX) and `PH`/`PL` with `$x`/`$y` (PHX/PLX/PHY/PLY) — index transfers/push-pull whose width is X-flag-governed; the 8-bit-intent pseudos were `XW_None`, so when the dataflow holds X=16 across a loop back-edge an 8-bit `TAY`/`TYX` ran 16-bit and dragged B-accumulator garbage into `Y.high`/`X.high` (the M side never had this — `requiredWidth` defaults to `MW_M8`). `T_A` (TXA/TYA) left X-agnostic (M-governed). Monotone-conservative (only adds `sep #$10`). **Bonus: fixed seed-157** (a second transfer-in-held-X16 mismatch). **Commit B** (re-applied the reverted `B.begin()` critical-edge placement, now safe): replaces the whole-function `placeLegacy` bail with a single absolute-mode entry switch at the target block's start (retains `placeLegacy` only for the X-passthrough-conflict corner). Verified: seed-31/157/160 all pass; `fuzz 500` 491→492/500 with seed-31 the only FAIL→PASS delta (bisect: seed-160 PASS on both bail and B.begin paths, no new regression); corpus 7/7, xy16 suite green, verify-clean on 31/160, `0002` round-trips (foreign-hunks=5). Residual 8 fuzz crashes are the separate pre-existing `$p`-spill bug (own open item). [impl plan](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md) · [critical-edge analysis](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
 - 2026-06-18 — [321-repsep-critical-edge-x16-liveness] **#321 seed-31 critical-edge fix: implemented + verified-correct, then REVERTED (regresses seed-160) — investigation logged.** Root-caused seed-31 (the hang fix's lone fuzz-50 residual): `MOSInsertREPSEP` bails to `placeLegacy` on a true critical edge (`bb.1→bb.3`), which forces X=8 at every block terminator and truncates `$x16` live across `bb.0→bb.1` (`sep #$30` zeroes X.high → wrong `cpx` branch). Replaced the bail with a single `B.begin()` entry-switch (provably correct in isolation). **Fixed seed-31, fuzz 50/50, suite green** — BUT `fuzz 200` exposed a **regression at seed-160**: removing the bail makes critical-edge functions use the dataflow's loop-mode-*holding*, which surfaces a **pre-existing latent bug** — X-agnostic transfer instructions (`TAY`/`TYX`, whose width is governed by the X flag) drag B-accumulator garbage into `Y.high`/`X.high` when X16 is held across the back-edge. Per "never regress", **reverted** (vendor + `0002` byte-identical to the hang-fix commit). seed-31 is now **blocked on the transfer-instruction fix** (open). Also surfaced pre-existing 51–200 residuals: seed-157 (xy16 mismatch), seed-169/173/196 (`+mos-a16` `$p`-spill verify crash, pre-REPSEP). Lesson: a green fuzz-50 is not enough for a core-pass change — the wider sweep + bail-bisect caught it. [plan](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
 - 2026-06-18 — [321-xy16-hang-fix-xhigh] **#321 xy16 hang fix: byte-level `ldx/ldy/stx/sty` ran in X16 → 2-byte read/write corrupted adjacent ZP/struct bytes → soft-stack overflow → `xy16@MAME=0x0000`.** `XHigh=1` on 14 real X/Y instr defs (`MOSInstrFormats.td` CC0_Regular + `MOSInstrInfo.td`) **plus** `requiredXWidth()` register-residency for the generic load/store pseudos that only become `LDX_ZeroPage`/etc. at MC-lowering, after REPSEP (`LDAbs`/`LDImag8`/`LDImm`/`STAbs`/`STImag8`/`LDXIdx`/`LDYIdx` with `$x`/`$y` → `XW_X8`). Fuzz **16/50 → 49/50, all 34 hangs cleared**; corpus 7/7, xy16 suite green; `0002` round-trips. Lone residual = seed-31, a separate critical-edge X16-liveness bug (own open item). [plan](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md).
 - 2026-06-18 — [321-native-mode-crt0-xy16] **#321 native-mode crt0 DBR=0 contract.** `phk; plb` in `.init.50` makes DBR=0 an explicit contract; standing `crt0native` gate; fuzz 50/50 green. [plan](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md).

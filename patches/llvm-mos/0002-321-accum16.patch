@@ -92,10 +92,10 @@ index 76d7409c1..733ef7097 100644
 +    [FeatureAccum16]>;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000..c9c4517e1
+index 000000000..e0b2f837e
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,530 @@
+@@ -0,0 +1,578 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -129,8 +129,12 @@ index 000000000..c9c4517e1
 +//   * function entry is 8-bit (ABI), every call/return boundary is 8-bit;
 +//   * width-agnostic ops (carry-init, branches) impose no constraint.
 +//
-+// v1 is conservative: when a mode switch would land on a true critical edge,
-+// the whole function falls back to the old per-block 8-bit anchoring.
++// A mode switch on a true critical edge is placed as a single absolute-mode
++// entry switch at the target block's start (coercing every in-edge at once),
++// which is correct because the target's entry width is well-defined and A16 is
++// never live across edges. The one residual unsafe case — forcing X to 8-bit on
++// an X-passthrough target whose entry width came from a conflicting-pred meet —
++// falls back to the old per-block 8-bit anchoring (placeLegacy).
 +//
 +// The STZ store-of-zero fusion (Increment 1a) is independent and kept as-is.
 +// Gated on FeatureAccum16; a no-op otherwise.
@@ -555,10 +559,28 @@ index 000000000..c9c4517e1
 +    XOut[&MBB] = outOfX(&MBB);
 +  }
 +
-+  // Step 3a — decide where each mode transition lands, and bail the whole
-+  // function to the legacy anchoring if any switch would fall on a true critical
-+  // edge (source has >1 successor AND target has >1 predecessor). v1 does not
-+  // split critical edges.
++  // Step 3a — decide where each mode transition lands.
++  //
++  // A transition on a true critical edge (source has >1 successor AND target has
++  // >1 predecessor) cannot be placed at the source's end without disturbing the
++  // source's other successors. Instead of bailing the whole function, place ONE
++  // absolute-mode entry switch at the *target's start*, which coerces every
++  // in-edge to the target's required entry width in a single REP/SEP. This is
++  // correct because insertSwitch sets an absolute mode and the target's entry
++  // width (In/XIn) is a single well-defined value:
++  //   * M — A16 is never live across an edge (the backend spills it to an Imag16
++  //     ZP slot), so forcing M at the target start never truncates a live
++  //     accumulator.
++  //   * X — forcing X16 only widens (safe). Forcing X8 could truncate an X16
++  //     value live *through* the target, but that requires the target to be
++  //     X-passthrough (it has no X-op, so it does not clobber X); a
++  //     non-passthrough target pins XIn via a real X-op that operates on X at
++  //     that width, so nothing X16 is live-through. The lone unsafe case — an
++  //     X-passthrough target forced to X8 (its XIn came from a conflicting-pred
++  //     meet) — retains the conservative whole-function placeLegacy fallback.
++  // (Before: any such critical edge bailed the entire function to placeLegacy,
++  // which forces 8-bit at every block terminator and so truncated a 16-bit X
++  // value live across a block boundary — the seed-31 miscompile.)
 +  struct Placement {
 +    MachineBasicBlock *MBB;
 +    bool AtEnd;
@@ -572,6 +594,34 @@ index 000000000..c9c4517e1
 +      continue; // entry has no CFG predecessor edges; its In=M8/X8 is the ABI state
 +    const bool NeedM16 = resolveIsM16(In[&B]);
 +    const bool NeedX16 = HasIndex16 ? resolveIsX16(XIn[&B]) : false;
++    // Survey the in-edges: which flags differ on some edge, and whether any
++    // transition is forced onto a true critical edge.
++    bool AnyMDiff = false, AnyXDiff = false, CriticalEdge = false;
++    for (MachineBasicBlock *P : B.predecessors()) {
++      bool M_diff = resolveIsM16(Out[P]) != NeedM16;
++      bool X_diff = HasIndex16 && (resolveIsX16(XOut[P]) != NeedX16);
++      if (!M_diff && !X_diff)
++        continue;
++      AnyMDiff |= M_diff;
++      AnyXDiff |= X_diff;
++      if (P->succ_size() != 1 && B.pred_size() != 1)
++        CriticalEdge = true;
++    }
++    if (CriticalEdge) {
++      // Unsafe only when forcing X8 onto an X-passthrough target (its X8 came
++      // from a conflicting-pred meet, so an X16 value may be live-through).
++      if (AnyXDiff && !NeedX16 && isPassthroughX(&B)) {
++        Bail = true;
++        break;
++      }
++      // One absolute-mode entry switch at the target start covers every in-edge
++      // (redundant on edges that already deliver the right width; correct on the
++      // rest). Skip per-edge placement for this block.
++      Placements.push_back(
++          {&B, /*AtEnd=*/false, AnyMDiff, NeedM16, AnyXDiff, NeedX16});
++      continue;
++    }
++    // No critical edge — per-edge placement (avoids redundant switches).
 +    for (MachineBasicBlock *P : B.predecessors()) {
 +      bool M_diff = resolveIsM16(Out[P]) != NeedM16;
 +      bool X_diff = HasIndex16 && (resolveIsX16(XOut[P]) != NeedX16);
@@ -582,18 +632,16 @@ index 000000000..c9c4517e1
 +      if (P->succ_size() == 1) {
 +        PlaceMBB = P;
 +        AtEnd = true;
-+      } else if (B.pred_size() == 1) {
++      } else {
++        // B.pred_size() == 1 here (else CriticalEdge would be set). A diff on a
++        // single-predecessor target means XIn/In is pinned by a real op (not a
++        // passthrough meet), so forcing it at the target start is safe.
 +        PlaceMBB = &B;
 +        AtEnd = false;
-+      } else {
-+        Bail = true; // critical edge — conservative whole-function fallback
-+        break;
 +      }
 +      Placements.push_back({PlaceMBB, AtEnd,
 +                            M_diff, NeedM16, X_diff, NeedX16});
 +    }
-+    if (Bail)
-+      break;
 +  }
 +
 +  if (Bail) {

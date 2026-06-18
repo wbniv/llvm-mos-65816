@@ -7,18 +7,14 @@ took fuzz 16/50 → 49/50, cleared all 34 hangs.
 **Baseline:** `dev/run.sh fuzz 50 1` → **49/50**, the single residual is seed-31, a *mismatch*
 (`xy16@MAME=0x0CCC` vs expected `0x0B1F`), **not** a hang.
 
-> **STATUS (2026-06-18): IMPLEMENTED, VERIFIED-CORRECT, then REVERTED — BLOCKED.**
-> The `B.begin()` fix below fixes seed-31 and passes **fuzz 50/50** + the full suite. But a wider
-> sweep — `dev/run.sh fuzz 200 1` — exposed a **regression at seed-160** (was PASS on the bail
-> path, FAIL with the fix). Root-caused (see *§Why this is blocked* below): the fix is itself
-> correct, but by removing the whole-function bail it makes critical-edge functions use the
-> cross-block dataflow's loop-mode-*holding*, which surfaces a **pre-existing latent bug** — the
-> X-agnostic **transfer instructions** (`TAY`/`TYX`/… whose width is governed by the X flag) are
-> not modelled in `requiredXWidth`. Per the prime directive (never regress), the fix was **reverted
-> to the bail** (vendor + `0002` back to the [hang-fix](2026-06-18-321-xy16-hang-fix-xhigh.md)
-> commit, byte-identical). **seed-31 stays open**, now *blocked on first fixing the
-> transfer-instruction X-annotation* (TODO M2; the hang-fix plan's *Deferred* item #2, which now
-> has concrete evidence: seed-160).
+> **STATUS (2026-06-18): LANDED — seed-31 FIXED.** First reverted as BLOCKED (the `B.begin()` fix
+> regressed seed-160 by exposing a latent transfer-instruction bug), then **unblocked and re-landed**
+> after the X-governed transfers/push-pull were annotated. See
+> [impl plan](2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md): Commit A annotates
+> `TA`/`TX`/`PHX`/`PLX` → `XW_X8` (also fixed seed-157), Commit B re-applied this `B.begin()` change.
+> Verified: seed-31 + seed-157 + seed-160 all pass; **`fuzz 500` → 492/500, 0 mismatch** (the 8
+> residuals are the pre-existing `$p`-spill crashes, out of scope). The §Why this is blocked analysis
+> below is retained as the root-cause record.
 
 ---
 
