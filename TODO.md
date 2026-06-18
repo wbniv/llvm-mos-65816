@@ -217,9 +217,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (gate 7/7 — companion ELF emitted, `--verify` clean, frame_base RS0, 16-bit local `DW_OP_regx`, line
   table) + tracked upstream-staged lit test `dev/lit/DebugInfo/MOS/dwarf-65816.ll` (verified via manual
   `llc|dwarfdump|FileCheck`). **No `vendor/` edits** (regen-patch wouldn't capture `llvm/test/`; full lit
-  unbuildable here) → no `0002` regen. **Implementation complete + end-to-end verified.** Left: only
-  user-triggered upstream posting (`docs/upstream-contribution-status.md`: lit test + `<output>.elf` doc
-  note) + 2 manual VS Code GUI-pane confirmations (disasm pane, source highlight).
+  unbuildable here) → no `0002` regen. **VS Code GUI (2026-06-19, drdevtools `545723a`):** extension
+  loads + attaches + source breakpoint on `a16local.c:17` **verifies** (abs path → DWARF basename →
+  `$8074`; screenshots in the Phase-3 Tier-3 plan). The GUI exercise found + fixed two drmon adapter bugs
+  (attach-flow stops; `stackTrace` source-line map); the full halt→source-map sequence is verified
+  headlessly (`task test-dap` `phasec` 8/8). **Implementation + verification complete.** Left: only
+  user-triggered upstream posting (lit test + `<output>.elf` doc note).
   [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
 
 ### Test Bench / CI
@@ -240,9 +243,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   quiet box (concurrent MAME load flakes the settle window). **VERIFIED 2026-06-19** —
   arith/control/arrays/structs/funcs PASS, `globals` XFAIL, exit 0; default `corpus` still 7/7.
   [plan](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md).
-- [ ] **Wire `corpus-a16` into CI** (follow-on to the gate above). Add it alongside the `xcheck` job in
-  `smoke.yml` once it has soaked locally — same heavy from-source-toolchain build, so it can share that
-  job's `actions/cache@v5` toolchain cache. [plan](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md).
+- [verify] **Wire `corpus-a16` into CI** — **IMPLEMENTED + YAML-validated locally 2026-06-19**; a green CI
+  dispatch is the remaining confirmation (heavy + user-triggered, mirrors the `xcheck`-into-CI item). Added a
+  SPC700-secret step + a gated `corpus-a16` step to `smoke.yml`'s `xcheck` job (which already builds the
+  from-source toolchain, SDK, and bsnes-jg). Verify with `gh workflow run snes-smoke && gh run watch` (needs
+  the `SNES_SPC700_ROM_B64` secret; expect the `xcheck` job to run the bsnes cross-check **and** `corpus-a16`
+  → `5/6 passed, 1 xfail`). [plan](docs/plans/2026-06-19-321-corpus-a16-ci.md).
 - [verify] **Wire the bsnes-jg `xcheck` into CI** — implemented + YAML-validated; a green CI dispatch
   is the remaining confirmation (heavy, user-triggered: the from-source toolchain build is ~30–90 min).
   Added an `xcheck` job to `smoke.yml` (parallel to `smoke`): builds the from-source patched toolchain
