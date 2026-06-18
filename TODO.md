@@ -231,6 +231,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   reproducible seeds, XFAIL-classified known issues. Run on a quiet box (concurrent load flakes MAME).
   Re-run before/after any A16-threading (Tier 2) or peephole-unification (Tier 3) change.
   [Tier-1 plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md). _(See Done for the landing + bugs.)_
+- [x] **#321 `corpus-a16` differential gate (standing capability).** `dev/corpus-a16.sh` +
+  `dev/run.sh corpus-a16`: builds every `examples/snes/corpus/*.c` (the realistic M0/M1 programs) under
+  `+mos-a16` **and** `+mos-xy16` and asserts host == default == `+mos-a16` == `+mos-xy16` on MAME + bsnes-jg
+  via the shared engine (`tools/a16_fuzz.py check`). Closes the "corpus only ever built **default 8-bit**"
+  gap — the one that hid the `globals.c` `+mos-a16 -Os` regalloc crash (now auto-XFAIL'd
+  `regalloc-out-of-registers`, no special-casing). Additive: no `vendor/`/`0002`/toolchain change. Run on a
+  quiet box (concurrent MAME load flakes the settle window). **VERIFIED 2026-06-19** —
+  arith/control/arrays/structs/funcs PASS, `globals` XFAIL, exit 0; default `corpus` still 7/7.
+  [plan](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md).
 - [verify] **Wire the bsnes-jg `xcheck` into CI** — implemented + YAML-validated; a green CI dispatch
   is the remaining confirmation (heavy, user-triggered: the from-source toolchain build is ~30–90 min).
   Added an `xcheck` job to `smoke.yml` (parallel to `smoke`): builds the from-source patched toolchain
@@ -692,4 +701,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      mirrors lib/, and full llvm-lit is unbuildable here), and the last two are the *delivered* artifacts
      (dev/run.sh dwarf gate 7/7 + the verified staged lit test) — Step 5 is complete (commit cc940f1).
      Nothing open. fp:02d8811ec8003aa5 fp:b4a301783ca3b9e3 fp:110cfbbe5aab25e6 fp:fe7817097ea1d37e -->
+- [ ] **(triage)** Fixing `globals.c` (deferred — upstream scavenger/regalloc, XFAIL'd; reevaluate at M2 wrap-up). — _from [2026-06-19-321-corpus-a16-differential-mode.md](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md)_  <!-- fp:3807f2b481a45e90 -->
+- [ ] **(triage)** Wiring `corpus-a16` into CI (`smoke.yml`/`xcheck`) — sensible follow-on once green locally. — _from [2026-06-19-321-corpus-a16-differential-mode.md](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md)_  <!-- fp:13cb10ca9b2122a5 -->
+- [ ] **(triage)** New corpus programs. — _from [2026-06-19-321-corpus-a16-differential-mode.md](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md)_  <!-- fp:f1527e7e0ec4fec4 -->
 <!-- END auto-captured-deferrals -->

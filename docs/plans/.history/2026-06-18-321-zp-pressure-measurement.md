@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/718ccd9) | #321 globals.c RA fix DECISION (ii): keep XFAIL, reevaluate at M2 wrap-up |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/3eeab5d) | #321 globals.c RA failure: record root cause across investigation + plan + docs |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/9fc5cf2) | #321 ZP-pressure measurement: baseline + globals.c +mos-a16 -Os RA-failure finding |
 
 <!--history-meta v1
+718ccd9	author	Will Norris
+718ccd9	added	6
+718ccd9	deleted	5
+718ccd9	files	1
+718ccd9	body	The isolated asserts root-cause (50a59b5) proved there is NO targeted fix —\nonly the general Phase-3 Ac16-residency rework, which is high-risk to the common\na16 path (un-threads the Phase-1 wins / reopens the 1d crash) and low-reward for a\npathological bug (the ZP measurement shows real code is slack). So per option (ii):\nkeep the XFAIL; do NOT do a risky rework for a pathological edge case now.\n\nRecorded across:\n- TODO.md: bug bullet decision + a Watch item "Reevaluate ... at M2 wrap-up"\n  (a16regpress.c is the ready acceptance case if Phase-3 residency is ever taken on).\n- A16-threading plan (Phase 3): asserts-done, keep-XFAIL, reevaluate flag.\n- ZP-pressure plan (FINDING follow-up): same.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3eeab5d	author	Will Norris
 3eeab5d	added	22
 3eeab5d	deleted	15

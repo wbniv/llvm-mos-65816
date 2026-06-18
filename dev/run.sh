@@ -29,6 +29,10 @@ Targets:
              (needs the SPC700 IPL at dev/roms/s_smp/spc700.rom)
   corpus     run the regression corpus headless in MAME: assert each program in
              examples/snes/corpus/ against examples/snes/corpus/expected.tsv
+  corpus-a16 run the regression corpus under +mos-a16 (differential): each
+             examples/snes/corpus/*.c asserted host == default == +mos-a16 ==
+             +mos-xy16 on MAME + bsnes-jg (globals.c XFAIL: regalloc-out-of-registers).
+             Closes the "corpus only ever built default 8-bit" gap that hid it.
   dwarf      ROADMAP step 6 compiler-side gate: a `-g` build emits verifiable DWARF
              AND ld.lld writes the <output>.elf debug companion — assert (shapes,
              not addrs): companion present, --verify clean, addr_size 0x04,

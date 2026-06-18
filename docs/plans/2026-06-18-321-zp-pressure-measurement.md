@@ -71,7 +71,10 @@ count — it's `-Os` **over-coalescing**: pre-RA MIR shows `-Os` produces **fewe
 ranges (8 distinct vregs) than `-O2` (14), yet only `-Os` crashes — the coalesced long ranges all need the
 *single* `A16` at once and can't be split/spilled apart, so the allocator gives up; `-O2` keeps the values in
 more, shorter vregs it *can* satisfy. **The regression corpus is built default 8-bit, so this was never
-exercised under `+mos-a16`**, and the fuzzer doesn't generate the shape — hence undiscovered. A *hard crash*,
+exercised under `+mos-a16`**, and the fuzzer doesn't generate the shape — hence undiscovered. (**Gap now
+closed:** `dev/run.sh corpus-a16` builds the corpus `+mos-a16`/`+mos-xy16` differentially —
+[corpus-a16 plan](2026-06-19-321-corpus-a16-differential-mode.md); `globals` stays XFAIL'd until the Phase-3
+fix.) A *hard crash*,
 more severe than the fragmentation the multi-value plan modeled; it is the
 [A16-threading Phase 3](2026-06-17-321-a16-threading.md) hard core (single-`Ac16` residency).
 
