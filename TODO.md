@@ -139,6 +139,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   fix (which only un-masked it). **Fix:** replace the bail with `B.begin()` entry-switch placement
   (correct for non-passthrough target; keep `placeLegacy` for the X-passthrough-conflict corner).
   [plan](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
+- [ ] **#321 xy16 — remaining REPSEP X-annotation gaps (watch pending fuzz evidence).** Same family as the
+  hang fix: instructions that touch X/Y but carry no X-width annotation, so the lattice can leave them in
+  the wrong mode. (1) **PHX/PLX/PHY/PLY in X16 mode** push/pull 2 bytes when X=0 — `xy16spillr` passes today
+  because spill is symmetric (push and pull share one X-mode), but an asymmetric push-X16/pull-X8 could
+  miscompile. (2) **TAX/TXA/TAY/TYA/TXY/TYX in mixed modes** — implied transfers carry no annotation; xy16
+  paths use the `TAX16`/`TXA16` pseudos (XLow=1). No evidence in the corpus yet → deferred; watch for new
+  fuzz failures that are NOT `xy16@MAME=0x0000` hangs. Detail in the hang-fix plan's *Deferred* section
+  ([plan](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md)).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
@@ -620,6 +628,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-18: prove-option-b Verification section now has all 5 steps recorded with raw output +
      PASS (the experiment ran: Option B measured +16..+28 B, WON'T-IMPLEMENT confirmed). The flag fired
      because the steps were written as a contract before the run; they are now filled. Nothing open. fp:e9e161484c038906 -->
-- [ ] **(triage)** **PHX/PLX/PHY/PLY in X16 mode.** Push/pull 2 bytes when X=0. The `xy16spillr` test — _from [2026-06-18-321-xy16-hang-fix-xhigh.md](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md)_  <!-- fp:089392f5e8b0053d -->
-- [ ] **(triage)** **Transfer instructions (TAX/TXA/TAY/TYA/TXY/TYX) in mixed modes.** Standard implied — _from [2026-06-18-321-xy16-hang-fix-xhigh.md](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md)_  <!-- fp:9a09f71d5902e937 -->
+<!-- triaged 2026-06-18: both xy16-hang-fix deferrals PROMOTED to the curated M2 Open bullet
+     "#321 xy16 — remaining REPSEP X-annotation gaps (watch pending fuzz evidence)" — PHX/PLX/PHY/PLY
+     in X16 mode + TAX/TXA/… transfers in mixed modes. They are speculative (no corpus/fuzz evidence
+     yet), so tracked as watch items, not active work. Detail stays in the plan's Deferred section.
+     fp:089392f5e8b0053d fp:9a09f71d5902e937 -->
 <!-- END auto-captured-deferrals -->
