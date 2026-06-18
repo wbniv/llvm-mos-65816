@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/f348042) | #321 xy16-legalizer-integration plan: record verification results for seed-56 crash fix |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/5d5e1f5) | #321 1e fix: G_MERGE_VALUES explicit zero-high-byte in tryAbsoluteIndexedAddressing (seed-56 crash) |
 
 <!--history-meta v1
+f348042	author	Will Norris
+f348042	added	30
+f348042	deleted	0
+f348042	files	1
+f348042	body	Corpus 7/7, xy16basic/spill/spillr PASS, patch sanity checks PASS.\nFuzz 16/50 baseline (xy16@MAME=0x0000 pre-existing hang; no new crashes).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5d5e1f5	author	Will Norris
 5d5e1f5	added	309
 5d5e1f5	deleted	0

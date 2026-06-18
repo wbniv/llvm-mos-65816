@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16indiry|xy16basic|xy16spill|xy16spillr|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16indiry|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -160,6 +160,8 @@ Targets:
              Ac16 spill path (MOSInstrInfo) still fires clean under +mos-xy16 (-verify-machineinstrs).
   xy16spillr #321 xy16 Increment 1e indexed-access gate: LDXImag16+LDAbsXIdx16 fires under
              +mos-xy16 (no Imag16→Xc16 COPY crash); corpus_result==0x3457 both emus.
+  xy16ops    #321 xy16 B2 legalizer gate: unmasked volatile 16-bit index triggers
+             G_LOAD_ABS_IDX16 → LDXImag16+LDAbsXIdx16; corpus_result==0x2A42 both emus.
   a16ret     #321 calling-convention: lock the A (low) / X (high) RETURN convention as a tested
              ABI invariant (test+docs only, no codegen change). Disasm gate: the i16 return is
              `ldx <high>; lda <low>; rts` (high byte->X, low byte->A, byte-pinned) and the i8 return

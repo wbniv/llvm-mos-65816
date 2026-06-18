@@ -279,13 +279,28 @@ RESULT: PASS — LDXImag16+LDAbsXIdx16 indexed access under +mos-xy16; corpus_re
 
 PASS
 
-3. **New test** — `examples/65816/xy16ops.c` + `dev/xy16ops.sh` (add at Step 2; disasm gates
-   verified at Step 3 once legalizer constrains vregs):
-   - Initial: `unsigned short count = *volatile_global_count;` → triggers `LDXAbs16`
-   - Body: counted loop incrementing/decrementing `count` → `INX16`/`DEX16`
-   - Final: `*result_ptr = count;` → triggers `STXAbs16`
-   - Gate: disasm shows `ldx abs`, `stx abs`, `inx`/`dex` under `rep #$10 / sep #$10`;
-     no byte-pair patterns
+3. **New test** — `examples/65816/xy16ops.c` + `dev/xy16ops.sh` (B2 legalizer gate):
+   - `arr[in_idx]` with unmasked `volatile unsigned short in_idx = 42` (no 8-bit proof
+     at compile time → B2 gate fires → `G_LOAD_ABS_IDX16`)
+   - MIR: 1 `G_LOAD_ABS_IDX16`; instruction-select: 1 `LDXImag16` + 1 `LDAbsXIdx16`
+   - corpus_result == 0x2A42 on host, default, and +mos-xy16 (both emulators)
+   - `inx`/`dex` / `ldx abs` / `stx abs` gates deferred to B1 implementation (loop-counter
+     Xc16 class constraint not yet implemented)
+
+```
+==> 1) +mos-xy16 -verify-machineinstrs must compile CLEAN (unmasked 16-bit index under +mos-xy16)
+  PASS: clean (exit 0)
+==> 2) the indexed access must use G_LOAD_ABS_IDX16 → LDXImag16+LDAbsXIdx16 (B2 gate)
+  PASS: 1 G_LOAD_ABS_IDX16 (legalizer) + 1 LDXImag16 + 1 LDAbsXIdx16 (selector) — B2 gate fires
+==> 4) MAME: host == default == +mos-xy16 (corpus_result == 0x2A42)
+  default: SMOKE: PASS addr=0x7E0202 len=2 got=0x2A42 (ran 60 ticks)
+  +mos-xy16: SMOKE: PASS addr=0x7E0202 len=2 got=0x2A42 (ran 60 ticks)
+==> 5) bsnes-jg: +mos-xy16 corpus_result == 0x2A42 (independent confirmation)
+  SMOKE: PASS off=0x202 len=2 got=0x2A42 (ran 180 frames, bsnes-jg)
+RESULT: PASS — G_LOAD_ABS_IDX16+LDXImag16+LDAbsXIdx16 B2 path under +mos-xy16; corpus_result==0x2A42; both emulators agree
+```
+
+PASS
 
 4. **New test** — `examples/65816/xy16idx.c` + `dev/xy16idx.sh` (add at Step 4):
    - `for (unsigned short i = 0; i < N; i++) arr[i] = v;`
