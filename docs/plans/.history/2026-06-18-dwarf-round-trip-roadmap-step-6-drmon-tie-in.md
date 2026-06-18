@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/6ff4689) | #321 DWARF step 6: record Step 2 (drmon DAP live-MAME V3-V6 PASS) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/fdd1fd4) | #321 DWARF round-trip (step 6): drmon-first plan + Step-1 audit (CLEAN) |
 
 <!--history-meta v1
+6ff4689	author	Will Norris
+6ff4689	added	28
+6ff4689	deleted	7
+6ff4689	files	1
+6ff4689	body	Step 2 (Phase 0) done: drmon's Phase-3 DAP live-MAME items V3-V6 are now\nautomated and passing (drdevtools 1a5c05f, `task test-dap`) — connected session,\nbreakpoint fires, registers + memory, each cross-checked vs a direct bridge read,\n3/3 runs 11/11. Only the two VS Code GUI-pane confirmations remain (manual).\n\nRecords the three headless-MAME harness lessons (-skip_gameinfo, run throttled,\nDAP requests need an "arguments" field) and the Tier-1 bridge's "pseudo-hold a\nNOP or two past the breakpoint" behavior — the latter shapes Phase C's assertion.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fdd1fd4	author	Will Norris
 fdd1fd4	added	380
 fdd1fd4	deleted	0
