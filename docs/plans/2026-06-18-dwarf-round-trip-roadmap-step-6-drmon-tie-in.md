@@ -31,8 +31,8 @@ still authored now; only the fixture/end-to-end test wait on the compiler fix.
 | # | Step | Repo / nature | Blocks on |
 |---|------|---------------|-----------|
 | 1 | **Read-only DWARF audit** — run built `mos-clang -g` + `llvm-dwarfdump` | llvm-mos-65816, **read-only** | nothing | ✅ **DONE — CLEAN** |
-| 2 | **Phase 0** — DAP live-MAME verification (close the `[wip]`) | drdevtools | nothing | ⏳ next |
-| 3 | **Phase B** — drmon DWARF loader + committed ELF fixture + unit tests | drdevtools | Step 1 (fixture trust) | |
+| 2 | **Phase 0** — DAP live-MAME verification (close the `[wip]`) | drdevtools | nothing | ✅ **DONE — V3–V6 PASS** |
+| 3 | **Phase B** — drmon DWARF loader + committed ELF fixture + unit tests | drdevtools | Step 1 (fixture trust) | ⏳ next |
 | 4 | **Phase C** — drmon end-to-end: breakpoint on real `-g` ROM in MAME | drdevtools | Steps 1, 3 | |
 | — | **⏸ PAUSE FOR REVIEW** — stop here; hand back for review before any `vendor/` edits | — | Steps 1–4 done | |
 | 5 | **Phase A** — vendor `.ll` regression tests + **debug-ELF emission path** (no emission *fix* needed); patch regen | llvm-mos-65816, **source edits** | review sign-off | |
@@ -155,10 +155,30 @@ Faithful-to-ROM debug ELF = emit it from the *same LTO link*, which is the prope
 
 ---
 
-## Step 2 — Phase 0: DAP live-MAME verification (drdevtools)
+## Step 2 — Phase 0: DAP live-MAME verification (drdevtools) — ✅ DONE (2026-06-18)
 
-The DAP adapter (Tiers 1–3) is written and offline-tested; the live-MAME items have never been run or
-recorded. Close them before layering the DWARF loader on top.
+**Result: V3–V6 automated + PASS, 3/3 runs 11/11.** New harness `task test-dap` (`linux/test_dap.sh`
++ `linux/dap/test_dap.py`); committed in drdevtools `1a5c05f`. Headless MAME + SNES Lua bridge on the
+host; `drmon-dap-snes` driven over DAP stdio in the build container (`--network=host`); every read
+cross-checked against a direct bridge connection. Only the two VS Code *GUI pane* confirmations remain
+(manual: Tier 2 disassembly pane, Tier 3 source highlight) — GUI views of protocol features now verified.
+
+**Three hard-won harness lessons (apply to any headless MAME+bridge automation, incl. Phase C):**
+1. **`-skip_gameinfo` is required headless** — without it MAME stalls on the disclaimer screen, emulated
+   time never advances, and the autoboot Lua bridge never binds its socket (port stays closed).
+2. **Run throttled (no `-nothrottle`)** — `-nothrottle` pegs a core and starves the bridge's per-frame
+   socket accept/handshake, so the adapter's attach-time `connect()` hangs. Throttled 60fps = reliable.
+3. **DAP requests must always carry `arguments`** — cppdap silently drops `attach`/`configurationDone`
+   (no response) if the field is absent; the test client now always sends `"arguments": {}`.
+
+Also: the Tier-1 Lua bridge (`-debugger none`) **pseudo-holds a NOP or two past** the breakpoint (stop
+is marker-detected on the next periodic tick); the Tier-2 C++ gdbstub freezes exactly. drmon faithfully
+reports MAME's PC (cross-check confirms), so this is a bridge property, not a DAP bug. Phase C's
+breakpoint assertion must allow "at or just past" the line address accordingly.
+
+<details><summary>Original open items (now closed except GUI panes)</summary>
+
+The DAP adapter (Tiers 1–3) was written and offline-tested; the live-MAME items had never been run.
 
 **Open items** (from `drdevtools/docs/plans/2026-06-12-phase-3-*.md`):
 
@@ -181,8 +201,9 @@ recorded. Close them before layering the DWARF loader on top.
 **ROM:** `linux/test-roms/drmon-test.sfc` (purpose-built NOP-sled + known addresses) for V3–V6.
 
 **Record:** paste raw output into each plan's Verification section (PASS/FAIL); if a step fails, fix it
-in the DAP code (regression guard: add the failing case to `test_dap.py`) and re-run. Promote the
-`[wip]` Phase 3 TODO item to `[x]` when all pass.
+in the DAP code (regression guard: add the failing case to `test_dap.py`) and re-run.
+
+</details>
 
 ---
 
