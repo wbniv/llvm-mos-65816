@@ -2902,7 +2902,7 @@ index fbedd8d46..d329144e2 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..a57cf412e 100644
+index 212ede1a0..3bb50f90f 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,6 +25,7 @@
@@ -3601,20 +3601,56 @@ index 212ede1a0..a57cf412e 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
-@@ -1879,6 +2403,12 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
-         Index = Builder.buildZExtOrTrunc(S8, NewOffset).getReg(0);
-         continue;
-       }
+@@ -1876,7 +2400,47 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+               .countMaxActiveBits() <= 8) {
+         if (Index)
+           return false;
+-        Index = Builder.buildZExtOrTrunc(S8, NewOffset).getReg(0);
++
++        // NewOffset:s16 is known to have only 8 active bits (high byte = 0).
++        // A plain G_TRUNC would leave the s16 Imag16 pair with a dead high
++        // lane: the RA's live-range splitter can emit an "undef %d.sublo =
++        // COPY %s.sublo" partial-define, and the subsequent spill of the full
++        // Imag16 pair reads the undefined high byte → crash (seed-56).
++        //
++        // Fix: insert G_TRUNC + G_CONSTANT(0) + G_MERGE_VALUES *before* the
++        // G_PTR_ADD so the replacement s16 value has an explicit zero high
++        // byte.  Replace all uses of NewOffset (except the G_TRUNC) with the
++        // new explicit s16, then use the s8 Lo as the index.  GPR (s8)
++        // spills never have the Imag16 partial-define issue.
++        LLT S16 = LLT::scalar(16);
++        auto &SavedMBB = Builder.getMBB();
++        auto SavedInsertPt = Builder.getInsertPt();
++
++        Builder.setInsertPt(
++            *const_cast<GPtrAdd *>(PtrAddAddr)->getParent(),
++            const_cast<GPtrAdd *>(PtrAddAddr)->getIterator());
++
++        Register Lo = Builder.buildTrunc(S8, NewOffset).getReg(0);
++        Register ZeroHi = Builder.buildConstant(S8, 0).getReg(0);
++        Register Explicit16 =
++            Builder.buildMergeLikeInstr(S16, {Lo, ZeroHi}).getReg(0);
++
++        // Replace every use of NewOffset with Explicit16, except the G_TRUNC
++        // we just created (which still needs to read the original s16 value).
++        MachineInstr *TruncMI = MRI.getVRegDef(Lo);
++        for (MachineOperand &MO :
++             llvm::make_early_inc_range(MRI.use_operands(NewOffset)))
++          if (MO.getParent() != TruncMI)
++            MO.setReg(Explicit16);
++
++        Builder.setInsertPt(SavedMBB, SavedInsertPt);
++        Index = Lo;
++        continue;
++      }
 +      // B2: under +mos-xy16, a direct s16 offset uses the widened form.
 +      if (STI.hasIndex16() && !Index && MRI.getType(NewOffset) == LLT::scalar(16)) {
 +        Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_ABS_IDX16 : MOS::G_STORE_ABS_IDX16;
 +        Index = NewOffset;
-+        continue;
-+      }
+         continue;
+       }
      }
-     return false;
-   }
-@@ -1959,6 +2489,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -1959,6 +2523,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
                     .countMaxActiveBits() <= 8) {
        Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
        Addr = Base;
