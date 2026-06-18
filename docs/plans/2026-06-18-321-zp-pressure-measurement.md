@@ -77,11 +77,12 @@ more severe than the fragmentation the multi-value plan modeled; it is the
 
 **Follow-up status (2026-06-18):** (1) TODO defect filed ✓; (2) deterministic repro
 `examples/65816/a16regpress.c` ✓ (`cca1694`); (3) fuzzer `KNOWN_ISSUES` XFAIL `regalloc-out-of-registers` ✓
-(generator-shape extension still optional); (4) **root-caused ✓** (investigation above) — the **fix is
-deferred to [A16-threading Phase 3](2026-06-17-321-a16-threading.md)** (same `shouldCoalesce`/`Ac16`-residency
-territory; risks un-threading the Phase-1 wins / reopening the 1d crash; needs an asserts build to target
-safely). The bug is *pathological* (this measurement shows real code is slack), so the XFAIL + repro are the
-cost-justified holding state.
+(generator-shape extension still optional); (4) **root-caused ✓ via an isolated asserts build (`50a59b5`)** —
+pinpointed it (hard-register A/X/Y exhaustion + unspillable INF `Ac16` transits; **coalescing ruled out**) and
+proved there is **no targeted fix**, only the general Phase-3 `Ac16`-residency rework (high-risk to the common
+a16 path / low-reward). **DECISION 2026-06-18: keep the XFAIL** for this *pathological* bug (real code is
+slack); **reevaluate at M2 wrap-up** (TODO Watch) — [A16-threading Phase 3](2026-06-17-321-a16-threading.md)
+is the fix home, `a16regpress.c` the acceptance case.
 
 ## Verification
 

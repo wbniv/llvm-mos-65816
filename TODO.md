@@ -96,11 +96,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   F3). ~~root-cause~~ **DONE 2026-06-18**: it's `-Os` **over-coalescing** s16 into long-lived `Ac16` ranges
   that can't fit the single `A16` (`-O0`/`-O2` clean; `-Os` has *fewer* but longer `Ac16` vregs than the
   passing `-O2`) — i.e. the **A16-threading Phase 3** hard core; full record:
-  [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md). **Remaining: the FIX —
-  DEFERRED, folded into A16-threading Phase 3** (same `shouldCoalesce`/`Ac16`-residency territory; risks
-  un-threading the Phase-1 wins / reopening the 1d crash; needs an asserts build to target safely — a blind
-  change is 3× worse than the XFAIL). **Pathological** (ZP measurement: real code is slack), so the XFAIL +
-  repro are the cost-justified holding state. When fixed: drop the `KNOWN_ISSUES` entry + make `a16regpress.c`
+  [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md). ~~the FIX~~ **asserts build
+  DONE `50a59b5`** — pinpointed it (hard-register A/X/Y exhaustion + unspillable INF `Ac16` *transits* in the
+  indexed loop; **coalescing RULED OUT**, so it's *pure* `Ac16`-residency, no `shouldCoalesce` lever) and
+  **proved there is NO targeted fix** — only the general pre-RA `Ac16`-residency rework (A16-threading
+  Phase 3), high-risk (un-threads the Phase-1 wins / reopens the 1d crash) and low-reward (Phase 1 already
+  captured the threading *wins*; only this pathological crash motivates it). **DECISION 2026-06-18 — keep the
+  XFAIL** (a risky rework is 3× worse for a pathological bug; ZP measurement: real code is slack);
+  **reevaluate at M2 wrap-up (see Watch).** When fixed: drop the `KNOWN_ISSUES` entry + make `a16regpress.c`
   a positive gate (a Phase-3 acceptance case). Optional: extend `a16_fuzz.py`'s generator to emit the
   two-loop / two-multiply / cross-loop-live shape.
   [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
@@ -253,8 +256,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 
 ## Watch
 
-_Nothing being watched yet — items move here when they need periodic checking (e.g. an upstream
-llvm-mos change to track) rather than active work._
+_Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
+revisit) rather than active work._
+
+- [ ] **Reevaluate the `globals.c` `+mos-a16 -O1/-Os` RA-fix decision — at M2 wrap-up.** Current state
+  (2026-06-18): **keep the XFAIL.** The isolated asserts root-cause (`50a59b5`) proved there is **no targeted
+  fix** — only the general Phase-3 `Ac16`-residency rework, which is high-risk (regresses the common a16 path)
+  and low-reward (Phase 1 already captured the threading wins) for a **pathological** bug (real code is slack).
+  Revisit when M2 is closed out, or sooner if the Phase-3 `Ac16`-residency work becomes independently
+  motivated; `examples/65816/a16regpress.c` is the ready acceptance case. Full root cause:
+  [a16-regalloc-pressure-failure](docs/investigations/65816-a16-regalloc-pressure-failure.md).
 
 
 ## Parked
