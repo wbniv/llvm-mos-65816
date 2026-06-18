@@ -81,6 +81,13 @@ one-line cause was found.
   doesn't fire yet) — capture it, make the change, rebuild, diff.
 - Decide on **bytes** (the `-Os` target), cycles as tiebreaker; report both. Hand-count 65816 cycles if
   needed (DP=0 assumption; the *delta* is usually insensitive to the DP penalty).
+- **Addressing/DBR contract (don't over-generalize the `inc abs` note).** Near data is bank-0 low WRAM
+  ($0200–$1FFF). The **8-bit `abs` path is DBR-relative** (`R_MOS_ADDR16`, reads `DBR:addr`); the **native-16
+  `long` path is DBR-independent** (`R_MOS_ADDR24`). So data access is a *mix*, not uniformly
+  DBR-independent. The crt0 establishes **DBR=0 explicitly** (`phk; plb` in `.init.50`) so the 8-bit `abs`
+  globals + MMIO writes land in bank 0; gate `dev/run.sh crt0native`. See
+  [native-mode-crt0-xy16 plan](plans/2026-06-18-321-native-mode-crt0-xy16.md). Full power-on→`main()`
+  walkthrough: [snes-bootup-sequence](snes-bootup-sequence.md).
 - **Measure in realistic 16-bit-ambient context, not just isolated leaf functions.** A leaf function pins
   the ambient accumulator mode at 8-bit and over-charges `rep`/`sep` to the op under study; real `+mos-a16`
   code holds `M=0` across sustained compute. (This regime difference has flipped measured conclusions

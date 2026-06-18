@@ -11,15 +11,32 @@
 #define __SNES__
 #include "snes.h"
 
-// .init.50 — earliest fragment. Mask interrupts, force binary mode, enter native
-// mode with a page-1 hardware stack and 8-bit width, and force-blank the PPU so
-// the screen holds a known state during the rest of initialization.
+// .init.50 — earliest fragment, runs at the reset entry. Establishes the 65816
+// native-mode contract the codegen depends on, then force-blanks the PPU so the
+// screen holds a known state during the rest of initialization. The contract:
+//
+//   E   = 0        native mode (XCE)
+//   SP  = $01FF    page-1 hardware stack (16-bit txs via a transient REP #$10; an
+//                  8-bit txs would set SP=$00FF and collide with the direct page)
+//   M   = 1        8-bit accumulator   } SEP #$30 — the codegen default; 16-bit
+//   X   = 1        8-bit index regs    } regions are bracketed by rep/sep #$20/#$10
+//   DBR = 0        data bank 0: the 8-bit `abs` / R_MOS_ADDR16 global path AND the
+//                  MMIO writes below read DBR:addr, and all near data lives in
+//                  bank-0 low WRAM ($0200-$1FFF). Reset leaves DBR=0, but we set it
+//                  EXPLICITLY (phk/plb) so the invariant is a stated contract, not
+//                  a reliance on the reset default that a later DBR change (bank
+//                  switch, MVN/MVP, interrupt) could silently break. The native
+//                  16-bit-accumulator path uses DBR-independent `long`/R_MOS_ADDR24
+//                  and is unaffected either way. See
+//                  docs/plans/2026-06-18-321-native-mode-crt0-xy16.md.
+//   DP  = 0        direct page at $0000 (reset default; never moved on this platform)
 //
 // The SDK assembles this TU for the 6502 (user C defaults to the 6502 code
-// generator), so the four 65816-only opcodes of the native-mode preamble are
-// emitted as `.byte` — the bytes execute on the SNES 65816 (a 5A22) exactly as
-// the mnemonics, and `llvm-objdump --mcpu=mosw65816` decodes them back. clc/txs
-// are plain 6502, so they stay as mnemonics.
+// generator), so the six 65816-only opcodes of the preamble are emitted as
+// `.byte`: XCE (fb), REP #$10 (c2 10), the 16-bit LDX #$01ff (a2 ff 01), SEP #$30
+// (e2 30), PHK (4b), PLB (ab). The bytes execute on the SNES 65816 (a 5A22)
+// exactly as the mnemonics, and `llvm-objdump --mcpu=mosw65816` decodes them back.
+// sei/cld/clc/txs/lda/sta are plain 6502, so they stay as mnemonics.
 asm(".section .init.50,\"axR\",@progbits\n"
     "  sei\n"                    // mask IRQ
     "  cld\n"                    // binary mode (decimal flag is undefined at reset)
@@ -29,6 +46,8 @@ asm(".section .init.50,\"axR\",@progbits\n"
     "  .byte 0xa2, 0xff, 0x01\n" // LDX #$01ff (16-bit immediate; 8-bit txs => SP=$00FF)
     "  txs\n"                    // hardware stack pointer -> $01FF (page 1)
     "  .byte 0xe2, 0x30\n"       // SEP #$30 -> M=1,X=1: 8-bit A+index (codegen default)
+    "  .byte 0x4b\n"             // PHK -> push program bank (=0; reset code is bank $00)
+    "  .byte 0xab\n"             // PLB -> DBR := 0 (explicit; abs globals + MMIO read DBR:addr)
     "  lda #$00\n"
     "  sta $4200\n"              // NMITIMEN: no NMI/IRQ/auto-joypad
     "  lda #$8f\n"

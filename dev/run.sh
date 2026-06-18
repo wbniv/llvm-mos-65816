@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16indiry|xy16basic|xy16spill|xy16spillr|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|toolchain|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16indiry|xy16basic|xy16spill|xy16spillr|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -19,6 +19,12 @@ Targets:
              compile examples/snes/hello.c -> build/hello.sfc   (default)
   compile    compile the SNES example in the container (image must exist)
   validate   structural validation of build/hello.sfc (reset path, checksum)
+  crt0native #321 native-mode crt0 contract gate: assert the reset preamble is
+             byte-exact INCLUDING the explicit DBR=0 establishment (phk/plb = 4b ab
+             after sep #$30), the native+emulation interrupt vectors are placed, and
+             a DEFAULT (8-bit) build's DBR-relative `abs` global access round-trips
+             corpus_result==0x2345 on MAME (+ bsnes-jg) — i.e. DBR=0 holds at runtime
+             (needs `toolchain` + `build` first)
   smoke      boot build/hello.sfc headless in MAME, assert sentinel==0x42
              (needs the SPC700 IPL at dev/roms/s_smp/spc700.rom)
   corpus     run the regression corpus headless in MAME: assert each program in

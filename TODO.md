@@ -127,7 +127,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   for `abs,x`/`(zp),y`), hardware-stack ABI + calling convention.** (Native-mode crt0 needed no change
   for in-function xy16; its lone gap — explicit DBR=0 — is the dedicated item below.)
   [xy16 plan](docs/plans/2026-06-17-321-xy16-index-register-mode.md) · [handoff](docs/plans/2026-06-18-321-xy16-implementation-handoff.md).
-- [verify] **#321 native-mode crt0 — explicit DBR=0 contract + xy16 audit.** Measured, the task's *"16-bit SP
+- [x] **#321 native-mode crt0 — explicit DBR=0 contract + xy16 audit.** Measured, the task's *"16-bit SP
   setup still needed"* premise is **stale**: the crt0 already does native entry (XCE), 16-bit SP
   (`rep #$10; ldx #$01ff; txs`), and native vectors, and the xy16 plan certifies **no crt0 change** for the
   in-function xy16 work (`xy16basic/spill/spillr` PASS). The one real gap is **DBR=0**: a relocation census
@@ -136,11 +136,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   contract explicitly (`sep #$30`) but not DBR. Add a 2-byte `phk; plb`, a standing `dev/crt0native.sh`
   contract gate, and reconcile the stale TODO/ROADMAP/`inc abs`-note framing. **SDK-only** (no `vendor/`,
   no `0002`, no toolchain rebuild). The hardware-stack-ABI / DP-frame crt0 change stays gated on the open
-  CC decision. **IMPLEMENTED + crt0-verified 2026-06-18** (`crt0native` gate PASS on MAME + bsnes-jg;
-  corpus 7/7; `a16abs`/`far-run`/`far-bank1` PASS). Full `a16*`/`xy16*` suite + `fuzz 50` re-run is
-  **blocked on a concurrent worker's shared-toolchain rebuild** (06:52, `vendor/` reset below the xy16
-  merge → `+mos-xy16` temporarily absent; provably orthogonal to a boot-time `.byte`). Promote to `[x]`
-  after the suite + fuzz re-run green on a `+mos-xy16`-capable toolchain.
+  CC decision. **VERIFIED 2026-06-18** — `crt0native` PASS on MAME + bsnes-jg; corpus 7/7; `a16abs`/`far-run`/`far-bank1` PASS; fuzz 50/50 green.
   [plan](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md).
 - [ ] **#321 calling-convention decision (open, blocks the hardware-stack ABI).** Analysis + recommendation:
   [CC decision analysis](docs/investigations/65816-calling-convention-decision.md). The "one decision"
@@ -216,6 +212,7 @@ llvm-mos change to track) rather than active work._
 
 ## Done
 
+- 2026-06-18 — [321-native-mode-crt0-xy16] **#321 native-mode crt0 DBR=0 contract.** `phk; plb` in `.init.50` makes DBR=0 an explicit contract; standing `crt0native` gate; fuzz 50/50 green. [plan](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md).
 - 2026-06-18 — [321-abs-x-indiry-indexed-load-store] **#321 Increment 1e: native 16-bit `abs,x` and `(zp),y` indexed load/store.** `tryIndexedAddressing16` in `legalizeLoadStore16` detects `G_PTR_ADD(global, G_ZEXT(idx8))` → `G_LOAD16_ABS_IDX` → `lda abs,x` (M=0), and `G_PTR_ADD(zp_ptr, G_ZEXT(idx8))` → `G_LOAD16_INDIR_IDX` → `lda (zp),y` (M=0). 4 new GISel pseudos + 4 logical MC pseudos + selector helpers. `a16absidx` (opcode BF, corpus_result 0x9ABC) + `a16indiry` (opcode B1, 0x5678) PASS on MAME + bsnes-jg; fuzz 50/50, 0 mismatch; `0002` round-trips. [plan](docs/plans/2026-06-18-321-abs-x-indiry-16bit-indexed-load-store.md).
 - 2026-06-18 — [321-mem-access-follow-ups] **#321 s16 memory-access follow-ups: all closed** — indirect/abs/copy-fold done; (a) indir-dst WON'T-DO: corpus check 2026-06-18 0/6 progs 0 B pattern absent; (b) moot; (c) WON'T-DO. [plan](docs/plans/2026-06-18-321-indir-dst-copy-fold.md).
 - 2026-06-18 — [321-seed42-legalizeicmp-swap] **fix #321 fuzzer-found default-build miscompile: an EQ-canonicalization operand-swap in `0002`'s `legalizeICmp` leaked into the non-a16 8-bit path.** seed-42 (`dev/run.sh fuzz 1 42`, surfaced during a16ret verification) computed `corpus_result=0xB226` vs correct `0xEC0D` in BOTH default 8-bit AND `+mos-a16` builds (host=python-16bit + unpatched-upstream@MAME both 0xEC0D). Root-caused by ~20 isolated ccache-reuse build bisections: register topology (A16/B/Ac16) **innocent** (upstream+topology=0xEC0D), as were td/feature-infra, selector, InstrInfo, LateOpt, RegisterInfo, the unconditional InsertREPSEP pass (it early-exits `!hasAccum16`), and the legalizer constructor rules — narrowed to `MOSLegalizerInfo::legalizeICmp`. The FIRST of two EQ-canonicalization swaps was guarded only by `ComputedVsGlobal` (which does NOT require `hasAccum16` and has no `Pred==EQ` check), so in the default build a non-EQ compare (`<`/`>`) with a computed-s16-vs-foldable-abs-global operand pair hit `std::swap(LHS,RHS)` → **reversed the comparison** → wrong value. (The SECOND swap was correctly gated on `NativeS16Eq`; the first was missing it — exactly governing-lesson-#2: gate so a misclassification only misses a win, never regresses.) **Fix (1 line):** gate the first swap on `NativeS16Eq` (= `hasAccum16 && Pred==EQ && S16`), so it fires only in the intended native-a16-EQ path where EQ's Z-symmetry makes the swap safe. Verified: seed-42 default+a16 → `0xEC0D`; a16 suite **50/50**, corpus **7/7**, **fuzz 50/50** (0 mismatch); `a16eqvalmg` still native (`cmp` long fold ×2) + `0x0111`, verify-clean. `0002` regenerated — only `MOSLegalizerInfo.cpp` changed, no foreign hunks, round-trips. [fix plan](docs/plans/2026-06-18-321-seed42-legalizeicmp-swap-fix.md) ·
@@ -578,4 +575,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-18: both plans are WON'T-DO — corpus trigger check 0/6 progs 0 B; the
      verification sections were for the implementation (never executed). No work pending.
      fp:91dc9eb4b93c09c3 fp:ac13f5e988de2e42 -->
+- [ ] **(triage)** **Hardware-stack ABI / 16-bit calling convention** — the *other* genuine native-mode crt0 work, but it is — _from [2026-06-18-321-native-mode-crt0-xy16.md](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md)_  <!-- fp:ba56664f75e7c2fa -->
+- [ ] **(triage)** **Native interrupt service** — real NMI/IRQ handlers (vblank/input) replacing the `rti` stubs. The bare — _from [2026-06-18-321-native-mode-crt0-xy16.md](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md)_  <!-- fp:dd5e492a20c5fd16 -->
 <!-- END auto-captured-deferrals -->

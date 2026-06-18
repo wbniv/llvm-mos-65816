@@ -223,7 +223,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    the snes crt0 enters 65816 native mode (`clc; xce` + 16-bit `ldx #$01ff; txs` + `sep #$30`) for
    *every* program, so a16 dropped its 1a test-local `clc; xce` and still reads `0x0042` on both
    emulators; corpus/far/xcheck stay green in native 8-bit
-   ([native-crt0 plan](plans/2026-06-14-321-native-mode-crt0.md)); (b) the size win needs amortization
+   ([native-crt0 plan](plans/2026-06-14-321-native-mode-crt0.md); DBR=0 later made an explicit `phk; plb`
+   contract — 2026-06-18 — because the 8-bit `abs`/R_MOS_ADDR16 global path is DBR-relative, see
+   [native-mode-crt0-xy16](plans/2026-06-18-321-native-mode-crt0-xy16.md)); (b) the size win needs amortization
    (one STZ under REP/SEP is +1 byte) — churn-minimization + the dual-width accumulator register
    (16-bit `lda`/`sta`, not just STZ) are the next increments._
    [Inc 1 plan](plans/2026-06-14-321-increment-1-16bit-accumulator.md).
