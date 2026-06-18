@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/3eeab5d) | #321 globals.c RA failure: record root cause across investigation + plan + docs |
+
+<!--history-meta v1
+3eeab5d	author	Will Norris
+3eeab5d	added	99
+3eeab5d	deleted	0
+3eeab5d	files	1
+3eeab5d	body	Root-caused the +mos-a16 -O1/-Os "ran out of registers" crash (no fix yet — it's\nthe A16-threading Phase 3 hard core, deferred). Captured in three places:\n\n- investigation (NEW) docs/investigations/65816-a16-regalloc-pressure-failure.md:\n  the full record. It's -Os OVER-COALESCING, not raw value count — pre-RA MIR shows\n  -Os makes FEWER but longer-lived Ac16 vregs (8) than the passing -O2 (14); the\n  coalesced long ranges all need the single A16 and can't be split/spilled, so RA\n  gives up. -O0/-O2 clean. Documents the fix locus (shouldCoalesce / Ac16 residency),\n  the two regression risks (un-threading the Phase-1 wins; reopening the 1d crash),\n  and why a correct fix needs an asserts build (release hides the culprit vreg).\n\n- plan: A16-threading Phase 3 — record a16regpress.c as a concrete *correctness*\n  trigger (a function that crashes today, not just suboptimal) + tighten the\n  acceptance gate (a16regpress.c must compile; no A16-threading size regression).\n\n- docs: zp-pressure plan FINDING — refined with the -O2-works / over-coalescing\n  evidence + follow-up status (root-cause done; fix folded into Phase 3).\n\n- TODO bullet updated to match (root-caused; fix deferred to Phase 3; pathological).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

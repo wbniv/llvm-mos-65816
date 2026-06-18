@@ -79,6 +79,33 @@ separate dir reusing `$ROOT/build/.ccache` per the [handoff](../agent-handoff.md
 Acceptance must include: `a16regpress.c` compiles clean, `a16localx.c` (the coalescer-crash guard) stays
 verify-clean, **no A16-threading size regression** (re-run `dev/measure-a16-threading.sh`), and `fuzz 200+`.
 
+## Pinpointed via an asserts build (2026-06-18) — and it is NOT a coalescing fix
+
+An isolated `Release + LLVM_ENABLE_ASSERTIONS=On` build (22 min, reusing the shared ccache; the shared
+toolchain untouched) + `-debug-only=regalloc` pinned the exact failure:
+
+- **The unspillable vregs are the `Ac16` *transits*.** E.g. `%122:ac16 = LDAbsIdx16 @B,%123` immediately
+  consumed by `%27:imag16 = STAImag16 %122`. A 1-instruction load→store range has **`weight:INF`** — you
+  can't spill it (nothing lives between def and use), so it *must* hold `$a16` for that instant. Same for the
+  `LDAImag16→ADCImag16→STAImag16` accumulation transits (%101/%106/%119 — two-segment INF ranges).
+- **The deadlock is hard-register (A/X/Y) exhaustion in the indexed-accumulation loop.** `LDAbsIdx16` needs
+  `A16` (=`A:B`) for the 16-bit result *and* `X` for the index; the other 16-bit accumulator cycles through
+  `A16` too; the 8-bit loop machinery then has nowhere but `$a` (A16's low-byte alias). The allocator evicts
+  and even live-range-splits the 8-bit squatter (`%157`), but every split piece returns to **`$a`** (X/Y are
+  taken), so `A16` is never freed for the unspillable `Ac16` transit → *"ran out of registers."*
+- **Coalescing is RULED OUT** — `-debug-only=...coalescing` shows zero 8-bit↔`A16`/`Ac16` joins. So the
+  plan's named Phase-3 candidate (reject 8-bit→`Ac16` coalescing — which fixes the *1d `LDImm`* crash) does
+  **not** apply to this crash.
+
+**Implication: there is no clean targeted one-liner.** Fusing `LD…16→STAImag16` (a selection-time change)
+removes the *load* transits but not the `ADCImag16`-chain transits, so it likely won't resolve the loop;
+lowering the transits' spill weight fights generic `CalcSpillWeights` (single-instruction ranges are INF by
+design). The real fix is the **general Phase-3 work — reduce the number of simultaneous `Ac16` transits the
+allocator must place** (pre-RA `Ac16` residency/threading: keep the running value in `A16` across ops so
+fewer load/store transits compete), with the soft-stack spill path as fallback. A substantial,
+regression-sensitive change (must not un-thread the Phase-1 wins or perturb the common a16 path) — hence a
+deliberate Phase-3 project, not a patch.
+
 ## Cost/benefit & recommendation
 
 The bug is **pathological**: the ZP-pressure baseline showed real code is *slack* (busiest real function
