@@ -125,6 +125,13 @@ add a `rep`/`sep` or miscompile.
 
 ## Phase 0 — does any real code trigger this? (measure before building)
 
+**RESULT — RAN 2026-06-18 (`dev/measure-zp-pressure.sh`): DEFER confirmed.** Across 6 kernels + 5/6 corpus
+(13 real functions) the imaginary-register high-water mark maxes at ~5 of 14 pairs; **zero** real functions
+exhaust the pool or fragment. The ~20-live *synthetic* shape does fragment (13 `rep/sep` brackets) — the
+pathological-only case below — so Phase 1 has **no real-world trigger → not built.** (The scan also surfaced
+a separate, more severe `+mos-a16 -Os` RA *crash* on `globals.c` — a different failure mode, tracked
+independently.) Full baseline: [ZP-pressure plan](2026-06-18-321-zp-pressure-measurement.md).
+
 The entire justification for Phase 1 is whether real-world `+mos-a16` code ever exhausts the 14-pair pool.
 **Build nothing yet.** Scan for the trigger:
 

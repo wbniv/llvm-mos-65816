@@ -139,8 +139,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   one `rep`/`sep` bracket with the 2nd value folded as a memory operand (`and/adc __rcN`), −58..−65 % vs
   default, and correct (verify-clean, no crash) even at pool exhaustion. The lone genuine residual — M=16
   fragmenting into many `rep`/`sep` brackets when a spill is emitted byte-wise-in-8-bit under **>14 live
-  s16** (pool exhaustion) — is **pathological-only** (no kernel/corpus/fuzz program hits it). The plan gates
-  any implementation on a Phase 0 trigger scan → likely DEFER-with-evidence.
+  s16** (pool exhaustion) — is **pathological-only**. **Phase 0 scan RAN 2026-06-18
+  (`dev/measure-zp-pressure.sh`): 0 of 13 real functions exhaust the pool (max ~5 of 14 pairs) → DEFER
+  confirmed with data** (the scan also surfaced a separate `+mos-a16 -Os` RA *crash* on `globals.c` — see
+  its own bullet above).
   [multi-value pressure plan](docs/plans/2026-06-18-321-16bit-alu-multivalue-register-pressure.md) ·
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
@@ -205,8 +207,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   for the first pass); ~~recursion~~ (the already-hardened soft static stack); and the ~~hard **frame** fork~~
   (**RESOLVED phased 2026-06-18**: the first pass keeps the soft static stack; the **TCD DP-window** is
   deferred behind a ZP-pressure measurement; pure stack-relative is ruled out as dominated). Never blocked
-  xy16 + native-mode crt0. **Remaining:** (1) the ZP-pressure measurement → build the DP-window *only if* the
-  imaginary-register file proves tight (deferred revival trigger; host-only, measure on corpus+kernels); (2)
+  xy16 + native-mode crt0. **Remaining:** (1) ~~the ZP-pressure measurement~~ **RAN 2026-06-18**
+  (`dev/measure-zp-pressure.sh`, `9fc5cf2`): the ZP is **slack** (real code max ~5 of 14 pairs) → the
+  **DP-window (a) is shelved with evidence**, not built (revisit only if future code nears the ceiling); (2)
   upstream posture — post the prior-art note + a first-pass CC to #321 (user-triggered; see Upstream section).
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).

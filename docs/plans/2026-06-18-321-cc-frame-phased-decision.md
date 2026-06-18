@@ -54,6 +54,14 @@ code (corpus + kernels at `+mos-a16 -Os`) shows the imaginary-register high-wate
 shelved *with evidence*. (Measurement is host-only — safe on a busy box — and is intentionally **not built
 here**; this record only names it as the trigger.)
 
+**MEASURED 2026-06-18 — SLACK; (a) stays shelved, evidence-backed.** `dev/measure-zp-pressure.sh` (the
+[ZP-pressure plan](2026-06-18-321-zp-pressure-measurement.md)) ran the baseline: across 13 real-code
+functions (6 kernels + 5/6 corpus) the imaginary-register high-water mark is **10 / 28 bytes — ~5 of 14
+pairs** (max, `k_bits:main`; mean ~2.8 pairs). Nothing approaches the budget, so the DP-window (a) would
+relieve pressure that isn't there → **(c) stands; (a) deferred indefinitely.** (The scan also surfaced a
+separate `+mos-a16 -Os` register-allocation *crash* on `globals.c` — a robustness bug, not a budget issue,
+tracked independently.)
+
 ## If revived: the (a) implementation path
 
 Model the **D** (direct-page) register in `MOSRegisterInfo.td` — the one missing piece; `PHD/PLD/TCD/TCS`
