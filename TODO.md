@@ -830,7 +830,12 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "The other two XFALs keep their own TODO bullets" -> already true: `scavenger-p-not-gpr` and
        `a16-zp-pressure-overflow` each have their own curated M2 bullets. Nothing open.
      fp:fd9f6337217bdfdf fp:d23acc84e2e4c0bd -->
-- [ ] **(triage)** **Not** changing argument passing (stays imaginary-register first-pass) or the A/X return convention — _from [2026-06-20-321-frame-abi-build-all-three-and-measure.md](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)_  <!-- fp:29fde811ff5d23b8 -->
-- [ ] **(triage)** **Not** auto-merging (a)/(b): landing is gated on the pre-registered bar; the default expectation is a — _from [2026-06-20-321-frame-abi-build-all-three-and-measure.md](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)_  <!-- fp:45ce4d0c0263904b -->
-- [ ] **(triage)** **Not** posting upstream from this plan — the evidence paragraph is *prepared*; posting is user-triggered. — _from [2026-06-20-321-frame-abi-build-all-three-and-measure.md](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)_  <!-- fp:ad37a4514712de70 -->
+<!-- triaged 2026-06-20: all three are explicit "## Out of scope / non-goals" NON-GOALS from the frame-ABI
+     head-to-head plan, not deferred work — they scope the study.
+     • "Not changing argument passing / A/X return" -> those CC sub-decisions are LOCKED/adopted; this study
+       is the frame/locals sub-decision only.
+     • "Not auto-merging (a)/(b)" -> the pre-registered go/no-go IS the plan's decision rule; nothing to track.
+     • "Not posting upstream from this plan" -> upstream posting is the curated user-triggered CC item; the
+       evidence paragraph is prepared by phase D. Nothing open.
+     fp:29fde811ff5d23b8 fp:45ce4d0c0263904b fp:ad37a4514712de70 -->
 <!-- END auto-captured-deferrals -->
