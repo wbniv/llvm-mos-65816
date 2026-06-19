@@ -20,18 +20,22 @@ follow; the codegen they'd share is the prize.
 
 ## Status
 
-**M0 — SNES test bench (in progress).** The SNES platform builds a valid,
-bootable 32 KiB LoROM `.sfc` from C using llvm-mos's existing 6502 backend — the
-65816 boots in 6502-emulation mode, so no 65816 codegen is needed yet. Reset
-vector → `_start`, the boot path is the crt0, `main()` is real compiled C, header
-+ checksum well-formed. **And it runs:** `dev/run.sh smoke` boots the ROM headless
-in MAME and the C-written `sentinel` reads back `0x42` from WRAM (verified
-2026-06-14). Remaining: the smoke loop green in CI (needs the BIOS secret) + a
-regression corpus.
+**M0 — SNES test bench: complete.** Valid bootable LoROM `.sfc` from C, 7/7 corpus
+tests green in CI, dual-emulator (MAME + bsnes-jg) differential.
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the full M0 → M1 → M2 plan and
-[docs/INVESTIGATION.md](docs/INVESTIGATION.md) for the upstream status, players,
-and the contribution rationale.
+**M1 — Far pointers: substantially complete.** 24-bit absolute-long load/store
+working across banks; far calls (JSL/RTL) deferred pending upstream ABI blessing.
+
+**M2 — 16-bit accumulator codegen: in progress.** `+mos-a16` enables the 65816's
+native 16-bit accumulator mode. Implemented and differential-verified on both
+emulators: full s16 ALU (add/sub/bitwise/shifts/cmp/inc/dec), constant-immediate
+folds, indirect and absolute load/store, cross-block REP/SEP mode-tracking,
+A16-threading (post-RA store/reload elimination), equality-as-value peephole.
+40/40 corpus, 31 micro-tests, 6 realistic kernels, 2 combinatorial tests, 50/50
+fuzz. CI green. **In progress:** s32 (`long`/`int32_t`) support; XY16 (`+mos-xy16`).
+
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the full plan and
+[docs/INVESTIGATION.md](docs/INVESTIGATION.md) for upstream status and contribution rationale.
 
 ## Layout
 

@@ -36,6 +36,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [Inc 2 plan](docs/plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md),
   [Inc 2b plan](docs/plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md).
 
+### Housekeeping
+
+- [wip] **Pre-public polish** — Apache-2.0 LICENSE + NOTICE, README → M2, gitignore transcripts.
+  [Plan](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md).
+
 ### M2 — Optimizing Payoff
 
 - [wip] **#321 `+mos-a16` s32 (`long`/`int32_t`) support — build the s32↔2×s16 path.** The Csmith fuzzer
@@ -803,4 +808,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • Conformance claims -> deliberately disclaimed (this is differential bug-finding, not ISO certification).
      • Floating-point / full-libc tests -> outside the freestanding subset; the Phase-0 filter excludes them.
      fp:3d23564aa9d16214 fp:9502a10868aa863f fp:9ef5b0820dd8d148 fp:a2b25e70c9c08d3b -->
+- [verify] **2026-06-14-pre-public-polish-license-readme-m2-gitignore** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-14-pre-public-polish-license-readme-m2-gitignore.md](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md)_  <!-- fp:72e135cd9174e480 -->
 <!-- END auto-captured-deferrals -->

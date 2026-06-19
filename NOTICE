@@ -1,0 +1,7 @@
+llvm-mos-65816
+Copyright 2026 Will Norris
+
+This project includes patches derived from llvm-mos and LLVM.
+llvm-mos is copyright its contributors; LLVM is copyright its contributors.
+Both are licensed under the Apache License, Version 2.0 with LLVM Exceptions.
+Original sources: https://github.com/llvm-mos/llvm-mos
