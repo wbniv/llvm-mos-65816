@@ -90,6 +90,28 @@ Both are deep and regression-sensitive — the same class as the deferred `globa
 is slack (no pool exhaustion in 13 real functions), so this is **pathological**. Holding state:
 XFAIL + deterministic repro, like `globals.c`.
 
+### Feasibility re-probe (2026-06-19) — why neither option is a drop-in
+
+Re-confirmed live (host `+mos-a16 -Os -verify` still emits `PH $p` / `STImag8 $p`) and probed both
+fixes against `saveScavengerRegister` (`MOSRegisterInfo.cpp`) + the repro's pre-PEI MIR:
+
+- **Option 2 is *not* a simple `PHP`/`PLP` bracket.** `P` has **no GPR spill home** (`STImag8`/`LDImag8`
+  are GPR-only; the illegal-`$p` symptom is exactly this fallthrough), so it can only be saved on the
+  hard stack. But `PHP`@`I` … `PLP`@`UseMI` only restores correctly when the intervening range is
+  **push/pull-balanced** (`pushPullBalanced`); under a16 the scavenge lands inside an *unbalanced* range
+  (the soft-stack `STStk`/`LDStk` spill run around the self-call), so the `PLP` would pop the wrong byte.
+  A correct upstream fix would need a **stack-relative restore** of the saved P (not a plain `PLP`), or
+  to teach the scavenger to choose a flag-safe spill point — both touch the upstream scavenger contract
+  across all MOS subtargets.
+- **Option 1 bottoms out in the `globals.c` core.** The live N/Z is a genuine 16-bit-compare result
+  consumed after intervening 16-bit work; the scavenge for the frame-index scratch (`$rs*`) falls in that
+  gap. Removing the liveness-across-scavenge is a register-pressure/scheduling problem identical to the
+  deferred `globals.c` RA failure — not a localized flag-kill.
+
+**Verdict: no narrow, low-risk fork-side fix.** Deferral stands; the genuine unblock is the **upstream
+issue** ([draft](../321-upstream-scavenger-nz-issue.md), user-triggered posting) — reevaluate alongside
+`globals.c` at M2 wrap-up.
+
 ## Disposition
 
 - **XFAIL'd:** `tools/a16_fuzz.py` `KNOWN_ISSUES` entry `scavenger-p-not-gpr` (matches
