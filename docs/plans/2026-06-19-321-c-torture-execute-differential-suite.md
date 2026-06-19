@@ -6,9 +6,11 @@ host filter (**1253 / 1656** in-scope) + the emulator differential runner. Full 
 wrong-value, all reproduced in isolation on both emulators — the payoff). Recorded in `xfails.tsv`; gate is
 green-modulo-known. **Remaining:** the `-Os` pass + per-defect root-cause backlog; Phase 3 (sampled CI).
 See §"Phase 2 — RESULTS".
-**BACKLOG RESOLUTION (2026-06-19):** the **frame-index fix cleared 13** (all a16), the **dg-require** refinement
-dropped the `pr7284-1` false positive (in-scope 1253→1228), and the **4 remaining defects are all xy16** —
-see §"Phase 2 backlog — RESOLUTION".
+**BACKLOG RESOLUTION (2026-06-19 → fully cleared 2026-06-20):** the **frame-index fix cleared 13** (all a16),
+the **dg-require** refinement dropped the `pr7284-1` false positive (in-scope 1253→1228), and the **4 remaining
+xy16 defects + `k_isort`'s xy16 leg were all cleared by ONE fix** (the `MOSInsertREPSEP` `requiredXWidth`
+index-width gap, 2026-06-20). **`xfails.tsv` now has no data rows — every known #321 a16/xy16 c-torture
+miscompile is fixed.** See §"Phase 2 backlog — RESOLUTION".
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — broaden correctness coverage beyond the 6-program corpus + `a16*` micro-tests + the random fuzzer).
 **Required reading:**
 [corpus-a16 differential gate (the engine this reuses)](2026-06-19-321-corpus-a16-differential-mode.md) ·
@@ -264,12 +266,19 @@ were almost all **one** root cause:
 - **`pr49419`'s a16 leg fixed too** by the frame-index commit — it is now **xy16-only**
   ([plan](2026-06-19-321-c-torture-pr49419-a16-xy16-hang.md)).
 
-**Remaining = 4 defects, ALL xy16** (the 16-bit-index track, added 2026-06-18, less battle-tested):
-`pr49419` (hang), `20041011-1` (64-bit `ull` + pressure), `doloop-1` (counted loop at `INT` limits),
-`va-arg-22` (varargs) — plus the `k_isort` xy16 miscompile surfaced by the suite's xy16 leg. `pr49419`'s
-loops trace instruction-correct yet hang ⇒ a runtime **X-flag (index-width) state** bug, prime suspect the
-**`MOSInsertREPSEP` X-flag lattice**, **likely shared** across the xy16 cluster (one fix may clear several).
-The a16 (16-bit-accumulator) track is now healthy.
+**~~Remaining = 4 defects, ALL xy16~~ ALL CLEARED 2026-06-20 by ONE fix** (the 16-bit-index track, added
+2026-06-18, less battle-tested): `pr49419` (hang), `20041011-1` (64-bit `ull` + pressure), `doloop-1`
+(counted loop at `INT` limits), `va-arg-22` (varargs) — plus the `k_isort` xy16 miscompile surfaced by the
+suite's xy16 leg. `pr49419`'s loops trace instruction-correct yet hang ⇒ a runtime **X-flag (index-width)
+state** bug, prime suspect the **`MOSInsertREPSEP` X-flag lattice**, **likely shared** across the xy16 cluster.
+- **All 5 cleared by ONE fix** — the `MOSInsertREPSEP` `requiredXWidth` **index-width gap** (2026-06-20,
+  [plan](2026-06-19-321-xy16-xflag-lattice-fix.md)). Index-register *value* ops (compares `CMPImm`/
+  `CMPImag8`/`CMPAbs` reading X/Y, register `INC`/`DEC`) were classified X-agnostic, so they ran in the
+  ambient X=16 left by a 16-bit-indexed load — `cpy #imm` then compared the loop counter's uninitialized high
+  byte. Cleared: `pr49419, doloop-1, 20041011-1, va-arg-22` (all 4 `xfails.tsv` rows removed) + `k_isort`'s
+  xy16 leg. Confirmed the shared-cause prediction (as the frame-index fix cleared 13). `xfails.tsv` is now
+  empty of data rows — **every known #321 a16/xy16 c-torture miscompile is fixed.**
+The a16 (16-bit-accumulator) **and** xy16 (16-bit-index) tracks are now both healthy.
 
 ## Verification
 

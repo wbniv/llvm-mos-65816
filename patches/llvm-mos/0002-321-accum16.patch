@@ -92,10 +92,10 @@ index 76d7409c1f1b..733ef7097a4d 100644
 +    [FeatureAccum16]>;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000000..e0b2f837ed90
+index 000000000000..1dfeba0f28ca
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,578 @@
+@@ -0,0 +1,598 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -274,7 +274,9 @@ index 000000000000..e0b2f837ed90
 +  // pseudos, so their TSFlags carry no XHigh. After RA all registers are
 +  // physical, so comparing against MOS::X / MOS::Y is valid.
 +  //   LDAbs / LDImag8 / LDImm / STAbs  — operand 0 is the GPR
++  //   INC / DEC (INX/INY/DEX/DEY)       — operand 0 is the GPR (def, tied src)
 +  //   STImag8                           — operand 1 is the GPR (op0 = ZP addr)
++  //   CMPImm / CMPImag8 / CMPAbs        — operand 1 is the GPR (op0 = Cc carry)
 +  //   LDXIdx / LDYIdx                   — always X / Y destination
 +  {
 +    auto isXY = [](Register R) { return R == MOS::X || R == MOS::Y; };
@@ -283,10 +285,28 @@ index 000000000000..e0b2f837ed90
 +    case MOS::LDImag8:
 +    case MOS::LDImm:
 +    case MOS::STAbs:
++    // INC/DEC register form (INX/INY/DEX/DEY): operand 0 is the modified index
++    // reg. The 8-bit pseudo touches it as an 8-bit value, so it must run X8 — in
++    // an X16 ambient `iny` would increment the full 16-bit Y (the 16-bit form is
++    // the dedicated XLow INX16/… pseudo). On A (INA/DEA) operand 0 is the
++    // accumulator → not X/Y → falls through to XW_None (M-governed).
++    case MOS::INC:
++    case MOS::DEC:
 +      if (MI.getOperand(0).isReg() && isXY(MI.getOperand(0).getReg()))
 +        return XW_X8;
 +      break;
 +    case MOS::STImag8:
++      if (MI.getOperand(1).isReg() && isXY(MI.getOperand(1).getReg()))
++        return XW_X8;
++      break;
++    // Compare pseudos whose compared value $l (operand 1; operand 0 is the Cc
++    // carry def) is an index reg → CPX/CPY, 8-bit-intent. Must run X8: in an X16
++    // ambient `cpy #imm` reads a 2-byte immediate and compares Y's (garbage) high
++    // byte — the pr49419 xy16 hang. On A (CMP) operand 1 is the accumulator → not
++    // X/Y → XW_None. (CMPImm16 is the 16-bit *accumulator* compare, distinct.)
++    case MOS::CMPImm:
++    case MOS::CMPImag8:
++    case MOS::CMPAbs:
 +      if (MI.getOperand(1).isReg() && isXY(MI.getOperand(1).getReg()))
 +        return XW_X8;
 +      break;

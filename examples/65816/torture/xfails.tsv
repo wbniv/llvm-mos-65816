@@ -33,8 +33,19 @@
 # SKIP'd as unsupported and never reach this list. (pr7284-1 — `n<<24`, int32plus — was the
 # motivating case; it is now filtered out, not listed below.)
 #
+# === FIXED 2026-06-20: all 4 remaining xy16 rows cleared by ONE fix ===
+# The MOSInsertREPSEP requiredXWidth X-flag (index-width) lattice gap — under +mos-xy16 the
+# per-instruction classifier left index-register VALUE ops (the compares CMPImm/CMPImag8/
+# CMPAbs reading X/Y, and the register INC/DEC = inx/iny/dex/dey) as X-agnostic (XW_None), so
+# each ran in whatever X width was AMBIENT. After a 16-bit-indexed load (rep #$10/#$30) the
+# ambient is X=16, so `cpy #imm` read a 2-byte immediate and compared the loop counter's
+# UNINITIALIZED high byte (the counter was init/incremented at X=8) -> wrong bound -> hang
+# (corpus_result 0x0000) or wrong value. Root-caused via pr49419, fixed in 0002
+# (MOSInsertREPSEP.cpp requiredXWidth: classify those ops XW_X8 when the X/Y operand is the
+# value). The class sweep cleared ALL FOUR xy16 rows (removed below): pr49419, 20041011-1,
+# doloop-1, va-arg-22 — plus k_isort's xy16 leg (dev/run.sh k_isort: all 3 tracks agree).
+# Regression guard: those torture tests now hard-PASS (default==+mos-a16==+mos-xy16 on
+# MAME + bsnes-jg). Plan: docs/plans/2026-06-19-321-xy16-xflag-lattice-fix.md
+#
 # test          feature   note (one-line characterization; deep root-cause is per-test follow-up)
-pr49419.c       a16+xy16  PR tree-optimization/49419 (xy16 also -> 0x0000) — DISTINCT bug (survived the frame-index fix)
-20041011-1.c    xy16      64-bit ull + 32 locals/loop = extreme register pressure; likely pressure-family or real 64-bit codegen  (note: XPASSes at -Os — -O1-specific)
-doloop-1.c      xy16      counted loop at INT limits (limits.h)
-va-arg-22.c     xy16      variadic argument handling
+# (no rows — every known #321 a16/xy16 c-torture miscompile is fixed as of 2026-06-20)

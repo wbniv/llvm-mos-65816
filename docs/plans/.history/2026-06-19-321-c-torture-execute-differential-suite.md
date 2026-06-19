@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/bae20ba) | #321 c-torture suite plan: record the Phase-2 backlog resolution |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/215f74d) | #321 c-torture Phase 2 -Os: 2 new miscompiles (pr34768), 1 flake, triage notes |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/0d76bfc) | #321 c-torture Phase 2 (-O1): 16 confirmed NEW a16/xy16 runtime miscompiles |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/15542ff) | #321 c-torture Phase 1: pilot finds a real a16 ZP-pressure overflow (pr15296.c) |
@@ -7,6 +8,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/34cd16a) | #321 plan: vendor GCC c-torture/execute behind the +mos-a16/+mos-xy16 differential gate |
 
 <!--history-meta v1
+bae20ba	author	Will Norris
+bae20ba	added	30
+bae20ba	deleted	0
+bae20ba	files	1
+bae20ba	body	Update the umbrella plan to reflect the same-day triage outcome: the "diverse, several\ndistinct bugs" expectation was wrong for the a16 cases — 13 of 18 rows were ONE root\ncause (the CmpBrAbsImm16 frame-index scramble, f2d65c2); the pr7284-1 false positive was\nremoved via dg-require (8622e3f, in-scope 1253->1228); pr49419's a16 leg was fixed too,\nleaving it xy16-only. Remaining backlog = 4 defects, ALL xy16, prime suspect the shared\nMOSInsertREPSEP X-flag lattice. Docs only.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01FbDXYbhvNuPv7B7SPgPLes
 215f74d	author	Will Norris
 215f74d	added	19
 215f74d	deleted	0
