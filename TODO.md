@@ -230,6 +230,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
+- [ ] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
+  de-facto-standard *execution*-correctness suite (~1,500 self-checking `abort()`/`exit(0)` programs) into the
+  existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a test is
+  in-scope iff the default build runs it to the PASS sentinel, then any `+mos-a16`/`+mos-xy16` disagreement is a
+  real defect (sidesteps "is this test appropriate for 16-bit `int`" — if default handles it, a16 must too).
+  Fetch-don't-commit (GPLv3 → sha256-pinned, gitignored, reproducible via `dev/fetch-torture.sh`, the
+  WDC816CC/ORCA-refs precedent). Phased: fetch + host-only compile/link filter → shim adapter + pilot → scale +
+  triage → sampled secret-gated CI. [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
   `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the
   full `+mos-a16` operator set; compiles each DEFAULT + `+mos-a16`, runs both on MAME + bsnes-jg, and
@@ -747,4 +755,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • the [verify] flag -> RESOLVED: the plan's "Result — VERIFIED 2026-06-19" section now records the regen
        round-trip PASS + the comment-only 0002 diff (committed c2882b3). Nothing open.
      fp:93d7dc31ec1433be fp:be0273e614032501 -->
+- [ ] **(triage)** Random program generation (Csmith/Yarpgen) — separate axis; we already have the fuzzer. — _from [2026-06-19-321-c-torture-execute-differential-suite.md](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md)_  <!-- fp:3d23564aa9d16214 -->
+- [ ] **(triage)** `c-testsuite` stdout model — fallback only (recorded above), not built unless the GPL fetch is rejected. — _from [2026-06-19-321-c-torture-execute-differential-suite.md](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md)_  <!-- fp:9502a10868aa863f -->
+- [ ] **(triage)** Conformance *claims* — this is differential bug-finding vs the trusted default build, not an ISO — _from [2026-06-19-321-c-torture-execute-differential-suite.md](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md)_  <!-- fp:9ef5b0820dd8d148 -->
+- [ ] **(triage)** Floating-point / full-libc tests — outside the freestanding subset; filtered out. — _from [2026-06-19-321-c-torture-execute-differential-suite.md](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md)_  <!-- fp:a2b25e70c9c08d3b -->
 <!-- END auto-captured-deferrals -->
