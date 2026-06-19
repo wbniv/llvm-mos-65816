@@ -70,6 +70,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — G_LOAD_ABS_IDX16+LDXImag16+LDAbsXIdx16 B2 path under +mos-xy16; corpus_result==$WANT; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "G_LOAD_ABS_IDX16+LDXImag16+LDAbsXIdx16 B2 path under +mos-xy16; corpus_result==$WANT; both emulators agree"
 exit $rc

@@ -60,6 +60,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — +mos-xy16 accepted, X-flag lattice inert for M16-only ops, corpus_result==0x0042" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "+mos-xy16 accepted, X-flag lattice inert for M16-only ops, corpus_result==0x0042"
 exit $rc

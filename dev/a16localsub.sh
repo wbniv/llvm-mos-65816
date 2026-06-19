@@ -69,6 +69,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit sub (sec/rep/lda/sbc/sta/sep) in Imag16 computes 0x1222; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit sub (sec/rep/lda/sbc/sta/sep) in Imag16 computes 0x1222; both emulators agree"
 exit $rc

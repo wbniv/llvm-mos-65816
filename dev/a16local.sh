@@ -69,6 +69,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit add (clc/rep/lda/adc/sta/sep) computes 0x1122; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit add (clc/rep/lda/adc/sta/sep) computes 0x1122; both emulators agree"
 exit $rc

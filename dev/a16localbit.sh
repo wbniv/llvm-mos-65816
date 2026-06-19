@@ -68,6 +68,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit and/ora/eor in Imag16 compile clean and compute 0x000F; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit and/ora/eor in Imag16 compile clean and compute 0x000F; both emulators agree"
 exit $rc

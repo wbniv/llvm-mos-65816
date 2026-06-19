@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/f30c9ea) | #321 implement bsnes-jg-only confirmation runner (dev/run.sh xcheck-suite) — 45/45 |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/d26a5e6) | #321 plan: bsnes-jg-only second-emulator confirmation runner (JG_ONLY / xcheck-suite) |
 
 <!--history-meta v1
+f30c9ea	author	Will Norris
+f30c9ea	added	54
+f30c9ea	deleted	1
+f30c9ea	files	1
+f30c9ea	body	Per the plan: a MAME-skipping JG_ONLY pass so the second emulator (bsnes-jg) can be\nexercised cheaply + deterministically — no MAME, no SPC700 BIOS, no quiet box.\n\n- dev/_emu.sh: JG_ONLY=1 guard in run_assert (skip MAME -> "SMOKE: SKIP", return 0)\n  and require_bios (no-op). Each test's own deterministic bsnes-jg leg still runs.\n- dev/xcheck-suite.sh (new): serial, niced pass over the a16*/xy16* tests that carry a\n  jgxcheck leg (45; the 6 compile-only gates auto-excluded). Optional PREFIX filter.\n  Logs to build/xcheck-suite/ (mounted, persist). PASS requires the positive\n  "(ran N frames, bsnes-jg)" result line, so a jgxcheck-absent SKIP can't masquerade\n  as a confirmation.\n- dev/run.sh: xcheck-suite target + usage + JG_ONLY env forwarding.\n\nVerified 2026-06-19 (raw output in the plan): (1) JG_ONLY skips MAME on a16add;\n(2) full suite 45/45 in ~49 s; (3) xy16 4/4 -- the recent xy16 codegen IS confirmed\non bsnes-jg; (4) runs with the SPC700 BIOS absent. TODO item -> [x].\n\nNo codegen / vendor / 0002 change.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 d26a5e6	author	Will Norris
 d26a5e6	added	107
 d26a5e6	deleted	0

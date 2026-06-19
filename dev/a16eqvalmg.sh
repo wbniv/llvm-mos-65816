@@ -73,6 +73,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — computed vs global s16 equality-as-value (CmpBrImagAbs16: lda zp; cmp long) computes 0x0111; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "computed vs global s16 equality-as-value (CmpBrImagAbs16: lda zp; cmp long) computes 0x0111; both emulators agree"
 exit $rc

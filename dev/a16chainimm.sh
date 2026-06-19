@@ -68,6 +68,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — constant term folds into a threaded 16-bit add chain and computes 0x2569; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "constant term folds into a threaded 16-bit add chain and computes 0x2569; both emulators agree"
 exit $rc

@@ -66,6 +66,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit absolute load/store (lda abs/sta abs) copies 0x5A3C; both emulators read 0x5A3D" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit absolute load/store (lda abs/sta abs) copies 0x5A3C; both emulators read 0x5A3D"
 exit $rc

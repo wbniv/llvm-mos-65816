@@ -71,6 +71,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit constant shifts (asl/lsr under rep/sep) compute 0x1278; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit constant shifts (asl/lsr under rep/sep) compute 0x1278; both emulators agree"
 exit $rc

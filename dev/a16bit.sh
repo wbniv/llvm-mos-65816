@@ -64,6 +64,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit and/ora/eor select correctly; AND reads 0x0F00 on both emulators" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit and/ora/eor select correctly; AND reads 0x0F00 on both emulators"
 exit $rc

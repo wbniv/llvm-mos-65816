@@ -113,6 +113,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit loop body holds 16-bit mode across iterations (rep hoisted, sep sunk); both emulators read 0x2340" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit loop body holds 16-bit mode across iterations (rep hoisted, sep sunk); both emulators read 0x2340"
 exit $rc

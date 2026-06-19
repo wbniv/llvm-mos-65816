@@ -71,6 +71,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit immediate folds to adc #\$0345 (no materialization); computes 0x1545 on both emulators" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit immediate folds to adc #\$0345 (no materialization); computes 0x1545 on both emulators"
 exit $rc

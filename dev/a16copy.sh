@@ -88,6 +88,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — fused indirect copy (lda (p); sta g, no round-trip) reads 0x3456; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "fused indirect copy (lda (p); sta g, no round-trip) reads 0x3456; both emulators agree"
 exit $rc

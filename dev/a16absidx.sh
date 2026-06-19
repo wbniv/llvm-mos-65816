@@ -66,6 +66,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit abs,x load (lda abs[_long],x / opcode BD/BF) reads 0x9ABC; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit abs,x load (lda abs[_long],x / opcode BD/BF) reads 0x9ABC; both emulators agree"
 exit $rc

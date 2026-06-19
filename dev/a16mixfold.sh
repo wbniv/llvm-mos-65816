@@ -77,6 +77,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — mixed-operand ALU reads the global directly (no Imag16 round-trip) and computes 0x2DC0; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "mixed-operand ALU reads the global directly (no Imag16 round-trip) and computes 0x2DC0; both emulators agree"
 exit $rc

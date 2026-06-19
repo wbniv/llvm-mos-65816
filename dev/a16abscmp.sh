@@ -68,6 +68,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit compare folds both global operands (lda abs; cmp abs) and computes 0x4303; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit compare folds both global operands (lda abs; cmp abs) and computes 0x4303; both emulators agree"
 exit $rc

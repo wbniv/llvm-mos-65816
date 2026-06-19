@@ -72,6 +72,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — soft-stack Ac16 spill compiles clean and computes 0x3457; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "soft-stack Ac16 spill compiles clean and computes 0x3457; both emulators agree"
 exit $rc

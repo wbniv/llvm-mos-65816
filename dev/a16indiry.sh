@@ -68,6 +68,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit (zp),y load (lda (zp),y / opcode B1) reads 0x5678; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit (zp),y load (lda (zp),y / opcode B1) reads 0x5678; both emulators agree"
 exit $rc

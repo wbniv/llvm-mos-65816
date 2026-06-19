@@ -64,6 +64,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit sub (sec/rep/lda/sbc/sta/sep) computes 0x0123; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit sub (sec/rep/lda/sbc/sta/sep) computes 0x0123; both emulators agree"
 exit $rc

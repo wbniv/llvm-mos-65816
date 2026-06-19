@@ -62,6 +62,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit STZ (rep/stz/sep) zeroes g16; both emulators read 0x0042" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit STZ (rep/stz/sep) zeroes g16; both emulators read 0x0042"
 exit $rc

@@ -69,6 +69,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit indirect load/store (lda (zp)/sta (zp)) round-trips 0xABCE; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit indirect load/store (lda (zp)/sta (zp)) round-trips 0xABCE; both emulators agree"
 exit $rc

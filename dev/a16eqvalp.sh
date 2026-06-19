@@ -63,6 +63,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — indirect s16 equality-as-value is native (both emulators), corpus_result==0x0101" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "indirect s16 equality-as-value is native (both emulators), corpus_result==0x0101"
 exit $rc

@@ -69,6 +69,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit AND/OR/XOR chains thread A16 (no carry, no round-trip) and compute 0x6261; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit AND/OR/XOR chains thread A16 (no carry, no round-trip) and compute 0x6261; both emulators agree"
 exit $rc

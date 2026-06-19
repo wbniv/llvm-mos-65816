@@ -72,6 +72,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — complex native-s16 (5 adds, reused locals) compiles clean and computes 0x33A0; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "complex native-s16 (5 adds, reused locals) compiles clean and computes 0x33A0; both emulators agree"
 exit $rc

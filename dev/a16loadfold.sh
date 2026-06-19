@@ -72,6 +72,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — global operands read directly via lda/adc abs (no Imag16 materialization); computes 0x2345 on both emulators" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "global operands read directly via lda/adc abs (no Imag16 materialization); computes 0x2345 on both emulators"
 exit $rc

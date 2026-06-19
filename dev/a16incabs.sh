@@ -69,6 +69,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit inc a/dec a on globals (g +-1, long addressing) computes 0x3502; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit inc a/dec a on globals (g +-1, long addressing) computes 0x3502; both emulators agree"
 exit $rc

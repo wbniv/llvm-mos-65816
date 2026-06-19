@@ -10,6 +10,11 @@
 #                                      boot ROM headless in MAME under smoke.lua, assert the
 #                                      SYMBOL bytes == EXPECT. Prints the SMOKE: line; returns
 #                                      0 on PASS, 1 on FAIL.
+#   emu_verdict RC "PASS detail"       print the closing verdict line: `RESULT: FAIL` when RC!=0,
+#                                      else `RESULT: PASS — <detail>`. Under JG_ONLY it rewrites any
+#                                      "both emulators …" claim in <detail> to name only bsnes-jg, so
+#                                      a MAME-skipped run never claims a MAME result it did not produce.
+#                                      Always returns 0 (the caller still does `exit $rc`).
 #
 #   JG_ONLY=1 (env)                    bsnes-jg-only pass: require_bios + run_assert become no-ops
 #                                      (the MAME leg is skipped), so a caller runs its deterministic
@@ -101,4 +106,27 @@ run_assert() {
     "SMOKE: PASS"*) return 0 ;;
     *) return 1 ;;
   esac
+}
+
+# emu_verdict RC "PASS detail" — the shared closing verdict line.
+# RC!=0 → "RESULT: FAIL"; else "RESULT: PASS — <detail>". Under JG_ONLY the MAME leg
+# did not run, so rewrite any "both emulators …" agreement claim in <detail> to name
+# only bsnes-jg. Always returns 0; the caller still does its own `exit $rc`.
+emu_verdict() {
+  local rc="$1" detail="$2"
+  if [ "$rc" -ne 0 ]; then echo "RESULT: FAIL"; return 0; fi
+  if [ "${JG_ONLY:-}" = "1" ]; then
+    # Cover every "both emulators …" phrasing the 45 tests use (agree / on both /
+    # read 0xNN / "(both emulators)" / trailing ", both emulators"). Order: specific
+    # → general. A novel future phrasing just falls through unrewritten (cosmetic,
+    # never a regression) — new tests should say "both emulators agree".
+    detail="$(printf '%s' "$detail" | sed -E \
+      -e 's/both emulators read ([0-9A-Fx]+)/bsnes-jg reads \1 (MAME skipped)/g' \
+      -e 's/(;?[[:space:]]*)both emulators agree/\1bsnes-jg confirmed (MAME skipped)/g' \
+      -e 's/on both emulators/on bsnes-jg (MAME skipped)/g' \
+      -e 's/\(both emulators\)/(bsnes-jg only; MAME skipped)/g' \
+      -e 's/,?[[:space:]]+both emulators/, bsnes-jg only (MAME skipped)/g')"
+  fi
+  echo "RESULT: PASS — $detail"
+  return 0
 }

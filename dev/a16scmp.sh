@@ -67,6 +67,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit signed compares (eor #\$8000 + cmp) compute 0x0111; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit signed compares (eor #\$8000 + cmp) compute 0x0111; both emulators agree"
 exit $rc

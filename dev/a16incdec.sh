@@ -66,6 +66,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — native 16-bit inc a/dec a (register +-1) computes 0x2668; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "native 16-bit inc a/dec a (register +-1) computes 0x2668; both emulators agree"
 exit $rc

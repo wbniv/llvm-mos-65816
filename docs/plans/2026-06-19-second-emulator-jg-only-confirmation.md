@@ -139,9 +139,16 @@ RESULT: PASS …   EXIT=0
 - **"bsnes-jg actually ran" is a positive check**: a test PASSes only if its log carries the
   `…(ran N frames, bsnes-jg)` result line — a green exit code alone can also mean the leg *SKIPped*
   (when `build/jgxcheck` is absent), which the suite now flags as `jg-SKIP`, not PASS.
-- Cosmetic: under `JG_ONLY` a per-test script still prints its closing `RESULT: PASS … both emulators
-  agree` (MAME was skipped). The suite keys off the **exit code + the bsnes-jg result line**, not that
-  text, so the tally is correct; the wording is left as-is to avoid touching all 45 scripts.
+- **Honest closing verdict (cleaned up 2026-06-19).** A shared `emu_verdict RC "detail"` helper in
+  `dev/_emu.sh` now owns the closing `RESULT:` line (and replaces the duplicated
+  `[ $rc -eq 0 ] && echo … || echo "RESULT: FAIL"` idiom in all 45 value tests). Under `JG_ONLY` it
+  rewrites every "both emulators …" claim in `detail` to name only bsnes-jg (e.g. *both emulators agree*
+  → *bsnes-jg confirmed (MAME skipped)*; *on both emulators* → *on bsnes-jg (MAME skipped)*; *both
+  emulators read 0xNN* → *bsnes-jg reads 0xNN (MAME skipped)*; *(both emulators)* → *(bsnes-jg only; MAME
+  skipped)*), so a MAME-skipped run never claims a result MAME did not produce. Normal (non-`JG_ONLY`)
+  output is **byte-identical** to before (the helper only rewrites under `JG_ONLY`). Verified: helper
+  unit-tested both modes; full `JG_ONLY` suite re-run **45/45**, and **zero** `both emulators` strings
+  remain in any per-test verdict log.
 
 ## Scope / non-goals
 

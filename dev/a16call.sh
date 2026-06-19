@@ -101,6 +101,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — call executes in 8-bit mode inside a 16-bit region; both emulators read 0x4456" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "call executes in 8-bit mode inside a 16-bit region; both emulators read 0x4456"
 exit $rc

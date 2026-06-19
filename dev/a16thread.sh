@@ -76,6 +76,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — A16-threading: no Imag16 round-trip, corpus_result==0x2544 on both emulators" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "A16-threading: no Imag16 round-trip, corpus_result==0x2544 on both emulators"
 exit $rc

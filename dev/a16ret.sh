@@ -108,6 +108,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — A(low)/X(high) return convention is locked: i16->ldx<high>;lda<low>;rts, i8->A; corpus_result==0x2387 (both emulators)" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "A(low)/X(high) return convention is locked: i16->ldx<high>;lda<low>;rts, i8->A; corpus_result==0x2387 (both emulators)"
 exit $rc

@@ -87,6 +87,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — G_LOAD_INDIR_IDX16+LDYImag16+LDIndirYIdx16 (zp),Y16 B2 path under +mos-xy16; corpus_result==$WANT; host==default==+mos-a16==+mos-xy16, both emulators" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "G_LOAD_INDIR_IDX16+LDYImag16+LDIndirYIdx16 (zp),Y16 B2 path under +mos-xy16; corpus_result==$WANT; host==default==+mos-a16==+mos-xy16, both emulators"
 exit $rc

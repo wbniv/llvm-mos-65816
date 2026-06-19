@@ -65,6 +65,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — s16 global equality-as-value is native 16-bit (v3 abs-fold) and computes 0x0101 (both emulators)" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "s16 global equality-as-value is native 16-bit (v3 abs-fold) and computes 0x0101 (both emulators)"
 exit $rc

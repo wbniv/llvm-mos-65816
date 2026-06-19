@@ -64,7 +64,11 @@ The bar is the **differential**: host-computed == default(non-`+mos-a16`)@MAME =
 `examples/65816/a16<name>.c` + `dev/a16<name>.sh` micro-test (pattern: a `corpus_result` the test asserts
 across host/default/a16 on both emulators, often with a disasm gate, e.g. native `cmp` present and no 8-bit
 `cpx/cpy`), wired into `dev/run.sh`, and is exercised by the fuzzer (`tools/a16_fuzz.py`). Use
-`examples/65816/a16eqval*.c` + `dev/a16eqval*.sh` as templates.
+`examples/65816/a16eqval*.c` + `dev/a16eqval*.sh` as templates. Close the script with
+`emu_verdict "$rc" "<pass detail incl. an emulator-agreement clause>"` (from `dev/_emu.sh`), **not** a
+hand-rolled `echo "RESULT: …"` — the helper prints `RESULT: FAIL`/`PASS` and, under `JG_ONLY`
+(`dev/run.sh xcheck-suite`, the bsnes-jg-only pass), rewrites the "both emulators" claim so a MAME-skipped
+run stays honest.
 
 **Gating discipline — the fuzzer guards the DEFAULT build too.** Every `+mos-a16` change must be gated so it
 *cannot* alter non-`+mos-a16` codegen — and that includes **operand canonicalizations / helper predicates**,

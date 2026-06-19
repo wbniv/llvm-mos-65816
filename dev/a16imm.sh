@@ -62,6 +62,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — 16-bit ALU-with-immediate computes 0x1545; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "16-bit ALU-with-immediate computes 0x1545; both emulators agree"
 exit $rc

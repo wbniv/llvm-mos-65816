@@ -68,6 +68,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — counted loop strength-reduces to a native 16-bit add and computes 0x1239; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "counted loop strength-reduces to a native 16-bit add and computes 0x1239; both emulators agree"
 exit $rc

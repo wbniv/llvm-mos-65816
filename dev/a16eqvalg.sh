@@ -75,6 +75,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — global s16 equality-as-value folds the operand (lda abs; cmp abs) and computes 0x1101; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "global s16 equality-as-value folds the operand (lda abs; cmp abs) and computes 0x1101; both emulators agree"
 exit $rc

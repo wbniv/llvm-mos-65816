@@ -64,6 +64,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — chained 16-bit add threads A16; computes 0x1230 on both emulators" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "chained 16-bit add threads A16; computes 0x1230 on both emulators"
 exit $rc

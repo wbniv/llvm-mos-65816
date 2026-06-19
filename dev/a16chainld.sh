@@ -66,6 +66,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — multi-use 16-bit add chain threads A16 (no Imag16 round-trip) and computes 0x1234; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "multi-use 16-bit add chain threads A16 (no Imag16 round-trip) and computes 0x1234; both emulators agree"
 exit $rc

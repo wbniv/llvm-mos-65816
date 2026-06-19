@@ -71,6 +71,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — computed s16 equality-as-value is native 16-bit (v2) and computes 0x1101; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "computed s16 equality-as-value is native 16-bit (v2) and computes 0x1101; both emulators agree"
 exit $rc

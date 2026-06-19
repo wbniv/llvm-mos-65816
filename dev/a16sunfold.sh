@@ -74,6 +74,5 @@ else
 fi
 
 echo
-[ $rc -eq 0 ] && echo "RESULT: PASS — both-global single-use-non-store ops read every operand directly (no Imag16 round-trip) and compute 0x3480; both emulators agree" \
-             || echo "RESULT: FAIL"
+emu_verdict "$rc" "both-global single-use-non-store ops read every operand directly (no Imag16 round-trip) and compute 0x3480; both emulators agree"
 exit $rc
