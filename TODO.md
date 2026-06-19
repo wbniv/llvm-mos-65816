@@ -777,4 +777,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • Conformance claims -> deliberately disclaimed (this is differential bug-finding, not ISO certification).
      • Floating-point / full-libc tests -> outside the freestanding subset; the Phase-0 filter excludes them.
      fp:3d23564aa9d16214 fp:9502a10868aa863f fp:9ef5b0820dd8d148 fp:a2b25e70c9c08d3b -->
+- [ ] **(triage)** **TODO (Yarpgen):** add a `TODO.md` item — *"vendor Yarpgen as a second random generator behind `--gen — _from [2026-06-19-321-csmith-differential-fuzzer.md](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md)_  <!-- fp:192eb34724f01c54 -->
+- [ ] **(triage)** **Yarpgen vs the known bug families** — it directly targets the regalloc/loop optimization surface where our — _from [2026-06-19-321-csmith-differential-fuzzer.md](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md)_  <!-- fp:0350991c23596f7a -->
+- [ ] **(triage)** **On approval, also:** add the matching `TODO.md` entry under *Test Bench / CI* for this Csmith work itself. — _from [2026-06-19-321-csmith-differential-fuzzer.md](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md)_  <!-- fp:d29683e80d7e9f15 -->
 <!-- END auto-captured-deferrals -->
