@@ -103,9 +103,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Phase 3), high-risk (un-threads the Phase-1 wins / reopens the 1d crash) and low-reward (Phase 1 already
   captured the threading *wins*; only this pathological crash motivates it). **DECISION 2026-06-18 — keep the
   XFAIL** (a risky rework is 3× worse for a pathological bug; ZP measurement: real code is slack);
-  **reevaluate at M2 wrap-up (see Watch).** When fixed: drop the `KNOWN_ISSUES` entry + make `a16regpress.c`
-  a positive gate (a Phase-3 acceptance case). Optional: extend `a16_fuzz.py`'s generator to emit the
-  two-loop / two-multiply / cross-loop-live shape.
+  **re-open only on the concrete trigger (see Watch — a 2nd independent regalloc/ZP-overflow from realistic
+  code, or a real function crossing ~10 of 14 `Imag16` pairs), then run the gated B0→B1→B2 spike.** When
+  fixed: drop the `KNOWN_ISSUES` entry + make `a16regpress.c` a positive gate (a Phase-3 acceptance case).
+  Optional: extend `a16_fuzz.py`'s generator to emit the two-loop / two-multiply / cross-loop-live shape.
   [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
   [finding](docs/plans/2026-06-18-321-zp-pressure-measurement.md) ·
   [A16-threading Phase 3](docs/plans/2026-06-17-321-a16-threading.md).
@@ -134,11 +135,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   −31/−36 % on dependent chains, −4..−10 B on real kernels; a corrected 300-program scan shows the true
   non-adjacent remainder is **1**. **Phase 2 retired:** fold-while-threaded is **already optimal** (interior
   immediates *and* near-abs globals fold into the threaded chain today — existing selection folds compose
-  with the peephole). **Remaining — (3) the genuine hard core, DEFERRED:** RA-level `Ac16` residency via a
-  `shouldCoalesce` barrier rejecting 8-bit↔`Ac16` coalescing (the `$a16 = LDImm` 1d crash) — realizable
-  gain is capped by the single 65816 accumulator (two live 16-bit values must spill to `Imag16`) and it
-  reopens the coalescer crash risk.
-  [plan](docs/plans/2026-06-17-321-a16-threading.md).
+  with the peephole). **Remaining — (3) the genuine hard core, DEFERRED:** RA-level `Ac16` residency. The
+  actual lever is **pre-RA `Ac16` residency** (thread the single-use producer's `Ac16` vreg into the
+  consumer at `selectAlu16Native`, collapsing the `INF` single-instruction transits that exhaust the
+  allocator); the `shouldCoalesce` 8-bit↔`Ac16` barrier (the `$a16 = LDImm` 1d crash) is a **safety
+  companion, NOT the fix** — the asserts root-cause (`50a59b5`) **ruled coalescing out** as the
+  `a16regpress.c` crash cause. Realizable gain is capped by the single 65816 accumulator (two live 16-bit
+  values must spill to `Imag16`) and it reopens the coalescer-crash risk → high-risk/low-reward, so
+  **keep the XFAIL** with a concrete re-open trigger + a gated B0→B1→B2 spike recipe (see Watch + the plan).
+  [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
+  [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
@@ -248,7 +254,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   2026-06-19**: filter → **1253/1656 in-scope**; runner (`tools/torture_run.py` + `dev/run.sh torture`).
   Full `-O1` pass: **1098 PASS, 136 SKIP, 3 known-XFAIL** (ZP-pressure) **+ 16 confirmed NEW runtime
   miscompiles** (a16/xy16 wrong-value, all reproduced isolated on both emulators → `xfails.tsv`, gate
-  green-modulo-known). **Remaining:** the `-Os` pass, Phase 3 sampled CI, + reaping orphan MAMEs in the runner.
+  green-modulo-known). **Remaining:** the `-Os` pass (**IN PROGRESS 2026-06-20** — full streamed sweep from
+  `--start 60`, MAME 3-way catch-net, hunting miscompiles + confirming the just-landed `CMPIndir16` fold
+  (`9009260`) non-regressing; any FAIL → bsnes-jg confirm + root-cause + de-XFAIL + micro-test;
+  [sweep plan](docs/plans/2026-06-20-321-broad-c-torture-sweep.md)), Phase 3 sampled CI, + reaping orphan
+  MAMEs in the runner.
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
   `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the
@@ -319,13 +329,19 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 _Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
 revisit) rather than active work._
 
-- [ ] **Reevaluate the `globals.c` `+mos-a16 -O1/-Os` RA-fix decision — at M2 wrap-up.** Current state
-  (2026-06-18): **keep the XFAIL.** The isolated asserts root-cause (`50a59b5`) proved there is **no targeted
-  fix** — only the general Phase-3 `Ac16`-residency rework, which is high-risk (regresses the common a16 path)
-  and low-reward (Phase 1 already captured the threading wins) for a **pathological** bug (real code is slack).
-  Revisit when M2 is closed out, or sooner if the Phase-3 `Ac16`-residency work becomes independently
-  motivated; `examples/65816/a16regpress.c` is the ready acceptance case. Full root cause:
-  [a16-regalloc-pressure-failure](docs/investigations/65816-a16-regalloc-pressure-failure.md).
+- [ ] **Reevaluate the `globals.c` `+mos-a16 -O1/-Os` RA-fix decision (Phase-3 `Ac16` residency).** Current
+  state (2026-06-20): **keep the XFAIL.** The isolated asserts root-cause (`50a59b5`) proved there is **no
+  targeted fix** — coalescing was **ruled out** (so the `shouldCoalesce` barrier is only a safety companion,
+  not the fix); only the general pre-RA `Ac16`-residency rework could clear it, and that is high-risk
+  (regresses the common a16 path / reopens the 1d crash) and low-reward (Phase 1.5 already captured the
+  threading wins) for a **pathological** bug (real code is slack). **Re-open only when** either **(a)** the
+  corpus / c-torture / fuzzer surfaces a *second independent* `regalloc-out-of-registers` (or
+  `a16-zp-pressure-overflow`) from **realistic** (not hand-reduced) code, or **(b)** the ZP-pressure baseline
+  (`dev/measure-zp-pressure.sh`) shows a real corpus function crossing **~10 of 14** `Imag16` pairs. If a
+  trigger fires, run the gated B0→B1→B2 spike (recipe in the A16-threading plan §5). Until then keep the
+  XFAIL — `examples/65816/a16regpress.c` is the ready acceptance case. Full root cause:
+  [a16-regalloc-pressure-failure](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
+  [deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
 
 
 ## Parked
