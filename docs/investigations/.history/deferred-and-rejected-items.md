@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/dcbd5de) | #321 docs: fix the dangling "(1)" in deferred/rejected-items intro |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+dcbd5de	author	Will Norris
+dcbd5de	added	7
+dcbd5de	deleted	5
+dcbd5de	files	1
+dcbd5de	body	The intro said "Three governing lessons" but listed only (2) and (3).\nAdd (1) measure-don't-assume — the load-bearing one here, since every\nrejection is a measured regression (worktree spike / corpus trigger\ncheck), not a prediction.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8006801	author	Will Norris
 8006801	added	69
 8006801	deleted	0
