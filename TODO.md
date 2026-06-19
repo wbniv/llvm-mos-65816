@@ -739,6 +739,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "standalone (zp),Y16 STORE gate" -> deliberate scope marker: the load path is the higher-value read; the
        symmetric store pseudo (STIndirYIdx16) is exercised by the fuzzer's xy16 track. Nothing open.
      fp:1fcc2870d2445ea7 fp:9b195ad521b9ffae fp:8e99366f38c84605 -->
-- [ ] **(triage)** Any functional change. Comments only. — _from [2026-06-19-fix-the-stale-skeleton-comments-in-selectxy16-rege.md](docs/plans/2026-06-19-fix-the-stale-skeleton-comments-in-selectxy16-rege.md)_  <!-- fp:93d7dc31ec1433be -->
-- [verify] **2026-06-19-fix-the-stale-skeleton-comments-in-selectxy16-rege** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-19-fix-the-stale-skeleton-comments-in-selectxy16-rege.md](docs/plans/2026-06-19-fix-the-stale-skeleton-comments-in-selectxy16-rege.md)_  <!-- fp:be0273e614032501 -->
+<!-- triaged 2026-06-19: both from the comment-fix plan, both resolved.
+     • "Any functional change. Comments only." -> the Out-of-scope marker itself (no work — the change is
+       literally comments only).
+     • the [verify] flag -> RESOLVED: the plan's "Result — VERIFIED 2026-06-19" section now records the regen
+       round-trip PASS + the comment-only 0002 diff (committed c2882b3). Nothing open.
+     fp:93d7dc31ec1433be fp:be0273e614032501 -->
 <!-- END auto-captured-deferrals -->

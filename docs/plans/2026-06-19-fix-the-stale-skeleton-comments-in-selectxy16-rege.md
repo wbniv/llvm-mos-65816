@@ -47,5 +47,15 @@
 3. `grep -c 'Xc16\|HasIndex16' patches/llvm-mos/0002-*.patch` non-zero (xy16 content intact); `grep -c 'legalizeICmp\|NativeS16Eq' …` unchanged vs before (no foreign absorption).
 4. Stage **only** `patches/llvm-mos/0002-321-accum16.patch`; verify `git diff --cached --name-only` is exactly that. Commit (no push). End with the `Co-Authored-By: Claude Opus 4.8 (1M context)` line.
 
+## Result — VERIFIED 2026-06-19
+
+- `dev/regen-patch.sh` → **round-trip PASS** ("reapplied MOS dir == live vendor"; 4123 lines, 22 files).
+- `git diff` of `0002` = **exactly the 3 comment hunks** (declaration, dispatch gate, function header) — no
+  other files, no unrelated hunks.
+- grep: `legalizeICmp|NativeS16Eq` = 9 (**unchanged** — no foreign absorption); `Xc16|HasIndex16` 105→104 and
+  `selectXY16` 9→10 are just my comment rewording (codegen content intact).
+- Committed `c2882b3` (3 files: `0002`, this plan, TODO Done entry); not pushed. No toolchain rebuild
+  (comments are inert).
+
 ## Out of scope
 - Any functional change. Comments only.
