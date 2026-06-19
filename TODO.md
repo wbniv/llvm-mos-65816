@@ -250,12 +250,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   miscompiles** (a16/xy16 wrong-value, all reproduced isolated on both emulators → `xfails.tsv`, gate
   green-modulo-known). **Remaining:** the `-Os` pass, Phase 3 sampled CI, + reaping orphan MAMEs in the runner.
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
-- [ ] **#321 root-cause the REMAINING c-torture `+mos-a16`/`+mos-xy16` miscompiles** (down from 18 → **4 real
-  + 1 false positive** after the frame-index fix cleared 13 — see Done). Each: delta-reduce → root-cause →
-  fix + regression test → remove its `xfails.tsv` row. Remaining: **`pr49419`** (a16+xy16, tree-opt; broadest
-  impact, do first), **`20041011-1`** (xy16, 64-bit `ull` + register pressure; likely fold into A16-threading
-  Phase 3), **`doloop-1`** (xy16, counted loop at `INT` limits), **`va-arg-22`** (xy16, varargs). `pr7284-1`
-  is a FALSE POSITIVE being removed by the dg-require harness refinement (↓).
+- [ ] **#321 root-cause the REMAINING c-torture miscompiles — ALL xy16 now** (down from 18 → **4**, after the
+  frame-index fix cleared 13 a16 cases + the dg-require refinement dropped the `pr7284-1` false positive, both
+  in Done). The a16 (16-bit-accumulator) track is healthy; **every remaining defect is xy16 (16-bit-index)**:
+  **`pr49419`** (hang — its a16 leg was fixed by the frame-index commit, now **xy16-only**; loop1/loop2
+  instruction-logic traces correct AND loop2 is byte-identical to the passing a16 → a runtime **X-flag /
+  index-width** bug, prime suspect the `MOSInsertREPSEP` X-flag lattice —
+  [plan](docs/plans/2026-06-19-321-c-torture-pr49419-a16-xy16-hang.md)), **`20041011-1`** (64-bit `ull` +
+  register pressure), **`doloop-1`** (counted loop at `INT` limits), **`va-arg-22`** (varargs); plus the
+  `k_isort` xy16 miscompile (↓). **Likely a shared X-flag-lattice cause** — one fix may clear several (as the
+  a16 frame-index fix cleared 13). Start by dumping MIR after `mos-insert-rep-sep` for an xy16 hang and
+  checking the X (index-width) flag state at each `lda abs,x`/`ldx`/`txa`.
   [suite plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [ ] **#321 xy16 `k_isort` miscompile (NEW — pre-existing, surfaced 2026-06-19)** — the first quiet-box run
   of the a16 suite's **xy16 leg** found `host=default=+mos-a16=0xF47A` but `+mos-xy16@MAME=0x9470`. PROVEN
