@@ -38,6 +38,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
+- [wip] **#321 `+mos-a16` s32 (`long`/`int32_t`) support — build the s32↔2×s16 path.** The Csmith fuzzer
+  (`wt/321-csmith`, 10/100 seeds, e.g. seed 11; XFAILed there as `a16-unmerge-s32`) surfaced that `+mos-a16`
+  **aborts the backend** on valid C that uses `int32_t`/`long` in s16-interacting shapes (e.g. `trunc i32→i16`):
+  `unable to legalize ... G_UNMERGE_VALUES %_(s32)`. The DEFAULT 8-bit build compiles the same program clean.
+  **Root cause (confirmed):** default narrows every s32 op to s8 bytes (no s32↔s16 boundary ever forms); under
+  `+mos-a16` **s16 is a legal type, so narrowing stops at s16** and diverts s32 into 2×s16 pieces — but the
+  s32↔s16 machinery (legalizer `G_TRUNC`/`G_ANYEXT`/`G_ZEXT`/`G_SEXT`/`G_MERGE`/`G_UNMERGE` **+** selector
+  support) doesn't exist. There is **no minimal fix**: unlocking one s32 op just exposes the next (measured:
+  unmerge→trunc→anyext→…), and you can't force s32→s8 because s16-legal blocks it — so the correctness fix *is*
+  the s32-under-a16 feature (it also delivers the i32 16-bit-chunk "optimizing payoff"). **Decision (a) INVEST**
+  (2026-06-19, project owner). Phases: P1 legalizer artifacts, P2 selector/artifact-combiner, P3 differential
+  correctness, P4 frozen-`.ll` regression + remove the XFAIL + regen `0002`.
+  [plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md).
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
