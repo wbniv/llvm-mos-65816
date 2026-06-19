@@ -755,8 +755,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • the [verify] flag -> RESOLVED: the plan's "Result — VERIFIED 2026-06-19" section now records the regen
        round-trip PASS + the comment-only 0002 diff (committed c2882b3). Nothing open.
      fp:93d7dc31ec1433be fp:be0273e614032501 -->
-- [ ] **(triage)** Random program generation (Csmith/Yarpgen) — separate axis; we already have the fuzzer. — _from [2026-06-19-321-c-torture-execute-differential-suite.md](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md)_  <!-- fp:3d23564aa9d16214 -->
-- [ ] **(triage)** `c-testsuite` stdout model — fallback only (recorded above), not built unless the GPL fetch is rejected. — _from [2026-06-19-321-c-torture-execute-differential-suite.md](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md)_  <!-- fp:9502a10868aa863f -->
-- [ ] **(triage)** Conformance *claims* — this is differential bug-finding vs the trusted default build, not an ISO — _from [2026-06-19-321-c-torture-execute-differential-suite.md](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md)_  <!-- fp:9ef5b0820dd8d148 -->
-- [ ] **(triage)** Floating-point / full-libc tests — outside the freestanding subset; filtered out. — _from [2026-06-19-321-c-torture-execute-differential-suite.md](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md)_  <!-- fp:a2b25e70c9c08d3b -->
+<!-- triaged 2026-06-19: all four are explicit "## Out of scope" NON-GOALS from the c-torture plan, not
+     deferred work — they scope the plan, nothing to track.
+     • Csmith/Yarpgen random generation -> a separate (generator) axis; we already have tools/a16_fuzz.py.
+     • c-testsuite stdout model -> recorded as the fallback if the GPL fetch is rejected; not built otherwise.
+     • Conformance claims -> deliberately disclaimed (this is differential bug-finding, not ISO certification).
+     • Floating-point / full-libc tests -> outside the freestanding subset; the Phase-0 filter excludes them.
+     fp:3d23564aa9d16214 fp:9502a10868aa863f fp:9ef5b0820dd8d148 fp:a2b25e70c9c08d3b -->
 <!-- END auto-captured-deferrals -->
