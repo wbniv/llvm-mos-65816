@@ -5,10 +5,11 @@ three governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics
 live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
-## Active worktrees (2026-06-19)
+## Active worktrees (2026-06-20)
 
 | Branch | Worktree | Task | Status |
 |--------|----------|------|--------|
+| `wt/321-frame-abi` | `/home/will/SRC/llvm-mos-65816-frame-abi` | frame-ABI head-to-head: build (a) DP-window + (b) FULL stack-relative + (c) soft-static baseline, measure size+cycles ([plan](plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)) | **ACTIVE** — Step 0 done 2026-06-20 (worktree + warm build 34 s + corpus 7/7) |
 | `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — Phases 0–4 done (s32 fixed); Phase 5 (sampled CI) open | ~~**MERGED** `dd5616b` → main 2026-06-19~~ |
 | `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~ |
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |

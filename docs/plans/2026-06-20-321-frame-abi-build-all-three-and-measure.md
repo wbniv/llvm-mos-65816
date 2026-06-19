@@ -53,12 +53,14 @@ worktree's compiler diff is discarded.
 
 ## Step 0 — set up the feature worktree (do this first)
 
-This is a **compiler-changing** feature, so unlike a host-only spike the worktree needs its **own editable
-`vendor/llvm-mos`** and a **freshly built toolchain** — the `cp -al` hardlink trick in
-[howto-feature-worktree.md](../howto-feature-worktree.md) exists to run `dev/run.sh` *without* rebuilding;
-here we rebuild because we edit the backend. Hardlink only the read-only bits we don't change (SDK,
-`jgxcheck`, bsnes-jg, BIOS — the SDK is default-built and our features are off-by-default, so it's unaffected,
-which P0 proves).
+This is a **compiler-changing** feature, so the worktree needs its **own editable `vendor/llvm-mos` +
+`vendor/llvm-mos-sdk`** and its own `build/`. The `cp -al` hardlink trick in
+[howto-feature-worktree.md](../howto-feature-worktree.md) is for running `dev/run.sh` *without* rebuilding;
+here we rebuild, so hardlinking `build/llvm-mos-install` would risk **corrupting main on rebuild-in-place**.
+Instead, **real-copy the warm `build/`** (cmake tree + the 1.8G ccache) so the first rebuild is a **fast
+incremental** (minutes), not a 30–90 min from-scratch build. This is relocatable because `dev/run.sh`
+bind-mounts the worktree as `/work` and the cmake cache uses `/work/...` paths (verified: 9 `/work` refs, 0
+host paths) — the proven `wt/321-xy16` layout (own real `vendor/` + own real `build/`).
 
 ```bash
 SLUG=frame-abi
@@ -68,22 +70,24 @@ WT="$MAIN-$SLUG"                                   # /home/will/SRC/llvm-mos-658
 # 1. Worktree off the LIVE main tip -> branch wt/321-frame-abi (hot tree: never a pinned older commit).
 git -C "$MAIN" worktree add -b "wt/321-$SLUG" "$WT" main
 
-# 2. Its OWN editable backend source — a REAL copy (not hardlinked), so edits/rebuilds stay isolated from
-#    main. vendor/ is gitignored, so the worktree starts without it.
-mkdir -p "$WT/vendor" "$WT/build"
-cp -a  "$MAIN/vendor/llvm-mos"  "$WT/vendor/"      # the LLVM/clang tree we edit + rebuild
+# 2. REAL copies of the editable backend + SDK sources (isolated edits; vendor/ is gitignored so the
+#    worktree starts without it). NOT hardlinked — we edit these.
+cp -a "$MAIN/vendor/llvm-mos"     "$WT/vendor/llvm-mos"
+cp -a "$MAIN/vendor/llvm-mos-sdk" "$WT/vendor/llvm-mos-sdk"
 
-# 3. Hardlink the read-only, unchanged bits (near-instant, shares inodes — never edit in place):
-cp -al "$MAIN/build/install"    "$WT/build/"       # SDK: mos-snes.cfg + platform libs
-cp -al "$MAIN/build/jgxcheck"   "$WT/build/"       # bsnes-jg readback harness
-cp -al "$MAIN/vendor/bsnes-jg"  "$WT/vendor/"      # bsnes-jg core + Database
-cp -al "$MAIN/dev/roms"         "$WT/dev/"         # SPC700 IPL (gitignored BIOS)
+# 3. REAL copy of the WARM build tree (cmake + ninja + ccache) -> fast incremental rebuild. Relocatable
+#    via the /work mount, so the baked /work paths resolve to whichever worktree dev/run.sh mounts.
+cp -a "$MAIN/build"               "$WT/build"
 
-# 4. Build the toolchain FRESH from the worktree's own source (30-90 min — unavoidable for a backend
-#    change; writes build/llvm-mos-install independently of main).
+# 4. bsnes-jg core + Database for the 2nd-emulator cross-check (read-only -> hardlink; jgxcheck already
+#    came in via build/ above).
+cp -al "$MAIN/vendor/bsnes-jg"    "$WT/vendor/bsnes-jg"
+cp -al "$MAIN/dev/roms"           "$WT/dev/roms"   # SPC700 IPL (gitignored BIOS), if not already present
+
+# 5. Incremental rebuild in the worktree (warm ccache -> minutes; confirms the tree builds under /work).
 cd "$WT" && dev/run.sh toolchain
 
-# 5. Sanity: the worktree compiles + runs the differential end-to-end before any edits.
+# 6. Sanity: differential end-to-end before any edits.
 dev/run.sh corpus                                  # expect 7/7
 ```
 
