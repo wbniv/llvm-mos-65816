@@ -9,7 +9,7 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
 | Branch | Worktree | Task | Status |
 |--------|----------|------|--------|
-| `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — replace the builtin generator (Phase 0 GO/NO-GO spike) | **WIP** 2026-06-19 |
+| `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — Phases 0–4 done (s32 fixed); Phase 5 (sampled CI) open | ~~**MERGED** `dd5616b` → main 2026-06-19~~ |
 | `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~ |
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |
 | `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): corpus trigger check | ~~CLOSED WON'T-DO~~ — 0/6 progs, 0 B, `f52d5b8` |
@@ -35,8 +35,11 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 - **Emulator / differential tests** (Docker; **run on a QUIET box** — concurrent docker/MAME load flakes
   MAME's settle window → false failures that pass on re-run): `dev/run.sh <name>`. The a16 suite:
   `for f in dev/a16*.sh dev/k_*.sh; do dev/run.sh "$(basename "$f" .sh)"; done`. Corpus:
-  `dev/run.sh corpus` (expect `7/7`). Differential fuzzer: `dev/run.sh fuzz 50 1` (expect
-  `50/50, 0 mismatch, 0 new-crash`).
+  `dev/run.sh corpus` (expect `7/7`). Differential fuzzer: `dev/run.sh fuzz [--gen csmith|builtin] [N] [seed]`
+  (**Csmith is now the default**; builtin selectable via `--gen builtin`). With Csmith: expect `0 mismatch,
+  0 crash` — a handful of seeds legitimately SKIP (Csmith `main` diverges before `corpus_result` is set,
+  so `--gc-sections` drops it). Example: `dev/run.sh fuzz 50 1` → `~46 PASS, 0 xfail, ~4 skip (0 mismatch)`
+  on seeds 1–50. Builtin (all 4-way oracle): `dev/run.sh fuzz --gen builtin 50 1` (expect `50/50, 0 mismatch`).
   - **The "QUIET box" rule is a MAME/fuzzer rule, not a bsnes-jg one.** The **bsnes-jg leg** (`build/jgxcheck`)
     is *deterministic* — fixed frame count + direct WRAM read, no Lua bridge / settle window — so its
     verdict is load-insensitive (and it needs no SPC700 BIOS). A **bsnes-jg-only** confirmation of the
@@ -129,7 +132,8 @@ Line numbers drift because `vendor/` is edited by multiple agents — **grep for
 Under `vendor/llvm-mos/llvm/lib/Target/MOS/`:
 
 - `MOSLegalizerInfo.cpp` — GISel legalization: `legalizeICmp`, `legalizeAddSub`, `legalizeLoadStore16`, the
-  `+mos-a16` gates (e.g. `NativeS16Eq`).
+  `+mos-a16` gates (e.g. `NativeS16Eq`); also the four `hasAccum16()`-gated s32↔s16 rules
+  (`G_ANYEXT`/`G_TRUNC`/`G_MERGE_VALUES`/`G_UNMERGE_VALUES`) so `+mos-a16` handles `int32_t`/`long`.
 - `MOSInstructionSelector.cpp` — selection: `select*`, the `m_CmpNZ*` / `CmpNZ*_match` matchers, operand-fold
   helpers (`getImm16Operand`, `foldableAbsLoad16`).
 - `MOSInstrPseudos.td` + `MOSInstrInfo.cpp` — pseudos: `CmpBrImag16` (Imag16-resident LHS),
