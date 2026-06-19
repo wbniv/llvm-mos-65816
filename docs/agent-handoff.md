@@ -5,10 +5,11 @@ three governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics
 live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
-## Active worktrees (2026-06-18)
+## Active worktrees (2026-06-19)
 
 | Branch | Worktree | Task | Status |
 |--------|----------|------|--------|
+| `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — replace the builtin generator (Phase 0 GO/NO-GO spike) | **WIP** 2026-06-19 |
 | `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~ |
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |
 | `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): corpus trigger check | ~~CLOSED WON'T-DO~~ — 0/6 progs, 0 B, `f52d5b8` |
@@ -36,6 +37,17 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
   `for f in dev/a16*.sh dev/k_*.sh; do dev/run.sh "$(basename "$f" .sh)"; done`. Corpus:
   `dev/run.sh corpus` (expect `7/7`). Differential fuzzer: `dev/run.sh fuzz 50 1` (expect
   `50/50, 0 mismatch, 0 new-crash`).
+  - **The "QUIET box" rule is a MAME/fuzzer rule, not a bsnes-jg one.** The **bsnes-jg leg** (`build/jgxcheck`)
+    is *deterministic* — fixed frame count + direct WRAM read, no Lua bridge / settle window — so its
+    verdict is load-insensitive (and it needs no SPC700 BIOS). A **bsnes-jg-only** confirmation of the
+    second oracle can therefore run on a contended box; run it **serial** (one core) to stay a light
+    neighbor to any concurrent MAME. Today the jgxcheck leg only runs *after* MAME inside each
+    `dev/a16*.sh`; the planned MAME-skipping `JG_ONLY` guard + `dev/run.sh xcheck-suite` makes the
+    second-emulator-only pass a first-class target —
+    [plan](plans/2026-06-19-second-emulator-jg-only-confirmation.md).
+- **Running `dev/run.sh` from a feature worktree** (the Docker run mounts a single root, so the `CLAUDE.md`
+  env-override trick is host-side only): hardlink the prebuilt `build/` in with `cp -al` — full procedure in
+  [`howto-feature-worktree.md`](howto-feature-worktree.md).
 - **External C suite (gcc c-torture, host-only Phase 0):** `dev/fetch-torture.sh` (pinned gcc-14.2.0,
   sha256-verified → gitignored `vendor/c-torture/`), then
   `FUZZ_ROOT=$PWD MOS_TOOLCHAIN=$PWD/build/llvm-mos-install python3 tools/torture_filter.py` partitions the

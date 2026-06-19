@@ -234,6 +234,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
+- [ ] **#321 bsnes-jg-only confirmation runner (`dev/run.sh xcheck-suite`).** A MAME-skipping `JG_ONLY`
+  pass over the value-differential micro-tests, so the **second emulator** can be exercised cheaply and
+  deterministically without booting MAME (the flaky leg) — runnable on a contended box, serial/niced.
+  Design: a `JG_ONLY` guard in `dev/_emu.sh` (`run_assert`/`require_bios` no-op when set) +
+  `dev/xcheck-suite.sh`. Motivated by confirming recent **xy16** codegen on bsnes-jg — coverage is
+  already complete (all 4 value-level xy16 tests carry a jgxcheck leg; `xy16spill` is a compile-only
+  `-verify-machineinstrs` gate, not a gap); what's unknown is the last actual *run*, which only a run
+  settles. The bsnes-jg leg is deterministic, so this needs **no** quiet box (unlike MAME/`fuzz`). Pure
+  harness tooling — no codegen/`vendor`/`0002` change.
+  [plan](docs/plans/2026-06-19-second-emulator-jg-only-confirmation.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
   into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
