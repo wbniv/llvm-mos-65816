@@ -127,7 +127,7 @@ The build/A-B harness selects strategies via the existing `-Xclang -target-featu
 
 | Phase | Deliverable | Gate to proceed |
 |---|---|---|
-| **P0** | Features + `frameStrategy()` tri-state + **inert** branch scaffolding | **Byte-identical default**: corpus+kernels `llvm-objdump -d` unchanged vs pre-change (the key guardrail) |
+| ~~**P0**~~ **DONE** | Features (`+mos-dp-frame`/`+mos-sr-frame`, off by default) + `frameStrategy()` tri-state plumbing. *(Branch-point switches deferred to A1/B with their logic — empty fall-through switches in hot functions are pure risk for zero value.)* | ✅ **Byte-identical default** — corpus+kernels default+a16 disasm 24/24 identical across the feature add (`dev/frameabi-byte-identical.sh`); features recognized + inert; corpus 7/7. Worktree `c2eaf61`. |
 | **P1** | Cycle infra: `dev/probe-cycles.lua` reachability probe + sentinel protocol + `dev/measure-frame-abi.sh` (size, 4-way) | MAME `total_cycles()` reachable (else adopt frame-count proxy fallback) |
 | **A0** | **DP-collision resolution** + hand-written `.s` proof ROM + a `canUseDPWindow` eligibility rule | Collision provably avoided at runtime on MAME+bsnes with a *clean* eligibility rule — **else STOP and report "(a) can't safely layer on the fixed-ZP model" as the finding** |
 | **A1–A2** | `D` register modeled (**reserved**, not allocatable) + `tsc;[sec;sbc #sz;tcs;]phd;tcd` prologue / `pld` epilogue (FrameSetup/Destroy flags) | `dev/run.sh crt0native` still PASS with a DP-window fn in the call chain |
