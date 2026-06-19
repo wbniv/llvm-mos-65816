@@ -269,18 +269,23 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   quiet box (concurrent MAME load flakes the settle window). **VERIFIED 2026-06-19** —
   arith/control/arrays/structs/funcs PASS, `globals` XFAIL, exit 0; default `corpus` still 7/7.
   [plan](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md).
-- [verify] **Wire `corpus-a16` into CI** — **IMPLEMENTED + YAML-validated locally 2026-06-19**; a green CI
-  dispatch is the remaining confirmation (heavy + user-triggered, mirrors the `xcheck`-into-CI item). Added a
-  SPC700-secret step + a gated `corpus-a16` step to `smoke.yml`'s `xcheck` job (which already builds the
-  from-source toolchain, SDK, and bsnes-jg). Verify with `gh workflow run snes-smoke && gh run watch` (needs
-  the `SNES_SPC700_ROM_B64` secret; expect the `xcheck` job to run the bsnes cross-check **and** `corpus-a16`
-  → `5/6 passed, 1 xfail`). [plan](docs/plans/2026-06-19-321-corpus-a16-ci.md).
-- [verify] **Wire the bsnes-jg `xcheck` into CI** — implemented + YAML-validated; a green CI dispatch
-  is the remaining confirmation (heavy, user-triggered: the from-source toolchain build is ~30–90 min).
+- [verify] **Wire `corpus-a16` into CI** — **IMPLEMENTED + local-verify DONE 2026-06-19**; only a green CI
+  dispatch remains (heavy + user-triggered). Added a SPC700-secret step + a gated `corpus-a16` step to
+  `smoke.yml`'s `xcheck` job (which already builds the from-source toolchain, SDK, and bsnes-jg). Local
+  verify: YAML parse + no-behavior-change PASS; the `dev/run.sh corpus-a16` command itself is green per the
+  differential-mode item above. **Never yet run in CI** — the last green run (`27475871789`, 2026-06-13,
+  ~1.5 min) is the *old* smoke-only workflow, predating this step. The `SNES_SPC700_ROM_B64` secret is
+  **already set**, so the single remaining action is: `gh workflow run snes-smoke && gh run watch` (expect
+  the `xcheck` job to run the bsnes cross-check **and** `corpus-a16` → `5/6 passed, 1 xfail`).
+  [plan](docs/plans/2026-06-19-321-corpus-a16-ci.md).
+- [verify] **Wire the bsnes-jg `xcheck` into CI** — **implemented + local-verify DONE 2026-06-19**; only a
+  green CI dispatch remains (heavy, user-triggered: the from-source toolchain build is ~30–90 min cold).
   Added an `xcheck` job to `smoke.yml` (parallel to `smoke`): builds the from-source patched toolchain
   (cached via `actions/cache@v5`, keyed on the backend patches; skipped on hit) + the snes-far SDK,
-  then `dev/run.sh xcheck` on bsnes-jg. Runs unconditionally (no SPC700 secret needed). Verify with
-  `gh workflow run snes-smoke && gh run watch` (cold then warm).
+  then `dev/run.sh xcheck` on bsnes-jg (no SPC700 secret needed). Local verify: YAML valid + `dev/run.sh
+  xcheck` re-ran green (hello 0x42, far-run/far-bank1 0xF3, exit 0; evidence in the plan). The heavy
+  `xcheck` job has **never run in CI** (the 2026-06-13 green run was the old smoke-only workflow). Single
+  remaining action: `gh workflow run snes-smoke && gh run watch` (cold then warm).
   [plan](docs/plans/2026-06-15-wire-bsnes-jg-xcheck-into-ci.md) ·
   [second-emulator plan](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
 - [verify] **M1 toolchain incremental-rebuild time not yet measured** — the from-source plan's

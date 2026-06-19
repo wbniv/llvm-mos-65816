@@ -83,8 +83,15 @@ dev/run.sh xcheck
 ```
 Expect the final line: `RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)`.
 ```
-(paste raw output here; PASS/FAIL)
+$ dev/run.sh xcheck   # toolchain + snes-far SDK already built; bsnes-jg only, no MAME (2026-06-19)
+==> bsnes-jg cross-check (independent of MAME)
+  PASS  hello.sfc:     SMOKE: PASS off=0x20  len=1 got=0x42 (ran 180 frames, bsnes-jg)
+  PASS  far-run.sfc:   SMOKE: PASS off=0x200 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  far-bank1.sfc: SMOKE: PASS off=0x200 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)
+XCHECK-EXIT=0
 ```
+**PASS** (2026-06-19) — the exact command CI's `bsnes-jg cross-check` step runs is green locally.
 
 ### 2. Workflow is valid YAML / lints.
 ```
