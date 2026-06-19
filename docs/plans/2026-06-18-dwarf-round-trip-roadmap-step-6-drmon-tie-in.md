@@ -36,6 +36,7 @@ still authored now; only the fixture/end-to-end test wait on the compiler fix.
 | 4 | **Phase C** — drmon end-to-end: breakpoint on real `-g` ROM in MAME | drdevtools | Steps 1, 3 | ✅ **DONE — 6/6, 3 runs** |
 | — | **⏸ PAUSE FOR REVIEW** — stop here; hand back for review before any `vendor/` edits | — | Steps 1–4 done | **◀ HERE** |
 | 5 | **Phase A** — DWARF regression tests (`dev/run.sh dwarf` + staged lit) | llvm-mos-65816 | review sign-off | ✅ **DONE — gate 7/7, lit verified** |
+| 6 | **`<output>.elf` doc note** — draft the undocumented-companion upstream note | llvm-mos-65816, **docs-only** | Step 5 | ✅ **DONE 2026-06-19 — drafted + both gates re-verified** |
 
 (The table has a 5th "status" column now.) Steps 1–4 are the "as much drmon as possible" block. **Stop
 and hand back for review after Step 4** — do **not** begin Step 5 (the only compiler-source work) until
@@ -403,6 +404,60 @@ foreign patch's hunks before staging.
 
 ---
 
+## Step 6 — `<output>.elf` doc note (llvm-mos-65816; docs-only) — ✅ DONE (2026-06-19)
+
+The last residual flagged by Step 5/A1b ("the single remaining upstream-worthy note: *document* that
+`<output>.elf` is the debugger artifact") existed only as a *description* — the lit-test ("test") half of
+the step-6 contribution was drafted, but the doc-note ("docs") half had no concrete artifact. Drafted it:
+
+- **[`docs/321-upstream-dwarf-output-elf-companion.md`](../321-upstream-dwarf-output-elf-companion.md)** —
+  upstream doc note in the house artifact format (status block, metadata table, title, summary,
+  source-quoted mechanism, the SNES instance, the recommended documentation-only change, and the bundled
+  *test+docs* `gh pr create`). Cites the exact emission points — `lld/ELF/Writer.cpp` `writeFile()`
+  (`outputFile += ".elf"` when `ctx.script->outputFormat` is non-empty) and `writeCustomOutputFormat()`
+  (the flat-image pass) — and frames the behavior as **general to every `OUTPUT_FORMAT { FULL/TRIM }`
+  platform** (nes-*, atari8-cart-*, supervision, …), not 65816-specific.
+- **No upstream *behavior* change** — `<output>.elf` already works; the note proposes only a `Writer.cpp`
+  source comment + an SDK doc sentence (both maintainer territory). **No `vendor/` edit here** (the note is
+  the rationale + ready-to-apply snippet); nothing to regen in `0002`.
+- **`docs/upstream-contribution-status.md`** updated: the DWARF item moves from *Future/blocked* to
+  *Ready to post now* (both halves drafted) with the bundled test+docs PR command; **TODO.md** DWARF
+  bullet's "Left:" line updated.
+
+### Step 6 — Verification (re-ran both step-5 gates on the current tree; 2026-06-19)
+
+**V1. Staged lit test — all four `RUN:` lines pass** (manual `llc | llvm-dwarfdump | FileCheck`, since
+full `llvm-lit` lacks `count`/`not` here):
+```
+$ T=dev/lit/DebugInfo/MOS/dwarf-65816.ll
+$ build/llvm-mos/bin/llc --filetype=obj -mtriple=mos -mcpu=mosw65816 -o /tmp/lit.o "$T"          # OK
+$ build/llvm-mos-install/bin/llvm-dwarfdump --debug-info /tmp/lit.o | build/llvm-mos/bin/FileCheck "$T"                       # CHECK PASS
+$ build/llvm-mos-install/bin/llvm-dwarfdump --debug-line /tmp/lit.o | build/llvm-mos/bin/FileCheck "$T" --check-prefix=LINE   # LINE PASS
+$ build/llvm-mos-install/bin/llvm-dwarfdump --verify    /tmp/lit.o
+… Verifying .debug_line... Verifying .debug_str_offsets...
+No errors.
+```
+**PASS** — CHECK + LINE + `--verify` clean.
+
+**V2. `dev/run.sh dwarf` — end-to-end gate 7/7** (real `--config -g` build, companion ELF asserted):
+```
+==> 1. ld.lld emitted the DWARF companion <output>.elf   PASS: companion dwarf-a16local.sfc.elf exists and has .debug_info
+==> 2. llvm-dwarfdump --verify is clean                  PASS: --verify: No errors
+==> 3. compile unit addr_size = 0x04                     PASS: addr_size = 0x04
+==> 4. main DW_AT_frame_base = DW_OP_regx RS0            PASS: frame_base = DW_OP_regx RS0
+==> 5. 16-bit local 't' has a DW_OP_regx location        PASS: local 't' has DW_AT_location with DW_OP_regx RSn
+==> 6. DW_TAG_subprogram main has low_pc + high_pc       PASS: subprogram has low_pc + high_pc
+==> 7. .debug_line maps a16local.c with end_sequence     PASS: line table has 8 rows + end_sequence
+RESULT: PASS — -g DWARF is correct + the <output>.elf debug companion is emitted
+```
+**PASS** — 7/7, the companion `.elf` (the doc note's subject) is emitted and `--verify`-clean.
+
+ROADMAP step 6 is now **complete on the compiler side**: implementation + the durable in-repo guard
+(`dev/run.sh dwarf`) + both upstream-PR halves (lit test + doc note) drafted and re-verified. Only
+user-triggered upstream *posting* remains.
+
+---
+
 ## Critical Files
 
 | Repo | File | Change |
@@ -416,7 +471,8 @@ foreign patch's hunks before staging.
 | drdevtools | `devsys/tools/drmon/linux/dap/session.cpp` | +loadElf in dispatch chain |
 | drdevtools | `devsys/tools/drmon/linux/dap/test_symbols.py` | +ELF test case |
 | drdevtools | `devsys/tools/drmon/linux/test-roms/{a16local.c,a16local.sfc,a16local.sfc.elf}` + `make-fixture.sh` | **new** — committed fixtures (ROM + auto-emitted DWARF companion) |
-| llvm-mos-65816 | `vendor/llvm-mos/llvm/test/DebugInfo/MOS/dwarf-65816-*.ll` | **new** tests (Step 5/A2) |
+| llvm-mos-65816 | `dev/lit/DebugInfo/MOS/dwarf-65816.ll` (+ `dev/lit/README.md`) | **new** staged lit test (Step 5; the `vendor/llvm-mos/llvm/test/` form is the drop-in target) |
+| llvm-mos-65816 | `docs/321-upstream-dwarf-output-elf-companion.md` | **new** `<output>.elf` doc note (Step 6) — the *docs* half of the test+docs PR |
 | ~~llvm-mos-sdk~~ | ~~`snes/lib/link-debug.ld` + `mos-snes-debug.cfg`~~ | ~~debug-ELF emission~~ **withdrawn** — `<rom>.elf` companion already exists |
 | llvm-mos-65816 | ~~`MOS{LegalizerInfo,InsertREPSEP}.cpp`~~ | ~~emission fix~~ **not needed** (Step 1 clean) |
 | llvm-mos-65816 | `patches/llvm-mos/0002-321-accum16.patch` | Regenerate only if a vendor `.cpp`/`.td` changes |

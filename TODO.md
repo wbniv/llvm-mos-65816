@@ -224,8 +224,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   loads + attaches + source breakpoint on `a16local.c:17` **verifies** (abs path → DWARF basename →
   `$8074`; screenshots in the Phase-3 Tier-3 plan). The GUI exercise found + fixed two drmon adapter bugs
   (attach-flow stops; `stackTrace` source-line map); the full halt→source-map sequence is verified
-  headlessly (`task test-dap` `phasec` 8/8). **Implementation + verification complete.** Left: only
-  user-triggered upstream posting (lit test + `<output>.elf` doc note).
+  headlessly (`task test-dap` `phasec` 8/8). **Step 6 DONE (2026-06-19):** the `<output>.elf` doc note is
+  now drafted (`docs/321-upstream-dwarf-output-elf-companion.md` — undocumented companion `.elf` for any
+  `OUTPUT_FORMAT { FULL/TRIM }` link), so **both** upstream-PR halves exist; both step-5 gates re-verified
+  (lit 4/4 RUN lines, `dev/run.sh dwarf` 7/7). Promoted in `upstream-contribution-status.md` to *Ready to
+  post now #5* (bundled test+docs PR). **Implementation + verification complete.** Left: only the
+  user-triggered upstream *posting*.
   [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
 
 ### Test Bench / CI
@@ -297,6 +301,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   Draft + exact `gh issue create` in [upstream-contribution-status](docs/upstream-contribution-status.md)
   (item 4) · body [docs/321-upstream-scavenger-nz-issue.md](docs/321-upstream-scavenger-nz-issue.md) ·
   [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md).
+- [ ] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Bundle the staged lit test
+  [`dev/lit/DebugInfo/MOS/dwarf-65816.ll`](dev/lit/DebugInfo/MOS/dwarf-65816.ll) (drop into
+  `llvm/test/DebugInfo/MOS/`) with the `<output>.elf` doc note + documentation-only `lld/ELF/Writer.cpp`
+  comment. 65816 DWARF content is already correct (no codegen change); both step-5 gates green
+  (`dev/run.sh dwarf` 7/7). Draft + exact `gh pr create` in
+  [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
+  [docs/321-upstream-dwarf-output-elf-companion.md](docs/321-upstream-dwarf-output-elf-companion.md).
 
 
 ## Watch

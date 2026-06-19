@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/fd80f89) | #321 DWARF step 6: record VS Code GUI confirmation (live halt+highlight) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/cc940f1) | #321 DWARF step 6 — Step 5: regression tests (dev/run.sh dwarf + staged lit) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/e609de4) | #321 DWARF step 6: correct the debug-ELF finding (companion exists) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/98a4340) | #321 DWARF step 6: record Steps 3-4 done (Phase B loader + Phase C end-to-end) |
@@ -7,6 +8,11 @@
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/fdd1fd4) | #321 DWARF round-trip (step 6): drmon-first plan + Step-1 audit (CLEAN) |
 
 <!--history-meta v1
+fd80f89	author	Will Norris
+fd80f89	added	10
+fd80f89	deleted	2
+fd80f89	files	1
+fd80f89	body	Tier-3 V6 confirmed live in VS Code (drdevtools 036b091): source breakpoint on\na16local.c:17 fires -> CPU halts at PC=$8074 -> VS Code highlights line 17 (CALL\nSTACK mapped to a16local.c:17, A=0x1122). The GUI exercise found + fixed two\ndrmon adapter bugs (#5 configurationDone bridge-go on attach; #6 stackTrace PC->\nsource mapping), both regression-tested by phasec 8/8. Screenshots + detail in\nthe drdevtools Phase-3 Tier-3 plan.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 cc940f1	author	Will Norris
 cc940f1	added	21
 cc940f1	deleted	4

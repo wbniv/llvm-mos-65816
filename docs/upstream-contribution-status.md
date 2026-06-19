@@ -1,6 +1,7 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-17 (verified against GitHub — see *Verified state* + *Refresh* below).
+**Last updated:** 2026-06-19 (DWARF *test+docs* promoted Future→Ready — both halves now drafted; GitHub
+open-count last verified 2026-06-17, see *Verified state* + *Refresh* below).
 
 A standing snapshot of every upstream-facing contribution from this fork: what is **drafted and ready to
 post**, what is **future/blocked**, and what GitHub actually shows right now. All posting is **user-triggered**
@@ -8,12 +9,11 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 ## TL;DR
 
-- **Ready to post now: 1 PR + 2 issues + 1 design note** — four artifacts, all drafted, all one command/paste away.
-  Strictly *PRs*, that's **one** (F4).
+- **Ready to post now: 2 PRs + 2 issues + 1 design note** — five artifacts, all drafted, all one command/paste away.
+  Strictly *PRs*, that's **two** (F4; and the DWARF step-6 test+docs).
 - **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
-  llvm-mos-sdk#415 engagement (someone else's existing PR). Plus a **drafted-and-staged** test+docs item
-  (ROADMAP step 6 DWARF: lit test in `dev/lit/` + `<output>.elf` doc note) — small, postable any time.
+  llvm-mos-sdk#415 engagement (someone else's existing PR).
 - **Hygiene: 1 stale fork branch** to delete (`revert-540-…`, references an already-merged upstream PR).
 
 ## Ready to post now
@@ -23,8 +23,10 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 | 1 | **F4** — `mos-late-opt` TYX/TXY dead-flag fix | **PR** | Clears dead/kill flags when rewriting `LDImm`→TYX/TXY (verifier reject on reentrant `+mos-a16`) | [`docs/321-upstream-late-opt-txy-pr.md`](321-upstream-late-opt-txy-pr.md) | `wbniv:mos-late-opt-txy-dead-flag` (pushed) |
 | 2 | **P3** — `reentrant` can't force the soft stack | **issue** | Latent footgun: `__attribute__((reentrant))` is a no-op for non-recursive fns (MOSNonReentrant re-stamps `nonreentrant`) | [`docs/321-upstream-reentrant-soft-stack-issue.md`](321-upstream-reentrant-soft-stack-issue.md) | n/a (issue) |
 | 3 | **#320** — far-pointer design note | **note** | Opens the five-address-space ABI-blessing discussion (a Discord/#320 post, not a code change) | [`docs/320-upstream-far-pointer-note.md`](320-upstream-far-pointer-note.md) | n/a (note) |
+| 4 | **scavenger N/Z-liveness** — `saveScavengerRegister` asserts N/Z dead | **issue** | Upstream crash: a compare/ALU flag live across a frame-vreg spill → illegal `STImag8 $p` (no fork patch — maintainer territory) | [`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md) | n/a (issue) |
+| 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | n/a (not pushed yet) |
 
-### 1 — F4 PR (the only actual PR)
+### 1 — F4 PR (a code-change PR; #5 DWARF is the other)
 
 Branch `wbniv/llvm-mos:mos-late-opt-txy-dead-flag` (commit `f690dc886`, branched from `c798c3141`, a clean
 ancestor of upstream `main`) is pushed; the body is drafted. Also carried locally as
@@ -71,6 +73,34 @@ gh issue create --repo llvm-mos/llvm-mos \
 
 Full internal analysis: [`docs/investigations/65816-a16-scavenger-nz-liveness.md`](investigations/65816-a16-scavenger-nz-liveness.md).
 
+### 5 — DWARF step-6 *test + docs* PR
+
+The 65816 DWARF *content* is already correct upstream — **no codegen change** (Step-1 audit clean,
+2026-06-18; re-verified 2026-06-19). Two drafted halves guard + document it, bundled as one PR:
+
+- **test:** [`dev/lit/DebugInfo/MOS/dwarf-65816.ll`](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) — pins the
+  65816 DWARF shapes (`addr_size 0x04`, `DW_AT_frame_base = DW_OP_regx RS0`, a 16-bit local in an
+  imaginary-register pair `DW_OP_regx RSn`, line table, `--verify` clean). Verified by its manual
+  `llc | llvm-dwarfdump | FileCheck` pipeline (full `llvm-lit` needs `count`/`not`, unbuilt here). Drops
+  into `llvm/test/DebugInfo/MOS/`.
+- **docs:** [`docs/321-upstream-dwarf-output-elf-companion.md`](321-upstream-dwarf-output-elf-companion.md)
+  — documents that `ld.lld` writes a `<output>.elf` DWARF companion beside the flat ROM for **any**
+  `OUTPUT_FORMAT { FULL/TRIM }` link (undocumented today; it's the artifact a source-level debugger loads).
+  Proposes a documentation-only `lld/ELF/Writer.cpp` comment + an SDK doc sentence — **no behavior change**.
+
+The durable in-repo guard is **`dev/run.sh dwarf`** (7/7, real `--config -g` build, companion-ELF
+asserted). **No fork patch carried** (the lit test is a drop-in; the doc comment is maintainer territory).
+Post it (after dropping the test in + adding the comment in a clean `wbniv/llvm-mos` checkout off `main`):
+
+```
+gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-dwarf-65816-test-docs --base main \
+  --title "[MOS] DebugInfo/MOS: 65816 DWARF test + document the <output>.elf companion" \
+  --body-file docs/321-upstream-dwarf-output-elf-companion.md   # strip the status block first
+```
+
+May also split: the lit test alone is a pure backend-test PR; the `<output>.elf` documentation is a
+separate `lld`/SDK docs change. See [DWARF round-trip plan, Step 6](plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
+
 ## Future / blocked (not yet postable — do **not** count these as pending)
 
 - **#320 five-address-space model + PR.** The real far-pointer codegen PR (asiekierka's 32-bit-default /
@@ -80,13 +110,9 @@ Full internal analysis: [`docs/investigations/65816-a16-scavenger-nz-liveness.md
   his `snesxc` reg lib + multi-bank linker, contribute our native-mode crt0 + dual-emulator CI on top). This
   is *engaging someone else's PR*, not opening our own. Strategy in
   [`docs/415-snes-target-reconciliation.md`](415-snes-target-reconciliation.md).
-- **DWARF regression test + `<output>.elf` doc note (ROADMAP step 6).** The 65816 DWARF *content* is already
-  correct upstream (no codegen change needed — verified 2026-06-18). Two small, drafted contributions guard
-  and document it: (1) a lit test [`dev/lit/DebugInfo/MOS/dwarf-65816.ll`](../dev/lit/DebugInfo/MOS/dwarf-65816.ll)
-  — verified locally via `llc | llvm-dwarfdump | FileCheck` (full `llvm-lit` needs `count`/`not`, unbuilt
-  here) — to drop into `llvm/test/DebugInfo/MOS/`; (2) a doc note that `ld.lld` writes a `<output>.elf` DWARF
-  companion beside the `FULL(rom)` ROM (undocumented today; it's the artifact a source-level debugger loads).
-  Bundle as a test+docs PR when desired. The durable in-repo guard is `dev/run.sh dwarf`.
+
+> *(The ROADMAP-step-6 DWARF **test + docs** item moved up to **Ready to post now #5** on 2026-06-19 —
+> both halves are now drafted: the staged lit test + the `<output>.elf` doc note.)*
 
 ## Hygiene — stale fork branch
 
