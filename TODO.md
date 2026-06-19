@@ -215,6 +215,21 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   upstream posture — post the prior-art note + a first-pass CC to #321 (user-triggered; see Upstream section).
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
+- [ ] **#321 frame-ABI head-to-head — build ALL THREE frames and measure (revives the (a)/(b) fork the proxy
+  shelved).** The frame fork above was settled on an **indirect** ZP-pressure proxy: (a) TCD DP-window deferred,
+  (b) pure stack-relative ruled out **on paper**. Per lesson #1 (measure, don't assume), build all three to
+  production quality — **(a) DP-window + (b) FULL stack-relative + (c) soft-static baseline** — selectable via
+  off-by-default subtarget features (`+mos-dp-frame`/`+mos-sr-frame`, default byte-identical), and run a
+  rigorous three-way head-to-head: **code size + real MAME cycle counts (new `dev/probe-cycles.lua` +
+  sentinel protocol) + the 4-way differential**, on corpus+kernels in 16-bit-ambient context. **Central trap:
+  the DP-collision** — the SNES linker hard-fixes `__rc*` at ZP `$00–$1F` and 65816 ZP addressing is
+  DP-relative, so `D≠0` silently retargets every `lda __rcN` (A0 is the make-or-break gate). Runs on a
+  **`wt/321-frame-abi` feature worktree** (own editable `vendor/llvm-mos` + fresh toolchain). **Pre-registered
+  go/no-go**: (a) lands only if it wins cycles ≥~10% on multiple programs with ≤~2% size cost; else
+  CONFIRMED-shelved. **A NULL result is the expected, upstream-strengthening conclusion** (it upgrades the
+  proxy shelving to a direct-metric one) and feeds the user-triggered #321 CC posting. Durable artifacts (the
+  harness + decision record) merge back regardless; the (a)/(b) compiler diff lands in `0002` only if it
+  clears the bar. [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
 
 ### Test Bench / CI
 
@@ -815,4 +830,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "The other two XFALs keep their own TODO bullets" -> already true: `scavenger-p-not-gpr` and
        `a16-zp-pressure-overflow` each have their own curated M2 bullets. Nothing open.
      fp:fd9f6337217bdfdf fp:d23acc84e2e4c0bd -->
+- [ ] **(triage)** **Not** changing argument passing (stays imaginary-register first-pass) or the A/X return convention — _from [2026-06-20-321-frame-abi-build-all-three-and-measure.md](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)_  <!-- fp:29fde811ff5d23b8 -->
+- [ ] **(triage)** **Not** auto-merging (a)/(b): landing is gated on the pre-registered bar; the default expectation is a — _from [2026-06-20-321-frame-abi-build-all-three-and-measure.md](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)_  <!-- fp:45ce4d0c0263904b -->
+- [ ] **(triage)** **Not** posting upstream from this plan — the evidence paragraph is *prepared*; posting is user-triggered. — _from [2026-06-20-321-frame-abi-build-all-three-and-measure.md](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)_  <!-- fp:ad37a4514712de70 -->
 <!-- END auto-captured-deferrals -->
