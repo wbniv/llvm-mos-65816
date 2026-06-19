@@ -134,6 +134,12 @@ def load_inscope():
 
 
 def main():
+    # Line-buffer stdout so a long run's per-test lines stream to a redirected log in real time
+    # (Python block-buffers to a pipe by default, which hides progress for hours).
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except Exception:
+        pass
     ap = argparse.ArgumentParser(description="Phase-1 differential runner for gcc c-torture/execute")
     ap.add_argument("count", nargs="?", type=int, default=30, help="number of in-scope tests (default 30)")
     ap.add_argument("--opt", default="-Os", help="optimization level (default -Os)")
