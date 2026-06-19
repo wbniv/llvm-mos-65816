@@ -36,6 +36,12 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
   `for f in dev/a16*.sh dev/k_*.sh; do dev/run.sh "$(basename "$f" .sh)"; done`. Corpus:
   `dev/run.sh corpus` (expect `7/7`). Differential fuzzer: `dev/run.sh fuzz 50 1` (expect
   `50/50, 0 mismatch, 0 new-crash`).
+- **External C suite (gcc c-torture, host-only Phase 0):** `dev/fetch-torture.sh` (pinned gcc-14.2.0,
+  sha256-verified → gitignored `vendor/c-torture/`), then
+  `FUZZ_ROOT=$PWD MOS_TOOLCHAIN=$PWD/build/llvm-mos-install python3 tools/torture_filter.py` partitions the
+  1656 tests into `examples/65816/torture/{inscope,unsupported}.tsv` (1253 in-scope). `mos-clang` runs
+  **directly on the host** (no Docker) — fast for compile-only filtering. The emulator differential runner
+  is Phase 1. [plan](plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - Long ops: background them and monitor; don't block on `sleep`.
 
 ## The correctness gate + micro-test pattern
