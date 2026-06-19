@@ -66,8 +66,36 @@ Commit message: `repo: add Apache-2.0 LICENSE, NOTICE, refresh README to M2, git
 
 ## Verification
 
-- `grep -c "Apache" LICENSE` → non-zero
-- `head -3 NOTICE` → shows project name + copyright
-- `grep "M2" README.md` → hits the new Status section
-- `grep "transcripts" .gitignore` → present
-- `git diff --cached --name-only` → exactly `LICENSE NOTICE README.md .gitignore`
+1. `grep -c "Apache" LICENSE` → non-zero
+
+```
+4
+```
+PASS
+
+2. `head -3 NOTICE` → shows project name + copyright
+
+```
+llvm-mos-65816
+Copyright 2026 Will Norris
+
+```
+PASS
+
+3. `grep "M2" README.md` → hits the new Status section
+
+```
+**M2 — 16-bit accumulator codegen: in progress.** `+mos-a16` enables the 65816's
+the regression net for when M1/M2 change codegen — same source must keep producing the
+```
+PASS
+
+4. `grep "transcripts" .gitignore` → present
+
+```
+# Internal session transcripts (never commit).
+docs/transcripts/
+```
+PASS
+
+All steps PASS — committed 181af86.

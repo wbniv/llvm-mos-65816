@@ -36,11 +36,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [Inc 2 plan](docs/plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md),
   [Inc 2b plan](docs/plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md).
 
-### Housekeeping
-
-- [wip] **Pre-public polish** — Apache-2.0 LICENSE + NOTICE, README → M2, gitignore transcripts.
-  [Plan](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md).
-
 ### M2 — Optimizing Payoff
 
 - [wip] **#321 `+mos-a16` s32 (`long`/`int32_t`) support — build the s32↔2×s16 path.** The Csmith fuzzer
@@ -373,6 +368,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-19 — [pre-public-polish] **Repo: Apache-2.0 LICENSE + NOTICE, README → M2, gitignore transcripts.** All four steps PASS (181af86). [plan](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md).
 - 2026-06-19 — [xy16-hang-verification] **#321 xy16: verified the runtime hangs are FIXED — no live hang remains.** The soft-stack P0 note's "35/50 `xy16@MAME=0x0000` hangs" were cleared by `8961afb` (byte-level `ldx/ldy/stx/sty` `XHigh` fix) + `4d8a2bd` (X-governed transfer/push-pull annotation). Fresh confirmation: `fuzz 50 1` and `fuzz 50 56` (the exact recorded-hang batches) = **50/50** each; `fuzz 500` = **492/500, 0 mismatch, 0 hangs**. Sole residual = 8 `$p`-spill **compile** xfails (169/173/196/268/271/272/306/420) — the separate `scavenger-p-not-gpr` item, not a hang. Corrected the stale "active area" triage note. (No code change — measurement only.)
 - 2026-06-19 — [xy16-skeleton-comment-fix] **#321 xy16: corrected the stale `// skeleton`/`returns false for everything` comments on `selectXY16`** — the function is fully implemented (C1 direct + C2 `abs,X16`/`(zp),Y16` indexed); comment-only `0002` regen, round-trip PASS, no codegen change. [plan](docs/plans/2026-06-19-fix-the-stale-skeleton-comments-in-selectxy16-rege.md).
 - 2026-06-18 — [repsep-x-annotation-for-x-governed-transfers-push] **#321 xy16: seed-31 FIXED — REPSEP X-annotation for X-governed transfers/push-pull unblocked the critical-edge fix. fuzz 500 → 492/500, 0 mismatch.** Two commits. **Commit A** (`4d8a2bd`): `requiredXWidth` now returns `XW_X8` for `TA` (TAX/TAY), `TX` (TXY/TYX) and `PH`/`PL` with `$x`/`$y` (PHX/PLX/PHY/PLY) — index transfers/push-pull whose width is X-flag-governed; the 8-bit-intent pseudos were `XW_None`, so when the dataflow holds X=16 across a loop back-edge an 8-bit `TAY`/`TYX` ran 16-bit and dragged B-accumulator garbage into `Y.high`/`X.high` (the M side never had this — `requiredWidth` defaults to `MW_M8`). `T_A` (TXA/TYA) left X-agnostic (M-governed). Monotone-conservative (only adds `sep #$10`). **Bonus: fixed seed-157** (a second transfer-in-held-X16 mismatch). **Commit B** (re-applied the reverted `B.begin()` critical-edge placement, now safe): replaces the whole-function `placeLegacy` bail with a single absolute-mode entry switch at the target block's start (retains `placeLegacy` only for the X-passthrough-conflict corner). Verified: seed-31/157/160 all pass; `fuzz 500` 491→492/500 with seed-31 the only FAIL→PASS delta (bisect: seed-160 PASS on both bail and B.begin paths, no new regression); corpus 7/7, xy16 suite green, verify-clean on 31/160, `0002` round-trips (foreign-hunks=5). Residual 8 fuzz crashes are the separate pre-existing `$p`-spill bug (own open item). [impl plan](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md) · [critical-edge analysis](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
@@ -808,5 +804,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • Conformance claims -> deliberately disclaimed (this is differential bug-finding, not ISO certification).
      • Floating-point / full-libc tests -> outside the freestanding subset; the Phase-0 filter excludes them.
      fp:3d23564aa9d16214 fp:9502a10868aa863f fp:9ef5b0820dd8d148 fp:a2b25e70c9c08d3b -->
-- [verify] **2026-06-14-pre-public-polish-license-readme-m2-gitignore** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-14-pre-public-polish-license-readme-m2-gitignore.md](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md)_  <!-- fp:72e135cd9174e480 -->
+<!-- triaged 2026-06-19: all four verification steps were run immediately before commit 181af86 (grep counts and grep output recorded in the plan, all PASS). The [verify] flag is a false positive — the plan was fulfilled in the same session. Nothing open. fp:72e135cd9174e480 -->
 <!-- END auto-captured-deferrals -->
