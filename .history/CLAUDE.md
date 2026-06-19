@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/9148a7b) | docs: investigations go on throwaway worktrees, not main (standing convention) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/6fff2f1) | #321 docs: wire awareness of the upstream-contribution-status queue into CLAUDE.md + TODO |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0083378) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
+9148a7b	author	Will Norris
+9148a7b	added	8
+9148a7b	deleted	0
+9148a7b	files	1
+9148a7b	body	Per a standing user principle (2026-06-18): exploratory/measurement work\n(measurements, spikes, probes) runs on a throwaway/<slug> branch in its own\nworktree, never on main's working copy — a dead-end stays disposable and, on\nthis hot shared tree (concurrent agents leave vendor/, 0002, TODO.md dirty),\nthe worktree gives a clean checkout + clean commits. Keep -> merge durable\nartifacts back; dead-end -> worktree remove + branch -D.\n\nAdded to the project commit-discipline section; the cross-project rule + rationale\nis in ~/SRC/CLAUDE.md "Worktree-based feature workflow" (extended to investigations),\nand an auto-memory (investigations-on-throwaway-branches) mirrors it.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 6fff2f1	author	Will Norris
 6fff2f1	added	4
 6fff2f1	deleted	0

@@ -55,7 +55,9 @@ glitch. (Exact commands + the micro-test pattern: `docs/agent-handoff.md`.)
   `main` HEAD — this repo's `main` working copy is a **hot shared tree** (concurrent agents leave `vendor/`,
   `0002`, `TODO.md` dirty mid-edit), so a worktree gives a clean checkout + clean commits with no surgical
   staging. The worktree has no `build/`: env-override `CLANG`/`OBJDUMP` to this checkout's
-  `build/llvm-mos-install/bin/...` rather than rebuilding. **Keep** → merge the durable artifacts (script,
+  `build/llvm-mos-install/bin/...` rather than rebuilding (host-side scripts only — for the Dockerized
+  `dev/run.sh`, `cp -al` the prebuilt `build/` subdirs into the worktree instead; see
+  [`docs/howto-feature-worktree.md`](docs/howto-feature-worktree.md)). **Keep** → merge the durable artifacts (script,
   recorded verdict) back; **dead-end** → `git worktree remove` + `git branch -D`. (Generic rule + rationale:
   `~/SRC/CLAUDE.md` "Worktree-based feature workflow".)
 - **Commit hooks fire automatically:** `regen-md-history` snapshots edited plans into `docs/plans/.history/`;
