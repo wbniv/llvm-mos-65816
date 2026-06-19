@@ -1,6 +1,7 @@
 # Replace the random fuzzer's *generator* with Csmith (keep the engine; builtin selectable)
 
-**Date:** 2026-06-19 · **Status:** Phase 0 DONE — **GO** (see *Phase 0 — RESULT*); Phase 1 next.
+**Date:** 2026-06-19 · **Status:** Phases 0–3 DONE (see *Phase 1–3 — RESULT*); Phase 4 (scale + triage) /
+Phase 5 (sampled CI) remain. The Csmith generator is now the `dev/run.sh fuzz` default.
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — strengthen the *random* correctness axis).
 **Required reading:**
 [Tier-1 fuzzer + engine](2026-06-15-321-tier1-broaden-corpus.md) ·
@@ -170,6 +171,58 @@ as SKIP. (3) the spike block-buffers stdout → `csmith_run.py` sets line-buffer
 `tools/csmith_run.py` (one seed end-to-end through `E.evaluate`), plus the `compile_rom` `cflags` tweak (or
 wrapper-TU fallback). Prove one Csmith program passes the existing `a16_fuzz.py check`-style flow.
 
+### Phase 1–3 — RESULT (2026-06-19): **DONE** (Phases 1, 2, 3 landed in one commit)
+
+Implemented on `wt/321-csmith`, host-side (MAME on host). The differential engine is reused verbatim; the
+only shared-engine change is the additive `cflags`/`verify` kwargs the plan anticipated (chosen over the
+wrapper-TU fallback — the Csmith runtime force-includes cleanly).
+
+**New / changed files**
+- **`tools/csmith_run.py`** *(new)* — per seed: `csmith -s SEED <frozen Phase-0 profile> -o gen.c` run from
+  `examples/65816/csmith/` (so Csmith reads `platform.info` → `integer size = 2`); force-include the adapter; a
+  fast host-side **fit pre-filter** (Phase 2 — a DEFAULT build, bucketed by `torture_filter.classify`:
+  non-buildable seeds → SKIP+counted, never silently dropped); then
+  `E.evaluate(src, expected=None, …, cflags=CFLAGS, verify=False)`. The pre-filter is also what cleanly
+  separates *"not a buildable oracle"* (DEFAULT fails → SKIP) from *"an a16-specific defect"* (DEFAULT builds,
+  a16/xy16 then fails → XFAIL/CRASH) — `evaluate` lumps the three builds in one `try`, so without the split a
+  DEFAULT region-overflow and a real a16 ICE would be indistinguishable.
+- **`dev/csmith.sh`** *(new)* — host-side runner (build-csmith-on-demand via `dev/fetch-csmith.sh`, BIOS check,
+  `FUZZ_ROOT`/`MOS_TOOLCHAIN` export → `csmith_run.py`).
+- **`tools/a16_fuzz.py`** *(edit — additive only)* — `cflags=()` on `compile_rom` / `verify_machineinstrs` /
+  `evaluate` (default empty → every existing caller byte-for-byte unchanged); a `verify=True` gate (Csmith
+  passes `verify=False`); `classify_known()` now also runs on a compile/link `CompileError` (not just a verify
+  log); new `a16-unmerge-s32` `KNOWN_ISSUES` entry.
+- **`dev/run.sh`** *(edit)* — Phase 3 dispatch `fuzz [--gen csmith|builtin] [N] [seed]` (default **csmith**,
+  run host-side, intercepted before the Docker dispatch like `repro`; **builtin** unchanged, still
+  in-container via `dev/fuzz.sh`).
+
+**Two non-obvious bits the Phase-0 spike flagged, both handled**
+1. **The s32 ICE is an LTO *link* error, not a `-verify-machineinstrs` rejection.** `+mos-a16` aborts `ld.lld`
+   with `LLVM ERROR: unable to legalize … = G_UNMERGE_VALUES %N:_(s32)`; `compile_rom` raises that as a
+   `CompileError`. So `evaluate`'s compile-failure handler now runs `classify_known(str(e))` — the verify-only
+   classify path never sees it → the seed XFAILs (`a16-unmerge-s32`) instead of mis-reporting CRASH.
+2. **Skip per-program verify for Csmith (`verify=False`).** Csmith TUs `#include <math.h>`, which the verify
+   command's bare `--target=mos` (no `--config`) can't resolve. The `--config` LTO link in `compile_rom` is the
+   crash gate instead (it already aborts on a backend ICE — see #1).
+
+**Sweep, seeds 1–100**
+(`FUZZ_ROOT=$PWD MOS_TOOLCHAIN=$PWD/build/llvm-mos-install python3 tools/csmith_run.py --count 100 --seed 1`):
+```
+==> csmith: 83/100 PASS, 10 xfail, 7 skip  (0 mismatch, 0 crash, 0 error)
+    skip buckets: diverged-before-result (corpus_result GC'd)=7
+```
+- **83 PASS / 0 mismatch** — faithfully reproduces the Phase-0 spike (`83 agree, 0 mismatch, 17`); the 17
+  non-runnable seeds are the *same* seeds.
+- **10 XFAIL `a16-unmerge-s32`** = seeds 9, 11, 39, 49, 50, 71, 83, 87, 96, 100 (the spike's 9 s32 seeds **+
+  seed 9**). Seed 9 is *both* diverging and s32: the spike labeled it diverging because it checks the default
+  map *before* the a16 build, whereas `evaluate` builds a16 first and surfaces the (more precise) s32 ICE. Net:
+  identical 17 seeds, one reclassified diverging→s32.
+- **7 SKIP** = seeds 16, 30, 33, 48, 58, 88, 99 — Csmith `main` diverges before `platform_main_end`, so
+  `--gc-sections` drops the unreferenced `corpus_result`; legitimately not a defect.
+
+The s32 finding stays a **separate M2 legalizer investigation** (XFAIL only — not fixed here);
+`vendor/llvm-mos`/`0002` are untouched (the entire diff is `tools/` + `dev/`).
+
 ### Phase 2 — host-side fit filter + flag profile
 Wire `torture_filter.classify` as a fast (no-emulator) pre-filter: oversize/compile-fail seeds are
 SKIP+counted (logged, never silently dropped). Freeze the `--max-*`/`--no-*` profile from Phase 0 data.
@@ -187,13 +240,51 @@ Larger seed sweeps on a quiet box. Delta-reduce any real FAIL into a tracked `ex
 Mirror the `corpus-a16` CI job in `smoke.yml`: a seeded subset per run, secret-gated, SKIP on missing BIOS.
 
 ## Verification (run on execution; paste raw output under each step)
-1. **Csmith builds + is pinned.** `dev/fetch-csmith.sh` on a clean checkout → builds; second run is a no-op. _(paste)_
-2. **Spike A.** seeds 1..20: linkable ones show `default == a16 == xy16` on MAME (+a16 on bsnes). _(paste)_
-3. **Spike B.** ~100-seed anomaly rate near-zero; any mismatch triaged real-vs-UB. _(paste)_
-4. **A real defect is caught.** Inject a wrong store into one program / a deliberately-broken build → runner reports **FAIL** (not SKIP/PASS). _(paste)_
-5. **Oversize → SKIP.** A program that overflows LoRAM → `region-overflow` SKIP with reason, counted. _(paste)_
-6. **Default flips to Csmith.** `dev/run.sh fuzz 30 1` runs Csmith; `dev/run.sh fuzz --gen builtin 50 1` runs the old generator. _(paste)_
-7. **Non-breaking.** `dev/run.sh corpus` 7/7, `corpus-a16` 5/6+XFAIL, `dev/run.sh fuzz --gen builtin 50 1` green, c-torture path unaffected, `0002` round-trips (no `vendor/llvm-mos` change in Phases 0–3). _(paste)_
+1. **Csmith builds + is pinned.** `dev/fetch-csmith.sh` on a clean checkout → builds; second run is a no-op.
+
+   Done in Phase 0 (`d39d49b`): Csmith 2.4.0 in gitignored `vendor/csmith` (`PINNED_SHA` recorded); a second
+   `dev/csmith.sh`/`dev/fetch-csmith.sh` invocation is a no-op (`==> csmith already built …`). **PASS.**
+2. **Spike A.** seeds 1..20: linkable ones show `default == a16 == xy16` on MAME (+a16 on bsnes).
+
+   Done in Phase 0 — see *Phase 0 — RESULT* (subsumed by the full 1–100 sweep in *Phase 1–3 — RESULT*). **PASS.**
+3. **Spike B.** ~100-seed anomaly rate near-zero; any mismatch triaged real-vs-UB.
+
+   Done in Phase 0; reconfirmed by the Phase-1 runner (0 value mismatches over 100 seeds). **PASS.**
+4. **A real defect is caught.** Inject a wrong store into one program / a deliberately-broken build → runner reports **FAIL** (not SKIP/PASS).
+
+   Negative control through the exact Csmith compile path (`cflags`, `verify=False`) — a real seed-10 program
+   handed a bogus reference (`expected=0x0000`; the real result is `0xA9A6`):
+   ```
+   status = FAIL
+   msg    = mismatch: host=0x0000, default@MAME=0xA9A6, a16@MAME=0xA9A6, xy16@MAME=0xA9A6, a16@bsnes=0xA9A6
+   triage = value mismatch (ref=0; default@MAME, a16@MAME, xy16@MAME, a16@bsnes)
+   ```
+   A value divergence surfaces as FAIL + triage, never a silent PASS/SKIP. **PASS.**
+5. **Oversize → SKIP.** A program that overflows LoRAM → `region-overflow` SKIP with reason, counted.
+
+   No seed in 1–100 overflows (the frozen profile is tuned to fit), so the path is exercised directly:
+   `csmith_run.prefilter()` on a 40 KB initialized array (accepted by the front-end, can't be placed by the
+   linker):
+   ```
+   prefilter(oversize) -> ('region-overflow', "ld.lld: ...")
+   run_one mapping     -> SKIP
+   ```
+   `torture_filter.classify` buckets it `region-overflow`; `run_one` maps any pre-filter hit to SKIP+counted
+   (the per-run summary prints `skip buckets: …`). **PASS.**
+6. **Default flips to Csmith.** `dev/run.sh fuzz 30 1` runs Csmith; `dev/run.sh fuzz --gen builtin 50 1` runs the old generator.
+
+   Dispatch parse verified across 9 arg forms (`fuzz` / `fuzz 30 1` / `fuzz --gen csmith 100 1` →
+   host `csmith.sh`; `fuzz --gen builtin …` → in-container `fuzz.sh`; `--gen=csmith`; `--gen bogus` rejected;
+   non-fuzz targets untouched). The 1–100 sweep ran via `csmith_run.py`; the builtin 50 ran via `a16_fuzz.py`.
+   **PASS.**
+7. **Non-breaking.** `dev/run.sh corpus` 7/7, `corpus-a16` 5/6+XFAIL, `dev/run.sh fuzz --gen builtin 50 1` green, c-torture path unaffected, `0002` round-trips (no `vendor/llvm-mos` change in Phases 0–3).
+   ```
+   ==> corpus: 7/7 passed
+   ==> corpus-a16: 5/6 passed, 1 xfail        (globals.c: regalloc-out-of-registers)
+   ==> fuzz: 50/50 PASS, 0 known-issue (xfail)  (0 mismatch, 0 new-crash, 0 error)   [--gen builtin]
+   ```
+   `0002` round-trips trivially: the entire diff is `tools/` + `dev/` (no `vendor/`, `patches/`, or `llvm/`),
+   so the patch is git-clean and `torture_filter.py` (the shared c-torture filter) is read-only here. **PASS.**
 
 ## Risks / honest scoping
 - **UB under 16-bit int** — the central risk, *designed out* by `platform.info` + safe_math, *measured* by the
