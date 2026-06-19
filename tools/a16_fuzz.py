@@ -822,6 +822,18 @@ KNOWN_ISSUES = [
     # again (regression guard).
     ("scavenger-p-not-gpr",
      lambda log: "$p is not a GPR register" in log),
+    # a16-zp-pressure-overflow: +mos-a16 at -O1/-Os on a register-heavy function allocates so
+    # many Imag16 zero-page pairs that the .zp section grows past 256 bytes, so an 8-bit
+    # zero-page relocation can no longer reach it -> link error "relocation R_MOS_ADDR8 out of
+    # range: N ... references section '.zp...'". DEFAULT 8-bit and +mos-a16 -O0 link clean — the
+    # SAME -O1/-Os register-pressure root cause as regalloc-out-of-registers, a different symptom
+    # (link-time ZP overflow vs an RA-time crash). Surfaced by the c-torture gate (pr15296.c).
+    # Classified here so torture_run XFAILs it (the fuzzer never feeds link errors to
+    # classify_known, so its behavior is unchanged). The fix is the same deferred Phase-3 Ac16/
+    # ZP-residency rework — see docs/investigations/65816-a16-regalloc-pressure-failure.md. REMOVE
+    # when fixed so the signature hard-FAILS again (regression guard).
+    ("a16-zp-pressure-overflow",
+     lambda log: "R_MOS_ADDR8 out of range" in log and ".zp" in log),
 ]
 
 

@@ -250,11 +250,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   test is in-scope iff the default build runs it to the PASS sentinel, then any `+mos-a16`/`+mos-xy16`
   disagreement is a real defect (sidesteps "is this test appropriate for 16-bit `int`" — if default handles it,
   a16 must too). Fetch-don't-commit (GPLv3 → sha256-pinned gcc-14.2.0, gitignored, reproducible via
-  `dev/fetch-torture.sh`, the WDC816CC/ORCA-refs precedent). **Phase 0 DONE 2026-06-19**: fetch + host-only
-  compile/link filter (`tools/torture_filter.py` + `_shim.c`) → **1253/1656 in-scope**, 403 unsupported (197
-  compile-error, 176 undefined-symbol [168 = printf], 26 link-other, 4 region-overflow); manifests in
-  `examples/65816/torture/{inscope,unsupported}.tsv`. **Remaining:** Phase 1 shim-runner + emulator pilot,
-  Phase 2 scale + triage, Phase 3 sampled secret-gated CI.
+  `dev/fetch-torture.sh`, the WDC816CC/ORCA-refs precedent). **Phases 0+1 DONE 2026-06-19**: fetch +
+  host-only filter (`tools/torture_filter.py` + `_shim.c`) → **1253/1656 in-scope**; emulator differential
+  runner (`tools/torture_run.py` + `dev/torture.sh` + `dev/run.sh torture`). 120-test pilot: **102 PASS,
+  17 SKIP, 1 XFAIL** — found a real `+mos-a16 -O1/-Os` ZP-pressure overflow (`pr15296.c`, same family as
+  the `globals.c` RA crash; new `KNOWN_ISSUES["a16-zp-pressure-overflow"]`). **Remaining:** Phase 2
+  full-suite scale + triage (overnight, time-budgeted), Phase 3 sampled secret-gated CI.
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
   `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the

@@ -118,9 +118,27 @@ contained — deterministic repro `examples/65816/a16regpress.c`, fuzzer `KNOWN_
 `a16regpress.c` becomes a concrete Phase-3 acceptance case (a function that *crashes* today, not merely
 suboptimal). When fixed: drop the fuzzer XFAIL and convert `a16regpress.c` to a positive differential gate.
 
+## Related manifestation — link-time ZP overflow (c-torture `pr15296.c`, 2026-06-19)
+
+The c-torture differential gate (Phase 1) surfaced a **second symptom of the same root cause**. On
+`gcc.c-torture/execute/pr15296.c` (pointer/union/`intptr_t` games, register-heavy), `+mos-a16` at
+`-O1`/`-Os` allocates so many `Imag16` zero-page pairs that the `.zp` section grows **past 256 bytes**, so
+an 8-bit zero-page relocation can no longer reach it:
+
+```
+ld.lld: error: relocation R_MOS_ADDR8 out of range: 1043 is not in [-128, 255]; references section '.zp.noinit'
+```
+
+Same fingerprint as the RA crash — **DEFAULT 8-bit and `+mos-a16 -O0` link clean; `-O1`/`-Os` fail** — but
+the over-allocation overflows the ZP *addressing budget* at link instead of exhausting the allocator at
+compile. Same `Ac16`/ZP-residency root cause, same fix home (A16-threading Phase 3). Classified
+`a16-zp-pressure-overflow` in `KNOWN_ISSUES` so the c-torture gate XFAILs it (the fuzzer never feeds link
+errors to `classify_known`, so its behavior is unchanged).
+
 ## Tracking
 
 - Repro: `examples/65816/a16regpress.c` · fuzzer XFAIL: `tools/a16_fuzz.py` `KNOWN_ISSUES["regalloc-out-of-registers"]`.
+- Sibling (ZP overflow): `vendor/c-torture/execute/pr15296.c` (gitignored) · XFAIL `KNOWN_ISSUES["a16-zp-pressure-overflow"]`.
 - TODO: M2 "#321 `+mos-a16 -O1/-Os` register-allocation FAILURE on real code (`globals.c`)".
 - Plans: [ZP-pressure measurement](../plans/2026-06-18-321-zp-pressure-measurement.md) (the surfacing) ·
   [A16-threading](../plans/2026-06-17-321-a16-threading.md) (Phase 3, the fix home).
