@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -198,6 +198,14 @@ Targets:
   a16indiry  #321 Increment 1e: native 16-bit (zp),y indexed load (`lda (zp),y` in M16, opcode B1).
              Runtime pointer + 8-bit Y offset -> one rep/sep + lda (zp),y (no iny/byte pair).
              corpus_result==0x5678 host==default==+mos-a16 on both emulators.
+  a16cmpidx  #321 native s16 RHS-indexed unsigned-ordering compare fold: a single-use arr[k]/p[k]
+             on the RHS of `lim < arr[k]` folds into one `cmp (zp)` (CMPIndir16, opcode D2) under a
+             rep/sep bracket instead of staging through an Imag16 temp; `lim > arr[k]` swaps arr[k]
+             to the LHS (lda (zp); cmp). corpus_result==0x1111 host==default==+mos-a16 both emulators.
+  a16cmpaudit #321 Phase-3 differential-audit of the WHOLE 16-bit compare surface: 8 predicates x
+             {as-value, as-branch} x RHS shapes {reg, imm, global, global-array[k], pointer[k],
+             stack-array[k]} + LHS-indexed control, over boundary values. host==default==+mos-a16
+             (0x5EE0) on both emulators, -verify-machineinstrs clean.
   fuzz       #321 Tier-1 differential fuzzer: generate N random valid C programs (from
              `seed`, default 25 from seed 1), compile each DEFAULT, +mos-a16, and +mos-xy16,
              and assert host-expected == default@MAME == a16@MAME == xy16@MAME == a16@bsnes-jg
