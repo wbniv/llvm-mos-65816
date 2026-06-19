@@ -831,18 +831,11 @@ KNOWN_ISSUES = [
     # again (regression guard).
     ("scavenger-p-not-gpr",
      lambda log: "$p is not a GPR register" in log),
-    # a16-unmerge-s32: +mos-a16 aborts the LTO link splitting a 32-bit `long` into two
-    # s16 halves — "LLVM ERROR: unable to legalize instruction: ... = G_UNMERGE_VALUES
-    # %N:_(s32) (in function: main)". The DEFAULT 8-bit build of the SAME program links
-    # clean → a +mos-a16-specific legalizer gap, distinct from the -O1/-Os regalloc/
-    # scavenger crashes above. Surfaced by Csmith emitting `long` (s32) the hand-rolled
-    # 16/8-bit generator never produced. This is an LTO *compile/link* error (caught by
-    # compile_rom as a CompileError), NOT a -verify-machineinstrs rejection — so the
-    # compile-failure handler in evaluate() must run classify_known() on it too. Tracked
-    # as a separate M2 legalizer investigation (do NOT fix here); XFAIL keeps the fuzzer
-    # exercising the rest of the space. REMOVE when fixed so the signature hard-FAILS again.
-    ("a16-unmerge-s32",
-     lambda log: "legalize" in log and "G_UNMERGE_VALUES" in log and "(s32)" in log),
+    # (a16-unmerge-s32 — the +mos-a16 `G_UNMERGE_VALUES s32` legalizer gap the Csmith fuzzer
+    # found — was FIXED 2026-06-19 by representing s32 as 2x s16 under a16; its KNOWN_ISSUES
+    # entry is removed so a recurrence hard-FAILS again. See the main-branch commit + plan
+    # docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md and the hermetic gate
+    # examples/65816/a16unmerge.ll / dev/run.sh a16unmerge.)
 ]
 
 
@@ -930,8 +923,8 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True):
         # past every retry (environmental flakes already cleared inside _run). When verify
         # is skipped (Csmith path), a backend ICE first appears HERE as a CompileError, not
         # as a verify rejection — so classify_known() must run on the link error too, else a
-        # KNOWN_ISSUES crash (e.g. a16-unmerge-s32 on Csmith `long`) would mis-report as a
-        # new CRASH instead of XFAIL.
+        # KNOWN_ISSUES crash that surfaces only at the --config LTO compile (e.g. a regalloc/
+        # scavenger ICE on a Csmith program) would mis-report as a new CRASH instead of XFAIL.
         kid = classify_known(str(e))
         if kid:
             return "XFAIL", "known issue [%s]" % kid, None
