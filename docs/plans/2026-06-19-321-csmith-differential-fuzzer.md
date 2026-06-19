@@ -1,6 +1,6 @@
 # Replace the random fuzzer's *generator* with Csmith (keep the engine; builtin selectable)
 
-**Date:** 2026-06-19 · **Status:** PLANNED (not started).
+**Date:** 2026-06-19 · **Status:** Phase 0 DONE — **GO** (see *Phase 0 — RESULT*); Phase 1 next.
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — strengthen the *random* correctness axis).
 **Required reading:**
 [Tier-1 fuzzer + engine](2026-06-15-321-tier1-broaden-corpus.md) ·

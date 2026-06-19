@@ -38,6 +38,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
+- [ ] **#321 `+mos-a16` legalizer gap: `G_UNMERGE_VALUES s32` → 2×s16 fails to legalize.** Csmith finding
+  (seed 11, `wt/321-csmith`): splitting a 32-bit `long` into two 16-bit halves aborts LTO codegen
+  (`LLVM ERROR: unable to legalize instruction: … = G_UNMERGE_VALUES %_(s32) (in function: main)`), while the
+  **default 8-bit build compiles the same program clean** → `+mos-a16`-specific, a *new* class distinct from
+  the known `-O1/-Os` RA crashes (`regalloc-out-of-registers`, `scavenger-p-not-gpr`). Surfaced because the
+  Csmith fuzzer emits `long` (the hand-rolled generator only used 16/8-bit); 9/100 spike seeds hit it. Next:
+  delta-reduce → `KNOWN_ISSUES` XFAIL (`a16-unmerge-s32`) to keep the harness green, then root-cause + fix as
+  its own investigation. [csmith plan §Phase 0 RESULT](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
@@ -234,6 +242,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
+- [wip] **#321 Csmith differential fuzzer — replace the builtin generator with Csmith** (keep the engine;
+  builtin selectable via `--gen builtin`). **Phase 0 DONE — GO** (`d39d49b`, on `wt/321-csmith`): Csmith 2.4.0
+  built (`dev/fetch-csmith.sh`, gitignored `vendor/csmith`) + freestanding adapter
+  (`examples/65816/csmith/{csmith_snes.h,platform.info}`); 100-seed spike = **83 agree, 0 mismatch, 17
+  skip/fail** → the default-build-as-oracle differential is sound (`platform.info` int=16 + type-parametric
+  `safe_math` ⇒ UB-free at the target's 16-bit `int`). It immediately found a real `+mos-a16` defect (the
+  `G_UNMERGE_VALUES s32` legalizer gap — its own M2 item above). Remaining: Phase 1 (`tools/csmith_run.py` +
+  additive `compile_rom` `cflags`; verify via `--config` so `csmith.h`'s `<math.h>` resolves; SKIP diverging
+  programs), Phase 2 (host-side fit filter reusing `torture_filter.classify`), Phase 3
+  (`dev/run.sh fuzz --gen csmith|builtin`, csmith default), Phase 5 (sampled CI). **Yarpgen follow-up:** add a
+  `--gen yarpgen` later to target `-O1/-Os` loop/scalar-opt bugs (no `platform.info` equiv → 16-bit-int caveat;
+  must redirect its baked-in `printf`). [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
   into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
@@ -777,7 +797,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • Conformance claims -> deliberately disclaimed (this is differential bug-finding, not ISO certification).
      • Floating-point / full-libc tests -> outside the freestanding subset; the Phase-0 filter excludes them.
      fp:3d23564aa9d16214 fp:9502a10868aa863f fp:9ef5b0820dd8d148 fp:a2b25e70c9c08d3b -->
-- [ ] **(triage)** **TODO (Yarpgen):** add a `TODO.md` item — *"vendor Yarpgen as a second random generator behind `--gen — _from [2026-06-19-321-csmith-differential-fuzzer.md](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md)_  <!-- fp:192eb34724f01c54 -->
-- [ ] **(triage)** **Yarpgen vs the known bug families** — it directly targets the regalloc/loop optimization surface where our — _from [2026-06-19-321-csmith-differential-fuzzer.md](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md)_  <!-- fp:0350991c23596f7a -->
-- [ ] **(triage)** **On approval, also:** add the matching `TODO.md` entry under *Test Bench / CI* for this Csmith work itself. — _from [2026-06-19-321-csmith-differential-fuzzer.md](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md)_  <!-- fp:d29683e80d7e9f15 -->
+<!-- triaged 2026-06-19: promoted into curated entries — the Csmith fuzzer (+ its Yarpgen follow-up) under
+     Test Bench / CI, and the `G_UNMERGE_VALUES s32` finding under M2 — Optimizing Payoff. These three were the
+     plan's own Follow-ups bullets (Yarpgen; Yarpgen-vs-known-bugs; "add the Csmith TODO entry"); now covered.
+     fp:192eb34724f01c54 fp:0350991c23596f7a fp:d29683e80d7e9f15 -->
 <!-- END auto-captured-deferrals -->
