@@ -3092,7 +3092,7 @@ index fbedd8d46..d329144e2 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..3bb50f90f 100644
+index 212ede1a0..e1aa41d9b 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,6 +25,7 @@
@@ -3103,7 +3103,68 @@ index 212ede1a0..3bb50f90f 100644
  #include "llvm/ADT/SmallVector.h"
  #include "llvm/CodeGen/GlobalISel/LegalizerHelper.h"
  #include "llvm/CodeGen/GlobalISel/LegalizerInfo.h"
-@@ -150,18 +151,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -92,13 +93,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+ 
+   // Integer Extension and Truncation
+ 
+-  getActionDefinitionsBuilder(G_ANYEXT)
+-      .legalFor({{S16, S8}})
+-      .customIf(typeIs(1, S1))
+-      .unsupported();
+-  getActionDefinitionsBuilder(G_TRUNC)
+-      .legalFor({{S1, S8}, {S1, S16}, {S8, S16}})
+-      .unsupported();
++  // #321 a16: under +mos-a16 an s32 (long/int32_t) is represented as 2x s16 — s16 is a
++  // legal type, so wide ops narrow to s16 (not s8), and the s32<->s16 ext/trunc/(un)merge
++  // glue mirrors the default path's s16<->s8. All additions gated on hasAccum16() so
++  // default codegen is byte-for-byte untouched. (NB: G_ZEXT stays maxScalar(0, S8) — it
++  // narrows zext through bytes for BOTH widths; raising it to S16 broke plain s8->s16 zext.)
++  {
++    auto &B = getActionDefinitionsBuilder(G_ANYEXT).legalFor({{S16, S8}});
++    if (STI.hasAccum16())
++      B.legalFor({{S32, S16}, {S32, S8}});
++    B.customIf(typeIs(1, S1)).unsupported();
++  }
++  {
++    auto &B = getActionDefinitionsBuilder(G_TRUNC)
++                  .legalFor({{S1, S8}, {S1, S16}, {S8, S16}});
++    if (STI.hasAccum16())
++      B.legalFor({{S16, S32}});
++    B.unsupported();
++  }
+ 
+   getActionDefinitionsBuilder(G_SEXT).custom();
+ 
+@@ -127,12 +139,22 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+ 
+   getActionDefinitionsBuilder({G_EXTRACT, G_INSERT}).lower();
+ 
+-  getActionDefinitionsBuilder(G_MERGE_VALUES)
+-      .legalForCartesianProduct({S16, P}, {S8, PZ})
+-      .unsupported();
+-  getActionDefinitionsBuilder(G_UNMERGE_VALUES)
+-      .legalForCartesianProduct({S8, PZ}, {S16, P})
+-      .unsupported();
++  // #321 a16: s32<->2x s16 (un)merge is the glue for the 2x s16 representation of s32
++  // (see the ext/trunc note above), mirroring the default s16<->s8 (un)merge.
++  {
++    auto &B = getActionDefinitionsBuilder(G_MERGE_VALUES)
++                  .legalForCartesianProduct({S16, P}, {S8, PZ});
++    if (STI.hasAccum16())
++      B.legalFor({{S32, S16}});
++    B.unsupported();
++  }
++  {
++    auto &B = getActionDefinitionsBuilder(G_UNMERGE_VALUES)
++                  .legalForCartesianProduct({S8, PZ}, {S16, P});
++    if (STI.hasAccum16())
++      B.legalFor({{S16, S32}});
++    B.unsupported();
++  }
+ 
+   getActionDefinitionsBuilder(G_BSWAP)
+       .customFor({S8})
+@@ -150,18 +172,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
        .widenScalarToNextMultipleOf(0, 8)
        .custom();
  
@@ -3139,7 +3200,7 @@ index 212ede1a0..3bb50f90f 100644
  
    getActionDefinitionsBuilder(G_MUL)
        .libcallFor({S8, S16, S32, S64})
-@@ -323,14 +330,20 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -323,14 +351,20 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
  
    // Memory Operations
  
@@ -3168,7 +3229,7 @@ index 212ede1a0..3bb50f90f 100644
  
    getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD}).custom();
  
-@@ -670,11 +683,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -670,11 +704,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    auto [Dst, Src] = MI.getFirst2Regs();
    assert(MRI.getType(Dst).isByteSized());
  
@@ -3193,7 +3254,7 @@ index 212ede1a0..3bb50f90f 100644
  
    // Handle multi-byte increments and decrements.
  
-@@ -862,6 +887,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -862,6 +908,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      return true;
    }
  
@@ -3218,7 +3279,7 @@ index 212ede1a0..3bb50f90f 100644
    Register Partial;
    Register NewAmt;
    // Shift by one multiples of one byte.
-@@ -878,11 +921,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -878,11 +942,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      case MOS::G_ROTR:
        break;
      case MOS::G_ASHR: {
@@ -3240,7 +3301,7 @@ index 212ede1a0..3bb50f90f 100644
        break;
      }
      case MOS::G_LSHR:
-@@ -1252,6 +1300,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1252,6 +1321,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
  
    LLT Type = MRI.getType(LHS);
  
@@ -3269,7 +3330,7 @@ index 212ede1a0..3bb50f90f 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1270,7 +1340,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1270,7 +1361,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -3413,7 +3474,7 @@ index 212ede1a0..3bb50f90f 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1341,16 +1546,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1341,16 +1567,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -3438,7 +3499,7 @@ index 212ede1a0..3bb50f90f 100644
      if (!isNZUseLegal(Dst, MRI))
        Z = buildNZSelect(Z, Builder);
      Builder.buildCopy(Dst, Z);
-@@ -1358,8 +1569,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1358,8 +1590,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {
@@ -3451,7 +3512,7 @@ index 212ede1a0..3bb50f90f 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1601,14 +1815,176 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1601,14 +1836,176 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
  
@@ -3629,7 +3690,7 @@ index 212ede1a0..3bb50f90f 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1645,6 +2021,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1645,6 +2042,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);
@@ -3640,7 +3701,7 @@ index 212ede1a0..3bb50f90f 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    auto ValueType = MRI.getType(MI.getValueReg());
-@@ -1671,6 +2051,150 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+@@ -1671,6 +2072,150 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
    return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
  }
  
@@ -3791,7 +3852,7 @@ index 212ede1a0..3bb50f90f 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
-@@ -1876,7 +2400,47 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -1876,7 +2421,47 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                .countMaxActiveBits() <= 8) {
          if (Index)
            return false;
@@ -3840,7 +3901,7 @@ index 212ede1a0..3bb50f90f 100644
          continue;
        }
      }
-@@ -1959,6 +2523,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -1959,6 +2544,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
                     .countMaxActiveBits() <= 8) {
        Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
        Addr = Base;

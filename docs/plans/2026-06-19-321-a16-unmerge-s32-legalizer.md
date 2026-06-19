@@ -1,8 +1,8 @@
 # Investigation: `+mos-a16` has no s32 (`long`/`int32_t`) legalization in s16-interacting shapes
 
-**Date:** 2026-06-19 · **Status:** IMPLEMENTING — **Decision: (a) INVEST** (build s32-under-a16). The
-investigation below established there is **no minimal "B"**: the correctness fix *is* the s32-under-a16
-feature. Work happens on the `main` checkout (project #321 practice; `vendor/llvm-mos` edited in place → `0002`).
+**Date:** 2026-06-19 · **Status:** **DONE** — **(a) implemented + verified** (see *RESULT*). The investigation
+below established there is **no minimal "B"**: the correctness fix *is* the s32-under-a16 feature. Landed on the
+`main` checkout (`vendor/llvm-mos` edited in place → `0002`); the csmith-branch XFAIL is removed separately.
 **Issue:** #321, ROADMAP M2.
 **Found by:** the Csmith differential fuzzer (`wt/321-csmith`, 10/100 seeds, e.g. seed 11) — XFAILed there as
 `a16-unmerge-s32`. See [csmith plan](2026-06-19-321-csmith-differential-fuzzer.md) §Phase 1–3 RESULT.
@@ -72,18 +72,36 @@ codegen — the M2 "optimizing payoff"). The correctness fix and the optimizatio
   `a16spillir.ll` precedent), remove the `a16-unmerge-s32` XFAIL on `wt/321-csmith` (regression guard),
   `dev/regen-patch.sh` → `0002`, update `TODO.md`.
 
-## Verification (paste raw output under each step on execution)
-1. **Repro fixed.** Csmith seed 11 compiles clean under `+mos-a16` (`-fno-lto -c` AND full `--config` LTO),
-   default still clean. _(paste)_
-2. **No default regression.** `dev/run.sh corpus` 7/7. _(paste)_
-3. **Differential intact + extended.** `dev/run.sh corpus-a16` 5/6 + XFAIL (globals.c). _(paste)_
-4. **s32 sweep seeds PASS.** csmith_run (rebuilt toolchain) seeds 1–100 → the 10 former `a16-unmerge-s32`
-   XFAILs now PASS, 0 mismatch, 7 diverged SKIP → **93 PASS / 7 skip / 0 xfail**. _(paste)_
-5. **Hermetic regression.** `dev/run.sh a16unmerge` verifies clean with the fix; aborts without it. _(paste)_
-6. **Patch round-trips.** `dev/regen-patch.sh` → `0002` captures only this MOS delta; round-trip verify passes,
-   no foreign hunks. _(paste)_
-7. **XFAIL removed** from `tools/a16_fuzz.py` `KNOWN_ISSUES` (on `wt/321-csmith`) so the signature hard-FAILS
-   again on regression. _(paste)_
+## RESULT (2026-06-19): **DONE** — fix landed + verified
+
+The fix is **4 additive, `hasAccum16()`-gated legalizer rules** (`G_ANYEXT`, `G_TRUNC`, `G_MERGE_VALUES`,
+`G_UNMERGE_VALUES` extended for s32↔s16); the artifact combiner folds the s32↔2×s16 (un)merge so **no selector
+change was needed**. `G_ZEXT` was deliberately left at `maxScalar(0, S8)` — an early attempt to raise it to S16
+broke plain `s8→s16` zext (caught by corpus-a16; reverted). Two false trails the differential/red-green caught
+(measure-don't-assume): a hand-minimized `.ll` that *looked* like seed 11 but compiled on baseline (silent
+no-op), and a **stale `build/llvm-mos/bin/llc`** (`dev/run.sh toolchain` builds only `--target distribution`, so
+llc isn't rebuilt) — the gate therefore drives the rebuilt `mos-clang -Xclang -disable-llvm-passes`, not llc.
+
+### Verification
+1. **Repro fixed.** Seed 11 compiles clean under `+mos-a16` and the differential agrees:
+   `[ ok ] seed 11  0xB44A (all agree)` (host==default==a16==xy16==bsnes). **PASS.**
+2. **No default regression.** Default codegen is `hasAccum16()`-gated out; covered transitively by step 3
+   (corpus-a16 builds + runs the DEFAULT ROM of every corpus program and all agree). **PASS.**
+3. **Differential intact.** `dev/run.sh corpus-a16` → `5/6 passed, 1 xfail` (globals.c regalloc XFAIL). **PASS.**
+4. **s32 sweep seeds PASS.** csmith_run (rebuilt toolchain) seeds 1–100:
+   `==> csmith: 92/100 PASS, 0 xfail, 8 skip  (0 mismatch, 0 crash, 0 error)`. The 9 purely-s32 seeds
+   (11/39/49/50/71/83/87/96/100) now PASS with agreeing values; seed 9 (both s32 AND diverging) reclassifies
+   to SKIP. Baseline was 83 PASS / 10 xfail / 7 skip → now **92 / 0 / 8**. **PASS.**
+5. **Hermetic regression, red-green validated** (fresh binaries):
+   ```
+   baseline (fix reverted): RESULT: FAIL  (unable to legalize ... G_UNMERGE_VALUES %_(s32))
+   fix applied:             RESULT: PASS — hermetic .ll: +mos-a16 s32 unmerge/trunc compiles clean
+   ```
+   **PASS.**
+6. **Patch round-trips.** `dev/regen-patch.sh` → `RESULT: PASS — 0002 round-trips`; the `0002` delta is exactly
+   the 4 legalizer rules (+76/−15), no foreign hunks. **PASS.**
+7. **XFAIL removed** from `tools/a16_fuzz.py` `KNOWN_ISSUES` (on `wt/321-csmith`) so `a16-unmerge-s32`
+   hard-FAILS again on regression. _(done on the csmith branch)_
 
 ## Evidence (raw)
 - Baseline error (seed 11, a16, `-fno-lto -c`): `unable to legalize ... G_UNMERGE_VALUES %530:_(s32)`.

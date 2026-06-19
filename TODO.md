@@ -38,19 +38,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [wip] **#321 `+mos-a16` s32 (`long`/`int32_t`) support — build the s32↔2×s16 path.** The Csmith fuzzer
-  (`wt/321-csmith`, 10/100 seeds, e.g. seed 11; XFAILed there as `a16-unmerge-s32`) surfaced that `+mos-a16`
-  **aborts the backend** on valid C that uses `int32_t`/`long` in s16-interacting shapes (e.g. `trunc i32→i16`):
-  `unable to legalize ... G_UNMERGE_VALUES %_(s32)`. The DEFAULT 8-bit build compiles the same program clean.
-  **Root cause (confirmed):** default narrows every s32 op to s8 bytes (no s32↔s16 boundary ever forms); under
-  `+mos-a16` **s16 is a legal type, so narrowing stops at s16** and diverts s32 into 2×s16 pieces — but the
-  s32↔s16 machinery (legalizer `G_TRUNC`/`G_ANYEXT`/`G_ZEXT`/`G_SEXT`/`G_MERGE`/`G_UNMERGE` **+** selector
-  support) doesn't exist. There is **no minimal fix**: unlocking one s32 op just exposes the next (measured:
-  unmerge→trunc→anyext→…), and you can't force s32→s8 because s16-legal blocks it — so the correctness fix *is*
-  the s32-under-a16 feature (it also delivers the i32 16-bit-chunk "optimizing payoff"). **Decision (a) INVEST**
-  (2026-06-19, project owner). Phases: P1 legalizer artifacts, P2 selector/artifact-combiner, P3 differential
-  correctness, P4 frozen-`.ll` regression + remove the XFAIL + regen `0002`.
-  [plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md).
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
@@ -368,6 +355,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-19 — [321-a16-unmerge-s32] **#321 `+mos-a16` s32 (`long`/`int32_t`) support — fixed the `G_UNMERGE_VALUES s32` backend abort.** Csmith-found (`wt/321-csmith` seed 11 + 9 more, XFAILed as `a16-unmerge-s32`): `+mos-a16` aborted on valid C using `int32_t`/`long` in s16-interacting shapes (e.g. `trunc i32→i16`), while DEFAULT compiled clean. Root cause: under `+mos-a16` s16 is a legal type so narrowing stops at s16 and diverts s32 into 2×s16 pieces, but the s32↔s16 legalizer glue didn't exist (no minimal fix — the cascade unmerge→trunc→anyext is the s32-under-a16 feature). Fix = **4 additive `hasAccum16()`-gated legalizer rules** (`G_ANYEXT`/`G_TRUNC`/`G_MERGE`/`G_UNMERGE` for s32↔s16); the artifact combiner folds the (un)merge so **no selector change**; `G_ZEXT` left at maxScalar S8 (raising to S16 broke s8→s16 zext). Verified: sweep **92/100 PASS, 0 mismatch, 0 xfail** (was 83/10/7); corpus-a16 5/6+xfail; hermetic `dev/run.sh a16unmerge` (frozen seed-11 `.ll`, **red-green validated** with fresh `mos-clang` — `llc` is stale, not in the `toolchain` rebuild path); `0002` regen round-trips. Remaining bookkeeping: remove the `a16-unmerge-s32` XFAIL on `wt/321-csmith`. [plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md).
 - 2026-06-19 — [pre-public-polish] **Repo: Apache-2.0 LICENSE + NOTICE, README → M2, gitignore transcripts.** All four steps PASS (181af86). [plan](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md).
 - 2026-06-19 — [xy16-hang-verification] **#321 xy16: verified the runtime hangs are FIXED — no live hang remains.** The soft-stack P0 note's "35/50 `xy16@MAME=0x0000` hangs" were cleared by `8961afb` (byte-level `ldx/ldy/stx/sty` `XHigh` fix) + `4d8a2bd` (X-governed transfer/push-pull annotation). Fresh confirmation: `fuzz 50 1` and `fuzz 50 56` (the exact recorded-hang batches) = **50/50** each; `fuzz 500` = **492/500, 0 mismatch, 0 hangs**. Sole residual = 8 `$p`-spill **compile** xfails (169/173/196/268/271/272/306/420) — the separate `scavenger-p-not-gpr` item, not a hang. Corrected the stale "active area" triage note. (No code change — measurement only.)
 - 2026-06-19 — [xy16-skeleton-comment-fix] **#321 xy16: corrected the stale `// skeleton`/`returns false for everything` comments on `selectXY16`** — the function is fully implemented (C1 direct + C2 `abs,X16`/`(zp),Y16` indexed); comment-only `0002` regen, round-trip PASS, no codegen change. [plan](docs/plans/2026-06-19-fix-the-stale-skeleton-comments-in-selectxy16-rege.md).
