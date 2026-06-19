@@ -1732,7 +1732,7 @@ index 21910cfea..e3fece8b0 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..3cfd46b6b 100644
+index cbdd54ab2..ce8a3875f 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1753,7 +1753,7 @@ index cbdd54ab2..3cfd46b6b 100644
 +  // G_XOR) whose value lives in an Imag16 zero-page pair (locals/multi-use, not
 +  // just the all-global peephole).
 +  bool selectAlu16Native(MachineInstr &MI);
-+  // #321 xy16: G_* ops assigned to Xc16/Yc16; skeleton for M2 legalizer work.
++  // #321 xy16: select G_* ops that use the 16-bit index registers Xc16/Yc16.
 +  bool selectXY16(MachineInstr &MI);
 +  // #321 native s16 constant shift (G_SHL / unsigned G_LSHR, amount in [1,7]):
 +  // `lda; (asl|lsr)*k; sta` on the Imag16 value, bracketed by one rep/sep.
@@ -1828,9 +1828,9 @@ index cbdd54ab2..3cfd46b6b 100644
 +    break;
    }
  
-+  // #321 xy16: route G_* ops assigned to Xc16/Yc16 here. Currently a skeleton
-+  // that returns false for everything; will be filled in during M2 legalizer
-+  // integration (index-register operand widening / load-address forms).
++  // #321 xy16: route G_* ops that use Xc16/Yc16 to selectXY16 (direct load/store/
++  // inc/dec/compare + abs,X16 / (zp),Y16 indexed addressing); returns false for ops
++  // it doesn't own, falling through to selectImpl.
 +  if (STI.hasIndex16() && selectXY16(MI))
 +    return true;
 +
@@ -2200,7 +2200,7 @@ index cbdd54ab2..3cfd46b6b 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1927,6 +2305,760 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1927,6 +2305,758 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    }
    return selectGeneric(MI);
  }
@@ -2396,11 +2396,9 @@ index cbdd54ab2..3cfd46b6b 100644
 +  return true;
 +}
 +
-+// #321 xy16: skeleton selector for G_* ops whose result RA assigned to Xc16/Yc16.
-+// Returns false to fall through to selectImpl — actual X/Y-index selection is a
-+// follow-on task (M2 legalizer integration: index-operand widening, LEA forms).
-+// #321 xy16: select operations that use the 16-bit X/Y index registers (Xc16/Yc16).
-+// Called before selectImpl from the early gate `if (STI.hasIndex16() && selectXY16(MI))`.
++// #321 xy16: select G_* ops that use the 16-bit X/Y index registers (Xc16/Yc16),
++// routed here before selectImpl by the early `STI.hasIndex16() && selectXY16(MI)` gate.
++// Returns false for ops it doesn't own (the default case) → they fall through to selectImpl.
 +//
 +// Handles:
 +//  C1 — direct register ops: G_LOAD/STORE16_ABS/INDIR + dst/val∈Xc16/Yc16 → LDX/STX/LDY/STY
