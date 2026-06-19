@@ -199,7 +199,13 @@ Targets:
              and assert host-expected == default@MAME == a16@MAME == xy16@MAME == a16@bsnes-jg
              + clean -verify-machineinstrs under both +mos-a16 and +mos-xy16.
              Mismatches/crashes land in build/fuzz-triage/.
-             Usage: dev/run.sh fuzz [N] [seed]   (e.g. dev/run.sh fuzz 1 1234 to repro a seed)
+             --gen csmith  (DEFAULT) the off-the-shelf Csmith generator, run HOST-side
+                           (default-build-as-oracle: default == +mos-a16 == +mos-xy16);
+                           builds vendor/csmith on demand. See dev/csmith.sh.
+             --gen builtin the hand-rolled generator with its own 4-way host oracle, run
+                           in-container (today's behavior). See dev/fuzz.sh.
+             Usage: dev/run.sh fuzz [--gen csmith|builtin] [N] [seed]
+                    (e.g. dev/run.sh fuzz --gen csmith 1 11 to repro one Csmith seed)
   k_*        #321 Tier-1 realistic kernels (CRC16, fixed-point mul, PRNG, popcount/bit-reverse,
              saturating add, insertion sort): each asserts host==default==+mos-a16 on both emus
   a16mix*    #321 Tier-1 combinatorial mixing: many s16 features in one body (compares + shifts
@@ -223,6 +229,27 @@ fi
 # not an in-container target — run it directly and stop.
 if [ "$TARGET" = "repro" ]; then
   exec "$HERE/repro.sh" "${@:2}"
+fi
+
+# `fuzz` dispatches by generator (--gen, default csmith). The Csmith generator and its
+# differential run are HOST-side (csmith builds on the host into gitignored vendor/csmith;
+# MAME + bsnes-jg are host tools) — no Docker, so it's intercepted here like `repro`. The
+# builtin generator keeps the in-container path (dev/fuzz.sh) byte-for-byte unchanged.
+if [ "$TARGET" = "fuzz" ]; then
+  GEN=csmith
+  ARGS=()
+  for ((i = 2; i <= $#; i++)); do
+    case "${!i}" in
+      --gen)   i=$((i + 1)); GEN="${!i-}" ;;
+      --gen=*) GEN="${!i#--gen=}" ;;
+      *)       ARGS+=("${!i}") ;;
+    esac
+  done
+  case "$GEN" in
+    csmith)  exec "$HERE/csmith.sh" "${ARGS[@]}" ;;
+    builtin) set -- fuzz "${ARGS[@]}" ;;  # fall through to the in-container dispatch below
+    *)       echo "FATAL: dev/run.sh fuzz: unknown --gen '$GEN' (want: csmith | builtin)" >&2; exit 1 ;;
+  esac
 fi
 
 docker build -t "$IMAGE" "$HERE" >/dev/null

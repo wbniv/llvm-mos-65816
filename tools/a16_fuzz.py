@@ -695,8 +695,11 @@ def _run(cmd, timeout=120, retries=2):
                              % (timeout, attempt + 1, retries))
 
 
-def compile_rom(src, rom, mapf, flags):
-    """Compile src -> SNES ROM. `flags` is a list of extra clang args (e.g. A16, XY16, [])."""
+def compile_rom(src, rom, mapf, flags, cflags=()):
+    """Compile src -> SNES ROM. `flags` is a list of extra clang args (e.g. A16, XY16, []).
+    `cflags` is extra front-end args (default empty); the Csmith runner passes its
+    `-include csmith_snes.h -I vendor/csmith/include` adapter here. Every existing caller
+    omits `cflags` → byte-for-byte unchanged."""
     # Legacy callers that pass a16 as a bool (True/False) → translate transparently.
     if isinstance(flags, bool):
         flags = A16 if flags else []
@@ -704,6 +707,7 @@ def compile_rom(src, rom, mapf, flags):
            "+mos-a16"  if "+mos-a16"  in flags else "default")
     cmd = [str(TOOL / "mos-clang"), "--config", str(CFG), "-mcpu=mosw65816"]
     cmd += flags
+    cmd += list(cflags)
     cmd += ["-Os", "-Wl,-Map=%s" % mapf, "-o", str(rom), str(src)]
     p = _run(cmd)
     if p.returncode != 0:
@@ -713,11 +717,16 @@ def compile_rom(src, rom, mapf, flags):
         raise CompileError("checksum rc=%d\n%s" % (c.returncode, c.stderr))
 
 
-def verify_machineinstrs(src, obj, flags=None):
-    """Compile with -verify-machineinstrs. `flags` defaults to A16. Returns (ok, log)."""
+def verify_machineinstrs(src, obj, flags=None, cflags=()):
+    """Compile with -verify-machineinstrs. `flags` defaults to A16. Returns (ok, log).
+    `cflags` (default empty) threads extra front-end args through unchanged for callers
+    that need an adapter header; the builtin path omits it. NOTE: this uses `--target=mos`
+    (no `--config`), so a TU that #includes libc headers (e.g. Csmith's <math.h>) can't be
+    verified here — the Csmith path skips this step (evaluate(..., verify=False)) and relies
+    on the `--config` link in compile_rom as its crash gate instead."""
     if flags is None:
         flags = A16
-    cmd = [str(TOOL / "mos-clang"), "--target=mos", "-mcpu=mosw65816", *flags,
+    cmd = [str(TOOL / "mos-clang"), "--target=mos", "-mcpu=mosw65816", *flags, *cflags,
            "-Os", "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
     try:
         p = _run(cmd)
@@ -834,6 +843,11 @@ KNOWN_ISSUES = [
     # when fixed so the signature hard-FAILS again (regression guard).
     ("a16-zp-pressure-overflow",
      lambda log: "R_MOS_ADDR8 out of range" in log and ".zp" in log),
+    # (a16-unmerge-s32 — the +mos-a16 `G_UNMERGE_VALUES s32` legalizer gap the Csmith fuzzer
+    # found — was FIXED 2026-06-19 by representing s32 as 2x s16 under a16; its KNOWN_ISSUES
+    # entry is removed so a recurrence hard-FAILS again. See the main-branch commit + plan
+    # docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md and the hermetic gate
+    # examples/65816/a16unmerge.ll / dev/run.sh a16unmerge.)
 ]
 
 
@@ -872,7 +886,7 @@ def triage(seed, csrc, reason, extra=None):
         pass
 
 
-def evaluate(src, expected, want_bsnes, on_triage):
+def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True):
     """The shared safety net: verify-machineinstrs (a16) + compile default/a16 + run
     both on MAME (+ a16 on bsnes-jg) + assert every value agrees.
 
@@ -880,36 +894,52 @@ def evaluate(src, expected, want_bsnes, on_triage):
     expected  int reference value (host-computed / baked), or None to use the trusted
               DEFAULT build's result as the reference (pure default==a16 differential).
     on_triage callback(reason:str, extra:dict) — persist artifacts on failure.
+    cflags    extra front-end args threaded to verify + every compile (default empty →
+              every existing caller unchanged); the Csmith runner passes its adapter
+              `-include csmith_snes.h -I vendor/csmith/include` here.
+    verify    run the -verify-machineinstrs crash gate (default True). The Csmith path
+              passes verify=False: its TUs #include <math.h>, which the verify command's
+              bare `--target=mos` (no `--config`) can't find — so the `--config` LTO link
+              in compile_rom is the crash gate there (it already aborts on a backend ICE,
+              caught below as a CompileError and run through classify_known).
     Returns (status, message, ref_value). status in {PASS,FAIL,CRASH,ERROR,XFAIL}.
     """
     WORK.mkdir(parents=True, exist_ok=True)
     SCRATCH.mkdir(parents=True, exist_ok=True)
 
     # 1) crash detector first: verify-machineinstrs under +mos-a16 and +mos-xy16
-    ok, vlog = verify_machineinstrs(src, WORK / "chk.vo", flags=A16)
-    if not ok:
-        kid = classify_known(vlog)
-        if kid:
-            return "XFAIL", "known issue [%s]" % kid, None
-        on_triage("verify-machineinstrs / compiler crash (+mos-a16)", {"verify": vlog})
-        return "CRASH", "verify-machineinstrs (+mos-a16) failed", None
-    # #321 xy16: also verify under +mos-xy16 (implies +mos-a16; catches X-lattice regressions)
-    ok_xy, vlog_xy = verify_machineinstrs(src, WORK / "chk_xy.vo", flags=XY16)
-    if not ok_xy:
-        on_triage("verify-machineinstrs / compiler crash (+mos-xy16)", {"verify": vlog_xy})
-        return "CRASH", "verify-machineinstrs (+mos-xy16) failed", None
+    if verify:
+        ok, vlog = verify_machineinstrs(src, WORK / "chk.vo", flags=A16, cflags=cflags)
+        if not ok:
+            kid = classify_known(vlog)
+            if kid:
+                return "XFAIL", "known issue [%s]" % kid, None
+            on_triage("verify-machineinstrs / compiler crash (+mos-a16)", {"verify": vlog})
+            return "CRASH", "verify-machineinstrs (+mos-a16) failed", None
+        # #321 xy16: also verify under +mos-xy16 (implies +mos-a16; catches X-lattice regressions)
+        ok_xy, vlog_xy = verify_machineinstrs(src, WORK / "chk_xy.vo", flags=XY16, cflags=cflags)
+        if not ok_xy:
+            on_triage("verify-machineinstrs / compiler crash (+mos-xy16)", {"verify": vlog_xy})
+            return "CRASH", "verify-machineinstrs (+mos-xy16) failed", None
 
     # 2) compile default, +mos-a16, and +mos-xy16 ROMs
     try:
         dft_rom, dft_map   = WORK / "chk_default.sfc", WORK / "chk_default.map"
         a16_rom, a16_map   = WORK / "chk_a16.sfc",     WORK / "chk_a16.map"
         xy16_rom, xy16_map = WORK / "chk_xy16.sfc",    WORK / "chk_xy16.map"
-        compile_rom(src, dft_rom, dft_map, flags=[])
-        compile_rom(src, a16_rom, a16_map, flags=A16)
-        compile_rom(src, xy16_rom, xy16_map, flags=XY16)
+        compile_rom(src, dft_rom, dft_map, flags=[], cflags=cflags)
+        compile_rom(src, a16_rom, a16_map, flags=A16, cflags=cflags)
+        compile_rom(src, xy16_rom, xy16_map, flags=XY16, cflags=cflags)
     except (CompileError, subprocess.TimeoutExpired) as e:
         # CompileError = link/checksum reject; TimeoutExpired = a link compile that hung
-        # past every retry (environmental flakes already cleared inside _run).
+        # past every retry (environmental flakes already cleared inside _run). When verify
+        # is skipped (Csmith path), a backend ICE first appears HERE as a CompileError, not
+        # as a verify rejection — so classify_known() must run on the link error too, else a
+        # KNOWN_ISSUES crash that surfaces only at the --config LTO compile (e.g. a regalloc/
+        # scavenger ICE on a Csmith program) would mis-report as a new CRASH instead of XFAIL.
+        kid = classify_known(str(e))
+        if kid:
+            return "XFAIL", "known issue [%s]" % kid, None
         on_triage("compile failure", {"error": str(e)})
         return "CRASH", "compile failure", None
 

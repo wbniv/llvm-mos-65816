@@ -240,6 +240,26 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   needs no quiet box and no SPC700 BIOS; serial/niced. **DONE + verified 2026-06-19: 45/45 in ~49 s**
   (incl. all 4 xy16 value tests → the recent xy16 codegen IS confirmed on bsnes-jg). Pure harness tooling.
   [plan](docs/plans/2026-06-19-second-emulator-jg-only-confirmation.md).
+- [wip] **#321 Csmith differential fuzzer — replace the builtin generator with Csmith** (keep the engine;
+  builtin selectable via `--gen builtin`). **Phases 0–3 DONE** (on `wt/321-csmith`): Phase 0 GO (`d39d49b`) —
+  Csmith 2.4.0 in gitignored `vendor/csmith` + freestanding adapter
+  (`examples/65816/csmith/{csmith_snes.h,platform.info}`); Phases 1–3 — `tools/csmith_run.py` (per-seed gen →
+  host-side fit pre-filter via `torture_filter.classify` → `evaluate(expected=None, cflags=…, verify=False)`),
+  `dev/csmith.sh`, additive `cflags`/`verify` kwargs in `a16_fuzz.py`, and `dev/run.sh fuzz --gen
+  csmith|builtin` (csmith default, host-side; builtin unchanged in-container). 1–100 sweep = **83/100 PASS, 0
+  mismatch, 10 xfail (`a16-unmerge-s32`), 7 skip (diverged)** — reproduces the spike; corpus 7/7, corpus-a16
+  5/6+xfail, builtin fuzz 50/50 green, `0002` untouched. The default-build-as-oracle differential is sound
+  (`platform.info` int=16 + type-parametric `safe_math` ⇒ UB-free at the target's 16-bit `int`). Two non-obvious
+  bits handled: the s32 ICE is an LTO *link* error (so `classify_known` runs on the `CompileError`, not just the
+  verify log), and Csmith skips per-program verify (its `<math.h>` won't resolve under bare `--target=mos`; the
+  `--config` link is the gate). Found a real `+mos-a16` defect on run one — the `G_UNMERGE_VALUES s32` legalizer
+  gap — now **FIXED on `main`** (s32 represented as 2×s16 under a16; the sweep re-runs **92/100 PASS, 0 xfail, 0
+  mismatch** and the `a16-unmerge-s32` XFAIL is removed — [s32 plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md)).
+  Remaining: **Phase 4** larger seed sweeps, **Phase 5** (sampled CI mirroring `corpus-a16`). **Yarpgen
+  follow-up:** add a `--gen yarpgen` later to target
+  `-O1/-Os` loop/scalar-opt bugs (no `platform.info` equiv → 16-bit-int caveat; must redirect its baked-in
+  `printf`); the `--gen` seam added here makes it drop-in.
+  [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
   into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
@@ -793,4 +813,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • Floating-point / full-libc tests -> outside the freestanding subset; the Phase-0 filter excludes them.
      fp:3d23564aa9d16214 fp:9502a10868aa863f fp:9ef5b0820dd8d148 fp:a2b25e70c9c08d3b -->
 <!-- triaged 2026-06-19: all four verification steps were run immediately before commit 181af86 (grep counts and grep output recorded in the plan, all PASS). The [verify] flag is a false positive — the plan was fulfilled in the same session. Nothing open. fp:72e135cd9174e480 -->
+<!-- triaged 2026-06-19: promoted into curated entries — the Csmith fuzzer (+ its Yarpgen follow-up) under
+     Test Bench / CI, and the `G_UNMERGE_VALUES s32` finding (now FIXED, see Done) under M2 — Optimizing
+     Payoff. These three were the plan's own Follow-ups bullets (Yarpgen; Yarpgen-vs-known-bugs; "add the
+     Csmith TODO entry"); now covered. fp:192eb34724f01c54 fp:0350991c23596f7a fp:d29683e80d7e9f15 -->
 <!-- END auto-captured-deferrals -->
