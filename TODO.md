@@ -789,7 +789,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      Test Bench / CI, and the `G_UNMERGE_VALUES s32` finding (now FIXED, see Done) under M2 — Optimizing
      Payoff. These three were the plan's own Follow-ups bullets (Yarpgen; Yarpgen-vs-known-bugs; "add the
      Csmith TODO entry"); now covered. fp:192eb34724f01c54 fp:0350991c23596f7a fp:d29683e80d7e9f15 -->
-- [ ] **(triage)** **EQ RHS-indexed fusion** (`g == arr[i]` / both-indexed): new `CmpBrAbsIdx16`/`CmpBrIndirIdx16` pseudos + — _from [2026-06-19-321-native-s16-16-bit-indexed-comparisons-rhs-cmp.md](docs/plans/2026-06-19-321-native-s16-16-bit-indexed-comparisons-rhs-cmp.md)_  <!-- fp:2a340a3f28882754 -->
-- [ ] **(triage)** **`+mos-xy16` 16-bit-index compares** (`cmp abs,X16`): separate instruction; the v1 helper deliberately — _from [2026-06-19-321-native-s16-16-bit-indexed-comparisons-rhs-cmp.md](docs/plans/2026-06-19-321-native-s16-16-bit-indexed-comparisons-rhs-cmp.md)_  <!-- fp:2596e84dcec84614 -->
-- [ ] **(triage)** **Indexed LHS explicit fold** — only if Phase 0 shows threading misses it. — _from [2026-06-19-321-native-s16-16-bit-indexed-comparisons-rhs-cmp.md](docs/plans/2026-06-19-321-native-s16-16-bit-indexed-comparisons-rhs-cmp.md)_  <!-- fp:c65f6994b1384180 -->
+<!-- triaged 2026-06-20: all three are the indexed-compares plan's own Deferred section, dispositioned there + in the Done entry [321-native-16bit-indexed-compares].
+     • "Indexed LHS explicit fold" -> NON-WORK: Phase 0 measured the LHS case (`arr[i] < limit`) already optimal (the staged value threads back into A16 via threadAccum16); the "only if Phase 0 shows threading misses it" gate did not trigger.
+     • "EQ RHS-indexed fusion" + "+mos-xy16 16-bit-index compares" -> real but measurement-gated extensions, intentionally not built in v1 (low frequency / separate instruction); fully recorded in the plan's Deferred section, to be revived only if a frequency scan justifies them. Nothing open. fp:2a340a3f28882754 fp:2596e84dcec84614 fp:c65f6994b1384180 -->
 <!-- END auto-captured-deferrals -->
