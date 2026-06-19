@@ -209,28 +209,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   upstream posture — post the prior-art note + a first-pass CC to #321 (user-triggered; see Upstream section).
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
-- [wip] **DWARF round-trip (drmon tie-in).** `-g` build emits llvm-mos DWARF that drmon's DAP loads
-  with correct line/variable mapping. ROADMAP step 6. **drmon block (Steps 1–4) DONE + committed
-  (2026-06-18); at the review pause before any `vendor/` edits.** Step 1 audit CLEAN: DWARF content
-  correct (16-bit local `t`→`DW_OP_regx RS1`, frame_base RS0, `--verify` clean) **and** the build already
-  emits a `<rom>.elf` DWARF companion (`ld.lld` writes it beside the ROM — *no* debug-ELF gap; an earlier
-  "discards the ELF" finding was wrong, corrected). drmon: `SymbolTable::loadElf` via libdwarf (drdevtools
-  `9b378ba`), live-MAME DAP V3–V6 PASS (`1a5c05f`), end-to-end source breakpoint fires in MAME — Phase C
-  6/6 (`bdf0af0`→`2344483`). **Step 5 DONE (2026-06-19):** compiler-side regression `dev/run.sh dwarf`
-  (gate 7/7 — companion ELF emitted, `--verify` clean, frame_base RS0, 16-bit local `DW_OP_regx`, line
-  table) + tracked upstream-staged lit test `dev/lit/DebugInfo/MOS/dwarf-65816.ll` (verified via manual
-  `llc|dwarfdump|FileCheck`). **No `vendor/` edits** (regen-patch wouldn't capture `llvm/test/`; full lit
-  unbuildable here) → no `0002` regen. **VS Code GUI (2026-06-19, drdevtools `545723a`):** extension
-  loads + attaches + source breakpoint on `a16local.c:17` **verifies** (abs path → DWARF basename →
-  `$8074`; screenshots in the Phase-3 Tier-3 plan). The GUI exercise found + fixed two drmon adapter bugs
-  (attach-flow stops; `stackTrace` source-line map); the full halt→source-map sequence is verified
-  headlessly (`task test-dap` `phasec` 8/8). **Step 6 DONE (2026-06-19):** the `<output>.elf` doc note is
-  now drafted (`docs/321-upstream-dwarf-output-elf-companion.md` — undocumented companion `.elf` for any
-  `OUTPUT_FORMAT { FULL/TRIM }` link), so **both** upstream-PR halves exist; both step-5 gates re-verified
-  (lit 4/4 RUN lines, `dev/run.sh dwarf` 7/7). Promoted in `upstream-contribution-status.md` to *Ready to
-  post now #5* (bundled test+docs PR). **Implementation + verification complete.** Left: only the
-  user-triggered upstream *posting*.
-  [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
 
 ### Test Bench / CI
 
@@ -375,6 +353,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-19 — [dwarf-round-trip] **DWARF round-trip (ROADMAP step 6) + drmon VS Code GUI: COMPLETE.** `-g` builds emit `<rom>.elf` companion; drmon loads it via libdwarf; source breakpoints fire in VS Code + MAME headlessly (8/8). `dev/run.sh dwarf` 7/7. Upstream PR halves drafted (lit test + `.elf` doc note). Left: user-triggered upstream posting (item 5 in upstream-contribution-status.md). [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
 - 2026-06-19 — [321-a16-unmerge-s32] **#321 `+mos-a16` s32 (`long`/`int32_t`) support — fixed the `G_UNMERGE_VALUES s32` backend abort.** Csmith-found (`wt/321-csmith` seed 11 + 9 more, XFAILed as `a16-unmerge-s32`): `+mos-a16` aborted on valid C using `int32_t`/`long` in s16-interacting shapes (e.g. `trunc i32→i16`), while DEFAULT compiled clean. Root cause: under `+mos-a16` s16 is a legal type so narrowing stops at s16 and diverts s32 into 2×s16 pieces, but the s32↔s16 legalizer glue didn't exist (no minimal fix — the cascade unmerge→trunc→anyext is the s32-under-a16 feature). Fix = **4 additive `hasAccum16()`-gated legalizer rules** (`G_ANYEXT`/`G_TRUNC`/`G_MERGE`/`G_UNMERGE` for s32↔s16); the artifact combiner folds the (un)merge so **no selector change**; `G_ZEXT` left at maxScalar S8 (raising to S16 broke s8→s16 zext). Verified: sweep **92/100 PASS, 0 mismatch, 0 xfail** (was 83/10/7); corpus-a16 5/6+xfail; hermetic `dev/run.sh a16unmerge` (frozen seed-11 `.ll`, **red-green validated** with fresh `mos-clang` — `llc` is stale, not in the `toolchain` rebuild path); `0002` regen round-trips. Remaining bookkeeping: remove the `a16-unmerge-s32` XFAIL on `wt/321-csmith`. [plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md).
 - 2026-06-19 — [pre-public-polish] **Repo: Apache-2.0 LICENSE + NOTICE, README → M2, gitignore transcripts.** All four steps PASS (181af86). [plan](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md).
 - 2026-06-19 — [xy16-hang-verification] **#321 xy16: verified the runtime hangs are FIXED — no live hang remains.** The soft-stack P0 note's "35/50 `xy16@MAME=0x0000` hangs" were cleared by `8961afb` (byte-level `ldx/ldy/stx/sty` `XHigh` fix) + `4d8a2bd` (X-governed transfer/push-pull annotation). Fresh confirmation: `fuzz 50 1` and `fuzz 50 56` (the exact recorded-hang batches) = **50/50** each; `fuzz 500` = **492/500, 0 mismatch, 0 hangs**. Sole residual = 8 `$p`-spill **compile** xfails (169/173/196/268/271/272/306/420) — the separate `scavenger-p-not-gpr` item, not a hang. Corrected the stale "active area" triage note. (No code change — measurement only.)
