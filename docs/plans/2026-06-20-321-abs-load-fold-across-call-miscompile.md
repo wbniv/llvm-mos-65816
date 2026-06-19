@@ -93,9 +93,20 @@ Applied identically to `foldableAbsLoad16` (G_LOAD16_ABS) and `foldableIndirLoad
 5. **verify-machineinstrs:** clean — exercised by every `diff_check`/`torture` compile above (no "Bad machine
    code"). **PASS**.
 6. **Non-breaking:** `dev/run.sh fuzz 50 1` + the full `-Os` torture re-sweep (`torture 1200 --start 60
-   --no-bsnes`, the exact range that had 2 FAILs) → expect 0 FAIL. _<running — fill on completion>_.
+   --no-bsnes`, the exact range that had 2 FAILs) → expect 0 FAIL.
+   ```
+   ==> csmith: 45/50 PASS, 0 xfail, 5 skip  (0 mismatch, 0 crash, 0 error)
+   ==> torture-run: 1114 PASS, 0 FAIL, 54 SKIP, 0 XFAIL (of 1168)
+        pr34768-1.c            PASS  all variants PASS (0x600D)
+        pr34768-2.c            PASS  all variants PASS (0x600D)
+   ```
+   **PASS** — re-sweep `0 FAIL` (was 2; +2 PASS, no regression); fuzz 0-mismatch/0-crash.
 7. **Patch round-trips:** `dev/regen-patch.sh`; staged set is exactly my files; `0002` no foreign hunks.
-   _<fill on commit>_.
+   ```
+   RESULT: PASS — 0002 round-trips (reapplied MOS dir == live vendor)
+   # git diff --stat: 26 insertions / 5 deletions (noStoreBetween + 2 call sites); noStoreBetween=3
+   ```
+   **PASS** — committed `86c2602`.
 
 ## Risks
 

@@ -35,10 +35,12 @@ completing default — also FAIL). `-verify-machineinstrs` is exercised by the p
   a follow-up `--opt -O1` pass is optional if `-Os` is clean.
 - **No `vendor/`/`0002` edits** unless Phase 2 produces a root-caused bug — Phase 1 is pure execution.
 
-## Phase 1 — Run the sweep (IN PROGRESS, 2026-06-20)
+## Phase 1 — Run the sweep — DONE 2026-06-20
 
-`dev/run.sh torture 1200 --start 60 --no-bsnes` — sweeps ~1168 in-scope tests at `-Os`. Watch the stream for
-`FAIL` / `XPASS` / `mismatch`. Record the final `torture-run: N PASS, M FAIL, …` tally.
+`dev/run.sh torture 1200 --start 60 --no-bsnes` swept all 1168 in-scope tests at `-Os`. First run:
+**`1112 PASS, 2 FAIL, 54 SKIP, 0 XFAIL`** — the 2 FAILs `pr34768-1`/`pr34768-2`, **0 XPASS churn** (the
+`CMPIndir16` fold `9009260` confirmed non-regressing). Combined with the earlier first-60 run, the whole
+in-scope set is covered at `-Os`.
 
 ## Phase 2 — Triage any FAIL (only if M > 0)
 
@@ -52,10 +54,15 @@ Per failing test, in priority order (mirror the prior cluster fixes):
 4. **Fix + regression-guard in the same change** — in-backend fix in `vendor/`, regen `0002`; de-XFAIL the
    cleared rows in `xfails.tsv` **and** add an `examples/65816/` micro-test as a positive gate.
 
-## Phase 3 — Record the verdict
+## Phase 3 — Record the verdict — DONE 2026-06-20
 
-Green: record the full tally + "no new FAIL / no XPASS churn; confirms the `CMPIndir16` fold non-regressing".
-Bugs found: one commit per cluster (fix + regen + de-XFAIL + micro-test), each citing the breaking commit.
+The 2-FAIL `pr34768` cluster was root-caused to a pre-existing a16 load-fold-across-call miscompile and
+**fixed** (commit `86c2602`, citing the breaking commit `ef4671d`; see
+[fix plan](2026-06-20-321-abs-load-fold-across-call-miscompile.md)). Full `-Os` **re-sweep:
+`1114 PASS, 0 FAIL, 54 SKIP, 0 XFAIL`** (was `1112/2`; +2 PASS, no regression), fuzz 45/50 0-mismatch/0-crash.
+Verdict: the in-scope c-torture set is **green at `-Os`** (and `-O1`), and the `CMPIndir16` fold is confirmed
+non-regressing. Remaining suite work (Phase 3 sampled CI, orphan-MAME reaping) tracked under the parent
+`[wip]` c-torture TODO item.
 
 ## Verification (run each; paste raw output + PASS/FAIL back here on execution)
 
