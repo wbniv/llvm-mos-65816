@@ -234,15 +234,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [ ] **#321 bsnes-jg-only confirmation runner (`dev/run.sh xcheck-suite`).** A MAME-skipping `JG_ONLY`
-  pass over the value-differential micro-tests, so the **second emulator** can be exercised cheaply and
-  deterministically without booting MAME (the flaky leg) — runnable on a contended box, serial/niced.
-  Design: a `JG_ONLY` guard in `dev/_emu.sh` (`run_assert`/`require_bios` no-op when set) +
-  `dev/xcheck-suite.sh`. Motivated by confirming recent **xy16** codegen on bsnes-jg — coverage is
-  already complete (all 4 value-level xy16 tests carry a jgxcheck leg; `xy16spill` is a compile-only
-  `-verify-machineinstrs` gate, not a gap); what's unknown is the last actual *run*, which only a run
-  settles. The bsnes-jg leg is deterministic, so this needs **no** quiet box (unlike MAME/`fuzz`). Pure
-  harness tooling — no codegen/`vendor`/`0002` change.
+- [x] **#321 bsnes-jg-only confirmation runner (`dev/run.sh xcheck-suite`) — standing capability.** A
+  MAME-skipping `JG_ONLY` pass (`dev/_emu.sh` guard + `dev/xcheck-suite.sh`) over the value-differential
+  micro-tests — exercises the **second emulator** cheaply + deterministically without booting MAME, so it
+  needs no quiet box and no SPC700 BIOS; serial/niced. **DONE + verified 2026-06-19: 45/45 in ~49 s**
+  (incl. all 4 xy16 value tests → the recent xy16 codegen IS confirmed on bsnes-jg). Pure harness tooling.
   [plan](docs/plans/2026-06-19-second-emulator-jg-only-confirmation.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)

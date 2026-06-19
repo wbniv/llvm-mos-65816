@@ -10,6 +10,11 @@
 #                                      boot ROM headless in MAME under smoke.lua, assert the
 #                                      SYMBOL bytes == EXPECT. Prints the SMOKE: line; returns
 #                                      0 on PASS, 1 on FAIL.
+#
+#   JG_ONLY=1 (env)                    bsnes-jg-only pass: require_bios + run_assert become no-ops
+#                                      (the MAME leg is skipped), so a caller runs its deterministic
+#                                      bsnes-jg leg alone — no MAME, no SPC700 BIOS, load-insensitive.
+#                                      Used by dev/xcheck-suite.sh; see the step-6 second-emulator plan.
 set -euo pipefail
 
 _EMU_ROOT=/work
@@ -17,6 +22,14 @@ _EMU_LUA="$_EMU_ROOT/dev/smoke.lua"
 _EMU_SCRATCH=/tmp/mame-scratch
 
 require_bios() {
+  # bsnes-jg-only pass (JG_ONLY=1): the bsnes-jg core needs no SPC700 IPL, so skip the
+  # MAME BIOS gate. Still set ROMPATH + scratch (harmless, matches the normal path) but
+  # never fail on a missing BIOS — the deterministic bsnes-jg leg carries the verdict.
+  if [ "${JG_ONLY:-}" = "1" ]; then
+    ROMPATH="${SNES_ROMPATH:-$_EMU_ROOT/dev/roms}"
+    mkdir -p "$_EMU_SCRATCH"
+    return 0
+  fi
   ROMPATH="${SNES_ROMPATH:-$_EMU_ROOT/dev/roms}"
   local bios="$ROMPATH/s_smp/spc700.rom"
   # MAME's snes driver requires the 64-byte SPC700 APU IPL ROM (Nintendo content;
@@ -42,6 +55,13 @@ _emu_map_lookup() {
 
 run_assert() {
   local rom="$1" map="$2" sym="$3" expect="$4"
+  # bsnes-jg-only pass (JG_ONLY=1): skip the MAME leg entirely — each test's own
+  # bsnes-jg block still runs. Return 0 so the caller's `|| rc=1` is a no-op; the
+  # verdict comes from the deterministic bsnes-jg check, not MAME.
+  if [ "${JG_ONLY:-}" = "1" ]; then
+    echo "SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)"
+    return 0
+  fi
   local vma size addr len log
 
   read -r vma size < <(_emu_map_lookup "$map" "$sym") || true

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|xcheck|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16indiry|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16indiry|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -201,12 +201,17 @@ Targets:
              saturating add, insertion sort): each asserts host==default==+mos-a16 on both emus
   a16mix*    #321 Tier-1 combinatorial mixing: many s16 features in one body (compares + shifts
              + chains + calls + spills); asserts host==default==+mos-a16 on both emus
+  xcheck-suite  bsnes-jg-ONLY confirmation: run the a16/xy16 value tests' second-
+             emulator leg with JG_ONLY=1 (MAME skipped), serial + nice. Deterministic
+             → needs no quiet box and no SPC700 BIOS. Optional PREFIX arg filters
+             (e.g. `xcheck-suite xy16`). Needs `xcheck` run first (builds build/jgxcheck).
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for
 `repro`, to repro.sh.
 Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH,
-MOS_TOOLCHAIN (toolchain install prefix to build the bench with), BUILD_JOBS.
+MOS_TOOLCHAIN (toolchain install prefix to build the bench with), BUILD_JOBS,
+JG_ONLY (=1 → bsnes-jg-only: skip the MAME leg, used by xcheck-suite / a single test).
 USAGE
   exit 0
 fi
@@ -230,4 +235,5 @@ exec docker run --rm \
   ${SNES_ROMPATH:+-e SNES_ROMPATH} \
   ${MOS_TOOLCHAIN:+-e MOS_TOOLCHAIN} \
   ${BUILD_JOBS:+-e BUILD_JOBS} \
+  ${JG_ONLY:+-e JG_ONLY} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}"

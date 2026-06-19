@@ -81,14 +81,67 @@ a cap is unnecessary for this runner. Add only if a future parallel mode is buil
 - **Non-codegen work** (e.g. the DWARF doc note): **skip both** — nothing observable changed on either
   emulator; the relevant gate is the task's own (`dev/run.sh dwarf`).
 
-## Verification (run once built — paste raw output here, PASS/FAIL each)
+## Verification — ✅ ALL PASS (implemented + run 2026-06-19)
+
+Implemented: `JG_ONLY` guard in `dev/_emu.sh` (`run_assert` + `require_bios`), `dev/xcheck-suite.sh`,
+and `dev/run.sh` (`xcheck-suite` target + `JG_ONLY` env forwarding).
 
 1. **`JG_ONLY=1` skips MAME, keeps the bsnes-jg leg** — `JG_ONLY=1 dev/run.sh a16add` →
    `SMOKE: SKIP (JG_ONLY …)` present, `bsnes-jg: … corpus_result == 0x2345` PASS, exit 0.
+```
+==> disasm gate: 16-bit add fuses to clc / rep #$20 / lda / adc / sta / sep #$20 (one bracket)
+  PASS: exactly one rep #$20 …  PASS: 16-bit adc present
+==> MAME: assert corpus_result == 0x2345 (0x1234 + 0x1111)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+==> bsnes-jg: assert corpus_result == 0x2345 (independent confirmation)
+  SMOKE: PASS off=0x206 len=2 got=0x2345 (ran 180 frames, bsnes-jg)
+RESULT: PASS …   EXIT=0
+```
+**PASS** — disasm gate still runs; MAME leg skipped; deterministic bsnes-jg leg confirms the value.
+
 2. **`dev/run.sh xcheck-suite`** runs every value test serially, prints a tally, exits 0 on all-pass.
+```
+==> bsnes-jg-only (JG_ONLY) confirmation — 45 value test(s), serial, nice -n 19
+  PASS  a16  …  a16thread  xy16basic  xy16indiry  xy16ops  xy16spillr      (45 lines, each with a
+                            SMOKE: PASS … (ran 180 frames, bsnes-jg) result line)
+RESULT: PASS — 45/45 bsnes-jg value tests agree (second emulator confirmed, MAME not run)
+SUITE-EXIT=0   (10:51:41Z → 10:52:30Z, ~49 s serial)
+```
+**PASS** — 45/45, ~49 s. (Set = a16*/xy16* carrying a jgxcheck leg; the 6 compile-only gates
+`a16spill`/`a16mix*`/`a16spillir`/`a16ashift8`/`xy16spill` are auto-excluded.)
+
 3. **`dev/run.sh xcheck-suite xy16`** runs exactly the 4 xy16 value tests; all bsnes-jg PASS.
+```
+==> bsnes-jg-only (JG_ONLY) confirmation — 4 value test(s) matching 'xy16', serial, nice -n 19
+  PASS  xy16basic    SMOKE: PASS off=0x202 len=2 got=0x0042 (ran 180 frames, bsnes-jg)
+  PASS  xy16indiry   SMOKE: PASS off=0x344 len=2 got=0x7E5A (ran 180 frames, bsnes-jg)
+  PASS  xy16ops      SMOKE: PASS off=0x202 len=2 got=0x2A42 (ran 180 frames, bsnes-jg)
+  PASS  xy16spillr   SMOKE: PASS off=0x215 len=2 got=0x3457 (ran 180 frames, bsnes-jg)
+RESULT: PASS — 4/4 bsnes-jg value tests agree (second emulator confirmed, MAME not run)   EXIT=0
+```
+**PASS** — 4/4. **This settles the motivating question: the recent xy16 codegen IS confirmed on the
+second emulator (bsnes-jg).**
+
 4. **BIOS-independence** — temporarily hide `dev/roms/s_smp/spc700.rom`; `JG_ONLY=1 dev/run.sh a16add`
    still passes (require_bios skipped). Restore the BIOS after.
+```
+=== SPC700 BIOS temporarily hidden (ABSENT) ===
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+  SMOKE: PASS off=0x206 len=2 got=0x2345 (ran 180 frames, bsnes-jg)
+RESULT: PASS …   EXIT=0
+=== BIOS restored (present) ===
+```
+**PASS** — runs to a green bsnes-jg verdict with the SPC700 IPL absent; BIOS restored.
+
+### Implementation notes / deviations from the design
+- **Logs land in `build/xcheck-suite/`** (under the mounted `/work`), not `/tmp` — the container is
+  `--rm`, so `/tmp` logs vanished; mounting them keeps per-test logs for triage.
+- **"bsnes-jg actually ran" is a positive check**: a test PASSes only if its log carries the
+  `…(ran N frames, bsnes-jg)` result line — a green exit code alone can also mean the leg *SKIPped*
+  (when `build/jgxcheck` is absent), which the suite now flags as `jg-SKIP`, not PASS.
+- Cosmetic: under `JG_ONLY` a per-test script still prints its closing `RESULT: PASS … both emulators
+  agree` (MAME was skipped). The suite keys off the **exit code + the bsnes-jg result line**, not that
+  text, so the tally is correct; the wording is left as-is to avoid touching all 45 scripts.
 
 ## Scope / non-goals
 
