@@ -729,7 +729,13 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "A separate corpus-a16 job (rejected above)" -> a rejected design alternative, not work. The chosen
        design extends the xcheck job (no toolchain-build duplication). Nothing open.
      fp:5f8372d2444e1e6b fp:6a08cf207dd87a4b -->
-- [ ] **(triage)** The open xy16 fuzz failures / emulator hangs (separate, active area). — _from [2026-06-19-321-xy16-indiry-gate.md](docs/plans/2026-06-19-321-xy16-indiry-gate.md)_  <!-- fp:1fcc2870d2445ea7 -->
-- [ ] **(triage)** Hardware-stack ABI + calling convention (deferred / gated on the CC decision). — _from [2026-06-19-321-xy16-indiry-gate.md](docs/plans/2026-06-19-321-xy16-indiry-gate.md)_  <!-- fp:9b195ad521b9ffae -->
-- [ ] **(triage)** A standalone `(zp),Y16` *store* gate (`STIndirYIdx16`) — the load path is the higher-value read; the store — _from [2026-06-19-321-xy16-indiry-gate.md](docs/plans/2026-06-19-321-xy16-indiry-gate.md)_  <!-- fp:8e99366f38c84605 -->
+<!-- triaged 2026-06-19: all three xy16-indiry-gate "Out of scope" bullets dispositioned (none is work for this task).
+     • "open xy16 fuzz failures / emulator hangs" -> a separate, active xy16-hardening area (the pre-existing
+       xy16@MAME hangs from the soft-stack P0 note); ongoing xy16 work is tracked by the curated M2 "#321 stage 1
+       — full xy16 mode + ABI" item. Not this gate's scope.
+     • "hardware-stack ABI + calling convention" -> now the explicit remaining follow-on IN that same stage-1
+       item (just reconciled), and gated on the curated "#321 calling-convention" item. Already covered.
+     • "standalone (zp),Y16 STORE gate" -> deliberate scope marker: the load path is the higher-value read; the
+       symmetric store pseudo (STIndirYIdx16) is exercised by the fuzzer's xy16 track. Nothing open.
+     fp:1fcc2870d2445ea7 fp:9b195ad521b9ffae fp:8e99366f38c84605 -->
 <!-- END auto-captured-deferrals -->
