@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/cfef277) | #321 docs: correct stale "corpus is 8-bit" claim on the scavenger XFAIL |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/09dee52) | #321 docs: split the scavenger N/Z-liveness crash into its own XFAIL row |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/dcbd5de) | #321 docs: fix the dangling "(1)" in deferred/rejected-items intro |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+cfef277	author	Will Norris
+cfef277	added	1
+cfef277	deleted	1
+cfef277	files	1
+cfef277	body	We now have a 16-bit corpus (corpus-a16 differential gate, c998d7f,\n2026-06-19). The reason the corpus doesn't catch the scavenger N/Z crash\nis not that the corpus is 8-bit — it's that the crash is a fuzzer-found\nshape (8/500 seeds), not a corpus program. The corpus's one +mos-a16\ncasualty is the separate globals.c RA failure. Reword the Why clause.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 09dee52	author	Will Norris
 09dee52	added	2
 09dee52	deleted	2
