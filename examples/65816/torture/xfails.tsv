@@ -14,11 +14,17 @@
 #
 # Remove a row when its defect is fixed (so the test hard-FAILS again = regression guard).
 #
+# CAVEAT (oracle gap, found during triage): "default build self-checks PASS" is necessary but
+# NOT sufficient — a test that relies on UB our target resolves differently (e.g. 32-bit `int`)
+# can PASS in default by chance and "fail" in a16 as a FALSE POSITIVE. Honor gcc's
+# `dg-require-effective-target` directives (int32plus, label_values, …); a TODO tracks adding a
+# Phase-0 filter for them. Rows flagged "FALSE-POSITIVE" below are target-inappropriate, not bugs.
+#
 # test          feature   note (one-line characterization; deep root-cause is per-test follow-up)
 20010518-2.c    a16       mis-aligned packed structures
 20020402-1.c    a16       derived from PR c/2100 (pointer/struct)
 20071202-1.c    a16       nested structs with int arrays
-20071210-1.c    a16       PR rtl-optimization/34302 (label-values / computed goto)
+20071210-1.c    a16       computed goto (goto *q; label_values/indirect_jumps) — suspect REPSEP M-mode tracking across indirect jump
 20080522-1.c    a16       referenced-vars / address-taken induction var
 921117-1.c      a16       struct return / layout
 990127-1.c      a16       (hand-written correctness test)
@@ -27,7 +33,7 @@ pr20466-1.c     a16       PR (multi-pointer noinline function)
 pr35472.c       a16       memset over a struct
 pr39120.c       a16       struct-by-value / pointer member (noinline)
 pr49419.c       a16+xy16  PR tree-optimization/49419 (xy16 also -> 0x0000)
-pr7284-1.c      a16+xy16  signed left-shift (impl-defined, DR#081)
-20041011-1.c    xy16      xy16 index-mode miscompile
+pr7284-1.c      a16+xy16  FALSE-POSITIVE — requires int32plus; n<<24 is UB on 16-bit int (default PASS by UB-luck), target-inappropriate
+20041011-1.c    xy16      64-bit ull + 32 locals/loop = extreme register pressure; likely pressure-family or real 64-bit codegen
 doloop-1.c      xy16      counted loop at INT limits (limits.h)
 va-arg-22.c     xy16      variadic argument handling

@@ -258,7 +258,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `memset`, varargs, signed left-shift, computed-goto, counted loops at `INT` limits) → likely several
   distinct bugs. Each: delta-reduce → minimal `.c` → root-cause → fix in-backend with a regression test (or
   XFAIL+investigation if upstream/deferred), then remove its `xfails.tsv` row. 13 a16 (incl. `pr49419`,
-  `pr7284-1` also xy16) + 3 xy16-only (`20041011-1`, `doloop-1`, `va-arg-22`).
+  `pr7284-1` also xy16) + 3 xy16-only (`20041011-1`, `doloop-1`, `va-arg-22`). **Triage started:** `pr7284-1`
+  is a **FALSE POSITIVE** (`dg-require int32plus`; `n<<24` is UB on 16-bit `int`) → also file a harness
+  refinement to **honor `dg-require-effective-target`** (skip `int32plus`/etc.) so the oracle stops admitting
+  UB-reliant tests; `20071210-1` suspect = REPSEP M-mode tracking across computed `goto *`.
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
   `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the
