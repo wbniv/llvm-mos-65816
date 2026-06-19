@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/15542ff) | #321 c-torture Phase 1: pilot finds a real a16 ZP-pressure overflow (pr15296.c) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8085d2a) | #321 c-torture Phase 0: fetch + host-side compile/link filter (1253/1656 in-scope) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/34cd16a) | #321 plan: vendor GCC c-torture/execute behind the +mos-a16/+mos-xy16 differential gate |
 
 <!--history-meta v1
+15542ff	author	Will Norris
+15542ff	added	68
+15542ff	deleted	21
+15542ff	files	1
+15542ff	body	120-test differential pilot (40 @ -Os, 40 @ -O1, 40 @ -O1 over pr*):\n102 PASS, 17 SKIP, 1 XFAIL. All four classification paths exercised; the\nrunner is correct.\n\nThe one FAIL, pr15296.c, is a REAL +mos-a16 -O1/-Os defect: the a16 build\nallocates so many Imag16 zero-page pairs that .zp.noinit grows past 256 B\nand an 8-bit ZP relocation overflows (R_MOS_ADDR8 out of range). DEFAULT\n8-bit and +mos-a16 -O0 link clean; -O1/-Os fail — the SAME register-\npressure root cause as the globals.c RA crash, a different symptom (link\nZP overflow vs RA crash). Added KNOWN_ISSUES["a16-zp-pressure-overflow"]\nso the gate XFAILs it (the fuzzer is unaffected — it never feeds link\nerrors to classify_known); recorded as a "related manifestation" in the\nRA-pressure investigation. Fix home: the deferred A16-threading Phase 3.\n\nPlan: Phases 0+1 marked DONE, Phase 1 RESULTS + verification filled.\nNo vendor/llvm-mos or 0002 change.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8085d2a	author	Will Norris
 8085d2a	added	76
 8085d2a	deleted	30

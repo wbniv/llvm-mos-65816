@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/f9a33d6) | #321 docs: reflect c-torture Phases 0+1 across the index docs |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/3be4584) | #321 docs: add the c-torture differential-suite plan to the plan index |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+f9a33d6	author	Will Norris
+f9a33d6	added	1
+f9a33d6	deleted	1
+f9a33d6	files	1
+f9a33d6	body	- plan-index.md: c-torture row -> Phases 0+1 done (pilot 102/17/1, the\n  pr15296 ZP-pressure finding); add the e9e3de6 + 15542ff commits.\n- deferred-and-rejected-items.md: note the a16-zp-pressure-overflow as a\n  sibling symptom on the globals.c XFAIL row (same Phase-3 fix).\n- agent-handoff.md: the emulator differential gate is live —\n  dev/run.sh torture, oracle-gated SKIP/FAIL/XFAIL.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3be4584	author	Will Norris
 3be4584	added	1
 3be4584	deleted	0

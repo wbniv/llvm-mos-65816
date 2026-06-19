@@ -33,8 +33,21 @@ import a16_fuzz as fz  # noqa: E402  (path set above; runs with ROOT=/work in th
 PASS_SENTINEL = 0x600D
 SRCDIR = fz.ROOT / "vendor" / "c-torture" / "execute"
 INSCOPE = fz.ROOT / "examples" / "65816" / "torture" / "inscope.tsv"
+XFAILS = fz.ROOT / "examples" / "65816" / "torture" / "xfails.tsv"
 SHIM = fz.ROOT / "examples" / "65816" / "torture" / "_shim.c"
 DEFS = ["-Dmain=torture_test_main", "-Dabort=__torture_abort", "-Dexit=__torture_exit"]
+
+
+def load_xfails():
+    """Map test-name -> note for the confirmed-miscompile expected-fail manifest (if present)."""
+    out = {}
+    if XFAILS.exists():
+        for ln in XFAILS.read_text().splitlines():
+            ln = ln.strip()
+            if ln and not ln.startswith("#"):
+                f = ln.split(None, 2)
+                out[f[0]] = (f[2] if len(f) > 2 else (f[1] if len(f) > 1 else ""))
+    return out
 
 
 def build(test, rom, mapf, flags, shim_obj, opt):
@@ -173,6 +186,7 @@ def main():
     if sp.returncode != 0:
         sys.exit("FATAL: shim precompile failed:\n%s" % sp.stderr)
 
+    xfails = load_xfails()
     tally = {"PASS": 0, "FAIL": 0, "SKIP": 0, "XFAIL": 0}
     fails = []
     for name in names:
@@ -180,14 +194,24 @@ def main():
         if not test.exists():
             print("  %-22s ERROR  not found" % name); continue
         status, detail = evaluate(test, shim_obj, args.opt, want_bsnes)
+        # A confirmed-miscompile in the expected-fail manifest is XFAIL, not FAIL, so the gate
+        # stays green-modulo-known while each backlog defect is triaged + fixed. An UNEXPECTED pass
+        # (status PASS but listed) is surfaced as XPASS — the row should be removed (defect fixed).
+        if name in xfails:
+            if status == "FAIL":
+                status, detail = "XFAIL", "expected c-torture miscompile (%s)" % xfails[name]
+            elif status == "PASS":
+                status, detail = "XPASS", "listed in xfails.tsv but now PASSes — remove the row"
         tally[status] = tally.get(status, 0) + 1
-        mark = {"PASS": "  ", "SKIP": "··", "XFAIL": "xf", "FAIL": "!!"}.get(status, "??")
+        mark = {"PASS": "  ", "SKIP": "··", "XFAIL": "xf", "XPASS": "XP", "FAIL": "!!"}.get(status, "??")
         print("  %s %-22s %-5s %s" % (mark, name, status, detail))
         if status == "FAIL":
             fails.append((name, detail))
 
-    print("==> torture-run: %d PASS, %d FAIL, %d SKIP, %d XFAIL (of %d)"
-          % (tally["PASS"], tally["FAIL"], tally["SKIP"], tally["XFAIL"], len(names)))
+    xp = tally.get("XPASS", 0)
+    print("==> torture-run: %d PASS, %d FAIL, %d SKIP, %d XFAIL%s (of %d)"
+          % (tally["PASS"], tally["FAIL"], tally["SKIP"], tally["XFAIL"],
+             (", %d XPASS" % xp) if xp else "", len(names)))
     if fails:
         print("    FAILs (real #321 defects to triage):")
         for n, d in fails:

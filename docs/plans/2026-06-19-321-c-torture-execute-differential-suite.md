@@ -1,10 +1,11 @@
 # Vendor an external C correctness suite (gcc `c-torture/execute`) behind the `+mos-a16`/`+mos-xy16` differential gate
 
-**Date:** 2026-06-19 · **Status:** **PHASES 0 + 1 DONE (2026-06-19)** — fetch + host-side filter
-(**1253 / 1656** in-scope) and the emulator differential runner both landed and verified. 120-test pilot:
-**102 PASS, 17 SKIP, 1 XFAIL** (a real `+mos-a16 -O1/-Os` defect, `pr15296.c`, classified into the known
-register-pressure family). Phase 2 (full-suite scale + triage) and Phase 3 (sampled CI) pending. See
-§"Phase 0 / Phase 1 — RESULTS".
+**Date:** 2026-06-19 · **Status:** **PHASES 0 + 1 DONE; PHASE 2 `-O1` PASS DONE (2026-06-19).** Fetch +
+host filter (**1253 / 1656** in-scope) + the emulator differential runner. Full `-O1` pass: **1098 PASS,
+136 SKIP, 3 known-XFAIL** (ZP-pressure family) **+ 16 confirmed NEW runtime miscompiles** (a16/xy16
+wrong-value, all reproduced in isolation on both emulators — the payoff). Recorded in `xfails.tsv`; gate is
+green-modulo-known. **Remaining:** the `-Os` pass + per-defect root-cause backlog; Phase 3 (sampled CI).
+See §"Phase 2 — RESULTS".
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — broaden correctness coverage beyond the 6-program corpus + `a16*` micro-tests + the random fuzzer).
 **Required reading:**
 [corpus-a16 differential gate (the engine this reuses)](2026-06-19-321-corpus-a16-differential-mode.md) ·
@@ -103,17 +104,18 @@ verdicts **are** committed (our own work).
    40 @ `-O1`, 40 @ `-O1` over the `pr*` regression tests. All four classification paths exercised; one
    real defect found (`pr15296.c`).
 
-### Phase 2 — scale + triage
-6. Run the **full `inscope.tsv`** at `-Os` and `-O1` (time-budgeted; this is the heavy emulator pass —
-   run on a quiet box / overnight, not inline). Triage every **FAIL**:
-   - delta-reduce (reuse the fuzzer's triage path) → minimal `.c` → root-cause → **fix in-backend with a
-     regression test** (the F1/F2/F3/F4 precedent), or **XFAIL** with a `KNOWN_ISSUES` entry + an
-     investigation note if it's the known RA/scavenger family.
-   - **Expectation:** most defects will be *new shapes of already-known* `-O1/-Os` register-pressure bugs
-     ([globals.c RA](../investigations/65816-a16-regalloc-pressure-failure.md),
-     [scavenger N/Z](../investigations/65816-a16-scavenger-nz-liveness.md)); genuinely new ones are the
-     prize.
-7. Freeze a stable in-scope manifest + its expected SKIP/PASS partition; record the run verdict.
+### Phase 2 — scale + triage — **`-O1` PASS DONE 2026-06-19** (`-Os` pass pending)
+6. ✅ Ran the **full `inscope.tsv`** at `-O1` (the `-Os` pass is queued). Triaged every FAIL: re-ran all
+   16 in isolation on a quiet box with bsnes-jg → **all 16 reproduced (zero flakes)**; the a16 ones agree
+   on **both** emulators. The **expectation was wrong** — they are **not** the register-pressure family
+   but **16 genuinely-new runtime miscompiles** (a16/xy16 computes a wrong value → the test's self-check
+   writes `0xDEAD`). Recorded in [`examples/65816/torture/xfails.tsv`](../../examples/65816/torture/xfails.tsv)
+   (the expected-fail manifest); `torture_run.py` now reports a listed test as **XFAIL** (and a fixed one as
+   **XPASS** → "remove the row"), so the gate is **green-modulo-known**. Deep per-test root-cause is a
+   separate backlog (the tests are diverse — packed structs, varargs, signed shift, computed-goto, … —
+   likely several distinct bugs).
+7. **Remaining:** the `-Os` pass (now non-aborting — the known fails XFAIL); then freeze the partition and
+   root-cause the backlog one defect at a time.
 
 ### Phase 3 — CI wiring (optional, follows Phase 2 green)
 8. A **sampled, secret-gated** CI job (mirror [corpus-a16 CI](2026-06-19-321-corpus-a16-ci.md)): a fixed
@@ -179,10 +181,46 @@ All four classification paths exercised; the runner is correct.
   `KNOWN_ISSUES["a16-zp-pressure-overflow"]` (so the gate XFAILs it, like `globals.c`) and recorded it in
   [the RA-pressure investigation](../investigations/65816-a16-regalloc-pressure-failure.md#related-manifestation--link-time-zp-overflow-c-torture-pr15296c-2026-06-19).
   The fix is the same deferred A16-threading Phase 3.
-- **No new miscompile** — and none is even *possible* from a conforming program: `+mos-a16` exposes no
-  predefined macro and shares the data model (16-bit `int`, same pointer sizes) with the default build, so
-  the two can only differ on a real codegen bug. That makes the differential precise: a value mismatch *is*
-  a defect.
+- **No new miscompile** *in the 120-test pilot* — and none is even *possible* from a conforming program:
+  `+mos-a16` exposes no predefined macro and shares the data model (16-bit `int`, same pointer sizes) with
+  the default build, so the two can only differ on a real codegen bug. That makes the differential precise:
+  a value mismatch *is* a defect. (The full suite — §Phase 2 — duly found 16.)
+
+## Phase 2 — RESULTS (2026-06-19, full `-O1` pass)
+
+Full `-O1` differential pass over all **1253** in-scope tests (MAME `default == +mos-a16 == +mos-xy16`):
+
+```
+==> torture-run: 1098 PASS, 16 FAIL, 136 SKIP, 3 XFAIL (of 1253)
+```
+
+- **1098 PASS** — real external C agrees across default / a16 / xy16.
+- **136 SKIP** — oracle-gated, all legitimate: 79 default-build-unsupported, 57 where the default build
+  itself self-fails (16-bit-`int`-inappropriate). None masks a bug.
+- **3 XFAIL** — `loop-2e.c`, `pr15296.c`, `pr44202-1.c`, all the known `a16-zp-pressure-overflow`
+  (ZP-overflow at link). The `KNOWN_ISSUES` signature catches them.
+- **16 FAIL → confirmed real, NEW runtime miscompiles** (the payoff). Each: the DEFAULT build self-checks
+  PASS (`0x600D`) but a16/xy16 computes a wrong value → self-check fails → `0xDEAD`. **All 16 re-run in
+  isolation on a quiet box with bsnes-jg reproduced — zero flakes** — and every a16 case agrees on **both**
+  MAME and bsnes-jg:
+
+  | scope | tests |
+  |---|---|
+  | `+mos-a16` (both emulators) | `20010518-2`, `20020402-1`, `20071202-1`, `20071210-1`, `20080522-1`, `921117-1`, `990127-1`, `990811-1`, `pr20466-1`, `pr35472`, `pr39120` |
+  | `+mos-a16` **and** `+mos-xy16` | `pr49419`, `pr7284-1` |
+  | `+mos-xy16` only | `20041011-1`, `doloop-1`, `va-arg-22` |
+
+  They are **diverse** — mis-aligned packed structs, nested struct/arrays, `memset`-over-struct, varargs,
+  signed left-shift, computed-goto/label-values, counted loops at `INT` limits — so likely **several
+  distinct** a16/xy16 codegen bugs, not one. Logged in `examples/65816/torture/xfails.tsv`; the runner
+  XFAILs them (and XPASSes a fixed one → "remove the row"), so the gate is **green-modulo-known**.
+  **Per-defect root-cause is the open backlog** — each is its own delta-reduce → minimal `.c` →
+  investigation, in the F1/F2/F3/F4 mold.
+
+> **Harness note (fixed):** the runner's per-test `subprocess.run(timeout=…)` kills a hung MAME but can
+> leave orphaned MAME children; over a 1253-test pass these accumulated and the final process hung in
+> teardown (so the `-Os` pass — chained after `set -e` — never started). The 16 FAILs are unaffected (all
+> reproduced isolated). The `-Os` pass reruns separately; reaping orphan MAMEs is a follow-up runner fix.
 
 ## Verification
 

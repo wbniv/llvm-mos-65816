@@ -246,12 +246,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   test is in-scope iff the default build runs it to the PASS sentinel, then any `+mos-a16`/`+mos-xy16`
   disagreement is a real defect (sidesteps "is this test appropriate for 16-bit `int`" — if default handles it,
   a16 must too). Fetch-don't-commit (GPLv3 → sha256-pinned gcc-14.2.0, gitignored, reproducible via
-  `dev/fetch-torture.sh`, the WDC816CC/ORCA-refs precedent). **Phases 0+1 DONE 2026-06-19**: fetch +
-  host-only filter (`tools/torture_filter.py` + `_shim.c`) → **1253/1656 in-scope**; emulator differential
-  runner (`tools/torture_run.py` + `dev/torture.sh` + `dev/run.sh torture`). 120-test pilot: **102 PASS,
-  17 SKIP, 1 XFAIL** — found a real `+mos-a16 -O1/-Os` ZP-pressure overflow (`pr15296.c`, same family as
-  the `globals.c` RA crash; new `KNOWN_ISSUES["a16-zp-pressure-overflow"]`). **Remaining:** Phase 2
-  full-suite scale + triage (overnight, time-budgeted), Phase 3 sampled secret-gated CI.
+  `dev/fetch-torture.sh`, the WDC816CC/ORCA-refs precedent). **Phases 0+1 + Phase 2 `-O1` pass DONE
+  2026-06-19**: filter → **1253/1656 in-scope**; runner (`tools/torture_run.py` + `dev/run.sh torture`).
+  Full `-O1` pass: **1098 PASS, 136 SKIP, 3 known-XFAIL** (ZP-pressure) **+ 16 confirmed NEW runtime
+  miscompiles** (a16/xy16 wrong-value, all reproduced isolated on both emulators → `xfails.tsv`, gate
+  green-modulo-known). **Remaining:** the `-Os` pass, Phase 3 sampled CI, + reaping orphan MAMEs in the runner.
+  [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
+- [ ] **#321 triage the 16 c-torture `+mos-a16`/`+mos-xy16` runtime miscompiles** (found by the Phase 2 `-O1`
+  pass, confirmed on both emulators — `examples/65816/torture/xfails.tsv`). These are **NEW** wrong-value
+  defects (not the known register-pressure family), diverse (packed structs, nested struct/arrays,
+  `memset`, varargs, signed left-shift, computed-goto, counted loops at `INT` limits) → likely several
+  distinct bugs. Each: delta-reduce → minimal `.c` → root-cause → fix in-backend with a regression test (or
+  XFAIL+investigation if upstream/deferred), then remove its `xfails.tsv` row. 13 a16 (incl. `pr49419`,
+  `pr7284-1` also xy16) + 3 xy16-only (`20041011-1`, `doloop-1`, `va-arg-22`).
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
   `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the
