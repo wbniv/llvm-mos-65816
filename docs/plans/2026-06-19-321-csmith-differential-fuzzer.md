@@ -1,7 +1,9 @@
 # Replace the random fuzzer's *generator* with Csmith (keep the engine; builtin selectable)
 
-**Date:** 2026-06-19 · **Status:** Phases 0–3 DONE (see *Phase 1–3 — RESULT*); Phase 4 (scale + triage) /
-Phase 5 (sampled CI) remain. The Csmith generator is now the `dev/run.sh fuzz` default.
+**Date:** 2026-06-19 · **Status:** Phases 0–3 DONE; **Phase 4 opened** — its first triaged finding (the
+`a16-unmerge-s32` legalizer gap) is **FIXED on `main`**
+([s32 plan](2026-06-19-321-a16-unmerge-s32-legalizer.md)). **GO disposition: merging this branch to `main`.**
+Phase 5 (sampled CI) remains. The Csmith generator is the `dev/run.sh fuzz` default.
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — strengthen the *random* correctness axis).
 **Required reading:**
 [Tier-1 fuzzer + engine](2026-06-15-321-tier1-broaden-corpus.md) ·
@@ -235,6 +237,13 @@ Implement the `--gen csmith|builtin` dispatch in `dev/fuzz.sh` (default csmith).
 Larger seed sweeps on a quiet box. Delta-reduce any real FAIL into a tracked `examples/65816/*.c` regression
 (the F1–F4 precedent) **or** XFAIL via a `KNOWN_ISSUES` entry. **Only here may `vendor/llvm-mos`/`0002` change**
 (a fix + its regression test).
+
+**Phase 4 — RESULT (in progress, 2026-06-19):** the first triaged finding — the `a16-unmerge-s32` legalizer
+gap (10/100 seeds) — was root-caused and **FIXED**: `+mos-a16` now represents s32 (`long`/`int32_t`) as 2×s16
+(four `hasAccum16()`-gated legalizer rules; the artifact combiner folds the (un)merge, no selector change).
+The differential sweep flips **83/10/7 → 92 PASS / 0 xfail / 8 skip, 0 mismatch**; hermetic regression
+`dev/run.sh a16unmerge` (red-green); the `KNOWN_ISSUES` XFAIL is removed so a recurrence hard-FAILS.
+Full writeup: [s32 legalizer plan](2026-06-19-321-a16-unmerge-s32-legalizer.md). Larger seed sweeps remain.
 
 ### Phase 5 — optional sampled CI
 Mirror the `corpus-a16` CI job in `smoke.yml`: a seeded subset per run, secret-gated, SKIP on missing BIOS.

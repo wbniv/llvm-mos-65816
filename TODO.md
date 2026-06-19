@@ -38,14 +38,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 `+mos-a16` legalizer gap: `G_UNMERGE_VALUES s32` → 2×s16 fails to legalize.** Csmith finding
-  (seed 11, `wt/321-csmith`): splitting a 32-bit `long` into two 16-bit halves aborts LTO codegen
-  (`LLVM ERROR: unable to legalize instruction: … = G_UNMERGE_VALUES %_(s32) (in function: main)`), while the
-  **default 8-bit build compiles the same program clean** → `+mos-a16`-specific, a *new* class distinct from
-  the known `-O1/-Os` RA crashes (`regalloc-out-of-registers`, `scavenger-p-not-gpr`). Surfaced because the
-  Csmith fuzzer emits `long` (the hand-rolled generator only used 16/8-bit); 9/100 spike seeds hit it. Next:
-  delta-reduce → `KNOWN_ISSUES` XFAIL (`a16-unmerge-s32`) to keep the harness green, then root-cause + fix as
-  its own investigation. [csmith plan §Phase 0 RESULT](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
 - [ ] **#321 native s16 — 16-bit comparison follow-ups** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
@@ -254,10 +246,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (`platform.info` int=16 + type-parametric `safe_math` ⇒ UB-free at the target's 16-bit `int`). Two non-obvious
   bits handled: the s32 ICE is an LTO *link* error (so `classify_known` runs on the `CompileError`, not just the
   verify log), and Csmith skips per-program verify (its `<math.h>` won't resolve under bare `--target=mos`; the
-  `--config` link is the gate). Found a real `+mos-a16` defect on run one (the `G_UNMERGE_VALUES s32` legalizer
-  gap — its own M2 item above; XFAILed, not fixed here). Remaining: **Phase 4** (scale + triage: larger sweeps,
-  delta-reduce any real FAIL into a tracked regression — the only phase that may touch `vendor/llvm-mos`/`0002`),
-  **Phase 5** (sampled CI mirroring `corpus-a16`). **Yarpgen follow-up:** add a `--gen yarpgen` later to target
+  `--config` link is the gate). Found a real `+mos-a16` defect on run one — the `G_UNMERGE_VALUES s32` legalizer
+  gap — now **FIXED on `main`** (s32 represented as 2×s16 under a16; the sweep re-runs **92/100 PASS, 0 xfail, 0
+  mismatch** and the `a16-unmerge-s32` XFAIL is removed — [s32 plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md)).
+  Remaining: **Phase 4** larger seed sweeps, **Phase 5** (sampled CI mirroring `corpus-a16`). **Yarpgen
+  follow-up:** add a `--gen yarpgen` later to target
   `-O1/-Os` loop/scalar-opt bugs (no `platform.info` equiv → 16-bit-int caveat; must redirect its baked-in
   `printf`); the `--gen` seam added here makes it drop-in.
   [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
