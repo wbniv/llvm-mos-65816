@@ -24,6 +24,13 @@ fatal error: error in backend: Found N machine code errors.
 DEFAULT 8-bit `-Os` and `+mos-a16 -O0` both compile clean. The corpus never caught it because
 the corpus is built default 8-bit (never `+mos-a16`), and the shape needs `-O1`/`-Os` pressure.
 
+> **Superseded 2026-06-19:** a `+mos-a16` corpus now exists (the `corpus-a16` differential gate,
+> [`c998d7f`](https://github.com/wbniv/llvm-mos-65816/commit/c998d7f)) — so the "corpus is 8-bit"
+> reason is no longer the operative one. This crash is **fuzzer-only**: it is a fuzz-generated
+> scavenge-under-live-N/Z shape (8/500 seeds), not a corpus program, so `corpus-a16` still doesn't
+> exercise it. The corpus's one `+mos-a16` casualty is the *separate* `globals.c` RA failure
+> ([`65816-a16-regalloc-pressure-failure.md`](65816-a16-regalloc-pressure-failure.md)).
+
 ## Root cause (asserts-confirmed)
 
 The crash is in the **register scavenger**, when `scavengeFrameVirtualRegs` must spill a register

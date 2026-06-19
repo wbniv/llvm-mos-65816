@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/229662a) | #321 $p-spill scavenger: feasibility re-probe — no narrow fix; deferral stands |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/b015df5) | #321 a16 scavenger crash: root-cause + XFAIL + investigation + upstream draft |
 
 <!--history-meta v1
+229662a	author	Will Norris
+229662a	added	22
+229662a	deleted	0
+229662a	files	1
+229662a	body	Pivoted to the $p-spill (scavenger-p-not-gpr) crash, the sole residual xy16-track\nfailure (8/500 fuzz xfails). Re-confirmed live and probed both fix options against\nsaveScavengerRegister + the repro MIR:\n\n- Option 2 (upstream PHP/PLP) is NOT a drop-in: P has no GPR spill home, and PHP/PLP\n  can't bracket P across the unbalanced push/pull range a16 lands the scavenge in\n  (the PLP would pop the wrong byte) — needs a stack-relative P restore or a flag-safe\n  spill-point choice, touching the upstream scavenger contract across all MOS subtargets.\n- Option 1 (a16-side flag-kill) bottoms out in the same register-pressure core as the\n  deferred globals.c RA failure (the live N/Z is a genuine later-consumed compare result).\n\nVerdict: no narrow low-risk fork-side fix; deferral stands; the genuine unblock is the\nupstream issue (drafted, user-triggered). Recorded in the investigation doc.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 b015df5	author	Will Norris
 b015df5	added	101
 b015df5	deleted	0
