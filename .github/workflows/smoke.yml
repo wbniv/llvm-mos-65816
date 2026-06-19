@@ -31,7 +31,10 @@
 name: snes-smoke
 
 on:
-  workflow_dispatch:   # manual only — see header
+  workflow_dispatch:   # manual only until repo goes public — uncomment below then
+  # push:
+  #   branches: [main]
+  # pull_request:
 
 concurrency:
   group: smoke-${{ github.ref }}

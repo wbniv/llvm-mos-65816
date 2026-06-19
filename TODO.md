@@ -316,13 +316,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   Draft + exact `gh issue create` in [upstream-contribution-status](docs/upstream-contribution-status.md)
   (item 4) · body [docs/321-upstream-scavenger-nz-issue.md](docs/321-upstream-scavenger-nz-issue.md) ·
   [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md).
-- [ ] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Bundle the staged lit test
-  [`dev/lit/DebugInfo/MOS/dwarf-65816.ll`](dev/lit/DebugInfo/MOS/dwarf-65816.ll) (drop into
-  `llvm/test/DebugInfo/MOS/`) with the `<output>.elf` doc note + documentation-only `lld/ELF/Writer.cpp`
-  comment. 65816 DWARF content is already correct (no codegen change); both step-5 gates green
-  (`dev/run.sh dwarf` 7/7). Draft + exact `gh pr create` in
+- [ ] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
+  `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
   [docs/321-upstream-dwarf-output-elf-companion.md](docs/321-upstream-dwarf-output-elf-companion.md).
+- [ ] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
+  `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
+  uncomment the two trigger lines in the `on:` block.
 
 
 ## Watch
