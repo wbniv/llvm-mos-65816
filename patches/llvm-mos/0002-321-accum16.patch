@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
-index 584cc0c4c..51f92653c 100644
+index 584cc0c4c8cd..51f92653c666 100644
 --- a/llvm/lib/Target/MOS/CMakeLists.txt
 +++ b/llvm/lib/Target/MOS/CMakeLists.txt
 @@ -31,6 +31,7 @@ add_llvm_target(MOSCodeGen
@@ -11,7 +11,7 @@ index 584cc0c4c..51f92653c 100644
    MOSInstrInfo.cpp
    MOSInstructionSelector.cpp
 diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
-index 66964b1fe..e2cb062d6 100644
+index 66964b1fe0a0..e2cb062d676b 100644
 --- a/llvm/lib/Target/MOS/MOS.h
 +++ b/llvm/lib/Target/MOS/MOS.h
 @@ -23,6 +23,7 @@ void initializeMOSCombinerPass(PassRegistry &);
@@ -23,7 +23,7 @@ index 66964b1fe..e2cb062d6 100644
  void initializeMOSLateOptimizationPass(PassRegistry &);
  void initializeMOSLowerSelectPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSCombiner.cpp b/llvm/lib/Target/MOS/MOSCombiner.cpp
-index bff8495ed..087920a7b 100644
+index bff8495ed611..087920a7beae 100644
 --- a/llvm/lib/Target/MOS/MOSCombiner.cpp
 +++ b/llvm/lib/Target/MOS/MOSCombiner.cpp
 @@ -443,6 +443,39 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
@@ -67,7 +67,7 @@ index bff8495ed..087920a7b 100644
                                      BuildFnTy &MatchInfo) const {
    auto LHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
 diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
-index 76d7409c1..733ef7097 100644
+index 76d7409c1f1b..733ef7097a4d 100644
 --- a/llvm/lib/Target/MOS/MOSFeatures.td
 +++ b/llvm/lib/Target/MOS/MOSFeatures.td
 @@ -19,3 +19,19 @@ def FeatureStaticStack :
@@ -92,7 +92,7 @@ index 76d7409c1..733ef7097 100644
 +    [FeatureAccum16]>;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000..e0b2f837e
+index 000000000000..e0b2f837ed90
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 @@ -0,0 +1,578 @@
@@ -676,7 +676,7 @@ index 000000000..e0b2f837e
 +}
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.h b/llvm/lib/Target/MOS/MOSInsertREPSEP.h
 new file mode 100644
-index 000000000..34f7e16f3
+index 000000000000..34f7e16f3588
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.h
 @@ -0,0 +1,25 @@
@@ -706,7 +706,7 @@ index 000000000..34f7e16f3
 +
 +#endif // LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
 diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
-index 12d05bed4..ba38163ae 100644
+index 12d05bed418f..ba38163ae084 100644
 --- a/llvm/lib/Target/MOS/MOSInstrFormats.td
 +++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
 @@ -57,6 +57,21 @@ def HasW65816 : Predicate<"Subtarget->hasW65816()">,
@@ -748,7 +748,7 @@ index 12d05bed4..ba38163ae 100644
  
  /// Matching CC1_NoImmediate, but with cc = 11. Common match for 6502X.
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
-index e81487e9c..6b2afb5b9 100644
+index e81487e9c866..6b2afb5b99c9 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
 +++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
 @@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
@@ -883,7 +883,7 @@ index e81487e9c..6b2afb5b9 100644
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 42a94c356..fe19e096e 100644
+index 42a94c356e67..fe19e096e6b3 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -352,6 +352,11 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
@@ -1070,7 +1070,7 @@ index 42a94c356..fe19e096e 100644
      SmallVectorImpl<MachineOperand> &Cond) const {
    // Condition includes all arguments except the branch target.
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
-index be5daff8f..c39c4be70 100644
+index be5daff8ffad..c39c4be704fd 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.h
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
 @@ -146,6 +146,7 @@ private:
@@ -1082,7 +1082,7 @@ index be5daff8f..c39c4be70 100644
    bool shouldRematPhysRegCopy() const override { return false; }
  };
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td
-index a71519559..fdd08df48 100644
+index a71519559a50..fdd08df4851d 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.td
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.td
 @@ -65,24 +65,38 @@ defm INC : CC2_NonShift<0b111, "inc">;
@@ -1163,7 +1163,7 @@ index a71519559..fdd08df48 100644
  /// The conditional branch instructions all have the form xxy10000. The flag
  /// indicated by xx is compared with y, and the branch is taken if they are
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index f3eb9549f..f44e895be 100644
+index f3eb9549f19f..f44e895be1d5 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,23 @@ class MOSLogicalInstr : Instruction {
@@ -1675,7 +1675,7 @@ index f3eb9549f..f44e895be 100644
 +  dag OutOperandList = (outs Yc16:$dst); dag InOperandList = (ins Ac16:$src);
 +}
 diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-index 21910cfea..e3fece8b0 100644
+index 21910cfeab37..e3fece8b0616 100644
 --- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
 +++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
 @@ -359,4 +359,52 @@ let mayLoad = true in {
@@ -1732,7 +1732,7 @@ index 21910cfea..e3fece8b0 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2..ce8a3875f 100644
+index cbdd54ab2ca7..ce8a3875fdd4 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -2960,7 +2960,7 @@ index cbdd54ab2..ce8a3875f 100644
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
 diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-index fbedd8d46..d329144e2 100644
+index fbedd8d46b95..d329144e2e4c 100644
 --- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 +++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 @@ -48,6 +48,7 @@ public:
@@ -3092,7 +3092,7 @@ index fbedd8d46..d329144e2 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 212ede1a0..e1aa41d9b 100644
+index 212ede1a0bf9..e1aa41d9b445 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,6 +25,7 @@
@@ -3914,7 +3914,7 @@ index 212ede1a0..e1aa41d9b 100644
    }
  
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-index 48cb1f356..583ca910d 100644
+index 48cb1f356c3a..583ca910d032 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 @@ -79,6 +79,11 @@ private:
@@ -3930,7 +3930,7 @@ index 48cb1f356..583ca910d 100644
                              GLoadStore &MI) const;
    std::optional<MachineOperand>
 diff --git a/llvm/lib/Target/MOS/MOSRegisterBanks.td b/llvm/lib/Target/MOS/MOSRegisterBanks.td
-index 868f6c712..7b5100bfe 100644
+index 868f6c71270a..7b5100bfeb5d 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterBanks.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterBanks.td
 @@ -11,4 +11,7 @@
@@ -3943,10 +3943,39 @@ index 868f6c712..7b5100bfe 100644
 +// register class on the selected ops, not by the bank (banks are unused here).
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index baf6de604..2194945af 100644
+index baf6de604cb7..4b1321dd9a92 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -427,10 +427,25 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -264,11 +264,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
+ 
+   int Idx = MI->getOperand(FIOperandNum).getIndex();
+   int64_t Offset = MFI.getObjectOffset(Idx);
+-  if (FIOperandNum + 1 < MI->getNumOperands() &&
+-      MI->getOperand(FIOperandNum + 1).isImm())
++  // Where the frame-index displacement lives depends on the instruction format,
++  // so key off the opcode rather than guessing "the operand after the frame
++  // index is its displacement immediate". That guess misfires for CmpBrAbsImm16
++  // (#321), whose operand after the frame-index address is the COMPARE immediate
++  // (not a displacement) — adding it would corrupt the resolved stack address.
++  switch (MI->getOpcode()) {
++  case MOS::AddrLostk:
++  case MOS::AddrHistk:
++  case MOS::LDStk:
++  case MOS::STStk:
++    // These carry the displacement in a separate immediate operand after the FI.
+     Offset += MI->getOperand(FIOperandNum + 1).getImm();
+-  else
++    break;
++  default:
++    // Every other (abs / GA-style) instruction — incl. all CmpBrAbs* — carries
++    // the displacement in the frame-index operand's own offset field.
+     Offset += MI->getOperand(FIOperandNum).getOffset();
++    break;
++  }
+ 
+   if (MFI.getStackID(Idx) == TargetStackID::Default) {
+     // All offsets are relative to the incoming SP
+@@ -427,10 +441,25 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
        IsLoad ? MI->getOperand(0).getReg() : MI->getOperand(1).getReg();
    int64_t Offset = MI->getOperand(3).getImm();
  
@@ -3975,7 +4004,7 @@ index baf6de604..2194945af 100644
      Register NewBase =
          IsLoad ? MI->getOperand(1).getReg() : MI->getOperand(0).getReg();
      // We can't scavenge a 16-bit register, so this can't be virtual here
-@@ -461,6 +476,69 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -461,6 +490,69 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
      return;
    }
  
@@ -4045,7 +4074,7 @@ index baf6de604..2194945af 100644
    if (MOS::Imag16RegClass.contains(Loc)) {
      if (!IsLoad) {
        // Loc may not be fully alive at this point, which would create uses of
-@@ -500,6 +578,15 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -500,6 +592,15 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
    if (Loc8)
      Loc = Loc8;
  
@@ -4062,7 +4091,7 @@ index baf6de604..2194945af 100644
  
    Register A = Loc;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index 94e229944..2df125248 100644
+index 94e229944885..2df125248bb1 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 @@ -90,6 +90,38 @@ def P : MOSReg<12, "P"> {
@@ -4122,7 +4151,7 @@ index 94e229944..2df125248 100644
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
  let isPressureFineGrained = true in {
 diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
-index 6d303255c..bc43100cd 100644
+index 6d303255c67f..bc43100cd577 100644
 --- a/llvm/lib/Target/MOS/MOSSubtarget.h
 +++ b/llvm/lib/Target/MOS/MOSSubtarget.h
 @@ -115,6 +115,12 @@ public:
@@ -4148,7 +4177,7 @@ index 6d303255c..bc43100cd 100644
    // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
    // no variable, so we instead bind pseudo features to this variable.
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index ceb0afe8a..e12e57622 100644
+index ceb0afe8a654..e12e5762211b 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 +++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 @@ -39,6 +39,7 @@

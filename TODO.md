@@ -259,8 +259,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `pr7284-1` also xy16) + 3 xy16-only (`20041011-1`, `doloop-1`, `va-arg-22`). **Triage started:** `pr7284-1`
   is a **FALSE POSITIVE** (`dg-require int32plus`; `n<<24` is UB on 16-bit `int`) → also file a harness
   refinement to **honor `dg-require-effective-target`** (skip `int32plus`/etc.) so the oracle stops admitting
-  UB-reliant tests; `20071210-1` suspect = REPSEP M-mode tracking across computed `goto *`.
-  [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
+  UB-reliant tests; `20071210-1` **ROOT-CAUSED** (NOT REPSEP): shared `MOSRegisterInfo::eliminateFrameIndex`
+  reads the frame displacement from the wrong operand for the a16-only `CmpBrAbsImm16` pseudo (its
+  post-address operand is the compare immediate, not a displacement) → a16-LTO stack accesses resolve to
+  `base+compareImm` not `base+frameOffset`. One-location fix, likely clears several rows (the
+  `if (local==CONST)` pattern) — see ↓.
+  [suite plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
+- [ ] **#321 fix the `CmpBrAbsImm16` frame-index elimination scramble** (the first backlog defect; root-caused
+  via `20071210-1`). Opcode-key the displacement source in `eliminateFrameIndex` instead of the positional
+  "next operand is the offset" guess; add a `prologepilog` `.mir` regression test + de-XFAIL every row the
+  class sweep clears. Gate: default codegen unchanged (only `CmpBrAbsImm16`, a16-only, differs); prove via
+  `fuzz 50 1`. [fix plan](docs/plans/2026-06-19-321-cmpbrabsimm16-frameindex-elimination-scramble.md).
 - [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
   `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the
   full `+mos-a16` operator set; compiles each DEFAULT + `+mos-a16`, runs both on MAME + bsnes-jg, and
