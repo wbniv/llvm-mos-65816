@@ -43,3 +43,8 @@ tasks:
     desc: "Clean-room: fresh checkout, then build + smoke inside it (host-side orchestration)"
     cmds:
       - dev/run.sh repro {{.CLI_ARGS}}
+
+  ci-watch:
+    desc: "Live-monitor a GitHub Actions run (default: latest snes-smoke): streams step transitions + heartbeat + final verdict. Args: [RUN_ID] | --once"
+    cmds:
+      - dev/ci-watch.sh {{.CLI_ARGS}}

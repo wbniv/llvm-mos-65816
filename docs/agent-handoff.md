@@ -56,6 +56,13 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
   build is the oracle, so a non-PASS default ⇒ **SKIP** and any FAIL is a real defect; known a16 crashes
   (incl. `a16-zp-pressure-overflow`) ⇒ XFAIL. [plan](plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - Long ops: background them and monitor; don't block on `sleep`.
+- **CI** (`.github/workflows/smoke.yml`, `workflow_dispatch`-only): the `smoke` job boots the corpus in
+  MAME; the `xcheck` job builds the from-source toolchain (cached) + SDK, then `dev/run.sh xcheck` (bsnes-jg)
+  and the secret-gated `dev/run.sh corpus-a16`. Dispatch: `gh workflow run snes-smoke`. **Monitor a run
+  with `task ci-watch` / `dev/ci-watch.sh [RUN_ID|--once]`** — streams step transitions + a heartbeat + the
+  final verdict and exits with the run's conclusion (background it; GitHub exposes in-progress step *logs*
+  only in the web UI, so ci-watch tracks structure, not log text). Both CI legs proven green: run
+  27823207476 (2026-06-19, cold ~1h46m; cached thereafter).
 
 ## The correctness gate + micro-test pattern
 

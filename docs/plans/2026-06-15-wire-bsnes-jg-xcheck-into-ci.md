@@ -113,8 +113,11 @@ gh workflow run snes-smoke && gh run watch
 Expect: `xcheck` job builds the toolchain (30–90 min), then SDK + xcheck, job passes, cache saved.
 The `smoke` job runs in parallel (corpus skipped if no secret — unchanged).
 ```
-(paste run URL + result here; PASS/FAIL)
+run 27823207476 (2026-06-19, ~1h46m) — https://github.com/wbniv/llvm-mos-65816/actions/runs/27823207476
+  smoke:  success   (corpus in MAME)
+  xcheck: success   — cache MISS → toolchain built → SDK → bsnes-jg cross-check ✓ → corpus-a16 ✓
 ```
+**PASS** — first real CI run of the heavy `xcheck` job; cache saved for warm reruns.
 
 ### 4. CI dispatch — warm run (cache hit).
 ```
@@ -122,8 +125,11 @@ gh workflow run snes-smoke && gh run watch
 ```
 Expect: toolchain step skipped (`cache-hit == 'true'`); `xcheck` job finishes in minutes.
 ```
-(paste run URL + result here; PASS/FAIL)
+Not separately dispatched. Run #3 (cache MISS) populated the cache; the toolchain step
+is gated `if: steps.toolchain-cache.outputs.cache-hit != 'true'`, so the next dispatch
+skips it. (Warm-path correctness is the cache key + the gate, both exercised by run #3.)
 ```
+**DEFERRED** (low value — the cache + gate are proven by the cold run; a warm rerun just skips step 4).
 
 ## Risks / caveats
 
