@@ -217,6 +217,25 @@ Full `-O1` differential pass over all **1253** in-scope tests (MAME `default == 
   **Per-defect root-cause is the open backlog** — each is its own delta-reduce → minimal `.c` →
   investigation, in the F1/F2/F3/F4 mold.
 
+**`-Os` pass (2026-06-19) — completed:** `1248-ish PASS, 2 new FAIL, 2 XPASS` over the same 1253 (the 16
+`-O1` known fails auto-XFAIL via `xfails.tsv`).
+- **2 new confirmed miscompiles:** `pr34768-1.c`, `pr34768-2.c` (a16 **and** xy16; both emulators agree).
+  PR34768 **const-indirect-call**: `(c ? foo : bar)()` with `bar __attribute__((const))`. Root-cause
+  finding: the **per-function 65816 asm is correct** (`test` reloads `x` after the call; `foo` negates
+  correctly; neither clobbers the `__rc20` holding `tmp`) — so the bug is at the **LTO / optimization
+  level** (the ROM is an LTO build; whole-program may wrongly treat the indirect call as side-effect-free
+  because one target is `const`, dropping the post-call reload). A pipeline interaction, *not* per-instr
+  selection — echoing the seed-42 lesson (an a16 difference perturbing a shared path).
+- **1 flake filtered:** `pr40404.c` reported "a16 build fails" in the pass but **builds clean 3/3 host-side**
+  (a16 + xy16) → a resource-pressure flake during the 1253-test run, not a defect. (Build steps can flake
+  too, not just MAME — a runner-retry follow-up.)
+- **2 XPASS = opt-level-dependent:** `20020402-1.c`, `20041011-1.c` fail at `-O1` but pass at `-Os`. Their
+  `xfails.tsv` rows **stay** (real at `-O1`); the "remove the row" hint only applies at the level the bug
+  was found → make the manifest opt-level-aware (follow-up).
+- **1 false positive:** `pr7284-1.c` needs `int32plus` (`n<<24` is UB on 16-bit `int`); default passed by
+  UB-luck. Oracle gap: honor `dg-require-effective-target` (follow-up). **Net genuine distinct
+  miscompiles: 17** (15 at `-O1` + 2 at `-Os`).
+
 > **Harness note (fixed):** the runner's per-test `subprocess.run(timeout=…)` kills a hung MAME but can
 > leave orphaned MAME children; over a 1253-test pass these accumulated and the final process hung in
 > teardown (so the `-Os` pass — chained after `set -e` — never started). The 16 FAILs are unaffected (all

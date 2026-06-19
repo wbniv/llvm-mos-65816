@@ -22,7 +22,7 @@
 #
 # test          feature   note (one-line characterization; deep root-cause is per-test follow-up)
 20010518-2.c    a16       mis-aligned packed structures
-20020402-1.c    a16       derived from PR c/2100 (pointer/struct)
+20020402-1.c    a16       derived from PR c/2100 (pointer/struct)  (note: XPASSes at -Os — -O1-specific)
 20071202-1.c    a16       nested structs with int arrays
 20071210-1.c    a16       computed goto (goto *q; label_values/indirect_jumps) — suspect REPSEP M-mode tracking across indirect jump
 20080522-1.c    a16       referenced-vars / address-taken induction var
@@ -34,6 +34,9 @@ pr35472.c       a16       memset over a struct
 pr39120.c       a16       struct-by-value / pointer member (noinline)
 pr49419.c       a16+xy16  PR tree-optimization/49419 (xy16 also -> 0x0000)
 pr7284-1.c      a16+xy16  FALSE-POSITIVE — requires int32plus; n<<24 is UB on 16-bit int (default PASS by UB-luck), target-inappropriate
-20041011-1.c    xy16      64-bit ull + 32 locals/loop = extreme register pressure; likely pressure-family or real 64-bit codegen
+20041011-1.c    xy16      64-bit ull + 32 locals/loop = extreme register pressure; likely pressure-family or real 64-bit codegen  (note: XPASSes at -Os — -O1-specific)
 doloop-1.c      xy16      counted loop at INT limits (limits.h)
 va-arg-22.c     xy16      variadic argument handling
+# Added from the Phase 2 -Os pass (2026-06-19), confirmed isolated on both emulators:
+pr34768-1.c     a16+xy16  PR34768 const-indirect-call: (c?foo:bar)() with bar __attribute__((const)) — per-function asm is CORRECT; bug is LTO-level (whole-program may drop the post-call reload of x). Suspect an optimization-pipeline interaction, not per-instr selection.
+pr34768-2.c     a16+xy16  PR34768 variant (int-returning foo/bar + res); same const-indirect-call root cause as pr34768-1

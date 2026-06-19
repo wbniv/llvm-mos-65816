@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/0d76bfc) | #321 c-torture Phase 2 (-O1): 16 confirmed NEW a16/xy16 runtime miscompiles |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/15542ff) | #321 c-torture Phase 1: pilot finds a real a16 ZP-pressure overflow (pr15296.c) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8085d2a) | #321 c-torture Phase 0: fetch + host-side compile/link filter (1253/1656 in-scope) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/34cd16a) | #321 plan: vendor GCC c-torture/execute behind the +mos-a16/+mos-xy16 differential gate |
 
 <!--history-meta v1
+0d76bfc	author	Will Norris
+0d76bfc	added	58
+0d76bfc	deleted	20
+0d76bfc	files	1
+0d76bfc	body	Full -O1 differential pass over all 1253 in-scope tests:\n1098 PASS, 136 SKIP, 3 known-XFAIL (a16-zp-pressure-overflow) + 16 FAIL.\n\nAll 16 FAILs re-run in isolation on a quiet box with bsnes-jg REPRODUCED\n(zero flakes); every a16 case agrees on both MAME and bsnes-jg. They are\nNEW runtime wrong-value miscompiles (default self-checks PASS, a16/xy16\nwrites 0xDEAD) — not the known register-pressure family — and diverse\n(packed structs, nested struct/arrays, memset, varargs, signed left-shift,\ncomputed-goto, counted loops at INT limits) => likely several distinct\na16/xy16 codegen bugs. This is the payoff of the external suite: real bugs\nthe home-grown tests never hit.\n\nRecorded in examples/65816/torture/xfails.tsv (expected-fail manifest);\ntorture_run.py now reports a listed test as XFAIL (and a fixed one as\nXPASS -> "remove the row"), so the gate is green-modulo-known. Per-defect\nroot-cause is the open backlog (new TODO item). No vendor/llvm-mos change.\n\nNote: the -Os pass didn't run (the runner left orphan MAME children that\nhung teardown after -O1, and set -e stopped the chained pass); the 16 are\nunaffected (confirmed isolated). -Os rerun + orphan-reaping are follow-ups.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 15542ff	author	Will Norris
 15542ff	added	68
 15542ff	deleted	21
