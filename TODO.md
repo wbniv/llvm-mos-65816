@@ -808,6 +808,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-20: all three are the indexed-compares plan's own Deferred section, dispositioned there + in the Done entry [321-native-16bit-indexed-compares].
      • "Indexed LHS explicit fold" -> NON-WORK: Phase 0 measured the LHS case (`arr[i] < limit`) already optimal (the staged value threads back into A16 via threadAccum16); the "only if Phase 0 shows threading misses it" gate did not trigger.
      • "EQ RHS-indexed fusion" + "+mos-xy16 16-bit-index compares" -> real but measurement-gated extensions, intentionally not built in v1 (low frequency / separate instruction); fully recorded in the plan's Deferred section, to be revived only if a frequency scan justifies them. Nothing open. fp:2a340a3f28882754 fp:2596e84dcec84614 fp:c65f6994b1384180 -->
-- [ ] **(triage)** **No compiler change.** This plan deliberately does **not** attempt the residency rework — the user chose — _from [2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md)_  <!-- fp:fd9f6337217bdfdf -->
-- [ ] **(triage)** **The other two XFALs** (`scavenger-p-not-gpr`, `a16-zp-pressure-overflow`) keep their own TODO bullets; — _from [2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md)_  <!-- fp:d23acc84e2e4c0bd -->
+<!-- triaged 2026-06-20: both are explicit "## Out of scope / non-goals" NON-GOALS from the Phase-3
+     deferral-formalization plan, not deferred work.
+     • "No compiler change" -> the whole point of the plan: the deferral IS the deliverable (the curated
+       Watch re-open trigger + the M2 A16-threading bullet's gated B0->B1->B2 spike recipe). Nothing to build.
+     • "The other two XFALs keep their own TODO bullets" -> already true: `scavenger-p-not-gpr` and
+       `a16-zp-pressure-overflow` each have their own curated M2 bullets. Nothing open.
+     fp:fd9f6337217bdfdf fp:d23acc84e2e4c0bd -->
 <!-- END auto-captured-deferrals -->
