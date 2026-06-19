@@ -10,9 +10,11 @@
 20010605-1.c	compile-error	vendor/c-torture/execute/20010605-1.c:6:5: error: function definition is not allowed here
 20010605-2.c	compile-error	vendor/c-torture/execute/20010605-2.c:18:3: error: call to undeclared function '__torture_exit'; ISO C99 and later do not support implicit function declarations [-Wimplic
 20020314-1.c	compile-error	vendor/c-torture/execute/20020314-1.c:15:7: error: call to undeclared library function 'alloca' with type 'void *(__size_t)' (aka 'void *(unsigned int)'); ISO C99 and lat
+20020404-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 20020406-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20020412-1.c	compile-error	vendor/c-torture/execute/20020412-1.c:25:10: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
 20020819-1.c	compile-error	vendor/c-torture/execute/20020819-1.c:3:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+20021024-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 20021120-3.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20030209-1.c	compile-error	vendor/c-torture/execute/20030209-1.c:6:10: error: array is too large (100 elements)
 20030222-1.c	link-other	PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
@@ -23,22 +25,30 @@
 20040308-1.c	compile-error	vendor/c-torture/execute/20040308-1.c:7:9: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
 20040423-1.c	compile-error	vendor/c-torture/execute/20040423-1.c:8:9: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
 20040520-1.c	compile-error	vendor/c-torture/execute/20040520-1.c:7:9: error: function definition is not allowed here
-20040629-1.c	compile-error	vendor/c-torture/execute/20040629-1.c:17:45: error: width of bit-field 'k' (26 bits) exceeds the width of its type (16 bits)
-20040705-1.c	compile-error	vendor/c-torture/execute/20040629-1.c:17:45: error: width of bit-field 'k' (26 bits) exceeds the width of its type (16 bits)
-20040705-2.c	compile-error	vendor/c-torture/execute/20040629-1.c:17:45: error: width of bit-field 'k' (26 bits) exceeds the width of its type (16 bits)
+20040629-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+20040703-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+20040705-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+20040705-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+20040709-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+20040709-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+20040709-3.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+20040811-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 20041019-1.c	compile-error	vendor/c-torture/execute/20041019-1.c:3:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 20041218-2.c	compile-error	vendor/c-torture/execute/20041218-2.c:5:19: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
-20050316-1.c	compile-error	vendor/c-torture/execute/20050316-1.c:27:35: error: invalid conversion between vector type 'V2HI' (vector of 2 'short' values) and integer type 'int' of different size
+20050316-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 20050604-1.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 20060420-1.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+20061101-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 20061220-1.c	compile-error	vendor/c-torture/execute/20061220-1.c:11:3: error: function definition is not allowed here
 20070201-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20070919-1.c	compile-error	vendor/c-torture/execute/20070919-1.c:29:19: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
 20081103-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+20081117-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 20090219-1.c	compile-error	vendor/c-torture/execute/20090219-1.c:13:5: error: function definition is not allowed here
 20110418-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20120427-1.c	compile-error	vendor/c-torture/execute/20120427-1.c:9:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 20120427-2.c	compile-error	vendor/c-torture/execute/20120427-2.c:9:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+20120919-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 20121108-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20140622-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20140828-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -47,8 +57,8 @@
 20141125-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20170419-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20180921-1.c	compile-error	vendor/c-torture/execute/20180921-1.c:62:22: error: chained comparison 'X < Y <= Z' does not behave the same as a mathematical expression [-Wparentheses]
-20181120-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-20190820-1.c	compile-error	vendor/c-torture/execute/20190820-1.c:59:13: error: width of bit-field 'field_width' (24 bits) exceeds the width of its type (16 bits)
+20181120-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+20190820-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 20230630-2.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20230630-4.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20230802-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -146,11 +156,13 @@ alias-3.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 alias-access-path-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 align-nest.c	compile-error	vendor/c-torture/execute/align-nest.c:12:9: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
 bcp-1.c	undefined-symbol	ld.lld: error: undefined symbol: bad2 (+3 more)
-bitfld-4.c	compile-error	vendor/c-torture/execute/bitfld-4.c:13:22: error: width of bit-field 'b' (20 bits) exceeds the width of its type (16 bits)
-bitfld-6.c	compile-error	vendor/c-torture/execute/bitfld-6.c:5:12: error: width of bit-field 'b' (20 bits) exceeds the width of its type (16 bits)
-bitfld-7.c	compile-error	vendor/c-torture/execute/bitfld-7.c:5:12: error: width of bit-field 'b' (24 bits) exceeds the width of its type (16 bits)
+bitfld-4.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+bitfld-6.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+bitfld-7.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 bitops-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 bswap-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+bswap-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+bswap-3.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 built-in-setjmp.c	compile-error	vendor/c-torture/execute/built-in-setjmp.c:14:3: error: __builtin_longjmp is not supported for the current target
 builtin-prefetch-1.c	link-other	ld.lld: error: Invalid call record (Producer: 'LLVM23.0.0git' Reader: 'LLVM 23.0.0git')
 builtin-prefetch-2.c	link-other	ld.lld: error: Invalid call record (Producer: 'LLVM23.0.0git' Reader: 'LLVM 23.0.0git')
@@ -161,7 +173,7 @@ builtin-prefetch-6.c	link-other	ld.lld: error: Invalid call record (Producer: 'L
 cmpdi-1.c	compile-error	vendor/c-torture/execute/cmpdi-1.c:6:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 cmpsf-1.c	compile-error	vendor/c-torture/execute/cmpsf-1.c:8:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 cmpsi-1.c	compile-error	vendor/c-torture/execute/cmpsi-1.c:3:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
-cmpsi-2.c	compile-error	vendor/c-torture/execute/cmpsi-2.c:7:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+cmpsi-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 comp-goto-2.c	compile-error	vendor/c-torture/execute/comp-goto-2.c:14:3: error: parameter 'a' was not declared, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 dbra-1.c	compile-error	vendor/c-torture/execute/dbra-1.c:3:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 divmod-1.c	compile-error	vendor/c-torture/execute/divmod-1.c:3:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
@@ -172,7 +184,7 @@ fprintf-chk-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 frame-address.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 inst-check.c	compile-error	vendor/c-torture/execute/inst-check.c:5:3: error: parameter 'm' was not declared, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 int-compare.c	compile-error	vendor/c-torture/execute/int-compare.c:5:8: error: parameter 'b' was not declared, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
-ipa-sra-2.c	compile-error	vendor/c-torture/execute/ipa-sra-2.c:4:12: error: array is too large (1'000'000 elements)
+ipa-sra-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 loop-2.c	compile-error	vendor/c-torture/execute/loop-2.c:5:4: error: parameter 'b' was not declared, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 loop-2d.c	compile-error	vendor/c-torture/execute/loop-2d.c:5:4: error: parameter 'b' was not declared, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 loop-2f.c	compile-error	vendor/c-torture/execute/loop-2f.c:6:10: fatal error: 'sys/types.h' file not found
@@ -200,7 +212,7 @@ pr103052.c	compile-error	vendor/c-torture/execute/pr103052.c:5:2: error: use of 
 pr103209.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr103376.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr103405.c	compile-error	vendor/c-torture/execute/pr103405.c:25:3: error: function definition is not allowed here
-pr103417.c	compile-error	vendor/c-torture/execute/pr103417.c:4:25: error: width of bit-field 'b' (24 bits) exceeds the width of its type (16 bits)
+pr103417.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr104814.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr104839.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr105613.c	compile-error	vendor/c-torture/execute/pr105613.c:4:18: error: __int128 is not supported on this target
@@ -210,9 +222,9 @@ pr107879.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr107881-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr108064.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr108292.c	compile-error	vendor/c-torture/execute/pr108292.c:12:33: error: address of vector element requested
-pr108498-2.c	compile-error	vendor/c-torture/execute/pr108498-2.c:6:39: error: width of bit-field 'c' (21 bits) exceeds the width of its type (16 bits)
-pr109938.c	compile-error	vendor/c-torture/execute/pr109938.c:4:10: fatal error: '../../gcc.dg/tree-ssa/pr109938.c' file not found
-pr109986.c	compile-error	vendor/c-torture/execute/pr109986.c:4:10: fatal error: '../../gcc.dg/tree-ssa/pr109986.c' file not found
+pr108498-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+pr109938.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+pr109986.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr110165-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr110166-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr110252-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -224,55 +236,62 @@ pr111331-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr111422.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr111431-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr111863-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+pr112581-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr113787.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr114207.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr114965.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr115033.c	compile-error	vendor/c-torture/execute/pr115033.c:34:3: error: use of unknown builtin '__builtin_exit' [-Wimplicit-function-declaration]
 pr17377.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
-pr19689.c	compile-error	vendor/c-torture/execute/pr19689.c:6:7: error: width of bit-field 'b' (29 bits) exceeds the width of its type (16 bits)
+pr19689.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr22061-1.c	compile-error	vendor/c-torture/execute/pr22061-1.c:12:7: error: call to undeclared library function 'alloca' with type 'void *(__size_t)' (aka 'void *(unsigned int)'); ISO C99 and late
 pr22061-3.c	compile-error	vendor/c-torture/execute/pr22061-3.c:7:28: error: function definition is not allowed here
 pr22061-4.c	compile-error	vendor/c-torture/execute/pr22061-4.c:8:28: error: function definition is not allowed here
 pr24135.c	compile-error	vendor/c-torture/execute/pr24135.c:11:5: error: function definition is not allowed here
 pr28865.c	compile-error	vendor/c-torture/execute/pr28865.c:3:20: error: initialization of flexible array member is not allowed
 pr28982b.c	compile-error	vendor/c-torture/execute/pr28982b.c:21:20: error: array is too large (65'536 elements)
+pr29797-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr30314.c	compile-error	vendor/c-torture/execute/pr30314.c:3:10: fatal error: '../../gcc.dg/tree-ssa/pr30314.c' file not found
 pr31072.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr31448.c	compile-error	vendor/c-torture/execute/pr31448.c:6:9: error: width of bit-field 'iIndex' (24 bits) exceeds the width of its type (16 bits)
+pr31448.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr36038.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr37573.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+pr37573.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+pr38151.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr38533.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr39100.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr39228.c	compile-error	vendor/c-torture/execute/pr39228.c:9:10: error: use of unknown builtin '__builtin_isinff' [-Wimplicit-function-declaration]
 pr39339.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr41935.c	compile-error	vendor/c-torture/execute/pr41935.c:9:23: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
+pr43220.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr43784.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr44852.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr44942.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+pr45262.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr47237.c	compile-error	vendor/c-torture/execute/pr47237.c:16:3: error: use of unknown builtin '__builtin_apply' [-Wimplicit-function-declaration]
 pr47538.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr50865.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr51447.c	compile-error	vendor/c-torture/execute/pr51447.c:22:7: error: function definition is not allowed here
-pr51581-1.c	region-overflow	ld.lld: error: section '.bss' will not fit in region 'ram': overflowed by 25090 bytes
-pr51581-2.c	region-overflow	ld.lld: error: section '.bss' will not fit in region 'ram': overflowed by 25090 bytes
+pr51581-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+pr51581-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr51933.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr52286.c	link-other	PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
 pr52760.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr52979-1.c	compile-error	vendor/c-torture/execute/pr52979-1.c:13:40: error: width of bit-field 'g' (31 bits) exceeds the width of its type (16 bits)
-pr52979-2.c	compile-error	vendor/c-torture/execute/pr52979-2.c:12:40: error: width of bit-field 'g' (31 bits) exceeds the width of its type (16 bits)
+pr52979-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+pr52979-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr53645-2.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 pr53645.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 pr53688.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr55875.c	compile-error	vendor/c-torture/execute/pr55875.c:4:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 pr56205.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+pr56799.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+pr57124.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr57130.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr57344-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr57344-2.c	compile-error	vendor/c-torture/execute/pr57344-2.c:6:7: error: width of bit-field 'a' (27 bits) exceeds the width of its type (16 bits)
+pr57344-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr57344-3.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr57344-4.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr57829.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr58431.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr58570.c	compile-error	vendor/c-torture/execute/pr58570.c:6:7: error: width of bit-field 'f1' (29 bits) exceeds the width of its type (16 bits)
+pr58570.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr58574.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr58943.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr58984.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -280,7 +299,7 @@ pr59229.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr59358.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr59643.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr60003.c	compile-error	vendor/c-torture/execute/pr60003.c:11:22: error: incompatible pointer types passing 'unsigned long long (*)[5]' to parameter of type 'void **' [-Wincompatible-pointer-typ
-pr60822.c	compile-error	vendor/c-torture/execute/pr60822.c:3:16: error: array is too large (800'000 elements)
+pr60822.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr60960.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 pr61517.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr61673.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -302,26 +321,28 @@ pr65427.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (u
 pr65648.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr65956.c	link-other	PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
 pr66233.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+pr66556.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr66940.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr67226.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr67714.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr67781.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+pr67781.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr68185.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr68249.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr68250.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr68390.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr68532.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr68648.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+pr68648.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr68841.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr69403.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr69691.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr70127.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr70460.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr70602.c	compile-error	vendor/c-torture/execute/pr70602.c:7:7: error: width of bit-field 't' (20 bits) exceeds the width of its type (16 bits)
+pr70602.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr71494.c	compile-error	vendor/c-torture/execute/pr71494.c:10:3: error: function definition is not allowed here
 pr71631.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+pr7284-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr77718.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr78170.c	compile-error	vendor/c-torture/execute/pr78170.c:17:7: error: width of bit-field 'f6' (17 bits) exceeds the width of its type (16 bits)
+pr78170.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr78586.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr78720.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr78791.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -340,7 +361,7 @@ pr83477.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr84339.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr84521.c	compile-error	vendor/c-torture/execute/pr84521.c:9:3: error: __builtin_longjmp is not supported for the current target
 pr84524.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr84748.c	compile-error	vendor/c-torture/execute/pr84748.c:3:18: error: __int128 is not supported on this target
+pr84748.c	dg-require-unsupported	requires int128 (16-bit-int target cannot satisfy)
 pr85156.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr85169.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 pr85331.c	compile-error	vendor/c-torture/execute/pr85331.c:12:8: error: use of unknown builtin '__builtin_shuffle' [-Wimplicit-function-declaration]
@@ -349,7 +370,7 @@ pr86528.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr86714.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr87290.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr88693.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr89195.c	compile-error	vendor/c-torture/execute/pr89195.c:4:21: error: width of bit-field 'i' (24 bits) exceeds the width of its type (16 bits)
+pr89195.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr89634.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr90025.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr90348.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -357,7 +378,7 @@ pr91137.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr92140.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr92618.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr92904.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr93213.c	compile-error	vendor/c-torture/execute/pr93213.c:8:18: error: __int128 is not supported on this target
+pr93213.c	dg-require-unsupported	requires int128 (16-bit-int target cannot satisfy)
 pr93249.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr93434.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr93908.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -370,7 +391,7 @@ pr94734.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr95731.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr97073.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr97421-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr97764.c	compile-error	vendor/c-torture/execute/pr97764.c:4:27: error: width of bit-field 'c' (28 bits) exceeds the width of its type (16 bits)
+pr97764.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr98304-2.c	compile-error	vendor/c-torture/execute/pr98304-2.c:3:10: fatal error: '../../gcc.dg/pr98304-1.c' file not found
 pr98366.c	compile-error	vendor/c-torture/execute/pr98366.c:4:44: error: width of bit-field 'e' (17 bits) exceeds the width of its type (16 bits)
 printf-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
@@ -381,6 +402,7 @@ scal-to-vec1.c	link-other	mos-clang: error: ld.lld command failed with exit code
 scal-to-vec2.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 scal-to-vec3.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 shiftdi-2.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+shiftdi.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 simd-5.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 simd-6.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
 stkalign.c	link-other	PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
@@ -395,6 +417,7 @@ strlen-7.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 struct-ret-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 tstdi-1.c	compile-error	vendor/c-torture/execute/tstdi-1.c:6:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 user-printf.c	undefined-symbol	ld.lld: error: undefined symbol: __osmaperrno (+5 more)
+usmul.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 va-arg-21.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 va-arg-24.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 va-arg-7.c	undefined-symbol	ld.lld: error: undefined symbol: debug
@@ -404,3 +427,5 @@ vfprintf-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 vfprintf-chk-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 vprintf-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 vprintf-chk-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+vrp-5.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
+vrp-6.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)

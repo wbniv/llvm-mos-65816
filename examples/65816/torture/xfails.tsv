@@ -26,15 +26,15 @@
 # torture tests now hard-PASS + the always-present examples/65816/a16frameidx micro-test.
 # Plan: docs/plans/2026-06-19-321-cmpbrabsimm16-frameindex-elimination-scramble.md
 #
-# CAVEAT (oracle gap, found during triage): "default build self-checks PASS" is necessary but
-# NOT sufficient — a test that relies on UB our target resolves differently (e.g. 32-bit `int`)
-# can PASS in default by chance and "fail" in a16 as a FALSE POSITIVE. Honor gcc's
-# `dg-require-effective-target` directives (int32plus, label_values, …); a TODO tracks adding a
-# Phase-0 filter for them. Rows flagged "FALSE-POSITIVE" below are target-inappropriate, not bugs.
+# CAVEAT (oracle gap): "default build self-checks PASS" is necessary but NOT sufficient — a test
+# relying on UB our target resolves differently (e.g. 32-bit `int`) can PASS default by chance and
+# "fail" a16 as a FALSE POSITIVE. HONORED 2026-06-19: tools/torture_filter.py now denies the
+# unsatisfiable integer-width dg-require-effective-targets (int32plus/int128), so such tests are
+# SKIP'd as unsupported and never reach this list. (pr7284-1 — `n<<24`, int32plus — was the
+# motivating case; it is now filtered out, not listed below.)
 #
 # test          feature   note (one-line characterization; deep root-cause is per-test follow-up)
 pr49419.c       a16+xy16  PR tree-optimization/49419 (xy16 also -> 0x0000) — DISTINCT bug (survived the frame-index fix)
-pr7284-1.c      a16+xy16  FALSE-POSITIVE — requires int32plus; n<<24 is UB on 16-bit int (default PASS by UB-luck), target-inappropriate
 20041011-1.c    xy16      64-bit ull + 32 locals/loop = extreme register pressure; likely pressure-family or real 64-bit codegen  (note: XPASSes at -Os — -O1-specific)
 doloop-1.c      xy16      counted loop at INT limits (limits.h)
 va-arg-22.c     xy16      variadic argument handling

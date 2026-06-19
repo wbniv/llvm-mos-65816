@@ -250,26 +250,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   miscompiles** (a16/xy16 wrong-value, all reproduced isolated on both emulators → `xfails.tsv`, gate
   green-modulo-known). **Remaining:** the `-Os` pass, Phase 3 sampled CI, + reaping orphan MAMEs in the runner.
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
-- [ ] **#321 triage the 16 c-torture `+mos-a16`/`+mos-xy16` runtime miscompiles** (found by the Phase 2 `-O1`
-  pass, confirmed on both emulators — `examples/65816/torture/xfails.tsv`). These are **NEW** wrong-value
-  defects (not the known register-pressure family), diverse (packed structs, nested struct/arrays,
-  `memset`, varargs, signed left-shift, computed-goto, counted loops at `INT` limits) → likely several
-  distinct bugs. Each: delta-reduce → minimal `.c` → root-cause → fix in-backend with a regression test (or
-  XFAIL+investigation if upstream/deferred), then remove its `xfails.tsv` row. 13 a16 (incl. `pr49419`,
-  `pr7284-1` also xy16) + 3 xy16-only (`20041011-1`, `doloop-1`, `va-arg-22`). **Triage started:** `pr7284-1`
-  is a **FALSE POSITIVE** (`dg-require int32plus`; `n<<24` is UB on 16-bit `int`) → also file a harness
-  refinement to **honor `dg-require-effective-target`** (skip `int32plus`/etc.) so the oracle stops admitting
-  UB-reliant tests; `20071210-1` **ROOT-CAUSED** (NOT REPSEP): shared `MOSRegisterInfo::eliminateFrameIndex`
-  reads the frame displacement from the wrong operand for the a16-only `CmpBrAbsImm16` pseudo (its
-  post-address operand is the compare immediate, not a displacement) → a16-LTO stack accesses resolve to
-  `base+compareImm` not `base+frameOffset`. One-location fix, likely clears several rows (the
-  `if (local==CONST)` pattern) — see ↓.
+- [ ] **#321 root-cause the REMAINING c-torture `+mos-a16`/`+mos-xy16` miscompiles** (down from 18 → **4 real
+  + 1 false positive** after the frame-index fix cleared 13 — see Done). Each: delta-reduce → root-cause →
+  fix + regression test → remove its `xfails.tsv` row. Remaining: **`pr49419`** (a16+xy16, tree-opt; broadest
+  impact, do first), **`20041011-1`** (xy16, 64-bit `ull` + register pressure; likely fold into A16-threading
+  Phase 3), **`doloop-1`** (xy16, counted loop at `INT` limits), **`va-arg-22`** (xy16, varargs). `pr7284-1`
+  is a FALSE POSITIVE being removed by the dg-require harness refinement (↓).
   [suite plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
-- [ ] **#321 fix the `CmpBrAbsImm16` frame-index elimination scramble** (the first backlog defect; root-caused
-  via `20071210-1`). Opcode-key the displacement source in `eliminateFrameIndex` instead of the positional
-  "next operand is the offset" guess; add a `prologepilog` `.mir` regression test + de-XFAIL every row the
-  class sweep clears. Gate: default codegen unchanged (only `CmpBrAbsImm16`, a16-only, differs); prove via
-  `fuzz 50 1`. [fix plan](docs/plans/2026-06-19-321-cmpbrabsimm16-frameindex-elimination-scramble.md).
+- [ ] **#321 xy16 `k_isort` miscompile (NEW — pre-existing, surfaced 2026-06-19)** — the first quiet-box run
+  of the a16 suite's **xy16 leg** found `host=default=+mos-a16=0xF47A` but `+mos-xy16@MAME=0x9470`. PROVEN
+  unrelated to the frame-index fix (k_isort xy16 has no block-move + no frame-index `CmpBrAbsImm16` — the only
+  instrs that fix touches; a16 leg is correct). An xy16-specific defect (16-bit-index path; insertion-sort +
+  `memcpy` + rotate-xor checksum). Triage: add a known-xy16-fail mechanism to the kernel suite
+  (green-modulo-known) then root-cause. Plan TBD when tackled.
 - [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
   `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the
   full `+mos-a16` operator set; compiles each DEFAULT + `+mos-a16`, runs both on MAME + bsnes-jg, and
@@ -362,6 +355,8 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-19 — [321-cmpbrabsimm16-frameindex] **fix the `CmpBrAbsImm16` frame-index elimination scramble — ONE line cleared 13 c-torture miscompiles.** `MOSRegisterInfo::eliminateFrameIndex` chose a frame object's displacement by a positional guess ("the operand after the frame index is its displacement immediate"); for the a16 fused pseudo `CmpBrAbsImm16` (`addr16:$l, i16imm:$r`) the post-address operand is the COMPARE immediate, so a16-LTO static/zero-page-stack accesses resolved to `base+compareImm` not `base+frameOffset` → wrong values → 0xDEAD. Fix: key the displacement source off the opcode (`LDStk`/`STStk`/`Addr{Lo,Hi}stk` → trailing imm operand; everything else incl. all `CmpBrAbs*` → the FI operand's own `getOffset()`). Default codegen unchanged by construction (no 8-bit instr has the FI-then-immediate layout). Root-caused via `20071210-1` (filed as a REPSEP/computed-goto suspect — it wasn't); the class sweep cleared 13 of 18 `xfails.tsv` rows (incl. `pr34768-1/-2` + `20010518-2`, both mis-hypothesized). Regression guard: 13 de-XFAIL'd torture rows + `examples/65816/a16frameidx` (0x4321 both emulators). Verified: corpus 7/7, fuzz 45/50 0-mismatch, a16 suite all-PASS (the `k_isort` xy16 fail is pre-existing, proven unrelated). `f2d65c2`; `0002` round-trips, no foreign hunks. [plan](docs/plans/2026-06-19-321-cmpbrabsimm16-frameindex-elimination-scramble.md).
+- 2026-06-19 — [321-torture-dg-require] **honor `dg-require-effective-target` in the c-torture Phase-0 filter — closes the oracle gap that admitted `pr7284-1`.** `tools/torture_filter.py` now denies the unsatisfiable integer-width requirements (`int32plus`/`int128`) before building, so UB-reliant tests (e.g. `pr7284-1`'s `n<<24` on 16-bit `int`) are bucketed `dg-require-unsupported` instead of passing default by UB-luck and "failing" a16 as false positives. In-scope 1253→1228 (58 dg-require-unsupported); `pr7284-1` removed from `xfails.tsv`. Harness-only (no `0002` change). [plan](docs/plans/2026-06-19-321-torture-honor-dg-require-effective-target.md).
 - 2026-06-19 — [dwarf-round-trip] **DWARF round-trip (ROADMAP step 6) + drmon VS Code GUI: COMPLETE.** `-g` builds emit `<rom>.elf` companion; drmon loads it via libdwarf; source breakpoints fire in VS Code + MAME headlessly (8/8). `dev/run.sh dwarf` 7/7. Upstream PR halves drafted (lit test + `.elf` doc note). Left: user-triggered upstream posting (item 5 in upstream-contribution-status.md). [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
 - 2026-06-19 — [321-a16-unmerge-s32] **#321 `+mos-a16` s32 (`long`/`int32_t`) support — fixed the `G_UNMERGE_VALUES s32` backend abort.** Csmith-found (`wt/321-csmith` seed 11 + 9 more, XFAILed as `a16-unmerge-s32`): `+mos-a16` aborted on valid C using `int32_t`/`long` in s16-interacting shapes (e.g. `trunc i32→i16`), while DEFAULT compiled clean. Root cause: under `+mos-a16` s16 is a legal type so narrowing stops at s16 and diverts s32 into 2×s16 pieces, but the s32↔s16 legalizer glue didn't exist (no minimal fix — the cascade unmerge→trunc→anyext is the s32-under-a16 feature). Fix = **4 additive `hasAccum16()`-gated legalizer rules** (`G_ANYEXT`/`G_TRUNC`/`G_MERGE`/`G_UNMERGE` for s32↔s16); the artifact combiner folds the (un)merge so **no selector change**; `G_ZEXT` left at maxScalar S8 (raising to S16 broke s8→s16 zext). Verified: sweep **92/100 PASS, 0 mismatch, 0 xfail** (was 83/10/7); corpus-a16 5/6+xfail; hermetic `dev/run.sh a16unmerge` (frozen seed-11 `.ll`, **red-green validated** with fresh `mos-clang` — `llc` is stale, not in the `toolchain` rebuild path); `0002` regen round-trips. Remaining bookkeeping: remove the `a16-unmerge-s32` XFAIL on `wt/321-csmith`. [plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md).
 - 2026-06-19 — [pre-public-polish] **Repo: Apache-2.0 LICENSE + NOTICE, README → M2, gitignore transcripts.** All four steps PASS (181af86). [plan](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md).

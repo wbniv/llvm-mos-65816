@@ -46,6 +46,16 @@ DEFS = ["-Dmain=torture_test_main", "-Dabort=__torture_abort", "-Dexit=__torture
 
 CLANG_ERR = __import__("re").compile(r"^.+?:\d+:\d+: (?:fatal )?error:", __import__("re").M)
 
+# gcc dg-require-effective-target: the test author's own declaration of what the target must
+# provide. Our `int` is 16-bit, so a test requiring a wider int is target-inappropriate — it
+# can pass the trusted default build by UB-luck and then "fail" +mos-a16 as a FALSE POSITIVE
+# (e.g. pr7284-1's `n << 24`). Deny ONLY the provably-unsatisfiable integer-width requirements
+# so a misclassification can only ever skip a target-inappropriate test, never drop a valid one.
+# We DO satisfy label_values / indirect_jumps (computed goto works — 20071210-1 passes), so
+# those are deliberately NOT denied. Extend DG_REQUIRE_DENY if a future false positive warrants.
+DG_REQUIRE_RE = __import__("re").compile(r"dg-require-effective-target\s+(\w+)")
+DG_REQUIRE_DENY = {"int32plus", "int128"}
+
 
 def classify(stderr):
     """Bucket a build failure into one reason category + a 1-line diag, in precedence order.
@@ -95,6 +105,16 @@ def build_one(cfile, opt, timeout, shim_obj):
     TU — applied to the whole command line they'd also rename the shim's own main() and clash.
     """
     name = cfile.name
+    # Honor dg-require-effective-target BEFORE building: a test that requires an integer
+    # width our 16-bit-int target can't provide is target-inappropriate (skip it so it can't
+    # masquerade as a +mos-a16 defect). Cheap regex over the source; no compile in the denied case.
+    try:
+        text = cfile.read_text(errors="replace")
+    except OSError:
+        text = ""
+    for req in DG_REQUIRE_RE.findall(text):
+        if req in DG_REQUIRE_DENY:
+            return name, "dg-require-unsupported", "requires %s (16-bit-int target cannot satisfy)" % req
     with tempfile.TemporaryDirectory() as td:
         rom = Path(td) / "t.sfc"
         mapf = Path(td) / "t.map"
