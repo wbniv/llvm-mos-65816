@@ -1,6 +1,8 @@
 # Vendor an external C correctness suite (gcc `c-torture/execute`) behind the `+mos-a16`/`+mos-xy16` differential gate
 
-**Date:** 2026-06-19 · **Status:** PLANNED (not started).
+**Date:** 2026-06-19 · **Status:** **PHASE 0 DONE (2026-06-19)** — fetch + host-side filter landed and
+verified; **1253 / 1656** top-level tests are in-scope (build a default SNES ROM). Phases 1–3 (the
+emulator differential run, scale + triage, CI) pending. See §"Phase 0 — RESULTS".
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — broaden correctness coverage beyond the 6-program corpus + `a16*` micro-tests + the random fuzzer).
 **Required reading:**
 [corpus-a16 differential gate (the engine this reuses)](2026-06-19-321-corpus-a16-differential-mode.md) ·
@@ -13,8 +15,9 @@ We have three correctness nets: the **6-program corpus** (`examples/snes/corpus/
 `a16*` micro-tests**, and a **random differential fuzzer** (`tools/a16_fuzz.py`). All three are
 *home-grown* — they test the shapes we thought to write. The gap is a **large, externally-authored,
 adversarial** body of real C. This plan slots the **GCC `c-torture/execute`** suite (the de-facto standard
-*execution*-correctness corpus — ~1,500 self-checking programs that `abort()` on a wrong result and
-`exit(0)` on success) into the **existing** differential engine, using the **default (non-`+mos-a16`)
+*execution*-correctness corpus — **1,656 top-level** self-checking programs that `abort()` on a wrong
+result and `exit(0)` on success; **1,253 build a default SNES ROM**, per Phase 0) into the **existing**
+differential engine, using the **default (non-`+mos-a16`)
 llvm-mos build as the trusted oracle**: a test is *in-scope* iff the default build runs it to the PASS
 sentinel; among in-scope tests, **any `+mos-a16`/`+mos-xy16` disagreement is a real defect**. This is the
 same `host == default == +mos-a16 == +mos-xy16` model `corpus-a16` already runs, scaled to a much larger
@@ -35,20 +38,24 @@ default build handles it, the a16 build must too).
 Our harness reads back a `volatile unsigned short corpus_result` from emulator RAM (MAME + bsnes-jg) and
 compares builds (`tools/a16_fuzz.py` → `compile_rom` / `run_mame` / `run_bsnes` / `map_lookup`). A torture
 test has no such symbol; it signals via `abort()` / `exit(0)` / `return 0` from `main`. Bridge with a small
-**shim TU** (`examples/65816/torture/_shim.c`) force-included at compile time:
+**shim TU** ([`examples/65816/torture/_shim.c`](../../examples/65816/torture/_shim.c), **landed in Phase 0**):
 
-- Rename the test's entry: compile the test `.c` with `-Dmain=torture_test_main`.
-- The shim provides the **real** `main`:
+- Preprocess each test with **`-Dmain=torture_test_main -Dabort=__torture_abort -Dexit=__torture_exit`** so
+  the test's `main` is renamed and its `abort()`/`exit()` calls route to the shim's stubs **instead of
+  colliding with the SDK libc's own `abort`/`exit`** (the first build attempt hit exactly that collision).
+- The shim provides the real `main` + the `__torture_*` stubs:
   ```c
-  volatile unsigned short corpus_result;
   #define PASS 0x600D
   #define FAIL 0xDEAD
-  int torture_test_main(void);
+  volatile unsigned short corpus_result;
+  int torture_test_main();                 /* empty parens: argv-taking mains still link */
+  void __torture_abort(void){ corpus_result = FAIL; for(;;){} }
+  void __torture_exit(int c){ corpus_result = c ? FAIL : PASS; for(;;){} }
   int main(void){ int r = torture_test_main(); corpus_result = r ? FAIL : PASS; for(;;){} }
-  void abort(void){ corpus_result = FAIL; for(;;){} }
-  void exit(int c){ corpus_result = c ? FAIL : PASS; for(;;){} }
-  // + freestanding stubs the in-scope subset needs: __assert_fail, etc.
   ```
+- **Build mechanics (learned in Phase 0):** because `-D…` applies to *every* TU on the command line, the
+  shim must be **precompiled once to `_shim.o`** (no `-D`) and the test then *linked against that object* —
+  otherwise the shim's own `main` is renamed to `torture_test_main` too and clashes.
 - **Classification** (a new thin runner, see Phase 1) by the read-back value of the *default* build:
   - default → `PASS` **and** `+mos-a16` == `+mos-xy16` == `PASS` on MAME (and `+mos-a16` == `PASS` on
     bsnes-jg) ⇒ **PASS**.
@@ -71,15 +78,16 @@ verdicts **are** committed (our own work).
 
 ## Plan (phased — each phase lands independently)
 
-### Phase 0 — fetch + host-side filter (no emulator; fast)
-1. `dev/fetch-torture.sh` — pinned, sha256-verified tarball → gitignored `vendor/c-torture/execute/`.
-   `set -euo pipefail`, `-h/--help`, idempotent (skip re-download if checksum matches).
-2. **Compile/link filter** (`tools/torture_filter.py`, host-only, **default build only** — no flags, no
-   emulator): for each `.c`, attempt the shim'd `compile_rom(... flags=[])` + link against the SNES SDK.
-   Bucket each test: `compiles+links` (candidate in-scope) vs `compile-fail` / `link-overflow`
-   (unsupported), with the diagnostic captured. Emit `examples/65816/torture/inscope.tsv` (the candidate
-   list) + `unsupported.tsv` (excluded, with reason). **Log the counts** (e.g. "1487 total → 612 build,
-   875 unsupported [n compile, m link]") — no silent caps.
+### Phase 0 — fetch + host-side filter (no emulator; fast) — **DONE 2026-06-19**
+1. ✅ [`dev/fetch-torture.sh`](../../dev/fetch-torture.sh) — pinned **gcc-14.2.0** (sha256
+   `a7b39bc6…f3cc9`), extracts only `gcc.c-torture/execute` into gitignored `vendor/c-torture/execute/`,
+   `set -euo pipefail` + `-h`/`--help`, idempotent (cached-tarball + extracted-tree fast paths).
+2. ✅ **Compile/link filter** ([`tools/torture_filter.py`](../../tools/torture_filter.py), host-only,
+   **default build only** — no flags, no emulator, `ProcessPoolExecutor`). Precompiles `_shim.o` once,
+   links each test against it, buckets the result. Emits
+   [`examples/65816/torture/inscope.tsv`](../../examples/65816/torture/inscope.tsv) +
+   [`unsupported.tsv`](../../examples/65816/torture/unsupported.tsv) with a reason per excluded test, and
+   logs the counts — **no silent caps** (every test lands in exactly one bucket). Result below.
 
 ### Phase 1 — adapter + runner + pilot
 3. `examples/65816/torture/_shim.c` (above) + `dev/torture.sh` (drive from host: `dev/run.sh torture
@@ -109,13 +117,51 @@ verdicts **are** committed (our own work).
    pseudo-random subset (seeded, not the full ~600 — emulator wall-clock) per run, plus the full set
    nightly. Forks without the BIOS secret skip. Never fail CI on a SKIP.
 
-## Verification (run on execution; paste raw output under each step)
+## Phase 0 — RESULTS (2026-06-19)
 
-1. **Fetch is reproducible + pinned.** `dev/fetch-torture.sh` on a clean checkout → sha256 matches; a
-   second run is a no-op. _(paste)_
-2. **Filter partitions deterministically.** `tools/torture_filter.py` → `inscope.tsv` + `unsupported.tsv`;
-   re-run is byte-identical; counts logged and sum to the total. _(paste)_
-3. **Adapter classifies correctly (pilot).** `dev/run.sh torture 30 --opt -Os`:
+Filter run: `FUZZ_ROOT=$PWD MOS_TOOLCHAIN=$PWD/build/llvm-mos-install python3 tools/torture_filter.py`
+(default build, `-Os`, 11 jobs, ~64 s over **1656** top-level `execute/*.c`):
+
+```
+==> 1253/1656 in-scope, 403 unsupported
+      compile-error    197
+      link-other        26
+      region-overflow    4
+      undefined-symbol  176
+```
+
+- **1253 in-scope** (75.7 %) — the candidate set for the Phase-1 differential run. Far larger than the
+  6-program corpus.
+- **403 unsupported**, each bucketed with a (sanitized, portable) diagnostic:
+  - **197 compile-error** — clang front-end rejects (implicit-function-decl in old K&R tests, oversized
+    bit-fields, target-type assumptions). Expected for a 1990s-era suite on a strict modern front end.
+  - **176 undefined-symbol** — needs libc we don't provide; **168 are `__putchar`** (i.e. `printf`/`puts`)
+    — these are the natural `c-testsuite`-style stdout tests, correctly excluded.
+  - **26 link-other** — LTO/bitcode rejects (`__builtin_prefetch`), GNU vector/SIMD extensions, ld.lld
+    limits.
+  - **4 region-overflow** — static data exceeds the SNES `ram` region (e.g. `.noinit` overflow by 7322 B).
+- The `builtins/` and `ieee/` subdirs (206 more tests) are **excluded by design** (compiler-builtin
+  libcalls / floating-point); pass `--subdirs` to include them, but they are out of the freestanding
+  integer scope this gate targets.
+- **Determinism:** two back-to-back full runs produce **byte-identical** `inscope.tsv` / `unsupported.tsv`
+  (the one initially-flapping row — `user-printf.c`, many missing symbols listed in nondeterministic order
+  — is now normalized to the sorted-smallest symbol + a `(+N more)` count).
+- **Build-mechanics correction** (now reflected in §"The adapter"): the shim must be **precompiled to
+  `_shim.o`** and linked, because `-Dmain=…` applies to *all* TUs on the command line and would otherwise
+  rename the shim's own `main`.
+
+## Verification
+
+1. **Fetch is reproducible + pinned.** ✅ PASS — `dev/fetch-torture.sh` (re-run, tarball cached):
+   ```
+   ==> tarball cached + verified (sha256 a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9)
+   ==> execute/ already extracted (1862 .c files)
+   ==> ready: …/vendor/c-torture/execute  (top-level: 1656 tests)
+   ```
+2. **Filter partitions deterministically.** ✅ PASS — counts sum (1253 + 197 + 26 + 4 + 176 = 1656); two
+   full runs `diff` byte-identical (`DETERMINISTIC ✓`); no machine-specific paths in the committed TSV
+   (`grep -c '/home/will\|/tmp/'` → 0). Output in §"Phase 0 — RESULTS".
+3. **Adapter classifies correctly (pilot).** _(Phase 1)_ `dev/run.sh torture 30 --opt -Os`:
    default==+mos-a16==+mos-xy16==PASS on the in-scope slice (MAME + bsnes-jg). _(paste)_
 4. **A real defect is caught.** Inject `abort()` into one passing test → runner reports **FAIL** (not
    SKIP/PASS). _(paste)_
@@ -125,9 +171,9 @@ verdicts **are** committed (our own work).
    `fuzz 50 1` green, `0002` round-trips (no `vendor/llvm-mos` change — this is test-harness only). _(paste)_
 
 ## Risks / honest scoping
-- **16-bit `int`.** llvm-mos `int` is 16 bits; a large fraction of torture tests assume ≥32-bit `int` and
-  will land in `unsupported.tsv`. Coverage is the *in-scope* subset, not all ~1,500 — state the number, don't
-  imply full conformance.
+- **16-bit `int`.** llvm-mos `int` is 16 bits; a fraction of torture tests assume ≥32-bit `int` and land in
+  `unsupported.tsv` (part of the 197 compile-errors). Coverage is the *in-scope* subset (**1253 / 1656**
+  measured in Phase 0), not the whole suite — state the number, don't imply full conformance.
 - **Tiny RAM.** The SNES corpus linker confines writable data to LoRAM (~7.5 KB); big-array tests overflow →
   SKIP (caught at link).
 - **Emulator wall-clock.** Full set × 3 variants × 2 `-O` × (MAME+bsnes) is hours. Hence the host-only

@@ -234,14 +234,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [ ] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
-  de-facto-standard *execution*-correctness suite (~1,500 self-checking `abort()`/`exit(0)` programs) into the
-  existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a test is
-  in-scope iff the default build runs it to the PASS sentinel, then any `+mos-a16`/`+mos-xy16` disagreement is a
-  real defect (sidesteps "is this test appropriate for 16-bit `int`" — if default handles it, a16 must too).
-  Fetch-don't-commit (GPLv3 → sha256-pinned, gitignored, reproducible via `dev/fetch-torture.sh`, the
-  WDC816CC/ORCA-refs precedent). Phased: fetch + host-only compile/link filter → shim adapter + pilot → scale +
-  triage → sampled secret-gated CI. [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
+- [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
+  de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
+  into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
+  test is in-scope iff the default build runs it to the PASS sentinel, then any `+mos-a16`/`+mos-xy16`
+  disagreement is a real defect (sidesteps "is this test appropriate for 16-bit `int`" — if default handles it,
+  a16 must too). Fetch-don't-commit (GPLv3 → sha256-pinned gcc-14.2.0, gitignored, reproducible via
+  `dev/fetch-torture.sh`, the WDC816CC/ORCA-refs precedent). **Phase 0 DONE 2026-06-19**: fetch + host-only
+  compile/link filter (`tools/torture_filter.py` + `_shim.c`) → **1253/1656 in-scope**, 403 unsupported (197
+  compile-error, 176 undefined-symbol [168 = printf], 26 link-other, 4 region-overflow); manifests in
+  `examples/65816/torture/{inscope,unsupported}.tsv`. **Remaining:** Phase 1 shim-runner + emulator pilot,
+  Phase 2 scale + triage, Phase 3 sampled secret-gated CI.
+  [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [x] **#321 Tier-1 differential fuzzer (standing capability).** `tools/a16_fuzz.py` +
   `dev/run.sh fuzz [N] [seed]`: seeded generator of random UB-free C over mixed 16/8-bit vars and the
   full `+mos-a16` operator set; compiles each DEFAULT + `+mos-a16`, runs both on MAME + bsnes-jg, and
