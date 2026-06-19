@@ -1,6 +1,6 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-19 (DWARF *test+docs* promoted Future→Ready — both halves now drafted; GitHub
+**Last updated:** 2026-06-19 (DWARF branch `wbniv:mos-dwarf-65816-test-docs` pushed `0ae9415`; GitHub
 open-count last verified 2026-06-17, see *Verified state* + *Refresh* below).
 
 A standing snapshot of every upstream-facing contribution from this fork: what is **drafted and ready to
@@ -24,7 +24,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 | 2 | **P3** — `reentrant` can't force the soft stack | **issue** | Latent footgun: `__attribute__((reentrant))` is a no-op for non-recursive fns (MOSNonReentrant re-stamps `nonreentrant`) | [`docs/321-upstream-reentrant-soft-stack-issue.md`](321-upstream-reentrant-soft-stack-issue.md) | n/a (issue) |
 | 3 | **#320** — far-pointer design note | **note** | Opens the five-address-space ABI-blessing discussion (a Discord/#320 post, not a code change) | [`docs/320-upstream-far-pointer-note.md`](320-upstream-far-pointer-note.md) | n/a (note) |
 | 4 | **scavenger N/Z-liveness** — `saveScavengerRegister` asserts N/Z dead | **issue** | Upstream crash: a compare/ALU flag live across a frame-vreg spill → illegal `STImag8 $p` (no fork patch — maintainer territory) | [`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md) | n/a (issue) |
-| 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | n/a (not pushed yet) |
+| 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | `wbniv:mos-dwarf-65816-test-docs` (pushed `0ae9415`) |
 
 ### 1 — F4 PR (a code-change PR; #5 DWARF is the other)
 
@@ -90,7 +90,7 @@ The 65816 DWARF *content* is already correct upstream — **no codegen change** 
 
 The durable in-repo guard is **`dev/run.sh dwarf`** (7/7, real `--config -g` build, companion-ELF
 asserted). **No fork patch carried** (the lit test is a drop-in; the doc comment is maintainer territory).
-Post it (after dropping the test in + adding the comment in a clean `wbniv/llvm-mos` checkout off `main`):
+Branch `wbniv/llvm-mos:mos-dwarf-65816-test-docs` (commit `0ae9415`, branched from `c798c3141`, upstream `main`) is pushed. Post it:
 
 ```
 gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-dwarf-65816-test-docs --base main \
