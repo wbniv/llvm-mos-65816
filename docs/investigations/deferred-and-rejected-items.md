@@ -6,11 +6,13 @@ companion to the [plan index](plan-index.md): the plan index lists what landed; 
 deliberately **not** built, and why, so a future worker doesn't re-explore a settled dead-end. Every row
 cites the disposition record (plan, `TODO.md`, or investigation note).*
 
-Three of the project's governing lessons drive most of these dispositions: **(2)** a native 16-bit op is
-not automatically smaller — it loses to a tight 8-bit path when operands are register-resident, so a
-blanket form that regresses common shapes is wrong; **(3)** modest gains are worth doing, but only
-*genuine* ones — gate, don't blanket. Most "rejected" rows below are a measured regression caught by that
-bar; most "deferred" rows are a real win gated behind a trigger that hasn't fired.
+All three of the project's governing lessons drive these dispositions: **(1)** measure, don't assume —
+predicted codegen is often wrong here, so each rejection below is a *measured* regression (a spike in a
+throwaway worktree, or a corpus trigger check), not a guess; **(2)** a native 16-bit op is not
+automatically smaller — it loses to a tight 8-bit path when operands are register-resident, so a blanket
+form that regresses common shapes is wrong; **(3)** modest gains are worth doing, but only *genuine* ones
+— gate, don't blanket. So most "rejected" rows are a measured regression caught by lesson (2)'s bar, and
+most "deferred" rows are a real win gated behind a trigger that hasn't fired.
 
 ## Legend — decision types
 
