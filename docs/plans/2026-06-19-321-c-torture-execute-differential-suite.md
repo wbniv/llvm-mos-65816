@@ -6,6 +6,9 @@ host filter (**1253 / 1656** in-scope) + the emulator differential runner. Full 
 wrong-value, all reproduced in isolation on both emulators — the payoff). Recorded in `xfails.tsv`; gate is
 green-modulo-known. **Remaining:** the `-Os` pass + per-defect root-cause backlog; Phase 3 (sampled CI).
 See §"Phase 2 — RESULTS".
+**BACKLOG RESOLUTION (2026-06-19):** the **frame-index fix cleared 13** (all a16), the **dg-require** refinement
+dropped the `pr7284-1` false positive (in-scope 1253→1228), and the **4 remaining defects are all xy16** —
+see §"Phase 2 backlog — RESOLUTION".
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — broaden correctness coverage beyond the 6-program corpus + `a16*` micro-tests + the random fuzzer).
 **Required reading:**
 [corpus-a16 differential gate (the engine this reuses)](2026-06-19-321-corpus-a16-differential-mode.md) ·
@@ -240,6 +243,33 @@ Full `-O1` differential pass over all **1253** in-scope tests (MAME `default == 
 > leave orphaned MAME children; over a 1253-test pass these accumulated and the final process hung in
 > teardown (so the `-Os` pass — chained after `set -e` — never started). The 16 FAILs are unaffected (all
 > reproduced isolated). The `-Os` pass reruns separately; reaping orphan MAMEs is a follow-up runner fix.
+
+## Phase 2 backlog — RESOLUTION (2026-06-19)
+
+The per-defect backlog (18 rows: 17 confirmed + the `pr7284-1` false positive) was triaged and substantially
+cleared the same day. The "diverse, several distinct bugs" expectation was **wrong** for the a16 cases — they
+were almost all **one** root cause:
+
+- **13 cleared by ONE fix** — the `CmpBrAbsImm16` **frame-index elimination scramble** (`f2d65c2`,
+  [plan](2026-06-19-321-cmpbrabsimm16-frameindex-elimination-scramble.md)). `MOSRegisterInfo::eliminateFrameIndex`
+  read the frame displacement from the wrong operand for the a16 fused compare-branch pseudo, so a16-LTO
+  static/zero-page-stack accesses resolved to `base+compareImm` not `base+frameOffset`. Cleared:
+  `20010518-2, 20020402-1, 20071202-1, 20071210-1, 20080522-1, 921117-1, 990127-1, 990811-1, pr20466-1,
+  pr35472, pr39120, pr34768-1, pr34768-2` (`pr34768-*` had been mis-filed as an LTO const-attribute bug,
+  `20010518-2` as a packed-struct/`long` bug — both were this defect). Regression guard: the 13 de-XFAIL'd
+  rows + `examples/65816/a16frameidx`.
+- **1 false positive removed** — `pr7284-1` (`int32plus`, `n<<24` UB on 16-bit `int`) via honoring
+  `dg-require-effective-target` in the filter (`8622e3f`,
+  [plan](2026-06-19-321-torture-honor-dg-require-effective-target.md)); in-scope **1253→1228**.
+- **`pr49419`'s a16 leg fixed too** by the frame-index commit — it is now **xy16-only**
+  ([plan](2026-06-19-321-c-torture-pr49419-a16-xy16-hang.md)).
+
+**Remaining = 4 defects, ALL xy16** (the 16-bit-index track, added 2026-06-18, less battle-tested):
+`pr49419` (hang), `20041011-1` (64-bit `ull` + pressure), `doloop-1` (counted loop at `INT` limits),
+`va-arg-22` (varargs) — plus the `k_isort` xy16 miscompile surfaced by the suite's xy16 leg. `pr49419`'s
+loops trace instruction-correct yet hang ⇒ a runtime **X-flag (index-width) state** bug, prime suspect the
+**`MOSInsertREPSEP` X-flag lattice**, **likely shared** across the xy16 cluster (one fix may clear several).
+The a16 (16-bit-accumulator) track is now healthy.
 
 ## Verification
 

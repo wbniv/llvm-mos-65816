@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/215f74d) | #321 c-torture Phase 2 -Os: 2 new miscompiles (pr34768), 1 flake, triage notes |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/0d76bfc) | #321 c-torture Phase 2 (-O1): 16 confirmed NEW a16/xy16 runtime miscompiles |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/15542ff) | #321 c-torture Phase 1: pilot finds a real a16 ZP-pressure overflow (pr15296.c) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8085d2a) | #321 c-torture Phase 0: fetch + host-side compile/link filter (1253/1656 in-scope) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/34cd16a) | #321 plan: vendor GCC c-torture/execute behind the +mos-a16/+mos-xy16 differential gate |
 
 <!--history-meta v1
+215f74d	author	Will Norris
+215f74d	added	19
+215f74d	deleted	0
+215f74d	files	1
+215f74d	body	-Os full pass: 2 new confirmed miscompiles pr34768-1/-2 (a16+xy16, both\nemulators) — PR34768 const-indirect-call. Root-caused to the LTO level:\nper-function 65816 asm is correct (test reloads x post-call; foo negates\nright; neither clobbers __rc20/tmp), so the bug is whole-program LTO\nwrongly treating (c?foo:bar)() as side-effect-free because bar is const.\nA pipeline interaction, not per-instr selection (seed-42-shaped).\n\nAlso: pr40404 "build fails" was a FLAKE (builds clean 3/3 host-side);\n20020402-1 + 20041011-1 XPASS at -Os (opt-level-specific, rows stay);\npr7284-1 is a false positive (int32plus / UB on 16-bit int). Net genuine\ndistinct miscompiles: 17 (15 @ -O1 + 2 @ -Os). xfails.tsv + plan updated.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0d76bfc	author	Will Norris
 0d76bfc	added	58
 0d76bfc	deleted	20
