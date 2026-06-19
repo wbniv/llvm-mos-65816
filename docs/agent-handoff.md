@@ -57,7 +57,17 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
   runs **directly on the host**, no Docker). Then the emulator differential gate:
   `dev/run.sh torture [N] [--opt -Os|-O1] [--start K] [--no-bsnes]` (`tools/torture_run.py`) — DEFAULT
   build is the oracle, so a non-PASS default ⇒ **SKIP** and any FAIL is a real defect; known a16 crashes
-  (incl. `a16-zp-pressure-overflow`) ⇒ XFAIL. [plan](plans/2026-06-19-321-c-torture-execute-differential-suite.md).
+  (incl. `a16-zp-pressure-overflow`) ⇒ XFAIL. **All known a16/xy16 runtime miscompiles are now FIXED**
+  (`xfails.tsv` has no data rows as of 2026-06-20: 13 a16 by the frame-index fix, then all 4 xy16 +
+  `k_isort` by the `requiredXWidth` index-width fix — `f2d65c2`, `55ec505`). A new FAIL is a regression.
+  [plan](plans/2026-06-19-321-c-torture-execute-differential-suite.md).
+- **xy16 codegen gotcha — LTO narrows small index loads to 8-bit.** The 16-bit-index pseudos
+  (`LDAbsXIdx16`/`LDIndirYIdx16`) only survive to the linked ROM when the index is *genuinely* 16-bit-wide
+  (e.g. `pr49419`'s `t[x]` double-indirect computed chase). A simple `arr[volatile_short_idx]` legalizes to
+  `G_LOAD_ABS_IDX16` per-function (so `xy16ops`/`xy16indiry` PASS, non-LTO `-c`) but **under `--config` LTO it
+  narrows back to 8-bit X** when the value provably fits — a valid optimization. Consequence: you can't
+  reproduce an X=16-ambient bug with a minimal global-array test through the (LTO) differential harness;
+  reach for a computed-index chase or use the c-torture rows.
 - Long ops: background them and monitor; don't block on `sleep`.
 - **CI** (`.github/workflows/smoke.yml`, `workflow_dispatch`-only): the `smoke` job boots the corpus in
   MAME; the `xcheck` job builds the from-source toolchain (cached) + SDK, then `dev/run.sh xcheck` (bsnes-jg)
@@ -139,7 +149,12 @@ Under `vendor/llvm-mos/llvm/lib/Target/MOS/`:
 - `MOSInstrPseudos.td` + `MOSInstrInfo.cpp` — pseudos: `CmpBrImag16` (Imag16-resident LHS),
   `CmpBrImm16` (const RHS), `CmpBrAbsAbs16` (both-global), `CmpBrAbsImm16` (global LHS + const RHS),
   `CmpBrImagAbs16` (computed LHS + global RHS); + their post-RA expansion (`expandCmpBr16`).
-- `MOSInsertREPSEP.cpp` — M-flag (8/16-bit) mode tracking across blocks.
+- `MOSInsertREPSEP.cpp` — M-flag (accumulator 8/16) **and** X-flag (xy16 index 8/16) mode tracking across
+  blocks (parallel lattices + the `rep`/`sep` placement). `requiredXWidth(MI)` is the per-instruction
+  index-width classifier — it must return `XW_X8` for every op that reads/writes an index reg (X/Y) at
+  8-bit intent (loads/stores/transfers/push-pull **and** the value ops: compares `CMPImm`/`CMPImag8`/
+  `CMPAbs` and register `INC`/`DEC` of X/Y) so they don't run in a stray X=16 ambient. Adding a new
+  8-bit index op? Add it here. Whole file is `hasAccum16()`-gated; X-lattice work is `HasIndex16`-gated.
 - `MOSLateOptimization.cpp` — post-RA peephole: `threadAccum16` eliminates redundant `STAImag16 R;
   LDAImag16 R` round-trips between dependent native-s16 ops (A16-threading Phases 0–1–1.5 done).
 - `MOSRegisterInfo.td` — register classes: `GPR` = {A,X,Y}, `Ac16` = {A16}, `Imag8`/`Imag16` = the

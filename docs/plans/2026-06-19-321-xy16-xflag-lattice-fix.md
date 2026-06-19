@@ -48,11 +48,15 @@ M- and X-restores into one `sep #$30` (one *fewer* instruction). The accumulator
 and `INA`/`DEA` keep `XW_None` (their X/Y test fails → fall through). Strictly xy16-gated: `requiredXWidth`
 is only called under `HasIndex16`, so default and `+mos-a16` codegen are untouched by construction.
 
-Why no global-array micro-test: the X=16 ambient requires a 16-bit-indexed op, and in the *committed*
-toolchain the absolute/(zp)-indexed 16-bit selection fires only for `pr49419`'s double-indirect
-computed-index chase — global/pointer loops narrow to 8-bit X, so a minimal global-array test compiles to
-all-X8 code and would not exercise the bug. The regression guards are therefore the cleared **c-torture
-rows** (hard-FAIL on regression) plus **`k_isort`** (always-on in the a16 suite; its xy16 leg was the bug).
+Why no global-array micro-test: the X=16 ambient requires a 16-bit-indexed op. The B2 16-bit-index gate
+still fires fine in the *per-function* path (verified: `xy16ops` legalizes `G_LOAD_ABS_IDX16` →
+`LDXImag16`+`LDAbsXIdx16`, gate PASSES) — but the differential harness links via `--config` (**LTO**), and
+under LTO a provably-small global/pointer index narrows back to 8-bit X (a valid optimization). So a minimal
+global-array test compiles to all-X8 code *in the linked ROM* and would not exercise the X=16 ambient. Only
+`pr49419`'s double-indirect computed-index chase keeps a genuinely-16-bit index through LTO. (This is an LTO
+narrowing, **not** a B2-gate regression — `xy16ops`/`xy16indiry` are unaffected.) The regression guards are
+therefore the cleared **c-torture rows** (hard-FAIL on regression) plus **`k_isort`** (always-on in the a16
+suite; its xy16 leg was the bug).
 
 ## Background — the M and X flags on the 65816
 
