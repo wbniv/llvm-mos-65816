@@ -58,7 +58,10 @@ Source-verified + asserts-build-confirmed write-up of an **upstream** crash:
 `MOSRegisterInfo::saveScavengerRegister` asserts N/Z dead at every scavenging point, but a
 compare/ALU flag can be live across a frame-vreg spill (readily hit by 16-bit-accumulator codegen)
 → illegal `STImag8 $p`. **No fork patch** (issue only; the fix touches the generic scavenger
-contract and is regression-sensitive — left to maintainers). Deterministic repro included. File it:
+contract and is regression-sensitive — left to maintainers). Deterministic repro included; **fix-directions
+sharpened 2026-06-19** (feasibility re-probe: `P` has no GPR spill home and `PHP`/`PLP` can't bracket it
+across an unbalanced push/pull range — so the obvious fix needs a stack-relative restore or a flag-safe
+spill point). File it:
 
 ```
 gh issue create --repo llvm-mos/llvm-mos \

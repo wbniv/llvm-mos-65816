@@ -1,4 +1,5 @@
-<!-- STATUS (internal; strip before posting): drafted 2026-06-18, ready to post (user-triggered).
+<!-- STATUS (internal; strip before posting): drafted 2026-06-18; fix-directions sharpened 2026-06-19
+     (feasibility re-probe — why PHP/PLP isn't a drop-in). Ready to post (user-triggered).
      Upstream issue for the register-scavenger N/Z-liveness assertion. -->
 
 # [MOS] Register scavenger asserts N/Z dead (`saveScavengerRegister`) — violated when a compare/ALU flag is live across a frame-vreg spill
@@ -73,9 +74,23 @@ fatal error: error in backend: Found N machine code errors.
 
 ## Likely fix directions
 
-- Save/restore N/Z (and `P`) around the scavenger spill (e.g. `PHP`/`PLP`) instead of asserting them
-  dead, so `saveScavengerRegister` is correct when a flag is live; and/or
-- give the `P` scavenger-spill a valid lowering when the hard-stack push/pull isn't balanced
-  (`pushPullBalanced` false) rather than emitting `STImag8 $p`.
+The obvious "just `PHP`/`PLP` around the spill" isn't sufficient on its own — two constraints make it
+non-trivial:
 
-Happy to provide the full delta-debugged repro and asserts backtrace.
+- **`P` has no GPR spill home.** `STImag8`/`LDImag8` are GPR-only, so the current `Reg == MOS::P`
+  fallthrough is structurally illegal — `P` can only be saved on the hard stack.
+- **`PHP`/`PLP` can't bracket `P` across an *unbalanced* push/pull range.** `saveScavengerRegister`
+  takes the hard-stack path only when `pushPullBalanced(I, UseMI)` holds, and the scavenge that trips
+  this bug lands inside an *unbalanced* range (a frame spill/reload run with net pushes between `I` and
+  `UseMI`), so a plain `PLP` at `UseMI` would pop the wrong byte.
+
+So a correct fix likely needs one of:
+
+1. A **flag-preserving restore that tolerates an unbalanced stack** — save `P` at `I`, restore it with a
+   *stack-relative* load at `UseMI` (accounting for the intervening net push) rather than a plain `PLP`; or
+2. Teaching the scavenger to **pick a spill point where N/Z is dead** (or to spill a register whose
+   save/restore sequence doesn't clobber the flags), so `P` never needs preserving here; or
+3. At minimum, **replacing the assert with a graceful path** so a flag-live scavenge cannot silently emit
+   illegal MIR in a release build.
+
+Happy to provide the full delta-debugged repro, the asserts backtrace, and the pre-PEI MIR.
