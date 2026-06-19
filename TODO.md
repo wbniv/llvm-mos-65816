@@ -177,9 +177,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   clean, `xy16spill` PASS); 16-bit arithmetic; ~~native-mode crt0~~ (entry + 16-bit SP + native
   vectors already present; explicit DBR=0 is the one real gap — dedicated item below); then
   hardware-stack ABI + calling convention. ROADMAP step 5.
-  **Remaining follow-ons: legalizer integration (wire Xc16/Yc16 into `selectXY16` + operand widening
-  for `abs,x`/`(zp),y`), hardware-stack ABI + calling convention.** (Native-mode crt0 needed no change
-  for in-function xy16; its lone gap — explicit DBR=0 — is the dedicated item below.)
+  **Legalizer integration DONE** (B1 `allUsesAreXY16Compatible` load→`Xc16` constraint + B2 16-bit-index
+  `abs,X16`/`(zp),Y16` widening via `Use16BitIdx`; `selectXY16` C1 direct + C2 indexed handlers all wired).
+  Both B2 sub-paths now gated: `abs,X16` by `xy16ops`, `(zp),Y16` by **`xy16indiry`** (added 2026-06-19 —
+  the path was wired-but-untested; gate PASSES, no bug; [plan](docs/plans/2026-06-19-321-xy16-indiry-gate.md)).
+  **Remaining follow-ons: hardware-stack ABI + calling convention** (gated on the CC decision). (Native-mode
+  crt0 needed no change for in-function xy16; its lone gap — explicit DBR=0 — is the dedicated item below.)
   [xy16 plan](docs/plans/2026-06-17-321-xy16-index-register-mode.md) · [handoff](docs/plans/2026-06-18-321-xy16-implementation-handoff.md).
 - [x] **#321 native-mode crt0 — explicit DBR=0 contract + xy16 audit.** Measured, the task's *"16-bit SP
   setup still needed"* premise is **stale**: the crt0 already does native entry (XCE), 16-bit SP
@@ -726,4 +729,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "A separate corpus-a16 job (rejected above)" -> a rejected design alternative, not work. The chosen
        design extends the xcheck job (no toolchain-build duplication). Nothing open.
      fp:5f8372d2444e1e6b fp:6a08cf207dd87a4b -->
+- [ ] **(triage)** The open xy16 fuzz failures / emulator hangs (separate, active area). — _from [2026-06-19-321-xy16-indiry-gate.md](docs/plans/2026-06-19-321-xy16-indiry-gate.md)_  <!-- fp:1fcc2870d2445ea7 -->
+- [ ] **(triage)** Hardware-stack ABI + calling convention (deferred / gated on the CC decision). — _from [2026-06-19-321-xy16-indiry-gate.md](docs/plans/2026-06-19-321-xy16-indiry-gate.md)_  <!-- fp:9b195ad521b9ffae -->
+- [ ] **(triage)** A standalone `(zp),Y16` *store* gate (`STIndirYIdx16`) — the load path is the higher-value read; the store — _from [2026-06-19-321-xy16-indiry-gate.md](docs/plans/2026-06-19-321-xy16-indiry-gate.md)_  <!-- fp:8e99366f38c84605 -->
 <!-- END auto-captured-deferrals -->

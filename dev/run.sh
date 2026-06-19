@@ -172,6 +172,9 @@ Targets:
              +mos-xy16 (no Imag16→Xc16 COPY crash); corpus_result==0x3457 both emus.
   xy16ops    #321 xy16 B2 legalizer gate: unmasked volatile 16-bit index triggers
              G_LOAD_ABS_IDX16 → LDXImag16+LDAbsXIdx16; corpus_result==0x2A42 both emus.
+  xy16indiry #321 xy16 B2 (zp),Y16 gate: runtime zp pointer + unmasked 16-bit offset
+             triggers G_LOAD_INDIR_IDX16 → LDYImag16+LDIndirYIdx16 (lda (dp),Y, no
+             byte-walk); corpus_result==0x7E5A host==default==+mos-a16==+mos-xy16 both emus.
   a16ret     #321 calling-convention: lock the A (low) / X (high) RETURN convention as a tested
              ABI invariant (test+docs only, no codegen change). Disasm gate: the i16 return is
              `ldx <high>; lda <low>; rts` (high byte->X, low byte->A, byte-pinned) and the i8 return
