@@ -107,7 +107,61 @@ to recover, record the verdict in this plan, `git worktree remove` + `git branch
 is materially nonzero → keep the worktree and proceed to Phase 2; the logged sites become Phase 2's targeted
 byte-diff fixtures (and, if a shape isn't already covered, a new micro-test).
 
-## Phase 2 — implementation (only if Phase 1 is positive)
+## Phase 1 — RESULTS (2026-06-20): both probes fire → **PROCEED to Phase 2**
+
+Ran on throwaway worktree `throwaway/loadfold-unify-measure` (seeded from `main`'s `build/llvm-mos` real-copy +
+hardlinked source; incremental rebuild of the probe patch **45 s**). Harness = `dev/measure-loadfold-recovery.sh`
+(the keeper). Compiled **53 a16 micro-tests** ×{a16 -Os, a16 -O1, default -Os} + **1228 in-scope c-torture**
+×{a16 -Os, default -Os} = **2615 compiles** (130 compile-fails: missing-header/K&R, contribute 0). The probes
+**log-and-bail** → codegen unchanged; this only counts.
+
+| Probe | raw hits | distinct (file,op) | opcode breakdown |
+|---|---|---|---|
+| **A** — AA-precision recovers a 16-bit fold | 11 | **7** | `G_LOAD16_ABS` ×7 (abs only; no indirect) |
+| **B** — single-use-volatile recovers a fold | 132 | **43** | `G_LOAD_ABS` (8-bit) ×30 · `G_LOAD16_ABS` (store-side) ×11 · `G_LOAD16_INDIR` ×1 · `G_LOAD_INDIR_IDX` ×1 |
+
+The opcode split **confirms the plan's predicted symmetry exactly**:
+
+- **Probe A — the "handful" is real and small.** 5 of the 7 are genuine c-torture programs (`990128-1`,
+  `packed-1`, `pr43236`, `pr85529-1`, `zero-struct-1`): a non-aliasing store sits between a `G_LOAD16_ABS` and
+  its user, which `noStoreBetween` drops but `mayAlias` keeps. All abs, no `G_LOAD16_INDIR` — as expected.
+- **Probe B — both predicted recoveries measured.**
+  - **8-bit volatile** (`G_LOAD_ABS` ×30, `G_LOAD_INDIR_IDX` ×1): single-use volatile loads the upstream
+    `shouldFoldMemAccess` volatile-bail blocks — the dominant case, and the volatile-MMIO-read idiom (real,
+    not an artefact). Real c-torture hits: `postmod-1`, `pr38819`, `20120808-1`, `pr57281`.
+  - **16-bit *store-side*** (`G_LOAD16_ABS` ×11, `G_LOAD16_INDIR` ×1): **exactly** the compare-vs-store
+    asymmetry the plan flagged — a volatile 16-bit global folds in a *compare* context
+    (`foldableAbsLoad16`→`noStoreBetween`, volatile-tolerant) but NOT in a *store/copy* context
+    (`loadStoreValueIntoA16`→`shouldFoldMemAccess`, volatile-bail). 12 distinct sites ⇒ it recurs.
+
+**Decision: PROCEED.** Both totals materially nonzero; recovery is real and recurring (volatile-drop broadly,
+AA-precision as a small handful). **Honest caveat:** raw hits are inflated ~2–3× by multi-mode compilation, and
+this counts foldable *sites*, not *bytes saved* — Phase 2's byte-diff over these fixtures is still the payoff
+gate (a single-use fold is a win per `shouldFoldMemAccess`'s own cost model, but the magnitude must be
+measured). Phase-2 byte-diff fixtures = the real c-torture sites above + the existing volatile micro-tests
+(`a16abscmp`/`a16loadfold`/`a16mixfold`) as the no-regression guard.
+
+<details><summary>Probe instrumentation (throwaway; Phase 1 reproduces from this + the harness script)</summary>
+
+Five hunks in `MOSInstructionSelector.cpp`, all behavior-preserving (count then bail):
+```
++#include "llvm/Support/raw_ostream.h"
++static AAResults *g_ProbeAA = nullptr;                       // file-scope; selection is single-threaded
+   InstructionSelector::setupMF(...);
++  g_ProbeAA = AA;                                            // capture AA for noStoreBetween (Probe A)
+-  if ((*Src.memoperands_begin())->isVolatile()) return false;        // shouldFoldMemAccess: drop early bail…
++  const bool ProbeVolatile = (*Src.memoperands_begin())->isVolatile();
+   … (whole gate runs) …
++  if (ProbeVolatile) { if (NumUsers==1) errs()<<"LOADFOLD-PROBE-B "<<Dst.getMF()->getName()<<" op="<<Src.getOpcode(); return false; }  // …count single-use at the final return, still bail
+   return true;
+   // noStoreBetween: on the mayStore bail, if it's a pure non-aliasing store, count it:
++  if (MI.mayStore() && !MI.isCall() && !MI.hasUnmodeledSideEffects() && g_ProbeAA && !MI.mayAlias(g_ProbeAA,*Def,true))
++    errs()<<"LOADFOLD-PROBE-A "<<Def->getMF()->getName()<<" op="<<Def->getOpcode();
+   return false;
+```
+</details>
+
+## Phase 2 — implementation (only if Phase 1 is positive) — **greenlit by Phase 1**
 
 1. Replace `shouldFoldMemAccess` + `noStoreBetween` with the single `canFoldLoadIntoUser(Dst,Src,AA)` above
    (volatile→single-use clamp; AA-precise scan). Re-point all call sites; delete `foldableAbsLoad16`/

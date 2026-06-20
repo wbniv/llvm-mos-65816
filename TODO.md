@@ -242,10 +242,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   value-side folds (`foldableAbsLoad16`/`foldableIndirLoad16`) the `mayAlias(AA,…)` check (thread the
   selector's `AA` member). Symmetry: AA-precision recovers folds on the **16-bit** side, the volatile-drop on
   the **8-bit** side (+ fixes today's asymmetry — a volatile 16-bit global folds in a *compare* but not a
-  *store/copy* context). **Gate first:** a throwaway instrument-and-count (compile-only, no MAME) over the a16
-  corpus + 1168 c-torture + ≥200 Csmith seeds — both recoverable-fold counts ~0 ⇒ DEFER-confirm and tear down;
-  nonzero ⇒ implement + byte-diff + full differential. `shouldFoldMemAccess` is upstream MOS code → the
-  volatile-relaxation is an upstream-contribution candidate. [plan](docs/plans/2026-06-20-321-unify-loadfold-gate-aa-volatile.md)
+  *store/copy* context). **Phase 1 DONE 2026-06-20** (`dev/measure-loadfold-recovery.sh`, throwaway worktree,
+  compile-only over 53 a16 tests + 1228 c-torture = 2615 compiles): **both probes fire → PROCEED.** Probe A
+  (AA-precision) **7 distinct sites** (`G_LOAD16_ABS`, 5 real c-torture: `990128-1`/`packed-1`/`pr43236`/
+  `pr85529-1`/`zero-struct-1`); Probe B (volatile) **43 distinct sites** — `G_LOAD_ABS` 8-bit ×30 (volatile-MMIO
+  idiom) + `G_LOAD16_ABS` store-side ×11 (the measured compare-vs-store asymmetry) + 2 indirect. **Phase 2
+  (greenlit):** implement the unified helper + **byte-diff** these fixtures (counts foldable sites, not yet
+  bytes) + full differential. `shouldFoldMemAccess` is upstream MOS code → the volatile-relaxation is an
+  upstream-contribution candidate. [plan §Phase 1 RESULTS](docs/plans/2026-06-20-321-unify-loadfold-gate-aa-volatile.md)
   · spun out of the [load-fold-call-hazard audit](docs/plans/2026-06-20-321-audit-a16-loadfold-call-hazard.md) §Deferred.
 
 ### Test Bench / CI
