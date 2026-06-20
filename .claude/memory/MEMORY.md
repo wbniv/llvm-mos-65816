@@ -6,6 +6,7 @@
 - [Investigations on throwaway branches](investigations-on-throwaway-branches.md) — exploratory/measurement work runs on a disposable worktree, never on main's hot shared working copy (user principle, 2026-06-18)
 - [No false-choice questions](no-false-choice-questions.md) — don't pose AskUserQuestion forks where every option collapses to the same next action or one is the obvious project default; just act and state it (user feedback, 2026-06-19)
 - [Close net-negative findings, don't defer](close-net-negative-findings-not-defer.md) — a measured net-negative is an answer (don't do it), not a "needs a gate / future work" backlog item; close it, record the evidence (user feedback, 2026-06-20)
+- [Worktree teardown: keep durable artifacts](worktree-teardown-keep-durable-artifacts.md) — reclaim the 95%+ build/vendor dupes but never delete the scripts/verdicts that reconstruct a test conclusion; retain worktrees until upstream merge (user feedback, 2026-06-21)
 
 <!-- BEGIN GLOBAL MEMORY (managed by claude-housekeeping; do not edit) -->
 

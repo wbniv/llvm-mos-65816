@@ -10,6 +10,11 @@ __pycache__/
 # loop plan + README. Supply it out-of-band (CI: from a secret).
 /dev/roms/
 
-# Claude per-project memory (project-specific files + symlinks to ~/.claude/memory generics)
+# Claude per-project memory (project-specific files + symlinks to ~/.claude/memory generics).
+# Also TRACK the project hook wiring (settings.json + hooks/) so it's reproducible from the
+# repo — e.g. the worktree-teardown guard. Everything else under .claude/ stays local
+# (scheduled_tasks.lock, transcripts, etc.).
 .claude/*
 !.claude/memory/
+!.claude/settings.json
+!.claude/hooks/
