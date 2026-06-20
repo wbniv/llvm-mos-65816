@@ -863,7 +863,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      closed net-negative; the literal single-helper merge rejected by measurement), now captured
      by the Done item [321-loadfold-unify]. Nothing to track.
      fp:5f85cd31e68981cc fp:f85cd73b8f51bdd5 fp:98f82e24c01c1ac9 -->
-- [verify] **2026-06-20-memory-organization-two-tier** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-20-memory-organization-two-tier.md](docs/plans/2026-06-20-memory-organization-two-tier.md)_  <!-- fp:7b6f4179413cb08f -->
+<!-- triaged 2026-06-20: verification run + recorded in the plan's "## Verification — DONE" section (all 5 steps ✓; commits 9a255fd/6779286). fp:7b6f4179413cb08f -->
 <!-- triaged 2026-06-20: both #320 Inc 3 deferrals dispositioned.
      • "Far-pointer calling convention" -> already the curated M1 Open bullet "#320 far-pointer calling
        convention — pass/return a 32-bit p2 across function boundaries" (added this increment; grouped with

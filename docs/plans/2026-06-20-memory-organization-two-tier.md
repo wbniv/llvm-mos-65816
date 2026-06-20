@@ -68,3 +68,32 @@ kebab-case + frontmatter `metadata.type`.
 4. homedir repo: no `projects.env`/sync script/gitignore block; `projects.json` kept; the 7 old paths
    resolved (moved/relocated), nothing dangling.
 5. Memory still loads end-to-end (`MEMORY.md` index valid, `[[links]]` intact).
+
+## Verification — DONE (2026-06-20)
+
+Verified inline during execution:
+1. `~/.claude/projects/-home-will-SRC-llvm-mos-65816/memory` → symlink to the llvm-mos repo ✓; all 4 generic
+   symlinks resolve to `~/.claude/memory/` ✓.
+2. llvm-mos repo tracks 7 memory entries (3 real `100644` + 4 symlinks `120000`); `scheduled_tasks.lock`
+   ignored ✓.
+3. The 4 generics present in `~/.claude/memory/` (master), with `applies-to: [universal]` ✓.
+4. homedir repo: `projects.env` + sync script + gitignore block removed (`9a255fd`); `projects.json`
+   registration kept; the 7 old paths moved/relocated, nothing dangling ✓.
+5. Memory loads end-to-end (a generic read via the project symlink path resolves to the master) ✓.
+Commits: homedir `9a255fd`, llvm-mos `6779286`.
+
+## Claude-housekeeping integration
+
+This work exposed a **drift class the housekeeping skill didn't check**: a project whose cwd-siloed loader
+dir `~/.claude/projects/<slug>/memory` is a **real directory** instead of a symlink to its own repo — so its
+memory isn't version-controlled in the project repo (exactly llvm-mos's pre-migration state).
+
+Added **scan #11 `unmirrored-memory`** to `~/.claude/skills/claude-housekeeping/` (`scanner.py` + `SKILL.md`,
+synced to the biohack-claude plugin source):
+- Per active project, flags a real-dir loader (vs symlink-to-repo) + a project repo `.gitignore` missing
+  `!.claude/memory/`; emits a backup → relocate → symlink migration command block (the llvm-mos pattern).
+- Verified on a live `scanner.py --report-only` run: flags **drdevtools, python-tui-lib,
+  spc700-ipl-divergence** (the 3 remaining real-dir projects) and **excludes the now-fixed llvm-mos**.
+
+Also added `applies-to: [universal]` to the 4 promoted generics so the skill's scoped memory cascade (scan #7)
+treats them explicitly rather than via the absent-→-universal default.
