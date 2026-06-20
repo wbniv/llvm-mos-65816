@@ -150,7 +150,46 @@ This doesn't kill A, but it forces a choice:
 The cleanest *conceptual* fix — materialize `rep`/`sep` (and their `XH`/`YH` clobbers) **pre-RA** so the
 allocator inherently sees them — remains the largest re-architecture and is still not recommended.
 
-## Recommendation
+## UPDATE 2 (A′ implemented) — it does NOT work; the conflict is created *after* the pass
+
+Implemented A′ as a pre-RA `MachineFunctionPass` (`MOSIndexWidthClobber`, `HasIndex16`-gated) marking `XH`/`YH`
+implicitly clobbered on every non-`XLow` op touching an 8-bit-X/Y-capable operand, hooked at `addPreRegAlloc`.
+Built (14 s incremental) and tested — **it does not fix the bug**, for three compounding reasons:
+
+1. **The clobber doesn't create interference.** `XH`/`YH` are declared *"not directly addressable — only
+   live as the high half of X16/Y16"* (`MOSRegisterInfo.td:112`). Implicit dead-defs of them do **not** make
+   the allocator spill a virtual `Xc16` value live across them — the minimal repro stayed wrong (`0x0000`),
+   register allocation essentially unchanged.
+2. **Wrong phase — the conflict doesn't exist yet at pass time.** The buggy interleaving (`g_21` in X across
+   the 8-bit `ldy`) is produced by the **machine scheduler + register allocator that run *after* this pass**.
+   At pass time the schedule is the *good* one (the `Xc16` value is immediately COPY-spilled to `Imag16`); a
+   pre-RA clobber can't prevent a conflict that a later pass creates.
+3. **Clobbering the full `X16`/`Y16` isn't viable either.** Those *are* allocator-tracked, but a full-reg
+   clobber conflicts with ops that legitimately define X/Y (e.g. `ldy` defines Y) → a double-def.
+
+It also **crashed** on real programs: the predicate flagged PHI nodes (any function with a loop, e.g.
+`transparent_crc`), and adding implicit defs to a PHI is invalid → segfault in `RenameIndependentSubregs`.
+
+**Conclusion:** the pre-RA clobber family (A / A′) is the **wrong phase** — the conflict is only observable
+*post*-register-allocation. The pass was unhooked (`addPreRegAlloc` removed); the toolchain is back to its
+buggy-but-functional baseline (seeds 247/445 compile, minimal repro deterministic `0x0000`); **nothing landed
+in `0002`**. The `MOSIndexWidthClobber.{cpp,h}` files remain in `vendor/` (gitignored, unregistered, inert).
+
+### Revised recommendation → **approach C (post-RA repair)** or a scheduler/liveness constraint
+
+- **C (post-RA, in `MOSInsertREPSEP`):** this is the phase where the bug is *visible* — the final schedule has
+  `ldx g_21 … sep #$10 … stx __rc`, the 16-bit value physically in X across the narrowing. Detect a 16-bit
+  index value (`XH`/`YH` live) across a narrowing `sep` and spill→reload it. Complex (custom spill/reload +
+  liveness in a pass that today only places `rep`/`sep`), but correct and at the right phase.
+- **Scheduler/liveness constraint:** stop the machine scheduler from interleaving an 8-bit-index op within a
+  16-bit index value's live range (the non-LTO schedule already avoids the bug by keeping `Xc16` short-lived
+  — the LTO scheduler is what extends it). Possibly the smallest change, but scheduling heuristics are subtle.
+- **Register-model change:** make `XH`/`YH` interference-tracked so a clobber actually forces a spill — broad
+  and risky.
+
+*Pending the owner's steer on C vs the scheduler-constraint before the next implementation attempt.*
+
+## Recommendation (superseded by UPDATE 2 above)
 
 **Approach A′** (conservative reg-class-based pre-RA clobber): it keeps the fix as a small pass that leverages
 the existing allocator's spilling (no hand-written spill/reload machinery, the error-prone part of C), it is

@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/8de0bd9) | #321 xy16: log native-16bit upstream entry; record approach-A phase-ordering wrinkle |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/4a7a46b) | #321 xy16 seed247/445 — root cause FOUND + verified; fix scoping doc (scope-first) |
 
 <!--history-meta v1
+8de0bd9	author	Will Norris
+8de0bd9	added	39
+8de0bd9	deleted	7
+8de0bd9	files	1
+8de0bd9	body	- upstream-contribution-status.md (Future/blocked): native-65816 16-bit codegen + the\n  index-width register model is M2 upstream material; the XH/YH clobber-on-narrowing\n  invariant must be carried into it (not bolted on as an xy16 special case).\n- investigation doc: implementing A revealed a phase-ordering wrinkle — the op that\n  triggers the high-byte clobber (a plain `load i8`) only becomes an 8-bit-index LDY\n  *after* register allocation, so a pre-RA "mark XW_X8 ops" pass can't precisely target\n  it. Refines the fix to A' (conservative reg-class clobber, leverages allocator spilling,\n  measurable over-spill) vs C (post-RA precise spill repair). Recommend A'; awaiting steer.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4a7a46b	author	Will Norris
 4a7a46b	added	157
 4a7a46b	deleted	0
