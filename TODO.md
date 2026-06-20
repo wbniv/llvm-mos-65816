@@ -838,7 +838,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "Not posting upstream from this plan" -> upstream posting is the curated user-triggered CC item; the
        evidence paragraph is prepared by phase D. Nothing open.
      fp:29fde811ff5d23b8 fp:45ce4d0c0263904b fp:ad37a4514712de70 -->
-- [ ] **(triage)** **AA-precision LANDED.** `noStoreBetween` → **`noClobberBetween`** + a `mayAlias(AA, *Def)` check (an — _from [2026-06-20-321-audit-a16-loadfold-call-hazard.md](docs/plans/2026-06-20-321-audit-a16-loadfold-call-hazard.md)_  <!-- fp:5f85cd31e68981cc -->
-- [ ] **(triage)** **volatile-drop CLOSED (net-negative, not pursued).** Dropping `shouldFoldMemAccess`'s volatile bail is — _from [2026-06-20-321-audit-a16-loadfold-call-hazard.md](docs/plans/2026-06-20-321-audit-a16-loadfold-call-hazard.md)_  <!-- fp:f85cd73b8f51bdd5 -->
-- [ ] **(triage)** **The literal single-helper merge was rejected by measurement:** it inherits `shouldFoldMemAccess`'s — _from [2026-06-20-321-audit-a16-loadfold-call-hazard.md](docs/plans/2026-06-20-321-audit-a16-loadfold-call-hazard.md)_  <!-- fp:98f82e24c01c1ac9 -->
+<!-- triaged 2026-06-20: all three are RESOLVED-status bullets from the audit doc's
+     "## Deferred → RESOLVED" section (the hook matched the word "Deferred" in the heading) —
+     NOT open work. They record the loadfold-unify outcome (AA-precision landed; volatile-drop
+     closed net-negative; the literal single-helper merge rejected by measurement), now captured
+     by the Done item [321-loadfold-unify]. Nothing to track.
+     fp:5f85cd31e68981cc fp:f85cd73b8f51bdd5 fp:98f82e24c01c1ac9 -->
 <!-- END auto-captured-deferrals -->
