@@ -178,6 +178,32 @@ ordering-value materialisation, single-use, not a branch) into `G_UADDE(0,0,carr
 inverted predicates), placed before `MOSLowerSelect` forms the diamond — measured net-positive, zero
 regression, or it doesn't ship.
 
+### 4b. Implementation BUILT + measured (2026-06-21): **NET-NEGATIVE → WON'T-DO**
+
+Built it (the §4a/§5 rewrite, in `legalizeZExt` on `wt/321-cmpval`) and measured the REAL output — which
+**reverses the §4a "GO."** The §4a byte-diff was on **isolated leaf functions**; the built compiler, measured in
+**realistic 16-bit-ambient context, regresses** — the exact regime-flip governing lesson #1 warns about.
+
+- **Correct + the leaf win is real:** all ordering predicates go branchless and verify-by-inspection correct
+  (UGE `cmp;adc`; ULT `cmp;adc;eor #1`; ULE/UGT operand-swap; SLT sign-flip). `eq_v` untouched. Default build
+  **byte-identical 75/75** (gating holds). Per-leaf: `uge_v` 25→19 (−6), `ult_v` 25→21 (−4), etc.
+- **But it regresses in realistic context.** The 8-bit `lda #0; adc #0` tail **breaks the 16-bit run** with its
+  `sep #$20`, forcing extra `rep`/`sep`. `a16cmpaudit` (compare-dense, sustained M16): **+262 B** (rep 204→231,
+  sep 212→238 ≈ +106 B churn; `eor #1` 23→54 ≈ +62 B inversions). c-torture (56 progs, realistic): **net ≈ 0**
+  — 1 win −6 B, **1 regression +5 B** (`20000224-1`); the value shape is rare, so the aggregate is a wash *with
+  regressions*.
+- **Why not gate/rescue:** the win-vs-regression hinges on the **ambient mode** (does the tail's `sep` break a
+  run?), which is **not visible at legalize time** — no clean conservative gate exists. The only churn-free form
+  is a **16-bit** `rol`-tail (no `sep`), but the selector narrows the `adc` to 8-bit and forcing 16-bit needs a
+  new MOS pseudo — high-effort for a **rare** value shape whose realistic aggregate is already ~0.
+
+**Verdict: WON'T-DO** (correct but net-negative in the regime that matters; rare shape; clean gating infeasible).
+The select-diamond is the better ordering-value materialisation in sustained 16-bit code. Recorded, not
+deferred (per "close net-negatives"). **This closes the native s16 comparison track**: the surface is native +
+optimal everywhere it pays (the byte-wise register-resident equality + the diamond materialisation are both the
+measured optimum); the one open lever was measured worse-in-context and is shut. `dev/measure-compare-surface.sh`
+is the durable audit harness.
+
 ## 5. The fix (only if Phase 0 §3 measures a win) + verification
 
 - Land the `G_UADDE(0,0,C)`-tail in `legalizeICmp`/select-lowering, **gated** so it fires only for an
