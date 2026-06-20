@@ -233,6 +233,21 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
   [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
 
+- [ ] **#321 unify the a16 load-fold gate — AA-precise *and* single-use-volatile-tolerant** (measurement-gated;
+  pure codegen-size upside, **zero** correctness change). Today two gates split the two capabilities:
+  `shouldFoldMemAccess` is AA-precise (folds across a provably non-aliasing store) but bails on all volatile;
+  `noStoreBetween` is volatile-tolerant (single-use) but bails on *any* intervening store. Merge into one
+  helper holding both — drop `shouldFoldMemAccess`'s blanket volatile bail for a single-use clamp
+  (`Volatile && NumUsers != 1 → bail`; ≥2 users would duplicate the volatile access), and give the 16-bit
+  value-side folds (`foldableAbsLoad16`/`foldableIndirLoad16`) the `mayAlias(AA,…)` check (thread the
+  selector's `AA` member). Symmetry: AA-precision recovers folds on the **16-bit** side, the volatile-drop on
+  the **8-bit** side (+ fixes today's asymmetry — a volatile 16-bit global folds in a *compare* but not a
+  *store/copy* context). **Gate first:** a throwaway instrument-and-count (compile-only, no MAME) over the a16
+  corpus + 1168 c-torture + ≥200 Csmith seeds — both recoverable-fold counts ~0 ⇒ DEFER-confirm and tear down;
+  nonzero ⇒ implement + byte-diff + full differential. `shouldFoldMemAccess` is upstream MOS code → the
+  volatile-relaxation is an upstream-contribution candidate. [plan](docs/plans/2026-06-20-321-unify-loadfold-gate-aa-volatile.md)
+  · spun out of the [load-fold-call-hazard audit](docs/plans/2026-06-20-321-audit-a16-loadfold-call-hazard.md) §Deferred.
+
 ### Test Bench / CI
 
 - [x] **#321 bsnes-jg-only confirmation runner (`dev/run.sh xcheck-suite`) — standing capability.** A
