@@ -64,6 +64,33 @@ dev/run.sh fuzz 50 1     # the differential harness, in the worktree's own Docke
   rebuild the toolchain *in the worktree*, first `rm -rf build/llvm-mos-install` to break the hardlink, then
   `dev/run.sh toolchain` writes a fresh, independent tree.
 
+## Compiler-changing variant — `cp -a` a warm build (rebuild in place)
+
+The hardlink recipe above is for **host-only / non-compiler** work (it shares `main`'s prebuilt toolchain
+read-only). When the feature **edits the compiler** (`vendor/llvm-mos`) and must rebuild, hardlinking
+`build/llvm-mos-install` would corrupt `main` on rebuild-in-place. Instead **real-copy** the editable sources
+and the **warm** `build/` (cmake tree + ccache) so the first rebuild is a fast *incremental* (minutes), not a
+30–90 min cold build. Relocatable because `dev/run.sh` bind-mounts the worktree as `/work` and the cmake cache
+uses `/work/...` paths. This is what `wt/320-far-cc` and `wt/321-frame-abi` use.
+
+```bash
+SLUG=myfeature; MAIN=/home/will/SRC/llvm-mos-65816; WT="$MAIN-$SLUG"
+git -C "$MAIN" worktree add -b "wt/NNN-$SLUG" "$WT" main
+mkdir -p "$WT/vendor" "$WT/dev"                          # create vendor/ FIRST (it's gitignored, absent in a fresh worktree)
+cp -a  "$MAIN/vendor/llvm-mos"     "$WT/vendor/llvm-mos"     # REAL copy: editable backend (~5 GB)
+cp -a  "$MAIN/vendor/llvm-mos-sdk" "$WT/vendor/llvm-mos-sdk" # REAL copy: editable SDK
+cp -a  "$MAIN/build"               "$WT/build"              # REAL copy: warm cmake + ccache (~6 GB) -> fast incremental
+cp -al "$MAIN/vendor/bsnes-jg"     "$WT/vendor/bsnes-jg"     # read-only -> hardlink
+cp -al "$MAIN/dev/roms"            "$WT/dev/roms"            # gitignored BIOS -> hardlink
+cd "$WT" && dev/run.sh toolchain && dev/run.sh corpus       # incremental rebuild (confirm clang-23 mtime advanced) + 7/7 sanity
+```
+
+Gotchas specific to this variant: **`mkdir -p "$WT/vendor"` before the first `cp -a`** (a fresh worktree has
+no `vendor/`, so `cp -a src dest/vendor/llvm-mos` fails if `dest/vendor` is absent — and `set -e` aborts the
+whole setup at that first copy). After each `vendor/` edit, **confirm the rebuild actually took** — check
+`build/llvm-mos-install/bin/clang-23`'s mtime advanced (the symlinked `clang` has a stale mtime; a stale build
+silently serves old codegen). Needs ~12 GB free per worktree.
+
 ## Disposition
 
 - **Keep (the work lands):** merge the durable artifacts to `main` (`git -C "$MAIN" merge "wt/321-$SLUG"`, or
