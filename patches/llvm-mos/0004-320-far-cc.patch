@@ -1,0 +1,243 @@
+diff --git a/llvm/lib/Target/MOS/MOSCallLowering.cpp b/llvm/lib/Target/MOS/MOSCallLowering.cpp
+index d448d2c56002..b4a72c9359b0 100644
+--- a/llvm/lib/Target/MOS/MOSCallLowering.cpp
++++ b/llvm/lib/Target/MOS/MOSCallLowering.cpp
+@@ -161,6 +161,11 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
+       report_fatal_error("Not yet implemented.");
+     case 8:
+     case 16:
++    // #320 Inc 4 Ph2: a 32-bit far (addrspace 2) pointer received in one Imag32
++    // (RL) quad — variant (a). The COPY below moves the whole 4-byte value at
++    // once. Inert without a +mos-farcc-* feature (no 32-bit location is ever
++    // assigned), so default codegen is unaffected.
++    case 32:
+       break;
+     }
+ 
+diff --git a/llvm/lib/Target/MOS/MOSCallingConv.cpp b/llvm/lib/Target/MOS/MOSCallingConv.cpp
+index 993ce3787622..f259c974be83 100644
+--- a/llvm/lib/Target/MOS/MOSCallingConv.cpp
++++ b/llvm/lib/Target/MOS/MOSCallingConv.cpp
+@@ -12,7 +12,30 @@
+ 
+ #include "MOSCallingConv.h"
+ 
++#include "MOSSubtarget.h"
+ #include "llvm/CodeGen/MachineFunction.h"
+ #include "llvm/IR/DataLayout.h"
+ 
+ #include "MOSGenCallingConv.inc"
++
++// #320 Inc 4 Ph2: far-pointer CC variant selectors (declared in MOSCallingConv.h,
++// referenced by the gated far-ptr rules in MOSCallingConv.td). Read the
++// off-by-default +mos-farcc-* feature from the current function's subtarget. With
++// none set, farPtrCC() == None and all return false, so the far-ptr rules never
++// match and default codegen is byte-identical.
++bool llvm::MOSFarCCImag32(CCState &State) {
++  return State.getMachineFunction().getSubtarget<MOSSubtarget>().farPtrCC() ==
++         MOSSubtarget::FarPtrCC::Imag32;
++}
++bool llvm::MOSFarCCSplit(CCState &State) {
++  return State.getMachineFunction().getSubtarget<MOSSubtarget>().farPtrCC() ==
++         MOSSubtarget::FarPtrCC::Split;
++}
++bool llvm::MOSFarCCAXY(CCState &State) {
++  return State.getMachineFunction().getSubtarget<MOSSubtarget>().farPtrCC() ==
++         MOSSubtarget::FarPtrCC::AXY;
++}
++bool llvm::MOSFarCCStack(CCState &State) {
++  return State.getMachineFunction().getSubtarget<MOSSubtarget>().farPtrCC() ==
++         MOSSubtarget::FarPtrCC::Stack;
++}
+diff --git a/llvm/lib/Target/MOS/MOSCallingConv.h b/llvm/lib/Target/MOS/MOSCallingConv.h
+index 80fa4df3729a..fda86e0709cc 100644
+--- a/llvm/lib/Target/MOS/MOSCallingConv.h
++++ b/llvm/lib/Target/MOS/MOSCallingConv.h
+@@ -30,6 +30,17 @@ bool CC_MOS_VarArgs(unsigned ValNo, MVT ValVT, MVT LocVT,
+                     CCValAssign::LocInfo LocInfo, ISD::ArgFlagsTy ArgFlags,
+                     Type *OrigTy, CCState &State);
+ 
++/// #320 Inc 4 Ph2: far-pointer calling-convention variant selectors. Each returns
++/// true iff the current function's subtarget has the matching off-by-default
++/// +mos-farcc-* feature (see MOSSubtarget::farPtrCC()). Referenced by the gated
++/// far (addrspace 2) pointer rules in CC_MOS (MOSCallingConv.td); with no feature
++/// set all return false, so a far pointer falls through to the generic near-pointer
++/// rule and default codegen stays byte-identical.
++bool MOSFarCCImag32(CCState &State);
++bool MOSFarCCSplit(CCState &State);
++bool MOSFarCCAXY(CCState &State);
++bool MOSFarCCStack(CCState &State);
++
+ } // namespace llvm
+ 
+ #endif // not LLVM_LIB_TARGET_MOS_MOSCALLINGCONV_H
+diff --git a/llvm/lib/Target/MOS/MOSCallingConv.td b/llvm/lib/Target/MOS/MOSCallingConv.td
+index 3f0d04c55389..771562229c01 100644
+--- a/llvm/lib/Target/MOS/MOSCallingConv.td
++++ b/llvm/lib/Target/MOS/MOSCallingConv.td
+@@ -58,6 +58,22 @@ let Entry = 1 in {
+ def CC_MOS : CallingConv<[
+   CCIfType<[i1], CCPromoteToType<i8>>,
+ 
++  // #320 Inc 4 Ph2: a 32-bit far (addrspace 2) pointer crossing a call. Each
++  // variant is gated on an off-by-default subtarget feature (selected by the A-B
++  // measurement harness via -target-feature). With none set the MOSFarCC* guards
++  // all return false, so these never match and a far pointer falls through to the
++  // generic 16-bit CCIfPtr rule below — exactly as before this change (where it
++  // then errors, since a 16-bit slot can't hold a 24-bit address). Placed BEFORE
++  // CCIfPtr so a selected variant claims the far pointer first.
++  //
++  // Variant (a) Imag32: the whole 32-bit pointer in one Imag32 (RL) quad — the
++  // natural width-extension of how near pointers pass in RS pairs. RL1/RL2/RL3 are
++  // the caller-saved quads (RL0 overlaps the soft-stack pointer RS0, RL4 the
++  // scavenger RS8); they alias RS2..RS7, and CCState::AllocateReg honors the shared
++  // __rc register units so a far ptr and a near ptr never double-book a byte.
++  CCIfPtrAddrSpace<2, CCIf<"MOSFarCCImag32(State)",
++      CCAssignToReg<[RL1, RL2, RL3]>>>,
++
+   // Pointers are preferentially assigned to imaginary registers so indirect
+   // addressing modes work without additional copying.
+   //
+diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
+index 733ef7097a4d..561097194218 100644
+--- a/llvm/lib/Target/MOS/MOSFeatures.td
++++ b/llvm/lib/Target/MOS/MOSFeatures.td
+@@ -35,3 +35,28 @@ def FeatureIndex16 :
+     "mos-xy16", "HasIndex16", "true",
+     "16-bit index register mode (insert REP/SEP X) on the WDC 65816.",
+     [FeatureAccum16]>;
++
++// #320 Inc 4 Ph2: off-by-default far-pointer calling-convention variants. Each
++// selects HOW a 32-bit far (addrspace 2) pointer is passed/returned across a
++// call. Like FeatureAccum16, NONE is attached to any Family in MOSDevices.td, so
++// default mosw65816 codegen is byte-identical; the A-B measurement harness
++// selects one via -target-feature (e.g. +mos-farcc-imag32). farPtrCC() reads the
++// first one set; with none set, a far pointer crossing a call still errors as it
++// did before this change (no far-ptr CC rule matches). Exactly one is expected at
++// a time. a16-INDEPENDENT (the passing machinery is far-side, not accumulator).
++def FeatureFarCCImag32 :
++  SubtargetFeature<
++    "mos-farcc-imag32", "HasFarCCImag32", "true",
++    "Far-pointer CC variant (a): pass/return a far pointer in one 32-bit Imag32 (RL) quad.">;
++def FeatureFarCCSplit :
++  SubtargetFeature<
++    "mos-farcc-split", "HasFarCCSplit", "true",
++    "Far-pointer CC variant (b): pass/return a far pointer as low-16 (RS pair) + bank byte (RC).">;
++def FeatureFarCCAXY :
++  SubtargetFeature<
++    "mos-farcc-axy", "HasFarCCAXY", "true",
++    "Far-pointer CC variant (c): pass/return a far pointer in A:X (low-16) + Y (bank byte).">;
++def FeatureFarCCStack :
++  SubtargetFeature<
++    "mos-farcc-stack", "HasFarCCStack", "true",
++    "Far-pointer CC variant (d): pass/return a far pointer on the 65816 hardware stack.">;
+diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
+index 42b275080f88..f31a5542ae6b 100644
+--- a/llvm/lib/Target/MOS/MOSISelLowering.cpp
++++ b/llvm/lib/Target/MOS/MOSISelLowering.cpp
+@@ -38,7 +38,7 @@ using namespace llvm;
+ 
+ MOSTargetLowering::MOSTargetLowering(const MOSTargetMachine &TM,
+                                      const MOSSubtarget &STI)
+-    : TargetLowering(TM, STI) {
++    : TargetLowering(TM, STI), Subtarget(STI) {
+   addRegisterClass(MVT::i1, &MOS::Anyi1RegClass);
+   addRegisterClass(MVT::i8, &MOS::Anyi8RegClass);
+   addRegisterClass(MVT::i16, &MOS::Imag16RegClass);
+@@ -87,8 +87,19 @@ MOSTargetLowering::getNumRegisters(LLVMContext &Context, EVT VT,
+ MVT MOSTargetLowering::getRegisterTypeForCallingConv(
+     LLVMContext &Context, CallingConv::ID CC, EVT VT,
+     const ISD::ArgFlagsTy &Flags) const {
+-  if (Flags.isPointer())
+-    return Flags.getPointerAddrSpace() == MOS::AS_ZeroPage ? MVT::i8 : MVT::i16;
++  if (Flags.isPointer()) {
++    if (Flags.getPointerAddrSpace() == MOS::AS_ZeroPage)
++      return MVT::i8;
++    // #320 Inc 4 Ph2: variant (a) carries a far (addrspace 2) pointer across a
++    // call as one 32-bit Imag32 (RL) quad, so the CC must see it at its true
++    // 32-bit width (p2:32) rather than the default 16-bit near-pointer width.
++    // Gated on the off-by-default feature: without it a far pointer stays i16 and
++    // crossing a call still errors exactly as before this change.
++    if (Flags.getPointerAddrSpace() == MOS::AS_Far &&
++        Subtarget.farPtrCC() == MOSSubtarget::FarPtrCC::Imag32)
++      return MVT::i32;
++    return MVT::i16;
++  }
+   return TargetLowering::getRegisterTypeForCallingConv(Context, CC, VT, Flags);
+ }
+ 
+diff --git a/llvm/lib/Target/MOS/MOSISelLowering.h b/llvm/lib/Target/MOS/MOSISelLowering.h
+index 4e7ff5b2015d..db9d51208dd6 100644
+--- a/llvm/lib/Target/MOS/MOSISelLowering.h
++++ b/llvm/lib/Target/MOS/MOSISelLowering.h
+@@ -94,6 +94,12 @@ public:
+   MachineBasicBlock *
+   EmitInstrWithCustomInserter(MachineInstr &MI,
+                               MachineBasicBlock *MBB) const override;
++
++private:
++  // #320 Inc 4 Ph2: retained to gate the far-pointer calling convention on the
++  // off-by-default +mos-farcc-* subtarget feature (getRegisterTypeForCallingConv
++  // must know the selected variant to size a far pointer at 32 bits).
++  const MOSSubtarget &Subtarget;
+ };
+ 
+ } // namespace llvm
+diff --git a/llvm/lib/Target/MOS/MOSRegisterBanks.td b/llvm/lib/Target/MOS/MOSRegisterBanks.td
+index 7b5100bfeb5d..b62986d09ab4 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterBanks.td
++++ b/llvm/lib/Target/MOS/MOSRegisterBanks.td
+@@ -14,4 +14,11 @@
+ // #321 Increment 1b: Ac16 (the 16-bit accumulator A16) joins the bank so 16-bit
+ // accumulator ops can be allocated. Allocation to A16 is forced by the Ac16
+ // register class on the selected ops, not by the bank (banks are unused here).
+-def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
++// #320 Inc 4: Imag32 (the real far-pointer ZP quad, distinct from the Fakei32
++// legalization placeholder) joins the bank so a 32-bit far pointer that is only
++// COPY'd through a function — e.g. received from one call and passed to the next,
++// never dereferenced locally — can be constrained to Imag32 by constrainGenericOp
++// (which needs the bank to COVER Imag32). Inert for default codegen: the only real
++// 32-bit register-resident value is a far (addrspace 2) pointer; s32 scalars are
++// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
++def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
+diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
+index bc43100cd577..90a622ab0984 100644
+--- a/llvm/lib/Target/MOS/MOSSubtarget.h
++++ b/llvm/lib/Target/MOS/MOSSubtarget.h
+@@ -121,6 +121,23 @@ public:
+   // #321 xy16: opt-in 16-bit index register mode (REP/SEP-bracketed 16-bit-X/Y).
+   bool hasIndex16() const { return HasIndex16; }
+ 
++  // #320 Inc 4 Ph2: off-by-default far-pointer calling-convention variant. How a
++  // 32-bit far (addrspace 2) pointer crosses a call. None == no +mos-farcc-*
++  // feature: a far pointer arg/return still errors exactly as before this change
++  // (no far-ptr CC rule matches), so default codegen is byte-identical.
++  enum class FarPtrCC { None, Imag32, Split, AXY, Stack };
++  FarPtrCC farPtrCC() const {
++    if (HasFarCCImag32)
++      return FarPtrCC::Imag32;
++    if (HasFarCCSplit)
++      return FarPtrCC::Split;
++    if (HasFarCCAXY)
++      return FarPtrCC::AXY;
++    if (HasFarCCStack)
++      return FarPtrCC::Stack;
++    return FarPtrCC::None;
++  }
++
+   bool hasW65816Or65EL02() const { return HasW65816Insns || Has65EL02Insns; }
+ 
+ private:
+@@ -148,6 +165,12 @@ private:
+   bool StaticStack = false;
+   bool HasAccum16 = false;
+   bool HasIndex16 = false;
++  // #320 Inc 4 Ph2: far-pointer CC variant selectors (off by default; see
++  // farPtrCC()). Set by ParseSubtargetFeatures from the +mos-farcc-* features.
++  bool HasFarCCImag32 = false;
++  bool HasFarCCSplit = false;
++  bool HasFarCCAXY = false;
++  bool HasFarCCStack = false;
+ 
+   // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
+   // no variable, so we instead bind pseudo features to this variable.
