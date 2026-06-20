@@ -72,6 +72,19 @@ build_rom far_call  mos-snes-far.cfg
 # #320 Inc 4 Ph2 (A0): far-ptr CC variant (a) — needs +mos-a16 (32-bit value) AND
 # +mos-farcc-imag32 (the far-ptr-across-call CC rule).
 build_rom farcc_imag32 mos-snes-far.cfg -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-farcc-imag32
+# #320 Inc 4 Ph2 (A1+): far-ptr CC variants (b)/(c)/(d) all build the SHARED round-trip
+# source (farcc_imag32.c) with different +mos-farcc-* flags; build_rom keys on $name.c,
+# so build these explicitly from the shared source.
+build_farcc_variant() { # rom-name farcc-flag
+  local name="$1" flag="$2"
+  [ -f "$BUILD/$name.sfc" ] && [ -f "$BUILD/$name.map" ] && return 0
+  echo "==> build $name.sfc (mos-snes-far.cfg +mos-a16 $flag, source farcc_imag32.c)"
+  "$TOOL/mos-clang" --config "$INSTALL/bin/mos-snes-far.cfg" -mcpu=mosw65816 -Os \
+    -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang "$flag" \
+    -Wl,-Map="$BUILD/$name.map" -o "$BUILD/$name.sfc" "$ROOT/examples/65816/farcc_imag32.c"
+  python3 "$ROOT/tools/snes-checksum.py" "$BUILD/$name.sfc" >/dev/null
+}
+build_farcc_variant farcc_split +mos-farcc-split
 
 # 3. Cross-check each ROM on bsnes-jg. Offset/len derived from the .map exactly
 # like the MAME path (dev/_emu.sh's _emu_map_lookup) — WRAM offset == symbol VMA.
@@ -100,6 +113,7 @@ xassert "$BUILD/far_arith.sfc" "$BUILD/far_arith.map" corpus_result 0xF3   # ban
 xassert "$BUILD/far_store.sfc" "$BUILD/far_store.map" corpus_result 0xF3   # bank $00, sta [dp] store then near read-back
 xassert "$BUILD/far_call.sfc"  "$BUILD/far_call.map"  corpus_result 0xF3   # bank $01, far call (JSL) + RTL return
 xassert "$BUILD/farcc_imag32.sfc" "$BUILD/farcc_imag32.map" corpus_result 0xF3 # bank $01, far PTR returned+passed across calls (variant a Imag32/RL)
+xassert "$BUILD/farcc_split.sfc"  "$BUILD/farcc_split.map"  corpus_result 0xF3 # bank $01, far PTR split offset(RS#)+bank(RC#) across calls (variant b)
 
 echo
 [ $rc -eq 0 ] && echo "RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)" \

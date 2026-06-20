@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_call|farcc_imag32|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_call|farcc_imag32|farcc_split|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -73,6 +73,9 @@ Targets:
              +mos-a16 +mos-farcc-imag32), assert a 32-bit far pointer round-trips across
              real calls (returned from + passed into noinline fns via one Imag32/RL quad),
              boot in MAME, read == 0xF3; also assert it does NOT compile without the flag
+  farcc_split  #320 Inc 4 Ph2 (A1): same round-trip source built +mos-farcc-split — far
+             pointer variant (b), low-16 offset in an RS# pair + bank byte in an RC#
+             (heterogeneous CC split via assignCustomValue); read == 0xF3, both emulators
   xcheck     second-emulator fidelity cross-check: boot the far ROMs in bsnes-jg
              (cycle-accurate, independent of MAME) headless and assert the same
              WRAM results — confirms the bank-$01 far read isn't a MAME quirk
