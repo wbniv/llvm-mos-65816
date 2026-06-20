@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/2feb53e) | #321 frame-ABI: mark A0 done in the plan (DP-collision avoidable; GO) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/d83dacf) | #321 frame-ABI: mark P0 done in the plan (byte-identical gate PASS) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/5a33180) | #321 frame-ABI: Step 0 done — register wt/321-frame-abi + correct the worktree setup |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/ad1d6d3) | #321 frame-ABI head-to-head: plan to build all three frames and measure |
 
 <!--history-meta v1
+2feb53e	author	Will Norris
+2feb53e	added	17
+2feb53e	deleted	6
+2feb53e	files	1
+2feb53e	body	A0 (the make-or-break gate) PASSED on wt/321-frame-abi (a73c564): the\nhand-encoded proof ROM ran at D=$1000, accessed a frame local via DP and the\n__rc16 cell via absolute simultaneously, yielding corpus_result==0xBBAA on both\nMAME and bsnes-jg -- proving absolute addressing reaches __rc regardless of D,\nso a DP-window can coexist with the fixed-ZP imaginary registers.\n\nRecord the eligibility rule (non-reentrant, <=256B, no-ISR/FP, __rc re-emitted\nas absolute) and the cost model: DP-window saves -1B per spilled-local access\nbut taxes +1B per __rc access + ~6-8B prologue/epilogue, so it wins only for\nspill-heavy/temp-light functions -- a narrow class (expected NULL-ish), to be\nsettled in phase M. Feasibility bar cleared -> proceed to A1.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 d83dacf	author	Will Norris
 d83dacf	added	1
 d83dacf	deleted	1

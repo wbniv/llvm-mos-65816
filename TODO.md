@@ -215,21 +215,22 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   upstream posture — post the prior-art note + a first-pass CC to #321 (user-triggered; see Upstream section).
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
-- [ ] **#321 frame-ABI head-to-head — build ALL THREE frames and measure (revives the (a)/(b) fork the proxy
-  shelved).** The frame fork above was settled on an **indirect** ZP-pressure proxy: (a) TCD DP-window deferred,
-  (b) pure stack-relative ruled out **on paper**. Per lesson #1 (measure, don't assume), build all three to
-  production quality — **(a) DP-window + (b) FULL stack-relative + (c) soft-static baseline** — selectable via
-  off-by-default subtarget features (`+mos-dp-frame`/`+mos-sr-frame`, default byte-identical), and run a
-  rigorous three-way head-to-head: **code size + real MAME cycle counts (new `dev/probe-cycles.lua` +
-  sentinel protocol) + the 4-way differential**, on corpus+kernels in 16-bit-ambient context. **Central trap:
-  the DP-collision** — the SNES linker hard-fixes `__rc*` at ZP `$00–$1F` and 65816 ZP addressing is
-  DP-relative, so `D≠0` silently retargets every `lda __rcN` (A0 is the make-or-break gate). Runs on a
-  **`wt/321-frame-abi` feature worktree** (own editable `vendor/llvm-mos` + fresh toolchain). **Pre-registered
-  go/no-go**: (a) lands only if it wins cycles ≥~10% on multiple programs with ≤~2% size cost; else
-  CONFIRMED-shelved. **A NULL result is the expected, upstream-strengthening conclusion** (it upgrades the
-  proxy shelving to a direct-metric one) and feeds the user-triggered #321 CC posting. Durable artifacts (the
-  harness + decision record) merge back regardless; the (a)/(b) compiler diff lands in `0002` only if it
-  clears the bar. [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
+- [ ] **#321 frame-ABI head-to-head — RESOLVED 2026-06-20: CONFIRMED-shelved (NULL), measured.** Revived the
+  (a)/(b) frame fork the ZP-pressure proxy had shelved on paper, on a `wt/321-frame-abi` feature worktree.
+  **P0** (`c2eaf61`): off-by-default `+mos-dp-frame`/`+mos-sr-frame` features + `frameStrategy()` plumbing,
+  byte-identical-default proven (24/24). **A0** (`a73c564`): the DP↔`__rc` collision (SNES linker pins
+  `__rc*` at ZP `$00–$1F`; 65816 ZP addressing is `D`-relative) is **avoidable** — a DP-window at `D=$1000`
+  read the `__rc16` cell via absolute correctly, `corpus_result==0xBBAA` on MAME+bsnes (`frameabi_a0.c`/`.sh`).
+  But the **A0 census** (`9617b0f`, `dev/frameabi-census.sh`) short-circuited the build: **0/13 realistic
+  corpus+kernel functions can profit** — locals are register-resident in `__rc` and local aggregates go
+  through a pointer in `__rc`, so frame/spill traffic is ~0 and there is **nothing for any frame ABI to
+  optimize**; only contrived volatile/const-shuffle shapes profit (`frameabi_heavy.c`). So A1–A4/B/M were
+  **not built** (would only confirm the measured NULL). A *stronger* result than the proxy shelving — the
+  opportunity itself was measured empty. **Remaining (small):** (1) merge the durable artifacts to `main`
+  (`frameabi_a0.c`/`.sh`, `frameabi_heavy.c`, `frameabi-census.sh`, `frameabi-byte-identical.sh`) + tear down
+  the worktree, discarding the (a)/(b) compiler diff (failed the go/no-go); (2) post the prepared #321 CC
+  evidence paragraph (user-triggered; see plan §Outcome + Upstream).
+  [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
 
 ### Test Bench / CI
 

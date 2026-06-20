@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/3d5a989) | #321 record the ZP-pressure baseline verdict across CC + multi-value items |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/e30f01c) | #321 CC frame decision RESOLVED (phased): record across docs |
 
 <!--history-meta v1
+3d5a989	author	Will Norris
+3d5a989	added	8
+3d5a989	deleted	0
+3d5a989	files	1
+3d5a989	body	Cross-reference the measured baseline (9fc5cf2, dev/measure-zp-pressure.sh) into\nthe two decisions it was the trigger for:\n\n- CC frame decision record + TODO bullet: the DP-window (a) revival trigger\n  RAN -> ZP is SLACK (13 real functions, max ~5 of 14 pairs) -> (a) shelved with\n  evidence, not built. (c) the soft static stack stands.\n- multi-value-register-pressure plan Phase 0 + TODO bullet: scan RAN -> 0 of 13\n  real functions exhaust the pool -> DEFER confirmed with data.\n\nBoth note the separate +mos-a16 -Os RA crash on globals.c surfaced by the scan\n(tracked in its own bullet, fd4d474).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e30f01c	author	Will Norris
 e30f01c	added	70
 e30f01c	deleted	0

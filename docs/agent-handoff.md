@@ -9,7 +9,7 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
 | Branch | Worktree | Task | Status |
 |--------|----------|------|--------|
-| `wt/321-frame-abi` | `/home/will/SRC/llvm-mos-65816-frame-abi` | frame-ABI head-to-head: build (a) DP-window + (b) FULL stack-relative + (c) soft-static baseline, measure size+cycles ([plan](plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)) | **ACTIVE** — Step 0 done 2026-06-20 (worktree + warm build 34 s + corpus 7/7) |
+| `wt/321-frame-abi` | `/home/will/SRC/llvm-mos-65816-frame-abi` | frame-ABI head-to-head: (a) DP-window + (b) stack-relative vs (c) soft-static ([plan](plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)) | **RESOLVED — CONFIRMED-shelved (NULL)** 2026-06-20: A0 census found 0/13 realistic fns profit (frames are ~unused; locals live in `__rc`). A1–M not built. **TODO:** merge durable artifacts (`frameabi_*`) to `main` + tear down; discard the (a)/(b) `0002` diff. |
 | `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — Phases 0–4 done (s32 fixed); Phase 5 (sampled CI) open | ~~**MERGED** `dd5616b` → main 2026-06-19~~ |
 | `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~ |
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |

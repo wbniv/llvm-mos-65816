@@ -1,7 +1,8 @@
 # #321 — 65816 stack-frame ABI: build all three frames and measure head-to-head
 
-**Date:** 2026-06-20 · **Status:** PLAN · **Scope:** `vendor/llvm-mos/` codegen + a new cycle-measurement
-harness. Large, multi-phase, **gated**. Runs on a **feature worktree**, not `main`.
+**Date:** 2026-06-20 · **Status:** **RESOLVED — CONFIRMED-shelved (NULL), measured** (P0+A0+census done;
+A1–A4/B/M not built — the A0 census short-circuited them; see **Outcome**). · **Scope:** `vendor/llvm-mos/`
+codegen + a new cycle-measurement harness. Ran on the `wt/321-frame-abi` feature worktree, not `main`.
 **ROADMAP:** step 5 (M2), the xy16 hardware-stack-ABI frontier · **TODO:** M2 "#321 stage 1 — full xy16 mode
 + ABI" / "#321 calling-convention".
 
@@ -128,13 +129,10 @@ The build/A-B harness selects strategies via the existing `-Xclang -target-featu
 | Phase | Deliverable | Gate to proceed |
 |---|---|---|
 | ~~**P0**~~ **DONE** | Features (`+mos-dp-frame`/`+mos-sr-frame`, off by default) + `frameStrategy()` tri-state plumbing. *(Branch-point switches deferred to A1/B with their logic — empty fall-through switches in hot functions are pure risk for zero value.)* | ✅ **Byte-identical default** — corpus+kernels default+a16 disasm 24/24 identical across the feature add (`dev/frameabi-byte-identical.sh`); features recognized + inert; corpus 7/7. Worktree `c2eaf61`. |
-| **P1** | Cycle infra: `dev/probe-cycles.lua` reachability probe + sentinel protocol + `dev/measure-frame-abi.sh` (size, 4-way) | MAME `total_cycles()` reachable (else adopt frame-count proxy fallback) |
-| ~~**A0**~~ **DONE — GO** | **DP-collision resolution** + hand-encoded proof ROM (`frameabi_a0.c`/`.sh`) + the `canUseDPWindow` eligibility rule | ✅ Collision provably **avoidable** — `corpus_result==0xBBAA` on MAME+bsnes (DP local + abs `__rc` coexist at `D≠0`); clean eligibility rule stated. Worktree `a73c564`. (Cost model predicts a narrow/NULL-ish win — see note.) |
-| **A1–A2** | `D` register modeled (**reserved**, not allocatable) + `tsc;[sec;sbc #sz;tcs;]phd;tcd` prologue / `pld` epilogue (FrameSetup/Destroy flags) | `dev/run.sh crt0native` still PASS with a DP-window fn in the call chain |
-| **A3–A4** | New `MosDPFrame` `TargetStackID` + DP-offset `eliminateFrameIndex` + fallbacks (recursion / >256 B / ISR / FP → soft stack) | `a16_fuzz.evaluate` differential PASS on corpus+kernels under `+mos-dp-frame` (host==default==a16, both emus) |
-| **B** | **FULL (b)**: 65816 `op dp,s` + `(dp,s),y` instruction defs (`HasW65816`), ISel/expansion, **`SPAdj` frame-offset tracking** (lift the `MOSRegisterInfo.cpp:263` `SPAdj==0` assert), new `MosSRFrame` stack ID + `,S` `eliminateFrameIndex`, soft-stack fallback | Differential PASS under `+mos-sr-frame` |
-| **M** | Full `measure-frame-abi.sh` run: 4-way **size + cycles**, multi-shape, 16-bit-ambient; inner-loop *and* whole-call cycle brackets | **Every cell differentially verified before any number is reported** (a smaller-but-wrong build is not a data point) |
-| **D** | Decision-record update + #321 evidence paragraph; apply go/no-go | — |
+| ~~**P1**~~ **NOT BUILT** | Cycle infra (`probe-cycles.lua` + `measure-frame-abi.sh`) — only needed for the M measurement | Deferred with A1–M: the A0 census short-circuited the build (see below). |
+| ~~**A0**~~ **DONE — GO (feasible) → but census says NULL** | **DP-collision resolution** + hand-encoded proof ROM (`frameabi_a0.c`/`.sh`) + the `canUseDPWindow` eligibility rule | ✅ Collision provably **avoidable** — `corpus_result==0xBBAA` on MAME+bsnes (DP local + abs `__rc` coexist at `D≠0`); clean eligibility rule stated. Worktree `a73c564`. (Cost model predicts a narrow/NULL-ish win — see note.) |
+| ~~**A1–A4 (a) · B (b) · M**~~ **NOT BUILT** | (a) DP-window codegen (D reg + prologue/epilogue + `MosDPFrame` elimination + fallbacks); FULL (b) stack-relative (`,S` defs + `SPAdj` tracking); the 4-way size/cycle measurement | **Short-circuited by the A0 census** (`9617b0f`): 0/13 realistic functions can profit — frame/spill traffic is ~0 (locals are `__rc`-resident), so there is nothing for *any* frame ABI to optimize. Building the codegen would only confirm the measured NULL and can't surface wins in spills that don't exist. |
+| ~~**D**~~ **DONE** | Decision: census-confirmed NULL; #321 evidence prepared; apply go/no-go | The A0 census **is** the measurement (of the *opportunity*, which is empty). See **Outcome** below; go/no-go = **CONFIRMED-shelved** for both (a) and (b). |
 
 ### Key implementation notes
 
@@ -188,6 +186,41 @@ The build/A-B harness selects strategies via the existing `-Xclang -target-featu
 - **NULL result** ("soft static stack is already at/near optimal for non-recursive code; the fancier frames
   aren't worth their complexity") is the expected, publishable conclusion that *strengthens* the upstream CC
   argument.
+
+## Outcome (2026-06-20) — CONFIRMED-shelved (NULL), measured
+
+**The soft static stack (c) is retained; (a) DP-window and (b) stack-relative are both CONFIRMED-shelved on
+direct measurement.** A0 cleared *feasibility* (the DP-collision is avoidable — `0xBBAA` on both emulators),
+then the A0 census (`dev/frameabi-census.sh`) settled *worth* at a fraction of the A1–M build cost:
+
+- **Realistic code (corpus + 6 kernels): 0/13 functions can profit** under a model deliberately generous to
+  (a) (save 2 B/spill, tax 1 B/`__rc`, 8 B prologue). 11/13 have **zero** static-stack spills.
+- **Why:** llvm-mos keeps locals **register-resident in `__rc`**, and routes local arrays/buffers/structs
+  through a **pointer in `__rc`** (`lda (__rc),y`); even `&local` lands in `__rc` (imaginary regs are
+  addressable ZP). So frame/spill traffic is ~0 — there is **nothing for *any* frame ABI to optimize**, and a
+  DP-window would *tax* the abundant `__rc` traffic. (b) is dominated for the same reason (it also only
+  optimizes frame access, of which there is none — without even (a)'s DP win).
+- **Winning boundary mapped (stress shapes, `frameabi_heavy.c`):** only **volatile-local** and
+  **constant-index array-shuffle** functions (spill-heavy, ~no arithmetic) profit — a pattern realistic
+  compute does not produce.
+
+**This is a *stronger* result than the prior ZP-pressure proxy shelving:** we directly measured the
+frame-traffic *opportunity* and found it empty, rather than inferring it from slack ZP. **Disposition:** the
+(a)/(b) compiler diff (the off-by-default `+mos-dp-frame`/`+mos-sr-frame` features in the worktree's `0002`)
+does **not** land — it failed the go/no-go bar. The **durable artifacts merge back** to `main`:
+`frameabi_a0.c`/`.sh` (feasibility proof + gate), `frameabi_heavy.c` + `frameabi-census.sh` (the measurement),
+`frameabi-byte-identical.sh` (the P0 guardrail). **Upstream (#321, user-triggered):** the evidence paragraph
+below turns the soft-static-stack choice into a measured one.
+
+> **#321 CC evidence (draft, user-triggered to post).** "We evaluated alternative 65816 stack-frame ABIs for
+> the C calling convention — a TCD direct-page window and pure hardware-stack-relative — against llvm-mos's
+> soft static stack. The direct-page window is *feasible* (it coexists with the fixed-ZP imaginary registers
+> if `__rc` is accessed via absolute addressing; verified on MAME + bsnes-jg). But measuring the frame-traffic
+> *opportunity* on a 7-program corpus + 6 kernels in 16-bit-ambient mode: **0 of 13 functions** would benefit,
+> because locals are register-resident in the imaginary-register file and local aggregates are reached through
+> a pointer in `__rc` — so static-stack/spill traffic is ≈0. A per-frame DP/stack window only taxes the
+> abundant imaginary-register accesses. The soft static stack is therefore retained as the first-pass CC
+> frame model — not by default, but by measurement."
 
 ## Reuse (don't rebuild)
 

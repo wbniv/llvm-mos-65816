@@ -62,6 +62,16 @@ relieve pressure that isn't there → **(c) stands; (a) deferred indefinitely.**
 separate `+mos-a16 -Os` register-allocation *crash* on `globals.c` — a robustness bug, not a budget issue,
 tracked independently.)
 
+**SUPERSEDED 2026-06-20 — DIRECTLY MEASURED; (a) AND (b) CONFIRMED-shelved (NULL).** The above shelved (a)
+on an *indirect* proxy (ZP slack). The frame-ABI head-to-head study
+([plan](2026-06-20-321-frame-abi-build-all-three-and-measure.md)) then measured the frame-traffic
+*opportunity* directly: A0 proved the DP↔`__rc` collision is *avoidable* (`0xBBAA` on MAME+bsnes), but the A0
+census (`dev/frameabi-census.sh`) found **0/13 realistic functions** would profit from *either* (a) DP-window
+or (b) stack-relative — locals are register-resident in `__rc` (and local aggregates go through a pointer in
+`__rc`), so static-stack/spill traffic is ≈0 and a per-frame window only taxes the abundant `__rc` accesses.
+**(c) the soft static stack is retained by measurement, not default.** The (a)/(b) codegen was not built (the
+census short-circuited it); pure stack-relative's paper "dominated" ruling is now evidence-backed too.
+
 ## If revived: the (a) implementation path
 
 Model the **D** (direct-page) register in `MOSRegisterInfo.td` — the one missing piece; `PHD/PLD/TCD/TCS`
