@@ -8,9 +8,10 @@ For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO
 ## TL;DR
 
 **#320 (far pointers / M1):** the slice that proves the concept is working — far load/store across
-bank boundaries plus **runtime far-pointer deref/cast/arithmetic (Inc 3 = 3a+3b+3c, complete)**, two
-emulators. The five-address-space model, far calls (JSL), and the far-pointer calling convention are not
-built yet; they're gated on upstream ABI blessing.
+bank boundaries, **runtime far-pointer deref/cast/arithmetic (Inc 3 = 3a+3b+3c)**, and **direct far
+CALLS (JSL/RTL, Inc 4 Phase 1)**, all on two emulators. The far-pointer calling convention is next —
+to be settled by **building every ABI variant and measuring** (no longer upstream-gated). The
+five-address-space model, far function pointers, and mixed-banking remain.
 
 **#321 (16-bit accumulator / M2):** the core codegen is complete. Every planned per-op optimization
 is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete re-open trigger. The
@@ -28,7 +29,8 @@ census short-circuited the build at the measurement step.
 | SNES SDK platform (`mos-platform/snes`, `snes-far`) | ✅ Done |
 | Design note for #320 (near→far ABI discussion) | ⬜ Drafted; **user-triggered** to post ([docs/320-upstream-far-pointer-note.md](320-upstream-far-pointer-note.md)) |
 | Five-address-space model + full PR | ⬜ Upstream-gated on design-note posting; not started |
-| Far calls (JSL / RTL), cross-bank function pointers | ⬜ Blocked on CC decision + upstream |
+| Far calls (JSL / RTL) — direct call to a `.far_*` leaf in another bank | ✅ **Done (Inc 4 Ph1, 2026-06-20)** — `dev/run.sh far_call` + `xcheck`, MAME+bsnes-jg PASS; in `0001`. Far function pointers, mixed-banking, far tail calls = follow-ups. [plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) |
+| Far-pointer calling convention (pass/return `p2`) | ⬜ **Inc 4 Phase 2 — build all ABI variants & measure** (no longer upstream-gated; reuses the frame-ABI harness) |
 | Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Runtime far-pointer arithmetic (`G_PTR_ADD` on AS2) | ✅ **Done (Inc 3c, 2026-06-20)** — `fp++` via the symmetric `s32→4×s8 G_UNMERGE_VALUES` mirror (`legalizeUnmergeS32ToBytes`, a16/`0002`; also closes a latent `uint32_t` shift-≥8 gap); `dev/run.sh far_arith` + `xcheck`, MAME+bsnes-jg PASS. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Far data >2 banks, far calls (JSL/RTL), far-pointer calling convention | ⬜ Deferred past Inc 3 (CC = ABI decision, upstream-gated; grouped with far calls / Inc 4) |

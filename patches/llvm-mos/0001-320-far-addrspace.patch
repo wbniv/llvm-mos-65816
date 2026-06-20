@@ -14,6 +14,41 @@ index dfe99d8f2a2a..c9e4c2f2f4c3 100644
    resetDataLayout(Layout);
  
    PointerWidth = 16;
+diff --git a/llvm/lib/Target/MOS/MOSCallLowering.cpp b/llvm/lib/Target/MOS/MOSCallLowering.cpp
+index bfa9303e3fc9..d448d2c56002 100644
+--- a/llvm/lib/Target/MOS/MOSCallLowering.cpp
++++ b/llvm/lib/Target/MOS/MOSCallLowering.cpp
+@@ -273,8 +273,13 @@ bool MOSCallLowering::lowerReturn(MachineIRBuilder &MIRBuilder,
+       *MF.getSubtarget().getFrameLowering());
+   const Function &F = MF.getFunction();
+ 
+-  auto Return =
+-      MIRBuilder.buildInstrNoInsert(TFI.isISR(MF) ? MOS::RTI : MOS::RTS);
++  // #320 Inc 4: a .far_* function (placed in another bank, entered via JSL) must
++  // return with RTL ($6B, pops the 3-byte PBR:PC that JSL pushed). W65816-only; a
++  // near function (or any default-target function) keeps RTS — default untouched.
++  const MOSSubtarget &STI = MF.getSubtarget<MOSSubtarget>();
++  bool IsFar = STI.hasW65816() && F.getSection().starts_with(".far_");
++  auto Return = MIRBuilder.buildInstrNoInsert(
++      TFI.isISR(MF) ? MOS::RTI : (IsFar ? MOS::RTL : MOS::RTS));
+ 
+   if (Val) {
+     MachineRegisterInfo &MRI = MF.getRegInfo();
+@@ -407,7 +412,13 @@ bool MOSCallLowering::lowerCall(MachineIRBuilder &MIRBuilder,
+   // additional code.
+   auto CallSeqStart = MIRBuilder.buildInstr(MOS::ADJCALLSTACKDOWN);
+ 
+-  auto Call = MIRBuilder.buildInstrNoInsert(MOS::JSR)
++  // #320 Inc 4: a direct call to a .far_* function (placed in another bank by the
++  // linker) uses JSL (24-bit long call, $22) so the program bank follows; the callee
++  // returns via RTL (see lowerReturn). Indirect / far-function-pointer calls stay
++  // near for now. W65816-only — default 6502 codegen is untouched (IsFar=false).
++  bool IsFar = STI.hasW65816() && Info.Callee.isGlobal() &&
++               Info.Callee.getGlobal()->getSection().starts_with(".far_");
++  auto Call = MIRBuilder.buildInstrNoInsert(IsFar ? MOS::JSL : MOS::JSR)
+                   .add(Info.Callee)
+                   .addRegMask(TRI.getCallPreservedMask(MF, Info.CallConv));
+ 
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
 index 70e8bb0d45b3..29032a1e32ea 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
@@ -108,10 +143,39 @@ index a19b69cd054f..be5daff8ffad 100644
  enum TargetIndex {
    TI_STATIC_STACK,
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index 6b8158ca0cac..a614d42a5638 100644
+index 6b8158ca0cac..b0a4f6b8f19d 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
-@@ -537,6 +537,13 @@ def LDIndirIdx : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)>
+@@ -323,6 +323,17 @@ def JSR : MOSLogicalInstr, PseudoInstExpansion<(JSR_Absolute addr16:$tgt)> {
+   let isCall = true;
+ }
+ 
++// #320 Inc 4 far calls: a far (24-bit) call to a function in another bank. Mirrors
++// JSR but expands to JSL_AbsoluteLong (opcode $22, pushes a 3-byte PBR:PC return
++// address), so the target relocates as R_MOS_ADDR24 (the callee's $01xxxx address).
++// Emitted by MOSCallLowering::lowerCall only for a .far_* callee on W65816; balanced
++// by RTL in the callee (see lowerReturn). HasW65816 is enforced at the emit site.
++def JSL : MOSLogicalInstr, PseudoInstExpansion<(JSL_AbsoluteLong addr24:$tgt)> {
++  dag InOperandList = (ins label:$tgt);
++
++  let isCall = true;
++}
++
+ def TailJMP : MOSLogicalInstr, PseudoInstExpansion<(JMP_Absolute addr16:$tgt)> {
+   dag InOperandList = (ins label:$tgt);
+ 
+@@ -340,6 +351,10 @@ class MOSReturn<Instruction Opcode> : MOSLogicalInstr, PseudoInstExpansion<(Opco
+ 
+ def RTS : MOSReturn<RTS_Implied>;
+ def RTI : MOSReturn<RTI_Implied>;
++// #320 Inc 4 far calls: return-from-long-subroutine (RTL, $6B, pops the 3-byte
++// PBR:PC return address a JSL pushed). Emitted by MOSCallLowering::lowerReturn only
++// when the current function is .far_* on W65816 — pairs with the caller's JSL.
++def RTL : MOSReturn<RTL_Implied>;
+ 
+ //===---------------------------------------------------------------------===//
+ // Immediate Load Instructions
+@@ -537,6 +552,13 @@ def LDIndirIdx : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)>
    dag InOperandList = (ins Imag16:$addr, Yc:$offset);
  }
  
@@ -125,7 +189,7 @@ index 6b8158ca0cac..a614d42a5638 100644
  class MOSStore : MOSLogicalInstr {
    let mayStore = true;
  }
-@@ -564,6 +571,12 @@ def STIndirIdx : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)
+@@ -564,6 +586,12 @@ def STIndirIdx : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)
    dag InOperandList = (ins Ac:$src, Imag16:$addr, Yc:$offset);
  }
  
@@ -138,7 +202,7 @@ index 6b8158ca0cac..a614d42a5638 100644
  let Predicates = [Has65C02] in {
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
-@@ -579,6 +592,21 @@ let Predicates = [Has65C02] in {
+@@ -579,6 +607,21 @@ let Predicates = [Has65C02] in {
    }
  }
  

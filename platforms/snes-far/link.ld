@@ -57,6 +57,13 @@ SECTIONS {
    * true cross-bank absolute-long ($018xxx — never zero-bank-relaxable). */
   .far_rodata : { *(.far_rodata .far_rodata.*) } >rom_1
 
+  /* Far CODE in bank $01 (#320 Inc 4). A function tagged
+   * __attribute__((section(".far_text"))) gets VMA $018xxx, so a call to it
+   * relocates as R_MOS_ADDR24 and is emitted as JSL $018xxx (the compiler also
+   * gives such a function an RTL return). It must be a leaf (or call only other
+   * far functions): a near JSR out of bank $01 would not switch the program bank. */
+  .far_text : { *(.far_text .far_text.*) } >rom_1
+
   /* Cartridge header at the top of bank $00 ($FFB0-$FFDF). */
   .snes_header 0xFFB0 : {
     KEEP(*(.snes_header))

@@ -206,13 +206,16 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    emit `JSL`; direct-page vs absolute vs long accesses match the addrspace of the pointer.
    (Evidence: `llvm-objdump` excerpt.)
 
-   _**PARTIAL** (2026-06-14). **Data-access half: PASS** — far loads/stores lower to absolute-long
-   (`af`/`8f`, see step 3's `lda $018000` = `af 00 80 01`) and near data stays 16-bit absolute, so
-   accesses match the pointer's addrspace. **Far-call half (JSR vs JSL): DEFERRED** — far *function*
-   calls have no codegen yet; emitting `JSL`/`RTL` requires the compiler to know a callee's bank,
-   which is the calling-convention decision (open, ABI-gating — see "Calling-convention decision"
-   above) and is upstream-coordinated. It lands with the full #320 model + ABI, not the #320
-   far-data slice. Tracked as TODO "#320 full model + upstream"._
+   _**PASS** (data-access half 2026-06-14, far-call half 2026-06-20). **Data-access half: PASS** — far
+   loads/stores lower to absolute-long (`af`/`8f`, see step 3's `lda $018000` = `af 00 80 01`) and near
+   data stays 16-bit absolute, so accesses match the pointer's addrspace. **Far-call half (JSR vs JSL):
+   PASS** — a direct call to a `__attribute__((section(".far_text")))` function in bank $01 now emits
+   `jsl $018xxx` ($22) and the callee returns `rtl` ($6B), while near calls stay `jsr`/`rts`; verified
+   on MAME + bsnes-jg (`dev/run.sh far_call` — value 0xF3 crosses the bank boundary). The compiler
+   learns the callee's bank from its `.far_*` section (no ABI commitment needed for the call mechanism).
+   Far function POINTERS, mixed-banking, and the far-pointer calling convention are Inc 4 follow-ups —
+   the CC now settled by building all variants and measuring, not upstream-gated.
+   [Inc 4 plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md)._
 
 5. **M2 — 16-bit A + REP/SEP.** A 16-bit arithmetic kernel (e.g. fixed-point multiply-add loop)
    compiles with correct `REP`/`SEP` placement, produces correct results, and is **smaller/faster**
