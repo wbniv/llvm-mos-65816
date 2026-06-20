@@ -23,18 +23,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
-  llvm-mos Discord (@asiekierka/@mysterymath) to open the ABI-blessing discussion. Note is drafted &
-  ready; this is the manual step that unblocks the full model below.
-- [ ] **#320 full five-address-space model + PR.** Implement the five-address-space layout
-  (asiekierka's 32-bit-default, packed 24-bit, zero-bank, abs-16) after maintainer ABI blessing, then
-  open the PR. Upstream-gated — coordinate on Discord with the running slice + design note in hand.
-  Blocked on the posting step above.
-- [ ] **#320 runtime far-pointer operations** (the far-pointer *codegen* deferred past the static
-  far load/store slice). From the Inc 2 / 2b "out of scope": near→far casts, far-pointer arithmetic,
-  indirect-long `[dp]` load/store, far *code* / `JSL` across banks, automatic bank assignment, and
-  far data spanning >2 banks. The address-space layout above is the prerequisite.
-  [Inc 2 plan](docs/plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md),
-  [Inc 2b plan](docs/plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md).
+  llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.
+  Note is drafted & ready; posting is the manual step.
+- [ ] **#320 runtime far-pointer operations** — Inc 3: `[dp]` indirect-long load/store (runtime
+  far-pointer dereference), near→far addrspacecast (`G_ADDRSPACE_CAST` AS0→AS2), far-pointer
+  arithmetic (offset ± preserving bank byte). Address-space layout is confirmed: `0=16-bit` (6502
+  default, unchanged), `1=ZP`, `2=far` (32-bit storage, 24-bit used) — no upstream blessing needed.
+  Packed-24 (AS3) and zero-bank (AS4) deferred until a concrete use case exists.
+  [plan](docs/plans/2026-06-20-320-far-pointer-runtime.md) · [Inc 2b](docs/plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md)
+- [ ] **#320 far calls** — Inc 4: `__far` function attribute, `JSL`/`RTL` codegen, far function
+  pointers. Separate from Inc 3 (data pointers); plan when Inc 3 lands.
 
 ### M2 — Optimizing Payoff
 
