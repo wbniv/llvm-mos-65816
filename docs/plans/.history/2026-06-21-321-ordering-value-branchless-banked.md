@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/ef21088) | #321 plan: add handoff-state to ordering-value-branchless plan |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/ac4a0c6) | #321 plan: bank ordering-as-value branchless win via 16-bit materialization |
 
 <!--history-meta v1
+ef21088	author	Will Norris
+ef21088	added	18
+ef21088	deleted	0
+ef21088	files	1
+ef21088	body	Records what is done (v1 8-bit close-out on main), the wt/321-cmpval spike\nstate (revert v1, build 16-bit form), the investigated facts (selectAddE 8-bit\nassert, no ROLAcc16, G_UADDE maxScalar S8), and the entry point (Phase 0 gate).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ac4a0c6	author	Will Norris
 ac4a0c6	added	104
 ac4a0c6	deleted	0

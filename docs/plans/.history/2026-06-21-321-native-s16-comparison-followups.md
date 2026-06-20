@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/8dfa73c) | #321 native s16 compare follow-ups: implementation BUILT, measured NET-NEGATIVE -> WONT-DO |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/e1f77a8) | #321 native s16 compare follow-ups: Phase 0 step 3 byte-diff -> GO (+3..6 B/site) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/1142a49) | #321 native s16 comparison follow-ups: plan + Phase 0 step-1 audit |
 
 <!--history-meta v1
+8dfa73c	author	Will Norris
+8dfa73c	added	26
+8dfa73c	deleted	0
+8dfa73c	files	1
+8dfa73c	body	Built the branchless ordering-value rewrite (legalizeZExt: zext(sbc-carry) ->\nG_UADDE(0,0,carry)+eor) on wt/321-cmpval. Correct + the leaf win is real (uge_v\n25->19) + default byte-identical 75/75. BUT the 8-bit adc-tail sep breaks 16-bit\nruns: a16cmpaudit +262 B (rep/sep churn + eor inversions); c-torture 56 progs\nnet ~0 WITH a regression (20000224-1 +5 B). The leaf byte-diff (GO) flipped in\nrealistic ambient context -- lesson #1. Clean gating infeasible (cost is ambient-\nmode-dependent, not visible at legalize time). Closes the compare track: native +\noptimal everywhere it pays. measure-compare-surface.sh is the durable harness.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e1f77a8	author	Will Norris
 e1f77a8	added	26
 e1f77a8	deleted	2

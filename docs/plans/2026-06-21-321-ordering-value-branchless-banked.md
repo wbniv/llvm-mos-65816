@@ -1,24 +1,83 @@
-# #321 native s16 — bank the ordering-as-value branchless win (the *right* way: 16-bit materialization)
+# #321 native s16 — ordering-as-value branchless materialization (the 16-bit form): BUILT + measured → WON'T-DO
 
-**One line:** The ordering-as-value boolean (`b = (a >= c)`) is worth banking (it's a real per-site win, and on
-a compiler any gain is a priority, never a go/no-go) — but the win has to be taken with a **materialization that
-matches the ambient M-mode** so it never forces a `sep`. The first attempt used an **8-bit** tail (`lda #0;
-adc #0`) which churns `rep`/`sep` in the **common** sustained-16-bit context (the measured +262 B `a16cmpaudit`
-regression). The fix is a **16-bit** materialization (`lda #$0000; rol`-equivalent, M16) — a16 code is mostly
-16-bit ([[a16-codegen-mostly-16bit-mode]]), so a 16-bit tail stays in the run → no churn → win where it matters.
+**One line:** The ordering-as-value boolean (`b = (a >= c)`) materializes a control-flow select-diamond; the
+hypothesis was that a **16-bit** branchless tail (`lda #$0000; rol`, M16) would stay inside the ambient
+sustained-16-bit run and beat the diamond without the `sep` churn that killed the 8-bit v1 form. **Built it
+(candidate A: `ROLAcc16` + `G_CARRY_BOOL16` + `selectCarryBool16` + `legalizeZExt` rewrite) and measured the
+real output — it REGRESSES, harder than v1.** The 16-bit form wins in *isolated leaf functions* (uge_v 25→23,
+uge_arith 54→42) but loses across **every** realistic a16 program, for three structural reasons the diamond
+exploits (free inversion-folding, M8-tail mode-match, GPR-not-ZP boolean). **WON'T-DO** — see the close-out
+(§0a). This closes the ordering-as-value branchless track in **both** forms (8-bit v1 **and** 16-bit candidate A);
+the select-diamond is the measured optimum.
 
-**Status:** PLANNED (2026-06-21). Supersedes the **WON'T-DO** verdict in
-[`2026-06-21-321-native-s16-comparison-followups.md` §4b](2026-06-21-321-native-s16-comparison-followups.md):
-that closed the *8-bit* implementation as net-negative; this plan banks the *same win* via the correct
-(16-bit / mode-matched) materialization. Per the user's sharpened rule (memory
-`modest-gains-worth-doing`): a clean gain is never shelved for being rare/modest — if the naive impl
-regresses, **build the form that banks it cleanly.** Compiler change → worktree `wt/321-cmpval` (exists).
+**Status:** CLOSED — WON'T-DO (2026-06-21), candidate A **BUILT + measured net-negative**. Joins the *8-bit* v1
+close-out in [`2026-06-21-321-native-s16-comparison-followups.md` §4b](2026-06-21-321-native-s16-comparison-followups.md).
+Per the user's sharpened rule (memory `modest-gains-worth-doing`) the gain was *built*, not shelved on a hunch —
+progressively cleaner forms (16-bit both-widths → 16-bit s16-only-gated) were measured and **none win on real
+code**, so per "close net-negatives" (memory `close-net-negative-findings-not-defer`) it is recorded as a
+*measured* "don't," not deferred. Spike lives in worktree `wt/321-cmpval` (vendor/, un-landed); **no `0002`
+change ships.** The remaining (deferred, higher-effort, uncertain-upside) lever is the mode-agnostic post-REPSEP
+pseudo — see §0a.
+
+### 0a. Phase-0 RESULT — candidate A BUILT + measured → WON'T-DO (2026-06-21)
+
+Implemented candidate A in full on `wt/321-cmpval` and rebuilt the toolchain (`clang-23` mtime advanced,
+new symbols present):
+
+- **`ROLAcc16`** pseudo (`MOSInstrLogical.td`, mirrors `RORAcc16`, `MLow=1`) — `rol a` at M16, carry→bit0.
+- **`LDAImm16`** pseudo (`lda #imm16` into `Ac16`, `MLow=1`, via the multiclass-generated `LDA_Immediate16`).
+- **`G_CARRY_BOOL16`** generic op (`MOSInstrGISel.td`) + **`selectCarryBool16`** (`lda #$0000; rol a; sta zp`).
+- **`legalizeZExt`** rewrite: `zext(16-bit-G_SBC carry)` → `G_CARRY_BOOL16` (s16 direct; s8 via `G_TRUNC`),
+  `hasAccum16`-gated. The inversion (ULT/UGT/SGE…) keeps the existing downstream `eor`.
+
+**The materialization works** (disasm confirms `lda #$0000; rol` replacing the diamond, no crash,
+`-verify-machineinstrs` clean) **and wins in ISOLATED leaves** — but **regresses every realistic program**:
+
+| Measurement (both `+mos-a16 -Os`) | diamond | candidate A | Δ |
+|---|---:|---:|---:|
+| `a16cmpaudit` (compare-dense), candidate A **both-widths** | 16845 | 17499 | **+654 B** |
+| `a16cmpaudit`, candidate A **gated to s16-only (direct preds)** | 16845 | 16923 | **+78 B** |
+| **whole a16 corpus** (s16-only gate) | 37356 | 37696 | **+340 B, ZERO programs improve** |
+| ↳ `a16scavnz` (one rol site, ZP-pressure cascade → spills) | 2296 | 2558 | +262 B |
+| `uge_v` leaf (isolated) | 25 | 23 | −2 B |
+| `uge_arith` = `acc*31+(a>=b)` leaf (isolated, M16 consumer) | 54 | 42 | −12 B |
+
+**Worse than the 8-bit v1 (+262 B); even the best conservative gate (s16-only direct predicates) is +78 B and
+ZERO real programs improve.** The isolated-leaf win (−12 B) appears in **no** corpus program — real
+ordering-as-value booleans are always followed by mode-transitioning code, so the diamond always wins.
+
+**Three structural reasons the select-diamond is optimal** (none fixable at legalize time):
+
+1. **Free inversion-folding.** The diamond chooses *which arm* loads `0` vs `1`, so predicate inversion
+   (ULT/UGT/SLT/SGE — ~half of orderings) costs **zero**. Any `rol`/`adc` materialization needs an explicit
+   `eor #1` per inverted site (the measured `eor` 23→54, +31).
+2. **M8-tail mode-match.** The diamond materializes via `ldx #0/#1` in **M8**, leaving the code in M8 — which
+   matches the ambient mode *after* most boolean sites in loop-structured code. The 16-bit `rol`'s **M16** tail
+   forces an extra `sep` before the following M8 housekeeping (measured `sep`/`rep` +13 each). The consumer's
+   mode is **not knowable at legalize time** → no conservative gate isolates the winning case.
+3. **Boolean in a GPR, not ZP.** The diamond leaves the 0/1 in `X`; candidate A's `STAImag16` consumes an
+   `Imag16` zero-page slot, which **cascades into spills** in pressured functions (`a16scavnz`: +262 B from a
+   single site).
+
+**Candidate B (`ADCImm16`) is strictly worse than A** — `adc #$0000` (3 B) vs `rol` (1 B), same reasons 1–3 —
+so it was **not built** (it would regress more).
+
+**The one remaining lever (deferred, NOT pursued):** a **mode-agnostic** materialization — an `MW_None` pseudo
+expanding *post-REPSEP* to ambient-width `lda #0; rol`, gated to **direct predicates only** — could neutralize
+reason 2 (no extra `sep`) but **not** reasons 1 or 3, for a **rare shape + modest per-site** gain. That is
+delicate `MOSInsertREPSEP` M-lattice work (the pass that has "flipped measured conclusions here") for an
+uncertain, partial upside; the plan deferred it (§3 "Mode-agnostic alternative"), and it stays deferred. If the
+track is ever revived, that is the entry point — the candidate-A spike (`wt/321-cmpval` `vendor/`) is the base.
+
+**Verdict: WON'T-DO.** The select-diamond is the measured-optimal ordering-as-value materialization. Recorded,
+not deferred (`close-net-negative-findings-not-defer`). Nothing lands in `0002`.
 
 ### 0. Handoff state (2026-06-21) — what's done, where to start
 
-- **Banked, not built.** The gain is fully scoped here; the implementation is a queued, low-priority backend
-  task (rare shape + multi-piece change). Entry point = **Phase 0 (§4)**: stand up candidate A, measure
-  `a16cmpaudit`, proceed only past the no-churn gate.
+- **BUILT + measured → WON'T-DO (see §0a above).** Candidate A was fully implemented and measured: it
+  regresses every realistic a16 program (a16cmpaudit +654 B both-widths / +78 B s16-only-gated; whole a16
+  corpus +340 B with zero wins), worse than v1. The §3/§4/§5 plan below is retained as the *as-designed*
+  spec (what was built); §0a is the *result*. Everything below §0a is historical context for the close-out.
 - **Done already (on `main`, pushed):** the v1 *measurement* — `legalizeZExt`→`G_UADDE(0,0,carry)` (8-bit) —
   built, verified correct + default-byte-identical, and **closed net-negative** (the `sep` churn, §1). Its byte
   evidence is in the comparison-follow-ups plan §4b. `dev/measure-compare-surface.sh` (the audit harness) is on

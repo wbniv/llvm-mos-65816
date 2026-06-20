@@ -204,6 +204,18 @@ optimal everywhere it pays (the byte-wise register-resident equality + the diamo
 measured optimum); the one open lever was measured worse-in-context and is shut. `dev/measure-compare-surface.sh`
 is the durable audit harness.
 
+> **Follow-up (2026-06-21): the 16-bit `rol`-tail above was BUILT and ALSO measured net-negative.** The
+> "only churn-free form is a 16-bit `rol`-tail" sentence motivated a dedicated spike
+> ([`2026-06-21-321-ordering-value-branchless-banked.md`](2026-06-21-321-ordering-value-branchless-banked.md))
+> — a real `ROLAcc16`/`LDAImm16`/`G_CARRY_BOOL16` materialization (`lda #$0000; rol a`, M16). It **regresses
+> harder than v1**: `a16cmpaudit` **+654 B** (both-widths) / **+78 B** (even gated to s16-direct-only), whole
+> a16 corpus **+340 B with zero programs improving**. The 16-bit `rol` tail is *not* in fact churn-free in
+> real code: the diamond folds predicate inversion for free (the `rol` needs an explicit `eor`), the diamond's
+> M8 tail matches the ambient mode after most boolean sites (the `rol`'s M16 tail forces a `sep`), and the
+> `rol` routes the boolean through an `Imag16` ZP slot (the diamond keeps it in `X`, avoiding spill cascades).
+> So the **ordering-as-value branchless materialization is now WON'T-DO in BOTH forms (8-bit v1 + 16-bit
+> candidate A)** — the diamond is the measured optimum, full stop. See that plan's §0a for the close-out.
+
 ## 5. The fix (only if Phase 0 §3 measures a win) + verification
 
 - Land the `G_UADDE(0,0,C)`-tail in `legalizeICmp`/select-lowering, **gated** so it fires only for an
