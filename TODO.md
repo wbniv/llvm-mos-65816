@@ -287,7 +287,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   one signature ⇒ likely a single shared bug. Repros: `dev/run.sh fuzz --gen csmith 1 {247,445}`. **Not**
   code-XFAIL'able (the csmith gate only classifies *compile*-log failures, not runtime mismatches), so re-sweeps
   report them as FAILs until fixed. For the xy16 worktree owner — the a16 worker did not touch xy16 codegen.
-  [handoff](docs/plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md).
+  **Fix plan written 2026-06-20** (grounded in seed-445 disasm: the divergence is an index op in the wrong X
+  width — the `requiredXWidth`/`MOSInsertREPSEP` X-lattice class, same family as `55ec505`; root-cause via MIR
+  after `mos-insert-rep-sep`, execute on `wt/321-xy16`).
+  [handoff](docs/plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md) ·
+  [fix plan](docs/plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
   into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
