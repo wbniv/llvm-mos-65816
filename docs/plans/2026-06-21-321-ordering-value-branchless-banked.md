@@ -14,6 +14,24 @@ that closed the *8-bit* implementation as net-negative; this plan banks the *sam
 `modest-gains-worth-doing`): a clean gain is never shelved for being rare/modest — if the naive impl
 regresses, **build the form that banks it cleanly.** Compiler change → worktree `wt/321-cmpval` (exists).
 
+### 0. Handoff state (2026-06-21) — what's done, where to start
+
+- **Banked, not built.** The gain is fully scoped here; the implementation is a queued, low-priority backend
+  task (rare shape + multi-piece change). Entry point = **Phase 0 (§4)**: stand up candidate A, measure
+  `a16cmpaudit`, proceed only past the no-churn gate.
+- **Done already (on `main`, pushed):** the v1 *measurement* — `legalizeZExt`→`G_UADDE(0,0,carry)` (8-bit) —
+  built, verified correct + default-byte-identical, and **closed net-negative** (the `sep` churn, §1). Its byte
+  evidence is in the comparison-follow-ups plan §4b. `dev/measure-compare-surface.sh` (the audit harness) is on
+  `main`.
+- **The `wt/321-cmpval` worktree holds the v1 8-bit spike** in `vendor/llvm-mos/.../MOSLegalizerInfo.cpp`
+  (`legalizeZExt`) — uncommitted, never landed. A pickup agent should **`git diff` it vs `main`, revert that
+  block, then implement the 16-bit form (§3)**; the worktree's built toolchain still contains v1, so rebuild
+  after the new edit (confirm `clang-23` mtime advances). Or start a fresh worktree per
+  [`howto-feature-worktree.md`](../howto-feature-worktree.md).
+- **Investigated facts (don't re-derive):** `selectAddE` asserts 8-bit (`MOSInstructionSelector.cpp:2218`), so
+  `G_UADDE` can only be the churning 8-bit tail; `ADCImm16` exists (`:688`) but `selectAddE` never reaches it;
+  no `ROLAcc16` (only `RORAcc16`, `:2972`); `G_UADDE` is `maxScalar(0,S8)` (`MOSLegalizerInfo.cpp:279`).
+
 ---
 
 ## 1. What we already know (measured 2026-06-21)
