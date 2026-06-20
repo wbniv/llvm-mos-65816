@@ -903,8 +903,14 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "not posting upstream" -> the curated user-triggered "#320 post design note upstream" bullet.
        Duplicate. Nothing open.
      fp:b7a659d550bb10a3 fp:9b54c26fd2f46d90 fp:5612fe3202e783db fp:a5a5bc42d30cd1b6 -->
-- [ ] **(triage)** **(d-hard) the hardware-`,S` convention** — explicitly deferred/record-and-drop (cost documented above); — _from [2026-06-21-320-far-cc-variant-d-stack.md](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)_  <!-- fp:235eae6afa6c3270 -->
-- [ ] **(triage)** **No new 65816 `,S` opcodes, no `SPAdj` threading** — both belong to (d-hard). — _from [2026-06-21-320-far-cc-variant-d-stack.md](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)_  <!-- fp:4659aab74b00d140 -->
-- [ ] **(triage)** **Not** promoting any winner to `0001` here (that's the parent plan's D step) and **not** building the M — _from [2026-06-21-320-far-cc-variant-d-stack.md](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)_  <!-- fp:3bcef2320eb561ac -->
-- [ ] **(triage)** **Not** changing near-ptr/scalar passing or the A/X scalar return (LOCKED). — _from [2026-06-21-320-far-cc-variant-d-stack.md](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)_  <!-- fp:249a072577185895 -->
+<!-- triaged 2026-06-21: all four are "## Out of scope / non-goals" NON-GOALS from the variant-(d)
+     stack plan (the hook matched the "Not …"/"deferred" wording) — scope boundaries, not open work.
+     • "(d-hard) hardware-`,S`" + "no new 65816 `,S` opcodes / no SPAdj threading" -> the plan's explicit
+       record-and-drop DECISION (re-opened only if the census surprises); tracked by the curated A3 row's
+       plan link. Nothing open.
+     • "not promoting a winner to 0001 / not building the M cycle harness here" -> the parent plan's D and
+       M steps, already in the M1 "#320 … Phase 2" bullet's Next-list. Duplicate.
+     • "not changing near-ptr/scalar passing or the A/X return (LOCKED)" -> methodology guardrail; nothing
+       to track.
+     fp:235eae6afa6c3270 fp:4659aab74b00d140 fp:3bcef2320eb561ac fp:249a072577185895 -->
 <!-- END auto-captured-deferrals -->
