@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/f5ec818) | #321 xy16: mark seed 247/445 fix RESOLVED across plans + handoff docs |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/1414510) | #321 xy16 plan: Track A unblocked + scoped (structural requiredXWidth rule) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/f410115) | #321 xy16: disambiguation DONE — seeds 247/445 are a REAL compiler bug (both emulators) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/7c773da) | #321 xy16 fix plan: record 10-agent root-cause workflow result (synthesis refuted 3/3) |
@@ -7,6 +8,11 @@
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/62aa64f) | #321 xy16: write fix plan for the Csmith seed 247/445 mismatches |
 
 <!--history-meta v1
+f5ec818	author	Will Norris
+f5ec818	added	11
+f5ec818	deleted	0
+f5ec818	files	1
+f5ec818	body	Bring the planning/doc artifacts current now that approach B landed (2d8ab51):\n- reduction plan: Phase D = approach B (refuted A'/#2 noted); Phase E filled with the\n  verification evidence (4-way values, csmith 101-500 = 0 mismatch/400, xy16 micro-tests,\n  c-torture 60/60, verify-machineinstrs, 0002 round-trip); Deliverables = the commit list.\n- canonical Track-B plan: RESOLVED banner (Track A hardening remains a follow-up).\n- handoff note: retired (resolution banner; original text kept for history).\n- agent-handoff.md worktrees table: wt/321-xy16 row -> RESOLVED.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 1414510	author	Will Norris
 1414510	added	34
 1414510	deleted	13

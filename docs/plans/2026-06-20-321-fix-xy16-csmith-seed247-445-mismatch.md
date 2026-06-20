@@ -6,7 +6,8 @@
 > the value is genuinely used as an index; otherwise it lowers through the accumulator. Verified 4-way on both
 > emulators + csmith 101–500 (0 mismatch / 0 crash over 400 seeds); a16/DEFAULT byte-identical (gated).
 > **Track A** (the separate `requiredXWidth` 8-bit-indexed-family *hardening* — a real latent defect that does
-> **not** fire in 247/445) remains an independent follow-up. Root-cause arc + the refuted A′/#2 approaches:
+> **not** fire in 247/445) is now **DONE (2026-06-21)** — see §Track A below and its
+> [impl plan](2026-06-21-321-xy16-track-a-requiredxwidth-indexed-family-hardening.md). Root-cause arc + the refuted A′/#2 approaches:
 > [investigation](../investigations/65816-xy16-index16-highbyte-clobber.md); execution + Phase-E verification
 > evidence: [reduction plan](2026-06-20-321-xy16-seed445-cvise-reduction.md). *(The "execute on `wt/321-xy16`"
 > note below is superseded — the fix landed on `main`, which carries the current `0002` + build tree.)*
@@ -116,7 +117,17 @@ FIRST — it bisects the whole problem in one build.
 
 ## Phase 2 — TWO TRACKS (revised per the workflow)
 
-### Track A — `requiredXWidth` 8-bit-indexed-family gap (hardening; UNBLOCKED 2026-06-20, ready)
+### Track A — `requiredXWidth` 8-bit-indexed-family gap (hardening) — ✅ DONE 2026-06-21
+
+> **DONE — see the implementation plan
+> [`2026-06-21-321-xy16-track-a-requiredxwidth-indexed-family-hardening.md`](2026-06-21-321-xy16-track-a-requiredxwidth-indexed-family-hardening.md).**
+> Shipped the **memory-gated** structural rule (`(mayLoad‖mayStore) && readsRegister(X/Y) → XW_X8`), *not* the
+> bare `readsRegister` sketched below — the `mayLoad/mayStore` gate excludes the M-governed `T_A` (TXA/TYA),
+> which the bare rule would `sep`-clobber. Also added an index-reading-branch clause for the `JMP (abs,X)`
+> jump-table dispatch (`JMPIdxIndir`). The "verified 8-bit family" list below has **errors** (it lists the
+> `XLow=1` 16-bit-index forms `LDAbsXIdx`/`STAbsXIdx`/`LDIndirYIdx` as 8-bit) — the impl plan's §1 has the
+> ground-truth-corrected family. Verified byte-identical (a16/default + xy16 + csmith 247/445), torture 60/0/0,
+> fuzz 0-mismatch. The sketch below is retained for the historical arc.
 
 A genuine latent xy16 defect (confirmed: seed 445's post-rep/sep MIR contains `LDAAbsIdx` unclassified →
 `XW_None`; the current switch classifies only `LDXIdx`/`LDYIdx` of the indexed family). Commit was blocked on

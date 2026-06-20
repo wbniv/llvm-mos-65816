@@ -92,10 +92,10 @@ index 76d7409c1f1b..733ef7097a4d 100644
 +    [FeatureAccum16]>;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000000..1dfeba0f28ca
+index 000000000000..408571c52395
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,598 @@
+@@ -0,0 +1,631 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -154,6 +154,7 @@ index 000000000000..1dfeba0f28ca
 +#include "llvm/CodeGen/MachineFunction.h"
 +#include "llvm/CodeGen/MachineInstrBuilder.h"
 +#include "llvm/CodeGen/TargetInstrInfo.h"
++#include "llvm/CodeGen/TargetRegisterInfo.h"
 +
 +using namespace llvm;
 +
@@ -258,7 +259,8 @@ index 000000000000..1dfeba0f28ca
 +// completely indifferent to the X flag. The default MUST be XW_None, not XW_X8.
 +// Returning XW_X8 by default would force a SEP #$10 after every M16-only op
 +// inside an X16 block, defeating 16-bit index mode and generating wrong assembly.
-+static XWidth requiredXWidth(const MachineInstr &MI) {
++static XWidth requiredXWidth(const MachineInstr &MI,
++                             const TargetRegisterInfo *TRI) {
 +  // ABI: 8-bit index registers across call/return boundaries.
 +  if (MI.isReturn() || MI.isCall())
 +    return XW_X8;
@@ -335,6 +337,35 @@ index 000000000000..1dfeba0f28ca
 +      break;
 +    }
 +  }
++  // Structural catch-all for the 8-bit indexed/indirect family (lda abs,X / lda (zp),Y /
++  // sta zp,X / ALU abs,X / RMW abs,X / the a16 *Idx16 forms with an 8-bit index / …). Any op
++  // that (a) touches memory and (b) reads an index register (X/Y) uses X/Y as an 8-bit ADDRESS
++  // index by construction: every genuine 16-bit-index form takes an Xc16/Yc16 operand and is
++  // XLow=1, so it already returned XW_X16 above (verified 32/32 against MOSInstrLogical.td).
++  // Force X8 so none can dereference a 16-bit index with a garbage high byte in a stray X=16
++  // ambient — the addressing-index sibling of the pr49419 value-compare bug (55ec505).
++  //
++  // Memory-gated on purpose: it must NOT catch the M-governed register transfer T_A (TXA/TYA),
++  // which reads X/Y as a *value* (not an index) and addresses no memory (mayLoad and mayStore
++  // are both false on it). A stray sep #$10 before a T_A reading a live 16-bit X would zero X's
++  // high byte and corrupt the transfer — turning safe hardening into a real regression. The
++  // mayLoad/mayStore gate makes the rule exact: "uses X/Y to address memory."
++  //
++  // Correctness-safe: only ever inserts sep #$10. After RA the index operand is the literal
++  // physical MOS::X/MOS::Y, so exact-match readsRegister suffices; TRI is threaded for
++  // alias-robustness against any future subreg-addressed indexed pseudo.
++  if ((MI.mayLoad() || MI.mayStore()) &&
++      (MI.readsRegister(MOS::X, TRI) || MI.readsRegister(MOS::Y, TRI)))
++    return XW_X8;
++  // Index-reading branch: the JMP (abs,X) jump-table dispatch (JMPIdxIndir, emitted by the
++  // legalizer for switch tables <=128 entries when hasJMPIdxIndir() — set on the 65816). It
++  // reads X as an 8-bit table index but is a non-mayLoad branch, so the memory catch-all above
++  // cannot reach it; it survives to REPSEP as a pseudo (no expandPostRAPseudo case). Force X8
++  // so it can't index the table with a garbage X-high byte in a stray X=16 ambient (a wild
++  // jump). Same safety floor as the memory rule: no branch carries XLow=1, so this only seps.
++  if (MI.isBranch() &&
++      (MI.readsRegister(MOS::X, TRI) || MI.readsRegister(MOS::Y, TRI)))
++    return XW_X8;
 +  // Branches are X-agnostic (same treatment as M flag).
 +  if (MI.isBranch())
 +    return XW_None;
@@ -356,6 +387,7 @@ index 000000000000..1dfeba0f28ca
 +
 +private:
 +  const TargetInstrInfo *TII = nullptr;
++  const TargetRegisterInfo *TRI = nullptr;
 +  bool HasIndex16 = false;
 +
 +  // Insert REP/SEP instructions at Pos to transition M and/or X to their new
@@ -399,7 +431,7 @@ index 000000000000..1dfeba0f28ca
 +  bool M16 = EntryIsM16, X16 = EntryIsX16;
 +  for (MachineInstr &MI : MBB) {
 +    MWidth MW = requiredWidth(MI);
-+    XWidth XW = HasIndex16 ? requiredXWidth(MI) : XW_None;
++    XWidth XW = HasIndex16 ? requiredXWidth(MI, TRI) : XW_None;
 +    if (MW == MW_None && XW == XW_None)
 +      continue;
 +    bool WantM16 = (MW == MW_None) ? M16 : resolveIsM16(MW);
@@ -426,7 +458,7 @@ index 000000000000..1dfeba0f28ca
 +      if (W != MW_None)
 +        EndM16 = (W == MW_M16);
 +      if (HasIndex16) {
-+        XWidth XW = requiredXWidth(MI);
++        XWidth XW = requiredXWidth(MI, TRI);
 +        if (XW != XW_None)
 +          EndX16 = (XW == XW_X16);
 +      }
@@ -451,6 +483,7 @@ index 000000000000..1dfeba0f28ca
 +  if (!STI.hasAccum16())
 +    return false;
 +  TII = STI.getInstrInfo();
++  TRI = STI.getRegisterInfo();
 +  HasIndex16 = STI.hasIndex16();
 +
 +  bool Changed = false;
@@ -509,7 +542,7 @@ index 000000000000..1dfeba0f28ca
 +        Lst = W;
 +      }
 +      if (HasIndex16) {
-+        XWidth XW = requiredXWidth(MI);
++        XWidth XW = requiredXWidth(MI, TRI);
 +        if (XW != XW_None) {
 +          if (XFst == XW_None)
 +            XFst = XW;
@@ -1183,7 +1216,7 @@ index a71519559a50..fdd08df4851d 100644
  /// The conditional branch instructions all have the form xxy10000. The flag
  /// indicated by xx is compared with y, and the branch is taken if they are
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index a614d42a5638..2d074bbec1de 100644
+index b0a4f6b8f19d..a005196bd8b6 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,23 @@ class MOSLogicalInstr : Instruction {
@@ -1210,7 +1243,7 @@ index a614d42a5638..2d074bbec1de 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -577,21 +594,6 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -592,21 +609,6 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -1232,7 +1265,7 @@ index a614d42a5638..2d074bbec1de 100644
  // #320 far runtime: LDA [dp] — runtime far-pointer indirect-long load. The ZP
  // address operand is an Imag32 quad holding the 24-bit far address (lo,hi,bank
  // in its first 3 bytes, byte 3 = pad); `lda [dp]` reads bytes dp..dp+2. The
-@@ -607,6 +609,372 @@ def STIndirLong : MOSStore, PseudoInstExpansion<(STA_IndirectLong addr8:$addr)>
+@@ -622,6 +624,372 @@ def STIndirLong : MOSStore, PseudoInstExpansion<(STA_IndirectLong addr8:$addr)>
    dag InOperandList = (ins Ac:$src, Imag32:$addr);
  }
  
@@ -1605,7 +1638,7 @@ index a614d42a5638..2d074bbec1de 100644
  //===---------------------------------------------------------------------===//
  // HuC Block Copy Instructions
  //===---------------------------------------------------------------------===//
-@@ -654,3 +1022,134 @@ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
+@@ -669,3 +1037,134 @@ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
  
  def : Pat<(i1 imm:$s), (LDImm1 imm:$s)>;
  def : Pat<(i8 imm:$s), (LDImm imm:$s)>;
