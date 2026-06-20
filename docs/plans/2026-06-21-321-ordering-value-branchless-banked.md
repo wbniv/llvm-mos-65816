@@ -67,7 +67,10 @@ expanding *post-REPSEP* to ambient-width `lda #0; rol`, gated to **direct predic
 reason 2 (no extra `sep`) but **not** reasons 1 or 3, for a **rare shape + modest per-site** gain. That is
 delicate `MOSInsertREPSEP` M-lattice work (the pass that has "flipped measured conclusions here") for an
 uncertain, partial upside; the plan deferred it (§3 "Mode-agnostic alternative"), and it stays deferred. If the
-track is ever revived, that is the entry point — the candidate-A spike (`wt/321-cmpval` `vendor/`) is the base.
+track is ever revived, that is the entry point — and the full candidate-A implementation is preserved as a
+durable patch at [`spikes/2026-06-21-321-ordering-value-candidate-a-spike.patch`](spikes/2026-06-21-321-ordering-value-candidate-a-spike.patch)
+(the `wt/321-cmpval` worktree was torn down 2026-06-21 after this close-out; apply the patch over a fresh
+`vendor/llvm-mos` checkout to reconstruct it).
 
 **Verdict: WON'T-DO.** The select-diamond is the measured-optimal ordering-as-value materialization. Recorded,
 not deferred (`close-net-negative-findings-not-defer`). Nothing lands in `0002`.

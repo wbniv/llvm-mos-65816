@@ -1,0 +1,191 @@
+# Candidate A spike — #321 ordering-as-value 16-bit branchless materialization (WON'T-DO).
+# Measured net-negative (a16cmpaudit +654 B; a16 corpus +340 B, zero wins) -> closed.
+# See docs/plans/2026-06-21-321-ordering-value-branchless-banked.md §0a for the verdict.
+# Reconstructs the spike: apply over main's vendor/llvm-mos (which already has 0002) with
+#   git apply -p1 --directory=vendor/llvm-mos  (or patch -p1 inside vendor/llvm-mos).
+#
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td	2026-06-20 22:00:56.855239795 +0700
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td	2026-06-21 05:37:11.977079044 +0700
+@@ -975,6 +975,35 @@
+   dag InOperandList = (ins Ac16:$src, Cc:$carryin);
+ }
+ 
++// #321 native s16 ordering-as-value: `rol a` in 16-bit-accumulator mode rotates the
++// carry into bit 0 of A16 while shifting left. Seeded from `lda #$0000` (A16=0), one
++// `rol a` yields A16 = carry (0/1) — the branchless boolean for an unsigned/signed
++// ORDERING compare consumed as a VALUE (`b = (a >= c)`), replacing the control-flow
++// select-diamond. Mirrors RORAcc16 (the carry is an operand, carry-out modeled but
++// dead here); MLow=1 so MOSInsertREPSEP keeps it inside the surrounding 16-bit run —
++// no sep, no churn (the v1 8-bit `lda #0; adc #0` tail's sep regressed a16cmpaudit).
++// The carry-in must reach here un-clobbered from the cmp/G_SBC; the Cc operand
++// dependence enforces that carry-liveness invariant. Emitted by selectCarryBool16.
++def ROLAcc16 : MOSLogicalInstr, PseudoInstExpansion<(ROL_Accumulator)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let Constraints = "$dst = $src";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout);
++  dag InOperandList = (ins Ac16:$src, Cc:$carryin);
++}
++
++// lda #imm16 — load a 16-bit immediate into A16 (M=0). LDA_Immediate16 is generated
++// by the CC1_All multiclass (like CMP_Immediate16). MLow=1 so MOSInsertREPSEP runs it
++// inside the 16-bit region. `lda` sets only N/Z (NOT C), so it is carry-transparent:
++// selectCarryBool16 uses it to seed `lda #$0000` between the ordering cmp (which sets
++// C) and the `rol a` that rotates C into bit 0, without disturbing that carry.
++def LDAImm16 : MOSLogicalInstr, PseudoInstExpansion<(LDA_Immediate16 imm16:$val)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins imm16:$val);
++}
++
+ let Predicates = [Has65C02] in {
+   // STZ abs
+   def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
+--- a/llvm/lib/Target/MOS/MOSInstrGISel.td	2026-06-20 18:49:02.546898358 +0700
++++ b/llvm/lib/Target/MOS/MOSInstrGISel.td	2026-06-21 05:37:28.755947414 +0700
+@@ -49,6 +49,20 @@
+   let InOperandList = (ins type0:$l, type0:$r, type1:$cin);
+ }
+ 
++// #321 native s16: materialize a 16-bit G_SBC carry-out as a branchless 0/1 VALUE,
++// in 16-bit-accumulator mode. The single input ($carry, type1=s1) is the C flag from
++// the unsigned-ordering compare (legalizeICmp's UGE/G_SBC path); the output ($dst,
++// type0=s16) equals that carry. legalizeZExt builds this for `zext(sbc-carry)` under
++// +mos-a16; selectCarryBool16 lowers it to `lda #$0000; rol a` (M=0) -> A16 = carry,
++// then STAImag16 -> Imag16. This stays inside the ambient 16-bit run (no rep/sep),
++// replacing the control-flow select-diamond that the zext would otherwise form
++// (MOSLowerSelect). The carry-liveness invariant (nothing clobbers C between the cmp
++// and the rol) is carried by the Cc operand dependence in the selected pseudos.
++def G_CARRY_BOOL16 : MOSGenericInstruction {
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins type1:$carry);
++}
++
+ // Generalized 8-bit load using the zero page indexed addressing mode. The base
+ // argument isn't a pointer; it's either a global value or an 8-bit immediate.
+ // The index argument is an 8-bit scalar. Additionally expects a
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp	2026-06-20 19:15:45.333524744 +0700
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp	2026-06-21 05:39:01.014223594 +0700
+@@ -108,6 +108,10 @@
+   // #321 native s16 constant shift (G_SHL / unsigned G_LSHR, amount in [1,7]):
+   // `lda; (asl|lsr)*k; sta` on the Imag16 value, bracketed by one rep/sep.
+   bool selectShift16Native(MachineInstr &MI);
++  // #321 native s16 ordering-as-value: G_CARRY_BOOL16 -> `lda #$0000; rol a; sta zp`
++  // (M=0), materializing an unsigned/signed-ordering G_SBC carry as a branchless
++  // 16-bit 0/1 boolean that stays inside the ambient 16-bit run (no select-diamond).
++  bool selectCarryBool16(MachineInstr &MI);
+   // #321 native s16 indirect load/store (G_LOAD16_INDIR / G_STORE16_INDIR):
+   // lda (zp)/sta (zp) in M=0 through a runtime pointer, one rep/sep.
+   bool selectMem16Indir(MachineInstr &MI);
+@@ -310,6 +314,8 @@
+   case MOS::G_UADDE:
+   case MOS::G_SADDE:
+     return selectAddE(MI);
++  case MOS::G_CARRY_BOOL16:
++    return selectCarryBool16(MI);
+   case MOS::G_INC:
+   case MOS::G_DEC:
+   case MOS::G_INC_TMP:
+@@ -2986,6 +2992,49 @@
+ 
+   for (MachineInstrBuilder &Bld : New)
+     constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++
++  MI.eraseFromParent();
++  return true;
++}
++
++// #321 native s16 ordering-as-value: lower G_CARRY_BOOL16 (Dst:s16 = the C flag of a
++// 16-bit ordering G_SBC) to a branchless `lda #$0000; rol a` materialization at M=0.
++// `rol a` rotates the carry into bit 0 of A16 (which `lda #$0000` cleared), so
++// A16 = carry (0/1); the result lands in Imag16 via STAImag16. The whole run is M=0
++// (LDAImm16/ROLAcc16/STAImag16 are MLow=1), so it sits inside the ambient 16-bit
++// region with no rep/sep — the mode-matched fix for the v1 8-bit `adc` tail's churn.
++// Carry-liveness: `lda #imm` sets only N/Z, so the carry from the cmp survives to the
++// rol; the explicit Cc carry-in operand keeps that dependence intact through regalloc.
++// The value enters A16 only via LDAImm16 and leaves only via STAImag16 — never an
++// Ac16<->8-bit COPY (the coalescer invariant the other native-s16 selectors honor).
++bool MOSInstructionSelector::selectCarryBool16(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  Register Dst = MI.getOperand(0).getReg();   // s16 result (Imag16-resident)
++  Register Carry = MI.getOperand(1).getReg(); // s1 — the ordering G_SBC carry-out
++
++  SmallVector<MachineInstrBuilder, 4> New;
++
++  // lda #$0000 -> A16  (carry-transparent: lda touches only N/Z)
++  Register Zero = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  New.push_back(Builder.buildInstr(MOS::LDAImm16).addDef(Zero).addImm(0));
++
++  // rol a -> A16 = (A16 << 1) | C = carry (A16 was 0). The carry-out (old bit 15 = 0)
++  // is dead.
++  Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  Register DeadCarry = MRI.createVirtualRegister(&MOS::CcRegClass);
++  New.push_back(Builder.buildInstr(MOS::ROLAcc16)
++                    .addDef(Res)
++                    .addDef(DeadCarry)
++                    .addUse(Zero)
++                    .addUse(Carry));
++
++  // sta dst (16-bit): the Imag16 dst is DEF'd by the store (imaginary-reg write).
++  New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Res));
++
++  for (MachineInstrBuilder &Bld : New)
++    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
+ 
+   MI.eraseFromParent();
+   return true;
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp	2026-06-20 20:27:46.554551311 +0700
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp	2026-06-21 05:55:52.947088726 +0700
+@@ -751,6 +751,49 @@
+   LLT DstTy = MRI.getType(Dst);
+ 
+   assert(MRI.getType(Src) == LLT::scalar(1));
++
++  // #321 native s16: branchless, MODE-MATCHED materialization of an ORDERING compare
++  // consumed as a VALUE (`b = (a >= c)`). legalizeICmp lowers the unsigned/signed
++  // orderings to a 16-bit G_SBC whose C-flag (def operand 1) IS the boolean; zext'ing
++  // that carry as a value otherwise flows through the buildSelect below ->
++  // MOSLowerSelect, which forms a control-flow diamond (bcc; sep; lda #1; bra; sep;
++  // lda #0) whose seps cut the surrounding 16-bit run. Instead emit G_CARRY_BOOL16
++  // (selectCarryBool16 -> `lda #$0000; rol a` at M=0), a branchless carry->bit0 tail
++  // that STAYS 16-bit, so in a16's sustained-16-bit code it sits inside the run with
++  // no rep/sep churn. (The v1 8-bit `lda #0; adc #0` tail forced a sep and regressed
++  // a16cmpaudit +262 B -- see 2026-06-21-321-native-s16-comparison-followups.md §4b;
++  // this 16-bit form is the fix.) The boolean materializes into Imag16 (s16); a wider
++  // zext result stays s16, an s8 zext narrows back via G_TRUNC. Inverted predicates
++  // (ULT/UGT/SGE...) keep their existing downstream `eor #1` inversion. Gated on
++  // hasAccum16 (default codegen byte-identical). Only a 16-bit G_SBC matches (the
++  // native ordering form); equality's Z is not a carry, so == stays a diamond (the
++  // standing optimum), and the branch path reads the carry via G_BRCOND_IMM directly
++  // and never reaches this zext, so it is untouched.
++  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
++  if (STI.hasAccum16() &&
++      (DstTy == LLT::scalar(16) || DstTy == LLT::scalar(8))) {
++    Register Cur = Src;
++    MachineInstr *Def = MRI.getVRegDef(Cur);
++    while (Def && Def->isCopy() && Def->getOperand(1).getReg().isVirtual()) {
++      Cur = Def->getOperand(1).getReg();
++      Def = MRI.getVRegDef(Cur);
++    }
++    if (Def && Def->getOpcode() == MOS::G_SBC && Def->getNumDefs() >= 2 &&
++        Cur == Def->getOperand(1).getReg() &&
++        MRI.getType(Def->getOperand(0).getReg()) == LLT::scalar(16)) {
++      LLT S16 = LLT::scalar(16);
++      if (DstTy == S16) {
++        Builder.buildInstr(MOS::G_CARRY_BOOL16, {Dst}, {Cur});
++      } else {
++        Register Wide = MRI.createGenericVirtualRegister(S16);
++        Builder.buildInstr(MOS::G_CARRY_BOOL16, {Wide}, {Cur});
++        Builder.buildTrunc(Dst, Wide);
++      }
++      MI.eraseFromParent();
++      return true;
++    }
++  }
++
+   auto One = Builder.buildConstant(DstTy, 1);
+   auto Zero = Builder.buildConstant(DstTy, 0);
+   Builder.buildSelect(Dst, Src, One, Zero);
