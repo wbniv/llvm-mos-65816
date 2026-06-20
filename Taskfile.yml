@@ -17,6 +17,21 @@ tasks:
       - task --list
     silent: true
 
+  # --- Host-side dev/test prerequisites ---
+
+  dev-setup:
+    desc: "Install host-side dev/test prerequisites (cvise for C-reduction of fuzz repros, …). Idempotent; uses sudo apt."
+    silent: true
+    cmds:
+      - |
+        set -euo pipefail
+        need=()
+        command -v cvise >/dev/null || need+=(cvise)
+        if [ ${#need[@]} -eq 0 ]; then echo "host prereqs already present: cvise"; exit 0; fi
+        echo "installing: ${need[*]}"
+        sudo apt-get update -qq
+        sudo apt-get install -y "${need[@]}"
+
   # --- Dev image / build pipeline (thin wrappers over dev/run.sh) ---
 
   build:
