@@ -213,6 +213,38 @@ Two findings make #2 unattractive as a quick fix:
 after register allocation. The robust fix is **C (post-RA repair)**, already filed as a TODO; **B**
 (reg-class steering away from `Xc16` for non-index values) is the intriguing-but-tangled root alternative.
 
+## UPDATE 4 — approach B IMPLEMENTED + VERIFIED ✅ (this is the fix)
+
+Tracing the selection showed the over-eager `Xc16` originates in **`selectXY16`'s `G_LOAD16_ABS` case**
+(`MOSInstructionSelector.cpp:2604`): it emits `LDXAbs16`/`LDYAbs16` whenever the *result is classed*
+`Xc16`/`Yc16` — even when the value is immediately spilled (only consumed by a COPY), never used as a real
+index. (`selectMem16Abs`, the C++ fallback, correctly lowers via `A16`→`STAImag16`.) **The fix** (≈22 lines,
+xy16-gated): in that case, only emit the direct `X16`/`Y16` load when the value is **genuinely used as an
+index** (has a non-COPY user); otherwise reclass the dst to `Imag16` and fall through to `selectMem16Abs`'s
+accumulator path. Selection is bottom-up, so the dst's users are already selected and classifiable.
+
+**Verified (2026-06-20):**
+- **Correct, 4-way, both emulators:** minimal repro `0x0002`, seed 445 `0x0D1D`, seed 247 `0x80FE` —
+  `default == default-O0 == a16 == xy16` everywhere. The csmith harness (incl. MAME) reports
+  `seed 247 0x80FE (all agree)`, `seed 445 0x0D1D (all agree)`, 0 mismatch/crash.
+- **a16/default byte-identical** — `selectXY16` is reached only under `STI.hasIndex16()`
+  (`MOSInstructionSelector.cpp:280`), so the change is unreachable for a16/default *by construction*.
+- **No xy16 regression:** `xy16basic`/`xy16ops`/`xy16indiry`/`xy16spill`/`xy16spillr` all PASS — crucially the
+  *genuine* index paths (`xy16ops`/`indiry`/`spillr`, which use `LDXImag16`/`LDAbsXIdx16`) are unchanged, so
+  the fix routes **only** the spurious-spill case to the accumulator.
+- **`-verify-machineinstrs` clean.**
+- **Smaller code, not larger:** the minimal `main` shrank from **61 → 54 bytes** — the fix *removes* the
+  pointless `rep #$10; ldx; sep #$10` round-trip rather than adding anything.
+
+Why B is *not* "incomplete" in practice: the fix keeps the direct `X16`/`Y16` load for every value genuinely
+consumed as an index (no regression there), and only diverts values that were headed for an immediate
+`Xc16`→`Imag16` spill — which is exactly the shape that the bug needs and that gains nothing from `Xc16`.
+
+**`0002` status:** the fix is live in `vendor/` (toolchain rebuilt + verified). Committing it to the tracked
+`patches/llvm-mos/0002-*.patch` is **pending coordination** — a concurrent worker has uncommitted **#320
+far-pointer runtime** vendor changes (`G_LOAD_FAR_INDIR`/`Imag32`/`tryFarIndirectAddressing`/`LDIndirLong`)
+that a `0002` regen would absorb, so a clean `0002` commit needs their work committed first (or a shelve).
+
 ## Recommendation (superseded by UPDATE 2 above)
 
 **Approach A′** (conservative reg-class-based pre-RA clobber): it keeps the fix as a small pass that leverages

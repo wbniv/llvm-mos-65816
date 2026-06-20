@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/a199678) | #321 xy16: #2 (scheduler/liveness) investigated — also founders on RA-time conflict |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/4d148dd) | #321 xy16: A' (pre-RA XH/YH clobber) implemented + REFUTED — wrong phase |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/8de0bd9) | #321 xy16: log native-16bit upstream entry; record approach-A phase-ordering wrinkle |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/4a7a46b) | #321 xy16 seed247/445 — root cause FOUND + verified; fix scoping doc (scope-first) |
 
 <!--history-meta v1
+a199678	author	Will Norris
+a199678	added	24
+a199678	deleted	0
+a199678	files	1
+a199678	body	Pinned the mechanism via LTO MIR per-pass: the scheduler interleaves the g_110_2 load\ninto g_21's Xc16 live range (harmless as 'ac'), then the ALLOCATOR assigns it to $y while\n$x16 is live -> the narrowing sep zeroes the high byte. So the conflict is again\nallocation-time.\n\nTwo blockers for #2: (1) the MOS custom scheduler (MOSSchedStrategy::tryCandidate) is\npressure-only, doesn't honor cluster edges, and counts physical regs only — a working #2\nneeds a DAG mutation + a tryCandidate change and still only papers over RA. (2) Cleaner\nlead: selectMem16Abs already lowers G_LOAD16_ABS via A16->STAImag16 (never Xc16), so g_21\nlanding in Xc16 (immediately spilled, never indexed) is an over-eager reg-bank/class\nchoice — approach B territory, but tangled (driven by RegBankSelect/consumer).\n\nNet: A' and #2 both founder on the same rock (conflict is created at/after RA). Robust fix\n= C (post-RA, filed TODO); B = clean-but-tangled root alternative.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4d148dd	author	Will Norris
 4d148dd	added	40
 4d148dd	deleted	1
