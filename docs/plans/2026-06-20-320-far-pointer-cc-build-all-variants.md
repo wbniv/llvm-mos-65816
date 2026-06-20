@@ -1,8 +1,8 @@
 # #320 Inc 4 Phase 2 — far-pointer calling convention: build all ABI variants and measure
 
 **Date:** 2026-06-20 (rev. 2026-06-21) · **Status:** 🔬 IN PROGRESS — P0 + A0 (variant a Imag32) + A1
-(variant b Imag16+bank) landed on `wt/320-far-cc`; A2 (variant c A:X+Y) is live in `vendor/` but
-**uncommitted** WIP; A3 (variant d stack), M (measurement) and D (decision) pending — see
+(variant b Imag16+bank) + A2 (variant c A:X+Y) landed on `wt/320-far-cc`, each round-tripping on MAME +
+bsnes-jg; A3 (variant d stack), M (measurement) and D (decision) pending — see
 [Implementation status](#implementation-status-as-of-2026-06-21). · **Scope:** `vendor/llvm-mos/` codegen (the CC) +
 a far-pointer-passing workload + the reused measurement harness. Runs on a feature worktree, not `main`.
 **Builds on:** [Inc 4 Ph1 far calls](2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) (JSL/RTL landed —
@@ -21,7 +21,7 @@ so the (c) infrastructure rode in alongside (b).
 | **P0** scaffolding | ✅ **landed** (`10a5fc0`) | 4 `+mos-farcc-*` features, `farPtrCC()` enum (`MOSSubtarget.h:128`), shared 32-bit (dis)assembly in `MOSCallLowering.cpp`; corpus+kernels byte-identical. |
 | **A0** variant (a) Imag32 | ✅ **landed** (`10a5fc0`) | CC rule `CCIfPtrAddrSpace<2, CCIf<"MOSFarCCImag32(State)", CCAssignToReg<[RL1,RL2,RL3]>>>`; round-trips arg **and** return on MAME + bsnes-jg (`farcc_imag32.{c,sh}`). |
 | **A1** variant (b) Imag16+bank | ✅ **landed** (`741a8c2`) | `CC_MOS_FarPtrSplit` custom assigner + `assignCustomValue` decompose/recompose; `farcc_split.sh` passes both emulators. |
-| **A2** variant (c) A:X+Y | 🔬 **uncommitted WIP** | `FeatureFarCCAXY` + the `MOSFarCCAXY()` predicate are committed, but **the `CC_MOS_FarPtrAXY` rule/assigner live only in `vendor/` — they are *not* in the committed `0004` patch yet** — and `dev/farcc_axy.sh` is untracked (`dev/run.sh`/`xcheck.sh` modified). Capture-and-gate pending. |
+| **A2** variant (c) A:X+Y | ✅ **landed** (`02953e7`) | `CC_MOS_FarPtrAXY` custom assigner (A:X offset + Y bank) + the 3-location `assignCustomValue` branch; `farcc_axy.sh` round-trips arg **and** return to `0xF3` on MAME + bsnes-jg; negative control + default byte-identical (corpus 7/7). **Singular by design** — one far ptr, must precede any A/X-consuming scalar arg. |
 | **A3** variant (d) stack | ⬜ **not started** | Only `FeatureFarCCStack` + the `MOSFarCCStack()` predicate stub exist; no assigner, no test. `,S` modes exist but are `Has65CE02`-gated → need new 65816 wiring. |
 | **M** measurement | ⬜ **not started** | The byte harness is reusable; **the cycle harness does not exist yet** (see the corrected note under the phased sequence). |
 | **D** decision | ⬜ **not started** | Winner promotes from the spike patch into `0001` (below). |
@@ -30,11 +30,11 @@ so the (c) infrastructure rode in alongside (b).
 patch **`0004-320-far-cc.patch`** (regen: `dev/regen-patch-0004.sh`) — *not* `0001`.
 `0001-320-far-addrspace.patch` is the permanent, a16-independent #320 base (Ph1 far calls etc.). At **D**,
 only the winner's CC code is **promoted from `0004` into `0001`** and made default-on; the spike `0004` is
-retired (or shrunk to the retained losers, mirroring `wt/321-frame-abi`). ⚠️ **Hygiene gap right now:**
-`vendor/` contains A2 (variant c) code that `0004` does not yet capture — regenerate `0004` and commit
-`dev/farcc_axy.sh` before treating the patch as the source of truth.
+retired (or shrunk to the retained losers, mirroring `wt/321-frame-abi`). ✅ **Hygiene gap closed
+(`02953e7`, 2026-06-21):** `0004` now captures variant (c) (365 → 429 lines, 9 files; round-trip-verified)
+and `dev/farcc_axy.sh` is committed — `vendor/` and the tracked patch are back in sync.
 
-**What this means for the rest of the plan:** variants (a)/(b)/(c) are already proven feasible, so the open
+**What this means for the rest of the plan:** variants (a)/(b)/(c) are all landed and two-emulator-verified, so the open
 decisions are now only (1) whether to build (d) at all and (2) how much measurement rigor is warranted —
 both governed by the **census** (below). The census short-circuit can legitimately end the study at "measure
 (a)/(b)/(c), default to (a), drop (d)" without ever building (d).
@@ -129,7 +129,7 @@ like `wt/321-frame-abi`).
 |---|---|---|
 | **P0** ✅ | The 4 features (off by default) + `farPtrCC()` plumbing + the **shared** call-lowering plumbing that lets a `p2` be assembled/disassembled as 4 bytes / 2 words (the part every variant needs). | **Byte-identical default** — corpus+kernels default & `+mos-a16` disasm identical across the feature add; features recognized + inert; corpus 7/7. (Reuse `dev/frameabi-byte-identical.sh`.) |
 | **A0** ✅ | **Variant (a) Imag32** end-to-end: the far-ptr CC rule + `RL#` assignment + a `p2`-across-`noinline` gate that PASSES. | A far pointer passed as an arg AND returned across a real call round-trips on **MAME + bsnes-jg**; `-verify-machineinstrs` clean. This is the feasibility proof + the default-winner baseline. |
-| **A1–A3** 🔬 | Variants (b), (c), (d) to the same correctness bar (each behind its flag). **Now: (b) ✅ landed; (c) 🔬 live in `vendor/` but uncommitted; (d) ⬜ not started.** | Each passes the same `p2`-across-call gate on both emulators. A variant that proves materially harder than (a) for no plausible win may be **recorded-and-dropped** (note why) rather than fully built — measure the opportunity first (census-style), per the frame-ABI lesson. |
+| **A1–A3** 🔬 | Variants (b), (c), (d) to the same correctness bar (each behind its flag). **Now: (b) ✅ landed (`741a8c2`); (c) ✅ landed (`02953e7`); (d) ⬜ not started.** | Each passes the same `p2`-across-call gate on both emulators. A variant that proves materially harder than (a) for no plausible win may be **recorded-and-dropped** (note why) rather than fully built — measure the opportunity first (census-style), per the frame-ABI lesson. |
 | **M** ⬜ | The measurement: bytes (`text_bytes`) + cycles on the far-ptr-passing workload, every cell differentially verified. | The N-way table (`prog \| a \| b \| c \| d \| Δ`) for bytes and cycles, inner-loop + whole-call brackets. |
 | **D** ⬜ | Decision: apply the go/no-go; land the winner in `0001`; make it the default-on far-ptr CC; record the rest. | Winner is differential-clean, `0001` round-trips (`dev/regen-patch-0001.sh`), no foreign hunks. |
 
@@ -203,8 +203,8 @@ The bar is the project **differential** (host == default == variant on MAME + bs
 4. **Fuzz + torture non-regression.** `dev/run.sh fuzz 200+` and a torture pass under the winner → 0
    mismatch / 0 new-crash.
 5. **Patch hygiene.** *During the spike:* `dev/regen-patch-0004.sh` → `0004-320-far-cc.patch` round-trips
-   and captures every committed variant (⚠️ today it does **not** include the A2/variant-c `vendor/` code —
-   regen before treating it as source of truth, and commit `dev/farcc_axy.sh`). *At D (winner only):*
+   and captures every committed variant (✅ as of `02953e7` it captures (a)/(b)/(c); (d) not yet built).
+   *At D (winner only):*
    promote into `0001` via `dev/regen-patch-0001.sh` → `0001` round-trips; staged set is exactly the
    authored CC files; `0001` stays a16-free; `0002`/`0003` untouched and the retired `0004` handled
    cleanly; no foreign hunks.

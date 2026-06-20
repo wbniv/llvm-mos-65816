@@ -10,7 +10,7 @@
 # Gate (as dev/farcc_split.sh): host-expected == +mos-a16 +mos-farcc-axy on MAME +
 # bsnes-jg; -verify-machineinstrs clean; negative control = does NOT compile without
 # the flag. Drive from the host: dev/run.sh farcc_axy.
-# See docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md (A2).
+# See docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md (Phase 2, A2).
 set -euo pipefail
 
 usage() { echo "Usage: dev/run.sh farcc_axy   # far-ptr CC variant (c) A:X+Y: round-trip a far ptr across calls == 0xF3"; exit 0; }

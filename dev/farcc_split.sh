@@ -11,7 +11,7 @@
 # Gate (as dev/farcc_imag32.sh): host-expected == +mos-a16 +mos-farcc-split on MAME
 # + bsnes-jg; -verify-machineinstrs clean; negative control = does NOT compile
 # without the flag. Drive from the host: dev/run.sh farcc_split.
-# See docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md (A1).
+# See docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md (Phase 2, A1).
 set -euo pipefail
 
 usage() { echo "Usage: dev/run.sh farcc_split   # far-ptr CC variant (b) Imag16+bank: round-trip a far ptr across calls == 0xF3"; exit 0; }

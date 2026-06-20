@@ -32,13 +32,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   go/no-go bars). Each variant adds the gated assignment rule (before `CCIfPtr`) + 4-byte (dis)assembly.
   Unlike the frame-ABI study, this one MUST ship one variant (a tie → simplest = Imag32), not "change
   nothing".
-  **In progress (2026-06-21, `wt/320-far-cc`):** P0 + A0 (variant a Imag32) + A1 (variant b Imag16+bank)
-  landed (`10a5fc0`, `741a8c2`), both round-trip arg+return on MAME + bsnes-jg; the gated `CC_MOS` far-ptr
-  rules (a/b/c) are now present. **Next:** capture A2 (variant c — live in `vendor/`, **not yet in `0004`**;
-  `dev/farcc_axy.sh` untracked) → A3 (variant d stack, not started; `,S` modes are 65CE02-gated) → build
-  the **net-new** cycle harness (`dev/probe-cycles.lua` + `dev/measure-far-cc.sh` — neither exists; the
-  frame study deferred its harness when its A0 census short-circuited) → M (measure) → D (promote winner →
-  `0001`, default-on). [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
+  **In progress (2026-06-21, `wt/320-far-cc`):** P0 + A0 (variant a Imag32) + A1 (variant b Imag16+bank) +
+  A2 (variant c A:X+Y) landed (`10a5fc0`, `741a8c2`, `02953e7`), each round-tripping arg+return to `0xF3` on
+  MAME + bsnes-jg; `0004` captures all three (round-trip-verified). **Next:** A3 (variant d stack, not
+  started; `,S` modes are 65CE02-gated) → build the **net-new** cycle harness (`dev/probe-cycles.lua` +
+  `dev/measure-far-cc.sh` — neither exists; the frame study deferred its harness when its A0 census
+  short-circuited) → M (measure) → D (promote winner → `0001`, default-on).
+  [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
 - [ ] **#320 far calls — follow-ups** (the JSL/RTL direct-call MECHANISM landed 2026-06-20, see Done).
   Remaining: (a) **far function pointers** — indirect far call (`jsl`/`jml [addr]` through a far code
   pointer; today an indirect call stays near); (b) **mixed-banking** — a far function that calls a NEAR
