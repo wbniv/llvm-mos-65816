@@ -129,7 +129,7 @@ The build/A-B harness selects strategies via the existing `-Xclang -target-featu
 |---|---|---|
 | ~~**P0**~~ **DONE** | Features (`+mos-dp-frame`/`+mos-sr-frame`, off by default) + `frameStrategy()` tri-state plumbing. *(Branch-point switches deferred to A1/B with their logic — empty fall-through switches in hot functions are pure risk for zero value.)* | ✅ **Byte-identical default** — corpus+kernels default+a16 disasm 24/24 identical across the feature add (`dev/frameabi-byte-identical.sh`); features recognized + inert; corpus 7/7. Worktree `c2eaf61`. |
 | **P1** | Cycle infra: `dev/probe-cycles.lua` reachability probe + sentinel protocol + `dev/measure-frame-abi.sh` (size, 4-way) | MAME `total_cycles()` reachable (else adopt frame-count proxy fallback) |
-| **A0** | **DP-collision resolution** + hand-written `.s` proof ROM + a `canUseDPWindow` eligibility rule | Collision provably avoided at runtime on MAME+bsnes with a *clean* eligibility rule — **else STOP and report "(a) can't safely layer on the fixed-ZP model" as the finding** |
+| ~~**A0**~~ **DONE — GO** | **DP-collision resolution** + hand-encoded proof ROM (`frameabi_a0.c`/`.sh`) + the `canUseDPWindow` eligibility rule | ✅ Collision provably **avoidable** — `corpus_result==0xBBAA` on MAME+bsnes (DP local + abs `__rc` coexist at `D≠0`); clean eligibility rule stated. Worktree `a73c564`. (Cost model predicts a narrow/NULL-ish win — see note.) |
 | **A1–A2** | `D` register modeled (**reserved**, not allocatable) + `tsc;[sec;sbc #sz;tcs;]phd;tcd` prologue / `pld` epilogue (FrameSetup/Destroy flags) | `dev/run.sh crt0native` still PASS with a DP-window fn in the call chain |
 | **A3–A4** | New `MosDPFrame` `TargetStackID` + DP-offset `eliminateFrameIndex` + fallbacks (recursion / >256 B / ISR / FP → soft stack) | `a16_fuzz.evaluate` differential PASS on corpus+kernels under `+mos-dp-frame` (host==default==a16, both emus) |
 | **B** | **FULL (b)**: 65816 `op dp,s` + `(dp,s),y` instruction defs (`HasW65816`), ISel/expansion, **`SPAdj` frame-offset tracking** (lift the `MOSRegisterInfo.cpp:263` `SPAdj==0` assert), new `MosSRFrame` stack ID + `,S` `eliminateFrameIndex`, soft-stack fallback | Differential PASS under `+mos-sr-frame` |
@@ -138,11 +138,22 @@ The build/A-B harness selects strategies via the existing `-Xclang -target-featu
 
 ### Key implementation notes
 
-- **A0 (make-or-break).** The only *correct* DP-window that preserves llvm-mos semantics restricts (a) to a
-  **narrow eligibility class**: non-reentrant functions whose `__rc*` footprint is empty/tiny, with the few
-  imaginary-register touches re-emitted as `D`-independent 16-bit `abs` (DBR=0, already established by crt0).
-  `canUseDPWindow(MF)` enforces it; everything else falls through to the unchanged soft stack. If A0 yields no
-  clean, reasonably-broad rule, that *is* the result — stop before A1.
+- **A0 (make-or-break) — DONE 2026-06-20, GO.** ✅ **The DP-collision is provably AVOIDABLE.**
+  `examples/65816/frameabi_a0.c` + `dev/frameabi_a0.sh` (hand-encoded `.byte`, default build): a function
+  ran at `D=$1000`, wrote a frame local via DP (`$10`→`$1010`), and **while `D≠0`** read the `__rc16` cell via
+  absolute (`$0010`) — still `$AA`, unclobbered → `corpus_result == 0xBBAA` on **MAME + bsnes-jg** (a
+  collision would have given `0xBBBB`). Worktree `a73c564`. So absolute addressing reaches `__rc` regardless
+  of `D`, and the mechanism is sound on both emulators.
+  **Eligibility rule (clean):** DP-window applies only to **non-reentrant, ≤256 B-frame, non-ISR, no-FP**
+  functions, with **every** `__rc*`/imaginary-register access in such a function re-emitted as `D`-independent
+  16-bit `abs` (DBR=0). `canUseDPWindow(MF)` enforces it; everything else falls through to the unchanged soft
+  stack.
+  **Cost model (the real story; settled empirically in M).** The window moves *spilled* locals from 3-byte
+  absolute static-stack slots → **2-byte DP (−1 B/access, the win)** but forces *every* imaginary-register
+  access from 2-byte DP → **3-byte abs (+1 B/access, the tax)**, plus ~6–8 B `tsc;phd;tcd … pld` per call.
+  Net win only where spilled-local accesses outnumber imaginary-register accesses by enough to clear the tax
+  + prologue — a **narrow class** (most llvm-mos locals are register-resident in `__rc`, not spilled), so the
+  expected overall result stays **NULL-ish**. A0 clears the *feasibility* bar; M decides *worth*.
 - **D register (A1).** Add `def D` in `MOSRegisterInfo.td` with a fresh HWEncoding outside the imaginary
   ranges (mirror the `XH/YH/X16/Y16` placement, `:114-123`); mark **reserved** in the `MOSRegisterInfo` ctor
   alongside `RS0`/`RS8` (`:69-73`). It's a frame invariant, never allocated. Frame-index elimination encodes
