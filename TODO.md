@@ -887,8 +887,13 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        (G_STORE_FAR_INDIR -> STIndirLong, the symmetric [dp] store); only a dedicated far_store.c
        micro-test is unwritten — trivial polish, not a tracked deliverable. Nothing open.
      fp:bffa7ff820f61a6a fp:41566cc6a199377c -->
-- [ ] **(triage)** **Not** changing near-pointer or scalar passing, or the A/X scalar return convention (LOCKED) — this — _from [2026-06-20-320-far-pointer-cc-build-all-variants.md](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)_  <!-- fp:b7a659d550bb10a3 -->
-- [ ] **(triage)** **Not** far function pointers / indirect far calls (separate Inc 4 follow-up) — this is far *data* — _from [2026-06-20-320-far-pointer-cc-build-all-variants.md](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)_  <!-- fp:9b54c26fd2f46d90 -->
-- [ ] **(triage)** **Not** auto-merging all variants: only the winner lands; the rest are a measured spike. — _from [2026-06-20-320-far-pointer-cc-build-all-variants.md](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)_  <!-- fp:5612fe3202e783db -->
-- [ ] **(triage)** **Not** posting upstream from this plan — the evidence paragraph is prepared; posting is user-triggered. — _from [2026-06-20-320-far-pointer-cc-build-all-variants.md](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)_  <!-- fp:a5a5bc42d30cd1b6 -->
+<!-- triaged 2026-06-20: all four are "## Out of scope / non-goals" NON-GOALS from the far-pointer-CC
+     Phase 2 plan (the hook matched the "Not ..." bullets) — scope boundaries, not open work.
+     • "not changing near-ptr/scalar passing or the A/X return (LOCKED)" + "not auto-merging variants"
+       -> methodology guardrails of the study itself; nothing to track.
+     • "far function pointers / indirect far calls" -> already the curated M1 bullet "#320 far calls —
+       follow-ups (a)". Duplicate.
+     • "not posting upstream" -> the curated user-triggered "#320 post design note upstream" bullet.
+       Duplicate. Nothing open.
+     fp:b7a659d550bb10a3 fp:9b54c26fd2f46d90 fp:5612fe3202e783db fp:a5a5bc42d30cd1b6 -->
 <!-- END auto-captured-deferrals -->
