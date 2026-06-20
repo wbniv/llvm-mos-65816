@@ -914,4 +914,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "not changing near-ptr/scalar passing or the A/X return (LOCKED)" -> methodology guardrail; nothing
        to track.
      fp:235eae6afa6c3270 fp:4659aab74b00d140 fp:3bcef2320eb561ac fp:249a072577185895 -->
+- [ ] **(triage)** **Not** building variant (d) hardware-`,S` (recorded-and-dropped; see the sub-plan). — _from [2026-06-21-320-far-cc-M-measure-D-land-winner.md](docs/plans/2026-06-21-320-far-cc-M-measure-D-land-winner.md)_  <!-- fp:22834bf4cff4871f -->
+- [ ] **(triage)** **Not** splitting the winner out of `0004` into `0001` (blocked by the shared `AnyRegBank`/a16 line; a — _from [2026-06-21-320-far-cc-M-measure-D-land-winner.md](docs/plans/2026-06-21-320-far-cc-M-measure-D-land-winner.md)_  <!-- fp:791ac5628feb80c1 -->
+- [ ] **(triage)** **Not** posting upstream (the evidence paragraph is prepared; posting is user-triggered). — _from [2026-06-21-320-far-cc-M-measure-D-land-winner.md](docs/plans/2026-06-21-320-far-cc-M-measure-D-land-winner.md)_  <!-- fp:5c80fc5e2b511bd9 -->
+- [ ] **(triage)** **Not** absolute cycle counts (MAME exposes only emulated time here) — the measurement is a differential — _from [2026-06-21-320-far-cc-M-measure-D-land-winner.md](docs/plans/2026-06-21-320-far-cc-M-measure-D-land-winner.md)_  <!-- fp:08ef1a18b66d3235 -->
+- [verify] **2026-06-21-320-far-cc-M-measure-D-land-winner** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-cc-M-measure-D-land-winner.md](docs/plans/2026-06-21-320-far-cc-M-measure-D-land-winner.md)_  <!-- fp:6a89972340f81bd6 -->
 <!-- END auto-captured-deferrals -->
