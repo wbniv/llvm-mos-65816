@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/364de87) | #321 c-torture -Os sweep + load-fold fix: record results (1114 PASS, 0 FAIL) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/86c2602) | #321 fix: a16 load-fold must not move a load across a memory-clobbering call |
 
 <!--history-meta v1
+364de87	author	Will Norris
+364de87	added	13
+364de87	deleted	2
+364de87	files	1
+364de87	body	Final verification of the -Os sweep and the load-fold-across-call fix:\n- full -Os re-sweep 1114 PASS, 0 FAIL, 54 SKIP (was 1112/2); pr34768-1/-2 PASS\n- fuzz 45/50, 0 mismatch / 0 crash\n- folds preserved (no win lost); verify-machineinstrs clean\n\nMarks the suite's -Os pass DONE in the [wip] c-torture item, adds the fix Done\nentry, and records the sweep + fix plan verdicts.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 86c2602	author	Will Norris
 86c2602	added	111
 86c2602	deleted	0
