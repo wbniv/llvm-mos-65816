@@ -1761,7 +1761,7 @@ index 21910cfeab37..e3fece8b0616 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2ca7..1b2851ed3d33 100644
+index cbdd54ab2ca7..29fa281ac98a 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -2009,19 +2009,20 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -968,6 +1153,11 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
+@@ -968,6 +1153,12 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
    return {LHS, Addr, Idx, Flag, Load, AA};
  }
  
 +// Defined later (beside selectSbc16): the defining single-use near-abs G_LOAD16_ABS
 +// of R in User's block, else null — the #321 v3 EQ abs-fold operand.
 +static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
-+                                       const MachineRegisterInfo &MRI);
++                                       const MachineRegisterInfo &MRI,
++                                       AAResults *AA);
 +
  bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
  
-@@ -991,6 +1181,89 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -991,6 +1182,89 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
@@ -2036,7 +2037,7 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +    // (CmpBrAbsImm16) instead of materializing it into an Imag16 pair. Same 1-to-1
 +    // volatile-safe fold as CmpBrAbsAbs16; the dead 16-bit G_SBC + COPY are cleaned by
 +    // InstructionSelect's isTriviallyDead.
-+    if (MachineInstr *LdL = foldableAbsLoad16(LHS, MI, MRI)) {
++    if (MachineInstr *LdL = foldableAbsLoad16(LHS, MI, MRI, AA)) {
 +      auto Branch = Builder.buildInstr(MOS::CmpBrAbsImm16)
 +                        .addMBB(Tgt)
 +                        .addUse(Flag, RegState::Undef)
@@ -2065,8 +2066,8 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +    // operand (mixed global-vs-local/register) stays on the Imag16 path, which is
 +    // exactly today's codegen, so no regression. EQ is commutative and the legalizer
 +    // already put a lone foldable global on the LHS, so both-foldable means g1 == g2.
-+    MachineInstr *LdL = foldableAbsLoad16(LHS, MI, MRI);
-+    MachineInstr *LdR = foldableAbsLoad16(RHS16, MI, MRI);
++    MachineInstr *LdL = foldableAbsLoad16(LHS, MI, MRI, AA);
++    MachineInstr *LdR = foldableAbsLoad16(RHS16, MI, MRI, AA);
 +    if (LdL && LdR) {
 +      const MachineInstr *Loads[] = {LdL, LdR};
 +      auto Branch = Builder.buildInstr(MOS::CmpBrAbsAbs16)
@@ -2111,7 +2112,7 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1091,12 +1364,163 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1091,12 +1365,174 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -2145,30 +2146,40 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +// and must not be intercepted here (class conflict with the Ac16 LDAbs16 fold).
 +
 +// Folding a load into its user re-reads the memory at the USER's location, not the
-+// load's. That is only value-preserving if nothing between the two writes memory.
-+// If any instruction strictly between Def and User may store (notably a call — e.g.
-+// `int tmp = g; clobber(); use(tmp, g)`, gcc c-torture pr34768), folding would move
-+// the read past the clobber and read a different value. Bail in that case (governing
-+// lesson #2: a conservative miss only forgoes a win, never regresses). Def and User
-+// are single-use + same-BB, so this scan is short and bounded.
-+static bool noStoreBetween(const MachineInstr *Def, const MachineInstr &User) {
++// load's. That is only value-preserving if nothing between the two CLOBBERS the loaded
++// memory. A call / unmodeled side effect could (e.g. `int tmp = g; clobber(); use(tmp,
++// g)`, gcc c-torture pr34768) -> bail. A store between only matters if it MAY ALIAS the
++// loaded address: AA-precision lets a provably non-aliasing store through (#321 Phase-1
++// Probe A — recovers folds the old conservative "any store" rule dropped). An *ordered*
++// (volatile/atomic) store is a hard bail regardless of aliasing, so a (possibly
++// volatile) load is never reordered across another volatile access. (Governing lesson
++// #2: a miss only forgoes a win, never regresses.) Def/User are single-use + same-BB,
++// so this scan is short and bounded; AA mirrors shouldFoldMemAccess's mayAlias check.
++static bool noClobberBetween(const MachineInstr *Def, const MachineInstr &User,
++                             AAResults *AA) {
 +  bool afterDef = false;
 +  for (const MachineInstr &MI : *Def->getParent()) {
 +    if (&MI == Def) { afterDef = true; continue; }
 +    if (&MI == &User)
 +      break;
-+    if (afterDef && (MI.mayStore() || MI.isCall() || MI.hasUnmodeledSideEffects()))
++    if (!afterDef)
++      continue;
++    if (MI.isCall() || MI.hasUnmodeledSideEffects())
++      return false;
++    if (MI.mayStore() &&
++        (MI.hasOrderedMemoryRef() || MI.mayAlias(AA, *Def, /*UseTBAA=*/true)))
 +      return false;
 +  }
 +  return true;
 +}
 +
 +static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
-+                                       const MachineRegisterInfo &MRI) {
++                                       const MachineRegisterInfo &MRI,
++                                       AAResults *AA) {
 +  MachineInstr *Def = MRI.getVRegDef(R);
 +  if (Def && Def->getOpcode() == MOS::G_LOAD16_ABS &&
 +      MRI.hasOneNonDBGUse(R) && Def->getParent() == User.getParent() &&
-+      !isXc16Reg(R, MRI) && noStoreBetween(Def, User))
++      !isXc16Reg(R, MRI) && noClobberBetween(Def, User, AA))
 +    return Def;
 +  return nullptr;
 +}
@@ -2180,11 +2191,12 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +// operand 1 is the zp pointer pair. No isXc16Reg guard: an indirect-load result is
 +// never Xc16-constrained (only the abs G_LOAD16_ABS arm constrains for selectXY16).
 +static MachineInstr *foldableIndirLoad16(Register R, const MachineInstr &User,
-+                                         const MachineRegisterInfo &MRI) {
++                                         const MachineRegisterInfo &MRI,
++                                         AAResults *AA) {
 +  MachineInstr *Def = MRI.getVRegDef(R);
 +  if (Def && Def->getOpcode() == MOS::G_LOAD16_INDIR &&
 +      MRI.hasOneNonDBGUse(R) && Def->getParent() == User.getParent() &&
-+      noStoreBetween(Def, User))
++      noClobberBetween(Def, User, AA))
 +    return Def;
 +  return nullptr;
 +}
@@ -2211,7 +2223,7 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +  // lda lhs (16-bit) -> A16. A single-use near-abs global LHS reads via `lda abs`
 +  // directly, dropping the `lda abs; sta tmp` round-trip; otherwise from its Imag16.
 +  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+  if (MachineInstr *LdL = foldableAbsLoad16(L, MI, MRI)) {
++  if (MachineInstr *LdL = foldableAbsLoad16(L, MI, MRI, AA)) {
 +    New.push_back(Builder.buildInstr(MOS::LDAbs16)
 +                      .addDef(Lo)
 +                      .add(LdL->getOperand(1))
@@ -2227,14 +2239,14 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +  if (auto Imm = getImm16Operand(R, MRI)) {
 +    New.push_back(
 +        Builder.buildInstr(MOS::CMPImm16).addDef(CarryOut).addUse(Lo).addImm(*Imm));
-+  } else if (MachineInstr *LdR = foldableAbsLoad16(R, MI, MRI)) {
++  } else if (MachineInstr *LdR = foldableAbsLoad16(R, MI, MRI, AA)) {
 +    New.push_back(Builder.buildInstr(MOS::CMPAbs16)
 +                      .addDef(CarryOut)
 +                      .addUse(Lo)
 +                      .add(LdR->getOperand(1))
 +                      .cloneMemRefs(*LdR));
 +    Folded.push_back(LdR);
-+  } else if (MachineInstr *LdR = foldableIndirLoad16(R, MI, MRI)) {
++  } else if (MachineInstr *LdR = foldableIndirLoad16(R, MI, MRI, AA)) {
 +    // arr[i]/p[i] on the RHS: read the value directly via `cmp (zp)` (CMPIndir16)
 +    // instead of staging it through an Imag16 temp. The pointer (operand 1) use is
 +    // transferred to the cmp; the single-use indirect load is erased below.
@@ -2275,7 +2287,7 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1927,6 +2351,758 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1927,6 +2363,758 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    }
    return selectGeneric(MI);
  }
@@ -2366,7 +2378,7 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +    }
 +    if (Step) {
 +      SmallVector<MachineInstrBuilder, 3> New;
-+      MachineInstr *LdV = foldableAbsLoad16(Val, MI, MRI);
++      MachineInstr *LdV = foldableAbsLoad16(Val, MI, MRI, AA);
 +      Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
 +      if (LdV)
 +        New.push_back(Builder.buildInstr(MOS::LDAbs16).addDef(Lo)
@@ -2401,8 +2413,8 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +  // Mixed-operand fold sites: a single-use near-abs global A folds into `lda abs`;
 +  // a single-use near-abs global B (no immediate) folds into the `OP abs` form.
 +  SmallVector<MachineInstr *, 2> Folded;
-+  MachineInstr *LdA = foldableAbsLoad16(A, MI, MRI);
-+  MachineInstr *LdB = Imm ? nullptr : foldableAbsLoad16(B, MI, MRI);
++  MachineInstr *LdA = foldableAbsLoad16(A, MI, MRI, AA);
++  MachineInstr *LdB = Imm ? nullptr : foldableAbsLoad16(B, MI, MRI, AA);
 +
 +  SmallVector<MachineInstrBuilder, 4> New;
 +
@@ -2629,7 +2641,7 @@ index cbdd54ab2ca7..1b2851ed3d33 100644
 +    MachineInstrBuilder CmpI;
 +    if (auto Imm = getImm16Operand(RHS, MRI)) {
 +      CmpI = Builder.buildInstr(CPImm).addDef(CarryOut).addUse(LHS).addImm(*Imm);
-+    } else if (MachineInstr *LdR = foldableAbsLoad16(RHS, MI, MRI)) {
++    } else if (MachineInstr *LdR = foldableAbsLoad16(RHS, MI, MRI, AA)) {
 +      CmpI = Builder.buildInstr(CPAbs)
 +                 .addDef(CarryOut)
 +                 .addUse(LHS)

@@ -172,6 +172,45 @@ Five hunks in `MOSInstructionSelector.cpp`, all behavior-preserving (count then 
 3. Run the **full differential gate** (Verification below) before landing. Regenerate `0002` with
    `dev/regen-patch.sh`; sanity-check it didn't absorb foreign hunks.
 
+## Phase 2 — RESULTS (2026-06-20): the byte-diff SPLIT the unification — land (a), revert (b)
+
+Built both halves on throwaway worktree `throwaway/loadfold-unify-phase2` and **measured** (`dev/measure-loadfold-bytes.sh`, the keeper). Two findings overturned the plan's "single helper / pure upside" premise:
+
+**The literal single-helper merge is WRONG — it regresses `a16abscmp`.** Routing the 16-bit value-side
+(`foldable*Load16`) through `shouldFoldMemAccess` makes it inherit that gate's `Src.hasOrderedMemoryRef()`
+scan bail (`:427`). But `a16abscmp` folds `volatile g1 == volatile g2` — folding `g1` means folding it
+*across `g2`'s intervening volatile load*, which the ordered-ref bail rejects. `noStoreBetween` allowed it
+(g2 isn't a store) and the emission stays ordered (`lda g1; cmp g2`). So the two gates are **not** mergeable
+into one logic; they stay **two helpers**, each gaining the other's capability separately.
+
+**(b) the volatile-drop is NOT pure size upside — it REGRESSES common shapes → REVERTED.** Dropping
+`shouldFoldMemAccess`'s volatile bail (single-use clamp) is *correct* (the folds are 1-access, ordering-safe)
+but the byte-diff over the a16 corpus was **net +17 B, 19 files GREW** — `a16abscmp` **+43**, `a16cmp` **+37**
+(default 8-bit mode). Disasm root cause: folding a single-use volatile load **consumed as bytes** by a 16-bit
+compare makes the operand **re-read** (`cmp b16v+1` twice) and adds `ldx #1/#0` + branches — the abs operand
+(3 B) loses to the imag8 (zp, 2 B) path. This is governing lesson #2/#3 exactly: *a native/abs form is not
+automatically smaller; a blanket change that regresses common shapes to win a sub-case is wrong — gate it.*
+The wins were real but mixed (`a16sunfold` −30, `a16eqvalc` −20, `pr38819` −14, ≈ −92 B) and **outweighed** by
+the regressions (≈ +109 B). **Reverted — and not pursued.** A residency/schedule-gated version (fold a
+volatile load only where the addressing mode is as cheap as imag8 and the value isn't split to bytes) could in
+principle keep the wins, but they're modest and entangled with the losses while a correct gate is high-effort
+and partly overlaps existing native paths — so this is a **recorded negative result, not a backlog item.** The
+door's open if a future need surfaces (the measurement harness + this record are the durable artifacts).
+
+**(a) AA-precision on the value-side gate — clean win, LANDED.** `noStoreBetween → noClobberBetween` + a
+`mayAlias(AA, *Def)` check (plus a hard bail on *ordered* stores, so a volatile load never reorders across a
+volatile store); `AA` threaded through `foldable{Abs,Indir}Load16` + their 10 call sites (`AA` is the
+`GIMatchTableExecutor` base member). Isolated byte-diff: **−26 B, 0 regressions** (`990128-1` −8, `packed-1`
+−8, `zero-struct-1` −10; byte-neutral on every a16 micro-test). `verify-machineinstrs`: **0 new failures** vs
+baseline (the 2 pre-existing `a16regpress`/`a16scavnz` RA-stress fails are baseline too). Differential: **all
+5 Probe-A c-torture recovery sites PASS** `host==default==+mos-a16==+mos-xy16` on **both MAME and bsnes-jg**
+(`990128-1`/`packed-1`/`pr43236`/`pr85529-1`/`zero-struct-1`, 0x600D) + a broad 120-test sweep. `0002`
+regenerated (round-trips; only the `noClobberBetween` + AA-threading hunks, no foreign absorption).
+
+**Net Phase 2:** AA-precision (a) lands (−26 B, the genuine half of the unification); the volatile-drop (b) is
+measured net-negative and **closed** (not pursued — see above). Regression guard = the 5 c-torture sites (in
+`inscope.tsv`, run by `dev/run.sh torture`) + `dev/measure-loadfold-bytes.sh`.
+
 ## Verification (the contract — fill raw output under each step when executed)
 
 The bar is the **differential**: host == default(non-a16)@MAME == a16@MAME == a16@bsnes-jg, plus

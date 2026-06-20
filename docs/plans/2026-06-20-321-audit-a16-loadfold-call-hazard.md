@@ -47,12 +47,24 @@ The two guards are therefore **complementary by design, not redundant**:
 - `shouldFoldMemAccess` — AA-precise on aliasing (folds across provably-non-aliasing stores), but volatile-strict.
 - `noStoreBetween` — volatile-tolerant, but conservatively bails on *any* intervening store/call.
 
-## Deferred (precision nicety, not a correctness gap)
+## Deferred → RESOLVED 2026-06-20: AA-precision landed, volatile-drop re-deferred
 
-A future unification could fold single-use volatile loads **and** be AA-precise on non-aliasing stores
-(`noStoreBetween` + a `mayAlias` check, dropping `shouldFoldMemAccess`'s volatile bail). That would recover
-the handful of folds `noStoreBetween` conservatively drops (a non-aliasing store between load and use). Pure
-codegen-size upside, no correctness impact — deferred; gate on a measurement showing it's worth a rebuild.
+The unification was specced, measured, and **split** by the byte-diff — see
+[the unify plan §Phase 2 RESULTS](2026-06-20-321-unify-loadfold-gate-aa-volatile.md):
+
+- **AA-precision LANDED.** `noStoreBetween` → **`noClobberBetween`** + a `mayAlias(AA, *Def)` check (an
+  *ordered* store still hard-bails, so a volatile load never reorders across a volatile store). Recovers the
+  handful of folds the old "any store" rule dropped — **−26 B** over the a16 corpus, **0 regressions**,
+  differential-clean on both emulators.
+- **volatile-drop CLOSED (net-negative, not pursued).** Dropping `shouldFoldMemAccess`'s volatile bail is
+  *correct* but measured **net +17 B / 19 regressions** — folding a single-use volatile load *consumed as
+  bytes* loses to imag8 (`a16abscmp` +43, `a16cmp` +37). A residency/schedule-gated version could keep the
+  modest wins, but they're entangled with the losses and the gate is high-effort — **recorded, not a backlog
+  item.** Reverted.
+- **The literal single-helper merge was rejected by measurement:** it inherits `shouldFoldMemAccess`'s
+  ordered-ref scan bail and regresses `a16abscmp`'s `volatile g1 == g2` fold (which folds `g1` across `g2`'s
+  intervening volatile load). The two gates stay complementary — `noClobberBetween` (volatile-tolerant +
+  now AA-precise) and `shouldFoldMemAccess` (volatile-strict) — **not** merged.
 
 ## Conclusion
 
