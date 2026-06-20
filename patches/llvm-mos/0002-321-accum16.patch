@@ -1761,7 +1761,7 @@ index 21910cfeab37..e3fece8b0616 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index cbdd54ab2ca7..29fa281ac98a 100644
+index cbdd54ab2ca7..556c7918c9d2 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -2287,7 +2287,7 @@ index cbdd54ab2ca7..29fa281ac98a 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1927,6 +2363,758 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -1927,6 +2363,779 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    }
    return selectGeneric(MI);
  }
@@ -2506,6 +2506,27 @@ index cbdd54ab2ca7..29fa281ac98a 100644
 +    bool IsX = isXc16Reg(Dst, MRI), IsY = isYc16Reg(Dst, MRI);
 +    if (!IsX && !IsY)
 +      return false;
++    // #321 seed 247/445: a 16-bit value classed Xc16/Yc16 whose only consumers are
++    // COPYs (i.e. it is immediately spilled to Imag16, never used as a real index) is
++    // NOT a genuine index. Loading it straight into X16/Y16 leaves a 16-bit value live
++    // in an index register across unrelated ops — and an intervening 8-bit-index op's
++    // narrowing `sep #$10` zeroes the X/Y high byte, silently corrupting it (the
++    // miscompile). Route such loads through the accumulator instead (reclass the dst to
++    // Imag16 and fall through to selectMem16Abs's LDAbs16→STAImag16). Keep the direct
++    // X16/Y16 load only when the value is genuinely consumed as an index. Selection is
++    // bottom-up, so Dst's users are already selected here.
++    {
++      bool GenuineIndex = false;
++      for (const MachineInstr &U : MRI.use_nodbg_instructions(Dst))
++        if (!U.isCopy()) {
++          GenuineIndex = true;
++          break;
++        }
++      if (!GenuineIndex) {
++        MRI.setRegClass(Dst, &MOS::Imag16RegClass);
++        return false;
++      }
++    }
 +    auto Ld = Builder.buildInstr(IsX ? MOS::LDXAbs16 : MOS::LDYAbs16)
 +                  .addDef(Dst)
 +                  .add(MI.getOperand(1));
