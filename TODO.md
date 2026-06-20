@@ -261,10 +261,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `crc32_tab` `bf/9f long,X` access is correct, index in-range, bank 0). The `requiredXWidth` 8-bit-indexed
   family gap (LDAAbsIdx/ST*Idx/*IndirIdx/ALU-Idx → `XW_None`) is a **real latent defect worth landing as
   hardening (Track A)** but provably does **not** fire in 247/445. The actual cause is **runtime** (a value bug
-  in the `long,X` X=16 path, or a MAME `long,X`-under-X16 behavior). **Decisive next test:** run **`xy16@bsnes-jg`**
-  on both seeds (the original differential never did) — agrees ⇒ MAME emulation artifact, not a compiler bug;
-  diverges ⇒ real bug → fill-vs-read runtime bisection. Plan split into Track A (hardening, ready) + Track B
-  (runtime bisection).
+  in the `long,X` X=16 path, or a MAME `long,X`-under-X16 behavior). **Disambiguation DONE 2026-06-20: it's a
+  REAL compiler bug** — `xy16@bsnes-jg` (the leg the original differential omitted) gives the SAME wrong values
+  as `xy16@MAME` (445: 0x35E7; 247: 0x7C73) → not a MAME artifact; the xy16 ROM is genuinely miscompiled (and
+  the workflow's "value-correct" claim is falsified — width correct, values wrong). Two generic minimal repros
+  (byte `tab[1024]`; `uint32_t[256]` CRC32) both PASS 4-way ⇒ the trigger is specific to seed 445/247, not a
+  generic table-index shape. **Next: delta-reduce seed 445** (install `cvise`/`creduce` with a load-insensitive
+  bsnes-jg interestingness test, or fill-vs-read bisection) → root-cause + fix. **Track A** (`requiredXWidth`
+  8-bit-indexed-family hardening — real latent defect, ready) commit is **blocked on the concurrent uncommitted
+  `noClobberBetween`/`0002` work**; land after that commits.
   [handoff](docs/plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md) ·
   [fix plan](docs/plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the

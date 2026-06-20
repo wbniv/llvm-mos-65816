@@ -119,17 +119,30 @@ structurally instead of by enumeration.)* Regression guard: a micro-test that fo
 op reached on every edge from an X16 region with no intervening classified-X8 op (the workflow's `go()` recipe;
 keep a genuinely-16-bit index alive so LTO can't narrow it). Land independently of Track B.
 
-### Track B — the actual 247/445 bug (cause not yet found; runtime bisection)
+### Track B — the actual 247/445 bug — CONFIRMED a real compiler bug (cause not yet isolated)
 
-1. **Disambiguate compiler-bug vs MAME-emulation-bug (do first):** run **`xy16@bsnes-jg`** on both seeds.
-   - `xy16@bsnes` == oracle ⇒ **MAME `long,X`-under-X16 artifact.** Not a compiler bug: file a MAME note,
-     close the seeds as emulator-caveat (and prefer bsnes-jg for the xy16 leg on `long,X` shapes). Done.
-   - `xy16@bsnes` != oracle ⇒ **real codegen/runtime bug** → step 2.
-2. **Runtime fill-vs-read bisection** (the genuine-X16 path is the only suspect left): build a variant where
-   the `crc32_tab` FILL goes via the xy16 `9f long,X` store but the READBACK is forced through a known-good
-   8-bit pointer path (isolates the store); and the converse — a host-initialized constant table read via the
-   xy16 `bf long,X` path (isolates the load). Whichever side flips the value localizes store vs load. Then
-   MIR/runtime-trace that op. (Reduction of the full seed is the fallback.)
+1. **Disambiguate compiler-bug vs MAME-artifact — DONE 2026-06-20: it's a REAL compiler bug.** Ran
+   `xy16@bsnes-jg` on both seeds (host-side jgxcheck, the leg the original differential omitted):
+   ```
+   seed 445: xy16@bsnes got=0x35E7 want=0x0D1D  FAIL   (same wrong value as xy16@MAME)
+   seed 247: xy16@bsnes got=0x7C73 want=0x80FE  FAIL   (same wrong value as xy16@MAME)
+   ```
+   **Both independent emulators agree on the SAME wrong xy16 value** ⇒ not a MAME `long,X`-under-X16 artifact;
+   the xy16 ROM is genuinely miscompiled. **This also falsifies the workflow's "value-correct at every indexed
+   op" conclusion** — the static X-WIDTH is correct, but the generated code produces wrong VALUES. The bug is a
+   value/semantic error the width-only static diff missed (or a non-indexed divergence in the X16 region).
+2. **Generic-shape minimal repros — both NEGATIVE (do not guess; reduce).**
+   - `tab[1024]` byte-array, 16-bit-index fill+sum → PASSES 4-way (0xFE00). Plain 16-bit byte indexing is fine.
+   - CRC32 with a real `uint32_t[256]` table (4-byte elements, `*4`-scaled 16-bit index via `long,X`) → PASSES
+     4-way (0x404F). So even the closest hand-written analogue of the Csmith `crc32_tab` shape is correct.
+   ⇒ the trigger is a *specific interaction* in seed 445/247, not any generic table-index shape.
+3. **Next — delta-reduce seed 445 (the reliable path; generic guesses are exhausted).** No `cvise`/`creduce`
+   installed; either install one (interestingness = build default+xy16 host-side, run BOTH via `jgxcheck`
+   (bsnes-jg is load-insensitive → safe even under parallel reduction), interesting iff both produce a value
+   and they differ) or hand-reduce. Then root-cause the minimal case (likely the genuine-X16 `bf/9f long,X`
+   crc32_tab access producing wrong bytes, or an s32/`long` value op in that region). The fill-vs-read
+   bisection (force the readback through an 8-bit pointer vs a host-initialized constant table read) is the
+   fallback localizer.
 
 ---
 
