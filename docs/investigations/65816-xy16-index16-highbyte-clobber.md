@@ -127,13 +127,37 @@ At a narrowing point where `XH`/`YH` is live, save the 16-bit index value to a s
   means inserting spill code and rewriting downstream uses by hand, with recomputed liveness (`LiveRegUnits`),
   in a pass that today only places `rep`/`sep`. Easy to get subtly wrong; the most error-prone option.
 
+## UPDATE (during implementation) — a phase-ordering wrinkle in approach A
+
+Inspecting the **actual pre-RA MIR** (not the `-S` schedule) showed the triggering op is, before register
+allocation, a *flexible* 8-bit load pseudo (`load i8 @g_110_2` → a GPR-result pseudo). Whether it becomes an
+8-bit-**index** `LDY_Absolute` (which forces the narrowing `sep` and clobbers `XH`) or a harmless accumulator
+`LDA` is **decided by the register allocator + `expandPostRAPseudo`** — *after* the point a pre-RA pass runs.
+So a pre-RA "mark `XW_X8` ops as clobbering `XH`/`YH`" pass (the simple version of A) **cannot precisely
+identify which ops to mark**: the `XW_X8`-ness is allocation-dependent.
+
+This doesn't kill A, but it forces a choice:
+- **A′ (conservative pre-RA clobber):** mark `XH`/`YH` clobbered on every op whose operand reg-class *could*
+  be allocated to X/Y as an 8-bit index (reg-class-based, allocation-independent ⇒ pre-RA-safe). **Correct**
+  (an over-claimed clobber only ever forces an *unnecessary* spill, never a miscompile). Cost = over-spill,
+  but likely **small in practice** because 16-bit index values are normally short-lived (the non-LTO schedule
+  spills `Xc16`→`imag16` immediately; the bug is LTO *extending* that live range). Must be **measured**.
+- **C (post-RA spill repair):** in `MOSInsertREPSEP` (post-RA, where `requiredXWidth` already identifies the
+  8-bit-index ops *precisely* and the allocation is final), detect a 16-bit index value (`XH`/`YH`) live
+  across a narrowing `sep` and spill→reload it. **Precise** (no over-spill) but needs liveness + spill/reload
+  + use-rewriting machinery in a pass that today only places `rep`/`sep`.
+
+The cleanest *conceptual* fix — materialize `rep`/`sep` (and their `XH`/`YH` clobbers) **pre-RA** so the
+allocator inherently sees them — remains the largest re-architecture and is still not recommended.
+
 ## Recommendation
 
-**Approach A.** It is the only **general + correct** fix: it encodes the actual hardware invariant (a live
-16-bit index value pins the index width, so 8-bit-index ops clobber the high bytes) at the right phase
-(pre-RA, where the allocator can act on it). B is incomplete (doesn't cover genuine-index live ranges); C is
-correct-able but high-risk post-RA surgery. A's only real cost is potential extra spills, which is a **size**
-question to *measure*, not a correctness risk — and it is `HasIndex16`-gated so a16/default are untouched.
+**Approach A′** (conservative reg-class-based pre-RA clobber): it keeps the fix as a small pass that leverages
+the existing allocator's spilling (no hand-written spill/reload machinery, the error-prone part of C), it is
+the structural hardware-invariant framing we want, and its only downside (over-spill) is a **measurable size**
+question, not a correctness risk. Fall back to **C** only if A′'s measured size cost is unacceptable. Both are
+`HasIndex16`-gated ⇒ a16/default byte-identical. *(Pending the owner's steer on the A′-vs-C trade-off before
+implementing — the over-spill cost is unknown until built.)*
 
 ### Implementation plan for A (next step, on approval)
 
@@ -149,8 +173,16 @@ question to *measure*, not a correctness risk — and it is `HasIndex16`-gated s
 
 ## Notes
 
-- **This is entirely our #321 code** (`+mos-xy16`, the `XH/YH/X16/Y16` classes are `#321 xy16` additions in
-  patch `0002`) — **not** an upstream llvm-mos defect, so no upstream report is owed; the fix is in `0002`.
+- **Ownership / upstream relevance.** Verified: `XH/YH/X16/Y16`, `Xc16/Yc16`, and `MOSInsertREPSEP` (net-new,
+  `--- /dev/null`) are all added by patch `0002`; upstream's `W65816` exists only as an **8-bit / emulation-
+  mode** target (`FeatureAccum16`/`FeatureIndex16` are explicitly *NOT* implied by `FamilyW65816`). So the
+  code and the bug are ours — but this is **not** merely a private-feature defect. The invariant it encodes
+  (the 65816's *single shared index-width flag* zeroes `XH`/`YH` on narrowing) is **fundamental hardware
+  behavior**, so the corrected register model is foundational native-65816 support that belongs in the **M2
+  upstream contribution** of native 16-bit codegen, not a fork-local afterthought. There is no bug to file
+  against *current* upstream (they lack native 16-bit mode), but the fix should be expressed as a structural
+  *hardware invariant* (every op that forces 8-bit index clobbers `XH`+`YH`) and carried into that
+  contribution — not bolted on as an `xy16` special case.
 - The 18-line cvise output and the 8-line UB-free repro are saved at `/tmp/xy16-reduce-445/SAVED-*.c`; the
   8-line form should become the committed regression micro-test.
 - Seed 247 shares the idiom (a 16-bit value routed through an index register, live across an 8-bit-index op);

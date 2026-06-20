@@ -129,6 +129,16 @@ Full internal record: [frame-ABI study plan §Outcome](plans/2026-06-20-321-fram
   his `snesxc` reg lib + multi-bank linker, contribute our native-mode crt0 + dual-emulator CI on top). This
   is *engaging someone else's PR*, not opening our own. Strategy in
   [`docs/415-snes-target-reconciliation.md`](415-snes-target-reconciliation.md).
+- **Native 65816 16-bit codegen (`+mos-a16` / `+mos-xy16`) + the index-width register model.** The whole #321
+  native-16-bit slice is fork-only — upstream's `W65816` is **8-bit / emulation-mode** (`FeatureAccum16` /
+  `FeatureIndex16` are *not* implied by `FamilyW65816`; `Ac16/Xc16/Yc16/XH/YH` and `MOSInsertREPSEP` are
+  net-new in `0002`). The **M2** goal is to upstream this. A correctness prerequisite surfaced 2026-06-20: the
+  16-bit **index-register model must encode the hardware invariant** that narrowing the 65816's *single shared
+  index-width flag* zeroes `XH`/`YH` — so a 16-bit index value can't be live across an 8-bit-index op (else
+  its high byte is silently lost; the seed 247/445 miscompile). Root cause + fix scoping:
+  [`docs/investigations/65816-xy16-index16-highbyte-clobber.md`](investigations/65816-xy16-index16-highbyte-clobber.md).
+  Fixed fork-side as a **structural hardware invariant** (not an `xy16` special-case); carry that model into
+  the upstream contribution. Blocked on the broader native-16-bit upstreaming (large; maintainer ABI alignment).
 
 > *(The ROADMAP-step-6 DWARF **test + docs** item moved up to **Ready to post now #5** on 2026-06-19 —
 > both halves are now drafted: the staged lit test + the `<output>.elf` doc note.)*
