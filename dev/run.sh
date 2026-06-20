@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_call|farcc_imag32|farcc_split|farcc_axy|farcc_stack|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_call|farcc_imag32|farcc_split|farcc_axy|farcc_stack|measure-far-cc|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -82,6 +82,9 @@ Targets:
   farcc_stack  #320 Inc 4 Ph2 (A3): same round-trip source built +mos-farcc-stack — far
              pointer variant (d), the whole 32-bit ptr in one 4-byte slot on the SOFT
              static stack (CCAssignToStack + ptrtoint/inttoptr); read == 0xF3, both emulators
+  measure-far-cc #320 Inc 4 Ph2 (M): bytes + round-trip throughput per far-ptr CC variant
+             (examples/65816/farcc_bench.c loop + dev/probe-cycles.lua, fixed-frame iteration
+             count — MAME has no Lua total_cycles()); emits the a/b/c/d table
   xcheck     second-emulator fidelity cross-check: boot the far ROMs in bsnes-jg
              (cycle-accurate, independent of MAME) headless and assert the same
              WRAM results — confirms the bank-$01 far read isn't a MAME quirk

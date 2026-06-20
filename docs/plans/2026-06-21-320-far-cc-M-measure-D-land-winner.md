@@ -44,6 +44,20 @@ is a sound cycle proxy for a **differential** (variant-vs-variant) comparison. B
 (run a fixed wall of frames, read how many loop iterations the program completed — more iterations = faster
 codegen). Deterministic on both emulators.
 
+## M — measured result (2026-06-21, `dev/run.sh measure-far-cc`, 120 frames)
+
+| variant | flag | `.text` B | round-trips / 120 f | cost_rel |
+|---|---|---|---|---|
+| **(a) Imag32** | `+mos-farcc-imag32` | **70** | **50441** | **1.00** (fastest) |
+| (b) Imag16+bank | `+mos-farcc-split` | 86 | 41385 | 1.22 |
+| (c) A:X+Y | `+mos-farcc-axy` | 102 | 43572 | 1.16 |
+| (d) soft-stack | `+mos-farcc-stack` | 174 | 30626 | 1.65 |
+
+**Verdict — (a) Imag32 wins on BOTH axes, decisively:** it is the smallest *and* the fastest; every other
+variant is both bigger and slower (every cell `corpus_result == 0xF3`-correct). The go/no-go ("smallest AND
+not materially slower in cycles") is satisfied with room to spare — no variant displaces (a) on either
+dimension, so the tie-break never even fires. **Ship (a).**
+
 ## D — land the winner as the default far-ptr CC
 
 Expected verdict (pending M): **(a) Imag32** — smallest, register-resident (so also fewest memory accesses
