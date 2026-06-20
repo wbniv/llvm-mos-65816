@@ -11,7 +11,7 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 |--------|----------|------|--------|
 | `wt/321-frame-abi` | `/home/will/SRC/llvm-mos-65816-frame-abi` | frame-ABI head-to-head: (a) DP-window + (b) stack-relative vs (c) soft-static ([plan](plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)) | **RESOLVED — CONFIRMED-shelved (NULL)** 2026-06-20: A0 census found 0/13 realistic fns profit (frames are ~unused; locals live in `__rc`). A1–M not built. **TODO:** merge durable artifacts (`frameabi_*`) to `main` + tear down; discard the (a)/(b) `0002` diff. |
 | `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — Phases 0–4 done (s32 fixed); Phase 5 (sampled CI) open | ~~**MERGED** `dd5616b` → main 2026-06-19~~ |
-| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~ |
+| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~. **OPEN:** Csmith seed-247 `+mos-xy16`-only runtime miscompile (a16 correct), handed off 2026-06-20 — repro `dev/run.sh fuzz --gen csmith 1 247`, [handoff](plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md). |
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |
 | `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): corpus trigger check | ~~CLOSED WON'T-DO~~ — 0/6 progs, 0 B, `f52d5b8` |
 
@@ -143,10 +143,21 @@ Line numbers drift because `vendor/` is edited by multiple agents — **grep for
 Under `vendor/llvm-mos/llvm/lib/Target/MOS/`:
 
 - `MOSLegalizerInfo.cpp` — GISel legalization: `legalizeICmp`, `legalizeAddSub`, `legalizeLoadStore16`, the
-  `+mos-a16` gates (e.g. `NativeS16Eq`); also the four `hasAccum16()`-gated s32↔s16 rules
-  (`G_ANYEXT`/`G_TRUNC`/`G_MERGE_VALUES`/`G_UNMERGE_VALUES`) so `+mos-a16` handles `int32_t`/`long`.
+  `+mos-a16` gates (e.g. `NativeS16Eq`); also the `hasAccum16()`-gated s32↔s16 rules
+  (`G_ANYEXT`/`G_TRUNC`/`G_MERGE_VALUES`/`G_UNMERGE_VALUES`) so `+mos-a16` handles `int32_t`/`long`. **Wide
+  scalars under a16 narrow to s16 (not s8), so s32 is 2×s16** — new wide merge/unmerge shapes need rules:
+  the direct **4×s8→s32 `G_MERGE_VALUES`** is custom-legalized (`legalizeMergeS32FromBytes`) into the legal
+  2-level form (`merge→s16 ×2, then →s32`) because `selectMergeValues` only takes a 2-source merge. The
+  symmetric s32→4×s8 unmerge is still `unsupported` (no seed hit it yet). *Gotcha:* a whole-module frozen
+  `.ll` is a poor regression fixture for these — it over-triggers by compiling runtime fns (`__adddf3`, s64)
+  with `+mos-a16`, which the real link doesn't; use the deterministic Csmith seed as the gate instead.
 - `MOSInstructionSelector.cpp` — selection: `select*`, the `m_CmpNZ*` / `CmpNZ*_match` matchers, operand-fold
-  helpers (`getImm16Operand`, `foldableAbsLoad16`).
+  helpers (`getImm16Operand`, `foldableAbsLoad16`/`foldableIndirLoad16`). **A16 load-fold helpers MUST guard
+  against intervening clobbers:** folding a load into a later ALU/compare operand re-reads memory at the
+  *user's* point, so `noStoreBetween(Def,User)` bails if any `mayStore`/`isCall` sits between (else a load
+  folded across a call reads the mutated value — the pr34768 miscompile). Upstream 8-bit folds use
+  `shouldFoldMemAccess` (AA-precise) for this, but it bails on *volatile* loads which the #321 corpus folds
+  single-use; `noStoreBetween` is the volatile-tolerant tailoring. Any new a16 fold helper must replicate it.
 - `MOSInstrPseudos.td` + `MOSInstrInfo.cpp` — pseudos: `CmpBrImag16` (Imag16-resident LHS),
   `CmpBrImm16` (const RHS), `CmpBrAbsAbs16` (both-global), `CmpBrAbsImm16` (global LHS + const RHS),
   `CmpBrImagAbs16` (computed LHS + global RHS); + their post-RA expansion (`expandCmpBr16`).
