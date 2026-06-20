@@ -858,6 +858,21 @@ def classify_known(log):
     return None
 
 
+# Deterministic repros for the deferred KNOWN_ISSUES defects, each paired with the kid it must
+# classify as. The `known-issues` XPASS guard (cmd_known_issues) asserts every one STILL crashes
+# -verify-machineinstrs under BOTH +mos-a16 and +mos-xy16 with this exact signature. When an
+# upstream/RA fix lands, the repro verifies CLEAN and the guard FAILS loudly — so the now-stale
+# KNOWN_ISSUES entry gets dropped (else it would silently mask a future regression of the same
+# signature) and the repro promoted to a positive differential gate. Maintain in lockstep with
+# KNOWN_ISSUES: dropping an entry there means dropping its row here too.
+# (a16-zp-pressure-overflow is intentionally absent: its repro is a gitignored c-torture file and
+# a LINK error, not a verify crash — so it can't be a verify-only guard row.)
+KNOWN_ISSUE_REPROS = [
+    ("examples/65816/a16regpress.c", "regalloc-out-of-registers"),
+    ("examples/65816/a16scavnz.c",   "scavenger-p-not-gpr"),
+]
+
+
 def save_known(seed, csrc, kid):
     d = TRIAGE / "known"
     d.mkdir(parents=True, exist_ok=True)
@@ -1034,6 +1049,64 @@ def triage_file(name, src_path, reason, extra=None):
     base.with_suffix(".txt").write_text("\n".join(info))
 
 
+def cmd_known_issues(args):
+    """XPASS guard: assert every KNOWN_ISSUE_REPROS file STILL crashes -verify-machineinstrs under
+    BOTH +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment one verifies
+    clean (the deferred bug got fixed) so the stale KNOWN_ISSUES entry is dropped + the repro
+    promoted to a positive gate. Pure host verify — no container/SDK/emulator/secret needed."""
+    WORK.mkdir(parents=True, exist_ok=True)
+    legs = [("+mos-a16", A16), ("+mos-xy16", XY16)]
+    total = len(KNOWN_ISSUE_REPROS) * len(legs)
+    reproduces = 0
+    fixed, drift = [], []
+    print("==> known-issues XPASS guard: each KNOWN_ISSUES repro must still crash verify "
+          "(+mos-a16 AND +mos-xy16)")
+    for rel, kid in KNOWN_ISSUE_REPROS:
+        src = ROOT / rel
+        if not src.exists():
+            print("  %-30s  MISSING SOURCE (%s)" % (rel, src))
+            drift.append((rel, kid, "repro source missing"))
+            continue
+        for tag, flags in legs:
+            ok, vlog = verify_machineinstrs(src, WORK / "ki.vo", flags=flags)
+            if ok:
+                print("  %-30s %-9s  XPASS — verifies CLEAN (issue [%s] no longer reproduces)"
+                      % (rel, tag, kid))
+                fixed.append((rel, kid, tag))
+            else:
+                got = classify_known(vlog)
+                if got == kid:
+                    print("  %-30s %-9s  xfail [%s] (still reproduces)" % (rel, tag, kid))
+                    reproduces += 1
+                else:
+                    print("  %-30s %-9s  DRIFT — crashes but signature=%s, expected [%s]"
+                          % (rel, tag, ("[%s]" % got) if got else "unclassified", kid))
+                    drift.append((rel, kid, "signature %s != [%s] under %s"
+                                  % (("[%s]" % got) if got else "unclassified", kid, tag)))
+    print()
+    if fixed:
+        print("XPASS: %d known-issue repro/leg(s) NO LONGER REPRODUCE — the deferred bug looks FIXED:"
+              % len(fixed))
+        for rel, kid, tag in fixed:
+            print("  - %s verifies clean under %s" % (rel, tag))
+        # de-dup the kids needing action
+        for kid in sorted({k for _, k, _ in fixed}):
+            print("ACTION: drop KNOWN_ISSUES['%s'] (and its KNOWN_ISSUE_REPROS row) in tools/a16_fuzz.py,"
+                  % kid)
+            print("        then promote the repro to a POSITIVE gate (host==default==+mos-a16==+mos-xy16).")
+    if drift:
+        print("DRIFT: %d known-issue repro(s) changed signature/availability — investigate before trusting"
+              " the XFAIL:" % len(drift))
+        for rel, kid, why in drift:
+            print("  - %s [%s]: %s" % (rel, kid, why))
+    if fixed or drift:
+        print("RESULT: FAIL — known-issue guard tripped (see ACTION/DRIFT above)")
+        return 1
+    print("RESULT: PASS — %d/%d known-issue legs still reproduce (XFAIL regression guard intact)"
+          % (reproduces, total))
+    return 0
+
+
 def cmd_check(args):
     """Differential check of one fixed source (a kernel / combinatorial test)."""
     src = Path(args.src)
@@ -1112,6 +1185,10 @@ def main():
     pc.add_argument("--name")
     pc.add_argument("--no-bsnes", action="store_true")
     pc.set_defaults(func=cmd_check)
+    pk = sub.add_parser("known-issues",
+                        help="XPASS guard: assert each KNOWN_ISSUES repro still crashes verify "
+                             "(fails loudly when a deferred bug is fixed → drop the entry)")
+    pk.set_defaults(func=cmd_known_issues)
     args = ap.parse_args()
     rc = args.func(args)
     sys.exit(rc or 0)

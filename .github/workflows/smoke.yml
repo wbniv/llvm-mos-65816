@@ -104,6 +104,16 @@ jobs:
         if: steps.toolchain-cache.outputs.cache-hit != 'true'
         run: dev/run.sh toolchain
 
+      # XPASS guard: assert each deferred KNOWN_ISSUES repro (a16regpress/a16scavnz) STILL
+      # crashes -verify-machineinstrs under +mos-a16 AND +mos-xy16. Pure host verify — needs
+      # only the toolchain (no SDK/emulator/SPC700 secret), so it runs unconditionally. When an
+      # upstream/RA fix lands a repro verifies clean and this step turns RED with the exact
+      # follow-up: drop the KNOWN_ISSUES entry + promote the repro to a positive gate.
+      - name: known-issues — XPASS guard (deferred KNOWN_ISSUES repros still reproduce)
+        env:
+          MOS_TOOLCHAIN: /work/build/llvm-mos-install
+        run: dev/run.sh known-issues
+
       # Build the SDK incl. the snes-far platform against the from-source toolchain.
       # MOS_TOOLCHAIN is the in-container path (the repo is mounted at /work).
       - name: Build SDK against the from-source toolchain
