@@ -1,4 +1,4 @@
-# #320 / #321 implementation status — 2026-06-20
+# #320 / #321 implementation status — 2026-06-21
 
 Quick-reference for "what's built, what's deferred, and where the ABI comparison landed."
 For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO.md).
@@ -103,8 +103,10 @@ upstream ABI discussion that the design note is meant to open.
 | `corpus-a16` differential gate (+a16/+xy16 on both emus) | ✅ Standing capability + in CI |
 | bsnes-jg `xcheck` in CI | ✅ Verified green (run 27823207476) |
 | Native-mode crt0 (DBR=0 via `phk;plb`, explicit contract) | ✅ Done |
-| Register-scavenger crash (`$p is not a GPR`) | ⬜ **Upstream bug** — XFAIL'd locally (8/500 seeds); fix deferred |
-| `+mos-a16 -Os` RA failure (`globals.c`) | ⬜ XFAIL'd — coalescing ruled out; only Phase-3 residency rework could fix; re-open trigger defined |
+| Register-scavenger crash (`$p is not a GPR`) | ⬜ **Upstream bug** — XFAIL'd (8/500 seeds), now under **both** `+mos-a16` and `+mos-xy16`; XPASS-guarded; fix deferred |
+| `+mos-a16 -Os` RA failure (`globals.c`) | ⬜ XFAIL'd — coalescing ruled out; only Phase-3 residency rework could fix; re-open trigger defined; XPASS-guarded |
+| KNOWN_ISSUES XFAIL handling — `evaluate()` classifies under `+mos-xy16` too + both-legs hardening | ✅ **Done (2026-06-21)** — a known `+mos-a16` issue can't mask a NEW `+mos-xy16` crash; both verify legs run; a new crash on either leg always hard-FAILs. [classify](plans/2026-06-21-321-xy16-verify-leg-classify-known.md) · [both-legs](plans/2026-06-21-321-xy16-verify-both-legs-hardening.md) |
+| KNOWN_ISSUES XPASS guard — `dev/run.sh known-issues` (unconditional in CI) | ✅ **Done (2026-06-21)** — asserts `a16regpress`/`a16scavnz` still crash `-verify-machineinstrs` under both modes; fails loudly with "drop the entry + promote to a positive gate" the moment an upstream/RA fix lands. [plan](plans/2026-06-21-321-known-issues-xpass-guard.md) |
 | F4 `TXY`/`TYX` dead-flag fix (patch `0003`) | ✅ In fork; **upstream PR ready** (user-triggered to post) |
 
 ### Pending codegen (greenlit or in-progress)
