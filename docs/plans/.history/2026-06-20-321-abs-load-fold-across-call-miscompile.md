@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/62b77d0) | #321 audit: a16 load-fold sites — pr34768 hazard class closed, no other site |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/364de87) | #321 c-torture -Os sweep + load-fold fix: record results (1114 PASS, 0 FAIL) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/86c2602) | #321 fix: a16 load-fold must not move a load across a memory-clobbering call |
 
 <!--history-meta v1
+62b77d0	author	Will Norris
+62b77d0	added	28
+62b77d0	deleted	0
+62b77d0	files	1
+62b77d0	body	Swept every a16 load/operand-fold site for the same "fold a load across a\nmemory-clobbering call/store" hazard that caused pr34768. Finding: the two\nhelpers fixed in 86c2602 (foldableAbsLoad16 / foldableIndirLoad16) were the\nONLY vulnerable ones. All others are already guarded:\n- upstream 8-bit m_FoldedLd* and loadStoreValueIntoA16 -> shouldFoldMemAccess\n  (isCall + mayAlias, AA-precise)\n- threadAccum16 + late peepholes -> explicit isCall/mayStore/modifiesRegister\n- selectMem16Indir/Abs lower a single node in place (no cross-point move)\n- CmpBrAbsAbs16 expansion only expands an already-selected (guarded) pseudo\n\nDeliberately did NOT consolidate the helpers onto shouldFoldMemAccess: it bails\non all volatile loads, which would regress the intentional single-use volatile-\noperand folds the corpus relies on (a16abscmp/a16loadfold/a16mixfold). The two\nguards are complementary by design. No code change; doc-only record.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 364de87	author	Will Norris
 364de87	added	13
 364de87	deleted	2

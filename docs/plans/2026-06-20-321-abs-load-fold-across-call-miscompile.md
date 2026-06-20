@@ -115,33 +115,13 @@ Applied identically to `foldableAbsLoad16` (G_LOAD16_ABS) and `foldableIndirLoad
 - **R2 (low):** `isCall()`/`mayStore` must cover `__call_indir` and ordinary `jsr` — both are `isCall()` in
   MIR; inline asm covered by `hasUnmodeledSideEffects()`.
 
-## Audit — all a16 load-fold sites checked for the same hazard (2026-06-20, no further bug)
+## Audit — all a16 load-fold sites checked for the same hazard
 
-After the fix, swept **every** load/operand-fold site in the MOS backend for the same "fold a load across a
-memory-clobbering call/store" hazard. Result: **the two helpers fixed here were the only vulnerable ones.**
-
-| Fold site | Guard against intervening clobber | Verdict |
-|---|---|---|
-| Upstream 8-bit `m_FoldedLdAbs`/`Idx`/`Indir`/`IndirIdx` (`MOSInstructionSelector.cpp:441–530`) | `shouldFoldMemAccess(Dst,Src,AA)` — bails on `isCall`/`hasUnmodeledSideEffects` + any `mayAlias` store (`:420–435`) | **safe** |
-| `loadStoreValueIntoA16` store-value fold (`:2940–2943`) | `shouldFoldMemAccess(StoreMI,*Def,AA)` | **safe** |
-| `threadAccum16` + the post-RA late peepholes (`MOSLateOptimization.cpp:107,119,489`) | explicit `isCall()`/`mayStore()`/`modifiesRegister(A16)` bails | **safe** |
-| `selectMem16Indir` / `selectMem16Abs` | lower a *single* G_LOAD16/G_STORE16 node in place — no cross-program-point move | **n/a — safe** |
-| `CmpBrAbsAbs16` expansion (`MOSInstrInfo.cpp:396,1430`) | only *expands* an already-selected pseudo; the fold decision is `selectBrCondImm`→`foldableAbsLoad16` (now guarded) | **safe** |
-| `foldableAbsLoad16` / `foldableIndirLoad16` (compare/ALU/EQ/indexed-cmp operand folds) | **was single-use + same-BB only → the bug**; now `noStoreBetween` | **FIXED (86c2602)** |
-
-**Why not consolidate the two helpers onto `shouldFoldMemAccess` (the codebase's standard guard)?**
-Considered and rejected: `shouldFoldMemAccess` bails on **all volatile loads** (`:369`), but the #321 design
-deliberately folds *single-use volatile* operands (one access either way, so correctness-preserving) — and
-the corpus/tests rely on it (`a16abscmp`, `a16loadfold`, `a16mixfold` fold `volatile unsigned short` globals;
-verified). Switching would *regress* those folds. `noStoreBetween` + the existing single-use check is the
-right tailoring: it folds single-use volatile loads **and** blocks the across-clobber hazard. The two guards
-are **complementary by design, not redundant** — `shouldFoldMemAccess` is AA-precise on aliasing but
-volatile-strict; `noStoreBetween` is volatile-tolerant but conservatively bails on any intervening store.
-(A future unification could fold single-use volatile loads *and* be AA-precise on non-aliasing stores, but
-that is a precision nicety, not a correctness gap — deferred.)
-
-**Conclusion: the bug class is closed.** No code change resulted from the audit (the one defect was already
-fixed in `86c2602`); this section is the durable record.
+Swept every load-fold site in the MOS backend for the same across-call hazard; **the two helpers fixed here
+were the only vulnerable ones** (all others guard via `shouldFoldMemAccess` or explicit `isCall`/`mayStore`).
+The full findings table + the "why not consolidate onto `shouldFoldMemAccess`" rationale (it bails on volatile
+loads the #321 corpus folds) live in the standalone audit plan
+[`2026-06-20-321-audit-a16-loadfold-call-hazard.md`]. **Bug class closed; no code change resulted.**
 
 ## References
 
