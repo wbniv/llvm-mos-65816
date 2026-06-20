@@ -31,7 +31,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   counts pick the winner, reusing the frame-ABI methodology (census, pre-registered go/no-go bars,
   `dev/measure-frame-abi.sh`, `dev/probe-cycles.lua`). The CC table (`CC_MOS`) has no 32-bit rule
   today → a `p2` mis-sizes into a 16-bit `RS1`; each variant adds the assignment rule + 4-byte
-  (dis)assembly. [plan](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) (Phase 2).
+  (dis)assembly. Unlike the frame-ABI study, this one MUST ship one variant (a tie → simplest = Imag32),
+  not "change nothing". [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
 - [ ] **#320 far calls — follow-ups** (the JSL/RTL direct-call MECHANISM landed 2026-06-20, see Done).
   Remaining: (a) **far function pointers** — indirect far call (`jsl`/`jml [addr]` through a far code
   pointer; today an indirect call stays near); (b) **mixed-banking** — a far function that calls a NEAR
@@ -886,4 +887,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        (G_STORE_FAR_INDIR -> STIndirLong, the symmetric [dp] store); only a dedicated far_store.c
        micro-test is unwritten — trivial polish, not a tracked deliverable. Nothing open.
      fp:bffa7ff820f61a6a fp:41566cc6a199377c -->
+- [ ] **(triage)** **Not** changing near-pointer or scalar passing, or the A/X scalar return convention (LOCKED) — this — _from [2026-06-20-320-far-pointer-cc-build-all-variants.md](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)_  <!-- fp:b7a659d550bb10a3 -->
+- [ ] **(triage)** **Not** far function pointers / indirect far calls (separate Inc 4 follow-up) — this is far *data* — _from [2026-06-20-320-far-pointer-cc-build-all-variants.md](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)_  <!-- fp:9b54c26fd2f46d90 -->
+- [ ] **(triage)** **Not** auto-merging all variants: only the winner lands; the rest are a measured spike. — _from [2026-06-20-320-far-pointer-cc-build-all-variants.md](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)_  <!-- fp:5612fe3202e783db -->
+- [ ] **(triage)** **Not** posting upstream from this plan — the evidence paragraph is prepared; posting is user-triggered. — _from [2026-06-20-320-far-pointer-cc-build-all-variants.md](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)_  <!-- fp:a5a5bc42d30cd1b6 -->
 <!-- END auto-captured-deferrals -->

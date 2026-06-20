@@ -128,7 +128,10 @@ can run in the default 8-bit build too → a genuine 4-way if the callee takes/r
 
 ## Phase 2 — far-pointer calling convention: build all variants and measure
 
-The multi-variant ABI study. **Separate execution, its own plan** when started; outline here.
+The multi-variant ABI study. **Now has its own detailed, executable plan:**
+[2026-06-20-320-far-pointer-cc-build-all-variants.md](2026-06-20-320-far-pointer-cc-build-all-variants.md)
+(feature flags per variant, feasibility/A0, census, N-way bytes+cycles measurement, pre-registered
+go/no-go, `wt/320-far-cc` worktree). Summary outline below.
 
 **Reuse the established methodology** (`docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md`):
 feature flags per variant (off by default, `MOSFeatures.td`) · a feasibility ROM per variant · a
