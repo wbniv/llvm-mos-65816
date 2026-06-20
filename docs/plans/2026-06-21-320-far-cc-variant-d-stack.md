@@ -1,6 +1,9 @@
 # #320 Inc 4 Ph2 A3 — far-pointer CC variant (d): stack passing (+ the build-vs-drop decision)
 
-**Date:** 2026-06-21 · **Status:** PLANNED (not started) · **Scope:** the 4th and final far-pointer CC
+**Date:** 2026-06-21 · **Status:** ✅ A3a DONE — variant (d) **soft-stack** landed (`ebaa515`), round-trips
+arg+return `0xF3` on MAME + bsnes-jg, corpus 7/7. **Byte census: (d) 174 B vs (a) 70 / (b) 86 / (c) 102 →
+dominated.** Hardware-`,S` (d-hard) **recorded-and-dropped**; the final winner pick defers to the parent
+plan's D (still expected: (a) Imag32). · **Scope:** the 4th and final far-pointer CC
 variant on `wt/320-far-cc` — pass/return a 32-bit far pointer (`p2`) **in memory (on a stack)** rather than
 in registers. **Builds on:** [the build-all-variants plan](2026-06-20-320-far-pointer-cc-build-all-variants.md)
 (P0 + A0 Imag32 + A1 Imag16+bank + A2 A:X+Y all landed & two-emulator-verified). **Prior art / precedent:**

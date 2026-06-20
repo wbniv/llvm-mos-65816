@@ -32,13 +32,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   go/no-go bars). Each variant adds the gated assignment rule (before `CCIfPtr`) + 4-byte (dis)assembly.
   Unlike the frame-ABI study, this one MUST ship one variant (a tie → simplest = Imag32), not "change
   nothing".
-  **In progress (2026-06-21, `wt/320-far-cc`):** P0 + A0 (variant a Imag32) + A1 (variant b Imag16+bank) +
-  A2 (variant c A:X+Y) landed (`10a5fc0`, `741a8c2`, `02953e7`), each round-tripping arg+return to `0xF3` on
-  MAME + bsnes-jg; `0004` captures all three (round-trip-verified). **Next:** A3 (variant d stack —
-  [plan](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md): build the cheap soft-stack route,
-  record-and-drop hardware-`,S`) → build the **net-new** cycle harness (`dev/probe-cycles.lua` +
-  `dev/measure-far-cc.sh` — neither exists; the frame study deferred its harness when its A0 census
-  short-circuited) → M (measure) → D (promote winner → `0001`, default-on).
+  **In progress (2026-06-21, `wt/320-far-cc`):** P0 + A0 (a Imag32) + A1 (b Imag16+bank) + A2 (c A:X+Y) +
+  A3a (d soft-stack, [plan](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)) all landed (`10a5fc0`,
+  `741a8c2`, `02953e7`, `ebaa515`), each round-tripping arg+return to `0xF3` on MAME + bsnes-jg; `0004`
+  captures all four (504 lines, round-trip-verified). **Byte census: (a) 70 / (b) 86 / (c) 102 / (d) 174 →
+  (a) Imag32 wins, (d) dominated**; variant (d) hardware-`,S` recorded-and-dropped. **Next:** the
+  **net-new** cycle harness (`dev/probe-cycles.lua` + `dev/measure-far-cc.sh` — neither exists; the frame
+  study deferred its harness when its A0 census short-circuited) → M (full cycle measure) → D (pick (a),
+  promote → `0001`, default-on).
   [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
 - [ ] **#320 far calls — follow-ups** (the JSL/RTL direct-call MECHANISM landed 2026-06-20, see Done).
   Remaining: (a) **far function pointers** — indirect far call (`jsl`/`jml [addr]` through a far code

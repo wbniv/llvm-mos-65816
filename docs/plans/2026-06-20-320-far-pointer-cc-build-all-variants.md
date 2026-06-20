@@ -2,7 +2,8 @@
 
 **Date:** 2026-06-20 (rev. 2026-06-21) · **Status:** 🔬 IN PROGRESS — P0 + A0 (variant a Imag32) + A1
 (variant b Imag16+bank) + A2 (variant c A:X+Y) landed on `wt/320-far-cc`, each round-tripping on MAME +
-bsnes-jg; A3 (variant d stack), M (measurement) and D (decision) pending — see
+bsnes-jg; A3a (variant d soft-stack) landed too (`ebaa515`) — byte census ran ((d) 174 B, dominated by
+(a) 70); only M (cycle measurement) and D (final pick) remain — see
 [Implementation status](#implementation-status-as-of-2026-06-21). · **Scope:** `vendor/llvm-mos/` codegen (the CC) +
 a far-pointer-passing workload + the reused measurement harness. Runs on a feature worktree, not `main`.
 **Builds on:** [Inc 4 Ph1 far calls](2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) (JSL/RTL landed —
@@ -22,7 +23,7 @@ so the (c) infrastructure rode in alongside (b).
 | **A0** variant (a) Imag32 | ✅ **landed** (`10a5fc0`) | CC rule `CCIfPtrAddrSpace<2, CCIf<"MOSFarCCImag32(State)", CCAssignToReg<[RL1,RL2,RL3]>>>`; round-trips arg **and** return on MAME + bsnes-jg (`farcc_imag32.{c,sh}`). |
 | **A1** variant (b) Imag16+bank | ✅ **landed** (`741a8c2`) | `CC_MOS_FarPtrSplit` custom assigner + `assignCustomValue` decompose/recompose; `farcc_split.sh` passes both emulators. |
 | **A2** variant (c) A:X+Y | ✅ **landed** (`02953e7`) | `CC_MOS_FarPtrAXY` custom assigner (A:X offset + Y bank) + the 3-location `assignCustomValue` branch; `farcc_axy.sh` round-trips arg **and** return to `0xF3` on MAME + bsnes-jg; negative control + default byte-identical (corpus 7/7). **Singular by design** — one far ptr, must precede any A/X-consuming scalar arg. |
-| **A3** variant (d) stack | ⬜ **planned** — [sub-plan](2026-06-21-320-far-cc-variant-d-stack.md) | Build the cheap **soft-stack** route (reuses the existing `assignValueToAddress` / `CCAssignToStack` mem path — the one varargs use); **record-and-drop** the hardware-`,S` route (blocked on `SPAdj==0` at `MOSRegisterInfo.cpp:278` + missing 65816 `,S` opcodes; frame-ABI measured 0/13). |
+| **A3** variant (d) stack | ✅ **A3a landed** (`ebaa515`) — [sub-plan](2026-06-21-320-far-cc-variant-d-stack.md) | Soft-stack route shipped: `CCIf<"MOSFarCCStack", CCAssignToStack<4,1>>` + an `assignValueToAddress` ptrtoint/inttoptr guard; round-trips arg **and** return `0xF3` on both emulators; corpus 7/7. **Byte census: (d) 174 B vs (a) 70 / (b) 86 / (c) 102 → dominated** (store+reload cost). Hardware-`,S` route **recorded-and-dropped** (`SPAdj==0` at `MOSRegisterInfo.cpp:278` + missing 65816 `,S` opcodes; frame-ABI 0/13). |
 | **M** measurement | ⬜ **not started** | The byte harness is reusable; **the cycle harness does not exist yet** (see the corrected note under the phased sequence). |
 | **D** decision | ⬜ **not started** | Winner promotes from the spike patch into `0001` (below). |
 
@@ -129,7 +130,7 @@ like `wt/321-frame-abi`).
 |---|---|---|
 | **P0** ✅ | The 4 features (off by default) + `farPtrCC()` plumbing + the **shared** call-lowering plumbing that lets a `p2` be assembled/disassembled as 4 bytes / 2 words (the part every variant needs). | **Byte-identical default** — corpus+kernels default & `+mos-a16` disasm identical across the feature add; features recognized + inert; corpus 7/7. (Reuse `dev/frameabi-byte-identical.sh`.) |
 | **A0** ✅ | **Variant (a) Imag32** end-to-end: the far-ptr CC rule + `RL#` assignment + a `p2`-across-`noinline` gate that PASSES. | A far pointer passed as an arg AND returned across a real call round-trips on **MAME + bsnes-jg**; `-verify-machineinstrs` clean. This is the feasibility proof + the default-winner baseline. |
-| **A1–A3** 🔬 | Variants (b), (c), (d) to the same correctness bar (each behind its flag). **Now: (b) ✅ landed (`741a8c2`); (c) ✅ landed (`02953e7`); (d) ⬜ not started.** | Each passes the same `p2`-across-call gate on both emulators. A variant that proves materially harder than (a) for no plausible win may be **recorded-and-dropped** (note why) rather than fully built — measure the opportunity first (census-style), per the frame-ABI lesson. |
+| **A1–A3** 🔬 | Variants (b), (c), (d) to the same correctness bar (each behind its flag). **Now: (b) ✅ landed (`741a8c2`); (c) ✅ landed (`02953e7`); (d-soft) ✅ landed (`ebaa515`); (d-hard) record-and-dropped.** | Each passes the same `p2`-across-call gate on both emulators. A variant that proves materially harder than (a) for no plausible win may be **recorded-and-dropped** (note why) rather than fully built — measure the opportunity first (census-style), per the frame-ABI lesson. |
 | **M** ⬜ | The measurement: bytes (`text_bytes`) + cycles on the far-ptr-passing workload, every cell differentially verified. | The N-way table (`prog \| a \| b \| c \| d \| Δ`) for bytes and cycles, inner-loop + whole-call brackets. |
 | **D** ⬜ | Decision: apply the go/no-go; land the winner in `0001`; make it the default-on far-ptr CC; record the rest. | Winner is differential-clean, `0001` round-trips (`dev/regen-patch-0001.sh`), no foreign hunks. |
 
