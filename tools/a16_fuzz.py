@@ -907,29 +907,33 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True):
     WORK.mkdir(parents=True, exist_ok=True)
     SCRATCH.mkdir(parents=True, exist_ok=True)
 
-    # 1) crash detector first: verify-machineinstrs under +mos-a16 and +mos-xy16
+    # 1) crash detector: -verify-machineinstrs under +mos-a16 AND +mos-xy16 (xy16 implies a16).
+    #    Run BOTH legs (unless a16 is itself a NEW crash) so a known a16 issue can never MASK a
+    #    genuinely-new xy16-only crash. Priority: a NEW (unclassified) crash on EITHER leg hard-FAILs;
+    #    only if neither leg has a new crash does a known issue on either leg yield XFAIL. See
+    #    docs/plans/2026-06-21-321-xy16-verify-both-legs-hardening.md.
     if verify:
-        ok, vlog = verify_machineinstrs(src, WORK / "chk.vo", flags=A16, cflags=cflags)
-        if not ok:
-            kid = classify_known(vlog)
-            if kid:
-                return "XFAIL", "known issue [%s]" % kid, None
-            on_triage("verify-machineinstrs / compiler crash (+mos-a16)", {"verify": vlog})
+        ok_a, vlog_a = verify_machineinstrs(src, WORK / "chk.vo", flags=A16, cflags=cflags)
+        kid_a = None if ok_a else classify_known(vlog_a)
+        if not ok_a and not kid_a:
+            # New, unclassified +mos-a16 crash — hard fail now; the xy16 leg can't change this.
+            on_triage("verify-machineinstrs / compiler crash (+mos-a16)", {"verify": vlog_a})
             return "CRASH", "verify-machineinstrs (+mos-a16) failed", None
-        # #321 xy16: also verify under +mos-xy16 (implies +mos-a16; catches X-lattice regressions)
+        # #321 xy16: always verify under +mos-xy16 too — EVEN when the a16 leg is a known issue — so a
+        # NEW xy16-only crash (e.g. an X-lattice regression) on a known-a16 program is never hidden by
+        # the a16 XFAIL. (xy16 catches X-lattice regressions; that's the population most likely to hit one.)
         ok_xy, vlog_xy = verify_machineinstrs(src, WORK / "chk_xy.vo", flags=XY16, cflags=cflags)
-        if not ok_xy:
-            # Symmetric with the +mos-a16 leg above: a known, already-diagnosed defect
-            # (regalloc-out-of-registers, scavenger-p-not-gpr, …) fires under +mos-xy16 too —
-            # xy16 IMPLIES a16 — so classify it XFAIL, not a spurious hard CRASH. An unmatched
-            # xy16 crash still hard-FAILs (e.g. a genuine X-lattice regression), preserving this
-            # leg's regression-guard purpose. (For repros that also crash the a16 leg this is moot
-            # — that leg short-circuits first; it matters when a16 verifies clean but xy16 doesn't.)
-            kid = classify_known(vlog_xy)
-            if kid:
-                return "XFAIL", "known issue [%s]" % kid, None
+        kid_xy = None if ok_xy else classify_known(vlog_xy)
+        if not ok_xy and not kid_xy:
+            # New, unclassified +mos-xy16 crash — hard fail even if the a16 leg was a known XFAIL.
             on_triage("verify-machineinstrs / compiler crash (+mos-xy16)", {"verify": vlog_xy})
             return "CRASH", "verify-machineinstrs (+mos-xy16) failed", None
+        # No NEW crash on either leg. If either leg hit a known, already-diagnosed defect → XFAIL
+        # (regalloc-out-of-registers, scavenger-p-not-gpr, …). Both legs of a pressure defect produce
+        # the same kid in practice; report the a16 one when set, else the xy16 one.
+        kid = kid_a or kid_xy
+        if kid:
+            return "XFAIL", "known issue [%s]" % kid, None
 
     # 2) compile default, +mos-a16, and +mos-xy16 ROMs
     try:
