@@ -189,6 +189,30 @@ in `0002`**. The `MOSIndexWidthClobber.{cpp,h}` files remain in `vendor/` (gitig
 
 *Pending the owner's steer on C vs the scheduler-constraint before the next implementation attempt.*
 
+## UPDATE 3 (#2 scheduler/liveness investigated) — also not a clean win
+
+Pinned the exact mechanism via LTO MIR after each pass: the **machine scheduler** interleaves the `g_110_2`
+load (32B) between `g_21`'s `Xc16` load (16B) and its spill-COPY (64B) — harmless *there* (it's `ac`/A) — but
+the **register allocator** then assigns that load to **`$y`** (an 8-bit-index op) while `$x16` is live, so the
+narrowing `sep` for the `ldy` zeroes the high byte. So the conflict is, again, an **allocation-time** choice.
+
+Two findings make #2 unattractive as a quick fix:
+1. The MOS scheduler's custom `MOSSchedStrategy::tryCandidate` (`MOSMachineScheduler.cpp`) is pressure-only
+   and **does not honor cluster edges**, and its `registerClassPressureDiff` counts **physical** regs only —
+   so neither a cluster-mutation nor an `Xc16`-pressure heuristic takes effect without extra surgery. A
+   working #2 needs a custom `ScheduleDAGMutation` **plus** a `tryCandidate` change, and still only papers
+   over the RA choice.
+2. **A cleaner lead surfaced:** `selectMem16Abs` (`MOSInstructionSelector.cpp:3020`) already lowers
+   `G_LOAD16_ABS` through `A16`→`STAImag16` — it never emits `LDXAbs16`/`Xc16`. So `g_21` landing in `Xc16`
+   (where it is *immediately spilled, never used as an index*) is an over-eager **reg-bank/class** assignment
+   upstream of the load selector — approach **B** territory. Preventing a non-index 16-bit value from being
+   classed `Xc16` would root-fix this shape, but the assignment is driven by `RegBankSelect`/the consumer and
+   is tangled.
+
+**Net:** A′ (pre-RA clobber) and #2 (scheduler) both founder on the same rock — the conflict is created at /
+after register allocation. The robust fix is **C (post-RA repair)**, already filed as a TODO; **B**
+(reg-class steering away from `Xc16` for non-index values) is the intriguing-but-tangled root alternative.
+
 ## Recommendation (superseded by UPDATE 2 above)
 
 **Approach A′** (conservative reg-class-based pre-RA clobber): it keeps the fix as a small pass that leverages
