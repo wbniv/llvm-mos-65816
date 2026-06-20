@@ -66,6 +66,29 @@ Hypotheses to walk (cap at 3, per the debugging guide):
 - **H3 — a 16-bit index value narrowed/widened incorrectly** by `selectXY16` (the `abs,X16`/`(zp),Y16`
   selection) so the addressing width disagrees with the index reg's actual width.
 
+## Phase 1 — RESULT (partial, 2026-06-20) — root-cause NOT yet isolated
+
+Method works; root cause not yet pinned (this is genuine `55ec505`-class difficulty). Findings:
+
+- **Got `main`'s MIR after `mos-insert-rep-sep` from the REAL LTO link** (not the whole-module replay, which
+  crashes on `__adddf3` s64 under `+mos-xy16` — the same runtime-fn over-trigger seen in the s32 work):
+  `mos-clang --config … +mos-xy16 -Os <prog> -Wl,-mllvm,-print-after=mos-insert-rep-sep` → grep `main`.
+- **Linear X-width trace of seed 445's `main` is inconclusive.** The only genuine 16-bit indexing is the
+  `crc32_tab` fill loop (`STAbsXIdx $a, @crc32_tab(+0..3), $x16` at X=16, a >256-entry / 4-byte-stride table —
+  `CMPImm16 $a16, 256` loop bound). All the 8-bit-index ops (`LDXIdx`/`LDAAbsIdx $y`, `LDAAbsIdx $x`,
+  `CMPImag8 $y`) sit at X=8 (set by a `SEP #$30`, never re-widened on the straight-line path). No obviously
+  mis-bracketed op on linear inspection ⇒ the bug is likely a **CFG/loop-edge X-width subtlety** (H2) or a
+  16-bit index whose **high byte isn't zeroed** (the value, not the bracket), not a flat `requiredXWidth` gap (H1).
+- **Negative result — a minimal 16-bit-table-index repro does NOT reproduce.** Built `tab[1024]` filled +
+  summed via a 16-bit loop index (forces real X=16 through LTO): `default == a16 == xy16 = 0xFE00`, all agree.
+  So **plain 16-bit table indexing is correct** — the bug needs the *specific* seed-445 shape (4-byte-stride
+  `crc32_tab` build + the `transparent_crc` readback, or a control-flow/loop interaction), not generic X=16.
+
+**Next step (handed back / for a focused follow-up):** delta-reduce seed 445 itself (the reliable path — the
+generic-shape guesses missed), OR do CFG-aware X-lattice analysis across the `crc32_tab` loop edges + the
+`transparent_crc` call boundary. The `transparent_crc` helper (CRC byte-walk over the struct) is the next
+suspect to disasm under xy16 vs a16. Cap hit (3 hypotheses) → checkpointed here per the debugging-limit rule.
+
 ## Phase 2 — fix + regression-guard (same change)
 
 - Fix in `MOSInsertREPSEP.cpp` (`requiredXWidth` / X-lattice) or `selectXY16` per Phase 1; **`HasIndex16`-gated**
