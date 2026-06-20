@@ -919,6 +919,15 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True):
         # #321 xy16: also verify under +mos-xy16 (implies +mos-a16; catches X-lattice regressions)
         ok_xy, vlog_xy = verify_machineinstrs(src, WORK / "chk_xy.vo", flags=XY16, cflags=cflags)
         if not ok_xy:
+            # Symmetric with the +mos-a16 leg above: a known, already-diagnosed defect
+            # (regalloc-out-of-registers, scavenger-p-not-gpr, …) fires under +mos-xy16 too —
+            # xy16 IMPLIES a16 — so classify it XFAIL, not a spurious hard CRASH. An unmatched
+            # xy16 crash still hard-FAILs (e.g. a genuine X-lattice regression), preserving this
+            # leg's regression-guard purpose. (For repros that also crash the a16 leg this is moot
+            # — that leg short-circuits first; it matters when a16 verifies clean but xy16 doesn't.)
+            kid = classify_known(vlog_xy)
+            if kid:
+                return "XFAIL", "known issue [%s]" % kid, None
             on_triage("verify-machineinstrs / compiler crash (+mos-xy16)", {"verify": vlog_xy})
             return "CRASH", "verify-machineinstrs (+mos-xy16) failed", None
 
