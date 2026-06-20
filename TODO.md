@@ -293,7 +293,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   report them as FAILs until fixed. For the xy16 worktree owner — the a16 worker did not touch xy16 codegen.
   **Fix plan written 2026-06-20** (grounded in seed-445 disasm: the divergence is an index op in the wrong X
   width — the `requiredXWidth`/`MOSInsertREPSEP` X-lattice class, same family as `55ec505`; root-cause via MIR
-  after `mos-insert-rep-sep`, execute on `wt/321-xy16`).
+  after `mos-insert-rep-sep`, execute on `wt/321-xy16`). **Phase 1 PARTIAL 2026-06-20** (root-cause NOT yet
+  isolated): linear X-width trace of seed 445's `main` inconclusive — all 8-bit-index ops sit correctly at X=8
+  on the straight-line path; the only genuine X=16 region is the `crc32_tab` fill loop; **negative result**: a
+  minimal 16-bit-table-index fill+sum repro PASSES 4-way (plain 16-bit table indexing is correct). The bug
+  needs the specific seed-445 shape. H2 (CFG/loop-edge X-width subtlety or high byte of a 16-bit index
+  uninitialized) is the prime suspect over H1 (flat `requiredXWidth` gap). Debugging cap (3 hypotheses) hit,
+  checkpointed. **Next step:** delta-reduce seed 445 itself OR CFG-aware X-lattice analysis across the
+  `crc32_tab` loop edges + `transparent_crc` call boundary.
   [handoff](docs/plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md) ·
   [fix plan](docs/plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the

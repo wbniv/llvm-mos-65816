@@ -11,7 +11,7 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 |--------|----------|------|--------|
 | `wt/321-frame-abi` | `/home/will/SRC/llvm-mos-65816-frame-abi` | frame-ABI head-to-head: (a) DP-window + (b) stack-relative vs (c) soft-static ([plan](plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)) | **RESOLVED — CONFIRMED-shelved (NULL)** 2026-06-20: A0 census found 0/13 realistic fns profit (frames are ~unused; locals live in `__rc`). A1–M not built. Durable artifacts (`frameabi_*`) **MERGED to `main`** `f114c42`; CC note ready to post (user-triggered). **Branch RETAINED until notified** (holds the inert, un-landed (a)/(b) `0002` spike) — do NOT tear down. |
 | `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — Phases 0–4 done (s32 fixed); Phase 5 (sampled CI) open | ~~**MERGED** `dd5616b` → main 2026-06-19~~ |
-| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~. **OPEN:** Csmith seed-247 `+mos-xy16`-only runtime miscompile (a16 correct), handed off 2026-06-20 — repro `dev/run.sh fuzz --gen csmith 1 247`, [handoff](plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md). |
+| `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~. **OPEN:** Csmith seeds 247+445 `+mos-xy16`-only runtime miscompiles (a16+default+bsnes agree; xy16@MAME wrong). [Fix plan](plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md) written; **Phase 1 PARTIAL** (2026-06-20): root-cause NOT yet isolated — linear X-width trace inconclusive, minimal 16-bit-table-index repro PASSES (plain indexing is correct); H2 (CFG/loop-edge X-width subtlety) prime suspect; debugging cap hit, checkpointed. **Next:** delta-reduce seed 445 OR CFG-aware X-lattice analysis on the `crc32_tab` loop + `transparent_crc` boundary. Repro: `dev/run.sh fuzz --gen csmith 1 {247,445}`. |
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |
 | `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): corpus trigger check | ~~CLOSED WON'T-DO~~ — 0/6 progs, 0 B, `f52d5b8` |
 
@@ -158,6 +158,11 @@ Under `vendor/llvm-mos/llvm/lib/Target/MOS/`:
   folded across a call reads the mutated value — the pr34768 miscompile). Upstream 8-bit folds use
   `shouldFoldMemAccess` (AA-precise) for this, but it bails on *volatile* loads which the #321 corpus folds
   single-use; `noStoreBetween` is the volatile-tolerant tailoring. Any new a16 fold helper must replicate it.
+  **Upcoming — Phase 2 greenlit 2026-06-20:** the split will be unified in `canFoldLoadIntoUser(Dst,Src,AA)`:
+  volatile-bail becomes a single-use clamp; `foldableAbsLoad16`/`foldableIndirLoad16`/`noStoreBetween` are
+  deleted. Phase-1 instrument-and-count found 43 volatile-recovery sites + 7 AA-precision sites across 2615
+  compiles. Until landed: "any new fold helper" still means `noStoreBetween` + single-use.
+  [plan](plans/2026-06-20-321-unify-loadfold-gate-aa-volatile.md).
 - `MOSInstrPseudos.td` + `MOSInstrInfo.cpp` — pseudos: `CmpBrImag16` (Imag16-resident LHS),
   `CmpBrImm16` (const RHS), `CmpBrAbsAbs16` (both-global), `CmpBrAbsImm16` (global LHS + const RHS),
   `CmpBrImagAbs16` (computed LHS + global RHS); + their post-RA expansion (`expandCmpBr16`).
