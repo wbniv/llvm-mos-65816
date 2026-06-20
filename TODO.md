@@ -256,20 +256,22 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `--config` link is the gate). Found a real `+mos-a16` defect on run one — the `G_UNMERGE_VALUES s32` legalizer
   gap — now **FIXED on `main`** (s32 represented as 2×s16 under a16; the sweep re-runs **92/100 PASS, 0 xfail, 0
   mismatch** and the `a16-unmerge-s32` XFAIL is removed — [s32 plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md)).
-  **Phase 4 (larger seed sweeps) RAN 2026-06-20** — seeds 101–300: **180/200 PASS, 18 skip, 2 defects found**:
+  **Phase 4 (larger seed sweeps) RAN 2026-06-20** — seeds 101–300 then 301–500 (400 fresh programs):
   (a) seed 113 a16 `G_MERGE_VALUES` s8×4→s32 legalizer crash — **FIXED** (see Done `[321-a16-s32-merge-s8x4]`);
-  (b) seed 247 `+mos-xy16`-only runtime mismatch — **handed off** to the xy16 area (see the open xy16 item below).
+  (b) seeds 247 + 445 `+mos-xy16`-only runtime mismatches (same signature) — **handed off** to the xy16 area
+  (see the open xy16 item below). The a16 path is otherwise clean across both ranges (0 crash, 0 a16 mismatch).
   Remaining: **Phase 5** (sampled CI mirroring `corpus-a16`). **Yarpgen
   follow-up:** add a `--gen yarpgen` later to target
   `-O1/-Os` loop/scalar-opt bugs (no `platform.info` equiv → 16-bit-int caveat; must redirect its baked-in
   `printf`); the `--gen` seam added here makes it drop-in.
   [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
-- [ ] **#321 xy16 — Csmith seed 247 runtime miscompile (HANDOFF to `wt/321-xy16`).** Csmith Phase-4 found a
-  `+mos-xy16`-only value divergence: `default@MAME=a16@MAME=a16@bsnes=0x80FE` (correct) vs **`xy16@MAME=0x7C73`**.
-  a16 is correct, so it's xy16 index-register codegen (the `selectXY16`/`requiredXWidth`/REP-SEP X-width area,
-  cf. `55ec505`). Deterministic repro: `dev/run.sh fuzz --gen csmith 1 247`. **Not** code-XFAIL'able (the csmith
-  gate only classifies *compile*-log failures, not runtime mismatches), so the 101–300 sweep will report it as a
-  FAIL until fixed. For the xy16 worktree owner — the a16 worker did not touch xy16 codegen.
+- [ ] **#321 xy16 — Csmith runtime miscompiles, seeds 247 + 445 (HANDOFF to `wt/321-xy16`).** Csmith sweeps
+  (101–300, 301–500) found **two** `+mos-xy16`-only value divergences, same signature (a16 + default + bsnes
+  agree; only xy16@MAME wrong): seed 247 (`0x80FE`→`0x7C73`), seed 445 (`0x0D1D`→`0x35E7`). a16 is correct, so
+  it's xy16 index-register codegen (`selectXY16`/`requiredXWidth`/REP-SEP X-width, cf. `55ec505`); two seeds /
+  one signature ⇒ likely a single shared bug. Repros: `dev/run.sh fuzz --gen csmith 1 {247,445}`. **Not**
+  code-XFAIL'able (the csmith gate only classifies *compile*-log failures, not runtime mismatches), so re-sweeps
+  report them as FAILs until fixed. For the xy16 worktree owner — the a16 worker did not touch xy16 codegen.
   [handoff](docs/plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
