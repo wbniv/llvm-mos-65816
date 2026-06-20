@@ -183,41 +183,76 @@ Candidate fix approaches (all xy16/`HasIndex16`-gated; correctness = the 4-way d
 
 Saved repros: `/tmp/xy16-reduce-445/SAVED-minimal-v1.c` (8-line UB-free), `…-cvise18.c` (raw cvise output).
 
-**Full root-cause + fix scoping:** [`docs/investigations/65816-xy16-index16-highbyte-clobber.md`](../investigations/65816-xy16-index16-highbyte-clobber.md).
-Per the scope-first decision, the fix is **not yet landed**; the investigation recommends **approach A**
-(model the `XH`/`YH` clobber on 8-bit-index ops via a pre-RA pass so regalloc spills live 16-bit index values),
-gated on `HasIndex16`. Phase D below executes that approach once the recommendation is approved.
+**Full root-cause + the explored approaches:** [`docs/investigations/65816-xy16-index16-highbyte-clobber.md`](../investigations/65816-xy16-index16-highbyte-clobber.md).
 
 ---
 
-## Phase D — fix (recommended approach: A — see the investigation doc)
+## Phase D — fix — **DONE via approach B** (commit `2d8ab51`)
 
-Fix at the Phase-C root cause, in `vendor/llvm-mos/` (edited in place). Constraints:
-- **HasIndex16-gated** ⇒ `+mos-a16` and DEFAULT builds stay **byte-identical** (verify, don't assume).
-- Conservative (lesson #2): a misclassification must only ever *miss a win / add a safe `sep`*, never regress.
-- Regenerate the tracked patch with `dev/regen-patch.sh`; sanity-check `0002` didn't absorb foreign hunks
-  (`grep -c <foreign-symbol> patches/llvm-mos/0002-*.patch`).
-- Add the minimal `.c` as a **regression micro-test** in the xy16 differential set (regression guard).
+Approach **A′** (pre-RA `XH`/`YH` clobber) and **#2** (scheduler/liveness) were both implemented/investigated
+and **refuted** — they founder on the same rock: the conflict (a 16-bit value held in X across an 8-bit-index
+op) is created *at register allocation*, invisible to any earlier pass. **Approach B** root-fixes it
+*upstream* of that: in `MOSInstructionSelector.cpp` `selectXY16`'s `G_LOAD16_ABS` case, the over-eager direct
+`LDXAbs16`/`LDYAbs16` (which created the spurious `Xc16` value in the first place) now fires **only when the
+loaded value is genuinely used as an index** (has a non-COPY user); otherwise the dst is reclassed to
+`Imag16` and lowered through the accumulator (`selectMem16Abs`'s `LDAbs16`→`STAImag16`). ≈22 lines,
+`HasIndex16`-gated ⇒ a16/DEFAULT byte-identical **by construction** (`selectXY16` is unreachable without
+`+mos-xy16`). Genuine-index codegen is unchanged (no regression); only the spurious-spill shape — the bug —
+is diverted, and the result is *smaller* (the pointless `ldx`/`sep` round-trip is gone).
 
-**Where it runs:** built+tested on **`wt/321-xy16`** (`main`/a16 untouched). The worktree has no built
-toolchain; per `docs/howto-feature-worktree.md`, `cp -al` the prebuilt `build/` subdirs in so
-`dev/run.sh toolchain` does an **incremental** rebuild. (Phase B ran against `main`'s prebuilt *unfixed*
-toolchain — correct; only Phase D needs the rebuilt one.)
+**Where it ran:** on `main` (the integration branch carrying the current `0002` + the incremental build
+tree; the historical `wt/321-xy16` worktree is on an older branch). `0002` was regenerated via a **clean temp
+reconstruction** (pristine + committed `0001`/`0002`/`0003` + just this fix) so a concurrent worker's
+uncommitted **#320 far-pointer** `vendor/` changes were **not** absorbed. No standalone micro-test was added
+— seeds 247 + 445 are deterministic and live in the csmith corpus (the 101–500 sweep is the regression
+guard); a minimal standalone test would compile to all-X8 under LTO and not exercise the X=16 ambient (same
+caveat as `55ec505`).
 
 ---
 
-## Phase E — verify (run each; paste raw output + PASS/FAIL back into this file)
+## Phase E — verify — **RESULT (2026-06-20): all PASS**
 
-1. **Build:** `dev/run.sh toolchain` on the worktree; confirm fresh `clang-23` mtime (stale-binary gotcha).
-2. **Fix works (the headline):** seeds 247 **and** 445 → `0x80FE` / `0x0D1D` on **both** `xy16@MAME` and
-   `xy16@bsnes-jg`; the minimal repro agrees 4-way.
-3. **No a16/default regression — byte-identical:** diff a16 and DEFAULT disasm of 247/445 + the xy16
-   micro-tests pre/post-fix — **zero** change (proves HasIndex16 gating).
-4. **No xy16 regression:** `xy16basic`/`xy16ops`/`xy16indiry`/`xy16spill*` PASS; `k_isort` xy16 leg agrees.
-5. **No broad regression:** `dev/run.sh fuzz --gen csmith 200 101` + `… 200 301` → 0 *new* mismatch
-   (247/445 now PASS); `dev/run.sh torture 60` clean.
-6. **`-verify-machineinstrs` clean**; `0002` round-trips; `git diff --cached --name-only` is exactly my
-   files (never `vendor/`, a foreign patch, or `docs/transcripts/`).
+1. **Build:** `dev/run.sh toolchain` (incremental, on `main`).
+   ```
+   ==> done in 0m 12s: clang version 23.0.0git (…/llvm-mos.git c798c31416f7)
+   ```
+   **PASS** — fresh `clang-23` (re-linked).
+2. **Fix works (the headline):** minimal + 247 + 445, all four configs, both emulators.
+   ```
+   minimal:  default=0x0002  default-O0=0x0002  a16=0x0002  xy16=0x0002   (want 0x0002)
+   seed 445: default=0x0D1D  default-O0=0x0D1D  a16=0x0D1D  xy16=0x0D1D   (want 0x0D1D)
+   seed 247: default=0x80FE  default-O0=0x80FE  a16=0x80FE  xy16=0x80FE   (want 0x80FE)
+   csmith harness (incl. MAME):  [ ok ] seed 247 0x80FE (all agree) · [ ok ] seed 445 0x0D1D (all agree)
+   ```
+   **PASS** — xy16 now matches the oracle everywhere (was 247:0x7C73, 445:0x35E7).
+3. **No a16/default regression — byte-identical:** the fix is entirely inside `selectXY16`, reached only
+   under `STI.hasIndex16()` (`MOSInstructionSelector.cpp:280`) → **unreachable** for a16/DEFAULT.
+   **PASS by construction** (gating — stronger than a spot byte-diff; steps 2 & 5 also show default/a16
+   values unchanged).
+4. **No xy16 regression:** the xy16 micro-test suite.
+   ```
+   xy16basic  PASS (0x0042)
+   xy16ops    PASS (0x2A42, both emulators)   <- genuine index path (LDXImag16/LDAbsXIdx16) UNCHANGED
+   xy16indiry PASS (0x7E5A)
+   xy16spill  PASS
+   xy16spillr PASS (0x3457)
+   ```
+   **PASS** — genuine-index codegen untouched (the fix diverts only the spurious-spill shape).
+5. **No broad regression:** csmith sweep + c-torture.
+   ```
+   ==> csmith: 182/200 PASS, 0 xfail, 18 skip  (0 mismatch, 0 crash, 0 error)   [seeds 101–300]
+   ==> csmith: 186/200 PASS, 0 xfail, 14 skip  (0 mismatch, 0 crash, 0 error)   [seeds 301–500]
+   ==> torture-run: 60 PASS, 0 FAIL, 0 SKIP, 0 XFAIL (of 60)  [default==+mos-a16==+mos-xy16, MAME + bsnes-jg]
+   ```
+   **PASS** — 0 mismatch/crash/error over 400 csmith seeds (247 + 445 pass in-sweep); c-torture 60/60 clean.
+6. **`-verify-machineinstrs` clean; `0002` round-trips; staged exactly my files.**
+   ```
+   verify-machineinstrs (xy16, minimal):              CLEAN (no verifier errors)
+   git apply --check 0002 on pristine+0001+0003:      CLEAN ✓
+   git diff --cached --name-only:  TODO.md  patches/llvm-mos/0002-321-accum16.patch   (no vendor/, no foreign)
+   ```
+   **PASS** — and the `0002` regen via a clean temp reconstruction left the concurrent #320 far-pointer
+   `vendor/` work untouched (0 far-pointer symbols absorbed).
 
 ---
 
@@ -235,11 +270,13 @@ toolchain — correct; only Phase D needs the rebuilt one.)
 - **Hot shared `main` tree.** Reduction writes only gitignored scratch; the fix lands on `wt/321-xy16`; the
   Taskfile change stages only `Taskfile.yml`.
 
-## Deliverables / commits
-- `main`: `Taskfile.yml` `dev-setup` task (Phase A).
-- `wt/321-xy16`: `dev/reduce-xy16.sh` (interestingness test) + the minimal repro + the `vendor/` fix's
-  `patches/llvm-mos/0002-*.patch` regen + the xy16 regression micro-test; update this plan + the canonical
-  Track-B plan with verification evidence; on success retire the handoff note + the open xy16 TODO item.
+## Deliverables / commits (all on `main`)
+- `ba93049` — Phase A `Taskfile.yml` `dev-setup` task + `dev/reduce-xy16.sh` (cvise interestingness test).
+- `4a7a46b` · `8de0bd9` · `4d148dd` · `a199678` · `6e5df4b` — the investigation record (root cause; the
+  refuted A′ + #2; the M2 upstream entry; approach B verified).
+- **`2d8ab51`** — the fix: `patches/llvm-mos/0002-*.patch` (`selectXY16` genuine-index gate) + TODO mark.
+- The handoff note and the open xy16 TODO item are marked **resolved** — this plan's Phase E is the
+  verification record; the full root-cause arc lives in the investigation doc.
 
 ## References
 - Canonical Track-B plan [`2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md`]; handoff

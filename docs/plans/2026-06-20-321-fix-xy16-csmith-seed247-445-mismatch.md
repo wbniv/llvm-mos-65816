@@ -1,5 +1,16 @@
 # #321 fix: `+mos-xy16` Csmith runtime miscompiles (seeds 247 + 445)
 
+> **✅ RESOLVED 2026-06-20 (commit `2d8ab51`) via approach B.** Root cause: a non-index 16-bit value classed
+> `Xc16` was loaded straight into X16 and left live across an 8-bit-index op, whose index-narrowing `sep #$10`
+> zeroes the X/Y high byte. Fix: `selectXY16`'s `G_LOAD16_ABS` emits the direct `LDXAbs16`/`LDYAbs16` only when
+> the value is genuinely used as an index; otherwise it lowers through the accumulator. Verified 4-way on both
+> emulators + csmith 101–500 (0 mismatch / 0 crash over 400 seeds); a16/DEFAULT byte-identical (gated).
+> **Track A** (the separate `requiredXWidth` 8-bit-indexed-family *hardening* — a real latent defect that does
+> **not** fire in 247/445) remains an independent follow-up. Root-cause arc + the refuted A′/#2 approaches:
+> [investigation](../investigations/65816-xy16-index16-highbyte-clobber.md); execution + Phase-E verification
+> evidence: [reduction plan](2026-06-20-321-xy16-seed445-cvise-reduction.md). *(The "execute on `wt/321-xy16`"
+> note below is superseded — the fix landed on `main`, which carries the current `0002` + build tree.)*
+
 **Worktree:** execute on **`wt/321-xy16`** (`/home/will/SRC/llvm-mos-65816-xy16`) — xy16 index-register codegen
 is that branch's domain; `main`/a16 is untouched. Plan lives in the shared `docs/plans/`. Supersedes the
 handoff note [`2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md`].

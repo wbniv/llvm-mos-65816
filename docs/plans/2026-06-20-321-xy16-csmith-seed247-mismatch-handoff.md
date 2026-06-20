@@ -1,6 +1,14 @@
 # #321 xy16 — Csmith runtime miscompiles (HANDOFF to the `wt/321-xy16` owner)
 
-**Status:** found by the Csmith sweeps (Phase 4, seeds 101–300; then 301–500), **not yet fixed**. Handed off
+> **✅ RESOLVED 2026-06-20 (commit `2d8ab51`) — this handoff is retired.** Root-caused via cvise reduction
+> (8-line UB-free repro) and fixed via **approach B**: `selectXY16`'s `G_LOAD16_ABS` only emits the direct
+> `LDXAbs16`/`LDYAbs16` when the value is genuinely used as an index (else it lowers through the accumulator),
+> so a non-index 16-bit value is never left live in X across an 8-bit-index op whose narrowing `sep` zeroes
+> the X/Y high byte. Verified 4-way on both emulators + the csmith 101–500 sweep (0 mismatch / 400 seeds) +
+> c-torture 60/60. See [investigation](../investigations/65816-xy16-index16-highbyte-clobber.md) +
+> [reduction plan](2026-06-20-321-xy16-seed445-cvise-reduction.md). *(Original handoff text below, for history.)*
+
+**Status (original):** found by the Csmith sweeps (Phase 4, seeds 101–300; then 301–500), **not yet fixed**. Handed off
 to the xy16 work area (`wt/321-xy16`) — these are `+mos-xy16`-only defects; a16 is correct in every case.
 
 ## The defects (TWO so far — likely a shared root cause)

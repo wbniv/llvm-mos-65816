@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/1414510) | #321 xy16 plan: Track A unblocked + scoped (structural requiredXWidth rule) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/f410115) | #321 xy16: disambiguation DONE — seeds 247/445 are a REAL compiler bug (both emulators) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/7c773da) | #321 xy16 fix plan: record 10-agent root-cause workflow result (synthesis refuted 3/3) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/f29639c) | #321 xy16 fix plan: record Phase-1 root-cause findings (not yet isolated) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/62aa64f) | #321 xy16: write fix plan for the Csmith seed 247/445 mismatches |
 
 <!--history-meta v1
+1414510	author	Will Norris
+1414510	added	34
+1414510	deleted	13
+1414510	files	1
+1414510	body	Concurrent noClobberBetween work committed (6440db0), so Track A's commit is\nunblocked. Recorded the verified specifics: the gap is real (LDAAbsIdx appears\nunclassified in seed 445 MIR); recommend the STRUCTURAL rule (post-XLow:\nreadsRegister(X/Y) -> XW_X8) over enumeration (the ALU-indexed pseudos are in\nindented TableGen blocks a top-level grep misses). Noted the size-regression\ncheck + the hard-RED-test caveat.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f410115	author	Will Norris
 f410115	added	24
 f410115	deleted	11
