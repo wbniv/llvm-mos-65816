@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|xy16basic|xy16spill|xy16spillr|xy16ops|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -60,6 +60,9 @@ Targets:
   far_cast   #320 Increment 3 (3b): build examples/65816/far_cast.c (snes, +mos-a16),
              assert a near->far address-space cast then RUNTIME deref lowers to
              indirect-long (`lda [dp]`, A7), boot in MAME, check bank-$00 read == 0xF3
+  far_arith  #320 Increment 3 (3c): build examples/65816/far_arith.c (snes, +mos-a16),
+             assert far-pointer arithmetic (fp++ -> G_PTR_ADD {PF,S32}) then RUNTIME
+             deref lowers to indirect-long (`lda [dp]`, A7), boot in MAME, read == 0xF3
   xcheck     second-emulator fidelity cross-check: boot the far ROMs in bsnes-jg
              (cycle-accurate, independent of MAME) headless and assert the same
              WRAM results — confirms the bank-$01 far read isn't a MAME quirk

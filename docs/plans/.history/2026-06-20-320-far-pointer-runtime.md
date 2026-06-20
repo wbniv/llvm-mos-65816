@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/aa5d054) | #320 Inc 3: runtime far-pointer deref (lda [dp]) + near→far cast |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/88b18f0) | #320 Inc 3 plan: runtime far-pointer dereference (lda [dp]), near→far cast, arithmetic |
 
 <!--history-meta v1
+aa5d054	author	Will Norris
+aa5d054	added	198
+aa5d054	deleted	179
+aa5d054	files	1
+aa5d054	body	Extends far-pointer codegen from constant/global absolute-long to RUNTIME far\npointers — a value computed at runtime, held in a ZP register, dereferenced via\nthe 65816 indirect-long instruction.\n\n3a (lda [dp]/sta [dp]): a far pointer laundered through a volatile (can't fold to\nabsolute-long) dereferences via opcode A7. 3b (G_ADDRSPACE_CAST AS0→AS2): a near\npointer zero-extends to a far pointer (bank $00). Both two-emulator verified\n(dev/run.sh far_indir / far_cast + xcheck → MAME + bsnes-jg, corpus_result=0xF3).\n\nThis required the backend's first first-class 32-bit ZP register — Imag32, a quad\nover two RS words = 4 contiguous __rc bytes the [dp] mode reads:\n  - subreg indices sublo16/subhi16, RL#K register entities, MOSReg32Class/Imag32\n  - getReservedRegs reserves any quad whose RS word is reserved (so a far pointer\n    never lands on the stack pointer RS0 / scavenger RS8) without reserving the\n    free RS sibling\n  - getRegClassForType(32)→Imag32; selectMergeValues 2×s16→Imag32 compose with two\n    explicit class-pin sites (else constrainGenericOp leaves class-less bridge COPYs)\n  - copyPhysReg Imag32 + __rc-symbol lowering (MOSMCInstLower/MOSRegisterInfo)\nplus four legalizer type-rules (G_INTTOPTR/G_PTRTOINT/G_PTR_ADD/G_ADDRSPACE_CAST\nfor the far pointer PF) and tryFarIndirectAddressing.\n\nNeeds +mos-a16: a runtime far pointer is a 32-bit VALUE and 32-bit value\nlegalization is a16-gated (the far machinery itself is a16-independent), so the\ngate is 3-way (host + +mos-a16 ×2 emus), not the usual 4-way. The handoff's\nLDA_IndirectLong/STA_IndirectLong MC defs already exist (CC1_All multiclass under\nHasW65816) → MOSInstrInfo.td untouched.\n\nAll in 0001 (the #320 far patch). 0002 (a16) was re-stacked via regen-patch.sh to\naccount for 0001 growing — round-trip PASS (pristine+0001+0002+0003 == live MOS\ndir), 0 far code added to 0002, the concurrent xy16 seed-247 fix preserved.\n\nDeferred: 3c far arithmetic (G_PTR_ADD on AS2) — blocked on the symmetric\ns32→4×s8 G_UNMERGE_VALUES legalization (a16/0002 gap, far_arith.c is first to hit\nit); far-pointer calling convention (pass/return p2 across calls) → Inc 4.\n\nNo regression: corpus 7/7; a16unmerge/a16spill/a16ptr + far-run/far-bank1 PASS.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 88b18f0	author	Will Norris
 88b18f0	added	271
 88b18f0	deleted	0

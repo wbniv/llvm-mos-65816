@@ -8,8 +8,9 @@ For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO
 ## TL;DR
 
 **#320 (far pointers / M1):** the slice that proves the concept is working — far load/store across
-bank boundaries, two emulators. The five-address-space model, far calls (JSL), and runtime far-pointer
-arithmetic are not built yet; they're gated on upstream ABI blessing.
+bank boundaries plus **runtime far-pointer deref/cast/arithmetic (Inc 3 = 3a+3b+3c, complete)**, two
+emulators. The five-address-space model, far calls (JSL), and the far-pointer calling convention are not
+built yet; they're gated on upstream ABI blessing.
 
 **#321 (16-bit accumulator / M2):** the core codegen is complete. Every planned per-op optimization
 is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete re-open trigger. The
@@ -29,7 +30,7 @@ census short-circuited the build at the measurement step.
 | Five-address-space model + full PR | ⬜ Upstream-gated on design-note posting; not started |
 | Far calls (JSL / RTL), cross-bank function pointers | ⬜ Blocked on CC decision + upstream |
 | Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
-| Runtime far-pointer arithmetic (`G_PTR_ADD` on AS2) | ⬜ **Deferred (Inc 3c)** — blocked on symmetric `s32→4×s8 G_UNMERGE_VALUES` legalization (a16/`0002` gap); `far_arith.c` is the first to hit it |
+| Runtime far-pointer arithmetic (`G_PTR_ADD` on AS2) | ✅ **Done (Inc 3c, 2026-06-20)** — `fp++` via the symmetric `s32→4×s8 G_UNMERGE_VALUES` mirror (`legalizeUnmergeS32ToBytes`, a16/`0002`; also closes a latent `uint32_t` shift-≥8 gap); `dev/run.sh far_arith` + `xcheck`, MAME+bsnes-jg PASS. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Far data >2 banks, far calls (JSL/RTL), far-pointer calling convention | ⬜ Deferred past Inc 3 (CC = ABI decision, upstream-gated; grouped with far calls / Inc 4) |
 | Formal #320/#321 psABI document | ⬜ Premature — upstream won't bless ahead of a live implementation |
 

@@ -1,6 +1,6 @@
 # #320 Increment 3 — runtime far-pointer codegen
 
-**Date:** 2026-06-20 · **Status:** IN PROGRESS (rev. 2 — rescoped from evidence)
+**Date:** 2026-06-20 · **Status:** COMPLETE — 3a + 3b + 3c all landed, two-emulator verified (rev. 3)
 **Milestone:** M1 extension
 **Builds on:** [Inc 2b](2026-06-14-320-increment-2b-multi-bank-rom-far-read.md) (cross-bank static far read, PASS)
 
@@ -18,7 +18,7 @@ Three sub-items:
 |---|---|---|---|
 | **3a** | Runtime far-pointer dereference | `G_LOAD`/`G_STORE` on AS2 non-const pointer → `lda [dp]`/`sta [dp]` | ✅ **DONE** — MAME + bsnes-jg |
 | **3b** | Near→far addrspacecast | `G_ADDRSPACE_CAST` AS0→AS2 → zero-extend 16-bit ptr to 32-bit (bank=$00) | ✅ **DONE** — MAME + bsnes-jg |
-| **3c** | Far-pointer arithmetic | `G_PTR_ADD` on AS2 ptr → 32-bit add (bank byte auto-carries across 64 KB) | ⬜ **DEFERRED** — blocked on the symmetric **s32→4×s8 `G_UNMERGE_VALUES`** legalization, a #321/a16 (`0002`) gap (the handoff's own "still unsupported, no seed hit it yet"). `far_arith.c` is the first to hit it; it belongs in the a16 s32 patch, not the #320 far patch. New TODO. |
+| **3c** | Far-pointer arithmetic | `G_PTR_ADD` on AS2 ptr → 32-bit add (bank byte auto-carries across 64 KB) | ✅ **DONE** — MAME + bsnes-jg (2026-06-20). Unblocked by the symmetric **s32→4×s8 `G_UNMERGE_VALUES`** mirror (`legalizeUnmergeS32ToBytes`, mirror of `legalizeMergeS32FromBytes`, `hasAccum16`-gated, in `0002`); `far_arith.c` is the gate. |
 
 ### Scope decision (2026-06-20, user-confirmed): **runtime deref only; far-pointer CC deferred**
 
@@ -257,7 +257,11 @@ Step 1 (far_indir disasm):  27: a7 00  lda [$0]           -> PASS (indirect-long
 Step 2 (far_indir MAME):    SMOKE: PASS addr=0x7E0204 got=0xF3                    -> PASS
 Step 3 (far_indir bsnes):   PASS far_indir.sfc: got=0xF3 (180 frames, bsnes-jg)   -> PASS
 Step 4 (far_cast MAME+jg):  MAME got=0xF3 (a7 present) + bsnes-jg got=0xF3         -> PASS
-Step 5 (far_arith 3c):      DEFERRED — unable to legalize G_UNMERGE_VALUES s32->4x s8 (a16/0002 gap)
+Step 5 (far_arith 3c):      disasm  2a: a7 00  lda [$0]                  -> PASS (fp++ deref is indirect-long)
+                            MAME      SMOKE: PASS addr=0x7E0202 got=0xF3  -> PASS (arr[1]=0xA9 read after fp++)
+                            bsnes-jg  far_arith.sfc got=0xF3 (180 frames) -> PASS
+                            Unblocked 2026-06-20 by the s32->4x s8 G_UNMERGE_VALUES mirror
+                            (legalizeUnmergeS32ToBytes, hasAccum16-gated, in 0002).
 Step 6 (a16 regression):    corpus 7/7; a16unmerge/a16spill/a16ptr PASS; far-run/far-bank1 still PASS -> PASS
 Step 7 (patch hygiene):     0001: Imag32/FAR_INDIR=40, accum16=0, foreign=0
                             0002 (re-stacked via regen-patch.sh): far ADDED-lines=0 (3 context only),
@@ -265,7 +269,13 @@ Step 7 (patch hygiene):     0001: Imag32/FAR_INDIR=40, accum16=0, foreign=0
                             regen-patch.sh round-trip: PASS (pristine+0001+0002+0003 == live MOS dir)
 ```
 
-**What shipped:** 3a (`lda [dp]` runtime deref) + 3b (AS0→AS2 cast), both two-emulator verified. The
+**What shipped:** 3a (`lda [dp]` runtime deref) + 3b (AS0→AS2 cast) + **3c (`fp++` far arithmetic,
+2026-06-20)**, all two-emulator verified. 3c added the symmetric **s32→4×s8 `G_UNMERGE_VALUES`**
+legalization (`legalizeUnmergeS32ToBytes` — the exact mirror of the existing `legalizeMergeS32FromBytes`,
+`hasAccum16`-gated, in `0002`): `fp++` lowers via `ptrtoint`/`add`/`inttoptr` and the s32 ±1 add splits
+the value into bytes, which the unmerge mirror now legalizes. This also closes a **latent a16 bug** — a
+`uint32_t` shift-by-≥8 (`legalizeShiftRotate`) emitted the same unsupported unmerge; no test hit it yet.
+The 3a/3b
 implementation added the backend's **first first-class 32-bit ZP register** (`Imag32` quad over two
 `RS` words = 4 contiguous `__rc` bytes): subreg indices `sublo16`/`subhi16`, `RL#K` register entities,
 `getReservedRegs` quad-overlap reservation (an `Imag32` must not land on the stack pointer `RS0` /

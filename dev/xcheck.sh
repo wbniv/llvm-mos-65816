@@ -66,6 +66,7 @@ build_rom far-bank1 mos-snes-far.cfg
 # #320 Increment 3: runtime far deref needs +mos-a16 (32-bit value legalization).
 build_rom far_indir mos-snes-far.cfg -Xclang -target-feature -Xclang +mos-a16
 build_rom far_cast  mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
+build_rom far_arith mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
 
 # 3. Cross-check each ROM on bsnes-jg. Offset/len derived from the .map exactly
 # like the MAME path (dev/_emu.sh's _emu_map_lookup) — WRAM offset == symbol VMA.
@@ -90,6 +91,7 @@ xassert "$BUILD/far-run.sfc"   "$BUILD/far-run.map"   corpus_result 0xF3   # ban
 xassert "$BUILD/far-bank1.sfc" "$BUILD/far-bank1.map" corpus_result 0xF3   # bank $01 (the fidelity point)
 xassert "$BUILD/far_indir.sfc" "$BUILD/far_indir.map" corpus_result 0xF3   # bank $01, RUNTIME far ptr via lda [dp]
 xassert "$BUILD/far_cast.sfc"  "$BUILD/far_cast.map"  corpus_result 0xF3   # bank $00, near->far cast then lda [dp]
+xassert "$BUILD/far_arith.sfc" "$BUILD/far_arith.map" corpus_result 0xF3   # bank $00, fp++ (G_PTR_ADD) then lda [dp]
 
 echo
 [ $rc -eq 0 ] && echo "RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)" \

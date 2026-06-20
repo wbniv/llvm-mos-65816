@@ -3237,7 +3237,7 @@ index fbedd8d46b95..d329144e2e4c 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 6356fa58723c..f5e5ffe61a11 100644
+index 6356fa58723c..fbb134ee9a87 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,6 +25,7 @@
@@ -3280,7 +3280,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
  
    getActionDefinitionsBuilder(G_SEXT).custom();
  
-@@ -132,12 +144,26 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -132,12 +144,30 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
  
    getActionDefinitionsBuilder({G_EXTRACT, G_INSERT}).lower();
  
@@ -3307,13 +3307,17 @@ index 6356fa58723c..f5e5ffe61a11 100644
 +    auto &B = getActionDefinitionsBuilder(G_UNMERGE_VALUES)
 +                  .legalForCartesianProduct({S8, PZ}, {S16, P});
 +    if (STI.hasAccum16())
-+      B.legalFor({{S16, S32}});
++      // {S16,S32} 2x s16<-s32 is the direct legal form; {S8,S32} is a 4x s8<-s32
++      // unmerge (e.g. the byte split inside an s32 ±1 add or an s32 shift>=8) that
++      // the 2-dest selectUnmergeValues can't take — custom-rewrite it into the legal
++      // 2-level form (see legalizeUnmergeS32ToBytes). Mirror of the G_MERGE_VALUES rule.
++      B.legalFor({{S16, S32}}).customFor({{S8, S32}});
 +    B.unsupported();
 +  }
  
    getActionDefinitionsBuilder(G_BSWAP)
        .customFor({S8})
-@@ -155,18 +181,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -155,18 +185,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
        .widenScalarToNextMultipleOf(0, 8)
        .custom();
  
@@ -3349,7 +3353,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
  
    getActionDefinitionsBuilder(G_MUL)
        .libcallFor({S8, S16, S32, S64})
-@@ -330,14 +362,20 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -330,14 +366,20 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
  
    // Memory Operations
  
@@ -3378,17 +3382,19 @@ index 6356fa58723c..f5e5ffe61a11 100644
  
    getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD}).custom();
  
-@@ -499,6 +537,9 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+@@ -499,6 +541,11 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
    case G_FREEZE:
      return legalizeToCopy(Helper, MRI, MI);
  
 +  case G_MERGE_VALUES:
 +    return legalizeMergeS32FromBytes(Helper, MRI, MI);
++  case G_UNMERGE_VALUES:
++    return legalizeUnmergeS32ToBytes(Helper, MRI, MI);
 +
    // Integer Operations
    case G_ADD:
    case G_SUB:
-@@ -595,6 +636,29 @@ static auto unmergeDefsSplitHigh(MachineInstr *MI) {
+@@ -595,6 +642,53 @@ static auto unmergeDefsSplitHigh(MachineInstr *MI) {
                       MI->getOperand(MI->getNumOperands() - 2)};
  }
  
@@ -3415,10 +3421,34 @@ index 6356fa58723c..f5e5ffe61a11 100644
 +  return true;
 +}
 +
++// #321 a16: a direct 4x s8 <- s32 G_UNMERGE_VALUES (only reached via customFor({S8,S32})
++// under +mos-a16) — the symmetric inverse of legalizeMergeS32FromBytes. Rewrite it into
++// the legal 2-level form so it routes through the s32-as-2x-s16 representation: unmerge
++// the s32 into two s16 words (legal {S16,S32}), then unmerge each word into two s8 bytes
++// (legal {S8,S16}), reusing the four original byte def regs. selectUnmergeValues only
++// takes a 2-dest unmerge, so the 4-dest form must be split here, not selected. Building
++// only unmerges (no new merge) cannot create a merge<->unmerge artifact-combine loop.
++bool MOSLegalizerInfo::legalizeUnmergeS32ToBytes(LegalizerHelper &Helper,
++                                                 MachineRegisterInfo &MRI,
++                                                 MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  const LLT S16 = LLT::scalar(16);
++  Register D0 = MI.getOperand(0).getReg();
++  Register D1 = MI.getOperand(1).getReg();
++  Register D2 = MI.getOperand(2).getReg();
++  Register D3 = MI.getOperand(3).getReg();
++  Register Src = MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
++  auto Words = Builder.buildUnmerge(S16, Src);     // s32 -> Lo:s16, Hi:s16
++  Builder.buildUnmerge({D0, D1}, Words.getReg(0)); // Lo -> D0, D1
++  Builder.buildUnmerge({D2, D3}, Words.getReg(1)); // Hi -> D2, D3
++  MI.eraseFromParent();
++  return true;
++}
++
  bool MOSLegalizerInfo::legalizeAnyExt(LegalizerHelper &Helper,
                                        MachineRegisterInfo &MRI,
                                        MachineInstr &MI) const {
-@@ -677,11 +741,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -677,11 +771,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    auto [Dst, Src] = MI.getFirst2Regs();
    assert(MRI.getType(Dst).isByteSized());
  
@@ -3443,7 +3473,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
  
    // Handle multi-byte increments and decrements.
  
-@@ -869,6 +945,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -869,6 +975,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      return true;
    }
  
@@ -3468,7 +3498,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
    Register Partial;
    Register NewAmt;
    // Shift by one multiples of one byte.
-@@ -885,11 +979,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -885,11 +1009,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      case MOS::G_ROTR:
        break;
      case MOS::G_ASHR: {
@@ -3490,7 +3520,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
        break;
      }
      case MOS::G_LSHR:
-@@ -1259,6 +1358,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1259,6 +1388,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
  
    LLT Type = MRI.getType(LHS);
  
@@ -3519,7 +3549,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1277,7 +1398,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1277,7 +1428,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -3663,7 +3693,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1348,16 +1604,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1348,16 +1634,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -3688,7 +3718,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
      if (!isNZUseLegal(Dst, MRI))
        Z = buildNZSelect(Z, Builder);
      Builder.buildCopy(Dst, Z);
-@@ -1365,8 +1627,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1365,8 +1657,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {
@@ -3701,7 +3731,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1615,14 +1880,176 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1615,14 +1910,176 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
  
@@ -3879,7 +3909,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1659,6 +2086,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1659,6 +2116,10 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);
@@ -3890,7 +3920,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
  
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    auto ValueType = MRI.getType(MI.getValueReg());
-@@ -1685,6 +2116,150 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+@@ -1685,6 +2146,150 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
    return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
  }
  
@@ -4041,7 +4071,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
-@@ -1913,7 +2488,47 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -1913,7 +2518,47 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                .countMaxActiveBits() <= 8) {
          if (Index)
            return false;
@@ -4090,7 +4120,7 @@ index 6356fa58723c..f5e5ffe61a11 100644
          continue;
        }
      }
-@@ -1996,6 +2611,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -1996,6 +2641,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
                     .countMaxActiveBits() <= 8) {
        Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
        Addr = Base;
@@ -4103,20 +4133,23 @@ index 6356fa58723c..f5e5ffe61a11 100644
    }
  
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-index aedc5b41b337..f24a57fa5c71 100644
+index aedc5b41b337..ecbec72df6ff 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-@@ -38,6 +38,9 @@ public:
+@@ -38,6 +38,12 @@ public:
                           MachineInstr &MI) const;
  
  private:
 +  // #321 a16: 4x s8 -> s32 G_MERGE_VALUES -> legal 2-level (2x s16) form.
 +  bool legalizeMergeS32FromBytes(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
 +                                 MachineInstr &MI) const;
++  // #321 a16: 4x s8 <- s32 G_UNMERGE_VALUES -> legal 2-level (2x s16) form (mirror).
++  bool legalizeUnmergeS32ToBytes(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                                 MachineInstr &MI) const;
    // Integer Extension and Truncation
    bool legalizeAnyExt(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
                        MachineInstr &MI) const;
-@@ -79,6 +82,11 @@ private:
+@@ -79,6 +85,11 @@ private:
                      GAnyLoad &MI) const;
    bool legalizeStore(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
                       GStore &MI) const;
