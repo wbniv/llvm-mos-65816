@@ -135,9 +135,62 @@ must survive refutation against the emulator):
 Cap at 3 verified-or-refuted hypotheses before reporting. Output: the exact defect (file:line + mechanism),
 proven by an emulator-value flip.
 
+## Phase B+C — RESULT (2026-06-20): minimal repro + verified root cause
+
+**cvise converged** the 852-line preprocessed seed 445 → **18 lines** (and cvise *removed its own UB on its
+own*: the null-pointer loop became a plain `long` counter). De-UB'd / re-minimized canonical repro (**8
+lines, UB-free**, `xy16` wrong on both emulators):
+
+```c
+volatile short corpus_result;
+long crc32_context, func_1_g_8; int g_21 = 535; volatile int g_59; char g_110_2;
+void crc32_byte(char b) { crc32_context = b; }
+void func_12(int x) { (void)x; g_59; }
+void main(){ func_1_g_8=0;
+  for(; func_1_g_8<=0; func_1_g_8+=1){ int *l_20=&g_21; func_12((*l_20)--); char *l_109=&g_110_2; *l_109|=g_21; }
+  crc32_byte(g_21>>8); corpus_result=crc32_context; }
+```
+Signature (both emulators): `default = a16 = default-O0 = 0x0002`, **`xy16 = 0x0000`**. Exposing the full
+`g_21` instead of `g_21>>8` gives `default=0x0216`, **`xy16=0x0016`** — `g_21`'s **high byte `0x02` is
+zeroed** under xy16.
+
+**ROOT CAUSE (verified by reading the post-LTO disasm + two emulator-value confirmations):** a 16-bit value
+(`g_21`, selected into the **`Xc16`** register class — `%0:xc16 = G_LOAD16_ABS @g_21`) is held **live in the
+X index register across a `sep #$10`** that `MOSInsertREPSEP` inserts to perform an unrelated **8-bit `ldy
+g_110_2`**. On the 65816, **narrowing the index width to 8-bit forces `XH`/`YH` (the X/Y high bytes) to
+zero** — destroying `g_21`'s high byte. The later `rep #$10; stx __rc2` then stores the corrupted `0x00xx`.
+This explains *both* load-bearing pieces the reduction kept: the call+pointer (`func_12((*l_20)--)`) forces
+`g_21` into `X16`; the `*l_109 |= g_21` line's 8-bit `g_110_2`→`Y` load forces the index-narrowing `sep`.
+Both emulators agreeing on `0x0000` confirms they correctly zero `XH` — so it is unambiguously a **compiler**
+bug (the codegen wrongly assumed `XH` survives the narrowing).
+
+**This is NOT the `requiredXWidth` tweak the plan anticipated — it is a register-MODEL gap.** `XH`/`YH` are
+modeled as registers (`MOSRegisterInfo.td:114`, sub-regs of `X16`/`Y16`), but **nothing models the index
+narrowing as clobbering them**: `SEP_Immediate` carries no `Defs`, and `MOSInsertREPSEP` runs **post-register-
+allocation** anyway. So the register allocator freely kept a 16-bit `Xc16` value live across an 8-bit-index
+op — an impossible situation on hardware (X and Y *share* one index-width flag, so a live 16-bit index value
+pins the index flag to 16-bit for its whole live range; any 8-bit-index op in that range is illegal).
+
+Candidate fix approaches (all xy16/`HasIndex16`-gated; correctness = the 4-way differential, zero regressions):
+- **(A) Model the clobber for regalloc:** make instructions that require 8-bit index (`requiredXWidth==XW_X8`)
+  implicitly clobber `XH`/`YH`, so the allocator spills any live 16-bit index value across them. Correct and
+  general; breadth/possible-pessimization risk; closest to the true hardware model.
+- **(B) Steer instruction selection** away from `Xc16`/`Yc16` for `G_LOAD16_ABS`-style values that aren't
+  genuine index uses (prefer `A16`/`Imag16`), so the 16-bit value never lands in an index reg it can't keep.
+  More localized; risks moving rather than fixing the problem.
+- **(C) Spill in `MOSInsertREPSEP`:** at a narrowing point where `XH`/`YH` is live, save/restore the 16-bit
+  index value around the `sep`. Most localized to the symptom; complex (post-RA spill insertion + liveness).
+
+Saved repros: `/tmp/xy16-reduce-445/SAVED-minimal-v1.c` (8-line UB-free), `…-cvise18.c` (raw cvise output).
+
+**Full root-cause + fix scoping:** [`docs/investigations/65816-xy16-index16-highbyte-clobber.md`](../investigations/65816-xy16-index16-highbyte-clobber.md).
+Per the scope-first decision, the fix is **not yet landed**; the investigation recommends **approach A**
+(model the `XH`/`YH` clobber on 8-bit-index ops via a pre-RA pass so regalloc spills live 16-bit index values),
+gated on `HasIndex16`. Phase D below executes that approach once the recommendation is approved.
+
 ---
 
-## Phase D — fix
+## Phase D — fix (recommended approach: A — see the investigation doc)
 
 Fix at the Phase-C root cause, in `vendor/llvm-mos/` (edited in place). Constraints:
 - **HasIndex16-gated** ⇒ `+mos-a16` and DEFAULT builds stay **byte-identical** (verify, don't assume).
