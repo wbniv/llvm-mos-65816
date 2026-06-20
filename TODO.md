@@ -336,6 +336,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
   [docs/321-upstream-dwarf-output-elf-companion.md](docs/321-upstream-dwarf-output-elf-companion.md).
+- [ ] **Post the #321 CC frame-ABI design note** (user-triggered; note, not a PR). Implementation-backed
+  evidence for the calling-convention discussion: the per-frame DP-window/stack-relative ABIs are feasible
+  but NULL on real code (0/13 functions profit — locals are `__rc`-resident), so keep the soft static stack
+  by measurement. Exact `gh issue comment 321` (and/or Discord CC thread) in
+  [upstream-contribution-status](docs/upstream-contribution-status.md) (item 6) · body
+  [docs/321-upstream-cc-frame-abi-note.md](docs/321-upstream-cc-frame-abi-note.md) · record
+  [frame-ABI study §Outcome](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
 - [ ] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
   `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
   uncomment the two trigger lines in the `on:` block.

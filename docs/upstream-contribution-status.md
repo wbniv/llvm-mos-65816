@@ -1,7 +1,8 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-19 (DWARF branch `wbniv:mos-dwarf-65816-test-docs` pushed `0ae9415`; GitHub
-open-count last verified 2026-06-17, see *Verified state* + *Refresh* below).
+**Last updated:** 2026-06-20 (added the #321 CC frame-ABI design note, ready to post — Ready-to-post #6.
+DWARF branch `wbniv:mos-dwarf-65816-test-docs` pushed `0ae9415`; GitHub open-count last verified 2026-06-17,
+see *Verified state* + *Refresh* below).
 
 A standing snapshot of every upstream-facing contribution from this fork: what is **drafted and ready to
 post**, what is **future/blocked**, and what GitHub actually shows right now. All posting is **user-triggered**
@@ -9,7 +10,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 ## TL;DR
 
-- **Ready to post now: 2 PRs + 2 issues + 1 design note** — five artifacts, all drafted, all one command/paste away.
+- **Ready to post now: 2 PRs + 2 issues + 2 design notes** — six artifacts, all drafted, all one command/paste away.
   Strictly *PRs*, that's **two** (F4; and the DWARF step-6 test+docs).
 - **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
@@ -25,6 +26,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 | 3 | **#320** — far-pointer design note | **note** | Opens the five-address-space ABI-blessing discussion (a Discord/#320 post, not a code change) | [`docs/320-upstream-far-pointer-note.md`](320-upstream-far-pointer-note.md) | n/a (note) |
 | 4 | **scavenger N/Z-liveness** — `saveScavengerRegister` asserts N/Z dead | **issue** | Upstream crash: a compare/ALU flag live across a frame-vreg spill → illegal `STImag8 $p` (no fork patch — maintainer territory) | [`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md) | n/a (issue) |
 | 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | `wbniv:mos-dwarf-65816-test-docs` (pushed `0ae9415`) |
+| 6 | **#321 CC frame-ABI** — measured frame-model evaluation | **note** | Implementation-backed CC evidence: DP-window/stack-relative are feasible but NULL on real code (locals are `__rc`-resident → frames ≈unused); keep the soft static stack, by measurement | [`docs/321-upstream-cc-frame-abi-note.md`](321-upstream-cc-frame-abi-note.md) | n/a (note) |
 
 ### 1 — F4 PR (a code-change PR; #5 DWARF is the other)
 
@@ -100,6 +102,23 @@ gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-dwarf-65816-test-docs --b
 
 May also split: the lit test alone is a pure backend-test PR; the `<output>.elf` documentation is a
 separate `lld`/SDK docs change. See [DWARF round-trip plan, Step 6](plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
+
+### 6 — #321 CC frame-ABI design note (a post, not a PR)
+
+Implementation-backed evidence for the #321 calling-convention discussion: we built the feasibility proof and
+measured the *opportunity* for a per-frame hardware-stack ABI (TCD direct-page window / stack-relative) vs the
+soft static stack. Finding: **feasible but NULL** — 0/13 realistic functions would benefit, because llvm-mos
+keeps locals register-resident in `__rc` (frames ≈ unused). The note argues to keep the soft static stack *by
+measurement*, and documents why the textbook commercial DP-frame doesn't transplant onto the fixed-ZP
+imaginary-register model. **No code change** (the off-by-default `+mos-dp-frame`/`+mos-sr-frame` spike was not
+landed — it failed the go/no-go bar). Reproducible via `dev/frameabi-census.sh` + `dev/run.sh frameabi_a0`.
+Post it (issue comment and/or the Discord CC thread):
+
+```
+gh issue comment 321 --repo llvm-mos/llvm-mos --body-file docs/321-upstream-cc-frame-abi-note.md   # strip the status block first
+```
+
+Full internal record: [frame-ABI study plan §Outcome](plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
 
 ## Future / blocked (not yet postable — do **not** count these as pending)
 
