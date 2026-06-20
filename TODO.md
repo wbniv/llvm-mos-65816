@@ -273,7 +273,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   green-modulo-known). **`-Os` pass DONE 2026-06-20** — full sweep of all 1168 in-scope @ `-Os`: **1114 PASS,
   0 FAIL, 54 SKIP** after fixing the **2 FAILs it found** (`pr34768-1/-2` — a pre-existing a16
   load-fold-across-call miscompile, see Done `[321-abs-load-fold-across-call]`); 0 XPASS churn confirms the
-  `CMPIndir16` fold (`9009260`) non-regressing.
+  `CMPIndir16` fold (`9009260`) non-regressing. **Full bsnes-jg 4-way confirmation pass DONE 2026-06-20** —
+  re-ran the entire in-scope set @ `-Os` with the bsnes-jg leg on **every** test (not just per-FAIL):
+  **1174 PASS, 0 FAIL, 54 SKIP** — `host==default@MAME==a16@MAME==a16@bsnes-jg` holds suite-wide, no
+  MAME-vs-bsnes divergence.
   [sweep plan](docs/plans/2026-06-20-321-broad-c-torture-sweep.md). **Remaining:** Phase 3 sampled CI +
   reaping orphan MAMEs in the runner.
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).

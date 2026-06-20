@@ -42,6 +42,15 @@ completing default — also FAIL). `-verify-machineinstrs` is exercised by the p
 `CMPIndir16` fold `9009260` confirmed non-regressing). Combined with the earlier first-60 run, the whole
 in-scope set is covered at `-Os`.
 
+**Full bsnes-jg confirmation pass — DONE 2026-06-20.** After the `pr34768` fix (`86c2602`), re-ran the
+**entire** in-scope set at `-Os` **with the bsnes-jg leg on every test** (`dev/run.sh torture 1300 --start 0
+--opt -Os`, no `--no-bsnes`) — completing the literal 4-way bar `host == default@MAME == a16@MAME ==
+a16@bsnes-jg` per test, not just per-FAIL:
+```
+==> torture-run: 1174 PASS, 0 FAIL, 54 SKIP, 0 XFAIL (of 1228)
+```
+**0 FAIL, no MAME-vs-bsnes divergence anywhere.** The in-scope c-torture suite is green at `-Os` 4-way.
+
 ## Phase 2 — Triage any FAIL (only if M > 0)
 
 Per failing test, in priority order (mirror the prior cluster fixes):
