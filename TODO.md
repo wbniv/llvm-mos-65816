@@ -270,6 +270,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `noClobberBetween`/`0002` work**; land after that commits.
   [handoff](docs/plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md) ·
   [fix plan](docs/plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md).
+  **Update 2026-06-20:** cvise-reduced to an 8-line UB-free repro + **root-caused** — a 16-bit index value's
+  high byte is zeroed by the index-narrowing `sep #$10` (a value held in X across an unrelated 8-bit `ldy`).
+  Pre-RA clobber fix (**A′**) implemented + **refuted** (wrong phase; the conflict is created post-RA). Now
+  trying a scheduler/liveness constraint; **approach C** is the fallback (next item).
+  [investigation](docs/investigations/65816-xy16-index16-highbyte-clobber.md) ·
+  [reduction plan](docs/plans/2026-06-20-321-xy16-seed445-cvise-reduction.md).
+- [ ] **#321 xy16 seed 247/445 — approach C (post-RA repair, fallback fix).** If the scheduler/liveness
+  constraint (in progress) doesn't fully fix the 16-bit-index high-byte clobber, fix it post-RA in
+  `MOSInsertREPSEP` — the phase where the final buggy schedule is visible (`ldx g_21 … sep #$10 … stx __rc`):
+  detect a 16-bit index value (`XH`/`YH` live) across a narrowing `sep` and spill→reload it. Rationale + the
+  refuted pre-RA approach A′ (wrong phase): [investigation](docs/investigations/65816-xy16-index16-highbyte-clobber.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
   into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
