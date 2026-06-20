@@ -1,50 +1,59 @@
 diff --git a/llvm/lib/Target/MOS/MOSCallLowering.cpp b/llvm/lib/Target/MOS/MOSCallLowering.cpp
-index d448d2c56002..9a62049680bc 100644
+index d448d2c56002..f5c78839646f 100644
 --- a/llvm/lib/Target/MOS/MOSCallLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSCallLowering.cpp
-@@ -102,6 +102,41 @@ struct MOSOutgoingValueHandler : CallLowering::OutgoingValueHandler {
+@@ -102,6 +102,50 @@ struct MOSOutgoingValueHandler : CallLowering::OutgoingValueHandler {
      Register ExtReg = extendRegister(ValVReg, VA);
      MIRBuilder.buildStore(ExtReg, Addr, *MMO);
    }
 +
-+  // #320 Inc 4 Ph2 variant (b): a far (addrspace 2) pointer leaving the function
-+  // (call arg or return value) is split into a 16-bit offset + an 8-bit bank by
-+  // CC_MOS_FarPtrSplit, which pushed two custom CCValAssigns. Decompose the 32-bit
-+  // pointer and drive each half to its register. Like ARM's f64->2x GPR split, the
-+  // actual copies are deferred via Thunk so they land after mem-loc assignments.
++  // #320 Inc 4 Ph2 variants (b)/(c): a far (addrspace 2) pointer leaving the
++  // function (call arg or return value) is split across registers by a custom CC
++  // assigner. Decompose the 32-bit pointer and drive each piece to its register.
++  // Dispatch on the VA count: 2 = variant (b) {16-bit offset, 8-bit bank}; 3 =
++  // variant (c) {offset.lo, offset.hi, bank} all i8 (A:X+Y). Like ARM's f64->2x GPR
++  // split, the copies are deferred via Thunk so they land after mem-loc assignments.
 +  unsigned assignCustomValue(CallLowering::ArgInfo &Arg,
 +                             ArrayRef<CCValAssign> VAs,
 +                             std::function<void()> *Thunk = nullptr) override {
 +    assert(Arg.Regs.size() == 1 && "far pointer occupies one vreg");
-+    const CCValAssign &OffVA = VAs[0];
-+    const CCValAssign &BankVA = VAs[1];
-+    assert(OffVA.needsCustom() && BankVA.needsCustom() && "expected custom VAs");
++    assert((VAs.size() == 2 || VAs.size() == 3) &&
++           "far-ptr split is 2 (variant b) or 3 (variant c) locations");
 +
-+    // offset = (i16)p2 ; bank = (i8)(p2 >> 16). The pointer must be ptrtoint'd
-+    // first: generic trunc/extract can't operate on a pointer type directly.
++    // ptrtoint first: generic trunc/extract can't operate on a pointer directly.
 +    auto P2Int = MIRBuilder.buildPtrToInt(LLT::scalar(32), Arg.Regs[0]);
-+    auto Offset = MIRBuilder.buildTrunc(LLT::scalar(16), P2Int);
-+    auto Shifted = MIRBuilder.buildLShr(
-+        LLT::scalar(32), P2Int,
-+        MIRBuilder.buildConstant(LLT::scalar(32), 16));
-+    auto Bank = MIRBuilder.buildTrunc(LLT::scalar(8), Shifted);
++    auto ByteAt = [&](unsigned Shift) -> Register {
++      Register Src = P2Int.getReg(0);
++      if (Shift)
++        Src = MIRBuilder
++                  .buildLShr(LLT::scalar(32), P2Int,
++                             MIRBuilder.buildConstant(LLT::scalar(32), Shift))
++                  .getReg(0);
++      return MIRBuilder.buildTrunc(LLT::scalar(8), Src).getReg(0);
++    };
 +
-+    Register OffReg = Offset.getReg(0);
-+    Register BankReg = Bank.getReg(0);
-+    auto DoAssign = [=]() {
-+      assignValueToReg(OffReg, OffVA.getLocReg(), OffVA);
-+      assignValueToReg(BankReg, BankVA.getLocReg(), BankVA);
++    SmallVector<Register, 3> Pieces;
++    if (VAs.size() == 3)
++      Pieces = {ByteAt(0), ByteAt(8), ByteAt(16)}; // (c): A=lo, X=hi, Y=bank
++    else
++      Pieces = {MIRBuilder.buildTrunc(LLT::scalar(16), P2Int).getReg(0),
++                ByteAt(16)}; // (b): RS#=offset(i16), RC#=bank(i8)
++
++    SmallVector<CCValAssign, 3> VACopies(VAs.begin(), VAs.end());
++    auto DoAssign = [this, Pieces, VACopies]() {
++      for (unsigned I = 0; I < Pieces.size(); ++I)
++        assignValueToReg(Pieces[I], VACopies[I].getLocReg(), VACopies[I]);
 +    };
 +    if (Thunk)
 +      *Thunk = DoAssign;
 +    else
 +      DoAssign();
-+    return 2;
++    return VAs.size();
 +  }
  };
  
  struct MOSOutgoingArgsHandler : MOSOutgoingValueHandler {
-@@ -161,6 +196,11 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
+@@ -161,6 +205,11 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
        report_fatal_error("Not yet implemented.");
      case 8:
      case 16:
@@ -56,46 +65,59 @@ index d448d2c56002..9a62049680bc 100644
        break;
      }
  
-@@ -171,6 +211,34 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
+@@ -171,6 +220,47 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
      MIRBuilder.buildCopy(ValVReg, PhysReg);
    }
  
-+  // #320 Inc 4 Ph2 variant (b): a far (addrspace 2) pointer arriving as a formal
-+  // argument / call return was split by CC_MOS_FarPtrSplit into a 16-bit offset
-+  // (an RS#) + an 8-bit bank (an RC#). Read both halves, then recompose the 32-bit
-+  // pointer: p2 = inttoptr( zext16(offset) | (zext8(bank) << 16) ). The high byte
-+  // (bits 24..31) is zero — a far address is 24-bit.
++  // #320 Inc 4 Ph2 variants (b)/(c): a far (addrspace 2) pointer arriving as a
++  // formal argument / call return was split across registers by a custom CC
++  // assigner. Read each location, zero-extend to 32, shift into place, OR together,
++  // and inttoptr. Dispatch on the VA count: 2 = variant (b) {offset i16 @ 0, bank
++  // i8 @ 16}; 3 = variant (c) {lo i8 @ 0, hi i8 @ 8, bank i8 @ 16}. The top byte
++  // (bits 24..31) stays zero — a far address is 24-bit.
 +  unsigned assignCustomValue(CallLowering::ArgInfo &Arg,
 +                             ArrayRef<CCValAssign> VAs,
 +                             std::function<void()> *Thunk = nullptr) override {
 +    assert(Arg.Regs.size() == 1 && "far pointer occupies one vreg");
-+    const CCValAssign &OffVA = VAs[0];
-+    const CCValAssign &BankVA = VAs[1];
-+    assert(OffVA.needsCustom() && BankVA.needsCustom() && "expected custom VAs");
++    assert((VAs.size() == 2 || VAs.size() == 3) &&
++           "far-ptr split is 2 (variant b) or 3 (variant c) locations");
 +
-+    Register OffVReg = MRI.createGenericVirtualRegister(LLT::scalar(16));
-+    Register BankVReg = MRI.createGenericVirtualRegister(LLT::scalar(8));
-+    assignValueToReg(OffVReg, OffVA.getLocReg(), OffVA);
-+    assignValueToReg(BankVReg, BankVA.getLocReg(), BankVA);
++    Register Combined;
++    auto AddPiece = [&](unsigned Width, unsigned Shift, const CCValAssign &VA) {
++      assert(VA.needsCustom() && "expected custom VA");
++      Register V = MRI.createGenericVirtualRegister(LLT::scalar(Width));
++      assignValueToReg(V, VA.getLocReg(), VA);
++      Register V32 = MIRBuilder.buildZExt(LLT::scalar(32), V).getReg(0);
++      if (Shift)
++        V32 = MIRBuilder
++                  .buildShl(LLT::scalar(32), V32,
++                            MIRBuilder.buildConstant(LLT::scalar(32), Shift))
++                  .getReg(0);
++      Combined = Combined
++                     ? MIRBuilder.buildOr(LLT::scalar(32), Combined, V32).getReg(0)
++                     : V32;
++    };
 +
-+    auto Off32 = MIRBuilder.buildZExt(LLT::scalar(32), OffVReg);
-+    auto Bank32 = MIRBuilder.buildZExt(LLT::scalar(32), BankVReg);
-+    auto BankHi = MIRBuilder.buildShl(
-+        LLT::scalar(32), Bank32,
-+        MIRBuilder.buildConstant(LLT::scalar(32), 16));
-+    auto Combined = MIRBuilder.buildOr(LLT::scalar(32), Off32, BankHi);
++    if (VAs.size() == 3) {
++      AddPiece(8, 0, VAs[0]);  // A = offset.lo
++      AddPiece(8, 8, VAs[1]);  // X = offset.hi
++      AddPiece(8, 16, VAs[2]); // Y = bank
++    } else {
++      AddPiece(16, 0, VAs[0]);  // RS# = offset (i16)
++      AddPiece(8, 16, VAs[1]);  // RC# = bank (i8)
++    }
 +    MIRBuilder.buildIntToPtr(Arg.Regs[0], Combined);
-+    return 2;
++    return VAs.size();
 +  }
 +
    /// Mark the given register as live-in. These will be function-level live-ins
    /// or implicit defs for formal arguments or call statements, respectively.
    virtual void makeLive(Register PhysReg) = 0;
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.cpp b/llvm/lib/Target/MOS/MOSCallingConv.cpp
-index 993ce3787622..2f2d6a4d5c06 100644
+index 993ce3787622..8a47e863537c 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.cpp
 +++ b/llvm/lib/Target/MOS/MOSCallingConv.cpp
-@@ -12,7 +12,58 @@
+@@ -12,7 +12,86 @@
  
  #include "MOSCallingConv.h"
  
@@ -154,11 +176,39 @@ index 993ce3787622..2f2d6a4d5c06 100644
 +                                         CCValAssign::Full));
 +  return true;
 +}
++
++// #320 Inc 4 Ph2 variant (c): carry a 32-bit far pointer in the hardware registers
++// A:X (16-bit offset: A=low, X=high) + Y (bank byte). There is no 16-bit A:X
++// register class, so the offset is TWO i8 locations — three custom CCValAssigns
++// total {A, X, Y}, (de)composed by MOSCallLowering::assignCustomValue (which
++// dispatches on the VA count: 2 -> variant b, 3 -> variant c). A/X/Y are
++// caller-saved GPRs; AllocateReg coordinates them with the i8 / near-pointer rules
++// via register-unit aliasing. A:X+Y is singular, so only ONE far pointer fits and
++// it must precede any A/X-consuming scalar arg (near-pointer args use RS#, so they
++// don't conflict); when A/X/Y are unavailable this returns false and the far ptr
++// falls through to the generic rule (which then errors) — the expected "(c) doesn't
++// scale past one" limitation.
++bool llvm::CC_MOS_FarPtrAXY(unsigned ValNo, MVT ValVT, MVT LocVT,
++                            CCValAssign::LocInfo LocInfo, ISD::ArgFlagsTy ArgFlags,
++                            CCState &State) {
++  MCRegister Lo = State.AllocateReg(MOS::A);
++  MCRegister Hi = State.AllocateReg(MOS::X);
++  MCRegister Bank = State.AllocateReg(MOS::Y);
++  if (!Lo || !Hi || !Bank)
++    return false;
++  State.addLoc(
++      CCValAssign::getCustomReg(ValNo, MVT::i8, Lo, MVT::i8, CCValAssign::Full));
++  State.addLoc(
++      CCValAssign::getCustomReg(ValNo, MVT::i8, Hi, MVT::i8, CCValAssign::Full));
++  State.addLoc(CCValAssign::getCustomReg(ValNo, MVT::i8, Bank, MVT::i8,
++                                         CCValAssign::Full));
++  return true;
++}
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.h b/llvm/lib/Target/MOS/MOSCallingConv.h
-index 80fa4df3729a..42989404cf1a 100644
+index 80fa4df3729a..4f5ec22aa23c 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.h
 +++ b/llvm/lib/Target/MOS/MOSCallingConv.h
-@@ -30,6 +30,26 @@ bool CC_MOS_VarArgs(unsigned ValNo, MVT ValVT, MVT LocVT,
+@@ -30,6 +30,34 @@ bool CC_MOS_VarArgs(unsigned ValNo, MVT ValVT, MVT LocVT,
                      CCValAssign::LocInfo LocInfo, ISD::ArgFlagsTy ArgFlags,
                      Type *OrigTy, CCState &State);
  
@@ -182,14 +232,22 @@ index 80fa4df3729a..42989404cf1a 100644
 +                        CCValAssign::LocInfo LocInfo, ISD::ArgFlagsTy ArgFlags,
 +                        CCState &State);
 +
++/// #320 Inc 4 Ph2 variant (c): custom CC assigner for a far (addrspace 2) pointer
++/// carried in A:X (16-bit offset, A=low/X=high) + Y (bank byte). Pushes THREE
++/// custom CCValAssigns {A, X, Y}; MOSCallLowering's assignCustomValue dispatches on
++/// the count (3 -> this variant). Referenced by the gated far-ptr rule in CC_MOS.
++bool CC_MOS_FarPtrAXY(unsigned ValNo, MVT ValVT, MVT LocVT,
++                      CCValAssign::LocInfo LocInfo, ISD::ArgFlagsTy ArgFlags,
++                      CCState &State);
++
  } // namespace llvm
  
  #endif // not LLVM_LIB_TARGET_MOS_MOSCALLINGCONV_H
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.td b/llvm/lib/Target/MOS/MOSCallingConv.td
-index 3f0d04c55389..41e5aabca9d7 100644
+index 3f0d04c55389..b8992d68d97e 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.td
 +++ b/llvm/lib/Target/MOS/MOSCallingConv.td
-@@ -58,6 +58,29 @@ let Entry = 1 in {
+@@ -58,6 +58,35 @@ let Entry = 1 in {
  def CC_MOS : CallingConv<[
    CCIfType<[i1], CCPromoteToType<i8>>,
  
@@ -215,6 +273,12 @@ index 3f0d04c55389..41e5aabca9d7 100644
 +  // MOSCallLowering::assignCustomValue does the pointer<->{offset,bank} composition.
 +  CCIfPtrAddrSpace<2, CCIf<"MOSFarCCSplit(State)",
 +      CCCustom<"CC_MOS_FarPtrSplit">>>,
++
++  // Variant (c) A:X+Y: 16-bit offset in A:X (A=low, X=high) + bank byte in Y. A:X
++  // is not a 16-bit class, so this is a 3-way {i8,i8,i8} split — the custom assigner
++  // CC_MOS_FarPtrAXY pushes the three locations and assignCustomValue composes them.
++  CCIfPtrAddrSpace<2, CCIf<"MOSFarCCAXY(State)",
++      CCCustom<"CC_MOS_FarPtrAXY">>>,
 +
    // Pointers are preferentially assigned to imaginary registers so indirect
    // addressing modes work without additional copying.

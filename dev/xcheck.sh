@@ -85,6 +85,7 @@ build_farcc_variant() { # rom-name farcc-flag
   python3 "$ROOT/tools/snes-checksum.py" "$BUILD/$name.sfc" >/dev/null
 }
 build_farcc_variant farcc_split +mos-farcc-split
+build_farcc_variant farcc_axy   +mos-farcc-axy
 
 # 3. Cross-check each ROM on bsnes-jg. Offset/len derived from the .map exactly
 # like the MAME path (dev/_emu.sh's _emu_map_lookup) — WRAM offset == symbol VMA.
@@ -114,6 +115,7 @@ xassert "$BUILD/far_store.sfc" "$BUILD/far_store.map" corpus_result 0xF3   # ban
 xassert "$BUILD/far_call.sfc"  "$BUILD/far_call.map"  corpus_result 0xF3   # bank $01, far call (JSL) + RTL return
 xassert "$BUILD/farcc_imag32.sfc" "$BUILD/farcc_imag32.map" corpus_result 0xF3 # bank $01, far PTR returned+passed across calls (variant a Imag32/RL)
 xassert "$BUILD/farcc_split.sfc"  "$BUILD/farcc_split.map"  corpus_result 0xF3 # bank $01, far PTR split offset(RS#)+bank(RC#) across calls (variant b)
+xassert "$BUILD/farcc_axy.sfc"    "$BUILD/farcc_axy.map"    corpus_result 0xF3 # bank $01, far PTR in A:X(offset)+Y(bank) across calls (variant c)
 
 echo
 [ $rc -eq 0 ] && echo "RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)" \
