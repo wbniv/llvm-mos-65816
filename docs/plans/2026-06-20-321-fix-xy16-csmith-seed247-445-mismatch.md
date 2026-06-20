@@ -66,49 +66,87 @@ Hypotheses to walk (cap at 3, per the debugging guide):
 - **H3 — a 16-bit index value narrowed/widened incorrectly** by `selectXY16` (the `abs,X16`/`(zp),Y16`
   selection) so the addressing width disagrees with the index reg's actual width.
 
-## Phase 1 — RESULT (partial, 2026-06-20) — root-cause NOT yet isolated
+## Phase 1 — RESULT (2026-06-20, 10-agent workflow `wf_826f3a8e-bff`, ~760k tok) — root cause is NOT a static X-width bug
 
-Method works; root cause not yet pinned (this is genuine `55ec505`-class difficulty). Findings:
+A multi-agent static analysis (6 angles, a16 as oracle: diff xy16-vs-a16 codegen; synthesize; **3 adversarial
+verifiers**) reached a firm, surprising conclusion. The earlier "linear trace inconclusive" became a definite
+**negative**, and the synthesized requiredXWidth fix was **refuted 3/3**.
 
-- **Got `main`'s MIR after `mos-insert-rep-sep` from the REAL LTO link** (not the whole-module replay, which
-  crashes on `__adddf3` s64 under `+mos-xy16` — the same runtime-fn over-trigger seen in the s32 work):
-  `mos-clang --config … +mos-xy16 -Os <prog> -Wl,-mllvm,-print-after=mos-insert-rep-sep` → grep `main`.
-- **Linear X-width trace of seed 445's `main` is inconclusive.** The only genuine 16-bit indexing is the
-  `crc32_tab` fill loop (`STAbsXIdx $a, @crc32_tab(+0..3), $x16` at X=16, a >256-entry / 4-byte-stride table —
-  `CMPImm16 $a16, 256` loop bound). All the 8-bit-index ops (`LDXIdx`/`LDAAbsIdx $y`, `LDAAbsIdx $x`,
-  `CMPImag8 $y`) sit at X=8 (set by a `SEP #$30`, never re-widened on the straight-line path). No obviously
-  mis-bracketed op on linear inspection ⇒ the bug is likely a **CFG/loop-edge X-width subtlety** (H2) or a
-  16-bit index whose **high byte isn't zeroed** (the value, not the bracket), not a flat `requiredXWidth` gap (H1).
-- **Negative result — a minimal 16-bit-table-index repro does NOT reproduce.** Built `tab[1024]` filled +
-  summed via a 16-bit loop index (forces real X=16 through LTO): `default == a16 == xy16 = 0xFE00`, all agree.
-  So **plain 16-bit table indexing is correct** — the bug needs the *specific* seed-445 shape (4-byte-stride
-  `crc32_tab` build + the `transparent_crc` readback, or a control-flow/loop interaction), not generic X=16.
+**Verified findings:**
+1. **Both seeds' static codegen is X-width-CORRECT and value-correct at every indexed op** (4 of 6 angles:
+   "no defect"). transparent_crc, selectXY16's index materialization, the 16-bit-index high-byte handling, and
+   the crc32_tab fill-loop lattice are all provably correct. Every 8-bit-indexed block in 247/445 is **X8-pinned
+   by an adjacent classified op** (`ldy #imm`/`iny`/`tyx`/JSR-return) right before the first indexed access, so
+   the lattice never flows X=16 into an unbracketed 8-bit op. The genuine X=16 region (the `crc32_tab[256]`
+   `*4`-scaled CRC access) is correctly `XLow=1` `bf/9f long,X` (`R_MOS_ADDR24 .bss.crc32_tab @0x0218`, bank 0,
+   index `i*4` ≤ 0x3FC, in range). Independently re-derived by all 3 verifiers.
+2. **The `requiredXWidth` family gap is a REAL latent defect — but it does NOT fire in 247/445.** `requiredXWidth`
+   (`MOSInsertREPSEP.cpp`) only enumerates LDAbs/LDImag8/LDImm/STAbs/INC/DEC/STImag8/CMP{Imm,Imag8,Abs}/
+   LDXIdx/LDYIdx/TA/TX/PH/PL; the whole 8-bit indexed/indirect family (LDAAbsIdx, LDAZpIdx, ST{Abs,Zp,Z}Idx,
+   LD/ST{Indir,IndirIdx}, the ADC/SBC/AND/ORA/EOR/ASL/LSR/ROL/ROR/CMP{Zp,Abs,Indir}Idx forms) falls to
+   `XW_None` (X-passthrough). If the lattice ever left X=16 ambient at one, it would deref a 16-bit index with a
+   garbage high byte. The genuinely-16-bit forms (`*Idx16`, `XLow=1`) are correctly `XW_X16`, so the gap can
+   only ever *miss a forced-X8* — never widen a 16-bit value. **a16/default-safe** (HasIndex16-gated, line 304).
+   But in 247/445 every such op is already X8-pinned (finding 1), so **closing the gap will not change their
+   output** — verified by 3/3.
+3. **The actual 247/445 cause was NOT isolated statically.** Static index-WIDTH is correct everywhere; the
+   dissent (5/6 + all verifiers) is that the true cause is *runtime*: a value bug in the genuine-X16 `bf/9f
+   long,X` crc32_tab path, or a **65816-core / MAME behavior of `long,X` under X=16** the static disasm can't
+   reveal. A minimal `tab[1024]` 16-bit-index fill+sum repro also **passes** (0xFE00 all-agree) — generic X=16
+   indexing is fine; the trigger is the specific Csmith CRC harness shape.
 
-**Next step (handed back / for a focused follow-up):** delta-reduce seed 445 itself (the reliable path — the
-generic-shape guesses missed), OR do CFG-aware X-lattice analysis across the `crc32_tab` loop edges + the
-`transparent_crc` call boundary. The `transparent_crc` helper (CRC byte-walk over the struct) is the next
-suspect to disasm under xy16 vs a16. Cap hit (3 hypotheses) → checkpointed here per the debugging-limit rule.
+**The decisive cheap test the workflow surfaced:** the original differential ran `default@MAME`, `a16@MAME`,
+`xy16@MAME`, `a16@bsnes-jg` — it **never ran `xy16@bsnes-jg`.** If `xy16@bsnes` *agrees* with the oracle while
+`xy16@MAME` is wrong, this is a **MAME `long,X`-under-X16 emulation artifact, not a compiler bug** (a16@MAME
+can't expose it — a16 keeps X=8). If `xy16@bsnes` *also* diverges, it's a real codegen/runtime bug. Run this
+FIRST — it bisects the whole problem in one build.
 
-## Phase 2 — fix + regression-guard (same change)
+---
 
-- Fix in `MOSInsertREPSEP.cpp` (`requiredXWidth` / X-lattice) or `selectXY16` per Phase 1; **`HasIndex16`-gated**
-  so a16 + default are untouched by construction (the pass early-returns unless `hasAccum16()`; X-lattice is
-  `HasIndex16`).
-- Regenerate `patches/llvm-mos/0002-321-accum16.patch`.
-- **Regression guard:** both seeds become passing csmith cases. Because the csmith gate can't XFAIL a runtime
-  mismatch by seed, also add a **deterministic micro-test** if the idiom minimizes (mirror `xy16ops`/the
-  c-torture rows) — but note the LTO-narrows-small-index gotcha (`agent-handoff.md`): a minimal global-array
-  index narrows to X8 under LTO, so the test must keep a genuinely-16-bit index (computed/double-indirect
-  chase, like `pr49419`) or assert at the MIR level.
+## Phase 2 — TWO TRACKS (revised per the workflow)
+
+### Track A — land the `requiredXWidth` family-gap fix (hardening; correct regardless of 247/445)
+
+A genuine latent xy16 defect, low-risk, ready to implement. In `requiredXWidth`'s opcode switch (beside
+`case MOS::LDXIdx: case MOS::LDYIdx: return XW_X8;`), add the 8-bit indexed/indirect family → `XW_X8`:
+`LDAZpIdx`/`LDAAbsIdx`, `ST{Zp,Abs,Z}Idx`, `LD/ST{Indir,IndirIdx}`, and the
+`ADC/SBC/AND/ORA/EOR/ASL/LSR/ROL/ROR/CMP{Zp,Abs,Indir}Idx` forms. **Verify each enum exists** against
+`build/.../MOSGenInstrInfo.inc` + the `.td` records (`MOSInstrLogical.td`) before committing; drop any that
+don't, add any indexed sibling that does. Do **not** add the `XLow=1` 16-bit forms (`*Idx16` — already
+`XW_X16`). HasIndex16-gated ⇒ a16/default byte-identical. *(Robust long-term alternative: scan MI operands for
+a physical `$x`/`$y` use marked index/address by the MCID and return `XW_X8` unless `XLow` — closes the gap
+structurally instead of by enumeration.)* Regression guard: a micro-test that forces an 8-bit `(zp),Y`/`abs,X`
+op reached on every edge from an X16 region with no intervening classified-X8 op (the workflow's `go()` recipe;
+keep a genuinely-16-bit index alive so LTO can't narrow it). Land independently of Track B.
+
+### Track B — the actual 247/445 bug (cause not yet found; runtime bisection)
+
+1. **Disambiguate compiler-bug vs MAME-emulation-bug (do first):** run **`xy16@bsnes-jg`** on both seeds.
+   - `xy16@bsnes` == oracle ⇒ **MAME `long,X`-under-X16 artifact.** Not a compiler bug: file a MAME note,
+     close the seeds as emulator-caveat (and prefer bsnes-jg for the xy16 leg on `long,X` shapes). Done.
+   - `xy16@bsnes` != oracle ⇒ **real codegen/runtime bug** → step 2.
+2. **Runtime fill-vs-read bisection** (the genuine-X16 path is the only suspect left): build a variant where
+   the `crc32_tab` FILL goes via the xy16 `9f long,X` store but the READBACK is forced through a known-good
+   8-bit pointer path (isolates the store); and the converse — a host-initialized constant table read via the
+   xy16 `bf long,X` path (isolates the load). Whichever side flips the value localizes store vs load. Then
+   MIR/runtime-trace that op. (Reduction of the full seed is the fallback.)
+
+---
 
 ## Phase 3 — verify (run each; paste raw output + PASS/FAIL)
 
-1. **Build:** `dev/run.sh toolchain` (on the worktree; see `howto-feature-worktree.md` for the `cp -al` of `build/`).
-2. **Both seeds fixed:** `dev/run.sh fuzz --gen csmith 1 247` and `… 1 445` → 4-way agree.
-3. **No xy16 regression:** `xy16basic`/`xy16ops`/`xy16indiry`/`xy16spill*` all PASS; `k_isort` xy16 leg agrees.
-4. **No a16/default regression:** a16 suite green; `dev/run.sh fuzz --gen csmith 200 101` and `… 200 301` →
-   0 mismatch (was the 2 xy16 seeds); c-torture `dev/run.sh torture 60` clean.
-5. **verify-machineinstrs** clean; `0002` round-trips, no foreign hunks.
+0. **Disambiguation (Track B step 1):** `xy16@bsnes-jg` on seeds 247 + 445 — record whether it agrees with the
+   oracle (⇒ MAME artifact) or diverges (⇒ real bug). This gates whether Track B is a compiler fix at all.
+1. **Build:** `dev/run.sh toolchain`; fresh `clang-23` mtime.
+2. **Track A non-regression (the key proof it's safe):** diff seeds 247/445 + the xy16 micro-tests disasm
+   xy16 vs the pre-fix build — the ONLY change may be **added `sep #$10`** before previously-unbracketed 8-bit
+   `(zp),Y`/`abs,X`/`abs,Y` ops; **a16 and default builds byte-identical** (proves HasIndex16 gating).
+3. **Track A micro-test:** the forced-X16→8-bit-indexed-op gate PASSES 4-way.
+4. **Track B (if a real bug):** seeds 247/445 → `0x80FE`/`0x0D1D` on `xy16@MAME` and `xy16@bsnes`.
+5. **No xy16 regression:** `xy16basic`/`xy16ops`/`xy16indiry`/`xy16spill*` PASS; `k_isort` xy16 leg agrees.
+6. **No a16/default regression:** a16 suite green; `dev/run.sh fuzz --gen csmith 200 101` + `… 200 301`
+   0 mismatch (modulo any still-open seed); c-torture `dev/run.sh torture 60` clean.
+7. **verify-machineinstrs** clean; `0002` round-trips, no foreign hunks.
 
 ## Notes / coordination
 

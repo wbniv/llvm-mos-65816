@@ -274,16 +274,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   one signature ⇒ likely a single shared bug. Repros: `dev/run.sh fuzz --gen csmith 1 {247,445}`. **Not**
   code-XFAIL'able (the csmith gate only classifies *compile*-log failures, not runtime mismatches), so re-sweeps
   report them as FAILs until fixed. For the xy16 worktree owner — the a16 worker did not touch xy16 codegen.
-  **Fix plan written 2026-06-20** (grounded in seed-445 disasm: the divergence is an index op in the wrong X
-  width — the `requiredXWidth`/`MOSInsertREPSEP` X-lattice class, same family as `55ec505`; root-cause via MIR
-  after `mos-insert-rep-sep`, execute on `wt/321-xy16`). **Phase 1 PARTIAL 2026-06-20** (root-cause NOT yet
-  isolated): linear X-width trace of seed 445's `main` inconclusive — all 8-bit-index ops sit correctly at X=8
-  on the straight-line path; the only genuine X=16 region is the `crc32_tab` fill loop; **negative result**: a
-  minimal 16-bit-table-index fill+sum repro PASSES 4-way (plain 16-bit table indexing is correct). The bug
-  needs the specific seed-445 shape. H2 (CFG/loop-edge X-width subtlety or high byte of a 16-bit index
-  uninitialized) is the prime suspect over H1 (flat `requiredXWidth` gap). Debugging cap (3 hypotheses) hit,
-  checkpointed. **Next step:** delta-reduce seed 445 itself OR CFG-aware X-lattice analysis across the
-  `crc32_tab` loop edges + `transparent_crc` call boundary.
+  **Root-cause RESULT 2026-06-20 (10-agent workflow `wf_826f3a8e-bff`, ~760k tok, synthesis refuted 3/3):**
+  the bug is **NOT a static X-width mis-bracket** — both seeds' codegen is X-width-correct + value-correct at
+  every indexed op (every 8-bit-indexed block is X8-pinned by an adjacent classified op; the genuine X=16
+  `crc32_tab` `bf/9f long,X` access is correct, index in-range, bank 0). The `requiredXWidth` 8-bit-indexed
+  family gap (LDAAbsIdx/ST*Idx/*IndirIdx/ALU-Idx → `XW_None`) is a **real latent defect worth landing as
+  hardening (Track A)** but provably does **not** fire in 247/445. The actual cause is **runtime** (a value bug
+  in the `long,X` X=16 path, or a MAME `long,X`-under-X16 behavior). **Decisive next test:** run **`xy16@bsnes-jg`**
+  on both seeds (the original differential never did) — agrees ⇒ MAME emulation artifact, not a compiler bug;
+  diverges ⇒ real bug → fill-vs-read runtime bisection. Plan split into Track A (hardening, ready) + Track B
+  (runtime bisection).
   [handoff](docs/plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md) ·
   [fix plan](docs/plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
