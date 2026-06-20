@@ -864,6 +864,13 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      by the Done item [321-loadfold-unify]. Nothing to track.
      fp:5f85cd31e68981cc fp:f85cd73b8f51bdd5 fp:98f82e24c01c1ac9 -->
 - [verify] **2026-06-20-memory-organization-two-tier** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-20-memory-organization-two-tier.md](docs/plans/2026-06-20-memory-organization-two-tier.md)_  <!-- fp:7b6f4179413cb08f -->
-- [ ] **(triage)** **Far-pointer calling convention** — pass/return a 32-bit `p2` across function boundaries — _from [2026-06-20-320-far-pointer-runtime.md](docs/plans/2026-06-20-320-far-pointer-runtime.md)_  <!-- fp:2f1aaa13df1acdfe -->
-- [ ] **(triage)** **`G_STORE` runtime far (`sta [dp]`)** — implemented symmetrically with the load, but the gate — _from [2026-06-20-320-far-pointer-runtime.md](docs/plans/2026-06-20-320-far-pointer-runtime.md)_  <!-- fp:edb3f3d7062da359 -->
+<!-- triaged 2026-06-20: both #320 Inc 3 deferrals dispositioned.
+     • "Far-pointer calling convention" -> already the curated M1 Open bullet "#320 far-pointer calling
+       convention — pass/return a 32-bit p2 across function boundaries" (added this increment; grouped with
+       far calls / Inc 4, upstream-gated). Duplicate.
+     • "G_STORE runtime far (sta [dp])" -> NOT open work: the store path IS implemented this increment
+       (G_STORE_FAR_INDIR -> STIndirLong, the symmetric [dp] store), exercised by the legalizer/selector
+       alongside the load. Only a dedicated far_store.c micro-test is unwritten — trivial polish, not a
+       tracked deliverable. Nothing open.
+     fp:2f1aaa13df1acdfe fp:edb3f3d7062da359 -->
 <!-- END auto-captured-deferrals -->
