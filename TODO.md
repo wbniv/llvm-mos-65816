@@ -869,6 +869,13 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        alongside the load. Only a dedicated far_store.c micro-test is unwritten — trivial polish, not a
        tracked deliverable. Nothing open.
      fp:2f1aaa13df1acdfe fp:edb3f3d7062da359 -->
-- [ ] **(triage)** **Far-pointer calling convention** (pass/return `p2` across functions) — ABI decision, upstream-gated, — _from [2026-06-20-do-3c-finish-320-increment-3-runtime-far-pointer-a.md](docs/plans/2026-06-20-do-3c-finish-320-increment-3-runtime-far-pointer-a.md)_  <!-- fp:bffa7ff820f61a6a -->
-- [ ] **(triage)** **`sta [dp]` store micro-test** (`*fp = v`) — the store is already implemented; a dedicated gate is a — _from [2026-06-20-do-3c-finish-320-increment-3-runtime-far-pointer-a.md](docs/plans/2026-06-20-do-3c-finish-320-increment-3-runtime-far-pointer-a.md)_  <!-- fp:41566cc6a199377c -->
+<!-- triaged 2026-06-20: re-capture of the two #320 Inc 3 "out of scope" deferrals from the migrated
+     task plan (do-3c-finish-...); both already dispositioned in the 2026-06-20 note above (only the
+     fingerprints differ — new plan file, restated wording).
+     • "Far-pointer calling convention" -> the curated M1 Open bullet "#320 far-pointer calling
+       convention" (grouped with far calls / Inc 4, upstream-gated). Duplicate.
+     • "sta [dp] store micro-test" -> NOT open work: the store path IS implemented
+       (G_STORE_FAR_INDIR -> STIndirLong, the symmetric [dp] store); only a dedicated far_store.c
+       micro-test is unwritten — trivial polish, not a tracked deliverable. Nothing open.
+     fp:bffa7ff820f61a6a fp:41566cc6a199377c -->
 <!-- END auto-captured-deferrals -->
