@@ -34,8 +34,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   nothing".
   **In progress (2026-06-21, `wt/320-far-cc`):** P0 + A0 (variant a Imag32) + A1 (variant b Imag16+bank) +
   A2 (variant c A:X+Y) landed (`10a5fc0`, `741a8c2`, `02953e7`), each round-tripping arg+return to `0xF3` on
-  MAME + bsnes-jg; `0004` captures all three (round-trip-verified). **Next:** A3 (variant d stack, not
-  started; `,S` modes are 65CE02-gated) → build the **net-new** cycle harness (`dev/probe-cycles.lua` +
+  MAME + bsnes-jg; `0004` captures all three (round-trip-verified). **Next:** A3 (variant d stack —
+  [plan](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md): build the cheap soft-stack route,
+  record-and-drop hardware-`,S`) → build the **net-new** cycle harness (`dev/probe-cycles.lua` +
   `dev/measure-far-cc.sh` — neither exists; the frame study deferred its harness when its A0 census
   short-circuited) → M (measure) → D (promote winner → `0001`, default-on).
   [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
@@ -902,4 +903,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "not posting upstream" -> the curated user-triggered "#320 post design note upstream" bullet.
        Duplicate. Nothing open.
      fp:b7a659d550bb10a3 fp:9b54c26fd2f46d90 fp:5612fe3202e783db fp:a5a5bc42d30cd1b6 -->
+- [ ] **(triage)** **(d-hard) the hardware-`,S` convention** — explicitly deferred/record-and-drop (cost documented above); — _from [2026-06-21-320-far-cc-variant-d-stack.md](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)_  <!-- fp:235eae6afa6c3270 -->
+- [ ] **(triage)** **No new 65816 `,S` opcodes, no `SPAdj` threading** — both belong to (d-hard). — _from [2026-06-21-320-far-cc-variant-d-stack.md](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)_  <!-- fp:4659aab74b00d140 -->
+- [ ] **(triage)** **Not** promoting any winner to `0001` here (that's the parent plan's D step) and **not** building the M — _from [2026-06-21-320-far-cc-variant-d-stack.md](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)_  <!-- fp:3bcef2320eb561ac -->
+- [ ] **(triage)** **Not** changing near-ptr/scalar passing or the A/X scalar return (LOCKED). — _from [2026-06-21-320-far-cc-variant-d-stack.md](docs/plans/2026-06-21-320-far-cc-variant-d-stack.md)_  <!-- fp:249a072577185895 -->
 <!-- END auto-captured-deferrals -->

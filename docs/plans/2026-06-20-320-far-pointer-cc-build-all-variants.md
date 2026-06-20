@@ -22,7 +22,7 @@ so the (c) infrastructure rode in alongside (b).
 | **A0** variant (a) Imag32 | ✅ **landed** (`10a5fc0`) | CC rule `CCIfPtrAddrSpace<2, CCIf<"MOSFarCCImag32(State)", CCAssignToReg<[RL1,RL2,RL3]>>>`; round-trips arg **and** return on MAME + bsnes-jg (`farcc_imag32.{c,sh}`). |
 | **A1** variant (b) Imag16+bank | ✅ **landed** (`741a8c2`) | `CC_MOS_FarPtrSplit` custom assigner + `assignCustomValue` decompose/recompose; `farcc_split.sh` passes both emulators. |
 | **A2** variant (c) A:X+Y | ✅ **landed** (`02953e7`) | `CC_MOS_FarPtrAXY` custom assigner (A:X offset + Y bank) + the 3-location `assignCustomValue` branch; `farcc_axy.sh` round-trips arg **and** return to `0xF3` on MAME + bsnes-jg; negative control + default byte-identical (corpus 7/7). **Singular by design** — one far ptr, must precede any A/X-consuming scalar arg. |
-| **A3** variant (d) stack | ⬜ **not started** | Only `FeatureFarCCStack` + the `MOSFarCCStack()` predicate stub exist; no assigner, no test. `,S` modes exist but are `Has65CE02`-gated → need new 65816 wiring. |
+| **A3** variant (d) stack | ⬜ **planned** — [sub-plan](2026-06-21-320-far-cc-variant-d-stack.md) | Build the cheap **soft-stack** route (reuses the existing `assignValueToAddress` / `CCAssignToStack` mem path — the one varargs use); **record-and-drop** the hardware-`,S` route (blocked on `SPAdj==0` at `MOSRegisterInfo.cpp:278` + missing 65816 `,S` opcodes; frame-ABI measured 0/13). |
 | **M** measurement | ⬜ **not started** | The byte harness is reusable; **the cycle harness does not exist yet** (see the corrected note under the phased sequence). |
 | **D** decision | ⬜ **not started** | Winner promotes from the spike patch into `0001` (below). |
 
