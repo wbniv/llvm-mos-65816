@@ -28,7 +28,9 @@ census short-circuited the build at the measurement step.
 | Design note for #320 (near→far ABI discussion) | ⬜ Drafted; **user-triggered** to post ([docs/320-upstream-far-pointer-note.md](320-upstream-far-pointer-note.md)) |
 | Five-address-space model + full PR | ⬜ Upstream-gated on design-note posting; not started |
 | Far calls (JSL / RTL), cross-bank function pointers | ⬜ Blocked on CC decision + upstream |
-| Runtime far-pointer operations (near→far cast, arithmetic, `[dp]` indirect, far data >2 banks) | ⬜ Deferred past the #320 static-slice PR |
+| Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
+| Runtime far-pointer arithmetic (`G_PTR_ADD` on AS2) | ⬜ **Deferred (Inc 3c)** — blocked on symmetric `s32→4×s8 G_UNMERGE_VALUES` legalization (a16/`0002` gap); `far_arith.c` is the first to hit it |
+| Far data >2 banks, far calls (JSL/RTL), far-pointer calling convention | ⬜ Deferred past Inc 3 (CC = ABI decision, upstream-gated; grouped with far calls / Inc 4) |
 | Formal #320/#321 psABI document | ⬜ Premature — upstream won't bless ahead of a live implementation |
 
 **M1 verdict:** the load/store slice is solid and two-emulator verified. Everything else waits on the

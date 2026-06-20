@@ -53,16 +53,19 @@ fi
 DB="$VENDOR/Database"
 
 # 2. Build-if-missing the far ROMs (so the target is self-contained).
-build_rom() { # name cfg
-  local name="$1" cfg="$2"
+build_rom() { # name cfg [extra-clang-flags...]
+  local name="$1" cfg="$2"; shift 2
   [ -f "$BUILD/$name.sfc" ] && [ -f "$BUILD/$name.map" ] && return 0
-  echo "==> build $name.sfc ($cfg -mcpu=mosw65816)"
-  "$TOOL/mos-clang" --config "$INSTALL/bin/$cfg" -mcpu=mosw65816 -Os \
+  echo "==> build $name.sfc ($cfg -mcpu=mosw65816 $*)"
+  "$TOOL/mos-clang" --config "$INSTALL/bin/$cfg" -mcpu=mosw65816 -Os "$@" \
     -Wl,-Map="$BUILD/$name.map" -o "$BUILD/$name.sfc" "$ROOT/examples/65816/$name.c"
   python3 "$ROOT/tools/snes-checksum.py" "$BUILD/$name.sfc" >/dev/null
 }
 build_rom far-run   mos-snes.cfg
 build_rom far-bank1 mos-snes-far.cfg
+# #320 Increment 3: runtime far deref needs +mos-a16 (32-bit value legalization).
+build_rom far_indir mos-snes-far.cfg -Xclang -target-feature -Xclang +mos-a16
+build_rom far_cast  mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
 
 # 3. Cross-check each ROM on bsnes-jg. Offset/len derived from the .map exactly
 # like the MAME path (dev/_emu.sh's _emu_map_lookup) — WRAM offset == symbol VMA.
@@ -85,6 +88,8 @@ echo "==> bsnes-jg cross-check (independent of MAME)"
 xassert "$BUILD/hello.sfc"     "$BUILD/hello.map"     sentinel      0x42   # liveness (from dev/run.sh build)
 xassert "$BUILD/far-run.sfc"   "$BUILD/far-run.map"   corpus_result 0xF3   # bank $00
 xassert "$BUILD/far-bank1.sfc" "$BUILD/far-bank1.map" corpus_result 0xF3   # bank $01 (the fidelity point)
+xassert "$BUILD/far_indir.sfc" "$BUILD/far_indir.map" corpus_result 0xF3   # bank $01, RUNTIME far ptr via lda [dp]
+xassert "$BUILD/far_cast.sfc"  "$BUILD/far_cast.map"  corpus_result 0xF3   # bank $00, near->far cast then lda [dp]
 
 echo
 [ $rc -eq 0 ] && echo "RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)" \
