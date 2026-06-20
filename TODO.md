@@ -226,10 +226,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   through a pointer in `__rc`, so frame/spill traffic is ~0 and there is **nothing for any frame ABI to
   optimize**; only contrived volatile/const-shuffle shapes profit (`frameabi_heavy.c`). So A1–A4/B/M were
   **not built** (would only confirm the measured NULL). A *stronger* result than the proxy shelving — the
-  opportunity itself was measured empty. **Remaining (small):** (1) merge the durable artifacts to `main`
-  (`frameabi_a0.c`/`.sh`, `frameabi_heavy.c`, `frameabi-census.sh`, `frameabi-byte-identical.sh`) + tear down
-  the worktree, discarding the (a)/(b) compiler diff (failed the go/no-go); (2) post the prepared #321 CC
-  evidence paragraph (user-triggered; see plan §Outcome + Upstream).
+  opportunity itself was measured empty. ~~Durable artifacts merged to `main`~~ (`f114c42`:
+  `frameabi_a0.c`/`.sh`, `frameabi_heavy.c`, `frameabi-census.sh`, `frameabi-byte-identical.sh`). **Remaining:**
+  (1) the `wt/321-frame-abi` branch is **retained until notified** (user, 2026-06-20) — holds the inert,
+  un-landed (a)/(b) `0002` spike; tear down only when told; (2) post the prepared #321 CC design note
+  (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
   [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
 
 ### Test Bench / CI

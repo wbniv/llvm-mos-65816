@@ -207,10 +207,13 @@ then the A0 census (`dev/frameabi-census.sh`) settled *worth* at a fraction of t
 **This is a *stronger* result than the prior ZP-pressure proxy shelving:** we directly measured the
 frame-traffic *opportunity* and found it empty, rather than inferring it from slack ZP. **Disposition:** the
 (a)/(b) compiler diff (the off-by-default `+mos-dp-frame`/`+mos-sr-frame` features in the worktree's `0002`)
-does **not** land — it failed the go/no-go bar. The **durable artifacts merge back** to `main`:
+does **not** land — it failed the go/no-go bar. The **durable artifacts are merged** to `main` (`f114c42`):
 `frameabi_a0.c`/`.sh` (feasibility proof + gate), `frameabi_heavy.c` + `frameabi-census.sh` (the measurement),
-`frameabi-byte-identical.sh` (the P0 guardrail). **Upstream (#321, user-triggered):** the evidence paragraph
-below turns the soft-static-stack choice into a measured one.
+`frameabi-byte-identical.sh` (the P0 guardrail). The **`wt/321-frame-abi` branch is RETAINED until notified**
+(user, 2026-06-20) — it holds the inert, un-landed (a)/(b) `0002` spike; do not tear it down until told.
+**Upstream (#321, user-triggered):** the drafted [CC design note](321-upstream-cc-frame-abi-note.md)
+(queued in [upstream-contribution-status](upstream-contribution-status.md) #6) turns the soft-static-stack
+choice into a measured one.
 
 > **#321 CC evidence (draft, user-triggered to post).** "We evaluated alternative 65816 stack-frame ABIs for
 > the C calling convention — a TCD direct-page window and pure hardware-stack-relative — against llvm-mos's
