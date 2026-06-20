@@ -151,8 +151,32 @@ Two refinements vs the §2 sketch, both *widening* the picture:
    won't-do) and register-LHS EQ stays byte-wise (optimal). So §3 is the **only** open lever, and it is wide.
 
 This justifies the §3 spike (step 3): a broad target + the mechanism (`selectAddE`/`G_UADDE`) already present.
-**Pending:** step 2 (frequency of ordering-as-value in real code) + step 3 (the byte-diff go/no-go spike, which
-needs a worktree — a legalizer/select-lowering change to route the ordering carry into `G_UADDE(0,0,C)`).
+
+### Phase 0 step 3 — byte-diff (RAN 2026-06-21): **GO**, +3…6 B/site
+
+The boolean materialisation is already a CFG diamond at `-print-before=instruction-select`
+(`G_SBC`→carry `%c`; `G_BRCOND_IMM %c`→two BBs→`G_PHI 1/0`) — i.e. `zext(i1 sbc-carry)` lowered through
+`G_SELECT`→`MOSLowerSelect`. Measured the win in **real bytes** (not estimated): take the compiler's diamond
+asm, hand-write the branchless `rol`-tail, byte-count both.
+
+```
+uge_v  (return x>=y, carry IS the result):
+  diamond:    rep;lda;cmp; bcc; sep;lda #1; bra; sep;lda #0; ldx #0; rts   = 25 B
+  branchless: rep;lda;cmp; lda #$0000; rol; sep; ldx #0; rts              = 19 B   → −6 B (−24%)
+ult_v  (return x<y, inverse carry): branchless + `eor #$0001`             = 22 B   → −3 B (−12%)
+```
+
+`lda #$0000; rol` (16-bit) puts the carry into bit 0 = the boolean, in 4 B, replacing the ~12 B diamond tail;
+the inverted predicates (ULT/ULE/SGE…) pay +3 B for `eor #1` but still win. **Clean win** for a single
+ordering-value materialisation (strictly smaller; touches neither the branch path — which reads the carry
+via `G_BRCOND_IMM` directly — nor equality, whose Z is non-rotatable). **Step 2 (frequency):** ordering-as-value
+is real but **less common than the branch form**, so the *aggregate* is modest — but per lesson #3 a clean
+3–6 B/site win amplified across every toolchain build is worth landing. **Verdict: GO** (clean, broad, modest).
+
+The implementation (§5) is therefore unblocked: a `hasAccum16()`-gated rewrite of `zext(i1 sbc-carry)` (the
+ordering-value materialisation, single-use, not a branch) into `G_UADDE(0,0,carry)` (+ an `eor #1` for the
+inverted predicates), placed before `MOSLowerSelect` forms the diamond — measured net-positive, zero
+regression, or it doesn't ship.
 
 ## 5. The fix (only if Phase 0 §3 measures a win) + verification
 
