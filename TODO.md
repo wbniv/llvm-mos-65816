@@ -245,49 +245,26 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   **Phase 4 (larger seed sweeps) RAN 2026-06-20** — seeds 101–300 then 301–500 (400 fresh programs):
   (a) seed 113 a16 `G_MERGE_VALUES` s8×4→s32 legalizer crash — **FIXED** (see Done `[321-a16-s32-merge-s8x4]`);
   (b) seeds 247 + 445 `+mos-xy16`-only runtime mismatches (same signature) — **handed off** to the xy16 area
-  (see the open xy16 item below). The a16 path is otherwise clean across both ranges (0 crash, 0 a16 mismatch).
+  (now **FIXED** — see Done `[321-xy16-seed247-445]`; the `requiredXWidth` Track A hardening remains open above).
+  The a16 path is otherwise clean across both ranges (0 crash, 0 a16 mismatch).
   Remaining: **Phase 5** (sampled CI mirroring `corpus-a16`). **Yarpgen
   follow-up:** add a `--gen yarpgen` later to target
   `-O1/-Os` loop/scalar-opt bugs (no `platform.info` equiv → 16-bit-int caveat; must redirect its baked-in
   `printf`); the `--gen` seam added here makes it drop-in.
   [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
-- [ ] **#321 xy16 — Csmith runtime miscompiles, seeds 247 + 445 (HANDOFF to `wt/321-xy16`).** Csmith sweeps
-  (101–300, 301–500) found **two** `+mos-xy16`-only value divergences, same signature (a16 + default + bsnes
-  agree; only xy16@MAME wrong): seed 247 (`0x80FE`→`0x7C73`), seed 445 (`0x0D1D`→`0x35E7`). a16 is correct, so
-  it's xy16 index-register codegen (`selectXY16`/`requiredXWidth`/REP-SEP X-width, cf. `55ec505`); two seeds /
-  one signature ⇒ likely a single shared bug. Repros: `dev/run.sh fuzz --gen csmith 1 {247,445}`. **Not**
-  code-XFAIL'able (the csmith gate only classifies *compile*-log failures, not runtime mismatches), so re-sweeps
-  report them as FAILs until fixed. For the xy16 worktree owner — the a16 worker did not touch xy16 codegen.
-  **Root-cause RESULT 2026-06-20 (10-agent workflow `wf_826f3a8e-bff`, ~760k tok, synthesis refuted 3/3):**
-  the bug is **NOT a static X-width mis-bracket** — both seeds' codegen is X-width-correct + value-correct at
-  every indexed op (every 8-bit-indexed block is X8-pinned by an adjacent classified op; the genuine X=16
-  `crc32_tab` `bf/9f long,X` access is correct, index in-range, bank 0). The `requiredXWidth` 8-bit-indexed
-  family gap (LDAAbsIdx/ST*Idx/*IndirIdx/ALU-Idx → `XW_None`) is a **real latent defect worth landing as
-  hardening (Track A)** but provably does **not** fire in 247/445. The actual cause is **runtime** (a value bug
-  in the `long,X` X=16 path, or a MAME `long,X`-under-X16 behavior). **Disambiguation DONE 2026-06-20: it's a
-  REAL compiler bug** — `xy16@bsnes-jg` (the leg the original differential omitted) gives the SAME wrong values
-  as `xy16@MAME` (445: 0x35E7; 247: 0x7C73) → not a MAME artifact; the xy16 ROM is genuinely miscompiled (and
-  the workflow's "value-correct" claim is falsified — width correct, values wrong). Two generic minimal repros
-  (byte `tab[1024]`; `uint32_t[256]` CRC32) both PASS 4-way ⇒ the trigger is specific to seed 445/247, not a
-  generic table-index shape. **Next: delta-reduce seed 445** (install `cvise`/`creduce` with a load-insensitive
-  bsnes-jg interestingness test, or fill-vs-read bisection) → root-cause + fix. **Track A** (`requiredXWidth`
-  8-bit-indexed-family hardening — real latent defect, ready) commit is **blocked on the concurrent uncommitted
-  `noClobberBetween`/`0002` work**; land after that commits.
-  [handoff](docs/plans/2026-06-20-321-xy16-csmith-seed247-mismatch-handoff.md) ·
-  [fix plan](docs/plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md).
-  **FIXED 2026-06-20 (approach B).** cvise-reduced to an 8-line UB-free repro, then root-caused: a 16-bit value
-  classed `Xc16` (loaded into X16) was left **live across an unrelated 8-bit-index op**, whose index-narrowing
-  `sep #$10` zeroes the X/Y high byte. **Fix** (~22 lines, xy16-gated): `selectXY16`'s `G_LOAD16_ABS` emits the
-  direct `LDXAbs16`/`LDYAbs16` only when the value is **genuinely used as an index**; else it reclasses to
-  `Imag16` and lowers through the accumulator. Verified 4-way both emulators (incl. MAME): minimal `0x0002`,
-  247 `0x80FE`, 445 `0x0D1D` all agree; csmith sweep 101–500 0 mismatch/crash; a16/default **byte-identical**
-  (gated); xy16 micro-tests green; `-verify-machineinstrs` clean; *smaller* code (minimal `main` 61→54 B).
-  **`0002` committed** — regenerated via a clean temp reconstruction (pristine + 0001/0002/0003 + *just* this
-  fix) so the concurrent uncommitted **#320 far-pointer** `vendor/` work was NOT absorbed; that work stays in
-  `vendor/` for its owner, untouched. Regression sweep **confirmed: csmith 101–500 = 0 mismatch / 0 crash /
-  0 error across 400 seeds** (247 + 445 now pass in-sweep). → ready to move to Done.
-  Full arc (refuted A′ pre-RA clobber + #2 scheduler/liveness): [investigation](docs/investigations/65816-xy16-index16-highbyte-clobber.md) ·
-  [reduction plan](docs/plans/2026-06-20-321-xy16-seed445-cvise-reduction.md).
+- [ ] **#321 xy16 — Track A: `requiredXWidth` 8-bit-indexed-family hardening (latent defect).** Separate from
+  the now-fixed seed 247/445 bug (an over-eager `Xc16` selection, fixed in `2d8ab51`). In
+  `MOSInsertREPSEP::requiredXWidth` the broad 8-bit-indexed/indirect family (`LDAAbsIdx`, `ST{Abs,Zp,Z}Idx`,
+  `LD/ST{Indir,IndirIdx}`, the ALU-indexed `ADC/SBC/AND/ORA/EOR/ASL/LSR/ROL/ROR/CMP` forms) falls through to
+  `XW_None` (X-passthrough) instead of `XW_X8`; if the X-lattice ever left X=16 ambient at one, it would deref a
+  16-bit index with a garbage high byte. **Correctness-safe + `HasIndex16`-gated** (only ever inserts a `sep`;
+  the genuine `*Idx16` forms are `XLow`→`XW_X16`, untouched) and provably does **not** fire in 247/445 (the
+  101–500 sweep is clean) — hardening, not a live bug. Recommended impl: the **structural rule** (after the
+  `XLow` check, `readsRegister(X/Y) → XW_X8`) over a hand-enumeration (the ALU-indexed pseudos live in indented
+  TableGen blocks a top-level grep misses); check the xy16 suite for SIZE regressions; a RED test is hard (the
+  gap is X8-pinned by adjacent ops in real code).
+  [canonical plan §Track A](docs/plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md) ·
+  [investigation](docs/investigations/65816-xy16-index16-highbyte-clobber.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
   into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
@@ -387,6 +364,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-20 — [321-xy16-seed247-445] **#321 xy16 seeds 247/445 `+mos-xy16` miscompile — FIXED (approach B).** cvise-reduced to an 8-line UB-free repro; root cause: a non-index 16-bit value classed `Xc16`, loaded into X16 and left live across an 8-bit-index op whose index-narrowing `sep #$10` zeroes the X/Y high byte. Fix: `selectXY16`'s `G_LOAD16_ABS` emits the direct `LDXAbs16`/`LDYAbs16` only when the value is genuinely used as an index, else reclasses to `Imag16` and lowers through the accumulator (≈22 lines, `HasIndex16`-gated → a16/default byte-identical). Verified 4-way both emulators (incl. MAME) + csmith 101–500 (0 mismatch/400) + c-torture 60/60; `-verify-machineinstrs` clean; smaller code (`main` 61→54 B). Patch `0002`=`2d8ab51`; refuted A′ (pre-RA clobber) + #2 (scheduler) documented. See [reduction plan](docs/plans/2026-06-20-321-xy16-seed445-cvise-reduction.md) · [investigation](docs/investigations/65816-xy16-index16-highbyte-clobber.md).
 - 2026-06-20 — [320-inc4-far-calls] **#320 Inc 4 Phase 1 — far CALLS (JSL/RTL) + Phase 0 far-pointer STORE (`sta [dp]`), two-emulator verified.** The cross-function half of #320 begins: a direct call to a function the linker placed in another 64 KB bank now emits **JSL** ($22, pushes a 3-byte PBR:PC) and the callee returns via **RTL** ($6B, pops 3). New `JSL`/`RTL` pseudos mirror `JSR`/`MOSReturn<RTS>`; `MOSCallLowering::lowerCall`/`lowerReturn` swap JSR→JSL / RTS→RTL when the callee/function is in a `.far_*` section, **`STI.hasW65816()`-gated** so default 6502 codegen is byte-identical. `.far_text`→`rom_1` (bank $01) added to `snes-far/link.ld`. `__far` = section attribute (no clang change); caller (JSL) and callee (RTL) are driven by the same attribute so they always agree. **MVP scope:** the far function is a LEAF — a far fn that `JSR`'d a near fn would keep PBR=$01 and run the wrong bank's bytes (mixed-banking + far function pointers + far tail calls are follow-ups; tail-call opt auto-skips since it keys on `MOS::JSR`). Gate `examples/65816/far_call.c` + `dev/far_call.sh`: `jsl` at the call + `rtl` in the far leaf, `far_leaf @ 0x18000` (bank $01), value 0xF3 crosses the boundary on MAME + bsnes-jg (far calls are a16-independent — 8-bit args). **Phase 0** closed the Inc 3 `sta [dp]` store loose end: `examples/65816/far_store.c` + `dev/far_store.sh` (disasm `87`, store-then-read-back 0xF3, both emulators). No regression: corpus 7/7 (near JSR/RTS intact), a16call/a16ret PASS, Csmith 27/30 (0 mismatch/crash), all 5 prior far ROMs PASS. In `0001` (a16-independent); new **`dev/regen-patch-0001.sh`** (sequential worktrees — 3-at-once overflowed /tmp) regenerates the far patch by isolating the far delta from 0002's interleaved a16 hunks, round-trip verified (0001 a16-free, 0002 still stacks). Gotcha recorded: a `.far_text` linker change needs `dev/run.sh build` (SDK rebuild), not just `toolchain` — else far code silently orphans into bank $00. [plan](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md).
 - 2026-06-20 — [320-inc3c-far-arith] **#320 Inc 3c — runtime far-pointer arithmetic (`fp++` / `G_PTR_ADD` on AS2), two-emulator verified — Inc 3 COMPLETE.** The last deferred Inc 3 item. `fp++` on an `address_space(2)` far pointer now lowers and executes: `G_PTR_ADD {PF,S32}` skips the `G_INC` fast-path (32-bit base) → generic `ptrtoint`/`add`/`inttoptr`; the s32 ±1 add (`legalizeAddSub`) splits the value with `buildUnmerge(S8, s32)` = a **4×s8 ← s32 `G_UNMERGE_VALUES`** that was `unsupported()` — the one gap blocking 3c. Fix = the symmetric mirror of the existing `legalizeMergeS32FromBytes`: **`legalizeUnmergeS32ToBytes`** (`customFor({{S8,S32}})` under `hasAccum16`, in `0002`) rewrites it 2-level — unmerge s32→2×s16 (legal `{S16,S32}`), then each s16→2×s8 (legal `{S8,S16}`), reusing the 4 original byte defs; builds only unmerges so no merge↔unmerge artifact-combine loop. Default 8-bit codegen untouched (a16-gated). **Bonus:** also closes a latent a16 bug — a `uint32_t` shift-by-≥8 (`legalizeShiftRotate`) emitted the same unsupported unmerge; no test hit it yet. Gate `examples/65816/far_arith.c` + `dev/far_arith.sh` + `xcheck` row (bank $00, `fp++` then `lda [dp]`, `arr[1]=0xA9 ^ 0x5A = 0xF3`). Verified (clang-23 rebuilt): far_arith disasm `2a: a7 00 lda [$0]` + MAME `0xF3` + bsnes-jg `0xF3`; far_indir/far_cast/far-run/far-bank1 no regression; a16incdec/a16add/a16sub PASS both emulators; Csmith 27/30 (0 mismatch, 0 crash, 0 error); `0002` regen round-trips (only the `legalizeUnmergeS32ToBytes` hunk — 0 foreign, `0001` untouched). 3a/3b shipped in `0001`; this unmerge in `0002`. **#320 Inc 3 (3a+3b+3c) now complete**; far-pointer CC + far calls remain Inc 4 (upstream-gated). [task plan](docs/plans/2026-06-20-do-3c-finish-320-increment-3-runtime-far-pointer-a.md) · [inc3 plan](docs/plans/2026-06-20-320-far-pointer-runtime.md).
 - 2026-06-20 — [320-inc3-far-runtime] **#320 Inc 3 — runtime far-pointer dereference (`lda [dp]`) + near→far cast, two-emulator verified.** A far pointer computed at RUNTIME (opaque via volatile, can't fold to absolute-long) now dereferences via 65816 indirect-long `lda [dp]` (opcode A7), and an AS0→AS2 `addrspacecast` zero-extends a near pointer to far (bank $00). Added the backend's **first first-class 32-bit ZP register** — `Imag32`, a quad over two `RS` words = 4 contiguous `__rc` bytes the `[dp]` mode reads (subreg indices `sublo16`/`subhi16`, `RL#K` entities, `getReservedRegs` quad-overlap reservation so a far ptr never lands on the stack ptr `RS0`/scavenger `RS8`, `getRegClassForType(32)`, a `selectMergeValues` 2×s16→Imag32 compose with two class-pin sites vs class-less bridge COPYs, `copyPhysReg`, `__rc`-symbol lowering) + 4 legalizer type-rules (`G_INTTOPTR`/`G_PTRTOINT`/`G_PTR_ADD`/`G_ADDRSPACE_CAST` for `PF`) + `tryFarIndirectAddressing`. Needs `+mos-a16` (a runtime far ptr is a 32-bit *value*; far machinery itself is a16-independent). The handoff's `LDA_IndirectLong` MC defs already existed (CC1_All multiclass) → `MOSInstrInfo.td` untouched. Gates `dev/run.sh far_indir`/`far_cast` (A7 + corpus_result=0xF3) + `xcheck` — MAME+bsnes-jg PASS; corpus 7/7, a16unmerge/a16spill/a16ptr + far-run/far-bank1 no regression; in `0001` (regen-patch.sh round-trips, 0002 re-stacked). **3c (far arithmetic) landed 2026-06-20** (the s32→4×s8 unmerge mirror — see [320-inc3c-far-arith] above); far-pointer CC deferred to Inc 4. [plan](docs/plans/2026-06-20-320-far-pointer-runtime.md).
