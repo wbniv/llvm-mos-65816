@@ -105,19 +105,40 @@ FIRST — it bisects the whole problem in one build.
 
 ## Phase 2 — TWO TRACKS (revised per the workflow)
 
-### Track A — land the `requiredXWidth` family-gap fix (hardening; correct regardless of 247/445)
+### Track A — `requiredXWidth` 8-bit-indexed-family gap (hardening; UNBLOCKED 2026-06-20, ready)
 
-A genuine latent xy16 defect, low-risk, ready to implement. In `requiredXWidth`'s opcode switch (beside
-`case MOS::LDXIdx: case MOS::LDYIdx: return XW_X8;`), add the 8-bit indexed/indirect family → `XW_X8`:
-`LDAZpIdx`/`LDAAbsIdx`, `ST{Zp,Abs,Z}Idx`, `LD/ST{Indir,IndirIdx}`, and the
-`ADC/SBC/AND/ORA/EOR/ASL/LSR/ROL/ROR/CMP{Zp,Abs,Indir}Idx` forms. **Verify each enum exists** against
-`build/.../MOSGenInstrInfo.inc` + the `.td` records (`MOSInstrLogical.td`) before committing; drop any that
-don't, add any indexed sibling that does. Do **not** add the `XLow=1` 16-bit forms (`*Idx16` — already
-`XW_X16`). HasIndex16-gated ⇒ a16/default byte-identical. *(Robust long-term alternative: scan MI operands for
-a physical `$x`/`$y` use marked index/address by the MCID and return `XW_X8` unless `XLow` — closes the gap
-structurally instead of by enumeration.)* Regression guard: a micro-test that forces an 8-bit `(zp),Y`/`abs,X`
-op reached on every edge from an X16 region with no intervening classified-X8 op (the workflow's `go()` recipe;
-keep a genuinely-16-bit index alive so LTO can't narrow it). Land independently of Track B.
+A genuine latent xy16 defect (confirmed: seed 445's post-rep/sep MIR contains `LDAAbsIdx` unclassified →
+`XW_None`; the current switch classifies only `LDXIdx`/`LDYIdx` of the indexed family). Commit was blocked on
+the concurrent `noClobberBetween`/`0002` work — **now committed (`6440db0`)**, so a regen-on-top is clean.
+
+**Recommended impl: the STRUCTURAL rule, not the enumeration.** Enumeration is fragile — the ALU-indexed
+pseudos (`ADCAbsIdx`/`SBCAbsIdx`/…/`CMP{Abs,Zp,Indir}Idx`) are defined in *indented* TableGen blocks that a
+top-level `^def` grep misses, so a hand-list will likely be incomplete. Instead, after the existing `XLow`
+check (line 168, which catches every 16-bit `*Idx16` form) and the existing value-op switch, add a catch-all:
+
+```cpp
+// Any remaining op that reads an 8-bit index reg (X/Y) as an index/address operand
+// is 8-bit-index by construction — the 16-bit forms are XLow (handled above). e.g.
+// lda abs,X / lda (zp),Y / ALU zp,X (LDAAbsIdx/LDIndirIdx/ADCAbsIdx/…). Force X8 so
+// they never run in a stray X16 ambient. (Adds only sep #$10 → correctness-safe.)
+if (MI.readsRegister(MOS::X, TRI) || MI.readsRegister(MOS::Y, TRI))
+  return XW_X8;
+```
+Safe because: (1) XLow 16-bit ops return `XW_X16` *before* this; (2) `readsRegister` with TRI is alias-aware,
+but post-XLow only 8-bit ops remain; (3) forcing X8 only inserts `sep #$10` — never miscompiles, at worst a
+size nit. It subsumes the addressing-index gap and is robust to new indexed pseudos. (`requiredXWidth` needs a
+`TRI` param or use the function's existing one.) The verified 8-bit family for reference/testing: `LDAZpIdx`,
+`LDAAbsIdx`, `LDAbsXIdx`, `LDIndir`, `LDIndirIdx`, `LDIndirYIdx`, `ST{Zp,Abs}Idx`, `STAbsXIdx`, `STIndir`,
+`STIndirIdx`, `STIndirYIdx`, `ASL/LSR/ROL/RORIdx`, `CMPAbsIdx`, + indented `ADC/SBC/AND/ORA/EORAbsIdx`. Do
+**not** touch the `XLow=1` `*Idx16` forms.
+
+**Caveats before landing:** HasIndex16-gated ⇒ a16/default byte-identical (verify). The structural rule may add
+`sep #$10` in more spots than the enumeration → check the **xy16 suite for SIZE regressions** (correctness is
+guaranteed). **A RED regression test is hard** (the gap is X8-pinned by adjacent ops in real code — the
+workflow's `go()` recipe must reach an 8-bit `(zp),Y`/`abs,X` op on every edge from an X16 region with NO
+intervening classified-X8 op, keeping a genuinely-16-bit index alive so LTO can't narrow it; if it can't be
+made to fire RED, land the fix as code-inspection-confirmed hardening with the non-regression proof and note
+the test gap). Land independently of Track B.
 
 ### Track B — the actual 247/445 bug — CONFIRMED a real compiler bug (cause not yet isolated)
 

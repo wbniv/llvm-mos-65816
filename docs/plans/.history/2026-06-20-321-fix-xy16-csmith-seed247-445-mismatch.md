@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/f410115) | #321 xy16: disambiguation DONE — seeds 247/445 are a REAL compiler bug (both emulators) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/7c773da) | #321 xy16 fix plan: record 10-agent root-cause workflow result (synthesis refuted 3/3) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/f29639c) | #321 xy16 fix plan: record Phase-1 root-cause findings (not yet isolated) |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/62aa64f) | #321 xy16: write fix plan for the Csmith seed 247/445 mismatches |
 
 <!--history-meta v1
+f410115	author	Will Norris
+f410115	added	24
+f410115	deleted	11
+f410115	files	1
+f410115	body	Ran xy16@bsnes-jg (the leg the original differential omitted): both seeds give\nthe SAME wrong values as xy16@MAME (445: 0x35E7 vs 0x0D1D; 247: 0x7C73 vs\n0x80FE). Two independent emulators agree on the wrong xy16 output -> NOT a MAME\nlong,X-under-X16 artifact; the xy16 ROM is genuinely miscompiled. This also\nfalsifies the root-cause workflow's "value-correct at every indexed op" claim:\nthe static X-WIDTH is correct, but the generated code produces wrong VALUES.\n\nTwo generic minimal repros both PASS 4-way (byte tab[1024]; uint32_t[256] CRC32)\n-> the trigger is specific to seed 445/247, not a generic table-index shape.\nNext: delta-reduce seed 445 (cvise/creduce w/ a load-insensitive bsnes-jg\ninterestingness test, or fill-vs-read bisection) -> root-cause + fix.\n\nTrack A (requiredXWidth 8-bit-indexed-family hardening, real latent defect) is\nready but its commit is blocked on a concurrent worker's uncommitted\nnoClobberBetween/0002 edits (land after that commits). Doc-only commit.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7c773da	author	Will Norris
 7c773da	added	78
 7c773da	deleted	40
