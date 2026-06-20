@@ -1,9 +1,25 @@
 diff --git a/llvm/lib/Target/MOS/MOSCallLowering.cpp b/llvm/lib/Target/MOS/MOSCallLowering.cpp
-index d448d2c56002..f5c78839646f 100644
+index d448d2c56002..daaee589df96 100644
 --- a/llvm/lib/Target/MOS/MOSCallLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSCallLowering.cpp
-@@ -102,6 +102,50 @@ struct MOSOutgoingValueHandler : CallLowering::OutgoingValueHandler {
-     Register ExtReg = extendRegister(ValVReg, VA);
+@@ -97,11 +97,65 @@ struct MOSOutgoingValueHandler : CallLowering::OutgoingValueHandler {
+                             const MachinePointerInfo &MPO,
+                             const CCValAssign &VA) override {
+     MachineFunction &MF = MIRBuilder.getMF();
++    // #320 Inc 4 Ph2 variant (d) Stack: a 32-bit far (addrspace 2) pointer passed in
++    // a stack slot. G_STORE of a pointer value isn't legal here, so ptrtoint to i32
++    // and store the i32 (the slot is i32-sized per getRegisterTypeForCallingConv).
++    // The only 32-bit pointer is a far ptr, so near ptrs / varargs scalars are
++    // untouched; inert without +mos-farcc-stack (no far ptr is ever stack-passed).
++    Register Val = ValVReg;
++    if (MRI.getType(Val).isPointer() && MRI.getType(Val).getSizeInBits() == 32) {
++      Val = MIRBuilder.buildPtrToInt(LLT::scalar(32), Val).getReg(0);
++      MemTy = LLT::scalar(32);
++    }
+     auto *MMO = MF.getMachineMemOperand(MPO, MachineMemOperand::MOStore, MemTy,
+                                         inferAlignFromPtrInfo(MF, MPO));
+-    Register ExtReg = extendRegister(ValVReg, VA);
++    Register ExtReg = extendRegister(Val, VA);
      MIRBuilder.buildStore(ExtReg, Addr, *MMO);
    }
 +
@@ -53,7 +69,7 @@ index d448d2c56002..f5c78839646f 100644
  };
  
  struct MOSOutgoingArgsHandler : MOSOutgoingValueHandler {
-@@ -161,6 +205,11 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
+@@ -161,6 +215,11 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
        report_fatal_error("Not yet implemented.");
      case 8:
      case 16:
@@ -65,7 +81,7 @@ index d448d2c56002..f5c78839646f 100644
        break;
      }
  
-@@ -171,6 +220,47 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
+@@ -171,6 +230,47 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
      MIRBuilder.buildCopy(ValVReg, PhysReg);
    }
  
@@ -113,6 +129,55 @@ index d448d2c56002..f5c78839646f 100644
    /// Mark the given register as live-in. These will be function-level live-ins
    /// or implicit defs for formal arguments or call statements, respectively.
    virtual void makeLive(Register PhysReg) = 0;
+@@ -194,11 +294,25 @@ struct MOSIncomingArgsHandler : public MOSIncomingValueHandler {
+                             const MachinePointerInfo &MPO,
+                             const CCValAssign &VA) override {
+     MachineFunction &MF = MIRBuilder.getMF();
++    // #320 Inc 4 Ph2 variant (d) Stack: mirror of the store side — a far ptr arrives
++    // in an i32-sized slot; load the i32 and inttoptr back to p2 (G_LOAD of a pointer
++    // value isn't legal). Guarded on the 32-bit-pointer shape (the only one is a far
++    // ptr), so near ptrs / varargs scalars take the plain load below.
++    bool FarPtr = MRI.getType(ValVReg).isPointer() &&
++                  MRI.getType(ValVReg).getSizeInBits() == 32;
++    if (FarPtr)
++      MemTy = LLT::scalar(32);
+     // All such loads are invariant: if the values are later spilled, they'll be
+     // spilled to spill slots, not the original incoming argument slots.
+     auto *MMO = MF.getMachineMemOperand(
+         MPO, MachineMemOperand::MOLoad | MachineMemOperand::MOInvariant, MemTy,
+         inferAlignFromPtrInfo(MF, MPO));
++    if (FarPtr) {
++      Register I32 = MRI.createGenericVirtualRegister(LLT::scalar(32));
++      MIRBuilder.buildLoad(I32, Addr, *MMO);
++      MIRBuilder.buildIntToPtr(ValVReg, I32);
++      return;
++    }
+     MIRBuilder.buildLoad(ValVReg, Addr, *MMO);
+   }
+ 
+@@ -239,10 +353,22 @@ struct MOSIncomingReturnHandler : public MOSIncomingValueHandler {
+                             const MachinePointerInfo &MPO,
+                             const CCValAssign &VA) override {
+     MachineFunction &MF = MIRBuilder.getMF();
++    // #320 Inc 4 Ph2 variant (d) Stack: far-ptr return arriving in an i32-sized slot
++    // — load i32 + inttoptr (see the args handler). Guarded on the 32-bit-ptr shape.
++    bool FarPtr = MRI.getType(ValVReg).isPointer() &&
++                  MRI.getType(ValVReg).getSizeInBits() == 32;
++    if (FarPtr)
++      MemTy = LLT::scalar(32);
+     // Such loads are not invariant; the same stack region may be reused for
+     // many different calls.
+     auto *MMO = MF.getMachineMemOperand(MPO, MachineMemOperand::MOLoad, MemTy,
+                                         inferAlignFromPtrInfo(MF, MPO));
++    if (FarPtr) {
++      Register I32 = MRI.createGenericVirtualRegister(LLT::scalar(32));
++      MIRBuilder.buildLoad(I32, Addr, *MMO);
++      MIRBuilder.buildIntToPtr(ValVReg, I32);
++      return;
++    }
+     MIRBuilder.buildLoad(ValVReg, Addr, *MMO);
+   }
+ 
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.cpp b/llvm/lib/Target/MOS/MOSCallingConv.cpp
 index 993ce3787622..8a47e863537c 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.cpp
@@ -244,10 +309,10 @@ index 80fa4df3729a..4f5ec22aa23c 100644
  
  #endif // not LLVM_LIB_TARGET_MOS_MOSCALLINGCONV_H
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.td b/llvm/lib/Target/MOS/MOSCallingConv.td
-index 3f0d04c55389..b8992d68d97e 100644
+index 3f0d04c55389..5dc3afdeef15 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.td
 +++ b/llvm/lib/Target/MOS/MOSCallingConv.td
-@@ -58,6 +58,35 @@ let Entry = 1 in {
+@@ -58,6 +58,45 @@ let Entry = 1 in {
  def CC_MOS : CallingConv<[
    CCIfType<[i1], CCPromoteToType<i8>>,
  
@@ -279,6 +344,16 @@ index 3f0d04c55389..b8992d68d97e 100644
 +  // CC_MOS_FarPtrAXY pushes the three locations and assignCustomValue composes them.
 +  CCIfPtrAddrSpace<2, CCIf<"MOSFarCCAXY(State)",
 +      CCCustom<"CC_MOS_FarPtrAXY">>>,
++
++  // Variant (d) Stack: the whole 32-bit pointer in one 4-byte slot on the soft
++  // static stack (RS0-relative) — the memory analog of (a)'s single RL quad, and
++  // the "pass it in memory, scales past one pointer" pole. getRegisterTypeForCallingConv
++  // already sizes the far ptr at i32 (one unit), so the generic mem path
++  // (assignValueToAddress — the one varargs use) stores/loads the 4 bytes with no
++  // custom assigner. NB this is the SOFT static stack; the hardware-S `,S` convention
++  // is a separate, deferred lift (blocked on SPAdj + missing 65816 `,S` opcodes).
++  CCIfPtrAddrSpace<2, CCIf<"MOSFarCCStack(State)",
++      CCAssignToStack<4, 1>>>,
 +
    // Pointers are preferentially assigned to imaginary registers so indirect
    // addressing modes work without additional copying.

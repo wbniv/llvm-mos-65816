@@ -86,6 +86,7 @@ build_farcc_variant() { # rom-name farcc-flag
 }
 build_farcc_variant farcc_split +mos-farcc-split
 build_farcc_variant farcc_axy   +mos-farcc-axy
+build_farcc_variant farcc_stack +mos-farcc-stack
 
 # 3. Cross-check each ROM on bsnes-jg. Offset/len derived from the .map exactly
 # like the MAME path (dev/_emu.sh's _emu_map_lookup) — WRAM offset == symbol VMA.
@@ -116,6 +117,7 @@ xassert "$BUILD/far_call.sfc"  "$BUILD/far_call.map"  corpus_result 0xF3   # ban
 xassert "$BUILD/farcc_imag32.sfc" "$BUILD/farcc_imag32.map" corpus_result 0xF3 # bank $01, far PTR returned+passed across calls (variant a Imag32/RL)
 xassert "$BUILD/farcc_split.sfc"  "$BUILD/farcc_split.map"  corpus_result 0xF3 # bank $01, far PTR split offset(RS#)+bank(RC#) across calls (variant b)
 xassert "$BUILD/farcc_axy.sfc"    "$BUILD/farcc_axy.map"    corpus_result 0xF3 # bank $01, far PTR in A:X(offset)+Y(bank) across calls (variant c)
+xassert "$BUILD/farcc_stack.sfc"  "$BUILD/farcc_stack.map"  corpus_result 0xF3 # bank $01, far PTR in a 4-byte soft-stack slot across calls (variant d)
 
 echo
 [ $rc -eq 0 ] && echo "RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)" \
