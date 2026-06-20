@@ -9,3 +9,7 @@ __pycache__/
 # driver requires the SPC700 IPL at dev/roms/s_smp/spc700.rom — see the smoke
 # loop plan + README. Supply it out-of-band (CI: from a secret).
 /dev/roms/
+
+# Claude per-project memory (project-specific files + symlinks to ~/.claude/memory generics)
+.claude/*
+!.claude/memory/

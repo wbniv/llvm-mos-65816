@@ -860,4 +860,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      closed net-negative; the literal single-helper merge rejected by measurement), now captured
      by the Done item [321-loadfold-unify]. Nothing to track.
      fp:5f85cd31e68981cc fp:f85cd73b8f51bdd5 fp:98f82e24c01c1ac9 -->
+- [verify] **2026-06-20-memory-organization-two-tier** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-20-memory-organization-two-tier.md](docs/plans/2026-06-20-memory-organization-two-tier.md)_  <!-- fp:7b6f4179413cb08f -->
 <!-- END auto-captured-deferrals -->
