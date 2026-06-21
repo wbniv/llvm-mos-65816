@@ -25,6 +25,114 @@ index 3a729fc34537..8efd4309f152 100644
    default:
      return 16;
    }
+diff --git a/llvm/include/llvm/CodeGen/AsmPrinter.h b/llvm/include/llvm/CodeGen/AsmPrinter.h
+index e7c8a4b76aa6..fdb46c06c7e8 100644
+--- a/llvm/include/llvm/CodeGen/AsmPrinter.h
++++ b/llvm/include/llvm/CodeGen/AsmPrinter.h
+@@ -583,6 +583,17 @@ public:
+                                       const Constant *BaseCV = nullptr,
+                                       uint64_t Offset = 0);
+ 
++  /// Hook for emitting a scalar constant whose size has no standard data fixup
++  /// (e.g. a 3-byte / 24-bit pointer). The generic path emits such a constant via
++  /// OutStreamer->emitValue(ME, Size), but MCFixup::getDataKindForSize only covers
++  /// 1/2/4/8 bytes, so a target with an odd-sized relocated pointer needs to emit
++  /// the bytes itself. Return true if handled; false to fall back to emitValue.
++  /// (MOS uses this for its 3-byte packed far pointer, addrspace 3 / #320.)
++  virtual bool emitNonStandardSizedConstant(const Constant *CV,
++                                            const MCExpr *ME, uint64_t Size) {
++    return false;
++  }
++
+   /// Print a general LLVM constant to the .s file.
+   /// On AIX, when an alias refers to a sub-element of a global variable, the
+   /// label of that alias needs to be emitted before the corresponding element.
+diff --git a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+index 2225c24fcd7b..f4fd3e9e8ee9 100644
+--- a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
++++ b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+@@ -4588,7 +4588,11 @@ static void emitGlobalConstantImpl(const DataLayout &DL, const Constant *CV,
+   if (AP.getObjFileLowering().supportIndirectSymViaGOTPCRel())
+     handleIndirectSymViaGOTPCRel(AP, &ME, BaseCV, Offset);
+ 
+-  AP.OutStreamer->emitValue(ME, Size);
++  // Give the target a chance to emit a constant whose size has no standard data
++  // fixup (e.g. MOS's 3-byte / 24-bit packed far pointer, #320). getDataKindForSize
++  // only covers 1/2/4/8, so emitValue(ME, 3) would otherwise mis-relocate.
++  if (!AP.emitNonStandardSizedConstant(CV, ME, Size))
++    AP.OutStreamer->emitValue(ME, Size);
+ }
+ 
+ /// EmitGlobalConstant - Print a general LLVM constant to the .s file.
+diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+index dd5b16b807b5..b63f86fc50c8 100644
+--- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
++++ b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+@@ -59,6 +59,9 @@ public:
+                               const Constant *BaseCV = nullptr,
+                               uint64_t Offset = 0) override;
+ 
++  bool emitNonStandardSizedConstant(const Constant *CV, const MCExpr *ME,
++                                    uint64_t Size) override;
++
+   void EmitToStreamer(MCStreamer &S, MCInst &Inst);
+ 
+   void emitInstruction(const MachineInstr *MI) override;
+@@ -116,6 +119,54 @@ const MCExpr *MOSAsmPrinter::lowerConstant(const Constant *CV,
+   }
+ }
+ 
++// Re-tag the symbol reference inside a lowered constant expr with a relocation
++// specifier (the byte-selector for a 24-bit address). The specifier must ride on the
++// MCSymbolRefExpr itself (as the jump-table low/high-byte emission does) — wrapping in
++// a MOSMCExpr instead loses it, because MOSMCExpr::evaluateAsRelocatableImpl drops the
++// variant on a relocatable (symbol) result. Handles a bare symbol and a symbol+offset
++// (a GEP'd far array element, e.g. &table_targets[i]); returns null for any other shape
++// so the caller can fall back to the generic path.
++static const MCExpr *retagFarByte(const MCExpr *E, MOSMCExpr::VariantKind VK,
++                                  MCContext &Ctx) {
++  if (const auto *SRE = dyn_cast<MCSymbolRefExpr>(E))
++    return MCSymbolRefExpr::create(&SRE->getSymbol(), VK, Ctx);
++  if (const auto *BE = dyn_cast<MCBinaryExpr>(E)) {
++    const MCExpr *LHS = retagFarByte(BE->getLHS(), VK, Ctx);
++    if (!LHS)
++      return nullptr;
++    return MCBinaryExpr::create(BE->getOpcode(), LHS, BE->getRHS(), Ctx);
++  }
++  return nullptr;
++}
++
++// #320 packed-24: a static AS_FarPacked (addrspace 3) pointer is a 24-bit far address
++// stored in a 3-byte slot. The generic data path emits it as emitValue(ME, 3), but
++// MCFixup::getDataKindForSize(3) is unreachable (only 1/2/4/8 exist) so it degrades to a
++// single 1-byte R_MOS_ADDR8 on the low byte -> a link error (relocation out of range) and
++// a dropped bank. Emit the three address bytes explicitly with the ADDR24 segment-lo /
++// segment-hi / bank relocations (lld writes one byte each) -> the full 24-bit address,
++// bank intact -- the static-data mirror of the runtime far-address materialization
++// (selectAddr/buildFarAddrWords + MOSMCInstLower). Gated strictly on AS_FarPacked, so all
++// other constants fall through to the generic emitValue path byte-for-byte unchanged.
++bool MOSAsmPrinter::emitNonStandardSizedConstant(const Constant *CV,
++                                                 const MCExpr *ME,
++                                                 uint64_t Size) {
++  auto *PT = dyn_cast<PointerType>(CV->getType());
++  if (Size != 3 || !PT || PT->getAddressSpace() != MOS::AS_FarPacked)
++    return false;
++  MCContext &Ctx = OutContext;
++  const MOSMCExpr::VariantKind Bytes[3] = {MOSMCExpr::VK_ADDR24_SEGMENT_LO,
++                                           MOSMCExpr::VK_ADDR24_SEGMENT_HI,
++                                           MOSMCExpr::VK_ADDR24_BANK};
++  const MCExpr *Tagged[3];
++  for (int I = 0; I < 3; ++I)
++    if (!(Tagged[I] = retagFarByte(ME, Bytes[I], Ctx)))
++      return false; // unexpected expr shape -> let the generic path handle it
++  for (int I = 0; I < 3; ++I)
++    OutStreamer->emitValue(Tagged[I], /*Size=*/1);
++  return true;
++}
++
+ void MOSAsmPrinter::EmitToStreamer(MCStreamer &S, MCInst &Inst) {
+   MOSAsmBackend::translateOpcodeToSubtarget(Inst, MF->getSubtarget());
+   // If this instruction contains an out-of-range immediate address, perform an
 diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
 index a660f4e46acb..3271f980152c 100644
 --- a/llvm/lib/Target/MOS/MOSISelLowering.cpp

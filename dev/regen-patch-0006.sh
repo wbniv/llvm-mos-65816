@@ -38,6 +38,13 @@ PACKED_FILES=(
   "llvm/lib/Target/MOS/MOSISelLowering.h"
   "llvm/lib/Target/MOS/MOSLegalizerInfo.cpp"
   "llvm/lib/Target/MOS/MOSLegalizerInfo.h"
+  # #320 packed-24 static-init reloc fix (2026-06-22): a 3-byte AS_FarPacked pointer
+  # constant has no standard data fixup, so a generic AsmPrinter hook + the MOS override
+  # emit the ADDR24 segment-lo/hi/bank triple. These two are OUTSIDE llvm/lib/Target/MOS,
+  # so they must be listed explicitly or a regen would silently drop the fix.
+  "llvm/lib/Target/MOS/MOSAsmPrinter.cpp"
+  "llvm/include/llvm/CodeGen/AsmPrinter.h"
+  "llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp"
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }

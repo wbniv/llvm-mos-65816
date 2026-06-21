@@ -81,6 +81,17 @@ if [ ! -f "$BUILD/packed24_e2e.sfc" ] || [ ! -f "$BUILD/packed24_e2e.map" ]; the
   python3 "$ROOT/tools/snes-checksum.py" "$BUILD/packed24_e2e.sfc" >/dev/null
 fi
 
+# packed-24 STATIC table: a link-time-initialized table of 8 packed (3-byte) far
+# pointers to bank $01, walked + summed (proves the static-init ADDR24 relocations).
+if [ ! -f "$BUILD/packed24_table.sfc" ] || [ ! -f "$BUILD/packed24_table.map" ]; then
+  echo "==> build packed24_table.sfc (mos-snes-far.cfg -mcpu=mosw65816 +mos-a16)"
+  "$TOOL/mos-clang" --config "$INSTALL/bin/mos-snes-far.cfg" -mcpu=mosw65816 -Os \
+    -Xclang -target-feature -Xclang +mos-a16 \
+    -Wl,-Map="$BUILD/packed24_table.map" -o "$BUILD/packed24_table.sfc" \
+    "$ROOT/examples/65816/packed24/packed24_table.c"
+  python3 "$ROOT/tools/snes-checksum.py" "$BUILD/packed24_table.sfc" >/dev/null
+fi
+
 # 3. Cross-check each ROM on bsnes-jg. Offset/len derived from the .map exactly
 # like the MAME path (dev/_emu.sh's _emu_map_lookup) — WRAM offset == symbol VMA.
 source "$ROOT/dev/_emu.sh"
@@ -109,6 +120,7 @@ xassert "$BUILD/far_store.sfc" "$BUILD/far_store.map" corpus_result 0xF3   # ban
 xassert "$BUILD/far_call.sfc"  "$BUILD/far_call.map"  corpus_result 0xF3   # bank $01, far call (JSL) + RTL return
 xassert "$BUILD/far_near_call.sfc" "$BUILD/far_near_call.map" corpus_result 0xE0 # bank $01 far -> near via __call_near_from_far (JSL thunk)
 xassert "$BUILD/packed24_e2e.sfc" "$BUILD/packed24_e2e.map" corpus_result 0xF3 # bank $01, packed-24 (3-byte) far ptr store/load + deref
+xassert "$BUILD/packed24_table.sfc" "$BUILD/packed24_table.map" corpus_result 0xA5 # bank $01, STATIC packed-24 far-ptr table (8x3 B, ADDR24 reloc per entry)
 
 echo
 [ $rc -eq 0 ] && echo "RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)" \

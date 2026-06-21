@@ -62,12 +62,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `dev/run.sh packed24` (new e2e, bank $01) `0xF3` MAME **and** bsnes-jg (bank byte survives 3-byte
   packing); `-verify-machineinstrs` clean; corpus 7/7; far suite PASS; `fuzz 50` 0-mismatch; storage
   −16 B/−25% (16-entry table 64→48 B), ×3 index cost. Worktree RETAINED until upstream merge.
-  **Still open in this item — next batch = packed-24 productionization**
-  ([handoff](docs/plans/2026-06-21-320-packed24-productionization-handoff.md)): (A) measure the win in
-  *realistic* 16-bit-ambient context (the −25% is synthetic — need a runtime-walked banked far-ptr table,
-  net-of-access-cost, with a break-even size); (B) fix the byte-2 absolute-long access cost (bytes 0,1 use
-  `abs` but byte 2 / the A-register byte uses `8f`/`af` `R_MOS_ADDR24` on a *near* slot → ~1 wasted
-  byte/access); (C) stretch: a `__far_packed` spelling. Separate threads: zero-bank (AS4) still deferred
+  **Productionization batch — (A) DONE + static-init reloc FIXED (2026-06-22)**
+  ([handoff](docs/plans/2026-06-21-320-packed24-productionization-handoff.md) ·
+  [fix plan](docs/plans/2026-06-22-320-packed24-static-init-reloc-fix.md)): ~~(A) measure the win in realistic
+  context~~ **DONE** (`dev/run.sh measure-packed24`): packed wins **≈N bytes at every N, break-even N≥1** —
+  the indexed-walk access code is equal (far loads only 3 of its 4 entry bytes; ×3-vs-×4 stride is a
+  constant), so the feared ×3-index/byte-2 cost does **not** apply to indexed table access. Task A also
+  surfaced that a **statically-initialized packed table didn't link** (each 3-byte entry emitted one
+  `R_MOS_ADDR8` — no 3-byte data fixup); **FIXED** via an `AsmPrinter::emitNonStandardSizedConstant` hook +
+  MOS override emitting the `ADDR24 SEGMENT_LO/HI/BANK` triple (landed in the updated **`0006`**; new
+  `dev/run.sh packed24_table` `0xA5` MAME+bsnes-jg, corpus 7/7, fuzz 0-mismatch). Still open: **(B)** byte-2
+  absolute-long cost — now *marginal* (the measurement shows it only affects direct single-slot access, not
+  indexed tables); **(C)** stretch `__far_packed` spelling. Separate threads: zero-bank (AS4) still deferred
   (≈ near ptr); post the upstream note (C1 + pow2 + census) — user-triggered.
   [incB handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
   [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md).

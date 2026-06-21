@@ -1,5 +1,25 @@
 # Handoff — packed-24 (addrspace 3): realistic-use validation + access-cost cleanup
 
+> ## ✅ Task A DONE + static-init reloc FIXED (2026-06-22)
+>
+> **Task A (measure the win) — done.** `dev/run.sh measure-packed24`: packed-24 wins **≈N bytes at every
+> table size, break-even N≥1** — in an *indexed table walk* the access code is equal (far loads only 3 of its
+> 4 entry bytes; the ×3-vs-×4 stride is a constant), so the feared "×3-index + byte-2-long" cost does **not**
+> apply to indexed table access. The −25% storage win is real and realizable.
+>
+> **But Task A surfaced a blocker — now FIXED.** The realistic shape (a *statically-initialized* table of
+> packed far pointers) did **not link**: each 3-byte entry emitted a single `R_MOS_ADDR8` (no 3-byte data
+> fixup exists; `getDataKindForSize(3)` is unreachable → degrades to `FK_Data_1`). Increment B had only
+> covered the *runtime* store/load path. Fixed via a generic `AsmPrinter::emitNonStandardSizedConstant` hook
+> + a MOS override that emits the `ADDR24 SEGMENT_LO/HI/BANK` triple for an `AS_FarPacked` constant — landed
+> in the updated **`0006`**. Verified: `dev/run.sh packed24_table` links + `0xA5` on MAME **and** bsnes-jg
+> (each static entry's bank byte survives); corpus 7/7; fuzz 0-mismatch; round-trip-clean. Full record:
+> [2026-06-22-320-packed24-static-init-reloc-fix.md](2026-06-22-320-packed24-static-init-reloc-fix.md).
+>
+> **Still open:** **Task B** (byte-2 absolute-long cost) — but the measurement shows it only affects *direct
+> single-slot* access, not indexed tables, so its value is now marginal. **Task C** (ergonomic spelling) and
+> **zero-bank (AS4)** remain as separate threads. The original handoff (below) is preserved.
+
 **For:** a fresh agent. **Status when written (2026-06-21):** packed-24 **Increment A (the 3-byte type)
 and Increment B (store/load/deref codegen) are DONE + verified + landed** on `main` as
 [`patches/llvm-mos/0006-320-packed24.patch`](../../patches/llvm-mos/0006-320-packed24.patch) (commit
