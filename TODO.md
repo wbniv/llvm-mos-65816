@@ -427,6 +427,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 6) · body
   [docs/321-upstream-cc-frame-abi-note.md](docs/321-upstream-cc-frame-abi-note.md) · record
   [frame-ABI study §Outcome](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
+- [ ] **#320 far-pointer codegen body — feature-complete, but Future/blocked** (not a postable artifact yet).
+  The fork's whole far-pointer slice (far calls (b); far function pointers (a) incl. the clang `far`/`long_call`
+  attribute, typed `far_fn_t` variable, `sizeof(far*)==4`, the far_indir/`isFarSymbol` crash fix) is now
+  feature-complete + pushed `origin/wt/320-far-followups`, verified both emulators. It forms the bulk of the
+  eventual #320 PR but is **gated on the ABI-blessing design note** (the M1 "#320 post design note upstream"
+  item) — so it's tracked under *Future/blocked* in
+  [upstream-contribution-status](docs/upstream-contribution-status.md), not ready-to-post.
 - [ ] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
   `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
   uncomment the two trigger lines in the `on:` block.

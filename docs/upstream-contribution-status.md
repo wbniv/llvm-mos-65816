@@ -1,8 +1,11 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-20 (added the #321 CC frame-ABI design note, ready to post — Ready-to-post #6.
-DWARF branch `wbniv:mos-dwarf-65816-test-docs` pushed `0ae9415`; GitHub open-count last verified 2026-06-17,
-see *Verified state* + *Refresh* below).
+**Last updated:** 2026-06-21 (the **#320 far-pointer fork-side implementation body** grew to feature-complete
+— clang `far`/`long_call` attribute (F2), typed `far_fn_t` variable, `sizeof(far*)==4`, far_indir crash fix;
+pushed `origin/wt/320-far-followups`. Still ABI-blessing-gated, so it stays *Future/blocked*, not a new
+ready-to-post item. Previously 2026-06-20: added the #321 CC frame-ABI design note (Ready-to-post #6); DWARF
+branch `wbniv:mos-dwarf-65816-test-docs` pushed `0ae9415`; GitHub open-count last verified 2026-06-17, see
+*Verified state* + *Refresh* below).
 
 A standing snapshot of every upstream-facing contribution from this fork: what is **drafted and ready to
 post**, what is **future/blocked**, and what GitHub actually shows right now. All posting is **user-triggered**
@@ -124,7 +127,27 @@ Full internal record: [frame-ABI study plan §Outcome](plans/2026-06-20-321-fram
 
 - **#320 five-address-space model + PR.** The real far-pointer codegen PR (asiekierka's 32-bit-default /
   packed 24-bit / zero-bank / abs-16 layout). Blocked on maintainer **ABI blessing** — gated behind posting
-  the #320 design note above. Not drafted as a PR yet.
+  the #320 design note above. Not drafted as a PR yet. **The fork-side implementation body is now large and
+  feature-complete (2026-06-21)** and would form the bulk of this PR once unblocked — all carried as
+  `patches/llvm-mos/0001` + gitignored `vendor/` recipes on `wt/320-far-followups` (pushed
+  `origin/wt/320-far-followups`), landing in `0001` once `0004`'s relationship to `main` settles:
+  - **far calls (b):** far→near mixed-banking via the bank-0 thunk `__call_near_from_far` (shipped to `main`).
+  - **far function pointers (a):** the p2-value sub-project (Layers 1–3 + Gap A/B), the `jsl __call_indir_far`
+    indirect-call mechanism, **and the clang front-end (F2):** a MOS **`far`/`long_call`** function/type
+    attribute (`MOSFarCall`) — notably it reuses the MIPS `long_call`/`far` GNU spelling via a **shared
+    `ParseKind="LongCall"`** (the same multi-target pattern `interrupt` uses), and a `CGExpr`/`CGExprScalar`
+    rewrite to the `store @__mos_far_target` + `call @__call_indir_far` shape. Both a **direct** `far` call
+    and a **stored** `far_fn_t fp = far_leaf; fp(x)` pointer work in single-file C (a `far` bit on
+    `FunctionType::ExtInfo` → `ptr addrspace(2)`).
+  - **far-pointer sizing:** `getPointerWidthV(AS2)`→32 + a `getTypeInfoImpl` arm so `sizeof(FAR*) ==
+    sizeof(far_fn_t) == 4` (matches the `p2:32:8` IR width).
+  - **a crash fix worth flagging upstream-adjacent:** `isFarSymbol` was treating any `.far*`-sectioned
+    symbol as far (24-bit), crashing when a `.far_rodata` datum's address is taken as a *near* pointer;
+    restricted to **functions** (`isa<Function>`). This is a fix to fork-only far machinery, so it rides the
+    same #320 PR rather than standing alone.
+  Verified end-to-end on **MAME + bsnes-jg** (the whole far suite, 12 ROMs) + corpus 7/7 + csmith 0-mismatch.
+  Still ABI-blessing-gated; the `far`/`long_call` attribute spelling-sharing design is a candidate talking
+  point for the #320 note when it's posted.
 - **llvm-mos-sdk#415 reconciliation.** Engage @Phillip-May's existing stalled SNES-target draft PR (build on
   his `snesxc` reg lib + multi-bank linker, contribute our native-mode crt0 + dual-emulator CI on top). This
   is *engaging someone else's PR*, not opening our own. Strategy in
