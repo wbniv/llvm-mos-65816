@@ -880,8 +880,14 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-06-21-320-far-cc-variants-bcd-and-measure** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-cc-variants-bcd-and-measure.md](docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md)_  <!-- fp:e3b7f46b9e51afa0 -->
 <!-- triaged 2026-06-21: native-s16-comparison-followups §5 verification is intentionally Phase-0-gated (it runs only IF the Phase 0 §3 byte-diff measures a win; the §4a step-1 audit IS recorded). Covered by the curated M2 "comparison follow-ups" SCOPED item above. Not a missed step. fp:c91b9765672261df -->
 <!-- triaged 2026-06-21: banked plan §5 verification is MOOT — candidate A was BUILT + measured net-negative (a16cmpaudit +654/+78 B, a16 corpus +340 B zero wins) and CLOSED WON'T-DO (§0a); nothing lands in 0002, so there is no codegen to verify. Covered by the curated M2 "comparison follow-ups" item above (now records both the 8-bit v1 AND 16-bit candidate-A close-outs). Not a missed step. fp:5f242fd76b40e2f7 -->
-- [ ] **(triage)** **(c) far tail calls** — separate TODO line; already conservative-safe (tail peephole keys on `JSR`). — _from [2026-06-21-320-far-calls-followups.md](docs/plans/2026-06-21-320-far-calls-followups.md)_  <!-- fp:a5f1db95f5a9627a -->
-- [ ] **(triage)** **The far-pointer *data* CC** (passing/returning a `p2` value) — the in-flight `wt/320-far-cc` study; — _from [2026-06-21-320-far-calls-followups.md](docs/plans/2026-06-21-320-far-calls-followups.md)_  <!-- fp:5221ad4b75df9534 -->
-- [ ] **(triage)** **SPC700 indirect-far** — 65816-only; SPC700's `__rc17` thunk path is untouched. — _from [2026-06-21-320-far-calls-followups.md](docs/plans/2026-06-21-320-far-calls-followups.md)_  <!-- fp:78cda9a654aa2b5f -->
-- [ ] **(triage)** **Auto-promoting near callees to far** — (b) keeps near callees byte-identical; no whole-program ABI — _from [2026-06-21-320-far-calls-followups.md](docs/plans/2026-06-21-320-far-calls-followups.md)_  <!-- fp:fde87b8fe11d4df6 -->
+<!-- triaged 2026-06-21: all four far-calls-followups "Out of scope" bullets are non-work — covered
+     by curated items or explicit non-goals of the now-tracked plan:
+     • (c) far tail calls -> already named as "(c) far tail calls = separate" inside the curated M1
+       "#320 far calls — follow-ups" bullet (conservative-safe today: tail peephole keys on JSR).
+     • far-pointer DATA CC (p2 passing/returning) -> the curated M1 "#320 Inc 4 Phase 2 — far-pointer
+       calling convention" bullet + wt/320-far-cc.
+     • SPC700 indirect-far -> explicit NON-GOAL (65816-only; the __rc17 thunk path is untouched).
+     • Auto-promoting near callees to far -> explicit NON-GOAL ((b) keeps near callees byte-identical;
+       uniform-far is a measured control/fallback, not a shipped default).
+     fp:a5f1db95f5a9627a fp:5221ad4b75df9534 fp:78cda9a654aa2b5f fp:fde87b8fe11d4df6 -->
 <!-- END auto-captured-deferrals -->
