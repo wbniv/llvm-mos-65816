@@ -8,10 +8,12 @@ For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO
 ## TL;DR
 
 **#320 (far pointers / M1):** the slice that proves the concept is working — far load/store across
-bank boundaries, **runtime far-pointer deref/cast/arithmetic (Inc 3 = 3a+3b+3c)**, and **direct far
-CALLS (JSL/RTL, Inc 4 Phase 1)**, all on two emulators. The far-pointer calling convention is next —
-to be settled by **building every ABI variant and measuring** (no longer upstream-gated). The
-five-address-space model, far function pointers, and mixed-banking remain.
+bank boundaries, **runtime far-pointer deref/cast/arithmetic (Inc 3 = 3a+3b+3c)**, **direct far
+CALLS (JSL/RTL, Inc 4 Phase 1)**, and **mixed-banking far→near calls (via the `__call_near_from_far`
+thunk, shipped to `main` 2026-06-21)**, all on two emulators. The far-pointer calling convention is
+next — to be settled by **building every ABI variant and measuring** (no longer upstream-gated; ships
+as `0004`). The five-address-space model and **far function pointers** (front-end **LOCKED = F2** MOS
+`far` attribute; backend gated on `0004` reaching `main`) remain.
 
 **#321 (16-bit accumulator / M2):** the core codegen is complete. Every planned per-op optimization
 is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete re-open trigger. The
@@ -29,15 +31,21 @@ census short-circuited the build at the measurement step.
 | SNES SDK platform (`mos-platform/snes`, `snes-far`) | ✅ Done |
 | Design note for #320 (near→far ABI discussion) | ⬜ Drafted; **user-triggered** to post ([docs/320-upstream-far-pointer-note.md](320-upstream-far-pointer-note.md)) |
 | Five-address-space model + full PR | ⬜ Upstream-gated on design-note posting; not started |
-| Far calls (JSL / RTL) — direct call to a `.far_*` leaf in another bank | ✅ **Done (Inc 4 Ph1, 2026-06-20)** — `dev/run.sh far_call` + `xcheck`, MAME+bsnes-jg PASS; in `0001`. Far function pointers, mixed-banking, far tail calls = follow-ups. [plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) |
+| Far calls (JSL / RTL) — direct call to a `.far_*` leaf in another bank | ✅ **Done (Inc 4 Ph1, 2026-06-20)** — `dev/run.sh far_call` + `xcheck`, MAME+bsnes-jg PASS; in `0001`. (far → far also already works — non-leaf JSL/RTL chains.) [plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) |
+| Mixed-banking — a far function calling a **near** function (`__call_near_from_far` thunk) | ✅ **Done + shipped to `main` (Inc 4 follow-up b, 2026-06-21, `5717f6b`)** — `lowerCall` routes far→near through the generic bank-0 thunk (`pea .Lback-1; jmp (__rc18); rtl`) reached by `JSL` (`0001`, HasW65816-gated, a16-free). `far_near_call == 0xE0` MAME+bsnes-jg, corpus 7/7, thunk `--gc-sections`'d from near ROMs (byte-identical). Lifts the "far must be leaf-or-far-only" constraint. [plan](plans/2026-06-21-320-far-calls-followups.md) |
+| Far function pointers — indirect call through a far code pointer (`__call_indir_far` / `jml [__rc18]`) | ⬜ **Inc 4 follow-up (a) — front-end LOCKED = F2** (MOS `far` attribute; clang forbids `address_space(2)` on fn types, `((far))` is MIPS-only). **Backend gated on `0004`** — forming/storing/returning a `p2` value crashes today (`G_TRUNC`/`G_UNMERGE`/`G_STORE` p2), the same p2-VALUE class the far-CC study ships as Imag32 in `0004-320-far-cc.patch` (not on `main` yet). Resumes on `wt/320-far-followups`. [plan](plans/2026-06-21-320-far-calls-followups.md) |
+| Far tail calls | ⬜ Separate follow-up — already conservative-safe (tail peephole keys on `JSR`, so a `JSL` is never tail-converted) |
 | Far-pointer calling convention (pass/return `p2`) | ⬜ **Inc 4 Phase 2 — build all ABI variants & measure** ([plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md); no longer upstream-gated; must ship one — tie → Imag32; reuses the frame-ABI harness) |
 | Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Runtime far-pointer arithmetic (`G_PTR_ADD` on AS2) | ✅ **Done (Inc 3c, 2026-06-20)** — `fp++` via the symmetric `s32→4×s8 G_UNMERGE_VALUES` mirror (`legalizeUnmergeS32ToBytes`, a16/`0002`; also closes a latent `uint32_t` shift-≥8 gap); `dev/run.sh far_arith` + `xcheck`, MAME+bsnes-jg PASS. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
-| Far data >2 banks, far calls (JSL/RTL), far-pointer calling convention | ⬜ Deferred past Inc 3 (CC = ABI decision, upstream-gated; grouped with far calls / Inc 4) |
+| Far data > 2 banks | ⬜ Deferred past Inc 3 (far load/store proven for ≤2 banks; multi-bank data placement not yet exercised) |
 | Formal #320/#321 psABI document | ⬜ Premature — upstream won't bless ahead of a live implementation |
 
-**M1 verdict:** the load/store slice is solid and two-emulator verified. Everything else waits on the
-upstream ABI discussion that the design note is meant to open.
+**M1 verdict:** load/store, runtime deref/cast/arithmetic, direct far calls, and mixed-banking far→near
+are all built and two-emulator verified. The far-pointer calling convention is **no longer
+upstream-gated** — it's a build-all-variants-and-measure task that ships as `0004`. Far function pointers
+(a) and the five-address-space model are the remaining frontier; (a)'s backend is gated on `0004`
+reaching `main`, and the five-address-space PR still waits on the design-note posting.
 
 ---
 
@@ -65,6 +73,7 @@ upstream ABI discussion that the design note is meant to open.
 | 16-bit signed ordering `slt/sle/sgt/sge` (branch) | `a16scmp` | ✅ |
 | Equality as a value `b = (a == c)` — 4 gated variants | `a16eqvalp` `a16eqvalg` `a16eqvalc` | ✅ |
 | Full native materialize for eq-as-value | WON'T-DO — measured +14 B (Option A) / +16–28 B (Option B) worse |
+| Ordering as a value `b = (a < c)` — branchless carry-tail | WON'T-DO — both 8-bit (`adc`) and 16-bit (`rol`) forms BUILT + measured net-negative (a16cmpaudit +262 B / +654 B; corpus +340 B, **0** programs improve). Select-diamond is the ambient-16-bit optimum (folds inversion free, M8 tail matches mode, keeps the bool in X not an Imag16 slot). Compare track CLOSED |
 | REP/SEP mode-tracking — M-flag, cross-block | `a16loop` `a16call` | ✅ |
 | s32 legalizer (unmerge s32↔s16, 4×s8→s32 merge) | Csmith seed-50 / seed-113 gates | ✅ |
 | A16 spill crash (F3) — static + soft-stack (reentrant) | `a16spill` `a16spillr` `a16spillir` | ✅ |
@@ -90,7 +99,8 @@ upstream ABI discussion that the design note is meant to open.
 | X-flag `requiredXWidth` gap fix (CPX/CPY/INC/DEC value ops) | ✅ Done — cleared all 5 xy16 torture miscompiles + `k_isort` |
 | Frame-index elimination scramble (CmpBrAbsImm16) | ✅ Done — cleared 13 c-torture miscompiles |
 | `xy16basic` / `xy16ops` / `xy16indiry` / `xy16spill` gates | ✅ All PASS on MAME + bsnes-jg |
-| **Csmith seed-247 + seed-445 runtime miscompiles** | ⬜ Phase 1 partial (see below) |
+| Csmith seed-247 + seed-445 runtime miscompiles | ✅ **FIXED 2026-06-20 (`2d8ab51`, approach B)** — cvise-reduced to an 8-line UB-free repro: a non-index s16 value classed `Xc16`, loaded into X16, left live across an 8-bit-index op whose `sep #$10` zeroes the high byte. `selectXY16` now emits `LDXAbs16`/`LDYAbs16` only when the value is genuinely an index, else reclasses to `Imag16`. 4-way both emulators + csmith 101–500 (0/400 mismatch) + c-torture 60/60; smaller code (61→54 B) |
+| `requiredXWidth` 8-bit-indexed-family hardening (Track A) | ✅ **Done 2026-06-21** — structural memory-gated catch-all closes the last index-width omission (the load/store/branch siblings of the value-compare bug); byte-identical 75/75, hardening not a live bug |
 | Hardware-stack ABI / 16-bit calling convention | ⬜ Pending (see ABI section) |
 
 ### Infrastructure + correctness corpus
@@ -114,7 +124,6 @@ upstream ABI discussion that the design note is meant to open.
 | Item | Status |
 |---|---|
 | Load-fold gate unification (AA-precision + volatile) — `canFoldLoadIntoUser` | ⬜ **Phase 2 greenlit** — Phase 1 confirmed 43 volatile + 7 AA-precision recovery sites; needs fresh worktree |
-| xy16 Csmith seeds 247+445 root cause | ⬜ **Phase 1 partial** — linear X-width trace inconclusive; minimal repro doesn't reproduce; H2 (CFG/loop-edge X-width) prime suspect; **next: delta-reduce seed 445** on `wt/321-xy16` |
 
 ---
 
@@ -185,12 +194,12 @@ Based on the commit history and plan records, **no work-in-progress was lost to 
 | Work item | State at time of crash | Outcome |
 |---|---|---|
 | Frame-ABI "build all three" | Census completed; A1–M correctly **not started** | Complete — NULL result is the answer |
-| xy16 Phase-1 root cause (seeds 247/445) | Debugging cap (3 hypotheses) hit; **intentionally checkpointed** | Checkpointed cleanly; Phase 1 findings recorded in the plan |
+| xy16 Csmith seeds 247/445 | Checkpointed at debugging cap, **then resumed and fixed** (`2d8ab51`, 2026-06-20) | Complete — cvise-reduced, root-caused, 4-way verified |
 | Load-fold Phase 1 measurement | Probe ran; throwaway worktree torn down; results recorded | Complete — PROCEED verdict |
 | c-torture -Os sweep + bsnes-jg 4-way | Both completed and recorded | Complete |
 
-The xy16 and load-fold items look "incomplete" because they **are** — but they stopped at a
-deliberate checkpoint, not a crash. The next steps are in the fix plan and TODO.
+The only genuinely open item above is **load-fold Phase 2** — it stopped at a deliberate checkpoint
+(Phase 1 PROCEED verdict recorded), not a crash. The next steps are in the plan and TODO.
 
 ---
 
@@ -200,13 +209,9 @@ deliberate checkpoint, not a crash. The next steps are in the fix plan and TODO.
    differential. Greenlit; start a fresh `throwaway/loadfold-unify` worktree.
    [plan](plans/2026-06-20-321-unify-loadfold-gate-aa-volatile.md)
 
-2. **xy16 Csmith seeds 247+445** — delta-reduce seed 445 on `wt/321-xy16`, or CFG-aware X-lattice
-   analysis across the `crc32_tab` loop edges + `transparent_crc` call boundary.
-   [fix plan](plans/2026-06-20-321-fix-xy16-csmith-seed247-445-mismatch.md)
+2. **Csmith Phase 5 + c-torture Phase 3** — sampled CI integration.
 
-3. **Csmith Phase 5 + c-torture Phase 3** — sampled CI integration.
-
-4. **Upstream posts (user-triggered):**
+3. **Upstream posts (user-triggered):**
    - F4 `TXY/TYX` dead-flag fix PR (ready)
    - Register-scavenger N/Z-liveness issue (draft ready)
    - #321 CC frame-ABI design note (draft ready)
@@ -214,5 +219,13 @@ deliberate checkpoint, not a crash. The next steps are in the fix plan and TODO.
    - DWARF step-6 test+docs PR (branch pushed)
    - #415 SNES target reconciliation (strategy drafted)
 
-5. **xy16 hardware-stack ABI** — the calling-convention implementation for 16-bit index-register
+4. **xy16 hardware-stack ABI** — the calling-convention implementation for 16-bit index-register
    mode. CC sub-decisions are all resolved; this is the remaining M2 codegen frontier.
+
+5. **#320 far-pointer calling convention** — build all ABI variants (Imag32 quad / Imag16+bank-byte /
+   A:X+Y / stack) behind feature flags & measure; must ship one (tie → Imag32), reusing the frame-ABI
+   harness. Lands as `0004`. [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)
+
+6. **#320 far function pointers (a)** — front-end LOCKED = F2 (MOS `far` attribute) + indirect
+   lowering (`__call_indir_far`); **unblocks once `0004` lands on `main`**, then resumes on
+   `wt/320-far-followups`. [plan](plans/2026-06-21-320-far-calls-followups.md)
