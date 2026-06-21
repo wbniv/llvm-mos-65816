@@ -109,6 +109,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   vendor tree without `0004`/`0005` applied (the whole-MOS-dir mirror can't subtract higher stacked patches).
   Low priority — bites only when someone next edits the far front-end in `vendor/`. The
   round-trip recipe `dev/land-far-integration.sh` is the complete-coverage alternative while FF exists.
+- [ ] **SNES near-code budget link-time assertion + #320 near/far code-model framing note** (planned
+  2026-06-22). Answers *"should we add a mode that limits codegen to 64k (32k on SNES)?"* — **no**: near
+  (`JSR`/`RTS`, `CodeModel::Small`, 2-byte fn ptr) is **already the default**, far is per-symbol opt-in, so a
+  `-mcmodel`-style mode would describe the status quo and buy **no** codegen win. The real gap is the
+  *guarantee*: `platforms/snes/link.ld` declares the full `0x8000` bank, so an over-budget build trips an
+  obscure `.snes_header` overlap instead of "code exceeds the 32 KiB LoROM near window ($8000–$FFAF)". Fix:
+  carve the header/vectors into a `romhdr` region so `rom`'s LENGTH *is* the budget → LLD emits a
+  region-named, byte-quantified overflow error; ROM stays byte-identical for in-budget programs; mirror to
+  `snes-far`. Plus a "near vs far = small/medium-large code model" section in the #320 upstream note +
+  pointer in upstream-contribution-status. Linker-script + docs only (no `vendor/` rebuild).
+  [plan](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md).
 
 ### M2 — Optimizing Payoff
 
@@ -978,4 +989,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-21: RESOLVED — the land plan now has a §Verification (2026-06-21) section with PASS recorded (round-trip empty over clang/+MOS/ except the 2 documented drift/stale files; a16-free + 0002/0003-sha-unchanged + sequence-apply all PASS). Landing is done; nothing left to run. fp:a51d6afac2a18fef -->
 <!-- triaged 2026-06-21: the packed24-incrementB-handoff §3 "Verification gate" is INSTRUCTIONS for the future agent who builds Increment B (the bar THEY must clear), not a verification to run now — Increment B is deferred until F2 lands on main. Nothing to verify here; covered by the curated M1 five-space item + its handoff link. fp:3d3c94fe546a028c -->
 <!-- triaged 2026-06-21: the packed24-productionization-handoff §2 "Verification gate" is INSTRUCTIONS for the future agent who picks up the next batch (the bar THEY must clear), not a verification to run now — it's a forward-looking resume prompt, not a completed plan. Tracked by the curated M1 five-space item's "next batch" link. Nothing to verify here. fp:93f3ef0f25357389 -->
+- [ ] **(triage)** **No `-mcmodel` / "limit codegen to 64k" compiler mode** — near is already the default and it buys no — _from [2026-06-22-snes-near-code-budget-and-code-model.md](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md)_  <!-- fp:a349fdb9e6fb6627 -->
+- [ ] **(triage)** **No `-mno-far` guardrail** — user chose to skip; far is already opt-in per symbol. — _from [2026-06-22-snes-near-code-budget-and-code-model.md](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md)_  <!-- fp:13a459b641dd2a38 -->
+- [ ] **(triage)** **`rom_1` far bank** in `snes-far` left as-is (already a clearly-named, overflow-checked region). — _from [2026-06-22-snes-near-code-budget-and-code-model.md](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md)_  <!-- fp:27a0f051def92af7 -->
+- [ ] **(triage)** **No compiler/`vendor/` edits** — linker-script + docs only. — _from [2026-06-22-snes-near-code-budget-and-code-model.md](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md)_  <!-- fp:9c15ab41c1ea4e0c -->
 <!-- END auto-captured-deferrals -->
