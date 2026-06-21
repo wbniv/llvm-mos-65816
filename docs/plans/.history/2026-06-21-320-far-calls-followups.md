@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/2d2a171) | #320 (a) far fn pointers: backend p2-value sub-project DONE + e2e verified — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/15df5fe) | #320 far-calls follow-ups: consolidate into a combined plan+handoff doc |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/93c7336) | #320 (a): p2-value legalization root-caused as a deep multi-layer 0004 sub-project |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/560900c) | #320 (a): far-indirect call MECHANISM built + verified (IR-rep #1, i32-target path) |
@@ -12,6 +13,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+2d2a171	author	Will Norris
+2d2a171	added	115
+2d2a171	deleted	56
+2d2a171	files	1
+2d2a171	body	Record the completed (a) far-function-pointer backend in the authoritative docs.\nThe deep p2-value sub-project (the plan's §6) is finished and the far indirect\ncall is verified end-to-end on MAME + bsnes-jg (worktree wt/320-far-followups\n579b911). Only the clang F2 ergonomic front-end remains.\n\n- plan §0/§6/§7/§8/§9: Layer 3 (selectUnMergeValues byte->word subreg — the real\n  crash; "SelectImm" framing was stale), Gap A (&far_sym->24-bit via\n  buildFarAddrWords + MO_ADDR24_* -> #mos24bank), Gap B (G_STORE/G_LOAD p2 via PF\n  value type) all FIXED with recipes; e2e (far_fnptr) DONE both emulators,\n  a16-only; F2 the only remaining piece, with its mapped design.\n- agent-handoff worktree row + TODO #320 item updated to match.\n\nThe backend edits live in the worktree's gitignored vendor/ (recipes in the plan,\nsince 0004 stacked blocks a clean 0001 regen); the e2e test artifacts are\ncommitted on the worktree (579b911).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 15df5fe	author	Will Norris
 15df5fe	added	245
 15df5fe	deleted	370

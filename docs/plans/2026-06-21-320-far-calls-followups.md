@@ -13,10 +13,17 @@ this file (see `.history/`).
 | Sub-task | State | Where |
 |---|---|---|
 | **(b) mixed-banking: far → near** | ✅ **DONE + SHIPPED to `main`** (`5717f6b`), verified both emulators | `main` |
-| **(a) far function pointers** | ✅ **BACKEND DONE + e2e VERIFIED both emulators** (2026-06-21, worktree `579b911`) — the full p2-value sub-project (Layer 3 + Gap A + Gap B) is fixed; the far indirect call works end-to-end on real silicon. ⏳ Only the **clang F2 ergonomic front-end** remains. | worktree `vendor/` |
+| **(a) far function pointers** | ✅ **DONE — backend + clang F2 + e2e VERIFIED both emulators** (2026-06-21) — the full p2-value sub-project (Layer 3 + Gap A + Gap B) **and** the clang `far`/`long_call` attribute (F2) are complete; a **single-file C** far-fn-ptr call (`far_leaf(0x5A)`, no asm / no `.set`) works end-to-end on real silicon. | worktree `vendor/` |
 | **(c) far tail calls** | ⛔ out of scope (separate; already conservative-safe) | — |
 
-**One-line resume for (a):** the deep p2-value sub-project is **COMPLETE + e2e-verified** —
+**(a) is now fully closed** — the clang **F2** front-end (the `far`/`long_call` attribute + call-rewrite)
+landed on the worktree 2026-06-21 and the e2e was rewritten to the clean single-file surface
+(`__attribute__((section(".far_text"), noinline, far))` + a plain `far_leaf(0x5A)` call — no `.set`, no
+hand-rolled `__mos_far_target` plumbing). It compiles to the proven IR shape, `-verify-machineinstrs` clean,
+`far_leaf(0x5A)==0xFF` on **MAME + bsnes-jg**, regression-clean (corpus 7/7, far_near_call + xcheck, csmith
+0-mismatch). Recipe: §6 "clang F2". The original deep-dive resume follows for history.
+
+**One-line resume for (a) [historical]:** the deep p2-value sub-project is **COMPLETE + e2e-verified** —
 ✅ **Layer 3** (the *actual* crash, after Layers 1/2, was `selectUnMergeValues` using byte subreg indices
 for the `s32→2×s16` unmerge → an ill-sized `Imag16=COPY Imag8`; fixed to size-gated `sublo16`/`subhi16`,
 mirroring `selectMergeValues`) · ✅ **Gap A** (`&far_sym`→24-bit: new `buildFarAddrWords` + `MO_ADDR24_*`
@@ -269,18 +276,64 @@ shares a defined AS0 function's name back to a bank-less near address — so the
 a **distinct-named** linker alias viewed as far data (`.set __far_leaf_addr, far_leaf`). This hand-emulates
 exactly what F2 will hide.
 
-### ⏳ clang F2 front-end — THE ONLY REMAINING PIECE (pure ergonomics)
-The backend needs nothing more. F2 lets C write `far_fn_t fp = &far_leaf; fp(x);` directly. Mapped (research
-2026-06-21): add a MOS `far` attribute (`TargetSpecificAttr<TargetMOS>`, spellings `far`/`long_call`, on
-`Function` + function-pointer typedef) in `clang/include/clang/Basic/Attr.td`; in `clang/lib/CodeGen` (a MOS
-target hook or a `CGExpr.cpp EmitCallExpr` intercept) rewrite a far-fn-ptr call into
-`store volatile i32 (ptrtoint fp), @__mos_far_target` + `call @__call_indir_far(args)` and ensure
-`&far_leaf` is typed `ptr addrspace(2)` so the now-built Gap A path materializes the 24 bits. MVP fallback:
-a `__builtin_mos_call_far`. Lands once written + a clang rebuild; the e2e already proves the lowered shape
-runs correctly. (No `BuiltinsMOS` exists yet.)
+### ✅ clang F2 front-end — DONE (2026-06-21)
+C now expresses a far-fn-ptr call in a **single file, no asm, no `.set`**: mark the target function `far`
+(`__attribute__((section(".far_text"), noinline, far))`) and call it normally (`far_leaf(0x5A)`); clang
+lowers the call to the proven shape
+(`store volatile i32 ptrtoint(ptr addrspace(2) @__mos_far_<sym>), @__mos_far_target` + `call
+@__call_indir_far(args)`). `-verify-machineinstrs` clean; `far_leaf(0x5A)==0xFF` on **MAME + bsnes-jg**;
+corpus 7/7, far_near_call + xcheck PASS, csmith 0-mismatch.
 
-**Status:** the suggested order (Layer 3 → Gap A → e2e → Gap B) is **done**; only F2 remains. Land the
-backend recipes in `0001` (regen once `0004`'s relationship to `main` is settled).
+**Design choice (recon-validated):** the `far` attribute rides the **function decl**, intercepted at the
+**call site** — *not* a far-fn-ptr value *type*. A typed far-fn-ptr variable (`far_fn_t fp;`) would need
+`ConvertType` to map a far-attributed function-pointer type to `ptr addrspace(2)` (32-bit), but
+`getTargetAddressSpace` hard-returns the program AS for function pointees and `ConvertType` canonicalizes
+away the attribute sugar; worse, clang's `getPointerWidthV(AS2)` reports **16** (not 32) so `sizeof(far*)`
+and the IR `p2:32:8` width disagree — a miscompile landmine. The function-attribute + call-site rewrite hits
+the *exact* proven IR with **zero** type-system surgery and **no** runtime far-pointer variable (the only p2
+value is the transient `ptrtoint(@__mos_far_<sym>)`). The typed-variable / indirect-through-`fp` surface is a
+clean **future** follow-up layered on a real 32-bit far-fn-ptr type (fix `getPointerWidthV` + a `Type::Pointer`
+AS2 arm); it is **not** needed for F2 and does not gate it.
+
+**Recipe (gitignored `vendor/` edits — durable record; land in `0001` once `0004` settles):**
+
+- **`clang/include/clang/Basic/Attr.td`** — new `def MOSFarCall : InheritableAttr, TargetSpecificAttr<TargetMOS>`
+  with `Spellings = [GCC<"long_call">, GCC<"far">]`, `Subjects = [Function]`, `ParseKind = "LongCall"`. The
+  `far`/`long_call` GNU spellings already belong to MIPS's `MipsLongCall`; a second owner collides in the
+  `getAttrKind` StringMatcher (`report_fatal_error("Had duplicate keys")` at **tablegen time**) unless both
+  share a `ParseKind` — exactly how the multi-target `interrupt` spelling is shared. So **also** give
+  `MipsLongCall` `let ParseKind = "LongCall";` and **drop its `let SimpleHandler = 1;`** (shared-ParseKind
+  attrs dispatch via an explicit handler, like `interrupt`). Tablegen then emits one merged
+  `ParsedAttrInfoLongCall` (kind `AT_LongCall`) whose auto-generated `diagAppertainsToDecl` enforces
+  function-only and whose `existsInTarget` covers `mos` + the mips arches. **Validate with `clang-tblgen`
+  before any clang rebuild** (sub-second): `-gen-clang-attr-parsed-attr-kinds` (no duplicate-key fatal,
+  `far`→`AT_LongCall`), `-gen-clang-attr-parsed-attr-impl` (merged info), `-gen-clang-attr-classes`
+  (`MOSFarCallAttr`).
+- **`clang/lib/Sema/SemaDeclAttr.cpp`** — `static void handleLongCallAttr(Sema&, Decl*, const ParsedAttr&)`
+  dispatching on the triple arch (`== llvm::Triple::mos` → `handleSimpleAttribute<MOSFarCallAttr>`, else
+  `handleSimpleAttribute<MipsLongCallAttr>`), plus `case ParsedAttr::AT_LongCall: handleLongCallAttr(...);`
+  in `ProcessDeclAttribute`. Subject/target appertainment is already enforced by the merged
+  `ParsedAttrInfoLongCall` before the handler runs, so no manual checks. (Blast radius: only `Mips.cpp`
+  reads `MipsLongCallAttr`; nothing references the old `AT_MipsLongCall` parsed kind.)
+- **`clang/lib/CodeGen/CGExpr.cpp`** — `static CGCallee emitMOSFarIndirectCallee(CGF, FnInfo, Sym)` +, in
+  `CodeGenFunction::EmitCall(QualType, …)` just before the inner `EmitCall(FnInfo, Callee, …)`, the intercept
+  `if (auto *FarFD = dyn_cast_or_null<FunctionDecl>(TargetDecl); FarFD && FarFD->hasAttr<MOSFarCallAttr>())
+  Callee = emitMOSFarIndirectCallee(*this, FnInfo, CGM.getMangledName(GlobalDecl(FarFD)));`. The helper: emit
+  `module asm ".globl __mos_far_<sym>\n.set __mos_far_<sym>, <sym>"` + an `external addrspace(2) constant i8`
+  global named `__mos_far_<sym>` (the **distinct-named** AS2 alias — a same-named alias of the AS0 function
+  collapses to a bankless near address; an addrspacecast AS0→AS2 zero-extends/drops the bank), once per
+  target; `store volatile i32 ptrtoint(@__mos_far_<sym>), @__mos_far_target` (align 1); then return
+  `CGCallee::forDirect(CGM.CreateRuntimeFunction(GetFunctionType(FnInfo), "__call_indir_far"))`. The store
+  sits after `EmitCallArgs` and immediately before the call, so a nested far call in an argument can't
+  clobber the slot first. (`__call_indir_far` is typed with the target's exact signature → MOSCallLowering
+  JSLs it and forwards arg registers untouched.)
+- **`examples/65816/far_fnptr.c`** (tracked, worktree) — rewritten to the clean `far` surface; the old
+  `.set __far_leaf_addr` / `extern volatile __mos_far_target` / `extern __call_indir_far` hand-emulation
+  deleted. (`dev/far_fnptr.sh` unchanged — the disasm/link/exec gates still pass.)
+
+**Status:** the whole of (a) — Layer 3 → Gap A → e2e → Gap B → **F2** — is **done**. Land the backend +
+F2 recipes in `0001` (regen once `0004`'s relationship to `main` is settled — F2 touches only `clang/`, so
+it composes cleanly with the backend MOS-target edits).
 
 ---
 
@@ -329,12 +382,17 @@ peephole keys on `MOS::JSR`, so a `JSL` is never tail-converted — conservative
 **Verification bar:** the project differential — host == far@MAME == far@bsnes-jg, plus
 `-verify-machineinstrs` clean. (b) meets it (a16-independent, incl. the default leg). (a) meets it
 **a16-only** (host == a16@MAME == a16@bsnes-jg; like `far_cast`/`far_indir`, the default 8-bit build can't
-decompose a 32-bit far-pointer value — no default leg). The e2e (`far_fnptr`) **PASSES** (`0xFF`, both
-emulators); the backend is verify-clean. Only F2 (front-end) remains.
+decompose a 32-bit far-pointer value — no default leg). The e2e (`far_fnptr`), now driven by the clean F2
+`far` surface, **PASSES** (`0xFF`, both emulators); backend + F2 are verify-clean. **(a) is fully closed.**
+F2 regression-clean: corpus **7/7**, far_near_call + xcheck PASS, a16unmerge PASS, csmith **36/40, 0
+mismatch / 0 crash** (the differential fuzzer compiles every program both default and a16 — proof the
+`far`-attribute / call-rewrite is inert for all non-`far` code).
 
 **Patch placement:** (b) is in `0001` (HasW65816-gated, a16-free) on `main`. (a)'s vendor changes
-(Layers 1/2/3 + Gap A + Gap B + the (a) call mechanism) are WIP in the worktree's gitignored `vendor/`;
-they land in `0001` (and/or a stacked patch alongside `0004`) when `0004`'s relationship to `main` settles.
+(Layers 1/2/3 + Gap A + Gap B + the (a) call mechanism + **F2** clang front-end) are WIP in the worktree's
+gitignored `vendor/`; they land in `0001` (and/or a stacked patch alongside `0004`) when `0004`'s
+relationship to `main` settles. F2 touches only `clang/` (Attr.td + SemaDeclAttr.cpp + CGExpr.cpp), so it
+composes cleanly with the MOS-target backend edits.
 
 ---
 
@@ -344,5 +402,6 @@ they land in `0001` (and/or a stacked patch alongside `0004`) when `0004`'s rela
   `5fd0ff5` Layer-3 IR-callee finding · `93c7336` p2-value multi-layer root-cause + Layers 1/2 fixed ·
   `15df5fe` consolidate plan+handoff.
 - **worktree `wt/320-far-followups`:** `dd33017` (b) · `1ea7507` (a) stub+0004 · `7ee5f6f` (a) global-slot
-  stub · **`579b911` (a) backend p2-value sub-project DONE (Layer 3 + Gap A + Gap B, recipes §6) + e2e
-  `far_fnptr` verified both emulators.**
+  stub · `579b911` (a) backend p2-value sub-project DONE (Layer 3 + Gap A + Gap B, recipes §6) + e2e
+  `far_fnptr` verified both emulators · **(a) clang F2 — the `far`/`long_call` attribute + call-rewrite;
+  `far_fnptr.c` rewritten to the clean single-file surface; e2e `0xFF` MAME+bsnes-jg, regression-clean.**

@@ -51,8 +51,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   today → a `p2` mis-sizes into a 16-bit `RS1`; each variant adds the assignment rule + 4-byte
   (dis)assembly. Unlike the frame-ABI study, this one MUST ship one variant (a tie → simplest = Imag32),
   not "change nothing". [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
-- [ ] **#320 far calls — follow-ups: (b) DONE, (a) gated on `0004`** (the JSL/RTL direct-call MECHANISM
-  landed 2026-06-20, see Done). [plan](docs/plans/2026-06-21-320-far-calls-followups.md). Scope (probes):
+- [ ] **#320 far calls — follow-ups: (a) + (b) feature-complete; (a) lands in `0001` once `0004` settles**
+  (the JSL/RTL direct-call MECHANISM landed 2026-06-20, see Done).
+  [plan](docs/plans/2026-06-21-320-far-calls-followups.md). Scope (probes):
   far → **far** already works (non-leaf `JSL`/`RTL` chains), so the real gaps are:
   - ~~(b) **mixed-banking — far → near**~~ **✅ DONE + SHIPPED to `main` 2026-06-21 (`5717f6b`)** — a
     far function calling a NEAR function routes through the generic bank-0 thunk **`__call_near_from_far`**
@@ -83,10 +84,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     value type). ✅ **e2e** `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` (wired into `dev/run.sh` +
     `dev/xcheck.sh`): `far_leaf(0x5A)==0xFF` on MAME + bsnes-jg, bank `$01`, `R_MOS_ADDR24_BANK` reloc,
     `jsl __call_indir_far`; **a16-only** (no default leg, like far_cast/far_indir). Regression-clean (corpus
-    7/7, far_near_call + xcheck PASS). **⏳ ONLY clang F2 remains** (the `far` attribute + call CodeGen — pure
-    front-end ergonomics; the e2e hand-emulates it via a distinct-named far-data linker alias). All backend
-    edits are gitignored `vendor/` recipes in the plan §6. WIP on `wt/320-far-followups` (`0004` stacked);
-    the recipes land in `0001` once `0004`'s relationship to `main` settles.
+    7/7, far_near_call + xcheck PASS). ✅ **clang F2 DONE 2026-06-21** — the MOS `far`/`long_call` attribute
+    (`MOSFarCall`, Attr.td, sharing `ParseKind="LongCall"` with `MipsLongCall` interrupt-style to dodge the
+    GNU-spelling duplicate-key collision) + a `CGExpr.cpp::EmitCall` intercept that rewrites a `far`-attributed
+    call into the proven `store volatile ptrtoint(@__mos_far_<sym> AS2)` + `call @__call_indir_far` shape (no
+    type-system surgery: the function-attribute + call-site rewrite avoids a 32-bit far-fn-ptr *type*, which
+    `getPointerWidthV(AS2)==16` + `ConvertType` canonicalization would make a miscompile landmine — a typed
+    `far_fn_t fp;` variable surface is a clean future follow-up). `far_fnptr.c` rewritten to the **clean
+    single-file `far` surface** (no asm / no `.set`); `far_leaf(0x5A)==0xFF` MAME+bsnes-jg, csmith 36/40
+    0-mismatch, `-verify-machineinstrs` clean. **(a) is feature-complete.** All backend + F2 edits are
+    gitignored `vendor/` recipes in the plan §6. WIP on `wt/320-far-followups` (`0004` stacked); the recipes
+    land in `0001` once `0004`'s relationship to `main` settles.
   - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
   Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
   [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
