@@ -38,12 +38,15 @@ printf '    %-12s %6s bytes\n' a16bitchain.sfc "$(stat -c%s "$ROM")"
 
 rc=0
 echo "==> disasm gate: each AND/OR/XOR chain reads its globals via and/ora/eor abs"
-echo "    (2f/0f/4f) and threads through A16 (no carry-init, low sta-zp = no round-trip)."
+echo "    (2[df]/0[df]/4[df]) and threads through A16 (no carry-init, low sta-zp = no round-trip)."
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-nand=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*2f\b' || true)    # and abs
-nora=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*0f\b' || true)    # ora abs
-neor=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*4f\b' || true)    # eor abs
+# Match BOTH the absolute (2d/0d/4d) and absolute-long (2f/0f/4f) forms: a near-global
+# operand reads as abs since the 0007 near-abs relaxation fix; far would be long. The
+# gate cares that the global is read DIRECTLY, not which relaxation form (super-set [df]).
+nand=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*2[df]\b' || true)  # and abs/long
+nora=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*0[df]\b' || true)  # ora abs/long
+neor=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*4[df]\b' || true)  # eor abs/long
 nstazp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*85\b' || true)  # sta zp (Imag16)
 echo "  and-abs=$nand  ora-abs=$nora  eor-abs=$neor  sta-zp=$nstazp"
 [ "$nand" -ge 2 ] && echo "  PASS: $nand and abs — AND chain reads globals directly" || { echo "  FAIL: expected >=2 and abs, got $nand"; rc=1; }
