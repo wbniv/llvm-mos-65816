@@ -78,6 +78,23 @@ plan; record them so the next agent doesn't re-assume.
 requires a **front-end far-code-pointer story that does not exist yet** — the larger, decision-bearing
 half. This argues for **(b) first** (see *Sequencing*).
 
+> **Cross-agent A0 spike (from `wt/320-far-cc`, 2026-06-21) — receipts for 2/4 + two extra *backend* gaps.**
+> A parallel host-side spike (`mos-clang`, relocs via `llvm-objdump -r`) confirms points 2/4 and surfaces
+> that (a)'s **backend** half isn't free either — the front-end story (1–4) is necessary but not sufficient:
+> - **Receipts:** `&far_leaf` relocs `R_MOS_ADDR16_LO`/`_HI` (bank lost) vs a far *data* access `R_MOS_ADDR24`
+>   (bank baked — but bound to the abs-long load, not to address-of). IR shows `define i8 @far_leaf` in the
+>   **default** AS: `address_space(2)` on a function *declaration* is **silently ignored** (no warning) — so
+>   the point-3 MIPS-`far`-style *decl* attribute won't by itself place the function in AS2; it still needs
+>   the address-of→24-bit (`R_MOS_ADDR24`) plumbing.
+> - **Backend gap A — value formation crashes.** Returning `&far_sym` as a far pointer mis-selects today:
+>   `$rl1 = SelectImm $x` → *"Illegal physical register"*; `G_STORE (p2)` → *"unable to legalize"*.
+> - **Backend gap B — value decomposition crashes.** Splitting a far fn-ptr value into the `jml` slot hits
+>   the **unsupported `s32 → 4×s8 G_UNMERGE_VALUES`** (the gap the handoff doc flags as "no seed hit it yet").
+>
+> Net: (a) = your front-end story **plus** these two legalizer fixes before `__call_indir_far` is reachable.
+> Reproducible: `/tmp/a0_*.c` (4 probes). (Duplicate-effort note: this branch is canonical; `wt/320-far-cc`
+> stood down.)
+
 ---
 
 ## (b) Mixed-banking: a far function calling a near function
