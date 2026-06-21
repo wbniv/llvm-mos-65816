@@ -77,6 +77,21 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (≈ near ptr); post the upstream note (C1 + pow2 + census) — user-triggered.
   [incB handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
   [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md).
+- [ ] **#320 zero-bank (AS4) — measure-and-close the LAST address space (plan-first; expected CONFIRMED
+  measured-null).** The 5th/last of asiekierka's spaces and the only one not formally evidence-closed: the
+  five-space §Phase 2 "NO-GO" rests on a **circular, lumped** census ("zero-bank likewise has 0 users") —
+  same trap packed-24's twin finding was corrected for. Close it properly, like packed-24 (built on a
+  measured win) / frame-ABI (closed on a measured null). **Premise-check (2026-06-22, 4 readers + 3
+  adversarial skeptics — 3/3 found no win):** zero-bank is bit-identical to a near pointer (both `…:16:8`,
+  both 16-bit-abs), so it competes not with far but with **"near ptr + on-demand `→far` cast"** — and ties it
+  on storage (2 B = 2 B), per-access, AND boundary. **Two structural facts:** (1) the cheap `ad`/`8d` access
+  AS4 was invented for is **already delivered on AS0** via the assembler's `ZeroBank` relaxation
+  (`MOSAsmBackend.cpp` `relaxInstructionTo` — narrow→long only when bank-0 unprovable); (2) no far indexed-long
+  mode, and AS4 cheap access is globals-only, so a runtime AS4 arg derefs no cheaper than near. Feasibility is
+  *higher* than packed-24 (~30 LoC, reuses near path + 0006 cast template, no `MVT` workaround) ⇒ **null by
+  worth, not infeasibility.** Plan: host-only de-lumped census (mirror `frameabi-census.sh`) + incumbent
+  quantification → close (nothing lands) → upstream paragraph completing the model. GO contingency kept +
+  pre-registered (not expected). [plan](docs/plans/2026-06-22-320-zerobank-as4-measure-and-close.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
   llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.
