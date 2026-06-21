@@ -1,414 +1,289 @@
-# #320 far-calls follow-ups — (a) far function pointers + (b) mixed-banking (far → near)
+# #320 far-calls follow-ups — combined PLAN + HANDOFF
 
-**Date:** 2026-06-21 · **Status:** PLAN (not started) · **Issue:** #320 (M1, far pointers/calls)
-**Builds on:** [Inc 4 Ph1 far calls](2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) — the direct
-`JSL`/`RTL` far-call MECHANISM (landed 2026-06-20, two-emulator verified) — and the in-flight
-[far-pointer CC study](2026-06-20-320-far-pointer-cc-build-all-variants.md) (`wt/320-far-cc`, variant
-(a) Imag32 done) whose 24-bit `p2` representation (a) reuses.
-
----
-
-## Context — what landed, and the two precise gaps
-
-Inc 4 Phase 1 shipped the **far-call mechanism**: a **direct** call to a `.far_*`-sectioned function is
-emitted as `JSL` ($22, pushes a 3-byte `PBR:PC`); that function returns with `RTL` ($6B, pops 3). Both
-sides are driven by the **same section attribute** (`MOSCallLowering.cpp` `lowerCall`/`lowerReturn`,
-`STI.hasW65816()`-gated, a16-independent, in `0001`). Gate: `examples/65816/far_call.c`.
-
-Two capabilities were deferred as follow-ups (the TODO's #320 follow-ups bullet):
-
-- **(a) Far function pointers** — an *indirect* call through a far code pointer. Today every indirect
-  call stays **near** (`jsr __call_indir`); a far function reached through a pointer is mis-called in the
-  current bank.
-- **(b) Mixed-banking** — a far function that calls a **near** function. Today a far function is
-  constrained to be a leaf (or call only other far functions).
-
-This plan also clarifies a scope point the older docs blurred (see *Measured findings* §1):
-**far → far already works** (a `.far_*` caller `JSL`s a `.far_*` callee, which `RTL`s back — a non-leaf
-chain that the current code handles). The real (b) gap is exclusively **far → near**.
-
-(c) far tail calls remains a **separate** follow-up (the tail-call peephole keys on `MOS::JSR`, so a
-`JSL` is already never tail-converted — conservative/safe today); it is **out of scope** here and stays
-its own TODO line.
+**Date:** 2026-06-21 · **Issue:** #320 (M1, far pointers/calls) · **Worktree:** `wt/320-far-followups`
+(`/home/will/SRC/llvm-mos-65816-far-followups`, retained) · **Builds on:** Inc 4 Ph1 (direct `JSL`/`RTL`
+far calls, landed 2026-06-20). This document is **both** the plan (designs + remaining work) and the
+handoff (current state + how to resume) for the two #320 follow-ups. It supersedes the earlier draft of
+this file (see `.history/`).
 
 ---
 
-## Measured findings (host-compile probes, 2026-06-21 — "measure, don't assume")
+## 0. TL;DR — status
 
-Run against the built `build/llvm-mos-install/bin/mos-clang` (`-mcpu=mosw65816`). These reshaped the
-plan; record them so the next agent doesn't re-assume.
+| Sub-task | State | Where |
+|---|---|---|
+| **(b) mixed-banking: far → near** | ✅ **DONE + SHIPPED to `main`** (`5717f6b`), verified both emulators | `main` |
+| **(a) far function pointers** | 🚧 **IN PROGRESS** — call mechanism built+verified; p2-value path is a deep multi-layer 0004 sub-project (2 layers fixed, 3 open) + clang front-end | worktree `vendor/` |
+| **(c) far tail calls** | ⛔ out of scope (separate; already conservative-safe) | — |
 
-1. **Far → far is NOT a leaf restriction.** `lowerCall` emits `JSL` for any `.far_*` *callee* and
-   `lowerReturn` emits `RTL` for any `.far_*` *current function*, independently. So a `.far_*` function
-   calling another `.far_*` function already produces a correct `JSL … RTL` pair. The leaf wording in
-   `far_call.c` / `link.ld` is about far **→ near** specifically. **(b) = far → near only.**
-
-2. **A far function pointer cannot be spelled with `address_space(2)`** (the mechanism far *data* uses,
-   `#define FAR __attribute__((address_space(2)))`). clang **hard-forbids** address-space-qualified
-   function types:
-   ```
-   error: function type may not be qualified with an address space
-   ```
-   (`clang/.../DiagnosticSemaKinds.td:3611`). Both natural spellings fail:
-   - `typedef uint8_t far_fn_t(uint8_t) FAR;` → error above.
-   - `uint8_t (FAR *fp)(uint8_t);` → same error (+ a near/far function-pointer-type mismatch).
-   A local `(* FAR fp)` instead binds AS2 to the pointer's *storage* → "automatic variable qualified
-   with an address space". **There is no address-space route to a far code pointer.**
-
-3. **`__attribute__((far))` / `((long_call))` exists but is MIPS-only.** `Attr.td:2249` defines them as
-   `MipsLongCall : TargetSpecificAttr<TargetAnyMips>` — **not** available on MOS. So the GCC-compatible
-   `far` spelling is a *candidate front-end*, but only after it's enabled for MOS (a clang change), and
-   even then it is a *function-declaration* attribute, not a pointer-type one.
-
-4. **Taking a far function's address yields only 16 bits today.** `sink = far_leaf;` (where `far_leaf`
-   is `.far_text`) compiles to `lda #mos16lo(far_leaf); lda #mos16hi(far_leaf)` — **no bank byte**. A far
-   code pointer needs the 24-bit address (`R_MOS_ADDR24`), which is not materialized for a function
-   symbol today.
-
-5. **The near indirect path is confirmed** the gap: a reinterpreted near function pointer call emits
-   `stx __rc18; … jsr __call_indir`, and `__call_indir` is just `jmp (__rc18)`
-   (`mos-platform/common/crt/call-indir.S`) — a tail-jump thunk: the target's `RTS` returns past the
-   thunk to the original caller. The far analog must mirror this exactly (below).
-
-6. **The far-pointer representation is settled:** `p2:32:8` — addrspace 2 is a 32-bit pointer whose low
-   24 bits are the address (`MOSTargetMachine.cpp:77`, `MOSInstrInfo.h:158`). Any far **code** pointer
-   reuses this layout; the far-CC study's Imag32 (`RL#`) quad is its register home.
-
-**Net:** (b) is fully expressible **today** (section attribute + backend-only work, no front-end). (a)
-requires a **front-end far-code-pointer story that does not exist yet** — the larger, decision-bearing
-half. This argues for **(b) first** (see *Sequencing*).
-
-> **Cross-agent A0 spike (from `wt/320-far-cc`, 2026-06-21; this branch is canonical, that one stood
-> down) — receipts for 2/4 + two extra *backend* gaps, re-confirmed here 2026-06-21.** A parallel
-> host-side spike (`mos-clang`, relocs via `llvm-objdump -r`) confirms points 2/4 and surfaces that (a)'s
-> **backend** half isn't free either — the front-end story (1–4) is necessary but not sufficient:
-> - **Receipts:** `&far_leaf` relocs `R_MOS_ADDR16_LO`/`_HI` (bank lost) vs a far *data* access
->   `R_MOS_ADDR24` (bank baked — but bound to the abs-long load, not to address-of). IR shows
->   `define i8 @far_leaf` in the **default** AS: `address_space(2)` on a function *declaration* is
->   **silently ignored** (no warning) — so the point-3 MIPS-`far`-style *decl* attribute won't by itself
->   place the function in AS2; it still needs address-of→24-bit (`R_MOS_ADDR24`) plumbing.
-> - **Backend gap A — p2-value formation crashes** (re-reproduced: `/tmp/gapA.c`): returning `&far_sym`
->   as a far pointer → `unable to legalize G_TRUNC %_(p2)` / `G_UNMERGE_VALUES %_(p2)` bad-machine-code.
-> - **Backend gap B — p2-value store/decompose crashes** (re-reproduced: `/tmp/gapB.c`): `G_STORE (p2)` →
->   *"unable to legalize"*; decomposing into the `jml` slot also hits the unsupported `s32→4×s8 G_UNMERGE`.
->
-> **These p2-VALUE legalizations are exactly the class the far-CC study already solved** to pass/return a
-> `p2` across a call — shipped as **variant (a) Imag32, default-on, in stacked patch `0004-320-far-cc.patch`
-> on `wt/320-far-cc`** (it returns a `p2` from `make_far_ptr()`), **but `0004` is not on `main` yet.** So
-> **(a) is gated on `0004` reaching `main`** (or being stacked into this worktree): build (a)'s
-> `__call_indir_far` + indirect lowering **on top of** the Imag32 p2 representation, then fix any residual
-> p2-value legalization (`G_STORE p2`, the byte-decompose) the CC path didn't need. Net: **(a) = front-end
-> story + the far-CC p2 base (`0004`) + the stub/indirect lowering + residual legalizer fixes** — a
-> multi-stage effort, not the "tractable backend half" the first draft implied. **(b) is unaffected** (no
-> p2 anywhere) and proceeds independently.
+**One-line resume for (a):** finish 0004's p2-value handling — **Layer 3** (`SelectImm` with an illegal
+Imag8 condition in the p2→i32 decompose) + **Gap B** (`G_STORE p2`) + **Gap A** (`&far_sym`→24-bit) — then
+the **clang F2** `far` attribute + CodeGen, then the **e2e runtime gate**. Root-cause each layer with
+`dev/run.sh asserts-build` (the release build only SIGSEGVs). The call mechanism + 2 RA-hint fixes are
+already built (§5, §6).
 
 ---
 
-## (b) Mixed-banking: a far function calling a near function
+## 1. Background & sharpened scope
 
-### Why it's broken and what's fundamentally required
+Inc 4 Ph1 shipped the **direct** far-call mechanism: a call to a `.far_*`-sectioned function → `JSL` ($22,
+3-byte `PBR:PC` push); that function returns `RTL` ($6B, pops 3). Both driven by the function's section,
+`STI.hasW65816()`-gated, a16-independent (in `0001-320-far-addrspace.patch`).
 
-A far function runs with `PBR=$01`. A near function's code lives in bank $00, and all its internal
-`JSR`/`RTS`/branches are program-bank-relative, so it **must run with `PBR=$00`**. (Its *data* access is
-fine regardless — crt0 pins `DBR=$00`.) The only ways to change `PBR` are `JSL`/`RTL`/`JML`/`RTI`. A near
-`RTS` cannot restore the caller's bank. Therefore **an `RTL` must execute on the way back**, and that
-`RTL` must be reached by the near callee's `RTS`. The minimal construct that satisfies this is a **bank-0
-veneer** — there is no way to avoid it without changing the near callee.
+**Measured scope correction (probes, 2026-06-21):** **far → far already works** — `lowerCall` emits `JSL`
+for any `.far_*` callee and `lowerReturn` emits `RTL` for any `.far_*` function, independently, so a far
+function calling another far function is already a correct non-leaf `JSL…RTL` chain. The "far must be a
+leaf" wording was only ever about far → **near**. So the real gaps are:
 
-### Implemented mechanism — generic bank-0 runtime thunk `__call_near_from_far`
+- **(a) far function pointers** — an *indirect* call through a far code pointer.
+- **(b) mixed-banking** — a far function calling a **near** function.
 
-**Chosen over the per-callee veneer (below) after a measure-the-implementation check (2026-06-21):**
-`MOSAsmPrinter` has only basic operand target-flags (`MO_LO/MO_HI/MO_HI_JT/MO_ZEROPAGE`) and **no
-`emitEndOfAsmFile` hook**, so a per-callee veneer needs ~5 new touch-points (a `MO_FAR_VENEER` flag,
-its MCInstLower plumbing, an AsmPrinter end-of-file override, a per-module callee set, section-aware
-label+MCInst emission). The generic thunk needs only `lowerCall` + a static, disasm-inspectable `.s`
-stub, and — decisively — **reuses the exact "copy address → ZP slot, `ChangeToES`, emit `JSL`" plumbing
-that (a)'s `__call_indir_far` also needs**, so doing (b) this way de-risks (a). The byte cost lands only
-on the rare far→near path; the per-callee veneer remains a clean future byte-optimization.
+---
 
-A single stub lives in bank $00 (project-owned `.s`, like `__call_indir`):
-```
-__call_near_from_far:        ; reached via JSL from far code (3-byte far return on stack); PBR now = $00
-    pea  .Lback-1            ; push a 2-byte NEAR return ( = g's RTS target) above the far return
-    jmp  (__rc18)            ; $6C near indirect jump to g (g's 16-bit addr in __rc18); g runs at PBR=$00
+## 2. (b) Mixed-banking (far → near) — DONE + SHIPPED
+
+A far function (bank $01, `PBR=$01`) calling a near function (bank $00) is broken because a near function's
+code/`JSR`/`RTS` are program-bank-relative (must run at `PBR=$00`), and a near `RTS` can't restore the
+caller's bank — only `JSL`/`RTL`/`JML`/`RTI` change `PBR`. So an `RTL` must execute on the way back,
+reached by the near callee's `RTS`. The minimal construct is a **bank-0 thunk**.
+
+**Mechanism (shipped):** a far → near direct call routes through a generic bank-0 thunk
+**`__call_near_from_far`** reached by `JSL`:
+
+```asm
+; platforms/snes/call-near-from-far.s  (own gc-able section; built -mcpu=mosw65816)
+__call_near_from_far:        ; entered via JSL from far code; PBR now = $00
+	pea	.Lback-1	; push a near RTS return ( = g's target, minus 1 for RTS's +1)
+	jmp	(__rc18)	; $6C near-indirect jump to g (g's 16-bit addr in RS9=__rc18); g runs at PBR=$00
 .Lback:
-    rtl                      ; pop the far caller's 3-byte return; PBR -> $01
+	rtl			; pop the far caller's 3-byte return; PBR -> $01
 ```
-The far caller materializes `g`'s 16-bit address into `RS9` (`__rc18:__rc19`, the established
-indirect-call scratch) and emits `JSL __call_near_from_far`. Trace: `JSL`(push3, PBR→0) → stub
-`PEA .Lback-1`(push2) → `JMP (__rc18)`→`g`(PBR=$00) → `g`'s `RTS`(pop2)→`.Lback` → `RTL`(pop3)→far
-caller, PBR→1. **`g` is byte-for-byte unchanged** (still near, still `RTS`); near callers of `g` are
-untouched. Cost: per far→near site ≈ address-load (~8 B) + `JSL` (4 B) vs near `JSR` (3 B), plus the
-one-time ~7 B stub — paid only on the cross-bank path. (`PEA`=$F4, `JMP (abs)`=$6C, both present.)
 
-**Detection in `lowerCall`** (extends the existing `IsFar` block, `MOSCallLowering.cpp:415-423`):
+`MOSCallLowering::lowerCall` detects caller-far + direct near callee, materializes `&g` into `RS9`
+(`__rc18:__rc19`), `ChangeToES("__call_near_from_far")`, and emits `JSL` (HasW65816-gated; in `0001`,
+a16-free). The near callee `g` is byte-for-byte unchanged (still `RTS`); near callers untouched. Per
+far→near site: +1 byte (`JSL` vs `JSR`) + ~+14 cycles + a one-time ~7-byte thunk.
+
+**Verified:** `examples/65816/far_near_call.c` + `dev/far_near_call.sh` — `main→far→near→near` chain returns
+`0xE0` on **MAME + bsnes-jg** (the near callee ran at `PBR=$00` incl. its *own* near `JSR`); disasm gate
+(`jsl __call_near_from_far`; thunk `pea`/`jmp(ind)`/`rtl`; near callee `rts`); corpus **7/7**; thunk
+**gc'd from near ROMs** (byte-identical); `-verify-machineinstrs` clean; `0001` round-trips a16-free.
+
+**Realization note:** a *per-callee veneer* (`g.far_veneer: jsr g; rtl`) is more byte-efficient but needs
+AsmPrinter synthesis MOS lacks (no `emitEndOfAsmFile`); the generic thunk is simpler and shares the
+"copy-address-to-slot + JSL-to-stub" plumbing with (a). Per-callee veneer = future byte-opt.
+
+---
+
+## 3. (a) Far function pointers — the three measured findings
+
+(a) is an *indirect* call through a far code pointer. Three findings (measured, not assumed) define it:
+
+1. **Front-end: no addrspace route.** A far code pointer can't use `__attribute__((address_space(2)))`
+   (what far *data* uses) — clang forbids address-space-qualified **function types** ("function type may
+   not be qualified with an address space"). `__attribute__((far))`/`long_call` exists but is
+   `TargetSpecificAttr<TargetAnyMips>` (MIPS-only). And `&far_fn` currently materializes only 16 bits
+   (`mos16lo/hi`, no bank) — **Gap A**.
+
+2. **⚠ Layer-3 IR constraint: a far fn ptr cannot be a `ptr addrspace(2)` *callee*.** LLVM's verifier
+   requires a call's callee in the program address space (0): `call … %fp` with `%fp : ptr addrspace(2)`
+   → *"defined with type 'ptr addrspace(2)' but expected 'ptr'"*. The MOS datalayout has no `P<n>` field
+   (program AS = 0 ⇒ near 16-bit fn ptrs), and `addrspacecast` p2→p0 drops the bank. **So the 24-bit
+   address cannot ride the IR `call` callee** — it must be threaded explicitly (intrinsic / custom-CC /
+   a stash-then-thunk). A "detect p2 callee in `lowerCall`" trigger is therefore *untriggerable*.
+
+3. **p2-value handling is incomplete (0004).** The far-CC study shipped Imag32 p2 *passing/returning* via
+   the CC value-handlers (patch `0004-320-far-cc.patch`), but forming/decomposing/storing a p2 *value*
+   crashes (Gaps A/B + the RA-hint/`SelectImm` layers in §6). 0004 is **stacked into this worktree** to
+   build (a) on; it is **not on `main`**.
+
+---
+
+## 4. (a) Design — IR-rep #1 (chosen by user 2026-06-21)
+
+A far function pointer is a **`p2` (32-bit, low 24 = address)** value. Because of finding §3.2, calling it
+is a **stash-then-thunk**: store the 24-bit target into a runtime slot, then a normal direct call to a
+bank-0 thunk that long-indirect-jumps through the slot; the (far) target `RTL`s back to the original
+caller.
+
+```
+  C:   fp(args)           // fp is a far function pointer (p2)
+  IR:  store volatile i32 (ptrtoint p2 %fp to i32), @__mos_far_target   // "set far target"
+       %r = call <ret> @__call_indir_far(args)                          // forwards args via the CC
+  ASM: ...stash 24-bit target into __mos_far_target...
+       jsl __call_indir_far        // pushes 3-byte PBR:PC
+  __call_indir_far:  jml (__mos_far_target)   // $DC long-indirect tail jump
+       <far target runs, RTL pops 3 -> original caller>
+```
+
+- **Front-end spelling = F2** (MOS `far` attribute) — locked by the user. F1 builtins = spike; F3
+  (type-enforced far-fn-ptr) = deferred ideal.
+- **"set far target" realization = a volatile store to a runtime global slot** `__mos_far_target`, *not* a
+  formal LLVM intrinsic. A formal target intrinsic needs a new `IntrinsicsMOS.td` + an edit to the global
+  `Intrinsics.td` (regenerates LLVM's intrinsic tables ⇒ heavy LLVM-wide rebuild) for no functional gain;
+  the architecture is identical. `volatile` keeps the store from being DCE'd/reordered past the call.
+- **`__call_indir_far` is JSL'd, not JSR'd** — `lowerCall` special-cases the symbol so the far target's
+  `RTL` (3-byte pop) matches.
+
+**Contract:** a far fn ptr must point to a far (`RTL`-returning) function — F2 enforces this at the type
+level; document loudly for any builtin/integer route.
+
+---
+
+## 5. (a) What's BUILT + verified (the call mechanism)
+
+The far-indirect **call mechanism** is built and verified on hand-authored IR with the target as a plain
+**`i32`** (`store volatile i32 %t, @__mos_far_target` + `call @__call_indir_far(args)` → the slot store +
+`jsl __call_indir_far`, `-verify-machineinstrs` clean). Two tracked + one vendor piece:
+
+**Stub (tracked — committed on the worktree):** `platforms/snes/call-indir-far.s`
+
+```asm
+.section .text.__call_indir_far,"ax",@progbits   ; own gc-able section
+.global __call_indir_far
+__call_indir_far:
+	jml	(__mos_far_target)	; $DC indirect-long jump through the 24-bit slot
+
+.section .noinit,"aw",@nobits                    ; 4-byte bank-0 RAM slot
+.global __mos_far_target
+__mos_far_target:
+	.zero 4
+```
+Wired into `platforms/snes/CMakeLists.txt`'s `snes-crt0-o` with a per-file `-mcpu=mosw65816`
+(`set_source_files_properties(... call-indir-far.s PROPERTIES COMPILE_OPTIONS "-mcpu=mosw65816")`); own
+section ⇒ `--gc-sections` drops it from ROMs with no far indirect call (near ROMs stay byte-identical).
+
+**`lowerCall` → JSL for `__call_indir_far` (vendor — RECIPE, in `vendor/.../MOSCallLowering.cpp`):**
+
 ```cpp
-bool CallerIsFar = STI.hasW65816() &&
-                   MF.getFunction().getSection().starts_with(".far_");
-bool CalleeIsFar = Info.Callee.isGlobal() &&
-                   Info.Callee.getGlobal()->getSection().starts_with(".far_");
-// direct callee:
-//   caller near, callee near  -> JSR  (today)
-//   caller *,    callee far   -> JSL  to the callee (today: far-call mechanism)
-//   caller far,  callee near  -> materialize &g into RS9; ChangeToES("__call_near_from_far"); emit JSL  (NEW)
+// after CalleeIsFar / IsFarNearThunk, in lowerCall:
+bool IsFarIndirThunk = STI.hasW65816() && Info.Callee.isGlobal() &&
+                       Info.Callee.getGlobal()->getName() == "__call_indir_far";
+// ... IsFar = STI.hasW65816() && (CalleeIsFar || IsFarNearThunk || IsFarIndirThunk);
+// (no implicit RS9/RC20 use — the slot is the memory global __mos_far_target,
+//  written by the volatile store; ordering is via the store's side effect.)
 ```
-The first two rows are unchanged (proven byte-identical default stays byte-identical — `CallerIsFar` is
-false off-65816 and for every near function). Only the third row is new. **Scope:** direct far→near only;
-indirect-from-far is (a)'s territory (a runtime pointer's near/far-ness isn't known here).
 
-### Alternatives (documented, not shipped)
-
-- **Per-callee bank-0 veneer** (`g.far_veneer: jsr g; rtl`, reached by `jsl g.far_veneer`) — the
-  ARM/AArch64 long-branch-veneer form; ~4 B/site + 4 B/callee, more byte-efficient than the generic thunk
-  when a near callee is hot, but needs the AsmPrinter synthesis above. **Future optimization** if a
-  census shows far→near is common.
-- **Whole-module "large code model"** (`+mos-code-far`: every function `JSL`/`RTL`) — trivially correct,
-  uniform, but pays on *every* call including all-near programs. A measurement **control/fallback**, not a
-  default (it would regress the common near shape — governing lesson #2/#3).
-
-### (b) gates
-
-- `examples/65816/far_near_call.c` + `dev/far_near_call.sh`: a `.far_text` function (bank $01) that
-  calls a **near** helper (bank $00) which itself makes a near call (proves `PBR=$00` held across the
-  near callee's own `JSR`/`RTS`), returning a sentinel checked host == default == far on **MAME +
-  bsnes-jg**. Disasm gate: `JSL __call_near_from_far` at the far call site (`22`), the stub body `f4`
-  (pea) + `6c` (jmp ind) + `6b` (rtl), and the near helper `<g>` still ends in `60` (rts). (Far calls are
-  a16-independent → can also run the default 8-bit build for a true 4-way.)
-- Regression: corpus 7/7 (near `JSR`/`RTS` intact), existing `far_call`/`far_store` still PASS, fuzz +
-  a torture spot 0-mismatch, `0001` round-trips a16-free.
+(Gitignored vendor edit; recipe here is the durable record.)
 
 ---
 
-## (a) Far function pointers: indirect far call
+## 6. (a) REMAINING — p2-value completeness (the deep sub-project)
 
-### ⚠ Layer-3 blocker (measured 2026-06-21): a far fn pointer can't be a far-addrspace IR callee
+Feeding a *real* `p2` far pointer to the verified mechanism requires finishing 0004's p2-value handling.
+**Root-cause each layer with `dev/run.sh asserts-build`** then `build/llvm-mos-asserts-install/bin/mos-clang
+… -mllvm -verify-machineinstrs` on a repro (the release toolchain only SIGSEGVs). Minimal repros:
+`/tmp/p2int.ll` (`define i32 @cvt(ptr addrspace(2) %fp){ ret ptrtoint }`), `/tmp/gapA.c`, `/tmp/gapB.c`,
+`/tmp/aii_test.ll` (full p2 store + thunk call) — re-create from the snippets if `/tmp` is cleared.
 
-The first draft assumed the backend trigger is "the indirect callee is a `p2` value" — **LLVM IR forbids
-this.** The verifier rejects `call … %fp` where `%fp` is `ptr addrspace(2)`: *"defined with type 'ptr
-addrspace(2)' but expected 'ptr'"* — a call's callee **must** be in the program address space (0). The MOS
-datalayout has no `P<n>` field ⇒ program addrspace = 0 ⇒ function pointers are 16-bit near; there is **no
-per-pointer far callee**, and an `addrspacecast` p2→p0 truncates 32→16, dropping the bank. So the 24-bit
-far address **cannot ride the IR `call` callee** — it must be threaded explicitly. Three IR
-representations (a real design decision, *on top of* the F2 surface syntax):
-
-1. **"set-far-target" intrinsic + named-thunk call** *(most tractable)* — `@llvm.mos.set_far_target(p2 %fp)`
-   stashes the 24-bit address in the slot, then a normal `call @__call_indir_far(args)` forwards args; the
-   backend emits `JSL` for the `__call_indir_far` symbol. Testable, args forward via the CC untouched.
-2. **A custom calling convention** (`MOS_FarIndirect`) where the `p2` is an explicit operand; `lowerCall`
-   keys on `Info.CallConv`, not the (impossible) callee type.
-3. **A full call intrinsic** `@llvm.mos.call_indir_far(p2, …)` — clean but awkward for arbitrary signatures.
-
-**Decision (user, 2026-06-21): build IR-rep #1 end-to-end.** Realized as a **volatile store to a runtime
-slot `__mos_far_target`** (the "set far target" step) + a direct `call @__call_indir_far(args)` — a lighter
-realization of #1 than a *formal* LLVM intrinsic (a target intrinsic needs a new `IntrinsicsMOS.td` + an
-edit to the global `Intrinsics.td`, which regenerates LLVM's intrinsic tables ⇒ a heavy LLVM-wide rebuild,
-for no functional gain; same stash-then-call architecture). The earlier "detect p2 callee in `lowerCall`"
-prototype stays **backed out** (untriggerable — Layer-3).
-
-**Status (2026-06-21) — the call MECHANISM is BUILT + verified; p2-value legalization + clang F2 remain.**
-- ✅ **`lowerCall`**: a direct call to `__call_indir_far` → `JSL` (the far target's `RTL` returns to the
-  original caller). The slot is memory, so no register liveness to thread.
-- ✅ **Runtime stub** `platforms/snes/call-indir-far.s`: `jml (__mos_far_target)` ($DC) + the 4-byte
-  bank-0 slot `__mos_far_target`; per-file `-mcpu=mosw65816`, own gc-able section (mirrors the (b) thunk).
-- ✅ **Verified on hand-authored IR** (the shape clang #1 emits, with the target as a plain **i32**):
-  `store volatile i32 %t, @__mos_far_target` + `call @__call_indir_far(args)` → the 3-byte slot store +
-  `jsl __call_indir_far`, **`-verify-machineinstrs` clean**.
-- ⏳ **Residual p2-value legalization — a DEEP, MULTI-LAYER 0004 sub-project (root-caused via the asserts
-  build).** Converting/decomposing a real `p2` (e.g. `ptrtoint(p2)→i32`, returning/storing a p2) is
-  unfinished in 0004 across several layers, each a distinct crash:
-  - ✅ **Layer 1 (FIXED): `copyCost` missing the `Imag32` case** — the RA copy-hint cost hit
-    `llvm_unreachable("Unexpected physical register copy")` (`MOSRegisterInfo.cpp:~1175`) on any imag32 (p2)
-    copy. Added the imag32 case (mirrors copyPhysReg's 2-word recursion).
-  - ✅ **Layer 2 (FIXED): `getRegAllocationHints` costs size-mismatched pairs** — the p2 decompose's
-    sub-register copies make it call `copyCost(imag16, imag8)` (cross-size) → the same unreachable. Added a
-    size-match guard (skip mismatched/invalid pairs). **Both fixes are regression-clean** (corpus 7/7,
-    far_near_call PASS — they only ever fire for imag32/p2, inert for all pre-far code) but live in the
-    worktree's `vendor/MOSRegisterInfo.cpp` (not yet patch-tracked).
-  - ⏳ **Layer 3 (OPEN): a `SelectImm` with an illegal condition.** Post-RA the p2→i32 path emits
-    `$rs1 = SelectImm $rc5, -1, 0` whose **operand 1 is an Imag8 (`$rc5`)** — `SelectImm`'s condition must
-    be a flag (NZ/C/V) → `-verify-machineinstrs` "Illegal physical register". A sext-style materialization
-    is being built with a mis-classed condition register in the decompose/return path.
-  - ⏳ **Gap B:** raw `G_STORE (p2)` is still `unable to legalize` (only the CC value-handler path stores p2,
-    via ptrtoint).
-  - ⏳ **Gap A:** `&far_sym`→24-bit (`R_MOS_ADDR24`) materialization still crashes.
-  Net: completing (a)'s p2 path = finishing 0004's p2-value handling (Layer 3 + Gaps A/B) — a focused
-  backend sub-project (use `dev/run.sh asserts-build` to root-cause each layer; the release build only
-  SIGSEGVs).
-- ⏳ **clang F2 front-end:** enable the `far` attribute for MOS + CodeGen that emits the `store volatile`
-  (target) + `call @__call_indir_far(args)` for a far-fn-ptr call. Not started.
-- ⏳ **e2e runtime gate:** needs Gap A (to materialize a real far target) + F2; then `far_fnptr.c` on both
-  emulators.
-
-### Runtime mechanism (BUILT — the i32-target path is verified)
-
-Symmetric to the near indirect thunk. A 24-bit far code pointer is copied into a 3-byte ZP slot, then:
+### ✅ Layer 1 — FIXED: `copyCost` missing the `Imag32` case
+`MOSRegisterInfo::copyCost` had GPR/Imag8/Imag16/Anyi1 cases but no `Imag32` → the RA's copy-hint cost hit
+`llvm_unreachable("Unexpected physical register copy")` on *any* imag32 (p2) copy. **Fix (vendor recipe):**
+```cpp
+// in copyCost, after the Imag16RegClass case:
+if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
+  return copyCost(MOS::RC0, MOS::RC1, STI) * 4;   // 4 byte copies (mirrors copyPhysRegImpl)
+}
 ```
-__call_indir_far:            ; reached via JSL (3-byte return already on stack)
-    jml  (__rc18)            ; $DC, indirect-LONG tail jump: reads 3 bytes at __rc18, PBR follows
+
+### ✅ Layer 2 — FIXED: `getRegAllocationHints` costs size-mismatched pairs
+The p2 decompose's sub-register copies make `getRegAllocationHints` call `copyCost(imag16, imag8)`
+(cross-size) → same unreachable. **Fix (vendor recipe):** guard both cost loops:
+```cpp
+const auto &SizeMismatch = [&](Register SelfReg) {
+  return !SelfReg || !OtherReg ||
+         TRI.getRegSizeInBits(*TRI.getMinimalPhysRegClass(SelfReg)) !=
+             TRI.getRegSizeInBits(*TRI.getMinimalPhysRegClass(OtherReg));
+};
+// for (Register R : Order) { ... if (SizeMismatch(SelfReg)) continue; copyCost(...); }
 ```
-Call site (in `lowerCall`'s `IsIndirect` path, for a **far** callee value):
-```
-    ; copy the 24-bit far code ptr into __rc18..__rc20 (low,high,bank)
-    jsl  __call_indir_far    ; pushes 3-byte PBR:PC of the caller
-    ; far target runs, RTL pops 3 -> returns to the ORIGINAL caller (any bank)
-```
-Trace: `JSL`(push3) → `__call_indir_far` `JML (ptr)`(tail, no push) → far target `RTL`(pop3) → original
-caller, PBR restored. Works regardless of the **caller's** bank (near or far). The instruction exists:
-`JML_Indirect16` ($DC, `MOSInstrInfo.td:779`).
+**Both fixes regression-clean** (corpus 7/7, far_near_call PASS; they only fire for imag32/p2). They live
+in `vendor/.../MOSRegisterInfo.cpp` (not yet patch-tracked — `0004` stacked blocks a clean `0001` regen).
 
-**Hard contract:** a far function pointer **must** point to a far (`RTL`-returning) function — `RTL`
-against a near `RTS` callee corrupts the stack. A proper far-code-pointer *type* (front-end, below) is
-what enforces this; an integer/builtin route leaves it to the user (document loudly).
+### ⏳ Layer 3 — OPEN: `SelectImm` with an illegal condition
+Post-RA, the p2→i32 path emits `$rs1 = SelectImm $rc5, -1, 0` whose **operand 1 is an Imag8 (`$rc5`)** —
+`SelectImm`'s condition must be a flag (NZ/C/V) → verify "Illegal physical register". A sext-style
+materialization is built with a mis-classed condition register in the decompose/return path. *Start here.*
+Likely in `copyPhysRegImpl`'s Anyi1 branch or a sext lowering for the 4×s8 unmerge; root-cause via the
+asserts build on `/tmp/p2int.ll` (the minimal `cvt` case reproduces it).
 
-**The 24-bit slot (settled in the build).** `jml`'s assembler syntax is `jml (__rc18)` (not `[…]`; opcode
-`$DC`). The slot is `RS9` (`__rc18:__rc19`, the established near-indirect scratch) + the bank in `RC20`
-(`__rc20`) — 3 contiguous bytes. RS9/RC20 aren't reserved (only RS0/RS8/frame are); like the near path,
-they work as fixed scratch via copy→implicit-use (verified RS9 is convention, not reservation). An Imag32
-`RL#` can't align to `__rc18` (RL`K` ⊃ `RS2K:RS2K+1`, and `RL4 ⊃ RS8` is the reserved scavenger), so the
-RS9+RC20 triple is the slot.
+### ⏳ Gap B — `G_STORE (p2)` unable to legalize
+Raw store of a p2 value isn't legalized (only the CC value-handler path stores p2, via `ptrtoint`). Needed
+if any p2 is stored to arbitrary memory.
 
-**Lowering (trigger superseded — see the Layer-3 blocker).** The slot-fill + `JSL` + `ChangeToES(
-"__call_indir_far")` sequence is right, and the byte-decompose (`ptrtoint`+`trunc`+`lshr` → RS9/RC20,
-mirroring 0004's `assignCustomValue`) works. But it must be **driven by the front-end's IR representation**
-(intrinsic / custom-CC), **not** by "callee is `p2`" (impossible — Layer-3). SPC700 stays on its `__rc17`
-near thunk; far indirect is 65816-only.
+### ⏳ Gap A — `&far_sym` → 24-bit (`R_MOS_ADDR24`)
+Taking the address of a `.far_*` symbol yields only 16 bits today. Needed to materialize a *real* far
+function/data address as a `p2` (and for the e2e runtime test — without it there's no real far target to
+point at). Extend the far-data address materialization (`0001` already emits `R_MOS_ADDR24` for far data
+*accesses*) to address-of.
 
-**Runtime stub home (done).** `__call_indir_far` is a **project-owned** stub at `platforms/snes/call-indir-
-far.s` (body `jml (__rc18)`), wired into `snes-crt0-o` with a per-file `-mcpu=mosw65816` (the platform
-otherwise builds crt0 objects without it) and placed in its own section so `--gc-sections` drops it until
-referenced — exactly like the (b) `__call_near_from_far` thunk. It is **built + assembled** on the worktree
-(`dc` = `jml ($0)`→`__rc18`) and is currently unreferenced (gc'd) pending the lowering trigger.
+### ⏳ clang F2 front-end
+Enable a MOS `far` attribute (un-gate `MipsLongCall` for MOS, or add `MOSFarCall`) for functions +
+function-pointer typedefs; CodeGen emits `store volatile i32 (ptrtoint fp), @__mos_far_target` + `call
+@__call_indir_far(args)` for a far-fn-ptr call. (No `BuiltinsMOS` exists yet.)
 
-### Front-end (the decision-bearing half — nothing exists today)
+### ⏳ e2e runtime gate
+After Gap A + F2: `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` — take `&far_leaf` as a far fn ptr,
+launder through `volatile`, call it; host == default == far on MAME + bsnes-jg; disasm shows 24-bit
+`&far_leaf` + `jsl __call_indir_far`.
 
-A far code pointer must be **expressible** and **materializable** in C. Three options, smallest-footprint
-first:
-
-| Option | Spelling | Front-end change | Ergonomics | Enforces far-only? |
-|---|---|---|---|---|
-| **F1 builtin** | `__builtin_mos_far_addr(&g)` → `uint32_t`; `__builtin_mos_call_far(addr, args…)` | new builtins (no type-system change); awkward for arbitrary signatures | low | no (user-managed) |
-| **F2 `far` fn attribute for MOS** *(recommended)* | enable `[[gnu::far]]`/`long_call` for MOS on functions **and** function-pointer typedefs | un-gate `MipsLongCall` → a MOS-available attr (or new `MOSFarCall`) + Sema + an IR marker the backend reads | medium; GCC-compatible spelling | partial (decl/typedef-scoped) |
-| **F3 far-fn-ptr type** | a MOS qualifier producing a `p2` pointer-to-function, bypassing the forbidden addrspace-on-function path | Sema/AST work to attach far-ness to the *pointee* without the addrspace diagnostic | high; cleanest C | yes (type-enforced) |
-
-**Recommendation:** validate the **backend+runtime half first against hand-authored IR/asm** (decoupled
-from the front-end), then adopt **F2** for the shippable C surface (GCC-compatible `far`, least Sema
-risk, marks both a far function and a far-callable typedef), with **F1 builtins** as the spike/escape
-hatch if F2's attribute-on-pointer-types proves fiddly. **F3** is the ideal end state (type-enforced
-far-only contract) but is the largest clang change — defer unless F2 is inadequate. **This front-end fork
-is the one genuine open decision in this plan** (see *Open decision*).
-
-**Materialization (finding §4).** Independent of the call: taking `&g` for a `.far_*` `g` must yield the
-24-bit address (`R_MOS_ADDR24`), not 16-bit. Whichever front-end option, the address-of a far function
-must lower to the `p2` 24-bit form (reuse the far *data* address materialization — `0001` already emits
-`R_MOS_ADDR24` for far data symbols; extend it to function symbols when the pointer type is far).
-
-### (a) dependency
-
-(a) **reuses the far-pointer CC's `p2`/Imag32 representation** (the value is a 24-bit code pointer). The
-backend+runtime half can proceed in parallel with the far-CC study, but if a far function pointer is ever
-**passed as an argument or returned**, that rides the far-CC outcome (currently `wt/320-far-cc`, variant
-(a) Imag32 done). Calling through a *local* far pointer needs only the type + materialization + indirect
-lowering, not the cross-call CC.
-
-### (a) gates
-
-- **Backend/runtime (no front-end):** `examples/65816/farfp.ll` — hand-authored IR (or a `.S` driver)
-  constructing an indirect far call through a 24-bit pointer; `llc`/assemble gate asserts `jsl
-  __call_indir_far` + the stub's `dc` (`jml (__rc18)`); a ROM driver checks the far target ran and
-  returned across the bank boundary on MAME + bsnes-jg.
-- **End-to-end C (after the chosen front-end):** `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` — take
-  `&far_leaf` as a far code pointer, launder through a `volatile`, call through it; host == default == far
-  on both emulators. Disasm: 24-bit materialization of `&far_leaf` (bank byte present) + `jsl
-  __call_indir_far`.
-- Regression: near indirect calls (`jsr __call_indir`) unchanged for all non-far pointers; corpus + fuzz
-  + torture spot 0-mismatch.
+**Suggested order:** Layer 3 → Gap A (unblocks a runtime test of the whole mechanism) → F2 → e2e → Gap B
+(only if needed). Then land the lot in `0001` (regen once `0004`'s relationship to `main` is settled).
 
 ---
 
-## Sequencing (recommended)
+## 7. Handoff — worktree state & how to resume
 
-1. **(b) mixed-banking first.** ✅ **DONE 2026-06-21** (verified both emulators — see *Status*). Self-
-   contained: section-driven `lowerCall` detection + the `__call_near_from_far` generic thunk + a C gate.
-   No front-end change, no CC dependency, low risk. Lifts the "far must be a leaf-or-far-only" constraint.
-2. **(a) far-CC p2 base must land first** — (a) needs the p2-VALUE legalization (form/return/store/
-   decompose a `p2`), which is the far-CC study's already-shipped Imag32 work in **`0004-320-far-cc.patch`**
-   (`wt/320-far-cc`). Land `0004` on `main` (or stack it into this worktree) **before** (a)'s backend, else
-   the two confirmed crashes (gaps A/B above) block it.
-3. **(a) backend+runtime** — on top of the Imag32 p2 base: `__call_indir_far` stub + JSL-indirect lowering
-   + the 24-bit slot; fix any residual p2-value legalization (`G_STORE p2`, byte-decompose) the CC path
-   didn't need. Validate on hand-authored IR/asm.
-4. **(a) front-end** — pick F2/F1 per the *Open decision*; wire the C surface + 24-bit `&far_fn`
-   materialization (`R_MOS_ADDR24` for a function symbol); land the end-to-end C gate.
+**Worktree `wt/320-far-followups`** (compiler-changing; own `vendor/` + warm-copied `build/`; **retained**
+per policy). Committed there: `1ea7507`/`7ee5f6f` (the (a) stub, CMakeLists, the stacked `0004` patch).
+**Uncommitted, gitignored `vendor/` edits (recipes in §5/§6):** `MOSCallLowering.cpp` (`IsFarIndirThunk`),
+`MOSRegisterInfo.cpp` (Layers 1+2). The toolchain in the worktree's `build/` is built with all of these
+(`0004` + (b) + (a) mechanism + Layers 1/2).
 
-(b) was independent and is done. (a) is now a multi-stage effort **gated on `0004`**; its front-end is a
-separate open decision on top.
+**To resume (a):**
+1. `cd /home/will/SRC/llvm-mos-65816-far-followups`
+2. Confirm the warm toolchain: `dev/run.sh corpus` (expect 7/7).
+3. Root-cause Layer 3: `dev/run.sh asserts-build` then
+   `build/llvm-mos-asserts-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature
+   -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -c -o /dev/null /tmp/p2int.ll` → read the precise
+   assert. (Re-create `/tmp/p2int.ll` from §6 if cleared.)
+4. After each vendor edit: `dev/run.sh toolchain` (confirm `build/llvm-mos-install/bin/clang-23` mtime
+   advanced — the `clang` symlink has a stale mtime), then re-run the repro **and** the regression
+   (`dev/run.sh corpus` + `dev/run.sh far_near_call`) — these RA paths affect *all* codegen.
 
----
+**Gotchas:**
+- The release build SIGSEGVs on these p2 crashes; **always use the asserts build to root-cause**.
+- The worktree's `vendor/` carries a **foreign `MOSInsertREPSEP.cpp` WIP delta** (copied at `cp -a` setup;
+  another agent's). Leave it; it's excluded from `0001`; it makes `dev/regen-patch-0001.sh`'s whole-dir
+  verify fail (cosmetic — confirm `0001` round-trips for *your* files with the targeted check).
+- `0004` is stacked in the worktree's `vendor/` (applied) but its patch file is committed; regen-`0001`
+  while `0004` is applied would contaminate `0001` — don't.
+- Far-call build needs **both** `dev/run.sh toolchain` (compiler) **and** `dev/run.sh build` (SDK; vendors
+  `platforms/snes*` incl. the stubs + `link.ld`); a compiler-only rebuild leaves the installed SDK stale.
 
-## Patch placement & worktree
-
-- **Compiler changes** (`lowerCall` far→near + far-indirect detection, AsmPrinter veneer, `&far_fn`
-  24-bit materialization, any clang front-end for (a)) are **`HasW65816`-gated, a16-independent** → land
-  in **`0001-320-far-addrspace.patch`** (which already spans `clang/lib/Basic/Targets` +
-  `llvm/lib/Target/MOS` + `llvm/lib/TargetParser`). Confirm `0001` stays a16-free
-  (`grep -c accum16 patches/llvm-mos/0001-*.patch` == 0) and absorbs no foreign hunks. The far-indirect
-  24-bit slot may touch the same `MOSRegisterInfo`/`AnyRegBank` lines the far-CC `0004` edits — if so,
-  coordinate with `wt/320-far-cc` (stack after, as `0004` did, rather than splitting a shared line).
-- **Project-tracked files** (normal commit): `platforms/snes-far/call-indir-far.s` + its
-  `CMakeLists.txt` wiring, the `examples/65816/*.c|.ll` + `dev/*.sh` gates, this plan, the TODO update.
-- **Worktree.** This is compiler-changing on the hot shared `vendor/` → run on a feature worktree
-  (`wt/320-far-followups`) off `main` HEAD with its own `vendor/` + warm-copied `build/`
-  ([howto-feature-worktree.md](../howto-feature-worktree.md) §compiler-changing); register it in the
-  agent-handoff Active-worktrees table while live. Durable artifacts (gates, stub, plan, decision record)
-  merge back; retain the worktree until the #320 work merges upstream (worktree-retention policy).
+**General mechanics** (build/test commands, the differential gate, backend navigation): the auto-loaded
+`docs/agent-handoff.md`. The worktree row there points back to this document.
 
 ---
 
-## Verification (the project differential gate)
+## 8. Decisions & verification
 
-The bar is unchanged: **host == default(non-`+mos-a16`)@MAME == far@MAME == far@bsnes-jg**, plus
-`-verify-machineinstrs` clean. Far calls are a16-independent, so each gate runs in the default 8-bit build
-too (genuine 4-way when the callee takes/returns ≤16-bit).
+**Decisions (2026-06-21):** (b) ship the generic thunk (per-callee veneer = future byte-opt); (a) build
+**IR-rep #1** end-to-end; (a) front-end = **F2** (MOS `far` attr); "set far target" realized as a volatile
+global-slot store (not a formal intrinsic). (c) far tail calls = separate, out of scope (the tail-call
+peephole keys on `MOS::JSR`, so a `JSL` is never tail-converted — conservative-safe already).
 
-1. **(b)** ✅ `dev/run.sh far_near_call` → far call emits `JSL __call_near_from_far`, thunk body =
-   `f4` (pea) + `6c` (jmp ind) + `6b` (rtl), near helper still `60` (rts); MAME + bsnes-jg both got
-   `0xE0`; far→far + corpus + the prior far ROMs still PASS; thunk gc'd from near ROMs (byte-identical).
-2. **(a) backend** `dev/run.sh farfp` (the `.ll`/`.S` gate) → `jsl __call_indir_far` + `dc` (jml (abs))
-   present; ROM round-trips the far target on both emulators.
-3. **(a) e2e** `dev/run.sh far_fnptr` → 24-bit `&far_leaf` (bank byte present), `jsl __call_indir_far`;
-   host == default == far on both emulators.
-4. **No regression:** corpus 7/7; near `JSR`/`RTS`/`jsr __call_indir` byte-identical for non-far code;
-   `dev/run.sh fuzz 200+` and a torture spot 0-mismatch/0-new-crash; all prior far ROMs PASS.
-5. **Patch hygiene:** `0001` regenerates and round-trips; staged set is exactly the authored files;
-   `0001` stays a16-free; `0002`/`0003` untouched.
-6. **Docs/upstream:** update this plan with results; point the TODO + implementation-status at what
-   shipped; if the result is upstream-worthy (a 65816 far-call ABI: veneer + `__call_indir_far`), queue
-   an evidence note in [upstream-contribution-status.md](../upstream-contribution-status.md) (posting is
-   user-triggered).
+**Verification bar** (unchanged): the project differential — host == default(non-`+mos-a16`)@MAME ==
+far@MAME == far@bsnes-jg, plus `-verify-machineinstrs` clean. (b) meets it. (a)'s mechanism is verified at
+the IR level (i32-target); its e2e differential gate is pending Gap A + F2.
+
+**Patch placement:** (b) is in `0001` (HasW65816-gated, a16-free) on `main`. (a)'s vendor changes are WIP
+in the worktree; they land in `0001` (and/or a stacked patch alongside `0004`) when (a) completes.
 
 ---
 
-## Out of scope / non-goals
+## 9. Commit trail (main)
 
-- **(c) far tail calls** — separate TODO line; already conservative-safe (tail peephole keys on `JSR`).
-- **The far-pointer *data* CC** (passing/returning a `p2` value) — the in-flight `wt/320-far-cc` study;
-  (a) reuses its representation but does not re-open it.
-- **SPC700 indirect-far** — 65816-only; SPC700's `__rc17` thunk path is untouched.
-- **Auto-promoting near callees to far** — (b) keeps near callees byte-identical; no whole-program ABI
-  change ships (the uniform-far code model is a measured control/fallback, not the default).
-
----
-
-## Decisions (resolved 2026-06-21)
-
-- **(b) far→near: SHIPPED.** Generic `__call_near_from_far` thunk merged to `main` (`5717f6b`), verified
-  both emulators. Done.
-- **(a) direction: PAUSE — (a) is a follow-up.** (b) ships now; (a) is gated on the far-CC Imag32 p2 base
-  (`0004`) reaching `main` and is picked up then. The worktree (`wt/320-far-followups`) + this plan are
-  left ready; do **not** tear it down (retention policy).
-- **(a) front-end spelling: F2 — MOS `far` attribute** (user, 2026-06-21). When (a) is built: enable a
-  GCC-compatible `far`/`long_call`-style attribute for MOS on functions **and** function-pointer typedefs
-  (least Sema risk). F1 builtins remain the spike/escape hatch; F3 (type-enforced far-fn-ptr) is the
-  deferred ideal. The **backend** half (the `0004` p2 base + `__call_indir_far`/indirect lowering +
-  residual `G_TRUNC`/`G_UNMERGE`/`G_STORE` p2 legalization) can be validated on hand-authored IR first,
-  decoupled from F2.
+- `5717f6b` ship (b) far→near to main · `560900c` (a) call mechanism built+verified ·
+  `5fd0ff5` Layer-3 IR-callee finding · `93c7336` p2-value multi-layer root-cause + Layers 1/2 fixed.
+- Worktree: `dd33017` (b) · `1ea7507` (a) stub+0004 · `7ee5f6f` (a) global-slot stub.

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/93c7336) | #320 (a): p2-value legalization root-caused as a deep multi-layer 0004 sub-project |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/560900c) | #320 (a): far-indirect call MECHANISM built + verified (IR-rep #1, i32-target path) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5fd0ff5) | #320 (a): Layer-3 finding — far fn ptr can't be a ptr addrspace(2) IR callee |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5d81d44) | #320 far-followups: (b) shipped to main (5717f6b); (a) paused, front-end LOCKED=F2 |
@@ -10,6 +11,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+93c7336	author	Will Norris
+93c7336	added	21
+93c7336	deleted	4
+93c7336	files	1
+93c7336	body	Pushed on (a)'s p2 path. Asserts-build root-causing found 0004's p2-value handling\nis unfinished across layers:\n- Layer 1 FIXED: copyCost missing the Imag32 case (RA copy-hint unreachable on any\n  imag32/p2 copy).\n- Layer 2 FIXED: getRegAllocationHints costs size-mismatched sub-register pairs from\n  the p2 decompose (copyCost(imag16,imag8)); added a size-match guard.\n  Both regression-clean (corpus 7/7, far_near_call PASS; only fire for imag32/p2).\n- Layer 3 OPEN: post-RA SelectImm with an Imag8 condition ($rs1 = SelectImm $rc5)\n  -> verify "Illegal physical register".\n- Gap B: raw G_STORE p2 unable to legalize. Gap A: &far_sym->24-bit.\nSo (a)'s p2 path = finishing 0004's p2-value handling (Layer 3 + Gaps A/B) + clang\nF2 + e2e. The 2 RA-hint fixes are in the worktree's vendor (recipes in the plan).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 560900c	author	Will Norris
 560900c	added	25
 560900c	deleted	8
