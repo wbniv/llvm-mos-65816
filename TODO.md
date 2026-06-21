@@ -53,12 +53,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     and an `addrspacecast` p2→p0 drops the bank. So the 24-bit address can't ride the IR `call` callee; it
     must be threaded via a **front-end IR representation** — (#1, leaning) a `set_far_target` intrinsic +
     a normal `call @__call_indir_far(args)`; (#2) a custom `MOS_FarIndirect` CC; (#3) a full call intrinsic.
-    **A "detect `p2` callee in `lowerCall`" trigger is untriggerable** (prototyped + backed out). So (a) =
-    F2 surface + the IR-representation design + the `0004` p2 base + the `__call_indir_far` lowering +
-    address-of-far-symbol→24-bit (Gap A) + residual legalizer fixes. **Runtime stub `__call_indir_far`
-    (`jml (__rc18)`) BUILT + assembled** (kept on the worktree, gc'd/unreferenced pending the trigger).
-    **Gated on (i) the IR-representation decision and (ii) `0004` reaching `main`**; resume on the retained
-    `wt/320-far-followups`.
+    (a "detect `p2` callee in `lowerCall`" trigger is untriggerable.) **IR-rep #1 CHOSEN (user 2026-06-21);
+    building end-to-end.** Realized as a volatile store to a runtime slot `__mos_far_target` + `call
+    @__call_indir_far` (lighter than a formal intrinsic — that needs `Intrinsics.td` regen). **Progress
+    2026-06-21:** the far-indirect **call mechanism is BUILT + verified** — `lowerCall` makes a call to
+    `__call_indir_far` a `JSL`; stub `call-indir-far.s` = `jml (__mos_far_target)` + the 4-byte slot;
+    hand-IR with an **i32 target** → slot store + `jsl`, `-verify-machineinstrs` clean. **Remaining
+    (substantial):** (1) p2-value legalization — `ptrtoint(p2)→i32`/p2-param decompose crash ("Illegal
+    physical register … `SelectImm`") + **Gap A** (`&far_sym`→24-bit `R_MOS_ADDR24`); (2) clang **F2** `far`
+    attr + CodeGen emitting the store+call; (3) e2e runtime gate. WIP on `wt/320-far-followups` (`0004`
+    stacked); still gated on `0004` reaching `main`.
   - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
   Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
   [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
@@ -271,10 +275,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (b) seeds 247 + 445 `+mos-xy16`-only runtime mismatches (same signature) — **handed off** to the xy16 area
   (now **FIXED** — see Done `[321-xy16-seed247-445]`; the `requiredXWidth` Track A hardening also **DONE** — see Done `[321-xy16-track-a]`).
   The a16 path is otherwise clean across both ranges (0 crash, 0 a16 mismatch).
-  Remaining: **Phase 5** (sampled CI mirroring `corpus-a16`). **Yarpgen
-  follow-up:** add a `--gen yarpgen` later to target
-  `-O1/-Os` loop/scalar-opt bugs (no `platform.info` equiv → 16-bit-int caveat; must redirect its baked-in
-  `printf`); the `--gen` seam added here makes it drop-in.
+  ~~Remaining: **Phase 5** (sampled CI mirroring `corpus-a16`).~~ **Phase 5 DONE 2026-06-21** — the
+  **`fuzz-csmith`** job in `.github/workflows/smoke.yml` (host-side: installs MAME + builds `vendor/csmith`;
+  `needs: xcheck` for the cached toolchain; 4-way differential; secret-gated skip-not-fail; `mode` input
+  `sampled` [40 seeds from `sample_seed`] / `full` [seeds 1..500]). Local sampled verify `dev/run.sh fuzz
+  --gen csmith 40 1` = **36/40 PASS, 0 mismatch/0 crash/0 error** (4 SKIP = `diverged-before-result`).
+  **Yarpgen follow-up** (optional, future): add a `--gen yarpgen` to target `-O1/-Os` loop/scalar-opt bugs
+  (no `platform.info` equiv → 16-bit-int caveat; must redirect its baked-in `printf`); the `--gen` seam makes
+  it drop-in.
   [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
 - [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)

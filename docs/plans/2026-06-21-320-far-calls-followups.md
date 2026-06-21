@@ -198,14 +198,31 @@ representations (a real design decision, *on top of* the F2 surface syntax):
    keys on `Info.CallConv`, not the (impossible) callee type.
 3. **A full call intrinsic** `@llvm.mos.call_indir_far(p2, …)` — clean but awkward for arbitrary signatures.
 
-**Status:** the runtime stub `__call_indir_far` (`jml (__rc18)`) is **built + assembled + kept** on the
-worktree (the design-independent half — every approach long-indirect-jumps through a ZP slot). The
-`lowerCall` "detect p2 callee" trigger was **prototyped and backed out** — it is *untriggerable* (no real
-IR yields a `p2` callee), so it can't be tested and would be dead/speculative. **Resuming (a) starts from
-the IR-representation choice above** (lean toward #1), not from `lowerCall` detection. The mechanism below
-is still the correct *runtime* shape; only its *trigger* changes.
+**Decision (user, 2026-06-21): build IR-rep #1 end-to-end.** Realized as a **volatile store to a runtime
+slot `__mos_far_target`** (the "set far target" step) + a direct `call @__call_indir_far(args)` — a lighter
+realization of #1 than a *formal* LLVM intrinsic (a target intrinsic needs a new `IntrinsicsMOS.td` + an
+edit to the global `Intrinsics.td`, which regenerates LLVM's intrinsic tables ⇒ a heavy LLVM-wide rebuild,
+for no functional gain; same stash-then-call architecture). The earlier "detect p2 callee in `lowerCall`"
+prototype stays **backed out** (untriggerable — Layer-3).
 
-### Runtime mechanism (correct; the trigger is the open design above)
+**Status (2026-06-21) — the call MECHANISM is BUILT + verified; p2-value legalization + clang F2 remain.**
+- ✅ **`lowerCall`**: a direct call to `__call_indir_far` → `JSL` (the far target's `RTL` returns to the
+  original caller). The slot is memory, so no register liveness to thread.
+- ✅ **Runtime stub** `platforms/snes/call-indir-far.s`: `jml (__mos_far_target)` ($DC) + the 4-byte
+  bank-0 slot `__mos_far_target`; per-file `-mcpu=mosw65816`, own gc-able section (mirrors the (b) thunk).
+- ✅ **Verified on hand-authored IR** (the shape clang #1 emits, with the target as a plain **i32**):
+  `store volatile i32 %t, @__mos_far_target` + `call @__call_indir_far(args)` → the 3-byte slot store +
+  `jsl __call_indir_far`, **`-verify-machineinstrs` clean**.
+- ⏳ **Residual p2-value legalization (blocks feeding a real far pointer):** converting a `p2` far pointer
+  to the i32 target crashes — `ptrtoint(p2)→i32` / the p2-param decompose hit *"Illegal physical register
+  … `$rs1 = SelectImm $rc4, -1, 0`"* (the cross-agent "Backend gap A" class), and **Gap A**
+  (`&far_sym`→24-bit `R_MOS_ADDR24`) crashes. These are a non-trivial selection/legalizer sub-project.
+- ⏳ **clang F2 front-end:** enable the `far` attribute for MOS + CodeGen that emits the `store volatile`
+  (target) + `call @__call_indir_far(args)` for a far-fn-ptr call. Not started.
+- ⏳ **e2e runtime gate:** needs Gap A (to materialize a real far target) + F2; then `far_fnptr.c` on both
+  emulators.
+
+### Runtime mechanism (BUILT — the i32-target path is verified)
 
 Symmetric to the near indirect thunk. A 24-bit far code pointer is copied into a 3-byte ZP slot, then:
 ```

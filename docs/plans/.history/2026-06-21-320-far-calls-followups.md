@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5fd0ff5) | #320 (a): Layer-3 finding — far fn ptr can't be a ptr addrspace(2) IR callee |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5d81d44) | #320 far-followups: (b) shipped to main (5717f6b); (a) paused, front-end LOCKED=F2 |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/dd33017) | #320 (b) mixed-banking: far->near calls via __call_near_from_far thunk |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/827596d) | #320 far-followups: absorb cross-agent A0 evidence; (b) DONE; (a) gated on 0004 |
@@ -8,6 +9,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+5fd0ff5	author	Will Norris
+5fd0ff5	added	47
+5fd0ff5	deleted	24
+5fd0ff5	files	1
+5fd0ff5	body	Continuing toward (a): stacked 0004 (p2 base) and prototyped indirect-far lowering.\nMeasured a third, deeper blocker: LLVM forbids a non-program-addrspace callee\n(verifier "expected 'ptr'"; MOS datalayout has no P<n> field; addrspacecast p2->p0\ndrops the bank). So a far fn ptr can't be a `ptr addrspace(2)` callee and the\n"detect p2 callee in lowerCall" trigger is untriggerable (prototyped + backed out).\nThe 24-bit address must be threaded via a front-end IR representation: #1 a\nset_far_target intrinsic + call @__call_indir_far(args) (leaning), #2 a custom\nMOS_FarIndirect CC, or #3 a full call intrinsic. The runtime stub __call_indir_far\n(jml (__rc18)) is built + assembled (correct, design-independent half). So (a) is\nblocked on the IR-representation DESIGN decision + 0004 on main; recipe captured in\nthe plan. (b) remains shipped + unaffected.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5d81d44	author	Will Norris
 5d81d44	added	13
 5d81d44	deleted	6
