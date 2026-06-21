@@ -18,7 +18,8 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 - **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
   llvm-mos-sdk#415 engagement (someone else's existing PR).
-- **Hygiene: 1 stale fork branch** to delete (`revert-540-…`, references an already-merged upstream PR).
+- **Hygiene: 1 leftover fork branch** (`revert-540-…`) **retained by preference** — user keeps fork
+  branches until merged upstream; **do not auto-propose deletion**.
 
 ## Ready to post now
 
@@ -166,12 +167,17 @@ Full internal record: [frame-ABI study plan §Outcome](plans/2026-06-20-321-fram
 > *(The ROADMAP-step-6 DWARF **test + docs** item moved up to **Ready to post now #5** on 2026-06-19 —
 > both halves are now drafted: the staged lit test + the `<output>.elf` doc note.)*
 
-## Hygiene — stale fork branch
+## Hygiene — leftover fork branch (retained by preference)
 
 `wbniv/llvm-mos:revert-540-fix/soft-stack-spill-crash` is a leftover **revert** branch of **upstream PR
 #540** ("fix(MOS): use reserved RS8 for soft stack spill scratch register"), which was **MERGED upstream on
-2026-01-26**. **No open PR uses the branch** — it is not a pending contribution of ours, just cruft. Safe to
-delete:
+2026-01-26**. No open PR uses it, so it is not a pending contribution of ours.
+
+**Standing policy (user, 2026-06-21): keep fork branches around — do not auto-propose deleting them.** The
+user retains fork branches as a habit (a safety net until the related work is merged upstream); this one is
+**left in place**. Only delete on an explicit, case-by-case request. Note the corner case for the record:
+this is a *revert* of an *already-merged* PR, so "until merged upstream" is technically already satisfied —
+but it stays unless the user says otherwise. The one-liner, if they ever opt in:
 
 ```
 gh api -X DELETE repos/wbniv/llvm-mos/git/refs/heads/revert-540-fix/soft-stack-spill-crash
