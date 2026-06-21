@@ -7,6 +7,7 @@
 - [No false-choice questions](no-false-choice-questions.md) — don't pose AskUserQuestion forks where every option collapses to the same next action or one is the obvious project default; just act and state it (user feedback, 2026-06-19)
 - [Close net-negative findings, don't defer](close-net-negative-findings-not-defer.md) — a measured net-negative is an answer (don't do it), not a "needs a gate / future work" backlog item; close it, record the evidence (user feedback, 2026-06-20)
 - [Worktree teardown: keep durable artifacts](worktree-teardown-keep-durable-artifacts.md) — reclaim the 95%+ build/vendor dupes but never delete the scripts/verdicts that reconstruct a test conclusion; retain worktrees until upstream merge (user feedback, 2026-06-21)
+- [Don't narrate the git SOP](feedback-dont-narrate-git-sop.md) — stop reporting committed-but-not-pushed / "origin is N behind" / "say the word and I'll push" every round; it's known SOP, just commit and stay silent about push state (user feedback, 2026-06-21)
 
 <!-- BEGIN GLOBAL MEMORY (managed by claude-housekeeping; do not edit) -->
 
