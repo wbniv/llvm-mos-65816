@@ -144,19 +144,82 @@ Run on `main`, host tools only, **zero `vendor/` edits** (pure measurement — s
 needed; the worktree is reserved for Phase 1+ which would edit the compiler). Reproducible via
 **`dev/measure-five-space-census.sh`**.
 
-### 0a — representability: **GO** (but moot — see 0b)
+### 0a — representability: **GO** — and *the reason we skipped packed-24 was wrong* (win still moot — see 0b)
 
-- **IR layer (source of truth, `llvm/lib/IR/DataLayout.cpp`):** `parseSize` requires only a *non-zero
-  24-bit integer* for a pointer size — **no power-of-two restriction** (the `isPowerOf2_32` check at
-  ~line 357 is on *alignment*). `getPointerSize = divideCeil(BitWidth,8)` ⇒ a 24-bit pointer occupies
-  **exactly 3 bytes**. **The upstream note's premise — "LLVM requires power-of-two pointer sizes" — is
-  factually wrong.** The current 32-bit "claim 32, use 24" far pointer was *not* forced by
-  representability; it stays on a simple type (no `MVT::i24`), which is a backend-convenience choice,
-  not a hard limit.
-- **Backend layer (empirical):** the MOS GISel pipeline carries a genuine 24-bit value —
-  `unsigned _BitInt(24)` arithmetic that touches the 3rd/bank byte compiles clean **both default and
-  `+mos-a16`**, `-verify-machineinstrs` clean, decomposed into a real 3-byte path
-  (`lda/ldx/ldy … adc #$1` on the high byte). So a 24-bit pointer is *buildable*, not just parseable.
+**What 0a settles.** asiekierka's #320 proposal carries a fifth space, **`3` = 24-bit "packed" far** — a
+far pointer that occupies **3 bytes** in memory instead of 4. Our shipped slice omits it, and our own
+upstream note ([320-upstream-far-pointer-note.md](../320-upstream-far-pointer-note.md)) justifies the
+32-bit "claim 32-bit, use 24" pointer on **representability** grounds, in two places (lines 47–48, 41):
+
+> _… the "claim 32-bit, use 24" approach — **LLVM requires power-of-two pointer sizes**._
+> _AS_Far (2): … top byte unused (**LLVM wants power-of-two pointer sizes**)._
+
+0a tests that claim against the source of truth and against the live backend. **It is false.**
+
+**IR layer — there is no power-of-two rule on pointer size (`llvm/lib/IR/DataLayout.cpp`).**
+
+- `parseSize` (the `<size>` field of a `p<n>:<size>:…` spec) accepts **any non-zero value that fits in
+  24 bits** — the guard is literally `!to_integer(...) || BitWidth == 0 || !isUInt<24>(BitWidth)`. **No
+  `isPowerOf2` on the size.** So `p3:24:8` parses clean.
+- The *only* power-of-two check in the spec parser is in **`parseAlignment`** (~line 357,
+  `isPowerOf2_32(Value / ByteWidth)`) and it gates the **alignment** field, not the size. `p3:24:8` has
+  ABI alignment 8 bits = 1 byte (a power of two) → fine.
+- `getPointerSize(AS) = divideCeil(getPointerSpec(AS).BitWidth, 8)` ⇒ `divideCeil(24,8) = 3`. LLVM lays a
+  24-bit pointer out in **exactly 3 bytes**, and `getIntPtrType` for it is **`i24`**. Fully representable.
+
+So the note's parenthetical is a **misconception to retract** — 32-bit was never *forced* by the IR.
+
+**Backend layer — 24-bit values are buildable, with one decisive caveat.** llvm-mos is **GlobalISel-only**,
+and GISel's `LLT` represents arbitrary widths (`LLT::scalar(24)`, `LLT::pointer(3, 24)`). Empirically
+(`dev/measure-five-space-census.sh` 0a): an `unsigned _BitInt(24)` kernel whose add carries into the
+3rd/bank byte compiles clean **both default and `+mos-a16`**, `-verify-machineinstrs` clean, lowering to a
+real 3-byte path (a 3-byte load `lda/ldx/ldy`, a byte-wise add chain, `adc #$1` on the high byte). So
+**intra-function** 24-bit codegen already works.
+
+**The caveat — and the *real* reason the far pointer is 32-bit. It is not pow2; it is `MVT`.** The
+machine-value-type system (`MVT`/`SimpleValueType`) has only power-of-two simple integers — `i8`, `i16`,
+`i32`, … **there is no `MVT::i24`.** GISel's `LLT` dodges this *inside* a function, but the interfaces that
+still speak `MVT` — register-class value-type lists (`addRegisterClass`) and especially the **calling
+convention** (`CC_MOS` / `CCValAssign`, which assign in `MVT`) — cannot directly carry a 24-bit value.
+That is precisely why the shipped far CC passes a far pointer **across function boundaries as `Imag32`**
+(32-bit), not 24. Our `_BitInt(24)` probe only exercises the intra-function path; a 24-bit pointer that is
+*passed/returned/stored* hits the `MVT::i24` gap. So **"claim 32, use 24" is a backend-plumbing
+convenience (stay on a simple type that register classes + the CC accept), not an IR limit** — that is the
+accurate statement, and the one to put upstream.
+
+### What 0a means for the upstream #320 response
+
+The packed-24 question on #320 has **three independent axes** that our note currently collapses into one
+"pow2" hand-wave. Separated, they give a precise, defensible position:
+
+| axis | the note's current basis | 0a verdict |
+|------|--------------------------|------------|
+| **Representable?** | "LLVM needs pow2 pointer sizes" | **FALSE** — `p3:24:8` parses, a 24-bit pointer is 3 bytes (`i24`), and `_BitInt(24)` builds. **Retract.** |
+| **Cheaper at runtime?** | "32-bit is *cheaper* than 24-bit … 24-bit arithmetic forces a 16+8 access pair and a mode switch" (line 130) | **Still TRUE in the +mos-a16 regime far code targets** — a 24-bit add splits 16+8 with an `M`-width switch where 32-bit stays a clean 16+16; in pure 8-bit mode the two are within a byte-op. Either way packed-24's upside is **storage, never arithmetic**. This becomes the *load-bearing* argument once pow2 is gone. |
+| **Cheap to implement?** | (unstated) | **No** — a 24-bit pointer needs the `MVT::i24` workaround in register classes + the CC (`CCValAssign`). Real effort, for a 1-byte-per-stored-pointer payoff. |
+
+**So our #320 response is a *strengthening* of the design discussion, not a reversal.** Keep the 32-bit far
+pointer as the default far representation — but on a **corrected** basis: packed-24 is *representable*; we
+were simply wrong about *why* we skipped it. We **recommend deferring the `3` = packed-24 space**, with
+data: (a) its 1-byte/pointer win lands **only on far pointers stored in memory**, and 0b measured **zero**
+such pointers in realistic code (and storing them doesn't even work yet — see 0b); (b) the cost is the
+`MVT::i24` plumbing, not free; ⇒ packed-24 is **net-negative until measured storage pressure exists** — the
+standard project posture for a real-but-unrealized modest gain (schedule behind a trigger, don't build
+speculatively). This same finding also settles the note's *other* open question, "default pointer width":
+with pow2 removed, the runtime-cost argument (axis 2) is what actually carries it, so the note should lead
+with that.
+
+**Edits to fold into the upstream note _before_ it is posted (do not post — just stage the corrections):**
+
+1. **Strike both "LLVM requires/wants power-of-two pointer sizes" parentheticals** (note lines 47–48 and
+   41; mirror the same comment in `MOSInstrInfo.h` `AS_Far`). Replace with: _"stored as a 32-bit value to
+   stay on a simple `MVT` type (there is no `MVT::i24`) — a backend-plumbing convenience for register
+   classes + the calling convention, **not** an IR-representability limit; `p:24` parses and a 24-bit
+   pointer is 3 bytes."_
+2. **Answer the proposal's space `3` explicitly:** packed-24 is representable but **deferred on
+   measurement** — empty opportunity (0b) + `MVT::i24` cost; revive on real stored-far-pointer pressure.
+3. **Lead the "default pointer width" discussion with the runtime-cost (axis-2) argument**, now that the
+   representability prop is removed.
 
 ### 0b — usage census: **EMPTY and BLOCKED** → Phase 1 + Phase 2 NO-GO
 
