@@ -68,7 +68,9 @@ the cases the size change unlocks, on real silicon —
 
 ## Verification
 
-1. `_Static_assert(sizeof(FAR void*) == 4 && sizeof(far_fn_t) == 4)` compiles (was 2 before).
+**All steps PASS (2026-06-21)** — raw evidence consolidated in *Result — DONE* below.
+
+1. `_Static_assert(sizeof(FAR void*) == 4 && sizeof(far_fn_t) == 4)` compiles (was 2 before). **PASS.**
 2. `dev/run.sh far_sizeof` → expected value on MAME; `dev/run.sh xcheck` (bsnes-jg) agrees.
 3. **No regression** — every existing far test byte-identical / same verdict:
    `dev/run.sh far_cast|far_store|far_indir|far_arith|far_call|far_near_call|far_fnptr|far_fnptr_var`,
