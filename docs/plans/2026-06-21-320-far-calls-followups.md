@@ -78,6 +78,30 @@ plan; record them so the next agent doesn't re-assume.
 requires a **front-end far-code-pointer story that does not exist yet** — the larger, decision-bearing
 half. This argues for **(b) first** (see *Sequencing*).
 
+> **Cross-agent A0 spike (from `wt/320-far-cc`, 2026-06-21; this branch is canonical, that one stood
+> down) — receipts for 2/4 + two extra *backend* gaps, re-confirmed here 2026-06-21.** A parallel
+> host-side spike (`mos-clang`, relocs via `llvm-objdump -r`) confirms points 2/4 and surfaces that (a)'s
+> **backend** half isn't free either — the front-end story (1–4) is necessary but not sufficient:
+> - **Receipts:** `&far_leaf` relocs `R_MOS_ADDR16_LO`/`_HI` (bank lost) vs a far *data* access
+>   `R_MOS_ADDR24` (bank baked — but bound to the abs-long load, not to address-of). IR shows
+>   `define i8 @far_leaf` in the **default** AS: `address_space(2)` on a function *declaration* is
+>   **silently ignored** (no warning) — so the point-3 MIPS-`far`-style *decl* attribute won't by itself
+>   place the function in AS2; it still needs address-of→24-bit (`R_MOS_ADDR24`) plumbing.
+> - **Backend gap A — p2-value formation crashes** (re-reproduced: `/tmp/gapA.c`): returning `&far_sym`
+>   as a far pointer → `unable to legalize G_TRUNC %_(p2)` / `G_UNMERGE_VALUES %_(p2)` bad-machine-code.
+> - **Backend gap B — p2-value store/decompose crashes** (re-reproduced: `/tmp/gapB.c`): `G_STORE (p2)` →
+>   *"unable to legalize"*; decomposing into the `jml` slot also hits the unsupported `s32→4×s8 G_UNMERGE`.
+>
+> **These p2-VALUE legalizations are exactly the class the far-CC study already solved** to pass/return a
+> `p2` across a call — shipped as **variant (a) Imag32, default-on, in stacked patch `0004-320-far-cc.patch`
+> on `wt/320-far-cc`** (it returns a `p2` from `make_far_ptr()`), **but `0004` is not on `main` yet.** So
+> **(a) is gated on `0004` reaching `main`** (or being stacked into this worktree): build (a)'s
+> `__call_indir_far` + indirect lowering **on top of** the Imag32 p2 representation, then fix any residual
+> p2-value legalization (`G_STORE p2`, the byte-decompose) the CC path didn't need. Net: **(a) = front-end
+> story + the far-CC p2 base (`0004`) + the stub/indirect lowering + residual legalizer fixes** — a
+> multi-stage effort, not the "tractable backend half" the first draft implied. **(b) is unaffected** (no
+> p2 anywhere) and proceeds independently.
+
 ---
 
 ## (b) Mixed-banking: a far function calling a near function
@@ -246,16 +270,21 @@ lowering, not the cross-call CC.
 
 ## Sequencing (recommended)
 
-1. **(b) mixed-banking first.** Self-contained: section-driven detection + an AsmPrinter veneer +
-   a C gate. No front-end change, no CC dependency, low risk. Delivers a visible capability (far code can
-   call the near runtime/helpers) and lifts the "far must be a leaf-or-far-only" constraint.
-2. **(a) backend+runtime half second** — `__call_indir_far` stub + JSL-indirect lowering + the 24-bit
-   slot, validated on hand-authored IR/asm (no front-end blocker).
-3. **(a) front-end** — pick F2/F1 per the *Open decision*; wire the C surface + 24-bit `&far_fn`
-   materialization; land the end-to-end C gate.
+1. **(b) mixed-banking first.** ✅ **DONE 2026-06-21** (verified both emulators — see *Status*). Self-
+   contained: section-driven `lowerCall` detection + the `__call_near_from_far` generic thunk + a C gate.
+   No front-end change, no CC dependency, low risk. Lifts the "far must be a leaf-or-far-only" constraint.
+2. **(a) far-CC p2 base must land first** — (a) needs the p2-VALUE legalization (form/return/store/
+   decompose a `p2`), which is the far-CC study's already-shipped Imag32 work in **`0004-320-far-cc.patch`**
+   (`wt/320-far-cc`). Land `0004` on `main` (or stack it into this worktree) **before** (a)'s backend, else
+   the two confirmed crashes (gaps A/B above) block it.
+3. **(a) backend+runtime** — on top of the Imag32 p2 base: `__call_indir_far` stub + JSL-indirect lowering
+   + the 24-bit slot; fix any residual p2-value legalization (`G_STORE p2`, byte-decompose) the CC path
+   didn't need. Validate on hand-authored IR/asm.
+4. **(a) front-end** — pick F2/F1 per the *Open decision*; wire the C surface + 24-bit `&far_fn`
+   materialization (`R_MOS_ADDR24` for a function symbol); land the end-to-end C gate.
 
-(b) and (a)-backend are independent and could be done in either order; (a)-front-end gates only the C
-ergonomics, not the capability.
+(b) was independent and is done. (a) is now a multi-stage effort **gated on `0004`**; its front-end is a
+separate open decision on top.
 
 ---
 
@@ -284,8 +313,9 @@ The bar is unchanged: **host == default(non-`+mos-a16`)@MAME == far@MAME == far@
 `-verify-machineinstrs` clean. Far calls are a16-independent, so each gate runs in the default 8-bit build
 too (genuine 4-way when the callee takes/returns ≤16-bit).
 
-1. **(b)** `dev/run.sh far_near_call` → disasm shows `JSL …far_veneer` at the far call, veneer = `jsr
-   <g>` + `6b` (rtl), `<g>` still `60` (rts); MAME + bsnes-jg agree on the sentinel; far→far still works.
+1. **(b)** ✅ `dev/run.sh far_near_call` → far call emits `JSL __call_near_from_far`, thunk body =
+   `f4` (pea) + `6c` (jmp ind) + `6b` (rtl), near helper still `60` (rts); MAME + bsnes-jg both got
+   `0xE0`; far→far + corpus + the prior far ROMs still PASS; thunk gc'd from near ROMs (byte-identical).
 2. **(a) backend** `dev/run.sh farfp` (the `.ll`/`.S` gate) → `jsl __call_indir_far` + `dc` (jml [abs])
    present; ROM round-trips the far target on both emulators.
 3. **(a) e2e** `dev/run.sh far_fnptr` → 24-bit `&far_leaf` (bank byte present), `jsl __call_indir_far`;
