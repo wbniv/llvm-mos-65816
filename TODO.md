@@ -36,7 +36,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [ ] **#320 far calls — follow-ups: (b) DONE, (a) gated on `0004`** (the JSL/RTL direct-call MECHANISM
   landed 2026-06-20, see Done). [plan](docs/plans/2026-06-21-320-far-calls-followups.md). Scope (probes):
   far → **far** already works (non-leaf `JSL`/`RTL` chains), so the real gaps are:
-  - ~~(b) **mixed-banking — far → near**~~ **✅ DONE 2026-06-21 (`dd33017`, `wt/320-far-followups`)** — a
+  - ~~(b) **mixed-banking — far → near**~~ **✅ DONE + SHIPPED to `main` 2026-06-21 (`5717f6b`)** — a
     far function calling a NEAR function routes through the generic bank-0 thunk **`__call_near_from_far`**
     (`pea .Lback-1; jmp (__rc18); rtl`) reached by `JSL` (`lowerCall` materializes `&g`→RS9 + `ChangeToES`;
     `0001`, HasW65816-gated, a16-free). Verified `far_near_call == 0xE0` MAME+bsnes-jg, corpus 7/7, thunk
@@ -47,8 +47,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     the far-CC study shipped as Imag32 in **`0004-320-far-cc.patch`** (on `wt/320-far-cc`, not on `main`).
     Plus a **front-end fork** — a far code pointer can't use `address_space(2)` (clang forbids addr-space
     function types) and `__attribute__((far))` is MIPS-only, so (a) needs a new MOS far-fn-ptr spelling
-    (F1 builtin / **F2 MOS `far` attr, recommended** / F3 far-fn-ptr type). So (a) = front-end + the `0004`
-    base + stub/indirect lowering + residual legalizer fixes; **gated on `0004` reaching `main`**.
+    (front-end **LOCKED = F2 MOS `far` attr**, user 2026-06-21; F1 builtins = spike, F3 = deferred ideal).
+    So (a) = F2 front-end + the `0004` base + stub/indirect lowering + residual legalizer fixes; **gated on
+    `0004` reaching `main`** (then resume on the retained `wt/320-far-followups`).
   - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
   Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
   [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).

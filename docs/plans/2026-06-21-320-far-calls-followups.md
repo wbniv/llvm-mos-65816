@@ -342,9 +342,16 @@ too (genuine 4-way when the callee takes/returns ≤16-bit).
 
 ---
 
-## Open decision (flagged for the user)
+## Decisions (resolved 2026-06-21)
 
-**(a)'s front-end spelling for far function pointers** (F1 builtin / F2 MOS `far` attribute / F3 far-fn-
-ptr type — table above). It sets the public API and the size of the clang change. The plan **recommends
-F2** (GCC-compatible `far`, least Sema risk) with **F1** as the spike, and sequences (a)'s **backend +
-runtime** half *before* this so it isn't blocked. Confirm or redirect before (a)'s front-end step.
+- **(b) far→near: SHIPPED.** Generic `__call_near_from_far` thunk merged to `main` (`5717f6b`), verified
+  both emulators. Done.
+- **(a) direction: PAUSE — (a) is a follow-up.** (b) ships now; (a) is gated on the far-CC Imag32 p2 base
+  (`0004`) reaching `main` and is picked up then. The worktree (`wt/320-far-followups`) + this plan are
+  left ready; do **not** tear it down (retention policy).
+- **(a) front-end spelling: F2 — MOS `far` attribute** (user, 2026-06-21). When (a) is built: enable a
+  GCC-compatible `far`/`long_call`-style attribute for MOS on functions **and** function-pointer typedefs
+  (least Sema risk). F1 builtins remain the spike/escape hatch; F3 (type-enforced far-fn-ptr) is the
+  deferred ideal. The **backend** half (the `0004` p2 base + `__call_indir_far`/indirect lowering +
+  residual `G_TRUNC`/`G_UNMERGE`/`G_STORE` p2 legalization) can be validated on hand-authored IR first,
+  decoupled from F2.
