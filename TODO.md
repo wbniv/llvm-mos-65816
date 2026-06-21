@@ -1005,5 +1005,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        uniform-far is a measured control/fallback, not a shipped default).
      fp:a5f1db95f5a9627a fp:5221ad4b75df9534 fp:78cda9a654aa2b5f fp:fde87b8fe11d4df6 -->
 - [verify] **2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md](docs/plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md)_  <!-- fp:a51d6afac2a18fef -->
-- [verify] **2026-06-21-320-packed24-incrementB-handoff** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-packed24-incrementB-handoff.md](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md)_  <!-- fp:3d3c94fe546a028c -->
+<!-- triaged 2026-06-21: the packed24-incrementB-handoff §3 "Verification gate" is INSTRUCTIONS for the future agent who builds Increment B (the bar THEY must clear), not a verification to run now — Increment B is deferred until F2 lands on main. Nothing to verify here; covered by the curated M1 five-space item + its handoff link. fp:3d3c94fe546a028c -->
 <!-- END auto-captured-deferrals -->
