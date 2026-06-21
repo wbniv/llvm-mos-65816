@@ -42,13 +42,13 @@ WANT=0xF3   # bank1_sentinel (0xA9) ^ 0x5A; flip to exercise the negative contro
 
 rc=0
 
-echo "==> negative control: WITHOUT +mos-farcc-imag32 the far-ptr-across-call must NOT compile"
+echo "==> default-on control: +mos-farcc-imag32 is now the DEFAULT (D, 2026-06-21) — WITHOUT it the far-ptr-across-call still compiles, identically"
 if "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs \
      -c -o /dev/null "$SRC" 2>"$NEGLOG"; then
-  echo "  FAIL: built without the feature — the far-ptr CC is NOT properly gated (default would be perturbed)"; rc=1
+  echo "  PASS: compiles by default — Imag32 is the shipped default far-ptr CC; the flag is now redundant"
 else
-  echo "  PASS: rejected without +mos-farcc-imag32 (far ptr can't cross a call by default). Diagnostic:"
-  grep -iE 'G_UNMERGE|Bad machine code|fatal|error' "$NEGLOG" | head -3 | sed 's/^/    /' || true
+  echo "  FAIL: the default-on far-ptr CC regressed — far-ptr-across-call no longer compiles by default:"
+  grep -iE 'G_UNMERGE|Bad machine code|fatal|error' "$NEGLOG" | head -3 | sed 's/^/    /' || true; rc=1
 fi
 
 echo "==> compile+link $SRC -> $(basename "$ROM")  (--config mos-snes-far.cfg -mcpu=mosw65816 +mos-a16 +mos-farcc-imag32 -Os)"

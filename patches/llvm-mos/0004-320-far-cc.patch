@@ -462,34 +462,39 @@ index 7b5100bfeb5d..b62986d09ab4 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
-index bc43100cd577..90a622ab0984 100644
+index bc43100cd577..870fb52004e8 100644
 --- a/llvm/lib/Target/MOS/MOSSubtarget.h
 +++ b/llvm/lib/Target/MOS/MOSSubtarget.h
-@@ -121,6 +121,23 @@ public:
+@@ -121,6 +121,28 @@ public:
    // #321 xy16: opt-in 16-bit index register mode (REP/SEP-bracketed 16-bit-X/Y).
    bool hasIndex16() const { return HasIndex16; }
  
-+  // #320 Inc 4 Ph2: off-by-default far-pointer calling-convention variant. How a
-+  // 32-bit far (addrspace 2) pointer crosses a call. None == no +mos-farcc-*
-+  // feature: a far pointer arg/return still errors exactly as before this change
-+  // (no far-ptr CC rule matches), so default codegen is byte-identical.
++  // #320 Inc 4 Ph2: how a 32-bit far (addrspace 2) pointer crosses a call.
++  // **D (decision, 2026-06-21):** the measurement (dev/run.sh measure-far-cc) made
++  // (a) Imag32 the winner — smallest AND fastest on every realistic far-ptr-passing
++  // program — so it is now the **default**: a far pointer arg/return *just works*
++  // (one RL quad) with no flag, instead of erroring as it did before this increment.
++  // The other three remain opt-in measurement overrides (the inert `0004` spike),
++  // selected by +mos-farcc-{split,axy,stack}. Default codegen stays byte-identical
++  // for code that does NOT cross a call with a far pointer (corpus/kernels): no far
++  // ptr ⇒ no far-ptr CC rule fires. None is now unreachable via features but kept so
++  // getRegisterTypeForCallingConv's `!= None` guard reads naturally.
 +  enum class FarPtrCC { None, Imag32, Split, AXY, Stack };
 +  FarPtrCC farPtrCC() const {
-+    if (HasFarCCImag32)
-+      return FarPtrCC::Imag32;
 +    if (HasFarCCSplit)
 +      return FarPtrCC::Split;
 +    if (HasFarCCAXY)
 +      return FarPtrCC::AXY;
 +    if (HasFarCCStack)
 +      return FarPtrCC::Stack;
-+    return FarPtrCC::None;
++    // (a) Imag32 — the measured winner — is the default (was: None ⇒ error).
++    return FarPtrCC::Imag32;
 +  }
 +
    bool hasW65816Or65EL02() const { return HasW65816Insns || Has65EL02Insns; }
  
  private:
-@@ -148,6 +165,12 @@ private:
+@@ -148,6 +170,12 @@ private:
    bool StaticStack = false;
    bool HasAccum16 = false;
    bool HasIndex16 = false;

@@ -34,13 +34,13 @@ WANT=0xF3
 
 rc=0
 
-echo "==> negative control: WITHOUT +mos-farcc-axy the far-ptr-across-call must NOT compile"
+echo "==> opt-in control: WITHOUT +mos-farcc-axy the far ptr uses the DEFAULT (Imag32, the shipped winner); the flag is an opt-in override to variant (c)"
 if "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs \
      -c -o /dev/null "$SRC" 2>"$NEGLOG"; then
-  echo "  FAIL: built without the feature — the far-ptr CC is NOT properly gated"; rc=1
+  echo "  PASS: compiles by default (Imag32); +mos-farcc-axy overrides to variant (c) below"
 else
-  echo "  PASS: rejected without +mos-farcc-axy. Diagnostic:"
-  grep -iE 'G_UNMERGE|Bad machine code|fatal|error' "$NEGLOG" | head -3 | sed 's/^/    /' || true
+  echo "  FAIL: the default-on far-ptr CC regressed — far-ptr-across-call no longer compiles by default:"
+  grep -iE 'G_UNMERGE|Bad machine code|fatal|error' "$NEGLOG" | head -3 | sed 's/^/    /' || true; rc=1
 fi
 
 echo "==> compile+link $SRC -> $(basename "$ROM")  (--config mos-snes-far.cfg -mcpu=mosw65816 +mos-a16 +mos-farcc-axy -Os)"
