@@ -1,6 +1,9 @@
 # #320 Inc 4 Ph2 M+D — measure far-ptr CC cycles, then land the winner default-on
 
-**Date:** 2026-06-21 · **Status:** PLANNED → in progress · **Scope:** the closing two phases of the
+**Date:** 2026-06-21 · **Status:** ✅ **RESOLVED** — M measured (`ceaded6`); D shipped **(a) Imag32 as the
+default far-ptr CC** (`b2bcdd1`): a far pointer crosses a call with no flag now. **Verified:** no-flag
+compile == winner (byte-identical), corpus 7/7, all 12 far ROMs `0xF3` on MAME + bsnes-jg, 4 gates pass. ·
+**Scope:** the closing two phases of the
 far-pointer CC study on `wt/320-far-cc`. All four variants are built + two-emulator-verified (A0–A3a) and
 byte-censused; this plan adds the **cycle** half of the measurement and then **ships the winner** as the
 default far-ptr calling convention. **Builds on:**

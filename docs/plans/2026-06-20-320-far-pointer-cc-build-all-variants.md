@@ -1,9 +1,10 @@
 # #320 Inc 4 Phase 2 — far-pointer calling convention: build all ABI variants and measure
 
-**Date:** 2026-06-20 (rev. 2026-06-21) · **Status:** 🔬 IN PROGRESS — P0 + A0 (variant a Imag32) + A1
-(variant b Imag16+bank) + A2 (variant c A:X+Y) landed on `wt/320-far-cc`, each round-tripping on MAME +
-bsnes-jg; A3a (variant d soft-stack) landed too (`ebaa515`) — byte census ran ((d) 174 B, dominated by
-(a) 70); only M (cycle measurement) and D (final pick) remain — see
+**Date:** 2026-06-20 (rev. 2026-06-21) · **Status:** ✅ **RESOLVED** — all four variants built + measured;
+**D shipped (a) Imag32 as the default far-ptr CC** (`b2bcdd1`), so a far pointer crosses a call with no flag
+now (it errored before). Measured (.text / round-trips-per-120-frames): **(a) 70 / 50441 — smallest AND
+fastest**; (b) 86 / 41385; (c) 102 / 43572; (d) 174 / 30626 — every other variant is bigger AND slower.
+b/c/d retained as the inert opt-in `0004` spike. M+D detail: [the M+D plan](2026-06-21-320-far-cc-M-measure-D-land-winner.md) — see
 [Implementation status](#implementation-status-as-of-2026-06-21). · **Scope:** `vendor/llvm-mos/` codegen (the CC) +
 a far-pointer-passing workload + the reused measurement harness. Runs on a feature worktree, not `main`.
 **Builds on:** [Inc 4 Ph1 far calls](2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) (JSL/RTL landed —

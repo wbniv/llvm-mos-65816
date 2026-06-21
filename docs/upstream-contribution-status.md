@@ -10,7 +10,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 ## TL;DR
 
-- **Ready to post now: 2 PRs + 2 issues + 2 design notes** — six artifacts, all drafted, all one command/paste away.
+- **Ready to post now: 2 PRs + 2 issues + 3 design notes** — seven artifacts, all drafted, all one command/paste away.
   Strictly *PRs*, that's **two** (F4; and the DWARF step-6 test+docs).
 - **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
@@ -27,6 +27,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 | 4 | **scavenger N/Z-liveness** — `saveScavengerRegister` asserts N/Z dead | **issue** | Upstream crash: a compare/ALU flag live across a frame-vreg spill → illegal `STImag8 $p` (no fork patch — maintainer territory) | [`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md) | n/a (issue) |
 | 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | `wbniv:mos-dwarf-65816-test-docs` (pushed `0ae9415`) |
 | 6 | **#321 CC frame-ABI** — measured frame-model evaluation | **note** | Implementation-backed CC evidence: DP-window/stack-relative are feasible but NULL on real code (locals are `__rc`-resident → frames ≈unused); keep the soft static stack, by measurement | [`docs/321-upstream-cc-frame-abi-note.md`](321-upstream-cc-frame-abi-note.md) | n/a (note) |
+| 7 | **#320 CC** — measured far-pointer-CC evaluation | **note** | Implementation-backed CC evidence: built all 4 far-ptr ABIs + measured — (a) Imag32 (one RL quad) is smallest AND fastest (70 B / 50441 rt vs 86/102/174 & slower), shipped default-on; decomposed/stack forms cost more for no win | [`docs/320-upstream-far-cc-measurement-note.md`](320-upstream-far-cc-measurement-note.md) | n/a (note) |
 
 ### 1 — F4 PR (a code-change PR; #5 DWARF is the other)
 
