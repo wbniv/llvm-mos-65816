@@ -19,8 +19,10 @@ and the e2e runtime gate still to land.
 
 **#321 (16-bit accumulator / M2):** the core codegen is complete. Every planned per-op optimization
 is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete re-open trigger. The
-ABI comparison (three frame strategies) ran to completion — it was **not** interrupted by crashes; the
-census short-circuited the build at the measurement step.
+**xy16 calling convention is now verified + formalized (`ebedd1c`)** — the last M2 codegen frontier,
+closed: the X/Y-8-bit-at-call boundary is correct by construction, and the two xy16-specific ABI levers
+were measured and shelved. The ABI comparison (three frame strategies) ran to completion — it was **not**
+interrupted by crashes; the census short-circuited the build at the measurement step.
 
 ---
 
@@ -104,7 +106,7 @@ is the other frontier; its PR still waits on the design-note posting.
 | `xy16basic` / `xy16ops` / `xy16indiry` / `xy16spill` gates | ✅ All PASS on MAME + bsnes-jg |
 | Csmith seed-247 + seed-445 runtime miscompiles | ✅ **FIXED 2026-06-20 (`2d8ab51`, approach B)** — cvise-reduced to an 8-line UB-free repro: a non-index s16 value classed `Xc16`, loaded into X16, left live across an 8-bit-index op whose `sep #$10` zeroes the high byte. `selectXY16` now emits `LDXAbs16`/`LDYAbs16` only when the value is genuinely an index, else reclasses to `Imag16`. 4-way both emulators + csmith 101–500 (0/400 mismatch) + c-torture 60/60; smaller code (61→54 B) |
 | `requiredXWidth` 8-bit-indexed-family hardening (Track A) | ✅ **Done 2026-06-21** — structural memory-gated catch-all closes the last index-width omission (the load/store/branch siblings of the value-compare bug); byte-identical 75/75, hardening not a live bug |
-| Hardware-stack ABI / 16-bit calling convention | ⬜ Pending (see ABI section) |
+| 16-bit calling convention (X/Y across calls) | ✅ **Done — verified + formalized (2026-06-21, `ebedd1c`)**. The 8-bit-register boundary was already mechanical (X/Y forced 8-bit at every `isCall`/`isReturn`; X16/Y16 caller-saved); this **closes the gap** with a cross-call differential gate (`xy16call.c`/`dev/run.sh xy16call`, a load-bearing 16-bit index live across a clobbering call → `0x7E5A` 4-way). **Correct by construction:** the RA parks the cross-call-live index in a callee-saved ZP `Imag16` pair and reloads `X16` only at point of use, so physical `X16` is never live across a call — no spill hazard, no fix needed. Two xy16-specific ABI levers **measured + shelved with evidence** (i32-return-in-`A16:X16`: realistic 0 call sites, a frame-ABI-style NULL; PHX/PLX index-spill: premise removed). [plan](plans/2026-06-18-321-m2-xy16-calling-convention-verify-formalize-me.md) |
 
 ### Infrastructure + correctness corpus
 
@@ -112,7 +114,7 @@ is the other frontier; its PR still waits on the design-note posting.
 |---|---|
 | Tier-1 differential fuzzer (`a16_fuzz.py`, builtin generator) | ✅ Standing capability |
 | Csmith differential fuzzer (phases 0–5; 1–500 seeds) | ✅ **Phases 0–5 done (2026-06-21)** — sampled CI wired (`fuzz-csmith` job, host-side, 4-way, secret-gated, `mode` sampled/full) |
-| GCC c-torture suite (-O1 pass: 1098 PASS; -Os pass: 1114 PASS; bsnes-jg 4-way) | ✅ **Done; Phase 3 sampled CI wired (2026-06-21)** — `torture` job (in-container, 4-way, seeded `--sample`, secret-gated, `mode` sampled/full) |
+| GCC c-torture suite (-O1 pass: 1098 PASS; -Os pass: 1114 PASS; bsnes-jg 4-way) | ✅ **Done; Phase 3 sampled CI wired (2026-06-21)** — `torture` job (in-container, 4-way, seeded `--sample`, secret-gated, `mode` sampled/full); runner now reaps orphan emulators (process-group kill, `e10d98f`) |
 | `corpus-a16` differential gate (+a16/+xy16 on both emus) | ✅ Standing capability + in CI |
 | bsnes-jg `xcheck` in CI | ✅ Verified green (run 27823207476) |
 | Native-mode crt0 (DBR=0 via `phk;plb`, explicit contract) | ✅ Done |
@@ -124,15 +126,16 @@ is the other frontier; its PR still waits on the design-note posting.
 
 ### Pending codegen (greenlit or in-progress)
 
-With load-fold landed and the compare track closed, the per-op a16 codegen is complete (see TL;DR). The
-remaining codegen frontiers are #320's far calling convention and xy16's ABI.
+With load-fold landed, the compare track closed, and the **xy16 calling convention verified + formalized
+(`ebedd1c`)**, the per-op a16 codegen *and* the xy16 frontier are complete (see TL;DR). The only remaining
+codegen frontier is **#320's far calling convention** (+ far fn pointers).
 
 | Item | Status |
 |---|---|
 | Load-fold gate unification (AA-precision) — `noClobberBetween` | ✅ **Done 2026-06-20 (`6440db0`)** — AA-precise fold landed (−26 B, 0 regressions, verify-clean, 5 c-torture recovery sites 4-way PASS). The volatile-drop half measured net-negative (+17 B / 19 regressions) and is **closed**, not pursued |
-| #320 far-pointer calling convention (`p2` pass/return) | ⬜ Build all ABI variants & measure; must ship one (ships as `0004`). See #320 table + What's next |
-| #320 far function pointers (a) | ⬜ Front-end LOCKED = F2; backend gated on `0004` reaching `main` |
-| xy16 hardware-stack ABI / 16-bit calling convention | ⬜ The remaining M2 codegen frontier — CC sub-decisions all resolved |
+| xy16 16-bit calling convention (X/Y across calls) | ✅ **Done 2026-06-21 (`ebedd1c`)** — verified (cross-call gate `xy16call`, 4-way) + formalized; correct by construction (cross-call index parks in callee-saved `Imag16`, never live in physical X16); 2 ABI levers measured + shelved. See XY16 table |
+| #320 far-pointer calling convention (`p2` pass/return) | 🔧 IN PROGRESS — variant (a) Imag32 built + verified (`wt/320-far-cc`); build remaining variants & measure; ships as `0004`. See #320 table + What's next |
+| #320 far function pointers (a) | 🔧 IN PROGRESS — mechanism built + verified; p2-value L1/L2 done, L3/Gap A/B + F2 front-end + e2e remain (gated on `0004`) |
 
 ---
 
@@ -207,8 +210,8 @@ Based on the commit history and plan records, **no work-in-progress was lost to 
 | Load-fold unification | Phase 1 PROCEED → Phase 2 built + byte-diffed → **landed (`6440db0`)** | Complete — AA-precision landed, volatile-drop closed net-negative |
 | c-torture -Os sweep + bsnes-jg 4-way | Both completed and recorded | Complete |
 
-Every item above ran to a clean conclusion — none was lost to a crash. The open frontiers are forward
-work (the #320 far calling convention and xy16 ABI), tracked in *What's next* and TODO.
+Every item above ran to a clean conclusion — none was lost to a crash. The one open frontier is forward
+work (the #320 far calling convention + far fn pointers), tracked in *What's next* and TODO.
 
 ---
 
@@ -225,10 +228,7 @@ work (the #320 far calling convention and xy16 ABI), tracked in *What's next* an
    (3) e2e runtime gate, on `wt/320-far-followups` (gated on `0004` reaching `main`).
    [plan](plans/2026-06-21-320-far-calls-followups.md)
 
-3. **xy16 hardware-stack ABI** — the calling-convention implementation for 16-bit index-register
-   mode. CC sub-decisions are all resolved; this is the remaining M2 codegen frontier.
-
-4. **Upstream posts (user-triggered):**
+3. **Upstream posts (user-triggered):**
    - F4 `TXY/TYX` dead-flag fix PR (ready)
    - Register-scavenger N/Z-liveness issue (draft ready)
    - #321 CC frame-ABI design note (draft ready)
