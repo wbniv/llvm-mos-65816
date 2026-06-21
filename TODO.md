@@ -34,10 +34,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (dis)assembly. Unlike the frame-ABI study, this one MUST ship one variant (a tie → simplest = Imag32),
   not "change nothing". [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
 - [ ] **#320 far calls — follow-ups** (the JSL/RTL direct-call MECHANISM landed 2026-06-20, see Done).
-  Remaining: (a) **far function pointers** — indirect far call (`jsl`/`jml [addr]` through a far code
-  pointer; today an indirect call stays near); (b) **mixed-banking** — a far function that calls a NEAR
-  function (today a far fn must be a leaf, since a near `JSR` out of bank $01 wouldn't switch the
-  program bank); (c) far tail calls. [plan](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md).
+  **Planned 2026-06-21** ([plan](docs/plans/2026-06-21-320-far-calls-followups.md)) — probes sharpened the
+  scope: far → **far** already works (non-leaf `JSL`/`RTL` chains fine), so the real gaps are: (a) **far
+  function pointers** — indirect far call (`jsl __call_indir_far` + `jml [__rc18]`, mirroring the near
+  `__call_indir`); **front-end fork** — a far code pointer CANNOT use `address_space(2)` (clang forbids
+  addr-space-qualified function types) and `__attribute__((far))` is MIPS-only, so (a) needs a new MOS
+  far-fn-ptr spelling (F1 builtin / **F2 MOS `far` attr, recommended** / F3 far-fn-ptr type — backend +
+  runtime half can land first, decoupled). (b) **mixed-banking — far → near** — a bank-0 `jsr g; rtl`
+  veneer reached by `JSL` (recommended; whole-module-far flag = control/fallback); **do (b) first**
+  (self-contained, no front-end, no CC dep). (c) far tail calls = separate (already conservative-safe —
+  tail peephole keys on `JSR`). (a) reuses the far-ptr CC `p2`/Imag32 rep
+  ([CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)).
+  Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md).
 
 ### M2 — Optimizing Payoff
 
@@ -872,4 +880,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-06-21-320-far-cc-variants-bcd-and-measure** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-cc-variants-bcd-and-measure.md](docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md)_  <!-- fp:e3b7f46b9e51afa0 -->
 <!-- triaged 2026-06-21: native-s16-comparison-followups §5 verification is intentionally Phase-0-gated (it runs only IF the Phase 0 §3 byte-diff measures a win; the §4a step-1 audit IS recorded). Covered by the curated M2 "comparison follow-ups" SCOPED item above. Not a missed step. fp:c91b9765672261df -->
 <!-- triaged 2026-06-21: banked plan §5 verification is MOOT — candidate A was BUILT + measured net-negative (a16cmpaudit +654/+78 B, a16 corpus +340 B zero wins) and CLOSED WON'T-DO (§0a); nothing lands in 0002, so there is no codegen to verify. Covered by the curated M2 "comparison follow-ups" item above (now records both the 8-bit v1 AND 16-bit candidate-A close-outs). Not a missed step. fp:5f242fd76b40e2f7 -->
+- [ ] **(triage)** **(c) far tail calls** — separate TODO line; already conservative-safe (tail peephole keys on `JSR`). — _from [2026-06-21-320-far-calls-followups.md](docs/plans/2026-06-21-320-far-calls-followups.md)_  <!-- fp:a5f1db95f5a9627a -->
+- [ ] **(triage)** **The far-pointer *data* CC** (passing/returning a `p2` value) — the in-flight `wt/320-far-cc` study; — _from [2026-06-21-320-far-calls-followups.md](docs/plans/2026-06-21-320-far-calls-followups.md)_  <!-- fp:5221ad4b75df9534 -->
+- [ ] **(triage)** **SPC700 indirect-far** — 65816-only; SPC700's `__rc17` thunk path is untouched. — _from [2026-06-21-320-far-calls-followups.md](docs/plans/2026-06-21-320-far-calls-followups.md)_  <!-- fp:78cda9a654aa2b5f -->
+- [ ] **(triage)** **Auto-promoting near callees to far** — (b) keeps near callees byte-identical; no whole-program ABI — _from [2026-06-21-320-far-calls-followups.md](docs/plans/2026-06-21-320-far-calls-followups.md)_  <!-- fp:fde87b8fe11d4df6 -->
 <!-- END auto-captured-deferrals -->
