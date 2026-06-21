@@ -25,10 +25,15 @@ ASSERT(__rc31 == 0x1f, "Inconsistent zero page map.")
 __stack = 0x2000;
 
 MEMORY {
-  zp    : ORIGIN = __rc31 + 1, LENGTH = 0x100 - (__rc31 + 1)   /* $0020-$00FF */
-  ram   : ORIGIN = 0x0200,     LENGTH = 0x1E00                 /* $0200-$1FFF */
-  rom   : ORIGIN = 0x8000,     LENGTH = 0x8000                 /* $8000-$FFFF, bank $00 */
-  rom_1 : ORIGIN = 0x018000,   LENGTH = 0x8000                 /* $018000-$01FFFF, bank $01 */
+  zp     : ORIGIN = __rc31 + 1, LENGTH = 0x100 - (__rc31 + 1)   /* $0020-$00FF */
+  ram    : ORIGIN = 0x0200,     LENGTH = 0x1E00                 /* $0200-$1FFF */
+  /* Near-code budget = $8000-$FFAF (0x7FB0 = 32688 B): bank $00 minus the fixed
+   * header+vectors carved into `romhdr` (kept in sync with platforms/snes/link.ld).
+   * An over-budget link fails loudly with "region 'rom' overflowed by N bytes"
+   * (remediation: move code to .far_text / data to .far_rodata in bank $01, or shrink). */
+  rom    : ORIGIN = 0x8000,     LENGTH = 0x7FB0                 /* $8000-$FFAF, near-code window (bank $00) */
+  romhdr : ORIGIN = 0xFFB0,     LENGTH = 0x0050                 /* $FFB0-$FFFF, fixed header + vectors */
+  rom_1  : ORIGIN = 0x018000,   LENGTH = 0x8000                 /* $018000-$01FFFF, bank $01 (far) */
 }
 
 REGION_ALIAS("c_readonly", rom)
@@ -67,7 +72,7 @@ SECTIONS {
   /* Cartridge header at the top of bank $00 ($FFB0-$FFDF). */
   .snes_header 0xFFB0 : {
     KEEP(*(.snes_header))
-  } >rom
+  } >romhdr
 
   /* Native-mode interrupt vectors ($FFE0-$FFEF). Unused while in emulation
    * mode, but pointed at the stub handlers for safety. */
@@ -76,7 +81,7 @@ SECTIONS {
     SHORT(0x0000) SHORT(irq)      /* $FFE4 COP,  $FFE6 BRK  */
     SHORT(0x0000) SHORT(nmi)      /* $FFE8 ABORT,$FFEA NMI  */
     SHORT(0x0000) SHORT(irq)      /* $FFEC -,    $FFEE IRQ  */
-  } >rom
+  } >romhdr
 
   /* Emulation-mode interrupt vectors ($FFF0-$FFFF). RESET is the boot entry. */
   .snes_vectors_emu 0xFFF0 : {
@@ -84,13 +89,15 @@ SECTIONS {
     SHORT(0x0000) SHORT(0x0000)   /* $FFF4 COP,  $FFF6 -    */
     SHORT(0x0000) SHORT(nmi)      /* $FFF8 ABORT,$FFFA NMI  */
     SHORT(_start) SHORT(irq)      /* $FFFC RESET,$FFFE IRQ  */
-  } >rom
+  } >romhdr
 }
 
 /* Emit the raw 64 KiB ROM image (headerless .sfc): bank $00 then bank $01.
- * FULL() pads each region to its full LENGTH, so file 0x0000-0x7FFF == bank $00
- * and file 0x8000-0xFFFF == bank $01 (CPU $018000) — the LoROM mapping. */
+ * FULL() pads each region to its full LENGTH; rom (0x7FB0) + romhdr (0x0050) =
+ * 0x8000, so file 0x0000-0x7FFF == bank $00 (code/rodata/data then header+vectors)
+ * and file 0x8000-0xFFFF == bank $01 (CPU $018000) — the LoROM mapping, unchanged. */
 OUTPUT_FORMAT {
   FULL(rom)
+  FULL(romhdr)
   FULL(rom_1)
 }

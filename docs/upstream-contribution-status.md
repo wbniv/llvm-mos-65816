@@ -66,6 +66,15 @@ gh issue create --repo llvm-mos/llvm-mos \
 Drafted and ready; the manual step is posting it to the llvm-mos Discord / issue #320
 (@asiekierka / @mysterymath) to open the ABI-blessing discussion. This **unblocks** the future #320 PR below.
 
+**Now also carries a "Code model: near vs far" section** (added 2026-06-22) — two distinct artifacts on one
+topic: (a) **compiler-side framing** (llvm-mos #320): near = `small`/`JSR` is the default, far = `medium`/`large`
+is per-symbol opt-in, so **no `-mcmodel` codegen mode is warranted**; (b) **SDK-side enforcement**
+(llvm-mos-sdk): the SNES near-code budget (`$8000–$FFAF`, 32688 B) is a *link-time contract* — `platforms/snes`
++ `snes-far` `link.ld` carve the header/vectors into a `romhdr` region so an over-budget link fails with
+`region 'rom' overflowed by N bytes` (landed in-fork, ROM byte-identical for in-budget programs;
+[plan](plans/2026-06-22-snes-near-code-budget-and-code-model.md)). (a) rides this note; (b) is an
+llvm-mos-sdk-side change carried in our platform.
+
 ### 4 — register-scavenger N/Z-liveness issue (an issue, **not** a PR)
 
 Source-verified + asserts-build-confirmed write-up of an **upstream** crash:

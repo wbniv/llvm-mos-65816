@@ -1,6 +1,6 @@
 # SNES near-code budget assertion + the near/far "code model" framing
 
-**Status:** planned (2026-06-22) · **Issue context:** #320 (24-bit address space) / SNES SDK target
+**Status:** DONE + verified (2026-06-22) · **Issue context:** #320 (24-bit address space) / SNES SDK target
 **Supplements:** [`CLAUDE.md`](../../CLAUDE.md) + [`docs/agent-handoff.md`](../agent-handoff.md) (build/test mechanics).
 
 ## Context
@@ -107,8 +107,12 @@ repo root with the SDK built (`mos-snes.cfg` / `mos-snes-far.cfg` present).
    **7/7** unchanged.
 
    ```
-   (paste: cmp of pre/post .sfc; corpus 7/7)
+   byte-identical: 7 snes corpus ROMs + 5 snes-far ROMs (far-bank1/far-run/far_call/
+     far_store/far_arith) all cmp-identical pre-carve vs post-carve — 12/12 ROMs, 0 diffs.
+   dev/run.sh corpus  ->  7/7 passed
    ```
+   **PASS** — the carve is output-neutral; every in-budget ROM is byte-identical (the region
+   boundaries it moves were already `FULL()`-padded, so 0x7FB0 + 0x0050 reproduces the bytes).
 
 2. **Far suite still links + runs (snes-far bank-$00 carve correct).** `dev/run.sh far_call`,
    `far_near_call`, `far-bank1` → expect existing PASS values (`far_near_call == 0xE0`, `far-bank1 == 0xF3`,
@@ -116,8 +120,17 @@ repo root with the SDK built (`mos-snes.cfg` / `mos-snes-far.cfg` present).
    unaffected.
 
    ```
-   (paste: far_call / far_near_call / far-bank1 verdicts)
+   far-bank1  RESULT: PASS — bank-$01 read == 0xF3            (ROM byte-identical)
+   far-run    RESULT: PASS — far load+store in MAME == 0xF3   (ROM byte-identical)
+   far_call   RESULT: PASS — JSL to bank $01 + RTL == 0xF3    (ROM byte-identical)
+   far_store  RESULT: PASS == 0xF3   far_arith  RESULT: PASS == 0xF3
    ```
+   **PASS** — the `snes-far` bank-$00 carve is correct; `romhdr` + `rom_1` coexist; bank-$01 far
+   placement is unaffected. (`far_near_call` FAILS, but it is **PRE-EXISTING on clean main HEAD**,
+   *not* this change: proven by stashing the carve + rebuilding the original `link.ld` → the test
+   fails identically, the compiler emitting `jsr near_helper` (a near call) instead of
+   `jsl __call_near_from_far`, so the thunk is gc-dropped. A link-time script cannot change
+   compile-time instruction selection — unrelated codegen issue, out of scope here.)
 
 3. **Overflow fails loudly with a clear, region-named, byte-quantified error.** Compile a deliberately
    oversized program against `snes` — an initialized `const` array large enough to push bank-$00 ROM past
@@ -126,15 +139,26 @@ repo root with the SDK built (`mos-snes.cfg` / `mos-snes-far.cfg` present).
    by N bytes`) — **not** the old obscure `.snes_header` overlap message.
 
    ```
-   (paste: the raw linker error)
+   $ mos-clang --config mos-snes.cfg -mcpu=mosw65816 -Os overflow_probe.c -o x.sfc
+   ld.lld: error: section '.rodata' will not fit in region 'rom': overflowed by 206 bytes
+   ld.lld: error: section .rodata virtual address range overlaps with .snes_header
+   >>> .snes_header range is [0xFFB0, 0xFFDF]
+   mos-clang: error: ld.lld command failed with exit code 1
    ```
+   **PASS** — the **leading** error names region `rom` + the byte count (`overflowed by 206 bytes`):
+   the clear "code exceeds the near window" diagnostic that was the whole point (the `.snes_header`
+   overlap now follows as a *secondary* consequence rather than being the sole, obscure message).
+   Note: the probe references its 0x8000-byte `const` array through a **`volatile` index** — a
+   fully-known const array is constant-folded and gc-dropped by `-Os` and would not overflow.
 
 4. **Docs preview.** `task md -- docs/320-upstream-far-pointer-note.md` and this plan render cleanly; all URLs
    in `[label](url)` form.
 
    ```
-   (paste: task md confirmation)
+   task md -- docs/320-upstream-far-pointer-note.md  ->  320-upstream-far-pointer-note.html (89 KB), opened
    ```
+   **PASS** — the #320 note (with the new "Code model: near vs far" section) + this plan render cleanly;
+   all URLs in `[label](url)` form.
 
 ## Out of scope (explicit)
 

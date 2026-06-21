@@ -219,6 +219,34 @@ roughly the target [llvm-mos-sdk#415](https://github.com/llvm-mos/llvm-mos-sdk/i
 
 ---
 
+## Code model: near vs far (the "should there be a 64k/32k codegen mode?" question)
+
+A recurring question is whether the 65816 backend should add a `-mcmodel`-style switch that "limits code
+generation to 64k (32k on the SNES)". The answer this slice supports is **no — the address space *is* the
+code model, at per-symbol granularity, which is strictly finer than a global flag:**
+
+- **Near is already the default.** A normal call lowers to `JSR`/`RTS` (2-byte, within-bank), function
+  pointers are 2-byte, and `CodeModel::Small` is the default (`MOSTargetMachine.cpp`). So "a mode that limits
+  codegen to the near window" **describes the status quo** and would buy **no** code-size win — near calls are
+  already the minimal form.
+- **Far is opt-in per symbol**, not a module flag: the `.far_*` section attribute / `far`/`long_call` function
+  attribute / a `far`-qualified (`address_space(2)`) pointer selects `JSL`/`RTL` + 4-byte pointers **only** for
+  the symbols that actually cross banks. You pay the far tax exactly where you need it.
+- **Mapping to the standard LLVM ladder for this discussion:** **`small` = all-near / single bank (today's
+  default)**; **`medium`/`large` = the #320 far story** (cross-bank code/data via `address_space(2)`/`.far_*`).
+  A whole-module `-mcmodel=large` knob would be *coarser* than the per-symbol mechanism and shrink nothing.
+- **The "near window" is bank geometry, enforced at link time, not a compiler flag.** On the SNES `snes`
+  LoROM target the near-code budget is **`$8000–$FFAF` (0x7FB0 = 32688 B)** — the bank minus the fixed
+  cartridge header + vectors. The SDK linker script (`platforms/snes/link.ld`, mirrored in `snes-far`) carves
+  those fixed sections into their own `romhdr` region so the `rom` region's `LENGTH` *is* the budget; an
+  over-budget link then fails loudly with a region-named, byte-quantified `region 'rom' overflowed by N bytes`
+  error (output byte-identical for any in-budget program). HiROM's 64k near window is the same idea, larger.
+
+**Decision: do not add a `-mcmodel` codegen mode** — per-symbol far is the better-factored mechanism; the
+near/far budget is a *link-time contract*, enforced in the SDK platform, not a codegen switch.
+
+---
+
 ## Links
 
 - Repo / patch / bench: **[wbniv/llvm-mos-65816](https://github.com/wbniv/llvm-mos-65816)**
