@@ -11,13 +11,15 @@ For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO
 bank boundaries, **runtime far-pointer deref/cast/arithmetic (Inc 3 = 3a+3b+3c)**, **direct far
 CALLS (JSL/RTL, Inc 4 Phase 1)**, and **mixed-banking far→near calls (via the `__call_near_from_far`
 thunk, shipped to `main` 2026-06-21)**, all on two emulators. The far-pointer calling convention is
-**in progress** — variant (a) Imag32 is built & two-emulator verified (`wt/320-far-cc`), with the other
-ABI variants + the measure-and-ship-the-winner step remaining (no longer upstream-gated; ships as `0004`).
-The five-address-space model remains; **far function pointers (a)** are now **FULLY DONE (2026-06-21)** —
+**DONE (2026-06-21)** — all 4 ABI variants built & two-emulator measured; variant (a) **Imag32 won** and
+landed as **`0004`** on `main` (round-trip-proven byte-identical to the `wt/320-far-cc` study tree).
+The five-address-space model remains; **far function pointers (a)** are now **FULLY DONE + LANDED (2026-06-21)** —
 the indirect-call mechanism, the full p2-value path, and `&far_fn`→24-bit land on the backend, **and** the
 clang front-end is complete: the **`far`/`long_call` attribute (F2)**, a **typed `far_fn_t` variable**
 (`far_fn_t fp = far_leaf; fp(x)`), and **`sizeof(far*)==4`** — all e2e-verified on both emulators (a fixed a
-pre-existing `far_indir` compiler crash along the way). Pushed `origin/wt/320-far-followups`.
+pre-existing `far_indir` compiler crash along the way). Pushed `origin/wt/320-far-followups`; **LANDED on
+`main` 2026-06-21** — the (a) work folded into `0001` (a16-free); the lone a16-context-entangled hunk
+(`MOSLegalizerInfo` PF-as-value) split into new **`0005`**; round-trip-proven to reproduce the verified tree.
 
 **#321 (16-bit accumulator / M2):** the core codegen is complete. Every planned per-op optimization
 is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete re-open trigger. The
@@ -39,9 +41,9 @@ interrupted by crashes; the census short-circuited the build at the measurement 
 | Five-address-space model + full PR | ⬜ Upstream-gated on design-note posting; not started |
 | Far calls (JSL / RTL) — direct call to a `.far_*` leaf in another bank | ✅ **Done (Inc 4 Ph1, 2026-06-20)** — `dev/run.sh far_call` + `xcheck`, MAME+bsnes-jg PASS; in `0001`. (far → far also already works — non-leaf JSL/RTL chains.) [plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) |
 | Mixed-banking — a far function calling a **near** function (`__call_near_from_far` thunk) | ✅ **Done + shipped to `main` (Inc 4 follow-up b, 2026-06-21, `5717f6b`)** — `lowerCall` routes far→near through the generic bank-0 thunk (`pea .Lback-1; jmp (__rc18); rtl`) reached by `JSL` (`0001`, HasW65816-gated, a16-free). `far_near_call == 0xE0` MAME+bsnes-jg, corpus 7/7, thunk `--gc-sections`'d from near ROMs (byte-identical). Lifts the "far must be leaf-or-far-only" constraint. [plan](plans/2026-06-21-320-far-calls-followups.md) |
-| Far function pointers — indirect call through a far code pointer (`__call_indir_far`) | ✅ **DONE (Inc 4 follow-up (a), 2026-06-21).** A far fn ptr can't be a `ptr addrspace(2)` IR callee (LLVM forbids a non-program-addrspace callee), so the 24-bit target is threaded via **IR-rep #1** — a volatile store to a runtime slot `__mos_far_target` + `call @__call_indir_far`; `lowerCall` emits `JSL`, the stub does `jml (__mos_far_target)`. **Backend** (`579b911`): the deep p2-value sub-project — L1 `copyCost` Imag32, L2 `getRegAllocationHints` size-guard, **L3 `selectUnMergeValues` byte→word subreg** (the real crash; "SelectImm" framing was stale), **Gap A `&far_sym`→24-bit** (`buildFarAddrWords`+`MO_ADDR24_*`→`#mos24bank`), **Gap B `G_STORE`/`G_LOAD p2`** (PF value type). **Clang front-end:** **F2 `far`/`long_call` attribute** (`285197d` — `MOSFarCall`, sharing MIPS's `long_call`/`far` GNU spelling via a shared `ParseKind`; `CGExpr` rewrite to the stash-then-thunk shape) → a clean single-file `far_leaf(0x5A)` call; **typed `far_fn_t` variable** (`5fa6d81` — a `far` bit on `FunctionType::ExtInfo` → `ptr addrspace(2)`; `far_fn_t fp = far_leaf; fp(x)`); **`sizeof(far*)==4`** (`ebdb0d1` — `getPointerWidthV(AS2)`→32 + a `getTypeInfoImpl` arm). Also fixed a **pre-existing `far_indir` SIGSEGV** (`isFarSymbol` over-fired on `.far_rodata` data taken as a near pointer → restrict the `.far*` section check to functions). **e2e `far_fnptr`/`far_fnptr_var`/`far_sizeof` + the whole far suite (12 ROMs) PASS on MAME + bsnes-jg** (a16-only), corpus 7/7, csmith 0-mismatch. All on `wt/320-far-followups` (pushed `origin/wt/320-far-followups`); backend + clang edits are gitignored `vendor/` recipes (land in `0001` once `0004`'s relationship to `main` settles). [plan](plans/2026-06-21-320-far-calls-followups.md) · [typed-var](plans/2026-06-21-320-far-fnptr-typed-variable.md) · [sizeof](plans/2026-06-21-320-far-pointer-sizeof.md) |
+| Far function pointers — indirect call through a far code pointer (`__call_indir_far`) | ✅ **DONE (Inc 4 follow-up (a), 2026-06-21).** A far fn ptr can't be a `ptr addrspace(2)` IR callee (LLVM forbids a non-program-addrspace callee), so the 24-bit target is threaded via **IR-rep #1** — a volatile store to a runtime slot `__mos_far_target` + `call @__call_indir_far`; `lowerCall` emits `JSL`, the stub does `jml (__mos_far_target)`. **Backend** (`579b911`): the deep p2-value sub-project — L1 `copyCost` Imag32, L2 `getRegAllocationHints` size-guard, **L3 `selectUnMergeValues` byte→word subreg** (the real crash; "SelectImm" framing was stale), **Gap A `&far_sym`→24-bit** (`buildFarAddrWords`+`MO_ADDR24_*`→`#mos24bank`), **Gap B `G_STORE`/`G_LOAD p2`** (PF value type). **Clang front-end:** **F2 `far`/`long_call` attribute** (`285197d` — `MOSFarCall`, sharing MIPS's `long_call`/`far` GNU spelling via a shared `ParseKind`; `CGExpr` rewrite to the stash-then-thunk shape) → a clean single-file `far_leaf(0x5A)` call; **typed `far_fn_t` variable** (`5fa6d81` — a `far` bit on `FunctionType::ExtInfo` → `ptr addrspace(2)`; `far_fn_t fp = far_leaf; fp(x)`); **`sizeof(far*)==4`** (`ebdb0d1` — `getPointerWidthV(AS2)`→32 + a `getTypeInfoImpl` arm). Also fixed a **pre-existing `far_indir` SIGSEGV** (`isFarSymbol` over-fired on `.far_rodata` data taken as a near pointer → restrict the `.far*` section check to functions). **e2e `far_fnptr`/`far_fnptr_var`/`far_sizeof` + the whole far suite (12 ROMs) PASS on MAME + bsnes-jg** (a16-only), corpus 7/7, csmith 0-mismatch. **✅ LANDED on `main` (2026-06-21):** folded into `0001` (a16-free); the lone a16-context-entangled hunk (`MOSLegalizerInfo` PF-as-value) split into new **`0005`**; round-trip-proven to reproduce the verified `wt/320-far-followups` tree. [land plan](plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md) · [plan](plans/2026-06-21-320-far-calls-followups.md) · [typed-var](plans/2026-06-21-320-far-fnptr-typed-variable.md) · [sizeof](plans/2026-06-21-320-far-pointer-sizeof.md) |
 | Far tail calls | ⬜ Separate follow-up — already conservative-safe (tail peephole keys on `JSR`, so a `JSL` is never tail-converted) |
-| Far-pointer calling convention (pass/return `p2`) | 🔧 **Inc 4 Phase 2 — IN PROGRESS** (`wt/320-far-cc`, `10a5fc0`): variant **(a) Imag32** P0+A0 **built & two-emulator verified** — a 32-bit far ptr returned-from + passed-into noinline calls round-trips `0xF3` on MAME+bsnes-jg, default byte-identical, csmith 30 seeds 0-mismatch; needed `Imag32 ∈ AnyRegBank`; delta = stacked **`0004-320-far-cc.patch`**. **Pending:** variants (b)/(c)/(d) + the bytes/cycles harness + ship-the-winner (only the winner lands; tie → Imag32). [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md) |
+| Far-pointer calling convention (pass/return `p2`) | ✅ **DONE — landed `0004` on `main` (Inc 4 Ph2, 2026-06-21).** All 4 ABI variants built & two-emulator measured (`wt/320-far-cc`); variant **(a) Imag32 won** (`0xF3` MAME+bsnes-jg, default byte-identical, csmith 0-mismatch; needs `Imag32 ∈ AnyRegBank`) and shipped as stacked **`0004-320-far-cc.patch`** + the measure harness + [measurement note](320-upstream-far-cc-measurement-note.md); losers stayed a measured spike. [study plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md) · [land plan](plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md) |
 | Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Runtime far-pointer arithmetic (`G_PTR_ADD` on AS2) | ✅ **Done (Inc 3c, 2026-06-20)** — `fp++` via the symmetric `s32→4×s8 G_UNMERGE_VALUES` mirror (`legalizeUnmergeS32ToBytes`, a16/`0002`; also closes a latent `uint32_t` shift-≥8 gap); `dev/run.sh far_arith` + `xcheck`, MAME+bsnes-jg PASS. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Far data > 2 banks | ⬜ Deferred past Inc 3 (far load/store proven for ≤2 banks; multi-bank data placement not yet exercised) |
@@ -49,10 +51,10 @@ interrupted by crashes; the census short-circuited the build at the measurement 
 
 **M1 verdict:** load/store, runtime deref/cast/arithmetic, direct far calls, mixed-banking far→near, **and
 far function pointers (a) — backend + clang front-end (F2 `far` attribute, typed `far_fn_t` variable,
-`sizeof(far*)==4`)** — are all built and two-emulator verified. Far function pointers (a) are **fully done**
-(2026-06-21). The far-pointer calling convention is **no longer upstream-gated** — a build-all-variants-and-
-measure task that ships as `0004`. The five-address-space model is the other frontier; its PR still waits on
-the design-note posting.
+`sizeof(far*)==4`)** — are all built and two-emulator verified. Far function pointers (a) are **fully done +
+landed on `main`** (2026-06-21, in `0001` + `0005`). The far-pointer calling convention is **done + landed**
+— all variants measured, **Imag32 won and shipped as `0004`** on `main`. The five-address-space model is the
+other frontier; its PR still waits on the design-note posting.
 
 ---
 
@@ -129,16 +131,17 @@ the design-note posting.
 ### Pending codegen (greenlit or in-progress)
 
 With load-fold landed, the compare track closed, the **xy16 calling convention verified + formalized
-(`ebedd1c`)**, and **#320 far function pointers (a) fully done (2026-06-21)**, the per-op a16 codegen, the
-xy16 frontier, and far fn pointers are all complete (see TL;DR). The only remaining codegen frontier is
-**#320's far-pointer calling convention** (`0004`, the `p2` pass/return variants).
+(`ebedd1c`)**, **#320 far function pointers (a) fully done + landed (2026-06-21, `0001`+`0005`)**, and the
+**#320 far-pointer calling convention landed (`0004`, Imag32 winner, 2026-06-21)**, the per-op a16 codegen,
+the xy16 frontier, far fn pointers, and the far-ptr CC are all complete (see TL;DR). No remaining greenlit
+codegen frontier on `main`; the five-address-space model PR is the open #320 thread (design-note-gated).
 
 | Item | Status |
 |---|---|
 | Load-fold gate unification (AA-precision) — `noClobberBetween` | ✅ **Done 2026-06-20 (`6440db0`)** — AA-precise fold landed (−26 B, 0 regressions, verify-clean, 5 c-torture recovery sites 4-way PASS). The volatile-drop half measured net-negative (+17 B / 19 regressions) and is **closed**, not pursued |
 | xy16 16-bit calling convention (X/Y across calls) | ✅ **Done 2026-06-21 (`ebedd1c`)** — verified (cross-call gate `xy16call`, 4-way) + formalized; correct by construction (cross-call index parks in callee-saved `Imag16`, never live in physical X16); 2 ABI levers measured + shelved. See XY16 table |
-| #320 far-pointer calling convention (`p2` pass/return) | 🔧 IN PROGRESS — variant (a) Imag32 built + verified (`wt/320-far-cc`); build remaining variants & measure; ships as `0004`. See #320 table + What's next |
-| #320 far function pointers (a) | ✅ **DONE (2026-06-21)** — backend (mechanism + p2-value L1–L3, Gap A/B) + clang front-end (F2 `far`/`long_call` attribute, typed `far_fn_t` variable, `sizeof(far*)==4`) + a pre-existing `far_indir` crash fix; `far_fnptr`/`far_fnptr_var`/`far_sizeof` + whole far suite 4-way PASS. See #320 table |
+| #320 far-pointer calling convention (`p2` pass/return) | ✅ **DONE 2026-06-21** — all 4 variants measured; **Imag32 won**, landed as `0004` on `main` (round-trip-proven). See #320 table |
+| #320 far function pointers (a) | ✅ **DONE + LANDED (2026-06-21)** — backend (mechanism + p2-value L1–L3, Gap A/B) + clang front-end (F2 `far`/`long_call` attribute, typed `far_fn_t` variable, `sizeof(far*)==4`) + a pre-existing `far_indir` crash fix; `far_fnptr`/`far_fnptr_var`/`far_sizeof` + whole far suite 4-way PASS; landed in `0001` (+ `0005` for the a16-context-entangled legalizer hunk). See #320 table |
 
 ---
 
@@ -213,22 +216,25 @@ Based on the commit history and plan records, **no work-in-progress was lost to 
 | Load-fold unification | Phase 1 PROCEED → Phase 2 built + byte-diffed → **landed (`6440db0`)** | Complete — AA-precision landed, volatile-drop closed net-negative |
 | c-torture -Os sweep + bsnes-jg 4-way | Both completed and recorded | Complete |
 
-Every item above ran to a clean conclusion — none was lost to a crash. The one open frontier is forward
-work (the #320 far-pointer calling convention, `0004`), tracked in *What's next* and TODO.
+Every item above ran to a clean conclusion — none was lost to a crash. The #320 far-pointer calling
+convention (`0004`) and the far-fn-pointer (a) line are now **landed on `main`** (2026-06-21); the open
+frontier is the #320 five-address-space model PR (design-note-gated), tracked in *What's next* and TODO.
 
 ---
 
 ## What's next (prioritized)
 
-1. **#320 far-pointer calling convention** — IN PROGRESS (`wt/320-far-cc`): variant (a) Imag32 built &
-   two-emulator verified (`0004`); remaining = variants (b)/(c)/(d) + bytes/cycles harness + ship-the-winner
-   (tie → Imag32). The gate for far function pointers (a).
-   [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)
+1. **#320 far-pointer calling convention** — ✅ **DONE + LANDED (2026-06-21)** (`wt/320-far-cc`): all 4 ABI
+   variants built & two-emulator measured; variant (a) **Imag32 won** and shipped as **`0004`** on `main`
+   (round-trip-proven); losers stayed a measured spike. Was the gate for far function pointers (a).
+   [study plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md) ·
+   [land plan](plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md)
 
-2. **#320 far function pointers (a)** — ✅ **DONE (2026-06-21)**: backend (mechanism + p2-value L1–L3, Gap
-   A/B) + clang front-end (F2 `far`/`long_call` attribute, typed `far_fn_t` variable, `sizeof(far*)==4`) +
-   a pre-existing `far_indir` crash fix; `far_fnptr`/`far_fnptr_var`/`far_sizeof` + whole far suite 4-way
-   PASS, pushed `origin/wt/320-far-followups`. Lands in `0001` once `0004` settles.
+2. **#320 far function pointers (a)** — ✅ **DONE + LANDED (2026-06-21)**: backend (mechanism + p2-value
+   L1–L3, Gap A/B) + clang front-end (F2 `far`/`long_call` attribute, typed `far_fn_t` variable,
+   `sizeof(far*)==4`) + a pre-existing `far_indir` crash fix; `far_fnptr`/`far_fnptr_var`/`far_sizeof` +
+   whole far suite 4-way PASS. **Landed on `main` in `0001`** (a16-free) **+ `0005`** (the a16-context-
+   entangled `MOSLegalizerInfo` PF-as-value hunk); round-trip-proven. Also pushed `origin/wt/320-far-followups`.
    [plan](plans/2026-06-21-320-far-calls-followups.md) ·
    [typed-var](plans/2026-06-21-320-far-fnptr-typed-variable.md) ·
    [sizeof](plans/2026-06-21-320-far-pointer-sizeof.md)

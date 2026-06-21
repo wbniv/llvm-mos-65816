@@ -28,9 +28,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   2026-06-21 19:36): under `+mos-a16`, `s1`–`s4` (store/load/array/struct), `z1` (`sizeof==4`), and `c1`
   (far→near) **all OK** (vs all-FAIL on `main`). `getPointerWidthV` gained `case 2: return 32`; `PF` is a
   storable value type (s32 merge → bytes). **Done, not ours to re-implement.** Caveat: it's in
-  `wt/320-far-followups` (pushed `origin/`), **ABI-gated, NOT on `main`** (main toolchain + `0001`
-  unchanged; lives in `0004` + recipes) — landing it on `main` is the ABI-blessing-gated decision tracked
-  in [upstream-contribution-status](docs/upstream-contribution-status.md). **Residuals:** (a) **`dp→near`
+  `wt/320-far-followups` (pushed `origin/`), **LANDED on `main` 2026-06-21** (was `wt/320-far-followups`-only): the
+  far-value implementation now ships in `0001` + `0004` + `0005`; the full five-space *upstream PR* stays
+  ABI-blessing-gated (tracked in [upstream-contribution-status](docs/upstream-contribution-status.md)). **Residuals:** (a) **`dp→near`
   cast = pre-existing UPSTREAM bug** (fails on plain `mos6502`: "Copy Instruction illegal with mismatching
   sizes", crashes w/o `-verify`) → an upstream issue to draft, not a fork fix; (b) far-ptr storage under
   **default 8-bit** is still un-legalized (a16-gated by design — likely fine). Evidence:
@@ -55,9 +55,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `AS_FarPacked=3` + datalayout `p3:24:8` + clang width; `sizeof(packed*)==3`, table 48 B, **corpus 7/7**).
   **Increment B (codegen to USE packed ptrs) BLOCKED on 24-bit width** — the `p2↔p3` cast + `p3`
   load/store route through `s24`, which the backend doesn't legalize (only `s8/s16/s32`), and the 3-byte
-  granularity breaks 2-source merges. Genuine novel-s24-width GISel effort. **DEFERRED until the F2
-  far-value work lands on `main`** (avoid rebase/conflict — both touch `getPointerWidthV`/datalayout/far
-  legalizer; packed-24 = the 3-byte form of F2's now-storable far value). **Worktree torn down
+  granularity breaks 2-source merges. Genuine novel-s24-width GISel effort. **UNBLOCKED 2026-06-21 — the F2
+  far-value work landed on `main`** (`0001`+`0004`+`0005`; both touch `getPointerWidthV`/datalayout/far
+  legalizer, so resume on a fresh worktree off current `main`); packed-24 = the 3-byte form of F2's
+  now-storable far value. **Worktree torn down
   2026-06-21** (12G reclaimed); durable artifacts on `main`: Increment A patch
   `docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch` + fixtures `examples/65816/packed24/` +
   recipe in [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md). Also
@@ -68,77 +69,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
   llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.
   Note is drafted & ready; posting is the manual step.
-- [ ] **#320 Inc 4 Phase 2 — far-pointer calling convention: build all variants & measure** — pass/return
-  a 32-bit `p2` across a call. **No longer upstream-gated** (2026-06-20, user): implement every ABI
-  variant (Imag32 quad / Imag16+bank-byte / A:X+Y / stack) behind feature flags and let byte/cycle
-  counts pick the winner, reusing the frame-ABI methodology (census, pre-registered go/no-go bars,
-  `dev/measure-frame-abi.sh`, `dev/probe-cycles.lua`). The CC table (`CC_MOS`) has no 32-bit rule
-  today → a `p2` mis-sizes into a 16-bit `RS1`; each variant adds the assignment rule + 4-byte
-  (dis)assembly. Unlike the frame-ABI study, this one MUST ship one variant (a tie → simplest = Imag32),
-  not "change nothing". [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
-- [ ] **#320 far calls — follow-ups: (a) + (b) feature-complete; (a) lands in `0001` once `0004` settles**
-  (the JSL/RTL direct-call MECHANISM landed 2026-06-20, see Done).
-  [plan](docs/plans/2026-06-21-320-far-calls-followups.md). Scope (probes):
-  far → **far** already works (non-leaf `JSL`/`RTL` chains), so the real gaps are:
-  - ~~(b) **mixed-banking — far → near**~~ **✅ DONE + SHIPPED to `main` 2026-06-21 (`5717f6b`)** — a
-    far function calling a NEAR function routes through the generic bank-0 thunk **`__call_near_from_far`**
-    (`pea .Lback-1; jmp (__rc18); rtl`) reached by `JSL` (`lowerCall` materializes `&g`→RS9 + `ChangeToES`;
-    `0001`, HasW65816-gated, a16-free). Verified `far_near_call == 0xE0` MAME+bsnes-jg, corpus 7/7, thunk
-    gc'd from near ROMs (byte-identical), `-verify-machineinstrs` clean. (per-callee veneer = future byte-opt.)
-  - (a) **far function pointers** — indirect far call (`jsl __call_indir_far` + `jml [__rc18]`, mirroring
-    near `__call_indir`). **BLOCKED on `0004`**: forming/returning/storing a `p2` value crashes today
-    (`G_TRUNC`/`G_UNMERGE`/`G_STORE` p2 — re-confirmed via the `wt/320-far-cc` A0 spike), the p2-VALUE class
-    the far-CC study shipped as Imag32 in **`0004-320-far-cc.patch`** (on `wt/320-far-cc`, not on `main`).
-    Plus a **front-end fork** — a far code pointer can't use `address_space(2)` (clang forbids addr-space
-    function types) and `__attribute__((far))` is MIPS-only, so (a) needs a new MOS far-fn-ptr spelling
-    (surface syntax **LOCKED = F2 MOS `far` attr**, user 2026-06-21; F1 builtins = spike, F3 = deferred).
-    **⚠ Layer-3 blocker (measured 2026-06-21): a far fn ptr CANNOT be a `ptr addrspace(2)` callee** — LLVM
-    forbids a non-program-addrspace callee (verifier: "expected 'ptr'"; MOS has no `P<n>` datalayout field),
-    and an `addrspacecast` p2→p0 drops the bank. So the 24-bit address can't ride the IR `call` callee; it
-    must be threaded via a **front-end IR representation** — (#1, leaning) a `set_far_target` intrinsic +
-    a normal `call @__call_indir_far(args)`; (#2) a custom `MOS_FarIndirect` CC; (#3) a full call intrinsic.
-    (a "detect `p2` callee in `lowerCall`" trigger is untriggerable.) **IR-rep #1 CHOSEN (user 2026-06-21);
-    building end-to-end.** Realized as a volatile store to a runtime slot `__mos_far_target` + `call
-    @__call_indir_far` (lighter than a formal intrinsic — that needs `Intrinsics.td` regen). **BACKEND DONE
-    + e2e VERIFIED both emulators 2026-06-21 (worktree `579b911`):** the far indirect call works end-to-end
-    on real silicon. The deep p2-value `0004` sub-project is COMPLETE: ✅ L1 `copyCost` Imag32; ✅ L2 hint
-    size-guard; ✅ **L3** — the *actual* crash was `selectUnMergeValues` tagging the `s32→2×s16` unmerge with
-    byte subreg indices (→ ill-sized `Imag16=COPY Imag8`); fixed to size-gated `sublo16/subhi16` (the
-    "SelectImm Imag8" framing was stale); ✅ **Gap A** `&far_sym`→24-bit (`buildFarAddrWords` + `MO_ADDR24_*`
-    → `#mos24segmentlo/hi/bank`, composed into Imag32); ✅ **Gap B** `G_STORE`/`G_LOAD p2` (list `PF` as a
-    value type). ✅ **e2e** `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` (wired into `dev/run.sh` +
-    `dev/xcheck.sh`): `far_leaf(0x5A)==0xFF` on MAME + bsnes-jg, bank `$01`, `R_MOS_ADDR24_BANK` reloc,
-    `jsl __call_indir_far`; **a16-only** (no default leg, like far_cast/far_indir). Regression-clean (corpus
-    7/7, far_near_call + xcheck PASS). ✅ **clang F2 DONE 2026-06-21** — the MOS `far`/`long_call` attribute
-    (`MOSFarCall`, Attr.td, sharing `ParseKind="LongCall"` with `MipsLongCall` interrupt-style to dodge the
-    GNU-spelling duplicate-key collision) + a `CGExpr.cpp::EmitCall` intercept that rewrites a `far`-attributed
-    call into the proven `store volatile ptrtoint(@__mos_far_<sym> AS2)` + `call @__call_indir_far` shape (no
-    type-system surgery: the function-attribute + call-site rewrite avoids a 32-bit far-fn-ptr *type*, which
-    `getPointerWidthV(AS2)==16` + `ConvertType` canonicalization would make a miscompile landmine — a typed
-    `far_fn_t fp;` variable surface is a clean future follow-up). `far_fnptr.c` rewritten to the **clean
-    single-file `far` surface** (no asm / no `.set`); `far_leaf(0x5A)==0xFF` MAME+bsnes-jg, csmith 36/40
-    0-mismatch, `-verify-machineinstrs` clean. **(a) is feature-complete.** ✅ **typed far-fn-ptr VARIABLE
-    surface DONE 2026-06-21** ([plan](docs/plans/2026-06-21-320-far-fnptr-typed-variable.md)):
-    `far_fn_t fp = far_leaf; fp(0x5A)` — a `far` bit on the canonical `FunctionType::ExtInfo`
-    (`MOSFarCall` → `DeclOrTypeAttr` riding the typedef; SemaType `handleFunctionTypeAttr` + TypeProperties.td
-    serialization) makes a far-attributed fn-ptr type lower to `ptr addrspace(2)` (ConvertType arm); the
-    `fp=far_leaf` decay materializes the p2 alias; `fp(x)` ptrtoints the loaded pointer into the slot.
-    `far_fnptr_var.c` e2e `0xFF` both emulators, regression-clean (corpus 7/7, csmith 0-mismatch). All
-    backend + F2 + typed-var edits are gitignored `vendor/` recipes in the plans. WIP on
-    `wt/320-far-followups` (`0004` stacked); the recipes land in `0001` once `0004`'s relationship to `main`
-    settles.
-  - (a-F) ✅ **`sizeof(far*) == 4` DONE 2026-06-21** (`getPointerWidthV(AS2)`→32 **+** a `getTypeInfoImpl`
-    `Type::Pointer` arm for far *function* pointers, whose far-ness is an `ExtInfo` bit not an AS qualifier) —
-    aligns clang's C-level far-pointer size with the `p2:32:8` IR width (was `sizeof(FAR*)==2`). New
-    `far_sizeof.c` (far ptr in a struct field, deref'd, adjacent tag intact) → **0xD1** MAME+bsnes-jg;
-    regression-clean (whole far suite + corpus 7/7 + csmith 0-mismatch; AS2-only ⇒ inert). **Surfaced + fixed
-    a PRE-EXISTING crash:** `far_indir` SIGSEGV'd (independent of this change — root-caused via revert) because
-    `isFarSymbol` treated any `.far*`-sectioned symbol as far; restricted the section check to **functions**
-    (`isa<Function>`) so a `.far_rodata` datum taken as a near pointer keeps a 16-bit address (far_indir now
-    **0xF3** both emulators). [plan](docs/plans/2026-06-21-320-far-pointer-sizeof.md).
-  - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
-  Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
-  [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
+- [ ] **#320 far tail calls** — separate, low-priority follow-up; already conservative-safe (the
+  tail-call peephole keys on `MOS::JSR`, so a `JSL` far call is never tail-converted). An optimization,
+  not a correctness gap. [plan](docs/plans/2026-06-21-320-far-calls-followups.md).
 
 ### M2 — Optimizing Payoff
 
@@ -472,6 +405,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-21 — [320-far-pointer-integration] **#320 far-pointer line LANDED on `main`: far fn pointers (a) folded into `0001`, the far-pointer calling convention (Imag32) as `0004`, the lone a16-context-entangled legalizer hunk as `0005`.** Round-trip patch surgery (`dev/land-far-integration.sh`): extracted the (a) recipes as `diff(R, FF)` against a same-base reference (`R` = pristine+`0001`+`0002`+`0003`+`0004`; `FF` = `wt/320-far-followups`), folded the a16-free far-fn-ptr work (backend Layers 1–3 + Gap A/B + the `__call_indir_far` mechanism + clang F2 `far`/`long_call` attr + typed `far_fn_t` var + `sizeof(far*)==4` + the `isFarSymbol` far_indir fix) into `0001` (a16-free — 0 `mos-a16`/`Ac16`/`hasAccum16` in the new hunks), landed the canonical far-cc `0004` (Imag32 won the 4-variant measure, 70 B/50441), and split the lone a16-context-entangled (a) hunk (`MOSLegalizerInfo` PF-as-value, which edits `0002`'s `if(hasAccum16)` block) into new **`0005`**. **Round-trip-proven:** `0001`+`0002`+`0003`+`0004`+`0005` reproduces the verified FF tree EXACTLY over `clang/`+`MOS/`, except two documented non-(a) files — `MOSInsertREPSEP.cpp` (FF working tree stale vs main's *current* `0002` X-width catch-all) and `clang/cmake/caches/MOS.cmake` (build-config drift, in no patch). `0002`/`0003` SHAs unchanged; `0004` = canonical `2efa05f2`. Harness landed too (`dev/farcc_*.sh`, `measure-far-cc.sh`, `probe-cycles.lua`, `regen-patch-0004.sh` baseline extended for `0005`, new `regen-patch-0005.sh`) + the far-cc measurement note (upstream-status #7). [land plan](docs/plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md).
 - 2026-06-21 — [321-xy16-cc-boundary] **#321 xy16 calling-convention — boundary VERIFIED + formalized; both optimization levers measured + shelved (the last open M2 CC item; codegen-inert).** The xy16 (16-bit X/Y index) call/return boundary was already mechanically implemented (X/Y forced 8-bit at every `isCall`/`isReturn` via `MOSInsertREPSEP` `requiredXWidth`→`XW_X8`, `XIn[Entry]=XW_X8`; X16/Y16 caller-saved in `MOS_CSR_RegMask`) but **UNTESTED across a call** — every prior xy16 test indexes *within* a function; `xy16spillr` carries `Ac16`. New deterministic guard `examples/65816/xy16call.c` + `dev/xy16call.sh` (`dev/run.sh xy16call`): a genuine 16-bit index (`0x0102`, load-bearing high byte → the value test is itself the LTO-narrowing detector) held live across a clobbering `noinline` call, then used as an array index → 4-way `host==default==+mos-a16==+mos-xy16==0x7E5A` on **MAME + bsnes-jg**, PASS. **Measured finding (refined the plan's hypothesis):** the boundary is correct *by construction* — the RA allocates the cross-call-live index to a **callee-saved ZP imaginary pair** (`$rs10`, in the `JSR` preserve regmask), reloading it into X16 via `LDXImag16` only at the point of use; **physical X16 is NEVER live across a call**, so the narrowing `sep` before the `jsr` can't touch the ZP-resident value and there is no X16 spill (A2 fix = no-op). Contract formalized in the CC decision doc §"Index registers across calls — adopted" + the prior-art note. **Both xy16-specific levers measured + shelved:** (B1) i32-return-in-`A16:X16` census `dev/xy16ret32-census.sh` → REALISTIC `N_i32callsite=0` (same 0/realistic signature as the frame-ABI NULL), only 30 i32-returning call sites across all 1228 in-scope c-torture programs — realizing it needs an ABI-wide typed hole in the REP/SEP "8-bit at boundary" invariant for traffic realistic code doesn't produce; (B2) `PHX`/`PLX` hardware-stack index-spill — premise removed by the measurement (no physical-X16 spill across calls), bounded near-zero by the existing ZP-pressure slack (~5/14 pairs), and against the soft/static-stack-only grain. Codegen-inert: test + docs + census + an `a16_fuzz.py` comment only — no `vendor/`, no `0002` regen (corpus/fuzz/c-torture not re-run — guaranteed-pass + shared-box courtesy). [plan](docs/plans/2026-06-18-321-m2-xy16-calling-convention-verify-formalize-me.md).
 - 2026-06-21 — [worktree-teardown-enforcement] **Worktree-teardown enforcement — keep durable artifacts, reclaim dupes (hook + wrapper).** Enforces the user policy (memory `worktree-teardown-keep-durable-artifacts`): on teardown reclaim the 95%+ `vendor/`+`build/` dupes but never lose the scripts/verdicts that reconstruct a conclusion; retain worktrees until upstream merge. Git has no `worktree remove` hook → the only intercept is a Claude Code **PreToolUse(Bash)** guard (`.claude/hooks/guard-worktree-teardown.sh`, wired in `.claude/settings.json`) that DENYs raw `git worktree remove` / `git branch -[dD] wt/…` and redirects to **`dev/worktree-teardown.sh`** — the blessed teardown that hard-aborts if any tracked work isn't on `main` (compares vs `main`, not the worktree's stale HEAD), then removes + reports reclaimed GB. Command-position-anchored matcher (mentions/`grep`/`list`/`add`/the wrapper pass through); the wrapper's internal removes are subprocess-exempt. `.gitignore` un-ignores `.claude/settings.json`+`hooks/` so the wiring is reproducible. Verified **15/15** (`dev/test-worktree-teardown.sh`): wt/321-track-a PASS (reclaim 12 GB); wt/320-far-cc ABORT on 2 unmerged commits. Schema confirmed via claude-code-guide. Committed `f2b61a2`. Follow-up: sha256 `hook-runner` integrity (deferred). [plan](docs/plans/2026-06-21-worktree-teardown-enforcement-hook.md).
 - 2026-06-21 — [321-known-issues-xpass-guard] **#321: known-issues XPASS guard — surface "drop the entry" the moment a deferred bug is fixed.** The deferred RA/scavenger defects are XFAIL'd via `KNOWN_ISSUES` with *"REMOVE when fixed"* comments, but nothing **surfaced the trigger**: an upstream/RA fix would just make the repro silently verify clean, leaving a stale entry that masks a future regression of the same signature. New guard: `KNOWN_ISSUE_REPROS` table + `tools/a16_fuzz.py known-issues` subcommand asserts each repro (`a16regpress.c`→regalloc-out-of-registers, `a16scavnz.c`→scavenger-p-not-gpr) STILL crashes `-verify-machineinstrs` under **both** `+mos-a16` and `+mos-xy16` with its expected kid; **XPASS** (verifies clean) or **DRIFT** (different/no signature, or missing) → hard FAIL printing the exact follow-up (drop the `KNOWN_ISSUES` entry + promote to a positive gate). Pure host verify (no SDK/emulator/secret). Wired: `dev/known-issues.sh` + `dev/run.sh known-issues` + an **unconditional CI step** in `smoke.yml`'s `xcheck` job (after the toolchain build), so any push/PR carrying the fix turns CI red with the instruction. Verified: guard PASS 4/4 legs (host + container/CI path); a simulated fix (row → clean TU) trips a loud FAIL exit 1 with the drop+promote ACTION. (`a16-zp-pressure-overflow` out of scope — its repro is a gitignored c-torture *link* error, not a verify crash.) [plan](docs/plans/2026-06-21-321-known-issues-xpass-guard.md).
@@ -1004,6 +938,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • Auto-promoting near callees to far -> explicit NON-GOAL ((b) keeps near callees byte-identical;
        uniform-far is a measured control/fallback, not a shipped default).
      fp:a5f1db95f5a9627a fp:5221ad4b75df9534 fp:78cda9a654aa2b5f fp:fde87b8fe11d4df6 -->
-- [verify] **2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md](docs/plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md)_  <!-- fp:a51d6afac2a18fef -->
+<!-- triaged 2026-06-21: RESOLVED — the land plan now has a §Verification (2026-06-21) section with PASS recorded (round-trip empty over clang/+MOS/ except the 2 documented drift/stale files; a16-free + 0002/0003-sha-unchanged + sequence-apply all PASS). Landing is done; nothing left to run. fp:a51d6afac2a18fef -->
 <!-- triaged 2026-06-21: the packed24-incrementB-handoff §3 "Verification gate" is INSTRUCTIONS for the future agent who builds Increment B (the bar THEY must clear), not a verification to run now — Increment B is deferred until F2 lands on main. Nothing to verify here; covered by the curated M1 five-space item + its handoff link. fp:3d3c94fe546a028c -->
 <!-- END auto-captured-deferrals -->

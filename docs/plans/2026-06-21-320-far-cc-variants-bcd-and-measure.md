@@ -1,6 +1,8 @@
 # #320 Inc 4 Ph2 — far-ptr CC variants (b)/(c)/(d) + measurement (implementation plan)
 
-**Date:** 2026-06-21 · **Status:** IN PROGRESS (A1 variant b underway) · **Scope:** `vendor/llvm-mos/` codegen
+**Date:** 2026-06-21 · **Status:** ✅ **RESOLVED (2026-06-21)** — variants (b)/(c)/(d) built & measured
+alongside (a); **Imag32 won and landed as `0004` on `main`** (see
+[land plan](2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md)). · **Scope:** `vendor/llvm-mos/` codegen
 (the CC) on `wt/320-far-cc`. **Supplements** the parent plan
 [2026-06-20-320-far-pointer-cc-build-all-variants.md](2026-06-20-320-far-pointer-cc-build-all-variants.md)
 (variant matrix, go/no-go, workload, verification bar) with the **implementation-level mechanism** discovered

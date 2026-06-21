@@ -1,0 +1,24 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index fbb134ee9a87..72b984a321d1 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -373,11 +373,17 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+     // #321 native s16: under +mos-a16 an s16 data load/store is ALSO custom, so it
+     // reaches legalizeLoad/legalizeStore, which routes a non-absolute 16-bit-pointer
+     // access to a native 16-bit indirect op (else narrows to two 8-bit ops as before).
++    // #320 far runtime: PF appears as a *value* too (loading/storing a far
++    // pointer held in a variable), not just as the access pointer. A PF value
++    // routes through legalizeLoad/legalizeStore, which inttoptr/ptrtoint it to
++    // an s32 and re-runs; the s32 then narrows to bytes (maxScalar below). PF is
++    // addrspace 2 — only W65816 far code ever forms one — so listing it as a
++    // value type is inert on every other subtarget.
+     auto &B = getActionDefinitionsBuilder({G_LOAD, G_STORE});
+     if (STI.hasAccum16())
+-      B.customForCartesianProduct({S8, S16, PZ, P}, {PZ, P, PF});
++      B.customForCartesianProduct({S8, S16, PZ, P, PF}, {PZ, P, PF});
+     else
+-      B.customForCartesianProduct({S8, PZ, P}, {PZ, P, PF});
++      B.customForCartesianProduct({S8, PZ, P, PF}, {PZ, P, PF});
+     B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, S8).unsupported();
+   }
+ 

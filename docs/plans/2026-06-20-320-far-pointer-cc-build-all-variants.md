@@ -1,7 +1,9 @@
 # #320 Inc 4 Phase 2 — far-pointer calling convention: build all ABI variants and measure
 
-**Date:** 2026-06-20 · **Status:** IN PROGRESS — **P0 + A0 (variant a Imag32) DONE & two-emulator
-verified** on `wt/320-far-cc` (`10a5fc0`); A1–A3 / M / D pending. · **Scope:** `vendor/llvm-mos/` codegen (the CC) +
+**Date:** 2026-06-20 · **Status:** ✅ **RESOLVED (2026-06-21)** — all 4 ABI variants built & two-emulator
+measured; **variant (a) Imag32 won** (70 B / 50441 round-trips, smallest *and* fastest) and **landed as
+`0004` on `main`** (round-trip-proven; see [land plan](2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md)).
+The other three are retained only as the measured spike. · **Scope:** `vendor/llvm-mos/` codegen (the CC) +
 a far-pointer-passing workload + the reused measurement harness. Runs on a feature worktree, not `main`.
 **Builds on:** [Inc 4 Ph1 far calls](2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) (JSL/RTL landed —
 the prerequisite: you can't pass a far pointer across a call you can't make). **Methodology template:**

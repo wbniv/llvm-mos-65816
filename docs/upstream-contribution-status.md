@@ -13,7 +13,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 ## TL;DR
 
-- **Ready to post now: 2 PRs + 2 issues + 2 design notes** — six artifacts, all drafted, all one command/paste away.
+- **Ready to post now: 2 PRs + 2 issues + 3 design notes** — seven artifacts, all drafted, all one command/paste away.
   Strictly *PRs*, that's **two** (F4; and the DWARF step-6 test+docs).
 - **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
@@ -31,6 +31,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 | 4 | **scavenger N/Z-liveness** — `saveScavengerRegister` asserts N/Z dead | **issue** | Upstream crash: a compare/ALU flag live across a frame-vreg spill → illegal `STImag8 $p` (no fork patch — maintainer territory) | [`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md) | n/a (issue) |
 | 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | `wbniv:mos-dwarf-65816-test-docs` (pushed `0ae9415`) |
 | 6 | **#321 CC frame-ABI** — measured frame-model evaluation | **note** | Implementation-backed CC evidence: DP-window/stack-relative are feasible but NULL on real code (locals are `__rc`-resident → frames ≈unused); keep the soft static stack, by measurement | [`docs/321-upstream-cc-frame-abi-note.md`](321-upstream-cc-frame-abi-note.md) | n/a (note) |
+| 7 | **#320 far-CC** — measured ABI evaluation (far ptr across a call) | **note** | Implementation-backed CC evidence: all 4 ABIs built behind `+mos-farcc-*` + measured (bytes + round-trips/frame) on MAME+bsnes-jg → **Imag32 wins decisively** (70 B/50441; smallest *and* fastest). Far ptr should pass/return whole in one 4-byte imaginary-register unit, by measurement. **Follow-up to #3** — post after the design note opens the conversation. Shipped as `0004` in-fork. | [`docs/320-upstream-far-cc-measurement-note.md`](320-upstream-far-cc-measurement-note.md) | n/a (note) |
 
 ### 1 — F4 PR (a code-change PR; #5 DWARF is the other)
 
@@ -124,14 +125,32 @@ gh issue comment 321 --repo llvm-mos/llvm-mos --body-file docs/321-upstream-cc-f
 
 Full internal record: [frame-ABI study plan §Outcome](plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
 
+### 7 — #320 far-CC measurement note (a post, not a PR)
+
+Implementation-backed evidence for how a far (addrspace 2) pointer should cross a call. We built **all four**
+plausible ABIs behind off-by-default `+mos-farcc-*` features and measured them on the same realistic
+round-trip (a far ptr returned from one `noinline`, passed into another, dereferenced across a bank), gated
+`0xF3` on MAME + bsnes-jg: **(a) Imag32 70 B/50441 · (b) Imag16+bank 86 B/41385 · (c) A:X+Y 102 B/43572 ·
+(d) soft-stack 174 B/30626**. **Imag32 wins on both axes**, so far-ptr-across-call ships **Imag32 by
+default** in-fork (patch `0004`); the others are retained only as the measured spike. **Follow-up to #3** —
+post after the design note opens the conversation. Reproducible via `dev/measure-far-cc.sh` +
+`dev/farcc_{imag32,split,axy,stack}.sh` + `dev/probe-cycles.lua`. Post it (Discord/#320 thread):
+
+```
+gh issue comment 320 --repo llvm-mos/llvm-mos --body-file docs/320-upstream-far-cc-measurement-note.md   # strip the status block first
+```
+
+Full internal record: [far-cc study + land plan](plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md).
+
 ## Future / blocked (not yet postable — do **not** count these as pending)
 
 - **#320 five-address-space model + PR.** The real far-pointer codegen PR (asiekierka's 32-bit-default /
   packed 24-bit / zero-bank / abs-16 layout). Blocked on maintainer **ABI blessing** — gated behind posting
   the #320 design note above. Not drafted as a PR yet. **The fork-side implementation body is now large and
-  feature-complete (2026-06-21)** and would form the bulk of this PR once unblocked — all carried as
-  `patches/llvm-mos/0001` + gitignored `vendor/` recipes on `wt/320-far-followups` (pushed
-  `origin/wt/320-far-followups`), landing in `0001` once `0004`'s relationship to `main` settles:
+  feature-complete (2026-06-21)** and would form the bulk of this PR once unblocked — now **landed on `main`
+  (2026-06-21)** as `patches/llvm-mos/0001` (a16-free) + `0004` (far-ptr CC, Imag32 winner) + `0005` (the lone
+  a16-context-entangled `MOSLegalizerInfo` PF-as-value hunk); round-trip-proven against `wt/320-far-followups`
+  (also pushed `origin/wt/320-far-followups`):
   - **far calls (b):** far→near mixed-banking via the bank-0 thunk `__call_near_from_far` (shipped to `main`).
   - **far function pointers (a):** the p2-value sub-project (Layers 1–3 + Gap A/B), the `jsl __call_indir_far`
     indirect-call mechanism, **and the clang front-end (F2):** a MOS **`far`/`long_call`** function/type

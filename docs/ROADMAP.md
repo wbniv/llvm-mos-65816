@@ -217,8 +217,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    2026-06-21): far→near routes through the `__call_near_from_far` bank-0 thunk (shipped to `main`); far fn
    pointers have the full backend p2-value path + indirect-call mechanism **and** the clang front-end (the
    `far`/`long_call` attribute, a typed `far_fn_t` variable, `sizeof(far*)==4`) — `far_fnptr`/`far_fnptr_var`/
-   `far_sizeof` 4-way PASS, `wt/320-far-followups`. The far-pointer **calling convention** (`0004`) is the
-   remaining Inc 4 follow-up — settled by building all variants and measuring, not upstream-gated.
+   `far_sizeof` 4-way PASS — **all landed on `main` 2026-06-21** (`0001` a16-free + `0005` for the
+   a16-context-entangled legalizer hunk; round-trip-proven). The far-pointer **calling convention** is also
+   **DONE + landed** — all variants measured, **Imag32 won and shipped as `0004`** on `main` (2026-06-21).
    [Inc 4 plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
    [follow-ups](plans/2026-06-21-320-far-calls-followups.md)._
 
