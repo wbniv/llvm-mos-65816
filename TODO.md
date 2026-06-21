@@ -33,19 +33,25 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   today → a `p2` mis-sizes into a 16-bit `RS1`; each variant adds the assignment rule + 4-byte
   (dis)assembly. Unlike the frame-ABI study, this one MUST ship one variant (a tie → simplest = Imag32),
   not "change nothing". [plan](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
-- [ ] **#320 far calls — follow-ups** (the JSL/RTL direct-call MECHANISM landed 2026-06-20, see Done).
-  **Planned 2026-06-21** ([plan](docs/plans/2026-06-21-320-far-calls-followups.md)) — probes sharpened the
-  scope: far → **far** already works (non-leaf `JSL`/`RTL` chains fine), so the real gaps are: (a) **far
-  function pointers** — indirect far call (`jsl __call_indir_far` + `jml [__rc18]`, mirroring the near
-  `__call_indir`); **front-end fork** — a far code pointer CANNOT use `address_space(2)` (clang forbids
-  addr-space-qualified function types) and `__attribute__((far))` is MIPS-only, so (a) needs a new MOS
-  far-fn-ptr spelling (F1 builtin / **F2 MOS `far` attr, recommended** / F3 far-fn-ptr type — backend +
-  runtime half can land first, decoupled). (b) **mixed-banking — far → near** — a bank-0 `jsr g; rtl`
-  veneer reached by `JSL` (recommended; whole-module-far flag = control/fallback); **do (b) first**
-  (self-contained, no front-end, no CC dep). (c) far tail calls = separate (already conservative-safe —
-  tail peephole keys on `JSR`). (a) reuses the far-ptr CC `p2`/Imag32 rep
-  ([CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)).
-  Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md).
+- [ ] **#320 far calls — follow-ups: (b) DONE, (a) gated on `0004`** (the JSL/RTL direct-call MECHANISM
+  landed 2026-06-20, see Done). [plan](docs/plans/2026-06-21-320-far-calls-followups.md). Scope (probes):
+  far → **far** already works (non-leaf `JSL`/`RTL` chains), so the real gaps are:
+  - ~~(b) **mixed-banking — far → near**~~ **✅ DONE 2026-06-21 (`dd33017`, `wt/320-far-followups`)** — a
+    far function calling a NEAR function routes through the generic bank-0 thunk **`__call_near_from_far`**
+    (`pea .Lback-1; jmp (__rc18); rtl`) reached by `JSL` (`lowerCall` materializes `&g`→RS9 + `ChangeToES`;
+    `0001`, HasW65816-gated, a16-free). Verified `far_near_call == 0xE0` MAME+bsnes-jg, corpus 7/7, thunk
+    gc'd from near ROMs (byte-identical), `-verify-machineinstrs` clean. (per-callee veneer = future byte-opt.)
+  - (a) **far function pointers** — indirect far call (`jsl __call_indir_far` + `jml [__rc18]`, mirroring
+    near `__call_indir`). **BLOCKED on `0004`**: forming/returning/storing a `p2` value crashes today
+    (`G_TRUNC`/`G_UNMERGE`/`G_STORE` p2 — re-confirmed via the `wt/320-far-cc` A0 spike), the p2-VALUE class
+    the far-CC study shipped as Imag32 in **`0004-320-far-cc.patch`** (on `wt/320-far-cc`, not on `main`).
+    Plus a **front-end fork** — a far code pointer can't use `address_space(2)` (clang forbids addr-space
+    function types) and `__attribute__((far))` is MIPS-only, so (a) needs a new MOS far-fn-ptr spelling
+    (F1 builtin / **F2 MOS `far` attr, recommended** / F3 far-fn-ptr type). So (a) = front-end + the `0004`
+    base + stub/indirect lowering + residual legalizer fixes; **gated on `0004` reaching `main`**.
+  - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
+  Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
+  [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
 
 ### M2 — Optimizing Payoff
 
