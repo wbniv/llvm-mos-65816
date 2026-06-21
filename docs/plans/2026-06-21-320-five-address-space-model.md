@@ -277,11 +277,17 @@ deliverable is the design note carrying the C1 finding + the corrected pow2 fact
 
 ---
 
-## Phase 1 — `addrspace 3` = packed-24 far (gated by 0a + 0b) — **NO-GO (closed null, 2026-06-21)**
+## Phase 1 — `addrspace 3` = packed-24 far (gated by 0a + 0b) — **SUPERSEDED: BUILT + LANDED + CLOSED**
 
-_Not built. 0a says it is representable; 0b says the opportunity is empty and the prerequisite
-(storing far pointers in memory) is incomplete. Kept below as the recipe to revive **iff** the 0b
-census later shows real stored-far-pointer pressure._
+> **Update:** the original 2026-06-21-morning "NO-GO" below was **reversed the same day** (user: "build
+> it"). packed-24 was built (Increment A + B), landed as `0006`, productionized, and its thread is now
+> **CLOSED** — see **§Build packed-24** below and the
+> [residuals close-out](2026-06-22-320-packed24-residuals-close.md). The NO-GO text is kept verbatim as the
+> historical decision record.
+
+_(Historical, 2026-06-21 AM) Not built. 0a says it is representable; 0b says the opportunity is empty and
+the prerequisite (storing far pointers in memory) is incomplete. Kept below as the recipe to revive **iff**
+the 0b census later shows real stored-far-pointer pressure._
 
 Add `AS_FarPacked` as a genuine 3-byte far pointer: same 24-bit addressing as `AS_Far`
 (absolute-long `af`/`8f`, indirect-long `[dp]`), but **3-byte storage** so far pointers in structs

@@ -158,9 +158,12 @@ Full internal record: [far-cc study + land plan](plans/2026-06-21-320-far-pointe
   `wt/320-far-followups` (also pushed `origin/wt/320-far-followups`). **All five of asiekierka's spaces are
   now measured** — AS0/1/2 ship, AS3 packed-24 built (measured win), and **AS4 zero-bank = CONFIRMED
   measured-null** (2026-06-22 de-lumped census `dev/measure-zerobank-census.sh`: bit-identical to a near
-  pointer, 0 realistic bank-0-far sites; the five-space model is complete). A separate near-abs bank-relaxation
-  optimization (`0007`, near globals → `abs` not `abs-long`) is built on `wt/320-near-abs-bank-relax`, not yet
-  landed:
+  pointer, 0 realistic bank-0-far sites; the five-space model is complete). The **packed-24 productionization
+  thread is CLOSED** (2026-06-22, [close-out](plans/2026-06-22-320-packed24-residuals-close.md)): Task A
+  measured + verified, Task C (`__far_packed` spelling) closed (no AS2 spelling to mirror), and Task B (byte-2
+  absolute-long cost) is the near-abs bank-relaxation `0007` — its plan is literally "the realization of Task
+  B". That separate optimization (`0007`, near globals → `abs` not `abs-long`, for ALL near pointers) is built
+  on `wt/320-near-abs-bank-relax`, not yet folded onto `main`'s patch stack:
   - **far calls (b):** far→near mixed-banking via the bank-0 thunk `__call_near_from_far` (shipped to `main`).
   - **far function pointers (a):** the p2-value sub-project (Layers 1–3 + Gap A/B), the `jsl __call_indir_far`
     indirect-call mechanism, **and the clang front-end (F2):** a MOS **`far`/`long_call`** function/type

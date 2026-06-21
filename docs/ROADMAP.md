@@ -222,7 +222,11 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    **DONE + landed** — all variants measured, **Imag32 won and shipped as `0004`** on `main` (2026-06-21).
    Of the five-address-space model, **AS3 packed-24** (the 3-byte far-ptr storage form for tables) is **built
    + landed** (`0006`, 2026-06-21/22, incl. the static-init table reloc fix; measured net win, break-even
-   N≥1); only **AS4 zero-bank** + the upstream PR remain.
+   N≥1), and its **productionization thread is CLOSED** (2026-06-22): Task A measured + verified, Task B
+   (byte-2 absolute-long cost) built as the general near-abs relaxation **`0007`** (not packed-specific),
+   Task C (`__far_packed` spelling) closed — no AS2 spelling to mirror. **AS4 zero-bank = CONFIRMED
+   measured-null** (2026-06-22) ⇒ all five spaces measured, the model is **complete**; only folding `0007`
+   onto `main` + the upstream PR/note remain.
    [Inc 4 plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
    [follow-ups](plans/2026-06-21-320-far-calls-followups.md)._
 
