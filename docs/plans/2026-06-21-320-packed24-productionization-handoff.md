@@ -1,5 +1,15 @@
 # Handoff — packed-24 (addrspace 3): realistic-use validation + access-cost cleanup
 
+> ## 🏁 THREAD CLOSED (2026-06-22) — see [packed-24 residuals close-out](2026-06-22-320-packed24-residuals-close.md)
+>
+> All three tasks resolved; **no packed-24-specific work remains.** **Task A** DONE + static-init reloc
+> FIXED (below). **Task B** (byte-2 absolute-long cost) = built as **`0007`** (the cost is general, not
+> packed-specific — `0007`'s plan is "the realization of Task B"; `8f/af→8d/ad` for all near pointers, −2 B
+> on packed byte-2). **Task C** (`__far_packed` spelling) closed — no AS2 spelling to mirror (forbidden
+> one-off; revive only via a shared `<mos.h>`). The §0 worktree (`wt/320-packed24-incB`) is **torn down**
+> (`f168003`) — its "reuse the worktree" setup is stale; all work is on `main`. The original handoff is
+> preserved below for history.
+
 > ## ✅ Task A DONE + static-init reloc FIXED (2026-06-22)
 >
 > **Task A (measure the win) — done.** `dev/run.sh measure-packed24`: packed-24 wins **≈N bytes at every

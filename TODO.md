@@ -61,7 +61,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `dev/regen-patch-0006.sh`; not folded into 0001 — touches files 0004/0005 share). **Verified:**
   `dev/run.sh packed24` (new e2e, bank $01) `0xF3` MAME **and** bsnes-jg (bank byte survives 3-byte
   packing); `-verify-machineinstrs` clean; corpus 7/7; far suite PASS; `fuzz 50` 0-mismatch; storage
-  −16 B/−25% (16-entry table 64→48 B), ×3 index cost. Worktree RETAINED until upstream merge.
+  −16 B/−25% (16-entry table 64→48 B), ×3 index cost. Worktree torn down (`f168003`); work landed on `main`.
   **Productionization batch — (A) DONE + static-init reloc FIXED (2026-06-22)**
   ([handoff](docs/plans/2026-06-21-320-packed24-productionization-handoff.md) ·
   [fix plan](docs/plans/2026-06-22-320-packed24-static-init-reloc-fix.md)): ~~(A) measure the win in realistic
@@ -71,10 +71,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   surfaced that a **statically-initialized packed table didn't link** (each 3-byte entry emitted one
   `R_MOS_ADDR8` — no 3-byte data fixup); **FIXED** via an `AsmPrinter::emitNonStandardSizedConstant` hook +
   MOS override emitting the `ADDR24 SEGMENT_LO/HI/BANK` triple (landed in the updated **`0006`**; new
-  `dev/run.sh packed24_table` `0xA5` MAME+bsnes-jg, corpus 7/7, fuzz 0-mismatch). Still open: **(B)** byte-2
-  absolute-long cost — now *marginal* (the measurement shows it only affects direct single-slot access, not
-  indexed tables); **(C)** stretch `__far_packed` spelling. Separate threads: zero-bank (AS4) still deferred
-  (≈ near ptr); post the upstream note (C1 + pow2 + census) — user-triggered.
+  `dev/run.sh packed24_table` `0xA5` MAME+bsnes-jg, corpus 7/7, fuzz 0-mismatch). **Productionization thread
+  CLOSED (2026-06-22)** ([close-out](docs/plans/2026-06-22-320-packed24-residuals-close.md)): ~~(B) byte-2
+  absolute-long cost~~ **= `0007`** — the cost is general, not packed-specific (only the A-register byte 2
+  bloated; STX/STY have no long form), so it was built as the near-abs bank-relaxation `0007` (`8f/af→8d/ad`
+  for ALL near pointers; its plan is literally "the realization of Task B", −2 B on packed byte-2, verified
+  `0001–0007` both emulators); a packed-local fix would duplicate `0007`'s DBR logic ⇒ **don't**. ~~(C)
+  `__far_packed` spelling~~ **closed** — precondition unmet (no AS2 spelling exists to mirror; far/dp/packed
+  are all per-file local `#define`s), so it's the forbidden one-off; revive only via a shared `<mos.h>`
+  covering all spaces (SDK concern). Worktree `wt/320-packed24-incB` torn down (`f168003`, 12 G reclaimed).
+  Separate threads: zero-bank (AS4) **CONFIRMED measured-null** (2026-06-22, model complete); fold `0007`
+  onto `main`'s stack; post the upstream note (C1 + pow2 + census) — user-triggered.
   [incB handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
   [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
@@ -1000,4 +1007,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      guardrail (far is per-symbol opt-in; user skipped), rom_1 left as-is (already a named overflow-checked
      region), linker-script + docs only (no vendor edit). Nothing open.
      fp:a349fdb9e6fb6627 fp:13a459b641dd2a38 fp:27a0f051def92af7 fp:9c15ab41c1ea4e0c -->
+- [ ] **(triage)** **Integrate `0007` onto `main`'s patch stack** (its own merge step). Once landed, optionally harden the — _from [2026-06-22-320-packed24-residuals-close.md](docs/plans/2026-06-22-320-packed24-residuals-close.md)_  <!-- fp:8a5ca7613ee06e0a -->
+- [ ] **(triage)** **Post the #320 upstream design note** — user-triggered (queued in — _from [2026-06-22-320-packed24-residuals-close.md](docs/plans/2026-06-22-320-packed24-residuals-close.md)_  <!-- fp:883b7d12864cf920 -->
 <!-- END auto-captured-deferrals -->

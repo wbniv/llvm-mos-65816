@@ -509,19 +509,21 @@ shows the predicted **×3 indexing** (`asl; clc; adc` = i×2+i).
 - **Measured win:** a 16-entry table is **48 B vs 64 B = −16 B (−25%)**; access cost ≈ neutral (×3 index
   math offset by one fewer pointer byte loaded). The win is realized exactly as predicted.
 
-Worktree `wt/320-packed24-incB` RETAINED until upstream merge (user policy). Durable artifacts on `main`:
+Worktree `wt/320-packed24-incB` torn down 2026-06-22 (`f168003`, 12 G reclaimed); all work on `main`. Durable artifacts on `main`:
 `0006-320-packed24.patch`, `dev/regen-patch-0006.sh`, the runnable e2e (`packed24_e2e.c` + `dev/packed24.sh`,
 wired into `dev/xcheck.sh`), and this record. (Increment A's recipe + the original blocker are preserved
 above and in `docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch`.)
 
-**Follow-ups (next batch — [productionization handoff](2026-06-21-320-packed24-productionization-handoff.md)):**
-(A) **realistic-context measurement** — the −25% is a *synthetic* table number; lesson #2/#3 demand a
-whole-program, runtime-walked banked far-pointer table measured net-of-access-cost (with a break-even
-table size), both `AS_Far` and `AS_FarPacked`. (B) **byte-2 absolute-long access cost** — confirmed: a
-packed access stores/loads bytes 0,1 via `abs` but **byte 2 (the A-register byte) via absolute-long**
-(`8f`/`af`, `R_MOS_ADDR24`) even though the slot is a *near* global → ~1 wasted byte/access-site; make
-the A-byte select `abs` when the base is near (gate conservatively). (C) stretch: an ergonomic
-`__far_packed` spelling. zero-bank (AS4) + the upstream-note posting remain separate threads.
+**Follow-ups — ALL RESOLVED; productionization thread CLOSED 2026-06-22**
+([close-out](2026-06-22-320-packed24-residuals-close.md) · superseding the
+[handoff](2026-06-21-320-packed24-productionization-handoff.md)): ~~(A) realistic-context measurement~~
+**DONE + verified** (packed wins at every N, break-even N≥1; static-init reloc bug surfaced + FIXED in
+`0006`). ~~(B) byte-2 absolute-long access cost~~ **= `0007`** — the cost is general, not packed-specific
+(only the A-register byte 2 bloated; STX/STY have no long form so bytes 0,1 were already `abs`), built as
+the near-abs bank-relaxation `0007` (`8f/af→8d/ad` for all near pointers, −2 B on packed byte-2). ~~(C)
+`__far_packed` spelling~~ **closed** — no AS2 spelling to mirror ⇒ forbidden one-off; revive only via a
+shared `<mos.h>`. Worktree `wt/320-packed24-incB` torn down (`f168003`). zero-bank (AS4) **measured-null**
+(model complete); folding `0007` onto `main` + the upstream-note posting remain separate threads.
 
 ---
 

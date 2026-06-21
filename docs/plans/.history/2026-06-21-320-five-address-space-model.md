@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-22](https://github.com/wbniv/llvm-mos-65816/commit/cd99be6) | #320 zero-bank (AS4): measure-and-close — CONFIRMED measured-null; five-space model complete |
 | [2026-06-22](https://github.com/wbniv/llvm-mos-65816/commit/6591319) | #320 docs: sync status to the landed packed-24 static-init fix + the 5-space state |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/b5b2ddf) | #320 packed-24: record productionization follow-ups + next-batch handoff |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/ebfc95e) | #320 packed-24 (AS3) Increment B: store/load/deref a 3-byte packed far pointer |
@@ -12,6 +13,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/caef3e9) | #320 five-address-space model: plan + Phase 0 census (packed-24/zero-bank = measured nulls) |
 
 <!--history-meta v1
+cd99be6	author	Will Norris
+cd99be6	added	10
+cd99be6	deleted	3
+cd99be6	files	1
+cd99be6	body	Implements docs/plans/2026-06-22-320-zerobank-as4-measure-and-close.md: the\nde-lumped close of asiekierka's fifth/last address space, replacing the circular\nlumped 0b assertion ("zero-bank likewise has 0 users") with a direct, reproducible\nmeasurement to the project bar.\n\nNew durable artifacts:\n- dev/measure-zerobank-census.sh — de-lumped census (mirrors frameabi-census.sh):\n  opportunity count + incumbent quantification + adversarial probe, host-only,\n  toolchain-robust (defaults to main; far-VALUE probes gate on post-F2).\n- examples/65816/zerobank_probe.c — the adversarial best-case shapes (heterogeneous\n  far table with bank-0 targets, far-typed API fed bank-0 data) that collapse to\n  "near pointer (+ lazy near->far cast)".\n\nMeasured verdict (raw evidence in the plan's Verification section):\n- Opportunity = 0: corpus/kernels Nfar=0; far suite stores 0 far pointers (all far\n  usage transient). No realistic site carries bank-0 data as a far-typed pointer.\n- Incumbent tie on every axis: zero-bank is bit-identical to a near pointer\n  (p4:16:8 == p0:16:8) — storage 2B==2B (probe: far_tbl 16B, near_tbl 8B, AS4 8B);\n  global access ad==ad; runtime deref (dp) (B2,5cyc) vs far [dp] (A7,6cyc), no far\n  indexed-long mode, AS4 cheap access globals-only.\n- The one possible access win (ad over af) is exactly the in-flight 0007 near-abs\n  relaxation's win for ALL near pointers (ff02726 "near-global abs stays 16-bit"),\n  more general than a far-typed AS4. On a 0007 toolchain near already emits ad; on\n  pre-0007 main near emits af, but that gap is 0007's near-pointer fix to close.\n- Feasible (~30 LoC, reuses near path + 0006 cast template, no MVT workaround) =>\n  null by WORTH, not infeasibility. Premise-checked (4 readers + 3 adversarial\n  skeptics, 0 wins). Dominated like frame-ABI's frames by the soft static stack.\n\nNothing built. Doc cascade: five-space plan Phase 2 (measured non-circular close),\nthe upstream note + contribution-status (all five spaces measured), and the\ncircular zero-bank line in measure-five-space-census.sh corrected to point at the\nde-lumped census. The five-address-space model is now COMPLETE.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 6591319	author	Will Norris
 6591319	added	7
 6591319	deleted	0
