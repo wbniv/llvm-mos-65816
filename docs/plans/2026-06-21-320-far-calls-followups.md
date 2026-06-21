@@ -246,8 +246,13 @@ all in `MOSInstructionSelector.cpp` + `MOSInstrInfo.h` + `MOSMCInstLower.cpp`):*
 - `MOSInstrInfo.h` `TOF`: add `MO_ADDR24_SEG_LO`, `MO_ADDR24_SEG_HI`, `MO_ADDR24_BANK`.
 - `MOSMCInstLower.cpp` `lowerSymbolOperand`: 3 new cases → `VK_ADDR24_SEGMENT_LO`/`_HI`/`_BANK`
   (the segment 16 bits == a near `R_MOS_ADDR16` would give, but the ADDR24 family is bank-aware/explicit).
-- `static isFarSymbol(Op)`: a global is far if `getAddressSpace()==MOS::AS_Far` **or** its aliasee object is
-  in a `.far*` section (covers far functions, which are AS0 + `.far_text`).
+- `static isFarSymbol(Op)`: a global is far if `getAddressSpace()==MOS::AS_Far` **or** its aliasee object is a
+  **`isa<Function>`** in a `.far*` section (covers far functions, which are AS0 + `.far_text`). The
+  function-only restriction on the section check is deliberate (fixed 2026-06-21 — see
+  [far-pointer-sizeof plan](2026-06-21-320-far-pointer-sizeof.md)): far **data** must opt in via
+  `address_space(2)`; a plain (AS0) `.far_rodata` datum whose address is taken as a **near** pointer (e.g.
+  far_indir building a 24-bit address by hand) keeps a 16-bit near address — otherwise the 24-bit
+  materialization over-fires into a 16-bit context and crashes `buildFarAddrWords`/`selectAddrLoHi`.
 - `buildFarAddrWords(Builder, GO)`: builds 4 `LDImm` bytes (seg-lo, seg-hi, bank, `#0`) and `composePtr`s
   them into two `Imag16` words `(segment)` and `(bank,0)`; returns the pair.
 - `selectAddr` (direct `p2` use): if `isFarSymbol`, `REG_SEQUENCE` the two words into the `Imag32` dest via

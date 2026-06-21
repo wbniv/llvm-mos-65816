@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5e9cdab) | #320 (a) far fn pointers: typed far_fn_t variable surface DONE — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/7c0a00f) | #320 (a) far fn pointers: clang F2 DONE — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/2d2a171) | #320 (a) far fn pointers: backend p2-value sub-project DONE + e2e verified — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/15df5fe) | #320 far-calls follow-ups: consolidate into a combined plan+handoff doc |
@@ -14,6 +15,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+5e9cdab	author	Will Norris
+5e9cdab	added	7
+5e9cdab	deleted	3
+5e9cdab	files	1
+5e9cdab	body	Record the typed far function-pointer VARIABLE surface (the F2 follow-up) as\ncomplete: far_fn_t fp = far_leaf; fp(0x5A) now works in single-file C.\n\n- new plan docs/plans/2026-06-21-320-far-fnptr-typed-variable.md (on the\n  worktree) has the full layer breakdown + recipe + verification result.\n- far-calls-followups plan §6: the "future follow-up" note now points to the\n  done work (a `far` bit on FunctionType::ExtInfo -> ptr addrspace(2); decay\n  materializes the p2 alias; indirect call ptrtoints the loaded fp).\n- agent-handoff wt/320-far-followups row + TODO #320: typed-var surface DONE.\n\nVerified: far_fnptr_var.c far_leaf(0x5A)==0xFF MAME+bsnes-jg, -verify-machineinstrs\nclean, regression-clean (far_fnptr direct 0xFF, corpus 7/7, csmith 54/60\n0-mismatch, PCH round-trip). getPointerWidthV(AS2)->32 stays deferred. Code +\ntest committed on wt/320-far-followups (5fa6d81).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7c0a00f	author	Will Norris
 7c0a00f	added	79
 7c0a00f	deleted	20

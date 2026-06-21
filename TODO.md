@@ -124,10 +124,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     (`MOSFarCall` → `DeclOrTypeAttr` riding the typedef; SemaType `handleFunctionTypeAttr` + TypeProperties.td
     serialization) makes a far-attributed fn-ptr type lower to `ptr addrspace(2)` (ConvertType arm); the
     `fp=far_leaf` decay materializes the p2 alias; `fp(x)` ptrtoints the loaded pointer into the slot.
-    `far_fnptr_var.c` e2e `0xFF` both emulators, regression-clean (corpus 7/7, csmith 0-mismatch). Deferred:
-    `getPointerWidthV(AS2)`→32 (for `sizeof`/aggregate/stored far pointers). All backend + F2 + typed-var
-    edits are gitignored `vendor/` recipes in the plans. WIP on `wt/320-far-followups` (`0004` stacked); the
-    recipes land in `0001` once `0004`'s relationship to `main` settles.
+    `far_fnptr_var.c` e2e `0xFF` both emulators, regression-clean (corpus 7/7, csmith 0-mismatch). All
+    backend + F2 + typed-var edits are gitignored `vendor/` recipes in the plans. WIP on
+    `wt/320-far-followups` (`0004` stacked); the recipes land in `0001` once `0004`'s relationship to `main`
+    settles.
+  - (a-F) ✅ **`sizeof(far*) == 4` DONE 2026-06-21** (`getPointerWidthV(AS2)`→32 **+** a `getTypeInfoImpl`
+    `Type::Pointer` arm for far *function* pointers, whose far-ness is an `ExtInfo` bit not an AS qualifier) —
+    aligns clang's C-level far-pointer size with the `p2:32:8` IR width (was `sizeof(FAR*)==2`). New
+    `far_sizeof.c` (far ptr in a struct field, deref'd, adjacent tag intact) → **0xD1** MAME+bsnes-jg;
+    regression-clean (whole far suite + corpus 7/7 + csmith 0-mismatch; AS2-only ⇒ inert). **Surfaced + fixed
+    a PRE-EXISTING crash:** `far_indir` SIGSEGV'd (independent of this change — root-caused via revert) because
+    `isFarSymbol` treated any `.far*`-sectioned symbol as far; restricted the section check to **functions**
+    (`isa<Function>`) so a `.far_rodata` datum taken as a near pointer keeps a 16-bit address (far_indir now
+    **0xF3** both emulators). [plan](docs/plans/2026-06-21-320-far-pointer-sizeof.md).
   - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
   Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
   [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).
