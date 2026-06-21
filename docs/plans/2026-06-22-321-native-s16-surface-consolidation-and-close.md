@@ -396,8 +396,10 @@ Mirror a pointer in [upstream-contribution-status](../upstream-contribution-stat
    TODO item (this plan's) is updated to **Phase-0 DONE** with the result; the unified-trigger synthesis lives in
    this plan + the roll-up's 0c block (the A16-threading and ALU-chain items already point at their own deferral
    docs — left untouched to avoid clobbering the hot shared tree; the unification cross-references them from
-   here). ROADMAP §5 + the upstream-status pointer are the remaining low-risk doc touches (the upstream paragraph
-   itself is drafted in this plan; posting is user-triggered).
+   here). **ROADMAP §5 now carries the consolidated step-5 acceptance note** (pointing at the 0b roll-up +
+   this plan), and **`upstream-contribution-status.md` folds the "stage-1 native-s16 measured-complete" pointer
+   into the Native-16-bit-codegen Future/blocked item** (the upstream paragraph itself is drafted in this plan;
+   posting rides the ABI-gated native-16-bit contribution, user-triggered).
 
 6. **Commit hygiene.** `git diff --cached --name-only` is exactly this plan + `dev/measure-native-s16-surface.sh`
    + the doc cascade — never `vendor/`, `0002`, a foreign patch, or `docs/transcripts/`. Triage any `## Inbox`

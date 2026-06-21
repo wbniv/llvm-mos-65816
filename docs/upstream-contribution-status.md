@@ -1,6 +1,10 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-21 (the **#320 far-pointer fork-side implementation body** grew to feature-complete
+**Last updated:** 2026-06-22 (the **#321 stage-1 native-s16 surface** is now **measured-complete** — consolidated
+host-side via `dev/measure-native-s16-surface.sh`; the drafted "stage-1 native-s16 is measured-complete" evidence
+paragraph lives in the [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md)
+and is folded into the *Native 65816 16-bit codegen* Future/blocked item below — still ABI-alignment-gated, not a
+new ready-to-post row. Previously 2026-06-21: the **#320 far-pointer fork-side implementation body** grew to feature-complete
 — clang `far`/`long_call` attribute (F2), typed `far_fn_t` variable, `sizeof(far*)==4`, far_indir crash fix;
 pushed `origin/wt/320-far-followups`. Still ABI-blessing-gated, so it stays *Future/blocked*, not a new
 ready-to-post item. Previously 2026-06-20: added the #321 CC frame-ABI design note (Ready-to-post #6); DWARF
@@ -188,6 +192,14 @@ Full internal record: [far-cc study + land plan](plans/2026-06-21-320-far-pointe
   [`docs/investigations/65816-xy16-index16-highbyte-clobber.md`](investigations/65816-xy16-index16-highbyte-clobber.md).
   Fixed fork-side as a **structural hardware invariant** (not an `xy16` special-case); carry that model into
   the upstream contribution. Blocked on the broader native-16-bit upstreaming (large; maintainer ABI alignment).
+  **Stage-1 surface measured-complete (2026-06-22):** `dev/measure-native-s16-surface.sh` consolidates the
+  per-op ALU/compare/shift/load-store + chains + cross-block M-flag + A16-threading surface — all at their
+  measured optimum; the sustained-16-bit kernel class is **−22 % aggregate** vs the 8-bit build (corpus 7/7),
+  while 8/16-interleave stress kernels are larger (opt-in/per-op-gated by design, lessons #1/#2) — with **one**
+  shared deferred core (RA-level 16-bit residency under register pressure). The drafted upstream "stage-1
+  native-s16 is measured-complete" paragraph is in the
+  [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md) (posting
+  rides this same ABI-gated native-16-bit contribution; user-triggered).
 
 > *(The ROADMAP-step-6 DWARF **test + docs** item moved up to **Ready to post now #5** on 2026-06-19 —
 > both halves are now drafted: the staged lit test + the `<output>.elf` doc note.)*

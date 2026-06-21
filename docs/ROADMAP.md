@@ -522,6 +522,21 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `0002` round-trips._
    [A16-threading plan](plans/2026-06-17-321-a16-threading.md)._
 
+   _**Consolidated step-5 acceptance + surface close-out (2026-06-22).** The per-increment paragraphs above each
+   proved their slice; **`dev/measure-native-s16-surface.sh`** now assembles the whole-surface map in one
+   artifact — it drives the three durable harnesses (compare-surface, a16-threading, zp-pressure) and adds the
+   step-5 acceptance table (`+mos-a16 -Os` vs the M1 8-bit/default output, same source). **Result (honest,
+   governing lessons #1/#2):** the sustained-16-bit-arithmetic class the bar names wins decisively —
+   dependent-chain **−63 %**, multi-value **−65 %**, `k_isort` **−39 %**, **aggregate −22 % (−220 B)**, corpus
+   **7/7** — so the step-5 *existence* bar is met; the 8/16-interleave **correctness stress kernels**
+   (`k_crc16` +27 %, `k_prng` +60 %, …) are *larger* under `+mos-a16` (pure `rep`/`sep`+`Imag16` cost — verified
+   no libcall asymmetry), which is exactly why the feature is **opt-in + per-op-gated, not blanket**. The
+   native-s16 surface is **measured-complete**: per-op ALU/compare/shift/load-store + chains + cross-block
+   M-flag + A16-threading all at their measured optimum, with **one** shared, pathological, deferred core —
+   RA-level 16-bit residency under register pressure (A16-threading Phase 3 ≡ the >14-live ALU-chain residual ≡
+   the `globals.c`/`a16regpress.c` `-Os` RA crash) — behind one trigger + one B0→B1→B2 spike recipe.
+   [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md)._
+
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
    the ROM's symbols.)
