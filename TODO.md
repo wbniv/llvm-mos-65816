@@ -118,9 +118,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     `getPointerWidthV(AS2)==16` + `ConvertType` canonicalization would make a miscompile landmine — a typed
     `far_fn_t fp;` variable surface is a clean future follow-up). `far_fnptr.c` rewritten to the **clean
     single-file `far` surface** (no asm / no `.set`); `far_leaf(0x5A)==0xFF` MAME+bsnes-jg, csmith 36/40
-    0-mismatch, `-verify-machineinstrs` clean. **(a) is feature-complete.** All backend + F2 edits are
-    gitignored `vendor/` recipes in the plan §6. WIP on `wt/320-far-followups` (`0004` stacked); the recipes
-    land in `0001` once `0004`'s relationship to `main` settles.
+    0-mismatch, `-verify-machineinstrs` clean. **(a) is feature-complete.** ✅ **typed far-fn-ptr VARIABLE
+    surface DONE 2026-06-21** ([plan](docs/plans/2026-06-21-320-far-fnptr-typed-variable.md)):
+    `far_fn_t fp = far_leaf; fp(0x5A)` — a `far` bit on the canonical `FunctionType::ExtInfo`
+    (`MOSFarCall` → `DeclOrTypeAttr` riding the typedef; SemaType `handleFunctionTypeAttr` + TypeProperties.td
+    serialization) makes a far-attributed fn-ptr type lower to `ptr addrspace(2)` (ConvertType arm); the
+    `fp=far_leaf` decay materializes the p2 alias; `fp(x)` ptrtoints the loaded pointer into the slot.
+    `far_fnptr_var.c` e2e `0xFF` both emulators, regression-clean (corpus 7/7, csmith 0-mismatch). Deferred:
+    `getPointerWidthV(AS2)`→32 (for `sizeof`/aggregate/stored far pointers). All backend + F2 + typed-var
+    edits are gitignored `vendor/` recipes in the plans. WIP on `wt/320-far-followups` (`0004` stacked); the
+    recipes land in `0001` once `0004`'s relationship to `main` settles.
   - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
   Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
   [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).

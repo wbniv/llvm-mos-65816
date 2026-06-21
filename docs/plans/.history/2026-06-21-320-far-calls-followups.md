@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/7c0a00f) | #320 (a) far fn pointers: clang F2 DONE — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/2d2a171) | #320 (a) far fn pointers: backend p2-value sub-project DONE + e2e verified — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/15df5fe) | #320 far-calls follow-ups: consolidate into a combined plan+handoff doc |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/93c7336) | #320 (a): p2-value legalization root-caused as a deep multi-layer 0004 sub-project |
@@ -13,6 +14,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+7c0a00f	author	Will Norris
+7c0a00f	added	79
+7c0a00f	deleted	20
+7c0a00f	files	1
+7c0a00f	body	Record the clang F2 front-end (MOS `far`/`long_call` attribute + call rewrite)\nas complete; (a) is now feature-complete (lands in 0001 once 0004 settles).\n\n- plan §6: full F2 recipe — Attr.td MOSFarCall sharing ParseKind="LongCall"\n  with MipsLongCall (interrupt-style, dodges the GNU-spelling duplicate-key\n  StringMatcher collision); SemaDeclAttr AT_LongCall target dispatch;\n  CGExpr.cpp emitMOSFarIndirectCallee + EmitCall call-site intercept;\n  far_fnptr.c clean rewrite. Plus the design rationale: function-attribute +\n  call-site rewrite, NOT a far-fn-ptr value *type* — a typed far_fn_t var would\n  need ConvertType->AS2 but getPointerWidthV(AS2)==16 disagrees with p2:32:8\n  (miscompile landmine); the typed-variable surface is a clean future follow-up.\n- plan §0/§8/§9: status table, verification, commit trail updated.\n- agent-handoff wt/320-far-followups row + TODO #320: (a) feature-complete.\n\nVerified: far_leaf(0x5A)==0xFF MAME+bsnes-jg, -verify-machineinstrs clean,\ncorpus 7/7, far_near_call+xcheck, csmith 36/40 0-mismatch. far_fnptr.c clean\nrewrite committed on wt/320-far-followups (285197d).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2d2a171	author	Will Norris
 2d2a171	added	115
 2d2a171	deleted	56

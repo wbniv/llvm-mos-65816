@@ -291,9 +291,13 @@ corpus 7/7, far_near_call + xcheck PASS, csmith 0-mismatch.
 away the attribute sugar; worse, clang's `getPointerWidthV(AS2)` reports **16** (not 32) so `sizeof(far*)`
 and the IR `p2:32:8` width disagree — a miscompile landmine. The function-attribute + call-site rewrite hits
 the *exact* proven IR with **zero** type-system surgery and **no** runtime far-pointer variable (the only p2
-value is the transient `ptrtoint(@__mos_far_<sym>)`). The typed-variable / indirect-through-`fp` surface is a
-clean **future** follow-up layered on a real 32-bit far-fn-ptr type (fix `getPointerWidthV` + a `Type::Pointer`
-AS2 arm); it is **not** needed for F2 and does not gate it.
+value is the transient `ptrtoint(@__mos_far_<sym>)`). The typed-variable / indirect-through-`fp` surface
+(`far_fn_t fp = far_leaf; fp(x);`) was built as a **follow-up** —
+[plan](2026-06-21-320-far-fnptr-typed-variable.md), DONE 2026-06-21: a `far` bit on the canonical
+`FunctionType::ExtInfo` makes a far-attributed function-pointer type lower to `ptr addrspace(2)`, the
+`fp = far_leaf` decay materializes the p2 alias, and `fp(x)` ptrtoints the loaded pointer into the slot.
+`far_fnptr_var.c` e2e `0xFF` on both emulators, regression-clean. (`getPointerWidthV(AS2)`→32 — for
+`sizeof`/aggregate/stored far pointers — is still deferred.)
 
 **Recipe (gitignored `vendor/` edits — durable record; land in `0001` once `0004` settles):**
 
