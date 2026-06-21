@@ -59,12 +59,11 @@ long→abs — `sta`/`lda` byte accesses **and** the native-s16 ALU absolute ops
 65816 program (lesson #3). It is **not** byte-identical to pre-fix default-65816 codegen (it is smaller),
 which is why the verification below leans on the differential (values unchanged), not byte-identity.
 
-## Verification (run in the `wt/320-packed24-incB` toolchain, which carried this fix; 2026-06-22)
+## Verification
 
-> The fix was built + verified in the `wt/320-packed24-incB` compiler worktree (own vendor + warm build),
-> then extracted to this lightweight worktree as the round-trip-verified `0007` patch. Re-running the full
-> both-emulators gate in a fresh compiler worktree is the optional belt-and-suspenders step; the evidence
-> below already establishes correctness (the differential is value-based, and abs/long read the same byte).
+> Initially built + verified in the `wt/320-packed24-incB` toolchain, then **re-verified on the full
+> `0001–0007` combined stack** in a fresh compiler worktree (`wt/320-near-abs-bank-relax`, off `main` after
+> `0006`'s static-init fix landed) — see §5. Both passes agree.
 
 ### 1. The fix does what it says (disasm), and far is preserved
 
@@ -116,16 +115,34 @@ A realistic far-pointer **table walked at runtime** in a 16-bit-ambient loop (16
 This near-abs fix additionally trims the direct packed-pointer access pattern (store/load a packed slot at a
 fixed address: byte-2 `8f/af` → `8d/ad`, −2 B).
 
+### 5. Full combined-stack gate (`0001–0007`, both emulators) — 2026-06-22
+
+Re-verified on a fresh compiler worktree (`wt/320-near-abs-bank-relax`): vendor reset to pristine, `0001–0007`
+applied fresh (so `0006`'s newly-landed static-init relocation fix and this `0007` are exercised *together*),
+full toolchain + SDK rebuilt, then:
+
+```
+corpus ......................... 7/7 passed
+packed24 (e2e) ................. PASS — 0xF3; slot 3 B; deref a7; bank byte materialized (MAME + bsnes-jg)
+packed24_table (static-init) ... PASS — packed 24 B vs far 32 B (−8 B, 25%); 8-entry table walked == 0xA5
+far suite (7) .................. far / far-bank1 / far_cast / far_arith / far_store / far_call / far_indir — all PASS
+a16 gates (6, long→abs) ........ a16bitchain/chainimm/chainld/localx/mixfold/sunfold — all PASS (disasm gate + MAME exec, both emulators)
+fuzz csmith 50 1 ............... 45/50 PASS, 0 xfail, 5 skip (0 mismatch, 0 crash, 0 error)
+```
+PASS — the combined `0001–0007` stack is correct on both emulators. The 6 a16 gates pass end-to-end (not just
+the host-side disasm count of §3), and `packed24_table` confirms `0006`+`0007` compose with no interaction.
+
 ## Files
 - `vendor/llvm-mos/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp` — the one-hunk fix → `0007`.
 - `dev/regen-patch-0007.sh` — regenerate + round-trip-verify `0007` (RESULT: PASS, 1 file, 28 lines).
 - `dev/a16{bitchain,chainimm,chainld,localx,mixfold,sunfold}.sh` — disasm gates made relaxation-form-tolerant.
 
 ## Status
-Fix DONE + verified. Landed as `0007` on `wt/320-near-abs-bank-relax`. **Not pushed** (coordinate — `0007`
-stacks after the other agent's in-flight `0006` static-init work; the two are independent files).
+Fix DONE + verified (own-stack **and** full `0001–0007` combined stack, §5). Landed as `0007` and **pushed to
+`origin/main`** (`ff02726`), stacked cleanly on `0006` (disjoint files — `0007` touches only `MOSAsmBackend.cpp`).
 
-### Optional follow-ups
-- Belt-and-suspenders: re-run the full both-emulators gate in a fresh compiler worktree with 0001–0007.
+### Follow-ups
+- ~~Belt-and-suspenders: re-run the full both-emulators gate on the combined `0001–0007` stack.~~ **DONE** (§5,
+  2026-06-22 — all green).
 - Upstreamable: this is a generic llvm-mos 65816 size fix (independent of #320/#321) — candidate for the
   upstream-contribution queue.
