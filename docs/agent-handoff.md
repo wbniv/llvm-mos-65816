@@ -14,7 +14,7 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 | `wt/321-track-a` | `/home/will/SRC/llvm-mos-65816-track-a` | #321 xy16 **Track A**: `requiredXWidth` 8-bit-indexed-family hardening ([plan](plans/2026-06-21-321-xy16-track-a-requiredxwidth-indexed-family-hardening.md)) | **✅ DONE — landed `46a39e6` on `main`** 2026-06-21. Compiler-changing worktree (own `vendor/` + warm-copied `build/`). The §3 memory-gated catch-all (`(mayLoad‖mayStore)&&reads X/Y→XW_X8`) **+** §3a index-reading-branch clause (closes the `JMP (abs,X)` `JMPIdxIndir` jump-table residual; user-confirmed in scope). **Verified:** default+a16 byte-identical 75/75 (gating) + xy16 byte-identical 75/75 + csmith 247/445 ROM-identical (inertness); corpus 7/7; xy16 suite + k_isort PASS; fuzz csmith 101–500 **0 mismatch/0 crash** (a seed-488 MAME timeout was QUIET-box contention vs `wt/320-far-cc`, re-verified PASS in isolation); **torture 60/0/0** (de-XFAIL'd rows stay XPASS); `-verify-machineinstrs` clean; `0002` round-trips, 0 foreign content. RED test not constructible (X8-pinned + LTO-narrows) → code-inspection hardening like `55ec505`. Landed in `0002`, **pushed to `origin/main`** (`d551f73`). **Worktree RETAINED — do NOT tear down until the #321/#320 work merges upstream** (user policy 2026-06-21; applies to all worktrees). Durable artifacts already on `main`, so removal loses nothing, but keep it until then. |
 | `wt/321-frame-abi` | `/home/will/SRC/llvm-mos-65816-frame-abi` | frame-ABI head-to-head: (a) DP-window + (b) stack-relative vs (c) soft-static ([plan](plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md)) | **RESOLVED — CONFIRMED-shelved (NULL)** 2026-06-20: A0 census found 0/13 realistic fns profit (frames are ~unused; locals live in `__rc`). A1–M not built. Durable artifacts (`frameabi_*`) **MERGED to `main`** `f114c42`; CC note ready to post (user-triggered). **Branch RETAINED until notified** (holds the inert, un-landed (a)/(b) `0002` spike) — do NOT tear down. |
 | `wt/321-cmpval` | `/home/will/SRC/llvm-mos-65816-cmpval` | #321 ordering-as-value branchless materialization — the 16-bit-`rol` form (candidate A) ([plan](plans/2026-06-21-321-ordering-value-branchless-banked.md)) | **RESOLVED — WON'T-DO (net-negative)** `74f04f4` 2026-06-21. Compiler-changing worktree (own `vendor/` + warm `build/`). Candidate A BUILT in full (`ROLAcc16` + `LDAImm16` + `G_CARRY_BOOL16` + `selectCarryBool16` + `legalizeZExt` rewrite; `lda #$0000; rol a` at M16). Correct + `-verify-machineinstrs` clean + DEFAULT byte-identical (gated), **wins in isolated leaves** (uge_v 25→23) **but REGRESSES every realistic a16 program** — a16cmpaudit **+654 B** (both-widths) / **+78 B** (s16-direct-gated), whole a16 corpus **+340 B, ZERO wins** (worse than the 8-bit v1's +262). Diamond is optimal (folds inversion free; M8 tail matches ambient mode; keeps the bool in `X`, not an `Imag16` ZP slot → no spill cascade). Both 8-bit (v1) AND 16-bit (candidate A) forms now closed; **no `0002` change ships** (docs-only close-out). **Worktree TORN DOWN 2026-06-21** (net-negative spike, nothing to merge); the candidate-A implementation is preserved as a durable patch `docs/plans/spikes/2026-06-21-321-ordering-value-candidate-a-spike.patch` (the base for the deferred mode-agnostic lever if ever revived). |
-| `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — Phases 0–4 done (s32 fixed); Phase 5 (sampled CI) open | ~~**MERGED** `dd5616b` → main 2026-06-19~~ |
+| `wt/321-csmith` | `/home/will/SRC/llvm-mos-65816-csmith` | Csmith differential fuzzer — Phases 0–5 DONE (s32 fixed; sampled CI wired `e865dff`) | ~~**MERGED** `dd5616b` → main 2026-06-19~~ |
 | `wt/321-xy16` | `/home/will/SRC/llvm-mos-65816-xy16` | xy16 index-register-mode implementation (Layers 1–5) | ~~**MERGED** `35604c7` → main 2026-06-18~~. ~~**OPEN:** Csmith seeds 247+445 `+mos-xy16`-only runtime miscompiles~~ **✅ RESOLVED `2d8ab51` (2026-06-20, on `main`).** cvise-reduced to an 8-line repro + root-caused: a non-index 16-bit value classed `Xc16` was loaded into X16 and left live across an 8-bit-index op whose narrowing `sep` zeroes the X/Y high byte. Fixed via **approach B** (`selectXY16`'s `G_LOAD16_ABS` emits the direct `LDXAbs16`/`LDYAbs16` only when the value is genuinely used as an index; else lowers through the accumulator). Verified 4-way both emulators + csmith 101–500 (0 mismatch/400) + c-torture 60/60; a16/DEFAULT byte-identical (gated). Arc + refuted A′/#2: [investigation](investigations/65816-xy16-index16-highbyte-clobber.md) · [plan](plans/2026-06-20-321-xy16-seed445-cvise-reduction.md). (Separate latent **Track A** `requiredXWidth` hardening remains a follow-up.) |
 | `main` | `/home/will/SRC/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |
 | `main` | `/home/will/SRC/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): corpus trigger check | ~~CLOSED WON'T-DO~~ — 0/6 progs, 0 B, `f52d5b8` |
@@ -60,8 +60,9 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
   sha256-verified → gitignored `vendor/c-torture/`) + `python3 tools/torture_filter.py` (host-only
   compile/link filter → `examples/65816/torture/{inscope,unsupported}.tsv`, 1253/1656 in-scope; `mos-clang`
   runs **directly on the host**, no Docker). Then the emulator differential gate:
-  `dev/run.sh torture [N] [--opt -Os|-O1] [--start K] [--no-bsnes]` (`tools/torture_run.py`) — DEFAULT
-  build is the oracle, so a non-PASS default ⇒ **SKIP** and any FAIL is a real defect; known a16 crashes
+  `dev/run.sh torture [N] [--opt -Os|-O1] [--start K] [--sample N [--sample-seed S]] [--no-bsnes]`
+  (`tools/torture_run.py`; `--sample N` = a seeded pseudo-random subset of N tests, reproducible — the
+  sampled-CI selector) — DEFAULT build is the oracle, so a non-PASS default ⇒ **SKIP** and any FAIL is a real defect; known a16 crashes
   (incl. `a16-zp-pressure-overflow`) ⇒ XFAIL. **All known a16/xy16 runtime miscompiles are now FIXED**
   (`xfails.tsv` has no data rows as of 2026-06-20: 13 a16 by the frame-index fix, then all 4 xy16 +
   `k_isort` by the `requiredXWidth` index-width fix — `f2d65c2`, `55ec505`). A new FAIL is a regression.
@@ -74,13 +75,22 @@ live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
   reproduce an X=16-ambient bug with a minimal global-array test through the (LTO) differential harness;
   reach for a computed-index chase or use the c-torture rows.
 - Long ops: background them and monitor; don't block on `sleep`.
-- **CI** (`.github/workflows/smoke.yml`, `workflow_dispatch`-only): the `smoke` job boots the corpus in
-  MAME; the `xcheck` job builds the from-source toolchain (cached) + SDK, then `dev/run.sh xcheck` (bsnes-jg)
-  and the secret-gated `dev/run.sh corpus-a16`. Dispatch: `gh workflow run snes-smoke`. **Monitor a run
-  with `task ci-watch` / `dev/ci-watch.sh [RUN_ID|--once]`** — streams step transitions + a heartbeat + the
-  final verdict and exits with the run's conclusion (background it; GitHub exposes in-progress step *logs*
-  only in the web UI, so ci-watch tracks structure, not log text). Both CI legs proven green: run
-  27823207476 (2026-06-19, cold ~1h46m; cached thereafter).
+- **CI** (`.github/workflows/smoke.yml`, `workflow_dispatch`-only): **four jobs.** `smoke` boots the corpus
+  in MAME; `xcheck` builds the from-source toolchain (cached) + SDK, then `dev/run.sh xcheck` (bsnes-jg) and
+  the secret-gated `dev/run.sh corpus-a16`. **`torture` + `fuzz-csmith`** (added 2026-06-21, `e865dff`) run
+  the #321 c-torture (Phase 3) + Csmith (Phase 5) differential fuzzers — both `needs: xcheck` (reuse its
+  cached toolchain) and run the same **4-way** gate (host==default==a16==xy16 on MAME + a16 on bsnes-jg).
+  `torture` runs in-container (fetches the suite, seeded `--sample`); `fuzz-csmith` runs **host-side** (installs
+  MAME, builds `vendor/csmith`, host `MOS_TOOLCHAIN`). A `workflow_dispatch` **`mode`** input picks `sampled`
+  (default; seeded subset) or `full` (whole c-torture suite + csmith 1..500); **`sample_seed`** makes the
+  subset reproducible. A commented `schedule:` block (auto-selects `full`) is ready for when public. All
+  secret-gated (skip — don't fail — without the SPC700 BIOS). Dispatch: `gh workflow run snes-smoke`
+  (`-f mode=full` for the whole sweep). **Monitor a run with `task ci-watch` / `dev/ci-watch.sh
+  [RUN_ID|--once]`** — streams step transitions + a heartbeat + the final verdict and exits with the run's
+  conclusion (background it; GitHub exposes in-progress step *logs* only in the web UI, so ci-watch tracks
+  structure, not log text). The `smoke`/`xcheck` legs are proven green: run 27823207476 (2026-06-19, cold
+  ~1h46m; cached thereafter); `torture`/`fuzz-csmith` are locally green (sampled 4-way), on-runner dispatch
+  pending.
 
 ## The correctness gate + micro-test pattern
 

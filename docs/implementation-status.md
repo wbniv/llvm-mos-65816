@@ -11,8 +11,9 @@ For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO
 bank boundaries, **runtime far-pointer deref/cast/arithmetic (Inc 3 = 3a+3b+3c)**, **direct far
 CALLS (JSL/RTL, Inc 4 Phase 1)**, and **mixed-banking far→near calls (via the `__call_near_from_far`
 thunk, shipped to `main` 2026-06-21)**, all on two emulators. The far-pointer calling convention is
-next — to be settled by **building every ABI variant and measuring** (no longer upstream-gated; ships
-as `0004`). The five-address-space model remains; **far function pointers (a)** are now **in progress** —
+**in progress** — variant (a) Imag32 is built & two-emulator verified (`wt/320-far-cc`), with the other
+ABI variants + the measure-and-ship-the-winner step remaining (no longer upstream-gated; ships as `0004`).
+The five-address-space model remains; **far function pointers (a)** are now **in progress** —
 the indirect-call **mechanism is built + verified** (IR-rep #1), with the p2-value path, the F2 front-end,
 and the e2e runtime gate still to land.
 
@@ -36,7 +37,7 @@ census short-circuited the build at the measurement step.
 | Mixed-banking — a far function calling a **near** function (`__call_near_from_far` thunk) | ✅ **Done + shipped to `main` (Inc 4 follow-up b, 2026-06-21, `5717f6b`)** — `lowerCall` routes far→near through the generic bank-0 thunk (`pea .Lback-1; jmp (__rc18); rtl`) reached by `JSL` (`0001`, HasW65816-gated, a16-free). `far_near_call == 0xE0` MAME+bsnes-jg, corpus 7/7, thunk `--gc-sections`'d from near ROMs (byte-identical). Lifts the "far must be leaf-or-far-only" constraint. [plan](plans/2026-06-21-320-far-calls-followups.md) |
 | Far function pointers — indirect call through a far code pointer (`__call_indir_far`) | 🔧 **Inc 4 follow-up (a) — IN PROGRESS (mechanism built + verified, 2026-06-21, `560900c`)**. Layer-3 finding: a far fn ptr **can't** be a `ptr addrspace(2)` IR callee (LLVM forbids a non-program-addrspace callee; `addrspacecast p2→p0` drops the bank), so the 24-bit target is threaded via **IR-rep #1** — a `set_far_target` volatile store to a runtime slot `__mos_far_target` + `call @__call_indir_far`. `lowerCall` makes that a `JSL`; the stub `jml (__mos_far_target)` + the 4-byte slot verify clean on hand-authored i32-target IR. **Remaining (substantial):** (1) p2-value legalization (`ptrtoint(p2)→i32`/p2-param decompose crash; `&far_sym`→24-bit); (2) clang **F2** `far` attr + CodeGen; (3) e2e runtime gate. WIP on `wt/320-far-followups` (`0004` stacked); gated on `0004` reaching `main`. [plan](plans/2026-06-21-320-far-calls-followups.md) |
 | Far tail calls | ⬜ Separate follow-up — already conservative-safe (tail peephole keys on `JSR`, so a `JSL` is never tail-converted) |
-| Far-pointer calling convention (pass/return `p2`) | ⬜ **Inc 4 Phase 2 — build all ABI variants & measure** ([plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md); no longer upstream-gated; must ship one — tie → Imag32; reuses the frame-ABI harness) |
+| Far-pointer calling convention (pass/return `p2`) | 🔧 **Inc 4 Phase 2 — IN PROGRESS** (`wt/320-far-cc`, `10a5fc0`): variant **(a) Imag32** P0+A0 **built & two-emulator verified** — a 32-bit far ptr returned-from + passed-into noinline calls round-trips `0xF3` on MAME+bsnes-jg, default byte-identical, csmith 30 seeds 0-mismatch; needed `Imag32 ∈ AnyRegBank`; delta = stacked **`0004-320-far-cc.patch`**. **Pending:** variants (b)/(c)/(d) + the bytes/cycles harness + ship-the-winner (only the winner lands; tie → Imag32). [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md) |
 | Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Runtime far-pointer arithmetic (`G_PTR_ADD` on AS2) | ✅ **Done (Inc 3c, 2026-06-20)** — `fp++` via the symmetric `s32→4×s8 G_UNMERGE_VALUES` mirror (`legalizeUnmergeS32ToBytes`, a16/`0002`; also closes a latent `uint32_t` shift-≥8 gap); `dev/run.sh far_arith` + `xcheck`, MAME+bsnes-jg PASS. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Far data > 2 banks | ⬜ Deferred past Inc 3 (far load/store proven for ≤2 banks; multi-bank data placement not yet exercised) |
@@ -213,9 +214,9 @@ work (the #320 far calling convention and xy16 ABI), tracked in *What's next* an
 
 ## What's next (prioritized)
 
-1. **#320 far-pointer calling convention** — build all ABI variants (Imag32 quad / Imag16+bank-byte /
-   A:X+Y / stack) behind feature flags & measure; must ship one (tie → Imag32), reusing the frame-ABI
-   harness. Lands as `0004` — the gate for far function pointers (a).
+1. **#320 far-pointer calling convention** — IN PROGRESS (`wt/320-far-cc`): variant (a) Imag32 built &
+   two-emulator verified (`0004`); remaining = variants (b)/(c)/(d) + bytes/cycles harness + ship-the-winner
+   (tie → Imag32). The gate for far function pointers (a).
    [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)
 
 2. **#320 far function pointers (a)** — IN PROGRESS: the indirect-call mechanism is built + verified
