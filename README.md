@@ -23,8 +23,12 @@ follow; the codegen they'd share is the prize.
 **M0 — SNES test bench: complete.** Valid bootable LoROM `.sfc` from C, 7/7 corpus
 tests green in CI, dual-emulator (MAME + bsnes-jg) differential.
 
-**M1 — Far pointers: substantially complete.** 24-bit absolute-long load/store
-working across banks; far calls (JSL/RTL) deferred pending upstream ABI blessing.
+**M1 — Far pointers: complete.** 24-bit absolute-long load/store across banks,
+runtime far-pointer deref/cast/arithmetic, direct far calls (JSL/RTL),
+mixed-banking far→near calls, and **far function pointers** (the indirect-call
+mechanism + the `far`/`long_call` attribute, a typed `far_fn_t` variable, and
+`sizeof(far*)==4`) — all two-emulator verified. The far-pointer **calling
+convention** (passing/returning `p2` by value) is the remaining piece.
 
 **M2 — 16-bit accumulator codegen: in progress.** `+mos-a16` enables the 65816's
 native 16-bit accumulator mode. Implemented and differential-verified on both

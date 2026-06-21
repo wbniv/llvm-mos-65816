@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/2cf27a4) | #320 (a) far pointers: sizeof(far*)==4 + far_indir crash fix — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5e9cdab) | #320 (a) far fn pointers: typed far_fn_t variable surface DONE — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/7c0a00f) | #320 (a) far fn pointers: clang F2 DONE — docs |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/2d2a171) | #320 (a) far fn pointers: backend p2-value sub-project DONE + e2e verified — docs |
@@ -15,6 +16,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+2cf27a4	author	Will Norris
+2cf27a4	added	7
+2cf27a4	deleted	2
+2cf27a4	files	1
+2cf27a4	body	Record Layer F (sizeof(far*)==4) and the pre-existing far_indir crash fix as\ndone.\n\n- TODO #320 (a-F): DONE — getPointerWidthV(AS2)->32 + getTypeInfoImpl arm\n  (far data + far function pointers both sizeof 4); far_sizeof.c 0xD1; the\n  isFarSymbol .far*-section check restricted to functions (fixes far_indir).\n- far-calls-followups plan §6: corrected the isFarSymbol recipe note (function-\n  only section check + why).\n- agent-handoff wt row: sizeof + far_indir-fix summary; whole far suite (12\n  ROMs) + corpus 7/7 + csmith 0-mismatch green both emulators.\n\nFull plan + verification: docs/plans/2026-06-21-320-far-pointer-sizeof.md (on\nwt/320-far-followups, ebdb0d1). Lands in 0001 with the rest of (a) once 0004\nsettles.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5e9cdab	author	Will Norris
 5e9cdab	added	7
 5e9cdab	deleted	3

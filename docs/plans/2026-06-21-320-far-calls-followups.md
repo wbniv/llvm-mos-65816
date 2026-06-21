@@ -31,8 +31,10 @@ flags → `#mos24segmentlo/hi` + `#mos24bank`, composed into an `Imag32`) · ✅
 of a `p2` *value* legalized by listing `PF` as a value type). The **e2e gate**
 (`examples/65816/far_fnptr.c` + `dev/far_fnptr.sh`, wired into `dev/run.sh` + `dev/xcheck.sh`) **PASSES on
 MAME + bsnes-jg** (`far_leaf(0x5A)==0xFF`, bank `$01`, `R_MOS_ADDR24_BANK` reloc, `jsl __call_indir_far`;
-a16-only like far_cast/far_indir). Recipes for all backend edits: §6. **The ONLY remaining piece is the
-clang F2 `far` attribute + call CodeGen** — pure front-end ergonomics; the backend needs nothing more.
+a16-only like far_cast/far_indir). Recipes for all backend edits: §6. ~~The ONLY remaining piece is the
+clang F2 `far` attribute + call CodeGen~~ — *at the time of this historical snapshot* F2 was the last piece;
+it landed (`285197d`), as did the typed `far_fn_t` variable + `sizeof(far*)==4` follow-ups. **(a) is now
+fully closed** — see the live status above.
 
 ---
 
@@ -358,13 +360,15 @@ per policy). Committed there: `1ea7507`/`7ee5f6f` (the (a) stub, CMakeLists, the
 **Tracked, committed there (`579b911`):** `examples/65816/far_fnptr.c`, `dev/far_fnptr.sh`, the `dev/run.sh`
 + `dev/xcheck.sh` wiring.
 
-**To resume (only F2 remains):**
-1. `cd /home/will/SRC/llvm-mos-65816-far-followups`
-2. Confirm the warm toolchain + e2e: `dev/run.sh corpus` (7/7), `dev/run.sh far_fnptr` (PASS 0xFF),
-   `dev/run.sh xcheck` (all far ROMs PASS incl. `far_fnptr`).
-3. Implement F2 (§6 "clang F2 front-end") in `clang/` (the only change left), then `dev/run.sh toolchain`
-   (confirm `build/llvm-mos-install/bin/clang-23` mtime advanced — the `clang` symlink has a stale mtime).
-   Make the single-file far-fn-ptr call work (replace the `.set`-alias hand-emulation in `far_fnptr.c`).
+**To resume — (a) is FULLY DONE; nothing remains here.** The clang **F2** front-end landed (`285197d`), as did
+the two follow-ups on their own plans: the **typed `far_fn_t` variable** surface
+([plan](2026-06-21-320-far-fnptr-typed-variable.md), `5fa6d81`) and **`sizeof(far*)==4`**
+([plan](2026-06-21-320-far-pointer-sizeof.md), `ebdb0d1`, which also fixed a pre-existing `far_indir` crash).
+The whole far suite (12 ROMs) + corpus 7/7 + csmith 0-mismatch pass on both emulators; pushed
+`origin/wt/320-far-followups`. To re-verify: `cd /home/will/SRC/llvm-mos-65816-far-followups` then
+`dev/run.sh far_fnptr` / `far_fnptr_var` / `far_sizeof` (+ `dev/run.sh xcheck`). The only forward work for
+#320 is the far-pointer **calling convention** (`0004`, `wt/320-far-cc`), and landing all of (a)'s recipes in
+`0001` once `0004`'s relationship to `main` settles.
 
 **Gotchas:**
 - The release build SIGSEGVs on these p2 crashes; **always use the asserts build to root-cause**.
@@ -410,7 +414,13 @@ composes cleanly with the MOS-target backend edits.
 - **main:** `5717f6b` ship (b) far→near · `560900c` (a) call mechanism built+verified ·
   `5fd0ff5` Layer-3 IR-callee finding · `93c7336` p2-value multi-layer root-cause + Layers 1/2 fixed ·
   `15df5fe` consolidate plan+handoff.
-- **worktree `wt/320-far-followups`:** `dd33017` (b) · `1ea7507` (a) stub+0004 · `7ee5f6f` (a) global-slot
-  stub · `579b911` (a) backend p2-value sub-project DONE (Layer 3 + Gap A + Gap B, recipes §6) + e2e
-  `far_fnptr` verified both emulators · **(a) clang F2 — the `far`/`long_call` attribute + call-rewrite;
-  `far_fnptr.c` rewritten to the clean single-file surface; e2e `0xFF` MAME+bsnes-jg, regression-clean.**
+- **worktree `wt/320-far-followups`** (pushed `origin/wt/320-far-followups`): `dd33017` (b) · `1ea7507` (a)
+  stub+0004 · `7ee5f6f` (a) global-slot stub · `579b911` (a) backend p2-value sub-project DONE (Layer 3 +
+  Gap A + Gap B, recipes §6) + e2e `far_fnptr` verified both emulators · `285197d` **(a) clang F2** — the
+  `far`/`long_call` attribute + call-rewrite; `far_fnptr.c` to the clean single-file surface · `5fa6d81`
+  **(a) typed `far_fn_t` variable** ([plan](2026-06-21-320-far-fnptr-typed-variable.md)) — `far` bit on
+  `FunctionType::ExtInfo` → `ptr addrspace(2)`; `far_fn_t fp = far_leaf; fp(x)` · `ebdb0d1` **(a)
+  `sizeof(far*)==4`** ([plan](2026-06-21-320-far-pointer-sizeof.md)) — `getPointerWidthV(AS2)`→32 +
+  `getTypeInfoImpl` arm; **+ fixed a pre-existing `far_indir` crash** (`isFarSymbol` `.far*` section check
+  restricted to functions) · `cf34086` triage. **(a) is fully closed; whole far suite (12 ROMs) + corpus
+  7/7 + csmith 0-mismatch on both emulators.**
