@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/ebfc95e) | #320 packed-24 (AS3) Increment B: store/load/deref a 3-byte packed far pointer |
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/6e580b5) | #320 packed-24: worktree torn down (Increment B deferred until F2 lands on main) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/008eab5) | #320 packed-24: Increment A DONE (3-byte type), Increment B blocked on 24-bit width |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/fe55a01) | #320 five-space: re-evaluate — far-data value type was BUILT by the F2 agent |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/05cda9c) | #320 far-value evidence: committed sample programs + compile results (proof) |
@@ -8,6 +10,16 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/caef3e9) | #320 five-address-space model: plan + Phase 0 census (packed-24/zero-bank = measured nulls) |
 
 <!--history-meta v1
+ebfc95e	author	Will Norris
+ebfc95e	added	66
+ebfc95e	deleted	31
+ebfc95e	files	1
+ebfc95e	body	Codegen to USE packed far pointers, built on post-F2 `main` (F2 precondition gate\nPASS: sizeof(far*)==4, far store/load/array/struct legalize clean). Shipped as the\nstacked 0006-320-packed24.patch (regen: dev/regen-patch-0006.sh) — NOT folded into\n0001 because packed-24 edits files 0004/0005 also touch (folding would risk absorbing\nforeign hunks; same reason 0004/0005 were stacked).\n\nIncrement B was not the predicted s24-narrowing job. Two findings:\n 1. CodeGenPrepare::optimizeLoadExt crashed on a 24-bit pointer load (getValueType ->\n    getPointerTy -> the invalid MVT::i24). Fixed by getPointerTy(AS_FarPacked)->i32:\n    a packed pointer's register/value form IS the 32-bit far form; only its 3-byte\n    memory footprint comes from the datalayout. One target hook fixes every generic\n    IR-pass site.\n 2. The artifact combiner only looks through TRUNC/SEXT/ZEXT/ANYEXT, not inttoptr/\n    ptrtoint, so an s24 routed via ptrtoint would never fold (and there is no MVT::i24\n    / 24-bit regclass to select it). Bridge p3<->3xs8 with G_MERGE/G_UNMERGE{PFP,S8}\n    instead; in every shape clang emits (cast->store, load->cast, packed->packed copy)\n    the bridge merge directly feeds the consuming unmerge -> the basic unmerge(merge)\n    fold removes it. No 24-bit value ever reaches the selector.\n\nImplementation (all AS_FarPacked-gated, default + non-AS3 codegen byte-unchanged):\n - getPointerTy(AS_FarPacked)->i32 (MOSISelLowering)\n - PFP=LLT::pointer(3,24) in G_ADDRSPACE_CAST + the G_LOAD/G_STORE value-type sets\n - legalizeAddrSpaceCast PFP arm (p2<->p3 via the 3 shared low bytes)\n - legalizePackedPtrAccess (p3 load/store = 3-byte access bridged via {PFP,S8})\n\nVerified (the bar):\n - Differential both emulators: dev/run.sh packed24 (new e2e, far ptr in bank $01)\n   corpus_result==0xF3 on MAME AND bsnes-jg -> the bank byte survives 3-byte packing.\n - -verify-machineinstrs clean (incB_use.c, the 4-shape table program, packed24_e2e.c).\n - Non-breaking: corpus 7/7; far suite (bank1/cast/arith/store/call) PASS; fuzz 50\n   0-mismatch.\n - Measured win: 16-entry table 64 B -> 48 B (-16 B, -25%); ~neutral access cost\n   (x3 index math offset by one fewer pointer byte loaded).\n\nNew: examples/65816/packed24/packed24_e2e.c + dev/packed24.sh (dev/run.sh packed24),\nwired into dev/xcheck.sh. Worktree wt/320-packed24-incB retained until upstream merge.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_016UaEGRGLhZFsejueUD9cnj
+6e580b5	author	Will Norris
+6e580b5	added	10
+6e580b5	deleted	4
+6e580b5	files	1
+6e580b5	body	dev/worktree-teardown.sh wt/320-five-space (12G reclaimed; durability check passed —\nall tracked work on main). Increment B deferred until the F2 far-value work lands on\nmain: building packed-24 off pre-F2 main would rebase onto post-F2 main later, and the\nedits overlap F2's (getPointerWidthV/datalayout/far legalizer); packed-24 is the 3-byte\nstorage form of F2's now-storable far value, so it extends that base. Durable artifacts\nkept on main (Increment A patch + examples/65816/packed24/ fixtures + plan recipe).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 008eab5	author	Will Norris
 008eab5	added	38
 008eab5	deleted	0

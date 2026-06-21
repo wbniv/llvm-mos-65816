@@ -62,8 +62,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `dev/run.sh packed24` (new e2e, bank $01) `0xF3` MAME **and** bsnes-jg (bank byte survives 3-byte
   packing); `-verify-machineinstrs` clean; corpus 7/7; far suite PASS; `fuzz 50` 0-mismatch; storage
   −16 B/−25% (16-entry table 64→48 B), ×3 index cost. Worktree RETAINED until upstream merge.
-  **Still open in this item:** zero-bank (AS4) still deferred (≈ near ptr); post the upstream note (C1 +
-  pow2 + census) — user-triggered. [handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
+  **Still open in this item — next batch = packed-24 productionization**
+  ([handoff](docs/plans/2026-06-21-320-packed24-productionization-handoff.md)): (A) measure the win in
+  *realistic* 16-bit-ambient context (the −25% is synthetic — need a runtime-walked banked far-ptr table,
+  net-of-access-cost, with a break-even size); (B) fix the byte-2 absolute-long access cost (bytes 0,1 use
+  `abs` but byte 2 / the A-register byte uses `8f`/`af` `R_MOS_ADDR24` on a *near* slot → ~1 wasted
+  byte/access); (C) stretch: a `__far_packed` spelling. Separate threads: zero-bank (AS4) still deferred
+  (≈ near ptr); post the upstream note (C1 + pow2 + census) — user-triggered.
+  [incB handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
   [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
@@ -950,4 +956,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fp:a5f1db95f5a9627a fp:5221ad4b75df9534 fp:78cda9a654aa2b5f fp:fde87b8fe11d4df6 -->
 <!-- triaged 2026-06-21: RESOLVED — the land plan now has a §Verification (2026-06-21) section with PASS recorded (round-trip empty over clang/+MOS/ except the 2 documented drift/stale files; a16-free + 0002/0003-sha-unchanged + sequence-apply all PASS). Landing is done; nothing left to run. fp:a51d6afac2a18fef -->
 <!-- triaged 2026-06-21: the packed24-incrementB-handoff §3 "Verification gate" is INSTRUCTIONS for the future agent who builds Increment B (the bar THEY must clear), not a verification to run now — Increment B is deferred until F2 lands on main. Nothing to verify here; covered by the curated M1 five-space item + its handoff link. fp:3d3c94fe546a028c -->
+- [verify] **2026-06-21-320-packed24-productionization-handoff** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-packed24-productionization-handoff.md](docs/plans/2026-06-21-320-packed24-productionization-handoff.md)_  <!-- fp:93f3ef0f25357389 -->
 <!-- END auto-captured-deferrals -->

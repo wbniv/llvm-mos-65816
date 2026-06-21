@@ -500,6 +500,15 @@ Worktree `wt/320-packed24-incB` RETAINED until upstream merge (user policy). Dur
 wired into `dev/xcheck.sh`), and this record. (Increment A's recipe + the original blocker are preserved
 above and in `docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch`.)
 
+**Follow-ups (next batch — [productionization handoff](2026-06-21-320-packed24-productionization-handoff.md)):**
+(A) **realistic-context measurement** — the −25% is a *synthetic* table number; lesson #2/#3 demand a
+whole-program, runtime-walked banked far-pointer table measured net-of-access-cost (with a break-even
+table size), both `AS_Far` and `AS_FarPacked`. (B) **byte-2 absolute-long access cost** — confirmed: a
+packed access stores/loads bytes 0,1 via `abs` but **byte 2 (the A-register byte) via absolute-long**
+(`8f`/`af`, `R_MOS_ADDR24`) even though the slot is a *near* global → ~1 wasted byte/access-site; make
+the A-byte select `abs` when the base is near (gate conservatively). (C) stretch: an ergonomic
+`__far_packed` spelling. zero-bank (AS4) + the upstream-note posting remain separate threads.
+
 ---
 
 ## Phase 4 — docs + upstream reconciliation
