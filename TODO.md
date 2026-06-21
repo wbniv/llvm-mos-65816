@@ -49,11 +49,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   limit). **0b/Phase 3:** packed-24 would size-optimize *storing a far pointer*, but **storing far pointers
   doesn't work at all yet** → packed-24 optimizes a non-existent capability ⇒ **DEFER** behind the
   far-pointer-value-completion item above (NOT a null — the capability is wanted; the byte-packing is the
-  premature part). Zero-bank ≈ a near pointer ⇒ marginal. **Update 2026-06-21 (re-eval):** the prerequisite
-  (storing far pointers) is now **DONE** by the F2 agent, so packed-24 is technically **unblocked** — but
-  still a deferred size-opt: build only on **measured byte-pressure**, via `LLT` + a 3-byte ZP class
-  (`Imag24`), **never `MVT::i24`** (0a). Remaining: post the upstream note (C1 finding + corrected pow2
-  fact + census) — user-triggered.
+  premature part). Zero-bank ≈ a near pointer ⇒ marginal. **Update 2026-06-21 (user said build it):**
+  measured the win = **25% storage** on far-ptr tables (16: 64→48 B) **but a ×3-index cost** (3-byte
+  elements) — opt-in so it never regresses non-users. **Increment A DONE on `wt/320-five-space`** (the
+  3-byte TYPE: `AS_FarPacked=3` + datalayout `p3:24:8` + clang width; `sizeof(packed*)==3`, table 48 B,
+  **corpus 7/7**). **Increment B (codegen to USE packed ptrs) BLOCKED on 24-bit width** — the `p2↔p3`
+  cast + `p3` load/store route through `s24`, which the backend doesn't legalize (only `s8/s16/s32`), and
+  the 3-byte granularity breaks 2-source merges. Genuine novel-s24-width GISel effort (multi-iteration,
+  ~20-min rebuilds) → **deferred** unless the s24 work is worth it for a speculative opt. Recipe+blocker:
+  [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md). Also remaining: post the
+  upstream note (C1 + pow2 + census) — user-triggered.
   [plan](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the

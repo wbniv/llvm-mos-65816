@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/fe55a01) | #320 five-space: re-evaluate — far-data value type was BUILT by the F2 agent |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/05cda9c) | #320 far-value evidence: committed sample programs + compile results (proof) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/f84efcd) | #320 five-space: Phase 3 (cast/value-state matrix) + correct the verdict (defer, don't null) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/d038c3a) | #320 five-space plan: expand 0a (representability) + tie it to the upstream #320 response |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/caef3e9) | #320 five-address-space model: plan + Phase 0 census (packed-24/zero-bank = measured nulls) |
 
 <!--history-meta v1
+fe55a01	author	Will Norris
+fe55a01	added	47
+fe55a01	deleted	4
+fe55a01	files	1
+fe55a01	body	Re-evaluated after the F2 agent finished. The desirable work this plan surfaced\n("complete the far-pointer data-value type") was BUILT by them, not just unblocked.\nVerified by compiling examples/65816/far-value-evidence/ against their rebuilt toolchain\n(wt/320-far-followups, clang-23 @ 2026-06-21 19:36): under +mos-a16, store/load/array/\nstruct a far pointer + sizeof==4 + far->near cast ALL compile (vs all-FAIL on main).\ngetPointerWidthV gained case 2:return 32; PF is a storable value type. Done, not ours to\nre-implement (ABI-gated, in 0004+recipes, not on main).\n\ndp->near cast = pre-existing UPSTREAM bug (fails on plain mos6502) -> upstream issue.\nNet: no clean in-scope codegen left for us here — value type done (theirs), dp->near\nupstream, packed-24/zero-bank deferred (now unblocked; build only on measured byte-\npressure, via LLT+Imag24, never MVT::i24).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 05cda9c	author	Will Norris
 05cda9c	added	3
 05cda9c	deleted	1

@@ -431,6 +431,44 @@ So there is **no clean, in-scope codegen left for *us* to implement here**: the 
 
 ---
 
+## Build packed-24 (user-directed 2026-06-21) — Increment A DONE; Increment B blocked on 24-bit width
+
+User directed building packed-24 ("measure first"). Measurement + feasibility (above): feasible without
+`MVT::i24`, 25% storage win, ×3-index cost, opt-in. Built on **`wt/320-five-space`** (off `main`).
+
+### Increment A — the 3-byte packed-far TYPE: **DONE + verified + non-breaking**
+
+Recipe (gitignored `vendor/` edits on `wt/320-five-space`):
+1. `MOSInstrInfo.h` — `enum AddressSpace { …, AS_Far, AS_FarPacked, NumAddrSpaces }` (AS3).
+2. `MOSTargetMachine.cpp` + `clang/lib/Basic/Targets/MOS.cpp` — datalayout `+p3:24:8`.
+3. `clang …/MOS.cpp::getPointerWidthV` — `case 3: return 24;`.
+
+Verified (worktree toolchain, rebuilt clang-23 @ 20:26): `sizeof(__packed_far*)==3`, `table[16]==48 B`
+(vs 64 for 32-bit far) — the storage win is realized at the type level; a packed global emits 3 bytes,
+a 16-table 48. **Non-breaking: corpus 7/7** (AS3 is inert unless code creates an addrspace-3 pointer).
+
+### Increment B — codegen to *use* packed pointers: **BLOCKED on 24-bit (s24) width**
+
+To store/load/deref a packed pointer, clang emits `addrspacecast p2↔p3` + `load/store p3`. The cast
+already routes through the integer (`legalizeAddrSpaceCast`: `ptrtoint → trunc/zext → inttoptr`), but
+only for `{P,PZ,PF}` — adding `PFP` routes the conversion through **`s24`** (`ptrtoint p3 → s24`,
+`trunc s32→s24`, `zext s24→s32`), and **this backend legalizes only `s8/s16/s32`** (`G_TRUNC` is
+`{S1,S8},{S1,S16},{S8,S16}` +a16 `{S16,S32}` then `unsupported`; no `s24`). The empirical failure
+confirms it: *"Generic extend/truncate can not operate on pointers"* (cast fell through to the default
+pointer-trunc) + the s24 path has no rules. The 24-bit/3-byte granularity also breaks the 2-source
+`selectMergeValues` (a 3×s8→s24 merge needs the custom multi-level treatment the far code uses for
+4×s8→s32). So Increment B is a genuine **novel-24-bit-width GISel effort** — multiple fiddly pieces
+(s24 trunc/zext/load/store narrowing, 3-byte merge/unmerge, `PFP` in inttoptr/ptrtoint/addrspacecast/
+load-store) — each iteration a ~20-min toolchain rebuild.
+
+**Disposition (per project discipline — gate speculative high-effort work; debugging limit):** Increment
+A is the clean, landed-in-worktree result (the type + storage win + non-breaking). Increment B is the
+24-bit-width rabbit hole — **deferred** unless the user wants to invest in the s24-width work, since
+packed-24 is opt-in/speculative (no real far-pointer-table code creates pressure yet). Recipe + blocker
+recorded here so it's reconstructible. Worktree `wt/320-five-space` retains the live Increment A build.
+
+---
+
 ## Phase 4 — docs + upstream reconciliation
 
 - Refresh [320-upstream-far-pointer-note.md](../320-upstream-far-pointer-note.md): the full shipped
