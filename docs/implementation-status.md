@@ -13,9 +13,10 @@ CALLS (JSL/RTL, Inc 4 Phase 1)**, and **mixed-banking far→near calls (via the 
 thunk, shipped to `main` 2026-06-21)**, all on two emulators. The far-pointer calling convention is
 **in progress** — variant (a) Imag32 is built & two-emulator verified (`wt/320-far-cc`), with the other
 ABI variants + the measure-and-ship-the-winner step remaining (no longer upstream-gated; ships as `0004`).
-The five-address-space model remains; **far function pointers (a)** are now **in progress** —
-the indirect-call **mechanism is built + verified** (IR-rep #1), with the p2-value path, the F2 front-end,
-and the e2e runtime gate still to land.
+The five-address-space model remains; **far function pointers (a)** are now **backend-complete +
+e2e-verified** (`2d2a171`) — the indirect-call mechanism, the full p2-value path, and `&far_fn`→24-bit all
+land and the far indirect call round-trips on both emulators; **only the clang F2 ergonomic front-end
+remains**.
 
 **#321 (16-bit accumulator / M2):** the core codegen is complete. Every planned per-op optimization
 is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete re-open trigger. The
@@ -37,7 +38,7 @@ interrupted by crashes; the census short-circuited the build at the measurement 
 | Five-address-space model + full PR | ⬜ Upstream-gated on design-note posting; not started |
 | Far calls (JSL / RTL) — direct call to a `.far_*` leaf in another bank | ✅ **Done (Inc 4 Ph1, 2026-06-20)** — `dev/run.sh far_call` + `xcheck`, MAME+bsnes-jg PASS; in `0001`. (far → far also already works — non-leaf JSL/RTL chains.) [plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) |
 | Mixed-banking — a far function calling a **near** function (`__call_near_from_far` thunk) | ✅ **Done + shipped to `main` (Inc 4 follow-up b, 2026-06-21, `5717f6b`)** — `lowerCall` routes far→near through the generic bank-0 thunk (`pea .Lback-1; jmp (__rc18); rtl`) reached by `JSL` (`0001`, HasW65816-gated, a16-free). `far_near_call == 0xE0` MAME+bsnes-jg, corpus 7/7, thunk `--gc-sections`'d from near ROMs (byte-identical). Lifts the "far must be leaf-or-far-only" constraint. [plan](plans/2026-06-21-320-far-calls-followups.md) |
-| Far function pointers — indirect call through a far code pointer (`__call_indir_far`) | 🔧 **Inc 4 follow-up (a) — IN PROGRESS (mechanism built + verified, 2026-06-21, `560900c`)**. Layer-3 finding: a far fn ptr **can't** be a `ptr addrspace(2)` IR callee (LLVM forbids a non-program-addrspace callee; `addrspacecast p2→p0` drops the bank), so the 24-bit target is threaded via **IR-rep #1** — a `set_far_target` volatile store to a runtime slot `__mos_far_target` + `call @__call_indir_far`. `lowerCall` makes that a `JSL`; the stub `jml (__mos_far_target)` + the 4-byte slot verify clean on hand-authored i32-target IR. **Remaining (substantial):** (1) **p2-value legalization — root-caused as a multi-layer `0004` sub-project (`93c7336`):** ✅ L1 `copyCost` Imag32 case + ✅ L2 `getRegAllocationHints` size-guard (both regression-clean), ⏳ L3 `SelectImm` illegal-Imag8, ⏳ Gap B `G_STORE p2`, ⏳ Gap A `&far_sym`→24-bit; (2) clang **F2** `far` attr + CodeGen; (3) e2e runtime gate. WIP on `wt/320-far-followups` (`0004` stacked); gated on `0004` reaching `main`. [plan](plans/2026-06-21-320-far-calls-followups.md) |
+| Far function pointers — indirect call through a far code pointer (`__call_indir_far`) | 🔧 **Inc 4 follow-up (a) — BACKEND DONE + e2e verified (2026-06-21, `2d2a171`); only the clang F2 front-end remains.** A far fn ptr can't be a `ptr addrspace(2)` IR callee (LLVM forbids a non-program-addrspace callee), so the 24-bit target is threaded via **IR-rep #1** — a `set_far_target` volatile store to a runtime slot `__mos_far_target` + `call @__call_indir_far`; `lowerCall` emits `JSL`, the stub does `jml (__mos_far_target)`. The deep **p2-value sub-project is complete:** L1 `copyCost` Imag32, L2 `getRegAllocationHints` size-guard, **L3 `selectUnMergeValues` byte→word subreg** (the real crash — the "SelectImm" framing was stale), **Gap A `&far_sym`→24-bit** (`buildFarAddrWords` + `MO_ADDR24_*`→`#mos24bank`), **Gap B `G_STORE`/`G_LOAD p2`** (via the PF value type) — all fixed. **e2e `far_fnptr` PASS on MAME + bsnes-jg** (a16-only), worktree `wt/320-far-followups` (`579b911`). Backend edits live in the worktree's gitignored `vendor/` (recipes in the plan; `0004` stacked blocks a clean `0001` regen). **Remaining: clang F2 `far` attr + CodeGen** (ergonomics; the design is mapped). [plan](plans/2026-06-21-320-far-calls-followups.md) |
 | Far tail calls | ⬜ Separate follow-up — already conservative-safe (tail peephole keys on `JSR`, so a `JSL` is never tail-converted) |
 | Far-pointer calling convention (pass/return `p2`) | 🔧 **Inc 4 Phase 2 — IN PROGRESS** (`wt/320-far-cc`, `10a5fc0`): variant **(a) Imag32** P0+A0 **built & two-emulator verified** — a 32-bit far ptr returned-from + passed-into noinline calls round-trips `0xF3` on MAME+bsnes-jg, default byte-identical, csmith 30 seeds 0-mismatch; needed `Imag32 ∈ AnyRegBank`; delta = stacked **`0004-320-far-cc.patch`**. **Pending:** variants (b)/(c)/(d) + the bytes/cycles harness + ship-the-winner (only the winner lands; tie → Imag32). [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md) |
 | Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
@@ -48,9 +49,8 @@ interrupted by crashes; the census short-circuited the build at the measurement 
 **M1 verdict:** load/store, runtime deref/cast/arithmetic, direct far calls, and mixed-banking far→near
 are all built and two-emulator verified. The far-pointer calling convention is **no longer
 upstream-gated** — it's a build-all-variants-and-measure task that ships as `0004`. Far function pointers
-(a) are **in progress** — the indirect-call mechanism is built + verified (IR-rep #1); the p2-value path,
-the F2 front-end, and the e2e gate remain, gated on `0004` reaching `main`. The five-address-space model
-is the other frontier; its PR still waits on the design-note posting.
+(a) are **backend-complete + e2e-verified** (`2d2a171`); only the clang F2 ergonomic front-end remains.
+The five-address-space model is the other frontier; its PR still waits on the design-note posting.
 
 ---
 
@@ -135,7 +135,7 @@ codegen frontier is **#320's far calling convention** (+ far fn pointers).
 | Load-fold gate unification (AA-precision) — `noClobberBetween` | ✅ **Done 2026-06-20 (`6440db0`)** — AA-precise fold landed (−26 B, 0 regressions, verify-clean, 5 c-torture recovery sites 4-way PASS). The volatile-drop half measured net-negative (+17 B / 19 regressions) and is **closed**, not pursued |
 | xy16 16-bit calling convention (X/Y across calls) | ✅ **Done 2026-06-21 (`ebedd1c`)** — verified (cross-call gate `xy16call`, 4-way) + formalized; correct by construction (cross-call index parks in callee-saved `Imag16`, never live in physical X16); 2 ABI levers measured + shelved. See XY16 table |
 | #320 far-pointer calling convention (`p2` pass/return) | 🔧 IN PROGRESS — variant (a) Imag32 built + verified (`wt/320-far-cc`); build remaining variants & measure; ships as `0004`. See #320 table + What's next |
-| #320 far function pointers (a) | 🔧 IN PROGRESS — mechanism built + verified; p2-value L1/L2 done, L3/Gap A/B + F2 front-end + e2e remain (gated on `0004`) |
+| #320 far function pointers (a) | 🔧 BACKEND DONE + e2e verified (`2d2a171`) — mechanism + full p2-value path (L1–L3, Gap A/B) + `far_fnptr` 4-way PASS; only the clang F2 front-end remains. See #320 table |
 
 ---
 
@@ -222,10 +222,9 @@ work (the #320 far calling convention + far fn pointers), tracked in *What's nex
    (tie → Imag32). The gate for far function pointers (a).
    [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)
 
-2. **#320 far function pointers (a)** — IN PROGRESS: the indirect-call mechanism is built + verified
-   (IR-rep #1: `set_far_target` slot + `__call_indir_far`→JSL + stub `jml`). Finish the (1) p2-value
-   legalization (L1/L2 done; L3 `SelectImm` + Gap A/B remain), (2) clang F2 `far` attr + CodeGen,
-   (3) e2e runtime gate, on `wt/320-far-followups` (gated on `0004` reaching `main`).
+2. **#320 far function pointers (a)** — BACKEND DONE + e2e verified (`2d2a171`): mechanism + full
+   p2-value path (L1–L3, Gap A/B `&far_fn`→24-bit) + `far_fnptr` 4-way PASS, on `wt/320-far-followups`.
+   **Only the clang F2 `far` attr + CodeGen (ergonomic front-end) remains** (design mapped).
    [plan](plans/2026-06-21-320-far-calls-followups.md)
 
 3. **Upstream posts (user-triggered):**
