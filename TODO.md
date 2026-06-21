@@ -30,11 +30,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   storable value type (s32 merge → bytes). **Done, not ours to re-implement.** Caveat: it's in
   `wt/320-far-followups` (pushed `origin/`), **LANDED on `main` 2026-06-21** (was `wt/320-far-followups`-only): the
   far-value implementation now ships in `0001` + `0004` + `0005`; the full five-space *upstream PR* stays
-  ABI-blessing-gated (tracked in [upstream-contribution-status](docs/upstream-contribution-status.md)). **Residuals:** (a) **`dp→near`
-  cast = pre-existing UPSTREAM bug** (fails on plain `mos6502`: "Copy Instruction illegal with mismatching
-  sizes", crashes w/o `-verify`) → an upstream issue to draft, not a fork fix; (b) far-ptr storage under
-  **default 8-bit** is still un-legalized (a16-gated by design — likely fine). Evidence:
-  `dev/measure-far-ptr-value-state.sh`.
+  ABI-blessing-gated (tracked in [upstream-contribution-status](docs/upstream-contribution-status.md)). **Residuals (both close-out, no fork patch — [plan](docs/plans/2026-06-22-320-far-value-residuals.md)):** (a) **"`dp→near` cast" =
+  pre-existing UPSTREAM bug, now root-caused (2026-06-22) as a DP-pointer-ARGUMENT crash** — *any* use of an
+  `addrspace(1)` (8-bit DP) pointer arg fails on plain `mos6502` (the CC passes it in a 16-bit `RS` reg →
+  illegal `(p1)=COPY $rs`, "Copy Instruction illegal with mismatching sizes"; asserts-aborts at
+  `MOSRegisterInfo.cpp:1146`, SIGSEGVs in `MOSLateOptimization` w/o `-verify`). Stock `p1:8:8` (our `0001`
+  only adds `p2:32:8`) ⇒ **upstream issue to draft** (user-triggered post), not a fork fix; (b) far-ptr
+  storage under **default 8-bit** is un-legalized — **a16-gated by design** (storage works under `+mos-a16`
+  via F2; 8-bit is a clean compile-time rejection; no 8-bit-only use case) → confirm + close by-design.
+  Evidence: `dev/measure-far-ptr-value-state.sh`.
   [plan §Re-evaluation](docs/plans/2026-06-21-320-five-address-space-model.md) ·
   [F2 hand-off](docs/plans/2026-06-21-320-far-calls-followups.md).
 - [ ] **#320 five-address-space model — Phase 0+3 DONE; new spaces (AS3 packed-24, AS4 zero-bank) DEFERRED
@@ -405,6 +409,15 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
   [plan](docs/plans/2026-06-22-321-scavenger-crash-upstream-issue.md) (pre-flight live-here/live-upstream +
   a time-boxed default-8-bit repro attempt so a maintainer can trigger it without the fork-only `+mos-a16`).
+- [ ] **File the DP-pointer-argument calling-convention upstream issue** (user-triggered; issue, not a PR).
+  Passing an `addrspace(1)` (8-bit direct-page) pointer **argument** crashes the MOS backend: the CC
+  materializes it into a 16-bit `RS` reg → illegal `(p1)=COPY $rs` ("Copy Instruction illegal with
+  mismatching sizes"; asserts `MOSRegisterInfo.cpp:1146`; SIGSEGV in `MOSLateOptimization` w/o `-verify`).
+  **Pure upstream** — reproduces on plain `mos6502`, no `+mos-a16`/`mosw65816`; stock `p1:8:8` (our `0001`
+  only adds `p2:32:8`). 2-line repro, no fork patch (maintainer CC fix). Surfaced as the `dp→near` far-value
+  residual; draft + queue per [plan](docs/plans/2026-06-22-320-far-value-residuals.md) (Part A) → body
+  `docs/320-upstream-dp-arg-cc-issue.md` + a `gh issue create` item in
+  [upstream-contribution-status](docs/upstream-contribution-status.md).
 - [ ] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
   `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
