@@ -349,7 +349,9 @@ absolute-long tax on every access.
 
 Characterized on the current `main` toolchain (clang-23 @ `c798c31`, pre-F2 — F2 landed only in
 `wt/320-far-followups`), host-side, no vendor edits. Reproducible: **`dev/measure-far-ptr-value-state.sh`**
-(every probe run *both* default and `+mos-a16`, since the far value machinery is `+mos-a16`-gated).
+(every probe run *both* default and `+mos-a16`, since the far value machinery is `+mos-a16`-gated). The
+probes are committed, inspectable sample programs in **`examples/65816/far-value-evidence/`** (its
+`README.md` maps each program to its compile result, with verbatim errors + the `MVT::i24` analysis).
 
 **3a — the cast / value-state matrix.** The 5×5 collapses to the implemented spaces (0 near, 1 DP, 2
 far; 3/4 don't exist). The matrix is **not "cleanly gated"** — several cells are broken, which is the

@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/f84efcd) | #320 five-space: Phase 3 (cast/value-state matrix) + correct the verdict (defer, don't null) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/d038c3a) | #320 five-space plan: expand 0a (representability) + tie it to the upstream #320 response |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/caef3e9) | #320 five-address-space model: plan + Phase 0 census (packed-24/zero-bank = measured nulls) |
 
 <!--history-meta v1
+f84efcd	author	Will Norris
+f84efcd	added	75
+f84efcd	deleted	18
+f84efcd	files	1
+f84efcd	body	Phase 3 characterization (dev/measure-far-ptr-value-state.sh, run both default and +mos-a16):\na far pointer is a complete ADDRESS mechanism (deref/load/store/arith/calls work, a16-gated)\nbut an INCOMPLETE VALUE TYPE — store/load/array/struct all fail under both modes,\nsizeof(far*)==2 not 4, far->near / dp->near casts fail (dp->near can segfault). 3a cast\nmatrix = the durable spec; 3b far-default flag = blocked on the value-type completion.\n\nVerdict corrected after user pushback: my first pass called this an "empty opportunity, close\nas null" — but that was circular (nothing stores far pointers because storing them is BROKEN,\nnot because there's no use). So:\n- NEW spaces (packed-24 #3, zero-bank #4): DEFER, not null — packed-24 would size-optimize a\n  capability (a far pointer stored in memory) that does not exist yet.\n- The capability they presuppose — completing the far-pointer VALUE type (sizeof==4 +\n  G_STORE/G_LOAD p2 in memory + aggregates + narrowing casts + merge 0004's pass/return) — is\n  promoted to its own DESIRABLE M1 TODO item. Coordinate the clang side with the F2 work.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 d038c3a	author	Will Norris
 d038c3a	added	76
 d038c3a	deleted	13
