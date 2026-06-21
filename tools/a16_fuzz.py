@@ -59,6 +59,18 @@ GOT_RE = re.compile(r"got=0x([0-9A-Fa-f]+)")
 
 ARR_N = 8
 ARR_MASK = ARR_N - 1
+# NOTE (xy16 cross-call boundary coverage): the `Index` expr masks with ARR_MASK (=7), so
+# arr[(unsigned)idx & 7] is provably <= 7 and LTO narrows the index back to an 8-bit X (a valid
+# optimization) -> the generated indexed loads do NOT exercise the genuine 16-bit-index (Xc16)
+# path. That is intentional here; widening to an unmasked array purely to keep an index 16-bit
+# across a call would perturb the host-eval model (State.arr / expected()) for little gain,
+# because the cross-call boundary is already covered two ways: (1) RecFuncDef/Call already hold
+# REC_LIVE 16-bit values live across calls, and the boundary is correct *by construction* — a
+# cross-call-live 16-bit index lands in a callee-saved ZP imaginary pair ($rs10-$rs15), reloaded
+# into X16 only at the point of use (physical X16 is never live across a call); (2) the
+# deterministic `dev/run.sh xy16call` gate (examples/65816/xy16call.c) locks the genuine
+# 16-bit-index-held-across-a-call case with a load-bearing-high-byte differential. See
+# docs/investigations/65816-calling-convention-decision.md §"Index registers across calls".
 
 # Recursion knobs (P0: force the soft/reentrant stack). MOSNonReentrant marks every
 # NON-recursive function `nonreentrant` -> static frame, so genuine recursion is the

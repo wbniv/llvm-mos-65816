@@ -88,6 +88,59 @@ an efficiency change to the *implementation* of the convention, allowed to updat
 not change the A(low)/X(high) *convention*. Plan:
 [`docs/plans/2026-06-17-321-ax-return-convention.md`](../plans/2026-06-17-321-ax-return-convention.md).
 
+## Index registers across calls — adopted (X/Y 8-bit at boundaries; X16/Y16 caller-saved)
+
+**Decision (2026-06-21): `+mos-xy16` is an *in-function* optimization; the call/return boundary stays
+8-bit.** This is the xy16 (16-bit index) counterpart of the A/X-return promotion — the boundary was already
+emergent from the backend; this converts it into a **verified, regression-guarded** invariant. **No codegen
+change.** The contract:
+
+- **X and Y are 8-bit at every call and return boundary and on function entry.**
+  `MOSInsertREPSEP::requiredXWidth` returns `XW_X8` for `MI.isCall()`/`MI.isReturn()`, and the entry block is
+  seeded `XIn[Entry]=XW_X8` — so the pass inserts a `sep #$10` (or combined `sep #$30`) to narrow X before
+  every `jsr`/`rts`, exactly mirroring the M-flag (`requiredWidth` → `MW_M8`). 16-bit-index ops only ever run
+  *between* boundaries.
+- **X16/Y16 are caller-saved.** `MOS_CSR` (`MOSCallingConv.td`) lists only `RC20–RC31`; the generated
+  `MOS_CSR_RegMask` clobbers `X16`/`Y16` (and `XH`/`YH`). A value live across a call is therefore preserved by
+  the register allocator, not assumed-surviving-in-register.
+
+**Measured finding — the boundary is correct *by construction*, not by a fragile spill ordering.** A
+genuine 16-bit index held live across a non-recursive clobbering call is allocated by the RA to a
+**callee-saved ZP imaginary-register pair** (`$rs10–$rs15`, in the `JSR` preserve regmask) and **reloaded into
+X16 via `LDXImag16` only at the point of use** — the physical `X16` register is **never live across the
+call**. So the value lives in mode-independent ZP across the boundary; the narrowing `sep #$10`/`sep #$30`
+before the `jsr` cannot touch it (it isn't in X16 then), and the post-call `LDXImag16` reloads the full 16
+bits. The earlier worry — that the RA *spills* `X16` and the spill-store must beat the narrowing `sep` (the
+seed-247/445 high-byte-zeroing class) — does not arise: there is nothing in `X16` to spill. (The `STXAbs16`/
+`TXA16`+`STAIndir16` `Xc16` caller-save encodings exist as the under-ZP-pressure fallback; that path is the
+same mechanism as any `+mos-a16` 16-bit value and is not xy16-specific.)
+
+**Regression guard:** `examples/65816/xy16call.c` + `dev/xy16call.sh` (`dev/run.sh xy16call`) — a 16-bit index
+(`0x0102`, a load-bearing high byte) held across a `noinline` clobbering call, then used as an array index
+after it. The 4-way value differential (host == default == `+mos-a16` == `+mos-xy16` == `0x7E5A` on MAME +
+bsnes-jg) catches a high-byte loss; structural gates lock the path (post-call `LDXImag16 $rs10`+`LDAbsXIdx16`;
+`$rs10` in the `JSR` preserve regmask; the `.o` shows X narrowed before the `jsr`, re-widened after). The
+load-bearing high byte makes the value test itself the LTO-narrowing detector (`0x0102` cannot validly narrow
+to 8-bit). As with the A/X note: the value test catches miscompiles; the structural gate catches convention
+drift (e.g. a future change that starts keeping `X16` live across calls, or narrows the reload).
+
+**xy16-specific boundary levers — measured, both shelved (2026-06-21).** xy16 unlocks two boundary
+optimizations beyond the kept 8-bit contract; both were measured first (frame-ABI methodology) and shelved:
+
+1. **i32 return in `A16:X16`** (the A/X note's "high word in X" intent — today an i32 return splits to
+   A:X + RC2:RC3). Census `dev/xy16ret32-census.sh`: **REALISTIC `N_i32callsite = 0`** (corpus + kernels — the
+   same 0/realistic signature as the frame-ABI A0 NULL), and only **30 i32-returning call sites across all 1228
+   in-scope c-torture programs** (~0.024/program, in a deliberately arithmetic-stress suite). Realizing the
+   lever costs an ABI-wide change — a *typed hole* in the REP/SEP pass's "8-bit at every boundary" correctness
+   invariant plus coordinated `CC_MOS`/`RetCC` + `lowerReturn`/`lowerCall` work — for traffic realistic code
+   does not produce. **Shelved with evidence; not built.**
+2. **`PHX`/`PLX` hardware-stack caller-save spill** of `X16`/`Y16` across a call (the literal "hardware-stack
+   ABI"; `PHX`/`PLX` push/pull 2 bytes when X=16). The measured finding above removes its premise: the RA never
+   puts a cross-call index in physical `X16` (it lives in a callee-saved ZP pair), so there is no `X16` spill to
+   route through the hardware stack in normal code. It would also be a new hardware-stack spill path against the
+   backend's soft/static-stack-only design (hardware-SP balance + interrupt/reentrancy hazards). **Shelved with
+   evidence; reopen only if cross-call-physical-`X16` residency becomes common.**
+
 ## The decision decomposes
 
 | Sub-decision | Difficulty | Read |

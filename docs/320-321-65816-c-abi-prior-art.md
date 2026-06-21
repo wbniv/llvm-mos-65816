@@ -88,6 +88,15 @@ gate that the `i16` return is `ldx <high>; lda <low>; rts` and the `i8` return i
 [`docs/investigations/65816-calling-convention-decision.md`](investigations/65816-calling-convention-decision.md)
 §"Return values — adopted" and [`docs/plans/2026-06-17-321-ax-return-convention.md`](plans/2026-06-17-321-ax-return-convention.md).
 
+**Index registers across calls follow the same posture (2026-06-21).** Under `+mos-xy16` the 16-bit index
+registers are *caller-saved* and 8-bit at every call/return boundary — `+mos-xy16` is an in-function
+optimization, not a cross-call mode. A 16-bit index held live across a call survives in a callee-saved ZP
+imaginary-register pair (reloaded into X16 at the point of use), so the boundary is correct by construction.
+This is consistent with the WDC/ORCA "high word of a longword result in X" prior art: the future 32-bit
+result's high word would live in a 16-bit X only while xy16 is active and would be caller-saved like any other
+index value — but a census found realistic code returns no i32 across calls, so that lever stays shelved. See
+the CC-decision doc §"Index registers across calls — adopted" and `dev/run.sh xy16call`.
+
 ### Memory models / near–far (directly informs #320)
 
 WDC816CC has four models, selected by code-size × data-size (manual p.22):
