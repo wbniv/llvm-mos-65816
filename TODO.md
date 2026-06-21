@@ -890,4 +890,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • Auto-promoting near callees to far -> explicit NON-GOAL ((b) keeps near callees byte-identical;
        uniform-far is a measured control/fallback, not a shipped default).
      fp:a5f1db95f5a9627a fp:5221ad4b75df9534 fp:78cda9a654aa2b5f fp:fde87b8fe11d4df6 -->
+- [verify] **2026-06-21-320-far-pointer-sizeof** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-pointer-sizeof.md](docs/plans/2026-06-21-320-far-pointer-sizeof.md)_  <!-- fp:72af8b0dbbbbb7b7 -->
 <!-- END auto-captured-deferrals -->
