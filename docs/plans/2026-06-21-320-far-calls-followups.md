@@ -213,10 +213,27 @@ prototype stays **backed out** (untriggerable — Layer-3).
 - ✅ **Verified on hand-authored IR** (the shape clang #1 emits, with the target as a plain **i32**):
   `store volatile i32 %t, @__mos_far_target` + `call @__call_indir_far(args)` → the 3-byte slot store +
   `jsl __call_indir_far`, **`-verify-machineinstrs` clean**.
-- ⏳ **Residual p2-value legalization (blocks feeding a real far pointer):** converting a `p2` far pointer
-  to the i32 target crashes — `ptrtoint(p2)→i32` / the p2-param decompose hit *"Illegal physical register
-  … `$rs1 = SelectImm $rc4, -1, 0`"* (the cross-agent "Backend gap A" class), and **Gap A**
-  (`&far_sym`→24-bit `R_MOS_ADDR24`) crashes. These are a non-trivial selection/legalizer sub-project.
+- ⏳ **Residual p2-value legalization — a DEEP, MULTI-LAYER 0004 sub-project (root-caused via the asserts
+  build).** Converting/decomposing a real `p2` (e.g. `ptrtoint(p2)→i32`, returning/storing a p2) is
+  unfinished in 0004 across several layers, each a distinct crash:
+  - ✅ **Layer 1 (FIXED): `copyCost` missing the `Imag32` case** — the RA copy-hint cost hit
+    `llvm_unreachable("Unexpected physical register copy")` (`MOSRegisterInfo.cpp:~1175`) on any imag32 (p2)
+    copy. Added the imag32 case (mirrors copyPhysReg's 2-word recursion).
+  - ✅ **Layer 2 (FIXED): `getRegAllocationHints` costs size-mismatched pairs** — the p2 decompose's
+    sub-register copies make it call `copyCost(imag16, imag8)` (cross-size) → the same unreachable. Added a
+    size-match guard (skip mismatched/invalid pairs). **Both fixes are regression-clean** (corpus 7/7,
+    far_near_call PASS — they only ever fire for imag32/p2, inert for all pre-far code) but live in the
+    worktree's `vendor/MOSRegisterInfo.cpp` (not yet patch-tracked).
+  - ⏳ **Layer 3 (OPEN): a `SelectImm` with an illegal condition.** Post-RA the p2→i32 path emits
+    `$rs1 = SelectImm $rc5, -1, 0` whose **operand 1 is an Imag8 (`$rc5`)** — `SelectImm`'s condition must
+    be a flag (NZ/C/V) → `-verify-machineinstrs` "Illegal physical register". A sext-style materialization
+    is being built with a mis-classed condition register in the decompose/return path.
+  - ⏳ **Gap B:** raw `G_STORE (p2)` is still `unable to legalize` (only the CC value-handler path stores p2,
+    via ptrtoint).
+  - ⏳ **Gap A:** `&far_sym`→24-bit (`R_MOS_ADDR24`) materialization still crashes.
+  Net: completing (a)'s p2 path = finishing 0004's p2-value handling (Layer 3 + Gaps A/B) — a focused
+  backend sub-project (use `dev/run.sh asserts-build` to root-cause each layer; the release build only
+  SIGSEGVs).
 - ⏳ **clang F2 front-end:** enable the `far` attribute for MOS + CodeGen that emits the `store volatile`
   (target) + `call @__call_indir_far(args)` for a far-fn-ptr call. Not started.
 - ⏳ **e2e runtime gate:** needs Gap A (to materialize a real far target) + F2; then `far_fnptr.c` on both

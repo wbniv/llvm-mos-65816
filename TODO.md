@@ -58,10 +58,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     @__call_indir_far` (lighter than a formal intrinsic — that needs `Intrinsics.td` regen). **Progress
     2026-06-21:** the far-indirect **call mechanism is BUILT + verified** — `lowerCall` makes a call to
     `__call_indir_far` a `JSL`; stub `call-indir-far.s` = `jml (__mos_far_target)` + the 4-byte slot;
-    hand-IR with an **i32 target** → slot store + `jsl`, `-verify-machineinstrs` clean. **Remaining
-    (substantial):** (1) p2-value legalization — `ptrtoint(p2)→i32`/p2-param decompose crash ("Illegal
-    physical register … `SelectImm`") + **Gap A** (`&far_sym`→24-bit `R_MOS_ADDR24`); (2) clang **F2** `far`
-    attr + CodeGen emitting the store+call; (3) e2e runtime gate. WIP on `wt/320-far-followups` (`0004`
+    hand-IR with an **i32 target** → slot store + `jsl`, `-verify-machineinstrs` clean. **p2-value
+    legalization is a DEEP MULTI-LAYER 0004 sub-project** (asserts-build root-caused): ✅ Layer 1 `copyCost`
+    missing `Imag32` case; ✅ Layer 2 `getRegAllocationHints` size-mismatch guard (both regression-clean —
+    corpus 7/7, far_near_call PASS — inert for non-far code); ⏳ Layer 3 `SelectImm` with an Imag8
+    condition (verify "Illegal physical register"); ⏳ Gap B `G_STORE p2`; ⏳ **Gap A** (`&far_sym`→24-bit).
+    Then (2) clang **F2** `far` attr + CodeGen emitting the store+call; (3) e2e runtime gate. WIP on
+    `wt/320-far-followups` (`0004`
     stacked); still gated on `0004` reaching `main`.
   - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
   Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·

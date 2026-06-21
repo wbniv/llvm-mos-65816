@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/560900c) | #320 (a): far-indirect call MECHANISM built + verified (IR-rep #1, i32-target path) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5fd0ff5) | #320 (a): Layer-3 finding — far fn ptr can't be a ptr addrspace(2) IR callee |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5d81d44) | #320 far-followups: (b) shipped to main (5717f6b); (a) paused, front-end LOCKED=F2 |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/dd33017) | #320 (b) mixed-banking: far->near calls via __call_near_from_far thunk |
@@ -9,6 +10,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+560900c	author	Will Norris
+560900c	added	25
+560900c	deleted	8
+560900c	files	1
+560900c	body	Built IR-rep #1 (user choice) end-to-end, backend-first. Realized "set_far_target"\nas a volatile store to a runtime slot __mos_far_target + call @__call_indir_far\n(lighter than a formal LLVM intrinsic, which would need Intrinsics.td regen for no\nfunctional gain). Verified on hand-authored IR with an i32 target: lowerCall makes\nthe __call_indir_far call a JSL; stub jml (__mos_far_target) + the 4-byte slot;\nslot-store + jsl, -verify-machineinstrs clean.\n\nRemaining (substantial, scoped): (1) p2-value legalization — ptrtoint(p2)->i32 /\np2-param decompose crash ("Illegal physical register ... SelectImm") + Gap A\n(&far_sym->24-bit); (2) clang F2 far attr + CodeGen; (3) e2e runtime gate. WIP on\nthe worktree (0004 stacked); plan/TODO/handoff updated.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5fd0ff5	author	Will Norris
 5fd0ff5	added	47
 5fd0ff5	deleted	24
