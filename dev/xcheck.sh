@@ -69,6 +69,7 @@ build_rom far_cast  mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
 build_rom far_arith mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
 build_rom far_store mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
 build_rom far_call  mos-snes-far.cfg
+build_rom far_near_call mos-snes-far.cfg
 
 # 3. Cross-check each ROM on bsnes-jg. Offset/len derived from the .map exactly
 # like the MAME path (dev/_emu.sh's _emu_map_lookup) — WRAM offset == symbol VMA.
@@ -96,6 +97,7 @@ xassert "$BUILD/far_cast.sfc"  "$BUILD/far_cast.map"  corpus_result 0xF3   # ban
 xassert "$BUILD/far_arith.sfc" "$BUILD/far_arith.map" corpus_result 0xF3   # bank $00, fp++ (G_PTR_ADD) then lda [dp]
 xassert "$BUILD/far_store.sfc" "$BUILD/far_store.map" corpus_result 0xF3   # bank $00, sta [dp] store then near read-back
 xassert "$BUILD/far_call.sfc"  "$BUILD/far_call.map"  corpus_result 0xF3   # bank $01, far call (JSL) + RTL return
+xassert "$BUILD/far_near_call.sfc" "$BUILD/far_near_call.map" corpus_result 0xE0 # bank $01 far -> near via __call_near_from_far (JSL thunk)
 
 echo
 [ $rc -eq 0 ] && echo "RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)" \

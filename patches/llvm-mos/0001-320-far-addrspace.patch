@@ -15,7 +15,7 @@ index dfe99d8f2a2a..c9e4c2f2f4c3 100644
  
    PointerWidth = 16;
 diff --git a/llvm/lib/Target/MOS/MOSCallLowering.cpp b/llvm/lib/Target/MOS/MOSCallLowering.cpp
-index bfa9303e3fc9..d448d2c56002 100644
+index bfa9303e3fc9..7659ad4d327e 100644
 --- a/llvm/lib/Target/MOS/MOSCallLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSCallLowering.cpp
 @@ -273,8 +273,13 @@ bool MOSCallLowering::lowerReturn(MachineIRBuilder &MIRBuilder,
@@ -34,21 +34,72 @@ index bfa9303e3fc9..d448d2c56002 100644
  
    if (Val) {
      MachineRegisterInfo &MRI = MF.getRegInfo();
-@@ -407,7 +412,13 @@ bool MOSCallLowering::lowerCall(MachineIRBuilder &MIRBuilder,
+@@ -376,6 +381,22 @@ bool MOSCallLowering::lowerCall(MachineIRBuilder &MIRBuilder,
+   const TargetRegisterInfo &TRI = *STI.getRegisterInfo();
+ 
+   bool IsIndirect = Info.Callee.isReg();
++
++  // #320 far-call banking (W65816-only; default 6502 codegen untouched).
++  //   CallerIsFar: the current function is .far_* (entered via JSL, returns RTL).
++  //   CalleeIsFar: a direct callee the linker places in another bank (.far_*).
++  bool CallerIsFar = STI.hasW65816() &&
++                     MF.getFunction().getSection().starts_with(".far_");
++  bool CalleeIsFar = Info.Callee.isGlobal() &&
++                     Info.Callee.getGlobal()->getSection().starts_with(".far_");
++
++  // #320 follow-up (b) mixed-banking: a far function's DIRECT call to a NEAR
++  // function must route through the bank-0 thunk __call_near_from_far (reached by
++  // JSL), because a near JSR out of bank $01 would not switch the program bank and
++  // a near RTS cannot restore the caller's bank. The thunk reads the callee's
++  // 16-bit address from RS9. (far->far and near->far already go long via IsFar.)
++  bool IsFarNearThunk = CallerIsFar && Info.Callee.isGlobal() && !CalleeIsFar;
++
+   if (IsIndirect) {
+     // Store the callee in RS9 (used by the libcall).
+     // Doing this before argument lowering gives additional freedom to
+@@ -399,6 +420,15 @@ bool MOSCallLowering::lowerCall(MachineIRBuilder &MIRBuilder,
+       // Call __call_indir to execute the indirect call.
+       Info.Callee.ChangeToES("__call_indir");
+     }
++  } else if (IsFarNearThunk) {
++    // Materialize the near callee's 16-bit address into RS9, then retarget the
++    // call to the bank-0 thunk. Like the indirect path, this happens before
++    // argument lowering (scheduling freedom); RS9 never holds arguments.
++    Register AddrReg =
++        MRI.createGenericVirtualRegister(LLT::pointer(0, /*SizeInBits=*/16));
++    MIRBuilder.buildGlobalValue(AddrReg, Info.Callee.getGlobal());
++    MIRBuilder.buildCopy(MOS::RS9, AddrReg);
++    Info.Callee.ChangeToES("__call_near_from_far");
+   }
+ 
+   // Generate the setup call frame pseudo instruction. This will record the size
+@@ -407,15 +437,24 @@ bool MOSCallLowering::lowerCall(MachineIRBuilder &MIRBuilder,
    // additional code.
    auto CallSeqStart = MIRBuilder.buildInstr(MOS::ADJCALLSTACKDOWN);
  
 -  auto Call = MIRBuilder.buildInstrNoInsert(MOS::JSR)
 +  // #320 Inc 4: a direct call to a .far_* function (placed in another bank by the
 +  // linker) uses JSL (24-bit long call, $22) so the program bank follows; the callee
-+  // returns via RTL (see lowerReturn). Indirect / far-function-pointer calls stay
-+  // near for now. W65816-only — default 6502 codegen is untouched (IsFar=false).
-+  bool IsFar = STI.hasW65816() && Info.Callee.isGlobal() &&
-+               Info.Callee.getGlobal()->getSection().starts_with(".far_");
++  // returns via RTL (see lowerReturn). #320 follow-up (b): a far->near call also goes
++  // long, via the __call_near_from_far thunk (IsFarNearThunk, retargeted above).
++  // Indirect / far-function-pointer calls stay near for now. W65816-only — default
++  // 6502 codegen is untouched (IsFar=false).
++  bool IsFar = STI.hasW65816() && (CalleeIsFar || IsFarNearThunk);
 +  auto Call = MIRBuilder.buildInstrNoInsert(IsFar ? MOS::JSL : MOS::JSR)
                    .add(Info.Callee)
                    .addRegMask(TRI.getCallPreservedMask(MF, Info.CallConv));
  
+-  // Indirect calls store the callee in RS9.
++  // Indirect calls and the far->near thunk store/read the callee in RS9.
+   if (IsIndirect) {
+     Call.addUse(MOS::RS9, RegState::Implicit);
+     if (STI.hasSPC700())
+       Call.addUse(MOS::RC17, RegState::Implicit);
++  } else if (IsFarNearThunk) {
++    Call.addUse(MOS::RS9, RegState::Implicit);
+   }
+ 
+   SmallVector<ArgInfo, 8> OutArgs;
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
 index 70e8bb0d45b3..29032a1e32ea 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td

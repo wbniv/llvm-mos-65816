@@ -74,6 +74,10 @@ Targets:
   far_call   #320 Increment 4: build examples/65816/far_call.c (snes-far), assert a
              call to a bank-$01 function emits JSL ($22) + the leaf returns RTL ($6b),
              boot in MAME, check the value returned across the bank boundary == 0xF3
+  far_near_call #320 follow-up (b): far (bank $01) -> near (bank $00) mixed-banking;
+             build examples/65816/far_near_call.c (snes-far), assert the far->near call
+             emits JSL __call_near_from_far (thunk: pea/jmp-ind/rtl), boot in MAME,
+             check the value folded up main->far->near->near == 0xE0
   xcheck     second-emulator fidelity cross-check: boot the far ROMs in bsnes-jg
              (cycle-accurate, independent of MAME) headless and assert the same
              WRAM results — confirms the bank-$01 far read isn't a MAME quirk
