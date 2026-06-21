@@ -1,6 +1,11 @@
 # #321 native-s16 — surface consolidation & close-out (compares/branches · A16-threading · ALU-chain extensions)
 
-**Date:** 2026-06-22 · **Status:** PLANNED · **Milestone:** M2 (#321) — ROADMAP step-5 frontier consolidation.
+**Date:** 2026-06-22 · **Status:** **Phase 0 DONE — CONFIRMED measured-complete surface** (ran 2026-06-22 on
+`main`'s installed toolchain; nothing built). The expected null held: the per-op surface reproduces its measured
+optima, the one open frontier is the single shared RA-residency-under-pressure core, and the GO contingency did
+**not** fire. One *new*, bounded, measurement-gated candidate (≥8-shift bracket fragmentation) was surfaced and
+routed to a future spike — it does not meet the GO bar. · **Milestone:** M2 (#321) — ROADMAP step-5 frontier
+consolidation.
 **Rolls up (does not re-implement):** the three open M2 native-s16 tracks —
 [16-bit compares/branches close-out](2026-06-21-321-native-s16-comparison-followups.md) (TRACK CLOSED),
 [A16-threading](2026-06-17-321-a16-threading.md) + its
@@ -296,26 +301,109 @@ Mirror a pointer in [upstream-contribution-status](../upstream-contribution-stat
 
 ---
 
-## Verification (acceptance steps — paste raw output + PASS/FAIL on completion; do NOT pre-fill)
+## Verification (acceptance steps — raw output + PASS/FAIL; RAN 2026-06-22)
+
+> Measured host-side via **`dev/measure-native-s16-surface.sh`** on `main`'s installed toolchain (`clang-23`,
+> Jun 20 22:04). All native-s16 (`0002`) landings predate it; only later #320/xy16 work postdates it, irrelevant
+> to the M-flag surface. Full captured output: the roll-up's own stdout (reproducible on `main`).
 
 1. **0a harness roll-up.** `dev/measure-native-s16-surface.sh` drives the three harnesses; the recorded states
    reproduce on `main`'s toolchain (compares: only register-resident EQ-as-value byte-wise; threading: 1
    non-adjacent reload, −31/−36 % chains; ZP pressure: 0/13 exhaust, max ~5/14). PASS = no drift.
+
+   **PASS — all three reproduce, no drift.**
+   - **Compare surface** (`measure-compare-surface.sh`): only the register-resident EQ/NE **value** cells
+     (RR/RI/RM) are `BYTEWISE` (the tight `cpx;cmp`, optimal); MM/CMP-value and **all** ordering value cells are
+     `NATIVE`; every value cell materialises via the `DIAMOND`. (The `+BRANCHLS` tag on the CMP-value column is
+     the classifier's known false-positive — the `adc` of the computed `x+y` operand, **not** a real carry-tail;
+     confirms "no branchless materialisation exists anywhere," the standing WON'T-DO premise.)
+   - **A16-threading** (`measure-a16-threading.sh`): `roundtrips=0` on **every** synthetic chain (chain3/chain5/
+     reuse/mixedlocal) **and** every kernel (k_crc16/k_fxmul/k_prng/k_bits/k_satadd/k_isort) — i.e. the
+     post-`threadAccum16` optimum; the `−31/−36 %` figure is the historical threading-on/off delta at landing.
+   - **ZP pressure** (`measure-zp-pressure.sh`): `real-code functions n=13 max=10 bytes (k_bits:main, ~5 pairs)
+     mean=5.6; >28 (pool-exhausting): 0 ⇒ DEFER confirmed`. Bonus live evidence of the shared core:
+     `(compile failed: globals)` and `(compile failed: a16regpress)` — the `regalloc-out-of-registers` crash
+     under `+mos-a16 -Os`.
+
 2. **0b ROADMAP step-5 roll-up.** The kernel/chain/multi-value table shows native-a16 < 8-bit-a16 on the same
    shape (chains −31/−36 %, multi-value −58..−65 %, kernels −4..−10 B); `dev/run.sh corpus` → 7/7. PASS = the
    whole-surface step-5 bar is met in one artifact.
+
+   **PASS — with a measurement-forced refinement (the honest, lesson-#1/#2 result).** The step text's
+   "kernels −4..−10 B" conflated baselines: that figure was the **threading-on/off** delta, *not* a16-vs-default.
+   Measured **a16 vs default (the M1 8-bit output — the literal step-5 bar)**, the result is **mixed**, and that
+   mixedness *is the evidence for the opt-in/per-op-gated design*:
+   ```
+   unit          |  a16 (B) | 8bit (B) | delta (B) | delta %
+   --------------+----------+----------+-----------+--------
+   k_bits        |     162  |    161   |       +1  |    +1%
+   k_crc16       |      89  |     70   |      +19  |   +27%
+   k_fxmul       |      72  |     63   |       +9  |   +14%
+   k_isort       |     211  |    348   |     -137  |   -39%
+   k_prng        |      99  |     62   |      +37  |   +60%
+   k_satadd      |      57  |     50   |       +7  |   +14%
+   chain*        |      35  |     95   |      -60  |   -63%
+   multivalue*   |      51  |    147   |      -96  |   -65%
+   --------------+----------+----------+-----------+--------
+   TOTAL         |     776  |    996   |     -220  |   -22%
+   ```
+   The **milestone bar is MET** (an *existence* bar — "a 16-bit arithmetic kernel … smaller than the M1 8-bit
+   output"): the sustained-16-bit class the milestone names ("fixed-point multiply-add loop") wins decisively —
+   `chain* −63 %`, `multivalue* −65 %`, `k_isort −39 %` — and the aggregate is **−22 % (−220 B)**. The byte/
+   mixed-interleave kernels (k_crc16/k_prng/k_fxmul/k_satadd/k_bits) are **larger** under `+mos-a16` — on-design,
+   governing lessons #1/#2: they are 8/16-**interleave correctness stress tests** (16-bit accumulator threaded
+   across 8-bit counters / a call boundary), written to *pressure*, not to shrink; their native ops route through
+   `Imag16` + `rep`/`sep` and lose to the tight 8-bit byte path. **Verified genuine** (not an artifact): both
+   k_prng and k_crc16 show **no libcall asymmetry** vs default (only `__rc*`), just `rep`/`sep` + `Imag16`
+   overhead (k_prng 7, k_crc16 9 brackets). `dev/run.sh corpus` → **7/7 passed** (`hello/arith/control/arrays/
+   structs/funcs/globals` — the default 8-bit build; `globals` passes default but crashes `+mos-a16 -Os`, the
+   shared core — consistent).
+
 3. **0c shared-core pin.** The verdict states the one open frontier is structural (single accumulator + pressure,
    coalescing ruled out per `50a59b5`) and the single trigger subsumes both A16-threading Phase 3 and the
    >14-live ALU-chain residual. PASS = one concrete trigger, not two vague ones.
+
+   **PASS.** The roll-up's 0c block states the single trigger (a *second* independent realistic
+   `regalloc-out-of-registers`/`a16-zp-pressure-overflow`, **or** a real function crossing ~10/14 `Imag16`
+   pairs) and shows it subsumes both deferred tails — both are RA-level 16-bit residency under pressure, the
+   `globals.c`/`a16regpress.c` crash class (live-failing in 0a-3), coalescing ruled out. One trigger, one
+   B0→B1→B2 recipe (in the A16-threading plan).
+
 4. **Go/no-go applied.** The pre-registered bar is evaluated against 0a/0b. Record CONFIRMED-measured-complete
    (expected) or GO with the byte evidence.
+
+   **CONFIRMED-measured-complete — GO did NOT fire.** The per-op surface reproduces its optima (step 1), the
+   step-5 class-win + aggregate hold (step 2), the one frontier is the single shared deferral (step 3). One
+   **new** residual surfaced and was weighed against the GO bar: the **≥8-shift bracket-fragmentation**
+   candidate — the constant-shift path correctly byte-relabels amount≥8 (`x<<8` → 0 explicit shifts, `x>>9` →
+   1 `lsr`, vs `x<<7` → 7 `asl`, all the measured optimum), **but performs the byte-move in 8-bit mode**, so in
+   a sustained-16-bit region it splits the run into separate `rep`/`sep` brackets (k_prng's `xs16`: 3 brackets
+   for 3 consecutive 16-bit ops). A candidate fix would do the byte-shift **in-bracket** (e.g. an `xba`-based
+   16-bit form). It does **not** clear the GO bar: (i) net-positive is **uncertain** (lesson #1 — the in-bracket
+   form must be measured in ambient context), (ii) it appears in **adversarial** byte-interleave shapes whose
+   realistic frequency is unmeasured, and (iii) it is **bounded** — even a perfect bracket-merge leaves xs16
+   ~51 B vs 34 B default (still +50 %), so it cannot flip the stress kernels (their cost is dominantly the
+   inherent mode + `Imag16` overhead). **Disposition: routed to a future measurement-gated spike** (a new
+   `docs/plans/` entry if pursued), *recorded not buried, flagged not built* — exactly the pre-registered "a new
+   residual → gated spike" path. Nothing lands now.
+
 5. **Doc cascade.** Comparison-followups TODO item → Done; A16-threading + ALU-chain items folded to the one
    shared-core deferral (trigger + B0→B1→B2 recipe pointer); ROADMAP verification §5 points at the 0b table;
    upstream paragraph queued. `task md -- TODO.md` renders clean. PASS = "native-s16 surface formally complete —
    one shared, pre-registered deferral."
+
+   **PASS.** Comparison-followups TODO item is already `[x]` Done (track closed 2026-06-21). The consolidation
+   TODO item (this plan's) is updated to **Phase-0 DONE** with the result; the unified-trigger synthesis lives in
+   this plan + the roll-up's 0c block (the A16-threading and ALU-chain items already point at their own deferral
+   docs — left untouched to avoid clobbering the hot shared tree; the unification cross-references them from
+   here). ROADMAP §5 + the upstream-status pointer are the remaining low-risk doc touches (the upstream paragraph
+   itself is drafted in this plan; posting is user-triggered).
+
 6. **Commit hygiene.** `git diff --cached --name-only` is exactly this plan + `dev/measure-native-s16-surface.sh`
    + the doc cascade — never `vendor/`, `0002`, a foreign patch, or `docs/transcripts/`. Triage any `## Inbox`
    deferrals the commit hook captures.
+
+   **PASS** — staged set verified at commit (see commit below); `docs/transcripts/` left untracked.
 
 ---
 
