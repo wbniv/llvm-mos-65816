@@ -310,8 +310,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `mode` input `sampled` [seeded `--sample 150 --sample-seed S` @ `-Os`] / `full` [whole in-scope @ `-Os`
   **and** `-O1`]). Added a seeded `--sample`/`--sample-seed` to `tools/torture_run.py` (was sequential-slice
   only). Local sampled verify `dev/run.sh torture --sample 150 --sample-seed 1 --opt -Os` = **143 PASS, 0
-  FAIL, 7 SKIP, 0 XFAIL** (4-way, MAME + bsnes-jg). **Optional tail (non-blocking):** reap orphan MAMEs in
-  the runner (matters for repeated local full sweeps; GH runners are ephemeral).
+  FAIL, 7 SKIP, 0 XFAIL** (4-way, MAME + bsnes-jg). ~~**Optional tail:** reap orphan MAMEs in the runner~~
+  **Orphan-MAME reaper DONE 2026-06-21** — `_run_emu` in `tools/a16_fuzz.py` spawns every emulator in its
+  own session/process group and `killpg`s the whole group on timeout / exit / SIGTERM (no leaked boots
+  across long local sweeps); behaviour-preserving (same `CompletedProcess`, re-raises `TimeoutExpired`).
+  Verified: forking child reaped group-wide on timeout; normal path unregressed (`torture --sample 8` 8/8).
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [verify] **M1 toolchain incremental-rebuild time not yet measured** — the from-source plan's
   verification step 4 ("editing a backend file relinks fast") is "not separately timed yet"; measure

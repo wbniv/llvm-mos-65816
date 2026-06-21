@@ -5,7 +5,7 @@
 (**1174 PASS, 0 FAIL** with bsnes-jg 4-way) sweeps green-modulo-known (`xfails.tsv` now empty — every
 known miscompile fixed). **Phase 3 (sampled CI) DONE** — the `torture` job is in
 `.github/workflows/smoke.yml` (in-container, 4-way, seeded `--sample`, secret-gated, `mode` sampled/full);
-see §"Phase 3 — RESULTS". Optional tail: orphan-MAME reaper (non-blocking). See §"Phase 2 — RESULTS".
+see §"Phase 3 — RESULTS". Orphan-MAME reaper DONE 2026-06-21 (`_run_emu` process-group kill). See §"Phase 2 — RESULTS".
 **BACKLOG RESOLUTION (2026-06-19 → fully cleared 2026-06-20):** the **frame-index fix cleared 13** (all a16),
 the **dg-require** refinement dropped the `pr7284-1` false positive (in-scope 1253→1228), and the **4 remaining
 xy16 defects + `k_isort`'s xy16 leg were all cleared by ONE fix** (the `MOSInsertREPSEP` `requiredXWidth`
@@ -154,8 +154,15 @@ across the sample. **PASS.** (The `full`-mode commands reuse the long-proven cou
 `-Os` 1174 PASS and `-O1` 1098 PASS from Phase 2 — so they are sound by construction; not re-run here as
 the full sweep is hours.)
 
-**Optional remaining (not blocking):** reap orphaned MAME children in the runner — matters for repeated
-local full sweeps; GH-hosted runners are ephemeral VMs, so leaked children die with the job.
+**Orphan-MAME reaper — DONE 2026-06-21.** `tools/a16_fuzz.py` now runs every emulator subprocess
+(`run_mame`/`run_bsnes`) via a `_run_emu` helper that spawns it in its own session/process group
+(`start_new_session=True`) and reaps the **whole group** (`os.killpg`) on three paths: the inline
+per-test timeout, an uncaught `KeyboardInterrupt`/normal exit (`atexit`), and `SIGTERM` (handler). So a
+hung boot no longer leaks a process across a 1000+-boot local sweep. Verified: a forking child is reaped
+group-wide on timeout (`killpg(pgid,0)` liveness probe → empty after kill); the normal path is
+unregressed (`torture --sample 8` → 8 PASS, 4-way). Behaviour-preserving — `_run_emu` returns the same
+`CompletedProcess` and re-raises `TimeoutExpired`, so all callers (corpus-a16, fuzzer, torture) are
+unchanged but now leak-free.
 
 ## Phase 0 — RESULTS (2026-06-19)
 
@@ -274,7 +281,9 @@ Full `-O1` differential pass over all **1253** in-scope tests (MAME `default == 
 > **Harness note (fixed):** the runner's per-test `subprocess.run(timeout=…)` kills a hung MAME but can
 > leave orphaned MAME children; over a 1253-test pass these accumulated and the final process hung in
 > teardown (so the `-Os` pass — chained after `set -e` — never started). The 16 FAILs are unaffected (all
-> reproduced isolated). The `-Os` pass reruns separately; reaping orphan MAMEs is a follow-up runner fix.
+> reproduced isolated). The `-Os` pass reruns separately. **Reaped 2026-06-21:** `_run_emu` now spawns
+> each emulator in its own process group and `killpg`s the whole group on timeout / exit / SIGTERM, so
+> children no longer accumulate (see §"Phase 3 — RESULTS").
 
 ## Phase 2 backlog — RESOLUTION (2026-06-19)
 

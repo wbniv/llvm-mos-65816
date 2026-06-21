@@ -28,9 +28,11 @@ The generated C is UB-free so the differential oracle is sound:
 Run INSIDE the dev container; drive from the host via `dev/run.sh fuzz [N] [seed]`.
 """
 import argparse
+import atexit
 import os
 import random
 import re
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -775,6 +777,55 @@ def map_lookup(mapf, sym):
     return None, None
 
 
+# Emulator subprocesses run in their own session (= own process group) so a stuck boot can be
+# reaped as a WHOLE TREE, not just the direct child. A per-test MAME timeout, a Ctrl-C, or a
+# SIGTERM otherwise leaks a process every time, and across a 1000+-boot local sweep they pile
+# up and starve the box. We track live emu children and kill the group on: the inline timeout
+# (below), interpreter exit / uncaught KeyboardInterrupt (atexit), and SIGTERM (handler).
+_LIVE_EMUS = set()
+
+
+def _kill_group(p):
+    try:
+        os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        pass  # already gone / not ours
+
+
+def _reap_emus(*_):
+    for p in list(_LIVE_EMUS):
+        if p.poll() is None:
+            _kill_group(p)
+
+
+atexit.register(_reap_emus)
+try:
+    signal.signal(signal.SIGTERM, lambda *a: (_reap_emus(), sys.exit(143)))
+except (ValueError, OSError):
+    pass  # not on the main thread — atexit + the inline timeout kill still cover it
+
+
+def _run_emu(cmd, timeout, env=None):
+    """subprocess.run for an emulator, but in its own process group so a timeout reaps the
+    whole tree (emulator + any children it forked). Returns a CompletedProcess and re-raises
+    subprocess.TimeoutExpired (after killing the group), so callers' handling is unchanged."""
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         text=True, env=env, start_new_session=True)
+    _LIVE_EMUS.add(p)
+    try:
+        out, err = p.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        _kill_group(p)
+        try:
+            p.communicate(timeout=10)  # reap the SIGKILL'd group (no zombie)
+        except Exception:
+            pass
+        raise
+    finally:
+        _LIVE_EMUS.discard(p)
+    return subprocess.CompletedProcess(cmd, p.returncode, out, err)
+
+
 def run_mame(rom, addr, want, length):
     env = dict(os.environ)
     env.update(
@@ -786,7 +837,7 @@ def run_mame(rom, addr, want, length):
            "-autoboot_script", str(SMOKE_LUA), "-skip_gameinfo",
            "-video", "none", "-sound", "none", "-nothrottle", "-seconds_to_run", "3",
            "-cfg_directory", str(SCRATCH), "-nvram_directory", str(SCRATCH)]
-    p = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=90)
+    p = _run_emu(cmd, timeout=90, env=env)
     m = re.search(r"^SMOKE:.*$", p.stdout, re.M)
     if not m:
         return None, "(no SMOKE line from MAME)\n" + p.stdout[-400:]
@@ -798,7 +849,7 @@ def run_bsnes(rom, off, length, want):
     if not (JGX.exists() and JG_DB.is_dir()):
         return "skip", "(bsnes-jg unavailable)"
     cmd = [str(JGX), str(rom), str(JG_DB), "0x%X" % off, str(length), "0x%X" % want, "180"]
-    p = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
+    p = _run_emu(cmd, timeout=90)
     line = (p.stdout + p.stderr).strip().splitlines()
     line = next((l for l in line if l.startswith("SMOKE:")), "(no SMOKE line)")
     g = GOT_RE.search(line)
