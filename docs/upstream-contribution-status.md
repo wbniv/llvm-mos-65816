@@ -17,7 +17,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 ## TL;DR
 
-- **Ready to post now: 2 PRs + 2 issues + 3 design notes** — seven artifacts, all drafted, all one command/paste away.
+- **Ready to post now: 2 PRs + 3 issues + 3 design notes** — eight artifacts, all drafted, all one command/paste away.
   Strictly *PRs*, that's **two** (F4; and the DWARF step-6 test+docs).
 - **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
@@ -36,6 +36,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 | 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | `wbniv:mos-dwarf-65816-test-docs` (pushed `0ae9415`) |
 | 6 | **#321 CC frame-ABI** — measured frame-model evaluation | **note** | Implementation-backed CC evidence: DP-window/stack-relative are feasible but NULL on real code (locals are `__rc`-resident → frames ≈unused); keep the soft static stack, by measurement | [`docs/321-upstream-cc-frame-abi-note.md`](321-upstream-cc-frame-abi-note.md) | n/a (note) |
 | 7 | **#320 far-CC** — measured ABI evaluation (far ptr across a call) | **note** | Implementation-backed CC evidence: all 4 ABIs built behind `+mos-farcc-*` + measured (bytes + round-trips/frame) on MAME+bsnes-jg → **Imag32 wins decisively** (70 B/50441; smallest *and* fastest). Far ptr should pass/return whole in one 4-byte imaginary-register unit, by measurement. **Follow-up to #3** — post after the design note opens the conversation. Shipped as `0004` in-fork. | [`docs/320-upstream-far-cc-measurement-note.md`](320-upstream-far-cc-measurement-note.md) | n/a (note) |
+| 8 | **DP-arg CC** — `addrspace(1)` 8-bit pointer argument in a 16-bit register | **issue** | Upstream crash: `CCIfPtr` (MOSCallingConv.td:65) assigns *every* pointer arg to a 16-bit `RS` pair, so an 8-bit `addrspace(1)` (direct-page) pointer arg → illegal `(p1)=COPY $rs` (no fork patch — maintainer CC fix). Reproduces on base `mos6502`. | [`docs/320-upstream-dp-arg-cc-issue.md`](320-upstream-dp-arg-cc-issue.md) | n/a (issue) |
 
 ### 1 — F4 PR (a code-change PR; #5 DWARF is the other)
 
@@ -145,6 +146,27 @@ gh issue comment 320 --repo llvm-mos/llvm-mos --body-file docs/320-upstream-far-
 ```
 
 Full internal record: [far-cc study + land plan](plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md).
+
+### 8 — DP-arg calling-convention issue (an issue, **not** a PR)
+
+Source-verified write-up of an **upstream** crash, surfaced as the "dp→near" residual of the #320
+far-pointer-value work: passing an `addrspace(1)` (8-bit direct-page) pointer as a **function argument**
+crashes the backend. Root cause is `MOSCallingConv.td:65` — `CCIfPtr<CCAssignToReg<[RS1..RS7]>>` assigns
+*every* pointer arg to a 16-bit `RS` pair (`CCIfPtr` = `CCIf<"ArgFlags.isPointer()">`, address-space-blind),
+so an 8-bit `addrspace(1)` pointer gets a 16-bit home → illegal `%vreg:(p1) = COPY $rsN` (`Def Size = 8,
+Src Size = 16`). Three faces: `-verify-machineinstrs` rejects it; an asserts build aborts at
+`MOSRegisterInfo.cpp:1059` (`copyCost`, during RA); a release build SIGSEGVs in `MOSLateOptimization`.
+**No fork patch** (issue only — the fix is address-space-aware CC assignment, e.g. `CCIfPtrAddrSpace<1, …>`
+to an 8-bit slot; maintainer territory). Reproduces on a **pristine** build at base `mos6502` (no
+`+mos-a16`/`mosw65816`); our vendor pin `c798c31` == upstream `main`. 2-line repro included. File it:
+
+```
+gh issue create --repo llvm-mos/llvm-mos \
+  --title "[MOS] Calling convention passes an addrspace(1) (8-bit direct-page) pointer argument in a 16-bit register — illegal size-mismatched COPY" \
+  --body-file docs/320-upstream-dp-arg-cc-issue.md   # strip the status block first
+```
+
+Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-far-value-residuals.md).
 
 ## Future / blocked (not yet postable — do **not** count these as pending)
 

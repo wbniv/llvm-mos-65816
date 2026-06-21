@@ -36,9 +36,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   illegal `(p1)=COPY $rs`, "Copy Instruction illegal with mismatching sizes"; asserts-aborts at
   `MOSRegisterInfo.cpp:1146`, SIGSEGVs in `MOSLateOptimization` w/o `-verify`). Stock `p1:8:8` (our `0001`
   only adds `p2:32:8`) ⇒ **upstream issue to draft** (user-triggered post), not a fork fix; (b) far-ptr
-  storage under **default 8-bit** is un-legalized — **a16-gated by design** (storage works under `+mos-a16`
-  via F2; 8-bit is a clean compile-time rejection; no 8-bit-only use case) → confirm + close by-design.
-  Evidence: `dev/measure-far-ptr-value-state.sh`.
+  storage under **default 8-bit** is un-legalized — **CLOSED 2026-06-22: a16-gated by design.** A far ptr is
+  a 32-bit value; its `s32↔bytes` bridge (`G_MERGE/G_UNMERGE {S32,S8}`) is fully `hasAccum16`-gated
+  (MOSLegalizerInfo.cpp:152-169, `unsupported()` else). Under 8-bit, storage fails as a **clean Legalizer
+  `unable to legalize` rejection — no object, no miscompile** (verified all four s1-s4 fixtures, no `-verify`),
+  unlike the (a) crash. Verdict is `0005`-invariant; no 8-bit-only use case (far ⇒ banking ⇒ 65816 ⇒ a16).
+  No fork fix. Evidence: `dev/measure-far-ptr-value-state.sh`.
   [plan §Re-evaluation](docs/plans/2026-06-21-320-five-address-space-model.md) ·
   [F2 hand-off](docs/plans/2026-06-21-320-far-calls-followups.md).
 - [ ] **#320 five-address-space model — Phase 0+3 DONE; new spaces (AS3 packed-24, AS4 zero-bank) DEFERRED

@@ -36,6 +36,17 @@ mos-clang --target=mos -mcpu=mosw65816 -Os -std=c23 -mllvm -verify-machineinstrs
 `z1` — wrong `sizeof`; `c*` — narrowing casts fail). That gap is the *desirable* M1 far-pointer
 completion work, not a dead end.
 
+> **⏱ This table is the PRE-F2 snapshot** (`mos-clang` @ `c798c31`, before the far-fn-ptr "F2" agent's
+> far-value work landed on `main`). **Post-F2** (`0001`+`0004`+`0005`): under **`+mos-a16`**, `s1`–`s4`
+> (store/load/array/struct), `z1` (`sizeof==4`), and `c1` (far→near) all pass. Two residuals are tracked +
+> closed in [`docs/plans/2026-06-22-320-far-value-residuals.md`](../../../docs/plans/2026-06-22-320-far-value-residuals.md):
+> (a) **`c2` dp→near** is a pre-existing **upstream** bug (the 8-bit `addrspace(1)` pointer *argument* gets a
+> 16-bit `RS` reg → illegal `COPY`; reproduces on plain `mos6502`) — filed upstream
+> ([`docs/320-upstream-dp-arg-cc-issue.md`](../../../docs/320-upstream-dp-arg-cc-issue.md)); (b) the
+> **default** column for `s*` stays FAIL **by design** — a far pointer's 32-bit `s32↔bytes` bridge is
+> `+mos-a16`-gated, so 8-bit far storage is a clean compile-time `unable to legalize` rejection (no object,
+> no miscompile).
+
 ## Verbatim failures (the storage gap)
 
 `s1_store_far_global.c` — the `p2` value store isn't legalized:

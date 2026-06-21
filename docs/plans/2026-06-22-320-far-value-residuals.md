@@ -263,41 +263,120 @@ Writing this plan, the issue body, and the doc/TODO edits happen on `main` as no
 
 ---
 
-## Verification
+## Outcome (executed 2026-06-22)
 
-Run each step; paste raw output in a code block below it and mark PASS/FAIL, then write back here.
+**Part A — DONE (drafted + queued; posting user-triggered).** No dup upstream; the crash root-caused to
+`MOSCallingConv.td:65` `CCIfPtr<CCAssignToReg<[RS1..RS7]>>` (= `CCIf<"ArgFlags.isPointer()">`,
+address-space-blind) assigning the 8-bit `addrspace(1)` pointer arg a 16-bit `RS` home. Issue body
+`docs/320-upstream-dp-arg-cc-issue.md`; queued as item 8 in `docs/upstream-contribution-status.md`. Fix
+direction uses the real `CCIfPtrAddrSpace<AS,…>` LLVM class (verified to exist).
+
+**Part B — DONE (closed, a16-gated by design).** Method deviated from Steps B.1–B.2 for a real reason and
+reached a stronger conclusion:
+
+- **The plan's post-F2-rebuild path was blocked.** Both retained worktree installs are gone, and `vendor/`
+  is a *stale shared partial* — a `c798c31` clone with the backend patches applied as working-tree edits but
+  **missing `0005`** (MOSLegalizerInfo.cpp:378 is the pre-F2 `{S8, S16, PZ, P}` form). It can't be safely
+  re-cloned (would destroy any concurrent worker's edits) and a from-scratch Docker LLVM rebuild is
+  disproportionate for a no-code-change by-design close.
+- **The verdict is `0005`-invariant, so the rebuild is unnecessary.** A far pointer is a **32-bit value**;
+  moving it to/from memory bytes needs the `s32↔bytes` bridge (`G_MERGE/G_UNMERGE {S32,S8}`), which is
+  **entirely `hasAccum16`-gated** (MOSLegalizerInfo.cpp:152–169 — `B.unsupported()` in the `else`). `0005`
+  only adds `PF` to the `{G_LOAD,G_STORE}` *custom* set, which under 8-bit reroutes the failure from
+  "`unable to legalize G_STORE (p2)`" (pre-`0005`) to "`unable to legalize` the downstream `s32` merge/store"
+  (post-`0005`) — **same kind** (a clean Legalizer `report_fatal_error`), different named instruction. I
+  measured the post-`0005` constituent ops directly on the pre-F2 build: `ptrtoint PF→s32` is legal (line
+  134, ungated) and a plain `uint32_t` store/load is fine under 8-bit, **but** reconstructing/decomposing a
+  far pointer's `s32` to/from bytes fails cleanly (`unable to legalize G_MERGE_VALUES {S8,S32}` /
+  `G_UNMERGE` at the Legalizer). The `+mos-a16` *win* half (`s1`–`s4`/`z1`/`c1` OK) is the F2 agent's
+  recorded verification (`wt/320-far-followups`, 2026-06-21).
+- **Safety confirmed:** all four real fixtures under default 8-bit (no `-verify`) abort at the Legalizer
+  with `unable to legalize` and **emit no object** — a deterministic compile-time rejection, not a
+  miscompile, and categorically unlike the dp→near crash (which *survives* the legalizer as a legal-looking
+  illegal COPY and SIGSEGVs in `MOSLateOptimization`). No realistic 8-bit-only use case (far pointers ⇒
+  banking ⇒ 65816 ⇒ `+mos-a16`). **Closed by design; no fork fix.**
+
+## Verification
 
 1. **DP-arg crash reproduces upstream-clean (Part A core claim).** `c2_dp_to_near.c` and the 2-line repro
    both FAIL on plain `mos6502 -Os -verify-machineinstrs` with "Copy Instruction is illegal with mismatching
    sizes / Def Size = 8, Src Size = 16"; the DP-**local** and near-arg controls pass.
 
-   _(pending — run Step A.2 + the reduction probe; paste output)_
+   ```
+   # 2-line repro, plain mos6502 -Os -verify-machineinstrs:
+   # After IRTranslator
+   bb.1 (%ir-block.1):
+     liveins: $rs1
+     %0:_(p1) = COPY $rs1
+     %1:_(s8) = G_LOAD %0:_(p1) :: (load (s8) from %ir.0, addrspace 1)
+   *** Bad machine code: Copy Instruction is illegal with mismatching sizes ***
+   - instruction: %0:_(p1) = COPY $rs1
+   Def Size = 8, Src Size = 16
+   fatal error: error in backend: Found 1 machine code errors.
+
+   # reduction probe (plain mos6502 -verify):
+   #   char d(char DP *p){ return *p; }            FAIL    (DP arg, no cast)
+   #   int  d(char DP *p){ return (int)(intptr)p;} FAIL    (DP arg, no deref)
+   #   char d(void){ static char DP *p; return *p;} OK     (DP local, not arg)
+   #   char d(char *p){ return *p; }               OK      (near arg — control)
+   ```
+   **PASS** — the trigger is the `addrspace(1)` pointer *argument*; the dp→near cast is incidental.
 
 2. **It's upstream, not fork.** `0001` only adds `p2:32:8` (DP `p1:8:8` is stock); `gh api` confirms
    `p1:8:8` and the `MOSRegisterInfo.cpp` "Unexpected physical register copy" site still present upstream.
 
-   _(pending — run Step A.3; paste output)_
+   ```
+   # upstream MOSTargetMachine.cpp:76 : e-m:e-p:16:8-p1:8:8-i16:8-...           (p1:8:8 is stock)
+   # upstream MOSRegisterInfo.cpp:1059: llvm_unreachable("Unexpected physical register copy.");
+   # upstream MOSCallingConv.td:65     : CCIfPtr<CCAssignToReg<[RS1..RS7]>>,
+   # upstream HEAD == our pin c798c31 (2026-04-23) → bug is live upstream.
+   # asserts build (ours): UNREACHABLE MOSRegisterInfo.cpp:1146 (copyCost → RAGreedy)
+   # release no-verify (ours): SIGSEGV in MOSLateOptimization
+   # grep -c copyCost/'Unexpected physical register copy' in 0002-0007 patches = 0
+   ```
+   **PASS** — base `mos6502`, no fork features; crash site & datalayout are pristine upstream.
 
 3. **Issue artifacts exist + queued.** `docs/320-upstream-dp-arg-cc-issue.md` written; a new *Ready to post
-   now* item with the exact `gh issue create` in `docs/upstream-contribution-status.md`; TL;DR count bumped.
+   now* item (#8) with the exact `gh issue create` in `docs/upstream-contribution-status.md`; TL;DR bumped
+   (`2 issues` → `3 issues`, `seven` → `eight`).
 
-   _(pending)_
+   **PASS** — both files written; no dup found (`gh search issues` → only the broad #320/#32 meta-issues).
 
-4. **Part B split confirmed on a post-F2 toolchain.** `measure-far-ptr-value-state.sh` shows `s1`–`s4`/`c1`/
-   `z1` OK under `+mos-a16` and FAIL default-8-bit (sanity: `s1 +mos-a16` is OK ⇒ F2 build).
+4. **Part B split (a16 OK / 8-bit FAIL) + the `s32↔bytes` bridge is a16-gated.** The `+mos-a16` win half is
+   F2-recorded (`s1`–`s4`/`z1`/`c1` OK on `wt/320-far-followups`, 2026-06-21). The 8-bit-fail half is
+   measured here; the bridge gating is source-verified.
 
-   _(pending — Step B.1–B.2)_
+   ```
+   # MOSLegalizerInfo.cpp:152-169 — the ONLY s32<->bytes (un)merge, fully under hasAccum16:
+   if (STI.hasAccum16())  B.legalFor({{S32,S16}}).customFor({{S32,S8}});
+   B.unsupported();                                  # <- else: no s32 path at all
+   if (STI.hasAccum16())  B.legalFor({{S16,S32}}).customFor({{S8,S32}});
+   B.unsupported();
+   # anchor (pre-F2 build, default 8-bit):
+   #   uint32_t store / load            OK   (plain i32 mem ops work on 6502)
+   #   far-ptr value -> s32 -> bytes    FAIL "unable to legalize G_MERGE/G_UNMERGE {S8,S32}" @ Legalizer
+   ```
+   **PASS** — 8-bit far storage is un-legalized because the 32-bit far value's byte bridge is a16-only;
+   the verdict is `0005`-invariant (see Outcome). Exact post-`0005` instruction not re-measured by rebuild
+   (vendor stale; rebuild disproportionate) — established by measured equivalents + source.
 
 5. **Default-8-bit far storage is a clean compile-time rejection (no miscompile).** Each `s*` fixture
-   without `-verify` aborts with `unable to legalize` (or, for `s1`, the recorded behavior); none silently
-   emits an object file.
+   without `-verify` aborts at the Legalizer with `unable to legalize`; none emits an object file.
 
-   _(pending — Step B.3)_
+   ```
+   s1_store_far_global   unable to legalize: G_STORE %0:_     | Running pass 'Legalizer' | no object
+   s2_load_far_global    unable to legalize: %0:_ = G_LOAD…   | Running pass 'Legalizer' | no object
+   s3_array_far          unable to legalize: %8:_ = G_LOAD…   | Running pass 'Legalizer' | no object
+   s4_struct_far         unable to legalize: %1:_ = G_LOAD…   | Running pass 'Legalizer' | no object
+   ```
+   **PASS** — deterministic Legalizer rejection, no object, no crash; unlike the dp→near (Part A) crash that
+   survives to `MOSLateOptimization`.
 
-6. **Bullets closed.** M1 TODO item: residual (a) → "filed upstream #NNN"; residual (b) → "closed:
-   a16-gated by design" with evidence pointer. `far-value-evidence/README.md` Reading note added.
+6. **Bullets closed.** M1 TODO item: residual (a) → upstream issue drafted+queued (Upstream/Contribution
+   item, posting user-triggered); residual (b) → "closed: a16-gated by design" with evidence pointer.
+   `far-value-evidence/README.md` Reading note added.
 
-   _(pending)_
+   **PASS** — see Bookkeeping below (TODO + README edited this turn).
 
 ---
 
