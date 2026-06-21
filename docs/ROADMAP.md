@@ -220,6 +220,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `far_sizeof` 4-way PASS — **all landed on `main` 2026-06-21** (`0001` a16-free + `0005` for the
    a16-context-entangled legalizer hunk; round-trip-proven). The far-pointer **calling convention** is also
    **DONE + landed** — all variants measured, **Imag32 won and shipped as `0004`** on `main` (2026-06-21).
+   Of the five-address-space model, **AS3 packed-24** (the 3-byte far-ptr storage form for tables) is **built
+   + landed** (`0006`, 2026-06-21/22, incl. the static-init table reloc fix; measured net win, break-even
+   N≥1); only **AS4 zero-bank** + the upstream PR remain.
    [Inc 4 plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
    [follow-ups](plans/2026-06-21-320-far-calls-followups.md)._
 

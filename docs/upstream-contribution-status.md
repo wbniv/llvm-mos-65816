@@ -147,10 +147,14 @@ Full internal record: [far-cc study + land plan](plans/2026-06-21-320-far-pointe
 - **#320 five-address-space model + PR.** The real far-pointer codegen PR (asiekierka's 32-bit-default /
   packed 24-bit / zero-bank / abs-16 layout). Blocked on maintainer **ABI blessing** — gated behind posting
   the #320 design note above. Not drafted as a PR yet. **The fork-side implementation body is now large and
-  feature-complete (2026-06-21)** and would form the bulk of this PR once unblocked — now **landed on `main`
-  (2026-06-21)** as `patches/llvm-mos/0001` (a16-free) + `0004` (far-ptr CC, Imag32 winner) + `0005` (the lone
-  a16-context-entangled `MOSLegalizerInfo` PF-as-value hunk); round-trip-proven against `wt/320-far-followups`
-  (also pushed `origin/wt/320-far-followups`):
+  feature-complete (2026-06-21/22)** and would form the bulk of this PR once unblocked — now **landed on
+  `main`** as `patches/llvm-mos/0001` (a16-free) + `0004` (far-ptr CC, Imag32 winner) + `0005` (the lone
+  a16-context-entangled `MOSLegalizerInfo` PF-as-value hunk) + **`0006`** (AS3 packed-24: the 3-byte far-ptr
+  storage form for tables, incl. the static-init relocation fix); round-trip-proven against
+  `wt/320-far-followups` (also pushed `origin/wt/320-far-followups`). **Of asiekierka's five spaces, only AS4
+  zero-bank remains unbuilt** (a likely measured null ≈ a near pointer). A separate near-abs bank-relaxation
+  optimization (`0007`, near globals → `abs` not `abs-long`) is built on `wt/320-near-abs-bank-relax`, not yet
+  landed:
   - **far calls (b):** far→near mixed-banking via the bank-0 thunk `__call_near_from_far` (shipped to `main`).
   - **far function pointers (a):** the p2-value sub-project (Layers 1–3 + Gap A/B), the `jsl __call_indir_far`
     indirect-call mechanism, **and the clang front-end (F2):** a MOS **`far`/`long_call`** function/type

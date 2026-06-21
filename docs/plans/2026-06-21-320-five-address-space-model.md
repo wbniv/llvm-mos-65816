@@ -450,6 +450,13 @@ a 16-table 48. **Non-breaking: corpus 7/7** (AS3 is inert unless code creates an
 
 ### Increment B — codegen to *use* packed pointers: **DONE + verified, 2026-06-21** (built on post-F2 `main`)
 
+> **Follow-up 2026-06-22 — static-init table reloc fix (`a76bf18`).** Increment B (below) covered the
+> *runtime* store/load/deref path; the realistic shape — a *statically-initialized* table of packed far
+> pointers — did NOT link (each 3-byte entry emitted one `R_MOS_ADDR8`; no 3-byte data fixup). Fixed via a
+> generic `AsmPrinter::emitNonStandardSizedConstant` hook + a MOS override emitting the `ADDR24
+> SEGMENT_LO/HI/BANK` triple; landed in the updated `0006`. Also Task A measured the win (break-even N≥1).
+> Full record: [2026-06-22-320-packed24-static-init-reloc-fix.md](2026-06-22-320-packed24-static-init-reloc-fix.md).
+
 Built on `wt/320-packed24-incB` (compiler-changing worktree off post-F2 `main`; F2 precondition gate
 PASS — `sizeof(far*)==4`, far store/load/array/struct legalize clean). The original "BLOCKED on s24"
 diagnosis was *half right* — the dead-end was specifically the **`inttoptr/ptrtoint`-roundtrip-through-s24**
