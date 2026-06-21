@@ -21,7 +21,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [ ] **#320 complete the far-pointer VALUE type — DESIRABLE M1 work surfaced by the five-space census.**
+- [ ] **#320 complete the far-pointer DATA-VALUE type — DESIRABLE M1 work surfaced by the five-space census.**
   A far pointer (`addrspace 2`) is today a complete *address mechanism* (deref/load/store/arith/calls all
   work, `+mos-a16`-gated) but an **incomplete value type**: it **can't be stored in memory** (global /
   array / struct-field store+load all fail under default AND `+mos-a16`), `sizeof(far*)==2` not 4 (clang
@@ -30,9 +30,25 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Real banked-memory C *wants* tables of far pointers (banked-asset/jump tables) — they just can't be
   written yet. **Scope:** (1) `getPointerWidthV` → `sizeof(far*)==4`; (2) legalize `G_STORE`/`G_LOAD p2`
   in memory + aggregate/static-init; (3) the narrowing/cross-space casts (+ fix the dp→near segfault);
-  (4) merge `0004`'s pass/return half. Coordinate the clang side with the in-flight `far`-attribute (F2)
-  work. Evidence: `dev/measure-far-ptr-value-state.sh`.
-  [plan §Phase 3 results + 0b verdict](docs/plans/2026-06-21-320-five-address-space-model.md).
+  (4) merge `0004`'s pass/return half.
+  **EXACT HAND-OFF with the F2 far-fn-ptr agent (verified 2026-06-21 against `wt/320-far-followups`):**
+  F2 is a *different track* — its `far`/`long_call` attr is `Subjects = [Function]` (far **code**-ptr
+  *call* lowering via `MOSFarCall` → `jsl __call_indir_far`), scoped to the **call site**, NOT a pointer
+  value type. So:
+  - **`getPointerWidthV`/`sizeof(far*)` (scope 1) is UNCLAIMED — F2 explicitly DEFERRED it.** Their plan
+    (`2026-06-21-320-far-calls-followups.md` L291–298) calls the `sizeof(far*)`==2 vs IR `p2:32:8`
+    disagreement "a miscompile landmine" and names the fix — "`getPointerWidthV` + a `Type::Pointer` AS2
+    arm" — as a "clean **future** follow-up … **not** needed for F2." Confirmed: their worktree `MOS.cpp`
+    still has the unfixed `default: return 16`. **This is mine to do.**
+  - **`G_STORE`/`G_LOAD p2` (Gap B, scope 2): REUSE `0004`, don't re-implement.** F2 already fixed Gap B
+    (list `PF` as a value type) for the fn-ptr p2 value; it lives in **`0004` on `wt/320-far-cc`** stacked
+    with the far-CC `Imag32`. Build the data-ptr store/aggregate path **on top of** that, and land it in
+    `0001` only once `0004`'s relationship to `main` settles (per F2's own "land in `0001` once `0004`
+    settles" note). Nothing F2/`0004` is on `main`'s toolchain yet (pre-F2 build verified).
+  - The typed far-pointer *variable* surface (`far_t fp;`) F2 punted is exactly scopes 1+3 here.
+  Evidence: `dev/measure-far-ptr-value-state.sh`.
+  [plan §Phase 3 results + 0b verdict](docs/plans/2026-06-21-320-five-address-space-model.md) ·
+  [F2 hand-off](docs/plans/2026-06-21-320-far-calls-followups.md).
 - [ ] **#320 five-address-space model — Phase 0+3 DONE; new spaces (AS3 packed-24, AS4 zero-bank) DEFERRED
   (premature, not nulls).** asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/
   `3`=packed-24/`4`=zero-bank); we ship 3 additive (`0`=near-default/`1`=DP/`2`=32-bit far). **Two hard
