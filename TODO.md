@@ -395,7 +395,9 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `+mos-a16` crash, XFAIL'd locally). Source-verified + asserts-confirmed; no fork patch (maintainer fix).
   Draft + exact `gh issue create` in [upstream-contribution-status](docs/upstream-contribution-status.md)
   (item 4) · body [docs/321-upstream-scavenger-nz-issue.md](docs/321-upstream-scavenger-nz-issue.md) ·
-  [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md).
+  [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
+  [plan](docs/plans/2026-06-22-321-scavenger-crash-upstream-issue.md) (pre-flight live-here/live-upstream +
+  a time-boxed default-8-bit repro attempt so a maintainer can trigger it without the fork-only `+mos-a16`).
 - [ ] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
   `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
