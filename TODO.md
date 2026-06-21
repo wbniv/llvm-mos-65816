@@ -122,26 +122,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
-- [ ] **#321 native-s16 — surface consolidation & close-out — Phase 0 DONE 2026-06-22, CONFIRMED
-  measured-complete; nothing built.** The #321 analogue of the #320 zero-bank measure-and-close, over the three
-  named native-s16 tracks (compares **CLOSED**; A16-threading banked Phases 0/1/1.5 + **deferred** Phase 3;
-  ALU-chains shipped all homogeneous forms + **characterized-deferred** multi-value pressure). Durable artifact
-  shipped: **`dev/measure-native-s16-surface.sh`** (drives the three existing harnesses + adds the missing
-  **ROADMAP step-5 acceptance** table). **Phase 0 results:** (0a) all three harnesses reproduce — compares native
-  except register-resident EQ-as-value (optimal byte-wise); threading roundtrips=0 (post-peephole optimum); ZP
-  max 10/28 B, **0/13 exhaust** (`globals.c`/`a16regpress.c` crash `+mos-a16 -Os` = the shared core). (0b)
-  step-5 **a16-vs-default is MIXED, honestly**: the sustained-16-bit class wins (`chain −63%`, `multivalue −65%`,
-  `k_isort −39%`, **aggregate −22%/−220 B**, corpus **7/7**) but the **8/16-interleave stress kernels regress**
-  (`k_prng +60%`, `k_crc16 +27%`, …) — on-design (lessons #1/#2; verified no libcall asymmetry, pure
-  `rep`/`sep`+`Imag16` cost) → confirms **why a16 is opt-in/per-op-gated**, not blanket. **The one fact it
-  contributes:** A16-threading **Phase 3** and the >14-live ALU-chain residual are the **same** deferred core —
-  RA-level 16-bit residency under register pressure (the `globals.c` `-Os` RA-crash class) — **one** frontier,
-  **one** trigger, **one** B0→B1→B2 spike recipe. **New candidate surfaced + routed (not built):** ≥8-shift
-  **bracket fragmentation** — amount≥8 byte-relabel is shift-optimal but does the byte-move in 8-bit mode,
-  splitting the M16 run (k_prng `xs16`: 3 brackets/3 ops); bounded (can't flip the stress kernels) + uncertain
-  net → future measurement-gated spike, doesn't meet the GO bar. Remaining low-risk doc touches: ROADMAP §5
-  pointer + the user-triggered upstream paragraph (drafted in-plan).
-  [plan](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
 - [x] **#321 native s16 — 16-bit comparison follow-ups — DONE 2026-06-21, track CLOSED.** ([plan](docs/plans/2026-06-21-321-native-s16-comparison-followups.md)) Compare surface measured ~complete (`dev/measure-compare-surface.sh`): everything native except the optimal byte-wise register-resident equality. The one open lever — the **ordering-as-value branchless carry-tail** (`zext(sbc-carry)`→`G_UADDE(0,0,carry)` in `legalizeZExt`) — was **BUILT + measured net-negative in realistic context** (correct + leaf-win real `uge_v` 25→19 + default byte-identical 75/75, but the 8-bit `adc` tail's `sep` breaks 16-bit runs: a16cmpaudit **+262 B** rep/sep-churn + `eor` inversions; c-torture 56 progs net≈0 **with** a +5 B regression) → **WON'T-DO** (the select-diamond is the ambient-16-bit optimum; clean gating infeasible — the cost is ambient-mode-dependent, invisible at legalize time). Classic lesson #1 leaf→ambient flip; spike on `wt/321-cmpval` (un-landed). **The mode-matched 16-bit-`rol` follow-up form (separate [banked plan §0a](docs/plans/2026-06-21-321-ordering-value-branchless-banked.md) — a real `ROLAcc16`/`LDAImm16`/`G_CARRY_BOOL16` materialization, `lda #$0000; rol a` at M16) was ALSO BUILT + measured 2026-06-21 → REGRESSES HARDER than v1: a16cmpaudit +654 B (both-widths) / +78 B (s16-direct-gated), whole a16 corpus +340 B with ZERO programs improving → WON'T-DO. Both 8-bit AND 16-bit forms closed: the select-diamond folds inversion free, its M8 tail matches ambient mode, and it keeps the boolean in `X` (not an `Imag16` ZP slot that cascades to spills). Deferred lever = mode-agnostic post-REPSEP pseudo (uncertain/partial upside, delicate REPSEP work — not pursued).** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
@@ -211,6 +191,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   code, or a real function crossing ~10 of 14 `Imag16` pairs), then run the gated B0→B1→B2 spike.** When
   fixed: drop the `KNOWN_ISSUES` entry + make `a16regpress.c` a positive gate (a Phase-3 acceptance case).
   Optional: extend `a16_fuzz.py`'s generator to emit the two-loop / two-multiply / cross-loop-live shape.
+  **↔ Shared core (native-s16 surface close-out):** one of three faces of a *single* deferred frontier —
+  RA-level 16-bit-value residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡
+  `globals.c` `-Os` RA-crash) — behind **one** re-open trigger (a 2nd independent *realistic*
+  `regalloc-out-of-registers` / `a16-zp-pressure-overflow`, **or** a real fn crossing ~10/14 `Imag16` pairs)
+  → **one** gated B0→B1→B2 spike. [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
   [finding](docs/plans/2026-06-18-321-zp-pressure-measurement.md) ·
   [A16-threading Phase 3](docs/plans/2026-06-17-321-a16-threading.md).
@@ -247,6 +232,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `a16regpress.c` crash cause. Realizable gain is capped by the single 65816 accumulator (two live 16-bit
   values must spill to `Imag16`) and it reopens the coalescer-crash risk → high-risk/low-reward, so
   **keep the XFAIL** with a concrete re-open trigger + a gated B0→B1→B2 spike recipe (see Watch + the plan).
+  **↔ Shared core (native-s16 surface close-out):** one of three faces of a *single* deferred frontier —
+  RA-level 16-bit-value residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡
+  `globals.c` `-Os` RA-crash) — behind **one** re-open trigger (a 2nd independent *realistic*
+  `regalloc-out-of-registers` / `a16-zp-pressure-overflow`, **or** a real fn crossing ~10/14 `Imag16` pairs)
+  → **one** gated B0→B1→B2 spike. [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
   [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
@@ -262,6 +252,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (`dev/measure-zp-pressure.sh`): 0 of 13 real functions exhaust the pool (max ~5 of 14 pairs) → DEFER
   confirmed with data** (the scan also surfaced a separate `+mos-a16 -Os` RA *crash* on `globals.c` — see
   its own bullet above).
+  **↔ Shared core (native-s16 surface close-out):** one of three faces of a *single* deferred frontier —
+  RA-level 16-bit-value residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡
+  `globals.c` `-Os` RA-crash) — behind **one** re-open trigger (a 2nd independent *realistic*
+  `regalloc-out-of-registers` / `a16-zp-pressure-overflow`, **or** a real fn crossing ~10/14 `Imag16` pairs)
+  → **one** gated B0→B1→B2 spike. [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [multi-value pressure plan](docs/plans/2026-06-18-321-16bit-alu-multivalue-register-pressure.md) ·
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
@@ -478,6 +473,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-22 — [321-native-s16-surface-consolidation] **#321 native-s16 surface CONSOLIDATED + measured-COMPLETE — the #321 analogue of the zero-bank close (nothing built).** Durable roll-up `dev/measure-native-s16-surface.sh` drives the three existing harnesses + adds the missing ROADMAP step-5 acceptance table. **Phase 0 (RAN 2026-06-22):** all three states reproduce — compares native except the optimal byte-wise register-resident EQ-as-value; A16-threading `roundtrips=0` (post-`threadAccum16` optimum); ZP `0/13` pool-exhaust (max ~5/14). Step-5 **a16-vs-default is honestly MIXED** — the sustained-16-bit class wins (`chain −63%`, `multivalue −65%`, `k_isort −39%`, **aggregate −22%/−220 B**, corpus **7/7**) while 8/16-interleave stress kernels regress by-design (`k_prng +60%`, `k_crc16 +27%`; verified pure `rep`/`sep`+`Imag16` cost, no libcall asymmetry) → confirms **why a16 is opt-in/per-op-gated**. **The one fact it contributes:** A16-threading Phase 3 ≡ ALU-chain >14-live ≡ `globals.c` `-Os` RA-crash are the **same** deferred core (RA-level 16-bit residency under register pressure) — one frontier, one trigger, one B0→B1→B2 recipe, now cross-referenced from all three still-open items. New ≥8-shift bracket-fragmentation candidate routed to a future gated spike (didn't meet the GO bar). GO contingency did **not** fire; doc cascade landed (`a584a78`: ROADMAP §5 + upstream-status fold). [plan](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md) · [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md).
 - 2026-06-22 — [m1-incremental-rebuild] **M1 incremental-rebuild time MEASURED (plan step 4 PASS): editing one backend `.cpp` → ~11 s relink, not a full rebuild.** Real string-literal edit to `MOSInsertREPSEP.cpp` (preprocessor-surviving → true ccache miss) → `dev/run.sh toolchain` = 12 ninja steps (recompile TU + re-`ar` MOS lib + relink lld/clang-23/clang-scan-deps), 11 s wall / 10 s in-container, vs 30–90 min cold. Measured on a verified-quiet host in an isolated real-copy worktree (per howto §compiler-changing); evidence in the plan. [m1 plan](docs/plans/2026-06-14-m1-from-source-toolchain.md).
 - 2026-06-22 — [320-zerobank-as4] **#320 zero-bank (AS4) measure-and-closed: CONFIRMED measured-null — the five-address-space model is now COMPLETE (all 5 spaces measured).** De-lumped the circular 0b census (the old `dev/measure-five-space-census.sh` line "zero-bank likewise has 0 users" was a lumped assertion, never an AS4-specific probe) into a direct, reproducible measurement — `dev/measure-zerobank-census.sh` + `examples/65816/zerobank_probe.c`, host-only: **0 realistic sites** carry bank-0 data as a far-typed pointer (corpus/kernels `Nfar=0`; far suite stores 0 far ptrs, all transient), and at any site zero-bank — bit-identical to a near pointer (`p4:16:8`==`p0:16:8`) — **ties the "near + lazy `near→far` cast" incumbent on every axis**: storage 2 B==2 B, global access `ad`==near's `ad`, runtime deref `(dp)` (no far indexed-long mode; AS4 cheap access is globals-only). Its one possible access win (forcing `ad` over `af`) is exactly the in-flight `0007` near-abs relaxation's win for ALL near pointers — not a new far-typed space. Premise-checked (workflow: 4 readers + 3 adversarial skeptics, 0 wins); feasible (~30 LoC, reuses near path + 0006 cast template, no `MVT` workaround) so **null by worth, not infeasibility** — dominated like frame-ABI's DP/SR frames by the soft static stack. **Nothing built.** Five-space §Phase 2, the upstream note + status, and the circular census line all updated. [plan](docs/plans/2026-06-22-320-zerobank-as4-measure-and-close.md).
 - 2026-06-21 — [320-far-pointer-integration] **#320 far-pointer line LANDED on `main`: far fn pointers (a) folded into `0001`, the far-pointer calling convention (Imag32) as `0004`, the lone a16-context-entangled legalizer hunk as `0005`.** Round-trip patch surgery (`dev/land-far-integration.sh`): extracted the (a) recipes as `diff(R, FF)` against a same-base reference (`R` = pristine+`0001`+`0002`+`0003`+`0004`; `FF` = `wt/320-far-followups`), folded the a16-free far-fn-ptr work (backend Layers 1–3 + Gap A/B + the `__call_indir_far` mechanism + clang F2 `far`/`long_call` attr + typed `far_fn_t` var + `sizeof(far*)==4` + the `isFarSymbol` far_indir fix) into `0001` (a16-free — 0 `mos-a16`/`Ac16`/`hasAccum16` in the new hunks), landed the canonical far-cc `0004` (Imag32 won the 4-variant measure, 70 B/50441), and split the lone a16-context-entangled (a) hunk (`MOSLegalizerInfo` PF-as-value, which edits `0002`'s `if(hasAccum16)` block) into new **`0005`**. **Round-trip-proven:** `0001`+`0002`+`0003`+`0004`+`0005` reproduces the verified FF tree EXACTLY over `clang/`+`MOS/`, except two documented non-(a) files — `MOSInsertREPSEP.cpp` (FF working tree stale vs main's *current* `0002` X-width catch-all) and `clang/cmake/caches/MOS.cmake` (build-config drift, in no patch). `0002`/`0003` SHAs unchanged; `0004` = canonical `2efa05f2`. Harness landed too (`dev/farcc_*.sh`, `measure-far-cc.sh`, `probe-cycles.lua`, `regen-patch-0004.sh` baseline extended for `0005`, new `regen-patch-0005.sh`) + the far-cc measurement note (upstream-status #7). [land plan](docs/plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md).
@@ -1031,4 +1027,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        section + upstream-contribution-status.md (artifact docs/320-upstream-far-pointer-note.md).
      Both fingerprints ledgered; deleted permanently. Nothing open here.
      fp:8a5ca7613ee06e0a fp:883b7d12864cf920 -->
+- [ ] **(triage)** Building anything: A16-threading Phase 3 / multi-value spill-fusion stay **deferred** under their one trigger — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:ceeea11785514bd6 -->
+- [ ] **(triage)** The ≥8-shift bracket-fragmentation candidate — routed to a *future* measurement-gated spike (a new `docs/plans/` — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:15f2dd1d2684d2f2 -->
+- [ ] **(triage)** Re-opening either WON'T-DO (ordering-as-value branchless in either form; full-native EQ-as-value materialize). — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:c49fd89e43e4867a -->
+- [ ] **(triage)** The CC/ABI track, xy16, and the two RA/scavenger *bugs* as bugs — owned by their own items; this close-out only — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:5c1003efe2386b53 -->
+- [ ] **(triage)** The upstream paragraph posting — user-triggered (already drafted in-plan + folded into upstream-status). — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:a2954d6096e3b85c -->
 <!-- END auto-captured-deferrals -->
