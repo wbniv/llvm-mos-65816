@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/f2b61a2) | Worktree-teardown enforcement: keep durable artifacts, reclaim dupes (hook + wrapper) |
+
+<!--history-meta v1
+f2b61a2	author	Will Norris
+f2b61a2	added	141
+f2b61a2	deleted	0
+f2b61a2	files	1
+f2b61a2	body	Enforce the worktree-teardown-keep-durable-artifacts policy (user 2026-06-21): on\nteardown reclaim the 95%+ vendor/+build/ dupes, but never lose the scripts/verdicts\nthat reconstruct a conclusion; retain worktrees until upstream merge.\n\nGit has no `worktree remove` hook, so the only intercept is a Claude Code\nPreToolUse(Bash) hook (schema confirmed via claude-code-guide). Built:\n- dev/worktree-teardown.sh — the blessed teardown: hard-aborts if any tracked work\n  isn't on main (compares vs main, not the worktree's stale HEAD, so a 0002\n  regenerated-then-copied-to-main is correctly safe), warns +--yes on untracked\n  dev/,docs/ files, then git worktree remove --force + git branch -D and reports the\n  reclaimed GB. --dry-run / -h.\n- .claude/hooks/guard-worktree-teardown.sh — a command-position-anchored PreToolUse\n  guard that DENYs raw `git worktree remove` / `git branch -[dD] wt/` and redirects to\n  the wrapper, while passing through mentions (echo/grep/doc), worktree list/add, and\n  the wrapper itself. The wrapper's internal git removes are subprocess-exempt.\n- .claude/settings.json — wires the PreToolUse(Bash) hook (project hooks merge after\n  the global ones).\n- dev/test-worktree-teardown.sh — 15/15 regression test (deny/passthrough matrix +\n  wrapper gates).\n\n.gitignore: also track .claude/settings.json + .claude/hooks/ (were local-only under\n.claude/*) so the wiring is reproducible from the repo; scheduled_tasks.lock +\ntranscripts stay local.\n\nVerified 15/15: wt/321-track-a --dry-run PASS (reclaim 12 GB, 258 keepers retained);\nwt/320-far-cc --dry-run ABORT on 2 unmerged commits (the durability gate protecting\nreal work). Follow-up: route the hook through the sha256 hook-runner for\ntamper-evidence (CLAUDE.md X6) — deferred (no project hook-runner yet).\n\nPlan: docs/plans/2026-06-21-worktree-teardown-enforcement-hook.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

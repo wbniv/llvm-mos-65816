@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/fd6b281) | #321 native s16 EQ-as-value v2: computed/Imag16-resident operands go native ((a+b)==c) |
+
+<!--history-meta v1
+fd6b281	author	Will Norris
+fd6b281	added	127
+fd6b281	deleted	0
+fd6b281	files	1
+fd6b281	body	The last gated EQ-as-value win from the spike. A gate-only change (no new pseudo — the\nvalue rides the existing buildNZSelect -> MOSLowerSelect -> G_BRCOND_IMM ->\nCmpBrImag16/CmpBrImm16 path): legalizeICmp now keeps an s16 ICMP_EQ native when both\noperands are already Imag16-resident (a computed native-s16 value or an indirect load),\nor one is a constant.\n\n- isComputedS16 matches the generic ALU/shift ops (G_ADD/SUB/AND/OR/XOR/SHL/LSHR/ASHR)\n  AND the load-rooted MOS combiner pseudos (G_ADD16_ABSLD / G_SUB16_ABSLD /\n  G_ADDCHAIN16_ABSLD / G_BITCHAIN16_ABSLD). The latter matters because a multi-use\n  `(a+b)` of near-abs globals becomes G_ADD16_ABSLD, not a generic G_ADD; its result is\n  stored to Imag16 (load-rooted), so it's a valid native compare operand.\n- ComputedEq fires only when both operands are Imag16-resident (or one is a constant) —\n  never when either is a register-arg (G_MERGE_VALUES of COPY $physreg, which would\n  spill: the +8 B regression the spike measured) or a global (v3's abs-fold domain).\n\nMeasured +mos-a16 .text bytes, v2-on vs v2-off:\n  computed == computed   71 -> 68 B   (-3)\n  computed == const      60 -> 58 B   (-2)\n  multi-use chained     146 -> 133 B  (-13; a16eqvalc, CmpBrImag16 x2 + CmpBrImm16)\n  computed == param      byte-identical (gate declines -> no regression)\n\nNew examples/65816/a16eqvalc.c + dev/a16eqvalc.sh: native 16-bit cmp (cmp zp / cmp #imm\nfor the const), no 8-bit cpx/cpy; corpus_result 0x1101 host==default==+mos-a16 on\nMAME + bsnes-jg. Completes the four gated EQ-as-value wins (v1 indirect, v3 both-global,\ng==0x1234 immediate, v2 computed).\n\nBackend source rides patches/llvm-mos/0002 (vendor/ gitignored; dev/regen-patch.sh).\nNon-breaking: a16 suite + corpus 7/7, fuzz 50/50 (0 mismatch/crash/error),\n-verify-machineinstrs clean, 0002 round-trips.\n\nPlan: docs/plans/2026-06-17-321-native-s16-eq-v2-computed-imag16-lhs.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/4bfcb1a) | #321 native s16: fold near-abs global operands into the 16-bit ALU (lda/adc abs) |
+
+<!--history-meta v1
+4bfcb1a	author	Will Norris
+4bfcb1a	added	130
+4bfcb1a	deleted	0
+4bfcb1a	files	1
+4bfcb1a	body	For a multi-use `t = a16v OP b16v`, the 1b store-fused peephole (alu16_abs) can't\nfold a multi-use result, so the native path copied each global operand byte-wise\ninto an Imag16 pair (~8 instrs) before the op. The new combiner rule alu16_absld\nreads the globals directly via the 16-bit absolute forms instead:\n\n  clc; rep #$20; lda b16v; adc a16v; sta __rc2; sep #$20\n\nNew register-result generic pseudos G_{ADD,SUB,AND,OR,XOR}16_ABSLD (mirror the\nG_*16_ABS family but $dst is an s16 result, not a store global; skipped by the\nlegalizer opcode-range, no rule) + selectAlu16AbsLd (clone of selectAlu16Abs\nending in STAImag16 so the value lands in Imag16 for its multiple uses). The\ncombiner reuses nearAbsLoad/nearAbsGlobalDef and erases the consumed loads safely\nvia the GISelChangeObserver — chosen over a selector-side fold because the volatile\nbyte-loads can't be erased mid-instruction-select-walk without corrupting the\niterator. Handles both the memory form (two loads) and the immediate form (one\nload + 16-bit const, commutative). No Ac16<->8-bit COPY (the native invariant).\n\nThe match requires a >1-use result, so single-store globals still fuse via the\nbetter alu16_abs (a16add/a16sub/a16bit stay green) and chains via add_chain16.\n\nTest a16loadfold.c: `t = a16v + b16v` (multi-use) reads both globals via lda/adc\nabs (opcodes af/6f, no adc-zp), corpus_result==0x2345 on MAME and bsnes-jg. Note:\nwith volatile operands each use is a separate single-use load, so a16local/sub/bit\nfold too — their disasm gates were widened to accept zp-or-folded forms (results\nunchanged) and the set -e no-match aborts guarded; pure-native adc-zp coverage\nstays via a16localx's local-operand chain.\n\nAlso lands the deferred TODO Done entry for the prior immediate-fold commit.\n\nNon-breaking: corpus 7/7; all 12 a16* tests green; SDK builds; patch 0002\nround-trips (applies on 0001, reproduces vendor MOS dir exactly).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

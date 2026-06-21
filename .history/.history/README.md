@@ -1,0 +1,47 @@
+| Date | Change |
+|------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/6efabde) | #320 (a) far fn pointers fully done — sync status docs (impl-status, ROADMAP, README, plans) |
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/181af86) | repo: Apache-2.0 LICENSE + NOTICE, README → M2 status, gitignore transcripts |
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/93862b3) | M1 Phase 0: build llvm-mos from source (lean) + green baseline |
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/c50a39c) | M0: regression corpus (6 programs) + generalized harness |
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/025be2f) | M0: add clean-room repro gate; park CI to manual-only |
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/18189b6) | docs: record M0 emulator-run PASS (MAME smoke) in ROADMAP + README |
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/982b6f3) | M0: implement headless MAME smoke loop (dev/run.sh smoke) |
+
+<!--history-meta v1
+6efabde	author	Will Norris
+6efabde	added	6
+6efabde	deleted	0
+6efabde	files	1
+6efabde	body	Bring the tracking docs current now that #320 (a) far function pointers is fully\nclosed (backend + clang F2 `far`/`long_call` attribute + typed `far_fn_t`\nvariable + sizeof(far*)==4, + a pre-existing far_indir crash fix; verified both\nemulators, pushed origin/wt/320-far-followups):\n\n- implementation-status.md: TL;DR, the far-fn-ptr table row, the M1 verdict, the\n  pending-codegen row, and What's-next #2 all flipped from "BACKEND DONE / only\n  F2 remains" to DONE.\n- ROADMAP.md: mixed-banking + far function pointers marked DONE; only the\n  far-pointer calling convention (0004) remains.\n- README.md: M1 far-pointers line updated (was "far calls deferred pending ABI\n  blessing" — stale; far calls + far fn pointers are done).\n- 2026-06-21-320-far-calls-followups.md: §7 resume + §9 commit trail updated;\n  struck the §0 historical "ONLY remaining piece is F2".\n- Co-located the typed-far_fn_t-variable + far-pointer-sizeof plans on main (they\n  were committed on wt/320-far-followups) so the status-doc cross-links resolve.\n\nAdversarial staleness audit (3-agent workflow) drove these fixes — final grep\nclean, all plan links resolve.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+181af86	author	Will Norris
+181af86	added	6
+181af86	deleted	0
+181af86	files	1
+181af86	body	- Add LICENSE (Apache-2.0) and NOTICE (derivative-of-llvm-mos attribution)\n  so the public fork has a clear license matching upstream\n- Refresh README Status from stale "M0 in progress" to accurate M2 snapshot:\n  M0 complete, M1 substantially complete, M2 +mos-a16 working with in-progress\n  s32/XY16 callouts\n- Gitignore docs/transcripts/ to eliminate accidental-commit risk\n- TODO + plan entry for this housekeeping item\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+93862b3	author	Will Norris
+93862b3	added	6
+93862b3	deleted	0
+93862b3	files	1
+93862b3	body	Codegen work (M1 #320) can't begin on the prebuilt, immutable toolchain.\nThis stands up a from-source llvm-mos build in the dev container and proves\nthe regression corpus stays green on the self-built compiler.\n\n- dev/toolchain.sh: clone llvm-mos, build clang/lld via the MOS.cmake cache\n  (Release, lld, 1 link job, ccache) -> build/llvm-mos-install. Trims the\n  distribution to clang+lld (idempotent sed drop of clang-tools-extra:\n  clangd/clang-tidy/include-fixer/...), cutting a cold build 39.2 -> 26.1 min.\n- dev/Dockerfile: host clang/lld/ccache (+zlib) to build LLVM; lld + Release\n  keep peak link memory under the 14 GiB host ceiling.\n- dev/build.sh: MOS_TOOLCHAIN selects the toolchain (default prebuilt). CMake\n  can't hot-swap the cross-compiler, so wipe the SDK build tree (only) when\n  MOS_TOOLCHAIN changes, tracked via build/.mos-toolchain.\n- dev/run.sh: `toolchain` target; forward MOS_TOOLCHAIN/BUILD_JOBS.\n\nVerification (2026-06-14): toolchain builds (clang 23.0.0git @ c798c31,\nTarget: mos); MOS_TOOLCHAIN=...llvm-mos-install build+corpus -> 7/7 (byte-\nidentical to prebuilt: same builtins.a, same expected values); default\nprebuilt path round-trips green (self-built<->prebuilt wipe verified both\nways). The self-built compiler is byte-equivalent to the prebuilt — only\nnow it's one we can edit for #320.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+c50a39c	author	Will Norris
+c50a39c	added	6
+c50a39c	deleted	0
+c50a39c	files	1
+c50a39c	body	ROADMAP step 2. Turns the one-program liveness bench into a correctness\nbaseline: 6 self-contained C programs each compute a result the host checks\nagainst a manifest, exercising a distinct slice of codegen. This is the\nregression net for when M1/M2 rewrite codegen — same source, same bytes.\n\n- examples/snes/corpus/{arith,control,arrays,structs,funcs,globals}.c — ALU,\n  control flow, arrays+.rodata, structs+pointers, calls+recursion, and the\n  crt0 .data/.bss init. Inputs are volatile to defeat -Os constant-folding;\n  each writes volatile uint16_t corpus_result. expected.tsv is the manifest.\n- dev/_emu.sh: shared run_assert — derives a symbol's WRAM address AND byte\n  length from the linker map (Size column), boots MAME headless, asserts.\n- dev/smoke.lua: SMOKE_LEN — read N bytes little-endian (default 1).\n- dev/smoke.sh: refactored onto _emu.sh (identical behavior).\n- dev/corpus.sh + run.sh `corpus` target: assert every manifest row, N/N table.\n- dev/build.sh: build every examples/snes/**/*.c, not just hello.\n- dev/run.sh: forward SMOKE_WANT/SMOKE_SETTLE/SNES_ROMPATH into the container\n  (so the documented overrides + negative control work via the entrypoint).\n- repro.sh + smoke.yml: run corpus (subsumes the hello liveness row).\n\nVerification (2026-06-14): dev/run.sh corpus -> 7/7 PASS\n(arith 0xA9E9, control 0x1DFB, arrays 0x03E1, structs 0x0340, funcs 0x011E,\nglobals 0xAB55, hello 0x42 — every hand-computed expected matched). Negative\ncontrol (corrupt one expected) -> that row FAIL, 6/7, exit 1. repro + CI below.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+025be2f	author	Will Norris
+025be2f	added	6
+025be2f	deleted	0
+025be2f	files	1
+025be2f	body	For a solo private repo, the routine reproducibility gate is local, not\nGitHub minutes + a per-push ROM upload. CI's unique value (from-scratch\nreproducibility) isn't GitHub-specific — it's "fresh checkout, no machine\nstate", which a local script delivers.\n\n- dev/repro.sh (host-side): git archive HEAD -> temp dir (committed files\n  only, no build/ or caches), supply the gitignored SPC700 IPL, then\n  run.sh build + run.sh smoke there. Proven green: "repro OK".\n- dev/run.sh: route `repro` host-side (not an in-container target).\n- .github/workflows/smoke.yml: triggers -> workflow_dispatch only. Proven\n  green once on a clean GH runner (run 27475012894, smoke step executed\n  with BIOS from secret); re-enable push/pull_request when public/upstream\n  or collaborators arrive.\n- README/plan: document repro + the manual-CI decision. Plan verification\n  step 5 (reproducible from clean checkout) -> PASS (both CI + local).\n- TODO: smoke loop -> Done (all 5 steps green); section structure refresh.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+18189b6	author	Will Norris
+18189b6	added	6
+18189b6	deleted	0
+18189b6	files	1
+18189b6	body	The smoke loop is implemented and green locally, so the docs that still\ndescribed the emulator-run half as "pending" are now stale.\n\n- ROADMAP step 1: Emulator-run half PASS (2026-06-14, MAME 0.285) with the\n  SMOKE: PASS + negative-control evidence; only the CI run remains (BIOS\n  secret). Cross-links the smoke loop plan.\n- README Status: "And it runs" — dev/run.sh smoke boots the ROM in MAME and\n  reads sentinel==0x42 back from WRAM.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+982b6f3	author	Will Norris
+982b6f3	added	11
+982b6f3	deleted	0
+982b6f3	files	1
+982b6f3	body	Boots build/hello.sfc in MAME's snes driver headless and asserts the\nsentinel==0x42 byte in WRAM ($7E0020), closing the run-half of ROADMAP\nverification step 1. Same emulation core drmon debugs against.\n\n- dev/Dockerfile: add mame (own layer after the toolchain so a version\n  bump never re-downloads the toolchain); PATH += /usr/games (Debian\n  installs the binary there, off the default non-login PATH).\n- dev/smoke.lua: clean-room autoboot script (no GPL drmon code) — counts\n  frames, reads the WRAM byte via maincpu program space, prints SMOKE:\n  PASS/FAIL, exits. Verdict travels on stdout (MAME can't set exit code).\n- dev/smoke.sh: BIOS preflight (exit 2 if missing), derive sentinel addr\n  from hello.map, run MAME headless with -rompath/-skip_gameinfo, exit 0\n  iff SMOKE: PASS.\n- .github/workflows/smoke.yml: build + smoke; materializes the SPC700 IPL\n  from the SNES_SPC700_ROM_B64 secret, gates the smoke step on it.\n- .gitignore: /dev/roms/ — the SPC700 IPL is Nintendo content, supplied\n  out-of-band, never committed (mirrors drdevtools' roms/ pattern).\n\nVerification (2026-06-14): MAME 0.285; clean dev/run.sh smoke -> SMOKE:\nPASS exit 0; negative control (SMOKE_WANT=0x99) -> SMOKE: FAIL exit 1;\nmame -verifyroms snes -> "romset snes is good". CI (step 5) pending the\nrepo secret + push. Evidence pasted into the plan.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

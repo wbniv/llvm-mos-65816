@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/ec2aa31) | #320 Increment 2b: far read crosses a real ROM bank boundary (bank $01) |
+
+<!--history-meta v1
+ec2aa31	author	Will Norris
+ec2aa31	added	202
+ec2aa31	deleted	0
+ec2aa31	files	1
+ec2aa31	body	Increment 2 proved far accesses execute in MAME, but with the far data in bank\n$00 — the 64 KiB the 6502 already reaches. 2b proves the thing far pointers\nexist for: reading data past 64 KiB, in a higher ROM bank. A 64 KiB LoROM places\na far global in bank $01 ($018000); the far load is `lda $018000` (af 00 80 01,\nbank byte 01, un-relaxable) and the cross-bank result round-trips through MAME\n(SMOKE: PASS got=0xF3). Completes ROADMAP step 3's "≥2 banks" half.\n\nStill emulation mode (absolute-long carries the bank byte, ignores the DBR) and\nNO codegen change — bank-$01 placement is a section attribute + linker rule; the\nabsolute-long + R_MOS_ADDR24 lowering is decided by the addrspace alone.\n\nIsolation: a child platform `snes-far` (platform(... COMPLETE PARENT snes)) that\ninherits snes's crt0/header/snes.h and overrides only link.ld (64 KiB: rom_1 bank\n$01 + .far_rodata + FULL(rom) FULL(rom_1)). `-Wl,-T` can't be used — the driver\nalready passes -Tlink.ld and lld concatenates -T scripts; the child-platform -L\nsearch is the SDK's own idiom (cf. atari2600-4k). Default snes platform and the\ncorpus stay 32 KiB and untouched.\n\n- platforms/snes-far/{CMakeLists.txt,link.ld}: the 64 KiB child platform.\n- examples/65816/far-bank1.c: far_src in .far_rodata (bank $01), far-load+store.\n- tools/snes-checksum.py: accept 32K/64K; own the ROM-size header byte (set from\n  image length, before the sum) — fixes the inherited header, removes a hardcode.\n- dev/far-bank1.sh + `dev/run.sh far-bank1`: build --config mos-snes-far.cfg,\n  gate on 64 KiB + far_src@$018xxx + AF/ADDR24, then run_assert via dev/_emu.sh.\n\nVerification (from-source toolchain, 2026-06-14): far-bank1 5/5 PASS — 64 KiB,\nfar_src @ $018000, linked `af 00 80 01`, SMOKE: PASS got=0xF3, negative control\nFAILs. No regression: corpus 7/7, far-run (bank $00) still PASS.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

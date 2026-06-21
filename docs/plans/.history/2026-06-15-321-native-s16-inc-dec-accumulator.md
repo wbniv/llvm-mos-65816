@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-15](https://github.com/wbniv/llvm-mos-65816/commit/98c5eac) | #321 native s16: 1-byte inc a / dec a for register ±1 (no 8-bit byte chain) |
+
+<!--history-meta v1
+98c5eac	author	Will Norris
+98c5eac	added	103
+98c5eac	deleted	0
+98c5eac	files	1
+98c5eac	body	A 16-bit register/local `x + 1` / `x - 1` dropped to an 8-bit byte inc/dec-with-\ncarry chain (`sep; ldx; stx; inc zp; bne; inc zp; rep`) even under +mos-a16 —\nthrashing M-mode inside a 16-bit region — because legalizeAddSub routed every s16\n±1 to the multi-byte G_INC/G_DEC path. In 16-bit-accumulator mode one `inc a` /\n`dec a` steps all 16 bits, so this is one instruction.\n\nlegalizeAddSub now keeps s16 ±1 un-narrowed under hasAccum16 (an early native\npassthrough, like non-±1), and selectAlu16Native emits inc a / dec a on A16 (new\nINCAcc16/DECAcc16 MLow=1 pseudos mirroring ASLAcc16). The signed step is computed\nfrom a constant operand: G_ADD +1 / G_SUB -1 -> inc; G_ADD -1 (0xFFFF) / G_SUB +1\n-> dec (ADD const may be either operand; SUB only the subtrahend — `1 - x` is not a\ndec). The value loads via the existing LHS abs-fold (lda abs near-abs global, else\nlda zp); inc/dec a set N/Z, which is correct for a plain ±1 (carry-out unused).\nDefault 8-bit codegen keeps the byte inc/dec path.\n\nNew a16incdec (2 inc + 2 dec, corpus_result==0x2668) asserts inc a (1a)/dec a (3a)\nand no 8-bit byte inc/dec (e6/c6). Companion a16loopred guards that a counted\n`while(i){x++;i--}` still strength-reduces to a single native 16-bit add\n(corpus_result==0x1239) — the inc/dec vanish in the reduced form, so it tests the\ncombine's correctness, not inc/dec. Both MAME + bsnes-jg agree.\n\nBonus: the now-native trailing `+1` lets two existing tests stay in one M16 region\n(a16ashift drops a forced sep; a16ptr merges two rep brackets) — those disasm gates\nupdated to assert the improvement; values (0xFE01, 0xABCE) and -verify-machineinstrs\nunchanged. Variable shifts (libcall) and amount-≥8 shifts (byte-relabel already\noptimal) intentionally left; memory-RMW inc abs is the follow-up.\n\nFull a16 suite (27 tests) + corpus 7/7 green on both emulators;\n-verify-machineinstrs clean; patch 0002 round-trips.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

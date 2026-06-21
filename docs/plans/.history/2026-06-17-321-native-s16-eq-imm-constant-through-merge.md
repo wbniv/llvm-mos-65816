@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/f8a32ae) | #321 native s16 `g == 0x1234` folds to `lda abs; cmp #imm` (recover byte-split constant) |
+
+<!--history-meta v1
+f8a32ae	author	Will Norris
+f8a32ae	added	146
+f8a32ae	deleted	0
+f8a32ae	files	1
+f8a32ae	body	The v3 follow-up. A 16-bit constant EQ operand is byte-split into\nG_MERGE_VALUES(i8 lo, i8 hi) during legalization (a G_CONSTANT i16 is illegal), so\nthe EQ matcher CmpNZImm16_match — which recovered the RHS only via\ngetIConstantVRegValWithLookThrough — missed it and fell to CmpBrImag16 with the\nconstant materialized (LDImm16; cmp zp).\n\n- Add shared getI16Const(R, const MRI&): recover a constant directly OR through\n  G_MERGE_VALUES of two byte constants (two non-constant byte loads -> nullopt, so\n  `g == h` is not mistaken for an immediate). Use it in CmpNZImm16_match and DRY\n  getImm16Operand (the ordering/ALU path already had this exact logic).\n- Re-instate the CmpBrAbsImm16 pseudo + the selectBrCondImm m_CmpNZImm16 fold\n  (foldable-abs LHS -> lda abs, const RHS -> cmp #imm; else the now-reachable\n  CmpBrImm16) + expandCmpBr16/dispatch/getBranchDestBlock.\n- Re-add the GlobalVsImm gate disjunct + canonicalization swap in legalizeICmp so a\n  value-use `g == imm` goes native (the constant is still a plain G_CONSTANT at\n  legalize time, before it is byte-split, so m_ICst sees it).\n\nBonus: the dormant CmpBrImm16 lights up — v1's `*p == 0x1234` and the branch\n`if (g == 0x1234)` now select `cmp #imm` instead of materializing the constant.\n\nexamples/65816/a16eqvalg.c extended with r3 = (g0 == 0x1234): 3 CmpBrAbsAbs16 +\n1 CmpBrAbsImm16; the gate now asserts cmp #imm16, still no cmp zp, no cpx/cpy;\ncorpus_result 0x1101 host==default==+mos-a16 on MAME + bsnes-jg.\n\nBackend source rides patches/llvm-mos/0002 (vendor/ gitignored; dev/regen-patch.sh).\nNon-breaking (the getImm16Operand refactor is byte-identical — a16imm/a16localimm/\na16chainimm green): a16 suite + corpus 7/7, fuzz 50/50 (0 mismatch/crash/error),\n-verify-machineinstrs clean, 0002 round-trips.\n\nPlan: docs/plans/2026-06-17-321-native-s16-eq-imm-constant-through-merge.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->
