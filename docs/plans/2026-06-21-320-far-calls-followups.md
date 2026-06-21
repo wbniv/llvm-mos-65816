@@ -91,28 +91,31 @@ fine regardless — crt0 pins `DBR=$00`.) The only ways to change `PBR` are `JSL
 `RTL` must be reached by the near callee's `RTS`. The minimal construct that satisfies this is a **bank-0
 veneer** — there is no way to avoid it without changing the near callee.
 
-### Recommended mechanism — per-callee bank-0 veneer ("call gate")
+### Implemented mechanism — generic bank-0 runtime thunk `__call_near_from_far`
 
-For a far caller `F` (bank $01) calling near `g` (bank $00), emit at the call site:
-```
-    jsl  g.far_veneer        ; 4 bytes; PBR -> $00 (veneer is in bank 0), pushes 3-byte PBR:PC
-```
-and synthesize once per distinct near callee a tiny veneer in `.text` (bank $00):
-```
-g.far_veneer:                ; reached only via JSL from far code; runs at PBR=$00
-    jsr  g                   ; near call; g runs at PBR=$00; g's RTS returns here
-    rtl                      ; pops the far caller's 3-byte return; PBR -> $01
-```
-Trace: `JSL`(push3, PBR→0) → veneer `JSR g`(push2) → `g` runs near, `RTS`(pop2)→veneer → veneer
-`RTL`(pop3)→`F`, PBR→1. **`g` is byte-for-byte unchanged** (still near, still `RTS`); near callers of `g`
-are untouched. Cost: **+1 byte** at the call site (`JSL` vs `JSR`) + **4 bytes** per distinct near callee
-(deduplicated) + ≈ **+14 cycles** per far→near call (`JSL`+`JSR`+`RTL` vs `JSR`). This is the 65816 form
-of an ARM/AArch64 long-branch **veneer**.
+**Chosen over the per-callee veneer (below) after a measure-the-implementation check (2026-06-21):**
+`MOSAsmPrinter` has only basic operand target-flags (`MO_LO/MO_HI/MO_HI_JT/MO_ZEROPAGE`) and **no
+`emitEndOfAsmFile` hook**, so a per-callee veneer needs ~5 new touch-points (a `MO_FAR_VENEER` flag,
+its MCInstLower plumbing, an AsmPrinter end-of-file override, a per-module callee set, section-aware
+label+MCInst emission). The generic thunk needs only `lowerCall` + a static, disasm-inspectable `.s`
+stub, and — decisively — **reuses the exact "copy address → ZP slot, `ChangeToES`, emit `JSL`" plumbing
+that (a)'s `__call_indir_far` also needs**, so doing (b) this way de-risks (a). The byte cost lands only
+on the rare far→near path; the per-callee veneer remains a clean future byte-optimization.
 
-**Where the veneer is synthesized:** in `MOSAsmPrinter`. During `lowerCall`, when far→near is detected
-(below), redirect the call's target to a veneer `MCSymbol` (`<g>.far_veneer`) and record the need in a
-per-module set keyed by the near callee; at `emitEndOfAsmFile`/module end, print each veneer once. (This
-mirrors how LLVM emits compiler stubs; it avoids fabricating a `MachineFunction` mid-GISel.)
+A single stub lives in bank $00 (project-owned `.s`, like `__call_indir`):
+```
+__call_near_from_far:        ; reached via JSL from far code (3-byte far return on stack); PBR now = $00
+    pea  .Lback-1            ; push a 2-byte NEAR return ( = g's RTS target) above the far return
+    jmp  (__rc18)            ; $6C near indirect jump to g (g's 16-bit addr in __rc18); g runs at PBR=$00
+.Lback:
+    rtl                      ; pop the far caller's 3-byte return; PBR -> $01
+```
+The far caller materializes `g`'s 16-bit address into `RS9` (`__rc18:__rc19`, the established
+indirect-call scratch) and emits `JSL __call_near_from_far`. Trace: `JSL`(push3, PBR→0) → stub
+`PEA .Lback-1`(push2) → `JMP (__rc18)`→`g`(PBR=$00) → `g`'s `RTS`(pop2)→`.Lback` → `RTL`(pop3)→far
+caller, PBR→1. **`g` is byte-for-byte unchanged** (still near, still `RTS`); near callers of `g` are
+untouched. Cost: per far→near site ≈ address-load (~8 B) + `JSL` (4 B) vs near `JSR` (3 B), plus the
+one-time ~7 B stub — paid only on the cross-bank path. (`PEA`=$F4, `JMP (abs)`=$6C, both present.)
 
 **Detection in `lowerCall`** (extends the existing `IsFar` block, `MOSCallLowering.cpp:415-423`):
 ```cpp
@@ -122,30 +125,31 @@ bool CalleeIsFar = Info.Callee.isGlobal() &&
                    Info.Callee.getGlobal()->getSection().starts_with(".far_");
 // direct callee:
 //   caller near, callee near  -> JSR  (today)
-//   caller *,    callee far   -> JSL  (today: far-call mechanism)
-//   caller far,  callee near  -> JSL <callee>.far_veneer   (NEW: mixed-banking)
+//   caller *,    callee far   -> JSL  to the callee (today: far-call mechanism)
+//   caller far,  callee near  -> materialize &g into RS9; ChangeToES("__call_near_from_far"); emit JSL  (NEW)
 ```
 The first two rows are unchanged (proven byte-identical default stays byte-identical — `CallerIsFar` is
-false off-65816 and for every near function). Only the third row is new.
+false off-65816 and for every near function). Only the third row is new. **Scope:** direct far→near only;
+indirect-from-far is (a)'s territory (a runtime pointer's near/far-ness isn't known here).
 
-### Alternative (documented, likely a measured control, not the ship)
+### Alternatives (documented, not shipped)
 
-**Whole-module "large code model"** — an off-by-default feature (`+mos-code-far`/`-mcmodel=large`-style)
-under which **every** function uses `JSL`/`RTL` and every call is long. Trivially correct and uniform,
-but pays the long-call cost on *every* call including all-near programs → only sensible when far code
-dominates. Keep it as the **fallback** if per-callee veneer synthesis proves unexpectedly hard, and as a
-**measurement baseline** (veneer vs uniform-far on a mixed-bank workload). Recommendation: **ship the
-veneer**, because it preserves the cheap near ABI and pays only at the boundary (the project's
-conservative "never regress the common shape" stance, governing lesson #2/#3).
+- **Per-callee bank-0 veneer** (`g.far_veneer: jsr g; rtl`, reached by `jsl g.far_veneer`) — the
+  ARM/AArch64 long-branch-veneer form; ~4 B/site + 4 B/callee, more byte-efficient than the generic thunk
+  when a near callee is hot, but needs the AsmPrinter synthesis above. **Future optimization** if a
+  census shows far→near is common.
+- **Whole-module "large code model"** (`+mos-code-far`: every function `JSL`/`RTL`) — trivially correct,
+  uniform, but pays on *every* call including all-near programs. A measurement **control/fallback**, not a
+  default (it would regress the common near shape — governing lesson #2/#3).
 
 ### (b) gates
 
 - `examples/65816/far_near_call.c` + `dev/far_near_call.sh`: a `.far_text` function (bank $01) that
   calls a **near** helper (bank $00) which itself makes a near call (proves `PBR=$00` held across the
   near callee's own `JSR`/`RTS`), returning a sentinel checked host == default == far on **MAME +
-  bsnes-jg**. Disasm gate: `JSL …far_veneer` at the far call site, the veneer body `jsr <g>` + `6b`
-  (rtl), and `<g>` itself still ends in `60` (rts). (Far calls are a16-independent → can also run the
-  default 8-bit build for a true 4-way.)
+  bsnes-jg**. Disasm gate: `JSL __call_near_from_far` at the far call site (`22`), the stub body `f4`
+  (pea) + `6c` (jmp ind) + `6b` (rtl), and the near helper `<g>` still ends in `60` (rts). (Far calls are
+  a16-independent → can also run the default 8-bit build for a true 4-way.)
 - Regression: corpus 7/7 (near `JSR`/`RTS` intact), existing `far_call`/`far_store` still PASS, fuzz +
   a torture spot 0-mismatch, `0001` round-trips a16-free.
 
