@@ -313,9 +313,16 @@ Add `AS_FarPacked` as a genuine 3-byte far pointer: same 24-bit addressing as `A
 
 ---
 
-## Phase 2 — `addrspace 4` = zero-bank far (gated by 0b) — **NO-GO (closed null, 2026-06-21)**
+## Phase 2 — `addrspace 4` = zero-bank far (gated by 0b) — **CONFIRMED measured-null (2026-06-22)**
 
-_Not built. 0b census: 0 users (a bank-0 far pointer is just a near pointer). Recipe kept for revival._
+_Not built. The 2026-06-21 "NO-GO" rested on a **circular, lumped** 0b census ("zero-bank likewise has 0
+users"). [The 2026-06-22 measure-and-close](2026-06-22-320-zerobank-as4-measure-and-close.md) **de-lumped it
+to the project bar** (`dev/measure-zerobank-census.sh`): 0 realistic sites carry bank-0 data as a far-typed
+pointer, and at any site zero-bank is bit-identical to a near pointer (`p4:16:8`==`p0:16:8`) and ties the
+"near + lazy `near→far` cast" incumbent on storage (2 B), `ad` access (which is the in-flight `0007` near-abs
+relaxation's win for ALL near pointers, not AS4's), and runtime `(dp)` deref — never beats it. Non-circular
+(the near+cast incumbent works today). **This completes the five-space model: all five spaces measured.**
+Recipe kept below for revival._
 
 Add `AS_FarZeroBank`: a **far-typed** pointer the compiler **knows is in bank `$00`**. Accessed via
 16-bit absolute (`ad`/`8d`, DBR-relative — cheaper than absolute-long), but type-compatible with far

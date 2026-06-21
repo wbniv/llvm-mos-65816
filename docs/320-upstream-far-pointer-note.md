@@ -65,8 +65,16 @@ pointer **cannot be stored in memory at all yet**: `sizeof(far*)` reports 2 (not
 storing/loading a far pointer to a global/array/struct fails to legalize (both default and `+mos-a16`).
 So packed-24 would size-optimize a capability that doesn't exist; the prerequisite is **completing the
 far-pointer value type** (storable + correct `sizeof`), the real next far-*data* work. Defer space `3`
-until that lands and real stored-far-pointer byte-pressure is measured. Space `4` (zero-bank) is ≈ a
-near pointer — marginal. *(Evidence: the five-address-space plan + `dev/measure-five-space-census.sh`.)*
+until that lands and real stored-far-pointer byte-pressure is measured. **Space `4` (zero-bank) is a
+measured null** (de-lumped census, 2026-06-22): it is bit-identical to a near pointer (16-bit storage,
+16-bit absolute access) and only adds far type-identity, so it saves **0 bytes of storage and 0 per
+access** versus a near pointer cast to far on demand. On a corpus + kernels + a bank-0-far-heavy probe,
+**0 sites** carry provably-bank-0 data through a far-typed pointer (bank `$00` is WRAM/ZP/MMIO + the local
+ROM window; far/asset data lives in high banks). So **all five of the proposal's spaces are now measured**
+— `0`/`1`/`2` ship, `3` packed-24 was *built* on a measured 25 % win on stored far-pointer tables, and `4`
+zero-bank is retained as a non-goal by measurement (its one possible `ad`-over-`af` access win is the
+near-pointer bank-relaxation's to claim, more general than a far-typed space). *(Evidence: the
+five-address-space plan + `dev/measure-five-space-census.sh` + `dev/measure-zerobank-census.sh`.)*
 
 ---
 

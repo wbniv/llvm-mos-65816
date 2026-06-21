@@ -151,8 +151,10 @@ Full internal record: [far-cc study + land plan](plans/2026-06-21-320-far-pointe
   `main`** as `patches/llvm-mos/0001` (a16-free) + `0004` (far-ptr CC, Imag32 winner) + `0005` (the lone
   a16-context-entangled `MOSLegalizerInfo` PF-as-value hunk) + **`0006`** (AS3 packed-24: the 3-byte far-ptr
   storage form for tables, incl. the static-init relocation fix); round-trip-proven against
-  `wt/320-far-followups` (also pushed `origin/wt/320-far-followups`). **Of asiekierka's five spaces, only AS4
-  zero-bank remains unbuilt** (a likely measured null ≈ a near pointer). A separate near-abs bank-relaxation
+  `wt/320-far-followups` (also pushed `origin/wt/320-far-followups`). **All five of asiekierka's spaces are
+  now measured** — AS0/1/2 ship, AS3 packed-24 built (measured win), and **AS4 zero-bank = CONFIRMED
+  measured-null** (2026-06-22 de-lumped census `dev/measure-zerobank-census.sh`: bit-identical to a near
+  pointer, 0 realistic bank-0-far sites; the five-space model is complete). A separate near-abs bank-relaxation
   optimization (`0007`, near globals → `abs` not `abs-long`) is built on `wt/320-near-abs-bank-relax`, not yet
   landed:
   - **far calls (b):** far→near mixed-banking via the bank-0 thunk `__call_near_from_far` (shipped to `main`).

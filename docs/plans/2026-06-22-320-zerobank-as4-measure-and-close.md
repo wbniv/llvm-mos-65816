@@ -1,7 +1,8 @@
 # #320 — zero-bank (AS4): measure-and-close the LAST address space
 
-**Date:** 2026-06-22 · **Status:** PLAN (premise-checked; expected outcome **CONFIRMED measured-null**, GO
-contingency kept) · **Milestone:** M1 (#320) — the address-space-layout consolidation
+**Date:** 2026-06-22 · **Status:** **DONE — CONFIRMED measured-null** (de-lumped census run 2026-06-22;
+nothing built; five-space model now complete). GO contingency did not fire. · **Milestone:** M1 (#320) —
+the address-space-layout consolidation
 **Closes:** [five-address-space model](2026-06-21-320-five-address-space-model.md) §Phase 2 (whose current
 "NO-GO (closed null)" rests on a *circular, lumped* census — see *Why re-open a closed null*).
 **Templates it mirrors:** [frame-ABI build-all-three-and-measure](2026-06-20-321-frame-abi-build-all-three-and-measure.md)
@@ -267,27 +268,90 @@ Fold into [320-upstream-far-pointer-note.md](../320-upstream-far-pointer-note.md
 
 ---
 
-## Verification (acceptance steps — paste raw evidence under each as met)
+## Verification (acceptance steps — raw evidence under each)
+
+> Measured 2026-06-22 via **`dev/measure-zerobank-census.sh`** (host-only). The decisive ACCESS demo + the
+> opportunity census run on **main's installed toolchain** (reproducible-on-main); the far-VALUE probes
+> (`sizeof(far*)==4`, the stored `far_tbl`) were run on the **post-F2 `wt/320-near-abs` toolchain** because
+> main's installed `clang-23` (06-20) is **stale pre-F2** at measurement time (`CLANG=…/near-abs/… `
+> env-override, the documented pattern). Two toolchains are shown for the access axis because it is gated by
+> the in-flight **`0007`** near-abs relaxation (see step 3).
 
 1. **0a feasibility.** AS4 implementability stated with file:line evidence (enum/datalayout/`getPointerWidthV`
    + the near-path reuse + the 0006 cast template). *(Optional spike, if run: `sizeof(__zerobank*)==2` and a
    `zerobank→far` cast compile.)* PASS = "feasible; close is a worth-decision."
+
+   **PASS.** Source-grounded by the premise-check (workflow `wf_2fdcaeb8-b44`, 4 readers): AS4 = Increment-A
+   (3 lines: `AS_FarZeroBank=4` enum + `-p4:16:8` datalayout + `getPointerWidthV case 4: return 16`) + an
+   Increment-B `legalizeAddrSpaceCast` arm modeled on `0006`'s `p2↔p3` block, with **load/store reusing the
+   near 16-bit-absolute path** (`MOSLegalizerInfo.cpp:2293-2322` `selectAddressingMode` routes by pointer
+   size; AS4 is 16-bit → transparent). **~30 LoC, no `MVT::i24`, no byte-merge bridge — strictly less than
+   packed-24.** The close is therefore a *worth* decision, not infeasibility. (Type-only spike skipped — not
+   needed, per frame-ABI precedent.)
+
 2. **0b de-lumped census.** `dev/measure-zerobank-census.sh` runs host-only and reports the count of
    provably-bank-0-via-far-typed-pointer sites across corpus + kernels + far suite + `zerobank_probe.c`, under
    the AS4-generous cost model, with the non-circularity note. PASS = a direct number replaces the lumped
    assertion. *(Expected: 0 qualifying sites.)*
+
+   **PASS — 0 qualifying sites** (replaces the lumped one-liner with a direct count):
+   ```
+   TOTAL realistic (corpus+kernels)   Nfar=0   Nstore=0   Nopp=0   (12 files)
+   TOTAL far suite                    Nfar=9   Nstore=0   Nopp=0   ( 9 files)
+   ```
+   Corpus/kernels use no far pointers (far is opt-in); the far suite's 9 far accesses target high-bank far
+   data and **store 0 far pointers** (all transient cast→deref→discard). **Non-circular:** unlike packed-24's
+   once-broken store, the near + lazy `near→far` cast incumbent *works today*, so `Nopp=0` is "covered by the
+   cheaper near path," not "inexpressible."
+
 3. **0c incumbent quantification.** Disasm shows (i) a near pointer to a *resolved* bank-0 global emits
    `ad`/`8d` (ZeroBank relaxation), widening to `af`/`8f` only for unresolved/cross-bank; (ii) `near→far` cast
    cost; (iii) storage parity near == AS4. PASS = the bar names the right incumbent.
+
+   **PASS — with a refinement the measurement forced (lesson #1).** The plan *assumed* near already stays
+   `ad` via the ZeroBank relaxation; measurement shows that relaxation suppression is the **in-flight `0007`**
+   work (`wt/320-near-abs`, commit `ff02726` — *"near-global abs stays 16-bit, suppress abs→long
+   bank-relax"*), **not yet on main**. So the access axis is toolchain-gated:
+   ```
+   # post-F2 + 0007 toolchain (the fixed world):
+   near_global → 0: ad 00 00      lda $0        [AD abs, 16-bit]   ⇐ identical to far_global... no:
+   far_global  → 0: af 00 00 00   lda $0        [AF abs-long, 24-bit]
+   #   ⇒ near already emits AD; a zero-bank global emits the SAME AD. AS4 access advantage over near = 0.
+
+   # current main (pre-0007):
+   near_global → 0: af 00 00 00   lda $0        [AF — main bank-relaxes a NEAR bank-0 access ad→af, wasteful]
+   far_global  → 0: af 00 00 00   lda $0        [AF — far, same long form]
+   #   ⇒ AS4's one possible access win (forcing AD) is exactly 0007's near-pointer fix, MORE general than AS4.
+   ```
+   Storage (sizeof, datalayout): `near*=2 B`, `far*=4 B` (measured post-F2); `zero-bank* = 2 B`
+   (`p4:16:8` == near's `p0:16:8`) ⇒ **storage win over near = 0.** Runtime deref (probe Shape 1):
+   `far_first → a7 lda [dp]` (6 cyc) vs `near_first → b2 lda (dp)` (5 cyc) — there is **no far indexed-long
+   mode** and AS4's cheap abs is globals-only, so a runtime AS4 pointer ties near's `(dp)` at best. Table
+   storage (probe Shape 2): `far_tbl = 16 B`, `near_tbl = 8 B`, zero-bank `= 8 B (= near)`. **The bar's
+   incumbent is near + lazy cast, and zero-bank ties it on every axis.**
+
 4. **Go/no-go applied.** The pre-registered bar is evaluated against 0b/0c. Record GO or CONFIRMED-null with
    the evidence. *(Expected: CONFIRMED-null.)*
+
+   **CONFIRMED-null.** 0 realistic opportunity sites (0b); and at any site, zero-bank ties near on storage
+   (2 B), global access (`ad`, which is `0007`'s near-path win), and runtime deref (`(dp)`), and never beats
+   it — dominated by "near pointer (+ lazy `near→far` cast)," exactly as frame-ABI's DP/SR frames were
+   dominated by the soft static stack. The GO bar (a realistic, repeated win *over near+lazy-cast*) is not
+   met. **Nothing is built.**
+
 5. **Phase 1 (only if GO):** `far_zerobank.c` round-trips a bank-0 datum via an AS4 pointer cast to `AS_Far`
    on MAME + bsnes-jg; disasm shows `ad`/`8d`; corpus 7/7; `fuzz 50 1` 0-mismatch; `-verify-machineinstrs`
    clean; `0007` round-trips.
+
+   **N/A — GO did not fire** (step 4 CONFIRMED-null). No compiler code built; no `0007`/`far_zerobank` patch.
+
 6. **Model completion + docs.** Five-space plan §Phase 2 updated (measured, non-circular close); TODO M1 item
    updated; upstream paragraph queued in `upstream-contribution-status` (posting user-triggered);
    `dev/measure-five-space-census.sh`'s circular zero-bank line corrected to point at the de-lumped census.
    PASS = "five-address-space model formally complete — all five spaces measured."
+
+   **PASS** — see the doc cascade landed alongside this verdict (five-space §Phase 2, TODO M1, the upstream
+   note paragraph + status pointer, and the corrected circular line in `dev/measure-five-space-census.sh`).
 
 ---
 

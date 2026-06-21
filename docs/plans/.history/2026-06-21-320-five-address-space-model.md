@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-22](https://github.com/wbniv/llvm-mos-65816/commit/6591319) | #320 docs: sync status to the landed packed-24 static-init fix + the 5-space state |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/b5b2ddf) | #320 packed-24: record productionization follow-ups + next-batch handoff |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/ebfc95e) | #320 packed-24 (AS3) Increment B: store/load/deref a 3-byte packed far pointer |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/6e580b5) | #320 packed-24: worktree torn down (Increment B deferred until F2 lands on main) |
@@ -11,6 +12,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/caef3e9) | #320 five-address-space model: plan + Phase 0 census (packed-24/zero-bank = measured nulls) |
 
 <!--history-meta v1
+6591319	author	Will Norris
+6591319	added	7
+6591319	deleted	0
+6591319	files	1
+6591319	body	Reflect the current reality across the status docs after the packed-24 static-init\nrelocation fix landed + pushed (a76bf18):\n- agent-handoff.md: wt/320-packed24-incB row gains the Task-A measure + static-init fix\n  (0006 now 10 files incl. the AsmPrinter hook); new wt/320-near-abs-bank-relax row\n  (0007 built on the worktree, not yet on main).\n- implementation-status.md: new #320 packed-24 (AS3) table row (DONE/landed 0006); the\n  five-space row + TL;DR note AS3 built+landed, only AS4 zero-bank + the PR remain.\n- ROADMAP.md: far-pointer block notes AS3 packed-24 built+landed (measured, break-even N>=1).\n- upstream-contribution-status.md: the far-pointer body now lists 0006; only AS4 remains\n  unbuilt; flags the un-landed 0007 near-abs optimization.\n- five-address-space plan: §Build packed-24 Increment B gains the 2026-06-22 static-init\n  follow-up pointer.\n\nDocs-only; no code/patch change. 0001-0006 unchanged.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 b5b2ddf	author	Will Norris
 b5b2ddf	added	9
 b5b2ddf	deleted	0
