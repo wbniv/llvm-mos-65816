@@ -989,8 +989,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-21: RESOLVED — the land plan now has a §Verification (2026-06-21) section with PASS recorded (round-trip empty over clang/+MOS/ except the 2 documented drift/stale files; a16-free + 0002/0003-sha-unchanged + sequence-apply all PASS). Landing is done; nothing left to run. fp:a51d6afac2a18fef -->
 <!-- triaged 2026-06-21: the packed24-incrementB-handoff §3 "Verification gate" is INSTRUCTIONS for the future agent who builds Increment B (the bar THEY must clear), not a verification to run now — Increment B is deferred until F2 lands on main. Nothing to verify here; covered by the curated M1 five-space item + its handoff link. fp:3d3c94fe546a028c -->
 <!-- triaged 2026-06-21: the packed24-productionization-handoff §2 "Verification gate" is INSTRUCTIONS for the future agent who picks up the next batch (the bar THEY must clear), not a verification to run now — it's a forward-looking resume prompt, not a completed plan. Tracked by the curated M1 five-space item's "next batch" link. Nothing to verify here. fp:93f3ef0f25357389 -->
-- [ ] **(triage)** **No `-mcmodel` / "limit codegen to 64k" compiler mode** — near is already the default and it buys no — _from [2026-06-22-snes-near-code-budget-and-code-model.md](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md)_  <!-- fp:a349fdb9e6fb6627 -->
-- [ ] **(triage)** **No `-mno-far` guardrail** — user chose to skip; far is already opt-in per symbol. — _from [2026-06-22-snes-near-code-budget-and-code-model.md](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md)_  <!-- fp:13a459b641dd2a38 -->
-- [ ] **(triage)** **`rom_1` far bank** in `snes-far` left as-is (already a clearly-named, overflow-checked region). — _from [2026-06-22-snes-near-code-budget-and-code-model.md](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md)_  <!-- fp:27a0f051def92af7 -->
-- [ ] **(triage)** **No compiler/`vendor/` edits** — linker-script + docs only. — _from [2026-06-22-snes-near-code-budget-and-code-model.md](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md)_  <!-- fp:9c15ab41c1ea4e0c -->
+<!-- triaged 2026-06-22: all four are explicit "Out of scope" NON-GOALS from the SNES near-code-budget
+     plan (2026-06-22-snes-near-code-budget-and-code-model.md), not deferred work — each is a decision
+     already stated in the curated M1 bullet "SNES near-code budget link-time assertion + #320 near/far
+     code-model framing note": no -mcmodel mode (near IS the default, zero codegen win), no -mno-far
+     guardrail (far is per-symbol opt-in; user skipped), rom_1 left as-is (already a named overflow-checked
+     region), linker-script + docs only (no vendor edit). Nothing open.
+     fp:a349fdb9e6fb6627 fp:13a459b641dd2a38 fp:27a0f051def92af7 fp:9c15ab41c1ea4e0c -->
 <!-- END auto-captured-deferrals -->
