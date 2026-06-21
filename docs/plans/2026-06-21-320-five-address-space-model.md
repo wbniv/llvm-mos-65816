@@ -1,9 +1,11 @@
 # #320 — the full five-address-space model (Option A → Option B)
 
-**Date:** 2026-06-21 · **Status:** PHASE 0 + 3 DONE (2026-06-21). **New spaces (packed-24 #3, zero-bank
-#4) DEFERRED as premature** — but Phase 0 surfaced the genuinely **desirable, open** work they presuppose:
-**completing the far-pointer VALUE type** (storable in memory + correct `sizeof`), now promoted to its own
-item. (Verdict corrected after user pushback — see *Phase 0 — results › 0b verdict (corrected)*.)
+**Date:** 2026-06-21 · **Status:** PHASE 0 + 3 DONE; **re-evaluated** (2026-06-21, later). New spaces
+(packed-24 #3, zero-bank #4) DEFERRED as premature. The desirable work Phase 0 surfaced —
+**completing the far-pointer VALUE type** (storable + `sizeof==4`) — was **built by the F2 agent**
+(`wt/320-far-followups`, verified, ABI-gated, not on `main`), so it's **done, not ours to re-implement**.
+`dp→near` cast = pre-existing **upstream** bug. **No clean in-scope codegen remains for us here** — see
+*Re-evaluation (2026-06-21, later)*.
 **Milestone:** M1 (#320) — the address-space layout consolidation
 **Builds on:** the shipped 3-space additive slice —
 [far codegen](2026-06-14-320-far-pointer-codegen.md) ·
@@ -385,6 +387,47 @@ no speculative build.
 **Phase 3 net:** the cast matrix is the durable spec, and it *confirms* the 0b reframe — the work worth
 doing is **completing the far-pointer value type**, after which 3a's broken cells close and 3b becomes
 measurable.
+
+---
+
+## Re-evaluation (2026-06-21, later) — the far-data value type LANDED (built by the F2 agent)
+
+The desirable work this plan surfaced ("complete the far-pointer data-value type") turned out to be
+**built by the far-fn-ptr (F2) agent**, not just unblocked. Verified by compiling the
+`examples/65816/far-value-evidence/` fixtures against their rebuilt toolchain (`wt/320-far-followups`,
+clang-23 @ 2026-06-21 19:36):
+
+| fixture | `main` (pre-F2) | `wt/320-far-followups`, `+mos-a16` |
+|---|---|---|
+| store far ptr → global (`s1`) | FAIL | **OK** |
+| load far ptr ← global (`s2`) | FAIL | **OK** |
+| array of far ptrs (`s3`) | FAIL | **OK** |
+| struct far-ptr field (`s4`) | FAIL | **OK** |
+| `sizeof(far*)` (`z1`) | 2 | **4** |
+| far→near cast (`c1`) | FAIL | **OK** |
+| dp→near cast (`c2`) | FAIL | FAIL (pre-existing upstream) |
+
+So the far-pointer **value type is complete** under `+mos-a16`: `getPointerWidthV` gained `case 2: return
+32`, and `PF` is a storable *value* type (the s32 merge narrows to bytes). **This satisfies the
+"complete the far-data value type" item — done by the other agent**, in `wt/320-far-followups` (pushed
+`origin/wt/320-far-followups`), **ABI-gated, not on `main`** (main's toolchain + `0001` unchanged; the
+work lives in `0004` + recipes). Re-implementing it on `main` would duplicate/conflict — so we don't.
+
+**`c2_dp_to_near` is a pre-existing UPSTREAM bug, not ours.** It fails identically on plain `mos6502`
+("Bad machine code: Copy Instruction is illegal with mismatching sizes"; crashes without `-verify`) — a
+generic DP(addrspace 1)→near(0) addrspacecast defect, unrelated to #320/#321. → an **upstream issue to
+report** (maintainer territory, like the scavenger-N/Z and `reentrant` issues), not a fork fix.
+
+**Net remaining in this plan:**
+1. **packed-24 (space 3)** is now technically *unblocked* (far pointers are storable) but still a
+   **deferred size-opt** — build only on measured byte-pressure, via `LLT` + a 3-byte ZP class (never
+   `MVT::i24`; see 0a).
+2. **zero-bank (4)** still marginal (≈ a near pointer).
+3. The far-data value type, though done, is **not on `main`** — landing it is an ABI-blessing-gated
+   decision, deliberately deferred per `upstream-contribution-status.md`.
+
+So there is **no clean, in-scope codegen left for *us* to implement here**: the value type is done
+(theirs), `dp→near` is upstream, packed-24/zero-bank are deferred-by-agreement.
 
 ---
 

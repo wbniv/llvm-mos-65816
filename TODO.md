@@ -21,33 +21,21 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [ ] **#320 complete the far-pointer DATA-VALUE type — DESIRABLE M1 work surfaced by the five-space census.**
-  A far pointer (`addrspace 2`) is today a complete *address mechanism* (deref/load/store/arith/calls all
-  work, `+mos-a16`-gated) but an **incomplete value type**: it **can't be stored in memory** (global /
-  array / struct-field store+load all fail under default AND `+mos-a16`), `sizeof(far*)==2` not 4 (clang
-  `getPointerWidthV` lacks `case 2: return 32`), narrowing casts far→near / dp→near fail (dp→near can
-  **segfault** w/o `-verify-machineinstrs`), and pass/return only works on `0004` (`wt/320-far-cc`).
-  Real banked-memory C *wants* tables of far pointers (banked-asset/jump tables) — they just can't be
-  written yet. **Scope:** (1) `getPointerWidthV` → `sizeof(far*)==4`; (2) legalize `G_STORE`/`G_LOAD p2`
-  in memory + aggregate/static-init; (3) the narrowing/cross-space casts (+ fix the dp→near segfault);
-  (4) merge `0004`'s pass/return half.
-  **EXACT HAND-OFF with the F2 far-fn-ptr agent (verified 2026-06-21 against `wt/320-far-followups`):**
-  F2 is a *different track* — its `far`/`long_call` attr is `Subjects = [Function]` (far **code**-ptr
-  *call* lowering via `MOSFarCall` → `jsl __call_indir_far`), scoped to the **call site**, NOT a pointer
-  value type. So:
-  - **`getPointerWidthV`/`sizeof(far*)` (scope 1) is UNCLAIMED — F2 explicitly DEFERRED it.** Their plan
-    (`2026-06-21-320-far-calls-followups.md` L291–298) calls the `sizeof(far*)`==2 vs IR `p2:32:8`
-    disagreement "a miscompile landmine" and names the fix — "`getPointerWidthV` + a `Type::Pointer` AS2
-    arm" — as a "clean **future** follow-up … **not** needed for F2." Confirmed: their worktree `MOS.cpp`
-    still has the unfixed `default: return 16`. **This is mine to do.**
-  - **`G_STORE`/`G_LOAD p2` (Gap B, scope 2): REUSE `0004`, don't re-implement.** F2 already fixed Gap B
-    (list `PF` as a value type) for the fn-ptr p2 value; it lives in **`0004` on `wt/320-far-cc`** stacked
-    with the far-CC `Imag32`. Build the data-ptr store/aggregate path **on top of** that, and land it in
-    `0001` only once `0004`'s relationship to `main` settles (per F2's own "land in `0001` once `0004`
-    settles" note). Nothing F2/`0004` is on `main`'s toolchain yet (pre-F2 build verified).
-  - The typed far-pointer *variable* surface (`far_t fp;`) F2 punted is exactly scopes 1+3 here.
-  Evidence: `dev/measure-far-ptr-value-state.sh`.
-  [plan §Phase 3 results + 0b verdict](docs/plans/2026-06-21-320-five-address-space-model.md) ·
+- [ ] **#320 far-pointer DATA-VALUE type — BUILT BY THE F2 AGENT (verified 2026-06-21); residuals only.**
+  The desirable work the five-space census surfaced (store/load/array/struct a far pointer + `sizeof==4`)
+  was **built by the far-fn-ptr agent**, not just unblocked. Verified by compiling
+  `examples/65816/far-value-evidence/` against their toolchain (`wt/320-far-followups`, clang-23 @
+  2026-06-21 19:36): under `+mos-a16`, `s1`–`s4` (store/load/array/struct), `z1` (`sizeof==4`), and `c1`
+  (far→near) **all OK** (vs all-FAIL on `main`). `getPointerWidthV` gained `case 2: return 32`; `PF` is a
+  storable value type (s32 merge → bytes). **Done, not ours to re-implement.** Caveat: it's in
+  `wt/320-far-followups` (pushed `origin/`), **ABI-gated, NOT on `main`** (main toolchain + `0001`
+  unchanged; lives in `0004` + recipes) — landing it on `main` is the ABI-blessing-gated decision tracked
+  in [upstream-contribution-status](docs/upstream-contribution-status.md). **Residuals:** (a) **`dp→near`
+  cast = pre-existing UPSTREAM bug** (fails on plain `mos6502`: "Copy Instruction illegal with mismatching
+  sizes", crashes w/o `-verify`) → an upstream issue to draft, not a fork fix; (b) far-ptr storage under
+  **default 8-bit** is still un-legalized (a16-gated by design — likely fine). Evidence:
+  `dev/measure-far-ptr-value-state.sh`.
+  [plan §Re-evaluation](docs/plans/2026-06-21-320-five-address-space-model.md) ·
   [F2 hand-off](docs/plans/2026-06-21-320-far-calls-followups.md).
 - [ ] **#320 five-address-space model — Phase 0+3 DONE; new spaces (AS3 packed-24, AS4 zero-bank) DEFERRED
   (premature, not nulls).** asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/
@@ -61,8 +49,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   limit). **0b/Phase 3:** packed-24 would size-optimize *storing a far pointer*, but **storing far pointers
   doesn't work at all yet** → packed-24 optimizes a non-existent capability ⇒ **DEFER** behind the
   far-pointer-value-completion item above (NOT a null — the capability is wanted; the byte-packing is the
-  premature part). Zero-bank ≈ a near pointer ⇒ marginal. Revisit 3-byte packing only after stored far
-  pointers work + measured byte-pressure. Remaining: post the upstream note (C1 finding + corrected pow2
+  premature part). Zero-bank ≈ a near pointer ⇒ marginal. **Update 2026-06-21 (re-eval):** the prerequisite
+  (storing far pointers) is now **DONE** by the F2 agent, so packed-24 is technically **unblocked** — but
+  still a deferred size-opt: build only on **measured byte-pressure**, via `LLT` + a 3-byte ZP class
+  (`Imag24`), **never `MVT::i24`** (0a). Remaining: post the upstream note (C1 finding + corrected pow2
   fact + census) — user-triggered.
   [plan](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
