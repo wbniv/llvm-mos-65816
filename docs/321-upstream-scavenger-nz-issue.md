@@ -30,6 +30,15 @@ materialization that the scavenger handles. Downstream in the same function, the
 case with an unbalanced hard-stack range (`pushPullBalanced` false) falls through to
 `STImag8 {Save}, {P}` / `LDImag8 {P}, {Save}`, which is illegal because `P` is not a GPR.
 
+## Regression — introduced by
+
+The N/Z-dead assumption traces to [`a367c3bb51d0`](https://github.com/llvm-mos/llvm-mos/commit/a367c3bb51d0)
+— *"Replace CMPTerm;BR with a new CmpBr."* (2024-02-06): the assertion's premise comment ("virtual
+registers are never inserted into CmpBr instructions") is about the `CmpBr` form that commit introduced,
+and the `assertNZDeadAt(...) / "expected N to be free when saving scavenger register"` line blames to it.
+The premise held for the patterns of the day but is not general — a 16-bit-accumulator compare/ALU keeps
+N (or Z) live across a frame-vreg spill. (Ancestor of current `main`.)
+
 ## Reproduce
 
 A recursive function holding several 16-bit values live across the self-call (register pressure →

@@ -44,6 +44,29 @@ machine verifier rejects the new use:
 The default 8-bit path never hits it; it shows up on the 65816 under register pressure that produces a
 dead `LDImm` followed by a same-value `LDImm`.
 
+### Regression — introduced by
+
+[`dbce7ad1e9cd2`](https://github.com/llvm-mos/llvm-mos/commit/dbce7ad1e9cd2) — *"Support emitting TXY/TYX
+on W65816/65EL02."* ([#299](https://github.com/llvm-mos/llvm-mos/pull/299), 2023-06-17). It added the
+`} else if (STI.hasW65816Or65EL02())` TYX/TXY rewrite branches **without setting `Load`**, so they never
+reach the source-cleanup the sibling transfer rewrites rely on. That cleanup
+(`if (Load) { Load->MI->getOperand(0).setIsDead(false); clearRegisterKills(...); }`) already existed —
+it dates to [`8416d2408044`](https://github.com/llvm-mos/llvm-mos/commit/8416d2408044) *"Fold LDImm away
+late to T__."* (2022-07-01) — so the W65816 branches were incomplete from introduction; the verifier
+reject only surfaces under the register pressure that feeds a dead same-value `LDImm` into the transfer.
+The introducing hunk (note the absence of any `Load = …`, unlike every sibling branch):
+
+```diff
++      } else if (STI.hasW65816Or65EL02()) {
++        if (Dst == MOS::X && LoadY.MI && LoadY.Val == Val) {
++          MI.setDesc(TII.get(MOS::TX));
++          MI.getOperand(1).ChangeToRegister(MOS::Y, /*isDef=*/false);
++        } else if (Dst == MOS::Y && LoadX.MI && LoadX.Val == Val) {
++          MI.setDesc(TII.get(MOS::TX));
++          MI.getOperand(1).ChangeToRegister(MOS::X, /*isDef=*/false);
++        }
+```
+
 ### Fix
 
 Set `Load` to the transfer source (`&LoadY` for `TYX`, `&LoadX` for `TXY`) in the two W65816 branches,

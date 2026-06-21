@@ -100,6 +100,18 @@ rule does not distinguish the 8-bit `addrspace(1)` pointer from the 16-bit defau
 The downstream abort site is `MOSRegisterInfo::copyCost` (`llvm_unreachable("Unexpected physical register
 copy.")`), reached because the 8-bit-vreg ↔ 16-bit-physreg copy has no legal cost/lowering.
 
+## Regression — introduced by
+
+[`e618537e7d5e`](https://github.com/llvm-mos/llvm-mos/commit/e618537e7d5e) — *"Use address space 1 for ZP
+pointers."* (2022-07-25). It introduced the 8-bit `addrspace(1)` direct-page pointer **without** a
+calling-convention carve-out for its width. The pointer-argument rule
+`CCIfPtr<CCAssignToReg<[RS1..RS7]>>` predates it —
+[`80c2618c0576`](https://github.com/llvm-mos/llvm-mos/commit/80c2618c0576) *"Use RISC-V-like calling
+convention."* (2021-09-22) — and is **address-space-blind** (`CCIfPtr` ≙ `CCIf<"ArgFlags.isPointer()">`),
+correct while every pointer was 16-bit. So the defect is the interaction: once `addrspace(1)` pointers
+exist (2022), passing one as an argument routes it through the 16-bit `RS` rule. Both commits are
+ancestors of current `main`; the bug has been latent since 2022.
+
 ## Likely fix directions
 
 Make the pointer-argument rule address-space-aware so an 8-bit `addrspace(1)` pointer is assigned an 8-bit
