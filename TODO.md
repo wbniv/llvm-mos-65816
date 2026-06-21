@@ -47,9 +47,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     the far-CC study shipped as Imag32 in **`0004-320-far-cc.patch`** (on `wt/320-far-cc`, not on `main`).
     Plus a **front-end fork** — a far code pointer can't use `address_space(2)` (clang forbids addr-space
     function types) and `__attribute__((far))` is MIPS-only, so (a) needs a new MOS far-fn-ptr spelling
-    (front-end **LOCKED = F2 MOS `far` attr**, user 2026-06-21; F1 builtins = spike, F3 = deferred ideal).
-    So (a) = F2 front-end + the `0004` base + stub/indirect lowering + residual legalizer fixes; **gated on
-    `0004` reaching `main`** (then resume on the retained `wt/320-far-followups`).
+    (surface syntax **LOCKED = F2 MOS `far` attr**, user 2026-06-21; F1 builtins = spike, F3 = deferred).
+    **⚠ Layer-3 blocker (measured 2026-06-21): a far fn ptr CANNOT be a `ptr addrspace(2)` callee** — LLVM
+    forbids a non-program-addrspace callee (verifier: "expected 'ptr'"; MOS has no `P<n>` datalayout field),
+    and an `addrspacecast` p2→p0 drops the bank. So the 24-bit address can't ride the IR `call` callee; it
+    must be threaded via a **front-end IR representation** — (#1, leaning) a `set_far_target` intrinsic +
+    a normal `call @__call_indir_far(args)`; (#2) a custom `MOS_FarIndirect` CC; (#3) a full call intrinsic.
+    **A "detect `p2` callee in `lowerCall`" trigger is untriggerable** (prototyped + backed out). So (a) =
+    F2 surface + the IR-representation design + the `0004` p2 base + the `__call_indir_far` lowering +
+    address-of-far-symbol→24-bit (Gap A) + residual legalizer fixes. **Runtime stub `__call_indir_far`
+    (`jml (__rc18)`) BUILT + assembled** (kept on the worktree, gc'd/unreferenced pending the trigger).
+    **Gated on (i) the IR-representation decision and (ii) `0004` reaching `main`**; resume on the retained
+    `wt/320-far-followups`.
   - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
   Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
   [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).

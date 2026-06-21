@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5d81d44) | #320 far-followups: (b) shipped to main (5717f6b); (a) paused, front-end LOCKED=F2 |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/dd33017) | #320 (b) mixed-banking: far->near calls via __call_near_from_far thunk |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/827596d) | #320 far-followups: absorb cross-agent A0 evidence; (b) DONE; (a) gated on 0004 |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/b6dde43) | #320 far-followups (a): graft cross-agent A0 spike evidence + 2 backend gaps |
@@ -7,6 +8,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+5d81d44	author	Will Norris
+5d81d44	added	13
+5d81d44	deleted	6
+5d81d44	files	1
+5d81d44	body	User decisions 2026-06-21: ship (b) now (done), pause (a) as a follow-up gated on\n0004 (far-CC Imag32 p2 base reaching main), and lock (a)'s front-end spelling to\nF2 (MOS far attribute). Plan Open-decision -> resolved; TODO + handoff updated.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 dd33017	author	Will Norris
 dd33017	added	77
 dd33017	deleted	60

@@ -181,12 +181,36 @@ indirect-from-far is (a)'s territory (a runtime pointer's near/far-ness isn't kn
 
 ## (a) Far function pointers: indirect far call
 
-### Backend + runtime (the tractable half — mirror `__call_indir`)
+### ⚠ Layer-3 blocker (measured 2026-06-21): a far fn pointer can't be a far-addrspace IR callee
+
+The first draft assumed the backend trigger is "the indirect callee is a `p2` value" — **LLVM IR forbids
+this.** The verifier rejects `call … %fp` where `%fp` is `ptr addrspace(2)`: *"defined with type 'ptr
+addrspace(2)' but expected 'ptr'"* — a call's callee **must** be in the program address space (0). The MOS
+datalayout has no `P<n>` field ⇒ program addrspace = 0 ⇒ function pointers are 16-bit near; there is **no
+per-pointer far callee**, and an `addrspacecast` p2→p0 truncates 32→16, dropping the bank. So the 24-bit
+far address **cannot ride the IR `call` callee** — it must be threaded explicitly. Three IR
+representations (a real design decision, *on top of* the F2 surface syntax):
+
+1. **"set-far-target" intrinsic + named-thunk call** *(most tractable)* — `@llvm.mos.set_far_target(p2 %fp)`
+   stashes the 24-bit address in the slot, then a normal `call @__call_indir_far(args)` forwards args; the
+   backend emits `JSL` for the `__call_indir_far` symbol. Testable, args forward via the CC untouched.
+2. **A custom calling convention** (`MOS_FarIndirect`) where the `p2` is an explicit operand; `lowerCall`
+   keys on `Info.CallConv`, not the (impossible) callee type.
+3. **A full call intrinsic** `@llvm.mos.call_indir_far(p2, …)` — clean but awkward for arbitrary signatures.
+
+**Status:** the runtime stub `__call_indir_far` (`jml (__rc18)`) is **built + assembled + kept** on the
+worktree (the design-independent half — every approach long-indirect-jumps through a ZP slot). The
+`lowerCall` "detect p2 callee" trigger was **prototyped and backed out** — it is *untriggerable* (no real
+IR yields a `p2` callee), so it can't be tested and would be dead/speculative. **Resuming (a) starts from
+the IR-representation choice above** (lean toward #1), not from `lowerCall` detection. The mechanism below
+is still the correct *runtime* shape; only its *trigger* changes.
+
+### Runtime mechanism (correct; the trigger is the open design above)
 
 Symmetric to the near indirect thunk. A 24-bit far code pointer is copied into a 3-byte ZP slot, then:
 ```
 __call_indir_far:            ; reached via JSL (3-byte return already on stack)
-    jml  [__rc18]            ; $DC, indirect-LONG tail jump: reads 3 bytes at __rc18, PBR follows
+    jml  (__rc18)            ; $DC, indirect-LONG tail jump: reads 3 bytes at __rc18, PBR follows
 ```
 Call site (in `lowerCall`'s `IsIndirect` path, for a **far** callee value):
 ```
@@ -194,7 +218,7 @@ Call site (in `lowerCall`'s `IsIndirect` path, for a **far** callee value):
     jsl  __call_indir_far    ; pushes 3-byte PBR:PC of the caller
     ; far target runs, RTL pops 3 -> returns to the ORIGINAL caller (any bank)
 ```
-Trace: `JSL`(push3) → `__call_indir_far` `JML [ptr]`(tail, no push) → far target `RTL`(pop3) → original
+Trace: `JSL`(push3) → `__call_indir_far` `JML (ptr)`(tail, no push) → far target `RTL`(pop3) → original
 caller, PBR restored. Works regardless of the **caller's** bank (near or far). The instruction exists:
 `JML_Indirect16` ($DC, `MOSInstrInfo.td:779`).
 
@@ -202,25 +226,24 @@ caller, PBR restored. Works regardless of the **caller's** bank (near or far). T
 against a near `RTS` callee corrupts the stack. A proper far-code-pointer *type* (front-end, below) is
 what enforces this; an integer/builtin route leaves it to the user (document loudly).
 
-**The 24-bit slot.** The near path uses `RS9` = `__rc18:__rc19` (16-bit). The far path needs 3 contiguous
-bytes reachable by `jml [__rc18]` — i.e. `__rc18..__rc20` (the bank byte at `__rc20`). Settle this as
-either (i) reuse the Imag32 `RL#` quad the far-CC study added (natural: a far code pointer *is* a `p2`),
-loading its low 3 bytes into the fixed `jml` slot, or (ii) a dedicated reserved triple analogous to
-`RS9`. Prefer (i) for representation unity; confirm the `jml [abs]` operand can name the ZP base.
+**The 24-bit slot (settled in the build).** `jml`'s assembler syntax is `jml (__rc18)` (not `[…]`; opcode
+`$DC`). The slot is `RS9` (`__rc18:__rc19`, the established near-indirect scratch) + the bank in `RC20`
+(`__rc20`) — 3 contiguous bytes. RS9/RC20 aren't reserved (only RS0/RS8/frame are); like the near path,
+they work as fixed scratch via copy→implicit-use (verified RS9 is convention, not reservation). An Imag32
+`RL#` can't align to `__rc18` (RL`K` ⊃ `RS2K:RS2K+1`, and `RL4 ⊃ RS8` is the reserved scavenger), so the
+RS9+RC20 triple is the slot.
 
-**Lowering changes** (`MOSCallLowering.cpp` `lowerCall`, `IsIndirect` branch, `:383-407` + the call-build
-at `:419-430`):
-- Detect "this indirect callee is far" (from the callee value's type/addrspace — see front-end).
-- Copy the 24-bit value into the far slot (3 bytes) instead of `RS9` (2 bytes).
-- `Info.Callee.ChangeToES("__call_indir_far")`.
-- Emit `JSL` (not `JSR`) so the 3-byte return is pushed; add the slot reg as an implicit use.
-- SPC700 has its own `__rc17` thunk path — far indirect is **65816-only**; leave SPC700 unchanged.
+**Lowering (trigger superseded — see the Layer-3 blocker).** The slot-fill + `JSL` + `ChangeToES(
+"__call_indir_far")` sequence is right, and the byte-decompose (`ptrtoint`+`trunc`+`lshr` → RS9/RC20,
+mirroring 0004's `assignCustomValue`) works. But it must be **driven by the front-end's IR representation**
+(intrinsic / custom-CC), **not** by "callee is `p2`" (impossible — Layer-3). SPC700 stays on its `__rc17`
+near thunk; far indirect is 65816-only.
 
-**Runtime stub home.** Add `__call_indir_far` as a **project-owned** stub in `platforms/snes-far/`
-(a new `call-indir-far.s`, wired through its `CMakeLists.txt` — `snes-far` is a `COMPLETE PARENT snes`
-platform, so it can add object files), **not** the shared `vendor/llvm-mos-sdk` common crt. Keeps the
-shared SDK untouched and the stub tracked in-repo. (If upstreamed later, it moves to the SDK common crt
-behind a 65816 guard.)
+**Runtime stub home (done).** `__call_indir_far` is a **project-owned** stub at `platforms/snes/call-indir-
+far.s` (body `jml (__rc18)`), wired into `snes-crt0-o` with a per-file `-mcpu=mosw65816` (the platform
+otherwise builds crt0 objects without it) and placed in its own section so `--gc-sections` drops it until
+referenced — exactly like the (b) `__call_near_from_far` thunk. It is **built + assembled** on the worktree
+(`dc` = `jml ($0)`→`__rc18`) and is currently unreferenced (gc'd) pending the lowering trigger.
 
 ### Front-end (the decision-bearing half — nothing exists today)
 
@@ -257,7 +280,7 @@ lowering, not the cross-call CC.
 
 - **Backend/runtime (no front-end):** `examples/65816/farfp.ll` — hand-authored IR (or a `.S` driver)
   constructing an indirect far call through a 24-bit pointer; `llc`/assemble gate asserts `jsl
-  __call_indir_far` + the stub's `dc` (`jml [__rc18]`); a ROM driver checks the far target ran and
+  __call_indir_far` + the stub's `dc` (`jml (__rc18)`); a ROM driver checks the far target ran and
   returned across the bank boundary on MAME + bsnes-jg.
 - **End-to-end C (after the chosen front-end):** `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` — take
   `&far_leaf` as a far code pointer, launder through a `volatile`, call through it; host == default == far
@@ -316,7 +339,7 @@ too (genuine 4-way when the callee takes/returns ≤16-bit).
 1. **(b)** ✅ `dev/run.sh far_near_call` → far call emits `JSL __call_near_from_far`, thunk body =
    `f4` (pea) + `6c` (jmp ind) + `6b` (rtl), near helper still `60` (rts); MAME + bsnes-jg both got
    `0xE0`; far→far + corpus + the prior far ROMs still PASS; thunk gc'd from near ROMs (byte-identical).
-2. **(a) backend** `dev/run.sh farfp` (the `.ll`/`.S` gate) → `jsl __call_indir_far` + `dc` (jml [abs])
+2. **(a) backend** `dev/run.sh farfp` (the `.ll`/`.S` gate) → `jsl __call_indir_far` + `dc` (jml (abs))
    present; ROM round-trips the far target on both emulators.
 3. **(a) e2e** `dev/run.sh far_fnptr` → 24-bit `&far_leaf` (bank byte present), `jsl __call_indir_far`;
    host == default == far on both emulators.
