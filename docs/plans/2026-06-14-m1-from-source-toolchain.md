@@ -103,9 +103,36 @@ baseline; not required for the value check, but tidy — note it.)
    · globals 0xAB55 · hello 0x42) — byte-identical to the prebuilt.
 3. **Default path unchanged + round-trips** — plain `dev/run.sh build && corpus` (prebuilt) still 7/7.
    **PASS** (2026-06-14): switching back (`…llvm-mos-install -> /opt/llvm-mos`) wiped + rebuilt, 7/7.
-4. **Incremental rebuild** — editing a backend file relinks (not a full rebuild). *Not separately
-   timed yet*; ccache + the persistent `build/llvm-mos` tree make this the expected behaviour and it's
-   exercised the first time #320 codegen edits land.
+4. **Incremental rebuild** — editing a backend file relinks (not a full rebuild). ccache + the
+   persistent `build/llvm-mos` tree make this the expected behaviour and it's exercised every time
+   codegen edits land.
+   **PASS** (2026-06-22): measured on an isolated throwaway worktree (real-copied warm `build/` +
+   `vendor/llvm-mos`, per `docs/howto-feature-worktree.md` §compiler-changing variant), on a verified-quiet
+   host (load 1.1, 9 GiB free). Made a *real* source edit to one MOS backend `.cpp` (changed a pass-name
+   string literal in `MOSInsertREPSEP.cpp` — survives the preprocessor, so a genuine ccache miss, not a
+   skipped compile), then `dev/run.sh toolchain`:
+
+   ```
+   $ sed -i 's/.../(m1-verify)/' vendor/llvm-mos/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
+   $ time dev/run.sh toolchain
+   ==> build the distribution target (-j6); first build is long (~30-90 min)
+   [1/12] Building CXX object tools/llvm-config/.../llvm-config.cpp.o
+   [2/12] Linking CXX executable bin/llvm-config
+   [3/12] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSInsertREPSEP.cpp.o
+   [4/12] Linking CXX static library lib/libLLVMMOSCodeGen.a
+   [5/12] Linking CXX executable bin/lld
+   [6/12] Linking CXX executable bin/clang-23
+   [7/12] Creating executable symlink bin/clang
+   [12/12] Linking CXX executable bin/clang-scan-deps
+   ==> done in 0m 10s: clang version 23.0.0git (… c798c31)
+   >>> CLEAN RUN host wall: 11s
+   ```
+
+   **~11 s wall (10 s in-container): 12 ninja steps** — recompile the one edited TU, re-`ar` the MOS
+   codegen lib, relink `lld`/`clang-23`/`clang-scan-deps` — vs the **30–90 min** cold `distribution`
+   build. So a backend edit relinks in seconds (lld + warm tree + ccache), confirming the iteration loop
+   is fast. (A no-op rebuild floor measured 9–23 s, the spread being first-invocation Docker
+   image-unpack overhead; steady-state incremental is the ~11 s above.)
 
 ## Key findings (2026-06-14)
 
