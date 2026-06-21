@@ -21,6 +21,24 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
+- [ ] **#320 five-address-space model — Phase 0 DONE; packed-24 (AS3) + zero-bank (AS4) CLOSED as measured
+  nulls.** asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/`3`=packed-24/`4`=zero-bank);
+  we ship 3 additive (`0`=near-default/`1`=DP/`2`=32-bit far). Far **capabilities** are all done
+  (data/calls/fn-ptrs/CC) — the model would add only upstream numbering + two size-opt spaces. **Two hard
+  constraints:** (C1) one MOS datalayout shared with the 6502 ⇒ `0`=far-default is **architecturally
+  foreclosed** (would break every 6502 pointer); "far by default" can only be a clang memory-model flag.
+  (C2) `addrspace(2)`=far is load-bearing tree-wide ⇒ keep additive numbers, defer any rename to upstream.
+  **Phase 0 (2026-06-21, `dev/measure-five-space-census.sh`):** ~~0a representability~~ **GO** — a 24-bit
+  pointer is representable (the note's "LLVM needs pow2 pointer sizes" is **WRONG**: `parseSize` has no pow2
+  rule, `getPointerSize`=3 bytes) and the backend carries `_BitInt(24)`. But ~~0b census~~ **NO-GO**:
+  **0 far pointers are stored in memory** in real code, `sizeof(far*)==2` (clang `getPointerWidthV` lacks
+  `case 2:return 32`), and `G_STORE p2` **crashes the legalizer on main** (p2-value store/load is unmerged
+  in `0004`). So packed-24/zero-bank are empty AND blocked → **closed as nulls** (frame-ABI pattern). The
+  **real surfaced next work** (separate, higher value): front-end far-pointer value completeness —
+  `sizeof(far*)==4` + aggregate/static-init support + merge `0004`'s p2 store/load — coordinate with the
+  in-flight clang `far`-attribute (F2) work. Remaining on this item: post the upstream design note (the
+  C1 finding + corrected pow2 fact + census) — user-triggered.
+  [plan](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
   llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.
