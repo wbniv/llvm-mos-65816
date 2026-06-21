@@ -121,9 +121,15 @@ reaching `main`, and the five-address-space PR still waits on the design-note po
 
 ### Pending codegen (greenlit or in-progress)
 
+With load-fold landed and the compare track closed, the per-op a16 codegen is complete (see TL;DR). The
+remaining codegen frontiers are #320's far calling convention and xy16's ABI.
+
 | Item | Status |
 |---|---|
-| Load-fold gate unification (AA-precision + volatile) — `canFoldLoadIntoUser` | ⬜ **Phase 2 greenlit** — Phase 1 confirmed 43 volatile + 7 AA-precision recovery sites; needs fresh worktree |
+| Load-fold gate unification (AA-precision) — `noClobberBetween` | ✅ **Done 2026-06-20 (`6440db0`)** — AA-precise fold landed (−26 B, 0 regressions, verify-clean, 5 c-torture recovery sites 4-way PASS). The volatile-drop half measured net-negative (+17 B / 19 regressions) and is **closed**, not pursued |
+| #320 far-pointer calling convention (`p2` pass/return) | ⬜ Build all ABI variants & measure; must ship one (ships as `0004`). See #320 table + What's next |
+| #320 far function pointers (a) | ⬜ Front-end LOCKED = F2; backend gated on `0004` reaching `main` |
+| xy16 hardware-stack ABI / 16-bit calling convention | ⬜ The remaining M2 codegen frontier — CC sub-decisions all resolved |
 
 ---
 
@@ -195,37 +201,34 @@ Based on the commit history and plan records, **no work-in-progress was lost to 
 |---|---|---|
 | Frame-ABI "build all three" | Census completed; A1–M correctly **not started** | Complete — NULL result is the answer |
 | xy16 Csmith seeds 247/445 | Checkpointed at debugging cap, **then resumed and fixed** (`2d8ab51`, 2026-06-20) | Complete — cvise-reduced, root-caused, 4-way verified |
-| Load-fold Phase 1 measurement | Probe ran; throwaway worktree torn down; results recorded | Complete — PROCEED verdict |
+| Load-fold unification | Phase 1 PROCEED → Phase 2 built + byte-diffed → **landed (`6440db0`)** | Complete — AA-precision landed, volatile-drop closed net-negative |
 | c-torture -Os sweep + bsnes-jg 4-way | Both completed and recorded | Complete |
 
-The only genuinely open item above is **load-fold Phase 2** — it stopped at a deliberate checkpoint
-(Phase 1 PROCEED verdict recorded), not a crash. The next steps are in the plan and TODO.
+Every item above ran to a clean conclusion — none was lost to a crash. The open frontiers are forward
+work (the #320 far calling convention and xy16 ABI), tracked in *What's next* and TODO.
 
 ---
 
 ## What's next (prioritized)
 
-1. **Load-fold unification Phase 2** — `canFoldLoadIntoUser`, byte-diff the fixtures, full
-   differential. Greenlit; start a fresh `throwaway/loadfold-unify` worktree.
-   [plan](plans/2026-06-20-321-unify-loadfold-gate-aa-volatile.md)
+1. **#320 far-pointer calling convention** — build all ABI variants (Imag32 quad / Imag16+bank-byte /
+   A:X+Y / stack) behind feature flags & measure; must ship one (tie → Imag32), reusing the frame-ABI
+   harness. Lands as `0004` — the gate for far function pointers (a).
+   [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)
 
-2. **Csmith Phase 5 + c-torture Phase 3** — sampled CI integration.
+2. **#320 far function pointers (a)** — front-end LOCKED = F2 (MOS `far` attribute) + indirect
+   lowering (`__call_indir_far`); **unblocks once `0004` lands on `main`**, then resumes on
+   `wt/320-far-followups`. [plan](plans/2026-06-21-320-far-calls-followups.md)
 
-3. **Upstream posts (user-triggered):**
+3. **xy16 hardware-stack ABI** — the calling-convention implementation for 16-bit index-register
+   mode. CC sub-decisions are all resolved; this is the remaining M2 codegen frontier.
+
+4. **Csmith Phase 5 + c-torture Phase 3** — sampled CI integration.
+
+5. **Upstream posts (user-triggered):**
    - F4 `TXY/TYX` dead-flag fix PR (ready)
    - Register-scavenger N/Z-liveness issue (draft ready)
    - #321 CC frame-ABI design note (draft ready)
    - #320 far-pointer design note (draft ready; unblocks the five-address-space PR)
    - DWARF step-6 test+docs PR (branch pushed)
    - #415 SNES target reconciliation (strategy drafted)
-
-4. **xy16 hardware-stack ABI** — the calling-convention implementation for 16-bit index-register
-   mode. CC sub-decisions are all resolved; this is the remaining M2 codegen frontier.
-
-5. **#320 far-pointer calling convention** — build all ABI variants (Imag32 quad / Imag16+bank-byte /
-   A:X+Y / stack) behind feature flags & measure; must ship one (tie → Imag32), reusing the frame-ABI
-   harness. Lands as `0004`. [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)
-
-6. **#320 far function pointers (a)** — front-end LOCKED = F2 (MOS `far` attribute) + indirect
-   lowering (`__call_indir_far`); **unblocks once `0004` lands on `main`**, then resumes on
-   `wt/320-far-followups`. [plan](plans/2026-06-21-320-far-calls-followups.md)
