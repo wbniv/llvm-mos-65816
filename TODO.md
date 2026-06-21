@@ -1027,9 +1027,15 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        section + upstream-contribution-status.md (artifact docs/320-upstream-far-pointer-note.md).
      Both fingerprints ledgered; deleted permanently. Nothing open here.
      fp:8a5ca7613ee06e0a fp:883b7d12864cf920 -->
-- [ ] **(triage)** Building anything: A16-threading Phase 3 / multi-value spill-fusion stay **deferred** under their one trigger — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:ceeea11785514bd6 -->
-- [ ] **(triage)** The ≥8-shift bracket-fragmentation candidate — routed to a *future* measurement-gated spike (a new `docs/plans/` — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:15f2dd1d2684d2f2 -->
-- [ ] **(triage)** Re-opening either WON'T-DO (ordering-as-value branchless in either form; full-native EQ-as-value materialize). — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:c49fd89e43e4867a -->
-- [ ] **(triage)** The CC/ABI track, xy16, and the two RA/scavenger *bugs* as bugs — owned by their own items; this close-out only — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:5c1003efe2386b53 -->
-- [ ] **(triage)** The upstream paragraph posting — user-triggered (already drafted in-plan + folded into upstream-status). — _from [2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md)_  <!-- fp:a2954d6096e3b85c -->
+<!-- triaged 2026-06-22: all five are the knock-out close-out plan's explicit "Out of scope" NON-GOALS,
+     not open work — a measure-and-close that builds nothing.
+     • "Building anything / A16-threading Phase 3 / multi-value spill-fusion" + "Re-opening either WON'T-DO"
+       -> the recorded keep-the-XFAIL / WON'T-DO decisions; the shared deferred core is tracked by the three
+       open items (globals.c RA / A16-threading Phase 3 / ALU >14-live), now unified with one trigger.
+     • "≥8-shift bracket-fragmentation candidate" -> routed to a FUTURE measurement-gated spike (didn't meet
+       the GO bar); a new docs/plans/ entry only if pursued. Not open now.
+     • "CC/ABI track, xy16, the two RA/scavenger bugs" -> named boundary; owned by their own curated items.
+     • "upstream paragraph posting" -> user-triggered, already drafted in-plan + folded into upstream-status.
+     Fingerprints ledgered; deleted permanently. Nothing open here.
+     fp:ceeea11785514bd6 fp:15f2dd1d2684d2f2 fp:c49fd89e43e4867a fp:5c1003efe2386b53 fp:a2954d6096e3b85c -->
 <!-- END auto-captured-deferrals -->
