@@ -1007,6 +1007,12 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      guardrail (far is per-symbol opt-in; user skipped), rom_1 left as-is (already a named overflow-checked
      region), linker-script + docs only (no vendor edit). Nothing open.
      fp:a349fdb9e6fb6627 fp:13a459b641dd2a38 fp:27a0f051def92af7 fp:9c15ab41c1ea4e0c -->
-- [ ] **(triage)** **Integrate `0007` onto `main`'s patch stack** (its own merge step). Once landed, optionally harden the — _from [2026-06-22-320-packed24-residuals-close.md](docs/plans/2026-06-22-320-packed24-residuals-close.md)_  <!-- fp:8a5ca7613ee06e0a -->
-- [ ] **(triage)** **Post the #320 upstream design note** — user-triggered (queued in — _from [2026-06-22-320-packed24-residuals-close.md](docs/plans/2026-06-22-320-packed24-residuals-close.md)_  <!-- fp:883b7d12864cf920 -->
+<!-- triaged 2026-06-22: both close-out "Follow-up" bullets are already curated, not new work.
+     • "Integrate 0007 onto main's patch stack" -> already a named separate thread in the M2 five-space
+       item ("fold 0007 onto main's stack") and tracked in upstream-contribution-status.md (0007 built on
+       wt/320-near-abs-bank-relax, not yet landed). Its own thread, not a packed-24 residual.
+     • "Post the #320 upstream design note" -> the standing user-triggered item in the Upstream/Contribution
+       section + upstream-contribution-status.md (artifact docs/320-upstream-far-pointer-note.md).
+     Both fingerprints ledgered; deleted permanently. Nothing open here.
+     fp:8a5ca7613ee06e0a fp:883b7d12864cf920 -->
 <!-- END auto-captured-deferrals -->
