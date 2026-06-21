@@ -61,7 +61,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   2026-06-21** (12G reclaimed); durable artifacts on `main`: Increment A patch
   `docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch` + fixtures `examples/65816/packed24/` +
   recipe in [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md). Also
-  remaining: post the upstream note (C1 + pow2 + census) — user-triggered.
+  remaining: post the upstream note (C1 + pow2 + census) — user-triggered. **Resume prompt for Increment B
+  (after F2 lands on `main`):** [handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md).
   [plan](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
@@ -1004,4 +1005,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        uniform-far is a measured control/fallback, not a shipped default).
      fp:a5f1db95f5a9627a fp:5221ad4b75df9534 fp:78cda9a654aa2b5f fp:fde87b8fe11d4df6 -->
 - [verify] **2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md](docs/plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md)_  <!-- fp:a51d6afac2a18fef -->
+- [verify] **2026-06-21-320-packed24-incrementB-handoff** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-packed24-incrementB-handoff.md](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md)_  <!-- fp:3d3c94fe546a028c -->
 <!-- END auto-captured-deferrals -->
