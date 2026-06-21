@@ -13,14 +13,19 @@ this file (see `.history/`).
 | Sub-task | State | Where |
 |---|---|---|
 | **(b) mixed-banking: far → near** | ✅ **DONE + SHIPPED to `main`** (`5717f6b`), verified both emulators | `main` |
-| **(a) far function pointers** | 🚧 **IN PROGRESS** — call mechanism built+verified; p2-value path is a deep multi-layer 0004 sub-project (2 layers fixed, 3 open) + clang front-end | worktree `vendor/` |
+| **(a) far function pointers** | ✅ **BACKEND DONE + e2e VERIFIED both emulators** (2026-06-21, worktree `579b911`) — the full p2-value sub-project (Layer 3 + Gap A + Gap B) is fixed; the far indirect call works end-to-end on real silicon. ⏳ Only the **clang F2 ergonomic front-end** remains. | worktree `vendor/` |
 | **(c) far tail calls** | ⛔ out of scope (separate; already conservative-safe) | — |
 
-**One-line resume for (a):** finish 0004's p2-value handling — **Layer 3** (`SelectImm` with an illegal
-Imag8 condition in the p2→i32 decompose) + **Gap B** (`G_STORE p2`) + **Gap A** (`&far_sym`→24-bit) — then
-the **clang F2** `far` attribute + CodeGen, then the **e2e runtime gate**. Root-cause each layer with
-`dev/run.sh asserts-build` (the release build only SIGSEGVs). The call mechanism + 2 RA-hint fixes are
-already built (§5, §6).
+**One-line resume for (a):** the deep p2-value sub-project is **COMPLETE + e2e-verified** —
+✅ **Layer 3** (the *actual* crash, after Layers 1/2, was `selectUnMergeValues` using byte subreg indices
+for the `s32→2×s16` unmerge → an ill-sized `Imag16=COPY Imag8`; fixed to size-gated `sublo16`/`subhi16`,
+mirroring `selectMergeValues`) · ✅ **Gap A** (`&far_sym`→24-bit: new `buildFarAddrWords` + `MO_ADDR24_*`
+flags → `#mos24segmentlo/hi` + `#mos24bank`, composed into an `Imag32`) · ✅ **Gap B** (`G_STORE`/`G_LOAD`
+of a `p2` *value* legalized by listing `PF` as a value type). The **e2e gate**
+(`examples/65816/far_fnptr.c` + `dev/far_fnptr.sh`, wired into `dev/run.sh` + `dev/xcheck.sh`) **PASSES on
+MAME + bsnes-jg** (`far_leaf(0x5A)==0xFF`, bank `$01`, `R_MOS_ADDR24_BANK` reloc, `jsl __call_indir_far`;
+a16-only like far_cast/far_indir). Recipes for all backend edits: §6. **The ONLY remaining piece is the
+clang F2 `far` attribute + call CodeGen** — pure front-end ergonomics; the backend needs nothing more.
 
 ---
 
@@ -200,35 +205,82 @@ const auto &SizeMismatch = [&](Register SelfReg) {
 **Both fixes regression-clean** (corpus 7/7, far_near_call PASS; they only fire for imag32/p2). They live
 in `vendor/.../MOSRegisterInfo.cpp` (not yet patch-tracked — `0004` stacked blocks a clean `0001` regen).
 
-### ⏳ Layer 3 — OPEN: `SelectImm` with an illegal condition
-Post-RA, the p2→i32 path emits `$rs1 = SelectImm $rc5, -1, 0` whose **operand 1 is an Imag8 (`$rc5`)** —
-`SelectImm`'s condition must be a flag (NZ/C/V) → verify "Illegal physical register". A sext-style
-materialization is built with a mis-classed condition register in the decompose/return path. *Start here.*
-Likely in `copyPhysRegImpl`'s Anyi1 branch or a sext lowering for the 4×s8 unmerge; root-cause via the
-asserts build on `/tmp/p2int.ll` (the minimal `cvt` case reproduces it).
+### ✅ Layer 3 — FIXED: `selectUnMergeValues` used byte subreg indices for the wide unmerge
+The plan's earlier "`SelectImm` illegal Imag8 condition" framing was **stale** — Layers 1/2 had already
+moved the crash. The *actual* current crash (asserts build, `/tmp/p2int.ll` = `cvt: ptrtoint p2→i32`) is
+`copyPhysRegImpl` "Unexpected physical register copy" on a **dead `$rsN(Imag16) = COPY $rc5(Imag8)`** —
+`selectUnMergeValues` (`MOSInstructionSelector.cpp`) unconditionally tagged the unmerge result copies with
+the **byte** subreg indices `MOS::sublo`/`MOS::subhi`. For the a16 `s32→2×s16` unmerge the destinations are
+16-bit, so the source subreg of an `Imag32` must be the **word** index `sublo16`/`subhi16` (a byte index
+resolves to a 1-byte `$rc`, giving the ill-sized 16←8 copy). **Fix (vendor recipe — in the `else` branch of
+`selectUnMergeValues`, mirroring the size gate in `selectMergeValues`):**
+```cpp
+const bool Wide = Builder.getMRI()->getType(Lo) == LLT::scalar(16);
+const unsigned LoSub = Wide ? MOS::sublo16 : MOS::sublo;
+const unsigned HiSub = Wide ? MOS::subhi16 : MOS::subhi;
+LoCopy = Builder.buildCopy(Lo, Src); LoCopy->getOperand(1).setSubReg(LoSub);
+HiCopy = Builder.buildCopy(Hi, Src); HiCopy->getOperand(1).setSubReg(HiSub);
+```
+A 16-bit unmerge result only arises from a16 `s32→2×s16`, so the 8-bit path is byte-for-byte unchanged.
+With this, the *whole* mechanism with a real `p2` (`callfar`: `ptrtoint` + `store volatile i32` + thunk
+`call`) is verify-clean. (Layers 1/2 stay; the size-mismatch hint guard is now belt-and-suspenders.)
 
-### ⏳ Gap B — `G_STORE (p2)` unable to legalize
-Raw store of a p2 value isn't legalized (only the CC value-handler path stores p2, via `ptrtoint`). Needed
-if any p2 is stored to arbitrary memory.
+### ✅ Gap B — FIXED: `G_STORE`/`G_LOAD` of a `p2` *value* (list `PF` as a value type)
+`legalizeLoad`/`legalizeStore` already convert a *pointer* value to `s32` (`inttoptr`/`ptrtoint`) and re-run
+(the `s32` then narrows to bytes) — but a `p2` value never *reached* them: the `{G_LOAD,G_STORE}` action
+rule's **value-type** set omitted `PF`, so it fell through to `.maxScalar(0,S8).unsupported()`. **Fix
+(vendor recipe — `MOSLegalizerInfo.cpp`):** add `PF` to the value-type cartesian-product set (both the
+`hasAccum16()` and the else branch). `PF` is addrspace 2 — only W65816 far code forms one — so it is inert
+on every other subtarget. (`G_LOAD p2` had the same gap; this fixes both.)
 
-### ⏳ Gap A — `&far_sym` → 24-bit (`R_MOS_ADDR24`)
-Taking the address of a `.far_*` symbol yields only 16 bits today. Needed to materialize a *real* far
-function/data address as a `p2` (and for the e2e runtime test — without it there's no real far target to
-point at). Extend the far-data address materialization (`0001` already emits `R_MOS_ADDR24` for far data
-*accesses*) to address-of.
+### ✅ Gap A — FIXED: `&far_sym` → full 24-bit `Imag32` (`R_MOS_ADDR24`)
+`selectAddr` crashed (`buildLdImm` asserts dest ≤ 16 bits) on a `p2` `G_GLOBAL_VALUE`. **Fix (vendor recipe,
+all in `MOSInstructionSelector.cpp` + `MOSInstrInfo.h` + `MOSMCInstLower.cpp`):**
+- `MOSInstrInfo.h` `TOF`: add `MO_ADDR24_SEG_LO`, `MO_ADDR24_SEG_HI`, `MO_ADDR24_BANK`.
+- `MOSMCInstLower.cpp` `lowerSymbolOperand`: 3 new cases → `VK_ADDR24_SEGMENT_LO`/`_HI`/`_BANK`
+  (the segment 16 bits == a near `R_MOS_ADDR16` would give, but the ADDR24 family is bank-aware/explicit).
+- `static isFarSymbol(Op)`: a global is far if `getAddressSpace()==MOS::AS_Far` **or** its aliasee object is
+  in a `.far*` section (covers far functions, which are AS0 + `.far_text`).
+- `buildFarAddrWords(Builder, GO)`: builds 4 `LDImm` bytes (seg-lo, seg-hi, bank, `#0`) and `composePtr`s
+  them into two `Imag16` words `(segment)` and `(bank,0)`; returns the pair.
+- `selectAddr` (direct `p2` use): if `isFarSymbol`, `REG_SEQUENCE` the two words into the `Imag32` dest via
+  `sublo16`/`subhi16` + `constrainGenericOp`.
+- `selectAddrLoHi` (the `s32→2×s16` unmerge fold): if `isFarSymbol`, return the two words. (Only the
+  top-level word unmerge of the global ever reaches here, so the word-vs-byte match always holds.)
 
-### ⏳ clang F2 front-end
-Enable a MOS `far` attribute (un-gate `MipsLongCall` for MOS, or add `MOSFarCall`) for functions +
-function-pointer typedefs; CodeGen emits `store volatile i32 (ptrtoint fp), @__mos_far_target` + `call
-@__call_indir_far(args)` for a far-fn-ptr call. (No `BuiltinsMOS` exists yet.)
+Verified: `get_addr` (return `p2`) and `addr_i32` (`ptrtoint p2→i32`) emit `#mos24segmentlo/hi` + `#mos24bank`
+into an `Imag32`; works in both the a16 *and* the default build (pure immediate loads + `REG_SEQUENCE`).
 
-### ⏳ e2e runtime gate
-After Gap A + F2: `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` — take `&far_leaf` as a far fn ptr,
-launder through `volatile`, call it; host == default == far on MAME + bsnes-jg; disasm shows 24-bit
-`&far_leaf` + `jsl __call_indir_far`.
+**All three regression-clean:** corpus **7/7**, `far_near_call` **PASS (0xE0)**, `xcheck` all far ROMs PASS;
+they fire only for `p2`/`Imag32`/far-symbol paths. They live in the worktree's gitignored `vendor/`
+(`0004` stacked blocks a clean `0001` regen — land them in `0001` once `0004`'s relationship to `main` is
+settled).
 
-**Suggested order:** Layer 3 → Gap A (unblocks a runtime test of the whole mechanism) → F2 → e2e → Gap B
-(only if needed). Then land the lot in `0001` (regen once `0004`'s relationship to `main` is settled).
+### ✅ e2e runtime gate — DONE (both emulators)
+`examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` (worktree `579b911`, wired into `dev/run.sh` +
+`dev/xcheck.sh`): a `.far_text` function's **full 24-bit address** is taken as a far (`p2`) value, stashed
+into `__mos_far_target`, and called via `jsl __call_indir_far` (→ `jml (__mos_far_target)`); `far_leaf`
+`RTL`s back. **`far_leaf(0x5A) == 0xFF` on MAME + bsnes-jg**, `far_leaf` in bank `$01`, the target
+materialization carries a `R_MOS_ADDR24_BANK` reloc, `jsl __call_indir_far` present. **a16-only** (host ==
+a16@MAME == a16@bsnes-jg; like `far_cast`/`far_indir`, the default 8-bit build can't decompose a 32-bit
+far-pointer value — `s32↔4×s8` (un)merge is `unsupported`, so there is **no default leg**).
+*Front-end note:* clang forbids addrspace-qualified function types **and** collapses a far-data alias that
+shares a defined AS0 function's name back to a bank-less near address — so the test takes the address through
+a **distinct-named** linker alias viewed as far data (`.set __far_leaf_addr, far_leaf`). This hand-emulates
+exactly what F2 will hide.
+
+### ⏳ clang F2 front-end — THE ONLY REMAINING PIECE (pure ergonomics)
+The backend needs nothing more. F2 lets C write `far_fn_t fp = &far_leaf; fp(x);` directly. Mapped (research
+2026-06-21): add a MOS `far` attribute (`TargetSpecificAttr<TargetMOS>`, spellings `far`/`long_call`, on
+`Function` + function-pointer typedef) in `clang/include/clang/Basic/Attr.td`; in `clang/lib/CodeGen` (a MOS
+target hook or a `CGExpr.cpp EmitCallExpr` intercept) rewrite a far-fn-ptr call into
+`store volatile i32 (ptrtoint fp), @__mos_far_target` + `call @__call_indir_far(args)` and ensure
+`&far_leaf` is typed `ptr addrspace(2)` so the now-built Gap A path materializes the 24 bits. MVP fallback:
+a `__builtin_mos_call_far`. Lands once written + a clang rebuild; the e2e already proves the lowered shape
+runs correctly. (No `BuiltinsMOS` exists yet.)
+
+**Status:** the suggested order (Layer 3 → Gap A → e2e → Gap B) is **done**; only F2 remains. Land the
+backend recipes in `0001` (regen once `0004`'s relationship to `main` is settled).
 
 ---
 
@@ -237,19 +289,20 @@ launder through `volatile`, call it; host == default == far on MAME + bsnes-jg; 
 **Worktree `wt/320-far-followups`** (compiler-changing; own `vendor/` + warm-copied `build/`; **retained**
 per policy). Committed there: `1ea7507`/`7ee5f6f` (the (a) stub, CMakeLists, the stacked `0004` patch).
 **Uncommitted, gitignored `vendor/` edits (recipes in §5/§6):** `MOSCallLowering.cpp` (`IsFarIndirThunk`),
-`MOSRegisterInfo.cpp` (Layers 1+2). The toolchain in the worktree's `build/` is built with all of these
-(`0004` + (b) + (a) mechanism + Layers 1/2).
+`MOSRegisterInfo.cpp` (Layers 1+2), `MOSInstructionSelector.cpp` (Layer 3 + Gap A: `isFarSymbol`,
+`buildFarAddrWords`, `selectAddr`/`selectAddrLoHi`), `MOSInstrInfo.h` (`MO_ADDR24_*`), `MOSMCInstLower.cpp`
+(`VK_ADDR24_*` cases), `MOSLegalizerInfo.cpp` (Gap B: `PF` value type). The toolchain in the worktree's
+`build/` is built with **all** of these (`0004` + (b) + (a) mechanism + Layers 1/2/3 + Gap A + Gap B).
+**Tracked, committed there (`579b911`):** `examples/65816/far_fnptr.c`, `dev/far_fnptr.sh`, the `dev/run.sh`
++ `dev/xcheck.sh` wiring.
 
-**To resume (a):**
+**To resume (only F2 remains):**
 1. `cd /home/will/SRC/llvm-mos-65816-far-followups`
-2. Confirm the warm toolchain: `dev/run.sh corpus` (expect 7/7).
-3. Root-cause Layer 3: `dev/run.sh asserts-build` then
-   `build/llvm-mos-asserts-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature
-   -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -c -o /dev/null /tmp/p2int.ll` → read the precise
-   assert. (Re-create `/tmp/p2int.ll` from §6 if cleared.)
-4. After each vendor edit: `dev/run.sh toolchain` (confirm `build/llvm-mos-install/bin/clang-23` mtime
-   advanced — the `clang` symlink has a stale mtime), then re-run the repro **and** the regression
-   (`dev/run.sh corpus` + `dev/run.sh far_near_call`) — these RA paths affect *all* codegen.
+2. Confirm the warm toolchain + e2e: `dev/run.sh corpus` (7/7), `dev/run.sh far_fnptr` (PASS 0xFF),
+   `dev/run.sh xcheck` (all far ROMs PASS incl. `far_fnptr`).
+3. Implement F2 (§6 "clang F2 front-end") in `clang/` (the only change left), then `dev/run.sh toolchain`
+   (confirm `build/llvm-mos-install/bin/clang-23` mtime advanced — the `clang` symlink has a stale mtime).
+   Make the single-file far-fn-ptr call work (replace the `.set`-alias hand-emulation in `far_fnptr.c`).
 
 **Gotchas:**
 - The release build SIGSEGVs on these p2 crashes; **always use the asserts build to root-cause**.
@@ -273,17 +326,23 @@ per policy). Committed there: `1ea7507`/`7ee5f6f` (the (a) stub, CMakeLists, the
 global-slot store (not a formal intrinsic). (c) far tail calls = separate, out of scope (the tail-call
 peephole keys on `MOS::JSR`, so a `JSL` is never tail-converted — conservative-safe already).
 
-**Verification bar** (unchanged): the project differential — host == default(non-`+mos-a16`)@MAME ==
-far@MAME == far@bsnes-jg, plus `-verify-machineinstrs` clean. (b) meets it. (a)'s mechanism is verified at
-the IR level (i32-target); its e2e differential gate is pending Gap A + F2.
+**Verification bar:** the project differential — host == far@MAME == far@bsnes-jg, plus
+`-verify-machineinstrs` clean. (b) meets it (a16-independent, incl. the default leg). (a) meets it
+**a16-only** (host == a16@MAME == a16@bsnes-jg; like `far_cast`/`far_indir`, the default 8-bit build can't
+decompose a 32-bit far-pointer value — no default leg). The e2e (`far_fnptr`) **PASSES** (`0xFF`, both
+emulators); the backend is verify-clean. Only F2 (front-end) remains.
 
-**Patch placement:** (b) is in `0001` (HasW65816-gated, a16-free) on `main`. (a)'s vendor changes are WIP
-in the worktree; they land in `0001` (and/or a stacked patch alongside `0004`) when (a) completes.
+**Patch placement:** (b) is in `0001` (HasW65816-gated, a16-free) on `main`. (a)'s vendor changes
+(Layers 1/2/3 + Gap A + Gap B + the (a) call mechanism) are WIP in the worktree's gitignored `vendor/`;
+they land in `0001` (and/or a stacked patch alongside `0004`) when `0004`'s relationship to `main` settles.
 
 ---
 
-## 9. Commit trail (main)
+## 9. Commit trail
 
-- `5717f6b` ship (b) far→near to main · `560900c` (a) call mechanism built+verified ·
-  `5fd0ff5` Layer-3 IR-callee finding · `93c7336` p2-value multi-layer root-cause + Layers 1/2 fixed.
-- Worktree: `dd33017` (b) · `1ea7507` (a) stub+0004 · `7ee5f6f` (a) global-slot stub.
+- **main:** `5717f6b` ship (b) far→near · `560900c` (a) call mechanism built+verified ·
+  `5fd0ff5` Layer-3 IR-callee finding · `93c7336` p2-value multi-layer root-cause + Layers 1/2 fixed ·
+  `15df5fe` consolidate plan+handoff.
+- **worktree `wt/320-far-followups`:** `dd33017` (b) · `1ea7507` (a) stub+0004 · `7ee5f6f` (a) global-slot
+  stub · **`579b911` (a) backend p2-value sub-project DONE (Layer 3 + Gap A + Gap B, recipes §6) + e2e
+  `far_fnptr` verified both emulators.**

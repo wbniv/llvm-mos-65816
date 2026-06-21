@@ -55,17 +55,20 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     a normal `call @__call_indir_far(args)`; (#2) a custom `MOS_FarIndirect` CC; (#3) a full call intrinsic.
     (a "detect `p2` callee in `lowerCall`" trigger is untriggerable.) **IR-rep #1 CHOSEN (user 2026-06-21);
     building end-to-end.** Realized as a volatile store to a runtime slot `__mos_far_target` + `call
-    @__call_indir_far` (lighter than a formal intrinsic — that needs `Intrinsics.td` regen). **Progress
-    2026-06-21:** the far-indirect **call mechanism is BUILT + verified** — `lowerCall` makes a call to
-    `__call_indir_far` a `JSL`; stub `call-indir-far.s` = `jml (__mos_far_target)` + the 4-byte slot;
-    hand-IR with an **i32 target** → slot store + `jsl`, `-verify-machineinstrs` clean. **p2-value
-    legalization is a DEEP MULTI-LAYER 0004 sub-project** (asserts-build root-caused): ✅ Layer 1 `copyCost`
-    missing `Imag32` case; ✅ Layer 2 `getRegAllocationHints` size-mismatch guard (both regression-clean —
-    corpus 7/7, far_near_call PASS — inert for non-far code); ⏳ Layer 3 `SelectImm` with an Imag8
-    condition (verify "Illegal physical register"); ⏳ Gap B `G_STORE p2`; ⏳ **Gap A** (`&far_sym`→24-bit).
-    Then (2) clang **F2** `far` attr + CodeGen emitting the store+call; (3) e2e runtime gate. WIP on
-    `wt/320-far-followups` (`0004`
-    stacked); still gated on `0004` reaching `main`.
+    @__call_indir_far` (lighter than a formal intrinsic — that needs `Intrinsics.td` regen). **BACKEND DONE
+    + e2e VERIFIED both emulators 2026-06-21 (worktree `579b911`):** the far indirect call works end-to-end
+    on real silicon. The deep p2-value `0004` sub-project is COMPLETE: ✅ L1 `copyCost` Imag32; ✅ L2 hint
+    size-guard; ✅ **L3** — the *actual* crash was `selectUnMergeValues` tagging the `s32→2×s16` unmerge with
+    byte subreg indices (→ ill-sized `Imag16=COPY Imag8`); fixed to size-gated `sublo16/subhi16` (the
+    "SelectImm Imag8" framing was stale); ✅ **Gap A** `&far_sym`→24-bit (`buildFarAddrWords` + `MO_ADDR24_*`
+    → `#mos24segmentlo/hi/bank`, composed into Imag32); ✅ **Gap B** `G_STORE`/`G_LOAD p2` (list `PF` as a
+    value type). ✅ **e2e** `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` (wired into `dev/run.sh` +
+    `dev/xcheck.sh`): `far_leaf(0x5A)==0xFF` on MAME + bsnes-jg, bank `$01`, `R_MOS_ADDR24_BANK` reloc,
+    `jsl __call_indir_far`; **a16-only** (no default leg, like far_cast/far_indir). Regression-clean (corpus
+    7/7, far_near_call + xcheck PASS). **⏳ ONLY clang F2 remains** (the `far` attribute + call CodeGen — pure
+    front-end ergonomics; the e2e hand-emulates it via a distinct-named far-data linker alias). All backend
+    edits are gitignored `vendor/` recipes in the plan §6. WIP on `wt/320-far-followups` (`0004` stacked);
+    the recipes land in `0001` once `0004`'s relationship to `main` settles.
   - (c) far tail calls = separate (already conservative-safe — tail peephole keys on `JSR`).
   Prior context: [Inc 4 Ph1](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
   [far-ptr CC study](docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md).

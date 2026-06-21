@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/15df5fe) | #320 far-calls follow-ups: consolidate into a combined plan+handoff doc |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/93c7336) | #320 (a): p2-value legalization root-caused as a deep multi-layer 0004 sub-project |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/560900c) | #320 (a): far-indirect call MECHANISM built + verified (IR-rep #1, i32-target path) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/5fd0ff5) | #320 (a): Layer-3 finding — far fn ptr can't be a ptr addrspace(2) IR callee |
@@ -11,6 +12,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/3aa2944) | #320 far-calls follow-ups: plan (a) far fn pointers + (b) mixed-banking |
 
 <!--history-meta v1
+15df5fe	author	Will Norris
+15df5fe	added	245
+15df5fe	deleted	370
+15df5fe	files	1
+15df5fe	body	Rewrite the plan as a single authoritative plan+handoff: (b) DONE+shipped; (a) in\nprogress with the call mechanism built+verified, the 3 measured findings, IR-rep #1\n+ F2 decisions, the durable vendor recipes (lowerCall, the 2 MOSRegisterInfo fixes,\nthe stub), the deep multi-layer p2-completeness remaining work (L1/L2 fixed; L3\nSelectImm + Gaps A/B + clang F2 + e2e open), and step-by-step resume instructions\n(asserts-build workflow, worktree state, gotchas). Trim the agent-handoff row to a\nconcise status pointing at the combined doc.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 93c7336	author	Will Norris
 93c7336	added	21
 93c7336	deleted	4
