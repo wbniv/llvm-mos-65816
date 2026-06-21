@@ -9,8 +9,9 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: dev/run.sh torture [N] [--opt -Os|-O1] [--start K] [--no-bsnes]"
-  echo "  Differential-test the first N in-scope c-torture tests (default N=30)."
+  echo "Usage: dev/run.sh torture [N] [--opt -Os|-O1] [--start K] [--sample N [--sample-seed S]] [--no-bsnes]"
+  echo "  Differential-test in-scope c-torture tests (default: first N=30)."
+  echo "  --sample N picks a seeded pseudo-random subset of N tests (reproducible; overrides N/--start)."
   exit 0
 }
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage

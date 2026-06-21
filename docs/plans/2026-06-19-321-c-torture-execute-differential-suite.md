@@ -1,11 +1,11 @@
 # Vendor an external C correctness suite (gcc `c-torture/execute`) behind the `+mos-a16`/`+mos-xy16` differential gate
 
-**Date:** 2026-06-19 · **Status:** **PHASES 0 + 1 DONE; PHASE 2 `-O1` PASS DONE (2026-06-19).** Fetch +
-host filter (**1253 / 1656** in-scope) + the emulator differential runner. Full `-O1` pass: **1098 PASS,
-136 SKIP, 3 known-XFAIL** (ZP-pressure family) **+ 16 confirmed NEW runtime miscompiles** (a16/xy16
-wrong-value, all reproduced in isolation on both emulators — the payoff). Recorded in `xfails.tsv`; gate is
-green-modulo-known. **Remaining:** the `-Os` pass + per-defect root-cause backlog; Phase 3 (sampled CI).
-See §"Phase 2 — RESULTS".
+**Date:** 2026-06-19 (Phase 3 added 2026-06-21) · **Status:** **PHASES 0–3 DONE.** Fetch + host filter
+(**1253 / 1656** in-scope) + the emulator differential runner; full `-O1` (**1098 PASS**) and `-Os`
+(**1174 PASS, 0 FAIL** with bsnes-jg 4-way) sweeps green-modulo-known (`xfails.tsv` now empty — every
+known miscompile fixed). **Phase 3 (sampled CI) DONE** — the `torture` job is in
+`.github/workflows/smoke.yml` (in-container, 4-way, seeded `--sample`, secret-gated, `mode` sampled/full);
+see §"Phase 3 — RESULTS". Optional tail: orphan-MAME reaper (non-blocking). See §"Phase 2 — RESULTS".
 **BACKLOG RESOLUTION (2026-06-19 → fully cleared 2026-06-20):** the **frame-index fix cleared 13** (all a16),
 the **dg-require** refinement dropped the `pr7284-1` false positive (in-scope 1253→1228), and the **4 remaining
 xy16 defects + `k_isort`'s xy16 leg were all cleared by ONE fix** (the `MOSInsertREPSEP` `requiredXWidth`
@@ -126,6 +126,36 @@ verdicts **are** committed (our own work).
 8. A **sampled, secret-gated** CI job (mirror [corpus-a16 CI](2026-06-19-321-corpus-a16-ci.md)): a fixed
    pseudo-random subset (seeded, not the full ~600 — emulator wall-clock) per run, plus the full set
    nightly. Forks without the BIOS secret skip. Never fail CI on a SKIP.
+
+#### Phase 3 — RESULTS (2026-06-21): DONE
+
+Added the **`torture`** job to `.github/workflows/smoke.yml` (in-container, mirroring `corpus-a16`).
+`needs: xcheck` so it reuses that job's cached from-source toolchain; builds the SDK + `build/jgxcheck`
+(for the always-on bsnes-jg 4-way leg); fetches the suite on the host (`dev/fetch-torture.sh`, the
+sha256-pinned gcc-14.2.0 → gitignored `vendor/c-torture/`; the committed `inscope.tsv` is the manifest);
+**secret-gated** (skip — don't fail — without the SPC700 BIOS). The `mode` dispatch input picks `sampled`
+(`dev/run.sh torture --sample 150 --sample-seed <seed> --opt -Os`) or `full` (the whole in-scope set at
+`-Os` **and** `-O1`). A commented `schedule:` block (auto-selects `full`) is ready for when public.
+
+Phase 3 needed one runner change: `tools/torture_run.py` had only a sequential `--start`/count slice
+(alphabetical inscope.tsv → unrepresentative head), so **`--sample N` / `--sample-seed S`** were added —
+a seeded, reproducible pseudo-random subset (`random.Random(S).sample(...)`, then sorted for stable
+output). Verified deterministic: same seed → identical 150-test set; different seed → different set;
+`--sample > len(inscope)` clamps to the full 1228.
+
+Local sampled verification (4-way, the exact per-run CI command):
+```
+$ dev/run.sh torture --sample 150 --sample-seed 1 --opt -Os
+==> torture-run: 150 test(s), -Os, sample=150 seed=1, default==+mos-a16==+mos-xy16 (MAME + bsnes-jg)
+==> torture-run: 143 PASS, 0 FAIL, 7 SKIP, 0 XFAIL (of 150)
+```
+0 FAIL / 0 XPASS, exit 0 — `host==default@MAME==+mos-a16@MAME==+mos-xy16@MAME==+mos-a16@bsnes-jg` holds
+across the sample. **PASS.** (The `full`-mode commands reuse the long-proven count-slice path — whole-set
+`-Os` 1174 PASS and `-O1` 1098 PASS from Phase 2 — so they are sound by construction; not re-run here as
+the full sweep is hours.)
+
+**Optional remaining (not blocking):** reap orphaned MAME children in the runner — matters for repeated
+local full sweeps; GH-hosted runners are ephemeral VMs, so leaked children die with the job.
 
 ## Phase 0 — RESULTS (2026-06-19)
 

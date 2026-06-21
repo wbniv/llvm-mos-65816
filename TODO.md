@@ -301,8 +301,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   re-ran the entire in-scope set @ `-Os` with the bsnes-jg leg on **every** test (not just per-FAIL):
   **1174 PASS, 0 FAIL, 54 SKIP** — `host==default@MAME==a16@MAME==a16@bsnes-jg` holds suite-wide, no
   MAME-vs-bsnes divergence.
-  [sweep plan](docs/plans/2026-06-20-321-broad-c-torture-sweep.md). **Remaining:** Phase 3 sampled CI +
-  reaping orphan MAMEs in the runner.
+  [sweep plan](docs/plans/2026-06-20-321-broad-c-torture-sweep.md). ~~**Remaining:** Phase 3 sampled CI~~
+  **Phase 3 sampled CI DONE 2026-06-21** — the **`torture`** job in `.github/workflows/smoke.yml`
+  (in-container, `needs: xcheck` for the cached toolchain, 4-way differential, secret-gated skip-not-fail;
+  `mode` input `sampled` [seeded `--sample 150 --sample-seed S` @ `-Os`] / `full` [whole in-scope @ `-Os`
+  **and** `-O1`]). Added a seeded `--sample`/`--sample-seed` to `tools/torture_run.py` (was sequential-slice
+  only). Local sampled verify `dev/run.sh torture --sample 150 --sample-seed 1 --opt -Os` = **143 PASS, 0
+  FAIL, 7 SKIP, 0 XFAIL** (4-way, MAME + bsnes-jg). **Optional tail (non-blocking):** reap orphan MAMEs in
+  the runner (matters for repeated local full sweeps; GH runners are ephemeral).
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - [verify] **M1 toolchain incremental-rebuild time not yet measured** — the from-source plan's
   verification step 4 ("editing a backend file relinks fast") is "not separately timed yet"; measure

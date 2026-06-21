@@ -1,9 +1,16 @@
-# SNES CI bench — two jobs, both running in the dev container (dev/run.sh) so CI
-# mirrors local exactly:
+# SNES CI bench — four jobs driven via dev/run.sh so CI mirrors local exactly:
 #   * smoke  — build the SDK + ROMs and boot the regression corpus headless in
 #              MAME (ROADMAP step 1/2). Uses the stock toolchain; the corpus step
 #              needs the SPC700 IPL secret (below).
 #   * xcheck — from-source-toolchain checks (ROADMAP step 3 + the M2 a16 gate).
+#   * torture / fuzz-csmith — #321 c-torture (Phase 3) + Csmith (Phase 5) differential
+#              fuzzers. Both `needs: xcheck` (reuse its cached from-source toolchain) and
+#              run the SAME 4-way differential gate (host == default == +mos-a16 == +mos-xy16
+#              on MAME + +mos-a16 on bsnes-jg). The `mode` dispatch input picks `sampled`
+#              (a seeded subset, default) or `full` (whole c-torture suite + csmith 1..500);
+#              `sample_seed` makes the subset reproducible. torture runs in-container;
+#              fuzz-csmith runs HOST-side (installs MAME, builds csmith on the host). Both are
+#              secret-gated (skip, don't fail, without the BIOS — like the corpus steps).
 #              Needs the FROM-SOURCE patched toolchain (build/llvm-mos-install), so
 #              it builds that (cached) + the snes-far SDK first, then runs two checks:
 #              (a) second-emulator fidelity cross-check — boot the far-pointer ROMs
@@ -31,10 +38,23 @@
 name: snes-smoke
 
 on:
-  workflow_dispatch:   # manual only until repo goes public — uncomment below then
+  workflow_dispatch:   # manual only until repo goes public — uncomment push/pr below then
+    inputs:
+      mode:
+        description: 'fuzz scope: sampled (per-run subset) | full (whole c-torture suite + csmith 1..500)'
+        type: choice
+        options: [sampled, full]
+        default: sampled
+      sample_seed:
+        description: 'seed for the sampled subset (csmith start-seed / torture shuffle-seed; reproducible)'
+        default: '1'
   # push:
   #   branches: [main]
   # pull_request:
+  # Nightly full fuzz — enable when the repo goes public. Scheduled runs auto-select mode=full
+  # (the job's MODE resolution keys on github.event_name), so no job edits are needed to turn this on.
+  # schedule:
+  #   - cron: '0 7 * * *'   # 07:00 UTC daily
 
 concurrency:
   group: smoke-${{ github.ref }}
@@ -153,3 +173,151 @@ jobs:
         env:
           MOS_TOOLCHAIN: /work/build/llvm-mos-install
         run: dev/run.sh corpus-a16
+
+  # GCC c-torture/execute differential (#321 Phase 3). Runs IN the dev container (like
+  # corpus-a16): mos-clang must be the from-source toolchain, so it `needs: xcheck` to reuse
+  # that job's cached build/llvm-mos-install (cache hit here) + populate it on a cold miss.
+  # `sampled` (default) runs a seeded pseudo-random subset; `full` runs the whole in-scope set
+  # at both -Os and -O1. The bsnes-jg 4-way leg is always on (build/jgxcheck built below).
+  torture:
+    needs: xcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Cache from-source toolchain
+        id: toolchain-cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            build/llvm-mos-install
+            build/.ccache
+          key: llvm-mos-toolchain-${{ runner.os }}-${{ hashFiles('patches/llvm-mos/*.patch', 'dev/toolchain.sh', 'dev/Dockerfile') }}
+          restore-keys: |
+            llvm-mos-toolchain-${{ runner.os }}-
+
+      - name: Build from-source toolchain (cache miss only)
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        run: dev/run.sh toolchain
+
+      - name: Build SDK against the from-source toolchain
+        env:
+          MOS_TOOLCHAIN: /work/build/llvm-mos-install
+        run: dev/run.sh build
+
+      # Build bsnes-jg (-> build/jgxcheck) so the differential runs the 4-way leg
+      # (host == default == +mos-a16 == +mos-xy16 on MAME + +mos-a16 on bsnes-jg).
+      - name: bsnes-jg cross-check (builds build/jgxcheck for the 4-way leg)
+        run: dev/run.sh xcheck
+
+      # Fetch the suite on the host (sha256-pinned gcc-14.2.0 -> gitignored vendor/c-torture/).
+      # inscope.tsv is committed, so no re-filter is needed — only the .c sources.
+      - name: Fetch the GCC c-torture suite (host, sha256-pinned)
+        run: dev/fetch-torture.sh
+
+      - name: Provide SNES SPC700 IPL (from secret)
+        id: bios
+        env:
+          ROM_B64: ${{ secrets.SNES_SPC700_ROM_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ROM_B64:-}" ]; then
+            mkdir -p dev/roms/s_smp
+            printf '%s' "$ROM_B64" | base64 -d > dev/roms/s_smp/spc700.rom
+            echo "has_bios=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_bios=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SNES_SPC700_ROM_B64 secret not set — skipping c-torture (toolchain/SDK/bsnes-jg still validated)."
+          fi
+
+      - name: c-torture differential (sampled | full), 4-way
+        if: steps.bios.outputs.has_bios == 'true'
+        env:
+          MOS_TOOLCHAIN: /work/build/llvm-mos-install
+        run: |
+          set -euo pipefail
+          MODE="${{ inputs.mode }}"
+          if [ "${{ github.event_name }}" = "schedule" ]; then MODE=full; fi
+          MODE="${MODE:-sampled}"
+          SEED="${{ inputs.sample_seed }}"; SEED="${SEED:-1}"
+          echo "::notice::c-torture mode=$MODE seed=$SEED"
+          if [ "$MODE" = "full" ]; then
+            dev/run.sh torture 100000 --opt -Os
+            dev/run.sh torture 100000 --opt -O1
+          else
+            dev/run.sh torture --sample 150 --sample-seed "$SEED" --opt -Os
+          fi
+
+  # Csmith-generated differential fuzz (#321 Phase 5). Unlike corpus-a16/torture, the Csmith
+  # path runs HOST-side (dev/run.sh fuzz --gen csmith -> dev/csmith.sh): csmith is built on the
+  # host into gitignored vendor/csmith and MAME runs on the host, so this job installs MAME and
+  # points MOS_TOOLCHAIN at the HOST build path (not /work). Still `needs: xcheck` for the cache.
+  fuzz-csmith:
+    needs: xcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Cache from-source toolchain
+        id: toolchain-cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            build/llvm-mos-install
+            build/.ccache
+          key: llvm-mos-toolchain-${{ runner.os }}-${{ hashFiles('patches/llvm-mos/*.patch', 'dev/toolchain.sh', 'dev/Dockerfile') }}
+          restore-keys: |
+            llvm-mos-toolchain-${{ runner.os }}-
+
+      - name: Build from-source toolchain (cache miss only)
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        run: dev/run.sh toolchain
+
+      # The Csmith differential runs host-side and shells out to `mame` (run_mame sets
+      # SDL_VIDEODRIVER=offscreen itself, so it's headless on the runner).
+      - name: Install MAME (host-side Csmith differential)
+        run: sudo apt-get update && sudo apt-get install -y mame
+
+      - name: Build SDK against the from-source toolchain
+        env:
+          MOS_TOOLCHAIN: /work/build/llvm-mos-install
+        run: dev/run.sh build
+
+      - name: bsnes-jg cross-check (builds build/jgxcheck for the 4-way leg)
+        run: dev/run.sh xcheck
+
+      # Build Csmith on the host (clone + cmake -> gitignored vendor/csmith; records PINNED_SHA).
+      - name: Build Csmith (host)
+        run: dev/fetch-csmith.sh
+
+      - name: Provide SNES SPC700 IPL (from secret)
+        id: bios
+        env:
+          ROM_B64: ${{ secrets.SNES_SPC700_ROM_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ROM_B64:-}" ]; then
+            mkdir -p dev/roms/s_smp
+            printf '%s' "$ROM_B64" | base64 -d > dev/roms/s_smp/spc700.rom
+            echo "has_bios=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_bios=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SNES_SPC700_ROM_B64 secret not set — skipping Csmith fuzz (toolchain/SDK/bsnes-jg still validated)."
+          fi
+
+      - name: Csmith differential (sampled | full), 4-way
+        if: steps.bios.outputs.has_bios == 'true'
+        env:
+          MOS_TOOLCHAIN: ${{ github.workspace }}/build/llvm-mos-install
+        run: |
+          set -euo pipefail
+          MODE="${{ inputs.mode }}"
+          if [ "${{ github.event_name }}" = "schedule" ]; then MODE=full; fi
+          MODE="${MODE:-sampled}"
+          SEED="${{ inputs.sample_seed }}"; SEED="${SEED:-1}"
+          echo "::notice::csmith mode=$MODE seed=$SEED"
+          if [ "$MODE" = "full" ]; then
+            dev/run.sh fuzz --gen csmith 500 1
+          else
+            dev/run.sh fuzz --gen csmith 40 "$SEED"
+          fi

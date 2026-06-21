@@ -22,6 +22,7 @@ dev container (MAME + bsnes-jg live there); drive from the host via dev/run.sh t
 See docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md (Phase 1).
 """
 import argparse
+import random
 import subprocess
 import sys
 import tempfile
@@ -158,6 +159,9 @@ def main():
     ap.add_argument("--opt", default="-Os", help="optimization level (default -Os)")
     ap.add_argument("--start", type=int, default=0, help="offset into inscope.tsv (for sharding)")
     ap.add_argument("--tests", nargs="*", help="explicit test filenames (override count/start)")
+    ap.add_argument("--sample", type=int, default=0,
+                    help="run a seeded pseudo-random subset of N in-scope tests (overrides count/start)")
+    ap.add_argument("--sample-seed", type=int, default=1, help="seed for --sample selection (reproducible)")
     ap.add_argument("--no-bsnes", action="store_true")
     # argparse rejects a separate-token value that looks like a flag (`--opt -Os`), so fold it
     # into the `=` form, which accepts dash-values. Lets users type the natural `--opt -Os`.
@@ -175,9 +179,20 @@ def main():
             sys.exit("FATAL: missing %s (run dev/fetch-torture.sh + tools/torture_filter.py + build first)" % need)
     want_bsnes = not args.no_bsnes and fz.JGX.exists() and fz.JG_DB.is_dir()
 
-    names = args.tests if args.tests else load_inscope()[args.start: args.start + args.count]
-    print("==> torture-run: %d test(s), %s, default==+mos-a16==+mos-xy16 (MAME%s)"
-          % (len(names), args.opt, " + bsnes-jg" if want_bsnes else ""))
+    # Selection: explicit --tests > seeded pseudo-random --sample > sequential --start/count slice.
+    # --sample picks a representative spread (inscope.tsv is alphabetical, so a head slice clusters);
+    # sampling is seeded for reproducibility, then sorted so the per-test output order stays stable.
+    if args.tests:
+        names, sel = args.tests, "explicit"
+    elif args.sample:
+        pool = load_inscope()
+        names = sorted(random.Random(args.sample_seed).sample(pool, min(args.sample, len(pool))))
+        sel = "sample=%d seed=%d" % (args.sample, args.sample_seed)
+    else:
+        names = load_inscope()[args.start: args.start + args.count]
+        sel = "start=%d" % args.start
+    print("==> torture-run: %d test(s), %s, %s, default==+mos-a16==+mos-xy16 (MAME%s)"
+          % (len(names), args.opt, sel, " + bsnes-jg" if want_bsnes else ""))
 
     shim_dir = tempfile.mkdtemp(prefix="torture-shim-")
     shim_obj = str(Path(shim_dir) / "_shim.o")

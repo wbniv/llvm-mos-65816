@@ -85,7 +85,8 @@ Targets:
   torture    #321 Phase 1: run N in-scope gcc c-torture/execute tests through the
              differential gate (default == +mos-a16 == +mos-xy16; default build is the
              oracle, so a non-PASS default SKIPs and any FAIL is a real defect).
-             Usage: dev/run.sh torture [N] [--opt -Os|-O1] [--start K] [--no-bsnes]
+             Usage: dev/run.sh torture [N] [--opt -Os|-O1] [--start K] [--sample N [--sample-seed S]] [--no-bsnes]
+             (--sample N = seeded pseudo-random subset of N tests, reproducible; for sampled CI)
              (host prereq: dev/fetch-torture.sh && python3 tools/torture_filter.py)
   a16        #321 Increment 1a: build examples/65816/a16.c with +mos-a16, assert a
              16-bit store-of-zero fuses to `rep #$20; stz; sep #$20` (disasm) and

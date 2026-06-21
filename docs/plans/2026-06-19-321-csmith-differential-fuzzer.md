@@ -1,9 +1,10 @@
 # Replace the random fuzzer's *generator* with Csmith (keep the engine; builtin selectable)
 
-**Date:** 2026-06-19 · **Status:** Phases 0–3 DONE; **Phase 4 opened** — its first triaged finding (the
-`a16-unmerge-s32` legalizer gap) is **FIXED on `main`**
-([s32 plan](2026-06-19-321-a16-unmerge-s32-legalizer.md)). **GO disposition: merging this branch to `main`.**
-Phase 5 (sampled CI) remains. The Csmith generator is the `dev/run.sh fuzz` default.
+**Date:** 2026-06-19 (Phase 5 added 2026-06-21) · **Status:** Phases 0–5 **DONE**. Phase 4's first triaged
+finding (the `a16-unmerge-s32` legalizer gap) is **FIXED on `main`**
+([s32 plan](2026-06-19-321-a16-unmerge-s32-legalizer.md)). **Phase 5 (sampled CI) DONE** — the
+`fuzz-csmith` job is in `.github/workflows/smoke.yml` (see Phase 5 RESULTS). The Csmith generator is the
+`dev/run.sh fuzz` default.
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — strengthen the *random* correctness axis).
 **Required reading:**
 [Tier-1 fuzzer + engine](2026-06-15-321-tier1-broaden-corpus.md) ·
@@ -247,6 +248,27 @@ Full writeup: [s32 legalizer plan](2026-06-19-321-a16-unmerge-s32-legalizer.md).
 
 ### Phase 5 — optional sampled CI
 Mirror the `corpus-a16` CI job in `smoke.yml`: a seeded subset per run, secret-gated, SKIP on missing BIOS.
+
+#### Phase 5 — RESULTS (2026-06-21): DONE
+
+Added the **`fuzz-csmith`** job to `.github/workflows/smoke.yml`. Because the Csmith differential runs
+**host-side** (`dev/run.sh fuzz --gen csmith` → `dev/csmith.sh`; not Docker), the job installs MAME on the
+runner, builds `vendor/csmith` on the host (`dev/fetch-csmith.sh`), and points `MOS_TOOLCHAIN` at the
+**host** `build/llvm-mos-install` (not `/work`). It `needs: xcheck` so it reuses that job's cached
+from-source toolchain, builds the SDK + `build/jgxcheck`, and is **secret-gated** (skip — don't fail —
+without the SPC700 BIOS, like `corpus-a16`). A `workflow_dispatch` **`mode`** input selects `sampled`
+(40 seeds from `sample_seed`, default) or `full` (`dev/run.sh fuzz --gen csmith 500 1`); the bsnes-jg
+4-way leg is always on. A commented `schedule:` block (auto-selects `full`) is ready for when the repo
+goes public.
+
+Local sampled verification (4-way, the exact per-run CI command):
+```
+$ dev/run.sh fuzz --gen csmith 40 1
+==> csmith: 36/40 PASS, 0 xfail, 4 skip  (0 mismatch, 0 crash, 0 error)
+    skip buckets: diverged-before-result (corpus_result GC'd)=4
+```
+0 mismatch / 0 crash / 0 error, exit 0. The 4 SKIPs are `diverged-before-result` (csmith GC'd
+`corpus_result` before the checksum write — legitimate, not a defect). **PASS.**
 
 ## Verification (run on execution; paste raw output under each step)
 1. **Csmith builds + is pinned.** `dev/fetch-csmith.sh` on a clean checkout → builds; second run is a no-op.

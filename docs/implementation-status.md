@@ -108,8 +108,8 @@ reaching `main`, and the five-address-space PR still waits on the design-note po
 | Item | Status |
 |---|---|
 | Tier-1 differential fuzzer (`a16_fuzz.py`, builtin generator) | ✅ Standing capability |
-| Csmith differential fuzzer (phases 0–4; 1–500 seeds) | ✅ Phases 0–4 done; Phase 5 (sampled CI) open |
-| GCC c-torture suite (-O1 pass: 1098 PASS; -Os pass: 1114 PASS; bsnes-jg 4-way) | ✅ Done; Phase 3 (sampled CI) open |
+| Csmith differential fuzzer (phases 0–5; 1–500 seeds) | ✅ **Phases 0–5 done (2026-06-21)** — sampled CI wired (`fuzz-csmith` job, host-side, 4-way, secret-gated, `mode` sampled/full) |
+| GCC c-torture suite (-O1 pass: 1098 PASS; -Os pass: 1114 PASS; bsnes-jg 4-way) | ✅ **Done; Phase 3 sampled CI wired (2026-06-21)** — `torture` job (in-container, 4-way, seeded `--sample`, secret-gated, `mode` sampled/full) |
 | `corpus-a16` differential gate (+a16/+xy16 on both emus) | ✅ Standing capability + in CI |
 | bsnes-jg `xcheck` in CI | ✅ Verified green (run 27823207476) |
 | Native-mode crt0 (DBR=0 via `phk;plb`, explicit contract) | ✅ Done |
@@ -223,9 +223,7 @@ work (the #320 far calling convention and xy16 ABI), tracked in *What's next* an
 3. **xy16 hardware-stack ABI** — the calling-convention implementation for 16-bit index-register
    mode. CC sub-decisions are all resolved; this is the remaining M2 codegen frontier.
 
-4. **Csmith Phase 5 + c-torture Phase 3** — sampled CI integration.
-
-5. **Upstream posts (user-triggered):**
+4. **Upstream posts (user-triggered):**
    - F4 `TXY/TYX` dead-flag fix PR (ready)
    - Register-scavenger N/Z-liveness issue (draft ready)
    - #321 CC frame-ABI design note (draft ready)
