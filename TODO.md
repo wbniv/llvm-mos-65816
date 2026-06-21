@@ -108,6 +108,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M2 — Optimizing Payoff
 
+- [ ] **#321 native-s16 — surface consolidation & close-out (compares/branches · A16-threading · ALU-chains)**
+  (planned 2026-06-22). The #321 analogue of the #320 zero-bank measure-and-close: the three named native-s16
+  tracks are each already at their measured state (compares **CLOSED**; A16-threading banked Phases 0/1/1.5 +
+  **deferred** Phase 3; ALU-chains shipped all homogeneous forms + **characterized-deferred** multi-value
+  pressure), so the deliverable is a single durable **surface map** — a `dev/measure-native-s16-surface.sh`
+  roll-up driving the three existing harnesses + the missing **ROADMAP step-5 acceptance** table (native-a16 <
+  8-bit-a16 on the same shape, corpus 7/7), the recorded verdict, and the upstream "#321 stage-1 native-s16 is
+  measured-complete" paragraph. **The one fact it contributes:** A16-threading **Phase 3** and the >14-live
+  ALU-chain residual are the **same** deferred hard core — RA-level 16-bit residency under register pressure
+  (the `globals.c` `-Os` RA-crash class) — so the surface has **one** open frontier behind **one** trigger +
+  **one** B0→B1→B2 spike recipe. Host-only measurement, no `vendor/` change expected (GO contingency
+  pre-registered). [plan](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
 - [x] **#321 native s16 — 16-bit comparison follow-ups — DONE 2026-06-21, track CLOSED.** ([plan](docs/plans/2026-06-21-321-native-s16-comparison-followups.md)) Compare surface measured ~complete (`dev/measure-compare-surface.sh`): everything native except the optimal byte-wise register-resident equality. The one open lever — the **ordering-as-value branchless carry-tail** (`zext(sbc-carry)`→`G_UADDE(0,0,carry)` in `legalizeZExt`) — was **BUILT + measured net-negative in realistic context** (correct + leaf-win real `uge_v` 25→19 + default byte-identical 75/75, but the 8-bit `adc` tail's `sep` breaks 16-bit runs: a16cmpaudit **+262 B** rep/sep-churn + `eor` inversions; c-torture 56 progs net≈0 **with** a +5 B regression) → **WON'T-DO** (the select-diamond is the ambient-16-bit optimum; clean gating infeasible — the cost is ambient-mode-dependent, invisible at legalize time). Classic lesson #1 leaf→ambient flip; spike on `wt/321-cmpval` (un-landed). **The mode-matched 16-bit-`rol` follow-up form (separate [banked plan §0a](docs/plans/2026-06-21-321-ordering-value-branchless-banked.md) — a real `ROLAcc16`/`LDAImm16`/`G_CARRY_BOOL16` materialization, `lda #$0000; rol a` at M16) was ALSO BUILT + measured 2026-06-21 → REGRESSES HARDER than v1: a16cmpaudit +654 B (both-widths) / +78 B (s16-direct-gated), whole a16 corpus +340 B with ZERO programs improving → WON'T-DO. Both 8-bit AND 16-bit forms closed: the select-diamond folds inversion free, its M8 tail matches ambient mode, and it keeps the boolean in `X` (not an `Imag16` ZP slot that cascades to spills). Deferred lever = mode-agnostic post-REPSEP pseudo (uncertain/partial upside, delicate REPSEP work — not pursued).** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
   (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
