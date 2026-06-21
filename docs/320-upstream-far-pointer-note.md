@@ -30,6 +30,46 @@ MAME harness + a 6502 regression corpus).
 
 ---
 
+## Correction & new findings (2026-06-21)
+
+*Folding in what we learned building toward the full five-address-space model. Three things change how
+this note should read.*
+
+**Status since drafting.** This slice has grown well past the foundational layer: runtime far pointers
+(`lda [dp]`), near→far casts, far-pointer arithmetic, far calls (`JSL`/`RTL`, far→near, far function
+pointers), the far-pointer calling convention (`p2`→`Imag32`), and 16-bit-accumulator (`+mos-a16`)
+codegen all landed, dual-emulator-verified. The "what this does **not** do yet" section below is the
+*original* snapshot, kept for provenance.
+
+**1. Retraction — a 24-bit pointer is NOT a power-of-two-size problem.** This note justified the 32-bit
+"claim 32, use 24" pointer with *"LLVM requires power-of-two pointer sizes."* **That is false.**
+`DataLayout::parseSize` accepts any non-zero ≤24-bit value as a pointer size (the only `isPowerOf2`
+check is on *alignment*), and `getPointerSize = divideCeil(bits, 8)` — so `p:24` parses and a 24-bit
+pointer is exactly **3 bytes**; `getIntPtrType` is `i24`. The GISel backend also carries a genuine
+24-bit value (`_BitInt(24)` compiles clean, default and `+mos-a16`). **The real reason far stays
+32-bit is `MVT`:** there is no `MVT::i24`, so a 24-bit value can't ride the register-class /
+calling-convention (`CCValAssign`) interfaces that still speak `MVT`. "Claim 32, use 24" is a
+backend-plumbing convenience, **not an IR-representability limit.**
+
+**2. `0 = far` as the default is architecturally foreclosed in llvm-mos.** The MOS datalayout is a
+*single* static string shared by the 6502 **and** every 65816 subtarget — not subtarget-conditional.
+Redefining `addrspace 0` to 32-bit far would make *every 6502 pointer* 32-bit and break the non-65816
+backend. So the proposal's headline `0 = far-default` can't be taken literally. The faithful way to
+express "far by default" is a **clang memory-model flag** that emits plain `T*` into the far space —
+`addrspace 0` keeps its 16-bit meaning. This reframes open decision #1 (below): treat the default as a
+front-end flag, and lead the argument with runtime cost now that the representability prop is gone.
+
+**3. The packed-24 space (proposal `3`): representable, but recommend deferring on measurement.** Its
+1-byte-per-pointer win lands *only* on far pointers **stored in memory** — and we measured that a far
+pointer **cannot be stored in memory at all yet**: `sizeof(far*)` reports 2 (not 4), and
+storing/loading a far pointer to a global/array/struct fails to legalize (both default and `+mos-a16`).
+So packed-24 would size-optimize a capability that doesn't exist; the prerequisite is **completing the
+far-pointer value type** (storable + correct `sizeof`), the real next far-*data* work. Defer space `3`
+until that lands and real stored-far-pointer byte-pressure is measured. Space `4` (zero-bank) is ≈ a
+near pointer — marginal. *(Evidence: the five-address-space plan + `dev/measure-five-space-census.sh`.)*
+
+---
+
 ## What's implemented + verified
 
 **Address space + data layout** (additive). A third pointer kind alongside the existing two:
@@ -44,8 +84,9 @@ enum AddressSpace { AS_Memory, AS_ZeroPage, AS_Far, NumAddrSpaces };
 // data layout (all three of MOSTargetMachine / clang MOS.cpp / TargetDataLayout)
 "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
 //                  ^^^^^^^ addrspace 2 = 32-bit pointer; only the low 24 bits are
-//                          emitted as the 65816 long address (the "claim 32-bit,
-//                          use 24" approach — LLVM requires power-of-two pointer sizes).
+//                          emitted as the 65816 long address (the "claim 32-bit, use 24"
+//                          approach — see Correction #1 below: this is an MVT-has-no-i24
+//                          plumbing convenience, NOT a power-of-two-size limit).
 ```
 
 **Codegen path** (all GlobalISel; gated on `W65816`):
@@ -126,12 +167,16 @@ Flagging it here so the divergence reads as conscious, not accidental.
 
 ## Open ABI decisions this slice informs (but does not decide)
 
-1. **Default pointer width.** 32-bit far as the default (the proposal — supported by the "32-bit is
-   *cheaper* than 24-bit on the 65816" finding, since 24-bit arithmetic forces a 16+8 access pair and
-   a mode switch) vs. a 16-bit default with opt-in far (this slice). This is the module-wide call; the
-   slice is built to make flipping it a contained change rather than a leap.
+1. **Default pointer width.** *(Reframed by Correction #2: `0 = far-default` is foreclosed by the
+   single shared datalayout — this is a **clang memory-model flag**, not a layout change.)* The case
+   for far-by-default now rests on the **"32-bit is *cheaper* than 24-bit on the 65816"** finding
+   (24-bit arithmetic forces a 16+8 access pair and a mode switch) — the load-bearing argument, since
+   the representability prop is retracted (Correction #1) — vs. a 16-bit default with opt-in far (this
+   slice). Buildable as a front-end flag, default off, so the decision can ride on measured bytes.
 2. **The five-space layout + final numbering** — including packed-24 (`3`) and zero-bank (`4`), which
-   this slice doesn't touch yet.
+   this slice doesn't touch yet. *(Correction #3: packed-24 is representable but recommended
+   deferred-on-measurement — its win needs far-pointers-stored-in-memory, which isn't complete yet;
+   zero-bank ≈ a near pointer, marginal.)*
 3. **Calling convention** (still open in #320/#321). Documented prior art, read firsthand from the
    WDC816CC manual (pp.21–26) and ORCA/C `Gen.pas`: both shipped-in-production compilers use a
    **hybrid** frame — arguments on the hardware stack, then `PHD`/`TCD` remap the Direct Page onto the
