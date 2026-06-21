@@ -72,6 +72,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [ ] **#320 far tail calls** — separate, low-priority follow-up; already conservative-safe (the
   tail-call peephole keys on `MOS::JSR`, so a `JSL` far call is never tail-converted). An optimization,
   not a correctness gap. [plan](docs/plans/2026-06-21-320-far-calls-followups.md).
+- [ ] **tooling: refresh `dev/regen-patch-0001.sh` `FAR_FILES` for the expanded `0001`** — after the
+  2026-06-21 far-pointer landing, `0001` gained ~17 (a) files (the clang front-end: `Attr.td`, `SemaType`,
+  `SemaDeclAttr`, `CGExpr*`, `ASTContext`, `TypePrinter`, `TypeBase.h`, `TypeProperties.td`, `CodeGenTypes`,
+  `CodeGenModule.h`, `Basic/Targets/MOS.cpp`; backend `MOSInstrInfo.h`, `MOSInstructionSelector`,
+  `MOSMCInstLower`, `MOSRegisterInfo`), but `FAR_FILES` still lists only `MOSInstrLogical.td` +
+  `MOSCallLowering.cpp`. The script *preserves* existing `0001` content (won't corrupt), but a **future**
+  edit to a new (a) file wouldn't be captured on regen. Also note: `regen-patch.sh`/`-0001` must be run on a
+  vendor tree without `0004`/`0005` applied (the whole-MOS-dir mirror can't subtract higher stacked patches).
+  Low priority — bites only when someone next edits the far front-end in `vendor/`. The
+  round-trip recipe `dev/land-far-integration.sh` is the complete-coverage alternative while FF exists.
 
 ### M2 — Optimizing Payoff
 
