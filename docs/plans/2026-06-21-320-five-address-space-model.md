@@ -1,7 +1,8 @@
 # #320 — the full five-address-space model (Option A → Option B)
 
-**Date:** 2026-06-21 · **Status:** PHASE 0 + 3 DONE; **re-evaluated** (2026-06-21, later). New spaces
-(packed-24 #3, zero-bank #4) DEFERRED as premature. The desirable work Phase 0 surfaced —
+**Date:** 2026-06-21 · **Status:** PHASE 0 + 3 DONE; **re-evaluated** (2026-06-21, later). **packed-24
+(#3) BUILT + verified — Increment A (type) + Increment B (codegen) both DONE** (2026-06-21, on post-F2
+`main`; see *Build packed-24*); zero-bank (#4) still DEFERRED as premature. The desirable work Phase 0 surfaced —
 **completing the far-pointer VALUE type** (storable + `sizeof==4`) — was **built by the F2 agent**
 (`wt/320-far-followups`, verified, ABI-gated, not on `main`), so it's **done, not ours to re-implement**.
 `dp→near` cast = pre-existing **upstream** bug. **No clean in-scope codegen remains for us here** — see
@@ -447,31 +448,57 @@ Verified (worktree toolchain, rebuilt clang-23 @ 20:26): `sizeof(__packed_far*)=
 (vs 64 for 32-bit far) — the storage win is realized at the type level; a packed global emits 3 bytes,
 a 16-table 48. **Non-breaking: corpus 7/7** (AS3 is inert unless code creates an addrspace-3 pointer).
 
-### Increment B — codegen to *use* packed pointers: **BLOCKED on 24-bit (s24) width**
+### Increment B — codegen to *use* packed pointers: **DONE + verified, 2026-06-21** (built on post-F2 `main`)
 
-To store/load/deref a packed pointer, clang emits `addrspacecast p2↔p3` + `load/store p3`. The cast
-already routes through the integer (`legalizeAddrSpaceCast`: `ptrtoint → trunc/zext → inttoptr`), but
-only for `{P,PZ,PF}` — adding `PFP` routes the conversion through **`s24`** (`ptrtoint p3 → s24`,
-`trunc s32→s24`, `zext s24→s32`), and **this backend legalizes only `s8/s16/s32`** (`G_TRUNC` is
-`{S1,S8},{S1,S16},{S8,S16}` +a16 `{S16,S32}` then `unsupported`; no `s24`). The empirical failure
-confirms it: *"Generic extend/truncate can not operate on pointers"* (cast fell through to the default
-pointer-trunc) + the s24 path has no rules. The 24-bit/3-byte granularity also breaks the 2-source
-`selectMergeValues` (a 3×s8→s24 merge needs the custom multi-level treatment the far code uses for
-4×s8→s32). So Increment B is a genuine **novel-24-bit-width GISel effort** — multiple fiddly pieces
-(s24 trunc/zext/load/store narrowing, 3-byte merge/unmerge, `PFP` in inttoptr/ptrtoint/addrspacecast/
-load-store) — each iteration a ~20-min toolchain rebuild.
+Built on `wt/320-packed24-incB` (compiler-changing worktree off post-F2 `main`; F2 precondition gate
+PASS — `sizeof(far*)==4`, far store/load/array/struct legalize clean). The original "BLOCKED on s24"
+diagnosis was *half right* — the dead-end was specifically the **`inttoptr/ptrtoint`-roundtrip-through-s24**
+shape (which `legalizeAddrSpaceCast` would have used). The fix sidesteps `s24` entirely.
 
-**Disposition (per project discipline — gate speculative high-effort work; debugging limit):** Increment
-A is the clean, verified result (the type + storage win + non-breaking). Increment B is the 24-bit-width
-rabbit hole — **deferred until the F2 far-value work lands on `main`**: building packed-24 now (off
-pre-F2 `main`) would rebase onto post-F2 `main` later, and our edits overlap F2's exactly
-(`getPointerWidthV`, datalayout, the far legalizer rules); conceptually packed-24 is the 3-byte storage
-form of F2's now-storable far *value*, so it should extend that base, not race it. **Worktree
-`wt/320-five-space` TORN DOWN 2026-06-21** (`dev/worktree-teardown.sh`, 12G reclaimed) — durable
-artifacts kept on `main`: the Increment A patch
-([`docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch`](spikes/2026-06-21-320-packed24-incrementA.patch)),
-the fixtures ([`examples/65816/packed24/`](../../examples/65816/packed24/)), and this recipe+blocker —
-so packed-24 is reconstructible on the post-F2 base anytime.
+**Two findings reframed the approach (measure, don't assume):**
+1. **An IR-level crash before any GISel s24 work even runs.** `deref_g` (load p3 + cast + far-deref)
+   segfaulted in **`CodeGenPrepare::optimizeLoadExt`** → `EVT::getExtendedSizeInBits` on the 24-bit
+   pointer load: `getValueType(p3)` → `getPointerTy(DL,3)` → `MVT::getIntegerVT(24)` = the invalid
+   `MVT::i24`. "Memory-only" doesn't shield IR passes that query the type's MVT. **Fix:** override
+   `MOSTargetLowering::getPointerTy(AS_FarPacked)` → `MVT::i32` (a packed pointer's register/value form
+   IS the 32-bit far form; only its memory footprint is 3 bytes, from the datalayout). One target-local
+   hook fixes every generic-pass site at once.
+2. **The artifact combiner only looks through `G_TRUNC/SEXT/ZEXT/ANYEXT`, NOT `inttoptr/ptrtoint`**
+   (`isArtifactCast`). So an `s24` formed by `ptrtoint p3 → s24` would never fold and would crash
+   selection (no `MVT::i24`, no 24-bit register class). **Fix:** bridge `p3 ↔ 3×s8` with
+   `G_MERGE_VALUES{PFP,S8}` / `G_UNMERGE_VALUES{S8,PFP}` directly (no `s24`, no `inttoptr` roundtrip). In
+   every shape clang emits (cast→store, load→cast, packed→packed copy) the bridge merge **directly feeds**
+   the consuming unmerge, so the basic `unmerge(merge)` artifact fold removes it — no 24-bit value or
+   pointer ever reaches the selector.
+
+**The implementation (all `0006-320-packed24.patch`, stacked after 0001-0005):**
+- `getPointerTy(AS_FarPacked)→i32` (MOSISelLowering) — the CGP fix.
+- `PFP = LLT::pointer(3,24)`; `PFP` added to `G_ADDRSPACE_CAST` + the `G_LOAD/G_STORE` *value*-type sets.
+- `legalizeAddrSpaceCast`: a `PFP` arm — `p2→p3` keeps the 3 low bytes (`ptrtoint; unmerge s32; merge 3→p3`),
+  `p3→p2` zero-extends the pad (`unmerge p3; merge 3+0→s32; inttoptr`). Other packed casts fail loudly.
+- `legalizePackedPtrAccess`: a `PFP` load = 3 byte-loads merged to p3; a `PFP` store = p3 unmerged to 3
+  byte-stores. Both bridge via `{PFP,S8}` merge/unmerge, which folds.
+
+**Codegen achieved** (`packed24_e2e.c`, snes-far, bank $01): `set` → `stx slot; sty slot+1; sta slot+2`
+(3-byte store, bank byte preserved); deref → `ldx/ldy/lda slot{,+1,+2}; stx __rc4; sty __rc5; stz __rc7`
+(zero-extend pad) `; sta __rc6; lda [__rc4]` (far indirect-long deref). The `cp` (packed→packed copy)
+shows the predicted **×3 indexing** (`asl; clc; adc` = i×2+i).
+
+**Verification (the bar) — all PASS** (full evidence in the handoff plan's §3):
+- **Differential, both emulators:** `dev/run.sh packed24` (MAME) `corpus_result==0xF3`; bsnes-jg
+  (`jgxcheck`) `got=0xF3`. The far pointer targets **bank $01**, so 0xF3 *proves the bank byte survives
+  the 3-byte packing*.
+- **`-verify-machineinstrs` clean** on `incB_use.c`, the 4-shape table program, and `packed24_e2e.c`.
+- **Non-breaking:** `dev/run.sh corpus` **7/7**; far suite (far-bank1/cast/arith/store/call) all PASS;
+  `dev/run.sh fuzz 50 1` 0-mismatch (every new hook is `AS_FarPacked`-gated → default + non-AS3 codegen
+  byte-unchanged).
+- **Measured win:** a 16-entry table is **48 B vs 64 B = −16 B (−25%)**; access cost ≈ neutral (×3 index
+  math offset by one fewer pointer byte loaded). The win is realized exactly as predicted.
+
+Worktree `wt/320-packed24-incB` RETAINED until upstream merge (user policy). Durable artifacts on `main`:
+`0006-320-packed24.patch`, `dev/regen-patch-0006.sh`, the runnable e2e (`packed24_e2e.c` + `dev/packed24.sh`,
+wired into `dev/xcheck.sh`), and this record. (Increment A's recipe + the original blocker are preserved
+above and in `docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch`.)
 
 ---
 
@@ -528,10 +555,18 @@ so packed-24 is reconstructible on the post-F2 base anytime.
    Census: 0 far pointers stored in memory (circular — storing is broken); `sizeof(far*)==2` (clang gap);
    `G_STORE p2` fails. `dev/measure-five-space-census.sh` 0b block. Packed-24/zero-bank deferred behind
    the desirable far-pointer-value-completion work this surfaced (see *0b verdict (corrected)*).
-3. **Phase 1 (if GO):** `far_packed.c` round-trips a packed-24 far load/store across a bank boundary
-   on MAME **and** bsnes-jg; the `sizeof` static-assert shows 3-byte storage; the census shape is
-   measurably smaller than `AS_Far`. Corpus 7/7; differential clean; `-verify-machineinstrs` clean.
-   (Evidence: emulator value dump + `llvm-size` diff + corpus run.)
+3. **Phase 1 / packed-24:** **PASS — BUILT + verified** (2026-06-21, on `wt/320-packed24-incB`; user
+   directed building it — see *Build packed-24 → Increment B*). `packed24_e2e.c` round-trips a 3-byte
+   packed far pointer **across a bank boundary** (target in bank $01) on MAME **and** bsnes-jg:
+   ```
+   dev/run.sh packed24:  SMOKE: PASS addr=0x7E0203 len=1 got=0xF3 (ran 60 ticks)   [MAME]
+   jgxcheck:             SMOKE: PASS off=0x203 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+   ```
+   `sizeof` static-asserts show 3-byte storage (`incA_sizeof.c` compiles); the census shape is measurably
+   smaller — a 16-entry table is **48 B vs 64 B (−16 B, −25%)** (`llvm-objdump --section-headers`). Corpus
+   **7/7**; `dev/run.sh fuzz 50 1` → `45/50 PASS, 0 mismatch, 0 crash`; far suite (far-bank1/cast/arith/
+   store/call) all PASS; `-verify-machineinstrs` clean. Shipped as `0006-320-packed24.patch` (round-trips
+   via `dev/regen-patch-0006.sh`). The ×3-index cost is recorded (vs `AS_Far` ×4) and is ~neutral.
 4. **Phase 2 (if GO):** `far_zerobank.c` accesses bank-0 data via 16-bit absolute, casts to `AS_Far`
    for a far call, round-trips on both emulators; measurably beats absolute-long for the census shape.
    Corpus 7/7; differential clean. (Evidence: disasm showing `ad`/`8d` not `af`/`8f` + emulator dump.)

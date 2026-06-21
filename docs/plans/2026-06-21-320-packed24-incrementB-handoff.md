@@ -1,5 +1,26 @@
 # Handoff — build packed-24 (addrspace 3) Increment B, once the F2 far-value work is on `main`
 
+> ## ✅ IMPLEMENTED — 2026-06-21 (this handoff is now a historical record)
+>
+> Increment B is **DONE + verified** on `wt/320-packed24-incB` (off post-F2 `main`). Precondition gate
+> PASS first (`sizeof(far*)==4`; far store/load/array/struct legalize clean). Shipped as the stacked
+> **`patches/llvm-mos/0006-320-packed24.patch`** (regen: `dev/regen-patch-0006.sh`) — NOT folded into
+> 0001, because packed-24 edits files 0004/0005 also touch and folding would risk absorbing foreign
+> hunks (same reason 0004/0005 were stacked; see §2 note below).
+>
+> **What it took (two findings, not the predicted s24 narrowing):** (1) a `getPointerTy(AS_FarPacked)→i32`
+> override in MOSISelLowering to stop `CodeGenPrepare` crashing on the invalid `MVT::i24`; (2) bridge
+> `p3 ↔ 3×s8` with `G_MERGE/G_UNMERGE{PFP,S8}` (NOT an `inttoptr/ptrtoint`-roundtrip through `s24` — the
+> artifact combiner doesn't look through ptr casts, so an `s24` would never fold). The merge directly
+> feeds the consuming unmerge in every shape clang emits → folds away → no 24-bit value reaches selection.
+>
+> **Verification (§3) all PASS:** packed24 differential `0xF3` on MAME **and** bsnes-jg (far ptr targets
+> **bank $01** → proves the bank byte survives 3-byte packing); `-verify-machineinstrs` clean; corpus
+> 7/7; far suite green; `fuzz 50` 0-mismatch; storage **48 B vs 64 B = −16 B (−25%)** for a 16-entry
+> table, ×3 index cost. Full technical record: the five-space plan's **§Build packed-24 → Increment B**.
+> New runnable test: `examples/65816/packed24/packed24_e2e.c` + `dev/packed24.sh` (`dev/run.sh packed24`),
+> wired into `dev/xcheck.sh`. The original handoff (below) is preserved as the orientation it was.
+
 **For:** a fresh agent. **Status when written (2026-06-21):** packed-24 Increment A (the 3-byte *type*)
 is built + verified + recorded; Increment B (codegen to *use* packed pointers) is **deferred until the
 F2 far-pointer-value work lands on `main`** (the in-flight "Build Reference R + extract (a)-delta →

@@ -53,18 +53,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   measured the win = **25% storage** on far-ptr tables (16: 64→48 B) **but a ×3-index cost** (3-byte
   elements) — opt-in so it never regresses non-users. **Increment A DONE + verified** (the 3-byte TYPE:
   `AS_FarPacked=3` + datalayout `p3:24:8` + clang width; `sizeof(packed*)==3`, table 48 B, **corpus 7/7**).
-  **Increment B (codegen to USE packed ptrs) BLOCKED on 24-bit width** — the `p2↔p3` cast + `p3`
-  load/store route through `s24`, which the backend doesn't legalize (only `s8/s16/s32`), and the 3-byte
-  granularity breaks 2-source merges. Genuine novel-s24-width GISel effort. **UNBLOCKED 2026-06-21 — the F2
-  far-value work landed on `main`** (`0001`+`0004`+`0005`; both touch `getPointerWidthV`/datalayout/far
-  legalizer, so resume on a fresh worktree off current `main`); packed-24 = the 3-byte form of F2's
-  now-storable far value. **Worktree torn down
-  2026-06-21** (12G reclaimed); durable artifacts on `main`: Increment A patch
-  `docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch` + fixtures `examples/65816/packed24/` +
-  recipe in [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md). Also
-  remaining: post the upstream note (C1 + pow2 + census) — user-triggered. **Resume prompt for Increment B
-  (after F2 lands on `main`):** [handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md).
-  [plan](docs/plans/2026-06-21-320-five-address-space-model.md).
+  **Increment B (codegen to store/load/deref packed ptrs) DONE + verified 2026-06-21** on
+  `wt/320-packed24-incB` (off post-F2 `main`) — NOT the predicted s24-narrowing job: (1) `getPointerTy(
+  AS_FarPacked)→i32` to stop `CodeGenPrepare` crashing on the invalid `MVT::i24`; (2) bridge `p3↔3×s8`
+  via `G_MERGE/G_UNMERGE{PFP,S8}` (no `s24`, no `inttoptr` roundtrip — the artifact combiner folds the
+  bridge against the adjacent unmerge/merge). Shipped as stacked **`0006-320-packed24.patch`** (regen
+  `dev/regen-patch-0006.sh`; not folded into 0001 — touches files 0004/0005 share). **Verified:**
+  `dev/run.sh packed24` (new e2e, bank $01) `0xF3` MAME **and** bsnes-jg (bank byte survives 3-byte
+  packing); `-verify-machineinstrs` clean; corpus 7/7; far suite PASS; `fuzz 50` 0-mismatch; storage
+  −16 B/−25% (16-entry table 64→48 B), ×3 index cost. Worktree RETAINED until upstream merge.
+  **Still open in this item:** zero-bank (AS4) still deferred (≈ near ptr); post the upstream note (C1 +
+  pow2 + census) — user-triggered. [handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
+  [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
   llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.

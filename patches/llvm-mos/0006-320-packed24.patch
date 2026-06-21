@@ -1,0 +1,279 @@
+diff --git a/clang/lib/Basic/Targets/MOS.cpp b/clang/lib/Basic/Targets/MOS.cpp
+index 3a729fc34537..8efd4309f152 100644
+--- a/clang/lib/Basic/Targets/MOS.cpp
++++ b/clang/lib/Basic/Targets/MOS.cpp
+@@ -19,9 +19,11 @@ using namespace clang::targets;
+ MOSTargetInfo::MOSTargetInfo(const llvm::Triple &Triple, const TargetOptions &)
+     : TargetInfo(Triple) {
+   // Must match the backend's MOSDataLayout (MOSTargetMachine.cpp). p2:32:8 =
+-  // addrspace 2 "far" (32-bit ptr; low 24 bits emitted as 65816 absolute-long). #320.
++  // addrspace 2 "far" (32-bit ptr; low 24 bits emitted as 65816 absolute-long).
++  // p3:24:8 = addrspace 3 "packed far" (3-byte storage form of a far pointer;
++  // memory-only — converts to/from p2 at load/store). #320.
+   static const char Layout[] =
+-      "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
++      "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
+   resetDataLayout(Layout);
+ 
+   PointerWidth = 16;
+@@ -208,6 +210,8 @@ uint64_t MOSTargetInfo::getPointerWidthV(LangAS AddrSpace) const {
+     return 8;
+   case 2: // Far: a 24-bit address held in a 32-bit pointer (datalayout p2:32:8).
+     return 32; // #320 — match the IR width so sizeof(far*) == 4.
++  case 3: // Packed far: 24-bit (3-byte) storage form of a far pointer (datalayout p3:24:8).
++    return 24; // #320 — sizeof(__packed_far *) == 3.
+   default:
+     return 16;
+   }
+diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
+index a660f4e46acb..3271f980152c 100644
+--- a/llvm/lib/Target/MOS/MOSISelLowering.cpp
++++ b/llvm/lib/Target/MOS/MOSISelLowering.cpp
+@@ -65,6 +65,19 @@ bool MOSTargetLowering::isSuitableForJumpTable(const SwitchInst *SI,
+   return TargetLowering::isSuitableForJumpTable(SI, NumCases, Range, PSI, BFI);
+ }
+ 
++MVT MOSTargetLowering::getPointerTy(const DataLayout &DL, uint32_t AS) const {
++  // #320 packed-24: AS_FarPacked (3) is a 24-bit pointer in MEMORY (datalayout
++  // p3:24:8) but there is NO MVT::i24, and a packed pointer is only ever held in
++  // registers as its 32-bit "far" form (it converts to/from AS_Far at load/store).
++  // The generic getPointerTy default (MVT::getIntegerVT(24)) yields an invalid MVT
++  // that crashes IR-level passes (e.g. CodeGenPrepare::optimizeLoadExt). Report the
++  // 32-bit far value type instead; the 3-byte memory footprint comes from the
++  // datalayout, not this hook, and GISel derives the 24-bit LLT from the datalayout.
++  if (AS == MOS::AS_FarPacked)
++    return MVT::i32;
++  return TargetLowering::getPointerTy(DL, AS);
++}
++
+ MVT MOSTargetLowering::getRegisterType(MVT VT) const {
+   // Even though a 16-bit register is available, it's not actually an integer
+   // register, so split to 8 bits instead.
+diff --git a/llvm/lib/Target/MOS/MOSISelLowering.h b/llvm/lib/Target/MOS/MOSISelLowering.h
+index db9d51208dd6..ba6a46222be0 100644
+--- a/llvm/lib/Target/MOS/MOSISelLowering.h
++++ b/llvm/lib/Target/MOS/MOSISelLowering.h
+@@ -45,6 +45,8 @@ public:
+                               uint64_t Range, ProfileSummaryInfo *PSI,
+                               BlockFrequencyInfo *BFI) const override;
+ 
++  MVT getPointerTy(const DataLayout &DL, uint32_t AS = 0) const override;
++
+   MVT getRegisterType(MVT VT) const override;
+ 
+   unsigned
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
+index 7ce06afbd743..880709364cdd 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.h
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
+@@ -156,8 +156,12 @@ namespace MOS {
+ // AS_Memory  (0): 16-bit absolute pointer (6502 default; data-bank-relative on 65816).
+ // AS_ZeroPage(1): 8-bit direct-page pointer.
+ // AS_Far     (2): 32-bit "far" pointer — 65816 24-bit address in the low 3 bytes,
+-//                 top byte unused (LLVM wants power-of-two pointer sizes). #320 Increment 1.
+-enum AddressSpace { AS_Memory, AS_ZeroPage, AS_Far, NumAddrSpaces };
++//                 top byte unused (32-bit stays a simple MVT type; there is no MVT::i24). #320 Inc 1.
++// AS_FarPacked(3): 24-bit "packed" far pointer — the 3-byte STORAGE form of AS_Far. A
++//                 memory-only type: it converts to/from AS_Far (truncate/extend the pad
++//                 byte) at load/store and is NEVER held as a 24-bit register value, so it
++//                 needs no MVT::i24 / 24-bit register class. #320 five-address-space model.
++enum AddressSpace { AS_Memory, AS_ZeroPage, AS_Far, AS_FarPacked, NumAddrSpaces };
+ 
+ enum TargetIndex {
+   TI_STATIC_STACK,
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 72b984a321d1..63571404f8ee 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -72,6 +72,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   // 65816 long address; LLVM requires power-of-two pointer sizes). Legal only
+   // where it appears; far load/store select to absolute-long addressing.
+   LLT PF = LLT::pointer(2, 32);
++  // #320 packed-24: AS_FarPacked (addrspace 3) — the 3-byte STORAGE form of a far
++  // pointer (datalayout p3:24:8). Memory-only: a PFP value is converted to/from the
++  // 32-bit far pointer (PF) at the load/store/addrspacecast boundary via a 3x s8 <->
++  // p3 merge/unmerge bridge (the artifact combiner folds the bridge so no 24-bit
++  // value ever stands alone — there is no MVT::i24 / 24-bit register class).
++  LLT PFP = LLT::pointer(3, 24);
+ 
+   // Constants
+ 
+@@ -137,7 +143,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   // #320 far runtime: near->far (AS0->AS2) zero-extends the 16-bit near pointer
+   // to the 32-bit far pointer (bank byte $00); handled in legalizeAddrSpaceCast.
+   getActionDefinitionsBuilder(G_ADDRSPACE_CAST)
+-      .customForCartesianProduct({P, PZ, PF})
++      .customForCartesianProduct({P, PZ, PF, PFP})
+       .unsupported();
+ 
+   // Scalar Operations
+@@ -379,11 +385,15 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+     // an s32 and re-runs; the s32 then narrows to bytes (maxScalar below). PF is
+     // addrspace 2 — only W65816 far code ever forms one — so listing it as a
+     // value type is inert on every other subtarget.
++    // #320 packed-24: PFP appears only as a *value* (a packed far pointer stored in
++    // / loaded from memory), never as the access pointer (it is cast to PF before any
++    // deref). A PFP value routes through legalizeLoad/legalizeStore, which accesses 3
++    // bytes and bridges to/from p3 via a 3x s8 merge/unmerge (see legalizePacked*).
+     auto &B = getActionDefinitionsBuilder({G_LOAD, G_STORE});
+     if (STI.hasAccum16())
+-      B.customForCartesianProduct({S8, S16, PZ, P, PF}, {PZ, P, PF});
++      B.customForCartesianProduct({S8, S16, PZ, P, PF, PFP}, {PZ, P, PF});
+     else
+-      B.customForCartesianProduct({S8, PZ, P, PF}, {PZ, P, PF});
++      B.customForCartesianProduct({S8, PZ, P, PF, PFP}, {PZ, P, PF});
+     B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, S8).unsupported();
+   }
+ 
+@@ -1821,6 +1831,37 @@ bool MOSLegalizerInfo::legalizeAddrSpaceCast(LegalizerHelper &Helper,
+   LLT DestTypeS = LLT::scalar(DestTypeP.getScalarSizeInBits());
+   LLT SrcTypeS = LLT::scalar(SrcTypeP.getScalarSizeInBits());
+ 
++  // #320 packed-24: AS_FarPacked (p3, 24-bit) <-> AS_Far (p2, 32-bit). Convert via
++  // the three shared low address bytes — never a 24-bit scalar (no MVT::i24). The
++  // 3x s8 <-> p3 merge/unmerge here is folded away by the artifact combiner against
++  // the matching merge/unmerge in the producing/consuming load/store (legalizePacked*).
++  const unsigned DestAS = DestTypeP.getAddressSpace();
++  const unsigned SrcAS = SrcTypeP.getAddressSpace();
++  if (DestAS == MOS::AS_FarPacked || SrcAS == MOS::AS_FarPacked) {
++    LLT S8 = LLT::scalar(8);
++    LLT S32 = LLT::scalar(32);
++    if (SrcAS == MOS::AS_FarPacked && DestAS == MOS::AS_Far) {
++      // p3 -> p2: zero-extend the bank pad byte (the address bits are identical).
++      auto Bytes = Builder.buildUnmerge(S8, SrcReg); // p3 -> 3x s8
++      auto Zero = Builder.buildConstant(S8, 0);
++      auto Merged = Builder.buildMergeValues(
++          S32, {Bytes.getReg(0), Bytes.getReg(1), Bytes.getReg(2), Zero.getReg(0)});
++      Builder.buildIntToPtr(DestReg, Merged);
++    } else if (SrcAS == MOS::AS_Far && DestAS == MOS::AS_FarPacked) {
++      // p2 -> p3: keep the three low address bytes, drop the unused pad byte.
++      auto SrcInt = Builder.buildPtrToInt(S32, SrcReg); // p2 -> s32
++      auto Bytes = Builder.buildUnmerge(S8, SrcInt);    // s32 -> 4x s8
++      Builder.buildMergeValues(
++          DestReg, {Bytes.getReg(0), Bytes.getReg(1), Bytes.getReg(2)}); // 3x s8 -> p3
++    } else {
++      // Other packed casts (e.g. near<->packed) are not formed by clang for the
++      // far-pointer-table use case; fail loudly rather than miscompile.
++      return false;
++    }
++    MI.eraseFromParent();
++    return true;
++  }
++
+   auto Tmp = Builder.buildPtrToInt(SrcTypeS, SrcReg);
+ 
+   if (DestTypeS.getSizeInBits() < SrcTypeS.getSizeInBits()) {
+@@ -2085,6 +2126,11 @@ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
+     // one native indirect load (else narrow to two 8-bit, as before).
+     if (MRI.getType(Load->getDstReg()) == LLT::scalar(16))
+       return legalizeLoadStore16(Helper, MRI, MI);
++    // #320 packed-24: loading a packed far pointer VALUE (p3) reads 3 bytes and
++    // merges them into a p3 (the merge is folded against the consuming cast/store).
++    LLT DstTy = MRI.getType(Load->getDstReg());
++    if (DstTy.isPointer() && DstTy.getAddressSpace() == MOS::AS_FarPacked)
++      return legalizePackedPtrAccess(Helper, MRI, *Load);
+   }
+ 
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+@@ -2115,6 +2161,51 @@ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
+   return true;
+ }
+ 
++// #320 packed-24: legalize a load/store whose VALUE is a packed far pointer (p3,
++// 24-bit, datalayout p3:24:8) as a 3-byte memory access bridged to/from p3 via a
++// 3x s8 merge/unmerge. The bridge merge/unmerge is folded away by the artifact
++// combiner against the matching unmerge/merge in the adjacent addrspacecast (or an
++// adjacent packed load/store for a packed->packed copy), so no 24-bit value or
++// pointer ever reaches the selector (there is no MVT::i24 / 24-bit register class).
++bool MOSLegalizerInfo::legalizePackedPtrAccess(LegalizerHelper &Helper,
++                                               MachineRegisterInfo &MRI,
++                                               GLoadStore &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  MachineFunction &MF = Builder.getMF();
++  const LLT S8 = LLT::scalar(8);
++  Register Ptr = MI.getPointerReg();
++  LLT PtrTy = MRI.getType(Ptr);
++  LLT OffTy = LLT::scalar(PtrTy.getSizeInBits());
++  const MachineMemOperand &MMO = **MI.memoperands_begin();
++  constexpr unsigned NumBytes = 3;
++
++  // Byte address: base, base+1, base+2.
++  auto byteAddr = [&](unsigned I) -> Register {
++    if (I == 0)
++      return Ptr;
++    return Builder.buildPtrAdd(PtrTy, Ptr, Builder.buildConstant(OffTy, I))
++        .getReg(0);
++  };
++
++  if (auto *Store = dyn_cast<GStore>(&MI)) {
++    auto Bytes = Builder.buildUnmerge(S8, Store->getValueReg()); // p3 -> 3x s8
++    for (unsigned I = 0; I < NumBytes; ++I)
++      Builder.buildStore(Bytes.getReg(I), byteAddr(I),
++                         *MF.getMachineMemOperand(&MMO, I, S8));
++  } else {
++    auto &Load = cast<GLoad>(MI);
++    SmallVector<Register, NumBytes> Bytes;
++    for (unsigned I = 0; I < NumBytes; ++I)
++      Bytes.push_back(Builder
++                          .buildLoad(S8, byteAddr(I),
++                                     *MF.getMachineMemOperand(&MMO, I, S8))
++                          .getReg(0));
++    Builder.buildMergeValues(Load.getDstReg(), Bytes); // 3x s8 -> p3
++  }
++  MI.eraseFromParent();
++  return true;
++}
++
+ // Converts pointer to integer before store, allowing the store to later be
+ // narrowed to 8 bits.
+ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -2126,6 +2217,13 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+   // native indirect store (else narrow to two 8-bit, as before).
+   if (MRI.getType(MI.getValueReg()) == LLT::scalar(16))
+     return legalizeLoadStore16(Helper, MRI, MI);
++  // #320 packed-24: storing a packed far pointer VALUE (p3) writes 3 bytes (the p3
++  // is unmerged to bytes; the unmerge is folded against the producing cast/load).
++  {
++    LLT ValTy = MRI.getType(MI.getValueReg());
++    if (ValTy.isPointer() && ValTy.getAddressSpace() == MOS::AS_FarPacked)
++      return legalizePackedPtrAccess(Helper, MRI, MI);
++  }
+ 
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+   auto ValueType = MRI.getType(MI.getValueReg());
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+index ecbec72df6ff..6c3649f31761 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -85,6 +85,9 @@ private:
+                     GAnyLoad &MI) const;
+   bool legalizeStore(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                      GStore &MI) const;
++  // #320 packed-24: load/store of a packed far pointer VALUE (p3) as a 3-byte access.
++  bool legalizePackedPtrAccess(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                               GLoadStore &MI) const;
+   // #321 native s16 indirect load/store (one 16-bit op vs two 8-bit).
+   bool legalizeLoadStore16(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                            GLoadStore &MI) const;
+diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+index e12e5762211b..a1319c6e23ef 100644
+--- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
++++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+@@ -74,11 +74,13 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeMOSZeroPageAllocPass(PR);
+ }
+ 
+-// p2:32:8 — addrspace 2 ("far"): 32-bit pointer (only the low 24 bits are emitted as
+-// 65816 absolute-long; LLVM requires a power-of-two pointer size, so 32 not 24). Inert
+-// for 6502 — nothing creates addrspace-2 pointers unless built for the 65816. #320.
++// p2:32:8 — addrspace 2 ("far"): 32-bit pointer (only the low 24 bits are the 65816
++// absolute-long address; 32 not 24 because there is no MVT::i24, so far stays a simple
++// register/CC type). p3:24:8 — addrspace 3 ("packed far"): the 3-byte STORAGE form of a
++// far pointer (memory-only; converts to/from p2 at load/store). Both inert for 6502 —
++// nothing creates addrspace-2/3 pointers unless built for the 65816. #320.
+ static const char *MOSDataLayout =
+-    "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
++    "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
+ 
+ /// Processes a CPU name.
+ static StringRef getCPU(StringRef CPU) {
