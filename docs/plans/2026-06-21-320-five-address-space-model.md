@@ -462,10 +462,16 @@ pointer-trunc) + the s24 path has no rules. The 24-bit/3-byte granularity also b
 load-store) — each iteration a ~20-min toolchain rebuild.
 
 **Disposition (per project discipline — gate speculative high-effort work; debugging limit):** Increment
-A is the clean, landed-in-worktree result (the type + storage win + non-breaking). Increment B is the
-24-bit-width rabbit hole — **deferred** unless the user wants to invest in the s24-width work, since
-packed-24 is opt-in/speculative (no real far-pointer-table code creates pressure yet). Recipe + blocker
-recorded here so it's reconstructible. Worktree `wt/320-five-space` retains the live Increment A build.
+A is the clean, verified result (the type + storage win + non-breaking). Increment B is the 24-bit-width
+rabbit hole — **deferred until the F2 far-value work lands on `main`**: building packed-24 now (off
+pre-F2 `main`) would rebase onto post-F2 `main` later, and our edits overlap F2's exactly
+(`getPointerWidthV`, datalayout, the far legalizer rules); conceptually packed-24 is the 3-byte storage
+form of F2's now-storable far *value*, so it should extend that base, not race it. **Worktree
+`wt/320-five-space` TORN DOWN 2026-06-21** (`dev/worktree-teardown.sh`, 12G reclaimed) — durable
+artifacts kept on `main`: the Increment A patch
+([`docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch`](spikes/2026-06-21-320-packed24-incrementA.patch)),
+the fixtures ([`examples/65816/packed24/`](../../examples/65816/packed24/)), and this recipe+blocker —
+so packed-24 is reconstructible on the post-F2 base anytime.
 
 ---
 

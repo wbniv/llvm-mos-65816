@@ -51,14 +51,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   far-pointer-value-completion item above (NOT a null — the capability is wanted; the byte-packing is the
   premature part). Zero-bank ≈ a near pointer ⇒ marginal. **Update 2026-06-21 (user said build it):**
   measured the win = **25% storage** on far-ptr tables (16: 64→48 B) **but a ×3-index cost** (3-byte
-  elements) — opt-in so it never regresses non-users. **Increment A DONE on `wt/320-five-space`** (the
-  3-byte TYPE: `AS_FarPacked=3` + datalayout `p3:24:8` + clang width; `sizeof(packed*)==3`, table 48 B,
-  **corpus 7/7**). **Increment B (codegen to USE packed ptrs) BLOCKED on 24-bit width** — the `p2↔p3`
-  cast + `p3` load/store route through `s24`, which the backend doesn't legalize (only `s8/s16/s32`), and
-  the 3-byte granularity breaks 2-source merges. Genuine novel-s24-width GISel effort (multi-iteration,
-  ~20-min rebuilds) → **deferred** unless the s24 work is worth it for a speculative opt. Recipe+blocker:
-  [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md). Also remaining: post the
-  upstream note (C1 + pow2 + census) — user-triggered.
+  elements) — opt-in so it never regresses non-users. **Increment A DONE + verified** (the 3-byte TYPE:
+  `AS_FarPacked=3` + datalayout `p3:24:8` + clang width; `sizeof(packed*)==3`, table 48 B, **corpus 7/7**).
+  **Increment B (codegen to USE packed ptrs) BLOCKED on 24-bit width** — the `p2↔p3` cast + `p3`
+  load/store route through `s24`, which the backend doesn't legalize (only `s8/s16/s32`), and the 3-byte
+  granularity breaks 2-source merges. Genuine novel-s24-width GISel effort. **DEFERRED until the F2
+  far-value work lands on `main`** (avoid rebase/conflict — both touch `getPointerWidthV`/datalayout/far
+  legalizer; packed-24 = the 3-byte form of F2's now-storable far value). **Worktree torn down
+  2026-06-21** (12G reclaimed); durable artifacts on `main`: Increment A patch
+  `docs/plans/spikes/2026-06-21-320-packed24-incrementA.patch` + fixtures `examples/65816/packed24/` +
+  recipe in [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md). Also
+  remaining: post the upstream note (C1 + pow2 + census) — user-triggered.
   [plan](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the

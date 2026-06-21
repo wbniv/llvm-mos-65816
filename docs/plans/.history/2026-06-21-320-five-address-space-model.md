@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/008eab5) | #320 packed-24: Increment A DONE (3-byte type), Increment B blocked on 24-bit width |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/fe55a01) | #320 five-space: re-evaluate — far-data value type was BUILT by the F2 agent |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/05cda9c) | #320 far-value evidence: committed sample programs + compile results (proof) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/f84efcd) | #320 five-space: Phase 3 (cast/value-state matrix) + correct the verdict (defer, don't null) |
@@ -7,6 +8,11 @@
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/caef3e9) | #320 five-address-space model: plan + Phase 0 census (packed-24/zero-bank = measured nulls) |
 
 <!--history-meta v1
+008eab5	author	Will Norris
+008eab5	added	38
+008eab5	deleted	0
+008eab5	files	1
+008eab5	body	User directed building packed-24 (measure first). On wt/320-five-space (off main):\n- Increment A DONE + verified: the 3-byte packed-far TYPE (AS_FarPacked=3, datalayout\n  p3:24:8, clang getPointerWidthV case 3) -> sizeof(packed*)==3, table[16]==48 B (vs 64\n  for 32-bit far); corpus 7/7 (AS3 inert unless code creates an addrspace-3 ptr).\n- Increment B (codegen to USE packed ptrs) BLOCKED on 24-bit width: addrspacecast p2<->p3\n  + load/store p3 route through s24, which the backend doesn't legalize (only s8/s16/s32;\n  empirical "extend/truncate can not operate on pointers"), and 3-byte granularity breaks\n  2-source merges. Genuine novel-s24-width GISel effort -> deferred (speculative opt, no\n  real far-ptr-table pressure). Recipe + precise blocker recorded in the plan.\nMeasure: 25% storage win on far-ptr tables, but a x3-index cost (opt-in, no regression).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fe55a01	author	Will Norris
 fe55a01	added	47
 fe55a01	deleted	4
