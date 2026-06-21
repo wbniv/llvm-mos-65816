@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/d038c3a) | #320 five-space plan: expand 0a (representability) + tie it to the upstream #320 response |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/caef3e9) | #320 five-address-space model: plan + Phase 0 census (packed-24/zero-bank = measured nulls) |
 
 <!--history-meta v1
+d038c3a	author	Will Norris
+d038c3a	added	76
+d038c3a	deleted	13
+d038c3a	files	1
+d038c3a	body	Deepen the Phase 0a finding and inline how it reshapes our planned #320 post:\n- IR layer: exact DataLayout.cpp source — parseSize has no pow2 rule (only parseAlignment\n  does), getPointerSize=divideCeil(24,8)=3 bytes, getIntPtrType=i24. The note's "LLVM\n  requires power-of-two pointer sizes" is a misconception to retract.\n- Backend layer: the real reason far is 32-bit is MVT (no MVT::i24) — a register-class +\n  calling-convention plumbing convenience, not an IR limit. _BitInt(24) proves the\n  intra-function path; the MVT::i24 gap is the cross-function/stored cost.\n- Three axes (representable / cheaper-at-runtime / cheap-to-implement) + our corrected\n  upstream position (keep 32-bit far, defer space 3 on measurement not on a false pow2\n  premise) + the concrete note edits to stage before posting (do not post).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 caef3e9	author	Will Norris
 caef3e9	added	346
 caef3e9	deleted	0

@@ -1,8 +1,9 @@
 # #320 — the full five-address-space model (Option A → Option B)
 
-**Date:** 2026-06-21 · **Status:** PHASE 0 DONE (2026-06-21) — **Phases 1–2 closed as measured nulls**
-(packed-24 is *representable* but the opportunity is empty AND blocked; the real next work is
-front-end far-pointer value completeness, not new spaces). See *Phase 0 — results* below.
+**Date:** 2026-06-21 · **Status:** PHASE 0 + 3 DONE (2026-06-21). **New spaces (packed-24 #3, zero-bank
+#4) DEFERRED as premature** — but Phase 0 surfaced the genuinely **desirable, open** work they presuppose:
+**completing the far-pointer VALUE type** (storable in memory + correct `sizeof`), now promoted to its own
+item. (Verdict corrected after user pushback — see *Phase 0 — results › 0b verdict (corrected)*.)
 **Milestone:** M1 (#320) — the address-space layout consolidation
 **Builds on:** the shipped 3-space additive slice —
 [far codegen](2026-06-14-320-far-pointer-codegen.md) ·
@@ -236,18 +237,34 @@ calls (the backend reads the datalayout → `Imag32`), but the far pointer **can
 in C memory**: `sizeof` is wrong *and* `G_STORE p2` isn't legalized on `main` (the p2-value store/load
 support is unmerged — it lives in `0004` on `wt/320-far-cc`).
 
-**Verdict.** Packed-24 is a *3-byte stored* far pointer — but **storing far pointers in memory doesn't
-work at all yet** (backend store unmerged + clang `sizeof` wrong), and **no realistic code stores far
-pointers** regardless. So the opportunity is both empty (frame-ABI-style: measured, not assumed) and
-two prerequisites away from mattering. Zero-bank (AS4) is worse off — **0 users** (a bank-0 far
-pointer is just a near pointer; an interop-only convenience nobody calls for).
+#### 0b verdict (corrected, 2026-06-21 — after user pushback)
 
-**Both Phase 1 (packed-24) and Phase 2 (zero-bank) are closed as measured nulls.** The genuinely
-valuable next far-pointer work that this census surfaced is **front-end value completeness** — fix
-`getPointerWidthV` (`sizeof(far*)==4`), add aggregate/static-init support for far pointers, and merge
-`0004`'s `G_STORE`/`G_LOAD p2` — *then* far pointers can be stored at all. A 3-byte packing is only
-worth revisiting if/when real code accumulates tables of stored far pointers (the SNES banked-asset
-idiom) and the byte pressure is measured, not assumed.
+My first pass called this "an empty opportunity, close as a null." That conflated two different things
+and the reasoning was partly **circular**. Corrected:
+
+- **The new SPACES (packed-24 #3, zero-bank #4) defer — yes, but not because "nobody wants them."**
+  Packed-24 is a 3-byte *size-optimization of a far pointer stored in memory*, and **a far pointer
+  cannot be stored in memory at all yet** (the value-state matrix in *Phase 3 — results* confirms
+  store/load/array/struct all fail, under default *and* `+mos-a16`). You can't shave a byte off a
+  capability that doesn't exist. Zero-bank (#4) is functionally a near pointer. So the new *address
+  spaces* are premature/marginal — **sequenced behind the capability, not built speculatively.**
+- **The capability they presuppose is itself DESIRABLE, OPEN work — not a null.** The census's real
+  output is the discovery that the far pointer is a complete **address mechanism** (deref / load / store
+  / arithmetic / calls all work, `+mos-a16`-gated) but an **incomplete value type**: you cannot store it
+  in a global / array / struct, cannot take a correct `sizeof` (it reports 2, not 4), and pass/return
+  only works on the `0004` worktree. **"No code stores far pointers" is circular** — nothing stores them
+  because storing them is *broken*, not because there's no use for tables of banked-asset far pointers.
+  (Contrast the frame-ABI study, which was genuinely empty for a *structural* reason: locals live in
+  `__rc`, so there is no frame traffic to optimize. Here there is a real, wanted capability behind a
+  bug.)
+
+**So:** Phase 1 (packed-24) + Phase 2 (zero-bank) stay **deferred** (premature/marginal — not built),
+but the **far-pointer value-type completion** they exposed is **promoted to its own desirable M1 item**:
+fix `getPointerWidthV` (`sizeof(far*)==4`), legalize `G_STORE`/`G_LOAD p2` in memory + aggregate/
+static-init, the narrowing/cross-space casts (far→near, dp→near currently fail/segfault), and merge
+`0004`'s pass/return half. A 3-byte packing is revisited only **after** the 4-byte stored far pointer
+works and real banked-asset-table byte-pressure is measured — at which point it's a clean size-opt, not
+a speculative space.
 
 ### 0c — numbering posture: confirmed
 
@@ -328,6 +345,45 @@ absolute-long tax on every access.
   near-default (bytes + cycles), and **record the number** — this is the evidence the
   default-pointer-width decision needs. We do **not** flip the default; we hand the maintainers data.
 
+### Phase 3 — results (2026-06-21)
+
+Characterized on the current `main` toolchain (clang-23 @ `c798c31`, pre-F2 — F2 landed only in
+`wt/320-far-followups`), host-side, no vendor edits. Reproducible: **`dev/measure-far-ptr-value-state.sh`**
+(every probe run *both* default and `+mos-a16`, since the far value machinery is `+mos-a16`-gated).
+
+**3a — the cast / value-state matrix.** The 5×5 collapses to the implemented spaces (0 near, 1 DP, 2
+far; 3/4 don't exist). The matrix is **not "cleanly gated"** — several cells are broken, which is the
+*value-type* gap, not a clean spec:
+
+| operation | default | +mos-a16 |
+|-----------|---------|----------|
+| deref a constant far addr | OK | OK |
+| near→far cast + deref (transient) | no-legalize | **OK** (a16-gated) |
+| **store** far ptr → global | verify-FAIL | verify-FAIL |
+| **load** far ptr ← global | no-legalize | no-legalize |
+| **array** of far ptrs | no-legalize | no-legalize |
+| **struct** field far ptr | no-legalize | no-legalize |
+| far→near cast + deref | verify-FAIL | verify-FAIL |
+| dp→near cast + deref | SEGFAULT / verify-FAIL | verify-FAIL |
+| `sizeof(far*)` | **2** (want 4) | **2** (want 4) |
+
+So a far pointer is a **complete address mechanism** (transient deref/load/store/arith/calls work,
+`+mos-a16`-gated) but an **incomplete value type** (can't be stored, sized, or narrowed). The "illegal
+casts fail loudly" property the plan wanted is *partly* true (most fail to legalize — loud) but
+dp→near can **segfault** without `-verify-machineinstrs` — a real robustness bug, not a graceful
+diagnostic.
+
+**3b — far-default flag: BLOCKED, not built.** `-mfar-pointers` would make plain `T*` a far pointer
+module-wide — but the matrix shows a far pointer **can't yet be stored in memory or sized correctly**,
+so making it the default pointer would break every program that puts a pointer in a struct/array. 3b is
+therefore **gated on the far-pointer value-type completion** (below) and, being a clang change, must
+also coordinate with the in-flight `far`-attribute (F2) work. Deferred with that explicit dependency;
+no speculative build.
+
+**Phase 3 net:** the cast matrix is the durable spec, and it *confirms* the 0b reframe — the work worth
+doing is **completing the far-pointer value type**, after which 3a's broken cells close and 3b becomes
+measurable.
+
 ---
 
 ## Phase 4 — docs + upstream reconciliation
@@ -379,9 +435,10 @@ absolute-long tax on every access.
    (`parseSize` has no pow2 restriction; `getPointerSize=divideCeil(24,8)`=3 bytes) + empirically
    confirmed the backend carries a 24-bit value (`_BitInt(24)` compiles clean default + `+mos-a16`,
    verify-clean). `dev/measure-five-space-census.sh` 0a block. The note's pow2 premise is disproven.
-2. **0b census.** **PASS — NO-GO for both new spaces** (2026-06-21). Census: 0 far pointers stored in
-   memory; `sizeof(far*)==2` (clang gap); `G_STORE p2` crashes the legalizer on `main`. Opportunity
-   empty + blocked. `dev/measure-five-space-census.sh` 0b block. Phases 1–2 closed as measured nulls.
+2. **0b census.** **PASS — new spaces DEFERRED (premature), value-type completion OPENED** (2026-06-21).
+   Census: 0 far pointers stored in memory (circular — storing is broken); `sizeof(far*)==2` (clang gap);
+   `G_STORE p2` fails. `dev/measure-five-space-census.sh` 0b block. Packed-24/zero-bank deferred behind
+   the desirable far-pointer-value-completion work this surfaced (see *0b verdict (corrected)*).
 3. **Phase 1 (if GO):** `far_packed.c` round-trips a packed-24 far load/store across a bank boundary
    on MAME **and** bsnes-jg; the `sizeof` static-assert shows 3-byte storage; the census shape is
    measurably smaller than `AS_Far`. Corpus 7/7; differential clean; `-verify-machineinstrs` clean.

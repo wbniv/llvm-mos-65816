@@ -96,6 +96,10 @@ echo "      wrong in C (front-end), so the 4-byte form must be completed before 
 echo "      form could matter. zero-bank (AS4) likewise has 0 users (a bank-0 far pointer"
 echo "      is just a near pointer)."
 hr
-bold "OVERALL: Phase 1 (packed-24) + Phase 2 (zero-bank) = NO-GO — close as measured nulls."
-echo "The real next far-pointer work is front-end value completeness (sizeof(far*)==4 +"
-echo "aggregate/static-init support) + merging 0004's p2-value store/load — NOT new spaces."
+bold "OVERALL: the NEW spaces (packed-24, zero-bank) are premature — DEFER, don't build."
+echo "But this is NOT a dead end: a far pointer can't be STORED in memory at all yet (see"
+echo "dev/measure-far-ptr-value-state.sh), so packed-24 would optimize a capability that does"
+echo "not exist. The real, DESIRABLE M1 work this surfaced is completing the far-pointer VALUE"
+echo "type: sizeof(far*)==4 (getPointerWidthV) + G_STORE/G_LOAD p2 in memory + aggregates +"
+echo "narrowing casts + merge 0004's pass/return half. Build that first; revisit 3-byte packing"
+echo "only once stored far pointers work and real byte-pressure is measured."

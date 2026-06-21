@@ -21,23 +21,33 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [ ] **#320 five-address-space model — Phase 0 DONE; packed-24 (AS3) + zero-bank (AS4) CLOSED as measured
-  nulls.** asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/`3`=packed-24/`4`=zero-bank);
-  we ship 3 additive (`0`=near-default/`1`=DP/`2`=32-bit far). Far **capabilities** are all done
-  (data/calls/fn-ptrs/CC) — the model would add only upstream numbering + two size-opt spaces. **Two hard
+- [ ] **#320 complete the far-pointer VALUE type — DESIRABLE M1 work surfaced by the five-space census.**
+  A far pointer (`addrspace 2`) is today a complete *address mechanism* (deref/load/store/arith/calls all
+  work, `+mos-a16`-gated) but an **incomplete value type**: it **can't be stored in memory** (global /
+  array / struct-field store+load all fail under default AND `+mos-a16`), `sizeof(far*)==2` not 4 (clang
+  `getPointerWidthV` lacks `case 2: return 32`), narrowing casts far→near / dp→near fail (dp→near can
+  **segfault** w/o `-verify-machineinstrs`), and pass/return only works on `0004` (`wt/320-far-cc`).
+  Real banked-memory C *wants* tables of far pointers (banked-asset/jump tables) — they just can't be
+  written yet. **Scope:** (1) `getPointerWidthV` → `sizeof(far*)==4`; (2) legalize `G_STORE`/`G_LOAD p2`
+  in memory + aggregate/static-init; (3) the narrowing/cross-space casts (+ fix the dp→near segfault);
+  (4) merge `0004`'s pass/return half. Coordinate the clang side with the in-flight `far`-attribute (F2)
+  work. Evidence: `dev/measure-far-ptr-value-state.sh`.
+  [plan §Phase 3 results + 0b verdict](docs/plans/2026-06-21-320-five-address-space-model.md).
+- [ ] **#320 five-address-space model — Phase 0+3 DONE; new spaces (AS3 packed-24, AS4 zero-bank) DEFERRED
+  (premature, not nulls).** asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/
+  `3`=packed-24/`4`=zero-bank); we ship 3 additive (`0`=near-default/`1`=DP/`2`=32-bit far). **Two hard
   constraints:** (C1) one MOS datalayout shared with the 6502 ⇒ `0`=far-default is **architecturally
   foreclosed** (would break every 6502 pointer); "far by default" can only be a clang memory-model flag.
   (C2) `addrspace(2)`=far is load-bearing tree-wide ⇒ keep additive numbers, defer any rename to upstream.
-  **Phase 0 (2026-06-21, `dev/measure-five-space-census.sh`):** ~~0a representability~~ **GO** — a 24-bit
-  pointer is representable (the note's "LLVM needs pow2 pointer sizes" is **WRONG**: `parseSize` has no pow2
-  rule, `getPointerSize`=3 bytes) and the backend carries `_BitInt(24)`. But ~~0b census~~ **NO-GO**:
-  **0 far pointers are stored in memory** in real code, `sizeof(far*)==2` (clang `getPointerWidthV` lacks
-  `case 2:return 32`), and `G_STORE p2` **crashes the legalizer on main** (p2-value store/load is unmerged
-  in `0004`). So packed-24/zero-bank are empty AND blocked → **closed as nulls** (frame-ABI pattern). The
-  **real surfaced next work** (separate, higher value): front-end far-pointer value completeness —
-  `sizeof(far*)==4` + aggregate/static-init support + merge `0004`'s p2 store/load — coordinate with the
-  in-flight clang `far`-attribute (F2) work. Remaining on this item: post the upstream design note (the
-  C1 finding + corrected pow2 fact + census) — user-triggered.
+  **Phase 0 (`dev/measure-five-space-census.sh`):** ~~0a representability~~ **GO** — 24-bit IS representable
+  (the note's "LLVM needs pow2 pointer sizes" is **WRONG**: `parseSize` has no pow2 rule, `getPointerSize`=3
+  bytes; backend carries `_BitInt(24)`). The real far reason is `MVT` has no `i24` (plumbing, not an IR
+  limit). **0b/Phase 3:** packed-24 would size-optimize *storing a far pointer*, but **storing far pointers
+  doesn't work at all yet** → packed-24 optimizes a non-existent capability ⇒ **DEFER** behind the
+  far-pointer-value-completion item above (NOT a null — the capability is wanted; the byte-packing is the
+  premature part). Zero-bank ≈ a near pointer ⇒ marginal. Revisit 3-byte packing only after stored far
+  pointers work + measured byte-pressure. Remaining: post the upstream note (C1 finding + corrected pow2
+  fact + census) — user-triggered.
   [plan](docs/plans/2026-06-21-320-five-address-space-model.md).
 - [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
