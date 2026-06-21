@@ -72,6 +72,7 @@ build_rom far_call  mos-snes-far.cfg
 build_rom far_near_call mos-snes-far.cfg
 # #320 follow-up (a): far function pointers — far indirect call needs +mos-a16.
 build_rom far_fnptr mos-snes-far.cfg -Xclang -target-feature -Xclang +mos-a16
+build_rom far_fnptr_var mos-snes-far.cfg -Xclang -target-feature -Xclang +mos-a16
 
 # 3. Cross-check each ROM on bsnes-jg. Offset/len derived from the .map exactly
 # like the MAME path (dev/_emu.sh's _emu_map_lookup) — WRAM offset == symbol VMA.
@@ -101,6 +102,7 @@ xassert "$BUILD/far_store.sfc" "$BUILD/far_store.map" corpus_result 0xF3   # ban
 xassert "$BUILD/far_call.sfc"  "$BUILD/far_call.map"  corpus_result 0xF3   # bank $01, far call (JSL) + RTL return
 xassert "$BUILD/far_near_call.sfc" "$BUILD/far_near_call.map" corpus_result 0xE0 # bank $01 far -> near via __call_near_from_far (JSL thunk)
 xassert "$BUILD/far_fnptr.sfc" "$BUILD/far_fnptr.map" corpus_result 0xFF # bank $01 far FN PTR — indirect call via __call_indir_far (JSL -> jml (slot))
+xassert "$BUILD/far_fnptr_var.sfc" "$BUILD/far_fnptr_var.map" corpus_result 0xFF # bank $01 far FN PTR var — far_fn_t fp = far_leaf; fp(x) via __call_indir_far
 
 echo
 [ $rc -eq 0 ] && echo "RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)" \
