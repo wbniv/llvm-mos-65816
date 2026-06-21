@@ -24,6 +24,12 @@ clang front-end is complete: the **`far`/`long_call` attribute (F2)**, a **typed
 pre-existing `far_indir` compiler crash along the way). Pushed `origin/wt/320-far-followups`; **LANDED on
 `main` 2026-06-21** — the (a) work folded into `0001` (a16-free); the lone a16-context-entangled hunk
 (`MOSLegalizerInfo` PF-as-value) split into new **`0005`**; round-trip-proven to reproduce the verified tree.
+The far-pointer **data-value** residuals are **closed** (2026-06-22, [plan](plans/2026-06-22-320-far-value-residuals.md)):
+the **dp→near** case is a pre-existing **upstream** CC bug — an 8-bit `addrspace(1)` pointer *argument* gets a
+16-bit `RS` register → illegal `COPY` (reproduces on plain `mos6502`; filed upstream
+[`320-upstream-dp-arg-cc-issue.md`](320-upstream-dp-arg-cc-issue.md), no fork fix) — and **default-8-bit** far
+storage is un-legalized **by design** (the 32-bit far value's `s32↔bytes` bridge is `+mos-a16`-gated → a clean
+compile-time `unable to legalize` rejection, never a miscompile).
 
 **#321 (16-bit accumulator / M2):** the core codegen is complete. Every planned per-op optimization
 is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete re-open trigger. The

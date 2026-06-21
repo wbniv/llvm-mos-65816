@@ -59,13 +59,20 @@ express "far by default" is a **clang memory-model flag** that emits plain `T*` 
 `addrspace 0` keeps its 16-bit meaning. This reframes open decision #1 (below): treat the default as a
 front-end flag, and lead the argument with runtime cost now that the representability prop is gone.
 
-**3. The packed-24 space (proposal `3`): representable, but recommend deferring on measurement.** Its
-1-byte-per-pointer win lands *only* on far pointers **stored in memory** — and we measured that a far
-pointer **cannot be stored in memory at all yet**: `sizeof(far*)` reports 2 (not 4), and
-storing/loading a far pointer to a global/array/struct fails to legalize (both default and `+mos-a16`).
-So packed-24 would size-optimize a capability that doesn't exist; the prerequisite is **completing the
-far-pointer value type** (storable + correct `sizeof`), the real next far-*data* work. Defer space `3`
-until that lands and real stored-far-pointer byte-pressure is measured. **Space `4` (zero-bank) is a
+**3. The packed-24 space (proposal `3`): representable; was deferred on measurement, since BUILT.** Its
+1-byte-per-pointer win lands *only* on far pointers **stored in memory**. At drafting, a far pointer
+**couldn't be stored at all**: `sizeof(far*)` reported 2 (not 4), and storing/loading one to a
+global/array/struct failed to legalize — so packed-24 would have size-optimized a non-existent
+capability, and the prerequisite was **completing the far-pointer value type**. **That has since landed**
+(the far-pointer value type — storable + `sizeof==4` under `+mos-a16` — in `0001`+`0004`+`0005`,
+2026-06-21), and **packed-24 (space `3`) was then built** (`0006`) on a measured ~25 % win on stored
+far-pointer tables. Two residuals of the value-type work are now resolved (2026-06-22,
+[far-value residuals plan](plans/2026-06-22-320-far-value-residuals.md)): the **dp→near** case is
+a pre-existing **upstream** calling-convention bug — an 8-bit `addrspace(1)` (direct-page) pointer
+*argument* gets a 16-bit `RS` register → illegal `COPY` (reproduces on plain `mos6502`; filed upstream,
+[issue body](320-upstream-dp-arg-cc-issue.md)) — and **default-8-bit far storage** stays
+un-legalized **by design** (the 32-bit far value's `s32↔bytes` bridge is `+mos-a16`-gated, so 8-bit far
+storage is a clean compile-time `unable to legalize` rejection, never a miscompile). **Space `4` (zero-bank) is a
 measured null** (de-lumped census, 2026-06-22): it is bit-identical to a near pointer (16-bit storage,
 16-bit absolute access) and only adds far type-identity, so it saves **0 bytes of storage and 0 per
 access** versus a near pointer cast to far on demand. On a corpus + kernels + a bank-0-far-heavy probe,

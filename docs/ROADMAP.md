@@ -220,6 +220,11 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `far_sizeof` 4-way PASS — **all landed on `main` 2026-06-21** (`0001` a16-free + `0005` for the
    a16-context-entangled legalizer hunk; round-trip-proven). The far-pointer **calling convention** is also
    **DONE + landed** — all variants measured, **Imag32 won and shipped as `0004`** on `main` (2026-06-21).
+   The far-pointer **DATA-VALUE type** (store/load/array/struct a far pointer + `sizeof==4`) landed with the
+   same work (`0001`+`0005`, `+mos-a16`); its two residuals are **closed** (2026-06-22): the **dp→near** case
+   is a pre-existing **upstream** CC bug (an 8-bit `addrspace(1)` pointer *argument* → a 16-bit reg; filed
+   upstream, no fork fix), and **default-8-bit** far storage is un-legalized **by design** (the 32-bit value's
+   `s32↔bytes` bridge is a16-gated → a clean compile-time rejection).
    Of the five-address-space model, **AS3 packed-24** (the 3-byte far-ptr storage form for tables) is **built
    + landed** (`0006`, 2026-06-21/22, incl. the static-init table reloc fix; measured net win, break-even
    N≥1), and its **productionization thread is CLOSED** (2026-06-22): Task A measured + verified, Task B

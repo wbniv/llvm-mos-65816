@@ -2,10 +2,11 @@
 
 # #320 far-value residuals — the dp→near (DP-arg) upstream crash + default-8-bit far-ptr storage (a16-gated by design)
 
-**Status:** PLANNED (2026-06-22) · **Issue:** #320, ROADMAP M1 · **Type:** close-out, two parts.
-**(A)** draft + queue an **upstream issue** for the dp→near crash (no fork patch; posting user-triggered).
-**(B)** confirm default-8-bit far-ptr storage is **a16-gated by design**, record the evidence, **close** it.
-**No `0002` / codegen change in either part.**
+**Status:** DONE (executed 2026-06-22) · **Issue:** #320, ROADMAP M1 · **Type:** close-out, two parts.
+**(A)** upstream issue **drafted + queued** for the dp→near crash — *posting is user-triggered, not yet done*
+(no fork patch). **(B)** default-8-bit far-ptr storage **confirmed a16-gated by design and CLOSED** (no fork
+patch). **No `0002` / codegen change in either part.** See **## Outcome** + **## Verification** (6/6 PASS)
+below; both Residuals bullets on the M1 TODO item are now closed.
 
 This plan closes the two **Residuals** bullets on the M1 *#320 far-pointer DATA-VALUE type* TODO item. The
 desirable far-value work (store/load/array/struct a far pointer, `sizeof==4`, far→near cast) was **built by
