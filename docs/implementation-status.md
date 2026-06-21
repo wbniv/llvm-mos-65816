@@ -12,8 +12,9 @@ bank boundaries, **runtime far-pointer deref/cast/arithmetic (Inc 3 = 3a+3b+3c)*
 CALLS (JSL/RTL, Inc 4 Phase 1)**, and **mixed-banking far→near calls (via the `__call_near_from_far`
 thunk, shipped to `main` 2026-06-21)**, all on two emulators. The far-pointer calling convention is
 next — to be settled by **building every ABI variant and measuring** (no longer upstream-gated; ships
-as `0004`). The five-address-space model and **far function pointers** (front-end **LOCKED = F2** MOS
-`far` attribute; backend gated on `0004` reaching `main`) remain.
+as `0004`). The five-address-space model remains; **far function pointers (a)** are now **in progress** —
+the indirect-call **mechanism is built + verified** (IR-rep #1), with the p2-value path, the F2 front-end,
+and the e2e runtime gate still to land.
 
 **#321 (16-bit accumulator / M2):** the core codegen is complete. Every planned per-op optimization
 is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete re-open trigger. The
@@ -33,7 +34,7 @@ census short-circuited the build at the measurement step.
 | Five-address-space model + full PR | ⬜ Upstream-gated on design-note posting; not started |
 | Far calls (JSL / RTL) — direct call to a `.far_*` leaf in another bank | ✅ **Done (Inc 4 Ph1, 2026-06-20)** — `dev/run.sh far_call` + `xcheck`, MAME+bsnes-jg PASS; in `0001`. (far → far also already works — non-leaf JSL/RTL chains.) [plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) |
 | Mixed-banking — a far function calling a **near** function (`__call_near_from_far` thunk) | ✅ **Done + shipped to `main` (Inc 4 follow-up b, 2026-06-21, `5717f6b`)** — `lowerCall` routes far→near through the generic bank-0 thunk (`pea .Lback-1; jmp (__rc18); rtl`) reached by `JSL` (`0001`, HasW65816-gated, a16-free). `far_near_call == 0xE0` MAME+bsnes-jg, corpus 7/7, thunk `--gc-sections`'d from near ROMs (byte-identical). Lifts the "far must be leaf-or-far-only" constraint. [plan](plans/2026-06-21-320-far-calls-followups.md) |
-| Far function pointers — indirect call through a far code pointer (`__call_indir_far` / `jml [__rc18]`) | ⬜ **Inc 4 follow-up (a) — front-end LOCKED = F2** (MOS `far` attribute; clang forbids `address_space(2)` on fn types, `((far))` is MIPS-only). **Backend gated on `0004`** — forming/storing/returning a `p2` value crashes today (`G_TRUNC`/`G_UNMERGE`/`G_STORE` p2), the same p2-VALUE class the far-CC study ships as Imag32 in `0004-320-far-cc.patch` (not on `main` yet). Resumes on `wt/320-far-followups`. [plan](plans/2026-06-21-320-far-calls-followups.md) |
+| Far function pointers — indirect call through a far code pointer (`__call_indir_far`) | 🔧 **Inc 4 follow-up (a) — IN PROGRESS (mechanism built + verified, 2026-06-21, `560900c`)**. Layer-3 finding: a far fn ptr **can't** be a `ptr addrspace(2)` IR callee (LLVM forbids a non-program-addrspace callee; `addrspacecast p2→p0` drops the bank), so the 24-bit target is threaded via **IR-rep #1** — a `set_far_target` volatile store to a runtime slot `__mos_far_target` + `call @__call_indir_far`. `lowerCall` makes that a `JSL`; the stub `jml (__mos_far_target)` + the 4-byte slot verify clean on hand-authored i32-target IR. **Remaining (substantial):** (1) p2-value legalization (`ptrtoint(p2)→i32`/p2-param decompose crash; `&far_sym`→24-bit); (2) clang **F2** `far` attr + CodeGen; (3) e2e runtime gate. WIP on `wt/320-far-followups` (`0004` stacked); gated on `0004` reaching `main`. [plan](plans/2026-06-21-320-far-calls-followups.md) |
 | Far tail calls | ⬜ Separate follow-up — already conservative-safe (tail peephole keys on `JSR`, so a `JSL` is never tail-converted) |
 | Far-pointer calling convention (pass/return `p2`) | ⬜ **Inc 4 Phase 2 — build all ABI variants & measure** ([plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md); no longer upstream-gated; must ship one — tie → Imag32; reuses the frame-ABI harness) |
 | Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
@@ -44,8 +45,9 @@ census short-circuited the build at the measurement step.
 **M1 verdict:** load/store, runtime deref/cast/arithmetic, direct far calls, and mixed-banking far→near
 are all built and two-emulator verified. The far-pointer calling convention is **no longer
 upstream-gated** — it's a build-all-variants-and-measure task that ships as `0004`. Far function pointers
-(a) and the five-address-space model are the remaining frontier; (a)'s backend is gated on `0004`
-reaching `main`, and the five-address-space PR still waits on the design-note posting.
+(a) are **in progress** — the indirect-call mechanism is built + verified (IR-rep #1); the p2-value path,
+the F2 front-end, and the e2e gate remain, gated on `0004` reaching `main`. The five-address-space model
+is the other frontier; its PR still waits on the design-note posting.
 
 ---
 
@@ -216,9 +218,10 @@ work (the #320 far calling convention and xy16 ABI), tracked in *What's next* an
    harness. Lands as `0004` — the gate for far function pointers (a).
    [plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md)
 
-2. **#320 far function pointers (a)** — front-end LOCKED = F2 (MOS `far` attribute) + indirect
-   lowering (`__call_indir_far`); **unblocks once `0004` lands on `main`**, then resumes on
-   `wt/320-far-followups`. [plan](plans/2026-06-21-320-far-calls-followups.md)
+2. **#320 far function pointers (a)** — IN PROGRESS: the indirect-call mechanism is built + verified
+   (IR-rep #1: `set_far_target` slot + `__call_indir_far`→JSL + stub `jml`). Finish the (1) p2-value
+   legalization, (2) clang F2 `far` attr + CodeGen, (3) e2e runtime gate, on `wt/320-far-followups`
+   (gated on `0004` reaching `main`). [plan](plans/2026-06-21-320-far-calls-followups.md)
 
 3. **xy16 hardware-stack ABI** — the calling-convention implementation for 16-bit index-register
    mode. CC sub-decisions are all resolved; this is the remaining M2 codegen frontier.
