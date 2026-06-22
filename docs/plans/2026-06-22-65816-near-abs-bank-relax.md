@@ -140,6 +140,8 @@ the host-side disasm count of §3), and `packed24_table` confirms `0006`+`0007` 
 ## Status
 Fix DONE + verified (own-stack **and** full `0001–0007` combined stack, §5). Landed as `0007` and **pushed to
 `origin/main`** (`ff02726`), stacked cleanly on `0006` (disjoint files — `0007` touches only `MOSAsmBackend.cpp`).
+**Now folded into `main`'s local patch stack** (`0001`–`0007`, integrated via the 2026-06-22 merge); the
+toolchain in the `main` checkout was rebuilt clean from the stack and verified (corpus 7/7, far suite, `a16`).
 
 ### Follow-ups
 - ~~Belt-and-suspenders: re-run the full both-emulators gate on the combined `0001–0007` stack.~~ **DONE** (§5,

@@ -16,8 +16,9 @@ landed as **`0004`** on `main` (round-trip-proven byte-identical to the `wt/320-
 The five-address-space model is **measured-complete** — **AS3 packed-24** (the 3-byte far-ptr storage form)
 is **built + verified + landed (`0006`, 2026-06-21/22, incl. the static-init table reloc fix)**, its
 **productionization thread CLOSED** (2026-06-22: Task A measured, Task B = the general near-abs relaxation
-`0007`, Task C closed — no AS2 spelling to mirror), and **AS4 zero-bank = CONFIRMED measured-null**; only
-folding `0007` onto `main` + the upstream PR/note remain. **Far function pointers (a)** are now **FULLY DONE + LANDED (2026-06-21)** —
+`0007`, Task C closed — no AS2 spelling to mirror), and **AS4 zero-bank = CONFIRMED measured-null**. `0007`
+is now **folded onto `main`** (the stack is `0001`–`0007`; toolchain rebuilt + verified 2026-06-22), so only
+the upstream PR/note remain. **Far function pointers (a)** are now **FULLY DONE + LANDED (2026-06-21)** —
 the indirect-call mechanism, the full p2-value path, and `&far_fn`→24-bit land on the backend, **and** the
 clang front-end is complete: the **`far`/`long_call` attribute (F2)**, a **typed `far_fn_t` variable**
 (`far_fn_t fp = far_leaf; fp(x)`), and **`sizeof(far*)==4`** — all e2e-verified on both emulators (a fixed a

@@ -230,8 +230,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    N≥1), and its **productionization thread is CLOSED** (2026-06-22): Task A measured + verified, Task B
    (byte-2 absolute-long cost) built as the general near-abs relaxation **`0007`** (not packed-specific),
    Task C (`__far_packed` spelling) closed — no AS2 spelling to mirror. **AS4 zero-bank = CONFIRMED
-   measured-null** (2026-06-22) ⇒ all five spaces measured, the model is **complete**; only folding `0007`
-   onto `main` + the upstream PR/note remain.
+   measured-null** (2026-06-22) ⇒ all five spaces measured, the model is **complete**. `0007` (the near-abs
+   relaxation) is now **folded onto `main`** — the patch stack is `0001`–`0007` — so only the upstream PR/note remain.
    The **near/far "code model"** is settled too (2026-06-22): near (`JSR`/`RTS`, `CodeModel::Small`, 2-byte
    fn ptr) is the default and far is per-symbol opt-in, so **no `-mcmodel` codegen mode** is warranted; the
    SNES near-code budget (`$8000–$FFAF` = 32688 B) is now an **enforced link-time contract** — `platforms/snes`

@@ -126,11 +126,12 @@ repo root with the SDK built (`mos-snes.cfg` / `mos-snes-far.cfg` present).
    far_store  RESULT: PASS == 0xF3   far_arith  RESULT: PASS == 0xF3
    ```
    **PASS** — the `snes-far` bank-$00 carve is correct; `romhdr` + `rom_1` coexist; bank-$01 far
-   placement is unaffected. (`far_near_call` FAILS, but it is **PRE-EXISTING on clean main HEAD**,
-   *not* this change: proven by stashing the carve + rebuilding the original `link.ld` → the test
-   fails identically, the compiler emitting `jsr near_helper` (a near call) instead of
-   `jsl __call_near_from_far`, so the thunk is gc-dropped. A link-time script cannot change
-   compile-time instruction selection — unrelated codegen issue, out of scope here.)
+   placement is unaffected. (`far_near_call` failed at verification time, but it was **a stale install**,
+   *not* this change: proven by stashing the carve + rebuilding the original `link.ld` → the test failed
+   identically, the compiler emitting `jsr near_helper` (a near call) instead of `jsl __call_near_from_far`,
+   so the thunk was gc-dropped. A link-time script cannot change compile-time instruction selection. The
+   installed `mos-clang` (2026-06-20) predated the far→near routing (`5717f6b`, 2026-06-21); **a later clean
+   `dev/run.sh toolchain` rebuild from the `0001`–`0007` stack restored it to `far_near_call == 0xE0`.**)
 
 3. **Overflow fails loudly with a clear, region-named, byte-quantified error.** Compile a deliberately
    oversized program against `snes` — an initialized `const` array large enough to push bank-$00 ROM past

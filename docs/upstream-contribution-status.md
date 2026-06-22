@@ -196,7 +196,7 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
   measured + verified, Task C (`__far_packed` spelling) closed (no AS2 spelling to mirror), and Task B (byte-2
   absolute-long cost) is the near-abs bank-relaxation `0007` — its plan is literally "the realization of Task
   B". That separate optimization (`0007`, near globals → `abs` not `abs-long`, for ALL near pointers) is built
-  on `wt/320-near-abs-bank-relax`, not yet folded onto `main`'s patch stack:
+  on `wt/320-near-abs-bank-relax`, **now folded onto `main`'s patch stack** (`0001`–`0007`, 2026-06-22):
   - **far calls (b):** far→near mixed-banking via the bank-0 thunk `__call_near_from_far` (shipped to `main`).
   - **far function pointers (a):** the p2-value sub-project (Layers 1–3 + Gap A/B), the `jsl __call_indir_far`
     indirect-call mechanism, **and the clang front-end (F2):** a MOS **`far`/`long_call`** function/type
