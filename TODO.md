@@ -1030,4 +1030,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "upstream paragraph posting" -> user-triggered, already drafted in-plan + folded into upstream-status.
      Fingerprints ledgered; deleted permanently. Nothing open here.
      fp:ceeea11785514bd6 fp:15f2dd1d2684d2f2 fp:c49fd89e43e4867a fp:5c1003efe2386b53 fp:a2954d6096e3b85c -->
+<!-- triaged 2026-06-22: all three 2026-06-22-65816-near-abs-bank-relax.md follow-ups handled — the two
+     "Belt-and-suspenders … full 0001-0007 gate" bullets are DONE (§5: combined-stack gate all green on
+     both emulators 2026-06-22); "Upstreamable (generic llvm-mos 65816 size fix)" is a future
+     user-triggered candidate recorded in the plan's §Status Follow-ups (not yet a drafted artifact, so
+     not queued in upstream-contribution-status.md). Nothing open to track here.
+     fp:92f89fa0e9b5b7fe fp:61d02e85f1ef111f fp:e9d664a8ba74dadc -->
 <!-- END auto-captured-deferrals -->

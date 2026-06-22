@@ -1,0 +1,28 @@
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
+index 9389a4291b3e..3b69550a7064 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
+@@ -174,6 +174,23 @@ bool MOSAsmBackend::fixupNeedsRelaxationAdvanced(const MCFragment &F,
+   if (Sec->getFlags() & ELF::SHF_MOS_ZEROPAGE)
+     return false;
+ 
++  // #320 65816: bank relaxation (Absolute -> AbsoluteLong) grows a 16-bit
++  // absolute access into a 24-bit absolute-long one. It is only ever needed when
++  // the symbol lives in a non-zero bank. A NEAR (bank-0) symbol accessed via
++  // plain absolute addressing must stay 16-bit: the compiler emits the explicit
++  // long form (LDA/STA AbsoluteLong, for address_space(2) / .far_* data via
++  // G_LOAD_FAR_ABS) whenever it genuinely needs a far access, so a plain-symbol
++  // Absolute is by construction a near access — valid under the DBR=0 contract,
++  // the same invariant the STX/STY near abs-stores already depend on (X/Y have
++  // no long form to relax to, which is why only the A-register path bloats).
++  // Only banked sections (.far*) need the abs->long growth (e.g. a hand-written
++  // `lda farsym`, where relaxing to long is the safe/correct choice regardless
++  // of bank). Gate conservatively: an unknown/non-ELF section already returned
++  // true above, so a misclassification can only MISS the size win, never emit a
++  // wrong-bank access.
++  if (BankRelax && !Sec->getName().starts_with(".far"))
++    return false;
++
+   return !MOS::isZeroPageSectionName(Sec->getName());
+ }
+ 

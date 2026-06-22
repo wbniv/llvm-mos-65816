@@ -38,11 +38,12 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM" >/dev/null
 printf '    %-12s %6s bytes\n' a16chainld.sfc "$(stat -c%s "$ROM")"
 
 rc=0
-echo "==> disasm gate: the 4-term chain threads through A16 — adc abs (6f) per term, and"
+echo "==> disasm gate: the 4-term chain threads through A16 — adc abs (6[df]) per term, and"
 echo "    NO intermediate Imag16 round-trip (only ONE sta zp = the reused result)."
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-nadcabs=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*6f\b' || true)  # adc abs/long
+# 6d (abs) since the 0007 near-abs relaxation fix; 6f (long) pre-fix or for far. [df] = both.
+nadcabs=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*6[df]\b' || true)  # adc abs/long
 nstazp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*85\b' || true)   # sta zp (Imag16)
 echo "  adc-abs=$nadcabs  sta-zp=$nstazp"
 [ "$nadcabs" -ge 3 ] && echo "  PASS: $nadcabs adc abs — each chain term read directly (4-term chain)" || { echo "  FAIL: expected >=3 adc abs, got $nadcabs"; rc=1; }

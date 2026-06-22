@@ -37,19 +37,22 @@ printf '    %-12s %6s bytes\n' a16mixfold.sfc "$(stat -c%s "$ROM")"
 
 rc=0
 echo "==> disasm gate: the global (a16v) is read directly in each of the 6 mixed ops —"
-echo "    lda abs/long (af) as LHS, or adc/sbc/and/ora/eor abs/long (6f/ef/2f/0f/4f) as"
+echo "    lda abs/long (a[df]) as LHS, or adc/sbc/and/ora/eor abs/long (6/e/2/0/4 [df]) as"
 echo "    operand — and is NEVER materialized into an Imag16 pair (lda abs; sta zp); the"
 echo "    only such round-trip is loc's one-time init from seed."
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-# Count, over the instruction stream: lda-abs (af), abs-long ALU ops, and the
-# `lda abs; sta zp` (af immediately followed by 85) materialization adjacency.
+# Count, over the instruction stream: lda-abs (a[df]), abs/long ALU ops, and the
+# `lda abs; sta zp` (a[df] immediately followed by 85) materialization adjacency.
+# Both the absolute (Xd) and absolute-long (Xf) forms count: a near-global operand reads
+# as abs since the 0007 near-abs relaxation fix (was long pre-fix); the gate only cares
+# the global is read DIRECTLY (in place), not which relaxation form it took.
 read -r ldabs absalu mat < <(printf '%s\n' "$DIS" | awk '
   /^[[:space:]]*[0-9a-f]+:[[:space:]]*[0-9a-f][0-9a-f] / {
     line=$0; sub(/^[^:]*:[ \t]*/,"",line); op=substr(line,1,2);
-    if (prev=="af" && op=="85") mat++;
-    if (op ~ /^(6f|ef|2f|0f|4f)$/) absalu++;
-    if (op=="af") ldabs++;
+    if ((prev=="af"||prev=="ad") && op=="85") mat++;
+    if (op ~ /^(6[df]|e[df]|2[df]|0[df]|4[df])$/) absalu++;
+    if (op=="af"||op=="ad") ldabs++;
     prev=op;
   }
   END { printf "%d %d %d\n", ldabs+0, absalu+0, mat+0 }')

@@ -38,11 +38,12 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM" >/dev/null
 printf '    %-12s %6s bytes\n' a16chainimm.sfc "$(stat -c%s "$ROM")"
 
 rc=0
-echo "==> disasm gate: each chain reads globals via adc abs (6f) and folds its constant"
+echo "==> disasm gate: each chain reads globals via adc abs (6[df]) and folds its constant"
 echo "    via adc #imm (69), threading through A16 (no per-add Imag16 round-trip)."
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
-nadcabs=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*6f\b' || true)  # adc abs/long
+# 6d (abs) since the 0007 near-abs relaxation fix; 6f (long) pre-fix or for far. [df] = both.
+nadcabs=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*6[df]\b' || true)  # adc abs/long
 nadcimm=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*69\b' || true)  # adc #imm16
 nstazp=$(printf '%s\n' "$DIS" | grep -ciE '^\s*[0-9a-f]+:\s*85\b' || true)   # sta zp (Imag16)
 echo "  adc-abs=$nadcabs  adc-imm=$nadcimm  sta-zp=$nstazp"
