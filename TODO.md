@@ -99,8 +99,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 - [ ] **#320 far tail calls** — separate, low-priority follow-up; already conservative-safe (the
-  tail-call peephole keys on `MOS::JSR`, so a `JSL` far call is never tail-converted). An optimization,
-  not a correctness gap. [plan](docs/plans/2026-06-21-320-far-calls-followups.md).
+  tail-call peephole `MOSLateOptimization::tailJMP` keys on `MOS::JSR`/`RTS`, so a far `JSL`/`RTL` tail is
+  never converted). An optimization, not a correctness gap. **Plan written 2026-06-22** (design
+  adversarially verified, all claims confirmed, no stack-corruption case): add a `TailJML` pseudo
+  (→ `JMP_AbsoluteLong` `$5C`, `R_MOS_ADDR24`) + a far arm `JSL <far global>; RTL → TailJML`, gated
+  direct-far-global-only so near→far (`JSL;RTS`) and the bank-0 thunks (external symbols) are auto-excluded;
+  −1 B + push/pop saved per far tail. Ready to pick up on `wt/320-far-tailcall`.
+  [plan](docs/plans/2026-06-22-320-far-tail-calls.md) ·
+  [origin](docs/plans/2026-06-21-320-far-calls-followups.md).
 ### M2 — Optimizing Payoff
 
 - [x] **#321 native s16 — 16-bit comparison follow-ups — DONE 2026-06-21, track CLOSED.** ([plan](docs/plans/2026-06-21-321-native-s16-comparison-followups.md)) Compare surface measured ~complete (`dev/measure-compare-surface.sh`): everything native except the optimal byte-wise register-resident equality. The one open lever — the **ordering-as-value branchless carry-tail** (`zext(sbc-carry)`→`G_UADDE(0,0,carry)` in `legalizeZExt`) — was **BUILT + measured net-negative in realistic context** (correct + leaf-win real `uge_v` 25→19 + default byte-identical 75/75, but the 8-bit `adc` tail's `sep` breaks 16-bit runs: a16cmpaudit **+262 B** rep/sep-churn + `eor` inversions; c-torture 56 progs net≈0 **with** a +5 B regression) → **WON'T-DO** (the select-diamond is the ambient-16-bit optimum; clean gating infeasible — the cost is ambient-mode-dependent, invisible at legalize time). Classic lesson #1 leaf→ambient flip; spike on `wt/321-cmpval` (un-landed). **The mode-matched 16-bit-`rol` follow-up form (separate [banked plan §0a](docs/plans/2026-06-21-321-ordering-value-branchless-banked.md) — a real `ROLAcc16`/`LDAImm16`/`G_CARRY_BOOL16` materialization, `lda #$0000; rol a` at M16) was ALSO BUILT + measured 2026-06-21 → REGRESSES HARDER than v1: a16cmpaudit +654 B (both-widths) / +78 B (s16-direct-gated), whole a16 corpus +340 B with ZERO programs improving → WON'T-DO. Both 8-bit AND 16-bit forms closed: the select-diamond folds inversion free, its M8 tail matches ambient mode, and it keeps the boolean in `X` (not an `Imag16` ZP slot that cascades to spills). Deferred lever = mode-agnostic post-REPSEP pseudo (uncertain/partial upside, delicate REPSEP work — not pursued).** (unsigned ordering, ~~(a) equality `== !=`~~,
