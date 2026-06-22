@@ -14,7 +14,7 @@ this file (see `.history/`).
 |---|---|---|
 | **(b) mixed-banking: far → near** | ✅ **DONE + SHIPPED to `main`** (`5717f6b`), verified both emulators | `main` |
 | **(a) far function pointers** | ✅ **DONE — backend + clang F2 + e2e VERIFIED both emulators** (2026-06-21) — the full p2-value sub-project (Layer 3 + Gap A + Gap B) **and** the clang `far`/`long_call` attribute (F2) are complete; a **single-file C** far-fn-ptr call (`far_leaf(0x5A)`, no asm / no `.set`) works end-to-end on real silicon. | worktree `vendor/` |
-| **(c) far tail calls** | ⛔ out of scope (separate; already conservative-safe) | — |
+| **(c) far tail calls** | ✅ **DONE — built + verified both emulators** (2026-06-22, own plan + worktree `wt/320-far-tailcall`) — `TailJML` pseudo + a far arm `JSL <far global>; RTL → TailJML` ($5C); far→far tail folds 5 B→4 B. [plan](2026-06-22-320-far-tail-calls.md) | `0001` (worktree) |
 
 **(a) is now fully closed** — the clang **F2** front-end (the `far`/`long_call` attribute + call-rewrite)
 landed on the worktree 2026-06-21 and the e2e was rewritten to the clean single-file surface

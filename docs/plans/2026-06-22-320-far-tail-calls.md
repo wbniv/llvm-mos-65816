@@ -1,6 +1,8 @@
 # #320 far tail calls — PLAN
 
-**Date:** 2026-06-22 · **Issue:** #320 (M1, far pointers/calls) · **Status:** PLAN (not started) ·
+**Date:** 2026-06-22 · **Issue:** #320 (M1, far pointers/calls) · **Status:** ✅ **DONE + verified both
+emulators** (built on `wt/320-far-tailcall`; regenerated into `0001` there + round-trip-proven; landing to
+`main`'s shared `vendor/` is the pending follow-up; §6 has the pasted evidence) ·
 **Builds on:** Inc 4 Ph1 direct `JSL`/`RTL` far calls (landed in `0001`) + follow-up (b) far→near thunk.
 **Supersedes the out-of-scope `(c)` stub in** [`2026-06-21-320-far-calls-followups.md`](2026-06-21-320-far-calls-followups.md) §0/§8.
 
@@ -230,48 +232,42 @@ and `grep -c TailJML patches/llvm-mos/0001-*.patch` must be `>0`. Confirm `0001`
 ## 5. Test plan
 
 Far calls are **a16-independent** (8-bit values, A/X CC), so the differential is
-`host == mosw65816@MAME == mosw65816@bsnes-jg` (no `+mos-a16` leg needed) — model on `far_near_call`.
+`host == mosw65816@MAME == mosw65816@bsnes-jg` — model on `far_near_call`. *(As built, the harness also
+exercises the `+mos-a16` build as a host-side `-verify`/disasm leg — the fold is a pure post-RA opcode swap
+with no accumulator-mode reference, so this proves mode-independence cheaply without a second ROM.)*
 
 ### 5a. Positive test — `examples/65816/far_tail.c` + `dev/far_tail.sh` (new)
 
-A far function that **tail-calls another far function directly** — the one shape the new arm converts:
+Two complementary `.far_text` shapes (both bank `$01`). The first is the minimal demonstrator; the second
+makes **execution** target-sensitive and covers multiple tail-blocks per function (added after the post-impl
+review flagged the original single-leaf test as execution-insensitive — see §8):
 
-```c
-// #320 far tail calls -- a FAR function (bank $01) tail-calls ANOTHER far function.
-// far->far already works (JSL far_inner; far_outer returns RTL); this proves the late
-// peephole rewrites that adjacent `JSL far_inner; RTL` into a direct long jump
-// `jmp.l far_inner` ($5C TailJML): far_inner runs and its own RTL pops main's 3-byte
-// JSL return, landing back in main (tail-call style) -- no redundant push/pop, -1 B.
-// a16-INDEPENDENT (8-bit values).
-#include <stdint.h>
-volatile uint8_t corpus_result;
-volatile uint8_t seed;
+- **`far_outer(x) → far_addk(x)`** — a *single* far→far tail. Folds `jsl`(4)+`rtl`(1) = **5 B → 4 B** (one
+  `$5C` long jmp). The size/disasm demonstrator.
+- **`far_pick(s, x): if (s) return far_addk(x); return far_xork(x);`** — a *conditional* with **two**
+  far-tail blocks tail-calling two leaves that return **distinct** values (`far_addk` = `+0x11`, `far_xork` =
+  `^0x5A`). Both blocks fold to `$5C`; block A is adjacent to block B by construction, so a **broken block-A
+  tail jump falls through to block B** and yields `far_xork`'s value instead — a *wrong* `corpus_result`, not
+  a silent pass. This is what makes execution discriminate the jump target (the leaves share bank `$01`, so
+  adjacency/fall-through is the realistic mis-lowering execution can catch within one bank; the disasm gate
+  separately proves the `$5C` form).
 
-__attribute__((section(".far_text"), noinline)) static uint8_t far_inner(uint8_t x) {
-  return (uint8_t)((x + 0x11) ^ 0x5A);
-}
-__attribute__((section(".far_text"), noinline)) static uint8_t far_outer(uint8_t x) {
-  return far_inner(x);             // pure far->far tail call -> JSL far_inner; RTL -> TailJML
-}
-int main(void) {
-  seed = 0xA9;                     // (0xA9 + 0x11) ^ 0x5A = 0xBA ^ 0x5A = 0xE0
-  corpus_result = far_outer(seed);
-  for (;;) {}
-}
-```
+`main`: `corpus_result = far_pick(1, far_outer(0xA9))` → path A → `far_addk(0xBA)` = **`0xCB`** (a broken
+block-A jump would fall through to `far_xork(0xBA)` = `0xE0`).
 
 `dev/far_tail.sh` (model on `dev/far_near_call.sh`), gates in order:
 
-1. **compile+link** `--config mos-snes-far.cfg -mcpu=mosw65816 -Os -mllvm -verify-machineinstrs` → clean.
-2. **disasm gate (the optimization fired):** in `far_outer`'s body (`llvm-objdump -dr`), assert a **long
-   `jmp` to `far_inner` carrying `R_MOS_ADDR24`** is present **and** there is **no `jsl` to `far_inner`** and
-   **no `rtl` in `far_outer`** (the `JSL`+`RTL` were folded into the `$5C` tail jump). Belt: `far_inner`
-   still has its own `rtl`; `main` has `jsl far_outer`. *(Distinguish the `$5C` long `jmp` from a near `$4C`
-   `jmp` by the `R_MOS_ADDR24` reloc / 24-bit operand — see §2 gotcha; `jml` is `$DC`, the wrong instr.)*
-3. **link gate:** `far_outer` and `far_inner` placed in bank `$01` (`$018000–$01FFFF`) via the `.map`.
-4. **execution gate:** boot in MAME, assert `corpus_result == 0xE0` (value folded `main→far_outer→far_inner`,
-   returned by `far_inner`'s `RTL` straight to `main`). Close with `emu_verdict` (bsnes-jg confirms via
-   `dev/run.sh xcheck`).
+1. **compile+link + a16 leg** `--config mos-snes-far.cfg -mcpu=mosw65816 -Os -mllvm -verify-machineinstrs` →
+   clean; **plus** a `+mos-a16` host compile (`-verify` clean + `far_outer` still folds to `$5C`).
+2. **disasm gate (the optimization fired):** `far_outer` = exactly **one** long `jmp` carrying
+   `R_MOS_ADDR24` into `.far_text`, **no `jsl`, no `rtl`**; `far_pick` = **two** long `jmp`s + two
+   `R_MOS_ADDR24`, no `jsl`/`rtl`; `far_addk` and `far_xork` each keep their **own `rtl`**. *(Distinguish the
+   `$5C` long `jmp` from a near `$4C` `jmp` by the `R_MOS_ADDR24` reloc — the `R_MOS_ADDR24` + `.far_text`
+   conjunction is the load-bearing discriminator, not the bare `jmp` token; see §2. `jml` is `$DC`, the wrong
+   instr. The reloc names the **section** `.far_text+N`, not the static symbol.)*
+3. **link gate:** all four far functions placed in bank `$01` (`$018000–$01FFFF`) via the `.map`.
+4. **execution gate:** boot in MAME, assert `corpus_result == 0xCB`. Close with `emu_verdict` (bsnes-jg
+   confirms via `dev/run.sh xcheck`).
 
 Wire into `dev/run.sh` dispatch (+ usage string) and `dev/xcheck.sh` (the bsnes-jg leg), mirroring
 `far_near_call`.
@@ -294,41 +290,85 @@ The §5a positive e2e + §5b negative assertion are the coverage; both run on **
 
 ## 6. Verification steps
 
-Run after implementing on the worktree (`cd` to the worktree; `dev/run.sh toolchain` **and** `dev/run.sh
-build` — far needs the SDK rebuilt for `platforms/snes*`). Paste raw output under each step + PASS/FAIL,
-write back here, then promote the TODO `[verify]` → `[x]`.
+Run on the worktree `wt/320-far-tailcall` (compiler-changing: own `vendor/` + `cp -a` warm `build/`; the
+incremental rebuild took — `clang-23` mtime advanced, `MOSLateOptimization.cpp.o` recompiled referencing the
+new `MOS::TailJML`, so tablegen regenerated the pseudo). The warm-copied SDK already had `mos-snes-far.cfg`
++ `__call_near_from_far`, so no SDK rebuild was needed for this compiler-only change. **All six steps
+executed 2026-06-22 — all PASS.**
 
-1. **MIR-verify clean (positive):**
-   `dev/run.sh far_tail` (or host: `mos-clang … -mllvm -verify-machineinstrs -c far_tail.c`) — exit 0.
+1. **MIR-verify clean (positive), default AND `+mos-a16`:** `dev/run.sh far_tail` compile+link with `-mllvm
+   -verify-machineinstrs` clean, plus a `+mos-a16` host leg (the optimization is a16-independent).
 
-   _(output / PASS|FAIL here)_
+   ```
+   ==> compile+link .../far_tail.c -> far_tail.sfc  (--config mos-snes-far.cfg -mcpu=mosw65816 -Os)
+   /work/build/far_tail.sfc: size=64KiB ...
+   ==> a16 gate: the fold is accumulator-mode-independent (-verify clean + still $5C under +mos-a16)
+     PASS: +mos-a16 compile + -verify-machineinstrs clean
+     PASS: far_outer folds to a long jmp ($5C) under +mos-a16 too (a16-independent)
+   ```
+   **PASS.**
 
-2. **Disasm gate — the tail conversion fired:** `far_outer` long-`jmp`s to `far_inner` (`R_MOS_ADDR24`), no
-   `jsl far_inner`, no `rtl` in `far_outer`; `far_inner` keeps its `rtl`. (Part of `dev/run.sh far_tail`.)
+2. **Disasm gate — the conversion fired (both shapes):** `far_outer` = one `$5C` long `jmp` (`R_MOS_ADDR24`
+   into `.far_text`, no `jsl`/`rtl`); `far_pick` = **two** `$5C` folds (its two far-tail blocks); the leaves
+   keep their own `rtl`. `far_outer` went `jsl`(4)+`rtl`(1) = **5 B** → long `jmp`(4) = **4 B** (the predicted
+   **−1 B**).
 
-   _(output / PASS|FAIL here)_
+   ```
+     PASS: far_outer = one long jmp into .far_text (TailJML $5C); no jsl/rtl
+     far_pick: long-jmp count=2  R_MOS_ADDR24 count=2
+     PASS: far_pick's TWO far-tail blocks both folded to long jmps; no jsl/rtl
+     PASS: far_addk keeps its own rtl
+     PASS: far_xork keeps its own rtl
+   ```
+   (Raw `far_outer`: `0: 5c 00 00 00  jmp  ... R_MOS_ADDR24 .far_text+0x11`.) **PASS.**
 
-3. **Execution differential (positive):** `corpus_result == 0xE0` on **MAME** (`dev/run.sh far_tail`) **and
-   bsnes-jg** (`dev/run.sh xcheck`). Host computes `0xE0`.
+3. **Execution differential (positive):** `corpus_result == 0xCB` on **MAME** and **bsnes-jg** (host computes
+   `0xCB` = `far_pick(1, far_outer(0xA9))`; a broken block-A tail jump would fall through to `far_xork` →
+   `0xE0`, so this value proves the jump target, not just stack-balance).
 
-   _(output / PASS|FAIL here)_
+   ```
+   # MAME (dev/run.sh far_tail):
+   SMOKE: PASS addr=0x7E0202 len=1 got=0xCB (ran 60 ticks)
+   RESULT: PASS — far->far tail calls folded to long jmps (TailJML $5C); far_pick took path A and
+                  far_addk's RTL returned past far_pick to main; value == 0xCB
+   # bsnes-jg (dev/run.sh xcheck):
+   PASS  far_tail.sfc: SMOKE: PASS off=0x202 len=1 got=0xCB (ran 180 frames, bsnes-jg)
+   RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)
+   ```
+   **PASS** (both emulators agree).
 
-4. **Negative gate — thunk NOT converted:** `dev/run.sh far_near_call` still PASSes `0xE0` **and** the new
-   assertion confirms `far_caller` keeps `jsl __call_near_from_far` + `rtl` (no long `jmp` to the thunk).
+4. **Negative gate — thunk NOT converted:** `dev/run.sh far_near_call` still PASSes `0xE0`, and the new
+   assertion confirms `far_caller`'s `JSL __call_near_from_far; RTL` is **left intact** (the thunk is an
+   external symbol → `isGlobal()` false → excluded).
 
-   _(output / PASS|FAIL here)_
+   ```
+     PASS: far_caller keeps JSL __call_near_from_far + its own RTL (far->near thunk tail NOT converted)
+   RESULT: PASS — far->near mixed-banking call via __call_near_from_far (JSL); ... value == 0xE0
+   ```
+   **PASS.**
 
 5. **Regression — far suite + corpus + fuzzer green, default build inert:**
-   `dev/run.sh corpus` (7/7); the far suite (`far`, `far-bank1`, `far_call`, `far_cast`, `far_indir`,
-   `far_arith`, `far_store`, `far_near_call`, `far_fnptr`); `dev/run.sh fuzz 50 1` (0 mismatch — proves the
-   peephole is inert for all non-far code, since the fuzzer compiles every program default **and** a16).
 
-   _(output / PASS|FAIL here)_
+   ```
+   far_near_call: PASS (0xE0) | corpus: 7/7 passed | far: PASS | far-bank1: PASS (0xF3)
+   far_call: PASS (0xF3) | far_cast: PASS (0xF3) | far_indir: PASS (0xF3)
+   far_arith: PASS (0xF3) | far_store: PASS (0xF3)
+   xcheck (bsnes-jg, all 12 far ROMs incl. packed24_e2e/packed24_table): RESULT: PASS
+   csmith fuzz 50 1: 45/50 PASS, 0 xfail, 5 skip  (0 mismatch, 0 crash, 0 error)
+   ```
+   **PASS** — the fuzzer compiles every program default **and** a16 and finds 0 mismatch, proving the
+   peephole is inert for all non-far code (it never emits `.far_text`, so the far arm never fires and the
+   near arm is byte-unchanged).
 
-6. **Patch hygiene:** `grep -c TailJML patches/llvm-mos/0001-*.patch` > 0; `… 0002-*.patch 0003-*.patch` == 0;
-   `0001` round-trips byte-identical (`dev/regen-patch-0001.sh` recon+verify).
+6. **Patch hygiene:** `TailJML` lands in `0001` only; `0001` round-trips the full `0001..0007` stack
+   byte-identical; the diff vs `main`'s committed `0001` is *exactly* the far-tail additions.
 
-   _(output / PASS|FAIL here)_
+   ```
+   0001: TailJML=3   0002: TailJML=0   0003: TailJML=0
+   RESULT: PASS — 0001 round-trips (reapplied 0001..0007 == live vendor, MOS + clang)
+   diff(regenerated 0001, main's 0001) = only the TailJML def + the tailJMP far arm + the GlobalValue.h include
+   ```
+   **PASS.**
 
 ---
 
@@ -345,7 +385,9 @@ write back here, then promote the TODO `[verify]` → `[x]`.
 
 ---
 
-## 8. Pre-write verification (3-agent adversarial workflow, 2026-06-22) — all confirmed
+## 8. Verification — two adversarial-workflow passes (2026-06-22)
+
+### 8a. Pre-write design verification (3-agent workflow) — all confirmed
 
 A `Workflow` fan-out red-teamed the design before this plan was written. **Verdict: all claims confirmed; no
 stack-corruption case found.**
@@ -365,6 +407,27 @@ stack-corruption case found.**
 **Two caveats folded in:** (1) `TailJML` over `JMP_AbsoluteLong` (`$5C`), never reuse `TailJMP`'s `$4C` —
 §2/§4a; (2) the far-section predicate has two non-identical spellings in-tree — inline-mirror `CalleeIsFar`'s
 `.far_` form — §4b.
+
+### 8b. Post-implementation review (3-agent workflow) — 2 ship, 1 test-strengthening applied
+
+After building, a second `Workflow` fan-out reviewed the actual diff + tests.
+
+- **C++-correctness agent: ship.** Iterator validity (erasing `Ret` doesn't invalidate the held `It`),
+  operand 0 = the call target, `getGlobal()` short-circuit-guarded, `setDesc`-alone sufficiency, no dead
+  code, the `GlobalValue.h` include correct/required — all ✅.
+- **Gate-precision agent: ship.** All seven far/near/thunk/data scenarios classified; the gate fires on
+  exactly direct far→far and excludes the rest; `HasW65816` check confirmed unnecessary (the far arm is
+  unreachable on non-W65816 since no `RTL` opcode can exist there) ✅.
+- **Test-robustness agent: fix-needed (applied).** Found the original single-leaf test's **execution** gate
+  was near-insensitive (the leaf sat immediately after the caller in the *same* bank, so a broken `$5C`
+  would fall through to it and still pass) and that `+mos-a16` wasn't exercised. **Fixed:** the test now uses
+  a two-distinct-value-leaf **conditional** `far_pick` (two far-tail blocks; a broken block-A jump falls
+  through to block B → a *different* value, making execution target-sensitive), plus a `+mos-a16` host leg.
+  Re-verified `0xCB` on both emulators (§5a, §6 steps 1–3).
+- **Both code agents** independently flagged one comment nit: my source comment wrongly said *both* bank-0
+  thunks are excluded by being `ChangeToES`'d to external symbols — true only for `__call_near_from_far`;
+  `__call_indir_far` stays a global and is excluded by the **`.far_` section** check. **Comment corrected**
+  in `MOSLateOptimization.cpp` (and §4b). The code was already correct (both excluded).
 
 ---
 

@@ -88,6 +88,7 @@ FAR_FILES=(
   "$MOSREL/MOSInstrInfo.h"
   "$MOSREL/MOSInstrLogical.td"
   "$MOSREL/MOSInstructionSelector.cpp"
+  "$MOSREL/MOSLateOptimization.cpp"
   "$MOSREL/MOSLegalizerInfo.cpp"
   "$MOSREL/MOSLegalizerInfo.h"
   "$MOSREL/MOSMCInstLower.cpp"

@@ -661,7 +661,7 @@ index a19b69cd054f..d8377bc8b441 100644
  
  } // namespace MOS
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index 6b8158ca0cac..b0a4f6b8f19d 100644
+index 6b8158ca0cac..715766180b8c 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -323,6 +323,17 @@ def JSR : MOSLogicalInstr, PseudoInstExpansion<(JSR_Absolute addr16:$tgt)> {
@@ -682,7 +682,32 @@ index 6b8158ca0cac..b0a4f6b8f19d 100644
  def TailJMP : MOSLogicalInstr, PseudoInstExpansion<(JMP_Absolute addr16:$tgt)> {
    dag InOperandList = (ins label:$tgt);
  
-@@ -340,6 +351,10 @@ class MOSReturn<Instruction Opcode> : MOSLogicalInstr, PseudoInstExpansion<(Opco
+@@ -332,6 +343,24 @@ def TailJMP : MOSLogicalInstr, PseudoInstExpansion<(JMP_Absolute addr16:$tgt)> {
+   let isReturn = true;
+ }
+ 
++// #320 far tail call: the far analogue of TailJMP. Emitted by
++// MOSLateOptimization::tailJMP only for a `JSL <far global>; RTL` block tail —
++// folds a far->far tail call into a single direct 24-bit long jump
++// (JMP_AbsoluteLong, opcode $5C, sets PBR:PC, relocates R_MOS_ADDR24). The far
++// callee's own RTL pops the caller's 3-byte JSL return, so control returns to the
++// original caller (tail-call style). Like JSL/RTL the def carries no Predicate —
++// HasW65816 is enforced at the emit site (the peephole's far-section gate, only
++// reachable on W65816 where JSL/RTL exist). NB: $5C disassembles as a *long* `jmp`,
++// NOT `jml` ($DC, the indirect long jump).
++def TailJML : MOSLogicalInstr, PseudoInstExpansion<(JMP_AbsoluteLong addr24:$tgt)> {
++  dag InOperandList = (ins label:$tgt);
++
++  let isBarrier = true;
++  let isTerminator = true;
++  let isCall = true;
++  let isReturn = true;
++}
++
+ class MOSReturn<Instruction Opcode> : MOSLogicalInstr, PseudoInstExpansion<(Opcode)> {
+   let isBarrier = true;
+   let isReturn = true;
+@@ -340,6 +369,10 @@ class MOSReturn<Instruction Opcode> : MOSLogicalInstr, PseudoInstExpansion<(Opco
  
  def RTS : MOSReturn<RTS_Implied>;
  def RTI : MOSReturn<RTI_Implied>;
@@ -693,7 +718,7 @@ index 6b8158ca0cac..b0a4f6b8f19d 100644
  
  //===---------------------------------------------------------------------===//
  // Immediate Load Instructions
-@@ -537,6 +552,13 @@ def LDIndirIdx : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)>
+@@ -537,6 +570,13 @@ def LDIndirIdx : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)>
    dag InOperandList = (ins Imag16:$addr, Yc:$offset);
  }
  
@@ -707,7 +732,7 @@ index 6b8158ca0cac..b0a4f6b8f19d 100644
  class MOSStore : MOSLogicalInstr {
    let mayStore = true;
  }
-@@ -564,6 +586,12 @@ def STIndirIdx : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)
+@@ -564,6 +604,12 @@ def STIndirIdx : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)
    dag InOperandList = (ins Ac:$src, Imag16:$addr, Yc:$offset);
  }
  
@@ -720,7 +745,7 @@ index 6b8158ca0cac..b0a4f6b8f19d 100644
  let Predicates = [Has65C02] in {
    // STZ abs
    def STZAbs : MOSStore, PseudoInstExpansion<(STZ_ZeroPage addr8:$addr)> {
-@@ -579,6 +607,21 @@ let Predicates = [Has65C02] in {
+@@ -579,6 +625,21 @@ let Predicates = [Has65C02] in {
    }
  }
  
@@ -976,6 +1001,67 @@ index d4936aabfadd..9712a96e9e44 100644
    case MOS::G_STORE_ABS_IDX:
      Opcode = MOS::STAbsIdx;
      break;
+diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+index fbedd8d46b95..5a6207e17a12 100644
+--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
++++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+@@ -29,6 +29,7 @@
+ #include "llvm/CodeGen/MachineInstrBuilder.h"
+ #include "llvm/CodeGen/TargetInstrInfo.h"
+ #include "llvm/CodeGen/TargetSubtargetInfo.h"
++#include "llvm/IR/GlobalValue.h"
+ 
+ #define DEBUG_TYPE "mos-late-opt"
+ 
+@@ -402,15 +403,42 @@ bool MOSLateOptimization::tailJMP(MachineBasicBlock &MBB) const {
+   if (MBB.size() < 2)
+     return false;
+   auto It = std::prev(MBB.end());
+-  if (It->getOpcode() != MOS::RTS)
++  const unsigned RetOp = It->getOpcode();
++  // Near return (JSR;RTS) or, on W65816, a far return (JSL;RTL).
++  if (RetOp != MOS::RTS && RetOp != MOS::RTL)
+     return false;
+-  MachineInstr &RTS = *It;
++  MachineInstr &Ret = *It;
+   --It;
+-  if (It->getOpcode() != MOS::JSR)
++  const auto &TII = *MBB.getParent()->getSubtarget().getInstrInfo();
++
++  // Near tail call: `JSR g; RTS` -> `TailJMP g` (a near $4C jump; g's own RTS
++  // returns to the original caller).
++  if (RetOp == MOS::RTS) {
++    if (It->getOpcode() != MOS::JSR)
++      return false;
++    Ret.eraseFromParent();
++    It->setDesc(TII.get(MOS::TailJMP));
++    return true;
++  }
++
++  // #320 far tail call: `JSL <direct far global>; RTL` -> `TailJML g` (a direct
++  // 24-bit long jump $5C; g runs and its own RTL pops the caller's 3-byte JSL
++  // return, landing at the original caller — tail-call style). The RTL terminator
++  // already proves the current function is far (lowerReturn emits RTL only for a
++  // .far_ frame). Restrict the callee to a direct far-function GLOBAL (isGlobal +
++  // a .far_ section) so the bank-0 thunks are excluded: __call_near_from_far is
++  // ChangeToES'd to an external symbol (isGlobal() == false), and __call_indir_far
++  // stays a global but lives in a bank-0 (non-.far_) section, so the section test
++  // rejects it. Conservative either way — a misclassification can only miss a win,
++  // never emit a wrong-bank jump or a mismatched return width. (The dangerous
++  // near->far shape is `JSL g; RTS`, which the RTL check above already rejects.)
++  if (It->getOpcode() != MOS::JSL)
++    return false;
++  const MachineOperand &Tgt = It->getOperand(0);
++  if (!Tgt.isGlobal() || !Tgt.getGlobal()->getSection().starts_with(".far_"))
+     return false;
+-  MachineInstr &JSR = *It;
+-  RTS.eraseFromParent();
+-  JSR.setDesc(JSR.getMF()->getSubtarget().getInstrInfo()->get(MOS::TailJMP));
++  Ret.eraseFromParent();
++  It->setDesc(TII.get(MOS::TailJML));
+   return true;
+ }
+ 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 index 8ba6b0b13f54..6356fa58723c 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp

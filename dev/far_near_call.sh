@@ -52,6 +52,26 @@ fi
 # The near helpers must still use a near JSR/RTS (they run at PBR=$00, unchanged).
 printf '%s\n' "$DIS" | grep -qiE '\brts\b' && echo "  PASS: near helper still returns via RTS" || { echo "  FAIL: near helper lost its RTS"; rc=1; }
 
+# NEGATIVE gate (#320 far tail calls): far_caller's `JSL __call_near_from_far; RTL` is a
+# JSL+RTL adjacency, but the far-tail arm of MOSLateOptimization::tailJMP (gated isGlobal &&
+# .far_ section) must NOT convert it: the thunk callee is an EXTERNAL symbol (ChangeToES'd),
+# so isGlobal() is false and the arm skips it. Conservative — excluding it only misses a
+# ~1-byte win, never emits a wrong return. far_caller must therefore keep its JSL to the
+# thunk AND its own trailing RTL (a wrongful conversion would replace the JSL with a long
+# jmp and erase the RTL). Regression guard so loosening the gate can't silently convert it.
+CALLER="$(printf '%s\n' "$DIS" | awk '
+  /^[0-9a-fA-F]+ <far_caller>:/ {grab=1; print; next}
+  grab && /^[0-9a-fA-F]+ <[^>]*>:/ {exit}
+  grab {print}
+')"
+if printf '%s\n' "$CALLER" | grep -iqE '\bjsl\b' \
+   && printf '%s\n' "$CALLER" | grep -iqE '\brtl\b' \
+   && ! printf '%s\n' "$CALLER" | grep -iqE '\bjmp\b'; then
+  echo "  PASS: far_caller keeps JSL __call_near_from_far + its own RTL (far->near thunk tail NOT converted)"
+else
+  echo "  FAIL: far_caller's far->near thunk tail was wrongly tail-converted (expected jsl+rtl, no long jmp)"; rc=1
+fi
+
 echo "==> thunk gate: __call_near_from_far is linked (gc kept it) with pea/jmp-indirect/rtl body"
 CRT0="$(find "$INSTALL" -name crt0.o -path '*snes*' 2>/dev/null | head -1 || true)"
 if [ -n "$CRT0" ]; then
