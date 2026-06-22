@@ -74,3 +74,5 @@ register and dereferences via zero-page-indexed addressing (`lda 0,x` / `sta 0,x
 `llvm/test/CodeGen/MOS/dp-pointer-arg.ll` — a load and a store through an `addrspace(1)` pointer argument,
 run under `-verify-machineinstrs` (which fails on the unfixed backend) with `CHECK` lines pinning the
 zero-page-indexed access.
+
+Fixes #561.
