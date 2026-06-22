@@ -232,8 +232,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    Task C (`__far_packed` spelling) closed — no AS2 spelling to mirror. **AS4 zero-bank = CONFIRMED
    measured-null** (2026-06-22) ⇒ all five spaces measured, the model is **complete**; only folding `0007`
    onto `main` + the upstream PR/note remain.
+   The **near/far "code model"** is settled too (2026-06-22): near (`JSR`/`RTS`, `CodeModel::Small`, 2-byte
+   fn ptr) is the default and far is per-symbol opt-in, so **no `-mcmodel` codegen mode** is warranted; the
+   SNES near-code budget (`$8000–$FFAF` = 32688 B) is now an **enforced link-time contract** — `platforms/snes`
+   + `snes-far` `link.ld` carve the header/vectors into a `romhdr` region so an over-budget link fails with
+   `region 'rom' overflowed by N bytes` (ROM byte-identical for in-budget programs).
    [Inc 4 plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
-   [follow-ups](plans/2026-06-21-320-far-calls-followups.md)._
+   [follow-ups](plans/2026-06-21-320-far-calls-followups.md) ·
+   [near-code budget](plans/2026-06-22-snes-near-code-budget-and-code-model.md)._
 
 5. **M2 — 16-bit A + REP/SEP.** A 16-bit arithmetic kernel (e.g. fixed-point multiply-add loop)
    compiles with correct `REP`/`SEP` placement, produces correct results, and is **smaller/faster**
