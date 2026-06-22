@@ -383,11 +383,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   lands in `llvm-mos`, targets any `-mcpu=mosw65816` platform). Strategy + the tier-1/tier-2
   positioning note for engaging @asiekierka on #321 are drafted in
   [415-snes-target-reconciliation](docs/415-snes-target-reconciliation.md). User-triggered (posting).
-- [ ] **Upstream the F4 `mos-late-opt` TXY/TYX dead-flag fix** (user-triggered). This is an **upstream
-  llvm-mos bug** (`MOSLateOptimization.cpp`, blames to `c798c3141`), carried in the fork as patch `0003`
-  as a private workaround. The upstream PR is **ready** (clean branch off upstream `main` + the 2-line
-  fix + an LLVM lit test, validated). Open it against `llvm-mos/llvm-mos`; once merged, drop `0003` and
-  bump the vendor pin. [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
+- [wip] **Upstream the F4 `mos-late-opt` TXY/TYX dead-flag fix** — ✅ **PR
+  [#562](https://github.com/llvm-mos/llvm-mos/pull/562) opened 2026-06-22.** Upstream llvm-mos bug
+  (`MOSLateOptimization.cpp`); **breaking commit = `dbce7ad1e9cd2`** ("Support emitting TXY/TYX on
+  W65816/65EL02", #299, 2023-06-17) — added the TYX/TXY rewrite branches without setting `Load`, so they
+  skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
+  `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
+  [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
 - [ ] **File the register-scavenger N/Z-liveness issue** (user-triggered; issue, not a PR). Upstream
   `MOSRegisterInfo::saveScavengerRegister` asserts N/Z dead at every scavenging point; a 16-bit
   compare/ALU flag live across a frame-vreg spill violates it → illegal `STImag8 $p` (the 8-fuzz-seed
@@ -397,15 +399,14 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
   [plan](docs/plans/2026-06-22-321-scavenger-crash-upstream-issue.md) (pre-flight live-here/live-upstream +
   a time-boxed default-8-bit repro attempt so a maintainer can trigger it without the fork-only `+mos-a16`).
-- [ ] **File the DP-pointer-argument calling-convention upstream issue** (user-triggered; issue, not a PR).
-  Passing an `addrspace(1)` (8-bit direct-page) pointer **argument** crashes the MOS backend: the CC
-  materializes it into a 16-bit `RS` reg → illegal `(p1)=COPY $rs` ("Copy Instruction illegal with
-  mismatching sizes"; asserts `MOSRegisterInfo.cpp:1146`; SIGSEGV in `MOSLateOptimization` w/o `-verify`).
-  **Pure upstream** — reproduces on plain `mos6502`, no `+mos-a16`/`mosw65816`; stock `p1:8:8` (our `0001`
-  only adds `p2:32:8`). 2-line repro, no fork patch (maintainer CC fix). Surfaced as the `dp→near` far-value
-  residual; draft + queue per [plan](docs/plans/2026-06-22-320-far-value-residuals.md) (Part A) → body
-  `docs/320-upstream-dp-arg-cc-issue.md` + a `gh issue create` item in
-  [upstream-contribution-status](docs/upstream-contribution-status.md).
+- [wip] **File the DP-pointer-argument calling-convention upstream issue** — ✅ **issue
+  [#561](https://github.com/llvm-mos/llvm-mos/issues/561) opened 2026-06-22.** Passing an `addrspace(1)`
+  (8-bit direct-page) pointer **argument** crashes the MOS backend: the CC materializes it into a 16-bit
+  `RS` reg → illegal `(p1)=COPY $rs`. **Pure upstream** — reproduces on plain `mos6502`; **breaking commit =
+  `e618537e7d5e`** ("Use address space 1 for ZP pointers", 2022-07-25) added the 8-bit DP space with no CC
+  carve-out (the address-space-blind `CCIfPtr` rule predates it). No fork patch (maintainer CC fix).
+  **Awaiting upstream triage.** [plan](docs/plans/2026-06-22-320-far-value-residuals.md) (Part A) · body
+  `docs/320-upstream-dp-arg-cc-issue.md`.
 - [ ] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
   `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body

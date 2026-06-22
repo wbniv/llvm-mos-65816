@@ -17,9 +17,11 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 ## TL;DR
 
-- **Ready to post now: 2 PRs + 3 issues + 3 design notes** — eight artifacts, all drafted, all one command/paste away.
-  Strictly *PRs*, that's **two** (F4; and the DWARF step-6 test+docs).
-- **Open on GitHub right now: 0.** We have **never** opened a PR or issue against `llvm-mos/llvm-mos` yet.
+- **Ready to post now: 1 PR + 2 issues + 3 design notes** — six artifacts (F4 PR + DP-arg issue posted
+  2026-06-22; see *Open on GitHub* below). Strictly *PRs*, that's **one** (the DWARF step-6 test+docs).
+- **Open on GitHub right now: 2** — [PR #562](https://github.com/llvm-mos/llvm-mos/pull/562) (F4 — TYX/TXY
+  dead-flag fix) and [issue #561](https://github.com/llvm-mos/llvm-mos/issues/561) (DP-arg CC), both opened
+  2026-06-22. (Our first contributions upstream.)
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
   llvm-mos-sdk#415 engagement (someone else's existing PR).
 - **Hygiene: 1 leftover fork branch** (`revert-540-…`) **retained by preference** — user keeps fork
@@ -29,14 +31,14 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 | # | Item | Type | What it does | Drafted at | Branch |
 |---|------|------|--------------|-----------|--------|
-| 1 | **F4** — `mos-late-opt` TYX/TXY dead-flag fix | **PR** | Clears dead/kill flags when rewriting `LDImm`→TYX/TXY (verifier reject on reentrant `+mos-a16`) | [`docs/321-upstream-late-opt-txy-pr.md`](321-upstream-late-opt-txy-pr.md) | `wbniv:mos-late-opt-txy-dead-flag` (pushed) |
+| 1 | ✅ **POSTED** — **F4** — `mos-late-opt` TYX/TXY dead-flag fix | **PR** | Clears dead/kill flags when rewriting `LDImm`→TYX/TXY (verifier reject on reentrant `+mos-a16`) | [`docs/321-upstream-late-opt-txy-pr.md`](321-upstream-late-opt-txy-pr.md) | [**PR #562**](https://github.com/llvm-mos/llvm-mos/pull/562) (opened 2026-06-22) |
 | 2 | **P3** — `reentrant` can't force the soft stack | **issue** | Latent footgun: `__attribute__((reentrant))` is a no-op for non-recursive fns (MOSNonReentrant re-stamps `nonreentrant`) | [`docs/321-upstream-reentrant-soft-stack-issue.md`](321-upstream-reentrant-soft-stack-issue.md) | n/a (issue) |
 | 3 | **#320** — far-pointer design note | **note** | Opens the five-address-space ABI-blessing discussion (a Discord/#320 post, not a code change). **Updated 2026-06-21** with the Phase 0/3 corrections: retracts the pow2-pointer-size premise (real reason = MVT has no i24), the C1 single-datalayout finding (`0=far-default` foreclosed → a clang flag), and the packed-24 representable-but-deferred position. Posting-ready (user-triggered). | [`docs/320-upstream-far-pointer-note.md`](320-upstream-far-pointer-note.md) | n/a (note) |
 | 4 | **scavenger N/Z-liveness** — `saveScavengerRegister` asserts N/Z dead | **issue** | Upstream crash: a compare/ALU flag live across a frame-vreg spill → illegal `STImag8 $p` (no fork patch — maintainer territory) | [`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md) | n/a (issue) |
 | 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | `wbniv:mos-dwarf-65816-test-docs` (pushed `0ae9415`) |
 | 6 | **#321 CC frame-ABI** — measured frame-model evaluation | **note** | Implementation-backed CC evidence: DP-window/stack-relative are feasible but NULL on real code (locals are `__rc`-resident → frames ≈unused); keep the soft static stack, by measurement | [`docs/321-upstream-cc-frame-abi-note.md`](321-upstream-cc-frame-abi-note.md) | n/a (note) |
 | 7 | **#320 far-CC** — measured ABI evaluation (far ptr across a call) | **note** | Implementation-backed CC evidence: all 4 ABIs built behind `+mos-farcc-*` + measured (bytes + round-trips/frame) on MAME+bsnes-jg → **Imag32 wins decisively** (70 B/50441; smallest *and* fastest). Far ptr should pass/return whole in one 4-byte imaginary-register unit, by measurement. **Follow-up to #3** — post after the design note opens the conversation. Shipped as `0004` in-fork. | [`docs/320-upstream-far-cc-measurement-note.md`](320-upstream-far-cc-measurement-note.md) | n/a (note) |
-| 8 | **DP-arg CC** — `addrspace(1)` 8-bit pointer argument in a 16-bit register | **issue** | Upstream crash: `CCIfPtr` (MOSCallingConv.td:65) assigns *every* pointer arg to a 16-bit `RS` pair, so an 8-bit `addrspace(1)` (direct-page) pointer arg → illegal `(p1)=COPY $rs` (no fork patch — maintainer CC fix). Reproduces on base `mos6502`. | [`docs/320-upstream-dp-arg-cc-issue.md`](320-upstream-dp-arg-cc-issue.md) | n/a (issue) |
+| 8 | ✅ **POSTED** — **DP-arg CC** — `addrspace(1)` 8-bit pointer argument in a 16-bit register | **issue** | Upstream crash: `CCIfPtr` (MOSCallingConv.td:65) assigns *every* pointer arg to a 16-bit `RS` pair, so an 8-bit `addrspace(1)` (direct-page) pointer arg → illegal `(p1)=COPY $rs` (no fork patch — maintainer CC fix). Reproduces on base `mos6502`. | [`docs/320-upstream-dp-arg-cc-issue.md`](320-upstream-dp-arg-cc-issue.md) | [**#561**](https://github.com/llvm-mos/llvm-mos/issues/561) (opened 2026-06-22) |
 
 ### 1 — F4 PR (a code-change PR; #5 DWARF is the other)
 
