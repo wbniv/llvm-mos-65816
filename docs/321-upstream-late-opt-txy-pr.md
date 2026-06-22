@@ -105,12 +105,14 @@ diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/M
          }
 ```
 
-Plus the `late-opt-65816.mir` test additions/updates (2 new dead-source cases; existing `txy`/`tyx`
-checks lose the stale `killed`). Full diff: `patches/llvm-mos/0003-late-opt-txy-dead-flag.patch`.
+Plus the `late-opt-65816.mir` test additions/updates (2 new dead-source cases; the existing `txy`/`tyx`
+checks lose the now-cleared stale `killed`). The complete diff is in the PR's Files tab.
 
-## Validation (local, on the rebuilt toolchain)
+## Validation
 
-- `llc -run-pass=mos-late-opt -verify-machineinstrs late-opt-65816.mir | FileCheck` → PASS.
-- The #321 fuzz gate `dev/run.sh fuzz 50 1` → 50/50 (the 2 formerly-crashing recursive seeds now clean,
-  values agree host == default == `+mos-a16` on MAME + bsnes-jg).
-- Non-breaking: corpus 7/7, `a16spillr`/`a16spill`/`a16localx`/`a16localbit` green.
+- `llc -run-pass=mos-late-opt -verify-machineinstrs late-opt-65816.mir | FileCheck` → PASS (the two new
+  cases fail without the fix and pass with it).
+- A differential fuzz run (50 recursive/soft-stack seeds, both emulators) → 50/50: the two
+  formerly-crashing seeds now compile clean, with results agreeing host == default == `+mos-a16` on
+  MAME + bsnes-jg.
+- No regressions: a 6502 C regression corpus and the 16-bit-accumulator (`+mos-a16`) test suite stay green.
