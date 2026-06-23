@@ -1030,7 +1030,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      user-triggered candidate recorded in the plan's §Status Follow-ups (not yet a drafted artifact, so
      not queued in upstream-contribution-status.md). Nothing open to track here.
      fp:92f89fa0e9b5b7fe fp:61d02e85f1ef111f fp:e9d664a8ba74dadc -->
-- [ ] **(triage)** **Not** building variant (d) stack, **not** the M measurement/cycle harness, **not** promoting any winner. — _from [2026-06-21-320-far-cc-axy-variant-c-hygiene-capture.md](docs/plans/2026-06-21-320-far-cc-axy-variant-c-hygiene-capture.md)_  <!-- fp:3dc7cd082923d714 -->
-- [ ] **(triage)** **Note for the future D step** (surfaced by `dev/regen-patch-0004.sh`'s header): folding the eventual — _from [2026-06-21-320-far-cc-axy-variant-c-hygiene-capture.md](docs/plans/2026-06-21-320-far-cc-axy-variant-c-hygiene-capture.md)_  <!-- fp:be1ae59165aaf65d -->
-- [ ] **(triage)** **If the gate fails in step 2**, this plan converts to "debug variant (c)" — a separate, larger effort to — _from [2026-06-21-320-far-cc-axy-variant-c-hygiene-capture.md](docs/plans/2026-06-21-320-far-cc-axy-variant-c-hygiene-capture.md)_  <!-- fp:f4fd52ba2dcb7fba -->
+<!-- triaged 2026-06-23: all three are scope-markers / a forward-note / a contingency from the routed
+     far-cc AXY variant-(c) hygiene plan (2026-06-21-320-far-cc-axy-variant-c-hygiene-capture.md), not open
+     work for this housekeeping pass — variant (d)/M-harness/winner-promotion are explicitly out of scope
+     (covered by the curated M1 far-pointer-CC item + 2026-06-21-320-far-cc-variants-bcd-and-measure.md),
+     the D-step fold-note is a forward reminder for that effort, and the 'debug variant (c)' branch is a
+     conditional contingency, not active work. Owned by the far-cc effort; nothing new opened here.
+     fp:3dc7cd082923d714 fp:be1ae59165aaf65d fp:f4fd52ba2dcb7fba -->
 <!-- END auto-captured-deferrals -->
