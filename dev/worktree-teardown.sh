@@ -11,18 +11,22 @@
 # own internal git removes are a subprocess of a non-matching Bash call, so the guard
 # does not fire on them (no bypass flag needed).
 #
-# Companion policy: retain worktrees until the work merges UPSTREAM — so teardown
-# requires an explicit --yes acknowledging it's time (no auto "is it upstream?" guess).
+# Companion policy (feature worktrees): retain until the work merges UPSTREAM — so
+# teardown requires an explicit --yes acknowledging it's time (no auto "is it upstream?"
+# guess). throwaway/<slug> worktrees (disposable measurements / spikes) are exempt from
+# retain-until-upstream, but --yes is still required because teardown is irreversible.
 #
 # Usage:
 #   dev/worktree-teardown.sh <slug|branch> [--dry-run] [--yes]
-#     <slug|branch>   e.g. 321-track-a  or  wt/321-track-a
+#     <slug|branch>   bare slug → wt/<slug> (feature); an explicit branch is used
+#                     verbatim, e.g. 321-track-a · wt/321-track-a · throwaway/verify-rebuild
 #     --dry-run       show what would happen (checks + reclaim figure), remove nothing
-#     --yes           acknowledge the retain-until-upstream policy + proceed with removal
+#     --yes           confirm it's time + proceed with the (irreversible) removal
 set -euo pipefail
 
 usage() {
-  sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
+  # the leading comment block (line 2 to the first code line), '# ' prefix stripped
+  awk 'NR>=2 && /^#/ {sub(/^# ?/, ""); print; next} NR>=2 {exit}' "$0"
   exit "${1:-0}"
 }
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage 0
@@ -38,8 +42,15 @@ for a in "$@"; do
 done
 [ -n "$ARG" ] || { echo "FATAL: need a worktree slug or branch (e.g. 321-track-a)" >&2; usage 1; }
 
-# Resolve BRANCH (wt/<slug>) and the registered worktree PATH from `git worktree list`.
-BRANCH="$ARG"; [[ "$BRANCH" == wt/* ]] || BRANCH="wt/$ARG"
+# Resolve BRANCH + the registered worktree PATH from `git worktree list`. A bare slug
+# (no '/') defaults to wt/<slug> (feature worktree); an explicit branch with a prefix
+# (wt/<slug>, throwaway/<slug>, …) is used verbatim — so disposable investigation /
+# measurement worktrees on throwaway/<slug> tear down via this blessed path too.
+case "$ARG" in
+  */*) BRANCH="$ARG" ;;
+  *)   BRANCH="wt/$ARG" ;;
+esac
+case "$BRANCH" in throwaway/*) IS_THROWAWAY=1 ;; *) IS_THROWAWAY=0 ;; esac
 WT="$(git worktree list --porcelain | awk -v b="refs/heads/$BRANCH" '
   /^worktree /{p=substr($0,10)} $0=="branch "b{print p; exit}')"
 [ -n "$WT" ] || { echo "FATAL: no worktree is checked out on branch '$BRANCH'." >&2
@@ -51,10 +62,19 @@ echo "==> teardown target: $WT  (branch $BRANCH)"
 # ── Durability gate 1: unmerged commits on the branch ──────────────────────────
 UNMERGED="$(git log --oneline "main..$BRANCH" 2>/dev/null || true)"
 if [ -n "$UNMERGED" ]; then
-  echo "ABORT: $BRANCH has commits not on main — durable work would be lost:" >&2
-  echo "$UNMERGED" | sed 's/^/    /' >&2
-  echo "  → cherry-pick / merge them to main first (git cherry-pick … or git merge $BRANCH)." >&2
-  exit 2
+  if [ "$IS_THROWAWAY" -eq 1 ]; then
+    echo "WARN: throwaway $BRANCH has commits not on main — teardown will DISCARD them:" >&2
+    echo "$UNMERGED" | sed 's/^/    /' >&2
+    if [ "$YES" -ne 1 ] && [ "$DRY" -ne 1 ]; then
+      echo "  → re-run with --yes to confirm they're disposable (or cherry-pick durable ones to main first)." >&2
+      exit 2
+    fi
+  else
+    echo "ABORT: $BRANCH has commits not on main — durable work would be lost:" >&2
+    echo "$UNMERGED" | sed 's/^/    /' >&2
+    echo "  → cherry-pick / merge them to main first (git cherry-pick … or git merge $BRANCH)." >&2
+    exit 2
+  fi
 fi
 
 # ── Durability gate 2: tracked changes whose content is NOT already on main ────
@@ -68,10 +88,19 @@ while IFS= read -r f; do
   git -C "$WT" diff --quiet main -- "$f" 2>/dev/null || LOST="$LOST    $f"$'\n'
 done < <(git -C "$WT" status --porcelain=v1 --untracked-files=no 2>/dev/null | cut -c4-)
 if [ -n "$LOST" ]; then
-  echo "ABORT: $WT has tracked content not on main — durable work would be lost:" >&2
-  printf '%s' "$LOST" >&2
-  echo "  → commit + land it on main first." >&2
-  exit 2
+  if [ "$IS_THROWAWAY" -eq 1 ]; then
+    echo "WARN: throwaway $WT has tracked content not on main — teardown will DISCARD it:" >&2
+    printf '%s' "$LOST" >&2
+    if [ "$YES" -ne 1 ] && [ "$DRY" -ne 1 ]; then
+      echo "  → re-run with --yes to confirm it's disposable (or commit + land it on main first)." >&2
+      exit 2
+    fi
+  else
+    echo "ABORT: $WT has tracked content not on main — durable work would be lost:" >&2
+    printf '%s' "$LOST" >&2
+    echo "  → commit + land it on main first." >&2
+    exit 2
+  fi
 fi
 
 # ── Durability warn: untracked, non-gitignored files under dev/ or docs/ ───────
@@ -99,8 +128,13 @@ if [ "$DRY" -eq 1 ]; then
   exit 0
 fi
 if [ "$YES" -ne 1 ]; then
-  echo "POLICY: retain worktrees until the work merges UPSTREAM." >&2
-  echo "  → re-run with --yes to confirm it's time and proceed with the (irreversible) teardown." >&2
+  if [ "$IS_THROWAWAY" -eq 1 ]; then
+    echo "POLICY: throwaway worktrees are disposable, but teardown is irreversible." >&2
+    echo "  → re-run with --yes to confirm and proceed with the teardown." >&2
+  else
+    echo "POLICY: retain worktrees until the work merges UPSTREAM." >&2
+    echo "  → re-run with --yes to confirm it's time and proceed with the (irreversible) teardown." >&2
+  fi
   exit 2
 fi
 

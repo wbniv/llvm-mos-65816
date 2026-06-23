@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/392030a) | #321 docs: add the feature-worktree howto (target of the agent-handoff + CLAUDE.md pointers) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/9148a7b) | docs: investigations go on throwaway worktrees, not main (standing convention) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/6fff2f1) | #321 docs: wire awareness of the upstream-contribution-status queue into CLAUDE.md + TODO |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0083378) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
+392030a	author	Will Norris
+392030a	added	3
+392030a	deleted	1
+392030a	files	1
+392030a	body	docs/howto-feature-worktree.md: the cp -al hardlink procedure to run dev/run.sh from a\nworktree without a 30-90 min toolchain rebuild (the CLAUDE.md env-override trick is\nhost-side only — it dangles inside dev/run.sh's single-root Docker mount). The pointer\nfrom agent-handoff.md landed via concurrent commit d26a5e6; this adds the file it and the\nCLAUDE.md caveat reference, plus the CLAUDE.md caveat itself.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 9148a7b	author	Will Norris
 9148a7b	added	8
 9148a7b	deleted	0

@@ -58,7 +58,9 @@ glitch. (Exact commands + the micro-test pattern: `docs/agent-handoff.md`.)
   `build/llvm-mos-install/bin/...` rather than rebuilding (host-side scripts only — for the Dockerized
   `dev/run.sh`, `cp -al` the prebuilt `build/` subdirs into the worktree instead; see
   [`docs/howto-feature-worktree.md`](docs/howto-feature-worktree.md)). **Keep** → merge the durable artifacts (script,
-  recorded verdict) back; **dead-end** → `git worktree remove` + `git branch -D`. (Generic rule + rationale:
+  recorded verdict) back; **dead-end** → `dev/worktree-teardown.sh throwaway/<slug> --yes` (raw
+  `git worktree remove` is guard-blocked; the wrapper handles `throwaway/<slug>` too — disposable, so no
+  retain-until-upstream gate, but `--yes` is still required). (Generic rule + rationale:
   `~/SRC/CLAUDE.md` "Worktree-based feature workflow".)
 - **Commit hooks fire automatically:** `regen-md-history` snapshots edited plans into `docs/plans/.history/`;
   `audit-plan-deferrals` captures plan "Deferred"/unverified bullets into a `## Inbox` in `TODO.md` —

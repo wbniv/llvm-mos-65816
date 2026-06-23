@@ -36,6 +36,7 @@ check "worktree list"                PASS 'git worktree list'
 check "worktree add"                 PASS 'git worktree add ../wt main'
 check "git status"                   PASS 'git status'
 check "branch -D (not wt/)"          PASS 'git branch -D feature/foo'
+check "branch -D throwaway/foo"      PASS 'git branch -D throwaway/verify-rebuild'
 check "mention in echo"              PASS 'echo "to clean up run git worktree remove foo"'
 check "mention in grep"             PASS 'grep "git worktree remove" docs/x.md'
 check "the wrapper itself"           PASS 'dev/worktree-teardown.sh 321-track-a --dry-run'
@@ -45,6 +46,13 @@ echo "=== wrapper: -h + bad-arg handling ==="
 if dev/worktree-teardown.sh -h >/dev/null 2>&1; then echo "  ✓ -h exits 0"; pass=$((pass + 1)); else echo "  ✗ -h"; fail=$((fail + 1)); fi
 badout="$(dev/worktree-teardown.sh wt/does-not-exist --dry-run 2>&1 || true)"
 if printf '%s' "$badout" | grep -q "FATAL: no worktree"; then echo "  ✓ bad arg → FATAL (exit 1)"; pass=$((pass + 1)); else echo "  ✗ bad arg"; fail=$((fail + 1)); fi
+
+echo ""
+echo "=== wrapper: branch/slug resolution (bare slug → wt/, explicit prefix verbatim) ==="
+twout="$(dev/worktree-teardown.sh throwaway/does-not-exist --dry-run 2>&1 || true)"
+if printf '%s' "$twout" | grep -q "branch 'throwaway/does-not-exist'"; then echo "  ✓ throwaway/<slug> used verbatim (not wt/-prefixed)"; pass=$((pass + 1)); else echo "  ✗ throwaway resolution: $twout"; fail=$((fail + 1)); fi
+slout="$(dev/worktree-teardown.sh does-not-exist --dry-run 2>&1 || true)"
+if printf '%s' "$slout" | grep -q "branch 'wt/does-not-exist'"; then echo "  ✓ bare slug → wt/<slug> (default preserved)"; pass=$((pass + 1)); else echo "  ✗ bare-slug default: $slout"; fail=$((fail + 1)); fi
 
 echo ""
 echo "(For a live durability-gate demo, run on a real worktree:"
