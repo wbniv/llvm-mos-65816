@@ -42,6 +42,18 @@ check "mention in grep"             PASS 'grep "git worktree remove" docs/x.md'
 check "the wrapper itself"           PASS 'dev/worktree-teardown.sh 321-track-a --dry-run'
 
 echo ""
+echo "=== guard hook: quote-aware parser (no false-positive on the phrase inside a quoted arg) ==="
+check "commit msg mentions phrase"   PASS 'git commit -m "use the wrapper, not git worktree remove"'
+check "; INSIDE quoted commit msg"   PASS 'git commit -m "step 1; git worktree remove x; step 2"'
+check "multi-line commit msg"        PASS 'git commit -m "line1
+git worktree remove x"'
+check "worktree prune (not remove)"  PASS 'git worktree prune'
+check "; -separated real teardown"   DENY 'cd x;git worktree remove z'
+check "subshell real teardown"       DENY '(git worktree remove ../wt)'
+check "branch --delete wt/ (long)"   DENY 'git branch --delete wt/321-foo'
+check "redirected real teardown"     DENY 'git worktree remove ../wt > /tmp/log'
+
+echo ""
 echo "=== wrapper: -h + bad-arg handling ==="
 if dev/worktree-teardown.sh -h >/dev/null 2>&1; then echo "  ✓ -h exits 0"; pass=$((pass + 1)); else echo "  ✗ -h"; fail=$((fail + 1)); fi
 badout="$(dev/worktree-teardown.sh wt/does-not-exist --dry-run 2>&1 || true)"
