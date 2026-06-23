@@ -2,7 +2,10 @@
 
 **Last updated:** 2026-06-23 (first upstream contributions now live — PR #562 (F4) + issue #561 + the #561
 fix PR #563; *Verified state* snapshot refreshed; project repo `wbniv/llvm-mos-65816` `main` pushed to
-`e39d0ed`. Previously 2026-06-22: the **#321 stage-1 native-s16 surface** is now **measured-complete** — consolidated
+`e39d0ed`. Also landed on `main`: **#320 far tail calls** in `0001` (`4adda8b`) — far→far `JSL;RTL` folds
+to a `TailJML`/`$5C` long jump, −1 B/site — and **32-bit `long`/`int32_t` value-verified** (`a16s32`
+micro-test + a gated `--s32` builtin-fuzzer track, test/tooling only); both fold into the ABI-gated fork
+bodies below, not new ready-to-post rows. Previously 2026-06-22: the **#321 stage-1 native-s16 surface** is now **measured-complete** — consolidated
 host-side via `dev/measure-native-s16-surface.sh`; the drafted "stage-1 native-s16 is measured-complete" evidence
 paragraph lives in the [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md)
 and is folded into the *Native 65816 16-bit codegen* Future/blocked item below — still ABI-alignment-gated, not a
@@ -214,7 +217,13 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
     symbol as far (24-bit), crashing when a `.far_rodata` datum's address is taken as a *near* pointer;
     restricted to **functions** (`isa<Function>`). This is a fix to fork-only far machinery, so it rides the
     same #320 PR rather than standing alone.
-  Verified end-to-end on **MAME + bsnes-jg** (the whole far suite, 12 ROMs) + corpus 7/7 + csmith 0-mismatch.
+  - **far tail calls (2026-06-23, `4adda8b`):** the post-RA tail-call peephole (`MOSLateOptimization::tailJMP`)
+    keyed only on near `JSR`/`RTS`, so a far function's `JSL g; RTL` tail was never converted. Added a
+    `TailJML` pseudo (→ `JMP_AbsoluteLong`/`$5C`, relocates `R_MOS_ADDR24`) + a far arm
+    `JSL <direct far global>; RTL → TailJML`, gated `isGlobal && .far_` so near→far (`JSL;RTS`) and the bank-0
+    thunks are auto-excluded (conservative — a misclass only misses a win). Far→far tail folds 5 B→4 B.
+    a16-independent; landed in `0001`. Verified `dev/run.sh far_tail` (`0xCB`) MAME+bsnes-jg.
+  Verified end-to-end on **MAME + bsnes-jg** (the whole far suite, 12 ROMs incl. `far_tail`) + corpus 7/7 + csmith 0-mismatch.
   Still ABI-blessing-gated; the `far`/`long_call` attribute spelling-sharing design is a candidate talking
   point for the #320 note when it's posted.
 - **llvm-mos-sdk#415 reconciliation.** Engage @Phillip-May's existing stalled SNES-target draft PR (build on
@@ -239,6 +248,11 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
   native-s16 is measured-complete" paragraph is in the
   [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md) (posting
   rides this same ABI-gated native-16-bit contribution; user-triggered).
+  **32-bit `long`/`int32_t` now value-verified (2026-06-23):** the `+mos-a16` s32 representation
+  (2×s16 + 4×s8↔s32 (un)merge + `__mulsi3`/`__udivsi3`/`__umodsi3` libcalls) gained a dedicated `a16s32`
+  4-way differential micro-test and a gated `--s32` track in the builtin fuzzer (lockstep C-emit/Python-oracle,
+  deterministic) — strengthens the test story carried with this contribution. Test/tooling only, no codegen
+  change. [plan](plans/2026-06-23-321-32bit-long-verification.md).
 
 > *(The ROADMAP-step-6 DWARF **test + docs** item moved up to **Ready to post now #5** on 2026-06-19 —
 > both halves are now drafted: the staged lit test + the `<output>.elf` doc note.)*
