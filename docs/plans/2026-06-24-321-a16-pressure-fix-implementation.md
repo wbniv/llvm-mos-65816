@@ -84,8 +84,13 @@ XFAIL — `scavenger-p-not-gpr` (repro `a16scavnz.c`, KNOWN_ISSUE_REPROS) and `a
    selected MIR: ADCImm=0, IncMB/INC=4 (counter -> inc chain); disasm: inx;inx;cpx (index in X)
    ```
    **PASS.**
-2. **SCAVNZ + pr15296 status.** `a16scavnz.c` still fails (`$p is not a GPR register`); `pr15296.c` a16 object
-   byte-identical pre/post Fix A. Both kept XFAIL (Fix A is regpress-specific). **PASS (expected partial).**
+2. **SCAVNZ + pr15296 status.** `a16scavnz.c` still fails (`$p is not a GPR register`) on BOTH main and
+   Fix A; `pr15296.c` a16 object byte-identical pre/post Fix A. Both kept XFAIL (Fix A is regpress-specific).
+   *Accuracy note:* the 8 catalogued "scavenger seeds" (169/173/196/268/271/272/306/420) **already pass on
+   current `main`** (csmith generation has drifted since they were catalogued — verified 169/196/271/306/420
+   `[ ok ]` / `[skip]`, 0 xfail, on the pre-fix `main` clang), so they are not evidence of this fix either
+   way; the **deterministic `a16scavnz.c` repro is the sole remaining `scavenger-p-not-gpr` reproducer**.
+   **PASS (expected partial).**
 3. **DEFAULT byte-identical.** worktree-clang vs main-clang, `-Os` (no `+mos-a16`):
    ```
    IDENTICAL (default): examples/65816/a16regpress.c
