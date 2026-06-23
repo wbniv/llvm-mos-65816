@@ -67,7 +67,52 @@ scavenger find a legal alternative; it just relocates the failure.
 
 (Steps 2–5 not run: step 1 already shows the hypothesis does not yield a clean compile.)
 
+## Attempt 2 — mark `LDCImm` rematerializable (user asked to keep trying)
+
+The scavenged value is `%N.subcarry = LDCImm 0` (carry constant). `MOSImmediateLoad` sets
+`isAsCheapAsAMove`/`isMoveImm` but **not** `isReMaterializable` (the sibling `LDImm1` flag-load explicitly
+does). `LDCImm` lowers to `CLC`/`SEC` — reads nothing, writes only C (not N/Z) — so it is trivially
+remat-safe (unlike `LDImm` = `LDA/LDX/LDY #imm`, which writes N/Z, so the flag can't go on the base class).
+Added `let isReMaterializable = true;` to `LDCImm` only. Rebuilt (bit confirmed in
+`MOSGenInstrInfo.inc`: `LDCImm … |Rematerializable|CheapAsAMove`).
+
+**Result: the crash *signature changes but does not clear.*** The illegal `STImag8 $p` is gone, but the
+scavenger now hits the **same** `report_fatal_error("Scavenger spill for register not yet implemented")` on
+the **same nameless flag-class register** as attempt 1. So both a "refuse P" gate and "rematerialize the
+carry" converge on the identical wall: at this site the scavenger must free a flag/carry-class register that
+MOS's `saveScavengerRegister` has **no implementation to spill**.
+
+(The `LDCImm`-rematerializable change is arguably a real latent upstream improvement on its own — it matches
+`LDImm1` and is remat-safe — but it does **not** fix this crash, so it is not proposed as the fix and was
+not landed/differential-tested.)
+
 ## Outcome — NO-GO for a narrow fix (issue stays issue-only; now better-evidenced)
+
+Two principled, independently-reasoned patches (attempt 1 = the conservative `canSaveScavengerRegister(P)`
+N/Z gate; attempt 2 = `LDCImm` rematerializable) both move the symptom but fail at the same wall. **Attempt 3
+(diagnostic, not a fix)** instrumented `saveScavengerRegister`'s `default:` arm to name the dead-end
+register:
+
+```
+Register: '' num=0 RC=Ac        (num=0 = MOS::NoRegister; class = Ac, the accumulator)
+```
+
+**This is the decisive finding.** After both fixes peel off the illegal-`P`-spill symptom, the scavenger is
+asked for an **accumulator-class (`Ac`) scratch and finds none to scavenge** — it passes `NoRegister`. That
+is **register-pressure exhaustion**, not a localized scavenger bug: under `+mos-a16` the 16-bit values
+saturate the tiny MOS register file, leaving nothing for the frame-index scavenger to free. It is the **same
+root cause** as the project's already-deferred `regalloc-out-of-registers` / `a16-zp-pressure-overflow`
+known-issues — the **Phase-3 `+mos-a16` Ac16/ZP-residency rework**
+([docs/investigations/65816-a16-regalloc-pressure-failure.md](../investigations/65816-a16-regalloc-pressure-failure.md)),
+explicitly deferred as a major undertaking.
+
+So the honest #2 conclusion: **there is no bounded scavenger patch.** The illegal-`P`-spill is a *symptom*
+of a16 register pressure; fixing the spill path just surfaces "no register to scavenge." The real fix is the
+deferred Phase-3 pressure rework (reduce a16 register pressure / ZP-residency so the scavenger always has a
+free accumulator), which is the large, separate effort already on the backlog — not landed here, not
+unreviewed. The 8 fuzz seeds stay XFAIL'd + XPASS-guarded; the issue is filed as the upstream report
+(strengthened with both tested dead-ends). Three hypotheses spent → conclusion reached, per the debugging
+limit. `wt/scavenger-nz` reverted to pristine; dead-end spike → teardown (durable artifact = this plan).
 
 The conservative `canSaveScavengerRegister(P)` N/Z gate — the safest possible local patch — **dead-ends**:
 at the failing site *every* register the scavenger can pick is unsaveable. P has no legal soft spill
