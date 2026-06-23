@@ -102,18 +102,33 @@ So a correct fix likely needs one of:
 3. At minimum, **replacing the assert with a graceful path** so a flag-live scavenge cannot silently emit
    illegal MIR in a release build.
 
-### A tested approach that does *not* work (so you can skip it)
+### Two approaches that do *not* work (so you can skip them)
 
-The tempting minimal fix — gating `canSaveScavengerRegister(MOS::P)` to also require N/Z dead across
-`[I, UseMI]` (so the scavenger declines `P` here) — **does not help**. With `P` refused, the scavenger
-falls through to `saveScavengerRegister`'s `default:` arm and hits
-`report_fatal_error("Scavenger spill for register not yet implemented")` on a **nameless flag/carry-class
-register** (the `%N.subcarry` vreg this frame access rematerializes). At the failing site *every* candidate
-the scavenger can choose is unsaveable, so the fix cannot live in the gate — it has to address how this
-flag/carry-class vreg comes to require frame-scavenging in a flag-live context (direction 2), or implement
-a real flag-preserving `P` spill across an unbalanced range (direction 1). The observed double-`P` scavenge
-in the failing block (a `PH $p` flagged "using an undefined physical register" alongside the `STImag8 $p`)
-also suggests the reserved `RC17` save slot collides across two scavenge events in the same block.
+We tried two minimal fixes; both move the symptom but hit the **same** underlying wall — the scavenger has
+to free a flag/carry-class register at this site that `saveScavengerRegister` has no way to spill:
+
+1. **Gate `canSaveScavengerRegister(MOS::P)` on N/Z-dead** (so the scavenger declines `P` here). The illegal
+   `STImag8 $p` goes away, but the scavenger then falls through to `saveScavengerRegister`'s `default:` arm
+   and hits `report_fatal_error("Scavenger spill for register not yet implemented")` on a **nameless
+   flag/carry-class register**.
+2. **Mark `LDCImm` rematerializable** (it lowers to `CLC`/`SEC` — reads nothing, writes only C, not N/Z — so
+   it is trivially remat-safe, unlike its base-class sibling `LDImm` = `LDA/LDX/LDY #imm` which writes N/Z;
+   note `MOSImmediateLoad` sets `isAsCheapAsAMove`/`isMoveImm` but not `isReMaterializable`). This **changes
+   the crash signature** (the `STImag8 $p` becomes the same `"not yet implemented"` dead-end) but does **not**
+   clear it — the scavenger still needs to free the same unsaveable flag/carry-class register.
+
+So the fix cannot live in the gate or in rematerialization flags. It has to either (a) **implement a real
+flag-preserving spill** for that register class in `saveScavengerRegister` (a `P`/flag save that tolerates
+an *unbalanced* push/pull range — the hard part, since flags can only move via the stack or a GPR), or
+(b) **prevent these `%N.subcarry` flag/carry-class vregs from being frame-spilled at all** in a flag-live
+context (a spill-weight / register-class change so they are always rematerialized). Both are core scavenger
+/ frame-lowering changes. The observed double-`P` scavenge in the failing block (a `PH $p` flagged "using an
+undefined physical register" alongside the `STImag8 $p`) also suggests the reserved `RC17` save slot
+collides across two scavenge events in the same block.
+
+(The `LDCImm`-rematerializable change in (2) is arguably a correct latent improvement on its own — it matches
+the sibling `LDImm1` flag-load and is remat-safe — but since it does not fix this crash we are not proposing
+it here.)
 
 Happy to provide the full delta-debugged repro, the asserts backtrace, the pre-PEI MIR, and the
 `-debug-only=reg-scavenging` trace.
