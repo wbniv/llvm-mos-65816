@@ -8,7 +8,9 @@ not a change to drdevtools. The work lands in `llvm-mos/llvm-mos` (compiler) and
 compiler that emits DWARF (spec landed Dec 2025) closes the loop *compile → optimized SNES ROM →
 DWARF symbols → source-level debug in drmon* on fully-open tooling. See the
 [investigation](INVESTIGATION.md) for the full status,
-players, and rival/dead efforts; this plan is the **execution order** distilled from it.
+players, and rival/dead efforts; this plan is the **execution order** distilled from it. Every plan
+that executes this roadmap is catalogued in the [plan index](investigations/plan-index.md) (one row
+per plan — summary · commits · category — sorted oldest → newest).
 
 **Upstream baseline at project start (verified 2026-06-13)** — what `llvm-mos`/`llvm-mos-sdk`
 shipped before this work; our progress against it is tracked in the milestone + verification

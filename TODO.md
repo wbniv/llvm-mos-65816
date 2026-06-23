@@ -5,7 +5,9 @@ llvm-mos-65816 = bringing an optimizing open-source C compiler to the WDC 65816 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the M0 → M1 → M2 plan and
 [docs/INVESTIGATION.md](docs/INVESTIGATION.md) for upstream status and rationale.
 Background: [docs/investigations/llvm-overview.md](docs/investigations/llvm-overview.md)
-(what LLVM is, and where llvm-mos fits).
+(what LLVM is, and where llvm-mos fits). Every plan under `docs/plans/` is catalogued in
+[docs/investigations/plan-index.md](docs/investigations/plan-index.md) — a one-row-per-plan
+table-of-contents (summary · commits · category), sorted oldest → newest.
 
 **Status markers:** `[ ]` open · `[wip]` in progress · `[verify]` implemented, verification
 not yet run+recorded (run the linked plan's verification steps, paste raw output + PASS/FAIL
