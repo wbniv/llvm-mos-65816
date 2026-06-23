@@ -1,9 +1,41 @@
 # `+mos-a16` register-allocation failure under `-O1`/`-Os` (the `globals.c` crash) — root cause
 
 *Deep root-cause record for the `+mos-a16` "ran out of registers" compile failure surfaced by the
-[ZP-pressure measurement](../plans/2026-06-18-321-zp-pressure-measurement.md). The fix is the
-[A16-threading Phase 3](../plans/2026-06-17-321-a16-threading.md) hard core; this note pins down **why**,
+[ZP-pressure measurement](../plans/2026-06-18-321-zp-pressure-measurement.md). This note pins down **why**,
 **how risky**, and **what a correct fix requires** so it can be done deliberately rather than guessed.*
+
+## RESOLUTION (2026-06-24) — FIXED for `globals.c`/`a16regpress.c` (fork patch `0009`)
+
+> **The 2026-06-18 conclusion below ("there is no clean targeted one-liner; only the general Phase-3
+> `Ac16`-residency rework") was REFUTED for THIS crash by a fresh asserts pinpoint.** Re-running
+> `-debug-only=regalloc` on the current toolchain showed the deadlock's *final* blocker is not an `Ac16`
+> transit fighting other `Ac16` transits — it is a single **A-pinned i8 loop counter**: the strength-reduced
+> array **byte index**, stepped `i += 2`, selects to the `add Ac,imm → ADCImm` pattern, so it is class
+> `Ac`={A} (`adc` is hardware-A-only). Held live across the 16-bit indexed-load `Ac16`=A:B transit, it
+> collides on physical A; last-chance recoloring of the counter **fails because `Ac` is a singleton {A}**
+> (`Fail to assign %122 to $a16` after `Try to recolor: %157`), and the single-instruction INF transit can't
+> spill. Coalescing was (still) ruled out — so the lever is **not** `Ac16`-residency/`shouldCoalesce`; it is
+> simply **de-pinning the counter from {A}**.
+>
+> **Fix (`0009`, [plan](../plans/2026-06-24-321-a16-pressure-fix-implementation.md)):** under `hasAccum16()`,
+> `MOSInstructionSelector::selectAddSub` lowers a small-constant i8 add/sub (`|Amt| ≤ 2`) to a relocatable
+> `G_INC`/`G_DEC` chain (`selectIncDecMB` → Anyi8 = A/X/Y/zp) instead of the A-pinned `ADCImm`. The byte index
+> then coalesces into the X array index (`inx; inx; cpx`), freeing A16 — the deadlock dissolves with **one
+> spillable/relocatable change**, no RA rework. DEFAULT 8-bit byte-identical; net **−123 B over 122 c-torture
+> programs (0 worse)**; both `a16regpress.c` and the original `globals.c` compile + run clean (release +
+> asserts); positive gate `dev/run.sh a16regpress` (0x01A7, both emulators). `KNOWN_ISSUES["regalloc-out-of-registers"]`
+> dropped.
+>
+> **What this did NOT fix (still the deferred Phase-3 s16 core):** the scavenger crash (`a16scavnz.c`,
+> `scavenger-p-not-gpr`) and the link-time ZP overflow (`pr15296.c`, `a16-zp-pressure-overflow`) — neither has
+> an i8 byte index; both are pure native-s16 register pressure, byte-identical pre/post `0009`. Those remain
+> XFAIL pending the general pre-RA `Ac16`/ZP-residency rework (or shared-subtarget frame-lowering). So the
+> "single deferred frontier" framing was *half* right: the s16-pressure core is real and deferred, but
+> `globals.c`'s specific deadlock had an orthogonal, conservative fix that did not require it.
+
+The 2026-06-18 analysis is preserved below as the historical record (it correctly ruled out coalescing and
+correctly judged the *general* rework risky/low-reward — it simply missed that the counter, not the `Ac16`
+transit count, was the recolorable lever).
 
 ## Symptom
 
@@ -113,10 +145,11 @@ The bug is **pathological**: the ZP-pressure baseline showed real code is *slack
 contained — deterministic repro `examples/65816/a16regpress.c`, fuzzer `KNOWN_ISSUES` XFAIL
 (`regalloc-out-of-registers`), and a TODO entry.
 
-**Recommendation: fold the fix into A16-threading Phase 3** rather than a one-off patch — it is the same
-`shouldCoalesce`/`Ac16`-residency territory and needs the same asserts build + no-regression measurement.
-`a16regpress.c` becomes a concrete Phase-3 acceptance case (a function that *crashes* today, not merely
-suboptimal). When fixed: drop the fuzzer XFAIL and convert `a16regpress.c` to a positive differential gate.
+~~**Recommendation: fold the fix into A16-threading Phase 3**~~ **SUPERSEDED — see RESOLUTION (2026-06-24)
+at the top.** A fresh asserts pinpoint found the recolorable lever was the A-pinned i8 byte index, not
+`Ac16`-residency, so the fix was a conservative, gated, single-locus `selectAddSub` change (fork patch
+`0009`) — NOT the general Phase-3 rework. The fuzzer XFAIL was dropped and `a16regpress.c` promoted to the
+positive gate `dev/run.sh a16regpress`.
 
 ## Related manifestation — link-time ZP overflow (c-torture `pr15296.c`, 2026-06-19)
 
@@ -131,14 +164,17 @@ ld.lld: error: relocation R_MOS_ADDR8 out of range: 1043 is not in [-128, 255]; 
 
 Same fingerprint as the RA crash — **DEFAULT 8-bit and `+mos-a16 -O0` link clean; `-O1`/`-Os` fail** — but
 the over-allocation overflows the ZP *addressing budget* at link instead of exhausting the allocator at
-compile. Same `Ac16`/ZP-residency root cause, same fix home (A16-threading Phase 3). Classified
-`a16-zp-pressure-overflow` in `KNOWN_ISSUES` so the c-torture gate XFAILs it (the fuzzer never feeds link
-errors to `classify_known`, so its behavior is unchanged).
+compile. **NOT fixed by patch `0009`** (verified: `pr15296.c`'s `+mos-a16 -Os` object is byte-identical
+pre/post): pr15296 is pointer/union/`intptr_t` register pressure with **no i8 byte index**, so the counter
+relocation never fires — this is the genuine native-s16/ZP-residency core, still the deferred Phase-3 rework.
+Classified `a16-zp-pressure-overflow` in `KNOWN_ISSUES` so the c-torture gate XFAILs it (the fuzzer never
+feeds link errors to `classify_known`, so its behavior is unchanged).
 
 ## Tracking
 
-- Repro: `examples/65816/a16regpress.c` · fuzzer XFAIL: `tools/a16_fuzz.py` `KNOWN_ISSUES["regalloc-out-of-registers"]`.
-- Sibling (ZP overflow): `vendor/c-torture/execute/pr15296.c` (gitignored) · XFAIL `KNOWN_ISSUES["a16-zp-pressure-overflow"]`.
-- TODO: M2 "#321 `+mos-a16 -O1/-Os` register-allocation FAILURE on real code (`globals.c`)".
+- Repro: `examples/65816/a16regpress.c` — **FIXED 2026-06-24 (patch `0009`); now a positive gate
+  `dev/run.sh a16regpress`** (the `KNOWN_ISSUES["regalloc-out-of-registers"]` entry + repro row were dropped).
+- Sibling (ZP overflow): `vendor/c-torture/execute/pr15296.c` (gitignored) · STILL XFAIL `KNOWN_ISSUES["a16-zp-pressure-overflow"]` (not fixed by `0009`).
+- TODO: M2 "#321 `+mos-a16 -O1/-Os` register-allocation FAILURE on real code (`globals.c`)" — marked DONE.
 - Plans: [ZP-pressure measurement](../plans/2026-06-18-321-zp-pressure-measurement.md) (the surfacing) ·
   [A16-threading](../plans/2026-06-17-321-a16-threading.md) (Phase 3, the fix home).

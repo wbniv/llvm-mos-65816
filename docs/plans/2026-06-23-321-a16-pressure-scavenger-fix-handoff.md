@@ -2,6 +2,19 @@
 
 # HANDOFF — fix the `+mos-a16` register-pressure crashes (scavenger N/Z + regalloc-out-of-registers)
 
+> **OUTCOME (2026-06-24) — CLEAN PARTIAL DONE. `regalloc-out-of-registers` FIXED (fork patch `0009`);
+> `scavenger-p-not-gpr` + `a16-zp-pressure-overflow` remain XFAIL.** Execution record + verification:
+> [`2026-06-24-321-a16-pressure-fix-implementation.md`](2026-06-24-321-a16-pressure-fix-implementation.md).
+> The handoff's premise that "both crashes share one root cause; fixing the pressure resolves both" was only
+> *half* right: a fresh asserts pinpoint showed `globals.c`/`a16regpress.c`'s deadlock is a single **A-pinned
+> i8 byte index** (`i += 2` → `ADCImm`/`Ac`={A}) blocking the `Ac16` transit — fixed conservatively by
+> `selectAddSub` lowering a small-const i8 add/sub to a relocatable `G_INC`/`G_DEC` chain under `hasAccum16()`
+> (DEFAULT byte-identical; net −123 B/122 c-torture progs; corpus 7/7, a16 suite 57/0, fuzz 0-mismatch).
+> SCAVNZ + pr15296 have **no i8 byte index** (pure native-s16 pressure, byte-identical pre/post `0009`), so
+> they still need the deferred **Phase-3 `Ac16`/ZP-residency rework** (a 13-agent design workflow + the prior
+> spike concur; maintainer-territory for any standalone scavenger patch). On `wt/321-a16-pressure`
+> (`c53c417`+); land `0009` to `main`'s shared `vendor/`+patch stack is the coordinated follow-up.
+
 **For:** a fresh agent on higher settings. **Date:** 2026-06-23. **Issue:** #321 / ROADMAP M2.
 **Read first (this guide is the standing preface):** [`CLAUDE.md`](../../CLAUDE.md) (project) +
 [`~/SRC/CLAUDE.md`](../../../CLAUDE.md) (generic) + [`docs/agent-handoff.md`](../agent-handoff.md)
