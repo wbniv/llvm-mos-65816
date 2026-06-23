@@ -243,22 +243,6 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
 > *(The ROADMAP-step-6 DWARF **test + docs** item moved up to **Ready to post now #5** on 2026-06-19 —
 > both halves are now drafted: the staged lit test + the `<output>.elf` doc note.)*
 
-## Hygiene — leftover fork branch (retained by preference)
-
-`wbniv/llvm-mos:revert-540-fix/soft-stack-spill-crash` is a leftover **revert** branch of **upstream PR
-#540** ("fix(MOS): use reserved RS8 for soft stack spill scratch register"), which was **MERGED upstream on
-2026-01-26**. No open PR uses it, so it is not a pending contribution of ours.
-
-**Standing policy (user, 2026-06-21): keep fork branches around — do not auto-propose deleting them.** The
-user retains fork branches as a habit (a safety net until the related work is merged upstream); this one is
-**left in place**. Only delete on an explicit, case-by-case request. Note the corner case for the record:
-this is a *revert* of an *already-merged* PR, so "until merged upstream" is technically already satisfied —
-but it stays unless the user says otherwise. The one-liner, if they ever opt in:
-
-```
-gh api -X DELETE repos/wbniv/llvm-mos/git/refs/heads/revert-540-fix/soft-stack-spill-crash
-```
-
 ## Verified state (GitHub, 2026-06-23)
 
 Our first upstream contributions are now live: **2 PRs + 1 issue open** (was 0 through 2026-06-22).
