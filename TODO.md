@@ -1037,4 +1037,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      the D-step fold-note is a forward reminder for that effort, and the 'debug variant (c)' branch is a
      conditional contingency, not active work. Owned by the far-cc effort; nothing new opened here.
      fp:3dc7cd082923d714 fp:be1ae59165aaf65d fp:f4fd52ba2dcb7fba -->
+- [verify] **2026-06-23-321-scavenger-nz-fix-spike** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-23-321-scavenger-nz-fix-spike.md](docs/plans/2026-06-23-321-scavenger-nz-fix-spike.md)_  <!-- fp:ff8c440178114461 -->
 <!-- END auto-captured-deferrals -->
