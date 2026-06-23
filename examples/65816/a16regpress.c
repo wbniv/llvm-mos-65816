@@ -1,31 +1,35 @@
-// KNOWN +mos-a16 CRASH (tracked) — deterministic register-allocation failure.
+// a16regpress.c — POSITIVE differential gate for the (now FIXED) +mos-a16 register-
+// allocation deadlock that used to abort: "ran out of registers during register
+// allocation in function 'main'" (KNOWN_ISSUES signature "regalloc-out-of-registers").
 //
-// Under `-mcpu=mosw65816` `+mos-a16` at -O1/-Os the register allocator aborts:
-// "ran out of registers during register allocation in function 'main'".
-// DEFAULT 8-bit -Os and +mos-a16 -O0 both compile cleanly, so this is an
-// OPTIMIZED-+mos-a16 register-pressure failure, not a value/codegen bug.
+// Reduced (delta-debugged) from examples/snes/corpus/globals.c. Trigger: a u16
+// accumulator (`r`) held live across a SECOND accumulation loop alongside u16*u8
+// multiplies, iterating u16 arrays so the strength-reduced byte index advances `i += 2`.
+// ROOT CAUSE (pinpointed on an asserts build, -debug-only=regalloc, 2026-06-24): the i8
+// byte index, stepped `i += 2`, selected to ADCImm and so was pinned to register class
+// Ac={A} (adc is hardware-A-only). Held live across the 16-bit indexed-load transit
+// (Ac16 = A:B), it collided on A — greedy could not recolor the counter off the singleton
+// {A}, and the single-instruction INF Ac16 transit could not spill -> deadlock. DEFAULT
+// 8-bit and +mos-a16 -O0 always compiled clean.
 //
-// Reduced (delta-debugged) from examples/snes/corpus/globals.c — a corpus program
-// built DEFAULT 8-bit, so this path was never exercised under +mos-a16, and the
-// differential fuzzer never generated this shape, so it went undiscovered.
-// Minimal trigger: a u16 accumulator (`r`) held live across a SECOND accumulation
-// loop, together with two u16*u8 multiplies (`*one`). Two live 16-bit accumulators
-// + the multiplies exhaust the scarce hard registers (A/Ac16, X/Y) + scavenger;
-// shrinking the arrays to [2] removes the crash (lower loop/index pressure).
-//
-// Expected to FAIL to compile under +mos-a16 -O1/-Os until fixed. The fix is in the
-// F3 / soft-stack spill-coverage family (allocator / spill path). When fixed, convert
-// this into a positive differential gate (host == default == +mos-a16, both emulators).
-// Tracked: TODO.md (#321 globals.c +mos-a16 -Os RA failure) + the fuzzer KNOWN_ISSUES
-// entry "regalloc-out-of-registers". Do NOT wire a green dev/ test while it crashes.
+// FIX (fork patch 0009-321-a16-pressure-incdec): under +mos-a16, selectAddSub lowers a
+// small-constant i8 add/sub (|Amt| <= 2) to a relocatable G_INC/G_DEC chain (Anyi8 =
+// A/X/Y/zp) instead of the A-pinned ADCImm, so the byte index coalesces into the X array
+// index (`inx; inx; cpx`) and frees A16. Gated on hasAccum16() -> default 8-bit codegen is
+// byte-identical. Now a green gate: dev/run.sh a16regpress asserts corpus_result is
+// identical host == default == +mos-a16 on MAME + bsnes-jg, plus a disasm gate (the byte
+// index increments via inx, not a clc/adc on A). The fuzzer
+// KNOWN_ISSUES["regalloc-out-of-registers"] entry + this file's KNOWN_ISSUE_REPROS row
+// were removed, so a recurrence hard-FAILS again (regression guard).
 #include <stdint.h>
 
 uint16_t A[4] = { 1, 2, 3, 4 };
 uint8_t  ab   = 0xAB;
-uint16_t B[8];
-uint8_t  bb;
+uint16_t B[8] = { 7, 11, 13, 17, 19, 23, 29, 31 };
+uint8_t  bb   = 0x5C;
 volatile uint8_t  one = 1;
 volatile uint16_t out;
+volatile unsigned short corpus_result;
 
 int main(void) {
     uint16_t r = 0;
@@ -36,5 +40,6 @@ int main(void) {
     for (i = 0; i < 8; i++) s += B[i];                    // r live across this whole loop
     s += bb;
     out = r + s;
+    corpus_result = out;                                  // expose the result for the gate
     for (;;) {}
 }

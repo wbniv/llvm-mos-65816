@@ -1,0 +1,53 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+index 84cbae35bfbd..ceaecd7a65c8 100644
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -561,6 +561,48 @@ bool MOSInstructionSelector::selectAddSub(MachineInstr &MI) {
+     // Don't inhibit generation of INC/DEC.
+     if (RHSConst->Value.abs().isOne())
+       return false;
++
++    // #321 a16 register-pressure relief: under +mos-a16, lower a SMALL-constant 8-bit
++    // add/sub to a short chain of relocatable INC/DEC (G_INC/G_DEC -> IncMB/DecMB on the
++    // Anyi8 class = A/X/Y/zp) instead of the A-pinned `add Ac,imm -> ADCImm` selImpl
++    // pattern (ADCImm constrains its operand to Ac={A} because `adc` is hardware-A-only).
++    // WHY: an A-pinned i8 loop counter — e.g. a u16-array byte index stepped `i += 2` —
++    // held live across a 16-bit indexed-load transit (Ac16 = A:B) deadlocks greedy
++    // register allocation: the counter cannot be recolored off the singleton A and the
++    // single-instruction INF Ac16 transit cannot spill (a16regpress.c: "ran out of
++    // registers"; pinpointed on an asserts build — last-chance recoloring of the {A}
++    // counter fails, so the Ac16 transit never gets $a16). A relocatable Anyi8 counter
++    // instead coalesces into the X array index (which is itself a COPY of the counter),
++    // freeing A16. selectIncDecMB constrains the chain to Anyi8 (the real relocate-off-A
++    // mechanism). Gated on hasAccum16() so the DEFAULT 8-bit build is byte-identical (it
++    // keeps the ADCImm pattern). Bounded by kMaxA16IncDecChain so the chain is never
++    // larger than clc;adc (an inc is 1 B in a register / a 65C02 `inc a`; a value that
++    // must round-trip through A for `adc` costs at least as much in every residency). A
++    // miss only keeps the ADC — never a wrong value: G_ADD/G_SUB are plain modular ops
++    // with no carry-out operand, so an inc/dec chain is value-identical (exactly as the
++    // pre-existing ±1 rewrite already relies on).
++    constexpr int64_t kMaxA16IncDecChain = 2;
++    if (STI.hasAccum16() && MRI.getType(Dst) == LLT::scalar(8)) {
++      int64_t Amt = RHSConst->Value.getSExtValue();
++      if (MI.getOpcode() == MOS::G_SUB)
++        Amt = -Amt;
++      int64_t Steps = std::abs(Amt);
++      if (Steps >= 2 && Steps <= kMaxA16IncDecChain) {
++        unsigned GOpc = Amt > 0 ? MOS::G_INC : MOS::G_DEC;
++        Register Cur = MI.getOperand(1).getReg();
++        for (int64_t I = 0; I < Steps; ++I) {
++          Register Out = (I + 1 == Steps)
++                             ? Dst
++                             : MRI.createGenericVirtualRegister(LLT::scalar(8));
++          MachineInstr *G = Builder.buildInstr(GOpc, {Out}, {Cur});
++          if (!selectIncDecMB(*G))
++            return false;
++          Cur = Out;
++        }
++        MI.eraseFromParent();
++        return true;
++      }
++    }
+   }
+ 
+   int64_t CarryInVal = MI.getOpcode() == MOS::G_ADD ? 0 : -1;

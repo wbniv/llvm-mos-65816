@@ -108,7 +108,7 @@ other frontier; its PR still waits on the design-note posting.
 | Phase 1 — adjacent `STAImag16 R; LDAImag16 R` peephole | ✅ Done — `a16thread`, −31/−36 % on chains |
 | Phase 1.5 — non-adjacent (across volatile stores, multi-reload) | ✅ Done — 1 genuine remainder in 300-program scan |
 | Phase 2 — fold-while-threaded | Retired — already optimal (immediates + abs globals fold into chain today) |
-| Phase 3 — RA-level `Ac16` residency | ⬜ **Deferred** — re-open trigger: 2nd independent regalloc crash from realistic code, or ZP pressure baseline crossing ~10/14 pairs |
+| Phase 3 — RA-level `Ac16` residency | ⬜ **Deferred** (the s16-pressure core) — re-open trigger: 2nd independent regalloc crash from realistic code, or ZP pressure baseline crossing ~10/14 pairs. **One concrete sub-case FIXED 2026-06-24 without it** (see below: the A-pinned i8-byte-index deadlock) |
 
 ### XY16 (X/Y permanently 16-bit)
 
@@ -136,7 +136,8 @@ other frontier; its PR still waits on the design-note posting.
 | bsnes-jg `xcheck` in CI | ✅ Verified green (run 27823207476) |
 | Native-mode crt0 (DBR=0 via `phk;plb`, explicit contract) | ✅ Done |
 | Register-scavenger crash (`$p is not a GPR`) | ⬜ **Upstream bug** — XFAIL'd (8/500 seeds), now under **both** `+mos-a16` and `+mos-xy16`; XPASS-guarded; fix deferred |
-| `+mos-a16 -Os` RA failure (`globals.c`) | ⬜ XFAIL'd — coalescing ruled out; only Phase-3 residency rework could fix; re-open trigger defined; XPASS-guarded |
+| `+mos-a16 -Os` RA failure (`globals.c` / `a16regpress.c`, `regalloc-out-of-registers`) | ✅ **FIXED 2026-06-24** (fork patch `0009`). Root cause (asserts `-debug-only=regalloc`): the strength-reduced i8 array byte index, stepped `i += 2`, selected to A-pinned `ADCImm` (class `Ac`={A}) and deadlocked greedy against the 16-bit indexed-load `Ac16` transit — the counter couldn't recolor off the singleton {A} and the INF transit couldn't spill. Fix: `selectAddSub` lowers a small-const i8 add/sub (`\|Amt\|≤2`) to a relocatable `G_INC`/`G_DEC` chain under `hasAccum16()` so the index lives in X (`inx;inx;cpx`), freeing A16. DEFAULT byte-identical; net −123 B over 122 c-torture progs. Both `a16regpress.c` + the original `globals.c` compile + run clean; positive gate `dev/run.sh a16regpress` (0x01A7, both emulators). [plan](plans/2026-06-24-321-a16-pressure-fix-implementation.md) |
+| `a16-zp-pressure-overflow` (`pr15296.c`, link-time ZP overflow) | ⬜ XFAIL'd — pointer/union pressure, no i8 byte index, so patch `0009` leaves it byte-identical; needs the deferred Phase-3 s16-residency rework |
 | KNOWN_ISSUES XFAIL handling — `evaluate()` classifies under `+mos-xy16` too + both-legs hardening | ✅ **Done (2026-06-21)** — a known `+mos-a16` issue can't mask a NEW `+mos-xy16` crash; both verify legs run; a new crash on either leg always hard-FAILs. [classify](plans/2026-06-21-321-xy16-verify-leg-classify-known.md) · [both-legs](plans/2026-06-21-321-xy16-verify-both-legs-hardening.md) |
 | KNOWN_ISSUES XPASS guard — `dev/run.sh known-issues` (unconditional in CI) | ✅ **Done (2026-06-21)** — asserts `a16regpress`/`a16scavnz` still crash `-verify-machineinstrs` under both modes; fails loudly with "drop the entry + promote to a positive gate" the moment an upstream/RA fix lands. [plan](plans/2026-06-21-321-known-issues-xpass-guard.md) |
 | F4 `TXY`/`TYX` dead-flag fix (patch `0003`) | ✅ In fork; **upstream PR ready** (user-triggered to post) |

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_call|far_near_call|far_tail|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_call|far_near_call|far_tail|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16regpress|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -31,10 +31,11 @@ Targets:
              examples/snes/corpus/ against examples/snes/corpus/expected.tsv
   corpus-a16 run the regression corpus under +mos-a16 (differential): each
              examples/snes/corpus/*.c asserted host == default == +mos-a16 ==
-             +mos-xy16 on MAME + bsnes-jg (globals.c XFAIL: regalloc-out-of-registers).
+             +mos-xy16 on MAME + bsnes-jg (globals.c was XFAIL regalloc-out-of-registers
+             -> FIXED 2026-06-24 by fork patch 0009, now compiles + runs clean).
              Closes the "corpus only ever built default 8-bit" gap that hid it.
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUES repro
-             (a16regpress/a16scavnz) STILL crashes -verify-machineinstrs under both
+             (a16scavnz) STILL crashes -verify-machineinstrs under both
              +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment
              one verifies clean (the deferred bug got fixed) -> drop the KNOWN_ISSUES entry
              + promote to a positive gate. Toolchain-only (no SDK/emulator/secret).
@@ -223,6 +224,11 @@ Targets:
   a16absidx  #321 Increment 1e: native 16-bit abs,x indexed load (`lda abs,x` in M16, opcode BD).
              8-bit byte offset from g_bytes[] -> one rep/sep + lda abs,x (no byte pair).
              corpus_result==0x9ABC host==default==+mos-a16 on both emulators.
+  a16regpress #321 FIXED register-pressure deadlock (was "regalloc-out-of-registers"): a u16
+             accumulator held across a 2nd loop over u16 arrays. The strength-reduced i8 byte index
+             (`i += 2`) used to A-pin (ADCImm) and collide with the Ac16 indexed-load transit; patch
+             0009 lowers it to a relocatable inc/inc chain so it lives in X. corpus_result==0x01A7
+             host==default==+mos-a16 on both emulators (byte index via inx, not A-pinned adc).
   a16frameidx #321 regression: eliminateFrameIndex / CmpBrAbsImm16 frame-index scramble (root-caused
              via c-torture 20071210-1; one fix cleared 13 differential miscompiles). A stack s[6]
              compared vs constants folds to static-stack CmpBrAbsImm16; the displacement must come from
