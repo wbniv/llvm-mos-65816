@@ -1,0 +1,17 @@
+| Date | Change |
+|------|--------|
+| [2026-06-22](https://github.com/wbniv/llvm-mos-65816/commit/4adda8b) | #320 far tail calls: TailJML far arm folds far->far tail (5 B -> 4 B) |
+| [2026-06-22](https://github.com/wbniv/llvm-mos-65816/commit/3fa16b0) | docs: plan #320 far tail calls (TailJML far arm in the tail peephole) |
+
+<!--history-meta v1
+4adda8b	author	Will Norris
+4adda8b	added	133
+4adda8b	deleted	70
+4adda8b	files	1
+4adda8b	body	The MOS tail-call peephole MOSLateOptimization::tailJMP keyed on near\nJSR/RTS only, so a far function's `JSL g; RTL` tail was never converted.\nAdd the far analogue: a new TailJML pseudo (-> JMP_AbsoluteLong $5C,\nrelocates R_MOS_ADDR24) and a second peephole arm\n  JSL <direct far global>; RTL  ->  TailJML\ngated isGlobal && section ".far_" so near->far (JSL;RTS) and the bank-0\nthunks (__call_near_from_far external symbol; __call_indir_far non-.far_\nsection) are auto-excluded -- conservative: a misclassification can only\nmiss a win, never emit a wrong-bank jump or a mismatched return width.\nFar->far tail folds jsl(4)+rtl(1)=5 B to one $5C long jmp = 4 B.\n\na16-independent -> regenerated into 0001 (round-trips 0001..0007;\nMOSLateOptimization.cpp added to regen-patch-0001.sh FAR_FILES).\n\nTests (new examples/65816/far_tail.c + dev/far_tail.sh, wired into\ndev/run.sh + dev/xcheck.sh): far_outer = a single far->far tail (the\n-1 B/disasm demonstrator); far_pick = a two-block conditional whose two\ndistinct-valued far leaves make execution target-sensitive (a broken\nblock-A jump falls through to block B -> a different corpus_result).\nVerified host == MAME == bsnes-jg == 0xCB, +mos-a16 -verify clean, plus\na negative gate in far_near_call.sh (the thunk tail must NOT convert).\ncorpus 7/7, far suite (12 ROMs), csmith fuzz 50 0-mismatch (default+a16\ninert). Design and implementation each adversarially reviewed by a\n3-agent workflow (all ship; one test-strengthening + one comment fix\napplied). Landing to main's shared vendor/+0001 is the pending follow-up.\n\nRealizes the (c) far-tail-call follow-up of #320 and the "#320 far tail\ncalls" TODO item. plan: docs/plans/2026-06-22-320-far-tail-calls.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3fa16b0	author	Will Norris
+3fa16b0	added	390
+3fa16b0	deleted	0
+3fa16b0	files	1
+3fa16b0	body	The MOS tail-call peephole MOSLateOptimization::tailJMP keys on near\nMOS::JSR/RTS, so a far function's `JSL g; RTL` tail is never converted.\nThis plan adds the far analogue: a TailJML pseudo (-> JMP_AbsoluteLong\n$5C, R_MOS_ADDR24) plus a second peephole arm `JSL <far global>; RTL ->\nTailJML`, gated direct-far-global-only so near->far (`JSL;RTS`) and the\nbank-0 thunks (__call_near_from_far/__call_indir_far, ChangeToES external\nsymbols) are auto-excluded -- conservative (a misclass only misses a win).\n-1 B + the redundant return push/pop saved per far tail call.\n\nDesign adversarially verified before writing (3-agent workflow): far->far\nstack-width invariant holds; near->far can't match the JSL+RTL key; thunks\nexcluded; TailJML must expand to $5C not reuse TailJMP's near $4C. All\nclaims confirmed, no stack-corruption case. a16-independent -> patch 0001.\n\nRealizes the (c) out-of-scope stub in the far-calls-followups plan and the\n"#320 far tail calls" TODO item. Ready to implement on wt/320-far-tailcall.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->
