@@ -19,9 +19,10 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 
 - **Ready to post now: 1 PR + 2 issues + 3 design notes** — six artifacts (F4 PR + DP-arg issue posted
   2026-06-22; see *Open on GitHub* below). Strictly *PRs*, that's **one** (the DWARF step-6 test+docs).
-- **Open on GitHub right now: 2** — [PR #562](https://github.com/llvm-mos/llvm-mos/pull/562) (F4 — TYX/TXY
-  dead-flag fix) and [issue #561](https://github.com/llvm-mos/llvm-mos/issues/561) (DP-arg CC), both opened
-  2026-06-22. (Our first contributions upstream.)
+- **Open on GitHub right now: 3** — [PR #562](https://github.com/llvm-mos/llvm-mos/pull/562) (F4 — TYX/TXY
+  dead-flag fix), [issue #561](https://github.com/llvm-mos/llvm-mos/issues/561) (DP-arg CC), and
+  [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563) (the **fix** for #561 — `Fixes #561`, auto-closes
+  it on merge). #561+#562 opened 2026-06-22; #563 opened 2026-06-23. (Our first contributions upstream.)
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
   llvm-mos-sdk#415 engagement (someone else's existing PR).
 - **Hygiene: 1 leftover fork branch** (`revert-540-…`) **retained by preference** — user keeps fork
@@ -38,7 +39,7 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
 | 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | `wbniv:mos-dwarf-65816-test-docs` (pushed `0ae9415`) |
 | 6 | **#321 CC frame-ABI** — measured frame-model evaluation | **note** | Implementation-backed CC evidence: DP-window/stack-relative are feasible but NULL on real code (locals are `__rc`-resident → frames ≈unused); keep the soft static stack, by measurement | [`docs/321-upstream-cc-frame-abi-note.md`](321-upstream-cc-frame-abi-note.md) | n/a (note) |
 | 7 | **#320 far-CC** — measured ABI evaluation (far ptr across a call) | **note** | Implementation-backed CC evidence: all 4 ABIs built behind `+mos-farcc-*` + measured (bytes + round-trips/frame) on MAME+bsnes-jg → **Imag32 wins decisively** (70 B/50441; smallest *and* fastest). Far ptr should pass/return whole in one 4-byte imaginary-register unit, by measurement. **Follow-up to #3** — post after the design note opens the conversation. Shipped as `0004` in-fork. | [`docs/320-upstream-far-cc-measurement-note.md`](320-upstream-far-cc-measurement-note.md) | n/a (note) |
-| 8 | ✅ **POSTED** — **DP-arg CC** — `addrspace(1)` 8-bit pointer argument in a 16-bit register | **issue** | Upstream crash: `CCIfPtr` (MOSCallingConv.td:65) assigns *every* pointer arg to a 16-bit `RS` pair, so an 8-bit `addrspace(1)` (direct-page) pointer arg → illegal `(p1)=COPY $rs` (no fork patch — maintainer CC fix). Reproduces on base `mos6502`. | [`docs/320-upstream-dp-arg-cc-issue.md`](320-upstream-dp-arg-cc-issue.md) | [**#561**](https://github.com/llvm-mos/llvm-mos/issues/561) (opened 2026-06-22) |
+| 8 | ✅ **POSTED + FIXED** — **DP-arg CC** — `addrspace(1)` 8-bit pointer argument in a 16-bit register | **issue + fix PR** | Upstream crash: `CCIfPtr` (MOSCallingConv.td:65) assigns *every* pointer arg to a 16-bit `RS` pair, so an 8-bit `addrspace(1)` (direct-page) pointer arg → illegal `(p1)=COPY $rs`. **Fix** = a `CCIfPtrAddrSpace<1, CCAssignToReg<[A, X, RC2..RC15]>>` rule (8-bit slot) + a `-verify` CodeGen test; spike-validated (5 shapes, corpus 7/7), carried as fork patch `0008`. | [issue body](320-upstream-dp-arg-cc-issue.md) · [PR body](320-upstream-dp-arg-cc-pr.md) | [**#561**](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22) → fixed by [**PR #563**](https://github.com/llvm-mos/llvm-mos/pull/563) (`wbniv:mos-dp-arg-cc`, 2026-06-23) |
 
 ### 1 — F4 PR (a code-change PR; #5 DWARF is the other)
 

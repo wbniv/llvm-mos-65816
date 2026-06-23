@@ -387,14 +387,18 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
   [plan](docs/plans/2026-06-22-321-scavenger-crash-upstream-issue.md) (pre-flight live-here/live-upstream +
   a time-boxed default-8-bit repro attempt so a maintainer can trigger it without the fork-only `+mos-a16`).
-- [wip] **File the DP-pointer-argument calling-convention upstream issue** — ✅ **issue
-  [#561](https://github.com/llvm-mos/llvm-mos/issues/561) opened 2026-06-22.** Passing an `addrspace(1)`
-  (8-bit direct-page) pointer **argument** crashes the MOS backend: the CC materializes it into a 16-bit
-  `RS` reg → illegal `(p1)=COPY $rs`. **Pure upstream** — reproduces on plain `mos6502`; **breaking commit =
-  `e618537e7d5e`** ("Use address space 1 for ZP pointers", 2022-07-25) added the 8-bit DP space with no CC
-  carve-out (the address-space-blind `CCIfPtr` rule predates it). No fork patch (maintainer CC fix).
-  **Awaiting upstream triage.** [plan](docs/plans/2026-06-22-320-far-value-residuals.md) (Part A) · body
-  `docs/320-upstream-dp-arg-cc-issue.md`.
+- [wip] **DP-pointer-argument calling-convention crash — reported + FIXED upstream** — ✅ **issue
+  [#561](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22) + fix [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563)
+  (2026-06-23, `Fixes #561` → auto-closes on merge).** Passing an `addrspace(1)` (8-bit direct-page) pointer
+  **argument** crashed the MOS backend: the CC materialized it into a 16-bit `RS` reg → illegal `(p1)=COPY
+  $rs`. **Pure upstream** — reproduces on plain `mos6502`; **breaking commit = `e618537e7d5e`** ("Use address
+  space 1 for ZP pointers", 2022-07-25). **Fix** (spike GO, `wt/dp-arg-cc`): a `CCIfPtrAddrSpace<1,
+  CCAssignToReg<[A, X, RC2..RC15]>>` rule giving the DP pointer an 8-bit slot (mirrors the far rules + i8
+  pool) + `llvm/test/CodeGen/MOS/dp-pointer-arg.ll`; validated (crash gone 5 shapes mos6502+mosw65816,
+  correct `lda 0,x`/`sta 0,x`, corpus 7/7, test crashes pre-fix/passes post). Carried as **fork patch `0008`**
+  (`e0e8bd4`); drop on merge + bump the vendor pin. **Awaiting upstream review.**
+  [plan](docs/plans/2026-06-22-320-far-value-residuals.md) (Part A) · issue body
+  `docs/320-upstream-dp-arg-cc-issue.md` · PR body `docs/320-upstream-dp-arg-cc-pr.md`.
 - [ ] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
   `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
