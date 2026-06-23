@@ -5,7 +5,8 @@ fix PR #563; *Verified state* snapshot refreshed; project repo `wbniv/llvm-mos-6
 `e39d0ed`. Also landed on `main`: **#320 far tail calls** in `0001` (`4adda8b`) — far→far `JSL;RTL` folds
 to a `TailJML`/`$5C` long jump, −1 B/site — and **32-bit `long`/`int32_t` value-verified** (`a16s32`
 micro-test + a gated `--s32` builtin-fuzzer track, test/tooling only); both fold into the ABI-gated fork
-bodies below, not new ready-to-post rows. Previously 2026-06-22: the **#321 stage-1 native-s16 surface** is now **measured-complete** — consolidated
+bodies below, not new ready-to-post rows. **Hygiene:** the leftover `revert-540-…` fork branch (stale
+revert of merged #540) was deleted by the user on explicit request → 0 leftover fork branches. Previously 2026-06-22: the **#321 stage-1 native-s16 surface** is now **measured-complete** — consolidated
 host-side via `dev/measure-native-s16-surface.sh`; the drafted "stage-1 native-s16 is measured-complete" evidence
 paragraph lives in the [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md)
 and is folded into the *Native 65816 16-bit codegen* Future/blocked item below — still ABI-alignment-gated, not a
@@ -30,8 +31,9 @@ post**, what is **future/blocked**, and what GitHub actually shows right now. Al
   it on merge). #561+#562 opened 2026-06-22; #563 opened 2026-06-23. (Our first contributions upstream.)
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
   llvm-mos-sdk#415 engagement (someone else's existing PR).
-- **Hygiene: 1 leftover fork branch** (`revert-540-…`) **retained by preference** — user keeps fork
-  branches until merged upstream; **do not auto-propose deletion**.
+- **Hygiene: 0 leftover fork branches** — `revert-540-…` (a stale revert of merged #540) was **deleted by
+  the user 2026-06-23** on explicit request. Standing policy unchanged: keep fork branches until merged
+  upstream; **do not auto-propose deletion** (delete only on explicit request).
 
 ## Ready to post now
 
@@ -257,21 +259,18 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
 > *(The ROADMAP-step-6 DWARF **test + docs** item moved up to **Ready to post now #5** on 2026-06-19 —
 > both halves are now drafted: the staged lit test + the `<output>.elf` doc note.)*
 
-## Hygiene — leftover fork branch (retained by preference)
+## Hygiene — leftover fork branch — RESOLVED (deleted 2026-06-23)
 
-`wbniv/llvm-mos:revert-540-fix/soft-stack-spill-crash` is a leftover **revert** branch of **upstream PR
-#540** ("fix(MOS): use reserved RS8 for soft stack spill scratch register"), which was **MERGED upstream on
-2026-01-26**. No open PR uses it, so it is not a pending contribution of ours.
+`wbniv/llvm-mos:revert-540-fix/soft-stack-spill-crash` (a leftover **revert** branch of **upstream PR #540**,
+"fix(MOS): use reserved RS8 for soft stack spill scratch register", **MERGED upstream 2026-01-26**) was
+**deleted by the user on 2026-06-23** (`gh api -X DELETE
+repos/wbniv/llvm-mos/git/refs/heads/revert-540-fix/soft-stack-spill-crash`). It was the documented corner
+case: a *revert* of an *already-merged* PR, so "retain until merged upstream" was already satisfied; no open
+PR used it. No leftover fork branches remain.
 
-**Standing policy (user, 2026-06-21): keep fork branches around — do not auto-propose deleting them.** The
-user retains fork branches as a habit (a safety net until the related work is merged upstream); this one is
-**left in place**. Only delete on an explicit, case-by-case request. Note the corner case for the record:
-this is a *revert* of an *already-merged* PR, so "until merged upstream" is technically already satisfied —
-but it stays unless the user says otherwise. The one-liner, if they ever opt in:
-
-```
-gh api -X DELETE repos/wbniv/llvm-mos/git/refs/heads/revert-540-fix/soft-stack-spill-crash
-```
+**Standing policy (user, 2026-06-21) unchanged: keep fork branches around — do not auto-propose deleting
+them.** This one was removed on the user's explicit request, which is the only condition under which a fork
+branch is deleted.
 
 ## Verified state (GitHub, 2026-06-23)
 
@@ -290,7 +289,7 @@ $ gh api repos/wbniv/llvm-mos/branches --jq '.[].name' | grep -v '^main$'
 mos-dp-arg-cc                              # PR #563 — DP-arg CC fix (pushed 2026-06-23)
 mos-late-opt-txy-dead-flag                 # PR #562 — F4 dead-flag fix
 mos-dwarf-65816-test-docs                  # DWARF step-6 PR — pushed, not yet opened (queue #5)
-revert-540-fix/soft-stack-spill-crash      # stale revert of merged upstream #540 (retained by preference)
+# (revert-540-fix/soft-stack-spill-crash deleted 2026-06-23 — stale revert of merged #540)
 
 $ gh pr view 540 --repo llvm-mos/llvm-mos --json number,title,state,mergedAt
 {"number":540,"title":"fix(MOS): use reserved RS8 for soft stack spill scratch register",
