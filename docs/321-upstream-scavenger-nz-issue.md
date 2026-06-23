@@ -102,4 +102,18 @@ So a correct fix likely needs one of:
 3. At minimum, **replacing the assert with a graceful path** so a flag-live scavenge cannot silently emit
    illegal MIR in a release build.
 
-Happy to provide the full delta-debugged repro, the asserts backtrace, and the pre-PEI MIR.
+### A tested approach that does *not* work (so you can skip it)
+
+The tempting minimal fix — gating `canSaveScavengerRegister(MOS::P)` to also require N/Z dead across
+`[I, UseMI]` (so the scavenger declines `P` here) — **does not help**. With `P` refused, the scavenger
+falls through to `saveScavengerRegister`'s `default:` arm and hits
+`report_fatal_error("Scavenger spill for register not yet implemented")` on a **nameless flag/carry-class
+register** (the `%N.subcarry` vreg this frame access rematerializes). At the failing site *every* candidate
+the scavenger can choose is unsaveable, so the fix cannot live in the gate — it has to address how this
+flag/carry-class vreg comes to require frame-scavenging in a flag-live context (direction 2), or implement
+a real flag-preserving `P` spill across an unbalanced range (direction 1). The observed double-`P` scavenge
+in the failing block (a `PH $p` flagged "using an undefined physical register" alongside the `STImag8 $p`)
+also suggests the reserved `RC17` save slot collides across two scavenge events in the same block.
+
+Happy to provide the full delta-debugged repro, the asserts backtrace, the pre-PEI MIR, and the
+`-debug-only=reg-scavenging` trace.

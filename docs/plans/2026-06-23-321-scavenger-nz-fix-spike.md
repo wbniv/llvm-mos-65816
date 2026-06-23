@@ -52,8 +52,47 @@ viable alternative exists.
 5. **XPASS guard:** if fixed, `dev/run.sh known-issues` will flip the `scavenger-p-not-gpr` repro from
    "still reproduces" to XPASS — so the `KNOWN_ISSUES` entry + `a16scavnz.c` gate get updated (de-XFAIL).
 
-_(results pasted below each step as the spike runs)_
+### Step 1 — release `-verify` on `a16scavnz.c`
 
-## Outcome
+```
+fatal error: error in backend: Scavenger spill for register not yet implemented.
+  llvm::RegScavenger::spill → scavengeRegisterBackwards → scavengeFrameVirtualRegs
+Register:                       (empty name — a flag/carry-class pseudo, not a GPR)
+```
 
-_(TBD — GO → upstream PR + fork patch + de-XFAIL; NO-GO → record what failed, keep issue-only.)_
+**FAIL (informative).** The illegal `STImag8 $p` is gone (the gate refused P), but the scavenger then falls
+through to the `default:` arm of `saveScavengerRegister` — `report_fatal_error("Scavenger spill for register
+not yet implemented")` — on a **nameless flag/carry-class register**. So refusing P does not let the
+scavenger find a legal alternative; it just relocates the failure.
+
+(Steps 2–5 not run: step 1 already shows the hypothesis does not yield a clean compile.)
+
+## Outcome — NO-GO for a narrow fix (issue stays issue-only; now better-evidenced)
+
+The conservative `canSaveScavengerRegister(P)` N/Z gate — the safest possible local patch — **dead-ends**:
+at the failing site *every* register the scavenger can pick is unsaveable. P has no legal soft spill
+(`STImag8 $p` illegal) and can't take the hard-stack bracket across the unbalanced range; the only other
+candidate is a flag/carry-class pseudo with **no `saveScavengerRegister` implementation at all**. So the
+defect is not in the gate — it is that MOS asks the scavenger to free a register in a flag-live, unbalanced
+context where the target has **no legal way to spill anything**.
+
+A real fix therefore lives in shared, regression-sensitive territory — one of:
+1. **Implement a flag-preserving P save that tolerates an unbalanced range** (PHP at `I` + a stack-relative
+   restore at `UseMI` accounting for the net push count) — fragile, and the observed double-P-scavenge
+   (`PH $p` "using an undefined physical register" alongside the `STImag8 $p`) shows the reserved RC17 slot
+   already collides across the two scavenge events.
+2. **Change how MOS models the flag/carry-class vreg** (`%NN.subcarry:pc = LDCImm 0`) so a frame access in a
+   flag-live context doesn't force scavenging an unsaveable register in the first place.
+
+Both are core MOS scavenger/frame-lowering changes across all subtargets — **maintainer territory**, exactly
+as the 2026-06-19 verdict held. This spike *confirms* that verdict with a concrete tested negative, which is
+the durable win: the upstream issue can now state "the conservative N/Z gate on
+`canSaveScavengerRegister(P)` does not work — it dead-ends the scavenger on a flag-class pseudo with no
+spill impl; the fix must address [1]/[2]." That is materially stronger maintainer guidance than the original
+issue.
+
+**Disposition:** the in-worktree gate edit is **not landed** (it doesn't fix the bug). Keep the issue
+**issue-only** (`docs/321-upstream-scavenger-nz-issue.md`); fold this tested-negative into its "Likely fix
+directions" if/when posting. `wt/scavenger-nz` is a **dead-end spike** → teardown
+(`dev/worktree-teardown.sh scavenger-nz`); the durable artifact is *this plan*. The 8 fuzz seeds stay
+XFAIL'd + XPASS-guarded as before — nothing changes in-fork.
