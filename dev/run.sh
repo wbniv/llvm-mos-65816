@@ -258,7 +258,9 @@ Targets:
              Usage: dev/run.sh fuzz [--gen csmith|builtin] [N] [seed]
                     (e.g. dev/run.sh fuzz --gen csmith 1 11 to repro one Csmith seed)
   k_*        #321 Tier-1 realistic kernels (CRC16, fixed-point mul, PRNG, popcount/bit-reverse,
-             saturating add, insertion sort): each asserts host==default==+mos-a16 on both emus
+             saturating add, insertion sort, Mandelbrot escape-time): each asserts
+             host==default==+mos-a16 on both emus. k_mandel is the beefy fixed-point demo
+             (gate slice; full image rendered host-side via tools/mandel-render + on-console)
   a16mix*    #321 Tier-1 combinatorial mixing: many s16 features in one body (compares + shifts
              + chains + calls + spills); asserts host==default==+mos-a16 on both emus
   xcheck-suite  bsnes-jg-ONLY confirmation: run the a16/xy16 value tests' second-
