@@ -291,10 +291,15 @@ all resolved. Both emulator frames assert the buffer CRC == the host's `0x75E8`.
 - **MAME headless snapshot** needs video enabled (unlike the smoke path); if fussy, bsnes-jg's framebuffer dump
   is the dependable PNG. Confirm early in Track 2.
 
-## Merge-back checklist (when it lands on `main`)
+## Merge-back checklist (all prep DONE on the branch; only the merge itself is user-triggered)
 
-- [ ] Durable artifacts only: `mandel.h`, `k_mandel.c`, `dev/k_mandel.sh`, `tools/mandel-render.c`, the `snes.h`
-      HAL additions, `dev/mandel-shot.sh`, this plan, the PNGs.
-- [ ] `TODO.md` entry → Done; add a row to `docs/investigations/plan-index.md`.
-- [ ] `dev/run.sh` help/target list includes `k_mandel` (+ `mandel-shot`).
-- [ ] Register/clear the worktree row in `docs/agent-handoff.md` Active-worktrees.
+- [x] ~~Durable artifacts committed~~ (no `vendor/`/`build/`/transcripts): `examples/65816/{mandel.h, k_mandel.c,
+      k_mandel_far.c}`, `examples/snes/{mandel-display.c, mandel-mode7.c}`, `tools/{mandel-render.c, png_write.h}`,
+      `dev/{k_mandel.sh, mandel-shot.sh, mandel-shot.lua, mandel-far.sh, mandel-mode7.sh, jgxcheck.cpp, xcheck.sh,
+      Dockerfile, run.sh}`, `platforms/snes/snes.h` (display HAL), `Taskfile.yml`, the screenshots, this plan, the
+      rendering handoff + the OO/screenshot/libraries how-tos.
+- [x] ~~`TODO.md` entry → Done~~ (`[x]`, 2026-06-25); ~~plan-index row added~~ (`docs/investigations/plan-index.md`, `Platform`).
+- [x] ~~`dev/run.sh` help / `task` targets~~ — `k_mandel`, `mandel-shot`, `mandel-far`, `mandel-mode7` (+ `task mandel-mame`).
+- [x] ~~Worktree registered in `docs/agent-handoff.md`~~ Active-worktrees (2026-06-25).
+- [ ] **Merge `wt/321-mandelbrot` → `main` + push** — user-triggered; the worktree is retained until then (policy).
+      Nothing is on `main` yet, so removal would lose nothing once merged.
