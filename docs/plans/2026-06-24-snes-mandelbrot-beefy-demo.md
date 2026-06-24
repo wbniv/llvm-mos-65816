@@ -204,6 +204,16 @@ SMOKE: PASS off=0x580 len=2 got=0x9103 (ran 1800 frames, bsnes-jg)
 RESULT: PASS — Mandelbrot rendered on SNES; MAME + bsnes-jg screenshots match host (CRC 0x9103)
 ```
 
+<img src="screenshots/mandel-compare.png" width="900">
+
+*Left→right: the **host** renderer (`tools/mandel-render`, 240×160 true pixels), then the same fixed-point
+Mandelbrot computed **on the SNES** under `+mos-a16` and screenshotted from **bsnes-jg** (256×224) and **MAME**
+(512×225, MAME's native 2×-wide snes snapshot). Same shape, same palette; both emulator frames assert their
+on-screen buffer CRC == the host's `0x9103`. (Regenerate the montage on a host with ImageMagick:
+`montage -label … mandel-host.png mandel-jg.png mandel-mame.png -tile 3x1 -geometry '^x224+8+8' -background '#222' mandel-compare.png`.)*
+
+Full-size individual frames:
+
 | host (`tools/mandel-render`) | bsnes-jg (framebuffer dump) | MAME (snapshot under Xvfb) |
 |---|---|---|
 | <img src="screenshots/mandel-host.png" width="240"> | <img src="screenshots/mandel-jg.png" width="240"> | <img src="screenshots/mandel-mame.png" width="240"> |
