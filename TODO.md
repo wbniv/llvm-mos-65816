@@ -1064,7 +1064,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "posting upstream artifacts is user-triggered" = a standing fact, already curated in the
        Upstream/Contribution section + upstream-contribution-status.md. Nothing open here.
      fp:05152983f417d956 fp:2b58be7d4ba4a17d fp:383468bec170eac8 -->
-- [ ] **(triage)** **Graphics layer (currently greenfield** — the repo's only on-screen code today is `hello.c`'s green — _from [2026-06-24-blossom-snes.md](docs/plans/2026-06-24-blossom-snes.md)_  <!-- fp:9a83cc394836d1de -->
-- [ ] **(triage)** **Interactivity:** joypad controls — random a/b/c, switch palette/formula/color-mode, auto-scale. — _from [2026-06-24-blossom-snes.md](docs/plans/2026-06-24-blossom-snes.md)_  <!-- fp:8b629fbc2e270274 -->
-- [ ] **(triage)** **Optional perf path:** the SNES hardware multiplier (`$4202/$4203 → $4216`) for the hot `b*x`. — _from [2026-06-24-blossom-snes.md](docs/plans/2026-06-24-blossom-snes.md)_  <!-- fp:fb7011942a1132aa -->
+<!-- triaged 2026-06-24: all three are the deferred Phase-2/3 sub-points of the Blossom SNES port,
+     already curated as the single "#3 SNES Blossom on-screen interactive port" item under Open/M2
+     (graphics layer = Mode-7 framebuffer + $7E shadow buffer + DMA + CGRAM regs; interactivity =
+     joypad controls; optional perf = $4202 hw multiplier). Not separate open work — covered there.
+     fp:9a83cc394836d1de fp:8b629fbc2e270274 fp:fb7011942a1132aa -->
 <!-- END auto-captured-deferrals -->
