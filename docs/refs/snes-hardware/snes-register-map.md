@@ -14,72 +14,72 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 | Addr | Name | R/W | Purpose |
 |------|------|-----|---------|
-| `$2100` | `REG_INIDISP` | W | Display control 1 — force-blank + master brightness. |
-| `$2101` | `REG_OBSEL` | W | Object (sprite) size + tile-base select. |
-| `$2102` | `REG_OAMADDL` | W | OAM word address, low byte (0..255). |
-| `$2103` | `REG_OAMADDH` | W | OAM address high + priority rotation. |
-| `$2104` | `REG_OAMDATA` | W | OAM data write (auto-increments OAMADD; write low then high). |
-| `$2105` | `REG_BGMODE` | W | BG mode + per-layer tile size. |
-| `$2106` | `REG_MOSAIC` | W | Mosaic block size + per-BG enable. |
-| `$2107` | `REG_BG1SC` | W | BG1 tilemap base + map size. |
-| `$2108` | `REG_BG2SC` | W | BG2 tilemap base + size (see BG1SC). |
-| `$2109` | `REG_BG3SC` | W | BG3 tilemap base + size (see BG1SC). |
-| `$210A` | `REG_BG4SC` | W | BG4 tilemap base + size (see BG1SC). |
-| `$210B` | `REG_BG12NBA` | W | BG1/BG2 character (tile) data base. |
-| `$210C` | `REG_BG34NBA` | W | BG3/BG4 character data base. |
-| `$210D` | `REG_BG1HOFS` | W | BG1 horizontal scroll (write twice; 10-bit, +Mode7 share). |
-| `$210E` | `REG_BG1VOFS` | W | BG1 vertical scroll (write twice; 10-bit). |
-| `$210F` | `REG_BG2HOFS` | W | BG2 horizontal scroll (write twice). |
-| `$2110` | `REG_BG2VOFS` | W | BG2 vertical scroll (write twice). |
-| `$2111` | `REG_BG3HOFS` | W | BG3 horizontal scroll (write twice). |
-| `$2112` | `REG_BG3VOFS` | W | BG3 vertical scroll (write twice). |
-| `$2113` | `REG_BG4HOFS` | W | BG4 horizontal scroll (write twice). |
-| `$2114` | `REG_BG4VOFS` | W | BG4 vertical scroll (write twice). |
-| `$2115` | `REG_VMAIN` | W | VRAM address increment control. |
-| `$2116` | `REG_VMADDL` | W | VRAM word address, low byte. |
-| `$2117` | `REG_VMADDH` | W | VRAM word address, high byte. |
-| `$2118` | `REG_VMDATAL` | W | VRAM data, low byte (increments per VMAIN if INCHIGH=0). |
-| `$2119` | `REG_VMDATAH` | W | VRAM data, high byte (increments per VMAIN if INCHIGH=1). |
-| `$2116` | `REG_VMADD` ¹⁶ | W | VRAM word address, 16-bit access alias over VMADDL/H. |
-| `$2118` | `REG_VMDATA` ¹⁶ | W | VRAM data, 16-bit access alias over VMDATAL/H (low then high). |
-| `$211A` | `REG_M7SEL` | W | Mode 7 screen settings. |
-| `$211B` | `REG_M7A` | W | Mode 7 matrix A (signed 8.8; write low,high). Also hw-multiply factor A. |
-| `$211C` | `REG_M7B` | W | Mode 7 matrix B (signed 8.8; write low,high). Also hw-multiply factor B (8-bit). |
-| `$211D` | `REG_M7C` | W | Mode 7 matrix C (signed 8.8; write low,high). |
-| `$211E` | `REG_M7D` | W | Mode 7 matrix D (signed 8.8; write low,high). |
-| `$211F` | `REG_M7X` | W | Mode 7 center X (signed 13-bit; write twice). |
-| `$2120` | `REG_M7Y` | W | Mode 7 center Y (signed 13-bit; write twice). |
-| `$2121` | `REG_CGADD` | W | CGRAM (palette) entry address (0..255). |
-| `$2122` | `REG_CGDATA` | W | CGRAM data port — BGR555, write low byte then high byte. |
-| `$2123` | `REG_W12SEL` | W | Window mask settings for BG1/BG2 (2 bits per window/layer). |
-| `$2124` | `REG_W34SEL` | W | Window mask settings for BG3/BG4. |
-| `$2125` | `REG_WOBJSEL` | W | Window mask settings for OBJ + color-math. |
-| `$2126` | `REG_WH0` | W | Window 1 left position (pixel 0..255). |
-| `$2127` | `REG_WH1` | W | Window 1 right position. |
-| `$2128` | `REG_WH2` | W | Window 2 left position. |
-| `$2129` | `REG_WH3` | W | Window 2 right position. |
-| `$212A` | `REG_WBGLOG` | W | Window-1/2 combine logic per BG (00 OR, 01 AND, 10 XOR, 11 XNOR). |
-| `$212B` | `REG_WOBJLOG` | W | Window combine logic for OBJ + color-math. |
-| `$212C` | `REG_TM` | W | Main-screen layer enable. |
-| `$212D` | `REG_TS` | W | Sub-screen layer enable (bits as TM). |
-| `$212E` | `REG_TMW` | W | Main-screen window-mask enable per layer (bits as TM). |
-| `$212F` | `REG_TSW` | W | Sub-screen window-mask enable per layer (bits as TM). |
-| `$2130` | `REG_CGWSEL` | W | Color-math control window + source. |
-| `$2131` | `REG_CGADSUB` | W | Color-math operation + per-layer enable. |
-| `$2132` | `REG_COLDATA` | W | Fixed color for color math (write once per channel). |
-| `$2133` | `REG_SETINI` | W | Display mode / interlace settings. |
-| `$2134` | `REG_MPYL` | R | Mode 7 / hw multiply result, low byte (M7A signed16 x M7B signed8 = signed24). |
-| `$2135` | `REG_MPYM` | R | multiply result, middle byte. |
-| `$2136` | `REG_MPYH` | R | multiply result, high byte. |
-| `$2137` | `REG_SLHV` | R | software latch: a dummy read latches the H/V counters into OPHCT/OPVCT. |
-| `$2138` | `REG_OAMDATAREAD` | R | OAM data read (auto-increments OAMADD). |
-| `$2139` | `REG_VMDATALREAD` | R | VRAM data read, low byte (increments per VMAIN). |
-| `$213A` | `REG_VMDATAHREAD` | R | VRAM data read, high byte. |
-| `$213B` | `REG_CGDATAREAD` | R | CGRAM data read (low then high). |
-| `$213C` | `REG_OPHCT` | R | horizontal counter latch (read twice: low then high bit 8; 0..339). |
-| `$213D` | `REG_OPVCT` | R | vertical counter latch (read twice; 0..261 NTSC). |
-| `$213E` | `REG_STAT77` | R | PPU1 (5C77) status. |
-| `$213F` | `REG_STAT78` | R | PPU2 (5C78) status. |
+| <nobr>`$2100`</nobr> | <nobr>`REG_INIDISP`</nobr> | W | Display control 1 — force-blank + master brightness. |
+| <nobr>`$2101`</nobr> | <nobr>`REG_OBSEL`</nobr> | W | Object (sprite) size + tile-base select. |
+| <nobr>`$2102`</nobr> | <nobr>`REG_OAMADDL`</nobr> | W | OAM word address, low byte (0..255). |
+| <nobr>`$2103`</nobr> | <nobr>`REG_OAMADDH`</nobr> | W | OAM address high + priority rotation. |
+| <nobr>`$2104`</nobr> | <nobr>`REG_OAMDATA`</nobr> | W | OAM data write (auto-increments OAMADD; write low then high). |
+| <nobr>`$2105`</nobr> | <nobr>`REG_BGMODE`</nobr> | W | BG mode + per-layer tile size. |
+| <nobr>`$2106`</nobr> | <nobr>`REG_MOSAIC`</nobr> | W | Mosaic block size + per-BG enable. |
+| <nobr>`$2107`</nobr> | <nobr>`REG_BG1SC`</nobr> | W | BG1 tilemap base + map size. |
+| <nobr>`$2108`</nobr> | <nobr>`REG_BG2SC`</nobr> | W | BG2 tilemap base + size (see BG1SC). |
+| <nobr>`$2109`</nobr> | <nobr>`REG_BG3SC`</nobr> | W | BG3 tilemap base + size (see BG1SC). |
+| <nobr>`$210A`</nobr> | <nobr>`REG_BG4SC`</nobr> | W | BG4 tilemap base + size (see BG1SC). |
+| <nobr>`$210B`</nobr> | <nobr>`REG_BG12NBA`</nobr> | W | BG1/BG2 character (tile) data base. |
+| <nobr>`$210C`</nobr> | <nobr>`REG_BG34NBA`</nobr> | W | BG3/BG4 character data base. |
+| <nobr>`$210D`</nobr> | <nobr>`REG_BG1HOFS`</nobr> | W | BG1 horizontal scroll (write twice; 10-bit, +Mode7 share). |
+| <nobr>`$210E`</nobr> | <nobr>`REG_BG1VOFS`</nobr> | W | BG1 vertical scroll (write twice; 10-bit). |
+| <nobr>`$210F`</nobr> | <nobr>`REG_BG2HOFS`</nobr> | W | BG2 horizontal scroll (write twice). |
+| <nobr>`$2110`</nobr> | <nobr>`REG_BG2VOFS`</nobr> | W | BG2 vertical scroll (write twice). |
+| <nobr>`$2111`</nobr> | <nobr>`REG_BG3HOFS`</nobr> | W | BG3 horizontal scroll (write twice). |
+| <nobr>`$2112`</nobr> | <nobr>`REG_BG3VOFS`</nobr> | W | BG3 vertical scroll (write twice). |
+| <nobr>`$2113`</nobr> | <nobr>`REG_BG4HOFS`</nobr> | W | BG4 horizontal scroll (write twice). |
+| <nobr>`$2114`</nobr> | <nobr>`REG_BG4VOFS`</nobr> | W | BG4 vertical scroll (write twice). |
+| <nobr>`$2115`</nobr> | <nobr>`REG_VMAIN`</nobr> | W | VRAM address increment control. |
+| <nobr>`$2116`</nobr> | <nobr>`REG_VMADDL`</nobr> | W | VRAM word address, low byte. |
+| <nobr>`$2117`</nobr> | <nobr>`REG_VMADDH`</nobr> | W | VRAM word address, high byte. |
+| <nobr>`$2118`</nobr> | <nobr>`REG_VMDATAL`</nobr> | W | VRAM data, low byte (increments per VMAIN if INCHIGH=0). |
+| <nobr>`$2119`</nobr> | <nobr>`REG_VMDATAH`</nobr> | W | VRAM data, high byte (increments per VMAIN if INCHIGH=1). |
+| <nobr>`$2116`</nobr> | <nobr>`REG_VMADD`</nobr> ¹⁶ | W | VRAM word address, 16-bit access alias over VMADDL/H. |
+| <nobr>`$2118`</nobr> | <nobr>`REG_VMDATA`</nobr> ¹⁶ | W | VRAM data, 16-bit access alias over VMDATAL/H (low then high). |
+| <nobr>`$211A`</nobr> | <nobr>`REG_M7SEL`</nobr> | W | Mode 7 screen settings. |
+| <nobr>`$211B`</nobr> | <nobr>`REG_M7A`</nobr> | W | Mode 7 matrix A (signed 8.8; write low,high). Also hw-multiply factor A. |
+| <nobr>`$211C`</nobr> | <nobr>`REG_M7B`</nobr> | W | Mode 7 matrix B (signed 8.8; write low,high). Also hw-multiply factor B (8-bit). |
+| <nobr>`$211D`</nobr> | <nobr>`REG_M7C`</nobr> | W | Mode 7 matrix C (signed 8.8; write low,high). |
+| <nobr>`$211E`</nobr> | <nobr>`REG_M7D`</nobr> | W | Mode 7 matrix D (signed 8.8; write low,high). |
+| <nobr>`$211F`</nobr> | <nobr>`REG_M7X`</nobr> | W | Mode 7 center X (signed 13-bit; write twice). |
+| <nobr>`$2120`</nobr> | <nobr>`REG_M7Y`</nobr> | W | Mode 7 center Y (signed 13-bit; write twice). |
+| <nobr>`$2121`</nobr> | <nobr>`REG_CGADD`</nobr> | W | CGRAM (palette) entry address (0..255). |
+| <nobr>`$2122`</nobr> | <nobr>`REG_CGDATA`</nobr> | W | CGRAM data port — BGR555, write low byte then high byte. |
+| <nobr>`$2123`</nobr> | <nobr>`REG_W12SEL`</nobr> | W | Window mask settings for BG1/BG2 (2 bits per window/layer). |
+| <nobr>`$2124`</nobr> | <nobr>`REG_W34SEL`</nobr> | W | Window mask settings for BG3/BG4. |
+| <nobr>`$2125`</nobr> | <nobr>`REG_WOBJSEL`</nobr> | W | Window mask settings for OBJ + color-math. |
+| <nobr>`$2126`</nobr> | <nobr>`REG_WH0`</nobr> | W | Window 1 left position (pixel 0..255). |
+| <nobr>`$2127`</nobr> | <nobr>`REG_WH1`</nobr> | W | Window 1 right position. |
+| <nobr>`$2128`</nobr> | <nobr>`REG_WH2`</nobr> | W | Window 2 left position. |
+| <nobr>`$2129`</nobr> | <nobr>`REG_WH3`</nobr> | W | Window 2 right position. |
+| <nobr>`$212A`</nobr> | <nobr>`REG_WBGLOG`</nobr> | W | Window-1/2 combine logic per BG (00 OR, 01 AND, 10 XOR, 11 XNOR). |
+| <nobr>`$212B`</nobr> | <nobr>`REG_WOBJLOG`</nobr> | W | Window combine logic for OBJ + color-math. |
+| <nobr>`$212C`</nobr> | <nobr>`REG_TM`</nobr> | W | Main-screen layer enable. |
+| <nobr>`$212D`</nobr> | <nobr>`REG_TS`</nobr> | W | Sub-screen layer enable (bits as TM). |
+| <nobr>`$212E`</nobr> | <nobr>`REG_TMW`</nobr> | W | Main-screen window-mask enable per layer (bits as TM). |
+| <nobr>`$212F`</nobr> | <nobr>`REG_TSW`</nobr> | W | Sub-screen window-mask enable per layer (bits as TM). |
+| <nobr>`$2130`</nobr> | <nobr>`REG_CGWSEL`</nobr> | W | Color-math control window + source. |
+| <nobr>`$2131`</nobr> | <nobr>`REG_CGADSUB`</nobr> | W | Color-math operation + per-layer enable. |
+| <nobr>`$2132`</nobr> | <nobr>`REG_COLDATA`</nobr> | W | Fixed color for color math (write once per channel). |
+| <nobr>`$2133`</nobr> | <nobr>`REG_SETINI`</nobr> | W | Display mode / interlace settings. |
+| <nobr>`$2134`</nobr> | <nobr>`REG_MPYL`</nobr> | R | Mode 7 / hw multiply result, low byte (M7A signed16 x M7B signed8 = signed24). |
+| <nobr>`$2135`</nobr> | <nobr>`REG_MPYM`</nobr> | R | multiply result, middle byte. |
+| <nobr>`$2136`</nobr> | <nobr>`REG_MPYH`</nobr> | R | multiply result, high byte. |
+| <nobr>`$2137`</nobr> | <nobr>`REG_SLHV`</nobr> | R | software latch: a dummy read latches the H/V counters into OPHCT/OPVCT. |
+| <nobr>`$2138`</nobr> | <nobr>`REG_OAMDATAREAD`</nobr> | R | OAM data read (auto-increments OAMADD). |
+| <nobr>`$2139`</nobr> | <nobr>`REG_VMDATALREAD`</nobr> | R | VRAM data read, low byte (increments per VMAIN). |
+| <nobr>`$213A`</nobr> | <nobr>`REG_VMDATAHREAD`</nobr> | R | VRAM data read, high byte. |
+| <nobr>`$213B`</nobr> | <nobr>`REG_CGDATAREAD`</nobr> | R | CGRAM data read (low then high). |
+| <nobr>`$213C`</nobr> | <nobr>`REG_OPHCT`</nobr> | R | horizontal counter latch (read twice: low then high bit 8; 0..339). |
+| <nobr>`$213D`</nobr> | <nobr>`REG_OPVCT`</nobr> | R | vertical counter latch (read twice; 0..261 NTSC). |
+| <nobr>`$213E`</nobr> | <nobr>`REG_STAT77`</nobr> | R | PPU1 (5C77) status. |
+| <nobr>`$213F`</nobr> | <nobr>`REG_STAT78`</nobr> | R | PPU2 (5C78) status. |
 
 <details><summary>Bit fields</summary>
 
@@ -484,96 +484,96 @@ Eight transfer channels plus the MDMAEN/HDMAEN enable triggers. — `snes_dma.h`
 
 | Addr | Name | R/W | Purpose |
 |------|------|-----|---------|
-| `$420B` | `REG_MDMAEN` | W | General-purpose DMA enable + trigger; CPU stalls until done. |
-| `$420C` | `REG_HDMAEN` | W | HDMA enable (per-scanline); bit n = arm channel n for HDMA. |
-| `$4300` | `REG_DMAP0` | RW | Channel 0 transfer parameters. |
-| `$4301` | `REG_BBAD0` | RW | Channel 0 B-bus destination (low byte of $21xx, e.g. $18 -> VMDATA). |
-| `$4302` | `REG_A1T0L` | RW | Channel 0 A-bus source address, low byte. |
-| `$4303` | `REG_A1T0H` | RW | Channel 0 A-bus source address, high byte. |
-| `$4304` | `REG_A1B0` | RW | Channel 0 A-bus source bank. |
-| `$4305` | `REG_DAS0L` | RW | Channel 0 byte count low (GP-DMA) / HDMA indirect addr low. 0 count = 65536. |
-| `$4306` | `REG_DAS0H` | RW | Channel 0 byte count high / HDMA indirect addr high. |
-| `$4307` | `REG_DASB0` | RW | Channel 0 HDMA indirect address bank (HDMA only). |
-| `$4308` | `REG_A2A0L` | RW | Channel 0 HDMA table current address, low (HDMA only). |
-| `$4309` | `REG_A2A0H` | RW | Channel 0 HDMA table current address, high (HDMA only). |
-| `$430A` | `REG_NTRL0` | RW | Channel 0 HDMA line counter (HDMA only). |
-| `$4310` | `REG_DMAP1` | RW | Channel 1 transfer parameters (see DMAP0). |
-| `$4311` | `REG_BBAD1` | RW | Channel 1 B-bus destination. |
-| `$4312` | `REG_A1T1L` | RW | Channel 1 A-bus source low. |
-| `$4313` | `REG_A1T1H` | RW | Channel 1 A-bus source high. |
-| `$4314` | `REG_A1B1` | RW | Channel 1 A-bus source bank. |
-| `$4315` | `REG_DAS1L` | RW | Channel 1 byte count low / HDMA indirect low. |
-| `$4316` | `REG_DAS1H` | RW | Channel 1 byte count high / HDMA indirect high. |
-| `$4317` | `REG_DASB1` | RW | Channel 1 HDMA indirect bank. |
-| `$4318` | `REG_A2A1L` | RW | Channel 1 HDMA table address low. |
-| `$4319` | `REG_A2A1H` | RW | Channel 1 HDMA table address high. |
-| `$431A` | `REG_NTRL1` | RW | Channel 1 HDMA line counter. |
-| `$4320` | `REG_DMAP2` | RW | Channel 2 transfer parameters (see DMAP0). |
-| `$4321` | `REG_BBAD2` | RW | Channel 2 B-bus destination. |
-| `$4322` | `REG_A1T2L` | RW | Channel 2 A-bus source low. |
-| `$4323` | `REG_A1T2H` | RW | Channel 2 A-bus source high. |
-| `$4324` | `REG_A1B2` | RW | Channel 2 A-bus source bank. |
-| `$4325` | `REG_DAS2L` | RW | Channel 2 byte count low / HDMA indirect low. |
-| `$4326` | `REG_DAS2H` | RW | Channel 2 byte count high / HDMA indirect high. |
-| `$4327` | `REG_DASB2` | RW | Channel 2 HDMA indirect bank. |
-| `$4328` | `REG_A2A2L` | RW | Channel 2 HDMA table address low. |
-| `$4329` | `REG_A2A2H` | RW | Channel 2 HDMA table address high. |
-| `$432A` | `REG_NTRL2` | RW | Channel 2 HDMA line counter. |
-| `$4330` | `REG_DMAP3` | RW | Channel 3 transfer parameters (see DMAP0). |
-| `$4331` | `REG_BBAD3` | RW | Channel 3 B-bus destination. |
-| `$4332` | `REG_A1T3L` | RW | Channel 3 A-bus source low. |
-| `$4333` | `REG_A1T3H` | RW | Channel 3 A-bus source high. |
-| `$4334` | `REG_A1B3` | RW | Channel 3 A-bus source bank. |
-| `$4335` | `REG_DAS3L` | RW | Channel 3 byte count low / HDMA indirect low. |
-| `$4336` | `REG_DAS3H` | RW | Channel 3 byte count high / HDMA indirect high. |
-| `$4337` | `REG_DASB3` | RW | Channel 3 HDMA indirect bank. |
-| `$4338` | `REG_A2A3L` | RW | Channel 3 HDMA table address low. |
-| `$4339` | `REG_A2A3H` | RW | Channel 3 HDMA table address high. |
-| `$433A` | `REG_NTRL3` | RW | Channel 3 HDMA line counter. |
-| `$4340` | `REG_DMAP4` | RW | Channel 4 transfer parameters (see DMAP0). |
-| `$4341` | `REG_BBAD4` | RW | Channel 4 B-bus destination. |
-| `$4342` | `REG_A1T4L` | RW | Channel 4 A-bus source low. |
-| `$4343` | `REG_A1T4H` | RW | Channel 4 A-bus source high. |
-| `$4344` | `REG_A1B4` | RW | Channel 4 A-bus source bank. |
-| `$4345` | `REG_DAS4L` | RW | Channel 4 byte count low / HDMA indirect low. |
-| `$4346` | `REG_DAS4H` | RW | Channel 4 byte count high / HDMA indirect high. |
-| `$4347` | `REG_DASB4` | RW | Channel 4 HDMA indirect bank. |
-| `$4348` | `REG_A2A4L` | RW | Channel 4 HDMA table address low. |
-| `$4349` | `REG_A2A4H` | RW | Channel 4 HDMA table address high. |
-| `$434A` | `REG_NTRL4` | RW | Channel 4 HDMA line counter. |
-| `$4350` | `REG_DMAP5` | RW | Channel 5 transfer parameters (see DMAP0). |
-| `$4351` | `REG_BBAD5` | RW | Channel 5 B-bus destination. |
-| `$4352` | `REG_A1T5L` | RW | Channel 5 A-bus source low. |
-| `$4353` | `REG_A1T5H` | RW | Channel 5 A-bus source high. |
-| `$4354` | `REG_A1B5` | RW | Channel 5 A-bus source bank. |
-| `$4355` | `REG_DAS5L` | RW | Channel 5 byte count low / HDMA indirect low. |
-| `$4356` | `REG_DAS5H` | RW | Channel 5 byte count high / HDMA indirect high. |
-| `$4357` | `REG_DASB5` | RW | Channel 5 HDMA indirect bank. |
-| `$4358` | `REG_A2A5L` | RW | Channel 5 HDMA table address low. |
-| `$4359` | `REG_A2A5H` | RW | Channel 5 HDMA table address high. |
-| `$435A` | `REG_NTRL5` | RW | Channel 5 HDMA line counter. |
-| `$4360` | `REG_DMAP6` | RW | Channel 6 transfer parameters (see DMAP0). |
-| `$4361` | `REG_BBAD6` | RW | Channel 6 B-bus destination. |
-| `$4362` | `REG_A1T6L` | RW | Channel 6 A-bus source low. |
-| `$4363` | `REG_A1T6H` | RW | Channel 6 A-bus source high. |
-| `$4364` | `REG_A1B6` | RW | Channel 6 A-bus source bank. |
-| `$4365` | `REG_DAS6L` | RW | Channel 6 byte count low / HDMA indirect low. |
-| `$4366` | `REG_DAS6H` | RW | Channel 6 byte count high / HDMA indirect high. |
-| `$4367` | `REG_DASB6` | RW | Channel 6 HDMA indirect bank. |
-| `$4368` | `REG_A2A6L` | RW | Channel 6 HDMA table address low. |
-| `$4369` | `REG_A2A6H` | RW | Channel 6 HDMA table address high. |
-| `$436A` | `REG_NTRL6` | RW | Channel 6 HDMA line counter. |
-| `$4370` | `REG_DMAP7` | RW | Channel 7 transfer parameters (see DMAP0). |
-| `$4371` | `REG_BBAD7` | RW | Channel 7 B-bus destination. |
-| `$4372` | `REG_A1T7L` | RW | Channel 7 A-bus source low. |
-| `$4373` | `REG_A1T7H` | RW | Channel 7 A-bus source high. |
-| `$4374` | `REG_A1B7` | RW | Channel 7 A-bus source bank. |
-| `$4375` | `REG_DAS7L` | RW | Channel 7 byte count low / HDMA indirect low. |
-| `$4376` | `REG_DAS7H` | RW | Channel 7 byte count high / HDMA indirect high. |
-| `$4377` | `REG_DASB7` | RW | Channel 7 HDMA indirect bank. |
-| `$4378` | `REG_A2A7L` | RW | Channel 7 HDMA table address low. |
-| `$4379` | `REG_A2A7H` | RW | Channel 7 HDMA table address high. |
-| `$437A` | `REG_NTRL7` | RW | Channel 7 HDMA line counter. |
+| <nobr>`$420B`</nobr> | <nobr>`REG_MDMAEN`</nobr> | W | General-purpose DMA enable + trigger; CPU stalls until done. |
+| <nobr>`$420C`</nobr> | <nobr>`REG_HDMAEN`</nobr> | W | HDMA enable (per-scanline); bit n = arm channel n for HDMA. |
+| <nobr>`$4300`</nobr> | <nobr>`REG_DMAP0`</nobr> | RW | Channel 0 transfer parameters. |
+| <nobr>`$4301`</nobr> | <nobr>`REG_BBAD0`</nobr> | RW | Channel 0 B-bus destination (low byte of $21xx, e.g. $18 -> VMDATA). |
+| <nobr>`$4302`</nobr> | <nobr>`REG_A1T0L`</nobr> | RW | Channel 0 A-bus source address, low byte. |
+| <nobr>`$4303`</nobr> | <nobr>`REG_A1T0H`</nobr> | RW | Channel 0 A-bus source address, high byte. |
+| <nobr>`$4304`</nobr> | <nobr>`REG_A1B0`</nobr> | RW | Channel 0 A-bus source bank. |
+| <nobr>`$4305`</nobr> | <nobr>`REG_DAS0L`</nobr> | RW | Channel 0 byte count low (GP-DMA) / HDMA indirect addr low. 0 count = 65536. |
+| <nobr>`$4306`</nobr> | <nobr>`REG_DAS0H`</nobr> | RW | Channel 0 byte count high / HDMA indirect addr high. |
+| <nobr>`$4307`</nobr> | <nobr>`REG_DASB0`</nobr> | RW | Channel 0 HDMA indirect address bank (HDMA only). |
+| <nobr>`$4308`</nobr> | <nobr>`REG_A2A0L`</nobr> | RW | Channel 0 HDMA table current address, low (HDMA only). |
+| <nobr>`$4309`</nobr> | <nobr>`REG_A2A0H`</nobr> | RW | Channel 0 HDMA table current address, high (HDMA only). |
+| <nobr>`$430A`</nobr> | <nobr>`REG_NTRL0`</nobr> | RW | Channel 0 HDMA line counter (HDMA only). |
+| <nobr>`$4310`</nobr> | <nobr>`REG_DMAP1`</nobr> | RW | Channel 1 transfer parameters (see DMAP0). |
+| <nobr>`$4311`</nobr> | <nobr>`REG_BBAD1`</nobr> | RW | Channel 1 B-bus destination. |
+| <nobr>`$4312`</nobr> | <nobr>`REG_A1T1L`</nobr> | RW | Channel 1 A-bus source low. |
+| <nobr>`$4313`</nobr> | <nobr>`REG_A1T1H`</nobr> | RW | Channel 1 A-bus source high. |
+| <nobr>`$4314`</nobr> | <nobr>`REG_A1B1`</nobr> | RW | Channel 1 A-bus source bank. |
+| <nobr>`$4315`</nobr> | <nobr>`REG_DAS1L`</nobr> | RW | Channel 1 byte count low / HDMA indirect low. |
+| <nobr>`$4316`</nobr> | <nobr>`REG_DAS1H`</nobr> | RW | Channel 1 byte count high / HDMA indirect high. |
+| <nobr>`$4317`</nobr> | <nobr>`REG_DASB1`</nobr> | RW | Channel 1 HDMA indirect bank. |
+| <nobr>`$4318`</nobr> | <nobr>`REG_A2A1L`</nobr> | RW | Channel 1 HDMA table address low. |
+| <nobr>`$4319`</nobr> | <nobr>`REG_A2A1H`</nobr> | RW | Channel 1 HDMA table address high. |
+| <nobr>`$431A`</nobr> | <nobr>`REG_NTRL1`</nobr> | RW | Channel 1 HDMA line counter. |
+| <nobr>`$4320`</nobr> | <nobr>`REG_DMAP2`</nobr> | RW | Channel 2 transfer parameters (see DMAP0). |
+| <nobr>`$4321`</nobr> | <nobr>`REG_BBAD2`</nobr> | RW | Channel 2 B-bus destination. |
+| <nobr>`$4322`</nobr> | <nobr>`REG_A1T2L`</nobr> | RW | Channel 2 A-bus source low. |
+| <nobr>`$4323`</nobr> | <nobr>`REG_A1T2H`</nobr> | RW | Channel 2 A-bus source high. |
+| <nobr>`$4324`</nobr> | <nobr>`REG_A1B2`</nobr> | RW | Channel 2 A-bus source bank. |
+| <nobr>`$4325`</nobr> | <nobr>`REG_DAS2L`</nobr> | RW | Channel 2 byte count low / HDMA indirect low. |
+| <nobr>`$4326`</nobr> | <nobr>`REG_DAS2H`</nobr> | RW | Channel 2 byte count high / HDMA indirect high. |
+| <nobr>`$4327`</nobr> | <nobr>`REG_DASB2`</nobr> | RW | Channel 2 HDMA indirect bank. |
+| <nobr>`$4328`</nobr> | <nobr>`REG_A2A2L`</nobr> | RW | Channel 2 HDMA table address low. |
+| <nobr>`$4329`</nobr> | <nobr>`REG_A2A2H`</nobr> | RW | Channel 2 HDMA table address high. |
+| <nobr>`$432A`</nobr> | <nobr>`REG_NTRL2`</nobr> | RW | Channel 2 HDMA line counter. |
+| <nobr>`$4330`</nobr> | <nobr>`REG_DMAP3`</nobr> | RW | Channel 3 transfer parameters (see DMAP0). |
+| <nobr>`$4331`</nobr> | <nobr>`REG_BBAD3`</nobr> | RW | Channel 3 B-bus destination. |
+| <nobr>`$4332`</nobr> | <nobr>`REG_A1T3L`</nobr> | RW | Channel 3 A-bus source low. |
+| <nobr>`$4333`</nobr> | <nobr>`REG_A1T3H`</nobr> | RW | Channel 3 A-bus source high. |
+| <nobr>`$4334`</nobr> | <nobr>`REG_A1B3`</nobr> | RW | Channel 3 A-bus source bank. |
+| <nobr>`$4335`</nobr> | <nobr>`REG_DAS3L`</nobr> | RW | Channel 3 byte count low / HDMA indirect low. |
+| <nobr>`$4336`</nobr> | <nobr>`REG_DAS3H`</nobr> | RW | Channel 3 byte count high / HDMA indirect high. |
+| <nobr>`$4337`</nobr> | <nobr>`REG_DASB3`</nobr> | RW | Channel 3 HDMA indirect bank. |
+| <nobr>`$4338`</nobr> | <nobr>`REG_A2A3L`</nobr> | RW | Channel 3 HDMA table address low. |
+| <nobr>`$4339`</nobr> | <nobr>`REG_A2A3H`</nobr> | RW | Channel 3 HDMA table address high. |
+| <nobr>`$433A`</nobr> | <nobr>`REG_NTRL3`</nobr> | RW | Channel 3 HDMA line counter. |
+| <nobr>`$4340`</nobr> | <nobr>`REG_DMAP4`</nobr> | RW | Channel 4 transfer parameters (see DMAP0). |
+| <nobr>`$4341`</nobr> | <nobr>`REG_BBAD4`</nobr> | RW | Channel 4 B-bus destination. |
+| <nobr>`$4342`</nobr> | <nobr>`REG_A1T4L`</nobr> | RW | Channel 4 A-bus source low. |
+| <nobr>`$4343`</nobr> | <nobr>`REG_A1T4H`</nobr> | RW | Channel 4 A-bus source high. |
+| <nobr>`$4344`</nobr> | <nobr>`REG_A1B4`</nobr> | RW | Channel 4 A-bus source bank. |
+| <nobr>`$4345`</nobr> | <nobr>`REG_DAS4L`</nobr> | RW | Channel 4 byte count low / HDMA indirect low. |
+| <nobr>`$4346`</nobr> | <nobr>`REG_DAS4H`</nobr> | RW | Channel 4 byte count high / HDMA indirect high. |
+| <nobr>`$4347`</nobr> | <nobr>`REG_DASB4`</nobr> | RW | Channel 4 HDMA indirect bank. |
+| <nobr>`$4348`</nobr> | <nobr>`REG_A2A4L`</nobr> | RW | Channel 4 HDMA table address low. |
+| <nobr>`$4349`</nobr> | <nobr>`REG_A2A4H`</nobr> | RW | Channel 4 HDMA table address high. |
+| <nobr>`$434A`</nobr> | <nobr>`REG_NTRL4`</nobr> | RW | Channel 4 HDMA line counter. |
+| <nobr>`$4350`</nobr> | <nobr>`REG_DMAP5`</nobr> | RW | Channel 5 transfer parameters (see DMAP0). |
+| <nobr>`$4351`</nobr> | <nobr>`REG_BBAD5`</nobr> | RW | Channel 5 B-bus destination. |
+| <nobr>`$4352`</nobr> | <nobr>`REG_A1T5L`</nobr> | RW | Channel 5 A-bus source low. |
+| <nobr>`$4353`</nobr> | <nobr>`REG_A1T5H`</nobr> | RW | Channel 5 A-bus source high. |
+| <nobr>`$4354`</nobr> | <nobr>`REG_A1B5`</nobr> | RW | Channel 5 A-bus source bank. |
+| <nobr>`$4355`</nobr> | <nobr>`REG_DAS5L`</nobr> | RW | Channel 5 byte count low / HDMA indirect low. |
+| <nobr>`$4356`</nobr> | <nobr>`REG_DAS5H`</nobr> | RW | Channel 5 byte count high / HDMA indirect high. |
+| <nobr>`$4357`</nobr> | <nobr>`REG_DASB5`</nobr> | RW | Channel 5 HDMA indirect bank. |
+| <nobr>`$4358`</nobr> | <nobr>`REG_A2A5L`</nobr> | RW | Channel 5 HDMA table address low. |
+| <nobr>`$4359`</nobr> | <nobr>`REG_A2A5H`</nobr> | RW | Channel 5 HDMA table address high. |
+| <nobr>`$435A`</nobr> | <nobr>`REG_NTRL5`</nobr> | RW | Channel 5 HDMA line counter. |
+| <nobr>`$4360`</nobr> | <nobr>`REG_DMAP6`</nobr> | RW | Channel 6 transfer parameters (see DMAP0). |
+| <nobr>`$4361`</nobr> | <nobr>`REG_BBAD6`</nobr> | RW | Channel 6 B-bus destination. |
+| <nobr>`$4362`</nobr> | <nobr>`REG_A1T6L`</nobr> | RW | Channel 6 A-bus source low. |
+| <nobr>`$4363`</nobr> | <nobr>`REG_A1T6H`</nobr> | RW | Channel 6 A-bus source high. |
+| <nobr>`$4364`</nobr> | <nobr>`REG_A1B6`</nobr> | RW | Channel 6 A-bus source bank. |
+| <nobr>`$4365`</nobr> | <nobr>`REG_DAS6L`</nobr> | RW | Channel 6 byte count low / HDMA indirect low. |
+| <nobr>`$4366`</nobr> | <nobr>`REG_DAS6H`</nobr> | RW | Channel 6 byte count high / HDMA indirect high. |
+| <nobr>`$4367`</nobr> | <nobr>`REG_DASB6`</nobr> | RW | Channel 6 HDMA indirect bank. |
+| <nobr>`$4368`</nobr> | <nobr>`REG_A2A6L`</nobr> | RW | Channel 6 HDMA table address low. |
+| <nobr>`$4369`</nobr> | <nobr>`REG_A2A6H`</nobr> | RW | Channel 6 HDMA table address high. |
+| <nobr>`$436A`</nobr> | <nobr>`REG_NTRL6`</nobr> | RW | Channel 6 HDMA line counter. |
+| <nobr>`$4370`</nobr> | <nobr>`REG_DMAP7`</nobr> | RW | Channel 7 transfer parameters (see DMAP0). |
+| <nobr>`$4371`</nobr> | <nobr>`REG_BBAD7`</nobr> | RW | Channel 7 B-bus destination. |
+| <nobr>`$4372`</nobr> | <nobr>`REG_A1T7L`</nobr> | RW | Channel 7 A-bus source low. |
+| <nobr>`$4373`</nobr> | <nobr>`REG_A1T7H`</nobr> | RW | Channel 7 A-bus source high. |
+| <nobr>`$4374`</nobr> | <nobr>`REG_A1B7`</nobr> | RW | Channel 7 A-bus source bank. |
+| <nobr>`$4375`</nobr> | <nobr>`REG_DAS7L`</nobr> | RW | Channel 7 byte count low / HDMA indirect low. |
+| <nobr>`$4376`</nobr> | <nobr>`REG_DAS7H`</nobr> | RW | Channel 7 byte count high / HDMA indirect high. |
+| <nobr>`$4377`</nobr> | <nobr>`REG_DASB7`</nobr> | RW | Channel 7 HDMA indirect bank. |
+| <nobr>`$4378`</nobr> | <nobr>`REG_A2A7L`</nobr> | RW | Channel 7 HDMA table address low. |
+| <nobr>`$4379`</nobr> | <nobr>`REG_A2A7H`</nobr> | RW | Channel 7 HDMA table address high. |
+| <nobr>`$437A`</nobr> | <nobr>`REG_NTRL7`</nobr> | RW | Channel 7 HDMA line counter. |
 
 <details><summary>Bit fields</summary>
 
@@ -642,31 +642,31 @@ Interrupt control, the hardware multiply/divide unit, the H/V IRQ timers, and Fa
 
 | Addr | Name | R/W | Purpose |
 |------|------|-----|---------|
-| `$4200` | `REG_NMITIMEN` | W | Interrupt + auto-joypad enable. |
-| `$4201` | `REG_WRIO` | W | Programmable I/O port (output). Bit 7 drives the controller-port |
-| `$4202` | `REG_WRMPYA` | W | Unsigned multiply: factor A (8-bit). |
-| `$4203` | `REG_WRMPYB` | W | Unsigned multiply: factor B (8-bit); writing starts 8x8->16, result in RDMPY after ~8 cycles. |
-| `$4204` | `REG_WRDIVL` | W | Unsigned divide: dividend low (16-bit dividend). |
-| `$4205` | `REG_WRDIVH` | W | Unsigned divide: dividend high. |
-| `$4206` | `REG_WRDIVB` | W | Unsigned divide: divisor (8-bit); writing starts 16/8, quotient in RDDIV / remainder in RDMPY after ~16 cycles. |
-| `$4204` | `REG_WRDIV` ¹⁶ | W | 16-bit access alias for the divide dividend (WRDIVL/H). |
-| `$4207` | `REG_HTIMEL` | W | H-count IRQ position, low (0..339). |
-| `$4208` | `REG_HTIMEH` | W | H-count IRQ position, high (bit 0). |
-| `$4209` | `REG_VTIMEL` | W | V-count IRQ position, low (0..261 NTSC). |
-| `$420A` | `REG_VTIMEH` | W | V-count IRQ position, high (bit 0). |
-| `$4207` | `REG_HTIME` ¹⁶ | W | 16-bit access alias for the H IRQ position (HTIMEL/H). |
-| `$4209` | `REG_VTIME` ¹⁶ | W | 16-bit access alias for the V IRQ position (VTIMEL/H). |
-| `$420D` | `REG_MEMSEL` | W | ROM access speed. |
-| `$4210` | `REG_RDNMI` | R | NMI flag + CPU version. |
-| `$4211` | `REG_TIMEUP` | R | IRQ flag. |
-| `$4212` | `REG_HVBJOY` | R | Blanking + auto-joypad status. |
-| `$4213` | `REG_RDIO` | R | Programmable I/O port (input). |
-| `$4214` | `REG_RDDIVL` | R | Divide quotient, low. |
-| `$4215` | `REG_RDDIVH` | R | Divide quotient, high. |
-| `$4216` | `REG_RDMPYL` | R | Multiply product low (or divide remainder low). |
-| `$4217` | `REG_RDMPYH` | R | Multiply product high (or divide remainder high). |
-| `$4214` | `REG_RDDIV` ¹⁶ | R | 16-bit access alias for the divide quotient (RDDIVL/H). |
-| `$4216` | `REG_RDMPY` ¹⁶ | R | 16-bit access alias for the multiply product / remainder (RDMPYL/H). |
+| <nobr>`$4200`</nobr> | <nobr>`REG_NMITIMEN`</nobr> | W | Interrupt + auto-joypad enable. |
+| <nobr>`$4201`</nobr> | <nobr>`REG_WRIO`</nobr> | W | Programmable I/O port (output). Bit 7 drives the controller-port |
+| <nobr>`$4202`</nobr> | <nobr>`REG_WRMPYA`</nobr> | W | Unsigned multiply: factor A (8-bit). |
+| <nobr>`$4203`</nobr> | <nobr>`REG_WRMPYB`</nobr> | W | Unsigned multiply: factor B (8-bit); writing starts 8x8->16, result in RDMPY after ~8 cycles. |
+| <nobr>`$4204`</nobr> | <nobr>`REG_WRDIVL`</nobr> | W | Unsigned divide: dividend low (16-bit dividend). |
+| <nobr>`$4205`</nobr> | <nobr>`REG_WRDIVH`</nobr> | W | Unsigned divide: dividend high. |
+| <nobr>`$4206`</nobr> | <nobr>`REG_WRDIVB`</nobr> | W | Unsigned divide: divisor (8-bit); writing starts 16/8, quotient in RDDIV / remainder in RDMPY after ~16 cycles. |
+| <nobr>`$4204`</nobr> | <nobr>`REG_WRDIV`</nobr> ¹⁶ | W | 16-bit access alias for the divide dividend (WRDIVL/H). |
+| <nobr>`$4207`</nobr> | <nobr>`REG_HTIMEL`</nobr> | W | H-count IRQ position, low (0..339). |
+| <nobr>`$4208`</nobr> | <nobr>`REG_HTIMEH`</nobr> | W | H-count IRQ position, high (bit 0). |
+| <nobr>`$4209`</nobr> | <nobr>`REG_VTIMEL`</nobr> | W | V-count IRQ position, low (0..261 NTSC). |
+| <nobr>`$420A`</nobr> | <nobr>`REG_VTIMEH`</nobr> | W | V-count IRQ position, high (bit 0). |
+| <nobr>`$4207`</nobr> | <nobr>`REG_HTIME`</nobr> ¹⁶ | W | 16-bit access alias for the H IRQ position (HTIMEL/H). |
+| <nobr>`$4209`</nobr> | <nobr>`REG_VTIME`</nobr> ¹⁶ | W | 16-bit access alias for the V IRQ position (VTIMEL/H). |
+| <nobr>`$420D`</nobr> | <nobr>`REG_MEMSEL`</nobr> | W | ROM access speed. |
+| <nobr>`$4210`</nobr> | <nobr>`REG_RDNMI`</nobr> | R | NMI flag + CPU version. |
+| <nobr>`$4211`</nobr> | <nobr>`REG_TIMEUP`</nobr> | R | IRQ flag. |
+| <nobr>`$4212`</nobr> | <nobr>`REG_HVBJOY`</nobr> | R | Blanking + auto-joypad status. |
+| <nobr>`$4213`</nobr> | <nobr>`REG_RDIO`</nobr> | R | Programmable I/O port (input). |
+| <nobr>`$4214`</nobr> | <nobr>`REG_RDDIVL`</nobr> | R | Divide quotient, low. |
+| <nobr>`$4215`</nobr> | <nobr>`REG_RDDIVH`</nobr> | R | Divide quotient, high. |
+| <nobr>`$4216`</nobr> | <nobr>`REG_RDMPYL`</nobr> | R | Multiply product low (or divide remainder low). |
+| <nobr>`$4217`</nobr> | <nobr>`REG_RDMPYH`</nobr> | R | Multiply product high (or divide remainder high). |
+| <nobr>`$4214`</nobr> | <nobr>`REG_RDDIV`</nobr> ¹⁶ | R | 16-bit access alias for the divide quotient (RDDIVL/H). |
+| <nobr>`$4216`</nobr> | <nobr>`REG_RDMPY`</nobr> ¹⁶ | R | 16-bit access alias for the multiply product / remainder (RDMPYL/H). |
 
 <details><summary>Bit fields</summary>
 
@@ -776,20 +776,20 @@ Serial controller access and the automatic-read pad latches. — `snes_joypad.h`
 
 | Addr | Name | R/W | Purpose |
 |------|------|-----|---------|
-| `$4016` | `REG_JOYSER0` | RW | Write: strobe/latch both ports. Read: controller 1 serial bit. |
-| `$4017` | `REG_JOYSER1` | R | Controller 2 serial bit (read). |
-| `$4218` | `REG_JOY1L` | R | Controller 1, low byte. |
-| `$4219` | `REG_JOY1H` | R | Controller 1, high byte. |
-| `$421A` | `REG_JOY2L` | R | Controller 2, low byte (layout as JOY1L). |
-| `$421B` | `REG_JOY2H` | R | Controller 2, high byte (layout as JOY1H). |
-| `$421C` | `REG_JOY3L` | R | Controller 3 (multitap), low byte. |
-| `$421D` | `REG_JOY3H` | R | Controller 3 (multitap), high byte. |
-| `$421E` | `REG_JOY4L` | R | Controller 4 (multitap), low byte. |
-| `$421F` | `REG_JOY4H` | R | Controller 4 (multitap), high byte. |
-| `$4218` | `REG_JOY1` ¹⁶ | R | Controller 1, full 16-bit button word. |
-| `$421A` | `REG_JOY2` ¹⁶ | R | Controller 2, 16-bit button word (layout as JOY1). |
-| `$421C` | `REG_JOY3` ¹⁶ | R | Controller 3, 16-bit button word. |
-| `$421E` | `REG_JOY4` ¹⁶ | R | Controller 4, 16-bit button word. |
+| <nobr>`$4016`</nobr> | <nobr>`REG_JOYSER0`</nobr> | RW | Write: strobe/latch both ports. Read: controller 1 serial bit. |
+| <nobr>`$4017`</nobr> | <nobr>`REG_JOYSER1`</nobr> | R | Controller 2 serial bit (read). |
+| <nobr>`$4218`</nobr> | <nobr>`REG_JOY1L`</nobr> | R | Controller 1, low byte. |
+| <nobr>`$4219`</nobr> | <nobr>`REG_JOY1H`</nobr> | R | Controller 1, high byte. |
+| <nobr>`$421A`</nobr> | <nobr>`REG_JOY2L`</nobr> | R | Controller 2, low byte (layout as JOY1L). |
+| <nobr>`$421B`</nobr> | <nobr>`REG_JOY2H`</nobr> | R | Controller 2, high byte (layout as JOY1H). |
+| <nobr>`$421C`</nobr> | <nobr>`REG_JOY3L`</nobr> | R | Controller 3 (multitap), low byte. |
+| <nobr>`$421D`</nobr> | <nobr>`REG_JOY3H`</nobr> | R | Controller 3 (multitap), high byte. |
+| <nobr>`$421E`</nobr> | <nobr>`REG_JOY4L`</nobr> | R | Controller 4 (multitap), low byte. |
+| <nobr>`$421F`</nobr> | <nobr>`REG_JOY4H`</nobr> | R | Controller 4 (multitap), high byte. |
+| <nobr>`$4218`</nobr> | <nobr>`REG_JOY1`</nobr> ¹⁶ | R | Controller 1, full 16-bit button word. |
+| <nobr>`$421A`</nobr> | <nobr>`REG_JOY2`</nobr> ¹⁶ | R | Controller 2, 16-bit button word (layout as JOY1). |
+| <nobr>`$421C`</nobr> | <nobr>`REG_JOY3`</nobr> ¹⁶ | R | Controller 3, 16-bit button word. |
+| <nobr>`$421E`</nobr> | <nobr>`REG_JOY4`</nobr> ¹⁶ | R | Controller 4, 16-bit button word. |
 
 <details><summary>Bit fields</summary>
 
@@ -870,10 +870,10 @@ The four ports to the (separate) SPC700/S-DSP audio processor. — `snes_apu.h`,
 
 | Addr | Name | R/W | Purpose |
 |------|------|-----|---------|
-| `$2140` | `REG_APUIO0` | RW | APU I/O port 0 (CPU<->SPC700 mailbox; also the command port). |
-| `$2141` | `REG_APUIO1` | RW | APU I/O port 1. |
-| `$2142` | `REG_APUIO2` | RW | APU I/O port 2. |
-| `$2143` | `REG_APUIO3` | RW | APU I/O port 3. |
+| <nobr>`$2140`</nobr> | <nobr>`REG_APUIO0`</nobr> | RW | APU I/O port 0 (CPU<->SPC700 mailbox; also the command port). |
+| <nobr>`$2141`</nobr> | <nobr>`REG_APUIO1`</nobr> | RW | APU I/O port 1. |
+| <nobr>`$2142`</nobr> | <nobr>`REG_APUIO2`</nobr> | RW | APU I/O port 2. |
+| <nobr>`$2143`</nobr> | <nobr>`REG_APUIO3`</nobr> | RW | APU I/O port 3. |
 
 
 
@@ -883,10 +883,10 @@ A CPU window into the full 128 KB of work RAM. — `snes_wram.h`, 4 registers.
 
 | Addr | Name | R/W | Purpose |
 |------|------|-----|---------|
-| `$2180` | `REG_WMDATA` | RW | WRAM data port; each access auto-increments WMADD. |
-| `$2181` | `REG_WMADDL` | W | WRAM address, low byte. |
-| `$2182` | `REG_WMADDM` | W | WRAM address, middle byte. |
-| `$2183` | `REG_WMADDH` | W | WRAM address, high byte. |
+| <nobr>`$2180`</nobr> | <nobr>`REG_WMDATA`</nobr> | RW | WRAM data port; each access auto-increments WMADD. |
+| <nobr>`$2181`</nobr> | <nobr>`REG_WMADDL`</nobr> | W | WRAM address, low byte. |
+| <nobr>`$2182`</nobr> | <nobr>`REG_WMADDM`</nobr> | W | WRAM address, middle byte. |
+| <nobr>`$2183`</nobr> | <nobr>`REG_WMADDH`</nobr> | W | WRAM address, high byte. |
 
 <details><summary>Bit fields</summary>
 

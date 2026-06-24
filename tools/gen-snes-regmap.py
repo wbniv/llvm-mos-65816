@@ -195,8 +195,13 @@ def emit(headers_dir: Path) -> str:
         out.append("|------|------|-----|---------|")
         for r in regs:
             alias = " ¹⁶" if r["width"] == 16 else ""
-            out.append(f"| `${r['addr']:04X}` | `REG_{r['name']}`{alias} | {r['access']} "
-                       f"| {esc(r['purpose'])} |")
+            # Keep the address + name atomic: <nobr> stops a squeezed column from
+            # breaking e.g. `$4212` into `$421`+`2`. (The shared md-to-html.sh
+            # preserves <nobr> tags and `td code { white-space: inherit }` lets the
+            # nowrap parent win; long tokens like sha256 elsewhere still wrap.)
+            addr = f"<nobr>`${r['addr']:04X}`</nobr>"
+            name = f"<nobr>`REG_{r['name']}`</nobr>{alias}"
+            out.append(f"| {addr} | {name} | {r['access']} | {esc(r['purpose'])} |")
         out.append("")
         bitregs = [r for r in regs if r["bits"]]
         if bitregs:
