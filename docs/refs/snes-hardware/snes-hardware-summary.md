@@ -26,6 +26,16 @@ independently 8- or 16-bit (the M and X status bits); `+mos-a16` runs with a 16-
 accumulator. See the [65816 reference](../65816/65816-reference.md) for the programming
 model and instruction set.
 
+```
+  bank        contents of each 64 KB bank (offset $0000 → $FFFF)
+  ───────     ──────────────────────────────────────────────────────────
+  $00–$3F  →  low-RAM mirror ($0000–$1FFF) · I/O ($2100/$4200/$4300) · LoROM $8000+
+  $40–$7D  →  cartridge ROM
+  $7E–$7F  →  128 KB Work RAM (WRAM)        ← high WRAM via far ptr or the $2180 port
+  $80–$BF  →  mirror of $00–$3F             (FastROM-capable)
+  $C0–$FF  →  cartridge ROM (HiROM)
+```
+
 The 24-bit address space is organised as **256 banks of 64 KB**. The system banks
 (`$00`–`$3F` and their fast mirror `$80`–`$BF`) share a common low layout:
 
@@ -69,6 +79,16 @@ and it composites them every scanline:
 > not just the ones you use — power-on state is indeterminate and some emulators
 > randomise it (`snes_ppu_reset_blank()` in `snes_ppu.h` does this).
 
+How those memories combine into a frame:
+
+```
+  VRAM ── tile / character data ┐
+  VRAM ── tilemap (tile→where) ─┤
+  CGRAM ─ 256 colours (BGR555) ─┼──►  PPU1 + PPU2  ──►  screen
+  OAM ─── 128 sprites ──────────┘     composite          256 × 224
+                                      each scanline
+```
+
 ### Background modes
 
 `BGMODE` ($2105) low three bits select the layer layout / bit depth:
@@ -90,6 +110,30 @@ normal modes store them as **bit-planes interleaved by row pair** (the fiddly pa
 the cost of a 256-tile cap and even/odd VRAM interleaving (tilemap in even bytes, chr in
 odd). Mode 7 is the natural fit for a per-pixel framebuffer-style image.
 
+**Tile (character) data format** — 4bpp 8×8 tile = 32 bytes; bit-planes interleaved by
+row pair, MSB = leftmost pixel:
+
+```
+  offset  0 : row0 plane0 │ row0 plane1   ┐ planes 0+1, rows 0–7  = 16 B
+  offset  2 : row1 plane0 │ row1 plane1   │
+       …                                   ┘
+  offset 16 : row0 plane2 │ row0 plane3   ┐ planes 2+3, rows 0–7  = 16 B
+       …                                   ┘
+  a pixel's 4-bit index = (p3 p2 p1 p0) read down the planes at that column
+  2bpp = 16 B (planes 0+1) · 8bpp = 64 B (planes 0–7) · Mode 7 chr = linear 1 byte/pixel
+```
+
+**Colour format** — each CGRAM entry is 16-bit **BGR555** (bit 15 ignored); `SNES_RGB(r,g,b)`
+packs it:
+
+```
+ 15  14  13  12  11  10   9   8   7   6   5   4   3   2   1   0 
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+│ · │ B │ B │ B │ B │ B │ G │ G │ G │ G │ G │ R │ R │ R │ R │ R │
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
+ ·=unused   B=blue[14-10]   G=green[9-5]   R=red[4-0]
+```
+
 ### Sprites, windows, colour math
 
 Up to **128 sprites**, ~32 per scanline, sizes 8×8 to 64×64 (a pair selectable via
@@ -105,6 +149,13 @@ fill VRAM in one v-blank. **HDMA** (`HDMAEN` $420C) streams a few bytes to regis
 scanline, for gradients, window animation, and Mode-7 matrix updates. Same access-window
 rule applies: do GP-DMA into VRAM/CGRAM/OAM in force-blank or v-blank. See the DMA / HDMA
 section of the [register map](snes-register-map.md).
+
+```
+  A-bus source              DMA channel x           B-bus → PPU port
+  A1Tx:A1Bx (ROM/RAM) ────► DMAPx · BBADx ────────► VMDATA / CGDATA / OAMDATA
+        └ DASx bytes ┘            ▲
+                                  └─ write MDMAEN bit x   (starts it; CPU stalls)
+```
 
 ## Audio
 
@@ -123,3 +174,12 @@ fires at a programmed `HTIME`/`VTIME` position. The usual loop: compute into a R
 during active display, then in the NMI handler DMA the changed bytes to the PPU during
 v-blank. A purely static image can instead just force-blank, build everything once, and
 release the blank — the simplest thing that displays.
+
+```
+  one NTSC frame ≈ 262 scanlines ≈ 1/60 s
+  line   0 ┃ ▓▓▓ visible display (~224 lines) ▓▓▓   VRAM/CGRAM/OAM writes: DROPPED
+  line 224 ┃ ── v-blank begins ──────────────────   NMI fires (NMITIMEN bit 7)
+           ┃ ███ v-blank (~38 lines) ███            VRAM/CGRAM/OAM + DMA: SAFE
+  line 262 ┃ (next frame)
+  loop: compute into a RAM shadow during display → DMA it to the PPU during v-blank
+```
