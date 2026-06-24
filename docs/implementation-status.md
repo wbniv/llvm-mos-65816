@@ -1,4 +1,4 @@
-# #320 / #321 implementation status — 2026-06-21
+# #320 / #321 implementation status — 2026-06-23
 
 Quick-reference for "what's built, what's deferred, and where the ABI comparison landed."
 For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO.md).
@@ -37,7 +37,13 @@ is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete
 **xy16 calling convention is now verified + formalized (`ebedd1c`)** — the last M2 codegen frontier,
 closed: the X/Y-8-bit-at-call boundary is correct by construction, and the two xy16-specific ABI levers
 were measured and shelved. The ABI comparison (three frame strategies) ran to completion — it was **not**
-interrupted by crashes; the census short-circuited the build at the measurement step.
+interrupted by crashes; the census short-circuited the build at the measurement step. **32-bit
+`long`/`int32_t` support is now value-verified (2026-06-23)** — a dedicated `a16s32` 4-way micro-test +
+a gated `--s32` track in the builtin fuzzer exercise the s32 path (2×s16 + (un)merge + mul/div libcalls)
+deterministically; both green.
+
+**Also on `main` (2026-06-23):** **#320 far tail calls** — a far→far tail `JSL g; RTL` now folds to a
+direct long jump (`TailJML`/`$5C`), −1 B per site (landed in `0001`, `4adda8b`; verified both emulators).
 
 ---
 
@@ -97,7 +103,7 @@ other frontier; its PR still waits on the design-note posting.
 | Full native materialize for eq-as-value | WON'T-DO — measured +14 B (Option A) / +16–28 B (Option B) worse |
 | Ordering as a value `b = (a < c)` — branchless carry-tail | WON'T-DO — both 8-bit (`adc`) and 16-bit (`rol`) forms BUILT + measured net-negative (a16cmpaudit +262 B / +654 B; corpus +340 B, **0** programs improve). Select-diamond is the ambient-16-bit optimum (folds inversion free, M8 tail matches mode, keeps the bool in X not an Imag16 slot). Compare track CLOSED |
 | REP/SEP mode-tracking — M-flag, cross-block | `a16loop` `a16call` | ✅ |
-| s32 legalizer (unmerge s32↔s16, 4×s8→s32 merge) | Csmith seed-50 / seed-113 gates | ✅ |
+| s32 legalizer (unmerge s32↔s16, 4×s8→s32 merge) | Csmith seed-50 / seed-113 gates; **`a16s32` dedicated 4-way micro-test** + **builtin fuzzer `--s32` track** (2026-06-23) | ✅ **value-verified** — `dev/run.sh a16s32` folds every s32 hazard (2×s16 carry, (un)merge, shifts, `__mulsi3`/`__udivsi3`/`__umodsi3`, s16→s32 ext, compare-as-value) → `host==default==+mos-a16==0x50F2B870` MAME+bsnes-jg; `fuzz --gen builtin --s32` 40/40 0-mismatch. [plan](plans/2026-06-23-321-32bit-long-verification.md) |
 | A16 spill crash (F3) — static + soft-stack (reentrant) | `a16spill` `a16spillr` `a16spillir` | ✅ |
 
 ### A16-threading
@@ -129,7 +135,7 @@ other frontier; its PR still waits on the design-note posting.
 
 | Item | Status |
 |---|---|
-| Tier-1 differential fuzzer (`a16_fuzz.py`, builtin generator) | ✅ Standing capability |
+| Tier-1 differential fuzzer (`a16_fuzz.py`, builtin generator) | ✅ Standing capability — **+ gated `--s32` 32-bit track (2026-06-23):** a seeded op-list over `uint32_t` regs, lockstep C-emit/Python-oracle, exercises the s32 path in the *deterministic* 4-way oracle (`fuzz --gen builtin --s32` 40/40 0-mismatch; `--s32` off byte-identical) |
 | Csmith differential fuzzer (phases 0–5; 1–500 seeds) | ✅ **Phases 0–5 done (2026-06-21)** — sampled CI wired (`fuzz-csmith` job, host-side, 4-way, secret-gated, `mode` sampled/full) |
 | GCC c-torture suite (-O1 pass: 1098 PASS; -Os pass: 1114 PASS; bsnes-jg 4-way) | ✅ **Done; Phase 3 sampled CI wired (2026-06-21)** — `torture` job (in-container, 4-way, seeded `--sample`, secret-gated, `mode` sampled/full); runner now reaps orphan emulators (process-group kill, `e10d98f`) |
 | `corpus-a16` differential gate (+a16/+xy16 on both emus) | ✅ Standing capability + in CI |

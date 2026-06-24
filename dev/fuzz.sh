@@ -30,9 +30,19 @@ TOOL="${MOS_TOOLCHAIN:-$ROOT/build/llvm-mos-install}/bin"
 source "$ROOT/dev/_emu.sh"
 require_bios || exit $?
 
-N="${1:-25}"
-SEED="${2:-1}"
+# Parse flags out so N/SEED stay positional (so `fuzz --gen builtin --s32 50 1` works
+# regardless of flag order). --s32 enables the 32-bit long/int32_t generator track.
 EXTRA=()
+POS=()
+for a in "$@"; do
+  case "$a" in
+    --s32)      EXTRA+=(--s32) ;;
+    --no-bsnes) EXTRA+=(--no-bsnes) ;;
+    *)          POS+=("$a") ;;
+  esac
+done
+N="${POS[0]:-25}"
+SEED="${POS[1]:-1}"
 [ -x "$ROOT/build/jgxcheck" ] && [ -d "$ROOT/vendor/bsnes-jg/Database" ] || EXTRA+=(--no-bsnes)
 
 exec python3 "$ROOT/tools/a16_fuzz.py" run --count "$N" --seed "$SEED" "${EXTRA[@]}"
