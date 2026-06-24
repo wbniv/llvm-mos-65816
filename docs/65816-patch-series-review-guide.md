@@ -674,9 +674,9 @@ because module-level inline `asm()` under LTO doesn't receive the `W65816` subta
 
 ```asm
 .section .init.50          ; runs at reset ($FFFC emulation RESET vector -> _start)
-  sei
-  cld
-  clc
+  sei                      ; mask IRQ — no interrupts during bring-up
+  cld                      ; clear decimal mode (D is undefined at reset; we want binary)
+  clc                      ; clear carry — seeds the C<->E swap that xce performs next
   xce                      ; E = 0  -> 65816 native mode
   rep #$10                 ; 16-bit index regs (so the txs below transfers 16 bits)
   ldx #$01ff               ; an 8-bit txs would set SP=$00FF, colliding with the direct page
@@ -684,9 +684,9 @@ because module-level inline `asm()` under LTO doesn't receive the `W65816` subta
   sep #$30                 ; M=1, X=1: 8-bit A + index — the codegen default
   phk                      ; push program bank (= 0)
   plb                      ; DBR := 0 (explicit; abs globals + the MMIO writes below read DBR:addr)
-  lda #$00
+  lda #$00                 ; A = $00 for the NMITIMEN store below
   sta $4200                ; NMITIMEN: no NMI / IRQ / auto-joypad
-  lda #$8f
+  lda #$8f                 ; A = $8F (bit 7 = force-blank, brightness 0)
   sta $2100                ; INIDISP: force blank, brightness 0
 ```
 

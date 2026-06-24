@@ -61,9 +61,9 @@ asm(".section .init.50,\"axR\",@progbits\n"
     "  sep #$30\n"               // SEP #$30 -> M=1,X=1: 8-bit A+index (codegen default)
     "  phk\n"                    // PHK -> push program bank (=0; reset code is bank $00)
     "  plb\n"                    // PLB -> DBR := 0 (explicit; abs globals + MMIO read DBR:addr)
-    "  lda #$00\n"
+    "  lda #$00\n"               // A = $00 for the NMITIMEN store below
     "  sta $4200\n"              // NMITIMEN: no NMI/IRQ/auto-joypad
-    "  lda #$8f\n"
+    "  lda #$8f\n"               // A = $8F (bit 7 = force-blank, brightness 0)
     "  sta $2100\n");            // INIDISP: force blank, brightness 0
 ```
 
