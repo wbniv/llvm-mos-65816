@@ -31,8 +31,9 @@
 //                  docs/plans/2026-06-18-321-native-mode-crt0-xy16.md.
 //   DP  = 0        direct page at $0000 (reset default; never moved on this platform)
 //
-// The SDK assembles this TU for the 6502 (user C defaults to the 6502 code
-// generator), so the six 65816-only opcodes of the preamble are emitted as
+// The platform builds this crt0 TU WITHOUT -mcpu=mosw65816 (its own objects are built
+// without it — see CMakeLists.txt — even though user C now defaults to mosw65816 via
+// clang.cfg), so the six 65816-only opcodes of the preamble are emitted as
 // `.byte`: XCE (fb), REP #$10 (c2 10), the 16-bit LDX #$01ff (a2 ff 01), SEP #$30
 // (e2 30), PHK (4b), PLB (ab). The bytes execute on the SNES 65816 (a 5A22)
 // exactly as the mnemonics, and `llvm-objdump --mcpu=mosw65816` decodes them back.

@@ -26,12 +26,19 @@ missing* — the optimizing 65816 codegen, which is the part nobody else has don
 | Aspect | #415 (Phillip) | Ours (this fork) | Reconciliation |
 |---|---|---|---|
 | crt0 / startup | 6502 `jsr`-chain, **emulation mode** | **65816 native mode** (XCE, 16-bit stack) — prereq for 16-bit codegen | **Contribute on top:** a native-mode variant/option for #415 |
-| `-mcpu` | none (pure 6502) | `-mcpu=mosw65816` | **Fix in #415** (asiekierka already asked) |
+| `-mcpu` | none (pure 6502) | **`-mcpu=mosw65816` (platform default, 2026-06-24)** | **Done our side** — `clang.cfg` now defaults it; this is the one-line change to offer #415 |
 | linker script | multi-bank LoROM (8 banks) | 32 KiB LoROM + `snes-far` 64 KiB | **Reuse his** multi-bank layout; keep our far-bank example |
 | register header | mature **multi-compiler** `snesxc` lib (REG_*) | minimal `snes.h` | **Reuse his** (with credit); it's real-game-tested |
 | ROM header / checksum | (in PR) | `tools/snes-checksum.py` | keep ours as a build step if useful |
 | test bench / CI | none | MAME + bsnes-jg dual-emulator harness | **Contribute on top:** offer our CI to #415 |
 | **compiler codegen** | **none** (stock 6502 backend) | **#320 far + #321 16-bit (ours)** | **Keep entirely separate** — lands in `llvm-mos`, not the SDK |
+
+> **Update (2026-06-24):** our `platforms/snes/clang.cfg` now sets `-mcpu=mosw65816` by default (the
+> `-mcpu` row above), so our SNES target ships **Tier-1** by default; `snes-far` inherits it via
+> `@mos-snes.cfg`. This is exactly the one-line change asiekierka asked #415 for. The #320/#321 **Tier-2**
+> codegen stays a layered opt-in (`+mos-a16`/`+mos-xy16`/`addrspace(2)`) on top — see the tier framing
+> below. The differential never relied on the default (its harness passes `-mcpu` explicitly on both legs)
+> and the crt0 objects are still built without `-mcpu`; M0 corpus (7/7) + smoke are unchanged by the flip.
 
 ## Contribute-on-top vs. keep-separate — the split
 
