@@ -243,6 +243,47 @@ boot reset. Verified deterministic by capturing the same ROM 3× and diffing the
 nondeterminism. With the flat-loop tile build + PPU reset, `+mos-a16` == default, pixel-for-pixel. There is no
 `+mos-a16` display defect.)*
 
+## Verification — Track 3 results (2026-06-25)  ✅ PASS — far stores + a big Mode 7 image
+
+**3a — far stores into HIGH WRAM** (`dev/run.sh mandel-far`, [`examples/65816/k_mandel_far.c`](../../examples/65816/k_mandel_far.c)):
+the escape buffer lives at `$7E2000` — RAM reachable *only* by 24-bit addressing (not in bank $00's window) —
+filled via far stores and CRC'd back via far loads.
+```
+  PASS: far store -> STA [dp] (87)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x820B (ran 170 ticks)          # MAME
+SMOKE: PASS off=0x200 len=2 got=0x820B (ran 600 frames, bsnes-jg)   # bsnes-jg
+RESULT: PASS — Mandelbrot far-stored into high WRAM $7E2000; CRC 0x820B host == +mos-a16 (MAME + bsnes-jg)
+```
+**PASS** — `+mos-a16`-only (a far pointer is a 32-bit value; default-8bit can't legalize `G_MERGE_VALUES s32`).
+The far store lowers to indirect-long `sta [dp]` (87). Proves the #320 far-store→load path carries the workload
+into genuinely-far RAM. Same 16×10 grid as `k_mandel`, so the host reference is the same `0x820B`.
+
+**3b — a BIG (128×128) per-pixel Mandelbrot on the SNES via Mode 7** (`dev/run.sh mandel-mode7`,
+[`examples/snes/mandel-mode7.c`](../../examples/snes/mandel-mode7.c)): 16 KiB escape buffer (too big for low
+WRAM) computed into `$7E2000` by far stores, displayed crisply via Mode 7 (linear 8bpp, 256 tiles = exactly
+16×16), uploaded to VRAM by a single **32 KiB DMA** of an interleaved staging image, shown at 2× zoom.
+```
+SMOKE: PASS off=0x200 len=2 got=0x75E8 (ran 16000 frames, bsnes-jg)
+SHOT: PASS corpus=0x75E8 (snapshot at frame 16000)                  # MAME under Xvfb
+RESULT: PASS — 128x128 Mandelbrot far-stored to high WRAM, Mode 7 + DMA on SNES; MAME + bsnes-jg match host (CRC 0x75E8)
+```
+
+<img src="screenshots/mandel-mode7-compare.png" width="900">
+
+*Left→right: the **host** renderer (128×128), then the same 128×128 escape buffer far-stored into high WRAM and
+rendered **on the SNES** via Mode 7, screenshotted from **bsnes-jg** (256×224) and **MAME** (512×225). Far finer
+than Track 2's 32×28 fat-pixel BG — the cardioid, period-2 bulb, antenna spike and seahorse-valley filaments are
+all resolved. Both emulator frames assert the buffer CRC == the host's `0x75E8`.*
+
+- **PASS** — `+mos-a16`-only; Mode 7 + DMA + far all verified (the pipeline was first de-risked with an instant
+  XOR test pattern via `-DMANDEL_TESTPAT`, then the real compute swapped in). `N=12` (not 32) because 128×128 =
+  16384 cells of software 32-bit fixed-point is heavy — the fill completes at frame ~14439 (measured), a one-off
+  render, not a windowed gate. The DMA upload (`dma_vbuf_to_vram()`) is the worked example the rendering handoff
+  points to.
+- **Track 3 finding — the far buffer is deterministic because it's fully written.** bsnes randomises high-WRAM
+  power-on state, but the fill overwrites every cell before the CRC reads it, so host == `+mos-a16` holds on both
+  emulators with no special handling (the PPU-reset discipline from Track 2 still applies to the *display*).
+
 ## Risks / notes
 
 - **Low-WRAM fit is the tight constraint** — verify via the map (step 3); fall back to 64×64. Don't assume.

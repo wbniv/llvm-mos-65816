@@ -29,6 +29,13 @@
 #define REG_VMDATAH  _SNES_REG8(0x2119) /* VRAM data write high (triggers inc)*/
 #define REG_VMADD    _SNES_REG16(0x2116)/* VRAM word address, 16-bit          */
 #define REG_VMDATA   _SNES_REG16(0x2118)/* VRAM data, 16-bit (low then high)  */
+#define REG_M7SEL    _SNES_REG8(0x211A) /* Mode 7 settings (screen over / flip) */
+#define REG_M7A      _SNES_REG8(0x211B) /* Mode 7 matrix A (8.8, write low,high)*/
+#define REG_M7B      _SNES_REG8(0x211C) /* Mode 7 matrix B                     */
+#define REG_M7C      _SNES_REG8(0x211D) /* Mode 7 matrix C                     */
+#define REG_M7D      _SNES_REG8(0x211E) /* Mode 7 matrix D                     */
+#define REG_M7X      _SNES_REG8(0x211F) /* Mode 7 center X (13-bit, write x2)  */
+#define REG_M7Y      _SNES_REG8(0x2120) /* Mode 7 center Y                     */
 #define REG_CGADD    _SNES_REG8(0x2121) /* CGRAM (palette) word address       */
 #define REG_CGDATA   _SNES_REG8(0x2122) /* CGRAM data port (write low, high)  */
 #define REG_TM       _SNES_REG8(0x212C) /* main-screen layer enable           */
@@ -70,6 +77,12 @@
 /* BG tile-size / mode helpers (REG_BGMODE low 3 bits = mode 0..7). */
 #define BGMODE_1 0x01   /* BG1/BG2 4bpp (16 colour), BG3 2bpp */
 #define BGMODE_3 0x03   /* BG1 8bpp (256 colour), BG2 4bpp    */
+#define BGMODE_7 0x07   /* single 8bpp rotation/scale layer   */
+
+/* Write a 16-bit Mode 7 matrix element (8.8 fixed point): low byte then high byte to
+ * the same port. 0x0100 = 1.0 (identity); 0x0080 = 0.5 (the screen samples the source
+ * at half-step, i.e. the image is shown at 2x zoom). */
+#define SNES_M7(reg, val) do { (reg) = (uint8_t)(val); (reg) = (uint8_t)((val) >> 8); } while (0)
 
 /* Build a BG?SC value: tilemap base in $400-word units (bits 7-2) + map size
  * (bits 1-0; 0 = 32x32). REG_BG?SC = SNES_BGSC(word_base, 0). */

@@ -43,6 +43,10 @@ Targets:
              only by 24-bit addressing) with the Mandelbrot via #320 far stores
              (sta [dp]), CRC it via far loads; +mos-a16-only, asserts host == +mos-a16
              (0x820B) on MAME + bsnes-jg + a disasm gate (examples/65816/k_mandel_far.c)
+  mandel-mode7 #321 beefy demo, Track 3b: a BIG 128x128 per-pixel Mandelbrot — far-stored
+             into high WRAM, displayed via Mode 7 (linear 8bpp), uploaded by one 32 KiB
+             DMA, shown at 2x zoom. Screenshots MAME + bsnes-jg, asserts on-screen CRC ==
+             host (0x75E8). +mos-a16-only; one-off (~14.4k-frame fill). examples/snes/mandel-mode7.c
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUES repro
              (a16regpress/a16scavnz) STILL crashes -verify-machineinstrs under both
              +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment

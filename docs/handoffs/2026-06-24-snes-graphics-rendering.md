@@ -68,9 +68,12 @@ int main(void) {
 
 The Mandelbrot demo uploads via **direct port writes** (`vram_w()` → `$2118`/`$2119` in a loop) because it's
 only ~1280 words. **A real library must use DMA** for full-screen uploads (a 32 KiB VRAM fill is ~hundreds of
-thousands of cycles by hand; DMA does it in ~one v-blank). The register recipe below is spec-correct; it is
-**exercised in-repo by Track 3's big upload** ([`examples/snes/mandel-far.c`](../../examples/snes/mandel-far.c)
-/ `dev/run.sh mandel-far`) — read that for a known-good call.
+thousands of cycles by hand; DMA does it in ~one v-blank). The register recipe below is **verified working** by Track 3b's big upload
+([`examples/snes/mandel-mode7.c`](../../examples/snes/mandel-mode7.c) / `dev/run.sh mandel-mode7`): a single
+**32 KiB DMA** of an interleaved Mode 7 image from high WRAM (`$7E…`) to VRAM, confirmed on both emulators —
+read `dma_vbuf_to_vram()` there for a copy-pasteable known-good call. (The Track 3a far-store gate
+[`examples/65816/k_mandel_far.c`](../../examples/65816/k_mandel_far.c) / `dev/run.sh mandel-far` exercises the
+far stores but uploads nothing, so it has no DMA.)
 
 **VMAIN (`$2115`) — the VRAM address auto-increment. Get this wrong and the picture interleaves/skips:**
 
@@ -222,7 +225,23 @@ linker concern** — VRAM is written at runtime through the data ports. Your til
   Mandelbrot "fat-pixel" tiles work. A *photographic* tile needs real bit-twiddling per pixel; **Mode 7 avoids
   it** (its character data is **linear 1 byte/pixel**, no bitplanes) at the cost of VRAM interleaving
   (even bytes = tilemap, odd bytes = chr) and a 256-tile cap (so a 128×128 unique-pixel image = 16×16 tiles
-  fills it exactly). Track 3 uses Mode 7 for a per-pixel image.
+  fills it exactly).
+
+### Mode 7 — verified per-pixel image path (Track 3b, `examples/snes/mandel-mode7.c`)
+Mode 7 is the path that worked for a per-pixel image. Confirmed details, end to end:
+- **VRAM is interleaved**: word `n` = `(chr[n] << 8) | tilemap[n]`. Build the whole interleaved image (32 KiB =
+  16384 words) in a staging buffer, then upload it as one DMA to `$2118` with **VMAIN=$80** (inc-after-`$2119`)
+  and **DMAP pattern 1** (writes `$2118` then `$2119` per word). One 32 KiB DMA from high WRAM did the job.
+- **De-linearise**: a raster `W×H` buffer → tiles. `tilemap[n]` indexes by screen position `(n&127, n>>7)`;
+  `chr[n]` indexes by tile `(n>>6)` then in-tile `(row (n>>3)&7, col n&7)`. The two mappings of `n` differ — get
+  them right or the image scrambles (validate with a recognisable test pattern *before* the slow real compute).
+- **256-tile cap** ⇒ 128×128 (16×16 tiles) is the sweet spot; it fills the chr space exactly.
+- **Matrix** (`M7A..M7D`, 8.8 fixed point, **write-twice** low-then-high): identity = A=D=`$0100`, B=C=`$0000`;
+  **2× zoom** (so a 128×128 image fills the 256-wide screen) = A=D=`$0080` (screen steps the source by 0.5).
+  `M7SEL=$00` (wrap), `M7X/M7Y` centre = 0 (write-twice), Mode 7 scroll via `BG1HOFS/BG1VOFS` = 0.
+- **Cost reality**: 128×128 = 16384 cells of software 32-bit fixed-point is heavy (~14k frames of emulated time
+  even at maxiter 12). Per-pixel compute *on the SNES* is slow — for anything interactive, precompute to ROM and
+  DMA, or compute coarse + scale with the Mode 7 matrix.
 
 ### Colour (CGRAM)
 - 256 entries, **BGR555**: bit layout `0bbbbbgggggrrrrr` (red low). Pack with
