@@ -569,6 +569,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
 
 ## Links
 
+- [Patch-series review guide](65816-patch-series-review-guide.md) — reviewer's map of `0001`–`0008`
+  (need/patch/proof, diagrams, appendices A–D) · [LLVM primer](llvm-primer-for-65816-review.md) for readers
+  new to LLVM
 - [Investigation: status, players, rivals](INVESTIGATION.md)
 - Zardoz / WDC816CC ABI (calling-convention prior art) (drdevtools research)
 - Upstream: [#32 umbrella](https://github.com/llvm-mos/llvm-mos/issues/32) ·
