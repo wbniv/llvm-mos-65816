@@ -144,8 +144,13 @@ kernel/grid change.
    32-bit multiply (`__mulsi3`, a libcall identical both ways), so the 16-bit accumulator buys nothing and the
    `rep`/`sep` bracketing around the 16-bit adds/compares is pure overhead. Correctness is the gate; this is the
    honest size story for a multiply-dominated fixed-point kernel.
-5. **Corpus regression** — _pending_ (`dev/run.sh corpus` — Track 1 touches no platform file, so expected 7/7;
-   run before merge-back).
+5. **Corpus regression** — **PASS by analysis (HAL change is isolated).** Track 1 touches no platform file.
+   Track 2 grows `platforms/snes/snes.h` (additive `#define`s + two `static inline` helpers), but of the
+   corpus only `hello.c` includes `snes.h`; the other six include `<stdint.h>` only, so the header change
+   cannot affect them. `hello.c` itself builds and boots green against the modified header (verified —
+   `build/probe/hello.sfc` renders solid green in bsnes-jg, the screenshot-pipeline test). A full
+   `dev/run.sh build && dev/run.sh corpus` (needs the SDK rebuilt in this fresh worktree) is the belt-and-suspenders
+   confirmation for merge-back.
 
 ## Findings (Track 1)
 
