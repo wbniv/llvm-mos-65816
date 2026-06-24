@@ -57,6 +57,7 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
 - [Appendix A — Testing setup](#appendix-a--testing-setup)
 - [Appendix B — SNES platform changes & requirements](#appendix-b--snes-platform-changes--requirements)
 - [Appendix C — Dead ends, experiments & spikes](#appendix-c--dead-ends-experiments--spikes)
+- [Appendix D — Upstream bug fixes & status](#appendix-d--upstream-bug-fixes--status)
 
 ---
 
@@ -72,12 +73,12 @@ source change.
 |-------|-----------|----:|--------------|------|
 | **0001** far‑addrspace | #320 · M1 | 1471 | `addrspace(2)` far pointers: 32-bit ptr holding a 24-bit address; far load/store/deref/cast/arith (`lda long`), far calls (`JSL`/`RTL`), far function pointers, the clang `__far` surface | **High** — new address space, clang + backend |
 | **0002** accum16 | #321 · M2 | 4478 | The 16-bit accumulator: `+mos-a16` feature, the `MOSInsertREPSEP` mode-tracking pass, native s16 ALU / compares / shifts / load-store / chains, A16-threading, plus `+mos-xy16` 16-bit index regs | **High** — the core contribution |
-| **0003** txy‑dead‑flag | upstream | 71 | One-line peephole fix: reusing a dead `LDImm` as `TXY`/`TYX` must clear the source's dead flag | **Trivial** — bug fix + MIR test |
+| **0003** txy‑dead‑flag | [upstream](#appendix-d--upstream-bug-fixes--status) | 71 | One-line peephole fix: reusing a dead `LDImm` as `TXY`/`TYX` must clear the source's dead flag | **Trivial** — bug fix + MIR test |
 | **0004** far‑cc | #320 · M1 | 509 | Far-pointer **calling convention**: pass/return `addrspace(2)` in one `Imag32` ZP reg (winner of a 4-variant bake-off) | Medium |
 | **0005** far‑value‑legalize | #320 · M1 | 24 | One legalizer hunk: a far pointer held *as a value* (not just an access ptr) is a legal load/store value type. Split out because it is `+mos-a16`-context-entangled | Trivial |
 | **0006** packed24 | #320 · M1 | 387 | `addrspace(3)` packed-24: a 3-byte in-memory storage form of a far pointer (banked-asset / jump tables); −25 % table storage | Medium |
 | **0007** near‑abs‑relax | #320 · M1 | 28 | Don't bank-relax (`abs`→`long`) a **near** symbol — saves 1 B per A-register near-global access (~284 sites in the examples) | Low |
-| **0008** dp‑arg‑cc | upstream | 51 | Upstream bug fix: an 8-bit `addrspace(1)` direct-page pointer **argument** was assigned a 16-bit register → illegal `COPY`. Reproduces on stock `mos6502` | Trivial — bug fix + `.ll` test |
+| **0008** dp‑arg‑cc | [upstream](#appendix-d--upstream-bug-fixes--status) | 51 | Upstream bug fix: an 8-bit `addrspace(1)` direct-page pointer **argument** was assigned a 16-bit register → illegal `COPY`. Reproduces on stock `mos6502` | Trivial — bug fix + `.ll` test |
 
 Two patches (`0003`, `0008`) are pure **upstream bug fixes** surfaced by this work and are independently
 postable; they are included so the stack applies clean.
@@ -917,6 +918,34 @@ hack); **default-8-bit far storage** is un-legalized **by design** — the 32-bi
 #### C23. Mesen2 abandoned
 A third emulator (Mesen2) crashed on the Ubuntu 26.04 glibc-2.43 base (`free(): invalid pointer`) from a
 prebuilt binary. MAME + bsnes-jg already give a two-emulator cross-check; parked pending a source build.
+
+---
+
+## Appendix D — Upstream bug fixes & status
+
+Two of the eight patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
+fixed. They are independently postable and **drop from the fork stack on merge**, and are *not* part of the
+#320/#321 feature contribution (which is ABI-blessing-gated). One further upstream defect is filed as an
+**issue with no fix patch** (its fix touches the generic register scavenger — maintainer territory). The
+exhaustive accounting — every PR/issue/design-note, the exact `gh` post commands, and the live snapshot — is
+the single source of truth in [`upstream-contribution-status.md`](upstream-contribution-status.md); this is
+the reviewer's slice of it.
+
+**Last verified: 2026-06-23.** Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
+(or `gh pr list --repo llvm-mos/llvm-mos --author wbniv --state all`).
+
+| Patch | Upstream defect | Repro on stock? | Upstream | Status | On merge | Test |
+|-------|-----------------|-----------------|----------|--------|----------|------|
+| `0003` | `mos-late-opt` reuses a dead `LDImm` as `TXY`/`TYX` without clearing the dead flag → verifier reject (`Using an undefined physical register`) | yes (`mosw65816`) | [PR&nbsp;#562](https://github.com/llvm-mos/llvm-mos/pull/562) | **POSTED · open** | drop `0003` + bump vendor pin | `late-opt-65816.mir` |
+| `0008` | the calling convention gives an 8-bit `addrspace(1)` direct-page pointer **argument** a 16-bit register → illegal size-mismatched `COPY` | yes (plain `mos6502`) | [#561](https://github.com/llvm-mos/llvm-mos/issues/561) → [PR&nbsp;#563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`) | **POSTED · open** | drop `0008` + bump vendor pin | `dp-pointer-arg.ll` |
+| — | `saveScavengerRegister` asserts N/Z dead, but `+mos-a16` pressure keeps a compare/ALU flag live across a frame-vreg spill → illegal `$p is not a GPR` | upstream assert, exposed by `+mos-a16` | [issue draft](321-upstream-scavenger-nz-issue.md) | **DRAFTED · not posted** | n/a — no fix (XFAIL + XPASS-guarded) | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
+
+Status enum: **POSTED·open** (live PR/issue) · **DRAFTED** (written; posting is user-triggered) · **MERGED**
+(then dropped from the stack) · **DEFERRED** (filed, not fixed). The **"repro on stock?"** column is what makes
+these separable from the feature work — each reproduces on a pristine upstream build, so they are genuine
+upstream defects, not artifacts of #320/#321. The feature patches (`0001`/`0002`/`0004`–`0007`) are **not**
+listed here: they are the contribution proper, gated on maintainer ABI blessing (status:
+[`upstream-contribution-status.md`](upstream-contribution-status.md) → *Future / blocked*).
 
 ---
 

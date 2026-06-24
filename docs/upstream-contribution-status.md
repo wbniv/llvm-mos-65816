@@ -15,7 +15,10 @@ branch `wbniv:mos-dwarf-65816-test-docs` pushed `0ae9415`; GitHub open-count las
 
 A standing snapshot of every upstream-facing contribution from this fork: what is **drafted and ready to
 post**, what is **future/blocked**, and what GitHub actually shows right now. All posting is **user-triggered**
-(the toolchain build + review burden lives with a human); this doc is the queue, one command per row.
+(the toolchain build + review burden lives with a human); this doc is the queue, one command per row. The
+reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack — is
+[review guide Appendix D](65816-patch-series-review-guide.md#appendix-d--upstream-bug-fixes--status)
+(refreshable via [`dev/upstream-status.sh`](../dev/upstream-status.sh)).
 
 ## TL;DR
 
