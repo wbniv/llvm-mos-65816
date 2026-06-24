@@ -7,6 +7,17 @@ is opt-in and gated so the default 8-bit code generator is byte-identical, every
 four-way differential test you can re-run, and the stack splits into two units (#320 far, #321 16-bit) that
 review almost independently.
 
+**Motivation — modern source-level debugging of the SNES.** This is *why the compiler work exists.*
+Source-level debugging of SNES code is not new to *drdevtools* — its debugger **drmon** already reads the
+legacy **assembler** symbol formats (`.sld`, COFF, ca65 `.dbg`, WLA-DX `.sym` — the COFF / Zardoz /
+drdevtools-SPASM lineage). What drmon lacks is the **modern** path: an **ELF/DWARF** loader fed by an
+*optimizing C compiler* on fully-open tooling. llvm-mos already emits **DWARF** (spec landed Dec 2025) and
+ships the 65816 assembler/linker — but had **no 65816 C codegen**, the one missing producer. This series is
+that producer: it closes the loop *optimizing C → SNES ROM + DWARF → source-level debug in drmon*, upgrading
+drmon from assembler-tied debug info to standard DWARF from optimized C. The 16-bit/far codegen below is the
+means; debuggable optimized C in drmon is the end. (Detail: [Appendix A.1](#a1-drmon) ·
+[`INVESTIGATION.md`](INVESTIGATION.md) · [`ROADMAP.md`](ROADMAP.md) step 6, the DWARF round-trip.)
+
 It addresses the two open, design-only upstream issues —
 [#320 24-bit address space](https://github.com/llvm-mos/llvm-mos/issues/320) and
 [#321 16-bit register mode](https://github.com/llvm-mos/llvm-mos/issues/321) — code-first, the posture the
@@ -51,7 +62,7 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
 
 ### 1.1 The patch stack at a glance
 
-Eight patches, applied bottom-up (`git am 0001..0008`); the files are `patches/llvm-mos/NNNN-*.patch` (full
+Eight patches, applied bottom-up (`git am 0001..0008`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
 name in each step of [§3](#3-the-narrative-each-step-with-need--patch--proof)). LOC is patch size, not net
 source change.
 
@@ -78,7 +89,7 @@ postable; they are included so the stack applies clean.
 This is enforced, not asserted. The differential fuzzer ([Appendix A](#appendix-a--testing-setup)) compiles
 every program **both** default and `+mos-a16` and compares both to a host oracle, so a gate that leaks into
 the 8-bit path surfaces immediately as a `default@MAME ≠ host` mismatch (this caught a real
-leak<sup><a href="#c16-seed-42--legalizeicmp-swap-leak">C16</a></sup>). A reviewer can therefore trust that
+leak<sup>[[C16]](#c16-seed-42--legalizeicmp-swap-leak)</sup>). A reviewer can therefore trust that
 **reviewing `0002` is reviewing *added* behavior**, never a silent change to what ships today. The gating
 discipline is spelled out in [§4](#4-cross-cutting-correctness-arguments).
 
@@ -251,7 +262,7 @@ Upstream llvm-mos has a 65816 *assembler/linker* but no C path to a far pointer 
 16-bit and bank-0-only. asiekierka's design sketch in #320 proposes a multi-address-space data layout; this
 patch implements the load-bearing subset and proves it on silicon.
 
-**Patch.** `patches/llvm-mos/0001-320-far-addrspace.patch` (clang AST/Sema/CodeGen + the MOS backend;
+**Patch.** [`patches/llvm-mos/0001-320-far-addrspace.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0001-320-far-addrspace.patch) (clang AST/Sema/CodeGen + the MOS backend;
 25 files). The spine is a new address space + a 32-bit pointer datalayout:
 
 ```cpp
@@ -268,7 +279,7 @@ high bank and a far call emits `JSL`/`RTL` (the backend infers the callee's bank
 call mechanism needs no ABI commitment). The clang side adds the `__far` type-attribute surface, a typed
 `far_fn_t`, and `sizeof(far*) == 4`. Far function pointers can't be an `addrspace(2)` IR callee (LLVM forbids
 a non-program-addrspace callee), so they thread the 24-bit target through a runtime slot + a generic
-`__call_indir_far` stub<sup><a href="#c20-far-fn-pointer-ir-representation">C20</a></sup>.
+`__call_indir_far` stub<sup>[[C20]](#c20-far-fn-pointer-ir-representation)</sup>.
 
 **Proof.** `dev/run.sh far-run far-bank1 far_indir far_cast far_arith far_call far_fnptr` — a far global in
 bank `$01` reads back through `lda $018000` (`af 00 80 01`) on **both** MAME and bsnes-jg; `JSL`/`RTL` cross
@@ -276,13 +287,15 @@ the bank boundary; corpus stays **7/7**. The whole patch is `HasW65816`/addrspac
 codegen is untouched (csmith 0-mismatch). M1 acceptance evidence is in
 [`docs/ROADMAP.md`](ROADMAP.md) steps 3–4. The far-pointer **CC**, **value**, and **packed** stories are the
 later patches `0004`/`0005`/`0006`; two residuals are closed by-design, not as
-fork hacks<sup><a href="#c21-far-value-residuals">C21</a></sup>.
+fork hacks<sup>[[C21]](#c21-far-value-residuals)</sup>.
 
 ### 3.2 `0002` — #321 16-bit accumulator (M2)
 
-This is the core contribution and the largest patch. It is best understood as: (1) a feature gate, (2) a
-mode-tracking pass, (3) a coalescer-safe residency model, (4) a per-op native-s16 surface built increment by
-increment behind that model, (5) the same machinery extended to 16-bit index registers (`+mos-xy16`).
+This is the core contribution and the largest patch — the full diff is
+[`patches/llvm-mos/0002-321-accum16.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0002-321-accum16.patch)
+(23 files across the MOS backend). It is best understood as: (1) a feature gate, (2) a mode-tracking pass,
+(3) a coalescer-safe residency model, (4) a per-op native-s16 surface built increment by increment behind
+that model, (5) the same machinery extended to 16-bit index registers (`+mos-xy16`).
 
 **Need.** #321: model the accumulator as 16-bit and place `REP`/`SEP` at a late stage. 16-bit arithmetic in
 8-bit codegen is a multi-byte carry chain; a single `M=0` `adc` does it in one op. The payoff is real but
@@ -303,7 +316,7 @@ def FeatureIndex16 : SubtargetFeature<"mos-xy16", "HasIndex16", "true",
 
 Everything downstream guards on `STI.hasAccum16()` (C++) or `let Predicates = [HasAccum16]` (tablegen). The
 gate predicate must be the *same* one that enables the behavior — gating on a looser operand-shape test is
-exactly the seed-42 leak<sup><a href="#c16-seed-42--legalizeicmp-swap-leak">C16</a></sup>.
+exactly the seed-42 leak<sup>[[C16]](#c16-seed-42--legalizeicmp-swap-leak)</sup>.
 
 **(2) The mode pass.** `MOSInsertREPSEP.cpp` runs **after RA** and tracks an M-width lattice
 (`{None, M8, M16, Conflict}`) by forward dataflow, placing `rep`/`sep` only at genuine transitions — inside a
@@ -323,11 +336,11 @@ preheader, `sep` sinks to the exit) instead of re-bracketing every iteration. Th
 
 **(3) Coalescer-safe residency — the central design decision.** The first prototype kept the s16 value
 resident in `A16` across ops; because `A16`'s low byte *aliases* the 8-bit `A`, an 8-bit `LDImm` coalesced
-into it and produced a malformed `$a16 = LDImm`<sup><a href="#c3-gisel-native-s16-coalescer-crash">C3</a></sup>. The
+into it and produced a malformed `$a16 = LDImm`<sup>[[C3]](#c3-gisel-native-s16-coalescer-crash)</sup>. The
 shipped model instead keeps the value's home in an **`Imag16`** zero-page pair and enters the physical `A16`
 **only** via load/store (`LDAImag16 → OP → STAImag16`), never via a COPY between 8- and 16-bit classes — so
 there is nothing for the coalescer to corrupt. This invariant is load-bearing across the whole patch
-(it is also why the spill paths needed fixing — F3<sup><a href="#c18-f3--selectimm-a16-spill-crash">C18</a></sup>).
+(it is also why the spill paths needed fixing — F3<sup>[[C18]](#c18-f3--selectimm-a16-spill-crash)</sup>).
 
 **(4) The native-s16 surface.** Built and measured one op-class at a time; each is a legalizer rule that
 keeps a small s16 op un-narrowed under the gate + a selector that emits the `MLow=1` form on the transient
@@ -350,12 +363,12 @@ keeps a small s16 op un-narrowed under the gate + a selector that emits the `MLo
 through `$a16`. Post-RA is deliberate: RA has already chosen `$a16` on both sides, so the peephole cannot
 reintroduce the C3 crash. Measured −31/−36 % on dependent chains. A 300-program scan retired "Phase 2" as
 already-optimal and deferred "Phase 3" (RA-level residency) behind a concrete
-trigger<sup><a href="#c2-a16-threading-phase-3--ra-level-residency">C2</a></sup>.
+trigger<sup>[[C2]](#c2-a16-threading-phase-3--ra-level-residency)</sup>.
 
 **(5) `+mos-xy16`** reuses the whole apparatus for 16-bit X/Y: register classes `Xc16`/`Yc16`, the parallel
 X-lattice, `selectXY16` direct + indexed handlers, and spill paths. Its one subtlety — narrowing `sep #$10`
 **zeroes** the index high byte, so a non-index value must never be parked in `X16` across a narrowing point —
-was a real miscompile, cvise-reduced and fixed<sup><a href="#c17-xy16-index-high-byte-clobber">C17</a></sup>. The
+was a real miscompile, cvise-reduced and fixed<sup>[[C17]](#c17-xy16-index-high-byte-clobber)</sup>. The
 xy16 calling convention is correct by construction (a cross-call-live index parks in a callee-saved `Imag16`
 pair; physical `X16` is never live across a call).
 
@@ -372,13 +385,13 @@ flowchart LR
 Four-way differential on every micro-test; `-verify-machineinstrs` clean (including `a16localx`, the C3
 guard); csmith **0-mismatch** over seeds 1–500; gcc c-torture **1098** PASS (-O1) / **1114** PASS (-Os),
 4-way; corpus **7/7** at every step. Whole-surface measurement
-(`dev/measure-native-s16-surface.sh`): the sustained-16-bit-arithmetic class the #321 bar names wins
+([`dev/measure-native-s16-surface.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/measure-native-s16-surface.sh)): the sustained-16-bit-arithmetic class the #321 bar names wins
 decisively — dependent-chain **−63 %**, multi-value **−65 %**, `k_isort` **−39 %**, aggregate **−22 %
 (−220 B)**. Honestly: 8/16-interleave **stress** kernels are *larger* under `+mos-a16` (`k_crc16` +27 %,
 `k_prng` +60 %) — pure `rep`/`sep`+`Imag16` overhead with no asymmetric libcall — which is *exactly* why the
 feature is opt-in and per-op-gated, not blanket. Two pathological residuals (an `-Os` RA-pressure crash; an
 upstream scavenger N/Z crash) are `XFAIL`-pinned with XPASS guards that fire the moment a fix
-lands<sup><a href="#c2-a16-threading-phase-3--ra-level-residency">C2</a></sup><sup><a href="#c19-upstream-register-scavenger-nz-crash">C19</a></sup>.
+lands<sup>[[C2]](#c2-a16-threading-phase-3--ra-level-residency)</sup><sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup>.
 Per-increment detail: the ~25 plans linked from [`docs/ROADMAP.md`](ROADMAP.md) step 5.
 
 ### 3.3 `0003` — TXY/TYX dead-flag peephole
@@ -389,7 +402,7 @@ RA-rematerialized and marked `dead`, reusing it as a transfer source left the `d
 rejects "Using an undefined physical register". This is a **stock llvm-mos** latent bug, surfaced by 65816
 codegen (which exercises `TXY`/`TYX`).
 
-**Patch.** `patches/llvm-mos/0003-late-opt-txy-dead-flag.patch` — clear the dead flag on the reused source,
+**Patch.** [`patches/llvm-mos/0003-late-opt-txy-dead-flag.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0003-late-opt-txy-dead-flag.patch) — clear the dead flag on the reused source,
 + two MIR regression tests (`ldimm_to_txy_clears_dead_source`, `…_tyx_…`):
 
 ```cpp
@@ -397,7 +410,7 @@ codegen (which exercises `TXY`/`TYX`).
 Load = &LoadX;   // (the fix clears Load->getOperand(0).setIsDead(false) before re-emit)
 ```
 
-**Proof.** `llvm/test/CodeGen/MOS/late-opt-65816.mir` — both new functions crash pre-fix, pass post.
+**Proof.** [`llvm/test/CodeGen/MOS/late-opt-65816.mir`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0003-late-opt-txy-dead-flag.patch) — both new functions crash pre-fix, pass post.
 Independent of any feature flag; **upstream-bound** (postable as a standalone fix).
 
 ### 3.4 `0004` — far-pointer calling convention
@@ -406,7 +419,7 @@ Independent of any feature flag; **upstream-bound** (postable as a standalone fi
 in `0001` only handles direct far *calls*; a far pointer flowing through the ABI needs a CC slot. Four ABI
 encodings are plausible; the choice is an ABI commitment, so it was **measured**, not guessed.
 
-**Patch.** `patches/llvm-mos/0004-320-far-cc.patch`. All four variants — (a) one `Imag32` ZP reg, (b)
+**Patch.** [`patches/llvm-mos/0004-320-far-cc.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0004-320-far-cc.patch). All four variants — (a) one `Imag32` ZP reg, (b)
 `Imag16`+bank reg, (c) `A:X`+`Y`, (d) hardware stack — were built behind feature flags and two-emulator
 measured. **Variant (a) `Imag32` won** and ships; the losers stayed a measured spike. It needs `Imag32` in
 `AnyRegBank` (a COPY-through class constraint shared with `0002`, which is why `0004` stacks on `0002`):
@@ -428,7 +441,7 @@ a legal load/store **value** type. This is one hunk, split out of `0001` only be
 `+mos-a16`-context-entangled (it interacts with the s16↔bytes narrowing that `0002` introduces) — keeping it
 separate keeps `0001` a16-free and round-trip-provable.
 
-**Patch.** `patches/llvm-mos/0005-320-far-ptr-value-legalize.patch` — add `PF` (the far-pointer value type)
+**Patch.** [`patches/llvm-mos/0005-320-far-ptr-value-legalize.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0005-320-far-ptr-value-legalize.patch) — add `PF` (the far-pointer value type)
 to the legalizer's Cartesian product of load/store value types:
 
 ```cpp
@@ -448,7 +461,7 @@ store/load/array/struct cases; corpus 7/7.
 table or banked-asset table of N far pointers — the 4th byte is pure waste. `addrspace(3)` packed-24 is the
 3-byte in-memory form (`p3:24:8`): `sizeof(packed*) == 3`, so a 16-entry table is 48 B instead of 64 B.
 
-**Patch.** `patches/llvm-mos/0006-320-packed24.patch`. Two non-obvious findings drove the implementation
+**Patch.** [`patches/llvm-mos/0006-320-packed24.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0006-320-packed24.patch). Two non-obvious findings drove the implementation
 (neither was the predicted "s24-narrowing" job): (1) `CodeGenPrepare` crashes on an invalid `MVT::i24` for a
 24-bit pointer load → the packed pointer's *register* form is the 32-bit far form (`getPointerTy(AS3)→i32`),
 memory footprint stays 3 B via datalayout; (2) the artifact combiner doesn't look through `inttoptr/ptrtoint`,
@@ -459,7 +472,7 @@ entry (a single `R_MOS_ADDR8` was wrong).
 
 **Proof.** `dev/run.sh packed24 packed24_table` → `0xF3`/`0xA5` on both emulators — the `0xF3` proves the
 **bank byte survives** 3-byte packing (target is bank `$01`). Storage **48 B vs 64 B (−25 %)**; measured
-break-even N≥1 (`dev/measure-packed24.sh`). Opt-in (`addrspace(3)`), so default/near codegen is unchanged.
+break-even N≥1 ([`dev/measure-packed24.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/measure-packed24.sh)). Opt-in (`addrspace(3)`), so default/near codegen is unchanged.
 
 ### 3.7 `0007` — near-abs bank-relaxation
 
@@ -468,7 +481,7 @@ plain (non-`.far`) symbol accessed via the **A register** was being grown to 4-b
 (`R_MOS_ADDR24`) and lld doesn't shrink it back, so the bloat reached the linked ROM — ~284 sites in the a16
 examples, +1 B each. (X/Y escaped: they have no long form.)
 
-**Patch.** `patches/llvm-mos/0007-65816-near-abs-bank-relax.patch` — one guard in
+**Patch.** [`patches/llvm-mos/0007-65816-near-abs-bank-relax.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0007-65816-near-abs-bank-relax.patch) — one guard in
 `MOSAsmBackend::fixupNeedsRelaxationAdvanced`:
 
 ```cpp
@@ -493,7 +506,7 @@ had no rule for it, so it fell through to the generic `CCIfPtr` and got a 16-bit
 size-mismatched `(p1) = COPY $rs` (def 8 / src 16). **Reproduces on stock `mos6502`** — a pre-existing
 upstream defect, surfaced by the far-pointer work, fixed here so the stack is clean.
 
-**Patch.** `patches/llvm-mos/0008-mos-dp-arg-cc.patch` — an 8-bit-slot rule before the generic `CCIfPtr`
+**Patch.** [`patches/llvm-mos/0008-mos-dp-arg-cc.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0008-mos-dp-arg-cc.patch) — an 8-bit-slot rule before the generic `CCIfPtr`
 (mirrors the i8 pool and the `0004` far rules), covering returns too:
 
 ```tablegen
@@ -502,7 +515,7 @@ CCIfPtrAddrSpace<1, CCAssignToReg<[A, X, RC2, RC3, RC4, RC5, RC6, RC7, RC8,
                                    RC9, RC10, RC11, RC12, RC13, RC14, RC15]>>,
 ```
 
-**Proof.** New `llvm/test/CodeGen/MOS/dp-pointer-arg.ll` — `load_dp`/`store_dp` crash pre-fix, post-fix emit
+**Proof.** New [`llvm/test/CodeGen/MOS/dp-pointer-arg.ll`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0008-mos-dp-arg-cc.patch) — `load_dp`/`store_dp` crash pre-fix, post-fix emit
 the correct zero-page-indexed `lda 0,x` / `sta 0,x` and pass `-verify-machineinstrs`. Corpus 7/7. Drafted as
 upstream [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`).
 
@@ -516,15 +529,15 @@ Four invariants underpin the whole stack; a reviewer who accepts these can trust
    (including operand canonicalizations and helper predicates, not just instruction defs) is guarded by the
    *same* predicate that enables the feature behavior (e.g. `NativeS16Eq = hasAccum16() && Type==S16 &&
    Pred==ICMP_EQ`). A looser guard once let an EQ-only operand swap reverse a `<` compare in the *default*
-   build<sup><a href="#c16-seed-42--legalizeicmp-swap-leak">C16</a></sup>. The differential fuzzer's default leg is
+   build<sup>[[C16]](#c16-seed-42--legalizeicmp-swap-leak)</sup>. The differential fuzzer's default leg is
    the standing enforcement.
 
 2. **The `Imag16`-resident invariant — the accumulator is entered only by load/store.** A live 16-bit value's
    home is a zero-page `Imag16` pair; `A16` (whose low byte aliases the 8-bit `A`) is transient, entered via
    `LDAImag16`/left via `STAImag16`, **never** by a COPY between 8- and 16-bit register classes. This is what
-   keeps the register coalescer from corrupting `$a16`<sup><a href="#c3-gisel-native-s16-coalescer-crash">C3</a></sup>,
+   keeps the register coalescer from corrupting `$a16`<sup>[[C3]](#c3-gisel-native-s16-coalescer-crash)</sup>,
    and it is why both spill paths (static + reentrant) were fixed to spill `Ac16` via 16-bit load/store rather
-   than a GPR COPY<sup><a href="#c18-f3--selectimm-a16-spill-crash">C18</a></sup>.
+   than a GPR COPY<sup>[[C18]](#c18-f3--selectimm-a16-spill-crash)</sup>.
 
 3. **The `DBR=0` addressing contract.** Near data (8-bit `abs`, `R_MOS_ADDR16`) and MMIO are DBR-relative;
    the crt0 pins `DBR=0` explicitly (`phk; plb`) so they resolve to bank 0. The native-16 `long` path
@@ -553,9 +566,10 @@ host-computed  ==  default(8-bit)@MAME  ==  +mos-a16@MAME  ==  +mos-a16@bsnes-jg
 
 <a id="a1-drmon"></a>
 
-**Why MAME is the primary emulator — drmon / drdevtools.** *drdevtools* is the open-source SNES
-development-tools suite this compiler feeds; *drmon* is its source-level debugger (a DWARF/DAP front-end
-being brought to Linux — see [`INVESTIGATION.md`](INVESTIGATION.md)). drmon's emulation core is **MAME's
+**drmon / drdevtools — the project's reason for being, and why MAME is primary.** *drdevtools* is the
+open-source SNES development-tools suite this compiler feeds; *drmon* is its DAP source-level debugger
+(coming to Linux), which today reads legacy assembler symbol formats (`.sld`/COFF/ca65/WLA-DX) and gains a
+modern ELF/DWARF path from this work — see the [Motivation](#) note up top + [`INVESTIGATION.md`](INVESTIGATION.md). drmon's emulation core is **MAME's
 `snes` driver**, so a ROM that is green on the MAME CI leg is by construction attachable in drmon. The
 end-to-end goal this serves: *compile → optimized SNES ROM → llvm-mos DWARF symbols → source-level debug in
 drmon*, entirely on open tooling (the compiler is the missing link; everything downstream already exists in
@@ -567,7 +581,7 @@ DWARF round-trip is [`ROADMAP.md`](ROADMAP.md) step 6.
   independent second opinion — and is *deterministic* (fixed frame count + direct WRAM read, no Lua settle
   window), so its leg is load-insensitive and can run on a contended box. MAME's leg needs a **quiet box**
   (concurrent docker/MAME load flakes its settle window). A third emulator (Mesen2) was
-  abandoned<sup><a href="#c23-mesen2-abandoned">C23</a></sup>.
+  abandoned<sup>[[C23]](#c23-mesen2-abandoned)</sup>.
 - **The default leg is the safety net.** Because each program is compiled *both* ways and both compared to
   the host oracle, an a16 helper that leaks into the 8-bit path shows up as `default@MAME ≠ host`. This is how
   gating discipline is enforced, not just asserted.
@@ -576,37 +590,37 @@ DWARF round-trip is [`ROADMAP.md`](ROADMAP.md) step 6.
 
 Each value-level feature gets `examples/65816/a16<name>.c` + `dev/a16<name>.sh`: a `corpus_result` the script
 asserts across host/default/a16 on both emulators, usually with a **disasm gate** (e.g. assert a native 16-bit
-`cmp` is present and no 8-bit `cpx/cpy` remains). Wired into `dev/run.sh`; closed with
+`cmp` is present and no 8-bit `cpx/cpy` remains). Wired into [`dev/run.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/run.sh); closed with
 `emu_verdict` (which rewrites the "both emulators" claim honestly under a bsnes-jg-only run). Templates:
 `a16eqval*`. ~40 such tests exist (the table in [§3.2](#32-0002--321-16-bit-accumulator-m2)).
 
 ### A.3 The corpus
 
-`examples/snes/corpus/` — small self-contained C programs (ALU, control flow, arrays/`.rodata`,
+[`examples/snes/corpus/`](https://github.com/wbniv/llvm-mos-65816/tree/main/examples/snes/corpus) — small self-contained C programs (ALU, control flow, arrays/`.rodata`,
 structs/pointers, recursion, `.data`/`.bss` init), host-checked against `expected.tsv`. `dev/run.sh corpus`
 ⇒ **7/7**. This is the M0 regression baseline that M1/M2 must never break.
 
 ### A.4 Differential fuzzers
 
-- **builtin** (`tools/a16_fuzz.py`): random UB-free C over mixed 8/16-bit vars + the full `+mos-a16` operator
+- **builtin** ([`tools/a16_fuzz.py`](https://github.com/wbniv/llvm-mos-65816/blob/main/tools/a16_fuzz.py)): random UB-free C over mixed 8/16-bit vars + the full `+mos-a16` operator
   set; compiles twice, runs 4-way, delta-reduces on mismatch; reproducible seeds. Found three real defects on
   day one (a signed-shift compile hang, an `asl/lsr` carry-clobber miscompile, the F3 spill crash) — each now
   a committed regression test.
 - **Csmith** (the default generator): language-level programs; seeds 1–500 run **0-mismatch** (a few legitimately
   SKIP when csmith's `main` diverges before `corpus_result`). Csmith caught the xy16 high-byte
-  clobber<sup><a href="#c17-xy16-index-high-byte-clobber">C17</a></sup> at seeds 247/445.
+  clobber<sup>[[C17]](#c17-xy16-index-high-byte-clobber)</sup> at seeds 247/445.
 
 ### A.5 GCC c-torture
 
-Host prereq `dev/fetch-torture.sh` (pinned gcc-14.2.0, sha256-verified) + a host-only compile/link filter
-(`tools/torture_filter.py`, 1253/1656 in-scope). `dev/run.sh torture [N] [--opt …] [--sample N]` runs the
+Host prereq [`dev/fetch-torture.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/fetch-torture.sh) (pinned gcc-14.2.0, sha256-verified) + a host-only compile/link filter
+([`tools/torture_filter.py`](https://github.com/wbniv/llvm-mos-65816/blob/main/tools/torture_filter.py), 1253/1656 in-scope). `dev/run.sh torture [N] [--opt …] [--sample N]` runs the
 emulator differential — the **default build is the oracle**, so a non-PASS default ⇒ SKIP and any FAIL is a
 real defect; known a16 crashes ⇒ XFAIL. Result: **1098** PASS (-O1) / **1114** PASS (-Os), 4-way, no
 data-row XFAILs remaining.
 
 ### A.6 CI
 
-`.github/workflows/smoke.yml` (`workflow_dispatch`), four jobs: `smoke` (corpus in MAME), `xcheck` (build the
+[`.github/workflows/smoke.yml`](https://github.com/wbniv/llvm-mos-65816/blob/main/.github/workflows/smoke.yml) (`workflow_dispatch`), four jobs: `smoke` (corpus in MAME), `xcheck` (build the
 from-source toolchain + SDK, bsnes-jg + secret-gated `corpus-a16`), `torture`, `fuzz-csmith` (both 4-way,
 `needs: xcheck`). A `mode` input picks `sampled` (seeded subset) or `full`; all secret-gated (skip, don't
 fail, without the SPC700 BIOS). `task ci-watch` streams step transitions + verdict.
@@ -632,41 +646,46 @@ dev/run.sh <name>          # e.g. a16add, far_call, corpus, fuzz 50 1
 ## Appendix B — SNES platform changes & requirements
 
 The SNES target is M0: it adds no codegen, but it is the environment every codegen test runs in. It lives in
-`platforms/snes/` (+ `platforms/snes-far/`) and is mirrored into a `vendor/llvm-mos-sdk` clone for
+[`platforms/snes/`](https://github.com/wbniv/llvm-mos-65816/tree/main/platforms/snes) (+ [`platforms/snes-far/`](https://github.com/wbniv/llvm-mos-65816/tree/main/platforms/snes-far)) and is mirrored into a `vendor/llvm-mos-sdk` clone for
 reconciliation with upstream sdk#415 ([§B.5](#b5-relationship-to-upstream-sdk415)).
 
 ### B.1 Files
 
 | File | Purpose |
 |------|---------|
-| `platforms/snes/crt0.c` | 65816 native-mode reset preamble (the contract below) + weak `nmi`/`irq` |
-| `platforms/snes/link.ld` | LoROM 32 KiB memory map, sections, near-code budget, vectors |
-| `platforms/snes-far/link.ld` | LoROM 64 KiB (bank `$00` + bank `$01` for `.far_text`/`.far_rodata`) |
-| `platforms/snes/header.s` | Cartridge header ($FFB0–$FFDF): title, map mode, checksum placeholders |
-| `platforms/snes/snes.h` | Minimal register HAL (`INIDISP`, `NMITIMEN`, …) |
-| `platforms/snes/clang.cfg` | `-mcpu=mosw65816` (platform default) + `-mlto-zp=224` + `-D__SNES__` — see [§B.7](#b7-mcpu-flow) |
-| `platforms/snes/call-near-from-far.s` | `__call_near_from_far` mixed-banking thunk |
-| `tools/snes-checksum.py` | Post-link ROM-size byte + checksum/complement patcher |
+| [`platforms/snes/crt0.c`](https://github.com/wbniv/llvm-mos-65816/blob/main/platforms/snes/crt0.c) | 65816 native-mode reset preamble (the contract below) + weak `nmi`/`irq` |
+| [`platforms/snes/link.ld`](https://github.com/wbniv/llvm-mos-65816/blob/main/platforms/snes/link.ld) | LoROM 32 KiB memory map, sections, near-code budget, vectors |
+| [`platforms/snes-far/link.ld`](https://github.com/wbniv/llvm-mos-65816/blob/main/platforms/snes-far/link.ld) | LoROM 64 KiB (bank `$00` + bank `$01` for `.far_text`/`.far_rodata`) |
+| [`platforms/snes/header.s`](https://github.com/wbniv/llvm-mos-65816/blob/main/platforms/snes/header.s) | Cartridge header ($FFB0–$FFDF): title, map mode, checksum placeholders |
+| [`platforms/snes/snes.h`](https://github.com/wbniv/llvm-mos-65816/blob/main/platforms/snes/snes.h) | Minimal register HAL (`INIDISP`, `NMITIMEN`, …) |
+| [`platforms/snes/clang.cfg`](https://github.com/wbniv/llvm-mos-65816/blob/main/platforms/snes/clang.cfg) | `-mcpu=mosw65816` (platform default) + `-mlto-zp=224` + `-D__SNES__` — see [§B.7](#b7-mcpu-flow) |
+| [`platforms/snes/call-near-from-far.s`](https://github.com/wbniv/llvm-mos-65816/blob/main/platforms/snes/call-near-from-far.s) | `__call_near_from_far` mixed-banking thunk |
+| [`tools/snes-checksum.py`](https://github.com/wbniv/llvm-mos-65816/blob/main/tools/snes-checksum.py) | Post-link ROM-size byte + checksum/complement patcher |
 
 ### B.2 The crt0 native-mode contract
 
 The 65816 boots in emulation mode and fetches the emulation RESET vector at `$FFFC` → `_start`. The 24-byte
-`.init.50` fragment establishes the contract the codegen depends on, then force-blanks the PPU. The six
-65816-only opcodes are hand-encoded as `.byte` because the platform builds its crt0 objects without
-`-mcpu=mosw65816` (`CMakeLists.txt`; the user-facing default is now `mosw65816` — see [§B.7](#b7-mcpu-flow)):
+`.init.50` fragment establishes the contract the codegen depends on, then force-blanks the PPU. Shown as
+65816 assembly; the actual `crt0.c` emits the six 65816-only ops (`xce`, `rep`, the 16-bit `ldx`, `sep`,
+`phk`, `plb`) as `.byte` because the platform builds its crt0 objects without `-mcpu=mosw65816`
+([§B.7](#b7-mcpu-flow)):
 
-```c
-asm(".section .init.50,\"axR\",@progbits\n"
-    "  sei\n  cld\n  clc\n"
-    "  .byte 0xfb\n"             // XCE      -> E=0, native mode
-    "  .byte 0xc2, 0x10\n"       // REP #$10 -> 16-bit index (so txs takes 16 bits)
-    "  .byte 0xa2, 0xff, 0x01\n" // LDX #$01ff   (8-bit txs would set SP=$00FF, colliding with DP)
-    "  txs\n"                    // SP -> $01FF
-    "  .byte 0xe2, 0x30\n"       // SEP #$30 -> M=1,X=1: 8-bit A+index (codegen default)
-    "  .byte 0x4b\n"             // PHK
-    "  .byte 0xab\n"             // PLB  -> DBR := 0 (explicit)
-    "  lda #$00\n  sta $4200\n"  // NMITIMEN: no NMI/IRQ/auto-joypad
-    "  lda #$8f\n  sta $2100\n");// INIDISP: force blank
+```asm
+.section .init.50          ; runs at reset ($FFFC emulation RESET vector -> _start)
+  sei
+  cld
+  clc
+  xce                      ; E = 0  -> 65816 native mode
+  rep #$10                 ; 16-bit index regs (so the txs below transfers 16 bits)
+  ldx #$01ff               ; an 8-bit txs would set SP=$00FF, colliding with the direct page
+  txs                      ; SP -> $01FF (page-1 hardware stack)
+  sep #$30                 ; M=1, X=1: 8-bit A + index — the codegen default
+  phk                      ; push program bank (= 0)
+  plb                      ; DBR := 0 (explicit; abs globals + the MMIO writes below read DBR:addr)
+  lda #$00
+  sta $4200                ; NMITIMEN: no NMI / IRQ / auto-joypad
+  lda #$8f
+  sta $2100                ; INIDISP: force blank, brightness 0
 ```
 
 | Reg | Value | Why |
@@ -705,7 +724,7 @@ overlap — this is the "near/far code model" decision: **no `-mcmodel` codegen 
 ### B.4 ROM header
 
 `$FFB0–$FFDF`: title `"LLVM-MOS SNES"`, map mode `$20` (LoROM/slow), ROM-size byte + checksum/complement
-patched post-link by `tools/snes-checksum.py` (checksum = sum of bytes mod `$10000`; complement =
+patched post-link by [`tools/snes-checksum.py`](https://github.com/wbniv/llvm-mos-65816/blob/main/tools/snes-checksum.py) (checksum = sum of bytes mod `$10000`; complement =
 checksum ^ `$FFFF`). Vectors: native at `$FFE0–$FFEF`, emulation at `$FFF0–$FFFF` with `$FFFC` RESET →
 `_start`.
 
@@ -738,17 +757,16 @@ this on [sdk#415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415)):
 | Level | How you get it | What it gives |
 |-------|----------------|---------------|
 | 1 — bare 6502 | nothing | the stock 6502 code generator |
-| 2 — `-mcpu=mosw65816` | **the SNES platform default** (`clang.cfg`, since 2026-06-24) | the upstream **Tier-1** 65816 ISA (`TXY`/`JSL`/`MVN`/`PEA`…) — free, *not* this work |
+| 2 — `-mcpu=mosw65816` | **the SNES platform default** (`clang.cfg`) | the upstream **Tier-1** 65816 ISA (`TXY`/`JSL`/`MVN`/`PEA`…) — free, *not* this work |
 | 3 — `+mos-a16` / `+mos-xy16` / `addrspace(2)` | explicit opt-in, layered on level 2 | **this contribution** — 16-bit accumulator / far pointers (**Tier-2**) |
 
-Our `platforms/snes/clang.cfg` now sets level 2 as the default (`snes-far` inherits it via `@mos-snes.cfg`).
-Three things make this safe and orthogonal to the #320/#321 work: (1) the differential harness passes
+The SNES platform's `clang.cfg` sets level 2 as the default (`snes-far` inherits it via `@mos-snes.cfg`).
+Three things keep this safe and orthogonal to the #320/#321 work: (1) the differential harness passes
 `-mcpu=mosw65816` **explicitly** on *both* the default-oracle and feature legs — the only per-leg difference
-is the target-feature — so the differential never depended on the platform default; (2) the platform's
+is the target-feature — so the differential does not depend on the platform default; (2) the platform's
 internal crt0/header objects are still built **without** `-mcpu` (the hand-encoded `.byte` preamble in
-[§B.2](#b2-the-crt0-native-mode-contract)); (3) the change affects only a *bare* `mos-snes-clang` build,
-which now gets the free Tier-1 instruction wins. Verified: M0 corpus **7/7** and smoke (`sentinel == 0x42`)
-unchanged by the flip.
+[§B.2](#b2-the-crt0-native-mode-contract)); (3) only a *bare* `mos-snes-clang` build is affected, and it
+gets the free Tier-1 instruction wins. The M0 corpus (**7/7**) and smoke (`sentinel == 0x42`) pass unchanged.
 
 ---
 
