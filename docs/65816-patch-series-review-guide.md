@@ -23,7 +23,9 @@ It addresses the two open, design-only upstream issues —
 [#321 16-bit register mode](https://github.com/llvm-mos/llvm-mos/issues/321) — code-first, the posture the
 maintainers ask for (ABI is blessed behind a running implementation, not ahead of it).
 
-**Audience:** someone comfortable writing LLVM/GISel target code. We show the load-bearing hunk per step and
+**Audience:** someone comfortable writing LLVM/GISel target code. **New to LLVM but fluent in compiler
+construction?** Read the companion [LLVM primer](llvm-primer-for-65816-review.md) first — it maps every
+LLVM/GISel term used here onto the concept you already know. We show the load-bearing hunk per step and
 point at the full `.patch` for the rest; we do not reproduce 7 k lines of diff inline (that would defeat the
 purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
 
