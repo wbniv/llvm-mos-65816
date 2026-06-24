@@ -5,6 +5,11 @@ three governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics
 live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
+**Preparing the upstream submission?** The reviewer-facing synthesis of the whole `0001`–`0008` patch stack —
+per-patch *need / patch / proof*, the dependency + sequencing + timeline diagrams, and the testing / SNES /
+dead-end appendices — is [`65816-patch-series-review-guide.md`](65816-patch-series-review-guide.md). It is the
+"how to review this" map; this file remains the "how to build/test/navigate it" mechanics.
+
 ## Active worktrees (2026-06-22)
 
 | Branch | Worktree | Task | Status |
