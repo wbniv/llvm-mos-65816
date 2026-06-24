@@ -38,7 +38,8 @@ missing* — the optimizing 65816 codegen, which is the part nobody else has don
 > `@mos-snes.cfg`. This is exactly the one-line change asiekierka asked #415 for. The #320/#321 **Tier-2**
 > codegen stays a layered opt-in (`+mos-a16`/`+mos-xy16`/`addrspace(2)`) on top — see the tier framing
 > below. The differential never relied on the default (its harness passes `-mcpu` explicitly on both legs)
-> and the crt0 objects are still built without `-mcpu`; M0 corpus (7/7) + smoke are unchanged by the flip.
+> and the platform's own objects set `-mcpu` (+`-fno-lto` for crt0's module-level asm) in their CMake rule,
+> decoupled from the user `clang.cfg`; M0 corpus (7/7) + smoke pass unchanged.
 
 ## Contribute-on-top vs. keep-separate — the split
 

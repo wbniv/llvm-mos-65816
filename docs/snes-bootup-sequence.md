@@ -54,23 +54,23 @@ asm(".section .init.50,\"axR\",@progbits\n"
     "  sei\n"                    // mask IRQ
     "  cld\n"                    // binary mode (decimal flag undefined at reset)
     "  clc\n"                    // clear carry, then exchange it with E:
-    "  .byte 0xfb\n"             // XCE      -> E=0, 65816 native mode (M=1,X=1 kept)
-    "  .byte 0xc2, 0x10\n"       // REP #$10 -> 16-bit index regs (so txs takes 16 bits)
-    "  .byte 0xa2, 0xff, 0x01\n" // LDX #$01ff (16-bit immediate; an 8-bit txs => SP=$00FF)
+    "  xce\n"                    // XCE      -> E=0, 65816 native mode (M=1,X=1 kept)
+    "  rep #$10\n"               // REP #$10 -> 16-bit index regs (so txs takes 16 bits)
+    "  ldx #$01ff\n"             // LDX #$01ff (16-bit immediate; an 8-bit txs => SP=$00FF)
     "  txs\n"                    // hardware stack pointer -> $01FF (page 1)
-    "  .byte 0xe2, 0x30\n"       // SEP #$30 -> M=1,X=1: 8-bit A+index (codegen default)
-    "  .byte 0x4b\n"             // PHK -> push program bank (=0; reset code is bank $00)
-    "  .byte 0xab\n"             // PLB -> DBR := 0 (explicit; abs globals + MMIO read DBR:addr)
+    "  sep #$30\n"               // SEP #$30 -> M=1,X=1: 8-bit A+index (codegen default)
+    "  phk\n"                    // PHK -> push program bank (=0; reset code is bank $00)
+    "  plb\n"                    // PLB -> DBR := 0 (explicit; abs globals + MMIO read DBR:addr)
     "  lda #$00\n"
     "  sta $4200\n"              // NMITIMEN: no NMI/IRQ/auto-joypad
     "  lda #$8f\n"
     "  sta $2100\n");            // INIDISP: force blank, brightness 0
 ```
 
-> The four-plus 65816-only opcodes are hand-encoded as `.byte` because the SDK assembles this TU for the
-> **6502** (user C defaults to the 6502 code generator). The bytes execute on the 5A22 exactly as the
-> mnemonics; `llvm-objdump --mcpu=mosw65816` decodes them back (it statically mis-prints the 16-bit
-> `ldx #$01ff` as `ldx #$ff` + a stray byte because it can't track REP/SEP mode — a disassembler cosmetic).
+> crt0 is built with `-mcpu=mosw65816 -fno-lto` (set in `platforms/snes/CMakeLists.txt`), so the 65816-only
+> ops are plain mnemonics. `-fno-lto` is required because module-level inline `asm()` under LTO does not
+> receive the `W65816` subtarget feature; with it, `ldx #$01ff` assembles to the correct 16-bit immediate
+> (`a2 ff 01`), byte-identical to the old hand-encoded `.byte` form.
 
 ### What actually executes (the linked bytes)
 

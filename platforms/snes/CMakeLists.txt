@@ -11,10 +11,15 @@ install(FILES snes.h TYPE INCLUDE)
 # in its own section so --gc-sections drops it from ROMs that make no far->near call
 # (near-only ROMs stay byte-identical; it is pulled only when a JSL references it).
 add_platform_object_file(snes-crt0-o crt0.o crt0.c header.s call-near-from-far.s)
-# The far->near thunk uses 65816-only instructions (PEA/RTL). The platform builds
-# crt0 objects without -mcpu=mosw65816 (crt0.c emits its own 65816 preamble as
-# .byte), so assemble just this pure-asm stub for the 65816 — its bytes run on the
-# SNES 5A22 like any other and are CPU-agnostic once linked.
+# crt0.c's native-mode preamble (XCE/REP/SEP/PHK/PLB + a 16-bit LDX) and the
+# far->near thunk (PEA/RTL) use 65816-only instructions, so build them with
+# -mcpu=mosw65816. crt0.c ALSO needs -fno-lto: its preamble is MODULE-LEVEL inline
+# asm, and under the platform's -flto the W65816 subtarget feature is not propagated
+# to the module-asm assembler ("instruction requires FeatureW65816"), so the
+# mnemonics would not assemble. crt0 has no C body to optimize, so dropping LTO for
+# it is free, and the bytes are identical to the old hand-encoded .byte form. The
+# .s thunk is assembled directly (no LTO bitcode), so it only needs -mcpu.
+set_source_files_properties(crt0.c PROPERTIES COMPILE_OPTIONS "-mcpu=mosw65816;-fno-lto")
 set_source_files_properties(call-near-from-far.s PROPERTIES COMPILE_OPTIONS "-mcpu=mosw65816")
 
 # Pull in the common startup pieces (soft-stack init, .data copy, .bss clear,

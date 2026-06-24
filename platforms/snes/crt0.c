@@ -31,24 +31,22 @@
 //                  docs/plans/2026-06-18-321-native-mode-crt0-xy16.md.
 //   DP  = 0        direct page at $0000 (reset default; never moved on this platform)
 //
-// The platform builds this crt0 TU WITHOUT -mcpu=mosw65816 (its own objects are built
-// without it — see CMakeLists.txt — even though user C now defaults to mosw65816 via
-// clang.cfg), so the six 65816-only opcodes of the preamble are emitted as
-// `.byte`: XCE (fb), REP #$10 (c2 10), the 16-bit LDX #$01ff (a2 ff 01), SEP #$30
-// (e2 30), PHK (4b), PLB (ab). The bytes execute on the SNES 65816 (a 5A22)
-// exactly as the mnemonics, and `llvm-objdump --mcpu=mosw65816` decodes them back.
-// sei/cld/clc/txs/lda/sta are plain 6502, so they stay as mnemonics.
+// crt0 is assembled with -mcpu=mosw65816 (set in CMakeLists.txt, independent of the
+// user-facing clang.cfg default), so the 65816-only preamble is written as plain
+// mnemonics. The assembler tracks the rep/sep widths, so `ldx #$01ff` encodes as a
+// 16-bit immediate (a2 ff 01) — verified byte-identical to the old hand-encoded form;
+// `llvm-objdump --mcpu=mosw65816` round-trips it.
 asm(".section .init.50,\"axR\",@progbits\n"
     "  sei\n"                    // mask IRQ
     "  cld\n"                    // binary mode (decimal flag is undefined at reset)
     "  clc\n"                    // clear carry, then exchange it with E:
-    "  .byte 0xfb\n"             // XCE      -> E=0, 65816 native mode (M=1,X=1 kept)
-    "  .byte 0xc2, 0x10\n"       // REP #$10 -> 16-bit index regs (so txs takes 16 bits)
-    "  .byte 0xa2, 0xff, 0x01\n" // LDX #$01ff (16-bit immediate; 8-bit txs => SP=$00FF)
+    "  xce\n"                    // E=0 -> 65816 native mode (M=1,X=1 kept)
+    "  rep #$10\n"               // 16-bit index regs (so the txs below takes 16 bits)
+    "  ldx #$01ff\n"             // 16-bit immediate; an 8-bit txs would set SP=$00FF
     "  txs\n"                    // hardware stack pointer -> $01FF (page 1)
-    "  .byte 0xe2, 0x30\n"       // SEP #$30 -> M=1,X=1: 8-bit A+index (codegen default)
-    "  .byte 0x4b\n"             // PHK -> push program bank (=0; reset code is bank $00)
-    "  .byte 0xab\n"             // PLB -> DBR := 0 (explicit; abs globals + MMIO read DBR:addr)
+    "  sep #$30\n"               // M=1,X=1: 8-bit A+index (codegen default)
+    "  phk\n"                    // push program bank (=0; reset code is bank $00)
+    "  plb\n"                    // DBR := 0 (explicit; abs globals + MMIO read DBR:addr)
     "  lda #$00\n"
     "  sta $4200\n"              // NMITIMEN: no NMI/IRQ/auto-joypad
     "  lda #$8f\n"

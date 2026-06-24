@@ -604,7 +604,7 @@ structs/pointers, recursion, `.data`/`.bss` init), host-checked against `expecte
 
 ### A.4 Differential fuzzers
 
-- **builtin** ([`tools/a16_fuzz.py`](https://github.com/wbniv/llvm-mos-65816/blob/main/tools/a16_fuzz.py)): random UB-free C over mixed 8/16-bit vars + the full `+mos-a16` operator
+- **builtin** ([`tools/a16_fuzz.py`](https://github.com/wbniv/llvm-mos-65816/blob/main/tools/a16_fuzz.py)): random C free of undefined behavior (UB) over mixed 8/16-bit vars + the full `+mos-a16` operator
   set; compiles twice, runs 4-way, delta-reduces on mismatch; reproducible seeds. Found three real defects on
   day one (a signed-shift compile hang, an `asl/lsr` carry-clobber miscompile, the F3 spill crash) — each now
   a committed regression test.
@@ -667,9 +667,9 @@ reconciliation with upstream sdk#415 ([§B.5](#b5-relationship-to-upstream-sdk41
 ### B.2 The crt0 native-mode contract
 
 The 65816 boots in emulation mode and fetches the emulation RESET vector at `$FFFC` → `_start`. The 24-byte
-`.init.50` fragment establishes the contract the codegen depends on, then force-blanks the PPU. Shown as
-65816 assembly; the actual `crt0.c` emits the six 65816-only ops (`xce`, `rep`, the 16-bit `ldx`, `sep`,
-`phk`, `plb`) as `.byte` because the platform builds its crt0 objects without `-mcpu=mosw65816`
+`.init.50` fragment establishes the contract the codegen depends on, then force-blanks the PPU. The crt0 is
+built with `-mcpu=mosw65816 -fno-lto`, so its 65816-only ops are plain mnemonics — `-fno-lto` is required
+because module-level inline `asm()` under LTO doesn't receive the `W65816` subtarget feature
 ([§B.7](#b7-mcpu-flow)):
 
 ```asm
@@ -765,9 +765,10 @@ this on [sdk#415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415)):
 The SNES platform's `clang.cfg` sets level 2 as the default (`snes-far` inherits it via `@mos-snes.cfg`).
 Three things keep this safe and orthogonal to the #320/#321 work: (1) the differential harness passes
 `-mcpu=mosw65816` **explicitly** on *both* the default-oracle and feature legs — the only per-leg difference
-is the target-feature — so the differential does not depend on the platform default; (2) the platform's
-internal crt0/header objects are still built **without** `-mcpu` (the hand-encoded `.byte` preamble in
-[§B.2](#b2-the-crt0-native-mode-contract)); (3) only a *bare* `mos-snes-clang` build is affected, and it
+is the target-feature — so the differential does not depend on the platform default; (2) the platform's own
+objects (crt0, the far→near thunk) set `-mcpu=mosw65816` in their **CMake** build rule, not via `clang.cfg`,
+so they are unaffected by the user-facing default (crt0 adds `-fno-lto` so its module-level asm gets the
+`W65816` feature — [§B.2](#b2-the-crt0-native-mode-contract)); (3) only a *bare* `mos-snes-clang` build is affected, and it
 gets the free Tier-1 instruction wins. The M0 corpus (**7/7**) and smoke (`sentinel == 0x42`) pass unchanged.
 
 ---
