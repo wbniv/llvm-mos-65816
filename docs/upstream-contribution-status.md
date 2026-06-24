@@ -1,6 +1,7 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-23 (first upstream contributions now live — PR #562 (F4) + issue #561 + the #561
+**Last updated:** 2026-06-24 (re-verified fork branches — the stale `revert-540-…` is **deleted** (0 leftover
+branches); #561/#562/#563 still open. 2026-06-23: first upstream contributions now live — PR #562 (F4) + issue #561 + the #561
 fix PR #563; *Verified state* snapshot refreshed; project repo `wbniv/llvm-mos-65816` `main` pushed to
 `e39d0ed`. Previously 2026-06-22: the **#321 stage-1 native-s16 surface** is now **measured-complete** — consolidated
 host-side via `dev/measure-native-s16-surface.sh`; the drafted "stage-1 native-s16 is measured-complete" evidence
@@ -30,8 +31,10 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
   it on merge). #561+#562 opened 2026-06-22; #563 opened 2026-06-23. (Our first contributions upstream.)
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
   llvm-mos-sdk#415 engagement (someone else's existing PR).
-- **Hygiene: 1 leftover fork branch** (`revert-540-…`) **retained by preference** — user keeps fork
-  branches until merged upstream; **do not auto-propose deletion**.
+- **Hygiene: 0 leftover fork branches** — the stale `revert-540-…` (a revert of now-merged upstream #540) was
+  **deleted** (verified gone 2026-06-24); the 3 remaining (`mos-dp-arg-cc`, `mos-late-opt-txy-dead-flag`,
+  `mos-dwarf-65816-test-docs`) are **active** PR/queue branches. Policy unchanged: keep fork branches until
+  merged upstream, **do not auto-propose deletion**.
 
 ## Ready to post now
 
@@ -246,7 +249,7 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
 > *(The ROADMAP-step-6 DWARF **test + docs** item moved up to **Ready to post now #5** on 2026-06-19 —
 > both halves are now drafted: the staged lit test + the `<output>.elf` doc note.)*
 
-## Verified state (GitHub, 2026-06-23)
+## Verified state (GitHub, 2026-06-24)
 
 Our first upstream contributions are now live: **2 PRs + 1 issue open** (was 0 through 2026-06-22).
 
@@ -263,7 +266,7 @@ $ gh api repos/wbniv/llvm-mos/branches --jq '.[].name' | grep -v '^main$'
 mos-dp-arg-cc                              # PR #563 — DP-arg CC fix (pushed 2026-06-23)
 mos-late-opt-txy-dead-flag                 # PR #562 — F4 dead-flag fix
 mos-dwarf-65816-test-docs                  # DWARF step-6 PR — pushed, not yet opened (queue #5)
-revert-540-fix/soft-stack-spill-crash      # stale revert of merged upstream #540 (retained by preference)
+# (revert-540-fix/soft-stack-spill-crash deleted by 2026-06-24 — was a stale revert of merged upstream #540)
 
 $ gh pr view 540 --repo llvm-mos/llvm-mos --json number,title,state,mergedAt
 {"number":540,"title":"fix(MOS): use reserved RS8 for soft stack spill scratch register",
