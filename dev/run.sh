@@ -33,6 +33,12 @@ Targets:
              examples/snes/corpus/*.c asserted host == default == +mos-a16 ==
              +mos-xy16 on MAME + bsnes-jg (globals.c XFAIL: regalloc-out-of-registers).
              Closes the "corpus only ever built default 8-bit" gap that hid it.
+  mandel-shot #321 beefy demo, Track 2: render the fixed-point Mandelbrot ON the SNES
+             (examples/snes/mandel-display.c, +mos-a16) and capture a REAL emulator
+             screenshot from BOTH cores headless — bsnes-jg (framebuffer dump via
+             jgxcheck) + MAME (video:snapshot under Xvfb) — each asserting the on-screen
+             buffer's CRC == the host renderer (build/mandel-{jg,mame,host}.png). See
+             docs/investigations/snes-emulator-screenshots.md.
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUES repro
              (a16regpress/a16scavnz) STILL crashes -verify-machineinstrs under both
              +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment

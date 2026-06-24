@@ -102,12 +102,20 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
-- [wip] **#321 beefy SNES demo — fixed-point Mandelbrot, differentially verified + rendered.** First *beefy*
-  customer for `+mos-a16`: a Q5.10 escape-time Mandelbrot fills a 96×64 low-WRAM buffer, CRC16's it into
-  `corpus_result` so the existing `diff_check` proves the **whole buffer** bit-identical across host ==
-  default == +mos-a16 == bsnes-jg (zero harness change), and the same source renders a host PNG + an
-  on-console emulator screenshot. Branch `wt/321-mandelbrot`. Track 1 (kernel + gate) → 2 (PPU display HAL +
-  screenshot) → 3 (high-WRAM big image, exercises #320 far stores).
+- [wip] **#321 beefy SNES demo — fixed-point Mandelbrot, differentially verified + rendered on both emulators.**
+  First *beefy* `+mos-a16` customer. Branch `wt/321-mandelbrot`.
+  **Track 1 DONE+green** (`dev/run.sh k_mandel`): Q5.10 escape-time kernel (`examples/65816/mandel.h`) compiled
+  by both the SNES target and a host PNG renderer; CRC16 of a 16×10 gate slice → `corpus_result`, asserting
+  host(`0x820B`)==default==`+mos-a16`==`+mos-xy16` on MAME+bsnes-jg, `-verify` clean. Found: `+mos-a16` is
+  +21% *bigger* (Lesson 2 — multiply-bound) and an all-inlined-form `+mos-a16` verifier crash (a16-regalloc
+  pressure family; shipped kernel uses `noinline mandel_cell`). **Track 2 DONE+green** (`dev/run.sh
+  mandel-shot`): renders ON the SNES (`examples/snes/mandel-display.c`, +mos-a16, fat-pixel Mode-1 BG) and
+  captures a **real emulator screenshot from BOTH** cores headless — bsnes-jg framebuffer dump + MAME
+  `video:snapshot` under Xvfb — each asserting on-screen CRC==host (`0x9103`); `+mos-a16`==default
+  pixel-for-pixel. Grew the SNES display HAL (`platforms/snes/snes.h`: VRAM/DMA/BG regs + `snes_ppu_reset_blank`),
+  shared PNG encoder (`tools/png_write.h`), how-to
+  [docs/investigations/snes-emulator-screenshots.md](docs/investigations/snes-emulator-screenshots.md).
+  **Track 3 remaining (optional):** high-WRAM big image (exercises #320 far stores).
   [plan](docs/plans/2026-06-24-snes-mandelbrot-beefy-demo.md).
 
 - [x] **#321 native s16 — 16-bit comparison follow-ups — DONE 2026-06-21, track CLOSED.** ([plan](docs/plans/2026-06-21-321-native-s16-comparison-followups.md)) Compare surface measured ~complete (`dev/measure-compare-surface.sh`): everything native except the optimal byte-wise register-resident equality. The one open lever — the **ordering-as-value branchless carry-tail** (`zext(sbc-carry)`→`G_UADDE(0,0,carry)` in `legalizeZExt`) — was **BUILT + measured net-negative in realistic context** (correct + leaf-win real `uge_v` 25→19 + default byte-identical 75/75, but the 8-bit `adc` tail's `sep` breaks 16-bit runs: a16cmpaudit **+262 B** rep/sep-churn + `eor` inversions; c-torture 56 progs net≈0 **with** a +5 B regression) → **WON'T-DO** (the select-diamond is the ambient-16-bit optimum; clean gating infeasible — the cost is ambient-mode-dependent, invisible at legalize time). Classic lesson #1 leaf→ambient flip; spike on `wt/321-cmpval` (un-landed). **The mode-matched 16-bit-`rol` follow-up form (separate [banked plan §0a](docs/plans/2026-06-21-321-ordering-value-branchless-banked.md) — a real `ROLAcc16`/`LDAImm16`/`G_CARRY_BOOL16` materialization, `lda #$0000; rol a` at M16) was ALSO BUILT + measured 2026-06-21 → REGRESSES HARDER than v1: a16cmpaudit +654 B (both-widths) / +78 B (s16-direct-gated), whole a16 corpus +340 B with ZERO programs improving → WON'T-DO. Both 8-bit AND 16-bit forms closed: the select-diamond folds inversion free, its M8 tail matches ambient mode, and it keeps the boolean in `X` (not an `Imag16` ZP slot that cascades to spills). Deferred lever = mode-agnostic post-REPSEP pseudo (uncertain/partial upside, delicate REPSEP work — not pursued).** (unsigned ordering, ~~(a) equality `== !=`~~,

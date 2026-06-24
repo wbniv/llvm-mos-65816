@@ -50,5 +50,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       pkg-config libsamplerate0-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# On-console screenshots from MAME (dev/mandel-shot.sh): MAME's `-snapshot` only
+# rasterises into a real display surface — under SDL `offscreen`/`-video none` it
+# writes an all-black PNG. Xvfb gives MAME a virtual X display so its normal renderer
+# runs headless and `manager.machine.video:snapshot()` captures the true PPU output.
+# (bsnes-jg needs none of this — it renders in software and dev/jgxcheck.cpp dumps its
+# framebuffer directly.) Own layer so it never re-triggers the toolchain/mame layers.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      xvfb \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV PATH=/opt/llvm-mos/bin:/usr/games:$PATH
 WORKDIR /work

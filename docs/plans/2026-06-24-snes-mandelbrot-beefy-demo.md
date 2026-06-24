@@ -184,6 +184,50 @@ fatal error: error in backend: Found 1 machine code errors.
 than default (fewer 16-bit ops), so default is the worst case. This is exactly the plan's "decoupled grids"
 design — the gate proves codegen on a small slice; the *beefy* image is the host PNG + the on-console render.
 
+## Verification — Track 2 results (2026-06-24)  ✅ PASS — rendered on BOTH emulators
+
+`dev/run.sh mandel-shot` renders the Mandelbrot **on the SNES** (`examples/snes/mandel-display.c`, `+mos-a16`,
+32×28 fat-pixel tiles in Mode 1 BG1 4bpp) and captures a **real, emulator-rendered** screenshot from both
+cores headless, each asserting the on-screen buffer's CRC == the host renderer:
+
+```
+==> built build/mandel-display.sfc (+mos-a16); corpus_result @ WRAM 0x580
+==> bsnes-jg: render + framebuffer dump (build/mandel-jg.png)
+SMOKE: PASS off=0x580 len=2 got=0x9103 (ran 1800 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/mandel-mame.png)
+    SHOT: PASS corpus=0x9103 (snapshot at frame 1400)
+RESULT: PASS — Mandelbrot rendered on SNES; MAME + bsnes-jg screenshots match host (CRC 0x9103)
+```
+
+| host (`tools/mandel-render`) | bsnes-jg (framebuffer dump) | MAME (snapshot under Xvfb) |
+|---|---|---|
+| <img src="screenshots/mandel-host.png" width="240"> | <img src="screenshots/mandel-jg.png" width="240"> | <img src="screenshots/mandel-mame.png" width="240"> |
+
+- **6. On-console display** — **PASS.** Both `build/mandel-jg.png` (256×224) and `build/mandel-mame.png`
+  (512×225, MAME's native 2×-wide snes snapshot) show the Mandelbrot with the shared palette. **`+mos-a16`
+  and default-8bit render byte-identically** (same PNG SHA) — a pixel-level differential on the *display*, not
+  just the compute.
+- **7. Display correctness** — **PASS.** The ROM leaves the escape-buffer CRC in `corpus_result`; both capture
+  paths assert it == the host CRC `0x9103` (same `mandel.h`, same 32×28 grid). So the on-screen pixels are the
+  differentially-verified ones, not a render artifact.
+
+**How both screenshots are obtained (the two cores need opposite tricks) — full how-to:
+[`docs/investigations/snes-emulator-screenshots.md`](../investigations/snes-emulator-screenshots.md):**
+- **bsnes-jg** renders in software into a caller buffer; `dev/jgxcheck.cpp` dumps it to PNG (gotcha: pixel
+  format is `0x00RRGGBB` — R/B opposite of a naïve read of the `lightTable` source; a green test can't catch
+  the swap).
+- **MAME**'s `video:snapshot()` is all-black under `-video none`/`offscreen`/`soft`/`accel`; it needs a real
+  surface, so we run it **under Xvfb** (baked into the dev image). `dev/mandel-shot.lua` snapshots + asserts.
+
+**Track-2 finding — initialise the PPU or the picture is nondeterministic.** bsnes-jg *randomises* the PPU
+control registers at power-on. A first cut set only the registers it "used" and rendered differently on every
+boot (random mosaic/window/colour-math; VRAM was byte-identical across runs, only the rendered frame varied).
+Fix: `snes_ppu_reset_blank()` (force-blank + zero `$2101–$2133`, skipping the data ports) — the standard SNES
+boot reset. Verified deterministic by capturing the same ROM 3× and diffing the SHA. *(Also: the earlier
+"`+mos-a16` renders garbage" was a red herring — a two-inner-loop tile upload that miscompiled, plus this
+nondeterminism. With the flat-loop tile build + PPU reset, `+mos-a16` == default, pixel-for-pixel. There is no
+`+mos-a16` display defect.)*
+
 ## Risks / notes
 
 - **Low-WRAM fit is the tight constraint** — verify via the map (step 3); fall back to 64×64. Don't assume.

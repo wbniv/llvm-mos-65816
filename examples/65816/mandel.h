@@ -71,6 +71,18 @@ static inline void mandel_fill(uint8_t *fb, uint8_t w, uint8_t h, uint8_t maxite
   }
 }
 
+// 5-bit-per-channel palette (BGR555-ready) for escape count n; interior (n>=maxiter)
+// is black. Shared so the host PNG (channels <<3 -> RGB888) and the on-console CGRAM
+// (SNES_RGB(r,g,b)) render the SAME colours — letting the emulator screenshot be
+// compared directly against the host reference.
+static inline void mandel_palette(uint8_t n, uint8_t maxiter, uint8_t *r5, uint8_t *g5, uint8_t *b5) {
+  if (n >= maxiter) { *r5 = 0; *g5 = 0; *b5 = 0; return; }
+  uint8_t t = (uint8_t)((unsigned)n * 31u / (maxiter ? maxiter : 1));   // 0..31
+  *r5 = t;
+  *g5 = (uint8_t)((t < 16) ? (t * 2) : 31);
+  *b5 = (uint8_t)(31 - t);
+}
+
 // CRC16-CCITT (XModem: poly 0x1021, init 0xFFFF, MSB-first, no reflection) over the
 // whole buffer — the SAME promotion-safe routine as examples/65816/k_crc16.c (the
 // "(uint16_t)x << 8" casts force unsigned-int promotion on the 16-bit-int target,

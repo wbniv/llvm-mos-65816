@@ -47,7 +47,7 @@ if [ ! -x "$JGX" ]; then
   ( cd "$VENDOR" && make ENABLE_STATIC=1 DISABLE_MODULE=1 -j"$(nproc)" >/dev/null )
   ARCHIVE="$(find "$VENDOR/objs" -name '*.a' | head -1)"
   [ -n "$ARCHIVE" ] || { echo "FATAL: bsnes-jg core archive not produced"; exit 1; }
-  g++ -O2 -std=c++11 -I"$VENDOR/src" -c "$ROOT/dev/jgxcheck.cpp" -o "$BUILD/jgxcheck.o"
+  g++ -O2 -std=c++11 -I"$VENDOR/src" -I"$ROOT/tools" -c "$ROOT/dev/jgxcheck.cpp" -o "$BUILD/jgxcheck.o"
   g++ "$BUILD/jgxcheck.o" "$ARCHIVE" -lsamplerate -lm -o "$JGX"
 fi
 DB="$VENDOR/Database"
