@@ -1045,7 +1045,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      documented in the plan (the conservative canSaveScavengerRegister(P) gate dead-ends the scavenger on a
      flag-class pseudo with no spill impl). Not a pending [verify]; spike concluded, issue stays issue-only.
      fp:ff8c440178114461 -->
-- [ ] **(triage)** The codegen itself is unchanged — this task is documentation + two ROM-byte-neutral platform refinements. — _from [2026-06-24-reviewer-patch-series-presentation.md](docs/plans/2026-06-24-reviewer-patch-series-presentation.md)_  <!-- fp:05152983f417d956 -->
-- [ ] **(triage)** GitHub links in the guide resolve only once `main` is pushed (origin was behind during authoring; merged + — _from [2026-06-24-reviewer-patch-series-presentation.md](docs/plans/2026-06-24-reviewer-patch-series-presentation.md)_  <!-- fp:2b58be7d4ba4a17d -->
-- [ ] **(triage)** Posting the upstream artifacts remains **user-triggered** (the tracker holds the `gh` commands). — _from [2026-06-24-reviewer-patch-series-presentation.md](docs/plans/2026-06-24-reviewer-patch-series-presentation.md)_  <!-- fp:383468bec170eac8 -->
+<!-- triaged 2026-06-24: all three are scope notes from the reviewer-presentation plan, not open work.
+     • "codegen unchanged" = a scope statement (this task = docs + two ROM-byte-neutral platform
+       refinements); nothing to build.
+     • "GitHub links resolve once main is pushed" = RESOLVED — main merged + pushed at the close of the task.
+     • "posting upstream artifacts is user-triggered" = a standing fact, already curated in the
+       Upstream/Contribution section + upstream-contribution-status.md. Nothing open here.
+     fp:05152983f417d956 fp:2b58be7d4ba4a17d fp:383468bec170eac8 -->
 <!-- END auto-captured-deferrals -->
