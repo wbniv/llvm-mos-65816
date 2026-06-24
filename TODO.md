@@ -312,6 +312,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (random a/b/c, switch palette/formula/color-mode, auto-scale). Optional perf: SNES hw multiplier
   (`$4202/$4203→$4216`) for the hot `b*x`. [plan](docs/plans/2026-06-24-blossom-snes.md).
 
+- [wip] **SNES hardware reference docs + subsystem-split `snes.h` + generators** (on `wt/321-snes-hwref`).
+  Durable reference set produced *from source*: (1) subsystem-split HAL headers
+  (`platforms/snes/snes_{ppu,dma,cpu,apu,wram,joypad}.h`) under a thin umbrella `snes.h`, annotated with
+  `@reg`/`@bit`; (2) a **complete CPU-visible MMIO register map** generated from those headers
+  (`tools/gen-snes-regmap.py`); (3) a **compact 65816 reference** generated from the in-tree LLVM-MOS
+  backend TableGen (`llvm-tblgen --dump-json`) and **validated against the canonical opcode matrix as a
+  correctness oracle** — which doubles as a **65816 backend-encoding audit**
+  (`tools/gen-65816-ref.py` → `65816-opcode-audit.md`); (4) an authored SNES hardware summary. Adopts
+  `wt/321-mandelbrot`'s exact HAL symbol names (merge stays a union). Unblocks #3's greenfield graphics
+  layer with a real register reference.
+  [plan](docs/plans/2026-06-25-snes-hardware-reference-docs-subsystem-split-snes.md).
+
 ### Test Bench / CI
 
 - [wip] **#321 Csmith differential fuzzer — replace the builtin generator with Csmith** (keep the engine;
