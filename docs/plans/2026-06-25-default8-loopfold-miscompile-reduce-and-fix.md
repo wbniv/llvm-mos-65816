@@ -44,10 +44,12 @@ pyramid header, build the `-DJGX_ZOOM` harness + the ROM from a scratch copy of 
 2. **Not loop-vs-straightline.** The optimizer **unrolls** the `i<4` byte loop in *both* forms (the post-LTO
    asm shows straight-line per-byte CRC steps `.LBB0_76/80/84/88/92…`, each with its own 8-iteration bit
    loop). So the source loop-vs-unrolled axis isn't the trigger — both end up unrolled.
-3. **Lead — an X-indexed `m[]` load under pressure.** In the loop form's fold, (at least) one `m[]` byte is
-   sourced via an **X-indexed stack load** — `eor mos8(.Lmain_zp_stk+7),x` — whereas the unrolled form uses
-   only direct (constant-offset) accesses. A wrong/clobbered `X` at that point would fold the wrong `m[]`
-   byte → wrong CRC, which matches the register-pressure sensitivity (standalone/minimal versions don't
+3. **Lead — an X-indexed `m[]` load under pressure. → CONFIRMED (2026-06-25) on the minimal repro.** In the
+   loop form's fold, the `m[i]` bytes are sourced via **X-indexed stack loads** — `ldy mos8(.Lmain_zp_stk+1),x`
+   (high) and `eor mos8(.Lmain_zp_stk),x` (low) — and the code then **immediately reuses `X` as the inner
+   CRC bit-counter** (`ldx #8`). The unrolled form's `--lto-emit-asm` has **no `.Lmain_zp_stk,x` indexed
+   loads at all** (constant-offset accesses only). A wrong/stale `X` at the indexed load folds the wrong
+   `m[]` byte → wrong CRC, matching the register-pressure sensitivity (standalone/minimal versions don't
    exhaust pressure, so the wrong-`X` window doesn't open → they compile correctly).
 4. **Default-8bit / baseline.** No `+mos-a16` involved, so per the investigation's caveat this may be an
    **upstream llvm-mos** issue rather than a 65816-fork (#320/#321) one — determine during reduction (does it
@@ -85,21 +87,77 @@ the main checkout (`build/llvm-mos-install`, `build/install`) rather than rebuil
 5. Implement the fix; add the regression test(s); `-verify-machineinstrs` clean; differential green.
 6. Merge the durable artifacts back to `main`; (optional) drop the `zoom.h` unroll workaround.
 
+## RESULT (2026-06-25): reduction done — minimal repro + confirmed root-cause lead
+
+cvise converged the full `mandel-zoom.c` (151 lines) → **51 lines raw**, hand-cleaned/de-UB'd to a
+**43-line** minimal repro: [`spikes/2026-06-25-loopfold-min.c`](spikes/2026-06-25-loopfold-min.c). The
+reduction held `zoom.h` **fixed** (host and target must compile the *same* fold) and shrank only the
+pressure **context**; the interestingness predicate was the **loop-vs-unroll control on the same
+candidate** (loop build ZOOM FAIL ∧ unroll build ZOOM PASS, both pinned to the canonical `host=0xF56C`
+scenario) — which rejects any cvise edit that introduces UB or collapses the trigger. Harness (reproduces
+the whole run): [`dev/reduce-loopfold.sh`](../../dev/reduce-loopfold.sh) (`setup`/`interesting`/`reduce`).
+
+The repro is **minimal by ablation**: removing *any* one of its four pressure sources —
+`snes_ppu_reset_blank()`, the inline palette `REG_CGDATA` loop, `apply_zoom()`'s `REG_CGDATA` loop, or the
+`img_hash16` boot loop — makes the bug vanish (loop then matches unroll). That delicate simultaneity is
+exactly why the earlier standalone-minimization attempts failed.
+
+**Root-cause lead — CONFIRMED (finding #3).** The post-LTO `--lto-emit-asm` diff (loop vs unroll) shows the
+loop form sources the `m[i]` matrix bytes via **X-indexed stack loads** that the unroll form never emits:
+```
+.LBB0_79:                       ; the i<4 matrix-fold loop (depth 2)
+  tax                           ; X = byte offset (i*2) into m[] on the stack
+  ldy  mos8(.Lmain_zp_stk+1),x  ; m[i] high byte   <-- X-indexed
+  sty  __rc2
+  lda  __rc7
+  eor  mos8(.Lmain_zp_stk),x    ; m[i] low byte    <-- X-indexed
+  ldx  #8                       ; X immediately REUSED as the inner CRC bit-counter
+```
+The unroll asm has **no `.Lmain_zp_stk,x` indexed loads** (constant-offset only). A wrong/stale `X` at the
+indexed load folds the wrong `m[]` byte → wrong CRC (`rom 0xE60E` vs correct `host/unroll 0xF56C`). The
+exact wrong-X mechanism (clobber vs bad index arithmetic; which pass) is the root-cause task (Verification
+step 4); classification (step 3) needs a self-contained, `mos6502`-retargetable repro.
+
 ## Verification
 
 1. **Repro is live + fast.** `dev/loopfold-repro.sh loop` prints `ZOOM: FAIL … host=0xF56C rom=0xE60E`;
    `dev/loopfold-repro.sh unroll` prints `ZOOM: PASS … 0xF56C`. (~10 s each, host-side, no container.)
+   ```
+   [loop]   ZOOM: FAIL frames=64 nonzero=64 swaps=3 host=0xF56C rom=0xE60E
+   [unroll] ZOOM: PASS frames=64 nonzero=64 swaps=3 zoom_crc=0xF56C (host replay == ROM, bsnes-jg)
+   ```
+   **PASS** — confirmed live this session.
 2. **Minimal repro.** `creduce` yields a small `.c` that, default-8bit on `mosw65816`, computes a fold result
    ≠ the host/unrolled value; the source-unrolled control matches. Paste the reduced `.c` + both results.
+   ```
+   cvise --n 12 (interestingness = loop-build ZOOM FAIL ∧ unroll-build ZOOM PASS, zoom.h fixed):
+     151 lines / 8555 B  ->  51 lines / 1073 B   (84 accepted reductions, ~26 min, exit 0)
+   Hand-cleaned + de-UB'd (nf=0, sized level_hash[], dropped a dead expr): 43 lines, still reproduces:
+     [loop]   ZOOM: FAIL frames=64 nonzero=64 swaps=3 host=0xF56C rom=0xE60E
+     [unroll] ZOOM: PASS frames=64 nonzero=64 swaps=3 zoom_crc=0xF56C
+   Minimal by ablation — removing ANY one collapses the bug (loop then matches unroll):
+     A inline palette REG_CGDATA loop   -> collapses
+     B apply_zoom() REG_CGDATA loop     -> collapses
+     C img_hash16 boot loop             -> collapses
+     D snes_ppu_reset_blank()           -> collapses
+   ```
+   Reduced `.c`: [`spikes/2026-06-25-loopfold-min.c`](spikes/2026-06-25-loopfold-min.c) (43 lines). Harness:
+   [`dev/reduce-loopfold.sh`](../../dev/reduce-loopfold.sh) (`reduce` = setup + cvise; reproduces the run).
+   **PASS** — reduced, de-UB'd, verified, and shown minimal by ablation.
 3. **Classification.** State whether the minimal repro reproduces on `mos6502` (→ upstream) or only
    `mosw65816` (→ fork); paste the per-target results.
+   **PENDING (next phase).** The `ZOOM` oracle is SNES/bsnes-specific (the reduced `.c` `#include`s the SNES
+   MMIO `mode7.h`), so classification needs a *self-contained* repro retargetable to `mos6502` with its own
+   value oracle — the next reduction step (a `corpus_result` differential, not the pad-log replay). The
+   defect is in the **default-8bit** path (no `+mos-a16`/`+mos-xy16`), so an upstream `llvm-mos` origin is
+   plausible per the investigation caveat — to be settled here.
 4. **Fix.** With the fix, the natural loop form == unrolled == host on the minimal repro AND in the full
-   `dev/run.sh mandel-zoom` (hd) and the fast sd repro; `-verify-machineinstrs` clean.
+   `dev/run.sh mandel-zoom` (hd) and the fast sd repro; `-verify-machineinstrs` clean. **PENDING.**
 5. **Regression test.** The new hermetic test (`loopfold.c`/`.sh` and/or frozen `.ll` `llc` gate) FAILs before
-   the fix and PASSes after; wired so the differential catches the class.
+   the fix and PASSes after; wired so the differential catches the class. **PENDING.**
 6. **No collateral.** `dev/run.sh corpus` + the a16/xy16 gates stay green (the fix is default-8bit codegen but
    must not regress anything); if the fix is in `vendor/`, regen `0002` and confirm it didn't absorb foreign
-   hunks.
+   hunks. **PENDING.**
 
 ## Risks / open items
 

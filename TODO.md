@@ -340,9 +340,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   the hd Docker demo the prior note assumed → cvise now tractable. Findings: it's a **post-LTO backend** bug
   (IR is correct; build is LTO), the `i<4` loop is compiler-**unrolled** in *both* forms, and the loop form
   sources an `m[]` byte via an **X-indexed stack load** (`eor …,x`) → likely a wrong/clobbered `X` under
-  pressure. Next: creduce via the fast repro → minimal `.c`/`.ll`, classify `mosw65816`-only vs `mos6502`
-  (possibly upstream), fix + regression test.
-  [plan](docs/plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md) ·
+  pressure. **cvise DONE 2026-06-25** (`dev/reduce-loopfold.sh`; predicate = loop-build ZOOM FAIL ∧
+  unroll-build ZOOM PASS, `zoom.h` held fixed): 151→**43-line** repro
+  ([`spikes/2026-06-25-loopfold-min.c`](docs/plans/spikes/2026-06-25-loopfold-min.c)), minimal by ablation
+  (4 pressure sources all load-bearing). The `--lto-emit-asm` diff **confirms** finding #3 — the loop form
+  sources `m[i]` via X-indexed `ldy/eor mos8(.Lmain_zp_stk{,+1}),x` (absent in unroll) then reuses `X` as
+  the inner CRC counter. **Next:** a self-contained `mos6502`-retargetable repro to classify upstream-vs-fork,
+  then root-cause the wrong-`X` + fix + regression test.
+  [plan](docs/plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md) (RESULT) ·
   [investigation](docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
 
 - [x] ~~**SNES hardware reference docs + subsystem-split `snes.h` + generators**~~ — **LANDED on `main`**
