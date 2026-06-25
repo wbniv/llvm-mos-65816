@@ -187,6 +187,22 @@ strong (minimal repro + structure verified correct + localized to verifier-clean
 upstream), an alternative is to **file upstream now** with this repro+analysis and let the llvm-mos
 maintainers (who own the regalloc) pin it.
 
+### Dynamic m[] check (2026-06-25): VALUES are correct — the fold's X-indexed READ is wrong
+Exposed `m[]` as a stable WRAM channel (`volatile int16_t m_log[4]; m_log[i]=m[i]` each frame, *direct*
+access) and read it back on bsnes for both forms (the bug survives — still `0xE60E`/`0xF56C`):
+```
+loop:   zoom_crc=0xE60E   m_log = 0x0000000000400040
+unroll: zoom_crc=0xF56C   m_log = 0x0000000000400040   (IDENTICAL)
+```
+The `m[]` **values are byte-identical** between the buggy loop form and the correct unroll form — so
+`zoom_matrix` computes/stores `m[]` correctly. `m_log` reads `m[]` *directly*; the fold reads it
+*X-indexed*. The fold diverges while reading from a correct array ⇒ **the defect is the fold's X-indexed
+read of `m[]` returning the wrong bytes at runtime** (a wrong `X`/index value at the indexed load), NOT a
+wrong `m[]` value. This dynamically **confirms finding #3** and **rules out** the value-computation/store
+side. The remaining unknown is purely *why X is wrong at the load at runtime* despite the static MIR/asm
+showing the offset induction as 0,2,4,6 — i.e. a runtime index/liveness corruption in core codegen, the
+exact frame/instruction of which a full dynamic instruction trace (#2) would pin.
+
 ## Verification
 
 1. **Repro is live + fast.** `dev/loopfold-repro.sh loop` prints `ZOOM: FAIL … host=0xF56C rom=0xE60E`;

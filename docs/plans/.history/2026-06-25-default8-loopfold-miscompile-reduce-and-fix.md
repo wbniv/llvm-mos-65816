@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fb48fe7) | plan: loopfold pass-disable bisection (#1) exhausted — verifier-clean core-codegen miscompile |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/c4f904d) | plan: loopfold MIR dive (#1) — structure verified correct at every level -> dynamic liveness clobber |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/25fd083) | docs: loopfold root-cause narrowing + provisional UPSTREAM classification |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/06be924) | plan: record loopfold accumulator-width classification (8-bit-accum only; +mos-a16 16-bit clean) |
@@ -7,6 +8,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+fb48fe7	author	Will Norris
+fb48fe7	added	25
+fb48fe7	deleted	4
+fb48fe7	files	1
+fb48fe7	body	Rebuilt the asserts toolchain (keeps shared -install pristine) with default-off cl::opt toggles\non the optional post-RA passes; reverted vendor/ after. Bisection on the loop-form runtime value:\n  baseline:                0xE60E\n  -mos-disable-late-opt:   clang ABORTS (mandatory; absence -> invalid MIR, asserts catch it)\n  -mos-disable-scavenging: clang ABORTS (mandatory)\n  -mos-disable-copy-opt:   <no-value> (non-running ROM)\n  -verify-regalloc / -verify-coalescing / -verify-machineinstrs: ALL CLEAN\nNone yield 0xF56C; generic -mllvm toggles (misched/post-misched/machine-cse/post-ra) don't fix it\neither; regalloc=basic / join-liveintervals=false produce non-running code (the MOS target depends\non greedy+coalescing). So the bug is NOT in any disablable peephole and survives every regalloc/\nliveness/machine verifier -> a SILENT miscompile in non-disablable core machinery (greedy regalloc/\nisel/zp-stack alloc) whose own correctness model is satisfied.\n\n#1 (bisection) exhausted. Remaining to pin the exact instruction: the dynamic trace (#2, MAME\nwatchpoint on the diverging ZP byte). Alternative given the strong analysis: file upstream now.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 c4f904d	author	Will Norris
 c4f904d	added	27
 c4f904d	deleted	1
