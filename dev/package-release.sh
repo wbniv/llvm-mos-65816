@@ -460,8 +460,8 @@ EOF
 EOF
 if [[ "$IS_NATIVE" == 1 ]]; then cat <<EOF
 
-Next (publish to apt.indri.studio):
-    task release-upload          # push tarball to r2://indri-apt/sources/
-    (cd ../indri.studio/apt && task build && task verify)
+Next (publish to apt.indri.studio — from the indri.studio repo):
+    (cd ../indri.studio && task release-upload -- <dist archives>)   # -> r2:indri-apt/sources/
+    (cd ../indri.studio/apt && task build && task verify)            # the .deb
 EOF
 fi

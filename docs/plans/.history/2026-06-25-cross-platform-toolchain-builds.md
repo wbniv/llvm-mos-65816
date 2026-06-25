@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2c58288) | release: task release-upload — publish dist archives to the /sources mirror |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/bff643e) | cross-build: interim linux-arm64 + windows-x86_64 packages (keep linux-x86_64 byte-identical) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ebac767) | plan: cross-platform toolchain builds (macOS arm64, Windows x86_64, Linux arm64) cross-compiled from the Linux Docker |
 
 <!--history-meta v1
+2c58288	author	Will Norris
+2c58288	added	10
+2c58288	deleted	2
+2c58288	files	1
+2c58288	body	The package-release "Next: task release-upload" note referenced a task that\ndidn't exist — make it. dev/release-upload.sh rclones the dist/ toolchain\narchives (.tar.xz/.zip + .sha256) to R2:indri-apt/sources/ (the R2 indri-apt\nbucket, served at apt.indri.studio/sources/ — the product page's direct-download\nlinks), NOT the apt pool/ (aptly-indexed .debs only; and GitHub is private so\nthe .deb flow can't use a release asset).\n\n- derives the /sources name llvm-mos-65816_0.0.0+git<date>.<sha>_<archtag>.<ext>\n  to match the indri.studio product-page links exactly (verified against both)\n- windows is gated behind WINDOWS_VERIFIED=1 — wine can't run it, so its -Os\n  functional check is owed on real Windows (release-verification policy)\n- DRY_RUN=1 previews; uses the R2 rclone remote (RCLONE_CONFIG_R2_* env, same\n  as indri.studio/apt's publish.yml)\n\nWired as `task release-upload -- <arch tags>`. Plan Increment 3 updated.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_013BoyGYjYmgXqoUoMoG8Wan
 bff643e	author	Will Norris
 bff643e	added	211
 bff643e	deleted	114
