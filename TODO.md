@@ -102,12 +102,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
-- [ ] **`dev/regen-patch-0004.sh` delta-based redesign** (surfaced by the 2026-06-25 far-cc-variants
-  `[verify]`). It isolates `0004` via a "baseline = every patch EXCEPT 0004", which `0008` (mos-dp-arg-cc,
-  authored on `0004`'s far-CC table in `MOSCallingConv.td`) structurally breaks (won't `git apply` onto a
-  0004-less baseline → fails at `MOSCallingConv.td:97`). It now fails-safe + is documented; needs a
-  delta-based redesign like `regen-patch-0001.sh` (whose STACK was also fixed to `0001..0009` this session).
-  The `0004` patch itself is intact + its codegen is verified (4 variants `0xF3` both emulators).
+- [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
+  "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
+  on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`
+  delta method: reconstruct the full `0001..0009` stack, capture new far-CC edits as a delta, re-derive `0004`
+  by applying the committed `0004` + delta onto a minimal `0001+0002+0003` baseline (so `0005..0009`'s shared-file
+  hunks never leak in and `0008` is never applied onto a 0004-less tree). Round-trips clean: `RESULT: PASS —
+  reapplied 0001..0009 == live vendor MOS dir` (regenerated `0004` differs from the committed one only by the
+  git index-hash header, now reflecting the current baseline).
 - [x] ~~**Rebuild main's toolchain to make the consolidation codegen live**~~ — **DONE 2026-06-25.** main's
   `vendor/llvm-mos` was reconciled to committed `0001..0009`, then `dev/run.sh toolchain` + SDK rebuilt
   (`snes-hirom`/`snes-zoom` platforms). Gates GREEN on the rebuilt compiler, both emulators: `corpus` 7/7,
