@@ -1097,5 +1097,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-25: this IS done — the matching Test Bench / CI entry was promoted to Done as
      [321-csmith-fuzzer] in the same commit (2cfd375) that captured this deferral; the struck-through plan
      bullet is the now-completed action, not open work. fp:bd0898d1d5c10cfa -->
-- [verify] **2026-06-25-cross-platform-toolchain-builds** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-25-cross-platform-toolchain-builds.md](docs/plans/2026-06-25-cross-platform-toolchain-builds.md)_  <!-- fp:6676955ce1f1f4cf -->
+<!-- triaged 2026-06-25: PLANNED pre-implementation plan (Status: PLANNED) — its Verification section is
+     intentionally unrun because nothing is built yet; the steps require the increments to exist first. Tracked
+     by the curated open item "#321 Cross-platform toolchain builds" under Distribution / Packaging, where the
+     PASS evidence will be recorded as Inc 0–4 land. Not a missed step. fp:6676955ce1f1f4cf -->
 <!-- END auto-captured-deferrals -->
