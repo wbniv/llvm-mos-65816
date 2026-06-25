@@ -11,6 +11,9 @@ __pycache__/
 # Generated at build time by tools/mandel-bake.c (dev/mandel-interactive.sh); 16 KiB of baked
 # image data — regenerable, not source. The interactive demo + jgxcheck-view bake it before compiling.
 /examples/snes/mandel_image.h
+# Generated at build time by tools/mandel-bake-pyramid.c (dev/mandel-zoom.sh); the baked zoom-pyramid
+# levels — regenerable, not source. The zoom demo + jgxcheck-zoom bake it before compiling.
+/examples/snes/pyramid_image.h
 # User-supplied emulator BIOS ROMs (copyrighted; never commit). MAME's snes
 # driver requires the SPC700 IPL at dev/roms/s_smp/spc700.rom — see the smoke
 # loop plan + README. Supply it out-of-band (CI: from a secret).

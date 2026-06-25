@@ -60,12 +60,10 @@ static void apply_view(const view_t *v, const int16_t m[4]) {
 int main(void) {
   snes_ppu_reset_blank();
 
-  // Instant upload: character data ROM->VRAM (high bytes), tilemap clear + 16x16 identity.
+  // Instant upload: character data ROM->VRAM (high bytes), tilemap clear + identity (16x16 tiles).
   m7_dma_chr(0x00, (uint16_t)(uintptr_t)MANDEL_CHR, (uint16_t)(MANDEL_IMG_W * MANDEL_IMG_H));
-  m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, (uint16_t)(MANDEL_IMG_W * MANDEL_IMG_H));
-  for (uint8_t ty = 0; ty < 16; ty++)
-    for (uint8_t tx = 0; tx < 16; tx++)
-      m7_tilemap_set((uint16_t)((uint16_t)ty * 128 + tx), (uint8_t)(ty * 16 + tx));
+  m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, M7_TILEMAP_WORDS);
+  m7_tilemap_identity(MANDEL_IMG_W / 8, MANDEL_IMG_H / 8);
   m7_cgram_load(MANDEL_PAL, MANDEL_NCOL);
 
   m7_begin();                            // Mode 7, BG1 main screen (still force-blanked)

@@ -53,6 +53,13 @@ Targets:
              fly-around at 60 fps. Builds default AND +mos-a16; per build asserts image hash == host
              AND a scripted-input view-math differential (host replay == ROM) on bsnes-jg, plus a
              MAME snapshot. examples/snes/mandel-interactive.c. Live: task mandel-mame ROM=mandel-interactive
+  mandel-zoom #321 M2: the Mandelbrot ZOOM PYRAMID — TRUE increasing detail on zoom-in. The host bakes
+             a stack of 2x-finer Mandelbrot levels (tools/mandel-bake-pyramid.c); the ROM DMAs the next
+             finer level as zoom crosses each 2x threshold (instant; SNES does zero fractal math). Phase 1
+             = 64x64 x 6 levels in one 32 KiB bank. Builds default AND +mos-a16; per build asserts a
+             per-level image hash (every baked level == host ref) AND a scripted-zoom view-math
+             differential (host replay == ROM) on bsnes-jg, plus a MAME snapshot. examples/snes/
+             mandel-zoom.c. Live: task mandel-zoom-play
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUES repro
              (a16regpress/a16scavnz) STILL crashes -verify-machineinstrs under both
              +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment
@@ -299,7 +306,9 @@ Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for
 `repro`, to repro.sh.
 Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH,
 MOS_TOOLCHAIN (toolchain install prefix to build the bench with), BUILD_JOBS,
-JG_ONLY (=1 → bsnes-jg-only: skip the MAME leg, used by xcheck-suite / a single test).
+JG_ONLY (=1 → bsnes-jg-only: skip the MAME leg, used by xcheck-suite / a single test),
+PYR_MODE (mandel-zoom: hd=128x128x8 multi-bank [default] | sd=64x64x6 single-bank),
+MANDEL_FRAMES / JGX_SCRIPT (mandel-zoom/-interactive frame budget + scripted input).
 USAGE
   exit 0
 fi
@@ -363,6 +372,9 @@ docker run --rm \
   ${MOS_TOOLCHAIN:+-e MOS_TOOLCHAIN} \
   ${BUILD_JOBS:+-e BUILD_JOBS} \
   ${JG_ONLY:+-e JG_ONLY} \
+  ${PYR_MODE:+-e PYR_MODE} \
+  ${MANDEL_FRAMES:+-e MANDEL_FRAMES} \
+  ${JGX_SCRIPT:+-e JGX_SCRIPT} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
   2> >(grep -vF 'different data layouts' | cat -s >&2)
 exit $?

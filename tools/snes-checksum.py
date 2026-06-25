@@ -7,23 +7,27 @@ sum of all bytes mod 0x10000, computed with the complement field pre-set to
 four placeholder bytes contribute a constant 0x1FE regardless of the final
 value, so a single pass suffices.
 
-Accepts 32 KiB (bank $00 only) or 64 KiB (banks $00+$01, #320 Increment 2b LoROM).
-The ROM-size header byte is set from the image length (the tool owns it, so the
-inherited header.s placeholder is corrected for whichever size was linked) — and
-because it's set before the sum, the checksum covers the corrected byte.
+Accepts 32 KiB (bank $00 only), 64 KiB (banks $00+$01, #320 Increment 2b LoROM),
+128 KiB, or 256 KiB (the #321 M2 zoom-pyramid's snes-zoom platform, banks $00..$07).
+All are power-of-two LoROM images that FULL()-fill their space, so the simple
+sum-of-all-bytes checksum holds. The ROM-size header byte is set from the image
+length (the tool owns it, so the inherited header.s placeholder is corrected for
+whichever size was linked) — and because it's set before the sum, the checksum
+covers the corrected byte.
 
 Usage: snes-checksum.py <rom.sfc>
 """
 import sys
 
 # LoROM header offsets within bank $00 ($FFD7/$FFDC-$FFDF -> file 0x7FD7/0x7FDC).
-# The header always lives in the first 32 KiB, so these are constant for both sizes.
+# The header always lives in the first 32 KiB, so these are constant for all sizes.
 ROMSIZE_OFF = 0x7FD7
 COMPLEMENT_OFF = 0x7FDC
 CHECKSUM_OFF = 0x7FDE
 
-# ROM-size header byte = log2(size in KiB): 32 KiB -> 0x05, 64 KiB -> 0x06.
-ROMSIZE_BYTE = {0x8000: 0x05, 0x10000: 0x06}
+# ROM-size header byte = log2(size in KiB): 32 KiB -> 0x05, 64 KiB -> 0x06,
+# 128 KiB -> 0x07, 256 KiB -> 0x08.
+ROMSIZE_BYTE = {0x8000: 0x05, 0x10000: 0x06, 0x20000: 0x07, 0x40000: 0x08}
 
 
 def main(argv: list[str]) -> int:
@@ -36,7 +40,7 @@ def main(argv: list[str]) -> int:
         rom = bytearray(f.read())
 
     if len(rom) not in ROMSIZE_BYTE:
-        print(f"error: expected a 32 KiB or 64 KiB LoROM image, got {len(rom)} bytes", file=sys.stderr)
+        print(f"error: expected a 32/64/128/256 KiB LoROM image, got {len(rom)} bytes", file=sys.stderr)
         return 1
 
     # Set the ROM-size header byte from the actual image size (before summing, so

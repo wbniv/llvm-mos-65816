@@ -17,15 +17,21 @@
 #include <bsnes.hpp>
 #include "png_write.h"   // dependency-free RGB8 PNG writer (shared with tools/mandel-render.c)
 
+#if defined(JGX_VIEW) || defined(JGX_ZOOM)
+// Interactive-demo input differential (built only by dev/mandel-interactive.sh / dev/mandel-zoom.sh
+// as a separate `jgxcheck-view` / `jgxcheck-zoom` binary, so the plain jgxcheck used by other
+// scripts is unaffected). Drive a scripted controller sequence into pollInput, then replay the
+// SHARED pure view math (examples/snes/view.h or zoom.h) over the ROM's ground-truth pad log and
+// assert an identical rolling CRC. The NO_IMG guards keep the baked image arrays out of this host
+// TU (we only need the SINCOS table + the per-level reference hashes).
 #ifdef JGX_VIEW
-// Interactive-demo input differential (built only by dev/mandel-interactive.sh as a separate
-// `jgxcheck-view` binary, so the plain jgxcheck used by other scripts is unaffected). Drive a
-// scripted controller sequence into pollInput, then replay the SHARED view math
-// (examples/snes/view.h) over the ROM's ground-truth pad log and assert an identical rolling
-// CRC. MANDEL_IMAGE_NO_IMG keeps the 16 KiB baked image out of this host TU (we only need
-// SINCOS for view_matrix).
 #define MANDEL_IMAGE_NO_IMG
 #include "view.h"
+#endif
+#ifdef JGX_ZOOM
+#define PYRAMID_NO_IMG
+#include "zoom.h"
+#endif
 
 static std::vector<uint16_t> g_script;   // per-frame button mask (frame -> JOY_* bits)
 static unsigned g_frame = 0;
@@ -134,7 +140,7 @@ static void dump_vram_hex(const char *label, unsigned wa, unsigned n) {
   fprintf(stderr, "\n");
 }
 static void audioFrame(const void*, size_t) {}                                     // headless: discard
-#ifdef JGX_VIEW
+#if defined(JGX_VIEW) || defined(JGX_ZOOM)
 // bsnes calls poll(udata, port, 0) on the controller latch and uses the full 16-bit return as
 // the button word (B in bit15 … R in bit4 — the JOY_* layout). Return the scripted mask for the
 // current frame; held past the script end. Exact frame alignment is irrelevant: the differential
@@ -183,13 +189,13 @@ int main(int argc, char **argv) {
   Bsnes::setInputSpec({0, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
   Bsnes::setInputSpec({1, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
 
-#ifdef JGX_VIEW
+#if defined(JGX_VIEW) || defined(JGX_ZOOM)
   if (getenv("JGX_SCRIPT")) parseScript(getenv("JGX_SCRIPT"));
 #endif
 
   for (int i = 0; i < frames; ++i) {
     Bsnes::run();
-#ifdef JGX_VIEW
+#if defined(JGX_VIEW) || defined(JGX_ZOOM)
     g_frame++;
 #endif
   }
@@ -246,6 +252,94 @@ int main(int argc, char **argv) {
       }
     } else {
       printf("VIEW: FAIL (WRAM offsets out of range)\n"); rc = 1;
+    }
+  }
+#endif
+
+#ifdef JGX_ZOOM
+  // (1) Per-level image correctness: the ROM hashes every baked level at boot into level_hash[];
+  // assert each == its host reference MANDEL_PYR_HASH[k] (so every displayed level IS the verified
+  // deeper Mandelbrot). (2) Zoom-math differential: replay zoom.h over the ROM's ground-truth pad
+  // log; assert host == ROM (gates the level-swap arithmetic + the Mode 7 matrix multiplies).
+  if (getenv("JGX_LEVELHASH")) {
+    unsigned lh_off = (unsigned)strtoul(getenv("JGX_LEVELHASH"), nullptr, 16);
+    // Single-bank: the ROM hashed every level on-console (all near). Multi-bank: only level 0 is
+    // near (bank $00) — levels 1.. are far and proved via the VRAM-readback gate below + a host-side
+    // ROM-file hash. So check all L levels' on-console hashes, or just level 0, accordingly.
+    int nlev = MANDEL_PYR_MULTIBANK ? 1 : MANDEL_PYR_L;
+    int allok = 1;
+    for (int k = 0; k < nlev; k++) {
+      unsigned a = lh_off + 2 * k;
+      uint16_t rom_h = (a + 1 < mem.second) ? (uint16_t)(wram[a] | (wram[a + 1] << 8)) : 0;
+      if (rom_h != MANDEL_PYR_HASH[k]) {
+        printf("HASH: FAIL level %d rom=0x%04X host=0x%04X\n", k, rom_h, MANDEL_PYR_HASH[k]);
+        allok = 0;
+      }
+    }
+    if (allok) printf("HASH: PASS %d on-console level%s (rom level_hash == host MANDEL_PYR_HASH, bsnes-jg)\n",
+                      nlev, nlev == 1 ? "" : "s");
+    else rc = 1;
+  }
+  // VRAM-readback gate: after the scripted dive, hash the chr actually IN VRAM (the displayed level)
+  // and assert it == MANDEL_PYR_HASH[cur_level]. This is the proof that the level-swap DMA — including
+  // a multi-bank DMA sourcing from a HIGH ROM bank — lands the correct level on screen. (img_hash16
+  // over the VRAM high bytes, matching the bake's tiled-chr hash; same rotate-xor as mandel.h.)
+  if (getenv("JGX_CURLEVEL")) {
+    unsigned cl_off = (unsigned)strtoul(getenv("JGX_CURLEVEL"), nullptr, 16);
+    unsigned nbytes = (unsigned)(MANDEL_PYR_W * MANDEL_PYR_H);
+    std::pair<void*, unsigned> vr = Bsnes::getMemoryRaw(Bsnes::Memory::VideoRAM);
+    if (cl_off < mem.second && vr.first && vr.second >= 2 * nbytes) {
+      unsigned cur = wram[cl_off];
+      const uint8_t *vram = (const uint8_t*)vr.first;
+      uint16_t h = 0;                                  // img_hash16 over the VRAM high bytes (chr)
+      for (unsigned i = 0; i < nbytes; i++) {
+        unsigned hi = ((unsigned)h >> 15) & 1u;
+        h = (uint16_t)((((unsigned)h << 1) | hi) ^ (unsigned)vram[2 * i + 1]);
+      }
+      if (getenv("JGX_VRAMOUT")) {                      // debug: write the nbytes high bytes to a file
+        FILE *vf = fopen(getenv("JGX_VRAMOUT"), "wb");
+        if (vf) { for (unsigned i = 0; i < nbytes; i++) fputc(vram[2 * i + 1], vf); fclose(vf); }
+      }
+      if (cur < (unsigned)MANDEL_PYR_L && h == MANDEL_PYR_HASH[cur]) {
+        printf("VRAM: PASS displayed level %u chr hash=0x%04X == host (bsnes-jg)\n", cur, h);
+      } else {
+        printf("VRAM: FAIL displayed level %u chr hash=0x%04X host=0x%04X\n",
+               cur, h, cur < (unsigned)MANDEL_PYR_L ? MANDEL_PYR_HASH[cur] : 0);
+        rc = 1;
+      }
+    } else {
+      printf("VRAM: FAIL (cur_level/VRAM out of range)\n"); rc = 1;
+    }
+  }
+  if (getenv("JGX_SCRIPT") && getenv("JGX_ZOOMCRC") && getenv("JGX_PADLOG") && getenv("JGX_NFRAMES")) {
+    unsigned padlog_off = (unsigned)strtoul(getenv("JGX_PADLOG"), nullptr, 16);
+    unsigned zc_off     = (unsigned)strtoul(getenv("JGX_ZOOMCRC"), nullptr, 16);
+    unsigned nf_off     = (unsigned)strtoul(getenv("JGX_NFRAMES"), nullptr, 16);
+    unsigned padlog_n   = getenv("JGX_PADLOG_N") ? (unsigned)atoi(getenv("JGX_PADLOG_N")) : 64;
+    if (nf_off < mem.second && zc_off + 1 < mem.second) {
+      unsigned nf = wram[nf_off];
+      if (nf > padlog_n) nf = padlog_n;
+      uint16_t rom_zc = (uint16_t)(wram[zc_off] | (wram[zc_off + 1] << 8));
+      zoom_t z; zoom_reset(&z);
+      uint16_t crc = 0xFFFF; unsigned nonzero = 0, swaps = 0;
+      for (unsigned i = 0; i < nf; i++) {
+        unsigned a = padlog_off + 2 * i;
+        uint16_t pad = (a + 1 < mem.second) ? (uint16_t)(wram[a] | (wram[a + 1] << 8)) : 0;
+        if (pad) nonzero++;
+        if (zoom_step(&z, pad)) swaps++;     // count level changes (input must exercise a swap)
+        int16_t m[4]; zoom_matrix(&z, m);
+        crc = zoom_fold(crc, &z, m);
+      }
+      if (nf > 0 && nonzero > 0 && swaps > 0 && crc == rom_zc) {
+        printf("ZOOM: PASS frames=%u nonzero=%u swaps=%u zoom_crc=0x%04X (host replay == ROM, bsnes-jg)\n",
+               nf, nonzero, swaps, crc);
+      } else {
+        printf("ZOOM: FAIL frames=%u nonzero=%u swaps=%u host=0x%04X rom=0x%04X\n",
+               nf, nonzero, swaps, crc, rom_zc);
+        rc = 1;
+      }
+    } else {
+      printf("ZOOM: FAIL (WRAM offsets out of range)\n"); rc = 1;
     }
   }
 #endif

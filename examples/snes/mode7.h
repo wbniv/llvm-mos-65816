@@ -90,6 +90,23 @@ static inline void m7_tilemap_set(uint16_t word, uint8_t tile) {
   REG_VMAIN = VMAIN_INC_HIGH_1; REG_VMADD = word; REG_VMDATAL = tile;
 }
 
+// The Mode 7 tile grid is a fixed 128x128 = 16384 entries (one byte each, the VRAM low byte).
+// Give m7_tilemap_clear this count to blank the whole grid before laying down the identity, for
+// ANY image size (an image smaller than 128x128 still surrounds itself with tile 0).
+#define M7_TILEMAP_WORDS 16384
+
+// Write the identity tilemap for a host-tiled image of `tiles_w` x `tiles_h` 8x8 tiles (image
+// W = tiles_w*8, H = tiles_h*8): the chr is laid out tile 0,1,2,... in row-major tile order
+// (tile = ty*tiles_w + tx, the mandel-bake order), so tile (ty*tiles_w + tx) maps to Mode 7
+// tilemap word ty*128 + tx — the image tiles sit in the top-left of the 128x128 grid, the rest
+// staying tile 0 from the preceding m7_tilemap_clear. Parametric so a 64x64 (8x8) pyramid level
+// and a 128x128 (16x16) image share one path. tiles_w*tiles_h must be <= 256 (Mode 7 tile cap).
+static inline void m7_tilemap_identity(uint8_t tiles_w, uint8_t tiles_h) {
+  for (uint8_t ty = 0; ty < tiles_h; ty++)
+    for (uint8_t tx = 0; tx < tiles_w; tx++)
+      m7_tilemap_set((uint16_t)((uint16_t)ty * 128 + tx), (uint8_t)(ty * tiles_w + tx));
+}
+
 // Load `n` BGR555 colours into CGRAM starting at palette index 0.
 static inline void m7_cgram_load(const uint16_t *pal, uint16_t n) {
   REG_CGADD = 0;
