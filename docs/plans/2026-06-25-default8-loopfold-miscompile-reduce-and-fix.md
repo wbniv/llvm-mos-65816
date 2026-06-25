@@ -221,11 +221,27 @@ exact frame/instruction of which a full dynamic instruction trace (#2) would pin
 
 **Status of the pin.** The *mechanism* is now precise (the fold's `m[i]` index is corrupted across the
 inner CRC bit-loops that clobber `X`; standalone indexed reads are fine). The *exact instruction/pass*
-still requires either an **instruction-level dynamic trace** (MAME debugger breakpoint logging `X` at the
-fold load each frame) or the upstream maintainers' regalloc tooling. Black-box value forensics has reached
-its limit. **Recommended next:** (1) the **pristine no-`0002` build** to make the upstream determination
-definitive (the user's gate: "a patch for upstream *if it is in fact upstream*"); then (2) either the
-instruction trace or an upstream filing with this repro+characterization.
+still requires either an **instruction-level dynamic trace** (logging `X` at the fold load each frame) or
+the upstream maintainers' regalloc tooling. Black-box value forensics has reached its limit.
+
+### Instruction-trace attempt (2026-06-25): MAME 0.277 headless-debugger wall
+Tried to log `X`/`PC`/`D` at the fold's `m[]` reads via the host MAME 0.277 debugger (the ZP frame is at
+direct page `0x6c`, 16 B; the fold's effective read address is `0x6c+X`):
+- `-debug` alone tries to open the **Qt GUI** debugger (Wayland errors) — unusable headless.
+- `-debug -debugger none -debugscript` runs (debugger banner in `debug.log`) but **`printf` output is
+  swallowed** and the `trace` command **writes no file**.
+- The Lua API *does* expose `cpu.debug:wpset` headlessly (confirmed; CPU state keys `PC/X/Y/D/CURPC` are
+  readable), but passing a **Lua function as the watchpoint action segfaults** MAME 0.277 (the action must
+  be a debugger-command string, and string actions can't reach Lua/stdout under `-debugger none`).
+
+So MAME-headless instruction tracing is blocked by tooling. The controllable alternative is to **instrument
+the bsnes-jg core** (`vendor/bsnes-jg/src/processor/wdc65816.cpp`, has `r.x`) with an env-gated read hook
+and rebuild the core (jgxcheck already links it) — a real but self-owned sub-project.
+
+**Recommended next:** (1) the **pristine no-`0002` build** to make the upstream determination definitive
+(the user's gate: "a patch for upstream *if it is in fact upstream*"); (2) the bsnes-core read-hook trace to
+pin the exact instruction; then (3) the patch. All three are substantial; the mechanism + repro are already
+strong enough to file upstream and let the regalloc owners pin the instruction if preferred.
 
 ## Verification
 

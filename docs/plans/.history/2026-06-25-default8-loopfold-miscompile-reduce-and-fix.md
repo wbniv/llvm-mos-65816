@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/cd77eaa) | plan: loopfold grind — frame-0 localization + mechanism (index across inner CRC loops) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/554e5ec) | plan: loopfold dynamic m[] check — VALUES correct, the fold's X-indexed READ is the bug |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fb48fe7) | plan: loopfold pass-disable bisection (#1) exhausted — verifier-clean core-codegen miscompile |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/c4f904d) | plan: loopfold MIR dive (#1) — structure verified correct at every level -> dynamic liveness clobber |
@@ -9,6 +10,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+cd77eaa	author	Will Norris
+cd77eaa	added	24
+cd77eaa	deleted	0
+cd77eaa	files	1
+cd77eaa	body	- Frame-0 divergence: ROM's rolling zoom_crc is already wrong after the first folded frame\n  (host 0x9F3D vs ROM 0xCE8C, m={0x3E,0,0,0x3E}).\n- Not an in-bounds reindex: brute-force over index/byte-offset corruption models of the correct\n  in-bounds m[] bytes reproduces neither 0xCE8C (frame 0) nor 0xE60E (full) -> the fold reads bytes\n  not derivable from the in-bounds m[] (OOB/wrong effective address). ZP frame is at 0x6c (16 B) but\n  too timing-fuzzy to capture via post-hoc WRAM reads.\n- Specific to the fold's shape: an INDEXED copy loop (for q<4: m_log[q]=m[q]) does NOT miscompile;\n  only the full fold does. So it's not a generic indexed-array-read bug -- it needs the m[i] index\n  carried across the two nested 8-iteration zoom_crc16_byte bit-loops that reuse X (ldx #8). The\n  index is corrupted across those inner loops under pressure, while __rc5/__rc6 read clean -- a\n  runtime corruption invisible to static inspection and every machine verifier.\n\nMechanism now precise; exact instruction/pass needs an instruction-level trace or upstream's\nregalloc tooling. Recommended next: pristine no-0002 build to make the upstream call definitive\n(the user's gate for an upstream patch), then trace or file.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 554e5ec	author	Will Norris
 554e5ec	added	16
 554e5ec	deleted	0
