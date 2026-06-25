@@ -125,6 +125,24 @@ so the defect is in the 65816 8-bit codegen. A `-mcpu=mos6502` build on the SNES
 valid 6502 oracle (65816 crt0/ABI — the correct unroll form returns `0xFF4B`), so upstream-vs-fork is
 settled by the responsible pass's provenance during root-cause, all on the 65816.
 
+**Root-cause narrowing (2026-06-25, asm structural diff loop vs unroll):** the loop form is the one that
+**materializes `m[]` as a contiguous array in the ZP soft-stack** and folds it via X-indexed loads:
+- loop: `.size .Lmain_zp_stk, 16` — `m[]` stored at `+0..+7` (8 stores), fold reads `mos8(.Lmain_zp_stk{,+1}),x`.
+- unroll: `.size .Lmain_zp_stk, 2` — `m[]` never arrayed; values stay in registers, no indexed loads.
+
+Two sub-hypotheses **refuted** on the asm: (1) the index ZP slots `__rc5`/`__rc6` are *not* clobbered by the
+inner CRC bit-loops (no uses in their block range); (2) `m[]` at `+0..+7` is *not* overwritten between its
+store and the fold. So it is **not** a simple index clobber — the defect lives in the `m[]`
+materialize-and-index sequence under the surrounding ZP-soft-stack pressure (the spill/reassembly at the
+matrix store, or the X-offset induction), a path the unroll form never takes.
+
+**Provisional upstream-vs-fork (pass provenance):** this is **default 8-bit** codegen — ZP soft-stack frame
++ regalloc + indexed addressing, all **upstream llvm-mos** machinery. The fork's `0002` *does* touch
+`MOSInstrInfo::loadStoreRegStackSlot`/`copyPhysRegImpl`, but those hunks are **`+mos-a16`-gated** (16-bit-
+accumulator spill), and `+mos-a16` tested **clean** — so the buggy default-8bit path doesn't run `0002`'s
+additions. **Likely an upstream `llvm-mos` bug.** Definitive confirmation (next): reproduce on a **pristine
+(no-`0002`) toolchain**; if it still miscompiles, file upstream.
+
 ## Verification
 
 1. **Repro is live + fast.** `dev/loopfold-repro.sh loop` prints `ZOOM: FAIL … host=0xF56C rom=0xE60E`;
@@ -165,7 +183,9 @@ settled by the responsible pass's provenance during root-cause, all on the 65816
    `+mos-a16` is a 65816-only feature, so the bug clearly lives in the 65816 8-bit codegen. Upstream-vs-fork
    is therefore settled by **pass provenance** during root-cause (step 4) — is the pass that emits the bad
    X-indexed load in the shared upstream tree or the fork's `0002`? — with all testing kept on the 65816.
-   **Partial** (8-bit-only confirmed; upstream-vs-fork resolves with the root cause).
+   **Partial → provisionally UPSTREAM** (8-bit-only confirmed; `0002`'s spill hunks are `+mos-a16`-gated and
+   a16 is clean, so the default-8bit path is unmodified upstream machinery — see RESULT "Provisional
+   upstream-vs-fork". Definitive: reproduce on a pristine no-`0002` toolchain).
 4. **Fix.** With the fix, the natural loop form == unrolled == host on the minimal repro AND in the full
    `dev/run.sh mandel-zoom` (hd) and the fast sd repro; `-verify-machineinstrs` clean. **PENDING.**
 5. **Regression test.** The new hermetic test (`loopfold.c`/`.sh` and/or frozen `.ll` `llc` gate) FAILs before

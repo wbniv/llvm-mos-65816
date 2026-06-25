@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/06be924) | plan: record loopfold accumulator-width classification (8-bit-accum only; +mos-a16 16-bit clean) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a0498d7) | reduce: cvise-minimize the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (43-line repro + X-indexed-load root-cause lead) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+06be924	author	Will Norris
+06be924	added	21
+06be924	deleted	6
+06be924	files	1
+06be924	body	Target-only loop-vs-unroll on bsnes (minimal repro), default vs +mos-a16:\n  mosw65816 default (8-bit A):   loop=0xE60E != unroll=0xF56C   -> BUG\n  mosw65816 +mos-a16 (16-bit A): loop=0xD351 == unroll=0xD351   -> clean (loop==unroll==host)\nSo the miscompile is 8-bit-accumulator (default) ONLY, now confirmed on the 43-line repro (not\njust the hd demo); +mos-a16 (16-bit accumulator) is correct. +mos-a16 is a 65816-only feature, so\nthe defect lives in the 65816 8-bit codegen.\n\nAlso recorded: a -mcpu=mos6502 build on the SNES platform is NOT a valid 6502 oracle (the SNES\ncrt0/ABI are 65816 -> even the known-correct unroll form returns 0xFF4B != 0xF56C), so it is\ndiscarded. Upstream-vs-fork is settled by the responsible pass's provenance during root-cause,\nwith all testing kept on the 65816.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a0498d7	author	Will Norris
 a0498d7	added	65
 a0498d7	deleted	7

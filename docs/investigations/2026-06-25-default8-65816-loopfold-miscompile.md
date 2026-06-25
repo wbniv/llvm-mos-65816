@@ -76,3 +76,12 @@ workaround (a 4-way unroll of a fixed-size fold), and the differential gate catc
 This is the *default* 8-bit code path (no `+mos-a16`), i.e. baseline 65816 codegen — so depending on
 where it reduces, it may be an upstream `llvm-mos` issue rather than a #321/65816-fork one. Determine
 that during the reduction (does it reproduce on `mos6502`, or only `mosw65816`?).
+
+**Provisional answer (2026-06-25):** likely **upstream**. The bug is **8-bit-accumulator (default) only**
+— `+mos-a16` (16-bit) is clean on the minimal repro (target-only on bsnes: default loop `0xE60E` ≠ unroll
+`0xF56C`; a16 loop `==` unroll `== 0xD351`). The loop form uniquely materializes `m[]` into a 16-byte ZP
+soft-stack frame and folds via X-indexed `mos8(.Lmain_zp_stk{,+1}),x` loads (unroll keeps `m[]` in
+registers, 2-byte frame) — default-8bit soft-stack/regalloc/indexed machinery that is **upstream**. The
+fork's `0002` only touches the spill path under `+mos-a16` gates (and a16 is clean). A `-mcpu=mos6502`
+build on the **SNES** platform is *not* a valid 6502 test (65816 crt0/ABI). Definitive confirmation
+deferred to a **pristine no-`0002`** reproduce. Full record: the plan's RESULT.
