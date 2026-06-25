@@ -333,6 +333,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `$4300–$430A` regs to `platforms/snes/snes.h` + a small reusable gfx helper). Then joypad controls
   (random a/b/c, switch palette/formula/color-mode, auto-scale). Optional perf: SNES hw multiplier
   (`$4202/$4203→$4216`) for the hot `b*x`. [plan](docs/plans/2026-06-24-blossom-snes.md).
+- [ ] **#321 Mandelbrot zoom pyramid — TRUE increasing detail as you zoom in (follow-up to the interactive
+  demo).** The interactive demo only *magnifies* its baked bitmap (no new detail); on-SNES recompute is out
+  (~4 min/128² compute + Q5.10 runs out of precision). Instead the **host** bakes a stack of 2×-finer levels
+  (full `double` precision, any depth) and the SNES **DMAs the next level** as zoom crosses each 2× threshold
+  — instant, deep, SNES does zero math. **Phase 1:** single-bank proof (64×64 × ~4 levels, fits the existing
+  32 KiB, 16× deep, no linker change). **Phase 2:** multi-bank LoROM (256 KiB) for 128×128 × 8 levels (256×).
+  Differential: each level's chr hash host==target on both emulators + a scripted-zoom view-math gate.
+  [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md).
 
 ### Test Bench / CI
 
