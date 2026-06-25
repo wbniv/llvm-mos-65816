@@ -229,6 +229,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
   [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
+- [ ] **#321 A16-threading Phase 3 — trigger-check pass (re-affirm or re-open the deferral).** Operationalizes
+  the Watch re-open condition rather than building Phase 3. On a throwaway worktree: re-measure ZP pressure
+  (`dev/measure-zp-pressure.sh`, extended with an explicit ~10/14-pair trigger verdict line + a wider real-code
+  corpus) for trigger **(b)**, and run a large-N csmith crash-sweep + corpus/suite under `-verify-machineinstrs`
+  for trigger **(a)** (a *new*, realistic `regalloc-out-of-registers` / `a16-zp-pressure-overflow`). Neither
+  fires → record dated evidence in Watch and stand pat; either fires → run the recorded B0→B1→B2 spike. Last
+  baseline (2026-06-18) was ~5/14 pairs and both prior crashes got orthogonal fixes (`0009`/`0011`+`0012`), so
+  DEFER is expected to stand — this just re-arms the trigger with current data.
+  [plan](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
@@ -1142,4 +1151,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      libfixmath) landed + verified this session (k_trig32 0x068A6933, k_trig32lut HiROM 0x87F0B404, both
      emulators). fp:b69409f652ecf145 fp:6129cc5f0e5198c0 -->
 - [verify] **2026-06-26-shared-plan-index-tooling** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-26-shared-plan-index-tooling.md](docs/plans/2026-06-26-shared-plan-index-tooling.md)_  <!-- fp:118418f2ad7a1a78 -->
+- [ ] **(triage)** **No compiler change unless a trigger fires.** Phase A is measurement only; Phase B is conditional. — _from [2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md)_  <!-- fp:3ad2a744312d14fb -->
+- [ ] **(triage)** **The other two XFAILs** (`scavenger-p-not-gpr` fixed by `0011`/`0012`; `a16-zp-pressure-overflow` / — _from [2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md)_  <!-- fp:e42894459a597bc4 -->
+- [ ] **(triage)** **Not re-deriving the spike.** If a trigger fires, Phase B runs the recorded B0→B1→B2 recipe verbatim; we — _from [2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md)_  <!-- fp:65a3ffeffa32c30e -->
 <!-- END auto-captured-deferrals -->
