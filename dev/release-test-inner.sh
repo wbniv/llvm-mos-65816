@@ -39,7 +39,13 @@ WORK="$(mktemp -d)"
 # artifacts (PNGs) back to the invoking host user so they aren't root-owned.
 trap 'chown -R "${HOST_UID:-0}:${HOST_GID:-0}" "$OUT" 2>/dev/null || true; rm -rf "$WORK"' EXIT
 
-c_grn=$'\e[32m'; c_red=$'\e[31m'; c_dim=$'\e[2m'; c_rst=$'\e[0m'; c_bold=$'\e[1m'
+# Colour only on a real TTY — under `docker run` (no -t) stdout is a pipe, so the
+# host runner tees a clean, uncoloured compile log.
+if [ -t 1 ]; then
+  c_grn=$'\e[32m'; c_red=$'\e[31m'; c_dim=$'\e[2m'; c_rst=$'\e[0m'; c_bold=$'\e[1m'
+else
+  c_grn=''; c_red=''; c_dim=''; c_rst=''; c_bold=''
+fi
 say()  { printf '%s\n' "$*"; }
 step() { printf '\n%s==> %s%s\n' "$c_bold" "$*" "$c_rst"; }
 
@@ -145,16 +151,26 @@ for b in "${builds[@]}"; do
   extra=(); label="default-8bit"
   [ "$b" = a16 ] && { extra=(-Xclang -target-feature -Xclang +mos-a16); label="+mos-a16"; }
   step "build + run: $label"
-  sfc="$WORK/$PROGRAM-$b.sfc"; map="$WORK/$PROGRAM-$b.map"; err="$WORK/$PROGRAM-$b.cc.err"
+  sfc="$WORK/$PROGRAM-$b.sfc"; map="$WORK/$PROGRAM-$b.map"; cc="$WORK/$PROGRAM-$b.cc.log"
   # Compile with the PUBLISHED argv0 driver (mos-snes-clang bakes in --config + -mcpu=mosw65816).
-  if ! "$CLANG" "${extra[@]}" -Os -Wl,-Map="$map" -o "$sfc" "$SRC" 2>"$err"; then
-    say "  ${c_red}FAIL${c_rst}: compile error"; sed 's/^/    /' "$err"; RESULT[$b]="FAIL(compile)"; rc=1; continue
+  # SHOW the compilation: echo the exact command, run it capturing combined stdout+stderr, and
+  # print that output (this is the "log showing the compilation"; the host runner tees it to a file).
+  cmd=("$(basename "$CLANG")" "${extra[@]}" -Os -Wl,-Map="$(basename "$map")" -o "$(basename "$sfc")" "$SRC")
+  say "  ${c_dim}\$ ${cmd[*]}${c_rst}"
+  set +e; "$CLANG" "${extra[@]}" -Os -Wl,-Map="$map" -o "$sfc" "$SRC" >"$cc" 2>&1; ccrc=$?; set -e
+  if [ "$ccrc" -ne 0 ]; then
+    say "  ${c_red}FAIL${c_rst}: compile error (exit $ccrc):"; sed 's/^/    | /' "$cc"; RESULT[$b]="FAIL(compile)"; rc=1; continue
+  fi
+  if [ -s "$cc" ]; then
+    say "  ${c_dim}compiler output:${c_rst}"; sed 's/^/    | /' "$cc"
+  else
+    say "    | (no diagnostics — warning-clean)"
   fi
   # Public-release bar: zero warnings tolerated.
-  if grep -qiE 'warning|error' "$err"; then
-    say "  ${c_red}FAIL${c_rst}: compile is NOT warning-clean:"; sed 's/^/    /' "$err"; RESULT[$b]="FAIL(warning)"; rc=1; continue
+  if grep -qiE 'warning|error' "$cc"; then
+    say "  ${c_red}FAIL${c_rst}: compile is NOT warning-clean (see output above)"; RESULT[$b]="FAIL(warning)"; rc=1; continue
   fi
-  say "  compiled ${c_grn}warning-clean${c_rst} ($(stat -c%s "$sfc") bytes)"
+  say "  ${c_grn}compiled warning-clean${c_rst} -> $(basename "$sfc") ($(stat -c%s "$sfc") bytes)"
   off=$(awk '$NF=="corpus_result"{print $1; exit}' "$map")
   [ -n "$off" ] || { say "  ${c_red}FAIL${c_rst}: corpus_result not in map"; RESULT[$b]="FAIL(nosym)"; rc=1; continue; }
   png=()
@@ -162,9 +178,16 @@ for b in "${builds[@]}"; do
   say "  bsnes-jg: boot + run $FRAMES frames, read corpus_result @ WRAM 0x$off vs $EXP"
   if line="$("$RIG/jgxcheck" "$sfc" "$RIG/Database" "0x$off" 2 "$EXP" "$FRAMES" "${png[@]}" 2>"$WORK/$b.jg.err")"; then
     say "  ${c_grn}$line${c_rst}"
-    [ "${#png[@]}" -gt 0 ] && say "  ${c_dim}emulator PNG: ${png[0]}${c_rst}"
     got=$(printf '%s' "$line" | grep -oE 'got=0x[0-9A-Fa-f]+' | cut -d= -f2)
     GOT[$b]="$got"; RESULT[$b]="PASS"
+    # Screenshot is a REQUIRED deliverable for the display program — fail if absent.
+    if [ "${#png[@]}" -gt 0 ]; then
+      if [ -s "${png[0]}" ]; then
+        say "  ${c_grn}screenshot${c_rst}: ${png[0]} ($(stat -c%s "${png[0]}") bytes, SNES Mandelbrot)"
+      else
+        say "  ${c_red}FAIL${c_rst}: expected screenshot ${png[0]} was not produced"; RESULT[$b]="FAIL(noshot)"; rc=1
+      fi
+    fi
   else
     say "  ${c_red}$line${c_rst}"; sed 's/^/    /' "$WORK/$b.jg.err" 2>/dev/null || true
     got=$(printf '%s' "$line" | grep -oE 'got=0x[0-9A-Fa-f]+' | cut -d= -f2 || true)
@@ -180,6 +203,14 @@ for b in "${builds[@]}"; do
   v="${RESULT[$b]:-?}"; col="$c_grn"; [ "$v" = PASS ] || col="$c_red"
   lbl="default-8bit"; [ "$b" = a16 ] && lbl="+mos-a16"
   printf '  %-14s %-10s %-8s %s%s%s\n' "$lbl" "${GOT[$b]:-?}" "$EXP" "$col" "$v" "$c_rst"
+done
+echo
+say "  ${c_bold}artifacts${c_rst} (in build/release-test/):"
+say "    - this run transcript -> the compile log (host runner tees it to release-test-$METHOD.log)"
+for f in "$OUT"/*.png; do
+  [ -e "$f" ] || continue
+  case "$f" in *mandel-host.png) tag="host reference (${DW:-?}x${DH:-?})";; *) tag="SNES Mandelbrot screenshot";; esac
+  say "    - $(basename "$f")  ($(stat -c%s "$f") bytes, $tag)"
 done
 echo
 if [ "$rc" -eq 0 ]; then

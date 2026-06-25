@@ -80,16 +80,21 @@ mkdir -p "$OUTDIR"
 
 # --- run the clean-room test (NO repo mount) --------------------------------
 # Root in-container (apt install + /opt writes); the inner script chowns /out back.
-echo "==> running clean-room test"
-rc=0
+# tee the container's (uncoloured, non-TTY) output to the compile-log artifact — it
+# carries each build's exact mos-snes-clang command + compiler output. PIPESTATUS[0]
+# preserves docker's exit code through the tee.
+LOG="$OUTDIR/release-test-$METHOD.log"
+echo "==> running clean-room test (transcript -> $LOG)"
 docker run --rm \
   -e METHOD="$METHOD" -e PROGRAM="$PROGRAM" -e A16="$A16" \
   ${FRAMES:+-e FRAMES="$FRAMES"} \
   -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" \
   "${RUN_ARGS[@]}" \
   -v "$OUTDIR":/out \
-  "$IMAGE" || rc=$?
+  "$IMAGE" 2>&1 | tee "$LOG"
+rc=${PIPESTATUS[0]}
 
 echo
-echo "==> artifacts in build/release-test/ : $(ls "$OUTDIR" 2>/dev/null | tr '\n' ' ')"
+echo "==> compile log : $LOG"
+echo "==> screenshots : $(ls "$OUTDIR"/*.png 2>/dev/null | tr '\n' ' ')"
 exit $rc

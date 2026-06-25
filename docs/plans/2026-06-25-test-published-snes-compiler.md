@@ -97,28 +97,44 @@ Host-side orchestrator. `set -euo pipefail`, `-h/--help`, env knobs:
 `PROGRAM=mandel-display|k_mandel` (default `mandel-display`), `TARBALL=<path>` (for `local`; default = newest
 `dist/*.tar.xz`), `FRAMES` (default per-program: 1800 / 200). It builds the rig image, then runs the
 container **with no repo mount** (clean-room) — for `local` the chosen tarball is the only thing handed in
-(read-only mount / `docker cp`), and an artifacts dir is mounted at `/out` for the PNGs/logs. Inside the
-container, per (method × build):
+(read-only mount / `docker cp`), and an artifacts dir (host `build/release-test/`) is mounted at `/out` for
+the two required deliverables below. Inside the container, per (method × build):
 
 1. **Sound-free assertion (cheap guard).** `grep -niE 'apu|spc|214[0-3]|sound|audio'` the program → must be
    empty. Documents the constraint in the test itself.
 2. **Acquire the published compiler** (the consumer path) per `METHOD` (table above). Assert the resolved
    `mos-snes-clang` is **not** under any dev tree and that `build/llvm-mos-install` is absent (clean-room).
-3. **Compile** the reference program with the acquired `mos-snes-clang` (default and/or `+mos-a16`):
+3. **Compile** the reference program with the acquired `mos-snes-clang` (default and/or `+mos-a16`). **Echo
+   the exact command line, then run it capturing combined stdout+stderr, and show that output** (the compile
+   transcript — empty means warning-clean, which is stated explicitly):
    ```
-   mos-snes-clang -Os -Wl,-Map=out.map -o out.sfc fixtures/snes/mandel-display.c             # default 8-bit
-   mos-snes-clang -Xclang -target-feature -Xclang +mos-a16 -Os -Wl,-Map=… -o out-a16.sfc …    # +mos-a16
+   $ mos-snes-clang -Os -Wl,-Map=out.map -o out.sfc fixtures/snes/mandel-display.c             # default 8-bit
+   $ mos-snes-clang -Xclang -target-feature -Xclang +mos-a16 -Os -Wl,-Map=… -o out-a16.sfc …    # +mos-a16
    ```
-   Capture stderr; **fail on any warning** (same public-release bar as packaging).
+   **fail on any warning** (same public-release bar as packaging). The whole run transcript — including these
+   commands and their output — is the **compile-log artifact** (see *Required outputs*).
 4. **Host oracle:** scrape DW/DH/DN from the program, then
-   `EXP=$('/opt/rig/mandel-render' /out/host.png $DW $DH $DN | grep -oE '0x[0-9A-Fa-f]{4}' | tail -1)`
+   `EXP=$('/opt/rig/mandel-render' /out/mandel-host.png $DW $DH $DN | grep -oE '0x[0-9A-Fa-f]{4}' | tail -1)`
    (≡ `0x9103` for mandel-display; `--gate` ≡ `0x820B` for k_mandel).
 5. **Run + verify (bsnes-jg, headless, BIOS-free):** read `corpus_result`'s WRAM offset from the `.map`, then
    ```
    /opt/rig/jgxcheck out.sfc /opt/rig/Database 0x<off> 2 "$EXP" <frames> /out/mandel-<build>.png
    ```
-   for each build; assert `SMOKE: PASS … got==EXP` for every one (and dump the emulator PNG).
-6. **Report** a table: method × build → got vs EXP → PASS/FAIL; non-zero exit on any FAIL.
+   for each build; assert `SMOKE: PASS … got==EXP` for every one and **dump the emulator-rendered
+   SNES-Mandelbrot screenshot** `/out/mandel-<build>.png` (the screenshot artifact; for mandel-display the
+   run FAILS if the PNG isn't produced).
+6. **Report** a table: method × build → got vs EXP → PASS/FAIL; then **list the produced artifacts** (the
+   compile log + the screenshots). Non-zero exit on any FAIL.
+
+#### Required outputs (every run MUST produce these in `build/release-test/`)
+1. **Compile log** — `release-test-<METHOD>.log`: the full run transcript, which by step 3 contains the exact
+   `mos-snes-clang` command line for each build and its compiler output (warning-clean or the diagnostics),
+   plus the oracle value and the per-build `SMOKE: PASS … got=…` lines. Written by the host runner tee-ing the
+   container's (plain, non-TTY → uncoloured) output; the path is echoed at the end. This is the
+   **"log output showing the compilation"**.
+2. **SNES Mandelbrot screenshot(s)** — `mandel-<build>.png` (`mandel-default.png`, `mandel-a16.png`): the
+   bsnes-jg-rendered 256×224 frame for each build, plus `mandel-host.png` (the 32×28 host reference). These
+   are the **"screenshot of the SNES Mandelbrot"**; the run asserts they exist.
 
 ### C. Wiring into the publish gate — *(edit: `dev/package-release.sh`, `Taskfile.yml`)*
 After `dev/package-release.sh` builds + checksums the tarball (and passes its warning-free self-test), it
@@ -146,33 +162,45 @@ the added gate.
 
 ## Verification
 1. `dev/test-release.sh METHOD=local` → output shows `host oracle: 0x9103`, then for default + `+mos-a16`:
-   `SMOKE: PASS … got=0x9103`, and `/out/mandel-*.png` written. Paste output; assert final `PASS`.
-2. `task package` → builds the tarball, passes the warning-free self-test, **then** runs the `METHOD=local`
+   `SMOKE: PASS … got=0x9103`. Paste output; assert final `PASS`.
+2. **Required outputs present.** After the run, `build/release-test/` contains: (a) `release-test-local.log`
+   whose body shows each build's `$ mos-snes-clang …` command and its compile output (warning-clean stated
+   explicitly); and (b) the screenshots `mandel-default.png` + `mandel-a16.png` (256×224 emulator frames) and
+   `mandel-host.png` (32×28 host reference). Assert all exist; the run itself fails if a screenshot is missing.
+3. `task package` → builds the tarball, passes the warning-free self-test, **then** runs the `METHOD=local`
    clean-room gate to `0x9103` PASS — all in one invocation; a forced failure (e.g. corrupt the tarball)
    makes `task package` exit non-zero.
-3. `task release-test METHOD=apt` and `METHOD=tarball` → resolve the live repo / product-page tarball, same
-   `0x9103` PASS.
-4. **Clean-room check:** the container has no `build/llvm-mos-install`; the resolved `mos-snes-clang` is the
+4. `task release-test METHOD=apt` and `METHOD=tarball` → resolve the live repo / product-page tarball, same
+   `0x9103` PASS, same two required outputs.
+5. **Clean-room check:** the container has no `build/llvm-mos-install`; the resolved `mos-snes-clang` is the
    extracted-tarball or `/usr/bin/...` path — i.e. the *published* compiler, not the dev build.
-5. **Sound-free check:** the grep guard is empty; the run uses bsnes-jg with **no** `spc700.rom` present.
-6. **Warning-clean:** the compile step emits zero clang/`ld.lld` warnings.
+6. **Sound-free check:** the grep guard is empty; the run uses bsnes-jg with **no** `spc700.rom` present.
+7. **Warning-clean:** the compile step emits zero clang/`ld.lld` warnings (visible in the compile log).
 
 ### Verification evidence (2026-06-25, all PASS)
 
-Step 1 — `METHOD=local` on `dist/llvm-mos-65816-…c49f395-linux-x86_64.tar.xz`:
+Steps 1–2 — `METHOD=local` on `dist/llvm-mos-65816-…c49f395-linux-x86_64.tar.xz`. The transcript SHOWS the
+compilation (exact command + output) per build, and produces the two required outputs:
 ```
-==> acquire the published compiler (METHOD=local)
-  mos-snes-clang: /opt/published/.../bin/mos-snes-clang  -> /opt/published/.../bin/clang-23
-==> host oracle (independent CRC over the same grid)
-  grid 32x28, N=15 (scraped from the program)
-  host reference: CRC16=0x9103  (/out/mandel-host.png)
+==> build + run: default-8bit
+  $ mos-snes-clang -Os -Wl,-Map=mandel-display-default.map -o mandel-display-default.sfc .../mandel-display.c
+    | (no diagnostics — warning-clean)
+  compiled warning-clean -> mandel-display-default.sfc (32768 bytes)
+  SMOKE: PASS off=0x580 len=2 got=0x9103 (ran 1800 frames, bsnes-jg)
+  screenshot: /out/mandel-default.png (172334 bytes, SNES Mandelbrot)
+==> build + run: +mos-a16
+  $ mos-snes-clang -Xclang -target-feature -Xclang +mos-a16 -Os -Wl,-Map=... -o mandel-display-a16.sfc .../mandel-display.c
+    | (no diagnostics — warning-clean)
+  ... SMOKE: PASS got=0x9103 ; screenshot: /out/mandel-a16.png
   default-8bit   0x9103     0x9103   PASS
   +mos-a16       0x9103     0x9103   PASS
 RESULT: PASS — the published compiler builds a correct, bootable ROM (METHOD=local)
 ```
-PASS (artifacts: `build/release-test/mandel-{host,default,a16}.png`; emulator frames 256×224, will-owned).
+Required outputs on disk (`build/release-test/`): `release-test-local.log` (2.3 KB, ANSI-free, shows both
+`$ mos-snes-clang …` commands), `mandel-default.png` + `mandel-a16.png` (256×224 emulator frames),
+`mandel-host.png` (32×28 host reference). All `will`-owned. PASS.
 
-Step 2 — `dev/package-release.sh` (the publish path) ran the gate after packaging:
+Step 3 — `dev/package-release.sh` (the publish path) ran the gate after packaging:
 ```
 ==> clean-room gate: run the tarball's compiler output in bsnes-jg (METHOD=local)
   ... default-8bit 0x9103 PASS ; +mos-a16 0x9103 PASS ; RESULT: PASS
@@ -187,15 +215,15 @@ RESULT: FAIL — see the per-build lines above
 ```
 PASS (the gate actually gates).
 
-Step 3 — `METHOD=apt` (live repo) and `METHOD=tarball` (live product-page link):
+Step 4 — `METHOD=apt` (live repo) and `METHOD=tarball` (live product-page link):
 ```
 METHOD=apt:      apt install -> /usr/bin/mos-snes-clang ; default 0x9103 PASS ; +mos-a16 0x9103 PASS ; RESULT: PASS
 METHOD=tarball:  scraped https://apt.indri.studio/sources/llvm-mos-65816_0.0.0+git20260625.c49f395.tar.xz
                  default 0x9103 PASS ; +mos-a16 0x9103 PASS ; RESULT: PASS
 ```
-PASS (both live consumer paths).
+PASS (both live consumer paths; each also emits its own `release-test-<method>.log` + screenshots).
 
-Steps 4–6 — every run printed `clean-room check … OK — only the published compiler is reachable`,
+Steps 5–7 — every run printed `clean-room check … OK — only the published compiler is reachable`,
 `sound-free check … OK — no sound/APU references`, and `compiled warning-clean`. PASS.
 
 ## Reproducible / optional CI

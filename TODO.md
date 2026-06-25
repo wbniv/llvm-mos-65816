@@ -470,7 +470,9 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   Docker container with NO dev toolchain, acquire the published compiler and compile a **sound-free**
   reference Mandelbrot (`examples/snes/mandel-display.c`, 32×28 N=15, CRC `0x9103`; secondary
   `examples/65816/k_mandel.c` `0x820B`), then verify on **bsnes-jg** (embedded SPC700 IPL → no BIOS, no sound)
-  against the host oracle (`mandel-render`) — both default-8bit and `+mos-a16`, plus an emulator-rendered PNG.
+  against the host oracle (`mandel-render`) — both default-8bit and `+mos-a16`. Every run emits two artifacts
+  to `build/release-test/`: a **compile log** (`release-test-<method>.log`, shows the exact `mos-snes-clang`
+  command + output) and the **SNES Mandelbrot screenshot** (`mandel-<build>.png`, bsnes-jg framebuffer).
   Three `METHOD`s: **`local`** (the freshly-built `dist/*.tar.xz` — the mandatory gate run from
   `dev/package-release.sh`, so *every* `task package` is clean-room-verified before upload), **`apt`** /
   **`tarball`** (live repo / product-page link, post-publish + periodic CI). Rig image

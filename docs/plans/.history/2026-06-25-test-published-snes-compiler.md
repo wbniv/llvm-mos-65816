@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a9d3e9e) | test(release): clean-room verify the PUBLISHED SNES compiler, wired into the publish gate |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a295256) | docs(plan): clean-room test of the published SNES compiler |
 
 <!--history-meta v1
+a9d3e9e	author	Will Norris
+a9d3e9e	added	172
+a9d3e9e	deleted	77
+a9d3e9e	files	1
+a9d3e9e	body	Add a throwaway-container test that exercises the *published* 65816 toolchain the way\na stranger would — acquire mos-snes-clang from the release path (no dev build visible),\ncompile examples/snes/mandel-display.c (default-8bit + +mos-a16), run each ROM headless\nin bsnes-jg (embedded SPC700 IPL → no BIOS, no sound), and assert the WRAM corpus_result\nCRC == an independent host oracle (0x9103, 32x28 N=15), dumping a real emulator PNG.\n\nThree acquisition methods:\n  - local   (default): the freshly-built dist/*.tar.xz — the publish GATE\n  - apt:     apt install llvm-mos-65816 from the live apt.indri.studio\n  - tarball: scrape + download the product-page tarball link\n\nWire it into publishing so every publish is verified: dev/package-release.sh now runs\nMETHOD=local on the tarball it just built, AFTER the warning-free self-test — a FAIL\nmeans the artifact is not a publish candidate (override only via SKIP_RELEASE_TEST=1).\n\nFiles:\n  - dev/Dockerfile.release-test  rig image: pinned bsnes-jg (2.1.0) + jgxcheck + the\n                                 host CRC oracle + fixtures; NO toolchain baked in\n  - dev/test-release.sh          host runner (builds rig, runs container w/ no repo\n                                 mount → clean-room) + task release-test\n  - dev/release-test-inner.sh    in-container driver (acquire/compile/run/assert/report)\n  - dev/package-release.sh       +clean-room gate after the tarball is built\n  - .dockerignore                keep the repo-root build context to the tracked fixtures\n\nVerified (all PASS): METHOD=local / apt / tarball each 0x9103 for both builds;\npackage-release.sh runs the gate end-to-end ("both PASSED"); negative control (corrupt\ntarball) correctly fails the gate.\n\nPlan: docs/plans/2026-06-25-test-published-snes-compiler.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a295256	author	Will Norris
 a295256	added	124
 a295256	deleted	0
