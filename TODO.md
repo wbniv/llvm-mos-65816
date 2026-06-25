@@ -1143,5 +1143,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      libfixmath) landed + verified this session (k_trig32 0x068A6933, k_trig32lut HiROM 0x87F0B404, both
      emulators). fp:b69409f652ecf145 fp:6129cc5f0e5198c0 -->
 - [verify] **2026-06-26-shared-plan-index-tooling** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-26-shared-plan-index-tooling.md](docs/plans/2026-06-26-shared-plan-index-tooling.md)_  <!-- fp:118418f2ad7a1a78 -->
-- [ ] **(triage)** ~~**Phase 2 — 16-bit CORDIC**~~ **DONE 2026-06-26** — `k_trig16.c` + `cordic16.h` + — _from [2026-06-25-trig-functions-as-a-c-compiler-differential-test-1.md](docs/plans/2026-06-25-trig-functions-as-a-c-compiler-differential-test-1.md)_  <!-- fp:946b42a13cc7db77 -->
+<!-- triaged 2026-06-26: NOT a deferral — this is the struck-through DONE marker for trig Phase 2,
+     now a curated Done entry [321-trig-phase2-cordic] (k_trig16 0x9446C734 host==default==+mos-a16,
+     both emulators; zero arithmetic libcalls; cross-width PASS). The hook keyed on the
+     "Phase 2 — 16-bit CORDIC" text under the master plan's Deferred header. fp:946b42a13cc7db77 -->
 <!-- END auto-captured-deferrals -->
