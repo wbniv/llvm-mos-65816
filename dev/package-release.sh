@@ -45,7 +45,12 @@ TOOLCHAIN_INSTALL="${TOOLCHAIN_INSTALL:-$ROOT/build/llvm-mos-install}"
 SDK_INSTALL="${SDK_INSTALL:-$ROOT/build/install}"
 DIST_DIR="${DIST_DIR:-$ROOT/dist}"
 STRIP="${STRIP:-1}"
-RELEASE_DOCS_DIR="${RELEASE_DOCS_DIR:-}"
+# Bundle the reader docs (.md + .pdf) so they ship with the release and the clean-room
+# report can list them. Default to the sibling indri.studio generated docs WHEN PRESENT;
+# an explicit RELEASE_DOCS_DIR=<path> overrides, RELEASE_DOCS_DIR= (empty) disables.
+# (Set via ${VAR-default}, so only an UNSET var triggers the auto-detect.)
+DEFAULT_DOCS_DIR="$ROOT/../indri.studio/public/docs"
+RELEASE_DOCS_DIR="${RELEASE_DOCS_DIR-$([ -d "$DEFAULT_DOCS_DIR" ] && echo "$DEFAULT_DOCS_DIR" || true)}"
 
 # --- preflight -------------------------------------------------------------
 [[ -x "$TOOLCHAIN_INSTALL/bin/clang-23" ]] || {
@@ -226,16 +231,26 @@ else
         echo "  tarball stays at $DIST_DIR/$NAME.tar.xz but is NOT a publish candidate. Do not upload it." >&2
         exit 1
     fi
+    # Keep the verification report alongside the release artifact (embeds the log +
+    # screenshots + package/docs details — see dev/release-report.py).
+    REPORT_SRC="$ROOT/build/release-test/release-report-latest.html"
+    if [[ -f "$REPORT_SRC" ]]; then
+        cp -f "$REPORT_SRC" "$DIST_DIR/$NAME-release-report.html"
+        echo "==> release report: $DIST_DIR/$NAME-release-report.html"
+    fi
 fi
 
 SIZE="$(du -h "$DIST_DIR/$NAME.tar.xz" | cut -f1)"
 SHA256="$(cut -d' ' -f1 < "$DIST_DIR/$NAME.tar.xz.sha256")"
+REPORT_NOTE=""
+[[ -f "$DIST_DIR/$NAME-release-report.html" ]] && REPORT_NOTE="
+    report:  $DIST_DIR/$NAME-release-report.html"
 cat <<EOF
 
 ==> done  (warning-free self-test + clean-room emulator gate both PASSED)
     tree:    $STAGE  ($(du -sh "$STAGE" | cut -f1))
     tarball: $DIST_DIR/$NAME.tar.xz  ($SIZE)
-    sha256:  $SHA256
+    sha256:  $SHA256$REPORT_NOTE
 
 Next (publish to apt.indri.studio):
     task release-upload          # push tarball to r2://indri-apt/sources/

@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/550a855) | test(release): ISO 8601 UTC timestamps on the compile + emulation runs |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/2e580a0) | test(release): emit a compile log + SNES Mandelbrot screenshot as required outputs |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a9d3e9e) | test(release): clean-room verify the PUBLISHED SNES compiler, wired into the publish gate |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a295256) | docs(plan): clean-room test of the published SNES compiler |
 
 <!--history-meta v1
+550a855	author	Will Norris
+550a855	added	13
+550a855	deleted	8
+550a855	files	1
+550a855	body	Each build's compile and bsnes-jg emulation now carry a `date -u +%Y-%m-%dT%H:%M:%SZ`\ntimestamp plus elapsed seconds, with `started …`/`finished …` markers bracketing the\nrun, so release-test-<method>.log is self-dated (SRC "ISO 8601 UTC timestamps\neverywhere" convention). Example:\n\n  [2026-06-25T09:53:03Z] compile\n  compiled warning-clean -> ...sfc (32768 bytes) [2026-06-25T09:53:04Z, 1s]\n  [2026-06-25T09:53:04Z] emulate — bsnes-jg: boot + run 1800 frames ...\n  SMOKE: PASS ... got=0x9103 [2026-06-25T09:53:12Z, 8s wall]\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2e580a0	author	Will Norris
 2e580a0	added	55
 2e580a0	deleted	27

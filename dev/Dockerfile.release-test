@@ -31,6 +31,8 @@ RUN mkdir -p /opt/bsnes-jg \
     && rm /tmp/bsnes-jg.tgz \
     && make -C /opt/bsnes-jg ENABLE_STATIC=1 DISABLE_MODULE=1 -j"$(nproc)" >/dev/null \
     && cp -a /opt/bsnes-jg/Database /opt/rig-Database
+# Surfaced in the release report (the inner driver reads it; the core is deleted below).
+ENV RIG_BSNES_VER=${BSNES_VER}
 
 # --- reference fixtures (preserve the include layout) ------------------------
 # COPYed after the expensive bsnes-jg layer so editing a fixture/source only re-runs

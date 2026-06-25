@@ -57,8 +57,10 @@ case "$PROGRAM" in
   *) say "FATAL: unknown PROGRAM='$PROGRAM' (use mandel-display | k_mandel)"; exit 2 ;;
 esac
 [ -f "$SRC" ] || { say "FATAL: fixture missing: $SRC"; exit 2; }
+STARTED="$(ts)"; HOST_ARCH="$(uname -m)"; HOST_CPUS="$(nproc)"
+UBUNTU="$( . /etc/os-release 2>/dev/null && printf '%s' "$PRETTY_NAME" )"
 say "${c_bold}clean-room release test${c_rst}  METHOD=$METHOD  PROGRAM=$PROGRAM  A16=$A16  FRAMES=$FRAMES"
-say "  started $(ts)  (host $(uname -m), $(nproc) CPU)"
+say "  started $STARTED  (host $HOST_ARCH, $HOST_CPUS CPU; ${UBUNTU:-?}; bsnes-jg ${RIG_BSNES_VER:-?})"
 
 # --- C. sound-free assertion (cheap guard) ----------------------------------
 step "sound-free check (no APU / SPC700 / \$2140-\$2143)"
@@ -77,11 +79,13 @@ acquire_from_tarball() { # <tarball>
   # mos-snes-clang is a symlink; -path (no -type) matches it without the find -o/-print gotcha.
   CLANG="$(find "$dst" -path '*/bin/mos-snes-clang' | head -1)"
 }
+PKG_SOURCE=""; PKG_VERSION=""; PKG_URL=""
 case "$METHOD" in
   local)
     [ -f /artifact/src.tar.xz ] || { say "FATAL: METHOD=local but /artifact/src.tar.xz not mounted"; exit 2; }
     say "  extracting the freshly-built tarball ($(du -h /artifact/src.tar.xz | cut -f1))"
     acquire_from_tarball /artifact/src.tar.xz
+    PKG_SOURCE="local tarball (the freshly-built dist artifact — the publish gate)"
     ;;
   tarball)
     say "  scraping the tarball link off $PRODUCT_PAGE"
@@ -90,6 +94,7 @@ case "$METHOD" in
     say "  -> $url"
     curl -fsSL "$url" -o "$WORK/published.tar.xz"
     acquire_from_tarball "$WORK/published.tar.xz"
+    PKG_SOURCE="product-page tarball link (live)"; PKG_URL="$url"
     ;;
   apt)
     say "  apt install llvm-mos-65816 from $APT_URL"
@@ -99,11 +104,17 @@ case "$METHOD" in
     apt-get update -qq
     apt-get install -y -qq llvm-mos-65816 >/dev/null
     CLANG="$(command -v mos-snes-clang || true)"
+    PKG_SOURCE="apt $APT_URL (live repo)"
+    PKG_VERSION="$(dpkg-query -W -f='${Version}' llvm-mos-65816 2>/dev/null || true)"
+    PKG_URL="$APT_URL"
     ;;
   *) say "FATAL: unknown METHOD='$METHOD' (use local | apt | tarball)"; exit 2 ;;
 esac
 [ -n "${CLANG:-}" ] && [ -e "$CLANG" ] || { say "FATAL: could not locate mos-snes-clang via METHOD=$METHOD"; exit 1; }
 CLANG_REAL="$(readlink -f "$CLANG")"
+CLANG_VER="$("$CLANG" --version 2>/dev/null | head -1)"
+# Published install tree root: <prefix>/bin/clang-23 -> <prefix>. Used for the docs listing.
+TREE="$(dirname "$(dirname "$CLANG_REAL")")"
 say "  mos-snes-clang: $CLANG  -> $CLANG_REAL"
 
 # --- clean-room assertions --------------------------------------------------
@@ -127,10 +138,12 @@ case "$ORACLE" in
     DH=$(awk '/#define DH /{print $3; exit}' "$SRC")
     DN=$(awk '/#define DN /{print $3; exit}' "$SRC")
     say "  grid ${DW}x${DH}, N=${DN} (scraped from the program)"
+    GRID="${DW}x${DH} N=${DN}"
     EXP=$("$RIG/mandel-render" "$OUT/mandel-host.png" "$DW" "$DH" "$DN" | grep -oE '0x[0-9A-Fa-f]{4}' | tail -1)
     say "  host reference: CRC16=$EXP  ($OUT/mandel-host.png)"
     ;;
   gate)
+    GRID="16x10 N=12 (gate slice)"
     EXP=$("$RIG/mandel-render" --gate | grep -oE '0x[0-9A-Fa-f]{4}' | tail -1)
     say "  host reference (gate): CRC16=$EXP"
     ;;
@@ -147,11 +160,12 @@ case "$A16" in
 esac
 
 # --- 2(compile) + 5(run) per build ------------------------------------------
-declare -A RESULT GOT
+declare -A RESULT GOT CC_DT JG_DT SFC FLAGS SHOT
 rc=0
 for b in "${builds[@]}"; do
   extra=(); label="default-8bit"
   [ "$b" = a16 ] && { extra=(-Xclang -target-feature -Xclang +mos-a16); label="+mos-a16"; }
+  FLAGS[$b]="${extra[*]}"; CC_DT[$b]="?"; JG_DT[$b]="?"; SFC[$b]=0; SHOT[$b]=""
   step "build + run: $label"
   sfc="$WORK/$PROGRAM-$b.sfc"; map="$WORK/$PROGRAM-$b.map"; cc="$WORK/$PROGRAM-$b.cc.log"
   # Compile with the PUBLISHED argv0 driver (mos-snes-clang bakes in --config + -mcpu=mosw65816).
@@ -162,7 +176,7 @@ for b in "${builds[@]}"; do
   say "  ${c_dim}\$ ${cmd[*]}${c_rst}"
   cc_t0=$(date +%s)
   set +e; "$CLANG" "${extra[@]}" -Os -Wl,-Map="$map" -o "$sfc" "$SRC" >"$cc" 2>&1; ccrc=$?; set -e
-  cc_dt=$(( $(date +%s) - cc_t0 ))
+  cc_dt=$(( $(date +%s) - cc_t0 )); CC_DT[$b]="$cc_dt"
   if [ "$ccrc" -ne 0 ]; then
     say "  ${c_red}FAIL${c_rst}: compile error (exit $ccrc):"; sed 's/^/    | /' "$cc"; RESULT[$b]="FAIL(compile)"; rc=1; continue
   fi
@@ -175,7 +189,8 @@ for b in "${builds[@]}"; do
   if grep -qiE 'warning|error' "$cc"; then
     say "  ${c_red}FAIL${c_rst}: compile is NOT warning-clean (see output above)"; RESULT[$b]="FAIL(warning)"; rc=1; continue
   fi
-  say "  ${c_grn}compiled warning-clean${c_rst} -> $(basename "$sfc") ($(stat -c%s "$sfc") bytes) [$(ts), ${cc_dt}s]"
+  SFC[$b]="$(stat -c%s "$sfc")"
+  say "  ${c_grn}compiled warning-clean${c_rst} -> $(basename "$sfc") (${SFC[$b]} bytes) [$(ts), ${cc_dt}s]"
   off=$(awk '$NF=="corpus_result"{print $1; exit}' "$map")
   [ -n "$off" ] || { say "  ${c_red}FAIL${c_rst}: corpus_result not in map"; RESULT[$b]="FAIL(nosym)"; rc=1; continue; }
   png=()
@@ -183,10 +198,11 @@ for b in "${builds[@]}"; do
   say "  ${c_dim}[$(ts)] emulate${c_rst} — bsnes-jg: boot + run $FRAMES frames, read corpus_result @ WRAM 0x$off vs $EXP"
   jg_t0=$(date +%s)
   if line="$("$RIG/jgxcheck" "$sfc" "$RIG/Database" "0x$off" 2 "$EXP" "$FRAMES" "${png[@]}" 2>"$WORK/$b.jg.err")"; then
-    jg_dt=$(( $(date +%s) - jg_t0 ))
+    jg_dt=$(( $(date +%s) - jg_t0 )); JG_DT[$b]="$jg_dt"
     say "  ${c_grn}$line${c_rst} [$(ts), ${jg_dt}s wall]"
     got=$(printf '%s' "$line" | grep -oE 'got=0x[0-9A-Fa-f]+' | cut -d= -f2)
     GOT[$b]="$got"; RESULT[$b]="PASS"
+    [ "${#png[@]}" -gt 0 ] && SHOT[$b]="$(basename "${png[0]}")"
     # Screenshot is a REQUIRED deliverable for the display program — fail if absent.
     if [ "${#png[@]}" -gt 0 ]; then
       if [ -s "${png[0]}" ]; then
@@ -196,6 +212,7 @@ for b in "${builds[@]}"; do
       fi
     fi
   else
+    JG_DT[$b]=$(( $(date +%s) - jg_t0 ))
     say "  ${c_red}$line${c_rst}"; sed 's/^/    /' "$WORK/$b.jg.err" 2>/dev/null || true
     got=$(printf '%s' "$line" | grep -oE 'got=0x[0-9A-Fa-f]+' | cut -d= -f2 || true)
     GOT[$b]="${got:-?}"; RESULT[$b]="FAIL"; rc=1
@@ -220,7 +237,49 @@ for f in "$OUT"/*.png; do
   say "    - $(basename "$f")  ($(stat -c%s "$f") bytes, $tag)"
 done
 echo
-say "  finished $(ts)"
+FINISHED="$(ts)"
+say "  finished $FINISHED"
+
+# --- machine-readable data for dev/release-report.py (host renders the HTML) -
+DATA="$OUT/release-report-data.tsv"
+overall="PASS"; [ "$rc" -eq 0 ] || overall="FAIL"
+{
+  printf 'meta\tstarted\t%s\n'          "$STARTED"
+  printf 'meta\tfinished\t%s\n'         "$FINISHED"
+  printf 'meta\tmethod\t%s\n'           "$METHOD"
+  printf 'meta\tprogram\t%s\n'          "$PROGRAM"
+  printf 'meta\ta16\t%s\n'              "$A16"
+  printf 'meta\tframes\t%s\n'           "$FRAMES"
+  printf 'meta\toracle\t%s\n'           "$EXP"
+  printf 'meta\tgrid\t%s\n'             "${GRID:-?}"
+  printf 'meta\tcompiler_version\t%s\n' "${CLANG_VER:-?}"
+  printf 'meta\tcompiler_path\t%s\n'    "$CLANG"
+  printf 'meta\thost_arch\t%s\n'        "$HOST_ARCH"
+  printf 'meta\thost_cpus\t%s\n'        "$HOST_CPUS"
+  printf 'meta\tubuntu\t%s\n'           "${UBUNTU:-?}"
+  printf 'meta\tbsnes\t%s\n'            "${RIG_BSNES_VER:-?}"
+  printf 'meta\tresult\t%s\n'           "$overall"
+  printf 'meta\tpkg_source\t%s\n'       "${PKG_SOURCE:-}"
+  printf 'meta\tpkg_version\t%s\n'      "${PKG_VERSION:-}"
+  printf 'meta\tpkg_url\t%s\n'          "${PKG_URL:-}"
+  printf 'meta\ttree_bytes\t%s\n'       "$(du -sb "$TREE" 2>/dev/null | cut -f1)"
+  for b in "${builds[@]}"; do
+    lbl="default-8bit"; [ "$b" = a16 ] && lbl="+mos-a16"
+    printf 'build\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "$lbl" "${FLAGS[$b]}" "${SFC[$b]}" "${GOT[$b]:-?}" "${RESULT[$b]:-?}" "${CC_DT[$b]}" "${JG_DT[$b]}" "${SHOT[$b]}"
+  done
+  # bundled docs in the published tree: top-level README + the docs/ tree (.md/.pdf),
+  # NOT the per-platform SDK READMEs (those aren't release documentation).
+  [ -f "$TREE/README.md" ] && printf 'doc\tREADME.md\t%s\tmd\n' "$(stat -c%s "$TREE/README.md")"
+  if [ -d "$TREE/docs" ]; then
+    find "$TREE/docs" -type f \( -iname '*.md' -o -iname '*.pdf' \) | sort | while read -r f; do
+      rel="docs/${f#"$TREE"/docs/}"; ext="$(printf '%s' "${f##*.}" | tr 'A-Z' 'a-z')"
+      printf 'doc\t%s\t%s\t%s\n' "$rel" "$(stat -c%s "$f")" "$ext"
+    done
+  fi
+} >"$DATA"
+say "  wrote $DATA (report data for dev/release-report.py)"
+
 if [ "$rc" -eq 0 ]; then
   say "${c_grn}${c_bold}RESULT: PASS${c_rst} — the published compiler builds a correct, bootable ROM (METHOD=$METHOD)"
 else

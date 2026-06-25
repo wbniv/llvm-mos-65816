@@ -94,7 +94,34 @@ docker run --rm \
   "$IMAGE" 2>&1 | tee "$LOG"
 rc=${PIPESTATUS[0]}
 
+# --- render the self-contained HTML report (§D of the plan) -----------------
+# Filename carries a UTC run-timestamp so repeated runs accumulate as history
+# (release-report-[<release-stamp>-]<method>-<UTC>.html), plus a stable
+# release-report-latest.html pointer to the newest one.
+DATA="$OUTDIR/release-report-data.tsv"
+if [ -f "$DATA" ]; then
+  RUN_TS="$(date -u +%Y%m%dT%H%M%SZ)"
+  rep_args=(--data "$DATA" --log "$LOG" --artifacts "$OUTDIR")
+  fnbase="release-report"
+  if [ "$METHOD" = local ] && [ -n "${TARBALL:-}" ]; then
+    relstamp="$(basename "$TARBALL" | sed -E 's/^llvm-mos-65816-(.+)-linux-x86_64\.tar\.xz$/\1/')"
+    rep_args+=(--tarball-name "$(basename "$TARBALL")"
+               --tarball-size "$(stat -c%s "$TARBALL")"
+               --tarball-sha  "$(sha256sum "$TARBALL" | cut -d' ' -f1)"
+               --stamp "$relstamp")
+    fnbase="$fnbase-$relstamp"
+  fi
+  REPORT="$OUTDIR/${fnbase}-${METHOD}-${RUN_TS}.html"
+  rep_args+=(--out "$REPORT")
+  if python3 "$ROOT/dev/release-report.py" "${rep_args[@]}"; then
+    cp -f "$REPORT" "$OUTDIR/release-report-latest.html"
+  else
+    echo "WARN: release-report.py failed (test verdict unaffected)" >&2
+  fi
+fi
+
 echo
 echo "==> compile log : $LOG"
 echo "==> screenshots : $(ls "$OUTDIR"/*.png 2>/dev/null | tr '\n' ' ')"
+[ -n "${REPORT:-}" ] && [ -f "$REPORT" ] && echo "==> report     : $REPORT"
 exit $rc

@@ -65,7 +65,7 @@ host oracle `mandel-render --gate` → **`0x820B`**, ~200 frames. Kept as a fast
 | `METHOD` | source of `mos-snes-clang` | when it runs |
 |---|---|---|
 | **`local`** (default) | the freshly-built `dist/llvm-mos-65816-*-linux-x86_64.tar.xz`, extracted in the clean container | **the publish gate** — invoked by `dev/package-release.sh` on every `task package`, *before* upload |
-| **`apt`** | `apt-get install llvm-mos-65816` → `/usr/bin/mos-snes-clang` from the live repo | post-publish / periodic CI confirmation of the live consumer path |
+| **`apt`** | `apt-get install llvm-mos-65816` → `/usr/bin/mos-snes-clang` from the live repo | post-publish confirmation of the live consumer path (run manually after a deploy) |
 | **`tarball`** | scrape the tarball URL off the live product page, download, extract | post-publish confirmation that the product-page download link works |
 
 `local` is the artifact the `.deb` is a byte-for-byte repack of (apt's `build.sh` does `cp -a` the extracted
@@ -137,6 +137,9 @@ the two required deliverables below. Inside the container, per (method × build)
 2. **SNES Mandelbrot screenshot(s)** — `mandel-<build>.png` (`mandel-default.png`, `mandel-a16.png`): the
    bsnes-jg-rendered 256×224 frame for each build, plus `mandel-host.png` (the 32×28 host reference). These
    are the **"screenshot of the SNES Mandelbrot"**; the run asserts they exist.
+3. **Release report** — `release-report-<stamp>.html` (see *§D*): a single self-contained, nicely-formatted
+   HTML page embedding the screenshots + the full timestamped log, plus the configuration, the release
+   package details, and the bundled-docs table. This is the human-facing **"report after each release"**.
 
 ### C. Wiring into the publish gate — *(edit: `dev/package-release.sh`, `Taskfile.yml`)*
 After `dev/package-release.sh` builds + checksums the tarball (and passes its warning-free self-test), it
@@ -150,6 +153,33 @@ Non-zero → `package-release.sh` exits non-zero and the tarball is **not** a pu
 Docker is unavailable the gate FAILS rather than silently skipping). `task package`'s description documents
 the added gate.
 
+**Docs bundling (so the report has real docs to list).** `dev/package-release.sh` copies `RELEASE_DOCS_DIR`'s
+contents into the release `docs/`. We default `RELEASE_DOCS_DIR` to the sibling `../indri.studio/public/docs`
+**when it exists** (the generated reader docs — `65816-opcodes`, `snes-hardware`, `snes-registers`, `oop-in-c`,
+`emulator-screenshots`, `snes-bootup`, each as `.md` + `.pdf`), so a normal release bundles them and the
+report lists them; absent the sibling repo the release still builds (README-only) and the report degrades
+gracefully. An explicit `RELEASE_DOCS_DIR=` (empty) or a real path overrides the default.
+
+### D. Release report — *(new: `dev/release-report.py`; `dev/test-release.sh` invokes it)*
+Every test run produces a **single self-contained HTML report**. The filename carries a **UTC run-timestamp**
+so repeated runs accumulate as history — `build/release-test/release-report-[<release-stamp>-]<method>-<UTC>.html`
+(e.g. `release-report-20260625-c49f395-local-20260625T173512Z.html`) — plus a stable
+`release-report-latest.html` pointer; the publish path also copies the canonical one to
+`dist/<name>-release-report.html`. Generated on the host from a small `release-report-data.tsv` the
+in-container driver writes (it knows the compiler/config/results/docs), the `release-test-<METHOD>.log`, and
+the PNGs (base64-embedded so the file is portable). Sections:
+- **Header** — title, overall PASS/FAIL badge, generated ISO 8601 UTC timestamp, version/stamp + git sha.
+- **Release package** — tarball name + size + sha256 (for `local`; for `apt`/`tarball` the live source +
+  version/URL), the compiler version string (`mos-snes-clang --version`), install-tree size, host triple.
+- **Bundled documentation** — a table of every `.md`/`.pdf` in the package (`README.md` + the `docs/` tree),
+  **name + size** + type, with a total. This is the requested *"names and sizes of the pdf/md docs included"*.
+- **Configuration** — methods, build variants + exact flags, `FRAMES`, oracle CRC, program grid, rig
+  (bsnes-jg version, ubuntu base), host arch + CPU count.
+- **Results** — the per-build table (got vs expect, verdict) with compile + emulate elapsed seconds and the
+  ISO 8601 UTC timestamps from the log.
+- **Screenshots** — the host reference + each build's SNES Mandelbrot, embedded inline with captions.
+- **Log** — the full timestamped compile+emulation transcript in a styled `<pre>`.
+
 ## Order of execution
 1. Add `.dockerignore`; write `dev/Dockerfile.release-test`; build the rig image once (bsnes-jg + jgxcheck +
    oracle + fixtures).
@@ -159,8 +189,10 @@ the added gate.
    built **and** clean-room-verified in one shot.
 5. Run `METHOD=apt` (live repo) and `METHOD=tarball` (product-page link) → same `0x9103` PASS (post-publish
    confirmation).
-6. (optional) Add a periodic CI `release-smoke` (`METHOD=apt`) catching a broken live publish; (optional) a
-   MAME 4-way leg behind a supplied `spc700.rom` for the full differential (not default — needs the BIOS).
+6. Add `dev/release-report.py`; have `dev/test-release.sh` emit the HTML report each run; default
+   `RELEASE_DOCS_DIR` to the sibling reader docs so the report lists the bundled `.md`/`.pdf`.
+7. (optional) a MAME 4-way leg behind a supplied `spc700.rom` for the full differential (not default — needs
+   the BIOS). **Not doing:** a periodic/scheduled CI `release-smoke` — see *Release policy*.
 
 ## Verification
 1. `dev/test-release.sh METHOD=local` → output shows `host oracle: 0x9103`, then for default + `+mos-a16`:
@@ -231,13 +263,27 @@ PASS (both live consumer paths; each also emits its own `release-test-<method>.l
 Steps 5–7 — every run printed `clean-room check … OK — only the published compiler is reachable`,
 `sound-free check … OK — no sound/APU references`, and `compiled warning-clean`. PASS.
 
-## Reproducible / optional CI
+Release report (§D) — every run wrote a timestamped self-contained HTML report, e.g.
+`release-report-20260625-c49f395-local-20260625T103321Z.html` (+ `release-report-latest.html`):
+```
+release-report: wrote …/release-report-…-local-…Z.html (462 KiB, 3 screenshot(s), 13 doc(s))
+```
+A full `task package` (default `RELEASE_DOCS_DIR` → sibling reader docs) bundled 12 reader docs (6× `.md`+`.pdf`)
+into the tarball; the report's *Bundled documentation* table listed all 13 (README + reader set) with type +
+size + a 2.1 MiB total, and the canonical report was copied to
+`dist/<name>-release-report.html`. Rendered (headless chrome) to confirm formatting. PASS.
+
+## Release policy (decided 2026-06-25)
+- **Always test on release.** The clean-room test runs on **every** release, as the `METHOD=local` gate inside
+  `dev/package-release.sh` — so a tarball is only a publish candidate once it has booted + computed correctly
+  in the clean room, and a fresh report exists. No release path skips it (the only bypass, `SKIP_RELEASE_TEST=1`,
+  is for an infra emergency and is loudly marked UNVERIFIED).
+- **No periodic / scheduled CI `release-smoke`.** We deliberately do **not** add a cron/scheduled job that
+  re-tests the live apt repo on a cadence. Verification is tied to the act of releasing, not to a timer.
+  `METHOD=apt` / `METHOD=tarball` remain available to run **manually** after a deploy to confirm the live
+  consumer path, but nothing runs them automatically.
 - Everything is a `task` + committed script + a Dockerfile → reproducible from the repo; bsnes-jg is fetched
   pinned in the image layer.
-- The `METHOD=local` gate is part of `dev/package-release.sh`, so the CI `package` job inherits the
-  clean-room verification with no extra wiring.
-- **Optional CI job** (`release-smoke` in `smoke.yml`, or a scheduled run): on a cadence, `task release-test
-  METHOD=apt` against the live apt repo — catches a broken publish. bsnes-jg-only, so no BIOS secret needed.
 
 ## Open items / risks
 - The reference fixtures (`mandel-display.c`, `mandel.h`, oracle, `jgxcheck`, bsnes-jg) come from **this repo**
