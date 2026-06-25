@@ -286,6 +286,29 @@ register on every predecessor, or not split it to `Y` when the back-edge needs `
 *workaround* is the shipped `zoom.h` loop→unrolled rewrite (already in place); a backend mitigation would
 have to steer this specific allocation, which risks pessimizing the common case.
 
+### PASS PINNED: the REGISTER COALESCER (2026-06-25) — reproduces on standalone `llc`, fix harness ready
+Two decisive results that turn this into a fixable, fast-iterating bug:
+1. **Standalone `llc` reproduces it.** `llc -mcpu=mosw65816 -O2 pl.ll` (the post-LTO IR) → link → SNES ROM
+   gives the buggy `zoom_crc=0x7BCB` (correct = `+mos-a16` `0x860E`). No LTO/linker needed → a **fast
+   verify loop**: `llc → link → jgxcheck zoom_crc`, must flip `0x7BCB`→`0x860E`. (`pl.ll` = `min.c`'s
+   post-LTO IR; reducers: `reduced3.ll` ~32 lines structural.)
+2. **The pass is the register coalescer.** `llc … -join-liveintervals=false` **FIXES** it (`0x860E`);
+   `-disable-machine-cp`/`-disable-post-ra`/scheduler toggles do not. `-verify-coalescing` is **clean** —
+   the coalescer believes its join is valid, so this is a coalescer correctness gap (an unsafe join of the
+   loop-carried CRC-high vreg: it's `ROL`-defined in `A`, copied to `Y` to survive the sign-test that
+   clobbers `A`, and needed back in `A` at the loop back-edge — the coalescer merges away the reconciling
+   `Y→A` copy).
+
+The coalescer is **generic upstream LLVM**; `0002` doesn't touch it (proof: every `0002`
+`copyPhysRegImpl`/`loadStoreRegStackSlot` hunk is gated to the **16-bit** classes `Xc16/Yc16/Imag16/Ac16`,
+which exist only under `+mos-a16`/`+mos-xy16`; the buggy loop is plain 8-bit `$a`/`$y`). **Conclusively
+upstream.** MOS *does* implement `MOSRegisterInfo::shouldCoalesce` with shift/rotate guards
+(`referencedByShiftRotate`), but they fire only when `NewRC == Imag8/Imag16` and are *performance* guards
+(avoid expensive `ASL zp`), not correctness — the buggy join's `NewRC` slips past them. **Fix direction
+(under test):** extend `shouldCoalesce` (or the coalescer's interference logic) to reject coalescing a
+rotate-carried `A`-class value across an `A`-clobber on a loop back-edge. Verifiable via the fast `llc`
+harness + zero regressions on the csmith/c-torture gate.
+
 ### bsnes-core instruction trace (2026-06-25): BREAKTHROUGH — the `m[]` read is CORRECT; the bug is the CRC state
 Built an env-gated read/write hook into `CPU::read`/`CPU::write` in `vendor/bsnes-jg/src/cpu.cpp` (logs
 soft-stack-frame accesses with the live 65816 `PC/X/Y/D` + byte value), compiled it into a *copy* of

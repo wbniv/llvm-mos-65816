@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/5237584) | plan: loopfold localized to GREEDY regalloc — definitively an upstream LLVM bug |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/8f09955) | plan: loopfold ROOT CAUSE PINNED — missing tya (A<-Y) on the CRC inner-loop skip path |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/e737568) | plan: loopfold bsnes-core trace BREAKTHROUGH — m[] read is CORRECT; bug is the CRC accumulator |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fb405c2) | plan: loopfold instruction-trace attempt — MAME 0.277 headless-debugger wall; bsnes-core hook is next |
@@ -13,6 +14,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+5237584	author	Will Norris
+5237584	added	20
+5237584	deleted	2
+5237584	files	1
+5237584	body	MIR through the LTO link (-print-after=phi-node-elimination, -print-after=greedy):\n- After PHI elimination the MIR is CORRECT: the CRC select-diamond copies the new crc-high to the\n  loop-carry vreg on BOTH arms (skip and xor); the back-edge chain is sound.\n- Greedy regalloc introduces the bug: because the sign-check (CmpBrZero on old crc-high = crc&0x8000)\n  needs A, greedy keeps the new crc-high in Y on the skip path, and the Y->A copy required before the\n  next iteration's ROL (which needs A) is dropped/coalesced away -> A stale. (The correct inlined\n  copies hold crc-high in memory __rc3 + sign-check via ldy, so both arms reload A consistently.)\n\nGreedy regalloc is generic upstream LLVM, untouched by the fork's 0002 (a16/xy16 feature code), and\na16 is clean -> DEFINITIVELY an upstream llvm-mos register-allocation bug, exposed by the MOS\nsingle-accumulator pressure of the indexed-loop fold. Fix belongs upstream (allocator must\nmaterialize the loop-carried value in the back-edge register on every predecessor). Fork-local\nworkaround: the shipped zoom.h loop->unrolled rewrite (already in place).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8f09955	author	Will Norris
 8f09955	added	25
 8f09955	deleted	0
