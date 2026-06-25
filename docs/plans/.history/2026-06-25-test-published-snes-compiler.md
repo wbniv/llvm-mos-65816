@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a2a8ce4) | test(release): also emit the report as Markdown (previews via task md, feeds PDF pipeline) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/0fdc711) | test(release): self-contained HTML report per run + bundle reader docs; release policy |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/550a855) | test(release): ISO 8601 UTC timestamps on the compile + emulation runs |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/2e580a0) | test(release): emit a compile log + SNES Mandelbrot screenshot as required outputs |
@@ -7,6 +8,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a295256) | docs(plan): clean-room test of the published SNES compiler |
 
 <!--history-meta v1
+a2a8ce4	author	Will Norris
+a2a8ce4	added	5
+a2a8ce4	deleted	0
+a2a8ce4	files	1
+a2a8ce4	body	dev/release-report.py now writes a Markdown sibling next to the .html (same stem): same\nsections — release-package / bundled-docs / configuration / results tables, the SNES\nscreenshots referenced by relative path (the .md lives beside the PNGs), and the compile+\nemulation log in a fenced block. Renders in the repo's `task md` preview and the md→PDF\npipeline. dev/package-release.sh copies it to dist/<name>-release-report.md alongside the .html.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0fdc711	author	Will Norris
 0fdc711	added	54
 0fdc711	deleted	8

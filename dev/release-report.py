@@ -62,6 +62,18 @@ def esc(s):
     return html.escape(str(s if s is not None else ""))
 
 
+# Canonical reader-doc reading order (mirrors dev/build-release-docs.sh) — the report
+# lists docs in this order, not alphabetically. README first; unknown docs sort last.
+DOC_ORDER = ["readme", "65816-opcodes", "snes-hardware", "snes-registers",
+             "snes-bootup", "emulator-screenshots", "oop-in-c"]
+
+
+def doc_sort_key(d):
+    stem = os.path.splitext(os.path.basename(d["name"]))[0].lower()
+    rank = DOC_ORDER.index(stem) if stem in DOC_ORDER else len(DOC_ORDER)
+    return (rank, stem, 0 if d.get("type") == "md" else 1)
+
+
 CSS = """
 :root{--bg:#0f1117;--panel:#171a23;--ink:#e6e8ee;--muted:#9aa3b2;--line:#2a2f3a;
       --grn:#3fb950;--red:#f85149;--accent:#58a6ff;--mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace}
@@ -108,6 +120,7 @@ def main():
     a = ap.parse_args()
 
     meta, builds, docs, exes = parse_data(a.data)
+    docs = sorted(docs, key=doc_sort_key)   # canonical reading order, not alphabetical
     result = meta.get("result", "FAIL")
     ok = result == "PASS"
 
