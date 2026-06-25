@@ -214,7 +214,7 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    emit `JSL`; direct-page vs absolute vs long accesses match the addrspace of the pointer.
    (Evidence: `llvm-objdump` excerpt.)
 
-   _**PASS** (data-access half 2026-06-14, far-call half 2026-06-20). **Data-access half: PASS** — far
+   **PASS** (data-access half 2026-06-14, far-call half 2026-06-20). **Data-access half: PASS** — far
    loads/stores lower to absolute-long (`af`/`8f`, see step 3's `lda $018000` = `af 00 80 01`) and near
    data stays 16-bit absolute, so accesses match the pointer's addrspace. **Far-call half (JSR vs JSL):
    PASS** — a direct call to a `__attribute__((section(".far_text")))` function in bank $01 now emits
@@ -247,14 +247,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `region 'rom' overflowed by N bytes` (ROM byte-identical for in-budget programs).
    [Inc 4 plan](plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md) ·
    [follow-ups](plans/2026-06-21-320-far-calls-followups.md) ·
-   [near-code budget](plans/2026-06-22-snes-near-code-budget-and-code-model.md)._
+   [near-code budget](plans/2026-06-22-snes-near-code-budget-and-code-model.md).
 
 5. **M2 — 16-bit A + REP/SEP.** A 16-bit arithmetic kernel (e.g. fixed-point multiply-add loop)
    compiles with correct `REP`/`SEP` placement, produces correct results, and is **smaller/faster**
    than the M1 8-bit-mode output for the same source. The M0+M1 corpus stays green. (Evidence:
    size/cycle comparison + corpus green.)
 
-   _**Increment 1a in progress (2026-06-14): first 16-bit-accumulator codegen, dual-emulator-verified.**
+   **Increment 1a in progress (2026-06-14): first 16-bit-accumulator codegen, dual-emulator-verified.**
    The new `MOSInsertREPSEP` pass (opt-in `+mos-a16`, reusing the MC `MLow/MHigh` width TSFlags) fuses a
    16-bit store-of-zero to `rep #$20; stz; sep #$20`; run in 65816 native mode it fully zeroes the
    16-bit value → `corpus_result == 0x0042` on **both** MAME and bsnes-jg (`dev/run.sh a16`).
@@ -266,10 +266,10 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    contract — 2026-06-18 — because the 8-bit `abs`/R_MOS_ADDR16 global path is DBR-relative, see
    [native-mode-crt0-xy16](plans/2026-06-18-321-native-mode-crt0-xy16.md)); (b) the size win needs amortization
    (one STZ under REP/SEP is +1 byte) — churn-minimization + the dual-width accumulator register
-   (16-bit `lda`/`sta`, not just STZ) are the next increments._
+   (16-bit `lda`/`sta`, not just STZ) are the next increments.
    [Inc 1 plan](plans/2026-06-14-321-increment-1-16bit-accumulator.md).
 
-   _**Increment 1b DONE (2026-06-14): a real 16-bit ALU through the dual-width A16 accumulator —
+   **Increment 1b DONE (2026-06-14): a real 16-bit ALU through the dual-width A16 accumulator —
    this step's "smaller/faster" bar met.** Modeled the 65816 16-bit accumulator `A16 = B:A` (class
    `Ac16`), then a pre-legalizer combiner fuses `g = a OP b` (and `g = a OP #imm`) to a REP/SEP-
    bracketed 16-bit sequence via `G_{ADD,SUB,AND,OR,XOR}16_ABS` + `selectAlu16Abs`. The whole basic
@@ -280,18 +280,18 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    builds). The genuine hard core of #321 — real values flow through a 16-bit register.
    Findings: a legalizer rule for a MOS-specific generic opcode corrupts the legalizer tables (skip by
    opcode-range instead); the carry-init must not split the REP/SEP run.
-   [Inc 1b plan](plans/2026-06-14-321-increment-1b-dual-width-accumulator.md)._
+   [Inc 1b plan](plans/2026-06-14-321-increment-1b-dual-width-accumulator.md).
 
-   _**Increment 1c (2026-06-14): a value stays live in A16 across ops — the general path begins.**
+   **Increment 1c (2026-06-14): a value stays live in A16 across ops — the general path begins.**
    `g = a + b + c` fuses to one bracket `rep #$20; lda b; clc; adc a; clc; adc c; sta g; sep #$20`,
    threading the running sum through A16 (the intermediate `a+b` survives in the accumulator for the
    `+c`) → `corpus_result == 0x1230` on **both** MAME and bsnes-jg (`dev/run.sh a16chain`). First
    codegen where a 16-bit value survives across operations in the register, not just within one fused
    op. Still a combiner peephole (all-load ADD chains); the full general path is GISel-native s16
    register allocation (A16 ⊕ Imag16 + spilling) + loops + cross-block mode-tracking.
-   [Inc 1c plan](plans/2026-06-14-321-increment-1c-chained-16bit-alu.md)._
+   [Inc 1c plan](plans/2026-06-14-321-increment-1c-chained-16bit-alu.md).
 
-   _**Increment 1d (2026-06-14): GISel-native s16 — attempted, reverted, blocker isolated.** A prototype
+   **Increment 1d (2026-06-14): GISel-native s16 — attempted, reverted, blocker isolated.** A prototype
    kept s16 `G_ADD`/sub/bitwise un-narrowed (gated on `hasAccum16`) and selected to one 16-bit op on a
    resident `Imag16` pair; it compiled **correct** code for simple cases (a multi-use local add read
    `0x1122` on both emulators) but **crashes the register coalescer on complex multi-op functions**: an
@@ -299,9 +299,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    producing a malformed `$a16 = LDImm`. That `A16`-aliases-`A` allocator entanglement is the genuine
    hard core of #321; the prototype was reverted to keep the tree green (1a-1c peephole stands). The
    fix needs allocator/coalescer-level work to keep `A16` and 8-bit `A` from entangling.
-   [Inc 1d plan](plans/2026-06-14-321-increment-1d-gisel-native-s16.md)._
+   [Inc 1d plan](plans/2026-06-14-321-increment-1d-gisel-native-s16.md).
 
-   _**Increment 1d-retry (2026-06-14): GISel-native s16 — the coalescer crash SOLVED; native add ships.**
+   **Increment 1d-retry (2026-06-14): GISel-native s16 — the coalescer crash SOLVED; native add ships.**
    Re-diagnosed from the code: the crash wasn't the `A16=A` aliasing (the peephole creates `Ac16` vregs
    and is fine; the aliasing is needed for transient-`A16` soundness) — it was the prototype keeping the
    s16 value resident *in* `Ac16` and shuffling it to/from `Imag16` with `copyPhysReg` (COPY-like), so an
@@ -447,9 +447,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [inc/dec abs plan](plans/2026-06-15-321-native-s16-inc-dec-memory-rmw.md) ·
    [multi-use-add-chain plan](plans/2026-06-15-321-native-s16-add-chain-multiuse.md) ·
    [add-chain-immediate plan](plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
-   [bitwise-chains plan](plans/2026-06-15-321-native-s16-bitwise-chains.md)._
+   [bitwise-chains plan](plans/2026-06-15-321-native-s16-bitwise-chains.md).
 
-   _**Tier 1 — broaden the test corpus (2026-06-16): the safety net that de-risks the two biggest
+   **Tier 1 — broaden the test corpus (2026-06-16): the safety net that de-risks the two biggest
    remaining wins.** The per-op micro-tests prove each optimization in isolation but can't surface the
    crashes/miscompiles that volume + 8/16-bit-width pressure expose — exactly what A16-threading (Tier 2,
    the coalescer-crash risk) and the 1b/1c→native peephole unification (Tier 3) are gated behind. Tier 1
@@ -470,7 +470,7 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    three carry committed regression tests; patch `0002` round-trips; the full a16 suite + 6 kernels + 2
    combinatorial = 40/40 green and corpus 7/7. A16-threading is now de-risked.
 
-   _**F3 — the `SelectImm $a16` crash — FIXED (2026-06-16); `fuzz 50 1` → 50/50, 0 xfail.** It was NOT a
+   **F3 — the `SelectImm $a16` crash — FIXED (2026-06-16); `fuzz 50 1` → 50/50, 0 xfail.** It was NOT a
    legalizer-gate issue (the first-guess "s16 ordering native gate lacks the all-uses-are-branches
    guard" was implemented and **disproven** — clean post-isel SSA, but the crash is post-RA, and the
    native UGE-as-value path is valid in isolation). It was the **A16↔8-bit register-coalescer crash**
@@ -484,12 +484,12 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    (reentrant)** spill path (`expandLDSTStk`) had the same `Imag16`-only gap and is **also FIXED** — it
    spills `Ac16` via a 16-bit indirect `STAIndir16`/`LDAIndir16` through a scratch-formed slot pointer
    (regression `examples/65816/a16spillr.c` + `dev/a16spillr.sh`, `corpus_result==0x3457` on both
-   emulators)._
+   emulators).
    [Tier-1 plan](plans/2026-06-15-321-tier1-broaden-corpus.md) ·
    [F3 fix plan](plans/2026-06-16-321-fix-cmp-value-selectimm.md) ·
-   [soft-stack plan](plans/2-one-tracked-follow-up-glimmering-ladybug.md)._
+   [soft-stack plan](plans/2-one-tracked-follow-up-glimmering-ladybug.md).
 
-   _**Native s16 equality-AS-VALUE (2026-06-17): the four gated wins.** Equality feeding a **branch**
+   **Native s16 equality-AS-VALUE (2026-06-17): the four gated wins.** Equality feeding a **branch**
    went native earlier (above), but equality consumed as a **value** (`b = (a == c)` — stored, returned,
    or fed into arithmetic) still narrowed to the 8-bit `cpx/cmp` two-byte chain even under `+mos-a16`,
    because the Z flag can't be a plain i1 (it only fuses into a terminator). The fix routes the value
@@ -516,14 +516,14 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    improved their global compares (`cmp zp` → `cmp abs/long`, superseding `a16eqval`'s byte-wise stopgap).
    Non-breaking throughout (a16 suite + corpus 7/7, **fuzz 50/50**, `-verify-machineinstrs` clean, `0002`
    round-trips). Remaining micro-cases (mixed `computed == global`, `x == 0`-as-value, register operands)
-   are intentionally 8-bit — best revisited with A16-threading, which shifts operand residency._
+   are intentionally 8-bit — best revisited with A16-threading, which shifts operand residency.
    [design + spike](plans/2026-06-16-321-native-s16-eq-as-value-cmpsel.md) ·
    [v1 gated impl](plans/2026-06-16-321-native-s16-eq-gated-impl.md) ·
    [v3 both-global](plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md) ·
    [g==imm const-merge](plans/2026-06-17-321-native-s16-eq-imm-constant-through-merge.md) ·
-   [v2 computed](plans/2026-06-17-321-native-s16-eq-v2-computed-imag16-lhs.md)._
+   [v2 computed](plans/2026-06-17-321-native-s16-eq-v2-computed-imag16-lhs.md).
 
-   _**A16-threading (2026-06-17): the step-5 "biggest win" — but reframed and landed coalescer-FREE.**
+   **A16-threading (2026-06-17): the step-5 "biggest win" — but reframed and landed coalescer-FREE.**
    Each native s16 op is self-contained (`LDAImag16 → OP → STAImag16`, value home = `Imag16` between ops —
    the 1d-retry coalescer-safe invariant), so a dependent chain stores each intermediate and immediately
    reloads it (`sta __rcN; lda __rcN`). The key reframing, grounded in the MIR: the win is **redundant
@@ -542,10 +542,10 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    machine can thread. New `examples/65816/a16thread.c` + `dev/a16thread.sh` (corpus_result 0x2544 on both
    emulators) + reusable `dev/measure-a16-threading.sh`. Non-breaking: a16 suite + kernels 47/47, corpus
    7/7, **fuzz 50/50**, `-verify-machineinstrs` clean (incl. `a16localx`, the coalescer-crash guard),
-   `0002` round-trips._
-   [A16-threading plan](plans/2026-06-17-321-a16-threading.md)._
+   `0002` round-trips.
+   [A16-threading plan](plans/2026-06-17-321-a16-threading.md).
 
-   _**Consolidated step-5 acceptance + surface close-out (2026-06-22).** The per-increment paragraphs above each
+   **Consolidated step-5 acceptance + surface close-out (2026-06-22).** The per-increment paragraphs above each
    proved their slice; **`dev/measure-native-s16-surface.sh`** now assembles the whole-surface map in one
    artifact — it drives the three durable harnesses (compare-surface, a16-threading, zp-pressure) and adds the
    step-5 acceptance table (`+mos-a16 -Os` vs the M1 8-bit/default output, same source). **Result (honest,
@@ -563,7 +563,7 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `+mos-xy16` **scavenger-N/Z crash** (`$p is not a GPR`) — patch `0011`, 2026-06-26 (route a live `$p`
    through a dead index reg into `RC17`; + `0012` for a `LDCImm` MC-lowering bug it surfaced). Both are now
    positive gates.)
-   [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md)._
+   [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
