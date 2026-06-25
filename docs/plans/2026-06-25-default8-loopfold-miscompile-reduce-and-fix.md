@@ -323,6 +323,15 @@ corpus 7/7, torture 30/30, csmith 54/60 (0 mismatch/crash/error), `-verify-machi
 upstream PR body: `patches/llvm-mos/0010-coalesce-rotate-ac.patch`,
 [`upstream-coalesce-rotate-ac-pr.md`](../upstream-coalesce-rotate-ac-pr.md).
 
+**Deeper validation (2026-06-26):** [`../investigations/2026-06-26-coalesce-rotate-ac-fix-validation.md`](../investigations/2026-06-26-coalesce-rotate-ac-fix-validation.md)
+— (1) **more fail-before/pass-after programs**: 4 `min.c` CRC-poly mutations all reproduce and are
+confirmed correct after (== `+mos-a16` oracle); a 96-program synthetic CRC fuzzer found 0 (the bug is
+narrow — needs a real program's pressure, not a bare CRC). (2) **minimality**: an env-toggled 4-variant
+sweep proves each clause is load-bearing — `both`-rotate (not `either`, which *introduces* a different
+miscompile), `NewRC==Ac` (halves refusals), and the rotate check (else +372 B bloat); the committed form
+is the tightest correct one. (3) **no regression**: corpus/torture/csmith green; the fix only refuses the
+precise rotate-`Ac` join class.
+
 ### bsnes-core instruction trace (2026-06-25): BREAKTHROUGH — the `m[]` read is CORRECT; the bug is the CRC state
 Built an env-gated read/write hook into `CPU::read`/`CPU::write` in `vendor/bsnes-jg/src/cpu.cpp` (logs
 soft-stack-frame accesses with the live 65816 `PC/X/Y/D` + byte value), compiled it into a *copy* of

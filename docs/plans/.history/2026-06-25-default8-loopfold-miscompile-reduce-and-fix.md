@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/b75dd46) | fix(upstream): default-8bit 65816 coalescer miscompile — don't coalesce rotate values into A-only Ac (patch 0010) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/c78db07) | plan: loopfold PASS PINNED to the register coalescer (upstream); fast llc verify harness ready |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/5237584) | plan: loopfold localized to GREEDY regalloc — definitively an upstream LLVM bug |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/8f09955) | plan: loopfold ROOT CAUSE PINNED — missing tya (A<-Y) on the CRC inner-loop skip path |
@@ -15,6 +16,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+b75dd46	author	Will Norris
+b75dd46	added	40
+b75dd46	deleted	9
+b75dd46	files	1
+b75dd46	body	Root-caused and fixed the DEFAULT-8bit matrix-fold-LOOP miscompile (the zoom demo's\ndifferential caught it: a CRC fold over int16_t m[4] computed 0xE60E vs the correct\nhost/unrolled 0xF56C). NOT the X-indexed-m[] lead the earlier notes suspected — an\ninstruction-level bsnes-jg-core trace proved m[] is read correctly; the CRC ACCUMULATOR\nis the casualty.\n\nROOT CAUSE (upstream, generic default-8bit codegen): the register coalescer merges two\nshift/rotate-referenced values into the A-only Ac class. A rotate (ASL/LSR/ROL/ROR) can\nonly operate on A, so an Ac value is pinned to A for its whole live range. When such a\nvalue is loop-carried across an inner conditional whose other arm needs A — an inlined\nCRC16 bit loop, where the bit-15 test reloads the pre-rotate byte into A while the rotated\nhigh byte must survive to the next iteration — coalescing removes the COPY that lets the\nvalue vacate A. The allocator strands it in Y; the back-edge ROL reads a stale A and the\nhigh byte falls one rotation behind from the first skip-path iteration. -join-liveintervals=\nfalse fixes it; -verify-machineinstrs/-verify-coalescing are both clean (verifier gap).\n\nFIX: MOSRegisterInfo::shouldCoalesce refuses the join when NewRC==AcRegClass and both COPY\noperands are referencedByShiftRotate (mirrors the function's existing rotate guards, which\nare perf guards forbidding coalescing rotate values INTO Imag8 memory; this arm is a\ncorrectness guard). ~4 LOC + an LLVM lit test (coalesce-rotate-ac.mir,\n-run-pass=register-coalescer: the %x:ac=COPY between two ROL results must survive).\n\nThis is generic default-8bit machinery, independent of #321 — carried as a NEW upstream-\nbound fork patch 0010 (NOT folded into 0002, which is +mos-a16/xy16-gated and untouched).\n\nVERIFIED: dev/loopfold-repro.sh loop -> ZOOM PASS 0xF56C (was FAIL 0xE60E); standalone\nllc pl.ll zoom_crc 0x7BCB -> 0x860E; corpus 7/7; c-torture 30/30 (default==a16==xy16);\ncsmith 54/60 (0 mismatch/crash/error); -verify-machineinstrs clean. Upstream PR body queued\n(docs/upstream-coalesce-rotate-ac-pr.md; branch wbniv:mos-coalesce-rotate-ac to mint).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 c78db07	author	Will Norris
 c78db07	added	23
 c78db07	deleted	0
