@@ -1039,9 +1039,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "not posting upstream" -> the curated user-triggered "#320 post design note upstream" bullet.
        Duplicate. Nothing open.
      fp:b7a659d550bb10a3 fp:9b54c26fd2f46d90 fp:5612fe3202e783db fp:a5a5bc42d30cd1b6 -->
-- [ ] **(triage)** **Not** changing near-pointer/scalar passing or the A/X scalar return convention (LOCKED) — far (p2) only. — _from [2026-06-21-320-far-cc-variants-bcd-and-measure.md](docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md)_  <!-- fp:608f27e69a9ee6af -->
-- [ ] **(triage)** **Not** far function pointers / indirect far calls — far *data* pointers crossing a call. — _from [2026-06-21-320-far-cc-variants-bcd-and-measure.md](docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md)_  <!-- fp:d15da622c632fbdd -->
-- [ ] **(triage)** **Not** auto-merging all variants: only the measured winner lands; the rest stay an inert spike on — _from [2026-06-21-320-far-cc-variants-bcd-and-measure.md](docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md)_  <!-- fp:209db6851015623a -->
+<!-- triaged 2026-06-25: all three are far-cc STUDY scope-boundary non-goals ("Not X"), not open work —
+     and the far-cc work has LANDED (0004 Imag32 winner on main; far function pointers via the curated M1
+     "#320 far calls follow-ups (a)"; only the winner merged, the losers stayed inert spikes — exactly as
+     these guardrails state). Echoes the earlier far-cc-variants triage just above. Nothing to track.
+     fp:608f27e69a9ee6af fp:d15da622c632fbdd fp:209db6851015623a -->
 - [verify] **2026-06-21-320-far-cc-variants-bcd-and-measure** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-cc-variants-bcd-and-measure.md](docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md)_  <!-- fp:e3b7f46b9e51afa0 -->
 <!-- triaged 2026-06-21: native-s16-comparison-followups §5 verification is intentionally Phase-0-gated (it runs only IF the Phase 0 §3 byte-diff measures a win; the §4a step-1 audit IS recorded). Covered by the curated M2 "comparison follow-ups" SCOPED item above. Not a missed step. fp:c91b9765672261df -->
 <!-- triaged 2026-06-21: banked plan §5 verification is MOOT — candidate A was BUILT + measured net-negative (a16cmpaudit +654/+78 B, a16 corpus +340 B zero wins) and CLOSED WON'T-DO (§0a); nothing lands in 0002, so there is no codegen to verify. Covered by the curated M2 "comparison follow-ups" item above (now records both the 8-bit v1 AND 16-bit candidate-A close-outs). Not a missed step. fp:5f242fd76b40e2f7 -->
