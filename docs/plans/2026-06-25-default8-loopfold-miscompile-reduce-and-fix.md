@@ -143,6 +143,29 @@ accumulator spill), and `+mos-a16` tested **clean** — so the buggy default-8bi
 additions. **Likely an upstream `llvm-mos` bug.** Definitive confirmation (next): reproduce on a **pristine
 (no-`0002`) toolchain**; if it still miscompiles, file upstream.
 
+### MIR dive (#1, 2026-06-25): structure verified correct at every level → a DYNAMIC liveness clobber
+Captured MIR through the LTO link (`-Wl,--lto-emit-asm -Wl,-mllvm,-print-after=greedy/mos-late-opt/
+mos-static-stack-alloc/mos-zero-page-alloc`). Pass pipeline suspects: `mos-zero-page-alloc`,
+`mos-static-stack-alloc`, greedy regalloc, `mos-late-opt`, post-RA scavenger (no per-pass disable flags in
+the MOS backend; `llc` standalone does **not** reproduce — the bug needs the exact LTO pipeline/pressure).
+What the MIR/asm shows, all **structurally correct**:
+- IR: loop form allocates `@zp_stack = [16 x i8]` (m[] is an addressable array) vs unroll `[2 x i8]`.
+- After greedy: `m[]` = `%stack.0` (+0..+7); stores hold the right values — `m[3]=%1847:%1856` equals `m[0]`
+  is **legitimate CSE** (`zoom_matrix`: `m[0]==m[3]==cos*scale`). Fold: `LDAbsIdx %stack.0+1,%1539` (high)
+  + `EORAbsIdx %stack.0,%1539` (low), index `%1539` = the loop offset.
+- asm: offset induction 0,2,4,6; byte order low-then-high; **trip count exactly 4** (16-bit counter
+  `__rc3:X` exits at 4 — verified the `cpx #4`/`inc;dec __rc3;beq` exit). Index ZP slots `__rc5`/`__rc6` and
+  `m[i]`-high slot `__rc2` are **not** clobbered by the inner CRC bit-loops; `m[]` not overwritten between
+  store and fold.
+
+So it is **not** a wrong index / wrong value / wrong order / off-by-one — every inspectable structure is
+correct, yet the runtime value diverges (`0xE60E` vs `0xF56C`). Conclusion: a **dynamic register/ZP-slot
+liveness clobber** under the loop form's pressure (a value the allocator treats as safe is overwritten at
+runtime) — consistent with the extreme pressure-sensitivity and invisible to static MIR inspection. **Next
+decisive step** to pin the exact pass: a **dynamic trace** (MAME/bsnes watchpoint on the diverging
+byte/ZP slot to catch the clobber), or a **pass-disable bisection** (toolchain rebuild on a throwaway
+worktree, no-op one suspect pass at a time, judge on the runtime value). Both are larger undertakings.
+
 ## Verification
 
 1. **Repro is live + fast.** `dev/loopfold-repro.sh loop` prints `ZOOM: FAIL … host=0xF56C rom=0xE60E`;
@@ -187,7 +210,10 @@ additions. **Likely an upstream `llvm-mos` bug.** Definitive confirmation (next)
    a16 is clean, so the default-8bit path is unmodified upstream machinery — see RESULT "Provisional
    upstream-vs-fork". Definitive: reproduce on a pristine no-`0002` toolchain).
 4. **Fix.** With the fix, the natural loop form == unrolled == host on the minimal repro AND in the full
-   `dev/run.sh mandel-zoom` (hd) and the fast sd repro; `-verify-machineinstrs` clean. **PENDING.**
+   `dev/run.sh mandel-zoom` (hd) and the fast sd repro; `-verify-machineinstrs` clean. **PENDING — root-cause
+   narrowed (see RESULT "MIR dive"): the codegen is structurally correct at IR/MIR/asm (m[] values, index,
+   order, trip count all verified), so it's a dynamic register/ZP-slot liveness clobber under the loop
+   form's pressure. Pinning the exact pass needs a dynamic trace or a pass-disable bisection rebuild.**
 5. **Regression test.** The new hermetic test (`loopfold.c`/`.sh` and/or frozen `.ll` `llc` gate) FAILs before
    the fix and PASSes after; wired so the differential catches the class. **PENDING.**
 6. **No collateral.** `dev/run.sh corpus` + the a16/xy16 gates stay green (the fix is default-8bit codegen but
