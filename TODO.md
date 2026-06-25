@@ -102,16 +102,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
-- [ ] **Post-consolidation patch-tooling + main-toolchain rebuild** (surfaced by the 2026-06-25 far-cc-variants
-  `[verify]`). Two items, both consequences of consolidating by recreating patches rather than merging:
-  **(a)** `dev/regen-patch-0004.sh` is structurally broken — it isolates `0004` via a "baseline = every patch
-  EXCEPT 0004", which `0008` (mos-dp-arg-cc, authored on `0004`'s far-CC table in `MOSCallingConv.td`) breaks
-  (won't `git apply` onto a 0004-less baseline). It now fails-safe + is documented; needs a **delta-based
-  redesign** like `regen-patch-0001.sh` (whose STACK was also fixed to `0001..0009` this session). **(b)** main's
-  `vendor/llvm-mos` was reconciled to the committed `0001..0009` (far-subscript fix + `0009` applied), but main's
-  **installed toolchain is still the pre-consolidation build** — run `dev/run.sh toolchain` (when the release
-  session frees the shared `build/`) to make the far-subscript + `0009` codegen live in main's compiler. The
-  patches themselves are verified (round-trip byte-identical; gated codegen re-verified on both emulators).
+- [ ] **`dev/regen-patch-0004.sh` delta-based redesign** (surfaced by the 2026-06-25 far-cc-variants
+  `[verify]`). It isolates `0004` via a "baseline = every patch EXCEPT 0004", which `0008` (mos-dp-arg-cc,
+  authored on `0004`'s far-CC table in `MOSCallingConv.td`) structurally breaks (won't `git apply` onto a
+  0004-less baseline → fails at `MOSCallingConv.td:97`). It now fails-safe + is documented; needs a
+  delta-based redesign like `regen-patch-0001.sh` (whose STACK was also fixed to `0001..0009` this session).
+  The `0004` patch itself is intact + its codegen is verified (4 variants `0xF3` both emulators).
+- [x] ~~**Rebuild main's toolchain to make the consolidation codegen live**~~ — **DONE 2026-06-25.** main's
+  `vendor/llvm-mos` was reconciled to committed `0001..0009`, then `dev/run.sh toolchain` + SDK rebuilt
+  (`snes-hirom`/`snes-zoom` platforms). Gates GREEN on the rebuilt compiler, both emulators: `corpus` 7/7,
+  `a16regpress` `0x01A7` + `corpus-a16` 6/6 (`0009` live), `k_trig32lut` `0x87F0B404` (far-subscript fix live —
+  200 KiB HiROM far LUT, index ≥ 32768), far suite `0xF3`. main is now consistent: patches == vendor == built toolchain.
 - [x] **#321 beefy SNES demo — fixed-point Mandelbrot, differentially verified + rendered on both emulators. DONE 2026-06-25.**
   First *beefy* `+mos-a16` customer. Branch `wt/321-mandelbrot`.
   **Track 1 DONE+green** (`dev/run.sh k_mandel`): Q5.10 escape-time kernel (`examples/65816/mandel.h`) compiled
