@@ -20,6 +20,10 @@
 #                                      (the MAME leg is skipped), so a caller runs its deterministic
 #                                      bsnes-jg leg alone — no MAME, no SPC700 BIOS, load-insensitive.
 #                                      Used by dev/xcheck-suite.sh; see the step-6 second-emulator plan.
+#   SMOKE_SETTLE / SMOKE_SECONDS (env) slow-kernel tuning. SMOKE_SETTLE = ticks (~frames) smoke.lua
+#                                      waits before sampling; SMOKE_SECONDS = MAME's -seconds_to_run
+#                                      backstop (default 3). A heavy kernel whose main() stores its
+#                                      result late (e.g. k_trig32 ~600 frames) raises BOTH.
 set -euo pipefail
 
 _EMU_ROOT=/work
@@ -82,6 +86,11 @@ run_assert() {
   log="$_EMU_SCRATCH/assert-$(basename "$rom").log"
   # Headless MAME. SDL offscreen/dummy => no window/audio device. -skip_gameinfo =>
   # no warnings screen. -seconds_to_run is a hang backstop; smoke.lua self-exits first.
+  # SMOKE_SECONDS (default 3) parameterizes that backstop in EMULATED seconds: a heavy
+  # realistic kernel (e.g. k_trig32's libfixmath software-32-bit-divide sweep, ~600 frames
+  # to reach main()'s store) needs both a larger SMOKE_SETTLE and a backstop past it, since
+  # at ~60 fps -seconds_to_run S caps the run at ~60*S frames. Existing callers set neither
+  # and keep the historical 3 s / 60-tick behavior byte-for-byte.
   # cfg/nvram to scratch so nothing is written into the mounted repo. `|| true` so a
   # nonzero mame exit can't abort the caller — the verdict comes only from the log.
   env SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy \
@@ -91,7 +100,7 @@ run_assert() {
       -autoboot_script "$_EMU_LUA" \
       -skip_gameinfo \
       -video none -sound none -nothrottle \
-      -seconds_to_run 3 \
+      -seconds_to_run "${SMOKE_SECONDS:-3}" \
       -cfg_directory "$_EMU_SCRATCH" -nvram_directory "$_EMU_SCRATCH" \
     >"$log" 2>&1 || true
 

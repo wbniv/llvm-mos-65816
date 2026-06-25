@@ -1,7 +1,12 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-25 (re-verified upstream state — #561/#562/#563 all still **OPEN**, none merged;
-3 fork branches intact; only drift was the project-`main` pointer, now generalized). Previously 2026-06-24 (added the review-guide reviewer slice — [Appendix D](65816-patch-series-review-guide.md#appendix-d--upstream-bug-fixes--status)
+**Last updated:** 2026-06-25 (added the **far array-subscript index-width correctness fix** to the #320 far-pointer
+body — clang `CGExpr.cpp` promoted the GEP index to the default 16-bit `IntPtrTy` for every AS, truncating a far/AS2
+index ≥ 32768; fix = the base pointer's per-AS index width. In `0001`; drafted
+[`docs/320-upstream-far-subscript-index-fix.md`](320-upstream-far-subscript-index-fix.md); folds into the
+Future/blocked #320 item below — not a new ready-to-post row (AS2 isn't upstream, so it's not standalone-testable).
+Also re-verified upstream state — #561/#562/#563 all still **OPEN**, none merged; 3 fork branches intact; the
+project-`main` pointer was generalized.) Previously 2026-06-24 (added the review-guide reviewer slice — [Appendix D](65816-patch-series-review-guide.md#appendix-d--upstream-bug-fixes--status)
 + `dev/upstream-status.sh` — and re-verified #561/#562/#563 still open. 2026-06-23: first upstream contributions now live — PR #562 (F4) + issue #561 + the #561
 fix PR #563; *Verified state* snapshot refreshed; project repo `wbniv/llvm-mos-65816` `main` pushed to
 `e39d0ed`. Also landed on `main`: **#320 far tail calls** in `0001` (`4adda8b`) — far→far `JSL;RTL` folds
@@ -232,6 +237,15 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
     `JSL <direct far global>; RTL → TailJML`, gated `isGlobal && .far_` so near→far (`JSL;RTS`) and the bank-0
     thunks are auto-excluded (conservative — a misclass only misses a win). Far→far tail folds 5 B→4 B.
     a16-independent; landed in `0001`. Verified `dev/run.sh far_tail` (`0xCB`) MAME+bsnes-jg.
+  - **far array-subscript miscompile fix (2026-06-25, `0001`):** clang's `EmitArraySubscriptExpr`/`EmitIdxAfterBase`
+    (`CGExpr.cpp`) promoted the GEP index to the **default 16-bit `IntPtrTy`** for every address space, so a far
+    (AS2, 32-bit) subscript `tbl[idx]` emitted `sext_i16(idx)*2` — truncating indices ≥ 32768 and corrupting the
+    bank byte (silent miscompile; far indexed loads only worked within one 64 KiB bank). Fixed to promote to the
+    **base pointer's per-AS index width** (`getIntPtrType(ctx, TargetAS)`) — generically correct (a no-op for
+    single-pointer-width targets; only bites an AS *wider* than the default = far). Surfaced + verified by the
+    ~200 KiB sin-LUT-in-far-rodata work (`platforms/snes-hirom`, `examples/65816/farindex.c`, `dev/run.sh k_trig32lut`
+    `0x87F0B404` MAME+bsnes-jg, corpus 7/7). Like the `isFarSymbol` fix, it touches fork-only far machinery (AS2 isn't
+    upstream) so it rides the #320 PR — but the `CGExpr` change is itself generic. Drafted: [`docs/320-upstream-far-subscript-index-fix.md`](320-upstream-far-subscript-index-fix.md).
   Verified end-to-end on **MAME + bsnes-jg** (the whole far suite, 12 ROMs incl. `far_tail`) + corpus 7/7 + csmith 0-mismatch.
   Still ABI-blessing-gated; the `far`/`long_call` attribute spelling-sharing design is a candidate talking
   point for the #320 note when it's posted.

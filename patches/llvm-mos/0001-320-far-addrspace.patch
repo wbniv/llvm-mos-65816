@@ -228,10 +228,43 @@ index dfe99d8f2a2a..3a729fc34537 100644
      return 16;
    }
 diff --git a/clang/lib/CodeGen/CGExpr.cpp b/clang/lib/CodeGen/CGExpr.cpp
-index 64adc4770808..7dfa12e6fe0b 100644
+index 64adc4770808..77b50510827c 100644
 --- a/clang/lib/CodeGen/CGExpr.cpp
 +++ b/clang/lib/CodeGen/CGExpr.cpp
-@@ -6866,6 +6866,60 @@ LValue CodeGenFunction::EmitStmtExprLValue(const StmtExpr *E) {
+@@ -4965,9 +4965,29 @@ LValue CodeGenFunction::EmitArraySubscriptExpr(const ArraySubscriptExpr *E,
+     if (SanOpts.has(SanitizerKind::ArrayBounds))
+       EmitBoundsCheck(E, E->getBase(), Idx, IdxTy, Accessed);
+ 
+-    // Extend or truncate the index type to 32 or 64-bits.
+-    if (Promote && Idx->getType() != IntPtrTy)
+-      Idx = Builder.CreateIntCast(Idx, IntPtrTy, IdxSigned, "idxprom");
++    // Extend or truncate the index to the BASE POINTER's address-space index
++    // width, not the default IntPtrTy. On targets whose address spaces have
++    // different pointer widths (MOS: near/AS0 is 16-bit, far/AS2 is 32-bit), a
++    // subscript through a wider far pointer must keep the full index — promoting
++    // to the 16-bit IntPtrTy truncated far indices >= 32768 and corrupted the
++    // high (bank) address bits. For single-pointer-width targets this resolves to
++    // exactly IntPtrTy, so their codegen is unchanged.
++    if (Promote) {
++      llvm::Type *PromoteTy = IntPtrTy;
++      QualType BaseTy = E->getBase()->getType();
++      QualType ElemTy;
++      if (const PointerType *PT = BaseTy->getAs<PointerType>())
++        ElemTy = PT->getPointeeType();
++      else if (const ArrayType *AT = getContext().getAsArrayType(BaseTy))
++        ElemTy = AT->getElementType();
++      if (!ElemTy.isNull()) {
++        unsigned TargetAS =
++            getContext().getTargetAddressSpace(ElemTy.getAddressSpace());
++        PromoteTy = CGM.getDataLayout().getIntPtrType(getLLVMContext(), TargetAS);
++      }
++      if (Idx->getType() != PromoteTy)
++        Idx = Builder.CreateIntCast(Idx, PromoteTy, IdxSigned, "idxprom");
++    }
+ 
+     return Idx;
+   };
+@@ -6866,6 +6886,60 @@ LValue CodeGenFunction::EmitStmtExprLValue(const StmtExpr *E) {
                          AlignmentSource::Decl);
  }
  
@@ -292,7 +325,7 @@ index 64adc4770808..7dfa12e6fe0b 100644
  RValue CodeGenFunction::EmitCall(QualType CalleeType,
                                   const CGCallee &OrigCallee, const CallExpr *E,
                                   ReturnValueSlot ReturnValue,
-@@ -7102,6 +7156,29 @@ RValue CodeGenFunction::EmitCall(QualType CalleeType,
+@@ -7102,6 +7176,29 @@ RValue CodeGenFunction::EmitCall(QualType CalleeType,
      }
    }
  

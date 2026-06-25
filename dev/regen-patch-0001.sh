@@ -53,6 +53,7 @@ STACK=(
   "$PATCHES/0005-320-far-ptr-value-legalize.patch"
   "$PATCHES/0006-320-packed24.patch"
   "$PATCHES/0007-65816-near-abs-bank-relax.patch"
+  "$PATCHES/0008-mos-dp-arg-cc.patch"
 )
 apply_stack() {  # apply_stack <worktree>  — apply every patch above 0001, in order
   local wt="$1" p

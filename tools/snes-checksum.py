@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Patch the SNES internal-header ROM-size byte + checksum/complement of a LoROM .sfc image.
+"""Patch the SNES internal-header map-mode + ROM-size byte + checksum/complement of a .sfc image.
 
 For a power-of-two ROM that fully fills its space, the checksum is simply the
 sum of all bytes mod 0x10000, computed with the complement field pre-set to
@@ -7,46 +7,61 @@ sum of all bytes mod 0x10000, computed with the complement field pre-set to
 four placeholder bytes contribute a constant 0x1FE regardless of the final
 value, so a single pass suffices.
 
-Accepts 32 KiB (bank $00 only), 64 KiB (banks $00+$01, #320 Increment 2b LoROM),
-128 KiB, or 256 KiB (the #321 M2 zoom-pyramid's snes-zoom platform, banks $00..$07).
-All are power-of-two LoROM images that FULL()-fill their space, so the simple
-sum-of-all-bytes checksum holds. The ROM-size header byte is set from the image
-length (the tool owns it, so the inherited header.s placeholder is corrected for
-whichever size was linked) — and because it's set before the sum, the checksum
-covers the corrected byte.
+LoROM (default): the internal header lives in the first 32 KiB at file 0x7FB0-0x7FFF.
+Accepts 32 KiB (bank $00), 64 KiB (banks $00+$01, #320 Increment 2b LoROM), 128 KiB, or
+256 KiB (the #321 M2 zoom-pyramid's snes-zoom platform, banks $00..$07) — all power-of-two
+LoROM images that fully fill their space, so the simple sum-of-all-bytes checksum holds.
 
-Usage: snes-checksum.py <rom.sfc>
+HiROM (--hirom): banks $C0+ map the full 64 KiB contiguously, so the header lives at
+file 0xFFB0-0xFFFF (bank $C0). Used by platforms/snes-hirom (libfixmath's ~200 KiB sin
+LUT in far rodata). Sets map-mode byte 0x21 (LoROM is 0x20, left as header.s emits it).
+
+The ROM-size header byte is set from the image length (the tool owns it, so the inherited
+header.s placeholder is corrected for whichever size/mapping was linked), before the sum, so
+the checksum covers the corrected bytes.
+
+Usage: snes-checksum.py [--hirom] <rom.sfc>
 """
 import sys
 
-# LoROM header offsets within bank $00 ($FFD7/$FFDC-$FFDF -> file 0x7FD7/0x7FDC).
-# The header always lives in the first 32 KiB, so these are constant for all sizes.
-ROMSIZE_OFF = 0x7FD7
-COMPLEMENT_OFF = 0x7FDC
-CHECKSUM_OFF = 0x7FDE
-
-# ROM-size header byte = log2(size in KiB): 32 KiB -> 0x05, 64 KiB -> 0x06,
-# 128 KiB -> 0x07, 256 KiB -> 0x08.
-ROMSIZE_BYTE = {0x8000: 0x05, 0x10000: 0x06, 0x20000: 0x07, 0x40000: 0x08}
-
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2 or argv[1] in ("-h", "--help"):
+    args = [a for a in argv[1:] if not a.startswith("-")]
+    hirom = "--hirom" in argv
+    if len(args) != 1 or "-h" in argv or "--help" in argv:
         print(__doc__)
-        return 0 if "-h" in argv or "--help" in argv else 2
+        return 0 if ("-h" in argv or "--help" in argv) else 2
 
-    path = argv[1]
+    path = args[0]
     with open(path, "rb") as f:
         rom = bytearray(f.read())
 
-    if len(rom) not in ROMSIZE_BYTE:
-        print(f"error: expected a 32/64/128/256 KiB LoROM image, got {len(rom)} bytes", file=sys.stderr)
-        return 1
+    if hirom:
+        # Header at file 0xFFB0-0xFFFF (bank $C0). Map-mode 0x21 = HiROM.
+        base = 0xFFB0
+        if len(rom) < 0x10000 or (len(rom) & (len(rom) - 1)) != 0:
+            print(f"error: --hirom expects a power-of-two image >= 64 KiB, got {len(rom)} bytes", file=sys.stderr)
+            return 1
+    else:
+        # LoROM header lives in the first 32 KiB regardless of total size.
+        base = 0x7FB0
+        if len(rom) not in (0x8000, 0x10000, 0x20000, 0x40000):
+            print(f"error: expected a 32/64/128/256 KiB LoROM image, got {len(rom)} bytes", file=sys.stderr)
+            return 1
 
-    # Set the ROM-size header byte from the actual image size (before summing, so
-    # the checksum covers it), then ensure the checksum placeholders are
-    # FF FF (complement) / 00 00 (checksum).
-    rom[ROMSIZE_OFF] = ROMSIZE_BYTE[len(rom)]
+    MAPMODE_OFF = base + 0x25      # $FFD5
+    ROMSIZE_OFF = base + 0x27      # $FFD7
+    COMPLEMENT_OFF = base + 0x2C   # $FFDC
+    CHECKSUM_OFF = base + 0x2E     # $FFDE
+
+    # ROM-size header byte = round(log2(size in KiB)): 32->0x05, 64->0x06, 128->0x07,
+    # 256->0x08, 512->0x09.
+    size_kib = len(rom) // 1024
+    rom[ROMSIZE_OFF] = size_kib.bit_length() - 1
+
+    if hirom:
+        rom[MAPMODE_OFF] = 0x21    # HiROM, slow
+
     rom[COMPLEMENT_OFF:COMPLEMENT_OFF + 2] = b"\xff\xff"
     rom[CHECKSUM_OFF:CHECKSUM_OFF + 2] = b"\x00\x00"
 
@@ -61,7 +76,8 @@ def main(argv: list[str]) -> int:
     with open(path, "wb") as f:
         f.write(rom)
 
-    print(f"{path}: size={len(rom)//1024}KiB rom_size_byte=0x{rom[ROMSIZE_OFF]:02X} "
+    print(f"{path}: {'HiROM' if hirom else 'LoROM'} size={size_kib}KiB "
+          f"map_mode=0x{rom[MAPMODE_OFF]:02X} rom_size_byte=0x{rom[ROMSIZE_OFF]:02X} "
           f"checksum=0x{checksum:04X} complement=0x{complement:04X}")
     return 0
 
