@@ -90,28 +90,31 @@ chr, 8×8 tiles): **~4 levels** (16 KiB) + code fit one bank → **16× deep zoo
 increasing detail. Proves the whole chain — `mandel-bake-pyramid`, the level-swap runtime, the differential
 gate, the screenshots — with zero linker work. Generalize `mode7.h` tiling to a parametric `W/H`.
 
-### Phase 2 — multi-bank LoROM, full resolution + depth  — **feasibility PROVEN; full build is a follow-up**
-Bump to **multi-bank LoROM** (target 256 KiB / 8 banks): a new `snes-zoom` platform (mirror
-`platforms/snes-far/link.ld` — code + vectors + `romhdr` in bank 0; each 128×128 level in its own
-bank-aligned section), teach `tools/snes-checksum.py` the larger `rom_size_byte` (256 KiB → `0x09`), and on a
-level-swap DMA from the per-level `bank:addr16`. Then bake **128×128 × 8 levels** = a 256× deep-zoom sequence
-at full resolution.
+### Phase 2 — multi-bank LoROM, full resolution + depth  — **DONE + green (2026-06-25)**
+**Multi-bank LoROM, 256 KiB / 8 banks, 128×128 × 8 levels = 256× deep zoom, builds default + `+mos-a16`.**
+As-built (it landed exactly the de-risked plan below):
+- **New platform `platforms/snes-zoom/{link.ld,CMakeLists.txt}`** (mirrors `snes-far`): bank 0 = code +
+  `LEVEL_0` + the `MANDEL_PYR/_BANK/_HASH` tables + header + vectors; banks `$01..$07` = one bank-aligned
+  `.rodata_levelN` section each (`$0N:8000`, so the DMA `addr16` is a constant `$8000` and only the bank
+  varies). `platform(snes-zoom COMPLETE PARENT snes)` inherits crt0/snes.h. Dev iteration hand-installs it
+  from `snes-far` (no SDK clone); `dev/run.sh build` installs it from source for reproducibility.
+- **Bake multi-bank mode** (`PYR_MULTIBANK=1`): tags `LEVEL_k` (k≥1) into `.rodata_levelK`, emits
+  `MANDEL_PYR_BANK[]` (level k → bank k) + `MANDEL_PYR_MULTIBANK`. Single-bank (Phase 1) path unchanged.
+- **Runtime**: the level swap DMAs from `(MANDEL_PYR_BANK[lvl] : (uint16_t)&LEVEL)` — a per-level bank byte
+  + a 16-bit `addr16` reloc, **no far-pointer deref**, so it stays default+`+mos-a16`-buildable. Boot-hashes
+  only the near `LEVEL_0` on-console; the far levels are verified by the harness.
+- **Verification**: `tools/snes-checksum.py` learned 128/256 KiB (`rom_size_byte` `0x07`/`0x08`); the harness
+  gained a **VRAM-readback gate** (`jgxcheck -DJGX_ZOOM`: hash the displayed chr after the dive, assert ==
+  `MANDEL_PYR_HASH[cur_level]` — proves a far-bank DMA lands the right level on screen) + a **host-side
+  ROM-file per-bank hash** (every level's data is correctly placed in its bank). `dev/mandel-zoom.sh`
+  `PYR_MODE=hd` (default) | `sd`.
 
-**The multi-bank far-DMA mechanic — the crux unknown — is PROVEN** (2026-06-25, spike
-[`spikes/2026-06-25-321-mandel-zoom-phase2-bank-dma-probe.c`](spikes/2026-06-25-321-mandel-zoom-phase2-bank-dma-probe.c),
-bsnes-jg). Against the *existing* `snes-far` platform (banks $00+$01): the linker places `.far_rodata` at VMA
-`$018000` (bank $01); `(uint16_t)&far_sym` resolves to `$8000` (the DMA `addr16`, a 16-bit reloc — no
-far-pointer deref, so addr-taking is even default-8bit-clean); and driving `A1B0=$01, A1T0=$8000` lands the
-**bank-$01 bytes** in VRAM (a VRAM dump shows word `N` high byte == `PAT[N]`, not bank-$00 garbage). So Phase 2
-is mechanical from here. **Remaining steps (de-risked):** (1) `platforms/snes-zoom/{link.ld,CMakeLists.txt}` —
-N `rom_k` regions + per-level `.rodata_levelK` sections, copied from `snes-far`; (2) bake multi-bank mode —
-tag each `LEVEL_k` with its bank section + emit a `MANDEL_PYR_BANK[L]` byte table; (3) runtime — DMA from
-`(MANDEL_PYR_BANK[lvl] : (uint16_t)&LEVEL_lvl)`; (4) per-level verification — either hash the ROM file's level
-regions host-side (keeps the demo default+a16-buildable, no on-console far reads) **or** go `+mos-a16`-only
-like `mandel-mode7` by hashing through an on-console **far-pointer table** (the #320 static-init far-ptr-table
-reloc path, `a76bf18`); (5) `snes-checksum.py` 256 KiB; (6) extend `dev/mandel-zoom.sh` to the larger ROM.
-(The #320 far machinery — far symbols, `R_MOS_ADDR24`, static-init far-ptr tables — already provides the
-multi-bank pieces, as the plan anticipated.)
+**The crux mechanic was proven first by a spike** (the #320 far machinery — far symbols, `R_MOS_ADDR24` — gave
+the multi-bank pieces, as the plan anticipated):
+[`spikes/2026-06-25-321-mandel-zoom-phase2-bank-dma-probe.c`](spikes/2026-06-25-321-mandel-zoom-phase2-bank-dma-probe.c).
+A DMA sources Mode 7 chr from a high ROM bank via the far-symbol's `bank:addr16`: the linker places the
+section at `$0N:8000`, `(uint16_t)&sym` resolves to `$8000`, and `A1B0=N` lands the bank-N bytes in VRAM
+(VRAM dump: word `i` high byte == `LEVEL_N[i]`). See Finding 3 for the one real surprise (the vblank limit).
 
 ## Verification (the differential bar — run each step, paste raw output, mark PASS/FAIL)
 
@@ -200,6 +203,52 @@ a follow-up** (see the Phase 2 section). As-built notes:
 6. **Live play** — `task mandel-zoom-play` (build-if-needed + MAME window): hold R to dive into deeper detail,
    L to back out, Y/A rotate, Select palette, Start reset to level 0.
 
+## Verification results (Phase 2, `PYR_MODE=hd` — multi-bank 128×128 × 8, 2026-06-25)
+
+The default `dev/run.sh mandel-zoom` mode (`hd`) builds the full multi-bank pyramid; `PYR_MODE=sd` reruns the
+Phase 1 single-bank build (still green — the same source parameterized).
+
+1. **Builds + fits (256 KiB / 8 banks).** Both variants link `-verify` clean to 262,144 B, no overflow; the
+   `.map` places `LEVEL_0` in bank 0 with the code and `LEVEL_1..7` bank-aligned at `$0N:8000`. **PASS.**
+   ```
+   [default] built 262144B, -verify clean, fit ok; corpus@$210 zoom_crc@$29 level_hash@$200 cur_level@$28 pad_log@$212
+   [a16]     built 262144B, -verify clean, fit ok; corpus@$210 zoom_crc@$29 level_hash@$200 cur_level@$28 pad_log@$212
+   ```
+2. **Per-level image correctness — every level in every bank == host.** `ROMFILE` (host hashes each bank's
+   level data in the .sfc), `SMOKE`/`HASH` (the near `LEVEL_0` on-console), and `VRAM` (the *displayed* chr
+   after diving into a FAR bank, read back from VRAM) all assert against the host reference, both builds, both
+   emulators. The `VRAM` gate is the multi-bank proof: the level on screen was DMA'd from a high ROM bank.
+   **PASS.**
+   ```
+   [default] ROMFILE: PASS levels 1..7 data in their banks == host ref
+   [default] SMOKE: PASS got=0xFAFA   HASH: PASS 1 on-console level   VRAM: PASS displayed level 3 chr hash=0x3737 == host
+   [a16]     ROMFILE: PASS levels 1..7 data in their banks == host ref
+   [a16]     SMOKE: PASS got=0xFAFA   HASH: PASS 1 on-console level   VRAM: PASS displayed level 3 chr hash=0x3737 == host
+   SHOT: PASS corpus=0xFAFA (snapshot at frame 260)                                              (MAME, Xvfb)
+   ```
+3. **Zoom / level-swap differential — host == target both builds** (unchanged from Phase 1; `zoom.h` is
+   bank-agnostic). **PASS.**
+   ```
+   [default] ZOOM: PASS frames=64 nonzero=64 swaps=3 zoom_crc=0xE91F (host replay == ROM, bsnes-jg)
+   [a16]     ZOOM: PASS frames=64 nonzero=64 swaps=3 zoom_crc=0x7EF3 (host replay == ROM, bsnes-jg)
+   RESULT: PASS — zoom pyramid [hd]: 128x128 x 8 levels across 8 banks (256K); … host==default==+mos-a16; MAME snapshot ok
+   ```
+4. **Increasing-detail screenshots (full resolution).** Host 128×128 per-level renders (the dive: whole set →
+   down the antenna → the four-pointed star → the mini-Mandelbrot → its interior), then the on-emulator deep
+   shot (bsnes-jg, palette-cycled, a deep far-bank level) and MAME at boot (level 0):
+
+   level 0 → 2 → 4 → 5 → 6 → 7 (host `double` reference, 128×128 — the deepest is the mini-set's interior):
+
+   <img src="screenshots/mandel-zoom-hd-l00.png" width="120"> <img src="screenshots/mandel-zoom-hd-l02.png" width="120"> <img src="screenshots/mandel-zoom-hd-l04.png" width="120"> <img src="screenshots/mandel-zoom-hd-l05.png" width="120"> <img src="screenshots/mandel-zoom-hd-l06.png" width="120"> <img src="screenshots/mandel-zoom-hd-l07.png" width="120">
+
+   On real cores — bsnes-jg mid-dive (a deep far-bank level, palette-cycled) and MAME at boot (level 0):
+
+   <img src="screenshots/mandel-zoom-hd-jg-deep.png" width="240"> <img src="screenshots/mandel-zoom-hd-mame-boot.png" width="300">
+
+   **PASS.**
+5. **No regression — `PYR_MODE=sd` still green** (the Phase 1 single-bank build, same source): 32,768 B, `HASH`
+   all 6 levels on-console, `VRAM` + `ZOOM` pass both builds. **PASS.**
+
 ## Findings
 
 **Finding 1 — a DEFAULT-8bit codegen MISCOMPILE the differential caught (pre-existing, narrow, independent of
@@ -217,10 +266,22 @@ Worked around by **unrolling** (`zoom.h`, with a comment) — faithful, still ga
 demo stays green. Tracked as a follow-up (TODO + agent-handoff) for a cvise reduction → backend fix; this is
 the kind of latent default-path miscompile the differential gate exists to surface.
 
-**Finding 2 — Phase 2's multi-bank far-DMA mechanic is PROVEN** (the spike, recorded in the Phase 2 section):
-a DMA sources Mode 7 chr from a high ROM bank via the far-symbol's `bank:addr16`, so the multi-bank pyramid is
-mechanical to finish. The #320 far machinery the plan flagged ("check for reusable multi-bank pieces") does
-provide them (far symbols, `R_MOS_ADDR24`, static-init far-ptr tables).
+**Finding 2 — Phase 2's multi-bank far-DMA works** (proven by the spike, then built): a DMA sources Mode 7 chr
+from a high ROM bank via the far-symbol's `bank:addr16`. The #320 far machinery the plan flagged ("check for
+reusable multi-bank pieces") provided them (far symbols, `R_MOS_ADDR24`). Notably this needed **no far
+*pointer*** — a per-level bank *byte* + a 16-bit `addr16` reloc suffices for the DMA, so the multi-bank demo
+builds **both** default-8bit and `+mos-a16` (the plan's hoped-for both-build held at full resolution).
+
+**Finding 3 — the real Phase 2 surprise: a swap DMA must fit the vblank window (the VRAM gate caught it).**
+VRAM is writable only during vblank or force-blank. A level swap re-DMAs the *whole* image's chr; a 128×128
+level is **16 KiB**, larger than one NTSC vblank's DMA budget (~6 KiB), so a swap during active display is
+**truncated mid-transfer** — only the in-vblank prefix lands, the rest is dropped. The VRAM-readback gate
+exposed it precisely: the displayed "level 7" was `LEVEL_7[0..4727]` then stale older data, and it **differed
+per build** (a tell that the content, not the codegen, was wrong). Confirmed the DMA itself is fine — a clean
+16 KiB bank-7 DMA *at boot* (under the power-on force-blank) transfers 16384/16384. **Fix:** bracket a large
+swap DMA in **force-blank** (`SWAP_NEEDS_FORCEBLANK = pixels > 6144`) — one blank frame, masked by the swap's
+scale-reset pop. A 64×64 level (4 KiB) fits vblank and swaps seamlessly (no blank), which is partly why Phase
+1 chose 64×64. (A future seamless 128×128 swap would split the chr DMA across ~3 vblanks — a deferred polish.)
 
 ## Risks / notes
 - **Multi-bank LoROM (Phase 2) is the main lift** — linker script + `rom_size_byte` + the far-symbol→DMA
@@ -240,9 +301,11 @@ provide them (far symbols, `R_MOS_ADDR24`, static-init far-ptr tables).
       `examples/snes/{mandel-zoom.c, zoom.h}` (+ gitignored `pyramid_image.h`), `dev/mandel-zoom.sh`,
       `mode7.h` (param `m7_tilemap_identity`), `dev/jgxcheck.cpp` (`JGX_ZOOM`), `dev/{run.sh,build.sh}` +
       `Taskfile.yml` wiring, `.gitignore`, screenshots, this plan.
-- [ ] Phase 2 artifacts (**feasibility proven; not yet built** — see the Phase 2 section's de-risked step list +
-      the spike): `platforms/snes-zoom/{link.ld,CMakeLists.txt}` (multi-bank), `tools/snes-checksum.py` (256 KiB
-      size byte), the per-level far-symbol→DMA plumbing, bake multi-bank mode, larger `dev/mandel-zoom.sh`.
+- [x] ~~Phase 2 artifacts~~ (committed `6fb3d1b`): `platforms/snes-zoom/{link.ld,CMakeLists.txt}` (multi-bank
+      256 KiB), `tools/snes-checksum.py` (128/256 KiB size byte), `tools/mandel-bake-pyramid.c` (multi-bank mode),
+      `examples/snes/mandel-zoom.c` (per-level bank DMA + force-blank), `dev/jgxcheck.cpp` (VRAM gate),
+      `dev/mandel-zoom.sh` (PYR_MODE hd/sd + ROM-file hash), `dev/run.sh` (PYR_MODE forward), the spike + HD
+      screenshots. Both modes green; Finding 3 (vblank/force-blank) recorded.
 - [x] ~~`TODO.md` entry + plan-index row.~~
 - [x] ~~Finding 1 (default-8bit matrix-fold-loop miscompile) recorded~~ — `zoom.h` comment + TODO + agent-handoff.
 - [ ] Merge `wt/321-mandel-zoom` → `main` (user-triggered / coordinate per policy).
