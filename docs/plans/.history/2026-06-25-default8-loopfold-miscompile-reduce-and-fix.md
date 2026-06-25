@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/e737568) | plan: loopfold bsnes-core trace BREAKTHROUGH — m[] read is CORRECT; bug is the CRC accumulator |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fb405c2) | plan: loopfold instruction-trace attempt — MAME 0.277 headless-debugger wall; bsnes-core hook is next |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/cd77eaa) | plan: loopfold grind — frame-0 localization + mechanism (index across inner CRC loops) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/554e5ec) | plan: loopfold dynamic m[] check — VALUES correct, the fold's X-indexed READ is the bug |
@@ -11,6 +12,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+e737568	author	Will Norris
+e737568	added	19
+e737568	deleted	0
+e737568	files	1
+e737568	body	Built an env-gated read/write hook into bsnes-jg CPU::read/write (logs soft-stack accesses with live\n65816 PC/X/Y/D + byte), spliced into a COPY of libbsnes.a (shared core untouched), relinked the tracer.\nFrame-0 ground truth (m={0x3E,0,0,0x3E}; soft-stack frame at DP 0x7C):\n  STORE: 0x7C..0x83 = 3E 00 00 00 00 00 3E 00   (correct m[])\n  READ (fold PC 83E3 hi/83E9 lo): X=0,2,4,6 over 0x7C..0x83 -> folds 3E,00,00,00,00,00,3E,00 (correct)\nSo m[] is stored AND read correctly with the correct index -> the "wrong-X / OOB m[] read" hypothesis\nis FALSIFIED. Yet frame-0 rolling CRC is 0xCE8C (ROM) vs 0x9F3D (correct) with all-correct inputs.\n=> the defect is in the running-CRC accumulator state of the loop-form fold's inner CRC bit-loops (a\nregalloc corruption of the 16-bit crc carried across the for(i<4) outer loop), while the indexed m[]\naccess it threads is fine. Trace tool (BSNES_TRACE=1) built + reusable; vendor/bsnes-jg reverted.\nMaterially changes the upstream report: a crc-accumulator regalloc bug exposed by the indexed-loop fold\nshape, NOT an index/indexed-load bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fb405c2	author	Will Norris
 fb405c2	added	21
 fb405c2	deleted	5

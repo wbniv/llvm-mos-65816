@@ -243,6 +243,31 @@ and rebuild the core (jgxcheck already links it) — a real but self-owned sub-p
 pin the exact instruction; then (3) the patch. All three are substantial; the mechanism + repro are already
 strong enough to file upstream and let the regalloc owners pin the instruction if preferred.
 
+### ROOT CAUSE PINNED (2026-06-25): a missing `tya` (A←Y) on the CRC inner loop's skip path
+Built an opcode+memory trace into the bsnes-jg core (`CPU::read/write` + `WDC65816::instruction()`, env-gated,
+in a COPY of `libbsnes.a`; shared core untouched) and reconstructed the 16-bit `crc` accumulator instruction
+by instruction. Findings, in order:
+- `m[]` is stored AND read correctly (index 0,2,4,6); the m[] fold is perfect. The crc is **already wrong
+  (`0xFB80` vs `0x9FBF`) entering the m[] loop** — folding the correct m[] from `0xFB80` gives exactly the
+  ROM's `0xCE8C`. So the bug is in the **non-m[] folds**.
+- The crc is correct through `lvl` (`0xE1F0`) and `sLo` (`0xCA92`), then **diverges inside the `sHi` fold's
+  inlined CRC bit-loop at iteration 4**: crc-low keeps shifting, crc-high gets stuck (~`0x34`, only OR-ing in
+  the carry).
+- **Exact mechanism** (disasm of that inlined `zoom_crc16_byte` copy): the loop holds crc-high in `A`, rotates
+  it (`rol`), copies to `Y` (`tay`), then on `bpl` (crc bit15 == 0) **skips** the `^0x1021` block. The xor
+  block ends with `tay` leaving `A = new crc-high`; the **skip path leaves `A = old crc-high`** (from
+  `lda $02`) — only `Y` holds the new value. The next iteration's loop-top `rol A` therefore rotates the
+  **stale** crc-high, so it falls one rotation behind from the iteration *after the first skip*. A reconciling
+  **`tya` (A←Y) is missing on the skip path** (or the loop should rotate `Y`, the canonical carried value).
+
+**Why it's so narrow:** the compiler inlines `zoom_crc16_byte` 13× and allocates registers per-copy; only the
+copies that keep crc-high in `Y`-vs-`A` inconsistently AND whose data takes a skip path mid-loop miscompile.
+The `m[]`-indexed outer loop is the *trigger* (it raises pressure enough to pick this bad allocation for the
+non-m[] copies); the indexed `m[]` access itself is correct. This is **default-8-bit** codegen — a
+register-allocation / copy-insertion bug in **upstream** MOS machinery (the loop-carried `crc` PHI's value is
+in `Y` on one back-edge predecessor but read from `A`). Fix target: the missing reconciling copy. Confirm on a
+pristine no-`0002` build, then fix + regression test.
+
 ### bsnes-core instruction trace (2026-06-25): BREAKTHROUGH — the `m[]` read is CORRECT; the bug is the CRC state
 Built an env-gated read/write hook into `CPU::read`/`CPU::write` in `vendor/bsnes-jg/src/cpu.cpp` (logs
 soft-stack-frame accesses with the live 65816 `PC/X/Y/D` + byte value), compiled it into a *copy* of
