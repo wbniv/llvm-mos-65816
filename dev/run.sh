@@ -331,7 +331,12 @@ docker build -t "$IMAGE" "$HERE" >/dev/null
 mkdir -p "$ROOT/build"
 # Forward the optional knobs into the container when set (name-only -e reads the
 # value from this script's environment — safe under `set -u` via :+).
-exec docker run --rm \
+# Filter the benign, high-volume "different data layouts" linker warnings out of stderr: a
+# +mos-a16 object carries the far p2/p3 address spaces in its datalayout, but the prebuilt libcrt
+# does not — ld.lld warns per archive member, which buries the real output. The mismatch is
+# harmless (the libs use no far pointers); everything else (incl. genuine errors) passes through.
+# stdout (the SMOKE/VIEW/RESULT lines) is untouched. docker's exit status is preserved.
+docker run --rm \
   -v "$ROOT":/work \
   --user "$(id -u):$(id -g)" \
   -e HOME=/work/build \
@@ -341,4 +346,6 @@ exec docker run --rm \
   ${MOS_TOOLCHAIN:+-e MOS_TOOLCHAIN} \
   ${BUILD_JOBS:+-e BUILD_JOBS} \
   ${JG_ONLY:+-e JG_ONLY} \
-  "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}"
+  "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
+  2> >(grep -vF 'different data layouts' | cat -s >&2)
+exit $?
