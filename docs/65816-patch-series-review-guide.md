@@ -56,6 +56,8 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
   - [3.8 `0008` — DP-pointer-argument CC (upstream bug)](#38-0008--dp-pointer-argument-cc-upstream-bug)
   - [3.9 `0009` — a16 register-pressure inc/dec de-pin](#39-0009--a16-register-pressure-incdec-de-pin)
   - [3.10 `0010` — coalesce-rotate-Ac (upstream bug)](#310-0010--coalesce-rotate-ac-upstream-bug)
+  - [3.11 `0011` — register-scavenger live-`$p` save (upstream bug)](#311-0011--register-scavenger-live-p-save-upstream-bug)
+  - [3.12 `0012` — `LDCImm` set-carry MC lowering (upstream bug)](#312-0012--ldcimm-set-carry-mc-lowering-upstream-bug)
 - [4. Cross-cutting correctness arguments](#4-cross-cutting-correctness-arguments)
 - [Appendix A — Testing setup](#appendix-a--testing-setup)
 - [Appendix B — SNES platform changes & requirements](#appendix-b--snes-platform-changes--requirements)
@@ -68,7 +70,7 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
 
 ### 1.1 The patch stack at a glance
 
-Ten patches, applied bottom-up (`git am 0001..0010`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
+Twelve patches, applied bottom-up (`git am 0001..0012`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
 name in each step of [§3](#3-the-narrative-each-step-with-need--patch--proof)). LOC is patch size, not net
 source change.
 
@@ -84,9 +86,13 @@ source change.
 | **0008** dp‑arg‑cc | [upstream](#appendix-d--upstream-bug-fixes--status) | 51 | Upstream bug fix: an 8-bit `addrspace(1)` direct-page pointer **argument** was assigned a 16-bit register → illegal `COPY`. Reproduces on stock `mos6502` | Trivial — bug fix + `.ll` test |
 | **0009** a16‑pressure‑incdec | #321 · M2 | 48 | Fixes a `+mos-a16 -O1/-Os` regalloc deadlock on real code (`globals.c`): lower a small-constant i8 add/sub (`\|amt\|≤2`) to a relocatable `G_INC`/`G_DEC` chain instead of A-pinned `ADCImm`, so a strength-reduced byte index can't pin the singleton `{A}` across a 16-bit-accumulator transit. DEFAULT byte-identical | Low |
 | **0010** coalesce‑rotate‑Ac | [upstream](#appendix-d--upstream-bug-fixes--status) | 40 | Default-8bit register-**coalescer** correctness fix: refuse to coalesce two shift/rotate-referenced values into the A-only `Ac` class — pinning the loop-carried CRC-high byte to `A` stranded it in `Y` while the back-edge `ROL` read a stale `A`, a silent miscompile (both verifiers clean). Surfaced by the M2 zoom demo's differential | **Trivial** — bug fix + MIR test |
+| **0011** scavenger‑live‑`$p` | [upstream](#appendix-d--upstream-bug-fixes--status) | 210 | Register-**scavenger** correctness fix: preserve a live `$p` across an *unbalanced* stack range (a `+mos-a16` 16-bit compare keeps N/Z live across a frame-carry spill; `$p` has no GPR home → illegal `$p is not a GPR`). Route `$p` hard-stack-neutrally through a dead index reg into `RC17`; drop the stale `assertNZDeadAt`. DEFAULT byte-identical (only a16 pressure triggers it) | Low — bug fix + a16 gate |
+| **0012** ldcimm‑set‑lower | [upstream](#appendix-d--upstream-bug-fixes--status) | 29 | MC-lowering fix: `MOSMCInstLower` asserted a single `LDCImm` set encoding (`-1`), but a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` (asserts) / silent NDEBUG-UB. Lower any nonzero i1 as `SEC`. DEFAULT byte-identical, differential-neutral | **Trivial** — bug fix |
 
-Three patches (`0003`, `0008`, `0010`) are pure **upstream bug fixes** surfaced by this work and are
-independently postable; they are included so the stack applies clean.
+Five patches (`0003`, `0008`, `0010`, `0011`, `0012`) are pure **upstream bug fixes** surfaced by this work and
+are independently postable; they are included so the stack applies clean. `0003`/`0008`/`0010` reproduce on the
+default 8-bit path; `0011`/`0012` are pristine-upstream defects that only the `+mos-a16` feature's longer flag
+live ranges actually trigger (so DEFAULT 8-bit codegen is byte-identical with them applied).
 
 ### 1.2 The one invariant that makes this reviewable
 
@@ -94,7 +100,8 @@ independently postable; they are included so the stack applies clean.
 > cannot alter non-opted-in codegen — the 6502/65816 8-bit generator is byte-identical with the *feature*
 > patches applied. The only deliberate changes to the default path are the three bundled upstream bug fixes
 > (`0003`/`0008`/`0010`) and the `0007` near-abs size win — each isolated, named, and independently
-> reviewable; none is feature behavior.**
+> reviewable; none is feature behavior. (The other two upstream fixes, `0011`/`0012`, fix pristine-upstream
+> defects that only the `+mos-a16` feature triggers, so they too leave the default path byte-identical.)**
 
 This is enforced, not asserted. The differential fuzzer ([Appendix A](#appendix-a--testing-setup)) compiles
 every program **both** default and `+mos-a16` and compares both to a host oracle, so a feature gate that leaks
@@ -132,10 +139,12 @@ The stack is two near-independent units. `0002` (#321) depends on `0001` only fo
 neither unit — it is a standalone default-8bit upstream fix. So:
 
 1. **Skim** [§2](#2-architecture-dependencies-sequencing--timeline) (the machine + the graph).
-2. **Warm up first** on the three standalone bug-fix patches — `0003`, `0008`, `0010` — quick, self-contained
-   reviews independent of the feature work (`0010` is a ~15-LOC coalescer correctness guard).
+2. **Warm up first** on the small standalone bug-fix patches — `0003`, `0008`, `0010`, `0012` — quick,
+   self-contained reviews independent of the feature work (`0010` is a ~15-LOC coalescer correctness guard;
+   `0012` is a one-line MC-lowering fix).
 3. **#320 reviewers:** then `0001` → `0004` → `0005` → `0006` → `0007` (`0008` already done in step 2).
-4. **#321 reviewers:** then `0002` → `0009`, a self-contained unit (`0003` already done in step 2).
+4. **#321 reviewers:** then `0002` → `0009` → `0011` (the a16-surfaced register-scavenger fix), a
+   self-contained unit (`0003` already done in step 2; `0012` is the MC-lowering bug `0011` exposed).
 
 ---
 
@@ -165,10 +174,15 @@ property — [§3.2](#32-0002--321-16-bit-accumulator-m2), [§4](#4-cross-cuttin
 
 ### 2.2 Dependency graph
 
-Solid arrow = real dependency (semantic, or shared-file context that must apply in order). The numeric order
-is the `git am` order. `0007`/`0008` stack at the top but are semantically standalone; `0009` is likewise a
-standalone `+mos-a16` selector fix layered on `0002`; `0010` is a standalone upstream coalescer fix
-(default-8bit, no feature) surfaced by the M2 demo.
+Solid arrow = real dependency (semantic, or shared-file context that must apply in order); dotted `surfaced` =
+this work *exposed* a pre-existing upstream bug but doesn't depend on the fix. The numeric order is the
+`git am` order. `0007`/`0008` stack at the top of the #320 column but are semantically standalone; `0009`,
+`0011`, `0012` sit in the **#321 column** because each is triggered **only by `+mos-a16`/`+mos-xy16`**
+(default 8-bit byte-identical): `0009` is an a16 selector fix layered on `0002`, and `0011` (register-scavenger
+live-`$p`) → `0012` (`LDCImm` MC lowering, exposed by fixing `0011`) are upstream defects only the 16-bit
+accumulator's longer flag live ranges reach. `0010` is the lone bug-fix **outside** both columns: a
+**default-8bit** coalescer miscompile that changes ships-today codegen (no feature flag) — the M2 demo merely
+caught it.
 
 ```mermaid
 flowchart TD
@@ -187,6 +201,8 @@ flowchart TD
         P2["0002 accum16<br/>REP/SEP + native s16 + xy16"]
         P3["0003 TXY dead-flag (upstream fix)"]
         P9["0009 a16-pressure incdec<br/>de-pin i8 counter from A"]
+        P11["0011 scavenger-live-$p<br/>route $p through RC17<br/>(upstream fix, a16-only)"]
+        P12["0012 LDCImm set-lower<br/>MC lowering<br/>(upstream fix, a16-only)"]
     end
 
     P10["0010 coalesce-rotate-Ac<br/>default-8bit coalescer (upstream fix)"]
@@ -197,6 +213,8 @@ flowchart TD
     P1 -.context.-> P2
     P2 --> P3
     P2 --> P9
+    P2 -.surfaced.-> P11
+    P11 -.surfaced.-> P12
     P1 --> P4
     P2 -->|Ac16/AnyRegBank| P4
     P2 -->|a16-gated hunk| P5
@@ -223,7 +241,7 @@ harness.
 flowchart LR
     M0["M0 — bench<br/>SNES crt0 + linker + ROM header<br/>MAME + bsnes-jg + corpus + fuzzer<br/>(no new codegen)"]
     M1["M1 — #320 far<br/>multi-bank, unoptimized<br/>(0001,0004,0005,0006,0007,0008)"]
-    M2["M2 — #321 16-bit<br/>the optimizing payoff<br/>(0002,0003,0009,0010)"]
+    M2["M2 — #321 16-bit<br/>the optimizing payoff<br/>(0002,0003,0009,0010,0011,0012)"]
     M0 --> M1
     M0 --> M2
     M1 -. "corpus = M2 regression baseline" .-> M2
@@ -247,7 +265,7 @@ flowchart LR
 
 ### 2.5 Timeline
 
-14 days, 514 commits, 140 plan files. M1 and M2 overlap deliberately.
+14 days, 530 commits, 142 plan files. M1 and M2 overlap deliberately.
 
 ```mermaid
 gantt
@@ -274,6 +292,7 @@ gantt
     surface consolidation + close       :2026-06-22, 1d
     a16-pressure incdec fix (0009)      :2026-06-24, 1d
     coalesce-rotate-Ac fix (0010)       :2026-06-26, 1d
+    scavenger live-$p + LDCImm (0011,0012) :2026-06-26, 1d
 ```
 
 ---
