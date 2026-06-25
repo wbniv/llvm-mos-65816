@@ -158,3 +158,22 @@ tasks:
         fi
       - task: mandel-mame
         vars: { ROM: mandel-interactive }
+
+  # --- Generated reference docs (from the HAL headers + the backend TableGen) ---
+
+  gen-docs:
+    desc: "Regenerate docs/refs from source: SNES register map (from snes_*.h) + 65816 reference/audit (from the backend TableGen). Needs build/ + vendor/llvm-mos (set LLVM_TBLGEN/MOS_TD to override)."
+    cmds:
+      - tools/gen-snes-regmap.py > docs/refs/snes-hardware/snes-register-map.md
+      - tools/gen-65816-ref.py --emit reference > docs/refs/65816/65816-reference.md
+      - tools/gen-65816-ref.py --emit audit > docs/refs/65816/65816-opcode-audit.md
+
+  check-docs:
+    desc: "Drift guard: assert the committed docs/refs match a fresh regeneration from source"
+    cmds:
+      - |
+        set -euo pipefail
+        diff -u docs/refs/snes-hardware/snes-register-map.md <(tools/gen-snes-regmap.py)
+        diff -u docs/refs/65816/65816-reference.md           <(tools/gen-65816-ref.py --emit reference)
+        diff -u docs/refs/65816/65816-opcode-audit.md        <(tools/gen-65816-ref.py --emit audit)
+        echo "docs/refs in sync with sources"

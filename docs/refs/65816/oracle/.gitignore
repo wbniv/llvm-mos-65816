@@ -1,0 +1,5 @@
+# Raw audit oracle — the CC0 65c816 datasheet transcription, vendored locally for
+# the opcode audit but NOT committed (the normalised oracle-65c816-opcodes.tsv one
+# level up IS committed). Re-fetch + sha256-verify with dev/fetch-65816-oracle.sh.
+# Provenance + license (CC0): ../SOURCES.md (tracked).
+65c816-datasheet.txt

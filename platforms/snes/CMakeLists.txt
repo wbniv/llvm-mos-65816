@@ -4,7 +4,18 @@ if(NOT CMAKE_CROSSCOMPILING)
   return()
 endif()
 
-install(FILES snes.h TYPE INCLUDE)
+# Install the umbrella snes.h plus every subsystem header it pulls in (the umbrella
+# #includes them, so installing snes.h alone would break <snes.h> for SDK consumers).
+install(FILES
+  snes.h
+  snes_mmio.h
+  snes_ppu.h
+  snes_dma.h
+  snes_cpu.h
+  snes_joypad.h
+  snes_apu.h
+  snes_wram.h
+  TYPE INCLUDE)
 
 # crt0: SNES bring-up + cartridge header, relocatably linked into crt0.o.
 # call-near-from-far.s: the #320 far->near mixed-banking thunk (__call_near_from_far),
