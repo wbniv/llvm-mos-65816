@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/cf30a73) | docs(plan-index): add the 2026-06-26 scavenger live-$p fix plan (→ 142) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/f791491) | docs(plan-index): add the shared plan-index tooling plan row (→ 141) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/40d93f0) | docs(plan-index): add the 10 plans created since the 2026-06-25 refresh (→ 140) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/840fc17) | docs: Phase 2 zoom-pyramid verification + HD montage; Findings 2/3; TODO/handoff/index |
@@ -14,6 +15,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+cf30a73	author	Will Norris
+cf30a73	added	3
+cf30a73	deleted	1
+cf30a73	files	1
+cf30a73	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f791491	author	Will Norris
 f791491	added	3
 f791491	deleted	1

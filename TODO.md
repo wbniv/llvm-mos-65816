@@ -218,10 +218,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   values must spill to `Imag16`) and it reopens the coalescer-crash risk → high-risk/low-reward, so
   **keep the XFAIL** with a concrete re-open trigger + a gated B0→B1→B2 spike recipe (see Watch + the plan).
   **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
-  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the scavenger-N/Z crash ≡
-  the `pr15296` ZP-overflow). The sibling `globals.c`/`a16regpress.c` `-Os` RA-**crash** had an *orthogonal*
-  targeted fix (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`) — **FIXED, patch `0009`**
-  (`ad506ed`, 2026-06-25; now a positive gate), so it left this frontier. The rest stays behind **one**
+  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the `pr15296` ZP-overflow).
+  **Two crashes once lumped into this core left it with orthogonal targeted fixes:** the
+  `globals.c`/`a16regpress.c` `-Os` RA-**crash** (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`)
+  — **FIXED, patch `0009`** (`ad506ed`, 2026-06-25) — and the `+mos-a16`/`+mos-xy16` **scavenger-N/Z crash**
+  (route a live `$p` through a dead index reg into `RC17`) — **FIXED, patch `0011`** (2026-06-26; + `0012`
+  for a `LDCImm` MC-lowering bug it surfaced); both are now positive gates. The rest stays behind **one**
   re-open trigger (a 2nd independent *realistic* `regalloc-out-of-registers` / `a16-zp-pressure-overflow`,
   **or** a real fn crossing ~10/14 `Imag16` pairs) → **one** gated B0→B1→B2 spike.
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
@@ -241,10 +243,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   confirmed with data** (the scan also surfaced a separate `+mos-a16 -Os` RA *crash* on `globals.c` — see
   its own bullet above).
   **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
-  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the scavenger-N/Z crash ≡
-  the `pr15296` ZP-overflow). The sibling `globals.c`/`a16regpress.c` `-Os` RA-**crash** had an *orthogonal*
-  targeted fix (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`) — **FIXED, patch `0009`**
-  (`ad506ed`, 2026-06-25; now a positive gate), so it left this frontier. The rest stays behind **one**
+  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the `pr15296` ZP-overflow).
+  **Two crashes once lumped into this core left it with orthogonal targeted fixes:** the
+  `globals.c`/`a16regpress.c` `-Os` RA-**crash** (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`)
+  — **FIXED, patch `0009`** (`ad506ed`, 2026-06-25) — and the `+mos-a16`/`+mos-xy16` **scavenger-N/Z crash**
+  (route a live `$p` through a dead index reg into `RC17`) — **FIXED, patch `0011`** (2026-06-26; + `0012`
+  for a `LDCImm` MC-lowering bug it surfaced); both are now positive gates. The rest stays behind **one**
   re-open trigger (a 2nd independent *realistic* `regalloc-out-of-registers` / `a16-zp-pressure-overflow`,
   **or** a real fn crossing ~10/14 `Imag16` pairs) → **one** gated B0→B1→B2 spike.
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
@@ -338,8 +342,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 ### Test Bench / CI
 
 - [ ] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** (follow-up to the now-**Done**
-  Csmith fuzzer — see Done `[321-csmith-fuzzer]`). Targets the `-O1/-Os` loop/scalar-opt surface where our open
-  XFAILs live (`regalloc-out-of-registers`, `scavenger-p-not-gpr`), so it's the natural next instrument. Two
+  Csmith fuzzer — see Done `[321-csmith-fuzzer]`). Targets the `-O1/-Os` loop/scalar-opt surface — the same
+  register-pressure regime that produced the `regalloc-out-of-registers` (fixed, `0009`) and
+  `scavenger-p-not-gpr` (fixed, `0011`) crashes and still hosts the open `a16-zp-pressure-overflow` XFAIL, so
+  it's the natural next instrument. Two
   costs: redirect its baked-in `printf` to `corpus_result`; the 16-bit-int caveat (no `platform.info`
   equivalent → would need width surgery to stay UB-free). The `--gen` seam already added for Csmith makes it
   drop-in. [plan §Follow-ups](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md) ·
@@ -478,13 +484,15 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 _Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
 revisit) rather than active work._
 
-- [ ] **Reevaluate the deferred s16-register-pressure core (Phase-3 `Ac16`/ZP residency).** The
-  `globals.c`/`a16regpress.c` `-Os` RA-**crash** is **FIXED** (patch `0009`, `ad506ed`, 2026-06-25 — an
-  *orthogonal* i8-loop-counter de-pin from `{A}`, **not** the residency rework; `a16regpress.c` is now a
-  positive gate, `0x01A7`). What **remains deferred** is the general pre-RA `Ac16`/ZP-residency rework, now
-  motivated only by two *pathological* XFAILs — the scavenger-N/Z crash (`a16scavnz.c`, `scavenger-p-not-gpr`)
-  and the link-time ZP overflow (`pr15296.c`, `a16-zp-pressure-overflow`), both byte-identical pre/post `0009`.
-  It is high-risk (regresses the common a16 path / reopens the 1d crash) and low-reward (Phase 1.5 already
+- [ ] **Reevaluate the deferred s16-register-pressure core (Phase-3 `Ac16`/ZP residency).** **Two** crashes
+  once attributed to this core turned out to have *orthogonal* targeted fixes, **not** the residency rework:
+  the `globals.c`/`a16regpress.c` `-Os` RA-**crash** (patch `0009`, `ad506ed`, 2026-06-25 — an i8-loop-counter
+  de-pin from `{A}`; `a16regpress.c` now a positive gate, `0x01A7`) and the `+mos-a16`/`+mos-xy16`
+  **scavenger-N/Z crash** (patch `0011`, 2026-06-26 — route a live `$p` through a dead index reg into `RC17`;
+  + `0012` for a `LDCImm` MC-lowering bug it surfaced; `a16scavnz.c` now a positive gate, `0x22A6`). What
+  **remains deferred** is the general pre-RA `Ac16`/ZP-residency rework, now motivated by only **one**
+  *pathological* XFAIL — the link-time ZP overflow (`pr15296.c`, `a16-zp-pressure-overflow`).
+  It is high-risk (regresses the common a16 path / reopens a crash class) and low-reward (Phase 1.5 already
   captured the threading wins; real code is slack). **Re-open only when** either **(a)** the corpus / c-torture
   / fuzzer surfaces a *second independent* `regalloc-out-of-registers` (or `a16-zp-pressure-overflow`) from
   **realistic** (not hand-reduced) code, or **(b)** the ZP-pressure baseline (`dev/measure-zp-pressure.sh`)

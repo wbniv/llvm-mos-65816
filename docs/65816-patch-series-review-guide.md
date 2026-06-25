@@ -566,7 +566,8 @@ Phase-3 residency work.
 **Proof.** Gated on `hasAccum16()`, so **DEFAULT 8-bit is byte-identical**. `a16regpress.c` (the former crash)
 is now a positive gate (`dev/run.sh a16regpress` → `0x01A7`, both emulators); `globals.c` compiles + runs
 clean; **−123 B over 122 c-torture programs (0 worse)**; the regen round-trips `0001..0009`. It does **not**
-fix the genuinely-deferred s16-pressure core — the scavenger-N/Z and `pr15296` ZP-overflow XFAILs stay.
+fix the deferred s16-pressure core — but the **scavenger-N/Z crash** that was once lumped into it has since
+been fixed independently (`0011`, see §3.11); only the `pr15296` ZP-overflow XFAIL now stays.
 
 ### 3.10 `0010` — coalesce-rotate-Ac (upstream bug)
 
@@ -603,6 +604,52 @@ if (NewRC == &MOS::AcRegClass &&
 **7/7**, c-torture **30/30**, csmith **54/60** (0 mismatch/crash); `-verify-machineinstrs` clean. Upstream PR
 **drafted** ([`docs/upstream-coalesce-rotate-ac-pr.md`](upstream-coalesce-rotate-ac-pr.md)), branch
 `wbniv:mos-coalesce-rotate-ac` to mint — see [Appendix D](#appendix-d--upstream-bug-fixes--status).
+
+### 3.11 `0011` — register-scavenger live-`$p` save (upstream bug)
+
+**Need.** A `+mos-a16`/`+mos-xy16` `-O1/-Os` crash on 8/500 fuzz seeds (`a16scavnz.c`):
+`MOSRegisterInfo::saveScavengerRegister` assumed N/Z dead at every scavenge point **and** that a live `$p` is
+only preserved across a *push/pull-balanced* range. Under 16-bit-accumulator flag live ranges, a 16-bit
+compare keeps N (or Z) live across a frame-index materialization whose carry the scavenger places in `$c` — a
+sub-register of `$p` — forcing the whole `$p` preserved across an **unbalanced** range. `$p` has no GPR spill
+home → illegal `STImag8 $p` (`$p is not a GPR`) + an undefined-`$p` `PH $p` (asserts build aborts at
+`assertNZDeadAt`). Pristine-upstream (`0002` touches no scavenger code) — see
+[[C19]](#c19-upstream-register-scavenger-nz-crash). *This was previously deferred as an issue-with-no-fix; the
+prior analysis missed the working approach.*
+
+**Patch.** [`patches/llvm-mos/0011-mos-scavenger-live-p-save.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0011-mos-scavenger-live-p-save.patch)
+— in `MOSRegisterInfo.cpp`: for the unbalanced case, route `$p` **hard-stack-neutrally** through a dead 8-bit
+index register into the reserved `RC17` slot — `PHP; PL<idx>; ST<idx> RC17` (save) / `LD<idx> RC17; PH<idx>;
+PLP` (restore). Each half is net-0 on the hard stack, so it tolerates the surrounding imbalance; width-safe
+because `MOSInsertREPSEP` runs *after* scavenging and forces index push/pull/load/store to `XW_X8` even under
+`+mos-xy16`. Plus: flag the no-reaching-def `PHP $p` `undef` (verifier), drop the stale `assertNZDeadAt`
+(its premise is the false invariant — flag preservation is holistic via the scavenger's interleaved P-saves),
+and widen `canSaveScavengerRegister(P)` to match.
+
+**Proof.** `a16scavnz.c` promoted from XFAIL to a positive gate ([`dev/a16scavnz.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/a16scavnz.sh),
+`dev/run.sh a16scavnz` → `0x22A6`, host==default==`+mos-a16`==`+mos-xy16`, MAME + bsnes-jg, **asserts-clean**);
+`KNOWN_ISSUES["scavenger-p-not-gpr"]` dropped; differential fuzz **121/121** (seeds 1–80 + 165–205, including
+the previously-XFAIL'd 169/173/196), 0 mismatch/crash; corpus **7/7** (default byte-identical); c-torture
+sample 58/0-fail; `0011` round-trips. Upstream PR **drafted**
+([`docs/upstream-scavenger-live-p-pr.md`](upstream-scavenger-live-p-pr.md)), branch
+`wbniv:mos-scavenger-live-p-save` to mint.
+
+### 3.12 `0012` — `LDCImm` set-carry MC lowering (upstream bug)
+
+**Need.** Surfaced once `0011` let `a16scavnz.c` compile *past* the scavenger to MC lowering: `MOSMCInstLower`
+lowered `LDCImm` (`Cc`, `i1imm`) only for `0` (`CLC`) and `-1` (`SEC`), `llvm_unreachable` otherwise. But a
+*set* i1 carry can arrive as `1` (a plain i1 `true`) — e.g. the carry-in materialized for a **16-bit `SBC`** —
+so a plain `+mos-a16` 16-bit subtract aborts an asserts build and silently mislowers the `default:
+__builtin_unreachable()` under NDEBUG (it happens to emit `SEC`, so the differential was always green).
+Pristine-upstream `MOSMCInstLower.cpp`.
+
+**Patch.** [`patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch)
+— lower the operand as the boolean it is: `imm == 0 ? CLC : SEC` (any nonzero → `SEC`). One line.
+
+**Proof.** **Differential-neutral** (emits the same `SEC`); a plain `+mos-a16` 16-bit subtract + `a16scavnz.c`
+compile clean on the **asserts** build; `a16sub` gate `0x0123` both emulators; `0012` round-trips. Upstream PR
+**drafted** ([`docs/upstream-ldcimm-set-lowering-pr.md`](upstream-ldcimm-set-lowering-pr.md)), branch
+`wbniv:mos-ldcimm-set-lowering` to mint.
 
 ---
 

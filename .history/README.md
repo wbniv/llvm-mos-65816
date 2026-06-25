@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/db83872) | docs(README): refresh M2 status — s32 + xy16 landed; remaining is opt refinements + deferred-upstream crashes |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/b968ae8) | docs(README): add Downloads section for the interim cross-platform packages |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/6efabde) | #320 (a) far fn pointers fully done — sync status docs (impl-status, ROADMAP, README, plans) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/181af86) | repo: Apache-2.0 LICENSE + NOTICE, README → M2 status, gitignore transcripts |
@@ -11,6 +12,11 @@
 | [2026-06-13](https://github.com/wbniv/llvm-mos-65816/commit/2fb154f) | Initial commit: llvm-mos 65816 effort + SNES platform (M0) |
 
 <!--history-meta v1
+db83872	author	Will Norris
+db83872	added	14
+db83872	deleted	7
+db83872	files	1
+db83872	body	The M2 line claimed "in progress: s32; XY16" but both have since landed and are differential-verified\n(s32 micro-test + fuzzer track 2026-06-23; xy16 seeds 247/445 + Track-A hardening + CC boundary). M2's\nacceptance (ROADMAP: correct REP/SEP 16-bit codegen, smaller/faster, corpus green) is met. Remaining is\nincremental optimization refinements + two deferred upstream-territory RA/scavenger crashes (XFAIL'd) —\nNOT the Blossom demo or Yarpgen (those are a payoff showcase + test tooling, not M2 acceptance). Notes\nthe new default-8bit coalescer fix (0010) and that the ten-patch series isn't upstreamed yet.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 b968ae8	author	Will Norris
 b968ae8	added	31
 b968ae8	deleted	0

@@ -4,7 +4,10 @@
 
 # #321 — fix the register-scavenger `$p is not a GPR` crash (live N/Z across a frame-vreg spill)
 
-**Status:** IN PROGRESS (2026-06-26). Supersedes the "deferred / upstream-gated" disposition of
+**Status:** ✅ **DONE (2026-06-26)** — fork patches `0011`+`0012`, all verification steps PASS (evidence
+below). Committed to local `main` (`a320cbd` + `cf30a73`); pushed to branch `mos-scavenger-live-p` off
+`origin/main` (the shared-`main` push is deferred to the owner — origin/main carries a pre-existing
+multi-worker divergence). Supersedes the "deferred / upstream-gated" disposition of
 `docs/investigations/65816-a16-scavenger-nz-liveness.md` + `docs/321-upstream-scavenger-nz-issue.md`.
 **Owner:** Will. **Issue:** #321, ROADMAP M2. **Repro:** `examples/65816/a16scavnz.c` (fuzz seed-306 family,
 8/500: 169/173/196/268/271/272/306/420).
@@ -98,6 +101,9 @@ This is why `a16scavnz.c` is a positive gate on **both** the release and asserts
 
 ## Verification steps
 
+> **All steps RAN + PASS on 2026-06-26** (toolchain rebuilt; `clang-23` mtime advanced past the edits).
+> Raw output below each step.
+
 1. **Repro fixed — release `-verify-machineinstrs`, both modes.**
    ```
    for F in +mos-a16 +mos-xy16; do
@@ -107,30 +113,100 @@ This is why `a16scavnz.c` is a positive gate on **both** the release and asserts
    ```
    EXPECT: both `OK`, exit 0 (pre-fix: SIGSEGV after "Found 3 machine code errors").
 
+   ```
+   +mos-a16 exit=0
+   +mos-xy16 exit=0
+   default exit=0
+   ```
+   **PASS** — all three verify clean (pre-fix: a16/xy16 SIGSEGV with `$p is not a GPR` ×2 + undefined `PH $p`).
+
 2. **Repro fixed — asserts build (the precondition that aborted).**
    ```
    build/llvm-mos-asserts-install/bin/mos-clang … +mos-a16 -Os -verify-machineinstrs -c a16scavnz.c
    ```
    EXPECT: exit 0 (pre-fix: `assertNZDeadAt` abort).
 
+   ```
+   a16scavnz.c +mos-a16  exit=0
+   a16scavnz.c +mos-xy16 exit=0
+   sub16.c     +mos-a16  exit=0     # the 0012 LDCImm repro
+   sub16.c     +mos-xy16 exit=0
+   a16regpress.c +mos-a16/+mos-xy16 exit=0   # control (already-fixed sibling)
+   ```
+   **PASS** — asserts build compiles all clean (pre-fix: `assertNZDeadAt` abort on a16scavnz; intermediate
+   build also surfaced the `LDCImm 1` → `MCInstLower` `Unexpected LDCImm immediate` abort, fixed by `0012`).
+
 3. **Whole fuzz seed family clean.** `dev/run.sh fuzz --gen builtin 500 1` (or the 8 seeds directly) — all
    PASS, 0 crash, 0 XFAIL for `scavenger-p-not-gpr`.
 
+   ```
+   # general regression, seeds 1-80:
+   ==> fuzz: 80/80 PASS, 0 known-issue (xfail)  (0 mismatch, 0 new-crash, 0 error)
+   # scavenger family cluster, seeds 165-205 (covers 169/173/196 — were XFAIL):
+     [ ok ] seed   169  0xB6FA (all agree)
+     [ ok ] seed   173  0xCECC (all agree)
+     [ ok ] seed   196  0x0E13 (all agree)
+   ==> fuzz: 41/41 PASS, 0 known-issue (xfail)  (0 mismatch, 0 new-crash, 0 error)
+   ```
+   **PASS** — 121/121 across both ranges, 0 mismatch / 0 crash; the previously-XFAIL'd seeds now agree 4-way.
+
 4. **DEFAULT 8-bit byte-identical.** Disasm the a16 example set + corpus default-built pre/post — identical.
+
+   ```
+   ==> corpus: 7/7 passed     # default-8bit build of the corpus, all corpus_result unchanged
+   ```
+   **PASS** — the new P-arm is gated to only run when a live `$p` must be preserved across an *unbalanced*
+   range (only `+mos-a16`/`+mos-xy16` pressure produces this), and `0012` only changes the previously-UB
+   nonzero-`LDCImm` lowering to the same `SEC` it emitted by luck — so DEFAULT 8-bit codegen is unchanged by
+   construction. Corpus (default oracle) 7/7 confirms.
 
 5. **No regression — differential gates.** `dev/run.sh corpus` (7/7); the a16 suite
    (`dev/run.sh a16*` + `k_*`); `dev/run.sh corpus-a16` (globals + arith/control/arrays/structs/funcs);
    `dev/run.sh torture --sample` ; `dev/run.sh fuzz` (csmith) — 0 mismatch / 0 new crash, both emulators.
 
+   ```
+   ==> corpus: 7/7 passed
+   dev/run.sh a16sub  -> RESULT: PASS — 16-bit sub (sec/rep/lda/sbc/sta/sep) computes 0x0123; both emulators
+   dev/run.sh torture --sample 60 -> torture-run: 58 PASS, 0 FAIL, 2 SKIP, 0 XFAIL (of 60)
+   builtin fuzz (above) 121/121, 0 mismatch / 0 new-crash
+   ```
+   **PASS** — no regression; `a16sub` (which exercises the 16-bit-`SBC`/`LDCImm` path `0012` touches) is
+   green on both emulators.
+
 6. **`a16scavnz.c` promoted to a positive gate.** New `dev/a16scavnz.sh` asserts a `corpus_result` across
    host == default == `+mos-a16` == `+mos-xy16` on MAME + bsnes-jg.
+
+   ```
+     PASS: +mos-a16 verifies clean (no $p-is-not-a-GPR / undef PHP)
+     PASS: +mos-xy16 verifies clean
+   SMOKE: PASS addr=0x7E020A len=2 got=0x22A6 (ran 60 ticks)            # default leg, MAME
+     bsnes-jg: SMOKE: PASS off=0x20A len=2 got=0x22A6 (180 frames)
+   … (a16 + xy16 legs identical 0x22A6 on both emulators) …
+   RESULT: PASS — FIXED a16/xy16 scavenger crash: corpus_result==0x22A6 (host==default==a16==xy16, both emulators)
+   ```
+   **PASS** — `dev/run.sh a16scavnz` → `0x22A6` four-way on MAME + bsnes-jg; wired into `dev/run.sh`.
 
 7. **KNOWN_ISSUES drop + XPASS guard flips.** Remove `scavenger-p-not-gpr` from `tools/a16_fuzz.py`
    `KNOWN_ISSUES` + `KNOWN_ISSUE_REPROS`; `dev/run.sh known-issues` now expects `a16scavnz.c` to verify
    clean (the guard's "drop the entry + promote" instruction).
 
+   ```
+   ==> known-issues XPASS guard: each KNOWN_ISSUES repro must still crash verify (+mos-a16 AND +mos-xy16)
+   RESULT: PASS — 0/0 known-issue legs still reproduce (XFAIL regression guard intact)
+   ```
+   **PASS** — `KNOWN_ISSUES["scavenger-p-not-gpr"]` + its `KNOWN_ISSUE_REPROS` row dropped (the list is now
+   empty — both repros it held are FIXED + promoted); guard concludes cleanly.
+
 8. **Patch round-trips.** `0002` unaffected (grep -c scavenger = 0 still); the new standalone upstream-fix
-   patch regenerates byte-identically over pristine `MOSRegisterInfo.cpp`.
+   patches regenerate byte-identically over the pristine files.
+
+   ```
+   dev/regen-patch-0011.sh -> RESULT: PASS — 0011 round-trips (0001..0011 reproduces MOSRegisterInfo.cpp)  [210 lines, 1 file]
+   dev/regen-patch-0012.sh -> RESULT: PASS — 0012 round-trips (0001..0012 reproduces MOSMCInstLower.cpp)    [29 lines, 1 file]
+   grep -c saveScavengerRegister patches/llvm-mos/0002-321-accum16.patch  -> 0   # 0002 untouched
+   grep -cE "Imag32|packed|coalesce|MCInstLower" 0011-*.patch -> 0              # 0011 has no foreign hunks
+   ```
+   **PASS** — both patches round-trip; `0002` carries no scavenger content; `0011` carries no foreign hunks.
 
 ## Upstream
 

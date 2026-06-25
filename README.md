@@ -40,10 +40,12 @@ index mode)** — both since landed and differential-verified (4-way host == def
 == `+mos-a16` == `+mos-xy16` on MAME + bsnes-jg). Corpus, micro-tests, realistic
 kernels, combinatorial tests, and Csmith differential fuzzing all green; CI green.
 **Remaining:** incremental optimization refinements (A16-threading / ALU-chain
-extensions) and two deferred upstream-territory RA/scavenger crashes (XFAIL'd). A
-default-8bit register-coalescer miscompile found while exercising the codegen was
-root-caused and **FIXED** (patch `0010`, upstream-bound). The ten-patch series is
-not yet upstreamed.
+extensions) and **one** deferred upstream-territory pressure XFAIL (the `pr15296`
+link-time ZP-overflow). The `+mos-a16`/`+mos-xy16` **register-scavenger crash**
+(`$p is not a GPR`) that used to head that list is now **FIXED** (pristine-upstream
+patch `0011`; a `LDCImm` MC-lowering bug it surfaced fixed as `0012`), as was a
+default-8bit register-coalescer miscompile found while exercising the codegen
+(patch `0010`). The twelve-patch series is not yet upstreamed.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the full plan and
 [docs/INVESTIGATION.md](docs/INVESTIGATION.md) for upstream status and contribution rationale.
