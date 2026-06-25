@@ -94,4 +94,104 @@ static inline int16_t cordic16_atan(int16_t x) {
   return cordic16_atan2(x, CORDIC16_ONE);
 }
 
+// ============================================================================================
+// Phase 3 — DERIVED functions (tan/asin/acos) + HYPERBOLIC (sinh/cosh/tanh).
+//
+// These build on the Phase 2 CORDIC primitives and add two small fixed-point helpers (a Q2.14
+// divide and sqrt). Unlike the Phase 2 core they DO use 32-bit mul/div on the s32 intermediate
+// (so they emit __mulsi3/__divsi3 — this is no longer the "zero arithmetic libcall" payload),
+// but they stay BIT-EXACT host vs target: int32 has the same value semantics both legs, and the
+// integer sqrt is pure shift/compare. Domains are kept in Q2.14 range [-2, 2).
+// ============================================================================================
+
+// Q2.14 divide a/b = (a<<14)/b through an int32 intermediate (truncates toward zero, like C).
+static inline int16_t cordic16_q214_div(int16_t a, int16_t b) {
+  return (int16_t)(((int32_t)a << CORDIC16_FRAC) / (int32_t)b);
+}
+
+// Q2.14 sqrt of v >= 0: isqrt(v * ONE), pure bit-by-bit (no libcall). For v in [0, ONE] the
+// result is in [0, ONE]. Identical on host and target (integer shifts/compares only).
+static inline int16_t cordic16_q214_sqrt(int16_t v) {
+  if (v <= 0) return 0;
+  uint32_t r = (uint32_t)v << CORDIC16_FRAC;     // v * ONE, <= 2^28
+  uint32_t res = 0, bit = 1UL << 26;             // top even bit <= 2^28
+  while (bit > r) bit >>= 2;
+  while (bit) {
+    if (r >= res + bit) { r -= res + bit; res = (res >> 1) + bit; }
+    else                  res >>= 1;
+    bit >>= 2;
+  }
+  return (int16_t)res;
+}
+
+// tan(x) = sin(x)/cos(x). Domain |x| <= ~1.1 so |tan| < 2 (Q2.14 range) and cos stays > 0.
+static inline int16_t cordic16_tan(int16_t angle) {
+  int16_t s, c;
+  cordic16_sincos(angle, &s, &c);
+  return cordic16_q214_div(s, c);
+}
+
+// asin(x) = atan2(x, sqrt(1 - x^2)). Domain |x| <= ~0.98 (sqrt arg > 0); result in (-pi/2, pi/2).
+static inline int16_t cordic16_asin(int16_t x) {
+  int16_t x2 = (int16_t)(((int32_t)x * (int32_t)x) >> CORDIC16_FRAC);
+  int16_t c  = cordic16_q214_sqrt((int16_t)(CORDIC16_ONE - x2));
+  return cordic16_atan2(x, c);
+}
+
+// acos(x) = atan2(sqrt(1 - x^2), x). Domain x in (0, 1] (right half-plane); result in [0, pi/2).
+static inline int16_t cordic16_acos(int16_t x) {
+  int16_t x2 = (int16_t)(((int32_t)x * (int32_t)x) >> CORDIC16_FRAC);
+  int16_t s  = cordic16_q214_sqrt((int16_t)(CORDIC16_ONE - x2));
+  return cordic16_atan2(s, x);
+}
+
+// One HYPERBOLIC-mode microrotation at schedule position p with shift sh (x' = x + d*(y>>sh),
+// y' = y + d*(x>>sh), z' = z - d*atanh; d = sign(z)). p indexes cordic16_atanh_tbl; the
+// (p, sh) pairs ARE the cordic16_hsched schedule, hardcoded here so the shifts stay constant.
+#define CORDIC16_HROT(p, sh)                                  \
+  do {                                                        \
+    int16_t dx = (int16_t)(x >> (sh));                        \
+    int16_t dy = (int16_t)(y >> (sh));                        \
+    if (z >= 0) { x = (int16_t)(x + dy); y = (int16_t)(y + dx); z = (int16_t)(z - cordic16_atanh_tbl[p]); } \
+    else        { x = (int16_t)(x - dy); y = (int16_t)(y - dx); z = (int16_t)(z + cordic16_atanh_tbl[p]); } \
+  } while (0)
+
+// sinh AND cosh of a Q2.14 angle in [-1, 1]. Seed x0 = ONE (NOT 1/An_h) so the fast-growing cosh
+// stays inside int16; the raw outputs are An_h*cosh / An_h*sinh, gain-corrected by *HGAIN at the
+// end. (Schedule positions 0..15 with the i=4 and i=13 repeats — matches cordic16_hsched.)
+static inline void cordic16_sinhcosh(int16_t angle, int16_t *sinh_out, int16_t *cosh_out) {
+  int16_t x = CORDIC16_ONE;
+  int16_t y = 0;
+  int16_t z = angle;
+  CORDIC16_HROT(0, 1);  CORDIC16_HROT(1, 2);  CORDIC16_HROT(2, 3);  CORDIC16_HROT(3, 4);
+  CORDIC16_HROT(4, 4);  CORDIC16_HROT(5, 5);  CORDIC16_HROT(6, 6);  CORDIC16_HROT(7, 7);
+  CORDIC16_HROT(8, 8);  CORDIC16_HROT(9, 9);  CORDIC16_HROT(10, 10); CORDIC16_HROT(11, 11);
+  CORDIC16_HROT(12, 12); CORDIC16_HROT(13, 13); CORDIC16_HROT(14, 13); CORDIC16_HROT(15, 14);
+  *cosh_out = (int16_t)(((int32_t)x * CORDIC16_HGAIN) >> CORDIC16_FRAC);
+  *sinh_out = (int16_t)(((int32_t)y * CORDIC16_HGAIN) >> CORDIC16_FRAC);
+}
+
+static inline int16_t cordic16_sinh(int16_t angle) {
+  int16_t s, c;
+  cordic16_sinhcosh(angle, &s, &c);
+  return s;
+}
+static inline int16_t cordic16_cosh(int16_t angle) {
+  int16_t s, c;
+  cordic16_sinhcosh(angle, &s, &c);
+  return c;
+}
+
+// tanh(x) = sinh/cosh = y/x BEFORE gain correction (the An_h gain cancels). Domain |x| <= 1.
+static inline int16_t cordic16_tanh(int16_t angle) {
+  int16_t x = CORDIC16_ONE;
+  int16_t y = 0;
+  int16_t z = angle;
+  CORDIC16_HROT(0, 1);  CORDIC16_HROT(1, 2);  CORDIC16_HROT(2, 3);  CORDIC16_HROT(3, 4);
+  CORDIC16_HROT(4, 4);  CORDIC16_HROT(5, 5);  CORDIC16_HROT(6, 6);  CORDIC16_HROT(7, 7);
+  CORDIC16_HROT(8, 8);  CORDIC16_HROT(9, 9);  CORDIC16_HROT(10, 10); CORDIC16_HROT(11, 11);
+  CORDIC16_HROT(12, 12); CORDIC16_HROT(13, 13); CORDIC16_HROT(14, 13); CORDIC16_HROT(15, 14);
+  return cordic16_q214_div(y, x);
+}
+
 #endif // CORDIC16_H
