@@ -11,6 +11,11 @@ dead-end appendices — is [`65816-patch-series-review-guide.md`](65816-patch-se
 [LLVM primer](llvm-primer-for-65816-review.md) for readers new to LLVM). It is the "how to review this" map;
 this file remains the "how to build/test/navigate it" mechanics.
 
+**Need the 65816 ISA itself** (registers, addressing modes, opcode matrix, cycle counts, native/emulation
+mode, `rep`/`sep`, `M`/`X` semantics)? [`65816-references.md`](65816-references.md) collects the canonical,
+freely-linkable sources — WDC's current W65C816S datasheet first — and records the **link-don't-vendor**
+licensing rule (datasheets are third-party copyrighted; the release tarball stays Apache-2.0/LLVM clean).
+
 ## Active worktrees (2026-06-25)
 
 | Branch | Worktree | Task | Status |
