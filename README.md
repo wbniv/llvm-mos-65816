@@ -41,6 +41,37 @@ fuzz. CI green. **In progress:** s32 (`long`/`int32_t`) support; XY16 (`+mos-xy1
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the full plan and
 [docs/INVESTIGATION.md](docs/INVESTIGATION.md) for upstream status and contribution rationale.
 
+## Downloads
+
+Prebuilt, relocatable toolchain packages (clang + lld + the SNES SDK, merged into one prefix).
+These are **interim preview** builds, published while the #320/#321 codegen patches are upstreamed —
+once they land, upstream llvm-mos's own release CI emits every platform and these retire. Only the host
+binaries differ per platform; the 65816 target output is identical (a cross-built clang is the *same*
+compiler — its ROM bytes are verified byte-identical to the native build's).
+
+| Host platform | Package | How to get it |
+|---|---|---|
+| **Linux x86‑64** | `.tar.xz` / `.deb` | published: [apt.indri.studio](https://apt.indri.studio) · [product page](https://indri.studio/apps/llvm-mos-65816/) |
+| **Linux arm64** (aarch64) | `.tar.xz` | interim — `task cross-build PLATFORM=linux-arm64` then `PLATFORM=linux-arm64 dev/package-release.sh` |
+| **Windows x86‑64** | `.zip` | interim — `task cross-build PLATFORM=windows-x86_64` then `PLATFORM=windows-x86_64 dev/package-release.sh` |
+| macOS arm64 | — | deferred (needs an Apple-licensed macOS SDK + a real Mac to verify) |
+
+`task package-all` builds all three at once (assumes the cross toolchains are built). Each package is
+relocatable — unpack anywhere, keep `bin/` and `mos-platform/` siblings — and compiles a SNES ROM with:
+
+```sh
+bin/mos-clang --config bin/mos-snes.cfg -mcpu=mosw65816 -Os -o hello.sfc hello.c
+#   ... add  -Xclang -target-feature -Xclang +mos-a16  to opt into 16-bit-accumulator codegen
+```
+
+> **Windows note.** The cross-built `clang.exe` is byte-identical-codegen to the Linux builds by
+> construction, but **wine cannot run it** (it faults in core codegen — a wine limitation, not a binary
+> defect), so the functional check is **deferred to real Windows**: before relying on the `.zip`, run the
+> command above (`mos-clang.exe --config bin\mos-snes.cfg …`) on a Windows box and confirm a warning-free
+> ROM. The per-platform convenience drivers (`mos-snes-clang.exe`) aren't shipped — use
+> `mos-clang.exe --config bin\<platform>.cfg`; for C++ add `--driver-mode=g++`. Keep the bundled `*.dll`
+> next to the `.exe`.
+
 ## Layout
 
 ```
