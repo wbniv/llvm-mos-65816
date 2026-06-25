@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# dev/regen-patch-0009.sh — regenerate patches/llvm-mos/0009-321-a16-pressure-incdec.patch
+# from the live (directly-edited) vendor/llvm-mos tree.
+#
+# What 0009 is: the #321 +mos-a16 register-pressure fix. Under +mos-a16,
+# MOSInstructionSelector::selectAddSub lowers a SMALL-constant 8-bit add/sub (|Amt| <= 2)
+# to a relocatable G_INC/G_DEC chain (selected via selectIncDecMB -> IncMB/DecMB on the
+# Anyi8 class = A/X/Y/zp) instead of the A-pinned `add Ac,imm -> ADCImm` selImpl pattern.
+# This de-pins a strength-reduced i8 array byte index (stepped `i += 2`) from the singleton
+# Ac={A}, so it coalesces into the X index and frees the 16-bit accumulator A16 — dissolving
+# the greedy RA deadlock that aborted "ran out of registers" on a u16 accumulator held
+# across a second loop (examples/65816/a16regpress.c, reduced from corpus globals.c). Gated
+# on hasAccum16() so DEFAULT 8-bit codegen is byte-identical. It touches only
+# MOSInstructionSelector.cpp; 0002 also edits that file, so 0009 is a clean STACKED patch
+# (the 0002 regen baseline omits 0004-0008, so folding this into 0002 would absorb their
+# MOS-dir hunks — a separate 0009 avoids that).
+#
+# 0009 = (live) - (pristine + 0001 + 0002 + 0003 + 0004 + 0005 + 0006 + 0007 + 0008),
+# restricted to the single file it touches. Runs on the HOST (needs git + diff; no container).
+# See docs/plans/2026-06-24-321-a16-pressure-fix-implementation.md.
+set -euo pipefail
+
+usage() { echo "Usage: dev/regen-patch-0009.sh   # regenerate + round-trip-verify patches/llvm-mos/0009-321-a16-pressure-incdec.patch"; exit 0; }
+[ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VENDOR="$ROOT/vendor/llvm-mos"
+PATCHES="$ROOT/patches/llvm-mos"
+P1="$PATCHES/0001-320-far-addrspace.patch"
+P2="$PATCHES/0002-321-accum16.patch"
+P3="$PATCHES/0003-late-opt-txy-dead-flag.patch"   # upstream-bound F4 fix; optional
+P4="$PATCHES/0004-320-far-cc.patch"
+P5="$PATCHES/0005-320-far-ptr-value-legalize.patch"
+P6="$PATCHES/0006-320-packed24.patch"
+P7="$PATCHES/0007-65816-near-abs-bank-relax.patch"
+P8="$PATCHES/0008-mos-dp-arg-cc.patch"
+P9="$PATCHES/0009-321-a16-pressure-incdec.patch"
+
+# The single file 0009 modifies. Diff'd individually so foreign WIP elsewhere never leaks in.
+PRESSURE_FILES=(
+  "llvm/lib/Target/MOS/MOSInstructionSelector.cpp"
+)
+
+[ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
+PRISTINE="$(git -C "$VENDOR" rev-parse HEAD)"
+echo "==> pristine vendor HEAD: $(git -C "$VENDOR" rev-parse --short HEAD)"
+
+WT=""
+cleanup() {
+  [ -n "$WT" ] && git -C "$VENDOR" worktree remove --force "$WT" 2>/dev/null || true
+  git -C "$VENDOR" worktree prune 2>/dev/null || true
+  [ -n "$WT" ] && rm -rf "$WT"
+}
+trap cleanup EXIT
+GIT_ID=(-c user.email=patchgen@local -c user.name=patchgen)
+mkwt() { WT="$(mktemp -d)"; git -C "$VENDOR" worktree add --detach "$WT" "$PRISTINE" >/dev/null; }
+rmwt() { git -C "$VENDOR" worktree remove --force "$WT" 2>/dev/null || true; rm -rf "$WT"; WT=""; }
+
+echo "==> [gen] baseline = pristine + 0001 + 0002 (+0003) + 0004 + 0005 + 0006 + 0007 + 0008; overlay live; diff"
+mkwt
+git -C "$WT" apply "$P1"
+git -C "$WT" apply "$P2"
+[ -f "$P3" ] && git -C "$WT" apply "$P3"
+git -C "$WT" apply "$P4"
+git -C "$WT" apply "$P5"
+git -C "$WT" apply "$P6"
+git -C "$WT" apply "$P7"
+git -C "$WT" apply "$P8"
+git -C "$WT" add -A
+git "${GIT_ID[@]}" -C "$WT" commit -q -m "stack baseline (0001-0008)"
+for f in "${PRESSURE_FILES[@]}"; do cp "$VENDOR/$f" "$WT/$f"; done
+git -C "$WT" diff > "$P9"
+echo "    wrote $P9 ($(wc -l < "$P9") lines, $(grep -c '^diff --git' "$P9") files)"
+rmwt
+
+echo "==> [verify] pristine + 0001..0009 reproduces the live $PRESSURE_FILES exactly"
+mkwt
+git -C "$WT" apply "$P1" "$P2"
+[ -f "$P3" ] && git -C "$WT" apply "$P3"
+git -C "$WT" apply "$P4" "$P5" "$P6" "$P7" "$P8" "$P9"
+rc=0
+for f in "${PRESSURE_FILES[@]}"; do
+  if ! diff -q "$WT/$f" "$VENDOR/$f" >/dev/null 2>&1; then
+    echo "  MISMATCH $f"; rc=1
+  fi
+done
+rmwt
+if [ $rc -eq 0 ]; then
+  echo "RESULT: PASS — 0009 round-trips (0001..0009 reproduces MOSInstructionSelector.cpp)"
+else
+  echo "RESULT: FAIL — round-trip mismatch"; exit 1
+fi

@@ -3,10 +3,12 @@
 #
 # For each examples/snes/corpus/*.c whose result symbol is corpus_result, assert
 #   host(expected) == default@MAME == +mos-a16@MAME == +mos-xy16@MAME == +mos-a16@bsnes-jg
-# via the shared differential engine (tools/a16_fuzz.py check). globals.c -> auto-XFAIL
-# (regalloc-out-of-registers, a known +mos-a16 -Os crash) with NO special-casing here —
-# the engine classifies it via KNOWN_ISSUES and prints "known issue [...]". Closes the
-# "corpus only ever built default 8-bit" gap (the gap that hid the globals.c crash).
+# via the shared differential engine (tools/a16_fuzz.py check). globals.c used to auto-XFAIL
+# (regalloc-out-of-registers, a +mos-a16 -Os RA crash) with NO special-casing here, via the
+# engine's KNOWN_ISSUES classifier. That signature was FIXED 2026-06-24 by fork patch 0009
+# (the i8 small-const inc/dec relocation) and its KNOWN_ISSUES entry removed, so globals.c now
+# compiles + runs clean and is asserted as a positive differential gate like the rest. Closes
+# the "corpus only ever built default 8-bit" gap (the gap that hid the globals.c crash).
 # Prints a table + "N/N passed, X xfail"; exits nonzero if any program FAILs. Runs INSIDE
 # the dev container; drive from host: dev/run.sh corpus-a16. Build first (toolchain + build).
 set -euo pipefail

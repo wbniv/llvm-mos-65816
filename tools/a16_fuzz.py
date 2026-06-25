@@ -968,15 +968,12 @@ def run_bsnes(rom, off, length, want):
 # StackSlot); its signature now hard-FAILS again so a regression cannot silently XFAIL.
 # See docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md.)
 KNOWN_ISSUES = [
-    # regalloc-out-of-registers: +mos-a16 at -O1/-Os exhausts the register allocator on a
-    # function holding a u16 accumulator live across a second loop alongside u16*u8 multiplies
-    # ("ran out of registers during register allocation"). DEFAULT 8-bit and +mos-a16 -O0
-    # compile clean. Deterministic repro: examples/65816/a16regpress.c (delta-debugged from
-    # the corpus program globals.c, built default 8-bit so never exercised under +mos-a16).
-    # Fix is in the F3 / soft-stack spill-coverage family (allocator / spill path), deferred —
-    # see TODO.md. REMOVE this entry when fixed so the signature hard-FAILS again (regression guard).
-    ("regalloc-out-of-registers",
-     lambda log: "ran out of registers during register allocation" in log),
+    # (regalloc-out-of-registers — +mos-a16 -O1/-Os "ran out of registers" on a u16 accumulator
+    # held live across a second loop alongside u16*u8 multiplies (repro globals.c / a16regpress.c)
+    # — was FIXED 2026-06-24 by fork patch 0009 (i8 small-const add/sub -> relocatable INC/DEC, so
+    # the strength-reduced byte index lives in X and frees A16). Its KNOWN_ISSUES entry +
+    # KNOWN_ISSUE_REPROS row are removed so a recurrence hard-FAILS again; globals.c is now a
+    # positive corpus gate. See docs/plans/2026-06-24-321-a16-pressure-fix-implementation.md.)
     # scavenger-p-not-gpr: +mos-a16 at -O1/-Os crashes the register scavenger.
     # MOSRegisterInfo::saveScavengerRegister assumes N/Z are dead at every
     # scavenging point ("NZ cannot be live ... virtual registers are never
@@ -996,7 +993,7 @@ KNOWN_ISSUES = [
     # many Imag16 zero-page pairs that the .zp section grows past 256 bytes, so an 8-bit
     # zero-page relocation can no longer reach it -> link error "relocation R_MOS_ADDR8 out of
     # range: N ... references section '.zp...'". DEFAULT 8-bit and +mos-a16 -O0 link clean — the
-    # SAME -O1/-Os register-pressure root cause as regalloc-out-of-registers, a different symptom
+    # SAME -O1/-Os register-pressure root cause as the now-fixed regalloc-out-of-registers, a different symptom
     # (link-time ZP overflow vs an RA-time crash). Surfaced by the c-torture gate (pr15296.c).
     # Classified here so torture_run XFAILs it (the fuzzer never feeds link errors to
     # classify_known, so its behavior is unchanged). The fix is the same deferred Phase-3 Ac16/
@@ -1029,7 +1026,6 @@ def classify_known(log):
 # (a16-zp-pressure-overflow is intentionally absent: its repro is a gitignored c-torture file and
 # a LINK error, not a verify crash — so it can't be a verify-only guard row.)
 KNOWN_ISSUE_REPROS = [
-    ("examples/65816/a16regpress.c", "regalloc-out-of-registers"),
     ("examples/65816/a16scavnz.c",   "scavenger-p-not-gpr"),
 ]
 
