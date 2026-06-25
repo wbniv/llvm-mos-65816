@@ -268,7 +268,55 @@ polymorphic dispatch that "looks right" isn't verified until the bytes agree.
 
 ---
 
-## 7. References
+## 7. The addressing modes that make this cheap — a note on the design
+
+Everything above leans on the same handful of addressing modes, and it's worth
+saying why they're there. The 6502 is famously **register-poor** — one 8-bit
+accumulator, two 8-bit index registers, an 8-bit stack pointer nailed to page 1
+— and the usual conclusion is that it's a poor target for compiled, high-level,
+or object-oriented code. That misreads the design: the richness lives in the
+**addressing modes**, not the register file, and those modes map almost
+one-to-one onto the shapes this document is built from (pointers, arrays,
+structs, vtables, call frames).
+
+| addressing mode | what it does | the HLL / OOP construct it serves |
+|---|---|---|
+| **zero page** `dp` | one-byte address into page 0 | the compiler's *register file* — llvm-mos parks its imaginary registers (`__rc*`) here; this answers "too few registers" |
+| **`(dp),Y`** — indirect indexed | `*(ptr + Y)`, pointer held in ZP | **`ptr->field`** in one instruction (member offset in Y); also `*ptr` and byte-array `p[i]` — the workhorse mode for compiled code |
+| **`(dp,X)`** — indexed indirect | pick the X-th pointer from a ZP table, then deref | arrays of pointers, callback tables |
+| **`abs,X` / `abs,Y`** | base + index | indexing a global / `static` array |
+| **`JSR (abs,X)`** *(65C816)* | call through an X-indexed table of code addresses | a **hardware vtable** / selector dispatch — §3(a): one instruction, no per-object storage |
+| **`sr,S` / `(sr,S),Y`** *(65816)* | stack-pointer-relative | C call frames — locals and arguments, recursion, re-entrancy |
+| **relocatable Direct Page** `D` *(65816)* | a movable "zero page" | a per-task / per-call register window (`tsc; phd; tcd`) — re-entrant code, multitasking |
+| **`[dp]` / `[dp],Y`** *(65816)* | 24-bit long indirect | far pointers and far methods across banks (§3, §5) |
+
+Two things stand out. First, **zero page is really a 256-byte register file** —
+which is exactly how a modern optimizer treats it, so the register-poverty
+critique is answered by the memory model rather than the register count. Second,
+the indexed-indirect family — `JSR (abs,X)` in particular — puts method dispatch
+*in the instruction set*: a vtable call, in one instruction, decades before
+vtables were fashionable.
+
+And the sharpest case is **struct-field access**: a struct pointer in zero page,
+the member's offset in Y, and `ptr->field` is a single `lda (ptr),Y` — exactly
+the `s->vt` load measured in §4. Arrays of multi-byte elements need the index
+scaled first, so for anything wider than a byte `ptr->field` is the cleaner fit
+than `p[i]`.
+
+The original 6502 already shipped 13 addressing modes in a $25 1975 part, when
+rival CPUs cost an order of magnitude more — richer addressing than its
+contemporaries, at a fraction of the price. The 65816 then added precisely the
+modes that compiled and re-entrant code had been missing — stack-relative
+frames, a relocatable direct page, and 24-bit long-indirect pointers — which is
+why the WDC816CC / ORCA-C frame ABI (see
+[the prior-art note](../320-321-65816-c-abi-prior-art.md)) and llvm-mos's own
+lowering land where they do. In hindsight the '816 reads like an architecture
+waiting for the optimizing compiler its addressing modes were designed to
+reward.
+
+---
+
+## 8. References
 - This repo: the measured lowering above (`build/llvm-mos-install/bin/mos-clang --target=mos
   -mcpu=mosw65816 -Os -S` on a vtable call); the rendering handoff
   [`docs/handoffs/2026-06-24-snes-graphics-rendering.md`](../handoffs/2026-06-24-snes-graphics-rendering.md).
