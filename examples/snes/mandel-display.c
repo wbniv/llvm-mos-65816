@@ -83,6 +83,15 @@ static void upload_scaled(const uint8_t *src, uint8_t sw, uint8_t sh) {
   }
 }
 
+// Write tilemap rows [r0,r1) at 1:1 (the 32x28 image maps directly onto the 32-wide map),
+// leaving every other row untouched. The final pass uses this to overwrite the coarse
+// 16x14 preview band-by-band, so the picture sharpens top-down as it computes instead of
+// holding one coarse frame then snapping to the finished image.
+static void upload_rows(const uint8_t *src, uint8_t r0, uint8_t r1) {
+  snes_vram_addr((uint16_t)(MAP_BASE + (uint16_t)r0 * 32));
+  for (uint16_t k = (uint16_t)r0 * DW; k < (uint16_t)r1 * DW; k++) vram_w((uint16_t)src[k]);
+}
+
 int main(void) {
   snes_ppu_reset_blank();                       // force-blank + zero PPU control regs
                                                  //  (kills bsnes power-up nondeterminism)
@@ -100,16 +109,22 @@ int main(void) {
   REG_TM      = TM_BG1;                          // main screen = BG1 only (TS/colour-math
                                                  //  already zeroed by snes_ppu_reset_blank)
 
-  // Progressive coarse->fine render. The beefy on-SNES compute fills the whole 32x28 buffer
-  // slowly, so instead of force-blanking until it finishes (~seconds of black), render at
-  // 4x4, reveal, then 8x7, 16x14, and finally the real 32x28 — a recognizable image lands in
-  // <0.1 s and sharpens. Each pass recomputes a finer grid of the SAME window (mandel_fill
-  // derives its steps from w/h, so every grid samples the identical region) and rewrites the
-  // tilemap; the force-blank around passes 2+ is sub-frame. Grids divide 32x28 cleanly.
+  // Progressive coarse->fine render so the screen shows useful detail throughout the slow
+  // on-SNES compute instead of force-blanking until it finishes (~seconds of black).
   //
-  // FIDELITY: passes 1-3 touch only `pre`/the tilemap. `fb` is filled exactly ONCE, by the
-  // final canonical mandel_fill(fb, DW, DH, DN) below, so corpus_result == the gate CRC
-  // (0x9103) by construction — progressive drawing changes only WHEN pixels appear.
+  // Phase 1 — whole-image coarse passes (4x4 -> 8x7 -> 16x14): each recomputes a finer grid
+  // of the SAME window (mandel_fill derives its steps from w/h, so every grid samples the
+  // identical region) and rewrites the full tilemap. A recognizable image lands in <0.1 s.
+  //
+  // Phase 2 — the canonical 32x28, computed and revealed BAND rows at a time, overwriting the
+  // 16x14 preview top-down. Because ~3/4 of the total compute is this final pass, revealing it
+  // incrementally is what keeps the picture visibly refining the whole time rather than sitting
+  // on a coarse frame and then snapping to the finished one.
+  //
+  // FIDELITY: phase-1 passes touch only `pre`/the tilemap. `fb` is filled exactly ONCE, by the
+  // phase-2 loop below, with the SAME window math + kernel as mandel_fill(fb, DW, DH, DN) — so
+  // corpus_result == the gate CRC (0x9103) by construction; progressive drawing only changes
+  // WHEN pixels appear.
 
   mandel_fill(pre, 4, 4, DN);                   // pass 1: 16 cells, the fast first paint
   upload_scaled(pre, 4, 4);
@@ -121,9 +136,26 @@ int main(void) {
   mandel_fill(pre, 16, 14, DN);                 // pass 3: 224 cells
   REG_INIDISP = INIDISP_FORCE_BLANK; upload_scaled(pre, 16, 14); REG_INIDISP = INIDISP_ON;
 
-  mandel_fill(fb, DW, DH, DN);                  // pass 4: the canonical buffer (same kernel as the gate)
+  // Phase 2: canonical 32x28, revealed top-down in BAND-row strips. The per-cell window math
+  // matches mandel_fill exactly (dre/dim derived from DW/DH, cr/ci stepped from RE0/IM0, the
+  // same mandel_cell), so fb is byte-identical to mandel_fill(fb, DW, DH, DN) -> CRC 0x9103.
+  {
+    const uint8_t BAND = 4;                      // rows per reveal: 7 strips sweep down the screen
+    int16_t dre = (int16_t)(MANDEL_REW / DW);
+    int16_t dim = (int16_t)(MANDEL_IMW / DH);
+    for (uint8_t j0 = 0; j0 < DH; j0 = (uint8_t)(j0 + BAND)) {
+      uint8_t j1 = (uint8_t)(j0 + BAND); if (j1 > DH) j1 = DH;
+      for (uint8_t j = j0; j < j1; j++) {
+        int16_t ci = (int16_t)(MANDEL_IM0 + (int16_t)j * dim);
+        for (uint8_t i = 0; i < DW; i++) {
+          int16_t cr = (int16_t)(MANDEL_RE0 + (int16_t)i * dre);
+          fb[(uint16_t)j * DW + i] = mandel_cell(cr, ci, DN);
+        }
+      }
+      REG_INIDISP = INIDISP_FORCE_BLANK; upload_rows(fb, j0, j1); REG_INIDISP = INIDISP_ON;
+    }
+  }
   corpus_result = mandel_crc(fb, (uint16_t)(DW * DH));
-  REG_INIDISP = INIDISP_FORCE_BLANK; upload_scaled(fb, DW, DH);  REG_INIDISP = INIDISP_ON;
 
   for (;;) {}
 }
