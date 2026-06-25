@@ -1,0 +1,180 @@
+commit c2eaf61e720241365cde9e7031d39e7f970a461e
+Author: Will Norris <will@biohack.net>
+Date:   Sat Jun 20 06:44:35 2026 +0700
+
+    #321 frame-ABI P0: add off-by-default +mos-dp-frame / +mos-sr-frame features + frameStrategy() plumbing
+    
+    P0 of the frame-ABI head-to-head study (docs/plans/2026-06-20-321-frame-abi-
+    build-all-three-and-measure.md). Establish the selection plumbing so later
+    phases (A1+ DP-window, B stack-relative) and the measurement harness can pick a
+    frame strategy, WITHOUT touching the shipping soft-static path:
+    
+      - MOSFeatures.td: FeatureDPFrame (+mos-dp-frame), FeatureSRFrame (+mos-sr-frame),
+        both OFF by default and NOT in any Family => default codegen unaffected.
+      - MOSSubtarget.h: hasDPFrame()/hasSRFrame() getters, the HasDPFrame/HasSRFrame
+        members, and a FrameStrategy {SoftStatic,DPWindow,StackRelative} tri-state
+        frameStrategy() query (DP wins if both set; default SoftStatic).
+    
+    The branch-point switches (emitPrologue/emitEpilogue/eliminateFrameIndex) are
+    DEFERRED to A1/B where they carry real logic — empty fall-through switches in
+    hot functions are pure risk for zero functional value at this step.
+    
+    Captured in the worktree branch's 0002 (frame-abi delta merges to main's 0002
+    only at GO; round-trips PASS, 22 files). New dev/frameabi-byte-identical.sh is
+    the P0 guardrail.
+    
+    Verification (host-side, worktree toolchain rebuilt 06:40):
+      - BYTE-IDENTICAL gate: corpus+kernels default + a16 disasm unchanged across the
+        feature addition (24/24 entries identical).
+      - +mos-dp-frame / +mos-sr-frame recognized (no unknown-feature warnings),
+        present in generated MOSGenSubtargetInfo.inc, and INERT (output == default).
+      - dev/run.sh corpus 7/7 still PASS.
+    
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+diff --git a/dev/frameabi-byte-identical.sh b/dev/frameabi-byte-identical.sh
+new file mode 100755
+index 0000000..64e2b2b
+--- /dev/null
++++ b/dev/frameabi-byte-identical.sh
+@@ -0,0 +1,46 @@
++#!/usr/bin/env bash
++# dev/frameabi-byte-identical.sh — P0 guardrail for the frame-ABI study
++# (docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
++#
++# Compile the corpus + kernels host-side at -Os in DEFAULT (8-bit) and +mos-a16,
++# and print a sha256 manifest of each object's disassembly. Run BEFORE and AFTER a
++# compiler change (e.g. adding the off-by-default +mos-dp-frame/+mos-sr-frame
++# features) and diff — identical manifests prove the change did NOT perturb the
++# default / +mos-a16 codegen that ships:
++#
++#   dev/frameabi-byte-identical.sh > /tmp/before.txt    # pre-change toolchain
++#   ... edit vendor/ + dev/run.sh toolchain ...
++#   dev/frameabi-byte-identical.sh > /tmp/after.txt     # post-change toolchain
++#   diff /tmp/before.txt /tmp/after.txt && echo BYTE-IDENTICAL
++#
++# Host-side (no Docker): the container-built mos-clang runs on the host. Override
++# CLANG/OBJDUMP to point at a different install.
++set -euo pipefail
++
++if [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ]; then
++  echo "Usage: dev/frameabi-byte-identical.sh   # sha256 disasm manifest of corpus+kernels (default + a16)"
++  exit 0
++fi
++
++ROOT="$(cd "$(dirname "$0")/.." && pwd)"
++T="$ROOT/build/llvm-mos-install/bin"
++CLANG="${CLANG:-$T/mos-clang}"
++OBJDUMP="${OBJDUMP:-$T/llvm-objdump}"
++[ -x "$CLANG" ] || { echo "FATAL: no from-source toolchain at $CLANG (run: dev/run.sh toolchain)" >&2; exit 1; }
++
++tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
++
++srcs="$( { ls "$ROOT"/examples/snes/corpus/*.c "$ROOT"/examples/65816/k_*.c; } 2>/dev/null | sort || true )"
++for src in $srcs; do
++  name="$(basename "$src")"
++  for variant in default a16; do
++    flags=(-Os)
++    [ "$variant" = a16 ] && flags+=(-Xclang -target-feature -Xclang +mos-a16)
++    if "$CLANG" --target=mos -mcpu=mosw65816 "${flags[@]}" -c -o "$tmp/o.o" "$src" 2>"$tmp/err"; then
++      h="$("$OBJDUMP" -d --mcpu=mosw65816 "$tmp/o.o" | tail -n +3 | sha256sum | cut -d' ' -f1)"
++      printf '%-8s %-14s %s\n' "$variant" "$name" "$h"
++    else
++      printf '%-8s %-14s COMPILE-FAIL\n' "$variant" "$name"
++    fi
++  done
++done
+diff --git a/patches/llvm-mos/0002-321-accum16.patch b/patches/llvm-mos/0002-321-accum16.patch
+index be3ea3d..4e36ec6 100644
+--- a/patches/llvm-mos/0002-321-accum16.patch
++++ b/patches/llvm-mos/0002-321-accum16.patch
+@@ -67,10 +67,10 @@ index bff8495ed611..087920a7beae 100644
+                                      BuildFnTy &MatchInfo) const {
+    auto LHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
+ diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
+-index 76d7409c1f1b..733ef7097a4d 100644
++index 76d7409c1f1b..581ddde330ce 100644
+ --- a/llvm/lib/Target/MOS/MOSFeatures.td
+ +++ b/llvm/lib/Target/MOS/MOSFeatures.td
+-@@ -19,3 +19,19 @@ def FeatureStaticStack :
++@@ -19,3 +19,39 @@ def FeatureStaticStack :
+    SubtargetFeature<
+      "static-stack", "StaticStack", "true",
+      "Whether to use statically-allocated stack frames if possible.">;
+@@ -90,6 +90,26 @@ index 76d7409c1f1b..733ef7097a4d 100644
+ +    "mos-xy16", "HasIndex16", "true",
+ +    "16-bit index register mode (insert REP/SEP X) on the WDC 65816.",
+ +    [FeatureAccum16]>;
+++
+++// #321 frame-ABI study: opt-in alternative stack-frame strategies for the WDC
+++// 65816, compared head-to-head against the default soft static stack
+++// (docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md). Each is
+++// OFF by default and NOT implied by FamilyW65816, so default codegen is
+++// unaffected; they are mutually exclusive (DP-window wins if both are set —
+++// see MOSSubtarget::frameStrategy()). The implementations land in later phases;
+++// the features exist first so the measurement harness can select a strategy.
+++//   (a) TCD direct-page window: tsc;[sbc;tcs;]phd;tcd prologue, pld epilogue,
+++//       locals via 8-bit DP-offset addressing (256 B cap, soft-stack fallback).
+++def FeatureDPFrame :
+++  SubtargetFeature<
+++    "mos-dp-frame", "HasDPFrame", "true",
+++    "TCD direct-page-window stack frame for locals on the WDC 65816.">;
+++
+++//   (b) Pure hardware-stack-relative: locals via (offset,S) / (offset,S),Y.
+++def FeatureSRFrame :
+++  SubtargetFeature<
+++    "mos-sr-frame", "HasSRFrame", "true",
+++    "Hardware-stack-relative (offset,S) stack frame for locals on the WDC 65816.">;
+ diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
+ new file mode 100644
+ index 000000000000..1dfeba0f28ca
+@@ -4205,10 +4225,10 @@ index 94e229944885..2df125248bb1 100644
+  def AImag8 : MOSReg8Class<(add Imag8, A)>;
+  let isPressureFineGrained = true in {
+ diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
+-index 6d303255c67f..bc43100cd577 100644
++index 6d303255c67f..5bfa6cfe7913 100644
+ --- a/llvm/lib/Target/MOS/MOSSubtarget.h
+ +++ b/llvm/lib/Target/MOS/MOSSubtarget.h
+-@@ -115,6 +115,12 @@ public:
++@@ -115,6 +115,27 @@ public:
+    bool hasJMPIdxIndir() const { return has65C02() || hasSPC700(); }
+    bool staticStack() const { return StaticStack; }
+  
+@@ -4217,16 +4237,35 @@ index 6d303255c67f..bc43100cd577 100644
+ +
+ +  // #321 xy16: opt-in 16-bit index register mode (REP/SEP-bracketed 16-bit-X/Y).
+ +  bool hasIndex16() const { return HasIndex16; }
+++
+++  // #321 frame-ABI study: opt-in alternative stack-frame strategies (both OFF by
+++  // default => SoftStatic, the shipping soft static stack). Mutually exclusive;
+++  // DP-window wins if both are somehow set. Implementations land in later phases.
+++  // docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md
+++  bool hasDPFrame() const { return HasDPFrame; }
+++  bool hasSRFrame() const { return HasSRFrame; }
+++  enum class FrameStrategy { SoftStatic, DPWindow, StackRelative };
+++  FrameStrategy frameStrategy() const {
+++    if (HasDPFrame)
+++      return FrameStrategy::DPWindow;
+++    if (HasSRFrame)
+++      return FrameStrategy::StackRelative;
+++    return FrameStrategy::SoftStatic;
+++  }
+ +
+    bool hasW65816Or65EL02() const { return HasW65816Insns || Has65EL02Insns; }
+  
+  private:
+-@@ -140,6 +146,8 @@ private:
++@@ -140,6 +161,12 @@ private:
+  
+    bool LongRegisterNames = false;
+    bool StaticStack = false;
+ +  bool HasAccum16 = false;
+ +  bool HasIndex16 = false;
+++  // #321 frame-ABI study: set by ParseSubtargetFeatures from +mos-dp-frame /
+++  // +mos-sr-frame (MOSFeatures.td). Both false => default soft static stack.
+++  bool HasDPFrame = false;
+++  bool HasSRFrame = false;
+  
+    // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
+    // no variable, so we instead bind pseudo features to this variable.
