@@ -300,8 +300,8 @@ refreshed. Factored that refresh into **`dev/sync-platform.sh`** and call it fro
    cardioid + period-2 bulb resolved, blue exterior, green escape bands. Both assert image hash `0xF99C`.*
 5. **No regression** — `mandel-mode7` (refactored onto `mode7.h`), `k_mandel`, and `corpus` re-run green
    (see TODO entry). **PASS.**
-6. **Live human play** — `task mandel-mame ROM=mandel-interactive` boots instantly; D-pad pans, L/R zoom,
-   Y/A rotate, Select cycles palette, Start resets.
+6. **Live human play** — `task mandel-play` (builds the ROM if needed, then opens a MAME window) boots
+   instantly; D-pad pans, L/R zoom, Y/A rotate, Select cycles palette, Start resets.
 
 ## Findings
 

@@ -111,6 +111,18 @@ tasks:
       - dev/run.sh mandel-far
 
   mandel-interactive:
-    desc: "#321 M2: INTERACTIVE Mandelbrot — host-baked image DMA'd ROM->VRAM for an instant boot, then a Mode 7 joypad fly-around. Builds default + +mos-a16, asserts image hash==host + a scripted-input view-math differential, screenshots both emulators. Leaves build/mandel-interactive.sfc (then: task mandel-mame ROM=mandel-interactive)."
+    desc: "#321 M2: INTERACTIVE Mandelbrot — host-baked image DMA'd ROM->VRAM for an instant boot, then a Mode 7 joypad fly-around. Builds default + +mos-a16, asserts image hash==host + a scripted-input view-math differential, screenshots both emulators. Leaves build/mandel-interactive.sfc (then: task mandel-play)."
     cmds:
       - dev/run.sh mandel-interactive
+
+  mandel-play:
+    desc: "PLAY the interactive Mandelbrot in a MAME WINDOW on this host (builds the ROM first if needed). Controls: D-pad pan | L/R zoom | Y/A rotate | Select palette | Start reset."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/mandel-interactive.sfc ]; then
+          echo "==> build/mandel-interactive.sfc missing — building it (dev/run.sh mandel-interactive)…"
+          dev/run.sh mandel-interactive
+        fi
+      - task: mandel-mame
+        vars: { ROM: mandel-interactive }
