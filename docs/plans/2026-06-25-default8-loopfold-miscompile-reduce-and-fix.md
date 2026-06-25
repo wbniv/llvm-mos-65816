@@ -203,6 +203,30 @@ side. The remaining unknown is purely *why X is wrong at the load at runtime* de
 showing the offset induction as 0,2,4,6 — i.e. a runtime index/liveness corruption in core codegen, the
 exact frame/instruction of which a full dynamic instruction trace (#2) would pin.
 
+### Further grind (2026-06-25): localized to frame 0; mechanism = index threaded through the inner CRC loops
+- **Frame-0 divergence.** Sweeping the emulator frame count, the ROM's rolling `zoom_crc` diverges on the
+  **very first folded frame** (host `0x9F3D` vs ROM `0xCE8C` after frame 0, where `m={0x3E,0,0,0x3E}`).
+- **Not an in-bounds reindex.** A brute-force over index/byte-offset corruption models of the *correct*
+  in-bounds `m[]` bytes reproduces neither the frame-0 `0xCE8C` nor the full `0xE60E` — so the fold reads
+  bytes that aren't the in-bounds `m[]` values (an OOB/wrong effective address, or values not derivable
+  from `m[]` alone). Ground-truth from the transient ZP soft-stack frame (at ZP `0x6c`, 16 B) was too
+  timing-fuzzy to capture reliably via post-hoc WRAM reads.
+- **Specific to the fold's shape.** Replacing the *direct* `m_log[i]=m[i]` capture with an **indexed loop**
+  `for q<4: m_log[q]=m[q]` does **not** miscompile (values stay correct) — so it is **not** a generic
+  indexed-array-read bug. The trigger needs the fold's exact structure: the `m[i]` index carried across the
+  **two nested 8-iteration `zoom_crc16_byte` bit-loops that reuse `X`** (`ldx #8`). The index must survive
+  those inner loops; under this pressure it is corrupted, while the static save/restore slots `__rc5`
+  (offset) / `__rc6` (counter) read clean — a runtime register/ZP-slot corruption invisible to static
+  inspection and to every machine verifier.
+
+**Status of the pin.** The *mechanism* is now precise (the fold's `m[i]` index is corrupted across the
+inner CRC bit-loops that clobber `X`; standalone indexed reads are fine). The *exact instruction/pass*
+still requires either an **instruction-level dynamic trace** (MAME debugger breakpoint logging `X` at the
+fold load each frame) or the upstream maintainers' regalloc tooling. Black-box value forensics has reached
+its limit. **Recommended next:** (1) the **pristine no-`0002` build** to make the upstream determination
+definitive (the user's gate: "a patch for upstream *if it is in fact upstream*"); then (2) either the
+instruction trace or an upstream filing with this repro+characterization.
+
 ## Verification
 
 1. **Repro is live + fast.** `dev/loopfold-repro.sh loop` prints `ZOOM: FAIL … host=0xF56C rom=0xE60E`;

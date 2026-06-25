@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/554e5ec) | plan: loopfold dynamic m[] check — VALUES correct, the fold's X-indexed READ is the bug |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fb48fe7) | plan: loopfold pass-disable bisection (#1) exhausted — verifier-clean core-codegen miscompile |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/c4f904d) | plan: loopfold MIR dive (#1) — structure verified correct at every level -> dynamic liveness clobber |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/25fd083) | docs: loopfold root-cause narrowing + provisional UPSTREAM classification |
@@ -8,6 +9,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+554e5ec	author	Will Norris
+554e5ec	added	16
+554e5ec	deleted	0
+554e5ec	files	1
+554e5ec	body	Exposed m[] as a stable WRAM channel (volatile m_log[4]=m[i] each frame, direct access) and read\nit on bsnes for both forms (bug survives: loop 0xE60E, unroll 0xF56C):\n  loop   m_log = 0x0000000000400040\n  unroll m_log = 0x0000000000400040   (IDENTICAL)\nThe m[] values are byte-identical between the buggy loop and correct unroll forms -> zoom_matrix\ncomputes/stores m[] correctly. m_log reads m[] DIRECTLY; the fold reads it X-INDEXED. The fold\ndiverges while reading a correct array => the defect is the fold's X-indexed read of m[] returning\nthe wrong bytes at runtime (wrong X/index at the load), NOT a wrong m[] value. Dynamically confirms\nfinding #3 and rules out the value-computation/store side. Remaining: why X is wrong at the load at\nruntime despite the static offset induction being 0,2,4,6 -> a full instruction trace (#2) pins it.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fb48fe7	author	Will Norris
 fb48fe7	added	25
 fb48fe7	deleted	4
