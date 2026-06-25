@@ -48,6 +48,7 @@ else
 fi
 say()  { printf '%s\n' "$*"; }
 step() { printf '\n%s==> %s%s\n' "$c_bold" "$*" "$c_rst"; }
+ts()   { date -u +%Y-%m-%dT%H:%M:%SZ; }   # ISO 8601 UTC (SRC convention)
 
 # --- resolve the program ----------------------------------------------------
 case "$PROGRAM" in
@@ -57,6 +58,7 @@ case "$PROGRAM" in
 esac
 [ -f "$SRC" ] || { say "FATAL: fixture missing: $SRC"; exit 2; }
 say "${c_bold}clean-room release test${c_rst}  METHOD=$METHOD  PROGRAM=$PROGRAM  A16=$A16  FRAMES=$FRAMES"
+say "  started $(ts)  (host $(uname -m), $(nproc) CPU)"
 
 # --- C. sound-free assertion (cheap guard) ----------------------------------
 step "sound-free check (no APU / SPC700 / \$2140-\$2143)"
@@ -156,8 +158,11 @@ for b in "${builds[@]}"; do
   # SHOW the compilation: echo the exact command, run it capturing combined stdout+stderr, and
   # print that output (this is the "log showing the compilation"; the host runner tees it to a file).
   cmd=("$(basename "$CLANG")" "${extra[@]}" -Os -Wl,-Map="$(basename "$map")" -o "$(basename "$sfc")" "$SRC")
+  say "  ${c_dim}[$(ts)] compile${c_rst}"
   say "  ${c_dim}\$ ${cmd[*]}${c_rst}"
+  cc_t0=$(date +%s)
   set +e; "$CLANG" "${extra[@]}" -Os -Wl,-Map="$map" -o "$sfc" "$SRC" >"$cc" 2>&1; ccrc=$?; set -e
+  cc_dt=$(( $(date +%s) - cc_t0 ))
   if [ "$ccrc" -ne 0 ]; then
     say "  ${c_red}FAIL${c_rst}: compile error (exit $ccrc):"; sed 's/^/    | /' "$cc"; RESULT[$b]="FAIL(compile)"; rc=1; continue
   fi
@@ -170,14 +175,16 @@ for b in "${builds[@]}"; do
   if grep -qiE 'warning|error' "$cc"; then
     say "  ${c_red}FAIL${c_rst}: compile is NOT warning-clean (see output above)"; RESULT[$b]="FAIL(warning)"; rc=1; continue
   fi
-  say "  ${c_grn}compiled warning-clean${c_rst} -> $(basename "$sfc") ($(stat -c%s "$sfc") bytes)"
+  say "  ${c_grn}compiled warning-clean${c_rst} -> $(basename "$sfc") ($(stat -c%s "$sfc") bytes) [$(ts), ${cc_dt}s]"
   off=$(awk '$NF=="corpus_result"{print $1; exit}' "$map")
   [ -n "$off" ] || { say "  ${c_red}FAIL${c_rst}: corpus_result not in map"; RESULT[$b]="FAIL(nosym)"; rc=1; continue; }
   png=()
   [ "$ORACLE" = display ] && png=("$OUT/mandel-$b.png")
-  say "  bsnes-jg: boot + run $FRAMES frames, read corpus_result @ WRAM 0x$off vs $EXP"
+  say "  ${c_dim}[$(ts)] emulate${c_rst} — bsnes-jg: boot + run $FRAMES frames, read corpus_result @ WRAM 0x$off vs $EXP"
+  jg_t0=$(date +%s)
   if line="$("$RIG/jgxcheck" "$sfc" "$RIG/Database" "0x$off" 2 "$EXP" "$FRAMES" "${png[@]}" 2>"$WORK/$b.jg.err")"; then
-    say "  ${c_grn}$line${c_rst}"
+    jg_dt=$(( $(date +%s) - jg_t0 ))
+    say "  ${c_grn}$line${c_rst} [$(ts), ${jg_dt}s wall]"
     got=$(printf '%s' "$line" | grep -oE 'got=0x[0-9A-Fa-f]+' | cut -d= -f2)
     GOT[$b]="$got"; RESULT[$b]="PASS"
     # Screenshot is a REQUIRED deliverable for the display program — fail if absent.
@@ -213,6 +220,7 @@ for f in "$OUT"/*.png; do
   say "    - $(basename "$f")  ($(stat -c%s "$f") bytes, $tag)"
 done
 echo
+say "  finished $(ts)"
 if [ "$rc" -eq 0 ]; then
   say "${c_grn}${c_bold}RESULT: PASS${c_rst} — the published compiler builds a correct, bootable ROM (METHOD=$METHOD)"
 else

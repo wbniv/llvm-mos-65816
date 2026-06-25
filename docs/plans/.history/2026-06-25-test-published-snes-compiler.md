@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/2e580a0) | test(release): emit a compile log + SNES Mandelbrot screenshot as required outputs |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a9d3e9e) | test(release): clean-room verify the PUBLISHED SNES compiler, wired into the publish gate |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a295256) | docs(plan): clean-room test of the published SNES compiler |
 
 <!--history-meta v1
+2e580a0	author	Will Norris
+2e580a0	added	55
+2e580a0	deleted	27
+2e580a0	files	1
+2e580a0	body	Every release-test run now produces two artifacts in build/release-test/:\n  1. release-test-<method>.log — the full run transcript, which shows each build's\n     exact `$ mos-snes-clang ...` command line and its compiler output (or "(no\n     diagnostics — warning-clean)"). The host runner tees the container's (now\n     uncoloured, non-TTY) output to this file; PIPESTATUS preserves the exit code.\n  2. mandel-<build>.png — the bsnes-jg-rendered SNES Mandelbrot screenshot per build\n     (+ mandel-host.png reference); the run FAILS if a display screenshot is missing.\n\nThe inner driver echoes the compile command before running it, prints the captured\noutput, asserts each screenshot exists, and ends with an artifact listing. Colours\nauto-disable off a TTY so the tee'd log is clean.\n\nVerified: METHOD=local and METHOD=apt both PASS 0x9103 (default-8bit + +mos-a16) and\nwrite release-test-<method>.log (ANSI-free, shows both compile commands) plus the\n256x224 screenshots.\n\nPlan: docs/plans/2026-06-25-test-published-snes-compiler.md (Design B "Required\noutputs" + refreshed evidence).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a9d3e9e	author	Will Norris
 a9d3e9e	added	172
 a9d3e9e	deleted	77

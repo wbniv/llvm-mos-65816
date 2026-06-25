@@ -129,9 +129,11 @@ the two required deliverables below. Inside the container, per (method × build)
 #### Required outputs (every run MUST produce these in `build/release-test/`)
 1. **Compile log** — `release-test-<METHOD>.log`: the full run transcript, which by step 3 contains the exact
    `mos-snes-clang` command line for each build and its compiler output (warning-clean or the diagnostics),
-   plus the oracle value and the per-build `SMOKE: PASS … got=…` lines. Written by the host runner tee-ing the
-   container's (plain, non-TTY → uncoloured) output; the path is echoed at the end. This is the
-   **"log output showing the compilation"**.
+   plus the oracle value and the per-build `SMOKE: PASS … got=…` lines. The **compile and emulation runs each
+   carry an ISO 8601 UTC timestamp** (`date -u +%Y-%m-%dT%H:%M:%SZ`, the SRC convention) and an elapsed-seconds
+   stamp, with `started …`/`finished …` markers bracketing the run, so the log is self-dated. Written by the
+   host runner tee-ing the container's (plain, non-TTY → uncoloured) output; the path is echoed at the end.
+   This is the **"log output showing the compilation"**.
 2. **SNES Mandelbrot screenshot(s)** — `mandel-<build>.png` (`mandel-default.png`, `mandel-a16.png`): the
    bsnes-jg-rendered 256×224 frame for each build, plus `mandel-host.png` (the 32×28 host reference). These
    are the **"screenshot of the SNES Mandelbrot"**; the run asserts they exist.
@@ -182,18 +184,21 @@ the added gate.
 Steps 1–2 — `METHOD=local` on `dist/llvm-mos-65816-…c49f395-linux-x86_64.tar.xz`. The transcript SHOWS the
 compilation (exact command + output) per build, and produces the two required outputs:
 ```
+  started 2026-06-25T09:52:59Z  (host x86_64, 12 CPU)
 ==> build + run: default-8bit
+  [2026-06-25T09:53:03Z] compile
   $ mos-snes-clang -Os -Wl,-Map=mandel-display-default.map -o mandel-display-default.sfc .../mandel-display.c
     | (no diagnostics — warning-clean)
-  compiled warning-clean -> mandel-display-default.sfc (32768 bytes)
-  SMOKE: PASS off=0x580 len=2 got=0x9103 (ran 1800 frames, bsnes-jg)
+  compiled warning-clean -> mandel-display-default.sfc (32768 bytes) [2026-06-25T09:53:04Z, 1s]
+  [2026-06-25T09:53:04Z] emulate — bsnes-jg: boot + run 1800 frames, read corpus_result @ WRAM 0x580 vs 0x9103
+  SMOKE: PASS off=0x580 len=2 got=0x9103 (ran 1800 frames, bsnes-jg) [2026-06-25T09:53:12Z, 8s wall]
   screenshot: /out/mandel-default.png (172334 bytes, SNES Mandelbrot)
 ==> build + run: +mos-a16
-  $ mos-snes-clang -Xclang -target-feature -Xclang +mos-a16 -Os -Wl,-Map=... -o mandel-display-a16.sfc .../mandel-display.c
-    | (no diagnostics — warning-clean)
-  ... SMOKE: PASS got=0x9103 ; screenshot: /out/mandel-a16.png
+  [2026-06-25T09:53:12Z] compile … +mos-a16 … | (no diagnostics — warning-clean)
+  [2026-06-25T09:53:13Z] emulate … SMOKE: PASS got=0x9103 [7s wall] ; screenshot: /out/mandel-a16.png
   default-8bit   0x9103     0x9103   PASS
   +mos-a16       0x9103     0x9103   PASS
+  finished 2026-06-25T09:53:20Z
 RESULT: PASS — the published compiler builds a correct, bootable ROM (METHOD=local)
 ```
 Required outputs on disk (`build/release-test/`): `release-test-local.log` (2.3 KB, ANSI-free, shows both
