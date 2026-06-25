@@ -39,6 +39,12 @@ as-value peephole, **s32 (`long`/`int32_t`)** and **XY16 (`+mos-xy16`, 16-bit X/
 index mode)** — both since landed and differential-verified (4-way host == default
 == `+mos-a16` == `+mos-xy16` on MAME + bsnes-jg). Corpus, micro-tests, realistic
 kernels, combinatorial tests, and Csmith differential fuzzing all green; CI green.
+A substantial **fixed-point trig** workload is the realistic capstone — the full
+function set both ways (Q16.16 via vendored libfixmath; Q2.14 via a fresh CORDIC,
+circular **and** hyperbolic), each a 4-way differential plus a cross-width accuracy
+check (`k_trig32`/`k_trig16`/`k_trig16x`, both emulators). It exercises the s32
+libcall paths, the zero-libcall native-s16 path, and a ~200 KiB HiROM far LUT (which
+flushed out + fixed a real clang far-array-subscript bug in `0001`).
 **Remaining:** incremental optimization refinements (A16-threading / ALU-chain
 extensions) and **one** deferred upstream-territory pressure XFAIL (the `pr15296`
 link-time ZP-overflow). The `+mos-a16`/`+mos-xy16` **register-scavenger crash**

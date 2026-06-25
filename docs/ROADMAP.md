@@ -565,6 +565,22 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    positive gates.)
    [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
 
+   **Trig differential test — the realistic M2 capstone (2026-06-25/26; "test the C compiler").** Beyond the
+   micro-kernels, a substantial fixed-point **trig** workload now exercises the M2 codegen across both widths
+   and all three phases, each a 4-way differential (host == default(8-bit) == `+mos-a16` on MAME + bsnes-jg)
+   plus a host cross-width accuracy harness: **Phase 1** — Q16.16 via vendored **libfixmath**
+   (`sin/cos/tan/asin/acos/atan/atan2`), the **s32-libcall** payload (`__mulsi3`/`__divsi3`, no 64-bit leak;
+   `k_trig32` `0x068A6933`), plus an accurate ~200 KiB sin LUT in a new **HiROM** platform that drove + fixed a
+   real **clang far-array-subscript** index-truncation bug in `0001` (`k_trig32lut` `0x87F0B404`). **Phase 2** —
+   a fresh **Q2.14 CORDIC** (`sin/cos/atan/atan2`), the deliberate inverse: pure shift-add so it compiles to
+   native 16-bit with **zero arithmetic libcalls** (`k_trig16` `0x9446C734`). **Phase 3** — derived
+   `tan/asin/acos` (a Q2.14 divide/sqrt → the s32-libcall payload in a 16-bit context) + hyperbolic
+   `sinh/cosh/tanh` via **CORDIC hyperbolic mode**, with the 32-bit hyperbolic reference derived from the
+   now-compiled `fix16_exp` (`k_trig16x` `0x759567C4`). The trig set is **complete**; SDK/example-level only (no
+   compiler change beyond the `0001` far-index fix). [Phase 1](plans/2026-06-25-trig-functions-as-a-c-compiler-differential-test-1.md) ·
+   [Phase 1c HiROM/LUT](plans/2026-06-25-trig-accurate-sin-lut-hirom.md) ·
+   [Phase 2](plans/2026-06-26-trig-phase2-q214-cordic.md) · [Phase 3](plans/2026-06-26-trig-phase3-derived-hyperbolic.md).
+
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
    debugger loads with correct line/variable mapping. (Evidence: drmon or `llvm-dwarfdump` against
    the ROM's symbols.)
