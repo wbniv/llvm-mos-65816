@@ -12,7 +12,15 @@ ROOT=/work
 VENDOR="$ROOT/vendor/llvm-mos-sdk"
 BUILD="$ROOT/build"
 INSTALL="$BUILD/install"
-MOS_TOOLCHAIN="${MOS_TOOLCHAIN:-/opt/llvm-mos}"
+# Default to the from-source toolchain when it's been built: it carries the #321/#320 fork
+# patches, so it supports +mos-a16 (16-bit accumulator + far high-WRAM pointers) and the
+# mos-a16-only examples (mandel-mode7, …) BUILD instead of being skipped. Fall back to the
+# prebuilt /opt/llvm-mos only if the from-source toolchain isn't present (then a16 ROMs skip,
+# loudly). Override either way with MOS_TOOLCHAIN. Build it with: dev/run.sh toolchain.
+if [ -z "${MOS_TOOLCHAIN:-}" ]; then
+  if [ -x "$BUILD/llvm-mos-install/bin/mos-clang" ]; then MOS_TOOLCHAIN="$BUILD/llvm-mos-install"
+  else MOS_TOOLCHAIN="/opt/llvm-mos"; fi
+fi
 MOS_CLANG="$MOS_TOOLCHAIN/bin/mos-clang"
 echo "==> toolchain: $MOS_CLANG ($("$MOS_CLANG" --version | head -1))"
 
