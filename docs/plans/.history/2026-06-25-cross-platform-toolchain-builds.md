@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/bff643e) | cross-build: interim linux-arm64 + windows-x86_64 packages (keep linux-x86_64 byte-identical) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ebac767) | plan: cross-platform toolchain builds (macOS arm64, Windows x86_64, Linux arm64) cross-compiled from the Linux Docker |
 
 <!--history-meta v1
+bff643e	author	Will Norris
+bff643e	added	211
+bff643e	deleted	114
+bff643e	files	1
+bff643e	body	Until #321 lands upstream, upstream llvm-mos CI emits no binary carrying the\n#320/#321 patches, so arm64-Linux / Windows devs have no prebuilt fork. Ship\nthose two interim binaries, cross-built from the existing x86-64 Linux Docker;\nkeep the already-working linux-x86_64 build untouched. macOS arm64 stays\ndeferred (needs a redistribution-restricted Apple SDK + a real Mac to test).\n\nInc 0 (package side): generalize dev/package-release.sh to a PLATFORM arg.\n  - host binaries from build/llvm-mos-install-<PLATFORM>; the host-agnostic\n    target artifacts (lib/clang builtins+headers, mos-platform, .cfg) + the\n    multi-format strip tool come from the native build.\n  - linux-x86_64 output proven BYTE-IDENTICAL to the pre-refactor script\n    (orig-vs-refactored staged-tree diff: same file set, same stripped clang-23).\n\nInc 1 linux-arm64: g++-aarch64-linux-gnu cross build; packaged; qemu-aarch64\n  self-test compiles examples/snes/hello.c warning-free with ROM sha256 ==\n  the native compiler's output (cross clang is the same compiler => identical\n  65816 codegen, so it inherits the native clean-room bsnes-jg gate).\n\nInc 2 windows-x86_64: mingw-w64 posix cross build -> .exe/.zip. Curated bin set\n  (the LLVM Windows install makes clang.exe the real binary + symlink aliases;\n  a full copy matrix would bloat the zip by GBs) = real binaries + minimal\n  copies (mos-clang.exe, ld.lld.exe, binutils aliases) + the 3 mingw runtime\n  DLLs. wine CANNOT run the mingw-LLVM binary (front-end runs, then faults\n  0xC0000005 in core codegen at every -O; strip-independent) -- a wine\n  limitation, not a binary defect -- so Windows ships on a structural +\n  codegen-identity-by-construction gate with the functional -Os check DEFERRED\n  to real Windows (cross-selftest.sh soft-fails exit 2 + BEFORE-PUBLISH notice).\n\nInc 3: task cross-build PLATFORM= + task package-all (the 3 interim platforms).\n\nNew dev/cross-selftest.sh (qemu/wine functional + ROM-identity, in the cross\nimage); dev/run.sh cross-selftest dispatch; Dockerfile.cross adds qemu-user +\nwine64. Plan + TODO updated with the wine finding and verification evidence.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_013BoyGYjYmgXqoUoMoG8Wan
 ebac767	author	Will Norris
 ebac767	added	140
 ebac767	deleted	0

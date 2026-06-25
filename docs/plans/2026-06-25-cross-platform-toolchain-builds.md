@@ -143,8 +143,16 @@ separate emulator run.
 **Increment 3 — orchestration.**
 - `Taskfile.yml`: `task package PLATFORM=<p>` and `task package-all` (loops `linux-x86_64`, `linux-arm64`,
   `windows-x86_64`; macOS skipped with a notice). Outputs all artifacts + `.sha256` into `dist/`.
-- Releasing stays a **local human step** (matches today); optionally a one-line `gh release upload`/
-  `task release-upload`, *not* an auto-CI workflow.
+- Releasing stays a **local human step** (matches today), *not* an auto-CI workflow. **`task release-upload`**
+  (`dev/release-upload.sh`) publishes the dist archives to the **`/sources`** mirror
+  (`R2:indri-apt/sources/` → `apt.indri.studio/sources/`, the product page's direct-download links) — **not**
+  the apt `pool/`, which is aptly-indexed `.deb`s only (GitHub is private, so the `.deb` flow can't use a
+  release asset; the `.deb` is the `indri.studio/apt` repo's job). Naming derives the `/sources` form
+  (`llvm-mos-65816_0.0.0+git<date>.<sha>_<archtag>.<ext>`) to match the product-page links; **windows is gated
+  behind `WINDOWS_VERIFIED=1`** (its `-Os` functional check is owed on real Windows — wine can't run it);
+  `DRY_RUN=1` previews. Uses the `R2` rclone remote (`RCLONE_CONFIG_R2_*` env, same as `indri.studio/apt`).
+  An `arm64` `.deb` for `apt install` on arm64 Linux would be a separate, optional addition to
+  `indri.studio/apt` (Architecture: arm64) — not built here.
 
 **Deferred increment — `macos-arm64` (Apple Silicon).** *Out of interim scope (decision 2026-06-25); kept
 specified for later or for retirement once upstream CI covers it.* Needs osxcross built in-image + the
