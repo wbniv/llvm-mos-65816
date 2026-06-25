@@ -3,16 +3,16 @@
 --
 -- MAME's video:snapshot() only captures a real rendered surface, so dev/mandel-shot.sh
 -- runs MAME under Xvfb (offscreen/-video none give an all-black PNG). The fill takes
--- ~900 frames; we snapshot well after (SHOT_AT, default 1400) so the screen is on and
--- stable. Inputs via env:
---   SHOT_ADDR  program-space addr of corpus_result (e.g. 0x7E0580)
+-- the Mode 7 render takes ~5600 frames; we snapshot well after (SHOT_AT, default 5800) so
+-- the screen is on and stable. Inputs via env:
+--   SHOT_ADDR  program-space addr of corpus_result (e.g. 0x7E0400)
 --   SHOT_WANT  expected CRC (host reference)
---   SHOT_AT    frame to snapshot/assert at (default 1400)
+--   SHOT_AT    frame to snapshot/assert at (default 5800)
 local function num(name, d) local v = os.getenv(name); if not v or v == "" then return d end
   return tonumber(v) or tonumber(v, 16) or d end
-local ADDR = num("SHOT_ADDR", 0x7E0580)
-local WANT = num("SHOT_WANT", 0x9103)
-local AT   = num("SHOT_AT", 1400)
+local ADDR = num("SHOT_ADDR", 0x7E0400)
+local WANT = num("SHOT_WANT", 0x204F)
+local AT   = num("SHOT_AT", 5800)
 
 local f, done = 0, false
 emu.register_periodic(function()

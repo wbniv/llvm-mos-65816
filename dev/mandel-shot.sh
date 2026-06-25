@@ -64,7 +64,7 @@ if [ ! -x "$JGX" ]; then
 fi
 if [ -x "$JGX" ] && [ -d "$VENDOR/Database" ]; then
   echo "==> bsnes-jg: render + framebuffer dump (build/mandel-jg.png)"
-  "$JGX" "$BUILD/mandel-display.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 1800 "$BUILD/mandel-jg.png" || rc=1
+  "$JGX" "$BUILD/mandel-display.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 5800 "$BUILD/mandel-jg.png" || rc=1
 else
   echo "    SKIP bsnes-jg (harness/core absent — run: dev/run.sh xcheck once)"
 fi
@@ -76,7 +76,7 @@ if command -v xvfb-run >/dev/null 2>&1; then
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \
     xvfb-run -a mame snes -cart "$BUILD/mandel-display.sfc" -rompath "$ROOT/dev/roms" \
       -autoboot_script "$ROOT/dev/mandel-shot.lua" -skip_gameinfo \
-      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 30 \
+      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 120 \
       -cfg_directory /tmp -nvram_directory /tmp 2>/dev/null | grep -m1 '^SHOT:' || true)"
   echo "    $line"
   if [ -f "$SNAP/snes/0000.png" ]; then mv "$SNAP/snes/0000.png" "$BUILD/mandel-mame.png"; fi
