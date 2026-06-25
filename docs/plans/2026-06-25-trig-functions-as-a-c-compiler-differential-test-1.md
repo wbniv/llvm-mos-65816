@@ -3,7 +3,8 @@
 **Status:** Phase 1 DONE + VERIFIED 2026-06-25 (worktree `wt/321-trig`) — 4-way differential PASS on
 both emulators, `corpus_result == 0x068A6933`, accuracy within precision, no 64-bit libcall leak;
 regression k_hopalong PASS + corpus 7/7. **Phase 2 (16-bit Q2.14 CORDIC) DONE 2026-06-26**
-([2026-06-26-trig-phase2-q214-cordic.md](2026-06-26-trig-phase2-q214-cordic.md)); Phase 3 (hyperbolic) DEFERRED. Extends the
+([Phase 2](2026-06-26-trig-phase2-q214-cordic.md)) + **Phase 3 (derived + hyperbolic) DONE 2026-06-26**
+([Phase 3](2026-06-26-trig-phase3-derived-hyperbolic.md)) — the trig set is COMPLETE. Extends the
 standing project guide; generic conventions in `~/SRC/CLAUDE.md` and the project `CLAUDE.md`.
 
 ## Context
@@ -31,7 +32,7 @@ from outside.
 |---|---|---|---|
 | 32-bit Q16.16 | **libfixmath** (vendored, MIT) — drop-in | `sin cos tan asin acos atan atan2` | **1** |
 | 16-bit Q2.14 | **CORDIC** — re-implementation | `sin cos atan atan2` (direct) | **2 ✓ DONE 2026-06-26** |
-| both | derived `tan/asin/acos` (16-bit) + optional hyperbolic `sinh/cosh/tanh` | | 3 (optional) |
+| both | derived `tan/asin/acos` (16-bit) + hyperbolic `sinh/cosh/tanh` (16-bit CORDIC + 32-bit `fix16_exp`) | | **3 ✓ DONE 2026-06-26** |
 
 Golden reference = host `libm` (`<math.h>`).
 
@@ -143,7 +144,7 @@ RESULT: PASS — Hopalong (Blossom) Q8.8 attractor ... host == default == +mos-a
 **PASS** — additive change; existing tests unaffected (k_hopalong exercises the same MAME+bsnes-jg
 assert path as the modified `_emu.sh`).
 
-## Deferred
+## Completed phases (was "Deferred")
 
 - ~~**Phase 2 — 16-bit CORDIC**~~ **DONE 2026-06-26** — `k_trig16.c` + `cordic16.h` +
   `tools/gen-cordic-tables.py` + `tools/trig-accuracy.c`; Q2.14 sin/cos/atan/atan2, 4-way differential
@@ -151,6 +152,10 @@ assert path as the modified `_emu.sh`).
   cross-width PASS (and CORDIC `atan` beats libfixmath). As predicted, the cross-width eps is bounded
   by libfixmath's coarse 32-bit side. Plan:
   [2026-06-26-trig-phase2-q214-cordic.md](2026-06-26-trig-phase2-q214-cordic.md).
-- **Phase 3 (optional)** — derived 16-bit `tan/asin/acos`; hyperbolic `sinh/cosh/tanh` (32-bit via the
-  already-vendored `fix16_exp`; 16-bit via CORDIC hyperbolic mode, sweep restricted to |x| ≤ 1.0 for
-  Q2.14 range).
+- ~~**Phase 3 — derived + hyperbolic**~~ **DONE 2026-06-26** — `k_trig16x.c` + the `cordic16.h`
+  derived (`tan/asin/acos`) and hyperbolic (`sinh/cosh/tanh`, CORDIC hyperbolic mode) functions +
+  `tools/trig-accuracy3.c`; 4-way differential `corpus_result == 0x759567C4` (both emulators), the s32
+  mul/div paths fire (the 16-bit-context libcall payload), cross-width PASS — with the 32-bit
+  hyperbolic reference derived from the now-compiled `fix16_exp` (CORDIC again beats libfixmath on
+  `asin/acos`). The trig set is complete; no further trig phases. Plan:
+  [2026-06-26-trig-phase3-derived-hyperbolic.md](2026-06-26-trig-phase3-derived-hyperbolic.md).

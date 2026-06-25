@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/4626ddd) | #321 trig Phase 2: 16-bit Q2.14 CORDIC — native-s16, zero-libcall differential |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/4ae4157) | #320: far array-subscript index-width fix (in 0001) + Q16.16 trig corpus + HiROM |
 
 <!--history-meta v1
+4626ddd	author	Will Norris
+4626ddd	added	9
+4626ddd	deleted	6
+4626ddd	files	1
+4626ddd	body	The deliberate complement to Phase 1 (Q16.16 libfixmath, which asserts the s32\nlibcalls __mulsi3/__divsi3 fire): CORDIC is shift-and-add only, so under +mos-a16\nit lowers to almost-entirely rep/sep-bracketed native 16-bit ALU code with ZERO\narithmetic libcalls. The driver asserts the *absence* of every __*hi3/__*si3/__*di3\nmul/div/shift helper (114 rep / 132 sep, -verify clean) — the inverse assertion.\n\nA fresh re-implementation (grep -ri cordic found nothing pre-existing):\n- examples/65816/cordic16.h — rotation-mode sincos, vectoring-mode atan/atan2,\n  fully UNROLLED so every >>i is a constant shift (no variable-shift libcall,\n  identical codegen host vs target).\n- tools/gen-cordic-tables.py -> examples/65816/cordic16_tables.h — atan(2^-i)\n  table + gain K=9949 derived from first principles, --check-able.\n- examples/65816/k_trig16.c — kernel mirroring k_trig32.c; pure-additive\n  volatile-stepped sweep so the whole kernel is libcall-free.\n- dev/k_trig16.sh — 5-stage driver (dev/run.sh k_trig16).\n- tools/trig-accuracy.c — host-only cross-width harness (Q2.14 vs Q16.16 vs libm).\n\nThree format-driven design moves (Q2.14 range is [-2,2), so pi doesn't fit):\nangles kept in-format (sin/cos in [-pi/2,pi/2], atan2 right-half-plane only);\nno int16 overflow anywhere (rotation seeds x0=1/An so magnitude <= ONE; vectoring\npre-halves inputs, scale-invariant) -> host (32-bit int) == target (16-bit int)\nbit-exact; libcall-free input generation.\n\nVerified: dev/run.sh k_trig16 -> corpus_result==0x9446C734 host==default(8-bit)==\n+mos-a16 on MAME + bsnes-jg; cross-width PASS (bounded by libfixmath's coarse 32-bit\nside, as the master plan predicted — and CORDIC atan err 3.6e-4 beats libfixmath's\n1.0e-2). No compiler change (SDK/example-level). Phase 3 (derived tan/asin/acos,\nhyperbolic) stays deferred.\n\nPlan: docs/plans/2026-06-26-trig-phase2-q214-cordic.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4ae4157	author	Will Norris
 4ae4157	added	153
 4ae4157	deleted	0
