@@ -102,6 +102,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
+- [ ] **Post-consolidation patch-tooling + main-toolchain rebuild** (surfaced by the 2026-06-25 far-cc-variants
+  `[verify]`). Two items, both consequences of consolidating by recreating patches rather than merging:
+  **(a)** `dev/regen-patch-0004.sh` is structurally broken — it isolates `0004` via a "baseline = every patch
+  EXCEPT 0004", which `0008` (mos-dp-arg-cc, authored on `0004`'s far-CC table in `MOSCallingConv.td`) breaks
+  (won't `git apply` onto a 0004-less baseline). It now fails-safe + is documented; needs a **delta-based
+  redesign** like `regen-patch-0001.sh` (whose STACK was also fixed to `0001..0009` this session). **(b)** main's
+  `vendor/llvm-mos` was reconciled to the committed `0001..0009` (far-subscript fix + `0009` applied), but main's
+  **installed toolchain is still the pre-consolidation build** — run `dev/run.sh toolchain` (when the release
+  session frees the shared `build/`) to make the far-subscript + `0009` codegen live in main's compiler. The
+  patches themselves are verified (round-trip byte-identical; gated codegen re-verified on both emulators).
 - [x] **#321 beefy SNES demo — fixed-point Mandelbrot, differentially verified + rendered on both emulators. DONE 2026-06-25.**
   First *beefy* `+mos-a16` customer. Branch `wt/321-mandelbrot`.
   **Track 1 DONE+green** (`dev/run.sh k_mandel`): Q5.10 escape-time kernel (`examples/65816/mandel.h`) compiled
@@ -1049,7 +1059,12 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      "#320 far calls follow-ups (a)"; only the winner merged, the losers stayed inert spikes — exactly as
      these guardrails state). Echoes the earlier far-cc-variants triage just above. Nothing to track.
      fp:608f27e69a9ee6af fp:d15da622c632fbdd fp:209db6851015623a -->
-- [verify] **2026-06-21-320-far-cc-variants-bcd-and-measure** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-21-320-far-cc-variants-bcd-and-measure.md](docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md)_  <!-- fp:e3b7f46b9e51afa0 -->
+<!-- triaged 2026-06-25: VERIFIED + recorded. Ran the far-cc-variants verification on main — all 4 variant
+     round-trips PASS (dev/run.sh farcc_{imag32,split,axy,stack} == 0xF3, both emulators, -verify clean),
+     far-suite non-regression PASS, and 0001/0009 round-trip byte-identical. Results written into the plan's
+     new "## Verification results — re-run on main 2026-06-25" section. The residual tooling (regen-0004
+     structural redesign + main toolchain rebuild) is split out as its own curated M2 item below — it is NOT
+     part of this study's codegen verification. fp:e3b7f46b9e51afa0 -->
 <!-- triaged 2026-06-21: native-s16-comparison-followups §5 verification is intentionally Phase-0-gated (it runs only IF the Phase 0 §3 byte-diff measures a win; the §4a step-1 audit IS recorded). Covered by the curated M2 "comparison follow-ups" SCOPED item above. Not a missed step. fp:c91b9765672261df -->
 <!-- triaged 2026-06-21: banked plan §5 verification is MOOT — candidate A was BUILT + measured net-negative (a16cmpaudit +654/+78 B, a16 corpus +340 B zero wins) and CLOSED WON'T-DO (§0a); nothing lands in 0002, so there is no codegen to verify. Covered by the curated M2 "comparison follow-ups" item above (now records both the 8-bit v1 AND 16-bit candidate-A close-outs). Not a missed step. fp:5f242fd76b40e2f7 -->
 <!-- triaged 2026-06-21: all four far-calls-followups "Out of scope" bullets are non-work — covered

@@ -103,6 +103,66 @@ execution gates + `emu_verdict`); reuse `tools/a16_fuzz.py evaluate()` extended 
 5. **Patch hygiene**: `dev/regen-patch-0004.sh` round-trips; staged set is exactly the authored files; `0001`
    stays a16-free; `0002`/`0003` untouched.
 
+## Verification results — re-run on `main` 2026-06-25
+
+(`[verify]` close-out. All four far-CC variants landed in `0004`, gated `+mos-farcc-*`, winner Imag32
+default-on. Re-verified against main's toolchain. The shared round-trip source
+`examples/65816/farcc_imag32.c` was restored to main this session — it hadn't been carried over when
+`0004` landed, which had left the landed `dev/farcc_*.sh` scripts dangling.)
+
+**1. Default byte-identical — PASS.** Every variant is an off-by-default `+mos-farcc-*` feature.
+
+```
+$ dev/run.sh corpus      → 7/7 passed
+$ dev/run.sh corpus-a16  → 6/6 passed, 0 xfail (default == +mos-a16 == +mos-xy16, MAME + bsnes-jg)
+```
+
+**2. Round-trip MAME + bsnes-jg, `-verify` clean — PASS (all four variants).**
+
+```
+$ dev/run.sh farcc_imag32  → SMOKE: PASS got=0xF3  (a) Imag32 / RL quad
+$ dev/run.sh farcc_split   → SMOKE: PASS got=0xF3  (b) offset RS# + bank RC#
+$ dev/run.sh farcc_axy     → SMOKE: PASS got=0xF3  (c) A:X offset + Y bank
+$ dev/run.sh farcc_stack   → SMOKE: PASS got=0xF3  (d) 4-byte soft-stack slot
+```
+
+Each: far deref selects `lda [dp]` (indirect-long); `bank1_sentinel` @ `$018000` (bank `$01`); real
+`make_far_ptr()`/`deref_far()` calls present (not inlined); bsnes-jg confirms via `dev/run.sh xcheck`.
+
+**3. Coexistence — PASS.** Each gate carries the far ptr through real calls; the custom split/axy
+assigners don't double-book a table-CC register (the 24-bit address survives both directions → `0xF3`).
+
+**4. Non-regression — PASS.** Far suite on main:
+
+```
+$ dev/run.sh far_indir → 0xF3   $ dev/run.sh far_call → 0xF3   $ dev/run.sh far_cast → 0xF3
+$ dev/run.sh far_arith → exit 0 (benign int-to-pointer-cast warnings only)
+```
+
+**5. Patch hygiene — patches CLEAN; one regen *script* needs redesign.**
+
+```
+$ dev/regen-patch-0001.sh  → RESULT: PASS — 0001 round-trips (byte-identical to committed; 1504 lines)
+$ dev/regen-patch-0009.sh  → RESULT: PASS — 0009 round-trips (byte-identical to committed; 53 lines)
+```
+
+- `0001` (now carrying the far-subscript fix) and `0009` round-trip **byte-identical**. `regen-patch-0001.sh`'s
+  `STACK` was stale (stopped at `0007`); fixed to apply the full `0001..0009`.
+- `0004` patch is intact + was round-trip-verified at land; its codegen is re-verified by steps 1–4.
+  **But `dev/regen-patch-0004.sh` can no longer round-trip:** it isolates `0004` by building a
+  "baseline = every patch EXCEPT 0004", which `0008` (mos-dp-arg-cc) structurally breaks — `0008`'s CC
+  rule is authored on top of `0004`'s far-CC table in `MOSCallingConv.td`, so it won't `git apply` onto a
+  0004-less baseline (fails at `MOSCallingConv.td:97`). The script now fails-safe at the baseline (no
+  longer silently bakes `0006`–`0009`'s hunks into `0004`) and is documented; a delta-based redesign (cf.
+  `regen-patch-0001.sh`) is tracked. **Not a `0004` defect.**
+- Also reconciled this session: main's `vendor/llvm-mos` (the build source) now carries the far-subscript
+  fix + `0009`, matching the committed `0001..0009` stack. **main's installed toolchain still needs a
+  `dev/run.sh toolchain` rebuild** to make those two codegen changes live (the consolidation verified them
+  on an isolated build that has since been torn down) — tracked.
+
+**Status: ✅ far-CC variant codegen + patch hygiene (0001/0009) VERIFIED on `main`.** Residual tooling
+follow-ups (regen-0004 redesign; main toolchain rebuild) are tracked in TODO, independent of this study.
+
 ## Critical files
 
 - `vendor/llvm-mos/llvm/lib/Target/MOS/MOSCallingConv.td` — add the (b)/(c) custom far-ptr rules (gated, before

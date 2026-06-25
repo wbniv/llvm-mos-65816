@@ -2,6 +2,19 @@
 # dev/regen-patch-0004.sh — regenerate patches/llvm-mos/0004-320-far-cc.patch from the
 # live (directly-edited) vendor/llvm-mos tree, via the isolated-worktree method.
 #
+# ⚠️ KNOWN-BROKEN as of 2026-06-25 — needs a redesign before it can regenerate 0004.
+# This script isolates 0004 by building a baseline of "every patch EXCEPT 0004" and
+# diffing the live MOS dir against it. That assumed nothing stacked ABOVE 0004 touches
+# 0004's files. 0008 (mos-dp-arg-cc) broke it: its CC rule is authored on top of 0004's
+# far-CC table in MOSCallingConv.td, so 0008 will not `git apply` onto a baseline that
+# lacks 0004 — the [gen] step now hard-FAILS at MOSCallingConv.td (fail-safe: it errors
+# instead of silently baking 0006-0009's hunks into 0004, the old failure mode). To
+# regen 0004 properly, redesign on the delta method regen-patch-0001.sh uses (capture the
+# NEW uncommitted far-CC edits, re-derive 0004 from a minimal baseline) — or temporarily
+# revert 0008 first. The committed 0004 is correct + round-trip-verified at land time, and
+# the far-CC codegen is re-verified by dev/run.sh farcc_{imag32,split,axy,stack} (all 0xF3,
+# both emulators). See docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md §Verification.
+#
 # 0004 is the #320 Inc 4 Phase 2 far-pointer CALLING CONVENTION (the off-by-default
 # +mos-farcc-* variants + farPtrCC() + the gated far-ptr CC rule + the Imag32
 # register-bank coverage). It is its OWN patch — stacked on 0001+0002+0003 — rather
@@ -44,6 +57,13 @@ P4="$PATCHES/0004-320-far-cc.patch"
 # does NOT leak into the regenerated 0004 (the whole-MOS-dir mirror would otherwise
 # absorb it). Optional, like 0003.
 P5="$PATCHES/0005-320-far-ptr-value-legalize.patch"
+# Patches stacked ABOVE 0004 that ALSO touch the MOS dir 0004 mirrors — they must be in
+# the exclude-0004 baseline too, else the whole-MOS-dir mirror absorbs their hunks into the
+# regenerated 0004 (the stale-stack bug). Append new ones here as the series grows.
+P6="$PATCHES/0006-320-packed24.patch"
+P7="$PATCHES/0007-65816-near-abs-bank-relax.patch"
+P8="$PATCHES/0008-mos-dp-arg-cc.patch"
+P9="$PATCHES/0009-321-a16-pressure-incdec.patch"
 MOSREL="llvm/lib/Target/MOS"
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
@@ -67,6 +87,10 @@ git -C "$WT_GEN" apply "$P1"
 git -C "$WT_GEN" apply "$P2"
 [ -f "$P3" ] && git -C "$WT_GEN" apply "$P3"
 [ -f "$P5" ] && git -C "$WT_GEN" apply "$P5"   # keep 0005's MOSLegalizerInfo out of 0004
+git -C "$WT_GEN" apply "$P6"   # packed24 (MOSLegalizerInfo + others) — exclude from 0004
+git -C "$WT_GEN" apply "$P7"   # near-abs (MOSAsmBackend) — exclude from 0004
+git -C "$WT_GEN" apply "$P8"   # dp-arg-cc (MOSCallingConv/CallLowering) — exclude from 0004
+git -C "$WT_GEN" apply "$P9"   # a16-pressure (MOSInstructionSelector) — exclude from 0004
 git -C "$WT_GEN" add -A
 git "${GIT_ID[@]}" -C "$WT_GEN" commit -q -m "0001+0002(+0003)(+0005) baseline"
 
@@ -83,6 +107,10 @@ git -C "$WT_VFY" apply "$P2"
 [ -f "$P3" ] && git -C "$WT_VFY" apply "$P3"
 git -C "$WT_VFY" apply "$P4"
 [ -f "$P5" ] && git -C "$WT_VFY" apply "$P5"   # full series so the MOS dir matches live
+git -C "$WT_VFY" apply "$P6"
+git -C "$WT_VFY" apply "$P7"
+git -C "$WT_VFY" apply "$P8"
+git -C "$WT_VFY" apply "$P9"
 
 echo "==> [verify] diff -rq reapplied MOS dir vs live vendor MOS dir"
 if diff -rq "$WT_VFY/$MOSREL" "$VENDOR/$MOSREL"; then
