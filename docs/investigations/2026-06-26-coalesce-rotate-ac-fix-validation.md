@@ -116,12 +116,12 @@ and on the torture set also `== +mos-xy16`) are the regression guard:
 |---|---|
 | `dev/run.sh corpus` | **7/7 PASS** (host == default == `+mos-a16`) |
 | `dev/run.sh torture` (c-torture) | **30/30 PASS, 0 FAIL** (default == a16 == xy16, MAME + bsnes-jg) |
-| `dev/run.sh fuzz --gen csmith 60` | **54/60 PASS, 0 mismatch / 0 crash / 0 error** (6 benign `corpus_result GC'd` skips) |
+| `dev/run.sh fuzz --gen csmith` seeds 1–60 | **54/60 PASS, 0 mismatch / 0 crash / 0 error** (6 benign `corpus_result GC'd` skips) |
+| `dev/run.sh fuzz --gen csmith` seeds 101–200 | **88/100 PASS, 0 mismatch / 0 crash / 0 error** (12 benign skips) — **142/160 total, 0 mismatch** |
 | a16 micro-tests (`a16`, `a16loop`, `a16loadfold`) | **PASS** (unaffected — fix is default-8bit) |
 | xy16 micro-tests (`xy16basic`, `xy16ops`, `xy16spill`) | **PASS** (unaffected) |
 | `-verify-machineinstrs` (fixed codegen, `pl.ll`) | **clean** |
 | the original repro `dev/loopfold-repro.sh loop` | **PASS** `0xF56C` (was FAIL `0xE60E`) |
-| `dev/run.sh fuzz --gen csmith 100 101` (seeds 101–200) | _(broader sweep; see commit follow-up)_ |
 
 The fix only ever **refuses** a coalesce for the precise `NewRC==Ac` ∧ both-operands-rotate-referenced
 class; every other join is untouched, so no allocation outside that class can change. Note the

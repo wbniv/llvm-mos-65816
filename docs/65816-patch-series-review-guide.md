@@ -126,10 +126,10 @@ The stack is two near-independent units. `0002` (#321) depends on `0001` only fo
 neither unit — it is a standalone default-8bit upstream fix. So:
 
 1. **Skim** [§2](#2-architecture-dependencies-sequencing--timeline) (the machine + the graph).
-2. **#320 reviewers:** `0001` → `0004` → `0005` → `0006` → `0007` → `0008`.
-3. **#321 reviewers:** `0002` → `0003` → `0009` as a self-contained unit.
-4. `0003`, `0008`, and `0010` are quick bug-fix reviews (the upstream defects — `0010` is a ~15-LOC
-   coalescer correctness guard); do them first to warm up.
+2. **Warm up first** on the three standalone bug-fix patches — `0003`, `0008`, `0010` — quick, self-contained
+   reviews independent of the feature work (`0010` is a ~15-LOC coalescer correctness guard).
+3. **#320 reviewers:** then `0001` → `0004` → `0005` → `0006` → `0007` (`0008` already done in step 2).
+4. **#321 reviewers:** then `0002` → `0009`, a self-contained unit (`0003` already done in step 2).
 
 ---
 
