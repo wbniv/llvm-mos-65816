@@ -1,0 +1,29 @@
+diff --git a/llvm/lib/Target/MOS/MOSMCInstLower.cpp b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+index c236b9d322b5..a421f7d433f0 100644
+--- a/llvm/lib/Target/MOS/MOSMCInstLower.cpp
++++ b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+@@ -497,16 +497,14 @@ void MOSMCInstLower::lower(const MachineInstr *MI, MCInst &OutMI) {
+     return;
+   }
+   case MOS::LDCImm: {
+-    switch (MI->getOperand(1).getImm()) {
+-    default:
+-      llvm_unreachable("Unexpected LDCImm immediate.");
+-    case 0:
+-      OutMI.setOpcode(MOS::CLC_Implied);
+-      return;
+-    case -1:
+-      OutMI.setOpcode(MOS::SEC_Implied);
+-      return;
+-    }
++    // The operand is an i1 carry value: 0 -> CLC, set -> SEC. A 'set' i1 can
++    // reach MC as -1 (sign-extended, the .td pattern's form) or as 1 (a plain
++    // i1 'true', e.g. the carry-in materialized for a 16-bit SBC), so treat any
++    // nonzero value as SEC rather than asserting a single encoding — the latter
++    // is an UNREACHABLE under asserts and silently mislowers under NDEBUG.
++    OutMI.setOpcode(MI->getOperand(1).getImm() == 0 ? MOS::CLC_Implied
++                                                    : MOS::SEC_Implied);
++    return;
+   }
+   case MOS::INWImag:
+   case MOS::DEWImag: {

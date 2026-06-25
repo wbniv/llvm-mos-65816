@@ -43,9 +43,12 @@ a gated `--s32` track in the builtin fuzzer exercise the s32 path (2×s16 + (un)
 deterministically; both green. **The lone `+mos-a16 -O1/-Os` RA-crash on real code (`globals.c`/
 `a16regpress.c`, "ran out of registers") is now FIXED** — fork patch **`0009`** (`ad506ed`, 2026-06-25), an
 *orthogonal* i8-loop-counter de-pin from `{A}` (**not** the deferred Phase-3 `Ac16`-residency rework); DEFAULT
-byte-identical, −123 B / 122 c-torture progs, and `a16regpress.c` is now a positive gate. The remaining two
-`+mos-a16` register-pressure XFAILs (the scavenger-N/Z crash, the `pr15296` link-time ZP-overflow) stay
-deferred behind one re-open trigger.
+byte-identical, −123 B / 122 c-torture progs, and `a16regpress.c` is now a positive gate. **The
+scavenger-N/Z crash (`$p is not a GPR`) is also now FIXED** — pristine-upstream fork patch **`0011`**
+(2026-06-26; route a live `$p` through a dead index reg into `RC17` for the unbalanced case), with the second
+upstream bug it surfaced (`LDCImm 1` → `MCInstLower` unreachable) fixed as **`0012`**; `a16scavnz.c` is now a
+positive gate. The lone remaining `+mos-a16` register-pressure XFAIL — the `pr15296` link-time ZP-overflow —
+stays deferred behind its re-open trigger.
 
 **Also on `main` (2026-06-23):** **#320 far tail calls** — a far→far tail `JSL g; RTL` now folds to a
 direct long jump (`TailJML`/`$5C`), −1 B per site (landed in `0001`, `4adda8b`; verified both emulators).
@@ -146,7 +149,7 @@ other frontier; its PR still waits on the design-note posting.
 | `corpus-a16` differential gate (+a16/+xy16 on both emus) | ✅ Standing capability + in CI |
 | bsnes-jg `xcheck` in CI | ✅ Verified green (run 27823207476) |
 | Native-mode crt0 (DBR=0 via `phk;plb`, explicit contract) | ✅ Done |
-| Register-scavenger crash (`$p is not a GPR`) | ⬜ **Upstream bug** — XFAIL'd (8/500 seeds), now under **both** `+mos-a16` and `+mos-xy16`; XPASS-guarded; fix deferred |
+| Register-scavenger crash (`$p is not a GPR`) | ✅ **FIXED — patch `0011`** (2026-06-26, pristine-upstream). Route a live `$p` hard-stack-neutrally through a dead index reg into `RC17` for the unbalanced case + drop the stale `assertNZDeadAt`. `a16scavnz.c` promoted to a **positive gate** (`dev/run.sh a16scavnz` → `0x22A6`, both emulators, asserts-clean); `KNOWN_ISSUES["scavenger-p-not-gpr"]` dropped. Surfaced + fixed a 2nd upstream bug, **`LDCImm 1` → `MCInstLower` unreachable**, as patch `0012`. [investigation §RESOLUTION](investigations/65816-a16-scavenger-nz-liveness.md) · [plan](plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md) |
 | `+mos-a16 -Os` RA failure (`globals.c`/`a16regpress.c`) | ✅ **FIXED — patch `0009`** (`ad506ed`, 2026-06-25). Orthogonal i8-loop-counter de-pin from `{A}` → `G_INC`/`G_DEC` in `selectAddSub` (**not** the Phase-3 residency rework; coalescing still ruled out); DEFAULT byte-identical, −123 B / 122 c-torture progs (0 worse). `KNOWN_ISSUES["regalloc-out-of-registers"]` dropped; `a16regpress.c` now a **positive gate** (`0x01A7`). [investigation §RESOLUTION](investigations/65816-a16-regalloc-pressure-failure.md) |
 | KNOWN_ISSUES XFAIL handling — `evaluate()` classifies under `+mos-xy16` too + both-legs hardening | ✅ **Done (2026-06-21)** — a known `+mos-a16` issue can't mask a NEW `+mos-xy16` crash; both verify legs run; a new crash on either leg always hard-FAILs. [classify](plans/2026-06-21-321-xy16-verify-leg-classify-known.md) · [both-legs](plans/2026-06-21-321-xy16-verify-both-legs-hardening.md) |
 | KNOWN_ISSUES XPASS guard — `dev/run.sh known-issues` (unconditional in CI) | ✅ **Done (2026-06-21)** — asserts the remaining XFAIL repro (`a16scavnz`) still crashes `-verify-machineinstrs` under both modes; fails loudly with "drop the entry + promote to a positive gate" the moment an upstream/RA fix lands. (It did exactly that for `a16regpress` → patch `0009`, now a positive gate.) [plan](plans/2026-06-21-321-known-issues-xpass-guard.md) |
@@ -265,7 +268,7 @@ frontier is the #320 five-address-space model PR (design-note-gated), tracked in
 
 3. **Upstream posts (user-triggered):**
    - F4 `TXY/TYX` dead-flag fix PR (ready)
-   - Register-scavenger N/Z-liveness issue (draft ready)
+   - Register-scavenger live-`$p` fix PR (`0011`, draft ready) + the `LDCImm` set-lowering fix PR (`0012`) it surfaced
    - #321 CC frame-ABI design note (draft ready)
    - #320 far-pointer design note (draft ready; unblocks the five-address-space PR)
    - DWARF step-6 test+docs PR (branch pushed)

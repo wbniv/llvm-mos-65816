@@ -1009,11 +1009,14 @@ demo also keeps a source-level unroll, so `main` was green throughout. Tracked:
 
 <a id="c19-upstream-register-scavenger-nz-crash"></a>
 
-#### C19. Register-scavenger N/Z crash — *upstream, deferred*
-`+mos-a16 -O1/-Os` pressure keeps N/Z live where the upstream scavenger asserts them dead → `$p is not a GPR`
-on 8/500 seeds. Pristine-upstream (no scavenger change in `0002`). XFAIL + XPASS-guarded; issue drafted
-([`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md)). Fix is high-risk/low-reward
-for a pathological frequency — deferred.
+#### C19. Register-scavenger N/Z crash — *upstream, **fixed here** (`0011`)*
+`+mos-a16 -O1/-Os` pressure keeps N/Z live where the upstream scavenger assumed them dead → `$p is not a GPR`
+on 8/500 seeds. Pristine-upstream (no scavenger change in `0002`). **FIXED 2026-06-26** by `0011` (route a
+live `$p` hard-stack-neutrally through a dead index reg into `RC17` for the unbalanced case; drop the stale
+`assertNZDeadAt`). `a16scavnz.c` is now a positive gate (`dev/run.sh a16scavnz` → `0x22A6`, both emulators,
+asserts-clean). Fixing it surfaced a second pristine-upstream bug — `LDCImm 1` → `MCInstLower` unreachable —
+fixed as `0012`. See [§Appendix&nbsp;D](#appendix-d--upstream-bug-fixes--status) ·
+[plan](plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
 
 #### C22. DP-pointer-argument CC crash (#561) — *upstream, fixed here*
 See [§3.8](#38-0008--dp-pointer-argument-cc-upstream-bug). Reproduces on stock `mos6502`; fixed as `0008` +
@@ -1046,19 +1049,18 @@ prebuilt binary. MAME + bsnes-jg already give a two-emulator cross-check; parked
 
 ## Appendix D — Upstream bug fixes & status
 
-Three of the ten patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
+Five of the twelve patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
 fixed. They are independently postable and **drop from the fork stack on merge**, and are *not* part of the
-#320/#321 feature contribution (which is ABI-blessing-gated). The newest, `0010`, is a **default-8bit
-register-coalescer** correctness fix (a silent CRC miscompile the M2 demo
-caught<sup>[[C24]](#c24-default8-loopfold-crc-miscompile)</sup>) — PR drafted, not yet pushed. One further
-upstream defect is filed as an **issue with no fix patch** (its fix touches the generic register scavenger —
-maintainer territory). The
+#320/#321 feature contribution (which is ABI-blessing-gated). The two newest, `0011` and `0012`, fix the
+**register-scavenger live-`$p` crash** (`$p is not a GPR`) and the **`LDCImm` set-carry MC lowering** bug it
+surfaced — both pristine-upstream, both PR-drafted, not yet pushed. (The scavenger crash was *previously*
+filed as an issue-with-no-fix; it now has a fix.) The
 exhaustive accounting — every PR/issue/design-note, the exact `gh` post commands, and the live snapshot — is
 the single source of truth in [`upstream-contribution-status.md`](upstream-contribution-status.md); this is
 the reviewer's slice of it.
 
-**Last verified: 2026-06-26** (#561/#562/#563 all still open, none merged; `0010` + the scavenger issue still
-drafted, not posted). Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
+**Last verified: 2026-06-26** (#561/#562/#563 all still open, none merged; `0010`/`0011`/`0012` drafted, not
+posted). Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
 (or `gh pr list --repo llvm-mos/llvm-mos --author wbniv --state all`).
 
 | Patch | Upstream defect | Repro on stock? | Upstream | Status | On merge | Test |
@@ -1066,7 +1068,8 @@ drafted, not posted). Refresh: [`dev/upstream-status.sh`](https://github.com/wbn
 | `0003` | `mos-late-opt` reuses a dead `LDImm` as `TXY`/`TYX` without clearing the dead flag → verifier reject (`Using an undefined physical register`) | yes (`mosw65816`) | [PR&nbsp;#562](https://github.com/llvm-mos/llvm-mos/pull/562) | **POSTED · open** | drop `0003` + bump vendor pin | `late-opt-65816.mir` |
 | `0008` | the calling convention gives an 8-bit `addrspace(1)` direct-page pointer **argument** a 16-bit register → illegal size-mismatched `COPY` | yes (plain `mos6502`) | [#561](https://github.com/llvm-mos/llvm-mos/issues/561) → [PR&nbsp;#563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`) | **POSTED · open** | drop `0008` + bump vendor pin | `dp-pointer-arg.ll` |
 | `0010` | the register coalescer merges two rotate-referenced values into the A-only `Ac` class → strands a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (silent miscompile; both `-verify-machineinstrs`/`-verify-coalescing` clean) | yes (default-8bit `mosw65816`; standalone `llc`) | [PR draft](upstream-coalesce-rotate-ac-pr.md) (`wbniv:mos-coalesce-rotate-ac` to mint) | **DRAFTED · not posted** | drop `0010` + bump vendor pin | `coalesce-rotate-ac.mir` |
-| — | `saveScavengerRegister` asserts N/Z dead, but `+mos-a16` pressure keeps a compare/ALU flag live across a frame-vreg spill → illegal `$p is not a GPR` | upstream assert, exposed by `+mos-a16` | [issue draft](321-upstream-scavenger-nz-issue.md) | **DRAFTED · not posted** | n/a — no fix (XFAIL + XPASS-guarded) | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
+| `0011` | `saveScavengerRegister` assumed N/Z dead + a live `$p` only balanced-saveable, but `+mos-a16` keeps a compare/ALU flag live across a frame-vreg spill in an unbalanced range → illegal `$p is not a GPR` + undefined-`$p` `PH $p` | yes (assert exposed by `+mos-a16`) | [PR draft](upstream-scavenger-live-p-pr.md) (`wbniv:mos-scavenger-live-p-save` to mint) | **DRAFTED · not posted** | drop `0011` + bump vendor pin | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
+| `0012` | `MOSMCInstLower` lowered `LDCImm` only for `0`/`-1`; a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG) | yes (`+mos-a16` 16-bit subtract; asserts build) | [PR draft](upstream-ldcimm-set-lowering-pr.md) (`wbniv:mos-ldcimm-set-lowering` to mint) | **DRAFTED · not posted** | drop `0012` + bump vendor pin | `a16scavnz` / a16 sub |
 
 Status enum: **POSTED·open** (live PR/issue) · **DRAFTED** (written; posting is user-triggered) · **MERGED**
 (then dropped from the stack) · **DEFERRED** (filed, not fixed). The **"repro on stock?"** column is what makes

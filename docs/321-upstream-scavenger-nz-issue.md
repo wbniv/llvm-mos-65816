@@ -1,6 +1,13 @@
-<!-- STATUS (internal; strip before posting): drafted 2026-06-18; fix-directions sharpened 2026-06-19
-     (feasibility re-probe — why PHP/PLP isn't a drop-in). Ready to post (user-triggered).
-     Upstream issue for the register-scavenger N/Z-liveness assertion. -->
+<!-- STATUS (internal; strip before posting): drafted 2026-06-18; fix-directions sharpened 2026-06-19.
+     SUPERSEDED 2026-06-26 by an actual FIX (fork patch 0011) — post the PR, not this issue. PR body:
+     docs/upstream-scavenger-live-p-pr.md. This issue-only draft is retained for history. -->
+
+> **SUPERSEDED 2026-06-26 — FIXED.** This was drafted as an *issue with no fix* (the analysis below judged
+> the upstream fix "not a drop-in"). It has since been **fixed** in fork patch
+> `0011-mos-scavenger-live-p-save.patch`; post the **PR** ([`upstream-scavenger-live-p-pr.md`](upstream-scavenger-live-p-pr.md)),
+> not this issue. The "two approaches that do not work" section below is correct but was not exhaustive — the
+> working approach routes `$p` through a dead index register into `RC17` (net-0 on the hard stack, so it
+> tolerates the unbalanced range). See [the resolution](investigations/65816-a16-scavenger-nz-liveness.md#resolution-2026-06-26).
 
 # [MOS] Register scavenger asserts N/Z dead (`saveScavengerRegister`) — violated when a compare/ALU flag is live across a frame-vreg spill
 

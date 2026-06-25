@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# dev/regen-patch-0011.sh — regenerate patches/llvm-mos/0011-mos-scavenger-live-p-save.patch
+# from the live (directly-edited) vendor/llvm-mos tree.
+#
+# What 0011 is: an UPSTREAM register-scavenger correctness fix (pristine llvm-mos, not #321
+# feature code). MOSRegisterInfo::saveScavengerRegister assumed the N/Z processor-status flags
+# are dead at every scavenging point ("NZ cannot be live ... virtual registers are never inserted
+# into CmpBr instructions"). Under longer flag live ranges (+mos-a16 16-bit compares/ALU) a 16-bit
+# compare keeps N (or Z) live across a frame-index materialization whose carry the scavenger places
+# in $c (a sub-register of $p), forcing the whole $p to be preserved across an UNBALANCED hard-stack
+# range — which the old code couldn't do ($p has no GPR spill home), so it emitted illegal
+# `STImag8 $p` ($p is not a GPR) plus an undefined-$p `PH $p`. The fix:
+#   - scope assertNZDeadAt to the A/Y cases (their LD/PL restore sets N/Z; P's PLP restores all);
+#   - for P in an unbalanced range, route P hard-stack-neutrally through a dead 8-bit index reg into
+#     RC17 (PHP;PL<idx>;ST<idx> / LD<idx>;PH<idx>;PLP) — width-safe because MOSInsertREPSEP runs last;
+#   - flag a scavenger PHP of a not-reaching-def $p as reading undef (verifier requirement);
+#   - widen canSaveScavengerRegister(P) to match.
+# It touches only MOSRegisterInfo.cpp. 0001/0002/0010 also edit that file, so 0011 is a clean
+# STACKED patch (a separate 0011 avoids absorbing their MOS-dir hunks).
+#
+# 0011 = (live) - (pristine + 0001 + 0002 + 0003 + 0004 + 0005 + 0006 + 0007 + 0008 + 0009 + 0010),
+# restricted to the single file it touches. Runs on the HOST (needs git + diff; no container).
+# See docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md.
+set -euo pipefail
+
+usage() { echo "Usage: dev/regen-patch-0011.sh   # regenerate + round-trip-verify patches/llvm-mos/0011-mos-scavenger-live-p-save.patch"; exit 0; }
+[ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VENDOR="$ROOT/vendor/llvm-mos"
+PATCHES="$ROOT/patches/llvm-mos"
+P1="$PATCHES/0001-320-far-addrspace.patch"
+P2="$PATCHES/0002-321-accum16.patch"
+P3="$PATCHES/0003-late-opt-txy-dead-flag.patch"
+P4="$PATCHES/0004-320-far-cc.patch"
+P5="$PATCHES/0005-320-far-ptr-value-legalize.patch"
+P6="$PATCHES/0006-320-packed24.patch"
+P7="$PATCHES/0007-65816-near-abs-bank-relax.patch"
+P8="$PATCHES/0008-mos-dp-arg-cc.patch"
+P9="$PATCHES/0009-321-a16-pressure-incdec.patch"
+P10="$PATCHES/0010-coalesce-rotate-ac.patch"
+P11="$PATCHES/0011-mos-scavenger-live-p-save.patch"
+
+# The single file 0011 modifies. Diff'd individually so foreign WIP elsewhere never leaks in.
+SCAV_FILES=(
+  "llvm/lib/Target/MOS/MOSRegisterInfo.cpp"
+)
+
+[ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
+PRISTINE="$(git -C "$VENDOR" rev-parse HEAD)"
+echo "==> pristine vendor HEAD: $(git -C "$VENDOR" rev-parse --short HEAD)"
+
+WT=""
+cleanup() {
+  [ -n "$WT" ] && git -C "$VENDOR" worktree remove --force "$WT" 2>/dev/null || true
+  git -C "$VENDOR" worktree prune 2>/dev/null || true
+  [ -n "$WT" ] && rm -rf "$WT"
+}
+trap cleanup EXIT
+GIT_ID=(-c user.email=patchgen@local -c user.name=patchgen)
+mkwt() { WT="$(mktemp -d)"; git -C "$VENDOR" worktree add --detach "$WT" "$PRISTINE" >/dev/null; }
+rmwt() { git -C "$VENDOR" worktree remove --force "$WT" 2>/dev/null || true; rm -rf "$WT"; WT=""; }
+
+echo "==> [gen] baseline = pristine + 0001..0010; overlay live MOSRegisterInfo.cpp; diff"
+mkwt
+git -C "$WT" apply "$P1" "$P2"
+[ -f "$P3" ] && git -C "$WT" apply "$P3"
+git -C "$WT" apply "$P4" "$P5" "$P6" "$P7" "$P8" "$P9" "$P10"
+git -C "$WT" add -A
+git "${GIT_ID[@]}" -C "$WT" commit -q -m "stack baseline (0001-0010)"
+for f in "${SCAV_FILES[@]}"; do cp "$VENDOR/$f" "$WT/$f"; done
+git -C "$WT" diff > "$P11"
+echo "    wrote $P11 ($(wc -l < "$P11") lines, $(grep -c '^diff --git' "$P11") files)"
+rmwt
+
+echo "==> [verify] pristine + 0001..0011 reproduces the live $SCAV_FILES exactly"
+mkwt
+git -C "$WT" apply "$P1" "$P2"
+[ -f "$P3" ] && git -C "$WT" apply "$P3"
+git -C "$WT" apply "$P4" "$P5" "$P6" "$P7" "$P8" "$P9" "$P10" "$P11"
+rc=0
+for f in "${SCAV_FILES[@]}"; do
+  if ! diff -q "$WT/$f" "$VENDOR/$f" >/dev/null 2>&1; then
+    echo "  MISMATCH $f"; rc=1
+  fi
+done
+rmwt
+if [ $rc -eq 0 ]; then
+  echo "RESULT: PASS — 0011 round-trips (0001..0011 reproduces MOSRegisterInfo.cpp)"
+else
+  echo "RESULT: FAIL — round-trip mismatch"; exit 1
+fi

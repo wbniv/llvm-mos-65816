@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/94b2bcb) | #321 docs: note corpus-a16 supersedes the "corpus is 8-bit" reason (scavenger XFAIL) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/229662a) | #321 $p-spill scavenger: feasibility re-probe — no narrow fix; deferral stands |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/b015df5) | #321 a16 scavenger crash: root-cause + XFAIL + investigation + upstream draft |
 
 <!--history-meta v1
+94b2bcb	author	Will Norris
+94b2bcb	added	7
+94b2bcb	deleted	0
+94b2bcb	files	1
+94b2bcb	body	The "corpus never caught it because the corpus is 8-bit" line was accurate\non 2026-06-18 but corpus-a16 (c998d7f) landed 2026-06-19. Add a Superseded\nnote: this crash is fuzzer-only (a fuzz-generated scavenge-under-live-N/Z\nshape, 8/500 seeds), so even the now-+mos-a16 corpus doesn't exercise it;\nthe corpus's one a16 casualty is the separate globals.c RA failure. Keeps\nthis doc consistent with deferred-and-rejected-items.md.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 229662a	author	Will Norris
 229662a	added	22
 229662a	deleted	0

@@ -1,0 +1,210 @@
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index 1979853fa7b5..d8c220dba489 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -156,23 +156,53 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
+   return !PushCount;
+ }
+ 
+-static void assertNZDeadAt(MachineBasicBlock &MBB,
+-                           MachineBasicBlock::iterator Pos) {
+-#ifndef NDEBUG
+-  LivePhysRegs LiveRegs;
+-  LiveRegs.init(*MBB.getParent()->getSubtarget().getRegisterInfo());
+-  LiveRegs.addLiveOutsNoPristines(MBB);
+-  for (MachineBasicBlock::reverse_iterator
+-           I = MBB.rbegin(),
+-           E = MachineBasicBlock::reverse_iterator(Pos);
+-       I != E; ++I) {
+-    LiveRegs.stepBackward(*I);
+-  }
+-  assert(!LiveRegs.contains(MOS::N) &&
+-         "expected N to be free when saving scavenger register");
+-  assert(!LiveRegs.contains(MOS::Z) &&
+-         "expected Z to be free when saving scavenger register");
+-#endif
++// Liveness immediately before Pos (i.e. into the instruction at Pos), computed
++// by stepping a basic-block live-out set backward to Pos.
++static void computeLiveBefore(MachineBasicBlock::iterator Pos,
++                              LivePhysRegs &LPR) {
++  MachineBasicBlock &MBB = *Pos->getParent();
++  LPR.addLiveOuts(MBB);
++  for (MachineBasicBlock::iterator J = std::prev(MBB.end()); J != Pos; --J)
++    LPR.stepBackward(*J);
++  LPR.stepBackward(*Pos);
++}
++
++// Find an 8-bit index register (X or Y) that is dead immediately before Pos, so
++// it can serve as a transient courier to move the processor-status byte through
++// the hard stack. X/Y are width-safe here: MOSInsertREPSEP runs after register
++// scavenging (addPreEmitPass) and classifies any push/pull/load/store of an
++// index register as XW_X8, so it will bracket these with sep/rep as needed even
++// under +mos-xy16. Returns MOS::NoRegister if neither is free.
++static Register findDeadIndexReg(MachineBasicBlock::iterator Pos) {
++  const MachineFunction &MF = *Pos->getParent()->getParent();
++  const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
++  const MachineRegisterInfo &MRI = MF.getRegInfo();
++  LivePhysRegs LPR(TRI);
++  computeLiveBefore(Pos, LPR);
++  for (Register R : {MOS::X, MOS::Y})
++    if (LPR.available(MRI, R.asMCReg()))
++      return R;
++  return MOS::NoRegister;
++}
++
++// Does Reg have no reaching definition at Pos — i.e. it is neither live-in to
++// the block nor defined by any earlier instruction? The scavenger borrows $c (a
++// sub-register of $p) for a frame-index carry, which forces the whole $p to be
++// preserved even where $p carries no live value; the resulting PHP then reads an
++// undef $p, which the machine verifier rejects unless the operand is flagged
++// undef. (This is a *reaching-definition* test, not liveness: $p may be "live"
++// by backward dataflow — used by a later PHP — yet still have no def above.)
++static bool hasNoReachingDef(Register Reg, MachineBasicBlock::iterator Pos) {
++  MachineBasicBlock &MBB = *Pos->getParent();
++  const TargetRegisterInfo &TRI =
++      *MBB.getParent()->getSubtarget().getRegisterInfo();
++  for (const MachineBasicBlock::RegisterMaskPair &LI : MBB.liveins())
++    if (TRI.regsOverlap(LI.PhysReg, Reg))
++      return false;
++  for (MachineBasicBlock::iterator J = MBB.begin(); J != Pos; ++J)
++    if (J->modifiesRegister(Reg, &TRI))
++      return false;
++  return true;
+ }
+ 
+ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -181,11 +211,6 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+                                             const TargetRegisterClass *RC,
+                                             Register Reg) const {
+ 
+-  // Note: NZ cannot be live at this point, since virtual registers are never
+-  // inserted into CmpBr instructions.
+-  assertNZDeadAt(MBB, I);
+-  assertNZDeadAt(MBB, UseMI);
+-
+   // Consider the regions in a basic block where a physical register is live.
+   // The register scavenger will select one of these regions to spill and mark
+   // the physical register as available within that region. Such a region cannot
+@@ -201,19 +226,22 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+     errs() << "Register: " << getName(Reg) << "\n";
+     report_fatal_error("Scavenger spill for register not yet implemented.");
+   case MOS::A:
+-  case MOS::Y:
+-  case MOS::P: {
++  case MOS::Y: {
++    // (Historically this asserted N/Z dead here, on the premise that "NZ cannot
++    // be live at this point, since virtual registers are never inserted into
++    // CmpBr instructions." That premise does not hold under longer flag live
++    // ranges — e.g. +mos-a16 16-bit compares — where N/Z can be live across a
++    // scavenge. The A/Y restore (LD/PL) transiently clobbers the physical N/Z,
++    // but the architected flag value is preserved by the scavenger's own
++    // interleaved P save/restore, so flag-liveness here is not an error.
++    // Correctness is enforced by -verify-machineinstrs and differential tests,
++    // not this per-save precondition; the stale assertion is dropped.)
++
+     // RS8 is reserved to save A and Y if necessary, but pushing is still
+     // preferred.
+     Register Save = Reg == MOS::A ? MOS::RC16 : MOS::RC17;
+     bool UseHardStack =
+-        (Reg == MOS::A || Reg == MOS::P || STI.hasGPRStackRegs()) &&
+-        pushPullBalanced(I, UseMI);
+-
+-    // P can only be efficiently saved to the hard stack.
+-    assert(!(Reg == MOS::P && !UseHardStack) &&
+-           "expected P live range to fully contain all overlapping vreg live "
+-           "ranges");
++        (Reg == MOS::A || STI.hasGPRStackRegs()) && pushPullBalanced(I, UseMI);
+ 
+     if (UseHardStack)
+       Builder.buildInstr(MOS::PH, {}, {Reg});
+@@ -228,6 +256,62 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+       Builder.buildInstr(MOS::LDImag8, {Reg}, {Save});
+     break;
+   }
++  case MOS::P: {
++    // The processor-status flags can be live across a scavenge point under
++    // 16-bit-accumulator codegen: a 16-bit compare/ALU keeps N (or Z) live
++    // across a frame-index materialization whose carry the scavenger must place
++    // in $c (a sub-register of $p), forcing the whole $p to be preserved. Unlike
++    // A/Y (restored via LD/PL, which only transiently set N/Z), the P restore
++    // must reproduce *all* of P exactly.
++    //
++    // The scavenger borrows $c (a sub-register of $p) for a frame-index carry,
++    // which forces the whole $p to be preserved even where $p carries no live
++    // value (the carry vreg is Pc-class). In that case the PHP reads an undef
++    // $p, which the verifier rejects unless the operand is flagged undef.
++    bool PUndef = hasNoReachingDef(MOS::P, I);
++
++    if (pushPullBalanced(I, UseMI)) {
++      // Balanced hard-stack range: PHP / PLP round-trips P and all its flags.
++      auto PHP = Builder.buildInstr(MOS::PH, {}, {Reg});
++      if (PUndef)
++        PHP.getInstr()->getOperand(0).setIsUndef();
++      Builder.setInsertPt(MBB, UseMI);
++      Builder.buildInstr(MOS::PL, {Reg}, {});
++      break;
++    }
++
++    // Unbalanced range (net pushes between I and UseMI from frame spills): a
++    // plain PLP would pop the wrong byte, and P has no GPR spill home
++    // (STImag8/LDImag8 are GPR-only — storing $p is illegal MIR). Route P
++    // hard-stack-*neutrally* through a dead 8-bit index register into the
++    // reserved RC17 slot:
++    //   save:    PHP ; PL<idx> ; ST<idx> RC17
++    //   restore: LD<idx> RC17 ; PH<idx> ; PLP
++    // Each half is push/pull-balanced (net 0), so it is independent of the
++    // surrounding imbalance. The courier pull/load clobbers N/Z, but only
++    // inside the borrowed region where the saved flags are not read; the final
++    // PLP restores them. RC17 already is the scavenger's reserved P/Y slot.
++    Register SaveIdx = findDeadIndexReg(I);
++    Register RestoreIdx = findDeadIndexReg(UseMI);
++    if (STI.hasGPRStackRegs() && SaveIdx && RestoreIdx) {
++      Register Slot(MOS::RC17);
++      auto PHP = Builder.buildInstr(MOS::PH, {}, {Reg});
++      if (PUndef)
++        PHP.getInstr()->getOperand(0).setIsUndef();
++      Builder.buildInstr(MOS::PL, {SaveIdx}, {});
++      Builder.buildInstr(MOS::STImag8, {Slot}, {SaveIdx});
++
++      Builder.setInsertPt(MBB, UseMI);
++      Builder.buildInstr(MOS::LDImag8, {RestoreIdx}, {Slot});
++      Builder.buildInstr(MOS::PH, {}, {RestoreIdx});
++      Builder.buildInstr(MOS::PL, {Reg}, {});
++      break;
++    }
++
++    report_fatal_error("saveScavengerRegister: cannot preserve a live "
++                       "processor-status register across an unbalanced stack "
++                       "range with no free index register");
++  }
+   }
+   return true;
+ }
+@@ -235,18 +319,24 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+ bool MOSRegisterInfo::canSaveScavengerRegister(
+     Register Reg, MachineBasicBlock::iterator I,
+     MachineBasicBlock::iterator UseMI) const {
++  const MOSSubtarget &STI = I->getMF()->getSubtarget<MOSSubtarget>();
++
+   // Easy cases
+   switch (Reg) {
+   case MOS::X:
+     return false;
+   case MOS::P:
+-    return pushPullBalanced(I, UseMI);
++    // P is saveable on a balanced hard-stack range (PHP/PLP), or — when the
++    // range is unbalanced — by routing it through a dead index register into
++    // RC17 (see saveScavengerRegister), which needs PHX/PHY and a free index
++    // register at both the save and restore points.
++    return pushPullBalanced(I, UseMI) ||
++           (STI.hasGPRStackRegs() && findDeadIndexReg(I) &&
++            findDeadIndexReg(UseMI));
+   default:
+     break;
+   }
+ 
+-  const MOSSubtarget &STI = I->getMF()->getSubtarget<MOSSubtarget>();
+-
+   bool UseHardStack =
+       (Reg == MOS::A || STI.hasGPRStackRegs()) && pushPullBalanced(I, UseMI);
+   if (UseHardStack)

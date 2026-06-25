@@ -98,24 +98,40 @@ is per-symbol opt-in, so **no `-mcmodel` codegen mode is warranted**; (b) **SDK-
 [plan](plans/2026-06-22-snes-near-code-budget-and-code-model.md)). (a) rides this note; (b) is an
 llvm-mos-sdk-side change carried in our platform.
 
-### 4 — register-scavenger N/Z-liveness issue (an issue, **not** a PR)
+### 4 — register-scavenger live-`$p` fix (a **PR** now — was an issue) + the `LDCImm` lowering fix it surfaced
 
-Source-verified + asserts-build-confirmed write-up of an **upstream** crash:
-`MOSRegisterInfo::saveScavengerRegister` asserts N/Z dead at every scavenging point, but a
-compare/ALU flag can be live across a frame-vreg spill (readily hit by 16-bit-accumulator codegen)
-→ illegal `STImag8 $p`. **No fork patch** (issue only; the fix touches the generic scavenger
-contract and is regression-sensitive — left to maintainers). Deterministic repro included; **fix-directions
-sharpened 2026-06-19** (feasibility re-probe: `P` has no GPR spill home and `PHP`/`PLP` can't bracket it
-across an unbalanced push/pull range — so the obvious fix needs a stack-relative restore or a flag-safe
-spill point). File it:
+**FIXED 2026-06-26** (supersedes the issue-only draft). Two pristine-upstream fork patches, each
+independently postable, each drops from the stack on merge:
+
+- **`0011-mos-scavenger-live-p-save.patch`** — `MOSRegisterInfo::saveScavengerRegister` assumed N/Z dead at
+  every scavenge point and that a live `$p` only needs preserving across a *balanced* range; both break under
+  16-bit-accumulator flag live ranges → illegal `STImag8 $p` (`$p is not a GPR`) + undefined-`$p` `PH $p`.
+  Fix: route `$p` hard-stack-neutrally through a dead 8-bit index register into `RC17` for the unbalanced
+  case, flag the no-reaching-def `PHP` `undef`, drop the stale `assertNZDeadAt`, widen
+  `canSaveScavengerRegister(P)`. PR body: [`docs/upstream-scavenger-live-p-pr.md`](upstream-scavenger-live-p-pr.md).
+- **`0012-mos-ldcimm-set-lowering.patch`** — surfaced once the scavenger no longer crashed (compilation
+  reached MC lowering): `MOSMCInstLower` only lowered `LDCImm` for `0`/`-1`, but a *set* i1 carry can arrive
+  as `1` (e.g. a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG). Fix: lower
+  any nonzero i1 as `SEC`. Reproduces on a plain `+mos-a16` 16-bit subtract (not scavenger-specific). PR body:
+  [`docs/upstream-ldcimm-set-lowering-pr.md`](upstream-ldcimm-set-lowering-pr.md).
+
+Post (user-triggered) — mint branches off pristine `c798c31416f7`, then:
 
 ```
-gh issue create --repo llvm-mos/llvm-mos \
-  --title "[MOS] Register scavenger asserts N/Z dead (saveScavengerRegister) — violated when a compare/ALU flag is live across a frame-vreg spill" \
-  --body-file docs/321-upstream-scavenger-nz-issue.md   # strip the status block first
+# scavenger fix
+gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-scavenger-live-p-save \
+  --title "[MOS] Register scavenger: preserve a live processor-status register across an unbalanced stack range" \
+  --body-file docs/upstream-scavenger-live-p-pr.md     # strip the status block first
+# LDCImm lowering fix
+gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-ldcimm-set-lowering \
+  --title "[MOS] Lower LDCImm set-carry from any nonzero i1, not only -1" \
+  --body-file docs/upstream-ldcimm-set-lowering-pr.md  # strip the status block first
 ```
 
-Full internal analysis: [`docs/investigations/65816-a16-scavenger-nz-liveness.md`](investigations/65816-a16-scavenger-nz-liveness.md).
+The original issue-only draft ([`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md))
+is retained for history with a SUPERSEDED banner. Full internal analysis + resolution:
+[`docs/investigations/65816-a16-scavenger-nz-liveness.md`](investigations/65816-a16-scavenger-nz-liveness.md) ·
+[plan](plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
 
 ### 5 — DWARF step-6 *test + docs* PR
 
