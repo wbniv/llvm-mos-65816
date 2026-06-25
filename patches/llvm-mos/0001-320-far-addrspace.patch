@@ -1035,10 +1035,17 @@ index d4936aabfadd..9712a96e9e44 100644
      Opcode = MOS::STAbsIdx;
      break;
 diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-index fbedd8d46b95..5a6207e17a12 100644
+index fbedd8d46b95..41bf900bd567 100644
 --- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 +++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-@@ -29,6 +29,7 @@
+@@ -23,12 +23,14 @@
+ #include "MOSSubtarget.h"
+ 
+ #include "llvm/ADT/SmallSet.h"
++#include "llvm/ADT/StringRef.h"
+ #include "llvm/CodeGen/GlobalISel/MachineIRBuilder.h"
+ #include "llvm/CodeGen/LivePhysRegs.h"
+ #include "llvm/CodeGen/MachineBasicBlock.h"
  #include "llvm/CodeGen/MachineInstrBuilder.h"
  #include "llvm/CodeGen/TargetInstrInfo.h"
  #include "llvm/CodeGen/TargetSubtargetInfo.h"
@@ -1046,7 +1053,7 @@ index fbedd8d46b95..5a6207e17a12 100644
  
  #define DEBUG_TYPE "mos-late-opt"
  
-@@ -402,15 +403,42 @@ bool MOSLateOptimization::tailJMP(MachineBasicBlock &MBB) const {
+@@ -402,15 +404,56 @@ bool MOSLateOptimization::tailJMP(MachineBasicBlock &MBB) const {
    if (MBB.size() < 2)
      return false;
    auto It = std::prev(MBB.end());
@@ -1071,21 +1078,35 @@ index fbedd8d46b95..5a6207e17a12 100644
 +    return true;
 +  }
 +
-+  // #320 far tail call: `JSL <direct far global>; RTL` -> `TailJML g` (a direct
-+  // 24-bit long jump $5C; g runs and its own RTL pops the caller's 3-byte JSL
-+  // return, landing at the original caller — tail-call style). The RTL terminator
-+  // already proves the current function is far (lowerReturn emits RTL only for a
-+  // .far_ frame). Restrict the callee to a direct far-function GLOBAL (isGlobal +
-+  // a .far_ section) so the bank-0 thunks are excluded: __call_near_from_far is
-+  // ChangeToES'd to an external symbol (isGlobal() == false), and __call_indir_far
-+  // stays a global but lives in a bank-0 (non-.far_) section, so the section test
-+  // rejects it. Conservative either way — a misclassification can only miss a win,
-+  // never emit a wrong-bank jump or a mismatched return width. (The dangerous
-+  // near->far shape is `JSL g; RTS`, which the RTL check above already rejects.)
++  // #320 far tail call: a far block tail `JSL <far target>; RTL` -> `TailJML` (a
++  // direct 24-bit long jump $5C; the far target's own RTL pops the caller's 3-byte
++  // JSL return, landing at the original caller — tail-call style). The RTL
++  // terminator already proves the current function is far (lowerReturn emits RTL
++  // only for a .far_ frame), so the dangerous near->far shape `JSL g; RTS` can
++  // never reach here. Two direct, provably-far callees fold — each matched
++  // precisely so any other JSL is left alone (conservative: a misclassification
++  // can only miss a win, never emit a wrong-bank jump or a mismatched return):
++  //   (a) a direct far-function GLOBAL (isGlobal + a .far_ section); and
++  //   (b) the far->near mixed-banking thunk __call_near_from_far, which lowerCall
++  //       ChangeToES's to an EXTERNAL symbol (so isGlobal() is false — match it by
++  //       name, mirroring how MOSCallLowering special-cases the same symbol). Its
++  //       body `pea .Lback-1; jmp (__rc18); .Lback: rtl` keeps a net-0 near frame
++  //       above our 3-byte return, so its terminal RTL pops the ORIGINAL caller's
++  //       return — the tail contract holds (the folded JSL's own 3-byte return is
++  //       exactly what the long jump elides).
++  // (The far-indirect thunk __call_indir_far would fold the same way, but its
++  // runtime stub is not yet landed in the SDK, so a far-indirect call doesn't link
++  // on this target — its tail-fold is deferred until that path ships. See
++  // docs/plans/2026-06-26-320-thunk-tail-calls.md.)
 +  if (It->getOpcode() != MOS::JSL)
 +    return false;
 +  const MachineOperand &Tgt = It->getOperand(0);
-+  if (!Tgt.isGlobal() || !Tgt.getGlobal()->getSection().starts_with(".far_"))
++  const bool DirectFarGlobal =
++      Tgt.isGlobal() && Tgt.getGlobal()->getSection().starts_with(".far_");
++  const bool NearFromFarThunk =
++      Tgt.isSymbol() &&
++      StringRef(Tgt.getSymbolName()) == "__call_near_from_far";
++  if (!DirectFarGlobal && !NearFromFarThunk)
      return false;
 -  MachineInstr &JSR = *It;
 -  RTS.eraseFromParent();

@@ -4,10 +4,12 @@
 # through the bank-0 thunk __call_near_from_far via JSL; the near callee runs at
 # PBR=$00 (its own near JSR/RTS work), then control RTLs back to the far caller.
 # Builds examples/65816/far_near_call.c against snes-far with -mcpu=mosw65816 (NO
-# +mos-a16 — far calls are a16-independent), asserts the far call site emits `jsl`
-# to __call_near_from_far (not a near `jsr` to the callee), that the thunk is
-# linked (gc kept it) with its pea/jmp-indirect/rtl body, that the far caller is in
-# bank $01, boots the ROM in MAME, and verifies the value folded up the
+# +mos-a16 — far calls are a16-independent). far_caller's tail `return near_helper(x)`
+# is a `JSL __call_near_from_far; RTL` adjacency, so the #320 far-tail peephole folds
+# it to a single long jmp ($5C TailJML, R_MOS_ADDR24) to the thunk — the thunk's own
+# RTL then returns past far_caller (tail-call style). Asserts that fold fired, that the
+# thunk is linked (gc kept it) with its pea/jmp-indirect/rtl body, that the far caller
+# is in bank $01, boots the ROM in MAME, and verifies the value folded up the
 # main->far->near->near chain (0xA9+0x11=0xBA, 0xBA^0x5A=0xE0).
 #
 # Gate is host-expected == mosw65816 on both emulators (MAME here + bsnes-jg via
@@ -40,37 +42,34 @@ echo "==> compile+link $SRC -> $(basename "$ROM")  (--config mos-snes-far.cfg -m
 python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 
 rc=0
-echo "==> disasm gate: the far->near call is JSL to __call_near_from_far (not a near JSR to the callee)"
+echo "==> disasm gate: the far->near TAIL call folds to a long jmp to __call_near_from_far (TailJML \$5C), not jsl+rtl"
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 -Os -c -o "$OBJ" "$SRC"
 DIS="$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$OBJ")"
-printf '%s\n' "$DIS" | grep -iE '\b(jsl|jsr|rts)\b|__call_near_from_far' || true
-if printf '%s\n' "$DIS" | grep -iqE '\bjsl\b' && printf '%s\n' "$DIS" | grep -q '__call_near_from_far'; then
-  echo "  PASS: far->near call -> JSL __call_near_from_far"
-else
-  echo "  FAIL: far->near call did not route through __call_near_from_far (JSL)"; rc=1
-fi
-# The near helpers must still use a near JSR/RTS (they run at PBR=$00, unchanged).
-printf '%s\n' "$DIS" | grep -qiE '\brts\b' && echo "  PASS: near helper still returns via RTS" || { echo "  FAIL: near helper lost its RTS"; rc=1; }
-
-# NEGATIVE gate (#320 far tail calls): far_caller's `JSL __call_near_from_far; RTL` is a
-# JSL+RTL adjacency, but the far-tail arm of MOSLateOptimization::tailJMP (gated isGlobal &&
-# .far_ section) must NOT convert it: the thunk callee is an EXTERNAL symbol (ChangeToES'd),
-# so isGlobal() is false and the arm skips it. Conservative — excluding it only misses a
-# ~1-byte win, never emits a wrong return. far_caller must therefore keep its JSL to the
-# thunk AND its own trailing RTL (a wrongful conversion would replace the JSL with a long
-# jmp and erase the RTL). Regression guard so loosening the gate can't silently convert it.
+# Isolate far_caller's block (its only call — the tail `return near_helper(x)`).
 CALLER="$(printf '%s\n' "$DIS" | awk '
   /^[0-9a-fA-F]+ <far_caller>:/ {grab=1; print; next}
   grab && /^[0-9a-fA-F]+ <[^>]*>:/ {exit}
   grab {print}
 ')"
-if printf '%s\n' "$CALLER" | grep -iqE '\bjsl\b' \
-   && printf '%s\n' "$CALLER" | grep -iqE '\brtl\b' \
-   && ! printf '%s\n' "$CALLER" | grep -iqE '\bjmp\b'; then
-  echo "  PASS: far_caller keeps JSL __call_near_from_far + its own RTL (far->near thunk tail NOT converted)"
+printf '%s\n' "$CALLER" | grep -iE '\b(jsl|jmp|rtl|rts)\b|__call_near_from_far|R_MOS_ADDR24' || true
+# POSITIVE gate (#320 far tail calls, thunk-tail extension): far_caller's
+# `JSL __call_near_from_far; RTL` now folds to a single long jmp ($5C TailJML,
+# R_MOS_ADDR24) to the bank-0 thunk — the thunk's own RTL pops far_caller's caller's
+# 3-byte return, so control returns PAST far_caller (tail-call style). The far-tail arm of
+# MOSLateOptimization::tailJMP matches the __call_near_from_far external symbol by name.
+# Distinguish the $5C long jmp from a near $4C jmp by the R_MOS_ADDR24 reloc; assert NO
+# jsl/rtl survive in far_caller. (A near $4C / R_MOS_ADDR16 or a leftover jsl/rtl = FAIL.)
+if printf '%s\n' "$CALLER" | grep -iqE '\bjmp\b' \
+   && printf '%s\n' "$CALLER" | grep -q '__call_near_from_far' \
+   && printf '%s\n' "$CALLER" | grep -q 'R_MOS_ADDR24' \
+   && ! printf '%s\n' "$CALLER" | grep -iqE '\bjsl\b' \
+   && ! printf '%s\n' "$CALLER" | grep -iqE '\brtl\b'; then
+  echo "  PASS: far_caller's far->near tail folded to a long jmp __call_near_from_far (\$5C, R_MOS_ADDR24); no jsl/rtl"
 else
-  echo "  FAIL: far_caller's far->near thunk tail was wrongly tail-converted (expected jsl+rtl, no long jmp)"; rc=1
+  echo "  FAIL: far->near thunk tail did not fold (expected long jmp + R_MOS_ADDR24, no jsl/rtl)"; rc=1
 fi
+# The near helpers must still use a near JSR/RTS (they run at PBR=$00, unchanged).
+printf '%s\n' "$DIS" | grep -qiE '\brts\b' && echo "  PASS: near helper still returns via RTS" || { echo "  FAIL: near helper lost its RTS"; rc=1; }
 
 echo "==> thunk gate: __call_near_from_far is linked (gc kept it) with pea/jmp-indirect/rtl body"
 CRT0="$(find "$INSTALL" -name crt0.o -path '*snes*' 2>/dev/null | head -1 || true)"
@@ -103,7 +102,7 @@ echo "==> execution gate: boot in MAME, assert corpus_result == $WANT (value fol
 source "$ROOT/dev/_emu.sh"
 require_bios || exit $?
 if run_assert "$ROM" "$MAP" corpus_result "$WANT"; then
-  emu_verdict 0 "far->near mixed-banking call via __call_near_from_far (JSL); near callee ran at PBR=\$00 incl. its own near JSR; value == $WANT (bsnes-jg confirms via dev/run.sh xcheck)"
+  emu_verdict 0 "far->near mixed-banking TAIL call folded to a long jmp __call_near_from_far (TailJML \$5C); thunk ran the near callee at PBR=\$00 incl. its own near JSR, then RTL'd past far_caller; value == $WANT (bsnes-jg confirms via dev/run.sh xcheck)"
 else
   emu_verdict 1 ""
   exit 1

@@ -3,19 +3,19 @@
 # (the #320 far patch) from the live (directly-edited) vendor/llvm-mos tree.
 #
 # Why a separate script from regen-patch.sh: 0001 is the BOTTOM of a stacked series
-# (0001..0007) and shares files with patches above it (e.g. MOSInstrLogical.td with
+# (0001..0012) and shares files with patches above it (e.g. MOSInstrLogical.td with
 # 0002, MOSCallLowering.cpp with 0004, MOSLegalizerInfo.cpp with 0002/0005/0006,
 # clang Targets/MOS.cpp with 0006). regen-patch.sh has no 0001 path. To regenerate
 # 0001 we must isolate the far hunks from the interleaved later-patch hunks. We do
 # that by reconstructing the tree as it is WITH the WHOLE committed stack applied
-# (pristine + 0001..0007) — i.e. "live minus any NEW, uncommitted far edits" — saving
+# (pristine + 0001..0012) — i.e. "live minus any NEW, uncommitted far edits" — saving
 # the touched files, diffing them against the live tree (= exactly the new far edits),
 # then re-applying just 0001 + that delta onto a pristine baseline to re-derive 0001.
 # The delta re-applies because far hunks anchor on PRISTINE near-call code (the
 # JSR/RTS/RTI pseudos, lowerCall/lowerReturn) that the later patches don't add — so
 # their context lines exist in the 0001-only tree.
 #
-# CRITICAL — the recon AND verify apply the FULL stack (0001..0007). A stale recon
+# CRITICAL — the recon AND verify apply the FULL stack (0001..0012). A stale recon
 # (the old 0001+0002+0003) would, for a file ALSO touched by 0004-0007, compute a
 # delta = those later patches' hunks and bake them into 0001 — corrupting it (and the
 # old MOS-dir-only verify, run on the 7-patch stack, would simply FAIL). Whenever a
@@ -55,6 +55,9 @@ STACK=(
   "$PATCHES/0007-65816-near-abs-bank-relax.patch"
   "$PATCHES/0008-mos-dp-arg-cc.patch"
   "$PATCHES/0009-321-a16-pressure-incdec.patch"
+  "$PATCHES/0010-coalesce-rotate-ac.patch"
+  "$PATCHES/0011-mos-scavenger-live-p-save.patch"
+  "$PATCHES/0012-mos-ldcimm-set-lowering.patch"
 )
 apply_stack() {  # apply_stack <worktree>  — apply every patch above 0001, in order
   local wt="$1" p
@@ -116,7 +119,7 @@ GIT_ID=(-c user.email=patchgen@local -c user.name=patchgen)
 mkwt() { WT="$(mktemp -d)"; git -C "$VENDOR" worktree add --detach "$WT" "$PRISTINE" >/dev/null; }
 rmwt() { git -C "$VENDOR" worktree remove --force "$WT" 2>/dev/null || true; rm -rf "$WT"; WT=""; }
 
-echo "==> [recon] pristine + 0001..0007 = live minus the new far edits; save FAR_FILES"
+echo "==> [recon] pristine + 0001..0012 = live minus the new far edits; save FAR_FILES"
 mkwt
 git -C "$WT" apply "$P1"
 apply_stack "$WT"
@@ -147,7 +150,7 @@ git -C "$WT" diff --cached > "$P1"
 echo "    wrote $P1 ($(wc -l < "$P1") lines, $(grep -c '^diff --git' "$P1") files)"
 rmwt
 
-echo "==> [verify] apply new 0001 + 0002..0007 to a fresh pristine worktree, diff vs live"
+echo "==> [verify] apply new 0001 + 0002..0012 to a fresh pristine worktree, diff vs live"
 mkwt
 git -C "$WT" apply "$P1"
 apply_stack "$WT"
@@ -163,7 +166,7 @@ for f in "${FAR_FILES[@]}"; do
 done
 rmwt
 if [ $rc -eq 0 ]; then
-  echo "RESULT: PASS — 0001 round-trips (reapplied 0001..0007 == live vendor, MOS + clang)"
+  echo "RESULT: PASS — 0001 round-trips (reapplied 0001..0012 == live vendor, MOS + clang)"
 else
   echo "RESULT: FAIL — round-trip mismatch (see diff above)"; exit 1
 fi

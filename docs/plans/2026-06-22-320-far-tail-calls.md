@@ -375,11 +375,13 @@ executed 2026-06-22 — all PASS.**
 ## 7. Scope / non-goals
 
 - **In scope:** direct **far→far** tail calls (the `JSL <far global>; RTL` shape).
-- **Deferred (conservative-excluded, future micro-opt):** converting the **thunk** tails
-  (`JSL __call_near_from_far; RTL` and `JSL __call_indir_far; RTL`). The §8 verification showed these *would*
-  be stack-safe to long-jump (the thunk's own `RTL` returns to the far caller), but it requires per-thunk
-  reasoning about internal stack discipline; excluding them only misses a ~1-byte win each. Revisit only with
-  a dedicated proof + its own test.
+- ~~**Deferred (conservative-excluded, future micro-opt):** converting the **thunk** tails
+  (`JSL __call_near_from_far; RTL` and `JSL __call_indir_far; RTL`).~~ **Followed up 2026-06-26**
+  ([plan](2026-06-26-320-thunk-tail-calls.md)): the per-thunk stack-discipline proof was discharged.
+  **far→near (`__call_near_from_far`) is now DONE** — gate matches the thunk's external symbol by exact name,
+  `0xE0` MAME+bsnes-jg. **far-indirect (`__call_indir_far`) is BLOCKED, not deferred** — that *call* path
+  doesn't link on `main` (its SDK runtime stub was never landed; `ld.lld: undefined symbol: __call_indir_far`),
+  so its tail-opt is premature until the stub + a far-indirect-call e2e land.
 - **Not needed:** any GISel/SelectionDAG tail-call lowering — the backend has none (§1); the peephole is the
   complete mechanism.
 
