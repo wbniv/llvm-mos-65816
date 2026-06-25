@@ -283,6 +283,18 @@ swap DMA in **force-blank** (`SWAP_NEEDS_FORCEBLANK = pixels > 6144`) — one bl
 scale-reset pop. A 64×64 level (4 KiB) fits vblank and swaps seamlessly (no blank), which is partly why Phase
 1 chose 64×64. (A future seamless 128×128 swap would split the chr DMA across ~3 vblanks — a deferred polish.)
 
+**Finding 4 — "Y/A/R don't work" in MAME was a key-map confusion, not a bug; it exposed an untested input
+path.** A live-play bug report. Root-caused empirically (inject the SNES R *field* via MAME Lua → `cur_level`
+climbs to 7, so the ROM + `snes_read_pad1` read the controller fine). The cause: **MAME's default SNES P1
+keys are non-obvious** — SNES R = MAME P1 BUTTON6 = keyboard **X**, SNES Y = BUTTON1 = **Left-Ctrl**, SNES A =
+BUTTON3 = **Space** — so pressing keyboard Y/A/R does nothing. The differential never caught this because it
+only drove input via bsnes-jg's `pollInput`; the **MAME controller path was untested** (the MAME leg only
+snapshotted the boot screen). **Fixes:** (1) ship `dev/mame-snes-input.cfg` — a verified MAME remap binding
+each SNES button to its matching keyboard letter (keyboard R→SNES R, Y→Y, A→A, L→L, S→Select, Enter→Start;
+D-pad stays arrows), copied to the play tasks' cfg dir so the on-screen labels just work; (2) a new
+**MAME live-input gate** (`dev/mandel-zoom-input.lua`): inject P1 R, assert `cur_level` advances — the
+differential now exercises `snes_read_pad1` reading `$4016` under MAME, the same path the keyboard drives.
+
 ## Risks / notes
 - **Multi-bank LoROM (Phase 2) is the main lift** — linker script + `rom_size_byte` + the far-symbol→DMA
   `bank:addr` plumbing. Phase 1 deliberately avoids it to prove value first. **Measure, don't assume:** check

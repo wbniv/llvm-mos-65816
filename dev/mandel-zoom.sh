@@ -175,6 +175,20 @@ if command -v xvfb-run >/dev/null 2>&1; then
   echo "    $line"
   [ -f "$SNAP/snes/0000.png" ] && mv "$SNAP/snes/0000.png" "$BUILD/mandel-zoom-mame.png"
   case "$line" in "SHOT: PASS"*) : ;; *) rc=1 ;; esac
+
+  # MAME-input gate: inject the SNES R (dive) button via the live controller path and assert the
+  # demo responds (cur_level advances). Closes the gap that the "Y/A/R don't work" report exposed —
+  # input was only ever tested via bsnes-jg's pollInput; this exercises snes_read_pad1 reading $4016
+  # under MAME, the same path the user's keyboard drives. (The keys themselves are remapped to match
+  # the on-screen labels by dev/mame-snes-input.cfg; here we inject the button field directly.)
+  CL=$(vma cur_level "$MAP"); IADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$CL )))
+  iline="$(INJ_ADDR="$IADDR" INJ_AT=260 \
+    xvfb-run -a mame snes -cart "$ROM" -rompath "$ROOT/dev/roms" \
+      -autoboot_script "$ROOT/dev/mandel-zoom-input.lua" -skip_gameinfo \
+      -sound none -nothrottle -seconds_to_run $(( 260 / 60 + 3 )) \
+      -cfg_directory /tmp -nvram_directory /tmp 2>/dev/null | grep -m1 '^INPUT:' || true)"
+  echo "    $iline"
+  case "$iline" in "INPUT: PASS"*) : ;; *) echo "  MAME live-input gate FAILED"; rc=1 ;; esac
 else
   echo "==> SKIP MAME snapshot (no xvfb-run — rebuild the dev image for the Xvfb layer)"
 fi
@@ -182,9 +196,9 @@ fi
 echo
 if [ "$rc" -eq 0 ]; then
   if [ "$MULTIBANK" = 1 ]; then
-    echo "RESULT: PASS — zoom pyramid [$PYR_MODE]: ${PW}x${PH} x $PL levels across $PL banks (${romb:-256K}); level-0 + every-bank ROM hash + displayed-level VRAM hash host==ref; zoom-math host==default==+mos-a16; MAME snapshot ok"
+    echo "RESULT: PASS — zoom pyramid [$PYR_MODE]: ${PW}x${PH} x $PL levels across $PL banks (${romb:-256K}); level-0 + every-bank ROM hash + displayed-level VRAM hash host==ref; zoom-math host==default==+mos-a16; MAME snapshot + live-input ok"
   else
-    echo "RESULT: PASS — zoom pyramid [$PYR_MODE]: $PL levels host==default==+mos-a16 (per-level hash); zoom-math host==target (bsnes-jg); displayed-level VRAM hash ok; MAME snapshot ok"
+    echo "RESULT: PASS — zoom pyramid [$PYR_MODE]: $PL levels host==default==+mos-a16 (per-level hash); zoom-math host==target (bsnes-jg); displayed-level VRAM hash ok; MAME snapshot + live-input ok"
   fi
 else
   echo "RESULT: FAIL — see the per-step lines above"

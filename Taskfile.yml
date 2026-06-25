@@ -89,11 +89,15 @@ tasks:
         case "$ROM" in
           mandel-mode7) echo "note: mandel-mode7's 128x128 software compute is ~4 min of EMULATED time — the screen stays black until it finishes, then shows the image." ;;
           mandel-display) echo "note: the image appears after the ~15 s (emulated) compute." ;;
-          mandel-interactive) echo "note: INSTANT boot. Controls — D-pad: pan | L/R: zoom out/in | Y/A: rotate | Select: cycle palette | Start: reset. (MAME P1 keys are version-dependent; remap via Tab -> Input Settings.)" ;;
-          mandel-zoom) echo "note: INSTANT boot. Hold R to DIVE (detail refreshes at each level), L to back out | Y/A rotate | Select palette | Start reset to level 0. (MAME P1 keys are version-dependent; remap via Tab -> Input Settings.)" ;;
+          mandel-interactive) echo "note: INSTANT boot. KEYS (remapped to match the labels): arrows=pan | L/R=zoom out/in | Y/A=rotate | S=cycle palette | Enter=reset." ;;
+          mandel-zoom) echo "note: INSTANT boot. KEYS (remapped to match the labels): hold R=DIVE (detail refreshes at each level), L=back out | Y/A=rotate | S=cycle palette | Enter=reset to level 0." ;;
         esac
         echo "launching $SFC in MAME — close the window to quit."
         mkdir -p build/.mame
+        # MAME's default SNES P1 keys are non-obvious (SNES R=keyboard X, Y=Left-Ctrl, A=Space), so the
+        # demo labels wouldn't match the keys. Drop in our remap (snes.cfg) so keyboard R/L/Y/A/S/Enter
+        # match the on-screen R/L/Y/A/Select/Start; D-pad stays on the arrows. See dev/mame-snes-input.cfg.
+        cp -f dev/mame-snes-input.cfg build/.mame/snes.cfg
         exec mame snes -cart "$SFC" -rompath dev/roms -skip_gameinfo -window \
           -cfg_directory build/.mame -nvram_directory build/.mame
 
