@@ -2,10 +2,11 @@
 
 This document is a reviewer's map of the patch stack that adds native **16-bit-accumulator** and
 **far-pointer (24-bit address)** C codegen for the WDC 65816 to [llvm-mos](https://github.com/llvm-mos/llvm-mos),
-together with an SNES target to exercise it. It exists to make the series **cheap to review**: every change
-is opt-in and gated so the default 8-bit code generator is byte-identical, every claim is backed by a
-four-way differential test you can re-run, and the stack splits into two units (#320 far, #321 16-bit) that
-review almost independently.
+together with an SNES target to exercise it. It exists to make the series **cheap to review**: every
+*feature* change is opt-in and gated so the default 8-bit code generator is byte-identical (the only
+default-path edits are a handful of isolated, upstream-bound bug fixes + one size win), every claim is backed
+by a four-way differential test you can re-run, and the stack splits into two units (#320 far, #321 16-bit)
+that review almost independently.
 
 **Motivation — modern source-level debugging of the SNES.** This is *why the compiler work exists.*
 Source-level debugging of SNES code is not new to *drdevtools* — its debugger **drmon** already reads the
@@ -89,15 +90,20 @@ independently postable; they are included so the stack applies clean.
 
 ### 1.2 The one invariant that makes this reviewable
 
-> **Everything new is opt-in (`+mos-a16` / `+mos-xy16` / `addrspace(2)`) and gated so it cannot alter
-> non-opted-in codegen. The existing 6502/65816 8-bit code generator is byte-identical with the stack
-> applied.**
+> **The #320/#321 feature contribution is opt-in (`+mos-a16` / `+mos-xy16` / `addrspace(2)`) and gated so it
+> cannot alter non-opted-in codegen — the 6502/65816 8-bit generator is byte-identical with the *feature*
+> patches applied. The only deliberate changes to the default path are the three bundled upstream bug fixes
+> (`0003`/`0008`/`0010`) and the `0007` near-abs size win — each isolated, named, and independently
+> reviewable; none is feature behavior.**
 
 This is enforced, not asserted. The differential fuzzer ([Appendix A](#appendix-a--testing-setup)) compiles
-every program **both** default and `+mos-a16` and compares both to a host oracle, so a gate that leaks into
-the 8-bit path surfaces immediately as a `default@MAME ≠ host` mismatch (this caught a real
+every program **both** default and `+mos-a16` and compares both to a host oracle, so a feature gate that leaks
+into the 8-bit path surfaces immediately as a `default@MAME ≠ host` mismatch (this caught a real
 leak<sup>[[C16]](#c16-seed-42--legalizeicmp-swap-leak)</sup>). A reviewer can therefore trust that
-**reviewing `0002` is reviewing *added* behavior**, never a silent change to what ships today. The gating
+**reviewing `0002` is reviewing *added* behavior**, never a silent change to what ships today. That same
+default-leg check is also what surfaced the one genuine default-path *defect* in scope — the C24 coalescer
+miscompile fixed by `0010` — so even the lone correctness change to default output is a named, differential-caught
+bug fix, not a feature side-effect. The gating
 discipline is spelled out in [§4](#4-cross-cutting-correctness-arguments).
 
 ### 1.3 The correctness bar
