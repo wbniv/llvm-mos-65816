@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/1ea31e9) | docs(plan-index): index trig Phase 3 (146 rows); triage the DONE Inbox false-positive |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ff3694c) | #320 far->near thunk tail folds (-1 B); fix stale far-tail status + regen STACK |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/9ac3917) | docs(plan-index): index the #321 a16 Phase-3 trigger-check-pass plan (145 rows) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/f59a5d5) | docs(plan-index): index trig Phase 2 (144 rows); triage the DONE Inbox false-positive |
@@ -20,6 +21,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+1ea31e9	author	Will Norris
+1ea31e9	added	3
+1ea31e9	deleted	1
+1ea31e9	files	1
+1ea31e9	body	The audit-plan-deferrals hook captured the struck-through 'Phase 3 — derived +\nhyperbolic' DONE marker (under the master plan's renamed Completed-phases header)\nas a deferral; it isn't — Phase 3 landed in 6f02ea7 and is a curated Done entry.\nReplaced the Inbox bullet with a triaged note carrying its fingerprint. Added the\nplan-index row for the Phase 3 plan (commit 6f02ea7, Fuzz / corpus).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ff3694c	author	Will Norris
 ff3694c	added	1
 ff3694c	deleted	0
