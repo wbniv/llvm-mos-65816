@@ -442,6 +442,21 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
   uncomment the two trigger lines in the `on:` block.
 
+### Distribution / Packaging
+
+- [ ] **#321 Cross-platform toolchain builds — `macos-arm64`, `windows-x86_64`, `linux-arm64`, cross-compiled
+  from the existing Linux x86-64 Docker** (no mac/Win CI runners; decision locked 2026-06-25). Only the host
+  binaries (clang/lld/llvm-*) differ per platform — the MOS compiler-rt builtins + clang resource headers +
+  SNES SDK are host-agnostic and copied once from the canonical Linux build, so the cross builds disable the
+  runtimes sub-build and reuse `build/llvm-mos/bin` tablegens via `LLVM_NATIVE_TOOL_DIR`. **Inc 0** refactor
+  `dev/toolchain.sh` host-parameterized + `dev/cross/*.cmake` + generalize `dev/package-release.sh`'s
+  hardcoded `linux-x86_64` tag (keep Linux byte-identical); **Inc 1** linux-arm64 (`g++-aarch64-linux-gnu`,
+  self-test via qemu); **Inc 2** windows-x86_64 (mingw-w64, `.exe`/symlink→copy/`.zip`, self-test via wine);
+  **Inc 3** macos-arm64 (osxcross + a user-supplied macOS SDK in `dev/sdks/` — the one manual ask, Apple
+  licensing; functional self-test deferred to a real Mac); **Inc 4** `task package-all`. Interim until the
+  `0001–0008` patches land upstream (upstream CI then emits these).
+  [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
+
 
 ## Watch
 
@@ -1082,4 +1097,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-25: this IS done — the matching Test Bench / CI entry was promoted to Done as
      [321-csmith-fuzzer] in the same commit (2cfd375) that captured this deferral; the struck-through plan
      bullet is the now-completed action, not open work. fp:bd0898d1d5c10cfa -->
+- [verify] **2026-06-25-cross-platform-toolchain-builds** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-25-cross-platform-toolchain-builds.md](docs/plans/2026-06-25-cross-platform-toolchain-builds.md)_  <!-- fp:6676955ce1f1f4cf -->
 <!-- END auto-captured-deferrals -->
