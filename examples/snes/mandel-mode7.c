@@ -83,15 +83,6 @@ static void build_coarse_row(uint8_t trow, uint8_t cw, uint8_t shx, uint8_t shy)
       }
 }
 
-// De-linearize tile-row `trow` of the far raster buffer into chrbuf (tiled order) via far loads.
-static void build_final_row(uint8_t trow) {
-  for (uint8_t tcol = 0; tcol < TILES; tcol++)
-    for (uint8_t r = 0; r < 8; r++)
-      for (uint8_t c = 0; c < 8; c++)
-        chrbuf[(uint16_t)tcol * 64 + (uint16_t)r * 8 + c] =
-          fb[(uint16_t)((uint16_t)(trow * 8 + r) * W + tcol * 8 + c)];   // FAR LOAD
-}
-
 // A whole coarse pass: compute the cw*ch grid, then reveal it tile-row by tile-row.
 static void coarse_pass(uint8_t cw, uint8_t ch, uint8_t shx, uint8_t shy, uint8_t in_vblank) {
   mandel_fill(scratch, cw, ch, DN);
@@ -124,29 +115,32 @@ int main(void) {
   REG_NMITIMEN = NMITIMEN_NMI;
 #endif
 
-  // Canonical 128x128: fill the far buffer a tile-row (8 rows) at a time and reveal each strip in
-  // vblank, so it sharpens top-down. fb is fully populated by far stores (the a16 use case); the
-  // CRC then runs over the whole far buffer == mandel-render 128 128 12.
+  // Canonical 128x128: fill the far buffer one image LINE at a time and reveal each line in vblank
+  // — a smooth top-down scanline fill. fb is fully populated by far stores (the a16 use case); the
+  // CRC then runs over the whole far buffer == mandel-render 128 128 12. In Mode 7's tiled layout
+  // one image row r is, per 8x8 tile, 8 contiguous chr bytes at tile*64 + r*8 — so a line is 16
+  // short runs (one per tile column), read straight from the far buffer.
 #ifndef MANDEL_TESTPAT
   int16_t dre = (int16_t)(MANDEL_REW / W);
   int16_t dim = (int16_t)(MANDEL_IMW / H);
 #endif
-  for (uint8_t trow = 0; trow < TILES; trow++) {
-    for (uint8_t r = 0; r < 8; r++) {
-      uint16_t y = (uint16_t)(trow * 8 + r);
+  for (uint16_t y = 0; y < H; y++) {
+    uint8_t trow = (uint8_t)(y >> 3), r = (uint8_t)(y & 7);
 #ifdef MANDEL_TESTPAT
-      for (uint16_t x = 0; x < W; x++) fb[y * W + x] = (uint8_t)(((x >> 2) ^ (y >> 2)) & 0x1F);
+    for (uint16_t x = 0; x < W; x++) fb[y * W + x] = (uint8_t)(((x >> 2) ^ (y >> 2)) & 0x1F);
 #else
-      int16_t ci = (int16_t)(MANDEL_IM0 + (int16_t)y * dim);
-      for (uint16_t x = 0; x < W; x++) {
-        int16_t cr = (int16_t)(MANDEL_RE0 + (int16_t)x * dre);
-        fb[y * W + x] = mandel_cell(cr, ci, DN);                // FAR STORE
-      }
-#endif
+    int16_t ci = (int16_t)(MANDEL_IM0 + (int16_t)y * dim);
+    for (uint16_t x = 0; x < W; x++) {
+      int16_t cr = (int16_t)(MANDEL_RE0 + (int16_t)x * dre);
+      fb[y * W + x] = mandel_cell(cr, ci, DN);                  // FAR STORE
     }
-    build_final_row(trow);
+#endif
     wait_vblank_fresh();
-    dma_chr_to((uint16_t)trow * ROW_BYTES, chrbuf, ROW_BYTES);
+    for (uint8_t tcol = 0; tcol < TILES; tcol++) {                          // row r of each of 16 tiles
+      snes_vram_addr((uint16_t)((uint16_t)(trow * TILES + tcol) * 64 + (uint16_t)r * 8));
+      uint16_t base = (uint16_t)(y * W + (uint16_t)tcol * 8);
+      for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = fb[base + c];           // FAR LOAD
+    }
   }
   corpus_result = crc_fb();            // far loads over the whole buffer == host reference
 

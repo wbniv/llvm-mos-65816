@@ -119,28 +119,30 @@ int main(void) {
   coarse_pass(16, 14, 2, 2, 1);
   coarse_pass(32, 28, 1, 1, 1);
 
-  // Canonical 64x56, top-down a tile-row at a time. Compute each strip's 8 rows ROW-MAJOR, fold
-  // every escape count into the rolling CRC in that order (so corpus_result == mandel_crc over a
-  // row-major 64x56 buffer == mandel-render 64 56 15), and stash each pixel into chrbuf at its
-  // TILED offset; then reveal the strip with one vblank DMA. Rows below keep the 32x28 preview ->
-  // sharpens top-down, flicker-free.
+  // Canonical 64x56, revealed ONE IMAGE LINE at a time — a smooth top-down scanline fill rather
+  // than 8-row jumps. Compute each row's 64 cells ROW-MAJOR, fold every escape count into the
+  // rolling CRC in that order (so corpus_result == mandel_crc over a row-major 64x56 buffer ==
+  // mandel-render 64 56 15), then write the line in vblank. In Mode 7's tiled layout one image
+  // row r is, per 8x8 tile, 8 contiguous chr bytes at tile*64 + r*8 — so a line is 8 short runs
+  // (one per tile column). Lines below keep the 32x28 preview -> sharpens line by line.
   {
     int16_t dre = (int16_t)(MANDEL_REW / DW);
     int16_t dim = (int16_t)(MANDEL_IMW / DH);
     uint16_t crc = 0xFFFF;
-    for (uint8_t trow = 0; trow < TILES_H; trow++) {
-      for (uint8_t r = 0; r < 8; r++) {
-        uint8_t j = (uint8_t)(trow * 8 + r);
-        int16_t ci = (int16_t)(MANDEL_IM0 + (int16_t)j * dim);
-        for (uint8_t i = 0; i < DW; i++) {
-          int16_t cr = (int16_t)(MANDEL_RE0 + (int16_t)i * dre);
-          uint8_t v = mandel_cell(cr, ci, DN);
-          crc_byte(&crc, v);
-          chrbuf[(uint16_t)(i >> 3) * 64 + (uint16_t)r * 8 + (i & 7)] = v;
-        }
+    for (uint8_t j = 0; j < DH; j++) {
+      uint8_t trow = (uint8_t)(j >> 3), r = (uint8_t)(j & 7);
+      int16_t ci = (int16_t)(MANDEL_IM0 + (int16_t)j * dim);
+      for (uint8_t i = 0; i < DW; i++) {
+        int16_t cr = (int16_t)(MANDEL_RE0 + (int16_t)i * dre);
+        uint8_t v = mandel_cell(cr, ci, DN);
+        crc_byte(&crc, v);
+        chrbuf[i] = v;                                                       // row-major line scratch
       }
       wait_vblank_fresh();
-      dma_chr_to((uint16_t)trow * ROW_BYTES, chrbuf, ROW_BYTES);
+      for (uint8_t tcol = 0; tcol < TILES_W; tcol++) {                       // 8 tiles, row r of each
+        snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));
+        for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = chrbuf[(uint16_t)tcol * 8 + c];
+      }
     }
     corpus_result = crc;                         // == gate CRC 0x204F (set once, after the render)
   }
