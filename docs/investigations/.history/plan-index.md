@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/f791491) | docs(plan-index): add the shared plan-index tooling plan row (→ 141) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/40d93f0) | docs(plan-index): add the 10 plans created since the 2026-06-25 refresh (→ 140) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/840fc17) | docs: Phase 2 zoom-pyramid verification + HD montage; Findings 2/3; TODO/handoff/index |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/52acebc) | docs+todo: triage the auto-captured Csmith deferral + log the closeout commit in plan-index |
@@ -13,6 +14,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+f791491	author	Will Norris
+f791491	added	3
+f791491	deleted	1
+f791491	files	1
+f791491	body	Closes the drift the post-commit hook flagged when 2026-06-26-shared-plan-index-\ntooling.md was committed (63daf1f). Demonstrates the loop: commit a plan → hook\nemits a paste-ready stub → fill summary/category → in sync.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 40d93f0	author	Will Norris
 40d93f0	added	18
 40d93f0	deleted	3
