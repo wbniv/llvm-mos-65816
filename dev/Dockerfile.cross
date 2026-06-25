@@ -11,11 +11,17 @@ FROM llvm-mos-65816-dev
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# linux-arm64:    aarch64 cross g++ (bundles its sysroot) + qemu to RUN the aarch64 clang.
-# windows-x86_64: mingw-w64 posix-threads cross g++ (→ native .exe).  (wine for the .exe
-#                 self-test is added in Increment 2, where the exact 26.04 package is pinned.)
+# BUILD deps (cross C/C++ toolchains):
+#   linux-arm64:    aarch64 cross g++ (bundles its sysroot).
+#   windows-x86_64: mingw-w64 posix-threads cross g++ (→ native .exe).
+# SELF-TEST emulators that RUN the produced foreign binary for the warning-free gate
+# (dev/cross-selftest.sh): qemu-user for aarch64, wine64 for the .exe. On Ubuntu 26.04
+# `qemu-user-static` is gone — `qemu-user` ships the statically-linked /usr/bin/qemu-aarch64;
+# `wine64` is the 64-bit loader. Both are off the critical build path (only the self-test
+# needs them) but baked in so `dev/run.sh cross-selftest` needs no manual setup.
 RUN apt-get update && apt-get install -y --no-install-recommends \
       g++-aarch64-linux-gnu \
-      qemu-user-static \
       g++-mingw-w64-x86-64-posix \
+      qemu-user \
+      wine64 \
     && rm -rf /var/lib/apt/lists/*

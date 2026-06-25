@@ -72,6 +72,7 @@ cmake -C "$SRC/clang/cmake/caches/MOS.cmake" -G Ninja \
   -DLLVM_RUNTIME_TARGETS="" \
   -DLLVM_DISTRIBUTION_COMPONENTS="$DIST_COMPONENTS" \
   -DLLVM_ENABLE_TERMINFO=OFF \
+  -DLLVM_PARALLEL_LINK_JOBS=1 \
   -DLLVM_CCACHE_BUILD=On
 
 echo "==> cross-build the distribution target (-j$JOBS); first build is long (~30-90 min)"
@@ -79,6 +80,19 @@ cmake --build "$BUILDDIR" --target distribution --parallel "$JOBS"
 
 echo "==> install-distribution -> $INSTALL"
 cmake --build "$BUILDDIR" --target install-distribution
+
+# Windows: the produced .exe dynamically link the mingw posix-threads runtime. Deposit
+# those DLLs into the install bin/ so the package step (which runs on the host, where these
+# DLLs do NOT exist) can bundle them next to the .exe. Without them clang.exe won't start.
+if [ "$PROFILE" = "windows-x86_64" ]; then
+  echo "==> bundling mingw runtime DLLs into $INSTALL/bin"
+  for dll in \
+      /usr/lib/gcc/x86_64-w64-mingw32/*-posix/libstdc++-6.dll \
+      /usr/lib/gcc/x86_64-w64-mingw32/*-posix/libgcc_s_seh-1.dll \
+      /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll; do
+    if [ -f "$dll" ]; then cp -v "$dll" "$INSTALL/bin/"; else echo "  WARN: missing $dll" >&2; fi
+  done
+fi
 
 echo "==> done in $((SECONDS/60))m $((SECONDS%60))s — $PROFILE host binaries at build/llvm-mos-install-$PROFILE/bin"
 echo "    next:  PLATFORM=$PROFILE dev/package-release.sh   (package + self-test)"

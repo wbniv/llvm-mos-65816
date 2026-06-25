@@ -466,18 +466,25 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 
 ### Distribution / Packaging
 
-- [ ] **#321 Cross-platform toolchain builds — `macos-arm64`, `windows-x86_64`, `linux-arm64`, cross-compiled
-  from the existing Linux x86-64 Docker** (no mac/Win CI runners; decision locked 2026-06-25). Only the host
-  binaries (clang/lld/llvm-*) differ per platform — the MOS compiler-rt builtins + clang resource headers +
-  SNES SDK are host-agnostic and copied once from the canonical Linux build, so the cross builds disable the
-  runtimes sub-build and reuse `build/llvm-mos/bin` tablegens via `LLVM_NATIVE_TOOL_DIR`. **Inc 0** refactor
-  `dev/toolchain.sh` host-parameterized + `dev/cross/*.cmake` + generalize `dev/package-release.sh`'s
-  hardcoded `linux-x86_64` tag (keep Linux byte-identical); **Inc 1** linux-arm64 (`g++-aarch64-linux-gnu`,
-  self-test via qemu); **Inc 2** windows-x86_64 (mingw-w64, `.exe`/symlink→copy/`.zip`, self-test via wine);
-  **Inc 3** macos-arm64 (osxcross + a user-supplied macOS SDK in `dev/sdks/` — the one manual ask, Apple
-  licensing; functional self-test deferred to a real Mac); **Inc 4** `task package-all`. Interim until the
-  `0001–0009` patches land upstream (upstream CI then emits these).
-  [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
+- [ ] **#321 Cross-platform toolchain builds — interim `linux-arm64` + `windows-x86_64` (keep `linux-x86_64`),
+  cross-compiled from the existing Linux x86-64 Docker** (no mac/Win CI runners; scope locked 2026-06-25).
+  Until #321 merges/fixes upstream, upstream CI emits no binary carrying these patches, so arm64-Linux /
+  Windows devs have no prebuilt fork — ship those two. Only the host binaries (clang/lld/llvm-*) differ per
+  platform; the MOS compiler-rt builtins + clang resource headers + SNES SDK are host-agnostic and copied once
+  from the canonical Linux build, so the cross builds disable the runtimes sub-build and reuse
+  `build/llvm-mos/bin` tablegens via `LLVM_NATIVE_TOOL_DIR`. **Inc 0 DONE** — build side (`dd2802a`) +
+  `dev/package-release.sh` generalized to a `PLATFORM` arg (native target artifacts reused, multi-format strip
+  via native objcopy, Windows curated-`.exe`/`.zip` branch, qemu/wine self-test via `dev/cross-selftest.sh`);
+  `linux-x86_64` proven **byte-identical** (orig-vs-refactored staged-tree diff). **Inc 1 DONE+validated** —
+  `linux-arm64` built, packaged, qemu self-test PASS with ROM `sha256 == native`. **Inc 2 DONE (functional
+  deferred)** — `windows-x86_64` built/packaged (curated `clang.exe`+`mos-clang.exe`+`ld.lld`+binutils aliases
+  + 3 mingw DLLs, `.zip`); **wine can't run the mingw-LLVM binary** (faults `0xC0000005` in core codegen at
+  every `-O`), so it ships on the **structural + codegen-identity-by-construction** gate with the functional
+  `-Os` check **deferred to real Windows** (soft-fail `exit 2`, BEFORE-PUBLISH notice). **Inc 3 DONE** —
+  `task cross-build PLATFORM=` + `task package-all`. **REMAINING:** real-Windows functional verification +
+  publish. **Deferred:** `macos-arm64` (osxcross + a user-supplied macOS SDK in `dev/sdks/` — Apple licensing;
+  functional self-test needs a real Mac) — out of interim scope, likely retired by upstream CI. Whole
+  capability retires when `0001–0009` land upstream. [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
 - [ ] **Clean-room test of the *published* SNES compiler — wired into the publish gate** — in a throwaway
   Docker container with NO dev toolchain, acquire the published compiler and compile a **sound-free**

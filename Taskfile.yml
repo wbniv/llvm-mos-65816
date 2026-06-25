@@ -82,6 +82,19 @@ tasks:
     cmds:
       - dev/package-release.sh {{.CLI_ARGS}}
 
+  cross-build:
+    desc: "Cross-build the clang/lld/llvm-* HOST tools for a NON-native host into build/llvm-mos-install-<PLATFORM>. PLATFORM=linux-arm64|windows-x86_64. Needs the native toolchain built first (reuses its tablegens). Long (~30-90 min cold; ccache-warm after). e.g. `task cross-build PLATFORM=linux-arm64`."
+    cmds:
+      - dev/run.sh cross-toolchain {{.PLATFORM}}
+
+  package-all:
+    desc: "Assemble ALL 3 interim platform packages into dist/: linux-x86_64 (kept, byte-identical) + linux-arm64 + windows-x86_64. The native leg runs the full SDK-rebuild + clean-room bsnes-jg gate; the cross legs reuse the native SDK and self-test under qemu/wine (ROM bytes must match native). PREREQ: both cross toolchains built (task cross-build PLATFORM=linux-arm64 ; task cross-build PLATFORM=windows-x86_64). macOS arm64 is deferred (needs a macOS SDK). Interim until #321 lands upstream."
+    cmds:
+      - task: package
+      - dev/package-release.sh PLATFORM=linux-arm64
+      - dev/package-release.sh PLATFORM=windows-x86_64
+      - 'echo "==> dist/ now holds:" && ls -1 dist/*.tar.xz dist/*.zip 2>/dev/null'
+
   release-test:
     desc: "Clean-room test the PUBLISHED SNES compiler in a throwaway Docker container with NO dev toolchain: acquire mos-snes-clang, compile examples/snes/mandel-display.c (default-8bit + +mos-a16), run in bsnes-jg (embedded SPC700 IPL → no BIOS/sound), assert the WRAM corpus_result CRC == the host oracle (0x9103) + dump an emulator PNG. METHOD=local (newest dist/*.tar.xz — the publish gate, also auto-run by `task package`) | apt (live apt.indri.studio) | tarball (product-page link). Knobs: PROGRAM=mandel-display|k_mandel, A16=both|1|0, TARBALL=<path>, FRAMES=n. Pass as `task release-test -- METHOD=apt`."
     cmds:

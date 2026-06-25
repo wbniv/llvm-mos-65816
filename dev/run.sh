@@ -344,9 +344,11 @@ if [ "$TARGET" = "fuzz" ]; then
 fi
 
 # `cross-toolchain` builds the llvm-mos HOST tools for a NON-native host (linux-arm64 /
-# windows-x86_64 / macos-arm64). It runs in a SEPARATE image carrying the cross toolchains
-# (dev/Dockerfile.cross, FROM the base image), so the shared base image stays untouched.
-if [ "$TARGET" = "cross-toolchain" ]; then
+# windows-x86_64 / macos-arm64); `cross-selftest` runs the produced foreign compiler under
+# qemu/wine to prove it compiles a SNES ROM warning-free with byte-identical output. Both run
+# in a SEPARATE image carrying the cross toolchains + emulators (dev/Dockerfile.cross, FROM
+# the base image), so the shared base image stays untouched.
+if [ "$TARGET" = "cross-toolchain" ] || [ "$TARGET" = "cross-selftest" ]; then
   IMAGE="${MOS_DEV_IMAGE:-llvm-mos-65816-dev-cross}"
   DEV_DOCKERFILE="${MOS_DEV_DOCKERFILE:-Dockerfile.cross}"
   # Dockerfile.cross is FROM the base image — make sure it exists locally first.
@@ -371,6 +373,9 @@ docker run --rm \
   ${SNES_ROMPATH:+-e SNES_ROMPATH} \
   ${MOS_TOOLCHAIN:+-e MOS_TOOLCHAIN} \
   ${BUILD_JOBS:+-e BUILD_JOBS} \
+  ${REF_SHA:+-e REF_SHA} \
+  ${RUNNER:+-e RUNNER} \
+  ${STAGE_REL:+-e STAGE_REL} \
   ${JG_ONLY:+-e JG_ONLY} \
   ${PYR_MODE:+-e PYR_MODE} \
   ${MANDEL_FRAMES:+-e MANDEL_FRAMES} \
