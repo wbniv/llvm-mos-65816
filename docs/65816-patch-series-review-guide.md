@@ -65,7 +65,7 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
 
 ### 1.1 The patch stack at a glance
 
-Eight patches, applied bottom-up (`git am 0001..0008`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
+Nine patches, applied bottom-up (`git am 0001..0009`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
 name in each step of [§3](#3-the-narrative-each-step-with-need--patch--proof)). LOC is patch size, not net
 source change.
 
@@ -79,6 +79,7 @@ source change.
 | **0006** packed24 | #320 · M1 | 387 | `addrspace(3)` packed-24: a 3-byte in-memory storage form of a far pointer (banked-asset / jump tables); −25 % table storage | Medium |
 | **0007** near‑abs‑relax | #320 · M1 | 28 | Don't bank-relax (`abs`→`long`) a **near** symbol — saves 1 B per A-register near-global access (~284 sites in the examples) | Low |
 | **0008** dp‑arg‑cc | [upstream](#appendix-d--upstream-bug-fixes--status) | 51 | Upstream bug fix: an 8-bit `addrspace(1)` direct-page pointer **argument** was assigned a 16-bit register → illegal `COPY`. Reproduces on stock `mos6502` | Trivial — bug fix + `.ll` test |
+| **0009** a16‑pressure‑incdec | #321 · M2 | 48 | Fixes a `+mos-a16 -O1/-Os` regalloc deadlock on real code (`globals.c`): lower a small-constant i8 add/sub (`\|amt\|≤2`) to a relocatable `G_INC`/`G_DEC` chain instead of A-pinned `ADCImm`, so a strength-reduced byte index can't pin the singleton `{A}` across a 16-bit-accumulator transit. DEFAULT byte-identical | Low |
 
 Two patches (`0003`, `0008`) are pure **upstream bug fixes** surfaced by this work and are independently
 postable; they are included so the stack applies clean.
@@ -803,8 +804,11 @@ paper reasoning. Drafted as the [#321 CC design note](321-upstream-cc-frame-abi-
 Phases 1/1.5 (post-RA peephole) already capture −31/−36 % on chains; a 300-program scan left **1** genuine
 remainder. Phase 3 (keep values in `Ac16` at allocation time) is capped by the single 65816 accumulator (two
 live 16-bit values must spill to `Imag16` anyway) and re-risks the C3 coalescer crash. **Re-open trigger:** a
-2nd independent realistic regalloc crash, or a real function crossing ~10/14 `Imag16` pairs. The same
-deferred core is the `globals.c`/`a16regpress.c` `-Os` RA-pressure crash (XFAIL + XPASS-guarded).
+2nd independent realistic regalloc crash, or a real function crossing ~10/14 `Imag16` pairs. The
+`globals.c`/`a16regpress.c` `-Os` RA-pressure **crash** that used to share this label was **FIXED** by patch
+`0009` (an *orthogonal* i8-loop-counter de-pin from `{A}`, **not** this residency rework — coalescing was still
+ruled out), so `a16regpress.c` is now a positive gate; the residency rework stays deferred, motivated only by
+the scavenger-N/Z (`a16scavnz.c`) + `pr15296` ZP-overflow XFAILs.
 
 ### 16-bit codegen-form spikes
 
@@ -923,7 +927,7 @@ prebuilt binary. MAME + bsnes-jg already give a two-emulator cross-check; parked
 
 ## Appendix D — Upstream bug fixes & status
 
-Two of the eight patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
+Two of the nine patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
 fixed. They are independently postable and **drop from the fork stack on merge**, and are *not* part of the
 #320/#321 feature contribution (which is ABI-blessing-gated). One further upstream defect is filed as an
 **issue with no fix patch** (its fix touches the generic register scavenger — maintainer territory). The

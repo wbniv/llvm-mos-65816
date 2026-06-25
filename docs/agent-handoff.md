@@ -5,7 +5,7 @@ three governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics
 live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
-**Preparing the upstream submission?** The reviewer-facing synthesis of the whole `0001`–`0008` patch stack —
+**Preparing the upstream submission?** The reviewer-facing synthesis of the whole `0001`–`0009` patch stack —
 per-patch *need / patch / proof*, the dependency + sequencing + timeline diagrams, and the testing / SNES /
 dead-end appendices — is [`65816-patch-series-review-guide.md`](65816-patch-series-review-guide.md) (with an
 [LLVM primer](llvm-primer-for-65816-review.md) for readers new to LLVM). It is the "how to review this" map;

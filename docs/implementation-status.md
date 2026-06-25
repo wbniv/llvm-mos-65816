@@ -1,4 +1,4 @@
-# #320 / #321 implementation status — 2026-06-23
+# #320 / #321 implementation status — 2026-06-25
 
 Quick-reference for "what's built, what's deferred, and where the ABI comparison landed."
 For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO.md).
@@ -40,7 +40,12 @@ were measured and shelved. The ABI comparison (three frame strategies) ran to co
 interrupted by crashes; the census short-circuited the build at the measurement step. **32-bit
 `long`/`int32_t` support is now value-verified (2026-06-23)** — a dedicated `a16s32` 4-way micro-test +
 a gated `--s32` track in the builtin fuzzer exercise the s32 path (2×s16 + (un)merge + mul/div libcalls)
-deterministically; both green.
+deterministically; both green. **The lone `+mos-a16 -O1/-Os` RA-crash on real code (`globals.c`/
+`a16regpress.c`, "ran out of registers") is now FIXED** — fork patch **`0009`** (`ad506ed`, 2026-06-25), an
+*orthogonal* i8-loop-counter de-pin from `{A}` (**not** the deferred Phase-3 `Ac16`-residency rework); DEFAULT
+byte-identical, −123 B / 122 c-torture progs, and `a16regpress.c` is now a positive gate. The remaining two
+`+mos-a16` register-pressure XFAILs (the scavenger-N/Z crash, the `pr15296` link-time ZP-overflow) stay
+deferred behind one re-open trigger.
 
 **Also on `main` (2026-06-23):** **#320 far tail calls** — a far→far tail `JSL g; RTL` now folds to a
 direct long jump (`TailJML`/`$5C`), −1 B per site (landed in `0001`, `4adda8b`; verified both emulators).
@@ -142,9 +147,9 @@ other frontier; its PR still waits on the design-note posting.
 | bsnes-jg `xcheck` in CI | ✅ Verified green (run 27823207476) |
 | Native-mode crt0 (DBR=0 via `phk;plb`, explicit contract) | ✅ Done |
 | Register-scavenger crash (`$p is not a GPR`) | ⬜ **Upstream bug** — XFAIL'd (8/500 seeds), now under **both** `+mos-a16` and `+mos-xy16`; XPASS-guarded; fix deferred |
-| `+mos-a16 -Os` RA failure (`globals.c`) | ⬜ XFAIL'd — coalescing ruled out; only Phase-3 residency rework could fix; re-open trigger defined; XPASS-guarded |
+| `+mos-a16 -Os` RA failure (`globals.c`/`a16regpress.c`) | ✅ **FIXED — patch `0009`** (`ad506ed`, 2026-06-25). Orthogonal i8-loop-counter de-pin from `{A}` → `G_INC`/`G_DEC` in `selectAddSub` (**not** the Phase-3 residency rework; coalescing still ruled out); DEFAULT byte-identical, −123 B / 122 c-torture progs (0 worse). `KNOWN_ISSUES["regalloc-out-of-registers"]` dropped; `a16regpress.c` now a **positive gate** (`0x01A7`). [investigation §RESOLUTION](investigations/65816-a16-regalloc-pressure-failure.md) |
 | KNOWN_ISSUES XFAIL handling — `evaluate()` classifies under `+mos-xy16` too + both-legs hardening | ✅ **Done (2026-06-21)** — a known `+mos-a16` issue can't mask a NEW `+mos-xy16` crash; both verify legs run; a new crash on either leg always hard-FAILs. [classify](plans/2026-06-21-321-xy16-verify-leg-classify-known.md) · [both-legs](plans/2026-06-21-321-xy16-verify-both-legs-hardening.md) |
-| KNOWN_ISSUES XPASS guard — `dev/run.sh known-issues` (unconditional in CI) | ✅ **Done (2026-06-21)** — asserts `a16regpress`/`a16scavnz` still crash `-verify-machineinstrs` under both modes; fails loudly with "drop the entry + promote to a positive gate" the moment an upstream/RA fix lands. [plan](plans/2026-06-21-321-known-issues-xpass-guard.md) |
+| KNOWN_ISSUES XPASS guard — `dev/run.sh known-issues` (unconditional in CI) | ✅ **Done (2026-06-21)** — asserts the remaining XFAIL repro (`a16scavnz`) still crashes `-verify-machineinstrs` under both modes; fails loudly with "drop the entry + promote to a positive gate" the moment an upstream/RA fix lands. (It did exactly that for `a16regpress` → patch `0009`, now a positive gate.) [plan](plans/2026-06-21-321-known-issues-xpass-guard.md) |
 | F4 `TXY`/`TYX` dead-flag fix (patch `0003`) | ✅ In fork; **upstream PR ready** (user-triggered to post) |
 
 ### Pending codegen (greenlit or in-progress)

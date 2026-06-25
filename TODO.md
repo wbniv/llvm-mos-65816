@@ -171,36 +171,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   stack — ~~file an issue~~ **issue DRAFTED + source-verified
   ([docs/321-upstream-reentrant-soft-stack-issue.md](docs/321-upstream-reentrant-soft-stack-issue.md));
   filing is user-triggered**. [plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
-- [ ] **#321 `+mos-a16 -O1/-Os` register-allocation FAILURE on real code (corpus `globals.c`).** Surfaced by
-  the ZP-pressure measurement (`dev/measure-zp-pressure.sh`): `globals.c:main` aborts RA — *"ran out of
-  registers during register allocation"* — under `+mos-a16` at `-O1`/`-Os`, while DEFAULT 8-bit `-Os` and
-  `+mos-a16 -O0` both compile clean. **Undiscovered because the corpus is built default 8-bit** (never
-  `+mos-a16`) and the fuzzer never generated the shape. ~~deterministic repro~~ + ~~fuzzer XFAIL~~ **DONE
-  `cca1694`**: delta-debugged minimal trigger `examples/65816/a16regpress.c` (a u16 accumulator held live
-  across a 2nd accumulation loop + two `u16*u8` multiplies; arrays `[4]`/`[8]` — shrinking to `[2]` removes
-  it), plus a `tools/a16_fuzz.py` `KNOWN_ISSUES` entry `regalloc-out-of-registers` (XFAIL-classified, mirrors
-  F3). ~~root-cause~~ **DONE 2026-06-18**: it's `-Os` **over-coalescing** s16 into long-lived `Ac16` ranges
-  that can't fit the single `A16` (`-O0`/`-O2` clean; `-Os` has *fewer* but longer `Ac16` vregs than the
-  passing `-O2`) — i.e. the **A16-threading Phase 3** hard core; full record:
-  [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md). ~~the FIX~~ **asserts build
-  DONE `50a59b5`** — pinpointed it (hard-register A/X/Y exhaustion + unspillable INF `Ac16` *transits* in the
-  indexed loop; **coalescing RULED OUT**, so it's *pure* `Ac16`-residency, no `shouldCoalesce` lever) and
-  **proved there is NO targeted fix** — only the general pre-RA `Ac16`-residency rework (A16-threading
-  Phase 3), high-risk (un-threads the Phase-1 wins / reopens the 1d crash) and low-reward (Phase 1 already
-  captured the threading *wins*; only this pathological crash motivates it). **DECISION 2026-06-18 — keep the
-  XFAIL** (a risky rework is 3× worse for a pathological bug; ZP measurement: real code is slack);
-  **re-open only on the concrete trigger (see Watch — a 2nd independent regalloc/ZP-overflow from realistic
-  code, or a real function crossing ~10 of 14 `Imag16` pairs), then run the gated B0→B1→B2 spike.** When
-  fixed: drop the `KNOWN_ISSUES` entry + make `a16regpress.c` a positive gate (a Phase-3 acceptance case).
-  Optional: extend `a16_fuzz.py`'s generator to emit the two-loop / two-multiply / cross-loop-live shape.
-  **↔ Shared core (native-s16 surface close-out):** one of three faces of a *single* deferred frontier —
-  RA-level 16-bit-value residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡
-  `globals.c` `-Os` RA-crash) — behind **one** re-open trigger (a 2nd independent *realistic*
-  `regalloc-out-of-registers` / `a16-zp-pressure-overflow`, **or** a real fn crossing ~10/14 `Imag16` pairs)
-  → **one** gated B0→B1→B2 spike. [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
-  [investigation](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
-  [finding](docs/plans/2026-06-18-321-zp-pressure-measurement.md) ·
-  [A16-threading Phase 3](docs/plans/2026-06-17-321-a16-threading.md).
 - [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
@@ -234,11 +204,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `a16regpress.c` crash cause. Realizable gain is capped by the single 65816 accumulator (two live 16-bit
   values must spill to `Imag16`) and it reopens the coalescer-crash risk → high-risk/low-reward, so
   **keep the XFAIL** with a concrete re-open trigger + a gated B0→B1→B2 spike recipe (see Watch + the plan).
-  **↔ Shared core (native-s16 surface close-out):** one of three faces of a *single* deferred frontier —
-  RA-level 16-bit-value residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡
-  `globals.c` `-Os` RA-crash) — behind **one** re-open trigger (a 2nd independent *realistic*
-  `regalloc-out-of-registers` / `a16-zp-pressure-overflow`, **or** a real fn crossing ~10/14 `Imag16` pairs)
-  → **one** gated B0→B1→B2 spike. [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
+  **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
+  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the scavenger-N/Z crash ≡
+  the `pr15296` ZP-overflow). The sibling `globals.c`/`a16regpress.c` `-Os` RA-**crash** had an *orthogonal*
+  targeted fix (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`) — **FIXED, patch `0009`**
+  (`ad506ed`, 2026-06-25; now a positive gate), so it left this frontier. The rest stays behind **one**
+  re-open trigger (a 2nd independent *realistic* `regalloc-out-of-registers` / `a16-zp-pressure-overflow`,
+  **or** a real fn crossing ~10/14 `Imag16` pairs) → **one** gated B0→B1→B2 spike.
+  [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
   [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
@@ -254,11 +227,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   (`dev/measure-zp-pressure.sh`): 0 of 13 real functions exhaust the pool (max ~5 of 14 pairs) → DEFER
   confirmed with data** (the scan also surfaced a separate `+mos-a16 -Os` RA *crash* on `globals.c` — see
   its own bullet above).
-  **↔ Shared core (native-s16 surface close-out):** one of three faces of a *single* deferred frontier —
-  RA-level 16-bit-value residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡
-  `globals.c` `-Os` RA-crash) — behind **one** re-open trigger (a 2nd independent *realistic*
-  `regalloc-out-of-registers` / `a16-zp-pressure-overflow`, **or** a real fn crossing ~10/14 `Imag16` pairs)
-  → **one** gated B0→B1→B2 spike. [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
+  **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
+  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the scavenger-N/Z crash ≡
+  the `pr15296` ZP-overflow). The sibling `globals.c`/`a16regpress.c` `-Os` RA-**crash** had an *orthogonal*
+  targeted fix (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`) — **FIXED, patch `0009`**
+  (`ad506ed`, 2026-06-25; now a positive gate), so it left this frontier. The rest stays behind **one**
+  re-open trigger (a 2nd independent *realistic* `regalloc-out-of-registers` / `a16-zp-pressure-overflow`,
+  **or** a real fn crossing ~10/14 `Imag16` pairs) → **one** gated B0→B1→B2 spike.
+  [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [multi-value pressure plan](docs/plans/2026-06-18-321-16bit-alu-multivalue-register-pressure.md) ·
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
@@ -477,7 +453,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   self-test via qemu); **Inc 2** windows-x86_64 (mingw-w64, `.exe`/symlink→copy/`.zip`, self-test via wine);
   **Inc 3** macos-arm64 (osxcross + a user-supplied macOS SDK in `dev/sdks/` — the one manual ask, Apple
   licensing; functional self-test deferred to a real Mac); **Inc 4** `task package-all`. Interim until the
-  `0001–0008` patches land upstream (upstream CI then emits these).
+  `0001–0009` patches land upstream (upstream CI then emits these).
   [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
 - [ ] **Clean-room test of the *published* SNES compiler — wired into the publish gate** — in a throwaway
@@ -502,18 +478,20 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 _Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
 revisit) rather than active work._
 
-- [ ] **Reevaluate the `globals.c` `+mos-a16 -O1/-Os` RA-fix decision (Phase-3 `Ac16` residency).** Current
-  state (2026-06-20): **keep the XFAIL.** The isolated asserts root-cause (`50a59b5`) proved there is **no
-  targeted fix** — coalescing was **ruled out** (so the `shouldCoalesce` barrier is only a safety companion,
-  not the fix); only the general pre-RA `Ac16`-residency rework could clear it, and that is high-risk
-  (regresses the common a16 path / reopens the 1d crash) and low-reward (Phase 1.5 already captured the
-  threading wins) for a **pathological** bug (real code is slack). **Re-open only when** either **(a)** the
-  corpus / c-torture / fuzzer surfaces a *second independent* `regalloc-out-of-registers` (or
-  `a16-zp-pressure-overflow`) from **realistic** (not hand-reduced) code, or **(b)** the ZP-pressure baseline
-  (`dev/measure-zp-pressure.sh`) shows a real corpus function crossing **~10 of 14** `Imag16` pairs. If a
-  trigger fires, run the gated B0→B1→B2 spike (recipe in the A16-threading plan §5). Until then keep the
-  XFAIL — `examples/65816/a16regpress.c` is the ready acceptance case. Full root cause:
+- [ ] **Reevaluate the deferred s16-register-pressure core (Phase-3 `Ac16`/ZP residency).** The
+  `globals.c`/`a16regpress.c` `-Os` RA-**crash** is **FIXED** (patch `0009`, `ad506ed`, 2026-06-25 — an
+  *orthogonal* i8-loop-counter de-pin from `{A}`, **not** the residency rework; `a16regpress.c` is now a
+  positive gate, `0x01A7`). What **remains deferred** is the general pre-RA `Ac16`/ZP-residency rework, now
+  motivated only by two *pathological* XFAILs — the scavenger-N/Z crash (`a16scavnz.c`, `scavenger-p-not-gpr`)
+  and the link-time ZP overflow (`pr15296.c`, `a16-zp-pressure-overflow`), both byte-identical pre/post `0009`.
+  It is high-risk (regresses the common a16 path / reopens the 1d crash) and low-reward (Phase 1.5 already
+  captured the threading wins; real code is slack). **Re-open only when** either **(a)** the corpus / c-torture
+  / fuzzer surfaces a *second independent* `regalloc-out-of-registers` (or `a16-zp-pressure-overflow`) from
+  **realistic** (not hand-reduced) code, or **(b)** the ZP-pressure baseline (`dev/measure-zp-pressure.sh`)
+  shows a real corpus function crossing **~10 of 14** `Imag16` pairs. If a trigger fires, run the gated
+  B0→B1→B2 spike (recipe in the A16-threading plan §5). Full root cause:
   [a16-regalloc-pressure-failure](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
+  [scavenger N/Z](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
   [deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
 
 
@@ -531,6 +509,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-25 — [321-a16-pressure-fix] **#321 `+mos-a16 -O1/-Os` regalloc out-of-registers crash on real code (`globals.c`) — FIXED, fork patch `0009`.** The `globals.c`/`a16regpress.c` *"ran out of registers during register allocation"* deadlock under `+mos-a16 -O1/-Os` (DEFAULT 8-bit + `+mos-a16 -O0` always compiled clean) is fixed. **Root cause** (fresh asserts pinpoint, `-debug-only=regalloc`): the final blocker was **not** `Ac16`-residency but a single **A-pinned i8 loop counter** — the strength-reduced array byte index (stepped `i += 2`) selects to `add Ac,imm → ADCImm` (class `Ac`={A}; `adc` is hardware-A-only), held live across the 16-bit indexed-load `Ac16`=A:B transit → collides on physical A; last-chance recolor fails (singleton `{A}`) and the 1-instr INF transit can't spill. **Fix (`0009`, `ad506ed`):** under `hasAccum16()`, `MOSInstructionSelector::selectAddSub` lowers a small-constant i8 add/sub (`|amt| ≤ 2`) to a relocatable `G_INC`/`G_DEC` chain (Anyi8 = A/X/Y/zp) instead of the A-pinned `ADCImm`, so the byte index coalesces into the X array index (`inx; inx; cpx`) and frees A16 — **one spillable/relocatable change, no RA rework**. Refutes the 2026-06-18 *"no targeted fix, only the general Phase-3 `Ac16`-residency rework"* conclusion **for this crash** (coalescing still ruled out — it's an orthogonal de-pin). DEFAULT 8-bit byte-identical (gated); **−123 B over 122 c-torture programs (0 worse)**; both `a16regpress.c` and the original `globals.c` compile + run clean (release + asserts). `KNOWN_ISSUES["regalloc-out-of-registers"]` dropped + repro row removed; `examples/65816/a16regpress.c` promoted to a **positive gate** (`dev/run.sh a16regpress` → `0x01A7`, both emulators). `regen-patch-0009.sh` round-trips (`0001..0009` == live `MOSInstructionSelector.cpp`). **NOT fixed by `0009`** (still XFAIL — the genuinely-deferred s16-pressure core): the scavenger-N/Z crash (`a16scavnz.c`, `scavenger-p-not-gpr`) + the `pr15296.c` link-time ZP overflow (`a16-zp-pressure-overflow`), both byte-identical pre/post. [plan](docs/plans/2026-06-24-321-a16-pressure-fix-implementation.md) · [handoff](docs/plans/2026-06-23-321-a16-pressure-scavenger-fix-handoff.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-regalloc-pressure-failure.md).
 - 2026-06-25 — [321-mandel-zoom-pyramid] **Mandelbrot ZOOM PYRAMID — true increasing detail on zoom-in (#321 M2), Phases 1 + 2.** The interactive demo only *magnifies* its baked bitmap; this adds genuinely-deeper detail. The host bakes a STACK of Mandelbrot levels, each 2× finer zoom centered on the real-axis mini-Mandelbrot (`c=-1.7548776662`, finalized by rendering several centres to PNG — Lesson 1); on the SNES, Mode 7 hardware-zooms the current level and the ROM **DMAs the next finer level** as zoom crosses each 2× threshold — so the dive runs into NEW structure (whole set → down the antenna → a complete tiny copy of the set) with **zero on-console fractal math**. 64×64 × 6 levels = 32× deep fits one 32 KiB LoROM bank (no linker change); builds **both default-8bit and `+mos-a16`** (near ROM DMA, no far pointer). New `tools/mandel-bake-pyramid.c` (host `double` renderer → gitignored `examples/snes/pyramid_image.h`: per-level tiled chr, one shared normalized palette, `MANDEL_PYR[]`/`MANDEL_PYR_HASH[]`, per-level PNGs), `examples/snes/{zoom.h (pure host-replayable level-swap state machine — `[S0/2,2·S0]` hysteresis, R/L dive, Y/A rotate), mandel-zoom.c}`, `dev/mandel-zoom.sh`; `mode7.h` gains parametric `m7_tilemap_identity`; `jgxcheck.cpp` gains `JGX_ZOOM`. **Differential PASS** (`dev/run.sh mandel-zoom`): per-level image hash all 6 levels host==default==`+mos-a16` (SMOKE 0x9191 + HASH) on MAME + bsnes-jg; scripted-zoom view-math host==target both builds (ZOOM, swaps=3); `-verify` clean; 32 KiB fit. Regressions green (`mandel-interactive` 0xF99C, `mandel-mode7` 0x75E8). **The gate caught a real DEFAULT-8bit matrix-fold-loop MISCOMPILE** (loop `m[i]` folds 0x456E vs correct 0xB115; unrolled form correct; context-sensitive, independent of #321 — see the new follow-up item). **Phase 2 DONE+green (`6fb3d1b`): multi-bank LoROM, 128×128 × 8 levels = 256× deep, 256 KiB / 8 banks** — new `platforms/snes-zoom` platform (one bank-aligned level per bank), bake `PYR_MULTIBANK` mode (per-level `.rodata_levelK` + `MANDEL_PYR_BANK[]`), the swap DMAs from `(bank : addr16)` (no far pointer → still builds default+`+mos-a16`), `snes-checksum.py` 256 KiB, a `jgxcheck` VRAM-readback gate + host ROM-file per-bank hash. `dev/run.sh mandel-zoom` (PYR_MODE=hd default | sd) PASS both modes/builds. **Found the vblank limit** (a 16 KiB swap DMA overruns vblank → truncated mid-transfer; fixed by force-blanking the large swap — the VRAM gate caught it). Live: `task mandel-zoom-play`. [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md).
 - 2026-06-25 — [321-interactive-mandelbrot] **Interactive SNES Mandelbrot — a real-time Mode 7 joypad fly-around (#321 M2), INSTANT boot, host==default==+mos-a16.** The static `mandel-mode7` was too slow (~4 min on-console compute); this bakes the 128×128 image host-side TILED into Mode 7 character order (`tools/mandel-bake.c` → gitignored `examples/snes/mandel_image.h`) and DMAs it straight ROM→VRAM at boot — no compute, no de-linearize loop (measured the reused `build_vbuf` at ~5–6 s of black boot and redesigned around it). Removing the far staging buffer means the demo builds **both default-8bit and `+mos-a16`**. New `examples/snes/{mandel-interactive.c, mode7.h (shared Mode 7 upload + DMA + matrix setters, refactored out of mandel-mode7.c), view.h (pure pan/zoom/rotate state + the 8.8 Mode 7 matrix 16×16→32 multiplies)}`, joypad HAL in `platforms/snes/snes.h` (`snes_read_pad1`/`snes_wait_vblank` + `JOY_*` + `VMAIN_INC_LOW_1`). **Differential PASS:** displayed-image hash **`0xF99C`** host==default==`+mos-a16` on MAME (Xvfb snapshot) + bsnes-jg; a **scripted-input view-math gate** (`dev/jgxcheck.cpp -DJGX_VIEW` replays `view.h` over the ROM's ground-truth pad log) host==target for BOTH builds; `-verify-machineinstrs` clean; 32 KiB fit. The gate caught a real 8/16 promotion bug (`h>>15` on the 16-bit-int target → negative-int arithmetic shift). Bonus fixes: a pre-existing dep-tracking bug (`dev/sync-platform.sh` — editing `platforms/snes/snes.h` now reaches the build) and `dev/build.sh` (bake the header + build `mos-a16-only`-marked far examples with +mos-a16; `dev/run.sh build` was broken on main since the beefy merge). Regressions green: `mandel-mode7` 0x75E8, `k_mandel` 0x820B, corpus 7/7. Controls: D-pad pan / L-R zoom / Y-A rotate / Select palette / Start reset (`task mandel-play`). [plan](docs/plans/2026-06-25-321-interactive-mandelbrot-mode7.md).
 - 2026-06-25 — [321-csmith-fuzzer] **#321 Csmith differential fuzzer DONE (Phases 0–5) + consolidated into a single-file reference.** Off-the-shelf [Csmith](https://github.com/csmith-project/csmith) replaced the hand-rolled generator as the `dev/run.sh fuzz` default (builtin kept via `--gen builtin`): per-seed gen (`tools/csmith_run.py`) → host-side fit pre-filter → the 4-way **default-as-oracle** differential (`host`≡`default@MAME` == `+mos-a16` == `+mos-xy16` == `+mos-a16@bsnes-jg`), sound because `platform.info` (int=2) + kept `safe_math` make output UB-free at the target's 16-bit `int`. SNES adapter `examples/65816/csmith/{csmith_snes.h,platform.info}` folds Csmith's 32-bit CRC into `corpus_result`; `vendor/csmith` built on demand (`dev/fetch-csmith.sh`). **Caught + drove fixes:** the a16 `G_UNMERGE`/`G_MERGE` s32 legalizer gaps (seeds 11, 113) + the `+mos-xy16` high-byte clobber (seeds 247+445) — all FIXED on `main`. **Phase 5 (`e865dff`):** sampled/full `fuzz-csmith` CI job (host-side, `needs: xcheck`, secret-gated, nightly `schedule:` ready-but-commented). Merged `dd5616b` (2026-06-19); consolidated 2026-06-25 — mechanism + state + open residue (nightly schedule, far/AS2/AS3 out-of-scope-by-design, regression-seed extraction, Yarpgen) + the WDC816CC/Plum Hall motivation — into [investigation](docs/investigations/csmith-differential-harness.md). [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).

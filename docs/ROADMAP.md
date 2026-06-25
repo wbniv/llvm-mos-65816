@@ -551,7 +551,9 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    native-s16 surface is **measured-complete**: per-op ALU/compare/shift/load-store + chains + cross-block
    M-flag + A16-threading all at their measured optimum, with **one** shared, pathological, deferred core —
    RA-level 16-bit residency under register pressure (A16-threading Phase 3 ≡ the >14-live ALU-chain residual ≡
-   the `globals.c`/`a16regpress.c` `-Os` RA crash) — behind one trigger + one B0→B1→B2 spike recipe.
+   the scavenger-N/Z crash ≡ the `pr15296` ZP-overflow) — behind one trigger + one B0→B1→B2 spike recipe. (The
+   sibling `globals.c`/`a16regpress.c` `-Os` RA **crash** had an orthogonal targeted fix — patch `0009`,
+   `ad506ed`, 2026-06-25 — and is now a positive gate.)
    [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level
@@ -569,7 +571,7 @@ Acceptance test per milestone — each step is the bar that milestone must clear
 
 ## Links
 
-- [Patch-series review guide](65816-patch-series-review-guide.md) — reviewer's map of `0001`–`0008`
+- [Patch-series review guide](65816-patch-series-review-guide.md) — reviewer's map of `0001`–`0009`
   (need/patch/proof, diagrams, appendices A–D) · [LLVM primer](llvm-primer-for-65816-review.md) for readers
   new to LLVM
 - [Investigation: status, players, rivals](INVESTIGATION.md)
