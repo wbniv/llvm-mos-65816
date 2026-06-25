@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/56f5d80) | docs: record scavenger-fix verification + sweep "deferred scavenger" framing (0011/0012) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/cf30a73) | docs(plan-index): add the 2026-06-26 scavenger live-$p fix plan (→ 142) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/f791491) | docs(plan-index): add the shared plan-index tooling plan row (→ 141) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/40d93f0) | docs(plan-index): add the 10 plans created since the 2026-06-25 refresh (→ 140) |
@@ -15,6 +16,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+56f5d80	author	Will Norris
+56f5d80	added	2
+56f5d80	deleted	2
+56f5d80	files	1
+56f5d80	body	Plan 2026-06-26-321-scavenger-nz-live-p-save-fix: flip status to DONE and paste\nthe raw verification evidence (PASS/FAIL) under each of the 8 numbered steps —\nrelease + asserts repro clean, 121/121 differential fuzz incl. the formerly-XFAIL\n169/173/196, corpus 7/7, a16sub gate, torture 58/0-fail, known-issues 0/0,\n0011/0012 round-trip.\n\nSweep the docs that still described the register-scavenger crash as a deferred,\nupstream-territory, no-fork-patch XFAIL — now that it is FIXED (0011) and the\nLDCImm MC-lowering bug it surfaced is FIXED (0012):\n- README: "two deferred RA/scavenger crashes" -> one (the pr15296 ZP-overflow);\n  ten-patch -> twelve-patch series.\n- ROADMAP §5 + TODO (deferred-core equivalence, the "two pathological XFAILs"\n  Watch item, the next-instrument item): the scavenger-N/Z crash had an\n  orthogonal targeted fix (0011), like globals.c did (0009) — it left the\n  deferred residency core; only the ZP-overflow XFAIL remains.\n- review guide: new §3.11 (0011) + §3.12 (0012) deep-dives; fix §3.9's stale\n  "scavenger XFAIL stays" line.\n- upstream-contribution-status: summary-table row 4 -> fix PR, add row 10 (0012).\n- plan-index: annotate the superseded scavenger-spike / pressure-handoff rows.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 cf30a73	author	Will Norris
 cf30a73	added	3
 cf30a73	deleted	1
