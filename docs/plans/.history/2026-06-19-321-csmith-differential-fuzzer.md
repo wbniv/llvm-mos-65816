@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/e865dff) | #321 CI: wire Csmith (Phase 5) + c-torture (Phase 3) as sampled, secret-gated jobs |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/9bdf5d4) | #321 csmith: finalize for merge — Phase 4 first finding (s32) FIXED, GO disposition |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/1d9fa68) | #321 csmith Phase 1-3: host-side differential runner + --gen dispatch |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/18c2c1f) | #321 csmith: record Phase 0 GO in the backlog + triage the deferral Inbox |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/d39d49b) | #321 csmith Phase 0: GO — differential fuzzer scaffolding + recorded verdict |
 
 <!--history-meta v1
+e865dff	author	Will Norris
+e865dff	added	26
+e865dff	deleted	4
+e865dff	files	1
+e865dff	body	Two new jobs in .github/workflows/smoke.yml, both `needs: xcheck` (reuse its cached\nfrom-source toolchain) and running the SAME 4-way differential gate (host == default\n== +mos-a16 == +mos-xy16 on MAME + +mos-a16 on bsnes-jg):\n\n- torture (in-container, mirrors corpus-a16): fetches the sha256-pinned suite on the\n  host, runs a seeded pseudo-random subset; full mode runs the whole in-scope set at\n  -Os and -O1.\n- fuzz-csmith (HOST-side, since dev/run.sh fuzz --gen csmith isn't Dockerized):\n  installs MAME, builds vendor/csmith, MOS_TOOLCHAIN -> host build path; sampled = 40\n  seeds, full = seeds 1..500.\n\nA `workflow_dispatch` `mode` input (sampled [default] / full) + `sample_seed` drive\nscope; a commented `schedule:` block (auto-selects full) is ready for when the repo\ngoes public. Both secret-gated: skip, not fail, without the SPC700 BIOS.\n\ntools/torture_run.py: add seeded `--sample N` / `--sample-seed S` (was sequential\n`--start`/count slice only — inscope.tsv is alphabetical, so a head slice clusters).\nDeterministic + clamps. Help updated in dev/torture.sh + dev/run.sh.\n\nLocal verification (the exact per-run CI commands, 4-way):\n  dev/run.sh fuzz --gen csmith 40 1      -> 36/40 PASS, 0 mismatch/crash/error\n  dev/run.sh torture --sample 150 --sample-seed 1 --opt -Os\n                                         -> 143 PASS, 0 FAIL, 7 SKIP, 0 XFAIL\nWorkflow YAML validates; embedded run-scripts shellcheck-clean (fixed a set -e abort\nin the mode-resolution: `[ x = y ] && MODE=full` -> `if [ x = y ]; then ...; fi`).\n\nDocs: both plan docs get a Phase 5 / Phase 3 RESULTS section; implementation-status +\nTODO flipped to done.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 9bdf5d4	author	Will Norris
 9bdf5d4	added	11
 9bdf5d4	deleted	2

@@ -4,7 +4,10 @@
 finding (the `a16-unmerge-s32` legalizer gap) is **FIXED on `main`**
 ([s32 plan](2026-06-19-321-a16-unmerge-s32-legalizer.md)). **Phase 5 (sampled CI) DONE** — the
 `fuzz-csmith` job is in `.github/workflows/smoke.yml` (see Phase 5 RESULTS). The Csmith generator is the
-`dev/run.sh fuzz` default.
+`dev/run.sh fuzz` default. **CLOSED 2026-06-25** — consolidated into a single-file reference (mechanism +
+state + open residue + the WDC816CC/Plum Hall motivation that prompted the write-up):
+[`docs/investigations/csmith-differential-harness.md`](../investigations/csmith-differential-harness.md);
+the `TODO.md` item is promoted to Done (`[321-csmith-fuzzer]`).
 **Issue:** #321, ROADMAP M2 (Test Bench / CI — strengthen the *random* correctness axis).
 **Required reading:**
 [Tier-1 fuzzer + engine](2026-06-15-321-tier1-broaden-corpus.md) ·
@@ -335,7 +338,10 @@ $ dev/run.sh fuzz --gen csmith 40 1
   `--gen` seam added here makes this drop-in later.
 - **Yarpgen vs the known bug families** — it directly targets the regalloc/loop optimization surface where our
   open XFAILs live (`regalloc-out-of-registers`, `scavenger-p-not-gpr`), so it's the natural next instrument.
-- **On approval, also:** add the matching `TODO.md` entry under *Test Bench / CI* for this Csmith work itself.
+- ~~**On approval, also:** add the matching `TODO.md` entry under *Test Bench / CI* for this Csmith work
+  itself.~~ **DONE** — and **promoted to Done 2026-06-25** (`[321-csmith-fuzzer]`); the Yarpgen follow-up above
+  is now its own open `[ ]` TODO item. The live open-residue list is maintained in the
+  [harness reference](../investigations/csmith-differential-harness.md) §7.
 
 ## References
 - Csmith int-width / UB facts: `src/CGOptions.cpp` (`set_platform_specific_options` parses `platform.info`;
