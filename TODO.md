@@ -322,10 +322,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [ ] **#321 / baseline — DEFAULT-8bit 65816 matrix-fold-LOOP miscompile → cvise → backend fix.** A real
   miscompile the zoom demo's differential caught: a `for(i<4){ f((uint8_t)m[i]); f((uint8_t)((uint16_t)m[i]>>8)); }`
   fold over an `int16_t m[4]` computes a wrong CRC vs the byte-identical unrolled form, in the **default 8-bit**
-  path (no `+mos-a16`). Context-sensitive — reproduces only inside the full demo's register pressure (3 standalone
-  reductions did NOT trigger it). Next: cvise-reduce from `mandel-zoom.c` (branch `wt/321-mandel-zoom`, revert
-  `zoom_fold` to the loop form) → minimal `.ll` → fix; check whether it's `mosw65816`-only or also `mos6502`
-  (possibly upstream). Full writeup: [docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md](docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
+  path (no `+mos-a16`). **FAST host-side repro found 2026-06-25** (`dev/loopfold-repro.sh`): it reproduces in
+  **sd mode** entirely host-side in ~10 s (loop `ZOOM: FAIL` rom 0xE60E ≠ host 0xF56C; unroll PASS) — NOT just
+  the hd Docker demo the prior note assumed → cvise now tractable. Findings: it's a **post-LTO backend** bug
+  (IR is correct; build is LTO), the `i<4` loop is compiler-**unrolled** in *both* forms, and the loop form
+  sources an `m[]` byte via an **X-indexed stack load** (`eor …,x`) → likely a wrong/clobbered `X` under
+  pressure. Next: creduce via the fast repro → minimal `.c`/`.ll`, classify `mosw65816`-only vs `mos6502`
+  (possibly upstream), fix + regression test.
+  [plan](docs/plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md) ·
+  [investigation](docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
 
 - [x] ~~**SNES hardware reference docs + subsystem-split `snes.h` + generators**~~ — **LANDED on `main`**
   2026-06-25 (consolidation). The umbrella `snes.h` re-exports every prior symbol (`VMAIN_INC_LOW_1`,
