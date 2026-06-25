@@ -35,13 +35,17 @@ address: far indexed loads silently only work within a single 64 KiB bank.
 ### Reproduction (fork, with the #320 far address space)
 
 `examples/65816/farindex.c` on the HiROM platform `platforms/snes-hirom` — a `const FAR uint16_t tbl[]`
-spanning banks $C1+, read at indices 100 / 50000 / 90000:
+spanning banks $C1..$C3 with `tbl[i] = (i + (i>>16)) & 0xFFFF`, read at indices 100 / 50000 / 90000. (This
+is now the committed regression gate `dev/run.sh farindex`, folding the three reads to
+`corpus_result == 0x0001D8A1`, host == +mos-a16 on MAME + bsnes-jg. The `+ (i>>16)` term ties each value to
+its bank ordinal, so the bank-$C3 read differs from its 16-bit-truncated alias by exactly 1 — a precise
+witness of the truncation.)
 
 | index | offset | want addr | before fix | after fix |
 |---|---|---|---|---|
 | 100   | 200      | `$C100C8` ($C1) | `0x0064` ✓ | `0x0064` ✓ |
-| 50000 | 100000   | `$C286A0` ($C2) | `0x0000` ✗ | `0xB0E9` ✓ |
-| 90000 | 180000   | `$C3BF20` ($C3) | `0x5D5C` ✗ (≈ `tbl[90000 & 0xFFFF]`) | `0xFB06` ✓ |
+| 50000 | 100000   | `$C286A0` ($C2) | wrong ✗ — index −15536 (signed i16) reads below `tbl`, into bank $C0 | `0xC350` ✓ |
+| 90000 | 180000   | `$C3BF20` ($C3) | `0x5F90` ✗ (= `tbl[90000 & 0xFFFF]` = `tbl[24464]`) | `0x5F91` ✓ |
 
 ## The fix
 

@@ -1,6 +1,11 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-25 (added the **far array-subscript index-width correctness fix** to the #320 far-pointer
+**Last updated:** 2026-06-26 (the **far array-subscript index-width fix** now has a **dedicated committed regression
+gate** — `dev/run.sh farindex`: `examples/65816/farindex.c` promoted from an open repro → passing gate, a
+`const FAR uint16_t tbl[]` read across banks $C1/$C2/$C3 folds `corpus_result==0x0001D8A1` on MAME + bsnes-jg.
+Strengthens the test story for that fix in the Future/blocked #320 body; still **not** a new ready-to-post row
+(AS2 isn't upstream-standalone-testable). Upstream state unchanged — #561/#562/#563 still OPEN.) Previously
+2026-06-25 (added the **far array-subscript index-width correctness fix** to the #320 far-pointer
 body — clang `CGExpr.cpp` promoted the GEP index to the default 16-bit `IntPtrTy` for every AS, truncating a far/AS2
 index ≥ 32768; fix = the base pointer's per-AS index width. In `0001`; drafted
 [`docs/320-upstream-far-subscript-index-fix.md`](320-upstream-far-subscript-index-fix.md); folds into the
@@ -260,8 +265,11 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
     (AS2, 32-bit) subscript `tbl[idx]` emitted `sext_i16(idx)*2` — truncating indices ≥ 32768 and corrupting the
     bank byte (silent miscompile; far indexed loads only worked within one 64 KiB bank). Fixed to promote to the
     **base pointer's per-AS index width** (`getIntPtrType(ctx, TargetAS)`) — generically correct (a no-op for
-    single-pointer-width targets; only bites an AS *wider* than the default = far). Surfaced + verified by the
-    ~200 KiB sin-LUT-in-far-rodata work (`platforms/snes-hirom`, `examples/65816/farindex.c`, `dev/run.sh k_trig32lut`
+    single-pointer-width targets; only bites an AS *wider* than the default = far). **Now regression-guarded by a
+    dedicated committed gate (2026-06-26):** `dev/run.sh farindex` — `examples/65816/farindex.c`, promoted from an
+    open repro to a passing gate, reads a `const FAR uint16_t tbl[]` spanning banks $C1/$C2/$C3 at three runtime
+    indices via `lda [dp]` and folds `corpus_result==0x0001D8A1`, host == +mos-a16 on MAME + bsnes-jg. Also
+    exercised in production by the ~200 KiB sin-LUT-in-far-rodata work (`platforms/snes-hirom`, `dev/run.sh k_trig32lut`
     `0x87F0B404` MAME+bsnes-jg, corpus 7/7). Like the `isFarSymbol` fix, it touches fork-only far machinery (AS2 isn't
     upstream) so it rides the #320 PR — but the `CGExpr` change is itself generic. Drafted: [`docs/320-upstream-far-subscript-index-fix.md`](320-upstream-far-subscript-index-fix.md).
   Verified end-to-end on **MAME + bsnes-jg** (the whole far suite, 12 ROMs incl. `far_tail`) + corpus 7/7 + csmith 0-mismatch.
