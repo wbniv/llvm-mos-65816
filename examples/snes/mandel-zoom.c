@@ -34,6 +34,13 @@
 #define TILES_W     (MANDEL_PYR_W / 8)                       // image tiles per row (8x8 chars)
 #define TILES_H     (MANDEL_PYR_H / 8)
 #define LEVEL_BYTES ((uint16_t)(MANDEL_PYR_W * MANDEL_PYR_H)) // chr bytes per level (DMA count)
+#define LEVEL_PIXELS (MANDEL_PYR_W * MANDEL_PYR_H)             // same, as a preprocessor-evaluable int
+// VRAM is writable only during vblank or force-blank. A swap re-DMAs the whole image's chr; if that
+// is bigger than what fits one vblank (~6 KiB), it overruns into active display and is TRUNCATED
+// mid-transfer (only the in-vblank prefix lands). So a LARGE level (128x128 = 16 KiB) must swap under
+// force-blank (one blank frame, masked by the swap's scale-reset pop); a SMALL level (64x64 = 4 KiB)
+// fits a vblank and swaps seamlessly. ~6 KiB threshold = a conservative NTSC vblank DMA budget.
+#define SWAP_NEEDS_FORCEBLANK (LEVEL_PIXELS > 6144)
 
 // WRAM proof channels (near, low WRAM .bss). Read by the emulator harness; volatile so the
 // per-frame writes are not optimised away.
@@ -59,12 +66,13 @@ static void cycle_palette(uint8_t shift) {
   }
 }
 
-// DMA level `lvl`'s character data ROM->VRAM (high bytes). Single-bank (Phase 1): every level is a
-// near ROM const, so a 16-bit source address in bank $00 reaches it. (Phase 2 multi-bank splits a
-// per-level far-symbol into bank:addr16 instead.) The tilemap is set ONCE at boot and untouched by
-// this high-byte DMA, so a swap is just this one transfer — instant.
+// DMA level `lvl`'s character data ROM->VRAM (high bytes), from its ROM bank. The DMA A-bus carries
+// the source bank, so the per-level (bank : addr16) reaches any bank uniformly: single-bank (Phase 1)
+// every level is bank $00 (MANDEL_PYR_BANK[]=0); multi-bank (Phase 2) level k is in bank k at $8000.
+// addr16 = (uint16_t)&LEVEL (a 16-bit reloc, no far deref) so this stays default+a16-buildable. The
+// tilemap is set ONCE at boot and untouched by this high-byte DMA, so a swap is just one transfer.
 static void dma_level(uint8_t lvl) {
-  m7_dma_chr(0x00, (uint16_t)(uintptr_t)MANDEL_PYR[lvl], LEVEL_BYTES);
+  m7_dma_chr(MANDEL_PYR_BANK[lvl], (uint16_t)(uintptr_t)MANDEL_PYR[lvl], LEVEL_BYTES);
 }
 
 // Push the current zoom to the PPU: Mode 7 matrix (precomputed in `m`) + palette rotation.
@@ -98,10 +106,20 @@ int main(void) {
   apply_zoom(&z, m);                      // initial view (level 0, fill scale)
   m7_show();                             // release force-blank — INSTANT Mandelbrot (just a DMA)
 
-  // Boot gate: hash EVERY baked level and assert each == its host reference (MANDEL_PYR_HASH[k]).
-  // Fast rolling hash (not CRC16) so all L finish in a few frames with level 0 already on screen.
+  // Boot gate: hash the near-readable level(s) and assert each == its host reference
+  // (MANDEL_PYR_HASH[k]). Fast rolling hash (not CRC16) so it finishes in a few frames with level 0
+  // already on screen. SINGLE-BANK (Phase 1): every level is near in bank $00, so hash all L. MULTI-
+  // BANK (Phase 2): only level 0 is near (bank $00) — levels 1.. live in higher banks and are NOT
+  // CPU-readable here without far loads, so they are verified by the harness instead (it reads back
+  // the DMA'd VRAM after the dive, asserting the displayed chr == MANDEL_PYR_HASH[cur_level], and
+  // hashes the ROM file's bank regions host-side). Keeping the on-console path near-only is what lets
+  // the demo build BOTH default-8bit and +mos-a16.
+#if MANDEL_PYR_MULTIBANK
+  level_hash[0] = img_hash16(MANDEL_PYR[0], LEVEL_BYTES);
+#else
   for (uint8_t k = 0; k < MANDEL_PYR_L; k++)
     level_hash[k] = img_hash16(MANDEL_PYR[k], LEVEL_BYTES);
+#endif
   corpus_result = level_hash[0];
   cur_level = 0;
 
@@ -111,7 +129,13 @@ int main(void) {
     snes_wait_vblank();
     uint16_t pad = snes_read_pad1();
     if (zoom_step(&z, pad)) {             // level changed -> DMA the new (finer/coarser) level
+#if SWAP_NEEDS_FORCEBLANK
+      REG_INIDISP = INIDISP_FORCE_BLANK;  // big chr DMA can't fit vblank -> blank so VRAM stays writable
       dma_level(z.lvl);
+      REG_INIDISP = INIDISP_ON;
+#else
+      dma_level(z.lvl);                   // fits vblank -> seamless, no blank
+#endif
       cur_level = z.lvl;
     }
     zoom_matrix(&z, m);

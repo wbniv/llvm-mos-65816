@@ -299,7 +299,9 @@ Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for
 `repro`, to repro.sh.
 Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH,
 MOS_TOOLCHAIN (toolchain install prefix to build the bench with), BUILD_JOBS,
-JG_ONLY (=1 → bsnes-jg-only: skip the MAME leg, used by xcheck-suite / a single test).
+JG_ONLY (=1 → bsnes-jg-only: skip the MAME leg, used by xcheck-suite / a single test),
+PYR_MODE (mandel-zoom: hd=128x128x8 multi-bank [default] | sd=64x64x6 single-bank),
+MANDEL_FRAMES / JGX_SCRIPT (mandel-zoom/-interactive frame budget + scripted input).
 USAGE
   exit 0
 fi
@@ -353,6 +355,9 @@ docker run --rm \
   ${MOS_TOOLCHAIN:+-e MOS_TOOLCHAIN} \
   ${BUILD_JOBS:+-e BUILD_JOBS} \
   ${JG_ONLY:+-e JG_ONLY} \
+  ${PYR_MODE:+-e PYR_MODE} \
+  ${MANDEL_FRAMES:+-e MANDEL_FRAMES} \
+  ${JGX_SCRIPT:+-e JGX_SCRIPT} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
   2> >(grep -vF 'different data layouts' | cat -s >&2)
 exit $?

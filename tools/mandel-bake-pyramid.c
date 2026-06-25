@@ -106,12 +106,20 @@ int main(int argc, char **argv) {
   double cre = env_d("PYR_CRE", CRE_DEFAULT);
   double cim = env_d("PYR_CIM", CIM_DEFAULT);
   double w0  = env_d("PYR_W0",  W0_DEFAULT);
+  // Multi-bank (Phase 2): tag LEVEL_k (k>=1) into a per-level bank section (.rodata_levelK -> bank k
+  // on the snes-zoom platform) + emit MANDEL_PYR_BANK[k]=k, so each 128x128 level lives in its own
+  // ROM bank and the runtime DMAs it from (bank k : $8000). Single-bank (default, Phase 1): all
+  // levels are near in bank 0 and MANDEL_PYR_BANK[]=0. Set PYR_MULTIBANK=1 to enable.
+  int multibank = getenv("PYR_MULTIBANK") && atoi(getenv("PYR_MULTIBANK"));
 
   // Mode 7 character data is linear 8bpp with a 256-tile cap, and a palette index must fit a byte.
   if (W < 8 || H < 8 || (W % 8) || (H % 8)) { fprintf(stderr, "W,H must be multiples of 8 (>=8)\n"); return 2; }
   if ((W / 8) * (H / 8) > 256) { fprintf(stderr, "W*H exceeds the Mode 7 256-tile cap\n"); return 2; }
   if (L < 1 || L > 64) { fprintf(stderr, "L must be 1..64\n"); return 2; }
   if (NCOL < 3 || NCOL > 256) { fprintf(stderr, "NCOL must be 3..256 (8bpp palette)\n"); return 2; }
+  // Multi-bank uses one bank per level k>=1 (.rodata_level1..7 -> banks $01..$07 on snes-zoom), so
+  // L-1 far levels must fit the 7 far banks => L <= 8.
+  if (multibank && L > 8) { fprintf(stderr, "PYR_MULTIBANK supports L<=8 (snes-zoom has banks $00..$07)\n"); return 2; }
 
   int tw = W / 8, th = H / 8;     // tiles per row / column
   size_t npix = (size_t)W * H;
@@ -137,8 +145,9 @@ int main(int argc, char **argv) {
     "#define MANDEL_PYR_L   %d\n"
     "#define MANDEL_PYR_W   %d\n"
     "#define MANDEL_PYR_H   %d\n"
-    "#define MANDEL_NCOL    %d\n\n",
-    W, H, L, cre, cim, L, W, H, NCOL);
+    "#define MANDEL_NCOL    %d\n"
+    "#define MANDEL_PYR_MULTIBANK %d   // 1 = levels 1.. in their own ROM banks (snes-zoom); 0 = single bank\n\n",
+    W, H, L, cre, cim, L, W, H, NCOL, multibank);
 
   // SINCOS: 8.8 signed sine, full circle = 256 entries. cos(a) = SINCOS[(a+64)&255]. Drives the
   // per-frame Mode 7 rotate/zoom matrix (zoom.h). Emitted first so PYRAMID_NO_IMG includers get it.
@@ -197,6 +206,10 @@ int main(int argc, char **argv) {
 
     fprintf(f, "// Level %d: window width %.6g (2^%d x deeper than level 0), N=%d, hash 0x%04X.\n",
             k, w_k, k, Nk, hash[k]);
+    // Multi-bank: levels 1.. go to a per-level section (.rodata_levelK -> bank k on snes-zoom);
+    // level 0 stays in .rodata (bank 0, so it is near-readable for the on-console boot hash).
+    if (multibank && k >= 1)
+      fprintf(f, "__attribute__((section(\".rodata_level%d\")))\n", k);
     fprintf(f, "static const uint8_t LEVEL_%d[MANDEL_PYR_W * MANDEL_PYR_H] = {\n  ", k);
     for (size_t p = 0; p < npix; p++)
       fprintf(f, "%u,%s", chr[p], ((p & 31) == 31) ? "\n  " : " ");
@@ -228,12 +241,22 @@ int main(int argc, char **argv) {
     }
   }
 
-  // Near pointer table -> each level's chr (the DMA source address for the level swap). Single-bank
-  // (Phase 1): every level is a near ROM const, so a 16-bit pointer reaches it in both the default
-  // and +mos-a16 builds. (Phase 2 multi-bank uses a per-level far-symbol address split instead.)
-  fprintf(f, "// DMA-source table: MANDEL_PYR[lvl] -> level lvl's character data.\n");
+  // DMA-source ADDRESS table: a NEAR pointer per level. `(uint16_t)MANDEL_PYR[lvl]` is the DMA
+  // addr16 (the symbol's low 16 bits — for a bank-placed level that is its in-bank $8000 offset).
+  // Works in BOTH the default and +mos-a16 builds (a 16-bit pointer; no far deref). Multi-bank
+  // levels 1.. live in higher banks, so these pointers are NOT dereferenceable on-console for k>=1
+  // (they would read bank $00) — they are used ONLY as the DMA addr16, paired with MANDEL_PYR_BANK.
+  fprintf(f, "// DMA-source addr16 table: (uint16_t)MANDEL_PYR[lvl] -> level lvl's in-bank chr address.\n");
   fprintf(f, "static const uint8_t *const MANDEL_PYR[MANDEL_PYR_L] = {\n  ");
   for (int k = 0; k < L; k++) fprintf(f, "LEVEL_%d,%s", k, ((k & 7) == 7) ? "\n  " : " ");
+  fprintf(f, "\n};\n");
+
+  // DMA-source BANK table: the A-bus bank byte (A1B0) for each level. Multi-bank: level k -> bank k.
+  // Single-bank: all 0 (every level in bank $00). The runtime DMAs from (MANDEL_PYR_BANK[lvl] :
+  // (uint16_t)MANDEL_PYR[lvl]) — uniform across both modes.
+  fprintf(f, "// DMA-source bank table: MANDEL_PYR_BANK[lvl] -> the ROM bank holding level lvl's chr.\n");
+  fprintf(f, "static const uint8_t MANDEL_PYR_BANK[MANDEL_PYR_L] = {\n  ");
+  for (int k = 0; k < L; k++) fprintf(f, "0x%02X,%s", multibank ? k : 0, ((k & 7) == 7) ? "\n  " : " ");
   fprintf(f, "\n};\n");
 
   fprintf(f, "#endif /* PYRAMID_NO_IMG */\n\n");

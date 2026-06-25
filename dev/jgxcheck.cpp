@@ -263,8 +263,12 @@ int main(int argc, char **argv) {
   // log; assert host == ROM (gates the level-swap arithmetic + the Mode 7 matrix multiplies).
   if (getenv("JGX_LEVELHASH")) {
     unsigned lh_off = (unsigned)strtoul(getenv("JGX_LEVELHASH"), nullptr, 16);
+    // Single-bank: the ROM hashed every level on-console (all near). Multi-bank: only level 0 is
+    // near (bank $00) — levels 1.. are far and proved via the VRAM-readback gate below + a host-side
+    // ROM-file hash. So check all L levels' on-console hashes, or just level 0, accordingly.
+    int nlev = MANDEL_PYR_MULTIBANK ? 1 : MANDEL_PYR_L;
     int allok = 1;
-    for (int k = 0; k < MANDEL_PYR_L; k++) {
+    for (int k = 0; k < nlev; k++) {
       unsigned a = lh_off + 2 * k;
       uint16_t rom_h = (a + 1 < mem.second) ? (uint16_t)(wram[a] | (wram[a + 1] << 8)) : 0;
       if (rom_h != MANDEL_PYR_HASH[k]) {
@@ -272,8 +276,40 @@ int main(int argc, char **argv) {
         allok = 0;
       }
     }
-    if (allok) printf("HASH: PASS all %d levels (rom level_hash == host MANDEL_PYR_HASH, bsnes-jg)\n", MANDEL_PYR_L);
+    if (allok) printf("HASH: PASS %d on-console level%s (rom level_hash == host MANDEL_PYR_HASH, bsnes-jg)\n",
+                      nlev, nlev == 1 ? "" : "s");
     else rc = 1;
+  }
+  // VRAM-readback gate: after the scripted dive, hash the chr actually IN VRAM (the displayed level)
+  // and assert it == MANDEL_PYR_HASH[cur_level]. This is the proof that the level-swap DMA — including
+  // a multi-bank DMA sourcing from a HIGH ROM bank — lands the correct level on screen. (img_hash16
+  // over the VRAM high bytes, matching the bake's tiled-chr hash; same rotate-xor as mandel.h.)
+  if (getenv("JGX_CURLEVEL")) {
+    unsigned cl_off = (unsigned)strtoul(getenv("JGX_CURLEVEL"), nullptr, 16);
+    unsigned nbytes = (unsigned)(MANDEL_PYR_W * MANDEL_PYR_H);
+    std::pair<void*, unsigned> vr = Bsnes::getMemoryRaw(Bsnes::Memory::VideoRAM);
+    if (cl_off < mem.second && vr.first && vr.second >= 2 * nbytes) {
+      unsigned cur = wram[cl_off];
+      const uint8_t *vram = (const uint8_t*)vr.first;
+      uint16_t h = 0;                                  // img_hash16 over the VRAM high bytes (chr)
+      for (unsigned i = 0; i < nbytes; i++) {
+        unsigned hi = ((unsigned)h >> 15) & 1u;
+        h = (uint16_t)((((unsigned)h << 1) | hi) ^ (unsigned)vram[2 * i + 1]);
+      }
+      if (getenv("JGX_VRAMOUT")) {                      // debug: write the nbytes high bytes to a file
+        FILE *vf = fopen(getenv("JGX_VRAMOUT"), "wb");
+        if (vf) { for (unsigned i = 0; i < nbytes; i++) fputc(vram[2 * i + 1], vf); fclose(vf); }
+      }
+      if (cur < (unsigned)MANDEL_PYR_L && h == MANDEL_PYR_HASH[cur]) {
+        printf("VRAM: PASS displayed level %u chr hash=0x%04X == host (bsnes-jg)\n", cur, h);
+      } else {
+        printf("VRAM: FAIL displayed level %u chr hash=0x%04X host=0x%04X\n",
+               cur, h, cur < (unsigned)MANDEL_PYR_L ? MANDEL_PYR_HASH[cur] : 0);
+        rc = 1;
+      }
+    } else {
+      printf("VRAM: FAIL (cur_level/VRAM out of range)\n"); rc = 1;
+    }
   }
   if (getenv("JGX_SCRIPT") && getenv("JGX_ZOOMCRC") && getenv("JGX_PADLOG") && getenv("JGX_NFRAMES")) {
     unsigned padlog_off = (unsigned)strtoul(getenv("JGX_PADLOG"), nullptr, 16);
