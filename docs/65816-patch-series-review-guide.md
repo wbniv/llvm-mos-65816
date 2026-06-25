@@ -108,7 +108,11 @@ host-computed  ==  default(8-bit)@MAME  ==  +mos-a16@MAME  ==  +mos-a16@bsnes-jg
 plus `llc -verify-machineinstrs` clean. Two independent emulators (MAME, used because it matches the
 [drmon/drdevtools](#a1-drmon) debug backend; and the cycle-accurate bsnes-jg) rule out emulator-specific
 quirks. Any
-disagreement or crash is treated as a real defect with a concrete cause — never a "glitch". Full mechanics:
+disagreement or crash is treated as a real defect with a concrete cause — never a "glitch". The bar is
+load-bearing, not decorative: it caught a real **default-8bit** miscompile (a pressure-sensitive `mosw65816`
+regalloc bug the demo corpus surfaced) that this stack does *not* introduce — `+mos-a16` compiles the same
+fold correctly — and which is under active root-cause as provisionally
+upstream<sup>[[C24]](#c24-default8-loopfold-crc-miscompile)</sup>. Full mechanics:
 [Appendix A](#appendix-a--testing-setup).
 
 ### 1.4 Suggested review order
@@ -151,7 +155,8 @@ property — [§3.2](#32-0002--321-16-bit-accumulator-m2), [§4](#4-cross-cuttin
 ### 2.2 Dependency graph
 
 Solid arrow = real dependency (semantic, or shared-file context that must apply in order). The numeric order
-is the `git am` order. `0007`/`0008` stack at the top but are semantically standalone.
+is the `git am` order. `0007`/`0008` stack at the top but are semantically standalone; `0009` is likewise a
+standalone `+mos-a16` selector fix layered on `0002`.
 
 ```mermaid
 flowchart TD
@@ -169,12 +174,14 @@ flowchart TD
     subgraph a16["#321 — 16-bit accumulator (M2)"]
         P2["0002 accum16<br/>REP/SEP + native s16 + xy16"]
         P3["0003 TXY dead-flag (upstream fix)"]
+        P9["0009 a16-pressure incdec<br/>de-pin i8 counter from A"]
     end
 
     SNES --> P1
     SNES --> P2
     P1 -.context.-> P2
     P2 --> P3
+    P2 --> P9
     P1 --> P4
     P2 -->|Ac16/AnyRegBank| P4
     P2 -->|a16-gated hunk| P5
@@ -201,7 +208,7 @@ harness.
 flowchart LR
     M0["M0 — bench<br/>SNES crt0 + linker + ROM header<br/>MAME + bsnes-jg + corpus + fuzzer<br/>(no new codegen)"]
     M1["M1 — #320 far<br/>multi-bank, unoptimized<br/>(0001,0004,0005,0006,0007,0008)"]
-    M2["M2 — #321 16-bit<br/>the optimizing payoff<br/>(0002,0003)"]
+    M2["M2 — #321 16-bit<br/>the optimizing payoff<br/>(0002,0003,0009)"]
     M0 --> M1
     M0 --> M2
     M1 -. "corpus = M2 regression baseline" .-> M2
@@ -225,7 +232,7 @@ flowchart LR
 
 ### 2.5 Timeline
 
-12 days, 416 commits, 127 plan files. M1 and M2 overlap deliberately.
+13 days, 506 commits, 140 plan files. M1 and M2 overlap deliberately.
 
 ```mermaid
 gantt
@@ -250,6 +257,7 @@ gantt
     eq-as-value + A16-threading         :2026-06-17, 1d
     cross-block REP/SEP + xy16          :2026-06-18, 3d
     surface consolidation + close       :2026-06-22, 1d
+    a16-pressure incdec fix (0009)      :2026-06-24, 1d
 ```
 
 ---
@@ -886,6 +894,38 @@ through to a single-byte path emitting `GPR = COPY A16` → lowered to the inval
 `Ac16` via direct 16-bit `LD/STAbs16` (static) / `*Indir16` (reentrant) to the frame slot — never a GPR COPY.
 Restores the [§4.2](#4-cross-cutting-correctness-arguments) invariant. Tests `a16spill*`.
 
+### Correctness bug under investigation
+
+<a id="c24-default8-loopfold-crc-miscompile"></a>
+
+#### C24. Default-8bit matrix-fold-loop CRC miscompile — *under investigation, provisionally upstream*
+A real **default-8bit** (no `+mos-a16`) `mosw65816` miscompile the Mandelbrot-zoom demo's differential
+caught: a CRC fold `for(i<4){ crc=f(crc,(uint8_t)m[i]); crc=f(crc,(uint8_t)((uint16_t)m[i]>>8)); }` over an
+`int16_t m[4]` computes a *different* runtime CRC than the byte-identical **unrolled** form (`0xE60E` vs
+correct `0xF56C`). No UB (`i∈[0,4)`, `m` has 4 elements) → a genuine defect. It is **pressure-sensitive**:
+standalone minimizations didn't trigger it until a fast host-side `sd`-mode repro
+([`dev/loopfold-repro.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/loopfold-repro.sh), ~10 s,
+no container) made cvise tractable → a **43-line** minimal repro (`spikes/2026-06-25-loopfold-min.c`),
+*minimal by ablation* (four simultaneous pressure sources, each load-bearing — remove any one and the bug
+vanishes), which is why the earlier standalone attempts failed.
+
+Why it doesn't dent the [§1.2](#12-the-one-invariant-that-makes-this-reviewable) invariant: it is
+**8-bit-accumulator only** — `+mos-a16` (16-bit accumulator) compiles the *same* fold correctly
+(loop == unroll == host) — so the defect lives in the 65816 **default 8-bit** path, which `0002`'s spill
+hunks don't touch (they are `+mos-a16`-gated, and a16 is clean). That makes it **provisionally an upstream
+`llvm-mos` bug**, not a #320/#321 one (definitive confirmation = a pristine no-`0002` rebuild, pending).
+It is **verifier-clean**: it survives `-verify-machineinstrs` / `-verify-regalloc` / `-verify-coalescing`
+and every *disablable* post-RA peephole — a silent miscompile in non-disablable core machinery (greedy
+regalloc / ISel / ZP-stack alloc / coalescer) whose own correctness model is satisfied. A bsnes-core
+instruction trace (an env-gated `CPU::read`/`write` hook into `vendor/bsnes-jg`) then **falsified** the
+initial "wrong-`X` indexed `m[]` load" hypothesis: `m[]` is stored *and* read correctly with the correct
+index — the corruption is in the running 16-bit **`crc` accumulator** carried across the `for(i<4)` outer
+loop, exposed by the indexed-loop fold shape. **Open:** follow `crc` through the inner CRC bit-loops to the
+exact corrupting instruction/pass → minimal backend fix + hermetic regression, or file upstream with the
+repro+analysis. The shipped demo dodges it with a source-level unroll, so `main` is green. Tracked:
+[loopfold plan](plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md) ·
+[investigation](investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
+
 ### Upstream bugs found (not our defects)
 
 <a id="c19-upstream-register-scavenger-nz-crash"></a>
@@ -930,12 +970,15 @@ prebuilt binary. MAME + bsnes-jg already give a two-emulator cross-check; parked
 Two of the nine patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
 fixed. They are independently postable and **drop from the fork stack on merge**, and are *not* part of the
 #320/#321 feature contribution (which is ABI-blessing-gated). One further upstream defect is filed as an
-**issue with no fix patch** (its fix touches the generic register scavenger — maintainer territory). The
+**issue with no fix patch** (its fix touches the generic register scavenger — maintainer territory); a
+second is under **active root-cause and not yet filed** — a pressure-sensitive **default-8bit** `mosw65816`
+regalloc miscompile the demo differential caught (provisionally upstream, pristine-build confirmation
+pending)<sup>[[C24]](#c24-default8-loopfold-crc-miscompile)</sup>. The
 exhaustive accounting — every PR/issue/design-note, the exact `gh` post commands, and the live snapshot — is
 the single source of truth in [`upstream-contribution-status.md`](upstream-contribution-status.md); this is
 the reviewer's slice of it.
 
-**Last verified: 2026-06-23.** Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
+**Last verified: 2026-06-25** (#561/#562/#563 all still open, none merged). Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
 (or `gh pr list --repo llvm-mos/llvm-mos --author wbniv --state all`).
 
 | Patch | Upstream defect | Repro on stock? | Upstream | Status | On merge | Test |
