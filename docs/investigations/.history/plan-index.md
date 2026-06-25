@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/840f640) | docs(plan-index): add the far-data->2-banks gate-formalization plan row |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/56f5d80) | docs: record scavenger-fix verification + sweep "deferred scavenger" framing (0011/0012) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/cf30a73) | docs(plan-index): add the 2026-06-26 scavenger live-$p fix plan (→ 142) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/f791491) | docs(plan-index): add the shared plan-index tooling plan row (→ 141) |
@@ -16,6 +17,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+840f640	author	Will Norris
+840f640	added	3
+840f640	deleted	1
+840f640	files	1
+840f640	body	Index row for docs/plans/2026-06-26-formalize-far-data-2-banks-into-a-dedicated-passin.md\n(#320 far-pointer; dev/run.sh farindex, a9601e5); bump footer 142 -> 143.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011tDRoGK3T4gSGAHGBXk88B
 56f5d80	author	Will Norris
 56f5d80	added	2
 56f5d80	deleted	2

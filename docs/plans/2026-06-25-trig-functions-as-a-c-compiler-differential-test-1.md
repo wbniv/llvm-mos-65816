@@ -2,7 +2,8 @@
 
 **Status:** Phase 1 DONE + VERIFIED 2026-06-25 (worktree `wt/321-trig`) — 4-way differential PASS on
 both emulators, `corpus_result == 0x068A6933`, accuracy within precision, no 64-bit libcall leak;
-regression k_hopalong PASS + corpus 7/7. Phases 2–3 (16-bit CORDIC, hyperbolic) DEFERRED. Extends the
+regression k_hopalong PASS + corpus 7/7. **Phase 2 (16-bit Q2.14 CORDIC) DONE 2026-06-26**
+([2026-06-26-trig-phase2-q214-cordic.md](2026-06-26-trig-phase2-q214-cordic.md)); Phase 3 (hyperbolic) DEFERRED. Extends the
 standing project guide; generic conventions in `~/SRC/CLAUDE.md` and the project `CLAUDE.md`.
 
 ## Context
@@ -29,7 +30,7 @@ from outside.
 | Side | Reference | Functions (as shipped) | Phase |
 |---|---|---|---|
 | 32-bit Q16.16 | **libfixmath** (vendored, MIT) — drop-in | `sin cos tan asin acos atan atan2` | **1** |
-| 16-bit Q2.14 | **CORDIC** — re-implementation | `sin cos atan atan2` (direct) | 2 |
+| 16-bit Q2.14 | **CORDIC** — re-implementation | `sin cos atan atan2` (direct) | **2 ✓ DONE 2026-06-26** |
 | both | derived `tan/asin/acos` (16-bit) + optional hyperbolic `sinh/cosh/tanh` | | 3 (optional) |
 
 Golden reference = host `libm` (`<math.h>`).
@@ -144,10 +145,12 @@ assert path as the modified `_emu.sh`).
 
 ## Deferred
 
-- **Phase 2 — 16-bit CORDIC** (`k_trig16.c`, `tools/gen-cordic-tables.py`): Q2.14 sin/cos/atan/atan2,
-  4-way differential, and the cross-width accuracy harness `tools/trig-accuracy.c`
-  (`max|int16−int32| ≤ eps16` on the shared functions). Note: libfixmath's atan/asin/acos are coarse
-  (~6e-3–1e-2), so the cross-width eps will be bounded by the 32-bit side, not the 16-bit CORDIC.
+- ~~**Phase 2 — 16-bit CORDIC**~~ **DONE 2026-06-26** — `k_trig16.c` + `cordic16.h` +
+  `tools/gen-cordic-tables.py` + `tools/trig-accuracy.c`; Q2.14 sin/cos/atan/atan2, 4-way differential
+  `corpus_result == 0x9446C734` (both emulators), native 16-bit with **zero arithmetic libcalls**,
+  cross-width PASS (and CORDIC `atan` beats libfixmath). As predicted, the cross-width eps is bounded
+  by libfixmath's coarse 32-bit side. Plan:
+  [2026-06-26-trig-phase2-q214-cordic.md](2026-06-26-trig-phase2-q214-cordic.md).
 - **Phase 3 (optional)** — derived 16-bit `tan/asin/acos`; hyperbolic `sinh/cosh/tanh` (32-bit via the
   already-vendored `fix16_exp`; 16-bit via CORDIC hyperbolic mode, sweep restricted to |x| ≤ 1.0 for
   Q2.14 range).
