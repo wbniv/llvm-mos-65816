@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/40d93f0) | docs(plan-index): add the 10 plans created since the 2026-06-25 refresh (→ 140) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/840fc17) | docs: Phase 2 zoom-pyramid verification + HD montage; Findings 2/3; TODO/handoff/index |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/52acebc) | docs+todo: triage the auto-captured Csmith deferral + log the closeout commit in plan-index |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/c613037) | docs: Phase 1 zoom-pyramid verification results, montage, Phase 2 probe + findings |
@@ -12,6 +13,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+40d93f0	author	Will Norris
+40d93f0	added	18
+40d93f0	deleted	3
+40d93f0	files	1
+40d93f0	body	Slot into chronological-by-creation-commit order: s32-long verification,\nthe reviewer patch-series presentation, Blossom Phase 1, the SNES\nhardware-reference HAL split, interim cross-platform toolchain builds, the\npublished-compiler clean-room test gate, the 0009 a16 register-pressure fix,\nthe trig-as-differential-test + its HiROM/sin-LUT follow-up (clang far-index\nmiscompile fix in 0001), and the 0010 default-8bit coalescer-miscompile fix.\nRefresh the footer count/date. Verified: every docs/plans/*.md now has a row\n(140 indexed == 140 on disk).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 840fc17	author	Will Norris
 840fc17	added	1
 840fc17	deleted	1
