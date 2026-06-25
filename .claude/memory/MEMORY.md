@@ -9,6 +9,7 @@
 - [Worktree teardown: keep durable artifacts](worktree-teardown-keep-durable-artifacts.md) — reclaim the 95%+ build/vendor dupes but never delete the scripts/verdicts that reconstruct a test conclusion; retain worktrees until upstream merge (user feedback, 2026-06-21)
 - [Don't narrate the git SOP](feedback-dont-narrate-git-sop.md) — stop reporting committed-but-not-pushed / "origin is N behind" / "say the word and I'll push" every round; it's known SOP, just commit and stay silent about push state (user feedback, 2026-06-21)
 - [Keep fork branches until merged](keep-fork-branches-until-merged.md) — don't auto-propose deleting wbniv/llvm-mos fork branches; user keeps them around until the work is merged upstream, delete only on explicit request (user feedback, 2026-06-21)
+- [Release verification policy](release-verification-policy.md) — published-compiler releases: ALWAYS test on release (the METHOD=local clean-room gate in package-release.sh) + produce an HTML report (log+screenshots+package/docs info); NO periodic/scheduled CI smoke — don't re-propose one (user feedback, 2026-06-25)
 
 <!-- BEGIN GLOBAL MEMORY (managed by claude-housekeeping; do not edit) -->
 
