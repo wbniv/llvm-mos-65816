@@ -1,5 +1,8 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/840fc17) | docs: Phase 2 zoom-pyramid verification + HD montage; Findings 2/3; TODO/handoff/index |
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/52acebc) | docs+todo: triage the auto-captured Csmith deferral + log the closeout commit in plan-index |
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/c613037) | docs: Phase 1 zoom-pyramid verification results, montage, Phase 2 probe + findings |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fe1a52d) | docs(plan-index): register the interactive Mandelbrot (Mode 7 fly-around) plan |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/d21da90) | docs: finalize the Mandelbrot plan + register it in the indexes |
 | [2026-06-24](https://github.com/wbniv/llvm-mos-65816/commit/8c14a3a) | docs: refresh plan-index — 74→127 plans, regenerate from git |
@@ -9,6 +12,21 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+840fc17	author	Will Norris
+840fc17	added	1
+840fc17	deleted	1
+840fc17	files	1
+840fc17	body	Plan updated: Phase 2 section -> DONE+green (multi-bank snes-zoom, 128x128 x 8, 256 KiB);\na Phase 2 verification-results section (ROMFILE + per-level/VRAM hash + ZOOM, both builds,\nraw output); the HD increasing-detail montage (host 128x128 levels 0/2/4/5/6/7 + the\nbsnes-jg deep far-bank shot + MAME boot); Finding 2 (multi-bank far-DMA works, no far\npointer -> builds both) and Finding 3 (the vblank limit: a 16 KiB swap DMA overruns vblank\n-> force-blank the large swap; the VRAM gate caught it). Merge-back: Phase 2 checked off.\n\nTODO: zoom-pyramid Done entry now covers both phases; the [wip] item retired (the\ndefault-8bit miscompile follow-up stays open). agent-handoff worktree row + plan-index row\nupdated to Phases 1+2 done.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+52acebc	author	Will Norris
+52acebc	added	1
+52acebc	deleted	1
+52acebc	files	1
+52acebc	body	The audit-plan-deferrals hook flagged the struck-through "add the matching\nTODO.md entry" plan bullet as a deferral — a false positive: that action is\nexactly what 2cfd375 completed (the [321-csmith-fuzzer] Done entry). Triaged\nin place (dated note + fingerprint, so the ledger won't re-add it). Also\nappend 2cfd375 to the Csmith plan's row in plan-index.md.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01UFzfnhDq55ttkAyXt724ZX
+c613037	author	Will Norris
+c613037	added	1
+c613037	deleted	0
+c613037	files	1
+c613037	body	Plan docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md updated with the Phase 1\nimplementation outcome + per-step verification results (all PASS, raw output pasted),\nthe increasing-detail screenshot montage (host per-level renders + bsnes-jg deep dive +\nMAME boot), and the Findings (the default-8bit matrix-fold-loop miscompile; the Phase 2\nmulti-bank far-DMA feasibility proof). Phase 2 section rewritten with the de-risked,\nevidence-backed remaining-steps list.\n\nSpike docs/plans/spikes/2026-06-25-321-mandel-zoom-phase2-bank-dma-probe.c — the recorded\nmeasurement + verdict proving a DMA can source chr from a high ROM bank via the far-symbol\nbank:addr16 (the Phase 2 crux): linker places .far_rodata at $018000, (uint16_t)&far_sym =\n$8000, A1B0=$01 DMA lands bank-$01 bytes in VRAM (verified, bsnes-jg).\n\nTODO.md: Phase 1 -> Done; Phase 2 follow-up (feasibility proven) + a new baseline-bug\nfollow-up (cvise the default-8bit miscompile -> backend fix). agent-handoff worktree row +\nplan-index row.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fe1a52d	author	Will Norris
 fe1a52d	added	1
 fe1a52d	deleted	0
