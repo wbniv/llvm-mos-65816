@@ -139,16 +139,19 @@ easier to drive headless for byte-level WRAM assertions. A web leg adds latency 
 
 ---
 
-## Suggested next step (if/when we want the showcase)
+## Status — became a standalone project (2026-06-25)
 
-1. Stand up an EmulatorJS page on the Cloudflare static stack; drop in `build/mandel-zoom.sfc` (and
-   the other demo ROMs) → instant working demo with the `snes9x` core.
-2. *If* we want gate-matched accuracy + clean licensing: build `libretro/bsnes-jg` with Emscripten,
-   load it as a custom core, retire snes9x from the page.
-3. Add the COOP/COEP `_headers` only if a threaded core build is ever needed (it isn't, for SNES).
+The showcase was wanted. It now lives as its own repo, **`~/SRC/bsnes-jg-wasm`** (named for the
+artifact: the WASM build of the gate's cycle-accurate core). Kept separate from this LLVM tree so
+its GPLv3 publish story doesn't entangle the Apache-2.0-w/-LLVM-exception compiler. Scaffolded with
+a reproducible Emscripten build pipeline (`build.sh`), an EmulatorJS loader page (showcase mode
+serves today), `serve.py`, the demo ROMs, GPLv3 `LICENSE`/`NOTICE`, and its own
+plan + TODO. See `~/SRC/bsnes-jg-wasm/docs/plans/2026-06-25-bsnes-jg-wasm.md`.
 
-This is a bounded build task, not open research — recorded here as a verdict, not promoted to a
-plan/TODO unless the showcase is actually wanted.
+Remaining headline work (in that repo's TODO): build the `bsnes-jg` core pinned to *our*
+`vendor/bsnes-jg` revision, wire the page to it, and prove the in-browser framebuffer CRC ==
+this gate's headless `jgxcheck` CRC (`0x9103` for `mandel-display`) — i.e. literally "the same
+core the gate trusts."
 
 ---
 
