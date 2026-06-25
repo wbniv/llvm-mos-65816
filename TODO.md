@@ -457,6 +457,14 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `0001–0008` patches land upstream (upstream CI then emits these).
   [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
+- [ ] **Clean-room test of the *published* SNES compiler** — in a throwaway Docker container, fetch the
+  toolchain from the public endpoints (apt.indri.studio `apt install` and/or the product-page tarball),
+  compile a **sound-free** reference Mandelbrot (`examples/65816/k_mandel.c`, gate CRC `0x820B`), and verify
+  on **bsnes-jg** (embedded SPC700 IPL → no BIOS, no sound) against the host oracle (`mandel-render --gate`)
+  — both default-8bit and `+mos-a16`. Rig image `dev/Dockerfile.release-test` (bsnes-jg + jgxcheck + oracle,
+  no toolchain baked) + `dev/test-release.sh` + `task release-test`; optional periodic CI release-smoke.
+  [plan](docs/plans/2026-06-25-test-published-snes-compiler.md).
+
 
 ## Watch
 
