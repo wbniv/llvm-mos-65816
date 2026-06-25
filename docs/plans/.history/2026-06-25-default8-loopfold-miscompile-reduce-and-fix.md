@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/c4f904d) | plan: loopfold MIR dive (#1) — structure verified correct at every level -> dynamic liveness clobber |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/25fd083) | docs: loopfold root-cause narrowing + provisional UPSTREAM classification |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/06be924) | plan: record loopfold accumulator-width classification (8-bit-accum only; +mos-a16 16-bit clean) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a0498d7) | reduce: cvise-minimize the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (43-line repro + X-indexed-load root-cause lead) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+c4f904d	author	Will Norris
+c4f904d	added	27
+c4f904d	deleted	1
+c4f904d	files	1
+c4f904d	body	Captured MIR through the LTO link (-Wl,-mllvm,-print-after=greedy/mos-late-opt/\nmos-static-stack-alloc/mos-zero-page-alloc). llc standalone does NOT reproduce (the bug needs\nthe exact LTO pipeline/pressure); no per-pass disable flags exist in the MOS backend.\n\nVerified the loop-form codegen is STRUCTURALLY CORRECT at every inspectable level:\n- IR: loop allocates @zp_stack=[16 x i8] (m[] addressable array) vs unroll [2 x i8].\n- after greedy: m[]=%stack.0(+0..7), stores hold right values (m[3]==m[0] is legit CSE:\n  zoom_matrix m[0]==m[3]==cos*scale); fold = LDAbsIdx/EORAbsIdx %stack.0{,+1},%1539 index.\n- asm: offset 0,2,4,6; byte order low-then-high; trip count EXACTLY 4 (16-bit counter __rc3:X,\n  verified cpx #4 / inc;dec __rc3;beq exit); index slots __rc5/__rc6 and m[i]-high __rc2 not\n  clobbered by the inner CRC loops; m[] not overwritten between store and fold.\n\nSo it is NOT a wrong index / value / order / off-by-one. Every static structure is correct yet\nthe runtime value diverges (0xE60E vs 0xF56C) -> a DYNAMIC register/ZP-slot liveness clobber\nunder the loop form's pressure (invisible to static MIR inspection; matches the pressure-\nfragility). Next to pin the pass: a dynamic trace (MAME/bsnes watchpoint on the diverging\nbyte/ZP slot) or a pass-disable bisection (throwaway-worktree toolchain rebuild). Both larger.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 25fd083	author	Will Norris
 25fd083	added	21
 25fd083	deleted	1

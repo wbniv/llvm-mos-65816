@@ -161,10 +161,31 @@ What the MIR/asm shows, all **structurally correct**:
 So it is **not** a wrong index / wrong value / wrong order / off-by-one — every inspectable structure is
 correct, yet the runtime value diverges (`0xE60E` vs `0xF56C`). Conclusion: a **dynamic register/ZP-slot
 liveness clobber** under the loop form's pressure (a value the allocator treats as safe is overwritten at
-runtime) — consistent with the extreme pressure-sensitivity and invisible to static MIR inspection. **Next
-decisive step** to pin the exact pass: a **dynamic trace** (MAME/bsnes watchpoint on the diverging
-byte/ZP slot to catch the clobber), or a **pass-disable bisection** (toolchain rebuild on a throwaway
-worktree, no-op one suspect pass at a time, judge on the runtime value). Both are larger undertakings.
+runtime) — consistent with the extreme pressure-sensitivity and invisible to static MIR inspection.
+
+### Pass-disable bisection (#1, 2026-06-25): the disablable passes are NOT the culprit; bug is verifier-clean
+Rebuilt the **asserts** toolchain (`dev/run.sh asserts-build`, keeps the shared `-install` clang pristine;
+confirmed it reproduces `0xE60E`/`0xF56C`) with default-off `cl::opt` toggles added to the three
+*optional* post-RA passes (reverted after). Bisection (judge on the runtime `zoom_crc` of the loop form):
+```
+baseline (no flag):       0xE60E   (buggy)
+-mos-disable-late-opt:    clang ABORTS  (mandatory — absence leaves invalid MIR; asserts catch it)
+-mos-disable-scavenging:  clang ABORTS  (mandatory)
+-mos-disable-copy-opt:    <no-value>    (non-running ROM)
+-verify-regalloc / -verify-coalescing / -verify-machineinstrs:  ALL CLEAN
+```
+None yield `0xF56C`. So the miscompile is **not** in any disablable peephole, and it survives every
+register-allocation/liveness/machine verifier — a **silent miscompile in non-disablable core machinery**
+(greedy regalloc / instruction selection / ZP-stack allocation / coalescer) whose own correctness model is
+satisfied. Generic `-mllvm` toggles also don't fix it (`-enable-misched=false`, `-enable-post-misched=false`,
+`-disable-machine-cse`, `-disable-post-ra` → still `0xE60E`; `-regalloc=basic`/`-join-liveintervals=false`
+→ non-running, the MOS target depends on greedy+coalescing; `-regalloc=fast` → out of registers).
+
+**Bisection (#1) exhausted.** Remaining method to pin the exact instruction is the **dynamic trace** (#2):
+MAME debugger watchpoint on the diverging ZP byte to catch the clobber live. Given the analysis is already
+strong (minimal repro + structure verified correct + localized to verifier-clean core codegen + provisional
+upstream), an alternative is to **file upstream now** with this repro+analysis and let the llvm-mos
+maintainers (who own the regalloc) pin it.
 
 ## Verification
 
