@@ -243,6 +243,25 @@ and rebuild the core (jgxcheck already links it) — a real but self-owned sub-p
 pin the exact instruction; then (3) the patch. All three are substantial; the mechanism + repro are already
 strong enough to file upstream and let the regalloc owners pin the instruction if preferred.
 
+### bsnes-core instruction trace (2026-06-25): BREAKTHROUGH — the `m[]` read is CORRECT; the bug is the CRC state
+Built an env-gated read/write hook into `CPU::read`/`CPU::write` in `vendor/bsnes-jg/src/cpu.cpp` (logs
+soft-stack-frame accesses with the live 65816 `PC/X/Y/D` + byte value), compiled it into a *copy* of
+`libbsnes.a` (shared core untouched) and relinked the jgxcheck tracer. Ground truth for frame 0
+(`m={0x3E,0,0,0x3E}`, soft-stack frame at direct page `0x7C`):
+```
+STORE (zoom_matrix):  0x7C=3E 7D=00 7E=00 7F=00 80=00 81=00 82=3E 83=00     (correct m[])
+READ  (fold, PC 83E3 hi / 83E9 lo):  X=0,2,4,6 over 0x7C..0x83 -> folds 3E,00,00,00,00,00,3E,00 (correct)
+```
+**So `m[]` is stored AND read correctly, with the correct index — the entire "wrong-X / OOB `m[]` read"
+hypothesis is FALSIFIED.** Yet the frame-0 rolling CRC is `0xCE8C` (ROM) vs `0x9F3D` (correct). The fold's
+inputs are all correct (`m[]` traced correct; the non-`m[]` bytes are byte-identical to the unroll form), so
+the defect is in the **running-CRC accumulator state of the loop-form fold's inner CRC bit-loops** — a
+register-allocation corruption of the 16-bit `crc` carried across the `for(i<4)` outer loop, while the
+indexed `m[]` access it threads is fine. The trace tool (env `BSNES_TRACE=1`) is built and reusable; the
+remaining step is to follow the `crc` accumulator through the inner loop to the exact corrupting
+instruction. **This materially changes the upstream report**: it is a `crc`-accumulator regalloc bug
+exposed by the indexed-loop fold shape, NOT an indexed-load/index bug.
+
 ## Verification
 
 1. **Repro is live + fast.** `dev/loopfold-repro.sh loop` prints `ZOOM: FAIL … host=0xF56C rom=0xE60E`;

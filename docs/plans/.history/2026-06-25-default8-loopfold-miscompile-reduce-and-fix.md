@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fb405c2) | plan: loopfold instruction-trace attempt — MAME 0.277 headless-debugger wall; bsnes-core hook is next |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/cd77eaa) | plan: loopfold grind — frame-0 localization + mechanism (index across inner CRC loops) |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/554e5ec) | plan: loopfold dynamic m[] check — VALUES correct, the fold's X-indexed READ is the bug |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fb48fe7) | plan: loopfold pass-disable bisection (#1) exhausted — verifier-clean core-codegen miscompile |
@@ -10,6 +11,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+fb405c2	author	Will Norris
+fb405c2	added	21
+fb405c2	deleted	5
+fb405c2	files	1
+fb405c2	body	Tried to log X/PC/D at the fold's m[] reads (ZP frame at direct page 0x6c; eff addr = 0x6c+X) via\nhost MAME 0.277:\n- -debug alone -> Qt GUI debugger (Wayland), unusable headless.\n- -debug -debugger none -debugscript runs but printf is swallowed and `trace` writes no file.\n- Lua cpu.debug:wpset works headlessly (CPU state PC/X/Y/D readable) BUT a Lua-function watchpoint\n  action SEGFAULTS MAME 0.277 (action must be a debugger-command string; those can't reach stdout\n  under -debugger none).\nSo MAME-headless instruction tracing is blocked. Controllable alternative: instrument the bsnes-jg\ncore (vendor/bsnes-jg/src/processor/wdc65816.cpp, has r.x) with an env-gated read hook + rebuild the\ncore (jgxcheck links it). Mechanism + repro are already strong enough to file upstream regardless.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 cd77eaa	author	Will Norris
 cd77eaa	added	24
 cd77eaa	deleted	0
