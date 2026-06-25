@@ -1145,4 +1145,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      phases of the trig differential plan, not deferrals — the plan itself tracks them. Phase 1 (Q16.16
      libfixmath) landed + verified this session (k_trig32 0x068A6933, k_trig32lut HiROM 0x87F0B404, both
      emulators). fp:b69409f652ecf145 fp:6129cc5f0e5198c0 -->
+- [verify] **2026-06-26-shared-plan-index-tooling** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-26-shared-plan-index-tooling.md](docs/plans/2026-06-26-shared-plan-index-tooling.md)_  <!-- fp:118418f2ad7a1a78 -->
 <!-- END auto-captured-deferrals -->
