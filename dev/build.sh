@@ -51,11 +51,14 @@ cmake --build "$BUILD"
 cmake --install "$BUILD"
 echo "$MOS_TOOLCHAIN" > "$STAMP"
 
-# Generate the baked Mandelbrot header (gitignored) that examples/snes/mandel-interactive.c needs
-# before the loop compiles it — keeps it reproducible-from-source rather than committed.
+# Generate the baked Mandelbrot headers (gitignored) that examples/snes/mandel-{interactive,zoom}.c
+# need before the loop compiles them — keeps them reproducible-from-source rather than committed.
 echo "==> bake examples/snes/mandel_image.h (tools/mandel-bake.c)"
 cc -O2 -I "$ROOT/examples/65816" "$ROOT/tools/mandel-bake.c" -o "$BUILD/mandel-bake" -lm
 "$BUILD/mandel-bake" "$ROOT/examples/snes/mandel_image.h" 128 128 32
+echo "==> bake examples/snes/pyramid_image.h (tools/mandel-bake-pyramid.c)"
+cc -O2 -I "$ROOT/examples/65816" -I "$ROOT/tools" "$ROOT/tools/mandel-bake-pyramid.c" -o "$BUILD/mandel-bake-pyramid" -lm
+"$BUILD/mandel-bake-pyramid" "$ROOT/examples/snes/pyramid_image.h" 64 64 6 32
 
 echo "==> build + checksum every SNES program (examples/snes/**/*.c)"
 shopt -s globstar nullglob

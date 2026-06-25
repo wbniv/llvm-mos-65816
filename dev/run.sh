@@ -52,6 +52,13 @@ Targets:
              fly-around at 60 fps. Builds default AND +mos-a16; per build asserts image hash == host
              AND a scripted-input view-math differential (host replay == ROM) on bsnes-jg, plus a
              MAME snapshot. examples/snes/mandel-interactive.c. Live: task mandel-mame ROM=mandel-interactive
+  mandel-zoom #321 M2: the Mandelbrot ZOOM PYRAMID — TRUE increasing detail on zoom-in. The host bakes
+             a stack of 2x-finer Mandelbrot levels (tools/mandel-bake-pyramid.c); the ROM DMAs the next
+             finer level as zoom crosses each 2x threshold (instant; SNES does zero fractal math). Phase 1
+             = 64x64 x 6 levels in one 32 KiB bank. Builds default AND +mos-a16; per build asserts a
+             per-level image hash (every baked level == host ref) AND a scripted-zoom view-math
+             differential (host replay == ROM) on bsnes-jg, plus a MAME snapshot. examples/snes/
+             mandel-zoom.c. Live: task mandel-zoom-play
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUES repro
              (a16regpress/a16scavnz) STILL crashes -verify-machineinstrs under both
              +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment
