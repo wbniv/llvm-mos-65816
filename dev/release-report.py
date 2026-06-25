@@ -17,9 +17,9 @@ import argparse, base64, html, os, sys
 
 
 def parse_data(path):
-    meta, builds, docs = {}, [], []
+    meta, builds, docs, exes = {}, [], [], []
     if not path or not os.path.exists(path):
-        return meta, builds, docs
+        return meta, builds, docs, exes
     with open(path, encoding="utf-8") as f:
         for line in f:
             line = line.rstrip("\n")
@@ -37,7 +37,9 @@ def parse_data(path):
                 })
             elif kind == "doc" and len(parts) >= 4:
                 docs.append({"name": parts[1], "bytes": parts[2], "type": parts[3]})
-    return meta, builds, docs
+            elif kind == "exe" and len(parts) >= 4:
+                exes.append({"name": parts[1], "bytes": parts[2], "kind": parts[3]})
+    return meta, builds, docs, exes
 
 
 def human(n):
@@ -58,6 +60,18 @@ def img_data_uri(path):
 
 def esc(s):
     return html.escape(str(s if s is not None else ""))
+
+
+# Canonical reader-doc reading order (mirrors dev/build-release-docs.sh) — the report
+# lists docs in this order, not alphabetically. README first; unknown docs sort last.
+DOC_ORDER = ["readme", "65816-opcodes", "snes-hardware", "snes-registers",
+             "snes-bootup", "emulator-screenshots", "oop-in-c"]
+
+
+def doc_sort_key(d):
+    stem = os.path.splitext(os.path.basename(d["name"]))[0].lower()
+    rank = DOC_ORDER.index(stem) if stem in DOC_ORDER else len(DOC_ORDER)
+    return (rank, stem, 0 if d.get("type") == "md" else 1)
 
 
 CSS = """
@@ -105,7 +119,8 @@ def main():
     ap.add_argument("--stamp", default="")
     a = ap.parse_args()
 
-    meta, builds, docs = parse_data(a.data)
+    meta, builds, docs, exes = parse_data(a.data)
+    docs = sorted(docs, key=doc_sort_key)   # canonical reading order, not alphabetical
     result = meta.get("result", "FAIL")
     ok = result == "PASS"
 
@@ -160,6 +175,37 @@ def main():
         parts.append("".join(rows))
     else:
         parts.append('<div class="panel"><div class="total">no .md/.pdf docs found in the package</div></div>')
+
+    # --- executables ---------------------------------------------------------
+    parts.append("<h2>Executables</h2>")
+    if exes:
+        rows = ['<div class="panel"><table><tr><th>file</th><th>size</th><th>kind</th></tr>']
+        bin_total = 0
+        for e in exes:
+            is_bin = e["kind"] == "binary"
+            if is_bin:
+                try:
+                    bin_total += int(e["bytes"])
+                except ValueError:
+                    pass
+            size = human(e["bytes"]) if is_bin else "—"
+            rows.append(f'<tr><td class="mono">{esc(e["name"])}</td>'
+                        f'<td class="mono">{size}</td>'
+                        f'<td class="mono">{esc(e["kind"])}</td></tr>')
+        nbin = sum(1 for e in exes if e["kind"] == "binary")
+        extra = ""
+        if meta.get("bin_total"):
+            try:
+                others = int(meta["bin_total"]) - len(exes)
+                if others > 0:
+                    extra = f" · +{others} other per-platform driver symlinks/.cfg in bin/"
+            except ValueError:
+                pass
+        rows.append(f'<tr><td class="total" colspan="3">{nbin} binaries, {human(bin_total)} total{extra}</td></tr>')
+        rows.append("</table></div>")
+        parts.append("".join(rows))
+    else:
+        parts.append('<div class="panel"><div class="total">no executables recorded</div></div>')
 
     # --- configuration -------------------------------------------------------
     parts.append("<h2>Configuration</h2>")
@@ -232,8 +278,144 @@ def main():
            f"<style>{CSS}</style></head><body>{''.join(parts)}</body></html>")
     with open(a.out, "w", encoding="utf-8") as f:
         f.write(doc)
-    print(f"release-report: wrote {a.out} ({len(doc)//1024} KiB, {len(shots)} screenshot(s), {len(docs)} doc(s))")
+
+    # --- Markdown sibling (previews via `task md`, feeds the PDF pipeline) ----
+    # Screenshots are referenced by relative path (the .md lives next to the PNGs),
+    # so the report stays small and renders in the repo's md workflow.
+    md_path = os.path.splitext(a.out)[0] + ".md"
+    write_markdown(md_path, meta, builds, docs, exes, a, shots, log_txt, result)
+
+    print(f"release-report: wrote {a.out} ({len(doc)//1024} KiB) + {os.path.basename(md_path)} "
+          f"({len(shots)} screenshot(s), {len(docs)} doc(s))")
     return 0
+
+
+def md_cell(s):
+    return str(s if s is not None else "").replace("|", "\\|").replace("\n", " ") or "—"
+
+
+def write_markdown(path, meta, builds, docs, exes, a, shots, log_txt, result):
+    L = []
+    L.append("# llvm-mos-65816 — release verification report")
+    L.append("")
+    L.append(f"**RESULT: {result}** · clean-room test of the *published* SNES compiler · "
+             f"generated {meta.get('finished','')}"
+             + (f" · `{a.stamp}`" if a.stamp else ""))
+    L.append("")
+
+    L.append("## Release package")
+    L.append("")
+    L.append("| field | value |")
+    L.append("|---|---|")
+    for k, v in [
+        ("tarball", a.tarball_name or meta.get("pkg_url", "")),
+        ("size", human(a.tarball_size) if a.tarball_size else ""),
+        ("sha256", a.tarball_sha or ""),
+        ("version / stamp", a.stamp or meta.get("pkg_version", "")),
+        ("source", meta.get("pkg_source", "")),
+        ("compiler", meta.get("compiler_version", "")),
+        ("compiler path", meta.get("compiler_path", "")),
+        ("install tree", human(meta.get("tree_bytes")) if meta.get("tree_bytes") else ""),
+    ]:
+        if v:
+            L.append(f"| {md_cell(k)} | `{md_cell(v)}` |")
+    L.append("")
+
+    L.append("## Bundled documentation")
+    L.append("")
+    if docs:
+        L.append("| document | type | size |")
+        L.append("|---|---|---|")
+        total = 0
+        for d in docs:
+            try:
+                total += int(d["bytes"])
+            except ValueError:
+                pass
+            L.append(f"| `{md_cell(d['name'])}` | {md_cell(d['type']).upper()} | {human(d['bytes'])} |")
+        L.append("")
+        L.append(f"*{len(docs)} file(s), {human(total)} total.*")
+    else:
+        L.append("*No .md/.pdf docs found in the package.*")
+    L.append("")
+
+    L.append("## Executables")
+    L.append("")
+    if exes:
+        L.append("| file | size | kind |")
+        L.append("|---|---|---|")
+        bin_total = 0
+        for e in exes:
+            is_bin = e["kind"] == "binary"
+            if is_bin:
+                try:
+                    bin_total += int(e["bytes"])
+                except ValueError:
+                    pass
+            size = human(e["bytes"]) if is_bin else "—"
+            L.append(f"| `{md_cell(e['name'])}` | {size} | {md_cell(e['kind'])} |")
+        nbin = sum(1 for e in exes if e["kind"] == "binary")
+        extra = ""
+        if meta.get("bin_total"):
+            try:
+                others = int(meta["bin_total"]) - len(exes)
+                extra = f" · +{others} other per-platform driver symlinks/.cfg in `bin/`" if others > 0 else ""
+            except ValueError:
+                pass
+        L.append("")
+        L.append(f"*{nbin} binaries, {human(bin_total)} total{extra}.*")
+    else:
+        L.append("*No executables recorded.*")
+    L.append("")
+
+    L.append("## Configuration")
+    L.append("")
+    L.append("| field | value |")
+    L.append("|---|---|")
+    for k, v in [
+        ("method", meta.get("method", "")),
+        ("program / grid", f'{meta.get("program","")} ({meta.get("grid","")})'),
+        ("builds tested", ", ".join(b["label"] for b in builds)),
+        ("oracle CRC", meta.get("oracle", "")),
+        ("frames", meta.get("frames", "")),
+        ("emulator", f'bsnes-jg {meta.get("bsnes","?")} (embedded SPC700 IPL — no BIOS, no sound)'),
+        ("rig base", meta.get("ubuntu", "")),
+        ("host", f'{meta.get("host_arch","")} · {meta.get("host_cpus","")} CPU'),
+        ("started", meta.get("started", "")),
+        ("finished", meta.get("finished", "")),
+    ]:
+        if v.strip(" ()·"):
+            L.append(f"| {md_cell(k)} | {md_cell(v)} |")
+    L.append("")
+
+    L.append("## Results")
+    L.append("")
+    L.append("| build | flags | ROM | got | expect | compile | emulate | verdict |")
+    L.append("|---|---|---|---|---|---|---|---|")
+    oracle = meta.get("oracle", "")
+    for b in builds:
+        L.append(f"| `{md_cell(b['label'])}` | `{md_cell(b['flags'] or '—')}` | {human(b['sfc'])} | "
+                 f"`{md_cell(b['got'])}` | `{md_cell(oracle)}` | {md_cell(b['compile_s'])}s | "
+                 f"{md_cell(b['emulate_s'])}s | **{md_cell(b['verdict'])}** |")
+    L.append("")
+
+    if shots:
+        L.append("## Screenshots")
+        L.append("")
+        for p, cap in shots:
+            L.append(f"**{md_cell(cap)}**")
+            L.append("")
+            L.append(f'<img src="{os.path.basename(p)}" width="384" style="image-rendering:pixelated">')
+            L.append("")
+
+    L.append("## Compile & emulation log")
+    L.append("")
+    L.append("```")
+    L.append(log_txt.rstrip("\n"))
+    L.append("```")
+    L.append("")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(L))
 
 
 if __name__ == "__main__":

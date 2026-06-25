@@ -46,11 +46,11 @@ SDK_INSTALL="${SDK_INSTALL:-$ROOT/build/install}"
 DIST_DIR="${DIST_DIR:-$ROOT/dist}"
 STRIP="${STRIP:-1}"
 # Bundle the reader docs (.md + .pdf) so they ship with the release and the clean-room
-# report can list them. Default to the sibling indri.studio generated docs WHEN PRESENT;
-# an explicit RELEASE_DOCS_DIR=<path> overrides, RELEASE_DOCS_DIR= (empty) disables.
-# (Set via ${VAR-default}, so only an UNSET var triggers the auto-detect.)
-DEFAULT_DOCS_DIR="$ROOT/../indri.studio/public/docs"
-RELEASE_DOCS_DIR="${RELEASE_DOCS_DIR-$([ -d "$DEFAULT_DOCS_DIR" ] && echo "$DEFAULT_DOCS_DIR" || true)}"
+# report can list them. Default: GENERATE them from THIS repo (dev/build-release-docs.sh —
+# reproducible, no dependency on the indri.studio sibling). An explicit RELEASE_DOCS_DIR=<path>
+# overrides; RELEASE_DOCS_DIR= (empty) disables doc bundling. The `${VAR-__auto__}` form keeps
+# the sentinel only when the var is UNSET (so an explicit empty value still disables).
+RELEASE_DOCS_DIR="${RELEASE_DOCS_DIR-__auto__}"
 
 # --- preflight -------------------------------------------------------------
 [[ -x "$TOOLCHAIN_INSTALL/bin/clang-23" ]] || {
@@ -163,10 +163,21 @@ if find "$STAGE" -xtype l | grep -q .; then
     exit 1
 fi
 
-# --- 6. license + optional docs + generated README -------------------------
+# --- 6. license + reader docs + generated README ---------------------------
 cp "$ROOT/LICENSE" "$ROOT/NOTICE" "$STAGE/"
+# __auto__ (the unset default): generate the reader docs FROM THIS REPO so the package
+# is self-contained (no indri.studio sibling dependency). .md always; .pdf best-effort.
+if [[ "$RELEASE_DOCS_DIR" == "__auto__" ]]; then
+    echo "==> generating reader docs from this repo (dev/build-release-docs.sh)"
+    if "$ROOT/dev/build-release-docs.sh" "$ROOT/build/release-docs" >&2; then
+        RELEASE_DOCS_DIR="$ROOT/build/release-docs"
+    else
+        echo "WARN: reader-doc generation failed — packaging WITHOUT bundled docs" >&2
+        RELEASE_DOCS_DIR=""
+    fi
+fi
 if [[ -n "$RELEASE_DOCS_DIR" && -d "$RELEASE_DOCS_DIR" ]]; then
-    echo "==> bundling docs from $RELEASE_DOCS_DIR"
+    echo "==> bundling docs from $RELEASE_DOCS_DIR ($(find "$RELEASE_DOCS_DIR" -maxdepth 1 -name '*.md' | wc -l) md, $(find "$RELEASE_DOCS_DIR" -maxdepth 1 -name '*.pdf' | wc -l) pdf)"
     mkdir -p "$STAGE/docs"
     cp -a "$RELEASE_DOCS_DIR"/. "$STAGE/docs/"
 fi
@@ -232,11 +243,16 @@ else
         exit 1
     fi
     # Keep the verification report alongside the release artifact (embeds the log +
-    # screenshots + package/docs details — see dev/release-report.py).
+    # screenshots + package/docs details — see dev/release-report.py). Both forms:
+    # the self-contained .html and the .md (previews via `task md`, feeds the PDF pipeline).
     REPORT_SRC="$ROOT/build/release-test/release-report-latest.html"
     if [[ -f "$REPORT_SRC" ]]; then
         cp -f "$REPORT_SRC" "$DIST_DIR/$NAME-release-report.html"
         echo "==> release report: $DIST_DIR/$NAME-release-report.html"
+        # The .md sibling sits next to the timestamped .html (not the -latest pointer);
+        # find the newest local report's .md and copy it too.
+        REPORT_MD="$(ls -t "$ROOT"/build/release-test/release-report-*-local-*.md 2>/dev/null | head -1 || true)"
+        [[ -n "$REPORT_MD" && -f "$REPORT_MD" ]] && cp -f "$REPORT_MD" "$DIST_DIR/$NAME-release-report.md"
     fi
 fi
 

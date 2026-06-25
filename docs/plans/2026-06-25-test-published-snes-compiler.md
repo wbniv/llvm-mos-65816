@@ -153,12 +153,16 @@ Non-zero → `package-release.sh` exits non-zero and the tarball is **not** a pu
 Docker is unavailable the gate FAILS rather than silently skipping). `task package`'s description documents
 the added gate.
 
-**Docs bundling (so the report has real docs to list).** `dev/package-release.sh` copies `RELEASE_DOCS_DIR`'s
-contents into the release `docs/`. We default `RELEASE_DOCS_DIR` to the sibling `../indri.studio/public/docs`
-**when it exists** (the generated reader docs — `65816-opcodes`, `snes-hardware`, `snes-registers`, `oop-in-c`,
-`emulator-screenshots`, `snes-bootup`, each as `.md` + `.pdf`), so a normal release bundles them and the
-report lists them; absent the sibling repo the release still builds (README-only) and the report degrades
-gracefully. An explicit `RELEASE_DOCS_DIR=` (empty) or a real path overrides the default.
+**Docs bundling (self-contained, reproducible).** `dev/build-release-docs.sh` GENERATES the reader docs
+**from this repo's own sources** (`git show` of the pinned ref:path — `main` + the `wt/321-snes-hwref`
+branch) into `build/release-docs/`: each as `.md` (always) and `.pdf` (best-effort — the shared
+`md-to-html.sh` + headless Chrome, which **pre-renders Mermaid diagrams to inline SVG**, so the doc charts
+render in the PDFs). `dev/package-release.sh` calls it by default (the unset `RELEASE_DOCS_DIR` → `__auto__`)
+and copies the result into the release `docs/`; an explicit `RELEASE_DOCS_DIR=<path>` overrides,
+`RELEASE_DOCS_DIR=` (empty) disables. No dependency on the indri.studio sibling. The 6 docs, in reading
+order: `65816-opcodes`, `snes-hardware`, `snes-registers`, `snes-bootup`, `emulator-screenshots`, `oop-in-c`
+(the report lists them in this order, not alphabetically). The report also has an **Executables** section
+listing the package's toolchain binaries (sizes) + the SNES driver symlinks.
 
 ### D. Release report — *(new: `dev/release-report.py`; `dev/test-release.sh` invokes it)*
 Every test run produces a **single self-contained HTML report**. The filename carries a **UTC run-timestamp**
@@ -179,6 +183,11 @@ the PNGs (base64-embedded so the file is portable). Sections:
   ISO 8601 UTC timestamps from the log.
 - **Screenshots** — the host reference + each build's SNES Mandelbrot, embedded inline with captions.
 - **Log** — the full timestamped compile+emulation transcript in a styled `<pre>`.
+
+Alongside the `.html`, the generator writes a **Markdown sibling** (`…​.md`, same path/stem) with the same
+sections — tables, the screenshots referenced by relative path (the `.md` lives next to the PNGs), and the
+log in a fenced block. It previews via `task md` and feeds the repo's md→PDF pipeline; the publish path copies
+it to `dist/<name>-release-report.md` next to the `.html`.
 
 ## Order of execution
 1. Add `.dockerignore`; write `dev/Dockerfile.release-test`; build the rig image once (bsnes-jg + jgxcheck +
