@@ -309,6 +309,20 @@ upstream.** MOS *does* implement `MOSRegisterInfo::shouldCoalesce` with shift/ro
 rotate-carried `A`-class value across an `A`-clobber on a loop back-edge. Verifiable via the fast `llc`
 harness + zero regressions on the csmith/c-torture gate.
 
+### FIXED (2026-06-26) — `shouldCoalesce` rejects rotate-referenced `Ac` joins; upstream patch `0010`
+The fix is in **`MOSRegisterInfo::shouldCoalesce`** (generic default-8bit; **upstream**, independent of
+`0002`): refuse the join when `NewRC == AcRegClass` and **both** operands of the COPY are
+`referencedByShiftRotate`. `Ac` is the A-only class (`def Ac : MOSReg8Class<(add A)>`); a rotate pins its
+operand to `A`, so coalescing two rotate values into `Ac` makes the merged value un-evictable from `A`
+across the bit-15 test (`lda __rc2`) that clobbers `A` — stranding it in `Y` while the back-edge `ROL`
+reads a stale `A`. Keeping the COPY lets the value live in the broader `AImag8`/`AY` class. This mirrors the
+function's existing rotate guards (which forbid coalescing rotate values *into* `Imag8` memory for
+*performance*); the new arm is a *correctness* guard. ~4 LOC + an LLVM lit test
+(`coalesce-rotate-ac.mir`, `-run-pass=register-coalescer`). Verified: repro fixed (`0xE60E`→`0xF56C`),
+corpus 7/7, torture 30/30, csmith 54/60 (0 mismatch/crash/error), `-verify-machineinstrs` clean. Patch +
+upstream PR body: `patches/llvm-mos/0010-coalesce-rotate-ac.patch`,
+[`upstream-coalesce-rotate-ac-pr.md`](../upstream-coalesce-rotate-ac-pr.md).
+
 ### bsnes-core instruction trace (2026-06-25): BREAKTHROUGH — the `m[]` read is CORRECT; the bug is the CRC state
 Built an env-gated read/write hook into `CPU::read`/`CPU::write` in `vendor/bsnes-jg/src/cpu.cpp` (logs
 soft-stack-frame accesses with the live 65816 `PC/X/Y/D` + byte value), compiled it into a *copy* of
@@ -372,15 +386,32 @@ exposed by the indexed-loop fold shape, NOT an indexed-load/index bug.
    a16 is clean, so the default-8bit path is unmodified upstream machinery — see RESULT "Provisional
    upstream-vs-fork". Definitive: reproduce on a pristine no-`0002` toolchain).
 4. **Fix.** With the fix, the natural loop form == unrolled == host on the minimal repro AND in the full
-   `dev/run.sh mandel-zoom` (hd) and the fast sd repro; `-verify-machineinstrs` clean. **PENDING — root-cause
-   narrowed (see RESULT "MIR dive"): the codegen is structurally correct at IR/MIR/asm (m[] values, index,
-   order, trip count all verified), so it's a dynamic register/ZP-slot liveness clobber under the loop
-   form's pressure. Pinning the exact pass needs a dynamic trace or a pass-disable bisection rebuild.**
-5. **Regression test.** The new hermetic test (`loopfold.c`/`.sh` and/or frozen `.ll` `llc` gate) FAILs before
-   the fix and PASSes after; wired so the differential catches the class. **PENDING.**
-6. **No collateral.** `dev/run.sh corpus` + the a16/xy16 gates stay green (the fix is default-8bit codegen but
-   must not regress anything); if the fix is in `vendor/`, regen `0002` and confirm it didn't absorb foreign
-   hunks. **PENDING.**
+   `dev/run.sh mandel-zoom` (hd) and the fast sd repro; `-verify-machineinstrs` clean.
+   ```
+   dev/loopfold-repro.sh loop   -> ZOOM: PASS frames=64 nonzero=64 swaps=3 zoom_crc=0xF56C  (was FAIL rom=0xE60E)
+   dev/loopfold-repro.sh unroll -> ZOOM: PASS frames=64 nonzero=64 swaps=3 zoom_crc=0xF56C  (control, unchanged)
+   standalone:  llc -mcpu=mosw65816 -O2 pl.ll -> link -> zoom_crc 0x7BCB -> 0x860E (== +mos-a16)
+   -verify-machineinstrs: CLEAN
+   ```
+   **PASS.** The fix is `MOSRegisterInfo::shouldCoalesce`: refuse coalescing two shift/rotate-referenced
+   values into the A-only `Ac` class (such a value is pinned to `A` by the rotate, so coalescing it
+   loop-carried across the `A`-clobbering bit-15 test strands it in `Y` and the back-edge `ROL` reads a
+   stale `A`). Carried as upstream-bound fork patch `patches/llvm-mos/0010-coalesce-rotate-ac.patch`.
+5. **Regression test.** The new hermetic test FAILs before the fix and PASSes after.
+   ```
+   llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir (-run-pass=register-coalescer):
+     fixed llc | FileCheck   -> PASS   (the %x:ac = COPY between two ROL results is preserved)
+     baseline  | FileCheck   -> FAIL   (baseline coalesces it away -> the two ROLs chain through one vreg)
+   ```
+   **PASS** — shipped inside patch `0010` (LLVM lit test, upstream-ready, mirrors `0003`'s format).
+6. **No collateral.** `dev/run.sh corpus` + the a16/xy16 gates stay green.
+   ```
+   corpus:    7/7 PASS (host == default == +mos-a16)
+   torture:   30/30 PASS, 0 FAIL  (default == a16 == xy16, MAME + bsnes-jg)
+   csmith:    54/60 PASS, 0 mismatch, 0 crash, 0 error  (6 benign "corpus_result GC'd" skips)
+   ```
+   **PASS.** The fix is a NEW separate patch (`0010`), not folded into `0002` — it is generic default-8bit
+   coalescer machinery, independent of #321 — so `0002` is untouched (no foreign-hunk risk).
 
 ## Risks / open items
 

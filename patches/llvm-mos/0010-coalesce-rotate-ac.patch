@@ -1,0 +1,52 @@
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -763,6 +763,21 @@
+     const TargetRegisterClass *NewRC, LiveIntervals &LIS) const {
+   const auto &MRI = MI->getMF()->getRegInfo();
+ 
++  // Don't coalesce two shift/rotate-referenced values together into the A-only Ac
++  // class. The accumulator is the only register ASL/LSR/ROL/ROR can operate on, so
++  // an Ac value is pinned to A for its whole live range. When such a value is also
++  // loop-carried across an inner conditional whose other arm needs A (e.g. an
++  // inlined CRC16 bit loop: the bit-test reloads the pre-rotate byte into A, while
++  // the rotated value must survive to the next iteration), pinning it to A-only
++  // leaves the allocator no register to evict it to on the skip path — it strands
++  // the live value in Y while the back-edge rotate reads a stale A, miscompiling
++  // silently (the machine verifier does not catch it). Keeping the copy live lets
++  // the value occupy the broader AImag8/AY class and spill/transfer as needed.
++  if (NewRC == &MOS::AcRegClass &&
++      referencedByShiftRotate(MI->getOperand(0).getReg(), MRI) &&
++      referencedByShiftRotate(MI->getOperand(1).getReg(), MRI))
++    return false;
++
+   // Don't coalesce Imag8 and AImag8 registers together when used by shifts or
+   // rotates.  This may cause expensive ASL zp's to be used when ASL A would
+   // have sufficed. It's better to do arithmetic in A and then copy it out.
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir
+@@ -0,0 +1,25 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=register-coalescer %s -o - | FileCheck %s
++
++# A value used by a rotate (ROL) is pinned to the accumulator (the Ac class), the
++# only register the rotate can read/write. Coalescing two such values together
++# into Ac removes the COPY that lets the live value vacate A when the other arm of
++# an enclosing conditional needs A (e.g. an inlined CRC16 bit loop). That strands
++# the value and the back-edge rotate reads a stale A -> a silent miscompile. The
++# coalescer must keep the COPY (MOSRegisterInfo::shouldCoalesce).
++---
++name: dont_coalesce_rotate_into_ac
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $a, $c
++    ; CHECK: [[ROL:%[0-9]+]]:ac, {{[^=]*}} = ROL %0
++    ; CHECK-NEXT: %{{[0-9]+}}:ac = COPY [[ROL]]
++    ; CHECK-NEXT: {{%[0-9]+}}:ac, {{.*}} = ROL
++    %0:ac = COPY $a
++    %1:cc = COPY $c
++    %2:ac, %3:cc = ROL %0, %1
++    %4:ac = COPY %2
++    %5:ac, %6:cc = ROL %4, %3
++    $a = COPY %5
++    RTS implicit $a
++...

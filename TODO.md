@@ -332,23 +332,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   matching keyboard letter (R→SNES R, Y→Y, A→A, L→L, S→Select, Enter→Start) so the demo labels just work;
   MAME's defaults are non-obvious (SNES R = keyboard X, Y = Left-Ctrl, A = Space). `task mandel-mame` drops it
   in. (Fixes the "Y/A/R don't work" report — it was the key map, not the ROM; verified by injecting the field.)
-- [ ] **#321 / baseline — DEFAULT-8bit 65816 matrix-fold-LOOP miscompile → cvise → backend fix.** A real
-  miscompile the zoom demo's differential caught: a `for(i<4){ f((uint8_t)m[i]); f((uint8_t)((uint16_t)m[i]>>8)); }`
-  fold over an `int16_t m[4]` computes a wrong CRC vs the byte-identical unrolled form, in the **default 8-bit**
-  path (no `+mos-a16`). **FAST host-side repro found 2026-06-25** (`dev/loopfold-repro.sh`): it reproduces in
-  **sd mode** entirely host-side in ~10 s (loop `ZOOM: FAIL` rom 0xE60E ≠ host 0xF56C; unroll PASS) — NOT just
-  the hd Docker demo the prior note assumed → cvise now tractable. Findings: it's a **post-LTO backend** bug
-  (IR is correct; build is LTO), the `i<4` loop is compiler-**unrolled** in *both* forms, and the loop form
-  sources an `m[]` byte via an **X-indexed stack load** (`eor …,x`) → likely a wrong/clobbered `X` under
-  pressure. **cvise DONE 2026-06-25** (`dev/reduce-loopfold.sh`; predicate = loop-build ZOOM FAIL ∧
-  unroll-build ZOOM PASS, `zoom.h` held fixed): 151→**43-line** repro
-  ([`spikes/2026-06-25-loopfold-min.c`](docs/plans/spikes/2026-06-25-loopfold-min.c)), minimal by ablation
-  (4 pressure sources all load-bearing). The `--lto-emit-asm` diff **confirms** finding #3 — the loop form
-  sources `m[i]` via X-indexed `ldy/eor mos8(.Lmain_zp_stk{,+1}),x` (absent in unroll) then reuses `X` as
-  the inner CRC counter. **Next:** a self-contained `mos6502`-retargetable repro to classify upstream-vs-fork,
-  then root-cause the wrong-`X` + fix + regression test.
-  [plan](docs/plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md) (RESULT) ·
-  [investigation](docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
+- [x] ~~**DEFAULT-8bit 65816 matrix-fold-LOOP miscompile → coalescer fix**~~ — **FIXED 2026-06-26.** A CRC fold over `int16_t m[4]` miscompiled vs the unrolled form (default-8bit; `0xE60E`≠`0xF56C`). cvise→43-line repro, then an instruction-level bsnes-core trace falsified the "wrong-X" lead and pinned it to the **register coalescer** merging two rotate-referenced values into the A-only `Ac` class (strands a loop-carried CRC byte in `Y`; back-edge `ROL` reads stale `A`). Fix in `MOSRegisterInfo::shouldCoalesce` (generic default-8bit → **upstream**), fork patch `0010-coalesce-rotate-ac.patch` + LLVM lit test. Repro fixed, corpus 7/7, torture 30/30, csmith 54/60 (0 mismatch). Upstream PR queued ([`upstream-coalesce-rotate-ac-pr.md`](docs/upstream-coalesce-rotate-ac-pr.md)). [plan](docs/plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md) · [investigation](docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
 
 - [x] ~~**SNES hardware reference docs + subsystem-split `snes.h` + generators**~~ — **LANDED on `main`**
   2026-06-25 (consolidation). The umbrella `snes.h` re-exports every prior symbol (`VMAIN_INC_LOW_1`,

@@ -1,8 +1,15 @@
 # Finding — a DEFAULT-8bit (non-`+mos-a16`) 65816 codegen miscompile of a 4-element array fold loop
 
-**Status:** real miscompile, **reproduced** (in context), **MINIMIZED** (2026-06-25) — cvise reduced the
-full `mandel-zoom.c` to a 43-line repro and the post-LTO asm confirms the X-indexed-`m[]`-load lead;
-root-cause + fix are next. Independent of the #321 `+mos-a16` work (it's in the *default* 8-bit path).
+**Status:** real miscompile, **reproduced**, **minimized**, **ROOT-CAUSED**, and **FIXED** (2026-06-26).
+Root cause: the **register coalescer** merges two rotate-referenced values into the A-only `Ac` class,
+stranding a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (an inlined CRC16 bit
+loop under register pressure). Fix in **`MOSRegisterInfo::shouldCoalesce`** (generic default-8bit →
+**upstream**, independent of `0002`), carried as fork patch `patches/llvm-mos/0010-coalesce-rotate-ac.patch`
++ an LLVM lit test. Verified: repro `0xE60E`→`0xF56C`, corpus 7/7, torture 30/30, csmith 54/60
+(0 mismatch/crash/error). The earlier "X-indexed-`m[]`-load" lead was **falsified** by an instruction-level
+bsnes-core trace — the `m[]` read is correct; the CRC *accumulator* is the casualty. Full arc:
+[the plan's RESULT](../plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md). Independent of the
+#321 `+mos-a16` work (it's in the *default* 8-bit path).
 Surfaced by the (now shelved) Mandelbrot zoom demo; the durable record is here. **Reduction result +
 artifacts:** [`../plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md`](../plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md)
 (RESULT) · minimal `.c` [`../plans/spikes/2026-06-25-loopfold-min.c`](../plans/spikes/2026-06-25-loopfold-min.c)

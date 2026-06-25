@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/c78db07) | plan: loopfold PASS PINNED to the register coalescer (upstream); fast llc verify harness ready |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/5237584) | plan: loopfold localized to GREEDY regalloc — definitively an upstream LLVM bug |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/8f09955) | plan: loopfold ROOT CAUSE PINNED — missing tya (A<-Y) on the CRC inner-loop skip path |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/e737568) | plan: loopfold bsnes-core trace BREAKTHROUGH — m[] read is CORRECT; bug is the CRC accumulator |
@@ -14,6 +15,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+c78db07	author	Will Norris
+c78db07	added	23
+c78db07	deleted	0
+c78db07	files	1
+c78db07	body	Two decisive results:\n1. Standalone llc reproduces: llc -mcpu=mosw65816 -O2 pl.ll -> link -> SNES gives the buggy\n   zoom_crc=0x7BCB (correct +mos-a16 = 0x860E). No LTO needed -> fast verify loop (llc -> link ->\n   jgxcheck zoom_crc, must flip 0x7BCB->0x860E).\n2. The pass is the register coalescer: llc -join-liveintervals=false FIXES it (0x860E);\n   machine-cp/post-ra/scheduler toggles don't. -verify-coalescing is CLEAN (coalescer correctness\n   gap): it merges away the reconciling Y->A copy of the loop-carried CRC-high (ROL-defined in A,\n   copied to Y to survive the A-clobbering sign-test, needed back in A at the back-edge).\n\nThe coalescer is generic upstream LLVM; 0002 doesn't touch it (every 0002 copyPhysReg/loadStore hunk\nis gated to the 16-bit classes Xc16/Yc16/Imag16/Ac16; the buggy loop is plain 8-bit $a/$y).\nCONCLUSIVELY UPSTREAM. MOS's shouldCoalesce has shift/rotate guards but only for NewRC==Imag8/Imag16\nand as perf (not correctness) guards -> the buggy join slips past. Fix direction under test: extend\nshouldCoalesce to reject coalescing a rotate-carried A-class value across an A-clobber on a loop\nback-edge. Verifiable via the fast llc harness + csmith/c-torture regression gate.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5237584	author	Will Norris
 5237584	added	20
 5237584	deleted	2

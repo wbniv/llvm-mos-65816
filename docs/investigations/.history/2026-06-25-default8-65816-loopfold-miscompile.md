@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/25fd083) | docs: loopfold root-cause narrowing + provisional UPSTREAM classification |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a0498d7) | reduce: cvise-minimize the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (43-line repro + X-indexed-load root-cause lead) |
 
 <!--history-meta v1
+25fd083	author	Will Norris
+25fd083	added	9
+25fd083	deleted	0
+25fd083	files	1
+25fd083	body	Asm structural diff (loop vs unroll, minimal repro, default-8bit):\n- loop:   .size .Lmain_zp_stk,16 — m[] materialized at +0..+7, fold via X-indexed\n          ldy/eor mos8(.Lmain_zp_stk{,+1}),x\n- unroll: .size .Lmain_zp_stk,2  — m[] kept in registers, no array, no indexed loads\nSo the loop form's bug is in materializing m[] into the ZP soft-stack and indexing it under\nthe surrounding pressure — machinery the unroll form avoids. Two sub-hypotheses refuted on the\nasm: the index ZP slots __rc5/__rc6 are NOT clobbered by the inner CRC bit-loops, and m[] at\n+0..+7 is NOT overwritten between store and fold — so it's not a simple index clobber.\n\nProvisional upstream-vs-fork: default-8bit ZP soft-stack + regalloc + indexed addressing are\nupstream llvm-mos; 0002's loadStoreRegStackSlot/copyPhysRegImpl hunks are +mos-a16-gated and\na16 tested clean, so the buggy default path doesn't run 0002's additions -> LIKELY UPSTREAM.\nDefinitive confirmation deferred to a pristine no-0002 reproduce.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a0498d7	author	Will Norris
 a0498d7	added	78
 a0498d7	deleted	0
