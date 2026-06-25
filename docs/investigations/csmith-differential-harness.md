@@ -55,8 +55,13 @@ binary) from an open, extensible, optimizing toolchain. (We're not the first to 
 "Validated (Plum Hall)" means "we licensed Plum Hall's commercial
 [C Validation Suite](https://plumhall.com/newsite/stec1.html) (C‑VS) and it passes." It's a proprietary
 conformance suite — **now owned by [Solid Sands](https://plumhall.com/newsite/suites.html)** (who also make
-SuperTest) — priced by quote, not a government badge. To *literally* replicate WDC's line you'd buy C‑VS and
-run it.
+SuperTest). There is **no badge/certificate** — "validated" just means it passed. Cost comes two ways:
+**license the suite** and run it yourself (single-site source license; "many thousands," exact figure by
+quote/NDA — INCITS bars vendors from discussing suite prices), or buy Plum Hall's **Compiler Qualification
+Service**, where they run ~100,000 test programs against your compiler and report bugs — that one *does*
+publish a [price table](http://www.plumhall.com/cqs/price/standard.html): **C $24,000 (2 option-configs) →
+$81,000 (24); C++ $30,000 → $98,000**. Either way it's a **procurement** decision — and (see below) it
+validates the Clang front end we already inherit, not the 65816 backend that is this project's actual risk.
 
 But the key realization: **Plum Hall tests the C *front end* — and ours is upstream Clang**, already among
 the most conformance-tested front ends in existence. We inherit that. The novel, *unproven* surface in this
