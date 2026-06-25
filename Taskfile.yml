@@ -59,6 +59,13 @@ tasks:
     cmds:
       - dev/run.sh repro {{.CLI_ARGS}}
 
+  # --- Interim release packaging (until #320/#321 land upstream) ---
+
+  package:
+    desc: "Assemble the relocatable Linux x86-64 toolchain+SDK into dist/llvm-mos-65816-<stamp>-linux-x86_64.tar.xz (+ .sha256). Host-side; needs build/llvm-mos-install + build/install. Env: STRIP=0 keeps debug, RELEASE_DOCS_DIR=<dir> bundles docs."
+    cmds:
+      - dev/package-release.sh {{.CLI_ARGS}}
+
   ci-watch:
     desc: "Live-monitor a GitHub Actions run (default: latest snes-smoke): streams step transitions + heartbeat + final verdict. Args: [RUN_ID] | --once"
     cmds:

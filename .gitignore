@@ -5,6 +5,9 @@ __pycache__/
 /vendor/
 # Build output: SDK build tree, install prefix, ROMs, maps.
 /build/
+# Release staging: relocatable dist tree + .tar.xz/.sha256 (dev/package-release.sh).
+# Reproducible output, not source — like /build/.
+/dist/
 # Generated at build time by tools/mandel-bake.c (dev/mandel-interactive.sh); 16 KiB of baked
 # image data — regenerable, not source. The interactive demo + jgxcheck-view bake it before compiling.
 /examples/snes/mandel_image.h
