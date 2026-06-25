@@ -24,6 +24,9 @@
 
 static uint8_t fb[DW * DH];          // escape buffer, 896 B (low WRAM)
 volatile uint16_t corpus_result;     // buffer CRC — the WRAM proof channel (== host 0x...)
+static uint8_t pre[16 * 14];         // progressive-preview scratch, 224 B. Declared AFTER
+                                     // corpus_result so the proof symbol keeps its WRAM addr
+                                     // (the in-browser self-check reads a fixed offset).
 
 // One VRAM word, explicit low-then-high so the $2119 write triggers the auto-increment
 // (don't rely on the byte order of a 16-bit volatile store to an MMIO port).
@@ -59,34 +62,68 @@ static void upload_solid_tiles(void) {
   }
 }
 
-// The tilemap IS the image: entry (r,c) = escape count = solid-tile number. Write the
-// FULL 32x32 map (1024 entries) so no on-screen cell can read bsnes's randomised
-// power-up VRAM; rows past the image (>= DH) get tile 0.
-static void upload_tilemap(void) {
+// The tilemap IS the image: each tile = escape count = solid-tile number. Write the FULL
+// 32x32 map (1024 entries) from an sw*sh source grid, nearest-neighbour scaled to fill the
+// 32x28 image — so a coarse pass (e.g. 4x4) blows up to cover the whole screen and a finer
+// pass refines it. Rows past the image (>= DH) get tile 0 so no on-screen cell reads bsnes's
+// randomised power-up VRAM. The per-tile divide is hoisted into two small index tables built
+// by counters (sw,sh always divide DW,DH evenly here), keeping the hot loop — and thus the
+// first reveal — fast. For the final pass (sw=DW, sh=DH) the tables are the identity.
+static void upload_scaled(const uint8_t *src, uint8_t sw, uint8_t sh) {
+  uint8_t cmap[DW], rmap[DH];
+  uint8_t rep_x = (uint8_t)(DW / sw), rep_y = (uint8_t)(DH / sh);
+  uint8_t s = 0, cnt = 0;
+  for (uint8_t col = 0; col < DW; col++) { cmap[col] = s; if (++cnt == rep_x) { cnt = 0; s++; } }
+  s = 0; cnt = 0;
+  for (uint8_t row = 0; row < DH; row++) { rmap[row] = s; if (++cnt == rep_y) { cnt = 0; s++; } }
   snes_vram_addr(MAP_BASE);
-  for (uint16_t i = 0; i < 1024; i++)
-    vram_w(i < (uint16_t)(DW * DH) ? (uint16_t)fb[i] : 0);
+  for (uint16_t i = 0; i < 1024; i++) {
+    uint8_t col = (uint8_t)(i & 31), row = (uint8_t)(i >> 5);
+    vram_w(row < DH ? (uint16_t)src[(uint16_t)rmap[row] * sw + cmap[col]] : 0);
+  }
 }
 
 int main(void) {
   snes_ppu_reset_blank();                       // force-blank + zero PPU control regs
                                                  //  (kills bsnes power-up nondeterminism)
 
-  mandel_fill(fb, DW, DH, DN);                  // the beefy compute (same kernel as the gate)
-  corpus_result = mandel_crc(fb, (uint16_t)(DW * DH));
-
+  // One-time PPU setup, done while still force-blanked: the shared palette, the 16 solid
+  // tiles, and BG1 pointed at our char/tilemap bases. (Scroll regs each latch two writes;
+  // the power-up value is garbage.)
   load_palette();
   upload_solid_tiles();
-  upload_tilemap();
-
   REG_BGMODE  = BGMODE_1;                        // mode 1: BG1 = 4bpp
   REG_BG12NBA = (uint8_t)(CHAR_BASE >> 12);      // BG1 char base ($1000-word units)
   REG_BG1SC   = SNES_BGSC(MAP_BASE, 0);          // BG1 tilemap base, 32x32 map
-  REG_BG1HOFS = 0; REG_BG1HOFS = 0;              // scroll = 0 (power-up value is garbage;
-  REG_BG1VOFS = 0; REG_BG1VOFS = 0;              //  each reg latches two writes)
+  REG_BG1HOFS = 0; REG_BG1HOFS = 0;              // scroll = 0
+  REG_BG1VOFS = 0; REG_BG1VOFS = 0;
   REG_TM      = TM_BG1;                          // main screen = BG1 only (TS/colour-math
                                                  //  already zeroed by snes_ppu_reset_blank)
-  REG_INIDISP = INIDISP_ON;                      // release force-blank: show it
+
+  // Progressive coarse->fine render. The beefy on-SNES compute fills the whole 32x28 buffer
+  // slowly, so instead of force-blanking until it finishes (~seconds of black), render at
+  // 4x4, reveal, then 8x7, 16x14, and finally the real 32x28 — a recognizable image lands in
+  // <0.1 s and sharpens. Each pass recomputes a finer grid of the SAME window (mandel_fill
+  // derives its steps from w/h, so every grid samples the identical region) and rewrites the
+  // tilemap; the force-blank around passes 2+ is sub-frame. Grids divide 32x28 cleanly.
+  //
+  // FIDELITY: passes 1-3 touch only `pre`/the tilemap. `fb` is filled exactly ONCE, by the
+  // final canonical mandel_fill(fb, DW, DH, DN) below, so corpus_result == the gate CRC
+  // (0x9103) by construction — progressive drawing changes only WHEN pixels appear.
+
+  mandel_fill(pre, 4, 4, DN);                   // pass 1: 16 cells, the fast first paint
+  upload_scaled(pre, 4, 4);
+  REG_INIDISP = INIDISP_ON;                      // first reveal — uses the boot force-blank (no blink)
+
+  mandel_fill(pre, 8, 7, DN);                   // pass 2: 56 cells
+  REG_INIDISP = INIDISP_FORCE_BLANK; upload_scaled(pre, 8, 7);   REG_INIDISP = INIDISP_ON;
+
+  mandel_fill(pre, 16, 14, DN);                 // pass 3: 224 cells
+  REG_INIDISP = INIDISP_FORCE_BLANK; upload_scaled(pre, 16, 14); REG_INIDISP = INIDISP_ON;
+
+  mandel_fill(fb, DW, DH, DN);                  // pass 4: the canonical buffer (same kernel as the gate)
+  corpus_result = mandel_crc(fb, (uint16_t)(DW * DH));
+  REG_INIDISP = INIDISP_FORCE_BLANK; upload_scaled(fb, DW, DH);  REG_INIDISP = INIDISP_ON;
 
   for (;;) {}
 }
