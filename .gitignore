@@ -23,6 +23,10 @@ __pycache__/
 /dev/sdks/*.tar.xz
 /dev/sdks/*.tar.bz2
 /dev/sdks/*.tar.gz
+# WDC W65C816S datasheet — copyrighted third-party reference. Keep locally for
+# convenience, but never commit/redistribute (see docs/65816-references.md:
+# link, don't vendor; the release tarball stays Apache-2.0/LLVM clean).
+/docs/w65c816s.pdf
 
 # Claude per-project memory (project-specific files + symlinks to ~/.claude/memory generics).
 # Also TRACK the project hook wiring (settings.json + hooks/) so it's reproducible from the
