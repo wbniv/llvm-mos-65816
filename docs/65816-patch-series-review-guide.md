@@ -53,6 +53,8 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
   - [3.6 `0006` — packed-24 (AS3) storage form](#36-0006--packed-24-as3-storage-form)
   - [3.7 `0007` — near-abs bank-relaxation](#37-0007--near-abs-bank-relaxation)
   - [3.8 `0008` — DP-pointer-argument CC (upstream bug)](#38-0008--dp-pointer-argument-cc-upstream-bug)
+  - [3.9 `0009` — a16 register-pressure inc/dec de-pin](#39-0009--a16-register-pressure-incdec-de-pin)
+  - [3.10 `0010` — coalesce-rotate-Ac (upstream bug)](#310-0010--coalesce-rotate-ac-upstream-bug)
 - [4. Cross-cutting correctness arguments](#4-cross-cutting-correctness-arguments)
 - [Appendix A — Testing setup](#appendix-a--testing-setup)
 - [Appendix B — SNES platform changes & requirements](#appendix-b--snes-platform-changes--requirements)
@@ -65,7 +67,7 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
 
 ### 1.1 The patch stack at a glance
 
-Nine patches, applied bottom-up (`git am 0001..0009`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
+Ten patches, applied bottom-up (`git am 0001..0010`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
 name in each step of [§3](#3-the-narrative-each-step-with-need--patch--proof)). LOC is patch size, not net
 source change.
 
@@ -80,9 +82,10 @@ source change.
 | **0007** near‑abs‑relax | #320 · M1 | 28 | Don't bank-relax (`abs`→`long`) a **near** symbol — saves 1 B per A-register near-global access (~284 sites in the examples) | Low |
 | **0008** dp‑arg‑cc | [upstream](#appendix-d--upstream-bug-fixes--status) | 51 | Upstream bug fix: an 8-bit `addrspace(1)` direct-page pointer **argument** was assigned a 16-bit register → illegal `COPY`. Reproduces on stock `mos6502` | Trivial — bug fix + `.ll` test |
 | **0009** a16‑pressure‑incdec | #321 · M2 | 48 | Fixes a `+mos-a16 -O1/-Os` regalloc deadlock on real code (`globals.c`): lower a small-constant i8 add/sub (`\|amt\|≤2`) to a relocatable `G_INC`/`G_DEC` chain instead of A-pinned `ADCImm`, so a strength-reduced byte index can't pin the singleton `{A}` across a 16-bit-accumulator transit. DEFAULT byte-identical | Low |
+| **0010** coalesce‑rotate‑Ac | [upstream](#appendix-d--upstream-bug-fixes--status) | 40 | Default-8bit register-**coalescer** correctness fix: refuse to coalesce two shift/rotate-referenced values into the A-only `Ac` class — pinning the loop-carried CRC-high byte to `A` stranded it in `Y` while the back-edge `ROL` read a stale `A`, a silent miscompile (both verifiers clean). Surfaced by the M2 zoom demo's differential | **Trivial** — bug fix + MIR test |
 
-Two patches (`0003`, `0008`) are pure **upstream bug fixes** surfaced by this work and are independently
-postable; they are included so the stack applies clean.
+Three patches (`0003`, `0008`, `0010`) are pure **upstream bug fixes** surfaced by this work and are
+independently postable; they are included so the stack applies clean.
 
 ### 1.2 The one invariant that makes this reviewable
 
@@ -109,22 +112,24 @@ plus `llc -verify-machineinstrs` clean. Two independent emulators (MAME, used be
 [drmon/drdevtools](#a1-drmon) debug backend; and the cycle-accurate bsnes-jg) rule out emulator-specific
 quirks. Any
 disagreement or crash is treated as a real defect with a concrete cause — never a "glitch". The bar is
-load-bearing, not decorative: it caught a real **default-8bit** miscompile (a pressure-sensitive `mosw65816`
-regalloc bug the demo corpus surfaced) that this stack does *not* introduce — `+mos-a16` compiles the same
-fold correctly — and which is under active root-cause as provisionally
-upstream<sup>[[C24]](#c24-default8-loopfold-crc-miscompile)</sup>. Full mechanics:
+load-bearing, not decorative: it caught a real **default-8bit** miscompile (a register-coalescer bug the M2
+demo corpus surfaced) that this stack does *not* introduce — `+mos-a16` compiles the same fold correctly —
+now root-caused to **generic upstream LLVM** and fixed as patch
+`0010`<sup>[[C24]](#c24-default8-loopfold-crc-miscompile)</sup>. Full mechanics:
 [Appendix A](#appendix-a--testing-setup).
 
 ### 1.4 Suggested review order
 
 The stack is two near-independent units. `0002` (#321) depends on `0001` only for **shared-file context**
 (both edit `MOSInstrLogical.td`, `MOSLegalizerInfo.cpp`), not for semantics; `0004`–`0006` (#320) depend on
-`0002` for a few `+mos-a16`-gated lines (the `Ac16`/`AnyRegBank` register-class entries). So:
+`0002` for a few `+mos-a16`-gated lines (the `Ac16`/`AnyRegBank` register-class entries). `0010` belongs to
+neither unit — it is a standalone default-8bit upstream fix. So:
 
 1. **Skim** [§2](#2-architecture-dependencies-sequencing--timeline) (the machine + the graph).
-2. **#320 reviewers:** `0001` → `0004` → `0005` → `0006` → `0007` → `0008`.
-3. **#321 reviewers:** `0002` → `0003` as a self-contained unit.
-4. `0003` and `0008` are 5-minute bug-fix reviews; do them first to warm up.
+2. **Warm up first** on the three standalone bug-fix patches — `0003`, `0008`, `0010` — quick, self-contained
+   reviews independent of the feature work (`0010` is a ~15-LOC coalescer correctness guard).
+3. **#320 reviewers:** then `0001` → `0004` → `0005` → `0006` → `0007` (`0008` already done in step 2).
+4. **#321 reviewers:** then `0002` → `0009`, a self-contained unit (`0003` already done in step 2).
 
 ---
 
@@ -156,7 +161,8 @@ property — [§3.2](#32-0002--321-16-bit-accumulator-m2), [§4](#4-cross-cuttin
 
 Solid arrow = real dependency (semantic, or shared-file context that must apply in order). The numeric order
 is the `git am` order. `0007`/`0008` stack at the top but are semantically standalone; `0009` is likewise a
-standalone `+mos-a16` selector fix layered on `0002`.
+standalone `+mos-a16` selector fix layered on `0002`; `0010` is a standalone upstream coalescer fix
+(default-8bit, no feature) surfaced by the M2 demo.
 
 ```mermaid
 flowchart TD
@@ -177,8 +183,11 @@ flowchart TD
         P9["0009 a16-pressure incdec<br/>de-pin i8 counter from A"]
     end
 
+    P10["0010 coalesce-rotate-Ac<br/>default-8bit coalescer (upstream fix)"]
+
     SNES --> P1
     SNES --> P2
+    SNES -.surfaced.-> P10
     P1 -.context.-> P2
     P2 --> P3
     P2 --> P9
@@ -208,7 +217,7 @@ harness.
 flowchart LR
     M0["M0 — bench<br/>SNES crt0 + linker + ROM header<br/>MAME + bsnes-jg + corpus + fuzzer<br/>(no new codegen)"]
     M1["M1 — #320 far<br/>multi-bank, unoptimized<br/>(0001,0004,0005,0006,0007,0008)"]
-    M2["M2 — #321 16-bit<br/>the optimizing payoff<br/>(0002,0003,0009)"]
+    M2["M2 — #321 16-bit<br/>the optimizing payoff<br/>(0002,0003,0009,0010)"]
     M0 --> M1
     M0 --> M2
     M1 -. "corpus = M2 regression baseline" .-> M2
@@ -232,7 +241,7 @@ flowchart LR
 
 ### 2.5 Timeline
 
-13 days, 506 commits, 140 plan files. M1 and M2 overlap deliberately.
+14 days, 514 commits, 140 plan files. M1 and M2 overlap deliberately.
 
 ```mermaid
 gantt
@@ -258,6 +267,7 @@ gantt
     cross-block REP/SEP + xy16          :2026-06-18, 3d
     surface consolidation + close       :2026-06-22, 1d
     a16-pressure incdec fix (0009)      :2026-06-24, 1d
+    coalesce-rotate-Ac fix (0010)       :2026-06-26, 1d
 ```
 
 ---
@@ -530,6 +540,63 @@ CCIfPtrAddrSpace<1, CCAssignToReg<[A, X, RC2, RC3, RC4, RC5, RC6, RC7, RC8,
 **Proof.** New [`llvm/test/CodeGen/MOS/dp-pointer-arg.ll`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0008-mos-dp-arg-cc.patch) — `load_dp`/`store_dp` crash pre-fix, post-fix emit
 the correct zero-page-indexed `lda 0,x` / `sta 0,x` and pass `-verify-machineinstrs`. Corpus 7/7. Drafted as
 upstream [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`).
+
+### 3.9 `0009` — a16 register-pressure inc/dec de-pin
+
+**Need.** Under `+mos-a16 -O1/-Os`, a real program (`globals.c`) hit a *"ran out of registers during register
+allocation"* deadlock (default-8bit and `+mos-a16 -O0` always compiled clean). Root cause: a strength-reduced
+i8 array index (stepped `i += 2`) selects to `add Ac,imm → ADCImm` — class `Ac` = `{A}`, because `adc` is
+hardware-A-only — and is held live across the 16-bit indexed-load `Ac16` (= `A:B`) transit, colliding on the
+single physical `A`; last-chance recolor fails on the singleton `{A}` and the one-instruction transit can't
+spill.
+
+**Patch.** [`patches/llvm-mos/0009-321-a16-pressure-incdec.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0009-321-a16-pressure-incdec.patch) — under `hasAccum16()`,
+`MOSInstructionSelector::selectAddSub` lowers a small-constant i8 add/sub (`|amt| ≤ 2`) to a relocatable
+`G_INC`/`G_DEC` chain (`Anyi8` = A/X/Y/zp) instead of the A-pinned `ADCImm`, so the byte index coalesces into
+the `X` array index (`inx; inx; cpx`) and frees `A16`. One spillable/relocatable change, no RA rework — and
+the C2 coalescing rework was *ruled out* as the cause, so this is an orthogonal de-pin, not the deferred
+Phase-3 residency work.
+
+**Proof.** Gated on `hasAccum16()`, so **DEFAULT 8-bit is byte-identical**. `a16regpress.c` (the former crash)
+is now a positive gate (`dev/run.sh a16regpress` → `0x01A7`, both emulators); `globals.c` compiles + runs
+clean; **−123 B over 122 c-torture programs (0 worse)**; the regen round-trips `0001..0009`. It does **not**
+fix the genuinely-deferred s16-pressure core — the scavenger-N/Z and `pr15296` ZP-overflow XFAILs stay.
+
+### 3.10 `0010` — coalesce-rotate-Ac (upstream bug)
+
+**Need.** A real **default-8bit** (no `+mos-a16`) `mosw65816` miscompile the M2 Mandelbrot-zoom demo's
+differential caught: a CRC16 fold over an `int16_t m[4]` computes a *different* runtime value than the
+byte-identical unrolled form (`0xE60E` vs correct `0xF56C`), with **both** `-verify-machineinstrs` and
+`-verify-coalescing` clean. An instruction-level bsnes-core trace + a standalone `llc` repro
+(`-join-liveintervals=false` flips it) pin it to the generic **register coalescer**: it merges two
+shift/rotate-referenced values together into the A-only `Ac` class. Because `ASL`/`LSR`/`ROL`/`ROR` are
+accumulator-only, an `Ac` value is pinned to `A` for its whole live range; when it is also loop-carried
+across an inner conditional whose other arm needs `A` (the inlined CRC16 bit loop's bit-15 test reloads the
+pre-rotate byte into `A`), the coalescer removes the `COPY` that would let the value vacate `A` — so the
+allocator strands it in `Y` while the loop back-edge's `ROL` reads a **stale `A`**. The coalescer is generic
+upstream LLVM, untouched by `0002` (every `0002` coalescer hunk is gated to the 16-bit
+`Xc16`/`Yc16`/`Imag16`/`Ac16` classes, and `+mos-a16` is clean) → **definitively upstream**. Full forensic
+chain: [[C24]](#c24-default8-loopfold-crc-miscompile).
+
+**Patch.** [`patches/llvm-mos/0010-coalesce-rotate-ac.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0010-coalesce-rotate-ac.patch) — ~15 lines in
+`MOSRegisterInfo::shouldCoalesce`: refuse the join when `NewRC == AcRegClass` **and** both COPY operands are
+`referencedByShiftRotate`. Keeping the `COPY` lets the value live in the broader `AImag8`/`AY` class and
+vacate `A` as needed. This mirrors the function's existing rotate guards (which forbid coalescing rotate
+values into `Imag8` for *performance*); the new arm is a *correctness* guard:
+
+```cpp
+// MOSRegisterInfo::shouldCoalesce — before the existing Imag8/AImag8 rotate guard:
+if (NewRC == &MOS::AcRegClass &&
+    referencedByShiftRotate(MI->getOperand(0).getReg(), MRI) &&
+    referencedByShiftRotate(MI->getOperand(1).getReg(), MRI))
+  return false;
+```
+
+**Proof.** New [`llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0010-coalesce-rotate-ac.patch)
+(`-run-pass=register-coalescer`): the rotate→rotate `COPY` must survive. Repro flips `0xE60E`→`0xF56C`; corpus
+**7/7**, c-torture **30/30**, csmith **54/60** (0 mismatch/crash); `-verify-machineinstrs` clean. Upstream PR
+**drafted** ([`docs/upstream-coalesce-rotate-ac-pr.md`](upstream-coalesce-rotate-ac-pr.md)), branch
+`wbniv:mos-coalesce-rotate-ac` to mint — see [Appendix D](#appendix-d--upstream-bug-fixes--status).
 
 ---
 
@@ -894,12 +961,12 @@ through to a single-byte path emitting `GPR = COPY A16` → lowered to the inval
 `Ac16` via direct 16-bit `LD/STAbs16` (static) / `*Indir16` (reentrant) to the frame slot — never a GPR COPY.
 Restores the [§4.2](#4-cross-cutting-correctness-arguments) invariant. Tests `a16spill*`.
 
-### Correctness bug under investigation
+### Correctness bug found, root-caused & fixed — default-8bit coalescer (upstream)
 
 <a id="c24-default8-loopfold-crc-miscompile"></a>
 
-#### C24. Default-8bit matrix-fold-loop CRC miscompile — *under investigation, provisionally upstream*
-A real **default-8bit** (no `+mos-a16`) `mosw65816` miscompile the Mandelbrot-zoom demo's differential
+#### C24. Default-8bit matrix-fold-loop CRC miscompile — *fixed; upstream coalescer bug (patch `0010`)*
+A real **default-8bit** (no `+mos-a16`) `mosw65816` miscompile the M2 Mandelbrot-zoom demo's differential
 caught: a CRC fold `for(i<4){ crc=f(crc,(uint8_t)m[i]); crc=f(crc,(uint8_t)((uint16_t)m[i]>>8)); }` over an
 `int16_t m[4]` computes a *different* runtime CRC than the byte-identical **unrolled** form (`0xE60E` vs
 correct `0xF56C`). No UB (`i∈[0,4)`, `m` has 4 elements) → a genuine defect. It is **pressure-sensitive**:
@@ -909,20 +976,26 @@ no container) made cvise tractable → a **43-line** minimal repro (`spikes/2026
 *minimal by ablation* (four simultaneous pressure sources, each load-bearing — remove any one and the bug
 vanishes), which is why the earlier standalone attempts failed.
 
-Why it doesn't dent the [§1.2](#12-the-one-invariant-that-makes-this-reviewable) invariant: it is
-**8-bit-accumulator only** — `+mos-a16` (16-bit accumulator) compiles the *same* fold correctly
-(loop == unroll == host) — so the defect lives in the 65816 **default 8-bit** path, which `0002`'s spill
-hunks don't touch (they are `+mos-a16`-gated, and a16 is clean). That makes it **provisionally an upstream
-`llvm-mos` bug**, not a #320/#321 one (definitive confirmation = a pristine no-`0002` rebuild, pending).
-It is **verifier-clean**: it survives `-verify-machineinstrs` / `-verify-regalloc` / `-verify-coalescing`
-and every *disablable* post-RA peephole — a silent miscompile in non-disablable core machinery (greedy
-regalloc / ISel / ZP-stack alloc / coalescer) whose own correctness model is satisfied. A bsnes-core
-instruction trace (an env-gated `CPU::read`/`write` hook into `vendor/bsnes-jg`) then **falsified** the
-initial "wrong-`X` indexed `m[]` load" hypothesis: `m[]` is stored *and* read correctly with the correct
-index — the corruption is in the running 16-bit **`crc` accumulator** carried across the `for(i<4)` outer
-loop, exposed by the indexed-loop fold shape. **Open:** follow `crc` through the inner CRC bit-loops to the
-exact corrupting instruction/pass → minimal backend fix + hermetic regression, or file upstream with the
-repro+analysis. The shipped demo dodges it with a source-level unroll, so `main` is green. Tracked:
+**Forensics (a model of "every anomaly has a concrete cause").** It is **8-bit-accumulator only** —
+`+mos-a16` (16-bit accumulator) compiles the *same* fold correctly (loop == unroll == host) — so the defect
+lives in the 65816 **default 8-bit** path, which `0002` doesn't touch. It is **verifier-clean** (survives
+`-verify-machineinstrs` / `-verify-regalloc` / `-verify-coalescing` and every *disablable* post-RA peephole).
+An env-gated bsnes-core instruction trace (a `CPU::read`/`write` + opcode hook into a private `vendor/bsnes-jg`
+copy) **falsified** the initial "wrong-`X` indexed `m[]` load" hypothesis: `m[]` is stored *and* read
+correctly with the correct index — the corruption is in the running 16-bit **`crc` accumulator**. A
+standalone `llc` repro then made iteration fast and `-join-liveintervals=false` localized the pass to the
+**register coalescer**.
+
+**Root cause + fix (patch `0010`).** The coalescer merges two shift/rotate-referenced values into the A-only
+`Ac` class; an `Ac` value is pinned to `A` (rotates are accumulator-only), so when the loop-carried CRC-high
+byte is also needed on the inner bit-15 test's other arm (which reloads `A`), the merged-away `COPY` leaves
+the allocator nowhere to evict it — it strands the value in `Y` while the back-edge `ROL` reads a stale `A`.
+Fixed in **`MOSRegisterInfo::shouldCoalesce`** (~15 LOC): refuse the join when `NewRC == AcRegClass` ∧ both
+operands are `referencedByShiftRotate` (a *correctness* sibling of the existing *performance* rotate guards).
+Generic upstream LLVM machinery, independent of `0002` ⇒ **definitively upstream**, carried as
+[`0010`](#310-0010--coalesce-rotate-ac-upstream-bug) + a `-run-pass=register-coalescer` lit test, upstream PR
+drafted. Repro flips `0xE60E`→`0xF56C`; corpus 7/7, torture 30/30, csmith 54/60 (0 mismatch). The shipped
+demo also keeps a source-level unroll, so `main` was green throughout. Tracked:
 [loopfold plan](plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md) ·
 [investigation](investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
 
@@ -967,31 +1040,33 @@ prebuilt binary. MAME + bsnes-jg already give a two-emulator cross-check; parked
 
 ## Appendix D — Upstream bug fixes & status
 
-Two of the nine patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
+Three of the ten patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
 fixed. They are independently postable and **drop from the fork stack on merge**, and are *not* part of the
-#320/#321 feature contribution (which is ABI-blessing-gated). One further upstream defect is filed as an
-**issue with no fix patch** (its fix touches the generic register scavenger — maintainer territory); a
-second is under **active root-cause and not yet filed** — a pressure-sensitive **default-8bit** `mosw65816`
-regalloc miscompile the demo differential caught (provisionally upstream, pristine-build confirmation
-pending)<sup>[[C24]](#c24-default8-loopfold-crc-miscompile)</sup>. The
+#320/#321 feature contribution (which is ABI-blessing-gated). The newest, `0010`, is a **default-8bit
+register-coalescer** correctness fix (a silent CRC miscompile the M2 demo
+caught<sup>[[C24]](#c24-default8-loopfold-crc-miscompile)</sup>) — PR drafted, not yet pushed. One further
+upstream defect is filed as an **issue with no fix patch** (its fix touches the generic register scavenger —
+maintainer territory). The
 exhaustive accounting — every PR/issue/design-note, the exact `gh` post commands, and the live snapshot — is
 the single source of truth in [`upstream-contribution-status.md`](upstream-contribution-status.md); this is
 the reviewer's slice of it.
 
-**Last verified: 2026-06-25** (#561/#562/#563 all still open, none merged). Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
+**Last verified: 2026-06-26** (#561/#562/#563 all still open, none merged; `0010` + the scavenger issue still
+drafted, not posted). Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
 (or `gh pr list --repo llvm-mos/llvm-mos --author wbniv --state all`).
 
 | Patch | Upstream defect | Repro on stock? | Upstream | Status | On merge | Test |
 |-------|-----------------|-----------------|----------|--------|----------|------|
 | `0003` | `mos-late-opt` reuses a dead `LDImm` as `TXY`/`TYX` without clearing the dead flag → verifier reject (`Using an undefined physical register`) | yes (`mosw65816`) | [PR&nbsp;#562](https://github.com/llvm-mos/llvm-mos/pull/562) | **POSTED · open** | drop `0003` + bump vendor pin | `late-opt-65816.mir` |
 | `0008` | the calling convention gives an 8-bit `addrspace(1)` direct-page pointer **argument** a 16-bit register → illegal size-mismatched `COPY` | yes (plain `mos6502`) | [#561](https://github.com/llvm-mos/llvm-mos/issues/561) → [PR&nbsp;#563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`) | **POSTED · open** | drop `0008` + bump vendor pin | `dp-pointer-arg.ll` |
+| `0010` | the register coalescer merges two rotate-referenced values into the A-only `Ac` class → strands a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (silent miscompile; both `-verify-machineinstrs`/`-verify-coalescing` clean) | yes (default-8bit `mosw65816`; standalone `llc`) | [PR draft](upstream-coalesce-rotate-ac-pr.md) (`wbniv:mos-coalesce-rotate-ac` to mint) | **DRAFTED · not posted** | drop `0010` + bump vendor pin | `coalesce-rotate-ac.mir` |
 | — | `saveScavengerRegister` asserts N/Z dead, but `+mos-a16` pressure keeps a compare/ALU flag live across a frame-vreg spill → illegal `$p is not a GPR` | upstream assert, exposed by `+mos-a16` | [issue draft](321-upstream-scavenger-nz-issue.md) | **DRAFTED · not posted** | n/a — no fix (XFAIL + XPASS-guarded) | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
 
 Status enum: **POSTED·open** (live PR/issue) · **DRAFTED** (written; posting is user-triggered) · **MERGED**
 (then dropped from the stack) · **DEFERRED** (filed, not fixed). The **"repro on stock?"** column is what makes
 these separable from the feature work — each reproduces on a pristine upstream build, so they are genuine
-upstream defects, not artifacts of #320/#321. The feature patches (`0001`/`0002`/`0004`–`0007`) are **not**
-listed here: they are the contribution proper, gated on maintainer ABI blessing (status:
+upstream defects, not artifacts of #320/#321. The feature patches (`0001`/`0002`/`0004`–`0007`/`0009`) are
+**not** listed here: they are the contribution proper, gated on maintainer ABI blessing (status:
 [`upstream-contribution-status.md`](upstream-contribution-status.md) → *Future / blocked*).
 
 ---
