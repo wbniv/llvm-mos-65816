@@ -30,13 +30,20 @@ mechanism + the `far`/`long_call` attribute, a typed `far_fn_t` variable, and
 `sizeof(far*)==4`) — all two-emulator verified. The far-pointer **calling
 convention** (passing/returning `p2` by value) is the remaining piece.
 
-**M2 — 16-bit accumulator codegen: in progress.** `+mos-a16` enables the 65816's
-native 16-bit accumulator mode. Implemented and differential-verified on both
-emulators: full s16 ALU (add/sub/bitwise/shifts/cmp/inc/dec), constant-immediate
-folds, indirect and absolute load/store, cross-block REP/SEP mode-tracking,
-A16-threading (post-RA store/reload elimination), equality-as-value peephole.
-40/40 corpus, 31 micro-tests, 6 realistic kernels, 2 combinatorial tests, 50/50
-fuzz. CI green. **In progress:** s32 (`long`/`int32_t`) support; XY16 (`+mos-xy16`).
+**M2 — 16-bit accumulator codegen: optimizing payoff in place; core codegen done.**
+`+mos-a16` enables the 65816's native 16-bit accumulator mode. Implemented and
+differential-verified on both emulators: full s16 ALU (add/sub/bitwise/shifts/cmp/
+inc/dec), constant-immediate folds, indirect and absolute load/store, cross-block
+REP/SEP mode-tracking, A16-threading (post-RA store/reload elimination), equality-
+as-value peephole, **s32 (`long`/`int32_t`)** and **XY16 (`+mos-xy16`, 16-bit X/Y
+index mode)** — both since landed and differential-verified (4-way host == default
+== `+mos-a16` == `+mos-xy16` on MAME + bsnes-jg). Corpus, micro-tests, realistic
+kernels, combinatorial tests, and Csmith differential fuzzing all green; CI green.
+**Remaining:** incremental optimization refinements (A16-threading / ALU-chain
+extensions) and two deferred upstream-territory RA/scavenger crashes (XFAIL'd). A
+default-8bit register-coalescer miscompile found while exercising the codegen was
+root-caused and **FIXED** (patch `0010`, upstream-bound). The ten-patch series is
+not yet upstreamed.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the full plan and
 [docs/INVESTIGATION.md](docs/INVESTIGATION.md) for upstream status and contribution rationale.
