@@ -238,6 +238,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   baseline (2026-06-18) was ~5/14 pairs and both prior crashes got orthogonal fixes (`0009`/`0011`+`0012`), so
   DEFER is expected to stand — this just re-arms the trigger with current data.
   [plan](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md).
+- [ ] **#321 `pr15296` link-time ZP overflow (`a16-zp-pressure-overflow`) — gated narrow-fix spike.** Distinct
+  from the Phase-3 trigger-check above: instead of re-affirming the deferral, *attempt* to clear the XFAIL with
+  a narrow, low-risk fix. Key reframe — the documented "Imag16-saturation" root cause is **refuted** by the
+  allocator (imag-regs hard-capped at 32 B; `MOSZeroPageAlloc` capped at `-zp-avail=224`), so a 1043-byte
+  `.zp.noinit` overflow is almost certainly a **containable accounting/cap defect (F1)** in the **pristine
+  upstream** `MOSZeroPageAlloc.cpp` — a generic, upstream-worthy bug, not the high-risk RA rework. Throwaway
+  worktree; gating empirical diagnosis (the symbol at offset 1043 → F1a/F1b/F2/F3) before any edit; land only
+  if **default-8-bit byte-identical** + regression-clean + pr15296 links/runs correct (`-O1`/`-Os`, both
+  emulators); else fall back to re-affirming the deferral with `dev/measure-zp-pressure.sh` evidence.
+  [plan](docs/plans/2026-06-26-pr15296-mos-a16-link-time-zp-overflow-gated-narrow.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
