@@ -203,6 +203,12 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    [Inc 2 plan](plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md) ·
    [Inc 2b plan](plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md) ·
    [xcheck plan](plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
+   **>2 banks (2026-06-26):** `dev/run.sh farindex` now formalizes the case beyond two banks — a
+   `const FAR uint16_t tbl[]` spanning banks $C1/$C2/$C3 (`snes-hirom`) read at three runtime indices
+   that land in three distinct banks via `lda [dp]` folds `corpus_result==0x0001D8A1` host == +mos-a16
+   on MAME + bsnes-jg (depends on the `0001` clang far-subscript fix; `k_trig32lut` corroborates on the
+   ~200 KiB sin LUT across $C1..$C4).
+   [farindex plan](plans/2026-06-26-formalize-far-data-2-banks-into-a-dedicated-passin.md).
 
 4. **M1 — address-space model honored.** Spot-check disassembly: near calls emit `JSR`, far calls
    emit `JSL`; direct-page vs absolute vs long accesses match the addrspace of the pointer.

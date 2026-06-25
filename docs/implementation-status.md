@@ -73,13 +73,14 @@ direct long jump (`TailJML`/`$5C`), −1 B per site (landed in `0001`, `4adda8b`
 | Far-pointer calling convention (pass/return `p2`) | ✅ **DONE — landed `0004` on `main` (Inc 4 Ph2, 2026-06-21).** All 4 ABI variants built & two-emulator measured (`wt/320-far-cc`); variant **(a) Imag32 won** (`0xF3` MAME+bsnes-jg, default byte-identical, csmith 0-mismatch; needs `Imag32 ∈ AnyRegBank`) and shipped as stacked **`0004-320-far-cc.patch`** + the measure harness + [measurement note](320-upstream-far-cc-measurement-note.md); losers stayed a measured spike. [study plan](plans/2026-06-20-320-far-pointer-cc-build-all-variants.md) · [land plan](plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md) |
 | Runtime far-pointer deref (`lda [dp]`/`sta [dp]`) + near→far cast (AS0→AS2) | ✅ **Done (Inc 3, 2026-06-20)** — `dev/run.sh far_indir`/`far_cast` + `xcheck`, MAME+bsnes-jg PASS. Added the backend's first 32-bit ZP register (`Imag32`); in `0001`. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
 | Runtime far-pointer arithmetic (`G_PTR_ADD` on AS2) | ✅ **Done (Inc 3c, 2026-06-20)** — `fp++` via the symmetric `s32→4×s8 G_UNMERGE_VALUES` mirror (`legalizeUnmergeS32ToBytes`, a16/`0002`; also closes a latent `uint32_t` shift-≥8 gap); `dev/run.sh far_arith` + `xcheck`, MAME+bsnes-jg PASS. [plan](plans/2026-06-20-320-far-pointer-runtime.md) |
-| Far data > 2 banks | ⬜ Deferred past Inc 3 (far load/store proven for ≤2 banks; multi-bank data placement not yet exercised) |
+| Far data > 2 banks | ✅ **Done — gate formalized 2026-06-26.** `dev/run.sh farindex`: a `const FAR uint16_t tbl[]` spanning banks $C1/$C2/$C3 (98304 × uint16, `snes-hirom`) read at three runtime indices (100/50000/90000) that land in three distinct banks via `lda [dp]` (R_MOS_ADDR24) folds `corpus_result==0x0001D8A1`, host == +mos-a16 on MAME + bsnes-jg. Depends on the clang far-subscript fix (`0001`: index promoted to the AS2 32-bit width → carries into the bank byte). `dev/run.sh k_trig32lut` independently corroborates (the ~200 KiB sin LUT across $C1..$C4); single-object absolute-long cross-bank read is gated by `far-bank1`. [plan](plans/2026-06-26-formalize-far-data-2-banks-into-a-dedicated-passin.md) |
 | Formal #320/#321 psABI document | ⬜ Premature — upstream won't bless ahead of a live implementation |
 
 **M1 verdict:** load/store, runtime deref/cast/arithmetic, direct far calls, mixed-banking far→near, **and
 far function pointers (a) — backend + clang front-end (F2 `far` attribute, typed `far_fn_t` variable,
-`sizeof(far*)==4`)** — are all built and two-emulator verified. Far function pointers (a) are **fully done +
-landed on `main`** (2026-06-21, in `0001` + `0005`). The far-pointer calling convention is **done + landed**
+`sizeof(far*)==4`)** — are all built and two-emulator verified. **Far data across >2 banks** is now a
+dedicated gate too (`dev/run.sh farindex`, banks $C1/$C2/$C3, 2026-06-26). Far function pointers (a) are
+**fully done + landed on `main`** (2026-06-21, in `0001` + `0005`). The far-pointer calling convention is **done + landed**
 — all variants measured, **Imag32 won and shipped as `0004`** on `main`. The five-address-space model is the
 other frontier; its PR still waits on the design-note posting.
 
