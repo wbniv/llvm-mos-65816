@@ -1,0 +1,21 @@
+# Cross-compilation layer over the base dev image (dev/Dockerfile → llvm-mos-65816-dev).
+# Adds the cross C/C++ toolchains dev/cross-toolchain.sh uses to build the llvm-mos HOST
+# binaries (clang/lld/llvm-*) for non-x86_64-linux hosts, plus the emulators that RUN the
+# foreign binary for the warning-free self-test. The 65816 *target* libs (MOS compiler-rt
+# builtins, SNES SDK) are host-agnostic and copied from the native build — not rebuilt here.
+#
+# Built as a SEPARATE tag (llvm-mos-65816-dev-cross) so the shared base image is untouched.
+# osxcross (macOS arm64, Increment 3) is added in a later layer once a macOS SDK is supplied
+# in dev/sdks/ — kept out for now so this image builds with no manual input.
+FROM llvm-mos-65816-dev
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# linux-arm64:    aarch64 cross g++ (bundles its sysroot) + qemu to RUN the aarch64 clang.
+# windows-x86_64: mingw-w64 posix-threads cross g++ (→ native .exe).  (wine for the .exe
+#                 self-test is added in Increment 2, where the exact 26.04 package is pinned.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      g++-aarch64-linux-gnu \
+      qemu-user-static \
+      g++-mingw-w64-x86-64-posix \
+    && rm -rf /var/lib/apt/lists/*

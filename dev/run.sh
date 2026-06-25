@@ -5,7 +5,8 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(dirname "$HERE")"
-IMAGE=llvm-mos-65816-dev
+IMAGE="${MOS_DEV_IMAGE:-llvm-mos-65816-dev}"
+DEV_DOCKERFILE="${MOS_DEV_DOCKERFILE:-Dockerfile}"
 TARGET="${1:-build}"
 
 if [ "$TARGET" = "-h" ] || [ "$TARGET" = "--help" ]; then
@@ -65,6 +66,12 @@ Targets:
              `task test-dap`.
   toolchain  build llvm-mos (clang/lld) FROM SOURCE -> build/llvm-mos-install
              (for M1 codegen; long first build — see dev/toolchain.sh)
+  cross-toolchain  cross-build the clang/lld/llvm-* HOST tools for a NON-native host
+             (linux-arm64 | windows-x86_64 | macos-arm64) from this x86-64 Linux
+             container -> build/llvm-mos-install-<profile>. Runs in the cross image
+             (dev/Dockerfile.cross); needs `toolchain` first (reuses its native
+             tablegens; the host-agnostic mos builtins+SDK are grafted at package time).
+             See dev/cross-toolchain.sh / docs/plans/2026-06-25-cross-platform-toolchain-builds.md
   far        #320 Increment 1: compile examples/65816/far-deref.c with the
              from-source toolchain and assert (at the disassembly level) that a
              far (addrspace 2) access lowers to 65816 absolute-long (LDA/STA
@@ -327,7 +334,17 @@ if [ "$TARGET" = "fuzz" ]; then
   esac
 fi
 
-docker build -t "$IMAGE" "$HERE" >/dev/null
+# `cross-toolchain` builds the llvm-mos HOST tools for a NON-native host (linux-arm64 /
+# windows-x86_64 / macos-arm64). It runs in a SEPARATE image carrying the cross toolchains
+# (dev/Dockerfile.cross, FROM the base image), so the shared base image stays untouched.
+if [ "$TARGET" = "cross-toolchain" ]; then
+  IMAGE="${MOS_DEV_IMAGE:-llvm-mos-65816-dev-cross}"
+  DEV_DOCKERFILE="${MOS_DEV_DOCKERFILE:-Dockerfile.cross}"
+  # Dockerfile.cross is FROM the base image — make sure it exists locally first.
+  docker build -t llvm-mos-65816-dev -f "$HERE/Dockerfile" "$HERE" >/dev/null
+fi
+
+docker build -t "$IMAGE" -f "$HERE/$DEV_DOCKERFILE" "$HERE" >/dev/null
 mkdir -p "$ROOT/build"
 # Forward the optional knobs into the container when set (name-only -e reads the
 # value from this script's environment — safe under `set -u` via :+).
