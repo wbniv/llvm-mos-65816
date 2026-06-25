@@ -1,6 +1,7 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-24 (added the review-guide reviewer slice — [Appendix D](65816-patch-series-review-guide.md#appendix-d--upstream-bug-fixes--status)
+**Last updated:** 2026-06-25 (re-verified upstream state — #561/#562/#563 all still **OPEN**, none merged;
+3 fork branches intact; only drift was the project-`main` pointer, now generalized). Previously 2026-06-24 (added the review-guide reviewer slice — [Appendix D](65816-patch-series-review-guide.md#appendix-d--upstream-bug-fixes--status)
 + `dev/upstream-status.sh` — and re-verified #561/#562/#563 still open. 2026-06-23: first upstream contributions now live — PR #562 (F4) + issue #561 + the #561
 fix PR #563; *Verified state* snapshot refreshed; project repo `wbniv/llvm-mos-65816` `main` pushed to
 `e39d0ed`. Also landed on `main`: **#320 far tail calls** in `0001` (`4adda8b`) — far→far `JSL;RTL` folds
@@ -278,9 +279,12 @@ PR used it. No leftover fork branches remain.
 them.** This one was removed on the user's explicit request, which is the only condition under which a fork
 branch is deleted.
 
-## Verified state (GitHub, 2026-06-24)
+## Verified state (GitHub, 2026-06-25)
 
 Our first upstream contributions are now live: **2 PRs + 1 issue open** (was 0 through 2026-06-22).
+**Re-verified 2026-06-25:** unchanged — #561/#562/#563 all still **OPEN** (none merged), the three fork
+branches (`mos-dp-arg-cc`, `mos-late-opt-txy-dead-flag`, `mos-dwarf-65816-test-docs`) intact, all nine
+drafted `*-upstream-*` artifact docs present.
 
 ```
 $ gh pr list --repo llvm-mos/llvm-mos --author wbniv --state all
@@ -304,9 +308,9 @@ $ gh pr view 540 --repo llvm-mos/llvm-mos --json number,title,state,mergedAt
 
 > **Note — two repos, don't conflate.** The PRs/issues/branches above target **`wbniv/llvm-mos`** (the LLVM
 > compiler fork → upstream `llvm-mos/llvm-mos`). Separately, the **project** repo `wbniv/llvm-mos-65816`
-> (this bench + the tracked `patches/`) had its `main` pushed to `e39d0ed` on 2026-06-23, carrying fork
-> patch `0008` (the DP-arg fix) and the #561/#563 artifacts — that is *our* history, not an upstream
-> contribution.
+> (this bench + the tracked `patches/`) had its `main` pushed to `e39d0ed` on 2026-06-23 (carrying fork
+> patch `0008` + the #561/#563 artifacts); `main` has since advanced with later bench work. Either way
+> that is *our* history, not an upstream contribution.
 
 ## Refresh this snapshot
 
