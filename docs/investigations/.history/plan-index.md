@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/f59a5d5) | docs(plan-index): index trig Phase 2 (144 rows); triage the DONE Inbox false-positive |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/840f640) | docs(plan-index): add the far-data->2-banks gate-formalization plan row |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/56f5d80) | docs: record scavenger-fix verification + sweep "deferred scavenger" framing (0011/0012) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/cf30a73) | docs(plan-index): add the 2026-06-26 scavenger live-$p fix plan (→ 142) |
@@ -17,6 +18,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+f59a5d5	author	Will Norris
+f59a5d5	added	3
+f59a5d5	deleted	1
+f59a5d5	files	1
+f59a5d5	body	The audit-plan-deferrals hook captured the struck-through "Phase 2 — 16-bit CORDIC"\nDONE marker (under the master plan's Deferred header) as if it were a new deferral;\nit isn't — Phase 2 landed in 4626ddd and is a curated Done entry. Replaced the Inbox\nbullet with a triaged note carrying its fingerprint so the ledger suppresses it.\nAdded the plan-index row for the Phase 2 plan (commit 4626ddd, Fuzz / corpus).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 840f640	author	Will Norris
 840f640	added	3
 840f640	deleted	1
