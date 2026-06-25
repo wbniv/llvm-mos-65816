@@ -33,17 +33,35 @@ static uint8_t chrbuf[ROW_BYTES];       // one tile-row, in Mode 7 tiled order, 
 volatile uint16_t corpus_result;        // rolling CRC of the canonical 64x56 buffer (the proof)
 static const uint8_t m7_zero = 0;       // fixed-source byte for the tilemap-clear DMA
 
+static uint16_t pal[DN + 1];            // base BGR555 palette, cached for the steady-state colour cycle
+
 // 16 CGRAM entries (escape 0..DN) = the shared Mandelbrot palette (mandel.h). 8bpp direct index:
-// the Mode 7 pixel value == escape count == the CRC byte.
+// the Mode 7 pixel value == escape count == the CRC byte. Also cached in pal[] for cycling.
 static void load_palette(void) {
   REG_CGADD = 0;
   for (uint8_t n = 0; n <= DN; n++) {
     uint8_t r, g, b;
     mandel_palette(n, DN, &r, &g, &b);
     uint16_t c = SNES_RGB(r, g, b);
+    pal[n] = c;
     REG_CGDATA = (uint8_t)(c & 0xFF);
     REG_CGDATA = (uint8_t)(c >> 8);
   }
+}
+
+// Steady-state colour cycle: rewrite CGRAM with the escape colours (indices 0..DN-1) rotated by
+// `shift` (0..DN-1), keeping the interior (index DN) black so only the bands flow. Called in
+// vblank, so no mid-frame CGRAM glitch.
+static void cycle_palette(uint8_t shift) {
+  REG_CGADD = 0;
+  for (uint8_t n = 0; n < DN; n++) {
+    uint8_t j = (uint8_t)(n + shift);
+    if (j >= DN) j = (uint8_t)(j - DN);
+    REG_CGDATA = (uint8_t)(pal[j] & 0xFF);
+    REG_CGDATA = (uint8_t)(pal[j] >> 8);
+  }
+  REG_CGDATA = (uint8_t)(pal[DN] & 0xFF);          // interior stays put (black)
+  REG_CGDATA = (uint8_t)(pal[DN] >> 8);
 }
 
 // CRC16-CCITT (XModem) one byte — the incremental form of mandel.h's mandel_crc, so feeding the
@@ -147,16 +165,18 @@ int main(void) {
     corpus_result = crc;                         // == gate CRC 0x204F (set once, after the render)
   }
 
-  // Steady state: the iconic Mode 7 move — slowly rotate the rendered fractal while gently zooming.
-  // Pivot on the image centre (32,28); the scroll offset keeps that point at screen centre so the
-  // angle-0 / 4x framing matches the static render exactly (no jump). Pure matrix animation, no
-  // recompute, so it never affects corpus_result. The matrix is latched in vblank each frame.
+  // Steady state: the iconic Mode 7 move — rotate the rendered fractal, breathe the zoom in/out,
+  // and cycle the colours, all at once. Pivot on the image centre (32,28); the scroll offset keeps
+  // that point at screen centre so the angle-0 framing matches the static render. Pure matrix +
+  // CGRAM animation, no recompute, so it never affects corpus_result. Latched in vblank each frame.
   m7_set_center(DW / 2, DH / 2);
   m7_set_scroll((uint16_t)(int16_t)(-(128 - DW / 2)), (uint16_t)(int16_t)(-(112 - DH / 2)));  // (-96,-84)
-  uint8_t angle = 0, t = 0;
+  uint8_t angle = 0, t = 0, pshift = 0, pcount = 0;
   for (;;) {
     wait_vblank_fresh();
-    int16_t zoom = (int16_t)(0x0030 + (((int32_t)SINCOS[(uint8_t)(t >> 1)] * 0x0008) >> 8));  // 0x28..0x38
+    if (++pcount >= 6) { pcount = 0; if (++pshift >= DN) pshift = 0; cycle_palette(pshift); }  // colour cycle
+    // zoom breathes 0x20..0x40 (8x deep into the centre <-> 4x full image) — a wider, deeper swing.
+    int16_t zoom = (int16_t)(0x0030 + (((int32_t)SINCOS[(uint8_t)(t >> 1)] * 0x0010) >> 8));
     int16_t cs = SINCOS[(uint8_t)(angle + 64)];   // cos (8.8)
     int16_t sn = SINCOS[angle];                    // sin (8.8)
     int16_t a = (int16_t)(((int32_t)cs * zoom) >> 8);
