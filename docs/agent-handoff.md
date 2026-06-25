@@ -18,6 +18,19 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
 
 ## Active worktrees (2026-06-25)
 
+> **CONSOLIDATION 2026-06-25 (user-directed "collapse worktrees, get things on main").** The standing
+> "retain worktrees until upstream merge" policy was **explicitly overridden** for this pass. Landed to
+> `main` and **torn down (local worktree + branch; `origin/wt/*` remotes kept)**:
+> `wt/321-snes-hwref` (HAL split + ref docs), `wt/321-mandel-zoom` (zoom demo), `wt/321-a16-pressure`
+> (patch **0009**, regalloc deadlock fix — re-verified: a16regpress + corpus-a16 globals.c now pass),
+> `wt/321-trig` (far array-subscript fix folded into **0001** + libfixmath/HiROM corpus — re-verified:
+> k_trig32 `0x068A6933`, k_trig32lut HiROM `0x87F0B404`, both emulators). Also torn down (already-merged
+> or superseded): `wt/320-far-tailcall`, `wt/320-near-abs-bank-relax`, `wt/321-mandelbrot`,
+> `wt/321-s32-verify`, `wt/321-track-a`, `wt/dp-arg-cc`, `wt/321-xy16`, `wt/320-far-cc`,
+> `wt/320-far-followups` (its far-cc round-trip sources + `far_sizeof` gate salvaged to `main`),
+> `wt/321-frame-abi` (NULL verdict; the inert `0002` frame-feature spike preserved as a docs/plans/spikes
+> patch). The rows below are pre-consolidation history; do not treat them as live.
+
 | Branch | Worktree | Task | Status |
 |--------|----------|------|--------|
 | `wt/321-mandel-zoom` | `/home/will/SRC/llvm-mos-65816-mandel-zoom` | #321 **Mandelbrot ZOOM PYRAMID** — true increasing detail on zoom-in ([plan](plans/2026-06-25-321-mandelbrot-zoom-pyramid.md)) | **✅ Phases 1 + 2 DONE+green (`a54041b`, `6fb3d1b`, on the branch — NOT merged).** Hardlink/non-compiler worktree (`build/install` real-copied so `sync-platform`'s `cp -f` can't mutate `main`; `snes-zoom` hand-installed from `snes-far`). Host bakes a stack of 2×-finer Mandelbrot levels (`tools/mandel-bake-pyramid.c`, `double`, centre = real-axis mini-Mandelbrot); the ROM DMAs the next finer level as Mode-7 zoom crosses each 2× threshold — increasing detail, zero on-console fractal math. **Phase 1** = single-bank 64×64 × 6 (32×) in one 32 KiB bank; **Phase 2** = multi-bank 128×128 × 8 (256×) on a new **`snes-zoom`** 8-bank/256 KiB platform (one bank-aligned level per bank, swap DMAs from `bank:addr16`). Both build default+`+mos-a16`. New `examples/snes/{zoom.h, mandel-zoom.c}`, `tools/mandel-bake-pyramid.c`, `platforms/snes-zoom/`, `dev/mandel-zoom.sh` (PYR_MODE hd/sd), `mode7.h` param `m7_tilemap_identity`, `jgxcheck.cpp` `JGX_ZOOM` (+VRAM-readback gate), `snes-checksum.py` 256 KiB. **Differential PASS both modes/builds**: per-level hash + VRAM-readback (displayed far-bank level == host) + scripted-zoom host==target, MAME+bsnes-jg, `-verify` clean. **FINDINGS: (1) a real DEFAULT-8bit matrix-fold-LOOP miscompile** (`for(i<4) m[i]` folds 0x456E vs 0xB115; unrolled correct; context-sensitive, INDEPENDENT of #321 — TODO follow-up cvise→backend); **(2) the vblank limit** (a 16 KiB swap DMA overruns vblank → truncated; fixed by force-blanking the large swap; the VRAM gate caught it). Spike: `docs/plans/spikes/2026-06-25-321-mandel-zoom-phase2-bank-dma-probe.c`. **Worktree RETAINED** (user policy); merge user-triggered. |

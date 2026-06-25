@@ -351,7 +351,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `zoom_fold` to the loop form) → minimal `.ll` → fix; check whether it's `mosw65816`-only or also `mos6502`
   (possibly upstream). Full writeup: [docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md](docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
 
-- [wip] **SNES hardware reference docs + subsystem-split `snes.h` + generators** (on `wt/321-snes-hwref`).
+- [x] ~~**SNES hardware reference docs + subsystem-split `snes.h` + generators**~~ — **LANDED on `main`**
+  2026-06-25 (consolidation). The umbrella `snes.h` re-exports every prior symbol (`VMAIN_INC_LOW_1`,
+  `snes_read_pad1`, `snes_wait_vblank` carried into the split headers); compile-verified.
   Durable reference set produced *from source*: (1) subsystem-split HAL headers
   (`platforms/snes/snes_{ppu,dma,cpu,apu,wram,joypad}.h`) under a thin umbrella `snes.h`, annotated with
   `@reg`/`@bit`; (2) a **complete CPU-visible MMIO register map** generated from those headers
@@ -1139,4 +1141,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      intentionally unrun because nothing is built yet; the steps require the increments to exist first. Tracked
      by the curated open item "#321 Cross-platform toolchain builds" under Distribution / Packaging, where the
      PASS evidence will be recorded as Inc 0–4 land. Not a missed step. fp:6676955ce1f1f4cf -->
+<!-- triaged 2026-06-25: trig Phase 2 (16-bit CORDIC) + Phase 3 (derived/hyperbolic) are curated FUTURE
+     phases of the trig differential plan, not deferrals — the plan itself tracks them. Phase 1 (Q16.16
+     libfixmath) landed + verified this session (k_trig32 0x068A6933, k_trig32lut HiROM 0x87F0B404, both
+     emulators). fp:b69409f652ecf145 fp:6129cc5f0e5198c0 -->
 <!-- END auto-captured-deferrals -->
