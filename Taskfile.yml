@@ -61,8 +61,24 @@ tasks:
 
   # --- Interim release packaging (until #320/#321 land upstream) ---
 
+  release-builtins:
+    desc: "Force-rebuild the toolchain's mos compiler-rt builtins so libclang_rt.builtins.a matches the CURRENT backend data layout. LLVM's runtimes sub-build doesn't re-trigger on a backend-only change (e.g. patch 0006 adding the packed-24 'p3:24:8' addrspace), leaving stale builtins that the SDK merges into libcrt → 'different data layouts' warnings on every user link. Reinstalls into build/llvm-mos-install."
+    cmds:
+      - dev/run.sh rebuild-builtins
+
+  release-sdk:
+    desc: "Clean-rebuild build/install (SNES SDK) against the PATCHED toolchain so libc/crt0/libcrt carry the far-pointer data layout — eliminates the ld.lld 'different data layouts' warnings. Forces a CLEAN build (sentinel stamp) because an incremental SDK build does NOT re-merge libcrt after release-builtins refreshes the toolchain's builtins.a."
+    deps: [release-builtins]
+    cmds:
+      # Make dev/build.sh wipe + clean-rebuild: its toolchain stamp is path-based and
+      # can't see that release-builtins changed the toolchain's builtins.a *content*.
+      # A clean build is the only thing that reliably re-merges libcrt.
+      - echo 'release-clean' > build/.mos-toolchain
+      - MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build
+
   package:
-    desc: "Assemble the relocatable Linux x86-64 toolchain+SDK into dist/llvm-mos-65816-<stamp>-linux-x86_64.tar.xz (+ .sha256). Host-side; needs build/llvm-mos-install + build/install. Env: STRIP=0 keeps debug, RELEASE_DOCS_DIR=<dir> bundles docs."
+    desc: "Assemble the relocatable Linux x86-64 toolchain+SDK into dist/llvm-mos-65816-<stamp>-linux-x86_64.tar.xz (+ .sha256). WARNING-FREE gate: the self-test fails on any clang/ld.lld warning (this is a public release). Runs release-builtins + release-sdk first. Env: STRIP=0 keeps debug, RELEASE_DOCS_DIR=<dir> bundles docs."
+    deps: [release-sdk]
     cmds:
       - dev/package-release.sh {{.CLI_ARGS}}
 

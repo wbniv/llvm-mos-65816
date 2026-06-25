@@ -125,17 +125,33 @@ if [[ "$STRIP" == "1" ]]; then
     done < <(find "$STAGE/bin" -maxdepth 1 -type f -print0)
 fi
 
-# --- 5. relocatability self-test (the gate) --------------------------------
-echo "==> self-test: compile a SNES ROM from the relocated prefix"
+# --- 5. relocatability + WARNING-FREE self-test (the gate) -----------------
+# This is a public release: zero warnings tolerated. Compile a SNES ROM from
+# the *moved* prefix, capturing stderr, and fail on a broken prefix OR on any
+# warning (e.g. an ld.lld data-layout mismatch from an SDK built with the
+# default unpatched /opt/llvm-mos — fixed by `task release-sdk`).
+echo "==> self-test: warning-free compile of a SNES ROM from the relocated prefix"
 SELFTEST_DIR="$(mktemp -d)"
 trap 'rm -rf "$SELFTEST_DIR"' EXIT
-if "$STAGE/bin/mos-clang" --config "$STAGE/bin/mos-snes.cfg" -mcpu=mosw65816 \
-        -Os -o "$SELFTEST_DIR/selftest.sfc" "$ROOT/examples/snes/hello.c"; then
-    echo "    OK  $(stat -c%s "$SELFTEST_DIR/selftest.sfc") bytes"
-else
+SELFTEST_ERR="$SELFTEST_DIR/stderr.log"
+if ! "$STAGE/bin/mos-clang" --config "$STAGE/bin/mos-snes.cfg" -mcpu=mosw65816 \
+        -Os -o "$SELFTEST_DIR/selftest.sfc" "$ROOT/examples/snes/hello.c" 2>"$SELFTEST_ERR"; then
     echo "FATAL: self-test failed — the relocated prefix is broken" >&2
+    sed 's/^/    /' "$SELFTEST_ERR" >&2
     exit 1
 fi
+if grep -qiE 'warning|error' "$SELFTEST_ERR"; then
+    echo "FATAL: release build is NOT warning-clean (public release — no warnings allowed)." >&2
+    echo "  offending diagnostics:" >&2
+    sed 's/^/    /' "$SELFTEST_ERR" >&2
+    echo >&2
+    echo "  The runtime libs must match the current backend's data layout. Rebuild, in order:" >&2
+    echo "    task release-builtins   # toolchain mos compiler-rt (the stale-after-patch libcrt fix)" >&2
+    echo "    task release-sdk        # SDK libc/crt0 against the patched toolchain" >&2
+    echo "  then re-run  task package  ." >&2
+    exit 1
+fi
+echo "    OK  $(stat -c%s "$SELFTEST_DIR/selftest.sfc") bytes — no warnings"
 if find "$STAGE" -xtype l | grep -q .; then
     echo "FATAL: dangling symlinks in staged tree:" >&2
     find "$STAGE" -xtype l >&2
