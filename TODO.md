@@ -1165,5 +1165,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      now a curated Done entry [321-trig-phase2-cordic] (k_trig16 0x9446C734 host==default==+mos-a16,
      both emulators; zero arithmetic libcalls; cross-width PASS). The hook keyed on the
      "Phase 2 — 16-bit CORDIC" text under the master plan's Deferred header. fp:946b42a13cc7db77 -->
-- [ ] **(triage)** ~~**Phase 3 — derived + hyperbolic**~~ **DONE 2026-06-26** — `k_trig16x.c` + the `cordic16.h` — _from [2026-06-25-trig-functions-as-a-c-compiler-differential-test-1.md](docs/plans/2026-06-25-trig-functions-as-a-c-compiler-differential-test-1.md)_  <!-- fp:ad6e1b319a9a239b -->
+<!-- triaged 2026-06-26: NOT a deferral — this is the struck-through DONE marker for trig Phase 3,
+     now a curated Done entry [321-trig-phase3-derived-hyperbolic] (k_trig16x 0x759567C4
+     host==default==+mos-a16, both emulators; cross-width PASS). The hook keyed on the
+     "Phase 3 — derived + hyperbolic" text under the master plan's (renamed) Completed-phases header. fp:ad6e1b319a9a239b -->
 <!-- END auto-captured-deferrals -->
