@@ -77,10 +77,15 @@ tasks:
       - MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build
 
   package:
-    desc: "Assemble the relocatable Linux x86-64 toolchain+SDK into dist/llvm-mos-65816-<stamp>-linux-x86_64.tar.xz (+ .sha256). WARNING-FREE gate: the self-test fails on any clang/ld.lld warning (this is a public release). Runs release-builtins + release-sdk first. Env: STRIP=0 keeps debug, RELEASE_DOCS_DIR=<dir> bundles docs."
+    desc: "Assemble the relocatable Linux x86-64 toolchain+SDK into dist/llvm-mos-65816-<stamp>-linux-x86_64.tar.xz (+ .sha256). GATES (both must pass or the tarball is not a publish candidate): (1) WARNING-FREE self-test — fails on any clang/ld.lld warning; (2) CLEAN-ROOM emulator test — task release-test METHOD=local builds+runs the tarball's own mos-snes-clang in bsnes-jg (default-8bit + +mos-a16) and asserts the WRAM CRC. Runs release-builtins + release-sdk first. Env: STRIP=0 keeps debug, RELEASE_DOCS_DIR=<dir> bundles docs, SKIP_RELEASE_TEST=1 bypasses the clean-room gate (NOT for a real publish)."
     deps: [release-sdk]
     cmds:
       - dev/package-release.sh {{.CLI_ARGS}}
+
+  release-test:
+    desc: "Clean-room test the PUBLISHED SNES compiler in a throwaway Docker container with NO dev toolchain: acquire mos-snes-clang, compile examples/snes/mandel-display.c (default-8bit + +mos-a16), run in bsnes-jg (embedded SPC700 IPL → no BIOS/sound), assert the WRAM corpus_result CRC == the host oracle (0x9103) + dump an emulator PNG. METHOD=local (newest dist/*.tar.xz — the publish gate, also auto-run by `task package`) | apt (live apt.indri.studio) | tarball (product-page link). Knobs: PROGRAM=mandel-display|k_mandel, A16=both|1|0, TARBALL=<path>, FRAMES=n. Pass as `task release-test -- METHOD=apt`."
+    cmds:
+      - dev/test-release.sh {{.CLI_ARGS}}
 
   ci-watch:
     desc: "Live-monitor a GitHub Actions run (default: latest snes-smoke): streams step transitions + heartbeat + final verdict. Args: [RUN_ID] | --once"
@@ -111,10 +116,14 @@ tasks:
         case "$ROM" in
           mandel-mode7) echo "note: mandel-mode7's 128x128 software compute is ~4 min of EMULATED time — the screen stays black until it finishes, then shows the image." ;;
           mandel-display) echo "note: the image appears after the ~15 s (emulated) compute." ;;
-          mandel-interactive) echo "note: INSTANT boot. Controls — D-pad: pan | L/R: zoom out/in | Y/A: rotate | Select: cycle palette | Start: reset. (MAME P1 keys are version-dependent; remap via Tab -> Input Settings.)" ;;
+          mandel-interactive) echo "note: INSTANT boot. KEYS (remapped to match the labels): arrows=pan | L/R=zoom out/in | Y/A=rotate | S=cycle palette | Enter=reset." ;;
         esac
         echo "launching $SFC in MAME — close the window to quit."
         mkdir -p build/.mame
+        # MAME's default SNES P1 keys are non-obvious (SNES R=keyboard X, Y=Left-Ctrl, A=Space), so the
+        # demo labels wouldn't match the keys. Drop in our remap (snes.cfg) so keyboard R/L/Y/A/S/Enter
+        # match the on-screen R/L/Y/A/Select/Start; D-pad stays on the arrows. See dev/mame-snes-input.cfg.
+        cp -f dev/mame-snes-input.cfg build/.mame/snes.cfg
         exec mame snes -cart "$SFC" -rompath dev/roms -skip_gameinfo -window \
           -cfg_directory build/.mame -nvram_directory build/.mame
 

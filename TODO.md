@@ -333,14 +333,23 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `$4300–$430A` regs to `platforms/snes/snes.h` + a small reusable gfx helper). Then joypad controls
   (random a/b/c, switch palette/formula/color-mode, auto-scale). Optional perf: SNES hw multiplier
   (`$4202/$4203→$4216`) for the hot `b*x`. [plan](docs/plans/2026-06-24-blossom-snes.md).
-- [ ] **#321 Mandelbrot zoom pyramid — TRUE increasing detail as you zoom in (follow-up to the interactive
-  demo).** The interactive demo only *magnifies* its baked bitmap (no new detail); on-SNES recompute is out
-  (~4 min/128² compute + Q5.10 runs out of precision). Instead the **host** bakes a stack of 2×-finer levels
-  (full `double` precision, any depth) and the SNES **DMAs the next level** as zoom crosses each 2× threshold
-  — instant, deep, SNES does zero math. **Phase 1:** single-bank proof (64×64 × ~4 levels, fits the existing
-  32 KiB, 16× deep, no linker change). **Phase 2:** multi-bank LoROM (256 KiB) for 128×128 × 8 levels (256×).
-  Differential: each level's chr hash host==target on both emulators + a scripted-zoom view-math gate.
-  [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md).
+- [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
+  demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
+  128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
+  swaps it's just Mode-7 magnify like the interactive demo; as a `+mos-a16` codegen customer it's redundant
+  (same `view.h` matrix math). Branch kept (unmerged) as the live repro for the bug below. KEEPERS landed on
+  `main`: the MAME key-remap + the compiler-bug finding.~~ [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md)
+- [x] ~~**MAME key remap for the SNES demos** (`dev/mame-snes-input.cfg`)~~ — binds each SNES button to its
+  matching keyboard letter (R→SNES R, Y→Y, A→A, L→L, S→Select, Enter→Start) so the demo labels just work;
+  MAME's defaults are non-obvious (SNES R = keyboard X, Y = Left-Ctrl, A = Space). `task mandel-mame` drops it
+  in. (Fixes the "Y/A/R don't work" report — it was the key map, not the ROM; verified by injecting the field.)
+- [ ] **#321 / baseline — DEFAULT-8bit 65816 matrix-fold-LOOP miscompile → cvise → backend fix.** A real
+  miscompile the zoom demo's differential caught: a `for(i<4){ f((uint8_t)m[i]); f((uint8_t)((uint16_t)m[i]>>8)); }`
+  fold over an `int16_t m[4]` computes a wrong CRC vs the byte-identical unrolled form, in the **default 8-bit**
+  path (no `+mos-a16`). Context-sensitive — reproduces only inside the full demo's register pressure (3 standalone
+  reductions did NOT trigger it). Next: cvise-reduce from `mandel-zoom.c` (branch `wt/321-mandel-zoom`, revert
+  `zoom_fold` to the loop form) → minimal `.ll` → fix; check whether it's `mosw65816`-only or also `mos6502`
+  (possibly upstream). Full writeup: [docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md](docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
 
 ### Test Bench / CI
 
@@ -457,13 +466,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `0001–0008` patches land upstream (upstream CI then emits these).
   [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
-- [ ] **Clean-room test of the *published* SNES compiler** — in a throwaway Docker container, fetch the
-  toolchain from the public endpoints (apt.indri.studio `apt install` and/or the product-page tarball),
-  compile a **sound-free** reference Mandelbrot (`examples/65816/k_mandel.c`, gate CRC `0x820B`), and verify
-  on **bsnes-jg** (embedded SPC700 IPL → no BIOS, no sound) against the host oracle (`mandel-render --gate`)
-  — both default-8bit and `+mos-a16`. Rig image `dev/Dockerfile.release-test` (bsnes-jg + jgxcheck + oracle,
-  no toolchain baked) + `dev/test-release.sh` + `task release-test`; optional periodic CI release-smoke.
-  [plan](docs/plans/2026-06-25-test-published-snes-compiler.md).
+- [ ] **Clean-room test of the *published* SNES compiler — wired into the publish gate** — in a throwaway
+  Docker container with NO dev toolchain, acquire the published compiler and compile a **sound-free**
+  reference Mandelbrot (`examples/snes/mandel-display.c`, 32×28 N=15, CRC `0x9103`; secondary
+  `examples/65816/k_mandel.c` `0x820B`), then verify on **bsnes-jg** (embedded SPC700 IPL → no BIOS, no sound)
+  against the host oracle (`mandel-render`) — both default-8bit and `+mos-a16`, plus an emulator-rendered PNG.
+  Three `METHOD`s: **`local`** (the freshly-built `dist/*.tar.xz` — the mandatory gate run from
+  `dev/package-release.sh`, so *every* `task package` is clean-room-verified before upload), **`apt`** /
+  **`tarball`** (live repo / product-page link, post-publish + periodic CI). Rig image
+  `dev/Dockerfile.release-test` (pinned bsnes-jg + jgxcheck + oracle + fixtures, no toolchain) +
+  `dev/test-release.sh` + `task release-test`. [plan](docs/plans/2026-06-25-test-published-snes-compiler.md).
 
 
 ## Watch

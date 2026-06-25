@@ -1,0 +1,65 @@
+# dev/Dockerfile.release-test — the clean-room RIG for testing the *published*
+# 65816 compiler (docs/plans/2026-06-25-test-published-snes-compiler.md).
+#
+# Deliberately carries NO toolchain: the unit under test is the published compiler,
+# acquired at run time from the freshly-built tarball (METHOD=local), the live apt
+# repo (METHOD=apt), or the product-page tarball link (METHOD=tarball). What IS baked
+# in is the *test rig* — a pinned bsnes-jg core + the jgxcheck harness, the host CRC
+# oracle (mandel-render), and the reference fixtures — so each run costs only
+# acquire-compiler + compile + run (seconds), not a bsnes-jg rebuild.
+#
+# Build context is the repo root (see .dockerignore — only the tracked fixtures +
+# dev/jgxcheck.cpp + tools/mandel-render.c are sent). The runner (dev/test-release.sh)
+# runs this image with NO repo mount, so the container can never see the dev build.
+FROM ubuntu:26.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential g++ make libsamplerate0-dev pkg-config \
+      curl gnupg ca-certificates xz-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# --- pinned bsnes-jg core (same pin as dev/xcheck.sh) -----------------------
+# Embeds the SPC700 IPL in its core (no external BIOS) and renders in software, so
+# jgxcheck can boot a ROM headless, read WRAM, and dump a real framebuffer PNG.
+ARG BSNES_VER=2.1.0
+ARG BSNES_SHA=a8e0fd36711406198afe1110ddc6960c9d795f4ab73d0badd8878396ac3d0c42
+RUN mkdir -p /opt/bsnes-jg \
+    && curl -fsSL "https://gitlab.com/jgemu/bsnes/-/archive/${BSNES_VER}/bsnes-${BSNES_VER}.tar.gz" -o /tmp/bsnes-jg.tgz \
+    && echo "${BSNES_SHA}  /tmp/bsnes-jg.tgz" | sha256sum -c - \
+    && tar xzf /tmp/bsnes-jg.tgz -C /opt/bsnes-jg --strip-components=1 \
+    && rm /tmp/bsnes-jg.tgz \
+    && make -C /opt/bsnes-jg ENABLE_STATIC=1 DISABLE_MODULE=1 -j"$(nproc)" >/dev/null \
+    && cp -a /opt/bsnes-jg/Database /opt/rig-Database
+
+# --- reference fixtures (preserve the include layout) ------------------------
+# COPYed after the expensive bsnes-jg layer so editing a fixture/source only re-runs
+# these cheap layers. mandel-display.c does #include "../65816/mandel.h", so snes/ and
+# 65816/ must be siblings; the host oracle (mandel-render.c) also needs mandel.h, so
+# the fixtures land BEFORE the rig-binary build below.
+RUN mkdir -p /opt/rig /opt/rig/src /opt/rig/fixtures/snes /opt/rig/fixtures/65816
+COPY dev/jgxcheck.cpp /opt/rig/src/jgxcheck.cpp
+COPY tools/mandel-render.c tools/png_write.h /opt/rig/src/
+COPY examples/snes/mandel-display.c /opt/rig/fixtures/snes/mandel-display.c
+COPY examples/65816/mandel.h        /opt/rig/fixtures/65816/mandel.h
+COPY examples/65816/k_mandel.c      /opt/rig/fixtures/65816/k_mandel.c
+
+# --- the rig binaries: jgxcheck harness + the host CRC oracle ----------------
+# mandel-render.c does #include "mandel.h" (resolved via -I to the 65816 fixtures, the
+# same kernel the on-target ROM compiles) and "png_write.h" (in /opt/rig/src).
+RUN ARCHIVE="$(find /opt/bsnes-jg/objs -name '*.a' | head -1)" \
+    && [ -n "$ARCHIVE" ] || { echo "FATAL: bsnes-jg archive not built" >&2; exit 1; } \
+    && g++ -O2 -std=c++11 -I/opt/bsnes-jg/src -I/opt/rig/src \
+         -c /opt/rig/src/jgxcheck.cpp -o /tmp/jgxcheck.o \
+    && g++ /tmp/jgxcheck.o "$ARCHIVE" -lsamplerate -lm -o /opt/rig/jgxcheck \
+    && cc -O2 -I/opt/rig/src -I/opt/rig/fixtures/65816 \
+         /opt/rig/src/mandel-render.c -o /opt/rig/mandel-render \
+    && cp -a /opt/rig-Database /opt/rig/Database \
+    && rm -rf /opt/bsnes-jg /opt/rig-Database /tmp/jgxcheck.o
+
+# --- the in-container test driver -------------------------------------------
+COPY dev/release-test-inner.sh /opt/rig/inner.sh
+RUN chmod +x /opt/rig/inner.sh
+
+WORKDIR /work
+ENTRYPOINT ["/opt/rig/inner.sh"]

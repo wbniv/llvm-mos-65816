@@ -209,11 +209,30 @@ echo "==> packaging"
         -cJf "$NAME.tar.xz" "$NAME" )
 ( cd "$DIST_DIR" && sha256sum "$NAME.tar.xz" > "$NAME.tar.xz.sha256" )
 
+# --- 8. clean-room PUBLISH GATE --------------------------------------------
+# The warning-free self-test above proves the relocated prefix links cleanly; this
+# proves the published artifact actually BOOTS and COMPUTES correctly. In a throwaway
+# container with NO dev toolchain, acquire THIS tarball's mos-snes-clang, compile the
+# reference Mandelbrot (default-8bit + +mos-a16), run each ROM in bsnes-jg (embedded
+# SPC700 IPL → no BIOS/sound) and assert the WRAM CRC == an independent host oracle.
+# A FAIL here means the tarball must NOT be published. Override (NOT for a real
+# release) with SKIP_RELEASE_TEST=1; if Docker is absent the gate FAILS, not skips.
+if [[ "${SKIP_RELEASE_TEST:-0}" == "1" ]]; then
+    echo "==> SKIP_RELEASE_TEST=1 — clean-room emulator gate SKIPPED (not a publish-grade build)"
+else
+    echo "==> clean-room gate: run the tarball's compiler output in bsnes-jg (METHOD=local)"
+    if ! "$ROOT/dev/test-release.sh" METHOD=local TARBALL="$DIST_DIR/$NAME.tar.xz"; then
+        echo "FATAL: clean-room release test FAILED — the published artifact does not build a correct ROM." >&2
+        echo "  tarball stays at $DIST_DIR/$NAME.tar.xz but is NOT a publish candidate. Do not upload it." >&2
+        exit 1
+    fi
+fi
+
 SIZE="$(du -h "$DIST_DIR/$NAME.tar.xz" | cut -f1)"
 SHA256="$(cut -d' ' -f1 < "$DIST_DIR/$NAME.tar.xz.sha256")"
 cat <<EOF
 
-==> done
+==> done  (warning-free self-test + clean-room emulator gate both PASSED)
     tree:    $STAGE  ($(du -sh "$STAGE" | cut -f1))
     tarball: $DIST_DIR/$NAME.tar.xz  ($SIZE)
     sha256:  $SHA256

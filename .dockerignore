@@ -1,0 +1,13 @@
+# Build context filter for dev/Dockerfile.release-test (the ONLY image whose build
+# context is the repo root; dev/Dockerfile + dev/Dockerfile.cross use the small dev/
+# context and are unaffected). The rig image needs only the tracked fixtures + two
+# host sources (dev/jgxcheck.cpp, tools/mandel-render.c) — keep the heavy gitignored
+# trees out so the context stays a few MB instead of ~12 GB.
+vendor/
+build/
+dist/
+.git/
+docs/transcripts/
+docs/plans/.history/
+**/__pycache__/
+**/*.pyc
