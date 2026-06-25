@@ -116,7 +116,14 @@ loop form sources the `m[i]` matrix bytes via **X-indexed stack loads** that the
 The unroll asm has **no `.Lmain_zp_stk,x` indexed loads** (constant-offset only). A wrong/stale `X` at the
 indexed load folds the wrong `m[]` byte → wrong CRC (`rom 0xE60E` vs correct `host/unroll 0xF56C`). The
 exact wrong-X mechanism (clobber vs bad index arithmetic; which pass) is the root-cause task (Verification
-step 4); classification (step 3) needs a self-contained, `mos6502`-retargetable repro.
+step 4).
+
+**Accumulator-width classification (2026-06-25, on the minimal repro, target-only on bsnes):** the bug is
+**8-bit-accumulator (default) only** — `mosw65816` default loop `0xE60E` ≠ unroll `0xF56C`, while
+`+mos-a16` (16-bit accumulator) is clean (loop `==` unroll `== host == 0xD351`). `+mos-a16` is 65816-only,
+so the defect is in the 65816 8-bit codegen. A `-mcpu=mos6502` build on the SNES platform is **not** a
+valid 6502 oracle (65816 crt0/ABI — the correct unroll form returns `0xFF4B`), so upstream-vs-fork is
+settled by the responsible pass's provenance during root-cause, all on the 65816.
 
 ## Verification
 
@@ -146,11 +153,19 @@ step 4); classification (step 3) needs a self-contained, `mos6502`-retargetable 
    **PASS** — reduced, de-UB'd, verified, and shown minimal by ablation.
 3. **Classification.** State whether the minimal repro reproduces on `mos6502` (→ upstream) or only
    `mosw65816` (→ fork); paste the per-target results.
-   **PENDING (next phase).** The `ZOOM` oracle is SNES/bsnes-specific (the reduced `.c` `#include`s the SNES
-   MMIO `mode7.h`), so classification needs a *self-contained* repro retargetable to `mos6502` with its own
-   value oracle — the next reduction step (a `corpus_result` differential, not the pad-log replay). The
-   defect is in the **default-8bit** path (no `+mos-a16`/`+mos-xy16`), so an upstream `llvm-mos` origin is
-   plausible per the investigation caveat — to be settled here.
+   ```
+   target-only loop-vs-unroll on bsnes (read rom zoom_crc), minimal repro:
+     mosw65816 default (8-bit A):   loop=0xE60E != unroll=0xF56C   -> BUG
+     mosw65816 +mos-a16 (16-bit A): loop=0xD351 == unroll=0xD351   -> clean (loop==unroll==host)
+   ```
+   So the miscompile is **8-bit-accumulator (default) only** on the 65816 — now confirmed on the minimal
+   repro (not just the hd demo); `+mos-a16` (16-bit accumulator) is correct. **A `-mcpu=mos6502` build on the
+   SNES platform is NOT a valid 6502 oracle** (the SNES crt0/ABI are 65816): even the known-correct *unroll*
+   form returns `0xFF4B != 0xF56C`, so that run is unfaithful — discarded (do not read it as "6502 clean").
+   `+mos-a16` is a 65816-only feature, so the bug clearly lives in the 65816 8-bit codegen. Upstream-vs-fork
+   is therefore settled by **pass provenance** during root-cause (step 4) — is the pass that emits the bad
+   X-indexed load in the shared upstream tree or the fork's `0002`? — with all testing kept on the 65816.
+   **Partial** (8-bit-only confirmed; upstream-vs-fork resolves with the root cause).
 4. **Fix.** With the fix, the natural loop form == unrolled == host on the minimal repro AND in the full
    `dev/run.sh mandel-zoom` (hd) and the fast sd repro; `-verify-machineinstrs` clean. **PENDING.**
 5. **Regression test.** The new hermetic test (`loopfold.c`/`.sh` and/or frozen `.ll` `llc` gate) FAILs before
