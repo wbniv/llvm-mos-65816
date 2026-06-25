@@ -1079,5 +1079,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      (graphics layer = Mode-7 framebuffer + $7E shadow buffer + DMA + CGRAM regs; interactivity =
      joypad controls; optional perf = $4202 hw multiplier). Not separate open work — covered there.
      fp:9a83cc394836d1de fp:8b629fbc2e270274 fp:fb7011942a1132aa -->
-- [ ] **(triage)** ~~**On approval, also:** add the matching `TODO.md` entry under *Test Bench / CI* for this Csmith work — _from [2026-06-19-321-csmith-differential-fuzzer.md](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md)_  <!-- fp:bd0898d1d5c10cfa -->
+<!-- triaged 2026-06-25: this IS done — the matching Test Bench / CI entry was promoted to Done as
+     [321-csmith-fuzzer] in the same commit (2cfd375) that captured this deferral; the struck-through plan
+     bullet is the now-completed action, not open work. fp:bd0898d1d5c10cfa -->
 <!-- END auto-captured-deferrals -->

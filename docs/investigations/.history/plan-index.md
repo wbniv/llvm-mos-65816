@@ -1,11 +1,29 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fe1a52d) | docs(plan-index): register the interactive Mandelbrot (Mode 7 fly-around) plan |
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/d21da90) | docs: finalize the Mandelbrot plan + register it in the indexes |
+| [2026-06-24](https://github.com/wbniv/llvm-mos-65816/commit/8c14a3a) | docs: refresh plan-index — 74→127 plans, regenerate from git |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/0d76bfc) | #321 c-torture Phase 2 (-O1): 16 confirmed NEW a16/xy16 runtime miscompiles |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/f9a33d6) | #321 docs: reflect c-torture Phases 0+1 across the index docs |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/3be4584) | #321 docs: add the c-torture differential-suite plan to the plan index |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+fe1a52d	author	Will Norris
+fe1a52d	added	1
+fe1a52d	deleted	0
+fe1a52d	files	1
+fe1a52d	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+d21da90	author	Will Norris
+d21da90	added	3
+d21da90	deleted	1
+d21da90	files	1
+d21da90	body	- plan: merge-back checklist marked done (artifacts committed, TODO->Done, run.sh/task\n  targets, indexes) — only the user-triggered merge to main remains.\n- plan-index.md: add the beefy SNES Mandelbrot demo row (Platform), refresh 127->128.\n- agent-handoff.md: register wt/321-mandelbrot in Active worktrees (all 4 stages green\n  on the branch; retained until merge per policy).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+8c14a3a	author	Will Norris
+8c14a3a	added	63
+8c14a3a	deleted	8
+8c14a3a	files	1
+8c14a3a	body	Bring docs/investigations/plan-index.md current: it had stopped at the\n2026-06-19 c-torture row (74 rows) while 53 more plans landed through\n2026-06-23. Regenerated per the index's own documented derivation:\n\n- Order + every Commit(s) column rebuilt from `git log --follow` (the\n  canonical sort reproduces the prior 74-row order exactly; 8 older rows\n  also picked up commits that touched them after the last refresh — one\n  prior row even listed a commit, e9e3de6, that never touched its file).\n- 53 new rows authored in-house from each plan's TL;DR / verdict, slotted\n  into chronological-by-creation-commit position (not just appended — e.g.\n  the pre-public-polish plan, filename-dated 06-14 but committed late,\n  correctly lands mid-table).\n- Existing 74 summaries/titles/categories preserved byte-for-byte.\n\nValidated: 127 rows, 1:1 with docs/plans/*.md on disk, no duplicate or\nbroken links, every row well-formed (5 cells), 314 commit links.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0d76bfc	author	Will Norris
 0d76bfc	added	1
 0d76bfc	deleted	1
