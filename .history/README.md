@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/b968ae8) | docs(README): add Downloads section for the interim cross-platform packages |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/6efabde) | #320 (a) far fn pointers fully done — sync status docs (impl-status, ROADMAP, README, plans) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/181af86) | repo: Apache-2.0 LICENSE + NOTICE, README → M2 status, gitignore transcripts |
 | [2026-06-14](https://github.com/wbniv/llvm-mos-65816/commit/93862b3) | M1 Phase 0: build llvm-mos from source (lean) + green baseline |
@@ -10,6 +11,11 @@
 | [2026-06-13](https://github.com/wbniv/llvm-mos-65816/commit/2fb154f) | Initial commit: llvm-mos 65816 effort + SNES platform (M0) |
 
 <!--history-meta v1
+b968ae8	author	Will Norris
+b968ae8	added	31
+b968ae8	deleted	0
+b968ae8	files	1
+b968ae8	body	Document the three interim preview packages (linux-x86_64 published via\napt.indri.studio; linux-arm64 + windows-x86_64 built locally via task\ncross-build / package-all), the relocatable mos-clang --config invocation,\nand the Windows caveat (wine can't run the binary -> verify on real Windows\nbefore relying on the .zip; per-platform drivers not shipped; keep the DLLs).\nmacOS arm64 noted as deferred. Retires once #320/#321 land upstream.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_013BoyGYjYmgXqoUoMoG8Wan
 6efabde	author	Will Norris
 6efabde	added	6
 6efabde	deleted	2

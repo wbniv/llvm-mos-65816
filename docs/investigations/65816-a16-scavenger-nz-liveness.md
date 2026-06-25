@@ -1,9 +1,34 @@
 # `+mos-a16` register-scavenger crash: N/Z live at a frame-vreg spill point
 
-**Status:** root-caused + asserts-confirmed; **XFAIL'd**, fix deferred (pristine-upstream bug).
-**Date:** 2026-06-18 · **Issue:** #321, ROADMAP M2.
+**Status:** ✅ **FIXED 2026-06-26** — fork patch **`0011-mos-scavenger-live-p-save.patch`** (pristine-upstream
+scavenger fix). The earlier "deferred — no narrow fork-side fix" verdict below is **superseded**.
+`a16scavnz.c` is now a positive gate (`dev/run.sh a16scavnz` → `0x22A6`, host==default==`+mos-a16`==`+mos-xy16`,
+both emulators; asserts build clean). **A second, independent upstream bug surfaced** once the scavenger no
+longer crashed (compilation reached MC lowering): `LDCImm 1` → `MOSMCInstLower` `llvm_unreachable` — fixed by
+**`0012-mos-ldcimm-set-lowering.patch`** (lower any nonzero i1 carry as `SEC`). See
+[plan](../plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md) ·
+[scavenger PR body](../upstream-scavenger-live-p-pr.md) · [LDCImm PR body](../upstream-ldcimm-set-lowering-pr.md).
+**Date (filed):** 2026-06-18 · **Issue:** #321, ROADMAP M2.
 **Repro:** `examples/65816/a16scavnz.c` (delta-debugged from fuzz seed-306).
 **Family:** 8/500 fuzz seeds — 169, 173, 196, 268, 271, 272, 306, 420.
+
+## RESOLUTION (2026-06-26)
+
+The fix is exactly the **option 2 (upstream `saveScavengerRegister`)** the deferral analysis below judged
+"not a drop-in" — made tractable by two observations the earlier probe missed:
+
+1. **A `$p` save tolerant of an unbalanced stack exists** without a stack-relative restore: route `$p`
+   *hard-stack-neutrally* through a **dead 8-bit index register** into the reserved `RC17` slot
+   (`PHP;PL<idx>;ST<idx> RC17` / `LD<idx> RC17;PH<idx>;PLP`). Each half is net-0 on the hard stack, so it is
+   independent of the surrounding imbalance — sidestepping the "unbalanced `PLP` pops the wrong byte" wall.
+2. **Width-safety is free:** `MOSInsertREPSEP` runs *after* scavenging and forces index push/pull/load/store
+   to `XW_X8`, so the courier stays 8-bit even under `+mos-xy16` — no `rep`/`sep` juggling in the scavenger.
+
+Plus: flag the no-reaching-def `PHP $p` `undef` (verifier), and **drop `assertNZDeadAt`** (its premise — N/Z
+dead at every scavenge — is the false invariant; flag preservation is holistic via the scavenger's
+interleaved P-saves, enforced by `-verify-machineinstrs` + the differential, not a per-save precondition).
+The "option 1 bottoms out in the globals.c core" note below no longer applies — this is option 2, and
+`globals.c`'s RA-pressure crash was independently fixed by patch `0009`.
 
 ## Symptom
 

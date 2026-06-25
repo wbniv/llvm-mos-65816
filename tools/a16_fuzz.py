@@ -974,21 +974,16 @@ KNOWN_ISSUES = [
     # the strength-reduced byte index lives in X and frees A16). Its KNOWN_ISSUES entry +
     # KNOWN_ISSUE_REPROS row are removed so a recurrence hard-FAILS again; globals.c is now a
     # positive corpus gate. See docs/plans/2026-06-24-321-a16-pressure-fix-implementation.md.)
-    # scavenger-p-not-gpr: +mos-a16 at -O1/-Os crashes the register scavenger.
-    # MOSRegisterInfo::saveScavengerRegister assumes N/Z are dead at every
-    # scavenging point ("NZ cannot be live ... virtual registers are never
-    # inserted into CmpBr instructions"); under +mos-a16 a 16-bit compare/ALU
-    # keeps N (or Z) live across a frame-vreg spill point, so it emits the illegal
-    # `STImag8 $p` P-spill -> "Bad machine code: $p is not a GPR register". DEFAULT
-    # 8-bit and +mos-a16 -O0 compile clean. PRISTINE UPSTREAM bug (not #321 code),
-    # confirmed via an asserts build (aborts at assertNZDeadAt). Deterministic
-    # repro: examples/65816/a16scavnz.c (delta-debugged from seed-306; the family
-    # is seeds 169/173/196/268/271/272/306/420). Full writeup + upstream-report
-    # draft: docs/investigations/65816-a16-scavenger-nz-liveness.md. REMOVE this
-    # entry when the upstream scavenger bug is fixed so the signature hard-FAILS
-    # again (regression guard).
-    ("scavenger-p-not-gpr",
-     lambda log: "$p is not a GPR register" in log),
+    # (scavenger-p-not-gpr — +mos-a16/+mos-xy16 -O1/-Os crashed the register scavenger:
+    # MOSRegisterInfo::saveScavengerRegister assumed N/Z dead at every scavenge point, but a 16-bit
+    # compare/ALU keeps N (or Z) live across a frame-index materialization whose carry the scavenger
+    # places in $c (a sub-register of $p), forcing the whole $p preserved across an UNBALANCED stack
+    # range -> illegal `STImag8 $p` ("$p is not a GPR register") + an undefined-$p `PH $p`
+    # — was FIXED 2026-06-26 by UPSTREAM fork patch 0011 (route $p hard-stack-neutrally through a
+    # dead index reg into RC17; flag the no-reaching-def PHP undef; scope the stale assert away). Its
+    # KNOWN_ISSUES entry + KNOWN_ISSUE_REPROS row are removed so a recurrence hard-FAILS again;
+    # a16scavnz.c is now a positive gate (dev/run.sh a16scavnz -> 0x22A6, both emulators). See
+    # docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md.)
     # a16-zp-pressure-overflow: +mos-a16 at -O1/-Os on a register-heavy function allocates so
     # many Imag16 zero-page pairs that the .zp section grows past 256 bytes, so an 8-bit
     # zero-page relocation can no longer reach it -> link error "relocation R_MOS_ADDR8 out of
@@ -1026,7 +1021,9 @@ def classify_known(log):
 # (a16-zp-pressure-overflow is intentionally absent: its repro is a gitignored c-torture file and
 # a LINK error, not a verify crash — so it can't be a verify-only guard row.)
 KNOWN_ISSUE_REPROS = [
-    ("examples/65816/a16scavnz.c",   "scavenger-p-not-gpr"),
+    # (empty — the two repros that lived here are both FIXED and promoted to positive gates:
+    #  a16regpress.c -> regalloc-out-of-registers (patch 0009, dev/run.sh a16regpress -> 0x01A7),
+    #  a16scavnz.c   -> scavenger-p-not-gpr      (patch 0011, dev/run.sh a16scavnz   -> 0x22A6).)
 ]
 
 

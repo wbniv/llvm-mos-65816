@@ -551,9 +551,12 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    native-s16 surface is **measured-complete**: per-op ALU/compare/shift/load-store + chains + cross-block
    M-flag + A16-threading all at their measured optimum, with **one** shared, pathological, deferred core —
    RA-level 16-bit residency under register pressure (A16-threading Phase 3 ≡ the >14-live ALU-chain residual ≡
-   the scavenger-N/Z crash ≡ the `pr15296` ZP-overflow) — behind one trigger + one B0→B1→B2 spike recipe. (The
-   sibling `globals.c`/`a16regpress.c` `-Os` RA **crash** had an orthogonal targeted fix — patch `0009`,
-   `ad506ed`, 2026-06-25 — and is now a positive gate.)
+   the `pr15296` ZP-overflow) — behind one trigger + one B0→B1→B2 spike recipe. (Two crashes once lumped into
+   this deferred core turned out to have **orthogonal targeted fixes**, not the deep residency rework: the
+   `globals.c`/`a16regpress.c` `-Os` RA crash — patch `0009`, `ad506ed`, 2026-06-25 — and the `+mos-a16`/
+   `+mos-xy16` **scavenger-N/Z crash** (`$p is not a GPR`) — patch `0011`, 2026-06-26 (route a live `$p`
+   through a dead index reg into `RC17`; + `0012` for a `LDCImm` MC-lowering bug it surfaced). Both are now
+   positive gates.)
    [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md)._
 
 6. **DWARF round-trip (drmon tie-in).** A `-g` build emits llvm-mos DWARF that a source-level

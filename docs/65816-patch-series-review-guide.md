@@ -2,10 +2,11 @@
 
 This document is a reviewer's map of the patch stack that adds native **16-bit-accumulator** and
 **far-pointer (24-bit address)** C codegen for the WDC 65816 to [llvm-mos](https://github.com/llvm-mos/llvm-mos),
-together with an SNES target to exercise it. It exists to make the series **cheap to review**: every change
-is opt-in and gated so the default 8-bit code generator is byte-identical, every claim is backed by a
-four-way differential test you can re-run, and the stack splits into two units (#320 far, #321 16-bit) that
-review almost independently.
+together with an SNES target to exercise it. It exists to make the series **cheap to review**: every
+*feature* change is opt-in and gated so the default 8-bit code generator is byte-identical (the only
+default-path edits are a handful of isolated, upstream-bound bug fixes + one size win), every claim is backed
+by a four-way differential test you can re-run, and the stack splits into two units (#320 far, #321 16-bit)
+that review almost independently.
 
 **Motivation — modern source-level debugging of the SNES.** This is *why the compiler work exists.*
 Source-level debugging of SNES code is not new to *drdevtools* — its debugger **drmon** already reads the
@@ -55,6 +56,8 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
   - [3.8 `0008` — DP-pointer-argument CC (upstream bug)](#38-0008--dp-pointer-argument-cc-upstream-bug)
   - [3.9 `0009` — a16 register-pressure inc/dec de-pin](#39-0009--a16-register-pressure-incdec-de-pin)
   - [3.10 `0010` — coalesce-rotate-Ac (upstream bug)](#310-0010--coalesce-rotate-ac-upstream-bug)
+  - [3.11 `0011` — register-scavenger live-`$p` save (upstream bug)](#311-0011--register-scavenger-live-p-save-upstream-bug)
+  - [3.12 `0012` — `LDCImm` set-carry MC lowering (upstream bug)](#312-0012--ldcimm-set-carry-mc-lowering-upstream-bug)
 - [4. Cross-cutting correctness arguments](#4-cross-cutting-correctness-arguments)
 - [Appendix A — Testing setup](#appendix-a--testing-setup)
 - [Appendix B — SNES platform changes & requirements](#appendix-b--snes-platform-changes--requirements)
@@ -67,7 +70,7 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
 
 ### 1.1 The patch stack at a glance
 
-Ten patches, applied bottom-up (`git am 0001..0010`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
+Twelve patches, applied bottom-up (`git am 0001..0012`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
 name in each step of [§3](#3-the-narrative-each-step-with-need--patch--proof)). LOC is patch size, not net
 source change.
 
@@ -83,21 +86,31 @@ source change.
 | **0008** dp‑arg‑cc | [upstream](#appendix-d--upstream-bug-fixes--status) | 51 | Upstream bug fix: an 8-bit `addrspace(1)` direct-page pointer **argument** was assigned a 16-bit register → illegal `COPY`. Reproduces on stock `mos6502` | Trivial — bug fix + `.ll` test |
 | **0009** a16‑pressure‑incdec | #321 · M2 | 48 | Fixes a `+mos-a16 -O1/-Os` regalloc deadlock on real code (`globals.c`): lower a small-constant i8 add/sub (`\|amt\|≤2`) to a relocatable `G_INC`/`G_DEC` chain instead of A-pinned `ADCImm`, so a strength-reduced byte index can't pin the singleton `{A}` across a 16-bit-accumulator transit. DEFAULT byte-identical | Low |
 | **0010** coalesce‑rotate‑Ac | [upstream](#appendix-d--upstream-bug-fixes--status) | 40 | Default-8bit register-**coalescer** correctness fix: refuse to coalesce two shift/rotate-referenced values into the A-only `Ac` class — pinning the loop-carried CRC-high byte to `A` stranded it in `Y` while the back-edge `ROL` read a stale `A`, a silent miscompile (both verifiers clean). Surfaced by the M2 zoom demo's differential | **Trivial** — bug fix + MIR test |
+| **0011** scavenger‑live‑`$p` | [upstream](#appendix-d--upstream-bug-fixes--status) | 210 | Register-**scavenger** correctness fix: preserve a live `$p` across an *unbalanced* stack range (a `+mos-a16` 16-bit compare keeps N/Z live across a frame-carry spill; `$p` has no GPR home → illegal `$p is not a GPR`). Route `$p` hard-stack-neutrally through a dead index reg into `RC17`; drop the stale `assertNZDeadAt`. DEFAULT byte-identical (only a16 pressure triggers it) | Low — bug fix + a16 gate |
+| **0012** ldcimm‑set‑lower | [upstream](#appendix-d--upstream-bug-fixes--status) | 29 | MC-lowering fix: `MOSMCInstLower` asserted a single `LDCImm` set encoding (`-1`), but a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` (asserts) / silent NDEBUG-UB. Lower any nonzero i1 as `SEC`. DEFAULT byte-identical, differential-neutral | **Trivial** — bug fix |
 
-Three patches (`0003`, `0008`, `0010`) are pure **upstream bug fixes** surfaced by this work and are
-independently postable; they are included so the stack applies clean.
+Five patches (`0003`, `0008`, `0010`, `0011`, `0012`) are pure **upstream bug fixes** surfaced by this work and
+are independently postable; they are included so the stack applies clean. `0003`/`0008`/`0010` reproduce on the
+default 8-bit path; `0011`/`0012` are pristine-upstream defects that only the `+mos-a16` feature's longer flag
+live ranges actually trigger (so DEFAULT 8-bit codegen is byte-identical with them applied).
 
 ### 1.2 The one invariant that makes this reviewable
 
-> **Everything new is opt-in (`+mos-a16` / `+mos-xy16` / `addrspace(2)`) and gated so it cannot alter
-> non-opted-in codegen. The existing 6502/65816 8-bit code generator is byte-identical with the stack
-> applied.**
+> **The #320/#321 feature contribution is opt-in (`+mos-a16` / `+mos-xy16` / `addrspace(2)`) and gated so it
+> cannot alter non-opted-in codegen — the 6502/65816 8-bit generator is byte-identical with the *feature*
+> patches applied. The only deliberate changes to the default path are the three bundled upstream bug fixes
+> (`0003`/`0008`/`0010`) and the `0007` near-abs size win — each isolated, named, and independently
+> reviewable; none is feature behavior. (The other two upstream fixes, `0011`/`0012`, fix pristine-upstream
+> defects that only the `+mos-a16` feature triggers, so they too leave the default path byte-identical.)**
 
 This is enforced, not asserted. The differential fuzzer ([Appendix A](#appendix-a--testing-setup)) compiles
-every program **both** default and `+mos-a16` and compares both to a host oracle, so a gate that leaks into
-the 8-bit path surfaces immediately as a `default@MAME ≠ host` mismatch (this caught a real
+every program **both** default and `+mos-a16` and compares both to a host oracle, so a feature gate that leaks
+into the 8-bit path surfaces immediately as a `default@MAME ≠ host` mismatch (this caught a real
 leak<sup>[[C16]](#c16-seed-42--legalizeicmp-swap-leak)</sup>). A reviewer can therefore trust that
-**reviewing `0002` is reviewing *added* behavior**, never a silent change to what ships today. The gating
+**reviewing `0002` is reviewing *added* behavior**, never a silent change to what ships today. That same
+default-leg check is also what surfaced the one genuine default-path *defect* in scope — the C24 coalescer
+miscompile fixed by `0010` — so even the lone correctness change to default output is a named, differential-caught
+bug fix, not a feature side-effect. The gating
 discipline is spelled out in [§4](#4-cross-cutting-correctness-arguments).
 
 ### 1.3 The correctness bar
@@ -126,10 +139,12 @@ The stack is two near-independent units. `0002` (#321) depends on `0001` only fo
 neither unit — it is a standalone default-8bit upstream fix. So:
 
 1. **Skim** [§2](#2-architecture-dependencies-sequencing--timeline) (the machine + the graph).
-2. **Warm up first** on the three standalone bug-fix patches — `0003`, `0008`, `0010` — quick, self-contained
-   reviews independent of the feature work (`0010` is a ~15-LOC coalescer correctness guard).
+2. **Warm up first** on the small standalone bug-fix patches — `0003`, `0008`, `0010`, `0012` — quick,
+   self-contained reviews independent of the feature work (`0010` is a ~15-LOC coalescer correctness guard;
+   `0012` is a one-line MC-lowering fix).
 3. **#320 reviewers:** then `0001` → `0004` → `0005` → `0006` → `0007` (`0008` already done in step 2).
-4. **#321 reviewers:** then `0002` → `0009`, a self-contained unit (`0003` already done in step 2).
+4. **#321 reviewers:** then `0002` → `0009` → `0011` (the a16-surfaced register-scavenger fix), a
+   self-contained unit (`0003` already done in step 2; `0012` is the MC-lowering bug `0011` exposed).
 
 ---
 
@@ -159,10 +174,15 @@ property — [§3.2](#32-0002--321-16-bit-accumulator-m2), [§4](#4-cross-cuttin
 
 ### 2.2 Dependency graph
 
-Solid arrow = real dependency (semantic, or shared-file context that must apply in order). The numeric order
-is the `git am` order. `0007`/`0008` stack at the top but are semantically standalone; `0009` is likewise a
-standalone `+mos-a16` selector fix layered on `0002`; `0010` is a standalone upstream coalescer fix
-(default-8bit, no feature) surfaced by the M2 demo.
+Solid arrow = real dependency (semantic, or shared-file context that must apply in order); dotted `surfaced` =
+this work *exposed* a pre-existing upstream bug but doesn't depend on the fix. The numeric order is the
+`git am` order. `0007`/`0008` stack at the top of the #320 column but are semantically standalone; `0009`,
+`0011`, `0012` sit in the **#321 column** because each is triggered **only by `+mos-a16`/`+mos-xy16`**
+(default 8-bit byte-identical): `0009` is an a16 selector fix layered on `0002`, and `0011` (register-scavenger
+live-`$p`) → `0012` (`LDCImm` MC lowering, exposed by fixing `0011`) are upstream defects only the 16-bit
+accumulator's longer flag live ranges reach. `0010` is the lone bug-fix **outside** both columns: a
+**default-8bit** coalescer miscompile that changes ships-today codegen (no feature flag) — the M2 demo merely
+caught it.
 
 ```mermaid
 flowchart TD
@@ -181,6 +201,8 @@ flowchart TD
         P2["0002 accum16<br/>REP/SEP + native s16 + xy16"]
         P3["0003 TXY dead-flag (upstream fix)"]
         P9["0009 a16-pressure incdec<br/>de-pin i8 counter from A"]
+        P11["0011 scavenger-live-$p<br/>route $p through RC17<br/>(upstream fix, a16-only)"]
+        P12["0012 LDCImm set-lower<br/>MC lowering<br/>(upstream fix, a16-only)"]
     end
 
     P10["0010 coalesce-rotate-Ac<br/>default-8bit coalescer (upstream fix)"]
@@ -191,6 +213,8 @@ flowchart TD
     P1 -.context.-> P2
     P2 --> P3
     P2 --> P9
+    P2 -.surfaced.-> P11
+    P11 -.surfaced.-> P12
     P1 --> P4
     P2 -->|Ac16/AnyRegBank| P4
     P2 -->|a16-gated hunk| P5
@@ -217,7 +241,7 @@ harness.
 flowchart LR
     M0["M0 — bench<br/>SNES crt0 + linker + ROM header<br/>MAME + bsnes-jg + corpus + fuzzer<br/>(no new codegen)"]
     M1["M1 — #320 far<br/>multi-bank, unoptimized<br/>(0001,0004,0005,0006,0007,0008)"]
-    M2["M2 — #321 16-bit<br/>the optimizing payoff<br/>(0002,0003,0009,0010)"]
+    M2["M2 — #321 16-bit<br/>the optimizing payoff<br/>(0002,0003,0009,0010,0011,0012)"]
     M0 --> M1
     M0 --> M2
     M1 -. "corpus = M2 regression baseline" .-> M2
@@ -241,7 +265,7 @@ flowchart LR
 
 ### 2.5 Timeline
 
-14 days, 514 commits, 140 plan files. M1 and M2 overlap deliberately.
+14 days, 530 commits, 142 plan files. M1 and M2 overlap deliberately.
 
 ```mermaid
 gantt
@@ -268,6 +292,7 @@ gantt
     surface consolidation + close       :2026-06-22, 1d
     a16-pressure incdec fix (0009)      :2026-06-24, 1d
     coalesce-rotate-Ac fix (0010)       :2026-06-26, 1d
+    scavenger live-$p + LDCImm (0011,0012) :2026-06-26, 1d
 ```
 
 ---
@@ -560,7 +585,8 @@ Phase-3 residency work.
 **Proof.** Gated on `hasAccum16()`, so **DEFAULT 8-bit is byte-identical**. `a16regpress.c` (the former crash)
 is now a positive gate (`dev/run.sh a16regpress` → `0x01A7`, both emulators); `globals.c` compiles + runs
 clean; **−123 B over 122 c-torture programs (0 worse)**; the regen round-trips `0001..0009`. It does **not**
-fix the genuinely-deferred s16-pressure core — the scavenger-N/Z and `pr15296` ZP-overflow XFAILs stay.
+fix the deferred s16-pressure core — but the **scavenger-N/Z crash** that was once lumped into it has since
+been fixed independently (`0011`, see §3.11); only the `pr15296` ZP-overflow XFAIL now stays.
 
 ### 3.10 `0010` — coalesce-rotate-Ac (upstream bug)
 
@@ -597,6 +623,52 @@ if (NewRC == &MOS::AcRegClass &&
 **7/7**, c-torture **30/30**, csmith **54/60** (0 mismatch/crash); `-verify-machineinstrs` clean. Upstream PR
 **drafted** ([`docs/upstream-coalesce-rotate-ac-pr.md`](upstream-coalesce-rotate-ac-pr.md)), branch
 `wbniv:mos-coalesce-rotate-ac` to mint — see [Appendix D](#appendix-d--upstream-bug-fixes--status).
+
+### 3.11 `0011` — register-scavenger live-`$p` save (upstream bug)
+
+**Need.** A `+mos-a16`/`+mos-xy16` `-O1/-Os` crash on 8/500 fuzz seeds (`a16scavnz.c`):
+`MOSRegisterInfo::saveScavengerRegister` assumed N/Z dead at every scavenge point **and** that a live `$p` is
+only preserved across a *push/pull-balanced* range. Under 16-bit-accumulator flag live ranges, a 16-bit
+compare keeps N (or Z) live across a frame-index materialization whose carry the scavenger places in `$c` — a
+sub-register of `$p` — forcing the whole `$p` preserved across an **unbalanced** range. `$p` has no GPR spill
+home → illegal `STImag8 $p` (`$p is not a GPR`) + an undefined-`$p` `PH $p` (asserts build aborts at
+`assertNZDeadAt`). Pristine-upstream (`0002` touches no scavenger code) — see
+[[C19]](#c19-upstream-register-scavenger-nz-crash). *This was previously deferred as an issue-with-no-fix; the
+prior analysis missed the working approach.*
+
+**Patch.** [`patches/llvm-mos/0011-mos-scavenger-live-p-save.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0011-mos-scavenger-live-p-save.patch)
+— in `MOSRegisterInfo.cpp`: for the unbalanced case, route `$p` **hard-stack-neutrally** through a dead 8-bit
+index register into the reserved `RC17` slot — `PHP; PL<idx>; ST<idx> RC17` (save) / `LD<idx> RC17; PH<idx>;
+PLP` (restore). Each half is net-0 on the hard stack, so it tolerates the surrounding imbalance; width-safe
+because `MOSInsertREPSEP` runs *after* scavenging and forces index push/pull/load/store to `XW_X8` even under
+`+mos-xy16`. Plus: flag the no-reaching-def `PHP $p` `undef` (verifier), drop the stale `assertNZDeadAt`
+(its premise is the false invariant — flag preservation is holistic via the scavenger's interleaved P-saves),
+and widen `canSaveScavengerRegister(P)` to match.
+
+**Proof.** `a16scavnz.c` promoted from XFAIL to a positive gate ([`dev/a16scavnz.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/a16scavnz.sh),
+`dev/run.sh a16scavnz` → `0x22A6`, host==default==`+mos-a16`==`+mos-xy16`, MAME + bsnes-jg, **asserts-clean**);
+`KNOWN_ISSUES["scavenger-p-not-gpr"]` dropped; differential fuzz **121/121** (seeds 1–80 + 165–205, including
+the previously-XFAIL'd 169/173/196), 0 mismatch/crash; corpus **7/7** (default byte-identical); c-torture
+sample 58/0-fail; `0011` round-trips. Upstream PR **drafted**
+([`docs/upstream-scavenger-live-p-pr.md`](upstream-scavenger-live-p-pr.md)), branch
+`wbniv:mos-scavenger-live-p-save` to mint.
+
+### 3.12 `0012` — `LDCImm` set-carry MC lowering (upstream bug)
+
+**Need.** Surfaced once `0011` let `a16scavnz.c` compile *past* the scavenger to MC lowering: `MOSMCInstLower`
+lowered `LDCImm` (`Cc`, `i1imm`) only for `0` (`CLC`) and `-1` (`SEC`), `llvm_unreachable` otherwise. But a
+*set* i1 carry can arrive as `1` (a plain i1 `true`) — e.g. the carry-in materialized for a **16-bit `SBC`** —
+so a plain `+mos-a16` 16-bit subtract aborts an asserts build and silently mislowers the `default:
+__builtin_unreachable()` under NDEBUG (it happens to emit `SEC`, so the differential was always green).
+Pristine-upstream `MOSMCInstLower.cpp`.
+
+**Patch.** [`patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch)
+— lower the operand as the boolean it is: `imm == 0 ? CLC : SEC` (any nonzero → `SEC`). One line.
+
+**Proof.** **Differential-neutral** (emits the same `SEC`); a plain `+mos-a16` 16-bit subtract + `a16scavnz.c`
+compile clean on the **asserts** build; `a16sub` gate `0x0123` both emulators; `0012` round-trips. Upstream PR
+**drafted** ([`docs/upstream-ldcimm-set-lowering-pr.md`](upstream-ldcimm-set-lowering-pr.md)), branch
+`wbniv:mos-ldcimm-set-lowering` to mint.
 
 ---
 
@@ -1003,11 +1075,14 @@ demo also keeps a source-level unroll, so `main` was green throughout. Tracked:
 
 <a id="c19-upstream-register-scavenger-nz-crash"></a>
 
-#### C19. Register-scavenger N/Z crash — *upstream, deferred*
-`+mos-a16 -O1/-Os` pressure keeps N/Z live where the upstream scavenger asserts them dead → `$p is not a GPR`
-on 8/500 seeds. Pristine-upstream (no scavenger change in `0002`). XFAIL + XPASS-guarded; issue drafted
-([`docs/321-upstream-scavenger-nz-issue.md`](321-upstream-scavenger-nz-issue.md)). Fix is high-risk/low-reward
-for a pathological frequency — deferred.
+#### C19. Register-scavenger N/Z crash — *upstream, **fixed here** (`0011`)*
+`+mos-a16 -O1/-Os` pressure keeps N/Z live where the upstream scavenger assumed them dead → `$p is not a GPR`
+on 8/500 seeds. Pristine-upstream (no scavenger change in `0002`). **FIXED 2026-06-26** by `0011` (route a
+live `$p` hard-stack-neutrally through a dead index reg into `RC17` for the unbalanced case; drop the stale
+`assertNZDeadAt`). `a16scavnz.c` is now a positive gate (`dev/run.sh a16scavnz` → `0x22A6`, both emulators,
+asserts-clean). Fixing it surfaced a second pristine-upstream bug — `LDCImm 1` → `MCInstLower` unreachable —
+fixed as `0012`. See [§Appendix&nbsp;D](#appendix-d--upstream-bug-fixes--status) ·
+[plan](plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
 
 #### C22. DP-pointer-argument CC crash (#561) — *upstream, fixed here*
 See [§3.8](#38-0008--dp-pointer-argument-cc-upstream-bug). Reproduces on stock `mos6502`; fixed as `0008` +
@@ -1040,18 +1115,18 @@ prebuilt binary. MAME + bsnes-jg already give a two-emulator cross-check; parked
 
 ## Appendix D — Upstream bug fixes & status
 
-Three of the ten patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
+Five of the twelve patches are **upstream bug fixes** — defects in stock llvm-mos that this work surfaced and
 fixed. They are independently postable and **drop from the fork stack on merge**, and are *not* part of the
-#320/#321 feature contribution (which is ABI-blessing-gated). The newest, `0010`, is a **default-8bit
-register-coalescer** correctness fix (a silent CRC miscompile the M2 demo
-caught<sup>[[C24]](#c24-default8-loopfold-crc-miscompile)</sup>) — PR drafted, not yet pushed. One further
-upstream defect is filed as an **issue with no fix patch** (its fix touches the generic register scavenger —
-maintainer territory). The
+#320/#321 feature contribution (which is ABI-blessing-gated). The two newest, `0011` and `0012`, fix the
+**register-scavenger live-`$p` crash** (`$p is not a GPR`) and the **`LDCImm` set-carry MC lowering** bug it
+surfaced — both pristine-upstream, both PR-drafted, not yet pushed. (The scavenger crash was *previously*
+filed as an issue-with-no-fix; it now has a fix.) The
 exhaustive accounting — every PR/issue/design-note, the exact `gh` post commands, and the live snapshot — is
 the single source of truth in [`upstream-contribution-status.md`](upstream-contribution-status.md); this is
 the reviewer's slice of it.
 
-**Last verified: 2026-06-25** (#561/#562/#563 all still open, none merged). Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
+**Last verified: 2026-06-26** (#561/#562/#563 all still open, none merged; `0010`/`0011`/`0012` drafted, not
+posted). Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
 (or `gh pr list --repo llvm-mos/llvm-mos --author wbniv --state all`).
 
 | Patch | Upstream defect | Repro on stock? | Upstream | Status | On merge | Test |
@@ -1059,7 +1134,8 @@ the reviewer's slice of it.
 | `0003` | `mos-late-opt` reuses a dead `LDImm` as `TXY`/`TYX` without clearing the dead flag → verifier reject (`Using an undefined physical register`) | yes (`mosw65816`) | [PR&nbsp;#562](https://github.com/llvm-mos/llvm-mos/pull/562) | **POSTED · open** | drop `0003` + bump vendor pin | `late-opt-65816.mir` |
 | `0008` | the calling convention gives an 8-bit `addrspace(1)` direct-page pointer **argument** a 16-bit register → illegal size-mismatched `COPY` | yes (plain `mos6502`) | [#561](https://github.com/llvm-mos/llvm-mos/issues/561) → [PR&nbsp;#563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`) | **POSTED · open** | drop `0008` + bump vendor pin | `dp-pointer-arg.ll` |
 | `0010` | the register coalescer merges two rotate-referenced values into the A-only `Ac` class → strands a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (silent miscompile; both `-verify-machineinstrs`/`-verify-coalescing` clean) | yes (default-8bit `mosw65816`; standalone `llc`) | [PR draft](upstream-coalesce-rotate-ac-pr.md) (`wbniv:mos-coalesce-rotate-ac` to mint) | **DRAFTED · not posted** | drop `0010` + bump vendor pin | `coalesce-rotate-ac.mir` |
-| — | `saveScavengerRegister` asserts N/Z dead, but `+mos-a16` pressure keeps a compare/ALU flag live across a frame-vreg spill → illegal `$p is not a GPR` | upstream assert, exposed by `+mos-a16` | [issue draft](321-upstream-scavenger-nz-issue.md) | **DRAFTED · not posted** | n/a — no fix (XFAIL + XPASS-guarded) | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
+| `0011` | `saveScavengerRegister` assumed N/Z dead + a live `$p` only balanced-saveable, but `+mos-a16` keeps a compare/ALU flag live across a frame-vreg spill in an unbalanced range → illegal `$p is not a GPR` + undefined-`$p` `PH $p` | yes (assert exposed by `+mos-a16`) | [PR draft](upstream-scavenger-live-p-pr.md) (`wbniv:mos-scavenger-live-p-save` to mint) | **DRAFTED · not posted** | drop `0011` + bump vendor pin | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
+| `0012` | `MOSMCInstLower` lowered `LDCImm` only for `0`/`-1`; a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG) | yes (`+mos-a16` 16-bit subtract; asserts build) | [PR draft](upstream-ldcimm-set-lowering-pr.md) (`wbniv:mos-ldcimm-set-lowering` to mint) | **DRAFTED · not posted** | drop `0012` + bump vendor pin | `a16scavnz` / a16 sub |
 
 Status enum: **POSTED·open** (live PR/issue) · **DRAFTED** (written; posting is user-triggered) · **MERGED**
 (then dropped from the stack) · **DEFERRED** (filed, not fixed). The **"repro on stock?"** column is what makes

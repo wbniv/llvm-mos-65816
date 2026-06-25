@@ -218,10 +218,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   values must spill to `Imag16`) and it reopens the coalescer-crash risk → high-risk/low-reward, so
   **keep the XFAIL** with a concrete re-open trigger + a gated B0→B1→B2 spike recipe (see Watch + the plan).
   **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
-  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the scavenger-N/Z crash ≡
-  the `pr15296` ZP-overflow). The sibling `globals.c`/`a16regpress.c` `-Os` RA-**crash** had an *orthogonal*
-  targeted fix (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`) — **FIXED, patch `0009`**
-  (`ad506ed`, 2026-06-25; now a positive gate), so it left this frontier. The rest stays behind **one**
+  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the `pr15296` ZP-overflow).
+  **Two crashes once lumped into this core left it with orthogonal targeted fixes:** the
+  `globals.c`/`a16regpress.c` `-Os` RA-**crash** (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`)
+  — **FIXED, patch `0009`** (`ad506ed`, 2026-06-25) — and the `+mos-a16`/`+mos-xy16` **scavenger-N/Z crash**
+  (route a live `$p` through a dead index reg into `RC17`) — **FIXED, patch `0011`** (2026-06-26; + `0012`
+  for a `LDCImm` MC-lowering bug it surfaced); both are now positive gates. The rest stays behind **one**
   re-open trigger (a 2nd independent *realistic* `regalloc-out-of-registers` / `a16-zp-pressure-overflow`,
   **or** a real fn crossing ~10/14 `Imag16` pairs) → **one** gated B0→B1→B2 spike.
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
@@ -241,10 +243,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   confirmed with data** (the scan also surfaced a separate `+mos-a16 -Os` RA *crash* on `globals.c` — see
   its own bullet above).
   **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
-  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the scavenger-N/Z crash ≡
-  the `pr15296` ZP-overflow). The sibling `globals.c`/`a16regpress.c` `-Os` RA-**crash** had an *orthogonal*
-  targeted fix (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`) — **FIXED, patch `0009`**
-  (`ad506ed`, 2026-06-25; now a positive gate), so it left this frontier. The rest stays behind **one**
+  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the `pr15296` ZP-overflow).
+  **Two crashes once lumped into this core left it with orthogonal targeted fixes:** the
+  `globals.c`/`a16regpress.c` `-Os` RA-**crash** (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`)
+  — **FIXED, patch `0009`** (`ad506ed`, 2026-06-25) — and the `+mos-a16`/`+mos-xy16` **scavenger-N/Z crash**
+  (route a live `$p` through a dead index reg into `RC17`) — **FIXED, patch `0011`** (2026-06-26; + `0012`
+  for a `LDCImm` MC-lowering bug it surfaced); both are now positive gates. The rest stays behind **one**
   re-open trigger (a 2nd independent *realistic* `regalloc-out-of-registers` / `a16-zp-pressure-overflow`,
   **or** a real fn crossing ~10/14 `Imag16` pairs) → **one** gated B0→B1→B2 spike.
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
@@ -252,19 +256,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
-- [ ] **#321 `+mos-a16` register-scavenger crash (`$p is not a GPR register`) — root-caused + XFAIL'd; UPSTREAM bug, fix deferred.**
-  `-verify-machineinstrs` crash on `+mos-a16 -O1/-Os` (clean at `-O0` / default 8-bit). **Asserts-build-confirmed**
-  root cause: `MOSRegisterInfo::saveScavengerRegister` (pristine UPSTREAM, *not* `0002`) asserts N/Z dead at every
-  scavenging point ("NZ cannot be live … virtual registers are never inserted into CmpBr instructions"), but a
-  16-bit compare/ALU keeps **N (or Z) live** across a frame-vreg spill → it emits the illegal `STImag8 $p`
-  P(rocessor-status)-spill. Asserts build aborts at `assertNZDeadAt`; release build → verify crash. **8/500 fuzz
-  seeds** (169/173/196/268/271/272/306/420), now **XFAIL** (`tools/a16_fuzz.py` KNOWN_ISSUES `scavenger-p-not-gpr`).
-  Deterministic repro `examples/65816/a16scavnz.c`; diagnostic `dev/asserts-build.sh`. Fix (deep, regression-
-  sensitive — save/restore N/Z/P around the scavenger spill, or keep flags dead at frame-index materialization)
-  **deferred**, same class as the `globals.c` RA failure. NOTE: ~~seed-157 (`+mos-xy16` value mismatch)~~ **FIXED
-  2026-06-18** by the transfer-instruction X-annotation — it was a second transfer-in-held-X16 bug, not distinct.
-  [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
-  [upstream issue draft](docs/321-upstream-scavenger-nz-issue.md).
 - [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
@@ -351,8 +342,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 ### Test Bench / CI
 
 - [ ] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** (follow-up to the now-**Done**
-  Csmith fuzzer — see Done `[321-csmith-fuzzer]`). Targets the `-O1/-Os` loop/scalar-opt surface where our open
-  XFAILs live (`regalloc-out-of-registers`, `scavenger-p-not-gpr`), so it's the natural next instrument. Two
+  Csmith fuzzer — see Done `[321-csmith-fuzzer]`). Targets the `-O1/-Os` loop/scalar-opt surface — the same
+  register-pressure regime that produced the `regalloc-out-of-registers` (fixed, `0009`) and
+  `scavenger-p-not-gpr` (fixed, `0011`) crashes and still hosts the open `a16-zp-pressure-overflow` XFAIL, so
+  it's the natural next instrument. Two
   costs: redirect its baked-in `printf` to `corpus_result`; the 16-bit-int caveat (no `platform.info`
   equivalent → would need width surgery to stay UB-free). The `--gen` seam already added for Csmith makes it
   drop-in. [plan §Follow-ups](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md) ·
@@ -405,15 +398,14 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
   `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
   [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
-- [ ] **File the register-scavenger N/Z-liveness issue** (user-triggered; issue, not a PR). Upstream
-  `MOSRegisterInfo::saveScavengerRegister` asserts N/Z dead at every scavenging point; a 16-bit
-  compare/ALU flag live across a frame-vreg spill violates it → illegal `STImag8 $p` (the 8-fuzz-seed
-  `+mos-a16` crash, XFAIL'd locally). Source-verified + asserts-confirmed; no fork patch (maintainer fix).
-  Draft + exact `gh issue create` in [upstream-contribution-status](docs/upstream-contribution-status.md)
-  (item 4) · body [docs/321-upstream-scavenger-nz-issue.md](docs/321-upstream-scavenger-nz-issue.md) ·
-  [investigation](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
-  [plan](docs/plans/2026-06-22-321-scavenger-crash-upstream-issue.md) (pre-flight live-here/live-upstream +
-  a time-boxed default-8-bit repro attempt so a maintainer can trigger it without the fork-only `+mos-a16`).
+- [ ] **Post the register-scavenger live-`$p` fix PR (`0011`) + the `LDCImm` set-lowering fix PR (`0012`)**
+  (user-triggered). The scavenger N/Z crash is now **FIXED** (was an issue-with-no-fix): route a live `$p`
+  hard-stack-neutrally through a dead index reg into `RC17` for the unbalanced case + drop the stale
+  `assertNZDeadAt`. Fixing it surfaced a second pristine-upstream bug (`LDCImm 1` → `MCInstLower` unreachable),
+  fixed as `0012`. Mint branches off `c798c31416f7`; exact `gh pr create` in
+  [upstream-contribution-status](docs/upstream-contribution-status.md) (item 4) · bodies
+  [scavenger](docs/upstream-scavenger-live-p-pr.md) + [LDCImm](docs/upstream-ldcimm-set-lowering-pr.md) ·
+  [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
 - [wip] **DP-pointer-argument calling-convention crash — reported + FIXED upstream** — ✅ **issue
   [#561](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22) + fix [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563)
   (2026-06-23, `Fixes #561` → auto-closes on merge).** Passing an `addrspace(1)` (8-bit direct-page) pointer
@@ -492,13 +484,15 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 _Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
 revisit) rather than active work._
 
-- [ ] **Reevaluate the deferred s16-register-pressure core (Phase-3 `Ac16`/ZP residency).** The
-  `globals.c`/`a16regpress.c` `-Os` RA-**crash** is **FIXED** (patch `0009`, `ad506ed`, 2026-06-25 — an
-  *orthogonal* i8-loop-counter de-pin from `{A}`, **not** the residency rework; `a16regpress.c` is now a
-  positive gate, `0x01A7`). What **remains deferred** is the general pre-RA `Ac16`/ZP-residency rework, now
-  motivated only by two *pathological* XFAILs — the scavenger-N/Z crash (`a16scavnz.c`, `scavenger-p-not-gpr`)
-  and the link-time ZP overflow (`pr15296.c`, `a16-zp-pressure-overflow`), both byte-identical pre/post `0009`.
-  It is high-risk (regresses the common a16 path / reopens the 1d crash) and low-reward (Phase 1.5 already
+- [ ] **Reevaluate the deferred s16-register-pressure core (Phase-3 `Ac16`/ZP residency).** **Two** crashes
+  once attributed to this core turned out to have *orthogonal* targeted fixes, **not** the residency rework:
+  the `globals.c`/`a16regpress.c` `-Os` RA-**crash** (patch `0009`, `ad506ed`, 2026-06-25 — an i8-loop-counter
+  de-pin from `{A}`; `a16regpress.c` now a positive gate, `0x01A7`) and the `+mos-a16`/`+mos-xy16`
+  **scavenger-N/Z crash** (patch `0011`, 2026-06-26 — route a live `$p` through a dead index reg into `RC17`;
+  + `0012` for a `LDCImm` MC-lowering bug it surfaced; `a16scavnz.c` now a positive gate, `0x22A6`). What
+  **remains deferred** is the general pre-RA `Ac16`/ZP-residency rework, now motivated by only **one**
+  *pathological* XFAIL — the link-time ZP overflow (`pr15296.c`, `a16-zp-pressure-overflow`).
+  It is high-risk (regresses the common a16 path / reopens a crash class) and low-reward (Phase 1.5 already
   captured the threading wins; real code is slack). **Re-open only when** either **(a)** the corpus / c-torture
   / fuzzer surfaces a *second independent* `regalloc-out-of-registers` (or `a16-zp-pressure-overflow`) from
   **realistic** (not hand-reduced) code, or **(b)** the ZP-pressure baseline (`dev/measure-zp-pressure.sh`)
@@ -523,6 +517,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-26 — [321-scavenger-live-p] **#321 `+mos-a16`/`+mos-xy16` register-scavenger crash (`$p is not a GPR`) — FIXED, pristine-upstream fork patch `0011` (+ `0012` for the bug it surfaced).** The 8/500-seed scavenger crash (`a16scavnz.c`; family 169/173/196/268/271/272/306/420) was *previously* deferred as an upstream issue-with-no-fix. **Root cause** (asserts-confirmed): `MOSRegisterInfo::saveScavengerRegister` assumed N/Z dead at every scavenge point AND that a live `$p` is only preserved across a *balanced* hard-stack range; both break under 16-bit-accumulator flag live ranges, where a 16-bit compare keeps N (or Z) live across a frame-index materialization whose carry the scavenger places in `$c` (a sub-register of `$p`) — forcing the whole `$p` preserved across an *unbalanced* range → illegal `STImag8 $p` + undefined-`$p` `PH $p`. **Fix (`0011`):** for the unbalanced case, route `$p` **hard-stack-neutrally** through a dead 8-bit index register into the reserved `RC17` slot (`PHP;PL<idx>;ST<idx> RC17` / `LD<idx> RC17;PH<idx>;PLP`) — each half net-0 on the stack, so independent of the imbalance; width-safe because `MOSInsertREPSEP` (runs after scavenging) forces index ops to `XW_X8` even under `+mos-xy16`. Plus: flag the no-reaching-def `PHP` `undef` (verifier), drop the stale `assertNZDeadAt` (its premise is the false invariant; flag preservation is holistic via the scavenger's interleaved P-saves). **Second bug found while validating** (compilation reached MC lowering once the scavenger no longer crashed): `MOSMCInstLower` lowered `LDCImm` only for `0`/`-1`, but a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG); a plain `+mos-a16` 16-bit subtract reproduces it. **Fix (`0012`):** lower any nonzero i1 as `SEC`. Both pristine-upstream (drop on merge); `0011`/`0012` round-trip (`0001..0012` == live tree). DEFAULT 8-bit unaffected; corpus 7/7; `a16scavnz.c` promoted to a **positive gate** (`dev/run.sh a16scavnz` → `0x22A6`, host==default==`+mos-a16`==`+mos-xy16`, MAME+bsnes-jg, **asserts-clean**); `KNOWN_ISSUES["scavenger-p-not-gpr"]` + its repro row dropped; differential fuzzer 0 mismatch/0 crash. [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-scavenger-nz-liveness.md) · [scavenger PR](docs/upstream-scavenger-live-p-pr.md) · [LDCImm PR](docs/upstream-ldcimm-set-lowering-pr.md).
 - 2026-06-25 — [321-a16-pressure-fix] **#321 `+mos-a16 -O1/-Os` regalloc out-of-registers crash on real code (`globals.c`) — FIXED, fork patch `0009`.** The `globals.c`/`a16regpress.c` *"ran out of registers during register allocation"* deadlock under `+mos-a16 -O1/-Os` (DEFAULT 8-bit + `+mos-a16 -O0` always compiled clean) is fixed. **Root cause** (fresh asserts pinpoint, `-debug-only=regalloc`): the final blocker was **not** `Ac16`-residency but a single **A-pinned i8 loop counter** — the strength-reduced array byte index (stepped `i += 2`) selects to `add Ac,imm → ADCImm` (class `Ac`={A}; `adc` is hardware-A-only), held live across the 16-bit indexed-load `Ac16`=A:B transit → collides on physical A; last-chance recolor fails (singleton `{A}`) and the 1-instr INF transit can't spill. **Fix (`0009`, `ad506ed`):** under `hasAccum16()`, `MOSInstructionSelector::selectAddSub` lowers a small-constant i8 add/sub (`|amt| ≤ 2`) to a relocatable `G_INC`/`G_DEC` chain (Anyi8 = A/X/Y/zp) instead of the A-pinned `ADCImm`, so the byte index coalesces into the X array index (`inx; inx; cpx`) and frees A16 — **one spillable/relocatable change, no RA rework**. Refutes the 2026-06-18 *"no targeted fix, only the general Phase-3 `Ac16`-residency rework"* conclusion **for this crash** (coalescing still ruled out — it's an orthogonal de-pin). DEFAULT 8-bit byte-identical (gated); **−123 B over 122 c-torture programs (0 worse)**; both `a16regpress.c` and the original `globals.c` compile + run clean (release + asserts). `KNOWN_ISSUES["regalloc-out-of-registers"]` dropped + repro row removed; `examples/65816/a16regpress.c` promoted to a **positive gate** (`dev/run.sh a16regpress` → `0x01A7`, both emulators). `regen-patch-0009.sh` round-trips (`0001..0009` == live `MOSInstructionSelector.cpp`). **NOT fixed by `0009`** (still XFAIL — the genuinely-deferred s16-pressure core): the scavenger-N/Z crash (`a16scavnz.c`, `scavenger-p-not-gpr`) + the `pr15296.c` link-time ZP overflow (`a16-zp-pressure-overflow`), both byte-identical pre/post. [plan](docs/plans/2026-06-24-321-a16-pressure-fix-implementation.md) · [handoff](docs/plans/2026-06-23-321-a16-pressure-scavenger-fix-handoff.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-regalloc-pressure-failure.md).
 - 2026-06-25 — [321-mandel-zoom-pyramid] **Mandelbrot ZOOM PYRAMID — true increasing detail on zoom-in (#321 M2), Phases 1 + 2.** The interactive demo only *magnifies* its baked bitmap; this adds genuinely-deeper detail. The host bakes a STACK of Mandelbrot levels, each 2× finer zoom centered on the real-axis mini-Mandelbrot (`c=-1.7548776662`, finalized by rendering several centres to PNG — Lesson 1); on the SNES, Mode 7 hardware-zooms the current level and the ROM **DMAs the next finer level** as zoom crosses each 2× threshold — so the dive runs into NEW structure (whole set → down the antenna → a complete tiny copy of the set) with **zero on-console fractal math**. 64×64 × 6 levels = 32× deep fits one 32 KiB LoROM bank (no linker change); builds **both default-8bit and `+mos-a16`** (near ROM DMA, no far pointer). New `tools/mandel-bake-pyramid.c` (host `double` renderer → gitignored `examples/snes/pyramid_image.h`: per-level tiled chr, one shared normalized palette, `MANDEL_PYR[]`/`MANDEL_PYR_HASH[]`, per-level PNGs), `examples/snes/{zoom.h (pure host-replayable level-swap state machine — `[S0/2,2·S0]` hysteresis, R/L dive, Y/A rotate), mandel-zoom.c}`, `dev/mandel-zoom.sh`; `mode7.h` gains parametric `m7_tilemap_identity`; `jgxcheck.cpp` gains `JGX_ZOOM`. **Differential PASS** (`dev/run.sh mandel-zoom`): per-level image hash all 6 levels host==default==`+mos-a16` (SMOKE 0x9191 + HASH) on MAME + bsnes-jg; scripted-zoom view-math host==target both builds (ZOOM, swaps=3); `-verify` clean; 32 KiB fit. Regressions green (`mandel-interactive` 0xF99C, `mandel-mode7` 0x75E8). **The gate caught a real DEFAULT-8bit matrix-fold-loop MISCOMPILE** (loop `m[i]` folds 0x456E vs correct 0xB115; unrolled form correct; context-sensitive, independent of #321 — see the new follow-up item). **Phase 2 DONE+green (`6fb3d1b`): multi-bank LoROM, 128×128 × 8 levels = 256× deep, 256 KiB / 8 banks** — new `platforms/snes-zoom` platform (one bank-aligned level per bank), bake `PYR_MULTIBANK` mode (per-level `.rodata_levelK` + `MANDEL_PYR_BANK[]`), the swap DMAs from `(bank : addr16)` (no far pointer → still builds default+`+mos-a16`), `snes-checksum.py` 256 KiB, a `jgxcheck` VRAM-readback gate + host ROM-file per-bank hash. `dev/run.sh mandel-zoom` (PYR_MODE=hd default | sd) PASS both modes/builds. **Found the vblank limit** (a 16 KiB swap DMA overruns vblank → truncated mid-transfer; fixed by force-blanking the large swap — the VRAM gate caught it). Live: `task mandel-zoom-play`. [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md).
 - 2026-06-25 — [321-interactive-mandelbrot] **Interactive SNES Mandelbrot — a real-time Mode 7 joypad fly-around (#321 M2), INSTANT boot, host==default==+mos-a16.** The static `mandel-mode7` was too slow (~4 min on-console compute); this bakes the 128×128 image host-side TILED into Mode 7 character order (`tools/mandel-bake.c` → gitignored `examples/snes/mandel_image.h`) and DMAs it straight ROM→VRAM at boot — no compute, no de-linearize loop (measured the reused `build_vbuf` at ~5–6 s of black boot and redesigned around it). Removing the far staging buffer means the demo builds **both default-8bit and `+mos-a16`**. New `examples/snes/{mandel-interactive.c, mode7.h (shared Mode 7 upload + DMA + matrix setters, refactored out of mandel-mode7.c), view.h (pure pan/zoom/rotate state + the 8.8 Mode 7 matrix 16×16→32 multiplies)}`, joypad HAL in `platforms/snes/snes.h` (`snes_read_pad1`/`snes_wait_vblank` + `JOY_*` + `VMAIN_INC_LOW_1`). **Differential PASS:** displayed-image hash **`0xF99C`** host==default==`+mos-a16` on MAME (Xvfb snapshot) + bsnes-jg; a **scripted-input view-math gate** (`dev/jgxcheck.cpp -DJGX_VIEW` replays `view.h` over the ROM's ground-truth pad log) host==target for BOTH builds; `-verify-machineinstrs` clean; 32 KiB fit. The gate caught a real 8/16 promotion bug (`h>>15` on the 16-bit-int target → negative-int arithmetic shift). Bonus fixes: a pre-existing dep-tracking bug (`dev/sync-platform.sh` — editing `platforms/snes/snes.h` now reaches the build) and `dev/build.sh` (bake the header + build `mos-a16-only`-marked far examples with +mos-a16; `dev/run.sh build` was broken on main since the beefy merge). Regressions green: `mandel-mode7` 0x75E8, `k_mandel` 0x820B, corpus 7/7. Controls: D-pad pan / L-R zoom / Y-A rotate / Select palette / Start reset (`task mandel-play`). [plan](docs/plans/2026-06-25-321-interactive-mandelbrot-mode7.md).
@@ -1145,4 +1140,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      phases of the trig differential plan, not deferrals — the plan itself tracks them. Phase 1 (Q16.16
      libfixmath) landed + verified this session (k_trig32 0x068A6933, k_trig32lut HiROM 0x87F0B404, both
      emulators). fp:b69409f652ecf145 fp:6129cc5f0e5198c0 -->
+- [verify] **2026-06-26-shared-plan-index-tooling** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-26-shared-plan-index-tooling.md](docs/plans/2026-06-26-shared-plan-index-tooling.md)_  <!-- fp:118418f2ad7a1a78 -->
 <!-- END auto-captured-deferrals -->
