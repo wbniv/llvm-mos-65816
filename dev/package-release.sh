@@ -232,11 +232,16 @@ else
         exit 1
     fi
     # Keep the verification report alongside the release artifact (embeds the log +
-    # screenshots + package/docs details — see dev/release-report.py).
+    # screenshots + package/docs details — see dev/release-report.py). Both forms:
+    # the self-contained .html and the .md (previews via `task md`, feeds the PDF pipeline).
     REPORT_SRC="$ROOT/build/release-test/release-report-latest.html"
     if [[ -f "$REPORT_SRC" ]]; then
         cp -f "$REPORT_SRC" "$DIST_DIR/$NAME-release-report.html"
         echo "==> release report: $DIST_DIR/$NAME-release-report.html"
+        # The .md sibling sits next to the timestamped .html (not the -latest pointer);
+        # find the newest local report's .md and copy it too.
+        REPORT_MD="$(ls -t "$ROOT"/build/release-test/release-report-*-local-*.md 2>/dev/null | head -1 || true)"
+        [[ -n "$REPORT_MD" && -f "$REPORT_MD" ]] && cp -f "$REPORT_MD" "$DIST_DIR/$NAME-release-report.md"
     fi
 fi
 

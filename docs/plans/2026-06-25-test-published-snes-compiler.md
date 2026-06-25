@@ -180,6 +180,11 @@ the PNGs (base64-embedded so the file is portable). Sections:
 - **Screenshots** — the host reference + each build's SNES Mandelbrot, embedded inline with captions.
 - **Log** — the full timestamped compile+emulation transcript in a styled `<pre>`.
 
+Alongside the `.html`, the generator writes a **Markdown sibling** (`…​.md`, same path/stem) with the same
+sections — tables, the screenshots referenced by relative path (the `.md` lives next to the PNGs), and the
+log in a fenced block. It previews via `task md` and feeds the repo's md→PDF pipeline; the publish path copies
+it to `dist/<name>-release-report.md` next to the `.html`.
+
 ## Order of execution
 1. Add `.dockerignore`; write `dev/Dockerfile.release-test`; build the rig image once (bsnes-jg + jgxcheck +
    oracle + fixtures).

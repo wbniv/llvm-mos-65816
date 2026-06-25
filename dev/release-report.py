@@ -232,8 +232,115 @@ def main():
            f"<style>{CSS}</style></head><body>{''.join(parts)}</body></html>")
     with open(a.out, "w", encoding="utf-8") as f:
         f.write(doc)
-    print(f"release-report: wrote {a.out} ({len(doc)//1024} KiB, {len(shots)} screenshot(s), {len(docs)} doc(s))")
+
+    # --- Markdown sibling (previews via `task md`, feeds the PDF pipeline) ----
+    # Screenshots are referenced by relative path (the .md lives next to the PNGs),
+    # so the report stays small and renders in the repo's md workflow.
+    md_path = os.path.splitext(a.out)[0] + ".md"
+    write_markdown(md_path, meta, builds, docs, a, shots, log_txt, result)
+
+    print(f"release-report: wrote {a.out} ({len(doc)//1024} KiB) + {os.path.basename(md_path)} "
+          f"({len(shots)} screenshot(s), {len(docs)} doc(s))")
     return 0
+
+
+def md_cell(s):
+    return str(s if s is not None else "").replace("|", "\\|").replace("\n", " ") or "—"
+
+
+def write_markdown(path, meta, builds, docs, a, shots, log_txt, result):
+    L = []
+    L.append("# llvm-mos-65816 — release verification report")
+    L.append("")
+    L.append(f"**RESULT: {result}** · clean-room test of the *published* SNES compiler · "
+             f"generated {meta.get('finished','')}"
+             + (f" · `{a.stamp}`" if a.stamp else ""))
+    L.append("")
+
+    L.append("## Release package")
+    L.append("")
+    L.append("| field | value |")
+    L.append("|---|---|")
+    for k, v in [
+        ("tarball", a.tarball_name or meta.get("pkg_url", "")),
+        ("size", human(a.tarball_size) if a.tarball_size else ""),
+        ("sha256", a.tarball_sha or ""),
+        ("version / stamp", a.stamp or meta.get("pkg_version", "")),
+        ("source", meta.get("pkg_source", "")),
+        ("compiler", meta.get("compiler_version", "")),
+        ("compiler path", meta.get("compiler_path", "")),
+        ("install tree", human(meta.get("tree_bytes")) if meta.get("tree_bytes") else ""),
+    ]:
+        if v:
+            L.append(f"| {md_cell(k)} | `{md_cell(v)}` |")
+    L.append("")
+
+    L.append("## Bundled documentation")
+    L.append("")
+    if docs:
+        L.append("| document | type | size |")
+        L.append("|---|---|---|")
+        total = 0
+        for d in docs:
+            try:
+                total += int(d["bytes"])
+            except ValueError:
+                pass
+            L.append(f"| `{md_cell(d['name'])}` | {md_cell(d['type']).upper()} | {human(d['bytes'])} |")
+        L.append("")
+        L.append(f"*{len(docs)} file(s), {human(total)} total.*")
+    else:
+        L.append("*No .md/.pdf docs found in the package.*")
+    L.append("")
+
+    L.append("## Configuration")
+    L.append("")
+    L.append("| field | value |")
+    L.append("|---|---|")
+    for k, v in [
+        ("method", meta.get("method", "")),
+        ("program / grid", f'{meta.get("program","")} ({meta.get("grid","")})'),
+        ("builds tested", ", ".join(b["label"] for b in builds)),
+        ("oracle CRC", meta.get("oracle", "")),
+        ("frames", meta.get("frames", "")),
+        ("emulator", f'bsnes-jg {meta.get("bsnes","?")} (embedded SPC700 IPL — no BIOS, no sound)'),
+        ("rig base", meta.get("ubuntu", "")),
+        ("host", f'{meta.get("host_arch","")} · {meta.get("host_cpus","")} CPU'),
+        ("started", meta.get("started", "")),
+        ("finished", meta.get("finished", "")),
+    ]:
+        if v.strip(" ()·"):
+            L.append(f"| {md_cell(k)} | {md_cell(v)} |")
+    L.append("")
+
+    L.append("## Results")
+    L.append("")
+    L.append("| build | flags | ROM | got | expect | compile | emulate | verdict |")
+    L.append("|---|---|---|---|---|---|---|---|")
+    oracle = meta.get("oracle", "")
+    for b in builds:
+        L.append(f"| `{md_cell(b['label'])}` | `{md_cell(b['flags'] or '—')}` | {human(b['sfc'])} | "
+                 f"`{md_cell(b['got'])}` | `{md_cell(oracle)}` | {md_cell(b['compile_s'])}s | "
+                 f"{md_cell(b['emulate_s'])}s | **{md_cell(b['verdict'])}** |")
+    L.append("")
+
+    if shots:
+        L.append("## Screenshots")
+        L.append("")
+        for p, cap in shots:
+            L.append(f"**{md_cell(cap)}**")
+            L.append("")
+            L.append(f'<img src="{os.path.basename(p)}" width="384" style="image-rendering:pixelated">')
+            L.append("")
+
+    L.append("## Compile & emulation log")
+    L.append("")
+    L.append("```")
+    L.append(log_txt.rstrip("\n"))
+    L.append("```")
+    L.append("")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(L))
 
 
 if __name__ == "__main__":

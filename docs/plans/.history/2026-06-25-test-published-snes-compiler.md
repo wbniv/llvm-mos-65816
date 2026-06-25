@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/0fdc711) | test(release): self-contained HTML report per run + bundle reader docs; release policy |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/550a855) | test(release): ISO 8601 UTC timestamps on the compile + emulation runs |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/2e580a0) | test(release): emit a compile log + SNES Mandelbrot screenshot as required outputs |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a9d3e9e) | test(release): clean-room verify the PUBLISHED SNES compiler, wired into the publish gate |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/a295256) | docs(plan): clean-room test of the published SNES compiler |
 
 <!--history-meta v1
+0fdc711	author	Will Norris
+0fdc711	added	54
+0fdc711	deleted	8
+0fdc711	files	1
+0fdc711	body	Adds dev/release-report.py: every release-test run now renders ONE self-contained,\nnicely-formatted HTML report (screenshots + full timestamped log base64/inline embedded)\nwith sections for the release package (name/size/sha256/compiler/version), a bundled-docs\ntable listing every .md/.pdf with names + sizes + total, the run configuration\n(method/builds/flags/frames/oracle/host/bsnes-jg/ubuntu), and per-build results with\ncompile + emulate timings. The in-container driver emits a release-report-data.tsv (config,\nresults, compiler version, docs listing); the host renders from that + the log + the PNGs.\n\nReport filename carries a UTC run-timestamp so repeated runs accumulate as history\n(release-report-[<release-stamp>-]<method>-<UTC>.html) + a release-report-latest.html\npointer; the publish path copies the canonical one to dist/<name>-release-report.html.\n\nDocs: dev/package-release.sh now defaults RELEASE_DOCS_DIR to the sibling\n../indri.studio/public/docs when present, so a normal release bundles the reader docs\n(6x .md + .pdf) and the report lists them; override with RELEASE_DOCS_DIR=<path> or\ndisable with RELEASE_DOCS_DIR= (empty).\n\nPolicy (plan "Release policy"): ALWAYS test on release (the mandatory METHOD=local gate in\npackage-release.sh) and NO periodic/scheduled CI release-smoke — verification is tied to\nthe act of releasing; apt/tarball methods remain manual post-deploy confirmations.\n\nVerified: standalone METHOD=local PASS → report (3 screenshots, README); full task package\nPASS → tarball bundles 12 reader docs, report lists 13 docs (2.1 MiB), copied to dist/.\nRendered both reports headless to confirm formatting.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 550a855	author	Will Norris
 550a855	added	13
 550a855	deleted	8
