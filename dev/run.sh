@@ -47,6 +47,11 @@ Targets:
              into high WRAM, displayed via Mode 7 (linear 8bpp), uploaded by one 32 KiB
              DMA, shown at 2x zoom. Screenshots MAME + bsnes-jg, asserts on-screen CRC ==
              host (0x75E8). +mos-a16-only; one-off (~14.4k-frame fill). examples/snes/mandel-mode7.c
+  mandel-interactive #321 M2: the INTERACTIVE Mandelbrot — a host-baked 128x128 image (tiled into
+             Mode 7 chars) DMA'd ROM->VRAM for an INSTANT boot, then a joypad pan/zoom/rotate
+             fly-around at 60 fps. Builds default AND +mos-a16; per build asserts image hash == host
+             AND a scripted-input view-math differential (host replay == ROM) on bsnes-jg, plus a
+             MAME snapshot. examples/snes/mandel-interactive.c. Live: task mandel-mame ROM=mandel-interactive
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUES repro
              (a16regpress/a16scavnz) STILL crashes -verify-machineinstrs under both
              +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment

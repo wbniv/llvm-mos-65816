@@ -103,4 +103,22 @@ static inline uint16_t mandel_crc(const uint8_t *fb, uint16_t len) {
   return crc;
 }
 
+// Fast 16-bit rolling hash for verifying a BAKED asset round-trips (host-baked == read back on
+// target) — NOT a CRC. The interactive demo bakes its image host-side, so the gate only needs to
+// catch a corrupted/misread ROM array (which flips many bytes); a rotate-xor over 16 KiB is ~10x
+// cheaper than mandel_crc's 8-shifts-per-byte, so it runs in a few frames at boot instead of
+// stalling the demo. Promotion-safe: the (uint16_t) casts pin the width on the 16-bit-int target.
+static inline uint16_t img_hash16(const uint8_t *p, uint16_t n) {
+  uint16_t h = 0;
+  for (uint16_t i = 0; i < n; i++) {
+    // rotate-left-1 then xor the byte. Cast to `unsigned` BEFORE shifting: on the 16-bit-int
+    // target, `h >> 15` would otherwise promote a >=0x8000 value to a NEGATIVE int and arithmetic-
+    // shift to 0xFFFF (a host/target divergence the differential gate caught). `unsigned` keeps it
+    // logical; the final (uint16_t) truncates the host's wider result to match the target's mod-2^16.
+    unsigned hi = ((unsigned)h >> 15) & 1u;
+    h = (uint16_t)((((unsigned)h << 1) | hi) ^ (unsigned)p[i]);
+  }
+  return h;
+}
+
 #endif /* MANDEL_H */

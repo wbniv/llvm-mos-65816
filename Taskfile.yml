@@ -67,7 +67,7 @@ tasks:
   # --- #321 beefy Mandelbrot demo ---
 
   mandel-mame:
-    desc: "Run a Mandelbrot demo ROM in a MAME WINDOW on this host (ROM=mandel-display [default] | mandel-mode7 | k_mandel_far). Build the ROM first via task mandel-shot / mandel-mode7 / mandel-far."
+    desc: "Run a Mandelbrot demo ROM in a MAME WINDOW on this host (ROM=mandel-display [default] | mandel-mode7 | mandel-interactive | k_mandel_far). Build the ROM first via task mandel-shot / mandel-mode7 / mandel-interactive / mandel-far."
     cmds:
       - |
         set -euo pipefail
@@ -76,10 +76,11 @@ tasks:
         if [ ! -f "$SFC" ]; then
           echo "missing $SFC — build it first:"
           case "$ROM" in
-            mandel-display) echo "    task mandel-shot     (Track 2 fat-pixel BG)";;
-            mandel-mode7)   echo "    task mandel-mode7    (Track 3b 128x128 Mode 7)";;
-            k_mandel_far)   echo "    task mandel-far      (Track 3a far-store gate)";;
-            *)              echo "    (unknown ROM '$ROM' — use mandel-display | mandel-mode7 | k_mandel_far)";;
+            mandel-display)     echo "    task mandel-shot        (Track 2 fat-pixel BG)";;
+            mandel-mode7)       echo "    task mandel-mode7       (Track 3b 128x128 Mode 7)";;
+            mandel-interactive) echo "    task mandel-interactive (M2 instant-boot Mode 7 fly-around)";;
+            k_mandel_far)       echo "    task mandel-far         (Track 3a far-store gate)";;
+            *)              echo "    (unknown ROM '$ROM' — use mandel-display | mandel-mode7 | mandel-interactive | k_mandel_far)";;
           esac
           exit 1
         fi
@@ -87,6 +88,7 @@ tasks:
         case "$ROM" in
           mandel-mode7) echo "note: mandel-mode7's 128x128 software compute is ~4 min of EMULATED time — the screen stays black until it finishes, then shows the image." ;;
           mandel-display) echo "note: the image appears after the ~15 s (emulated) compute." ;;
+          mandel-interactive) echo "note: INSTANT boot. Controls — D-pad: pan | L/R: zoom out/in | Y/A: rotate | Select: cycle palette | Start: reset. (MAME P1 keys are version-dependent; remap via Tab -> Input Settings.)" ;;
         esac
         echo "launching $SFC in MAME — close the window to quit."
         mkdir -p build/.mame
@@ -107,3 +109,8 @@ tasks:
     desc: "#321 Track 3a: Mandelbrot into high WRAM via #320 far stores, asserted host==+mos-a16 on both emulators. Leaves build/k_mandel_far.sfc."
     cmds:
       - dev/run.sh mandel-far
+
+  mandel-interactive:
+    desc: "#321 M2: INTERACTIVE Mandelbrot — host-baked image DMA'd ROM->VRAM for an instant boot, then a Mode 7 joypad fly-around. Builds default + +mos-a16, asserts image hash==host + a scripted-input view-math differential, screenshots both emulators. Leaves build/mandel-interactive.sfc (then: task mandel-mame ROM=mandel-interactive)."
+    cmds:
+      - dev/run.sh mandel-interactive

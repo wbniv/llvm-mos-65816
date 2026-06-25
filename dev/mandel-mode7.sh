@@ -30,6 +30,10 @@ FRAMES="${MANDEL_FRAMES:-16000}"     # 128x128/N=12 fill completes ~frame 14439 
 [ -x "$TOOL/mos-clang" ] || { echo "FATAL: no from-source toolchain at $TOOL (run: dev/run.sh toolchain)"; exit 1; }
 [ -f "$INSTALL/bin/mos-snes.cfg" ] || { echo "FATAL: snes platform not built (run: dev/run.sh build)"; exit 1; }
 
+# Pick up edits to platforms/snes/snes.h (+ link.ld) without a full re-vendor (<snes.h> resolves
+# to the installed copy, so this refresh is the header dependency).
+INSTALL="$INSTALL" "$ROOT/dev/sync-platform.sh"
+
 # Grid from the source so the host reference can't drift.
 W=$(awk '/#define W /{print $3; exit}' "$SRC")
 H=$(awk '/#define H /{print $3; exit}' "$SRC")

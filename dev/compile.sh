@@ -6,10 +6,9 @@ set -euo pipefail
 
 ROOT=/work
 INSTALL="$ROOT/build/install"
-SRC="$ROOT/platforms/snes"
 
-cp "$SRC/link.ld" "$INSTALL/mos-platform/snes/lib/link.ld"
-cp "$SRC/snes.h"  "$INSTALL/mos-platform/snes/include/snes.h"
+# Refresh platform headers + linker script into the install (the header/linker dependency).
+"$ROOT/dev/sync-platform.sh"
 
 /opt/llvm-mos/bin/mos-clang --config "$INSTALL/bin/mos-snes.cfg" \
   -Os -Wl,-Map="$ROOT/build/hello.map" -o "$ROOT/build/hello.sfc" \

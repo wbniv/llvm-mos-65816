@@ -51,13 +51,36 @@ cmake --build "$BUILD"
 cmake --install "$BUILD"
 echo "$MOS_TOOLCHAIN" > "$STAMP"
 
+# Generate the baked Mandelbrot header (gitignored) that examples/snes/mandel-interactive.c needs
+# before the loop compiles it — keeps it reproducible-from-source rather than committed.
+echo "==> bake examples/snes/mandel_image.h (tools/mandel-bake.c)"
+cc -O2 -I "$ROOT/examples/65816" "$ROOT/tools/mandel-bake.c" -o "$BUILD/mandel-bake" -lm
+"$BUILD/mandel-bake" "$ROOT/examples/snes/mandel_image.h" 128 128 32
+
 echo "==> build + checksum every SNES program (examples/snes/**/*.c)"
 shopt -s globstar nullglob
+# Does this toolchain support the #321 +mos-a16 feature? The prebuilt /opt/llvm-mos does NOT;
+# the from-source build/llvm-mos-install does. mos-a16-only examples are skipped if it doesn't.
+a16probe="$("$MOS_CLANG" --config "$INSTALL/bin/mos-snes.cfg" -mcpu=mosw65816 \
+  -Xclang -target-feature -Xclang +mos-a16 -x c -S -o /dev/null - <<<'int main(void){return 0;}' 2>&1 || true)"
+case "$a16probe" in
+  *"not a recognized feature"*) A16_OK=0
+    echo "    (+mos-a16 unsupported by this toolchain — mos-a16-only examples SKIPPED; use MOS_TOOLCHAIN=$BUILD/llvm-mos-install for those)" ;;
+  *) A16_OK=1 ;;
+esac
 count=0
 for src in "$ROOT"/examples/snes/**/*.c; do
   name="$(basename "$src" .c)"
   rom="$BUILD/$name.sfc"
-  "$MOS_CLANG" --config "$INSTALL/bin/mos-snes.cfg" \
+  # Far-pointer examples (address_space(2) high-WRAM buffers, e.g. mandel-mode7.c) self-declare a
+  # `mos-a16-only` marker; they REQUIRE +mos-a16 (default-8bit can't legalize a `p2` G_PTR_ADD).
+  # The grep survives the far type being spelled via a macro (M7_FAR). Skip if unsupported.
+  a16=()
+  if grep -q 'mos-a16-only' "$src"; then
+    [ "$A16_OK" = 1 ] || { printf '    %-14s SKIP (mos-a16-only; toolchain lacks +mos-a16)\n' "$name"; continue; }
+    a16=(-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16)
+  fi
+  "$MOS_CLANG" --config "$INSTALL/bin/mos-snes.cfg" "${a16[@]}" \
     -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src"
   python3 "$ROOT/tools/snes-checksum.py" "$rom"
   printf '    %-14s %6s bytes\n' "$name" "$(stat -c%s "$rom")"

@@ -49,6 +49,14 @@
 #define REG_MDMAEN   _SNES_REG8(0x420B) /* general-purpose DMA channel enable */
 #define REG_MEMSEL   _SNES_REG8(0x420D) /* ROM access speed (0=slow,1=fast)   */
 
+/* --- Input / status --- */
+#define REG_JOYSER0  _SNES_REG8(0x4016) /* joypad strobe (write) + serial read ctrl1 (bit0)  */
+#define REG_JOYSER1  _SNES_REG8(0x4017) /* serial read ctrl2 (bit0)                          */
+#define REG_RDNMI    _SNES_REG8(0x4210) /* bit7 = vblank-NMI flag (set at vblank, read-clears)*/
+#define REG_HVBJOY   _SNES_REG8(0x4212) /* bit7 vblank, bit6 hblank, bit0 auto-joypad busy    */
+#define REG_JOY1L    _SNES_REG8(0x4218) /* auto-read pad1 low  (needs NMITIMEN bit0)          */
+#define REG_JOY1H    _SNES_REG8(0x4219) /* auto-read pad1 high                                */
+
 /* --- DMA channel 0 (general purpose) --- */
 #define REG_DMAP0    _SNES_REG8(0x4300) /* ch0 transfer params (dir/mode)     */
 #define REG_BBAD0    _SNES_REG8(0x4301) /* ch0 B-bus dest ($21xx low byte)    */
@@ -66,6 +74,9 @@
 /* VMAIN: increment the VRAM word address by 1 after a write to $2119 (VMDATAH).
  * The usual setting for sequential word writes via the 16-bit VMDATA port. */
 #define VMAIN_INC_HIGH_1    0x80
+/* VMAIN: increment after a write to $2118 (VMDATAL) instead — for streaming only the LOW byte
+ * of each VRAM word (e.g. a Mode 7 tilemap, whose high byte is the character data). */
+#define VMAIN_INC_LOW_1     0x00
 
 /* Main-screen layer-enable bits (REG_TM). */
 #define TM_BG1 0x01
@@ -73,6 +84,22 @@
 #define TM_BG3 0x04
 #define TM_BG4 0x08
 #define TM_OBJ 0x10
+
+/* SNES controller bitmask, in manual serial-read order (MSB first). Identical to the auto-read
+ * $4219:$4218 word layout and to bsnes Input::Gamepad::* — so the same masks work whether read
+ * manually (snes_read_pad1) or via auto-read. (Must match examples/snes/view.h's fallback.) */
+#define JOY_B      0x8000
+#define JOY_Y      0x4000
+#define JOY_SELECT 0x2000
+#define JOY_START  0x1000
+#define JOY_UP     0x0800
+#define JOY_DOWN   0x0400
+#define JOY_LEFT   0x0200
+#define JOY_RIGHT  0x0100
+#define JOY_A      0x0080
+#define JOY_X      0x0040
+#define JOY_L      0x0020
+#define JOY_R      0x0010
 
 /* BG tile-size / mode helpers (REG_BGMODE low 3 bits = mode 0..7). */
 #define BGMODE_1 0x01   /* BG1/BG2 4bpp (16 colour), BG3 2bpp */
@@ -93,6 +120,28 @@
 
 /* Point the VRAM data port at word address `wa` for subsequent REG_VMDATA writes. */
 static inline void snes_vram_addr(uint16_t wa) { REG_VMAIN = VMAIN_INC_HIGH_1; REG_VMADD = wa; }
+
+/* Read controller 1 by the MANUAL serial protocol: strobe $4016 (write 1 then 0 to latch the
+ * button state), then shift 16 bits out of $4016 bit 0, MSB first. Returns the JOY_* bitmask
+ * (B,Y,Select,Start,U,D,L,R,A,X,L,R in bits 15..4; the low nibble is the controller signature).
+ * Requires auto-joypad read OFF (NMITIMEN bit0 = 0 — crt0 leaves it 0); otherwise the hardware
+ * auto-reader and this manual read fight over $4016. (Auto-read alternative: set NMITIMEN bit0,
+ * wait HVBJOY bit0 == 0 each frame, then read the REG_JOY1L/REG_JOY1H word.) */
+static inline uint16_t snes_read_pad1(void) {
+  REG_JOYSER0 = 1;
+  REG_JOYSER0 = 0;
+  uint16_t p = 0;
+  for (uint8_t i = 0; i < 16; i++)
+    p = (uint16_t)((p << 1) | (REG_JOYSER0 & 1));
+  return p;
+}
+
+/* Block until the next vblank. RDNMI ($4210) bit 7 is set at the start of vblank regardless of
+ * whether NMI generation is enabled, and is cleared by reading the register — giving clean
+ * once-per-frame pacing with crt0's weak `rti` NMI stub (no interrupt handler needed). */
+static inline void snes_wait_vblank(void) {
+  while (!(REG_RDNMI & 0x80)) { }
+}
 
 /* Force-blank the screen and reset the PPU CONTROL registers to a known-zero state
  * (BG mode, mosaic, BG/char bases, scrolls, mode-7, windows, main/sub layer-enables,

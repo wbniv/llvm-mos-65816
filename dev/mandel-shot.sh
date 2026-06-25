@@ -26,6 +26,10 @@ VENDOR="$ROOT/vendor/bsnes-jg"
 [ -x "$TOOL/mos-clang" ] || { echo "FATAL: no from-source toolchain at $TOOL (run: dev/run.sh toolchain)"; exit 1; }
 [ -f "$CFG" ] || { echo "FATAL: SDK/snes not built (run: MOS_TOOLCHAIN=$BUILD/llvm-mos-install dev/run.sh build)"; exit 1; }
 
+# Pick up edits to platforms/snes/snes.h (+ link.ld) without a full re-vendor (<snes.h> resolves
+# to the installed copy, so this refresh is the header dependency).
+"$ROOT/dev/sync-platform.sh"
+
 # Grid params come from the source so the host reference can't drift out of sync.
 DW=$(awk '/#define DW /{print $3; exit}' "$SRC")
 DH=$(awk '/#define DH /{print $3; exit}' "$SRC")
