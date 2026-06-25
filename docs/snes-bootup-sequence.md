@@ -47,24 +47,25 @@ $FFFC   SHORT(_start)                       ← emulation RESET vector
 
 ## Stage 1 — `.init.50`: native-mode preamble ([`crt0.c`](../platforms/snes/crt0.c))
 
-The 24-byte fragment that establishes the machine contract. Source:
+The 24-byte fragment that establishes the machine contract:
 
-```c
-asm(".section .init.50,\"axR\",@progbits\n"
-    "  sei\n"                    // mask IRQ
-    "  cld\n"                    // binary mode (decimal flag undefined at reset)
-    "  clc\n"                    // clear carry, then exchange it with E:
-    "  xce\n"                    // XCE      -> E=0, 65816 native mode (M=1,X=1 kept)
-    "  rep #$10\n"               // REP #$10 -> 16-bit index regs (so txs takes 16 bits)
-    "  ldx #$01ff\n"             // LDX #$01ff (16-bit immediate; an 8-bit txs => SP=$00FF)
-    "  txs\n"                    // hardware stack pointer -> $01FF (page 1)
-    "  sep #$30\n"               // SEP #$30 -> M=1,X=1: 8-bit A+index (codegen default)
-    "  phk\n"                    // PHK -> push program bank (=0; reset code is bank $00)
-    "  plb\n"                    // PLB -> DBR := 0 (explicit; abs globals + MMIO read DBR:addr)
-    "  lda #$00\n"               // A = $00 for the NMITIMEN store below
-    "  sta $4200\n"              // NMITIMEN: no NMI/IRQ/auto-joypad
-    "  lda #$8f\n"               // A = $8F (bit 7 = force-blank, brightness 0)
-    "  sta $2100\n");            // INIDISP: force blank, brightness 0
+```asm
+        .section .init.50, "axR", @progbits
+
+        sei                 ; mask IRQ
+        cld                 ; binary mode (decimal flag is undefined at reset)
+        clc                 ; clear carry, then exchange it with E (next op):
+        xce                 ; E = 0 -> 65816 native mode (M=1, X=1 kept)
+        rep #$10            ; 16-bit index regs, so the next txs takes a 16-bit value
+        ldx #$01ff          ; 16-bit immediate (an 8-bit txs would leave SP=$00FF)
+        txs                 ; hardware stack pointer -> $01FF (page 1)
+        sep #$30            ; M=1, X=1: 8-bit A + index (the codegen default)
+        phk                 ; push program bank (= 0; reset code is in bank $00) ...
+        plb                 ; ... pull it into DBR -> DBR := 0 (abs globals + MMIO read DBR:addr)
+        lda #$00            ; A = $00 for the NMITIMEN store below
+        sta $4200           ; NMITIMEN: no NMI / IRQ / auto-joypad
+        lda #$8f            ; bit 7 = force-blank, brightness 0
+        sta $2100           ; INIDISP: force blank, brightness 0
 ```
 
 > crt0 is built with `-mcpu=mosw65816 -fno-lto` (set in `platforms/snes/CMakeLists.txt`), so the 65816-only
