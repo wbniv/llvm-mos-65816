@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/8f09955) | plan: loopfold ROOT CAUSE PINNED — missing tya (A<-Y) on the CRC inner-loop skip path |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/e737568) | plan: loopfold bsnes-core trace BREAKTHROUGH — m[] read is CORRECT; bug is the CRC accumulator |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fb405c2) | plan: loopfold instruction-trace attempt — MAME 0.277 headless-debugger wall; bsnes-core hook is next |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/cd77eaa) | plan: loopfold grind — frame-0 localization + mechanism (index across inner CRC loops) |
@@ -12,6 +13,11 @@
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad4d6ae) | plan: reduce + fix the DEFAULT-8bit 65816 matrix-fold-LOOP miscompile (+ fast repro) |
 
 <!--history-meta v1
+8f09955	author	Will Norris
+8f09955	added	25
+8f09955	deleted	0
+8f09955	files	1
+8f09955	body	Traced the 16-bit crc accumulator instruction-by-instruction (bsnes-jg core hooks in a COPY of\nlibbsnes.a; shared core untouched). m[] is read perfectly; the crc is already wrong (0xFB80 vs\n0x9FBF) ENTERING the m[] loop (folding correct m[] from 0xFB80 -> exactly the ROM's 0xCE8C). The crc\nis correct through lvl(0xE1F0) and sLo(0xCA92), then diverges inside the sHi fold's inlined CRC\nbit-loop at iteration 4: crc-low keeps shifting, crc-high gets stuck.\n\nEXACT BUG (disasm): the loop holds crc-high in A, rotates it (rol), copies to Y (tay), then on bpl\n(crc bit15==0) SKIPS the ^0x1021 block. The xor block ends with tay leaving A=new crc-high; the SKIP\npath leaves A=OLD crc-high (only Y has the new value). The next iteration's `rol A` rotates the stale\ncrc-high -> it falls one rotation behind from the iteration after the first skip. A reconciling\n`tya` (A<-Y) is MISSING on the skip path. Default-8-bit codegen -> a regalloc/copy-insertion bug in\nupstream MOS machinery (loop-carried crc PHI is in Y on one back-edge predecessor, read from A). The\nm[]-indexed outer loop is only the trigger (raises pressure -> bad per-copy allocation); m[] itself\nis correct. Next: confirm on pristine no-0002, then fix the missing copy + regression test.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e737568	author	Will Norris
 e737568	added	19
 e737568	deleted	0

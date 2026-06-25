@@ -265,8 +265,26 @@ copies that keep crc-high in `Y`-vs-`A` inconsistently AND whose data takes a sk
 The `m[]`-indexed outer loop is the *trigger* (it raises pressure enough to pick this bad allocation for the
 non-m[] copies); the indexed `m[]` access itself is correct. This is **default-8-bit** codegen — a
 register-allocation / copy-insertion bug in **upstream** MOS machinery (the loop-carried `crc` PHI's value is
-in `Y` on one back-edge predecessor but read from `A`). Fix target: the missing reconciling copy. Confirm on a
-pristine no-`0002` build, then fix + regression test.
+in `Y` on one back-edge predecessor but read from `A`). Fix target: the missing reconciling copy.
+
+### Localized to the GREEDY register allocator — DEFINITIVELY UPSTREAM (2026-06-25)
+Captured MIR through the LTO link (`-print-after=phi-node-elimination`, `-print-after=greedy`):
+- **After PHI elimination the MIR is CORRECT.** The CRC select-diamond (`bb.63` header → `bb.101` skip /
+  `bb.64` xor → `bb.65` merge) copies the new crc-high to the loop-carry vreg on **both** arms
+  (`%1699 = COPY %762` on skip, `%1699 = COPY %753` on xor); `%1699 → %747 → %1697 → ` back-edge. Sound.
+- **Greedy regalloc introduces the bug.** Because the sign-check (`CmpBrZero` on the old crc-high, = `crc &
+  0x8000`) needs `A`, greedy keeps the new crc-high in `Y` on the skip path, and the `Y→A` copy required
+  before the next iteration's `ROL` (which needs `A`) is **dropped/coalesced away** — leaving `A` stale.
+  (The *correct* inlined copies sidestep it by holding crc-high in **memory** `__rc3` and doing the sign
+  check via `ldy __rc2`, so both arms reload `A` consistently.)
+
+Greedy register allocation is **generic upstream LLVM**, not touched by the fork's `0002` (which is
+`+mos-a16`/`+mos-xy16` feature code) — and `+mos-a16` is clean. So this is **definitively an upstream
+`llvm-mos` register-allocation bug**, exposed by the MOS single-accumulator pressure of the indexed-loop
+fold. **The fix belongs upstream** (the allocator must materialize the loop-carried value in the back-edge
+register on every predecessor, or not split it to `Y` when the back-edge needs `A`). A reliable fork-local
+*workaround* is the shipped `zoom.h` loop→unrolled rewrite (already in place); a backend mitigation would
+have to steer this specific allocation, which risks pessimizing the common case.
 
 ### bsnes-core instruction trace (2026-06-25): BREAKTHROUGH — the `m[]` read is CORRECT; the bug is the CRC state
 Built an env-gated read/write hook into `CPU::read`/`CPU::write` in `vendor/bsnes-jg/src/cpu.cpp` (logs
