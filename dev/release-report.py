@@ -17,9 +17,9 @@ import argparse, base64, html, os, sys
 
 
 def parse_data(path):
-    meta, builds, docs = {}, [], []
+    meta, builds, docs, exes = {}, [], [], []
     if not path or not os.path.exists(path):
-        return meta, builds, docs
+        return meta, builds, docs, exes
     with open(path, encoding="utf-8") as f:
         for line in f:
             line = line.rstrip("\n")
@@ -37,7 +37,9 @@ def parse_data(path):
                 })
             elif kind == "doc" and len(parts) >= 4:
                 docs.append({"name": parts[1], "bytes": parts[2], "type": parts[3]})
-    return meta, builds, docs
+            elif kind == "exe" and len(parts) >= 4:
+                exes.append({"name": parts[1], "bytes": parts[2], "kind": parts[3]})
+    return meta, builds, docs, exes
 
 
 def human(n):
@@ -105,7 +107,7 @@ def main():
     ap.add_argument("--stamp", default="")
     a = ap.parse_args()
 
-    meta, builds, docs = parse_data(a.data)
+    meta, builds, docs, exes = parse_data(a.data)
     result = meta.get("result", "FAIL")
     ok = result == "PASS"
 
@@ -160,6 +162,37 @@ def main():
         parts.append("".join(rows))
     else:
         parts.append('<div class="panel"><div class="total">no .md/.pdf docs found in the package</div></div>')
+
+    # --- executables ---------------------------------------------------------
+    parts.append("<h2>Executables</h2>")
+    if exes:
+        rows = ['<div class="panel"><table><tr><th>file</th><th>size</th><th>kind</th></tr>']
+        bin_total = 0
+        for e in exes:
+            is_bin = e["kind"] == "binary"
+            if is_bin:
+                try:
+                    bin_total += int(e["bytes"])
+                except ValueError:
+                    pass
+            size = human(e["bytes"]) if is_bin else "—"
+            rows.append(f'<tr><td class="mono">{esc(e["name"])}</td>'
+                        f'<td class="mono">{size}</td>'
+                        f'<td class="mono">{esc(e["kind"])}</td></tr>')
+        nbin = sum(1 for e in exes if e["kind"] == "binary")
+        extra = ""
+        if meta.get("bin_total"):
+            try:
+                others = int(meta["bin_total"]) - len(exes)
+                if others > 0:
+                    extra = f" · +{others} other per-platform driver symlinks/.cfg in bin/"
+            except ValueError:
+                pass
+        rows.append(f'<tr><td class="total" colspan="3">{nbin} binaries, {human(bin_total)} total{extra}</td></tr>')
+        rows.append("</table></div>")
+        parts.append("".join(rows))
+    else:
+        parts.append('<div class="panel"><div class="total">no executables recorded</div></div>')
 
     # --- configuration -------------------------------------------------------
     parts.append("<h2>Configuration</h2>")
@@ -237,7 +270,7 @@ def main():
     # Screenshots are referenced by relative path (the .md lives next to the PNGs),
     # so the report stays small and renders in the repo's md workflow.
     md_path = os.path.splitext(a.out)[0] + ".md"
-    write_markdown(md_path, meta, builds, docs, a, shots, log_txt, result)
+    write_markdown(md_path, meta, builds, docs, exes, a, shots, log_txt, result)
 
     print(f"release-report: wrote {a.out} ({len(doc)//1024} KiB) + {os.path.basename(md_path)} "
           f"({len(shots)} screenshot(s), {len(docs)} doc(s))")
@@ -248,7 +281,7 @@ def md_cell(s):
     return str(s if s is not None else "").replace("|", "\\|").replace("\n", " ") or "—"
 
 
-def write_markdown(path, meta, builds, docs, a, shots, log_txt, result):
+def write_markdown(path, meta, builds, docs, exes, a, shots, log_txt, result):
     L = []
     L.append("# llvm-mos-65816 — release verification report")
     L.append("")
@@ -291,6 +324,35 @@ def write_markdown(path, meta, builds, docs, a, shots, log_txt, result):
         L.append(f"*{len(docs)} file(s), {human(total)} total.*")
     else:
         L.append("*No .md/.pdf docs found in the package.*")
+    L.append("")
+
+    L.append("## Executables")
+    L.append("")
+    if exes:
+        L.append("| file | size | kind |")
+        L.append("|---|---|---|")
+        bin_total = 0
+        for e in exes:
+            is_bin = e["kind"] == "binary"
+            if is_bin:
+                try:
+                    bin_total += int(e["bytes"])
+                except ValueError:
+                    pass
+            size = human(e["bytes"]) if is_bin else "—"
+            L.append(f"| `{md_cell(e['name'])}` | {size} | {md_cell(e['kind'])} |")
+        nbin = sum(1 for e in exes if e["kind"] == "binary")
+        extra = ""
+        if meta.get("bin_total"):
+            try:
+                others = int(meta["bin_total"]) - len(exes)
+                extra = f" · +{others} other per-platform driver symlinks/.cfg in `bin/`" if others > 0 else ""
+            except ValueError:
+                pass
+        L.append("")
+        L.append(f"*{nbin} binaries, {human(bin_total)} total{extra}.*")
+    else:
+        L.append("*No executables recorded.*")
     L.append("")
 
     L.append("## Configuration")

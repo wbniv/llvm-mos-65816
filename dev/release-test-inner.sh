@@ -277,6 +277,18 @@ overall="PASS"; [ "$rc" -eq 0 ] || overall="FAIL"
       printf 'doc\t%s\t%s\t%s\n' "$rel" "$(stat -c%s "$f")" "$ext"
     done
   fi
+  # executables shipped in bin/: the real toolchain BINARIES (size), then the
+  # user-facing SNES driver symlinks (entry points). The package also carries a
+  # mos-<plat>-clang symlink + .cfg per SDK platform — counted, not enumerated.
+  if [ -d "$TREE/bin" ]; then
+    find "$TREE/bin" -maxdepth 1 -type f ! -name '*.cfg' | sort | while read -r f; do
+      printf 'exe\tbin/%s\t%s\tbinary\n' "$(basename "$f")" "$(stat -c%s "$f")"
+    done
+    for d in mos-clang mos-clang++ mos-snes-clang mos-snes-clang++ mos-snes-far-clang mos-snes-far-clang++; do
+      [ -L "$TREE/bin/$d" ] && printf 'exe\tbin/%s\t-1\tdriver → %s\n' "$d" "$(readlink "$TREE/bin/$d")"
+    done
+    printf 'meta\tbin_total\t%s\n' "$(find "$TREE/bin" -maxdepth 1 \( -type f -o -type l \) | wc -l | tr -d ' ')"
+  fi
 } >"$DATA"
 say "  wrote $DATA (report data for dev/release-report.py)"
 
