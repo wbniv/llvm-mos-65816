@@ -43,6 +43,11 @@ RUN mkdir -p /opt/rig /opt/rig/src /opt/rig/fixtures/snes /opt/rig/fixtures/6581
 COPY dev/jgxcheck.cpp /opt/rig/src/jgxcheck.cpp
 COPY tools/mandel-render.c tools/png_write.h /opt/rig/src/
 COPY examples/snes/mandel-display.c /opt/rig/fixtures/snes/mandel-display.c
+# mandel-display.c grew Mode-7 deps (2026-06): #include "mode7.h" (-> <snes.h> from the SDK
+# sysroot) + #include "sincos.h" (-> <stdint.h>). They must sit beside it in fixtures/snes/
+# or the published compiler can't compile the reference (clean-room gate fails at compile).
+COPY examples/snes/mode7.h          /opt/rig/fixtures/snes/mode7.h
+COPY examples/snes/sincos.h         /opt/rig/fixtures/snes/sincos.h
 COPY examples/65816/mandel.h        /opt/rig/fixtures/65816/mandel.h
 COPY examples/65816/k_mandel.c      /opt/rig/fixtures/65816/k_mandel.c
 
