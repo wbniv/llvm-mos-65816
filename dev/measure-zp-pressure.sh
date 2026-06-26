@@ -123,7 +123,7 @@ for f in "$ROOT"/examples/65816/a16*.c; do [[ -e "$f" ]] || continue; record a16
 echo ""
 echo "=== SUMMARY ==="
 awk -F'\t' -v BUD="$BUDGET_BYTES" '
-  $1=="kernel"||$1=="corpus"{ real[nr++]=$4; if($4>rmax){rmax=$4;rmaxf=$2":"$3}; rsum+=$4; if($4>=24)tight++; if($4>BUD)exh++ }
+  $1=="kernel"||$1=="corpus"{ real[nr++]=$4; if($4>rmax){rmax=$4;rmaxf=$2":"$3}; rsum+=$4; if($4>=24)tight++; if($4>BUD)exh++; if($4>=20)trig20++ }
   $1=="a16"{ a[na++]=$4; if($4>amax)amax=$4; asum+=$4 }
   $1=="synthetic"{}
   END{
@@ -135,4 +135,12 @@ awk -F'\t' -v BUD="$BUDGET_BYTES" '
     print  "VERDICT INPUTS:"
     printf "  CC-frame DP-window:  ZP is %s (max real-code function = %d/%d-byte budget).\n", (rmax>=24?"TIGHT - revisit (a)":"SLACK - (c) stands, shelve (a) with evidence"), rmax, BUD
     printf "  multi-value Phase 0: pool-exhausting real functions = %d => %s\n", exh+0, (exh>0?"PROCEED (spill-fusion has a trigger)":"DEFER confirmed (no real function exhausts the pool)")
+    # A16-threading Phase-3 re-open trigger (b): a real function crossing ~10 of 14
+    # Imag16 pairs (>= 20 distinct __rc bytes). Distinct from the >=24/>28 lines above.
+    # NOTE: a FIRE here is necessary but NOT sufficient to build Phase 3 — the
+    # 2026-06-26 trigger-check measured pre-RA Ac16 residency as net-negative (zero
+    # pressure relief + a mild byte regression; the pressure is genuinely-simultaneous
+    # liveness the single accumulator cannot thread away). See
+    # docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md.
+    printf "  A16-threading Phase-3 trigger (b): real fns >= 20 B (~10/14 pairs) = %d (max %d B ~%.0f pairs, %s) => %s\n", trig20+0, rmax, rmax/2, rmaxf, (rmax>=20?"FIRE":"defer-stands")
   }' "$RES"

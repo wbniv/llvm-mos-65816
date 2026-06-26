@@ -1,9 +1,20 @@
 # #321 A16-threading Phase 3 — trigger-check pass (re-open or re-affirm the deferral)
 
-**Date:** 2026-06-26 · **Status:** PLAN · **Mode:** measure-first, decision-gated.
+**Date:** 2026-06-26 · **Status:** DONE — executed. **Mode:** measure-first, decision-gated.
 **Scope of execution:** a throwaway worktree (host-only measurement + the existing differential harness).
 **No `vendor/` change in this plan** — the compiler is only touched if a trigger fires (Phase B, separate
 worktree).
+
+> **OUTCOME (2026-06-26) — trigger (b) FIRED → ran the gated spike → CLOSED Phase 3 as measured net-negative.**
+> The expected "DEFER stands" path did *not* hold: new heavy-16-bit math kernels (CORDIC/Mandelbrot/Hopalong)
+> pushed 6 real fns to ~10/14 `Imag16` pairs (`cordic16_atan2` at the full 14/14), firing trigger (b);
+> trigger (a) stayed clean. At the user's direction (B0-first, then B1-as-measurement) we built and measured
+> the spike: **B0** (`shouldCoalesce` Ac16 barrier) is byte-for-byte **inert**; **B1** (pre-RA `Ac16`
+> residency, hidden flag `-mos-a16-prera-residency`) **fires heavily but yields zero peak-ZP-pressure relief
+> and a +24 B regression** — the single accumulator caps the gain, now proven. Nothing landed (default build
+> byte-identical). **Full record + reproduce + the spike `.diff`:**
+> [`docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md`](../investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
+> The B2 stage below was therefore not reached (B1 NO-GO).
 
 ## Context — why this change
 
