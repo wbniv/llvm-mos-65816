@@ -304,17 +304,20 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   un-landed (a)/(b) `0002` spike; tear down only when told; (2) post the prepared #321 CC design note
   (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
   [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
-- [ ] **#3 SNES Blossom on-screen interactive port — the graphical payoff demo (Phase 1 kernel DONE).**
+- [ ] **#3 SNES Blossom on-screen interactive port — the graphical payoff demo (Phase 1 kernel DONE; in progress `wt/321-blossom`).**
   Phase 1 (`k_hopalong.c`, the Q8.8 Hopalong/Blossom attractor math) is landed + 4-way verified (see
-  Done). Remaining = render it natively + make it interactive. **Graphics is greenfield** (the repo's
-  only on-screen code is `hello.c`'s green backdrop): Mode 7 chunky 8bpp framebuffer (identity
-  tilemap; per-pixel = high-byte VRAM write), a 64 KB hit-count **shadow buffer in WRAM bank `$7E`**
-  via runtime far pointer (the `+mos-a16` far path, cf. `examples/65816/far_indir.c`), VBlank DMA of
-  recolored bands shadow→VRAM, 256-color CGRAM palette + palette-cycling — this **pulls forward the
-  deferred Phase-2 graphics layer** (add VRAM `$2115–$2119`, Mode-7 matrix `$211A–$2120`, DMA `$420B`/
-  `$4300–$430A` regs to `platforms/snes/snes.h` + a small reusable gfx helper). Then joypad controls
-  (random a/b/c, switch palette/formula/color-mode, auto-scale). Optional perf: SNES hw multiplier
-  (`$4202/$4203→$4216`) for the hot `b*x`. [plan](docs/plans/2026-06-24-blossom-snes.md).
+  Done). Remaining = render it natively + make it interactive. **Scope corrected (brief was stale):**
+  graphics is *not* greenfield — the Mode 7 demo family (`mandel-mode7`/`-interactive`/`-zoom`) landed
+  2026-06-25 with reusable `examples/snes/mode7.h` + `view.h` + the `dev/jgxcheck.cpp` two-emulator
+  differential harness, and the Phase-2 register pull-forward is already done in
+  `platforms/snes/snes_{ppu,dma,cpu,joypad}.h`. So real work = a Hopalong **plotter/accumulator** (the
+  new `+mos-a16` customer: far read-modify-write into a 64 KB hit grid in **bank `$7F`** — `$7E` is
+  full), **colorizer**, **amortized per-band animation** + CGRAM palette-cycling, a **`blossom.h`
+  joypad param state machine** (host-replayable like `view.h`), and two differential gates
+  (deterministic grid-hash `host==+mos-a16`@both-emus; param-replay `host==default==+mos-a16`).
+  Optional perf: SNES hw multiplier (`$4202/$4203→$4216`) for the hot `b*x`.
+  [plan](docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md)
+  (supersedes [Phase-1 plan](docs/plans/2026-06-24-blossom-snes.md)).
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
