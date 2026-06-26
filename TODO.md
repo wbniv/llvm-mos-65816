@@ -1190,7 +1190,15 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      now a curated Done entry [321-trig-phase3-derived-hyperbolic] (k_trig16x 0x759567C4
      host==default==+mos-a16, both emulators; cross-width PASS). The hook keyed on the
      "Phase 3 — derived + hyperbolic" text under the master plan's (renamed) Completed-phases header. fp:ad6e1b319a9a239b -->
-- [ ] **(triage)** **builtins multi-file harness.** Making the 55 builtins main tests actually *run* requires replicating — _from [2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md)_  <!-- fp:7b6e5bccb4c5ca3f -->
-- [ ] **(triage)** Opt-level-aware `xfails.tsv`, runner retry-on-flake — unchanged from the original plan's out-of-scope. — _from [2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md)_  <!-- fp:356612fa02492cc3 -->
-- [ ] **(triage)** No CI change: the `torture` job reads the **committed** manifest (never re-runs the filter), so a — _from [2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md)_  <!-- fp:cfb4ea31c0a22df9 -->
+<!-- triaged 2026-06-26: all three full-vendoring "Out of scope" captures are deliberate non-goals /
+     non-deferrals, nothing open.
+     • "builtins multi-file harness" (run the 55 builtins main tests by replicating gcc's builtins.exp
+       multi-file link) -> an explicit, documented non-goal in the plan's Out-of-scope; the 55 are already
+       accounted-for as the `builtins-multifile` unsupported bucket. Low value (most lower to libc we don't
+       provide); reopen only if someone wants real builtin coverage — the plan records exactly what it takes.
+     • "Opt-level-aware xfails / runner retry-on-flake" -> carried verbatim from the ORIGINAL c-torture
+       plan's out-of-scope (already-known non-work), not introduced by this increment.
+     • "No CI change …" -> NOT a deferral; it's the statement that the torture CI job reads the committed
+       manifest so it needs no edit (the hook keyed on the "No CI change" prose). Verified true this commit.
+     fp:7b6e5bccb4c5ca3f fp:356612fa02492cc3 fp:cfb4ea31c0a22df9 -->
 <!-- END auto-captured-deferrals -->
