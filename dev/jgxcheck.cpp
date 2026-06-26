@@ -17,7 +17,7 @@
 #include <bsnes.hpp>
 #include "png_write.h"   // dependency-free RGB8 PNG writer (shared with tools/mandel-render.c)
 
-#if defined(JGX_VIEW) || defined(JGX_ZOOM)
+#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
 // Interactive-demo input differential (built only by dev/mandel-interactive.sh / dev/mandel-zoom.sh
 // as a separate `jgxcheck-view` / `jgxcheck-zoom` binary, so the plain jgxcheck used by other
 // scripts is unaffected). Drive a scripted controller sequence into pollInput, then replay the
@@ -31,6 +31,9 @@
 #ifdef JGX_ZOOM
 #define PYRAMID_NO_IMG
 #include "zoom.h"
+#endif
+#ifdef JGX_BLOSSOM
+#include "blossom.h"
 #endif
 
 static std::vector<uint16_t> g_script;   // per-frame button mask (frame -> JOY_* bits)
@@ -140,7 +143,7 @@ static void dump_vram_hex(const char *label, unsigned wa, unsigned n) {
   fprintf(stderr, "\n");
 }
 static void audioFrame(const void*, size_t) {}                                     // headless: discard
-#if defined(JGX_VIEW) || defined(JGX_ZOOM)
+#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
 // bsnes calls poll(udata, port, 0) on the controller latch and uses the full 16-bit return as
 // the button word (B in bit15 … R in bit4 — the JOY_* layout). Return the scripted mask for the
 // current frame; held past the script end. Exact frame alignment is irrelevant: the differential
@@ -189,13 +192,13 @@ int main(int argc, char **argv) {
   Bsnes::setInputSpec({0, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
   Bsnes::setInputSpec({1, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
 
-#if defined(JGX_VIEW) || defined(JGX_ZOOM)
+#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
   if (getenv("JGX_SCRIPT")) parseScript(getenv("JGX_SCRIPT"));
 #endif
 
   for (int i = 0; i < frames; ++i) {
     Bsnes::run();
-#if defined(JGX_VIEW) || defined(JGX_ZOOM)
+#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
     g_frame++;
 #endif
   }
@@ -252,6 +255,39 @@ int main(int argc, char **argv) {
       }
     } else {
       printf("VIEW: FAIL (WRAM offsets out of range)\n"); rc = 1;
+    }
+  }
+#endif
+
+#ifdef JGX_BLOSSOM
+  // Input differential: replay blossom.h over the ROM's ground-truth pad log; assert host == ROM.
+  if (getenv("JGX_SCRIPT") && getenv("JGX_BLOSSOMCRC") && getenv("JGX_PADLOG") && getenv("JGX_NFRAMES")) {
+    unsigned padlog_off = (unsigned)strtoul(getenv("JGX_PADLOG"), nullptr, 16);
+    unsigned bc_off     = (unsigned)strtoul(getenv("JGX_BLOSSOMCRC"), nullptr, 16);
+    unsigned nf_off     = (unsigned)strtoul(getenv("JGX_NFRAMES"), nullptr, 16);
+    unsigned padlog_n   = getenv("JGX_PADLOG_N") ? (unsigned)atoi(getenv("JGX_PADLOG_N")) : 64;
+    if (nf_off < mem.second && bc_off + 1 < mem.second) {
+      unsigned nf = wram[nf_off];
+      if (nf > padlog_n) nf = padlog_n;
+      uint16_t rom_bc = (uint16_t)(wram[bc_off] | (wram[bc_off + 1] << 8));
+      blossom_t v; blossom_reset(&v);
+      uint16_t crc = 0xFFFF; unsigned nonzero = 0;
+      for (unsigned i = 0; i < nf; i++) {
+        unsigned a = padlog_off + 2 * i;
+        uint16_t pad = (a + 1 < mem.second) ? (uint16_t)(wram[a] | (wram[a + 1] << 8)) : 0;
+        if (pad) nonzero++;
+        blossom_step(&v, pad);
+        crc = blossom_fold(crc, &v);
+      }
+      if (nf > 0 && nonzero > 0 && crc == rom_bc) {
+        printf("BLOSSOM: PASS frames=%u nonzero=%u blossom_crc=0x%04X (host replay == ROM, bsnes-jg)\n",
+               nf, nonzero, crc);
+      } else {
+        printf("BLOSSOM: FAIL frames=%u nonzero=%u host=0x%04X rom=0x%04X\n", nf, nonzero, crc, rom_bc);
+        rc = 1;
+      }
+    } else {
+      printf("BLOSSOM: FAIL (WRAM offsets out of range)\n"); rc = 1;
     }
   }
 #endif

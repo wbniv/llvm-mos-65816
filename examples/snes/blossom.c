@@ -1,31 +1,42 @@
-// #3 Blossom — Stage 2: a static Mode 7 render of the Hopalong attractor.
+// #3 Blossom — the interactive on-screen Hopalong attractor on the SNES (Stages 2-4).
 //
-// Accumulate K_POINTS orbit points into a 128x128 hit-count grid in high WRAM ($7E2000) via the far
-// read-modify-write path (Stage 1, examples/65816/k_blossom_far.c — differentially proven). The hit
-// count IS the 8bpp Mode 7 pixel value (a CGRAM index), so DISPLAY it by revealing the grid one Mode 7
-// tile-row at a time: build_band() far-loads one band of the grid into a NEAR staging buffer in Mode 7
-// tiled order, then dma_chr_to() DMAs that band into VRAM's character (high) bytes; an identity
-// tilemap + a 256-entry CGRAM palette do the colouring. The grid's hash is parked in corpus_result
-// (the boot gate == the host oracle, examples/65816/k_blossom_far.c -DHOST -DK_GATE=K_POINTS).
+//   D-pad ....... pan        L / R ...... zoom out / in       A / Y ...... next / prev attractor
+//   Select ...... colour mode             Start ...... reset view + attractor
 //
-// The band reveal (far grid -> NEAR chrbuf -> DMA) keeps only ONE far pointer live per helper (the
-// grid_hash idiom), sidestepping the +mos-a16 far-pointer pressure that derails a far->far whole-image
-// build; it is also the per-vblank unit the Stage-3 amortised animation reuses. All compute runs
-// force-blanked (slow per-pixel far work is fine for a one-time static image — the mandel-mode7 model).
-// +mos-a16-only (far pointers). Capture: dev/run.sh blossom.
+// The attractor is accumulated into a 128x128 hit-count grid in high WRAM ($7E2000) via the far
+// read-modify-write path (Stage 1) and displayed via Mode 7: the hit count IS the 8bpp pixel (a CGRAM
+// index), revealed one tile-row per frame (build_band far-loads a band of the grid into a NEAR buffer
+// in tiled order, dma_chr_to DMAs it to VRAM char bytes — one far pointer live per helper, the
+// grid_hash idiom that sidesteps the +mos-a16 far-pointer pressure that a far->far whole-image build
+// hits). The orbit state persists across frames so the cloud BLOOMS progressively; the 256-entry CGRAM
+// palette is rotated every frame for the "wallpaper for the mind" shimmer.
 //
+// Two differential channels (both built default + +mos-a16, host == target):
+//   * grid:  a DETERMINISTIC boot accumulation of K_GATE classic points -> corpus_result == the host
+//            oracle (examples/65816/k_blossom_far.c -DHOST -DK_GATE=K_GATE). +mos-a16-only (far grid).
+//   * state: the per-frame controller state machine (examples/snes/blossom.h) folded to blossom_crc
+//            over a logged pad sequence; dev/jgxcheck.cpp -DJGX_BLOSSOM replays it. NEAR math, so this
+//            builds BOTH default and +mos-a16.
+//
+// Capture / drive: dev/run.sh blossom.  Live play: task blossom-mame (key map in dev/mame-snes-input.cfg).
 // Plan: docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md.
 #define HOP_GRID 128                              // Rung A: 16 KiB grid in $7E2000 (1:1 with display)
 #define HOP_NOINLINE __attribute__((noinline))    // bound +mos-a16 pressure on the far-RMW path
 #include <snes.h>
 #include "mode7.h"
 #include "../65816/hopalong.h"
+#include "blossom.h"
 
-#ifndef K_POINTS
-#define K_POINTS 24000     // points to accumulate for a dense, recognizable cloud (host oracle matches)
+#ifndef K_GATE
+#define K_GATE 8000        // deterministic boot accumulation = the grid differential anchor (classic).
+                          // The orbit math is ~1 __mulsi3/point (no hw multiplier yet — the plan's
+                          // optional perf path), so the live plot runs ~1200 pts/s; 8000 blooms in
+                          // ~6-7 s and still resolves the attractor. Multiple of P_FRAME.
 #endif
-#define TILES     16       // 128/8 — Mode 7 tiles per axis (128x128 image = 16x16 = 256 tiles)
+#define P_FRAME   400      // points accumulated per animation-loop pass (bloom granularity)
+#define TILES     16       // 128/8 — Mode 7 tiles per axis
 #define ROW_BYTES 1024     // one Mode 7 tile-row of character data (16 tiles * 64 bytes)
+#define PADLOG_N  64       // bounded, fully-logged verifiable window (frames)
 
 #define FAR __attribute__((address_space(2)))
 static FAR uint8_t *const grid = (FAR uint8_t *)0x7E2000u;   // 16 KiB hit grid (the 8bpp source)
@@ -34,36 +45,66 @@ HOP_DEFINE_CLEAR(grid_clear, FAR)
 HOP_DEFINE_PLOT (grid_plot,  FAR)
 HOP_DEFINE_HASH (grid_hash,  FAR)
 
-// Classic params, VOLATILE so the optimizer can't fold the orbit to a constant grid.
-volatile short pa = HOP_A_CLASSIC, pb = HOP_B_CLASSIC, pc = HOP_C_CLASSIC;
-volatile uint16_t corpus_result;                  // near: grid hash (boot gate == host reference)
 static const uint8_t m7_zero = 0;                 // fixed-source byte for the tilemap-clear DMA
-static uint8_t chrbuf[ROW_BYTES];                 // near: one tile-row, Mode 7 tiled order, staged for DMA
+static uint8_t chrbuf[ROW_BYTES];                 // near: one tile-row staged for DMA
+static uint16_t pal[256];                         // near: base CGRAM palette for the current colour mode
+static uint16_t cgbuf[256];                       // near: this frame's rotated CGRAM image, staged for DMA
+static hop_pt orbit;                              // persistent orbit point (accumulates across frames)
 
-// 256-entry "fire" CGRAM palette (the pixel value IS the hit count). Index 0 (no hits) = black
-// backdrop; counts ramp blue -> magenta -> orange -> white. The count is pre-scaled (t = count*3 +
-// bright floor) so even a SINGLE hit glows clearly and the dense core saturates white — the attractor
-// is a sparse point cloud, so a near-black low end (count==index linearly) would render it invisible.
-static void load_palette(void) {
-  REG_CGADD = 0;
-  for (uint16_t i = 0; i < 256; i++) {
+// WRAM proof channels (near .bss; volatile so the per-frame writes survive optimisation).
+volatile uint16_t corpus_result;                  // deterministic boot grid hash == host oracle
+volatile uint16_t blossom_crc;                    // rolling CRC of per-frame controller state
+volatile uint8_t  nframes;                        // frames folded into blossom_crc (<= PADLOG_N)
+volatile uint16_t pad_log[PADLOG_N];              // ground-truth pad reads for the host replay
+
+// Build the near base palette for colour `mode` (index 0 = black backdrop). Indices 1..255 are a full
+// HUE WHEEL (6 segments, full brightness) so that rotating it (the per-frame cyc shift in
+// stage_palette) flows colour through the whole attractor — the "wallpaper for the mind" shimmer. The
+// hit count IS the index, so denser regions sit at a different wheel position than sparse edges; the
+// mode offsets the starting hue. Rebuilt only on a colour-mode change (the divides are fine off the
+// hot path).
+static void build_palette(uint8_t mode) {
+  pal[0] = 0;                                       // backdrop / no hits = black
+  for (uint16_t i = 1; i < 256; i++) {
+    uint16_t h = (uint16_t)((i + (uint16_t)mode * 64u) & 0xFFu);   // hue position 0..255, mode-shifted
+    uint8_t seg = (uint8_t)(h / 43);                // 0..5
+    uint8_t f = (uint8_t)((h % 43) * 31u / 43u);    // 0..31 ramp within the segment
     uint8_t r, g, b;
-    if (i == 0) { r = 0; g = 0; b = 0; }
-    else {
-      uint16_t t = (uint16_t)i * 3u + 40u;  if (t > 255) t = 255;   // bright floor + fast ramp
-      r = (t < 96)  ? (uint8_t)(t * 31u / 96u)                       : 31;
-      g = (t < 96)  ? 0 : (t < 176) ? (uint8_t)((t - 96) * 31u / 80u) : 31;
-      b = (t < 64)  ? (uint8_t)(16u + t * 15u / 64u)                  : (t < 160 ? (uint8_t)(31u - (t - 64) * 31u / 96u) : (uint8_t)((t - 160) * 31u / 95u));
+    switch (seg) {
+      case 0:  r = 31;          g = f;           b = 0;            break;   // red -> yellow
+      case 1:  r = (uint8_t)(31 - f); g = 31;    b = 0;            break;   // yellow -> green
+      case 2:  r = 0;           g = 31;          b = f;            break;   // green -> cyan
+      case 3:  r = 0;           g = (uint8_t)(31 - f); b = 31;     break;   // cyan -> blue
+      case 4:  r = f;           g = 0;           b = 31;           break;   // blue -> magenta
+      default: r = 31;          g = 0;           b = (uint8_t)(31 - f); break; // magenta -> red
     }
-    uint16_t c = SNES_RGB(r, g, b);
-    REG_CGDATA = (uint8_t)(c & 0xFF);
-    REG_CGDATA = (uint8_t)(c >> 8);
+    pal[i] = SNES_RGB(r, g, b);
   }
 }
 
-// Far-load tile-row `trow` (8 image rows) of the grid into near chrbuf, in Mode 7 tiled order
-// (chr byte tcol*64 + r*8 + c is image pixel (tcol*8+c, trow*8+r)). One far pointer (grid) live ->
-// near writes — the grid_hash idiom. noinline to bound +mos-a16 pressure (handoff §4).
+// Stage this frame's CGRAM image into near cgbuf (active display): index 0 = black backdrop; indices
+// 1..255 are the base palette ROTATED by `cyc` (the shimmer). Done OUT of vblank so the vblank only
+// has to fire the DMA.
+static void stage_palette(uint8_t cyc) {
+  cgbuf[0] = 0;                                    // index 0 = black backdrop
+  for (uint16_t i = 1; i < 256; i++) {
+    uint16_t src = i + cyc; if (src > 255) src -= 255;   // rotate within 1..255
+    cgbuf[i] = pal[src];
+  }
+}
+
+// DMA the staged CGRAM image cgbuf -> CGRAM (512 bytes in vblank — far faster + glitch-free vs 512
+// hand writes, which spill past vblank into active display and shear the palette across scanlines).
+static void dma_cgram(void) {
+  REG_CGADD = 0;
+  REG_DMAP0 = 0x00; REG_BBAD0 = 0x22;              // A->B inc, pattern 0, dest $2122 (CGDATA)
+  REG_A1T0L = (uint8_t)(uintptr_t)cgbuf; REG_A1T0H = (uint8_t)((uintptr_t)cgbuf >> 8); REG_A1B0 = 0x00;
+  REG_DAS0L = 0x00; REG_DAS0H = 0x02;              // 512 bytes (256 BGR555 entries)
+  REG_MDMAEN = 0x01;
+}
+
+// Far-load tile-row `trow` (8 image rows) of the grid into near chrbuf, Mode 7 tiled order (one far
+// pointer live -> near writes, the grid_hash idiom). noinline to bound +mos-a16 pressure (handoff §4).
 __attribute__((noinline)) static void build_band(uint8_t trow) {
   for (uint8_t tcol = 0; tcol < TILES; tcol++)
     for (uint8_t r = 0; r < 8; r++)
@@ -76,30 +117,67 @@ __attribute__((noinline)) static void build_band(uint8_t trow) {
 // DMA ROW_BYTES of character data from near chrbuf into Mode 7 VRAM HIGH bytes at word `destword`.
 static void dma_chr_to(uint16_t destword) {
   REG_VMAIN = VMAIN_INC_HIGH_1; REG_VMADD = destword;
-  REG_DMAP0 = 0x00; REG_BBAD0 = 0x19;                          // A->B inc, pattern 0, dest $2119 (VMDATAH)
+  REG_DMAP0 = 0x00; REG_BBAD0 = 0x19;
   REG_A1T0L = (uint8_t)(uintptr_t)chrbuf; REG_A1T0H = (uint8_t)((uintptr_t)chrbuf >> 8); REG_A1B0 = 0x00;
   REG_DAS0L = (uint8_t)ROW_BYTES; REG_DAS0H = (uint8_t)(ROW_BYTES >> 8);
   REG_MDMAEN = 0x01;
 }
 
 int main(void) {
-  snes_ppu_reset_blank();                 // force-blank + zero PPU control regs (determinism)
-  m7_begin();                             // Mode 7, BG1 main screen (still force-blanked)
+  snes_ppu_reset_blank();
+  m7_begin();
   m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, M7_TILEMAP_WORDS);
-  m7_tilemap_identity(TILES, TILES);      // 128x128 image = 16x16 tiles, top-left of the grid
-  load_palette();
+  m7_tilemap_identity(TILES, TILES);
+  m7_set_center(64, 64);                  // pivot the Mode 7 transform around the image centre
 
+  blossom_t v; blossom_reset(&v);
   grid_clear(grid);
-  grid_plot(grid, pa, pb, pc, K_POINTS);  // far-RMW accumulation (force-blanked)
-  corpus_result = grid_hash(grid);        // boot gate: grid hash == host reference
-
-  for (uint8_t trow = 0; trow < TILES; trow++) {   // reveal: far grid -> near chrbuf -> VRAM, band by band
-    build_band(trow);
-    dma_chr_to((uint16_t)trow * ROW_BYTES);
-  }
-  m7_set_matrix(0x0080, 0x0000, 0x0000, 0x0080);  // 2x zoom -> 128x128 fills 256x224
-  m7_set_center(0, 0);
+  orbit.x = 0; orbit.y = 0;
+  build_palette(v.pal);
+  m7_set_matrix(v.zoom, 0x0000, 0x0000, v.zoom);
   m7_set_scroll(0, 0);
-  m7_show();                              // release force-blank — the attractor appears
-  for (;;) {}
+  m7_show();                              // release force-blank; the attractor BLOOMS in live below
+  REG_NMITIMEN = NMITIMEN_NMI;            // VBlank NMI -> snes_wait_vblank pacing
+
+  // Accumulation is CAPPED at K_GATE points per attractor: the orbit visits a fixed support, so a
+  // capped bloom keeps the background dark (an uncapped accumulate eventually fills every cell). The
+  // bloom is progressive (P_FRAME/frame, K_GATE/P_FRAME frames); after it, the grid is static and the
+  // cheap 60 fps motion is pure CGRAM palette-cycling. A preset change resets the cap -> re-bloom.
+  uint16_t crc = 0xFFFF, done = 0;
+  uint8_t  nf = 0, trow = 0, gated = 0;
+  for (;;) {
+    uint16_t pad = snes_read_pad1();
+    blossom_step(&v, pad);
+    short a = BLOSSOM_PA[v.preset], b = BLOSSOM_PB[v.preset], c = BLOSSOM_PC[v.preset];
+    if (v.dirty) {                         // preset/reset changed -> clear + re-bloom from scratch
+      grid_clear(grid);
+      orbit.x = 0; orbit.y = 0;
+      build_palette(v.pal);
+      done = 0; gated = 0;
+    }
+    uint16_t chunk = 0;                    // points to plot this frame (0 once fully bloomed)
+    if (done < K_GATE) { chunk = (uint16_t)(K_GATE - done); if (chunk > P_FRAME) chunk = P_FRAME; }
+    if (chunk) { grid_plot(grid, &orbit, a, b, c, chunk); done = (uint16_t)(done + chunk); }
+    build_band(trow);                      // reveal one band (re-uploads the static grid once bloomed)
+    stage_palette(v.cyc);                  // build this frame's rotated CGRAM image (active display)
+
+    snes_wait_vblank();                    // --- vblank: DMAs + a few register writes only ---
+    dma_chr_to((uint16_t)trow * ROW_BYTES);
+    dma_cgram();
+    m7_set_matrix(v.zoom, 0x0000, 0x0000, v.zoom);
+    m7_set_scroll((uint16_t)v.cx, (uint16_t)v.cy);
+    trow = (uint8_t)((trow + 1) & (TILES - 1));
+
+    // Boot grid gate: once the CLASSIC attractor is fully + deterministically bloomed, hash it ==
+    // the host oracle (the differential anchor; preset != 0 blooms aren't the gate).
+    if (!gated && done == K_GATE && v.preset == 0) { corpus_result = grid_hash(grid); gated = 1; }
+
+    if (nf < PADLOG_N) {                   // the verifiable controller-math window
+      pad_log[nf] = pad;
+      crc = blossom_fold(crc, &v);
+      nf++;
+      blossom_crc = crc;
+      nframes = nf;
+    }
+  }
 }

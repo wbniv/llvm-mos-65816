@@ -35,8 +35,9 @@ HOP_DEFINE_CLEAR(grid_clear, /*near*/)
 HOP_DEFINE_PLOT (grid_plot,  /*near*/)
 HOP_DEFINE_HASH (grid_hash,  /*near*/)
 int main(void) {
+  hop_pt p = { 0, 0 };
   grid_clear(host_grid);
-  grid_plot(host_grid, pa, pb, pc, K_GATE);
+  grid_plot(host_grid, &p, pa, pb, pc, K_GATE);
   long hits = 0, sat = 0;
   for (long i = 0; i < HOP_GRID * HOP_GRID; i++) { if (host_grid[i]) hits++; if (host_grid[i] == 255) sat++; }
   fprintf(stderr, "host grid: maxabs=%ld clamps=%d  cells_hit=%ld/%d  saturated=%ld\n",
@@ -52,8 +53,9 @@ HOP_DEFINE_PLOT (grid_plot,  FAR)
 HOP_DEFINE_HASH (grid_hash,  FAR)
 volatile uint16_t corpus_result;                  // near (low WRAM) — the harness reads this
 int main(void) {
+  hop_pt p = { 0, 0 };
   grid_clear(grid);                               // WRAM is not zeroed at boot (bsnes randomises)
-  grid_plot(grid, pa, pb, pc, K_GATE);            // far RMW accumulation
+  grid_plot(grid, &p, pa, pb, pc, K_GATE);        // far RMW accumulation
   corpus_result = grid_hash(grid);                // far-load hash == host reference
   for (;;) {}
 }

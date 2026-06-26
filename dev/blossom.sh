@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
-# dev/blossom.sh — #3 Blossom Stage 2: the Hopalong attractor rendered on the SNES via Mode 7.
+# dev/blossom.sh — #3 Blossom: the interactive Hopalong attractor on the SNES (Mode 7).
 #
-# Accumulate K_POINTS orbit points into a 128x128 far hit grid ($7E2000) via the far read-modify-write
-# path, then reveal it band-by-band (far grid -> near chrbuf -> VRAM DMA) with a "fire" CGRAM palette.
-# +mos-a16-only (far pointers). The grid's hash (corpus_result) is gated against the host oracle
-# (examples/65816/k_blossom_far.c -DHOST -DK_GATE=K_POINTS — the SAME hopalong.h), so this is
-# host == +mos-a16 on MAME + bsnes-jg, plus a real framebuffer screenshot from BOTH cores.
+# The attractor blooms live into a 128x128 far hit grid ($7E2000) via the far read-modify-write path,
+# is revealed band-by-band (far grid -> near chrbuf -> VRAM DMA) with a cycling hue palette, and is
+# driven by the joypad (pan / zoom / attractor-preset / colour). +mos-a16-only (far grid). Two
+# differential channels, host == target:
+#   * grid:  a DETERMINISTIC boot accumulation of K_GATE classic points -> corpus_result == the host
+#            oracle (examples/65816/k_blossom_far.c -DHOST -DK_GATE). host == +mos-a16, MAME + bsnes-jg.
+#   * state: a SCRIPTED controller sequence is fed in; the ROM logs the pads it read + a rolling CRC of
+#            the per-frame controller state (examples/snes/blossom.h); jgxcheck -DJGX_BLOSSOM replays
+#            that pure state math over the ground-truth pad log and asserts an identical CRC (bsnes-jg).
+# Plus a bsnes-jg framebuffer PNG and a MAME snapshot. Outputs build/blossom-{jg,mame}.png.
 #
-# Outputs build/blossom-{jg,mame}.png. Drive: dev/run.sh blossom.
+# Drive: dev/run.sh blossom.  Live play: task blossom-mame.
 # Plan: docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md.
 set -euo pipefail
 case "${1-}" in -h|--help)
-  echo "Usage: dev/run.sh blossom   # Hopalong attractor on SNES via Mode 7 (far hit-grid + band DMA); screenshot MAME + bsnes-jg"
+  echo "Usage: dev/run.sh blossom   # interactive Hopalong attractor on SNES (far hit-grid + Mode 7); grid + state differential + screenshots"
   exit 0;; esac
 
 ROOT=/work
@@ -24,53 +29,64 @@ ROM="$BUILD/blossom.sfc"
 MAP="$BUILD/blossom.map"
 VENDOR="$ROOT/vendor/bsnes-jg"
 A16=(-Xclang -target-feature -Xclang +mos-a16)
+# Scripted controller sequence (SEGMENT:FRAMES) for the state gate — zoom/pan/palette only (preset
+# changes re-bloom, which is slow); varied + non-trivial so the logged pad sequence is meaningful.
+SCRIPT="${JGX_SCRIPT:-R:150,DOWN:150,SELECT:2,L:150,UP:150,RIGHT:150,SELECT:2,LEFT:150}"
 
 [ -x "$TOOL/mos-clang" ] || { echo "FATAL: no from-source toolchain at $TOOL (run: dev/run.sh toolchain)"; exit 1; }
 [ -f "$INSTALL/bin/mos-snes.cfg" ] || { echo "FATAL: snes platform not built (run: dev/run.sh build)"; exit 1; }
 
-# Pick up edits to platforms/snes/snes.h without a full re-vendor (<snes.h> -> the installed copy).
 INSTALL="$INSTALL" "$ROOT/dev/sync-platform.sh"
 
-# K_POINTS from the source so the host oracle can't drift; plot ~K/7 frames, +reveal+margin.
-K_POINTS=$(awk '/#define K_POINTS /{print $3; exit}' "$SRC")
-FRAMES="${MANDEL_FRAMES:-$(( K_POINTS / 5 + 1200 ))}"
-echo "==> blossom: K_POINTS=$K_POINTS  (frames=$FRAMES)"
+# K_GATE from the source so the host oracle can't drift; bloom ~K_GATE/700 s + the 64-frame state
+# window fills after it -> a generous frame budget.
+K_GATE=$(awk '/#define K_GATE /{print $3; exit}' "$SRC")
+FRAMES="${MANDEL_FRAMES:-1500}"
+echo "==> blossom: K_GATE=$K_GATE  (frames=$FRAMES, script=$SCRIPT)"
 
 # 1. Host oracle derives the golden grid hash (cc -DHOST over the SAME hopalong.h, matching K).
-cc -DHOST -O2 -DK_GATE="$K_POINTS" -o "$BUILD/blossom_oracle" "$ORACLE"
+cc -DHOST -O2 -DK_GATE="$K_GATE" -o "$BUILD/blossom_oracle" "$ORACLE"
 HOSTREP="$("$BUILD/blossom_oracle" 2>&1 1>/dev/null || true)"
 WANT="$("$BUILD/blossom_oracle")"
 echo "    $HOSTREP"
 echo "==> host reference: grid hash = $WANT"
 
-# 2. Build the Mode 7 ROM (+mos-a16) + find corpus_result.
+# 2. Build the +mos-a16 ROM (the far grid is a16-only) + find the proof-channel symbols.
 "$TOOL/mos-clang" --config "$INSTALL/bin/mos-snes.cfg" -mcpu=mosw65816 "${A16[@]}" -Os \
   -mllvm -verify-machineinstrs -Wl,-Map="$MAP" -o "$ROM" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$ROM" >/dev/null
-VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$MAP")
-ADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$VMA )))
-echo "==> built $(basename "$ROM") (+mos-a16); corpus_result @ WRAM 0x$VMA"
+vma() { awk -v s="$1" '$NF==s{print $1; exit}' "$MAP"; }
+CV=$(vma corpus_result); BC=$(vma blossom_crc); NF=$(vma nframes); PL=$(vma pad_log)
+ADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$CV )))
+echo "==> built $(basename "$ROM") (+mos-a16); corpus@\$$CV blossom_crc@\$$BC pad_log@\$$PL"
 
 rc=0
 
-# 3. bsnes-jg: framebuffer dump + assert. Always (re)build jgxcheck from current source — a worktree's
-#    hardlinked build/jgxcheck can predate the PNG-dump support.
-JGX="$BUILD/jgxcheck"
+# 3. bsnes-jg: state-machine differential (with scripted input) + grid gate + framebuffer dump. Build a
+#    -DJGX_BLOSSOM harness (the state replay) and a plain jgxcheck (the PNG dump) from current source.
 ARCHIVE="$(find "$VENDOR/objs" -name '*.a' 2>/dev/null | head -1 || true)"
+JGXB="$BUILD/jgxcheck-blossom"; JGX="$BUILD/jgxcheck"
 if [ -n "$ARCHIVE" ]; then
+  g++ -O2 -std=c++11 -DJGX_BLOSSOM -I"$VENDOR/src" -I"$ROOT/tools" -I"$ROOT/examples/snes" -I"$ROOT/examples/65816" \
+      -c "$ROOT/dev/jgxcheck.cpp" -o "$BUILD/jgxcheck-blossom.o"
+  g++ "$BUILD/jgxcheck-blossom.o" "$ARCHIVE" -lsamplerate -lm -o "$JGXB"
   g++ -O2 -std=c++11 -I"$VENDOR/src" -I"$ROOT/tools" -c "$ROOT/dev/jgxcheck.cpp" -o "$BUILD/jgxcheck.o"
   g++ "$BUILD/jgxcheck.o" "$ARCHIVE" -lsamplerate -lm -o "$JGX"
 fi
-if [ -x "$JGX" ] && [ -d "$VENDOR/Database" ]; then
-  echo "==> bsnes-jg: render + framebuffer dump (build/blossom-jg.png)"
-  "$JGX" "$ROM" "$VENDOR/Database" "0x$VMA" 2 "$WANT" "$FRAMES" "$BUILD/blossom-jg.png" || rc=1
+if [ -x "$JGXB" ] && [ -d "$VENDOR/Database" ]; then
+  echo "==> bsnes-jg: grid gate (corpus == $WANT) + state replay (BLOSSOM) + framebuffer dump"
+  out="$(JGX_SCRIPT="$SCRIPT" JGX_BLOSSOMCRC="0x$BC" JGX_PADLOG="0x$PL" JGX_NFRAMES="0x$NF" JGX_PADLOG_N=64 \
+    "$JGXB" "$ROM" "$VENDOR/Database" "0x$CV" 2 "$WANT" "$FRAMES" "$BUILD/blossom-jg.png" 2>/dev/null || true)"
+  echo "$out" | grep -E 'SMOKE|BLOSSOM' | sed 's/^/    /'
+  echo "$out" | grep -q 'SMOKE: PASS'   || { echo "    grid gate FAILED"; rc=1; }
+  echo "$out" | grep -q 'BLOSSOM: PASS' || { echo "    state gate FAILED"; rc=1; }
 else
   echo "    SKIP bsnes-jg (harness/core absent — run: dev/run.sh xcheck once)"
 fi
 
-# 4. MAME under Xvfb: snapshot + assert (snapshot well after the compute completes).
+# 4. MAME under Xvfb: snapshot + assert the grid gate (sample after the bloom completes).
 if command -v xvfb-run >/dev/null 2>&1; then
-  echo "==> MAME (under Xvfb): snapshot + assert (build/blossom-mame.png)"
+  echo "==> MAME (under Xvfb): snapshot + grid gate (build/blossom-mame.png)"
   SNAP="$BUILD/.bl-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
   secs=$(( FRAMES / 60 + 5 ))
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$WANT" SHOT_AT="$FRAMES" \
@@ -87,7 +103,7 @@ fi
 
 echo
 if [ "$rc" -eq 0 ]; then
-  echo "RESULT: PASS — Hopalong attractor on SNES (far hit-grid + Mode 7 band DMA); MAME + bsnes-jg match host (hash $WANT)"
+  echo "RESULT: PASS — interactive Hopalong attractor on SNES; grid hash $WANT host == +mos-a16 (MAME + bsnes-jg); state-math host == ROM (bsnes-jg)"
 else
   echo "RESULT: FAIL — see the per-step lines above"
 fi

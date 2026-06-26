@@ -120,29 +120,30 @@ HOP_NOINLINE static void hop_step(hop_pt *p, short a, short b, short c) {
 #endif
 }
 
-// --- Coordinate map: Q8.8 orbit value -> grid pixel. Constant-coefficient so it folds identically
-// on host (int=32) and target (int=16). HOP_GRID is the square grid edge (128 = "Rung A" de-risk in
-// $7E2000; 256 = "Rung B" target 64 KB in $7F). HOP_GAIN scales maxabs (~5857) to ~0.93*(GRID/2) px
-// from the centre, leaving a margin; chosen per grid (256-grid gain is 2x the 128-grid's). ---
+// --- Coordinate map: Q8.8 orbit value -> grid pixel. A pure ARITHMETIC SHIFT (>> HOP_SHIFT) — not a
+// multiply — so it costs nothing per point (the per-point budget is dominated by the orbit's one
+// __mulsi3; two more for a constant-gain map would triple it and make the live bloom crawl) and folds
+// identically on host (int=32) and target (int=16). HOP_GRID is the square grid edge (128 = "Rung A"
+// in $7E2000; 256 = "Rung B" 64 KB in $7F); the shift scales maxabs (~5857) to ~0.7*(GRID/2) px from
+// the centre with margin: 128-grid >>7 -> ±46 px of 64; 256-grid >>6 -> ±92 px of 128. ---
 #ifndef HOP_GRID
 #define HOP_GRID 128
 #endif
 #define HOP_CENTER (HOP_GRID / 2)
 #if   HOP_GRID == 256
-#define HOP_GAIN 1342
+#define HOP_SHIFT 6
 #elif HOP_GRID == 128
-#define HOP_GAIN 671
+#define HOP_SHIFT 7
 #else
-#error "hopalong.h: define HOP_GAIN for this HOP_GRID"
+#error "hopalong.h: define HOP_SHIFT for this HOP_GRID"
 #endif
-#define HOP_GSHIFT 16
 // Total cells, as a uint16_t. The (uint32_t) multiply avoids 16-bit-int overflow at compile time;
 // for HOP_GRID==256 the product 65536 wraps to 0 — and the do/while loops below run until ++i wraps
 // back to 0, covering the full 0..65535 (for 128 it is a plain 16384-iteration loop).
 #define HOP_NCELLS ((uint16_t)((uint32_t)HOP_GRID * (uint32_t)HOP_GRID))
 
 static inline int16_t hop_map(short v) {
-  return (int16_t)((int16_t)(((int32_t)v * HOP_GAIN) >> HOP_GSHIFT) + HOP_CENTER);
+  return (int16_t)((int16_t)(v >> HOP_SHIFT) + HOP_CENTER);
 }
 
 // Stamp `NAME(QUAL uint8_t *grid)` — zero the whole grid. The far grid in WRAM is NOT linker-zeroed
@@ -165,15 +166,16 @@ static inline int16_t hop_map(short v) {
   }
 
 // Stamp `NAME(QUAL uint8_t *grid, short a, short b, short c, uint16_t n)` — iterate the orbit n
-// points from (0,0), map each to a grid pixel, DROP out-of-range points (a smear-free border; a pure
-// unsigned compare, identical both sides), and SATURATINGLY increment the hit counter (far RMW on
-// target: lda [dp] / compare / inc / sta [dp]).
+// points CONTINUING from orbit state *p (the caller seeds {0,0} for a from-scratch render, or keeps a
+// persistent point to accumulate across animation frames — N points plotted in one call or in chunks
+// give the same grid, since the orbit is deterministic), map each to a grid pixel, DROP out-of-range
+// points (a smear-free border; a pure unsigned compare, identical both sides), and SATURATINGLY
+// increment the hit counter (far RMW on target: lda [dp] / compare / inc / sta [dp]).
 #define HOP_DEFINE_PLOT(NAME, QUAL)                                        \
-  HOP_FN void NAME(QUAL uint8_t *grid, short a, short b, short c, uint16_t n) { \
-    hop_pt p = { 0, 0 };                                                   \
+  HOP_FN void NAME(QUAL uint8_t *grid, hop_pt *p, short a, short b, short c, uint16_t n) { \
     for (uint16_t i = 0; i < n; i++) {                                     \
-      hop_step(&p, a, b, c);                                               \
-      int16_t px = hop_map(p.x), py = hop_map(p.y);                        \
+      hop_step(p, a, b, c);                                                \
+      int16_t px = hop_map(p->x), py = hop_map(p->y);                      \
       if ((uint16_t)px < (uint16_t)HOP_GRID &&                            \
           (uint16_t)py < (uint16_t)HOP_GRID) {                            \
         uint16_t idx = (uint16_t)((unsigned)py * HOP_GRID + (unsigned)px); \

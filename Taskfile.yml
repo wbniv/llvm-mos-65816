@@ -108,7 +108,7 @@ tasks:
   # --- #321 beefy Mandelbrot demo ---
 
   mandel-mame:
-    desc: "Run a Mandelbrot demo ROM in a MAME WINDOW on this host (ROM=mandel-display [default] | mandel-mode7 | mandel-interactive | mandel-zoom | k_mandel_far). Build the ROM first via task mandel-shot / mandel-mode7 / mandel-interactive / mandel-zoom / mandel-far."
+    desc: "Run a demo ROM in a MAME WINDOW on this host (ROM=mandel-display [default] | mandel-mode7 | mandel-interactive | mandel-zoom | k_mandel_far | blossom). Build the ROM first via task mandel-shot / mandel-mode7 / mandel-interactive / mandel-zoom / mandel-far, or dev/run.sh blossom."
     cmds:
       - |
         set -euo pipefail
@@ -122,7 +122,8 @@ tasks:
             mandel-interactive) echo "    task mandel-interactive (M2 instant-boot Mode 7 fly-around)";;
             mandel-zoom)        echo "    task mandel-zoom        (M2 zoom pyramid — increasing detail)";;
             k_mandel_far)       echo "    task mandel-far         (Track 3a far-store gate)";;
-            *)              echo "    (unknown ROM '$ROM' — use mandel-display | mandel-mode7 | mandel-interactive | mandel-zoom | k_mandel_far)";;
+            blossom)            echo "    dev/run.sh blossom      (#3 interactive Hopalong attractor)";;
+            *)              echo "    (unknown ROM '$ROM' — use mandel-display | mandel-mode7 | mandel-interactive | mandel-zoom | k_mandel_far | blossom)";;
           esac
           exit 1
         fi
@@ -132,6 +133,7 @@ tasks:
           mandel-display) echo "note: the image appears after the ~15 s (emulated) compute." ;;
           mandel-interactive) echo "note: INSTANT boot. KEYS (remapped to match the labels): arrows=pan | L/R=zoom out/in | Y/A=rotate | S=cycle palette | Enter=reset." ;;
           mandel-zoom) echo "note: INSTANT boot. KEYS (remapped to match the labels): hold R=DIVE (detail refreshes at each level), L=back out | Y/A=rotate | S=cycle palette | Enter=reset to level 0." ;;
+          blossom) echo "note: the attractor BLOOMS in over ~10 s, then shimmers. KEYS (remapped to match the labels): arrows=pan | L/R=zoom out/in | A/Y=next/prev attractor (re-blooms) | S=colour mode | Enter=reset." ;;
         esac
         echo "launching $SFC in MAME — close the window to quit."
         mkdir -p build/.mame

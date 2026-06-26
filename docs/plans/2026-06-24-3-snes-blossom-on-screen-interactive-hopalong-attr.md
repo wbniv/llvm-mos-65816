@@ -234,9 +234,28 @@ sample well after a deterministic plotted-point count, never at a frame edge (ha
    under `+mos-a16` (clean `-verify`, runtime runaway) — a second far-pointer pressure fragility beyond
    the Stage-1 `__memset` bug; not minimally reproduced (isolated repros pass), worked around by the
    band/near-staging structure, which is also the Stage-3 per-vblank unit.
-4. **Interaction gate:** `VIEW`/`BLOSSOM: PASS` — host replay of `blossom.h` == ROM `blossom_crc`, for
-   both default and `+mos-a16` builds.
-5. **Live play:** `task blossom-mame` (or `task mandel-mame ROM=blossom`) — joypad changes params/
-   palette/scale; reset works.
-6. **Size delta recorded** for `examples/snes/blossom.c`, `+mos-a16` vs default (`.text` sections),
-   documented like the Phase-1 `+14 B` note (a measurement, not a defect; the differential is the bar).
+   **Stages 3-4 superseded the static demo:** `examples/snes/blossom.c` is now the *animated,
+   interactive* renderer (the static path is its boot bloom). Two changes shifted the goldens: the
+   coordinate map became a pure shift (`hop_map` `>> HOP_SHIFT`, not a constant-gain multiply — three
+   `__mulsi3`/point would make the live bloom crawl), and `K_GATE` dropped to 8000 (the plot runs
+   ~1200 pts/s with no hw multiplier, so 8000 blooms in ~10 s). New classic golden = `0x9047`.
+
+4. **Interaction gate (Stage 4):** `dev/run.sh blossom` → `BLOSSOM: PASS` — host replay of `blossom.h`
+   over the ROM's ground-truth pad log == the ROM's `blossom_crc`.
+
+   ```
+   bsnes-jg: SMOKE: PASS off=0x24 len=2 got=0x9047 (grid hash == host)
+   bsnes-jg: BLOSSOM: PASS frames=64 nonzero=64 blossom_crc=0xC4E8 (host replay == ROM)
+   MAME:     SHOT: PASS corpus=0x9047 (snapshot at frame 1500)
+   RESULT: PASS — grid hash 0x9047 host == +mos-a16 (MAME + bsnes-jg); state-math host == ROM (bsnes-jg)
+   ```
+   **PASS** — the controller state machine (`blossom.h`: pan/zoom/preset/colour, edge + level) is
+   differentially verified via `dev/jgxcheck.cpp -DJGX_BLOSSOM` (the `view.h`/`JGX_VIEW` pattern). The
+   demo is `+mos-a16`-only (far grid), so the state gate is `host == +mos-a16` (no default leg).
+
+5. **Live play:** `task mandel-mame ROM=blossom` — the attractor blooms in (~10 s) then shimmers;
+   arrows pan, L/R zoom, A/Y switch attractor (re-bloom), Select cycles colour, Start resets. The
+   `dev/mame-snes-input.cfg` key remap makes the keyboard labels match.
+
+6. *(Optional)* Size delta + the **hw-multiplier perf path** (`$4202/$4203→$4216` for the hot `b*x`) to
+   speed the bloom — measure before/after; gate per the "native op isn't automatically smaller" lesson.
