@@ -401,7 +401,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `#include`-wrappers — **ONE root cause**. default + `+mos-a16` self-check PASS, `+mos-xy16` reads `0xDEAD`,
   reproducible isolated on MAME at both `-Os`/`-O1` (opt-independent). Hypothesis: X-flag/select-diamond width
   under 16-bit index regs (sibling of the `requiredXWidth` index-width family). Remove the 3 `xfails.tsv` rows
-  when fixed → they become positive gates. [finding](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md).
+  when fixed → they become positive gates. [finding](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md) ·
+  [fix plan](docs/plans/2026-06-26-full-xy16-backend-fix-close-the-last-mos-xy16-defe.md).
 ### Upstream / Contribution
 
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
