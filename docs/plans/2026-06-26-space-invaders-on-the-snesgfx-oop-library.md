@@ -23,7 +23,8 @@ is borrowed **only as a host-side asset converter** — we are not switching too
 A playable, recognizable Space Invaders (player ship, 5×11 marching/animating/speeding alien fleet of 3
 types, player shot + alien bombs, destructible shields, bonus UFO, score/lives HUD, attract + play), built on
 `snesgfx`, and **verified on the repo's differential bar** (host == default@MAME == a16@MAME == a16@bsnes-jg,
-+ corpus 5-way default==a16==xy16, + two-emulator screenshots, + `-verify-machineinstrs` clean).
++ corpus 5-way default==a16==xy16, + two-emulator screenshots, + `-verify-machineinstrs` clean), and finally
+**published as a playable in-browser page at https://www.biohack.net/space-invaders/** (P7, `snes-rom-page`).
 
 Phased so an MVP lands first and each phase is independently verifiable (build order de-risks fastest).
 
@@ -206,8 +207,13 @@ Read alongside: `platforms/snes/snes_ppu.h`/`snes_dma.h`/`snes_joypad.h`, `dev/_
   slice here (the differential bar goes green).
 - **P4** — `TextLayer` HUD (score/hi/lives/title) + the `gfx4snes` font asset path.
 - **P5** — `ShieldField` (discrete-state damage first, then per-pixel erase; verify chr bytes vs a host model).
-- **P6** — `Ufo`, explosions, attract↔play states, level progression. Optional: publish a playable page via
-  the `snes-rom-page` skill.
+- **P6** — `Ufo`, explosions, attract↔play states, level progression.
+- **P7 — publish a playable in-browser page** at **https://www.biohack.net/space-invaders/** via the
+  `snes-rom-page` skill (shared bsnes-jg WASM player + a `/space-invaders` Astro page with controls). Ship
+  the `+mos-a16` ROM (`build/invaders-a16.sfc`). **Hard prerequisite:** the ROM must pass the bsnes 3×-capture
+  determinism check (the page runs bsnes-jg WASM, so any power-on flap shows there) — already enforced by
+  `dev/invaders.sh`. The ROM should boot into the deterministic attract demo and hand control to the player on
+  START (so visitors can watch *and* play).
 
 ## Verification steps (run during implementation; paste raw output + PASS/FAIL — **PENDING**)
 
