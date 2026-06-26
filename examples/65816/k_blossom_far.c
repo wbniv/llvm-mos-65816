@@ -17,9 +17,11 @@
 #define HOP_NOINLINE __attribute__((noinline))    // bound +mos-a16 pressure on the far-RMW path
 #include "hopalong.h"
 
+#ifndef K_GATE
 #define K_GATE 4000        // deterministic plotted-point count — independent of emulator frame
-                          // timing (sampled after it completes). Tuned to finish in the window
-                          // AND drive some hot-pixel saturation (see the host oracle's report).
+                          // timing (sampled after it completes). Overridable so this same file is the
+                          // HOST ORACLE for examples/snes/blossom.c (build -DK_GATE=K_POINTS -DHOST).
+#endif
 
 // Classic params, VOLATILE so the optimizer can't fold the whole orbit to a constant grid.
 volatile short pa = HOP_A_CLASSIC, pb = HOP_B_CLASSIC, pc = HOP_C_CLASSIC;
