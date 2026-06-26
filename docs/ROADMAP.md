@@ -537,7 +537,8 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    1). **Measured −31/−36 % on dependent chains, −4..−10 B on real kernels.** A 300-program study **retired
    Phase 2** (fold-while-threaded is already optimal — interior immediates and near-abs globals fold into
    the threaded chain today). The general **RA-level `Ac16` residency** (the actual coalescer-crash core,
-   Tier 2) **stays deferred**: its realizable gain is capped by the single 65816 accumulator (two live
+   Tier 2) was deferred, then **CLOSED 2026-06-26 as measured net-negative** (the gated pre-RA spike gave
+   **+24 B / zero peak-ZP relief**): its realizable gain is capped by the single 65816 accumulator (two live
    16-bit values must spill to `Imag16`), so the peephole already captures what a single-accumulator
    machine can thread. New `examples/65816/a16thread.c` + `dev/a16thread.sh` (corpus_result 0x2544 on both
    emulators) + reusable `dev/measure-a16-threading.sh`. Non-breaking: a16 suite + kernels 47/47, corpus
@@ -562,8 +563,13 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    `globals.c`/`a16regpress.c` `-Os` RA crash — patch `0009`, `ad506ed`, 2026-06-25 — and the `+mos-a16`/
    `+mos-xy16` **scavenger-N/Z crash** (`$p is not a GPR`) — patch `0011`, 2026-06-26 (route a live `$p`
    through a dead index reg into `RC17`; + `0012` for a `LDCImm` MC-lowering bug it surfaced). Both are now
-   positive gates.)
-   [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
+   positive gates.) **And the "one deferred core" is now itself empty (2026-06-26):** the `pr15296`
+   ZP-overflow turned out to be a **stale XFAIL** (now a positive c-torture gate), and the Phase-3
+   `Ac16`-residency spike was run — trigger (b) fired (real kernels at ~10/14 `Imag16` pairs) but residency
+   measured **net-negative** (+24 B / zero peak-ZP relief), so it is **not** the remedy. No `+mos-a16`
+   register-pressure XFAILs remain.
+   [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md) ·
+   [Phase-3 spike+verdict](investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
 
    **Trig differential test — the realistic M2 capstone (2026-06-25/26; "test the C compiler").** Beyond the
    micro-kernels, a substantial fixed-point **trig** workload now exercises the M2 codegen across both widths

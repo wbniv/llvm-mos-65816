@@ -50,7 +50,7 @@ census_group() {  # $1 = label; $2.. = source files
     [ -f "$src" ] || continue
     name="$(basename "$src")"
     if ! "$CLANG" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$tmp/c.o" "$src" 2>/dev/null; then
-      printf '%-22s %7s %5s %7s  %s\n' "$name" "-" "-" "-" "COMPILE-FAIL (xfail: regalloc-out-of-registers)"
+      printf '%-22s %7s %5s %7s  %s\n' "$name" "-" "-" "-" "COMPILE-FAIL (unexpected — the old regalloc-out-of-registers XFAIL was fixed in 0009)"
       continue
     fi
     out="$("$OBJDUMP" -dr --mcpu=mosw65816 "$tmp/c.o" | awk -v pfx="$name:" '

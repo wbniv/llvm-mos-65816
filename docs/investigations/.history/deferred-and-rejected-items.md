@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/5bea574) | docs: sync living refs with patch 0009 (globals.c +mos-a16 RA crash FIXED) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/f9a33d6) | #321 docs: reflect c-torture Phases 0+1 across the index docs |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/cfef277) | #321 docs: correct stale "corpus is 8-bit" claim on the scavenger XFAIL |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/09dee52) | #321 docs: split the scavenger N/Z-liveness crash into its own XFAIL row |
@@ -7,6 +8,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+5bea574	author	Will Norris
+5bea574	added	3
+5bea574	deleted	3
+5bea574	files	1
+5bea574	body	Patch 0009 (ad506ed) landed on main 2026-06-25 and fixed the +mos-a16\n-O1/-Os "ran out of registers" regalloc deadlock on real code\n(globals.c / a16regpress.c) via an orthogonal i8-loop-counter de-pin\n({A}-pinned ADCImm -> relocatable G_INC/G_DEC), NOT the deferred Phase-3\nAc16-residency rework. The dated plan/investigation files already record\nthis; this brings the living reference docs into sync:\n\n- TODO.md: move the globals.c RA-failure bullet to Done (0009 detail);\n  refocus the Watch item on the remaining deferred s16-pressure core\n  (scavenger-N/Z + pr15296 ZP-overflow); update the shared-core framing\n  in the A16-threading + ALU-chain bullets (globals.c crash left the\n  frontier); bump the forward-looking upstream patch count to 0001-0009.\n- implementation-status.md: flip the RA-failure row to FIXED(0009);\n  add it to the #321 TL;DR; correct the XPASS-guard row (only a16scavnz\n  remains asserted-to-crash); header date -> 2026-06-25.\n- 65816-patch-series-review-guide.md: nine patches, add the 0009 row,\n  fix the deferred-core statement + "nine patches" count.\n- ROADMAP.md + agent-handoff.md: patch count 0001-0009; ROADMAP\n  shared-core face list updated.\n- deferred-and-rejected-items.md: globals.c row -> FIXED(0009), keep\n  pr15296 ZP-overflow as the still-deferred sibling.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LRTvYvtgA5tTtrFDw9ih6Z
 f9a33d6	author	Will Norris
 f9a33d6	added	1
 f9a33d6	deleted	1
