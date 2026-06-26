@@ -333,6 +333,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   proof — then **measure** the dispatch cost (disasm: N `__call_indir`/frame, not per-tile; OOP-vs-procedural
   size delta; does C reach `JSR (abs,X)`?) and write the numbers back into oop-in-c.md §4–§5. The "small
   reusable gfx helper" the Blossom item above wants. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md).
+- [ ] **Space Invaders on `snesgfx` — the playable graphical payoff demo (builds out the sprite/OAM front-end).**
+  A real, on-screen Space Invaders (player, 5×11 marching/animating/speeding alien fleet of 3 types, player
+  shot + alien bombs, destructible shields, bonus UFO, score/lives HUD, attract+play) built on `snesgfx` —
+  driving the `SpriteSet` (OAM, "not yet built"), `TextLayer`/`ShieldField` (`BgLayer`), and `Controller`.
+  OOP discipline: objects+methods only, `App` object, vtable seam **only** at the 3 render layers (entities are
+  static-dispatch objects). No far pointers ⇒ builds **default + a16 + xy16** = the full 5-way differential.
+  Verified gold-standard: a portable HAL-free `invaders_logic.h` + host oracle `tools/invaders-sim.c` →
+  deterministic **attract** state-CRC asserted host==default@MAME==a16@MAME==a16@bsnes-jg (`dev/run.sh
+  invaders`) + corpus 5-way slice + two-emulator screenshots, `-verify-machineinstrs` clean. Assets: PNG →
+  `gfx4snes` (foundry `pvsneslib-core`) → committed `.pic`/`.pal` → **objcopied to bank-$00 `.rodata` objects**
+  by `dev/build.sh` (`-O elf32-mos`, `--rename-section .data=.rodata`) and linked — no compiled C arrays.
+  [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md).
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
