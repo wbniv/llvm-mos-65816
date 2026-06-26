@@ -353,6 +353,20 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   **production deploy to https://www.biohack.net/space-invaders/ awaits user OK** (`cd ~/SRC/biohack.net &&
   task publish TAG=v1.0.75`). Future refactor: move HUD/shields from OAM sprites to `TextLayer`/`ShieldField`
   BG layers.
+- [ ] **Compiler stress-test demo battery — algorithm+visual SNES demos**
+  ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
+  host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
+  bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. The selected 9 each hit a
+  distinct codegen corner:
+  - [ ] **#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.
+  - [ ] **#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.
+  - [ ] **#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.
+  - [ ] **#11 Spirograph (hypotrochoid)** — sin/cos LUT + fixed-point mul; shows rose curves.
+  - [ ] **#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.
+  - [ ] **#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.
+  - [ ] **#16 Wireframe 3-D solid** — 3×3 matrix mul + perspective **divide** + Bresenham; shows a spinning solid.
+  - [ ] **#19 π spigot + Monte-Carlo** — multi-precision **carry chains** + div/mod + rng; shows digits + dart scatter.
+  - [ ] **#20 Bignum factorial/Fibonacci** — multi-precision **carry propagation**; shows the giant number on screen.
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
