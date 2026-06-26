@@ -190,8 +190,33 @@ sample well after a deterministic plotted-point count, never at a frame edge (ha
 ## Verification (run end-to-end; paste raw output + PASS/FAIL into this file as steps complete)
 
 1. **Phase-1 gate not regressed:** `dev/run.sh k_hopalong` → still `RESULT: PASS … 0x1BBC`.
-2. **Headless far-RMW gate:** `dev/run.sh blossom` step 1 → grid-hash `host == +mos-a16 @ MAME ==
-   +mos-a16 @ bsnes-jg`; rep/sep ≥4 each on the plot path; `-verify-machineinstrs` clean.
+
+   ```
+   PASS: native 16-bit active (12 rep / 13 sep brackets on the orbit arithmetic)
+   PASS: host oracle corpus_result=0x1BBC == golden 0x1BBC
+   default:   SMOKE: PASS addr=0x7E0200 len=2 got=0x1BBC (ran 120 ticks)
+   +mos-a16:  SMOKE: PASS addr=0x7E0200 len=2 got=0x1BBC (ran 120 ticks)
+   bsnes-jg:  SMOKE: PASS off=0x200 len=2 got=0x1BBC (ran 180 frames)
+   RESULT: PASS — host == default == +mos-a16 (both emulators)
+   ```
+   **PASS** — `hopalong.h` refactor (hop_step shared) is value-preserving; `0x1BBC` holds.
+
+2. **Headless far-RMW gate (Stage 1):** `dev/run.sh blossom-grid` → grid-hash `host == +mos-a16 @ MAME
+   == +mos-a16 @ bsnes-jg`; far-RMW disasm gate; `-verify-machineinstrs` clean.
+
+   ```
+   host grid: maxabs=5895 clamps=0  cells_hit=1050/16384  saturated=0   golden = 0x19DE
+   PASS: far RMW present (lda [dp]=2, sta [dp]=2)
+   PASS: native 16-bit active (rep=20, sep=25)
+   MAME:      SMOKE: PASS addr=0x7E0206 len=2 got=0x19DE (ran 750 ticks)
+   bsnes-jg:  SMOKE: PASS off=0x206 len=2 got=0x19DE (ran 900 frames)
+   RESULT: PASS — Hopalong far-RMW hit grid in high WRAM $7E2000; hash 0x19DE host == +mos-a16
+   ```
+   **PASS** — the new +mos-a16 customer (far read-modify-write at a runtime 24-bit index) is
+   differentially verified. **Found + worked around a far-pointer miscompile en route:** a far constant
+   fill is coalesced to the near `__memset` (wrong bank); fixed in `HOP_DEFINE_CLEAR` with a volatile
+   far store; repro `examples/65816/far_memset.c`, diagnosis `docs/320-far-memset-miscompile.md`.
+
 3. **Render correctness:** `dev/run.sh blossom` → image gate PASS on both emulators; bsnes-jg PNG +
    MAME snapshot written (`build/blossom-*.png`) and visually show the attractor.
 4. **Interaction gate:** `VIEW`/`BLOSSOM: PASS` — host replay of `blossom.h` == ROM `blossom_crc`, for

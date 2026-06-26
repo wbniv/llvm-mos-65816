@@ -61,6 +61,11 @@ Targets:
              per-level image hash (every baked level == host ref) AND a scripted-zoom view-math
              differential (host replay == ROM) on bsnes-jg, plus a MAME snapshot. examples/snes/
              mandel-zoom.c. Live: task mandel-zoom-play
+  blossom-grid #3 Blossom Stage 1: the headless far read-modify-write HIT GRID gate — plot K_GATE
+             Hopalong orbit points into a 128x128 hit-count grid at high WRAM $7E2000 via the far path
+             (each point a far RMW: lda [dp]/saturate/inc/sta [dp] at a runtime index), then far-load
+             hash -> corpus_result. Golden derived from the host oracle (hopalong.h); +mos-a16-only,
+             asserts host == +mos-a16 on MAME + bsnes-jg + a far-RMW disasm gate. examples/65816/k_blossom_far.c
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUE_REPROS repro
              STILL crashes -verify-machineinstrs under both +mos-a16 and +mos-xy16 with its
              expected signature; fails loudly the moment one verifies clean -> drop the entry

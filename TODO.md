@@ -318,6 +318,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Optional perf: SNES hw multiplier (`$4202/$4203→$4216`) for the hot `b*x`.
   [plan](docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md)
   (supersedes [Phase-1 plan](docs/plans/2026-06-24-blossom-snes.md)).
+- [ ] **#320 far-pointer miscompile — a far constant-fill is lowered to the NEAR `__memset` (wrong bank).**
+  Found 2026-06-26 building #3's far hit-grid clear: `grid[i]=0x42` over a `FAR uint8_t*` is coalesced
+  at `-Os` into `jsr __memset`, which drops the 24-bit bank byte and writes `$00:2000` (MMIO/open-bus)
+  instead of `$7E2000` — a **silent** miscompile (a store→load CRC can't catch it; an independent far
+  read does). Root-caused + minimal repro `examples/65816/far_memset.c`; **worked around** for #3 with a
+  volatile far store (`HOP_DEFINE_CLEAR`). **Fix not yet attempted** — smallest correct fix is to stop
+  the loop-idiom recognizer forming `memset`/`memcpy` for `addrspace(2)` (fall back to the inline
+  `sta [dp]` loop), or call a far-aware `__memset_far`; generic to the far feature → upstream-worthy
+  (cf. the `0010` coalescer fix path). [note](docs/320-far-memset-miscompile.md).
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
