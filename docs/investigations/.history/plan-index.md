@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/d9d7f82) | docs(plan-index): add the snesgfx OOP rendering-library plan row (153 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/eeaa1e9) | docs(plan-index): add the far-pointer G_PHI(p2) backend-gap fix row (152 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/1127ddc) | docs(plan-index): add the far-memset wrong-bank fix row (151 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2c07c95) | docs(plan-index): add the xy16-cmove stale-XFAIL resolution row (150 plans) |
@@ -30,6 +31,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+d9d7f82	author	Will Norris
+d9d7f82	added	5
+d9d7f82	deleted	1
+d9d7f82	files	1
+d9d7f82	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 eeaa1e9	author	Will Norris
 eeaa1e9	added	4
 eeaa1e9	deleted	1
