@@ -247,19 +247,30 @@ Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-f
     `ParseKind="LongCall"`** (the same multi-target pattern `interrupt` uses), and a `CGExpr`/`CGExprScalar`
     rewrite to the `store @__mos_far_target` + `call @__call_indir_far` shape. Both a **direct** `far` call
     and a **stored** `far_fn_t fp = far_leaf; fp(x)` pointer work in single-file C (a `far` bit on
-    `FunctionType::ExtInfo` → `ptr addrspace(2)`).
+    `FunctionType::ExtInfo` → `ptr addrspace(2)`). **Completed in Phase B (2026-06-26, `ec4a80b`):** the
+    runtime stub `__call_indir_far`/`__mos_far_target` (`platforms/snes/call-indir-far.s`) — authored on the
+    retired follow-ups worktree but never landed — is now in the tracked SDK, so a far-indirect call **links +
+    runs** (`far_fnptr.c`, `0xFF` both emulators; was `ld.lld: undefined symbol`). Also fixed a **pre-existing
+    far-indirect-from-far-caller miscompile**: a far function calling `__call_indir_far` was mis-routed through
+    `__call_near_from_far` (`IsFarNearThunk` captured the bank-0 thunk global) → stack corruption (the indir
+    thunk `jml`s away, never returns to the near thunk's `pea` site); fix excludes `__call_indir_far` from
+    `IsFarNearThunk` so it JSLs directly (`far_indir_tail.c`).
   - **far-pointer sizing:** `getPointerWidthV(AS2)`→32 + a `getTypeInfoImpl` arm so `sizeof(FAR*) ==
     sizeof(far_fn_t) == 4` (matches the `p2:32:8` IR width).
   - **a crash fix worth flagging upstream-adjacent:** `isFarSymbol` was treating any `.far*`-sectioned
     symbol as far (24-bit), crashing when a `.far_rodata` datum's address is taken as a *near* pointer;
     restricted to **functions** (`isa<Function>`). This is a fix to fork-only far machinery, so it rides the
     same #320 PR rather than standing alone.
-  - **far tail calls (2026-06-23, `4adda8b`):** the post-RA tail-call peephole (`MOSLateOptimization::tailJMP`)
-    keyed only on near `JSR`/`RTS`, so a far function's `JSL g; RTL` tail was never converted. Added a
-    `TailJML` pseudo (→ `JMP_AbsoluteLong`/`$5C`, relocates `R_MOS_ADDR24`) + a far arm
-    `JSL <direct far global>; RTL → TailJML`, gated `isGlobal && .far_` so near→far (`JSL;RTS`) and the bank-0
-    thunks are auto-excluded (conservative — a misclass only misses a win). Far→far tail folds 5 B→4 B.
-    a16-independent; landed in `0001`. Verified `dev/run.sh far_tail` (`0xCB`) MAME+bsnes-jg.
+  - **far tail calls — all three forms (2026-06-23..26, `0001`):** the post-RA tail-call peephole
+    (`MOSLateOptimization::tailJMP`) keyed only on near `JSR`/`RTS`, so a far function's `JSL g; RTL` tail was
+    never converted. Added a `TailJML` pseudo (→ `JMP_AbsoluteLong`/`$5C`, relocates `R_MOS_ADDR24`) + a far
+    arm that now folds **three** provably-far callees, each matched precisely (conservative — a misclass only
+    misses a win): (a) a **direct far global** (`isGlobal && .far_`, `4adda8b`); (b) the **far→near** thunk
+    `__call_near_from_far` (an external symbol — matched by name, `ff3694c`); (c) the **far-indirect** thunk
+    `__call_indir_far` (a bank-0 global — matched by name, Phase B `ec4a80b`). Each folds `JSL;RTL → TailJML`
+    (−1 B, drops the redundant return push/pop); the `RTL` terminator proves the frame is far, so the
+    dangerous near→far `JSL;RTS` shape can't match. a16-independent. Verified `dev/run.sh far_tail`/
+    `far_near_call`/`far_indir_tail` (`0xCB`/`0xE0`/`0xFF`) MAME+bsnes-jg.
   - **far array-subscript miscompile fix (2026-06-25, `0001`):** clang's `EmitArraySubscriptExpr`/`EmitIdxAfterBase`
     (`CGExpr.cpp`) promoted the GEP index to the **default 16-bit `IntPtrTy`** for every address space, so a far
     (AS2, 32-bit) subscript `tbl[idx]` emitted `sext_i16(idx)*2` — truncating indices ≥ 32768 and corrupting the

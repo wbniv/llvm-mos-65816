@@ -123,9 +123,9 @@ FAIL. Appended `0010`/`0011`/`0012` (the script's own contract: "append new patc
 
 ---
 
-## 4. Phase B proof — far-indirect calls don't link on `main`
+## 4. The Phase B discovery — far-indirect calls didn't link on `main` (now FIXED)
 
-A minimal clang `far`-attribute call, compiled with the worktree toolchain:
+What blocked Phase B at first: a minimal clang `far`-attribute call compiled fine but failed to link —
 
 ```
 $ mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c probe.c
@@ -133,15 +133,15 @@ $ mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a1
         00000018:  R_MOS_ADDR24  __call_indir_far          # compiles fine
 $ mos-clang --config mos-snes-far.cfg -mcpu=mosw65816 +mos-a16 -Os -o probe.sfc probe.c
   ld.lld: error: undefined symbol: __mos_far_target
-  ld.lld: error: undefined symbol: __call_indir_far        # <-- the gap
+  ld.lld: error: undefined symbol: __call_indir_far        # <-- the gap, since FIXED
 ```
 
-`__call_indir_far` / `__mos_far_target` exist nowhere in the live SDK; the snes `CMakeLists.txt` builds crt0
-from only `crt0.c header.s call-near-from-far.s`. So far-indirect calls are unlinkable on `main` — its
-thunk-tail opt is premature. **Recommended follow-up (separate plan):** restore `platforms/snes/call-indir-far.s`
-(`jml (__mos_far_target)` + the 4-byte `.noinit` slot) per `docs/plans/2026-06-21-320-far-calls-followups.md`
-§, add a far-indirect-**call** e2e (resurrect `far_fnptr.c`), confirm it links + runs on both emulators, THEN
-add the `IndirFarThunk` arm (its stack proof: the stub pushes nothing, so the far target's `RTL` pops `R_F`).
+`__call_indir_far` / `__mos_far_target` existed nowhere in the live SDK (the snes `CMakeLists.txt` built crt0
+from only `crt0.c header.s call-near-from-far.s`) — the runtime stub was authored on the retired
+`wt/320-far-followups` worktree but never landed. **RESOLVED** by Phase B (§0): landed the stub into the
+tracked `platforms/snes/`, restored the `far_fnptr.c` e2e, and (building a *far-caller* test) found + fixed
+the deeper far-indirect-from-far-caller miscompile, then added the `IndirFarThunk` fold arm. See §5b for the
+post-fix verification.
 
 ---
 
