@@ -26,6 +26,7 @@
 #include "mode7.h"
 #include "../65816/hopalong.h"
 #include "blossom.h"
+#include "hud.h"
 
 #ifndef K_GATE
 #define K_GATE 8000        // deterministic boot accumulation = the grid differential anchor (classic).
@@ -87,8 +88,10 @@ static void build_palette(uint8_t mode) {
 // has to fire the DMA.
 static void stage_palette(uint8_t cyc) {
   cgbuf[0] = 0;                                    // index 0 = black backdrop
-  for (uint16_t i = 1; i < 256; i++) {
-    uint16_t src = i + cyc; if (src > 255) src -= 255;   // rotate within 1..255
+  cgbuf[1] = 0x7FE0;                               // index 1 = CYAN — RESERVED for the HUD (hud.h);
+                                                   // kept off the attractor cycle (build_band skips 1)
+  for (uint16_t i = 2; i < 256; i++) {
+    uint16_t src = i + cyc; while (src > 255) src -= 254;   // rotate within 2..255
     cgbuf[i] = pal[src];
   }
 }
@@ -110,7 +113,9 @@ __attribute__((noinline)) static void build_band(uint8_t trow) {
     for (uint8_t r = 0; r < 8; r++)
       for (uint8_t c = 0; c < 8; c++) {
         uint8_t x = (uint8_t)(tcol * 8 + c), y = (uint8_t)(trow * 8 + r);
-        chrbuf[(uint16_t)tcol * 64 + (uint16_t)r * 8 + c] = grid[(uint16_t)((uint16_t)y * HOP_GRID + x)];
+        uint8_t cnt = grid[(uint16_t)((uint16_t)y * HOP_GRID + x)];   // raw hit count (grid is gated)
+        // Display index skips CGRAM 1 (reserved for the HUD): 0 stays backdrop, 1..255 -> 2..255.
+        chrbuf[(uint16_t)tcol * 64 + (uint16_t)r * 8 + c] = cnt ? (uint8_t)(cnt < 255 ? cnt + 1 : 255) : 0;
       }
 }
 
@@ -121,6 +126,32 @@ static void dma_chr_to(uint16_t destword) {
   REG_A1T0L = (uint8_t)(uintptr_t)chrbuf; REG_A1T0H = (uint8_t)((uintptr_t)chrbuf >> 8); REG_A1B0 = 0x00;
   REG_DAS0L = (uint8_t)ROW_BYTES; REG_DAS0H = (uint8_t)(ROW_BYTES >> 8);
   REG_MDMAEN = 0x01;
+}
+
+// Live HUD value bar: assemble the field strings from the view state (in active display), then
+// hud_text them in vblank when something changed. Row 0 = preset name + a/b/c; row 1 = palette + zoom.
+// Padded to fixed widths so a shorter value clears the previous one. The bottom legend is static.
+static const char *const PRESET_NAME[BLOSSOM_NPRESET] = { "CLASSIC", "DENSE", "BLOOM" };
+static char hud_row0[28];   // "<name pad 8>A.. B.. C.."  (padded to 27)
+static char hud_row1[20];   // "PALn  ZOOM z.zX"          (padded to 16)
+
+static void hud_build(const blossom_t *v) {
+  char *p = hud_row0;
+  uint8_t k = 0;
+  for (const char *nm = PRESET_NAME[v->preset]; *nm; nm++) { *p++ = *nm; k++; }
+  while (k++ < 8) *p++ = ' ';                                  // pad name to 8 cols (a/b/c aligned)
+  *p++ = 'A'; p += hud_fmt_q88(BLOSSOM_PA[v->preset], p); *p++ = ' ';
+  *p++ = 'B'; p += hud_fmt_q88(BLOSSOM_PB[v->preset], p); *p++ = ' ';
+  *p++ = 'C'; p += hud_fmt_q88(BLOSSOM_PC[v->preset], p);
+  while (p < hud_row0 + 27) *p++ = ' ';                        // pad to clear any previous longer value
+  *p = '\0';
+
+  char *q = hud_row1;
+  *q++ = 'P'; *q++ = 'A'; *q++ = 'L'; *q++ = (char)('0' + v->pal);
+  *q++ = ' '; *q++ = ' '; *q++ = 'Z'; *q++ = 'O'; *q++ = 'O'; *q++ = 'M'; *q++ = ' ';
+  q += hud_fmt_zoom(v->zoom, q);
+  while (q < hud_row1 + 16) *q++ = ' ';
+  *q = '\0';
 }
 
 int main(void) {
@@ -136,6 +167,8 @@ int main(void) {
   build_palette(v.pal);
   m7_set_matrix(v.zoom, 0x0000, 0x0000, v.zoom);
   m7_set_scroll(0, 0);
+  hud_begin();                            // BG3 text bars + HDMA screen-split (Mode 7 plot box)
+  hud_text(HUD_BOT_ROW, 1, "LR ZOOM AY ATTR SEL COL ST RST");   // static control legend
   m7_show();                              // release force-blank; the attractor BLOOMS in live below
   REG_NMITIMEN = NMITIMEN_NMI;            // VBlank NMI -> snes_wait_vblank pacing
 
@@ -145,10 +178,14 @@ int main(void) {
   // cheap 60 fps motion is pure CGRAM palette-cycling. A preset change resets the cap -> re-bloom.
   uint16_t crc = 0xFFFF, done = 0;
   uint8_t  nf = 0, trow = 0, gated = 0;
+  uint8_t  hud_p = 0xFF, hud_pal = 0xFF, hud_need = 0; int16_t hud_z = 0;   // HUD value-bar shadow
   for (;;) {
     uint16_t pad = snes_read_pad1();
     blossom_step(&v, pad);
     short a = BLOSSOM_PA[v.preset], b = BLOSSOM_PB[v.preset], c = BLOSSOM_PC[v.preset];
+    if (v.preset != hud_p || v.pal != hud_pal || v.zoom != hud_z) {  // value bar changed -> rebuild
+      hud_p = v.preset; hud_pal = v.pal; hud_z = v.zoom; hud_build(&v); hud_need = 1;
+    }
     if (v.dirty) {                         // preset/reset changed -> clear + re-bloom from scratch
       grid_clear(grid);
       orbit.x = 0; orbit.y = 0;
@@ -166,6 +203,11 @@ int main(void) {
     dma_cgram();
     m7_set_matrix(v.zoom, 0x0000, 0x0000, v.zoom);
     m7_set_scroll((uint16_t)v.cx, (uint16_t)v.cy);
+    if (hud_need) {                        // push the rebuilt value bar (vblank: VRAM writable)
+      hud_text(HUD_TOP_ROW, 1, hud_row0);
+      hud_text((uint8_t)(HUD_TOP_ROW + 1), 1, hud_row1);
+      hud_need = 0;
+    }
     trow = (uint8_t)((trow + 1) & (TILES - 1));
 
     // Boot grid gate: once the CLASSIC attractor is fully + deterministically bloomed, hash it ==

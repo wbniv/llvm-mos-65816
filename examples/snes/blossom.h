@@ -91,6 +91,39 @@ static inline uint16_t blossom_crc16_byte(uint16_t crc, uint8_t b) {
   return crc;
 }
 
+// --- HUD field formatting (PURE; host-linkable). Drives the on-screen value bar (examples/snes/hud.h)
+// AND is folded into blossom_crc by blossom_fold below, so the format math is host == +mos-a16 verified
+// (a discrepancy — int size, char signedness — breaks the gate). Keep every cast load-bearing. ---
+
+// Write a Q8.8 signed value to buf as "[-]I.FF" (2 fraction digits, rounded). Returns chars written.
+static inline uint8_t hud_fmt_q88(int16_t q, char *buf) {
+  uint8_t n = 0;
+  if (q < 0) { buf[n++] = '-'; q = (int16_t)-q; }
+  uint16_t mag = (uint16_t)q;
+  uint16_t ip = (uint16_t)(mag >> 8);
+  uint16_t fp = (uint16_t)(((uint16_t)(mag & 0xFFu) * 100u + 128u) >> 8);   // rounded 2-digit fraction
+  if (fp >= 100u) { fp = (uint16_t)(fp - 100u); ip = (uint16_t)(ip + 1u); }
+  if (ip >= 10u) buf[n++] = (char)('0' + ip / 10u);
+  buf[n++] = (char)('0' + ip % 10u);
+  buf[n++] = '.';
+  buf[n++] = (char)('0' + fp / 10u);
+  buf[n++] = (char)('0' + fp % 10u);
+  return n;
+}
+
+// Write the Mode-7 zoom as a magnification "M.MX" (one decimal). mag*10 = 256/zoom * 10 = 2560/zoom.
+static inline uint8_t hud_fmt_zoom(int16_t zoom, char *buf) {
+  uint16_t m10 = (uint16_t)(2560u / (uint16_t)zoom);
+  uint8_t n = 0;
+  uint16_t ip = (uint16_t)(m10 / 10u);
+  if (ip >= 10u) buf[n++] = (char)('0' + ip / 10u);
+  buf[n++] = (char)('0' + ip % 10u);
+  buf[n++] = '.';
+  buf[n++] = (char)('0' + m10 % 10u);
+  buf[n++] = 'X';
+  return n;
+}
+
 // Fold one frame's state into the rolling CRC (little-endian). The proof channel: host replay over
 // the logged pads must reproduce the ROM's value exactly.
 static inline uint16_t blossom_fold(uint16_t crc, const blossom_t *v) {
@@ -104,6 +137,13 @@ static inline uint16_t blossom_fold(uint16_t crc, const blossom_t *v) {
   crc = blossom_crc16_byte(crc, (uint8_t)((uint16_t)v->cx >> 8));
   crc = blossom_crc16_byte(crc, (uint8_t)v->cy);
   crc = blossom_crc16_byte(crc, (uint8_t)((uint16_t)v->cy >> 8));
+  // HUD format channel: fold the on-screen field bytes (preset a/b/c decimals + zoom magnification) so
+  // the format math (hud_fmt_q88 / hud_fmt_zoom) is exercised host == +mos-a16 over the logged input.
+  char buf[8]; uint8_t n, i;
+  n = hud_fmt_q88(BLOSSOM_PA[v->preset], buf); for (i = 0; i < n; i++) crc = blossom_crc16_byte(crc, (uint8_t)buf[i]);
+  n = hud_fmt_q88(BLOSSOM_PB[v->preset], buf); for (i = 0; i < n; i++) crc = blossom_crc16_byte(crc, (uint8_t)buf[i]);
+  n = hud_fmt_q88(BLOSSOM_PC[v->preset], buf); for (i = 0; i < n; i++) crc = blossom_crc16_byte(crc, (uint8_t)buf[i]);
+  n = hud_fmt_zoom(v->zoom, buf);              for (i = 0; i < n; i++) crc = blossom_crc16_byte(crc, (uint8_t)buf[i]);
   return crc;
 }
 

@@ -320,6 +320,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `+mos-a16` — clean `-verify`, runtime runaway; NOT minimally reproduced — isolated repros pass; worked
   around with the band/near-staging structure). [plan](docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md)
   (supersedes [Phase-1 plan](docs/plans/2026-06-24-blossom-snes.md)).
+  - [ ] **On-screen field/value HUD + plot-box reframe (split-screen).** Answers "the graphic fills the
+    whole screen / there are no fields & values to adjust": carve the screen with an **HDMA mode-split**
+    (`BGMODE`+`TM` per-scanline) into a **Mode 7 plot box** with **tiled BG3 value/control bars** top &
+    bottom (Mockup A) showing the live `a/b/c`/zoom/palette fields + the control legend. New reusable
+    `examples/snes/{hud,font8}.h` — the **first HDMA + BG-text** in the repo. Gates unaffected
+    (`0x9047` grid / `blossom_crc`); HUD format math folded into `blossom_crc` to stay verified.
+    [plan](docs/plans/2026-06-26-blossom-split-screen-hud-mode-7-plot-box-tiled-bg3.md).
 - [ ] **#320 far-pointer miscompile — a far constant-fill is lowered to the NEAR `__memset` (wrong bank).**
   Found 2026-06-26 building #3's far hit-grid clear: `grid[i]=0x42` over a `FAR uint8_t*` is coalesced
   at `-Os` into `jsr __memset`, which drops the 24-bit bank byte and writes `$00:2000` (MMIO/open-bus)
