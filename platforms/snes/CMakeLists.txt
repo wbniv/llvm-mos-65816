@@ -18,10 +18,12 @@ install(FILES
   TYPE INCLUDE)
 
 # crt0: SNES bring-up + cartridge header, relocatably linked into crt0.o.
-# call-near-from-far.s: the #320 far->near mixed-banking thunk (__call_near_from_far),
-# in its own section so --gc-sections drops it from ROMs that make no far->near call
-# (near-only ROMs stay byte-identical; it is pulled only when a JSL references it).
-add_platform_object_file(snes-crt0-o crt0.o crt0.c header.s call-near-from-far.s)
+# call-near-from-far.s: the #320 far->near mixed-banking thunk (__call_near_from_far).
+# call-indir-far.s: the #320 far function-pointer thunk (__call_indir_far + the
+# __mos_far_target slot). Both live in their own sections so --gc-sections drops them
+# from ROMs that make no far->near / far-indirect call (near-only ROMs stay
+# byte-identical; each is pulled only when a JSL references it).
+add_platform_object_file(snes-crt0-o crt0.o crt0.c header.s call-near-from-far.s call-indir-far.s)
 # crt0.c's native-mode preamble (XCE/REP/SEP/PHK/PLB + a 16-bit LDX) and the
 # far->near thunk (PEA/RTL) use 65816-only instructions, so build them with
 # -mcpu=mosw65816. crt0.c ALSO needs -fno-lto: its preamble is MODULE-LEVEL inline
@@ -32,6 +34,7 @@ add_platform_object_file(snes-crt0-o crt0.o crt0.c header.s call-near-from-far.s
 # .s thunk is assembled directly (no LTO bitcode), so it only needs -mcpu.
 set_source_files_properties(crt0.c PROPERTIES COMPILE_OPTIONS "-mcpu=mosw65816;-fno-lto")
 set_source_files_properties(call-near-from-far.s PROPERTIES COMPILE_OPTIONS "-mcpu=mosw65816")
+set_source_files_properties(call-indir-far.s PROPERTIES COMPILE_OPTIONS "-mcpu=mosw65816")
 
 # Pull in the common startup pieces (soft-stack init, .data copy, .bss clear,
 # exit-as-infinite-loop — there is no OS to return to on a console).

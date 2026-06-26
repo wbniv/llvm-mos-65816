@@ -71,6 +71,10 @@ build_rom far_store mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
 build_rom far_call  mos-snes-far.cfg
 build_rom far_near_call mos-snes-far.cfg
 build_rom far_tail  mos-snes-far.cfg
+# #320 far function pointers: indirect call through __call_indir_far (needs +mos-a16).
+build_rom far_fnptr mos-snes-far.cfg -Xclang -target-feature -Xclang +mos-a16
+# #320 Phase B: a far function's far-indirect TAIL folds to a long jmp __call_indir_far.
+build_rom far_indir_tail mos-snes-far.cfg -Xclang -target-feature -Xclang +mos-a16
 # #320 packed-24 (addrspace 3) Increment B: 3-byte packed far pointer round-trip,
 # bank $01 (needs +mos-a16; source lives in the packed24/ subdir).
 if [ ! -f "$BUILD/packed24_e2e.sfc" ] || [ ! -f "$BUILD/packed24_e2e.map" ]; then
@@ -121,6 +125,8 @@ xassert "$BUILD/far_store.sfc" "$BUILD/far_store.map" corpus_result 0xF3   # ban
 xassert "$BUILD/far_call.sfc"  "$BUILD/far_call.map"  corpus_result 0xF3   # bank $01, far call (JSL) + RTL return
 xassert "$BUILD/far_near_call.sfc" "$BUILD/far_near_call.map" corpus_result 0xE0 # bank $01 far -> near via __call_near_from_far (JSL thunk)
 xassert "$BUILD/far_tail.sfc"  "$BUILD/far_tail.map"  corpus_result 0xCB   # bank $01 far -> far TAIL calls folded to long jmp (TailJML $5C); path-A value (fall-through would be 0xE0)
+xassert "$BUILD/far_fnptr.sfc" "$BUILD/far_fnptr.map" corpus_result 0xFF   # bank $01 far INDIRECT call via __call_indir_far (JSL -> jml (__mos_far_target)); far_leaf(0x5A)^0xA5
+xassert "$BUILD/far_indir_tail.sfc" "$BUILD/far_indir_tail.map" corpus_result 0xFF # bank $01 far-indirect TAIL folded to long jmp __call_indir_far (TailJML $5C); far_outer(0x5A)
 xassert "$BUILD/packed24_e2e.sfc" "$BUILD/packed24_e2e.map" corpus_result 0xF3 # bank $01, packed-24 (3-byte) far ptr store/load + deref
 xassert "$BUILD/packed24_table.sfc" "$BUILD/packed24_table.map" corpus_result 0xA5 # bank $01, STATIC packed-24 far-ptr table (8x3 B, ADDR24 reloc per entry)
 

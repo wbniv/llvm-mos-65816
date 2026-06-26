@@ -1,9 +1,11 @@
-# #320 thunk tail calls — far→near folds; far-indirect is BLOCKED
+# #320 thunk tail calls — far→near + far-indirect both fold
 
 **Date:** 2026-06-26 · **Issue:** #320 (M1, far pointers/calls) · **Status:** ✅ **Phase A DONE + verified
-both emulators** (far→near thunk tail). ⛔ **Phase B BLOCKED** — far-indirect calls don't link on `main`
-(prerequisite unlanded). · **Builds on:** `4adda8b` (direct far→far tail, the `TailJML` pseudo + far arm) ·
-**Worktree:** `wt/320-far-tail-thunks`.
+both emulators** (far→near thunk tail, landed `ff3694c`). ✅ **Phase B DONE + verified both emulators** — the
+`__call_indir_far` runtime stub landed, a far-indirect *call* now links/runs, a **pre-existing
+far-indirect-from-far-caller miscompile was found + fixed**, and the far-indirect thunk tail folds. ·
+**Builds on:** `4adda8b` (direct far→far tail, the `TailJML` pseudo + far arm) · **Worktrees:**
+`wt/320-far-tail-thunks` (Phase A), `wt/320-far-indir-stub` (Phase B).
 
 ---
 
@@ -20,12 +22,22 @@ cases deliberately excluded** (the conservative gate keyed on `isGlobal() && .fa
 name. Per converted far→near tail: **−1 B** + the redundant push/pop dropped. Conservative — matched by exact
 name (mirrors how `MOSCallLowering` special-cases the same symbol), so any other `JSL` is left alone.
 
-**Phase B (c) is BLOCKED by a prerequisite, not by the gate.** A far-indirect *call* doesn't even link on
-`main`: `__call_indir_far`'s runtime stub (`call-indir-far.s` + the `__mos_far_target` slot) was never landed
-into the tracked `platforms/snes/` or the SDK — only WIP commits (`7ee5f6f`, `1ea7507`) exist. Proven below
-(§4). Optimizing the tail of a path that doesn't link is premature; the `IndirFarThunk` arm was intentionally
-**not** added. Recommended follow-up: land the stub + a far-indirect-**call** e2e first (that also closes a
-latent overclaim — the status doc lists far-fn-pointer *calls* as "done + landed", but they don't link).
+**Phase B (c) is now DONE** (was blocked on an unlanded prerequisite). Three pieces:
+1. **Landed the runtime stub** `platforms/snes/call-indir-far.s` (`__call_indir_far`: `jml (__mos_far_target)`
+   + the 4-byte `__mos_far_target` `.noinit` slot) + wired it into `platforms/snes/CMakeLists.txt` (gc-sectioned,
+   `-mcpu=mosw65816`). A far-indirect *call* now links (was `ld.lld: undefined symbol: __call_indir_far`).
+   Resurrected the e2e `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` (`far_leaf(0x5A)==0xFF`, both emulators).
+2. **Found + fixed a pre-existing far-indirect-from-far-caller miscompile.** A far function calling
+   `__call_indir_far` was mis-routed through `__call_near_from_far` (`IsFarNearThunk` fired for the bank-0
+   `__call_indir_far` global, overriding `IsFarIndirThunk`) — but `__call_indir_far` `jml`s away and never
+   returns to the near thunk's `pea` site, so the far target's `RTL` popped a corrupted address. Fix:
+   exclude `__call_indir_far` from `IsFarNearThunk` (it must JSL directly). Now a far caller `JSL`s it directly,
+   exactly like a near caller. New gate `examples/65816/far_indir_tail.c` (`far_outer` far-indirect tail).
+3. **Added the `IndirFarThunk` fold arm** (now live, post-fix): `JSL __call_indir_far; RTL` → `TailJML`
+   (the indir thunk pushes nothing, so the far target's `RTL` pops the original caller's return — proof even
+   simpler than (b)). `far_indir_tail` folds to `$5C` and runs `0xFF` on both emulators.
+
+Both thunk-tail cases now fold; the conservative gate matches all three callees by exact symbol/section.
 
 ---
 
@@ -188,10 +200,35 @@ diff(regenerated 0001, main's 0001) = only the StringRef include + the far-arm b
 
 ---
 
+## 5b. Phase B verification — all PASS (2026-06-26, worktree `wt/320-far-indir-stub`)
+
+SDK rebuilt (the stub lands in the snes crt0); toolchain rebuilt (lowerCall fix + IndirFarThunk arm;
+`MOSCallLowering.cpp.o` + `MOSLateOptimization.cpp.o` recompiled).
+
+**1. far-indirect CALL links + runs (`dev/run.sh far_fnptr`, near caller):**
+```
+  PASS: far indirect call -> JSL __call_indir_far
+  PASS: 24-bit target materialization carries a bank (R_MOS_ADDR24_BANK) reloc
+  PASS: __call_indir_far linked into the ROM      # was: ld.lld undefined symbol
+SMOKE: PASS addr=0x7E0200 len=1 got=0xFF (ran 60 ticks)   # far_leaf(0x5A)^0xA5
+```
+**2. far-indirect TAIL folds + the far-caller fix (`dev/run.sh far_indir_tail`):**
+```
+      17: 5c 00 00 00  jmp  $0 <far_leaf>
+            00000018:  R_MOS_ADDR24  __call_indir_far     # was R_MOS_ADDR24 __call_near_from_far (the bug)
+  PASS: far_outer's far-indirect tail folded to a long jmp __call_indir_far ($5C, R_MOS_ADDR24); no jsl/rtl
+  PASS: far_leaf keeps its own rtl
+SMOKE: PASS addr=0x7E0200 len=1 got=0xFF (ran 60 ticks)
+```
+**3. Both emulators + no regression (`dev/run.sh xcheck`, bsnes-jg — all 14 far ROMs):** `far_fnptr 0xFF`,
+`far_indir_tail 0xFF`, `far_near_call 0xE0` (unaffected by the fix), `far_tail 0xCB`, rest `0xF3`/`0xA5`.
+**4. Default unaffected:** corpus 7/7; csmith fuzz 50 0-mismatch.
+
 ## 6. Scope / non-goals
 
-- **In scope:** the far→near thunk tail `JSL __call_near_from_far; RTL` → `TailJML`.
-- **Blocked (prerequisite unlanded):** the far-indirect thunk tail — `__call_indir_far` doesn't link (§4).
+- **In scope:** all three thunk-tail cases — direct far→far (`4adda8b`), far→near (`__call_near_from_far`,
+  Phase A), far-indirect (`__call_indir_far`, Phase B) — plus landing the indir-far runtime stub and fixing
+  the far-indirect-from-far-caller call miscompile (the prerequisite that made (c) real).
 - **Not needed:** a new pseudo (reuse `TailJML`), any GISel tail path (the peephole is the whole mechanism).
 
 ## 7. Upstream

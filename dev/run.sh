@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_call|far_near_call|far_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -114,6 +114,12 @@ Targets:
   far_tail   #320 far tail calls: build examples/65816/far_tail.c (snes-far), assert a
              far->far TAIL call is folded to a long jmp ($5C TailJML, not jsl+rtl),
              boot in MAME, check the value folded main->far_outer->far_inner == 0xE0
+  far_fnptr  #320 far function pointers: build examples/65816/far_fnptr.c (snes-far,
+             +mos-a16), assert a far INDIRECT call routes JSL __call_indir_far (thunk:
+             jml (__mos_far_target)), boot in MAME, check far_leaf(0x5A) == 0xFF
+  far_indir_tail #320 Phase B: build examples/65816/far_indir_tail.c (snes-far, +mos-a16),
+             assert a far function's far-INDIRECT tail folds to a long jmp __call_indir_far
+             ($5C TailJML, not jsl+rtl), boot in MAME, check far_outer(0x5A) == 0xFF
   farindex   #320 "far data > 2 banks" gate: a const FAR uint16_t tbl[] spanning banks
              $C1..$C3 (98304 x uint16, snes-hirom) read at 3 volatile indices (100/50000/
              90000) that land in 3 distinct banks via lda [dp] (A7, R_MOS_ADDR24); folds
