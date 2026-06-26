@@ -152,12 +152,14 @@ static void inv_fleet_cols(const inv_state *s, uint8_t *lo, uint8_t *hi) {
   *lo = any ? l : 0; *hi = any ? h : 0;
 }
 
-/* ONE simulation frame. No joypad: the player is a scripted attract AI. noinline bounds a16
+/* ONE simulation frame, with player intent (move ∈ {-1,0,+1}, fire ∈ {0,1}) — OR move==INV_AI to run
+   the deterministic scripted attract AI (the gate path; inv_step() wraps this). noinline bounds a16
    register pressure (handoff §4), exactly like mandel_cell / k_prng. */
+#define INV_AI ((int8_t)2)        /* move sentinel: use the scripted attract AI */
 #if defined(__clang__) || defined(__GNUC__)
 __attribute__((noinline))
 #endif
-static void inv_step(inv_state *s) {
+static void inv_step2(inv_state *s, int8_t move, uint8_t fire) {
   s->frame = (uint16_t)(s->frame + 1);
 
   /* ---- fleet march ---- */
@@ -178,23 +180,31 @@ static void inv_step(inv_state *s) {
     }
   }
 
-  /* ---- scripted player AI (deterministic attract) ---- */
+  /* ---- player: scripted AI in attract (move==INV_AI), else driven by (move,fire) ---- */
   if (s->player_cool) s->player_cool = (uint8_t)(s->player_cool - 1);
-  /* focus on the UFO if present, else a (slowly wandering) alive column */
-  int16_t target;
-  if (s->ufo_live) target = s->ufo_x;
-  else {
-    uint8_t fc = (uint8_t)((s->frame >> 4) % INV_COLS);          /* sweep columns over time   */
-    if ((inv_rng(s) & 0x3f) == 0) fc = (uint8_t)(inv_rng(s) % INV_COLS);  /* occasional jump   */
-    uint8_t tries = 0;
-    while (!inv_lowest_in_col(s, fc) && tries < INV_COLS) { fc = (uint8_t)((fc + 1) % INV_COLS); tries++; }
-    target = (int16_t)(inv_alien_x(s, fc) + (INV_ALIEN_W - INV_PLAYER_W) / 2);
+  int16_t target = 0;
+  uint8_t do_fire = fire;
+  if (move == INV_AI) {
+    /* focus on the UFO if present, else a (slowly wandering) alive column */
+    if (s->ufo_live) target = s->ufo_x;
+    else {
+      uint8_t fc = (uint8_t)((s->frame >> 4) % INV_COLS);          /* sweep columns over time   */
+      if ((inv_rng(s) & 0x3f) == 0) fc = (uint8_t)(inv_rng(s) % INV_COLS);  /* occasional jump   */
+      uint8_t tries = 0;
+      while (!inv_lowest_in_col(s, fc) && tries < INV_COLS) { fc = (uint8_t)((fc + 1) % INV_COLS); tries++; }
+      target = (int16_t)(inv_alien_x(s, fc) + (INV_ALIEN_W - INV_PLAYER_W) / 2);
+    }
+    if (s->player_x < target) s->player_x = (int16_t)(s->player_x + 2);
+    else if (s->player_x > target) s->player_x = (int16_t)(s->player_x - 2);
+  } else {
+    s->player_x = (int16_t)(s->player_x + (int16_t)(move * 2));
   }
-  if (s->player_x < target) s->player_x = (int16_t)(s->player_x + 2);
-  else if (s->player_x > target) s->player_x = (int16_t)(s->player_x - 2);
   if (s->player_x < 8) s->player_x = 8;
   if (s->player_x > (int16_t)(INV_SCRW - INV_PLAYER_W - 8)) s->player_x = (int16_t)(INV_SCRW - INV_PLAYER_W - 8);
-  if (!s->pbul_live && !s->player_cool && (int16_t)(target - s->player_x) > -6 && (int16_t)(target - s->player_x) < 6) {
+  if (move == INV_AI)
+    do_fire = (uint8_t)(!s->pbul_live && !s->player_cool &&
+                        (int16_t)(target - s->player_x) > -6 && (int16_t)(target - s->player_x) < 6);
+  if (do_fire && !s->pbul_live && !s->player_cool) {
     s->pbul_live = 1; s->player_cool = 18;
     s->pbul_x = (int16_t)(s->player_x + INV_PLAYER_W / 2);
     s->pbul_y = INV_PLAYER_Y;
@@ -272,6 +282,9 @@ static void inv_step(inv_state *s) {
     if (s->lives == 0) { s->lives = 3; s->score = 0; s->wave = 0; inv_fleet_reset(s, 0); }  /* attract: loop */
   }
 }
+
+/* The deterministic attract step (the gate / host-oracle path): scripted AI, no input. */
+static inline void inv_step(inv_state *s) { inv_step2(s, INV_AI, 0); }
 
 /* serialize the state into a fixed byte order (NOT a struct memcpy). */
 static uint16_t inv_serialize(const inv_state *s, uint8_t *b) {

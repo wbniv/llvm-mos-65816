@@ -13,6 +13,7 @@
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/sprite_set.h"
+#include "snesgfx/controller.h"
 #include "invaders_logic.h"
 #include "invaders_art.h"
 
@@ -60,13 +61,16 @@ static void render(const inv_state *s, SpriteSet *spr) {
     }
 }
 
-// The application is an object: it owns the Display, the SpriteSet, the sim, and the attract CRC state.
+// The application is an object: it owns the Display, the SpriteSet, the sim, input, and CRC state.
+enum { MODE_ATTRACT = 0, MODE_PLAY = 1 };
 typedef struct {
-  Display   screen;
-  SpriteSet sprites;
-  inv_state sim;
-  uint16_t  roll;
-  uint16_t  frame;
+  Display    screen;
+  SpriteSet  sprites;
+  Controller pad;
+  inv_state  sim;
+  uint16_t   roll;
+  uint16_t   frame;
+  uint8_t    mode;
 } Game;
 
 volatile uint16_t corpus_result;   // differential proof channel (read from WRAM)
@@ -78,20 +82,33 @@ static void game_init(Game *g) {
   upq_push_cgram(&g->screen.q, 0, &backdrop, 0x00, 2);                               // backdrop black
   upq_push_vram(&g->screen.q, SPR_CHR, INV_TILES, 0x00, INV_TILES_LEN, VMAIN_INC_HIGH_1);  // gfx4snes tiles
   sprite_set_palette(&g->sprites, &g->screen.q, /*group*/ 0, INV_PAL, (uint8_t)INV_PAL_LEN); // gfx4snes palette
+  controller_init(&g->pad);
   inv_init(&g->sim);
   g->roll = 0xFFFF;
   g->frame = 0;
+  g->mode = MODE_ATTRACT;
 }
 
-// One attract frame: advance the deterministic sim, fold the rolling CRC, latch at INV_FRAMES.
-// noinline for the same a16 register-pressure reason (inv_step is already noinline in the header).
+// One frame. ATTRACT: the deterministic scripted sim (the gate path) — fold + latch the CRC at
+// INV_FRAMES, then keep playing the demo; START hands control to the player. PLAY: the pad drives
+// the player (D-pad to move, A/B/Y to fire), SELECT returns to attract. noinline bounds a16 pressure.
 __attribute__((noinline))
-static void game_step(Game *g) {
-  if (g->frame < (uint16_t)INV_FRAMES) {
-    inv_step(&g->sim);
-    g->roll = inv_fold(g->roll, &g->sim);
-    if (++g->frame == (uint16_t)INV_FRAMES)
-      corpus_result = (uint16_t)(g->roll ^ inv_state_crc(&g->sim));   // == host oracle == 0x3DAC
+static void game_update(Game *g) {
+  controller_poll(&g->pad);
+  if (g->mode == MODE_ATTRACT) {
+    inv_step(&g->sim);                                       // scripted AI (deterministic)
+    if (g->frame < (uint16_t)INV_FRAMES) {
+      g->roll = inv_fold(g->roll, &g->sim);
+      if (++g->frame == (uint16_t)INV_FRAMES)
+        corpus_result = (uint16_t)(g->roll ^ inv_state_crc(&g->sim));   // == host oracle == 0x3DAC
+    }
+    if (controller_pressed(&g->pad) & JOY_START) { inv_init(&g->sim); g->mode = MODE_PLAY; }
+  } else {
+    uint16_t h = controller_held(&g->pad);
+    int8_t  mv = (h & JOY_LEFT) ? (int8_t)-1 : (h & JOY_RIGHT) ? (int8_t)1 : (int8_t)0;
+    uint8_t fr = (controller_pressed(&g->pad) & (JOY_A | JOY_B | JOY_Y)) ? 1u : 0u;
+    inv_step2(&g->sim, mv, fr);
+    if (controller_pressed(&g->pad) & JOY_SELECT) { inv_init(&g->sim); g->mode = MODE_ATTRACT; }
   }
 }
 
@@ -99,7 +116,7 @@ int main(void) {
   static Game g;
   game_init(&g);
   for (;;) {
-    game_step(&g);
+    game_update(&g);
     render(&g.sim, &g.sprites);
     display_frame(&g.screen);     // wait v-blank, emit OAM, flush DMA, release force-blank on frame 1
   }
