@@ -39,6 +39,13 @@
 #define ROW_BYTES 1024     // one Mode 7 tile-row of character data (16 tiles * 64 bytes)
 #define PADLOG_N  64       // bounded, fully-logged verifiable window (frames)
 
+// Mode 7 scroll bias that CENTRES the attractor in the plot box. The pivot (m7_set_center) is the grid
+// centre 64,64 = the attractor's geometric centre (orbit starts at 0,0 -> hop_map -> 64,64; the cloud
+// spans grid ~18..110). To land grid 64 at the screen centre (128, 112) the Mode 7 scroll must be
+// pivot - screen_centre. Pan (cx,cy) adds to this; zoom then magnifies around the centred attractor.
+#define PLOT_HBIAS ((int16_t)-64)   // 64 - 128
+#define PLOT_VBIAS ((int16_t)-48)   // 64 - 112  (HUD bars are symmetric, so plot-box centre = screen centre)
+
 #define FAR __attribute__((address_space(2)))
 static FAR uint8_t *const grid = (FAR uint8_t *)0x7E2000u;   // 16 KiB hit grid (the 8bpp source)
 
@@ -166,7 +173,7 @@ int main(void) {
   orbit.x = 0; orbit.y = 0;
   build_palette(v.pal);
   m7_set_matrix(v.zoom, 0x0000, 0x0000, v.zoom);
-  m7_set_scroll(0, 0);
+  m7_set_scroll((uint16_t)PLOT_HBIAS, (uint16_t)PLOT_VBIAS);   // centre the attractor in the plot box
   hud_begin();                            // BG3 text bars + HDMA screen-split (Mode 7 plot box)
   hud_text(HUD_BOT_ROW, 1, "LR ZOOM AY ATTR SEL COL ST RST");   // static control legend
   m7_show();                              // release force-blank; the attractor BLOOMS in live below
@@ -202,7 +209,7 @@ int main(void) {
     dma_chr_to((uint16_t)trow * ROW_BYTES);
     dma_cgram();
     m7_set_matrix(v.zoom, 0x0000, 0x0000, v.zoom);
-    m7_set_scroll((uint16_t)v.cx, (uint16_t)v.cy);
+    m7_set_scroll((uint16_t)(v.cx + PLOT_HBIAS), (uint16_t)(v.cy + PLOT_VBIAS));   // centred + pan
     if (hud_need) {                        // push the rebuilt value bar (vblank: VRAM writable)
       hud_text(HUD_TOP_ROW, 1, hud_row0);
       hud_text((uint8_t)(HUD_TOP_ROW + 1), 1, hud_row1);
