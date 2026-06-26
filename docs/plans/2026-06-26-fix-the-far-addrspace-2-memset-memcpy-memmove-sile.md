@@ -58,22 +58,30 @@ tree before building. So the runtime is a plain main-repo commit — there is **
 
 **New file `platforms/snes/mem-far.c`** — `__memset_far`, `__memcpy_far`, `__memmove_far`, each taking
 `FAR`-qualified (`__attribute__((address_space(2)))`, the spelling used throughout `examples/65816/`)
-pointer params so the Imag32 far ABI matches the compiler-emitted call by construction. Bodies are the
-per-byte far-store loops (mirroring `mem.c`'s `__memset`/`memcpy`/`memmove`). **One non-mechanical spot:**
-`__memmove_far` must choose copy direction by comparing the **full 32-bit far pointer values**, not a
-16-bit-truncated `uintptr_t` like the near `memmove` does — else overlap within a high-WRAM bank is
+pointer params so the Imag32 far ABI matches the compiler-emitted call by construction. **Loop shape (as
+built — see the Implementation note below):** the bodies are **index-style** (`ptr[i]`, far base
+loop-invariant, `i` an `i16` index) — **NOT** the `mem.c` `ptr++` pointer-increment style. A far pointer
+carried across a loop back-edge forms an unsupported `G_PHI (p2)` and crashes the backend; the index form
+keeps the phi on the integer index and recomputes the full 24-bit address each iteration (the 32-bit add
+carries into the bank byte, so a span may legally cross banks). **One non-mechanical spot:** `__memmove_far`
+chooses copy direction by comparing the **full 32-bit far pointer values** (`(uint32_t)dst <= (uint32_t)src`),
+not a 16-bit-truncated `uintptr_t` like the near `memmove` does — else overlap within a high-WRAM bank is
 mishandled.
 
-**`platforms/snes/CMakeLists.txt`** — register `mem-far.c` into the snes libc so it links into far ROMs
-(follow the existing `add_platform_library`/`merge_libraries` pattern used for crt0 at lines 26-47; a
-separate source file = separate archive member, so `--gc-sections` keeps it out of ROMs that never call a
-far memop → no size regression for existing ROMs). Per-source compile options are **mandatory**:
+**`platforms/snes/CMakeLists.txt`** — register `mem-far.c` into the snes libc via
+`add_platform_library(snes-c mem-far.c)` (OUTPUT_NAME strips the `snes-` prefix → `libc.a`, and it
+auto-merges the parent `common-c`; the `nes-action53-c` precedent), so `derived.cfg`'s `snes/lib`-first
+search shadows common's libc while every near symbol still resolves from the one merged archive. A separate
+source file = separate archive member, so `--gc-sections` keeps it out of ROMs that never call a far memop
+→ no size regression for existing ROMs. Per-source compile options are **mandatory**:
 - `-fno-builtin` — **critical**: otherwise the loop-idiom recognizer turns `mem-far.c`'s own loops back
   into `llvm.memset/memcpy.p2` → infinite recursion into themselves. (Generalizes the existing
   `-fno-builtin-memset` on `common/c/CMakeLists.txt:71`.)
 - `-mcpu=mosw65816` — the far deref is indirect-long (`sta/lda [dp]`).
-- `-Xclang -target-feature -Xclang +mos-a16` — the far pointer is a 32-bit value; the in-loop `ptr++` is a
-  32-bit `G_PTR_ADD` that only legalizes under `+mos-a16`.
+- `-Xclang -target-feature -Xclang +mos-a16` — the far pointer is a 32-bit value; the per-iteration `ptr[i]`
+  address is a 32-bit `G_PTR_ADD` that only legalizes under `+mos-a16`.
+- `-fno-lto` — pin the far-store codegen at build time (mirrors `crt0.c`), so the far ops select on the
+  module's own `mosw65816`/`+mos-a16` features rather than depending on LTO feature-propagation.
 
 ### Part B — backend routing in `legalizeMemOp` (compiler change → new patch)
 
