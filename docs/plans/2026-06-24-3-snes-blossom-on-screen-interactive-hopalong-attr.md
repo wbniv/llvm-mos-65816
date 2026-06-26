@@ -217,8 +217,23 @@ sample well after a deterministic plotted-point count, never at a frame edge (ha
    fill is coalesced to the near `__memset` (wrong bank); fixed in `HOP_DEFINE_CLEAR` with a volatile
    far store; repro `examples/65816/far_memset.c`, diagnosis `docs/320-far-memset-miscompile.md`.
 
-3. **Render correctness:** `dev/run.sh blossom` → image gate PASS on both emulators; bsnes-jg PNG +
-   MAME snapshot written (`build/blossom-*.png`) and visually show the attractor.
+3. **Render correctness (Stage 2):** `dev/run.sh blossom` → grid-hash gate PASS on both emulators;
+   bsnes-jg PNG + MAME snapshot written (`build/blossom-{jg,mame}.png`) and visually show the attractor.
+
+   ```
+   host grid: maxabs=5895 clamps=0  cells_hit=1115/16384  saturated=0   golden = 0x2FD2 (K=24000)
+   bsnes-jg:  SMOKE: PASS off=0x206 len=2 got=0x2FD2 (ran 6000 frames)   -> build/blossom-jg.png
+   MAME:      SHOT:  PASS corpus=0x2FD2 (snapshot at frame 6000)         -> build/blossom-mame.png
+   RESULT: PASS — Hopalong attractor on SNES (far hit-grid + Mode 7 band DMA); MAME + bsnes-jg match host
+   ```
+   **PASS** — the attractor renders on-screen (Mode 7, 128×128 8bpp; the characteristic Hopalong lobes +
+   central V + fractal edges, fire palette, white-hot dense core), identical on both emulators. Display
+   path: far hit grid → per-band far-load into a NEAR `chrbuf` → DMA to VRAM char bytes (the `grid_hash`
+   one-far-pointer idiom). **Note:** the originally-planned far→far whole-image build (`m7_vbuf` /
+   `M7_DEFINE_BUILD_VBUF`) and a synthetic far constant-fill *test pattern* both derailed at runtime
+   under `+mos-a16` (clean `-verify`, runtime runaway) — a second far-pointer pressure fragility beyond
+   the Stage-1 `__memset` bug; not minimally reproduced (isolated repros pass), worked around by the
+   band/near-staging structure, which is also the Stage-3 per-vblank unit.
 4. **Interaction gate:** `VIEW`/`BLOSSOM: PASS` — host replay of `blossom.h` == ROM `blossom_crc`, for
    both default and `+mos-a16` builds.
 5. **Live play:** `task blossom-mame` (or `task mandel-mame ROM=blossom`) — joypad changes params/
