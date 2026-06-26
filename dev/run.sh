@@ -51,6 +51,16 @@ Targets:
              only by 24-bit addressing) with the Mandelbrot via #320 far stores
              (sta [dp]), CRC it via far loads; +mos-a16-only, asserts host == +mos-a16
              (0x820B) on MAME + bsnes-jg + a disasm gate (examples/65816/k_mandel_far.c)
+  blossom-grid #3 Blossom Stage 1: the headless far read-modify-write HIT GRID gate — plot K_GATE
+             Hopalong orbit points into a 128x128 hit-count grid at high WRAM $7E2000 via the far path
+             (each point a far RMW: lda [dp]/saturate/inc/sta [dp] at a runtime index), then far-load
+             hash -> corpus_result. Golden derived from the host oracle (hopalong.h); +mos-a16-only,
+             asserts host == +mos-a16 on MAME + bsnes-jg + a far-RMW disasm gate. examples/65816/k_blossom_far.c
+  blossom    #3 Blossom: the Hopalong attractor RENDERED + INTERACTIVE on the SNES via Mode 7 —
+             accumulate points into the far hit grid, reveal band-by-band (far grid -> near chrbuf ->
+             VRAM DMA) with a hue CGRAM palette, a split-screen HUD, and joypad pan/zoom/preset/colour.
+             +mos-a16-only; grid hash host == +mos-a16 on MAME + bsnes-jg + a controller-state
+             differential + a framebuffer screenshot from both (build/blossom-{jg,mame}.png). examples/snes/blossom.c
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUE_REPROS repro
              STILL crashes -verify-machineinstrs under both +mos-a16 and +mos-xy16 with its
              expected signature; fails loudly the moment one verifies clean -> drop the entry

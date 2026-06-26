@@ -310,17 +310,28 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   un-landed (a)/(b) `0002` spike; tear down only when told; (2) post the prepared #321 CC design note
   (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
   [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
-- [ ] **#3 SNES Blossom on-screen interactive port — the graphical payoff demo (Phase 1 kernel DONE).**
-  Phase 1 (`k_hopalong.c`, the Q8.8 Hopalong/Blossom attractor math) is landed + 4-way verified (see
-  Done). Remaining = render it natively + make it interactive. **Graphics is greenfield** (the repo's
-  only on-screen code is `hello.c`'s green backdrop): Mode 7 chunky 8bpp framebuffer (identity
-  tilemap; per-pixel = high-byte VRAM write), a 64 KB hit-count **shadow buffer in WRAM bank `$7E`**
-  via runtime far pointer (the `+mos-a16` far path, cf. `examples/65816/far_indir.c`), VBlank DMA of
-  recolored bands shadow→VRAM, 256-color CGRAM palette + palette-cycling — this **pulls forward the
-  deferred Phase-2 graphics layer** (add VRAM `$2115–$2119`, Mode-7 matrix `$211A–$2120`, DMA `$420B`/
-  `$4300–$430A` regs to `platforms/snes/snes.h` + a small reusable gfx helper). Then joypad controls
-  (random a/b/c, switch palette/formula/color-mode, auto-scale). Optional perf: SNES hw multiplier
-  (`$4202/$4203→$4216`) for the hot `b*x`. [plan](docs/plans/2026-06-24-blossom-snes.md).
+- [ ] **#3 SNES Blossom on-screen interactive port — CORE + HUD DONE, verified, landed on `main`; only optional polish left.**
+  **Landed** (`task blossom` / `dev/run.sh blossom`, RESULT PASS): the Hopalong attractor renders + blooms
+  live on the SNES via Mode 7 (`examples/snes/blossom.c`) — far read-modify-write accumulation into a
+  128×128 hit grid (`$7E2000`), revealed band-by-band (far grid → near `chrbuf` → VRAM DMA), hue-wheel
+  CGRAM palette cycling, and joypad pan/zoom/preset/colour (`examples/snes/blossom.h`, the `view.h`-analog
+  state machine). Two differential channels pass: grid hash `host == +mos-a16` on **MAME + bsnes-jg**
+  (`0x9047`) and the controller state-math `host == ROM` (bsnes-jg, `dev/jgxcheck.cpp -DJGX_BLOSSOM`).
+  Shared math in `examples/65816/hopalong.h`; screenshots `build/blossom-{jg,mame}.png`; live play
+  `task blossom-play`. Also **published as a playable in-browser page** (indri.studio/blossom +
+  biohack.net/blossom via the `snes-rom-page` skill) with a user manual (`docs/blossom-manual.md`).
+  **Remaining = optional only:** (a) a literal **64 KB / 256×256 supersampled grid in bank `$7F`** for
+  anti-aliasing (used 16 KB — the far path is identical, just smaller); (b) the **hw multiplier**
+  (`$4202/$4203→$4216`) for the hot `b*x` to speed the ~10 s bloom; (c) re-test the 2nd far-pointer
+  fragility (a far→far whole-image / far constant-fill in a multi-far TU derailed at runtime under
+  `+mos-a16`; worked around with band/near-staging) — **likely now resolved by the far-memops fix
+  (`0013`/`0014`)** that landed on `main` since; confirm and drop the workaround if so.
+  [plan](docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md).
+  - [x] ~~**On-screen field/value HUD + plot-box reframe (split-screen).**~~ **DONE** — carves the screen
+    with an **HDMA mode-split** (`BGMODE`+`TM` streamed per-scanline) into a **Mode 7 plot box** with
+    **tiled BG3 value/control bars** top & bottom (live `a/b/c`/zoom/palette fields + the control legend).
+    Reusable `examples/snes/{hud,font8}.h` — the repo's first HDMA + BG-text; gates unaffected (`0x9047`
+    grid / `blossom_crc`). [plan](docs/plans/2026-06-26-blossom-split-screen-hud-mode-7-plot-box-tiled-bg3.md).
 - [ ] **`snesgfx` — re-imagine SNES rendering as an OOP-in-C library (interface + implementation).** Take the
   proven mechanics (force-blank/v-blank access window, DMA, VRAM layout, Mode 7 — handoff
   [2026-06-24-snes-graphics-rendering.md](docs/handoffs/2026-06-24-snes-graphics-rendering.md)) and express
