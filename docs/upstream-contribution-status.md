@@ -1,6 +1,20 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-26 (the **far array-subscript index-width fix** now has a **dedicated committed regression
+**Last updated:** 2026-06-26 (**far addrspace-2 memset/memcpy/memmove silent wrong-bank fix** — a far memop the
+backend can't inline-expand (variable size, or constant size over `MOSLegalizerInfo`'s `SizeLimit`) fell through
+`legalizeMemOp` into the generic `createMemLibcall`, which called the **near** runtime (`__memset`/`memcpy`,
+16-bit `char*`) while passing the 32-bit far pointer → the bank byte was silently dropped → wrong-bank store/load,
+no diagnostic. Sources are NOT just the loop-idiom recognizer: clang `EmitAggregateCopy` (any far struct copy, no
+size threshold), null/const init, `__builtin_mem*`, and MemCpyOpt all converge on the same path. Fix = route far
+memops at the `legalizeMemOp` chokepoint to a far-aware runtime (`__memset_far`/`__memcpy_far`/`__memmove_far`,
+`platforms/snes/mem-far.c`) via two static helpers (`anyFarPointerOperand` + `createFarMemLibcall`) in
+`MOSLegalizerInfo.cpp`; near pointers widen to far bank `$00`. No generic-LLVM change. Carried as fork patch
+**`0013-320-far-memops`**, gated by `dev/run.sh far_memops` (`corpus_result==0x74`, MAME+bsnes-jg, `-Os`/`-O2`) +
+the standing far suite (`dev/run.sh xcheck`). A self-contained **MOS-backend correctness fix, upstream-worthy**
+once #320's AS2 is blessed — folds into the Future/blocked #320 body, **not** a new ready-to-post row (AS2 isn't
+upstream-standalone-testable). Surfaced a related backend gap noted for follow-up: a far-pointer loop induction
+variable forms an unsupported `G_PHI (p2)`; the runtime is written index-style (invariant far base) to avoid it.
+Upstream state unchanged — #561/#562/#563 still OPEN.) Previously 2026-06-26 (the **far array-subscript index-width fix** now has a **dedicated committed regression
 gate** — `dev/run.sh farindex`: `examples/65816/farindex.c` promoted from an open repro → passing gate, a
 `const FAR uint16_t tbl[]` read across banks $C1/$C2/$C3 folds `corpus_result==0x0001D8A1` on MAME + bsnes-jg.
 Strengthens the test story for that fix in the Future/blocked #320 body; still **not** a new ready-to-post row

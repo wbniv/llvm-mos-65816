@@ -45,3 +45,20 @@ merge_libraries(snes-crt0
   common-zero-bss
   common-exit-loop
 )
+
+# #320 far runtime: __memset_far / __memcpy_far / __memmove_far (addrspace 2).
+# Lives in the snes libc (libc.a) so it shadows common's — derived.cfg searches
+# snes/lib before common/lib — and add_platform_library auto-merges common-c, so
+# every existing near libc symbol still resolves from this one archive. mem-far.c
+# is a separate archive member, so --gc-sections drops it from ROMs that make no
+# far memop (near-only ROMs stay byte-identical; it is pulled only when the
+# backend emits a __memset_far/__memcpy_far/__memmove_far call). Built for the
+# 65816 (the far deref is indirect-long), +mos-a16 (a far pointer is a 32-bit
+# value; the in-loop ptr++ only legalizes under a16), -fno-builtin (so the
+# loop-idiom recognizer can't turn these very loops back into far
+# llvm.memset/memcpy -> recursion into ourselves; generalizes common/c's
+# -fno-builtin-memset), and -fno-lto (pins the far-store codegen at build time,
+# mirroring crt0.c).
+add_platform_library(snes-c mem-far.c)
+set_source_files_properties(mem-far.c PROPERTIES COMPILE_OPTIONS
+  "-fno-builtin;-mcpu=mosw65816;-fno-lto;-Xclang;-target-feature;-Xclang;+mos-a16")

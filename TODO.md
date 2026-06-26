@@ -102,6 +102,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
+- [ ] **#321 far (addrspace 2) memset/memcpy/memmove SILENT WRONG-BANK miscompile — FIX IN PROGRESS.**
+  A far memop that can't inline-expand (variable size, or constant > `SizeLimit`) falls through
+  `MOSLegalizerInfo::legalizeMemOp` to the generic `createMemLibcall`, which calls the **near**
+  `__memset`/`memcpy`/`memmove` (16-bit `char*`) while passing the 32-bit far pointer — the **bank byte
+  is dropped** → wrong-bank store/load, no diagnostic. Sources are NOT just the loop-idiom recognizer:
+  clang `EmitAggregateCopy` (any far struct copy, no size threshold), null/const init, `__builtin_mem*`,
+  and MemCpyOpt all hit the same path. Fix at the chokepoint: add `__memset_far`/`__memcpy_far`/
+  `__memmove_far` to the snes runtime + route far memops to them in `legalizeMemOp` (new patch `0013`).
+  No generic-LLVM change; upstream-worthy for llvm-mos. **Plan:**
+  [docs/plans/2026-06-26-fix-the-far-addrspace-2-memset-memcpy-memmove-sile.md](docs/plans/2026-06-26-fix-the-far-addrspace-2-memset-memcpy-memmove-sile.md).
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
   "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
   on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`

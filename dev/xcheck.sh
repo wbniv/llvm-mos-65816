@@ -68,6 +68,9 @@ build_rom far_indir mos-snes-far.cfg -Xclang -target-feature -Xclang +mos-a16
 build_rom far_cast  mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
 build_rom far_arith mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
 build_rom far_store mos-snes.cfg     -Xclang -target-feature -Xclang +mos-a16
+# #320/#321 far memset/memcpy: routes to the far runtime (__memset_far/__memcpy_far),
+# fills HIGH WRAM ($7E) — needs +mos-a16 (32-bit far ptr).
+build_rom far_memops mos-snes.cfg    -Xclang -target-feature -Xclang +mos-a16
 build_rom far_call  mos-snes-far.cfg
 build_rom far_near_call mos-snes-far.cfg
 build_rom far_tail  mos-snes-far.cfg
@@ -122,6 +125,7 @@ xassert "$BUILD/far_indir.sfc" "$BUILD/far_indir.map" corpus_result 0xF3   # ban
 xassert "$BUILD/far_cast.sfc"  "$BUILD/far_cast.map"  corpus_result 0xF3   # bank $00, near->far cast then lda [dp]
 xassert "$BUILD/far_arith.sfc" "$BUILD/far_arith.map" corpus_result 0xF3   # bank $00, fp++ (G_PTR_ADD) then lda [dp]
 xassert "$BUILD/far_store.sfc" "$BUILD/far_store.map" corpus_result 0xF3   # bank $00, sta [dp] store then near read-back
+xassert "$BUILD/far_memops.sfc" "$BUILD/far_memops.map" corpus_result 0x74 # bank $7E, far memset+memcpy via __memset_far/__memcpy_far (50*0x5A + sum(0..63))
 xassert "$BUILD/far_call.sfc"  "$BUILD/far_call.map"  corpus_result 0xF3   # bank $01, far call (JSL) + RTL return
 xassert "$BUILD/far_near_call.sfc" "$BUILD/far_near_call.map" corpus_result 0xE0 # bank $01 far -> near via __call_near_from_far (JSL thunk)
 xassert "$BUILD/far_tail.sfc"  "$BUILD/far_tail.map"  corpus_result 0xCB   # bank $01 far -> far TAIL calls folded to long jmp (TailJML $5C); path-A value (fall-through would be 0xE0)
