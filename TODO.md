@@ -23,7 +23,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### M1 — Far Pointers (first real codegen)
 
-- [ ] **#320 far-pointer DATA-VALUE type — BUILT BY THE F2 AGENT (verified 2026-06-21); residuals only.**
+- [x] **#320 far-pointer DATA-VALUE type — BUILT BY THE F2 AGENT (verified 2026-06-21); residuals only.**
   The desirable work the five-space census surfaced (store/load/array/struct a far pointer + `sizeof==4`)
   was **built by the far-fn-ptr agent**, not just unblocked. Verified by compiling
   `examples/65816/far-value-evidence/` against their toolchain (`wt/320-far-followups`, clang-23 @
@@ -161,7 +161,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [compare-operand-fold plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md) ·
   [full-native materialize plan](docs/plans/2026-06-18-321-native-s16-eq-as-value-full-native-materialize.md) ·
   [Option B rol-tail proof](docs/plans/2026-06-18-prove-option-b-rol-tail-materialization-for-native.md).
-- [ ] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** The F3 `Ac16`
+- [x] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** (P0/P1/P2 all DONE 2026-06-17/18; P3 is a user-triggered upstream issue — see Upstream.) The F3 `Ac16`
   spill fix landed on **both** stacks, but the soft-stack half was found only by a hand-written recursive
   reproducer — the **fuzzer never reaches it**: `gen_funcs` emits only leaf functions (`expr(pure=True)`
   excludes the `call` leaf), so the call graph is acyclic → `MOSNonReentrant` marks every function
@@ -184,7 +184,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   stack — ~~file an issue~~ **issue DRAFTED + source-verified
   ([docs/321-upstream-reentrant-soft-stack-issue.md](docs/321-upstream-reentrant-soft-stack-issue.md));
   filing is user-triggered**. [plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
-- [ ] **#321 native s16 — agreed optimization order (after load-fold).** ~~(2) 16-bit compares/branches~~
+- [x] **#321 native s16 — agreed optimization order (after load-fold).** (DONE — every slice shipped or measured-WON'T-DO; (7) HW-stack ABI is upstream-gated.) ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
   `lda; inc/dec a; sta`]; remaining: ~~variable shifts~~ [**WON'T DO** — task7 spike 2026-06-17: inline counted loop costs more bytes than `__ashlhi3`/`__lsrhi3` libcall at −Os], amount ≥8 [byte-relabel
@@ -200,7 +200,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
   ROADMAP step 5 frontier.
   [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
-- [ ] **#321 A16-threading — keep the running s16 value live in the accumulator across ops** (item (5)
+- [x] **#321 A16-threading — keep the running s16 value live in the accumulator across ops** (Phases 0/1/1.5 DONE; Phase 2 retired; Phase 3 CLOSED 2026-06-26 net-negative.) (item (5)
   above; the ROADMAP-step-5 "biggest win", de-risked now the Tier-1 corpus exists). **Phases 0–1 + 1.5
   DONE (2026-06-17 — see Done):** the redundant `STAImag16 R; LDAImag16 R` round-trip between dependent
   native s16 ops is eliminated by a coalescer-safe post-RA peephole (`threadAccum16` in
@@ -231,7 +231,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
   [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
-- [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
+- [x] **#321 16-bit ALU chain extensions** (DONE — add/bitwise chains shipped; SUB moot; multi-value pressure characterized + DEFER confirmed with data.) (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
   **moot** (the optimizer reassociates `a-b-c` to `a-(b+c)`, not a homogeneous chain). Remaining —
@@ -258,7 +258,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
-- [ ] **#321 stage 1 — full xy16 mode + ABI** (after Increment 1): ~~X/Y permanently 16-bit~~
+- [x] **#321 stage 1 — full xy16 mode + ABI** (DONE — Layers 1–5 + legalizer + CC verified/formalized; HW-stack ABI follow-on is upstream-gated.) (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
   — Layers 1–5 committed to `wt/321-xy16`: feature flag + Xc16/Yc16 regs + pseudos + parallel
@@ -273,7 +273,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   **Remaining follow-ons: hardware-stack ABI + calling convention** (gated on the CC decision). (Native-mode
   crt0 needed no change for in-function xy16; its lone gap — explicit DBR=0 — is the dedicated item below.)
   [xy16 plan](docs/plans/2026-06-17-321-xy16-index-register-mode.md) · [handoff](docs/plans/2026-06-18-321-xy16-implementation-handoff.md).
-- [ ] **#321 calling-convention — frame decision RESOLVED (phased) 2026-06-18; remaining work deferred/gated.**
+- [x] **#321 calling-convention — frame decision RESOLVED (phased) 2026-06-18; remaining work deferred/gated.**
   [CC decision analysis](docs/investigations/65816-calling-convention-decision.md) ·
   [decision record](docs/plans/2026-06-18-321-cc-frame-phased-decision.md). The "one decision" decomposes
   into 4 sub-decisions, now all dispositioned: ~~return~~ (A low / X high — **LOCKED 2026-06-17**,
@@ -287,7 +287,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   upstream posture — post the prior-art note + a first-pass CC to #321 (user-triggered; see Upstream section).
   [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
   [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
-- [ ] **#321 frame-ABI head-to-head — RESOLVED 2026-06-20: CONFIRMED-shelved (NULL), measured.** Revived the
+- [x] **#321 frame-ABI head-to-head — RESOLVED 2026-06-20: CONFIRMED-shelved (NULL), measured.** Revived the
   (a)/(b) frame fork the ZP-pressure proxy had shelved on paper, on a `wt/321-frame-abi` feature worktree.
   **P0** (`c2eaf61`): off-by-default `+mos-dp-frame`/`+mos-sr-frame` features + `frameStrategy()` plumbing,
   byte-identical-default proven (24/24). **A0** (`a73c564`): the DP↔`__rc` collision (SNES linker pins
@@ -343,11 +343,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [ ] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** (follow-up to the now-**Done**
+- [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
+  The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
+  `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
+  **resolved** (stale), and Csmith already drove all three pressure-bug fixes (`0009`/`0011`/pr15296) and runs
+  **0-mismatch** on that regime. Against it: Yarpgen's output isn't UB-free at the target's 16-bit `int` (no
+  `platform.info` equivalent) → real width-surgery cost for marginal added coverage. Re-open only if a real
+  pressure bug ever slips past Csmith. (follow-up to the now-**Done**
   Csmith fuzzer — see Done `[321-csmith-fuzzer]`). Targets the `-O1/-Os` loop/scalar-opt surface — the same
   register-pressure regime that produced the `regalloc-out-of-registers` (fixed, `0009`) and
-  `scavenger-p-not-gpr` (fixed, `0011`) crashes and still hosts the open `a16-zp-pressure-overflow` XFAIL, so
-  it's the natural next instrument. Two
+  `scavenger-p-not-gpr` (fixed, `0011`) crashes; the `a16-zp-pressure-overflow` XFAIL it was meant to chase is
+  now **resolved**. Two
   costs: redirect its baked-in `printf` to `corpus_result`; the 16-bit-int caveat (no `platform.info`
   equivalent → would need width surgery to stay UB-free). The `--gen` seam already added for Csmith makes it
   drop-in. [plan §Follow-ups](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md) ·
@@ -517,6 +523,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-26 — [todo-stale-box-sweep] **Backlog audit — flipped 8 stale `[ ]` umbrella boxes to `[x]` and closed Yarpgen as WON'T-DO; Open now reflects reality.** Following the far-data + pr15296 stale-XFAIL finds, swept the whole Open list: the genuinely-remaining items are upstream-posting (user-triggered) or measured-WON'T-DO — there are **no further hidden-done features**. Marked done (work already recorded in Done + the investigations): `#320 far-pointer data-value type` (built, residuals closed), `#321 soft-stack reentrant spill coverage` (P0/P1/P2 done; P3 = upstream issue), `native s16 optimization order` (all slices shipped/WON'T-DO), `A16-threading` (Phases 0/1/1.5 done, 2 retired, 3 CLOSED net-negative), `16-bit ALU chain extensions` (shipped + DEFER-with-data), `xy16 mode + ABI` (verified/formalized), `CC frame decision` (RESOLVED phased), `frame-ABI head-to-head` (CONFIRMED-shelved NULL). **Closed `Yarpgen` as WON'T-DO (superseded):** its motivating `a16-zp-pressure-overflow` XFAIL is resolved + Csmith already covers the `-O1/-Os` pressure regime 0-mismatch; its 16-bit-`int` UB-soundness cost isn't worth marginal coverage. **The lone substantive open engineering item is now `#3 SNES Blossom on-screen interactive port`** (greenfield graphics); the rest is upstream/distribution/gated.
 - 2026-06-26 — [320-far-indir-tail] **#320 Phase B DONE — far-indirect calls now LINK + RUN, a far-caller call miscompile FIXED, and the far-indirect thunk tail folds.** Completes the "thunk tails" arc ([[320-thunk-tail-calls]] did far→near). **(1) Landed the missing runtime stub** `platforms/snes/call-indir-far.s` (`__call_indir_far`: `jml (__mos_far_target)` + the 4-byte `__mos_far_target` `.noinit` slot) + wired into `platforms/snes/CMakeLists.txt` (gc-sectioned, `-mcpu=mosw65816`; snes-far inherits it via PARENT). A far-indirect *call* now links (was `ld.lld: undefined symbol: __call_indir_far`); resurrected e2e `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` (`far_leaf(0x5A)==0xFF`, MAME+bsnes-jg). **(2) Fixed a pre-existing far-indirect-from-far-caller miscompile:** a far function calling `__call_indir_far` was mis-routed through `__call_near_from_far` (`IsFarNearThunk` captured the bank-0 `__call_indir_far` global, overriding `IsFarIndirThunk`) → stack corruption (the indir thunk `jml`s away, never returns to the near thunk's `pea` site). Fix: exclude `__call_indir_far` from `IsFarNearThunk` so it JSLs directly. **(3) Added the `IndirFarThunk` fold arm** to `MOSLateOptimization::tailJMP` — now live post-fix: `JSL __call_indir_far; RTL → TailJML` (the indir thunk pushes nothing → far target's RTL pops the original caller's return). New gate `examples/65816/far_indir_tail.c` + `dev/far_indir_tail.sh` (`far_outer` far-indirect tail folds to `$5C`, `0xFF` both emulators). Compiler edits (MOSCallLowering.cpp + MOSLateOptimization.cpp) regenerated into `0001`; round-trips `0001..0012`. xcheck all 14 far ROMs PASS on bsnes-jg (incl. far_fnptr/far_indir_tail 0xFF, far_near_call 0xE0 unaffected); corpus 7/7; csmith 50 0-mismatch. Closes the far-fn-ptr-(a) "done+landed" overclaim. Worktree `wt/320-far-indir-stub`. [plan](docs/plans/2026-06-26-320-thunk-tail-calls.md).
 - 2026-06-26 — [321-pr15296-zp-overflow] **#321 `pr15296` link-time ZP overflow (`a16-zp-pressure-overflow`) — XFAIL was STALE; now a positive gate.** The gated narrow-fix spike's diagnosis found the bug no longer reproduces: on the current stack (`c798c31`+`0001..0012`) `dev/run.sh torture --tests pr15296.c` at **both `-Os` and `-O1`** folds `default==+mos-a16==+mos-xy16==0x600D` on MAME+bsnes-jg, with `.zp.noinit` **18 B** (not the recorded 1043 B). The documented "`Imag16`-saturation past 256 B" mechanism was **wrong** — the allocator hard-caps ZP at `-zp-avail=224` (`MOSZeroPageAlloc.cpp:263/267/829/841`), so the 1043 B was a pre-fix register-pressure artifact relieved by the post-`0009` advances (`0010`–`0012`; likely `0011`'s scavenger live-`$p` rework, whose pre-fix `$p` mishandling inflated spill/ZP traffic — exact patch not bisected, would need a counterfactual rebuild). Dropped `KNOWN_ISSUES["a16-zp-pressure-overflow"]` (`tools/a16_fuzz.py`) so a recurrence hard-FAILS; pr15296 is now a positive in-scope c-torture gate. **No `+mos-a16` register-pressure XFAILs remain.** No compiler change (already fixed). [plan](docs/plans/2026-06-26-pr15296-mos-a16-link-time-zp-overflow-gated-narrow.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-regalloc-pressure-failure.md).
 - 2026-06-26 — [321-a16-phase3-trigger-check] **#321 A16-threading Phase 3 trigger-check → CLOSE Phase 3 as measured net-negative.** Trigger **(b) FIRED** — new heavy-16-bit math kernels (CORDIC `k_trig16`/`k_trig32`, Mandelbrot, Hopalong) pushed 6 real fns to ~10/14 pairs (`cordic16_atan2` at the full **14/14**), up from ~5/14 on 2026-06-18; trigger **(a)** clean (full sweep + csmith 200, 0 mismatch/crash). Ran the gated spike: **B0** (`shouldCoalesce` `{Anyi1,Anyi8,GPR}→Ac16` barrier) proven **byte-for-byte inert** across all 190 example/corpus compiles (isolated in-build — a false `far_near_call.c` diff was hot-tree vendor drift). **B1** (flag-gated pre-RA `Ac16`-residency pass `MOSPreRAAccum16`, mirrors post-RA `threadAccum16` on SSA vregs) **fires heavily** (`k_trig16` −103 round-trips) and is `-verify` clean on all 190, but gives **zero peak-ZP-pressure relief** (`cordic16_atan2` 14/14→14/14) and is a **net +24 B regression** (`k_trig16` +26 B) — the pool-fill is genuinely-simultaneous liveness the single accumulator can't thread away, confirming the deferral's cap by measurement. Nothing landed (default build byte-identical). Added the explicit Phase-3 FIRE line to `dev/measure-zp-pressure.sh`; spike preserved as a `.diff`. See [spike+verdict](docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md) · [plan](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md).
