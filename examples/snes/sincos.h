@@ -1,6 +1,6 @@
 // 256-entry signed 8.8 sine table (SINCOS[a] = round(256 * sin(2*pi*a/256))); cos(a) = SINCOS[(a+64)&255].
-// Standalone math LUT for the Mode 7 rotate/zoom in mandel-display.c (kept independent of the baked
-// mandel_image.h so mandel-display has no generated-asset dependency). Regenerate:
+// Standalone math LUT for the Mode 7 rotate/zoom in mandel-display.c (a committed, generated-asset-free
+// table, so mandel-display builds straight from source). Regenerate:
 //   python3 -c 'import math;print(",".join(str(round(256*math.sin(2*math.pi*a/256))) for a in range(256)))'
 #ifndef SINCOS_H
 #define SINCOS_H

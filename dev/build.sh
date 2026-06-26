@@ -14,7 +14,7 @@ BUILD="$ROOT/build"
 INSTALL="$BUILD/install"
 # Default to the from-source toolchain when it's been built: it carries the #321/#320 fork
 # patches, so it supports +mos-a16 (16-bit accumulator + far high-WRAM pointers) and the
-# mos-a16-only examples (mandel-mode7, …) BUILD instead of being skipped. Fall back to the
+# mos-a16-only examples (mandel-display, …) BUILD instead of being skipped. Fall back to the
 # prebuilt /opt/llvm-mos only if the from-source toolchain isn't present (then a16 ROMs skip,
 # loudly). Override either way with MOS_TOOLCHAIN. Build it with: dev/run.sh toolchain.
 if [ -z "${MOS_TOOLCHAIN:-}" ]; then
@@ -59,12 +59,6 @@ cmake --build "$BUILD"
 cmake --install "$BUILD"
 echo "$MOS_TOOLCHAIN" > "$STAMP"
 
-# Generate the baked Mandelbrot header (gitignored) that examples/snes/mandel-interactive.c
-# needs before the loop compiles it — keeps it reproducible-from-source rather than committed.
-echo "==> bake examples/snes/mandel_image.h (tools/mandel-bake.c)"
-cc -O2 -I "$ROOT/examples/65816" "$ROOT/tools/mandel-bake.c" -o "$BUILD/mandel-bake" -lm
-"$BUILD/mandel-bake" "$ROOT/examples/snes/mandel_image.h" 128 128 32
-
 echo "==> build + checksum every SNES program (examples/snes/**/*.c)"
 shopt -s globstar nullglob
 # Does this toolchain support the #321 +mos-a16 feature? The prebuilt /opt/llvm-mos does NOT;
@@ -80,7 +74,7 @@ count=0
 for src in "$ROOT"/examples/snes/**/*.c; do
   name="$(basename "$src" .c)"
   rom="$BUILD/$name.sfc"
-  # Far-pointer examples (address_space(2) high-WRAM buffers, e.g. mandel-mode7.c) self-declare a
+  # Far-pointer examples (address_space(2) high-WRAM buffers, e.g. mandel-display.c) self-declare a
   # `mos-a16-only` marker; they REQUIRE +mos-a16 (default-8bit can't legalize a `p2` G_PTR_ADD).
   # The grep survives the far type being spelled via a macro (M7_FAR). Skip if unsupported.
   a16=()

@@ -68,10 +68,12 @@ int main(void) {
 
 The Mandelbrot demo uploads via **direct port writes** (`vram_w()` → `$2118`/`$2119` in a loop) because it's
 only ~1280 words. **A real library must use DMA** for full-screen uploads (a 32 KiB VRAM fill is ~hundreds of
-thousands of cycles by hand; DMA does it in ~one v-blank). The register recipe below is **verified working** by Track 3b's big upload
-([`examples/snes/mandel-mode7.c`](../../examples/snes/mandel-mode7.c) / `dev/run.sh mandel-mode7`): a single
-**32 KiB DMA** of an interleaved Mode 7 image from high WRAM (`$7E…`) to VRAM, confirmed on both emulators —
-read `dma_vbuf_to_vram()` there for a copy-pasteable known-good call. (The Track 3a far-store gate
+thousands of cycles by hand; DMA does it in ~one v-blank). The register recipe below is **verified working** by the
+far Mode-7 tester ([`examples/snes/mandel-display.c`](../../examples/snes/mandel-display.c) / `dev/run.sh
+mandel-shot`), whose `dma_chr_to()` streams one Mode-7 tile-row (512 B) WRAM→VRAM per v-blank — a copy-pasteable
+known-good call, confirmed on both emulators. (The original one-shot **32 KiB interleaved-image DMA**
+`dma_vbuf_to_vram()` lived in the since-removed `mandel-mode7.c`; its recipe is preserved in the Mode 7 section
+below.) (The Track 3a far-store gate
 [`examples/65816/k_mandel_far.c`](../../examples/65816/k_mandel_far.c) / `dev/run.sh mandel-far` exercises the
 far stores but uploads nothing, so it has no DMA.)
 
@@ -227,8 +229,10 @@ linker concern** — VRAM is written at runtime through the data ports. Your til
   (even bytes = tilemap, odd bytes = chr) and a 256-tile cap (so a 128×128 unique-pixel image = 16×16 tiles
   fills it exactly).
 
-### Mode 7 — verified per-pixel image path (Track 3b, `examples/snes/mandel-mode7.c`)
-Mode 7 is the path that worked for a per-pixel image. Confirmed details, end to end:
+### Mode 7 — verified per-pixel image path (originally Track 3b's `mandel-mode7.c`, removed 2026-06-26; the live far Mode-7 example is now [`examples/snes/mandel-display.c`](../../examples/snes/mandel-display.c))
+Mode 7 is the path that worked for a per-pixel image. Confirmed details, end to end (the one-shot 32 KiB
+interleaved-image DMA below was `mandel-mode7.c`'s; the surviving `mandel-display.c` instead streams the image a
+tile-row at a time, but the interleave/de-linearise rules are identical):
 - **VRAM is interleaved**: word `n` = `(chr[n] << 8) | tilemap[n]`. Build the whole interleaved image (32 KiB =
   16384 words) in a staging buffer, then upload it as one DMA to `$2118` with **VMAIN=$80** (inc-after-`$2119`)
   and **DMAP pattern 1** (writes `$2118` then `$2119` per word). One 32 KiB DMA from high WRAM did the job.
@@ -285,5 +289,5 @@ Mode 7 is the path that worked for a per-pixel image. Confirmed details, end to 
 ### External references (canonical)
 - **fullsnes** (nocash) — the exhaustive SNES hardware reference (PPU regs, OAM, DMA, timing).
 - **anomie's** SNES docs (PPU/registers/timing) — the classic deep dives.
-- This repo: `examples/snes/mandel-display.c`, `examples/snes/mandel-far.c` (Track 3, DMA + far),
-  `dev/mandel-shot.sh`, `docs/investigations/snes-emulator-screenshots.md`.
+- This repo: `examples/snes/mandel-display.c` (far Mode-7 tester), `examples/65816/k_mandel_far.c` (Track 3a
+  far-store gate), `dev/mandel-shot.sh`, `docs/investigations/snes-emulator-screenshots.md`.

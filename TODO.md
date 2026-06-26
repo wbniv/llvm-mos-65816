@@ -136,6 +136,21 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   CRC==host (`0x75E8`). Grew the HAL with Mode 7 + DMA regs; rendering **handoff for the next agent**:
   [docs/handoffs/2026-06-24-snes-graphics-rendering.md](docs/handoffs/2026-06-24-snes-graphics-rendering.md).
   [plan](docs/plans/2026-06-24-snes-mandelbrot-beefy-demo.md).
+  **Consolidated 2026-06-26** (user request): the separate Track 3b `mandel-mode7` and the M2
+  `mandel-interactive` demos were **removed**, and the Track 2 tester `mandel-display.c` was converted to
+  **far/`+mos-a16`-only** — it now far-stores its 64×56 escape buffer into high WRAM (`$7E2000`) and
+  far-loads it back (CRC `0x204F` unchanged), so the publish gate exercises the `sta [dp]`/`lda [dp]` far
+  path. (`mandel-far`/`k_mandel_far.c` Track 3a kept.)
+  [plan](docs/plans/2026-06-26-collapse-the-snes-mandelbrot-demos-into-one-far-16.md).
+
+- [ ] **Collapse the SNES Mandelbrot demos into one far/16-bit tester (#321).** Delete `mandel-mode7.c`
+  + `mandel-interactive.c` (and their interactive-only deps `view.h`, generated `mandel_image.h`,
+  `tools/mandel-bake.c`, `dev/mandel-{mode7,interactive}.sh`); convert the canonical tester
+  `examples/snes/mandel-display.c` to **far / `+mos-a16`-only** — far-store the 64×56 escape buffer into
+  high WRAM (`$7E2000`), far-load it back for VRAM upload + CRC (still `0x204F`), so the publish gate now
+  exercises `sta [dp]`/`lda [dp]`. Prune dead `mode7.h` helpers; release gate (`release-test-inner.sh`)
+  forces `mandel-display` a16-only. **[verify]** per the plan's verification section.
+  [plan](docs/plans/2026-06-26-collapse-the-snes-mandelbrot-demos-into-one-far-16.md).
 
 - [x] **#321 native s16 — 16-bit comparison follow-ups — DONE 2026-06-21, track CLOSED.** ([plan](docs/plans/2026-06-21-321-native-s16-comparison-followups.md)) Compare surface measured ~complete (`dev/measure-compare-surface.sh`): everything native except the optimal byte-wise register-resident equality. The one open lever — the **ordering-as-value branchless carry-tail** (`zext(sbc-carry)`→`G_UADDE(0,0,carry)` in `legalizeZExt`) — was **BUILT + measured net-negative in realistic context** (correct + leaf-win real `uge_v` 25→19 + default byte-identical 75/75, but the 8-bit `adc` tail's `sep` breaks 16-bit runs: a16cmpaudit **+262 B** rep/sep-churn + `eor` inversions; c-torture 56 progs net≈0 **with** a +5 B regression) → **WON'T-DO** (the select-diamond is the ambient-16-bit optimum; clean gating infeasible — the cost is ambient-mode-dependent, invisible at legalize time). Classic lesson #1 leaf→ambient flip; spike on `wt/321-cmpval` (un-landed). **The mode-matched 16-bit-`rol` follow-up form (separate [banked plan §0a](docs/plans/2026-06-21-321-ordering-value-branchless-banked.md) — a real `ROLAcc16`/`LDAImm16`/`G_CARRY_BOOL16` materialization, `lda #$0000; rol a` at M16) was ALSO BUILT + measured 2026-06-21 → REGRESSES HARDER than v1: a16cmpaudit +654 B (both-widths) / +78 B (s16-direct-gated), whole a16 corpus +340 B with ZERO programs improving → WON'T-DO. Both 8-bit AND 16-bit forms closed: the select-diamond folds inversion free, its M8 tail matches ambient mode, and it keeps the boolean in `X` (not an `Imag16` ZP slot that cascades to spills). Deferred lever = mode-agnostic post-REPSEP pseudo (uncertain/partial upside, delicate REPSEP work — not pursued).** (unsigned ordering, ~~(a) equality `== !=`~~,
   and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
@@ -488,9 +503,10 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 
 - [ ] **Clean-room test of the *published* SNES compiler — wired into the publish gate** — in a throwaway
   Docker container with NO dev toolchain, acquire the published compiler and compile a **sound-free**
-  reference Mandelbrot (`examples/snes/mandel-display.c`, 32×28 N=15, CRC `0x9103`; secondary
-  `examples/65816/k_mandel.c` `0x820B`), then verify on **bsnes-jg** (embedded SPC700 IPL → no BIOS, no sound)
-  against the host oracle (`mandel-render`) — both default-8bit and `+mos-a16`. Every run emits three artifacts
+  reference Mandelbrot (`examples/snes/mandel-display.c`, 64×56 N=15, CRC `0x204F` — now the far/16-bit
+  tester, so **`+mos-a16`-only**; secondary `examples/65816/k_mandel.c` `0x820B`, default-8bit + `+mos-a16`),
+  then verify on **bsnes-jg** (embedded SPC700 IPL → no BIOS, no sound)
+  against the host oracle (`mandel-render`). Every run emits three artifacts
   to `build/release-test/`: a **compile log** (`release-test-<method>.log`, timestamped, shows the exact
   `mos-snes-clang` command + output), the **SNES Mandelbrot screenshot(s)** (`mandel-<build>.png`, bsnes-jg
   framebuffer), and a nicely-formatted self-contained **HTML release report** (`release-report-<stamp>.html`:

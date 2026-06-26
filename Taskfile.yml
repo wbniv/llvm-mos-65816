@@ -96,7 +96,7 @@ tasks:
       - 'echo "==> dist/ now holds:" && ls -1 dist/*.tar.xz dist/*.zip 2>/dev/null'
 
   release-test:
-    desc: "Clean-room test the PUBLISHED SNES compiler in a throwaway Docker container with NO dev toolchain: acquire mos-snes-clang, compile examples/snes/mandel-display.c (default-8bit + +mos-a16), run in bsnes-jg (embedded SPC700 IPL → no BIOS/sound), assert the WRAM corpus_result CRC == the host oracle (0x9103) + dump an emulator PNG. METHOD=local (newest dist/*.tar.xz — the publish gate, also auto-run by `task package`) | apt (live apt.indri.studio) | tarball (product-page link). Knobs: PROGRAM=mandel-display|k_mandel, A16=both|1|0, TARBALL=<path>, FRAMES=n. Pass as `task release-test -- METHOD=apt`."
+    desc: "Clean-room test the PUBLISHED SNES compiler in a throwaway Docker container with NO dev toolchain: acquire mos-snes-clang, compile examples/snes/mandel-display.c (+mos-a16 — the far/16-bit tester is a16-only), run in bsnes-jg (embedded SPC700 IPL → no BIOS/sound), assert the WRAM corpus_result CRC == the host oracle (0x204F) + dump an emulator PNG. METHOD=local (newest dist/*.tar.xz — the publish gate, also auto-run by `task package`) | apt (live apt.indri.studio) | tarball (product-page link). Knobs: PROGRAM=mandel-display|k_mandel, A16=both|1|0 (mandel-display forces a16-only), TARBALL=<path>, FRAMES=n. Pass as `task release-test -- METHOD=apt`."
     cmds:
       - dev/test-release.sh {{.CLI_ARGS}}
 
@@ -108,7 +108,7 @@ tasks:
   # --- #321 beefy Mandelbrot demo ---
 
   mandel-mame:
-    desc: "Run a Mandelbrot demo ROM in a MAME WINDOW on this host (ROM=mandel-display [default] | mandel-mode7 | mandel-interactive | k_mandel_far). Build the ROM first via task mandel-shot / mandel-mode7 / mandel-interactive / mandel-far."
+    desc: "Run a Mandelbrot demo ROM in a MAME WINDOW on this host (ROM=mandel-display [default] | k_mandel_far). Build the ROM first via task mandel-shot / mandel-far."
     cmds:
       - |
         set -euo pipefail
@@ -117,19 +117,15 @@ tasks:
         if [ ! -f "$SFC" ]; then
           echo "missing $SFC — build it first:"
           case "$ROM" in
-            mandel-display)     echo "    task mandel-shot        (Track 2 fat-pixel BG)";;
-            mandel-mode7)       echo "    task mandel-mode7       (Track 3b 128x128 Mode 7)";;
-            mandel-interactive) echo "    task mandel-interactive (M2 instant-boot Mode 7 fly-around)";;
-            k_mandel_far)       echo "    task mandel-far         (Track 3a far-store gate)";;
-            *)              echo "    (unknown ROM '$ROM' — use mandel-display | mandel-mode7 | mandel-interactive | k_mandel_far)";;
+            mandel-display) echo "    task mandel-shot   (far Mode 7 tester)";;
+            k_mandel_far)   echo "    task mandel-far    (Track 3a far-store gate)";;
+            *)              echo "    (unknown ROM '$ROM' — use mandel-display | k_mandel_far)";;
           esac
           exit 1
         fi
         [ -f dev/roms/s_smp/spc700.rom ] || { echo "missing dev/roms/s_smp/spc700.rom (SPC700 IPL) — MAME's snes driver needs it."; exit 1; }
         case "$ROM" in
-          mandel-mode7) echo "note: mandel-mode7's 128x128 software compute is ~4 min of EMULATED time — the screen stays black until it finishes, then shows the image." ;;
           mandel-display) echo "note: the image appears after the ~15 s (emulated) compute." ;;
-          mandel-interactive) echo "note: INSTANT boot. KEYS (remapped to match the labels): arrows=pan | L/R=zoom out/in | Y/A=rotate | S=cycle palette | Enter=reset." ;;
         esac
         echo "launching $SFC in MAME — close the window to quit."
         mkdir -p build/.mame
@@ -141,36 +137,14 @@ tasks:
           -cfg_directory build/.mame -nvram_directory build/.mame
 
   mandel-shot:
-    desc: "#321 Track 2: render the fat-pixel Mandelbrot ON the SNES, screenshot from MAME + bsnes-jg (headless). Leaves build/mandel-display.sfc."
+    desc: "#321: render the canonical on-SNES Mandelbrot tester (far-stored into high WRAM, displayed via Mode 7; +mos-a16) ON the SNES, screenshot from MAME + bsnes-jg (headless). Leaves build/mandel-display.sfc."
     cmds:
       - dev/run.sh mandel-shot
-
-  mandel-mode7:
-    desc: "#321 Track 3b: 128x128 per-pixel Mandelbrot via Mode 7 + DMA + far stores, screenshot both emulators (headless). Leaves build/mandel-mode7.sfc."
-    cmds:
-      - dev/run.sh mandel-mode7
 
   mandel-far:
     desc: "#321 Track 3a: Mandelbrot into high WRAM via #320 far stores, asserted host==+mos-a16 on both emulators. Leaves build/k_mandel_far.sfc."
     cmds:
       - dev/run.sh mandel-far
-
-  mandel-interactive:
-    desc: "#321 M2: INTERACTIVE Mandelbrot — host-baked image DMA'd ROM->VRAM for an instant boot, then a Mode 7 joypad fly-around. Builds default + +mos-a16, asserts image hash==host + a scripted-input view-math differential, screenshots both emulators. Leaves build/mandel-interactive.sfc (then: task mandel-play)."
-    cmds:
-      - dev/run.sh mandel-interactive
-
-  mandel-play:
-    desc: "PLAY the interactive Mandelbrot in a MAME WINDOW on this host (builds the ROM first if needed). Controls: D-pad pan | L/R zoom | Y/A rotate | Select palette | Start reset."
-    cmds:
-      - |
-        set -euo pipefail
-        if [ ! -f build/mandel-interactive.sfc ]; then
-          echo "==> build/mandel-interactive.sfc missing — building it (dev/run.sh mandel-interactive)…"
-          dev/run.sh mandel-interactive
-        fi
-      - task: mandel-mame
-        vars: { ROM: mandel-interactive }
 
   # --- Generated reference docs (from the HAL headers + the backend TableGen) ---
 

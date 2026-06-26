@@ -5,9 +5,10 @@
 # jgxcheck + the host CRC oracle + the reference fixtures, NO toolchain) and runs it
 # with NO repo mount, so the container can only ever see the *published* compiler —
 # never this checkout's build/llvm-mos-install. Inside, it acquires mos-snes-clang,
-# compiles the reference Mandelbrot (default-8bit + +mos-a16), runs each ROM headless
-# in bsnes-jg (embedded SPC700 IPL → no BIOS, no sound), and asserts the WRAM CRC
-# matches an independent host oracle. See docs/plans/2026-06-25-test-published-snes-compiler.md.
+# compiles the reference Mandelbrot (mandel-display is far/+mos-a16-only; k_mandel builds
+# default-8bit + +mos-a16), runs each ROM headless in bsnes-jg (embedded SPC700 IPL →
+# no BIOS, no sound), and asserts the WRAM CRC matches an independent host oracle.
+# See docs/plans/2026-06-25-test-published-snes-compiler.md.
 #
 # This is also the PUBLISH GATE: dev/package-release.sh runs `METHOD=local` on the
 # freshly-built tarball, so every `task package` is clean-room-verified before upload.
@@ -29,7 +30,8 @@ Knobs (env or KEY=VALUE args):
              apt     = apt install llvm-mos-65816 from the live apt.indri.studio
              tarball = scrape + download the product-page tarball link
   PROGRAM  mandel-display | k_mandel    reference program                 (default mandel-display)
-  A16      both | 1 | 0                 which builds to test              (default both)
+  A16      both | 1 | 0                 which builds to test              (default both;
+                                          mandel-display is far/a16-only → forced to 1)
   TARBALL  <path>                       tarball for METHOD=local          (default: newest dist/*.tar.xz)
   FRAMES   <n>                          emulated frames before sampling   (default: per program)
   NO_CACHE 1                            docker build --no-cache (force a fresh rig image)

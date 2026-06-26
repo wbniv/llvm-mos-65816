@@ -1,21 +1,23 @@
-// #321 beefy demo, Track 2 — render the fixed-point Mandelbrot ON the SNES, in MODE 7.
+// #321 — the canonical on-SNES fixed-point Mandelbrot tester, rendered in MODE 7 via FAR stores.
 //
-// Unlike mandel-mode7.c (which DMAs a HOST-baked 128x128 image and needs +mos-a16 high WRAM),
-// this computes the fractal on the 65816 and writes it, a tile-row at a time, into Mode 7
-// character VRAM — progressively (coarse -> fine), then spins/zooms it with the affine matrix.
+// This is what the publish/release gate (dev/release-test-inner.sh) and `task mandel-shot` compile,
+// so it is deliberately the broadest single codegen exercise we can make it: the 65816 computes the
+// fractal and FAR-STORES every pixel into a high-WRAM escape buffer at $7E2000 (the #320 far path,
+// sta [dp]), then FAR-LOADS it back (lda [dp]) both to upload each line to Mode 7 character VRAM and
+// to CRC the finished image. Revealed progressively (coarse -> fine), then spun/zoomed by the affine
+// matrix. corpus_result carries the buffer CRC as the differential proof channel.
 //
-// It stays on the DEFAULT 65816 target (so the prebuilt toolchain builds it and it syncs to the
-// web demo): no +mos-a16 far/high-WRAM pixel buffer. Pixels are staged in a small NEAR low-WRAM
-// buffer and DMA'd to VRAM; the fidelity CRC is rolled byte-by-byte as the canonical pass
-// computes (no full image buffer needed).
+// mos-a16-only — far pointers are 32-bit values, so this requires +mos-a16 (the 16-bit-accumulator
+// target); the prebuilt 8-bit toolchain can't legalize the far G_PTR_ADD. dev/build.sh greps for the
+// "mos-a16-only" marker above to drive +mos-a16 (and skip where the toolchain lacks it).
 //
-// REVEAL DURING VBLANK — no force-blank flash. Each refresh is one Mode 7 tile-row = 8 image rows
-// = a contiguous 512-byte character region; a 512-byte WRAM->VRAM DMA fits comfortably inside one
-// vblank, so the picture fills in (and later sharpens) flicker-free.
+// REVEAL DURING VBLANK — no force-blank flash. Each coarse refresh is one Mode 7 tile-row = 8 image
+// rows = a contiguous 512-byte character region; a 512-byte WRAM->VRAM DMA fits comfortably inside
+// one vblank, so the picture fills in (and later sharpens) flicker-free.
 //
 // Image: 64x56 px = 8x7 Mode 7 tiles, DN=15 (escape 0..15, 15 = interior = black). The matrix
-// 4x-magnifies it to exactly fill 256x224. corpus_result carries the buffer CRC (== the host
-// reference tools/mandel-render 64 56 15 == 0x204F) as the differential proof channel.
+// 4x-magnifies it to exactly fill 256x224. corpus_result == the host reference
+// tools/mandel-render 64 56 15 == 0x204F.
 #include <snes.h>
 #include "mode7.h"
 #include "../65816/mandel.h"
@@ -28,9 +30,13 @@
 #define TILES_H (DH / 8)     // 7
 #define ROW_BYTES 512        // one tile-row of character data (8 tiles * 64 bytes)
 
+// Canonical 64x56 escape buffer in HIGH WRAM ($7E2000) — reachable only via 24-bit/far addressing,
+// so filling + reading it exercises the #320 far store/load path (sta [dp] / lda [dp]). 3584 B.
+static M7_FAR uint8_t *const fb = (M7_FAR uint8_t *)0x7E2000u;
+
 static uint8_t scratch[32 * 28];        // coarse-preview grid (max 32x28 = 896 B, low WRAM)
-static uint8_t chrbuf[ROW_BYTES];       // one tile-row, in Mode 7 tiled order, staged for DMA
-volatile uint16_t corpus_result;        // rolling CRC of the canonical 64x56 buffer (the proof)
+static uint8_t chrbuf[ROW_BYTES];       // near: one tile-row, Mode 7 tiled order, staged for coarse DMA
+volatile uint16_t corpus_result;        // near: CRC of the canonical far buffer fb (the proof)
 static const uint8_t m7_zero = 0;       // fixed-source byte for the tilemap-clear DMA
 
 static uint16_t pal[DN + 1];            // base BGR555 palette, cached for the steady-state colour cycle
@@ -64,13 +70,16 @@ static void cycle_palette(uint8_t shift) {
   REG_CGDATA = (uint8_t)(pal[DN] >> 8);
 }
 
-// CRC16-CCITT (XModem) one byte — the incremental form of mandel.h's mandel_crc, so feeding the
-// canonical buffer row-major reproduces mandel_crc(fb, DW*DH) exactly (== the host reference).
-static void crc_byte(uint16_t *crc, uint8_t b) {
-  uint16_t c = (uint16_t)(*crc ^ (uint16_t)((uint16_t)b << 8));
-  for (uint8_t i = 0; i < 8; i++)
-    c = (c & 0x8000) ? (uint16_t)((uint16_t)(c << 1) ^ 0x1021) : (uint16_t)(c << 1);
-  *crc = c;
+// CRC16-CCITT (XModem) over the canonical 64x56 escape buffer via FAR LOADS. Folding fb row-major
+// reproduces mandel.h's mandel_crc(fb, DW*DH) exactly (== the host reference tools/mandel-render).
+static uint16_t crc_fb(void) {
+  uint16_t crc = 0xFFFF;
+  for (uint16_t k = 0; k < (uint16_t)(DW * DH); k++) {
+    crc ^= (uint16_t)((uint16_t)fb[k] << 8);                    // FAR LOAD
+    for (uint8_t b = 0; b < 8; b++)
+      crc = (crc & 0x8000) ? (uint16_t)((uint16_t)(crc << 1) ^ 0x1021) : (uint16_t)(crc << 1);
+  }
+  return crc;
 }
 
 // DMA `nbytes` of character data from a NEAR buffer (bank $00 low WRAM) into the Mode 7 VRAM HIGH
@@ -138,31 +147,30 @@ int main(void) {
   coarse_pass(32, 28, 1, 1, 1);
 
   // Canonical 64x56, revealed ONE IMAGE LINE at a time — a smooth top-down scanline fill rather
-  // than 8-row jumps. Compute each row's 64 cells ROW-MAJOR, fold every escape count into the
-  // rolling CRC in that order (so corpus_result == mandel_crc over a row-major 64x56 buffer ==
-  // mandel-render 64 56 15), then write the line in vblank. In Mode 7's tiled layout one image
-  // row r is, per 8x8 tile, 8 contiguous chr bytes at tile*64 + r*8 — so a line is 8 short runs
-  // (one per tile column). Lines below keep the 32x28 preview -> sharpens line by line.
+  // than 8-row jumps. Compute each row's 64 cells ROW-MAJOR and FAR-STORE them into fb ($7E2000,
+  // high WRAM — the #320 far-store path); then read the line back via FAR LOADS to upload it. In
+  // Mode 7's tiled layout one image row r is, per 8x8 tile, 8 contiguous chr bytes at tile*64 + r*8
+  // — so a line is 8 short runs (one per tile column). Lines below keep the 32x28 preview ->
+  // sharpens line by line. After the full fill, crc_fb() folds the whole far buffer (FAR LOADS) so
+  // corpus_result == mandel_crc over a row-major 64x56 buffer == mandel-render 64 56 15 == 0x204F.
   {
     int16_t dre = (int16_t)(MANDEL_REW / DW);
     int16_t dim = (int16_t)(MANDEL_IMW / DH);
-    uint16_t crc = 0xFFFF;
     for (uint8_t j = 0; j < DH; j++) {
       uint8_t trow = (uint8_t)(j >> 3), r = (uint8_t)(j & 7);
       int16_t ci = (int16_t)(MANDEL_IM0 + (int16_t)j * dim);
       for (uint8_t i = 0; i < DW; i++) {
         int16_t cr = (int16_t)(MANDEL_RE0 + (int16_t)i * dre);
-        uint8_t v = mandel_cell(cr, ci, DN);
-        crc_byte(&crc, v);
-        chrbuf[i] = v;                                                       // row-major line scratch
+        fb[(uint16_t)j * DW + i] = mandel_cell(cr, ci, DN);                  // FAR STORE
       }
       wait_vblank_fresh();
       for (uint8_t tcol = 0; tcol < TILES_W; tcol++) {                       // 8 tiles, row r of each
         snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));
-        for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = chrbuf[(uint16_t)tcol * 8 + c];
+        uint16_t base = (uint16_t)((uint16_t)j * DW + (uint16_t)tcol * 8);
+        for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = fb[base + c];          // FAR LOAD
       }
     }
-    corpus_result = crc;                         // == gate CRC 0x204F (set once, after the render)
+    corpus_result = crc_fb();                    // far loads over the whole buffer == 0x204F
   }
 
   // Steady state: the iconic Mode 7 move — rotate the rendered fractal, breathe the zoom in/out,

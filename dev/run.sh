@@ -35,25 +35,17 @@ Targets:
              +mos-xy16 on MAME + bsnes-jg (all programs PASS — globals.c's
              regalloc-out-of-registers was fixed in patch 0009, now a positive gate).
              Closes the "corpus only ever built default 8-bit" gap that hid it.
-  mandel-shot #321 beefy demo, Track 2: render the fixed-point Mandelbrot ON the SNES
-             (examples/snes/mandel-display.c, +mos-a16) and capture a REAL emulator
-             screenshot from BOTH cores headless — bsnes-jg (framebuffer dump via
-             jgxcheck) + MAME (video:snapshot under Xvfb) — each asserting the on-screen
-             buffer's CRC == the host renderer (build/mandel-{jg,mame,host}.png). See
+  mandel-shot #321: render the canonical on-SNES Mandelbrot tester ON the SNES
+             (examples/snes/mandel-display.c, +mos-a16; far-stored into high WRAM,
+             displayed via Mode 7) and capture a REAL emulator screenshot from BOTH cores
+             headless — bsnes-jg (framebuffer dump via jgxcheck) + MAME (video:snapshot
+             under Xvfb) — each asserting the on-screen buffer's CRC == the host renderer
+             (0x204F; build/mandel-{jg,mame,host}.png). See
              docs/investigations/snes-emulator-screenshots.md.
   mandel-far  #321 beefy demo, Track 3a: fill a HIGH-WRAM buffer ($7E2000, reachable
              only by 24-bit addressing) with the Mandelbrot via #320 far stores
              (sta [dp]), CRC it via far loads; +mos-a16-only, asserts host == +mos-a16
              (0x820B) on MAME + bsnes-jg + a disasm gate (examples/65816/k_mandel_far.c)
-  mandel-mode7 #321 beefy demo, Track 3b: a BIG 128x128 per-pixel Mandelbrot — far-stored
-             into high WRAM, displayed via Mode 7 (linear 8bpp), uploaded by one 32 KiB
-             DMA, shown at 2x zoom. Screenshots MAME + bsnes-jg, asserts on-screen CRC ==
-             host (0x75E8). +mos-a16-only; one-off (~14.4k-frame fill). examples/snes/mandel-mode7.c
-  mandel-interactive #321 M2: the INTERACTIVE Mandelbrot — a host-baked 128x128 image (tiled into
-             Mode 7 chars) DMA'd ROM->VRAM for an INSTANT boot, then a joypad pan/zoom/rotate
-             fly-around at 60 fps. Builds default AND +mos-a16; per build asserts image hash == host
-             AND a scripted-input view-math differential (host replay == ROM) on bsnes-jg, plus a
-             MAME snapshot. examples/snes/mandel-interactive.c. Live: task mandel-mame ROM=mandel-interactive
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUE_REPROS repro
              STILL crashes -verify-machineinstrs under both +mos-a16 and +mos-xy16 with its
              expected signature; fails loudly the moment one verifies clean -> drop the entry
@@ -312,8 +304,7 @@ Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for
 `repro`, to repro.sh.
 Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH,
 MOS_TOOLCHAIN (toolchain install prefix to build the bench with), BUILD_JOBS,
-JG_ONLY (=1 → bsnes-jg-only: skip the MAME leg, used by xcheck-suite / a single test),
-MANDEL_FRAMES / JGX_SCRIPT (mandel-interactive frame budget + scripted input).
+JG_ONLY (=1 → bsnes-jg-only: skip the MAME leg, used by xcheck-suite / a single test).
 USAGE
   exit 0
 fi
@@ -382,8 +373,6 @@ docker run --rm \
   ${RUNNER:+-e RUNNER} \
   ${STAGE_REL:+-e STAGE_REL} \
   ${JG_ONLY:+-e JG_ONLY} \
-  ${MANDEL_FRAMES:+-e MANDEL_FRAMES} \
-  ${JGX_SCRIPT:+-e JGX_SCRIPT} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
   2> >(grep -vF 'different data layouts' | cat -s >&2)
 exit $?

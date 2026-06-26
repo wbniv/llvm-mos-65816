@@ -2,16 +2,16 @@
 # dev/release-test-inner.sh — runs INSIDE the clean-room rig (dev/Dockerfile.release-test).
 #
 # Acquires the *published* 65816 compiler (NOT the dev build — this container has no
-# /work/build), compiles the reference Mandelbrot in both the default-8bit and the
-# +mos-a16 form, runs each ROM headless in bsnes-jg (embedded SPC700 IPL → no BIOS,
-# no sound), and asserts the WRAM corpus_result CRC matches the host oracle. Dumps a
-# real emulator-rendered PNG per build. Prints a method×build result table; non-zero
-# exit on any FAIL.
+# /work/build), compiles the reference Mandelbrot (mandel-display is far/+mos-a16-only;
+# k_mandel builds both default-8bit and +mos-a16), runs each ROM headless in bsnes-jg
+# (embedded SPC700 IPL → no BIOS, no sound), and asserts the WRAM corpus_result CRC
+# matches the host oracle. Dumps a real emulator-rendered PNG per build. Prints a
+# method×build result table; non-zero exit on any FAIL.
 #
 # Env knobs (set by dev/test-release.sh):
 #   METHOD   = local | apt | tarball     (where mos-snes-clang comes from)
 #   PROGRAM  = mandel-display | k_mandel  (default mandel-display)
-#   A16      = both | 1 | 0               (which builds; default both)
+#   A16      = both | 1 | 0               (which builds; default both — mandel-display forces a16-only)
 #   FRAMES   = <n>                        (emulated frames before sampling; default per program)
 #   PRODUCT_PAGE / APT_URL / APT_KEY_URL  (endpoints; defaults below)
 # Inputs mounted by the runner:
@@ -52,7 +52,11 @@ ts()   { date -u +%Y-%m-%dT%H:%M:%SZ; }   # ISO 8601 UTC (SRC convention)
 
 # --- resolve the program ----------------------------------------------------
 case "$PROGRAM" in
-  mandel-display) SRC="$RIG/fixtures/snes/mandel-display.c"; FRAMES="${FRAMES:-1800}"; ORACLE=display ;;
+  mandel-display) SRC="$RIG/fixtures/snes/mandel-display.c"; FRAMES="${FRAMES:-1800}"; ORACLE=display
+                  # The far/16-bit tester is +mos-a16-only: its high-WRAM escape buffer needs the
+                  # far G_PTR_ADD the default-8bit target can't legalize. Collapse A16=both -> a16-only
+                  # so the gate doesn't attempt (and fail) a default-8bit build. (k_mandel keeps both.)
+                  [ "$A16" = both ] && { A16=1; say "  note: mandel-display is far/a16-only — testing +mos-a16 only"; } ;;
   k_mandel)       SRC="$RIG/fixtures/65816/k_mandel.c";      FRAMES="${FRAMES:-200}";  ORACLE=gate ;;
   *) say "FATAL: unknown PROGRAM='$PROGRAM' (use mandel-display | k_mandel)"; exit 2 ;;
 esac

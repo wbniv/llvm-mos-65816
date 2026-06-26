@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2b4d631) | docs(plan-index): add the full-xy16-backend-fix row (149 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/5f3b316) | #321 c-torture: finish the full vendoring (ieee/ + builtins/ into the gate) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/de658f0) | docs: finish the stale-deferral sweep — propagate Phase-3 closure + fixed crashes |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ec4a80b) | #320 Phase B: land __call_indir_far stub; fix far-indirect-from-far-caller; fold its tail |
@@ -25,6 +26,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+2b4d631	author	Will Norris
+2b4d631	added	3
+2b4d631	deleted	1
+2b4d631	files	1
+2b4d631	body	Index the new fix plan introduced in 3e338fb under the xy16 category; bump\nthe footer count 148 -> 149.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_0112c75d3fGCNwh9khVrTuCj
 5f3b316	author	Will Norris
 5f3b316	added	1
 5f3b316	deleted	1

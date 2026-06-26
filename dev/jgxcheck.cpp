@@ -17,45 +17,6 @@
 #include <bsnes.hpp>
 #include "png_write.h"   // dependency-free RGB8 PNG writer (shared with tools/mandel-render.c)
 
-#ifdef JGX_VIEW
-// Interactive-demo input differential (built only by dev/mandel-interactive.sh
-// as a separate `jgxcheck-view` binary, so the plain jgxcheck used by other
-// scripts is unaffected). Drive a scripted controller sequence into pollInput, then replay the
-// SHARED pure view math (examples/snes/view.h) over the ROM's ground-truth pad log and
-// assert an identical rolling CRC. The NO_IMG guards keep the baked image arrays out of this host
-// TU (we only need the SINCOS table + the per-level reference hashes).
-#ifdef JGX_VIEW
-#define MANDEL_IMAGE_NO_IMG
-#include "view.h"
-#endif
-
-static std::vector<uint16_t> g_script;   // per-frame button mask (frame -> JOY_* bits)
-static unsigned g_frame = 0;
-
-// Parse "RIGHT:24,R:24,A:24,..." into g_script (one button per segment, held for N frames).
-static void parseScript(const char *s) {
-  struct { const char *n; uint16_t m; } BTN[] = {
-    {"B", JOY_B}, {"Y", JOY_Y}, {"SELECT", JOY_SELECT}, {"START", JOY_START},
-    {"UP", JOY_UP}, {"DOWN", JOY_DOWN}, {"LEFT", JOY_LEFT}, {"RIGHT", JOY_RIGHT},
-    {"A", JOY_A}, {"X", JOY_X}, {"L", JOY_L}, {"R", JOY_R}, {"NONE", 0},
-  };
-  std::string str(s);
-  size_t i = 0;
-  while (i < str.size()) {
-    size_t comma = str.find(',', i);
-    std::string seg = str.substr(i, comma == std::string::npos ? std::string::npos : comma - i);
-    i = (comma == std::string::npos) ? str.size() : comma + 1;
-    size_t colon = seg.find(':');
-    if (colon == std::string::npos) continue;
-    std::string name = seg.substr(0, colon);
-    int cnt = atoi(seg.c_str() + colon + 1);
-    uint16_t mask = 0;
-    for (auto &b : BTN) if (name == b.n) { mask = b.m; break; }
-    for (int k = 0; k < cnt; k++) g_script.push_back(mask);
-  }
-}
-#endif
-
 static std::vector<uint8_t> game;
 static std::string gamepath, datapath;
 static uint32_t *vbuf = nullptr;
@@ -136,19 +97,7 @@ static void dump_vram_hex(const char *label, unsigned wa, unsigned n) {
   fprintf(stderr, "\n");
 }
 static void audioFrame(const void*, size_t) {}                                     // headless: discard
-#ifdef JGX_VIEW
-// bsnes calls poll(udata, port, 0) on the controller latch and uses the full 16-bit return as
-// the button word (B in bit15 … R in bit4 — the JOY_* layout). Return the scripted mask for the
-// current frame; held past the script end. Exact frame alignment is irrelevant: the differential
-// replays the ROM's ground-truth pad log, not this script (this only has to make input non-trivial).
-static int pollInput(const void*, unsigned port, unsigned /*id*/) {
-  if (port != 0 || g_script.empty()) return 0;
-  unsigned f = (g_frame < g_script.size()) ? g_frame : (unsigned)(g_script.size() - 1);
-  return (int)g_script[f];
-}
-#else
-static int pollInput(const void*, unsigned, unsigned) { return 0; }
-#endif
+static int pollInput(const void*, unsigned, unsigned) { return 0; }                 // headless: no input
 
 int main(int argc, char **argv) {
   if (argc < 6) {
@@ -185,16 +134,7 @@ int main(int argc, char **argv) {
   Bsnes::setInputSpec({0, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
   Bsnes::setInputSpec({1, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
 
-#ifdef JGX_VIEW
-  if (getenv("JGX_SCRIPT")) parseScript(getenv("JGX_SCRIPT"));
-#endif
-
-  for (int i = 0; i < frames; ++i) {
-    Bsnes::run();
-#ifdef JGX_VIEW
-    g_frame++;
-#endif
-  }
+  for (int i = 0; i < frames; ++i) Bsnes::run();
 
   if (png_out) dump_png(png_out, 224);
   if (getenv("JGX_VRAM")) {
@@ -217,40 +157,6 @@ int main(int argc, char **argv) {
     printf("SMOKE: FAIL off=0x%X len=%u got=0x%0*X want=0x%0*X\n", off, len, 2 * len, got, 2 * len, want);
     rc = 1;
   }
-
-#ifdef JGX_VIEW
-  // Input differential: replay view.h over the ROM's ground-truth pad log; assert host == ROM.
-  if (getenv("JGX_SCRIPT") && getenv("JGX_VIEWCRC") && getenv("JGX_PADLOG") && getenv("JGX_NFRAMES")) {
-    unsigned padlog_off = (unsigned)strtoul(getenv("JGX_PADLOG"), nullptr, 16);
-    unsigned vc_off     = (unsigned)strtoul(getenv("JGX_VIEWCRC"), nullptr, 16);
-    unsigned nf_off     = (unsigned)strtoul(getenv("JGX_NFRAMES"), nullptr, 16);
-    unsigned padlog_n   = getenv("JGX_PADLOG_N") ? (unsigned)atoi(getenv("JGX_PADLOG_N")) : 64;
-    if (nf_off < mem.second && vc_off + 1 < mem.second) {
-      unsigned nf = wram[nf_off];
-      if (nf > padlog_n) nf = padlog_n;
-      uint16_t rom_vc = (uint16_t)(wram[vc_off] | (wram[vc_off + 1] << 8));
-      view_t v; view_reset(&v);
-      uint16_t crc = 0xFFFF; unsigned nonzero = 0;
-      for (unsigned i = 0; i < nf; i++) {
-        unsigned a = padlog_off + 2 * i;
-        uint16_t pad = (a + 1 < mem.second) ? (uint16_t)(wram[a] | (wram[a + 1] << 8)) : 0;
-        if (pad) nonzero++;
-        view_step(&v, pad);
-        int16_t m[4]; view_matrix(&v, m);
-        crc = view_fold(crc, &v, m);
-      }
-      if (nf > 0 && nonzero > 0 && crc == rom_vc) {
-        printf("VIEW: PASS frames=%u nonzero=%u view_crc=0x%04X (host replay == ROM, bsnes-jg)\n",
-               nf, nonzero, crc);
-      } else {
-        printf("VIEW: FAIL frames=%u nonzero=%u host=0x%04X rom=0x%04X\n", nf, nonzero, crc, rom_vc);
-        rc = 1;
-      }
-    } else {
-      printf("VIEW: FAIL (WRAM offsets out of range)\n"); rc = 1;
-    }
-  }
-#endif
 
   return rc;
 }
