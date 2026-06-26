@@ -2,22 +2,23 @@
 
 ## Status — as-built 2026-06-27
 
-**Done & verified (all GREEN):** `snesgfx` library (`display`/`upload`/`vram`/`drawable`/`scene`/
+**COMPLETE & verified (all GREEN).** `snesgfx` library (`display`/`upload`/`vram`/`drawable`/`scene`/
 `sprite_set`/`controller`); the full game (`invaders.c`) — fleet of 3 alien types × 2-frame anim + march +
-speed-up, player, shot, alien bombs, UFO, AABB collisions, scoring/lives, attract **and** interactive play
-(START). Differential bar: host == default@MAME == a16@MAME == xy16@MAME == default/a16@bsnes-jg == **0x3DAC**,
-`-verify-machineinstrs` clean, bsnes **3× byte-identical** (`dev/run.sh invaders`). Real **gfx4snes** art via
-**Option B** (`art/invaders/draw.py` → committed `.pic`/`.pal` → `dev/build.sh` objcopy into bank-$00
-`.rodata`). Corpus 5-way slice (`corpus/invaders_sim.c`, `0x3DAC`). Both-emulator screenshots clean.
+speed-up, player, shot, alien bombs, UFO, **destructible bunkers**, AABB collisions, **score + lives HUD**,
+attract **and** interactive play (START). Differential bar: host == default@MAME == a16@MAME == xy16@MAME ==
+default/a16@bsnes-jg == **0x9D57**, `-verify-machineinstrs` clean, bsnes **3× byte-identical**
+(`dev/run.sh invaders`). Real **gfx4snes** art via **Option B** (`art/invaders/draw.py` → committed
+`.pic`/`.pal` → `dev/build.sh` objcopy into bank-$00 `.rodata`). Corpus 5-way slice
+(`corpus/invaders_sim.c`, `0x9D57`). Both-emulator screenshots show fleet + eroding bunkers + score + lives.
 **Bug fixed:** `SpriteSet` did `REG_TM |= TM_OBJ` on the **write-only** TM register → bsnes flap; now a
-`Display` TM shadow. Commits `1d753fe`, `c76d735`, `b71f93d`, `e6d31e6`, `3e87d01`, `aca9594`.
+`Display` TM shadow. Commits `1d753fe`, `c76d735`, `b71f93d`, `e6d31e6`, `aca9594`, `bb652a6`.
+(HUD/shields are rendered as OAM sprites, not the `TextLayer`/`ShieldField` BG layers the plan sketched — a
+future refactor; the game is complete and verified as-is. The render now spans ~2 v-blanks/step ≈ 30 fps.)
 
-**P7 page:** `/space-invaders` built, screenshot-verified, committed on `biohack.net` (`c20b62e`). **Deploy
+**P7 page:** `/space-invaders` built, screenshot-verified, committed on `biohack.net` (`957c2cf`). **Deploy
 to production (https://www.biohack.net/space-invaders/) PENDING explicit user OK** — `task publish
-TAG=v1.0.75` (tag → GitHub Actions → Cloudflare Pages) was guardrail-blocked as an outward deploy.
-
-**Remaining (polish, P4–P5):** on-screen HUD (score/lives via a `TextLayer` BG) and destructible shields
-(`ShieldField`). Not required for a playable, verified game; deferred.
+TAG=v1.0.75` (tag → GitHub Actions → Cloudflare Pages) is guardrail-blocked as an outward deploy; run it
+manually or authorize it.
 
 ## Context
 

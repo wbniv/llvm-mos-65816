@@ -345,12 +345,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `gfx4snes` (foundry `pvsneslib-core`) → committed `.pic`/`.pal` → **objcopied to bank-$00 `.rodata` objects**
   by `dev/build.sh` (`-O elf32-mos`, `--rename-section .data=.rodata`) and linked — no compiled C arrays.
   [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md).
-  **STATUS 2026-06-27 — built, verified, playable (attract + START to play):** full game + `snesgfx`
-  library + gfx4snes art (Option B) all GREEN — host==default@MAME==a16@MAME==xy16@MAME==default/a16@bsnes-jg
-  ==`0x3DAC`, `-verify` clean, bsnes 3× byte-identical (`dev/run.sh invaders`). Fixed a real PPU bug
-  (`SpriteSet` RMW of write-only `TM` → bsnes flap; now a `Display` TM shadow). In-browser page built +
-  committed on biohack.net (`c20b62e`); **production deploy to https://www.biohack.net/space-invaders/ awaits
-  user OK** (`task publish TAG=v1.0.75`). Remaining polish (deferred): on-screen HUD + destructible shields.
+  **STATUS 2026-06-27 — COMPLETE & verified (attract + START to play):** full game (fleet 3 types, bombs,
+  UFO, **destructible bunkers**, **score+lives HUD**) + `snesgfx` library + gfx4snes art (Option B) all GREEN
+  — host==default@MAME==a16@MAME==xy16@MAME==default/a16@bsnes-jg==`0x9D57`, `-verify` clean, bsnes 3×
+  byte-identical (`dev/run.sh invaders`). Fixed a real PPU bug (`SpriteSet` RMW of write-only `TM` → bsnes
+  flap; now a `Display` TM shadow). In-browser page built + committed on biohack.net (`957c2cf`);
+  **production deploy to https://www.biohack.net/space-invaders/ awaits user OK** (`cd ~/SRC/biohack.net &&
+  task publish TAG=v1.0.75`). Future refactor: move HUD/shields from OAM sprites to `TextLayer`/`ShieldField`
+  BG layers.
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*

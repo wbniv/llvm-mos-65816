@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/de9101c) | docs(invaders): record as-built status — game verified, page committed, deploy pending |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3e87d01) | docs(invaders-plan): add P7 — publish playable page at biohack.net/space-invaders |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/1d753fe) | #321 snesgfx P0: OOP rendering library core + SpriteSet (OAM front-end) |
 
 <!--history-meta v1
+de9101c	author	Will Norris
+de9101c	added	19
+de9101c	deleted	0
+de9101c	files	1
+de9101c	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3e87d01	author	Will Norris
 3e87d01	added	9
 3e87d01	deleted	3
