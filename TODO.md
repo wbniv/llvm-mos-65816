@@ -304,19 +304,21 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   un-landed (a)/(b) `0002` spike; tear down only when told; (2) post the prepared #321 CC design note
   (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
   [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
-- [ ] **#3 SNES Blossom on-screen interactive port — the graphical payoff demo (Phase 1 kernel DONE; in progress `wt/321-blossom`).**
-  Phase 1 (`k_hopalong.c`, the Q8.8 Hopalong/Blossom attractor math) is landed + 4-way verified (see
-  Done). Remaining = render it natively + make it interactive. **Scope corrected (brief was stale):**
-  graphics is *not* greenfield — the Mode 7 demo family (`mandel-mode7`/`-interactive`/`-zoom`) landed
-  2026-06-25 with reusable `examples/snes/mode7.h` + `view.h` + the `dev/jgxcheck.cpp` two-emulator
-  differential harness, and the Phase-2 register pull-forward is already done in
-  `platforms/snes/snes_{ppu,dma,cpu,joypad}.h`. So real work = a Hopalong **plotter/accumulator** (the
-  new `+mos-a16` customer: far read-modify-write into a 64 KB hit grid in **bank `$7F`** — `$7E` is
-  full), **colorizer**, **amortized per-band animation** + CGRAM palette-cycling, a **`blossom.h`
-  joypad param state machine** (host-replayable like `view.h`), and two differential gates
-  (deterministic grid-hash `host==+mos-a16`@both-emus; param-replay `host==default==+mos-a16`).
-  Optional perf: SNES hw multiplier (`$4202/$4203→$4216`) for the hot `b*x`.
-  [plan](docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md)
+- [ ] **#3 SNES Blossom on-screen interactive port — CORE DONE + 2-way verified (`wt/321-blossom`); only optional polish left.**
+  **Landed** (`dev/run.sh blossom`, RESULT PASS): the Hopalong attractor renders + blooms live on the
+  SNES via Mode 7 (`examples/snes/blossom.c`) — far read-modify-write accumulation into a 128×128 hit
+  grid (`$7E2000`), revealed band-by-band (far grid → near `chrbuf` → VRAM DMA), hue-wheel CGRAM palette
+  cycling, and joypad pan/zoom/preset/colour (`examples/snes/blossom.h`, the `view.h`-analog state
+  machine). Two differential channels pass: grid hash `host == +mos-a16` on **MAME + bsnes-jg**
+  (`0x9047`), and the controller state-math `host == ROM` (bsnes-jg, `dev/jgxcheck.cpp -DJGX_BLOSSOM`).
+  Shared math factored into `examples/65816/hopalong.h`. Screenshots `build/blossom-{jg,mame}.png`; live
+  play `task mandel-mame ROM=blossom`. **Remaining = optional only:** (a) the literal **64 KB / 256×256
+  supersampled grid in bank `$7F`** for anti-aliasing (used 16 KB Rung-A — the far path is identical,
+  just smaller); (b) the **hw multiplier** (`$4202/$4203→$4216`) for the hot `b*x` to speed the ~10 s
+  bloom (the plot is ~1 `__mulsi3`/point, ~1200 pts/s); (c) **investigate the 2nd far-pointer fragility**
+  (a far→far whole-image build / far constant-fill in a multi-far-function TU derailed at runtime under
+  `+mos-a16` — clean `-verify`, runtime runaway; NOT minimally reproduced — isolated repros pass; worked
+  around with the band/near-staging structure). [plan](docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md)
   (supersedes [Phase-1 plan](docs/plans/2026-06-24-blossom-snes.md)).
 - [ ] **#320 far-pointer miscompile — a far constant-fill is lowered to the NEAR `__memset` (wrong bank).**
   Found 2026-06-26 building #3's far hit-grid clear: `grid[i]=0x42` over a `FAR uint8_t*` is coalesced
