@@ -200,6 +200,28 @@ tasks:
     cmds:
       - dev/run.sh mandel-zoom
 
+  blossom:
+    desc: "#3: the INTERACTIVE Hopalong/Blossom attractor on the SNES — far read-modify-write hit grid + Mode 7 band DMA + cycling hue palette + joypad. +mos-a16-only; asserts the grid hash host==+mos-a16 on both emulators AND a scripted-input controller-state differential, screenshots both. Leaves build/blossom.sfc (then: task blossom-play)."
+    cmds:
+      - dev/run.sh blossom
+
+  blossom-grid:
+    desc: "#3 Stage 1: the headless far read-modify-write HIT-GRID gate — plot Hopalong points into a 128x128 grid at high WRAM $7E2000 via the far path, far-load hash, assert host==+mos-a16 on both emulators + a far-RMW disasm gate. Leaves build/k_blossom_far.sfc."
+    cmds:
+      - dev/run.sh blossom-grid
+
+  blossom-play:
+    desc: "PLAY the interactive Blossom attractor in a MAME WINDOW on this host (builds the ROM first if needed). The attractor blooms in over ~10 s then shimmers. Arrows pan | L/R zoom | A/Y next/prev attractor | Select colour | Start reset."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/blossom.sfc ]; then
+          echo "==> build/blossom.sfc missing — building it (dev/run.sh blossom)…"
+          dev/run.sh blossom
+        fi
+      - task: mandel-mame
+        vars: { ROM: blossom }
+
   mandel-zoom-play:
     desc: "PLAY the Mandelbrot zoom pyramid in a MAME WINDOW on this host (builds the ROM first if needed). Hold R to DIVE into deeper detail, L to back out | Y/A rotate | Select palette | Start reset."
     cmds:
