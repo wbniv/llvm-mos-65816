@@ -50,6 +50,16 @@ forward-declare the struct in the header, define it only in the `.c`. Callers ca
 /* foo.c */  struct Foo { int x; };    /* definition is private to this TU */
 ```
 
+**A clean object interface is *only* constructors + methods — no bare (receiver-less) procedures.** Every
+public function takes the object it acts on as its first parameter (`Type_verb(Type *self, …)`); a global
+`do_thing()` that pokes shared state behind the caller's back is the procedural shape OOP is meant to
+replace. The payoff is that an **invariant wrapped in a constructor cannot be bypassed**: e.g. a driver whose
+hardware bring-up sequence (reset → configure → enable, *in that order*) lives in `device_open(Device *)` and
+whose only mutators are methods on `Device` makes the dangerous ordering un-expressible by the caller — they
+can't forget the reset or enable too early, because the bare register pokes aren't in the interface. (This is
+exactly how the [`snesgfx`](../plans/2026-06-26-snes-rendering-oop-library.md) rendering library hides the
+SNES boot bracket and the v-blank access-window rule: a `Display` constructor + methods, no `REG_*` in client code.)
+
 ### Inheritance — "base struct first"
 Make the base the **first member** of the derived struct. C guarantees a pointer to a struct
 equals a pointer to its first member, so the upcast `(Base*)derived` is valid and free. (This
