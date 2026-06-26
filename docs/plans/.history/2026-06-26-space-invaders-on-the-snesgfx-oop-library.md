@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3e87d01) | docs(invaders-plan): add P7 — publish playable page at biohack.net/space-invaders |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/1d753fe) | #321 snesgfx P0: OOP rendering library core + SpriteSet (OAM front-end) |
 
 <!--history-meta v1
+3e87d01	author	Will Norris
+3e87d01	added	9
+3e87d01	deleted	3
+3e87d01	files	1
+3e87d01	body	Per request: ship build/invaders-a16.sfc to a playable in-browser page at\nhttps://www.biohack.net/space-invaders/ via the snes-rom-page skill (bsnes-jg\nWASM). Hard prereq: the bsnes 3x-capture determinism check (already enforced by\ndev/invaders.sh) — the page runs bsnes-jg, so any power-on flap would show there.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 1d753fe	author	Will Norris
 1d753fe	added	243
 1d753fe	deleted	0
