@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/5f3b316) | #321 c-torture: finish the full vendoring (ieee/ + builtins/ into the gate) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/de658f0) | docs: finish the stale-deferral sweep — propagate Phase-3 closure + fixed crashes |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ec4a80b) | #320 Phase B: land __call_indir_far stub; fix far-indirect-from-far-caller; fold its tail |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/798414a) | docs(plan-index): add the pr15296 ZP-overflow gated-spike plan row (148) |
@@ -24,6 +25,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+5f3b316	author	Will Norris
+5f3b316	added	1
+5f3b316	deleted	1
+5f3b316	files	1
+5f3b316	body	The Phase-0 filter globbed only top-level execute/*.c (1656), leaving the\nieee/ and builtins/ subdirs unaccounted-for. tools/torture_filter.py now scans\nthe whole suite: SRCDIR-relative manifest keys (disambiguating the 5\ntop-level/subdir name collisions: 920810-1.c, 930529-1.c, strcpy-2.c,\nstrlen-2.c, strlen-3.c) + an unconditional */*.c glob that excludes builtins'\n-lib.c companions (builtins/lib/ is two levels deep, never reached).\n\nManifest now accounts for the full real suite: 1288/1779 in-scope (was\n1228/1656).\n  - ieee/ (68): 60 in-scope = genuinely new floating-point differential\n    coverage. Gate, 4-way MAME + bsnes-jg: -Os 53 PASS/4 SKIP/3 XFAIL,\n    -O1 57 PASS/0 SKIP/3 XFAIL, 0 FAIL.\n  - builtins/ (55 main tests): honest builtins-multifile bucket (gcc's\n    builtins.exp multi-file harness -- main_test() + lib/main.c/-lib.c\n    companions -- not single-file linkable). The 55 -lib.c + 28 lib/ support\n    files correctly excluded as non-tests.\n\nThe sweep surfaced ONE new +mos-xy16 defect (the payoff of finishing the\nvendoring -- the integer top-level suite never reached this path):\nfp-cmp-8.c + fp-cmp-8l.c + pr38016.c are the same test body (fp compare-as-\nselect / "cmove": __builtin_isunordered/isless(x,y) ? a : b). default + a16\nPASS, xy16 reads 0xDEAD, reproducible isolated on MAME at both -Os/-O1.\nRecorded as xfails.tsv rows (green-modulo-known) + a TODO follow-up to\nroot-cause+fix.\n\nRunner unchanged (resolves subdir-pathed names via SRCDIR / name; outputs are\nfixed-name per-test tempdirs). CI unchanged (reads the committed manifest).\n\nPlan: docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 de658f0	author	Will Norris
 de658f0	added	2
 de658f0	deleted	2
