@@ -1,5 +1,14 @@
 # Full xy16 backend fix — close the last `+mos-xy16` defect (fp compare-as-select)
 
+> **RESOLVED 2026-06-26 — NO DEFECT. The XFAIL was STALE.** Step 3 (the measurement arbiter)
+> redirected the conclusion: the bug does not reproduce on a clean build of the committed patch
+> stack (`0001..0012`) — all 3 rows XPASS at `-Os` and `-O1` on MAME + bsnes-jg, and the xy16
+> codegen for this body uses no 16-bit index register at all, so the hypothesized H1 class cannot
+> manifest. The 12:02 sweep measured a stale/dirty shared `build/`, not the tracked patches (same
+> as `pr15296`). De-XFAIL'd to positive gates; no `vendor/`/`0002` change. Full evidence + the
+> patch-stack-identical proof: [resolution](2026-06-26-321-xy16-cmove-stale-xfail-resolution.md).
+> The H1/H2/H3 hypothesis material below is retained as the (unneeded) investigation contract.
+
 ## Context
 
 The 65816 `+mos-xy16` (16-bit X/Y index register) backend is **fully implemented and
