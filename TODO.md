@@ -1163,7 +1163,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      phases of the trig differential plan, not deferrals — the plan itself tracks them. Phase 1 (Q16.16
      libfixmath) landed + verified this session (k_trig32 0x068A6933, k_trig32lut HiROM 0x87F0B404, both
      emulators). fp:b69409f652ecf145 fp:6129cc5f0e5198c0 -->
-- [verify] **2026-06-26-shared-plan-index-tooling** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-26-shared-plan-index-tooling.md](docs/plans/2026-06-26-shared-plan-index-tooling.md)_  <!-- fp:118418f2ad7a1a78 -->
+<!-- triaged 2026-06-26: [verify] DONE — all 5 verification steps of
+     [2026-06-26-shared-plan-index-tooling.md](docs/plans/2026-06-26-shared-plan-index-tooling.md) RAN + PASS,
+     raw output recorded in the plan's Verification section (checker in-sync 148 rows + drift stub; pre-commit
+     regen/audit still fire; post-commit dispatcher silent-on-sync; seed+check in a fresh repo; llvm-specific
+     copies removed + corpus 7/7). Plan MECHANISM-DONE+VERIFIED; cross-project rollout stays user-gated. fp:118418f2ad7a1a78 -->
 <!-- triaged 2026-06-26: all three trigger-check-pass deferrals are Out-of-scope/non-goal
      scope clarifications, not lost work — all covered by curated items.
      • "No compiler change unless a trigger fires" / "Not re-deriving the spike" -> the new curated
