@@ -13,6 +13,8 @@ partitions the suite into:
                    region-overflow  static data/code exceeds SNES RAM/ROM
                    link-other       any other link failure
                    timeout          compile/link exceeded the per-test budget
+                   builtins-multifile  a builtins/ test needing gcc's multi-file harness
+                                       (lib/main.c + -lib.c companions) — not single-file linkable
 
 Emits examples/65816/torture/{inscope,unsupported}.tsv and logs the counts. Nothing is
 silently dropped — every test lands in exactly one bucket.
@@ -55,6 +57,14 @@ CLANG_ERR = __import__("re").compile(r"^.+?:\d+:\d+: (?:fatal )?error:", __impor
 # those are deliberately NOT denied. Extend DG_REQUIRE_DENY if a future false positive warrants.
 DG_REQUIRE_RE = __import__("re").compile(r"dg-require-effective-target\s+(\w+)")
 DG_REQUIRE_DENY = {"int32plus", "int128"}
+
+# gcc's builtins/ tests are a MULTI-FILE harness: each foo.c defines main_test() (not main) and is
+# linked by builtins.exp against lib/main.c (the real entry) + a foo-lib.c reference impl. Our
+# single-file freestanding build can't replicate that, so they're detected by the harness signature
+# (main_test + no standalone main) and bucketed honestly — not compiled into a misleading
+# `undefined symbol: torture_test_main`. MAIN_RE matches a real `main(` definition but NOT the
+# `main_test(` harness entry ("main" there is followed by "_", so \s*\( can't match).
+MAIN_RE = __import__("re").compile(r"(?<!\w)main\s*\(")
 
 
 def classify(stderr):
@@ -104,7 +114,10 @@ def build_one(cfile, opt, timeout, shim_obj):
     The shim is precompiled ONCE (build_shim) because the -D renames must hit only the test
     TU — applied to the whole command line they'd also rename the shim's own main() and clash.
     """
-    name = cfile.name
+    # Manifest key is the path RELATIVE to SRCDIR (e.g. "foo.c", "ieee/foo.c", "builtins/foo.c"),
+    # not just the basename — 5 names collide across top-level/subdir (920810-1.c, strcpy-2.c, …),
+    # and the runner resolves the test via SRCDIR / name.
+    name = str(cfile.relative_to(SRCDIR))
     # Honor dg-require-effective-target BEFORE building: a test that requires an integer
     # width our 16-bit-int target can't provide is target-inappropriate (skip it so it can't
     # masquerade as a +mos-a16 defect). Cheap regex over the source; no compile in the denied case.
@@ -115,6 +128,12 @@ def build_one(cfile, opt, timeout, shim_obj):
     for req in DG_REQUIRE_RE.findall(text):
         if req in DG_REQUIRE_DENY:
             return name, "dg-require-unsupported", "requires %s (16-bit-int target cannot satisfy)" % req
+    # gcc builtins/ multi-file harness: bucket honestly instead of letting it fail with a
+    # misleading undefined-symbol. Gated on the harness signature so a genuinely self-contained
+    # builtins test (none today) would still go through the normal build.
+    if cfile.parent.name == "builtins" and "main_test" in text and not MAIN_RE.search(text):
+        return name, "builtins-multifile", \
+            "gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable"
     with tempfile.TemporaryDirectory() as td:
         rom = Path(td) / "t.sfc"
         mapf = Path(td) / "t.map"
@@ -145,16 +164,17 @@ def main():
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 4) - 1))
     ap.add_argument("--timeout", type=int, default=60, help="per-test compile/link budget, seconds")
     ap.add_argument("--limit", type=int, default=0, help="only the first N tests (debug)")
-    ap.add_argument("--subdirs", action="store_true", help="also include builtins/ and ieee/ subdirs")
     args = ap.parse_args()
 
     for need in (TOOL / "mos-clang", CFG, SHIM, SRCDIR):
         if not Path(need).exists():
             sys.exit("FATAL: missing %s (run dev/fetch-torture.sh + build the toolchain/SDK first)" % need)
 
+    # Top-level + the ieee/ and builtins/ subdirs, so the committed manifest accounts for the WHOLE
+    # execute suite (the "nothing silently dropped" invariant). Exclude builtins' -lib.c reference-impl
+    # companions (not tests); builtins/lib/ is two levels deep so */*.c (one level) never reaches it.
     tests = sorted(SRCDIR.glob("*.c"))
-    if args.subdirs:
-        tests += sorted(SRCDIR.glob("*/*.c"))
+    tests += sorted(t for t in SRCDIR.glob("*/*.c") if not t.name.endswith("-lib.c"))
     if args.limit:
         tests = tests[: args.limit]
     total = len(tests)

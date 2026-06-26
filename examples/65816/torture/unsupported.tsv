@@ -170,6 +170,61 @@ builtin-prefetch-3.c	link-other	ld.lld: error: Invalid call record (Producer: 'L
 builtin-prefetch-4.c	link-other	ld.lld: error: Invalid call record (Producer: 'LLVM23.0.0git' Reader: 'LLVM 23.0.0git')
 builtin-prefetch-5.c	link-other	ld.lld: error: Invalid call record (Producer: 'LLVM23.0.0git' Reader: 'LLVM 23.0.0git')
 builtin-prefetch-6.c	link-other	ld.lld: error: Invalid call record (Producer: 'LLVM23.0.0git' Reader: 'LLVM 23.0.0git')
+builtins/20010124-1.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/abs-1.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/abs-2.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/abs-3.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/complex-1.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/fprintf.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/fputs.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memchr.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memcmp.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memcpy-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memmove-2.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memmove-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memmove.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memops-asm.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/mempcpy-2.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/mempcpy-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/mempcpy.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memset-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/memset.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/pr22237.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/pr23484-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/pr93262-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/printf.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/snprintf-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/sprintf-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/sprintf.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/stpcpy-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/stpncpy-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strcat-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strcat.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strchr.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strcmp.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strcpy-2.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strcpy-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strcpy.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strcspn.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strlen-2.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strlen-3.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strlen.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strncat-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strncat.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strncmp-2.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strncmp.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strncpy-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strncpy.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strnlen.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strpbrk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strpcpy-2.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strpcpy.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strrchr.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strspn.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strstr-asm.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/strstr.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/vsnprintf-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
+builtins/vsprintf-chk.c	builtins-multifile	gcc builtins multi-file harness (needs lib/main.c + -lib.c companions); not single-file linkable
 cmpdi-1.c	compile-error	vendor/c-torture/execute/cmpdi-1.c:6:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 cmpsf-1.c	compile-error	vendor/c-torture/execute/cmpsf-1.c:8:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 cmpsi-1.c	compile-error	vendor/c-torture/execute/cmpsi-1.c:3:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
@@ -182,6 +237,14 @@ fprintf-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 fprintf-2.c	undefined-symbol	ld.lld: error: undefined symbol: __osmaperrno (+5 more)
 fprintf-chk-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 frame-address.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+ieee/20041213-1.c	undefined-symbol	ld.lld: error: undefined symbol: sqrt
+ieee/920810-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
+ieee/cdivchkd.c	undefined-symbol	ld.lld: error: undefined symbol: ilogb
+ieee/cdivchkf.c	undefined-symbol	ld.lld: error: undefined symbol: ilogb
+ieee/cdivchkld.c	undefined-symbol	ld.lld: error: undefined symbol: ilogbl
+ieee/mzero4.c	undefined-symbol	ld.lld: error: undefined symbol: atan (+5 more)
+ieee/pr72824-2.c	link-other	mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+ieee/pr72824.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 inst-check.c	compile-error	vendor/c-torture/execute/inst-check.c:5:3: error: parameter 'm' was not declared, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 int-compare.c	compile-error	vendor/c-torture/execute/int-compare.c:5:8: error: parameter 'b' was not declared, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
 ipa-sra-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)

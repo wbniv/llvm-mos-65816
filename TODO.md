@@ -358,7 +358,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   equivalent → would need width surgery to stay UB-free). The `--gen` seam already added for Csmith makes it
   drop-in. [plan §Follow-ups](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md) ·
   [harness reference](docs/investigations/csmith-differential-harness.md).
-- [wip] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
+- [x] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
   de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
   into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
   test is in-scope iff the default build runs it to the PASS sentinel, then any `+mos-a16`/`+mos-xy16`
@@ -387,6 +387,21 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   across long local sweeps); behaviour-preserving (same `CompletedProcess`, re-raises `TimeoutExpired`).
   Verified: forking child reaped group-wide on timeout; normal path unregressed (`torture --sample 8` 8/8).
   [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
+  **Full vendoring DONE 2026-06-26** — `tools/torture_filter.py` now scans the **whole** suite (top-level +
+  `ieee/` + `builtins/`; SRCDIR-relative manifest keys disambiguate the 5 top-level/subdir name collisions;
+  was top-level-only): **1288/1779 in-scope** (was 1228/1656). `ieee/` (68) → **60 in-scope** = genuinely new
+  floating-point coverage (`-Os` 53 PASS / 4 SKIP / 3 XFAIL · `-O1` 57 PASS / 0 SKIP / 3 XFAIL · **0 FAIL**,
+  4-way MAME + bsnes-jg); `builtins/` (55 main tests) → honest **`builtins-multifile`** bucket (gcc's
+  `builtins.exp` multi-file harness — `main_test()` + `lib/main.c`/`-lib.c` companions — not single-file
+  linkable; the 55 `-lib.c` + 28 `lib/` support files correctly excluded). The sweep **surfaced one new
+  `+mos-xy16` defect** → follow-up below. [full-vendoring plan](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md).
+- [ ] **#321 root-cause + fix the `+mos-xy16` fp compare-as-select ("cmove") miscompile** — the only defect
+  the `ieee/` full-vendoring sweep found (2026-06-26). `xfails.tsv`: `ieee/fp-cmp-8.c` (gcc "cmove patterns"
+  test — `__builtin_isunordered/isless(x,y) ? a : b`) + its long-double `fp-cmp-8l.c` and double `pr38016.c`
+  `#include`-wrappers — **ONE root cause**. default + `+mos-a16` self-check PASS, `+mos-xy16` reads `0xDEAD`,
+  reproducible isolated on MAME at both `-Os`/`-O1` (opt-independent). Hypothesis: X-flag/select-diamond width
+  under 16-bit index regs (sibling of the `requiredXWidth` index-width family). Remove the 3 `xfails.tsv` rows
+  when fixed → they become positive gates. [finding](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md).
 ### Upstream / Contribution
 
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
@@ -1175,4 +1190,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      now a curated Done entry [321-trig-phase3-derived-hyperbolic] (k_trig16x 0x759567C4
      host==default==+mos-a16, both emulators; cross-width PASS). The hook keyed on the
      "Phase 3 — derived + hyperbolic" text under the master plan's (renamed) Completed-phases header. fp:ad6e1b319a9a239b -->
+- [ ] **(triage)** **builtins multi-file harness.** Making the 55 builtins main tests actually *run* requires replicating — _from [2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md)_  <!-- fp:7b6e5bccb4c5ca3f -->
+- [ ] **(triage)** Opt-level-aware `xfails.tsv`, runner retry-on-flake — unchanged from the original plan's out-of-scope. — _from [2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md)_  <!-- fp:356612fa02492cc3 -->
+- [ ] **(triage)** No CI change: the `torture` job reads the **committed** manifest (never re-runs the filter), so a — _from [2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md)_  <!-- fp:cfb4ea31c0a22df9 -->
 <!-- END auto-captured-deferrals -->

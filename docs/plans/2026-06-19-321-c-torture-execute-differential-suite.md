@@ -187,15 +187,56 @@ Filter run: `FUZZ_ROOT=$PWD MOS_TOOLCHAIN=$PWD/build/llvm-mos-install python3 to
   - **26 link-other** — LTO/bitcode rejects (`__builtin_prefetch`), GNU vector/SIMD extensions, ld.lld
     limits.
   - **4 region-overflow** — static data exceeds the SNES `ram` region (e.g. `.noinit` overflow by 7322 B).
-- The `builtins/` and `ieee/` subdirs (206 more tests) are **excluded by design** (compiler-builtin
-  libcalls / floating-point); pass `--subdirs` to include them, but they are out of the freestanding
-  integer scope this gate targets.
+- The `builtins/` and `ieee/` subdirs were initially excluded (top-level-only glob); the **full vendoring**
+  (2026-06-26, see §"Full vendoring" below) brings them into the same partition — `ieee/` adds real
+  floating-point coverage, `builtins/` is accounted-for as a documented multi-file-harness bucket.
 - **Determinism:** two back-to-back full runs produce **byte-identical** `inscope.tsv` / `unsupported.tsv`
   (the one initially-flapping row — `user-printf.c`, many missing symbols listed in nondeterministic order
   — is now normalized to the sorted-smallest symbol + a `(+N more)` count).
 - **Build-mechanics correction** (now reflected in §"The adapter"): the shim must be **precompiled to
   `_shim.o`** and linked, because `-Dmain=…` applies to *all* TUs on the command line and would otherwise
   rename the shim's own `main`.
+
+## Full vendoring — RESULTS (2026-06-26)
+
+The Phase-0 filter originally globbed **only top-level** `execute/*.c` (1656), leaving the two subdirectories
+unaccounted-for. `tools/torture_filter.py` now scans them too (one source edit: SRCDIR-relative manifest keys
++ unconditional `*/*.c` glob excluding `builtins/*-lib.c`; `builtins/lib/` is two levels deep so it's never
+reached), so the committed manifest accounts for the **whole real suite**. Net scanned 1779 = 1656 top-level
++ 68 `ieee/` + 55 `builtins/` main tests (the 55 `-lib.c` companions + 28 `builtins/lib/` support files are
+**not tests** and are excluded).
+
+```
+==> 1288/1779 in-scope, 491 unsupported   (was 1228/1656)
+      builtins-multifile  55      ← gcc builtins multi-file harness; not single-file linkable (NEW bucket)
+      compile-error      170
+      dg-require-unsupported 58
+      link-other          27
+      region-overflow      2
+      undefined-symbol   179
+```
+
+- **`ieee/` (68): 60 in-scope, 8 unsupported.** Genuinely new differential coverage — single-file IEEE-754
+  self-checking tests exercising `+mos-a16`/`+mos-xy16` handling of `float`/`double` **values** (load/store/
+  spill, branch-on-fp) and the **soft-float call ABI** (marshalling 8-byte doubles). NB: there is no a16
+  multilib, so the soft-float kernels (`__adddf3`, `__divsf3`, …) link from the single 8-bit `common` library
+  and are identical object code across default/a16/xy16 — what a16 recompiles is the test's own TU, not the
+  arithmetic kernels.
+- **`builtins/` (55 main tests): all `builtins-multifile`.** gcc's `builtins.exp` is a multi-file harness
+  (each `foo.c` defines `main_test()`, linked against `lib/main.c` + a `foo-lib.c` reference impl). Our
+  single-file freestanding build can't replicate that, so they're bucketed honestly (detected by the
+  `main_test`-without-`main` signature) rather than failing with a misleading `undefined symbol:
+  torture_test_main`. Making them *run* (companion-linking) is an explicit out-of-scope follow-up.
+- **Differential gate result** (60 in-scope `ieee/`, 4-way MAME + bsnes-jg):
+  - `-Os`: **53 PASS, 0 FAIL, 4 SKIP, 3 XFAIL** · `-O1`: **57 PASS, 0 FAIL, 0 SKIP, 3 XFAIL**.
+  - The 4 `-Os` SKIPs (`fp-cmp-cond-1`, `inf-4`, `pr108540-2`, `pr109386`) are the default-8bit oracle
+    correctly gating tests it can't itself pass (they PASS at `-O1`).
+  - **3 XFAIL = one newly-found `+mos-xy16` defect.** `fp-cmp-8.c` + `fp-cmp-8l.c` + `pr38016.c` are the
+    **same test body** (the latter two `#include "fp-cmp-8.c"`): the floating-point **compare-as-select**
+    ("cmove", `__builtin_isunordered/isless(x,y) ? a : b`) miscompiles under `+mos-xy16` (default + a16 PASS,
+    xy16 reads `0xDEAD`), reproducibly in isolation at both opt levels → `xfails.tsv`, gate green-modulo-known.
+    Root-cause + fix is a dedicated follow-up. **This is the payoff of finishing the vendoring** — the integer
+    top-level suite never reached this path.
 
 ## Phase 1 — RESULTS (2026-06-19)
 

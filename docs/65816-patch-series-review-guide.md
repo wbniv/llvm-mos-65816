@@ -764,7 +764,7 @@ structs/pointers, recursion, `.data`/`.bss` init), host-checked against `expecte
 ### A.5 GCC c-torture
 
 Host prereq [`dev/fetch-torture.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/fetch-torture.sh) (pinned gcc-14.2.0, sha256-verified) + a host-only compile/link filter
-([`tools/torture_filter.py`](https://github.com/wbniv/llvm-mos-65816/blob/main/tools/torture_filter.py), 1253/1656 in-scope). `dev/run.sh torture [N] [--opt …] [--sample N]` runs the
+([`tools/torture_filter.py`](https://github.com/wbniv/llvm-mos-65816/blob/main/tools/torture_filter.py), 1288/1779 in-scope — full suite incl. `ieee/`+`builtins/` as of 2026-06-26). `dev/run.sh torture [N] [--opt …] [--sample N]` runs the
 emulator differential — the **default build is the oracle**, so a non-PASS default ⇒ SKIP and any FAIL is a
 real defect; known a16 crashes ⇒ XFAIL. Result: **1098** PASS (-O1) / **1114** PASS (-Os), 4-way, no
 data-row XFAILs remaining.

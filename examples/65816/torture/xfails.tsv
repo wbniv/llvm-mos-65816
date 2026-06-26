@@ -47,5 +47,18 @@
 # Regression guard: those torture tests now hard-PASS (default==+mos-a16==+mos-xy16 on
 # MAME + bsnes-jg). Plan: docs/plans/2026-06-19-321-xy16-xflag-lattice-fix.md
 #
+# === FOUND 2026-06-26: 3 rows from the ieee/ full-vendoring sweep (ONE root cause) ===
+# The first defect surfaced by vendoring the ieee/ subdir (floating-point) into the gate.
+# All 3 rows are the SAME test body — fp-cmp-8.c (the gcc "cmove patterns are correct" test:
+# __builtin_isunordered/isless/islessgreater/... (x,y) ? a : b) — fp-cmp-8l.c and pr38016.c
+# both `#include "fp-cmp-8.c"` (long double / double). So this is ONE +mos-xy16 miscompile of
+# the floating-point COMPARE-AS-SELECT ("cmove") lowering: default + +mos-a16 self-check PASS,
+# +mos-xy16 reads 0xDEAD. Reproduces in isolation on MAME at BOTH -Os and -O1 (opt-independent),
+# 0 PASS / 3 FAIL. The default-8bit oracle PASSes, so it is a real xy16 codegen defect, not a
+# target-inappropriate test. Root-cause + fix is a dedicated follow-up (see TODO #321 ieee xy16
+# fp-compare-select). Remove these rows when fixed (so the tests hard-FAIL again = regression guard).
+#
 # test          feature   note (one-line characterization; deep root-cause is per-test follow-up)
-# (no rows — every known #321 a16/xy16 c-torture miscompile is fixed as of 2026-06-20)
+ieee/fp-cmp-8.c   xy16  fp compare-as-select ("cmove", __builtin_isunordered/isless ? a:b) miscompile under +mos-xy16, double; xy16@MAME=0xDEAD, default+a16 PASS @ -Os and -O1
+ieee/fp-cmp-8l.c  xy16  same fp-cmp-8.c body, long double (#include "fp-cmp-8.c") — same root cause
+ieee/pr38016.c    xy16  same fp-cmp-8.c body, double (PR38016 regression, #include "fp-cmp-8.c") — same root cause

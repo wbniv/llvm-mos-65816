@@ -95,14 +95,17 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
   [`howto-feature-worktree.md`](howto-feature-worktree.md).
 - **External C suite (gcc c-torture):** host prereq `dev/fetch-torture.sh` (pinned gcc-14.2.0,
   sha256-verified → gitignored `vendor/c-torture/`) + `python3 tools/torture_filter.py` (host-only
-  compile/link filter → `examples/65816/torture/{inscope,unsupported}.tsv`, 1253/1656 in-scope; `mos-clang`
-  runs **directly on the host**, no Docker). Then the emulator differential gate:
+  compile/link filter → `examples/65816/torture/{inscope,unsupported}.tsv`, **1288/1779 in-scope** (the
+  full suite as of the 2026-06-26 vendoring: top-level + `ieee/` 60 in-scope + `builtins/` 55 as the
+  `builtins-multifile` bucket); `mos-clang` runs **directly on the host**, no Docker). Then the emulator differential gate:
   `dev/run.sh torture [N] [--opt -Os|-O1] [--start K] [--sample N [--sample-seed S]] [--no-bsnes]`
   (`tools/torture_run.py`; `--sample N` = a seeded pseudo-random subset of N tests, reproducible — the
   sampled-CI selector) — DEFAULT build is the oracle, so a non-PASS default ⇒ **SKIP** and any FAIL is a real defect; known a16 crashes
-  (incl. `a16-zp-pressure-overflow`) ⇒ XFAIL. **All known a16/xy16 runtime miscompiles are now FIXED**
-  (`xfails.tsv` has no data rows as of 2026-06-20: 13 a16 by the frame-index fix, then all 4 xy16 +
-  `k_isort` by the `requiredXWidth` index-width fix — `f2d65c2`, `55ec505`). A new FAIL is a regression.
+  (incl. `a16-zp-pressure-overflow`) ⇒ XFAIL. The earlier 17 a16/xy16 runtime miscompiles are all FIXED
+  (frame-index `f2d65c2`, `requiredXWidth` `55ec505`, load-fold-across-call `86c2602`); the **full ieee/
+  vendoring (2026-06-26) surfaced one NEW `+mos-xy16` defect** — the fp **compare-as-select** ("cmove")
+  miscompile, `xfails.tsv` rows `ieee/fp-cmp-8.c` + `fp-cmp-8l.c` + `pr38016.c` (same body, one root cause;
+  root-cause+fix is a follow-up). A new FAIL outside those rows is a regression.
   [plan](plans/2026-06-19-321-c-torture-execute-differential-suite.md).
 - **xy16 codegen gotcha — LTO narrows small index loads to 8-bit.** The 16-bit-index pseudos
   (`LDAbsXIdx16`/`LDIndirYIdx16`) only survive to the linked ROM when the index is *genuinely* 16-bit-wide

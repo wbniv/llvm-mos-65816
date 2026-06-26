@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/e10d98f) | #321 test-bench: reap orphan emulator processes (process-group kill in a16_fuzz) |
 | [2026-06-21](https://github.com/wbniv/llvm-mos-65816/commit/e865dff) | #321 CI: wire Csmith (Phase 5) + c-torture (Phase 3) as sampled, secret-gated jobs |
 | [2026-06-20](https://github.com/wbniv/llvm-mos-65816/commit/55ec505) | #321 xy16: fix the requiredXWidth index-width gap — clears all 5 remaining defects |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/bae20ba) | #321 c-torture suite plan: record the Phase-2 backlog resolution |
@@ -10,6 +11,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/34cd16a) | #321 plan: vendor GCC c-torture/execute behind the +mos-a16/+mos-xy16 differential gate |
 
 <!--history-meta v1
+e10d98f	author	Will Norris
+e10d98f	added	13
+e10d98f	deleted	4
+e10d98f	files	1
+e10d98f	body	The differential runner spawned MAME/bsnes-jg via subprocess.run(timeout=…), which\non timeout kills only the direct child — any forked descendants are orphaned, and\nacross a 1000+-boot local sweep they pile up (the c-torture plan's Phase-2 note: a\nfull pass once hung in teardown on accumulated MAMEs).\n\nFix: a _run_emu() helper runs each emulator in its own session/process group\n(start_new_session=True) and kills the WHOLE group (os.killpg) on three paths — the\ninline per-test timeout, interpreter exit / uncaught KeyboardInterrupt (atexit), and\nSIGTERM (handler). run_mame/run_bsnes route through it. Behaviour-preserving: returns\nthe same CompletedProcess and re-raises TimeoutExpired, so corpus-a16/fuzzer/torture\ncallers are unchanged but now leak-free.\n\nVerified: a forking child is reaped group-wide on timeout (killpg(pgid,0) liveness\nprobe → group empty after kill); normal path unregressed (dev/run.sh torture\n--sample 8 → 8 PASS, 4-way); py_compile clean. (The earlier "orphan survived" noise\nduring testing was a self-matching shell-level `pkill -f "sleep N"` hitting the test\nharness, not the fix.)\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e865dff	author	Will Norris
 e865dff	added	36
 e865dff	deleted	6

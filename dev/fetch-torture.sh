@@ -56,4 +56,4 @@ else
   echo "    extracted $(find "$DEST/execute" -name '*.c' | wc -l) .c files"
 fi
 
-echo "==> ready: $DEST/execute  (top-level: $(ls "$DEST/execute"/*.c | wc -l) tests)"
+echo "==> ready: $DEST/execute  (top-level $(find "$DEST/execute" -maxdepth 1 -name '*.c' | wc -l), ieee/ $(find "$DEST/execute/ieee" -maxdepth 1 -name '*.c' | wc -l), builtins/ $(find "$DEST/execute/builtins" -maxdepth 1 -name '*.c' | wc -l) tests)"

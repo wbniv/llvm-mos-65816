@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/de658f0) | docs: finish the stale-deferral sweep — propagate Phase-3 closure + fixed crashes |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ec4a80b) | #320 Phase B: land __call_indir_far stub; fix far-indirect-from-far-caller; fold its tail |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/798414a) | docs(plan-index): add the pr15296 ZP-overflow gated-spike plan row (148) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/1ea31e9) | docs(plan-index): index trig Phase 3 (146 rows); triage the DONE Inbox false-positive |
@@ -23,6 +24,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+de658f0	author	Will Norris
+de658f0	added	2
+de658f0	deleted	2
+de658f0	files	1
+de658f0	body	Completes the sweep started in 42ae119, propagating the 2026-06-26 state to the\nsecondary docs that still said "deferred"/"still XFAIL":\n\n  - ROADMAP.md: the "RA-level Ac16 residency stays deferred" + "one deferred core\n    (≡ pr15296 ZP-overflow)" framing -> CLOSED net-negative; pr15296 resolved; no\n    +mos-a16 register-pressure XFAILs remain\n  - deferred-and-rejected-items.md: Phase-3 row DEFERRED -> CLOSED (net-negative);\n    globals/pr15296 row "sibling still XFAIL" -> RESOLVED (stale); scavenger row\n    XFAIL/"deferral stands" -> FIXED (0011/0012, positive gate 0x22A6)\n  - plan-index.md: A16-threading "Phase 3 deferred" + the trigger-check summary ->\n    note trigger (b) fired and the spike measured residency net-negative (CLOSED)\n  - frameabi-census.sh: stale "xfail: regalloc-out-of-registers" defensive label\n    (fixed in 0009) -> "unexpected"\n\nCorrections only, no behavior change. Matches the already-updated TODO Watch,\nimplementation-status.md, README.md, a16scavnz.c header, and the spike+verdict doc.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011tDRoGK3T4gSGAHGBXk88B
 ec4a80b	author	Will Norris
 ec4a80b	added	1
 ec4a80b	deleted	1
