@@ -320,7 +320,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
   swaps it's just Mode-7 magnify like the interactive demo; as a `+mos-a16` codegen customer it's redundant
   (same `view.h` matrix math). Branch kept (unmerged) as the live repro for the bug below. KEEPERS landed on
-  `main`: the MAME key-remap + the compiler-bug finding.~~ [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md)
+  `main`: the MAME key-remap + the compiler-bug finding.~~ **REMOVED from `main` 2026-06-26** (user request) — deleted the demo (`mandel-zoom.c`/`zoom.h`), `tools/mandel-bake-pyramid.c`, `platforms/snes-zoom/`, `dev/mandel-zoom*`, the orphaned `dev/loopfold-repro.sh`/`reduce-loopfold.sh` discovery scripts, and `jgxcheck.cpp`'s `JGX_ZOOM`. The coalesce-rotate fix is unaffected (its self-contained `.mir` lit test in `0010` is the upstream repro). Plan + screenshots kept as history. [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md)
 - [x] ~~**MAME key remap for the SNES demos** (`dev/mame-snes-input.cfg`)~~ — binds each SNES button to its
   matching keyboard letter (R→SNES R, Y→Y, A→A, L→L, S→Select, Enter→Start) so the demo labels just work;
   MAME's defaults are non-obvious (SNES R = keyboard X, Y = Left-Ctrl, A = Space). `task mandel-mame` drops it

@@ -108,7 +108,7 @@ tasks:
   # --- #321 beefy Mandelbrot demo ---
 
   mandel-mame:
-    desc: "Run a Mandelbrot demo ROM in a MAME WINDOW on this host (ROM=mandel-display [default] | mandel-mode7 | mandel-interactive | mandel-zoom | k_mandel_far). Build the ROM first via task mandel-shot / mandel-mode7 / mandel-interactive / mandel-zoom / mandel-far."
+    desc: "Run a Mandelbrot demo ROM in a MAME WINDOW on this host (ROM=mandel-display [default] | mandel-mode7 | mandel-interactive | k_mandel_far). Build the ROM first via task mandel-shot / mandel-mode7 / mandel-interactive / mandel-far."
     cmds:
       - |
         set -euo pipefail
@@ -120,9 +120,8 @@ tasks:
             mandel-display)     echo "    task mandel-shot        (Track 2 fat-pixel BG)";;
             mandel-mode7)       echo "    task mandel-mode7       (Track 3b 128x128 Mode 7)";;
             mandel-interactive) echo "    task mandel-interactive (M2 instant-boot Mode 7 fly-around)";;
-            mandel-zoom)        echo "    task mandel-zoom        (M2 zoom pyramid — increasing detail)";;
             k_mandel_far)       echo "    task mandel-far         (Track 3a far-store gate)";;
-            *)              echo "    (unknown ROM '$ROM' — use mandel-display | mandel-mode7 | mandel-interactive | mandel-zoom | k_mandel_far)";;
+            *)              echo "    (unknown ROM '$ROM' — use mandel-display | mandel-mode7 | mandel-interactive | k_mandel_far)";;
           esac
           exit 1
         fi
@@ -131,7 +130,6 @@ tasks:
           mandel-mode7) echo "note: mandel-mode7's 128x128 software compute is ~4 min of EMULATED time — the screen stays black until it finishes, then shows the image." ;;
           mandel-display) echo "note: the image appears after the ~15 s (emulated) compute." ;;
           mandel-interactive) echo "note: INSTANT boot. KEYS (remapped to match the labels): arrows=pan | L/R=zoom out/in | Y/A=rotate | S=cycle palette | Enter=reset." ;;
-          mandel-zoom) echo "note: INSTANT boot. KEYS (remapped to match the labels): hold R=DIVE (detail refreshes at each level), L=back out | Y/A=rotate | S=cycle palette | Enter=reset to level 0." ;;
         esac
         echo "launching $SFC in MAME — close the window to quit."
         mkdir -p build/.mame
@@ -192,20 +190,3 @@ tasks:
         diff -u docs/refs/65816/65816-reference.md           <(tools/gen-65816-ref.py --emit reference)
         diff -u docs/refs/65816/65816-opcode-audit.md        <(tools/gen-65816-ref.py --emit audit)
         echo "docs/refs in sync with sources"
-
-  mandel-zoom:
-    desc: "#321 M2: Mandelbrot ZOOM PYRAMID — true increasing detail on zoom-in. Host bakes a stack of 2x-finer levels; the ROM DMAs the next level as zoom crosses each 2x threshold (instant; zero on-console fractal math). Builds default + +mos-a16, asserts a per-level image hash + a scripted-zoom view-math differential, screenshots both emulators. Leaves build/mandel-zoom.sfc (then: task mandel-zoom-play)."
-    cmds:
-      - dev/run.sh mandel-zoom
-
-  mandel-zoom-play:
-    desc: "PLAY the Mandelbrot zoom pyramid in a MAME WINDOW on this host (builds the ROM first if needed). Hold R to DIVE into deeper detail, L to back out | Y/A rotate | Select palette | Start reset."
-    cmds:
-      - |
-        set -euo pipefail
-        if [ ! -f build/mandel-zoom.sfc ]; then
-          echo "==> build/mandel-zoom.sfc missing — building it (dev/run.sh mandel-zoom)…"
-          dev/run.sh mandel-zoom
-        fi
-      - task: mandel-mame
-        vars: { ROM: mandel-zoom }

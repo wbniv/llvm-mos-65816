@@ -9,7 +9,7 @@ value, so a single pass suffices.
 
 LoROM (default): the internal header lives in the first 32 KiB at file 0x7FB0-0x7FFF.
 Accepts 32 KiB (bank $00), 64 KiB (banks $00+$01, #320 Increment 2b LoROM), 128 KiB, or
-256 KiB (the #321 M2 zoom-pyramid's snes-zoom platform, banks $00..$07) — all power-of-two
+256 KiB — all power-of-two
 LoROM images that fully fill their space, so the simple sum-of-all-bytes checksum holds.
 
 HiROM (--hirom): banks $C0+ map the full 64 KiB contiguously, so the header lives at
