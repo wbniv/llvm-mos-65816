@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/6548046) | docs(#321 a16 Phase-3): sync plan/ROADMAP/TODO with the full B0->B1->B2 + probe outcome |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/fc74388) | #321 a16 Phase-3 close-out artifacts (verdict + spike diff + measure trigger line) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/e7e2270) | #321 a16-threading Phase 3: plan the trigger-check pass (re-affirm or re-open) |
 
 <!--history-meta v1
+6548046	author	Will Norris
+6548046	added	9
+6548046	deleted	3
+6548046	files	1
+6548046	body	The plan banner said B2 was "not reached" — it was: record B2 (correct but\n+530 B whole-set => NO-GO) and the post-RA-extension probe (not real; the\nresidency benefit is intrinsically RA-level). ROADMAP figure updated from the\nB1-only +24 B to the whole-set +530 B; TODO Done line extended likewise.\nVerdict unchanged: Phase 3 closed, measured net-negative.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fc74388	author	Will Norris
 fc74388	added	12
 fc74388	deleted	1

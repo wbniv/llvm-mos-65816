@@ -121,9 +121,11 @@ reuse). There is nothing to extract at the pressure-safe post-RA layer.
   that could re-open is a **genuinely different remedy** for an *actual* realistic `Imag16` overflow
   (`pr15296`-class), e.g. better `Imag16` spill packing — **not** accumulator residency.
 - **Nothing landed.** B0 is proven-inert but only matters *with* B1, so it is **not** landed (per "don't add
-  defensive code for a feature we're not building"). The full B0+B1 spike is preserved for reproducibility:
-  [`2026-06-26-a16-phase3-prera-residency-spike.diff`](2026-06-26-a16-phase3-prera-residency-spike.diff)
-  (`+115` lines: the `shouldCoalesce` barrier, the `MOSPreRAAccum16` pass + flag, and the pipeline wiring).
+  defensive code for a feature we're not building"). The raw spike `.diff` was **not retained** (Phase 3 is
+  closed, nothing to land); the implementation is fully described in §Phase B0/B1 above — the
+  `shouldCoalesce` `{Anyi1,Anyi8,GPR}→Ac16` barrier, the pre-RA `MOSPreRAAccum16` SSA-threading pass + the
+  `-mos-a16-prera-residency` flag, and the `addMachineSSAOptimization` pipeline wiring — and is
+  reconstructible from that if ever revisited.
 
 ## Reproduce
 
@@ -132,7 +134,7 @@ reuse). There is nothing to extract at the pressure-safe post-RA layer.
 dev/measure-zp-pressure.sh | tail -1
 
 # the spike (compiler-editing worktree; flag is off by default → measurement only)
-#   apply docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.diff to vendor/llvm-mos, rebuild, then:
+#   re-create the B0 barrier + MOSPreRAAccum16 pass per §Phase B0/B1 above, rebuild, then:
 CF="--target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os"
 F="-mllvm -mos-a16-prera-residency"
 # fires (round-trips collapse) but pressure unchanged + bytes worse:

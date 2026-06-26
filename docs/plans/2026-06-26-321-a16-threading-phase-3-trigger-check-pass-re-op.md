@@ -17,8 +17,8 @@ worktree).
 > example+corpus set** (41 worse / 6 better) → fails net-neutral-or-better. A follow-up **post-RA-extension
 > probe** (can the 6 winners be salvaged pressure-neutrally?) came back **NOT real** — `threadAccum16` already
 > removes 100% of *resident* round-trips; the rest are genuine reloads across the single accumulator's reuse,
-> i.e. intrinsically RA-level. Nothing landed (default build byte-identical). **Full record + reproduce + the
-> spike `.diff`:**
+> i.e. intrinsically RA-level. Nothing landed (default build byte-identical; the raw spike `.diff` was not
+> retained — the implementation is described in the record below). **Full record + reproduce:**
 > [`docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md`](../investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
 > So all three stages (B0/B1/B2) + the salvage probe ran; verdict: **close Phase 3, net-negative**.
 
