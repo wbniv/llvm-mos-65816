@@ -21,7 +21,10 @@ typedef struct {
   void (*emit)   (Drawable *self, UploadQueue *q);  /* enqueue this frame's uploads        */
 } DrawableVT;
 
-struct Drawable { const DrawableVT *vt; };          /* base object: vtable pointer FIRST */
+struct Drawable {
+  const DrawableVT *vt;   /* base object: vtable pointer FIRST */
+  uint8_t tm_bits;        /* main-screen enable bit(s) for this layer (TM_OBJ/TM_BG1/...) — */
+};                        /* OR'd into Display's TM shadow (TM $212C is WRITE-ONLY: never |=). */
 
 static inline void drawable_reserve(Drawable *d, VramAlloc *va) { d->vt->reserve(d, va); }
 static inline void drawable_emit   (Drawable *d, UploadQueue *q) { d->vt->emit(d, q); }

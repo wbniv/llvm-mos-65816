@@ -29,11 +29,21 @@ cc -O2 -I "$ROOT/examples/snes" "$ROOT/tools/invaders-sim.c" -o "$BUILD/invaders
 EXPECT=$("$BUILD/invaders-sim" | grep -oE '0x[0-9A-Fa-f]{4}' | tail -1)
 echo "==> host oracle: attract CRC16=$EXPECT"
 
-# 2. Build DEFAULT and +mos-a16 ROMs (both must match the oracle).
+# 2. Build DEFAULT and +mos-a16 ROMs (both must match the oracle). The committed gfx4snes
+#    binaries are objcopied into bank-$00 .rodata objects and linked (Option B — no C arrays).
+OBJCOPY="${MOS_TOOLCHAIN:-$BUILD/llvm-mos-install}/bin/llvm-objcopy"
+ASSETS=()
+for ext in pic pal; do
+  [ -e "$ROOT/examples/snes/invaders.$ext" ] || continue
+  ( cd "$ROOT/examples/snes" && "$OBJCOPY" -I binary -O elf32-mos \
+      --rename-section ".data=.rodata.invaders_${ext},alloc,load,readonly,data,contents" \
+      "invaders.$ext" "$BUILD/invaders.$ext.o" )
+  ASSETS+=("$BUILD/invaders.$ext.o")
+done
 build_rom() { # <tag> <extra-flags...>
   local tag="$1"; shift
   "$TOOL/mos-clang" --config "$CFG" "$@" -mllvm -verify-machineinstrs -Os \
-    -Wl,-Map="$BUILD/invaders$tag.map" -o "$BUILD/invaders$tag.sfc" "$SRC"
+    -Wl,-Map="$BUILD/invaders$tag.map" -o "$BUILD/invaders$tag.sfc" "$SRC" "${ASSETS[@]}"
   python3 "$ROOT/tools/snes-checksum.py" "$BUILD/invaders$tag.sfc" >/dev/null
 }
 build_rom ""    -mcpu=mosw65816
@@ -73,6 +83,15 @@ if [ -x "$JGX" ] && [ -d "$VENDOR/Database" ]; then
     echo "==> bsnes-jg assert: invaders$tag.sfc"
     "$JGX" "$BUILD/invaders$tag.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" "$SETTLE" "${png[@]}" || rc=1
   done
+  # bsnes power-on determinism (handoff §3.1): 3 captures must be byte-identical, else the PPU is
+  # under-initialised and the screen flaps — which would also flap on the biohack bsnes-jg WASM page.
+  for i in 1 2 3; do "$JGX" "$BUILD/invaders-a16.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" "$SETTLE" "$BUILD/.inv-det$i.png" >/dev/null 2>&1 || true; done
+  if [ "$(sha1sum "$BUILD"/.inv-det1.png "$BUILD"/.inv-det2.png "$BUILD"/.inv-det3.png 2>/dev/null | awk '{print $1}' | sort -u | wc -l)" = "1" ]; then
+    echo "    bsnes determinism: PASS (3x byte-identical)"
+  else
+    echo "    bsnes determinism: FAIL (screen flaps — under-initialised PPU)"; rc=1
+  fi
+  rm -f "$BUILD"/.inv-det1.png "$BUILD"/.inv-det2.png "$BUILD"/.inv-det3.png
 else
   echo "    SKIP bsnes-jg (harness/core absent — run: dev/run.sh xcheck once)"
 fi

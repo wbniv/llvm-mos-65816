@@ -7,13 +7,14 @@
 // (tools/invaders-sim.c) and the corpus slice exactly: host == default@MAME == a16@MAME ==
 // a16@bsnes-jg == 0x3DAC. No far pointers, so it builds default + a16 + xy16 (the full 5-way bar).
 //
-// Sprite tiles are generated at runtime from compact 1bpp shapes (recognizable squid/crab/octopus/
-// ship/UFO) so the file links standalone today; the polished gfx4snes 16x16 art (Option B: PNG ->
-// .pic/.pal -> objcopy into ROM .rodata) drops in next without changing the CRC (it is state-based).
+// Sprite art is authored in art/invaders/sprites.png, converted by gfx4snes to committed
+// examples/snes/invaders.{pic,pal}, objcopied into bank-$00 ROM .rodata by dev/build.sh and linked
+// (Option B — no compiled C arrays). The 4bpp tiles arrive via INV_TILES / palette via INV_PAL.
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/sprite_set.h"
 #include "invaders_logic.h"
+#include "invaders_art.h"
 
 #define SPR_CHR   0x4000        // sprite tile VRAM base (word) — OBSEL namebase 2
 #define ATTR      0x20          // OAM attr: priority 2, palette group 0, tile# < 256
@@ -26,45 +27,8 @@
 // tile indices in VRAM
 enum { T_SQUID = 0, T_CRAB = 2, T_OCTO = 4, T_PLAYER = 6, T_BULLET = 7, T_BOMB = 8, T_UFO = 9, T_COUNT = 10 };
 
-// 1bpp 8x8 shapes (bit7 = leftmost). Two animation frames for each alien.
-static const uint8_t shapes[T_COUNT][8] = {
-  /* squid A */ { 0x3C,0x7E,0xDB,0xFF,0x24,0x5A,0xA5,0x00 },
-  /* squid B */ { 0x3C,0x7E,0xDB,0xFF,0x42,0x24,0x5A,0x00 },
-  /* crab  A */ { 0x81,0x42,0x7E,0xDB,0xFF,0xBD,0xA5,0x00 },
-  /* crab  B */ { 0x81,0x5A,0xFF,0xDB,0xFF,0x7E,0x24,0x42 },
-  /* octo  A */ { 0x3C,0x7E,0xFF,0xDB,0xFF,0x24,0x5A,0x81 },
-  /* octo  B */ { 0x3C,0x7E,0xFF,0xDB,0xFF,0x42,0xA5,0x42 },
-  /* player */  { 0x18,0x18,0x3C,0x7E,0xFF,0xFF,0xFF,0xFF },
-  /* bullet */  { 0x18,0x18,0x18,0x18,0x00,0x00,0x00,0x00 },
-  /* bomb   */  { 0x18,0x30,0x18,0x30,0x18,0x30,0x18,0x00 },
-  /* ufo    */  { 0x00,0x3C,0x7E,0xFF,0x7E,0x24,0x00,0x00 },
-};
-// per-tile colour index (into sprite palette group 0)
-static const uint8_t tile_color[T_COUNT] = { 2,2, 3,3, 4,4, 1, 1, 5, 5 };
-// sprite palette group 0 -> CGRAM 128.. (index 0 = transparent)
-static const uint16_t pal[6] = {
-  0x0000, SNES_RGB(31,31,31), SNES_RGB(0,31,0), SNES_RGB(0,31,31), SNES_RGB(31,31,0), SNES_RGB(31,0,0),
-};
 static const uint16_t backdrop = 0x0000;     // CGRAM 0 — black (set for determinism; bsnes randomizes)
 static const uint8_t row_tile[INV_ROWS] = { T_SQUID, T_CRAB, T_CRAB, T_OCTO, T_OCTO };
-
-static uint8_t tilebuf[T_COUNT * 32];        // 4bpp tiles, staged for one DMA to OBJ VRAM
-
-// Expand each 1bpp shape into a 4bpp tile coloured by tile_color[t]
-// (4bpp: bytes [p0,p1] x 8 rows, then [p2,p3] x 8 rows; a set bit takes the colour's bit in each plane).
-static void build_tiles(void) {
-  for (uint8_t t = 0; t < T_COUNT; t++) {
-    uint8_t c = tile_color[t];
-    uint8_t *o = &tilebuf[t * 32];
-    for (uint8_t r = 0; r < 8; r++) {
-      uint8_t row = shapes[t][r];
-      o[2 * r]      = (c & 1) ? row : 0;
-      o[2 * r + 1]  = (c & 2) ? row : 0;
-      o[16 + 2 * r] = (c & 4) ? row : 0;
-      o[16 + 2 * r + 1] = (c & 8) ? row : 0;
-    }
-  }
-}
 
 // Draw the whole simulation state into the OAM shadow (typed, static-dispatch — no per-entity vtable).
 // noinline: bounds +mos-a16 register pressure (handoff §4) — the fleet loop holds many live 16-bit
@@ -111,10 +75,9 @@ static void game_init(Game *g) {
   display_init(&g->screen);
   sprite_set_init(&g->sprites, /*size_pair*/ 0, SPR_CHR);
   display_add(&g->screen, (Drawable *)&g->sprites);
-  build_tiles();
   upq_push_cgram(&g->screen.q, 0, &backdrop, 0x00, 2);                               // backdrop black
-  upq_push_vram(&g->screen.q, SPR_CHR, tilebuf, 0x00, sizeof tilebuf, VMAIN_INC_HIGH_1);
-  sprite_set_palette(&g->sprites, &g->screen.q, /*group*/ 0, pal, sizeof pal);
+  upq_push_vram(&g->screen.q, SPR_CHR, INV_TILES, 0x00, INV_TILES_LEN, VMAIN_INC_HIGH_1);  // gfx4snes tiles
+  sprite_set_palette(&g->sprites, &g->screen.q, /*group*/ 0, INV_PAL, (uint8_t)INV_PAL_LEN); // gfx4snes palette
   inv_init(&g->sim);
   g->roll = 0xFFFF;
   g->frame = 0;

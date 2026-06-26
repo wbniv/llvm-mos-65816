@@ -22,6 +22,7 @@ typedef struct {
   UploadQueue q;       /* private collaborator */
   VramAlloc   va;      /* private collaborator */
   Scene       scene;   /* the drawables        */
+  uint8_t     tm;      /* TM ($212C) shadow — TM is WRITE-ONLY, so we never read-modify-write it */
   uint8_t     shown;   /* force-blank released yet? */
 } Display;
 
@@ -33,15 +34,20 @@ static inline void display_init(Display *d) {
   upq_init(&d->q, 0);                      /* GP-DMA channel 0 */
   vram_init(&d->va, 0x0000, 0x0000);       /* BG regions bump-allocate from word 0 (OBJ uses a fixed page) */
   scene_init(&d->scene);
+  d->tm = 0;
   d->shown = 0;
   REG_BGMODE   = BGMODE_1;                  /* BG1/BG2 4bpp, BG3 2bpp */
+  REG_TM       = 0;                          /* all layers off until drawables enable theirs */
   REG_NMITIMEN = NMITIMEN_NMI;              /* enable the v-blank NMI flag so snes_wait_vblank() works */
 }
 
-/* Add a drawable and reserve its VRAM / set its layer registers now (still force-blanked). */
+/* Add a drawable, reserve its VRAM / set its layer registers, and enable its layer on the main
+   screen via the TM shadow (never a read-modify-write of the write-only TM register). */
 static inline void display_add(Display *d, Drawable *layer) {
   scene_add(&d->scene, layer);
   drawable_reserve(layer, &d->va);
+  d->tm = (uint8_t)(d->tm | layer->tm_bits);
+  REG_TM = d->tm;
 }
 
 /* One frame: wait a FRESH v-blank (discard a stale flag first), let each drawable emit into the

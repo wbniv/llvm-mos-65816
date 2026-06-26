@@ -70,6 +70,7 @@ case "$a16probe" in
     echo "    (+mos-a16 unsupported by this toolchain — mos-a16-only examples SKIPPED; use MOS_TOOLCHAIN=$BUILD/llvm-mos-install for those)" ;;
   *) A16_OK=1 ;;
 esac
+OBJCOPY="$MOS_TOOLCHAIN/bin/llvm-objcopy"
 count=0
 for src in "$ROOT"/examples/snes/**/*.c; do
   name="$(basename "$src" .c)"
@@ -82,8 +83,21 @@ for src in "$ROOT"/examples/snes/**/*.c; do
     [ "$A16_OK" = 1 ] || { printf '    %-14s SKIP (mos-a16-only; toolchain lacks +mos-a16)\n' "$name"; continue; }
     a16=(-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16)
   fi
+  # Sidecar binary assets: objcopy committed examples/snes/<name>.{pic,pal,map,chr,bin} into
+  # bank-$00 .rodata objects and link them (Option B — raw gfx4snes output, no compiled C arrays;
+  # symbols _binary_<name>_<ext>_start/_end/_size). Run from the asset dir so symbol names are clean.
+  assets=()
+  for ext in pic pal map chr bin; do
+    a="$ROOT/examples/snes/$name.$ext"
+    [ -e "$a" ] || continue
+    o="$BUILD/$name.$ext.o"
+    ( cd "$ROOT/examples/snes" && "$OBJCOPY" -I binary -O elf32-mos \
+        --rename-section ".data=.rodata.${name}_${ext},alloc,load,readonly,data,contents" \
+        "$name.$ext" "$o" )
+    assets+=("$o")
+  done
   "$MOS_CLANG" --config "$INSTALL/bin/mos-snes.cfg" "${a16[@]}" \
-    -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src"
+    -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src" "${assets[@]}"
   python3 "$ROOT/tools/snes-checksum.py" "$rom"
   printf '    %-14s %6s bytes\n' "$name" "$(stat -c%s "$rom")"
   count=$((count + 1))

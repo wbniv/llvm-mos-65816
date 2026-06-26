@@ -30,7 +30,7 @@ static void _sprite_reserve(Drawable *d, VramAlloc *va) {
   (void)va;                 /* OBJ tile VRAM is a fixed page, not bump-allocated */
   SpriteSet *s = (SpriteSet *)d;
   REG_OBSEL = (uint8_t)((s->size_pair << 5) | ((s->chr_base_word >> 13) & 7));
-  REG_TM   |= TM_OBJ;       /* enable sprites on the main screen */
+  /* TM is set by Display from the tm_bits shadow — never RMW a write-only register here. */
 }
 
 static void _sprite_emit(Drawable *d, UploadQueue *q) {
@@ -43,6 +43,7 @@ static const DrawableVT SPRITE_VT = { _sprite_reserve, _sprite_emit };
 /* Construct: wire the vtable, record OBSEL config, hide all 128 sprites. */
 static inline void sprite_set_init(SpriteSet *s, uint8_t size_pair, uint16_t chr_base_word) {
   s->base.vt = &SPRITE_VT;
+  s->base.tm_bits = TM_OBJ;       /* Display ORs this into its TM shadow */
   s->size_pair = size_pair;
   s->chr_base_word = chr_base_word;
   for (uint16_t o = 0; o < 512; o += 4) {
