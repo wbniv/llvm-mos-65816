@@ -12,4 +12,4 @@ corpus/arrays.c     corpus_result  0x03E1    arrays + .rodata lookup table
 corpus/structs.c    corpus_result  0x0340    struct layout + pointer deref
 corpus/funcs.c      corpus_result  0x011E    calls + recursion (soft stack)
 corpus/globals.c    corpus_result  0xAB55    crt0 .data copy + .bss clear
-corpus/invaders_sim.c	corpus_result	0x3DAC	Space Invaders deterministic attract sim, 600 frames (shared invaders_logic.h)
+corpus/invaders_sim.c	corpus_result	0x9D57	Space Invaders deterministic attract sim, 600 frames (shared invaders_logic.h)

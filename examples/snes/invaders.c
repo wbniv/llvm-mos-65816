@@ -25,8 +25,13 @@
 #define SLOT_BOMB0  2
 #define SLOT_UFO    6
 #define SLOT_FLEET  8           // 8 .. 8+55-1 = 62
-// tile indices in VRAM
-enum { T_SQUID = 0, T_CRAB = 2, T_OCTO = 4, T_PLAYER = 6, T_BULLET = 7, T_BOMB = 8, T_UFO = 9, T_COUNT = 10 };
+#define SLOT_SHIELD 63          // 63 .. 94  (4 shields x 8 blocks)
+#define SLOT_SCORE  95          // 95 .. 99  (5 score digits)
+#define SLOT_LIVES  100         // 100 .. 104 (life icons)
+// tile indices in VRAM (match the gfx4snes sheet / art/invaders/draw.py cell order)
+enum { T_SQUID = 0, T_CRAB = 2, T_OCTO = 4, T_PLAYER = 6, T_BULLET = 7, T_BOMB = 8, T_UFO = 9,
+       T_SHIELD = 10, T_DIGIT0 = 11 };
+#define SH_BLOCKS (SH_COLS * SH_ROWS)
 
 static const uint16_t backdrop = 0x0000;     // CGRAM 0 — black (set for determinism; bsnes randomizes)
 static const uint8_t row_tile[INV_ROWS] = { T_SQUID, T_CRAB, T_CRAB, T_OCTO, T_OCTO };
@@ -59,6 +64,31 @@ static void render(const inv_state *s, SpriteSet *spr) {
       else
         sprite_set_hide(spr, sl);
     }
+
+  // shields: 4 bunkers, each SH_COLS x SH_ROWS blocks; hide a block when its bit is cleared
+  for (uint8_t sh = 0; sh < INV_SHIELDS; sh++)
+    for (uint8_t b = 0; b < SH_BLOCKS; b++) {
+      uint8_t sl = (uint8_t)(SLOT_SHIELD + sh * SH_BLOCKS + b);
+      if (s->shield[sh] & (uint8_t)(1u << b))
+        sprite_set_put(spr, sl, (int16_t)(SH_X(sh) + (b % SH_COLS) * SH_BLK),
+                       (uint8_t)(INV_SH_Y + (b / SH_COLS) * SH_BLK), T_SHIELD, ATTR, 0);
+      else
+        sprite_set_hide(spr, sl);
+    }
+
+  // HUD: 5-digit score (top-left, most-significant first)
+  uint16_t sc = s->score;
+  for (uint8_t d = 0; d < 5; d++) {
+    uint8_t digit = (uint8_t)(sc % 10); sc = (uint16_t)(sc / 10);
+    sprite_set_put(spr, (uint8_t)(SLOT_SCORE + (4 - d)), (int16_t)(8 + (4 - d) * 8), 8,
+                   (uint8_t)(T_DIGIT0 + digit), ATTR, 0);
+  }
+  // HUD: lives as little ship icons (top-right)
+  for (uint8_t i = 0; i < 5; i++) {
+    uint8_t sl = (uint8_t)(SLOT_LIVES + i);
+    if (i < s->lives) sprite_set_put(spr, sl, (int16_t)(204 + i * 12), 8, T_PLAYER, ATTR, 0);
+    else              sprite_set_hide(spr, sl);
+  }
 }
 
 // The application is an object: it owns the Display, the SpriteSet, the sim, input, and CRC state.

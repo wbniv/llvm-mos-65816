@@ -52,9 +52,10 @@ VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$BUILD/invaders.map"); OFF="0x
 ADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$VMA )))
 echo "==> built default + a16; corpus_result @ WRAM $OFF"
 
-# How many frames to let the attract sim reach the freeze/latch point (1 sim step per frame).
+# Emulator frames to let the attract sim reach the latch point. The game runs ~1 sim step per loop
+# iteration, but a frame's render+update can span up to ~2 v-blanks, so allow 2x + margin.
 FRAMES=$(awk '/#define INV_FRAMES/{print $3; exit}' "$ROOT/examples/snes/invaders_logic.h")
-SETTLE=$(( FRAMES + 80 )); SECS=$(( SETTLE / 50 + 3 ))
+SETTLE=$(( FRAMES * 2 + 200 )); SECS=$(( SETTLE / 40 + 5 ))
 rc=0
 
 # 3. MAME assert (default + a16) via smoke.lua.

@@ -45,6 +45,14 @@
 #define INV_UFO_Y      18
 #define INV_UFO_W      16
 #define INV_FLEET_Y0   28          /* fleet top on a fresh wave */
+/* shields: 4 bunkers, each a 4x2 grid of 8px blocks (one hit per block) */
+#define INV_SHIELDS    4
+#define SH_COLS        4
+#define SH_ROWS        2
+#define SH_BLK         8
+#define INV_SH_Y       158
+#define INV_SH_FULL    0xFFu        /* all 8 blocks alive */
+#define SH_X(i)        ((int16_t)(24 + (i) * 56))   /* shield i origin x */
 
 typedef struct {
   uint16_t alive[INV_ROWS];        /* bit c set => alien (row,c) alive (low 11 bits) */
@@ -59,6 +67,7 @@ typedef struct {
   int16_t  bomb_x[INV_NBOMB], bomb_y[INV_NBOMB]; uint8_t bomb_live[INV_NBOMB];
   uint8_t  bomb_timer;
   int16_t  ufo_x; uint8_t ufo_live; int8_t ufo_dir; uint16_t ufo_timer;
+  uint8_t  shield[INV_SHIELDS];    /* bit (by*SH_COLS+bx) set => block alive */
   uint16_t score;
   uint8_t  lives;
   uint8_t  wave;
@@ -103,6 +112,22 @@ static void inv_fleet_reset(inv_state *s, uint8_t wave) {
   s->move_timer = 0;
   s->move_period = inv_period(INV_NALIEN);
   s->anim = 0;
+  for (uint8_t i = 0; i < INV_SHIELDS; i++) s->shield[i] = INV_SH_FULL;  /* fresh bunkers each wave */
+}
+
+/* If (cx,cy) lands on an intact shield block, destroy it and return 1 (projectile absorbed). */
+static uint8_t inv_shield_hit(inv_state *s, int16_t cx, int16_t cy) {
+  if (cy < INV_SH_Y || cy >= (int16_t)(INV_SH_Y + SH_ROWS * SH_BLK)) return 0;
+  for (uint8_t i = 0; i < INV_SHIELDS; i++) {
+    int16_t ox = SH_X(i);
+    if (cx < ox || cx >= (int16_t)(ox + SH_COLS * SH_BLK)) continue;
+    uint8_t bx = (uint8_t)((uint16_t)(cx - ox) / SH_BLK);
+    uint8_t by = (uint8_t)((uint16_t)(cy - INV_SH_Y) / SH_BLK);
+    uint8_t bit = (uint8_t)(1u << (by * SH_COLS + bx));
+    if (s->shield[i] & bit) { s->shield[i] = (uint8_t)(s->shield[i] & (uint8_t)~bit); return 1; }
+    return 0;   /* a hole in the bunker — pass through */
+  }
+  return 0;
 }
 
 static void inv_init(inv_state *s) {
@@ -272,14 +297,18 @@ static void inv_step2(inv_state *s, int8_t move, uint8_t fire) {
     s->score = (uint16_t)(s->score + 100u + (uint16_t)((inv_rng(s) & 3) * 50u));
     s->pbul_live = 0; s->ufo_live = 0;
   }
-  /* alien bombs vs player */
-  for (uint8_t i = 0; i < INV_NBOMB; i++) if (s->bomb_live[i] &&
-      inv_aabb(s->bomb_x[i], s->bomb_y[i], INV_BOMB_W, INV_BOMB_H,
-               s->player_x, INV_PLAYER_Y, INV_PLAYER_W, INV_PLAYER_H)) {
-    s->bomb_live[i] = 0;
-    if (s->lives) s->lives = (uint8_t)(s->lives - 1);
-    s->player_x = (int16_t)((INV_SCRW - INV_PLAYER_W) / 2);
-    if (s->lives == 0) { s->lives = 3; s->score = 0; s->wave = 0; inv_fleet_reset(s, 0); }  /* attract: loop */
+  /* player shot vs shields */
+  if (s->pbul_live && inv_shield_hit(s, s->pbul_x, s->pbul_y)) s->pbul_live = 0;
+  /* alien bombs vs shields, then vs player */
+  for (uint8_t i = 0; i < INV_NBOMB; i++) if (s->bomb_live[i]) {
+    if (inv_shield_hit(s, s->bomb_x[i], (int16_t)(s->bomb_y[i] + INV_BOMB_H))) { s->bomb_live[i] = 0; continue; }
+    if (inv_aabb(s->bomb_x[i], s->bomb_y[i], INV_BOMB_W, INV_BOMB_H,
+                 s->player_x, INV_PLAYER_Y, INV_PLAYER_W, INV_PLAYER_H)) {
+      s->bomb_live[i] = 0;
+      if (s->lives) s->lives = (uint8_t)(s->lives - 1);
+      s->player_x = (int16_t)((INV_SCRW - INV_PLAYER_W) / 2);
+      if (s->lives == 0) { s->lives = 3; s->score = 0; s->wave = 0; inv_fleet_reset(s, 0); }  /* attract: loop */
+    }
   }
 }
 
@@ -298,6 +327,7 @@ static uint16_t inv_serialize(const inv_state *s, uint8_t *b) {
   b[n++] = s->pbul_live; b[n++] = (uint8_t)s->pbul_x; b[n++] = (uint8_t)(s->pbul_y);
   for (uint8_t i = 0; i < INV_NBOMB; i++) { b[n++] = s->bomb_live[i]; b[n++] = (uint8_t)s->bomb_y[i]; }
   b[n++] = s->ufo_live; b[n++] = (uint8_t)s->ufo_x; b[n++] = (uint8_t)(s->ufo_x >> 8);
+  for (uint8_t i = 0; i < INV_SHIELDS; i++) b[n++] = s->shield[i];
   b[n++] = (uint8_t)s->score; b[n++] = (uint8_t)(s->score >> 8);
   b[n++] = s->lives; b[n++] = s->wave;
   b[n++] = (uint8_t)s->rng; b[n++] = (uint8_t)(s->rng >> 8);
