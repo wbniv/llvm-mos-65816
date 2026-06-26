@@ -106,9 +106,15 @@ HAL*, exactly the procedural shape we are replacing (and the original `mandel-di
 constructs a `Display`, hands it drawables, and calls methods. The thin `snes.h` register map is the
 implementation layer the library's *methods* sit on — the library calls it, the client does not.
 
-The only **"exceptional circumstances"**: application *content* compute (the Mandelbrot math that fills the
-image buffer) and pure test-harness scaffolding (the CRC sentinel). Neither is part of the *graphics*
-interface, so neither is bound to a graphics object — and both are flagged as such at their call sites (§4).
+**The application is an object too — OOP all the way up.** "Not part of the graphics library" does not mean
+"not OOP": the client is a program with state (the image buffer, the animation phase) and behavior (render,
+animate), so it is its own object — an **`App`** class (§4) that *owns* the `Display` and its drawables and
+exposes `app_render`/`app_step`/`app_crc` **methods**. So `main()` itself has no bare calls — it constructs an
+`App` and calls methods on it. The only things that remain plain functions are (a) **pure leaf math** used
+*inside* a method (the `mandel_cell` escape iteration, the CRC16 step — stateless computation shared with the
+host renderer, legitimately functional, not interface), and (b) the one irreducible boundary: assigning the
+result to the `volatile uint16_t corpus_result` symbol the differential harness reads out of WRAM — and even
+that RHS is a method call (`app_crc(&app)`).
 
 ### 3a. `display.h` — `Display` (the root context; the client's only entry; owns the boot bracket)
 
@@ -268,38 +274,63 @@ frame. The **measurement** (§5) records whether llvm-mos lowers the `table[i](c
 
 ---
 
-## 4. The worked client — `examples/snes/mandel-oop.c`
+## 4. The worked client — `examples/snes/mandel-oop.c` (the `App` is an object too)
 
-Reproduce `mandel-display.c`'s render **through `snesgfx`**, same CRC `0x204F`, plus a second drawable kind
-so the polymorphic container is genuinely exercised:
+Reproduce `mandel-display.c`'s render **through `snesgfx`**, same CRC `0x204F`, with a second drawable kind so
+the polymorphic container is genuinely exercised — and the *application itself is an object*: an **`App`** that
+owns the `Display`, its drawables, and the far image buffer, exposing render/animate/crc as methods. `main()`
+constructs the `App` and calls methods on it; there are no bare calls at the orchestration level.
 
 ```c
 // mos-a16-only — far pointers (high-WRAM image buffer) are 32-bit values (build.sh greps this marker).
-#include <snes.h>                       /* the HAL — used by the library's METHODS, never by this client */
+#include <snes.h>                       /* the HAL — used by the library's METHODS, never by application code */
 #include "snesgfx/display.h"  #include "snesgfx/mode7_layer.h"  #include "snesgfx/sprite_set.h"
-#include "../65816/mandel.h"  #include "sincos.h"  #include "mode7.h"  /* M7_FAR */
+#include "../65816/mandel.h"  #include "sincos.h"  #include "mode7.h"  /* M7_FAR, mandel_cell, mandel_crc */
 
-static M7_FAR uint8_t *const fb = (M7_FAR uint8_t *)0x7E2000u;   /* the canonical far escape buffer */
-volatile uint16_t corpus_result;
+/* ---- the application, itself an object: owns the rendering context + its content ---- */
+typedef struct {
+  Display    screen;                  /* owns the rendering context (boot bracket, queue, scene) */
+  Mode7Layer fractal;                 /* drawable 1: the affine fractal layer over `buf`         */
+  SpriteSet  hud;                     /* drawable 2: a HUD cursor — forces a 2nd kind            */
+  M7_FAR uint8_t *buf;                /* the escape-count image, high WRAM (far)                 */
+  uint8_t    angle;                   /* animation phase                                         */
+} App;
+
+static void app_init(App *a, M7_FAR uint8_t *buf) {                 /* constructor */
+  a->buf = buf; a->angle = 0;
+  display_init(&a->screen);                                         /* boot bracket — encapsulated */
+  mode7_layer_init(&a->fractal, buf, 8, 7);
+  sprite_set_init(&a->hud);
+  display_add(&a->screen, (Drawable *)&a->fractal);                 /* (Drawable*) = zero-cost upcast, not a call */
+  display_add(&a->screen, (Drawable *)&a->hud);
+}
+static void app_render(App *a) {                                    /* content compute — a METHOD now */
+  for (uint16_t k = 0; k < 64*56; k++) a->buf[k] = mandel_cell_at(k, 64, 56, 15);  /* FAR stores; pure leaf math */
+}
+static uint16_t app_crc(const App *a) { return mandel_crc_far(a->buf, 64*56); }    /* far-load CRC16 leaf */
+static void app_step(App *a) {                                      /* one animation frame — a METHOD */
+  mode7_layer_spin(&a->fractal, SINCOS, a->angle++);
+  sprite_set_move(&a->hud, /*i*/0, 128, 112);
+  display_frame(&a->screen);                                        /* wait v-blank · emit · flush · present */
+}
+
+static M7_FAR uint8_t *const FB = (M7_FAR uint8_t *)0x7E2000u;      /* the canonical far escape buffer */
+volatile uint16_t corpus_result;                                   /* the differential harness's proof symbol */
 
 int main(void) {
-  Display screen;  display_init(&screen);              /* boot bracket encapsulated — NO bare HAL call */
-
-  Mode7Layer fractal;  mode7_layer_init(&fractal, fb, 8, 7);    /* constructors: receiver = the object */
-  SpriteSet  hud;      sprite_set_init(&hud);                   /* a 2nd kind → the polymorphic scene  */
-  display_add(&screen, (Drawable *)&fractal);                   /* (Drawable*) is the zero-cost upcast */
-  display_add(&screen, (Drawable *)&hud);                       /*  (base struct first) — not a call   */
-
-  mandel_render_far(fb, 64, 56, 15);                   /* APPLICATION content compute — not the gfx interface */
-
-  for (uint8_t angle = 0; ; angle++) {
-    mode7_layer_spin(&fractal, SINCOS, angle);         /* method: update the layer's affine state      */
-    sprite_set_move(&hud, /*i*/0, 128, 112);           /* method: place the HUD cursor                 */
-    display_frame(&screen);                            /* wait v-blank · emit · flush DMA · present 1st */
-  }
-  corpus_result = mandel_crc_far(fb, 64 * 56);         /* TEST-HARNESS sentinel == 0x204F (exceptional) */
+  static App app;
+  app_init(&app, FB);                       /* construct */
+  app_render(&app);                         /* compute the fractal into its buffer (method) */
+  corpus_result = app_crc(&app);            /* RHS is a method; LHS is the harness ABI symbol == 0x204F */
+  for (;;) app_step(&app);                  /* animate forever (method per frame) */
 }
 ```
+
+Every call in `main` and in `App`'s methods is a method on an object; the only plain functions left are pure
+leaf math (`mandel_cell_at`, `mandel_crc_far` — stateless, shared with the host renderer, *inside* methods)
+and the lone `corpus_result =` assignment that hands the result to the differential gate. *(If the repo grows
+more on-screen demos, `App` promotes to an abstract base — virtual `render`/`step`, a generic `app_run(App*)`
+event loop — i.e. the §3d–§3e `Drawable` vtable pattern applied one level up, at the application layer.)*
 
 A new `dev/run.sh mandel-oop` gate (mirrors `mandel-shot`) builds it `+mos-a16`, boots both emulators
 headless, and asserts `corpus_result == 0x204F` on host == a16@MAME == a16@bsnes-jg. (Far pointers can't
@@ -331,10 +362,12 @@ The HOWTO must not assert costs it hasn't measured. This library produces three 
 - **P0 — `display.h` + `upload.h` + `vram.h`** (root context + correctness core). `display_init` (boot
   bracket) then one Mode 7 tile-row through the owned queue/`display_frame`; byte-diff VRAM vs the procedural
   path. Establishes that the boot bracket + access window are encapsulated. *Gate before any OOP.*
-- **P1 — `drawable.h` + `scene.h` + `mode7_layer.h`**, single-drawable `mandel-oop.c`. Assert CRC `0x204F`
-  on both emulators (`dev/run.sh mandel-oop`). This is the zero-regression proof — **and** the
-  no-bare-functions audit: `grep -E 'snes_|REG_|upq_|vram_|scene_' mandel-oop.c` finds *nothing* (the client
-  touches only `Display`/layer methods + the two flagged application/test exceptions).
+- **P1 — `drawable.h` + `scene.h` + `mode7_layer.h`**, single-drawable `mandel-oop.c` wrapped in the `App`
+  object. Assert CRC `0x204F` on both emulators (`dev/run.sh mandel-oop`). This is the zero-regression proof —
+  **and** the no-bare-functions audit: `grep -E 'snes_|REG_|upq_|vram_|scene_|display_frame' mandel-oop.c`
+  appears *only inside `App`'s methods*, never in `main`; `main` calls only `app_*` methods. The single
+  non-method line is `corpus_result = app_crc(&app);` (the harness ABI symbol), and the only plain functions
+  are pure leaf math (`mandel_cell_at`/`mandel_crc_far`) called *inside* methods.
 - **P2 — `sprite_set.h`**, add the HUD drawable → 2-kind `Scene`. Re-assert `0x204F` (the Mandelbrot CRC is
   unaffected by the sprite), screenshot shows the cursor. This is the polymorphism proof + measurement §5.1/§5.2.
 - **P3 — `controller.h`** + an interactive variant (or fold into the existing interactive-mandelbrot plan).
