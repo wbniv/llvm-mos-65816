@@ -565,9 +565,12 @@ Acceptance test per milestone — each step is the bar that milestone must clear
    through a dead index reg into `RC17`; + `0012` for a `LDCImm` MC-lowering bug it surfaced). Both are now
    positive gates.) **And the "one deferred core" is now itself empty (2026-06-26):** the `pr15296`
    ZP-overflow turned out to be a **stale XFAIL** (now a positive c-torture gate), and the Phase-3
-   `Ac16`-residency spike was run — trigger (b) fired (real kernels at ~10/14 `Imag16` pairs) but residency
-   measured **net-negative** (+24 B / zero peak-ZP relief), so it is **not** the remedy. No `+mos-a16`
-   register-pressure XFAILs remain.
+   `Ac16`-residency spike was run end-to-end (B0→B1→B2) — trigger (b) fired (real kernels at ~10/14 `Imag16`
+   pairs) but residency measured **net-negative**: zero peak-ZP relief and a code-size regression
+   (+24 B kernels / **+530 B whole example+corpus set, 41 worse / 6 better**), while fully correct (corpus 7/7,
+   csmith 200 0-mismatch). A post-RA-extension probe confirmed the 6 winners can't be salvaged
+   pressure-neutrally (the benefit is intrinsically RA-level), so residency is **not** the remedy. No
+   `+mos-a16` register-pressure XFAILs remain.
    [surface consolidation plan](plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md) ·
    [Phase-3 spike+verdict](investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
 

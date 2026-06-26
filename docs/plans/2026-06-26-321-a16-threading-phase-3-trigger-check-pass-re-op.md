@@ -11,10 +11,16 @@ worktree).
 > trigger (a) stayed clean. At the user's direction (B0-first, then B1-as-measurement) we built and measured
 > the spike: **B0** (`shouldCoalesce` Ac16 barrier) is byte-for-byte **inert**; **B1** (pre-RA `Ac16`
 > residency, hidden flag `-mos-a16-prera-residency`) **fires heavily but yields zero peak-ZP-pressure relief
-> and a +24 B regression** — the single accumulator caps the gain, now proven. Nothing landed (default build
-> byte-identical). **Full record + reproduce + the spike `.diff`:**
+> and a +24 B regression** on the kernels — the single accumulator caps the gain, now proven. **B2** was then
+> run too (flag defaulted on so the differential exercises it): residency is **correct** (corpus 7/7, a16/k_
+> suite 66/66, csmith 200 0-mismatch, 196/196 `-verify`-clean) but a **net +530 B regression across the whole
+> example+corpus set** (41 worse / 6 better) → fails net-neutral-or-better. A follow-up **post-RA-extension
+> probe** (can the 6 winners be salvaged pressure-neutrally?) came back **NOT real** — `threadAccum16` already
+> removes 100% of *resident* round-trips; the rest are genuine reloads across the single accumulator's reuse,
+> i.e. intrinsically RA-level. Nothing landed (default build byte-identical). **Full record + reproduce + the
+> spike `.diff`:**
 > [`docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md`](../investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
-> The B2 stage below was therefore not reached (B1 NO-GO).
+> So all three stages (B0/B1/B2) + the salvage probe ran; verdict: **close Phase 3, net-negative**.
 
 ## Context — why this change
 
