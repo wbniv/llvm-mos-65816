@@ -3,6 +3,13 @@
 **Date:** 2026-06-20 · **Status:** PLAN (docs-only) · **Scope:** `TODO.md` + the A16-threading plan doc.
 **No `vendor/` change, no `0002` regen, no toolchain rebuild.**
 
+> **SUPERSEDED 2026-06-26 — the recipe this plan recorded has since RUN.** The re-open trigger (b) fired and
+> the gated B0→B1→B2 spike was executed: pre-RA `Ac16` residency measured **net-negative** (zero peak-ZP
+> relief, +530 B whole-set), so Phase 3 is **closed**, not deferred. This plan is retained as the historical
+> record of the deferral + recipe; the execution + verdict live in
+> [the trigger-check plan](2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md) ·
+> [spike+verdict](../investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
+
 ## Context — why this change
 
 The M2 "#321 A16-threading" item's last remaining slice is **Phase 3 — RA-level `Ac16` residency**, the

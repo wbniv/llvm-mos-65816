@@ -409,8 +409,8 @@ keeps a small s16 op un-narrowed under the gate + a selector that emits the `MLo
 `STAImag16 R; LDAImag16 R` round-trips a dependent chain leaves between self-contained ops — the value threads
 through `$a16`. Post-RA is deliberate: RA has already chosen `$a16` on both sides, so the peephole cannot
 reintroduce the C3 crash. Measured −31/−36 % on dependent chains. A 300-program scan retired "Phase 2" as
-already-optimal and deferred "Phase 3" (RA-level residency) behind a concrete
-trigger<sup>[[C2]](#c2-a16-threading-phase-3--ra-level-residency)</sup>.
+already-optimal; "Phase 3" (RA-level residency) was later built behind a hidden flag, measured
+**net-negative**, and **closed**<sup>[[C2]](#c2-a16-threading-phase-3--ra-level-residency)</sup>.
 
 **(5) `+mos-xy16`** reuses the whole apparatus for 16-bit X/Y: register classes `Xc16`/`Yc16`, the parallel
 X-lattice, `selectXY16` direct + indexed handlers, and spill paths. Its one subtlety — narrowing `sep #$10`
@@ -437,8 +437,10 @@ decisively — dependent-chain **−63 %**, multi-value **−65 %**, `k_isort` *
 (−220 B)**. Honestly: 8/16-interleave **stress** kernels are *larger* under `+mos-a16` (`k_crc16` +27 %,
 `k_prng` +60 %) — pure `rep`/`sep`+`Imag16` overhead with no asymmetric libcall — which is *exactly* why the
 feature is opt-in and per-op-gated, not blanket. Two pathological residuals (an `-Os` RA-pressure crash; an
-upstream scavenger N/Z crash) are `XFAIL`-pinned with XPASS guards that fire the moment a fix
-lands<sup>[[C2]](#c2-a16-threading-phase-3--ra-level-residency)</sup><sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup>.
+upstream scavenger N/Z crash) were `XFAIL`-pinned but are **now FIXED** (patches `0009` / `0011`+`0012`) and
+are positive gates; the deferred Phase-3 residency rework they motivated was built, measured **net-negative**,
+and **closed** — no `+mos-a16` register-pressure XFAILs
+remain<sup>[[C2]](#c2-a16-threading-phase-3--ra-level-residency)</sup><sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup>.
 Per-increment detail: the ~25 plans linked from [`docs/ROADMAP.md`](ROADMAP.md) step 5.
 
 ### 3.3 `0003` — TXY/TYX dead-flag peephole
@@ -579,7 +581,7 @@ spill.
 `MOSInstructionSelector::selectAddSub` lowers a small-constant i8 add/sub (`|amt| ≤ 2`) to a relocatable
 `G_INC`/`G_DEC` chain (`Anyi8` = A/X/Y/zp) instead of the A-pinned `ADCImm`, so the byte index coalesces into
 the `X` array index (`inx; inx; cpx`) and frees `A16`. One spillable/relocatable change, no RA rework — and
-the C2 coalescing rework was *ruled out* as the cause, so this is an orthogonal de-pin, not the deferred
+the C2 coalescing rework was *ruled out* as the cause, so this is an orthogonal de-pin, not the (now-closed)
 Phase-3 residency work.
 
 **Proof.** Gated on `hasAccum16()`, so **DEFAULT 8-bit is byte-identical**. `a16regpress.c` (the former crash)
@@ -947,15 +949,20 @@ paper reasoning. Drafted as the [#321 CC design note](321-upstream-cc-frame-abi-
 
 <a id="c2-a16-threading-phase-3--ra-level-residency"></a>
 
-#### C2. A16-threading Phase 3 — RA-level `Ac16` residency — *deferred*
+#### C2. A16-threading Phase 3 — RA-level `Ac16` residency — *closed (measured net-negative)*
 Phases 1/1.5 (post-RA peephole) already capture −31/−36 % on chains; a 300-program scan left **1** genuine
 remainder. Phase 3 (keep values in `Ac16` at allocation time) is capped by the single 65816 accumulator (two
-live 16-bit values must spill to `Imag16` anyway) and re-risks the C3 coalescer crash. **Re-open trigger:** a
-2nd independent realistic regalloc crash, or a real function crossing ~10/14 `Imag16` pairs. The
-`globals.c`/`a16regpress.c` `-Os` RA-pressure **crash** that used to share this label was **FIXED** by patch
-`0009` (an *orthogonal* i8-loop-counter de-pin from `{A}`, **not** this residency rework — coalescing was still
-ruled out), so `a16regpress.c` is now a positive gate; the residency rework stays deferred, motivated only by
-the scavenger-N/Z (`a16scavnz.c`) + `pr15296` ZP-overflow XFAILs.
+live 16-bit values must spill to `Imag16` anyway) and re-risks the C3 coalescer crash. **Resolution
+(2026-06-26):** the re-open trigger (a real function crossing ~10/14 `Imag16` pairs) **fired** — new
+CORDIC/Mandelbrot/Hopalong kernels reached 10–14/14 — so the gated B0→B1→B2 spike was built behind a hidden
+flag and **measured net-negative**: the `shouldCoalesce` Ac16 barrier (B0) is byte-for-byte inert, and pre-RA
+residency (B1/B2) fires heavily but gives **zero peak-ZP relief and a +530 B whole-set regression** while
+fully correct; a post-RA salvage of the low-pressure winners isn't real (the benefit is intrinsically
+RA-level). So Phase 3 is **closed, not deferred**. All three issues that once motivated it are resolved
+**without** residency: `globals.c`/`a16regpress.c` RA crash → `0009` (orthogonal i8-loop-counter de-pin,
+coalescing ruled out — now a positive gate); scavenger-N/Z (`a16scavnz.c`) → `0011`/`0012`; `pr15296`
+ZP-overflow → a **stale XFAIL** (now a positive gate). No `+mos-a16` register-pressure XFAILs remain.
+[Phase-3 spike+verdict](investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
 
 ### 16-bit codegen-form spikes
 
