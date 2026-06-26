@@ -161,8 +161,27 @@ static void hud_build(const blossom_t *v) {
   *q = '\0';
 }
 
+// Clear all 64 KB of VRAM to 0 (force-blank only). bsnes RANDOMISES power-on VRAM, so the BG layers
+// flash garbage the instant the display is enabled. The Mode 7 character rows are only filled one
+// band/frame by the render loop, so without a boot clear the plot area shows random tiles for the first
+// ~16 frames; clear everything (and preload CGRAM, below) BEFORE m7_show so the first visible frame is
+// clean. Two fixed-source DMAs (low byte then high byte of every word) from the zero const.
+static void vram_clear_all(void) {
+  REG_VMAIN = VMAIN_INC_LOW_1; REG_VMADD = 0;                  // pass 1: every VRAM low byte
+  REG_DMAP0 = 0x08; REG_BBAD0 = 0x18;                          // A->B, FIXED source, pattern 0 -> $2118
+  REG_A1T0L = (uint8_t)(uintptr_t)&m7_zero; REG_A1T0H = (uint8_t)((uintptr_t)&m7_zero >> 8); REG_A1B0 = 0x00;
+  REG_DAS0L = 0x00; REG_DAS0H = 0x80;                          // 0x8000 bytes = 32768 words
+  REG_MDMAEN = 0x01;
+  REG_VMAIN = VMAIN_INC_HIGH_1; REG_VMADD = 0;                 // pass 2: every VRAM high byte
+  REG_DMAP0 = 0x08; REG_BBAD0 = 0x19;                          // -> $2119
+  REG_A1T0L = (uint8_t)(uintptr_t)&m7_zero; REG_A1T0H = (uint8_t)((uintptr_t)&m7_zero >> 8); REG_A1B0 = 0x00;
+  REG_DAS0L = 0x00; REG_DAS0H = 0x80;
+  REG_MDMAEN = 0x01;
+}
+
 int main(void) {
   snes_ppu_reset_blank();
+  vram_clear_all();                       // wipe random power-on VRAM before anything can be displayed
   m7_begin();
   m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, M7_TILEMAP_WORDS);
   m7_tilemap_identity(TILES, TILES);
@@ -176,6 +195,7 @@ int main(void) {
   m7_set_scroll((uint16_t)PLOT_HBIAS, (uint16_t)PLOT_VBIAS);   // centre the attractor in the plot box
   hud_begin();                            // BG3 text bars + HDMA screen-split (Mode 7 plot box)
   hud_text(HUD_BOT_ROW, 1, "LR ZOOM AY ATTR SEL COL ST RST");   // static control legend
+  stage_palette(0); dma_cgram();          // load CGRAM before display (no garbage-colour first frame)
   m7_show();                              // release force-blank; the attractor BLOOMS in live below
   REG_NMITIMEN = NMITIMEN_NMI;            // VBlank NMI -> snes_wait_vblank pacing
 
