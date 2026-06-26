@@ -138,6 +138,39 @@ grid-derived, so **no fixture or CRC change**.
 5. **CI smoke unaffected:** `.github/workflows/smoke.yml` builds `hello.c` + the corpus, not
    `mandel-display`, so a16-only changes nothing there — confirm by inspection.
 
+## Verification results (2026-06-26)
+
+1. **Build + differential** — `dev/run.sh mandel-shot`:
+   ```
+   ==> mandel-shot: grid 64x56, N=15
+   ==> host reference: CRC16=0x204F (build/mandel-host.png)
+   ==> built build/mandel-display.sfc (+mos-a16); corpus_result @ WRAM 0x200
+   SMOKE: PASS off=0x200 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+       SHOT: PASS corpus=0x204F (snapshot at frame 5800)
+   RESULT: PASS — Mandelbrot rendered on SNES; MAME + bsnes-jg screenshots match host (CRC 0x204F)
+   ```
+   **PASS** — host == bsnes-jg == MAME == `0x204F`.
+2. **Far opcodes** — `llvm-objdump -d --mcpu=mosw65816 build/mandel-display.sfc.elf`:
+   ```
+   82e6: 87 04   sta [$4]   ; far STORE   (1×)
+   8373: a7 0c   lda [$c]   ; far LOAD
+   83de: a7 08   lda [$8]   ; far LOAD    (2×)
+   ```
+   **PASS** — `sta [dp]` (87) ×1 + `lda [dp]` (A7) ×2 emitted.
+3. **Publish gate (a16-only path)** — `task release-test -- PROGRAM=mandel-display A16=1`:
+   **NOT RUN** (heavy clean-room Docker gate, needs a `dist/*.tar.xz`). Wired by inspection: the
+   `mandel-display` arm forces `A16=1` when `A16=both`; all edited scripts pass `bash -n`. Recommended
+   follow-up before the next publish.
+4. **No dangling references** — grep over `Taskfile.yml dev/ examples/ tools/`:
+   **PASS** — only an untracked pre-existing orphan (`examples/snes/pyramid_image.h`, from the earlier
+   zoom removal) and a historical spike comment remain; no live build wiring. `jgxcheck.cpp` recompiles
+   clean after the JGX_VIEW excision.
+5. **CI smoke unaffected** — **PASS** by inspection (`smoke.yml` builds `hello.c` + corpus only).
+
+**Website deploy** — far ROM live at `https://indri.studio/apps/llvm-mos-65816/play/`; live ROM
+sha256 `e41daf50…` == the gate-passed build; live manifest carries `off 0x200` / `frames 5800` /
+`want 0x204F`. Commits: `llvm-mos-65816 0034e3c`, `bsnes-jg-wasm 85de645`, `indri.studio e8751f5`.
+
 ## Deploy to website (after building) — `../indri.studio/`
 
 The indri.studio product page hosts a **playable in-browser SNES demo** of `mandel-display.sfc`
