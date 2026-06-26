@@ -9,11 +9,13 @@
 The Phase-3 re-open trigger **(b) fired** — real heavy-16-bit-math kernels now use most/all of the `Imag16`
 pool — so we ran the gated **B0→B1** spike to answer *"is pre-RA `Ac16` residency worth landing?"*. Answer,
 **measured end-to-end: NO.** Pre-RA residency works and fires heavily, but delivers **zero peak-ZP-pressure
-relief** and a **net +24 B code-size regression** across the real a16 kernel set. The high pressure is
-*genuinely-simultaneous* live 16-bit values that the single 65816 accumulator cannot thread away — exactly
-the deferral's stated cap, now **proven, not assumed**. Phase 3 is therefore **closed as net-negative**, not
-left open: the trigger is re-framed (a proxy FIRE is necessary but not sufficient; the *fix* is what's
-net-negative).
+relief** and a code-size **regression** (B1: +24 B over the kernels; **B2: +530 B over the whole example+corpus
+set, 41 files worse / 6 better**), while being fully correct (corpus 7/7, a16/k_ suite 66/66, csmith 200
+0-mismatch, 196/196 `-verify`-clean). The high pressure is *genuinely-simultaneous* live 16-bit values that the
+single 65816 accumulator cannot thread away — exactly the deferral's stated cap, now **proven, not assumed**.
+A follow-up probe (below) confirmed there is **no pressure-neutral post-RA win** to salvage from the 6
+winners either. Phase 3 is therefore **closed as net-negative**, not left open: the trigger is re-framed (a
+proxy FIRE is necessary but not sufficient; the *fix* is what's net-negative).
 
 ## What prompted it
 
@@ -72,6 +74,43 @@ accumulator / reopens regression risk on the common path", now **empirically con
 
 Per the B1 gate ("NO-GO if any win regresses"): **NO-GO**. Per project lesson #2/#3 (a blanket change that
 regresses common shapes is wrong) and "close net-negative findings, don't defer": **close Phase 3**.
+
+## Phase B2 — broad differential correctness + net size (residency ON): **NO-GO**
+
+Rebuilt the spike with the flag **defaulted on** so the differential harness (which can't inject `-mllvm`)
+exercises residency, then ran the full B2 gate:
+
+| B2 check | Result |
+|---|---|
+| Whole-set net `.text` (OFF vs ON, all examples+corpus, `-O1`+`-Os`) | **65580 → 66110 B = +530 B WORSE** (196 pairs; **41 worse, 6 better**) |
+| Emulator differential | **corpus 7/7** (host==default==`+mos-a16` on MAME+bsnes-jg), **a16/k_ suite 66/66**, **csmith 200: 0 mismatch / 0 crash / 0 error** |
+| `-verify-machineinstrs` (residency ON) | **196/196 clean** |
+
+Residency is **correct** (runs identically on both emulators) but the B2 "net-neutral-or-better across the
+whole set → land" criterion **fails hard** (+530 B). The regression is broad, not a tail artifact.
+
+## Post-RA extension probe — can the 6 winners be salvaged pressure-neutrally? **NO.**
+
+The 6 winning `(file,opt)` pairs are 3 files — `a16cmpaudit.c` −82 B (a *synthetic* harness exercising every
+16-bit compare form), `a16loadcall.c` −10 B (micro-test), `k_hopalong.c` −2 B (the only real kernel). They
+win because they are **low register pressure** (threading removes round-trips without forcing spills); the
+losers are high-pressure (`a16s32` +88, CORDIC `k_trig16x`/`k_trig16` +58/+26, the `*spillr` spill tests +34).
+Two facts kill any "just the winners" gate:
+
+1. **Consumer kind does not separate win from loss** — `a16cmpaudit` *wins* with ~90% ALU/shift consumers;
+   `k_trig16` *loses* with 82 compare consumers. The discriminator is **register pressure**, which a pre-RA
+   pass cannot reliably predict (RA decides it later) — i.e. a conservative "never-regress" gate *is* the
+   deferred RA-integration, not a cheap heuristic.
+2. **There is no pressure-neutral post-RA win left.** In `a16cmpaudit`'s post-`threadAccum16` MIR (flag off),
+   **0** A-clean `STAImag16`→`LDAImag16` pairs survive — the post-RA peephole has already removed every
+   *resident* round-trip. The 220 surviving reloads are all **A-dirty**: the single `$a16` was reused by an
+   intervening 16-bit op (`$rs4 = STAImag16 $a16` … `$a16 = LDAImag16 $rs13` — a *different* value cycling
+   through the one accumulator), so the value genuinely lives in `Imag16` and the reload is *necessary*.
+   Threading those post-RA would be incorrect (the value isn't in `$a16`); making it correct = keeping it
+   resident across the reuse = the pre-RA residency that just measured net-negative.
+
+So the residency benefit is **intrinsically RA-level** (keep a value live across the single accumulator's
+reuse). There is nothing to extract at the pressure-safe post-RA layer.
 
 ## Verdict & disposition
 
