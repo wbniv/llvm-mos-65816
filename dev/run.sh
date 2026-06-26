@@ -95,6 +95,9 @@ Targets:
   far_memops #320/#321: build examples/65816/far_memops.c (snes, +mos-a16), assert a
              far memset/memcpy routes to the FAR runtime (__memset_far/__memcpy_far),
              boot in MAME at -Os/-O2, read high-WRAM ($7E) back == 0x74 (right bank)
+  far_loop   #321: build examples/65816/far_loop.c (snes, +mos-a16), assert a far-pointer
+             INDUCTION-VARIABLE loop compiles (was: G_PHI(p2) backend abort) -> sta/lda [dp];
+             boot in MAME at -Os/-O2, far-ptr IV write+read-back of high-WRAM ($7E) == 0xC9
   far_call   #320 Increment 4: build examples/65816/far_call.c (snes-far), assert a
              call to a bank-$01 function emits JSL ($22) + the leaf returns RTL ($6b),
              boot in MAME, check the value returned across the bank boundary == 0xF3

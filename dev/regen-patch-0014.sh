@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# dev/regen-patch-0014.sh — regenerate patches/llvm-mos/0014-321-far-ptr-phi-legalize.patch
+# from the live (directly-edited) vendor/llvm-mos tree.
+#
+# What 0014 is: the #321 far-pointer-PHI legalization fix. A far (addrspace 2)
+# pointer carried across a loop back-edge — a far-pointer induction variable
+# (for(;n;p++) *p=…) — forms a G_PHI of a far (p2) pointer. The MOS legalizer
+# made G_PHI legal only for {s1,s8,p0,p1}, NOT p2, so the backend ABORTED:
+# "unable to legalize instruction: %N:_(p2) = G_PHI ...". 0014 custom-legalizes a
+# far-pointer phi to an s32 phi (MOSLegalizerInfo::legalizePhi): ptrtoint each
+# incoming value at the end of its predecessor block, retype the phi to s32, then
+# inttoptr the result back to p2 after the block's phis — the same ptrtoint/inttoptr
+# bridge far load/store + legalizePtrAdd use. The s32 phi then hands off to the
+# standard narrowScalar-of-G_PHI(s32)->bytes path. Touches MOSLegalizerInfo.{cpp,h};
+# the runtime-free micro-test lives in the main repo (examples/65816/far_loop.c).
+#
+# MOSLegalizerInfo.{cpp,h} are SHARED files (0001/0002/0005/0006/0013 also edit the
+# .cpp), so 0014 is captured by the delta method: reconstruct pristine + 0001..0013,
+# overlay the live MOSLegalizerInfo.{cpp,h}, and diff — that delta is exactly the new
+# legalizePhi hunks (the G_PHI rule + the legalizeCustom dispatch + the handler).
+#
+# 0014 = (live) - (pristine + 0001..0013), restricted to the two files it touches.
+# Runs on the HOST (needs git + diff; no container).
+# See docs/plans/2026-06-26-fix-the-far-pointer-g-phi-p2-backend-gap.md.
+set -euo pipefail
+
+usage() { echo "Usage: dev/regen-patch-0014.sh   # regenerate + round-trip-verify patches/llvm-mos/0014-321-far-ptr-phi-legalize.patch"; exit 0; }
+[ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VENDOR="$ROOT/vendor/llvm-mos"
+PATCHES="$ROOT/patches/llvm-mos"
+PSTACK=(
+  "$PATCHES/0001-320-far-addrspace.patch"
+  "$PATCHES/0002-321-accum16.patch"
+  "$PATCHES/0003-late-opt-txy-dead-flag.patch"
+  "$PATCHES/0004-320-far-cc.patch"
+  "$PATCHES/0005-320-far-ptr-value-legalize.patch"
+  "$PATCHES/0006-320-packed24.patch"
+  "$PATCHES/0007-65816-near-abs-bank-relax.patch"
+  "$PATCHES/0008-mos-dp-arg-cc.patch"
+  "$PATCHES/0009-321-a16-pressure-incdec.patch"
+  "$PATCHES/0010-coalesce-rotate-ac.patch"
+  "$PATCHES/0011-mos-scavenger-live-p-save.patch"
+  "$PATCHES/0012-mos-ldcimm-set-lowering.patch"
+  "$PATCHES/0013-320-far-memops.patch"
+)
+P14="$PATCHES/0014-321-far-ptr-phi-legalize.patch"
+
+# The files 0014 modifies. Diff'd individually so foreign WIP elsewhere never leaks in.
+PHI_FILES=(
+  "llvm/lib/Target/MOS/MOSLegalizerInfo.cpp"
+  "llvm/lib/Target/MOS/MOSLegalizerInfo.h"
+)
+
+[ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
+PRISTINE="$(git -C "$VENDOR" rev-parse HEAD)"
+echo "==> pristine vendor HEAD: $(git -C "$VENDOR" rev-parse --short HEAD)"
+
+WT=""
+cleanup() {
+  [ -n "$WT" ] && git -C "$VENDOR" worktree remove --force "$WT" 2>/dev/null || true
+  git -C "$VENDOR" worktree prune 2>/dev/null || true
+  [ -n "$WT" ] && rm -rf "$WT"
+}
+trap cleanup EXIT
+GIT_ID=(-c user.email=patchgen@local -c user.name=patchgen)
+mkwt() { WT="$(mktemp -d)"; git -C "$VENDOR" worktree add --detach "$WT" "$PRISTINE" >/dev/null; }
+rmwt() { git -C "$VENDOR" worktree remove --force "$WT" 2>/dev/null || true; rm -rf "$WT"; WT=""; }
+
+apply_stack() { for p in "${PSTACK[@]}"; do [ -f "$p" ] && git -C "$WT" apply "$p"; done; }
+
+echo "==> [gen] baseline = pristine + 0001..0013; overlay live MOSLegalizerInfo.{cpp,h}; diff"
+mkwt
+apply_stack
+git -C "$WT" add -A
+git "${GIT_ID[@]}" -C "$WT" commit -q -m "stack baseline (0001-0013)"
+for f in "${PHI_FILES[@]}"; do cp "$VENDOR/$f" "$WT/$f"; done
+git -C "$WT" diff > "$P14"
+echo "    wrote $P14 ($(wc -l < "$P14") lines, $(grep -c '^diff --git' "$P14") files)"
+rmwt
+
+echo "==> [verify] pristine + 0001..0014 reproduces the live ${PHI_FILES[*]} exactly"
+mkwt
+apply_stack
+git -C "$WT" apply "$P14"
+rc=0
+for f in "${PHI_FILES[@]}"; do
+  if ! diff -q "$WT/$f" "$VENDOR/$f" >/dev/null 2>&1; then
+    echo "  MISMATCH $f"; rc=1
+  fi
+done
+rmwt
+if [ $rc -eq 0 ]; then
+  echo "RESULT: PASS — 0014 round-trips (0001..0014 reproduces MOSLegalizerInfo.{cpp,h})"
+else
+  echo "RESULT: FAIL — round-trip mismatch"; exit 1
+fi

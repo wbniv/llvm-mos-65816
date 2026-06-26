@@ -1,0 +1,86 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index c4430bb145fa..3d9831fc56fa 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -407,6 +407,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+ 
+   getActionDefinitionsBuilder(G_PHI)
+       .legalFor({S1, S8, P, PZ})
++      // #321: a far pointer (PF, p2) carried across a loop back-edge forms a
++      // G_PHI(p2) that no scalar/widen action covers. Custom-legalize it to an
++      // s32 phi via ptrtoint/inttoptr (see legalizePhi), reusing the same bridge
++      // far load/store and legalizePtrAdd already rely on. (PFP/p3 is memory-only
++      // — never a register/phi value — so it cannot reach here.)
++      .customFor({PF})
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+       .unsupported();
+@@ -613,6 +619,8 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+     return legalizeMemOp(Helper, MRI, MI, LocObserver);
+ 
+   // Control Flow
++  case G_PHI:
++    return legalizePhi(Helper, MRI, MI);
+   case G_BRCOND:
+     return legalizeBrCond(Helper, MRI, MI);
+   case G_BRJT:
+@@ -1767,6 +1775,46 @@ bool MOSLegalizerInfo::legalizeAbs(LegalizerHelper &Helper,
+   return true;
+ }
+ 
++// #321: legalize a far-pointer (PF, p2) G_PHI by converting it to an s32 phi.
++// G_PHI is legal only for {s1,s8,p0,p1}; a far pointer carried across a loop
++// back-edge (a far-pointer induction variable) otherwise aborts the backend
++// ("unable to legalize ... G_PHI (p2)"). We ptrtoint each incoming value at the
++// end of its predecessor block, retype the phi to s32, then inttoptr the result
++// back to p2 after the block's phis — the same bridge legalizePtrAdd / far
++// load+store use. The resulting s32 phi hands off to the standard
++// narrowScalar-of-G_PHI(s32)->bytes path (exercised by any i32 loop counter).
++// Modeled on LegalizerHelper::widenScalar's G_PHI case for the insert points.
++bool MOSLegalizerInfo::legalizePhi(LegalizerHelper &Helper,
++                                   MachineRegisterInfo &MRI,
++                                   MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++
++  Register Dst = MI.getOperand(0).getReg();
++  LLT IntTy = LLT::scalar(MRI.getType(Dst).getSizeInBits()); // s32 for p2
++
++  Helper.Observer.changingInstr(MI);
++
++  // ptrtoint each incoming far-pointer value at the end of its predecessor
++  // block (operands come in (value, block) pairs).
++  for (unsigned I = 1, E = MI.getNumOperands(); I < E; I += 2) {
++    MachineBasicBlock &Pred = *MI.getOperand(I + 1).getMBB();
++    Builder.setInsertPt(Pred, Pred.getFirstTerminatorForward());
++    auto Int = Builder.buildPtrToInt(IntTy, MI.getOperand(I).getReg());
++    MI.getOperand(I).setReg(Int.getReg(0));
++  }
++
++  // Retype the phi def to the integer, then inttoptr it back to the far pointer
++  // immediately after the block's phis.
++  Register NewDst = MRI.createGenericVirtualRegister(IntTy);
++  MI.getOperand(0).setReg(NewDst);
++  MachineBasicBlock &MBB = *MI.getParent();
++  Builder.setInsertPt(MBB, MBB.getFirstNonPHI());
++  Builder.buildIntToPtr(Dst, NewDst);
++
++  Helper.Observer.changedInstr(MI);
++  return true;
++}
++
+ bool MOSLegalizerInfo::legalizePtrAdd(LegalizerHelper &Helper,
+                                       MachineRegisterInfo &MRI,
+                                       MachineInstr &MI) const {
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+index 6c3649f31761..d2df2ca53748 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -69,6 +69,8 @@ private:
+                       MachineInstr &MI) const;
+   bool legalizeAbs(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                    MachineInstr &MI) const;
++  bool legalizePhi(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                   MachineInstr &MI) const;
+   bool legalizePtrAdd(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                       MachineInstr &MI) const;
+   bool legalizePtrMask(LegalizerHelper &Helper, MachineRegisterInfo &MRI,

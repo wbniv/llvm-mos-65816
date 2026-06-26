@@ -1,6 +1,19 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-26 (**far addrspace-2 memset/memcpy/memmove silent wrong-bank fix** — a far memop the
+**Last updated:** 2026-06-26 (**far-pointer-PHI legalization fix** — a far (addrspace 2) pointer used as a loop
+induction variable (`for(;n;p++) *p=…`) forms a `G_PHI` of a far (p2) pointer; the MOS legalizer made `G_PHI`
+legal only for `{s1,s8,p0,p1}`, NOT the 32-bit p2, so the backend ABORTED (`unable to legalize ... G_PHI (p2)`)
+on valid C. This **resolves the follow-up gap the far-memops entry below noted** (the reason `mem-far.c` is written
+index-style). Fix = `MOSLegalizerInfo::legalizePhi` (`.customFor({PF})` on the `G_PHI` rule + a `legalizeCustom`
+arm): custom-legalize a far-pointer phi to an **s32 phi** — ptrtoint each incoming value in its predecessor,
+inttoptr the result back to p2 after the phi — the same ptrtoint/inttoptr bridge `legalizePtrAdd`/far load+store
+use; the s32 phi reuses the standard `narrowScalar`→bytes path. Purely additive (other phi types untouched), no
+generic-LLVM change. Carried as fork patch **`0014-321-far-ptr-phi-legalize`** + `dev/regen-patch-0014.sh`, gated
+by `dev/run.sh far_loop` (`corpus_result==0xC9`, MAME `-Os`/`-O2` + bsnes-jg via `xcheck`; the compile gate IS the
+crash regression-guard). A self-contained **MOS-backend correctness fix, upstream-worthy** once #320's AS2 is
+blessed — folds into the Future/blocked #320/#321 body, **not** a new ready-to-post row (AS2 isn't
+upstream-standalone-testable). No GitHub state change (no posting) — #561/#562/#563 still OPEN.) Previously
+2026-06-26 (**far addrspace-2 memset/memcpy/memmove silent wrong-bank fix** — a far memop the
 backend can't inline-expand (variable size, or constant size over `MOSLegalizerInfo`'s `SizeLimit`) fell through
 `legalizeMemOp` into the generic `createMemLibcall`, which called the **near** runtime (`__memset`/`memcpy`,
 16-bit `char*`) while passing the 32-bit far pointer → the bank byte was silently dropped → wrong-bank store/load,
