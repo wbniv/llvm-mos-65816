@@ -170,11 +170,30 @@ relocation never fires — this is the genuine native-s16/ZP-residency core, sti
 Classified `a16-zp-pressure-overflow` in `KNOWN_ISSUES` so the c-torture gate XFAILs it (the fuzzer never
 feeds link errors to `classify_known`, so its behavior is unchanged).
 
+### RESOLUTION — the XFAIL was stale; pr15296 now passes (2026-06-26)
+
+Re-checked on the current toolchain (pristine `c798c31` + patches `0001..0012`): **pr15296.c links clean and
+fully passes the differential gate** — `dev/run.sh torture --tests pr15296.c` at **both `-Os` and `-O1`**
+folds `default == +mos-a16 == +mos-xy16 == 0x600D` on **MAME + bsnes-jg**. The `.zp.noinit` section is now
+**0x12 B (≈18 B)**, not the 1043 B of the original overflow.
+
+**The "`Imag16` saturation past 256 B" mechanism above was wrong.** The zero-page imaginary registers are
+hard-capped at 32 B (`MOSRegisterInfo.cpp` reserves `RS16..RS127`) and `MOSZeroPageAlloc` is hard-capped at
+`-zp-avail=224` (`build/install/bin/mos-snes.cfg`; enforced at `MOSZeroPageAlloc.cpp:263/267/829/841`), so a
+1043-byte `.zp.noinit` could never be intrinsic Imag16 pressure — it was a **register-pressure artifact** of
+the pre-fix codegen, relieved by the post-`0009` advances (`0010`–`0012`). The **likely** relief is patch
+`0011` (the register-scavenger live-`$p` rework): its pre-fix `saveScavengerRegister` mishandled `$p`
+(forcing it preserved across an *unbalanced* stack range → extra `STImag8 $p` spill traffic), which plausibly
+inflated the ZP/spill footprint that overflowed here. **Exact relieving patch not bisected** — a counterfactual
+toolchain rebuild (reverse `0011`/`0012`, rebuild, re-link) would confirm; not run, as the item is resolved.
+The `KNOWN_ISSUES["a16-zp-pressure-overflow"]` classifier was dropped (`tools/a16_fuzz.py`) so a recurrence
+hard-FAILS again; pr15296.c is now a **positive in-scope c-torture gate**.
+
 ## Tracking
 
 - Repro: `examples/65816/a16regpress.c` — **FIXED 2026-06-24 (patch `0009`); now a positive gate
   `dev/run.sh a16regpress`** (the `KNOWN_ISSUES["regalloc-out-of-registers"]` entry + repro row were dropped).
-- Sibling (ZP overflow): `vendor/c-torture/execute/pr15296.c` (gitignored) · STILL XFAIL `KNOWN_ISSUES["a16-zp-pressure-overflow"]` (not fixed by `0009`).
+- Sibling (ZP overflow): `vendor/c-torture/execute/pr15296.c` (gitignored) · **RESOLVED 2026-06-26 — stale XFAIL; now a positive c-torture gate** (links clean + `0x600D` both emulators at `-Os`/`-O1`; `KNOWN_ISSUES["a16-zp-pressure-overflow"]` dropped). See §RESOLUTION above.
 - TODO: M2 "#321 `+mos-a16 -O1/-Os` register-allocation FAILURE on real code (`globals.c`)" — marked DONE.
 - Plans: [ZP-pressure measurement](../plans/2026-06-18-321-zp-pressure-measurement.md) (the surfacing) ·
   [A16-threading](../plans/2026-06-17-321-a16-threading.md) (Phase 3, the fix home).

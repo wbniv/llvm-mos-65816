@@ -47,8 +47,13 @@ byte-identical, −123 B / 122 c-torture progs, and `a16regpress.c` is now a pos
 scavenger-N/Z crash (`$p is not a GPR`) is also now FIXED** — pristine-upstream fork patch **`0011`**
 (2026-06-26; route a live `$p` through a dead index reg into `RC17` for the unbalanced case), with the second
 upstream bug it surfaced (`LDCImm 1` → `MCInstLower` unreachable) fixed as **`0012`**; `a16scavnz.c` is now a
-positive gate. The lone remaining `+mos-a16` register-pressure XFAIL — the `pr15296` link-time ZP-overflow —
-stays deferred behind its re-open trigger.
+positive gate. The last `+mos-a16` register-pressure XFAIL — the `pr15296` link-time ZP-overflow — is now
+**also resolved (2026-06-26): the XFAIL was stale.** pr15296 links clean (`.zp.noinit` 18 B, not the recorded
+1043 B) and folds `default==+mos-a16==+mos-xy16==0x600D` on both emulators at `-Os` and `-O1`; the documented
+"`Imag16`-saturation past 256 B" mechanism was wrong (the allocator hard-caps ZP at `-zp-avail=224`), the
+overflow was a pre-fix register-pressure artifact relieved by the post-`0009` stack (`0010`–`0012`), and the
+`KNOWN_ISSUES` classifier was dropped (pr15296 is now a positive c-torture gate). **No `+mos-a16`
+register-pressure XFAILs remain.**
 
 **Also on `main` (2026-06-23):** **#320 far tail calls** — a far→far tail `JSL g; RTL` now folds to a
 direct long jump (`TailJML`/`$5C`), −1 B per site (landed in `0001`, `4adda8b`; verified both emulators).

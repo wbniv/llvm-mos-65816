@@ -984,18 +984,18 @@ KNOWN_ISSUES = [
     # KNOWN_ISSUES entry + KNOWN_ISSUE_REPROS row are removed so a recurrence hard-FAILS again;
     # a16scavnz.c is now a positive gate (dev/run.sh a16scavnz -> 0x22A6, both emulators). See
     # docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md.)
-    # a16-zp-pressure-overflow: +mos-a16 at -O1/-Os on a register-heavy function allocates so
-    # many Imag16 zero-page pairs that the .zp section grows past 256 bytes, so an 8-bit
-    # zero-page relocation can no longer reach it -> link error "relocation R_MOS_ADDR8 out of
-    # range: N ... references section '.zp...'". DEFAULT 8-bit and +mos-a16 -O0 link clean — the
-    # SAME -O1/-Os register-pressure root cause as the now-fixed regalloc-out-of-registers, a different symptom
-    # (link-time ZP overflow vs an RA-time crash). Surfaced by the c-torture gate (pr15296.c).
-    # Classified here so torture_run XFAILs it (the fuzzer never feeds link errors to
-    # classify_known, so its behavior is unchanged). The fix is the same deferred Phase-3 Ac16/
-    # ZP-residency rework — see docs/investigations/65816-a16-regalloc-pressure-failure.md. REMOVE
-    # when fixed so the signature hard-FAILS again (regression guard).
-    ("a16-zp-pressure-overflow",
-     lambda log: "R_MOS_ADDR8 out of range" in log and ".zp" in log),
+    # (a16-zp-pressure-overflow — +mos-a16 -O1/-Os on the register-heavy pr15296.c link-overflowed
+    # the zero page: "relocation R_MOS_ADDR8 out of range: 1043 ... references section '.zp.noinit'"
+    # (DEFAULT 8-bit / +mos-a16 -O0 linked clean) — is FIXED as of the current stack. Verified
+    # 2026-06-26: pr15296.c links clean (.zp.noinit 0x12 B, not 1043) and runs
+    # default==+mos-a16==+mos-xy16==0x600D on MAME + bsnes-jg (dev/run.sh torture --tests pr15296.c,
+    # -Os AND -O1). The recorded "Imag16 saturation past 256 B" mechanism was WRONG — the allocator
+    # hard-caps the zero page at -zp-avail=224 (mos-snes.cfg), so the 1043 B was a register-pressure
+    # artifact relieved by the post-0009 codegen advances (0010-0012; the 0011 scavenger live-$p
+    # rework the likely relief, since its pre-fix $p mishandling inflated spill/ZP usage — exact
+    # relieving patch not bisected, would need a counterfactual rebuild). Its KNOWN_ISSUES entry +
+    # classifier are removed so a recurrence hard-FAILS again; pr15296.c is now a positive in-scope
+    # c-torture gate. See docs/investigations/65816-a16-regalloc-pressure-failure.md.)
     # (a16-unmerge-s32 — the +mos-a16 `G_UNMERGE_VALUES s32` legalizer gap the Csmith fuzzer
     # found — was FIXED 2026-06-19 by representing s32 as 2x s16 under a16; its KNOWN_ISSUES
     # entry is removed so a recurrence hard-FAILS again. See the main-branch commit + plan

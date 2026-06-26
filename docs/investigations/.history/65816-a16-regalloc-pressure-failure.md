@@ -1,9 +1,21 @@
 | Date | Change |
 |------|--------|
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad506ed) | #321: land patch 0009 — fix the +mos-a16 regalloc out-of-registers deadlock |
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/15542ff) | #321 c-torture Phase 1: pilot finds a real a16 ZP-pressure overflow (pr15296.c) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/50a59b5) | #321 globals.c RA crash: pin the exact mechanism via an isolated asserts build |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/3eeab5d) | #321 globals.c RA failure: record root cause across investigation + plan + docs |
 
 <!--history-meta v1
+ad506ed	author	Will Norris
+ad506ed	added	48
+ad506ed	deleted	12
+ad506ed	files	1
+ad506ed	body	From wt/321-a16-pressure. Under +mos-a16 at -O1/-Os, a function holding a u16\naccumulator live across a second loop alongside u16*u8 multiplies aborted with\n"ran out of registers during register allocation" (repro globals.c, reduced to\nexamples/65816/a16regpress.c). Root cause: a strength-reduced i8 byte index\n(stepped i += 2) selected the A-pinned `add Ac,imm -> ADCImm` pattern, pinned to\nthe singleton Ac={A} held across the 16-bit accumulator's live range — greedy RA\ncan't relocate Ac and the 1-instr INF transit can't spill, so it deadlocks.\n\nFix (patch 0009, MOSInstructionSelector::selectAddSub, gated hasAccum16()):\nlower a small-constant 8-bit add/sub (|amt| <= 2) to a relocatable G_INC/G_DEC\nchain (Anyi8 = A/X/Y/zp) instead of A-pinned ADCImm, so the byte index lives in\nX and frees A16. DEFAULT 8-bit codegen byte-identical (gated); touches only\nMOSInstructionSelector.cpp.\n\nVerification: applies clean onto main's 0001..0008; regen-patch-0009.sh\nround-trips (pristine + 0001..0009 == live MOSInstructionSelector.cpp). Removed\nthe now-stale `regalloc-out-of-registers` KNOWN_ISSUES entry + its repro row from\ntools/a16_fuzz.py (globals.c/a16regpress.c are now positive gates). Differential\ngate re-run on the consolidated stack this session.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+15542ff	author	Will Norris
+15542ff	added	18
+15542ff	deleted	0
+15542ff	files	1
+15542ff	body	120-test differential pilot (40 @ -Os, 40 @ -O1, 40 @ -O1 over pr*):\n102 PASS, 17 SKIP, 1 XFAIL. All four classification paths exercised; the\nrunner is correct.\n\nThe one FAIL, pr15296.c, is a REAL +mos-a16 -O1/-Os defect: the a16 build\nallocates so many Imag16 zero-page pairs that .zp.noinit grows past 256 B\nand an 8-bit ZP relocation overflows (R_MOS_ADDR8 out of range). DEFAULT\n8-bit and +mos-a16 -O0 link clean; -O1/-Os fail — the SAME register-\npressure root cause as the globals.c RA crash, a different symptom (link\nZP overflow vs RA crash). Added KNOWN_ISSUES["a16-zp-pressure-overflow"]\nso the gate XFAILs it (the fuzzer is unaffected — it never feeds link\nerrors to classify_known); recorded as a "related manifestation" in the\nRA-pressure investigation. Fix home: the deferred A16-threading Phase 3.\n\nPlan: Phases 0+1 marked DONE, Phase 1 RESULTS + verification filled.\nNo vendor/llvm-mos or 0002 change.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 50a59b5	author	Will Norris
 50a59b5	added	27
 50a59b5	deleted	0

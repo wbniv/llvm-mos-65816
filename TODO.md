@@ -209,14 +209,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   −31/−36 % on dependent chains, −4..−10 B on real kernels; a corrected 300-program scan shows the true
   non-adjacent remainder is **1**. **Phase 2 retired:** fold-while-threaded is **already optimal** (interior
   immediates *and* near-abs globals fold into the threaded chain today — existing selection folds compose
-  with the peephole). **Remaining — (3) the genuine hard core, DEFERRED:** RA-level `Ac16` residency. The
-  actual lever is **pre-RA `Ac16` residency** (thread the single-use producer's `Ac16` vreg into the
-  consumer at `selectAlu16Native`, collapsing the `INF` single-instruction transits that exhaust the
-  allocator); the `shouldCoalesce` 8-bit↔`Ac16` barrier (the `$a16 = LDImm` 1d crash) is a **safety
-  companion, NOT the fix** — the asserts root-cause (`50a59b5`) **ruled coalescing out** as the
-  `a16regpress.c` crash cause. Realizable gain is capped by the single 65816 accumulator (two live 16-bit
-  values must spill to `Imag16`) and it reopens the coalescer-crash risk → high-risk/low-reward, so
-  **keep the XFAIL** with a concrete re-open trigger + a gated B0→B1→B2 spike recipe (see Watch + the plan).
+  with the peephole). **Remaining — (3) the genuine hard core, ~~DEFERRED~~ CLOSED 2026-06-26 (measured
+  net-negative):** RA-level `Ac16` residency. The lever was **pre-RA `Ac16` residency** (thread the single-use
+  producer's `Ac16` vreg into the consumer, collapsing the `INF` single-instruction transits); the
+  `shouldCoalesce` 8-bit↔`Ac16` barrier was its **safety companion, NOT the fix**. The 2026-06-26 trigger-check
+  built and **measured** both behind a hidden flag: the barrier is byte-for-byte **inert** (B0), and pre-RA
+  residency (B1) **fires heavily but gives zero peak-ZP-pressure relief and a +24 B regression** — the
+  realizable gain is capped by the single 65816 accumulator (genuinely-simultaneous live 16-bit values must
+  spill to `Imag16` no matter how transits thread), now **proven, not assumed**. So Phase 3 is **closed, not
+  shelved**; only an *actual* realistic `a16-zp-pressure-overflow` could re-open, and it would need a different
+  remedy (not residency). [spike+verdict](docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
   **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
   residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the `pr15296` ZP-overflow).
   **Two crashes once lumped into this core left it with orthogonal targeted fixes:** the
@@ -229,25 +231,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
   [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
-- [ ] **#321 A16-threading Phase 3 — trigger-check pass (re-affirm or re-open the deferral).** Operationalizes
-  the Watch re-open condition rather than building Phase 3. On a throwaway worktree: re-measure ZP pressure
-  (`dev/measure-zp-pressure.sh`, extended with an explicit ~10/14-pair trigger verdict line + a wider real-code
-  corpus) for trigger **(b)**, and run a large-N csmith crash-sweep + corpus/suite under `-verify-machineinstrs`
-  for trigger **(a)** (a *new*, realistic `regalloc-out-of-registers` / `a16-zp-pressure-overflow`). Neither
-  fires → record dated evidence in Watch and stand pat; either fires → run the recorded B0→B1→B2 spike. Last
-  baseline (2026-06-18) was ~5/14 pairs and both prior crashes got orthogonal fixes (`0009`/`0011`+`0012`), so
-  DEFER is expected to stand — this just re-arms the trigger with current data.
-  [plan](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md).
-- [ ] **#321 `pr15296` link-time ZP overflow (`a16-zp-pressure-overflow`) — gated narrow-fix spike.** Distinct
-  from the Phase-3 trigger-check above: instead of re-affirming the deferral, *attempt* to clear the XFAIL with
-  a narrow, low-risk fix. Key reframe — the documented "Imag16-saturation" root cause is **refuted** by the
-  allocator (imag-regs hard-capped at 32 B; `MOSZeroPageAlloc` capped at `-zp-avail=224`), so a 1043-byte
-  `.zp.noinit` overflow is almost certainly a **containable accounting/cap defect (F1)** in the **pristine
-  upstream** `MOSZeroPageAlloc.cpp` — a generic, upstream-worthy bug, not the high-risk RA rework. Throwaway
-  worktree; gating empirical diagnosis (the symbol at offset 1043 → F1a/F1b/F2/F3) before any edit; land only
-  if **default-8-bit byte-identical** + regression-clean + pr15296 links/runs correct (`-O1`/`-Os`, both
-  emulators); else fall back to re-affirming the deferral with `dev/measure-zp-pressure.sh` evidence.
-  [plan](docs/plans/2026-06-26-pr15296-mos-a16-link-time-zp-overflow-gated-narrow.md).
 - [ ] **#321 16-bit ALU chain extensions** (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
@@ -503,22 +486,20 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 _Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
 revisit) rather than active work._
 
-- [ ] **Reevaluate the deferred s16-register-pressure core (Phase-3 `Ac16`/ZP residency).** **Two** crashes
-  once attributed to this core turned out to have *orthogonal* targeted fixes, **not** the residency rework:
-  the `globals.c`/`a16regpress.c` `-Os` RA-**crash** (patch `0009`, `ad506ed`, 2026-06-25 — an i8-loop-counter
-  de-pin from `{A}`; `a16regpress.c` now a positive gate, `0x01A7`) and the `+mos-a16`/`+mos-xy16`
-  **scavenger-N/Z crash** (patch `0011`, 2026-06-26 — route a live `$p` through a dead index reg into `RC17`;
-  + `0012` for a `LDCImm` MC-lowering bug it surfaced; `a16scavnz.c` now a positive gate, `0x22A6`). What
-  **remains deferred** is the general pre-RA `Ac16`/ZP-residency rework, now motivated by only **one**
-  *pathological* XFAIL — the link-time ZP overflow (`pr15296.c`, `a16-zp-pressure-overflow`).
-  It is high-risk (regresses the common a16 path / reopens a crash class) and low-reward (Phase 1.5 already
-  captured the threading wins; real code is slack). **Re-open only when** either **(a)** the corpus / c-torture
-  / fuzzer surfaces a *second independent* `regalloc-out-of-registers` (or `a16-zp-pressure-overflow`) from
-  **realistic** (not hand-reduced) code, or **(b)** the ZP-pressure baseline (`dev/measure-zp-pressure.sh`)
-  shows a real corpus function crossing **~10 of 14** `Imag16` pairs. If a trigger fires, run the gated
-  B0→B1→B2 spike (recipe in the A16-threading plan §5). Full root cause:
+- **Phase-3 `Ac16`/ZP-residency rework — CLOSED 2026-06-26 (measured net-negative); only an *actual* overflow
+  re-opens, and not via residency.** The two crashes once lumped into this core already got orthogonal fixes
+  (`globals.c`/`a16regpress.c` `-Os` RA-crash → patch `0009`; scavenger-N/Z → `0011`+`0012`; both now positive
+  gates). The 2026-06-26 **trigger-check** then settled the rest: re-open trigger **(b) fired** (new
+  CORDIC/Mandelbrot/Hopalong kernels put 6 real fns at ~10/14 pairs, `cordic16_atan2` at the full 14/14), so we
+  ran the gated spike — and **measured pre-RA `Ac16` residency as net-negative**: it fires heavily but gives
+  **zero** peak-pressure relief and a **+24 B** regression (the pool-fill is genuinely-simultaneous liveness the
+  single accumulator can't thread away). So a `measure-zp-pressure.sh` FIRE is **necessary but not sufficient**
+  — residency is *not* the remedy. **Watch only for** an *actual* realistic `a16-zp-pressure-overflow`
+  (`pr15296`-class — note `pr15296` itself now **passes** on the current stack, a stale XFAIL resolved
+  2026-06-26; this watches for a *new* one) in **real** (not hand-reduced) code; if one appears it needs a **different** remedy (e.g.
+  better `Imag16` spill packing), **not** accumulator residency. Full record:
+  [Phase-3 spike+verdict](docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md) ·
   [a16-regalloc-pressure-failure](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
-  [scavenger N/Z](docs/investigations/65816-a16-scavenger-nz-liveness.md) ·
   [deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
 
 
@@ -536,6 +517,8 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-26 — [321-pr15296-zp-overflow] **#321 `pr15296` link-time ZP overflow (`a16-zp-pressure-overflow`) — XFAIL was STALE; now a positive gate.** The gated narrow-fix spike's diagnosis found the bug no longer reproduces: on the current stack (`c798c31`+`0001..0012`) `dev/run.sh torture --tests pr15296.c` at **both `-Os` and `-O1`** folds `default==+mos-a16==+mos-xy16==0x600D` on MAME+bsnes-jg, with `.zp.noinit` **18 B** (not the recorded 1043 B). The documented "`Imag16`-saturation past 256 B" mechanism was **wrong** — the allocator hard-caps ZP at `-zp-avail=224` (`MOSZeroPageAlloc.cpp:263/267/829/841`), so the 1043 B was a pre-fix register-pressure artifact relieved by the post-`0009` advances (`0010`–`0012`; likely `0011`'s scavenger live-`$p` rework, whose pre-fix `$p` mishandling inflated spill/ZP traffic — exact patch not bisected, would need a counterfactual rebuild). Dropped `KNOWN_ISSUES["a16-zp-pressure-overflow"]` (`tools/a16_fuzz.py`) so a recurrence hard-FAILS; pr15296 is now a positive in-scope c-torture gate. **No `+mos-a16` register-pressure XFAILs remain.** No compiler change (already fixed). [plan](docs/plans/2026-06-26-pr15296-mos-a16-link-time-zp-overflow-gated-narrow.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-regalloc-pressure-failure.md).
+- 2026-06-26 — [321-a16-phase3-trigger-check] **#321 A16-threading Phase 3 trigger-check → CLOSE Phase 3 as measured net-negative.** Trigger **(b) FIRED** — new heavy-16-bit math kernels (CORDIC `k_trig16`/`k_trig32`, Mandelbrot, Hopalong) pushed 6 real fns to ~10/14 pairs (`cordic16_atan2` at the full **14/14**), up from ~5/14 on 2026-06-18; trigger **(a)** clean (full sweep + csmith 200, 0 mismatch/crash). Ran the gated spike: **B0** (`shouldCoalesce` `{Anyi1,Anyi8,GPR}→Ac16` barrier) proven **byte-for-byte inert** across all 190 example/corpus compiles (isolated in-build — a false `far_near_call.c` diff was hot-tree vendor drift). **B1** (flag-gated pre-RA `Ac16`-residency pass `MOSPreRAAccum16`, mirrors post-RA `threadAccum16` on SSA vregs) **fires heavily** (`k_trig16` −103 round-trips) and is `-verify` clean on all 190, but gives **zero peak-ZP-pressure relief** (`cordic16_atan2` 14/14→14/14) and is a **net +24 B regression** (`k_trig16` +26 B) — the pool-fill is genuinely-simultaneous liveness the single accumulator can't thread away, confirming the deferral's cap by measurement. Nothing landed (default build byte-identical). Added the explicit Phase-3 FIRE line to `dev/measure-zp-pressure.sh`; spike preserved as a `.diff`. See [spike+verdict](docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md) · [plan](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md).
 - 2026-06-26 — [320-thunk-tail-calls] **#320 far→near thunk tail now folds (−1 B); far-indirect BLOCKED on an unlanded prereq; stale far-tail status row fixed.** Opened from a self-contradicting `implementation-status.md` (`:53-54` recorded the `4adda8b` far→far landing, `:72` still said "JSL is never tail-converted"). **Phase A (DONE):** broaden `MOSLateOptimization::tailJMP`'s far arm to also fold `JSL __call_near_from_far; RTL → TailJML` — the far→near mixed-banking thunk is `ChangeToES`'d to an EXTERNAL symbol, so match it by exact name (`isSymbol() && name == "__call_near_from_far"`, mirroring `MOSCallLowering`); stack-safe (the thunk's `pea…rts` is a net-0 near frame above the 3-byte far return, its `rtl` pops the original caller's). Flipped `dev/far_near_call.sh`'s negative gate → positive (long `jmp __call_near_from_far` + `R_MOS_ADDR24`, no jsl/rtl); `0xE0` MAME+bsnes-jg, far_tail still `0xCB`, corpus 7/7, csmith 50 0-mismatch, `+mos-a16` verify clean. In `0001` (round-trips `0001..0012`; diff vs main's `0001` = only the far-arm broadening). Also fixed `regen-patch-0001.sh`'s **stale `STACK`** (stopped at `0009`; appended `0010`–`0012` so the round-trip verify matches live). **Phase B (BLOCKED, not deferred):** far-indirect `JSL __call_indir_far; RTL` would fold the same way, but a far-indirect *call* doesn't link on `main` — its runtime stub (`call-indir-far.s` + `__mos_far_target`) was never landed into tracked `platforms/snes/`/the SDK (only WIP `7ee5f6f`/`1ea7507`); proven via `ld.lld: undefined symbol: __call_indir_far`. Recommend landing the stub + a far-indirect-call e2e first (also corrects the far-fn-ptr-(a) "done+landed" overclaim). Worktree `wt/320-far-tail-thunks`. [plan](docs/plans/2026-06-26-320-thunk-tail-calls.md).
 - 2026-06-26 — [321-trig-phase3-derived-hyperbolic] **#321 trig compiler-test Phase 3 — derived (tan/asin/acos) + hyperbolic (sinh/cosh/tanh) Q2.14 CORDIC. DONE + VERIFIED — the trig set is now COMPLETE.** Completes the surface across both widths: Phase 1 (Q16.16 libfixmath, s32-libcall payload) · Phase 2 (Q2.14 CORDIC direct, zero-libcall native-s16) · **Phase 3 (Q2.14 derived + hyperbolic)**. Two new coverage points: (a) a **16-bit-context s32-libcall payload** — `tan=sin/cos` needs a Q2.14 divide and `asin/acos=atan2(·,√(1−x²))` a Q2.14 sqrt, so `__mulsi3`/`__divsi3` fire (the 16-bit analogue of Phase 1), `-verify` clean, no 64-bit leak, 346 rep / 372 sep; (b) **CORDIC hyperbolic mode** for `sinh/cosh/tanh` (the repeated i=4,13 `atanh(2^-i)` schedule) — a path neither Phase 1/2 reach. Extends `tools/gen-cordic-tables.py` (hyperbolic `atanh` table + `HGAIN=19784`, `--check`-able) + `examples/65816/cordic16.h` (libcall-free `q214_sqrt`/`q214_div`, derived + hyperbolic functions; hyperbolic seeds `x0=ONE` not `1/An_h` so the fast-growing `cosh` stays in int16, post-scaled by `HGAIN`; `tanh=y/x` cancels the gain). New `examples/65816/k_trig16x.c` + `dev/k_trig16x.sh` + `tools/trig-accuracy3.c`. **`dev/run.sh k_trig16x`**: `corpus_result==0x759567C4` host==default(8-bit)==`+mos-a16` on **MAME + bsnes-jg**; cross-width PASS with the **32-bit hyperbolic derived from the now-compiled `fix16_exp`** (vendored-but-uncompiled until Phase 3) — `fix16_exp` is accurate (hyperbolic cross ~5e-4) while CORDIC again *beats* libfixmath on `asin/acos` (err16 4e-4 vs err32 1.0e-2). Bit-exact host==target holds because int32 intermediates have identical value semantics both legs. No compiler change (SDK/example-level). [plan](docs/plans/2026-06-26-trig-phase3-derived-hyperbolic.md).
 - 2026-06-26 — [321-trig-phase2-cordic] **#321 trig compiler-test Phase 2 — 16-bit Q2.14 CORDIC as the native-s16 / zero-libcall differential. DONE + VERIFIED.** The deliberate complement to Phase 1 (Q16.16 libfixmath, which *asserts* the s32 libcalls `__mulsi3`/`__divsi3` fire): CORDIC is shift-and-add only, so under `+mos-a16` it compiles to almost-entirely `rep`/`sep`-bracketed native 16-bit ALU code with **zero arithmetic libcalls** — the driver asserts the *absence* of every `__*hi3`/`__*si3`/`__*di3` mul/div/shift helper (114 rep / 132 sep, `-verify` clean). A **fresh re-implementation** (`grep -ri cordic` confirmed nothing pre-existed): `examples/65816/cordic16.h` (rotation-mode `sincos`, vectoring-mode `atan/atan2`, fully UNROLLED so every `>>i` is a constant shift), seeded from `tools/gen-cordic-tables.py` → `examples/65816/cordic16_tables.h` (`atan(2^-i)` table + gain `K=9949` derived from first principles, `--check`-able). **Three format-driven design moves** (Q2.14 range is [−2,2), so π doesn't fit): angles kept in-format (`sin/cos`∈[−π/2,π/2], `atan2` right-half-plane only); no int16 overflow anywhere (rotation seeds `x0=1/An` so magnitude ≤ ONE; vectoring pre-halves inputs, scale-invariant) → **host (32-bit int) == target (16-bit int) bit-exact**; pure-additive volatile-stepped input sweep so the *whole* kernel is libcall-free. `dev/run.sh k_trig16`: `corpus_result==0x9446C734` host==default(8-bit)==`+mos-a16` on **MAME + bsnes-jg**; cross-width harness `tools/trig-accuracy.c` PASS (16-bit vs 32-bit bounded by libfixmath's coarse side, as predicted — and CORDIC `atan` err 3.6e-4 actually *beats* libfixmath's 1.0e-2). No compiler change (SDK/example-level). Phase 3 (derived `tan/asin/acos`, hyperbolic) stays deferred. [plan](docs/plans/2026-06-26-trig-phase2-q214-cordic.md).
