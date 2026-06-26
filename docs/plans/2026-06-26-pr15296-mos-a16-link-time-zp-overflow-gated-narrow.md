@@ -1,5 +1,20 @@
 # Plan — pr15296 `+mos-a16` link-time ZP overflow: gated narrow-fix spike
 
+## OUTCOME (2026-06-26) — RESOLVED: the XFAIL was STALE; no fix needed
+
+Step 1's diagnosis short-circuited the spike: the bug **no longer reproduces** on the current stack
+(`c798c31` + `0001..0012`). pr15296 links clean (`.zp.noinit` **18 B**, not the recorded 1043 B) and folds
+`default==+mos-a16==+mos-xy16==0x600D` on **MAME + bsnes-jg** at **both `-Os` and `-O1`**
+(`dev/run.sh torture --tests pr15296.c`). The documented "`Imag16`-saturation past 256 B" mechanism was
+confirmed **wrong** (the allocator hard-caps ZP at `-zp-avail=224`); the 1043 B was a pre-fix
+register-pressure artifact relieved by the post-`0009` advances (`0010`–`0012`; likely `0011`'s scavenger
+live-`$p` rework — exact patch **not bisected**, as a 12 GB counterfactual rebuild is disproportionate for an
+already-resolved item). **Landed (`d3f750c`):** dropped `KNOWN_ISSUES["a16-zp-pressure-overflow"]`
+(`tools/a16_fuzz.py`; the list is now empty — no `+mos-a16` register-pressure XFAILs remain), promoted
+pr15296 to a positive in-scope c-torture gate, corrected the investigation §RESOLUTION + `implementation-status.md` + TODO.
+**No worktree, no compiler change.** The F1/F2/F3 spike plan below was therefore not executed — kept as the record of the
+approach and the allocator-cap analysis that predicted a containable (not intrinsic) cause.
+
 ## Context
 
 `vendor/c-torture/execute/pr15296.c` (pointer/union/`intptr_t`, register-heavy) builds clean default-8-bit
