@@ -321,6 +321,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `$4300–$430A` regs to `platforms/snes/snes.h` + a small reusable gfx helper). Then joypad controls
   (random a/b/c, switch palette/formula/color-mode, auto-scale). Optional perf: SNES hw multiplier
   (`$4202/$4203→$4216`) for the hot `b*x`. [plan](docs/plans/2026-06-24-blossom-snes.md).
+- [ ] **`snesgfx` — re-imagine SNES rendering as an OOP-in-C library (interface + implementation).** Take the
+  proven mechanics (force-blank/v-blank access window, DMA, VRAM layout, Mode 7 — handoff
+  [2026-06-24-snes-graphics-rendering.md](docs/handoffs/2026-06-24-snes-graphics-rendering.md)) and express
+  them as header-only objects following [oop-in-c](docs/investigations/object-oriented-c-and-assembly.md):
+  an `UploadQueue` (the access-window rule in one place), a `VramAlloc`, a `Drawable` vtable + heterogeneous
+  `Scene` (the *justified* per-object vtable — coarse dispatch, one call/drawable/frame), concrete
+  `Mode7Layer`/`SpriteSet`/`BgLayer`, and a selector-table joypad dispatch (the cheap dynamic form). Verify
+  via a parallel client `examples/snes/mandel-oop.c` reproducing `mandel-display.c`'s CRC `0x204F`
+  (host==a16@MAME==a16@bsnes-jg, `dev/run.sh mandel-oop`, `-verify-machineinstrs` clean) — zero-regression
+  proof — then **measure** the dispatch cost (disasm: N `__call_indir`/frame, not per-tile; OOP-vs-procedural
+  size delta; does C reach `JSR (abs,X)`?) and write the numbers back into oop-in-c.md §4–§5. The "small
+  reusable gfx helper" the Blossom item above wants. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md).
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
