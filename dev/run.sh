@@ -42,6 +42,11 @@ Targets:
              under Xvfb) — each asserting the on-screen buffer's CRC == the host renderer
              (0x204F; build/mandel-{jg,mame,host}.png). See
              docs/investigations/snes-emulator-screenshots.md.
+  invaders   #321 Space Invaders on the snesgfx OOP library (examples/snes/invaders.c):
+             run the DETERMINISTIC attract sim and assert its rolling state-CRC host ==
+             default@MAME == a16@MAME == default/a16@bsnes-jg (no far pointers, so default +
+             a16 both build), then snapshot the rendered frame from MAME (Xvfb) + bsnes-jg
+             (build/invaders-{mame,jg}.png).
   mandel-far  #321 beefy demo, Track 3a: fill a HIGH-WRAM buffer ($7E2000, reachable
              only by 24-bit addressing) with the Mandelbrot via #320 far stores
              (sta [dp]), CRC it via far loads; +mos-a16-only, asserts host == +mos-a16
