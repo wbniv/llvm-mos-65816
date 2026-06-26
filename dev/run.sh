@@ -32,7 +32,8 @@ Targets:
              examples/snes/corpus/ against examples/snes/corpus/expected.tsv
   corpus-a16 run the regression corpus under +mos-a16 (differential): each
              examples/snes/corpus/*.c asserted host == default == +mos-a16 ==
-             +mos-xy16 on MAME + bsnes-jg (globals.c XFAIL: regalloc-out-of-registers).
+             +mos-xy16 on MAME + bsnes-jg (all programs PASS — globals.c's
+             regalloc-out-of-registers was fixed in patch 0009, now a positive gate).
              Closes the "corpus only ever built default 8-bit" gap that hid it.
   mandel-shot #321 beefy demo, Track 2: render the fixed-point Mandelbrot ON the SNES
              (examples/snes/mandel-display.c, +mos-a16) and capture a REAL emulator
@@ -60,11 +61,13 @@ Targets:
              per-level image hash (every baked level == host ref) AND a scripted-zoom view-math
              differential (host replay == ROM) on bsnes-jg, plus a MAME snapshot. examples/snes/
              mandel-zoom.c. Live: task mandel-zoom-play
-  known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUES repro
-             (a16regpress/a16scavnz) STILL crashes -verify-machineinstrs under both
-             +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment
-             one verifies clean (the deferred bug got fixed) -> drop the KNOWN_ISSUES entry
-             + promote to a positive gate. Toolchain-only (no SDK/emulator/secret).
+  known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUE_REPROS repro
+             STILL crashes -verify-machineinstrs under both +mos-a16 and +mos-xy16 with its
+             expected signature; fails loudly the moment one verifies clean -> drop the entry
+             + promote to a positive gate. Currently VACUOUS — KNOWN_ISSUE_REPROS is empty (all
+             tracked crashes FIXED: a16regpress->0009, a16scavnz->0011/0012, both positive gates;
+             KNOWN_ISSUES emptied by the pr15296 stale-XFAIL resolution). Re-arms automatically when
+             a new XFAIL is added. Toolchain-only (no SDK/emulator/secret).
   dwarf      ROADMAP step 6 compiler-side gate: a `-g` build emits verifiable DWARF
              AND ld.lld writes the <output>.elf debug companion — assert (shapes,
              not addrs): companion present, --verify clean, addr_size 0x04,

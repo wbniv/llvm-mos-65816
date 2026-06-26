@@ -46,8 +46,9 @@ check (`k_trig32`/`k_trig16`/`k_trig16x`, both emulators). It exercises the s32
 libcall paths, the zero-libcall native-s16 path, and a ~200 KiB HiROM far LUT (which
 flushed out + fixed a real clang far-array-subscript bug in `0001`).
 **Remaining:** incremental optimization refinements (A16-threading / ALU-chain
-extensions) and **one** deferred upstream-territory pressure XFAIL (the `pr15296`
-link-time ZP-overflow). The `+mos-a16`/`+mos-xy16` **register-scavenger crash**
+extensions); as of 2026-06-26 there are **no deferred register-pressure XFAILs** — the
+`pr15296` link-time ZP-overflow that used to be listed here was a **stale XFAIL**, now
+verified PASS (a positive c-torture gate). The `+mos-a16`/`+mos-xy16` **register-scavenger crash**
 (`$p is not a GPR`) that used to head that list is now **FIXED** (pristine-upstream
 patch `0011`; a `LDCImm` MC-lowering bug it surfaced fixed as `0012`), as was a
 default-8bit register-coalescer miscompile found while exercising the codegen

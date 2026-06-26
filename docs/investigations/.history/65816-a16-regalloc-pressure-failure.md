@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/d3f750c) | #321 pr15296 a16 ZP-overflow XFAIL was stale — flip to a positive gate |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/ad506ed) | #321: land patch 0009 — fix the +mos-a16 regalloc out-of-registers deadlock |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/15542ff) | #321 c-torture Phase 1: pilot finds a real a16 ZP-pressure overflow (pr15296.c) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/50a59b5) | #321 globals.c RA crash: pin the exact mechanism via an isolated asserts build |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/3eeab5d) | #321 globals.c RA failure: record root cause across investigation + plan + docs |
 
 <!--history-meta v1
+d3f750c	author	Will Norris
+d3f750c	added	20
+d3f750c	deleted	1
+d3f750c	files	1
+d3f750c	body	The gated narrow-fix spike's Step-1 diagnosis found the bug no longer\nreproduces on the current stack (c798c31 + 0001..0012): pr15296 links clean\n(.zp.noinit 18 B, not the recorded 1043 B) and folds\ndefault==+mos-a16==+mos-xy16==0x600D on MAME + bsnes-jg at BOTH -Os and -O1\n(dev/run.sh torture --tests pr15296.c).\n\nThe documented "Imag16-saturation past 256 B" mechanism was wrong: the\nallocator hard-caps the zero page at -zp-avail=224 (MOSZeroPageAlloc.cpp\n263/267/829/841), so 1043 B was a pre-fix register-pressure artifact relieved\nby the post-0009 advances (0010-0012; likely 0011's scavenger live-$p rework,\nwhose pre-fix $p mishandling inflated spill/ZP traffic — exact patch not\nbisected, would need a counterfactual rebuild).\n\n  - tools/a16_fuzz.py: drop KNOWN_ISSUES["a16-zp-pressure-overflow"] (now the\n    last entry — KNOWN_ISSUES is empty; a recurrence hard-FAILS) + a FIXED note\n  - investigation: §RESOLUTION with the corrected mechanism + confirmed PASS\n  - implementation-status.md / TODO.md: no +mos-a16 register-pressure XFAILs\n    remain; pr15296 is now a positive in-scope c-torture gate\n\nNo compiler change (already fixed). Regression: torture --start 748 10 -> 10/10\nPASS both emulators (incl. pr15296), corpus 7/7.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011tDRoGK3T4gSGAHGBXk88B
 ad506ed	author	Will Norris
 ad506ed	added	48
 ad506ed	deleted	12

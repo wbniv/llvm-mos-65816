@@ -134,7 +134,7 @@ other frontier; its PR still waits on the design-note posting.
 | Phase 1 — adjacent `STAImag16 R; LDAImag16 R` peephole | ✅ Done — `a16thread`, −31/−36 % on chains |
 | Phase 1.5 — non-adjacent (across volatile stores, multi-reload) | ✅ Done — 1 genuine remainder in 300-program scan |
 | Phase 2 — fold-while-threaded | Retired — already optimal (immediates + abs globals fold into chain today) |
-| Phase 3 — RA-level `Ac16` residency | ⬜ **Deferred** — re-open trigger: 2nd independent regalloc crash from realistic code, or ZP pressure baseline crossing ~10/14 pairs |
+| Phase 3 — RA-level `Ac16` residency | 🔻 **Deferred → CLOSED 2026-06-26 (measured net-negative).** Trigger (b) **fired** (CORDIC/Mandelbrot/Hopalong kernels put 6 real fns at ~10/14 pairs, `cordic16_atan2` at 14/14), so the gated pre-RA `Ac16`-residency spike ran — and gave **zero peak-ZP relief + a +24 B regression** (the pool-fill is genuinely-simultaneous liveness the single accumulator can't thread away). So residency is **not** the remedy. Watch only for an *actual* realistic `a16-zp-pressure-overflow`, which would need a *different* fix (e.g. better `Imag16` spill packing). [spike+verdict](investigations/2026-06-26-a16-phase3-prera-residency-spike.md) |
 
 ### XY16 (X/Y permanently 16-bit)
 

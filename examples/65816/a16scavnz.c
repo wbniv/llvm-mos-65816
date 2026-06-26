@@ -20,8 +20,9 @@
 // compare (v5 / the recursive-call argument) that keeps N/Z live across it.
 // DEFAULT 8-bit and +mos-a16 -O0 compile clean; only +mos-a16 at -O1/-Os crashes.
 //
-// XFAIL'd in tools/a16_fuzz.py (KNOWN_ISSUES "scavenger-p-not-gpr"). When the
-// upstream scavenger bug is fixed, drop that entry and make this a positive gate.
+// FIXED 2026-06-26 (pristine-upstream fork patches 0011 + 0012); this is now a
+// POSITIVE gate — dev/run.sh a16scavnz -> 0x22A6 (host==default==+mos-a16==+mos-xy16,
+// both emulators, asserts-clean). The KNOWN_ISSUES "scavenger-p-not-gpr" entry was dropped.
 volatile unsigned short in_u0 = 0xDC13, in_u1 = 0x6128, in_u2 = 0x8E60, in_idx = 0xC204;
 volatile short in_s0 = 0x6ADC;
 volatile unsigned short corpus_result;

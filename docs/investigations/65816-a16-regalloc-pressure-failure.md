@@ -33,6 +33,14 @@
 > "single deferred frontier" framing was *half* right: the s16-pressure core is real and deferred, but
 > `globals.c`'s specific deadlock had an orthogonal, conservative fix that did not require it.
 
+**UPDATE 2026-06-26 — both of those "remaining XFAILs" are now resolved, also without the Phase-3 rework:**
+the scavenger crash (`a16scavnz.c`) was FIXED by patches `0011`+`0012` (now a positive gate, `0x22A6`), and
+the `pr15296.c` ZP overflow turned out to be a **stale XFAIL** — it now links clean and passes (see
+§RESOLUTION under *Related manifestation* below). `KNOWN_ISSUES` is now empty; **no `+mos-a16`
+register-pressure XFAILs remain.** The deferred Phase-3 `Ac16`-residency rework was separately **CLOSED
+2026-06-26 as measured net-negative** (trigger (b) fired, the spike gave +24 B / zero peak-ZP relief — see
+[Phase-3 spike+verdict](2026-06-26-a16-phase3-prera-residency-spike.md)).
+
 The 2026-06-18 analysis is preserved below as the historical record (it correctly ruled out coalescing and
 correctly judged the *general* rework risky/low-reward — it simply missed that the counter, not the `Ac16`
 transit count, was the recolorable lever).

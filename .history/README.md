@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/5a424df) | docs(roadmap,readme): record the trig differential test as the M2 capstone |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/56f5d80) | docs: record scavenger-fix verification + sweep "deferred scavenger" framing (0011/0012) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/db83872) | docs(README): refresh M2 status — s32 + xy16 landed; remaining is opt refinements + deferred-upstream crashes |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/b968ae8) | docs(README): add Downloads section for the interim cross-platform packages |
@@ -13,6 +14,11 @@
 | [2026-06-13](https://github.com/wbniv/llvm-mos-65816/commit/2fb154f) | Initial commit: llvm-mos 65816 effort + SNES platform (M0) |
 
 <!--history-meta v1
+5a424df	author	Will Norris
+5a424df	added	6
+5a424df	deleted	0
+5a424df	files	1
+5a424df	body	The trig compiler-test (all 3 phases, both fixed-point widths) is now complete and\nlanded; reflect it in the milestone-narrative docs:\n- ROADMAP step 5 (M2): a capstone paragraph — Phase 1 (Q16.16 libfixmath, s32-libcall\n  payload + the HiROM sin-LUT that fixed a clang far-index bug in 0001), Phase 2 (Q2.14\n  CORDIC direct, zero-libcall native-s16), Phase 3 (derived + CORDIC hyperbolic).\n- README M2 status: a sentence noting the trig workload as the realistic capstone\n  (k_trig32/k_trig16/k_trig16x, both emulators, cross-width accuracy).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 56f5d80	author	Will Norris
 56f5d80	added	6
 56f5d80	deleted	4
