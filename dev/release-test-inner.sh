@@ -52,7 +52,11 @@ ts()   { date -u +%Y-%m-%dT%H:%M:%SZ; }   # ISO 8601 UTC (SRC convention)
 
 # --- resolve the program ----------------------------------------------------
 case "$PROGRAM" in
-  mandel-display) SRC="$RIG/fixtures/snes/mandel-display.c"; FRAMES="${FRAMES:-1800}"; ORACLE=display
+  mandel-display) SRC="$RIG/fixtures/snes/mandel-display.c"; FRAMES="${FRAMES:-5800}"; ORACLE=display
+                  # FRAMES: the 64x56 far render settles corpus_result at ~frame 5084 (measured,
+                  # bsnes-jg) — far stores/loads + the on-console fixed-point compute. 5800 leaves
+                  # ~14% margin. (The old 1800 default dated from the smaller/faster 32x28 grid and
+                  # was already too low for 64x56; far made it unmissable.)
                   # The far/16-bit tester is +mos-a16-only: its high-WRAM escape buffer needs the
                   # far G_PTR_ADD the default-8bit target can't legalize. Collapse A16=both -> a16-only
                   # so the gate doesn't attempt (and fail) a default-8bit build. (k_mandel keeps both.)
