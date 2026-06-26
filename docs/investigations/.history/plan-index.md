@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/1127ddc) | docs(plan-index): add the far-memset wrong-bank fix row (151 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2c07c95) | docs(plan-index): add the xy16-cmove stale-XFAIL resolution row (150 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/0034e3c) | #321: collapse the SNES Mandelbrot demos into one far/16-bit tester |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2b4d631) | docs(plan-index): add the full-xy16-backend-fix row (149 plans) |
@@ -28,6 +29,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+1127ddc	author	Will Norris
+1127ddc	added	4
+1127ddc	deleted	1
+1127ddc	files	1
+1127ddc	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01J79PZm5LMmiJGxQH9kHcuQ
 2c07c95	author	Will Norris
 2c07c95	added	4
 2c07c95	deleted	1
