@@ -16,6 +16,7 @@
 - [Give decisive recommendations](feedback-decisive-recommendations.md) — for a free-form field/choice, state THE recommended value as the instruction; don't hedge with "anything/whatever, e.g. X" (user feedback, 2026-06-26)
 - [Sweep XFAILs may be a stale build](sweep-xfails-may-be-stale-build.md) — new XFAILs from a suite sweep can be artifacts of a stale/dirty shared build/, not real defects; rebuild from committed patches + re-run before trusting them (2× now: pr15296, ieee/fp-cmp-8 xy16; 2026-06-26)
 - [Docs can typeset real LaTeX math](md-to-html-latex-math.md) — `task md` now renders ```` ```math ```` (display) + `` $`...`$ `` (inline) to self-contained SVG via md_math.py (matplotlib mathtext); bare `$...$` is NOT a delimiter ($420B clash). mathtext subset → parse fail degrades to a red raw-LaTeX box (2026-06-26)
+- [SNES demo cookbook + skill](snes-demo-cookbook.md) — `docs/snes-demo-cookbook.md` is the full recipe (6 artifacts, hardware budget, snesgfx API, CGRAM math, gate template, publish checklist); `~/.claude/skills/snes-demo/SKILL.md` is the agent skill triggered by "implement #N" or "build the X demo" (2026-06-27)
 
 <!-- BEGIN GLOBAL MEMORY (managed by claude-housekeeping; do not edit) -->
 
