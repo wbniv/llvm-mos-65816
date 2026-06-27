@@ -51,14 +51,15 @@ static inline void display_add(Display *d, Drawable *layer) {
 }
 
 /* One frame: wait a FRESH v-blank, force-blank during DMA (allows VRAM writes at any
-   scanline — the loop body takes ~25 scanlines which nominally fits in the 36-scanline
-   vblank, but timing drift from a slightly-over-budget compute loop can push the tail
-   into active display; force-blank ensures those writes are never rejected). */
+   scanline — timing drift from a slightly-over-budget compute loop can push the DMA tail
+   into active display; force-blank ensures those writes are never rejected).
+   scene_emit() runs BEFORE snes_wait_vblank so it does not eat into the 36-scanline
+   vblank window: it only touches WRAM (no PPU ports) so it is safe at any scanline. */
 static inline void display_frame(Display *d) {
   (void)REG_RDNMI;                          /* clear a stale flag latched during the compute */
+  scene_emit(&d->scene, &d->q);             /* build upload queue (WRAM only — any scanline) */
   snes_wait_vblank();                       /* block until the next v-blank actually begins   */
   REG_INIDISP = 0x80;                       /* force-blank: DMA succeeds at any vcounter      */
-  scene_emit(&d->scene, &d->q);             /* one virtual emit() per drawable                */
   upq_flush(&d->q);                         /* DMA — CPU stalls per job until transfer done   */
   REG_INIDISP = INIDISP_ON;                 /* restore brightness                             */
   d->shown = 1;
