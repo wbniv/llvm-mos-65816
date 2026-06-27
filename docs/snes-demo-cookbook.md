@@ -422,8 +422,10 @@ After the gate passes, invoke the `/snes-rom-page` skill. Inputs:
 
 The skill:
 1. Runs `scaffold.sh` (copies ROM + engine + preview + manifest entry).
-2. Scaffolds `src/pages/<slug>.astro` from `page-template.astro` with ROM-specific text.
-3. Adds a gallery card to `src/pages/snes.astro`.
+2. Scaffolds `src/pages/snes/<slug>.astro` from `page-template.astro` with ROM-specific text.
+   The template includes a **Fullscreen** button (`id="fullscreen"`) wired in `app.js` — it
+   fullscreens the canvas wrapper and toggles to "Exit full"; hidden on browsers without the API.
+3. Adds a gallery card to `src/pages/snes/index.astro`.
 4. Builds the site, headless-screenshots the live page.
 5. Commits + `task release` (auto-bumps the patch version + deploys to Cloudflare Pages).
 
@@ -510,7 +512,7 @@ Before calling a demo "done":
 | Demo | ROM | Algorithm header | Gate script | Key technique |
 |------|-----|-----------------|-------------|---------------|
 | **π Spigot + Monte-Carlo (#19)** | `examples/snes/spigot.c` | `examples/65816/pi_spigot.h` | `dev/pi.sh` | Carry-chain div/mod + 16×16→32 mul; custom `PiHud` drawable |
-| **N-body Orbits (#13)** | `examples/snes/nbody.c` | `examples/65816/nbody.h` | `dev/nbody.sh` | `__mulsi3` (r²) + `__udivsi3` (1/r²); `noinline` to cap RA pressure; CGRAM palette fade |
+| **N-body Orbits (#13)** | `examples/snes/n-body.c` | `examples/65816/n-body.h` | `dev/n-body.sh` | `__mulsi3` (r²) + `__udivsi3` (1/r²); `noinline` to cap RA pressure; CGRAM palette fade |
 | **Spirograph (#11)** | `examples/snes/spirograph.c` | `examples/65816/spiro.h` | `dev/spirograph.sh` | Sin/cos LUT + mul; `BitmapCanvas` + `TextLayer` |
 | **Blossom (Hopalong)** | `examples/snes/blossom.c` | (inline) | `dev/blossom.sh` | Far high-WRAM scatter (a16-only); CGRAM palette cycling |
 | **Space Invaders** | `examples/snes/invaders.c` | `examples/snes/invaders_logic.h` | `dev/invaders*` | `SpriteSet`; the full OOP `snesgfx` showcase |
