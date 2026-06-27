@@ -381,7 +381,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     [plan](docs/plans/2026-06-27-11-snes-spirograph-hypotrochoid.md). **PUBLISHED — playable in-browser at
     https://biohack.net/spirograph/** (biohack.net v1.0.78, `snes-rom-page`; bsnes-jg WASM + Verify-fidelity
     selfcheck 0x32D4).
-  - [ ] **#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.
+  - [ ] **#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails. [plan](docs/plans/2026-06-27-13-snes-nbody-orbits.md)
   - [ ] **#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.
   - [wip] **#16 Wireframe 3-D solid** — 3×3 matrix mul + perspective **divide** + Bresenham; shows a spinning solid.
     **PLAN WRITTEN** ([plan](docs/plans/2026-06-27-16-snes-wireframe-3d-solid.md)) — direct successor to #11:

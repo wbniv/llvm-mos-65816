@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/72fb2dd) | chore(plan-index): add #19 π spigot + Monte-Carlo plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/ea42d15) | #11 spirograph: record publish — live at biohack.net/spirograph/ |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/80ff596) | #11 spirograph: tune EPI scale to fit the canvas (golden 0xB8AA->0x32D4) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/b5e094a) | docs(plan-index): add the #11 spirograph demo row |
@@ -37,6 +38,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+72fb2dd	author	Will Norris
+72fb2dd	added	3
+72fb2dd	deleted	1
+72fb2dd	files	1
+72fb2dd	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ea42d15	author	Will Norris
 ea42d15	added	1
 ea42d15	deleted	1
