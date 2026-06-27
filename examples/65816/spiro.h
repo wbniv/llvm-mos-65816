@@ -72,7 +72,8 @@ enum { SPIRO_HYPO = 0, SPIRO_EPI = 1, SPIRO_ROSE = 2, SPIRO_LISSA = 3, SPIRO_NMO
 // exercises every multiply / divide / LUT / rep-sep shape in all four families (a miscompiled op
 // perturbs the hash on the first point). The renderer is unbounded; this only sizes the gate.
 #define SPIRO_K_GATE        32u
-#define SPIRO_SHIFT         9    // hypo/epi: (amp1+amp2)*256 >> 9  -> ~screen-radius px
+#define SPIRO_SHIFT         9    // hypo: (amp1+amp2)*256 >> 9  -> ~screen-radius px
+#define SPIRO_EPI_SHIFT    10    // epi: amp1 = R+r is ~2x larger, so shift one more to stay on-canvas
 #define SPIRO_ROSE_SHIFT   10    // rose: rho*cos product (+-65536) >> 10 -> +-64
 #define SPIRO_LISSA_AMP   110    // lissajous amplitude
 #define SPIRO_LISSA_SHIFT   9
@@ -112,7 +113,7 @@ SPIRO_FN void spiro_derive(uint8_t R, uint8_t r, uint8_t d, uint8_t mode, spiro_
     if (num < 0) num = (int16_t)-num;                 // hypo needs R>r; guard anyway
     p->amp1 = num;
     p->amp2 = (int16_t)d;
-    p->shift = SPIRO_SHIFT;
+    p->shift = (mode == SPIRO_EPI) ? SPIRO_EPI_SHIFT : SPIRO_SHIFT;
     // gear ratio (R-+r)/r as Q8.8, one __udivsi3; dphi = dtheta * ratio
     uint16_t kphi = (uint16_t)(((uint32_t)(uint16_t)num << 8) / r);
     p->da = SPIRO_DT;

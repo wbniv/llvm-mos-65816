@@ -52,7 +52,7 @@ Targets:
              verified curve math (examples/65816/spiro.h: sin/cos-LUT + 16x16->32 fixed-point mul +
              gear-ratio divide) BLOOMS a parametric rose; joypad-interactive (R/wheel/pen, mode,
              gear preset) with a tiled HUD. Curve families: hypo/epi/rose/Lissajous. Asserts the
-             curve hash corpus_result == host (0xB8AA) on MAME + bsnes-jg (3x byte-identical) + a
+             curve hash corpus_result == host (0x32D4) on MAME + bsnes-jg (3x byte-identical) + a
              disasm gate, screenshots both (build/spirograph-{mame,jg}.png). The full 5-way
              differential (host==default==a16==xy16) of the curve + controller math is the corpus
              slice gate: dev/run.sh corpus-a16 (spiro_sim + spiro_ctrl_sim). No far pointers.

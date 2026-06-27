@@ -108,7 +108,7 @@ static void app_init(App *a) {
 int main(void) {
   static App a;
   app_init(&a);
-  corpus_result = spiro_gate_crc();                           // self-verify curve math == host 0xB8AA
+  corpus_result = spiro_gate_crc();                           // self-verify curve math == host 0x32D4
   for (;;) {
     controller_poll(&a.pad);
     spiro_view_step(&a.view, controller_held(&a.pad));        // edge/level handling inside

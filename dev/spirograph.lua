@@ -3,12 +3,12 @@
 -- real rendered surface, so dev/spirograph.sh runs MAME under Xvfb. The gate (spiro_gate_crc) finishes
 -- in <60 frames and the figure blooms over ~100; we snapshot well after (SHOT_AT, default 500). Inputs:
 --   SHOT_ADDR  program-space addr of corpus_result (e.g. 0x7E137A)
---   SHOT_WANT  expected hash (host reference, 0xB8AA)
+--   SHOT_WANT  expected hash (host reference, 0x32D4)
 --   SHOT_AT    frame to snapshot/assert at (default 500)
 local function num(name, d) local v = os.getenv(name); if not v or v == "" then return d end
   return tonumber(v) or tonumber(v, 16) or d end
 local ADDR = num("SHOT_ADDR", 0x7E0000)
-local WANT = num("SHOT_WANT", 0xB8AA)
+local WANT = num("SHOT_WANT", 0x32D4)
 local AT   = num("SHOT_AT", 500)
 
 local f, done = 0, false

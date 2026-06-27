@@ -15,9 +15,9 @@ tiled **HUD** (`snesgfx/text_layer.h` + `font8.h`) showing the live `R / wheel /
 fields and a control legend, joypad-interactive (D-pad ±R/wheel, L/R ±pen, A/Y mode, Select gear preset,
 Start reset). **No far pointers** ⇒ it builds default-8-bit AND `+mos-a16` AND `+mos-xy16` and earns the
 **full 5-way differential bar**. Two corpus slices carry the proof: `corpus/spiro_sim.c` (the curve math,
-golden **0xB8AA**) and `corpus/spiro_ctrl_sim.c` (the controller + HUD-format math over a scripted pad
+golden **0x32D4**) and `corpus/spiro_ctrl_sim.c` (the controller + HUD-format math over a scripted pad
 sequence, golden **0x6A26**) — both `host == default == +mos-a16 == +mos-xy16` on MAME + bsnes-jg via
-`dev/run.sh corpus-a16` (9/9). The on-screen demo self-verifies `corpus_result == 0xB8AA` and is gated +
+`dev/run.sh corpus-a16` (9/9). The on-screen demo self-verifies `corpus_result == 0x32D4` and is gated +
 screenshotted by `dev/run.sh spirograph`. Shared math is `examples/65816/spiro.h`; the interactive state
 machine is `examples/snes/spirograph.h`. **Decisions vs the original plan:** (1) the controller-math
 differential is a **deterministic-scripted corpus slice** (`spiro_ctrl_sim`) rather than a `JGX_SPIRO`
@@ -339,36 +339,36 @@ Two channels + the corpus slice + screenshots, each a proven pattern:
    prints a stable hash twice.
 
    ```
-   spirograph gate  K=32/mode x 4 modes  hash=0xB8AA
-   spirograph gate  K=32/mode x 4 modes  hash=0xB8AA
+   spirograph gate  K=32/mode x 4 modes  hash=0x32D4
+   spirograph gate  K=32/mode x 4 modes  hash=0x32D4
    ```
-   **PASS** — the shared curve math (`spiro.h`, all four families) folds to a stable golden `0xB8AA`.
+   **PASS** — the shared curve math (`spiro.h`, all four families) folds to a stable golden `0x32D4`.
 
 2. **5-way differential (curve + controller math):** `dev/run.sh corpus-a16`.
 
    ```
-   spiro_sim       PASS  corpus_result=0xB8AA  hypo/epi/rose/lissajous curve-point hash, 32 pts x 4 modes
+   spiro_sim       PASS  corpus_result=0x32D4  hypo/epi/rose/lissajous curve-point hash, 32 pts x 4 modes
    spiro_ctrl_sim  PASS  corpus_result=0x6A26  interactive controller + HUD-format math over a scripted pad seq
    ==> corpus-a16: 9/9 passed, 0 xfail
    ```
    **PASS** — `host == default@MAME == +mos-a16@MAME == +mos-xy16@MAME == +mos-a16@bsnes-jg` for BOTH the
-   curve math (`spiro_sim` `0xB8AA`) and the interactive controller + HUD-format math (`spiro_ctrl_sim`
+   curve math (`spiro_sim` `0x32D4`) and the interactive controller + HUD-format math (`spiro_ctrl_sim`
    `0x6A26`); dual `-verify-machineinstrs` clean; the existing 7 corpus slices unregressed.
 
 3. **On-console render + disasm gate + both-emulator screenshot:** `dev/run.sh spirograph`.
 
    ```
-   ==> host oracle: spirograph curve hash = 0xB8AA
+   ==> host oracle: spirograph curve hash = 0x32D4
    ==> disasm gate (curve hot loop codegen)
-       PASS  __mulsi3=12  __udiv=4  rep/sep=106  (sin/cos-LUT + fixed-point mul + gear divide, native-16)
+       PASS  __mulsi3=12  __udiv=4  rep/sep=104  (sin/cos-LUT + fixed-point mul + gear divide, native-16)
    ==> bsnes-jg: render + framebuffer dump (build/spirograph-jg.png) + assert
-   SMOKE: PASS off=0x137A len=2 got=0xB8AA (ran 500 frames, bsnes-jg)
+   SMOKE: PASS off=0x137A len=2 got=0x32D4 (ran 500 frames, bsnes-jg)
        PASS  3x bsnes-jg capture byte-identical (4693104f...45e1)
    ==> MAME (under Xvfb): snapshot + assert (build/spirograph-mame.png)
-       SHOT: PASS corpus=0xB8AA (snapshot at frame 500)
-   RESULT: PASS — Spirograph rendered on SNES; MAME + bsnes-jg screenshots + curve hash 0xB8AA host == +mos-a16
+       SHOT: PASS corpus=0x32D4 (snapshot at frame 500)
+   RESULT: PASS — Spirograph rendered on SNES; MAME + bsnes-jg screenshots + curve hash 0x32D4 host == +mos-a16
    ```
-   **PASS** — the on-screen `+mos-a16` ROM self-verifies `corpus_result == host 0xB8AA` on **both**
+   **PASS** — the on-screen `+mos-a16` ROM self-verifies `corpus_result == host 0x32D4` on **both**
    emulators; the disasm gate confirms the hot loop is the declared codegen (sin/cos-LUT + `__mulsi3`
    fixed-point multiply + gear-ratio `__udiv` + native-16 `rep`/`sep`); bsnes-jg is 3× byte-identical
    (deterministic); both framebuffer screenshots written.
