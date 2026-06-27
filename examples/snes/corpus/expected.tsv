@@ -18,3 +18,4 @@ corpus/spiro_ctrl_sim.c	corpus_result	0x6A26	spirograph interactive controller +
 corpus/pi_sim.c	corpus_result	0x7711	π spigot (PI_GATE_DIGITS=1, PI_ELEMS=676, a[0]=0) + MC (PI_GATE_THROWS=256) gate CRC (shared pi_spigot.h)
 corpus/ca1d_sim.c	corpus_result	0xAB2C	1-D CA: 32 Rule-90 + 32 Rule-110 gens from single-cell seed; CRC-16 of all output rows (shared ca1d.h)
 corpus/rdiff_sim.c	corpus_result	0x6969	Gray-Scott cumulative gate_crc (GS_GATE_W=8, GS_GATE_H=8, GS_GATE_STEPS=50; DU=102/DV=10/F=14/K=16)
+corpus/nbody_sim.c	corpus_result	0xCC65	N-body (N=3, GRAV_K=64, GRAV_SOFT=16, DT_SHIFT=4) Symplectic Euler, 32 steps, rotate-XOR CRC

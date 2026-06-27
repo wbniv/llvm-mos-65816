@@ -173,6 +173,11 @@ tasks:
     cmds:
       - dev/run.sh spirograph
 
+  nbody:
+    desc: "#13: N-body orbits — Newtonian gravity (1/r²) + Verlet; assert corpus_result (nbody_gate_crc 0xCC65) == host on MAME + bsnes-jg + disasm gate (__udivsi3 + __mulsi3 + rep/sep). Leaves build/nbody.sfc + build/nbody-{mame,jg}.png."
+    cmds:
+      - dev/run.sh nbody
+
   pi:
     desc: "#19: render the π Spigot + Monte-Carlo demo on SNES (+mos-a16); assert corpus_result (pi_gate_crc 0x7711) == host on MAME + bsnes-jg + disasm gate (__udivmodsi4 + __mulsi3 + rep/sep). Leaves build/spigot.sfc + build/spigot-{mame,jg}.png."
     cmds:
