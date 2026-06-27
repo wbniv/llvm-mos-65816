@@ -23,7 +23,7 @@ Taskfile.yml entry             ← `task <name>` = `dev/run.sh <name>`
 ```
 
 Publication is a seventh step: the `/snes-rom-page` skill scaffolds a playable emulator page at
-[biohack.net/snes/](https://biohack.net/snes/) and its own `/<slug>` page.
+[biohack.net/snes/](https://biohack.net/snes/) and its own `/snes/<slug>` page.
 
 The plan doc (`docs/plans/YYYY-MM-DD-7-snes-<name>.md`) precedes all of them — plan first,
 code second. Number the plan after its battery ID (`#7`, `#11`, `#19`, …).
