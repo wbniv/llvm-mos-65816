@@ -23,7 +23,7 @@
 /* 4 palettes × 16 colours = 64 CGRAM entries (128 bytes).
  * Palette 0 = all black (diverged / background).
  * Palettes 1–3 = root 1/2/3: colour 0 = black, colours 1–15 = dark→bright.
- * Tilemap word: (root << 10) | shade  where shade=15 (fast) to 1 (slow). */
+ * Tilemap word: (root << 12) | shade  where shade=15 (fast) to 1 (slow). */
 static const uint16_t newton_pal[64] = {
     /* Palette 0 — diverged (all black) */
     SNES_RGB( 0, 0, 0), SNES_RGB( 0, 0, 0), SNES_RGB( 0, 0, 0), SNES_RGB( 0, 0, 0),
@@ -74,6 +74,10 @@ static void _newton_reserve(Drawable *d, VramAlloc *va) {
     /* BG1 registers */
     REG_BG1SC   = SNES_BGSC(NEWTON_MAP, 0);
     REG_BG12NBA = (uint8_t)((NEWTON_CHR >> 12) & 0x0Fu);
+    /* Zero the BG1 tilemap in VRAM. Power-on VRAM is garbage; any row not yet
+       DMA'd by the progressive fill would otherwise show random tiles/colours. */
+    snes_vram_addr(NEWTON_MAP);
+    for (uint16_t i = 0; i < (uint16_t)(32u * 32u); i++) REG_VMDATA = 0;
     /* Shadow cleared to tile-0/palette-0 = black */
     for (uint16_t i = 0; i < (uint16_t)(NEWTON_ROWS * NEWTON_W); i++) l->shadow[i] = 0;
     l->dirty_rows = 0;
@@ -119,7 +123,7 @@ static uint16_t newton_tile(uint16_t tx, uint16_t ty) {
     uint8_t shade = (iters == 0u) ? 15u :
                     (iters >= 14u) ? 1u  :
                     (uint8_t)(15u - iters);
-    return (uint16_t)((uint16_t)(uint8_t)root << 10) | shade;
+    return (uint16_t)(((uint16_t)(uint8_t)root << 12) | shade);
 }
 
 volatile uint16_t corpus_result;
