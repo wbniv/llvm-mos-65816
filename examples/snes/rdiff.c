@@ -4,6 +4,13 @@
  * Visual: V-concentration mapped through a 16-colour navy→white palette on BG1 4bpp;
  * Turing spots self-organise from five seeded 2×2 perturbations over ~300 frames.
  *
+ * Memory layout (low WRAM, bank 0):
+ *   gs_u[2][GS_H*GS_W]   2 × 896 uint8_t = 1792 B  (ping-pong U buffers)
+ *   gs_v[2][GS_H*GS_W]   2 × 896 uint8_t = 1792 B  (ping-pong V buffers)
+ *   gstate                4 × 64  uint8_t =  256 B  (gate scratch)
+ *   shadow[GS_H/2*GS_W]     14×32 uint16_t = 896 B  (half-tilemap DMA buffer)
+ *   Total ≈ 4756 B — well under the 7680 B ram region.
+ *
  * corpus_result = rdiff_gate_crc() on an 8×8 sub-grid (50 steps), set once at startup.
  * See docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md                               */
 #include <snes.h>
@@ -29,20 +36,20 @@ static const uint16_t rdiff_pal[16] = {
     SNES_RGB(31, 31, 31),
 };
 
-/* ---- Simulation state (global: 4 × 896 int16_t = 7 168 bytes total) ---------- */
+/* ---- Simulation state (global: 4 × 896 uint8_t = 3584 bytes total) ----------- */
 /* Double-buffered so the display drawable can read the completed buffer safely.    */
-static int16_t gs_u[2][GS_H * GS_W];
-static int16_t gs_v[2][GS_H * GS_W];
+static uint8_t gs_u[2][GS_H * GS_W];
+static uint8_t gs_v[2][GS_H * GS_W];
 static uint8_t gs_buf = 0;   /* index of the current (just-written) buffer */
 
 /* pointer the drawable reads each frame; set by main after each step batch */
-static int16_t *g_cur_v;
+static uint8_t *g_cur_v;
 
 /* ---- RdiffLayer drawable ------------------------------------------------------ */
 typedef struct {
     Drawable base;
-    uint8_t  half;                 /* 0 = upload rows 0-13, 1 = upload rows 14-27 */
-    uint16_t shadow[GS_H * GS_W]; /* tilemap shadow (one entry per cell)           */
+    uint8_t  half;                       /* 0 = upload rows 0-13, 1 = rows 14-27  */
+    uint16_t shadow[(GS_H / 2) * GS_W]; /* half-tilemap shadow (896 B)            */
 } RdiffLayer;
 
 static void _rdiff_reserve(Drawable *d, VramAlloc *va) {
@@ -74,23 +81,21 @@ static void _rdiff_emit(Drawable *d, UploadQueue *q) {
     /* palette upload: 16 colours × 2 bytes starting at colour index 0 */
     upq_push_cgram(q, 0u, rdiff_pal, 0x00u, (uint16_t)sizeof rdiff_pal);
 
-    /* rebuild the tilemap shadow for the half we're about to DMA this frame */
+    /* rebuild the half-shadow for the rows we're about to DMA this frame */
     uint8_t start = l->half ? (uint8_t)(GS_H / 2) : 0u;
     uint8_t end   = l->half ? (uint8_t)GS_H        : (uint8_t)(GS_H / 2);
-    for (uint8_t y = start; y < end; y++) {
-        for (uint8_t x = 0; x < GS_W; x++) {
-            /* V ∈ [0,255] → tile index [0,15] */
-            l->shadow[(uint16_t)y * GS_W + x] =
-                (uint16_t)(g_cur_v[(uint16_t)y * GS_W + x] >> 4);
-        }
+    uint8_t *src  = g_cur_v + (uint16_t)start * GS_W;
+    for (uint16_t n = 0; n < (uint16_t)((GS_H / 2) * GS_W); n++) {
+        /* V ∈ [0,255] → tile index [0,15] */
+        l->shadow[n] = (uint16_t)(src[n] >> 4);
     }
 
-    /* DMA half the tilemap to VRAM: 14 rows × 32 cols × 2 bytes = 896 bytes < 1536 B budget */
+    /* DMA half the tilemap to VRAM: 14 rows × 32 cols × 2 bytes = 896 bytes < 1536 B */
     upq_push_vram(q,
         (uint16_t)(RDIFF_MAP + (uint16_t)start * 32u),
-        l->shadow + (uint16_t)start * GS_W,
+        l->shadow,
         0x00u,
-        (uint16_t)(GS_H / 2u * GS_W * 2u),
+        (uint16_t)((GS_H / 2u) * GS_W * 2u),
         VMAIN_INC_HIGH_1);
 
     l->half ^= 1u;

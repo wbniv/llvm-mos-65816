@@ -23,36 +23,43 @@
 /* Gate sub-grid (small enough to finish before corpus-a16 times out) */
 #define GS_GATE_W     8
 #define GS_GATE_H     8
-#define GS_GATE_STEPS 50
+#define GS_GATE_STEPS  8   /* 8 steps ≈ 40 SNES frames (fits corpus 60-frame SETTLE window) */
 
-/* Gate state — caller allocates as a static to avoid soft-stack overflow on SNES */
+/* Gate state — caller allocates as a static to avoid soft-stack overflow on SNES.
+ * uint8_t storage (values clamped to [0,255]) cuts per-array size in half vs int16_t. */
 typedef struct {
-    int16_t u  [GS_GATE_H * GS_GATE_W];
-    int16_t v  [GS_GATE_H * GS_GATE_W];
-    int16_t nu [GS_GATE_H * GS_GATE_W];
-    int16_t nv [GS_GATE_H * GS_GATE_W];
+    uint8_t u  [GS_GATE_H * GS_GATE_W];
+    uint8_t v  [GS_GATE_H * GS_GATE_W];
+    uint8_t nu [GS_GATE_H * GS_GATE_W];
+    uint8_t nv [GS_GATE_H * GS_GATE_W];
 } rdiff_gate_state;
 
 /* One Gray-Scott simulation step over a flat (row-major) W×H grid.
- * Reads (u,v), writes (nu,nv).  HOT PATH: 4 × __mulsi3 per cell
- * (uv=u*v, uvv=uv*v — two explicit var×var calls; dfu=DU*lu, dfv=DV*lv —
- *  constant×var, may expand to shifts+adds on some targets).
- * Values clamped to [0, 255] (S≡1.0). */
-static void gs_step(int16_t *u, int16_t *v, int16_t *nu, int16_t *nv,
+ * Reads (u,v), writes (nu,nv).  HOT PATH: 4 × __mulsi3 per cell:
+ *   uv=u*v, uvv=uv*v  — two explicit var×var calls (reaction term)
+ *   dfu=DU*lu, dfv=DV*lv — constant×var (may expand to shifts+adds)
+ * Values are clamped to [0, 255]; stored as uint8_t but computed in int16_t.
+ * noinline: prevents LTO from merging this loop with the caller's copy loop.
+ * Without it the merged loop reads nu/nv before all cells are written, making
+ * the result depend on the initial values of nu/nv (MAME WRAM garbage → wrong
+ * hash on SNES even though the host oracle is correct). */
+static __attribute__((noinline)) void gs_step(uint8_t *u, uint8_t *v, uint8_t *nu, uint8_t *nv,
                     int16_t W, int16_t H) {
     int16_t i = 0;
     for (int16_t y = 0; y < H; y++) {
         for (int16_t x = 0; x < W; x++, i++) {
-            int16_t uc = u[i];
-            int16_t vc = v[i];
+            int16_t uc = (int16_t)u[i];
+            int16_t vc = (int16_t)v[i];
             /* 5-point Laplacian with toroidal wrap */
             int16_t xr = (int16_t)(x + 1 < W ? x + 1 : 0);
             int16_t xl = (int16_t)(x > 0     ? x - 1 : W - 1);
             int16_t yd = (int16_t)(y + 1 < H ? y + 1 : 0);
             int16_t yu = (int16_t)(y > 0     ? y - 1 : H - 1);
-            int16_t lu = (int16_t)(u[y*W+xr] + u[y*W+xl] + u[yd*W+x] + u[yu*W+x])
+            int16_t lu = (int16_t)((int16_t)u[y*W+xr] + (int16_t)u[y*W+xl]
+                                 + (int16_t)u[yd*W+x] + (int16_t)u[yu*W+x])
                        - (int16_t)(4 * uc);
-            int16_t lv = (int16_t)(v[y*W+xr] + v[y*W+xl] + v[yd*W+x] + v[yu*W+x])
+            int16_t lv = (int16_t)((int16_t)v[y*W+xr] + (int16_t)v[y*W+xl]
+                                 + (int16_t)v[yd*W+x] + (int16_t)v[yu*W+x])
                        - (int16_t)(4 * vc);
             /* u×v² reaction term — two explicit __mulsi3 calls (variable × variable) */
             int16_t uv  = (int16_t)((int32_t)uc * vc >> 8);
@@ -66,24 +73,24 @@ static void gs_step(int16_t *u, int16_t *v, int16_t *nu, int16_t *nv,
             /* new concentrations, clamped to [0, 255] */
             int16_t nu_ = (int16_t)(uc + dfu - uvv + fee);
             int16_t nv_ = (int16_t)(vc + dfv + uvv - kil);
-            nu[i] = nu_ < 0 ? 0 : nu_ > 255 ? 255 : nu_;
-            nv[i] = nv_ < 0 ? 0 : nv_ > 255 ? 255 : nv_;
+            nu[i] = (uint8_t)(nu_ < 0 ? 0 : nu_ > 255 ? 255 : nu_);
+            nv[i] = (uint8_t)(nv_ < 0 ? 0 : nv_ > 255 ? 255 : nv_);
         }
     }
 }
 
 /* Gate hash: run GS_GATE_STEPS steps on an 8×8 grid seeded with a 2×2 central spot.
  * Folds V after EACH step into a 16-bit rotating-XOR CRC (cumulative — non-zero even
- * if the final state is trivial).  Pass a static rdiff_gate_state to avoid a 512-byte
+ * if the final state is trivial).  Pass a static rdiff_gate_state to avoid a 256-byte
  * soft-stack frame on SNES. */
 static uint16_t rdiff_gate_crc(rdiff_gate_state *gs) {
-    int16_t cells = (int16_t)(GS_GATE_H * GS_GATE_W);
+    uint8_t cells = (uint8_t)(GS_GATE_H * GS_GATE_W);
     /* initialise: U=255 (≈1.0), V=0 everywhere */
-    for (int16_t i = 0; i < cells; i++) { gs->u[i] = 255; gs->v[i] = 0; }
+    for (uint8_t i = 0; i < cells; i++) { gs->u[i] = 255; gs->v[i] = 0; }
     /* seed 2×2 block at grid centre: U=128, V=128 */
-    for (int16_t dy = 0; dy < 2; dy++) {
-        for (int16_t dx = 0; dx < 2; dx++) {
-            int16_t idx = (int16_t)((GS_GATE_H/2 + dy) * GS_GATE_W + (GS_GATE_W/2 + dx));
+    for (uint8_t dy = 0; dy < 2; dy++) {
+        for (uint8_t dx = 0; dx < 2; dx++) {
+            uint8_t idx = (uint8_t)((GS_GATE_H/2 + dy) * GS_GATE_W + (GS_GATE_W/2 + dx));
             gs->u[idx] = 128;
             gs->v[idx] = 128;
         }
@@ -93,7 +100,7 @@ static uint16_t rdiff_gate_crc(rdiff_gate_state *gs) {
     uint16_t h = 0;
     for (uint8_t s = 0; s < GS_GATE_STEPS; s++) {
         gs_step(gs->u, gs->v, gs->nu, gs->nv, GS_GATE_W, GS_GATE_H);
-        for (int16_t i = 0; i < cells; i++) {
+        for (uint8_t i = 0; i < cells; i++) {
             gs->u[i] = gs->nu[i];
             gs->v[i] = gs->nv[i];
             h = (uint16_t)((h << 1) | (h >> 15)) ^ (uint16_t)gs->v[i];

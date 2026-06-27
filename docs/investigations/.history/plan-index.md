@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2a2dbc2) | docs(plan-index): add cache-control headers plan row (77d085b) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/669c44f) | docs(plan-index): record commit sha for #13 N-body orbits (f0eead4) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/6525579) | docs(plan-index): record commit sha for #6 1d-ca demo (dce7db4) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/dce7db4) | feat(snes): #6 Rule 90/110 1-D CA scrolling demo (examples/snes/1d-ca.c) |
@@ -45,6 +46,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+2a2dbc2	author	Will Norris
+2a2dbc2	added	2
+2a2dbc2	deleted	1
+2a2dbc2	files	1
+2a2dbc2	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 669c44f	author	Will Norris
 669c44f	added	1
 669c44f	deleted	1

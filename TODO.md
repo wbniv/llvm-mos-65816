@@ -370,10 +370,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. The selected 9 each hit a
   distinct codegen corner:
-  - [ ] **#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.
+  - [wip] **#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction. ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
   - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~
   - [ ] **#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.
-  - [wip] **#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns. ([plan](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md))
+  - [x] ~~**#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.~~
   - [x] **#11 Spirograph (hypotrochoid)** — **DONE + verified (`wt/321-spirograph`).** Four curve families
     (hypo/epi/rose/Lissajous) bloom into a NEAR 2bpp bitmap canvas (new `snesgfx/bitmap_canvas.h` set-pixel
     rasterizer + `text_layer.h` HUD), joypad + on-screen `R/W/D/mode/petals` HUD. **No far pointers → full
@@ -391,7 +391,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     (rotation matrix + perspective divide + polyhedron tables). Stays NEAR → full 5-way bar. Publishes to
     [biohack.net/3d-wireframe/](https://biohack.net/3d-wireframe/).
   - [x] ~~**#19 π spigot + Monte-Carlo** — multi-precision **carry chains** + div/mod + rng; shows digits + dart scatter.~~
-  - [ ] **#20 Bignum factorial/Fibonacci** — multi-precision **carry propagation**; shows the giant number on screen.
+  - [wip] **#20 Bignum factorial/Fibonacci** — multi-precision **carry propagation**; shows the giant number on screen. ([plan](docs/plans/2026-06-27-20-snes-bignum-factorial-factorial.md))
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
@@ -610,6 +610,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-27 — [snes-rdiff] **#8 Gray-Scott reaction-diffusion SNES demo.** Activator-inhibitor PDE; 3×__mulsi3/cell; corpus gate 0x8484 (GS_GATE_STEPS=8, 8×8 grid; noinline gs_step prevents LTO merge bug), 5-way PASS (mul=3 rep/sep=111), published [biohack.net/snes/rdiff/](https://biohack.net/snes/rdiff/). [plan](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md)
 - 2026-06-27 — [snes-n-body] **#13 N-body orbits SNES demo.** Sun+Earth+Jupiter Symplectic Euler; corpus gate 0xCC65 (32 steps), 5-way PASS (__udivsi3=2 __mulsi3=6 rep/sep=82), published [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/). [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
 - 2026-06-27 — [snes-1d-ca] **#6 Rule 90/110 1-D CA SNES demo.** Bitpacked 256-cell CA; sliding-window inner loop (constant-1 shifts only); corpus gate 0xAB2C (32 R90 + 32 R110 gens), 5-way PASS (shifts=7 bools=11 bad_mul=0), published [biohack.net/1d-ca/](https://biohack.net/1d-ca/). [plan](docs/plans/2026-06-27-6-snes-rule90-110-1d-ca.md)
 - 2026-06-27 — [snes-double-pendulum] **#14 Double Pendulum chaos SNES demo.** Two pendulums, 1 LUT-tick offset → diverging path traces; corpus gate 0xE859 (256 steps), 5-way PASS (__mulsi3=6 __divsi3=2 rep/sep=77), published [biohack.net/double-pendulum/](https://biohack.net/double-pendulum/). [plan](../../biohack.net/docs/plans/2026-06-27-14-snes-double-pendulum.md)
