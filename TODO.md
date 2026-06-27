@@ -541,6 +541,11 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   eventual #320 PR but is **gated on the ABI-blessing design note** (the M1 "#320 post design note upstream"
   item) — so it's tracked under *Future/blocked* in
   [upstream-contribution-status](docs/upstream-contribution-status.md), not ready-to-post.
+- [ ] **Post LTO + `+mos-a16` bitmask-loop early-exit bug** (user-triggered; issue only, no fix patch yet).
+  LTO miscompile: a `for (uint8_t r=0; r<28; r++) { bits & (1u<<r); }` loop generates `cmp r, #16; jmp rts`
+  — exits at the first r ≥ 16 iteration. Confirmed in `_fact_emit` (factorial demo pre-fix ROM). Exact `gh
+  issue create` in [upstream-contribution-status](docs/upstream-contribution-status.md) (item 11) · body
+  [321-upstream-lto-a16-bitmask-loop-early-exit-issue.md](docs/321-upstream-lto-a16-bitmask-loop-early-exit-issue.md).
 - [ ] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
   `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
   uncomment the two trigger lines in the `on:` block.
