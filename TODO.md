@@ -378,8 +378,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     5-way bar:** `dev/run.sh corpus-a16` 9/9 (`spiro_sim` 0x32D4 curve math + `spiro_ctrl_sim` 0x6A26
     controller/HUD-format math, host==default==a16==xy16 MAME+bsnes); `dev/run.sh spirograph` RESULT PASS
     (disasm gate __mulsi3+__udiv+rep/sep, bsnes 3× byte-identical, MAME+bsnes screenshots == host 0x32D4).
-    [plan](docs/plans/2026-06-27-11-snes-spirograph-hypotrochoid.md). **Publish to
-    https://biohack.net/spirograph/ pending user OK.**
+    [plan](docs/plans/2026-06-27-11-snes-spirograph-hypotrochoid.md). **PUBLISHED — playable in-browser at
+    https://biohack.net/spirograph/** (biohack.net v1.0.78, `snes-rom-page`; bsnes-jg WASM + Verify-fidelity
+    selfcheck 0x32D4).
   - [ ] **#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.
   - [ ] **#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.
   - [ ] **#16 Wireframe 3-D solid** — 3×3 matrix mul + perspective **divide** + Bresenham; shows a spinning solid.

@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/80ff596) | #11 spirograph: tune EPI scale to fit the canvas (golden 0xB8AA->0x32D4) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/b5e094a) | docs(plan-index): add the #11 spirograph demo row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2b9924c) | docs(plan-index): add the Space-Invaders-on-snesgfx plan row (154 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/d9d7f82) | docs(plan-index): add the snesgfx OOP rendering-library plan row (153 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/eeaa1e9) | docs(plan-index): add the far-pointer G_PHI(p2) backend-gap fix row (152 plans) |
@@ -34,6 +36,16 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+80ff596	author	Will Norris
+80ff596	added	1
+80ff596	deleted	1
+80ff596	files	1
+80ff596	body	The epitrochoid's amplitude is R+r (vs R-r for the hypotrochoid), so at the\nshared shift its outer lobes ran ~76-88 px from centre and clipped the 64 px\nhalf-canvas. Give EPI its own shift (SPIRO_EPI_SHIFT=10) so the full figure\nstays on-canvas — now a clean ring of interlocking loops.\n\nThe gate hash shifts with it: 0xB8AA -> 0x32D4 (expected.tsv, the demo\nself-verify, dev/spirograph.lua default, docs). Re-verified:\n  - dev/run.sh corpus-a16  9/9 (spiro_sim 0x32D4, spiro_ctrl_sim 0x6A26).\n  - dev/run.sh spirograph  RESULT PASS (disasm gate, bsnes 3x byte-identical,\n    MAME+bsnes screenshots == host 0x32D4).\nThe hypo/rose/Lissajous figures and the bloom visual are unchanged (the demo\nboots HYPO; its screenshot SHA is identical).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+b5e094a	author	Will Norris
+b5e094a	added	1
+b5e094a	deleted	0
+b5e094a	files	1
+b5e094a	body	Row for docs/plans/2026-06-27-11-snes-spirograph-hypotrochoid.md (introduced in\n8d0fe7d), category Platform — the plan-index drift hook's request.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2b9924c	author	Will Norris
 2b9924c	added	4
 2b9924c	deleted	1

@@ -1,6 +1,7 @@
 # #11 — SNES Spirograph (hypotrochoid): (R, r, d) parametric rose curves
 
-**Status:** BUILT + verified (branch `wt/321-spirograph`). Demo #11 of the **compiler stress-test demo
+**Status:** DONE — built, verified, merged to `main`, and **PUBLISHED live at
+[https://biohack.net/spirograph/](https://biohack.net/spirograph/)**. Demo #11 of the **compiler stress-test demo
 battery** ([ideas](../investigations/2026-06-27-compiler-stress-test-demo-ideas.md); `TODO.md` →
 "Compiler stress-test demo battery" → **#11**). Supplements the standing guides (`~/SRC/CLAUDE.md`,
 project `CLAUDE.md`, `docs/agent-handoff.md`). Mirrors the proven demo pattern: a shared host+target
@@ -399,11 +400,22 @@ Two channels + the corpus slice + screenshots, each a proven pattern:
    **PASS** — bsnes-jg, the four curve families (HYPO / EPI / ROSE / LISSA) at the classic gear; the HUD
    tracks `R96 W36 D20 <MODE> P8`. MAME is pixel-identical (`screenshots/spirograph-hypo-mame.png`).
 
-8. **Publish (P6) — PENDING (held for user OK).** `snes-rom-page` scaffolds `/spirograph` on `biohack.net`
-   with `build/spirograph.sfc` (`+mos-a16`); the page is built + screenshot-verified + committed; the
-   bsnes-jg WASM player boots the demo (the 3× determinism check is already green, step 3). Production
-   deploy to [https://biohack.net/spirograph/](https://biohack.net/spirograph/) (`task publish TAG=v…`) is
-   **outward — held for explicit user OK.**
+8. **Publish (P6) — DONE (user-authorized 2026-06-27).** `snes-rom-page` scaffolded `/spirograph` on
+   `biohack.net` with `build/spirograph.sfc` (`+mos-a16`) + a Verify-fidelity selfcheck (`0x32D4`), wrote
+   `src/pages/spirograph.astro` (branded clone of the blossom page), built + headless-screenshot-verified
+   (the bsnes-jg WASM core boots, the rose renders, the top HUD is unclipped, the player centred), and
+   deployed via `task publish TAG=v1.0.78` (tag → GitHub Actions → Cloudflare Pages). **Live + verified:**
+   [https://biohack.net/spirograph/](https://biohack.net/spirograph/) returns HTTP 200, the ROM/preview/
+   manifest assets serve, the Cloudflare Pages deploy step succeeded.
+
+   ```
+   Run cloudflare/wrangler-action@v4 .... success   (pages deploy dist --project-name biohack-net)
+   https://biohack.net/spirograph/  ->  HTTP 200
+   ```
+   **PASS.** (Caught + avoided a regression: `scaffold.sh` re-synced a stale bundled `app.js` that would
+   revert the site's deliberate `yoff=0` fix and re-clip the top HUD bar — kept the site's `app.js`. The
+   red CI run is only the **pre-existing** post-deploy Lighthouse "Threshold check" gate, which also failed
+   on v1.0.76/v1.0.77; the deploy itself runs *before* it and succeeded.)
 
 ## Risks
 
