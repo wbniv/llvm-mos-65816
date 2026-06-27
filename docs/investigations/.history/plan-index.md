@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/ea42d15) | #11 spirograph: record publish — live at biohack.net/spirograph/ |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/80ff596) | #11 spirograph: tune EPI scale to fit the canvas (golden 0xB8AA->0x32D4) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/b5e094a) | docs(plan-index): add the #11 spirograph demo row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2b9924c) | docs(plan-index): add the Space-Invaders-on-snesgfx plan row (154 plans) |
@@ -36,6 +37,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+ea42d15	author	Will Norris
+ea42d15	added	1
+ea42d15	deleted	1
+ea42d15	files	1
+ea42d15	body	The demo is published (user-authorized): snes-rom-page scaffolded /spirograph on\nbiohack.net with the +mos-a16 ROM + a Verify-fidelity selfcheck (0x32D4), deployed\nvia task publish TAG=v1.0.78 (Cloudflare Pages). Live + verified (HTTP 200, assets\nserve, deploy step succeeded). Update TODO/handoff/plan-index/plan publish status.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 80ff596	author	Will Norris
 80ff596	added	1
 80ff596	deleted	1
