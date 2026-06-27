@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/fcaa7b8) | feat(snes): #8 Gray-Scott reaction-diffusion demo (rdiff) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2a2dbc2) | docs(plan-index): add cache-control headers plan row (77d085b) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/669c44f) | docs(plan-index): record commit sha for #13 N-body orbits (f0eead4) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/6525579) | docs(plan-index): record commit sha for #6 1d-ca demo (dce7db4) |
@@ -46,6 +47,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+fcaa7b8	author	Will Norris
+fcaa7b8	added	5
+fcaa7b8	deleted	2
+fcaa7b8	files	1
+fcaa7b8	body	- `examples/65816/rdiff.h`: `__attribute__((noinline))` on `gs_step` prevents\n  LTO loop-merging that reads nu/nv before all cells are written (MAME WRAM\n  garbage → wrong hash without it); reduce `GS_GATE_STEPS` 50 → 8 (fits the\n  60-frame corpus SETTLE window; 50 steps = ~250 frames, too slow).\n- `examples/snes/rdiff.c`: SNES ROM with `BG1` 4bpp V-field display, alternating\n  half-tilemap DMA (fits V-blank), corpus_result wired via `.noinit..rdiff` gstate.\n- `examples/snes/corpus/rdiff_sim.c`: corpus slice; gstate in `.noinit..rdiff`\n  keeps BSS = 2 bytes (avoids buggy DEY-based `__memset` for count ≥ 256).\n- `examples/snes/corpus/expected.tsv`: rdiff_sim hash 0x8484 (GS_GATE_STEPS=8).\n- Plan: all 7 verification steps PASS (host/MAME/bsnes-jg 5-way, corpus-a16 13/14).\n- TODO #8 closed (moved to Done section).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2a2dbc2	author	Will Norris
 2a2dbc2	added	2
 2a2dbc2	deleted	1
