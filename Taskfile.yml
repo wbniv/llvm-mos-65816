@@ -178,6 +178,28 @@ tasks:
     cmds:
       - dev/run.sh pi
 
+  double-pendulum:
+    desc: "#14: Double Pendulum chaos — two pendulums with near-identical ICs diverge on a BitmapCanvas; asserts corpus_result (dpend_gate_crc, 256 steps) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __divsi3 + rep/sep). Leaves build/double-pendulum.sfc + build/double-pendulum-{mame,jg}.png."
+    cmds:
+      - dev/run.sh double-pendulum
+
+  double-pendulum-play:
+    desc: "PLAY the Double Pendulum chaos demo in a MAME window on this host (builds the ROM first if needed). Two pendulums with near-identical ICs trace diverging paths."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/double-pendulum.sfc ]; then
+          echo "==> build/double-pendulum.sfc missing — building it (dev/run.sh double-pendulum)…"
+          dev/run.sh double-pendulum
+        fi
+      - task: mandel-mame
+        vars: { ROM: double-pendulum }
+
+  1d-ca:
+    desc: "#6: Rule 90/110 — 1-D CA scrolling down the SNES screen; assert corpus_result (ca1d_gate_crc) == host on MAME + bsnes-jg + disasm gate (shifts+bools, no mul/div). Leaves build/1d-ca.sfc + build/1d-ca-{mame,jg}.png."
+    cmds:
+      - dev/run.sh 1d-ca
+
   # --- Generated reference docs (from the HAL headers + the backend TableGen) ---
 
   gen-docs:
