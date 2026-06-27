@@ -267,6 +267,10 @@ controls table (same pattern as blossom.astro / spirograph's biohack page).
    screenshot of the live [biohack.net/spigot/](https://biohack.net/spigot/) page shows emulator
    playing; ROM is live.
 
+    ROM boots live in the headless screenshot (ROM canvas shows "Pi 3." + scatter dots at first frame);
+    gallery updated 4→5 demos; deployed as v1.0.82 to Cloudflare Pages.
+    PASS
+
 3. 4-way differential gate: `task corpus-a16` (or the pi.sh gate) — host == default == +mos-a16 ==
    +mos-xy16 on MAME + bsnes-jg; disasm probe sees `__udivmodsi4` + `__mulsi3` + `rep`/`sep`.
 
