@@ -30,9 +30,11 @@ static void ca_step(const uint8_t *src, uint8_t *dst, uint8_t rule) {
     for (k = 0; k < 8u; k++) rl[k] = (uint8_t)((rule >> k) & 1u);
 
     for (b = 0; b < (uint8_t)CA_BYTES; b++) {
-        uint8_t prev = src[(uint8_t)(b - 1u) & (uint8_t)(CA_BYTES - 1u)];
+        /* Dead (non-periodic) boundaries: cells outside [0,255] = 0.
+         * Toroidal wrap causes Rule 90 to collapse to all-zeros at gen N/2=128. */
+        uint8_t prev = (b > 0u)                        ? src[(uint8_t)(b - 1u)] : 0u;
         uint8_t curr = src[b];
-        uint8_t next = src[(uint8_t)(b + 1u) & (uint8_t)(CA_BYTES - 1u)];
+        uint8_t next = (b < (uint8_t)(CA_BYTES - 1u)) ? src[(uint8_t)(b + 1u)] : 0u;
         uint8_t out  = 0;
         uint8_t mask = 1u;
         uint8_t lbit = (uint8_t)((prev >> 7u) & 1u);  /* left-neighbour of bit 0 */
