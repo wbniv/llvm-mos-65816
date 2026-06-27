@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/67804be) | docs(plan-index): add SHA 7bb4f86 for #20 factorial plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/7bb4f86) | feat(snes): #20 Bignum Factorial demo (factorial) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/0ca1c15) | docs(plan-index): add SHA fcaa7b8 for #8 rdiff plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/fcaa7b8) | feat(snes): #8 Gray-Scott reaction-diffusion demo (rdiff) |
@@ -49,6 +50,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+67804be	author	Will Norris
+67804be	added	1
+67804be	deleted	1
+67804be	files	1
+67804be	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7bb4f86	author	Will Norris
 7bb4f86	added	2
 7bb4f86	deleted	2
