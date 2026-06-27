@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/eb378b1) | docs(plan-index): add SHA b76f8ef for #2 Newton's-method fractal plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/67804be) | docs(plan-index): add SHA 7bb4f86 for #20 factorial plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/7bb4f86) | feat(snes): #20 Bignum Factorial demo (factorial) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/0ca1c15) | docs(plan-index): add SHA fcaa7b8 for #8 rdiff plan row |
@@ -50,6 +51,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+eb378b1	author	Will Norris
+eb378b1	added	1
+eb378b1	deleted	1
+eb378b1	files	1
+eb378b1	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 67804be	author	Will Norris
 67804be	added	1
 67804be	deleted	1
