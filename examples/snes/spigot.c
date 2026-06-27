@@ -12,9 +12,13 @@
 //
 // PI_DIGITS=20 (PI_ELEMS=76) keeps the gate+display fast enough for the bsnes-jg WASM runner
 // on mobile; corpus/pi_sim.c uses the default PI_DIGITS=200 (676 cells) for the full stress test.
+//
+// SWEEP_PER_CALL=3, MC_PER_CALL=6: fits the main loop body inside 1 SNES frame (44 667 cycles)
+// so display_frame() catches the very next vblank → smooth animation at WASM emulation speed.
+// (25 iters × ~7 000 cyc/iter + 32 × ~3 500 cyc/throw ≈ 7× the frame budget → frozen display.)
 #define PI_DIGITS      20
-#define SWEEP_PER_CALL 25
-#define MC_PER_CALL    32
+#define SWEEP_PER_CALL  3
+#define MC_PER_CALL     6
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"

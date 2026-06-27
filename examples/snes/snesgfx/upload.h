@@ -67,27 +67,27 @@ static inline void upq_push_oam(UploadQueue *q, const void *src, uint8_t bank, u
   j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes;
 }
 
-/* Write a GP-DMA channel register (channel `chan`, byte offset `off` within $43x0). */
-static inline void _upq_dma(uint8_t chan, uint8_t off, uint8_t val) {
-  *(volatile uint8_t *)(uintptr_t)(0x4300u + (uint16_t)chan * 0x10u + off) = val;
-}
-
 /* Run every queued job via DMA, then empty the queue. MUST be called in force-blank or
-   v-blank (Display guarantees this). The CPU stalls on each MDMAEN until the copy completes. */
+   v-blank (Display guarantees this). The CPU stalls on each MDMAEN until the copy completes.
+   dma_base and mdmaen_bit are hoisted out of the loop so the 65816 never recomputes
+   chan*0x10 or 1<<chan on every iteration (those are variable-cost ops). */
 static inline void upq_flush(UploadQueue *q) {
+  volatile uint8_t *dma_base =
+    (volatile uint8_t *)(uintptr_t)(0x4300u + (uint16_t)q->chan * 0x10u);
+  uint8_t mdmaen_bit = (uint8_t)(1u << q->chan);
   for (uint8_t i = 0; i < q->n; i++) {
     const UpqJob *j = &q->job[i];
     if (j->port == UPQ_VRAM)       { REG_VMAIN = j->vmain; REG_VMADD = j->dest; }
     else if (j->port == UPQ_CGRAM) { REG_CGADD = (uint8_t)j->dest; }
     else                           { REG_OAMADDL = (uint8_t)j->dest; REG_OAMADDH = (uint8_t)(j->dest >> 8); }
-    _upq_dma(q->chan, 0, j->dmap);
-    _upq_dma(q->chan, 1, j->bbad);
-    _upq_dma(q->chan, 2, (uint8_t)j->src);
-    _upq_dma(q->chan, 3, (uint8_t)(j->src >> 8));
-    _upq_dma(q->chan, 4, j->src_bank);
-    _upq_dma(q->chan, 5, (uint8_t)j->nbytes);
-    _upq_dma(q->chan, 6, (uint8_t)(j->nbytes >> 8));
-    REG_MDMAEN = (uint8_t)(1u << q->chan);
+    dma_base[0] = j->dmap;
+    dma_base[1] = j->bbad;
+    dma_base[2] = (uint8_t)j->src;
+    dma_base[3] = (uint8_t)(j->src >> 8);
+    dma_base[4] = j->src_bank;
+    dma_base[5] = (uint8_t)j->nbytes;
+    dma_base[6] = (uint8_t)(j->nbytes >> 8);
+    REG_MDMAEN = mdmaen_bit;
   }
   q->n = 0;
 }

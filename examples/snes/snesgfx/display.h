@@ -50,15 +50,18 @@ static inline void display_add(Display *d, Drawable *layer) {
   REG_TM = d->tm;
 }
 
-/* One frame: wait a FRESH v-blank (discard a stale flag first), let each drawable emit into the
-   queue, flush it via DMA, and on the FIRST frame release force-blank LAST — screen on only
-   after a complete upload (no flash, deterministic). */
+/* One frame: wait a FRESH v-blank, force-blank during DMA (allows VRAM writes at any
+   scanline — the loop body takes ~25 scanlines which nominally fits in the 36-scanline
+   vblank, but timing drift from a slightly-over-budget compute loop can push the tail
+   into active display; force-blank ensures those writes are never rejected). */
 static inline void display_frame(Display *d) {
   (void)REG_RDNMI;                          /* clear a stale flag latched during the compute */
   snes_wait_vblank();                       /* block until the next v-blank actually begins   */
+  REG_INIDISP = 0x80;                       /* force-blank: DMA succeeds at any vcounter      */
   scene_emit(&d->scene, &d->q);             /* one virtual emit() per drawable                */
-  upq_flush(&d->q);                         /* the only PPU-data-port writes, in v-blank      */
-  if (!d->shown) { REG_INIDISP = INIDISP_ON; d->shown = 1; }
+  upq_flush(&d->q);                         /* DMA — CPU stalls per job until transfer done   */
+  REG_INIDISP = INIDISP_ON;                 /* restore brightness                             */
+  d->shown = 1;
 }
 
 #endif /* SNESGFX_DISPLAY_H */
