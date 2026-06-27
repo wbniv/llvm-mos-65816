@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/dce7db4) | feat(snes): #6 Rule 90/110 1-D CA scrolling demo (examples/snes/1d-ca.c) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fb4c00) | docs(plan-index): fill commit SHA for #8 rdiff + mark gate-run pending |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fcbb63) | feat(snes): #8 Gray-Scott reaction-diffusion demo (examples/snes/rdiff.c) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/08c7384) | feat(snes): #14 Double Pendulum chaos demo — semi-implicit Euler + chaos divergence |
@@ -42,6 +43,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+dce7db4	author	Will Norris
+dce7db4	added	2
+dce7db4	deleted	1
+dce7db4	files	1
+dce7db4	body	Bitpacked 256-cell elementary CA (uint8_t[32], 1 bit/cell). ca_step() uses\na sliding-window inner loop with constant-1 shifts only (win >>= 1, mask <<= 1)\nand a precomputed 8-entry rule lookup table (static uint8_t rl[8], fixed WRAM\naddr) — eliminates variable-amount shift loops (20-40 cycles each on the 65816)\nfrom the hot path. Disasm gate: shifts=7 bools=11 bad_mul=0 bad_div=0.\n\nSNES ROM: BG3 2bpp tile ring (32×32 tiles, 256 px tall), identity tilemap,\nBG3VOFS ring scroll. CaDisplay custom Drawable handles tile DMA (512 B every\n8 gens) and VOFS update. Joypad X toggles Rule 90 (green, Sierpinski) ↔\nRule 110 (amber, Turing-complete chaos); Enter resets.\n\nGate CRC: 0xAB2C (32 Rule-90 + 32 Rule-110 gens, CRC-16 of all output rows).\n5-way bar (no far pointers): host == default@MAME == +mos-a16@MAME ==\n+mos-xy16@MAME == +mos-a16@bsnes-jg. corpus-a16: 11/12 PASS (rdiff_sim\nis in-progress from another worker, unrelated). Published biohack.net/1d-ca/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3fb4c00	author	Will Norris
 3fb4c00	added	1
 3fb4c00	deleted	1
