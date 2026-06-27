@@ -364,9 +364,17 @@ spirograph's biohack page.
    [biohack.net/nbody/](https://biohack.net/nbody/) shows emulator playing; gallery updated.
 
     ```
-    (pending /snes-rom-page invocation)
+    scaffold: nbody -> /home/will/SRC/biohack.net/public/play
+      engine  play/app.js
+      rom     play/roms/nbody.sfc (32768 bytes)
+      preview play/preview/nbody.png
+      manifest play/roms/manifest.json (8 rom(s))
+    build: 12 page(s) built in 1.20s
+    headless screenshot: ROM running at FRAME:264, orbital trails visible
+    gallery: snes.astro updated (8 demos), "Eight Super Nintendo programs"
+    biohack.net commit fbdaeae, tag v1.0.88, pushed → Cloudflare Pages deploy triggered
     ```
-    PENDING
+    PASS
 
 4. 4-way differential gate: `task corpus-a16` — host == default == `+mos-a16` == `+mos-xy16` on MAME
    + bsnes-jg; `nbody_sim` hash matches host oracle.
