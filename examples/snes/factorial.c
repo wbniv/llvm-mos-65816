@@ -204,12 +204,21 @@ int main(void) {
     // Gate CRC uses its own static bignum_state; does not affect a.bn.
     corpus_result = factorial_gate_crc();
 
+    // delay: count-down between advances. Starts at 2 to let the initial
+    // CGRAM+rows 0-13 DMA settle; thereafter 1 drain frame lets rows 16-27
+    // finish before the next advance. Using a counter (not dirty_rows == 0)
+    // avoids a 32-bit zero-compare that can misfire on bits 16-27 under
+    // +mos-a16 codegen on the 65816, which would permanently stall n at 1.
+    uint8_t delay = 2u;
     for (;;) {
-        // Advance one factorial step only after the previous DMA flush completes.
-        // dirty_rows == 0 means emit() has drained all pending rows to VRAM.
-        if (a.bn.n < (uint16_t)FACT_MAX_N && a.disp.dirty_rows == 0u) {
-            bignum_mul_n(&a.bn, (uint16_t)(a.bn.n + 1u));
-            fact_display_update(&a.disp, &a.bn);
+        if (a.bn.n < (uint16_t)FACT_MAX_N) {
+            if (delay == 0u) {
+                bignum_mul_n(&a.bn, (uint16_t)(a.bn.n + 1u));
+                fact_display_update(&a.disp, &a.bn);
+                delay = 1u;
+            } else {
+                delay--;
+            }
         }
         display_frame(&a.screen);
     }
