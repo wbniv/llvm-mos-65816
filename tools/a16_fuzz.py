@@ -1001,6 +1001,18 @@ KNOWN_ISSUES = [
     # entry is removed so a recurrence hard-FAILS again. See the main-branch commit + plan
     # docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md and the hermetic gate
     # examples/65816/a16unmerge.ll / dev/run.sh a16unmerge.)
+
+    # a16-newton-step-rc-undef — +mos-a16/+mos-xy16 -Os on newton_step() (examples/65816/newton.h)
+    # hits "Bad machine code: Using an undefined physical register" for a COPY of a ZP-pair register
+    # ($rc3 under a16, $rc3 under xy16) into $x. The RA assigns a virtual register to $rcN but emits
+    # the COPY in a basic block where $rcN has no visible definition — a MachineVerifier false-positive:
+    # the code IS emitted and runs CORRECTLY (dev/run.sh newton: MAME+bsnes-jg both give 0x4D8B).
+    # Root cause: the +mos-a16 RA's ZP-pair allocation loses track of def points for COPY-materialized
+    # physreg copies under high register pressure (6+ simultaneous int16_t×int16_t→int32_t tmps).
+    # Repro: examples/snes/corpus/newton_sim.c; gate: dev/run.sh newton (build+disasm+both emus PASS).
+    # Fix: investigate RA def-tracking for $rcN COPY insertions under +mos-a16 high-pressure paths.
+    ("a16-newton-step-rc-undef",
+     lambda log: "newton_step" in log and "Using an undefined physical register" in log),
 ]
 
 
@@ -1021,9 +1033,9 @@ def classify_known(log):
 # (a16-zp-pressure-overflow is intentionally absent: its repro is a gitignored c-torture file and
 # a LINK error, not a verify crash — so it can't be a verify-only guard row.)
 KNOWN_ISSUE_REPROS = [
-    # (empty — the two repros that lived here are both FIXED and promoted to positive gates:
-    #  a16regpress.c -> regalloc-out-of-registers (patch 0009, dev/run.sh a16regpress -> 0x01A7),
-    #  a16scavnz.c   -> scavenger-p-not-gpr      (patch 0011, dev/run.sh a16scavnz   -> 0x22A6).)
+    # a16-newton-step-rc-undef: $rcN COPY to $x in newton_step under +mos-a16/+mos-xy16.
+    # Crashes verify-machineinstrs but runs correctly (gate: dev/run.sh newton → PASS 0x4D8B).
+    ("examples/snes/corpus/newton_sim.c", "a16-newton-step-rc-undef"),
 ]
 
 

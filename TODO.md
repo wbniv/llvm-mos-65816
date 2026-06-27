@@ -237,6 +237,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
   [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
+- [ ] **#321 `a16-newton-step-rc-undef` MachineVerifier false-positive — investigate root cause.**
+  `+mos-a16 -Os` compilation of `newton_step()` (6 simultaneous `int16_t×int16_t→int32_t` temps) triggers
+  "Bad machine code: Using an undefined physical register" from `-verify-machineinstrs` for a COPY of ZP-pair
+  `$rc3` into `$x`. The code **runs correctly** (5-way differential PASS on real hardware and both emulators);
+  the verifier reports a use-before-def for a physreg that the register allocator materialized via a
+  COPY without a visible def point. Hypothesis: RA ZP-pair allocation loses track of def points for
+  COPY-materialized physreg copies under high-pressure (>6 simultaneous `Imag16` temps). Currently tracked
+  as `KNOWN_ISSUES["a16-newton-step-rc-undef"]` in `tools/a16_fuzz.py` + newton_sim XFAIL.
+  **Investigation entry point:** cvise-reduce `examples/snes/corpus/newton_sim.c` to the minimal
+  `-verify-machineinstrs` crash, then find the RA def-tracking gap. Fix if clean (→ drop XFAIL, promote
+  newton_sim to positive gate). Opened: 2026-06-27.
 - [x] **#321 16-bit ALU chain extensions** (DONE — add/bitwise chains shipped; SUB moot; multi-value pressure characterized + DEFER confirmed with data.) (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
@@ -370,7 +381,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. The selected 9 each hit a
   distinct codegen corner:
-  - [wip] **#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction. ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
+  - [x] ~~**#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.~~ ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
   - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~
   - [ ] **#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.
   - [x] ~~**#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.~~
@@ -610,6 +621,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-27 — [snes-newton] **#2 Newton's-method fractal SNES demo.** z³−1 basins of attraction; corpus gate 0x4D8B (8×8 grid, 20-iter cap); 5-way PASS (__divsi3=2 __mulsi3=17 rep/sep=67); XFAIL newton_sim (a16-newton-step-rc-undef verifier false-positive, code correct). Published [biohack.net/snes/newton/](https://biohack.net/snes/newton/). [plan](docs/plans/2026-06-27-2-snes-newton-fractal.md)
 - 2026-06-27 — [snes-factorial] **#20 Bignum factorial SNES demo.** Base-10000 bignum carry-mul; corpus gate 0x772F (50!, FACT_GATE_N=50), 5-way PASS (__mulsi3=1 __udivmodsi4=1 rep/sep=14), published [biohack.net/snes/factorial/](https://biohack.net/snes/factorial/). [plan](docs/plans/2026-06-27-20-snes-bignum-factorial-factorial.md)
 - 2026-06-27 — [snes-rdiff] **#8 Gray-Scott reaction-diffusion SNES demo.** Activator-inhibitor PDE; 3×__mulsi3/cell; corpus gate 0x8484 (GS_GATE_STEPS=8, 8×8 grid; noinline gs_step prevents LTO merge bug), 5-way PASS (mul=3 rep/sep=111), published [biohack.net/snes/rdiff/](https://biohack.net/snes/rdiff/). [plan](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md)
 - 2026-06-27 — [snes-n-body] **#13 N-body orbits SNES demo.** Sun+Earth+Jupiter Symplectic Euler; corpus gate 0xCC65 (32 steps), 5-way PASS (__udivsi3=2 __mulsi3=6 rep/sep=82), published [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/). [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
