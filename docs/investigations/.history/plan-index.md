@@ -3,11 +3,13 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2b9924c) | docs(plan-index): add the Space-Invaders-on-snesgfx plan row (154 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/d9d7f82) | docs(plan-index): add the snesgfx OOP rendering-library plan row (153 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/eeaa1e9) | docs(plan-index): add the far-pointer G_PHI(p2) backend-gap fix row (152 plans) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ddeea52) | docs(plan-index): add the Blossom split-screen-HUD row (150 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/1127ddc) | docs(plan-index): add the far-memset wrong-bank fix row (151 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2c07c95) | docs(plan-index): add the xy16-cmove stale-XFAIL resolution row (150 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/0034e3c) | #321: collapse the SNES Mandelbrot demos into one far/16-bit tester |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2b4d631) | docs(plan-index): add the full-xy16-backend-fix row (149 plans) |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/5f3b316) | #321 c-torture: finish the full vendoring (ieee/ + builtins/ into the gate) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/952c86c) | docs: add plan-index row for the Blossom interactive-renderer plan |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/de658f0) | docs: finish the stale-deferral sweep — propagate Phase-3 closure + fixed crashes |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ec4a80b) | #320 Phase B: land __call_indir_far stub; fix far-indirect-from-far-caller; fold its tail |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/798414a) | docs(plan-index): add the pr15296 ZP-overflow gated-spike plan row (148) |
@@ -47,6 +49,11 @@ eeaa1e9	added	4
 eeaa1e9	deleted	1
 eeaa1e9	files	1
 eeaa1e9	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01J79PZm5LMmiJGxQH9kHcuQ
+ddeea52	author	Will Norris
+ddeea52	added	3
+ddeea52	deleted	1
+ddeea52	files	1
+ddeea52	body	Index the docs/plans/2026-06-26-blossom-split-screen-hud-mode-7-plot-box-tiled-bg3.md\nplan (commit 2a7901b) and bump the footer count 149 -> 150.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01WvEd363ixdhtgwWEWHf9pF
 1127ddc	author	Will Norris
 1127ddc	added	4
 1127ddc	deleted	1
@@ -72,6 +79,11 @@ eeaa1e9	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com
 5f3b316	deleted	1
 5f3b316	files	1
 5f3b316	body	The Phase-0 filter globbed only top-level execute/*.c (1656), leaving the\nieee/ and builtins/ subdirs unaccounted-for. tools/torture_filter.py now scans\nthe whole suite: SRCDIR-relative manifest keys (disambiguating the 5\ntop-level/subdir name collisions: 920810-1.c, 930529-1.c, strcpy-2.c,\nstrlen-2.c, strlen-3.c) + an unconditional */*.c glob that excludes builtins'\n-lib.c companions (builtins/lib/ is two levels deep, never reached).\n\nManifest now accounts for the full real suite: 1288/1779 in-scope (was\n1228/1656).\n  - ieee/ (68): 60 in-scope = genuinely new floating-point differential\n    coverage. Gate, 4-way MAME + bsnes-jg: -Os 53 PASS/4 SKIP/3 XFAIL,\n    -O1 57 PASS/0 SKIP/3 XFAIL, 0 FAIL.\n  - builtins/ (55 main tests): honest builtins-multifile bucket (gcc's\n    builtins.exp multi-file harness -- main_test() + lib/main.c/-lib.c\n    companions -- not single-file linkable). The 55 -lib.c + 28 lib/ support\n    files correctly excluded as non-tests.\n\nThe sweep surfaced ONE new +mos-xy16 defect (the payoff of finishing the\nvendoring -- the integer top-level suite never reached this path):\nfp-cmp-8.c + fp-cmp-8l.c + pr38016.c are the same test body (fp compare-as-\nselect / "cmove": __builtin_isunordered/isless(x,y) ? a : b). default + a16\nPASS, xy16 reads 0xDEAD, reproducible isolated on MAME at both -Os/-O1.\nRecorded as xfails.tsv rows (green-modulo-known) + a TODO follow-up to\nroot-cause+fix.\n\nRunner unchanged (resolves subdir-pathed names via SRCDIR / name; outputs are\nfixed-name per-test tempdirs). CI unchanged (reads the committed manifest).\n\nPlan: docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+952c86c	author	Will Norris
+952c86c	added	4
+952c86c	deleted	1
+952c86c	files	1
+952c86c	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 de658f0	author	Will Norris
 de658f0	added	2
 de658f0	deleted	2

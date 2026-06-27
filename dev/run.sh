@@ -47,6 +47,15 @@ Targets:
              default@MAME == a16@MAME == default/a16@bsnes-jg (no far pointers, so default +
              a16 both build), then snapshot the rendered frame from MAME (Xvfb) + bsnes-jg
              (build/invaders-{mame,jg}.png).
+  spirograph #11 compiler stress-test demo: the Spirograph (hypotrochoid) on the snesgfx OOP
+             library (examples/snes/spirograph.c) — a NEAR 2bpp bitmap canvas (BG3) into which the
+             verified curve math (examples/65816/spiro.h: sin/cos-LUT + 16x16->32 fixed-point mul +
+             gear-ratio divide) BLOOMS a parametric rose; joypad-interactive (R/wheel/pen, mode,
+             gear preset) with a tiled HUD. Curve families: hypo/epi/rose/Lissajous. Asserts the
+             curve hash corpus_result == host (0x32D4) on MAME + bsnes-jg (3x byte-identical) + a
+             disasm gate, screenshots both (build/spirograph-{mame,jg}.png). The full 5-way
+             differential (host==default==a16==xy16) of the curve + controller math is the corpus
+             slice gate: dev/run.sh corpus-a16 (spiro_sim + spiro_ctrl_sim). No far pointers.
   mandel-far  #321 beefy demo, Track 3a: fill a HIGH-WRAM buffer ($7E2000, reachable
              only by 24-bit addressing) with the Mandelbrot via #320 far stores
              (sta [dp]), CRC it via far loads; +mos-a16-only, asserts host == +mos-a16
