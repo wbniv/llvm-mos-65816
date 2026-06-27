@@ -155,9 +155,9 @@ def bit_box(reg: dict) -> str:
         legend.append(f"`{glyph}`={field}[{fmt_bits(hi, lo)}]")
     order = range(n - 1, -1, -1)
     nums = " " + " ".join(f"{b:^3}" for b in order)
-    top = "┌" + "┬".join("───" for _ in order) + "┐"
-    mid = "│" + "│".join(f" {cell[b]} " for b in order) + "│"
-    bot = "└" + "┴".join("───" for _ in order) + "┘"
+    top = "+" + "+".join("---" for _ in order) + "+"
+    mid = "|" + "|".join(f" {cell[b]} " for b in order) + "|"
+    bot = "+" + "+".join("---" for _ in order) + "+"
     return "```\n" + "\n".join([nums, top, mid, bot]) + "\n```\n\n" + "  ".join(legend)
 
 
