@@ -1281,4 +1281,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "No CI change …" -> NOT a deferral; it's the statement that the torture CI job reads the committed
        manifest so it needs no edit (the hook keyed on the "No CI change" prose). Verified true this commit.
      fp:7b6e5bccb4c5ca3f fp:356612fa02492cc3 fp:cfb4ea31c0a22df9 -->
+- [verify] **2026-06-27-cache-control-headers-for-biohack-net-snes-demos** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)_  <!-- fp:040872b597cf6793 -->
 <!-- END auto-captured-deferrals -->
