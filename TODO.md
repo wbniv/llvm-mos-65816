@@ -371,7 +371,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   distinct codegen corner:
   - [ ] **#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.
   - [ ] **#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.
-  - [ ] **#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.
+  - [wip] **#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns. ([plan](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md))
   - [x] **#11 Spirograph (hypotrochoid)** — **DONE + verified (`wt/321-spirograph`).** Four curve families
     (hypo/epi/rose/Lissajous) bloom into a NEAR 2bpp bitmap canvas (new `snesgfx/bitmap_canvas.h` set-pixel
     rasterizer + `text_layer.h` HUD), joypad + on-screen `R/W/D/mode/petals` HUD. **No far pointers → full

@@ -178,6 +178,11 @@ tasks:
     cmds:
       - dev/run.sh pi
 
+  rdiff:
+    desc: "#8: render the Gray-Scott reaction-diffusion demo on SNES (+mos-a16); assert corpus_result (rdiff cumulative gate_crc 0x6969) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + rep/sep). Leaves build/rdiff.sfc + build/rdiff-{mame,jg}.png."
+    cmds:
+      - dev/run.sh rdiff
+
   double-pendulum:
     desc: "#14: Double Pendulum chaos — two pendulums with near-identical ICs diverge on a BitmapCanvas; asserts corpus_result (dpend_gate_crc, 256 steps) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __divsi3 + rep/sep). Leaves build/double-pendulum.sfc + build/double-pendulum-{mame,jg}.png."
     cmds:

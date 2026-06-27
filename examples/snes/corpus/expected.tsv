@@ -16,3 +16,5 @@ corpus/invaders_sim.c	corpus_result	0x9D57	Space Invaders deterministic attract 
 corpus/spiro_sim.c	corpus_result	0x32D4	spirograph (R,r,d) hypo/epi/rose/lissajous curve-point hash, 32 pts x 4 modes (shared spiro.h)
 corpus/spiro_ctrl_sim.c	corpus_result	0x6A26	spirograph interactive controller + HUD-format math over a scripted pad sequence (shared spirograph.h)
 corpus/pi_sim.c	corpus_result	0x771D	π spigot (PI_GATE_DIGITS=1, PI_ELEMS=676) + MC (PI_GATE_THROWS=256) gate CRC (shared pi_spigot.h)
+corpus/ca1d_sim.c	corpus_result	0xAB2C	1-D CA: 32 Rule-90 + 32 Rule-110 gens from single-cell seed; CRC-16 of all output rows (shared ca1d.h)
+corpus/rdiff_sim.c	corpus_result	0x6969	Gray-Scott cumulative gate_crc (GS_GATE_W=8, GS_GATE_H=8, GS_GATE_STEPS=50; DU=102/DV=10/F=14/K=16)

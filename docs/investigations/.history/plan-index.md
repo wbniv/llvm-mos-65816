@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/08c7384) | feat(snes): #14 Double Pendulum chaos demo — semi-implicit Euler + chaos divergence |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/a659f72) | docs(plan): #13 N-body orbits — Newtonian gravity · Verlet · 1/r² |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/72fb2dd) | chore(plan-index): add #19 π spigot + Monte-Carlo plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/ea42d15) | #11 spirograph: record publish — live at biohack.net/spirograph/ |
@@ -39,6 +40,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+08c7384	author	Will Norris
+08c7384	added	3
+08c7384	deleted	1
+08c7384	files	1
+08c7384	body	Two double pendulums with a 1-LUT-tick initial angle difference swing from a shared pivot.\nMass-2 paths trace white/cyan trails in a BitmapCanvas; diverge exponentially showing\nsensitive dependence on initial conditions.\n\nGate: dpend_gate_crc 0xE859 (256 steps), __mulsi3=6, __divsi3=2, rep/sep=77.\n5-way PASS: host == default@MAME == +mos-a16@MAME == +mos-a16@bsnes-jg == +mos-xy16.\nPublished at https://biohack.net/double-pendulum/\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 a659f72	author	Will Norris
 a659f72	added	2
 a659f72	deleted	1
