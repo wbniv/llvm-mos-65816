@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fb4c00) | docs(plan-index): fill commit SHA for #8 rdiff + mark gate-run pending |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fcbb63) | feat(snes): #8 Gray-Scott reaction-diffusion demo (examples/snes/rdiff.c) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/08c7384) | feat(snes): #14 Double Pendulum chaos demo — semi-implicit Euler + chaos divergence |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/a659f72) | docs(plan): #13 N-body orbits — Newtonian gravity · Verlet · 1/r² |
@@ -41,6 +42,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+3fb4c00	author	Will Norris
+3fb4c00	added	1
+3fb4c00	deleted	1
+3fb4c00	files	1
+3fb4c00	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3fcbb63	author	Will Norris
 3fcbb63	added	1
 3fcbb63	deleted	0
