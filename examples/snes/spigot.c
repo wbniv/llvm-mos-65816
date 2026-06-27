@@ -2,13 +2,19 @@
 //
 // Renders two live computations side-by-side on the SNES:
 //   LEFT (cols 0-15): π digits ticking out via the Rabinowitz-Wagon spigot algorithm —
-//     a multi-precision carry sweep across a 676-element uint16 array with uint32 intermediates.
+//     a multi-precision carry sweep across a 76-element uint16 array with uint32 intermediates.
 //     Stress: __udivsi3/__umodsi3 × PI_ELEMS per digit + carry chains.
 //   RIGHT (cols 16-31, rows 0-15): dart scatter canvas (128×128) — Monte-Carlo estimate of π.
 //     Stress: 16×16→32 multiply per throw under +mos-a16.
 //
 // No far pointers → builds default-8-bit AND +mos-a16 AND +mos-xy16 → 5-way differential bar.
 // See docs/plans/2026-06-27-19-snes-pi-spigot-montecarlo.md.
+//
+// PI_DIGITS=20 (PI_ELEMS=76) keeps the gate+display fast enough for the bsnes-jg WASM runner
+// on mobile; corpus/pi_sim.c uses the default PI_DIGITS=200 (676 cells) for the full stress test.
+#define PI_DIGITS      20
+#define SWEEP_PER_CALL 25
+#define MC_PER_CALL    32
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"
