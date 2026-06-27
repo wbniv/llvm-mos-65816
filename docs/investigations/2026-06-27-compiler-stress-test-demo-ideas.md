@@ -29,8 +29,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 1. **Julia set explorer** — `z²+c` with `c` animated along a path. *Stresses:* Q-format complex multiply,
    far high-WRAM framebuffer (a16). *Shows:* morphing Julia fractal.
-2. **Newton's-method fractal** — `z − p(z)/p′(z)` for `z³−1`, colour by which root it converges to.
-   *Stresses:* complex **division** (the hard one) + convergence branching. *Shows:* basins of attraction.
+2. ~~**Newton's-method fractal** — `z − p(z)/p′(z)` for `z³−1`, colour by which root it converges to.
+   *Stresses:* complex **division** (the hard one) + convergence branching. *Shows:* basins of attraction.~~ ✓ [/snes/newton/](https://biohack.net/snes/newton/)
 3. **Burning Ship / Multibrot** — `|Re|,|Im|` folding, or `zᵈ`. *Stresses:* extra multiplies, abs, `pow`
    loops. *Shows:* the ship / d-fold bulb.
 4. **Buddhabrot** — accumulate *escaping* orbit visits into a density buffer. *Stresses:* scatter writes to a
@@ -44,8 +44,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
    *Shows:* Sierpinski (90) / chaos (110) scrolling down — the display *is* the computation.~~ ✓ [/snes/1d-ca/](https://biohack.net/snes/1d-ca/)
 7. **Doom-fire / heat field** — per-cell decay + PRNG, palette ramp. *Stresses:* array sweep + rng + CGRAM.
    *Shows:* animated fire from the heat array.
-8. **Reaction–diffusion (Gray–Scott)** — two-chemical PDE, Laplacian, mul-add per cell. *Stresses:* heavy
-   fixed-point **mul-add** loops. *Shows:* Turing spots/stripes self-organising.
+8. ~~**Reaction–diffusion (Gray–Scott)** — two-chemical PDE, Laplacian, mul-add per cell. *Stresses:* heavy
+   fixed-point **mul-add** loops. *Shows:* Turing spots/stripes self-organising.~~ ✓ [/snes/rdiff/](https://biohack.net/snes/rdiff/)
 
 ## Trig / parametric — sin-cos LUTs, fixed-point accumulation
 
@@ -77,9 +77,9 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 19. ~~**π — spigot digits + Monte-Carlo** — unbounded spigot (big-int mul/div/mod) alongside a Buffon/dart
     estimate. *Stresses:* multi-precision **carry chains** + div/mod + rng. *Shows:* digits ticking out beside
     a dart scatter with the running estimate.~~ ✓ [/snes/spigot/](https://biohack.net/snes/spigot/)
-20. **Bignum factorial / Fibonacci** — `1000!` or `Fib(5000)` in a digit array, schoolbook carry mul/add.
+20. ~~**Bignum factorial / Fibonacci** — `1000!` or `Fib(5000)` in a digit array, schoolbook carry mul/add.
     *Stresses:* multi-precision **carry propagation** across arrays. *Shows:* the giant number filling the
-    screen + its digit count.
+    screen + its digit count.~~ ✓ [/snes/factorial/](https://biohack.net/snes/factorial/)
 
 ---
 
@@ -87,24 +87,27 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 | Codegen aspect | Demos |
 |---|---|
-| complex / 32-bit fixed-point **multiply** | 1–4, 8, 9–11, 13, 16 |
-| **division** / reciprocal / sqrt | 2, 13, 15, 16, 19 |
+| Codegen aspect | Demos |
+|---|---|
+| complex / 32-bit fixed-point **multiply** | 1, ~~2~~, 3, 4, ~~8~~, 9–10, ~~11~~, ~~13~~, ~~16~~ |
+| **division** / reciprocal / sqrt | ~~2~~, ~~13~~, 15, ~~16~~, ~~19~~ |
 | **recursion** & the soft stack / frame ABI | 17, 18 |
 | **heaps / queues / structs** (data structures) | 18 |
-| **bit manipulation** (pack/shift/boolean) | 5, 6 |
-| multi-precision **carry-chain** codegen | 19, 20 |
+| **bit manipulation** (pack/shift/boolean) | 5, ~~6~~ |
+| ~~multi-precision **carry-chain** codegen~~ | ~~19, 20~~ |
 | **shift-add**, multiply-free | 12 |
-| **far / high-WRAM** buffers (a16-only) | 1, 4, 8, 13 |
-| **PRNG + scatter** writes | 4, 7, 19 |
-| **sin/cos LUT** indexing | 9–11, 14, 16 |
+| **far / high-WRAM** buffers (a16-only) | 1, 4, ~~8~~, ~~13~~ |
+| **PRNG + scatter** writes | 4, 7, ~~19~~ |
+| **sin/cos LUT** indexing | 9–10, ~~11~~, ~~14~~, ~~16~~ |
 
 ## Recommended first picks
 
 Sharpest compiler stress for the effort, each hitting a corner the existing demos don't:
 
-- **#2 Newton's-method fractal** — complex **division** per pixel (Mandelbrot is multiply-only).
-- ~~**#16 wireframe 3-D solid** — matrix multiply + perspective **divide** + line rasterisation.~~ ✓
-- **#19 / #20 big-integer** — multi-precision **carry-chain** codegen, untouched by every other demo. (#19 ✓)
+- ~~**#2 Newton's-method fractal** — complex **division** per pixel (Mandelbrot is multiply-only).~~ ✓ [/snes/newton/](https://biohack.net/snes/newton/)
+- ~~**#16 wireframe 3-D solid** — matrix multiply + perspective **divide** + line rasterisation.~~ ✓ [/snes/3d-wireframe/](https://biohack.net/snes/3d-wireframe/)
+- ~~**#19 π — spigot digits + Monte-Carlo** — multi-precision **carry-chain** codegen + div/mod + rng.~~ ✓ [/snes/spigot/](https://biohack.net/snes/spigot/)
+- ~~**#20 Bignum factorial / Fibonacci** — multi-precision **carry-chain** codegen, untouched by every other demo.~~ ✓ [/snes/factorial/](https://biohack.net/snes/factorial/)
 - **#12 CORDIC** — a **multiply-free** shift-add inner loop (and the repo already has CORDIC tables).
 
 Each would be built on `snesgfx` the same way as Space Invaders: a shared host+target logic header, a
