@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/6525579) | docs(plan-index): record commit sha for #6 1d-ca demo (dce7db4) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/dce7db4) | feat(snes): #6 Rule 90/110 1-D CA scrolling demo (examples/snes/1d-ca.c) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fb4c00) | docs(plan-index): fill commit SHA for #8 rdiff + mark gate-run pending |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fcbb63) | feat(snes): #8 Gray-Scott reaction-diffusion demo (examples/snes/rdiff.c) |
@@ -43,6 +44,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+6525579	author	Will Norris
+6525579	added	1
+6525579	deleted	1
+6525579	files	1
+6525579	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 dce7db4	author	Will Norris
 dce7db4	added	2
 dce7db4	deleted	1
