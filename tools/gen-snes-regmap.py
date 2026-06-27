@@ -132,7 +132,8 @@ def fmt_bits(hi: int, lo: int) -> str:
 
 
 def bit_box(reg: dict) -> str:
-    """A Unicode bit-layout mockup for one register (8- or 16-bit)."""
+    """SVG bit-layout diagram for one register (8- or 16-bit).
+    Coordinate-based layout is font-independent — no glyph-width alignment issues."""
     n = reg["width"]
     cell = ["·"] * n
     used: dict[str, str] = {}
@@ -153,12 +154,41 @@ def bit_box(reg: dict) -> str:
         for b in range(lo, hi + 1):
             cell[b] = glyph
         legend.append(f"`{glyph}`={field}[{fmt_bits(hi, lo)}]")
-    order = range(n - 1, -1, -1)
-    nums = " " + " ".join(f"{b:^3}" for b in order)
-    top = "┌" + "┬".join("───" for _ in order) + "┐"
-    mid = "│" + "│".join(f" {cell[b]} " for b in order) + "│"
-    bot = "└" + "┴".join("───" for _ in order) + "┘"
-    return "```\n" + "\n".join([nums, top, mid, bot]) + "\n```\n\n" + "  ".join(legend)
+    order = list(range(n - 1, -1, -1))
+    CW, PAD, NH, BH = 33, 8, 18, 24   # cell width, padding, number-row h, box h
+    W = n * CW + 2 * PAD
+    H = NH + BH + 2 * PAD
+    name = reg["name"]
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}"'
+        f' width="{W}" style="max-width:100%;display:block;margin:0.5em 0"'
+        f' role="img" aria-label="bit-field layout for {name}">',
+        # panel background
+        f'  <rect width="{W}" height="{H}" rx="4"'
+        f'   style="fill:var(--color-surface-container-low,#1e293b)"/>',
+    ]
+    # bit-number labels
+    for i, b in enumerate(order):
+        x = PAD + i * CW + CW // 2
+        parts.append(f'  <text x="{x}" y="{PAD + 13}" text-anchor="middle"'
+                     f' font-size="11" fill="currentColor" opacity="0.7">{b}</text>')
+    # box outline
+    bx, by = PAD, PAD + NH
+    parts.append(f'  <rect x="{bx}" y="{by}" width="{n * CW}" height="{BH}"'
+                 f' fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>')
+    # vertical dividers
+    for i in range(1, n):
+        x = PAD + i * CW
+        parts.append(f'  <line x1="{x}" y1="{by}" x2="{x}" y2="{by + BH}"'
+                     f' stroke="currentColor" stroke-width="1" opacity="0.5"/>')
+    # cell content labels
+    cy = by + BH // 2 + 4
+    for i, b in enumerate(order):
+        cx = PAD + i * CW + CW // 2
+        parts.append(f'  <text x="{cx}" y="{cy}" text-anchor="middle"'
+                     f' font-size="12" fill="currentColor">{cell[b]}</text>')
+    parts.append('</svg>')
+    return "\n".join(parts) + "\n\n" + "  ".join(legend)
 
 
 def emit(headers_dir: Path) -> str:

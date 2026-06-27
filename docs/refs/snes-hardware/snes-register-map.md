@@ -85,12 +85,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2100` INIDISP** — Display control 1 — force-blank + master brightness.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ F │ · │ · │ · │ B │ B │ B │ B │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for INIDISP">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">F</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+</svg>
 
 `F`=FBLANK[7]  `B`=BRIGHT[3-0]
 
@@ -101,12 +122,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2101` OBSEL** — Object (sprite) size + tile-base select.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ S │ S │ S │ N │ N │ A │ A │ A │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for OBSEL">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">N</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">N</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+</svg>
 
 `S`=SIZE[7-5]  `N`=NAMESEL[4-3]  `A`=NAMEBASE[2-0]
 
@@ -118,12 +160,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2103` OAMADDH** — OAM address high + priority rotation.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ P │ · │ · │ · │ · │ · │ · │ A │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for OAMADDH">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">P</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+</svg>
 
 `P`=PRIO[7]  `A`=ADDRHI[0]
 
@@ -134,12 +197,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2105` BGMODE** — BG mode + per-layer tile size.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ S │ Z │ 2 │ 1 │ B │ M │ M │ M │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for BGMODE">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">Z</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">1</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+</svg>
 
 `S`=SZ4[7]  `Z`=SZ3[6]  `2`=SZ2[5]  `1`=SZ1[4]  `B`=BG3PRIO[3]  `M`=MODE[2-0]
 
@@ -154,12 +238,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2106` MOSAIC** — Mosaic block size + per-BG enable.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ S │ S │ S │ S │ B │ G │ 2 │ 1 │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for MOSAIC">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">1</text>
+</svg>
 
 `S`=SIZE[7-4]  `B`=BG4[3]  `G`=BG3[2]  `2`=BG2[1]  `1`=BG1[0]
 
@@ -173,12 +278,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2107` BG1SC** — BG1 tilemap base + map size.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ B │ B │ B │ B │ B │ B │ S │ S │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for BG1SC">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+</svg>
 
 `B`=BASE[7-2]  `S`=SIZE[1-0]
 
@@ -189,12 +315,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$210B` BG12NBA** — BG1/BG2 character (tile) data base.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ B │ B │ B │ B │ G │ G │ G │ G │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for BG12NBA">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+</svg>
 
 `B`=BG2[7-4]  `G`=BG1[3-0]
 
@@ -205,12 +352,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$210C` BG34NBA** — BG3/BG4 character data base.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ B │ B │ B │ B │ G │ G │ G │ G │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for BG34NBA">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+</svg>
 
 `B`=BG4[7-4]  `G`=BG3[3-0]
 
@@ -221,12 +389,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2115` VMAIN** — VRAM address increment control.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ I │ · │ · │ · │ R │ R │ S │ S │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for VMAIN">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+</svg>
 
 `I`=INCHIGH[7]  `R`=REMAP[3-2]  `S`=STEP[1-0]
 
@@ -238,12 +427,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$211A` M7SEL** — Mode 7 screen settings.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ O │ O │ · │ · │ · │ · │ V │ H │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for M7SEL">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">H</text>
+</svg>
 
 `O`=OVER[7-6]  `V`=VFLIP[1]  `H`=HFLIP[0]
 
@@ -255,12 +465,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2123` W12SEL** — Window mask settings for BG1/BG2 (2 bits per window/layer).
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ W │ W │ 2 │ 2 │ G │ G │ B │ B │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for W12SEL">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">W</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">W</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+</svg>
 
 `B`=BG1W1[1-0]  `G`=BG1W2[3-2]  `2`=BG2W1[5-4]  `W`=BG2W2[7-6]
 
@@ -273,12 +504,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2124` W34SEL** — Window mask settings for BG3/BG4.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ W │ W │ 4 │ 4 │ G │ G │ B │ B │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for W34SEL">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">W</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">W</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">4</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">4</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+</svg>
 
 `B`=BG3W1[1-0]  `G`=BG3W2[3-2]  `4`=BG4W1[5-4]  `W`=BG4W2[7-6]
 
@@ -291,12 +543,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2125` WOBJSEL** — Window mask settings for OBJ + color-math.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ A │ A │ M │ M │ B │ B │ O │ O │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for WOBJSEL">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+</svg>
 
 `O`=OBJW1[1-0]  `B`=OBJW2[3-2]  `M`=MATHW1[5-4]  `A`=MATHW2[7-6]
 
@@ -309,12 +582,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$212A` WBGLOG** — Window-1/2 combine logic per BG (00 OR, 01 AND, 10 XOR, 11 XNOR).
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ 4 │ 4 │ 3 │ 3 │ G │ G │ B │ B │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for WBGLOG">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">4</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">4</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">3</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">3</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+</svg>
 
 `B`=BG1[1-0]  `G`=BG2[3-2]  `3`=BG3[5-4]  `4`=BG4[7-6]
 
@@ -327,12 +621,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$212B` WOBJLOG** — Window combine logic for OBJ + color-math.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ · │ · │ · │ · │ M │ M │ O │ O │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for WOBJLOG">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+</svg>
 
 `O`=OBJ[1-0]  `M`=MATH[3-2]
 
@@ -343,12 +658,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$212C` TM** — Main-screen layer enable.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ · │ · │ · │ O │ B │ G │ 2 │ 1 │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for TM">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">1</text>
+</svg>
 
 `O`=OBJ[4]  `B`=BG4[3]  `G`=BG3[2]  `2`=BG2[1]  `1`=BG1[0]
 
@@ -362,12 +698,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2130` CGWSEL** — Color-math control window + source.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ M │ M │ A │ A │ · │ · │ S │ D │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for CGWSEL">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">D</text>
+</svg>
 
 `M`=MAINMASK[7-6]  `A`=MATHMASK[5-4]  `S`=SUBSRC[1]  `D`=DIRECT[0]
 
@@ -380,12 +737,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2131` CGADSUB** — Color-math operation + per-layer enable.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ S │ H │ B │ O │ G │ 3 │ 2 │ 1 │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for CGADSUB">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">H</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">3</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">1</text>
+</svg>
 
 `S`=SUB[7]  `H`=HALF[6]  `B`=BACKDROP[5]  `O`=OBJ[4]  `G`=BG4[3]  `3`=BG3[2]  `2`=BG2[1]  `1`=BG1[0]
 
@@ -402,12 +780,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2132` COLDATA** — Fixed color for color math (write once per channel).
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ B │ G │ R │ I │ I │ I │ I │ I │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for COLDATA">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+</svg>
 
 `B`=B[7]  `G`=G[6]  `R`=R[5]  `I`=INTENSITY[4-0]
 
@@ -420,12 +819,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$2133` SETINI** — Display mode / interlace settings.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ E │ X │ · │ · │ H │ O │ B │ I │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for SETINI">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">E</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">X</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">H</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+</svg>
 
 `E`=EXTSYNC[7]  `X`=EXTBG[6]  `H`=HIRES[3]  `O`=OVERSCAN[2]  `B`=OBJILACE[1]  `I`=ILACE[0]
 
@@ -440,12 +860,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$213E` STAT77** — PPU1 (5C77) status.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ T │ R │ M │ · │ V │ V │ V │ V │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for STAT77">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">T</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">M</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+</svg>
 
 `T`=TIMEOVER[7]  `R`=RANGEOVER[6]  `M`=MASTER[5]  `V`=VERSION[3-0]
 
@@ -458,12 +899,33 @@ Display, backgrounds, OAM, VRAM, Mode 7, CGRAM, windows, colour math, and the re
 
 **`$213F` STAT78** — PPU2 (5C78) status.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ F │ L │ · │ P │ V │ V │ V │ V │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for STAT78">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">F</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">L</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">P</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+</svg>
 
 `F`=FIELD[7]  `L`=LATCH[6]  `P`=PAL[4]  `V`=VERSION[3-0]
 
@@ -579,12 +1041,33 @@ Eight transfer channels plus the MDMAEN/HDMAEN enable triggers. — `snes_dma.h`
 
 **`$420B` MDMAEN** — General-purpose DMA enable + trigger; CPU stalls until done.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ C │ H │ 5 │ 4 │ 3 │ 2 │ 1 │ 0 │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for MDMAEN">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">H</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">5</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">4</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">3</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">1</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">0</text>
+</svg>
 
 `C`=CH7[7]  `H`=CH6[6]  `5`=CH5[5]  `4`=CH4[4]  `3`=CH3[3]  `2`=CH2[2]  `1`=CH1[1]  `0`=CH0[0]
 
@@ -601,12 +1084,33 @@ Eight transfer channels plus the MDMAEN/HDMAEN enable triggers. — `snes_dma.h`
 
 **`$420C` HDMAEN** — HDMA enable (per-scanline); bit n = arm channel n for HDMA.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ C │ C │ C │ C │ C │ C │ C │ C │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for HDMAEN">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">C</text>
+</svg>
 
 `C`=CH[7-0]
 
@@ -616,12 +1120,33 @@ Eight transfer channels plus the MDMAEN/HDMAEN enable triggers. — `snes_dma.h`
 
 **`$4300` DMAP0** — Channel 0 transfer parameters.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ D │ I │ · │ S │ S │ U │ U │ U │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for DMAP0">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">D</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">U</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">U</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">U</text>
+</svg>
 
 `D`=DIR[7]  `I`=INDIRECT[6]  `S`=STEP[4-3]  `U`=UNIT[2-0]
 
@@ -672,12 +1197,33 @@ Interrupt control, the hardware multiply/divide unit, the H/V IRQ timers, and Fa
 
 **`$4200` NMITIMEN** — Interrupt + auto-joypad enable.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ N │ · │ H │ H │ · │ · │ · │ A │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for NMITIMEN">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">N</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">H</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">H</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+</svg>
 
 `N`=NMI[7]  `H`=HVIRQ[5-4]  `A`=AUTOJOY[0]
 
@@ -689,12 +1235,33 @@ Interrupt control, the hardware multiply/divide unit, the H/V IRQ timers, and Fa
 
 **`$4201` WRIO** — Programmable I/O port (output). Bit 7 drives the controller-port
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ I │ O │ · │ · │ · │ · │ · │ · │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for WRIO">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">O</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+</svg>
 
 `I`=IO7[7]  `O`=IO6[6]
 
@@ -705,12 +1272,33 @@ Interrupt control, the hardware multiply/divide unit, the H/V IRQ timers, and Fa
 
 **`$420D` MEMSEL** — ROM access speed.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ · │ · │ · │ · │ · │ · │ · │ F │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for MEMSEL">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">F</text>
+</svg>
 
 `F`=FASTROM[0]
 
@@ -720,12 +1308,33 @@ Interrupt control, the hardware multiply/divide unit, the H/V IRQ timers, and Fa
 
 **`$4210` RDNMI** — NMI flag + CPU version.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ N │ · │ · │ · │ V │ V │ V │ V │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for RDNMI">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">N</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+</svg>
 
 `N`=NMIFLAG[7]  `V`=VERSION[3-0]
 
@@ -736,12 +1345,33 @@ Interrupt control, the hardware multiply/divide unit, the H/V IRQ timers, and Fa
 
 **`$4211` TIMEUP** — IRQ flag.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ I │ · │ · │ · │ · │ · │ · │ · │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for TIMEUP">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+</svg>
 
 `I`=IRQFLAG[7]
 
@@ -751,12 +1381,33 @@ Interrupt control, the hardware multiply/divide unit, the H/V IRQ timers, and Fa
 
 **`$4212` HVBJOY** — Blanking + auto-joypad status.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ V │ H │ · │ · │ · │ · │ · │ J │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for HVBJOY">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">V</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">H</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">J</text>
+</svg>
 
 `V`=VBLANK[7]  `H`=HBLANK[6]  `J`=JOYBUSY[0]
 
@@ -795,12 +1446,33 @@ Serial controller access and the automatic-read pad latches. — `snes_joypad.h`
 
 **`$4218` JOY1L** — Controller 1, low byte.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ A │ X │ L │ R │ I │ I │ I │ I │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for JOY1L">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">X</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">L</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">I</text>
+</svg>
 
 `A`=A[7]  `X`=X[6]  `L`=L[5]  `R`=R[4]  `I`=ID[3-0]
 
@@ -814,12 +1486,33 @@ Serial controller access and the automatic-read pad latches. — `snes_joypad.h`
 
 **`$4219` JOY1H** — Controller 1, high byte.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ B │ Y │ S │ T │ U │ D │ L │ R │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for JOY1H">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">Y</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">T</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">U</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">D</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">L</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
+</svg>
 
 `B`=B[7]  `Y`=Y[6]  `S`=SELECT[5]  `T`=START[4]  `U`=UP[3]  `D`=DOWN[2]  `L`=LEFT[1]  `R`=RIGHT[0]
 
@@ -836,12 +1529,57 @@ Serial controller access and the automatic-read pad latches. — `snes_joypad.h`
 
 **`$4218` JOY1** — Controller 1, full 16-bit button word.
 
-```
- 15  14  13  12  11  10   9   8   7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
-│ B │ Y │ S │ T │ U │ D │ L │ R │ A │ X │ 0 │ 1 │ · │ · │ · │ · │
-└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 544 58" width="544" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for JOY1">
+  <rect width="544" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">15</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">14</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">13</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">12</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">11</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">10</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">9</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">8</text>
+  <text x="288" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="321" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="354" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="387" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="420" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="453" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="486" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="519" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="528" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="272" y1="26" x2="272" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="305" y1="26" x2="305" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="338" y1="26" x2="338" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="371" y1="26" x2="371" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="404" y1="26" x2="404" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="437" y1="26" x2="437" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="470" y1="26" x2="470" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="503" y1="26" x2="503" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">Y</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">S</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">T</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">U</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">D</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">L</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
+  <text x="288" y="42" text-anchor="middle" font-size="12" fill="currentColor">A</text>
+  <text x="321" y="42" text-anchor="middle" font-size="12" fill="currentColor">X</text>
+  <text x="354" y="42" text-anchor="middle" font-size="12" fill="currentColor">0</text>
+  <text x="387" y="42" text-anchor="middle" font-size="12" fill="currentColor">1</text>
+  <text x="420" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="453" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="486" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="519" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+</svg>
 
 `B`=B[15]  `Y`=Y[14]  `S`=SELECT[13]  `T`=START[12]  `U`=UP[11]  `D`=DOWN[10]  `L`=LEFT[9]  `R`=RIGHT[8]  `A`=A[7]  `X`=X[6]  `0`=L[5]  `1`=R[4]
 
@@ -892,12 +1630,33 @@ A CPU window into the full 128 KB of work RAM. — `snes_wram.h`, 4 registers.
 
 **`$2183` WMADDH** — WRAM address, high byte.
 
-```
-  7   6   5   4   3   2   1   0 
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ · │ · │ · │ · │ · │ · │ · │ B │
-└───┴───┴───┴───┴───┴───┴───┴───┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 58" width="280" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for WMADDH">
+  <rect width="280" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
+  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
+  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
+  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
+  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
+  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
+  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
+  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
+  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
+  <rect x="8" y="26" width="264" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
+  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
+</svg>
 
 `B`=BANK[0]
 
