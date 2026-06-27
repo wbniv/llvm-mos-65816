@@ -57,7 +57,7 @@
 // Spigot state (all bank-0, NEAR — no far pointers → builds default+a16+xy16)
 
 typedef struct {
-    uint16_t a[PI_ELEMS]; // register array; initialized to 2; a[i] < 2*i-1 after step 1
+    uint16_t a[PI_ELEMS]; // register array; a[0]=0, a[1..n]=2; a[i] < 2*i-1 after step 1
     uint32_t q;           // running carry across frames (for partial-sweep mode)
     int16_t  sweep_i;     // current loop index (PI_ELEMS-1 downto 0; reset per digit)
     int16_t  predigit;    // held-back output digit; -1 = no output pending yet
@@ -71,7 +71,8 @@ typedef struct {
 // Spigot: init + partial-sweep
 
 static void pi_spigot_init(pi_spigot_state *s) {
-    for (int16_t i = 0; i < (int16_t)PI_ELEMS; i++) s->a[i] = 2;
+    s->a[0] = 0;  /* a[0] starts at 0; only a[1..n] = 2 (Rabinowitz-Wagon §3) */
+    for (int16_t i = 1; i < (int16_t)PI_ELEMS; i++) s->a[i] = 2;
     s->q        = 0;
     s->sweep_i  = (int16_t)(PI_ELEMS - 1);
     s->predigit = -1;

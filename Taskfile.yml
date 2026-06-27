@@ -174,7 +174,7 @@ tasks:
       - dev/run.sh spirograph
 
   pi:
-    desc: "#19: render the π Spigot + Monte-Carlo demo on SNES (+mos-a16); assert corpus_result (pi_gate_crc 0x771D) == host on MAME + bsnes-jg + disasm gate (__udivmodsi4 + __mulsi3 + rep/sep). Leaves build/spigot.sfc + build/spigot-{mame,jg}.png."
+    desc: "#19: render the π Spigot + Monte-Carlo demo on SNES (+mos-a16); assert corpus_result (pi_gate_crc 0x7711) == host on MAME + bsnes-jg + disasm gate (__udivmodsi4 + __mulsi3 + rep/sep). Leaves build/spigot.sfc + build/spigot-{mame,jg}.png."
     cmds:
       - dev/run.sh pi
 
