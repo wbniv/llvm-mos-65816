@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/7bb4f86) | feat(snes): #20 Bignum Factorial demo (factorial) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/0ca1c15) | docs(plan-index): add SHA fcaa7b8 for #8 rdiff plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/fcaa7b8) | feat(snes): #8 Gray-Scott reaction-diffusion demo (rdiff) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2a2dbc2) | docs(plan-index): add cache-control headers plan row (77d085b) |
@@ -48,6 +49,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+7bb4f86	author	Will Norris
+7bb4f86	added	2
+7bb4f86	deleted	2
+7bb4f86	files	1
+7bb4f86	body	Base-10000 bignum carry-propagation multiply: 1000! in a 700-element\nuint16_t array, showing the growing decimal number across 27 BG3\ntilemap rows. Stresses __mulsi3 (u16×u16→u32) + __udivmodsi4 (combined\ndiv+mod when both quot and rem are live) + rep/sep under +mos-a16.\n\nGate: FACT_GATE_N=50 → hash 0x772F (50!, ~32 elements; completes within\nSMOKE_SETTLE=60 frames). 5-way differential: host == default == +mos-a16\n== +mos-xy16 on MAME + bsnes-jg. Disasm: __mulsi3=1 __udivmodsi4=1\nrep/sep=14.\n\nPublished: biohack.net/snes/factorial/ (Verify fidelity button wired to\nWRAM 0xF46, CRC 0x772F, 500 frames).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0ca1c15	author	Will Norris
 0ca1c15	added	1
 0ca1c15	deleted	1
