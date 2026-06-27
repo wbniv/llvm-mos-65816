@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/dbec1b5) | docs(plan): mark #13 N-body publish step PASS (biohack.net/nbody/ live, v1.0.88) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f0eead4) | feat(snes): #13 N-body orbits demo (examples/snes/nbody.c) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/a659f72) | docs(plan): #13 N-body orbits — Newtonian gravity · Verlet · 1/r² |
 
 <!--history-meta v1
+dbec1b5	author	Will Norris
+dbec1b5	added	10
+dbec1b5	deleted	2
+dbec1b5	files	1
+dbec1b5	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f0eead4	author	Will Norris
 f0eead4	added	35
 f0eead4	deleted	14

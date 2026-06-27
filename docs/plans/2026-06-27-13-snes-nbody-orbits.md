@@ -316,21 +316,21 @@ corpus_result: `0xCC65` (NBODY_GATE_STEPS=32, host == default@MAME == +mos-a16@M
 
 ## Publication
 
-After verified ROM, run `/snes-rom-page`:
+**Published:** [biohack.net/nbody/](https://biohack.net/nbody/) — biohack.net commit `fbdaeae`, tag `v1.0.88`.
 
 ```bash
-~/.claude/skills/snes-rom-page/scaffold.sh \
+~/.config/claude/will/skills/snes-rom-page/scaffold.sh \
   --rom build/nbody.sfc \
   --slug nbody \
-  --site /home/will/SRC/indri.studio \
+  --site /home/will/SRC/biohack.net \
   --title "N-body Orbits" \
-  --preview /tmp/nbody-preview.png \
-  --selfcheck "0xOFF LEN 0xWANT GATE_HASH"
+  --preview build/nbody-mame.png \
+  --selfcheck "0x14FA 2 0xCC65 500 N-body (N=3) Symplectic Euler 32 steps hash=0xCC65"
 ```
 
-Page `src/pages/nbody.astro`: intro with Newton's inverse-square law and Verlet integration, emulator
-widget, description of the three-body system, controls table — same pattern as spigot.astro /
-spirograph's biohack page.
+Page `src/pages/nbody.astro`: lede with Symplectic Euler + Q8.8 fixed-point description, emulator
+widget, force-pair pseudocode block, codegen-under-test table, technical notes (noinline register-pressure fix).
+Gallery (`snes.astro`): 8th demo entry; lede updated to "Eight Super Nintendo programs".
 
 ---
 

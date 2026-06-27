@@ -510,6 +510,7 @@ Before calling a demo "done":
 | Demo | ROM | Algorithm header | Gate script | Key technique |
 |------|-----|-----------------|-------------|---------------|
 | **π Spigot + Monte-Carlo (#19)** | `examples/snes/spigot.c` | `examples/65816/pi_spigot.h` | `dev/pi.sh` | Carry-chain div/mod + 16×16→32 mul; custom `PiHud` drawable |
+| **N-body Orbits (#13)** | `examples/snes/nbody.c` | `examples/65816/nbody.h` | `dev/nbody.sh` | `__mulsi3` (r²) + `__udivsi3` (1/r²); `noinline` to cap RA pressure; CGRAM palette fade |
 | **Spirograph (#11)** | `examples/snes/spirograph.c` | `examples/65816/spiro.h` | `dev/spirograph.sh` | Sin/cos LUT + mul; `BitmapCanvas` + `TextLayer` |
 | **Blossom (Hopalong)** | `examples/snes/blossom.c` | (inline) | `dev/blossom.sh` | Far high-WRAM scatter (a16-only); CGRAM palette cycling |
 | **Space Invaders** | `examples/snes/invaders.c` | `examples/snes/invaders_logic.h` | `dev/invaders*` | `SpriteSet`; the full OOP `snesgfx` showcase |
