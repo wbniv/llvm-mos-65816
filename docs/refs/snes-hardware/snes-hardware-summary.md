@@ -126,56 +126,56 @@ row pair, MSB = leftmost pixel:
 **Colour format** — each CGRAM entry is 16-bit **BGR555** (bit 15 ignored); `SNES_RGB(r,g,b)`
 packs it:
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 544 58" width="544" style="max-width:100%;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for BGR555">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 544 58" width="544" height="58" style="max-width:100%;height:auto;display:block;margin:0.5em 0" role="img" aria-label="bit-field layout for BGR555">
   <rect width="544" height="58" rx="4"   style="fill:var(--color-surface-container-low,#1e293b)"/>
-  <text x="24" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">15</text>
-  <text x="57" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">14</text>
-  <text x="90" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">13</text>
-  <text x="123" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">12</text>
-  <text x="156" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">11</text>
-  <text x="189" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">10</text>
-  <text x="222" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">9</text>
-  <text x="255" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">8</text>
-  <text x="288" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">7</text>
-  <text x="321" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">6</text>
-  <text x="354" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">5</text>
-  <text x="387" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">4</text>
-  <text x="420" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">3</text>
-  <text x="453" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">2</text>
-  <text x="486" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">1</text>
-  <text x="519" y="21" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">0</text>
-  <rect x="8" y="26" width="528" height="24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="41" y1="26" x2="41" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="74" y1="26" x2="74" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="107" y1="26" x2="107" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="140" y1="26" x2="140" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="173" y1="26" x2="173" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="206" y1="26" x2="206" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="239" y1="26" x2="239" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="272" y1="26" x2="272" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="305" y1="26" x2="305" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="338" y1="26" x2="338" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="371" y1="26" x2="371" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="404" y1="26" x2="404" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="437" y1="26" x2="437" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="470" y1="26" x2="470" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <line x1="503" y1="26" x2="503" y2="50" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-  <text x="24" y="42" text-anchor="middle" font-size="12" fill="currentColor">·</text>
-  <text x="57" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
-  <text x="90" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
-  <text x="123" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
-  <text x="156" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
-  <text x="189" y="42" text-anchor="middle" font-size="12" fill="currentColor">B</text>
-  <text x="222" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
-  <text x="255" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
-  <text x="288" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
-  <text x="321" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
-  <text x="354" y="42" text-anchor="middle" font-size="12" fill="currentColor">G</text>
-  <text x="387" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
-  <text x="420" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
-  <text x="453" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
-  <text x="486" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
-  <text x="519" y="42" text-anchor="middle" font-size="12" fill="currentColor">R</text>
+  <text x="24" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">15</text>
+  <text x="57" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">14</text>
+  <text x="90" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">13</text>
+  <text x="123" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">12</text>
+  <text x="156" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">11</text>
+  <text x="189" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">10</text>
+  <text x="222" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">9</text>
+  <text x="255" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">8</text>
+  <text x="288" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">7</text>
+  <text x="321" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">6</text>
+  <text x="354" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">5</text>
+  <text x="387" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">4</text>
+  <text x="420" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">3</text>
+  <text x="453" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">2</text>
+  <text x="486" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">1</text>
+  <text x="519" y="21" text-anchor="middle" style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7">0</text>
+  <rect x="8" y="26" width="528" height="24" style="fill:none;stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="41" y1="26" x2="41" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="74" y1="26" x2="74" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="107" y1="26" x2="107" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="140" y1="26" x2="140" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="173" y1="26" x2="173" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="206" y1="26" x2="206" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="239" y1="26" x2="239" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="272" y1="26" x2="272" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="305" y1="26" x2="305" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="338" y1="26" x2="338" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="371" y1="26" x2="371" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="404" y1="26" x2="404" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="437" y1="26" x2="437" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="470" y1="26" x2="470" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <line x1="503" y1="26" x2="503" y2="50" style="stroke:currentColor;stroke-width:1;opacity:0.5"/>
+  <text x="24" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">·</text>
+  <text x="57" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">B</text>
+  <text x="90" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">B</text>
+  <text x="123" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">B</text>
+  <text x="156" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">B</text>
+  <text x="189" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">B</text>
+  <text x="222" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">G</text>
+  <text x="255" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">G</text>
+  <text x="288" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">G</text>
+  <text x="321" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">G</text>
+  <text x="354" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">G</text>
+  <text x="387" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">R</text>
+  <text x="420" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">R</text>
+  <text x="453" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">R</text>
+  <text x="486" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">R</text>
+  <text x="519" y="42" text-anchor="middle" style="font-size:12px;font-family:sans-serif;fill:currentColor">R</text>
 </svg>
 
 `·`=unused  `B`=blue[14-10]  `G`=green[9-5]  `R`=red[4-0]

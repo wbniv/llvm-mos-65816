@@ -159,9 +159,15 @@ def bit_box(reg: dict) -> str:
     W = n * CW + 2 * PAD
     H = NH + BH + 2 * PAD
     name = reg["name"]
+    # CSS inline styles on <text> prevent prose/body CSS from overriding font-size.
+    # Explicit height attribute + height:auto keeps the SVG from stretching to
+    # fill the block container (browsers default SVG height to 150px when omitted).
+    num_style  = 'style="font-size:11px;font-family:sans-serif;fill:currentColor;opacity:0.7"'
+    cell_style = 'style="font-size:12px;font-family:sans-serif;fill:currentColor"'
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}"'
-        f' width="{W}" style="max-width:100%;display:block;margin:0.5em 0"'
+        f' width="{W}" height="{H}"'
+        f' style="max-width:100%;height:auto;display:block;margin:0.5em 0"'
         f' role="img" aria-label="bit-field layout for {name}">',
         # panel background
         f'  <rect width="{W}" height="{H}" rx="4"'
@@ -170,23 +176,21 @@ def bit_box(reg: dict) -> str:
     # bit-number labels
     for i, b in enumerate(order):
         x = PAD + i * CW + CW // 2
-        parts.append(f'  <text x="{x}" y="{PAD + 13}" text-anchor="middle"'
-                     f' font-size="11" fill="currentColor" opacity="0.7">{b}</text>')
+        parts.append(f'  <text x="{x}" y="{PAD + 13}" text-anchor="middle" {num_style}>{b}</text>')
     # box outline
     bx, by = PAD, PAD + NH
     parts.append(f'  <rect x="{bx}" y="{by}" width="{n * CW}" height="{BH}"'
-                 f' fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>')
+                 f' style="fill:none;stroke:currentColor;stroke-width:1;opacity:0.5"/>')
     # vertical dividers
     for i in range(1, n):
         x = PAD + i * CW
         parts.append(f'  <line x1="{x}" y1="{by}" x2="{x}" y2="{by + BH}"'
-                     f' stroke="currentColor" stroke-width="1" opacity="0.5"/>')
+                     f' style="stroke:currentColor;stroke-width:1;opacity:0.5"/>')
     # cell content labels
     cy = by + BH // 2 + 4
     for i, b in enumerate(order):
         cx = PAD + i * CW + CW // 2
-        parts.append(f'  <text x="{cx}" y="{cy}" text-anchor="middle"'
-                     f' font-size="12" fill="currentColor">{cell[b]}</text>')
+        parts.append(f'  <text x="{cx}" y="{cy}" text-anchor="middle" {cell_style}>{cell[b]}</text>')
     parts.append('</svg>')
     return "\n".join(parts) + "\n\n" + "  ".join(legend)
 
