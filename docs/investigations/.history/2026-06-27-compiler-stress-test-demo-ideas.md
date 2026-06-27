@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/7f860b3) | refactor(nbody→n-body): update all content refs after file rename |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+7f860b3	author	Will Norris
+7f860b3	added	13
+7f860b3	deleted	13
+7f860b3	files	1
+7f860b3	body	Update internal file-path references, URLs, echo strings, includes,\nand docs throughout to match the nbody→n-body rename committed in 9369ced.\nAlso strikes through #13 N-body orbits in the demo ideas backlog\n(live at biohack.net/snes/n-body/).\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01KWxFJW6PaCDvq1FJE8Tuu6
 f9559f4	author	Will Norris
 f9559f4	added	111
 f9559f4	deleted	0

@@ -6,8 +6,8 @@ multi-precision carry chains, bit manipulation, shift-add, far/high-WRAM pointer
 pointers) **and renders the computation itself** on screen, so the visual *is* the proof, not a side channel.
 
 These complement the demos already built: the fixed-point **Mandelbrot** (Mode 7, far stores —
-[`examples/snes/mandel-display.c`](../../examples/snes/mandel-display.c)), the **Blossom** Hopalong attractor,
-and **Space Invaders** on the `snesgfx` OOP library
+[`examples/snes/mandel-display.c`](../../examples/snes/mandel-display.c)), the **Blossom** Hopalong attractor ✓ [/snes/blossom/](https://biohack.net/snes/blossom/),
+and **Space Invaders** on the `snesgfx` OOP library ✓ [/snes/space-invaders/](https://biohack.net/snes/space-invaders/)
 ([plan](../plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)). None of the 20 below duplicate those.
 
 ## The bar each demo should meet (so it's a real test, not a toy)
