@@ -183,6 +183,40 @@ tasks:
     cmds:
       - dev/run.sh pi
 
+  factorial:
+    desc: "#20: Bignum factorial — 1000! in a base-10000 digit array; custom 28-row FactDisplay drawable; assert corpus_result (factorial_gate_crc for 50!, 0x772F) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __udivmodsi4 + rep/sep). Leaves build/factorial.sfc + build/factorial-{mame,jg}.png."
+    cmds:
+      - dev/run.sh factorial
+
+  factorial-play:
+    desc: "PLAY the bignum factorial demo in a MAME window on this host (builds the ROM first if needed). Displays growing n! digit-by-digit filling the screen."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/factorial.sfc ]; then
+          echo "==> build/factorial.sfc missing — building it (dev/run.sh factorial)…"
+          dev/run.sh factorial
+        fi
+      - task: mandel-mame
+        vars: { ROM: factorial }
+
+  newton:
+    desc: "#2: Newton's-method fractal z³−1 — complex division (__divsi3) + multiply (__mulsi3); assert corpus_result (newton_gate_crc 0x4D8B) == host on MAME + bsnes-jg + disasm gate. Leaves build/newton.sfc + build/newton-{mame,jg}.png."
+    cmds:
+      - dev/run.sh newton
+
+  newton-play:
+    desc: "PLAY the Newton's-method fractal in a MAME window (builds the ROM first if needed). Tiles fill progressively over ~224 frames."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/newton.sfc ]; then
+          echo "==> build/newton.sfc missing — building it (dev/run.sh newton)…"
+          dev/run.sh newton
+        fi
+      - task: mandel-mame
+        vars: { ROM: newton }
+
   rdiff:
     desc: "#8: render the Gray-Scott reaction-diffusion demo on SNES (+mos-a16); assert corpus_result (rdiff cumulative gate_crc 0x6969) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + rep/sep). Leaves build/rdiff.sfc + build/rdiff-{mame,jg}.png."
     cmds:

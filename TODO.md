@@ -391,7 +391,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     (rotation matrix + perspective divide + polyhedron tables). Stays NEAR → full 5-way bar. Publishes to
     [biohack.net/3d-wireframe/](https://biohack.net/3d-wireframe/).
   - [x] ~~**#19 π spigot + Monte-Carlo** — multi-precision **carry chains** + div/mod + rng; shows digits + dart scatter.~~
-  - [wip] **#20 Bignum factorial/Fibonacci** — multi-precision **carry propagation**; shows the giant number on screen. ([plan](docs/plans/2026-06-27-20-snes-bignum-factorial-factorial.md))
+  - [x] ~~**#20 Bignum factorial/Fibonacci** — multi-precision **carry propagation**; shows the giant number on screen.~~
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
@@ -610,6 +610,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-27 — [snes-factorial] **#20 Bignum factorial SNES demo.** Base-10000 bignum carry-mul; corpus gate 0x772F (50!, FACT_GATE_N=50), 5-way PASS (__mulsi3=1 __udivmodsi4=1 rep/sep=14), published [biohack.net/snes/factorial/](https://biohack.net/snes/factorial/). [plan](docs/plans/2026-06-27-20-snes-bignum-factorial-factorial.md)
 - 2026-06-27 — [snes-rdiff] **#8 Gray-Scott reaction-diffusion SNES demo.** Activator-inhibitor PDE; 3×__mulsi3/cell; corpus gate 0x8484 (GS_GATE_STEPS=8, 8×8 grid; noinline gs_step prevents LTO merge bug), 5-way PASS (mul=3 rep/sep=111), published [biohack.net/snes/rdiff/](https://biohack.net/snes/rdiff/). [plan](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md)
 - 2026-06-27 — [snes-n-body] **#13 N-body orbits SNES demo.** Sun+Earth+Jupiter Symplectic Euler; corpus gate 0xCC65 (32 steps), 5-way PASS (__udivsi3=2 __mulsi3=6 rep/sep=82), published [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/). [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
 - 2026-06-27 — [snes-1d-ca] **#6 Rule 90/110 1-D CA SNES demo.** Bitpacked 256-cell CA; sliding-window inner loop (constant-1 shifts only); corpus gate 0xAB2C (32 R90 + 32 R110 gens), 5-way PASS (shifts=7 bools=11 bad_mul=0), published [biohack.net/1d-ca/](https://biohack.net/1d-ca/). [plan](docs/plans/2026-06-27-6-snes-rule90-110-1d-ca.md)

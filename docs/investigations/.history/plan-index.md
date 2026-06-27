@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/0ca1c15) | docs(plan-index): add SHA fcaa7b8 for #8 rdiff plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/fcaa7b8) | feat(snes): #8 Gray-Scott reaction-diffusion demo (rdiff) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2a2dbc2) | docs(plan-index): add cache-control headers plan row (77d085b) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/669c44f) | docs(plan-index): record commit sha for #13 N-body orbits (f0eead4) |
@@ -47,6 +48,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+0ca1c15	author	Will Norris
+0ca1c15	added	1
+0ca1c15	deleted	1
+0ca1c15	files	1
+0ca1c15	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fcaa7b8	author	Will Norris
 fcaa7b8	added	5
 fcaa7b8	deleted	2
