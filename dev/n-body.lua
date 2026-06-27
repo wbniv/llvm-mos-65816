@@ -1,4 +1,4 @@
--- dev/nbody.lua — MAME autoboot: let the N-body demo run, snapshot the real PPU output,
+-- dev/n-body.lua — MAME autoboot: let the N-body demo run, snapshot the real PPU output,
 -- and assert corpus_result (from nbody_gate_crc, computed before the display loop) matches
 -- the host oracle.  corpus_result is set on frame 0 (before the first v-blank), so it is
 -- stable from the earliest frame. We snapshot at SHOT_AT (default 500) for a nice trail view.

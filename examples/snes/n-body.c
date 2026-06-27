@@ -13,7 +13,7 @@
 // No far pointers → builds default-8-bit AND +mos-a16 AND +mos-xy16
 // → full 5-way differential bar.
 //
-// See docs/plans/2026-06-27-13-snes-nbody-orbits.md.
+// See docs/plans/2026-06-27-13-snes-n-body-orbits.md.
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"

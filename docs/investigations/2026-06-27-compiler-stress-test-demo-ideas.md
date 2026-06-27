@@ -40,8 +40,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 5. **Conway's Game of Life** — bit-packed neighbour sums, ping-pong buffers. *Stresses:* bitops, array index,
    two-buffer swap. *Shows:* gliders/guns evolving.
-6. **Rule 90/110 (1-D CA)** — each row from the previous via 8-bit logic. *Stresses:* shifts/boolean logic.
-   *Shows:* Sierpinski (90) / chaos (110) scrolling down — the display *is* the computation.
+6. ~~**Rule 90/110 (1-D CA)** — each row from the previous via 8-bit logic. *Stresses:* shifts/boolean logic.
+   *Shows:* Sierpinski (90) / chaos (110) scrolling down — the display *is* the computation.~~ ✓ [/snes/1d-ca/](https://biohack.net/snes/1d-ca/)
 7. **Doom-fire / heat field** — per-cell decay + PRNG, palette ramp. *Stresses:* array sweep + rng + CGRAM.
    *Shows:* animated fire from the heat array.
 8. **Reaction–diffusion (Gray–Scott)** — two-chemical PDE, Laplacian, mul-add per cell. *Stresses:* heavy
@@ -53,20 +53,20 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
    + accumulation. *Shows:* the decaying traced curve.
 10. **Fourier epicycles** — sum of rotating vectors traces a shape. *Stresses:* many sin/cos + complex add.
     *Shows:* nested circles drawing an outline.
-11. **Spirograph (hypotrochoid)** — `(R, r, d)` parametric. *Stresses:* sin/cos + mul. *Shows:* the rose pattern.
+11. ~~**Spirograph (hypotrochoid)** — `(R, r, d)` parametric. *Stresses:* sin/cos + mul. *Shows:* the rose pattern.~~ ✓ [/snes/spirograph/](https://biohack.net/snes/spirograph/)
 12. **CORDIC clock/rotator** — sin/cos/atan via **shift-add only** (no multiply). *Stresses:* shift-add
     convergence loops — a different ALU profile from everything else. *Shows:* a rotating hand with its angle.
 
 ## Physics & numerical integration — fixed-point, division, sqrt
 
-13. **N-body orbits** — Newtonian gravity, Verlet, `1/r²`. *Stresses:* fixed-point mul + **division** +
-    integration. *Shows:* planets orbiting with fading trails.
-14. **Double pendulum (chaos)** — Euler/RK integration with sin. *Stresses:* sin + sensitive fixed-point
-    integration. *Shows:* the chaotic swing + path trace.
+13. ~~**N-body orbits** — Newtonian gravity, Verlet, `1/r²`. *Stresses:* fixed-point mul + **division** +
+    integration. *Shows:* planets orbiting with fading trails.~~ ✓ [/snes/n-body/](https://biohack.net/snes/n-body/)
+14. ~~**Double pendulum (chaos)** — Euler/RK integration with sin. *Stresses:* sin + sensitive fixed-point
+    integration. *Shows:* the chaotic swing + path trace.~~ ✓ [/snes/double-pendulum/](https://biohack.net/snes/double-pendulum/)
 15. **Raycaster maze** — DDA grid cast, wall height = `1/dist` per column. *Stresses:* fixed-point +
     **per-column division**. *Shows:* first-person 3-D corridors.
-16. **Wireframe 3-D solid** — rotation matrix (sin/cos LUT), perspective projection (divide), Bresenham lines.
-    *Stresses:* 3×3 matrix mul + projection divide + line raster. *Shows:* a spinning cube/icosahedron.
+16. ~~**Wireframe 3-D solid** — rotation matrix (sin/cos LUT), perspective projection (divide), Bresenham lines.
+    *Stresses:* 3×3 matrix mul + projection divide + line raster. *Shows:* a spinning cube/icosahedron.~~ ✓ [/snes/3d-wireframe/](https://biohack.net/snes/3d-wireframe/)
 
 ## Discrete algorithms, data structures & big-integers — recursion, heaps, carry chains
 
@@ -74,9 +74,9 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
     stack / frame ABI), compares, in-place swaps. *Shows:* bars sorting in real time.
 18. **Maze generate + solve** — DFS carve (recursion) then A*/BFS (priority-queue frontier). *Stresses:*
     recursion + a heap/queue data structure + array. *Shows:* maze built, then the shortest path lit.
-19. **π — spigot digits + Monte-Carlo** — unbounded spigot (big-int mul/div/mod) alongside a Buffon/dart
+19. ~~**π — spigot digits + Monte-Carlo** — unbounded spigot (big-int mul/div/mod) alongside a Buffon/dart
     estimate. *Stresses:* multi-precision **carry chains** + div/mod + rng. *Shows:* digits ticking out beside
-    a dart scatter with the running estimate.
+    a dart scatter with the running estimate.~~ ✓ [/snes/spigot/](https://biohack.net/snes/spigot/)
 20. **Bignum factorial / Fibonacci** — `1000!` or `Fib(5000)` in a digit array, schoolbook carry mul/add.
     *Stresses:* multi-precision **carry propagation** across arrays. *Shows:* the giant number filling the
     screen + its digit count.
@@ -103,8 +103,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 Sharpest compiler stress for the effort, each hitting a corner the existing demos don't:
 
 - **#2 Newton's-method fractal** — complex **division** per pixel (Mandelbrot is multiply-only).
-- **#16 wireframe 3-D solid** — matrix multiply + perspective **divide** + line rasterisation.
-- **#19 / #20 big-integer** — multi-precision **carry-chain** codegen, untouched by every other demo.
+- ~~**#16 wireframe 3-D solid** — matrix multiply + perspective **divide** + line rasterisation.~~ ✓
+- **#19 / #20 big-integer** — multi-precision **carry-chain** codegen, untouched by every other demo. (#19 ✓)
 - **#12 CORDIC** — a **multiply-free** shift-add inner loop (and the repo already has CORDIC tables).
 
 Each would be built on `snesgfx` the same way as Space Invaders: a shared host+target logic header, a

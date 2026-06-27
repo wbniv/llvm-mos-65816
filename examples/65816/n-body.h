@@ -19,7 +19,7 @@
 // source compiles correctly on both host (int=32) and 65816 target (int=16).
 //
 // No hardware here (no snes.h, no MMIO).
-// See docs/plans/2026-06-27-13-snes-nbody-orbits.md.
+// See docs/plans/2026-06-27-13-snes-n-body-orbits.md.
 #ifndef NBODY_H
 #define NBODY_H
 
