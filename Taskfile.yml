@@ -168,6 +168,16 @@ tasks:
       - task: mandel-mame
         vars: { ROM: blossom }
 
+  spirograph:
+    desc: "#11: render the Spirograph (hypotrochoid) demo on SNES (+mos-a16); assert curve hash host==+mos-a16 on MAME + bsnes-jg + disasm gate. Leaves build/spirograph.sfc + build/spirograph-{mame,jg}.png."
+    cmds:
+      - dev/run.sh spirograph
+
+  pi:
+    desc: "#19: render the π Spigot + Monte-Carlo demo on SNES (+mos-a16); assert corpus_result (pi_gate_crc 0x771D) == host on MAME + bsnes-jg + disasm gate (__udivmodsi4 + __mulsi3 + rep/sep). Leaves build/spigot.sfc + build/spigot-{mame,jg}.png."
+    cmds:
+      - dev/run.sh pi
+
   # --- Generated reference docs (from the HAL headers + the backend TableGen) ---
 
   gen-docs:

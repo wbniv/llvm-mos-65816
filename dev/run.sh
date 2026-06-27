@@ -56,6 +56,13 @@ Targets:
              disasm gate, screenshots both (build/spirograph-{mame,jg}.png). The full 5-way
              differential (host==default==a16==xy16) of the curve + controller math is the corpus
              slice gate: dev/run.sh corpus-a16 (spiro_sim + spiro_ctrl_sim). No far pointers.
+  pi         #19 compiler stress-test demo: π Spigot + Monte-Carlo (examples/snes/spigot.c) — the
+             Rabinowitz-Wagon spigot algorithm ticks π digits into the left panel (32-bit div/mod
+             carry chain across 676 uint16s, PI_DIGITS=200) while the right panel shows a scatter
+             canvas accumulating Monte-Carlo darts (xorshift16 + 16x16→32 r² test). No far pointers
+             → builds default + +mos-a16 + +mos-xy16. Asserts corpus_result (pi_gate_crc: 1 spigot
+             digit + 256 MC throws) == host oracle (0x771D) on MAME + bsnes-jg + a disasm gate
+             (__udivmodsi4 + __mulsi3 + rep/sep). Screenshots: build/spigot-{mame,jg}.png.
   mandel-far  #321 beefy demo, Track 3a: fill a HIGH-WRAM buffer ($7E2000, reachable
              only by 24-bit addressing) with the Mandelbrot via #320 far stores
              (sta [dp]), CRC it via far loads; +mos-a16-only, asserts host == +mos-a16

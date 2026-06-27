@@ -15,3 +15,4 @@ corpus/globals.c    corpus_result  0xAB55    crt0 .data copy + .bss clear
 corpus/invaders_sim.c	corpus_result	0x9D57	Space Invaders deterministic attract sim, 600 frames (shared invaders_logic.h)
 corpus/spiro_sim.c	corpus_result	0x32D4	spirograph (R,r,d) hypo/epi/rose/lissajous curve-point hash, 32 pts x 4 modes (shared spiro.h)
 corpus/spiro_ctrl_sim.c	corpus_result	0x6A26	spirograph interactive controller + HUD-format math over a scripted pad sequence (shared spirograph.h)
+corpus/pi_sim.c	corpus_result	0x771D	π spigot (PI_GATE_DIGITS=1, PI_ELEMS=676) + MC (PI_GATE_THROWS=256) gate CRC (shared pi_spigot.h)
