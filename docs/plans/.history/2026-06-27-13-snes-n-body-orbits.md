@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f3ca16c) | docs(plan): fix stale snes.astro refs → snes/index.astro in #13 n-body plan |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/9369ced) | chore(todo): mark biohack.net cache headers done (v1.0.91) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/cab7d24) | docs(snes-nbody): close out #13 — fix plan publication section + TODO done + cookbook entry |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/dbec1b5) | docs(plan): mark #13 N-body publish step PASS (biohack.net/nbody/ live, v1.0.88) |
@@ -7,6 +8,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/a659f72) | docs(plan): #13 N-body orbits — Newtonian gravity · Verlet · 1/r² |
 
 <!--history-meta v1
+f3ca16c	author	Will Norris
+f3ca16c	added	24
+f3ca16c	deleted	24
+f3ca16c	files	1
+f3ca16c	body	Gallery moved to src/pages/snes/index.astro in biohack.net v1.0.89.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 9369ced	author	Will Norris
 9369ced	added	414
 9369ced	deleted	0

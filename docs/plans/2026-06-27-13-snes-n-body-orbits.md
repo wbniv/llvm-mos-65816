@@ -364,7 +364,7 @@ Gallery (`snes/index.astro`): 8th demo entry; lede updated to "Eight Super Ninte
    [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/) shows emulator playing; gallery updated.
 
     ```
-    scaffold: nbody -> /home/will/SRC/biohack.net/public/play
+    scaffold: n-body -> /home/will/SRC/biohack.net/public/play
       engine  play/app.js
       rom     play/roms/n-body.sfc (32768 bytes)
       preview play/preview/n-body.png
@@ -377,7 +377,7 @@ Gallery (`snes/index.astro`): 8th demo entry; lede updated to "Eight Super Ninte
     PASS
 
 4. 4-way differential gate: `task corpus-a16` — host == default == `+mos-a16` == `+mos-xy16` on MAME
-   + bsnes-jg; `nbody_sim` hash matches host oracle.
+   + bsnes-jg; `n-body_sim` hash matches host oracle.
 
     ```
     ==> corpus-a16: expected.tsv  (default == +mos-a16 == +mos-xy16, MAME + bsnes-jg)
@@ -393,7 +393,7 @@ Gallery (`snes/index.astro`): 8th demo entry; lede updated to "Eight Super Ninte
       pi_sim     PASS   corpus_result=0x7711
       ca1d_sim   PASS   corpus_result=0xAB2C
       rdiff_sim  FAIL   (pre-existing: 0x0000 on MAME — compute timeout, unrelated to #13)
-      nbody_sim  PASS   corpus_result=0xCC65  N-body (N=3, GRAV_K=64, GRAV_SOFT=16, DT_SHIFT=4) Symplectic Euler, 32 steps, rotate-XOR CRC
+      n-body_sim PASS   corpus_result=0xCC65  N-body (N=3, GRAV_K=64, GRAV_SOFT=16, DT_SHIFT=4) Symplectic Euler, 32 steps, rotate-XOR CRC
     ==> corpus-a16: 12/13 passed, 0 xfail
     ```
     PASS (rdiff_sim pre-existing)
