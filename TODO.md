@@ -364,6 +364,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   **production deploy to https://www.biohack.net/space-invaders/ awaits user OK** (`cd ~/SRC/biohack.net &&
   task publish TAG=v1.0.75`). Future refactor: move HUD/shields from OAM sprites to `TextLayer`/`ShieldField`
   BG layers.
+- [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
 - [ ] **Compiler stress-test demo battery — algorithm+visual SNES demos**
   ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
@@ -382,7 +383,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     [plan](docs/plans/2026-06-27-11-snes-spirograph-hypotrochoid.md). **PUBLISHED — playable in-browser at
     https://biohack.net/spirograph/** (biohack.net v1.0.78, `snes-rom-page`; bsnes-jg WASM + Verify-fidelity
     selfcheck 0x32D4).
-  - [x] ~~**#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.~~ [plan](docs/plans/2026-06-27-13-snes-nbody-orbits.md)
+  - [x] ~~**#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.~~ [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
   - [x] ~~**#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.~~
   - [wip] **#16 Wireframe 3-D solid** — 3×3 matrix mul + perspective **divide** + Bresenham; shows a spinning solid.
     **PLAN WRITTEN** ([plan](docs/plans/2026-06-27-16-snes-wireframe-3d-solid.md)) — direct successor to #11:
@@ -609,7 +610,7 @@ revisit) rather than active work._
 
 ## Done
 
-- 2026-06-27 — [snes-nbody] **#13 N-body orbits SNES demo.** Sun+Earth+Jupiter Symplectic Euler; corpus gate 0xCC65 (32 steps), 5-way PASS (__udivsi3=2 __mulsi3=6 rep/sep=82), published [biohack.net/nbody/](https://biohack.net/nbody/). [plan](docs/plans/2026-06-27-13-snes-nbody-orbits.md)
+- 2026-06-27 — [snes-n-body] **#13 N-body orbits SNES demo.** Sun+Earth+Jupiter Symplectic Euler; corpus gate 0xCC65 (32 steps), 5-way PASS (__udivsi3=2 __mulsi3=6 rep/sep=82), published [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/). [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
 - 2026-06-27 — [snes-1d-ca] **#6 Rule 90/110 1-D CA SNES demo.** Bitpacked 256-cell CA; sliding-window inner loop (constant-1 shifts only); corpus gate 0xAB2C (32 R90 + 32 R110 gens), 5-way PASS (shifts=7 bools=11 bad_mul=0), published [biohack.net/1d-ca/](https://biohack.net/1d-ca/). [plan](docs/plans/2026-06-27-6-snes-rule90-110-1d-ca.md)
 - 2026-06-27 — [snes-double-pendulum] **#14 Double Pendulum chaos SNES demo.** Two pendulums, 1 LUT-tick offset → diverging path traces; corpus gate 0xE859 (256 steps), 5-way PASS (__mulsi3=6 __divsi3=2 rep/sep=77), published [biohack.net/double-pendulum/](https://biohack.net/double-pendulum/). [plan](../../biohack.net/docs/plans/2026-06-27-14-snes-double-pendulum.md)
 - 2026-06-27 — [snes-pi-spigot] **#19 π Spigot + Monte-Carlo SNES demo.** Rabinowitz-Wagon carry chain + MC darts, corpus gate 0x771D (PI_GATE_DIGITS=1, PI_GATE_THROWS=256), corpus-a16 10/10 PASS, published [biohack.net/spigot/](https://biohack.net/spigot/) v1.0.82. [plan](docs/plans/2026-06-27-19-snes-pi-spigot-montecarlo.md)
