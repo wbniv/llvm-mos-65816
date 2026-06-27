@@ -5,7 +5,7 @@
 "Compiler stress-test demo battery" → **#13**). Supplements the standing guides (`~/SRC/CLAUDE.md`,
 project `CLAUDE.md`, [`docs/agent-handoff.md`](../agent-handoff.md)). It is the **physics/integration**
 member of the battery. Final step: **publish the verified `.sfc` as a playable in-browser page at
-[https://biohack.net/nbody/](https://biohack.net/nbody/)** via the `snes-rom-page` skill.
+[https://biohack.net/snes/n-body/](https://biohack.net/snes/n-body/)** via the `snes-rom-page` skill.
 
 ---
 
@@ -25,7 +25,7 @@ the orbits bloom again. Stress targets: **16×16→32 multiply** (r² computatio
 
 **No far pointers** → builds default-8-bit AND `+mos-a16` AND `+mos-xy16` → **full 5-way differential bar**.
 
-**Publish:** [biohack.net/nbody/](https://biohack.net/nbody/) via `/snes-rom-page` skill.
+**Publish:** [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/) via `/snes-rom-page` skill.
 
 ---
 
@@ -256,16 +256,16 @@ BOX_ROW    = 1        rows 1..16 (px 8..135)
 | Path | Purpose |
 |------|---------|
 | `examples/65816/nbody.h` | Portable physics: `Body` struct, `nbody_init()`, `nbody_step()`, `nbody_gate_crc()`; `#ifdef HOST` oracle path |
-| `examples/snes/nbody.c` | SNES ROM: `BitmapCanvas` + CGRAM fade + `NbodyHud` + frame loop |
+| `examples/snes/n-body.c` | SNES ROM: `BitmapCanvas` + CGRAM fade + `NbodyHud` + frame loop |
 | `examples/snes/corpus/nbody_sim.c` | Corpus slice: calls `nbody_gate_crc()`, writes `corpus_result` |
 | `tools/nbody-sim.c` | Host oracle: same function, prints golden hash |
-| `dev/nbody.sh` | Gate: build ROM → disasm probe → bsnes-jg → MAME |
+| `dev/n-body.sh` | Gate: build ROM → disasm probe → bsnes-jg → MAME |
 
 ### Modified
 
 | Path | Change |
 |------|--------|
-| `Taskfile.yml` | Add `task nbody` target |
+| `Taskfile.yml` | Add `task n-body` target |
 | `TODO.md` | Add plan link to `#13`; mark `[wip]` when implementation starts, `[x]` when verified |
 | `docs/investigations/plan-index.md` | Add row for this plan |
 
@@ -281,7 +281,7 @@ BOX_ROW    = 1        rows 1..16 (px 8..135)
 | `font8.h` | `examples/snes/` | 8×8 glyphs for HUD (0-9 + uppercase) |
 | `snes_wait_vblank()`, `snes_ppu_reset_blank()` | `platforms/snes/snes.h` | SNES boot + frame |
 | `tools/spiro-sim.c` | `tools/` | Template for `tools/nbody-sim.c` |
-| `dev/spirograph.sh` | `dev/` | Template for `dev/nbody.sh` |
+| `dev/spirograph.sh` | `dev/` | Template for `dev/n-body.sh` |
 | `examples/snes/corpus/spiro_sim.c` | `examples/snes/corpus/` | Template for `nbody_sim.c` |
 
 **Not reused:** `snesgfx/text_layer.h` (the spirograph text layer is BG3-cotenant and needs its char
@@ -301,10 +301,10 @@ corpus_result (volatile uint16_t):
     - Fold each body's x, y, vx, vy into h via rotate-XOR
     - Return h (16-bit)
 
-Gate (dev/nbody.sh):
+Gate (dev/n-body.sh):
   host == clang-default@MAME == clang-+mos-a16@MAME == clang-+mos-xy16@MAME == default/a16@bsnes-jg
 
-Disasm probe (in nbody.sh):
+Disasm probe (in n-body.sh):
   - __mulsi3 or 16×16→32 mul count >= 2  (r² computation: dx*dx + dy*dy)
   - __udivsi3 count >= 1  (GRAV_K / r2 — the 1/r² force)
   - rep / sep instructions present  (native 16-bit bracketing under +mos-a16)
@@ -316,42 +316,42 @@ corpus_result: `0xCC65` (NBODY_GATE_STEPS=32, host == default@MAME == +mos-a16@M
 
 ## Publication
 
-**Published:** [biohack.net/nbody/](https://biohack.net/nbody/) — biohack.net commit `fbdaeae`, tag `v1.0.88`.
+**Published:** [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/) — biohack.net commit `fbdaeae`, tag `v1.0.88`.
 
 ```bash
 ~/.config/claude/will/skills/snes-rom-page/scaffold.sh \
-  --rom build/nbody.sfc \
-  --slug nbody \
+  --rom build/n-body.sfc \
+  --slug n-body \
   --site /home/will/SRC/biohack.net \
   --title "N-body Orbits" \
-  --preview build/nbody-mame.png \
+  --preview build/n-body-mame.png \
   --selfcheck "0x14FA 2 0xCC65 500 N-body (N=3) Symplectic Euler 32 steps hash=0xCC65"
 ```
 
-Page `src/pages/nbody.astro`: lede with Symplectic Euler + Q8.8 fixed-point description, emulator
+Page `src/pages/snes/n-body.astro`: lede with Symplectic Euler + Q8.8 fixed-point description, emulator
 widget, force-pair pseudocode block, codegen-under-test table, technical notes (noinline register-pressure fix).
-Gallery (`snes.astro`): 8th demo entry; lede updated to "Eight Super Nintendo programs".
+Gallery (`snes/index.astro`): 8th demo entry; lede updated to "Eight Super Nintendo programs".
 
 ---
 
 ## Verification Steps
 
-1. Build + smoke: `task nbody` compiles `build/nbody.sfc` (`+mos-a16`); MAME boots, writes
+1. Build + smoke: `task n-body` compiles `build/n-body.sfc` (`+mos-a16`); MAME boots, writes
    `corpus_result` without crashing; headless screenshot (500 frames ≈ 8 s) shows at least 2 bodies
    visibly in motion on canvas with trail marks, energy readout stable.
 
     ```
     ==> host oracle: N-body gate hash = 0xCC65
-    ==> built build/nbody.sfc (+mos-a16); corpus_result @ WRAM 0x14fa
-    ==> bsnes-jg: render + framebuffer dump (build/nbody-jg.png) + assert
+    ==> built build/n-body.sfc (+mos-a16); corpus_result @ WRAM 0x14fa
+    ==> bsnes-jg: render + framebuffer dump (build/n-body-jg.png) + assert
     SMOKE: PASS off=0x14FA len=2 got=0xCC65 (ran 500 frames, bsnes-jg)
-    ==> MAME (under Xvfb): snapshot + assert (build/nbody-mame.png)
+    ==> MAME (under Xvfb): snapshot + assert (build/n-body-mame.png)
         SHOT: PASS corpus=0xCC65 (snapshot at frame 500)
     RESULT: PASS — N-body orbits rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xCC65 host == +mos-a16
     ```
     PASS
 
-2. Disasm probe: `dev/nbody.sh` disasm gate — `__mulsi3`/16×16→32 ≥ 2, `__udivsi3` ≥ 1,
+2. Disasm probe: `dev/n-body.sh` disasm gate — `__mulsi3`/16×16→32 ≥ 2, `__udivsi3` ≥ 1,
    `rep`/`sep` ≥ 1.
 
     ```
@@ -361,17 +361,17 @@ Gallery (`snes.astro`): 8th demo entry; lede updated to "Eight Super Nintendo pr
     PASS
 
 3. **Publish** (before full gate): `/snes-rom-page` — scaffold + build + headless screenshot of
-   [biohack.net/nbody/](https://biohack.net/nbody/) shows emulator playing; gallery updated.
+   [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/) shows emulator playing; gallery updated.
 
     ```
     scaffold: nbody -> /home/will/SRC/biohack.net/public/play
       engine  play/app.js
-      rom     play/roms/nbody.sfc (32768 bytes)
-      preview play/preview/nbody.png
+      rom     play/roms/n-body.sfc (32768 bytes)
+      preview play/preview/n-body.png
       manifest play/roms/manifest.json (8 rom(s))
     build: 12 page(s) built in 1.20s
     headless screenshot: ROM running at FRAME:264, orbital trails visible
-    gallery: snes.astro updated (8 demos), "Eight Super Nintendo programs"
+    gallery: snes/index.astro updated (8 demos), "Eight Super Nintendo programs"
     biohack.net commit fbdaeae, tag v1.0.88, pushed → Cloudflare Pages deploy triggered
     ```
     PASS
@@ -406,7 +406,7 @@ Gallery (`snes.astro`): 8th demo entry; lede updated to "Eight Super Nintendo pr
     ```
     PASS
 
-6. `task md -- docs/plans/2026-06-27-13-snes-nbody-orbits.md` — plan renders cleanly.
+6. `task md -- docs/plans/2026-06-27-13-snes-n-body-orbits.md` — plan renders cleanly.
 
     ```
     (visual check pending)
