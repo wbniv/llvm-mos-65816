@@ -24,6 +24,7 @@
 #define HOP_NOINLINE __attribute__((noinline))    // bound +mos-a16 pressure on the far-RMW path
 #include <snes.h>
 #include "mode7.h"
+#include "snesgfx/splash.h"
 #include "../65816/hopalong.h"
 #include "blossom.h"
 #include "hud.h"
@@ -181,6 +182,11 @@ static void vram_clear_all(void) {
 
 int main(void) {
   snes_ppu_reset_blank();
+  // Title splash (Mode 7 has no spare BG -> temporary BGMODE_1 BG3 text): ~1.5 s, then restores
+  // force-blank + self-clears its VRAM. The grid-hash corpus_result is deterministic (timing-
+  // independent), and the controller differential asserts the ROM's CRC against a replay of the
+  // ROM's OWN pad log, so the splash's frame shift doesn't change the asserted result.
+  splash_show("BLOSSOM", "HOPALONG ATTRACTOR", 90);
   vram_clear_all();                       // wipe random power-on VRAM before anything can be displayed
   m7_begin();
   m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, M7_TILEMAP_WORDS);

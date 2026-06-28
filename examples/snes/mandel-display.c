@@ -20,6 +20,7 @@
 // tools/mandel-render 64 56 15 == 0x204F.
 #include <snes.h>
 #include "mode7.h"
+#include "snesgfx/splash.h"
 #include "../65816/mandel.h"
 #include "sincos.h"
 
@@ -124,6 +125,12 @@ static void coarse_pass(uint8_t cw, uint8_t ch, uint8_t shx, uint8_t shy, uint8_
 
 int main(void) {
   snes_ppu_reset_blank();                       // force-blank + zero PPU control regs
+
+  // Title splash (Mode 7 has no spare BG, so a temporary BGMODE_1 BG3 text layer): ~1.5 s, then it
+  // restores force-blank and self-clears its VRAM so the Mode 7 setup below starts clean. The huge
+  // gate frame budget (jgxcheck 5800 / MAME 120 s) absorbs the added frames; corpus_result is the
+  // image CRC, stable long after settle.
+  splash_show("MANDELBROT", "ESCAPE TIME", 90);
 
   // One-time Mode 7 setup (force-blanked): enter Mode 7, clear the 128x128 tilemap and lay the 8x7
   // identity, load the palette, frame the image at 4x (a=d=0x0040 -> 64x56 fills 256x224, top-left

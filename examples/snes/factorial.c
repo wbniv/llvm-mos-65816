@@ -34,7 +34,7 @@
 
 // BG3 2bpp palettes (4 entries × 2 bytes, uploaded to CGRAM during init):
 //   palette 0 (CGRAM  0..3): digit area  — white on black
-//   palette 1 (CGRAM  8..11): HUD row   — cyan on black
+//   palette 2 (CGRAM  8..11): HUD row   — cyan on black (2bpp: palette N → CGRAM N*4)
 static const uint16_t pal_digits[4] = {
     SNES_RGB(0,  0,  0), SNES_RGB(31, 31, 31), SNES_RGB(0, 0, 0), SNES_RGB(0, 0, 0),
 };
@@ -106,9 +106,12 @@ static inline uint16_t _tile(char c) {
         : (uint16_t)FONT_BASE;
 }
 
-// Same but palette 1 (cyan HUD): OR in palette bits 13-15 = 001 → 1 << 13.
+// Same but the cyan HUD palette. pal_hud is uploaded to CGRAM 8..11 (line 194), which
+// for 2bpp BG3 is palette 2 (palette N -> CGRAM N*4). The tilemap palette field is bits
+// 10-12 (vhopppcc cccccccc), so select it with 2 << 10 — NOT 1 << 13 (which sets the
+// priority bit and leaves the palette field 0, rendering the HUD in palette-0 white).
 static inline uint16_t _tile_hud(char c) {
-    return (uint16_t)(_tile(c) | (uint16_t)(1u << 13));
+    return (uint16_t)(_tile(c) | (uint16_t)(2u << 10));
 }
 
 // uint16_t → NUL-terminated decimal (buf ≥ 6 bytes). Returns buf.

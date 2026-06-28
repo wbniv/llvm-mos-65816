@@ -15,6 +15,10 @@
 #include "snesgfx/display.h"
 #include "snesgfx/drawable.h"
 #include "snesgfx/upload.h"
+/* This demo's BG3 chr fills VRAM words 0x0000..0x2000 (1024 2bpp tiles), so move the title's BG2
+   char base clear of it before including title_layer.h (default 0x1000 would collide). */
+#define TITLE_CHR_WORD 0x6000u
+#include "snesgfx/title_layer.h"
 #include "snesgfx/controller.h"
 #include "../65816/ca1d.h"
 
@@ -176,7 +180,16 @@ int main(void) {
     static App a;
     app_init(&a);
 
+    // Title overlay (BG2, char base moved to 0x6000 above); held during the gate CRC, then torn
+    // down before the automaton scrolls. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
+    static TitleLayer title;
+    title_init(&title, "CELLULAR AUTOMATA", "RULE 90 / 110");
+    display_add(&a.screen, (Drawable *)&title);
+    display_frame(&a.screen);
+
     corpus_result = ca_gate_crc();
+    display_hold(&a.screen, 110);                            // ~2 s title (consistent on-screen time)
+    display_hide_layer(&a.screen, (Drawable *)&title);
 
     for (;;) {
         uint8_t *src, *dst;

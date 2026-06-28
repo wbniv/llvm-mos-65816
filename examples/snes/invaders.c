@@ -13,6 +13,7 @@
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/sprite_set.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/controller.h"
 #include "invaders_logic.h"
 #include "invaders_art.h"
@@ -145,9 +146,17 @@ static void game_update(Game *g) {
 int main(void) {
   static Game g;
   game_init(&g);
+  /* Title overlay on BG2 (OBJ chr lives at 0x4000.., the default title regions 0x1000/0x5000 are
+     free). Overlaid on the first 60 attract frames and hidden IN-loop — no pre-loop hold frames, so
+     the gate's frame-INV_FRAMES corpus latch is unaffected (gate-neutral). */
+  static TitleLayer title;
+  title_init(&title, "SPACE INVADERS", "SPRITES + OAM");
+  display_add(&g.screen, (Drawable *)&title);
+  uint16_t tf = 0;
   for (;;) {
     game_update(&g);
     render(&g.sim, &g.sprites);
+    if (tf < 60u && ++tf == 60u) display_hide_layer(&g.screen, (Drawable *)&title);
     display_frame(&g.screen);     // wait v-blank, emit OAM, flush DMA, release force-blank on frame 1
   }
 }

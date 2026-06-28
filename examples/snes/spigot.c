@@ -22,6 +22,7 @@
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/drawable.h"
 #include "snesgfx/vram.h"
@@ -313,11 +314,20 @@ int main(void) {
     static App a;
     app_init(&a);
 
+    // Title overlay (BG2), added after the demo layers; held during the gate CRC, then torn down
+    // before the digits stream. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
+    static TitleLayer title;
+    title_init(&title, "PI SPIGOT", "MONTE CARLO");
+    display_add(&a.screen, (Drawable *)&title);
+    display_frame(&a.screen);
+
     // Self-verify: run the gate CRC using the App's pre-allocated state.
     // pi_gate_crc() reinitializes sp + mc; we re-init them after for the main loop.
     corpus_result = pi_gate_crc(&a.sp, &a.mc);
     pi_spigot_init(&a.sp);
     mc_init(&a.mc, 0xBEEF);
+    display_hold(&a.screen, 110);                            // ~2 s title (gate hash is fast here)
+    display_hide_layer(&a.screen, (Drawable *)&title);
 
     for (;;) {
         // 1. Spigot: advance the carry sweep; dequeue output digits.

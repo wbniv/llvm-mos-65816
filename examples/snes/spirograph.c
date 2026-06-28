@@ -13,6 +13,7 @@
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"
 #include "snesgfx/text_layer.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/controller.h"
 #include "spirograph.h"
 
@@ -108,7 +109,15 @@ static void app_init(App *a) {
 int main(void) {
   static App a;
   app_init(&a);
+  /* Title overlay (BG2), added after the demo layers; held while the gate-CRC computes, then torn
+     down before the curve blooms. Gate-neutral (no DMA; corpus_result is the pre-loop hash). */
+  static TitleLayer title;
+  title_init(&title, "SPIROGRAPH", "HYPOTROCHOID");
+  display_add(&a.screen, (Drawable *)&title);
+  display_frame(&a.screen);
   corpus_result = spiro_gate_crc();                           // self-verify curve math == host 0x32D4
+  display_hold(&a.screen, 110);                               // ~2 s title (gate hash is fast here)
+  display_hide_layer(&a.screen, (Drawable *)&title);
   for (;;) {
     controller_poll(&a.pad);
     spiro_view_step(&a.view, controller_held(&a.pad));        // edge/level handling inside

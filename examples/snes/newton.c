@@ -7,6 +7,7 @@
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/drawable.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/vram.h"
 #include "../65816/newton.h"
@@ -23,7 +24,10 @@
 /* 4 palettes × 16 colours = 64 CGRAM entries (128 bytes).
  * Palette 0 = all black (diverged / background).
  * Palettes 1–3 = root 1/2/3: colour 0 = black, colours 1–15 = dark→bright.
- * Tilemap word: (root << 12) | shade  where shade=15 (fast) to 1 (slow). */
+ * Tilemap word: (root << 10) | shade  where shade=15 (fast) to 1 (slow).
+ * The BG tilemap palette field is bits 10-12 (vhopppcc cccccccc), so the root
+ * index (1/2/3 -> palette 1/2/3) shifts << 10, NOT << 12 (which would select the
+ * uninitialised CGRAM palettes 4-5 = garbage colours). See hud.h:46. */
 static const uint16_t newton_pal[64] = {
     /* Palette 0 — diverged (all black) */
     SNES_RGB( 0, 0, 0), SNES_RGB( 0, 0, 0), SNES_RGB( 0, 0, 0), SNES_RGB( 0, 0, 0),
@@ -123,7 +127,7 @@ static uint16_t newton_tile(uint16_t tx, uint16_t ty) {
     uint8_t shade = (iters == 0u) ? 15u :
                     (iters >= 14u) ? 1u  :
                     (uint8_t)(15u - iters);
-    return (uint16_t)(((uint16_t)(uint8_t)root << 12) | shade);
+    return (uint16_t)(((uint16_t)(uint8_t)root << 10) | shade);
 }
 
 volatile uint16_t corpus_result;
@@ -136,8 +140,17 @@ int main(void) {
     display_init(&d);
     display_add(&d, (Drawable *)&layer);
 
+    /* Title overlay on BG2, added AFTER the demo layer so its REG_BG12NBA write wins. Shown while
+       the slow gate-hash compute runs below (no display_frame -> the PPU holds the title on screen),
+       then torn down before the progressive fill begins. Gate-neutral: no DMA, hash is pre-loop. */
+    static TitleLayer title;
+    title_init(&title, "NEWTON FRACTAL", "COMPLEX DIVISION");
+    display_add(&d, (Drawable *)&title);
+    display_frame(&d);                       /* release force-blank with the title visible */
+
     /* Gate hash runs before the display loop (no V-blank waits; ~64-128 ms emulated). */
     corpus_result = newton_gate_crc();
+    display_hide_layer(&d, (Drawable *)&title);   /* title done; reveal BG1 for the fill */
 
     /* Progressive rendering: NEWTON_TPF tiles/frame → full screen in ~224 frames. */
     uint16_t next_tile = 0;

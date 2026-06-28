@@ -9,6 +9,7 @@
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/drawable.h"
 #include "snesgfx/vram.h"
@@ -97,8 +98,17 @@ int main(void) {
     static App a;
     app_init(&a);
 
+    // Title overlay (BG2), added after the demo layer; held during the gate CRC, then torn down
+    // before the path traces. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
+    static TitleLayer title;
+    title_init(&title, "DOUBLE PENDULUM", "CHAOS");
+    display_add(&a.screen, (Drawable *)&title);
+    display_frame(&a.screen);
+
     // Gate CRC: deterministic 256-step hash written to WRAM before display loop.
     corpus_result = dpend_gate_crc();
+    display_hold(&a.screen, 110);                            // ~2 s title (gate hash is fast here)
+    display_hide_layer(&a.screen, (Drawable *)&title);
 
     for (;;) {
         // 4 integration substeps per frame for smoother motion.

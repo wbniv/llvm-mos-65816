@@ -18,8 +18,9 @@
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"
 #include "snesgfx/text_layer.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
-#include "../65816/nbody.h"
+#include "../65816/n-body.h"
 
 // ---------------------------------------------------------------------------
 // VRAM layout
@@ -195,9 +196,18 @@ int main(void) {
 
     app_init(&a);
 
+    // Title overlay (BG2), added after the demo layers; held while the gate CRC computes, then torn
+    // down before the orbits draw. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
+    static TitleLayer title;
+    title_init(&title, "N-BODY ORBITS", "GRAVITY");
+    display_add(&a.screen, (Drawable *)&title);
+    display_frame(&a.screen);
+
     // Compute the gate CRC before entering the display loop.
     // nbody_gate_crc() uses its own local NBody array, so the running sim is unaffected.
     corpus_result = nbody_gate_crc();
+    display_hold(&a.screen, 110);                            // ~2 s title (gate hash is fast here)
+    display_hide_layer(&a.screen, (Drawable *)&title);
 
     for (;;) {
         // 1. Physics: one Symplectic Euler step.

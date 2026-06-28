@@ -50,6 +50,15 @@ static inline void display_add(Display *d, Drawable *layer) {
   REG_TM = d->tm;
 }
 
+/* Disable a previously display_add'd layer: clear its TM bits from the shadow and rewrite the
+   write-only TM register. Used to tear down a transient overlay (e.g. a TitleLayer shown during a
+   demo's slow pre-loop compute) so the demo's own layer takes over. TM is a plain PPU control
+   register (not VRAM/CGRAM/OAM), so this is safe to call outside v-blank. */
+static inline void display_hide_layer(Display *d, Drawable *layer) {
+  d->tm = (uint8_t)(d->tm & (uint8_t)~layer->tm_bits);
+  REG_TM = d->tm;
+}
+
 /* One frame: wait a FRESH v-blank, force-blank during DMA (allows VRAM writes at any
    scanline — timing drift from a slightly-over-budget compute loop can push the DMA tail
    into active display; force-blank ensures those writes are never rejected).
@@ -63,6 +72,16 @@ static inline void display_frame(Display *d) {
   upq_flush(&d->q);                         /* DMA — CPU stalls per job until transfer done   */
   REG_INIDISP = INIDISP_ON;                 /* restore brightness                             */
   d->shown = 1;
+}
+
+/* Hold the current screen (e.g. a just-added TitleLayer) for `frames` v-blanks. Each frame still
+   emits the scene, so a demo's initial (blank) layer is harmless underneath the overlay. Use this to
+   guarantee a minimum on-screen title time for demos with little pre-loop compute; demos with a long
+   pre-loop compute (e.g. Newton's gate hash) need 0 here because the compute itself holds the title.
+   NOTE: these frames shift a fixed-time gate screenshot — re-confirm the demo's render still completes
+   before its dev/<demo>.sh capture (bump -seconds_to_run / jgxcheck frames if not). */
+static inline void display_hold(Display *d, uint16_t frames) {
+  while (frames--) display_frame(d);
 }
 
 #endif /* SNESGFX_DISPLAY_H */

@@ -16,6 +16,7 @@
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/drawable.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/vram.h"
 #include "../65816/rdiff.h"
@@ -144,6 +145,17 @@ int main(void) {
     Display d;
     display_init(&d);
     display_add(&d, (Drawable *)&rdiff);
+
+    /* Title overlay (BG2), added after the demo layer. rdiff's gate hash is computed before the
+       display exists (above), so there is no long compute to hide behind — hold the title a fixed
+       ~1 s, then tear it down. The reaction-diffusion is continuous, so the ~60-frame offset does
+       not affect the (separately-asserted) corpus hash; re-confirm the screenshot if it ever gates
+       on a framebuffer CRC. */
+    static TitleLayer title;
+    title_init(&title, "REACTION DIFFUSION", "GRAY-SCOTT");
+    display_add(&d, (Drawable *)&title);
+    display_hold(&d, 110);
+    display_hide_layer(&d, (Drawable *)&title);
 
     for (;;) {
         /* GS simulation steps (during active display — compute budget ≈ 44% of frame) */
