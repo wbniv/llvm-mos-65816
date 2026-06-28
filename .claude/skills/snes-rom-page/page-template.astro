@@ -1,0 +1,141 @@
+---
+// src/pages/{{SLUG}}.astro — playable in-browser {{TITLE}} (SNES) + instructions.
+//
+// Boots the shared bsnes-jg WASM player (public/play/app.js — the cycle-accurate core) on
+// roms/{{SLUG}}.sfc. Self-contained: emulator markup + boot script + styles below. Brand the
+// colours to the host site (see SKILL.md "Per-site" notes); the layout/CSS works as-is on any
+// Astro static site.
+//
+// Cache-busting: hash each play/ asset at build time -> window.BJG_BUST (path -> short sha); app.js
+// appends "?v=<sha>" to every fetch so the edge caches them immutably yet a re-synced asset still
+// gets a fresh URL. Missing files degrade to plain paths.
+import Base from '../layouts/Base.astro';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+
+const PLAY = 'public/play';
+const BUST_ASSETS = [
+  'app.js', 'cores/bsnes_jg.js', 'cores/bsnes_jg.wasm', 'cores/PROVENANCE.json',
+  'roms/manifest.json', 'roms/{{SLUG}}.sfc', 'preview/{{SLUG}}.png',
+];
+const bust: Record<string, string> = {};
+for (const a of BUST_ASSETS) {
+  try { bust[a] = createHash('sha256').update(readFileSync(`${PLAY}/${a}`)).digest('hex').slice(0, 12); } catch {}
+}
+const appV = bust['app.js'] ?? '';
+
+// EDIT: each row is [keys, action]. These are the in-browser keys (see the keymap in SKILL.md).
+const controls = [
+  ['← ↑ ↓ →', 'D-pad'],
+  ['Z / X', 'B / A'],
+  ['A / S', 'Y / X'],
+  ['Q / W', 'L / R'],
+  ['Enter', 'Start'],
+  ['Shift', 'Select'],
+];
+---
+
+<Base title="{{TITLE}}" description="{{DESC}}">
+  <main class="rp-wrap">
+
+    <header class="rp-hero">
+      <h1 class="rp-title">{{TITLE}}</h1>
+      <p class="rp-lede">{{DESC}}</p>
+    </header>
+
+    <!-- emulator (centred) -->
+    <section id="bjg-embed" class="rp-player" aria-label="Live SNES emulator running {{TITLE}}">
+      <div class="rp-screen"><canvas id="screen" width="256" height="224" aria-label="SNES screen"></canvas></div>
+      <div class="rp-row">
+        <span id="status" class="rp-status">loading core…</span>
+        <span id="checkresult" class="rp-badge"></span>
+        <button id="verify" class="rp-btn" disabled>Verify fidelity</button>
+        <button id="fullscreen" class="rp-btn">Fullscreen</button>
+      </div>
+      <p class="rp-keys">{{KEYS_LINE}}</p>
+      <p id="banner" class="rp-banner"></p>
+      <p class="rp-hint">Click the screen, then play. (Tab away and it pauses.)</p>
+    </section>
+
+    <!-- instructions -->
+    <section class="rp-doc">
+      <h2>Controls</h2>
+      <table class="rp-table">
+        <thead><tr><th>Keys</th><th>Action</th></tr></thead>
+        <tbody>
+          {controls.map(([k, a]) => (<tr><td><kbd>{k}</kbd></td><td>{a}</td></tr>))}
+        </tbody>
+      </table>
+
+      {/* EDIT: replace with the ROM-specific notes (what it is, what the buttons do, tips). */}
+      {{INSTRUCTIONS}}
+    </section>
+
+  </main>
+</Base>
+
+<script is:inline define:vars={{ bust, appV, slug: '{{SLUG}}' }}>
+  // (Re)boot the player on each page-load so it survives view transitions (if the site uses them).
+  function bootEmulator() {
+    if (!document.getElementById('bjg-embed')) return;
+    if (window.__bjgStop) { try { window.__bjgStop(); } catch (e) {} }
+    window.BJG_BASE = '/play/';
+    window.BJG_DEFAULT_ROM = slug;
+    window.BJG_BUST = bust;
+    window.BsnesJg = undefined;
+    window.__bjg = undefined;
+    var old = document.getElementById('bjg-appjs');
+    if (old) old.remove();
+    var s = document.createElement('script');
+    s.id = 'bjg-appjs';
+    s.src = '/play/app.js' + (appV ? '?v=' + appV : '');
+    document.body.appendChild(s);
+  }
+  if (!window.__bjgReg) {
+    window.__bjgReg = true;
+    document.addEventListener('astro:page-load', bootEmulator);
+  }
+  // Sites without a ClientRouter never fire astro:page-load — boot directly too.
+  if (document.readyState !== 'loading') bootEmulator();
+  else document.addEventListener('DOMContentLoaded', bootEmulator);
+</script>
+
+<style>
+  /* Brand: override --rp-accent / colours to the host site. Everything else is layout. */
+  .rp-wrap { --rp-accent: #c2410c; max-width: 900px; margin-inline: auto; padding: 2rem 1.25rem 4rem; color: inherit; }
+  .rp-hero { max-width: 42rem; margin-inline: auto; text-align: center; }
+  .rp-title { font-size: clamp(2rem, 7vw, 3.25rem); font-weight: 800; margin: 0; }
+  .rp-lede { margin: .75rem 0 0; opacity: .85; line-height: 1.6; }
+
+  /* the player — CENTRED, capped near 2x the 256x224 native */
+  .rp-player { max-width: 544px; margin: 2rem auto 0; }
+  .rp-screen { width: 100%; background: #000; border-radius: 8px; line-height: 0; }
+  /* NATURAL aspect, full height — no overflow:hidden / object-fit, which would shave the top scanline
+     (the SNES picture's first visible row sits flush at canvas row 0 after the player's crop). */
+  .rp-screen canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+  .rp-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin-top: .85rem;
+            font: 12px/1.4 ui-monospace, monospace; opacity: .8; }
+  .rp-btn { margin-left: auto; background: transparent; color: inherit; cursor: pointer; font-size: 12px;
+            border: 1px solid color-mix(in srgb, var(--rp-accent) 45%, transparent);
+            border-radius: 8px; padding: .4rem .85rem; transition: border-color .15s, color .15s; }
+  .rp-btn:hover:not(:disabled) { border-color: var(--rp-accent); color: var(--rp-accent); }
+  .rp-btn:disabled { opacity: .45; cursor: not-allowed; }
+  .rp-badge { font: 12px ui-monospace, monospace; }
+  .rp-badge.running { color: var(--rp-accent); }
+  .rp-badge.pass { background: #54d98c; color: #0c1116; font-weight: 600; padding: 2px 8px; border-radius: 5px; }
+  .rp-badge.fail { background: #ff6b6b; color: #0c1116; font-weight: 600; padding: 2px 8px; border-radius: 5px; }
+  .rp-keys { margin: .75rem 0 0; font-size: 11.5px; opacity: .75; }
+  .rp-keys b { opacity: 1; font-weight: 600; }
+  .rp-hint { margin: .5rem 0 0; font-size: 12px; opacity: .6; }
+  .rp-banner { margin: .6rem 0 0; font-size: 12px; opacity: .75; }
+
+  /* instructions */
+  .rp-doc { max-width: 42rem; margin: 3rem auto 0; line-height: 1.65; }
+  .rp-doc h2 { font-size: 1.5rem; margin: 2rem 0 .5rem; }
+  .rp-table { width: 100%; max-width: 28rem; border-collapse: collapse; margin: .5rem 0 1rem; }
+  .rp-table th { text-align: left; text-transform: uppercase; font-size: .72rem; letter-spacing: .08em;
+                 opacity: .6; padding: .35rem .6rem; border-bottom: 1px solid currentColor; }
+  .rp-table td { padding: .35rem .6rem; border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent); }
+  .rp-doc kbd { font: 600 .82em ui-monospace, monospace; border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+                border-radius: 4px; padding: .05em .4em; }
+</style>

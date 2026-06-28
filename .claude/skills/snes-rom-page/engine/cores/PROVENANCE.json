@@ -1,0 +1,9 @@
+{
+  "core": "bsnes-jg (jgemu/bsnes)",
+  "source": "https://gitlab.com/jgemu/bsnes/-/archive/2.1.0/bsnes-2.1.0.tar.gz",
+  "version": "2.1.0",
+  "sha256": "a8e0fd36711406198afe1110ddc6960c9d795f4ab73d0badd8878396ac3d0c42",
+  "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.1 (25e4e8d6550d392ba9e0c2936bce7cf41ee47cc0)",
+  "built": "2026-06-25T14:34:26Z",
+  "note": "the exact core+version the llvm-mos-65816 differential gate trusts (dev/jgxcheck.cpp)"
+}
