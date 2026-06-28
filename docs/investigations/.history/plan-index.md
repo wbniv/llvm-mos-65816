@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/99c1485) | docs(plan-index): add #16 Wireframe 3-D Solid row (56cf11c) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/eb378b1) | docs(plan-index): add SHA b76f8ef for #2 Newton's-method fractal plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/67804be) | docs(plan-index): add SHA 7bb4f86 for #20 factorial plan row |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/7bb4f86) | feat(snes): #20 Bignum Factorial demo (factorial) |
@@ -51,6 +52,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+99c1485	author	Will Norris
+99c1485	added	3
+99c1485	deleted	1
+99c1485	files	1
+99c1485	body	Clears the plan-index drift flagged by the audit-plan-deferrals hook on\nthe prior commit. The plan was created in 56cf11c ("plan") and was missing\na row in docs/investigations/plan-index.md.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 eb378b1	author	Will Norris
 eb378b1	added	1
 eb378b1	deleted	1

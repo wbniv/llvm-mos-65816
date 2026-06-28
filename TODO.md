@@ -541,11 +541,18 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   eventual #320 PR but is **gated on the ABI-blessing design note** (the M1 "#320 post design note upstream"
   item) — so it's tracked under *Future/blocked* in
   [upstream-contribution-status](docs/upstream-contribution-status.md), not ready-to-post.
-- [ ] **Post LTO + `+mos-a16` bitmask-loop early-exit bug** (user-triggered; issue only, no fix patch yet).
-  LTO miscompile: a `for (uint8_t r=0; r<28; r++) { bits & (1u<<r); }` loop generates `cmp r, #16; jmp rts`
-  — exits at the first r ≥ 16 iteration. Confirmed in `_fact_emit` (factorial demo pre-fix ROM). Exact `gh
-  issue create` in [upstream-contribution-status](docs/upstream-contribution-status.md) (item 11) · body
-  [321-upstream-lto-a16-bitmask-loop-early-exit-issue.md](docs/321-upstream-lto-a16-bitmask-loop-early-exit-issue.md).
+- [x] ~~**LTO + `+mos-a16` bitmask-loop early-exit bug** — draft upstream issue~~ → **RETRACTED as a
+  MISDIAGNOSIS (2026-06-28); DO NOT POST.** Controlled rebuild proved `cmp #$10` is `_fact_emit`'s
+  `q->n < UPQ_MAX_JOBS` (=16) queue-full exit, not the shift counter `r`: `-DUPQ_MAX_JOBS=20` moves it to
+  `cmp #$14` (tracks the macro). No row-skip miscompile. Issue body + status item 11 banner-retracted.
+  [plan/evidence](docs/plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md).
+- [ ] **(OPEN follow-up) Root-cause the *real* factorial stall** behind the `3ab028e` delay-counter
+  workaround — possible 32-bit `dirty_rows == 0` miscompile under **LTO** (non-LTO codegen is correct) or a
+  frame-ordering bug. Needs a runnable LTO build; currently **blocked** by an unrelated `__memset_far`
+  far-memops legalization crash (`G_PTR_ADD p2,s16`) that breaks `dev/run.sh build` (snes-far platform; needs
+  `+mos-a16` to legalize — see [far-memops plan](docs/plans/2026-06-26-fix-the-far-addrspace-2-memset-memcpy-memmove-sile.md)).
+  Options: fix/skip snes-far so the SDK builds, or a standalone freestanding-LTO harness for the minimal
+  reproducer. If confirmed, file a fresh correctly-characterized issue.
 - [ ] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
   `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
   uncomment the two trigger lines in the `on:` block.

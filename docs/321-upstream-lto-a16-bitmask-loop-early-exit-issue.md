@@ -1,5 +1,24 @@
 # Upstream issue — LTO + `+mos-a16`: 32-bit bitmask loop exits early for shift amounts ≥ 16
 
+> ## ⛔ RETRACTED — MISDIAGNOSIS. **DO NOT POST.**
+> Verified 2026-06-28 by a controlled rebuild + disassembly experiment
+> ([plan](plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md)). The `cmp #$10` this issue
+> reads as "compare shift counter `r` with 16" is actually the loop's **second guard,
+> `q->n < UPQ_MAX_JOBS`**, where `UPQ_MAX_JOBS = 16 = 0x10`. Proof: overriding the macro with
+> `-DUPQ_MAX_JOBS=20` changed the constant to `cmp #$14` — it **tracks the macro**, so the compared value is
+> `q->n` (the upload-queue depth), **not** `r`. The real `r < 28` bound (`cpy #$1c`) is present and correct.
+> The `jmp rts` is the **intended per-vblank DMA-budget exit** (≤16 jobs/frame; 28 rows flush over 2 frames),
+> not a row-skipping miscompile. The annotation labeling stack slot `$2c` as "loop counter r" was the error —
+> it held `q->n`. **The root cause below is wrong; there is no row-16 shift-split miscompile.**
+>
+> The original demo stall is a *separate, still-unverified* question (a possible 32-bit `== 0` miscompile
+> under LTO, or a frame-ordering bug). If pursued and confirmed, it warrants a **fresh, correctly-characterized
+> issue with a real reproducer** — not this one. The `3ab028e` delay-counter workaround stands regardless.
+>
+> Everything below is preserved verbatim as the original (incorrect) draft.
+
+---
+
 **Post command** (user-triggered):
 ```sh
 gh issue create \
