@@ -1,9 +1,13 @@
 # 2026-06-28 — Re-verify the "LTO + `+mos-a16` bitmask-loop early-exit" diagnosis (#321 upstream item 11)
 
-**Status:** ✅ RESOLVED (2026-06-28) — **draft issue is a MISDIAGNOSIS** (Outcome A). The `cmp #$10` is the
-`q->n < UPQ_MAX_JOBS` queue-full exit, proven by a controlled `-D` override (constant tracked the macro
-`0x10`→`0x14`). The row-skip claim is false. A *secondary* hypothesis (real 32-bit `== 0` miscompile under
-LTO behind the original stall) remains OPEN — blocked on a runnable LTO build (see Results §Step 4).
+**Status:** ✅ RESOLVED (2026-06-28) — **draft issue is a MISDIAGNOSIS** (Outcome A), confirmed under the
+**real LTO build**. The `cmp #$10` is the `q->n < UPQ_MAX_JOBS` queue-full exit, proven by a controlled `-D`
+override (constant tracked the macro `0x10`→`0x14`) and re-confirmed in the LTO `_fact_emit` disasm (`cpy
+#$10`→`jmp`→`rts`; `__ashlsi3` called; `cpy #$1c` r-bound intact). `dev/run.sh factorial` runs correct
+(bsnes-jg `0x772F` == host). The *secondary* hypothesis (32-bit `== 0` LTO miscompile behind the original
+stall) is **down-graded to logic/timing** — the LTO 32-bit zero test is correct codegen; no compiler issue to
+file. The SDK build that first appeared to block this was a `MOS_TOOLCHAIN` host-vs-container path footgun,
+not a snes-far defect (see Results §Step 1).
 **Supplements:** the standing project guide (`CLAUDE.md`) + `docs/agent-handoff.md` (build/disasm mechanics).
 **Touches:** `docs/321-upstream-lto-a16-bitmask-loop-early-exit-issue.md` (the draft issue under test),
 `docs/upstream-contribution-status.md` item 11, `TODO.md` Upstream section. **No `vendor/` / compiler change.**
@@ -122,28 +126,36 @@ minimal isolation (host-oracle + on-console) needed to attribute it. Capture the
 
 ## Verification status
 
-- [x] Step 1 — toolchain built (SDK build crashed on the unrelated far-memops yak; worked around)
-- [x] Step 2 — `_fact_emit` disassembled
+- [x] Step 1 — toolchain + SDK built (SDK breakage was a `MOS_TOOLCHAIN` host-vs-container path footgun, fixed)
+- [x] Step 2 — `_fact_emit` disassembled (non-LTO)
 - [x] Step 3 — controlled `UPQ_MAX_JOBS` override (the decisive bit) — **draft DISPROVEN**
-- [ ] Step 4 — real stall root-cause **OPEN** (blocked on a runnable LTO build)
+- [x] Step 3b — confirmed under the **real LTO** build + `dev/run.sh factorial` runs correct (bsnes-jg `0x772F`)
+- [~] Step 4 — real stall: evidence says **logic/timing, not a compiler bug** (not a 100% e2e proof; no issue to file)
 
 ## Results (2026-06-28)
 
-### Step 1 — toolchain built; SDK build blocked by an unrelated crash
+### Step 1 — toolchain + SDK built (after fixing a toolchain-path footgun)
 
 `dev/run.sh toolchain` built clean (`mos-clang` = clang 23.0.0git `c798c3141`, `+mos-a16` accepted, `vendor/`
-patches 0001–0014 present). `dev/run.sh build` (SNES SDK) then **crashed** — but on a *different* bug:
+patches 0001–0014 present). `dev/run.sh build` (SNES SDK) first **crashed** on what looked like a snes-far bug:
 
 ```
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
 fatal error: error in backend: unable to legalize instruction:
   %12:_(p2) = G_PTR_ADD %7:_, %11:_(s16) (in function: __memset_far)
 ```
 
-`__memset_far` is `platforms/snes/mem-far.c` (the #320 far-memset runtime). Its own header note says the far
-`ptr[i]` is "a 32-bit G_PTR_ADD that only legalizes **under a16**" — so this is a build-config/legalization gap
-in the **snes-far** platform, orthogonal to the factorial question. It killed the whole SDK build (no install,
-no usable `mos-snes.cfg`). **Worked around** by compiling `factorial.c` to an object directly from the source
-include dirs (no link / no LTO needed for the structural question). PASS (toolchain) / blocked (SDK install).
+**Root cause = NOT a snes-far/compiler bug.** The failing compile ran `/opt/llvm-mos/bin/mos-clang` — the dev
+image's *prebuilt* toolchain, which predates `+mos-a16` — so the flag was rejected and `mem-far.c`'s far
+`G_PTR_ADD` (which legalizes only under a16) crashed. Why the wrong compiler? The SDK build was invoked with
+`MOS_TOOLCHAIN="$PWD/build/llvm-mos-install"` — a **host** path — but `dev/run.sh` runs in Docker with the repo
+at `/work`, so that path doesn't resolve in-container (log: `…/build/llvm-mos-install/bin/mos-clang: No such
+file or directory`) and CMake fell back to `/opt/llvm-mos`. **Fix:** pass the container path
+`MOS_TOOLCHAIN=/work/build/llvm-mos-install` (as `dev/build.sh`'s own header documents) **and** wipe the stale
+SDK tree the first run left configured for `/opt/llvm-mos` (`rm -rf build/mos-platform build/install`). The SDK
+then built end-to-end: `mem-far.c` compiles with no crash, `mos-snes.cfg` + `libc.a`/`libcrt0.a` (snes + snes-far)
+installed. (The proper snes-far `mem-far.c` compile with `+mos-a16` was independently confirmed crash-free.)
+PASS. *(Footgun, not a code defect — the standalone object-compile workaround used earlier is no longer needed.)*
 
 ### Steps 2–3 — the decisive controlled experiment
 
@@ -167,13 +179,37 @@ to ZP slot `$2c` and read via `lda $2c; cmp #$10` — the disasm annotation that
 r" was the original error. Same variable: `q->n`. The committed `factorial.c`/`upload.h` were verified
 unchanged by the working-tree's cosmetic HUD-palette edits, so the experiment reflects the real demo.)
 
-### Step 4 — the *actual* stall: OPEN
+### Step 3b — confirmed under the EXACT LTO build the issue referenced
+
+With the SDK now built, `factorial.c` was compiled the real way (`--config mos-snes.cfg` ⇒ `-flto`,
+`+mos-a16 -Os`) and `_fact_emit` disassembled from `fact-lto.sfc.elf`:
+
+```
+8ec8:  cpy #$10              ; q->n vs UPQ_MAX_JOBS (16)  ← the "cmp #$10" the issue misread as "r vs 16"
+8eca:  bcc $8ecf             ; q->n < 16 → loop body
+8ecc:  jmp $909e             ; q->n >= 16 → exit ...
+909e:  rts                   ; ... and $909e IS the rts (correct queue-full exit)
+8eff:  jsr __ashlsi3         ; (uint32_t)1u<<r — the 32-bit shift IS called (issue claimed it never is for r>=16)
+9078:  cpy #$1c              ; r < FACT_NROWS (28) — the real loop bound, all 28 rows iterated
+8f1e-8f2e: lda $5;bne / lda $4;bne / lda $3;bne / lda $2;bne / jmp   ; a CORRECT 32-bit zero/nonzero test
+```
+
+So under LTO: the only `#$10` is the `q->n` guard; `__ashlsi3` is called; the `r<28` bound is intact; no
+`cmp r,#16` shift-split exists. **Primary misdiagnosis confirmed end-to-end.** And the **real LTO factorial
+runs correctly**: `dev/run.sh factorial` → host oracle `0x772F` == bsnes-jg `0x772F` (SMOKE PASS), disasm gate
+PASS (`__mulsi3=1 __udivmodsi4=1 rep/sep=14`). (MAME leg can't run in this checkout — `dev/roms/s_smp/spc700.rom`,
+the SNES IPL BIOS, is absent; bsnes-jg needs no external IPL and validated the result.)
+
+### Step 4 — the *actual* stall: evidence now points to logic/timing, not a miscompile
 
 With `_fact_emit` proven correct, the original `dirty_rows == 0` gate **should** reach 0 in 2 frames and
-advance every ~2 frames — so a permanent stall at n=1 implies the 32-bit `== 0` compare (or the `1u<<r`
-clear) genuinely misfired under **LTO**, OR a frame-ordering subtlety. The standalone **non-LTO** codegen of
-the drain+`==0` pattern is **correct** (`cpx #$1c` bound, `__ashlsi3`-style call for `1u<<r`, proper rep/sep
-32-bit AND-NOT). The bug — if real — is LTO-only, and reproducing it needs a runnable/linkable LTO build,
-which the far-memops SDK crash currently blocks. **Unverified; do not assert a compiler cause.** Options to
-close it: (a) fix/skip the snes-far platform so `dev/run.sh build` completes → faithful LTO factorial build;
-(b) build a standalone LTO harness (freestanding link) for the minimal reproducer.
+advance every ~2 frames — so a permanent stall at n=1 would imply the 32-bit `== 0` compare misfired. But the
+**LTO** `_fact_emit` disasm (Step 3b) shows a 32-bit zero/nonzero test compiled **correctly** (the
+`lda $5;bne … lda $2;bne; jmp` chain at `8f1e–8f2e`) — the exact codegen a `dirty_rows == 0` gate would use —
+and the non-LTO drain+`==0` reproducer is correct too. So the weight of evidence is now **no compiler bug**:
+the original stall was most likely a frame-ordering/logic issue in the gate (the `dirty_rows == 0` check read
+across the 2-frame, 16-jobs/frame drain), which the `3ab028e` delay counter sidesteps cleanly. **Not yet a
+100% end-to-end proof** (that would mean building the *pre-`3ab028e`* `main()` under LTO and watching it stall
+or not in an emulator), but no longer an open *compiler-bug* suspicion. Remaining option if certainty is
+wanted: temporarily restore the pre-fix gate and run it (needs the SNES IPL for the MAME leg; bsnes-jg alone
+would do). **Do not file any compiler issue for this.**

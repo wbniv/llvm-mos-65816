@@ -546,13 +546,15 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `q->n < UPQ_MAX_JOBS` (=16) queue-full exit, not the shift counter `r`: `-DUPQ_MAX_JOBS=20` moves it to
   `cmp #$14` (tracks the macro). No row-skip miscompile. Issue body + status item 11 banner-retracted.
   [plan/evidence](docs/plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md).
-- [ ] **(OPEN follow-up) Root-cause the *real* factorial stall** behind the `3ab028e` delay-counter
-  workaround — possible 32-bit `dirty_rows == 0` miscompile under **LTO** (non-LTO codegen is correct) or a
-  frame-ordering bug. Needs a runnable LTO build; currently **blocked** by an unrelated `__memset_far`
-  far-memops legalization crash (`G_PTR_ADD p2,s16`) that breaks `dev/run.sh build` (snes-far platform; needs
-  `+mos-a16` to legalize — see [far-memops plan](docs/plans/2026-06-26-fix-the-far-addrspace-2-memset-memcpy-memmove-sile.md)).
-  Options: fix/skip snes-far so the SDK builds, or a standalone freestanding-LTO harness for the minimal
-  reproducer. If confirmed, file a fresh correctly-characterized issue.
+- [~] **(LOW-PRIORITY follow-up) The *real* factorial stall** behind the `3ab028e` delay-counter workaround —
+  **now believed logic/timing, NOT a compiler bug.** The real LTO `_fact_emit` shows a *correct* 32-bit
+  zero/nonzero test (`lda;bne ×4; jmp`), the same codegen a `dirty_rows == 0` gate uses — so the stall was
+  most likely the gate reading across the 2-frame, 16-jobs/frame drain, which the delay counter sidesteps.
+  **No compiler issue to file.** Only remaining (optional) certainty step: restore the pre-`3ab028e` gate and
+  run it under LTO (bsnes-jg suffices; MAME needs the absent SNES IPL). The SDK now builds — the earlier
+  `__memset_far` "blocker" was a `MOS_TOOLCHAIN` host-vs-container path footgun (pass
+  `/work/build/llvm-mos-install`, not `$PWD/...`), not a snes-far defect.
+  [evidence](docs/plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md).
 - [ ] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
   `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
   uncomment the two trigger lines in the `on:` block.
