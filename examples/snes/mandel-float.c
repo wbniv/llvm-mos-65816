@@ -27,8 +27,15 @@
 
 #define DW 64                // image width  (8 tiles)
 #define DH 56                // image height (7 tiles)
-#define DN 8                 // display maxiter (escape 0..8 -> 9-entry palette). Soft-float is slow,
-                             // so keep this modest; the GATE uses MF_GATE_ITER (12) independently of DN.
+#define DN 12                // display maxiter (escape 0..12 -> 13-entry palette). Richer colour bands
+                             // than 8; the GATE uses MF_GATE_ITER (12) independently of DN.
+#define DISP_NWIN 1          // ONLY W0 (the whole set) is shown on screen — the iconic, reliably
+                             // colourful view. The deeper MF_WIN entries (W1..W5) zoom toward the set
+                             // interior and, at DN maxiter on the chunky 16x14 grid, can't resolve
+                             // their thin escape filaments -> they render mostly-black (and the wipe
+                             // transitions tore), so the display holds W0 and lets the Mode-7 spin +
+                             // zoom-breathe + palette cycle be the motion, re-grinding it each pass so
+                             // the soft-float keeps running. (The GATE still uses MF_WIN[0] and [2].)
 #define CW 16                // COARSE compute grid: 16x14, 4x-upscaled into the 64x56 framebuffer.
 #define CH 14                // 64/16 = 56/14 = 4 = 2^SH, so the upscale is a shift. Deliberately CHUNKY:
 #define SHX 2                // at hundreds of soft-float libcalls per pixel a full-res grind would take
@@ -194,8 +201,9 @@ int main(void) {
   boot_paint(MF_WIN[win]);
 
   for (;;) {
-    // Advance to the next zoom window (W0..W5 then wrap) — the image we will grind during this spin.
-    win = (uint8_t)((win + 1u < (unsigned)MF_NWIN) ? win + 1u : 0u);
+    // Advance to the next SHALLOW zoom window (W0 <-> W1 then wrap) — the image we will grind during
+    // this spin. Capped at DISP_NWIN so the demo never dives into the near-black deep windows.
+    win = (uint8_t)((win + 1u < (unsigned)DISP_NWIN) ? win + 1u : 0u);
 
     // Spin the CURRENT image one full turn while computing the NEXT window's coarse grid, one row
     // per frame. Soft-float is slow, so a row may span several vblanks; the spin keeps the affine
