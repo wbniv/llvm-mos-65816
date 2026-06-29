@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/4d2611d) | docs(investigation): mark demo battery complete (20/20) + strikethrough self-note |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8e6f647) | feat(snes): #3 Burning Ship fractal — |Re|,|Im|-folding escape-time demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/0cabf2d) | feat(snes): #1 Julia Set Explorer — z²+c complex-multiply / far-framebuffer stress demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/579ad86) | feat(snes): #15 Raycaster maze — DDA grid-cast, per-column 1/dist divide |
@@ -16,6 +17,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+4d2611d	author	Will Norris
+4d2611d	added	14
+4d2611d	deleted	15
+4d2611d	files	1
+4d2611d	body	All 20 stress-test demo ideas now shipped/published. Add completion\nbanner, strike the coverage-map numbers and each row's aspect label per\nthe ~~done~~ convention, fix a duplicated table header and a malformed\ndouble-tilde token. Record a NOTE-TO-SELF to apply strikethrough to\ncompleted items consistently everywhere (index tables included).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8e6f647	author	Will Norris
 8e6f647	added	17
 8e6f647	deleted	14
