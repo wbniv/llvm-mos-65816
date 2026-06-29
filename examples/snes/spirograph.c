@@ -112,12 +112,9 @@ int main(void) {
   /* Title overlay (BG2), added after the demo layers; held while the gate-CRC computes, then torn
      down before the curve blooms. Gate-neutral (no DMA; corpus_result is the pre-loop hash). */
   static TitleLayer title;
-  title_init(&title, "SPIROGRAPH", "HYPOTROCHOID");
-  display_add(&a.screen, (Drawable *)&title);
-  display_frame(&a.screen);
+  title_begin(&a.screen, &title, "SPIROGRAPH", "HYPOTROCHOID");
   corpus_result = spiro_gate_crc();                           // self-verify curve math == host 0x32D4
-  display_hold(&a.screen, 110);                               // ~2 s title (gate hash is fast here)
-  display_hide_layer(&a.screen, (Drawable *)&title);
+  title_end(&a.screen, &title, 110);                               // ~2 s title (gate hash is fast here)
   for (;;) {
     controller_poll(&a.pad);
     spiro_view_step(&a.view, controller_held(&a.pad));        // edge/level handling inside

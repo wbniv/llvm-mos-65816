@@ -160,10 +160,8 @@ int main(void) {
     /* Title overlay (BG2), added after the demo layer; held ~2 s then torn down. The gun/soup
        continue underneath; the corpus hash is the separate pre-loop gate value, so unaffected. */
     static TitleLayer title;
-    title_init(&title, "CONWAY LIFE", "GLIDER GUN");
-    display_add(&d, (Drawable *)&title);
-    display_hold(&d, 110);
-    display_hide_layer(&d, (Drawable *)&title);
+    title_begin(&d, &title, "CONWAY LIFE", "GLIDER GUN");
+    title_end(&d, &title, 110);
 
     for (;;) {
         /* When the displayed grid has fully streamed, advance one generation and ping-pong. */

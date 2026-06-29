@@ -317,17 +317,14 @@ int main(void) {
     // Title overlay (BG2), added after the demo layers; held during the gate CRC, then torn down
     // before the digits stream. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
     static TitleLayer title;
-    title_init(&title, "PI SPIGOT", "MONTE CARLO");
-    display_add(&a.screen, (Drawable *)&title);
-    display_frame(&a.screen);
+    title_begin(&a.screen, &title, "PI SPIGOT", "MONTE CARLO");
 
     // Self-verify: run the gate CRC using the App's pre-allocated state.
     // pi_gate_crc() reinitializes sp + mc; we re-init them after for the main loop.
     corpus_result = pi_gate_crc(&a.sp, &a.mc);
     pi_spigot_init(&a.sp);
     mc_init(&a.mc, 0xBEEF);
-    display_hold(&a.screen, 110);                            // ~2 s title (gate hash is fast here)
-    display_hide_layer(&a.screen, (Drawable *)&title);
+    title_end(&a.screen, &title, 110);                            // ~2 s title (gate hash is fast here)
 
     for (;;) {
         // 1. Spigot: advance the carry sweep; dequeue output digits.

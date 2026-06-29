@@ -133,10 +133,8 @@ int main(void) {
     /* Title overlay (BG2), added after the demo layer; held ~1 s then torn down. The fire is
        continuous, so the ~60-frame offset does not affect the (separately-asserted) corpus hash. */
     static TitleLayer title;
-    title_init(&title, "DOOM FIRE", "HEAT FIELD");
-    display_add(&d, (Drawable *)&title);
-    display_hold(&d, 110);
-    display_hide_layer(&d, (Drawable *)&title);
+    title_begin(&d, &title, "DOOM FIRE", "HEAT FIELD");
+    title_end(&d, &title, 110);
 
     for (;;) {
         /* one propagation sweep over the full grid (during active display) */

@@ -258,15 +258,12 @@ int main(void) {
 
     // Title overlay (BG2), added after the demo layer; held during the gate CRC, then torn down.
     static TitleLayer title;
-    title_init(&title, "SORTING RACE", "QUICK HEAP MERGE");
-    display_add(&a.d, (Drawable *)&title);
-    display_frame(&a.d);
+    title_begin(&a.d, &title, "SORTING RACE", "QUICK HEAP MERGE");
 
     // Self-verify: the differential gate hash (8 rounds of recursive sorts + self-check).
     corpus_result = sortrace_gate_crc();
 
-    display_hold(&a.d, 80);
-    display_hide_layer(&a.d, (Drawable *)&title);
+    title_end(&a.d, &title, 80);
 
     for (;;) {
         race_step(&a);

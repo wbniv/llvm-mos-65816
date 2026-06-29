@@ -113,14 +113,11 @@ int main(void) {
   /* Title overlay (BG2), added after the demo layers; held while the gate-CRC computes, then torn
      down before the curve blooms. Gate-neutral (no DMA; corpus_result is the pre-loop hash). */
   static TitleLayer title;
-  title_init(&title, "HARMONOGRAPH", "LISSAJOUS");
-  display_add(&a.screen, (Drawable *)&title);
-  display_frame(&a.screen);
+  title_begin(&a.screen, &title, "HARMONOGRAPH", "LISSAJOUS");
 
   corpus_result = harmo_gate_crc();                           /* self-verify curve math == host 0x0EBB */
   rebloom(&a);                                                /* harmo_gate_crc reused preset 0 state; restart */
-  display_hold(&a.screen, 110);                               /* ~2 s title (gate hash is fast here) */
-  display_hide_layer(&a.screen, (Drawable *)&title);
+  title_end(&a.screen, &title, 110);                               /* ~2 s title (gate hash is fast here) */
 
   for (;;) {
     plot_n(&a, PTS_PER_FRAME);

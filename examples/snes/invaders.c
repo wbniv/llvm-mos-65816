@@ -150,8 +150,7 @@ int main(void) {
      free). Overlaid on the first 60 attract frames and hidden IN-loop — no pre-loop hold frames, so
      the gate's frame-INV_FRAMES corpus latch is unaffected (gate-neutral). */
   static TitleLayer title;
-  title_init(&title, "SPACE INVADERS", "SPRITES + OAM");
-  display_add(&g.screen, (Drawable *)&title);
+  title_begin(&g.screen, &title, "SPACE INVADERS", "SPRITES + OAM");
   uint16_t tf = 0;
   for (;;) {
     game_update(&g);

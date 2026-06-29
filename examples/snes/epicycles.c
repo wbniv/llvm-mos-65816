@@ -140,13 +140,10 @@ int main(void) {
     app_init(&a);
 
     static TitleLayer title;
-    title_init(&title, "FOURIER", "EPICYCLES");
-    display_add(&a.screen, (Drawable *)&title);
-    display_frame(&a.screen);
+    title_begin(&a.screen, &title, "FOURIER", "EPICYCLES");
 
     corpus_result = epi_gate_crc();          // self-verify epicycle math == host 0x4F6C
-    display_hold(&a.screen, 100u);           // ~1.7 s title
-    display_hide_layer(&a.screen, (Drawable *)&title);
+    title_end(&a.screen, &title, 100u);           // ~1.7 s title
 
     for (;;) {
         step_frame(&a);

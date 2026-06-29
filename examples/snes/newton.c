@@ -144,13 +144,12 @@ int main(void) {
        the slow gate-hash compute runs below (no display_frame -> the PPU holds the title on screen),
        then torn down before the progressive fill begins. Gate-neutral: no DMA, hash is pre-loop. */
     static TitleLayer title;
-    title_init(&title, "NEWTON FRACTAL", "COMPLEX DIVISION");
-    display_add(&d, (Drawable *)&title);
+    title_begin(&d, &title, "NEWTON FRACTAL", "COMPLEX DIVISION");
     display_frame(&d);                       /* release force-blank with the title visible */
 
     /* Gate hash runs before the display loop (no V-blank waits; ~64-128 ms emulated). */
     corpus_result = newton_gate_crc();
-    display_hide_layer(&d, (Drawable *)&title);   /* title done; reveal BG1 for the fill */
+    title_end(&d, &title, 0);   /* no extra hold — the gate compute already held the card */
 
     /* Progressive rendering: NEWTON_TPF tiles/frame → full screen in ~224 frames. */
     uint16_t next_tile = 0;

@@ -27,6 +27,7 @@
 
 #include <snes.h>
 #include "drawable.h"
+#include "display.h"        /* title_begin/title_end drive the Display (add/frame/hold/hide) */
 #include "../font8.h"
 
 #ifndef TITLE_CHR_WORD
@@ -105,6 +106,35 @@ static inline void title_init(TitleLayer *t, const char *line0, const char *line
   t->base.tm_bits = TM_BG2;
   t->line0 = line0;
   t->line1 = line1;
+}
+
+/* ------------------------------------------------------------------------------------------------
+ * The shared title-screen subroutine every demo calls. title_begin() raises the title card;
+ * title_end() holds it then tears it down. Splitting begin/end (rather than one all-in-one call) is
+ * what lets the demos that do heavy pre-loop compute run it WHILE the title is up:
+ *
+ *   title_begin(d, &title, "NAME", "SUBTITLE");   // card up, force-blank released
+ *   corpus_result = <gate>();                     // (optional) compute the PPU masks behind the card
+ *   title_end(d, &title, 110);                    // hold ~2 s, then hand off to the demo's layer
+ *
+ * Centralising here means a single change to these two functions restyles every demo's intro at once.
+ * Call title_begin AFTER adding the demo's own drawables (TitleLayer's reserve() writes the shared
+ * BG12NBA char-base register last).
+ * ------------------------------------------------------------------------------------------------ */
+
+/* Raise the title card: init it, reserve its VRAM (force-blank), and release force-blank with the
+ * card visible over the demo's (black) layer. */
+static inline void title_begin(Display *d, TitleLayer *t, const char *line0, const char *line1) {
+  title_init(t, line0, line1);
+  display_add(d, (Drawable *)t);     /* reserve() in force-blank: font + tilemap + palette */
+  display_frame(d);                  /* release force-blank with the card showing */
+}
+
+/* Hold the card for `frames` v-blanks (0 = no hold — e.g. when a long compute already held it), then
+ * tear it down so the demo's own layer takes over. */
+static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
+  display_hold(d, frames);
+  display_hide_layer(d, (Drawable *)t);
 }
 
 #endif /* SNESGFX_TITLE_LAYER_H */
