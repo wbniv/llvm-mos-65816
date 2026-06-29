@@ -408,6 +408,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. The selected 9 each hit a
   distinct codegen corner:
+  - [x] ~~**#1 Julia set explorer** — `z²+c` Q5.10 **complex multiply** (3 `__mulsi3`/iter) far-stored into high WRAM `$7E2000`, drawn through Mode 7 as `c` orbits `0.7885·e^iθ` (morphs + spins; the grind is the morph, the affine matrix the motion). Gate `julia_gate_crc` `0x3490`; bsnes-jg host==`+mos-a16` + disasm gate (`__mulsi3=3`, `rep/sep=46`). MAME leg SKIP (no SPC700 IPL here; demos-only non-blocker).~~ ✓ [/snes/julia/](https://biohack.net/snes/julia/) ([plan](docs/plans/2026-06-28-1-snes-julia.md))
   - [x] ~~**#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.~~ ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
   - [x] ~~**#5 Conway's Game of Life** — bit-packed SWAR neighbour sums (and/eor/ora + asl/lsr, multiply-free); a Gosper glider gun fires gliders into a settling random soup. Gate `life_gate_crc` `0xDDF1`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/life/](https://biohack.net/snes/life/) ([plan](docs/plans/2026-06-28-5-snes-life.md))
   - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~

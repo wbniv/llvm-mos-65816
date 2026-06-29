@@ -217,6 +217,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: maze }
 
+  julia:
+    desc: "#1: Julia set explorer — z^2+c with c animated along the 0.7885*e^itheta orbit; the whole 64x56 Mode-7 image RECOMPUTED every keyframe (sustained Q5.10 complex multiply, 3 __mulsi3/iter) and FAR-STORED into high WRAM $7E2000 (+mos-a16). Assert corpus_result (julia_gate_crc 0x3490) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__mulsi3 + rep/sep). Leaves build/julia.sfc + build/julia-{jg,mame}.png."
+    cmds:
+      - dev/run.sh julia
+
+  julia-play:
+    desc: "PLAY the Julia-set explorer in a MAME window on this host (builds the ROM first if needed). Shows a morphing Julia fractal sweeping top-to-bottom as c orbits the path, colour-cycled."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/julia.sfc ]; then
+          echo "==> build/julia.sfc missing — building it (dev/run.sh julia)…"
+          dev/run.sh julia
+        fi
+      - task: mandel-mame
+        vars: { ROM: julia }
+
   factorial:
     desc: "#20: Bignum factorial — 1000! in a base-10000 digit array; custom 28-row FactDisplay drawable; assert corpus_result (factorial_gate_crc for 50!, 0x772F) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __udivmodsi4 + rep/sep). Leaves build/factorial.sfc + build/factorial-{mame,jg}.png."
     cmds:

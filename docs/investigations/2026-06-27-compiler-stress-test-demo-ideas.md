@@ -32,8 +32,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 ## Fractals & complex iteration — fixed-point mul/div, tight per-pixel loops
 
-1. **Julia set explorer** — `z²+c` with `c` animated along a path. *Stresses:* Q-format complex multiply,
-   far high-WRAM framebuffer (a16). *Shows:* morphing Julia fractal.
+1. ~~**Julia set explorer** — `z²+c` with `c` animated along a path. *Stresses:* Q-format complex multiply,
+   far high-WRAM framebuffer (a16). *Shows:* morphing Julia fractal.~~ ✓ [/snes/julia/](https://biohack.net/snes/julia/)
 2. ~~**Newton's-method fractal** — `z − p(z)/p′(z)` for `z³−1`, colour by which root it converges to.
    *Stresses:* complex **division** (the hard one) + convergence branching. *Shows:* basins of attraction.~~ ✓ [/snes/newton/](https://biohack.net/snes/newton/)
 3. **Burning Ship / Multibrot** — `|Re|,|Im|` folding, or `zᵈ`. *Stresses:* extra multiplies, abs, `pow`
@@ -99,14 +99,14 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 |---|---|
 | Codegen aspect | Demos |
 |---|---|
-| complex / 32-bit fixed-point **multiply** | 1, ~~2~~, 3, 4, ~~8~~, ~~9~~–~~10~~, ~~11~~, ~~13~~, ~~16~~ |
+| complex / 32-bit fixed-point **multiply** | ~~1~~, ~~2~~, 3, 4, ~~8~~, ~~9~~–~~10~~, ~~11~~, ~~13~~, ~~16~~ |
 | **division** / reciprocal / sqrt | ~~2~~, ~~13~~, ~~15~~, ~~16~~, ~~19~~ |
 | **recursion** & the soft stack / frame ABI | ~~17~~, ~~18~~ |
 | **heaps / queues / structs** (data structures) | ~~18~~ |
 | **bit manipulation** (pack/shift/boolean) | ~~5~~, ~~6~~ |
 | ~~multi-precision **carry-chain** codegen~~ | ~~19, 20~~ |
 | **shift-add**, multiply-free | ~~12~~ |
-| **far / high-WRAM** buffers (a16-only) | 1, 4, ~~8~~, ~~13~~ |
+| **far / high-WRAM** buffers (a16-only) | ~~1~~, 4, ~~8~~, ~~13~~ |
 | **PRNG + scatter** writes | 4, ~~7~~, ~~19~~ |
 | **sin/cos LUT** indexing | ~~9~~, ~~10~~, ~~11~~, ~~14~~, ~~16~~ |
 

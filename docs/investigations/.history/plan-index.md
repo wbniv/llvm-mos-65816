@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/579ad86) | feat(snes): #15 Raycaster maze — DDA grid-cast, per-column 1/dist divide |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/70e1840) | feat(snes): #9 Lissajous / Harmonograph — damped sin-LUT curve demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/30333e0) | feat(snes): #5 Conway's Game of Life — bit-parallel SWAR neighbour sums |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/070328f) | feat(snes): #10 Fourier epicycles — many-multiply / sin-cos stress demo |
@@ -63,6 +64,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+579ad86	author	Will Norris
+579ad86	added	1
+579ad86	deleted	0
+579ad86	files	1
+579ad86	body	Demo #15 of the compiler stress-test battery — the division member. A\nWolfenstein-style grid raycaster auto-walks a 16×16 maze: each of 64\nscreen columns marches a ray cell-to-cell by integer DDA and draws the\nwall slice at screen_h / perpendicular_distance. Three __udivsi3 per\ncolumn (two deltaDist = |1/rayDir| reciprocals + the 1/dist projection)\n— the only division-bound demo. Camera-plane basis from a Q8.8 sine LUT\n(fisheye-free); distance-shaded slices into a BitmapCanvas, 2-row HUD.\n\nGate rc_gate_crc = 0xB200 (64-column fan, fixed camera, rotate-XOR fold\nof wall height + side). No far pointers => full 5-way bar. Verified:\ndev/run.sh raycaster RESULT PASS (disasm __udivsi3=3 + rep/sep=51;\nbsnes-jg host==+mos-a16 0xB200; -verify-machineinstrs clean on\ndefault/+mos-a16/+mos-xy16; MAME pending the SPC700 IPL — non-blocker\nper the demos-only policy). Published biohack.net/snes/raycaster/\n(biohack.net v1.0.117).\n\nThe differential caught a real bug: the axis-aligned-ray deltaDist\nsentinel 0x3FFFFFF made frac*sentinel (256*0x3FFFFFF ~ 8.6e9) overflow\nsigned int32 — UB the host -O2 and target -Os builds optimised\ndifferently (host 0x724B != target 0xB200). Shrunk to 0x400000 (keeps\n256*sentinel < 2^31, still exceeds any real accumulated sideDist); also\nfixed RC_VIEWH*256 (128*256 overflows int16 on the 16-bit target) ->\n(int32_t)RC_VIEWH * 256.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 70e1840	author	Will Norris
 70e1840	added	1
 70e1840	deleted	0
