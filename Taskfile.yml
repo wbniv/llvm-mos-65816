@@ -200,6 +200,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: factorial }
 
+  cordic:
+    desc: "#12: CORDIC rotator — sin/cos/atan via shift-add only (no multiply); rotating hand over a CORDIC vector field. Assert corpus_result (cordic_gate_crc 0x4D41) == host on MAME + bsnes-jg + INVERTED disasm gate (mul/div/vshift=0, rep/sep + cordic16_atan_tbl present). Leaves build/cordic.sfc + build/cordic-{mame,jg}.png."
+    cmds:
+      - dev/run.sh cordic
+
+  cordic-play:
+    desc: "PLAY the CORDIC rotator demo in a MAME window on this host (builds the ROM first if needed). Shows a rotating hand sweeping a CORDIC-computed vector field + an atan2 angle self-check."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/cordic.sfc ]; then
+          echo "==> build/cordic.sfc missing — building it (dev/run.sh cordic)…"
+          dev/run.sh cordic
+        fi
+      - task: mandel-mame
+        vars: { ROM: cordic }
+
   newton:
     desc: "#2: Newton's-method fractal z³−1 — complex division (__divsi3) + multiply (__mulsi3); assert corpus_result (newton_gate_crc 0x4D8B) == host on MAME + bsnes-jg + disasm gate. Leaves build/newton.sfc + build/newton-{mame,jg}.png."
     cmds:

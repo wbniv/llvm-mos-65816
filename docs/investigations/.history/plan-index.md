@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/189c2be) | docs(plan-index): add row for the LTO+a16 bitmask misdiagnosis verification plan |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/c09912a) | docs(upstream): retract LTO+a16 bitmask early-exit issue as a misdiagnosis |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/99c1485) | docs(plan-index): add #16 Wireframe 3-D Solid row (56cf11c) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/eb378b1) | docs(plan-index): add SHA b76f8ef for #2 Newton's-method fractal plan row |
@@ -53,6 +54,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+189c2be	author	Will Norris
+189c2be	added	1
+189c2be	deleted	1
+189c2be	files	1
+189c2be	body	Cites the retraction commit c09912a. Staged surgically (the shared plan-index\nalso carries another worker's uncommitted #12 CORDIC row — left untouched).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 c09912a	author	Will Norris
 c09912a	added	1
 c09912a	deleted	0
