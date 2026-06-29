@@ -85,7 +85,9 @@ else
 fi
 
 # 4. MAME under Xvfb: snapshot + assert the grid gate (sample after the bloom completes).
-if command -v xvfb-run >/dev/null 2>&1; then
+if [ ! -f "$ROOT/dev/roms/s_smp/spc700.rom" ]; then
+  echo "    SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content; supply out-of-band)"
+elif command -v xvfb-run >/dev/null 2>&1; then
   echo "==> MAME (under Xvfb): snapshot + grid gate (build/blossom-mame.png)"
   SNAP="$BUILD/.bl-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
   secs=$(( FRAMES / 60 + 5 ))

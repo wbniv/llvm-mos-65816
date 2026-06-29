@@ -64,13 +64,22 @@ if [ ! -x "$JGX" ]; then
 fi
 if [ -x "$JGX" ] && [ -d "$VENDOR/Database" ]; then
   echo "==> bsnes-jg: render + framebuffer dump (build/rdiff-jg.png) + assert"
-  "$JGX" "$BUILD/rdiff.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 500 "$BUILD/rdiff-jg.png" || rc=1
+  # Run 2000 frames before the framebuffer dump: the Gray-Scott field is seeded after the ~110-frame
+  # title hold and needs time to organise into its Turing spot pattern, so a 500-frame snapshot is
+  # half-empty. 2000 frames yields a developed, screen-filling card. (The corpus assert reads
+  # corpus_result — set at startup — so it is unaffected by the longer run.)
+  "$JGX" "$BUILD/rdiff.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 2000 "$BUILD/rdiff-jg.png" || rc=1
 else
   echo "    SKIP bsnes-jg (harness/core absent — run: dev/run.sh xcheck once)"
 fi
 
 # 5. MAME under Xvfb — snapshot the real PPU output + assert.
-if command -v xvfb-run >/dev/null 2>&1; then
+# MAME's snes driver needs the gitignored 64-byte SPC700 IPL ROM; without it MAME aborts with
+# "Required files are missing". Treat its absence as SKIP (like the bsnes harness above), not FAIL —
+# it is an env-wide gap (every demo's MAME leg), not a defect in this ROM (bsnes-jg + disasm cover it).
+if [ ! -f "$ROOT/dev/roms/s_smp/spc700.rom" ]; then
+  echo "    SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content; supply out-of-band)"
+elif command -v xvfb-run >/dev/null 2>&1; then
   echo "==> MAME (under Xvfb): snapshot + assert (build/rdiff-mame.png)"
   SNAP="$BUILD/.rdiff-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \

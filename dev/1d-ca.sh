@@ -73,7 +73,12 @@ else
 fi
 
 # 5. MAME under Xvfb — snapshot the real PPU output + assert.
-if command -v xvfb-run >/dev/null 2>&1; then
+# MAME's snes driver needs the gitignored 64-byte SPC700 IPL ROM; without it MAME aborts with
+# "Required files are missing". Treat its absence as SKIP (like the bsnes harness above), not FAIL —
+# it is an env-wide gap (every demo's MAME leg), not a defect in this ROM (bsnes-jg + disasm cover it).
+if [ ! -f "$ROOT/dev/roms/s_smp/spc700.rom" ]; then
+  echo "    SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content; supply out-of-band)"
+elif command -v xvfb-run >/dev/null 2>&1; then
   echo "==> MAME (under Xvfb): snapshot + assert (build/1d-ca-mame.png)"
   SNAP="$BUILD/.ca1d-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \

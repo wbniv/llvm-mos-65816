@@ -41,17 +41,21 @@ static uint8_t fire[FIRE_W * FIRE_H];
 /* deterministic xorshift seed advanced by fire_step each frame */
 static uint16_t fire_seed = 0xF1A3u;
 
-/* ---- FireLayer drawable (BG1 4bpp, half-tilemap DMA per frame) ----------------- */
+/* ---- FireLayer drawable (BG1 4bpp, FULL-tilemap DMA per frame) ------------------
+ * The grid is re-uploaded whole every frame (28×32×2 = 1792 B) so the entire screen
+ * advances at 60 Hz from one consistent fire_step. (A half-tilemap split — upload 14
+ * rows/frame while fire_step advances the whole grid each frame — refreshes each half at
+ * only 30 Hz and from a DIFFERENT sim step than the other half: that reads as a sluggish,
+ * shimmering image. 1792 B fits the NTSC v-blank with wide margin, so upload it all.) */
 typedef struct {
     Drawable base;
-    uint8_t  half;                        /* 0 = upload rows 0..13, 1 = rows 14..27 */
-    uint16_t shadow[(FIRE_H / 2) * FIRE_W]; /* half-tilemap shadow (14*32 = 448 words) */
+    uint16_t shadow[FIRE_H * FIRE_W];     /* full-tilemap shadow (28*32 = 896 words) */
 } FireLayer;
 
 static void _fire_reserve(Drawable *d, VramAlloc *va) {
     (void)va;
     FireLayer *l = (FireLayer *)d;
-    l->half = 0;
+    (void)l;
 
     /* BG1 registers — BG12NBA is WRITE-ONLY; we own both nibbles (BG2 unused by the demo). */
     REG_BG1SC   = SNES_BGSC(FIRE_MAP, 0);
@@ -82,23 +86,19 @@ static void _fire_emit(Drawable *d, UploadQueue *q) {
     /* palette upload: 16 colours × 2 bytes from colour index 0 (32 B) */
     upq_push_cgram(q, 0u, fire_pal, 0x00u, (uint16_t)sizeof fire_pal);
 
-    /* rebuild the half-shadow for the rows we're about to DMA (tile index == heat value) */
-    uint8_t start = l->half ? (uint8_t)(FIRE_H / 2) : 0u;
-    const uint8_t *src = fire + (uint16_t)start * FIRE_W;
-    for (uint16_t n = 0; n < (uint16_t)((FIRE_H / 2) * FIRE_W); n++) {
-        uint16_t t = (uint16_t)src[n];
+    /* rebuild the FULL-grid shadow (tile index == heat value, clamped to the 16-colour ramp) */
+    for (uint16_t n = 0; n < (uint16_t)(FIRE_H * FIRE_W); n++) {
+        uint16_t t = (uint16_t)fire[n];
         l->shadow[n] = t > 15u ? 15u : t;
     }
 
-    /* DMA half the tilemap: 14 rows × 32 × 2 = 896 bytes */
+    /* DMA the whole tilemap in one job: 28 rows × 32 × 2 = 1792 bytes (fits one v-blank) */
     upq_push_vram(q,
-        (uint16_t)(FIRE_MAP + (uint16_t)start * 32u),
+        FIRE_MAP,
         l->shadow,
         0x00u,
-        (uint16_t)((FIRE_H / 2u) * FIRE_W * 2u),
+        (uint16_t)(FIRE_H * FIRE_W * 2u),
         VMAIN_INC_HIGH_1);
-
-    l->half ^= 1u;
 }
 
 static const DrawableVT FIRE_VT = { _fire_reserve, _fire_emit };

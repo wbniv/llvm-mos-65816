@@ -85,9 +85,10 @@ static void _cad_reserve(Drawable *d, VramAlloc *va) {
 static void _cad_emit(Drawable *d, UploadQueue *q) {
     CaDisplay *cad = (CaDisplay *)d;
 
-    // Update BG3 vertical scroll every vblank (two writes = low then high byte).
-    REG_BG3VOFS = cad->vofs_lo;
-    REG_BG3VOFS = 0;   // high byte always 0 (scroll range 0..255)
+    // Update BG3 vertical scroll. emit() runs BEFORE snes_wait_vblank (active display), so the
+    // scroll latch must NOT be poked here directly — that shears the picture mid-frame. Enqueue it
+    // so upq_flush() applies it in the v-blank window with the DMA. (High byte always 0: range 0..255.)
+    upq_push_scroll(q, (uint16_t)(uintptr_t)&REG_BG3VOFS, (uint16_t)cad->vofs_lo);
 
     // Upload a completed tile-row if ready (DMA 512 B to chr VRAM).
     if (cad->tile_dirty) {

@@ -140,14 +140,19 @@ static void gs_init(void) {
 volatile uint16_t corpus_result;
 
 int main(void) {
-    gs_init();
-    gs_buf  = 0;
-    g_cur_v = gs_v[0];
-
     /* gate hash on 8×8 sub-grid, 50 steps — written once so the corpus harness can
-     * read it at WRAM[corpus_result] any time after the first frame */
+     * read it at WRAM[corpus_result] any time after the first frame (independent of the
+     * displayed field, which lives in gs_u/gs_v). */
     static rdiff_gate_state gstate;
     corpus_result = rdiff_gate_crc(&gstate);
+
+    /* g_cur_v points at the (still all-zero BSS) field for the title-hold frames. Every cell
+       therefore maps to tile 0 = 4bpp colour 0 = TRANSPARENT, so the BG2 title shows cleanly.
+       We seed the field only AFTER the title is hidden: in Mode 1 BG1 has higher priority than
+       BG2, so seeding the whole grid first (opaque cells) would bury the title text — the bug
+       this ordering fixes. See title_layer.h's priority caveat. */
+    gs_buf  = 0;
+    g_cur_v = gs_v[0];
 
     static RdiffLayer rdiff;
     rdiff.base.vt = &RDIFF_VT;
@@ -166,6 +171,11 @@ int main(void) {
     display_add(&d, (Drawable *)&title);
     display_hold(&d, 110);
     display_hide_layer(&d, (Drawable *)&title);
+
+    /* Title gone — now seed the field. From here BG1 fills with opaque Turing texture. */
+    gs_init();
+    gs_buf  = 0;
+    g_cur_v = gs_v[0];
 
     for (;;) {
         /* GS simulation steps (during active display — compute budget ≈ 44% of frame) */

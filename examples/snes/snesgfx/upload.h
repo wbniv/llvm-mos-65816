@@ -15,8 +15,10 @@
 #define UPQ_MAX_JOBS 16
 #endif
 
-/* A queued DMA upload. `port` selects which destination-address register to load first. */
-enum { UPQ_VRAM = 0, UPQ_CGRAM = 1, UPQ_OAM = 2 };
+/* A queued DMA upload. `port` selects which destination-address register to load first.
+   UPQ_REG is the odd one out: not a DMA, just a write-twice register poke (scroll latches)
+   carried in the queue so it lands in the v-blank window like everything else. */
+enum { UPQ_VRAM = 0, UPQ_CGRAM = 1, UPQ_OAM = 2, UPQ_REG = 3 };
 
 typedef struct {
   uint16_t dest;     /* VRAM word addr / CGRAM index / OAM byte addr */
@@ -67,6 +69,16 @@ static inline void upq_push_oam(UploadQueue *q, const void *src, uint8_t bank, u
   j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes;
 }
 
+/* Enqueue a write-twice PPU register poke — the BGnHOFS/BGnVOFS scroll latches ($210D..$2114).
+   It is applied inside upq_flush() (the v-blank/force-blank window), NOT during active display:
+   a scroll register written mid-frame shears the picture from that scanline down. `value`'s low
+   byte then high byte are written to the register at address `reg` (e.g. &REG_BG3VOFS). */
+static inline void upq_push_scroll(UploadQueue *q, uint16_t reg, uint16_t value) {
+  if (q->n >= UPQ_MAX_JOBS) return;
+  UpqJob *j = &q->job[q->n++];
+  j->port = UPQ_REG; j->dest = reg; j->src = value; j->nbytes = 0;
+}
+
 /* Run every queued job via DMA, then empty the queue. MUST be called in force-blank or
    v-blank (Display guarantees this). The CPU stalls on each MDMAEN until the copy completes.
    dma_base and mdmaen_bit are hoisted out of the loop so the 65816 never recomputes
@@ -77,6 +89,12 @@ static inline void upq_flush(UploadQueue *q) {
   uint8_t mdmaen_bit = (uint8_t)(1u << q->chan);
   for (uint8_t i = 0; i < q->n; i++) {
     const UpqJob *j = &q->job[i];
+    if (j->port == UPQ_REG) {       /* write-twice register poke (scroll latch) — not a DMA */
+      volatile uint8_t *r = (volatile uint8_t *)(uintptr_t)j->dest;
+      *r = (uint8_t)j->src;          /* low byte  */
+      *r = (uint8_t)(j->src >> 8);   /* high byte */
+      continue;
+    }
     if (j->port == UPQ_VRAM)       { REG_VMAIN = j->vmain; REG_VMADD = j->dest; }
     else if (j->port == UPQ_CGRAM) { REG_CGADD = (uint8_t)j->dest; }
     else                           { REG_OAMADDL = (uint8_t)j->dest; REG_OAMADDH = (uint8_t)(j->dest >> 8); }

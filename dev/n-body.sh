@@ -71,7 +71,9 @@ else
 fi
 
 # 5. MAME under Xvfb — snapshot + assert.
-if command -v xvfb-run >/dev/null 2>&1; then
+if [ ! -f "$ROOT/dev/roms/s_smp/spc700.rom" ]; then
+  echo "    SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content; supply out-of-band)"
+elif command -v xvfb-run >/dev/null 2>&1; then
   echo "==> MAME (under Xvfb): snapshot + assert (build/n-body-mame.png)"
   SNAP="$BUILD/.n-body-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \
