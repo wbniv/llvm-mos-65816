@@ -2,8 +2,9 @@
 
 > **Status (2026-06-29).** **Round 1 (#1–#20) — all 20 shipped** ✓, published on
 > [biohack.net/snes](https://biohack.net/snes/); the differential gate found a handful of pre-existing
-> compiler bugs along the way. **Round 2 (#21+) — in progress** (#21 ✓ [soft-float](https://biohack.net/snes/mandel-float/)
-> shipped 2026-06-29), below: each targets a **codegen corner the first 20 never execute** (soft-float,
+> compiler bugs along the way. **Round 2 (#21+) — in progress** (#21 ✓ [soft-float](https://biohack.net/snes/mandel-float/),
+> #22 ✓ [64-bit avalanche](https://biohack.net/snes/avalanche/) shipped 2026-06-29), below: each targets a
+> **codegen corner the first 20 never execute** (soft-float,
 > 64-bit integers, jump tables, by-value struct ABI, bitfields, variadics, variable-count shifts,
 > pointer-chasing trees) — the untested libcall/ABI paths where the remaining bugs hide.
 
@@ -146,7 +147,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 | New codegen corner | Why bugs hide there | Demos |
 |---|---|---|
 | **soft-float (IEEE-754)** — `__addsf3`/`__mulsf3`/`__divsf3`/`__ltsf2`/`__floatsisf`/`__fixsfsi` | no Round-1 demo uses `float` at all; single-precision is fully specified → bit-exact differential | ~~21~~, 24 |
-| **64-bit integers** — `__muldi3`/`__udivdi3`/`__ashldi3`/`__lshrdi3`, 4-limb carry | every Round-1 demo tops out at 32-bit | 22 |
+| **64-bit integers** — `__muldi3`/`__udivdi3`/`__ashldi3`/`__lshrdi3`, 4-limb carry | every Round-1 demo tops out at 32-bit | ~~22~~ |
 | **jump-table / computed branch** — switch-dispatch + indirect-call tables | never exercised | 24, 29a |
 | **aggregate / by-value struct ABI** — sret vs register-pair return | structs exist (#18) but are never passed/returned **by value** | 26 |
 | **bitfield insert/extract** — `unsigned x : n` fields | zero usage so far | 29b |
@@ -163,9 +164,9 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
     **entire soft-float library**. The differential is razor-sharp — single precision is fully specified, so
     host `float` must equal target soft-float **bit-for-bit**; any rounding/conversion bug shows instantly.
     *Shows:* the fractal, with a fixed-point twin for the timing contrast. ← **sharpest first pick.**~~ ✓ [/snes/mandel-float/](https://biohack.net/snes/mandel-float/) *(bit-exact host==default==a16==xy16 `0x4169`; no compiler bug — soft-float codegen correct across all modes)*
-22. **64-bit hash plasma / xorshift64 field** — `__muldi3`, 64-bit shifts/xor, carry across 4 limbs.
+22. ~~**64-bit hash plasma / xorshift64 field** — `__muldi3`, 64-bit shifts/xor, carry across 4 limbs.
     *Shows:* an avalanche field (flip one input bit → output bits cascade) or a hash-coloured plasma.
-    *(Variant: Q16.48 **deep-zoom** Mandelbrot whose multiply needs a 64-bit intermediate.)*
+    *(Variant: Q16.48 **deep-zoom** Mandelbrot whose multiply needs a 64-bit intermediate.)*~~ ✓ [/snes/avalanche/](https://biohack.net/snes/avalanche/) *(splitmix64 matrix; bit-exact host==default==a16==xy16 `0x27EA`; disasm `__muldi3`+`__udivdi3`+64-bit shift; no bug)*
 26. **Boids flocking (struct-by-value vectors)** — steering functions take/return `vec2` **by value**.
     *Stresses:* the **aggregate-return ABI** (sret vs register pair), invoked thousands of times/frame.
     *Shows:* a flock swirling — separation / alignment / cohesion.
@@ -199,6 +200,6 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 Sharpest at opening a code path the first 20 never run:
 
 - ~~**#21 soft-float** — largest untested surface, and a bit-exact differential.~~ ✓ [/snes/mandel-float/](https://biohack.net/snes/mandel-float/)
-- **#22 64-bit integers** — `__muldi3` & friends, never touched.
+- ~~**#22 64-bit integers** — `__muldi3` & friends, never touched.~~ ✓ [/snes/avalanche/](https://biohack.net/snes/avalanche/)
 - **#26 struct-by-value ABI** — aggregate return on a hot path.
 - **#29a jump-table VM** — indirect dispatch / function-pointer table.

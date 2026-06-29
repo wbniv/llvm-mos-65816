@@ -273,6 +273,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: mandel-float }
 
+  avalanche:
+    desc: "#22: 64-Bit Avalanche — splitmix64 hash matrix, every op a 64-bit libcall (__muldi3/__lshrdi3/__ashldi3/__udivdi3/__adddi3) — the integer-width family no other demo touches. Cell (i,j)=output bit j of hash64(seed^(1<<i)); a correct mixer => ~50% dense rainbow field. BIT-EXACT: assert corpus_result (h64_gate_crc 0x27EA) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__muldi3 + 64-bit shift + __udivdi3 + rep/sep). Leaves build/avalanche.sfc + build/avalanche-{jg,mame}.png."
+    cmds:
+      - dev/run.sh avalanche
+
+  avalanche-play:
+    desc: "PLAY the 64-Bit Avalanche in a MAME window on this host (builds the ROM first if needed). Shows a shimmering rainbow avalanche matrix — every cell a 64-bit splitmix64 hash bit."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/avalanche.sfc ]; then
+          echo "==> build/avalanche.sfc missing — building it (dev/run.sh avalanche)…"
+          dev/run.sh avalanche
+        fi
+      - task: mandel-mame
+        vars: { ROM: avalanche }
+
   factorial:
     desc: "#20: Bignum factorial — 1000! in a base-10000 digit array; custom 28-row FactDisplay drawable; assert corpus_result (factorial_gate_crc for 50!, 0x772F) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __udivmodsi4 + rep/sep). Leaves build/factorial.sfc + build/factorial-{mame,jg}.png."
     cmds:
