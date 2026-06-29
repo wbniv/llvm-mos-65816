@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/34fd3ad) | #12 CORDIC rotator SNES demo — multiply-free compiler stress-test |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/189c2be) | docs(plan-index): add row for the LTO+a16 bitmask misdiagnosis verification plan |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/c09912a) | docs(upstream): retract LTO+a16 bitmask early-exit issue as a misdiagnosis |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/99c1485) | docs(plan-index): add #16 Wireframe 3-D Solid row (56cf11c) |
@@ -54,6 +55,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+34fd3ad	author	Will Norris
+34fd3ad	added	1
+34fd3ad	deleted	0
+34fd3ad	files	1
+34fd3ad	body	Adds demo #12 of the compiler stress-test battery: the multiply-free member.\nA rotating hand sweeps a CORDIC-computed vector field (ring + 12 spokes), with a\n2-row HUD showing the angle in degrees and a live atan2() self-check of it.\n\nBuilt ON TOP OF the existing examples/65816/cordic16.h (Q2.14, fully-unrolled\nrotation cordic16_sincos + vectoring cordic16_atan2). New examples/65816/cordic.h\nadds the full-circle quadrant-fold rotor + cordic_gate_crc (folds both the\nrotation and vectoring shift-add sweeps). Custom Rotator drawable uses a\nsplit-bitplane trick (plane 0 = static face, plane 1 = moving hand) so erasing\nthe hand is just zeroing plane 1 — one 4 KB chr buffer, fits SNES low RAM.\n\ndev/run.sh cordic RESULT PASS: host oracle == bsnes-jg corpus hash 0x4D41;\nINVERTED disasm gate (mul=div=vshift=0, rep/sep=252, adc/sbc=143) — every other\ndemo asserts the PRESENCE of __mulsi3/__udivmodsi4; this one asserts their\nABSENCE. The atan tables constant-fold into immediate adc/sbc operands (the\nrotation indices are compile-time constants), so there is no rodata table symbol\nto grep — the immediate shift-add IS the multiply-free signature. All three modes\n(default/+mos-a16/+mos-xy16) -verify-machineinstrs clean.\n\nMAME leg + the formal runtime 5-way are blocked here only by the missing\ngitignored SPC700 IPL (dev/roms/s_smp/spc700.rom), an environment gap affecting\nevery demo's MAME leg; dev/cordic.sh now SKIPs MAME when the IPL is absent\n(matching the bsnes-harness-absent SKIP) instead of silently failing.\n\nFiles: examples/65816/cordic.h, examples/snes/cordic.c,\nexamples/snes/corpus/cordic_sim.c, tools/cordic-sim.c, dev/cordic.{sh,lua},\ndocs/plans/2026-06-28-12-snes-cordic-clock-rotator.md, + Taskfile.yml /\nexpected.tsv / TODO.md / plan-index.md bookkeeping.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 189c2be	author	Will Norris
 189c2be	added	1
 189c2be	deleted	1
