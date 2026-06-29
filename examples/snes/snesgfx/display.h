@@ -24,6 +24,8 @@ typedef struct {
   Scene       scene;   /* the drawables        */
   uint8_t     tm;      /* TM ($212C) shadow — TM is WRITE-ONLY, so we never read-modify-write it */
   uint8_t     shown;   /* force-blank released yet? */
+  uint8_t     bright;  /* current INIDISP master brightness 0..15 (the post-flush value)          */
+  uint8_t     btgt;    /* brightness target — display_frame ramps `bright` one step toward it      */
 } Display;
 
 /* Constructor: the boot bracket. Force-blank + zero all PPU control regs, init the owned
@@ -36,6 +38,8 @@ static inline void display_init(Display *d) {
   scene_init(&d->scene);
   d->tm = 0;
   d->shown = 0;
+  d->bright = INIDISP_ON;                   /* default full brightness — the ramp is a no-op    */
+  d->btgt   = INIDISP_ON;                   /* until a fade is requested (display_fade_to)        */
   REG_BGMODE   = BGMODE_1;                  /* BG1/BG2 4bpp, BG3 2bpp */
   REG_TM       = 0;                          /* all layers off until drawables enable theirs */
   REG_NMITIMEN = NMITIMEN_NMI;              /* enable the v-blank NMI flag so snes_wait_vblank() works */
@@ -70,8 +74,23 @@ static inline void display_frame(Display *d) {
   snes_wait_vblank();                       /* block until the next v-blank actually begins   */
   REG_INIDISP = 0x80;                       /* force-blank: DMA succeeds at any vcounter      */
   upq_flush(&d->q);                         /* DMA — CPU stalls per job until transfer done   */
-  REG_INIDISP = INIDISP_ON;                 /* restore brightness                             */
+  /* Ramp the master brightness one step toward its target (the title-screen fade in/out). With
+     btgt == bright (the default) this is a no-op and the screen is simply full-on. */
+  if (d->bright < d->btgt)      d->bright++;
+  else if (d->bright > d->btgt) d->bright--;
+  REG_INIDISP = d->bright;                  /* 0..15 brightness (force-blank bit clear)       */
   d->shown = 1;
+}
+
+/* Set the brightness fade target (0 = black .. 15 = full). display_frame ramps toward it 1/frame. */
+static inline void display_fade_to(Display *d, uint8_t target) { d->btgt = target; }
+
+/* Block, ramping the master brightness to `target` (one step per v-blank), so the screen fades to
+   `target` over ~|bright-target| frames. The scene still emits each frame, so a fading title's
+   slide/shimmer/backdrop keep animating through the fade. */
+static inline void display_fade(Display *d, uint8_t target) {
+  d->btgt = target;
+  while (d->bright != target) display_frame(d);
 }
 
 /* Hold the current screen (e.g. a just-added TitleLayer) for `frames` v-blanks. Each frame still

@@ -44,7 +44,17 @@ typedef struct {
   Drawable    base;
   const char *line0;   /* centred on TITLE_ROW0      (NULL = skip) */
   const char *line1;   /* centred on TITLE_ROW0 + 2  (NULL = skip) */
+  /* --- cinematics state (driven by title_begin/title_end; emit() pushes it each frame) --- */
+  int16_t     slide;   /* BG2 H-scroll (px); eased to 0 so the card slides in + settles centre */
+  uint8_t     phase;   /* animation clock for the ink shimmer + backdrop drift                  */
+  uint8_t     active;  /* 1 = emit() pushes the cinematics; 0 = static no-op                    */
+  uint8_t     restore; /* 1 = fade-out: drive the backdrop back to black for the demo           */
+  uint16_t    ink;     /* live ink colour (CGRAM palette-7 colour 1) — persists for the DMA src  */
+  uint16_t    back;    /* live backdrop colour (CGRAM[0]) — persists for the DMA src             */
 } TitleLayer;
+
+#define TITLE_INK_IDX  (uint8_t)(TITLE_PAL * 16u + 1u)   /* CGRAM entry for the title ink (=113) */
+#define TITLE_SLIDE0   56                                 /* initial BG2 H-scroll → text eases in */
 
 #define TITLE_ROW0  12u   /* vertical placement: line0 mid-screen, line1 two rows below */
 
@@ -97,7 +107,38 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
   t->base.tm_bits = TM_BG2;
 }
 
-static void _title_emit(Drawable *d, UploadQueue *q) { (void)d; (void)q; }  /* static: nothing per-frame */
+/* Per-frame cinematics: when active, ease the BG2 slide toward centre and push the live ink-shimmer
+ * + backdrop-drift colours. All three go through the UploadQueue (WRAM-only enqueue here; the actual
+ * register/CGRAM writes happen in upq_flush during the v-blank/force-blank window — the access-window
+ * rule). When inactive (the demo is running) this is a no-op, so the layer stays gate-neutral. */
+static void _title_emit(Drawable *d, UploadQueue *q) {
+  TitleLayer *t = (TitleLayer *)d;
+  if (!t->active) return;
+
+  /* slide: exponential ease-out of the BG2 horizontal scroll toward 0 (card settles to centre). */
+  if (t->slide > 0) t->slide = (int16_t)(t->slide - ((t->slide + 3) >> 2));
+  if (t->slide < 0) t->slide = 0;
+  upq_push_scroll(q, (uint16_t)(uintptr_t)&REG_BG2HOFS, (uint16_t)t->slide);
+
+  t->phase = (uint8_t)(t->phase + 1u);
+  if (!t->restore) {
+    /* ink shimmer: a gentle brightness "breath" on the white title text (triangle 0..127..0). */
+    uint8_t p   = (uint8_t)(t->phase << 1);
+    uint8_t tri = (uint8_t)((p & 0x80u) ? (uint8_t)(255u - p) : p);  /* 0..127 triangle */
+    uint8_t lvl = (uint8_t)(24u + (tri >> 4));                       /* 24..31 — subtle glow */
+    t->ink  = (uint16_t)SNES_RGB(lvl, lvl, lvl);
+    /* backdrop drift: a slow, DARK blue-teal pulse on CGRAM[0] so the card isn't flat black. */
+    uint8_t b    = t->phase;
+    uint8_t btri = (uint8_t)((b & 0x80u) ? (uint8_t)(255u - b) : b); /* 0..127 */
+    t->back = (uint16_t)SNES_RGB(0u, (uint8_t)(btri >> 5), (uint8_t)(2u + (btri >> 4)));  /* ≤(0,3,9) */
+  } else {
+    /* fade-out: hold the ink, drive the backdrop back to black so the demo starts on black. */
+    t->ink  = (uint16_t)SNES_RGB(28, 28, 28);
+    t->back = 0u;
+  }
+  upq_push_cgram(q, TITLE_INK_IDX, &t->ink, 0x00u, 2u);   /* palette-7 colour 1 (the text ink) */
+  upq_push_cgram(q, 0u,            &t->back, 0x00u, 2u);   /* CGRAM[0] backdrop */
+}
 
 static const DrawableVT TITLE_VT = { _title_reserve, _title_emit };
 
@@ -122,19 +163,27 @@ static inline void title_init(TitleLayer *t, const char *line0, const char *line
  * BG12NBA char-base register last).
  * ------------------------------------------------------------------------------------------------ */
 
-/* Raise the title card: init it, reserve its VRAM (force-blank), and release force-blank with the
- * card visible over the demo's (black) layer. */
+/* Raise the title card cinematically: reserve it, then FADE the master brightness up from black while
+ * the text SLIDES in from the side and the backdrop drifts — all over ~16 v-blanks. After this returns
+ * the card is fully lit; a demo may then run heavy pre-loop compute (the PPU holds the lit card). */
 static inline void title_begin(Display *d, TitleLayer *t, const char *line0, const char *line1) {
   title_init(t, line0, line1);
+  t->slide = TITLE_SLIDE0; t->phase = 0; t->active = 1; t->restore = 0;
+  t->ink = (uint16_t)SNES_RGB(31, 31, 31); t->back = 0u;
   display_add(d, (Drawable *)t);     /* reserve() in force-blank: font + tilemap + palette */
-  display_frame(d);                  /* release force-blank with the card showing */
+  d->bright = 0;                     /* start from black ... */
+  display_fade(d, INIDISP_ON);       /* ... fade up + slide in + backdrop drift (emit drives them) */
 }
 
-/* Hold the card for `frames` v-blanks (0 = no hold — e.g. when a long compute already held it), then
- * tear it down so the demo's own layer takes over. */
+/* Hold the lit card for `frames` v-blanks (the shimmer + backdrop animate), then FADE it out to black,
+ * tear it down, and leave the brightness ramping back to full so the demo's first frames FADE IN. */
 static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
-  display_hold(d, frames);
+  display_hold(d, frames);           /* dwell: ink shimmer + backdrop drift */
+  t->restore = 1;                    /* emit() now drives the backdrop back to black */
+  display_fade(d, 0);                /* fade the card out to black */
   display_hide_layer(d, (Drawable *)t);
+  t->active = 0;                     /* emit() reverts to a no-op (gate-neutral) */
+  display_fade_to(d, INIDISP_ON);    /* the demo's main-loop frames ramp brightness back up → fade-in */
 }
 
 #endif /* SNESGFX_TITLE_LAYER_H */
