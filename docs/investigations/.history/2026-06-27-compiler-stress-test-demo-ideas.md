@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8e6f647) | feat(snes): #3 Burning Ship fractal — |Re|,|Im|-folding escape-time demo |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/0cabf2d) | feat(snes): #1 Julia Set Explorer — z²+c complex-multiply / far-framebuffer stress demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/579ad86) | feat(snes): #15 Raycaster maze — DDA grid-cast, per-column 1/dist divide |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/70e1840) | feat(snes): #9 Lissajous / Harmonograph — damped sin-LUT curve demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/30333e0) | feat(snes): #5 Conway's Game of Life — bit-parallel SWAR neighbour sums |
@@ -14,6 +16,16 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+8e6f647	author	Will Norris
+8e6f647	added	17
+8e6f647	deleted	14
+8e6f647	files	1
+8e6f647	body	Demo #3 of the compiler stress-test battery — the abs-fold fractal. The\nMandelbrot's folded cousin z_{n+1} = (|Re z| + i|Im z|)² + c. Per\niteration three Q12 __mulsi3 (zx², zy², |zx·zy|) — the same count as\nMandelbrot — PLUS the two abs folds that ARE the algorithm (and make the\nship). Escape-time bands render the black ship silhouette; the whole\n32×28 grid is ground out once behind the title (too heavy for a 60 fps\nreveal — interior cells run the full iteration count) then the bands are\npalette-cycled. Multiply-only, no divide.\n\nGate bs_gate_crc = 0x6F2D (16×16 window over the ship, maxiter 24,\nescape-count rotate-XOR hash). No far pointers => full 5-way bar.\nVerified: dev/run.sh burning-ship RESULT PASS (disasm __mulsi3=3 +\nrep/sep=26, divide=0; bsnes-jg host==+mos-a16 0x6F2D;\n-verify-machineinstrs clean on default/+mos-a16/+mos-xy16; MAME pending\nthe SPC700 IPL — non-blocker per the demos-only policy). Published\nbiohack.net/snes/burning-ship/ (biohack.net v1.0.118).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+0cabf2d	author	Will Norris
+0cabf2d	added	4
+0cabf2d	deleted	4
+0cabf2d	files	1
+0cabf2d	body	The Mandelbrot demo's morphing cousin: iterates z²+c in Q5.10 with z₀ = the\npixel and c a single constant per frame, swept along the 0.7885·e^iθ orbit so\nthe set continuously morphs. Three 16×16→32 __mulsi3 per iteration; the escape\nimage is far-stored into a high-WRAM buffer at $7E2000 (the #320 sta [dp] path)\nand far-loaded back into Mode 7 VRAM. A full 64×56 recompute is ~22 s on the\n65816, so the set is re-ground a coarse row per spin frame in the background\nwhile the Mode 7 affine matrix spins + zoom-breathes it at 60 fps.\n\nShared kernel examples/65816/julia.h (host oracle + corpus slice + ROM). Gate\njulia_gate_crc 0x3490 (4 keyframe c over a 6×6 grid, maxiter 8 — far-pointer-free,\nso the corpus slice is a full 5-way bar; finishes by ~frame 90, inside the\n180-frame corpus budget). dev/run.sh julia PASS on the demo bar (disasm\n__mulsi3=3 + rep/sep=46; bsnes-jg host==+mos-a16 0x3490; MAME SKIP — no SPC700\nIPL in this env, demos-only non-blocker). Published biohack.net/snes/julia/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 579ad86	author	Will Norris
 579ad86	added	3
 579ad86	deleted	3

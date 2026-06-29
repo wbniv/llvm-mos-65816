@@ -95,23 +95,22 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 ## Coverage map (why this is a good battery, not 20 of the same test)
 
-<!-- NOTE TO SELF (strikethrough): do NOT strike the demo numbers in this coverage map. They are an
-     *index* (cross-references), not a to-do checklist — the "~~…~~ = done" convention from ~/SRC/CLAUDE.md
-     applies to the numbered demo *list* above (where one struck bullet stands out among open ones), not here.
-     Now that all 20 ship, striking every number turned the whole table into an illegible wall of struck text
-     (see the 2026-06-29 render). Keep these numbers PLAIN; per-demo done-state lives in the list + banner. -->
+<!-- NOTE TO SELF (strikethrough): cross out completed items EVERYWHERE in this doc, consistently — same as
+     the ideas list at the top. In this coverage map: strike each demo number (~~N~~) when its demo ships, and
+     strike the left-column aspect name once EVERY number in that row is crossed off. All 20 shipped → the
+     whole table is struck. Strikethrough = done; do not leave completed items plain. -->
 | Codegen aspect | Demos |
 |---|---|
-| complex / 32-bit fixed-point **multiply** | 1, 2, 3, 4, 8, 9–10, 11, 13, 16 |
-| **division** / reciprocal / sqrt | 2, 13, 15, 16, 19 |
-| **recursion** & the soft stack / frame ABI | 17, 18 |
-| **heaps / queues / structs** (data structures) | 18 |
-| **bit manipulation** (pack/shift/boolean) | 5, 6 |
-| multi-precision **carry-chain** codegen | 19, 20 |
-| **shift-add**, multiply-free | 12 |
-| **far / high-WRAM** buffers (a16-only) | 1, 4, 8, 13 |
-| **PRNG + scatter** writes | 4, 7, 19 |
-| **sin/cos LUT** indexing | 9, 10, 11, 14, 16 |
+| ~~complex / 32-bit fixed-point **multiply**~~ | ~~1~~, ~~2~~, ~~3~~, ~~4~~, ~~8~~, ~~9~~–~~10~~, ~~11~~, ~~13~~, ~~16~~ |
+| ~~**division** / reciprocal / sqrt~~ | ~~2~~, ~~13~~, ~~15~~, ~~16~~, ~~19~~ |
+| ~~**recursion** & the soft stack / frame ABI~~ | ~~17~~, ~~18~~ |
+| ~~**heaps / queues / structs** (data structures)~~ | ~~18~~ |
+| ~~**bit manipulation** (pack/shift/boolean)~~ | ~~5~~, ~~6~~ |
+| ~~multi-precision **carry-chain** codegen~~ | ~~19~~, ~~20~~ |
+| ~~**shift-add**, multiply-free~~ | ~~12~~ |
+| ~~**far / high-WRAM** buffers (a16-only)~~ | ~~1~~, ~~4~~, ~~8~~, ~~13~~ |
+| ~~**PRNG + scatter** writes~~ | ~~4~~, ~~7~~, ~~19~~ |
+| ~~**sin/cos LUT** indexing~~ | ~~9~~, ~~10~~, ~~11~~, ~~14~~, ~~16~~ |
 
 ## Recommended first picks
 
