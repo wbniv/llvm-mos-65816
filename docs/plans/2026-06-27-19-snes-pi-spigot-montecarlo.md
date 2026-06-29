@@ -1,5 +1,7 @@
 # #19 — SNES π Spigot + Monte-Carlo
 
+<p align="center"><img src="screenshots/spigot.png" width="512" alt="spigot demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** IN PROGRESS — plan written, implementation starting.
 Demo #19 of the **compiler stress-test demo battery** (`TODO.md` → "Compiler stress-test demo battery").
 Supplements the standing guides (`~/SRC/CLAUDE.md`, project `CLAUDE.md`, `docs/agent-handoff.md`).

@@ -1,5 +1,7 @@
 # #11 — SNES Spirograph (hypotrochoid): (R, r, d) parametric rose curves
 
+<p align="center"><img src="screenshots/spirograph.png" width="512" alt="spirograph demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** DONE — built, verified, merged to `main`, and **PUBLISHED live at
 [https://biohack.net/spirograph/](https://biohack.net/spirograph/)**. Demo #11 of the **compiler stress-test demo
 battery** ([ideas](../investigations/2026-06-27-compiler-stress-test-demo-ideas.md); `TODO.md` →

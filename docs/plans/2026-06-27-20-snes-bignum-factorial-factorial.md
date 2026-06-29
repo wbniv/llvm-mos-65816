@@ -1,5 +1,7 @@
 # Plan: #20 — SNES Bignum Factorial (`factorial`)
 
+<p align="center"><img src="screenshots/factorial.png" width="512" alt="factorial demo running on the SNES (bsnes-jg render)"></p>
+
 ## Context
 
 Demo #20 of the compiler stress-test battery: display `n!` as a growing decimal number on screen,
@@ -193,7 +195,7 @@ PASS (factorial_sim passes; 2 failures are pre-existing and unrelated)
 
 6. `/snes-rom-page` publishes to biohack.net; headless screenshot shows the factorial number on screen.
 
-<img src="plans/screenshots/factorial-page.png" width="700">
+<img src="screenshots/factorial-page.png" width="700">
 
 Page at `biohack.net/snes/factorial/`: Dune Rise title, ROM running in bsnes-jg WASM canvas ("1" visible in initial frame), Verify fidelity button wired to gate CRC `0x772F`, algorithm pseudocode and compiler stress-test table rendered correctly.
 PASS

@@ -1,5 +1,7 @@
 # Plan — Space Invaders on the `snesgfx` OOP library
 
+<p align="center"><img src="screenshots/invaders.png" width="512" alt="invaders demo running on the SNES (bsnes-jg render)"></p>
+
 ## Status — as-built 2026-06-27
 
 **COMPLETE & verified (all GREEN).** `snesgfx` library (`display`/`upload`/`vram`/`drawable`/`scene`/

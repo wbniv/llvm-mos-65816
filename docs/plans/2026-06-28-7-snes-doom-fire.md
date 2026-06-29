@@ -1,5 +1,7 @@
 # #7 — SNES Doom-fire: per-cell decay + PRNG, palette ramp
 
+<p align="center"><img src="screenshots/doom-fire.png" width="512" alt="doom-fire demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** DONE + PUBLISHED (2026-06-28). Demo **#7** of the **compiler stress-test demo battery**.
 Gate `0x3C59`; `dev/run.sh doom-fire` RESULT PASS (bsnes-jg + disasm; MAME SKIP env-wide). Live at
 [biohack.net/snes/doom-fire/](https://biohack.net/snes/doom-fire/).

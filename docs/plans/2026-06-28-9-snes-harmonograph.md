@@ -1,5 +1,7 @@
 # #9 — SNES Lissajous / Harmonograph: damped sinusoids, the decaying traced curve
 
+<p align="center"><img src="screenshots/harmonograph.png" width="512" alt="harmonograph demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** DONE + PUBLISHED. Demo **#9** of the **compiler stress-test demo battery**.
 Gate hash **`0x0EBB`**; `dev/run.sh harmonograph` RESULT PASS (disasm `__mulsi3`=2 + `rep/sep`=36,
 zero divide; bsnes-jg host == `+mos-a16` `0x0EBB`); `-verify-machineinstrs` clean on

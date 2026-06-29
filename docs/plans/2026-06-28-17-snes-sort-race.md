@@ -1,5 +1,7 @@
 # #17 — SNES Sorting Race: quicksort vs heapsort vs mergesort of a bar array
 
+<p align="center"><img src="screenshots/sort-race.png" width="512" alt="sort-race demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** BUILT + `dev/run.sh sort-race` RESULT PASS (host == bsnes-jg corpus hash `0xB28F`; disasm
 recursion+compare+native-16 gate PASS; 3-mode `-verify-machineinstrs` clean). DONE on the demo bar
 per the 2026-06-28 policy (bsnes-jg PASS + browser-verified; the MAME leg is a non-blocker — env-wide

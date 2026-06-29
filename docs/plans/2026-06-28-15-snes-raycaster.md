@@ -1,5 +1,7 @@
 # #15 — SNES Raycaster maze: DDA grid-cast, per-column 1/dist division
 
+<p align="center"><img src="screenshots/raycaster.png" width="512" alt="raycaster demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** DONE + PUBLISHED. Demo **#15** of the **compiler stress-test demo battery**.
 Gate hash **`0xB200`**; `dev/run.sh raycaster` RESULT PASS (disasm `__udivsi3`=3 + `rep/sep`=51;
 bsnes-jg host == `+mos-a16` `0xB200`); `-verify-machineinstrs` clean ×3. Published —

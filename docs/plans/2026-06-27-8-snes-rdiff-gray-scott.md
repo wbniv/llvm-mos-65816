@@ -1,5 +1,7 @@
 # Plan: #8 Gray-Scott Reaction-Diffusion SNES demo (`rdiff`)
 
+<p align="center"><img src="screenshots/rdiff.png" width="512" alt="rdiff demo running on the SNES (bsnes-jg render)"></p>
+
 **Date:** 2026-06-27  
 **Battery ID:** #8  
 **Slug:** `rdiff`  

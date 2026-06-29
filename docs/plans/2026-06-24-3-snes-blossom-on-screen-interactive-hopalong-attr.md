@@ -1,5 +1,7 @@
 # #3 — SNES Blossom: on-screen interactive Hopalong-attractor port
 
+<p align="center"><img src="screenshots/blossom.png" width="512" alt="blossom demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** plan. Phase 1 (headless Q8.8 kernel `examples/65816/k_hopalong.c`) is landed + 4-way
 verified (golden `0x1BBC`). This plan covers the on-screen interactive renderer.
 Plan supplements the standing guides (`~/SRC/CLAUDE.md`, project `CLAUDE.md`,

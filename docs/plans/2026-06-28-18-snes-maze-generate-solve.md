@@ -1,5 +1,7 @@
 # #18 — SNES Maze: generate (recursion) + A* solve (priority-queue heap)
 
+<p align="center"><img src="screenshots/maze.png" width="512" alt="maze demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** BUILT + VERIFIED + **PUBLISHED** — live at [biohack.net/snes/maze/](https://biohack.net/snes/maze/)
 (biohack.net v1.0.113), 2026-06-28. bsnes-jg + host + `-verify` clean (default/+mos-a16/+mos-xy16). Demo
 **#18** of the **compiler stress-test demo battery**. Only the MAME leg remains pending (SPC700 IPL absent

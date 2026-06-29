@@ -1,5 +1,7 @@
 # #2 — SNES Newton's-Method Fractal: complex division + convergence branching
 
+<p align="center"><img src="screenshots/newton.png" width="512" alt="newton demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** COMPLETE (2026-06-27). Demo **#2** of the **compiler stress-test demo battery**.
 
 ## Context

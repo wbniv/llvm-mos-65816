@@ -223,6 +223,11 @@ Template (fill in all sections):
 ```markdown
 # #N — SNES <Name>: <tagline>
 
+<!-- Title card — fill in after the gate runs (step 9): the SAME build/<slug>-jg.png
+     that becomes the /snes-rom-page --preview. Path is screenshots/<slug>.png
+     (relative to docs/plans/ — NOT plans/screenshots/). -->
+<p align="center"><img src="screenshots/<slug>.png" width="512" alt="<Name> demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** PLANNED. Demo **#N** of the **compiler stress-test demo battery**.
 
 ## Context
@@ -260,8 +265,11 @@ Table: asset → from → used for.
 3. Corpus slice host-compiles; ./a.out exits 0.
 4. `dev/run.sh <slug>` — host oracle + disasm gate + bsnes-jg + MAME all PASS.
 5. `dev/run.sh corpus-a16` — all slices PASS.
-6. /snes-rom-page publishes; headless screenshot shows the ROM running.
-7. `task md -- docs/plans/...` renders cleanly.
+6. **Title card** — copy the gate's `build/<slug>-jg.png` to `docs/plans/screenshots/<slug>.png`,
+   embed it under the H1 (the `<img>` slot above), and confirm it shows the demo running.
+   This is the **same** artifact passed to /snes-rom-page as `--preview` — one render, two uses.
+7. /snes-rom-page publishes; headless screenshot shows the ROM running.
+8. `task md -- docs/plans/...` renders cleanly (the title card resolves).
 ```
 
 Add a `[wip]` TODO entry under "Compiler stress-test demo battery" in `TODO.md` with a
@@ -488,14 +496,22 @@ All slices must PASS. If any regress, investigate before proceeding.
 
 ### 9 — Publish
 
-Invoke `/snes-rom-page` with:
+First **land the title card** — one render, two uses. The gate leaves `build/<slug>-jg.png`
+(the full-colour bsnes-jg frame-500 snapshot); MAME's `build/<slug>-mame.png` is often blank
+(MAME leg SKIPs env-wide), so prefer the `-jg.png` render for both the plan and the web page:
+
+```bash
+cp build/<slug>-jg.png docs/plans/screenshots/<slug>.png   # → the plan's title card (step 6)
+```
+
+Then invoke `/snes-rom-page` with that **same** PNG as the preview / web title card:
 
 ```
 --rom build/<slug>.sfc
 --slug <slug>
 --site ~/SRC/biohack.net
 --title "<Display Title>"
---preview build/<slug>-mame.png
+--preview build/<slug>-jg.png
 --selfcheck "0x<VMA> 2 0x<EXPECT> 500 <label>"
 ```
 
@@ -507,13 +523,25 @@ awk '$NF=="corpus_result"{print $1; exit}' build/<slug>.map
 ### 10 — Close out
 
 - Paste raw output of each verification step into the plan doc, then mark `PASS` or `FAIL`.
-- Mark the TODO item `[x]` and move it to the Done section (one tight line, ≤ 150 chars).
+- **Mark the TODO item done with strikethrough.** Flip `[wip]`→`[x]`, move it to the Done section
+  (one tight line, ≤ 150 chars), and **strike the title** `~~…~~` per the shared `~/SRC/CLAUDE.md`
+  "Strike through completed to-do items" rule — with the published URL as the proof, e.g.
+  `[x] ~~**#N <Name>**~~ — … ✓ [/snes/<slug>/](https://biohack.net/snes/<slug>/)`.
+- **Strike the entry in the demo-ideas backlog** —
+  `docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md`. This is the live progress tracker,
+  so update **every** place the demo appears (match the existing done entries like
+  `~~**Newton's-method fractal** …~~ ✓ [/snes/newton/](https://biohack.net/snes/newton/)`):
+  1. the numbered **idea entry** — wrap its title+description in `~~…~~` and append `✓ [/snes/<slug>/](https://biohack.net/snes/<slug>/)`;
+  2. the **Coverage map** table rows — strike the demo's `#N` in each row it appears in (`~~N~~`);
+  3. the **Recommended first picks** list — strike its bullet if listed there.
 - Update `docs/investigations/plan-index.md` with the commit SHA.
 - Commit — stage only your files:
   `examples/65816/<slug>.h`, `examples/snes/<slug>.c`,
   `examples/snes/corpus/<slug>_sim.c`, `tools/<slug>-sim.c`,
   `dev/<slug>.sh`, `dev/<slug>.lua`,
-  `Taskfile.yml`, `TODO.md`, `docs/plans/…`, `docs/investigations/plan-index.md`.
+  `Taskfile.yml`, `TODO.md`, `docs/plans/…`, `docs/plans/screenshots/<slug>.png`,
+  `docs/investigations/plan-index.md`,
+  `docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md`.
   End the commit message with:
   `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
 
@@ -582,6 +610,9 @@ Full-screen tilemap re-upload (32×28 × 2 = 1 792 bytes) does NOT fit one V-bla
 - **After writing the corpus slice:** `cc` compiles it; `./a.out` exits 0.
 - **After writing the ROM:** `mos-clang --config ... -o build/<slug>.sfc ...` succeeds;
   `snes-checksum.py` exits 0.
-- **After the gate:** both emulators agree with the host oracle; disasm probes all ≥ 1.
+- **After the gate:** both emulators agree with the host oracle; disasm probes all ≥ 1;
+  `build/<slug>-jg.png` shows the demo running (this is the title card + web preview).
+- **After the title card:** `docs/plans/screenshots/<slug>.png` exists, the plan's `<img>`
+  resolves under `task md`, and the *same* file is the `/snes-rom-page --preview`.
 - **After publication:** headless screenshot of `http://localhost:8799/<slug>/` shows the ROM
   running (not a blank page or "ROM failed to load").

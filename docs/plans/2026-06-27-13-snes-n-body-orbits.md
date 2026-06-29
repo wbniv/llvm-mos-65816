@@ -1,5 +1,7 @@
 # #13 — SNES N-body Orbits: Newtonian gravity · Verlet · 1/r²
 
+<p align="center"><img src="screenshots/n-body.png" width="512" alt="n-body demo running on the SNES (bsnes-jg render)"></p>
+
 **Status:** VERIFIED. Demo **#13** of the **compiler stress-test demo battery**
 ([ideas](../investigations/2026-06-27-compiler-stress-test-demo-ideas.md#L62); `TODO.md` →
 "Compiler stress-test demo battery" → **#13**). Supplements the standing guides (`~/SRC/CLAUDE.md`,

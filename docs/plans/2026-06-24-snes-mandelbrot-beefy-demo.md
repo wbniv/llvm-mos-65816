@@ -1,5 +1,7 @@
 # Plan — SNES Mandelbrot: a beefy `+mos-a16` fixed-point demo, differentially verified and displayed on-console
 
+<p align="center"><img src="screenshots/mandel.png" width="512" alt="mandel demo running on the SNES (bsnes-jg render)"></p>
+
 **Branch:** `wt/321-mandelbrot` (worktree `…/llvm-mos-65816-mandelbrot`, off `main` @ `5585972`).
 **Issue:** #321 (M2) — the SNES platform exists to exercise `+mos-a16`; this is its first *beefy* customer.
 Supplement to [`CLAUDE.md`](../../CLAUDE.md) + [`docs/agent-handoff.md`](../agent-handoff.md).
