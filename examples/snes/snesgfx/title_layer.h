@@ -45,16 +45,20 @@ typedef struct {
   const char *line0;   /* centred on TITLE_ROW0      (NULL = skip) */
   const char *line1;   /* centred on TITLE_ROW0 + 2  (NULL = skip) */
   /* --- cinematics state (driven by title_begin/title_end; emit() pushes it each frame) --- */
-  int16_t     slide;   /* BG2 H-scroll (px); eased to 0 so the card slides in + settles centre */
-  uint8_t     phase;   /* animation clock for the ink shimmer + backdrop drift                  */
+  int16_t     y0, y1;  /* line0/line1 vertical position, Q4 (row<<4); eased to the centre rows  */
+  uint8_t     py0, py1;/* last integer tilemap rows drawn (cleared when a line moves)           */
+  uint8_t     phase;   /* animation clock for the ink shimmer + the rainbow backdrop            */
   uint8_t     active;  /* 1 = emit() pushes the cinematics; 0 = static no-op                    */
+  uint8_t     flyin;   /* 1 = emit() eases the lines in; 0 = hold them parked (during fade-up)  */
   uint8_t     restore; /* 1 = fade-out: drive the backdrop back to black for the demo           */
   uint16_t    ink;     /* live ink colour (CGRAM palette-7 colour 1) — persists for the DMA src  */
   uint16_t    back;    /* live backdrop colour (CGRAM[0]) — persists for the DMA src             */
+  uint16_t    rbuf0[TITLE_COLS];  /* prebuilt BG2 tilemap row for line0 (centred glyphs)         */
+  uint16_t    rbuf1[TITLE_COLS];  /* ... for line1                                               */
+  uint16_t    rblank[TITLE_COLS]; /* an all-space row, used to clear a line's previous position  */
 } TitleLayer;
 
 #define TITLE_INK_IDX  (uint8_t)(TITLE_PAL * 16u + 1u)   /* CGRAM entry for the title ink (=113) */
-#define TITLE_SLIDE0   56                                 /* initial BG2 H-scroll → text eases in */
 
 #define TITLE_ROW0  12u   /* vertical placement: line0 mid-screen, line1 two rows below */
 
@@ -73,6 +77,19 @@ static void _title_put_centred(uint16_t row, const char *s) {
   snes_vram_addr((uint16_t)(TITLE_MAP_WORD + row * TITLE_COLS + col));
   for (const char *p = s; *p && col < TITLE_COLS; p++, col++)
     REG_VMDATA = (uint16_t)((TITLE_PAL << 10) | _title_glyph((uint8_t)*p));
+}
+
+/* Triangle wave 0..127..0 over a uint8 ramp — the building block of the rainbow backdrop. */
+static inline uint8_t _title_tri(uint8_t x) { return (uint8_t)((x & 0x80u) ? (uint8_t)(255u - x) : x); }
+
+/* Build one BG2 tilemap row (TITLE_COLS words) into `buf`: all spaces, with `s` centred. */
+static void _title_build_row(uint16_t *buf, const char *s) {
+  for (uint8_t i = 0; i < TITLE_COLS; i++) buf[i] = (uint16_t)(TITLE_PAL << 10);   /* space glyph */
+  if (!s) return;
+  uint8_t len = 0; for (const char *p = s; *p && len < TITLE_COLS; p++) len++;
+  uint8_t col = (uint8_t)((TITLE_COLS - len) / 2u);
+  for (const char *p = s; *p && col < TITLE_COLS; p++, col++)
+    buf[col] = (uint16_t)((TITLE_PAL << 10) | _title_glyph((uint8_t)*p));
 }
 
 static void _title_reserve(Drawable *d, VramAlloc *va) {
@@ -97,40 +114,71 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
     for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
   }
 
-  /* Clear the whole 32x32 tilemap to the (all-zero) space glyph, then lay the centred lines. */
+  /* Clear the whole 32x32 tilemap to the (all-zero) space glyph. */
   snes_vram_addr(TITLE_MAP_WORD);
   for (uint16_t i = 0; i < (uint16_t)(TITLE_COLS * TITLE_ROWS); i++)
     REG_VMDATA = (uint16_t)(TITLE_PAL << 10);       /* palette 7, tile 0 (space) */
-  _title_put_centred(TITLE_ROW0,      t->line0);
-  _title_put_centred(TITLE_ROW0 + 2u, t->line1);
+
+  /* Prebuild the two text rows + a blank row (DMA sources for the per-frame fly-in). */
+  _title_build_row(t->rbuf0, t->line0);
+  _title_build_row(t->rbuf1, t->line1);
+  _title_build_row(t->rblank, (const char *)0);
+
+  /* Place line0 at the TOP edge (row 0) and line1 at the BOTTOM edge (row 27); emit() flies them in
+     toward the centre rows. (Direct VRAM writes are safe — reserve runs in force-blank.) */
+  snes_vram_addr((uint16_t)TITLE_MAP_WORD);
+  for (uint8_t i = 0; i < TITLE_COLS; i++) REG_VMDATA = t->rbuf0[i];
+  snes_vram_addr((uint16_t)(TITLE_MAP_WORD + 27u * TITLE_COLS));
+  for (uint8_t i = 0; i < TITLE_COLS; i++) REG_VMDATA = t->rbuf1[i];
+  t->y0 = 0;                    t->py0 = 0;
+  t->y1 = (int16_t)(27 << 4);   t->py1 = 27;
 
   t->base.tm_bits = TM_BG2;
 }
 
-/* Per-frame cinematics: when active, ease the BG2 slide toward centre and push the live ink-shimmer
- * + backdrop-drift colours. All three go through the UploadQueue (WRAM-only enqueue here; the actual
- * register/CGRAM writes happen in upq_flush during the v-blank/force-blank window — the access-window
- * rule). When inactive (the demo is running) this is a no-op, so the layer stays gate-neutral. */
+/* Per-frame cinematics: when active, fly the two text lines in from the top + bottom edges to the
+ * centre (re-DMAing a line's tilemap row only when its integer row changes), shimmer the ink, and
+ * cycle a rainbow backdrop. Everything goes through the UploadQueue (WRAM-only enqueue here; the
+ * actual VRAM/CGRAM writes happen in upq_flush during the v-blank/force-blank window — the
+ * access-window rule). When inactive (the demo is running) this is a no-op, so the layer stays
+ * gate-neutral. */
 static void _title_emit(Drawable *d, UploadQueue *q) {
   TitleLayer *t = (TitleLayer *)d;
   if (!t->active) return;
 
-  /* slide: exponential ease-out of the BG2 horizontal scroll toward 0 (card settles to centre). */
-  if (t->slide > 0) t->slide = (int16_t)(t->slide - ((t->slide + 3) >> 2));
-  if (t->slide < 0) t->slide = 0;
-  upq_push_scroll(q, (uint16_t)(uintptr_t)&REG_BG2HOFS, (uint16_t)t->slide);
+  /* fly-in (only once armed — title_begin fades up first with the lines parked at the edges, so the
+     travel is seen at full brightness): ease each line's Q4 row toward its centre target, snapping
+     the final sub-row so it settles exactly, and redraw only on an integer-row change. line0
+     descends from the top edge, line1 rises from the bottom edge — they meet in the middle. */
+  if (t->flyin) {
+    int16_t tgt0 = (int16_t)(TITLE_ROW0 << 4), tgt1 = (int16_t)((TITLE_ROW0 + 2u) << 4);
+    t->y0 = (int16_t)(t->y0 + ((tgt0 - t->y0) >> 3));
+    t->y1 = (int16_t)(t->y1 + ((tgt1 - t->y1) >> 3));
+    if ((int16_t)(tgt0 - t->y0) < 16) t->y0 = tgt0;   /* snap the last <1 row so the loop terminates */
+    if ((int16_t)(t->y1 - tgt1) < 16) t->y1 = tgt1;
+    uint8_t ny0 = (uint8_t)(t->y0 >> 4), ny1 = (uint8_t)(t->y1 >> 4);
+    if (ny0 != t->py0) {
+      upq_push_vram(q, (uint16_t)(TITLE_MAP_WORD + (uint16_t)t->py0 * TITLE_COLS), t->rblank, 0x00u, TITLE_COLS * 2u, VMAIN_INC_HIGH_1);
+      upq_push_vram(q, (uint16_t)(TITLE_MAP_WORD + (uint16_t)ny0   * TITLE_COLS), t->rbuf0,  0x00u, TITLE_COLS * 2u, VMAIN_INC_HIGH_1);
+      t->py0 = ny0;
+    }
+    if (ny1 != t->py1) {
+      upq_push_vram(q, (uint16_t)(TITLE_MAP_WORD + (uint16_t)t->py1 * TITLE_COLS), t->rblank, 0x00u, TITLE_COLS * 2u, VMAIN_INC_HIGH_1);
+      upq_push_vram(q, (uint16_t)(TITLE_MAP_WORD + (uint16_t)ny1   * TITLE_COLS), t->rbuf1,  0x00u, TITLE_COLS * 2u, VMAIN_INC_HIGH_1);
+      t->py1 = ny1;
+    }
+  }
 
   t->phase = (uint8_t)(t->phase + 1u);
   if (!t->restore) {
-    /* ink shimmer: a gentle brightness "breath" on the white title text (triangle 0..127..0). */
-    uint8_t p   = (uint8_t)(t->phase << 1);
-    uint8_t tri = (uint8_t)((p & 0x80u) ? (uint8_t)(255u - p) : p);  /* 0..127 triangle */
-    uint8_t lvl = (uint8_t)(24u + (tri >> 4));                       /* 24..31 — subtle glow */
-    t->ink  = (uint16_t)SNES_RGB(lvl, lvl, lvl);
-    /* backdrop drift: a slow, DARK blue-teal pulse on CGRAM[0] so the card isn't flat black. */
-    uint8_t b    = t->phase;
-    uint8_t btri = (uint8_t)((b & 0x80u) ? (uint8_t)(255u - b) : b); /* 0..127 */
-    t->back = (uint16_t)SNES_RGB(0u, (uint8_t)(btri >> 5), (uint8_t)(2u + (btri >> 4)));  /* ≤(0,3,9) */
+    /* ink shimmer: a gentle brightness "breath" on the white title text. */
+    uint8_t lvl = (uint8_t)(24u + (_title_tri((uint8_t)(t->phase << 1)) >> 4));   /* 24..31 */
+    t->ink = (uint16_t)SNES_RGB(lvl, lvl, lvl);
+    /* FLASHY cycling-rainbow backdrop: three 120°-shifted triangle waves → a smooth hue sweep. */
+    uint8_t h = (uint8_t)(t->phase << 1);
+    t->back = (uint16_t)SNES_RGB((uint8_t)(_title_tri(h)                  >> 2),
+                                 (uint8_t)(_title_tri((uint8_t)(h + 85u)) >> 2),
+                                 (uint8_t)(_title_tri((uint8_t)(h + 170u))>> 2));
   } else {
     /* fade-out: hold the ink, drive the backdrop back to black so the demo starts on black. */
     t->ink  = (uint16_t)SNES_RGB(28, 28, 28);
@@ -168,11 +216,14 @@ static inline void title_init(TitleLayer *t, const char *line0, const char *line
  * the card is fully lit; a demo may then run heavy pre-loop compute (the PPU holds the lit card). */
 static inline void title_begin(Display *d, TitleLayer *t, const char *line0, const char *line1) {
   title_init(t, line0, line1);
-  t->slide = TITLE_SLIDE0; t->phase = 0; t->active = 1; t->restore = 0;
+  t->phase = 0; t->active = 1; t->restore = 0; t->flyin = 0;
   t->ink = (uint16_t)SNES_RGB(31, 31, 31); t->back = 0u;
-  display_add(d, (Drawable *)t);     /* reserve() in force-blank: font + tilemap + palette */
-  d->bright = 0;                     /* start from black ... */
-  display_fade(d, INIDISP_ON);       /* ... fade up + slide in + backdrop drift (emit drives them) */
+  display_add(d, (Drawable *)t);     /* reserve(): builds rows, parks text top+bottom, inits y0/y1 */
+  d->bright = 0;                     /* fade up to full with the lines parked at the edges ...       */
+  display_fade(d, INIDISP_ON);
+  t->flyin = 1;                      /* ... then fly them in to the centre at full brightness       */
+  for (uint8_t g = 0; (t->py0 != (uint8_t)TITLE_ROW0 || t->py1 != (uint8_t)(TITLE_ROW0 + 2u)) && g < 48u; g++)
+    display_frame(d);
 }
 
 /* Hold the lit card for `frames` v-blanks (the shimmer + backdrop animate), then FADE it out to black,
