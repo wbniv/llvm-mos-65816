@@ -16,10 +16,15 @@ Mirror the established pattern (see `mandel.h` / `invaders_logic.h`):
 
 1. **Shared host+target logic header** — the math/algorithm in pure `<stdint.h>` C (explicit `int16_t`/`int32_t`
    widths; `int` is 16-bit on target, 32-bit on host), compiled both on the SNES and by a host oracle.
-2. **Differential CRC** — fold the result/state into a CRC; assert **host == default@MAME == +mos-a16@MAME ==
-   +mos-xy16@MAME == default/+mos-a16@bsnes-jg**, `-verify-machineinstrs` clean, bsnes 3× byte-identical.
+2. **Differential CRC** — fold the result/state into a CRC; assert **host == default/+mos-a16@bsnes-jg**,
+   `-verify-machineinstrs` clean, bsnes 3× byte-identical. **MAME is optional for demos** (the user
+   final-verifies each demo in the browser, which runs the same bsnes-jg core) — so a pending/flaky MAME
+   leg (e.g. SPC700 IPL) does **not** block a demo. Run the MAME legs (`default`/`+mos-a16`/`+mos-xy16`)
+   when convenient as a bonus cross-check, but bsnes-jg PASS + browser is the demo bar. (The **core compiler
+   fuzzer / micro-test gate is unchanged** — it still requires the full host==default==a16==xy16 on
+   MAME + bsnes-jg; this relaxation is demos-only.)
 3. **On-screen render via `snesgfx`** — sprites or a Mode 7 / BG buffer that visualises the computation;
-   two-emulator screenshot.
+   bsnes-jg screenshot (MAME screenshot optional).
 
 Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16`, like Mandelbrot).
 
@@ -55,8 +60,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
     *Shows:* nested circles drawing an outline.~~ ✓ [/snes/epicycles/](https://biohack.net/snes/epicycles/) *(8 baked
     DFT coefficients of a 5-pointed star; 4 `__mulsi3` per harmonic + 32-bit accumulate, divide-free.)*
 11. ~~**Spirograph (hypotrochoid)** — `(R, r, d)` parametric. *Stresses:* sin/cos + mul. *Shows:* the rose pattern.~~ ✓ [/snes/spirograph/](https://biohack.net/snes/spirograph/)
-12. **CORDIC clock/rotator** — sin/cos/atan via **shift-add only** (no multiply). *Stresses:* shift-add
-    convergence loops — a different ALU profile from everything else. *Shows:* a rotating hand with its angle.
+12. ~~**CORDIC clock/rotator** — sin/cos/atan via **shift-add only** (no multiply). *Stresses:* shift-add
+    convergence loops — a different ALU profile from everything else. *Shows:* a rotating hand with its angle.~~ ✓ [/snes/cordic/](https://biohack.net/snes/cordic/)
 
 ## Physics & numerical integration — fixed-point, division, sqrt
 
@@ -100,7 +105,7 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 | **heaps / queues / structs** (data structures) | ~~18~~ |
 | **bit manipulation** (pack/shift/boolean) | 5, ~~6~~ |
 | ~~multi-precision **carry-chain** codegen~~ | ~~19, 20~~ |
-| **shift-add**, multiply-free | 12 |
+| **shift-add**, multiply-free | ~~12~~ |
 | **far / high-WRAM** buffers (a16-only) | 1, 4, ~~8~~, ~~13~~ |
 | **PRNG + scatter** writes | 4, ~~7~~, ~~19~~ |
 | **sin/cos LUT** indexing | 9, ~~10~~, ~~11~~, ~~14~~, ~~16~~ |
@@ -113,7 +118,7 @@ Sharpest compiler stress for the effort, each hitting a corner the existing demo
 - ~~**#16 wireframe 3-D solid** — matrix multiply + perspective **divide** + line rasterisation.~~ ✓ [/snes/3d-wireframe/](https://biohack.net/snes/3d-wireframe/)
 - ~~**#19 π — spigot digits + Monte-Carlo** — multi-precision **carry-chain** codegen + div/mod + rng.~~ ✓ [/snes/spigot/](https://biohack.net/snes/spigot/)
 - ~~**#20 Bignum factorial / Fibonacci** — multi-precision **carry-chain** codegen, untouched by every other demo.~~ ✓ [/snes/factorial/](https://biohack.net/snes/factorial/)
-- **#12 CORDIC** — a **multiply-free** shift-add inner loop (and the repo already has CORDIC tables).
+- ~~**#12 CORDIC** — a **multiply-free** shift-add inner loop (and the repo already has CORDIC tables).~~ ✓ [/snes/cordic/](https://biohack.net/snes/cordic/)
 
 Each would be built on `snesgfx` the same way as Space Invaders: a shared host+target logic header, a
 `dev/run.sh <name>` differential gate, and a two-emulator screenshot.
