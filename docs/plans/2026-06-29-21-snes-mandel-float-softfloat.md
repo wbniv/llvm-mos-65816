@@ -11,6 +11,16 @@ across all modes). Demo **#21** of the **compiler stress-test demo battery** —
 (new codegen corners). See
 [`docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md`](../investigations/2026-06-27-compiler-stress-test-demo-ideas.md).
 
+> **Post-publish display fix (2026-06-29, commit `c911efd`, live `v1.0.129`).** A Mode-7 sweep cleared the
+> *transform* (proper rotation, `det=z²`, never singular — not the avalanche bug) but found a **content**
+> defect: the zoom path dived into deep windows (W2–W5) that, at `DN` maxiter on the chunky 16×14 grid,
+> can't resolve their thin escape filaments → they rendered near-black (and the wipe transitions tore), so
+> the demo spent most of its runtime black. Fix (display-only, gate unchanged `0x4169`): cap the on-screen
+> zoom to **W0 only** (`DISP_NWIN=1`, the iconic whole set) with `DN` 8→12 for richer bands; the Mode-7
+> spin + zoom-breathe + palette cycle are the motion. Verified always-bright (steady-state luma 48–107,
+> 53–71% non-black, no black/torn frames). See the
+> [Mode-7 transform sweep](../investigations/2026-06-29-mode7-transform-sweep.md).
+
 ## Context
 
 Every Round-1 demo (#1–#20) does its math in **fixed-point integer** (Q-format multiply, carry chains).

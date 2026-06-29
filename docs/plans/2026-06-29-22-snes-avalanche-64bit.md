@@ -9,6 +9,15 @@ bit-exact 5-way differential (`0x27EA`), no compiler bug (64-bit codegen correct
 **#22** of the **compiler stress-test demo battery** — a **Round 2** entry (new codegen corners). See
 [`docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md`](../investigations/2026-06-27-compiler-stress-test-demo-ideas.md).
 
+> **Post-publish display fix (2026-06-29, commit `8c3373a`, live `v1.0.127`).** The first cut had three
+> on-screen defects (gate hash unchanged): (1) `drift_frame` built a **degenerate** Mode-7 matrix
+> (`A=D=cos·0x40` but `B=C=sin·0x10` — mismatched scales) that went **singular at `cos=0`** and collapsed
+> the image to black every ¼ turn → replaced with an axis-aligned zoom-breathe (`det` always > 0);
+> (2) the gate (256 × 64-bit `__udivdi3`) ran before display = ~7 s black boot → now **chunked** across
+> frames (byte-identical replica → `0x27EA`); (3) `compute_col` did 56 variable 64-bit shifts/column →
+> four 16-bit-word splits. Selfcheck offset corrected `0x200`→`0x20` (gate state shifted WRAM). See the
+> [Mode-7 transform sweep](../investigations/2026-06-29-mode7-transform-sweep.md).
+
 ## Context
 
 Every Round-1 demo (and #21) tops out at **32-bit** arithmetic. **None use `uint64_t`.** This one mixes
