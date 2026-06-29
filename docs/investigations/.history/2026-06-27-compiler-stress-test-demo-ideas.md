@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/673b64b) | docs(investigation): add Round 2 (#21+) — new codegen-corner demos |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/4d2611d) | docs(investigation): mark demo battery complete (20/20) + strikethrough self-note |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8e6f647) | feat(snes): #3 Burning Ship fractal — |Re|,|Im|-folding escape-time demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/0cabf2d) | feat(snes): #1 Julia Set Explorer — z²+c complex-multiply / far-framebuffer stress demo |
@@ -17,6 +18,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+673b64b	author	Will Norris
+673b64b	added	80
+673b64b	deleted	3
+673b64b	files	1
+673b64b	body	Round 1 (#1-20) shipped and its differential gate surfaced several\npre-existing compiler bugs, all in libcall/ABI paths. Round 2 targets\nthe codegen families the first 20 never execute — soft-float, 64-bit\nintegers, jump tables, by-value struct ABI, bitfields, variadics,\nvariable-count shifts, pointer-chasing trees — with an untested-corner\ncoverage map. Also restore the round-status banner and re-strike #4\nBuddhabrot (dropped by concurrent-tree churn).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4d2611d	author	Will Norris
 4d2611d	added	14
 4d2611d	deleted	15

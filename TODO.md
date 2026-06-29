@@ -499,6 +499,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     [biohack.net/3d-wireframe/](https://biohack.net/3d-wireframe/).
   - [x] ~~**#19 π spigot + Monte-Carlo** — multi-precision **carry chains** + div/mod + rng; shows digits + dart scatter.~~
   - [x] ~~**#20 Bignum factorial/Fibonacci** — multi-precision **carry propagation**; shows the giant number on screen.~~
+  - [x] ~~**#21 Soft-Float Mandelbrot** (Round 2) — escape-time `z²+c` in **IEEE-754 single-precision `float`**: every op a soft-float libcall (`__mulsf3`/`__addsf3`/`__subsf3`/`__divsf3`/`__gtsf2`/`__floatsisf`), the library no Round-1 demo touches. **Bit-exact** host==default==a16==xy16 `0x4169` (FMA forbidden by one-op-per-statement); disasm `__mulsf3=8`/`__add-subsf3=12`/`rep-sep=35`. No compiler bug — soft-float codegen correct across all modes.~~ ✓ [/snes/mandel-float/](https://biohack.net/snes/mandel-float/) ([plan](docs/plans/2026-06-29-21-snes-mandel-float-softfloat.md))
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*

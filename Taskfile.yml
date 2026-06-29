@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: julia }
 
+  mandel-float:
+    desc: "#21: Soft-Float Mandelbrot — escape-time z^2+c in IEEE-754 single-precision `float`, so every op is a soft-float libcall (__mulsf3/__addsf3/__subsf3/__divsf3/__gtsf2/__floatsisf) — the library no other demo touches. 16x14 grid 4x-upscaled into the $7E2000 far framebuffer, Mode-7 zoom (+mos-a16). BIT-EXACT differential: assert corpus_result (mf_gate_crc 0x4169) == host single-precision on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__mulsf3 + __add/subsf3 + rep/sep). Leaves build/mandel-float.sfc + build/mandel-float-{jg,mame}.png."
+    cmds:
+      - dev/run.sh mandel-float
+
+  mandel-float-play:
+    desc: "PLAY the Soft-Float Mandelbrot in a MAME window on this host (builds the ROM first if needed). Shows the chunky escape-time set rendered by software floating point, Mode-7 zooming through the seahorse spiral, colour-cycled."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/mandel-float.sfc ]; then
+          echo "==> build/mandel-float.sfc missing — building it (dev/run.sh mandel-float)…"
+          dev/run.sh mandel-float
+        fi
+      - task: mandel-mame
+        vars: { ROM: mandel-float }
+
   factorial:
     desc: "#20: Bignum factorial — 1000! in a base-10000 digit array; custom 28-row FactDisplay drawable; assert corpus_result (factorial_gate_crc for 50!, 0x772F) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __udivmodsi4 + rep/sep). Leaves build/factorial.sfc + build/factorial-{mame,jg}.png."
     cmds:
