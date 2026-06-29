@@ -341,6 +341,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: harmonograph }
 
+  raycaster:
+    desc: "#15: Raycaster maze — a first-person camera auto-walks a 16×16 maze; 64 columns DDA-cast per view, wall height = screen_h / distance (per-column divide) on BG3 2bpp; asserts corpus_result (rc_gate_crc 0xB200, 64-column fan) == host on MAME + bsnes-jg + disasm gate (__udivsi3 + rep/sep). Leaves build/raycaster.sfc + build/raycaster-{mame,jg}.png."
+    cmds:
+      - dev/run.sh raycaster
+
+  raycaster-play:
+    desc: "PLAY the Raycaster maze demo in a MAME window on this host (builds the ROM first if needed). A first-person camera wanders a maze; DDA-cast wall slices shaded by distance."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/raycaster.sfc ]; then
+          echo "==> build/raycaster.sfc missing — building it (dev/run.sh raycaster)…"
+          dev/run.sh raycaster
+        fi
+      - task: mandel-mame
+        vars: { ROM: raycaster }
+
   double-pendulum:
     desc: "#14: Double Pendulum chaos — two pendulums with near-identical ICs diverge on a BitmapCanvas; asserts corpus_result (dpend_gate_crc, 256 steps) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __divsi3 + rep/sep). Leaves build/double-pendulum.sfc + build/double-pendulum-{mame,jg}.png."
     cmds:

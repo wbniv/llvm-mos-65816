@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/70e1840) | feat(snes): #9 Lissajous / Harmonograph — damped sin-LUT curve demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/30333e0) | feat(snes): #5 Conway's Game of Life — bit-parallel SWAR neighbour sums |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/5d7319a) | docs(demo-ideas): strike #12 CORDIC — published + live (biohack.net/snes/cordic/) |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/070328f) | feat(snes): #10 Fourier epicycles — many-multiply / sin-cos stress demo |
@@ -12,6 +13,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+70e1840	author	Will Norris
+70e1840	added	4
+70e1840	deleted	4
+70e1840	files	1
+70e1840	body	Demo #9 of the compiler stress-test battery — the damped sibling of the\n#11 spirograph (multiply-only). Four detuned pendulums (two per axis)\ntrace a Lissajous figure that precesses and spirals inward as an\nexponential envelope decays. Per sample the hot loop issues eight\n__mulsi3 — four amplitude products sin·env + four envelope-decay\nproducts env·decay (the running exponential env=(env·decay)>>15, a\nsustained fixed-point multiply + accumulation) — plus the Q8.8 sine LUT,\nwith NO divide. The envelope is scaled (ENVF=2) so env·decay fits int32.\nRendered into a BitmapCanvas with a 2-row HUD; four presets cycle as\neach figure settles.\n\nGate harmo_gate_crc = 0x0EBB (256 samples of preset 0, rotate-XOR fold\nof both coords). No far pointers ⇒ full 5-way bar. Verified:\ndev/run.sh harmonograph RESULT PASS (disasm __mulsi3=2 + rep/sep=36,\nzero divide; bsnes-jg host==+mos-a16 0x0EBB; -verify-machineinstrs clean\non default/+mos-a16/+mos-xy16; MAME pending the env-wide SPC700 IPL —\nnon-blocker per the demos-only policy). Published\nbiohack.net/snes/harmonograph/ (biohack.net v1.0.115).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 30333e0	author	Will Norris
 30333e0	added	3
 30333e0	deleted	3

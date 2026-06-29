@@ -443,6 +443,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     **Pending:** publish to [biohack.net/cordic/](https://biohack.net/cordic/) (batched with the re-publish).
   - [x] ~~**#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.~~ [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
   - [x] ~~**#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.~~
+  - [x] ~~**#15 Raycaster maze** — DDA grid-cast, wall height = screen_h/dist (3 `__udivsi3`/column: 2 deltaDist reciprocals + the 1/dist projection); first-person 3-D corridors, distance-shaded. The battery's **division** member. Gate `rc_gate_crc` `0xB200`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3. (Differential caught a signed-`int32`-overflow UB optimised differently host vs target.)~~ ✓ [/snes/raycaster/](https://biohack.net/snes/raycaster/) ([plan](docs/plans/2026-06-28-15-snes-raycaster.md))
   - [x] ~~**#17 Sorting race**~~ — quicksort vs heapsort vs mergesort animate three bar arrays; the battery's
     **recursion / soft-stack / frame-ABI** member. ([plan](docs/plans/2026-06-28-17-snes-sort-race.md)) — recursive
     `sr_qsort`+`sr_msort` (`noinline`) force the reentrant soft-stack spill path (array pointer live across the

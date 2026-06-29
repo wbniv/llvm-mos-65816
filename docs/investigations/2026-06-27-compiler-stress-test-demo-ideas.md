@@ -69,8 +69,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
     integration. *Shows:* planets orbiting with fading trails.~~ ✓ [/snes/n-body/](https://biohack.net/snes/n-body/)
 14. ~~**Double pendulum (chaos)** — Euler/RK integration with sin. *Stresses:* sin + sensitive fixed-point
     integration. *Shows:* the chaotic swing + path trace.~~ ✓ [/snes/double-pendulum/](https://biohack.net/snes/double-pendulum/)
-15. **Raycaster maze** — DDA grid cast, wall height = `1/dist` per column. *Stresses:* fixed-point +
-    **per-column division**. *Shows:* first-person 3-D corridors.
+15. ~~**Raycaster maze** — DDA grid cast, wall height = `1/dist` per column. *Stresses:* fixed-point +
+    **per-column division**. *Shows:* first-person 3-D corridors.~~ ✓ [/snes/raycaster/](https://biohack.net/snes/raycaster/)
 16. ~~**Wireframe 3-D solid** — rotation matrix (sin/cos LUT), perspective projection (divide), Bresenham lines.
     *Stresses:* 3×3 matrix mul + projection divide + line raster. *Shows:* a spinning cube/icosahedron.~~ ✓ [/snes/3d-wireframe/](https://biohack.net/snes/3d-wireframe/)
 
@@ -100,7 +100,7 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 | Codegen aspect | Demos |
 |---|---|
 | complex / 32-bit fixed-point **multiply** | 1, ~~2~~, 3, 4, ~~8~~, ~~9~~–~~10~~, ~~11~~, ~~13~~, ~~16~~ |
-| **division** / reciprocal / sqrt | ~~2~~, ~~13~~, 15, ~~16~~, ~~19~~ |
+| **division** / reciprocal / sqrt | ~~2~~, ~~13~~, ~~15~~, ~~16~~, ~~19~~ |
 | **recursion** & the soft stack / frame ABI | ~~17~~, ~~18~~ |
 | **heaps / queues / structs** (data structures) | ~~18~~ |
 | **bit manipulation** (pack/shift/boolean) | ~~5~~, ~~6~~ |
