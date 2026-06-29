@@ -375,6 +375,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: raycaster }
 
+  burning-ship:
+    desc: "#3: Burning Ship fractal — the |Re|,|Im|-folding cousin of Mandelbrot; a 32×28 escape-time grid (BG1 4bpp solid tiles) revealed progressively then palette-cycled; asserts corpus_result (bs_gate_crc 0x6F2D, 16×16 window) == host on MAME + bsnes-jg + disasm gate (3 __mulsi3/iter + abs + rep/sep, no divide). Leaves build/burning-ship.sfc + build/burning-ship-{mame,jg}.png."
+    cmds:
+      - dev/run.sh burning-ship
+
+  burning-ship-play:
+    desc: "PLAY the Burning Ship fractal demo in a MAME window on this host (builds the ROM first if needed). The ship reveals top-to-bottom, then the escape bands flow via palette cycling."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/burning-ship.sfc ]; then
+          echo "==> build/burning-ship.sfc missing — building it (dev/run.sh burning-ship)…"
+          dev/run.sh burning-ship
+        fi
+      - task: mandel-mame
+        vars: { ROM: burning-ship }
+
   double-pendulum:
     desc: "#14: Double Pendulum chaos — two pendulums with near-identical ICs diverge on a BitmapCanvas; asserts corpus_result (dpend_gate_crc, 256 steps) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __divsi3 + rep/sep). Leaves build/double-pendulum.sfc + build/double-pendulum-{mame,jg}.png."
     cmds:

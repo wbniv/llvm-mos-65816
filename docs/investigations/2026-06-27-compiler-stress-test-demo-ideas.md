@@ -36,8 +36,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
    far high-WRAM framebuffer (a16). *Shows:* morphing Julia fractal.~~ ✓ [/snes/julia/](https://biohack.net/snes/julia/)
 2. ~~**Newton's-method fractal** — `z − p(z)/p′(z)` for `z³−1`, colour by which root it converges to.
    *Stresses:* complex **division** (the hard one) + convergence branching. *Shows:* basins of attraction.~~ ✓ [/snes/newton/](https://biohack.net/snes/newton/)
-3. **Burning Ship / Multibrot** — `|Re|,|Im|` folding, or `zᵈ`. *Stresses:* extra multiplies, abs, `pow`
-   loops. *Shows:* the ship / d-fold bulb.
+3. ~~**Burning Ship / Multibrot** — `|Re|,|Im|` folding, or `zᵈ`. *Stresses:* extra multiplies, abs, `pow`
+   loops. *Shows:* the ship / d-fold bulb.~~ ✓ [/snes/burning-ship/](https://biohack.net/snes/burning-ship/)
 4. **Buddhabrot** — accumulate *escaping* orbit visits into a density buffer. *Stresses:* scatter writes to a
    far buffer + PRNG sampling. *Shows:* the ghostly orbit-density image.
 
@@ -95,20 +95,23 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 ## Coverage map (why this is a good battery, not 20 of the same test)
 
+<!-- NOTE TO SELF (strikethrough): do NOT strike the demo numbers in this coverage map. They are an
+     *index* (cross-references), not a to-do checklist — the "~~…~~ = done" convention from ~/SRC/CLAUDE.md
+     applies to the numbered demo *list* above (where one struck bullet stands out among open ones), not here.
+     Now that all 20 ship, striking every number turned the whole table into an illegible wall of struck text
+     (see the 2026-06-29 render). Keep these numbers PLAIN; per-demo done-state lives in the list + banner. -->
 | Codegen aspect | Demos |
 |---|---|
-| Codegen aspect | Demos |
-|---|---|
-| complex / 32-bit fixed-point **multiply** | ~~1~~, ~~2~~, 3, 4, ~~8~~, ~~9~~–~~10~~, ~~11~~, ~~13~~, ~~16~~ |
-| **division** / reciprocal / sqrt | ~~2~~, ~~13~~, ~~15~~, ~~16~~, ~~19~~ |
-| **recursion** & the soft stack / frame ABI | ~~17~~, ~~18~~ |
-| **heaps / queues / structs** (data structures) | ~~18~~ |
-| **bit manipulation** (pack/shift/boolean) | ~~5~~, ~~6~~ |
-| ~~multi-precision **carry-chain** codegen~~ | ~~19, 20~~ |
-| **shift-add**, multiply-free | ~~12~~ |
-| **far / high-WRAM** buffers (a16-only) | ~~1~~, 4, ~~8~~, ~~13~~ |
-| **PRNG + scatter** writes | 4, ~~7~~, ~~19~~ |
-| **sin/cos LUT** indexing | ~~9~~, ~~10~~, ~~11~~, ~~14~~, ~~16~~ |
+| complex / 32-bit fixed-point **multiply** | 1, 2, 3, 4, 8, 9–10, 11, 13, 16 |
+| **division** / reciprocal / sqrt | 2, 13, 15, 16, 19 |
+| **recursion** & the soft stack / frame ABI | 17, 18 |
+| **heaps / queues / structs** (data structures) | 18 |
+| **bit manipulation** (pack/shift/boolean) | 5, 6 |
+| multi-precision **carry-chain** codegen | 19, 20 |
+| **shift-add**, multiply-free | 12 |
+| **far / high-WRAM** buffers (a16-only) | 1, 4, 8, 13 |
+| **PRNG + scatter** writes | 4, 7, 19 |
+| **sin/cos LUT** indexing | 9, 10, 11, 14, 16 |
 
 ## Recommended first picks
 
