@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/607c3cb) | docs(plan-index): backfill #12 CORDIC commit SHA (34fd3ad) + built/published status |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/34fd3ad) | #12 CORDIC rotator SNES demo — multiply-free compiler stress-test |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/189c2be) | docs(plan-index): add row for the LTO+a16 bitmask misdiagnosis verification plan |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/c09912a) | docs(upstream): retract LTO+a16 bitmask early-exit issue as a misdiagnosis |
@@ -55,6 +56,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+607c3cb	author	Will Norris
+607c3cb	added	1
+607c3cb	deleted	1
+607c3cb	files	1
+607c3cb	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 34fd3ad	author	Will Norris
 34fd3ad	added	1
 34fd3ad	deleted	0

@@ -285,3 +285,28 @@ Run each command, paste raw output in the block below it, then mark PASS/FAIL.
 7. **Published page** (`https://biohack.net/snes/rdiff/`): ROM loads, pattern running
 
    ~~PASS/FAIL: TBD~~ PASS (committed to biohack.net master; deploys on next `task release`)
+
+---
+
+## Update 2026-06-28 — 16-bit rework (the demo wasn't forming patterns)
+
+User report: "I don't think it's working." Diagnosis (host simulation of the shipped `rdiff.h`):
+the 8-bit (scale 256) field with `Du≈0.40` **floods** — the activator over-diffuses and V fills the
+whole grid (782/896 cells active by 200 steps); on the slow SNES you only ever saw the early
+growing-blob transient. The differential gate stayed green because the host oracle ran the *same*
+mis-tuned math — the gate validates codegen, not pattern quality.
+
+**Fix (this commit):** reworked `rdiff.h` to **16-bit fixed-point** (scale `GS_S=4096`) with the
+canonical stable-spot regime `Du=0.16 / Dv=0.08`, `F≈0.0366`, `k≈0.062` (`DU=655 DV=328 F=150 K=254`),
+and **full-grid random-noise seeding** (deterministic xorshift) so the Turing instability breaks
+symmetry into a real spot/worm pattern instead of a symmetric ring. Validated on the host (stable
+~250 active cells; clean spots by ~400 steps).
+
+SNES-side: the four 16-bit double-buffers don't fit the 8 KB low-WRAM region at 32×28, so the grid is
+**32×24** (centred with a 2-row navy border, `GS_ROW0`), and the whole tilemap is cleared in reserve.
+The 16-bit step is heavier (now **6× `__mulsi3`**, all genuine 32-bit) so it advances slowly — full-grid
+noise gives immediate on-screen texture that organises over time.
+
+New gate hash **`0x5555`** (was `0x8484`); `corpus/expected.tsv` + the manifest selfcheck updated.
+Verified host == bsnes-jg `0x5555`, disasm `__mulsi3=6`, and the pattern renders + evolves on bsnes-jg
+(`build/rdfinal-*.png`: noise → organising worms/spots). Re-published to biohack.net.

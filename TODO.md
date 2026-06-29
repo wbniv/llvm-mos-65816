@@ -376,6 +376,33 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   task publish TAG=v1.0.75`). Future refactor: move HUD/shields from OAM sprites to `TextLayer`/`ShieldField`
   BG layers.
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
+- [ ] **SNES demos — startup garbage fix + title screens** ([plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)).
+  User-reported: Newton "starts off with garbage" + "takes too long to show anything". **Part A (garbage) root-caused
+  + fixed in source:** commit `ac9c0b2` regressed Newton's tilemap palette field to `root<<12` (selects uninitialised
+  CGRAM palettes 4–5 = garbage); reverted to `root<<10` (palette field is bits 10-12, per `hud.h:46`). Battery audit:
+  garbage is Newton-only; also fixed `factorial.c` HUD palette (`1<<13` priority-bit → `2<<10`, the CGRAM-8 palette).
+  **Part B (title screens) — facility + 10 demos done, VERIFIED on bsnes-jg:** shared `snesgfx/title_layer.h`
+  (BG2 4bpp static overlay, font promoted to 4bpp, palette 7, written in force-blank, no DMA) + `display_hide_layer()`
+  / `display_hold()` in `display.h` + `snesgfx/splash.h` (BGMODE_1 BG3 splash for Mode-7 demos, self-clears VRAM).
+  Wired into newton, spirograph, n-body, double-pendulum, spigot, 1d-ca (`TITLE_CHR_WORD=0x6000` override), rdiff,
+  invaders (in-loop overlay), + Mode-7 mandel-display & blossom (splash); `display_hold(110)` ~2 s on fast-`gate_crc`
+  demos — all gate-neutral. Drive-by: fixed `n-body.c`'s pre-existing broken include (`nbody.h`→`n-body.h`).
+  **VERIFIED on bsnes-jg:** newton basins garbage-free (R/G/B); all 10 titles render (incl. 1d-ca override = no VRAM
+  collision); differential intact — newton 0x4D8B, spirograph 0x32D4, invaders 0x9D57, mandel 0x204F, blossom grid
+  0x9047 + controller replay PASS, all == host. MAME leg pending (needs SPC700 BIOS in `dev/roms/`). **Deferred:**
+  factorial title (worker conflict on `_fact_emit`); hello excluded
+  (smoke-test solid-green contract). **RE-PUBLISHED to biohack.net (v1.0.105):** all 10 changed ROMs rebuilt + live
+  (checksums verified against the served `.sfc`); manifest selfcheck `off` regenerated where the title code shifted
+  `corpus_result` (newton 0x908→0x90f, spirograph 0x137a→0x1381, n-body→0x1501, dpend→0x12e1, spigot→0x1698,
+  1d-ca→0x51b, space-invaders 0x25→0x2c; rdiff/blossom/factorial unchanged). 3d-wireframe untouched (no source here).
+  NOTE: the Deploy-site workflow shows red on a **pre-existing informational Lighthouse threshold gate** (claude/cv/home
+  A11y/BP < 95) that runs AFTER the wrangler deploy — the Cloudflare Pages deploy step itself ✓ passed.
+  **FOLLOW-UP — rdiff Gray-Scott 16-bit rework (2026-06-28):** user reported rdiff "not working" — the 8-bit
+  (scale 256, Du≈0.40) field **floods** (no patterns), green gate notwithstanding (gate checks codegen, not
+  visual). Reworked `examples/65816/rdiff.h` to 16-bit fixed-point (scale 4096; Du=0.16/Dv=0.08, F≈0.0366,
+  k≈0.062) + full-grid noise seeding → real Turing spots/worms. Grid 32×24 (RAM fit). New gate hash 0x5555
+  (was 0x8484); `expected.tsv` + manifest updated. Differential host==default==a16==xy16==0x5555 on bsnes-jg,
+  disasm `__mulsi3=6`. [plan §Update 2026-06-28](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md). Re-published.
 - [ ] **Compiler stress-test demo battery — algorithm+visual SNES demos**
   ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,

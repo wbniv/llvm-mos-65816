@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/fcaa7b8) | feat(snes): #8 Gray-Scott reaction-diffusion demo (rdiff) |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fcbb63) | feat(snes): #8 Gray-Scott reaction-diffusion demo (examples/snes/rdiff.c) |
 
 <!--history-meta v1
+fcaa7b8	author	Will Norris
+fcaa7b8	added	43
+fcaa7b8	deleted	16
+fcaa7b8	files	1
+fcaa7b8	body	- `examples/65816/rdiff.h`: `__attribute__((noinline))` on `gs_step` prevents\n  LTO loop-merging that reads nu/nv before all cells are written (MAME WRAM\n  garbage → wrong hash without it); reduce `GS_GATE_STEPS` 50 → 8 (fits the\n  60-frame corpus SETTLE window; 50 steps = ~250 frames, too slow).\n- `examples/snes/rdiff.c`: SNES ROM with `BG1` 4bpp V-field display, alternating\n  half-tilemap DMA (fits V-blank), corpus_result wired via `.noinit..rdiff` gstate.\n- `examples/snes/corpus/rdiff_sim.c`: corpus slice; gstate in `.noinit..rdiff`\n  keeps BSS = 2 bytes (avoids buggy DEY-based `__memset` for count ≥ 256).\n- `examples/snes/corpus/expected.tsv`: rdiff_sim hash 0x8484 (GS_GATE_STEPS=8).\n- Plan: all 7 verification steps PASS (host/MAME/bsnes-jg 5-way, corpus-a16 13/14).\n- TODO #8 closed (moved to Done section).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3fcbb63	author	Will Norris
 3fcbb63	added	260
 3fcbb63	deleted	0

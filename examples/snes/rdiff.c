@@ -4,12 +4,12 @@
  * Visual: V-concentration mapped through a 16-colour navy→white palette on BG1 4bpp;
  * Turing spots self-organise from five seeded 2×2 perturbations over ~300 frames.
  *
- * Memory layout (low WRAM, bank 0):
- *   gs_u[2][GS_H*GS_W]   2 × 896 uint8_t = 1792 B  (ping-pong U buffers)
- *   gs_v[2][GS_H*GS_W]   2 × 896 uint8_t = 1792 B  (ping-pong V buffers)
- *   gstate                4 × 64  uint8_t =  256 B  (gate scratch)
- *   shadow[GS_H/2*GS_W]     14×32 uint16_t = 896 B  (half-tilemap DMA buffer)
- *   Total ≈ 4756 B — well under the 7680 B ram region.
+ * Memory layout (low WRAM, bank 0) — 16-bit fixed-point, 32×24 grid (24 rows keep it in budget):
+ *   gs_u[2][GS_H*GS_W]   2 × 768 uint16_t = 3072 B  (ping-pong U buffers)
+ *   gs_v[2][GS_H*GS_W]   2 × 768 uint16_t = 3072 B  (ping-pong V buffers)
+ *   gstate                4 × 64  uint16_t =  512 B  (gate scratch)
+ *   shadow[GS_H/2*GS_W]     12×32 uint16_t =  768 B  (half-tilemap DMA buffer)
+ *   Total ≈ 7424 B — just under the 7680 B ram region.
  *
  * corpus_result = rdiff_gate_crc() on an 8×8 sub-grid (50 steps), set once at startup.
  * See docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md                               */
@@ -39,12 +39,12 @@ static const uint16_t rdiff_pal[16] = {
 
 /* ---- Simulation state (global: 4 × 896 uint8_t = 3584 bytes total) ----------- */
 /* Double-buffered so the display drawable can read the completed buffer safely.    */
-static uint8_t gs_u[2][GS_H * GS_W];
-static uint8_t gs_v[2][GS_H * GS_W];
-static uint8_t gs_buf = 0;   /* index of the current (just-written) buffer */
+static uint16_t gs_u[2][GS_H * GS_W];   /* 16-bit fixed-point (scale GS_S) */
+static uint16_t gs_v[2][GS_H * GS_W];
+static uint8_t  gs_buf = 0;   /* index of the current (just-written) buffer */
 
 /* pointer the drawable reads each frame; set by main after each step batch */
-static uint8_t *g_cur_v;
+static uint16_t *g_cur_v;
 
 /* ---- RdiffLayer drawable ------------------------------------------------------ */
 typedef struct {
@@ -73,6 +73,11 @@ static void _rdiff_reserve(Drawable *d, VramAlloc *va) {
         for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp23;
     }
 
+    /* Clear the whole 32×32 tilemap to tile 0 (navy): the grid only fills rows
+       GS_ROW0..GS_ROW0+GS_H-1, so the border rows must not show power-on garbage. */
+    snes_vram_addr(RDIFF_MAP);
+    for (uint16_t i = 0; i < (uint16_t)(32u * 32u); i++) REG_VMDATA = 0u;
+
     l->base.tm_bits = TM_BG1;
 }
 
@@ -85,15 +90,16 @@ static void _rdiff_emit(Drawable *d, UploadQueue *q) {
     /* rebuild the half-shadow for the rows we're about to DMA this frame */
     uint8_t start = l->half ? (uint8_t)(GS_H / 2) : 0u;
     uint8_t end   = l->half ? (uint8_t)GS_H        : (uint8_t)(GS_H / 2);
-    uint8_t *src  = g_cur_v + (uint16_t)start * GS_W;
+    uint16_t *src = g_cur_v + (uint16_t)start * GS_W;
     for (uint16_t n = 0; n < (uint16_t)((GS_H / 2) * GS_W); n++) {
-        /* V ∈ [0,255] → tile index [0,15] */
-        l->shadow[n] = (uint16_t)(src[n] >> 4);
+        /* V ∈ [0,GS_S] → tile index [0,15] (GS_S>>8 = 16, clamp to 15) */
+        uint16_t t = (uint16_t)(src[n] >> 8);
+        l->shadow[n] = t > 15u ? 15u : t;
     }
 
-    /* DMA half the tilemap to VRAM: 14 rows × 32 cols × 2 bytes = 896 bytes < 1536 B */
+    /* DMA half the tilemap to VRAM (centred via GS_ROW0): 12 rows × 32 × 2 = 768 bytes */
     upq_push_vram(q,
-        (uint16_t)(RDIFF_MAP + (uint16_t)start * 32u),
+        (uint16_t)(RDIFF_MAP + (uint16_t)(start + GS_ROW0) * 32u),
         l->shadow,
         0x00u,
         (uint16_t)((GS_H / 2u) * GS_W * 2u),
@@ -105,24 +111,28 @@ static void _rdiff_emit(Drawable *d, UploadQueue *q) {
 static const DrawableVT RDIFF_VT = { _rdiff_reserve, _rdiff_emit };
 
 /* ---- Simulation init ---------------------------------------------------------- */
+/* 16-bit xorshift PRNG (deterministic seed) — scatters the seed spots that break the
+   symmetry. A single symmetric seed only grows a symmetric ring; scattered noise lets the
+   Turing instability fragment into the spot pattern. */
+static uint16_t gs_rng = 0xACE1u;
+static uint16_t gs_xs(void) {
+    uint16_t x = gs_rng;
+    x ^= (uint16_t)(x << 7);
+    x ^= (uint16_t)(x >> 9);
+    x ^= (uint16_t)(x << 8);
+    return gs_rng = x;
+}
+
 static void gs_init(void) {
-    /* All U=255 (≈1.0), V=0 (trivial stable state) */
+    /* Full-grid random noise: each cell is, with ~50% probability, perturbed to U=S/2, V=S/4
+       (else the trivial U=S, V=0 rest state). Seeding the whole field — rather than a few spots —
+       gives immediate on-screen texture that organises into the Turing spot pattern within a couple
+       hundred steps (important: the 16-bit step is heavy, so the SNES advances slowly; a sparse seed
+       would spend the first many seconds nearly blank). Deterministic xorshift → reproducible. */
+    gs_rng = 0xACE1u;
     for (uint16_t i = 0; i < (uint16_t)(GS_H * GS_W); i++) {
-        gs_u[0][i] = 255;
-        gs_v[0][i] = 0;
-    }
-    /* Seed five independent 2×2 spots: U=128, V=128 each */
-    static const uint8_t seeds[5][2] = { {14,16}, {7,8}, {20,24}, {21,8}, {7,22} };
-    for (uint8_t s = 0; s < 5; s++) {
-        uint8_t sy = seeds[s][0];
-        uint8_t sx = seeds[s][1];
-        for (uint8_t dy = 0; dy <= 1; dy++) {
-            for (uint8_t dx = 0; dx <= 1; dx++) {
-                uint16_t idx = (uint16_t)((uint16_t)(sy + dy) * GS_W + (sx + dx));
-                gs_u[0][idx] = 128;
-                gs_v[0][idx] = 128;
-            }
-        }
+        if (gs_xs() & 1u) { gs_u[0][i] = GS_S / 2; gs_v[0][i] = GS_S / 4; }
+        else              { gs_u[0][i] = GS_S;     gs_v[0][i] = 0;       }
     }
 }
 
