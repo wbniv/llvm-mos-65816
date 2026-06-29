@@ -64,3 +64,34 @@ curl -sI "https://biohack.net/play/roms/spigot.sfc" | grep -i cache-control
 
 Then deploy a dummy ROM change (touch spigot.sfc, redeploy) and verify a normal mobile
 pull-to-refresh (not hard refresh) picks up the new hash and loads the new ROM.
+
+### Verified 2026-06-29 — PASS
+
+Step 1 — page Cache-Control:
+
+```
+$ curl -sI https://biohack.net/snes/spigot/ | grep -i cache-control
+cache-control: public, max-age=0, must-revalidate
+```
+
+PASS — HTML revalidates on every load.
+
+Step 2 — versioned play asset Cache-Control:
+
+```
+$ curl -sI "https://biohack.net/play/roms/spigot.sfc" | grep -i cache-control
+cache-control: public, max-age=31536000, immutable
+```
+
+PASS — `/play/*` is immutably cached.
+
+**Implementation note:** the deployed `public/_headers` declares only the `/play/*` immutable
+rule and relies on Cloudflare Pages' built-in default (`max-age=0, must-revalidate`) for HTML —
+deliberately, so a `/*` rule can't bleed `must-revalidate` into the immutable `/play/*` entries.
+The observed live behaviour matches the plan's intent exactly.
+
+Step 3 — fresh-ROM pickup on redeploy: proven end-to-end by the real `v1.0.121` republish
+(doom-fire/rdiff/1d-ca got new ROM binaries). The live `/play/roms/<slug>.sfc` `sha256` matched
+the freshly-built committed ROMs immediately after deploy, so the `?v=<sha>` busting + revalidating
+HTML served the new content without a hard refresh. PASS (no dummy touch needed — a real ROM swap
+exercised the same path).

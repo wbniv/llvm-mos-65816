@@ -1408,5 +1408,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "No CI change …" -> NOT a deferral; it's the statement that the torture CI job reads the committed
        manifest so it needs no edit (the hook keyed on the "No CI change" prose). Verified true this commit.
      fp:7b6e5bccb4c5ca3f fp:356612fa02492cc3 fp:cfb4ea31c0a22df9 -->
-- [verify] **2026-06-27-cache-control-headers-for-biohack-net-snes-demos** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)_  <!-- fp:040872b597cf6793 -->
+<!-- triaged 2026-06-29: VERIFIED + recorded — ran the cache-control curl steps against live
+     biohack.net (page = `public, max-age=0, must-revalidate`; `/play/*` = `public, max-age=31536000,
+     immutable`), PASS pasted into the plan's "Verified 2026-06-29" section; fresh-ROM pickup proven by
+     the real v1.0.121 republish. Already covered by the curated [x] "biohack.net cache headers" above.
+     fp:040872b597cf6793 -->
 <!-- END auto-captured-deferrals -->
