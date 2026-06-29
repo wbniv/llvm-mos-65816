@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/6831fac) | docs(plan-index): add #17 Sorting Race row (f8aff1c) |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/32a4114) | feat(snes): #7 Doom-fire / heat-field demo — array sweep + PRNG, palette ramp |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/9f3d71e) | feat(snes): #18 Maze generate + solve — recursion + A* priority-queue heap demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/5e02b1a) | fix(snes): rdiff Gray-Scott 16-bit rework — real reaction-diffusion patterns |
@@ -59,6 +60,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+6831fac	author	Will Norris
+6831fac	added	1
+6831fac	deleted	0
+6831fac	files	1
+6831fac	body	Backfill the plan-index row for the #17 Sorting Race demo committed in f8aff1c\n(per the plan-index-drift commit hook).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 32a4114	author	Will Norris
 32a4114	added	1
 32a4114	deleted	0

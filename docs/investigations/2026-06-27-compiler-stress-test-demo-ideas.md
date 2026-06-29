@@ -51,8 +51,9 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 9. **Lissajous / harmonograph** — damped `sin(at), sin(bt+φ)` plotting. *Stresses:* sin LUT + fixed-point mul
    + accumulation. *Shows:* the decaying traced curve.
-10. **Fourier epicycles** — sum of rotating vectors traces a shape. *Stresses:* many sin/cos + complex add.
-    *Shows:* nested circles drawing an outline.
+10. ~~**Fourier epicycles** — sum of rotating vectors traces a shape. *Stresses:* many sin/cos + complex add.
+    *Shows:* nested circles drawing an outline.~~ ✓ [/snes/epicycles/](https://biohack.net/snes/epicycles/) *(8 baked
+    DFT coefficients of a 5-pointed star; 4 `__mulsi3` per harmonic + 32-bit accumulate, divide-free.)*
 11. ~~**Spirograph (hypotrochoid)** — `(R, r, d)` parametric. *Stresses:* sin/cos + mul. *Shows:* the rose pattern.~~ ✓ [/snes/spirograph/](https://biohack.net/snes/spirograph/)
 12. **CORDIC clock/rotator** — sin/cos/atan via **shift-add only** (no multiply). *Stresses:* shift-add
     convergence loops — a different ALU profile from everything else. *Shows:* a rotating hand with its angle.
@@ -102,7 +103,7 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 | **shift-add**, multiply-free | 12 |
 | **far / high-WRAM** buffers (a16-only) | 1, 4, ~~8~~, ~~13~~ |
 | **PRNG + scatter** writes | 4, ~~7~~, ~~19~~ |
-| **sin/cos LUT** indexing | 9–10, ~~11~~, ~~14~~, ~~16~~ |
+| **sin/cos LUT** indexing | 9, ~~10~~, ~~11~~, ~~14~~, ~~16~~ |
 
 ## Recommended first picks
 

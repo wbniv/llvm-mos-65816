@@ -24,3 +24,4 @@ corpus/newton_sim.c	corpus_result	0x4D8B	Newton's-method fractal z³−1, 8×8 g
 corpus/cordic_sim.c	corpus_result	0x4D41	CORDIC rotator full-circle sweep (GATE_N=96): rotation cordic16_sincos + vectoring cordic16_atan2, shift-add only → zero mul/div libcalls (shared cordic.h)
 corpus/maze_sim.c	corpus_result	0x0749	Maze recursive-division generate + A* indexed-heap solve (16x15) gate CRC: walls + path + heap counters (shared maze.h)
 corpus/doom-fire_sim.c	corpus_result	0x3C59	Doom-fire heat field: 16x16 grid, 30 steps; per-cell xorshift16 PRNG + flat-index array sweep (multiply-free), rotate-XOR CRC of full grid each step (shared doom-fire.h)
+corpus/epicycles_sim.c	corpus_result	0x4F6C	Fourier epicycles: sum of 8 rotating vectors (DFT of a star) traces the outline; 4 __mulsi3/harmonic + 32-bit accumulate, no divide (shared epicycles.h)

@@ -183,6 +183,23 @@ tasks:
     cmds:
       - dev/run.sh pi
 
+  epicycles:
+    desc: "#10: Fourier epicycles — a sum of 8 rotating vectors (DFT of a star) traces the outline; sin/cos-LUT sweep with 4 __mulsi3 per harmonic + 32-bit accumulate, NO divide (the many-multiply member). Assert corpus_result (epi_gate_crc 0x4F6C) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__mulsi3 + rep/sep, divide=0). Leaves build/epicycles.sfc + build/epicycles-{jg,mame}.png."
+    cmds:
+      - dev/run.sh epicycles
+
+  epicycles-play:
+    desc: "PLAY the Fourier-epicycles demo in a MAME window on this host (builds the ROM first if needed). Shows nested generating circles + a 5-pointed star outline drawing itself, looping."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/epicycles.sfc ]; then
+          echo "==> build/epicycles.sfc missing — building it (dev/run.sh epicycles)…"
+          dev/run.sh epicycles
+        fi
+      - task: mandel-mame
+        vars: { ROM: epicycles }
+
   maze:
     desc: "#18: Maze generate + solve — recursive-division carve (genuine recursion, ~log depth to fit the 65816 256-byte HW stack) + A* indexed binary-heap solve (16x15), animated. Assert corpus_result (maze_gate_crc 0x0749) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (recursion self-call + rep/sep; no 32-bit libcalls). Leaves build/maze.sfc + build/maze-{jg,mame}.png."
     cmds:

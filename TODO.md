@@ -412,6 +412,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~
   - [x] ~~**#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.~~ ✓ [/snes/doom-fire/](https://biohack.net/snes/doom-fire/) ([plan](docs/plans/2026-06-28-7-snes-doom-fire.md))
   - [x] ~~**#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.~~
+  - [wip] **#10 Fourier epicycles** — sum of rotating vectors traces a shape; many sin/cos + complex add; shows
+    nested circles drawing an outline. ([plan](docs/plans/2026-06-28-10-snes-fourier-epicycles.md)) — the battery's
+    **many-multiply / sin-cos** member (no divide): a sin/cos-LUT sweep with **4 `__mulsi3` per harmonic** + 32-bit
+    accumulate, over 8 baked DFT coefficients of a 5-pointed star (`tools/gen-epicycles-tables.py`). **BUILT +
+    `dev/run.sh epicycles` RESULT PASS:** host oracle == bsnes-jg corpus hash `0x4F6C`; disasm gate `__mulsi3=4` +
+    rep/sep=28, divide=0; default==+mos-a16==+mos-xy16 on bsnes-jg + `-verify` clean (all 3) + UBSan clean. On-screen
+    star draws itself over its generating circle (frame-500 shot = full PT-256 star). **Pending:** MAME leg (SPC700
+    IPL absent here) + publish to [biohack.net/snes/epicycles/](https://biohack.net/snes/epicycles/).
   - [x] **#11 Spirograph (hypotrochoid)** — **DONE + verified (`wt/321-spirograph`).** Four curve families
     (hypo/epi/rose/Lissajous) bloom into a NEAR 2bpp bitmap canvas (new `snesgfx/bitmap_canvas.h` set-pixel
     rasterizer + `text_layer.h` HUD), joypad + on-screen `R/W/D/mode/petals` HUD. **No far pointers → full
