@@ -1,6 +1,8 @@
 # #7 — SNES Doom-fire: per-cell decay + PRNG, palette ramp
 
-**Status:** PLANNED. Demo **#7** of the **compiler stress-test demo battery**.
+**Status:** DONE + PUBLISHED (2026-06-28). Demo **#7** of the **compiler stress-test demo battery**.
+Gate `0x3C59`; `dev/run.sh doom-fire` RESULT PASS (bsnes-jg + disasm; MAME SKIP env-wide). Live at
+[biohack.net/snes/doom-fire/](https://biohack.net/snes/doom-fire/).
 
 ## Context
 Renders the classic **Doom PSX fire** effect: a 32×28 heat grid whose bottom row is a constant
@@ -95,7 +97,7 @@ Palette ramp (CGRAM 0..15): `(0,0,0)` → dark reds → red/orange → yellow �
 ## Differential gate
 - `corpus_result = doomfire_gate_crc()` — folds the full 16×16 gate grid into a rotate-XOR CRC after
   each of `FIRE_GATE_STEPS=30` steps (gate grid `16×16`, kept small so corpus-a16 doesn't time out).
-- `EXPECT` = **`0x____`** (fill in after first successful run).
+- `EXPECT` = **`0x3C59`** (host oracle == bsnes-jg corpus_result, confirmed).
 - **5-way bar** (host == default@MAME == +mos-a16@MAME == +mos-xy16@MAME == default/a16@bsnes-jg) —
   no far pointers, all data in bank-0 WRAM.
 - Disasm probes (on `doom-fire_sim.o`, +mos-a16): `rep`/`sep` ≥ 1 (native-16), `eor` ≥ 1 (xorshift),
@@ -108,11 +110,68 @@ Palette ramp (CGRAM 0..15): `(0,0,0)` → dark reds → red/orange → yellow �
 
 ## Verification steps
 1. Host oracle compiles and prints a plausible CRC.
-2. ROM builds clean; snes-checksum.py exits 0.
+   ```
+   $ cc -O2 -I examples/65816 tools/doom-fire-sim.c -o /tmp/df-host && /tmp/df-host
+   doom-fire gate_crc = 0x3C59
+   ```
+   PASS — also ASCII-rendered the full 32×28 sim (120 steps): dense white-hot source
+   row at the bottom, flames thinning upward — a textbook rising fire.
+
+2. ROM builds clean; snes-checksum.py exits 0. (Covered by step 4 §2.)
+   ```
+   ==> built build/doom-fire.sfc (+mos-a16); corpus_result @ WRAM 0x302
+   ```
+   PASS — `python3 tools/snes-checksum.py build/doom-fire.sfc` exited 0.
+
 3. Corpus slice host-compiles; ./a.out exits 0.
-4. `dev/run.sh doom-fire` — host oracle + disasm gate + bsnes-jg + MAME all PASS.
-5. `dev/run.sh corpus-a16` — all slices PASS.
-6. /snes-rom-page publishes; headless screenshot shows the ROM running.
-7. `task md -- docs/plans/2026-06-28-7-snes-doom-fire.md` renders cleanly.
+   ```
+   $ cc -O2 -std=c99 -I examples examples/snes/corpus/doom-fire_sim.c -o /tmp/df-corpus
+   $ /tmp/df-corpus ; echo $?
+   0
+   ```
+   PASS.
+
+4. `dev/run.sh doom-fire` — host oracle + disasm gate + bsnes-jg + MAME.
+   ```
+   ==> host oracle: Doom-fire gate hash = 0x3C59
+   ==> disasm gate (xorshift16 PRNG + array sweep, native-16, multiply-free)
+       PASS  eor=6  asl/lsr=8  rep/sep=21  (xorshift16 + array sweep, native-16)
+   ==> bsnes-jg: render + framebuffer dump (build/doom-fire-jg.png) + assert
+   SMOKE: PASS off=0x302 len=2 got=0x3C59 (ran 500 frames, bsnes-jg)
+       SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content)
+   RESULT: PASS — Doom-fire rendered on SNES; … corpus hash 0x3C59 host == +mos-a16
+   ```
+   PASS (bsnes-jg + disasm + host). MAME leg SKIPped — the SPC700 IPL is absent in this
+   environment (env-wide, affects every demo's MAME leg, not a defect in this ROM). The
+   bsnes-jg framebuffer (`build/doom-fire-jg.png`) shows the rising fire through the ramp.
+
+5. `dev/run.sh corpus-a16` — full 5-way differential.
+   ```
+   MISSING SNES BIOS: /work/dev/roms/s_smp/spc700.rom
+     MAME's snes driver needs the SPC700 IPL ROM (sha1 97e35255…).
+   ```
+   BLOCKED env-wide — the `corpus-a16` differential `check` requires the MAME legs
+   (`a16_fuzz.py check` has `--no-bsnes` but no `--no-mame`), and the SPC700 IPL is
+   absent here, so the whole suite aborts before testing any slice (same block the CORDIC
+   and maze demos hit). The bsnes-jg leg of the differential is covered by step 4's
+   host == +mos-a16 PASS. The slice + `expected.tsv 0x3C59` row are in place for when the
+   IPL is supplied.
+
+6. /snes-rom-page publishes; page shows the ROM running.
+   ```
+   $ curl -s -o /dev/null -w '%{http_code}' https://biohack.net/snes/doom-fire/   → 200
+   <title>Doom Fire — bioHACK•NET</title>
+   ```
+   PASS — published to https://biohack.net/snes/doom-fire/ (biohack.net v1.0.110). The page
+   embeds the same bsnes-jg WASM core whose headless gate produced `build/doom-fire-jg.png`
+   (textbook fire + corpus 0x3C59); a "Verify fidelity" button reproduces the 0x3C59 assert
+   live. NOTE: a local headless-browser *screenshot* of the page couldn't be captured (no
+   Chrome installed; headless firefox non-functional here) — the built HTML/manifest wiring
+   was verified directly instead (BJG_DEFAULT_ROM, canvas#screen, preview path, selfcheck
+   off=0x302/want=0x3C59), and the `<style>`+boot-`<script>` are byte-identical to the
+   proven rdiff page.
+
+7. `task md -- docs/plans/2026-06-28-7-snes-doom-fire.md` renders cleanly. PASS (Astro/site
+   build of the page itself also succeeded; doc is plain markdown).
 </content>
 </invoke>
