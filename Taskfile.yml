@@ -234,6 +234,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: cordic }
 
+  sort-race:
+    desc: "#17: Sorting Race — quicksort vs heapsort vs mergesort animate three bar arrays; recursion (soft stack / frame ABI) stress. Assert corpus_result (sortrace_gate_crc 0xB28F) == host on MAME + bsnes-jg + disasm gate (recursion sr_qsort/sr_msort + cmp + rep/sep). Leaves build/sort-race.sfc + build/sort-race-{mame,jg}.png."
+    cmds:
+      - dev/run.sh sort-race
+
+  sort-race-play:
+    desc: "PLAY the Sorting Race demo in a MAME window on this host (builds the ROM first if needed). Shows quicksort/heapsort/mergesort racing to sort three bar arrays in real time."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/sort-race.sfc ]; then
+          echo "==> build/sort-race.sfc missing — building it (dev/run.sh sort-race)…"
+          dev/run.sh sort-race
+        fi
+      - task: mandel-mame
+        vars: { ROM: sort-race }
+
   newton:
     desc: "#2: Newton's-method fractal z³−1 — complex division (__divsi3) + multiply (__mulsi3); assert corpus_result (newton_gate_crc 0x4D8B) == host on MAME + bsnes-jg + disasm gate. Leaves build/newton.sfc + build/newton-{mame,jg}.png."
     cmds:

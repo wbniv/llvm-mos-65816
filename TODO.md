@@ -434,6 +434,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     **Pending:** publish to [biohack.net/cordic/](https://biohack.net/cordic/) (batched with the re-publish).
   - [x] ~~**#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.~~ [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
   - [x] ~~**#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.~~
+  - [wip] **#17 Sorting race** — quicksort vs heapsort vs mergesort animate three bar arrays; the battery's
+    **recursion / soft-stack / frame-ABI** member. ([plan](docs/plans/2026-06-28-17-snes-sort-race.md)) — recursive
+    `sr_qsort`+`sr_msort` (`noinline`) force the reentrant soft-stack spill path (array pointer live across the
+    self-`jsr`, the `a16spillr.c` machinery in a real workload); iterative `sr_hsort` is the non-recursive contrast.
+    Animation is record/replay (sorts emit an op-log; ROM replays 1 op/algo/frame, repaints touched columns) so REAL
+    recursion stays the stress. **BUILT + `dev/run.sh sort-race` RESULT PASS:** host oracle == bsnes-jg corpus hash
+    `0xB28F` (gate: 8 rounds, each asserts all 3 sorts agree on the identity permutation + folds `cmps^moves`); disasm
+    gate recursion(`sr_qsort`/`sr_msort` refs=695) + `cmp`=44 + `rep/sep`=233, zero 32-bit libcalls; default==+mos-a16==
+    +mos-xy16 `-verify-machineinstrs` clean (all 3). Screenshot shows the race: QUICK(red) `M72 C193 DONE`, HEAP(green)
+    `M183 C226` racing, MERGE(blue) `M160 C118 DONE` — quicksort wins. **MAME leg + runtime 5-way BLOCKED** on the
+    missing gitignored SPC700 IPL (env-wide, non-blocker per 2026-06-28); stays NEAR → full 5-way bar (pending IPL/CI).
+    **Pending:** publish to [biohack.net/snes/sort-race/](https://biohack.net/snes/sort-race/).
   - [wip] **#18 Maze generate + solve** — recursion + a priority-queue heap + arrays; shows a maze built then
     the shortest path lit. ([plan](docs/plans/2026-06-28-18-snes-maze-generate-solve.md)) — the battery's
     **recursion + data-structure** member (multiply/divide-free). **BUILT + `dev/run.sh maze` RESULT PASS:**

@@ -70,8 +70,10 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 ## Discrete algorithms, data structures & big-integers — recursion, heaps, carry chains
 
-17. **Sorting race** — animate quicksort vs heapsort vs mergesort of a bar array. *Stresses:* recursion (soft
-    stack / frame ABI), compares, in-place swaps. *Shows:* bars sorting in real time.
+17. ~~**Sorting race** — animate quicksort vs heapsort vs mergesort of a bar array. *Stresses:* recursion (soft
+    stack / frame ABI), compares, in-place swaps. *Shows:* bars sorting in real time.~~
+    ✓ [/snes/sort-race/](https://biohack.net/snes/sort-race/) *(recursive quicksort + mergesort are the soft-stack
+    witness; iterative heapsort is the non-recursive contrast — bsnes-jg PASS `0xB28F`.)*
 18. ~~**Maze generate + solve** — recursive-division carve (recursion) then A* (priority-queue heap frontier).
     *Stresses:* recursion + a heap/queue data structure + array. *Shows:* maze built, then the shortest path lit.~~
     ✓ [/snes/maze/](https://biohack.net/snes/maze/) *(carve = recursive **division**, not a backtracker DFS — the
@@ -93,7 +95,7 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 |---|---|
 | complex / 32-bit fixed-point **multiply** | 1, ~~2~~, 3, 4, ~~8~~, 9–10, ~~11~~, ~~13~~, ~~16~~ |
 | **division** / reciprocal / sqrt | ~~2~~, ~~13~~, 15, ~~16~~, ~~19~~ |
-| **recursion** & the soft stack / frame ABI | 17, ~~18~~ |
+| **recursion** & the soft stack / frame ABI | ~~17~~, ~~18~~ |
 | **heaps / queues / structs** (data structures) | ~~18~~ |
 | **bit manipulation** (pack/shift/boolean) | 5, ~~6~~ |
 | ~~multi-precision **carry-chain** codegen~~ | ~~19, 20~~ |
