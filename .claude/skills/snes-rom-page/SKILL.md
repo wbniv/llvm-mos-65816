@@ -70,17 +70,29 @@ safe to distribute.
    Keep `desc` to 2 sentences max — the card is small. The `keys` line is rendered in monospace at
    11 px; keep it under ~60 chars so it doesn't truncate on a 2-column card.
 
-5. **Build, then VERIFY before deploying** — headless-screenshot the built page and confirm the core
-   boots, the picture renders, the HUD/text isn't clipped, and the player is centred:
+5. **Build, then VERIFY before deploying.** Two distinct things to check:
+
+   - **Does the ROM render?** A **bsnes-jg screenshot of the ROM is sufficient** — the page boots the
+     *same* bsnes-jg WASM core, so the build gate's `build/<slug>-jg.png` (or any bsnes-jg render of
+     the exact ROM you're shipping; confirm the sha matches what's deployed) already proves the picture
+     renders. **No Chrome needed for this** — don't block the publish on a browser screenshot you can't
+     run. (When in doubt that the deployed `.sfc` is the one you rendered: `sha256sum` both.)
+   - **Is the page shell intact?** (core boots in-browser, HUD/text not clipped, player centred.) This is
+     a per-*page* concern, unchanged by the ROM, so it only needs checking when you edited the
+     `.astro`/template — and it's the *only* thing the Chrome shot adds over the bsnes-jg render. If
+     Chrome is available and you changed the page, screenshot it; otherwise verify the page serves
+     (`curl -o/dev/null -w '%{http_code}'`) and trust the unchanged template.
 
    ```sh
    cd <SITE_DIR> && task build
+   # Optional page-shell shot (only if Chrome is present AND you edited the page):
    ( python3 -m http.server 8799 --directory dist & sleep 1
      google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars \
        --window-size=1000,1400 --virtual-time-budget=9000 \
        --screenshot=/tmp/<slug>.png "http://localhost:8799/<slug>/" )
    ```
-   Read `/tmp/<slug>.png`. (`--virtual-time-budget` fast-forwards so the ROM runs to a live frame.)
+   (`--virtual-time-budget` fast-forwards so the ROM runs to a live frame.) On a republish that only
+   swaps the ROM/preview/manifest, the bsnes-jg render + an HTTP 200 check is the verification.
 
 6. **Commit, then deploy** per the site (*Per-site*).
 

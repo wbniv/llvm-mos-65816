@@ -6,6 +6,12 @@
 Gate `0x3C59`; `dev/run.sh doom-fire` RESULT PASS (bsnes-jg + disasm; MAME SKIP env-wide). Live at
 [biohack.net/snes/doom-fire/](https://biohack.net/snes/doom-fire/).
 
+> **Update 2026-06-29 — display fix (refresh was halved).** `_fire_emit` uploaded only 14 of 28
+> tilemap rows per frame (alternating halves) while `fire_step` advanced the whole grid every frame,
+> so each half refreshed at 30 Hz, out of phase. Fixed to a full-grid 1792 B upload per frame (fits one
+> NTSC v-blank) → consistent 60 Hz. Gate unchanged `0x3C59`; clean-build `corpus_result` @ WRAM `0x22`.
+> Republished biohack.net `v1.0.121`. See [VBLANK / flicker sweep](2026-06-29-snes-vblank-flicker-sweep.md).
+
 ## Context
 Renders the classic **Doom PSX fire** effect: a 32×28 heat grid whose bottom row is a constant
 max-heat source; every frame each interior cell inherits the cell below it minus a random decay,

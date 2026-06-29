@@ -7,6 +7,14 @@
 **Slug:** `rdiff`  
 **Status:** COMPLETE — all 5-way gate checks PASS, published to biohack.net
 
+> **Update 2026-06-29 — title z-order fix + card.** The BG2 title was buried by the diffusion: in
+> Mode 1 **BG1 (the grid) outranks BG2 (the title)**, and the field was seeded *before* the title hold.
+> Fixed by seeding *after* `display_hide_layer()` so BG1 is transparent while the title shows (priority
+> caveat now documented in `snesgfx/title_layer.h`). Website card capture bumped to 2000 frames (was a
+> half-empty 500-frame "2 blue dots" shot). Current gate `0x5555` (the `0x8484` cited below is from an
+> earlier `GS_GATE_STEPS`); clean-build `corpus_result` @ WRAM `0x20`. Republished biohack.net `v1.0.121`.
+> See [VBLANK / flicker sweep](2026-06-29-snes-vblank-flicker-sweep.md).
+
 ---
 
 ## Context
