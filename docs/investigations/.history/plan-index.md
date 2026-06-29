@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/5e02b1a) | fix(snes): rdiff Gray-Scott 16-bit rework — real reaction-diffusion patterns |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/607c3cb) | docs(plan-index): backfill #12 CORDIC commit SHA (34fd3ad) + built/published status |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/34fd3ad) | #12 CORDIC rotator SNES demo — multiply-free compiler stress-test |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/189c2be) | docs(plan-index): add row for the LTO+a16 bitmask misdiagnosis verification plan |
@@ -56,6 +57,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+5e02b1a	author	Will Norris
+5e02b1a	added	1
+5e02b1a	deleted	0
+5e02b1a	files	1
+5e02b1a	body	User reported rdiff "not working". Host simulation of the shipped rdiff.h\nconfirmed it: the 8-bit (scale 256) field with Du≈0.40 floods — the activator\nover-diffuses and V fills the whole grid; on the slow SNES you only saw the\nearly growing-blob transient. The differential gate stayed green because the\nhost oracle ran the same mis-tuned math (the gate validates codegen, not\npattern quality).\n\nRework examples/65816/rdiff.h to 16-bit fixed-point (scale GS_S=4096) in the\ncanonical stable-spot regime (Du=0.16/Dv=0.08, F≈0.0366, k≈0.062 ->\nDU=655/DV=328/F=150/K=254), with full-grid deterministic-noise seeding so the\nTuring instability breaks symmetry into a real spot/worm pattern instead of a\nsymmetric ring. Grid is 32x24 (the four 16-bit double-buffers don't fit the\n8 KB low-WRAM region at 32x28; centred with a 2-row navy border, tilemap\ncleared in reserve).\n\nNew gate hash 0x5555 (was 0x8484); corpus/expected.tsv updated. Differential\nhost == default == a16 == xy16 == 0x5555 on bsnes-jg; disasm __mulsi3=6 (the\n32-bit reaction is more codegen stress than the old 8-bit path). Pattern\nrenders + evolves (noise -> organising worms/spots).\n\nAlso lands the pending SNES title-screen doc rows (TODO.md, plan-index.md).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 607c3cb	author	Will Norris
 607c3cb	added	1
 607c3cb	deleted	1

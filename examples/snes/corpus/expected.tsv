@@ -22,3 +22,5 @@ corpus/nbody_sim.c	corpus_result	0xCC65	N-body (N=3, GRAV_K=64, GRAV_SOFT=16, DT
 corpus/factorial_sim.c	corpus_result	0x772F	Bignum factorial 50! in base-10000 uint16 array; carry-mul + __mulsi3 + __udivmodsi4 (shared factorial.h)
 corpus/newton_sim.c	corpus_result	0x4D8B	Newton's-method fractal z³−1, 8×8 grid in [−1.2,1.2]², 20-iter cap; complex division + multiply (shared newton.h)
 corpus/cordic_sim.c	corpus_result	0x4D41	CORDIC rotator full-circle sweep (GATE_N=96): rotation cordic16_sincos + vectoring cordic16_atan2, shift-add only → zero mul/div libcalls (shared cordic.h)
+corpus/maze_sim.c	corpus_result	0x0749	Maze recursive-division generate + A* indexed-heap solve (16x15) gate CRC: walls + path + heap counters (shared maze.h)
+corpus/doom-fire_sim.c	corpus_result	0x3C59	Doom-fire heat field: 16x16 grid, 30 steps; per-cell xorshift16 PRNG + flat-index array sweep (multiply-free), rotate-XOR CRC of full grid each step (shared doom-fire.h)

@@ -183,6 +183,23 @@ tasks:
     cmds:
       - dev/run.sh pi
 
+  maze:
+    desc: "#18: Maze generate + solve — recursive-division carve (genuine recursion, ~log depth to fit the 65816 256-byte HW stack) + A* indexed binary-heap solve (16x15), animated. Assert corpus_result (maze_gate_crc 0x0749) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (recursion self-call + rep/sep; no 32-bit libcalls). Leaves build/maze.sfc + build/maze-{jg,mame}.png."
+    cmds:
+      - dev/run.sh maze
+
+  maze-play:
+    desc: "PLAY the maze gen+solve demo in a MAME window on this host (builds the ROM first if needed). Shows a maze carved, then A* exploring (dim cells) and the shortest path lit (yellow), looping with new mazes."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/maze.sfc ]; then
+          echo "==> build/maze.sfc missing — building it (dev/run.sh maze)…"
+          dev/run.sh maze
+        fi
+      - task: mandel-mame
+        vars: { ROM: maze }
+
   factorial:
     desc: "#20: Bignum factorial — 1000! in a base-10000 digit array; custom 28-row FactDisplay drawable; assert corpus_result (factorial_gate_crc for 50!, 0x772F) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __udivmodsi4 + rep/sep). Leaves build/factorial.sfc + build/factorial-{mame,jg}.png."
     cmds:
@@ -238,6 +255,23 @@ tasks:
     desc: "#8: render the Gray-Scott reaction-diffusion demo on SNES (+mos-a16); assert corpus_result (rdiff cumulative gate_crc 0x6969) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + rep/sep). Leaves build/rdiff.sfc + build/rdiff-{mame,jg}.png."
     cmds:
       - dev/run.sh rdiff
+
+  doom-fire:
+    desc: "#7: Doom-fire heat field — a 32×28 heat grid rises + flickers from a max-heat source on BG1 4bpp (16-colour ramp); asserts corpus_result (doomfire_gate_crc 0x3C59, 16×16 grid × 30 steps) == host on MAME + bsnes-jg + disasm gate (xorshift16 eor/asl/lsr + rep/sep, multiply-free). Leaves build/doom-fire.sfc + build/doom-fire-{mame,jg}.png."
+    cmds:
+      - dev/run.sh doom-fire
+
+  doom-fire-play:
+    desc: "PLAY the Doom-fire demo in a MAME window on this host (builds the ROM first if needed). Flames rise + flicker from a max-heat source row through a black→red→orange→yellow→white palette."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/doom-fire.sfc ]; then
+          echo "==> build/doom-fire.sfc missing — building it (dev/run.sh doom-fire)…"
+          dev/run.sh doom-fire
+        fi
+      - task: mandel-mame
+        vars: { ROM: doom-fire }
 
   double-pendulum:
     desc: "#14: Double Pendulum chaos — two pendulums with near-identical ICs diverge on a BitmapCanvas; asserts corpus_result (dpend_gate_crc, 256 steps) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __divsi3 + rep/sep). Leaves build/double-pendulum.sfc + build/double-pendulum-{mame,jg}.png."

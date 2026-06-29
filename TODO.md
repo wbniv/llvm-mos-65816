@@ -434,6 +434,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     **Pending:** publish to [biohack.net/cordic/](https://biohack.net/cordic/) (batched with the re-publish).
   - [x] ~~**#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.~~ [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
   - [x] ~~**#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.~~
+  - [wip] **#18 Maze generate + solve** — recursion + a priority-queue heap + arrays; shows a maze built then
+    the shortest path lit. ([plan](docs/plans/2026-06-28-18-snes-maze-generate-solve.md)) — the battery's
+    **recursion + data-structure** member (multiply/divide-free). **BUILT + `dev/run.sh maze` RESULT PASS:**
+    host oracle == bsnes-jg corpus hash `0x0749`; disasm gate recursion(`maze_divide` self-call)=3 + rep/sep=227,
+    zero 32-bit libcalls; default==+mos-a16==+mos-xy16 on bsnes-jg + `-verify` clean (all 3). **Carve = recursive
+    division** (centre-biased ~log depth) not a backtracker DFS — the 65816's 256-byte HW stack can't hold a DFS's
+    O(N) recursion depth (measured: ~6 B/level × 199 deep ≫ 256). On-screen A* matches host (`expanded=112 path=37`,
+    seed `0xC0DE`). **Pending:** MAME leg (SPC700 IPL absent here) + publish to
+    [biohack.net/snes/maze/](https://biohack.net/snes/maze/).
   - [wip] **#16 Wireframe 3-D solid** — 3×3 matrix mul + perspective **divide** + Bresenham; shows a spinning solid.
     **PLAN WRITTEN** ([plan](docs/plans/2026-06-27-16-snes-wireframe-3d-solid.md)) — direct successor to #11:
     reuses the whole `snesgfx` frame + `canvas_line`/`canvas_plot`; only-new code is `examples/65816/wire3d.h`

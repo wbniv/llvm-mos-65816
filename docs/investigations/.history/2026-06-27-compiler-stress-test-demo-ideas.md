@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/572acf2) | docs(demo-ideas): strike through all completed demos + full-row for carry-chain |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/e66075e) | docs(ideas): add live links for Blossom + Space Invaders in preamble |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/7f860b3) | refactor(nbody→n-body): update all content refs after file rename |
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+572acf2	author	Will Norris
+572acf2	added	19
+572acf2	deleted	16
+572acf2	files	1
+572acf2	body	Mark #2, #8, #20 as done (missed in prior pass); strike their entries in the\nnumbered list, coverage map cells, and Recommended first picks. Strike the\nentire carry-chain row (label + numbers) since both #19 and #20 are now done.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_013Zdsshyc1boVJkzfGNn4eC
 e66075e	author	Will Norris
 e66075e	added	2
 e66075e	deleted	2

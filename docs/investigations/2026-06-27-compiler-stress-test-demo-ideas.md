@@ -72,8 +72,10 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 17. **Sorting race** — animate quicksort vs heapsort vs mergesort of a bar array. *Stresses:* recursion (soft
     stack / frame ABI), compares, in-place swaps. *Shows:* bars sorting in real time.
-18. **Maze generate + solve** — DFS carve (recursion) then A*/BFS (priority-queue frontier). *Stresses:*
-    recursion + a heap/queue data structure + array. *Shows:* maze built, then the shortest path lit.
+18. ~~**Maze generate + solve** — recursive-division carve (recursion) then A* (priority-queue heap frontier).
+    *Stresses:* recursion + a heap/queue data structure + array. *Shows:* maze built, then the shortest path lit.~~
+    ✓ [/snes/maze/](https://biohack.net/snes/maze/) *(carve = recursive **division**, not a backtracker DFS — the
+    65816's 256-byte hardware stack can't hold a DFS's O(N) recursion depth; recursive division is ~log depth.)*
 19. ~~**π — spigot digits + Monte-Carlo** — unbounded spigot (big-int mul/div/mod) alongside a Buffon/dart
     estimate. *Stresses:* multi-precision **carry chains** + div/mod + rng. *Shows:* digits ticking out beside
     a dart scatter with the running estimate.~~ ✓ [/snes/spigot/](https://biohack.net/snes/spigot/)
@@ -91,8 +93,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 |---|---|
 | complex / 32-bit fixed-point **multiply** | 1, ~~2~~, 3, 4, ~~8~~, 9–10, ~~11~~, ~~13~~, ~~16~~ |
 | **division** / reciprocal / sqrt | ~~2~~, ~~13~~, 15, ~~16~~, ~~19~~ |
-| **recursion** & the soft stack / frame ABI | 17, 18 |
-| **heaps / queues / structs** (data structures) | 18 |
+| **recursion** & the soft stack / frame ABI | 17, ~~18~~ |
+| **heaps / queues / structs** (data structures) | ~~18~~ |
 | **bit manipulation** (pack/shift/boolean) | 5, ~~6~~ |
 | ~~multi-precision **carry-chain** codegen~~ | ~~19, 20~~ |
 | **shift-add**, multiply-free | 12 |
