@@ -77,6 +77,15 @@ Targets:
              VRAM DMA) with a hue CGRAM palette, a split-screen HUD, and joypad pan/zoom/preset/colour.
              +mos-a16-only; grid hash host == +mos-a16 on MAME + bsnes-jg + a controller-state
              differential + a framebuffer screenshot from both (build/blossom-{jg,mame}.png). examples/snes/blossom.c
+  buddha-grid #4 Buddhabrot headless: the far SCATTER-WRITE density-grid gate — draw K_GATE random
+             samples, iterate z^2+c, replay each ESCAPING orbit into a 128x128 hit-count grid at high
+             WRAM $7E2000 via the far RMW path, far-load hash -> corpus_result. Golden derived from the
+             host oracle (buddha.h); +mos-a16-only, host == +mos-a16 on MAME + bsnes-jg + a far-RMW +
+             complex-multiply disasm gate. examples/65816/k_buddha_far.c
+  buddha     #4 Buddhabrot: escaping-orbit DENSITY accumulation RENDERED on the SNES via Mode 7 —
+             accumulate samples into the far hit grid, reveal band-by-band with a ghostly glow palette.
+             +mos-a16-only; grid hash host == +mos-a16 on bsnes-jg + MAME + a framebuffer screenshot
+             from both (build/buddha-{jg,mame}.png). examples/snes/buddha.c
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUE_REPROS repro
              STILL crashes -verify-machineinstrs under both +mos-a16 and +mos-xy16 with its
              expected signature; fails loudly the moment one verifies clean -> drop the entry

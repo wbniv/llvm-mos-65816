@@ -102,6 +102,24 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
+- [ ] **FORK REGRESSION — MOS legalizer parks a shared `G_CONSTANT 0` in a non-dominating block
+  (`-verify-machineinstrs` failure, default-8-bit).** A fold-while-walking loop (came[cell] consumed
+  both as a folded value and as a signed-`int8_t`-table index, with an early-`break` diamond CFG) makes
+  the legalizer **CSE** the byte-narrowing zero-constant of the unsigned high-byte (loop header) with the
+  sign-extension basis of `int8_t DX[d]` (loop body) into **one** `G_CONSTANT i8 0`, defined in the body
+  → doesn't dominate the header use → *"Virtual register defs don't dominate all uses"* → build aborts
+  (exit 70). **NOT UPSTREAM:** unpatched upstream `mos-clang` at the SAME commit (`c798c31`) compiles it
+  CLEAN — it emits a **per-block** constant; our fork's patched legalizer shares one. Fires in
+  default/`+mos-a16`/`+mos-xy16`. **NOT a demonstrated miscompile** (with `-verify` off the ROM computes
+  the correct value on bsnes-jg for two `came[]` fillings — the value is 0, so a stale read rarely
+  diverges); but it blocks `-verify` builds and is a latent hazard. Surfaced + worked around in the maze
+  demo (`maze.h` split into `maze_path_build` + `maze_fold_path`). Verified repro + full analysis:
+  [`docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c`](docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c).
+  Introducing pass = **legalizer** (`-stop-after=irtranslator` clean, `=legalizer` dirty); pass pipeline
+  is byte-identical to upstream, so it's a fork **legalizer-rule** change. **Next:** bisect the offending
+  patch (suspects 0001/0002/0005/0006/0013/0014 — legalizer-touching) on an isolated `vendor/llvm-mos`
+  worktree (warm ccache), then gate/fix it and register the repro in `KNOWN_ISSUE_REPROS`
+  (`tools/a16_fuzz.py known-issues`) so the XPASS guard surfaces the fix. **Do NOT file upstream.**
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
   "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
   on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`
@@ -411,7 +429,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   - [x] ~~**#1 Julia set explorer** — `z²+c` Q5.10 **complex multiply** (3 `__mulsi3`/iter) far-stored into high WRAM `$7E2000`, drawn through Mode 7 as `c` orbits `0.7885·e^iθ` (morphs + spins; the grind is the morph, the affine matrix the motion). Gate `julia_gate_crc` `0x3490`; bsnes-jg host==`+mos-a16` + disasm gate (`__mulsi3=3`, `rep/sep=46`). MAME leg SKIP (no SPC700 IPL here; demos-only non-blocker).~~ ✓ [/snes/julia/](https://biohack.net/snes/julia/) ([plan](docs/plans/2026-06-28-1-snes-julia.md))
   - [x] ~~**#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.~~ ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
   - [x] ~~**#3 Burning Ship fractal** — `z=(|Re z|+i|Im z|)²+c`; the abs-fold + 3 `__mulsi3`/iter (Q12), escape-time bands, black ship silhouette, palette-cycled; multiply-only. Gate `bs_gate_crc` `0x6F2D`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/burning-ship/](https://biohack.net/snes/burning-ship/) ([plan](docs/plans/2026-06-28-3-snes-burning-ship.md))
-  - [x] ~~**#3 Burning Ship fractal** — `z=(|Re z|+i|Im z|)²+c`; the abs-fold + 3 `__mulsi3`/iter (Q12), escape-time bands, black ship silhouette, palette-cycled; multiply-only. Gate `bs_gate_crc` `0x6F2D`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/burning-ship/](https://biohack.net/snes/burning-ship/) ([plan](docs/plans/2026-06-28-3-snes-burning-ship.md))
+  - [x] ~~**#4 Buddhabrot** — escaping-orbit **density accumulation** into a 128×128 **far** buffer ($7E2000);
+    the battery's **PRNG + far scatter-write** member.~~ ([plan](docs/plans/2026-06-28-4-snes-buddhabrot.md)) — xorshift16
+    samples `c`, `z²+c` escape test, then orbit-replay far RMW (`lda [dp]`/`inc`/`sta [dp]`); 3 `__mulsi3`/iter ×2
+    passes. `+mos-a16`-only (far grid) → **3-way bar**, blossom model. **BUILT + `dev/run.sh buddha-grid` + `buddha`
+    RESULT PASS:** host oracle == bsnes-jg corpus hash `0x7C31`; disasm gate far RMW(`lda/sta [dp]`=2) + rep/sep(31/34)
+    + `__mulsi3`=8; `-verify` clean. Ghostly blue Buddhabrot blooms via Mode 7. MAME leg pending the SPC700 IPL
+    (non-blocking). **PUBLISHED + LIVE** → [biohack.net/snes/buddhabrot/](https://biohack.net/snes/buddhabrot/) (v1.0.119).
   - [x] ~~**#5 Conway's Game of Life** — bit-packed SWAR neighbour sums (and/eor/ora + asl/lsr, multiply-free); a Gosper glider gun fires gliders into a settling random soup. Gate `life_gate_crc` `0xDDF1`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/life/](https://biohack.net/snes/life/) ([plan](docs/plans/2026-06-28-5-snes-life.md))
   - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~
   - [x] ~~**#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.~~ ✓ [/snes/doom-fire/](https://biohack.net/snes/doom-fire/) ([plan](docs/plans/2026-06-28-7-snes-doom-fire.md))

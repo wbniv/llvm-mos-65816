@@ -168,6 +168,28 @@ tasks:
       - task: mandel-mame
         vars: { ROM: blossom }
 
+  buddha:
+    desc: "#4: Buddhabrot — escaping-orbit DENSITY accumulation on the SNES — far scatter-write hit grid ($7E2000) + Mode 7 band DMA + ghostly glow palette. +mos-a16-only; asserts the grid hash host==+mos-a16 on bsnes-jg + MAME, screenshots both. Leaves build/buddha.sfc + build/buddha-{jg,mame}.png (then: task buddha-play)."
+    cmds:
+      - dev/run.sh buddha
+
+  buddha-grid:
+    desc: "#4 headless: the far SCATTER-WRITE density-grid gate — draw K_GATE random samples, iterate z^2+c, replay escaping orbits into a 128x128 grid at high WRAM $7E2000 via the far RMW path, far-load hash, assert host==+mos-a16 on both emulators + a far-RMW + complex-multiply disasm gate. Leaves build/k_buddha_far.sfc."
+    cmds:
+      - dev/run.sh buddha-grid
+
+  buddha-play:
+    desc: "PLAY the Buddhabrot demo in a MAME WINDOW on this host (builds the ROM first if needed). The density cloud blooms in progressively as escaping orbits accumulate."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/buddha.sfc ]; then
+          echo "==> build/buddha.sfc missing — building it (dev/run.sh buddha)…"
+          dev/run.sh buddha
+        fi
+      - task: mandel-mame
+        vars: { ROM: buddha }
+
   spirograph:
     desc: "#11: render the Spirograph (hypotrochoid) demo on SNES (+mos-a16); assert curve hash host==+mos-a16 on MAME + bsnes-jg + disasm gate. Leaves build/spirograph.sfc + build/spirograph-{mame,jg}.png."
     cmds:
