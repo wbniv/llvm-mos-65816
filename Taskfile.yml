@@ -307,6 +307,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: doom-fire }
 
+  life:
+    desc: "#5: Conway's Game of Life — a 128×112 bit-packed grid (Gosper glider gun + random soup) evolves by B3/S23 on BG3 2bpp; asserts corpus_result (life_gate_crc 0xDDF1, 64×48 grid × 32 gens) == host on MAME + bsnes-jg + disasm gate (SWAR neighbour sums: shifts+bools, no mul/div). Leaves build/life.sfc + build/life-{mame,jg}.png."
+    cmds:
+      - dev/run.sh life
+
+  life-play:
+    desc: "PLAY the Conway's Game of Life demo in a MAME window on this host (builds the ROM first if needed). A Gosper glider gun fires gliders down-right into a settling random soup."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/life.sfc ]; then
+          echo "==> build/life.sfc missing — building it (dev/run.sh life)…"
+          dev/run.sh life
+        fi
+      - task: mandel-mame
+        vars: { ROM: life }
+
   double-pendulum:
     desc: "#14: Double Pendulum chaos — two pendulums with near-identical ICs diverge on a BitmapCanvas; asserts corpus_result (dpend_gate_crc, 256 steps) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __divsi3 + rep/sep). Leaves build/double-pendulum.sfc + build/double-pendulum-{mame,jg}.png."
     cmds:

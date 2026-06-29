@@ -43,8 +43,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 ## Cellular automata & grids — bit-twiddling, array indexing, double-buffer
 
-5. **Conway's Game of Life** — bit-packed neighbour sums, ping-pong buffers. *Stresses:* bitops, array index,
-   two-buffer swap. *Shows:* gliders/guns evolving.
+5. ~~**Conway's Game of Life** — bit-packed neighbour sums, ping-pong buffers. *Stresses:* bitops, array index,
+   two-buffer swap. *Shows:* gliders/guns evolving.~~ ✓ [/snes/life/](https://biohack.net/snes/life/)
 6. ~~**Rule 90/110 (1-D CA)** — each row from the previous via 8-bit logic. *Stresses:* shifts/boolean logic.
    *Shows:* Sierpinski (90) / chaos (110) scrolling down — the display *is* the computation.~~ ✓ [/snes/1d-ca/](https://biohack.net/snes/1d-ca/)
 7. ~~**Doom-fire / heat field** — per-cell decay + PRNG, palette ramp. *Stresses:* array sweep + rng + CGRAM.
@@ -103,7 +103,7 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 | **division** / reciprocal / sqrt | ~~2~~, ~~13~~, 15, ~~16~~, ~~19~~ |
 | **recursion** & the soft stack / frame ABI | ~~17~~, ~~18~~ |
 | **heaps / queues / structs** (data structures) | ~~18~~ |
-| **bit manipulation** (pack/shift/boolean) | 5, ~~6~~ |
+| **bit manipulation** (pack/shift/boolean) | ~~5~~, ~~6~~ |
 | ~~multi-precision **carry-chain** codegen~~ | ~~19, 20~~ |
 | **shift-add**, multiply-free | ~~12~~ |
 | **far / high-WRAM** buffers (a16-only) | 1, 4, ~~8~~, ~~13~~ |

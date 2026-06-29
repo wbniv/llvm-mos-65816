@@ -409,6 +409,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. The selected 9 each hit a
   distinct codegen corner:
   - [x] ~~**#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.~~ ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
+  - [x] ~~**#5 Conway's Game of Life** — bit-packed SWAR neighbour sums (and/eor/ora + asl/lsr, multiply-free); a Gosper glider gun fires gliders into a settling random soup. Gate `life_gate_crc` `0xDDF1`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/life/](https://biohack.net/snes/life/) ([plan](docs/plans/2026-06-28-5-snes-life.md))
   - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~
   - [x] ~~**#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.~~ ✓ [/snes/doom-fire/](https://biohack.net/snes/doom-fire/) ([plan](docs/plans/2026-06-28-7-snes-doom-fire.md))
   - [x] ~~**#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.~~

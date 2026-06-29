@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/5d7319a) | docs(demo-ideas): strike #12 CORDIC — published + live (biohack.net/snes/cordic/) |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/070328f) | feat(snes): #10 Fourier epicycles — many-multiply / sin-cos stress demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/f8aff1c) | feat(snes): #17 Sorting Race demo — quicksort/heapsort/mergesort recursion stress |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/32a4114) | feat(snes): #7 Doom-fire / heat-field demo — array sweep + PRNG, palette ramp |
@@ -10,6 +11,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+5d7319a	author	Will Norris
+5d7319a	added	12
+5d7319a	deleted	7
+5d7319a	files	1
+5d7319a	body	#12 CORDIC rotator is built, gate-passes (bsnes-jg 0x4D41, multiply-free),\nand published; mark it done in the demo-ideas backlog (main entry, coverage\nmap, recommended-picks). #5 Life left open — built but not yet published.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 070328f	author	Will Norris
 070328f	added	4
 070328f	deleted	3
