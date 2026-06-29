@@ -162,9 +162,9 @@ Mode 7, no HUD (same as Julia — Mode 7 has no spare BG layer). 64×56 escape i
 
 6. **Title card** — `build/mandel-float-jg.png` → `docs/plans/screenshots/mandel-float.png`, embedded above. **PASS**.
 7. **/snes-rom-page publishes.** Page `src/pages/snes/mandel-float.astro` + assets scaffolded into
-   biohack.net; `task build` → 27 pages, `dist/snes/mandel-float/index.html` built; gallery card added.
-   Static verification **PASS** (no template placeholders; ROM/preview/default-rom wired; gate hash
-   `0x4169` + disasm counts in page; manifest has `mandel-float`; assets in `dist/`). _Live headless
-   screenshot could not run on this host (no Chrome installed) — page is a verbatim clone of the
-   proven Julia page and the ROM renders in the identical bsnes-jg core (the gate's `-jg.png`)._ **PASS** (static).
+   biohack.net; gallery card added; deployed (Cloudflare Pages, tag-driven). Live: `curl` returns HTTP 200
+   for the page, the 32 768-byte ROM, and the preview; the gallery lists the card. Title card / web preview =
+   the **bsnes-jg frame-2200 render** (the trusted cycle-accurate core, same one the in-browser WASM player
+   runs) — the iconic whole black Mandelbrot set surrounded by escape bands, chunky (each fat pixel hundreds
+   of soft-float ops). **PASS**.
 8. `task md -- docs/plans/...` renders cleanly (title card resolves). **PASS**.

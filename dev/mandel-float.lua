@@ -2,15 +2,15 @@
 -- output, and assert the gate proof (corpus_result) matches the host oracle. MAME's video:snapshot()
 -- needs a real rendered surface, so dev/mandel-float.sh runs MAME under Xvfb. The gate (mf_gate_crc)
 -- finishes during the title splash; the soft-float grind then reveals the first zoom level. We
--- snapshot at SHOT_AT (default 1700) to show the rendered set. Inputs:
+-- snapshot at SHOT_AT (default 2200) to show the rendered set. Inputs:
 --   SHOT_ADDR  program-space addr of corpus_result (e.g. 0x7E____)
 --   SHOT_WANT  expected hash (host reference, 0x4169)
---   SHOT_AT    frame to snapshot/assert at (default 1700)
+--   SHOT_AT    frame to snapshot/assert at (default 2200)
 local function num(name, d) local v = os.getenv(name); if not v or v == "" then return d end
   return tonumber(v) or tonumber(v, 16) or d end
 local ADDR = num("SHOT_ADDR", 0x7E0000)
 local WANT = num("SHOT_WANT", 0x4169)
-local AT   = num("SHOT_AT", 1700)
+local AT   = num("SHOT_AT", 2200)
 
 local f, done = 0, false
 emu.register_periodic(function()

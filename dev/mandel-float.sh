@@ -69,7 +69,7 @@ if [ ! -x "$JGX" ]; then
 fi
 if [ -x "$JGX" ] && [ -d "$VENDOR/Database" ]; then
   echo "==> bsnes-jg: render + framebuffer dump (build/mandel-float-jg.png) + assert"
-  "$JGX" "$BUILD/mandel-float.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 1700 "$BUILD/mandel-float-jg.png" || rc=1
+  "$JGX" "$BUILD/mandel-float.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 2200 "$BUILD/mandel-float-jg.png" || rc=1
 else
   echo "    SKIP bsnes-jg (harness/core absent — run: dev/run.sh xcheck once)"
 fi
