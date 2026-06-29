@@ -4,7 +4,8 @@
 > [biohack.net/snes](https://biohack.net/snes/); the differential gate found a handful of pre-existing
 > compiler bugs along the way. **Round 2 (#21+) — in progress** (#21 ✓ [soft-float](https://biohack.net/snes/mandel-float/),
 > #22 ✓ [64-bit avalanche](https://biohack.net/snes/avalanche/), #26 ✓ [boids / struct-by-value
-> ABI](https://biohack.net/snes/boids/) shipped 2026-06-29), below: each targets a
+> ABI](https://biohack.net/snes/boids/), #29a ✓ [bytecode-VM turtle](https://biohack.net/snes/turtle-vm/)
+> shipped 2026-06-29), below: each targets a
 > **codegen corner the first 20 never execute** (soft-float,
 > 64-bit integers, jump tables, by-value struct ABI, bitfields, variadics, variable-count shifts,
 > pointer-chasing trees) — the untested libcall/ABI paths where the remaining bugs hide.
@@ -149,7 +150,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 |---|---|---|
 | **soft-float (IEEE-754)** — `__addsf3`/`__mulsf3`/`__divsf3`/`__ltsf2`/`__floatsisf`/`__fixsfsi` | no Round-1 demo uses `float` at all; single-precision is fully specified → bit-exact differential | ~~21~~, 24 |
 | **64-bit integers** — `__muldi3`/`__udivdi3`/`__ashldi3`/`__lshrdi3`, 4-limb carry | every Round-1 demo tops out at 32-bit | ~~22~~ |
-| **jump-table / computed branch** — switch-dispatch + indirect-call tables | never exercised | 24, 29a |
+| **jump-table / computed branch** — switch-dispatch + indirect-call tables | never exercised | 24, ~~29a~~ |
 | **aggregate / by-value struct ABI** — sret vs register-pair return | structs exist (#18) but are never passed/returned **by value** | ~~26~~ |
 | **bitfield insert/extract** — `unsigned x : n` fields | zero usage so far | 29b |
 | **variable-count shifts** — `__ashlsi3`/`__lshrsi3` with a *data-dependent* count | all Round-1 shifts are compile-time constants | 28, 30 |
@@ -171,8 +172,8 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 26. ~~**Boids flocking (struct-by-value vectors)** — steering functions take/return `vec2` **by value**.
     *Stresses:* the **aggregate-return ABI** (sret vs register pair), invoked thousands of times/frame.
     *Shows:* a flock swirling — separation / alignment / cohesion.~~ ✓ [/snes/boids/](https://biohack.net/snes/boids/) *(vec2 by-value kernel, noinline; bit-exact host==default==a16==xy16 `0xA8AB`; disasm by-value-calls=497 + `__mulsi3` + `__divsi3`; no bug — aggregate-return ABI correct in all modes)*
-29a. **Bytecode-VM turtle** — a stack machine interpreting a compiled program. *Stresses:* **jump-table
-    dispatch** + a function-pointer opcode table. *Shows:* turtle graphics driven by bytecode.
+29a. ~~**Bytecode-VM turtle** — a stack machine interpreting a compiled program. *Stresses:* **jump-table
+    dispatch** + a function-pointer opcode table. *Shows:* turtle graphics driven by bytecode.~~ ✓ [/snes/turtle-vm/](https://biohack.net/snes/turtle-vm/) *(dense switch → `JMP (abs,X)` jump table + `jsr __call_indir` fnptr opcode table; bit-exact host==default==a16==xy16 `0x4007`; no bug — confirms the xy16 JMPIdxIndir hardening)*
 32. **printf HUD (variadic)** — a tiny `vsnprintf` driving a readout; exercises **`va_arg`**. Best *folded
     into* another demo's HUD rather than built standalone.
 
@@ -203,4 +204,4 @@ Sharpest at opening a code path the first 20 never run:
 - ~~**#21 soft-float** — largest untested surface, and a bit-exact differential.~~ ✓ [/snes/mandel-float/](https://biohack.net/snes/mandel-float/)
 - ~~**#22 64-bit integers** — `__muldi3` & friends, never touched.~~ ✓ [/snes/avalanche/](https://biohack.net/snes/avalanche/)
 - ~~**#26 struct-by-value ABI** — aggregate return on a hot path.~~ ✓ [/snes/boids/](https://biohack.net/snes/boids/)
-- **#29a jump-table VM** — indirect dispatch / function-pointer table.
+- ~~**#29a jump-table VM** — indirect dispatch / function-pointer table.~~ ✓ [/snes/turtle-vm/](https://biohack.net/snes/turtle-vm/)

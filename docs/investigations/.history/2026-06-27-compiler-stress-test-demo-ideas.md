@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/d5a4f74) | feat(snes): #26 Boids Flock — struct-by-value / aggregate-return ABI stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/7172dd9) | feat(snes): #22 64-Bit Avalanche — splitmix64 hash matrix / 64-bit integer libcall stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/cd3663a) | feat(snes): #21 Soft-Float Mandelbrot — IEEE-754 single-precision escape-time / soft-float libcall stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/673b64b) | docs(investigation): add Round 2 (#21+) — new codegen-corner demos |
@@ -20,6 +21,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+d5a4f74	author	Will Norris
+d5a4f74	added	6
+d5a4f74	deleted	5
+d5a4f74	files	1
+d5a4f74	body	Demo #26 of the compiler stress-test battery (Round 2). Reynolds flocking built\non a vec2 {int16_t x,y} VALUE type whose steering kernel (v2_add/v2_sub/v2_scale\n+ separation/alignment/cohesion) TAKES and RETURNS the struct BY VALUE, noinline\nso the O(N^2)/frame calls survive -Os — the small-struct register-pair-vs-sret\naggregate-return path no other demo passes a struct through.\n\nInteger fixed-point (Q12.4) => bit-exact; flock in bank-0 WRAM (no far pointers)\n=> full 5-way bar. corpus gate boids_gate_crc = 0xA8AB (8-bird flock, 12 steps).\ndev/run.sh boids RESULT PASS: disasm by-value-calls=497 + __mulsi3=6 + __divsi3=4\n+ rep/sep=103; bsnes-jg host==+mos-a16 0xA8AB. 5-way confirmed host==default==\n+mos-a16==+mos-xy16 on bsnes-jg, -verify clean (MAME SKIP — no SPC700 IPL,\ndemos-only non-blocker). No compiler bug — aggregate-return ABI correct in all\nmodes. Boids coloured by heading octant = the visual proof.\n\nPublished biohack.net/snes/boids/ (v1.0.128).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7172dd9	author	Will Norris
 7172dd9	added	7
 7172dd9	deleted	6

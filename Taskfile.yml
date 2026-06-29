@@ -307,6 +307,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: boids }
 
+  turtle-vm:
+    desc: "#29a: Bytecode-VM Turtle — a stack-machine bytecode interpreter draws LOGO turtle graphics; the dense switch(op) lowers to a JMP (abs,X) jump-table dispatch (JMPIdxIndir) and the ALU ops dispatch through a function-pointer opcode table (jsr __call_indir) — the indirect/computed control-flow corners no other demo runs. Integer fixed-point => bit-exact; assert corpus_result (vm_gate_crc 0x4007) == host on bsnes-jg (+ MAME if SPC700 IPL) + disasm gate (jump-table + __call_indir + rep/sep). Leaves build/turtle-vm.sfc + build/turtle-vm-{jg,mame}.png."
+    cmds:
+      - dev/run.sh turtle-vm
+
+  turtle-vm-play:
+    desc: "PLAY the Bytecode-VM Turtle demo in a MAME window on this host (builds the ROM first if needed). A turtle interpreter draws a multi-colour spiral rosette = the visual proof the jump-table + function-pointer dispatch is correct."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/turtle-vm.sfc ]; then
+          echo "==> build/turtle-vm.sfc missing — building it (dev/run.sh turtle-vm)…"
+          dev/run.sh turtle-vm
+        fi
+      - task: mandel-mame
+        vars: { ROM: turtle-vm }
+
   factorial:
     desc: "#20: Bignum factorial — 1000! in a base-10000 digit array; custom 28-row FactDisplay drawable; assert corpus_result (factorial_gate_crc for 50!, 0x772F) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __udivmodsi4 + rep/sep). Leaves build/factorial.sfc + build/factorial-{mame,jg}.png."
     cmds:
