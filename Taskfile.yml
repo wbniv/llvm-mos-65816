@@ -290,6 +290,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: avalanche }
 
+  boids:
+    desc: "#26: Boids Flock — Reynolds flocking on a vec2 {int16_t x,y} VALUE type; the steering kernel takes/returns struct BY VALUE (noinline), exercising the aggregate-return ABI (register-pair vs sret) O(N^2)/frame — untested by every other demo. Integer fixed-point => bit-exact; assert corpus_result (boids_gate_crc 0xA8AB) == host on bsnes-jg (+ MAME if SPC700 IPL) + disasm gate (by-value calls + __mulsi3 + rep/sep). Leaves build/boids.sfc + build/boids-{jg,mame}.png."
+    cmds:
+      - dev/run.sh boids
+
+  boids-play:
+    desc: "PLAY the Boids Flock demo in a MAME window on this host (builds the ROM first if needed). A flock of dots clumps, aligns into heading-coloured streams, and avoids collisions — the visual proof the struct-by-value ABI is correct."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/boids.sfc ]; then
+          echo "==> build/boids.sfc missing — building it (dev/run.sh boids)…"
+          dev/run.sh boids
+        fi
+      - task: mandel-mame
+        vars: { ROM: boids }
+
   factorial:
     desc: "#20: Bignum factorial — 1000! in a base-10000 digit array; custom 28-row FactDisplay drawable; assert corpus_result (factorial_gate_crc for 50!, 0x772F) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __udivmodsi4 + rep/sep). Leaves build/factorial.sfc + build/factorial-{mame,jg}.png."
     cmds:
