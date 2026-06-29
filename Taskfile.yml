@@ -324,6 +324,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: life }
 
+  harmonograph:
+    desc: "#9: Lissajous / Harmonograph — four damped pendulums trace a precessing, inward-spiralling Lissajous curve on BG3 2bpp; asserts corpus_result (harmo_gate_crc 0x0EBB, 256 samples) == host on MAME + bsnes-jg + disasm gate (sin-LUT + __mulsi3 ×8/sample + rep/sep, no divide). Leaves build/harmonograph.sfc + build/harmonograph-{mame,jg}.png."
+    cmds:
+      - dev/run.sh harmonograph
+
+  harmonograph-play:
+    desc: "PLAY the Harmonograph demo in a MAME window on this host (builds the ROM first if needed). Damped sinusoids trace a Lissajous figure that precesses and decays, then the next preset blooms."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/harmonograph.sfc ]; then
+          echo "==> build/harmonograph.sfc missing — building it (dev/run.sh harmonograph)…"
+          dev/run.sh harmonograph
+        fi
+      - task: mandel-mame
+        vars: { ROM: harmonograph }
+
   double-pendulum:
     desc: "#14: Double Pendulum chaos — two pendulums with near-identical ICs diverge on a BitmapCanvas; asserts corpus_result (dpend_gate_crc, 256 steps) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __divsi3 + rep/sep). Leaves build/double-pendulum.sfc + build/double-pendulum-{mame,jg}.png."
     cmds:

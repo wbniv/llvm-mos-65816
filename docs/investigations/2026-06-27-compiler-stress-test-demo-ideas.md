@@ -54,8 +54,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 
 ## Trig / parametric — sin-cos LUTs, fixed-point accumulation
 
-9. **Lissajous / harmonograph** — damped `sin(at), sin(bt+φ)` plotting. *Stresses:* sin LUT + fixed-point mul
-   + accumulation. *Shows:* the decaying traced curve.
+9. ~~**Lissajous / harmonograph** — damped `sin(at), sin(bt+φ)` plotting. *Stresses:* sin LUT + fixed-point mul
+   + accumulation. *Shows:* the decaying traced curve.~~ ✓ [/snes/harmonograph/](https://biohack.net/snes/harmonograph/)
 10. ~~**Fourier epicycles** — sum of rotating vectors traces a shape. *Stresses:* many sin/cos + complex add.
     *Shows:* nested circles drawing an outline.~~ ✓ [/snes/epicycles/](https://biohack.net/snes/epicycles/) *(8 baked
     DFT coefficients of a 5-pointed star; 4 `__mulsi3` per harmonic + 32-bit accumulate, divide-free.)*
@@ -99,7 +99,7 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 |---|---|
 | Codegen aspect | Demos |
 |---|---|
-| complex / 32-bit fixed-point **multiply** | 1, ~~2~~, 3, 4, ~~8~~, 9–10, ~~11~~, ~~13~~, ~~16~~ |
+| complex / 32-bit fixed-point **multiply** | 1, ~~2~~, 3, 4, ~~8~~, ~~9~~–~~10~~, ~~11~~, ~~13~~, ~~16~~ |
 | **division** / reciprocal / sqrt | ~~2~~, ~~13~~, 15, ~~16~~, ~~19~~ |
 | **recursion** & the soft stack / frame ABI | ~~17~~, ~~18~~ |
 | **heaps / queues / structs** (data structures) | ~~18~~ |
@@ -108,7 +108,7 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 | **shift-add**, multiply-free | ~~12~~ |
 | **far / high-WRAM** buffers (a16-only) | 1, 4, ~~8~~, ~~13~~ |
 | **PRNG + scatter** writes | 4, ~~7~~, ~~19~~ |
-| **sin/cos LUT** indexing | 9, ~~10~~, ~~11~~, ~~14~~, ~~16~~ |
+| **sin/cos LUT** indexing | ~~9~~, ~~10~~, ~~11~~, ~~14~~, ~~16~~ |
 
 ## Recommended first picks
 

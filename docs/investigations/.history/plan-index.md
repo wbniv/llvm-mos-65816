@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/30333e0) | feat(snes): #5 Conway's Game of Life — bit-parallel SWAR neighbour sums |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/070328f) | feat(snes): #10 Fourier epicycles — many-multiply / sin-cos stress demo |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/6831fac) | docs(plan-index): add #17 Sorting Race row (f8aff1c) |
 | [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/32a4114) | feat(snes): #7 Doom-fire / heat-field demo — array sweep + PRNG, palette ramp |
@@ -61,6 +62,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+30333e0	author	Will Norris
+30333e0	added	1
+30333e0	deleted	1
+30333e0	files	1
+30333e0	body	Demo #5 of the compiler stress-test battery — the 2-D bit-manipulation\nmember (companion to the 1-D #6 Rule 90/110), deliberately multiply-/\ndivide-free. A 128×112 bit-packed grid (8 cells/byte) evolves by B3/S23:\neach byte's eight neighbour bit-vectors are summed bit-parallel into a\n4-bit-per-cell count via a ripple of SWAR half-adders (carry=a&b;\nsum=a^b) — pure and/eor/ora plus constant-1 asl/lsr for the cross-byte\nneighbour alignment, plus the two-buffer ping-pong swap. A Gosper glider\ngun fires gliders into a settling random soup, rendered on BG3 2bpp via a\ncustom LifeGrid drawable (doom-fire-style full-grid streaming, 56\ntiles/frame).\n\nGate life_gate_crc = 0xDDF1 (Gosper gun on 64×48 grid, 32 gens, CRC-16\nof all output rows). No far pointers ⇒ full 5-way bar. Verified:\ndev/run.sh life RESULT PASS (disasm shifts=22 bools=51, zero\n__mulsi3/__udivmodsi4; bsnes-jg host==+mos-a16 0xDDF1;\n-verify-machineinstrs clean on default/+mos-a16/+mos-xy16; MAME pending\nthe env-wide SPC700 IPL — non-blocker per the demos-only policy).\nPublished biohack.net/snes/life/ (biohack.net v1.0.114).\n\nFiles: examples/65816/life.h (logic), examples/snes/life.c (ROM),\nexamples/snes/corpus/life_sim.c (slice), tools/life-sim.c (oracle),\ndev/life.{sh,lua} (gate), plus Taskfile/TODO/plan/plan-index/backlog/\nexpected.tsv wiring.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 070328f	author	Will Norris
 070328f	added	1
 070328f	deleted	0

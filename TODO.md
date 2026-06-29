@@ -413,6 +413,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~
   - [x] ~~**#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.~~ ✓ [/snes/doom-fire/](https://biohack.net/snes/doom-fire/) ([plan](docs/plans/2026-06-28-7-snes-doom-fire.md))
   - [x] ~~**#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.~~
+  - [x] ~~**#9 Lissajous / Harmonograph** — damped sin·env + env·decay (8 `__mulsi3`/sample, sin LUT, multiply-only); four detuned pendulums trace a precessing, inward-spiralling Lissajous curve. Gate `harmo_gate_crc` `0x0EBB`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/harmonograph/](https://biohack.net/snes/harmonograph/) ([plan](docs/plans/2026-06-28-9-snes-harmonograph.md))
   - [x] **#10 Fourier epicycles** — sum of rotating vectors traces a shape; many sin/cos + complex add; shows
     nested circles drawing an outline. ([plan](docs/plans/2026-06-28-10-snes-fourier-epicycles.md)) — the battery's
     **many-multiply / sin-cos** member (no divide): a sin/cos-LUT sweep with **4 `__mulsi3` per harmonic** + 32-bit

@@ -26,3 +26,4 @@ corpus/maze_sim.c	corpus_result	0x0749	Maze recursive-division generate + A* ind
 corpus/doom-fire_sim.c	corpus_result	0x3C59	Doom-fire heat field: 16x16 grid, 30 steps; per-cell xorshift16 PRNG + flat-index array sweep (multiply-free), rotate-XOR CRC of full grid each step (shared doom-fire.h)
 corpus/life_sim.c	corpus_result	0xDDF1	Conway's Game of Life B3/S23: Gosper gun on 64x48 bitpacked grid, 32 gens; SWAR bit-parallel neighbour sums (and/eor/ora + asl/lsr, multiply-free), CRC-16 of all output rows (shared life.h)
 corpus/epicycles_sim.c	corpus_result	0x4F6C	Fourier epicycles: sum of 8 rotating vectors (DFT of a star) traces the outline; 4 __mulsi3/harmonic + 32-bit accumulate, no divide (shared epicycles.h)
+corpus/harmonograph_sim.c	corpus_result	0x0EBB	Lissajous/harmonograph: 4 damped pendulums (2/axis, detuned), 256 samples preset 0; 8 __mulsi3/sample (sin·env amplitude + env·decay envelope), sin LUT, rotate-XOR hash, no divide (shared harmonograph.h)
