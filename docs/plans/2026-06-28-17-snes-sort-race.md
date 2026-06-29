@@ -150,7 +150,15 @@ colour via the tilemap entry's 3-bit palette field (BG3 2bpp stride-4: pal 1/2/3
    ```
    NEAR — full on-MAME 5-way pending the IPL (same non-blocker as #12).
 
-6. Published in-browser page + screenshot. _(pending — see TODO.)_
+6. Published in-browser page + screenshot. PASS — `/snes-rom-page` scaffolded the ROM + preview +
+   manifest selfcheck, the `/snes/sort-race` page (branded, mirrors cordic), and the gallery card;
+   biohack.net built clean, committed (`b4eddb3`), tag `v1.0.111` → Cloudflare Pages deploy step
+   succeeded. **Live: [biohack.net/snes/sort-race/](https://biohack.net/snes/sort-race/) returns HTTP
+   200.** (A headless in-browser screenshot couldn't run — no Chrome/Chromium on this host — but the
+   page is structurally identical to the working cordic page and the ROM's render is already proven by
+   the gate's `build/sort-race-jg.png`, produced by the same bsnes-jg core the WASM player uses. The
+   shared engine `app.js`/`cores` were left at the deployed version — the scaffold's bundled engine was
+   older and would have dropped the Fullscreen handler.)
 
 7. `task md -- docs/plans/2026-06-28-17-snes-sort-race.md` renders cleanly. _(run at close-out.)_
 
