@@ -410,7 +410,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   distinct codegen corner:
   - [x] ~~**#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.~~ ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
   - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~
-  - [ ] **#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.
+  - [x] ~~**#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.~~ ✓ [/snes/doom-fire/](https://biohack.net/snes/doom-fire/) ([plan](docs/plans/2026-06-28-7-snes-doom-fire.md))
   - [x] ~~**#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.~~
   - [x] **#11 Spirograph (hypotrochoid)** — **DONE + verified (`wt/321-spirograph`).** Four curve families
     (hypo/epi/rose/Lissajous) bloom into a NEAR 2bpp bitmap canvas (new `snesgfx/bitmap_canvas.h` set-pixel
@@ -682,6 +682,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-28 — [snes-doom-fire] **#7 Doom-fire / heat-field SNES demo.** Classic PSX-Doom fire: a 32×28 heat grid rises + flickers from a max-heat source row through a 16-colour CGRAM ramp on BG1 4bpp. Deliberately **multiply-/divide-free** — the stress is a flat-index 8-bit array sweep + a 16-bit xorshift16 PRNG per cell. corpus gate 0x3C59 (16×16 grid, 30 steps); `dev/run.sh doom-fire` RESULT PASS (disasm eor=6 asl/lsr=8 rep/sep=21, zero __mulsi3/__udivmodsi4; bsnes-jg host==+mos-a16 0x3C59). MAME leg pending the SPC700 IPL (env-wide non-blocker; demos-only policy). Published [biohack.net/snes/doom-fire/](https://biohack.net/snes/doom-fire/). [plan](docs/plans/2026-06-28-7-snes-doom-fire.md)
 - 2026-06-27 — [snes-newton] **#2 Newton's-method fractal SNES demo.** z³−1 basins of attraction; corpus gate 0x4D8B (8×8 grid, 20-iter cap); 5-way PASS (__divsi3=2 __mulsi3=17 rep/sep=67); XFAIL newton_sim (a16-newton-step-rc-undef verifier false-positive, code correct). Published [biohack.net/snes/newton/](https://biohack.net/snes/newton/). [plan](docs/plans/2026-06-27-2-snes-newton-fractal.md)
 - 2026-06-27 — [snes-factorial] **#20 Bignum factorial SNES demo.** Base-10000 bignum carry-mul; corpus gate 0x772F (50!, FACT_GATE_N=50), 5-way PASS (__mulsi3=1 __udivmodsi4=1 rep/sep=14), published [biohack.net/snes/factorial/](https://biohack.net/snes/factorial/). [plan](docs/plans/2026-06-27-20-snes-bignum-factorial-factorial.md)
 - 2026-06-27 — [snes-rdiff] **#8 Gray-Scott reaction-diffusion SNES demo.** Activator-inhibitor PDE; 3×__mulsi3/cell; corpus gate 0x8484 (GS_GATE_STEPS=8, 8×8 grid; noinline gs_step prevents LTO merge bug), 5-way PASS (mul=3 rep/sep=111), published [biohack.net/snes/rdiff/](https://biohack.net/snes/rdiff/). [plan](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md)

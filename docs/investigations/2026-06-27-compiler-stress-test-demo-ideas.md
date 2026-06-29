@@ -42,8 +42,8 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
    two-buffer swap. *Shows:* gliders/guns evolving.
 6. ~~**Rule 90/110 (1-D CA)** — each row from the previous via 8-bit logic. *Stresses:* shifts/boolean logic.
    *Shows:* Sierpinski (90) / chaos (110) scrolling down — the display *is* the computation.~~ ✓ [/snes/1d-ca/](https://biohack.net/snes/1d-ca/)
-7. **Doom-fire / heat field** — per-cell decay + PRNG, palette ramp. *Stresses:* array sweep + rng + CGRAM.
-   *Shows:* animated fire from the heat array.
+7. ~~**Doom-fire / heat field** — per-cell decay + PRNG, palette ramp. *Stresses:* array sweep + rng + CGRAM.
+   *Shows:* animated fire from the heat array.~~ ✓ [/snes/doom-fire/](https://biohack.net/snes/doom-fire/)
 8. ~~**Reaction–diffusion (Gray–Scott)** — two-chemical PDE, Laplacian, mul-add per cell. *Stresses:* heavy
    fixed-point **mul-add** loops. *Shows:* Turing spots/stripes self-organising.~~ ✓ [/snes/rdiff/](https://biohack.net/snes/rdiff/)
 
@@ -99,7 +99,7 @@ Builds default-8-bit unless it needs a far/high-WRAM framebuffer (then `+mos-a16
 | ~~multi-precision **carry-chain** codegen~~ | ~~19, 20~~ |
 | **shift-add**, multiply-free | 12 |
 | **far / high-WRAM** buffers (a16-only) | 1, 4, ~~8~~, ~~13~~ |
-| **PRNG + scatter** writes | 4, 7, ~~19~~ |
+| **PRNG + scatter** writes | 4, ~~7~~, ~~19~~ |
 | **sin/cos LUT** indexing | 9–10, ~~11~~, ~~14~~, ~~16~~ |
 
 ## Recommended first picks
