@@ -324,4 +324,20 @@ static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
   display_fade_to(d, INIDISP_ON);
 }
 
+/* splash16 — drop-in replacement for splash_show() that uses the 16×16 TitleLayer instead of
+ * the static BGMODE_1 BG3 splash. Adds the animated fly-in + rainbow backdrop; leaves the
+ * screen at INIDISP_BLANK (force-blank) on return so the caller can set up Mode 7 VRAM.
+ *
+ * Strings must be ≤ TITLE_MAX_CHARS (16) chars. Replaces both the include and the call:
+ *   #include "snesgfx/splash.h"  →  #include "snesgfx/title_layer.h"
+ *   splash_show(l0, l1, n)       →  splash16(l0, l1, n)
+ */
+static inline void splash16(const char *line0, const char *line1, uint16_t frames) {
+  Display _d; display_init(&_d);
+  static TitleLayer _t;
+  title_begin16(&_d, &_t, line0, line1);
+  title_end(&_d, &_t, frames);
+  REG_INIDISP = 0x80;   /* re-enter force-blank for Mode 7 / VRAM setup */
+}
+
 #endif /* SNESGFX_TITLE_LAYER_H */

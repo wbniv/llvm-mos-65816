@@ -1,14 +1,14 @@
 # SNES 65816 compiler stress-test demos (algorithm + visual)
 
-> **Status (2026-06-30).** **Round 1 (#1–#20) — all 20 shipped** ✓, published on
-> [biohack.net/snes](https://biohack.net/snes/); the differential gate found a handful of pre-existing
-> compiler bugs along the way. **Round 2 (#21+) — in progress** (#21 ✓ [soft-float](https://biohack.net/snes/mandel-float/),
-> #22 ✓ [64-bit avalanche](https://biohack.net/snes/avalanche/), #24 ✓ [fn-plot / recursive-descent parser](https://biohack.net/snes/fn-plot/),
-> #26 ✓ [boids / struct-by-value ABI](https://biohack.net/snes/boids/), #29a ✓ [bytecode-VM turtle](https://biohack.net/snes/turtle-vm/)
-> shipped 2026-06-29/30), below: each targets a
-> **codegen corner the first 20 never execute** (soft-float,
-> 64-bit integers, jump tables, by-value struct ABI, bitfields, variadics, variable-count shifts,
-> pointer-chasing trees) — the untested libcall/ABI paths where the remaining bugs hide.
+> **Status (2026-06-30).** **Round 1 (#1–#20) — all 20 shipped** ✓ and **Round 2 (#21–#32) — all shipped** ✓,
+> published on [biohack.net/snes](https://biohack.net/snes/); the differential gate found a handful of
+> pre-existing compiler bugs along the way. Round 2 each targets a
+> **codegen corner the first 20 never execute** — soft-float (#21), 64-bit integers (#22),
+> string libcalls (#23/#24), recursive-descent parser (#24), FFT butterfly + bit-reversal (#25),
+> by-value struct ABI (#26), modulo-heavy (#27), variable-count shifts (#28), jump-table + bitfields
+> (#29a/#29b), 32-bit shift/add/XOR (#30), pointer-chasing trees (#31), variadic va_arg (#32) — the
+> untested libcall/ABI paths where the remaining bugs hid. **All Round-2 corners came back green: no new
+> compiler bug surfaced** (the #23 in-place-memmove xy16 miscompile was fixed in-flight; see its row).
 
 A backlog of candidate demo programs whose job is to **stress the llvm-mos 65816 codegen** — each leans
 on a different corner of the compiler (32-bit/fixed-point multiply, division, recursion + the soft stack,
@@ -150,7 +150,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 |---|---|---|
 | ~~**soft-float (IEEE-754)**~~ — `__addsf3`/`__mulsf3`/`__divsf3`/`__ltsf2`/`__floatsisf`/`__fixsfsi` | no Round-1 demo uses `float` at all; single-precision is fully specified → bit-exact differential | ~~21~~, ~~24~~ |
 | ~~**64-bit integers**~~ — `__muldi3`/`__udivdi3`/`__ashldi3`/`__lshrdi3`, 4-limb carry | every Round-1 demo tops out at 32-bit | ~~22~~ |
-| **jump-table / computed branch** — switch-dispatch + indirect-call tables | never exercised | ~~29a~~ |
+| ~~**jump-table / computed branch** — switch-dispatch + indirect-call tables~~ | never exercised | ~~29a~~ |
 | ~~**aggregate / by-value struct ABI**~~ — sret vs register-pair return | structs exist (#18) but are never passed/returned **by value** | ~~26~~ |
 | ~~**bitfield insert/extract**~~ — `unsigned x : n` fields | zero usage so far | ~~29b~~ |
 | ~~**variable-count shifts** — `__ashlsi3`/`__lshrsi3` with a *data-dependent* count~~ | all Round-1 shifts are compile-time constants | ~~28~~, ~~30~~ |

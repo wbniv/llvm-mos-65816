@@ -15,7 +15,7 @@
 // splitmix64 + a 64-bit divide) == the host oracle tools/avalanche-sim == 0x27EA.
 #include <snes.h>
 #include "mode7.h"
-#include "snesgfx/splash.h"
+#include "snesgfx/title_layer.h"
 #include "../65816/avalanche.h"
 #include "sincos.h"
 
@@ -153,7 +153,7 @@ static void drift_frame(uint8_t k) {
 int main(void) {
   snes_ppu_reset_blank();
 
-  splash_show("64-BIT", "AVALANCHE", 90);
+  splash16("64-BIT", "AVALANCHE", 90);
 
   // One-time Mode 7 setup (force-blanked): enter Mode 7, clear tilemap, lay the 8x7 identity, load the
   // rainbow palette, frame the 64x56 image at 4x.

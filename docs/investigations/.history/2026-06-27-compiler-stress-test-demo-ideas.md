@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b1aa00a) | snes(#31): Barnes-Hut quadtree galaxy — pointer-chasing dynamic trees |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e7d1965) | snes(#32): va_arg variadic formatter — mini_sprintf + Lissajous |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/39f1972) | snes(#25): 32-point DIT FFT spectrum analyser — butterfly __mulsi3 + bit-reversal |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8e1dd62) | snes(#28): Hilbert space-filling curve — __ashlsi3+__lshrsi3 variable-count shifts |
@@ -28,6 +29,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+b1aa00a	author	Will Norris
+b1aa00a	added	5
+b1aa00a	deleted	5
+b1aa00a	files	1
+b1aa00a	body	Recursive bh_insert/bh_force walk a pooled-node quadtree via runtime child[]\nindices (ZP-indexed indirect loads + tree-shaped JSR-to-self call graph) —\nthe linked-tree corner distinct from #13's flat-array N-body and #18's flat heap.\nFused with gravity kernel: __mulsi3=5, __divsi3=4. bh_force self-recursion 447\nrefs, rep/sep=160. Gate 0xEF0B; 5-way green. Published: biohack.net/snes/bhut/.\n\nDeliberate heavy grind (~1 step/25 frames): the recursive call graph + divide\npath run continuously — that IS the stress. No miscompile found; tree-walk\ncodegen correct across all modes.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e7d1965	author	Will Norris
 e7d1965	added	2
 e7d1965	deleted	2

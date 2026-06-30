@@ -23,7 +23,7 @@
 #define BUD_GRID 128                              // 16 KiB grid in $7E2000 (1:1 with the display)
 #include <snes.h>
 #include "mode7.h"
-#include "snesgfx/splash.h"
+#include "snesgfx/title_layer.h"
 #include "../65816/buddha.h"
 
 // Gate point (deterministic, == the host oracle) and the final on-screen sample budget. K_GATE must
@@ -138,7 +138,7 @@ int main(void) {
   snes_ppu_reset_blank();
   // Title splash (~1.5 s), then it restores force-blank + self-clears its VRAM. The grid-hash
   // corpus_result is deterministic (timing-independent), so the splash's frame shift can't change it.
-  splash_show("BUDDHABROT", "ESCAPE-ORBIT DENSITY", 90);
+  splash16("BUDDHABROT", "ORBIT DENSITY", 90);
   vram_clear_all();                       // wipe random power-on VRAM before anything is displayed
   m7_begin();
   m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, M7_TILEMAP_WORDS);
