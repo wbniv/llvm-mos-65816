@@ -190,8 +190,8 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
     loop. *Shows:* the morphing cardioid / nephroid envelope.
 28. **Hilbert / Gray-code curve** — bit-interleave + **variable-count** shifts/rotates + recursion.
     *Shows:* the space-filling curve at rising order.
-29b. **Truchet tiles (packed bitfields)** — per-cell state as `unsigned : n` bitfields; stresses
-    insert/extract. *Shows:* a curved-tile labyrinth.
+29b. ~~**Truchet tiles (packed bitfields)** — per-cell state as `unsigned : n` bitfields; stresses
+    insert/extract. *Shows:* a curved-tile labyrinth.~~ ✓ [/snes/truchet/](https://biohack.net/snes/truchet/) *(16-bit bitfield struct, 6 fields; bit-exact host==default==a16==xy16 `0xB3E6`; disasm and/ora/shift, libcalls=0; no bug)*
 30. **TEA / XTEA cipher avalanche** — tight 32-bit mix (data-dependent shifts + adds + xor + magic delta).
     *Shows:* encrypt the framebuffer; one bit flip → avalanche.
 31. **Barnes-Hut quadtree galaxy** — recursive build/walk over a **pooled struct-node tree** (distinct from
