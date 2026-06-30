@@ -1,39 +1,41 @@
 # `+mos-xy16` miscompile: iterative in-place `memmove`/`memcpy` rewrite over a 16-bit-indexed buffer
 
-**Status: RESOLVED — NOT reproducible on the shipping toolchain (full patch stack). No compiler bug.**
-Re-measured 2026-06-29 against `build/llvm-mos-install` (the full `0001..0014` stack + merged `8c928b8`):
-the minimal repro and the real #23 L-System demo both come out **host==default==+mos-a16==+mos-xy16**.
-The original `0x1CC6` was produced by an **isolated** toolchain (`throwaway/lsystem-xy16-verify`, built off
-`6f940e9`), which differs from the shipping compiler — the stale/partial-build false-alarm class the summary
-below worried about. A differential **regression gate** now locks the correct behaviour in
-(`dev/run.sh xy16inplace`). _Original OPEN investigation preserved below for the record._
+**Status: FIXED — real compiler bug, fixed in `MOSInsertREPSEP::placeIntraBlock` (patch `0002`, commit
+`e643329`).** The original X-width-lattice hypothesis (this "Summary"/"Isolation" section, "across loop
+iterations … an X-width lattice / register-allocation interaction") was **correct**; the later trunc
+hypothesis was wrong. A differential **regression gate** locks the fix in (`dev/run.sh xy16inplace`).
 
-## Resolution (2026-06-29) — measured on the shipping toolchain
+> **Correction (note to self).** An earlier revision of this section (commit `b46aa2b`) wrongly declared this
+> "RESOLVED — no compiler bug, isolated-toolchain artifact." That was an **error of measurement sequencing**:
+> I re-ran the repro against the shared `build/llvm-mos-install` and saw `0x90AA` (correct) — but that build had
+> **already been rebuilt at 18:38 with the fix** (`MOSInsertREPSEP.cpp.o` @ 18:38:20, `clang-23` @ 18:38:21),
+> committed 9 min later as `e643329`. I measured the *fixed* toolchain and mistook it for "never broken." The
+> bug was real. Lesson: on the hot shared tree, pin the toolchain's build time against the fix before concluding
+> "not reproducible" (cf. [[stress-demos-fix-compiler-not-workaround]], governing lesson #1 "verify a rebuild
+> actually took / measure in realistic context").
 
-| test | CAP=1700 (16-bit idx) | CAP=200 (8-bit idx) | verdict |
-|---|---|---|---|
-| host oracle | `0x90AA` | `0xDEBD` | ground truth |
-| default (8-bit) @ bsnes-jg | `0x90AA` | `0xDEBD` | ✅ |
-| `+mos-a16` @ bsnes-jg | `0x90AA` | `0xDEBD` | ✅ |
-| **`+mos-xy16`** @ bsnes-jg | **`0x90AA`** | **`0xDEBD`** | ✅ **matches** |
+## Root cause + fix (commit `e643329`, `MOSInsertREPSEP`)
 
-`-verify-machineinstrs` clean; the real `#23` L-System demo gate passes (`0x79C3`); the `xy16` micro-test
-suite (`xy16basic/ops/indiry/spill/...`) passes its codegen checks (`xy16indiry` confirms the `(zp),Y16`
-B2 gate fires). **Mechanism:** post-legalizer MIR (`-stop-after=legalizer`) shows the genuine 16-bit buffer
-index lowers through the dedicated **`G_*_ABS_IDX16` path (B2)** — *not* the seed-56 `trunc`-to-8-bit
-workaround (B1). B1 only fires when value-tracking proves the index `<256` (`KnownBits ≤ 8`), exactly the
-`CAP=200` case — and that path is also correct. So:
+The genuine 16-bit buffer index *does* lower through the dedicated `G_*_ABS_IDX16` path (B2) — that part of my
+MIR reading was right. The defect was one level down, in **X-register width management**: `MOSInsertREPSEP`
+placed a `sep #$10` (narrowing X/Y to 8-bit, e.g. ahead of a `ldy #imm`) **between** the `ldx __rcN` that loads
+the 16-bit index and the `lda buf,X16` that consumes it. On the 65816 `SEP` physically **zeroes X's high byte**,
+so `lda abs,X16` then indexed from `X.lo` only — reading `buf[i & 0xFF]` instead of `buf[i]` for `i ≥ 256`
+(exactly: needs `+mos-xy16` + a 16-bit index + the iterative loop that keeps the index live across the
+narrowing). **Fix:** track the last `XW_X16` X-writer per block; when an 8→16 `REP` is inserted for an X-reader
+after a 16→8 narrowing, clone that writer and insert it `[REP, reload, reader]` so X is restored to the full
+16-bit value before the indexed load. Default/`+mos-a16` unaffected (no 16-bit index register).
 
-- **The "Root cause (hypothesis)" below is refuted.** B1's `trunc` is never on the 16-bit-index path; for the
-  one case it *does* handle (`CAP=200`) the high byte is provably zero, so dropping it is correct.
-- **`8c928b8` is unrelated.** That fix only changed *where* B1's MERGE is emitted; B1 is not reached for a
-  16-bit index, so `8c928b8` cannot have caused **or** fixed this. The full stack was correct independent of it.
-- **The `0x1CC6` was an isolated-toolchain artifact.** I could not reproduce it from the shipping compiler;
-  the likeliest cause is the isolated build differed from the full stack (missing/older MOS patches or a stale
-  binary — the same class flagged in `321-xy16-cmove-stale-xfail` / `321-pr15296-zp-overflow`). If a from-scratch
-  clean-build attribution is wanted, that is the one remaining (expensive) step not done here.
+This is a sibling of the earlier `requiredXWidth`/X-lattice fixes (`4d8a2bd`, `321-xy16-track-a`,
+`321-xy16-seed247-445`) — a new omission they didn't cover. `8c928b8` (the legalizer-domination fix) is
+**unrelated** (it only moved B1's MERGE insert point; B1 isn't on the 16-bit-index path).
 
-**Impact:** the #23 L-System demo is **NOT blocked** — it ships 5-way-green on the shipping toolchain.
+| test (shipping toolchain, post-fix) | CAP=1700 (16-bit idx) | CAP=200 (8-bit idx) |
+|---|---|---|
+| host == default == `+mos-a16` == `+mos-xy16` @ bsnes-jg | `0x90AA` | `0xDEBD` |
+
+`-verify-machineinstrs` clean; real #23 L-System demo gate passes (`0x79C3`). Gate: `dev/run.sh xy16inplace`
+(commit `64b7431`). **Impact:** #23 L-System ships 5-way-green.
 
 ## Relationship to `8c928b8` (legalizer indexed-addressing domination fix)
 
