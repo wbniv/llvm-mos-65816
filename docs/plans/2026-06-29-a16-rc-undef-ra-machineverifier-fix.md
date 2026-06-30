@@ -18,18 +18,32 @@ never change a value) and **tightly gated**: it changes only **4 / 34** corpus p
 `boids_sim`, `raycaster_sim`, `sort-race_sim` — all math-heavy; all stay `-verify` clean + differential
 green), the other 30 are **byte-identical**.
 
-**Cause #2 — register-allocator binding of a pure-virtual value (DEFERRED).** A *different* shape:
-`lsystem_sim.c` (all levels) and `newton_sim.c` **at `-O1`** (in `newton_gate_crc`) bind a **pure-virtual**
-loop/cross-call Imag16 value — one with **no `$rcN` copy anywhere** in its def/use chain during coalescing
-(verified: no `COPY $rcN` in the pre-coalescer MIR) — to a call-clobbered `$rc` pair. The register
-**allocator** chooses this on its own; the coalescer only *enables* it by fattening the live range (which
-is why `-join-liveintervals=false` masks both). With **no copy-hint signal**, `shouldCoalesce` cannot
-target it — the only coalescer rule that "fixes" it is a blanket one that perturbs **22–25 / 34** corpus
-programs (confirmed empirically), which is the forbidden blanket change (lessons #2/#3). The genuine fix is
-**RA-interference-level** (why does greedy RA assign a `$rc` pair to a value live across a call clobbering
-it?) — the "large RA rework" the Risk note anticipated. **Now being worked** (Cause #2 §below); until it
-lands `lsystem_sim.c` keeps its `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]` XFAIL and `newton_sim.c -O1`
-is out of the battery's verify surface (everything is `-Os`).
+**Cause #2 — dead read of an `undef` sub-register lane of a partial `Imag16` pair (DEFERRED — deep RA).**
+A *different* shape: `lsystem_sim.c` (all levels) and `newton_sim.c` **at `-O1`** (in `newton_gate_crc`)
+hit the same verifier message but with **no `$rcN` copy anywhere** in the value's def/use chain during
+coalescing — so `shouldCoalesce` cannot target it (the only coalescer rule that masks it perturbs
+**22–25 / 34** corpus programs — the forbidden blanket change, lessons #2/#3). Root-caused precisely
+(2026-06-30, asserts `-debug-only=regalloc` on `lsystem_sim.c main`):
+
+- The failing `$x = COPY killed $rc11` (6000B) is a **dead** copy — its `$x` is overwritten 16 bytes later
+  (6016B) before any use. It is a leftover use of `%1759`, a 16-bit value passed to `__mulsi3` whose **low
+  byte is defined** (`$rc10 = COPY $rc6`) and whose **high byte is `undef`** (the `undef %N.sublo:imag16 =
+  COPY …` sub-register idiom marks the sibling lane undef).
+- RA assigns `%1759` to `$rs5` (`$rc10:$rc11`) and *tracks the undef high lane as live* from the
+  `undef`-def point to the dead 6000B read (trace: `assigning %1759 to $rs5: … RC11LSB [5980r,6000r)`), but
+  **no instruction materializes the high lane**. When the virtual subrange is lowered to the **physical**
+  `$rc11`, the `undef` attribute is lost (physreg reads carry no undef flag), so the dead full-pair read of
+  `$rc11` looks like a use of an undefined physical register — which the verifier rejects. The value is a
+  genuine don't-care (the copy is dead), so the code runs correctly (`0x79C3`).
+
+This is a **generic-LLVM RA / sub-register-`undef`-liveness** issue (the `undef %N.sublo` idiom is pervasive
+across the backend), not MOS-specific behavior. A safe fix is either (a) propagate the `undef` flag onto the
+lowered physreg read, or (b) eliminate the dead pair-extract copies before verification — both deep,
+toolchain-wide, and **risky to attempt blindly on a shared compiler** for a *code-correct* (latent-only)
+defect. **Deferred** to a focused upstream issue / a dedicated RA pass; until it lands `lsystem_sim.c` keeps
+its `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]` XFAIL and `newton_sim.c -O1` is out of the battery's
+verify surface (everything is `-Os`). (`-join-liveintervals=false` masks it only because disabling the
+coalescer leaves the dead copies as separate vregs the dead-MI pass then removes.)
 
 | witness | `-O0` | `-O1` | `-Os` | which cause |
 |---|---|---|---|---|
