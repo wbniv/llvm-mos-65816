@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/cff089f) | docs(plan-index): add #23 L-System Plant + SNES title HDMA rows (184 plans) |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/91caaa1) | chore: move the blocked #23 L-system demo off main to a branch |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/2535829) | docs(snes): mark #16 Wireframe 3-D Solid done — source recreated + republished |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/6fe6e69) | feat(snes): #29b Truchet (packed bitfields) — bitfield insert/extract stress demo |
@@ -77,6 +78,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+cff089f	author	Will Norris
+cff089f	added	3
+cff089f	deleted	0
+cff089f	files	1
+cff089f	body	Two rows previously missing from the plan-index (flagged by the pre-commit\naudit hook after the preceding commit):\n\n- #23 L-System Plant (e643329): string-rewriting + bracket-stack demo\n  with the xy16 in-place-memmove miscompile fix.\n- SNES title intro HDMA pixel-centre (317ddde): slow the fly-in + per-line\n  pixel centring via BG2HOFS HDMA.\n\nAlso bumps the footer from 182 → 184 plans.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 91caaa1	author	Will Norris
 91caaa1	added	0
 91caaa1	deleted	1
