@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/fbaf268) | docs(demo-ideas): Round 2 complete — strike #29a coverage row + update status header |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b1aa00a) | snes(#31): Barnes-Hut quadtree galaxy — pointer-chasing dynamic trees |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e7d1965) | snes(#32): va_arg variadic formatter — mini_sprintf + Lissajous |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/39f1972) | snes(#25): 32-point DIT FFT spectrum analyser — butterfly __mulsi3 + bit-reversal |
@@ -29,6 +30,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+fbaf268	author	Will Norris
+fbaf268	added	10
+fbaf268	deleted	10
+fbaf268	files	1
+fbaf268	body	All 32 numbered demos (#1-#20 Round 1, #21-#32 Round 2) now shipped and published.\nEvery Round-2 codegen corner came back green; no new compiler bug surfaced (the\n#23 in-place-memmove xy16 miscompile was fixed in-flight during that demo).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 b1aa00a	author	Will Norris
 b1aa00a	added	5
 b1aa00a	deleted	5

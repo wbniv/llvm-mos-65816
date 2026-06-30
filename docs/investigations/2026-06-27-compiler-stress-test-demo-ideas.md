@@ -9,6 +9,7 @@
 > (#29a/#29b), 32-bit shift/add/XOR (#30), pointer-chasing trees (#31), variadic va_arg (#32) — the
 > untested libcall/ABI paths where the remaining bugs hid. **All Round-2 corners came back green: no new
 > compiler bug surfaced** (the #23 in-place-memmove xy16 miscompile was fixed in-flight; see its row).
+> **Completion summary:** [`2026-06-30-stress-test-battery-status.md`](2026-06-30-stress-test-battery-status.md).
 
 A backlog of candidate demo programs whose job is to **stress the llvm-mos 65816 codegen** — each leans
 on a different corner of the compiler (32-bit/fixed-point multiply, division, recursion + the soft stack,
