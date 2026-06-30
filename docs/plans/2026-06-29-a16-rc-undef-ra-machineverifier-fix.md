@@ -35,12 +35,22 @@ coalescing — so `shouldCoalesce` cannot target it (the only coalescer rule tha
   `$rc11`, the `undef` attribute is lost (physreg reads carry no undef flag), so the dead full-pair read of
   `$rc11` looks like a use of an undefined physical register — which the verifier rejects. The value is a
   genuine don't-care (the copy is dead), so the code runs correctly (`0x79C3`).
+- **Rewriter level (2026-06-30, deeper):** MOS *does* enable sub-register liveness
+  (`MOSSubtarget::enableSubRegLiveness() == true`, `Imag16` has disjunct `sublo`/`subhi`), and the
+  `VirtRegRewriter` *does* mark undef sub-register reads (`VirtRegMap.cpp` `readsUndefSubreg` →
+  `MO.setIsUndef(true)`). The reason it misses this case: a **live-range-split full-pair `COPY`**
+  (`%1759 = COPY %x`, both lanes, single def at 5980r) propagates the **undef `subhi` lane as a *live*
+  value**, so `readsUndefSubreg` finds a live subrange overlapping the `subhi` lane mask at the read and
+  returns `false` (not undef). I.e. the splitter/copy-insertion does **not** carry the lane's `undef`-ness
+  through the inserted COPY, defeating the rewriter's existing undef-marking downstream.
 
-This is a **generic-LLVM RA / sub-register-`undef`-liveness** issue (the `undef %N.sublo` idiom is pervasive
-across the backend), not MOS-specific behavior. A safe fix is either (a) propagate the `undef` flag onto the
-lowered physreg read, or (b) eliminate the dead pair-extract copies before verification — both deep,
-toolchain-wide, and **risky to attempt blindly on a shared compiler** for a *code-correct* (latent-only)
-defect. **Deferred** to a focused upstream issue / a dedicated RA pass; until it lands `lsystem_sim.c` keeps
+This is a **generic-LLVM RA / sub-register-`undef`-liveness** issue (live-range splitting of a
+partially-undef pair; the `undef %N.sublo` idiom is pervasive), not MOS-specific behavior. A safe fix is
+either (a) carry the `undef` lane through the split/spill `COPY` (SplitKit / InlineSpiller) so the
+downstream read is recognized undef, (b) make `readsUndefSubreg` trace the subrange value to its `undef`
+origin, or (c) eliminate the dead pair-extract copies before verification — all deep, toolchain-wide, and
+**risky to attempt on a shared compiler** for a *code-correct* (latent-only) defect. Until a fix lands
+`lsystem_sim.c` keeps
 its `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]` XFAIL and `newton_sim.c -O1` is out of the battery's
 verify surface (everything is `-Os`). (`-join-liveintervals=false` masks it only because disabling the
 coalescer leaves the dead copies as separate vregs the dead-MI pass then removes.)

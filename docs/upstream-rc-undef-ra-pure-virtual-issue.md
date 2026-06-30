@@ -55,16 +55,28 @@ not because the coalescer is at fault, but because without coalescing the dead
 extracts stay separate vregs that the dead-MI pass then removes. With coalescing,
 the dead pair-extract survives RA as a physical read of the undef lane.
 
-## Candidate fixes (maintainer's call — touches generic RA / the imaginary-register sub-register model)
+## Why the rewriter's existing undef-marking misses it
 
-1. **Propagate `undef` onto the lowered physreg read.** When `VirtRegRewriter`
-   materializes a sub-register read whose subrange is `undef` at that point, set
-   the `undef` flag on the physical operand (the verifier accepts an `undef`
-   physreg read).
-2. **Eliminate the dead pair-extract** before verification (a dead `$x = COPY
+The target enables sub-register liveness (`enableSubRegLiveness() == true`,
+`Imag16` has disjunct `sublo`/`subhi`), and `VirtRegRewriter` already marks undef
+sub-register reads (`VirtRegMap.cpp`: `readsUndefSubreg(MO)` → `MO.setIsUndef(true)`).
+It misses this case because a **live-range-split full-pair `COPY`** (`%1759 = COPY
+%x`, defining *both* lanes at one slot) propagates the **undef `subhi` lane as a
+*live* value** — so `readsUndefSubreg` finds a live subrange overlapping the
+`subhi` lane mask at the read and returns `false`. The split/copy-insertion does not
+carry the lane's `undef`-ness through the inserted COPY.
+
+## Candidate fixes (maintainer's call — touches generic RA / sub-register liveness)
+
+1. **Carry `undef` through the split/spill COPY.** In SplitKit / InlineSpiller,
+   when copying a value whose lane is `undef`, mark that lane `undef` on the
+   inserted COPY's source so the downstream read is recognized undef.
+2. **Trace the undef origin in `readsUndefSubreg`** — treat a subrange whose
+   reaching value originates at an `undef` def as not-live for the read.
+3. **Eliminate the dead pair-extract** before verification (a dead `$x = COPY
    $rcN` whose def is dead and whose source lane is undef).
 
-Both are toolchain-wide; the `undef %N.sublo:imag16 = …` idiom is pervasive in the
+All are toolchain-wide; the `undef %N.sublo:imag16 = …` idiom is pervasive in the
 MOS backend, so any change needs a full differential + verify regression sweep.
 
 ## Reproduction (downstream llvm-mos-65816 fork)
