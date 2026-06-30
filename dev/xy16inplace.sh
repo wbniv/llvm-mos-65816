@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # dev/xy16inplace.sh — differential regression gate for the iterative in-place memmove/memcpy over a
-# 16-bit-indexed buffer (the #23 L-system shape). Reported 2026-06-29 as a +mos-xy16 miscompile; proven
-# NOT reproducible on the full patch stack (the 16-bit index uses the dedicated G_*_ABS_IDX16 path).
-# This gate LOCKS THAT IN: host==default==+mos-a16==+mos-xy16, for CAP=1700 (16-bit indices) AND CAP=200
-# (8-bit indices, the trunc/B1 path). Any future regression hard-FAILs. Drive: dev/run.sh xy16inplace.
+# 16-bit-indexed buffer (the #23 L-system shape). This was a REAL +mos-xy16 miscompile (CAP=1700
+# xy16=0x1CC6 vs 0x90AA), fixed in MOSInsertREPSEP::placeIntraBlock (commit e643329): a `sep #$10`
+# between `ldx __rcN` and `lda buf,X16` zeroed X's high byte, so the indexed load read buf[i&0xFF].
+# This gate LOCKS THE FIX IN: host==default==+mos-a16==+mos-xy16, for CAP=1700 (16-bit indices, the
+# bug) AND CAP=200 (8-bit indices). Any regression hard-FAILs. Drive: dev/run.sh xy16inplace.
 set -euo pipefail
 case "${1-}" in -h|--help) echo "Usage: dev/run.sh xy16inplace  # 5-way differential gate, in-place memmove over a 16-bit-indexed buffer"; exit 0;; esac
 ROOT=/work; B="$ROOT/build"
 TOOL="$B/llvm-mos-install/bin"; CFG="$B/install/bin/mos-snes.cfg"
-SRC="$ROOT/examples/65816/xy16inplace.c"
+SRC="$ROOT/examples/65816/xy16-inplace-memmove-repro.c"
 DB="$ROOT/vendor/bsnes-jg/Database"; JGX="$B/jgxcheck"
 [ -x "$TOOL/mos-clang" ] || { echo "FATAL: no toolchain"; exit 1; }
 [ -x "$JGX" ] && [ -d "$DB" ] || { echo "    SKIP bsnes-jg (harness absent)"; exit 0; }
