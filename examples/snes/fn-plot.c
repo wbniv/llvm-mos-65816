@@ -155,7 +155,7 @@ int main(void) {
     // Title intro card — shown while the gate CRC computes.
     // Must be added AFTER all demo drawables and BEFORE any demo HDMA.
     static TitleLayer title;
-    title_begin(&a.screen, &title, "FN-PLOT", "RECURSIVE PARSER");
+    title_begin16(&a.screen, &title, "FN-PLOT", "RECURSIVE PARSER");
 
     // Gate CRC: evaluates fn_exprs[0] at 64 points — runs in ~9 frames during title.
     corpus_result = fn_gate_crc();

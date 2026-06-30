@@ -167,7 +167,7 @@ int main(void) {
     app_init(&a);
 
     static TitleLayer title;
-    title_begin(&a.screen, &title, "CARDIOID", "TIMES TABLE");
+    title_begin16(&a.screen, &title, "CARDIOID", "TIMES TABLE");
 
     corpus_result = card_gate_crc();
 

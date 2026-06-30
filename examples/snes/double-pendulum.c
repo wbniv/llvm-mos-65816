@@ -101,7 +101,7 @@ int main(void) {
     // Title overlay (BG2), added after the demo layer; held during the gate CRC, then torn down
     // before the path traces. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
     static TitleLayer title;
-    title_begin(&a.screen, &title, "DOUBLE PENDULUM", "CHAOS");
+    title_begin16(&a.screen, &title, "DOUBLE PENDULUM", "CHAOS");
 
     // Gate CRC: deterministic 256-step hash written to WRAM before display loop.
     corpus_result = dpend_gate_crc();

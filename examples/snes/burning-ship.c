@@ -122,7 +122,7 @@ int main(void) {
      pass while the title masks it (no display_frame during the compute → the PPU keeps showing the
      title). Then tear the title down and flow the escape bands forever. */
   static TitleLayer title;
-  title_begin(&d, &title, "BURNING SHIP", "FRACTAL");   /* shows the card (grid still black underneath) */
+  title_begin16(&d, &title, "BURNING SHIP", "FRACTAL");   /* shows the card (grid still black underneath) */
 
   for (uint8_t r = 0; r < (uint8_t)BS_H; r++) compute_row(r);   /* compute the whole ship */
 

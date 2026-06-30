@@ -51,7 +51,7 @@ int main(void) {
   // Title card (BG2). Run the VM behind it: corpus_result = the path CRC (== host oracle == 0x4007), and
   // a->segs gets the line segments the turtle traced (recording does not change the CRC).
   static TitleLayer title;
-  title_begin(&a.screen, &title, "BYTECODE VM", "TURTLE");
+  title_begin16(&a.screen, &title, "BYTECODE VM", "TURTLE");
   corpus_result = vm_run(VM_PROG, VM_PROG_LEN, a.segs, VM_MAX_SEG, &a.nseg);
   title_end(&a.screen, &title, 110);
   a.screen.bright = INIDISP_ON; a.screen.btgt = INIDISP_ON;          // full brightness from frame 1

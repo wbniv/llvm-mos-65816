@@ -56,7 +56,7 @@ int main(void) {
   // Title card (BG2). Behind it, rewrite the L-system then interpret it: the interpreter draws the whole
   // plant into the canvas (via draw_seg) AND returns the path CRC -> corpus_result (== host == 0x79C3).
   static TitleLayer title;
-  title_begin(&a.screen, &title, "L-SYSTEM", "PLANT");
+  title_begin16(&a.screen, &title, "L-SYSTEM", "PLANT");
   uint16_t len;
   const char *s = lsystem_build(&len);
   corpus_result = lsystem_interp(s, len, draw_seg, &a.canvas);

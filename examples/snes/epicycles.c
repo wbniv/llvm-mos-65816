@@ -140,7 +140,7 @@ int main(void) {
     app_init(&a);
 
     static TitleLayer title;
-    title_begin(&a.screen, &title, "FOURIER", "EPICYCLES");
+    title_begin16(&a.screen, &title, "FOURIER", "EPICYCLES");
 
     corpus_result = epi_gate_crc();          // self-verify epicycle math == host 0x4F6C
     title_end(&a.screen, &title, 100u);           // ~1.7 s title

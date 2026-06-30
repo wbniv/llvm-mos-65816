@@ -121,7 +121,7 @@ int main(void) {
   // Cinematic title card (BG2). corpus_result is computed once behind the card — the gate flock is
   // independent of the visual flock, so the proof is stable long before any snapshot deadline.
   static TitleLayer title;
-  title_begin(&a.screen, &title, "BOIDS", "STRUCT-BY-VALUE");
+  title_begin16(&a.screen, &title, "BOIDS", "STRUCT-BY-VALUE");
   corpus_result = boids_gate_crc();          // == host oracle == 0xA8AB
   title_end(&a.screen, &title, 110);
   // Snap to full brightness. title_end leaves the demo fading IN one step per display_frame, but each

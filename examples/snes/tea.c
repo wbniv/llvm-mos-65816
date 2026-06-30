@@ -157,7 +157,7 @@ int main(void) {
     app_init(&a);
 
     static TitleLayer title;
-    title_begin(&a.screen, &title, "TEA CIPHER", "AVALANCHE");
+    title_begin16(&a.screen, &title, "TEA CIPHER", "AVALANCHE");
 
     corpus_result = tea_gate_crc();
 

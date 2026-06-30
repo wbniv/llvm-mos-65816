@@ -160,7 +160,7 @@ int main(void) {
     /* Title overlay (BG2), added after the demo layer; held ~2 s then torn down. The gun/soup
        continue underneath; the corpus hash is the separate pre-loop gate value, so unaffected. */
     static TitleLayer title;
-    title_begin(&d, &title, "CONWAY LIFE", "GLIDER GUN");
+    title_begin16(&d, &title, "CONWAY LIFE", "GLIDER GUN");
     title_end(&d, &title, 110);
 
     for (;;) {

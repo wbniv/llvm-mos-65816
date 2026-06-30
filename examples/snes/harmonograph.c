@@ -113,7 +113,7 @@ int main(void) {
   /* Title overlay (BG2), added after the demo layers; held while the gate-CRC computes, then torn
      down before the curve blooms. Gate-neutral (no DMA; corpus_result is the pre-loop hash). */
   static TitleLayer title;
-  title_begin(&a.screen, &title, "HARMONOGRAPH", "LISSAJOUS");
+  title_begin16(&a.screen, &title, "HARMONOGRAPH", "LISSAJOUS");
 
   corpus_result = harmo_gate_crc();                           /* self-verify curve math == host 0x0EBB */
   rebloom(&a);                                                /* harmo_gate_crc reused preset 0 state; restart */

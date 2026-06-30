@@ -238,7 +238,7 @@ int main(void) {
 
     // Title overlay (BG2), held during the gate CRC, then torn down before the maze animates.
     static TitleLayer title;
-    title_begin(&a.screen, &title, "MAZE", "GENERATE + SOLVE");
+    title_begin16(&a.screen, &title, "MAZE", "GENERATE + SOLVE");
 
     // Self-verify: the gate CRC generates+solves the fixed-seed maze. It reuses the App's maze_t,
     // so re-arm the on-screen maze (seed 0xC0DE) afterwards.

@@ -317,7 +317,7 @@ int main(void) {
     // Title overlay (BG2), added after the demo layers; held during the gate CRC, then torn down
     // before the digits stream. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
     static TitleLayer title;
-    title_begin(&a.screen, &title, "PI SPIGOT", "MONTE CARLO");
+    title_begin16(&a.screen, &title, "PI SPIGOT", "MONTE CARLO");
 
     // Self-verify: run the gate CRC using the App's pre-allocated state.
     // pi_gate_crc() reinitializes sp + mc; we re-init them after for the main loop.

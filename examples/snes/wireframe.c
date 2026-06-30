@@ -113,7 +113,7 @@ int main(void) {
   /* Title overlay (BG2), added after the demo layers; held while the gate-CRC computes, then torn down
      before the solid spins. Gate-neutral (no DMA; corpus_result is the pre-loop hash). */
   static TitleLayer title;
-  title_begin(&a.screen, &title, "3D WIREFRAME", "SPINNING SOLID");
+  title_begin16(&a.screen, &title, "3D WIREFRAME", "SPINNING SOLID");
   corpus_result = wire3d_gate_crc();                          // self-verify the 3-D math == host 0xE737
   title_end(&a.screen, &title, 110);
   for (;;) {

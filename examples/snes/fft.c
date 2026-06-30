@@ -147,7 +147,7 @@ int main(void) {
     text_puts(&a.text, 1, 0, "N=32  5 STAGES  MULSI3×320");
 
     static TitleLayer title;
-    title_begin(&a.screen, &title, "FFT SPECTRUM", "RADIX-2 DIT");
+    title_begin16(&a.screen, &title, "FFT SPECTRUM", "RADIX-2 DIT");
 
     corpus_result = fft_gate_crc();
 

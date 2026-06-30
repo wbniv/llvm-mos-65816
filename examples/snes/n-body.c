@@ -199,7 +199,7 @@ int main(void) {
     // Title overlay (BG2), added after the demo layers; held while the gate CRC computes, then torn
     // down before the orbits draw. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
     static TitleLayer title;
-    title_begin(&a.screen, &title, "N-BODY ORBITS", "GRAVITY");
+    title_begin16(&a.screen, &title, "N-BODY ORBITS", "GRAVITY");
 
     // Compute the gate CRC before entering the display loop.
     // nbody_gate_crc() uses its own local NBody array, so the running sim is unaffected.

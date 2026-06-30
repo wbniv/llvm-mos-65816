@@ -100,7 +100,7 @@ int main(void) {
 
   /* Title overlay (BG2), held while the gate-CRC computes, then torn down before the maze renders. */
   static TitleLayer title;
-  title_begin(&a.screen, &title, "RAYCASTER", "MAZE");
+  title_begin16(&a.screen, &title, "RAYCASTER", "MAZE");
 
   corpus_result = rc_gate_crc();                  /* self-verify raycaster == host 0x724B */
   title_end(&a.screen, &title, 110);                   /* ~2 s title */

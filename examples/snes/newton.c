@@ -144,7 +144,7 @@ int main(void) {
        the slow gate-hash compute runs below (no display_frame -> the PPU holds the title on screen),
        then torn down before the progressive fill begins. Gate-neutral: no DMA, hash is pre-loop. */
     static TitleLayer title;
-    title_begin(&d, &title, "NEWTON FRACTAL", "COMPLEX DIVISION");
+    title_begin16(&d, &title, "NEWTON FRACTAL", "COMPLEX DIVISION");
     display_frame(&d);                       /* release force-blank with the title visible */
 
     /* Gate hash runs before the display loop (no V-blank waits; ~64-128 ms emulated). */

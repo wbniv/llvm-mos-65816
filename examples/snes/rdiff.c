@@ -167,7 +167,7 @@ int main(void) {
        not affect the (separately-asserted) corpus hash; re-confirm the screenshot if it ever gates
        on a framebuffer CRC. */
     static TitleLayer title;
-    title_begin(&d, &title, "REACT DIFFUSION", "GRAY-SCOTT");
+    title_begin16(&d, &title, "REACT DIFFUSION", "GRAY-SCOTT");
     title_end(&d, &title, 110);
 
     /* Title gone — now seed the field. From here BG1 fills with opaque Turing texture. */

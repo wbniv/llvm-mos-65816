@@ -112,7 +112,7 @@ int main(void) {
   // begin/end would freeze the screen on the parked title). Tear it down, THEN fold the proof: the
   // maze is already on screen and just holds a few seconds before the ripples start. == oracle 0xB3E6.
   static TitleLayer title;
-  title_begin(&a.screen, &title, "TRUCHET", "BITFIELDS");
+  title_begin16(&a.screen, &title, "TRUCHET", "BITFIELDS");
   title_end(&a.screen, &title, 90);
   corpus_result = tr_gate_crc();
 

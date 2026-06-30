@@ -114,7 +114,7 @@ int main(void) {
     app_init(&a);
 
     static TitleLayer title;
-    title_begin(&a.screen, &title, "VA_ARG", "LISSAJOUS");
+    title_begin16(&a.screen, &title, "VA_ARG", "LISSAJOUS");
 
     corpus_result = vaprintf_gate_crc();
 
