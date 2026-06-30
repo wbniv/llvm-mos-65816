@@ -42,6 +42,10 @@ tap **Select** and `PAL` steps `0→1→2→3`; press **A** and the name + `A/B/
 
 ## Running it
 
+**Play in the browser** — no install needed:
+[biohack.net/blossom](https://biohack.net/blossom) runs the exact bsnes‑jg core used by the gate,
+right in the tab. Click the screen to focus, then use the keys in the table below.
+
 **Play interactively on this machine (MAME window):**
 
 ```
@@ -60,12 +64,25 @@ task blossom          # or: dev/run.sh blossom
 
 **The ROM** is `build/blossom.sfc` — a standard LoROM `.sfc` you can load in any SNES emulator.
 
+On first boot (and after each attractor switch) a **title splash** shows for ~1.5 s before the
+attractor starts accumulating.
+
 ---
 
 ## Key mappings per emulator
 
 The buttons Blossom needs are **D‑pad, L, R, A, Y, Select, Start**. How those land on your keyboard
-depends on the emulator. Two that are pinned down:
+depends on the emulator.
+
+### biohack.net in-browser player
+
+| Key | SNES button | Action |
+|---|---|---|
+| **← ↑ ↓ →** | D‑pad | Pan |
+| **Q** / **W** | L / R | Zoom out / in |
+| **X** / **A** | A / Y | Next / previous attractor |
+| **Shift** | Select | Cycle colour mode |
+| **Enter** | Start | Reset |
 
 ### MAME — via `task blossom-play` (this repo)
 
