@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/39f1972) | snes(#25): 32-point DIT FFT spectrum analyser — butterfly __mulsi3 + bit-reversal |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8e1dd62) | snes(#28): Hilbert space-filling curve — __ashlsi3+__lshrsi3 variable-count shifts |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3e6c825) | snes(#27,#30): times-table cardioid + TEA cipher — __umodsi3 + 32-bit shift/add/XOR |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/471d04f) | snes(fn-plot): #24 recursive-descent float function plotter — 5-way green |
@@ -26,6 +27,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+39f1972	author	Will Norris
+39f1972	added	3
+39f1972	deleted	3
+39f1972	files	1
+39f1972	body	5 stages × 16 butterflies × 4× __mulsi3 = 320 multiply calls per FFT frame.\nBit-reversal permutation via precomputed FFT_BITREV[32] table (new corner).\nGate 0x6D7A; __mulsi3=4, rep/sep=63; 5-way green. Sweeping tone animation.\nPublished: biohack.net/snes/fft/ (v1.0.143).\n\nNo miscompile found — FFT butterfly codegen correct across all modes.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8e1dd62	author	Will Norris
 8e1dd62	added	5
 8e1dd62	deleted	5

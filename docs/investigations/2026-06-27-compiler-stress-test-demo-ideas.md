@@ -154,7 +154,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 | ~~**aggregate / by-value struct ABI**~~ — sret vs register-pair return | structs exist (#18) but are never passed/returned **by value** | ~~26~~ |
 | ~~**bitfield insert/extract**~~ — `unsigned x : n` fields | zero usage so far | ~~29b~~ |
 | ~~**variable-count shifts** — `__ashlsi3`/`__lshrsi3` with a *data-dependent* count~~ | all Round-1 shifts are compile-time constants | ~~28~~, ~~30~~ |
-| **variadic `va_arg`** — the stack-walking calling convention | untouched | 32 |
+| ~~**variadic `va_arg`** — the stack-walking calling convention~~ | untouched | ~~32~~ |
 | ~~**string / char-array building**~~ — `memcpy`/`memmove`/`strlen` over grown buffers | untouched | ~~23~~, ~~24~~ |
 | **pointer-chasing dynamic trees** — recursive build/walk over pooled nodes | #18's heap is a flat array, not a linked structure | 31 |
 | ~~**modulo-heavy** inner loop — `__umodhi`/`__umodsi3` per iteration~~ | div appears, but never `%` as the hot op | ~~27~~ |
@@ -174,7 +174,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
     *Shows:* a flock swirling — separation / alignment / cohesion.~~ ✓ [/snes/boids/](https://biohack.net/snes/boids/) *(vec2 by-value kernel, noinline; bit-exact host==default==a16==xy16 `0xA8AB`; disasm by-value-calls=497 + `__mulsi3` + `__divsi3`; no bug — aggregate-return ABI correct in all modes)*
 29a. ~~**Bytecode-VM turtle** — a stack machine interpreting a compiled program. *Stresses:* **jump-table
     dispatch** + a function-pointer opcode table. *Shows:* turtle graphics driven by bytecode.~~ ✓ [/snes/turtle-vm/](https://biohack.net/snes/turtle-vm/) *(dense switch → `JMP (abs,X)` jump table + `jsr __call_indir` fnptr opcode table; bit-exact host==default==a16==xy16 `0x4007`; no bug — confirms the xy16 JMPIdxIndir hardening)*
-32. **printf HUD (variadic)** — a tiny `vsnprintf` driving a readout; exercises **`va_arg`**. Best *folded
+~~32. **printf HUD (variadic)** — a tiny `vsnprintf` driving a readout; exercises **`va_arg`**. Best *folded
     into* another demo's HUD rather than built standalone.
 
 ## Strong stressors with great visuals

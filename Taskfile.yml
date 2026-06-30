@@ -572,6 +572,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fn-plot }
 
+  vaprintf:
+    desc: "#32: va_arg variadic formatter + Lissajous — assert corpus_result (vaprintf_gate_crc 0xE1F3, 4 mini_sprintf/9 va_arg) == host on MAME + bsnes-jg + disasm gate (jsr>=4, rep/sep>=1). Leaves build/vaprintf.sfc + build/vaprintf-{mame,jg}.png."
+    cmds:
+      - dev/run.sh vaprintf
+
+  vaprintf-play:
+    desc: "PLAY the va_arg Lissajous demo in a MAME window (builds first if needed). 6 Lissajous figures cycle with HUD formatted via mini_sprintf."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/vaprintf.sfc ]; then
+          echo "==> build/vaprintf.sfc missing — building it (dev/run.sh vaprintf)…"
+          dev/run.sh vaprintf
+        fi
+      - task: mandel-mame
+        vars: { ROM: vaprintf }
+
   fft:
     desc: "#25: FFT spectrum analyser — assert corpus_result (fft_gate_crc 0x6D7A, N=32) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1, rep/sep>=1). Leaves build/fft.sfc + build/fft-{mame,jg}.png."
     cmds:
