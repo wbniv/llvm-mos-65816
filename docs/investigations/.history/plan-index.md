@@ -1,5 +1,8 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/91caaa1) | chore: move the blocked #23 L-system demo off main to a branch |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/2535829) | docs(snes): mark #16 Wireframe 3-D Solid done — source recreated + republished |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/6fe6e69) | feat(snes): #29b Truchet (packed bitfields) — bitfield insert/extract stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8ed73d1) | feat(snes): #29a Bytecode-VM Turtle — jump-table + function-pointer dispatch demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/d5a4f74) | feat(snes): #26 Boids Flock — struct-by-value / aggregate-return ABI stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/7172dd9) | feat(snes): #22 64-Bit Avalanche — splitmix64 hash matrix / 64-bit integer libcall stress demo |
@@ -74,6 +77,21 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+91caaa1	author	Will Norris
+91caaa1	added	0
+91caaa1	deleted	1
+91caaa1	files	1
+91caaa1	body	The #23 L-system demo's tracking entries (Taskfile task, expected.tsv corpus row,\nplan-index row, TODO [wip]) were committed to main by a concurrent git add -A\nwhile the demo SOURCE stayed untracked — leaving main inconsistent (the\nexpected.tsv row pointed at a corpus slice not on main, which would fail\ncorpus-a16). The demo is blocked on a +mos-xy16 miscompile its own gate found, so\nit now lives on branch wip/23-lsystem-blocked (source + plan + tracking). Remove\nthe dangling lsystem references from main; keep the bug Open item (the legitimate\nrecord of the compiler defect, with repro examples/65816/xy16-inplace-memmove-repro.c).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+2535829	author	Will Norris
+2535829	added	1
+2535829	deleted	1
+2535829	files	1
+2535829	body	Flip the #16 TODO [wip]->[x] (struck, in place) and the plan-index row\nPLANNED->RECREATED&VERIFIED (4689940). The demo's source was lost (built on a\nthrowaway worktree, never committed); rebuilt strictly to plan, gate 0xE737\nhost==default==a16==xy16 on bsnes-jg, republished /snes/3d-wireframe/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+6fe6e69	author	Will Norris
+6fe6e69	added	3
+6fe6e69	deleted	1
+6fe6e69	files	1
+6fe6e69	body	Round-2 (new-codegen-corner) demo. No prior demo uses C bitfields; this packs every cell\ninto a 16-bit bitfield struct (orient:1/style:1/hue:3/phase:2/mark:1/energy:4) and a wave\nripples through a 16x16 '10 PRINT'/Truchet diagonal maze, reading/writing fields each step\n+ redraw -> the bitfield insert/extract codegen (mask and + merge ora + shift, pure ALU,\nNO libcalls) runs continuously.\n\nBitfield-width subtlety: unsigned is 32-bit host / 16-bit target, so fields are declared\nuint16_t:n (identical 16-bit unit, sizeof(Cell)==2) and the gate folds EXTRACTED values, so\na divergence = a real insert/extract miscompile, not a legal layout diff. Verified bit-exact\nhost == default == +mos-a16 == +mos-xy16 == 0xB3E6 on bsnes-jg; disasm and=13/ora=8/shift=32/\nrep-sep=59/libcalls=0. No compiler bug. Display: snesgfx BitmapCanvas maze, pulsed-source\ncolour ripples, palette cycle.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8ed73d1	author	Will Norris
 8ed73d1	added	2
 8ed73d1	deleted	1
