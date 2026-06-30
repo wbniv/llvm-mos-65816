@@ -1,9 +1,11 @@
 # `a16-*-rc-undef` — fix the `$x = COPY $rcN` "undefined physical register" MachineVerifier failure
 
-**Status:** CAUSE #1 FIXED (2026-06-30, `throwaway/rc-undef-fix` worktree); CAUSE #2 diagnosed + deferred.
-The single `rc-undef` symptom turned out to be **two distinct defects** sharing the same MachineVerifier
-error. Both were proven with an **asserts toolchain** (`build/llvm-mos-asserts`, `-debug-only=regalloc`
-join traces) on a lifted minimal repro (`examples/65816/rcundef.c` = `newton_step`).
+**Status:** CAUSE #1 FIXED + SHIPPED (2026-06-30, commit `f1af264`; newton demo rebuilt + deployed to
+[biohack.net/snes/newton/](https://biohack.net/snes/newton/), tag `v1.0.146`). **CAUSE #2 — IN PROGRESS**
+(RA-interference fix, `throwaway/rc-undef-fix` worktree). The single `rc-undef` symptom turned out to be
+**two distinct defects** sharing the same MachineVerifier error. Both were proven with an **asserts
+toolchain** (`build/llvm-mos-asserts`, `-debug-only=regalloc` join traces) on a lifted minimal repro
+(`examples/65816/rcundef.c` = `newton_step`).
 
 **Cause #1 — register-coalescer copy-hint (FIXED).** The coalescer folds a value read **straight out of a
 call-clobbered imaginary register** (`vreg = COPY $rcN`) into an **Imag16 pair** (a sub-register copy) that
@@ -25,8 +27,9 @@ is why `-join-liveintervals=false` masks both). With **no copy-hint signal**, `s
 target it — the only coalescer rule that "fixes" it is a blanket one that perturbs **22–25 / 34** corpus
 programs (confirmed empirically), which is the forbidden blanket change (lessons #2/#3). The genuine fix is
 **RA-interference-level** (why does greedy RA assign a `$rc` pair to a value live across a call clobbering
-it?) — the "large RA rework" the Risk note anticipated. **Deferred**: `lsystem_sim.c` keeps its
-`KNOWN_ISSUES` XFAIL; `newton_sim.c -O1` is out of the battery's verify surface (everything is `-Os`).
+it?) — the "large RA rework" the Risk note anticipated. **Now being worked** (Cause #2 §below); until it
+lands `lsystem_sim.c` keeps its `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]` XFAIL and `newton_sim.c -O1`
+is out of the battery's verify surface (everything is `-Os`).
 
 | witness | `-O0` | `-O1` | `-Os` | which cause |
 |---|---|---|---|---|
