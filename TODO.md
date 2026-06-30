@@ -447,17 +447,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     [plan](docs/plans/2026-06-27-11-snes-spirograph-hypotrochoid.md). **PUBLISHED — playable in-browser at
     https://biohack.net/spirograph/** (biohack.net v1.0.78, `snes-rom-page`; bsnes-jg WASM + Verify-fidelity
     selfcheck 0x32D4).
-  - [wip] **#12 CORDIC rotator** — sin/cos/atan via **shift-add only** (no multiply); shows a rotating hand
-    over a CORDIC-computed vector field + an `atan2` self-check of its angle.
-    ([plan](docs/plans/2026-06-28-12-snes-cordic-clock-rotator.md)) — the battery's **multiply-free** member:
-    builds on the existing `examples/65816/cordic16.h` (Q2.14, unrolled, zero arithmetic libcalls). **BUILT +
-    `dev/run.sh cordic` RESULT PASS:** host oracle == bsnes-jg corpus hash `0x4D41`; **inverted** disasm gate
-    (`mul=div=vshift=0`, `rep/sep=252`, `adc/sbc=143`) — the atan tables **constant-fold into immediate
-    adc/sbc** (no rodata symbol; original `atan_tbl` probe was wrong → replaced by `adc/sbc` witness);
-    all-3-mode `-verify-machineinstrs` clean. Visual OK (ring+12 spokes+hand, `ANGLE 123 / ATAN2 123 OK`).
-    **MAME leg + runtime 5-way BLOCKED** on the missing gitignored SPC700 IPL (`dev/roms/s_smp/spc700.rom`) —
-    env-wide, not demo-specific; gate now SKIPs it. Stays NEAR → full 5-way bar (pending IPL/CI).
-    **Pending:** publish to [biohack.net/cordic/](https://biohack.net/cordic/) (batched with the re-publish).
+  - [x] ~~**#12 CORDIC rotator** — sin/cos/atan via **shift-add only** (no multiply); shows a rotating hand
+    over a CORDIC-computed vector field + an `atan2` self-check of its angle.~~
+    ([plan](docs/plans/2026-06-28-12-snes-cordic-clock-rotator.md)) — gate CRC `0x4D41`; inverted disasm gate
+    (`mul=div=vshift=0`, `rep/sep=252`, `adc/sbc=143`); `-verify` clean ×3. MAME leg blocked on SPC700 IPL
+    (env-wide non-blocker). ✓ [/snes/cordic/](https://biohack.net/snes/cordic/) (biohack.net v1.0.137).
   - [x] ~~**#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.~~ [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
   - [x] ~~**#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.~~
   - [x] ~~**#15 Raycaster maze** — DDA grid-cast, wall height = screen_h/dist (3 `__udivsi3`/column: 2 deltaDist reciprocals + the 1/dist projection); first-person 3-D corridors, distance-shaded. The battery's **division** member. Gate `rc_gate_crc` `0xB200`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3. (Differential caught a signed-`int32`-overflow UB optimised differently host vs target.)~~ ✓ [/snes/raycaster/](https://biohack.net/snes/raycaster/) ([plan](docs/plans/2026-06-28-15-snes-raycaster.md))
