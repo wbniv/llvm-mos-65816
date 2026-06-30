@@ -141,6 +141,23 @@ tasks:
     cmds:
       - dev/run.sh mandel-shot
 
+  mandel-oop:
+    desc: "snesgfx formal verification: OOP Mandelbrot — Mode 7 as a Drawable (MandelLayer), corpus_result == 0x204F (+mos-a16). Proves: (1) Mode 7 OOP, (2) no bare REG_*/snes_* in main(), (3) coarse-grained dispatch (1 virtual call/frame). Disasm + size delta vs mandel-display printed. Leaves build/mandel-oop.sfc + build/mandel-oop-jg.png."
+    cmds:
+      - dev/run.sh mandel-oop
+
+  mandel-oop-play:
+    desc: "PLAY the OOP Mandelbrot verification client in a MAME window (builds first if needed). Same 64x56 Mandelbrot as mandel-display but orchestrated through the snesgfx Display + MandelLayer OOP interface."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/mandel-oop.sfc ]; then
+          echo "==> build/mandel-oop.sfc missing — building it (dev/run.sh mandel-oop)…"
+          dev/run.sh mandel-oop
+        fi
+      - task: mandel-mame
+        vars: { ROM: mandel-oop }
+
   mandel-far:
     desc: "#321 Track 3a: Mandelbrot into high WRAM via #320 far stores, asserted host==+mos-a16 on both emulators. Leaves build/k_mandel_far.sfc."
     cmds:
@@ -537,6 +554,23 @@ tasks:
     desc: "#6: Rule 90/110 — 1-D CA scrolling down the SNES screen; assert corpus_result (ca1d_gate_crc) == host on MAME + bsnes-jg + disasm gate (shifts+bools, no mul/div). Leaves build/1d-ca.sfc + build/1d-ca-{mame,jg}.png."
     cmds:
       - dev/run.sh 1d-ca
+
+  fn-plot:
+    desc: "#24: Recursive-descent float function plotter — assert corpus_result (fn_gate_crc 0x2EBE, 64 pts) == host on MAME + bsnes-jg + disasm gate (__mulsf3 + __divsf3 + rep/sep). Leaves build/fn-plot.sfc + build/fn-plot-{mame,jg}.png."
+    cmds:
+      - dev/run.sh fn-plot
+
+  fn-plot-play:
+    desc: "PLAY the fn-plot function plotter demo in a MAME window (builds first if needed). Cycles through y=x*x-0.5, y=x*x*x-x, y=x/(x*x+1), y=x^4-x^2."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/fn-plot.sfc ]; then
+          echo "==> build/fn-plot.sfc missing — building it (dev/run.sh fn-plot)…"
+          dev/run.sh fn-plot
+        fi
+      - task: mandel-mame
+        vars: { ROM: fn-plot }
 
   # --- Generated reference docs (from the HAL headers + the backend TableGen) ---
 

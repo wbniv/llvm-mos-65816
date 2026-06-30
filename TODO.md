@@ -351,38 +351,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     **tiled BG3 value/control bars** top & bottom (live `a/b/c`/zoom/palette fields + the control legend).
     Reusable `examples/snes/{hud,font8}.h` — the repo's first HDMA + BG-text; gates unaffected (`0x9047`
     grid / `blossom_crc`). [plan](docs/plans/2026-06-26-blossom-split-screen-hud-mode-7-plot-box-tiled-bg3.md).
-- [ ] **`snesgfx` — re-imagine SNES rendering as an OOP-in-C library (interface + implementation).** Take the
-  proven mechanics (force-blank/v-blank access window, DMA, VRAM layout, Mode 7 — handoff
-  [2026-06-24-snes-graphics-rendering.md](docs/handoffs/2026-06-24-snes-graphics-rendering.md)) and express
-  them as header-only objects following [oop-in-c](docs/investigations/object-oriented-c-and-assembly.md):
-  an `UploadQueue` (the access-window rule in one place), a `VramAlloc`, a `Drawable` vtable + heterogeneous
-  `Scene` (the *justified* per-object vtable — coarse dispatch, one call/drawable/frame), concrete
-  `Mode7Layer`/`SpriteSet`/`BgLayer`, and a selector-table joypad dispatch (the cheap dynamic form). Verify
-  via a parallel client `examples/snes/mandel-oop.c` reproducing `mandel-display.c`'s CRC `0x204F`
-  (host==a16@MAME==a16@bsnes-jg, `dev/run.sh mandel-oop`, `-verify-machineinstrs` clean) — zero-regression
-  proof — then **measure** the dispatch cost (disasm: N `__call_indir`/frame, not per-tile; OOP-vs-procedural
-  size delta; does C reach `JSR (abs,X)`?) and write the numbers back into oop-in-c.md §4–§5. The "small
-  reusable gfx helper" the Blossom item above wants. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md).
-- [ ] **Space Invaders on `snesgfx` — the playable graphical payoff demo (builds out the sprite/OAM front-end).**
-  A real, on-screen Space Invaders (player, 5×11 marching/animating/speeding alien fleet of 3 types, player
-  shot + alien bombs, destructible shields, bonus UFO, score/lives HUD, attract+play) built on `snesgfx` —
-  driving the `SpriteSet` (OAM, "not yet built"), `TextLayer`/`ShieldField` (`BgLayer`), and `Controller`.
-  OOP discipline: objects+methods only, `App` object, vtable seam **only** at the 3 render layers (entities are
-  static-dispatch objects). No far pointers ⇒ builds **default + a16 + xy16** = the full 5-way differential.
-  Verified gold-standard: a portable HAL-free `invaders_logic.h` + host oracle `tools/invaders-sim.c` →
-  deterministic **attract** state-CRC asserted host==default@MAME==a16@MAME==a16@bsnes-jg (`dev/run.sh
-  invaders`) + corpus 5-way slice + two-emulator screenshots, `-verify-machineinstrs` clean. Assets: PNG →
-  `gfx4snes` (foundry `pvsneslib-core`) → committed `.pic`/`.pal` → **objcopied to bank-$00 `.rodata` objects**
-  by `dev/build.sh` (`-O elf32-mos`, `--rename-section .data=.rodata`) and linked — no compiled C arrays.
-  [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md).
-  **STATUS 2026-06-27 — COMPLETE & verified (attract + START to play):** full game (fleet 3 types, bombs,
-  UFO, **destructible bunkers**, **score+lives HUD**) + `snesgfx` library + gfx4snes art (Option B) all GREEN
-  — host==default@MAME==a16@MAME==xy16@MAME==default/a16@bsnes-jg==`0x9D57`, `-verify` clean, bsnes 3×
-  byte-identical (`dev/run.sh invaders`). Fixed a real PPU bug (`SpriteSet` RMW of write-only `TM` → bsnes
-  flap; now a `Display` TM shadow). In-browser page built + committed on biohack.net (`957c2cf`);
-  **production deploy to https://www.biohack.net/space-invaders/ awaits user OK** (`cd ~/SRC/biohack.net &&
-  task publish TAG=v1.0.75`). Future refactor: move HUD/shields from OAM sprites to `TextLayer`/`ShieldField`
-  BG layers.
+- [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~
+- [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
 - [ ] **SNES demos — startup garbage fix + title screens** ([plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)).
   User-reported: Newton "starts off with garbage" + "takes too long to show anything". **Part A (garbage) root-caused
@@ -485,6 +455,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   - [x] ~~**#29b Truchet (packed bitfields)** (Round 2) — a 16x16 "10 PRINT" diagonal maze where every cell is a **16-bit bitfield struct** (orient:1/style:1/hue:3/phase:2/mark:1/energy:4); a wave ripples through it, reading/writing fields -> bitfield **insert/extract** codegen (and/ora/shift, NO libcalls). Declared `uint16_t : n` so layout matches host/target; gate folds EXTRACTED field values. **Bit-exact** host==default==a16==xy16 `0xB3E6`; disasm `and=13`/`ora=8`/`shift=32`/`rep-sep=59`/`libcalls=0`. No bug.~~ ✓ [/snes/truchet/](https://biohack.net/snes/truchet/) ([plan](docs/plans/2026-06-29-29b-snes-truchet-bitfields.md))
   - [x] ~~**#26 Boids Flock** (Round 2) — Reynolds flocking on a `vec2 {int16_t x,y}` VALUE type; steering kernel takes/returns `struct` by value (`noinline`, O(N²)/frame) → the **aggregate-return ABI** (register-pair vs `sret`) no other demo passes a struct through. Bit-exact `0xA8AB` host==default==a16==xy16; disasm by-value-calls=497 + `__mulsi3` + `__divsi3`. No bug.~~ ✓ [/snes/boids/](https://biohack.net/snes/boids/) ([plan](docs/plans/2026-06-29-26-snes-boids-struct-abi.md))
   - [x] ~~**#29a Bytecode-VM Turtle** (Round 2) — a stack-machine bytecode interpreter drawing LOGO turtle graphics: the dense `switch(op)` lowers to **`JMP (abs,X)` jump-table dispatch** (JMPIdxIndir) and the ALU ops dispatch through a **function-pointer opcode table** (`jsr __call_indir`) — the indirect/computed control-flow corners no other demo runs. Bit-exact `0x4007` host==default==a16==xy16; disasm jump-table=1 + `__call_indir`=1 + rep/sep. No bug — confirms the xy16 JMPIdxIndir hardening.~~ ✓ [/snes/turtle-vm/](https://biohack.net/snes/turtle-vm/) ([plan](docs/plans/2026-06-29-29a-snes-turtle-vm-bytecode.md))
+  - [wip] **#24 fn-plot — Recursive-descent float function plotter** (Round 2) — re-parses four baked expressions per pixel using `fn_eval_expr→fn_eval_term→fn_eval_factor` recursion (up to 7 levels deep; soft-stack ABI stress) + evaluates in `float` (soft-float: `__mulsf3`/`__addsf3`/`__subsf3`/`__divsf3`/`__fixsfsi`); plots curves on a BitmapCanvas, cycles all four automatically. Gate `fn_gate_crc` `0x2EBE`. ([plan](docs/plans/2026-06-30-24-snes-fn-plot.md))
 - [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
   demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
   128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*

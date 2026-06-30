@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/a598069) | docs(snesgfx): make the client an object too — an App class |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/e9a8663) | docs(snesgfx): interface rule — objects + methods, no bare functions |
 | [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/d5c1448) | docs(snesgfx): plan an OOP-in-C SNES rendering library + improve oop-in-c |
 
 <!--history-meta v1
+a598069	author	Will Norris
+a598069	added	62
+a598069	deleted	29
+a598069	files	1
+a598069	body	Review: the application content compute (mandel_render) + CRC sentinel were\nstill bare functions in main(). "Not part of the graphics library" != "not\nOOP" — the program has state + behavior, so it's an object.\n\nWrap the client in an `App` class that owns the Display, its drawables, and the\nfar image buffer, exposing app_init/app_render/app_crc/app_step methods. main()\nis now: construct App, call methods. The only non-method statement is\n`corpus_result = app_crc(&app)` (the differential harness's ABI symbol, RHS is\na method); the only plain functions are pure leaf math (mandel_cell/CRC) called\ninside methods. Note: App promotes to an abstract base (virtual render/step +\ngeneric app_run) if the repo grows more demos — the Drawable vtable pattern one\nlevel up. P1 audit + the interface-rule section updated to match.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e9a8663	author	Will Norris
 e9a8663	added	121
 e9a8663	deleted	57
