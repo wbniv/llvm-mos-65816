@@ -79,6 +79,16 @@ carry the lane's `undef`-ness through the inserted COPY.
 All are toolchain-wide; the `undef %N.sublo:imag16 = …` idiom is pervasive in the
 MOS backend, so any change needs a full differential + verify regression sweep.
 
+A downstream attempt at (2) — a bounded `readsUndefSubreg` tracer that follows a
+spuriously-live lane through full-register split COPYs to its `undef` origin —
+clears the straight-line shape but **not** these witnesses: both are
+**loop-carried**, so the lane's reaching value at the read is a **PHI-def** at the
+loop header. Proving its undef-origin requires recursing through every predecessor
+**including the loop back-edge** (visited-set + slot/lanemask care), which is a
+materially larger change — reinforcing that this belongs in SplitKit/InlineSpiller
+(carry the lane's undef-ness through the inserted COPY at the source) rather than a
+patch on the rewriter's read side.
+
 ## Reproduction (downstream llvm-mos-65816 fork)
 
 `examples/snes/corpus/lsystem_sim.c` (function `main`) and

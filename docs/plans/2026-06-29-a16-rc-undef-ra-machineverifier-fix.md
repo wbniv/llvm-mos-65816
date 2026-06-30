@@ -49,8 +49,18 @@ partially-undef pair; the `undef %N.sublo` idiom is pervasive), not MOS-specific
 either (a) carry the `undef` lane through the split/spill `COPY` (SplitKit / InlineSpiller) so the
 downstream read is recognized undef, (b) make `readsUndefSubreg` trace the subrange value to its `undef`
 origin, or (c) eliminate the dead pair-extract copies before verification — all deep, toolchain-wide, and
-**risky to attempt on a shared compiler** for a *code-correct* (latent-only) defect. Until a fix lands
-`lsystem_sim.c` keeps
+**risky to attempt on a shared compiler** for a *code-correct* (latent-only) defect.
+
+**Fix attempt (2026-06-30, candidate (b), reverted).** Implemented a bounded, conservative
+`VirtRegRewriter::lanesUndefAt` that traces a spuriously-"live" lane back through full-register virtual
+split COPYs to an `undef` origin and feeds it into `readsUndefSubreg` (only ever proves *more* lanes undef
+→ correctness-safe; corpus differential as the net). It did **not** clear the witnesses: both are
+**loop-carried**, so the `subhi` subrange's reaching value at the read is a **PHI-def** at the loop header,
+and the tracer conservatively bails on `isPHIDef()`. Proving PHI undef-origin means recursing across **all**
+predecessors **including the loop back-edge** (needs a visited-set + careful slot/lanemask handling) — a
+materially larger and riskier change. Reverted (the generic `VirtRegMap.cpp` edit was isolated to the
+throwaway worktree's vendor; the shipped Release toolchain never carried it). Confirms the fix is a genuine
+generic-LLVM RA undertaking, best done upstream. Until it lands `lsystem_sim.c` keeps
 its `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]` XFAIL and `newton_sim.c -O1` is out of the battery's
 verify surface (everything is `-Os`). (`-join-liveintervals=false` masks it only because disabling the
 coalescer leaves the dead copies as separate vregs the dead-MI pass then removes.)
