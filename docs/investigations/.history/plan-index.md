@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f74cb6f) | docs(plan-index): add snesgfx mandel-oop verification row (185 plans) |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/cff089f) | docs(plan-index): add #23 L-System Plant + SNES title HDMA rows (184 plans) |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/91caaa1) | chore: move the blocked #23 L-system demo off main to a branch |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/2535829) | docs(snes): mark #16 Wireframe 3-D Solid done — source recreated + republished |
@@ -78,6 +79,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+f74cb6f	author	Will Norris
+f74cb6f	added	2
+f74cb6f	deleted	0
+f74cb6f	files	1
+f74cb6f	body	Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 cff089f	author	Will Norris
 cff089f	added	3
 cff089f	deleted	0

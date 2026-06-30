@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/6fe6e69) | feat(snes): #29b Truchet (packed bitfields) — bitfield insert/extract stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8ed73d1) | feat(snes): #29a Bytecode-VM Turtle — jump-table + function-pointer dispatch demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/d5a4f74) | feat(snes): #26 Boids Flock — struct-by-value / aggregate-return ABI stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/7172dd9) | feat(snes): #22 64-Bit Avalanche — splitmix64 hash matrix / 64-bit integer libcall stress demo |
@@ -22,6 +23,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+6fe6e69	author	Will Norris
+6fe6e69	added	2
+6fe6e69	deleted	2
+6fe6e69	files	1
+6fe6e69	body	Round-2 (new-codegen-corner) demo. No prior demo uses C bitfields; this packs every cell\ninto a 16-bit bitfield struct (orient:1/style:1/hue:3/phase:2/mark:1/energy:4) and a wave\nripples through a 16x16 '10 PRINT'/Truchet diagonal maze, reading/writing fields each step\n+ redraw -> the bitfield insert/extract codegen (mask and + merge ora + shift, pure ALU,\nNO libcalls) runs continuously.\n\nBitfield-width subtlety: unsigned is 32-bit host / 16-bit target, so fields are declared\nuint16_t:n (identical 16-bit unit, sizeof(Cell)==2) and the gate folds EXTRACTED values, so\na divergence = a real insert/extract miscompile, not a legal layout diff. Verified bit-exact\nhost == default == +mos-a16 == +mos-xy16 == 0xB3E6 on bsnes-jg; disasm and=13/ora=8/shift=32/\nrep-sep=59/libcalls=0. No compiler bug. Display: snesgfx BitmapCanvas maze, pulsed-source\ncolour ripples, palette cycle.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8ed73d1	author	Will Norris
 8ed73d1	added	6
 8ed73d1	deleted	5
