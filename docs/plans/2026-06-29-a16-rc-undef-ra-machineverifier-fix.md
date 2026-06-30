@@ -21,7 +21,53 @@ It has been an open issue since the #2 Newton demo shipped (2026-06-27) with `ne
 L-System demo independently reproduces the same class (in `main`, after the demo's string-rewrite + bracket
 stack inline), confirming it is **not** newton-specific.
 
-## Diagnosis (so far)
+## It's the REGISTER COALESCER (decisive, 2026-06-29)
+
+`-mllvm -join-liveintervals=false` (disable the coalescer) → **`newton_sim.c` `-verify` CLEAN** at
+`-Os`/a16. So the disconnected def→use is **created by the register coalescer**, not the core RA — which
+means the fix is **low-risk**: refusing a coalesce in `MOSRegisterInfo::shouldCoalesce` is *always* safe
+(it only costs a copy, never correctness), and the **corpus-byte-identical** check is the safety net for
+narrowing the rule. This is the same hook + risk profile as the committed `0010-coalesce-rotate-ac` fix.
+
+**The bad coalesce (hypothesis, from the MIR):** a value live **across a `$rcN`-clobbering libcall**
+(`JSR __mulsi3 … implicit-def $rc3`, with the `mos_csr` regmask) gets coalesced **into that `$rcN`**, so
+its def is destroyed by the call yet a later block reads it — the coalescer's interference check isn't
+treating the call's `implicit-def`/clobber of the imaginary `$rcN` pair as conflicting with the
+cross-call-live value. Candidate fixes (lowest-risk first): (a) a `shouldCoalesce` refusal when coalescing
+a value into an `Imag8/Imag16` ($rc) class across a clobbering call (query `LIS`); (b) ensure libcalls'
+`implicit-def $rcN` / the CSR regmask correctly mark the imaginary pairs clobbered so the standard
+interference check rejects the join.
+
+**Next step to land it:** an **asserts build** (`dev/run.sh asserts-build`) → `-debug-only=regalloc`
+join trace pins the exact `vregX ↔ $rcN` join → write the narrow `shouldCoalesce` refusal → re-verify
+`newton`+`lsystem` `-verify` clean **and** corpus disasm byte-identical + torture + fuzz, then drop both
+XFAILs and add `dev/run.sh rcundef`. (This Release toolchain has no asserts, so the trace needs that build.)
+
+## Root cause — PINNED (2026-06-29, post-virtregrewriter MIR of `newton_step`)
+
+It is **not** a cosmetic stale-liveins issue — the verifier is **correct**. Exact site (`-Os`, a16):
+
+```
+bb.9:   ... JSR __mulsi3 ... implicit-def $rc3      ; last def of $rc3
+        renamable $rc24 = COPY $rc3                  ; read (not killed)
+bb.10:  liveins: $rc29, ...   (NO $rc3)              ; $rc3 NOT live-in
+bb.11:  liveins: $rc29, ...   (NO $rc3)
+bb.12:  liveins: $rc29, ...   (NO $rc3)
+        renamable $x = COPY killed renamable $rc3    ; <-- USE with NO reaching def
+```
+
+The RA **ends `$rc3`'s live range at bb.9** (not propagated into bb.10/11/12's liveins), yet emits a
+**use of `$rc3` in bb.12**. There is **no def of `$rc3` reaching that use** on the dataflow — it only
+produces the right answer because the physical `$rc3` happens to retain the bb.9 value undisturbed across
+bb.10/11 (no intervening reuse). So this is a **disconnected def→use** — a high-pressure **live-range
+splitting / spill** of an imaginary-register value where the **reload that should re-define `$rc3` before
+the bb.12 use is missing**. It is a **latent miscompile hazard** (if the RA had reused `$rc3` in bb.10/11
+it would be a real wrong-answer), which is exactly why the MachineVerifier rejects it — and why the right
+fix is at the **RA live-range / spill-reload** level, not a liveins recompute (recomputing liveins can't
+add `$rc3` because no def reaches the use). **RA-level change ⇒ miscompile-risk ⇒ must re-verify the corpus
+byte-identical + torture + fuzz before trusting it.**
+
+## Diagnosis (path)
 
 - The bad COPY appears **after the Virtual Register Rewriter** (the last `IR Dump After` before the verifier
   aborts is `Virtual Register Rewriter`; the Greedy RA assigns the value, the rewriter materializes the
