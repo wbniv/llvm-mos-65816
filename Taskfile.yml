@@ -341,23 +341,6 @@ tasks:
       - task: mandel-mame
         vars: { ROM: turtle-vm }
 
-  lsystem:
-    desc: "#23: L-System Plant — grows an L-system by string rewriting (each generation rewrites a char buffer IN PLACE with memmove + memcpy + strlen, the string-libcall corner no other demo runs) then a turtle interprets it with a bracket push/pop stack into a fractal plant. Integer fixed-point => bit-exact; assert corpus_result (lsystem_gate_crc 0x79C3) == host on bsnes-jg (+ MAME if SPC700 IPL) + disasm gate (memcpy/memmove + strlen + rep/sep). Leaves build/lsystem.sfc + build/lsystem-{jg,mame}.png."
-    cmds:
-      - dev/run.sh lsystem
-
-  lsystem-play:
-    desc: "PLAY the L-System Plant demo in a MAME window on this host (builds the ROM first if needed). A string-rewriting L-system grows into a fractal plant = the visual proof the memcpy/memmove/strlen string build + bracket stack are correct."
-    cmds:
-      - |
-        set -euo pipefail
-        if [ ! -f build/lsystem.sfc ]; then
-          echo "==> build/lsystem.sfc missing — building it (dev/run.sh lsystem)…"
-          dev/run.sh lsystem
-        fi
-      - task: mandel-mame
-        vars: { ROM: lsystem }
-
   factorial:
     desc: "#20: Bignum factorial — 1000! in a base-10000 digit array; custom 28-row FactDisplay drawable; assert corpus_result (factorial_gate_crc for 50!, 0x772F) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __udivmodsi4 + rep/sep). Leaves build/factorial.sfc + build/factorial-{mame,jg}.png."
     cmds:
