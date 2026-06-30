@@ -572,6 +572,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fn-plot }
 
+  bhut:
+    desc: "#31: Barnes-Hut quadtree galaxy — assert corpus_result (bh_gate_crc 0xEF0B, N=8, 6 steps) == host on MAME + bsnes-jg + disasm gate (__mulsi3+__divsi3 + recursive bh_force + rep/sep). Leaves build/bhut.sfc + build/bhut-{mame,jg}.png."
+    cmds:
+      - dev/run.sh bhut
+
+  bhut-play:
+    desc: "PLAY the Barnes-Hut quadtree galaxy demo in a MAME window (builds first if needed). 8-body gravity via recursive quadtree force walk; trails trace the collapse."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/bhut.sfc ]; then
+          echo "==> build/bhut.sfc missing — building it (dev/run.sh bhut)…"
+          dev/run.sh bhut
+        fi
+      - task: mandel-mame
+        vars: { ROM: bhut }
+
   vaprintf:
     desc: "#32: va_arg variadic formatter + Lissajous — assert corpus_result (vaprintf_gate_crc 0xE1F3, 4 mini_sprintf/9 va_arg) == host on MAME + bsnes-jg + disasm gate (jsr>=4, rep/sep>=1). Leaves build/vaprintf.sfc + build/vaprintf-{mame,jg}.png."
     cmds:

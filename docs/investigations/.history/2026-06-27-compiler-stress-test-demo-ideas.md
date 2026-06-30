@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e7d1965) | snes(#32): va_arg variadic formatter — mini_sprintf + Lissajous |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/39f1972) | snes(#25): 32-point DIT FFT spectrum analyser — butterfly __mulsi3 + bit-reversal |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8e1dd62) | snes(#28): Hilbert space-filling curve — __ashlsi3+__lshrsi3 variable-count shifts |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3e6c825) | snes(#27,#30): times-table cardioid + TEA cipher — __umodsi3 + 32-bit shift/add/XOR |
@@ -27,6 +28,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+e7d1965	author	Will Norris
+e7d1965	added	2
+e7d1965	deleted	2
+e7d1965	files	1
+e7d1965	body	mini_sprintf(%u/%d/%x) exercises the variadic calling convention on the 65816:\nva_arg(ap, unsigned int) reads 2 bytes on target (16-bit int) vs 4 on x86 host.\nSmall-value gate avoids width divergence → bit-exact 5-way green.\nGate 0xE1F3; jsr=7 (4 mini_sprintf + 3 helpers); rep/sep=45; __mulsi3=0.\nPublished: biohack.net/snes/vaprintf/ (v1.0.145).\n\nNo miscompile found — variadic va_arg codegen correct across all modes.\nFirst demo in the battery to exercise the variadic calling convention.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 39f1972	author	Will Norris
 39f1972	added	3
 39f1972	deleted	3

@@ -156,7 +156,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 | ~~**variable-count shifts** — `__ashlsi3`/`__lshrsi3` with a *data-dependent* count~~ | all Round-1 shifts are compile-time constants | ~~28~~, ~~30~~ |
 | ~~**variadic `va_arg`** — the stack-walking calling convention~~ | untouched | ~~32~~ |
 | ~~**string / char-array building**~~ — `memcpy`/`memmove`/`strlen` over grown buffers | untouched | ~~23~~, ~~24~~ |
-| **pointer-chasing dynamic trees** — recursive build/walk over pooled nodes | #18's heap is a flat array, not a linked structure | 31 |
+| ~~**pointer-chasing dynamic trees** — recursive build/walk over pooled nodes~~ | #18's heap is a flat array, not a linked structure | ~~31~~ |
 | ~~**modulo-heavy** inner loop — `__umodhi`/`__umodsi3` per iteration~~ | div appears, but never `%` as the hot op | ~~27~~ |
 | ~~**bit-reversal / interleave permutation**~~ | never exercised | ~~25~~, ~~28~~ |
 
@@ -179,8 +179,8 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 
 ## Strong stressors with great visuals
 
-23. **L-system turtle** — string rewriting (char-array grow, `memmove`) + bracket **push/pop** of turtle
-    state + sin/cos. *Shows:* Koch / dragon curve / algorithmic plant growing.
+~~23. **L-system turtle** — string rewriting (char-array grow, `memmove`) + bracket **push/pop** of turtle
+    state + sin/cos. *Shows:* Koch / dragon curve / algorithmic plant growing.~~ ✓ [/snes/lsystem/](https://biohack.net/snes/lsystem/)
 24. ~~**Recursive-descent function plotter** — a real **recursive-descent parser** (deep recursion + string
     scan) feeding a switch-dispatch evaluator; pairs with soft-float (#21) for the eval. *Shows:* type-in
     `y=f(x)` plotted live.~~ ✓ [/snes/fn-plot/](https://biohack.net/snes/fn-plot/)
@@ -194,8 +194,8 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
     insert/extract. *Shows:* a curved-tile labyrinth.~~ ✓ [/snes/truchet/](https://biohack.net/snes/truchet/) *(16-bit bitfield struct, 6 fields; bit-exact host==default==a16==xy16 `0xB3E6`; disasm and/ora/shift, libcalls=0; no bug)*
 ~~30. **TEA / XTEA cipher avalanche** — tight 32-bit mix (data-dependent shifts + adds + xor + magic delta).
     *Shows:* encrypt the framebuffer; one bit flip → avalanche.~~ ✓ [/snes/tea/](https://biohack.net/snes/tea/)
-31. **Barnes-Hut quadtree galaxy** — recursive build/walk over a **pooled struct-node tree** (distinct from
-    #13's flat-array N-body). *Shows:* a galaxy with the quadtree overlaid.
+~~31. **Barnes-Hut quadtree galaxy** — recursive build/walk over a **pooled struct-node tree** (distinct from
+    #13's flat-array N-body). *Shows:* a galaxy with the quadtree overlaid.~~ ✓ [/snes/bhut/](https://biohack.net/snes/bhut/)
 
 ## Round 2 first picks
 
