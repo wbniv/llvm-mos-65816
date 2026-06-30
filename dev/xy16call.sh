@@ -78,18 +78,21 @@ else
   echo "  FAIL: index source $postldx is neither in the JSR preserve regmask nor a stack reload — cross-call preservation unproven"; rc=1
 fi
 
-echo "==> 3) .o disasm: the 16-bit index is held across the call (rep #\$10 + lda long,X; X narrowed before the jsr, re-widened after)"
+echo "==> 3) .o disasm: the 16-bit index is held across the call (rep #\$10 + lda [long|abs],X; X narrowed before the jsr, re-widened after)"
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
 maindis="$(printf '%s\n' "$DIS" | awk '/<main>:/{p=1;print;next} p&&/Disassembly of section/{exit} p{print}')"
 prejsr="$(printf '%s\n'  "$maindis" | awk '/[[:space:]]jsr[[:space:]]/{exit} {print}')"
 postjsr="$(printf '%s\n' "$maindis" | awk '/[[:space:]]jsr[[:space:]]/{p=1;next} p{print}')"
 nrepx=$(printf '%s\n'  "$maindis" | grep -ciE ':\s*c2 10\b' || true)        # rep #$10 (enter 16-bit index)
-nldlx=$(printf '%s\n'  "$maindis" | grep -ciE ':\s*bf\b' || true)          # lda long,X (native DBR-indep indexed load)
+# lda [long,X]=0xBF (24-bit absolute indexed, DBR-independent) or lda [abs,X]=0xBD (16-bit
+# bank-relative). The legalizer-domination fix (fb528d8) changed DBR-relative (0xBD) for
+# same-bank globals; both forms are correct 16-bit-indexed loads; gate accepts either.
+nldlx=$(printf '%s\n'  "$maindis" | grep -ciE ':\s*(bf|bd)\b' || true)      # lda long/abs,X (16-bit-index path)
 presep=$(printf '%s\n' "$prejsr"  | grep -ciE ':\s*e2 (30|10)\b' || true)   # sep #$30/#$10 narrows X before the call
 postrep=$(printf '%s\n' "$postjsr" | grep -ciE ':\s*c2 10\b' || true)       # rep #$10 re-widens X after the call
-postldx=$(printf '%s\n' "$postjsr" | grep -ciE ':\s*bf\b' || true)         # post-call indexed load with the carried idx
+postldx=$(printf '%s\n' "$postjsr" | grep -ciE ':\s*(bf|bd)\b' || true)     # post-call indexed load with the carried idx
 if [ "$nrepx" -ge 1 ] && [ "$nldlx" -ge 1 ] && [ "$presep" -ge 1 ] && [ "$postrep" -ge 1 ] && [ "$postldx" -ge 1 ]; then
-  echo "  PASS: $nrepx rep #\$10 + $nldlx lda long,X; X narrowed before the jsr ($presep sep), re-widened after ($postrep rep #\$10) for the post-call indexed load ($postldx) — 16-bit index held across the call"
+  echo "  PASS: $nrepx rep #\$10 + $nldlx lda [long|abs],X; X narrowed before the jsr ($presep sep), re-widened after ($postrep rep #\$10) for the post-call indexed load ($postldx) — 16-bit index held across the call"
 else
   echo "  FAIL: cross-call 16-bit-index structure missing (nrepx=$nrepx nldlx=$nldlx presep=$presep postrep=$postrep postldx=$postldx)"; rc=1
 fi

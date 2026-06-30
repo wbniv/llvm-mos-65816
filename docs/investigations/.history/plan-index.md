@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8ed73d1) | feat(snes): #29a Bytecode-VM Turtle — jump-table + function-pointer dispatch demo |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/d5a4f74) | feat(snes): #26 Boids Flock — struct-by-value / aggregate-return ABI stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/7172dd9) | feat(snes): #22 64-Bit Avalanche — splitmix64 hash matrix / 64-bit integer libcall stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/9b1f137) | docs(plan-index): add the VBLANK/flicker sweep row (182 plans) |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/48f1c90) | docs(plan-index): fill #21 Soft-Float Mandelbrot SHA (cd3663a) — cluster fully commit-linked |
@@ -72,6 +74,16 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+8ed73d1	author	Will Norris
+8ed73d1	added	2
+8ed73d1	deleted	1
+8ed73d1	files	1
+8ed73d1	body	Demo #29a of the compiler stress-test battery (Round 2). A stack-machine bytecode\ninterpreter draws LOGO turtle graphics: the main switch(op) over a dense opcode\nrange lowers to a JMP (abs,X) jump table (the JMPIdxIndir pseudo the xy16\nrequiredXWidth hardening singled out) and the binary ALU ops dispatch through a\nstatic-const function-pointer opcode table (jsr __call_indir) — the indirect /\ncomputed control-flow corners no other demo runs.\n\nInteger fixed-point (Q8.8 turtle in int32, SINCOS 8.8 LUT) => bit-exact; near\nfunction pointers + bank-0 data => full 5-way bar. corpus gate vm_gate_crc = 0x4007\n(180-segment program). dev/run.sh turtle-vm RESULT PASS: disasm jump-table=1 +\n__call_indir=1 + __mulsi3=2 + rep/sep=155; bsnes-jg host==+mos-a16 0x4007. 5-way\nconfirmed host==default==+mos-a16==+mos-xy16 on bsnes-jg, -verify clean — a live\ncross-mode confirmation of the JMPIdxIndir index-width fix (incl. xy16, where the\njump table indexes with a 16-bit X). No compiler bug. Draws a woven multi-colour\nspiral rosette = the visual proof.\n\nPublished biohack.net/snes/turtle-vm/ (v1.0.130).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+d5a4f74	author	Will Norris
+d5a4f74	added	1
+d5a4f74	deleted	0
+d5a4f74	files	1
+d5a4f74	body	Demo #26 of the compiler stress-test battery (Round 2). Reynolds flocking built\non a vec2 {int16_t x,y} VALUE type whose steering kernel (v2_add/v2_sub/v2_scale\n+ separation/alignment/cohesion) TAKES and RETURNS the struct BY VALUE, noinline\nso the O(N^2)/frame calls survive -Os — the small-struct register-pair-vs-sret\naggregate-return path no other demo passes a struct through.\n\nInteger fixed-point (Q12.4) => bit-exact; flock in bank-0 WRAM (no far pointers)\n=> full 5-way bar. corpus gate boids_gate_crc = 0xA8AB (8-bird flock, 12 steps).\ndev/run.sh boids RESULT PASS: disasm by-value-calls=497 + __mulsi3=6 + __divsi3=4\n+ rep/sep=103; bsnes-jg host==+mos-a16 0xA8AB. 5-way confirmed host==default==\n+mos-a16==+mos-xy16 on bsnes-jg, -verify clean (MAME SKIP — no SPC700 IPL,\ndemos-only non-blocker). No compiler bug — aggregate-return ABI correct in all\nmodes. Boids coloured by heading octant = the visual proof.\n\nPublished biohack.net/snes/boids/ (v1.0.128).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7172dd9	author	Will Norris
 7172dd9	added	1
 7172dd9	deleted	0
