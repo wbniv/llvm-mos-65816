@@ -1,0 +1,112 @@
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index baf6de604..bcfdffceb 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -20,8 +20,10 @@
+ #include "MOSInstrInfo.h"
+ #include "MOSMachineFunctionInfo.h"
+ #include "MOSSubtarget.h"
++#include "llvm/ADT/BitVector.h"
+ #include "llvm/ADT/SmallSet.h"
+ #include "llvm/ADT/SmallVector.h"
++#include "llvm/CodeGen/LiveIntervals.h"
+ #include "llvm/CodeGen/LivePhysRegs.h"
+ #include "llvm/CodeGen/MachineBasicBlock.h"
+ #include "llvm/CodeGen/MachineFrameInfo.h"
+@@ -641,12 +643,62 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
+   return true;
+ }
+ 
++// True if the virtual register Reg's unique definition is a COPY *directly* out of a
++// physical imaginary register ($rcN) — `Reg = COPY $rcN` — and Reg is live across a
++// call that clobbers that same $rcN.
++//
++// $rcN are the calling convention's imaginary (zero-page) argument/return scratch: a
++// libcall passes and returns values in them and clobbers them (via the call's
++// regmask). A `Reg = COPY $rcN` reading such a return value hints Reg back to $rcN.
++// If Reg is then folded into an imaginary-register *pair* (a sub-register copy
++// building an Imag16) that outlives a libcall re-clobbering $rcN, the pair inherits
++// the $rcN hint and the allocator re-binds it to $rcN across the clobber — leaving a
++// use of $rcN with no reaching definition on that path. The value survives in $rcN at
++// runtime so the code is correct, but the IR is ill-formed and the MachineVerifier
++// rejects it ("Using an undefined physical register") — a latent miscompile hazard.
++static bool copiedFromClobberedPhysImag(Register Reg,
++                                        const MachineRegisterInfo &MRI,
++                                        LiveIntervals &LIS) {
++  if (!Reg.isVirtual() || !LIS.hasInterval(Reg))
++    return false;
++  const MachineInstr *Def = MRI.getUniqueVRegDef(Reg);
++  if (!Def || !Def->isCopy())
++    return false;
++  Register Src = Def->getOperand(1).getReg();
++  if (!Src.isPhysical() || !MOS::Imag8RegClass.contains(Src))
++    return false;
++  BitVector Usable;
++  return LIS.checkRegMaskInterference(LIS.getInterval(Reg), Usable) &&
++         !Usable.test(Src.id());
++}
++
+ bool MOSRegisterInfo::shouldCoalesce(
+     MachineInstr *MI, const TargetRegisterClass *SrcRC, unsigned SubReg,
+     const TargetRegisterClass *DstRC, unsigned DstSubReg,
+     const TargetRegisterClass *NewRC, LiveIntervals &LIS) const {
+   const auto &MRI = MI->getMF()->getRegInfo();
+ 
++  // Don't fold a value read straight out of a call-clobbered imaginary register
++  // ($rcN, via `vreg = COPY $rcN`) into an imaginary-register *pair* (a sub-register
++  // copy that builds an Imag16) when that value outlives the clobbering call. The
++  // pair inherits the physical-$rcN allocation hint and the allocator re-binds it to
++  // $rcN across the clobber, producing a disconnected def->use the MachineVerifier
++  // rejects ("Using an undefined physical register") — a latent miscompile hazard.
++  // Refusing keeps the COPY so the value gets its own spillable vreg.
++  //
++  // Narrowly gated to stay inert on the common case: it requires (1) a *direct*
++  // `vreg = COPY $rcN` read (unique def), (2) that vreg genuinely live across a call
++  // clobbering $rcN, and (3) a sub-register copy into an Imag16 pair — the exact shape
++  // that re-creates the re-bindable hint. It only ever keeps an extra COPY, never
++  // changing correctness. (A distinct manifestation, where the allocator binds a
++  // *pure-virtual* value — no $rcN copy at all — to a clobbered $rc pair, is an
++  // RA-assignment defect this coalescer guard cannot target; see the plan.)
++  if (NewRC == &MOS::Imag16RegClass && (DstSubReg || SubReg)) {
++    if (copiedFromClobberedPhysImag(MI->getOperand(0).getReg(), MRI, LIS) ||
++        copiedFromClobberedPhysImag(MI->getOperand(1).getReg(), MRI, LIS))
++      return false;
++  }
++
+   // Don't coalesce Imag8 and AImag8 registers together when used by shifts or
+   // rotates.  This may cause expensive ASL zp's to be used when ASL A would
+   // have sufficed. It's better to do arithmetic in A and then copy it out.
+diff --git a/llvm/test/CodeGen/MOS/coalesce-rc-undef.mir b/llvm/test/CodeGen/MOS/coalesce-rc-undef.mir
+new file mode 100644
+index 000000000..135a2c554
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/coalesce-rc-undef.mir
+@@ -0,0 +1,28 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=register-coalescer %s -o - | FileCheck %s
++
++# A value read straight out of an imaginary return register ($rc3) that is then
++# clobbered by a call it stays live across, folded into an Imag16 pair via a
++# sub-register COPY. Coalescing the COPY pulls the `COPY $rc3` def into the pair, so
++# the allocator re-binds the pair to $rc3 across the call's clobber -> a use of $rc3
++# with no reaching def (MachineVerifier: "Using an undefined physical register"). The
++# coalescer must KEEP the COPY (MOSRegisterInfo::shouldCoalesce).
++--- |
++  define void @dont_coalesce_clobbered_rc_into_pair() { ret void }
++  declare void @g()
++...
++---
++name: dont_coalesce_clobbered_rc_into_pair
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rc3
++    ; CHECK: [[V:%[0-9]+]]:imag8 = COPY $rc3
++    ; CHECK: JSR
++    ; CHECK: undef %{{[0-9]+}}.sublo:imag16 = COPY [[V]]
++    %0:imag8 = COPY $rc3
++    JSR @g, mos_csr, implicit-def $rc3
++    undef %1.sublo:imag16 = COPY %0
++    %1.subhi:imag16 = COPY %0
++    $rc2 = COPY %1.sublo
++    RTS implicit $rc2
++...

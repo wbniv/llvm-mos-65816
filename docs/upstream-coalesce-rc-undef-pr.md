@@ -130,6 +130,26 @@ interference) and is out of scope for this coalescer guard.
 ```
 
 (Requires `#include "llvm/ADT/BitVector.h"` and
-`#include "llvm/CodeGen/LiveIntervals.h"`.) Carried downstream as fork patch
-`0002` (the comprehensive `+mos-a16` codegen patch) plus the lit test as
-`patches/llvm-mos/0015-321-coalesce-rc-undef-test.patch`.
+`#include "llvm/CodeGen/LiveIntervals.h"`.)
+
+The complete, self-contained change (the `copiedFromClobberedPhysImag` helper, the
+`shouldCoalesce` guard, the two includes, and the lit test) is carried as
+**`patches/llvm-mos/0015-321-coalesce-rc-undef.patch`** — generated against and
+verified to apply cleanly to pristine upstream `c798c3141` (`git apply --check`),
+exactly the `0010-coalesce-rotate-ac` model. (It also lands in the comprehensive
+fork patch `0002` for the live in-fork build, as every backend change does.)
+
+## Posting (user-triggered)
+
+Mint a branch off pristine `c798c3141`, apply `0015`, push, and open the PR:
+
+```sh
+# in a fresh pristine llvm-mos clone at c798c3141:
+git checkout -b mos-coalesce-rc-undef c798c3141
+git apply /path/to/patches/llvm-mos/0015-321-coalesce-rc-undef.patch
+git add -A && git commit -m "[MOS] Don't coalesce a call-clobbered imaginary-register value into a pair across the clobber"
+git push wbniv mos-coalesce-rc-undef
+gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-coalesce-rc-undef \
+  --title "[MOS] Don't coalesce a call-clobbered imaginary-register value into a pair across the clobber" \
+  --body-file docs/upstream-coalesce-rc-undef-pr.md   # strip this status block first
+```
