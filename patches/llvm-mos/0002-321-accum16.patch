@@ -5284,10 +5284,21 @@ index 868f6c712..b62986d09 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 8e9b57fc9..d8c220dba 100644
+index 8e9b57fc9..b391a8427 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -156,23 +156,53 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
+@@ -20,8 +20,10 @@
+ #include "MOSInstrInfo.h"
+ #include "MOSMachineFunctionInfo.h"
+ #include "MOSSubtarget.h"
++#include "llvm/ADT/BitVector.h"
+ #include "llvm/ADT/SmallSet.h"
+ #include "llvm/ADT/SmallVector.h"
++#include "llvm/CodeGen/LiveIntervals.h"
+ #include "llvm/CodeGen/LivePhysRegs.h"
+ #include "llvm/CodeGen/MachineBasicBlock.h"
+ #include "llvm/CodeGen/MachineFrameInfo.h"
+@@ -156,23 +158,53 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
    return !PushCount;
  }
  
@@ -5358,7 +5369,7 @@ index 8e9b57fc9..d8c220dba 100644
  }
  
  bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
-@@ -181,11 +211,6 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -181,11 +213,6 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
                                              const TargetRegisterClass *RC,
                                              Register Reg) const {
  
@@ -5370,7 +5381,7 @@ index 8e9b57fc9..d8c220dba 100644
    // Consider the regions in a basic block where a physical register is live.
    // The register scavenger will select one of these regions to spill and mark
    // the physical register as available within that region. Such a region cannot
-@@ -201,19 +226,22 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -201,19 +228,22 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
      errs() << "Register: " << getName(Reg) << "\n";
      report_fatal_error("Scavenger spill for register not yet implemented.");
    case MOS::A:
@@ -5402,7 +5413,7 @@ index 8e9b57fc9..d8c220dba 100644
  
      if (UseHardStack)
        Builder.buildInstr(MOS::PH, {}, {Reg});
-@@ -228,6 +256,62 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -228,6 +258,62 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
        Builder.buildInstr(MOS::LDImag8, {Reg}, {Save});
      break;
    }
@@ -5465,7 +5476,7 @@ index 8e9b57fc9..d8c220dba 100644
    }
    return true;
  }
-@@ -235,18 +319,24 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -235,18 +321,24 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
  bool MOSRegisterInfo::canSaveScavengerRegister(
      Register Reg, MachineBasicBlock::iterator I,
      MachineBasicBlock::iterator UseMI) const {
@@ -5493,7 +5504,7 @@ index 8e9b57fc9..d8c220dba 100644
    bool UseHardStack =
        (Reg == MOS::A || STI.hasGPRStackRegs()) && pushPullBalanced(I, UseMI);
    if (UseHardStack)
-@@ -279,11 +369,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
+@@ -279,11 +371,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
  
    int Idx = MI->getOperand(FIOperandNum).getIndex();
    int64_t Offset = MFI.getObjectOffset(Idx);
@@ -5522,7 +5533,7 @@ index 8e9b57fc9..d8c220dba 100644
  
    if (MFI.getStackID(Idx) == TargetStackID::Default) {
      // All offsets are relative to the incoming SP
-@@ -442,10 +546,25 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -442,10 +548,25 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
        IsLoad ? MI->getOperand(0).getReg() : MI->getOperand(1).getReg();
    int64_t Offset = MI->getOperand(3).getImm();
  
@@ -5551,7 +5562,7 @@ index 8e9b57fc9..d8c220dba 100644
      Register NewBase =
          IsLoad ? MI->getOperand(1).getReg() : MI->getOperand(0).getReg();
      // We can't scavenge a 16-bit register, so this can't be virtual here
-@@ -476,6 +595,69 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -476,6 +597,69 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
      return;
    }
  
@@ -5621,7 +5632,7 @@ index 8e9b57fc9..d8c220dba 100644
    if (MOS::Imag16RegClass.contains(Loc)) {
      if (!IsLoad) {
        // Loc may not be fully alive at this point, which would create uses of
-@@ -515,6 +697,15 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -515,6 +699,15 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
    if (Loc8)
      Loc = Loc8;
  
@@ -5637,10 +5648,66 @@ index 8e9b57fc9..d8c220dba 100644
    assert(Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc));
  
    Register A = Loc;
-@@ -662,6 +853,21 @@ bool MOSRegisterInfo::shouldCoalesce(
+@@ -656,12 +849,77 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
+   return true;
+ }
+ 
++// True if the virtual register Reg's unique definition is a COPY *directly* out of a
++// physical imaginary register ($rcN) — `Reg = COPY $rcN` — and Reg is live across a
++// call that clobbers that same $rcN.
++//
++// $rcN are the calling convention's imaginary (zero-page) argument/return scratch: a
++// libcall passes and returns values in them and clobbers them (via the call's
++// regmask). A `Reg = COPY $rcN` reading such a return value hints Reg back to $rcN.
++// If Reg is then folded into an imaginary-register *pair* (a sub-register copy
++// building an Imag16) that outlives a libcall re-clobbering $rcN, the pair inherits
++// the $rcN hint and the allocator re-binds it to $rcN across the clobber — leaving a
++// use of $rcN with no reaching definition on that path. The value survives in $rcN at
++// runtime so the code is correct, but the IR is ill-formed and the MachineVerifier
++// rejects it ("Using an undefined physical register") — a latent miscompile hazard.
++static bool copiedFromClobberedPhysImag(Register Reg,
++                                        const MachineRegisterInfo &MRI,
++                                        LiveIntervals &LIS) {
++  if (!Reg.isVirtual() || !LIS.hasInterval(Reg))
++    return false;
++  const MachineInstr *Def = MRI.getUniqueVRegDef(Reg);
++  if (!Def || !Def->isCopy())
++    return false;
++  Register Src = Def->getOperand(1).getReg();
++  if (!Src.isPhysical() || !MOS::Imag8RegClass.contains(Src))
++    return false;
++  BitVector Usable;
++  return LIS.checkRegMaskInterference(LIS.getInterval(Reg), Usable) &&
++         !Usable.test(Src.id());
++}
++
+ bool MOSRegisterInfo::shouldCoalesce(
+     MachineInstr *MI, const TargetRegisterClass *SrcRC, unsigned SubReg,
+     const TargetRegisterClass *DstRC, unsigned DstSubReg,
      const TargetRegisterClass *NewRC, LiveIntervals &LIS) const {
    const auto &MRI = MI->getMF()->getRegInfo();
  
++  // Don't fold a value read straight out of a call-clobbered imaginary register
++  // ($rcN, via `vreg = COPY $rcN`) into an imaginary-register *pair* (a sub-register
++  // copy that builds an Imag16) when that value outlives the clobbering call. The
++  // pair inherits the physical-$rcN allocation hint and the allocator re-binds it to
++  // $rcN across the clobber, producing a disconnected def->use the MachineVerifier
++  // rejects ("Using an undefined physical register") — a latent miscompile hazard.
++  // Refusing keeps the COPY so the value gets its own spillable vreg.
++  //
++  // Narrowly gated to stay inert on the common case: it requires (1) a *direct*
++  // `vreg = COPY $rcN` read (unique def), (2) that vreg genuinely live across a call
++  // clobbering $rcN, and (3) a sub-register copy into an Imag16 pair — the exact shape
++  // that re-creates the re-bindable hint. It only ever keeps an extra COPY, never
++  // changing correctness. (A distinct manifestation, where the allocator binds a
++  // *pure-virtual* value — no $rcN copy at all — to a clobbered $rc pair, is an
++  // RA-assignment defect this coalescer guard cannot target; see the plan.)
++  if (NewRC == &MOS::Imag16RegClass && (DstSubReg || SubReg)) {
++    if (copiedFromClobberedPhysImag(MI->getOperand(0).getReg(), MRI, LIS) ||
++        copiedFromClobberedPhysImag(MI->getOperand(1).getReg(), MRI, LIS))
++      return false;
++  }
++
 +  // Don't coalesce two shift/rotate-referenced values together into the A-only Ac
 +  // class. The accumulator is the only register ASL/LSR/ROL/ROR can operate on, so
 +  // an Ac value is pinned to A for its whole live range. When such a value is also

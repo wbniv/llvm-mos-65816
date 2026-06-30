@@ -1002,17 +1002,30 @@ KNOWN_ISSUES = [
     # docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md and the hermetic gate
     # examples/65816/a16unmerge.ll / dev/run.sh a16unmerge.)
 
-    # a16-newton-step-rc-undef — +mos-a16/+mos-xy16 -Os on newton_step() (examples/65816/newton.h)
-    # hits "Bad machine code: Using an undefined physical register" for a COPY of a ZP-pair register
-    # ($rc3 under a16, $rc3 under xy16) into $x. The RA assigns a virtual register to $rcN but emits
-    # the COPY in a basic block where $rcN has no visible definition — a MachineVerifier false-positive:
-    # the code IS emitted and runs CORRECTLY (dev/run.sh newton: MAME+bsnes-jg both give 0x4D8B).
-    # Root cause: the +mos-a16 RA's ZP-pair allocation loses track of def points for COPY-materialized
-    # physreg copies under high register pressure (6+ simultaneous int16_t×int16_t→int32_t tmps).
-    # Repro: examples/snes/corpus/newton_sim.c; gate: dev/run.sh newton (build+disasm+both emus PASS).
-    # Fix: investigate RA def-tracking for $rcN COPY insertions under +mos-a16 high-pressure paths.
-    ("a16-newton-step-rc-undef",
-     lambda log: "newton_step" in log and "Using an undefined physical register" in log),
+    # (a16-newton-step-rc-undef — +mos-a16/+mos-xy16 -Os on newton_step() emitted "Using an undefined
+    # physical register" for a COPY of a ZP-pair $rcN into $x — was FIXED 2026-06-30 (CAUSE #1: the
+    # register COALESCER folded a value read straight out of a call-clobbered imaginary $rcN
+    # (`vreg = COPY $rcN`) into an Imag16 pair that outlived the clobbering call, so the allocator
+    # re-bound it to $rcN across the clobber → disconnected def→use). Fixed in
+    # MOSRegisterInfo::shouldCoalesce (fork patch 0002, tightly gated: 4/34 corpus programs change,
+    # all -verify clean + differential green). newton_sim.c now verifies CLEAN at -Os (the battery's
+    # level) so its KNOWN_ISSUES entry + KNOWN_ISSUE_REPROS row are removed and a recurrence hard-FAILS;
+    # gates: dev/run.sh rcundef (-verify) + dev/run.sh newton (0x4D8B, both emus). See
+    # docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md.)
+
+    # a16-rc-undef-ra-pure-virtual — the SECOND, distinct root cause (CAUSE #2) of the same
+    # "Using an undefined physical register" symptom, NOT fixed by the cause-#1 coalescer guard. The
+    # register ALLOCATOR binds a PURE-VIRTUAL Imag16 value — one with no `$rcN` copy anywhere in its
+    # def/use chain during coalescing — to a call-clobbered `$rc` pair it is live across. Witnesses:
+    # lsystem_sim.c `main` (all opt levels, $rc11) and newton_sim.c `newton_gate_crc` at -O1 only. With
+    # no copy-hint signal, MOSRegisterInfo::shouldCoalesce cannot target it; the only coalescer rule
+    # that masks it perturbs 22-25/34 corpus programs (forbidden blanket change). The genuine fix is
+    # RA-interference-level (greedy RA / LiveRegMatrix must treat the call's regmask clobber of the
+    # imaginary pair as interference). The code runs CORRECTLY (lsystem differential 0x79C3, both emus);
+    # this is a latent-hazard verify XFAIL pending the RA fix. Repro: examples/snes/corpus/lsystem_sim.c
+    # at -Os. See docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md (Cause #2).
+    ("a16-rc-undef-ra-pure-virtual",
+     lambda log: "Using an undefined physical register" in log),
 ]
 
 

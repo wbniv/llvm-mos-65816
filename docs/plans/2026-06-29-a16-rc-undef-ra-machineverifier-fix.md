@@ -1,10 +1,43 @@
 # `a16-*-rc-undef` — fix the `$x = COPY $rcN` "undefined physical register" MachineVerifier failure
 
-**Status:** PLANNED. Root-cause + fix of the long-standing `a16-newton-step-rc-undef` MachineVerifier
-false-positive, now with a **second independent witness** (the #23 L-System demo). The goal is to make
-**both** `newton_sim.c` and `lsystem_sim.c` pass `-verify-machineinstrs` at `-O1`/`-Os` (a16 + xy16) so the
-two `rc-undef` XFAILs can be **dropped** (not papered over) — per the battery's "stress the compiler, never
-work around it" directive.
+**Status:** CAUSE #1 FIXED (2026-06-30, `throwaway/rc-undef-fix` worktree); CAUSE #2 diagnosed + deferred.
+The single `rc-undef` symptom turned out to be **two distinct defects** sharing the same MachineVerifier
+error. Both were proven with an **asserts toolchain** (`build/llvm-mos-asserts`, `-debug-only=regalloc`
+join traces) on a lifted minimal repro (`examples/65816/rcundef.c` = `newton_step`).
+
+**Cause #1 — register-coalescer copy-hint (FIXED).** The coalescer folds a value read **straight out of a
+call-clobbered imaginary register** (`vreg = COPY $rcN`) into an **Imag16 pair** (a sub-register copy) that
+**outlives the clobbering call**; the pair inherits the physical-`$rcN` allocation hint and the allocator
+re-binds it to `$rcN` across the clobber → the disconnected `$x = COPY $rcN` def→use. Fixed in
+**`MOSRegisterInfo::shouldCoalesce`** (fork patch `0002`): refuse exactly that coalesce (direct
+`COPY $rcN` unique-def, live across a call clobbering `$rcN`, into a sub-register of an Imag16). Keeps a
+COPY → the value gets its own spillable vreg. **Correctness-safe by construction** (refusing a coalesce can
+never change a value) and **tightly gated**: it changes only **4 / 34** corpus programs (`newton_sim`,
+`boids_sim`, `raycaster_sim`, `sort-race_sim` — all math-heavy; all stay `-verify` clean + differential
+green), the other 30 are **byte-identical**.
+
+**Cause #2 — register-allocator binding of a pure-virtual value (DEFERRED).** A *different* shape:
+`lsystem_sim.c` (all levels) and `newton_sim.c` **at `-O1`** (in `newton_gate_crc`) bind a **pure-virtual**
+loop/cross-call Imag16 value — one with **no `$rcN` copy anywhere** in its def/use chain during coalescing
+(verified: no `COPY $rcN` in the pre-coalescer MIR) — to a call-clobbered `$rc` pair. The register
+**allocator** chooses this on its own; the coalescer only *enables* it by fattening the live range (which
+is why `-join-liveintervals=false` masks both). With **no copy-hint signal**, `shouldCoalesce` cannot
+target it — the only coalescer rule that "fixes" it is a blanket one that perturbs **22–25 / 34** corpus
+programs (confirmed empirically), which is the forbidden blanket change (lessons #2/#3). The genuine fix is
+**RA-interference-level** (why does greedy RA assign a `$rc` pair to a value live across a call clobbering
+it?) — the "large RA rework" the Risk note anticipated. **Deferred**: `lsystem_sim.c` keeps its
+`KNOWN_ISSUES` XFAIL; `newton_sim.c -O1` is out of the battery's verify surface (everything is `-Os`).
+
+| witness | `-O0` | `-O1` | `-Os` | which cause |
+|---|---|---|---|---|
+| `examples/65816/rcundef.c` (min repro = lifted `newton_step`) | ✅ | ✅ | ✅ | #1 fixed |
+| `newton_sim.c` | ✅ | ⚠️ #2 | ✅ | #1 fixed (`-Os`); `-O1` is #2 |
+| `lsystem_sim.c` | ✅ | ❌ #2 | ❌ #2 | #2 deferred (XFAIL kept) |
+
+`newton_sim.c` at `-Os` is the **ship/verify** level (`tools/a16_fuzz.py` + every demo/corpus build use
+`-Os`); its `-Os` XPASS guard fires → the **newton** XFAIL drops. The newton ROM **changes bytes** (the fix
+refuses a coalesce → different registers) while preserving the value (`0x4D8B`, 5-way differential), so the
+demo is genuinely rebuilt + republished.
 
 ## Context
 
