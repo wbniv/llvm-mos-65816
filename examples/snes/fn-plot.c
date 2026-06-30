@@ -2,7 +2,8 @@
 //
 // Parses four baked expressions with a recursive-descent parser, evaluates each at
 // 128 x-values using soft-float arithmetic, and plots the curve on a BitmapCanvas.
-// Cycles through all four expressions automatically.
+// Consecutive pixels are joined by canvas_line() so steep curves have no gaps.
+// Cycles through all four expressions automatically with an animated title intro.
 //
 // Codegen stress:
 //   Recursive call graph: fn_eval_expr → fn_eval_term → fn_eval_factor → fn_eval_expr
@@ -18,6 +19,7 @@
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"
 #include "snesgfx/text_layer.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/drawable.h"
 #include "snesgfx/vram.h"
@@ -39,14 +41,14 @@ static const uint16_t bg3_pal[4] = {
     SNES_RGB( 0, 24, 28),   // 3: cyan (unused)
 };
 
-// Pixels to draw per frame. 1 pixel/frame → ≤24 000 cycles (worst: "x*x*x*x-x*x"),
-// comfortably under the 44 667-cycle NTSC budget.
-#define PIXELS_PER_FRAME 1u
+// Draw 2 pixels/frame. Each evaluation: ~6 000–18 000 cycles depending on expression.
+// 2 × worst-case ≈ 36 000 < 44 667 NTSC budget. Takes 64 frames (~1 s) per curve.
+#define PIXELS_PER_FRAME 2u
 
 // Pause frames between expressions (≈4 seconds)
 #define PAUSE_FRAMES 240u
 
-// Short display names for each expression (padded to 16 chars)
+// Short display names padded to 16 chars
 static const char * const fn_names[] = {
     "y=x*x-0.5      ",
     "y=x*x*x-x      ",
@@ -54,8 +56,7 @@ static const char * const fn_names[] = {
     "y=x*x*x*x-x*x  ",
 };
 
-// ─── Minimal number formatter ─────────────────────────────────────────────────
-// Write decimal digits of v (≤999) right-justified into 3 chars at dst[0..2].
+// ─── Number formatter (3 digits, leading zeros) ──────────────────────────────
 static void fmt3(char *dst, uint16_t v) {
     dst[0] = (char)('0' + (uint8_t)(v / (uint16_t)100));
     dst[1] = (char)('0' + (uint8_t)((v / (uint16_t)10) % (uint16_t)10));
@@ -71,6 +72,7 @@ typedef struct {
     uint8_t      expr_idx;     // current expression (0..FN_NEXPR-1)
     uint16_t     cur_px;       // next pixel column to draw (0..127; ≥128 = done)
     uint16_t     pause_timer;  // frames spent pausing after curve complete
+    int16_t      prev_py;      // canvas row of the previous column (-1 = none)
 } App;
 
 // ─── App init ────────────────────────────────────────────────────────────────
@@ -86,24 +88,19 @@ static void app_init(App *a) {
     a->expr_idx   = 0;
     a->cur_px     = 0;
     a->pause_timer = 0;
+    a->prev_py    = -1;
 
-    // Upload palette (4 × 2 = 8 bytes, fits handily)
     upq_push_cgram(&a->screen.q, 0, bg3_pal, 0x00u, (uint16_t)sizeof bg3_pal);
 }
 
 // ─── HUD update ──────────────────────────────────────────────────────────────
-// Top row (bar 0): "FN-PLOT  y=x*x-0.5       [1/4]"  (32 chars)
-// Bot row (bar 1): "PX:NNN  [===========         ]"  (32 chars)
 static void hud_update(App *a) {
-    char buf[33];
-    uint8_t i;
+    char buf[21];   // max use: 20-char progress bar + NUL
 
-    // --- Top row ---
-    // "FN-PLOT  " (9) + name[0..15] (16) + " [N/4]" (6) = 31 chars + NUL
+    // Top row: "FN-PLOT  y=x*x-0.5       [1/4]"
     text_clear_bar(&a->text, 0);
     text_puts(&a->text, 0, 0, "FN-PLOT  ");
     text_puts(&a->text, 0, 9, fn_names[a->expr_idx]);
-    // expression index at col 26
     buf[0] = '[';
     buf[1] = (char)('1' + (char)a->expr_idx);
     buf[2] = '/';
@@ -112,34 +109,42 @@ static void hud_update(App *a) {
     buf[5] = 0;
     text_puts(&a->text, 0, 26, buf);
 
-    // --- Bottom row ---
-    // "PX:NNN  [<20-char bar>]  " (32 chars)
+    // Bottom row: "PX:NNN  [====================]"
     text_clear_bar(&a->text, 1);
     text_puts(&a->text, 1, 0, "PX:");
     fmt3(buf, (a->cur_px < (uint16_t)CANVAS_W) ? a->cur_px : (uint16_t)CANVAS_W);
-    text_puts(&a->text, 1, 3, buf);   // 3 digits
+    text_puts(&a->text, 1, 3, buf);
     text_puts(&a->text, 1, 7, "[");
-
     uint8_t filled = (a->cur_px >= (uint16_t)CANVAS_W) ? 20u :
                      (uint8_t)(((uint16_t)a->cur_px * 20u) / (uint16_t)CANVAS_W);
+    uint8_t i;
     for (i = 0; i < 20u; i++) buf[i] = (i < filled) ? '=' : ' ';
     buf[20] = 0;
     text_puts(&a->text, 1, 8, buf);
     text_puts(&a->text, 1, 28, "]");
 }
 
-// ─── Plot one pixel column ────────────────────────────────────────────────────
-static void plot_pixel(App *a, uint16_t px) {
-    // xi: x value in [-2.0, 2.0), step = 4/128 = 0.03125
-    float xi = -2.0f + (float)px * 0.03125f;          /* __floatsisf, __mulsf3, __subsf3 */
-    float yi = fn_eval(a->expr_idx, xi);               /* recursive-descent soft-float */
+// ─── Plot one pixel column, connecting to the previous column ─────────────────
+static void plot_column(App *a, uint16_t px) {
+    // xi in [-2.0, 2.0), step = 4/128 = 0.03125
+    float xi = -2.0f + (float)px * 0.03125f;         /* __floatsisf, __mulsf3, __addsf3 */
+    float yi = fn_eval(a->expr_idx, xi);              /* recursive-descent soft-float */
     // Map y in [-2, 2] → canvas row [0, 127]: py = (2.0 - yi) * 32
-    // Values outside [0,127] are clipped by canvas_plot's unsigned compare.
-    int16_t py = (int16_t)((2.0f - yi) * 32.0f);      /* __subsf3, __mulsf3, __fixsfsi */
-    canvas_plot(&a->canvas, (int16_t)px, py, (uint8_t)1u);
+    int16_t py = (int16_t)((2.0f - yi) * 32.0f);     /* __subsf3, __mulsf3, __fixsfsi */
+
+    if (py >= 0 && py < (int16_t)CANVAS_H) {
+        if (a->prev_py >= 0 && a->prev_py < (int16_t)CANVAS_H && px > 0u) {
+            // Connect to previous column: fills gaps on steep sections
+            canvas_line(&a->canvas, (int16_t)(px - 1u), a->prev_py,
+                        (int16_t)px, py, (uint8_t)1u);
+        } else {
+            canvas_plot(&a->canvas, (int16_t)px, py, (uint8_t)1u);
+        }
+    }
+    a->prev_py = py;
 }
 
-// ─── corpus_result (gate anchor, read by both emulators) ─────────────────────
+// ─── corpus_result (gate anchor) ─────────────────────────────────────────────
 volatile uint16_t corpus_result;
 
 // ─── Main ────────────────────────────────────────────────────────────────────
@@ -147,18 +152,26 @@ int main(void) {
     static App a;
     app_init(&a);
 
-    // Compute the gate CRC before entering the display loop (~9 frames for 64 evaluations).
+    // Title intro card — shown while the gate CRC computes.
+    // Must be added AFTER all demo drawables and BEFORE any demo HDMA.
+    static TitleLayer title;
+    title_begin(&a.screen, &title, "FN-PLOT", "RECURSIVE PARSER");
+
+    // Gate CRC: evaluates fn_exprs[0] at 64 points — runs in ~9 frames during title.
     corpus_result = fn_gate_crc();
+
+    // Hold the title ~1.5 s then fade out into the demo.
+    title_end(&a.screen, &title, 90);
 
     hud_update(&a);
 
     for (;;) {
         if (a.cur_px < (uint16_t)CANVAS_W) {
-            // Draw next pixel(s) of the current curve
+            // Draw PIXELS_PER_FRAME columns left-to-right, connected by lines
             uint8_t k;
             for (k = 0; k < (uint8_t)PIXELS_PER_FRAME; k++) {
                 if (a.cur_px >= (uint16_t)CANVAS_W) break;
-                plot_pixel(&a, a.cur_px);
+                plot_column(&a, a.cur_px);
                 a.cur_px++;
             }
             hud_update(&a);
@@ -170,6 +183,7 @@ int main(void) {
                 a.expr_idx    = (uint8_t)((uint8_t)(a.expr_idx + 1u) % (uint8_t)FN_NEXPR);
                 a.cur_px      = 0;
                 a.pause_timer = 0;
+                a.prev_py     = -1;
             }
             hud_update(&a);
         }

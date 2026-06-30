@@ -127,7 +127,22 @@ All headers live in `examples/snes/snesgfx/`. Include them in the SNES ROM file 
 | `bitmap_canvas.h` | `BitmapCanvas` — 2bpp canvas of N×M tiles, set-pixel + Bresenham + capped DMA | Scatter plots, pixel drawing, line drawing |
 | `text_layer.h` | `TextLayer` — **2-row HUD only** (TEXT_NROWS = 2); font8.h glyphs into BG3 tilemap | Two HUD bars (top + bottom) |
 | `sprite_set.h` | `SpriteSet` — OAM sprite manager | Sprites |
+| `title_layer.h` | `TitleLayer` + `title_begin()`/`title_end()` — animated fly-in intro card on BG2 (the universally free layer); shimmer + fade | **Required for every demo** — wrap the gate-CRC startup call inside title_begin/title_end |
 | `controller.h` | Joypad polling helpers | Interactive demos |
+
+**TitleLayer — required for every demo.** Every demo must show the animated title card while the gate CRC computes at startup. The canonical pattern (from `n-body.c`):
+
+```c
+#include "snesgfx/title_layer.h"
+// in main():
+static TitleLayer title;
+title_begin(&a.screen, &title, "DEMO NAME", "SUBTITLE");   // fly-in + fade-up
+corpus_result = <slug>_gate_crc();                         // runs during title hold
+title_end(&a.screen, &title, 90);                          // ~1.5 s dwell then fade-out
+// main display loop starts here (brightness ramps back up on first frames)
+```
+
+Call `title_begin` **after** `display_add()` for all demo drawables, and **before** any demo-specific HDMA is armed. `title_end` tears down the card and fades into the demo.
 
 **`TextLayer` limitation:** it only supports 2 HUD rows. For full-screen text (e.g. a
 digit display covering 27+ rows), write a **custom Drawable** — see the `PiHud` pattern in
@@ -305,11 +320,16 @@ Table: asset → from → used for.
 3. Corpus slice host-compiles; ./a.out exits 0.
 4. `dev/run.sh <slug>` — host oracle + disasm gate + bsnes-jg + MAME all PASS.
 5. `dev/run.sh corpus-a16` — all slices PASS.
-6. **Title card** — copy the gate's `build/<slug>-jg.png` to `docs/plans/screenshots/<slug>.png`,
-   embed it under the H1 (the `<img>` slot above), and confirm it shows the demo running.
-   This is the **same** artifact passed to /snes-rom-page as `--preview` — one render, two uses.
-7. /snes-rom-page publishes; headless screenshot shows the ROM running.
-8. `task md -- docs/plans/...` renders cleanly (the title card resolves).
+6. **Title intro card** — inspect `build/<slug>-jg.png` (the bsnes-jg frame-500 snapshot):
+   confirm the **demo animation is running** (not a blank or frozen screen), AND that the
+   demo's `TitleLayer` intro card appeared during startup (the bsnes-jg render at frame 500
+   should show the main demo — the title has already faded by then; if it shows a blank
+   canvas with only the HUD, the title or the animation is missing from the ROM).
+7. **Plan title card** — copy `build/<slug>-jg.png` → `docs/plans/screenshots/<slug>.png`,
+   embed it under the H1 `<img>` slot, confirm it shows the demo running.
+   This is the **same** artifact passed to /snes-rom-page as `--preview`.
+8. /snes-rom-page publishes; headless screenshot shows the ROM running.
+9. `task md -- docs/plans/...` renders cleanly (the title card resolves).
 ```
 
 Add a `[wip]` TODO entry under "Compiler stress-test demo battery" in `TODO.md` with a
@@ -540,20 +560,27 @@ dev/run.sh corpus-a16
 
 All slices must PASS. If any regress, investigate before proceeding.
 
-### 9 — Publish
+### 9 — Publish (two-stage)
 
-First **land the title card** — one render, two uses. The gate leaves `build/<slug>-jg.png`
-(the full-colour bsnes-jg frame-500 snapshot); MAME's `build/<slug>-mame.png` is often blank
-(MAME leg SKIPs env-wide), so prefer the `-jg.png` render for both the plan and the web page:
+**Stage A — publish the default-8-bit ROM first.** Build without any `+mos-a16`/`+mos-xy16`
+flags and publish immediately so the demo is live while the full differential verification runs:
 
 ```bash
-cp build/<slug>-jg.png docs/plans/screenshots/<slug>.png   # → the plan's title card (step 6)
+# Build default-8-bit
+"$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 -Os \
+  -Wl,-Map="build/<slug>-default.map" -o "build/<slug>-default.sfc" \
+  "examples/snes/<slug>.c"
+python3 tools/snes-checksum.py "build/<slug>-default.sfc" >/dev/null
 ```
 
-Then invoke `/snes-rom-page` with that **same** PNG as the preview / web title card:
-
+Then land the plan title card from the bsnes-jg render of the full gate run (which built +mos-a16):
+```bash
+cp build/<slug>-jg.png docs/plans/screenshots/<slug>.png
 ```
---rom build/<slug>.sfc
+
+Invoke `/snes-rom-page` with the **default-8-bit ROM** as the initial publish:
+```
+--rom build/<slug>-default.sfc
 --slug <slug>
 --site ~/SRC/biohack.net
 --title "<Display Title>"
@@ -561,10 +588,27 @@ Then invoke `/snes-rom-page` with that **same** PNG as the preview / web title c
 --selfcheck "0x<VMA> 2 0x<EXPECT> 500 <label>"
 ```
 
-`VMA` (WRAM offset of `corpus_result`):
+`VMA`: get the offset from the **+mos-a16** map (the default-8-bit map has the same symbol):
 ```bash
 awk '$NF=="corpus_result"{print $1; exit}' build/<slug>.map
 ```
+
+**Stage B — after all emulator legs verified, re-publish the +mos-a16 ROM.** Once the full
+5-way differential gate has confirmed host == default == +mos-a16 == +mos-xy16 on both MAME
+and bsnes-jg, overwrite the published ROM with the optimised +mos-a16 build:
+
+```
+/snes-rom-page
+  --rom build/<slug>.sfc        ← the +mos-a16 build from the gate run
+  --slug <slug>
+  --site ~/SRC/biohack.net
+  --title "<Display Title>"
+  --preview build/<slug>-jg.png
+  --selfcheck "0x<VMA> 2 0x<EXPECT> 500 <label>"
+```
+
+This re-runs scaffold.sh which overwrites `public/play/roms/<slug>.sfc` and rebuilds the manifest,
+then the site redeploys with the stress-tested ROM. The page URL and selfcheck are unchanged.
 
 ### 10 — Close out
 
