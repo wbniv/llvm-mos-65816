@@ -159,31 +159,47 @@ int main(void) {
     static int16_t xr[FFT_N], xi[FFT_N];
     static int16_t new_bars[NBINS];
 
+    // Draw the first bin immediately
+    gen_signal(xr, xi, a.cur_bin, 0);
+    fft_run(xr, xi);
+    compute_bars(xr, xi, new_bars);
+    canvas_clear(&a.canvas);
+    for (uint8_t b = 0u; b < (uint8_t)NBINS; b++) {
+        int16_t h = new_bars[b];
+        if (h <= 0) continue;
+        int16_t x0 = (int16_t)((uint16_t)b * (uint16_t)BAR_W);
+        uint8_t color = (h > 96) ? 3u : 2u;
+        for (int16_t y = (int16_t)(CANVAS_H - h); y < (int16_t)CANVAS_H; y++)
+            for (uint8_t dx = 0u; dx < (uint8_t)BAR_W; dx++)
+                canvas_plot(&a.canvas, (int16_t)(x0 + (int16_t)dx), y, color);
+    }
+
     for (;;) {
-        // Generate signal and compute FFT
+        // Run FFT every frame for the compiler stress test (corpus_result proved
+        // correctness at startup; the gate CRC ran during the title animation).
+        // We still compute the spectrum here so the multiply hot-path runs continuously.
         gen_signal(xr, xi, a.cur_bin, a.phase);
         fft_run(xr, xi);
-        compute_bars(xr, xi, new_bars);
-
-        // Render bars (erase old via canvas_clear, draw new)
-        canvas_clear(&a.canvas);
-        for (uint8_t b = 0u; b < (uint8_t)NBINS; b++) {
-            int16_t h = new_bars[b];
-            if (h <= 0) { a.bar_h[b] = 0; continue; }
-            int16_t x0 = (int16_t)((uint16_t)b * (uint16_t)BAR_W);
-            uint8_t color = (h > 96) ? 3u : 2u;  // tall bars get accent color
-            for (int16_t y = (int16_t)(CANVAS_H - h); y < (int16_t)CANVAS_H; y++)
-                for (uint8_t dx = 0u; dx < (uint8_t)BAR_W; dx++)
-                    canvas_plot(&a.canvas, (int16_t)(x0 + (int16_t)dx), y, color);
-            a.bar_h[b] = h;
-        }
-
-        a.phase = (uint8_t)(a.phase + 4u);  // slow phase rotation
+        a.phase = (uint8_t)(a.phase + 4u);
 
         a.hold++;
         if (a.hold >= (uint16_t)N_HOLD) {
+            // Advance bin: recompute bars + redraw canvas.
+            // canvas_clear marks all 256 tiles dirty; emit flushes 64/frame → 4 frames
+            // to complete. N_HOLD=60 >> 4, so the full canvas is visible before next change.
             a.cur_bin = (uint8_t)(a.cur_bin < (uint8_t)(NBINS - 1u) ? a.cur_bin + 1u : 1u);
-            a.hold = 0u;
+            a.hold    = 0u;
+            compute_bars(xr, xi, new_bars);
+            canvas_clear(&a.canvas);
+            for (uint8_t b = 0u; b < (uint8_t)NBINS; b++) {
+                int16_t h = new_bars[b];
+                if (h <= 0) continue;
+                int16_t x0 = (int16_t)((uint16_t)b * (uint16_t)BAR_W);
+                uint8_t color = (h > 96) ? 3u : 2u;
+                for (int16_t y = (int16_t)(CANVAS_H - h); y < (int16_t)CANVAS_H; y++)
+                    for (uint8_t dx = 0u; dx < (uint8_t)BAR_W; dx++)
+                        canvas_plot(&a.canvas, (int16_t)(x0 + (int16_t)dx), y, color);
+            }
             hud_top(&a);
         }
 
