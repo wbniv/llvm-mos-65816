@@ -93,6 +93,9 @@ coalescer leaves the dead copies as separate vregs the dead-MI pass then removes
 refuses a coalesce → different registers) while preserving the value (`0x4D8B`, 5-way differential), so the
 demo is genuinely rebuilt + republished.
 
+**Durable record (the standalone write-up of the whole two-cause arc):**
+[`docs/investigations/2026-06-30-65816-a16-rc-undef-two-causes.md`](../investigations/2026-06-30-65816-a16-rc-undef-two-causes.md).
+
 ## Context
 
 Under `+mos-a16`/`+mos-xy16` at `-O1`/`-Os`, high-register-pressure functions emit a
