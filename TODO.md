@@ -500,11 +500,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     division** (centre-biased ~log depth) not a backtracker DFS — the 65816's 256-byte HW stack can't hold a DFS's
     O(N) recursion depth (measured: ~6 B/level × 199 deep ≫ 256). On-screen A* matches host (`expanded=112 path=37`,
     seed `0xC0DE`). **PUBLISHED** [biohack.net/snes/maze/](https://biohack.net/snes/maze/) (v1.0.113); MAME leg still pending the SPC700 IPL (non-blocking).
-  - [wip] **#16 Wireframe 3-D solid** — 3×3 matrix mul + perspective **divide** + Bresenham; shows a spinning solid.
-    **PLAN WRITTEN** ([plan](docs/plans/2026-06-27-16-snes-wireframe-3d-solid.md)) — direct successor to #11:
-    reuses the whole `snesgfx` frame + `canvas_line`/`canvas_plot`; only-new code is `examples/65816/wire3d.h`
-    (rotation matrix + perspective divide + polyhedron tables). Stays NEAR → full 5-way bar. Publishes to
-    [biohack.net/3d-wireframe/](https://biohack.net/3d-wireframe/).
+  - [x] ~~**#16 Wireframe 3-D solid** — 3×3 matrix mul + perspective **divide** + Bresenham; spinning solid.~~ ✓ source **RECREATED** (`4689940`; the original was built on a throwaway worktree + never committed, so the source was lost) strictly to the plan: `wire3d.h` (rotation matrix + perspective `__divsi3` + tetra/cube/octa/icosa tables) + `wireframe.{h,c}` + 2 corpus slices + gate. Gate `0xE737` host==default==a16==xy16 on bsnes-jg, disasm `__mulsi3`+`__divsi3`+rep/sep, `-verify` clean (a16+xy16). Republished [/snes/3d-wireframe/](https://biohack.net/snes/3d-wireframe/) ([plan](docs/plans/2026-06-27-16-snes-wireframe-3d-solid.md))
   - [x] ~~**#19 π spigot + Monte-Carlo** — multi-precision **carry chains** + div/mod + rng; shows digits + dart scatter.~~
   - [x] ~~**#20 Bignum factorial/Fibonacci** — multi-precision **carry propagation**; shows the giant number on screen.~~
   - [x] ~~**#21 Soft-Float Mandelbrot** (Round 2) — escape-time `z²+c` in **IEEE-754 single-precision `float`**: every op a soft-float libcall (`__mulsf3`/`__addsf3`/`__subsf3`/`__divsf3`/`__gtsf2`/`__floatsisf`), the library no Round-1 demo touches. **Bit-exact** host==default==a16==xy16 `0x4169` (FMA forbidden by one-op-per-statement); disasm `__mulsf3=8`/`__add-subsf3=12`/`rep-sep=35`. No compiler bug — soft-float codegen correct across all modes.~~ ✓ [/snes/mandel-float/](https://biohack.net/snes/mandel-float/) ([plan](docs/plans/2026-06-29-21-snes-mandel-float-softfloat.md))
