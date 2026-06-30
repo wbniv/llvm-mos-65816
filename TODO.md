@@ -104,30 +104,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
-- [wip] **FORK REGRESSION — `0002` indexed-addressing use-replacement crosses a block boundary
-  (`-verify-machineinstrs` "defs don't dominate all uses").** **ROOT-CAUSED + FIX VERIFIED + COMMITTED
-  on branch `wt/fix-legalizer-indexed-domination` (`8c928b8`, worktree
-  `~/SRC/llvm-mos-65816-legalfix`) 2026-06-29; MERGE to `main` + shared-toolchain rebuild + full gates
-  PENDING (coordinate — do not run two concurrent toolchain builds).** A fold-while-walk
-  loop (`came[cell]` consumed both as a folded value AND as a signed-`int8_t`-table index, with an
-  early-`break` diamond) trips it. **Root cause:** `0002`'s seed-56 workaround in
-  `MOSLegalizerInfo::tryAbsoluteIndexedAddressing` builds `Explicit16 = G_MERGE(trunc(NewOffset),
-  G_CONSTANT 0)` **at the `G_PtrAdd`'s (body) block** and replaces *all* uses of `NewOffset` — but that
-  value is also the `h ^ came` operand in the loop **header**, so the body-defined MERGE is referenced
-  in a sibling block. (The earlier "shared `G_CONSTANT 0` CSE" framing was a red herring;
-  `legalizeSExt` is upstream-identical.) Bisect: `0001` clean, `0001+0002` reproduces. **NOT UPSTREAM**
-  (`c798c31` unpatched is clean). **NOT a miscompile** (`-verify`-off ROM is correct); blocks `-verify`
-  builds. **Fix (1 site, in `0002`):** insert the trunc/zext at `NewOffset`'s SSA definition (dominates
-  every use) instead of at the `G_PtrAdd`. Verified on an isolated `0001+0002` bisect toolchain:
-  `-verify` clean all 3 modes; no miscompile (varied-`came` differential == host on bsnes-jg, all 3
-  modes); 285-compile `-verify` sweep → 0 new failures. **Done on the branch:** regenerated `0002`
-  (fix only, 0 foreign hunks), positive `-verify` regression gate
-  (`examples/65816/legalindexdom.c` + `dev/legalindexdom.sh`, asserts clean all 3 modes), spike header
-  → FIXED. **Next (on merge):** rebuild the shared toolchain + run full gates (corpus, corpus-a16,
-  csmith fuzzer), then merge to `main`; optionally un-work-around `maze.h`'s two-pass split (per the
-  "stress the compiler, never work around it" directive). Repro + analysis:
-  [`docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c`](docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c).
-  **Do NOT file upstream** (fork-internal fix).
+- [ ] **Un-work-around `maze.h`'s two-pass split** now that the legalizer indexed-addr domination
+  fix is live (`fb528d8`). `examples/65816/maze.h` splits the fold-while-walk loop into
+  `maze_path_build` + `maze_fold_path` purely to dodge the old `-verify` abort; the single
+  fold-while-walk loop should now compile `-verify`-clean (the `legalindexdom` gate proves the shape).
+  Re-fold, re-gate (maze `0x0749` must hold or be re-baselined), per the "stress the compiler, never
+  work around it" directive. Low priority (the demo is correct either way).
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
   "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
   on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`
@@ -741,6 +723,7 @@ revisit) rather than active work._
 
 ## Done
 
+- 2026-06-29 — [fix-legalizer-indexed-domination] **FORK REGRESSION FIXED + MERGED — `0002` indexed-addressing use-replacement crossed a block boundary (`-verify-machineinstrs` "defs don't dominate all uses").** A fold-while-walk loop (a `uint8_t` array read both as a folded value AND a signed-`int8_t`-table index, with an early-`break` diamond — the maze demo's shape) tripped it. **Root cause:** `0002`'s seed-56 workaround in `MOSLegalizerInfo::tryAbsoluteIndexedAddressing` built `Explicit16 = G_MERGE(trunc(NewOffset),0)` **at the `G_PtrAdd`'s body block** and replaced *all* uses of `NewOffset`, but that value is also used in the loop **header** → body-defined MERGE referenced in a sibling block. **Fix (1 site):** insert the trunc/zext at `NewOffset`'s SSA def (dominates every use). Bisected `0001` clean / `0001+0002` repro; **NOT upstream** (`c798c31` clean) and **NOT a miscompile** (`-verify`-off ROM correct) — but blocked `-verify` builds (forced the maze two-pass split, now a low-pri un-work-around follow-up). Worked on a dedicated branch (`wt/fix-legalizer-indexed-domination` `8c928b8`), shared toolchain rebuilt + merged `fb528d8`. Verified post-rebuild: new `legalindexdom` `-verify` gate clean default/+mos-a16/+mos-xy16; bsnes-jg sweep 6/6 (maze `0x0749`, pi `0x7711`, spirograph `0x32D4`, epicycles `0x4F6C`, n-body `0xCC65`, dbl-pendulum `0xE859`) all host==+mos-a16 (MAME corpus SKIP — no SPC700 IPL). Gate `examples/65816/legalindexdom.c` + `dev/legalindexdom.sh`. Repro/analysis: [spike](docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c).
 - 2026-06-29 — [snes-turtle-vm] **#29a Bytecode-VM Turtle SNES demo — jump-table + function-pointer dispatch.** A stack-machine bytecode interpreter drawing LOGO turtle graphics: the main `switch(op)` over a dense opcode range lowers to **`JMP (abs,X)` jump-table dispatch** (the JMPIdxIndir path the xy16 `requiredXWidth` hardening singled out) and the ALU ops dispatch through a `static const` **function-pointer opcode table** (`jsr __call_indir`) — the indirect/computed control-flow corners no other demo runs. Integer fixed-point (Q8.8 + SINCOS LUT) ⇒ bit-exact; near fnptrs + bank-0 data ⇒ 5-way. corpus gate `0x4007` (180-segment program); `dev/run.sh turtle-vm` RESULT PASS (disasm jump-table=1 + `__call_indir`=1 + `__mulsi3`=2 + rep/sep=155; bsnes-jg host==+mos-a16 `0x4007`); 5-way confirmed host==default==a16==xy16 on bsnes-jg, `-verify` clean — a live cross-mode confirmation of the JMPIdxIndir fix (MAME SKIP — no SPC700 IPL, demos-only non-blocker). Draws a woven multi-colour spiral rosette = the visual proof; **no bug**. Published [biohack.net/snes/turtle-vm/](https://biohack.net/snes/turtle-vm/) (`v1.0.130`). [plan](docs/plans/2026-06-29-29a-snes-turtle-vm-bytecode.md)
 - 2026-06-29 — [snes-boids] **#26 Boids Flock SNES demo — struct-by-value / aggregate-return ABI.** Reynolds flocking on a `vec2 {int16_t x,y}` VALUE type whose steering kernel (`v2_add`/`v2_sub`/`v2_scale` + `separation`/`alignment`/`cohesion`) takes/returns the struct by value, `noinline` so the O(N²)/frame calls survive `-Os` — the small-struct register-pair-vs-`sret` return path no other demo exercises. Integer fixed-point (Q12.4) ⇒ bit-exact; far-pointer-free ⇒ 5-way. corpus gate `0xA8AB` (8-bird flock, 12 steps); `dev/run.sh boids` RESULT PASS (disasm by-value-calls=497 + `__mulsi3`=6 + `__divsi3`=4 + rep/sep=103; bsnes-jg host==+mos-a16 `0xA8AB`); 5-way confirmed host==default==a16==xy16 on bsnes-jg, `-verify` clean (MAME SKIP — no SPC700 IPL, demos-only non-blocker). Flock coloured by heading octant (aligned birds share a hue → coherent streams) = the visual proof; **no bug** — aggregate-return ABI correct in all modes. Published [biohack.net/snes/boids/](https://biohack.net/snes/boids/) (`v1.0.128`). [plan](docs/plans/2026-06-29-26-snes-boids-struct-abi.md)
 - 2026-06-29 — [snes-title-hdma-pixel-center] **Title intro: slow the fly-in + pixel-centre each line via HDMA.** Two user reports on the shared `snesgfx/title_layer.h`: (1) the vertical fly-in was too fast to see — swapped the exponential `>>3` ease for a constant slow velocity (`TITLE_FLY_STEP=3`, ~12-13 rows over ~70 frames ≈ 1.15 s), spin cap 48→96; (2) tile-grid centring leaves odd-length lines 4 px off — added per-line PIXEL centring by streaming `BG2HOFS` per scanline via new reusable `snesgfx/hdma_hscroll.h` (2-band write-twice HDMA, channel 3, table in low-WRAM bss). Static table (split in the blank gap row, scanline 108, to dodge the 1-line HDMA value-settle shear); separates the two lines for the whole fly-in so no per-frame rebuild. Verified on `life` (mixed parity CONWAY LIFE 11-odd / GLIDER GUN 10-even): gate `0xDDF1` unchanged (gate-neutral), diff vs `-DTITLE_PIXEL_CENTER_OFF` shows CONWAY LIFE shifted **exactly +4 px**, GLIDER GUN **zero** diff (independent per-line, no artifact), `-verify-machineinstrs` clean. [plan](docs/plans/2026-06-29-snes-title-hdma-pixel-center-slow-flyin.md)
