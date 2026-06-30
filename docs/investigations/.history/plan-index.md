@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b9e7b8c) | docs(plan-index): add #25 FFT row (188 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8f275e0) | docs(plan-index): add title_layer 16×16 font row (186 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4c7c9de) | docs(plan-index): add #28 Hilbert row (187 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b4e238a) | docs(plan-index): add #27 cardioid + #30 TEA rows (186 plans) |
@@ -85,6 +86,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+b9e7b8c	author	Will Norris
+b9e7b8c	added	1
+b9e7b8c	deleted	0
+b9e7b8c	files	1
+b9e7b8c	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8f275e0	author	Will Norris
 8f275e0	added	2
 8f275e0	deleted	0
