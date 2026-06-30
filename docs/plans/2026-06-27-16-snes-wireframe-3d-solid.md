@@ -1,5 +1,24 @@
 # #16 — SNES Wireframe 3-D Solid: rotation matrix · perspective divide · Bresenham lines
 
+<p align="center"><img src="screenshots/wireframe.png" width="512" alt="3-D Wireframe Solid spinning on the SNES (bsnes-jg render): a perspective cube with the SOLID / spin / dist HUD"></p>
+
+> **RECREATED & VERIFIED 2026-06-29.** The original source was built on a throwaway `wt/321-wireframe`
+> worktree (per step 0 below), the ROM published, but the `.c`/`.h` were **never committed** — so when
+> the demo battery was rebuilt the source was missing. This recreates it strictly to the spec below.
+> Files: `examples/65816/wire3d.h` (math), `examples/snes/wireframe.{h,c}`, `tools/wire3d-sim.c`,
+> `examples/snes/corpus/wire3d_{sim,ctrl_sim}.c`, `dev/wireframe.{sh,lua}` (+ a `#ifndef` guard on
+> `CANVAS_FLUSH_TILES` so the crisp full-canvas clear+redraw can push 4 KB/v-blank). The recreation's
+> tuning constants differ from the lost original, so the gate hash is **new (`0xE737`, not the lost
+> `0xEF8E`)** — the recreation supersedes the orphaned ROM (manifest `want` updated on republish).
+>
+> **Gate — `dev/run.sh wireframe` PASS:** host oracle `0xE737`; disasm `__mulsi3=12` (3×3 matrix mul) +
+> `__div=2` (perspective `__divsi3`) + `rep/sep=130` (native-16); bsnes-jg `corpus_result==0xE737` (host
+> == +mos-a16); 3× byte-identical (deterministic). **5-way (bsnes-jg legs):** `wire3d_sim` host ==
+> default == +mos-a16 == +mos-xy16 = `0xE737`; `wire3d_ctrl_sim` likewise = `0xE3CD`. `-verify-machineinstrs`
+> clean under +mos-a16 AND +mos-xy16; default-8-bit builds. (MAME legs env-skipped — no SPC700 IPL, as
+> for every demo here.) Gate sized so the slowest build (default-8-bit) sets `corpus_result` by frame 50,
+> inside the corpus runner's 60-frame settle window.
+
 **Status:** PLANNED. Demo **#16** of the **compiler stress-test demo battery**
 ([ideas](../investigations/2026-06-27-compiler-stress-test-demo-ideas.md#L68); `TODO.md` →
 "Compiler stress-test demo battery" → **#16**). Supplements the standing guides (`~/SRC/CLAUDE.md`,

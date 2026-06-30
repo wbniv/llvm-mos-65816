@@ -25,7 +25,11 @@
 #define CANVAS_H       (CANVAS_TILES_H * 8)       /* 128 */
 #define CANVAS_NTILES  (CANVAS_TILES_W * CANVAS_TILES_H)   /* 256 */
 #define CANVAS_TILEBYTES 16                       /* 2bpp: 8 rows x 2 planes */
-#define CANVAS_FLUSH_TILES 64                     /* max tiles DMA'd per frame (64*16 = 1 KB/v-blank) */
+#ifndef CANVAS_FLUSH_TILES
+#define CANVAS_FLUSH_TILES 64                     /* max tiles DMA'd per frame (64*16 = 1 KB/v-blank). */
+#endif                                            /* A demo may #define it higher before include (e.g.   */
+                                                  /* wireframe's crisp full-canvas clear+redraw needs 256 */
+                                                  /* = 4 KB/v-blank, which a real NTSC v-blank can move). */
 
 typedef struct {
   Drawable base;                                  /* member 0 — (Drawable*)&c is a free upcast */
