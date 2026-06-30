@@ -184,7 +184,7 @@ int main(void) {
     // Title overlay (BG2, char base moved to 0x6000 above); held during the gate CRC, then torn
     // down before the automaton scrolls. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
     static TitleLayer title;
-    title_begin(&a.screen, &title, "CELLULAR AUTOMATA", "RULE 90 / 110");
+    title_begin(&a.screen, &title, "CELL AUTOMATA", "RULE 90 / 110");
 
     corpus_result = ca_gate_crc();
     title_end(&a.screen, &title, 110);                            // ~2 s title (consistent on-screen time)
