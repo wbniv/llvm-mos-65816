@@ -58,9 +58,26 @@ split COPYs to an `undef` origin and feeds it into `readsUndefSubreg` (only ever
 **loop-carried**, so the `subhi` subrange's reaching value at the read is a **PHI-def** at the loop header,
 and the tracer conservatively bails on `isPHIDef()`. Proving PHI undef-origin means recursing across **all**
 predecessors **including the loop back-edge** (needs a visited-set + careful slot/lanemask handling) — a
-materially larger and riskier change. Reverted (the generic `VirtRegMap.cpp` edit was isolated to the
-throwaway worktree's vendor; the shipped Release toolchain never carried it). Confirms the fix is a genuine
-generic-LLVM RA undertaking, best done upstream. Until it lands `lsystem_sim.c` keeps
+materially larger and riskier change.
+
+**Second attempt (2026-06-30, "globally undef", reverted).** A `laneGloballyUndef` that scans **all** of a
+sub-range's value numbers (PHIs skipped as forwarders, COPYs traced one hop, cycles cut by a visited-set) —
+sidestepping the loop-PHI problem. Instrumented to log why it bails: for the failing values (`%1759`,
+`%1756`, `%1757`) the bails are **conservative**, *not* genuine real-defs — `%1756` is a **sub-register
+COPY def** (`dstSub=subhi`) the tracer refuses to invert, and `%1759`/`%1757` have a VNInfo whose def slot
+is **valid but maps to no instruction** (`phi=0 defValid=1`, an obscure split-product subrange value). (The
+`STAImag16` real-defs the log also shows belong to *other* vregs, correctly not-undef.) So the fix is
+**close** — the lane really is path-undef and the blockers are tracer conservatism — but finishing it safely
+needs intricate **sub-register lane-mask composition** through subreg COPYs plus handling that obscure
+VNInfo, where a wrong lane computation is a **silent miscompile** the corpus might not exercise. For a
+*code-correct* (verifier-only) defect that trade is wrong, so it was reverted.
+
+Net: three attempts (rewriter path-sensitive; rewriter global; both informed by the SplitKit `defFromParent`
+lane logic) converge on the same conclusion — this is a genuine **generic-LLVM RA feature** (path-sensitive,
+loop-aware, subreg-lane-precise undef propagation), not a safe bounded downstream patch. All edits were
+isolated to the throwaway worktree's `vendor/llvm-mos/llvm/lib/CodeGen/VirtRegMap.cpp` (generic CodeGen, in
+no fork patch) and fully reverted; the shipped Release toolchain never carried any of them. Best done
+upstream. Until it lands `lsystem_sim.c` keeps
 its `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]` XFAIL and `newton_sim.c -O1` is out of the battery's
 verify surface (everything is `-Os`). (`-join-liveintervals=false` masks it only because disabling the
 coalescer leaves the dead copies as separate vregs the dead-MI pass then removes.)
