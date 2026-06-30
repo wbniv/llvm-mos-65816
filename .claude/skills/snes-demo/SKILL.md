@@ -23,6 +23,46 @@ discipline) before starting.
 
 ---
 
+## ⚠️ The whole point: stress-test the compiler — NEVER work around it
+
+These demos exist to **exercise the C compiler we built** (`vendor/llvm-mos`, the `+mos-a16`/`+mos-xy16`
+backend) and **surface its bugs**. The visual is just a witness. So when the toolchain misbehaves, the
+default is **isolate → diagnose → fix it in the compiler (and prepare an upstream patch when warranted)** —
+**not** reshape the demo to dodge it.
+
+**The differential gate is the arbiter.** The host-computed value (`tools/<slug>-sim`, native `int`/IEEE)
+is **ground truth**. If `host != default@MAME != +mos-a16 != +mos-xy16 != bsnes-jg`, or
+`-verify-machineinstrs` fails, or the assembler/linker errors, or the ROM crashes — that is a **compiler
+defect**, full stop. It is the *success condition* of a stress-test demo, not an obstacle.
+
+**FORBIDDEN — "making the gate green" by changing the demo:** adding a cast, reordering/splitting an
+expression, swapping an operator or width, adding `volatile`, lowering `-Os`→`-O0`, marking things
+`noinline` *to avoid a miscompile* (vs. to preserve a realistic call shape), shrinking `GATE_N` past the
+point the bug fires, or otherwise avoiding the construct that triggers it. All of these **hide** the very
+bug the demo was built to catch. Don't.
+
+**The protocol when the gate disagrees (or `-verify`/assembler/crash):**
+1. **Reproduce + shrink** to a minimal micro-test (the `examples/snes/corpus/*_sim.c` / micro-test pattern
+   in `docs/agent-handoff.md`) — the smallest C that still diverges host vs target. `cvise` if needed.
+2. **Diagnose** in the backend (`vendor/llvm-mos`): read the disasm, find the wrong instruction/legalization,
+   identify the pass/pattern. Confirm with `-verify-machineinstrs` and a byte diff.
+3. **Fix in the compiler**, rebuild (`dev/run.sh toolchain` — watch the stale-`clang-23` gotcha), and prove
+   `host == default == a16 == xy16` again on the *unaltered* demo.
+4. **Regenerate the patch** (`dev/regen-patch.sh` → `patches/llvm-mos/0002-321-accum16.patch`) and **queue
+   the upstream contribution** in `docs/upstream-contribution-status.md` (a minimal repro + the fix) when
+   the bug is in-scope and warranted. Add a regression micro-test to the corpus.
+5. Only then continue the demo on the corrected toolchain.
+
+**The one legitimate exception — bugs in the demo's OWN code, not the compiler.** A defect in the *renderer*
+(e.g. a degenerate Mode-7 matrix that collapses the image, a DMA outside V-blank, an off-by-one in a tile
+address) is a demo bug → fix it in the demo. The test: does the **differential** still hold
+(`host == target`)? If yes, the computation is correct and you're looking at a display bug — fix the
+display. If the differential *breaks*, it's the compiler — go to the protocol above. (Precedent: the #21/#22
+Mode-7 collapses were demo-code bugs with the gate fully green; the raycaster `int32` overflow + the `0001`
+far-index miscompile were real compiler bugs caught by the gate and fixed in the backend.)
+
+---
+
 ## Inputs
 
 Gather these before writing a line of code:
@@ -477,12 +517,18 @@ Wire into `Taskfile.yml`:
 dev/run.sh <slug>
 ```
 
-**Failure triage:**
-- `SHOT: FAIL off=X len=Y got=0x0000` → `corpus_result` not set before the frame count expires.
-  Reduce `GATE_N` or increase `--seconds_to_run` in the gate script.
-- Disasm probe FAIL → compiler inlined/eliminated the hot call. Add
-  `__attribute__((noinline))` to the hot function, or increase `GATE_N`.
-- bsnes-jg mismatch → real miscompile (or stale build — run `dev/run.sh toolchain` first).
+**Failure triage** (distinguish *harness* failures from *compiler* failures — the latter is the prize, see
+the ⚠️ section at the top):
+- `SHOT: FAIL off=X len=Y got=0x0000` → harness timing: `corpus_result` not set before the frame count
+  expires. Reduce `GATE_N` or increase `--seconds_to_run` / the snapshot frame. (Not a compiler bug.)
+- Disasm probe FAIL → the codegen corner you wanted isn't present (compiler inlined/eliminated the hot
+  call, or constant-folded it). Restore a realistic shape (`noinline`, a runtime operand so it can't fold)
+  or raise `GATE_N`. (Not a compiler bug — but if the op vanished due to a *wrong* transform, see below.)
+- **bsnes-jg mismatch, or `default`/`a16`/`xy16` disagree, or `-verify-machineinstrs` fails, or an
+  assembler/linker error, or a crash → a REAL COMPILER BUG** (after ruling out a stale build —
+  `dev/run.sh toolchain` first). **Do NOT edit the demo to make it pass.** Follow the isolate → diagnose →
+  fix-in-`vendor/llvm-mos` → regen-patch → queue-upstream protocol in the ⚠️ section above. This is the
+  demo doing its job.
 
 Fill in `EXPECT` in the plan doc after the first successful run.
 
