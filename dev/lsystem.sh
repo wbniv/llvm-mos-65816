@@ -4,9 +4,14 @@
 # host oracle (tools/lsystem-sim.c):
 #   * bsnes-jg — dev/jgxcheck.cpp dumps its framebuffer + asserts.
 #   * MAME     — under Xvfb, dev/lsystem.lua snapshots + asserts.
-# Plus a disasm gate proving the 64-bit hash hot loop has __muldi3 + 64-bit shift + __udivdi3 + rep/sep.
+# Plus a disasm gate proving the string-rewrite hot loop has memmove + memcpy + strlen + rep/sep.
 # The full 5-way differential (host==default==+mos-a16==+mos-xy16) is the corpus slice (lsystem_sim.c)
 # gate, run by dev/run.sh corpus-a16.
+#
+# The on-console ROM additionally records the plant's segments into a FAR buffer at $7E2000 and replays
+# them progressively (the plant grows stroke by stroke) — exercising the +mos-a16 far-pointer store+load
+# path. That far path is display-only (the corpus slice stays far-pointer-free / 5-way); its correctness
+# is proven by the picture: a far miscompile scrambles the replayed segments and the plant breaks.
 #
 # Drive: dev/run.sh lsystem. Outputs build/lsystem-{jg,mame}.png.
 set -euo pipefail

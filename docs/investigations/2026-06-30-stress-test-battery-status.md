@@ -32,7 +32,7 @@ gitignored SPC700 IPL; the bsnes-jg leg + the 4-way corpus differential carry co
 |---|------|--------------------|----------|---------|
 | 21 | [mandel-float](https://biohack.net/snes/mandel-float/) | soft-float IEEE-754 (`__mulsf3`/`__divsf3`/…) | `0x4169` | green, no bug |
 | 22 | [avalanche](https://biohack.net/snes/avalanche/) | 64-bit integers (`__muldi3`/`__udivdi3`/…) | `0x27EA` | green, no bug |
-| 23 | [lsystem](https://biohack.net/snes/lsystem/) | string libcalls (`memmove`/`memcpy`/`strlen`) | `0x79C3` | **found+fixed** xy16 in-place-memmove miscompile |
+| 23 | [lsystem](https://biohack.net/snes/lsystem/) | string libcalls (`memmove`/`memcpy`/`strlen`); + far-ptr store/load reveal | `0x79C3` | **found+fixed** xy16 in-place-memmove miscompile |
 | 24 | [fn-plot](https://biohack.net/snes/fn-plot/) | recursive-descent parser + soft-float | `0x2EBE` | green, no bug |
 | 25 | [fft](https://biohack.net/snes/fft/) | FFT butterfly `__mulsi3` + bit-reversal | `0x6D7A` | green; display bug found+fixed (not codegen) |
 | 26 | [boids](https://biohack.net/snes/boids/) | by-value struct ABI (sret vs reg-pair) | `0xA8AB` | green, no bug |

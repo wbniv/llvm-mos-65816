@@ -184,3 +184,26 @@ biohack.net commit `acfe4bb`, tag `v1.0.136` — deployed to Cloudflare Pages. L
 
 PASS
 8. `task md -- docs/plans/2026-06-29-23-snes-lsystem-string-rewriting.md` renders cleanly.
+
+## Addendum (2026-06-30) — progressive-growth + far-pointer reveal upgrade
+
+The originally-shipped ROM drew the whole plant in a single startup interpretation pass and then held
+it static. Two changes (gate value unchanged at `0x79C3`):
+
+1. **Progressive growth.** The startup `lsystem_interp` pass now RECORDS every F-segment (5 bytes:
+   x0,y0,x1,y1,col) into a **far buffer at `$7E2000`** via an `emit` callback, and folds the CRC into
+   `corpus_result` in the same pass (the CRC is independent of `emit`, so the gate value is unchanged).
+   The main loop then replays a few segments per frame from the far buffer, so the plant draws itself
+   stroke by stroke (trunk first, then branch by branch), then holds and regrows.
+
+2. **Far-pointer coverage (the valuable part).** Recording into `$7E2000` exercises the `+mos-a16`
+   24-bit **far-pointer STORE** path; the per-frame replay exercises the **far LOAD** path — high-WRAM
+   codegen the low-WRAM-only version never touched. This is display-only: the corpus slice
+   (`lsystem_sim.c`) stays far-pointer-free, so the **differential gate remains a 5-way bar** (host ==
+   default == +mos-a16 == +mos-xy16, `0x79C3`). The far path's correctness is proven by the picture —
+   a far store/load miscompile would scramble the replayed segments and break the plant (the
+   "picture IS the proof" principle, same as julia/buddhabrot's far grids).
+
+Verification: `dev/run.sh lsystem` PASS (gate `0x79C3`, disasm `memcpy/memmove=2 strlen=1 rep/sep=87`);
+bsnes-jg frames 400 (title) → 500 (mid-growth sprout) → 600 (full plant) confirm the animation.
+Selfcheck frame bumped 500 → 600 (growth completes ~frame 580). Re-published biohack.net **v1.0.148**.

@@ -54,6 +54,14 @@
 #define TITLE_ROWS       32u
 #define TITLE_MAX_CHARS  16u      /* max chars/line in 16×16 mode (TITLE_COLS / 2 cols per glyph) */
 
+/* TITLE_RBUF_COLS — row-buffer width in words. Default is TITLE_COLS*2 (64 words) to hold both
+   the top and bottom tile rows for 16×16 fly-in DMA. For tight-RAM demos that only use the 8×8
+   font (title_begin), define TITLE_RBUF_COLS=TITLE_COLS before including this header to get
+   the compact 32-word buffers. */
+#ifndef TITLE_RBUF_COLS
+#define TITLE_RBUF_COLS (TITLE_COLS * 2u)
+#endif
+
 #define TITLE_FLY_STEP   3        /* vertical fly-in speed, Q4 (row<<4) units/frame               */
 #define TITLE_HDMA_CHAN  3u        /* HDMA channel for 8×8 BG2HOFS pixel-centre (0=GP-DMA UpQ,
                                      1-2=hud.h split; 3 is free during the intro)                 */
@@ -72,11 +80,11 @@ typedef struct {
   uint8_t     font16;  /* 0 = 8×8 (default), 1 = 16×16 pixel-doubled                             */
   uint16_t    ink;     /* live ink colour (CGRAM palette-7 colour 1)                               */
   uint16_t    back;    /* live backdrop colour (CGRAM[0])                                          */
-  /* rbuf0/rbuf1/rblank are 64 words each (TITLE_COLS*2).
-     8×8 mode uses [0..31] only; 16×16 uses [0..63] (top row + bottom row). */
-  uint16_t    rbuf0[TITLE_COLS * 2u];
-  uint16_t    rbuf1[TITLE_COLS * 2u];
-  uint16_t    rblank[TITLE_COLS * 2u];
+  /* Row buffers: TITLE_RBUF_COLS words each (default 64 = top+bottom tile rows for 16×16;
+     override to TITLE_COLS=32 for tight-RAM 8×8-only demos). */
+  uint16_t    rbuf0[TITLE_RBUF_COLS];
+  uint16_t    rbuf1[TITLE_RBUF_COLS];
+  uint16_t    rblank[TITLE_RBUF_COLS];
   HScroll2    hscroll;  /* HDMA table for 8×8 pixel-centre (built but unused in 16×16 mode)       */
 } TitleLayer;
 

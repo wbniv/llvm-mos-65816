@@ -16,6 +16,7 @@
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/drawable.h"
+#define TITLE_RBUF_COLS TITLE_COLS   /* compact 8×8 row buffers — rdiff BSS is at capacity */
 #include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/vram.h"
@@ -167,7 +168,7 @@ int main(void) {
        not affect the (separately-asserted) corpus hash; re-confirm the screenshot if it ever gates
        on a framebuffer CRC. */
     static TitleLayer title;
-    title_begin16(&d, &title, "REACT DIFFUSION", "GRAY-SCOTT");
+    title_begin(&d, &title, "REACT DIFFUSION", "GRAY-SCOTT");
     title_end(&d, &title, 110);
 
     /* Title gone — now seed the field. From here BG1 fills with opaque Turing texture. */
