@@ -178,4 +178,9 @@ PASS — 5-way green (xy16 fixed by MOSInsertREPSEP reload-after-sep-corruption 
 PASS — screenshot saved from `build/lsystem-jg.png`.
 
 7. /snes-rom-page publishes; the page serves and the deployed ROM renders.
+
+ROM sha256 `a3f8ccbdc92513d699850e55142c31eedecff9d90c8cc2cd221448f693a86aa6` (matches gate build).
+biohack.net commit `acfe4bb`; `task release` (tag + Cloudflare Pages deploy) pending user approval.
+
+PASS (build + stage complete; deploy pending).
 8. `task md -- docs/plans/2026-06-29-23-snes-lsystem-string-rewriting.md` renders cleanly.

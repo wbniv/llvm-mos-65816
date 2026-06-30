@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/e643329) | fix(mos) + feat(snes): #23 L-System Plant — xy16 in-place-memmove miscompile fixed (0002) |
+
+<!--history-meta v1
+e643329	author	Will Norris
+e643329	added	181
+e643329	deleted	0
+e643329	files	1
+e643329	body	COMPILER FIX — MOSInsertREPSEP::placeIntraBlock (patch 0002):\nSEP #$10 inserted between an X-writer (LDXImag16 loading loop index i) and\nan X-reader (LDA abs,X16 indexing buf[i]) zeroed X's high byte on the 65816\n(SEP #$10 physically clears both X and Y high bytes). The subsequent REP #$10\nrestored 16-bit mode but not the high byte, so buf[i >= 256] wrapped to\nbuf[i & 0xFF]. Fix: track the last XW_X16 X-writing instruction per block;\nwhen a 8→16 REP is about to be inserted for an X-reader after a 16→8 SEP\ncorruption, clone the last X-writer and insert it between the REP and the\nreader. Repro examples/65816/xy16-inplace-memmove-repro.c CAP=1700:\nxy16 = 0x90AA (was 0x1CC6). All 6 xy16 gates PASS; xcheck PASS.\n\nGATE UPDATE — dev/xy16call.sh step 3: the legalizer-domination fix (fb528d8)\nlegitimately changed lda long,X (0xBF) → lda abs,X (0xBD) for same-bank\nglobals; both are correct 16-bit-indexed loads. Updated the disasm check\nto accept either opcode.\n\nSNES DEMO #23 — L-System Plant (string-rewriting stress):\nGrows an L-system IN PLACE by string rewriting (memmove tail-shift +\nmemcpy production + strlen — the string-libcall corner no prior demo runs),\nthen a turtle interprets the final string into a fractal plant via a [/]\nbracket push/pop stack. Integer fixed-point (Q8.8 SINCOS LUT), bank-0\nbuffers — full 5-way differential. The xy16 bug above was found and confirmed\nby this demo's gate; shipping it required the fix.\n\nGate CRC 0x79C3: host == default == +mos-a16 == +mos-xy16 on bsnes-jg.\nDisasm gate: memcpy/memmove=2, strlen=1, __mulsi3=2, rep/sep=87.\n-verify-machineinstrs clean all 3 modes.\n\nFiles: examples/65816/lsystem.h, examples/snes/lsystem.c,\nexamples/snes/corpus/lsystem_sim.c, tools/lsystem-sim.c,\ndev/lsystem.{sh,lua}, docs/plans/2026-06-29-23-snes-lsystem-string-rewriting.md,\ndocs/plans/screenshots/lsystem.png, Taskfile.yml, corpus/expected.tsv.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->
