@@ -17,6 +17,8 @@ Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TOD
 
 ## Open
 
+- [ ] **`+mos-xy16` miscompile — iterative in-place `memmove`/`memcpy` rewrite over a 16-bit-indexed buffer** (found 2026-06-29 by the #23 L-system demo's differential gate; **confirmed real**, toolchain `c798c31`, not a stale build). A loop that rewrites a `>256`-byte buffer in place (memmove tail-shift + memcpy production, pointers/length from a 16-bit loop index) produces wrong bytes under `+mos-xy16` only (`xy16=0x1CC6` vs host==default==a16 `0x90AA`). Isolated: needs xy16 **AND** 16-bit index (`CAP=200` 8-bit is clean) **AND** the iterative loop (single expansion clean; ping-pong clean). A **new** `requiredXWidth`/X-lattice gap the prior fixes (`4d8a2bd`/`321-xy16-xflag-lattice`/`321-xy16-track-a`) don't cover; `-verify` clean. Clean repro: `examples/65816/xy16-inplace-memmove-repro.c` (CAP toggle). Next: LTO-surviving repro → MIR after `mos-insert-rep-sep` → fix `MOSInsertREPSEP.cpp` on a throwaway compiler worktree → re-verify corpus/torture/fuzz/xy16 + add a `dev/` gate. ([investigation](docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md)). **Blocks #23 L-system shipping 5-way-green.**
+
 ### M0 — Test Bench
 
 _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
@@ -102,24 +104,30 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
-- [ ] **FORK REGRESSION — MOS legalizer parks a shared `G_CONSTANT 0` in a non-dominating block
-  (`-verify-machineinstrs` failure, default-8-bit).** A fold-while-walking loop (came[cell] consumed
-  both as a folded value and as a signed-`int8_t`-table index, with an early-`break` diamond CFG) makes
-  the legalizer **CSE** the byte-narrowing zero-constant of the unsigned high-byte (loop header) with the
-  sign-extension basis of `int8_t DX[d]` (loop body) into **one** `G_CONSTANT i8 0`, defined in the body
-  → doesn't dominate the header use → *"Virtual register defs don't dominate all uses"* → build aborts
-  (exit 70). **NOT UPSTREAM:** unpatched upstream `mos-clang` at the SAME commit (`c798c31`) compiles it
-  CLEAN — it emits a **per-block** constant; our fork's patched legalizer shares one. Fires in
-  default/`+mos-a16`/`+mos-xy16`. **NOT a demonstrated miscompile** (with `-verify` off the ROM computes
-  the correct value on bsnes-jg for two `came[]` fillings — the value is 0, so a stale read rarely
-  diverges); but it blocks `-verify` builds and is a latent hazard. Surfaced + worked around in the maze
-  demo (`maze.h` split into `maze_path_build` + `maze_fold_path`). Verified repro + full analysis:
+- [wip] **FORK REGRESSION — `0002` indexed-addressing use-replacement crosses a block boundary
+  (`-verify-machineinstrs` "defs don't dominate all uses").** **ROOT-CAUSED + FIX VERIFIED + COMMITTED
+  on branch `wt/fix-legalizer-indexed-domination` (`8c928b8`, worktree
+  `~/SRC/llvm-mos-65816-legalfix`) 2026-06-29; MERGE to `main` + shared-toolchain rebuild + full gates
+  PENDING (coordinate — do not run two concurrent toolchain builds).** A fold-while-walk
+  loop (`came[cell]` consumed both as a folded value AND as a signed-`int8_t`-table index, with an
+  early-`break` diamond) trips it. **Root cause:** `0002`'s seed-56 workaround in
+  `MOSLegalizerInfo::tryAbsoluteIndexedAddressing` builds `Explicit16 = G_MERGE(trunc(NewOffset),
+  G_CONSTANT 0)` **at the `G_PtrAdd`'s (body) block** and replaces *all* uses of `NewOffset` — but that
+  value is also the `h ^ came` operand in the loop **header**, so the body-defined MERGE is referenced
+  in a sibling block. (The earlier "shared `G_CONSTANT 0` CSE" framing was a red herring;
+  `legalizeSExt` is upstream-identical.) Bisect: `0001` clean, `0001+0002` reproduces. **NOT UPSTREAM**
+  (`c798c31` unpatched is clean). **NOT a miscompile** (`-verify`-off ROM is correct); blocks `-verify`
+  builds. **Fix (1 site, in `0002`):** insert the trunc/zext at `NewOffset`'s SSA definition (dominates
+  every use) instead of at the `G_PtrAdd`. Verified on an isolated `0001+0002` bisect toolchain:
+  `-verify` clean all 3 modes; no miscompile (varied-`came` differential == host on bsnes-jg, all 3
+  modes); 285-compile `-verify` sweep → 0 new failures. **Done on the branch:** regenerated `0002`
+  (fix only, 0 foreign hunks), positive `-verify` regression gate
+  (`examples/65816/legalindexdom.c` + `dev/legalindexdom.sh`, asserts clean all 3 modes), spike header
+  → FIXED. **Next (on merge):** rebuild the shared toolchain + run full gates (corpus, corpus-a16,
+  csmith fuzzer), then merge to `main`; optionally un-work-around `maze.h`'s two-pass split (per the
+  "stress the compiler, never work around it" directive). Repro + analysis:
   [`docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c`](docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c).
-  Introducing pass = **legalizer** (`-stop-after=irtranslator` clean, `=legalizer` dirty); pass pipeline
-  is byte-identical to upstream, so it's a fork **legalizer-rule** change. **Next:** bisect the offending
-  patch (suspects 0001/0002/0005/0006/0013/0014 — legalizer-touching) on an isolated `vendor/llvm-mos`
-  worktree (warm ccache), then gate/fix it and register the repro in `KNOWN_ISSUE_REPROS`
-  (`tools/a16_fuzz.py known-issues`) so the XPASS guard surfaces the fix. **Do NOT file upstream.**
+  **Do NOT file upstream** (fork-internal fix).
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
   "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
   on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`
