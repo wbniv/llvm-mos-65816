@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/f68f074) | docs(snes): plan step 7 — biohack.net commit acfe4bb staged; deploy pending |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/e643329) | fix(mos) + feat(snes): #23 L-System Plant — xy16 in-place-memmove miscompile fixed (0002) |
 
 <!--history-meta v1
+f68f074	author	Will Norris
+f68f074	added	5
+f68f074	deleted	0
+f68f074	files	1
+f68f074	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e643329	author	Will Norris
 e643329	added	181
 e643329	deleted	0
