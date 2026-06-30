@@ -10,6 +10,13 @@
 > untested libcall/ABI paths where the remaining bugs hid. **All Round-2 corners came back green: no new
 > compiler bug surfaced** (the #23 in-place-memmove xy16 miscompile was fixed in-flight; see its row).
 > **Completion summary:** [`2026-06-30-stress-test-battery-status.md`](2026-06-30-stress-test-battery-status.md).
+>
+> **Round 3 (#33–#52) — 20 new ideas drafted** (bottom of this doc): twenty more codegen corners none of
+> the first 32 touch — `double` soft-float, libm transcendentals, `setjmp`/`longjmp`, `alloca`/VLA,
+> sparse-switch, computed-`goto`, constant-divisor magic reciprocal, table-LUT CRC, free-list allocator,
+> Duff's device, signed-64 divide, saturating/overflow-builtin arithmetic, union type-punning, `qsort`
+> callbacks, Newton-Raphson refinement, IIR feedback, LZ/RLE decode, many-arg calling-convention spill,
+> coroutines/protothreads, and cross-byte-boundary bitfields. Not yet built.
 
 A backlog of candidate demo programs whose job is to **stress the llvm-mos 65816 codegen** — each leans
 on a different corner of the compiler (32-bit/fixed-point multiply, division, recursion + the soft stack,
@@ -206,3 +213,169 @@ Sharpest at opening a code path the first 20 never run:
 - ~~**#22 64-bit integers** — `__muldi3` & friends, never touched.~~ ✓ [/snes/avalanche/](https://biohack.net/snes/avalanche/)
 - ~~**#26 struct-by-value ABI** — aggregate return on a hot path.~~ ✓ [/snes/boids/](https://biohack.net/snes/boids/)
 - ~~**#29a jump-table VM** — indirect dispatch / function-pointer table.~~ ✓ [/snes/turtle-vm/](https://biohack.net/snes/turtle-vm/)
+
+---
+
+# Round 3 (#33–#52) — twenty more new codegen corners
+
+Rounds 1–2 (32 demos) exhausted fixed-point integer math, 32-bit `float`, 64-bit *unsigned* integers,
+the dense jump-table, struct-by-value, clean bitfields, variable shifts, variadics, string libcalls,
+pointer-trees, and the far-pointer path. Round 3 targets **twenty corners none of the first 32 execute** —
+the rest of the floating-point library (`double` + libm), the non-local-control-flow family
+(`setjmp`/`longjmp`, computed-`goto`, Duff's device), dynamic stack frames (`alloca`/VLA), the
+allocator/ABI edges (free-list, `qsort` callback, 8+-arg spill, union punning), the *signed* and
+*constant-divisor* arithmetic paths, recursive DSP feedback, and decode/refinement loops. Same bar as
+before: a shared host+target header, a differential CRC, a `snesgfx` render, the picture *is* the proof.
+
+**Two design gotchas to honour up front** (the "measure, don't assume" rule):
+
+- **libm transcendentals are NOT bit-exact across libms.** IEEE-754 mandates correct rounding only for
+  `+ − × ÷` **and `sqrtf`**; `sinf`/`cosf`/`expf`/`logf`/`powf`/`atan2f` may differ by 1 ULP between the
+  host's glibc and the target's picolibc — so a naive `host == target` CRC over those would FAIL even
+  with *correct* codegen. A libm demo must either (a) restrict the differential to `sqrtf` + plain float
+  arithmetic, or (b) ship its **own** polynomial/CORDIC transcendental in the shared header (host==target
+  by construction, like the existing `SINCOS` LUT). Pick one deliberately; don't oracle against glibc's
+  `sinf`. `double` *arithmetic* (`__adddf3`/`__muldf3`/`__divdf3`, +`sqrt`) **is** correctly-rounded → a
+  clean bit-exact differential, same as #21 for `float`.
+- **`setjmp`/`longjmp` and `alloca`/VLA may not be fully supported** by the llvm-mos soft-stack target.
+  That is itself a finding worth surfacing — but for a shippable *demo*, verify the toolchain provides
+  them first; if a feature is absent or miscompiles, that becomes a backend bug report, not a demo.
+
+## Untested-corner coverage map (the point of Round 3)
+
+| New codegen corner | Why bugs hide there | Demos |
+|---|---|---|
+| **`double` soft-float** — `__adddf3`/`__muldf3`/`__divdf3`/`__fixdfsi`/`__floatsidf`/`__extenddfsf2`/`__truncdfsf2` | #21/#24 used only 32-bit `float`; `double` is a wholly separate 64-bit library, correctly-rounded → bit-exact | 33 |
+| **libm transcendentals** — `sqrtf` (+ self-shipped `sin`/`exp`) | #24 used float *operators*, never a libm *function* call (see the ULP gotcha above) | 34 |
+| **non-local jumps** — `setjmp`/`longjmp` full context save/restore | the whole register + SP + return-addr context spill; never exercised | 35 |
+| **dynamic stack frames** — `alloca` / C99 VLAs (runtime-sized frame) | every frame so far is fixed-size; runtime SP adjustment is untested | 36 |
+| **sparse-switch binary search** — if-else comparison tree, *not* a jump table | #29a was a *dense* switch → table; non-contiguous cases lower totally differently | 37 |
+| **computed `goto` / label values** — `goto *tab[op]` threaded dispatch | distinct from #29a's switch jump-table; the threaded-code path | 38 |
+| **constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift | #27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation | 39 |
+| **table-indexed ROM-LUT byte loop** — 256-entry `const` table, long-addressed per byte | reads a big `const` table from ROM via 24-bit addressing every iteration | 40 |
+| **free-list allocator** — manual malloc/free, pointer recycling | #31's pool is append-only (bump + reset); a free list recycles individual nodes | 41 |
+| **irreducible control flow** — Duff's device (switch jumping into a loop) | a CFG the structurizer can't reduce; never exercised | 42 |
+| **signed 64-bit divide/mod** — `__divdi3`/`__moddi3` (sign-corrected) | #22 was *unsigned* 64-bit; signed div/mod is a distinct sign-handling libcall | 43 |
+| **overflow-checked / saturating arithmetic** — `__builtin_add_overflow`, carry/V-flag tests + clamp | flag-testing add/sub sequences never stressed | 44 |
+| **union type-punning** — `union{float;uint32}` aliased load/store, bit reinterpret | reading one storage as two types — the aliasing/reinterpret path | 45 |
+| **indirect comparator ABI** — `qsort` with a function-pointer comparator callback | #17's sorts were hand-written; libc `qsort` calls *back* per compare | 46 |
+| **iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt) | a convergent fixed-point loop, distinct from a single divide libcall | 47 |
+| **recursive feedback (IIR)** — `y[n]=a·y[n−1]+b·y[n−2]+x[n]` dependency chain | #25's FFT is feed-forward + reorderable; an IIR feedback chain can't be reordered | 48 |
+| **decode state machine + back-reference** — RLE/LZ decompression with output copy-back | a byte-stream decoder writing back-references into its own output (pointer arith) | 49 |
+| **>register-count argument spill** — functions with 8+ params passed on the soft stack | every prior call fits the register-arg budget; argument spilling is untested | 50 |
+| **resumable functions** — coroutine/protothread static-state switch (cooperative tasks) | local state preserved across re-entry via a saved case index | 51 |
+| **cross-byte-boundary bitfields** — `uint32_t a:5,b:11,c:7,d:9` straddling bytes | #29b's fields fit one `uint16`; straddling fields force multi-byte shift + mask | 52 |
+
+## The twenty (each opens a corner the first 32 never run)
+
+33. **Deep-zoom Mandelbrot — `double` precision.** Render the escape-time iteration in **64-bit `double`**
+    beside a 32-bit `float` twin; as the zoom deepens the `float` side pixelates into blocks while `double`
+    stays crisp. *Stresses:* the entire **double-precision soft-float library**
+    (`__muldf3`/`__divdf3`/`__adddf3`/`__fixdfsi`/`__floatsidf`/`__extenddfsf2`/`__truncdfsf2`). Bit-exact
+    differential — IEEE-754 `double` arithmetic is correctly rounded. *Shows:* a live zoom with a
+    float-vs-double split screen (the precision cliff is the visual).
+
+34. **Function-surface ripple — `sqrtf` + libm.** A rotating height-shaded plot of
+    `z = ownsin(ownsqrt(x²+y²) − t)`, or an accurate pendulum. *Stresses:* a real **libm `sqrtf` call**
+    (correctly-rounded → differentiable) plus the float arithmetic around it; the trig comes from a
+    **header-shipped polynomial/CORDIC `sin`** so host==target by construction (see the ULP gotcha).
+    *Shows:* a breathing 3-D ripple surface.
+
+35. **Backtracking solver — `setjmp`/`longjmp`.** An N-Queens or maze solver that places pieces recursively
+    and **`longjmp`s straight back to the last choice point** on a dead end. *Stresses:* **non-local-jump
+    context save/restore** (`setjmp`/`longjmp` — full SP + return + callee-saved spill); verify toolchain
+    support first. *Shows:* the board filling, then snapping back as it backtracks, live.
+
+36. **Polygon scanline fill — `alloca` / VLA.** Spinning convex/concave polygons of varying vertex counts,
+    each filled with an **edge table sized at runtime** (`int xs[nverts]`). *Stresses:* **dynamic stack
+    allocation** (`alloca`/VLA → runtime frame-pointer adjustment); a soft-stack target may not support it
+    — a gap is a finding. *Shows:* morphing filled polygons (3→12 sides) tumbling.
+
+37. **CHIP-8 / step-sequencer — sparse switch.** An opcode interpreter whose cases are **non-contiguous**
+    (`0x00E0`, `0x1NNN`, `0xANNN`, `0xFX55`…), forcing a **binary-search if-else tree** instead of #29a's
+    dense jump table. *Stresses:* **sparse-switch comparison-tree lowering**. *Shows:* a tiny CHIP-8 game
+    or a step-sequenced light show running its own bytecode.
+
+38. **Threaded-code VM — computed `goto`.** A Brainfuck/Forth interpreter dispatching with
+    **`goto *handlers[op]`** (label-as-value threading) — the fastest interpreter loop, a different path
+    than a `switch`. *Stresses:* **indirect-goto / label-value dispatch**. *Shows:* a Brainfuck program
+    drawing a pattern as its tape head scrubs.
+
+39. **Analog clock + odometer — constant-divisor magic reciprocal.** Split seconds/minutes/hours and base-N
+    digits with **compile-time constant divides** (`/60`, `/12`, `/10`, `/360`). *Stresses:* the
+    compiler's **strength-reduction of constant division to a magic-number multiply-high + shift** (distinct
+    from #27's runtime `__umodsi3`). *Shows:* a sweeping clock face + a rolling base-N odometer.
+
+40. **Procedural hash-texture — table-driven CRC32.** Feed coordinates through a **real CRC32 with a
+    256-entry `const` table in ROM** (a 24-bit-addressed indexed load per byte) to colour a scrolling,
+    mutating field. *Stresses:* a **256-entry ROM-LUT indexed byte loop**. *Shows:* "checksum rain" /
+    hash-marble that flows.
+
+41. **Particle fountain — free-list pool allocator.** Particles **allocated on spawn and freed on death**,
+    recycling slots through a manual **free list** (distinct from #31's append-only bump pool). *Stresses:*
+    **free-list pointer recycling / manual malloc-free**. *Shows:* a sparking fountain with particles
+    continuously born and dying.
+
+42. **Dissolve transition — Duff's device.** A screen wipe/dissolve copy unrolled with the classic
+    **switch-jumping-into-a-loop**. *Stresses:* **irreducible loop-switch control flow** the structurizer
+    can't reduce. *Shows:* one image dissolving into the next in interleaved bursts.
+
+43. **Light-years odometer / 64-bit Julia — signed 64-bit divide.** A Q-format orbit or a giant signed
+    counter needing **`__divdi3`/`__moddi3`** (signed 64-bit divide+mod), distinct from #22's unsigned
+    `__udivdi3`. *Stresses:* **signed 64-bit division/modulo** (sign-correction codegen). *Shows:* a vast
+    signed odometer ticking through zero, or a 64-bit-deep Julia.
+
+44. **HDR light blending — saturating / overflow-checked add.** Many overlapping translucent glows summed
+    per pixel with **`__builtin_add_overflow` saturation** (clamp to white). *Stresses:*
+    **overflow-builtin / carry-and-V-flag saturating arithmetic**. *Shows:* drifting bloom-lights that
+    blow out to white where they pile up.
+
+45. **Metaballs — union type-pun fast-inverse-sqrt.** The Quake `union { float f; uint32_t i; }`
+    **bit-hack reciprocal-sqrt** drives a field of merging blobs. *Stresses:* **union type-punning**
+    (aliased load/store + float↔int bit reinterpret). *Shows:* gooey metaballs splitting and fusing.
+
+46. **Sort visualizer — `qsort` + comparator callback.** Bars sorted by **libc `qsort` with a swappable
+    function-pointer comparator** (by height / hue / parity) — an **indirect call per comparison**.
+    *Stresses:* the **`qsort` callback / indirect-comparator ABI**. *Shows:* the array animating as
+    different comparators reshuffle it.
+
+47. **Perspective floor/tunnel — Newton-Raphson reciprocal.** A textured ground plane computing **`1/z`
+    per span by iterative Newton refinement** (no hardware divide). *Stresses:* **iterative fixed-point
+    refinement** (a convergent reciprocal/sqrt loop). *Shows:* a racing perspective-mapped checker floor
+    or tunnel.
+
+48. **Resonant-filter scope — IIR / Goertzel feedback.** A 2-pole **IIR resonator**
+    (`y[n] = a·y[n−1] − b·y[n−2] + x[n]`) ringing on an impulse, or a Goertzel tone detector. *Stresses:*
+    the **recursive feedback dependency chain** (can't be reordered like #25's feed-forward FFT). *Shows:*
+    an oscilloscope of a plucked, decaying resonance; or frequency bins lighting to a tune.
+
+49. **Image-decompress reveal — RLE/LZ back-references.** A compressed picture **decoded by a byte-stream
+    state machine that copies back-references from its own output** (LZ77 sliding window). *Stresses:* the
+    **decode state machine + output back-reference pointer arithmetic**. *Shows:* the classic "image
+    loading in" progressive reveal.
+
+50. **Color-grade kernel — many-argument calling convention.** A per-pixel transform taking **8+
+    coefficients** (lift/gamma/gain ×3 + mix), forcing arguments **onto the soft stack**. *Stresses:*
+    **>register-count argument spilling** in the calling convention. *Shows:* a live scene re-grade
+    sweeping through looks.
+
+51. **Cooperative critters — coroutines / protothreads.** Dozens of agents, each a **resumable
+    switch-state function** (protothread) that yields and resumes, preserving local state across frames.
+    *Stresses:* **resumable-function state preservation** (saved case-index re-entry). *Shows:* a swarm of
+    little creatures each running its own scripted behaviour concurrently.
+
+52. **Live 65816 disassembler — cross-byte-boundary bitfields.** Decode an opcode byte-stream into
+    **bitfields that straddle byte boundaries** (`opcode:8, mode:3, len:2, …` packed across a `uint32_t`),
+    forcing multi-byte shift + mask extract (distinct from #29b's single-`uint16` fields). *Stresses:*
+    **unaligned / cross-boundary bitfield extract-insert**. *Shows:* a scrolling, colour-coded disassembly
+    of its own ROM (meta!).
+
+## Round 3 first picks
+
+Sharpest at opening a code path the first 32 never run:
+
+- **#33 `double` soft-float** — the largest brand-new library surface, with a clean bit-exact differential (the `double` analogue of #21).
+- **#35 `setjmp`/`longjmp`** — the context save/restore ABI; nothing else in 52 demos touches it (and may surface a toolchain gap).
+- **#38 computed-`goto`** — a second VM that opens the *threaded-dispatch* path #29a's `switch` jump-table didn't.
+- **#44 saturating / `__builtin_add_overflow`** — flag-sequence codegen, plus a gorgeous additive-bloom visual.
+- **#48 IIR feedback** — the non-reorderable recursive dependency chain the feed-forward FFT (#25) never exercised.
