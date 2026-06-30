@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/471d04f) | snes(fn-plot): #24 recursive-descent float function plotter — 5-way green |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f74cb6f) | docs(plan-index): add snesgfx mandel-oop verification row (185 plans) |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/cff089f) | docs(plan-index): add #23 L-System Plant + SNES title HDMA rows (184 plans) |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/91caaa1) | chore: move the blocked #23 L-system demo off main to a branch |
@@ -79,6 +80,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+471d04f	author	Will Norris
+471d04f	added	1
+471d04f	deleted	0
+471d04f	files	1
+471d04f	body	Adds the fn-plot compiler stress-test demo (Round 2, battery #24):\n  - examples/65816/fn_plot.h: recursive-descent parser + IEEE-754 soft-float\n    evaluator; fn_gate_crc evaluates x*x-0.5 at 64 pts → 0x2EBE\n  - examples/snes/fn-plot.c: SNES ROM; BitmapCanvas + TextLayer; 4 baked\n    expressions cycle automatically at 1 px/frame\n  - examples/snes/corpus/fn_plot_sim.c: corpus slice; added to expected.tsv\n  - tools/fn-plot-sim.c: host oracle\n  - dev/fn-plot.sh + dev/fn-plot.lua: gate script\n\nGate: __mulsf3=5, __divsf3=1, rep/sep=48; bsnes-jg host==+mos-a16 0x2EBE.\nMAME: SKIP (no SPC700 IPL — demos-only non-blocker). No compiler bug found.\nPublished biohack.net/snes/fn-plot/ (v1.0.138).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f74cb6f	author	Will Norris
 f74cb6f	added	2
 f74cb6f	deleted	0
