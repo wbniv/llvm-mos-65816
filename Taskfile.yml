@@ -572,6 +572,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fn-plot }
 
+  fft:
+    desc: "#25: FFT spectrum analyser — assert corpus_result (fft_gate_crc 0x6D7A, N=32) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1, rep/sep>=1). Leaves build/fft.sfc + build/fft-{mame,jg}.png."
+    cmds:
+      - dev/run.sh fft
+
+  fft-play:
+    desc: "PLAY the FFT spectrum analyser demo in a MAME window (builds first if needed)."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/fft.sfc ]; then
+          echo "==> build/fft.sfc missing — building it (dev/run.sh fft)…"
+          dev/run.sh fft
+        fi
+      - task: mandel-mame
+        vars: { ROM: fft }
+
   hilbert:
     desc: "#28: Hilbert space-filling curve — assert corpus_result (hilbert_gate_crc 0x5999, ORDER=4, 256 pts) == host on MAME + bsnes-jg + disasm gate (__ashlsi3+__lshrsi3>=1, rep/sep>=1). Leaves build/hilbert.sfc + build/hilbert-{mame,jg}.png."
     cmds:

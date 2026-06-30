@@ -158,7 +158,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 | ~~**string / char-array building**~~ — `memcpy`/`memmove`/`strlen` over grown buffers | untouched | ~~23~~, ~~24~~ |
 | **pointer-chasing dynamic trees** — recursive build/walk over pooled nodes | #18's heap is a flat array, not a linked structure | 31 |
 | ~~**modulo-heavy** inner loop — `__umodhi`/`__umodsi3` per iteration~~ | div appears, but never `%` as the hot op | ~~27~~ |
-| **bit-reversal / interleave permutation** | never exercised | 25, 28 |
+| ~~**bit-reversal / interleave permutation**~~ | never exercised | ~~25~~, ~~28~~ |
 
 ## Highest bug-yield — brand-new libcall/ABI paths
 
@@ -184,8 +184,8 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 24. ~~**Recursive-descent function plotter** — a real **recursive-descent parser** (deep recursion + string
     scan) feeding a switch-dispatch evaluator; pairs with soft-float (#21) for the eval. *Shows:* type-in
     `y=f(x)` plotted live.~~ ✓ [/snes/fn-plot/](https://biohack.net/snes/fn-plot/)
-25. **Radix-2 FFT spectrum analyser** — **bit-reversal permutation** + in-place butterfly loops + twiddle
-    complex-multiply. *Shows:* animated frequency bars of a synthesised chord.
+~~25. **Radix-2 FFT spectrum analyser** — **bit-reversal permutation** + in-place butterfly loops + twiddle
+    complex-multiply. *Shows:* animated frequency bars of a synthesised chord.~~ ✓ [/snes/fft/](https://biohack.net/snes/fft/)
 ~~27. **Times-table cardioid** — `(k·i) mod N` per chord around a circle, animated `k`; **modulo-heavy** inner
     loop. *Shows:* the morphing cardioid / nephroid envelope.~~ ✓ [/snes/cardioid/](https://biohack.net/snes/cardioid/)
 ~~28. **Hilbert / Gray-code curve** — bit-interleave + **variable-count** shifts/rotates + recursion.

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8e1dd62) | snes(#28): Hilbert space-filling curve — __ashlsi3+__lshrsi3 variable-count shifts |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3e6c825) | snes(#27,#30): times-table cardioid + TEA cipher — __umodsi3 + 32-bit shift/add/XOR |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/471d04f) | snes(fn-plot): #24 recursive-descent float function plotter — 5-way green |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/6fe6e69) | feat(snes): #29b Truchet (packed bitfields) — bitfield insert/extract stress demo |
@@ -25,6 +26,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+8e1dd62	author	Will Norris
+8e1dd62	added	5
+8e1dd62	deleted	5
+8e1dd62	files	1
+8e1dd62	body	Order-4 d2xy/xy2d bijection; loop variable k (0..3) drives rx<<k, ry<<k, 1<<k\nat runtime → __ashlsi3=5, __lshrsi3 confirmed; rep/sep=23, __mulsi3=0.\nRound-trip hil_xy2d(hil_d2xy(d))==d verified for all 256 points.\nGate 0x5999; 5-way green. Published: biohack.net/snes/hilbert/ (v1.0.142).\n\nThis opens the variable-count 32-bit shift corner (#28,#30 coverage map row)\nthat TEA #30 targeted but missed (TEA's constant <<4/>>5 get inlined at -Os).\nNo miscompile found; variable-count shift codegen correct across all modes.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3e6c825	author	Will Norris
 3e6c825	added	3
 3e6c825	deleted	3
