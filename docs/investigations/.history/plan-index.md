@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0cec517) | docs(fn-plot): update plan + TODO + plan-index for post-ship fixes |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/471d04f) | snes(fn-plot): #24 recursive-descent float function plotter — 5-way green |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f74cb6f) | docs(plan-index): add snesgfx mandel-oop verification row (185 plans) |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/cff089f) | docs(plan-index): add #23 L-System Plant + SNES title HDMA rows (184 plans) |
@@ -80,6 +81,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+0cec517	author	Will Norris
+0cec517	added	1
+0cec517	deleted	1
+0cec517	files	1
+0cec517	body	Plan (2026-06-30-24-snes-fn-plot.md):\n- Algorithm: document canvas_line connected-curve approach + 2px/frame rate\n- Files: add title_layer.h to reused infrastructure table\n- Publication: two-stage sequencing, final WRAM offset 0x002a\n- Verification: updated gate output, title-card check, post-ship fix log\n\nTODO.md: updated fn-plot entry with TitleLayer / canvas_line / 0x002a\n\nplan-index.md: filled real commit SHAs (471d04f + d65c75e), noted fix\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 471d04f	author	Will Norris
 471d04f	added	1
 471d04f	deleted	0

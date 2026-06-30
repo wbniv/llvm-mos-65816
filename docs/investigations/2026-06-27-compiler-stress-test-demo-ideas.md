@@ -157,7 +157,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 | **variadic `va_arg`** — the stack-walking calling convention | untouched | 32 |
 | ~~**string / char-array building**~~ — `memcpy`/`memmove`/`strlen` over grown buffers | untouched | ~~23~~, ~~24~~ |
 | **pointer-chasing dynamic trees** — recursive build/walk over pooled nodes | #18's heap is a flat array, not a linked structure | 31 |
-| **modulo-heavy** inner loop — `__umodhi`/`__umodsi3` per iteration | div appears, but never `%` as the hot op | 27 |
+| ~~**modulo-heavy** inner loop — `__umodhi`/`__umodsi3` per iteration~~ | div appears, but never `%` as the hot op | ~~27~~ |
 | **bit-reversal / interleave permutation** | never exercised | 25, 28 |
 
 ## Highest bug-yield — brand-new libcall/ABI paths
@@ -186,8 +186,8 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
     `y=f(x)` plotted live.~~ ✓ [/snes/fn-plot/](https://biohack.net/snes/fn-plot/)
 25. **Radix-2 FFT spectrum analyser** — **bit-reversal permutation** + in-place butterfly loops + twiddle
     complex-multiply. *Shows:* animated frequency bars of a synthesised chord.
-27. **Times-table cardioid** — `(k·i) mod N` per chord around a circle, animated `k`; **modulo-heavy** inner
-    loop. *Shows:* the morphing cardioid / nephroid envelope.
+~~27. **Times-table cardioid** — `(k·i) mod N` per chord around a circle, animated `k`; **modulo-heavy** inner
+    loop. *Shows:* the morphing cardioid / nephroid envelope.~~ ✓ [/snes/cardioid/](https://biohack.net/snes/cardioid/)
 28. **Hilbert / Gray-code curve** — bit-interleave + **variable-count** shifts/rotates + recursion.
     *Shows:* the space-filling curve at rising order.
 29b. ~~**Truchet tiles (packed bitfields)** — per-cell state as `unsigned : n` bitfields; stresses

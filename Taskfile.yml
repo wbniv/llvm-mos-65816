@@ -572,6 +572,40 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fn-plot }
 
+  tea:
+    desc: "#30: TEA cipher avalanche — assert corpus_result (tea_gate_crc 0xDF0E, 8 plaintexts x 32 rounds) == host on MAME + bsnes-jg + disasm gate (mul=0, rep/sep>=1). Leaves build/tea.sfc + build/tea-{mame,jg}.png."
+    cmds:
+      - dev/run.sh tea
+
+  tea-play:
+    desc: "PLAY the TEA cipher avalanche demo in a MAME window (builds first if needed). Cycles through 16 1-bit key variants showing the avalanche effect."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/tea.sfc ]; then
+          echo "==> build/tea.sfc missing — building it (dev/run.sh tea)…"
+          dev/run.sh tea
+        fi
+      - task: mandel-mame
+        vars: { ROM: tea }
+
+  cardioid:
+    desc: "#27: Times-table cardioid — assert corpus_result (card_gate_crc 0x523B, k=2..8 x N=200) == host on MAME + bsnes-jg + disasm gate (__mulsi3 + __umodsi3 + rep/sep). Leaves build/cardioid.sfc + build/cardioid-{mame,jg}.png."
+    cmds:
+      - dev/run.sh cardioid
+
+  cardioid-play:
+    desc: "PLAY the times-table cardioid demo in a MAME window (builds first if needed). k animates 2..30: k=2 cardioid, k=3 nephroid, higher epicycloid envelopes."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/cardioid.sfc ]; then
+          echo "==> build/cardioid.sfc missing — building it (dev/run.sh cardioid)…"
+          dev/run.sh cardioid
+        fi
+      - task: mandel-mame
+        vars: { ROM: cardioid }
+
   # --- Generated reference docs (from the HAL headers + the backend TableGen) ---
 
   gen-docs:
