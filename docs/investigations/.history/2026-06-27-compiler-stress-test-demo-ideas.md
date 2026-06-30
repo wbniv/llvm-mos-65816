@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3e6c825) | snes(#27,#30): times-table cardioid + TEA cipher — __umodsi3 + 32-bit shift/add/XOR |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/471d04f) | snes(fn-plot): #24 recursive-descent float function plotter — 5-way green |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/6fe6e69) | feat(snes): #29b Truchet (packed bitfields) — bitfield insert/extract stress demo |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8ed73d1) | feat(snes): #29a Bytecode-VM Turtle — jump-table + function-pointer dispatch demo |
@@ -24,6 +25,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+3e6c825	author	Will Norris
+3e6c825	added	3
+3e6c825	deleted	3
+3e6c825	files	1
+3e6c825	body	#27 cardioid: chord from i to k*(i+65536)%N for k=2..30, N=200.\n  Gate 0x523B; __mulsi3=1, __umodsi3=1, rep/sep=6; 5-way green.\n  Published: biohack.net/snes/cardioid/ (v1.0.140).\n\n#30 TEA: 32-round Tiny Encryption Algorithm, 16 key-variant avalanche.\n  Gate 0xDF0E; __mulsi3=0, shift_libcalls=0, rep/sep=22; 5-way green.\n  Published: biohack.net/snes/tea/ (v1.0.141).\n\nBoth open novel codegen corners: modulo-heavy (__umodsi3 sole hot op) and\n32-bit add/XOR/shift-only (multiply-free) paths the prior 24 demos never ran.\nNo miscompile found on either; differential confirmed host==+mos-a16==+mos-xy16.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 471d04f	author	Will Norris
 471d04f	added	12
 471d04f	deleted	12

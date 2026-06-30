@@ -153,7 +153,7 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
 | **jump-table / computed branch** — switch-dispatch + indirect-call tables | never exercised | ~~29a~~ |
 | ~~**aggregate / by-value struct ABI**~~ — sret vs register-pair return | structs exist (#18) but are never passed/returned **by value** | ~~26~~ |
 | ~~**bitfield insert/extract**~~ — `unsigned x : n` fields | zero usage so far | ~~29b~~ |
-| **variable-count shifts** — `__ashlsi3`/`__lshrsi3` with a *data-dependent* count | all Round-1 shifts are compile-time constants | 28, 30 |
+| ~~**variable-count shifts** — `__ashlsi3`/`__lshrsi3` with a *data-dependent* count~~ | all Round-1 shifts are compile-time constants | ~~28~~, ~~30~~ |
 | **variadic `va_arg`** — the stack-walking calling convention | untouched | 32 |
 | ~~**string / char-array building**~~ — `memcpy`/`memmove`/`strlen` over grown buffers | untouched | ~~23~~, ~~24~~ |
 | **pointer-chasing dynamic trees** — recursive build/walk over pooled nodes | #18's heap is a flat array, not a linked structure | 31 |
@@ -188,12 +188,12 @@ differential CRC, `snesgfx` render); the table below tracks the **new** corners 
     complex-multiply. *Shows:* animated frequency bars of a synthesised chord.
 ~~27. **Times-table cardioid** — `(k·i) mod N` per chord around a circle, animated `k`; **modulo-heavy** inner
     loop. *Shows:* the morphing cardioid / nephroid envelope.~~ ✓ [/snes/cardioid/](https://biohack.net/snes/cardioid/)
-28. **Hilbert / Gray-code curve** — bit-interleave + **variable-count** shifts/rotates + recursion.
-    *Shows:* the space-filling curve at rising order.
+~~28. **Hilbert / Gray-code curve** — bit-interleave + **variable-count** shifts/rotates + recursion.
+    *Shows:* the space-filling curve at rising order.~~ ✓ [/snes/hilbert/](https://biohack.net/snes/hilbert/)
 29b. ~~**Truchet tiles (packed bitfields)** — per-cell state as `unsigned : n` bitfields; stresses
     insert/extract. *Shows:* a curved-tile labyrinth.~~ ✓ [/snes/truchet/](https://biohack.net/snes/truchet/) *(16-bit bitfield struct, 6 fields; bit-exact host==default==a16==xy16 `0xB3E6`; disasm and/ora/shift, libcalls=0; no bug)*
-30. **TEA / XTEA cipher avalanche** — tight 32-bit mix (data-dependent shifts + adds + xor + magic delta).
-    *Shows:* encrypt the framebuffer; one bit flip → avalanche.
+~~30. **TEA / XTEA cipher avalanche** — tight 32-bit mix (data-dependent shifts + adds + xor + magic delta).
+    *Shows:* encrypt the framebuffer; one bit flip → avalanche.~~ ✓ [/snes/tea/](https://biohack.net/snes/tea/)
 31. **Barnes-Hut quadtree galaxy** — recursive build/walk over a **pooled struct-node tree** (distinct from
     #13's flat-array N-body). *Shows:* a galaxy with the quadtree overlaid.
 
