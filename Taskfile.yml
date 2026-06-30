@@ -196,7 +196,7 @@ tasks:
       - dev/run.sh spirograph
 
   n-body:
-    desc: "#13: N-body orbits — Newtonian gravity (1/r²) + Verlet; assert corpus_result (nbody_gate_crc 0xCC65) == host on MAME + bsnes-jg + disasm gate (__udivsi3 + __mulsi3 + rep/sep). Leaves build/nbody.sfc + build/nbody-{mame,jg}.png."
+    desc: "#13: N-body orbits — Newtonian gravity (1/r²) + Verlet; assert corpus_result (nbody_gate_crc 0xCC65) == host on MAME + bsnes-jg + disasm gate (__udivsi3 + __mulsi3 + rep/sep). Leaves build/n-body.sfc + build/n-body-{mame,jg}.png."
     cmds:
       - dev/run.sh n-body
 
