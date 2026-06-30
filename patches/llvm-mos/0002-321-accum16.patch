@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
-index 584cc0c4c8cd..51f92653c666 100644
+index 584cc0c4c..51f92653c 100644
 --- a/llvm/lib/Target/MOS/CMakeLists.txt
 +++ b/llvm/lib/Target/MOS/CMakeLists.txt
 @@ -31,6 +31,7 @@ add_llvm_target(MOSCodeGen
@@ -11,7 +11,7 @@ index 584cc0c4c8cd..51f92653c666 100644
    MOSInstrInfo.cpp
    MOSInstructionSelector.cpp
 diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
-index 66964b1fe0a0..e2cb062d676b 100644
+index 66964b1fe..e2cb062d6 100644
 --- a/llvm/lib/Target/MOS/MOS.h
 +++ b/llvm/lib/Target/MOS/MOS.h
 @@ -23,6 +23,7 @@ void initializeMOSCombinerPass(PassRegistry &);
@@ -23,7 +23,7 @@ index 66964b1fe0a0..e2cb062d676b 100644
  void initializeMOSLateOptimizationPass(PassRegistry &);
  void initializeMOSLowerSelectPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSCombiner.cpp b/llvm/lib/Target/MOS/MOSCombiner.cpp
-index bff8495ed611..087920a7beae 100644
+index bff8495ed..087920a7b 100644
 --- a/llvm/lib/Target/MOS/MOSCombiner.cpp
 +++ b/llvm/lib/Target/MOS/MOSCombiner.cpp
 @@ -443,6 +443,39 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
@@ -67,7 +67,7 @@ index bff8495ed611..087920a7beae 100644
                                      BuildFnTy &MatchInfo) const {
    auto LHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
 diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
-index 76d7409c1f1b..733ef7097a4d 100644
+index 76d7409c1..733ef7097 100644
 --- a/llvm/lib/Target/MOS/MOSFeatures.td
 +++ b/llvm/lib/Target/MOS/MOSFeatures.td
 @@ -19,3 +19,19 @@ def FeatureStaticStack :
@@ -92,7 +92,7 @@ index 76d7409c1f1b..733ef7097a4d 100644
 +    [FeatureAccum16]>;
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000000..408571c52395
+index 000000000..408571c52
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 @@ -0,0 +1,631 @@
@@ -729,7 +729,7 @@ index 000000000000..408571c52395
 +}
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.h b/llvm/lib/Target/MOS/MOSInsertREPSEP.h
 new file mode 100644
-index 000000000000..34f7e16f3588
+index 000000000..34f7e16f3
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.h
 @@ -0,0 +1,25 @@
@@ -759,7 +759,7 @@ index 000000000000..34f7e16f3588
 +
 +#endif // LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
 diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
-index 12d05bed418f..ba38163ae084 100644
+index 12d05bed4..ba38163ae 100644
 --- a/llvm/lib/Target/MOS/MOSInstrFormats.td
 +++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
 @@ -57,6 +57,21 @@ def HasW65816 : Predicate<"Subtarget->hasW65816()">,
@@ -801,7 +801,7 @@ index 12d05bed418f..ba38163ae084 100644
  
  /// Matching CC1_NoImmediate, but with cc = 11. Common match for 6502X.
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
-index 29032a1e32ea..7a40adf8fc1a 100644
+index 29032a1e3..7a40adf8f 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
 +++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
 @@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
@@ -936,7 +936,7 @@ index 29032a1e32ea..7a40adf8fc1a 100644
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 6850ed4ab963..fa621b8e1dda 100644
+index 6850ed4ab..fa621b8e1 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -352,6 +352,11 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
@@ -1123,7 +1123,7 @@ index 6850ed4ab963..fa621b8e1dda 100644
      SmallVectorImpl<MachineOperand> &Cond) const {
    // Condition includes all arguments except the branch target.
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
-index be5daff8ffad..c39c4be704fd 100644
+index d8377bc8b..7ce06afbd 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.h
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
 @@ -146,6 +146,7 @@ private:
@@ -1135,7 +1135,7 @@ index be5daff8ffad..c39c4be704fd 100644
    bool shouldRematPhysRegCopy() const override { return false; }
  };
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td
-index a71519559a50..fdd08df4851d 100644
+index a71519559..fdd08df48 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.td
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.td
 @@ -65,24 +65,38 @@ defm INC : CC2_NonShift<0b111, "inc">;
@@ -1216,7 +1216,7 @@ index a71519559a50..fdd08df4851d 100644
  /// The conditional branch instructions all have the form xxy10000. The flag
  /// indicated by xx is compared with y, and the branch is taken if they are
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index b0a4f6b8f19d..a005196bd8b6 100644
+index 715766180..8cf4a0c9c 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,23 @@ class MOSLogicalInstr : Instruction {
@@ -1243,7 +1243,7 @@ index b0a4f6b8f19d..a005196bd8b6 100644
  }
  
  //===---------------------------------------------------------------------===//
-@@ -592,21 +609,6 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -610,21 +627,6 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
  
@@ -1265,7 +1265,7 @@ index b0a4f6b8f19d..a005196bd8b6 100644
  // #320 far runtime: LDA [dp] — runtime far-pointer indirect-long load. The ZP
  // address operand is an Imag32 quad holding the 24-bit far address (lo,hi,bank
  // in its first 3 bytes, byte 3 = pad); `lda [dp]` reads bytes dp..dp+2. The
-@@ -622,6 +624,372 @@ def STIndirLong : MOSStore, PseudoInstExpansion<(STA_IndirectLong addr8:$addr)>
+@@ -640,6 +642,372 @@ def STIndirLong : MOSStore, PseudoInstExpansion<(STA_IndirectLong addr8:$addr)>
    dag InOperandList = (ins Ac:$src, Imag32:$addr);
  }
  
@@ -1638,7 +1638,7 @@ index b0a4f6b8f19d..a005196bd8b6 100644
  //===---------------------------------------------------------------------===//
  // HuC Block Copy Instructions
  //===---------------------------------------------------------------------===//
-@@ -669,3 +1037,134 @@ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
+@@ -687,3 +1055,134 @@ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
  
  def : Pat<(i1 imm:$s), (LDImm1 imm:$s)>;
  def : Pat<(i8 imm:$s), (LDImm imm:$s)>;
@@ -1774,7 +1774,7 @@ index b0a4f6b8f19d..a005196bd8b6 100644
 +  dag OutOperandList = (outs Yc16:$dst); dag InOperandList = (ins Ac16:$src);
 +}
 diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-index 21910cfeab37..e3fece8b0616 100644
+index 21910cfea..e3fece8b0 100644
 --- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
 +++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
 @@ -359,4 +359,52 @@ let mayLoad = true in {
@@ -1831,7 +1831,7 @@ index 21910cfeab37..e3fece8b0616 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index bab75066c7aa..96824c6d1481 100644
+index 9712a96e9..84cbae35b 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -1844,7 +1844,7 @@ index bab75066c7aa..96824c6d1481 100644
    bool selectFrameIndex(MachineInstr &MI);
    std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
    bool selectAddr(MachineInstr &MI);
-@@ -96,6 +99,36 @@ private:
+@@ -102,6 +105,36 @@ private:
    bool selectIncDecMB(MachineInstr &MI);
    bool selectUnMergeValues(MachineInstr &MI);
    bool selectBrIndirect(MachineInstr &MI);
@@ -1881,7 +1881,7 @@ index bab75066c7aa..96824c6d1481 100644
  
    // Select instructions that correspond 1:1 to a target instruction.
    bool selectGeneric(MachineInstr &MI);
-@@ -199,17 +232,54 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -205,17 +238,54 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    switch (MI.getOpcode()) {
    case MOS::G_ADD:
    case MOS::G_SUB:
@@ -1936,7 +1936,7 @@ index bab75066c7aa..96824c6d1481 100644
    if (selectImpl(MI, *CoverageInfo))
      return true;
  
-@@ -251,6 +321,30 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+@@ -257,6 +327,30 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_BRINDIRECT:
      return selectBrIndirect(MI);
  
@@ -1967,7 +1967,7 @@ index bab75066c7aa..96824c6d1481 100644
    case MOS::G_IMPLICIT_DEF:
    case MOS::G_LOAD_ZP_IDX:
    case MOS::G_LOAD_ABS:
-@@ -769,6 +863,28 @@ static Register getSbcFlagForRegister(const MachineInstr &Sbc, Register Reg) {
+@@ -775,6 +869,28 @@ static Register getSbcFlagForRegister(const MachineInstr &Sbc, Register Reg) {
    llvm_unreachable("Could not find register in G_SBC outputs.");
  }
  
@@ -1996,7 +1996,7 @@ index bab75066c7aa..96824c6d1481 100644
  // Match criteria common to all Cmp where N or Z are used.
  struct CmpNZ_match {
    Register &LHS;
-@@ -784,6 +900,11 @@ struct CmpNZ_match {
+@@ -790,6 +906,11 @@ struct CmpNZ_match {
      CondMI = DefSrcReg->MI;
      if (CondMI->getOpcode() != MOS::G_SBC)
        return false;
@@ -2008,7 +2008,7 @@ index bab75066c7aa..96824c6d1481 100644
  
      auto CInConst =
          getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
-@@ -796,6 +917,70 @@ struct CmpNZ_match {
+@@ -802,6 +923,70 @@ struct CmpNZ_match {
    }
  };
  
@@ -2079,7 +2079,7 @@ index bab75066c7aa..96824c6d1481 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -975,6 +1160,12 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
+@@ -981,6 +1166,12 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
    return {LHS, Addr, Idx, Flag, Load, AA};
  }
  
@@ -2092,7 +2092,7 @@ index bab75066c7aa..96824c6d1481 100644
  bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
  
-@@ -998,6 +1189,89 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1004,6 +1195,89 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
@@ -2182,7 +2182,7 @@ index bab75066c7aa..96824c6d1481 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1098,12 +1372,174 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1104,12 +1378,174 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -2357,7 +2357,7 @@ index bab75066c7aa..96824c6d1481 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -1955,6 +2391,779 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -2047,6 +2483,779 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    }
    return selectGeneric(MI);
  }
@@ -3138,10 +3138,10 @@ index bab75066c7aa..96824c6d1481 100644
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
 diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-index fbedd8d46b95..d329144e2e4c 100644
+index 3325a123f..0f2616ac9 100644
 --- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 +++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-@@ -48,6 +48,7 @@ public:
+@@ -50,6 +50,7 @@ public:
    bool lowerCmpZeros(MachineBasicBlock &MBB) const;
    void lowerCmpZero(MachineInstr &MI) const;
    bool combineLdImm(MachineBasicBlock &MBB) const;
@@ -3149,7 +3149,7 @@ index fbedd8d46b95..d329144e2e4c 100644
    bool tailJMP(MachineBasicBlock &MBB) const;
  };
  
-@@ -56,6 +57,7 @@ bool MOSLateOptimization::runOnMachineFunction(MachineFunction &MF) {
+@@ -58,6 +59,7 @@ bool MOSLateOptimization::runOnMachineFunction(MachineFunction &MF) {
    for (MachineBasicBlock &MBB : MF) {
      Changed |= lowerCmpZeros(MBB);
      Changed |= combineLdImm(MBB);
@@ -3157,7 +3157,7 @@ index fbedd8d46b95..d329144e2e4c 100644
      Changed |= tailJMP(MBB);
    }
    return Changed;
-@@ -398,6 +400,111 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
+@@ -400,6 +402,111 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
    return Changed;
  }
  
@@ -3270,7 +3270,7 @@ index fbedd8d46b95..d329144e2e4c 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 6356fa58723c..fbb134ee9a87 100644
+index 6356fa587..d994daf09 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,6 +25,7 @@
@@ -4104,7 +4104,7 @@ index 6356fa58723c..fbb134ee9a87 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
-@@ -1913,7 +2518,47 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -1913,7 +2518,56 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                .countMaxActiveBits() <= 8) {
          if (Index)
            return false;
@@ -4125,9 +4125,18 @@ index 6356fa58723c..fbb134ee9a87 100644
 +        auto &SavedMBB = Builder.getMBB();
 +        auto SavedInsertPt = Builder.getInsertPt();
 +
-+        Builder.setInsertPt(
-+            *const_cast<GPtrAdd *>(PtrAddAddr)->getParent(),
-+            const_cast<GPtrAdd *>(PtrAddAddr)->getIterator());
++        // Insert the trunc + explicit zero-extend right after NewOffset's DEFINITION, which by
++        // SSA dominates EVERY use of NewOffset. The value can also be used in a sibling block
++        // (e.g. (uint16_t)arr[i] used as this index AND XOR'd in the loop header); inserting at
++        // the G_PTR_ADD's block left the replacement Explicit16 not dominating those sibling uses
++        // -> machine-verifier "Virtual register defs don't dominate all uses". This was a fork
++        // regression vs upstream (minimal repro: a fold-while-walk loop -- the maze demo;
++        // default-8-bit + +mos-a16/+mos-xy16).
++        MachineInstr *OffDef = MRI.getVRegDef(NewOffset);
++        MachineBasicBlock &OffMBB = *OffDef->getParent();
++        Builder.setInsertPt(OffMBB, OffDef->isPHI()
++                                        ? OffMBB.getFirstNonPHI()
++                                        : std::next(OffDef->getIterator()));
 +
 +        Register Lo = Builder.buildTrunc(S8, NewOffset).getReg(0);
 +        Register ZeroHi = Builder.buildConstant(S8, 0).getReg(0);
@@ -4153,7 +4162,7 @@ index 6356fa58723c..fbb134ee9a87 100644
          continue;
        }
      }
-@@ -1996,6 +2641,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -1996,6 +2650,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
                     .countMaxActiveBits() <= 8) {
        Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
        Addr = Base;
@@ -4166,7 +4175,7 @@ index 6356fa58723c..fbb134ee9a87 100644
    }
  
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-index aedc5b41b337..ecbec72df6ff 100644
+index aedc5b41b..ecbec72df 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 @@ -38,6 +38,12 @@ public:
@@ -4195,7 +4204,7 @@ index aedc5b41b337..ecbec72df6ff 100644
                              GLoadStore &MI) const;
    std::optional<MachineOperand>
 diff --git a/llvm/lib/Target/MOS/MOSRegisterBanks.td b/llvm/lib/Target/MOS/MOSRegisterBanks.td
-index 868f6c71270a..7b5100bfeb5d 100644
+index 868f6c712..7b5100bfe 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterBanks.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterBanks.td
 @@ -11,4 +11,7 @@
@@ -4208,7 +4217,7 @@ index 868f6c71270a..7b5100bfeb5d 100644
 +// register class on the selected ops, not by the bank (banks are unused here).
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 85357faf47b3..0de444fa56eb 100644
+index 8e9b57fc9..a366daebc 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -279,11 +279,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
@@ -4356,7 +4365,7 @@ index 85357faf47b3..0de444fa56eb 100644
  
    Register A = Loc;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index fe863f0a98bb..ba96b6022307 100644
+index fe863f0a9..ba96b6022 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 @@ -96,6 +96,38 @@ def P : MOSReg<12, "P"> {
@@ -4416,7 +4425,7 @@ index fe863f0a98bb..ba96b6022307 100644
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
  let isPressureFineGrained = true in {
 diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
-index 6d303255c67f..bc43100cd577 100644
+index 6d303255c..bc43100cd 100644
 --- a/llvm/lib/Target/MOS/MOSSubtarget.h
 +++ b/llvm/lib/Target/MOS/MOSSubtarget.h
 @@ -115,6 +115,12 @@ public:
@@ -4442,7 +4451,7 @@ index 6d303255c67f..bc43100cd577 100644
    // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
    // no variable, so we instead bind pseudo features to this variable.
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index ceb0afe8a654..e12e5762211b 100644
+index ceb0afe8a..e12e57622 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 +++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 @@ -39,6 +39,7 @@
