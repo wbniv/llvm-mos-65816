@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8f275e0) | docs(plan-index): add title_layer 16×16 font row (186 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4c7c9de) | docs(plan-index): add #28 Hilbert row (187 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b4e238a) | docs(plan-index): add #27 cardioid + #30 TEA rows (186 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3e6c825) | snes(#27,#30): times-table cardioid + TEA cipher — __umodsi3 + 32-bit shift/add/XOR |
@@ -84,6 +85,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+8f275e0	author	Will Norris
+8f275e0	added	2
+8f275e0	deleted	0
+8f275e0	files	1
+8f275e0	body	Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 4c7c9de	author	Will Norris
 4c7c9de	added	1
 4c7c9de	deleted	0
