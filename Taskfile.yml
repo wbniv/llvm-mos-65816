@@ -290,6 +290,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: mandel-float }
 
+  mandel-double:
+    desc: "#33: Double-Precision Mandelbrot — escape-time z^2+c in IEEE-754 64-bit `double` (top half) beside a `float` twin (bottom half), so every op is a 64-bit soft-float libcall (__muldf3/__adddf3/__subdf3/__gtdf2/__floatsidf) — the library no other demo touches. 16x14 grid 4x-upscaled into the $7E2000 far framebuffer, Mode-7 spin (+mos-a16). BIT-EXACT differential: corpus_result (md_gate_crc 0x0EDF) == host double on bsnes-jg, host==default==a16==xy16, + disasm gate (__muldf3 + __add/subdf3 + rep/sep). NOTE: a16/xy16 slice -verify hits the documented a16-rc-undef-ra-pure-virtual known issue (code bit-exact correct). Leaves build/mandel-double.sfc + build/mandel-double-{jg,mame}.png."
+    cmds:
+      - dev/run.sh mandel-double
+
+  mandel-double-play:
+    desc: "PLAY the Double-Precision Mandelbrot in a MAME window on this host (builds the ROM first if needed). Shows the chunky escape-time set rendered by 64-bit software floating point (top half double / bottom half float), Mode-7 spinning, colour-cycled."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/mandel-double.sfc ]; then
+          echo "==> build/mandel-double.sfc missing — building it (dev/run.sh mandel-double)…"
+          dev/run.sh mandel-double
+        fi
+      - task: mandel-mame
+        vars: { ROM: mandel-double }
+
   avalanche:
     desc: "#22: 64-Bit Avalanche — splitmix64 hash matrix, every op a 64-bit libcall (__muldi3/__lshrdi3/__ashldi3/__udivdi3/__adddi3) — the integer-width family no other demo touches. Cell (i,j)=output bit j of hash64(seed^(1<<i)); a correct mixer => ~50% dense rainbow field. BIT-EXACT: assert corpus_result (h64_gate_crc 0x27EA) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__muldi3 + 64-bit shift + __udivdi3 + rep/sep). Leaves build/avalanche.sfc + build/avalanche-{jg,mame}.png."
     cmds:

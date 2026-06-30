@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/30e3918) | docs(plan-index): add title-screen VOFS easing row (192 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f5e8262) | docs(plan-index): add title-screen upgrade row (191 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/2f0c318) | docs(plan-index): add #31 Barnes-Hut row (190 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0eb843f) | docs(plan-index): add #32 vaprintf row (189 plans) |
@@ -89,6 +90,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+30e3918	author	Will Norris
+30e3918	added	2
+30e3918	deleted	0
+30e3918	files	1
+30e3918	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f5e8262	author	Will Norris
 f5e8262	added	2
 f5e8262	deleted	0

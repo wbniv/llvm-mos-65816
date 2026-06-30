@@ -245,7 +245,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 
 | New codegen corner | Why bugs hide there | Demos |
 |---|---|---|
-| **`double` soft-float** — `__adddf3`/`__muldf3`/`__divdf3`/`__fixdfsi`/`__floatsidf`/`__extenddfsf2`/`__truncdfsf2` | #21/#24 used only 32-bit `float`; `double` is a wholly separate 64-bit library, correctly-rounded → bit-exact | 33 |
+| **`double` soft-float** — `__adddf3`/`__muldf3`/`__divdf3`/`__fixdfsi`/`__floatsidf`/`__extenddfsf2`/`__truncdfsf2` | #21/#24 used only 32-bit `float`; `double` is a wholly separate 64-bit library, correctly-rounded → bit-exact | ~~33~~ |
 | **libm transcendentals** — `sqrtf` (+ self-shipped `sin`/`exp`) | #24 used float *operators*, never a libm *function* call (see the ULP gotcha above) | 34 |
 | **non-local jumps** — `setjmp`/`longjmp` full context save/restore | the whole register + SP + return-addr context spill; never exercised | 35 |
 | **dynamic stack frames** — `alloca` / C99 VLAs (runtime-sized frame) | every frame so far is fixed-size; runtime SP adjustment is untested | 36 |
@@ -268,12 +268,12 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 
 ## The twenty (each opens a corner the first 32 never run)
 
-33. **Deep-zoom Mandelbrot — `double` precision.** Render the escape-time iteration in **64-bit `double`**
+33. ~~**Deep-zoom Mandelbrot — `double` precision.** Render the escape-time iteration in **64-bit `double`**
     beside a 32-bit `float` twin; as the zoom deepens the `float` side pixelates into blocks while `double`
     stays crisp. *Stresses:* the entire **double-precision soft-float library**
     (`__muldf3`/`__divdf3`/`__adddf3`/`__fixdfsi`/`__floatsidf`/`__extenddfsf2`/`__truncdfsf2`). Bit-exact
     differential — IEEE-754 `double` arithmetic is correctly rounded. *Shows:* a live zoom with a
-    float-vs-double split screen (the precision cliff is the visual).
+    float-vs-double split screen (the precision cliff is the visual).~~ ✓ [/snes/mandel-double/](https://biohack.net/snes/mandel-double/) — bit-exact `host==default==a16==xy16==0x0EDF`; double top / float bottom (whole set, seamless), cliff folded into the gate + shown host-side (deep zoom too slow live); NEW 3rd witness of the `a16-rc-undef-ra-pure-virtual` known issue (code bit-exact correct). ([plan](../plans/2026-06-30-33-snes-mandel-double.md))
 
 34. **Function-surface ripple — `sqrtf` + libm.** A rotating height-shaded plot of
     `z = ownsin(ownsqrt(x²+y²) − t)`, or an accurate pendulum. *Stresses:* a real **libm `sqrtf` call**
@@ -374,7 +374,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 
 Sharpest at opening a code path the first 32 never run:
 
-- **#33 `double` soft-float** — the largest brand-new library surface, with a clean bit-exact differential (the `double` analogue of #21).
+- ~~**#33 `double` soft-float** — the largest brand-new library surface, with a clean bit-exact differential (the `double` analogue of #21).~~ ✓ [/snes/mandel-double/](https://biohack.net/snes/mandel-double/)
 - **#35 `setjmp`/`longjmp`** — the context save/restore ABI; nothing else in 52 demos touches it (and may surface a toolchain gap).
 - **#38 computed-`goto`** — a second VM that opens the *threaded-dispatch* path #29a's `switch` jump-table didn't.
 - **#44 saturating / `__builtin_add_overflow`** — flag-sequence codegen, plus a gorgeous additive-bloom visual.

@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b24713b) | docs(demo-ideas): Round 3 — 20 new compiler-stress demo ideas (#33–#52) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/66271bb) | docs(battery): add stress-test battery completion status report |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/fbaf268) | docs(demo-ideas): Round 2 complete — strike #29a coverage row + update status header |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b1aa00a) | snes(#31): Barnes-Hut quadtree galaxy — pointer-chasing dynamic trees |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e7d1965) | snes(#32): va_arg variadic formatter — mini_sprintf + Lissajous |
@@ -30,6 +32,16 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+b24713b	author	Will Norris
+b24713b	added	173
+b24713b	deleted	0
+b24713b	files	1
+b24713b	body	Twenty more codegen corners none of the first 32 demos touch, each with a\nvisual: double soft-float, libm/sqrtf, setjmp/longjmp, alloca/VLA, sparse-switch,\ncomputed-goto, constant-divisor magic reciprocal, table-LUT CRC32, free-list\nallocator, Duff's device, signed-64 divide, saturating/overflow-builtin, union\ntype-punning, qsort callbacks, Newton reciprocal, IIR feedback, LZ/RLE decode,\n8+-arg calling-convention spill, coroutines/protothreads, cross-boundary bitfields.\n\nIncludes a per-corner coverage map + Round 3 first picks, and two up-front design\ngotchas: libm transcendentals aren't bit-exact across libms (only sqrtf + the basic\nops are correctly-rounded — must self-ship sin/exp or restrict to sqrtf), and\nsetjmp/alloca may not be supported by the soft-stack target (a gap is itself a\nfinding). Header status updated. Not yet built.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+66271bb	author	Will Norris
+66271bb	added	1
+66271bb	deleted	0
+66271bb	files	1
+66271bb	body	All 32 demos shipped + gate-verified + published. Consolidates the\ncompiler-correctness verdict (all corners green, bugs found were pre-existing\nand fixed in-flight), the Round-2 coverage table with gate CRCs, and the\n#25-FFT display-vs-codegen distinction. Linked from the demo-ideas tracker.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fbaf268	author	Will Norris
 fbaf268	added	10
 fbaf268	deleted	10
