@@ -3,7 +3,7 @@
 Reference doc for the `TitleLayer` intro card used by all snesgfx battery demos, plus the `splash` fallback for Mode 7 demos.
 
 **Source:** [`examples/snes/snesgfx/title_layer.h`](../examples/snes/snesgfx/title_layer.h)
-**Integration example:** [`examples/snes/fn-plot.c`](../examples/snes/fn-plot.c) lines 157–164
+**Integration example:** [`examples/snes/fn-plot.c`](../examples/snes/fn-plot.c) (8×8), [`examples/snes/hilbert.c`](../examples/snes/hilbert.c) (16×16)
 
 ---
 
@@ -11,18 +11,34 @@ Reference doc for the `TitleLayer` intro card used by all snesgfx battery demos,
 
 The title card is a `Drawable` called `TitleLayer` that lives on **BG2 (4bpp)**. Every snesgfx demo already occupies BG1 (newton/rdiff) or BG3 (canvas/text), leaving BG2 universally free. The layer is completely **gate-neutral**: once `title_end()` sets `active = 0`, `emit()` becomes a no-op and the demo's corpus hash and HDMA are unaffected.
 
+### Font modes
+
+Two font sizes are available, selected per title card:
+
+```c
+title_begin(d, &t, line0, line1);    // 8×8 — default, all existing demos
+title_begin16(d, &t, line0, line1);  // 16×16 pixel-doubled — short strings (≤16 chars)
+title_end(d, &t, frames);            // shared teardown for both
+```
+
+**8×8 mode:** 64 glyphs × 1 tile × 16 words = 1024 words. Max 32 chars/line. HDMA channel 3 used for sub-tile pixel centring (odd-length strings get a −4 px nudge).
+
+**16×16 mode:** each 8×8 glyph is pixel-doubled at load time into 4 tiles arranged 2×2 (TL/TR/BL/BR = tiles `4g+0..4g+3`). 64 glyphs × 4 tiles × 16 words = 4096 words. Max 16 chars/line. Centering is exact at the 16 px tile boundary — no HDMA needed, channel 3 stays free for demos.
+
 ```
 VRAM layout (BG2 only; demo layers left untouched)
 ─────────────────────────────────────────────────
 0x0000  demo BG1 / BG3 char data
-0x1000  TitleLayer BG2 char data (64 glyphs × 16 words = 1 K words)
+0x1000  TitleLayer BG2 char data
+          8×8 mode:   1024 words (0x1000–0x13FF)
+          16×16 mode: 4096 words (0x1000–0x1FFF)
 0x4000  demo BG1 / BG3 tilemaps
 0x5000  TitleLayer BG2 tilemap  (32×32 × 1 word = 1 K words)
 ```
 
-**CGRAM palette 7** (entries 112–127) is reserved by the title. Colour 0 = transparent, colour 1 = the animated ink. `CGRAM[0]` is the hardware backdrop (SNES universal background); the title cycles it as a rainbow.
+**CGRAM palette 7** (entries 112–127) is reserved by the title. Colour 0 = transparent, colour 1 = the animated ink. `CGRAM[0]` is the hardware backdrop; the title cycles it as a rainbow.
 
-**Font:** 8×8 ASCII 0x20–0x5F (uppercase + digits + punctuation). 2bpp glyphs from `font8.h`, promoted to 4bpp at load time (planes 2–3 = 0) so ink = colour 1.
+**Font source:** 8×8 2bpp ASCII 0x20–0x5F from `font8.h`, promoted to 4bpp at load (planes 2–3 = 0, so ink = colour 1). In 16×16 mode the promotion and doubling happen together in `_title_reserve()`.
 
 ---
 
@@ -48,20 +64,29 @@ title_begin()                                    title_end()
 
 - Writes `REG_BG2SC` and `REG_BG12NBA` for BG2 character + tilemap base.
 - Loads CGRAM palette 7: colour 0 = black, colour 1 = white `(0x7FFF)`.
-- Loads font (64 glyphs × 16 words each) into VRAM at `0x1000`.
+- Loads font into VRAM at `0x1000` (8×8: 1024 words; 16×16: 4096 words).
 - Clears the 32×32 tilemap to spaces.
-- Places `line0` at **tilemap row 0** (top edge) and `line1` at **tilemap row 27** (bottom edge).
+- Parks lines at the screen edges (see table below).
 - Pre-builds row buffers `rbuf0`, `rbuf1`, `rblank` for fast DMA during fly-in.
-- Arms **HDMA channel 3** on `BG2HOFS` with a static 2-band pixel-centre table.
+- **8×8 only:** arms HDMA channel 3 on `BG2HOFS` for sub-tile pixel centring.
+
+| Mode | line0 parks at | line1 parks at | Buffer width |
+|---|---|---|---|
+| 8×8 | row 0 (top edge, visible) | row 27 (bottom edge) | 32 words |
+| 16×16 | rows 0–1 (top edge) | rows 28–29 (off-screen) | 64 words (top + bottom tile row) |
 
 ```
-Tilemap at reserve (32 columns wide, shown schematically)
-──────────────────────────────────────────────────────────
-row  0  ████████████ FN-PLOT ████████████   ← line0 parked at top
-row  1  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-row  2  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+8×8 tilemap at reserve (32 columns, schematic)
+──────────────────────────────────────────────
+row  0  ████ FN-PLOT ████   ← line0 parked (visible at top)
      …  (empty rows)
-row 27  ████ RECURSIVE PARSER █████████   ← line1 parked at bottom
+row 27  ██ RECURSIVE PARSER ██  ← line1 parked (visible at bottom)
+
+16×16 tilemap at reserve
+──────────────────────────────────────────────
+rows  0-1  ████ HILBERT CURVE ████   ← line0 parked (visible at top)
+      …    (empty rows)
+rows 28-29 ██ SPACE-FILLING ██        ← line1 parked (off-screen)
 ```
 
 ---
@@ -128,13 +153,13 @@ Screen at fly-in complete
   (rainbow backdrop visible where text is transparent)
 ```
 
-### Pixel-perfect centring (HDMA)
+### Pixel-perfect centring
 
-Tile placement floors to the 8 px grid. Odd-length strings land 4 px left of true centre. A static 2-band HDMA table on `BG2HOFS` corrects this:
+**8×8 mode — HDMA:** Tile placement floors to the 8 px grid. Odd-length strings land 4 px left of true centre. A static 2-band HDMA table on `BG2HOFS` (channel 3) corrects this:
 
 ```
-HDMA stream (channel 3, BG2HOFS)
-  scanlines   0–111 : hofs for line0  (shift = 0 if even len, −4 if odd)
+HDMA stream (channel 3, BG2HOFS) — 8×8 mode only
+  scanlines   0–111 : hofs for line0  (−4 if odd len, 0 if even)
   scanlines 112–223 : hofs for line1
 
 hofs formula: 8·col + 4·len − 128
@@ -142,7 +167,9 @@ hofs formula: 8·col + 4·len − 128
   "RECURSIVE PARSER"  len=16 (even)→ hofs =  0   (no shift needed)
 ```
 
-The split scanline (112) sits in the blank gap row between the two text lines. An HDMA value change takes one scanline to settle; parking the split on a transparent row hides the transition artefact.
+The split scanline (112) sits in the blank gap between the lines; parking the split there hides the 1-scanline HDMA settle artefact.
+
+**16×16 mode — exact, no HDMA:** col_start = (32 − 2·len) / 2, pixel_start = 8·col_start = 128 − 8·len, which equals (256 − 16·len) / 2 — the true pixel centre — for every integer len 0..16. HDMA channel 3 stays free for demos.
 
 ---
 
@@ -234,29 +261,41 @@ Title card during dwell (representative frame)
 ## Integration Pattern
 
 ```c
-// fn-plot.c:157–164
+// 8×8 — fn-plot.c (long subtitle fits 32-char limit)
 static TitleLayer title;
 title_begin(&a.screen, &title, "FN-PLOT", "RECURSIVE PARSER");
+corpus_result = fn_gate_crc();       // heavy compute runs DURING the title
+title_end(&a.screen, &title, 90);
 
-corpus_result = fn_gate_crc();   // heavy compute runs DURING the title (~9 frames)
-
-title_end(&a.screen, &title, 90);  // hold 90 frames (~1.5 s), then fade out
+// 16×16 — hilbert.c (short strings, max 16 chars each)
+static TitleLayer title;
+title_begin16(&a.screen, &title, "HILBERT CURVE", "SPACE-FILLING");
+corpus_result = hilbert_gate_crc();
+title_end(&a.screen, &title, 110);
 ```
 
-Key ordering rules:
+Key ordering rules (both modes):
 1. Add demo drawables first (`display_add()` for each demo layer).
-2. Call `title_begin()` **last** — its `reserve()` writes `REG_BG12NBA` and must not clobber BG1's char-base nibble.
-3. Run gate compute between `title_begin` and `title_end` — the PPU holds the lit card with no `display_frame()` calls needed.
+2. Call `title_begin[16]()` **last** — `reserve()` writes `REG_BG12NBA` and must not clobber BG1's char-base nibble.
+3. Run gate compute between `title_begin[16]` and `title_end` — the PPU holds the lit card.
+
+**Choosing the mode:** use 16×16 when both strings are ≤16 chars and you want a logo-weight title card. Use 8×8 for longer strings or subtitles where readability matters over visual impact.
 
 ---
 
-## Screenshot
+## Screenshots
 
-The demo immediately after the title card exits (fn-plot, first frames):
+8×8 title card (fn-plot, mid-dwell, native 256×224):
 
-<img src="plans/screenshots/fn-plot.png" width="700">
+<img src="plans/screenshots/fn-plot-title-150.png" width="700">
 
-*(No title-card screenshot exists yet — the intro exits before the gate screenshot is taken. To capture it: run `dev/run.sh gate` and pause bsnes-jg during the intro.)*
+16×16 title card (fn-plot with `title_begin16`, same timing):
+
+<img src="plans/screenshots/fn-plot-16x16-f130.png" width="700">
+
+16×16 on biohack.net (hilbert, bsnes-jg WASM player, native resolution):
+
+<img src="plans/screenshots/hilbert-title.png" width="700">
 
 ---
 
@@ -290,10 +329,11 @@ splash_show("BLOSSOM", "BLOOM AUTOMATON", 120);
 
 | Symbol | Value | Meaning |
 |---|---|---|
-| `TITLE_ROW0` | 12 | Centre row for line0 |
-| `TITLE_ROW0 + 2` | 14 | Centre row for line1 |
-| `TITLE_FLY_STEP` | 3 | Fly-in speed, Q4 units/frame |
-| `TITLE_HDMA_CHAN` | 3 | HDMA channel for BG2HOFS pixel-centre |
+| `TITLE_ROW0` | 12 | Centre row for line0 (top of block in both modes) |
+| `TITLE_ROW0 + 2` | 14 | Centre row for line1 (top of block) |
+| `TITLE_FLY_STEP` | 3 | Fly-in speed, Q4 units/frame (both modes) |
+| `TITLE_HDMA_CHAN` | 3 | HDMA channel for BG2HOFS pixel-centre (8×8 only) |
+| `TITLE_MAX_CHARS` | 16 | Max chars per line in 16×16 mode |
 | `TITLE_CHR_WORD` | `0x1000` | BG2 char data base (VRAM word address) |
 | `TITLE_MAP_WORD` | `0x5000` | BG2 tilemap base |
 | `TITLE_PAL` | 7 | CGRAM palette (entries 112–127) |

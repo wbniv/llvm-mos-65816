@@ -70,27 +70,28 @@ These demos still use `title_begin` (8×8) so the change is cosmetic until they 
 ```
 0x0000  demo BG1/BG3 char data
 0x1000  TitleLayer BG2 char data
-          8×8 mode:  1024 words (glyphs 0–63 × 1 tile each)
+          8×8 mode:   1024 words (glyphs 0–63 × 1 tile each, up to 0x13FF)
           16×16 mode: 4096 words (glyphs 0–63 × 4 tiles each, 0x1000–0x1FFF)
-0x2000  (free in 16×16 mode; free above 0x1400 in 8×8 mode)
+0x2000  free
 0x5000  TitleLayer BG2 tilemap (1024 words, unchanged in both modes)
 ```
 
-## VRAM layout after change
-```
-0x0000  demo BG1/BG3 char data
-0x1000  TitleLayer BG2 char data (4096 words, glyphs 0–63 × 4 tiles each)
-0x2000  (free)
-0x5000  TitleLayer BG2 tilemap (1024 words, unchanged)
-```
+## Demos using `title_begin16`
+
+| Demo | line0 | line1 | Committed |
+|---|---|---|---|
+| `hilbert.c` | `"HILBERT CURVE"` (13) | `"SPACE-FILLING"` (13) | `d56fd23` |
+
+All other demos remain on `title_begin` (8×8).
 
 ## Verification
 
 1. ~~Build: `task compile` — zero errors.~~ PASS
-2. ~~Gate: fn-plot corpus hash unchanged.~~ PASS `0x2EBE` (both 8×8 and 16×16 modes tested)
-3. ~~Visual: 16×16 text renders correctly.~~ PASS — pixel measurement confirms:
-   - `"FN-PLOT"` (len=7): starts at x=72 = tile-col 9 × 8px (exact 16×16 centering), spans ~106px ≈ 7×16=112px ✓
-   - `"RECURSIVE PARSER"` (len=16): spans ~250px ≈ full 256px screen width = 16×16px ✓
-   - Text height covers 2 tile rows (16px) as expected ✓
-   - Screenshots: `docs/plans/screenshots/fn-plot-16x16-f{60,90,130}.png`
-4. rdiff and 1d-ca string abbreviations — not yet verified visually (low priority; 8×8 path unchanged)
+2. ~~Gate: fn-plot corpus hash unchanged (8×8 and 16×16 modes).~~ PASS `0x2EBE`
+3. ~~Gate: hilbert corpus hash unchanged after switching to `title_begin16`.~~ PASS `0x5999`
+4. ~~Visual: 16×16 text renders correctly.~~ PASS
+   - Pixel measurement: `"FN-PLOT"` (len=7) starts at x=72 = col 9×8px (exact 16×16 centring), spans ~106px ≈ 7×16=112px ✓
+   - `"RECURSIVE PARSER"` (len=16) spans ~250px ≈ full 256px screen ✓
+   - Text height: 2 tile rows (16px) ✓  Screenshots: `docs/plans/screenshots/fn-plot-16x16-f{60,90,130}.png`
+   - Live on [biohack.net/snes/hilbert/](https://biohack.net/snes/hilbert/) — large blocky 2×2-pixel glyphs visible ✓
+5. ~~rdiff/1d-ca string abbreviations committed.~~ PASS (both ≤16 chars; still on 8×8 for now)
