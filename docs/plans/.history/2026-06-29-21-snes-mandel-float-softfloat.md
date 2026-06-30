@@ -1,14 +1,8 @@
 | Date | Change |
 |------|--------|
-| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/3d66b05) | docs(snes): #21 use the iconic bsnes-jg frame-2200 whole-set render as the title card |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/cd3663a) | feat(snes): #21 Soft-Float Mandelbrot — IEEE-754 single-precision escape-time / soft-float libcall stress demo |
 
 <!--history-meta v1
-3d66b05	author	Will Norris
-3d66b05	added	5
-3d66b05	deleted	5
-3d66b05	files	1
-3d66b05	body	The frame-1700 capture was mid-paint and abstract; frame 2200 shows the full black\nMandelbrot set surrounded by escape bands. Bump the gate snapshot frame 1700->2200 so\nre-runs reproduce the card, and update the plan title card + verification note.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 cd3663a	author	Will Norris
 cd3663a	added	170
 cd3663a	deleted	0
