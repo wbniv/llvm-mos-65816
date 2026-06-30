@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/661b01e) | #33 Double-Precision Mandelbrot SNES demo — 64-bit double soft-float |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b24713b) | docs(demo-ideas): Round 3 — 20 new compiler-stress demo ideas (#33–#52) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/66271bb) | docs(battery): add stress-test battery completion status report |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/fbaf268) | docs(demo-ideas): Round 2 complete — strike #29a coverage row + update status header |
@@ -32,6 +33,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+661b01e	author	Will Norris
+661b01e	added	4
+661b01e	deleted	4
+661b01e	files	1
+661b01e	body	The double analogue of #21 (mandel-float): escape-time z^2+c in IEEE-754\n64-bit `double` (top half) beside the 32-bit `float` twin (bottom half),\nMode-7 far-buffer renderer (+mos-a16-only). Exercises the entire double\nsoft-float library (__muldf3/__adddf3/__subdf3/__gtdf2/__floatsidf +\n__truncdfsf2/__extendsfdf2) — disjoint from #22's 64-bit integer family,\notherwise untested by the battery.\n\nBit-exact host==default==+mos-a16==+mos-xy16==0x0EDF on bsnes-jg (all three\ncompiled modes); disasm __muldf3=8/__add+subdf3=12/rep-sep=31. MAME leg\nenv-blocked (no SPC700 IPL). ROM fit one 32 KiB bank by const-folding the\ncoordinate divides (the huge double lib pushed it 2289 B over).\n\nCompiler finding: a NEW (3rd) witness of the documented\na16-rc-undef-ra-pure-virtual known issue (CAUSE #2) — the a16/xy16 corpus\nslice trips -verify 'undefined physical register' (same symptom the shipped\nmandel-float slice emits) but runs bit-exact correct (proven by the 4-way\nbsnes-jg differential incl. the flagged xy16 mode). Latent-hazard verify\nXFAIL, not a miscompile; not reshaped to dodge it per the stress protocol.\n\nPublished: biohack.net/snes/mandel-double/ (v1.0.150).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 b24713b	author	Will Norris
 b24713b	added	173
 b24713b	deleted	0

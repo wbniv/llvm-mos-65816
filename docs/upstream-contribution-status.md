@@ -65,8 +65,9 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 
 ## TL;DR
 
-- **Ready to post now: 1 PR + 3 issues + 3 design notes** — seven artifacts (F4 PR + DP-arg issue posted
-  2026-06-22; see *Open on GitHub* below). Strictly *PRs*, that's **one** (the DWARF step-6 test+docs).
+- **Ready to post now: 1 PR + 4 issues + 3 design notes** — eight artifacts (F4 PR + DP-arg issue posted
+  2026-06-22; see *Open on GitHub* below). Strictly *PRs*, that's **one** (the DWARF step-6 test+docs). The
+  4th issue (#9) is the **llvm-mos-sdk** `longjmp`/`setjmp.S` 65816 bug found 2026-06-30 (a different repo).
 - **Open on GitHub right now: 3** — [PR #562](https://github.com/llvm-mos/llvm-mos/pull/562) (F4 — TYX/TXY
   dead-flag fix), [issue #561](https://github.com/llvm-mos/llvm-mos/issues/561) (DP-arg CC), and
   [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563) (the **fix** for #561 — `Fixes #561`, auto-closes
@@ -251,6 +252,29 @@ gh issue create --repo llvm-mos/llvm-mos \
 ```
 
 Full internal record: [far-value residuals plan §Part A](plans/2026-06-22-320-far-value-residuals.md).
+
+### 9 — `longjmp` broken on the 65816 — `setjmp.S` is 6502-only (an **llvm-mos-sdk** issue, not a PR)
+
+Surfaced scoping demo #35 (the `setjmp`/`longjmp` battery member). The SDK's common
+`mos-platform/common/c/setjmp.S` is a **6502** implementation: `setjmp` reads the return address from a
+**hardcoded page `$0100`** (`tsx`; `lda $101,x`/`$102,x`) and saves only the **8-bit** hard stack pointer
+(`txa`); `longjmp` restores it with `tax; txs`. On the **65816 in native mode** (which the SNES crt0 enters
+via `XCE`) the stack pointer **S is 16-bit and not page-1-bound**, so `longjmp` restores a corrupted S and
+`rts`-es to a garbage address — **`longjmp` never returns**. `setjmp` + normal return works; only the
+`longjmp` restore is broken. Reproduces in **default-8-bit AND `+mos-a16`** → pre-existing upstream, **not**
+the #321 fork. Minimal repro confirmed on bsnes-jg (`corpus_result` stuck at the pre-`longjmp` value). Fix
+direction: a 65816-aware `setjmp.S` (save/restore the full 16-bit S with `tsc`/`tcs`; read/replace the
+return address stack-relative, not at `$0101`/`$0102`; mind M/X widths). **No fork patch yet** (deferred per
+user 2026-06-30 — document + keep deploying demos; a dedicated session can write + test the SDK fix). File it
+against the **SDK** repo:
+
+```
+gh issue create --repo llvm-mos/llvm-mos-sdk \
+  --title "[65816] longjmp corrupts the stack pointer in native mode — common setjmp.S is 6502-only (8-bit page-\$0100 stack)" \
+  --body-file docs/investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md   # trim to the repro + root cause
+```
+
+Full internal record: [setjmp/longjmp 65816 investigation](investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md).
 
 ## Future / blocked (not yet postable — do **not** count these as pending)
 

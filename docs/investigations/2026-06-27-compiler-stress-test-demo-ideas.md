@@ -285,6 +285,15 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     and **`longjmp`s straight back to the last choice point** on a dead end. *Stresses:* **non-local-jump
     context save/restore** (`setjmp`/`longjmp` — full SP + return + callee-saved spill); verify toolchain
     support first. *Shows:* the board filling, then snapping back as it backtracks, live.
+    **⚠ BLOCKED (2026-06-30) — `longjmp` is BROKEN on the 65816.** Scoping this demo surfaced a real bug:
+    the SDK's common `setjmp.S` is 6502-only — it saves/restores only the **8-bit page-$0100 hardware
+    stack**, but the 65816 native-mode stack pointer is **16-bit**, so `longjmp` corrupts S and `rts`-es to
+    garbage (`setjmp` + normal return works; `longjmp` never returns). Fails in **default-8-bit AND
+    `+mos-a16`** → pre-existing upstream `llvm-mos-sdk`, not the #321 fork. The "gap is a finding" outcome
+    idea #35 itself anticipated. Demo deferred until a 65816-aware `setjmp.S` lands (16-bit `tsc`/`tcs` +
+    stack-relative return addr). Full repro + root cause:
+    [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md); queued in
+    [upstream-contribution-status](../upstream-contribution-status.md).
 
 36. **Polygon scanline fill — `alloca` / VLA.** Spinning convex/concave polygons of varying vertex counts,
     each filled with an **edge table sized at runtime** (`int xs[nverts]`). *Stresses:* **dynamic stack
@@ -375,7 +384,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 Sharpest at opening a code path the first 32 never run:
 
 - ~~**#33 `double` soft-float** — the largest brand-new library surface, with a clean bit-exact differential (the `double` analogue of #21).~~ ✓ [/snes/mandel-double/](https://biohack.net/snes/mandel-double/)
-- **#35 `setjmp`/`longjmp`** — the context save/restore ABI; nothing else in 52 demos touches it (and may surface a toolchain gap).
+- **#35 `setjmp`/`longjmp`** — the context save/restore ABI; nothing else in 52 demos touches it (and may surface a toolchain gap). **⚠ BLOCKED — it surfaced exactly that gap: `longjmp` is broken on the 65816 (6502-only `setjmp.S`); see #35 above + [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md).**
 - **#38 computed-`goto`** — a second VM that opens the *threaded-dispatch* path #29a's `switch` jump-table didn't.
 - **#44 saturating / `__builtin_add_overflow`** — flag-sequence codegen, plus a gorgeous additive-bloom visual.
 - **#48 IIR feedback** — the non-reorderable recursive dependency chain the feed-forward FFT (#25) never exercised.
