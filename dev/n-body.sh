@@ -42,7 +42,7 @@ rc=0
 # 3. Disasm gate: hot loop must have __udivsi3 + 16x16->32 mul + rep/sep.
 echo "==> disasm gate (N-body force loop codegen)"
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os \
-  -c "$ROOT/examples/snes/corpus/nbody_sim.c" -I"$ROOT/examples" -o "$BUILD/n-body_sim.o" 2>/dev/null
+  -c "$ROOT/examples/snes/corpus/n-body_sim.c" -I"$ROOT/examples" -o "$BUILD/n-body_sim.o" 2>/dev/null
 dis=$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$BUILD/n-body_sim.o" 2>/dev/null || true)
 div=$(printf '%s\n' "$dis" | grep -c '__udivsi3'   || true)
 mul=$(printf '%s\n' "$dis" | grep -cE '__mulsi3|__umulsi3' || true)
