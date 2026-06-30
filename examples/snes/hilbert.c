@@ -120,7 +120,7 @@ int main(void) {
     text_puts(&a.text, 1, 0, "ORDER:4  256 PTS  ASHLSI3");
 
     static TitleLayer title;
-    title_begin(&a.screen, &title, "HILBERT CURVE", "SPACE-FILLING");
+    title_begin16(&a.screen, &title, "HILBERT CURVE", "SPACE-FILLING");
 
     corpus_result = hilbert_gate_crc();
 
