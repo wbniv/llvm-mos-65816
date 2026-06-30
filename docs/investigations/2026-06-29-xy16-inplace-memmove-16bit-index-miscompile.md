@@ -1,9 +1,39 @@
 # `+mos-xy16` miscompile: iterative in-place `memmove`/`memcpy` rewrite over a 16-bit-indexed buffer
 
-**Status:** OPEN — confirmed-real defect (not a stale build). Found 2026-06-29 by the #23 L-System demo's
-5-way differential gate. Clean minimal repro in hand. **Distinct from the `8c928b8` legalizer-domination
-fix** (tested on an isolated worktree toolchain with that fix applied — my repro still diverges; see below).
-Root-cause **hypothesis identified** (see "Root cause").
+**Status: RESOLVED — NOT reproducible on the shipping toolchain (full patch stack). No compiler bug.**
+Re-measured 2026-06-29 against `build/llvm-mos-install` (the full `0001..0014` stack + merged `8c928b8`):
+the minimal repro and the real #23 L-System demo both come out **host==default==+mos-a16==+mos-xy16**.
+The original `0x1CC6` was produced by an **isolated** toolchain (`throwaway/lsystem-xy16-verify`, built off
+`6f940e9`), which differs from the shipping compiler — the stale/partial-build false-alarm class the summary
+below worried about. A differential **regression gate** now locks the correct behaviour in
+(`dev/run.sh xy16inplace`). _Original OPEN investigation preserved below for the record._
+
+## Resolution (2026-06-29) — measured on the shipping toolchain
+
+| test | CAP=1700 (16-bit idx) | CAP=200 (8-bit idx) | verdict |
+|---|---|---|---|
+| host oracle | `0x90AA` | `0xDEBD` | ground truth |
+| default (8-bit) @ bsnes-jg | `0x90AA` | `0xDEBD` | ✅ |
+| `+mos-a16` @ bsnes-jg | `0x90AA` | `0xDEBD` | ✅ |
+| **`+mos-xy16`** @ bsnes-jg | **`0x90AA`** | **`0xDEBD`** | ✅ **matches** |
+
+`-verify-machineinstrs` clean; the real `#23` L-System demo gate passes (`0x79C3`); the `xy16` micro-test
+suite (`xy16basic/ops/indiry/spill/...`) passes its codegen checks (`xy16indiry` confirms the `(zp),Y16`
+B2 gate fires). **Mechanism:** post-legalizer MIR (`-stop-after=legalizer`) shows the genuine 16-bit buffer
+index lowers through the dedicated **`G_*_ABS_IDX16` path (B2)** — *not* the seed-56 `trunc`-to-8-bit
+workaround (B1). B1 only fires when value-tracking proves the index `<256` (`KnownBits ≤ 8`), exactly the
+`CAP=200` case — and that path is also correct. So:
+
+- **The "Root cause (hypothesis)" below is refuted.** B1's `trunc` is never on the 16-bit-index path; for the
+  one case it *does* handle (`CAP=200`) the high byte is provably zero, so dropping it is correct.
+- **`8c928b8` is unrelated.** That fix only changed *where* B1's MERGE is emitted; B1 is not reached for a
+  16-bit index, so `8c928b8` cannot have caused **or** fixed this. The full stack was correct independent of it.
+- **The `0x1CC6` was an isolated-toolchain artifact.** I could not reproduce it from the shipping compiler;
+  the likeliest cause is the isolated build differed from the full stack (missing/older MOS patches or a stale
+  binary — the same class flagged in `321-xy16-cmove-stale-xfail` / `321-pr15296-zp-overflow`). If a from-scratch
+  clean-build attribution is wanted, that is the one remaining (expensive) step not done here.
+
+**Impact:** the #23 L-System demo is **NOT blocked** — it ships 5-way-green on the shipping toolchain.
 
 ## Relationship to `8c928b8` (legalizer indexed-addressing domination fix)
 
