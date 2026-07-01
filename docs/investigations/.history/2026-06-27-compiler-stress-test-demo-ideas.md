@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5f28aea) | #52 Cross-Byte-Boundary Bitfield Disassembler SNES demo — final Round-3 demo (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e0ca23) | #51 Protothread Critter Swarm SNES demo — resumable functions (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4f6558f) | #50 Many-Argument Color-Grade Kernel SNES demo — >register-count arg spill (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/149bfdf) | #49 LZ77 Image-Decompress Reveal SNES demo — back-references from own output (clean positive) |
@@ -50,6 +51,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+5f28aea	author	Will Norris
+5f28aea	added	3
+5f28aea	deleted	3
+5f28aea	files	1
+5f28aea	body	A 65816 instruction descriptor packs opcode:8, mode:3, len:2, group:5, cycles:4,\nflags:7, rmw:1 across a uint32_t, with group (bits 13-17) crossing the byte-1/2\nboundary at bit 16 and flags (bits 22-28) crossing byte-2/3 at bit 24 — forcing\nmulti-byte shift+mask to extract and read-modify-write to insert (distinct from\n#29b truchet's single-uint16 fields). The gate folds read-back field values so the\ndifferential is layout-independent yet a cross-byte corruption still diverges.\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0x31D7 on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate: and-masks + 23 multi-byte shifts, zero arith libcalls. No compiler bug.\nThis completes the Round-3 (#33-#52) compiler stress-test demo battery. Live at\nhttps://biohack.net/snes/disbits/ (biohack v1.0.169).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0e0ca23	author	Will Norris
 0e0ca23	added	3
 0e0ca23	deleted	3

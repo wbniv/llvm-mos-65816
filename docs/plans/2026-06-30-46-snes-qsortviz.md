@@ -42,6 +42,45 @@ int cmp(const void *a, const void *b){
 }
 ```
 
+### Root-cause mechanism (three layers)
+
+1. **Clang canonicalizes the idiom to an intrinsic.** Under `-Os`, clang recognizes `(x>y)-(x<y)` and
+   folds it into a single generic operation — the *signed three-way compare* — rather than two `icmp`s
+   plus a subtract. The emitted IR is literally:
+   ```llvm
+   %5 = tail call i16 @llvm.scmp.i16.i16(i16 %3, i16 %4)
+   ```
+   `llvm.scmp`/`llvm.ucmp` are **recent** LLVM intrinsics (added ~2024) introduced to represent the C++20
+   spaceship operator and this common C idiom as one node. This is why nothing in the earlier battery hit
+   it — no prior demo wrote a three-way compare, so the intrinsic never appeared.
+
+2. **GlobalISel lowers it to the generic machine opcode `G_SCMP`.** The mos backend selects via the
+   GlobalISel pipeline, whose **Legalizer** pass walks every generic opcode and — per the target's
+   `MOSLegalizerInfo` table — decides *legal as-is* / *widen-narrow* / *lower*. `G_SCMP`/`G_UCMP` are among
+   those generic opcodes.
+
+3. **The gap:** `MOSLegalizerInfo` had **no entry at all** for `G_SCMP`/`G_UCMP`. On an opcode with no
+   rule, the legalizer can't guess — it calls `report_fatal_error("unable to legalize instruction: …
+   G_SCMP …")` and the whole compile aborts. **Not accum-specific:** it reproduced identically in plain
+   default 8-bit codegen, at every integer width, in both `-fno-lto` and the LTO-link path — a **general,
+   latent llvm-mos backend gap** any `qsort`-style comparator would hit.
+
+Because the failure is a hard build-time `report_fatal_error` (not a subtle miscompile), the differential
+didn't have to catch a value divergence — the *loud* part is that a completely ordinary `qsort` comparator
+crashed the compiler. The stress-demo methodology ("write realistic C that hits corners other code
+doesn't") is exactly what surfaced it.
+
+### Why the fix is correct + minimal
+
+`.lower()` routes to LLVM's **pre-existing** `LegalizerHelper::lowerThreewayCompare` (`LegalizerHelper.cpp:4828`),
+which rewrites `scmp(a,b)`/`ucmp(a,b)` into the `G_ICMP` + `G_SELECT` primitives the mos backend **already
+legalizes**. So the change is purely additive — it wires a missed opcode into machinery already present
+and working; no generic-LLVM change, no new lowering code, no risk to other opcodes. It sits next to the
+identical `.lower()` handling of the comparison-derived `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX` (and `G_ABS`)
+ops the 6502/65816 also has no native form for — `G_SCMP`/`G_UCMP` simply belonged in that list and were
+missed (understandably: they are a newer opcode than most of that file). The demo (`dev/run.sh qsortviz`,
+WRAM hash `0x8EA5`) is now the permanent regression guard.
+
 ## Context
 
 A sort visualizer: 32 bars reshuffle, then re-sort under a rotating **libc `qsort`** call whose comparator

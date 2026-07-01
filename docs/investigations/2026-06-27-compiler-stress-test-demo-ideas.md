@@ -11,12 +11,20 @@
 > compiler bug surfaced** (the #23 in-place-memmove xy16 miscompile was fixed in-flight; see its row).
 > **Completion summary:** [`2026-06-30-stress-test-battery-status.md`](2026-06-30-stress-test-battery-status.md).
 >
-> **Round 3 (#33–#52) — 20 new ideas drafted** (bottom of this doc): twenty more codegen corners none of
-> the first 32 touch — `double` soft-float, libm transcendentals, `setjmp`/`longjmp`, `alloca`/VLA,
-> sparse-switch, computed-`goto`, constant-divisor magic reciprocal, table-LUT CRC, free-list allocator,
-> Duff's device, signed-64 divide, saturating/overflow-builtin arithmetic, union type-punning, `qsort`
-> callbacks, Newton-Raphson refinement, IIR feedback, LZ/RLE decode, many-arg calling-convention spill,
-> coroutines/protothreads, and cross-byte-boundary bitfields. Not yet built.
+> **Round 3 (#33–#52) — COMPLETE** ✓ (2026-06-30). Twenty more codegen corners none of the first 32
+> touch — `double` soft-float, libm transcendentals, `setjmp`/`longjmp`, `alloca`/VLA, sparse-switch,
+> computed-`goto`, constant-divisor magic reciprocal, table-LUT CRC, free-list allocator, Duff's device,
+> signed-64 divide, saturating/overflow-builtin arithmetic, union type-punning, `qsort` callbacks,
+> Newton-Raphson refinement, IIR feedback, LZ/RLE decode, many-arg calling-convention spill,
+> coroutines/protothreads, and cross-byte-boundary bitfields. **All buildable demos shipped** (18 of 20):
+> only **#34** (no libm `sqrtf` — library gap) and **#35** (`longjmp` broken — 6502-only `setjmp.S`
+> toolchain gap; deferred) are non-buildable and documented as such. **One real compiler bug found +
+> fixed:** **#46** surfaced a backend crash — the `(x>y)-(x<y)` comparator idiom emits the newer `G_SCMP`
+> three-way-compare opcode, which `MOSLegalizerInfo` had **no legalization rule for** (`unable to legalize
+> G_SCMP`, in default/a16/xy16 alike). Fixed with a one-line `.lower()` (patch `0016-mos-scmp-ucmp-legalize`,
+> routing to LLVM's `lowerThreewayCompare`); **standalone-testable, queued upstream** in
+> [`docs/upstream-contribution-status.md`](../upstream-contribution-status.md). Every other Round-3 corner
+> came back green — no further compiler bug.
 
 A backlog of candidate demo programs whose job is to **stress the llvm-mos 65816 codegen** — each leans
 on a different corner of the compiler (32-bit/fixed-point multiply, division, recursion + the soft stack,

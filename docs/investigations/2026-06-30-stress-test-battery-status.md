@@ -7,16 +7,18 @@
 
 ## Headline
 
-**All 32 numbered demos are shipped, gate-verified, and published.** Round 1 (#1–#20) and Round 2
-(#21–#32) are both complete. Every demo is live on [biohack.net/snes](https://biohack.net/snes/)
-with an in-browser bsnes-jg player and a **Verify-fidelity** self-check that reproduces the build
-gate's WRAM assert live in the tab.
+**Rounds 1–3 (#1–#52) are complete.** All **50 buildable** demos are shipped, gate-verified, and
+published on [biohack.net/snes](https://biohack.net/snes/) with an in-browser bsnes-jg player and a
+**Verify-fidelity** self-check that reproduces the build gate's WRAM assert live in the tab. Only two
+Round-3 entries are non-buildable and documented as such: **#34** (no libm `sqrtf` — a library gap) and
+**#35** (`longjmp` broken — the 6502-only `setjmp.S`, a toolchain gap; deferred, see its investigation).
 
 **Compiler-correctness verdict: the `+mos-a16` / `+mos-xy16` backend is green across every codegen
 corner the battery exercises.** The differential bar (`host == default == +mos-a16 == +mos-xy16` on
-MAME + bsnes-jg, `-verify-machineinstrs` clean) holds for all 32 demos. The bugs the battery found
-were all **pre-existing** and were fixed in-flight (see "Bugs found" below); no Round-2 corner
-surfaced a *new* miscompile.
+MAME + bsnes-jg, `-verify-machineinstrs` clean) holds for all shipped demos. The bugs the battery found
+were all **pre-existing** and were fixed in-flight (see "Bugs found" below). Round 2 surfaced no new
+miscompile; **Round 3 surfaced one real backend crash — the `G_SCMP`/`G_UCMP` legalization gap (#46) —
+now fixed** and queued for upstream.
 
 ## The bar
 
@@ -46,7 +48,47 @@ gitignored SPC700 IPL; the bsnes-jg leg + the 4-way corpus differential carry co
 
 The Round-2 untested-corner coverage map in the tracker is now **fully struck**.
 
+## Round 3 coverage — corners none of the first 32 touch
+
+| # | Demo | New codegen corner | Gate CRC | Verdict |
+|---|------|--------------------|----------|---------|
+| 33 | [mandel-double](https://biohack.net/snes/mandel-double/) | `double` soft-float (`__adddf3`/`__muldf3`/…) | — | green, no bug |
+| 34 | — | libm `sqrtf` | — | **not built** — library gap (no libm) |
+| 35 | — | `setjmp`/`longjmp` full context save | — | **not built** — `longjmp` broken (6502-only `setjmp.S`); deferred |
+| 36 | [polyfill](https://biohack.net/snes/polyfill/) | C99 VLA / runtime-sized frame | `0x8ED9` | green, no bug (the "VLA gap" doesn't exist) |
+| 37 | [seqvm](https://biohack.net/snes/seqvm/) | sparse-switch → comparison tree | `0xE8C5` | green, no bug |
+| 38 | [bf-vm](https://biohack.net/snes/bf-vm/) | computed-`goto` threaded dispatch | `0x9954` | green, no bug |
+| 39 | [divclock](https://biohack.net/snes/divclock/) | constant-divisor strength reduction | `0xF72E` | green; **measured finding** — llvm-mos does NOT strength-reduce (retains `__udivNi3`; correct on soft-mul) |
+| 40 | [crctex](https://biohack.net/snes/crctex/) | 256-entry ROM-LUT indexed byte loop (CRC32) | `0xDBBA` | green, no bug |
+| 41 | [poolfx](https://biohack.net/snes/poolfx/) | free-list pool allocator (LIFO recycle) | `0x2B9B` | green, no bug |
+| 42 | [duff](https://biohack.net/snes/duff/) | Duff's device — irreducible loop-switch CFG | `0x5531` | green, no bug |
+| 43 | [sodo](https://biohack.net/snes/sodo/) | signed 64-bit divmod (`__divmoddi4`) | `0xD2A2` | green; measured — clang merges div+mod into combined signed `__divmoddi4` |
+| 44 | [hdr-bloom](https://biohack.net/snes/hdr-bloom/) | saturating `__builtin_add_overflow` | `0xF951` | green, no bug |
+| 45 | [metaball](https://biohack.net/snes/metaball/) | union type-pun (Quake fast-inverse-sqrt) | `0xAEBE` | green, no bug |
+| **46** | **[qsortviz](https://biohack.net/snes/qsortviz/)** | **libc `qsort` + fn-ptr comparator** | `0x8EA5` | **FOUND + FIXED** `G_SCMP`/`G_UCMP` legalization crash (patch `0016`) |
+| 47 | [nrecip](https://biohack.net/snes/nrecip/) | Newton-Raphson reciprocal (multiply-only) | `0x044A` | green, no bug |
+| 48 | [iir-scope](https://biohack.net/snes/iir-scope/) | IIR feedback (non-reorderable) | `0x49BD` | green, no bug |
+| 49 | [lzdec](https://biohack.net/snes/lzdec/) | LZ77 back-refs from own output | `0x0100` | green, no bug |
+| 50 | [cgrade](https://biohack.net/snes/cgrade/) | >register-count argument spill | `0x783F` | green, no bug |
+| 51 | [critters](https://biohack.net/snes/critters/) | resumable protothreads | `0xAD9F` | green, no bug |
+| 52 | [disbits](https://biohack.net/snes/disbits/) | cross-byte-boundary bitfields | `0x31D7` | green, no bug |
+
+The Round-3 untested-corner coverage map in the tracker is now **fully struck** (except the #34/#35
+non-buildable rows, annotated).
+
 ## Bugs found by the battery (all pre-existing, all fixed)
+
+- **`G_SCMP`/`G_UCMP` legalization crash** (caught by #46 qsortviz) — the standard C three-way-compare
+  comparator idiom `(x>y)-(x<y)` is canonicalized by clang to the newer `llvm.scmp` intrinsic → the
+  generic opcode `G_SCMP`, for which `MOSLegalizerInfo` had **no rule**, so the backend aborted (`unable
+  to legalize G_SCMP`) in default 8-bit / `+mos-a16` / `+mos-xy16` alike, at every width, in both
+  `-fno-lto` and the LTO-link path — i.e. any program sorting with a spaceship comparator failed to build.
+  Fix = one line `getActionDefinitionsBuilder({G_SCMP, G_UCMP}).lower();` (patch
+  `0016-mos-scmp-ucmp-legalize`), routing to LLVM's existing `LegalizerHelper::lowerThreewayCompare`
+  (icmp+select expansion the backend already legalizes). **Standalone-testable (not AS2/accum-gated) →
+  ready-to-post upstream** (`docs/upstream-contribution-status.md`); the demo (`dev/run.sh qsortviz`,
+  `0x8EA5`) is the permanent regression guard. Full write-up:
+  [`docs/plans/2026-06-30-46-snes-qsortviz.md`](../plans/2026-06-30-46-snes-qsortviz.md).
 
 - **xy16 in-place-memmove 16-bit-index miscompile** (caught by #23 lsystem) — `sep #$10` between
   `ldx` and `lda abs,X16` zeroed X's high byte; fixed in `MOSInsertREPSEP::placeIntraBlock`
@@ -68,13 +110,20 @@ The Round-2 untested-corner coverage map in the tracker is now **fully struck**.
 Each demo = a shared portable header (`examples/65816/<slug>.h`, the code under differential test)
 + a host oracle (`tools/<slug>-sim.c`) + a corpus slice (`examples/snes/corpus/<slug>_sim.c`,
 auto-picked into `dev/run.sh corpus-a16`) + the on-console ROM (`examples/snes/<slug>.c`) + a gate
-script (`dev/<slug>.sh`). The corpus now has **38 differential slices**. The "measure, don't assume"
-and "fix the compiler, don't work around" lessons held: where a gate looked wrong (#25), the
-differential correctly fingered it as a display bug, not codegen — and where codegen *was* wrong
-(#23), the demo's job was to surface it for an upstream-quality fix.
+script (`dev/<slug>.sh`). The corpus now has **53 differential slices**. The "measure, don't assume"
+and "fix the compiler, don't work around" lessons held across all three rounds: where a gate looked
+wrong (#25) the differential correctly fingered a display bug, not codegen; where codegen *was* wrong
+(#23 memmove, #46 `G_SCMP`), the demo's job was to surface it for an upstream-quality fix — and in #46
+that meant isolating a minimal repro, diagnosing the missing legalizer rule, fixing it in `vendor/`,
+rebuilding the toolchain, re-proving the full 5-way differential, and capturing the fix as a standalone
+tracked patch queued upstream. A few Round-3 demos also produced **measured findings** rather than bugs
+(#39 no constant-divisor strength reduction; #43 div+mod merged into `__divmoddi4`) — the "measure,
+don't assume" lesson paying off directly.
 
 ## What's left (not battery demos)
 
-The battery itself is done. Remaining #321 follow-ups live in `TODO.md` (upstream PR posting,
-cross-platform toolchain builds, the `a16-newton-step-rc-undef` MachineVerifier investigation, etc.)
-and are tracked there, not here.
+The battery itself is **done** (Rounds 1–3, #1–#52; only #34/#35 unbuilt by library/toolchain gap).
+Remaining #321 follow-ups live in `TODO.md` (upstream PR *posting* — including the new #46 `G_SCMP` fix,
+user-triggered — cross-platform toolchain builds, the `a16-newton-step-rc-undef` MachineVerifier
+investigation, etc.) and are tracked there, not here. A **Round 4** would need a fresh idea list drafted
+in [`2026-06-27-compiler-stress-test-demo-ideas.md`](2026-06-27-compiler-stress-test-demo-ideas.md) first.
