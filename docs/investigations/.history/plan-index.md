@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f3e3393) | #48 IIR Resonant-Filter Scope SNES demo — recursive feedback dependency chain |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4e90f14) | docs(plan-index): point #44 hdr-bloom row at its commit 0af9b34 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0af9b34) | #44 HDR Additive Bloom SNES demo — saturating / overflow-checked add |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e899f6) | docs(plan-index): point #38 bf-vm row at its commit f29be2f |
@@ -96,6 +97,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+f3e3393	author	Will Norris
+f3e3393	added	1
+f3e3393	deleted	0
+f3e3393	files	1
+f3e3393	body	Round 3 compiler stress-test demo #48: the recursive feedback dependency chain\nmember. Four 2-pole IIR resonators y[n] = (a1*y[n-1] + a2*y[n-2]) >> Q + x[n],\narpeggiated by impulse plucks, drawn as a live oscilloscope. Each sample depends\non the two previous outputs, so the loop is strictly serial — the compiler can't\nreorder/vectorize it like #25's feed-forward FFT. The differential (host==target\non the exact recursion) is the real test of the corner, and it passes: no\nmiscompile, no -verify failure.\n\nA small runtime vibrato on a1 keeps the feedback multiply a genuine runtime\n__mulsi3=2 (a constant coefficient would strength-reduce to shift-adds) and makes\nthe chord chorus-wobble. Differential: host == default == +mos-a16 == +mos-xy16\n== 0x49BD on bsnes-jg, -verify clean ×3 (MAME leg SKIP — no SPC700 IPL). No\ncompiler bug.\n\nBring-up (all demo-side, differential green throughout): forced runtime coeff to\npreserve the mul; slowed the vibrato well below the resonator frequencies to\navoid parametric-amplification blow-up; raised CANVAS_FLUSH_TILES to 256 for the\nfull-canvas-redraw scope (the default 64-tile cap starved the centre trace).\n\nNew: examples/65816/iir_scope.h, examples/snes/iir-scope.c,\nexamples/snes/corpus/iir_scope_sim.c, tools/iir-scope-sim.c, dev/iir-scope.{sh,lua}.\nPublished: https://biohack.net/snes/iir-scope/ (biohack.net v1.0.154).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4e90f14	author	Will Norris
 4e90f14	added	1
 4e90f14	deleted	1
