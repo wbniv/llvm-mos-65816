@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  satcomet:
+    desc: "#75: Saturating Palette Comet Trails — G_UADDSAT+G_USUBSAT (uint8 glow/decay) AND G_SADDSAT+G_SSUBSAT (int16 velocity kicks) all via __builtin_elementwise_add_sat/sub_sat -> lowerAddSubSatToMinMax at MOSLegalizerInfo:246. Six comets streak leaving trails that saturate to white where they cross. Assert corpus_result (satcomet_gate_crc 0xC2AF) == host. Leaves build/satcomet.sfc + build/satcomet-{mame,jg}.png."
+    cmds:
+      - dev/run.sh satcomet
+
+  satcomet-play:
+    desc: "PLAY the Saturating Comet Trails demo in MAME (builds first if needed). Comets streak and saturate where they cross."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/satcomet.sfc ]; then
+          echo "==> build/satcomet.sfc missing -- building..."
+          dev/run.sh satcomet
+        fi
+      - task: mandel-mame
+        vars: { ROM: satcomet }
+
   smulorbit:
     desc: "#76: Signed Multiply-Overflow Orbit Sentinel — G_SMULO at s16 (lowerMulo widen-multiply-sign-check) + s32 (lowerMulo widen to int64 -> __muldi3) via __builtin_mul_overflow on int16_t and int32_t. First demo to use signed mul-overflow check. Orbit-scatter with overflow teleport sparks. Assert corpus_result (smulorbit_gate_crc 0xD81B) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, rep/sep>=1). Leaves build/smulorbit.sfc + build/smulorbit-{mame,jg}.png."
     cmds:

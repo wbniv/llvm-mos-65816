@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/456a8a9) | feat(snes/smulorbit): #76 Signed Multiply-Overflow Orbit (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/6277d7e) | feat(snes/fabsridge): #80 Fabs Ridgeline (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/91bd3fe) | feat(snes/funnelkal): #73 Funnel-Shift Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/4f1df40) | docs(ideas): add Round 5 (#73-#92) — twenty more new codegen corners |
@@ -76,6 +77,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+456a8a9	author	Will Norris
+456a8a9	added	3
+456a8a9	deleted	3
+456a8a9	files	1
+456a8a9	body	G_SMULO via __builtin_mul_overflow on int16_t (G_SMULO s16 -> lowerMulo at\nLegalizerHelper:2693, widen to int32 -> __mulsi3) and int32_t (G_SMULO s32 ->\nwiden to int64 -> __muldi3). First demo to use signed multiply-overflow check.\nDistinct from #44 G_UADDO and #56 G_SMULH.\n\nMEASURED FINDING: ideas doc predicted __mulosi4 for s32 path; actual lowering\nuses __muldi3 (widen-to-int64 strategy). No compiler bug — lowering correct.\n\nGate: host==default==+mos-a16==+mos-xy16==0xD81B. 5-way green.\nPublished: https://biohack.net/snes/smulorbit/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 6277d7e	author	Will Norris
 6277d7e	added	3
 6277d7e	deleted	3

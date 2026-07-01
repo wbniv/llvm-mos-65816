@@ -711,7 +711,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     forms G_ROTL; no header uses rotateleft/rotateright. *Differential:* integer-exact: rotates of fixed-width
     uint8_t/uint16_t are bit-defined identically host vs target; CRC folds all ring registers; no int, no float.
 
-75. **Saturating Palette Comet Trails.** *Stresses:* Unsigned uint8 glow/decay via
+~~75. **Saturating Palette Comet Trails.** *Stresses:* Unsigned uint8 glow/decay via
     __builtin_elementwise_add_sat/sub_sat (G_UADDSAT clamps 255, G_USUBSAT 0) AND signed int16 velocity kicks
     (G_SADDSAT/G_SSUBSAT clamp +/-INT16). Unlike demo 44 hdr-bloom (__builtin_add_overflow to G_UADDO flag-
     test+branch) and demo 70 dither (hand-written ternary to G_ICMP+G_SELECT, never *SAT). *Shows:* Six bright
@@ -720,7 +720,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     walls with a velocity snap. Palette-cycled. *Verified present:* MOSLegalizerInfo.cpp:246-247
     G_SADDSAT/G_UADDSAT/G_SSUBSAT/G_USUBSAT .lower(); __builtin_elementwise_add_sat/sub_sat Builtins.td 1753;
     grep: no header uses add_sat/sub_sat. *Differential:* integer-exact: saturating adds/subs on uint8/int16 are
-    clamp-defined identically host vs target; CRC folds field + velocity words; no float, no NaN.
+    clamp-defined identically host vs target; CRC folds field + velocity words; no float, no NaN.~~ ✓ [/snes/satcomet/](https://biohack.net/snes/satcomet/) ([plan](../plans/2026-07-01-75-snes-satcomet.md))
 
 ~~76. **Signed Multiply-Overflow Orbit Sentinel.** *Stresses:* G_SMULO via __builtin_mul_overflow(a,b,ptr) on
     int16 orbital state and a wider int32 accumulator (drawing __mulosi4). Unlike demo 44 hdr-bloom
@@ -973,7 +973,7 @@ Sharpest at opening a code path the first 72 never run:
   consistency check distinct from demo 44 add-overflow carry/V test, and draws compiler-rt __mulosi4 for int32.
   Overflow is a first-class control signal (teleport-on-overflow); the differential folds the overflow count: a
   clean positive stressing a widen-multiply-then-compare shape no demo runs.
-- **#75 satcomet** — The SAT representative: co-emits signed (G_SADDSAT/G_SSUBSAT on int16 velocity) and
+- ~~**#75 satcomet**~~ ✓ [/snes/satcomet/](https://biohack.net/snes/satcomet/) — The SAT representative: co-emits signed (G_SADDSAT/G_SSUBSAT on int16 velocity) and
   unsigned (G_UADDSAT/G_USUBSAT on uint8 glow/decay) via lowerAddSubSatToMinMax (branchless min/max),
   categorically different from demo 44 overflow-flag-plus-branch. Integer-exact, visually vivid, anchoring a
   family six candidates competed for.
