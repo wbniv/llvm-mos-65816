@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  fenwick:
+    desc: "#63: Fenwick tree (binary-indexed tree) — a moving bump point-updates 16 bins each frame; the running prefix sum (integral) is queried back and drawn as a rising staircase below the signal. Both walks use the i & -i low-bit-isolation two's-complement trick (update i+=i&-i, query i-=i&-i). Gate cross-checks the BIT prefix vs a linear reference. Assert corpus_result (fenwick_gate_crc 0x3454) == host on MAME + bsnes-jg + disasm gate (and-masks, no mul/div). Leaves build/fenwick.sfc + build/fenwick-{mame,jg}.png."
+    cmds:
+      - dev/run.sh fenwick
+
+  fenwick-play:
+    desc: "PLAY the Fenwick Tree demo in a MAME window on this host (builds the ROM first if needed). Shows a moving signal and its running integral (prefix sum) maintained by a binary-indexed tree."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/fenwick.sfc ]; then
+          echo "==> build/fenwick.sfc missing — building it (dev/run.sh fenwick)…"
+          dev/run.sh fenwick
+        fi
+      - task: mandel-mame
+        vars: { ROM: fenwick }
+
   percol:
     desc: "#62: Union-find percolation — bond percolation on a 16x16 grid: random adjacent bonds union cells' sets (disjoint-set with PATH COMPRESSION: find chases parent pointers to the root and rewrites the whole path); cells connected to the top light up 'wet' until the wet region reaches the bottom (percolation), then reseeds. The corner: the union-find find-with-compression pointer flatten (distinct from #18's heap, #31's tree). Assert corpus_result (percol_gate_crc 0x025B) == host on MAME + bsnes-jg + disasm gate (parent-chase branches). Leaves build/percol.sfc + build/percol-{mame,jg}.png."
     cmds:
