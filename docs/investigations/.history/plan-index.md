@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/25b6b8e) | docs(plan-index): point #43 sodo row at its commit ca16265 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ca16265) | #43 Signed 64-bit Odometer SNES demo — sign-corrected __divmoddi4 (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/256a383) | docs(plan-index): point #42 duff row at its commit 5698c17 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5698c17) | #42 Dissolve Transition (Duff's Device) SNES demo — irreducible loop-switch CFG (clean positive) |
@@ -111,6 +112,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+25b6b8e	author	Will Norris
+25b6b8e	added	1
+25b6b8e	deleted	1
+25b6b8e	files	1
+25b6b8e	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ca16265	author	Will Norris
 ca16265	added	1
 ca16265	deleted	0

@@ -257,7 +257,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | ~~**irreducible control flow** — Duff's device (switch jumping into a loop)~~ | ~~a CFG the structurizer can't reduce; never exercised~~ | ~~42~~ ✓ [/snes/duff/](https://biohack.net/snes/duff/) |
 | ~~**signed 64-bit divide/mod** — `__divdi3`/`__moddi3` (sign-corrected)~~ | ~~#22 was *unsigned* 64-bit; signed div/mod is a distinct sign-handling libcall~~ | ~~43~~ ✓ [/snes/sodo/](https://biohack.net/snes/sodo/) (fires as combined `__divmoddi4`) |
 | **overflow-checked / saturating arithmetic** — `__builtin_add_overflow`, carry/V-flag tests + clamp | flag-testing add/sub sequences never stressed | ~~44~~ |
-| **union type-punning** — `union{float;uint32}` aliased load/store, bit reinterpret | reading one storage as two types — the aliasing/reinterpret path | 45 |
+| ~~**union type-punning** — `union{float;uint32}` aliased load/store, bit reinterpret~~ | ~~reading one storage as two types — the aliasing/reinterpret path~~ | ~~45~~ ✓ [/snes/metaball/](https://biohack.net/snes/metaball/) |
 | **indirect comparator ABI** — `qsort` with a function-pointer comparator callback | #17's sorts were hand-written; libc `qsort` calls *back* per compare | 46 |
 | **iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt) | a convergent fixed-point loop, distinct from a single divide libcall | 47 |
 | **recursive feedback (IIR)** — `y[n]=a·y[n−1]+b·y[n−2]+x[n]` dependency chain | #25's FFT is feed-forward + reorderable; an IIR feedback chain can't be reordered | ~~48~~ |
@@ -339,9 +339,9 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     **overflow-builtin / carry-and-V-flag saturating arithmetic**. *Shows:* drifting bloom-lights that
     blow out to white where they pile up.~~ ✓ [/snes/hdr-bloom/](https://biohack.net/snes/hdr-bloom/) — 6 glows sat-added per cell (`__builtin_add_overflow`→`adc`+`bcs`); overlaps clamp to white; `host==default==a16==xy16==0xF951` on bsnes-jg, `-verify` clean ×3. **No compiler bug.**
 
-45. **Metaballs — union type-pun fast-inverse-sqrt.** The Quake `union { float f; uint32_t i; }`
+45. ~~**Metaballs — union type-pun fast-inverse-sqrt.** The Quake `union { float f; uint32_t i; }`
     **bit-hack reciprocal-sqrt** drives a field of merging blobs. *Stresses:* **union type-punning**
-    (aliased load/store + float↔int bit reinterpret). *Shows:* gooey metaballs splitting and fusing.
+    (aliased load/store + float↔int bit reinterpret). *Shows:* gooey metaballs splitting and fusing.~~ ✓ [/snes/metaball/](https://biohack.net/snes/metaball/) *(Quake fast-inverse-sqrt, magic `0x5f3759df`; bit-exact host==default==a16==xy16 `0xAEBE`; `__mulsf3`+magic-byte immediates, one-op-per-statement soft-float; no bug)*
 
 46. **Sort visualizer — `qsort` + comparator callback.** Bars sorted by **libc `qsort` with a swappable
     function-pointer comparator** (by height / hue / parity) — an **indirect call per comparison**.

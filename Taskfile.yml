@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  metaball:
+    desc: "#45: Union type-pun fast-inverse-sqrt metaballs — a field of merging blobs whose 1/dist falloff is the Quake fast-inverse-sqrt bit hack (union{float f;uint32 i;} reads a float's storage AS an integer, mangles it with 0x5f3759df, reads it back AS a float). Assert corpus_result (metaball_gate_crc 0xAEBE) == host on MAME + bsnes-jg + disasm gate (__mulsf3, magic 0x5f3759df bytes, rep/sep). Leaves build/metaball.sfc + build/metaball-{mame,jg}.png."
+    cmds:
+      - dev/run.sh metaball
+
+  metaball-play:
+    desc: "PLAY the union-punned metaballs demo in a MAME window on this host (builds the ROM first if needed). Shows gooey blobs splitting and fusing."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/metaball.sfc ]; then
+          echo "==> build/metaball.sfc missing — building it (dev/run.sh metaball)…"
+          dev/run.sh metaball
+        fi
+      - task: mandel-mame
+        vars: { ROM: metaball }
+
   sodo:
     desc: "#43: Signed 64-bit odometer — a vast signed counter ticks through zero (negative -> positive), each value decomposed into decimal digits via the v%10 / v/=10 loop, which on negatives exercises the SIGN-CORRECTED 64-bit divide+modulo (clang merges the adjacent div+mod into __divmoddi4, distinct from #22's unsigned __udivdi3). Scrolling value tape. Assert corpus_result (sodo_gate_crc 0xD2A2) == host on MAME + bsnes-jg + disasm gate (__divmoddi4, rep/sep). Leaves build/sodo.sfc + build/sodo-{mame,jg}.png."
     cmds:

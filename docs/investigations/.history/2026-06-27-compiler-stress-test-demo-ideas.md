@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ca16265) | #43 Signed 64-bit Odometer SNES demo — sign-corrected __divmoddi4 (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5698c17) | #42 Dissolve Transition (Duff's Device) SNES demo — irreducible loop-switch CFG (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a12b00d) | #41 Free-List Pool Allocator SNES demo — manual free-list slot recycling (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ad34254) | #40 Table-Driven CRC32 Procedural Texture SNES demo — 256-entry ROM-LUT byte loop |
@@ -43,6 +44,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+ca16265	author	Will Norris
+ca16265	added	3
+ca16265	deleted	3
+ca16265	files	1
+ca16265	body	A vast signed odometer ticks through zero (negative -> positive), each value split\ninto 18 decimal digits by the v%10 / v/=10 loop — sign-corrected on negatives.\nDistinct from #22's unsigned __udivdi3.\n\nMEASURED FINDING (no bug): clang merges the adjacent v/10 and v%10 into the\ncombined SIGNED libcall __divmoddi4 (not separate __divdi3/__moddi3). Disasm gate\nasserts signed-64-divmod>=1 and unsigned-64==0 (proving the signed path).\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0xD2A2 on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nNo compiler bug — signed 64-bit divmod of both signs is byte-exact across all\nmodes. Live at https://biohack.net/snes/sodo/ (biohack v1.0.161).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5698c17	author	Will Norris
 5698c17	added	3
 5698c17	deleted	3
