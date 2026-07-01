@@ -467,7 +467,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 
 | New codegen corner | Why bugs hide there | Demos |
 |---|---|---|
-| **bit-population intrinsics** — `__popcountsi2`/`__clzsi2`/`__ctzsi2`/`__paritysi2`/`__ffssi2` + inline `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree (`.lower()` @308) | never emitted once in 52 demos; the inline lowering is a multi-branch shift sequence with its own edge cases (zero-input, width) | 53 |
+| **bit-population intrinsics** — `__popcountsi2`/`__clzsi2`/`__ctzsi2`/`__paritysi2`/`__ffssi2` + inline `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree (`.lower()` @308) | never emitted once in 52 demos; the inline lowering is a multi-branch shift sequence with its own edge cases (zero-input, width) | ~~53~~ ✓ |
 | **byte-swap / bit-reverse intrinsics** — `__bswapsi2`; `G_BITREVERSE.lower()` @186 | #25/#28 reversed bits by *hand*; the clang builtin → generic-opcode → lowering path is untested | 54 |
 | **finite-field GF(2⁸) / carryless multiply** — XOR-accumulate + log/antilog table, no carry | a whole ALU profile with **no `adc` carry chain** — pure XOR + table; never exercised | 55 |
 | **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (`(a*b)>>16` recognised) | fixed-point demos forced full `__mulsi3`; the *high-half* recognition + its extend/trunc is a distinct path | 56 |
@@ -492,12 +492,12 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 
 ### Bit-population, permutation & finite-field ALU — the count/reverse/scan family
 
-53. **Bit-census field — `popcount`/`clz`/`ctz`/`parity`.** Colour each cell by a **bit-population intrinsic**
+53. ~~**Bit-census field — `popcount`/`clz`/`ctz`/`parity`.** Colour each cell by a **bit-population intrinsic**
     of its coordinates and a time term — `popcount(x ^ y ^ t)`, `clz(x | y)`, `ctz(x & y)`, cycling the
     function — producing the famous self-similar XOR/AND bit-fractal, now driven through the *actual*
     intrinsics. *Stresses:* `__popcountsi2` / `__clzsi2` / `__ctzsi2` / `__paritysi2` **and** the inline
     `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree lowering (`.lower()` @308) at 16- and 32-bit — never emitted in
-    52 demos. *Shows:* a breathing, scrolling bit-census texture that morphs as the function cycles.
+    52 demos. *Shows:* a breathing, scrolling bit-census texture that morphs as the function cycles.~~ ✓ [/snes/bitcensus/](https://biohack.net/snes/bitcensus/) — bit-exact `host==default==a16==xy16==0x9516`; **MEASURED:** the `ll` builtins **inline-lower** (SWAR masks `#$55`/`#$33` in the disasm), the `__*di2` helpers are never called; clean positive, no bug. Width-safe via the 64-bit `ll` variants. ([plan](../plans/2026-06-30-53-snes-bitcensus.md))
 
 54. **Perfect-shuffle transition — `bswap` + `bit-reverse`.** A screen transition that permutes an image by
     routing each pixel's index through **`__builtin_bswap32` and `__builtin_bitreverse`**, scrambling then
@@ -620,9 +620,9 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 
 Sharpest at opening a code path the first 52 never run:
 
-- **#53 bit-census (`popcount`/`clz`/`ctz`)** — the entire **bit-population intrinsic family**, never emitted
+- ~~**#53 bit-census (`popcount`/`clz`/`ctz`)** — the entire **bit-population intrinsic family**, never emitted
   once in 52 demos, plus the inline `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree lowering. Largest brand-new
-  surface, and an integer-exact differential.
+  surface, and an integer-exact differential.~~ ✓ [/snes/bitcensus/](https://biohack.net/snes/bitcensus/) — clean positive, no bug; the `ll` builtins inline-lower (SWAR), the `__*di2` helpers are never called.
 - **#56 rotozoom (`G_UMULH`)** — the **multiply-high** recognition the fixed-point demos never triggered
   (they forced full `__mulsi3`), wrapped in the most eye-catching visual of the set.
 - **#57 median network (`G_SMIN`/`G_SMAX`/`G_ABS`)** — branchless min/max/abs as the hot op, a different

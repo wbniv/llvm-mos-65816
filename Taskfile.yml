@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  bitcensus:
+    desc: "#53: Bit-census field — each cell's colour is a bit-population count (popcount/clz/ctz/parity) of a 64-bit value from its (x,y,time), cycling the four __builtin_*ll intrinsics; they inline-lower via G_CTPOP/G_CTLZ/G_CTTZ (SWAR masks 0x55/0x33 in the disasm). XOR-fractal / magnitude / ruler / checker textures. Assert corpus_result (bitcensus_gate_crc 0x9516) == host on MAME + bsnes-jg + disasm gate. Leaves build/bitcensus.sfc + build/bitcensus-{mame,jg}.png."
+    cmds:
+      - dev/run.sh bitcensus
+
+  bitcensus-play:
+    desc: "PLAY the Bit-Census Field demo in a MAME window on this host (builds the ROM first if needed). Shows a scrolling texture coloured by the bit-population intrinsic family, cycling popcount/clz/ctz/parity."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/bitcensus.sfc ]; then
+          echo "==> build/bitcensus.sfc missing — building it (dev/run.sh bitcensus)…"
+          dev/run.sh bitcensus
+        fi
+      - task: mandel-mame
+        vars: { ROM: bitcensus }
+
   crctex:
     desc: "#40: Table-driven CRC32 procedural texture — each cell's colour is a real CRC32 (poly 0xEDB88320) of its (x,y,time) via the byte-at-a-time algorithm crc=TABLE[(crc^byte)&0xFF]^(crc>>8), TABLE a const uint32[256] in ROM. Flowing hash-marble field. Assert corpus_result (crctex_gate_crc 0xDBBA) == host on MAME + bsnes-jg + disasm gate (CRC32_TAB ref, eor cascade, rep/sep). Leaves build/crctex.sfc + build/crctex-{mame,jg}.png."
     cmds:
