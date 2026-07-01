@@ -471,7 +471,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **byte-swap / bit-reverse intrinsics** — `__bswapsi2`; `G_BITREVERSE.lower()` @186 | #25/#28 reversed bits by *hand*; the clang builtin → generic-opcode → lowering path is untested | ~~54~~ ✓ |
 | **finite-field GF(2⁸) / carryless multiply** — XOR-accumulate + log/antilog table, no carry | a whole ALU profile with **no `adc` carry chain** — pure XOR + table; never exercised | ~~55~~ ✓ |
 | **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (`(a*b)>>16` recognised) | fixed-point demos forced full `__mulsi3`; the *high-half* recognition + its extend/trunc is a distinct path | ~~56~~ ✓ |
-| **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281 | select+icmp lowering as the **hot** op (sorting network / clamp); #44 was carry/V-flag, not select | 57 |
+| **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281 | select+icmp lowering as the **hot** op (sorting network / clamp); #44 was carry/V-flag, not select | ~~57~~ ✓ |
 | **NaN / unordered float compares** — `__unordsf2`/`__eqsf2`/`__nesf2` | #21/#33 used only ordered `<`; equality + unordered/NaN tests lower to different libcalls | 58 |
 | **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | 59 |
 | **`div_t` struct-return over custom `G_SDIVREM`** — libc `div()`/`ldiv()` (@229, `legalizeDivRem`) | combines aggregate-return ABI **and** the divrem stack-temp legalizer; #39/#43 used bare `/`,`%` | 60 |
@@ -519,11 +519,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     recognising the mul-high instead of forcing a full `__mulsi3`. *Shows:* a hypnotic rotating, pulsing
     zoom of a checker/mandala texture (the classic "rotozoomer").~~ ✓ [/snes/rotozoom/](https://biohack.net/snes/rotozoom/) — bit-exact `host==default==a16==xy16==0x391B`; **MEASURED:** no narrower mul-high exists on this soft-multiply target — the `G_SMULH.lower()` (@300) widens through `__muldi3` (Q16.16) / `__mulsi3` (Q8.8 coeffs), like #39's degrade-to-primitive. Clean positive, no bug. (Heavy gate → snapshot frame 700.) ([plan](../plans/2026-06-30-56-snes-rotozoom.md))
 
-57. **Median denoiser — branchless min/max/abs network.** A live noisy source cleaned by a **9-element
+57. ~~**Median denoiser — branchless min/max/abs network.** A live noisy source cleaned by a **9-element
     sorting network** built entirely from `min`/`max` compare-exchanges (branchless), median in the centre.
     *Stresses:* `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` (@272) and `G_ABS.custom()` (@281) as the **hot**
     op — select+icmp chains, a different lowering from #44's carry/V-flag saturation. *Shows:* snow/speckle
-    noise wiped to a clean image, side-by-side before/after, sweeping.
+    noise wiped to a clean image, side-by-side before/after, sweeping.~~ ✓ [/snes/medfilt/](https://biohack.net/snes/medfilt/) — bit-exact `host==default==a16==xy16==0x87FE`; 19-comparator median-of-9 network, `(a<b)?a:b` → `G_UMIN/G_UMAX .lower()` (@272) → `cmp`+branch (no cmov on 65816), abs → `G_ABS`; zero mul/div libcalls; gate cross-checks the network median vs an insertion-sort median (0 mismatches / 200k tuples). Clean positive, no bug. ([plan](../plans/2026-06-30-57-snes-medfilt.md))
 
 58. **Complex domain-colouring with poles — NaN/unordered float compares.** Plot a rational complex function
     `f(z) = (z²−1)/(z²+c)` by domain colouring; near its **poles** the divide yields ∞/NaN and the code
@@ -625,8 +625,8 @@ Sharpest at opening a code path the first 52 never run:
   surface, and an integer-exact differential.~~ ✓ [/snes/bitcensus/](https://biohack.net/snes/bitcensus/) — clean positive, no bug; the `ll` builtins inline-lower (SWAR), the `__*di2` helpers are never called.
 - ~~**#56 rotozoom (`G_UMULH`)** — the **multiply-high** recognition the fixed-point demos never triggered
   (they forced full `__mulsi3`), wrapped in the most eye-catching visual of the set.~~ ✓ [/snes/rotozoom/](https://biohack.net/snes/rotozoom/) — clean positive; measured: the `G_SMULH.lower()` widens through `__muldi3`/`__mulsi3` (no narrower mul-high on a soft-multiply target).
-- **#57 median network (`G_SMIN`/`G_SMAX`/`G_ABS`)** — branchless min/max/abs as the hot op, a different
-  lowering from #44's carry/V-flag saturation.
+- ~~**#57 median network (`G_SMIN`/`G_SMAX`/`G_ABS`)** — branchless min/max/abs as the hot op, a different
+  lowering from #44's carry/V-flag saturation.~~ ✓ [/snes/medfilt/](https://biohack.net/snes/medfilt/) — clean positive; min/max `.lower()` → `cmp`+branch (no cmov), zero libcalls.
 - **#60 `div()`/`div_t`** — the libc struct-return-by-value *over* the custom `G_SDIVREM` stack-temp
   legalizer, two ABI paths braided together that #39/#43's bare `/`,`%` never touched.
 - **#62 union-find percolation** — path-compression pointer-chase-and-flatten, a data structure neither

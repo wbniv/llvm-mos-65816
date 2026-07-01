@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  medfilt:
+    desc: "#57: Median denoiser — a salt-and-pepper-noised image is cleaned by a 3x3 median filter; a sweeping wipe shows denoised vs raw. The median-of-9 is a 19-comparator branchless sorting network of min/max compare-exchanges (the select idiom (a<b)?a:b = G_UMIN/G_UMAX .lower() @272 -> cmp+branch), + abs (G_ABS @281). Gate cross-checks the network median vs an insertion-sort median. Assert corpus_result (medfilt_gate_crc 0x87FE) == host on MAME + bsnes-jg + disasm gate (cmp density, no mul/div libcall). Leaves build/medfilt.sfc + build/medfilt-{mame,jg}.png."
+    cmds:
+      - dev/run.sh medfilt
+
+  medfilt-play:
+    desc: "PLAY the Median Denoiser demo in a MAME window on this host (builds the ROM first if needed). Shows a sweeping wipe between salt-and-pepper noise and its 3x3 median-filtered result."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/medfilt.sfc ]; then
+          echo "==> build/medfilt.sfc missing — building it (dev/run.sh medfilt)…"
+          dev/run.sh medfilt
+        fi
+      - task: mandel-mame
+        vars: { ROM: medfilt }
+
   rotozoom:
     desc: "#56: Rotozoom — an affine texture spin-zoom; each cell samples a procedural texture at a Q16.16 rotated/scaled coord, where q16mul(a,b)=(int64)a*b>>16 is the WIDENING MULTIPLY-HIGH (G_SMULH/G_UMULH .lower() @300, via __muldi3 on this soft-multiply target). Assert corpus_result (rotozoom_gate_crc 0xD448) == host on MAME + bsnes-jg + disasm gate (__muldi3, __mulsi3, SINCOS, rep/sep). Leaves build/rotozoom.sfc + build/rotozoom-{mame,jg}.png."
     cmds:
