@@ -329,7 +329,13 @@ static inline void title_begin(Display *d, TitleLayer *t, const char *line0, con
 static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
   display_hold(d, frames);
   t->restore = 1;
-  display_fade(d, 0);                 /* fade to black while lines slide out */
+  /* Run ease-out at FULL BRIGHTNESS until both lines clear their respective edges,
+     then fade to black. This keeps the sliding motion visible throughout. */
+  for (uint8_t g = 0; g < 80u; g++) {
+    display_frame(d);
+    if (t->vofs_top > (int16_t)(TITLE_ROW0 * 8u) && t->vofs_bot < 0) break;
+  }
+  display_fade(d, 0);
   d->tm |= t->demo_tm;               /* restore demo layers before hide_layer removes BG2 */
   display_hide_layer(d, (Drawable *)t);
   REG_HDMAEN = 0;
