@@ -470,7 +470,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **bit-population intrinsics** — `__popcountsi2`/`__clzsi2`/`__ctzsi2`/`__paritysi2`/`__ffssi2` + inline `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree (`.lower()` @308) | never emitted once in 52 demos; the inline lowering is a multi-branch shift sequence with its own edge cases (zero-input, width) | ~~53~~ ✓ |
 | **byte-swap / bit-reverse intrinsics** — `__bswapsi2`; `G_BITREVERSE.lower()` @186 | #25/#28 reversed bits by *hand*; the clang builtin → generic-opcode → lowering path is untested | ~~54~~ ✓ |
 | **finite-field GF(2⁸) / carryless multiply** — XOR-accumulate + log/antilog table, no carry | a whole ALU profile with **no `adc` carry chain** — pure XOR + table; never exercised | ~~55~~ ✓ |
-| **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (`(a*b)>>16` recognised) | fixed-point demos forced full `__mulsi3`; the *high-half* recognition + its extend/trunc is a distinct path | 56 |
+| **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (`(a*b)>>16` recognised) | fixed-point demos forced full `__mulsi3`; the *high-half* recognition + its extend/trunc is a distinct path | ~~56~~ ✓ |
 | **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281 | select+icmp lowering as the **hot** op (sorting network / clamp); #44 was carry/V-flag, not select | 57 |
 | **NaN / unordered float compares** — `__unordsf2`/`__eqsf2`/`__nesf2` | #21/#33 used only ordered `<`; equality + unordered/NaN tests lower to different libcalls | 58 |
 | **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | 59 |
@@ -513,11 +513,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 
 ### Untouched arithmetic-lowering corners
 
-56. **Rotozoom / Droste zoom — widening multiply-high (`G_UMULH`).** A full-screen affine texture spin-zoom
+56. ~~**Rotozoom / Droste zoom — widening multiply-high (`G_UMULH`).** A full-screen affine texture spin-zoom
     (rotate + scale a tile) whose sample address is `(coord * scale) >> 16` — a **high-half multiply** of a
     32×32 product. *Stresses:* `G_UMULH`/`G_SMULH.lower()` (@300, extend→mul→shift→trunc), the compiler
     recognising the mul-high instead of forcing a full `__mulsi3`. *Shows:* a hypnotic rotating, pulsing
-    zoom of a checker/mandala texture (the classic "rotozoomer").
+    zoom of a checker/mandala texture (the classic "rotozoomer").~~ ✓ [/snes/rotozoom/](https://biohack.net/snes/rotozoom/) — bit-exact `host==default==a16==xy16==0x391B`; **MEASURED:** no narrower mul-high exists on this soft-multiply target — the `G_SMULH.lower()` (@300) widens through `__muldi3` (Q16.16) / `__mulsi3` (Q8.8 coeffs), like #39's degrade-to-primitive. Clean positive, no bug. (Heavy gate → snapshot frame 700.) ([plan](../plans/2026-06-30-56-snes-rotozoom.md))
 
 57. **Median denoiser — branchless min/max/abs network.** A live noisy source cleaned by a **9-element
     sorting network** built entirely from `min`/`max` compare-exchanges (branchless), median in the centre.
@@ -623,8 +623,8 @@ Sharpest at opening a code path the first 52 never run:
 - ~~**#53 bit-census (`popcount`/`clz`/`ctz`)** — the entire **bit-population intrinsic family**, never emitted
   once in 52 demos, plus the inline `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree lowering. Largest brand-new
   surface, and an integer-exact differential.~~ ✓ [/snes/bitcensus/](https://biohack.net/snes/bitcensus/) — clean positive, no bug; the `ll` builtins inline-lower (SWAR), the `__*di2` helpers are never called.
-- **#56 rotozoom (`G_UMULH`)** — the **multiply-high** recognition the fixed-point demos never triggered
-  (they forced full `__mulsi3`), wrapped in the most eye-catching visual of the set.
+- ~~**#56 rotozoom (`G_UMULH`)** — the **multiply-high** recognition the fixed-point demos never triggered
+  (they forced full `__mulsi3`), wrapped in the most eye-catching visual of the set.~~ ✓ [/snes/rotozoom/](https://biohack.net/snes/rotozoom/) — clean positive; measured: the `G_SMULH.lower()` widens through `__muldi3`/`__mulsi3` (no narrower mul-high on a soft-multiply target).
 - **#57 median network (`G_SMIN`/`G_SMAX`/`G_ABS`)** — branchless min/max/abs as the hot op, a different
   lowering from #44's carry/V-flag saturation.
 - **#60 `div()`/`div_t`** — the libc struct-return-by-value *over* the custom `G_SDIVREM` stack-temp

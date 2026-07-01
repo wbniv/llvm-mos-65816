@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  rotozoom:
+    desc: "#56: Rotozoom — an affine texture spin-zoom; each cell samples a procedural texture at a Q16.16 rotated/scaled coord, where q16mul(a,b)=(int64)a*b>>16 is the WIDENING MULTIPLY-HIGH (G_SMULH/G_UMULH .lower() @300, via __muldi3 on this soft-multiply target). Assert corpus_result (rotozoom_gate_crc 0xD448) == host on MAME + bsnes-jg + disasm gate (__muldi3, __mulsi3, SINCOS, rep/sep). Leaves build/rotozoom.sfc + build/rotozoom-{mame,jg}.png."
+    cmds:
+      - dev/run.sh rotozoom
+
+  rotozoom-play:
+    desc: "PLAY the Rotozoom demo in a MAME window on this host (builds the ROM first if needed). Shows a procedural texture spinning and breathing via Q16.16 affine sampling."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/rotozoom.sfc ]; then
+          echo "==> build/rotozoom.sfc missing — building it (dev/run.sh rotozoom)…"
+          dev/run.sh rotozoom
+        fi
+      - task: mandel-mame
+        vars: { ROM: rotozoom }
+
   gf256:
     desc: "#55: GF(2^8) Galois field — each cell's colour is a finite-field combination gf_mul(A,α^x)^gf_mul(B,α^y) (A,B rotate through α-powers → morphing plaid); the field multiply is a CARRYLESS multiply via log/antilog tables + XOR (no carry chain), the arithmetic under Reed-Solomon/QR. HUD shows a live RS syndrome. Gate cross-checks gf_mul vs a slow bit-by-bit carryless multiply. Assert corpus_result (gf256_gate_crc 0xC028) == host on MAME + bsnes-jg + disasm gate (GF_EXP/GF_LOG refs, eor, no mul/div libcall). Leaves build/gf256.sfc + build/gf256-{mame,jg}.png."
     cmds:
