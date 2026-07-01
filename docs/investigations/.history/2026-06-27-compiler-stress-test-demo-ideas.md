@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0ccecd9) | feat(snes/sbitfld): #78 Signed-Bitfield Terrain Sculptor (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/26c2e18) | feat(snes/satcast): #77 Saturating-Cast Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1f15000) | feat(snes/rotkal): #74 Rotate-Register Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/155f742) | feat(snes/satcomet): #75 Saturating Palette Comet Trails (Round 5, compiler stress-test) |
@@ -80,6 +81,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+0ccecd9	author	Will Norris
+0ccecd9	added	3
+0ccecd9	deleted	2
+0ccecd9	files	1
+0ccecd9	body	G_SEXT_INREG via int16_t height:5/slope:4/flow:4 signed bitfield read-back;\nlegalizer :130 .lower() → shl(16-N)+ashr(16-N) sign-extend pair per field.\nFirst signed-bitfield demo (prior #29b/#52 used unsigned, zero-extend only).\n\nAnimated erosion: positive-slope ridges decrement, negative-slope valleys fill.\nIndigo valleys (signed-negative) prove sext fires (zero-extend would show gold).\nGate: asl=41, rep/sep=85; 5-way green 0x40C5.\nNo compiler bug — sign-extension lowers correctly across all modes.\nPublished: https://biohack.net/snes/sbitfld/ (biohack.net v1.0.208).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 26c2e18	author	Will Norris
 26c2e18	added	2
 26c2e18	deleted	2

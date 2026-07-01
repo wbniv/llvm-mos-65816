@@ -761,7 +761,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     bit-exact host vs target; CRC folds every packed cell word; no float.~~
     ✓ [/snes/sbitfld/](https://biohack.net/snes/sbitfld/) ([plan](../plans/2026-07-01-78-snes-sbitfld.md))
 
-79. **Descending memmove Scroll Slabs.** *Stresses:* G_MEMMOVE with memmove(buf+1,buf,N-1) (dst>src overlapping,
+~~79. **Descending memmove Scroll Slabs.** *Stresses:* G_MEMMOVE with memmove(buf+1,buf,N-1) (dst>src overlapping,
     forces Descending=true high-to-low) plus memmove(buf,buf+k,N-k) ascending (Descending=false) for both sub-
     paths. Unlike demo 23 lsystem (memmove incidental for string-rewriting, ascending/non-overlap) and demo 49
     lzdec (hand-codes overlapping back-ref copy byte-by-byte, never emits G_MEMMOVE). *Shows:* Two counter-
@@ -772,7 +772,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     Descending=true; offset adjust 3231/3247); SDK memmove weak impl llvm-mos-sdk mos-
     platform/common/c/mem.c:15. *Differential:* integer-exact: memmove of a byte buffer is a pure data shuffle,
     identical byte array host vs target regardless of internal direction; a WRONG direction breaks the CRC and
-    smears the image. No float.
+    smears the image. No float.~~ ✓ [/snes/mvscrl/](https://biohack.net/snes/mvscrl/) ([plan](../plans/2026-07-01-79-snes-mvscrl.md))
 
 ### Float sign-bit, rounding and min/max lowering
 
