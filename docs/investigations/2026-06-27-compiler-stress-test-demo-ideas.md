@@ -261,7 +261,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | ~~**indirect comparator ABI** — `qsort` with a function-pointer comparator callback~~ | ~~#17's sorts were hand-written; libc `qsort` calls *back* per compare~~ | ~~46~~ ✓ [/snes/qsortviz/](https://biohack.net/snes/qsortviz/) **🐞 caught+fixed `G_SCMP` backend crash** |
 | ~~**iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt)~~ | ~~a convergent fixed-point loop, distinct from a single divide libcall~~ | ~~47~~ ✓ [/snes/nrecip/](https://biohack.net/snes/nrecip/) |
 | **recursive feedback (IIR)** — `y[n]=a·y[n−1]+b·y[n−2]+x[n]` dependency chain | #25's FFT is feed-forward + reorderable; an IIR feedback chain can't be reordered | ~~48~~ |
-| **decode state machine + back-reference** — RLE/LZ decompression with output copy-back | a byte-stream decoder writing back-references into its own output (pointer arith) | 49 |
+| ~~**decode state machine + back-reference** — RLE/LZ decompression with output copy-back~~ | ~~a byte-stream decoder writing back-references into its own output (pointer arith)~~ | ~~49~~ ✓ [/snes/lzdec/](https://biohack.net/snes/lzdec/) |
 | **>register-count argument spill** — functions with 8+ params passed on the soft stack | every prior call fits the register-arg budget; argument spilling is untested | 50 |
 | **resumable functions** — coroutine/protothread static-state switch (cooperative tasks) | local state preserved across re-entry via a saved case index | 51 |
 | **cross-byte-boundary bitfields** — `uint32_t a:5,b:11,c:7,d:9` straddling bytes | #29b's fields fit one `uint16`; straddling fields force multi-byte shift + mask | 52 |
@@ -358,10 +358,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     the **recursive feedback dependency chain** (can't be reordered like #25's feed-forward FFT). *Shows:*
     an oscilloscope of a plucked, decaying resonance; or frequency bins lighting to a tune.~~ ✓ [/snes/iir-scope/](https://biohack.net/snes/iir-scope/) — 4 plucked 2-pole resonators; `host==default==a16==xy16==0x49BD` on bsnes-jg, `__mulsi3=2`, `-verify` clean ×3. **No compiler bug.**
 
-49. **Image-decompress reveal — RLE/LZ back-references.** A compressed picture **decoded by a byte-stream
+49. ~~**Image-decompress reveal — RLE/LZ back-references.** A compressed picture **decoded by a byte-stream
     state machine that copies back-references from its own output** (LZ77 sliding window). *Stresses:* the
     **decode state machine + output back-reference pointer arithmetic**. *Shows:* the classic "image
-    loading in" progressive reveal.
+    loading in" progressive reveal.~~ ✓ [/snes/lzdec/](https://biohack.net/snes/lzdec/) *(LZSS decoder, overlapping back-refs; 56B→256-cell diamond; bit-exact host==default==a16==xy16 `0x0100`; indirect `lda ($zp)` copy, 0 libcalls; no bug)*
 
 50. **Color-grade kernel — many-argument calling convention.** A per-pixel transform taking **8+
     coefficients** (lift/gamma/gain ×3 + mix), forcing arguments **onto the soft stack**. *Stresses:*

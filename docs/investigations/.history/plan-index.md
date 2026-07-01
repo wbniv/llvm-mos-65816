@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d936292) | docs(plan-index): point #47 nrecip row at its commit be11fd9 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/be11fd9) | #47 Newton-Raphson Reciprocal Floor SNES demo — multiply-only iterative refinement (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/48f8580) | docs(plan-index): point #46 qsortviz row at its commit 3c2c7a5 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3c2c7a5) | #46 qsort Sort Visualizer SNES demo — caught + FIXED a real backend crash (G_SCMP) |
@@ -117,6 +118,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+d936292	author	Will Norris
+d936292	added	1
+d936292	deleted	1
+d936292	files	1
+d936292	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 be11fd9	author	Will Norris
 be11fd9	added	1
 be11fd9	deleted	0

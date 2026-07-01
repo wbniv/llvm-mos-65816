@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  lzdec:
+    desc: "#49: LZ77/LZSS image-decompress reveal — a compressed picture decoded by a byte-stream state machine that copies back-references from its OWN output (LZ77 sliding window), then progressively revealed cell-by-cell. Assert corpus_result (lzdec_gate_crc 0x0100) == host on MAME + bsnes-jg + disasm gate (LZ_STREAM ref, output writes, no arith libcall, rep/sep). Leaves build/lzdec.sfc + build/lzdec-{mame,jg}.png."
+    cmds:
+      - dev/run.sh lzdec
+
+  lzdec-play:
+    desc: "PLAY the LZ77 image-decompress reveal demo in a MAME window on this host (builds the ROM first if needed). Shows a compressed image loading in progressively."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/lzdec.sfc ]; then
+          echo "==> build/lzdec.sfc missing — building it (dev/run.sh lzdec)…"
+          dev/run.sh lzdec
+        fi
+      - task: mandel-mame
+        vars: { ROM: lzdec }
+
   nrecip:
     desc: "#47: Newton-Raphson reciprocal perspective floor — a scrolling checkerboard floor whose 1/z depth mapping is a MULTIPLY-ONLY fixed-point Newton reciprocal (x = x*(2 - m*x), no hardware divide, no divide libcall). Assert corpus_result (nrecip_gate_crc 0x044A) == host on MAME + bsnes-jg + disasm gate (__mulsi3, zero divide libcalls, rep/sep). Leaves build/nrecip.sfc + build/nrecip-{mame,jg}.png."
     cmds:
