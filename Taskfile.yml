@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  dither:
+    desc: "#70: Floyd-Steinberg error-diffusion dither — a smooth drifting gradient reduced to 4 grey levels by Floyd-Steinberg error diffusion: each pixel's SIGNED quantisation residual is spread to its down-right neighbours (7/16, 3/16, 5/16, 1/16) so the next pixels see the accumulated error, and the smooth scene resolves into shimmering dither. Forward-carried signed error across a two-row error buffer, distinct from #7's decay+PRNG fire. Assert corpus_result (dither_gate_crc 0x80C4) == host on MAME + bsnes-jg + disasm gate (no wide mul/div libcalls, signed shifts). Leaves build/dither.sfc + build/dither-{mame,jg}.png."
+    cmds:
+      - dev/run.sh dither
+
+  dither-play:
+    desc: "PLAY the Floyd-Steinberg Dither demo in a MAME window on this host (builds the ROM first if needed). Shows a smooth gradient resolving into a shimmering 4-level error-diffusion dither."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/dither.sfc ]; then
+          echo "==> build/dither.sfc missing â building it (dev/run.sh dither)â¦"
+          dev/run.sh dither
+        fi
+      - task: mandel-mame
+        vars: { ROM: dither }
+
   gouraud:
     desc: "#69: Gouraud triangle tumbler — a spinning equilateral triangle whose three vertices carry three brightnesses is FILLED and colour-interpolated per pixel: three signed cross-product edge functions (bx-ax)(py-ay)-(by-ay)(px-ax) decide inside/outside, and their values are the barycentric weights that shade the face across four bands. Distinct from #16's wireframe LINES. The gate exercises the per-pixel barycentric DIVIDE (num/area). Assert corpus_result (gouraud_gate_crc 0x209C) == host on MAME + bsnes-jg + disasm gate (__mulsi3, __divsi3). Leaves build/gouraud.sfc + build/gouraud-{mame,jg}.png."
     cmds:

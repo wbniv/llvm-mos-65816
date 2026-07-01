@@ -1,0 +1,11 @@
+/* Corpus slice: dither HAL-free. Differential engine checks it 5 ways:
+   host == default == +mos-a16 == +mos-xy16 on MAME + bsnes-jg, -verify clean. */
+#include "../../65816/dither.h"
+
+volatile uint16_t corpus_result;
+
+int main(void) {
+    corpus_result = dither_gate_crc();
+    for (;;) {}
+    return 0;
+}

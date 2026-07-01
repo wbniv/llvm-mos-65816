@@ -488,7 +488,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **Huffman bit-stream decode** — MSB-first bit reader + pointer-linked tree descent | #49 was *byte*-oriented LZ back-refs; a *bit*-granular reader + tree walk is distinct | ~~67~~ ✓ |
 | **gradient (Perlin) noise** — permutation table + fade **polynomial** + gradient dot + lerp | value-noise/plasma/CA never did the perm-index + Hermite-fade + dot-product-of-gradients pipeline | ~~68~~ ✓ |
 | **barycentric edge-function raster** — 3 cross-product edge fns + per-pixel interpolation | #16 drew wireframe **lines** only; solid interpolated fill is a different inner loop | ~~69~~ ✓ |
-| **error-diffusion (signed spread)** — Floyd–Steinberg propagate signed residual to neighbours + clamp | #7 doom-fire was decay+PRNG; forward-carried *signed* error with saturation is untested | 70 |
+| **error-diffusion (signed spread)** — Floyd–Steinberg propagate signed residual to neighbours + clamp | #7 doom-fire was decay+PRNG; forward-carried *signed* error with saturation is untested | ~~70~~ ✓ |
 | **marching-squares contour** — 16-case edge **LUT** + edge-crossing interpolation | #45 rendered the metaball *field*; extracting its iso-contour is a separate case-table + lerp | 71 |
 | **multi-dimensional array indexing** — true `grid[z][y][x]` with non-pow-2 strides | every prior grid was 1-D or hand-indexed `y*W+x`; compiler-generated N-D GEP multiplies are untested | 72 |
 
@@ -603,11 +603,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     barycentric interpolation inner loop — #16 drew wireframe **lines** only. *Shows:* a smoothly Gouraud-
     shaded rotating icosahedron / gem.~~ ✓ [/snes/gouraud/](https://biohack.net/snes/gouraud/) — bit-exact `host==default==a16==xy16==0xC5E9` on bsnes-jg; 3 int32 cross-product edge functions (`__mulsi3`) + per-pixel barycentric divide (`__divsi3`); a tumbling gold→orange→crimson Gouraud triangle. Correctness bar green; the `-verify` crash is the documented `a16-rc-undef-ra-pure-virtual` XFAIL (code bit-exact correct). A demo-only inverted-stepper-sign bug (invisible to the gate) was caught by host cross-check + fixed. ([plan](../plans/2026-06-30-69-snes-gouraud.md))
 
-70. **Error-diffusion camera — Floyd–Steinberg dither.** Reduce a smooth animated gradient scene to few
+70. ~~**Error-diffusion camera — Floyd–Steinberg dither.** Reduce a smooth animated gradient scene to few
     colours by **Floyd–Steinberg error diffusion**, spreading the signed quantisation residual to
     down-right neighbours (7/16, 3/16, 5/16, 1/16) with saturation. *Stresses:* forward-carried **signed**
     error propagation + clamp across a scanline sweep — #7's fire was decay+PRNG, not error diffusion.
-    *Shows:* a smooth scene resolving into shimmering ordered dither, the error visibly flowing.
+    *Shows:* a smooth scene resolving into shimmering ordered dither, the error visibly flowing.~~ ✓ [/snes/dither/](https://biohack.net/snes/dither/) — bit-exact `host==default==a16==xy16==0x80C4`, `-verify` clean ×2; two-row signed error buffer, residual split `(e*k)>>4` (arithmetic shift, no division), quantiser = 3 compares + 4-level LUT. A drifting gradient resolves into the 4-grey FS dither. Clean positive, no bug (incidental scene/index multiplies noted, cf #39). ([plan](../plans/2026-06-30-70-snes-dither.md))
 
 71. **Marching-squares contours — 16-case edge LUT.** Extract and animate the **iso-contours** of a scalar
     field (drifting metaball sum) via **marching squares**: a 16-entry case table selects which cell edges
