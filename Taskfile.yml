@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  gouraud:
+    desc: "#69: Gouraud triangle tumbler — a spinning equilateral triangle whose three vertices carry three brightnesses is FILLED and colour-interpolated per pixel: three signed cross-product edge functions (bx-ax)(py-ay)-(by-ay)(px-ax) decide inside/outside, and their values are the barycentric weights that shade the face across four bands. Distinct from #16's wireframe LINES. The gate exercises the per-pixel barycentric DIVIDE (num/area). Assert corpus_result (gouraud_gate_crc 0x209C) == host on MAME + bsnes-jg + disasm gate (__mulsi3, __divsi3). Leaves build/gouraud.sfc + build/gouraud-{mame,jg}.png."
+    cmds:
+      - dev/run.sh gouraud
+
+  gouraud-play:
+    desc: "PLAY the Gouraud Triangle demo in a MAME window on this host (builds the ROM first if needed). Shows a smoothly-shaded triangle tumbling, filled by barycentric edge-function rasterisation."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/gouraud.sfc ]; then
+          echo "==> build/gouraud.sfc missing — building it (dev/run.sh gouraud)…"
+          dev/run.sh gouraud
+        fi
+      - task: mandel-mame
+        vars: { ROM: gouraud }
+
   perlin:
     desc: "#68: Perlin gradient-noise flow field — each cell's colour is 2-D Perlin noise of its (x,y) plus a scrolling time offset: a permutation table + the Hermite quintic fade polynomial 6t^5-15t^4+10t^3 + gradient dot products + lerp, all fixed-point. Flows like smoke/marble. The perm-index + fade-polynomial + dot-of-gradients + interpolation pipeline, none of the first 67 demos run. Assert corpus_result (perlin_gate_crc 0xA72D) == host on MAME + bsnes-jg + disasm gate (__mulsi3, PN_PERM). Leaves build/perlin.sfc + build/perlin-{mame,jg}.png."
     cmds:
