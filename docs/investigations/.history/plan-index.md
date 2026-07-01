@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0c5df0a) | docs(plan-index): point #41 poolfx row at its commit a12b00d |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a12b00d) | #41 Free-List Pool Allocator SNES demo — manual free-list slot recycling (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/6e87c01) | docs(plan-index): point #40 crctex row at its commit ad34254 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ad34254) | #40 Table-Driven CRC32 Procedural Texture SNES demo — 256-entry ROM-LUT byte loop |
@@ -107,6 +108,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+0c5df0a	author	Will Norris
+0c5df0a	added	1
+0c5df0a	deleted	1
+0c5df0a	files	1
+0c5df0a	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a12b00d	author	Will Norris
 a12b00d	added	1
 a12b00d	deleted	0

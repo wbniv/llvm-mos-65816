@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a12b00d) | #41 Free-List Pool Allocator SNES demo — manual free-list slot recycling (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ad34254) | #40 Table-Driven CRC32 Procedural Texture SNES demo — 256-entry ROM-LUT byte loop |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4d20e30) | #39 Constant-Divisor Clock + Odometer SNES demo — strength-reduction probe (finding) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e134e54) | #37 Sparse-Switch Step-Sequencer VM SNES demo — comparison-tree opcode dispatch |
@@ -41,6 +42,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+a12b00d	author	Will Norris
+a12b00d	added	3
+a12b00d	deleted	3
+a12b00d	files	1
+a12b00d	body	A particle fountain recycles 48 fixed slots through a singly-linked LIFO free list\nthreaded through the slots themselves (alloc: i=head; head=slot[head].next;\nfree: slot[i].next=head; head=i) — distinct from #31's append-only bump pool.\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0x2B9B on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate proves the recycling is ldy-indexed struct-array pointer chasing with\nzero arithmetic libcalls. No compiler bug — the free-list lowers byte-exact across\nall modes. Live at https://biohack.net/snes/poolfx/ (biohack v1.0.159).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ad34254	author	Will Norris
 ad34254	added	3
 ad34254	deleted	3

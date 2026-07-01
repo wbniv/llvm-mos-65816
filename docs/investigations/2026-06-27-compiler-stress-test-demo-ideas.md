@@ -254,7 +254,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | ~~**constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift~~ | ~~#27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation~~ | ~~39~~ (FINDING: llvm-mos does NOT strength-reduce — retains `__udivNi3`, correct on soft-multiply) |
 | ~~**table-indexed ROM-LUT byte loop** — 256-entry `const` table, long-addressed per byte~~ | ~~reads a big `const` table from ROM via 24-bit addressing every iteration~~ | ~~40~~ |
 | ~~**free-list allocator** — manual malloc/free, pointer recycling~~ | ~~#31's pool is append-only (bump + reset); a free list recycles individual nodes~~ | ~~41~~ ✓ [/snes/poolfx/](https://biohack.net/snes/poolfx/) |
-| **irreducible control flow** — Duff's device (switch jumping into a loop) | a CFG the structurizer can't reduce; never exercised | 42 |
+| ~~**irreducible control flow** — Duff's device (switch jumping into a loop)~~ | ~~a CFG the structurizer can't reduce; never exercised~~ | ~~42~~ ✓ [/snes/duff/](https://biohack.net/snes/duff/) |
 | **signed 64-bit divide/mod** — `__divdi3`/`__moddi3` (sign-corrected) | #22 was *unsigned* 64-bit; signed div/mod is a distinct sign-handling libcall | 43 |
 | **overflow-checked / saturating arithmetic** — `__builtin_add_overflow`, carry/V-flag tests + clamp | flag-testing add/sub sequences never stressed | ~~44~~ |
 | **union type-punning** — `union{float;uint32}` aliased load/store, bit reinterpret | reading one storage as two types — the aliasing/reinterpret path | 45 |
@@ -325,9 +325,9 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     **free-list pointer recycling / manual malloc-free**. *Shows:* a sparking fountain with particles
     continuously born and dying.~~ ✓ [/snes/poolfx/](https://biohack.net/snes/poolfx/) *(free-list LIFO recycle of 48 slots; bit-exact host==default==a16==xy16 `0x2B9B`; ldy-indexed slot chase, 0 arith libcalls; no bug)*
 
-42. **Dissolve transition — Duff's device.** A screen wipe/dissolve copy unrolled with the classic
+42. ~~**Dissolve transition — Duff's device.** A screen wipe/dissolve copy unrolled with the classic
     **switch-jumping-into-a-loop**. *Stresses:* **irreducible loop-switch control flow** the structurizer
-    can't reduce. *Shows:* one image dissolving into the next in interleaved bursts.
+    can't reduce. *Shows:* one image dissolving into the next in interleaved bursts.~~ ✓ [/snes/duff/](https://biohack.net/snes/duff/) *(Duff's device copy, lengths 1..40; bit-exact host==default==a16==xy16 `0x5531`; jmp=19 branch mesh, 0 arith libcalls; no bug — backend lowers irreducible CFG cleanly)*
 
 43. **Light-years odometer / 64-bit Julia — signed 64-bit divide.** A Q-format orbit or a giant signed
     counter needing **`__divdi3`/`__moddi3`** (signed 64-bit divide+mod), distinct from #22's unsigned

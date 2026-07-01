@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  duff:
+    desc: "#42: Dissolve transition via Duff's device — one image dissolves into the next in scattered tile bursts, each revealed tile's 16 bytes copied by the classic switch-into-a-loop (irreducible loop-switch control flow the structurizer can't reduce). Assert corpus_result (duff_gate_crc 0x5531) == host on MAME + bsnes-jg + disasm gate (jmp branch mesh, no arith libcall, rep/sep). Leaves build/duff.sfc + build/duff-{mame,jg}.png."
+    cmds:
+      - dev/run.sh duff
+
+  duff-play:
+    desc: "PLAY the Duff-device dissolve demo in a MAME window on this host (builds the ROM first if needed). Shows one image dissolving into the next in scattered bursts."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/duff.sfc ]; then
+          echo "==> build/duff.sfc missing — building it (dev/run.sh duff)…"
+          dev/run.sh duff
+        fi
+      - task: mandel-mame
+        vars: { ROM: duff }
+
   poolfx:
     desc: "#41: Free-list pool allocator — a particle fountain recycles 48 fixed slots through a manual singly-linked LIFO free list threaded through the slots (alloc pops the head, free pushes it back). Continuous births/deaths. Assert corpus_result (poolfx_gate_crc 0x2B9B) == host on MAME + bsnes-jg + disasm gate (ldy-indexed slot chase, no arith libcall, rep/sep). Leaves build/poolfx.sfc + build/poolfx-{mame,jg}.png."
     cmds:
