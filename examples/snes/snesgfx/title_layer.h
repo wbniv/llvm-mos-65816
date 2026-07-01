@@ -2,41 +2,43 @@
  *
  * Every demo in the battery leaves BG2 free, so the title can live there in BGMODE_1 without
  * colliding with any demo layer. Font data and the tilemap are written once in reserve() under
- * force-blank; the CINEMATIC intro (title_begin…title_end) then animates via emit() using
- * REG_BG2VOFS to scroll both lines pixel-smoothly into position — zero VRAM traffic during the
- * animation. Ink shimmer + rainbow backdrop are driven via CGRAM pushes each frame.
+ * force-blank; the CINEMATIC intro (title_begin…title_end) then animates two independent BG2VOFS
+ * bands via HDMA — line0 descends from the top, line1 rises from the bottom — each easing to rest
+ * at centre screen. Demo drawables (canvas, text, HUD) are masked off during the title card and
+ * restored in title_end(). Ink shimmer + rainbow backdrop are driven via CGRAM pushes each frame.
  *
  * Layout (always):
- *   line0 — 8×8 font, centred on tilemap row 12 (screen row 96 at VOFS=0)
- *   line1 — 16×16 pixel-doubled font, centred on tilemap rows 14–15 (screen rows 112–127)
+ *   line0 — 8×8 font, centred at tilemap row 12 (VOFS=0 → screen row 96)
+ *   line1 — 16×16 pixel-doubled font, at tilemap rows 30–31 (VOFS=128 → screen rows 112–127)
  *
- * Animation sequence:
- *   1. reserve() parks the layer at BG2VOFS=TITLE_VOFS_START (both lines above the screen).
- *   2. title_begin() fades the screen to full brightness, then eases BG2VOFS toward 0 — fast far
- *      out, decelerating gently to rest (exponential decay).
- *   3. title_end(frames) holds for `frames` v-blanks, then sets restore=1 and fades to black.
- *      During the fade, emit() accelerates BG2VOFS upward (quadratic ramp) — the text exits the
- *      top of the screen in ≤ 6 frames. Screen then fades back up for the demo.
+ *   The two lines share ONE BG2 layer but each band of the screen gets its own VOFS via HDMA:
+ *     Band A [scanlines 0..107]   → vofs_top  (governs line0)
+ *     Band B [scanlines 108..223] → vofs_bot  (governs line1)
+ *
+ * VOFS geometry:
+ *   screen_row = tilemap_y − VOFS  (mod tilemap height = 256 px)
+ *   line0 @ y=96:  vofs_top 128→0 eases screen_row from −32 (above screen) to 96  (centre)
+ *   line1 @ y=240: vofs_bot 0→128 eases screen_row from  240 (below screen) to 112 (centre)
+ *   Ease-out reverses: vofs_top rises 0→96+ (line0 exits top); vofs_bot falls 128→0− (exits bottom)
+ *
+ * Animation timing (at 60 fps):
+ *   Ease-in  ~2 s (≈120 frames) — exponential decay, TITLE_FLYIN_SHIFT=6
+ *   Hold     2 s  (TITLE_HOLD_FRAMES=120) — lines stationary, shimmer/rainbow continues
+ *   Ease-out ~1.2 s — constant TITLE_EASEOUT_VEL=3 px/frame; screen fades simultaneously
  *
  * VRAM layout (single mode, always mixed):
  *   tiles   0– 63  8×8 glyphs (line0)               1 K words at TITLE_CHR_WORD
  *   tiles  64–319  16×16 expanded glyphs (line1)     4 K words at TITLE_CHR_WORD + 0x0400
- *   Total 5 K words starting at TITLE_CHR_WORD = 0x1000.
+ *   Total 5 K words at TITLE_CHR_WORD = 0x1000.
  *
- * HDMA channel 3 on BG2HOFS: pixel-centres line0 (8×8 can't always land on a tile boundary).
- * Line1 is always exactly centred at the 16 px tile boundary — its HDMA band is 0.
+ * HDMA channels (both free during the title intro — hud.h arms 1–2 only inside demo loops):
+ *   TITLE_HDMA_CHAN_VOFS = 3 — BG2VOFS 2-band counter-slide (rebuilt each emit frame)
+ *   TITLE_HDMA_CHAN_HOFS = 4 — BG2HOFS pixel-centring for line0 (static, built once in reserve)
+ *
+ * TM masking: title_begin() saves the demo drawables' TM bits and masks them off so the demo's
+ * canvas/text/HUD does not show during the title card. title_end() restores them before fade-up.
  *
  * Gate-neutral: once title_end() sets active=0, emit() is a no-op.
- *
- * Lifecycle:
- *   display_init(d); display_add(d, <demo drawables>); display_add(d, &title.base);
- *   title_begin(d, &title, "CATEGORY", "DEMO NAME");   // fly-in + hold begins
- *   <heavy pre-loop compute>
- *   title_end(d, &title, hold_frames);
- *   for (;;) { <render>; display_frame(d); }
- *
- * Strings must be UPPERCASE ASCII (font8 covers 0x20..0x5F). Max 32 chars for line0, 16 for line1.
- * Add the TitleLayer AFTER the demo's own drawables — reserve() writes REG_BG12NBA last.
  *
  * Header-only (static inline). Reuses examples/snes/font8.h. */
 #ifndef SNESGFX_TITLE_LAYER_H
@@ -59,29 +61,46 @@
 #define TITLE_ROWS       32u
 #define TITLE_MAX_CHARS  16u      /* max chars for line1 (16×16 font; 2 tile-cols per glyph)     */
 #define TITLE_L1_TILE    FONT8_N  /* first tile index for 16×16 glyphs (= 64)                   */
-#define TITLE_VOFS_START 220      /* initial BG2VOFS: both lines above screen (screen row < 0)   */
 
-#define TITLE_HDMA_CHAN  3u       /* HDMA channel for BG2HOFS pixel-centre (0=GP-DMA UpQ,
-                                    1-2=hud.h split; 3 is free during the intro)                 */
+#define TITLE_ROW0       12u      /* tilemap row for line0 (8×8); screen row = 96 at VOFS=0     */
+#define TITLE_ROW1       30u      /* tilemap row for line1 top (16×16); screen row=112 at VOFS=128 */
+
+/* VOFS start / target values. Line0: vofs_top 128→0 (enters from top).
+   Line1: vofs_bot 0→128 (enters from bottom; tilemap_y=240 − vofs_bot = screen_row). */
+#define TITLE_VOFS_TOP_START    128
+#define TITLE_VOFS_BOT_TARGET   128
+
+/* Animation parameters */
+#define TITLE_FLYIN_SHIFT    6    /* exponential decay shift — ~2 s ease-in at 60 fps           */
+#define TITLE_EASEOUT_VEL    3    /* px/frame constant ease-out — ~1.2 s exit                   */
+#define TITLE_HOLD_FRAMES  120    /* 2 s hold at 60 fps                                         */
+
+/* HDMA channel assignment */
+#define TITLE_HDMA_CHAN_VOFS  3u  /* BG2VOFS 2-band counter-slide                               */
+#define TITLE_HDMA_CHAN_HOFS  4u  /* BG2HOFS pixel-centring for line0                           */
+
+/* Scanline split: between row 12 (line0) and row 30 (line1); sits in the gap. */
+#define TITLE_HDMA_SPLIT  (uint8_t)((TITLE_ROW0 + 1u) * 8u + 4u)   /* = 108 */
 
 typedef struct {
   Drawable    base;
-  const char *line0;   /* 8×8 font, centred on row 12      (NULL = skip) */
-  const char *line1;   /* 16×16 font, centred on rows 14–15 (NULL = skip) */
+  const char *line0;     /* 8×8 font, centred on tilemap row 12   (NULL = skip) */
+  const char *line1;     /* 16×16 font, centred on tilemap rows 30–31 (NULL = skip) */
   /* --- cinematics state --- */
-  int16_t     vofs;    /* live BG2VOFS (TITLE_VOFS_START = above screen, 0 = at target)         */
-  int16_t     vel;     /* ease-out velocity accumulator (added to vofs each frame)               */
-  uint8_t     phase;   /* animation clock for ink shimmer + rainbow backdrop                     */
-  uint8_t     active;  /* 1 = emit() is live; 0 = static no-op                                  */
-  uint8_t     flyin;   /* 1 = ease vofs toward 0; 0 = hold current vofs                         */
-  uint8_t     restore; /* 1 = ease-out: accelerate vofs upward + drive backdrop to black         */
-  uint16_t    ink;     /* live ink colour (CGRAM palette-7 colour 1)                             */
-  uint16_t    back;    /* live backdrop colour (CGRAM[0])                                        */
-  HScroll2    hscroll; /* HDMA table for BG2HOFS pixel-centring on line0                        */
+  int16_t     vofs_top;  /* BG2VOFS band A: 128=above screen → 0=at target (line0)          */
+  int16_t     vofs_bot;  /* BG2VOFS band B: 0=below screen → 128=at target (line1)          */
+  uint8_t     phase;     /* animation clock for ink shimmer + rainbow backdrop               */
+  uint8_t     active;    /* 1 = emit() is live; 0 = no-op                                   */
+  uint8_t     flyin;     /* 1 = ease lines toward target; 0 = hold                          */
+  uint8_t     restore;   /* 1 = ease-out: slide lines back to edges                         */
+  uint8_t     demo_tm;   /* saved demo drawables' TM bits, restored in title_end()          */
+  uint16_t    ink;       /* live ink colour (CGRAM palette-7 colour 1)                      */
+  uint16_t    back;      /* live backdrop colour (CGRAM[0])                                 */
+  HScroll2    vscroll;   /* BG2VOFS 2-band HDMA table (rebuilt each emit frame)             */
+  HScroll2    hscroll;   /* BG2HOFS pixel-centring HDMA table (static)                     */
 } TitleLayer;
 
 #define TITLE_INK_IDX  (uint8_t)(TITLE_PAL * 16u + 1u)   /* CGRAM entry for ink (= 113) */
-#define TITLE_ROW0      12u   /* target tilemap row for line0; line1 top = TITLE_ROW0 + 2 */
 
 /* Glyph index for an ASCII char (space / out-of-set → 0). */
 static inline uint16_t _title_glyph(uint8_t ch) {
@@ -139,21 +158,21 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
      Horizontal: each source bit → 2 adjacent bits. Vertical: each row emitted twice. */
   snes_vram_addr((uint16_t)(TITLE_CHR_WORD + (uint16_t)(FONT8_N * 16u)));
   for (uint16_t g = 0; g < FONT8_N; g++) {
-    for (uint8_t r = 0; r < 8u; r++)                                    /* TL: rows 0-3 left  */
+    for (uint8_t r = 0; r < 8u; r++)
       REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u)]) >> 8);
     for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)                                    /* TR: rows 0-3 right */
+    for (uint8_t r = 0; r < 8u; r++)
       REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u)]) & 0xFFu);
     for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)                                    /* BL: rows 4-7 left  */
+    for (uint8_t r = 0; r < 8u; r++)
       REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u) + 4u]) >> 8);
     for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)                                    /* BR: rows 4-7 right */
+    for (uint8_t r = 0; r < 8u; r++)
       REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u) + 4u]) & 0xFFu);
     for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
   }
 
-  /* Clear tilemap to transparent (palette 7 entry 0 = transparent). */
+  /* Clear tilemap to transparent. */
   snes_vram_addr(TITLE_MAP_WORD);
   for (uint16_t i = 0; i < (uint16_t)(TITLE_COLS * TITLE_ROWS); i++)
     REG_VMDATA = (uint16_t)(TITLE_PAL << 10);
@@ -172,25 +191,24 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
     }
   }
 
-  /* Write line1 (16×16) at tilemap rows 14 (top) and 15 (bottom), centred. */
+  /* Write line1 (16×16) at tilemap rows 30 (top) and 31 (bottom), centred.
+     At VOFS_bot=128, screen_row = 240-128 = 112 (same visual position as before). */
   {
     const char *s = t->line1;
     uint8_t len = 0;
     if (s) for (const char *p = s; *p && len < TITLE_MAX_CHARS; p++) len++;
     uint8_t sc = (uint8_t)((TITLE_COLS - (uint8_t)(2u * len)) / 2u);
-    /* Top tile row (row 14) */
-    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)(TITLE_ROW0 + 2u) * TITLE_COLS));
+    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)TITLE_ROW1 * TITLE_COLS));
     for (uint8_t i = 0; i < TITLE_COLS; i++) {
       uint16_t tile = 0;
       if (s && i >= sc && i < (uint8_t)(sc + 2u * len)) {
-        uint8_t ci = (uint8_t)((i - sc) >> 1u);   /* char index */
-        uint8_t hs = (uint8_t)((i - sc) & 1u);    /* 0=left tile, 1=right tile */
+        uint8_t ci = (uint8_t)((i - sc) >> 1u);
+        uint8_t hs = (uint8_t)((i - sc) & 1u);
         tile = (uint16_t)((uint16_t)TITLE_L1_TILE + 4u * _title_glyph((uint8_t)s[ci]) + hs);
       }
       REG_VMDATA = (uint16_t)((uint16_t)(TITLE_PAL << 10) | tile);
     }
-    /* Bottom tile row (row 15) */
-    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)(TITLE_ROW0 + 3u) * TITLE_COLS));
+    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)(TITLE_ROW1 + 1u) * TITLE_COLS));
     for (uint8_t i = 0; i < TITLE_COLS; i++) {
       uint16_t tile = 0;
       if (s && i >= sc && i < (uint8_t)(sc + 2u * len)) {
@@ -202,14 +220,20 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
     }
   }
 
-  /* Park both lines above the screen; build + arm HDMA for line0 pixel-centring.
-     Split at scanline (TITLE_ROW0+1)*8+4 = 108 — sits in the blank gap row between line0 and
-     line1. Band A [0..107]: line0 HOFS; band B [108..223]: 0 (line1 is always exactly centred). */
-  REG_BG2VOFS = (uint8_t)TITLE_VOFS_START; REG_BG2VOFS = (uint8_t)(TITLE_VOFS_START >> 8);
-  t->vofs = TITLE_VOFS_START; t->vel = 0;
-  hscroll2_build(&t->hscroll, (uint8_t)((TITLE_ROW0 + 1u) * 8u + 4u),
-                 _title_hofs(t->line0), 0);
-  hscroll2_arm(TITLE_HDMA_CHAN, HSCROLL_BG2HOFS, &t->hscroll);
+  /* Initial VOFS: line0 above screen (band A = TITLE_VOFS_TOP_START = 128),
+                   line1 below screen (band B = 0, tilemap_y=240 → screen_row=240 > 223). */
+  t->vofs_top = TITLE_VOFS_TOP_START;
+  t->vofs_bot = 0;
+  REG_BG2VOFS = (uint8_t)TITLE_VOFS_TOP_START; REG_BG2VOFS = (uint8_t)((uint16_t)TITLE_VOFS_TOP_START >> 8);
+
+  /* VOFS HDMA: 2-band counter-slide (channel 3). Rebuilt each emit() frame. */
+  hscroll2_build(&t->vscroll, TITLE_HDMA_SPLIT,
+                 (int16_t)TITLE_VOFS_TOP_START, (int16_t)0);
+  hscroll2_arm(TITLE_HDMA_CHAN_VOFS, VSCROLL_BG2VOFS, &t->vscroll);
+
+  /* HOFS HDMA: static pixel-centring for line0 (channel 4). */
+  hscroll2_build(&t->hscroll, TITLE_HDMA_SPLIT, _title_hofs(t->line0), 0);
+  hscroll2_arm(TITLE_HDMA_CHAN_HOFS, HSCROLL_BG2HOFS, &t->hscroll);
 
   t->base.tm_bits = TM_BG2;
 }
@@ -221,19 +245,29 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
   if (!t->active) return;
 
   if (t->flyin) {
-    /* ease-in: exponential decay toward vofs=0 — fast far out, gentle landing */
-    if (t->vofs > 0) {
-      int16_t step = (int16_t)(t->vofs >> 3);
-      if (step < 1) step = 1;
-      t->vofs -= step;
-      if (t->vofs < 0) t->vofs = 0;
+    /* Line0: vofs_top decreases 128→0 (line enters from top). */
+    if (t->vofs_top > 0) {
+      int16_t s = (int16_t)(t->vofs_top >> TITLE_FLYIN_SHIFT);
+      if (s < 1) s = 1;
+      t->vofs_top -= s;
+      if (t->vofs_top < 0) t->vofs_top = 0;
+    }
+    /* Line1: vofs_bot increases 0→128 (line rises from bottom). */
+    if (t->vofs_bot < (int16_t)TITLE_VOFS_BOT_TARGET) {
+      int16_t remain = (int16_t)((int16_t)TITLE_VOFS_BOT_TARGET - t->vofs_bot);
+      int16_t s = (int16_t)(remain >> TITLE_FLYIN_SHIFT);
+      if (s < 1) s = 1;
+      t->vofs_bot += s;
+      if (t->vofs_bot > (int16_t)TITLE_VOFS_BOT_TARGET) t->vofs_bot = (int16_t)TITLE_VOFS_BOT_TARGET;
     }
   } else if (t->restore) {
-    /* ease-out: quadratic acceleration upward — off-screen in ≤ 6 frames */
-    t->vel += 6;
-    t->vofs += t->vel;
+    /* Ease-out: constant velocity, lines exit their respective edges. */
+    t->vofs_top += TITLE_EASEOUT_VEL;   /* line0 slides off top  */
+    t->vofs_bot -= TITLE_EASEOUT_VEL;   /* line1 slides off bottom */
   }
-  upq_push_scroll(q, (uint16_t)(uintptr_t)&REG_BG2VOFS, (uint16_t)t->vofs);
+
+  /* Rebuild VOFS HDMA table — HDMA reads WRAM at next vblank automatically, no UpQ needed. */
+  hscroll2_build(&t->vscroll, TITLE_HDMA_SPLIT, t->vofs_top, t->vofs_bot);
 
   t->phase = (uint8_t)(t->phase + 1u);
   if (!t->restore) {
@@ -262,40 +296,52 @@ static inline void title_init(TitleLayer *t, const char *line0, const char *line
 
 /* ── public API ───────────────────────────────────────────────────────────────────────────────── */
 
-/* title_begin — fly-in title card. line0 = 8×8 (category/subtitle), line1 = 16×16 (title name).
-   Fades to full brightness, then eases both lines in from above. Returns when lines are at rest. */
+/* title_begin — counter-sliding fly-in title card.
+ *   line0 = 8×8  (category/subtitle) — descends from top
+ *   line1 = 16×16 (demo name)        — rises from bottom
+ * Masks demo drawables' TM bits for the duration (restored in title_end).
+ * Returns when both lines are at rest. */
 static inline void title_begin(Display *d, TitleLayer *t, const char *line0, const char *line1) {
   title_init(t, line0, line1);
   t->phase = 0; t->active = 1; t->restore = 0; t->flyin = 0;
   t->ink = (uint16_t)SNES_RGB(31, 31, 31); t->back = 0u;
-  display_add(d, (Drawable *)t);
-  REG_HDMAEN = (uint8_t)(1u << TITLE_HDMA_CHAN);
+
+  uint8_t demo_tm = d->tm;            /* save demo drawables' TM bits before title is added */
+  display_add(d, (Drawable *)t);      /* d->tm |= TM_BG2 */
+  t->demo_tm = demo_tm;
+  d->tm = TM_BG2; REG_TM = TM_BG2;  /* show only title during intro — hide canvas/HUD/text */
+
+  REG_HDMAEN = (uint8_t)((1u << TITLE_HDMA_CHAN_VOFS) | (1u << TITLE_HDMA_CHAN_HOFS));
   d->bright = 0;
-  display_fade(d, INIDISP_ON);   /* fade in with lines parked above screen */
+  display_fade(d, INIDISP_ON);        /* fade in with lines at start positions */
   t->flyin = 1;
-  for (uint8_t g = 0; t->vofs != 0 && g < 96u; g++)
+  for (uint8_t g = 0;
+       (t->vofs_top != 0 || t->vofs_bot != (int16_t)TITLE_VOFS_BOT_TARGET) && g < 200u;
+       g++)
     display_frame(d);
 }
 
 /* title_begin16 — backward-compat alias (all pre-existing call sites used this name). */
 #define title_begin16 title_begin
 
-/* title_end — hold for `frames` v-blanks, then ease-out very fast and fade to black.
-   Disables the title layer and fades the screen back up for the demo to begin. */
+/* title_end — hold for `frames` v-blanks, ease-out, fade to black, restore demo layers.
+ *   Recommended: pass TITLE_HOLD_FRAMES (120 = 2 s) unless the demo has specific needs. */
 static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
   display_hold(d, frames);
-  t->restore = 1; t->vel = 0;
-  display_fade(d, 0);            /* fade to black; ease-out runs during this */
+  t->restore = 1;
+  display_fade(d, 0);                 /* fade to black while lines slide out */
+  d->tm |= t->demo_tm;               /* restore demo layers before hide_layer removes BG2 */
   display_hide_layer(d, (Drawable *)t);
   REG_HDMAEN = 0;
-  REG_BG2HOFS = 0; REG_BG2HOFS = 0;   /* clear HOFS latch */
-  REG_BG2VOFS = 0; REG_BG2VOFS = 0;   /* reset VOFS latch for next use */
+  REG_BG2HOFS = 0; REG_BG2HOFS = 0; /* clear HOFS latch */
+  REG_BG2VOFS = 0; REG_BG2VOFS = 0; /* reset VOFS latch */
   t->active = 0;
-  display_fade_to(d, INIDISP_ON);
+  display_fade_to(d, INIDISP_ON);    /* fade back up showing demo content */
 }
 
 /* splash16 — standalone title splash (no pre-existing display; leaves screen in force-blank).
-   Drop-in replacement for splash_show() + the old splash.h include for Mode-7 demos. */
+ * Drop-in for Mode-7 demos that don't use the display system for their main render.
+ * Recommended: pass TITLE_HOLD_FRAMES (120) for consistent timing. */
 static inline void splash16(const char *line0, const char *line1, uint16_t frames) {
   Display _d; display_init(&_d);
   static TitleLayer _t;

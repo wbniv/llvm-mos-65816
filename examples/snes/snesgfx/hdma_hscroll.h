@@ -29,6 +29,12 @@
 #define HSCROLL_BG3HOFS  0x11u
 #define HSCROLL_BG4HOFS  0x13u
 
+/* B-bus destination low bytes for the four BG vertical-scroll latches. */
+#define VSCROLL_BG1VOFS  0x0Eu
+#define VSCROLL_BG2VOFS  0x10u
+#define VSCROLL_BG3VOFS  0x12u
+#define VSCROLL_BG4VOFS  0x14u
+
 /* A 2-band horizontal-scroll HDMA table (7 bytes incl. the 0 terminator). */
 typedef struct { uint8_t tab[7]; } HScroll2;
 
