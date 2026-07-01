@@ -1,0 +1,11 @@
+/* Corpus slice: grid3d HAL-free. Differential engine checks it 5 ways:
+   host == default == +mos-a16 == +mos-xy16 on MAME + bsnes-jg, -verify clean. */
+#include "../../65816/grid3d.h"
+
+volatile uint16_t corpus_result;
+
+int main(void) {
+    corpus_result = grid3d_gate_crc();
+    for (;;) {}
+    return 0;
+}

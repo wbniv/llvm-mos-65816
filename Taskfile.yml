@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  grid3d:
+    desc: "#72: 3-D grid voxel life \u2014 a life-like cellular automaton (survive 4..7, born 5..6, Moore-26, toroidal wrap) runs in a TRUE 3-D array uint8 grid[6][6][6] accessed as grid[z][y][x], so the COMPILER generates the plane/row stride arithmetic z*36+y*6+x (non-power-of-2). Every prior grid demo was 1-D or hand-indexed y*W+x; this leans on the compiler's multi-dimensional GEP lowering (26 reads/cell). The live voxels tumble as a depth-shaded rotating cube. Assert corpus_result (grid3d_gate_crc 0x859F) == host on MAME + bsnes-jg + disasm gate (g3_a/g3_b refs, stride shifts). Leaves build/grid3d.sfc + build/grid3d-{mame,jg}.png."
+    cmds:
+      - dev/run.sh grid3d
+
+  grid3d-play:
+    desc: "PLAY the 3-D Grid Voxel Life demo in a MAME window on this host (builds the ROM first if needed). Shows a Moore-26 3-D cellular automaton tumbling as a depth-shaded rotating voxel cube."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/grid3d.sfc ]; then
+          echo "==> build/grid3d.sfc missing \u2014 building it (dev/run.sh grid3d)\u2026"
+          dev/run.sh grid3d
+        fi
+      - task: mandel-mame
+        vars: { ROM: grid3d }
+
   msquares:
     desc: "#71: Marching-squares iso-contours \u2014 a scalar field (sum of moving parabolic metaball domes) is sampled on a grid; each cell's 4 corners are thresholded into a 4-bit CASE index, a 16-entry const edge table (MS_SEG) says which cell edges the contour crosses, and each crossing is placed by edge-crossing interpolation t=(iso-va)/(vb-va) (a signed int32 divide). Bright iso-contour outlines around dim-filled merging/splitting blobs. Extracting the contour (vs #45 rendering the field) is a distinct case-table + lerp loop. Assert corpus_result (msquares_gate_crc 0x33EB) == host on MAME + bsnes-jg + disasm gate (MS_SEG refs, __divsi3). Leaves build/msquares.sfc + build/msquares-{mame,jg}.png."
     cmds:

@@ -490,7 +490,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **barycentric edge-function raster** — 3 cross-product edge fns + per-pixel interpolation | #16 drew wireframe **lines** only; solid interpolated fill is a different inner loop | ~~69~~ ✓ |
 | **error-diffusion (signed spread)** — Floyd–Steinberg propagate signed residual to neighbours + clamp | #7 doom-fire was decay+PRNG; forward-carried *signed* error with saturation is untested | ~~70~~ ✓ |
 | **marching-squares contour** — 16-case edge **LUT** + edge-crossing interpolation | #45 rendered the metaball *field*; extracting its iso-contour is a separate case-table + lerp | ~~71~~ ✓ |
-| **multi-dimensional array indexing** — true `grid[z][y][x]` with non-pow-2 strides | every prior grid was 1-D or hand-indexed `y*W+x`; compiler-generated N-D GEP multiplies are untested | 72 |
+| **multi-dimensional array indexing** — true `grid[z][y][x]` with non-pow-2 strides | every prior grid was 1-D or hand-indexed `y*W+x`; compiler-generated N-D GEP multiplies are untested | ~~72~~ ✓ |
 
 ## The twenty (each opens a corner the first 52 never run)
 
@@ -615,10 +615,10 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     dispatch** + edge-crossing lerp — #45 rendered the metaball *field*; the contour is a separate case-table
     + interpolation. *Shows:* glowing iso-lines snaking around merging/splitting blobs.~~ ✓ [/snes/msquares/](https://biohack.net/snes/msquares/) — correctness green `host==default==a16==xy16==0x86A7` on bsnes-jg; 4-bit corner-sign case → 16-entry `MS_SEG` edge LUT + edge-crossing interpolation divide (`__divsi3`); yellow iso-outline around dim-filled merging blobs. The `-verify` crash is the documented `a16-rc-undef-ra-pure-virtual` XFAIL (divide-heavy, code bit-exact correct). Demo field made multiply-free via incremental second-difference stepping, host-cross-checked vs `ms_field`. ([plan](../plans/2026-06-30-71-snes-msquares.md))
 
-72. **3-D cellular automaton cube — multi-dimensional indexing.** A rotating **voxel cube** running a 3-D
+72. ~~**3-D cellular automaton cube — multi-dimensional indexing.** A rotating **voxel cube** running a 3-D
     life-like automaton in a true `uint8 grid[Z][Y][X]` array with non-power-of-2 dimensions. *Stresses:*
     **compiler-generated N-D array address arithmetic** (`z*Y*X + y*X + x` GEP multiplies) — every prior grid
-    was 1-D or hand-indexed. *Shows:* a slowly tumbling cube of cells being born and dying in 3-D.
+    was 1-D or hand-indexed. *Shows:* a slowly tumbling cube of cells being born and dying in 3-D.~~ ✓ [/snes/grid3d/](https://biohack.net/snes/grid3d/) — bit-exact `host==default==a16==xy16==0xFCDE`, `-verify` clean ×2; true `uint8 grid[6][6][6]` accessed `grid[z][y][x]` (compiler emits `z*36+y*6+x`; 26 Moore reads/cell) running a survive-4..7/born-5..6 3-D CA, tumbling as a depth-shaded voxel cube. Clean positive, no bug (caught+fixed a demo-only `CANVAS_FLUSH_TILES` display bug, ruled out a miscompile via default==a16). ([plan](../plans/2026-06-30-72-snes-grid3d.md))
 
 ## Round 4 first picks
 
