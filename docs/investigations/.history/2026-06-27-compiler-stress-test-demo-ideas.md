@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4f6558f) | #50 Many-Argument Color-Grade Kernel SNES demo — >register-count arg spill (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/149bfdf) | #49 LZ77 Image-Decompress Reveal SNES demo — back-references from own output (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/be11fd9) | #47 Newton-Raphson Reciprocal Floor SNES demo — multiply-only iterative refinement (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3c2c7a5) | #46 qsort Sort Visualizer SNES demo — caught + FIXED a real backend crash (G_SCMP) |
@@ -48,6 +49,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+4f6558f	author	Will Norris
+4f6558f	added	3
+4f6558f	deleted	3
+4f6558f	files	1
+4f6558f	body	A per-cell color grade takes 10 int16 params (3 lifts, 3 gammas, gain, mix, bias +\nbase), overflowing the register-argument budget so the extras spill onto the soft\nstack (.noinit..Lstatic_stack) and the callee reads them back off frame. The\ncoefficients sweep over time, re-grading a gradient.\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0x783F on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate: color_grade called, args spill to .noinit..Lstatic_stack (40 refs).\nNo compiler bug — the many-arg CC marshals byte-exact across all modes. Live at\nhttps://biohack.net/snes/cgrade/ (biohack v1.0.166).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 149bfdf	author	Will Norris
 149bfdf	added	3
 149bfdf	deleted	3

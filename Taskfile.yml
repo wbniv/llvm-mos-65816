@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  critters:
+    desc: "#51: Protothread critter swarm — a swarm of critters, each a RESUMABLE protothread that yields each frame and resumes its scripted box-patrol via a saved continuation index (case labels inside loops -> mid-loop re-entry + cross-call state preservation). Assert corpus_result (critters_gate_crc 0xAD9F) == host on MAME + bsnes-jg + disasm gate (critter_step lc-dispatch, jmp branch mesh, no arith libcall, rep/sep). Leaves build/critters.sfc + build/critters-{mame,jg}.png."
+    cmds:
+      - dev/run.sh critters
+
+  critters-play:
+    desc: "PLAY the protothread critter-swarm demo in a MAME window on this host (builds the ROM first if needed). Shows a swarm of critters each running its own scripted patrol."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/critters.sfc ]; then
+          echo "==> build/critters.sfc missing — building it (dev/run.sh critters)…"
+          dev/run.sh critters
+        fi
+      - task: mandel-mame
+        vars: { ROM: critters }
+
   cgrade:
     desc: "#50: Many-argument color-grade kernel — a per-cell grade takes 10 int16 params (3 lifts, 3 gammas, gain, mix, bias + base), forcing the extras onto the soft stack (>register-count argument spilling). The coefficients sweep over time, re-grading a gradient. Assert corpus_result (cgrade_gate_crc 0x783F) == host on MAME + bsnes-jg + disasm gate (color_grade call, Lstatic_stack arg spill, rep/sep). Leaves build/cgrade.sfc + build/cgrade-{mame,jg}.png."
     cmds:
