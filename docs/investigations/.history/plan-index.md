@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/26c2e18) | feat(snes/satcast): #77 Saturating-Cast Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1f15000) | feat(snes/rotkal): #74 Rotate-Register Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0f32b19) | docs(plan-index): add #75 satcomet row |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/eecfd2f) | docs(plan-index): add #76 smulorbit row |
@@ -173,6 +174,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+26c2e18	author	Will Norris
+26c2e18	added	2
+26c2e18	deleted	1
+26c2e18	files	1
+26c2e18	body	fminf(__builtin_fminf)→G_FMINNUM + fmaxf(__builtin_fmaxf)→G_FMAXNUM + (int16_t)→G_FPTOSI\nchain; legalizer :502 inserts NaN guard (buildIsFPClass(fcNan)+G_SELECT).\nFirst demo in the battery to use fminf/fmaxf.\n\n6-fold hex kaleidoscope via sort(|q|,|r|,|s|) first-sextant fold (no trig).\nGATE_N=16 × 8 tiles (reduced from spec's implied 100: soft-float ~3k cyc/op,\nlarger GATE_N would exceed 500-frame title window). Sort-by-value (not pointer)\navoids 65816 stack-address-of latency.\n\nGate: __mulsf3=4, fminf/fmaxf-refs=2, rep/sep=38; 5-way green 0xC8CF.\nNo compiler bug — fmin/fmax/fptosi chain lowers correctly across all modes.\nPublished: https://biohack.net/snes/satcast/ (biohack.net v1.0.207).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 1f15000	author	Will Norris
 1f15000	added	1
 1f15000	deleted	0

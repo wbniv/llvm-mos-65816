@@ -748,7 +748,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     (colour 0) never NaN bits; poly is mul/add one-per-statement (no FMA); CRC folds uint8 colour indices:
     integer-exact.~~ ✓ [/snes/satcast/](https://biohack.net/snes/satcast/) ([plan](../plans/2026-07-01-77-snes-satcast.md))
 
-78. **Signed-Bitfield Terrain Sculptor.** *Stresses:* G_SEXT_INREG via a struct int16_t height:5, slope:4,
+~~78. **Signed-Bitfield Terrain Sculptor.** *Stresses:* G_SEXT_INREG via a struct int16_t height:5, slope:4,
     flow:4, uint16_t mat:3 reading signed fields back (sign-extend to 16 bits) plus an int8_t signed-narrowing
     companion. Unlike demo 52 disbits (uint32_t opcode:8 unsigned, zero-extend, constant shifts) and demo 29b
     truchet (uint16_t orient:1 unsigned): both grep-confirmed unsigned, never sign-extend. *Shows:* An animated
@@ -758,7 +758,8 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     MOSLegalizerInfo.cpp:130 G_SEXT_INREG .lower() (shl/ashr); triggered by ISO C99 6.7.2.1 signed-bitfield
     read-back in GlobalISel IR; no header uses signed bitfields. *Differential:* integer-exact: field-container
     signedness pinned (int16_t container gives signed field), sign-extended values are plain int16 arithmetic
-    bit-exact host vs target; CRC folds every packed cell word; no float.
+    bit-exact host vs target; CRC folds every packed cell word; no float.~~
+    ✓ [/snes/sbitfld/](https://biohack.net/snes/sbitfld/) ([plan](../plans/2026-07-01-78-snes-sbitfld.md))
 
 79. **Descending memmove Scroll Slabs.** *Stresses:* G_MEMMOVE with memmove(buf+1,buf,N-1) (dst>src overlapping,
     forces Descending=true high-to-low) plus memmove(buf,buf+k,N-k) ascending (Descending=false) for both sub-

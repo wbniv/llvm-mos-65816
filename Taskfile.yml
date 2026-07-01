@@ -477,6 +477,20 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  sbitfld:
+    desc: "#78: Signed-Bitfield Terrain Sculptor -- G_SEXT_INREG via int16_t height:5/slope:4/flow:4 signed bitfield read-back (legalizer :130 .lower() shl+ashr pair). First signed-bitfield demo. Animated eroding terrain. Assert corpus_result (sbitfld_gate_crc 0x40C5) == host on MAME + bsnes-jg. Leaves build/sbitfld.sfc + build/sbitfld-{mame,jg}.png."
+    cmds:
+      - dev/run.sh sbitfld
+
+  sbitfld-play:
+    desc: "PLAY the Signed-Bitfield Terrain demo in a MAME window (builds first if needed)."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/sbitfld.sfc ]; then dev/run.sh sbitfld; fi
+      - task: mandel-mame
+        vars: { ROM: sbitfld }
+
   satcast:
     desc: "#77: Saturating-Cast Kaleidoscope -- fminf→G_FMINNUM + fmaxf→G_FMAXNUM + (int16_t)→G_FPTOSI chain (legalizer:502 NaN guard). First demo to use fminf/fmaxf. 6-fold hex kaleidoscope, GATE_N=16 × 8 tiles. Assert corpus_result (satcast_gate_crc 0xC8CF) == host on MAME + bsnes-jg. Leaves build/satcast.sfc + build/satcast-{mame,jg}.png."
     cmds:
