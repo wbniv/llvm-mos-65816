@@ -47,7 +47,9 @@ typedef struct {
   Display      screen;
   BitmapCanvas canvas;
   TextLayer    text;
-  uint16_t     t;        // frame counter (drives scroll + function cycle)
+  uint16_t     t;        // frame counter (drives function cycle)
+  uint16_t     t_snap;   // t captured at the START of each 4-band cycle — held constant so all
+                         // bands in the cycle use the same sx/sy/tt (prevents scroll seam)
   uint8_t      band;     // which BAND of cell-rows to recompute this frame
   uint8_t      fn;       // live intrinsic (0..3)
   uint8_t      fn_shown; // fn currently written to the HUD (avoid redundant text redraw)
@@ -64,13 +66,13 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
   for (uint8_t r = 0; r < 8; r++) { t[r * 2] = p0; t[r * 2 + 1] = p1; }
 }
 
-// Recompute one BAND of cell-rows from the bit-census at time t (scrolls + morphs). noinline caps RA.
+// Recompute one BAND of cell-rows from the bit-census at snapshot t. noinline caps RA.
 __attribute__((noinline))
-static void field_band(App *a) {
+static void field_band(App *a, uint16_t t_snap) {
   uint8_t y0 = (uint8_t)(a->band * BAND);
-  uint16_t sx = (uint16_t)(a->t >> 2);       // diagonal scroll
-  uint16_t sy = (uint16_t)(a->t >> 3);
-  uint16_t tt = (uint16_t)(a->t >> 4);
+  uint16_t sx = (uint16_t)(t_snap >> 2);      // diagonal scroll — same for all bands in a cycle
+  uint16_t sy = (uint16_t)(t_snap >> 3);
+  uint16_t tt = (uint16_t)(t_snap >> 4);
   for (uint8_t cy = y0; cy < (uint8_t)(y0 + BAND) && cy < NCELL; cy++)
     for (uint8_t cx = 0; cx < NCELL; cx++) {
       uint8_t census = bitcensus_cell((uint16_t)(cx + sx), (uint16_t)(cy + sy), tt, a->fn);
@@ -92,6 +94,7 @@ static void app_init(App *a) {
   display_add(&a->screen, (Drawable *)&a->text);
   upq_push_cgram(&a->screen.q, 0, bg3_pal, 0x00, (uint8_t)sizeof bg3_pal);
   a->t = 0u;
+  a->t_snap = 0u;
   a->band = 0u;
   a->fn = 0u;
   a->fn_shown = 0xFFu;
@@ -112,9 +115,12 @@ int main(void) {
       text_puts(&a.text, 1, 0, fn_name[a.fn]);
       a.fn_shown = a.fn;
     }
-    field_band(&a);
+    field_band(&a, a.t_snap);                    // all bands in a cycle share the same snapshot
     a.band++;
-    if (a.band * BAND >= NCELL) a.band = 0u;
+    if (a.band * BAND >= NCELL) {
+      a.band = 0u;
+      a.t_snap = a.t;                            // advance snapshot only after a full redraw cycle
+    }
     display_frame(&a.screen);
   }
 }
