@@ -256,7 +256,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | **free-list allocator** — manual malloc/free, pointer recycling | #31's pool is append-only (bump + reset); a free list recycles individual nodes | 41 |
 | **irreducible control flow** — Duff's device (switch jumping into a loop) | a CFG the structurizer can't reduce; never exercised | 42 |
 | **signed 64-bit divide/mod** — `__divdi3`/`__moddi3` (sign-corrected) | #22 was *unsigned* 64-bit; signed div/mod is a distinct sign-handling libcall | 43 |
-| **overflow-checked / saturating arithmetic** — `__builtin_add_overflow`, carry/V-flag tests + clamp | flag-testing add/sub sequences never stressed | 44 |
+| **overflow-checked / saturating arithmetic** — `__builtin_add_overflow`, carry/V-flag tests + clamp | flag-testing add/sub sequences never stressed | ~~44~~ |
 | **union type-punning** — `union{float;uint32}` aliased load/store, bit reinterpret | reading one storage as two types — the aliasing/reinterpret path | 45 |
 | **indirect comparator ABI** — `qsort` with a function-pointer comparator callback | #17's sorts were hand-written; libc `qsort` calls *back* per compare | 46 |
 | **iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt) | a convergent fixed-point loop, distinct from a single divide libcall | 47 |
@@ -334,10 +334,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     `__udivdi3`. *Stresses:* **signed 64-bit division/modulo** (sign-correction codegen). *Shows:* a vast
     signed odometer ticking through zero, or a 64-bit-deep Julia.
 
-44. **HDR light blending — saturating / overflow-checked add.** Many overlapping translucent glows summed
+44. ~~**HDR light blending — saturating / overflow-checked add.** Many overlapping translucent glows summed
     per pixel with **`__builtin_add_overflow` saturation** (clamp to white). *Stresses:*
     **overflow-builtin / carry-and-V-flag saturating arithmetic**. *Shows:* drifting bloom-lights that
-    blow out to white where they pile up.
+    blow out to white where they pile up.~~ ✓ [/snes/hdr-bloom/](https://biohack.net/snes/hdr-bloom/) — 6 glows sat-added per cell (`__builtin_add_overflow`→`adc`+`bcs`); overlaps clamp to white; `host==default==a16==xy16==0xF951` on bsnes-jg, `-verify` clean ×3. **No compiler bug.**
 
 45. **Metaballs — union type-pun fast-inverse-sqrt.** The Quake `union { float f; uint32_t i; }`
     **bit-hack reciprocal-sqrt** drives a field of merging blobs. *Stresses:* **union type-punning**
@@ -386,5 +386,5 @@ Sharpest at opening a code path the first 32 never run:
 - ~~**#33 `double` soft-float** — the largest brand-new library surface, with a clean bit-exact differential (the `double` analogue of #21).~~ ✓ [/snes/mandel-double/](https://biohack.net/snes/mandel-double/)
 - **#35 `setjmp`/`longjmp`** — the context save/restore ABI; nothing else in 52 demos touches it (and may surface a toolchain gap). **⚠ BLOCKED — it surfaced exactly that gap: `longjmp` is broken on the 65816 (6502-only `setjmp.S`); see #35 above + [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md).**
 - ~~**#38 computed-`goto`** — a second VM that opens the *threaded-dispatch* path #29a's `switch` jump-table didn't.~~ ✓ [/snes/bf-vm/](https://biohack.net/snes/bf-vm/) — clean positive, no bug.
-- **#44 saturating / `__builtin_add_overflow`** — flag-sequence codegen, plus a gorgeous additive-bloom visual.
+- ~~**#44 saturating / `__builtin_add_overflow`** — flag-sequence codegen, plus a gorgeous additive-bloom visual.~~ ✓ [/snes/hdr-bloom/](https://biohack.net/snes/hdr-bloom/) — clean positive, no bug.
 - **#48 IIR feedback** — the non-reorderable recursive dependency chain the feed-forward FFT (#25) never exercised.

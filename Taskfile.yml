@@ -239,6 +239,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: bf-vm }
 
+  hdr-bloom:
+    desc: "#44: HDR additive-bloom — saturating / overflow-checked add (__builtin_add_overflow → adc; bcs). Six drifting glows sum per cell, clamping to white where they pile up. Assert corpus_result (hdr_bloom_gate_crc 0x2798) == host on MAME + bsnes-jg + disasm gate (adc + carry-branch + rep/sep). Leaves build/hdr-bloom.sfc + build/hdr-bloom-{mame,jg}.png."
+    cmds:
+      - dev/run.sh hdr-bloom
+
+  hdr-bloom-play:
+    desc: "PLAY the HDR bloom demo in a MAME window on this host (builds the ROM first if needed). Shows six drifting lights blooming and blowing out to white where they overlap."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/hdr-bloom.sfc ]; then
+          echo "==> build/hdr-bloom.sfc missing — building it (dev/run.sh hdr-bloom)…"
+          dev/run.sh hdr-bloom
+        fi
+      - task: mandel-mame
+        vars: { ROM: hdr-bloom }
+
   epicycles:
     desc: "#10: Fourier epicycles — a sum of 8 rotating vectors (DFT of a star) traces the outline; sin/cos-LUT sweep with 4 __mulsi3 per harmonic + 32-bit accumulate, NO divide (the many-multiply member). Assert corpus_result (epi_gate_crc 0x4F6C) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__mulsi3 + rep/sep, divide=0). Leaves build/epicycles.sfc + build/epicycles-{jg,mame}.png."
     cmds:

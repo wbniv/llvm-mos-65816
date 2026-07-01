@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e899f6) | docs(plan-index): point #38 bf-vm row at its commit f29be2f |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f29be2f) | #38 Brainfuck Threaded-Code VM SNES demo — computed-goto threaded dispatch |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/33e5415) | docs(plan-index): point #33 mandel-double row at its squashed commit 661b01e |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/661b01e) | #33 Double-Precision Mandelbrot SNES demo — 64-bit double soft-float |
@@ -93,6 +94,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+0e899f6	author	Will Norris
+0e899f6	added	1
+0e899f6	deleted	1
+0e899f6	files	1
+0e899f6	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f29be2f	author	Will Norris
 f29be2f	added	1
 f29be2f	deleted	0
