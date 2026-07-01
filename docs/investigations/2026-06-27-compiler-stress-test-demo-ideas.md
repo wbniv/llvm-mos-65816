@@ -483,7 +483,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **union-find / disjoint-set** — parent-array **path compression** (in-place pointer rewrite) | #18 (heap), #31 (tree) never did the find-with-compression pointer-chase-and-flatten idiom | ~~62~~ ✓ |
 | **Fenwick / binary-indexed tree** — `i & -i` low-bit isolation in a range-sum loop | the `i += i & -i` two's-complement bit trick is a codegen shape nothing else emits | ~~63~~ ✓ |
 | **non-comparison sort** — counting/radix: histogram + prefix-sum + scatter, **zero compares** | #17's sorts were all comparison-based; a compare-free scatter sort is a different loop nest | ~~64~~ ✓ |
-| **computational-geometry orientation** — cross-product **sign** tests + angular sort (convex hull) | signed 2-D cross products driving branch decisions; never exercised | 65 |
+| **computational-geometry orientation** — cross-product **sign** tests + angular sort (convex hull) | signed 2-D cross products driving branch decisions; never exercised | ~~65~~ ✓ |
 | **2-D dynamic-programming table** — memoised recurrence + `max`/`min` reductions + backtrack pointer walk | a doubly-indexed table fill with data-dependent reductions; a new loop/GEP shape | 66 |
 | **Huffman bit-stream decode** — MSB-first bit reader + pointer-linked tree descent | #49 was *byte*-oriented LZ back-refs; a *bit*-granular reader + tree walk is distinct | 67 |
 | **gradient (Perlin) noise** — permutation table + fade **polynomial** + gradient dot + lerp | value-noise/plasma/CA never did the perm-index + Hermite-fade + dot-product-of-gradients pipeline | 68 |
@@ -573,10 +573,10 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     scatter-sort loop nest (histogram + prefix scan + stable scatter) — every #17 sort was comparison-based.
     *Shows:* bars re-bucketing pass by pass, stable within each digit, converging to sorted.~~ ✓ [/snes/radix/](https://biohack.net/snes/radix/) — bit-exact `host==default==a16==xy16==0x123E`; LSD radix base-16 (histogram + prefix-sum + stable scatter, zero data compares, 0 mul/div libcalls); bars sort into an ascending value-band gradient; gate cross-checks sorted (no inversions) + permutation (xor/sum). Clean positive, no bug. ([plan](../plans/2026-06-30-64-snes-radix.md))
 
-65. **Convex-hull rubber band — orientation cross-products.** Scattered moving points with their **convex
+65. ~~**Convex-hull rubber band — orientation cross-products.** Scattered moving points with their **convex
     hull** snapping taut around them (gift-wrap / Graham scan). *Stresses:* signed 2-D **cross-product
     orientation tests** (`(b−a)×(c−a)` sign) driving the branch decisions, plus an angular sort — never
-    exercised. *Shows:* a drifting point cloud wrapped by a live rubber-band hull.
+    exercised. *Shows:* a drifting point cloud wrapped by a live rubber-band hull.~~ ✓ [/snes/hull/](https://biohack.net/snes/hull/) — bit-exact `host==default==a16==xy16==0x84E3`; gift-wrap (Jarvis) picks vertices from the sign of the **int32** cross product (cast to avoid 16-bit overflow), `__mulsi3`+`cmp`; amber rubber-band hull around a drifting cyan point cloud; gate cross-checks the hull is valid (all points left of every edge). Clean positive, no bug. ([plan](../plans/2026-06-30-65-snes-hull.md))
 
 66. **Edit-distance / knapsack DP — 2-D table + backtrack.** Fill a **dynamic-programming table** (Levenshtein
     or 0/1-knapsack) cell by cell, then trace the optimal path back through it. *Stresses:* a doubly-indexed

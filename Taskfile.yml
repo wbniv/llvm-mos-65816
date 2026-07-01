@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  hull:
+    desc: "#65: Convex hull rubber-band — a cloud of points drifts and bounces; each frame the convex hull is recomputed by gift-wrapping (Jarvis march) purely from the SIGN of the signed 2-D cross product (int32 to avoid overflow), and drawn as a taut rubber band. A computational-geometry orientation test none of the first 64 demos run. Gate cross-checks the hull is valid (all points left of every edge). Assert corpus_result (hull_gate_crc 0xA58C) == host on MAME + bsnes-jg + disasm gate (__mulsi3 cross, cmp sign tests). Leaves build/hull.sfc + build/hull-{mame,jg}.png."
+    cmds:
+      - dev/run.sh hull
+
+  hull-play:
+    desc: "PLAY the Convex Hull demo in a MAME window on this host (builds the ROM first if needed). Shows a drifting point cloud wrapped by a rubber-band convex hull, recomputed each frame via cross-product orientation."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/hull.sfc ]; then
+          echo "==> build/hull.sfc missing — building it (dev/run.sh hull)…"
+          dev/run.sh hull
+        fi
+      - task: mandel-mame
+        vars: { ROM: hull }
+
   radix:
     desc: "#64: Radix / counting sort — 16 bars sorted base-16 one nibble at a time: each pass histograms the digit, prefix-sums the counts into offsets, and stable-scatters the elements — a NON-COMPARISON sort (zero compares); shows raw -> low-nibble pass -> sorted, then reshuffles. Distinct from #17's comparison sorts. Gate cross-checks sorted (no inversions) + permutation (xor/sum). Assert corpus_result (radix_gate_crc 0x123E) == host on MAME + bsnes-jg + disasm gate (indexed scatter, no mul/div). Leaves build/radix.sfc + build/radix-{mame,jg}.png."
     cmds:
