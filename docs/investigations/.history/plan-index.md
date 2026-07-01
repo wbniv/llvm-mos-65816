@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5698c17) | #42 Dissolve Transition (Duff's Device) SNES demo — irreducible loop-switch CFG (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0c5df0a) | docs(plan-index): point #41 poolfx row at its commit a12b00d |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a12b00d) | #41 Free-List Pool Allocator SNES demo — manual free-list slot recycling (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/6e87c01) | docs(plan-index): point #40 crctex row at its commit ad34254 |
@@ -108,6 +109,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+5698c17	author	Will Norris
+5698c17	added	1
+5698c17	deleted	0
+5698c17	files	1
+5698c17	body	An image dissolves into the next in scattered tile bursts, each tile's 16 bytes\ncopied by the classic Duff's device — a switch whose case labels land in the\nmiddle of a do/while loop body (irreducible control flow the structurizer can't\nreduce).\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0x5531 on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate proves the switch/loop tangle lowers to a dense branch mesh (19 jmp,\n19 bne) with zero arithmetic libcalls. No compiler bug — the mos backend lowers\nirreducible CFG byte-exact across all modes. Live at https://biohack.net/snes/duff/\n(biohack v1.0.160).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0c5df0a	author	Will Norris
 0c5df0a	added	1
 0c5df0a	deleted	1
