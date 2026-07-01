@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  gf256:
+    desc: "#55: GF(2^8) Galois field — each cell's colour is a finite-field combination gf_mul(A,α^x)^gf_mul(B,α^y) (A,B rotate through α-powers → morphing plaid); the field multiply is a CARRYLESS multiply via log/antilog tables + XOR (no carry chain), the arithmetic under Reed-Solomon/QR. HUD shows a live RS syndrome. Gate cross-checks gf_mul vs a slow bit-by-bit carryless multiply. Assert corpus_result (gf256_gate_crc 0xC028) == host on MAME + bsnes-jg + disasm gate (GF_EXP/GF_LOG refs, eor, no mul/div libcall). Leaves build/gf256.sfc + build/gf256-{mame,jg}.png."
+    cmds:
+      - dev/run.sh gf256
+
+  gf256-play:
+    desc: "PLAY the GF(2^8) Galois Field demo in a MAME window on this host (builds the ROM first if needed). Shows a morphing finite-field plaid coloured by GF(2^8) carryless multiplies."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/gf256.sfc ]; then
+          echo "==> build/gf256.sfc missing — building it (dev/run.sh gf256)…"
+          dev/run.sh gf256
+        fi
+      - task: mandel-mame
+        vars: { ROM: gf256 }
+
   bitshuffle:
     desc: "#54: Perfect-shuffle transition — a source image is permuted by the bit-reversal of each cell's index (__builtin_bitreverse32, G_BITREVERSE inline mask-swap cascade; involution → scramble/unscramble), byte-swap recolour via __builtin_bswap32. Assert corpus_result (bitshuffle_gate_crc 0x2A4A) == host on MAME + bsnes-jg + disasm gate (bitrev masks 0xAA/0xCC, rep/sep). Leaves build/bitshuffle.sfc + build/bitshuffle-{mame,jg}.png."
     cmds:
