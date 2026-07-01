@@ -26,8 +26,12 @@
 > [`docs/upstream-contribution-status.md`](../upstream-contribution-status.md). Every other Round-3 corner
 > came back green — no further compiler bug.
 >
-> **Round 4 (#53–#72) — DRAFTED** (2026-06-30, backlog below, not yet built). Twenty more corners none of
-> the first 52 execute, each grounded in a **verified** backend path: the **bit-population intrinsic
+> **Round 4 (#53–#72) — IN PROGRESS** (#53–#61 shipped). **#61 (Diffie–Hellman 64-bit modexp) 🐞 CAUGHT +
+> FIXED A REAL BACKEND BUG** — the `+mos-a16`/`+mos-xy16` legalizer had no rule for `G_UNMERGE_VALUES`
+> splitting an `s64` into 16-bit lanes (nor odd-width `G_ANYEXT`), crashing on any 64-bit-arithmetic-heavy
+> program (default 8-bit was fine). Fixed with the s64↔s16 (un)merge glue mirroring the existing s32 glue +
+> routing odd-width anyext through zext (patch `0017`, corpus 62/62 green, queued upstream). Twenty corners
+> none of the first 52 execute, each grounded in a **verified** backend path: the **bit-population intrinsic
 > family** (`__popcountsi2`/`__clzsi2`/`__ctzsi2`/`__paritysi2` + the inline `G_CTLZ`/`G_CTTZ`/`G_CTPOP`
 > lowering at `MOSLegalizerInfo.cpp:308`), byte-swap / bit-reverse intrinsics (`__bswapsi2`;
 > `G_BITREVERSE.lower()` @186), **widening multiply-high** (`G_UMULH`/`G_SMULH.lower()` @300),
@@ -475,7 +479,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **NaN / unordered float compares** — `__unordsf2`/`__eqsf2`/`__nesf2` | #21/#33 used only ordered `<`; equality + unordered/NaN tests lower to different libcalls | ~~58~~ ✓ |
 | **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | ~~59~~ ✓ |
 | **`div_t` struct-return over custom `G_SDIVREM`** — libc `div()`/`ldiv()` (@229, `legalizeDivRem`) | combines aggregate-return ABI **and** the divrem stack-temp legalizer; #39/#43 used bare `/`,`%` | ~~60~~ ✓ |
-| **64-bit modular exponentiation** — `__umoddi3` as the *hot* op in square-and-multiply | #22 was 64-bit mul/shift/xor (hash), #27 was 16/32-bit `%`; a 64-bit `%`-per-iteration loop is neither | 61 |
+| **64-bit modular exponentiation** — `__umoddi3` as the *hot* op in square-and-multiply | #22 was 64-bit mul/shift/xor (hash), #27 was 16/32-bit `%`; a 64-bit `%`-per-iteration loop is neither | ~~61~~ ✓ 🐞 |
 | **union-find / disjoint-set** — parent-array **path compression** (in-place pointer rewrite) | #18 (heap), #31 (tree) never did the find-with-compression pointer-chase-and-flatten idiom | 62 |
 | **Fenwick / binary-indexed tree** — `i & -i` low-bit isolation in a range-sum loop | the `i += i & -i` two's-complement bit trick is a codegen shape nothing else emits | 63 |
 | **non-comparison sort** — counting/radix: histogram + prefix-sum + scatter, **zero compares** | #17's sorts were all comparison-based; a compare-free scatter sort is a different loop nest | 64 |
@@ -544,11 +548,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     custom `G_SDIVREM` stack-temp legalizer (@229) together — distinct from #39/#43's bare `/`,`%`. *Shows:*
     four rolling odometers ticking the same time in four bases.~~ ✓ [/snes/multibase/](https://biohack.net/snes/multibase/) — bit-exact `host==default==a16==xy16==0x371A`; real `div`/`lldiv` calls (aggregate-return ABI, confirmed via relocations) + `G_SDIVREM`; `div()` kept <32768 (16-bit int) + `lldiv()` 64-bit-safe (`ldiv` unused — width mismatch). Clean positive, no bug. ([plan](../plans/2026-06-30-60-snes-multibase.md))
 
-61. **Diffie–Hellman colour-mixer — 64-bit modular exponentiation.** Two "parties" exchange colours by
+61. ~~**Diffie–Hellman colour-mixer — 64-bit modular exponentiation.** Two "parties" exchange colours by
     **`gᵃ mod p` square-and-multiply** on 64-bit values, converging on a shared secret hue; also a
     modexp-driven pseudo-random Lissajous. *Stresses:* `__umoddi3` (64-bit `%`) as the **hot** op inside a
     square-and-multiply loop — neither #22's 64-bit hash (mul/shift/xor) nor #27's 16/32-bit `%`. *Shows:*
-    two paint-swatches mixing to an identical secret colour, keys scrolling.
+    two paint-swatches mixing to an identical secret colour, keys scrolling.~~ ✓ [/snes/dhmix/](https://biohack.net/snes/dhmix/) **🐞 CAUGHT + FIXED A REAL BACKEND BUG** — the 64-bit modexp crashed the `+mos-a16`/`+mos-xy16` legalizer (`unable to legalize G_UNMERGE_VALUES (s64)` / `G_ANYEXT (s24)`; default-8-bit OK). Fixed with the s64↔s16 (un)merge glue + odd-width anyext routing (patch `0017`, queued upstream). Post-fix bit-exact `host==default==a16==xy16==0x69AA`; corpus 62/62 green, no regression. ([plan](../plans/2026-06-30-61-snes-dhmix.md) · [investigation](2026-06-30-a16-s64-unmerge-anyext-legalize-crash.md))
 
 ### Data structures & algorithms the battery never ran
 

@@ -1,0 +1,131 @@
+From: llvm-mos-65816 #321
+Subject: [PATCH] 321 a16: s64<->s16 (un)merge glue + odd-width G_ANYEXT legalization
+#
+# Fixes backend crashes under +mos-a16/+mos-xy16 (OK on default 8-bit):
+#   unable to legalize instruction: G_UNMERGE_VALUES (s64)   [split 64-bit into 16-bit lanes]
+#   unable to legalize instruction: G_ANYEXT (s24)           [widen a 20-bit-masked value]
+# Found by SNES compiler stress-test demo #61 (64-bit modular exponentiation).
+#
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -44,6 +44,12 @@
+   // #321 a16: 4x s8 <- s32 G_UNMERGE_VALUES -> legal 2-level (2x s16) form (mirror).
+   bool legalizeUnmergeS32ToBytes(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                                  MachineInstr &MI) const;
++  // #321 a16: 4x s16 -> s64 G_MERGE_VALUES -> legal 2-level (2x s32) form (one level up).
++  bool legalizeMergeS64FromWords(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                                 MachineInstr &MI) const;
++  // #321 a16: 4x s16 <- s64 G_UNMERGE_VALUES -> legal 2-level (2x s32) form (mirror).
++  bool legalizeUnmergeS64ToWords(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                                 MachineInstr &MI) const;
+   // Integer Extension and Truncation
+   bool legalizeAnyExt(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                       MachineInstr &MI) const;
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -109,7 +109,13 @@
+     auto &B = getActionDefinitionsBuilder(G_ANYEXT).legalFor({{S16, S8}});
+     if (STI.hasAccum16())
+       B.legalFor({{S32, S16}, {S32, S8}});
+-    B.customIf(typeIs(1, S1)).unsupported();
++    // #321 a16: an odd source width (e.g. an s24 the combiner narrows a 20-bit AND to) has no
++    // s16-lane decomposition; anyext's high bits are don't-care, so route it through zext (via
++    // legalizeAnyExt), which narrows through bytes and legalizes any width. s1-source stays custom.
++    B.customIf([](const LegalityQuery &Q) {
++       unsigned SrcBits = Q.Types[1].getSizeInBits();
++       return SrcBits == 1 || (SrcBits != 8 && SrcBits != 16 && SrcBits != 32);
++     }).unsupported();
+   }
+   {
+     auto &B = getActionDefinitionsBuilder(G_TRUNC)
+@@ -161,7 +167,10 @@
+       // merge (e.g. an i8->i32 sext the artifact combiner couldn't fold) that the
+       // 2-source selectMergeValues can't take — custom-rewrite it into the legal
+       // 2-level form (see legalizeMergeS32FromBytes).
+-      B.legalFor({{S32, S16}}).customFor({{S32, S8}});
++      // {S64,S32} 2x s32->s64 is the direct legal form; {S64,S16} is a 4x s16->s64
++      // merge that the 2-source selector can't take — custom-rewrite to the 2-level
++      // form (see legalizeMergeS64FromWords). Mirror of the s32 case, one level up.
++      B.legalFor({{S32, S16}, {S64, S32}}).customFor({{S32, S8}, {S64, S16}});
+     B.unsupported();
+   }
+   {
+@@ -172,7 +181,10 @@
+       // unmerge (e.g. the byte split inside an s32 ±1 add or an s32 shift>=8) that
+       // the 2-dest selectUnmergeValues can't take — custom-rewrite it into the legal
+       // 2-level form (see legalizeUnmergeS32ToBytes). Mirror of the G_MERGE_VALUES rule.
+-      B.legalFor({{S16, S32}}).customFor({{S8, S32}});
++      // {S32,S64} 2x s32<-s64 is the direct legal form; {S16,S64} is a 4x s16<-s64
++      // unmerge (e.g. splitting a 64-bit value into 16-bit lanes) — custom-rewrite to
++      // the 2-level form (see legalizeUnmergeS64ToWords). Mirror of the s32 case.
++      B.legalFor({{S16, S32}, {S32, S64}}).customFor({{S8, S32}, {S16, S64}});
+     B.unsupported();
+   }
+ 
+@@ -572,8 +584,15 @@
+     return legalizeToCopy(Helper, MRI, MI);
+ 
+   case G_MERGE_VALUES:
++    // customFor {S32,S8} (4x s8->s32) and {S64,S16} (4x s16->s64); pick by dest width.
++    if (MRI.getType(MI.getOperand(0).getReg()).getSizeInBits() == 64)
++      return legalizeMergeS64FromWords(Helper, MRI, MI);
+     return legalizeMergeS32FromBytes(Helper, MRI, MI);
+   case G_UNMERGE_VALUES:
++    // customFor {S8,S32} (4x s8<-s32) and {S16,S64} (4x s16<-s64); pick by source width.
++    if (MRI.getType(MI.getOperand(MI.getNumOperands() - 1).getReg())
++            .getSizeInBits() == 64)
++      return legalizeUnmergeS64ToWords(Helper, MRI, MI);
+     return legalizeUnmergeS32ToBytes(Helper, MRI, MI);
+ 
+   // Integer Operations
+@@ -720,6 +739,50 @@
+   MI.eraseFromParent();
+   return true;
+ }
++
++// #321 a16: a direct 4x s16 -> s64 G_MERGE_VALUES (only reached via customFor({S64,S16})
++// under +mos-a16) — the s64 analogue of legalizeMergeS32FromBytes, one level up: merge each
++// pair of s16 words into an s32 (legal {S32,S16}), then merge the two s32 halves into the s64
++// (legal {S64,S32}). selectMergeValues only takes a 2-source merge, so the 4-source form must be
++// split here, not selected.
++bool MOSLegalizerInfo::legalizeMergeS64FromWords(LegalizerHelper &Helper,
++                                                 MachineRegisterInfo &MRI,
++                                                 MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  const LLT S32 = LLT::scalar(32);
++  Register Dst = MI.getOperand(0).getReg();
++  Register W0 = MI.getOperand(1).getReg();
++  Register W1 = MI.getOperand(2).getReg();
++  Register W2 = MI.getOperand(3).getReg();
++  Register W3 = MI.getOperand(4).getReg();
++  auto Lo = Builder.buildMergeValues(S32, {W0, W1});
++  auto Hi = Builder.buildMergeValues(S32, {W2, W3});
++  Builder.buildMergeValues(Dst, {Lo.getReg(0), Hi.getReg(0)});
++  MI.eraseFromParent();
++  return true;
++}
++
++// #321 a16: a direct 4x s16 <- s64 G_UNMERGE_VALUES (only reached via customFor({S16,S64})
++// under +mos-a16) — the symmetric inverse of legalizeMergeS64FromWords, and the s64 analogue of
++// legalizeUnmergeS32ToBytes: unmerge the s64 into two s32 halves (legal {S32,S64}), then unmerge
++// each half into two s16 words (legal {S16,S32}), reusing the four original word def regs.
++// selectUnmergeValues only takes a 2-dest unmerge, so the 4-dest form must be split here.
++bool MOSLegalizerInfo::legalizeUnmergeS64ToWords(LegalizerHelper &Helper,
++                                                 MachineRegisterInfo &MRI,
++                                                 MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  const LLT S32 = LLT::scalar(32);
++  Register D0 = MI.getOperand(0).getReg();
++  Register D1 = MI.getOperand(1).getReg();
++  Register D2 = MI.getOperand(2).getReg();
++  Register D3 = MI.getOperand(3).getReg();
++  Register Src = MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
++  auto Halves = Builder.buildUnmerge(S32, Src);     // s64 -> Lo:s32, Hi:s32
++  Builder.buildUnmerge({D0, D1}, Halves.getReg(0)); // Lo -> D0, D1
++  Builder.buildUnmerge({D2, D3}, Halves.getReg(1)); // Hi -> D2, D3
++  MI.eraseFromParent();
++  return true;
++}
+ 
+ bool MOSLegalizerInfo::legalizeAnyExt(LegalizerHelper &Helper,
+                                       MachineRegisterInfo &MRI,

@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  dhmix:
+    desc: "#61: Diffie-Hellman colour-mixer — two parties publish A=g^a mod p, B=g^b mod p, then both compute the shared secret g^(ab) mod p; three colour bands (Alice/shared/Bob) shift while the shared bands always agree. Hot op = 64-bit modulo (__umoddi3) in a square-and-multiply modpow. 🐞 FOUND+FIXED an a16/xy16 legalizer crash (G_UNMERGE_VALUES s64->s16 / G_ANYEXT s24; patch 0017). Assert corpus_result (dhmix_gate_crc 0xB7C4) == host on MAME + bsnes-jg + disasm gate (__umoddi3, __muldi3). Leaves build/dhmix.sfc + build/dhmix-{mame,jg}.png."
+    cmds:
+      - dev/run.sh dhmix
+
+  dhmix-play:
+    desc: "PLAY the Diffie-Hellman Colour-Mixer demo in a MAME window on this host (builds the ROM first if needed). Shows two parties' public colours mixing to an identical shared-secret colour via 64-bit modular exponentiation."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/dhmix.sfc ]; then
+          echo "==> build/dhmix.sfc missing — building it (dev/run.sh dhmix)…"
+          dev/run.sh dhmix
+        fi
+      - task: mandel-mame
+        vars: { ROM: dhmix }
+
   multibase:
     desc: "#60: Multi-base clock — one climbing counter shown in four bases at once (decimal, dozenal, hex, sexagesimal), each digit split with the libc div() returning a div_t (quotient+remainder) BY VALUE, plus a 64-bit odometer via lldiv() returning an lldiv_t. The corner: the div_t/lldiv_t aggregate-return ABI + the custom G_SDIVREM legalizer @229 (distinct from #39's `/`,`%` and #43's raw 64-bit divmod). Assert corpus_result (multibase_gate_crc 0xF43F) == host on MAME + bsnes-jg + disasm gate (div/lldiv calls). Leaves build/multibase.sfc + build/multibase-{mame,jg}.png."
     cmds:
