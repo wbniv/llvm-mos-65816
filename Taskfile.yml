@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  multibase:
+    desc: "#60: Multi-base clock — one climbing counter shown in four bases at once (decimal, dozenal, hex, sexagesimal), each digit split with the libc div() returning a div_t (quotient+remainder) BY VALUE, plus a 64-bit odometer via lldiv() returning an lldiv_t. The corner: the div_t/lldiv_t aggregate-return ABI + the custom G_SDIVREM legalizer @229 (distinct from #39's `/`,`%` and #43's raw 64-bit divmod). Assert corpus_result (multibase_gate_crc 0xF43F) == host on MAME + bsnes-jg + disasm gate (div/lldiv calls). Leaves build/multibase.sfc + build/multibase-{mame,jg}.png."
+    cmds:
+      - dev/run.sh multibase
+
+  multibase-play:
+    desc: "PLAY the Multi-Base Clock demo in a MAME window on this host (builds the ROM first if needed). Shows one counter ticking in decimal, dozenal, hex and sexagesimal at once, split with libc div()/lldiv()."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/multibase.sfc ]; then
+          echo "==> build/multibase.sfc missing — building it (dev/run.sh multibase)…"
+          dev/run.sh multibase
+        fi
+      - task: mandel-mame
+        vars: { ROM: multibase }
+
   cosmzoom:
     desc: "#59: Cosmic zoom ruler — a uint64 scale grows exponentially and is placed on a LOG ruler by converting it to float (so exponential growth reads as a linear sweep), then back to uint64 for the read-out. The conversions are __floatundisf / __fixunssfdi / __floatdisf / __fixsfdi — 64-bit int <-> float (#21/#33 converted only 32-bit ints). Assert corpus_result (cosm_gate_crc 0x502F) == host on MAME + bsnes-jg + disasm gate. Leaves build/cosmzoom.sfc + build/cosmzoom-{mame,jg}.png."
     cmds:

@@ -474,7 +474,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281 | select+icmp lowering as the **hot** op (sorting network / clamp); #44 was carry/V-flag, not select | ~~57~~ ✓ |
 | **NaN / unordered float compares** — `__unordsf2`/`__eqsf2`/`__nesf2` | #21/#33 used only ordered `<`; equality + unordered/NaN tests lower to different libcalls | ~~58~~ ✓ |
 | **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | ~~59~~ ✓ |
-| **`div_t` struct-return over custom `G_SDIVREM`** — libc `div()`/`ldiv()` (@229, `legalizeDivRem`) | combines aggregate-return ABI **and** the divrem stack-temp legalizer; #39/#43 used bare `/`,`%` | 60 |
+| **`div_t` struct-return over custom `G_SDIVREM`** — libc `div()`/`ldiv()` (@229, `legalizeDivRem`) | combines aggregate-return ABI **and** the divrem stack-temp legalizer; #39/#43 used bare `/`,`%` | ~~60~~ ✓ |
 | **64-bit modular exponentiation** — `__umoddi3` as the *hot* op in square-and-multiply | #22 was 64-bit mul/shift/xor (hash), #27 was 16/32-bit `%`; a 64-bit `%`-per-iteration loop is neither | 61 |
 | **union-find / disjoint-set** — parent-array **path compression** (in-place pointer rewrite) | #18 (heap), #31 (tree) never did the find-with-compression pointer-chase-and-flatten idiom | 62 |
 | **Fenwick / binary-indexed tree** — `i & -i` low-bit isolation in a range-sum loop | the `i += i & -i` two's-complement bit trick is a codegen shape nothing else emits | 63 |
@@ -538,11 +538,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     `__floatdisf` / `__fixsfdi` — 64-bit-integer↔float conversion, never done (correctly-rounded → bit-exact).
     *Shows:* a smoothly gliding powers-of-ten ruler / scale-of-the-universe zoom.~~ ✓ [/snes/cosmzoom/](https://biohack.net/snes/cosmzoom/) — bit-exact `host==default==a16==xy16==0x502F`; uint64 scale → float (`__floatundisf`) for log positioning + round-trip back (`__fixunssfdi`) + signed `__floatdisf`/`__fixsfdi`. Used **float not double** (ROM/speed); `scale<10^18` so `(float)v→(uint64)` can't overflow-UB. Clean positive, no bug. ([plan](../plans/2026-06-30-59-snes-cosmzoom.md))
 
-60. **Multi-base chronometer — `div()`/`ldiv()` `div_t` struct-return.** One instant shown simultaneously in
+60. ~~**Multi-base chronometer — `div()`/`ldiv()` `div_t` struct-return.** One instant shown simultaneously in
     decimal, dozenal, hex and sexagesimal, each digit split with the libc **`div()`/`ldiv()` returning
     `div_t` by value** (quotient+remainder in one call). *Stresses:* the aggregate-return ABI **and** the
     custom `G_SDIVREM` stack-temp legalizer (@229) together — distinct from #39/#43's bare `/`,`%`. *Shows:*
-    four rolling odometers ticking the same time in four bases.
+    four rolling odometers ticking the same time in four bases.~~ ✓ [/snes/multibase/](https://biohack.net/snes/multibase/) — bit-exact `host==default==a16==xy16==0x371A`; real `div`/`lldiv` calls (aggregate-return ABI, confirmed via relocations) + `G_SDIVREM`; `div()` kept <32768 (16-bit int) + `lldiv()` 64-bit-safe (`ldiv` unused — width mismatch). Clean positive, no bug. ([plan](../plans/2026-06-30-60-snes-multibase.md))
 
 61. **Diffie–Hellman colour-mixer — 64-bit modular exponentiation.** Two "parties" exchange colours by
     **`gᵃ mod p` square-and-multiply** on 64-bit values, converging on a shared secret hue; also a
@@ -627,8 +627,8 @@ Sharpest at opening a code path the first 52 never run:
   (they forced full `__mulsi3`), wrapped in the most eye-catching visual of the set.~~ ✓ [/snes/rotozoom/](https://biohack.net/snes/rotozoom/) — clean positive; measured: the `G_SMULH.lower()` widens through `__muldi3`/`__mulsi3` (no narrower mul-high on a soft-multiply target).
 - ~~**#57 median network (`G_SMIN`/`G_SMAX`/`G_ABS`)** — branchless min/max/abs as the hot op, a different
   lowering from #44's carry/V-flag saturation.~~ ✓ [/snes/medfilt/](https://biohack.net/snes/medfilt/) — clean positive; min/max `.lower()` → `cmp`+branch (no cmov), zero libcalls.
-- **#60 `div()`/`div_t`** — the libc struct-return-by-value *over* the custom `G_SDIVREM` stack-temp
-  legalizer, two ABI paths braided together that #39/#43's bare `/`,`%` never touched.
+- ~~**#60 `div()`/`div_t`** — the libc struct-return-by-value *over* the custom `G_SDIVREM` stack-temp
+  legalizer, two ABI paths braided together that #39/#43's bare `/`,`%` never touched.~~ ✓ [/snes/multibase/](https://biohack.net/snes/multibase/) — clean positive; real `div`/`lldiv` calls returning `div_t`/`lldiv_t` by value.
 - **#62 union-find percolation** — path-compression pointer-chase-and-flatten, a data structure neither
   #18's heap nor #31's tree exercised, with a gorgeous phase-transition visual.
 
