@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4d20e30) | #39 Constant-Divisor Clock + Odometer SNES demo — strength-reduction probe (finding) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e134e54) | #37 Sparse-Switch Step-Sequencer VM SNES demo — comparison-tree opcode dispatch |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/cdb8641) | #36 Polygon Scanline Fill (VLA) SNES demo — runtime-sized C99 VLA edge table |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f3e3393) | #48 IIR Resonant-Filter Scope SNES demo — recursive feedback dependency chain |
@@ -39,6 +40,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+4d20e30	author	Will Norris
+4d20e30	added	3
+4d20e30	deleted	3
+4d20e30	files	1
+4d20e30	body	Demo #39 of the compiler stress-test battery — a probe for constant-divisor\nmagic-reciprocal strength reduction (analog clock + rolling odometer split via\ncompile-time /60, /10, /12).\n\nMEASURED FINDING (governing lesson #1 — measure, don't assume), NOT a bug: llvm-mos\ndoes NOT strength-reduce constant division to a magic reciprocal at any width — a\nmicro-test confirms even uint16 x/10 lowers to __udivhi3, and uint32 x/60 to\n__udivsi3/__udivmodsi4. The magic reciprocal needs a MULHU (high half of a wide\nmultiply) which is itself a libcall on this soft-multiply target, so the LLVM cost\nmodel correctly RETAINS the division libcall (it cannot beat it). So the demo\nactually stresses heavy constant-divisor division, proven bit-exact:\nhost==default==+mos-a16==+mos-xy16==0xF72E on bsnes-jg, -verify clean under a16/xy16.\nDisasm gate documents the finding (udiv-libcall=5). MAME leg SKIP (no SPC700 IPL).\n\nFirst analog-clock visual in the battery. Live: https://biohack.net/snes/divclock/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e134e54	author	Will Norris
 e134e54	added	3
 e134e54	deleted	3

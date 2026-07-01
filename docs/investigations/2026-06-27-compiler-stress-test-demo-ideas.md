@@ -252,7 +252,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | ~~**sparse-switch binary search** — if-else comparison tree, *not* a jump table~~ | ~~#29a was a *dense* switch → table; non-contiguous cases lower totally differently~~ | ~~37~~ |
 | **computed `goto` / label values** — `goto *tab[op]` threaded dispatch | distinct from #29a's switch jump-table; the threaded-code path | ~~38~~ |
 | ~~**constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift~~ | ~~#27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation~~ | ~~39~~ (FINDING: llvm-mos does NOT strength-reduce — retains `__udivNi3`, correct on soft-multiply) |
-| **table-indexed ROM-LUT byte loop** — 256-entry `const` table, long-addressed per byte | reads a big `const` table from ROM via 24-bit addressing every iteration | 40 |
+| ~~**table-indexed ROM-LUT byte loop** — 256-entry `const` table, long-addressed per byte~~ | ~~reads a big `const` table from ROM via 24-bit addressing every iteration~~ | ~~40~~ |
 | **free-list allocator** — manual malloc/free, pointer recycling | #31's pool is append-only (bump + reset); a free list recycles individual nodes | 41 |
 | **irreducible control flow** — Duff's device (switch jumping into a loop) | a CFG the structurizer can't reduce; never exercised | 42 |
 | **signed 64-bit divide/mod** — `__divdi3`/`__moddi3` (sign-corrected) | #22 was *unsigned* 64-bit; signed div/mod is a distinct sign-handling libcall | 43 |
@@ -315,10 +315,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     compiler's **strength-reduction of constant division to a magic-number multiply-high + shift** (distinct
     from #27's runtime `__umodsi3`). *Shows:* a sweeping clock face + a rolling base-N odometer.~~ ✓ [/snes/divclock/](https://biohack.net/snes/divclock/) — sweeping analog clock + rolling odometer; `host==default==+mos-a16==+mos-xy16==0xF72E` on bsnes-jg, `-verify` clean ×3. **MEASURED FINDING (no bug):** llvm-mos does **not** strength-reduce constant division to a magic reciprocal at any width (even `uint16 x/10`→`__udivhi3`) — the reciprocal needs a `MULHU` that is itself a libcall on this soft-multiply target, so the cost model correctly retains `__udivNi3`. The demo thus stresses heavy constant-divisor division, proven bit-exact across all modes.
 
-40. **Procedural hash-texture — table-driven CRC32.** Feed coordinates through a **real CRC32 with a
+40. ~~**Procedural hash-texture — table-driven CRC32.** Feed coordinates through a **real CRC32 with a
     256-entry `const` table in ROM** (a 24-bit-addressed indexed load per byte) to colour a scrolling,
     mutating field. *Stresses:* a **256-entry ROM-LUT indexed byte loop**. *Shows:* "checksum rain" /
-    hash-marble that flows.
+    hash-marble that flows.~~ ✓ [/snes/crctex/](https://biohack.net/snes/crctex/) — bit-standard CRC-32 (poly 0xEDB88320, `crc32("123456789")==0xCBF43926`), a `const uint32[256]` ROM table indexed per byte colours a flowing hash-marble field; `host==default==+mos-a16==+mos-xy16==0xDBBA` on bsnes-jg, `-verify` clean ×3. **No compiler bug** — the ROM-LUT indexed byte loop is byte-exact across all modes.
 
 41. **Particle fountain — free-list pool allocator.** Particles **allocated on spawn and freed on death**,
     recycling slots through a manual **free list** (distinct from #31's append-only bump pool). *Stresses:*

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e92a366) | docs(plan-index): point #39 divclock row at its commit 4d20e30 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4d20e30) | #39 Constant-Divisor Clock + Odometer SNES demo — strength-reduction probe (finding) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/1887831) | docs(plan-index): point #37 seqvm row at its commit e134e54 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e134e54) | #37 Sparse-Switch Step-Sequencer VM SNES demo — comparison-tree opcode dispatch |
@@ -103,6 +104,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+e92a366	author	Will Norris
+e92a366	added	1
+e92a366	deleted	1
+e92a366	files	1
+e92a366	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4d20e30	author	Will Norris
 4d20e30	added	1
 4d20e30	deleted	0

@@ -256,8 +256,25 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  crctex:
+    desc: "#40: Table-driven CRC32 procedural texture — each cell's colour is a real CRC32 (poly 0xEDB88320) of its (x,y,time) via the byte-at-a-time algorithm crc=TABLE[(crc^byte)&0xFF]^(crc>>8), TABLE a const uint32[256] in ROM. Flowing hash-marble field. Assert corpus_result (crctex_gate_crc 0xDBBA) == host on MAME + bsnes-jg + disasm gate (CRC32_TAB ref, eor cascade, rep/sep). Leaves build/crctex.sfc + build/crctex-{mame,jg}.png."
+    cmds:
+      - dev/run.sh crctex
+
+  crctex-play:
+    desc: "PLAY the CRC32 hash-marble texture demo in a MAME window on this host (builds the ROM first if needed). Shows a flowing procedural field coloured by a table-driven CRC32."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/crctex.sfc ]; then
+          echo "==> build/crctex.sfc missing — building it (dev/run.sh crctex)…"
+          dev/run.sh crctex
+        fi
+      - task: mandel-mame
+        vars: { ROM: crctex }
+
   divclock:
-    desc: "#39: Magic-reciprocal clock + odometer — splits a frame tick into h:m:s and a counter into base-10 digits via COMPILE-TIME CONSTANT divides (/60 /10 /12) the compiler strength-reduces to magic multiply-high (NOT #27's runtime __udivsi3). Sweeping analog clock + rolling odometer. Assert corpus_result (divclock_gate_crc 0xF72E) == host on MAME + bsnes-jg + disasm gate (mul>=1, udiv-libcall=0, rep/sep). Leaves build/divclock.sfc + build/divclock-{mame,jg}.png."
+    desc: "#39: Constant-divisor clock + odometer — splits a frame tick into h:m:s and a counter into base-10 digits via COMPILE-TIME CONSTANT divides (/60 /10 /12). MEASURED FINDING: llvm-mos does NOT strength-reduce these to a magic reciprocal (retains __udivNi3 — the reciprocal's MULHU is itself a libcall on this soft-multiply target); correct cost decision, differential green. Sweeping analog clock + rolling odometer. Assert corpus_result (divclock_gate_crc 0xF72E) == host on MAME + bsnes-jg + disasm gate (udiv-libcall>=1, rep/sep). Leaves build/divclock.sfc + build/divclock-{mame,jg}.png."
     cmds:
       - dev/run.sh divclock
 
