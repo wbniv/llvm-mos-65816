@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3399ad3) | demo battery finding: longjmp broken on 65816 (#35 blocked) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/661b01e) | #33 Double-Precision Mandelbrot SNES demo — 64-bit double soft-float |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b24713b) | docs(demo-ideas): Round 3 — 20 new compiler-stress demo ideas (#33–#52) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/66271bb) | docs(battery): add stress-test battery completion status report |
@@ -33,6 +34,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+3399ad3	author	Will Norris
+3399ad3	added	10
+3399ad3	deleted	1
+3399ad3	files	1
+3399ad3	body	Scoping demo #35 (setjmp/longjmp) surfaced a real pre-existing bug: the SDK's\ncommon mos-platform/common/c/setjmp.S is 6502-only — setjmp reads the return\naddress from a hardcoded page $0100 (tsx; lda $101,x) and saves only the 8-bit\nhard stack pointer; longjmp restores via tax; txs. The 65816 in native mode\n(SNES crt0 XCE) has a 16-bit stack pointer not bound to page 1, so longjmp\nrestores a corrupted S and rts-es to garbage — longjmp never returns (setjmp +\nnormal return works). Minimal repro on bsnes-jg, fails in default-8bit AND\n+mos-a16 → upstream llvm-mos-sdk, not the #321 fork.\n\nUser call: document + skip #35, keep deploying demos; the 65816-aware setjmp.S\nfix (16-bit tsc/tcs + stack-relative return addr) is deferred to a dedicated\nsession. Investigation note + upstream queue entry (issue #9, llvm-mos-sdk) +\n#35 marked BLOCKED in the demo backlog.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 661b01e	author	Will Norris
 661b01e	added	4
 661b01e	deleted	4

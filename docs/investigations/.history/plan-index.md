@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d126ec2) | #38 Brainfuck Threaded-Code VM SNES demo — computed-goto threaded dispatch |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/33e5415) | docs(plan-index): point #33 mandel-double row at its squashed commit 661b01e |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/661b01e) | #33 Double-Precision Mandelbrot SNES demo — 64-bit double soft-float |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/30e3918) | docs(plan-index): add title-screen VOFS easing row (192 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f5e8262) | docs(plan-index): add title-screen upgrade row (191 plans) |
@@ -91,6 +93,16 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+d126ec2	author	Will Norris
+d126ec2	added	1
+d126ec2	deleted	0
+d126ec2	files	1
+d126ec2	body	Round 3 compiler stress-test demo #38: the computed-`goto` / labels-as-values\nmember. A Brainfuck interpreter dispatches each opcode with `goto *handlers[op]`,\nwhich lowers on the 65816 to a genuine indexed-indirect jump `jmp ($ind,x)` ($7C)\nplus `jmp ($ind)` ($6C) — the textbook threaded-code instruction, the dispatch\npath #29a's `switch` jump-table never opened. Runs the canonical Hello World:\nthe program pointer (tape head) scrubs the source, the 64-cell tape heat-grid\nmutates, the OUT marquee spells HELLO WORLD, with live step/pointer stats.\n\nControl-flow only (no __mul/__udiv; rep/sep=111, indirect-jmp=2). Differential:\nhost == default == +mos-a16 == +mos-xy16 == 0x9954 on bsnes-jg, -verify clean\nacross all three modes (MAME leg SKIP — no SPC700 IPL on this box). No compiler\nbug — LLVM indirectbr/blockaddress lower correctly on the 65816 across every\nbackend feature mode (a clean positive, unlike #35's broken longjmp).\n\nOne display-side bug found + fixed IN THE DEMO (not the compiler): the BG3\ndirty-row mask used `1u << r`, a 16-bit-`int` shift that is UB for r>=16 on the\n16-bit-int target, freezing the lower HUD rows -> `(uint32_t)1u << r`. Also clear\nthe full BG3 tilemap in reserve() (uninitialized-VRAM stripes otherwise). The\ndifferential stayed green throughout — correctly classifying both as demo bugs.\n\nNew: examples/65816/bf_vm.h, examples/snes/bf-vm.c,\nexamples/snes/corpus/bf_vm_sim.c, tools/bf-vm-sim.c, dev/bf-vm.{sh,lua}.\nPublished: https://biohack.net/snes/bf-vm/ (biohack.net v1.0.152).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+33e5415	author	Will Norris
+33e5415	added	1
+33e5415	deleted	1
+33e5415	files	1
+33e5415	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 661b01e	author	Will Norris
 661b01e	added	1
 661b01e	deleted	0

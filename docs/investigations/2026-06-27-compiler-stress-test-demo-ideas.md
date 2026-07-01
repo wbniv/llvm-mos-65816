@@ -250,7 +250,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | **non-local jumps** — `setjmp`/`longjmp` full context save/restore | the whole register + SP + return-addr context spill; never exercised | 35 |
 | **dynamic stack frames** — `alloca` / C99 VLAs (runtime-sized frame) | every frame so far is fixed-size; runtime SP adjustment is untested | 36 |
 | **sparse-switch binary search** — if-else comparison tree, *not* a jump table | #29a was a *dense* switch → table; non-contiguous cases lower totally differently | 37 |
-| **computed `goto` / label values** — `goto *tab[op]` threaded dispatch | distinct from #29a's switch jump-table; the threaded-code path | 38 |
+| **computed `goto` / label values** — `goto *tab[op]` threaded dispatch | distinct from #29a's switch jump-table; the threaded-code path | ~~38~~ |
 | **constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift | #27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation | 39 |
 | **table-indexed ROM-LUT byte loop** — 256-entry `const` table, long-addressed per byte | reads a big `const` table from ROM via 24-bit addressing every iteration | 40 |
 | **free-list allocator** — manual malloc/free, pointer recycling | #31's pool is append-only (bump + reset); a free list recycles individual nodes | 41 |
@@ -305,10 +305,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     dense jump table. *Stresses:* **sparse-switch comparison-tree lowering**. *Shows:* a tiny CHIP-8 game
     or a step-sequenced light show running its own bytecode.
 
-38. **Threaded-code VM — computed `goto`.** A Brainfuck/Forth interpreter dispatching with
+38. ~~**Threaded-code VM — computed `goto`.** A Brainfuck/Forth interpreter dispatching with
     **`goto *handlers[op]`** (label-as-value threading) — the fastest interpreter loop, a different path
     than a `switch`. *Stresses:* **indirect-goto / label-value dispatch**. *Shows:* a Brainfuck program
-    drawing a pattern as its tape head scrubs.
+    drawing a pattern as its tape head scrubs.~~ ✓ [/snes/bf-vm/](https://biohack.net/snes/bf-vm/) — Hello World; `goto *handlers[op]` → 65816 indexed-indirect `jmp ($ind,x)`; `host==default==a16==xy16==0x9954` on bsnes-jg, `-verify` clean ×3. **No compiler bug** — `indirectbr`/`blockaddress` lower correctly across all modes.
 
 39. **Analog clock + odometer — constant-divisor magic reciprocal.** Split seconds/minutes/hours and base-N
     digits with **compile-time constant divides** (`/60`, `/12`, `/10`, `/360`). *Stresses:* the
@@ -385,6 +385,6 @@ Sharpest at opening a code path the first 32 never run:
 
 - ~~**#33 `double` soft-float** — the largest brand-new library surface, with a clean bit-exact differential (the `double` analogue of #21).~~ ✓ [/snes/mandel-double/](https://biohack.net/snes/mandel-double/)
 - **#35 `setjmp`/`longjmp`** — the context save/restore ABI; nothing else in 52 demos touches it (and may surface a toolchain gap). **⚠ BLOCKED — it surfaced exactly that gap: `longjmp` is broken on the 65816 (6502-only `setjmp.S`); see #35 above + [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md).**
-- **#38 computed-`goto`** — a second VM that opens the *threaded-dispatch* path #29a's `switch` jump-table didn't.
+- ~~**#38 computed-`goto`** — a second VM that opens the *threaded-dispatch* path #29a's `switch` jump-table didn't.~~ ✓ [/snes/bf-vm/](https://biohack.net/snes/bf-vm/) — clean positive, no bug.
 - **#44 saturating / `__builtin_add_overflow`** — flag-sequence codegen, plus a gorgeous additive-bloom visual.
 - **#48 IIR feedback** — the non-reorderable recursive dependency chain the feed-forward FFT (#25) never exercised.

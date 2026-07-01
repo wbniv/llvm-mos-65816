@@ -222,6 +222,23 @@ tasks:
     cmds:
       - dev/run.sh pi
 
+  bf-vm:
+    desc: "#38: Brainfuck threaded-code VM — computed goto (goto *handlers[op] → indirect jmp). Runs Hello World; assert corpus_result (bf_vm_gate_crc 0x9954) == host on MAME + bsnes-jg + disasm gate (indirect-jmp + rep/sep, control-flow only, no __mul/__udiv). Leaves build/bf-vm.sfc + build/bf-vm-{mame,jg}.png."
+    cmds:
+      - dev/run.sh bf-vm
+
+  bf-vm-play:
+    desc: "PLAY the Brainfuck threaded-code VM demo in a MAME window on this host (builds the ROM first if needed). Shows the program pointer scrubbing the source, the tape heat-grid mutating, and the OUT marquee filling in HELLO WORLD!, looping."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/bf-vm.sfc ]; then
+          echo "==> build/bf-vm.sfc missing — building it (dev/run.sh bf-vm)…"
+          dev/run.sh bf-vm
+        fi
+      - task: mandel-mame
+        vars: { ROM: bf-vm }
+
   epicycles:
     desc: "#10: Fourier epicycles — a sum of 8 rotating vectors (DFT of a star) traces the outline; sin/cos-LUT sweep with 4 __mulsi3 per harmonic + 32-bit accumulate, NO divide (the many-multiply member). Assert corpus_result (epi_gate_crc 0x4F6C) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__mulsi3 + rep/sep, divide=0). Leaves build/epicycles.sfc + build/epicycles-{jg,mame}.png."
     cmds:
