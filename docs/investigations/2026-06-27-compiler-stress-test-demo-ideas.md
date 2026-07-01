@@ -701,7 +701,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     *Differential:* integer-exact: funnel shift on uint16 (concat hi:lo, shift n mod 16, take 16-bit slice) is
     bit-defined identically host vs target; CRC folds every row word; a lowering slip diverges the CRC.~~ ✓ [/snes/funnelkal/](https://biohack.net/snes/funnelkal/) ([plan](../plans/2026-07-01-73-snes-funnelkal.md))
 
-74. **Rotate-Register Kaleidoscope.** *Stresses:* G_ROTL/G_ROTR via __builtin_rotateleft8/right8/rotateleft16
+~~74. **Rotate-Register Kaleidoscope.** *Stresses:* G_ROTL/G_ROTR via __builtin_rotateleft8/right8/rotateleft16
     with BOTH constant per-ring amounts (ConstantAmt 1046-1061) and a runtime frame-driven amount. Unlike demo
     28 hilbert / demo 6 ca1d / demo 30 tea (only G_SHL/G_LSHR/G_ASHR shift-chains, never a rotate). *Shows:* A
     4-colour kaleidoscopic mandala on the 128x128 canvas: 8-fold mirrored spokes precess as each ring bit
@@ -709,7 +709,8 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     animated. *Verified present:* MOSLegalizerInfo.cpp:254 G_ROTL/G_ROTR custom lowering legalizeShiftRotate
     1029-1254 (S8 special 1167-1178); __builtin_rotateleft8/16 to Intrinsic fshl to matchFunnelShiftToRotate
     forms G_ROTL; no header uses rotateleft/rotateright. *Differential:* integer-exact: rotates of fixed-width
-    uint8_t/uint16_t are bit-defined identically host vs target; CRC folds all ring registers; no int, no float.
+    uint8_t/uint16_t are bit-defined identically host vs target; CRC folds all ring registers; no int, no float.~~
+    ✓ [/snes/rotkal/](https://biohack.net/snes/rotkal/) ([plan](../plans/2026-07-01-74-snes-rotkal.md))
 
 ~~75. **Saturating Palette Comet Trails.** *Stresses:* Unsigned uint8 glow/decay via
     __builtin_elementwise_add_sat/sub_sat (G_UADDSAT clamps 255, G_USUBSAT 0) AND signed int16 velocity kicks

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/155f742) | feat(snes/satcomet): #75 Saturating Palette Comet Trails (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/456a8a9) | feat(snes/smulorbit): #76 Signed Multiply-Overflow Orbit (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/6277d7e) | feat(snes/fabsridge): #80 Fabs Ridgeline (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/91bd3fe) | feat(snes/funnelkal): #73 Funnel-Shift Kaleidoscope (Round 5, compiler stress-test) |
@@ -77,6 +78,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+155f742	author	Will Norris
+155f742	added	3
+155f742	deleted	3
+155f742	files	1
+155f742	body	G_UADDSAT/G_USUBSAT (uint8 glow/decay) AND G_SADDSAT/G_SSUBSAT (int16 velocity)\nall via __builtin_elementwise_add_sat/sub_sat -> lowerAddSubSatToMinMax at :246.\nFirst demo to use any *SAT intrinsic. All 4 variants from one demo.\n\nGate: host==default==+mos-a16==+mos-xy16==0xC2AF. cmp=9/rep-sep=18. 5-way green.\nNo compiler bug - clean positive, untested SAT lowering path now covered.\n\nDemo OOB fix: comet i=5 initial py=16 out of bounds for glow[16][16]. Fixed\nwith & 15u mask. Differential correctly caught the discrepancy (host UB hit\npadding; target UB hit different WRAM). Classic demo-bug-not-compiler-bug case.\n\nPublished: https://biohack.net/snes/satcomet/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 456a8a9	author	Will Norris
 456a8a9	added	3
 456a8a9	deleted	3

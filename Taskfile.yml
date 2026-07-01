@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  rotkal:
+    desc: "#74: Rotate-Register Kaleidoscope -- G_ROTL/G_ROTR byte/16-bit custom lowering (legalizeShiftRotate:1029-1254, ConstantAmt:1046, S8-special:1167) via __builtin_rotateleft8/right8/rotateleft16 with BOTH constant per-ring and runtime amounts. First demo to use any rotate builtin. 8-fold mandala on 128x128 BG3. Assert corpus_result (rotkal_gate_crc 0x300C) == host on MAME + bsnes-jg + disasm gate (asl>=4, ror+rol>=1, rep/sep>=1). Leaves build/rotkal.sfc + build/rotkal-{mame,jg}.png."
+    cmds:
+      - dev/run.sh rotkal
+
+  rotkal-play:
+    desc: "PLAY the Rotate-Register Kaleidoscope demo in a MAME window (builds first if needed). Shows an 8-fold-symmetric mandala driven by G_ROTL/G_ROTR constant+runtime rotates."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/rotkal.sfc ]; then
+          echo "==> build/rotkal.sfc missing -- building (dev/run.sh rotkal)..."
+          dev/run.sh rotkal
+        fi
+      - task: mandel-mame
+        vars: { ROM: rotkal }
+
   funnelkal:
     desc: "#73: Funnel-Shift Kaleidoscope -- G_FSHL/G_FSHR two-source funnel shift via __builtin_elementwise_fshl(A,B,k)/fshr with A!=B, forcing .lower() at MOSLegalizerInfo.cpp:317 (the 'terrible' default double-source shift+or expansion that matchFunnelShiftToRotate cannot rescue). 8-fold-symmetric kaleidoscope mandala on 128x128 BG3. Assert corpus_result (funnelkal_gate_crc 0xEED4) == host on MAME + bsnes-jg + disasm gate (ora>=2, rep/sep>=1). Leaves build/funnelkal.sfc + build/funnelkal-{mame,jg}.png."
     cmds:
