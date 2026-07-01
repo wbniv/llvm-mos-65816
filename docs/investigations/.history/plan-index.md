@@ -1,5 +1,46 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1549220) | docs(plan-index): point #72 grid3d row at its commit 3676149 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3676149) | #72 3-D Grid Voxel Life SNES demo — multi-dimensional array indexing (clean positive, FINAL Round-4 demo) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3a4c2b8) | docs(plan-index): point #71 msquares row at its commit a8e4ba1 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a8e4ba1) | #71 Marching-Squares Iso-Contours SNES demo — 16-case edge LUT + edge interpolation (clean positive + rc-undef XFAIL witness) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/44eceb3) | docs(plan-index): point #70 dither row at its commit af56fe3 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/af56fe3) | #70 Floyd-Steinberg Error-Diffusion Dither SNES demo — forward-carried signed residual (clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/78cbe5a) | docs(plan-index): point #69 gouraud row at its commit a342c9e |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a342c9e) | #69 Gouraud Triangle Tumbler SNES demo — barycentric edge-function raster (clean positive + rc-undef XFAIL witness) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/7c457ec) | docs(plan-index): point #68 perlin row at its commit 5e54c4f |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5e54c4f) | #68 Perlin Gradient-Noise Flow Field SNES demo — fade polynomial + gradient dot + lerp (clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0735024) | docs(plan-index): point #67 huffman row at its commit 5a73244 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5a73244) | #67 Huffman Decode Reveal SNES demo — bit-stream tree walk (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a8d7845) | docs(plan-index): point #66 editdist row at its commit 15427ec |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/15427ec) | #66 Edit-Distance DP SNES demo — a 2-D dynamic-programming table (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a6bb81d) | docs(plan-index): point #65 hull row at its commit ab47d47 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/ab47d47) | #65 Convex Hull Rubber-Band SNES demo — cross-product orientation tests (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/bb5b512) | docs(plan-index): point #64 radix row at its commit 6fc0e28 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/6fc0e28) | #64 Radix / Counting Sort SNES demo — a non-comparison sort (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/85bc34f) | docs(plan-index): point #63 fenwick row at its commit 8d57a11 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/8d57a11) | #63 Fenwick Tree SNES demo — the i & -i low-bit-isolation trick (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/cbef6e2) | docs(plan-index): point #62 percol row at its commit 15a34e9 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/15a34e9) | #62 Union-Find Percolation SNES demo — disjoint-set path compression (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a6f9915) | docs(plan-index): point #61 dhmix row at its commit c360dfc |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/c360dfc) | #61 Diffie-Hellman Colour-Mixer SNES demo — 64-bit modexp; CAUGHT + FIXED a real backend bug (Round 4) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e14e370) | docs(plan-index): point #60 multibase row at its commit a0455bc |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a0455bc) | #60 Multi-Base Clock SNES demo — libc div()/lldiv() div_t struct-return (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8bc5892) | docs(plan-index): point #59 cosmzoom row at its commit 696a0f9 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/696a0f9) | #59 Cosmic Zoom Ruler SNES demo — 64-bit integer <-> float conversion (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f4b0141) | docs(plan-index): point #58 domcol row at its commit eca8cc3 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/eca8cc3) | #58 Complex Domain-Colouring SNES demo — NaN/unordered float compares (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f31aae5) | docs(plan-index): point #57 medfilt row at its commit 76c511d |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/76c511d) | #57 Median Denoiser SNES demo — branchless min/max/abs network (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/2aa768c) | docs(plan-index): point #56 rotozoom row at its commit aa7da46 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/aa7da46) | #56 Rotozoom SNES demo — widening multiply-high (G_SMULH/G_UMULH) (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/fe273cc) | docs(plan-index): point #55 gf256 row at its commit 52b772c |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/52b772c) | #55 GF(2^8) Galois Field SNES demo — Reed-Solomon carryless multiply (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/18106e8) | docs(plan-index): point #54 bitshuffle row at its commit d2ecd9b |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d2ecd9b) | #54 Perfect-Shuffle Transition SNES demo — byte-swap / bit-reverse intrinsics (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b6ed82a) | docs(plan-index): point #53 bitcensus row at its commit a2cbe1b |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a2cbe1b) | #53 Bit-Census Field SNES demo — bit-population intrinsic family (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5334d66) | docs(plan-index): point #52 disbits row at its commit 5f28aea |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5f28aea) | #52 Cross-Byte-Boundary Bitfield Disassembler SNES demo — final Round-3 demo (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/1d91eb5) | docs(plan-index): point #51 critters row at its commit 0e0ca23 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e0ca23) | #51 Protothread Critter Swarm SNES demo — resumable functions (clean positive) |
@@ -126,6 +167,211 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+1549220	author	Will Norris
+1549220	added	1
+1549220	deleted	1
+1549220	files	1
+1549220	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3676149	author	Will Norris
+3676149	added	1
+3676149	deleted	0
+3676149	files	1
+3676149	body	Demo #72 of the compiler stress-test battery (Round 4) — the LAST demo,\ncompleting the #53-#72 set. A life-like cellular automaton (survive 4..7, born\n5..6, Moore-26 neighbourhood, toroidal wrap) runs in a TRUE 3-D array\nuint8 grid[6][6][6], accessed as grid[z][y][x] so the COMPILER generates the\nplane/row stride arithmetic z*36 + y*6 + x (D=6, non-power-of-2) — 26\nmulti-dimensional reads per cell. Every prior grid demo was 1-D or hand-indexed\ny*W+x; this is the first that leans on the compiler's N-dimensional GEP lowering.\nLive voxels tumble as a depth-shaded rotating cube.\n\nDifferential GREEN: host==default==+mos-a16==+mos-xy16==0xFCDE on bsnes-jg (700\nframes; MAME BIOS absent here), -verify clean x2. Disasm gate g3_a/g3_b-refs=28,\nshifts=35, rep/sep=88 (stride mul=0 — the small non-pow2 strides strength-reduce\nto shift-adds, cf #39/#70; the multi-dim GEP is still exercised + verified).\n\nClean positive — no compiler bug. Caught + fixed a DEMO-only display bug (missing\n#define CANVAS_FLUSH_TILES 256 -> only the top 64 tiles flushed each frame ->\nthe cube rendered as ~6 dots in a top strip); RULED OUT a miscompile by\nconfirming the default 8-bit build rendered identically to +mos-a16/+mos-xy16\n(WRAM probes showed the multi-dim read + projection were correct). Also trimmed\nthe Moore-26 gate GATE_N 6->3 so the synchronous startup gate settles by ~frame\n500 instead of freezing the title ~800 frames.\n\nPublished /snes/grid3d/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3a4c2b8	author	Will Norris
+3a4c2b8	added	1
+3a4c2b8	deleted	1
+3a4c2b8	files	1
+3a4c2b8	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+a8e4ba1	author	Will Norris
+a8e4ba1	added	1
+a8e4ba1	deleted	0
+a8e4ba1	files	1
+a8e4ba1	body	Demo #71 of the compiler stress-test battery (Round 4). A scalar field (sum of\nmoving parabolic metaball domes) is sampled on a grid; each cell's four corners\nare thresholded into a 4-bit CASE index, a 16-entry const edge table MS_SEG maps\nit to which cell edges the contour crosses, and each crossing is placed by\nedge-crossing interpolation t=(iso-va)/(vb-va) (a signed int32 __divsi3). The\niso-contour is drawn as bright outlines around dim-filled blobs that merge and\nsplit. Distinct from #45, which rendered the metaball FIELD; extracting its\ncontour is a separate case-table + lerp loop.\n\nCorrectness bar GREEN: host==default==+mos-a16==+mos-xy16==0x86A7 on bsnes-jg\n(900 frames; MAME BIOS absent here). Disasm gate MS_SEG-refs=4, __divsi3=4,\nrep/sep=155.\n\nCompiler finding: -verify-machineinstrs crashes under a16/xy16 at -Os with the\ndocumented a16-rc-undef-ra-pure-virtual known issue ('Using an undefined\nphysical register') — an XFAIL witness (code bit-exact correct, differential\ngreen). Like #69, a high-register-pressure int32-divide kernel trips it.\n\nPerf: the naive field is __mulsi3-heavy (dx^2,dy^2 per corner) and made the demo\ncrawl; the ROM fills the value grid with an incremental second-difference\nstepper (no per-point multiply), cross-checked against ms_field on the host (0\nmismatches over 200 frames x 1089 points) since that fast path is demo-only and\nNOT differential-covered (the incremental-raster blind-spot). The gate keeps\nms_field with a precomputed value grid so it settles in-window.\n\nPublished /snes/msquares/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+44eceb3	author	Will Norris
+44eceb3	added	1
+44eceb3	deleted	1
+44eceb3	files	1
+44eceb3	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+af56fe3	author	Will Norris
+af56fe3	added	1
+af56fe3	deleted	0
+af56fe3	files	1
+af56fe3	body	Demo #70 of the compiler stress-test battery (Round 4). A smooth drifting\ngradient is reduced to four grey levels by Floyd-Steinberg error diffusion: each\npixel's SIGNED quantisation residual e = value - level is spread to its\ndown-right neighbours (7/16 right, 3/16 down-left, 5/16 down, 1/16 down-right)\nacross a two-row error buffer, so the following pixels see the accumulated error\n— the smooth scene resolves into shimmering dither. Distinct from #7's decay+PRNG\nfire: this is forward-carried SIGNED error propagation.\n\nAll int16 (values + error, signed) so bit-exact host vs target. The residual\nsplit (e*k)>>4 is an arithmetic shift (both gcc and llvm-mos arithmetic-shift\nsigned right); the quantiser is 3 compares and the 4 levels come from a LUT — so\nthe FS core needs NO division (the whole point of error diffusion). The\ne*7/e*3/e*5 constant multiplies strength-reduce to shift-adds.\n\nDifferential GREEN: host==default==+mos-a16==+mos-xy16==0x80C4 on bsnes-jg (MAME\nBIOS absent here), -verify clean x2. Disasm gate divide-libcalls=0, shifts=25,\nrep/sep=69 (incidental runtime-index/scene mul=2, cf #39). Clean positive — no\ncompiler bug.\n\nPublished /snes/dither/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+78cbe5a	author	Will Norris
+78cbe5a	added	1
+78cbe5a	deleted	1
+78cbe5a	files	1
+78cbe5a	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+a342c9e	author	Will Norris
+a342c9e	added	1
+a342c9e	deleted	0
+a342c9e	files	1
+a342c9e	body	Demo #69 of the compiler stress-test battery (Round 4). A tumbling equilateral\ntriangle is filled and colour-interpolated per pixel: three signed int32\ncross-product edge functions E(A,B,P)=(Bx-Ax)(Py-Ay)-(By-Ay)(Px-Ax) decide\ninside/outside (all agree with the winding), and their values are the\nbarycentric weights that shade the face, I=(e0*a0+e1*a1+e2*a2)/area (a per-pixel\ndivide). Distinct from #16's wireframe LINES. Gate rasterises 2 tumble\norientations fresh-per-pixel: __mulsi3 edge fns + __divsi3 barycentric normalise.\n\nCorrectness bar GREEN: host==default==+mos-a16==+mos-xy16==0xC5E9 on bsnes-jg\n(600 frames each; MAME BIOS absent here). Disasm gate __mulsi3=11, __divsi3=1,\nrep/sep=165.\n\nTwo compiler findings (both documented in the plan):\n 1. -verify-machineinstrs crashes under a16/xy16 at -Os with the documented\n    a16-rc-undef-ra-pure-virtual known issue ('Using an undefined physical\n    register', 3x '$x/$a = COPY killed $rcN'). XFAIL — the code is bit-exact\n    correct (green differential confirms). A divide-heavy int32 kernel joins the\n    soft-float slices as an rc-undef witness.\n 2. A DEMO-only bug: the on-screen incremental edge-function steppers had\n    inverted signs, so draw_tri rendered nothing while the gate stayed green\n    (the gate recomputes gs_edge fresh per pixel, no steppers). Caught by a host\n    cross-check (covered=0 -> 2080 after fixing the six signs).\n\nPublished /snes/gouraud/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+7c457ec	author	Will Norris
+7c457ec	added	1
+7c457ec	deleted	1
+7c457ec	files	1
+7c457ec	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+5e54c4f	author	Will Norris
+5e54c4f	added	1
+5e54c4f	deleted	0
+5e54c4f	files	1
+5e54c4f	body	Demo #68 of the compiler stress-test battery (Round 4). Each cell's colour is\n2-D Perlin gradient noise of its (x,y) plus a scrolling time offset — a seeded\nFisher-Yates permutation table, the inline Hermite fade polynomial\n6t^5-15t^4+10t^3 (Q0.8 fixed-point, __mulsi3-heavy), a 4-way gradient dot and\nlerp. Banded recompute so the field drifts like smoke/marble. Fixed-point\nthroughout, so bit-exact host vs target by construction; distinct from\nvalue-noise/plasma/CA (none did gradient noise).\n\nDifferential: host==default==+mos-a16==+mos-xy16==0xA72D on bsnes-jg (MAME leg\nSKIP — no SPC700 IPL), -verify clean x2. Disasm gate __mulsi3=15,\nPN_PERM-refs=11, rep/sep=60. Clean positive — no compiler bug.\n\nPublished /snes/perlin/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+0735024	author	Will Norris
+0735024	added	1
+0735024	deleted	1
+0735024	files	1
+0735024	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+5a73244	author	Will Norris
+5a73244	added	1
+5a73244	deleted	0
+5a73244	files	1
+5a73244	body	A 16x16 image (4 colours) is Huffman-encoded into a bitstream, then decoded bit\nby bit -- pull one bit (MSB-first), descend the pointer-linked Huffman tree\n(left on 0, right on 1 via HF_KID0/HF_KID1), emit a symbol at each leaf\n(HF_SYM), restart at the root -- and the pixels are revealed a few per frame\n(the classic image loading in), then it replays. A bit-granular stream reader +\ntree descent, distinct from #49's byte-oriented LZ back-references.\n\nuint8/uint16 cursor/indices, byte stream -> bit-exact. Gate cross-checks the\ndecoded image == source (a mismatch counter folded, must be 0); the fold mixes\npixel position (so the symmetric image can't cancel to 0x0000) and folds the\nstream bytes. Host: 256 px -> 576 bits, 0 mismatches.\nhost==default==+mos-a16==+mos-xy16==0xE8E4 on bsnes-jg, -verify clean x2.\nDisasm bit-shifts=22 tree-refs=5 rep/sep=49. Published /snes/huffman/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+a8d7845	author	Will Norris
+a8d7845	added	1
+a8d7845	deleted	1
+a8d7845	files	1
+a8d7845	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+15427ec	author	Will Norris
+15427ec	added	1
+15427ec	deleted	0
+15427ec	files	1
+15427ec	body	For each word pair the (m+1)x(n+1) Levenshtein table D[i][j] is filled by the\nmin-recurrence D[i][j]=min(D[i-1][j-1]+cost, D[i-1][j]+1, D[i][j-1]+1), then the\noptimal alignment is backtracked from D[m][n] to D[0][0]. Drawn as a cost\nheat-map with the traced path lit, cycling 5 word pairs. A 2-D DP table (true\nD[i][j] addressing) with a min-recurrence + backtrack -- a loop/GEP shape none\nof the first 65 demos run.\n\nuint8 table/strings -> bit-exact. D[i][j] in uint8 D[16][16] = base + i*16 + j\n(16 = power of 2 -> shift, no multiply). Gate cross-checks edit(A,B)==edit(B,A)\n(symmetry); host edit(KITTEN,SITTING)=3. host==default==+mos-a16==+mos-xy16==\n0xFB59 on bsnes-jg, -verify clean x2. Disasm indexed-load/sta=15 cmp=13\nrep/sep=92. Published /snes/editdist/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+a6bb81d	author	Will Norris
+a6bb81d	added	1
+a6bb81d	deleted	1
+a6bb81d	files	1
+a6bb81d	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+ab47d47	author	Will Norris
+ab47d47	added	1
+ab47d47	deleted	0
+ab47d47	files	1
+ab47d47	body	A cloud of 14 points drifts and bounces; each frame the convex hull is\nrecomputed by gift-wrapping (Jarvis march) and drawn as a taut rubber band. The\ncorner: the signed 2-D cross-product orientation predicate -- gift-wrap picks\neach next vertex purely from the sign of cross(O,A,B) = (A.x-O.x)(B.y-O.y) -\n(A.y-O.y)(B.x-O.x). Nothing in the first 64 demos runs a computational-geometry\norientation test; #16 wireframe drew lines but never asked which side of a\nsegment a point is on.\n\nWidth: the cross is computed in int32 (explicit cast on each int16 difference)\nto avoid 16-bit overflow -> __mulsi3; sign compared via cmp. Gate cross-checks\nevery hull edge has all points on its left (valid hull -> a violation counter\nfolded, must stay 0). host==default==+mos-a16==+mos-xy16==0x84E3 on bsnes-jg,\n-verify clean x2. Heavy (gift-wrap + O(n^2) validity) -> GATE_N=12, snapshot\nframe 700. Disasm __mulsi3=8 cmp=27 rep/sep=110. Published /snes/hull/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+bb5b512	author	Will Norris
+bb5b512	added	1
+bb5b512	deleted	1
+bb5b512	files	1
+bb5b512	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+6fc0e28	author	Will Norris
+6fc0e28	added	1
+6fc0e28	deleted	0
+6fc0e28	files	1
+6fc0e28	body	16 bars sorted base-16 one nibble at a time: each pass histograms the digit,\nprefix-sums the counts into starting offsets, and stable-scatters each element\nto its offset -- a NON-COMPARISON sort (zero comparisons on the data, 0 mul/div\nlibcalls). Distinct from #17 sort-race (quick/heap/merge, all comparison-based):\na compare-free scatter sort is a different loop nest -- array reads/writes and\nrunning sums.\n\nValues uint8, counts/offsets uint16 -> bit-exact. Gate cross-checks: after each\nsort the array must be non-decreasing (an inversion counter, folded, = 0) AND a\npermutation of the input (in/out xor and sum must match). host==default==\n+mos-a16==+mos-xy16==0x123E on bsnes-jg, -verify clean x2. Disasm\nindexed-load/sta=9 mul/div-libcalls=0 rep/sep=34. Bars re-bucket raw ->\nlow-nibble -> sorted (value-band gradient), then reshuffle. Published /snes/radix/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+85bc34f	author	Will Norris
+85bc34f	added	1
+85bc34f	deleted	1
+85bc34f	files	1
+85bc34f	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+8d57a11	author	Will Norris
+8d57a11	added	1
+8d57a11	deleted	0
+8d57a11	files	1
+8d57a11	body	A binary-indexed tree maintaining the running integral (prefix sum) of a moving\nsignal. A triangular bump point-updates 16 bins each frame; the prefix sum is\nqueried back and drawn as a rising staircase below. Both walks use the i & -i\nlow-bit-isolation two's-complement trick: update climbs i += i & -i, query\ndescends i -= i & -i -- a codegen shape none of the first 62 demos emit.\n\nWidth: the low bit is (uint16_t)(i & (uint16_t)(0u - i)) so the two's-complement\nwraps at 16 bits identically on host (int=32) and target (int=16). The gate\ncross-checks the BIT prefix against an independent linear prefix sum (they must\nagree) + folds i & -i directly. No mul/div libcall on the BIT path (indices are\npower-of-2 shifts). host==default==+mos-a16==+mos-xy16==0x3454 on bsnes-jg,\n-verify clean x2. Disasm and=5 mul/div-libcalls=0 rep/sep=56. Published\n/snes/fenwick/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+cbef6e2	author	Will Norris
+cbef6e2	added	1
+cbef6e2	deleted	1
+cbef6e2	files	1
+cbef6e2	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+15a34e9	author	Will Norris
+15a34e9	added	1
+15a34e9	deleted	0
+15a34e9	files	1
+15a34e9	body	Bond percolation on a 16x16 grid: cells start as singleton sets; random\nadjacent bonds union their sets (disjoint-set with PATH COMPRESSION -- find\nwalks parent pointers to the root, then re-points the whole path straight at\nit, i.e. pointer-chasing with in-place update). Cells connected to the top row\nlight up "wet"; the wet region grows until a white spanning cluster reaches the\nbottom (the percolation phase transition), then reseeds.\n\nCorner: the union-find find-with-compression pointer flatten -- distinct from\n#18's flat-array heap and #31's append-only pooled tree. parent[] is uint16\nindices, rank[] uint8; RNG + bond order seeded -> bit-exact + reproducible.\n(The parent-array checksum uses a uint32 multiply to avoid a 16-bit overflow\nUB -- the only __mulhi3 on the path.)\n\nGate folds the component count + a compressing find after every bond + the\npercolation verdict + the parent-array checksum. host==default==+mos-a16==\n+mos-xy16==0x025B on bsnes-jg, -verify clean x2 (MAME leg SKIP). Disasm gate\nparent-refs=43 branches=24 rep/sep=106. Wet region grows over frames ->\nsnapshot frame 900. Published /snes/percol/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+a6f9915	author	Will Norris
+a6f9915	added	1
+a6f9915	deleted	1
+a6f9915	files	1
+a6f9915	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+c360dfc	author	Will Norris
+c360dfc	added	1
+c360dfc	deleted	0
+c360dfc	files	1
+c360dfc	body	Demo #61 (64-bit modular exponentiation: __umoddi3 hot op in square-and-multiply)\ncrashed the +mos-a16/+mos-xy16 backend legalizer:\n  unable to legalize instruction: G_UNMERGE_VALUES %N:_(s64)   (split s64 -> 16-bit lanes)\n  unable to legalize instruction: G_ANYEXT %N:_(s24)           (widen a 20-bit-masked value)\nDefault 8-bit compiled fine -- the gap was only in the 16-bit-register modes: the\n#321 fork had s32<->s16/s8 (un)merge glue but not the s64<->s16 level, and G_ANYEXT\nhad no fallback for an odd (s24) source width.\n\nFIX (patch 0017-321-a16-s64-unmerge-anyext-legalize, all hasAccum16()-gated):\n - G_MERGE/G_UNMERGE_VALUES: add {S64,S32}/{S32,S64} as the direct legal 2-lane form\n   and {S64,S16}/{S16,S64} as a custom 2-level rewrite (s64 <-> 2x s32 <-> 4x s16),\n   via new legalizeMergeS64FromWords / legalizeUnmergeS64ToWords -- exact analogues\n   of the existing s32 FromBytes/ToBytes handlers, one level up.\n - G_ANYEXT: route any non-{8,16,32} source width through G_ZEXT (anyext high bits\n   are don't-care; zeroing them is a valid refinement, never a miscompile).\n\nRebuilt the toolchain. Validation: the 8-line minimal repro + the demo now compile;\nALL 62 corpus slices compile under a16 AND xy16 (0 regressions); the 64-bit demos\n(avalanche 0x27EA, sodo 0xD2A2, cosmzoom 0x502F, multibase 0x371A, mandel-double\n0x0EDF) and a non-64-bit sample (gf256, medfilt) stay differential-green; -verify\nclean. Carried as standalone fork patch 0017 (round-trip-verified vs pristine\nc798c3141; NOT via regen-patch.sh, which absorbs 0016). Queued upstream.\n\nThe demo: two parties publish g^a mod p / g^b mod p, both compute the shared secret\ng^(ab) mod p; three colour bands shift while the shared band always agrees. The gate\nfolds A, B, both shared computations, and s1^s2 (=0 iff the DH property holds).\nPost-fix host==default==+mos-a16==+mos-xy16==0x69AA on bsnes-jg, -verify clean x2.\nThe demo (masked exponent -> the s24 pattern) is a permanent regression guard.\nPublished /snes/dhmix/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+e14e370	author	Will Norris
+e14e370	added	1
+e14e370	deleted	1
+e14e370	files	1
+e14e370	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+a0455bc	author	Will Norris
+a0455bc	added	1
+a0455bc	deleted	0
+a0455bc	files	1
+a0455bc	body	One climbing counter shown in four bases at once (decimal, dozenal, hex,\nsexagesimal), each digit split with the libc div() returning a div_t\n(quotient+remainder) BY VALUE, plus a 64-bit odometer via lldiv() returning an\nlldiv_t. The corner: the div_t/lldiv_t AGGREGATE-RETURN ABI braided with the\ncustom G_SDIVREM legalizer (MOSLegalizerInfo.cpp:229, legalizeDivRem). #39 used\nthe `/`,`%` operators; #43 raw signed 64-bit divmod; neither called a libc\nfunction returning an aggregate by value. Relocations confirm real div/lldiv\ncalls (not inlined).\n\nWidth: div() takes int (16-bit target / 32-bit host) -> counter kept < 32768;\nlldiv() takes long long (64-bit both) -> odometer kept < 10^18 (< 2^63) so the\n(long long) cast is defined; ldiv() (long = 32/64 mismatch) deliberately unused.\nnoinline mb_div() forces the div_t by-value return. Reconstruction check uses\nuint32 accumulators (no 16-bit overflow UB).\n\nDisplay: custom multi-row text Drawable; reserve() clears the WHOLE 32x32 BG3\ntilemap to the space glyph (else uninitialised-VRAM garbage stripes show).\nlldiv-heavy gate -> GATE_N=60 + odometer throttle (was 0x0000 at frame 500 with\nGATE_N=120 -- timing, not a miscompile; PASSed at 800); snapshot frame 700.\n\nGate: host==default==+mos-a16==+mos-xy16==0x371A on bsnes-jg, -verify clean x2\n(MAME leg SKIP). Disasm div-calls=1 lldiv-calls=1 rep/sep=22. Published\n/snes/multibase/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+8bc5892	author	Will Norris
+8bc5892	added	1
+8bc5892	deleted	1
+8bc5892	files	1
+8bc5892	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+696a0f9	author	Will Norris
+696a0f9	added	1
+696a0f9	deleted	0
+696a0f9	files	1
+696a0f9	body	A uint64 scale grows exponentially (nanometres to the cosmos) and is placed on\na LOG ruler by converting it to float (so exponential growth reads as a linear\nbar sweep), then back to uint64 for the read-out. The conversions are\n__floatundisf (uint64->float), __fixunssfdi (float->uint64), plus a signed\n__floatdisf / __fixsfdi round-trip -- 64-bit int <-> float, a corner #21/#33\n(32-bit ints only) never emitted.\n\nDesign: FLOAT not double (double balloons the ROM per #33, and is slower);\nper-frame float work is just cosm_pos (a few conversions -> fast, no #58\nsoft-float slowness). scale stays < 10^18 (< 2^60) so (float)v never rounds up\nto >= 2^64 -> (uint64)fv is always defined (no overflow UB).\n__floatundisf/__fixunssfdi are correctly-rounded -> bit-identical host/target.\n\nThe zoom bar fills slowly (exponential scale on a log ruler), so the bsnes-jg\nsnapshot frame is 1400; corpus_result is set far earlier (the _demo5 5-way\ncheck at 500 passes).\n\nGate: host==default==+mos-a16==+mos-xy16==0x502F on bsnes-jg, -verify clean x2\n(MAME leg SKIP). Disasm __floatundisf=2 __fixunssfdi=1 __floatdisf=1 rep/sep=28.\nPublished /snes/cosmzoom/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+f4b0141	author	Will Norris
+f4b0141	added	1
+f4b0141	deleted	1
+f4b0141	files	1
+f4b0141	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+eca8cc3	author	Will Norris
+eca8cc3	added	1
+eca8cc3	deleted	0
+eca8cc3	files	1
+eca8cc3	body	Colours a grid by the complex rational map f(z)=(z^2-1)/(z^2+c). At a pole\n(z^2+c==0) the reciprocal gives Inf/NaN and the code branches on isnan\n(x!=x -> __unordsf2, the unordered compare) / isinf (__eqsf2) to paint the\nsingularities. #21/#33 (mandel float/double) used only the ordered `<`;\nequality + unordered/NaN compares are a different libcall set.\n\nDifferential safety: folds the COLOUR INDEX (branch outcome), NEVER raw NaN\nbits (a quiet-NaN payload is not fully specified). Finite colours use ordered\ncompares only (no atan2 -> no libm ULP). One arithmetic op per statement (no\nFMA) -> single float bit-identical host vs target. A guaranteed exact pole\n(domcol_cell(8,8,0,0) -> dd==0 -> NaN) each gate iter covers __unordsf2.\n\nSoft-float perf: ~150k cyc/cell. Mitigations: one reciprocal 1/dd + two muls\n(not two divides; still 1/0=Inf, 0*Inf=NaN at a pole -> the corner holds);\nGATE_N=4 (corpus_result set ~frame 250, before the 500-frame checks); 8x8\nvisual computed once live on-console one row/frame (a "developing" reveal),\nthen the palette cycles for a shimmer.\n\nGate: host==default==+mos-a16==+mos-xy16==0xF3FD on bsnes-jg, -verify clean x2\n(MAME leg SKIP). Disasm __unordsf2=2 __divsf3=1 __mulsf3=12 rep/sep=28.\nPublished /snes/domcol/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+f31aae5	author	Will Norris
+f31aae5	added	1
+f31aae5	deleted	1
+f31aae5	files	1
+f31aae5	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+76c511d	author	Will Norris
+76c511d	added	1
+76c511d	deleted	0
+76c511d	files	1
+76c511d	body	A salt-and-pepper-noised image cleaned by a 3x3 median filter; a sweeping wipe\nshows denoised vs raw. The median-of-9 is a 19-comparator branchless sorting\nnetwork: each compare-exchange is lo=min(a,b);hi=max(a,b), the select idiom\n(a<b)?a:b / (a<b)?b:a = G_UMIN/G_UMAX (MOSLegalizerInfo.cpp:272 .lower()); the\nnoise-removed diff uses abs = G_ABS (@281). Distinct from #44 hdr-bloom\n(carry/V-flag saturating add) -- this is the min/max select path.\n\nMEASURED (no bug): the 65816 has no conditional-move, so min/max lowers to\ncmp+branch, not a branchless cmov -- "branchless" is the source idiom. Zero\nmul/div libcalls (the whole network is compares/loads/stores).\n\nCorrectness: the gate folds the network median against an INDEPENDENT\ninsertion-sort median; host-side verified 0 mismatches over 200000 random\n9-tuples.\n\nGate: host==default==+mos-a16==+mos-xy16==0x87FE on bsnes-jg, -verify clean x2\n(MAME leg SKIP). Disasm cmp=12 mul/div-libcalls=0 rep/sep=19. Published\n/snes/medfilt/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+2aa768c	author	Will Norris
+2aa768c	added	1
+2aa768c	deleted	1
+2aa768c	files	1
+2aa768c	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+aa7da46	author	Will Norris
+aa7da46	added	1
+aa7da46	deleted	0
+aa7da46	files	1
+aa7da46	body	An affine texture spin-zoom: each cell samples a procedural checker/grid texture\nat a Q16.16 rotated/scaled coordinate. q16mul(a,b)=(int64)a*b>>16 keeps the\nmiddle 32 bits of a 64-bit product -- the widening multiply-high that G_SMULH/\nG_UMULH model (MOSLegalizerInfo.cpp:300 .lower() = extend/mul/shift/trunc).\n\nMEASURED FINDING (no bug, cf #39): on this soft-multiply target there is no\nnarrower mul-high instruction -- the .lower() widens to a full product and\nshifts, so Q16.16 goes through __muldi3 and a 16x16->hi16 form through\n__mulsi3. The corner is the widening/mul-high lowering built on the multiply\nlibcalls. Distinct from #22 avalanche (full 64-bit hash) -- here it's the\nmul-high EXTRACTION in a per-pixel affine sampler.\n\nHarness note: the gate is multiply-heavy (~18 __muldi3/iter). At GATE_N=200 it\ntook >500 frames, so bsnes read 0x0000 at frame 500 -- a TIMING miss, not a\nmiscompile (PASSed 0xD448 at frame 900). Fixed by pacing: GATE_N=100 (done\n~frame 450), snapshot frame 700. SINCOS Q8.8 LUT reused. int64 intermediate +\narithmetic signed-shift on both compilers -> width-exact.\n\nGate: host==default==+mos-a16==+mos-xy16==0x391B on bsnes-jg, -verify clean x2\n(MAME leg SKIP). Disasm __muldi3=5 __mulsi3=4 SINCOS=2 rep/sep=30. Published\n/snes/rotozoom/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+fe273cc	author	Will Norris
+fe273cc	added	1
+fe273cc	deleted	1
+fe273cc	files	1
+fe273cc	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+52b772c	author	Will Norris
+52b772c	added	1
+52b772c	deleted	0
+52b772c	files	1
+52b772c	body	A morphing finite-field plaid: each cell is a GF(2^8) combination\ngf_mul(A, a^x) ^ gf_mul(B, a^y), A/B rotating through the alpha-powers. The\nfield multiply is a CARRYLESS multiply — two log-table lookups + an add + an\nantilog lookup, NO adc carry chain — the arithmetic under Reed-Solomon / QR\ncodes (generator a=2, primitive polynomial 0x11D). The HUD tracks a live RS\nsyndrome (Horner evaluation in GF) that flags a periodically-corrupted symbol.\n\nAn ALU profile none of the first 54 demos run: CRC #40 and TEA #30 still ride\nthe ordinary integer carry paths. Field add is bare XOR; multiply is table +\nXOR. Disasm gate: GF_EXP/GF_LOG table refs, eor cascade, and ZERO integer\nmul/div libcalls (the field multiply is table-based, not __mulqi3).\n\nCorrectness: the gate folds gf_mul against an INDEPENDENT slow bit-by-bit\ncarryless multiply (gf_mul_slow) that must agree; host-side verified identical\nover all 65536 pairs. Syndrome(zeros)==0, gf_mul(2,0x80)==0x1D.\n\nGate: host==default==+mos-a16==+mos-xy16==0xC028 on bsnes-jg, -verify clean x2\n(MAME leg SKIP). Published /snes/gf256/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+18106e8	author	Will Norris
+18106e8	added	1
+18106e8	deleted	1
+18106e8	files	1
+18106e8	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+d2ecd9b	author	Will Norris
+d2ecd9b	added	1
+d2ecd9b	deleted	0
+d2ecd9b	files	1
+d2ecd9b	body	A source image is permuted by the bit-reversal of each cell's linear index\n(__builtin_bitreverse32) — an involution, so the same op scrambles into the\nFFT butterfly order and un-scrambles — with a __builtin_bswap32 recolour while\nheld. Distinct from #25/#28 which reverse bits by hand: here the clang builtins\ntake the generic-opcode -> legalizer path.\n\nBoth builtins INLINE-LOWER: __builtin_bitreverse32 -> G_BITREVERSE .lower()\n(MOSLegalizerInfo.cpp:186) as a mask-swap cascade (complementary masks\n#$aa/#$cc/#$f0 in the disasm); __builtin_bswap32 -> inline byte moves (no\n__bswapsi2 symbol). __builtin_bitreverse is clang-only (gcc lacks it), so the\nhost oracle uses a portable SWAR reference computing the bit-identical value;\nthe differential tests the target's G_BITREVERSE lowering vs ground truth.\n\nBoth operate on uint32 (32-bit host and target alike) -> bit-exact by\nconstruction. Gate folds the FULL 32-bit reversed/swapped values (every bit\nmatters) + the involution round-trip; built from constant shifts/XORs so no\nincidental __mulsi3. (First cut folded two full permutations of 0..255 and\ncollapsed to 0x0000 -- a weak differential; strengthened.)\n\nGate: host==default==+mos-a16==+mos-xy16==0x2A4A on bsnes-jg, -verify clean x2\n(MAME leg SKIP). Disasm gate #$aa=6 #$cc=8 rep/sep=58. Published /snes/bitshuffle/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+b6ed82a	author	Will Norris
+b6ed82a	added	1
+b6ed82a	deleted	1
+b6ed82a	files	1
+b6ed82a	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+a2cbe1b	author	Will Norris
+a2cbe1b	added	1
+a2cbe1b	deleted	0
+a2cbe1b	files	1
+a2cbe1b	body	First demo of Round 4 (#53-#72). Each cell's colour is a bit-count of a 64-bit\nvalue built from its (x,y,time), cycling the four __builtin_*ll intrinsics —\npopcountll / clzll / ctzll / parityll — giving XOR-fractal / magnitude-band /\nruler / checker textures that scroll and cycle.\n\nCorner: the bit-population intrinsic family, never emitted in the first 52\ndemos (earlier "bit" demos shift/mask by hand). MEASURED FINDING (no bug, like\n#39): the ll builtins INLINE-LOWER via G_CTPOP/G_CTLZ/G_CTTZ .lower()\n(MOSLegalizerInfo.cpp:308) to SWAR bit-count trees — the compiler-rt __*di2\nhelpers are never called. Disasm shows the SWAR masks #$55/#$33.\n\nWidth-safe by construction: the plain int/long builtins are 16/32-bit on\ntarget vs 32/64-bit on host and would diverge legitimately; the 64-bit ll\nvariants are identical on both, so the differential is a true codegen test.\nclz/ctz args forced non-zero (UB guard).\n\nGate: host==default==+mos-a16==+mos-xy16==0x9516 on bsnes-jg, -verify clean x2\n(MAME leg SKIP — no SPC700 IPL here). Disasm gate #$55=16 #$33=32 rep/sep=166.\nPublished /snes/bitcensus/.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+5334d66	author	Will Norris
+5334d66	added	1
+5334d66	deleted	1
+5334d66	files	1
+5334d66	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5f28aea	author	Will Norris
 5f28aea	added	1
 5f28aea	deleted	0
