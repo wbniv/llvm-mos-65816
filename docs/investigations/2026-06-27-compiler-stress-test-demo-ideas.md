@@ -248,7 +248,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | **`double` soft-float** — `__adddf3`/`__muldf3`/`__divdf3`/`__fixdfsi`/`__floatsidf`/`__extenddfsf2`/`__truncdfsf2` | #21/#24 used only 32-bit `float`; `double` is a wholly separate 64-bit library, correctly-rounded → bit-exact | ~~33~~ |
 | **libm transcendentals** — `sqrtf` (+ self-shipped `sin`/`exp`) | #24 used float *operators*, never a libm *function* call (see the ULP gotcha above) | 34 |
 | **non-local jumps** — `setjmp`/`longjmp` full context save/restore | the whole register + SP + return-addr context spill; never exercised | 35 |
-| **dynamic stack frames** — `alloca` / C99 VLAs (runtime-sized frame) | every frame so far is fixed-size; runtime SP adjustment is untested | 36 |
+| ~~**dynamic stack frames** — `alloca` / C99 VLAs (runtime-sized frame)~~ | ~~every frame so far is fixed-size; runtime SP adjustment is untested~~ | ~~36~~ |
 | **sparse-switch binary search** — if-else comparison tree, *not* a jump table | #29a was a *dense* switch → table; non-contiguous cases lower totally differently | 37 |
 | **computed `goto` / label values** — `goto *tab[op]` threaded dispatch | distinct from #29a's switch jump-table; the threaded-code path | ~~38~~ |
 | **constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift | #27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation | 39 |
@@ -295,10 +295,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md); queued in
     [upstream-contribution-status](../upstream-contribution-status.md).
 
-36. **Polygon scanline fill — `alloca` / VLA.** Spinning convex/concave polygons of varying vertex counts,
+36. ~~**Polygon scanline fill — `alloca` / VLA.** Spinning convex/concave polygons of varying vertex counts,
     each filled with an **edge table sized at runtime** (`int xs[nverts]`). *Stresses:* **dynamic stack
     allocation** (`alloca`/VLA → runtime frame-pointer adjustment); a soft-stack target may not support it
-    — a gap is a finding. *Shows:* morphing filled polygons (3→12 sides) tumbling.
+    — a gap is a finding. *Shows:* morphing filled polygons (3→12 sides) tumbling.~~ ✓ [/snes/polyfill/](https://biohack.net/snes/polyfill/) — a tumbling star morphs its point count (3→8) driving a runtime-sized VLA crossing table (`int16_t xs[nv]`) in an even-odd scanline fill; `host==default==+mos-a16==+mos-xy16==0x8ED9` on bsnes-jg, `-verify` clean ×3. **No compiler bug** — the soft-stack target lowers C99 VLAs (runtime SP adjustment) correctly; "the gap" idea #36 anticipated does not exist.
 
 37. **CHIP-8 / step-sequencer — sparse switch.** An opcode interpreter whose cases are **non-contiguous**
     (`0x00E0`, `0x1NNN`, `0xANNN`, `0xFX55`…), forcing a **binary-search if-else tree** instead of #29a's

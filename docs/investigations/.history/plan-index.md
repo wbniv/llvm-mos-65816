@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/14fa754) | docs(plan-index): point #48 iir-scope row at its commit f3e3393 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f3e3393) | #48 IIR Resonant-Filter Scope SNES demo — recursive feedback dependency chain |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4e90f14) | docs(plan-index): point #44 hdr-bloom row at its commit 0af9b34 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0af9b34) | #44 HDR Additive Bloom SNES demo — saturating / overflow-checked add |
@@ -97,6 +98,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+14fa754	author	Will Norris
+14fa754	added	1
+14fa754	deleted	1
+14fa754	files	1
+14fa754	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f3e3393	author	Will Norris
 f3e3393	added	1
 f3e3393	deleted	0

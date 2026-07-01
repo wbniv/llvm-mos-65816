@@ -273,6 +273,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: iir-scope }
 
+  polyfill:
+    desc: "#36: Polygon scanline fill (VLA) — a tumbling star whose vertex count morphs at run time drives an even-odd scanline rasteriser with a RUNTIME-SIZED C99 VLA (int16_t xs[nv]) — the soft-stack alloca/VLA stress. Assert corpus_result (polyfill_gate_crc 0x8ED9) == host on MAME + bsnes-jg + disasm gate (__divsi3/__udivsi3 crossing divide + __mulsi3 vertex + rep/sep). Leaves build/polyfill.sfc + build/polyfill-{mame,jg}.png."
+    cmds:
+      - dev/run.sh polyfill
+
+  polyfill-play:
+    desc: "PLAY the polygon scanline-fill VLA demo in a MAME window on this host (builds the ROM first if needed). Shows a filled star tumbling and morphing its point count."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/polyfill.sfc ]; then
+          echo "==> build/polyfill.sfc missing — building it (dev/run.sh polyfill)…"
+          dev/run.sh polyfill
+        fi
+      - task: mandel-mame
+        vars: { ROM: polyfill }
+
   epicycles:
     desc: "#10: Fourier epicycles — a sum of 8 rotating vectors (DFT of a star) traces the outline; sin/cos-LUT sweep with 4 __mulsi3 per harmonic + 32-bit accumulate, NO divide (the many-multiply member). Assert corpus_result (epi_gate_crc 0x4F6C) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__mulsi3 + rep/sep, divide=0). Leaves build/epicycles.sfc + build/epicycles-{jg,mame}.png."
     cmds:
