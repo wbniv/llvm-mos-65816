@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/149bfdf) | #49 LZ77 Image-Decompress Reveal SNES demo — back-references from own output (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d936292) | docs(plan-index): point #47 nrecip row at its commit be11fd9 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/be11fd9) | #47 Newton-Raphson Reciprocal Floor SNES demo — multiply-only iterative refinement (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/48f8580) | docs(plan-index): point #46 qsortviz row at its commit 3c2c7a5 |
@@ -118,6 +119,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+149bfdf	author	Will Norris
+149bfdf	added	1
+149bfdf	deleted	0
+149bfdf	files	1
+149bfdf	body	An LZ77/LZSS byte-stream decoder copies back-references from its OWN output buffer\n(sliding window; overlapping copies RLE-expand runs), decoding a 56-byte stream to\na 256-cell diamond image (tools/lzgen.py generated + roundtrip-verified), then\nprogressively revealed cell-by-cell.\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0x0100 on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate: the back-ref copy lowers to indirect lda ($zp) pointer loads/stores\nwith zero arithmetic libcalls. No compiler bug — the self-referential decoder is\nbyte-exact across all modes. Live at https://biohack.net/snes/lzdec/ (biohack v1.0.165).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 d936292	author	Will Norris
 d936292	added	1
 d936292	deleted	1
