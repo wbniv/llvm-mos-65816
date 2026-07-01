@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5f28aea) | #52 Cross-Byte-Boundary Bitfield Disassembler SNES demo — final Round-3 demo (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/1d91eb5) | docs(plan-index): point #51 critters row at its commit 0e0ca23 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e0ca23) | #51 Protothread Critter Swarm SNES demo — resumable functions (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/38da772) | docs(plan-index): add counter-sliding title screen row (193 plans) |
@@ -125,6 +126,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+5f28aea	author	Will Norris
+5f28aea	added	1
+5f28aea	deleted	0
+5f28aea	files	1
+5f28aea	body	A 65816 instruction descriptor packs opcode:8, mode:3, len:2, group:5, cycles:4,\nflags:7, rmw:1 across a uint32_t, with group (bits 13-17) crossing the byte-1/2\nboundary at bit 16 and flags (bits 22-28) crossing byte-2/3 at bit 24 — forcing\nmulti-byte shift+mask to extract and read-modify-write to insert (distinct from\n#29b truchet's single-uint16 fields). The gate folds read-back field values so the\ndifferential is layout-independent yet a cross-byte corruption still diverges.\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0x31D7 on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate: and-masks + 23 multi-byte shifts, zero arith libcalls. No compiler bug.\nThis completes the Round-3 (#33-#52) compiler stress-test demo battery. Live at\nhttps://biohack.net/snes/disbits/ (biohack v1.0.169).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 1d91eb5	author	Will Norris
 1d91eb5	added	1
 1d91eb5	deleted	1
