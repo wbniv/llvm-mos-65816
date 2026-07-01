@@ -264,7 +264,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | ~~**decode state machine + back-reference** — RLE/LZ decompression with output copy-back~~ | ~~a byte-stream decoder writing back-references into its own output (pointer arith)~~ | ~~49~~ ✓ [/snes/lzdec/](https://biohack.net/snes/lzdec/) |
 | ~~**>register-count argument spill** — functions with 8+ params passed on the soft stack~~ | ~~every prior call fits the register-arg budget; argument spilling is untested~~ | ~~50~~ ✓ [/snes/cgrade/](https://biohack.net/snes/cgrade/) |
 | ~~**resumable functions** — coroutine/protothread static-state switch (cooperative tasks)~~ | ~~local state preserved across re-entry via a saved case index~~ | ~~51~~ ✓ [/snes/critters/](https://biohack.net/snes/critters/) |
-| **cross-byte-boundary bitfields** — `uint32_t a:5,b:11,c:7,d:9` straddling bytes | #29b's fields fit one `uint16`; straddling fields force multi-byte shift + mask | 52 |
+| ~~**cross-byte-boundary bitfields** — `uint32_t a:5,b:11,c:7,d:9` straddling bytes~~ | ~~#29b's fields fit one `uint16`; straddling fields force multi-byte shift + mask~~ | ~~52~~ ✓ [/snes/disbits/](https://biohack.net/snes/disbits/) |
 
 ## The twenty (each opens a corner the first 32 never run)
 
@@ -373,11 +373,11 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     *Stresses:* **resumable-function state preservation** (saved case-index re-entry). *Shows:* a swarm of
     little creatures each running its own scripted behaviour concurrently.~~ ✓ [/snes/critters/](https://biohack.net/snes/critters/) *(24 protothreads, `lc`-dispatch + case-in-loop re-entry + struct-kept state; bit-exact host==default==a16==xy16 `0xAD9F`; no bug)*
 
-52. **Live 65816 disassembler — cross-byte-boundary bitfields.** Decode an opcode byte-stream into
+52. ~~**Live 65816 disassembler — cross-byte-boundary bitfields.** Decode an opcode byte-stream into
     **bitfields that straddle byte boundaries** (`opcode:8, mode:3, len:2, …` packed across a `uint32_t`),
     forcing multi-byte shift + mask extract (distinct from #29b's single-`uint16` fields). *Stresses:*
     **unaligned / cross-boundary bitfield extract-insert**. *Shows:* a scrolling, colour-coded disassembly
-    of its own ROM (meta!).
+    of its own ROM (meta!).~~ ✓ [/snes/disbits/](https://biohack.net/snes/disbits/) *(uint32 fields `group:5` crosses bit 16, `flags:7` crosses bit 24 → multi-byte shift+mask; bit-exact host==default==a16==xy16 `0x31D7`; and-masks + 23 shifts, 0 libcalls; no bug)*
 
 ## Round 3 first picks
 

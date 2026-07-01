@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  disbits:
+    desc: "#52: Cross-byte-boundary bitfield disassembler — a scrolling colour map where each cell decodes a synthetic opcode into bitfields that STRADDLE byte boundaries inside a uint32 (opcode:8, mode:3, len:2, group:5, cycles:4, flags:7, rmw:1; group crosses bit 16, flags crosses bit 24), forcing multi-byte shift+mask. Assert corpus_result (disbits_gate_crc 0x31D7) == host on MAME + bsnes-jg + disasm gate (and-masks, multi-byte shifts, no arith libcall, rep/sep). Leaves build/disbits.sfc + build/disbits-{mame,jg}.png."
+    cmds:
+      - dev/run.sh disbits
+
+  disbits-play:
+    desc: "PLAY the cross-byte bitfield disassembler demo in a MAME window on this host (builds the ROM first if needed). Shows a scrolling colour-coded field-decode map."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/disbits.sfc ]; then
+          echo "==> build/disbits.sfc missing — building it (dev/run.sh disbits)…"
+          dev/run.sh disbits
+        fi
+      - task: mandel-mame
+        vars: { ROM: disbits }
+
   critters:
     desc: "#51: Protothread critter swarm — a swarm of critters, each a RESUMABLE protothread that yields each frame and resumes its scripted box-patrol via a saved continuation index (case labels inside loops -> mid-loop re-entry + cross-call state preservation). Assert corpus_result (critters_gate_crc 0xAD9F) == host on MAME + bsnes-jg + disasm gate (critter_step lc-dispatch, jmp branch mesh, no arith libcall, rep/sep). Leaves build/critters.sfc + build/critters-{mame,jg}.png."
     cmds:
