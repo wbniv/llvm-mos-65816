@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/256a383) | docs(plan-index): point #42 duff row at its commit 5698c17 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5698c17) | #42 Dissolve Transition (Duff's Device) SNES demo — irreducible loop-switch CFG (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0c5df0a) | docs(plan-index): point #41 poolfx row at its commit a12b00d |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a12b00d) | #41 Free-List Pool Allocator SNES demo — manual free-list slot recycling (clean positive) |
@@ -109,6 +110,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+256a383	author	Will Norris
+256a383	added	1
+256a383	deleted	1
+256a383	files	1
+256a383	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5698c17	author	Will Norris
 5698c17	added	1
 5698c17	deleted	0
