@@ -319,6 +319,7 @@ static inline void title_begin(Display *d, TitleLayer *t, const char *line0, con
        (t->vofs_top != 0 || t->vofs_bot != (int16_t)TITLE_VOFS_BOT_TARGET) && g < 200u;
        g++)
     display_frame(d);
+  t->flyin = 0;   /* ease-in complete; clear so title_end's restore branch is reachable */
 }
 
 /* title_begin16 — backward-compat alias (all pre-existing call sites used this name). */
