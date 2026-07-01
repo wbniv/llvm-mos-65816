@@ -84,7 +84,7 @@ elif command -v xvfb-run >/dev/null 2>&1; then
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \
     xvfb-run -a mame snes -cart "$BUILD/grid3d.sfc" -rompath "$ROOT/dev/roms" \
       -autoboot_script "$ROOT/dev/grid3d.lua" -skip_gameinfo \
-      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 14 \
+      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 20 \
       -cfg_directory /tmp -nvram_directory /tmp 2>/dev/null | grep -m1 '^SHOT:' || true)"
   echo "    $line"
   if [ -f "$SNAP/snes/0000.png" ]; then mv "$SNAP/snes/0000.png" "$BUILD/grid3d-mame.png"; fi

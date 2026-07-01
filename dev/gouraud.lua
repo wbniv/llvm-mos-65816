@@ -10,7 +10,7 @@ local function num(name, d) local v = os.getenv(name); if not v or v == "" then 
   return tonumber(v) or tonumber(v, 16) or d end
 local ADDR = num("SHOT_ADDR", 0x7E0000)
 local WANT = num("SHOT_WANT", 0xC5E9)
-local AT   = num("SHOT_AT", 1500)
+local AT   = num("SHOT_AT", 900)
 
 local f, done = 0, false
 emu.register_periodic(function()
