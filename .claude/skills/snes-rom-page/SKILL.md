@@ -23,6 +23,10 @@ safe to distribute.
 - **ROM** — path to the `.sfc` (required).
 - **slug** — URL path + manifest id, lowercase `[a-z0-9-]` (e.g. `blossom`).
 - **title** + one-line **description**.
+- **category** — one of the ids from `index.astro`'s `categories` list (e.g. `motion`). Derive
+  the human label from that list too (e.g. `Motion & Curves`) for `{{CATEGORY_LABEL}}`. Current
+  ids: `fractals`, `physics`, `cellular`, `motion`, `algorithms`, `rendering`, `signals`,
+  `bignums`, `ciphers`, `classics`.
 - **controls / instructions** — what the buttons do + a short "what is it" (the ROM author knows; ask
   if unclear). The keys are fixed by the player (below) — you map them to the ROM's actions.
 - optional **preview** PNG (256×224) shown while the core downloads.
@@ -46,7 +50,8 @@ safe to distribute.
    Pass `--player-src DIR` only to re-sync the engine from a newer `bsnes-jg-wasm` build.
 
 3. **Write the page** `src/pages/<slug>.astro` from `page-template.astro`:
-   - Replace `{{SLUG}}` `{{TITLE}}` `{{DESC}}` `{{KEYS_LINE}}` `{{INSTRUCTIONS}}`.
+   - Replace `{{SLUG}}` `{{TITLE}}` `{{DESC}}` `{{KEYS_LINE}}` `{{INSTRUCTIONS}}`
+     `{{CATEGORY_ID}}` `{{CATEGORY_LABEL}}`.
    - Set the `controls` array (keys → action) and the `{{KEYS_LINE}}` one-liner to the ROM's mapping.
    - Brand it to the site (set `--rp-accent`, swap colours/props — *Per-site*). The template's layout
      + the **natural-aspect canvas** (no `overflow:hidden`/`object-fit`) and **centred player**
@@ -64,6 +69,7 @@ safe to distribute.
      title: '<Title>',
      desc: '<One or two sentences: what it renders, the technique, any notable constraint.>',
      keys: '<compact key-hint line matching the page's controls, e.g. "← → move · Z/X fire">',
+     category: '<category-id>',
    },
    ```
 

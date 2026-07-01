@@ -40,6 +40,7 @@ const controls = [
 
     <header class="rp-hero">
       <h1 class="rp-title">{{TITLE}}</h1>
+      <a href="/snes/#cat-{{CATEGORY_ID}}" class="rp-cat-chip">{{CATEGORY_LABEL}}</a>
       <p class="rp-lede">{{DESC}}</p>
     </header>
 
@@ -105,6 +106,15 @@ const controls = [
   .rp-wrap { --rp-accent: #c2410c; max-width: 900px; margin-inline: auto; padding: 2rem 1.25rem 4rem; color: inherit; }
   .rp-hero { max-width: 42rem; margin-inline: auto; text-align: center; }
   .rp-title { font-size: clamp(2rem, 7vw, 3.25rem); font-weight: 800; margin: 0; }
+  .rp-cat-chip {
+    display: inline-block; margin-top: .5rem; padding: 3px 10px;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    color: var(--ink-dim, #888); background: var(--bg-soft, #1e2128);
+    border: 1px solid var(--rule, #2e3138); border-radius: 4px;
+    text-decoration: none; transition: border-color .15s, color .15s;
+  }
+  .rp-cat-chip:hover { border-color: var(--rp-accent); color: var(--rp-accent); }
   .rp-lede { margin: .75rem 0 0; opacity: .85; line-height: 1.6; }
 
   /* the player — CENTRED, capped near 2x the 256x224 native */
