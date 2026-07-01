@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/eecfd2f) | docs(plan-index): add #76 smulorbit row |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a68142d) | docs(plan-index): add gallery-categories-netflix row + triage TODO inbox |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/c007bfe) | docs(plan-index): add #80 fabsridge row |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/8473d5b) | docs(plan-index): add #73 funnelkal row |
@@ -170,6 +171,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+eecfd2f	author	Will Norris
+eecfd2f	added	1
+eecfd2f	deleted	0
+eecfd2f	files	1
+eecfd2f	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a68142d	author	Will Norris
 a68142d	added	1
 a68142d	deleted	0
