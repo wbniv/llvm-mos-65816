@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  funnelkal:
+    desc: "#73: Funnel-Shift Kaleidoscope -- G_FSHL/G_FSHR two-source funnel shift via __builtin_elementwise_fshl(A,B,k)/fshr with A!=B, forcing .lower() at MOSLegalizerInfo.cpp:317 (the 'terrible' default double-source shift+or expansion that matchFunnelShiftToRotate cannot rescue). 8-fold-symmetric kaleidoscope mandala on 128x128 BG3. Assert corpus_result (funnelkal_gate_crc 0xEED4) == host on MAME + bsnes-jg + disasm gate (ora>=2, rep/sep>=1). Leaves build/funnelkal.sfc + build/funnelkal-{mame,jg}.png."
+    cmds:
+      - dev/run.sh funnelkal
+
+  funnelkal-play:
+    desc: "PLAY the Funnel-Shift Kaleidoscope demo in a MAME window (builds first if needed). Shows an 8-fold-symmetric mandala driven by G_FSHL/G_FSHR two-source funnel shifts."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/funnelkal.sfc ]; then
+          echo "==> build/funnelkal.sfc missing -- building (dev/run.sh funnelkal)..."
+          dev/run.sh funnelkal
+        fi
+      - task: mandel-mame
+        vars: { ROM: funnelkal }
+
   grid3d:
     desc: "#72: 3-D grid voxel life -- a life-like cellular automaton (survive 4..7, born 5..6, Moore-26, toroidal wrap) runs in a TRUE 3-D array uint8 grid[6][6][6] accessed as grid[z][y][x], so the COMPILER generates the plane/row stride arithmetic z*36+y*6+x (non-power-of-2). Every prior grid demo was 1-D or hand-indexed y*W+x; this leans on the compiler's multi-dimensional GEP lowering (26 reads/cell). The live voxels tumble as a depth-shaded rotating cube. Assert corpus_result (grid3d_gate_crc 0x859F) == host on MAME + bsnes-jg + disasm gate (g3_a/g3_b refs, stride shifts). Leaves build/grid3d.sfc + build/grid3d-{mame,jg}.png."
     cmds:

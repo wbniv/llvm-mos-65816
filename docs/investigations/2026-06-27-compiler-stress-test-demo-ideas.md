@@ -691,7 +691,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
 
 ### Integer-lowering: saturating/overflow/cast/bit-slide/sign-extend
 
-73. **Funnel-Shift Kaleidoscope.** *Stresses:* G_FSHL/G_FSHR via __builtin_elementwise_fshl(A,B,k)/fshr with
+~~73. **Funnel-Shift Kaleidoscope.** *Stresses:* G_FSHL/G_FSHR via __builtin_elementwise_fshl(A,B,k)/fshr with
     A!=B so matchFunnelShiftToRotate refuses to fold to a rotate, forcing .lower() at 317. Unlike demo 28
     hilbert / demo 30 tea (single-operand variable G_SHL/G_LSHR, never a funnel) and demo 54 bitshuffle (single-
     source G_BITREVERSE). *Shows:* An 8-fold-symmetric bit-pattern mandala on the 128x128 BG3 canvas: registers
@@ -699,7 +699,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     funnel count k. Never static. *Verified present:* MOSLegalizerInfo.cpp:317 G_FSHL/G_FSHR .lower() with
     warning 314-316; __builtin_elementwise_fshl/fshr Builtins.td 1765/1771; grep of 76 headers: zero fshl/fshr.
     *Differential:* integer-exact: funnel shift on uint16 (concat hi:lo, shift n mod 16, take 16-bit slice) is
-    bit-defined identically host vs target; CRC folds every row word; a lowering slip diverges the CRC.
+    bit-defined identically host vs target; CRC folds every row word; a lowering slip diverges the CRC.~~ ✓ [/snes/funnelkal/](https://biohack.net/snes/funnelkal/) ([plan](../plans/2026-07-01-73-snes-funnelkal.md))
 
 74. **Rotate-Register Kaleidoscope.** *Stresses:* G_ROTL/G_ROTR via __builtin_rotateleft8/right8/rotateleft16
     with BOTH constant per-ring amounts (ConstantAmt 1046-1061) and a runtime frame-driven amount. Unlike demo
@@ -961,7 +961,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
 
 Sharpest at opening a code path the first 72 never run:
 
-- **#73 funnelkal** — Highest bug-yield: forces the ONE lowering path the backend source explicitly flags as
+- ~~**#73 funnelkal**~~ ✓ [/snes/funnelkal/](https://biohack.net/snes/funnelkal/) — Highest bug-yield: forces the ONE lowering path the backend source explicitly flags as
   terrible (G_FSHL/FSHR .lower() at 317) via two DIFFERENT hi/lo uint16 operands so matchFunnelShiftToRotate
   cannot rescue it. No demo emitted a funnel-shift node; the fragile double-source shift+or expansion is prime
   bug territory, and the CRC over row words catches any bit slip.
