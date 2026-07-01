@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/1887831) | docs(plan-index): point #37 seqvm row at its commit e134e54 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e134e54) | #37 Sparse-Switch Step-Sequencer VM SNES demo — comparison-tree opcode dispatch |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f77a7e3) | docs(plan-index): point #36 polyfill row at its commit cdb8641 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/cdb8641) | #36 Polygon Scanline Fill (VLA) SNES demo — runtime-sized C99 VLA edge table |
@@ -101,6 +102,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+1887831	author	Will Norris
+1887831	added	1
+1887831	deleted	1
+1887831	files	1
+1887831	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e134e54	author	Will Norris
 e134e54	added	1
 e134e54	deleted	0

@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  divclock:
+    desc: "#39: Magic-reciprocal clock + odometer — splits a frame tick into h:m:s and a counter into base-10 digits via COMPILE-TIME CONSTANT divides (/60 /10 /12) the compiler strength-reduces to magic multiply-high (NOT #27's runtime __udivsi3). Sweeping analog clock + rolling odometer. Assert corpus_result (divclock_gate_crc 0xF72E) == host on MAME + bsnes-jg + disasm gate (mul>=1, udiv-libcall=0, rep/sep). Leaves build/divclock.sfc + build/divclock-{mame,jg}.png."
+    cmds:
+      - dev/run.sh divclock
+
+  divclock-play:
+    desc: "PLAY the magic-reciprocal clock demo in a MAME window on this host (builds the ROM first if needed). Shows a sweeping analog clock + a rolling base-10 odometer."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/divclock.sfc ]; then
+          echo "==> build/divclock.sfc missing — building it (dev/run.sh divclock)…"
+          dev/run.sh divclock
+        fi
+      - task: mandel-mame
+        vars: { ROM: divclock }
+
   iir-scope:
     desc: "#48: IIR resonant-filter scope — recursive feedback dependency chain (y[n]=a1*y[n-1]+a2*y[n-2]+x[n], non-reorderable). Four plucked resonators on an oscilloscope. Assert corpus_result (iir_scope_gate_crc 0x5177) == host on MAME + bsnes-jg + disasm gate (__mulsi3 feedback multiply + rep/sep). Leaves build/iir-scope.sfc + build/iir-scope-{mame,jg}.png."
     cmds:

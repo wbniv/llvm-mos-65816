@@ -251,7 +251,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | ~~**dynamic stack frames** — `alloca` / C99 VLAs (runtime-sized frame)~~ | ~~every frame so far is fixed-size; runtime SP adjustment is untested~~ | ~~36~~ |
 | ~~**sparse-switch binary search** — if-else comparison tree, *not* a jump table~~ | ~~#29a was a *dense* switch → table; non-contiguous cases lower totally differently~~ | ~~37~~ |
 | **computed `goto` / label values** — `goto *tab[op]` threaded dispatch | distinct from #29a's switch jump-table; the threaded-code path | ~~38~~ |
-| **constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift | #27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation | 39 |
+| ~~**constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift~~ | ~~#27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation~~ | ~~39~~ (FINDING: llvm-mos does NOT strength-reduce — retains `__udivNi3`, correct on soft-multiply) |
 | **table-indexed ROM-LUT byte loop** — 256-entry `const` table, long-addressed per byte | reads a big `const` table from ROM via 24-bit addressing every iteration | 40 |
 | **free-list allocator** — manual malloc/free, pointer recycling | #31's pool is append-only (bump + reset); a free list recycles individual nodes | 41 |
 | **irreducible control flow** — Duff's device (switch jumping into a loop) | a CFG the structurizer can't reduce; never exercised | 42 |
@@ -310,10 +310,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     than a `switch`. *Stresses:* **indirect-goto / label-value dispatch**. *Shows:* a Brainfuck program
     drawing a pattern as its tape head scrubs.~~ ✓ [/snes/bf-vm/](https://biohack.net/snes/bf-vm/) — Hello World; `goto *handlers[op]` → 65816 indexed-indirect `jmp ($ind,x)`; `host==default==a16==xy16==0x9954` on bsnes-jg, `-verify` clean ×3. **No compiler bug** — `indirectbr`/`blockaddress` lower correctly across all modes.
 
-39. **Analog clock + odometer — constant-divisor magic reciprocal.** Split seconds/minutes/hours and base-N
+39. ~~**Analog clock + odometer — constant-divisor magic reciprocal.** Split seconds/minutes/hours and base-N
     digits with **compile-time constant divides** (`/60`, `/12`, `/10`, `/360`). *Stresses:* the
     compiler's **strength-reduction of constant division to a magic-number multiply-high + shift** (distinct
-    from #27's runtime `__umodsi3`). *Shows:* a sweeping clock face + a rolling base-N odometer.
+    from #27's runtime `__umodsi3`). *Shows:* a sweeping clock face + a rolling base-N odometer.~~ ✓ [/snes/divclock/](https://biohack.net/snes/divclock/) — sweeping analog clock + rolling odometer; `host==default==+mos-a16==+mos-xy16==0xF72E` on bsnes-jg, `-verify` clean ×3. **MEASURED FINDING (no bug):** llvm-mos does **not** strength-reduce constant division to a magic reciprocal at any width (even `uint16 x/10`→`__udivhi3`) — the reciprocal needs a `MULHU` that is itself a libcall on this soft-multiply target, so the cost model correctly retains `__udivNi3`. The demo thus stresses heavy constant-divisor division, proven bit-exact across all modes.
 
 40. **Procedural hash-texture — table-driven CRC32.** Feed coordinates through a **real CRC32 with a
     256-entry `const` table in ROM** (a 24-bit-addressed indexed load per byte) to colour a scrolling,
