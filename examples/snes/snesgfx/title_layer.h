@@ -91,7 +91,7 @@
 typedef struct {
   Drawable    base;
   const char *line0;     /* 8×8 font, centred on tilemap row 12   (NULL = skip) */
-  const char *line1;     /* 16×16 font, centred on tilemap rows 30–31 (NULL = skip) */
+  const char *line1;     /* 16×16 font, centred on tilemap rows 14–15 (NULL = skip) */
   /* --- cinematics state --- */
   int16_t     vofs_top;  /* BG2VOFS band A: 128=above screen → 0=at target (line0)          */
   int16_t     vofs_bot;  /* BG2VOFS band B: 0=below screen → 128=at target (line1)          */

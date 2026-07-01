@@ -113,7 +113,7 @@ static void app_init(App *a) {
 }
 
 int main(void) {
-    m7splash_begin("HILBERT CURVE", "SPACE-FILLING");
+    m7splash_begin("SPACE-FILLING", "HILBERT CURVE");
     corpus_result = hilbert_gate_crc();   /* runs during hold; screen shows last frame */
     m7splash_end(90);
 

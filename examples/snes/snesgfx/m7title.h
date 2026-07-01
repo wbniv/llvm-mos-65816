@@ -8,8 +8,8 @@
  *   Tiles 0..63   — FONT8 glyphs 0..63, 8bpp, ink palette index 1 (bright title).
  *   Tiles 64..127 — same glyphs, ink palette index 2 (dim subtitle).
  *   Tilemap LOW bytes: all tile 0 (space/black), except text rows.
- *     line1 (title) at tile row 12 → screen_y 96  — uses tiles 0..63  (ink=1)
- *     line0 (subtitle) at tile row 14 → screen_y 112 — uses tiles 64..127 (ink=2)
+ *     line0 (subtitle) at tile row 12 → screen_y 96  — uses tiles 64..127 (ink=2)
+ *     line1 (title)    at tile row 14 → screen_y 112 — uses tiles  0..63  (ink=1)
  *   Text centred in the 32-tile (256 px) visible window.
  *
  * CGRAM: 0=black, 1=white (shimmer), 2=dim (subtitle).
@@ -33,9 +33,11 @@
 #include "../sincos.h"
 #include "../mode7.h"
 
-/* Tilemap rows (tile units; pixel_y = row * 8). */
-#define M7T_ROW1   12u   /* title    (line1, bright ink=1) → screen_y 96  */
-#define M7T_ROW0   14u   /* subtitle (line0, dim   ink=2) → screen_y 112 */
+/* Tilemap rows (tile units; pixel_y = row * 8). Matches title_layer.h convention:
+ *   ROW0 = upper (subtitle, line0, dim)    → screen_y 96
+ *   ROW1 = lower (title,    line1, bright) → screen_y 112  ← zoom centre (128,112) */
+#define M7T_ROW0   12u   /* subtitle (line0, dim   ink=2) → screen_y 96  */
+#define M7T_ROW1   14u   /* title    (line1, bright ink=1) → screen_y 112 */
 
 /* Visible tile columns at 1:1 scale (256 px / 8 px/tile). */
 #define M7T_VCOLS  32u
@@ -125,8 +127,8 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
     _m7t_write_all_glyphs();
 
     /* Tilemap: write text rows.
-     * line1 (title, arg2) uses tiles 0..63 (ink=1, bright) at row M7T_ROW1.
-     * line0 (subtitle, arg1) uses tiles 64..127 (ink=2, dim) at row M7T_ROW0. */
+     * line1 (title, arg2)    → tiles  0..63  (ink=1, bright) at M7T_ROW1=14 (zoom centre).
+     * line0 (subtitle, arg1) → tiles 64..127 (ink=2, dim)   at M7T_ROW0=12 (above centre). */
     _m7t_write_row(line1, M7T_ROW1, 0u);
     _m7t_write_row(line0, M7T_ROW0, FONT8_N);
 
