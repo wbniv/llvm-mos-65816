@@ -25,6 +25,21 @@
 > routing to LLVM's `lowerThreewayCompare`); **standalone-testable, queued upstream** in
 > [`docs/upstream-contribution-status.md`](../upstream-contribution-status.md). Every other Round-3 corner
 > came back green — no further compiler bug.
+>
+> **Round 4 (#53–#72) — DRAFTED** (2026-06-30, backlog below, not yet built). Twenty more corners none of
+> the first 52 execute, each grounded in a **verified** backend path: the **bit-population intrinsic
+> family** (`__popcountsi2`/`__clzsi2`/`__ctzsi2`/`__paritysi2` + the inline `G_CTLZ`/`G_CTTZ`/`G_CTPOP`
+> lowering at `MOSLegalizerInfo.cpp:308`), byte-swap / bit-reverse intrinsics (`__bswapsi2`;
+> `G_BITREVERSE.lower()` @186), **widening multiply-high** (`G_UMULH`/`G_SMULH.lower()` @300),
+> **branchless min/max/abs** (`G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281),
+> **NaN / unordered float compares** (`__unordsf2`/`__eqsf2`/`__nesf2`), **64-bit⇄float conversion**
+> (`__floatdidf`/`__fixdfdi`/`__floatdisf`), the libc **`div()`/`ldiv()` `div_t` struct-return** over the
+> custom `G_SDIVREM` legalizer (@229), plus data-structure/algorithm corners the battery never ran —
+> union-find path-compression, Fenwick `i&-i`, non-comparison (radix/counting) sort, convex-hull
+> orientation tests, 2-D dynamic-programming tables, Huffman bit-tree decode — and rendering techniques
+> with distinct codegen (widening-mul rotozoom, barycentric edge-function fill, Floyd–Steinberg error
+> diffusion, marching-squares contours, gradient noise, 3-D `grid[z][y][x]` multi-dim indexing). Every
+> symbol/opcode cited was confirmed present in `vendor/llvm-mos/` before drafting.
 
 A backlog of candidate demo programs whose job is to **stress the llvm-mos 65816 codegen** — each leans
 on a different corner of the compiler (32-bit/fixed-point multiply, division, recursion + the soft stack,
@@ -396,3 +411,226 @@ Sharpest at opening a code path the first 32 never run:
 - ~~**#38 computed-`goto`** — a second VM that opens the *threaded-dispatch* path #29a's `switch` jump-table didn't.~~ ✓ [/snes/bf-vm/](https://biohack.net/snes/bf-vm/) — clean positive, no bug.
 - ~~**#44 saturating / `__builtin_add_overflow`** — flag-sequence codegen, plus a gorgeous additive-bloom visual.~~ ✓ [/snes/hdr-bloom/](https://biohack.net/snes/hdr-bloom/) — clean positive, no bug.
 - ~~**#48 IIR feedback** — the non-reorderable recursive dependency chain the feed-forward FFT (#25) never exercised.~~ ✓ [/snes/iir-scope/](https://biohack.net/snes/iir-scope/) — clean positive, no bug.
+
+---
+
+# Round 4 (#53–#72) — twenty more new codegen corners
+
+Rounds 1–3 (52 demos) exhausted fixed-point integer math, single/double soft-float *arithmetic*, un/signed
+64-bit integers, the dense **and** sparse switch, computed-`goto`, struct-**by-value** pass, clean **and**
+straddling bitfields, variable shifts, variadics, string libcalls, pointer-trees, free-lists, Duff's device,
+VLAs, `qsort` callbacks, and the far-pointer path. Round 4 targets **twenty corners none of the first 52
+execute** — chosen by walking the backend for opcodes/libcalls the battery has *never* emitted. Each row was
+**verified present in `vendor/llvm-mos/` before drafting** (line numbers are `MOSLegalizerInfo.cpp` unless
+noted), so these are real paths, not guesses:
+
+- the **bit-population intrinsic family** — count-ones/leading-zeros/trailing-zeros/parity/first-set, i.e.
+  `__popcountsi2` / `__clzsi2` / `__ctzsi2` / `__paritysi2` / `__ffssi2` (compiler-rt) *and* the inline
+  `G_CTLZ`/`G_CTTZ`/`G_CTPOP` shift-tree lowering (`.lower()` @308) — never once emitted in 52 demos;
+- **byte-swap / bit-reverse intrinsics** — `__bswapsi2`, and `G_BITREVERSE.lower()` @186 (clang's
+  `__builtin_bswap32` / `__builtin_bitreverse32`), distinct from #25/#28's *hand-rolled* reversal loops;
+- **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (extend→mul→shift→trunc), the compiler
+  recognising `(a*b) >> 16` as a high-half multiply — not the full `__mulsi3` the fixed-point demos forced;
+- **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272 and `G_ABS.custom()` @281
+  (select+icmp, no branch), never the *hot* op before;
+- **NaN / unordered float compares** — `__unordsf2` / `__eqsf2` / `__nesf2` (`comparesf2.c`); #21/#33 only
+  ever used the *ordered* `<`, never equality or an unordered/NaN test;
+- **64-bit⇄float conversion** — `__floatdidf` / `__fixdfdi` / `__floatdisf` / `__fixsfdi`; the float demos
+  never converted a 64-bit integer to/from floating point;
+- the libc **`div()` / `ldiv()`** returning **`div_t` by value** — hitting the aggregate-return ABI *and*
+  the custom `G_SDIVREM` legalizer's stack-temp path (@229, `legalizeDivRem`) at once, distinct from #39/#43
+  which used the raw `/` and `%` operators separately;
+
+…plus data-structure / algorithm corners the battery never ran (union-find path compression, Fenwick `i&-i`,
+non-comparison sort, convex-hull orientation, 2-D DP tables, Huffman bit-tree decode) and rendering
+techniques with distinct codegen (widening-mul rotozoom, barycentric edge-function fill, error diffusion,
+marching squares, gradient noise, 3-D multi-dim indexing). Same bar as before: a shared host+target header,
+a differential CRC, a `snesgfx` render, the picture *is* the proof.
+
+**Three design gotchas to honour up front** (the "measure, don't assume" rule, Round-4 edition):
+
+- **Keep the differential integer or integer-exact wherever possible.** Corners 53–57, 60–72 are integer /
+  fixed-point → host==target is bit-exact by construction. The three float corners (58/59 + any float used
+  elsewhere) stay differential-safe only if (a) you use **float *arithmetic* + header-shipped polynomials**,
+  **never glibc libm** (the Round-3 ULP gotcha still holds — no `sinf`/`expf` oracle), and (b) IEEE
+  conversions/`sqrtf` are correctly-rounded so they *are* safe.
+- **Do not fold raw NaN bit-patterns into the CRC (#58).** A quiet-NaN payload is not fully specified, so
+  hashing raw NaN bits could diverge even with correct codegen. Fold the **branch outcome** (`isnan(x)` →
+  the *colour index* chosen for a singularity), not the float's bits — the boolean is deterministic and
+  host==target. This keeps the demo a test of the *unordered-compare codegen*, not of NaN payloads.
+- **`div()`/`ldiv()` come from picolibc, `__builtin_bitreverse`/`__builtin_bswap` from clang.** Both are
+  confirmed present, but include the right header (`<stdlib.h>`) / use the builtin form so the intended
+  `G_SDIVREM` / `G_BITREVERSE` / `__bswapsi2` path is actually taken (a hand-rolled loop would test nothing
+  new — that's exactly the #25/#28 vs #54 distinction).
+
+## Untested-corner coverage map (the point of Round 4)
+
+| New codegen corner | Why bugs hide there | Demos |
+|---|---|---|
+| **bit-population intrinsics** — `__popcountsi2`/`__clzsi2`/`__ctzsi2`/`__paritysi2`/`__ffssi2` + inline `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree (`.lower()` @308) | never emitted once in 52 demos; the inline lowering is a multi-branch shift sequence with its own edge cases (zero-input, width) | 53 |
+| **byte-swap / bit-reverse intrinsics** — `__bswapsi2`; `G_BITREVERSE.lower()` @186 | #25/#28 reversed bits by *hand*; the clang builtin → generic-opcode → lowering path is untested | 54 |
+| **finite-field GF(2⁸) / carryless multiply** — XOR-accumulate + log/antilog table, no carry | a whole ALU profile with **no `adc` carry chain** — pure XOR + table; never exercised | 55 |
+| **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (`(a*b)>>16` recognised) | fixed-point demos forced full `__mulsi3`; the *high-half* recognition + its extend/trunc is a distinct path | 56 |
+| **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281 | select+icmp lowering as the **hot** op (sorting network / clamp); #44 was carry/V-flag, not select | 57 |
+| **NaN / unordered float compares** — `__unordsf2`/`__eqsf2`/`__nesf2` | #21/#33 used only ordered `<`; equality + unordered/NaN tests lower to different libcalls | 58 |
+| **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | 59 |
+| **`div_t` struct-return over custom `G_SDIVREM`** — libc `div()`/`ldiv()` (@229, `legalizeDivRem`) | combines aggregate-return ABI **and** the divrem stack-temp legalizer; #39/#43 used bare `/`,`%` | 60 |
+| **64-bit modular exponentiation** — `__umoddi3` as the *hot* op in square-and-multiply | #22 was 64-bit mul/shift/xor (hash), #27 was 16/32-bit `%`; a 64-bit `%`-per-iteration loop is neither | 61 |
+| **union-find / disjoint-set** — parent-array **path compression** (in-place pointer rewrite) | #18 (heap), #31 (tree) never did the find-with-compression pointer-chase-and-flatten idiom | 62 |
+| **Fenwick / binary-indexed tree** — `i & -i` low-bit isolation in a range-sum loop | the `i += i & -i` two's-complement bit trick is a codegen shape nothing else emits | 63 |
+| **non-comparison sort** — counting/radix: histogram + prefix-sum + scatter, **zero compares** | #17's sorts were all comparison-based; a compare-free scatter sort is a different loop nest | 64 |
+| **computational-geometry orientation** — cross-product **sign** tests + angular sort (convex hull) | signed 2-D cross products driving branch decisions; never exercised | 65 |
+| **2-D dynamic-programming table** — memoised recurrence + `max`/`min` reductions + backtrack pointer walk | a doubly-indexed table fill with data-dependent reductions; a new loop/GEP shape | 66 |
+| **Huffman bit-stream decode** — MSB-first bit reader + pointer-linked tree descent | #49 was *byte*-oriented LZ back-refs; a *bit*-granular reader + tree walk is distinct | 67 |
+| **gradient (Perlin) noise** — permutation table + fade **polynomial** + gradient dot + lerp | value-noise/plasma/CA never did the perm-index + Hermite-fade + dot-product-of-gradients pipeline | 68 |
+| **barycentric edge-function raster** — 3 cross-product edge fns + per-pixel interpolation | #16 drew wireframe **lines** only; solid interpolated fill is a different inner loop | 69 |
+| **error-diffusion (signed spread)** — Floyd–Steinberg propagate signed residual to neighbours + clamp | #7 doom-fire was decay+PRNG; forward-carried *signed* error with saturation is untested | 70 |
+| **marching-squares contour** — 16-case edge **LUT** + edge-crossing interpolation | #45 rendered the metaball *field*; extracting its iso-contour is a separate case-table + lerp | 71 |
+| **multi-dimensional array indexing** — true `grid[z][y][x]` with non-pow-2 strides | every prior grid was 1-D or hand-indexed `y*W+x`; compiler-generated N-D GEP multiplies are untested | 72 |
+
+## The twenty (each opens a corner the first 52 never run)
+
+### Bit-population, permutation & finite-field ALU — the count/reverse/scan family
+
+53. **Bit-census field — `popcount`/`clz`/`ctz`/`parity`.** Colour each cell by a **bit-population intrinsic**
+    of its coordinates and a time term — `popcount(x ^ y ^ t)`, `clz(x | y)`, `ctz(x & y)`, cycling the
+    function — producing the famous self-similar XOR/AND bit-fractal, now driven through the *actual*
+    intrinsics. *Stresses:* `__popcountsi2` / `__clzsi2` / `__ctzsi2` / `__paritysi2` **and** the inline
+    `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree lowering (`.lower()` @308) at 16- and 32-bit — never emitted in
+    52 demos. *Shows:* a breathing, scrolling bit-census texture that morphs as the function cycles.
+
+54. **Perfect-shuffle transition — `bswap` + `bit-reverse`.** A screen transition that permutes an image by
+    routing each pixel's index through **`__builtin_bswap32` and `__builtin_bitreverse`**, scrambling then
+    perfectly un-scrambling it (a radix-reversal / butterfly-network shuffle). *Stresses:* `__bswapsi2` and
+    `G_BITREVERSE.lower()` (@186) — the **intrinsic** path, distinct from #25/#28's hand-rolled reversal
+    loops. *Shows:* an image dissolving through a digital "riffle shuffle" and snapping back whole.
+
+55. **Reed–Solomon glyph — GF(2⁸) carryless multiply.** Finite-field arithmetic over GF(2⁸) via **log/antilog
+    tables and XOR** (Galois multiply, no carry) building a QR-style codeword whose parity symbols repair
+    deliberately corrupted cells live. *Stresses:* an ALU profile with **no `adc` carry chain at all** — pure
+    XOR-accumulate + ROM-table lookup (Galois `gmul`), a shape nothing in the battery emits. *Shows:* a glyph
+    with cells being knocked out and error-corrected back, syndrome bars pulsing.
+
+### Untouched arithmetic-lowering corners
+
+56. **Rotozoom / Droste zoom — widening multiply-high (`G_UMULH`).** A full-screen affine texture spin-zoom
+    (rotate + scale a tile) whose sample address is `(coord * scale) >> 16` — a **high-half multiply** of a
+    32×32 product. *Stresses:* `G_UMULH`/`G_SMULH.lower()` (@300, extend→mul→shift→trunc), the compiler
+    recognising the mul-high instead of forcing a full `__mulsi3`. *Shows:* a hypnotic rotating, pulsing
+    zoom of a checker/mandala texture (the classic "rotozoomer").
+
+57. **Median denoiser — branchless min/max/abs network.** A live noisy source cleaned by a **9-element
+    sorting network** built entirely from `min`/`max` compare-exchanges (branchless), median in the centre.
+    *Stresses:* `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` (@272) and `G_ABS.custom()` (@281) as the **hot**
+    op — select+icmp chains, a different lowering from #44's carry/V-flag saturation. *Shows:* snow/speckle
+    noise wiped to a clean image, side-by-side before/after, sweeping.
+
+58. **Complex domain-colouring with poles — NaN/unordered float compares.** Plot a rational complex function
+    `f(z) = (z²−1)/(z²+c)` by domain colouring; near its **poles** the divide yields ∞/NaN and the code
+    branches on `isnan`/`isinf` (`x != x`) to paint singularities distinctly. *Stresses:* `__unordsf2` /
+    `__eqsf2` / `__nesf2` — equality + unordered/NaN tests, never used (only the ordered `<`). *Differential:*
+    fold the **colour index**, not raw NaN bits (see gotcha). *Shows:* a smooth phase-coloured field with
+    glowing pole singularities as `c` animates.
+
+59. **Powers-of-ten log ruler — 64-bit⇄float conversion.** A continuous logarithmic zoom from Planck length
+    to the cosmos: a **`uint64` scale counter converted to `double`** each frame (`__floatdidf`) for
+    log-scale positioning, tick labels back via `__fixdfdi`. *Stresses:* `__floatdidf` / `__fixdfdi` /
+    `__floatdisf` / `__fixsfdi` — 64-bit-integer↔float conversion, never done (correctly-rounded → bit-exact).
+    *Shows:* a smoothly gliding powers-of-ten ruler / scale-of-the-universe zoom.
+
+60. **Multi-base chronometer — `div()`/`ldiv()` `div_t` struct-return.** One instant shown simultaneously in
+    decimal, dozenal, hex and sexagesimal, each digit split with the libc **`div()`/`ldiv()` returning
+    `div_t` by value** (quotient+remainder in one call). *Stresses:* the aggregate-return ABI **and** the
+    custom `G_SDIVREM` stack-temp legalizer (@229) together — distinct from #39/#43's bare `/`,`%`. *Shows:*
+    four rolling odometers ticking the same time in four bases.
+
+61. **Diffie–Hellman colour-mixer — 64-bit modular exponentiation.** Two "parties" exchange colours by
+    **`gᵃ mod p` square-and-multiply** on 64-bit values, converging on a shared secret hue; also a
+    modexp-driven pseudo-random Lissajous. *Stresses:* `__umoddi3` (64-bit `%`) as the **hot** op inside a
+    square-and-multiply loop — neither #22's 64-bit hash (mul/shift/xor) nor #27's 16/32-bit `%`. *Shows:*
+    two paint-swatches mixing to an identical secret colour, keys scrolling.
+
+### Data structures & algorithms the battery never ran
+
+62. **Percolation / Kruskal maze — union-find path compression.** Randomly union neighbouring cells, watching
+    clusters merge and a spanning path ignite the instant top connects to bottom (the percolation phase
+    transition). *Stresses:* **disjoint-set with path compression** — the `find` that chases parent pointers
+    *and rewrites them flat* in place; #18 (heap) / #31 (tree) never did this idiom. *Shows:* a grid of
+    cells fusing into ever-larger coloured regions until one percolates and lights the whole path.
+
+63. **Dynamic range-sum bars — Fenwick / binary-indexed tree.** A live signal whose windowed sums drive an
+    equaliser, maintained by a **Fenwick tree** (`i += i & -i` to update, `i -= i & -i` to query).
+    *Stresses:* the `i & -i` **low-bit-isolation** two's-complement trick in a prefix-sum loop — a codegen
+    shape nothing else emits. *Shows:* bars whose heights are O(log n) range sums, responding as points are
+    added/removed.
+
+64. **Radix-sort bars — non-comparison sort.** Animate a **counting/radix sort** of a bar array: histogram →
+    prefix-sum → scatter, one digit pass at a time, **zero comparisons**. *Stresses:* the compare-free
+    scatter-sort loop nest (histogram + prefix scan + stable scatter) — every #17 sort was comparison-based.
+    *Shows:* bars re-bucketing pass by pass, stable within each digit, converging to sorted.
+
+65. **Convex-hull rubber band — orientation cross-products.** Scattered moving points with their **convex
+    hull** snapping taut around them (gift-wrap / Graham scan). *Stresses:* signed 2-D **cross-product
+    orientation tests** (`(b−a)×(c−a)` sign) driving the branch decisions, plus an angular sort — never
+    exercised. *Shows:* a drifting point cloud wrapped by a live rubber-band hull.
+
+66. **Edit-distance / knapsack DP — 2-D table + backtrack.** Fill a **dynamic-programming table** (Levenshtein
+    or 0/1-knapsack) cell by cell, then trace the optimal path back through it. *Stresses:* a doubly-indexed
+    memoised recurrence with data-dependent `min`/`max` reductions (also `G_SMIN`/`G_SMAX`) + a backtrack
+    pointer walk — a new loop/GEP shape. *Shows:* the DP grid filling with a heat gradient, then the optimal
+    alignment / packing path lighting up through it.
+
+67. **Huffman decode reveal — bit-stream tree walk.** A compressed image decoded by a **bit-granular reader**
+    (MSB-first) descending a **pointer-linked Huffman tree**, one bit per edge, emitting a symbol at each
+    leaf. *Stresses:* the bit-reader (`code = (code<<1)|nextbit`) + tree-descent — distinct from #49's
+    *byte*-oriented LZ back-refs. *Shows:* the classic progressive "image decoding in" reveal, bit by bit.
+
+### Rendering & geometry techniques with distinct codegen
+
+68. **Gradient-noise flow field — Perlin.** A flowing field where **Perlin gradient noise** (permutation
+    table + Hermite **fade polynomial** `6t⁵−15t⁴+10t³` + gradient dot products + lerp) advects particles or
+    warps a texture. *Stresses:* the perm-index + fade-polynomial + dot-of-gradients + interpolation pipeline
+    — value-noise/plasma/CA never did gradient noise. *Shows:* organic drifting smoke / marble / flow-field
+    streamlines.
+
+69. **Gouraud triangle tumbler — barycentric edge functions.** A spinning solid whose faces are **filled and
+    colour-interpolated** via edge-function rasterisation (three cross-product edge fns; inside = all signs
+    agree; barycentric weights shade each pixel). *Stresses:* the edge-function sign tests + per-pixel
+    barycentric interpolation inner loop — #16 drew wireframe **lines** only. *Shows:* a smoothly Gouraud-
+    shaded rotating icosahedron / gem.
+
+70. **Error-diffusion camera — Floyd–Steinberg dither.** Reduce a smooth animated gradient scene to few
+    colours by **Floyd–Steinberg error diffusion**, spreading the signed quantisation residual to
+    down-right neighbours (7/16, 3/16, 5/16, 1/16) with saturation. *Stresses:* forward-carried **signed**
+    error propagation + clamp across a scanline sweep — #7's fire was decay+PRNG, not error diffusion.
+    *Shows:* a smooth scene resolving into shimmering ordered dither, the error visibly flowing.
+
+71. **Marching-squares contours — 16-case edge LUT.** Extract and animate the **iso-contours** of a scalar
+    field (drifting metaball sum) via **marching squares**: a 16-entry case table selects which cell edges
+    the contour crosses, then linear interpolation places the crossing. *Stresses:* the 16-case edge **LUT
+    dispatch** + edge-crossing lerp — #45 rendered the metaball *field*; the contour is a separate case-table
+    + interpolation. *Shows:* glowing iso-lines snaking around merging/splitting blobs.
+
+72. **3-D cellular automaton cube — multi-dimensional indexing.** A rotating **voxel cube** running a 3-D
+    life-like automaton in a true `uint8 grid[Z][Y][X]` array with non-power-of-2 dimensions. *Stresses:*
+    **compiler-generated N-D array address arithmetic** (`z*Y*X + y*X + x` GEP multiplies) — every prior grid
+    was 1-D or hand-indexed. *Shows:* a slowly tumbling cube of cells being born and dying in 3-D.
+
+## Round 4 first picks
+
+Sharpest at opening a code path the first 52 never run:
+
+- **#53 bit-census (`popcount`/`clz`/`ctz`)** — the entire **bit-population intrinsic family**, never emitted
+  once in 52 demos, plus the inline `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree lowering. Largest brand-new
+  surface, and an integer-exact differential.
+- **#56 rotozoom (`G_UMULH`)** — the **multiply-high** recognition the fixed-point demos never triggered
+  (they forced full `__mulsi3`), wrapped in the most eye-catching visual of the set.
+- **#57 median network (`G_SMIN`/`G_SMAX`/`G_ABS`)** — branchless min/max/abs as the hot op, a different
+  lowering from #44's carry/V-flag saturation.
+- **#60 `div()`/`div_t`** — the libc struct-return-by-value *over* the custom `G_SDIVREM` stack-temp
+  legalizer, two ABI paths braided together that #39/#43's bare `/`,`%` never touched.
+- **#62 union-find percolation** — path-compression pointer-chase-and-flatten, a data structure neither
+  #18's heap nor #31's tree exercised, with a gorgeous phase-transition visual.
+
+Each would be built on `snesgfx` the same way as the first 52: a shared host+target logic header, a
+`dev/run.sh <name>` differential gate, and a two-emulator screenshot — the picture *is* the proof.
