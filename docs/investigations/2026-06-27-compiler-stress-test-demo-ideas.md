@@ -484,7 +484,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **Fenwick / binary-indexed tree** — `i & -i` low-bit isolation in a range-sum loop | the `i += i & -i` two's-complement bit trick is a codegen shape nothing else emits | ~~63~~ ✓ |
 | **non-comparison sort** — counting/radix: histogram + prefix-sum + scatter, **zero compares** | #17's sorts were all comparison-based; a compare-free scatter sort is a different loop nest | ~~64~~ ✓ |
 | **computational-geometry orientation** — cross-product **sign** tests + angular sort (convex hull) | signed 2-D cross products driving branch decisions; never exercised | ~~65~~ ✓ |
-| **2-D dynamic-programming table** — memoised recurrence + `max`/`min` reductions + backtrack pointer walk | a doubly-indexed table fill with data-dependent reductions; a new loop/GEP shape | 66 |
+| **2-D dynamic-programming table** — memoised recurrence + `max`/`min` reductions + backtrack pointer walk | a doubly-indexed table fill with data-dependent reductions; a new loop/GEP shape | ~~66~~ ✓ |
 | **Huffman bit-stream decode** — MSB-first bit reader + pointer-linked tree descent | #49 was *byte*-oriented LZ back-refs; a *bit*-granular reader + tree walk is distinct | 67 |
 | **gradient (Perlin) noise** — permutation table + fade **polynomial** + gradient dot + lerp | value-noise/plasma/CA never did the perm-index + Hermite-fade + dot-product-of-gradients pipeline | 68 |
 | **barycentric edge-function raster** — 3 cross-product edge fns + per-pixel interpolation | #16 drew wireframe **lines** only; solid interpolated fill is a different inner loop | 69 |
@@ -578,11 +578,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     orientation tests** (`(b−a)×(c−a)` sign) driving the branch decisions, plus an angular sort — never
     exercised. *Shows:* a drifting point cloud wrapped by a live rubber-band hull.~~ ✓ [/snes/hull/](https://biohack.net/snes/hull/) — bit-exact `host==default==a16==xy16==0x84E3`; gift-wrap (Jarvis) picks vertices from the sign of the **int32** cross product (cast to avoid 16-bit overflow), `__mulsi3`+`cmp`; amber rubber-band hull around a drifting cyan point cloud; gate cross-checks the hull is valid (all points left of every edge). Clean positive, no bug. ([plan](../plans/2026-06-30-65-snes-hull.md))
 
-66. **Edit-distance / knapsack DP — 2-D table + backtrack.** Fill a **dynamic-programming table** (Levenshtein
+66. ~~**Edit-distance / knapsack DP — 2-D table + backtrack.** Fill a **dynamic-programming table** (Levenshtein
     or 0/1-knapsack) cell by cell, then trace the optimal path back through it. *Stresses:* a doubly-indexed
     memoised recurrence with data-dependent `min`/`max` reductions (also `G_SMIN`/`G_SMAX`) + a backtrack
     pointer walk — a new loop/GEP shape. *Shows:* the DP grid filling with a heat gradient, then the optimal
-    alignment / packing path lighting up through it.
+    alignment / packing path lighting up through it.~~ ✓ [/snes/editdist/](https://biohack.net/snes/editdist/) — bit-exact `host==default==a16==xy16==0xFB59`; Levenshtein `D[i][j]=min(sub,del,ins)` 2-D table + backtrack (min-of-3 `cmp`, doubly-indexed `D[i][j]`); cost heat-map with the traced alignment path, cycling word pairs; gate cross-checks symmetry `edit(A,B)==edit(B,A)`. Clean positive, no bug. ([plan](../plans/2026-06-30-66-snes-editdist.md))
 
 67. **Huffman decode reveal — bit-stream tree walk.** A compressed image decoded by a **bit-granular reader**
     (MSB-first) descending a **pointer-linked Huffman tree**, one bit per edge, emitting a symbol at each

@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  editdist:
+    desc: "#66: Edit-distance DP — for each word pair the (m+1)x(n+1) Levenshtein table D[i][j] is filled by the min-recurrence D[i][j]=min(sub,del,ins), then the optimal alignment is backtracked from D[m][n] to D[0][0]. Drawn as a cost heat-map with the path lit. A 2-D dynamic-programming table (true D[i][j] addressing) + min-recurrence + backtrack, none of the first 65 demos run. Gate cross-checks symmetry (edit(A,B)==edit(B,A)). Assert corpus_result (editdist_gate_crc 0xFB59) == host on MAME + bsnes-jg + disasm gate. Leaves build/editdist.sfc + build/editdist-{mame,jg}.png."
+    cmds:
+      - dev/run.sh editdist
+
+  editdist-play:
+    desc: "PLAY the Edit-Distance DP demo in a MAME window on this host (builds the ROM first if needed). Shows the Levenshtein DP table as a cost heat-map with the optimal alignment path traced through it."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/editdist.sfc ]; then
+          echo "==> build/editdist.sfc missing — building it (dev/run.sh editdist)…"
+          dev/run.sh editdist
+        fi
+      - task: mandel-mame
+        vars: { ROM: editdist }
+
   hull:
     desc: "#65: Convex hull rubber-band — a cloud of points drifts and bounces; each frame the convex hull is recomputed by gift-wrapping (Jarvis march) purely from the SIGN of the signed 2-D cross product (int32 to avoid overflow), and drawn as a taut rubber band. A computational-geometry orientation test none of the first 64 demos run. Gate cross-checks the hull is valid (all points left of every edge). Assert corpus_result (hull_gate_crc 0xA58C) == host on MAME + bsnes-jg + disasm gate (__mulsi3 cross, cmp sign tests). Leaves build/hull.sfc + build/hull-{mame,jg}.png."
     cmds:
