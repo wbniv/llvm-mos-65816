@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/fcc842e) | docs(plan-index): point #50 cgrade row at its commit 4f6558f |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4f6558f) | #50 Many-Argument Color-Grade Kernel SNES demo — >register-count arg spill (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/bd155f8) | docs(plan-index): point #49 lzdec row at its commit 149bfdf |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/149bfdf) | #49 LZ77 Image-Decompress Reveal SNES demo — back-references from own output (clean positive) |
@@ -121,6 +122,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+fcc842e	author	Will Norris
+fcc842e	added	1
+fcc842e	deleted	1
+fcc842e	files	1
+fcc842e	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4f6558f	author	Will Norris
 4f6558f	added	1
 4f6558f	deleted	0
