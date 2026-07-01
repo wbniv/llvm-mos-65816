@@ -468,7 +468,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | New codegen corner | Why bugs hide there | Demos |
 |---|---|---|
 | **bit-population intrinsics** — `__popcountsi2`/`__clzsi2`/`__ctzsi2`/`__paritysi2`/`__ffssi2` + inline `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree (`.lower()` @308) | never emitted once in 52 demos; the inline lowering is a multi-branch shift sequence with its own edge cases (zero-input, width) | ~~53~~ ✓ |
-| **byte-swap / bit-reverse intrinsics** — `__bswapsi2`; `G_BITREVERSE.lower()` @186 | #25/#28 reversed bits by *hand*; the clang builtin → generic-opcode → lowering path is untested | 54 |
+| **byte-swap / bit-reverse intrinsics** — `__bswapsi2`; `G_BITREVERSE.lower()` @186 | #25/#28 reversed bits by *hand*; the clang builtin → generic-opcode → lowering path is untested | ~~54~~ ✓ |
 | **finite-field GF(2⁸) / carryless multiply** — XOR-accumulate + log/antilog table, no carry | a whole ALU profile with **no `adc` carry chain** — pure XOR + table; never exercised | 55 |
 | **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (`(a*b)>>16` recognised) | fixed-point demos forced full `__mulsi3`; the *high-half* recognition + its extend/trunc is a distinct path | 56 |
 | **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281 | select+icmp lowering as the **hot** op (sorting network / clamp); #44 was carry/V-flag, not select | 57 |
@@ -499,11 +499,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     `G_CTPOP`/`G_CTLZ`/`G_CTTZ` shift-tree lowering (`.lower()` @308) at 16- and 32-bit — never emitted in
     52 demos. *Shows:* a breathing, scrolling bit-census texture that morphs as the function cycles.~~ ✓ [/snes/bitcensus/](https://biohack.net/snes/bitcensus/) — bit-exact `host==default==a16==xy16==0x9516`; **MEASURED:** the `ll` builtins **inline-lower** (SWAR masks `#$55`/`#$33` in the disasm), the `__*di2` helpers are never called; clean positive, no bug. Width-safe via the 64-bit `ll` variants. ([plan](../plans/2026-06-30-53-snes-bitcensus.md))
 
-54. **Perfect-shuffle transition — `bswap` + `bit-reverse`.** A screen transition that permutes an image by
+54. ~~**Perfect-shuffle transition — `bswap` + `bit-reverse`.** A screen transition that permutes an image by
     routing each pixel's index through **`__builtin_bswap32` and `__builtin_bitreverse`**, scrambling then
     perfectly un-scrambling it (a radix-reversal / butterfly-network shuffle). *Stresses:* `__bswapsi2` and
     `G_BITREVERSE.lower()` (@186) — the **intrinsic** path, distinct from #25/#28's hand-rolled reversal
-    loops. *Shows:* an image dissolving through a digital "riffle shuffle" and snapping back whole.
+    loops. *Shows:* an image dissolving through a digital "riffle shuffle" and snapping back whole.~~ ✓ [/snes/bitshuffle/](https://biohack.net/snes/bitshuffle/) — bit-exact `host==default==a16==xy16==0x2A4A`; bit-reversal is an involution (scramble==unscramble); both builtins **inline-lower** (`G_BITREVERSE` mask-swap cascade `#$aa`/`#$cc`; `bswap32`→byte moves, no `__bswapsi2`). `__builtin_bitreverse` is clang-only → gcc host uses a SWAR reference. Clean positive, no bug. ([plan](../plans/2026-06-30-54-snes-bitshuffle.md))
 
 55. **Reed–Solomon glyph — GF(2⁸) carryless multiply.** Finite-field arithmetic over GF(2⁸) via **log/antilog
     tables and XOR** (Galois multiply, no carry) building a QR-style codeword whose parity symbols repair

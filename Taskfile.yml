@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  bitshuffle:
+    desc: "#54: Perfect-shuffle transition — a source image is permuted by the bit-reversal of each cell's index (__builtin_bitreverse32, G_BITREVERSE inline mask-swap cascade; involution → scramble/unscramble), byte-swap recolour via __builtin_bswap32. Assert corpus_result (bitshuffle_gate_crc 0x2A4A) == host on MAME + bsnes-jg + disasm gate (bitrev masks 0xAA/0xCC, rep/sep). Leaves build/bitshuffle.sfc + build/bitshuffle-{mame,jg}.png."
+    cmds:
+      - dev/run.sh bitshuffle
+
+  bitshuffle-play:
+    desc: "PLAY the Perfect-Shuffle Transition demo in a MAME window on this host (builds the ROM first if needed). Shows an image scramble into bit-reversed order and un-scramble, with a byte-swap recolour."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/bitshuffle.sfc ]; then
+          echo "==> build/bitshuffle.sfc missing — building it (dev/run.sh bitshuffle)…"
+          dev/run.sh bitshuffle
+        fi
+      - task: mandel-mame
+        vars: { ROM: bitshuffle }
+
   bitcensus:
     desc: "#53: Bit-census field — each cell's colour is a bit-population count (popcount/clz/ctz/parity) of a 64-bit value from its (x,y,time), cycling the four __builtin_*ll intrinsics; they inline-lower via G_CTPOP/G_CTLZ/G_CTTZ (SWAR masks 0x55/0x33 in the disasm). XOR-fractal / magnitude / ruler / checker textures. Assert corpus_result (bitcensus_gate_crc 0x9516) == host on MAME + bsnes-jg + disasm gate. Leaves build/bitcensus.sfc + build/bitcensus-{mame,jg}.png."
     cmds:
