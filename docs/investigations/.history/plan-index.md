@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e134e54) | #37 Sparse-Switch Step-Sequencer VM SNES demo — comparison-tree opcode dispatch |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f77a7e3) | docs(plan-index): point #36 polyfill row at its commit cdb8641 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/cdb8641) | #36 Polygon Scanline Fill (VLA) SNES demo — runtime-sized C99 VLA edge table |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/14fa754) | docs(plan-index): point #48 iir-scope row at its commit f3e3393 |
@@ -100,6 +101,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+e134e54	author	Will Norris
+e134e54	added	1
+e134e54	deleted	0
+e134e54	files	1
+e134e54	body	Demo #37 of the compiler stress-test battery — the sparse-switch member. A tiny\nregister VM runs a looping bytecode song; its opcode dispatch is a switch over 14\nNON-CONTIGUOUS byte cases (0x00..0xF0) that the compiler must lower to a\nbinary-search comparison tree, not a jump table (#29a) or computed goto (#38).\nThe 8 registers drive an 8-bar equalizer light show.\n\nClean positive, NO compiler bug: host==default==+mos-a16==+mos-xy16==0xE8C5 on\nbsnes-jg, -verify-machineinstrs clean under a16 and xy16. Disasm gate confirms\nthe comparison-tree shape: cmp/cpx/cpy=22, indexed-indirect jmp=0, rep/sep=30.\nControl-flow only (no __mul/__udiv). MAME leg SKIP (no SPC700 IPL, non-blocking).\n\nLive: https://biohack.net/snes/seqvm/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f77a7e3	author	Will Norris
 f77a7e3	added	1
 f77a7e3	deleted	1
