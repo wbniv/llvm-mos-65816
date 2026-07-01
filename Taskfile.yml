@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  iir-scope:
+    desc: "#48: IIR resonant-filter scope — recursive feedback dependency chain (y[n]=a1*y[n-1]+a2*y[n-2]+x[n], non-reorderable). Four plucked resonators on an oscilloscope. Assert corpus_result (iir_scope_gate_crc 0x5177) == host on MAME + bsnes-jg + disasm gate (__mulsi3 feedback multiply + rep/sep). Leaves build/iir-scope.sfc + build/iir-scope-{mame,jg}.png."
+    cmds:
+      - dev/run.sh iir-scope
+
+  iir-scope-play:
+    desc: "PLAY the IIR resonant-filter scope in a MAME window on this host (builds the ROM first if needed). Shows a plucked-chord oscilloscope trace ringing and decaying, chorus-wobbling."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/iir-scope.sfc ]; then
+          echo "==> build/iir-scope.sfc missing — building it (dev/run.sh iir-scope)…"
+          dev/run.sh iir-scope
+        fi
+      - task: mandel-mame
+        vars: { ROM: iir-scope }
+
   epicycles:
     desc: "#10: Fourier epicycles — a sum of 8 rotating vectors (DFT of a star) traces the outline; sin/cos-LUT sweep with 4 __mulsi3 per harmonic + 32-bit accumulate, NO divide (the many-multiply member). Assert corpus_result (epi_gate_crc 0x4F6C) == host on bsnes-jg (+ MAME if SPC700 IPL present) + disasm gate (__mulsi3 + rep/sep, divide=0). Leaves build/epicycles.sfc + build/epicycles-{jg,mame}.png."
     cmds:

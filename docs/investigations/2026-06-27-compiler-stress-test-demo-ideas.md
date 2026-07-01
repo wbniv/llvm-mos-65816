@@ -260,7 +260,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | **union type-punning** — `union{float;uint32}` aliased load/store, bit reinterpret | reading one storage as two types — the aliasing/reinterpret path | 45 |
 | **indirect comparator ABI** — `qsort` with a function-pointer comparator callback | #17's sorts were hand-written; libc `qsort` calls *back* per compare | 46 |
 | **iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt) | a convergent fixed-point loop, distinct from a single divide libcall | 47 |
-| **recursive feedback (IIR)** — `y[n]=a·y[n−1]+b·y[n−2]+x[n]` dependency chain | #25's FFT is feed-forward + reorderable; an IIR feedback chain can't be reordered | 48 |
+| **recursive feedback (IIR)** — `y[n]=a·y[n−1]+b·y[n−2]+x[n]` dependency chain | #25's FFT is feed-forward + reorderable; an IIR feedback chain can't be reordered | ~~48~~ |
 | **decode state machine + back-reference** — RLE/LZ decompression with output copy-back | a byte-stream decoder writing back-references into its own output (pointer arith) | 49 |
 | **>register-count argument spill** — functions with 8+ params passed on the soft stack | every prior call fits the register-arg budget; argument spilling is untested | 50 |
 | **resumable functions** — coroutine/protothread static-state switch (cooperative tasks) | local state preserved across re-entry via a saved case index | 51 |
@@ -353,10 +353,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     refinement** (a convergent reciprocal/sqrt loop). *Shows:* a racing perspective-mapped checker floor
     or tunnel.
 
-48. **Resonant-filter scope — IIR / Goertzel feedback.** A 2-pole **IIR resonator**
+48. ~~**Resonant-filter scope — IIR / Goertzel feedback.** A 2-pole **IIR resonator**
     (`y[n] = a·y[n−1] − b·y[n−2] + x[n]`) ringing on an impulse, or a Goertzel tone detector. *Stresses:*
     the **recursive feedback dependency chain** (can't be reordered like #25's feed-forward FFT). *Shows:*
-    an oscilloscope of a plucked, decaying resonance; or frequency bins lighting to a tune.
+    an oscilloscope of a plucked, decaying resonance; or frequency bins lighting to a tune.~~ ✓ [/snes/iir-scope/](https://biohack.net/snes/iir-scope/) — 4 plucked 2-pole resonators; `host==default==a16==xy16==0x49BD` on bsnes-jg, `__mulsi3=2`, `-verify` clean ×3. **No compiler bug.**
 
 49. **Image-decompress reveal — RLE/LZ back-references.** A compressed picture **decoded by a byte-stream
     state machine that copies back-references from its own output** (LZ77 sliding window). *Stresses:* the
@@ -387,4 +387,4 @@ Sharpest at opening a code path the first 32 never run:
 - **#35 `setjmp`/`longjmp`** — the context save/restore ABI; nothing else in 52 demos touches it (and may surface a toolchain gap). **⚠ BLOCKED — it surfaced exactly that gap: `longjmp` is broken on the 65816 (6502-only `setjmp.S`); see #35 above + [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md).**
 - ~~**#38 computed-`goto`** — a second VM that opens the *threaded-dispatch* path #29a's `switch` jump-table didn't.~~ ✓ [/snes/bf-vm/](https://biohack.net/snes/bf-vm/) — clean positive, no bug.
 - ~~**#44 saturating / `__builtin_add_overflow`** — flag-sequence codegen, plus a gorgeous additive-bloom visual.~~ ✓ [/snes/hdr-bloom/](https://biohack.net/snes/hdr-bloom/) — clean positive, no bug.
-- **#48 IIR feedback** — the non-reorderable recursive dependency chain the feed-forward FFT (#25) never exercised.
+- ~~**#48 IIR feedback** — the non-reorderable recursive dependency chain the feed-forward FFT (#25) never exercised.~~ ✓ [/snes/iir-scope/](https://biohack.net/snes/iir-scope/) — clean positive, no bug.

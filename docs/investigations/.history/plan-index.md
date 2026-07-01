@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4e90f14) | docs(plan-index): point #44 hdr-bloom row at its commit 0af9b34 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0af9b34) | #44 HDR Additive Bloom SNES demo — saturating / overflow-checked add |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e899f6) | docs(plan-index): point #38 bf-vm row at its commit f29be2f |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f29be2f) | #38 Brainfuck Threaded-Code VM SNES demo — computed-goto threaded dispatch |
@@ -95,6 +96,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+4e90f14	author	Will Norris
+4e90f14	added	1
+4e90f14	deleted	1
+4e90f14	files	1
+4e90f14	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0af9b34	author	Will Norris
 0af9b34	added	1
 0af9b34	deleted	0

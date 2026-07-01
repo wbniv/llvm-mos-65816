@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0af9b34) | #44 HDR Additive Bloom SNES demo — saturating / overflow-checked add |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f29be2f) | #38 Brainfuck Threaded-Code VM SNES demo — computed-goto threaded dispatch |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3399ad3) | demo battery finding: longjmp broken on 65816 (#35 blocked) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/661b01e) | #33 Double-Precision Mandelbrot SNES demo — 64-bit double soft-float |
@@ -35,6 +36,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+0af9b34	author	Will Norris
+0af9b34	added	4
+0af9b34	deleted	4
+0af9b34	files	1
+0af9b34	body	Round 3 compiler stress-test demo #44: the saturating / overflow-checked add\nmember. Six drifting lights stamp radial glows into an 8-bit intensity field\neach frame, summed with __builtin_add_overflow — each add clamps to 255 instead\nof wrapping, so where the glows overlap the field blows out to white (the HDR\nbloom look, done entirely in 8-bit integers, no float). The overflow builtin\nlowers to a carry-out add + carry branch (adc; bcs) — a flag-testing add\nsequence no earlier battery demo ran (adc=14, carry-branch=11, rep/sep=71;\ndeliberately no __mul/__udiv).\n\nDifferential: host == default == +mos-a16 == +mos-xy16 == 0xF951 on bsnes-jg,\n-verify clean across all three modes (MAME leg SKIP — no SPC700 IPL). No\ncompiler bug — __builtin_add_overflow lowers correctly on the 65816 across every\nbackend feature mode; the 16 genuinely-clamped cells prove the saturation branch\nitself is correct, not just the add.\n\nField on BG1 4bpp (16 solid-colour tiles, full-tilemap DMA per frame — the\ndoom-fire #7 model). The gate CRC is compute-heavy, so it runs behind the title\ncard (else startup is a long black screen + late corpus_result); the clamped-cell\ncount is split out of the per-frame step (gate-only) to keep the display path light.\n\nNew: examples/65816/hdr_bloom.h, examples/snes/hdr-bloom.c,\nexamples/snes/corpus/hdr_bloom_sim.c, tools/hdr-bloom-sim.c, dev/hdr-bloom.{sh,lua}.\nPublished: https://biohack.net/snes/hdr-bloom/ (biohack.net v1.0.153).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f29be2f	author	Will Norris
 f29be2f	added	4
 f29be2f	deleted	4
