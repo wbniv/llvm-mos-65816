@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a68142d) | docs(plan-index): add gallery-categories-netflix row + triage TODO inbox |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/c007bfe) | docs(plan-index): add #80 fabsridge row |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/8473d5b) | docs(plan-index): add #73 funnelkal row |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1549220) | docs(plan-index): point #72 grid3d row at its commit 3676149 |
@@ -169,6 +170,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+a68142d	author	Will Norris
+a68142d	added	1
+a68142d	deleted	0
+a68142d	files	1
+a68142d	body	Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 c007bfe	author	Will Norris
 c007bfe	added	1
 c007bfe	deleted	0
