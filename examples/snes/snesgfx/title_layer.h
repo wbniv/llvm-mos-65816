@@ -261,9 +261,12 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
       if (t->vofs_bot > (int16_t)TITLE_VOFS_BOT_TARGET) t->vofs_bot = (int16_t)TITLE_VOFS_BOT_TARGET;
     }
   } else if (t->restore) {
-    /* Ease-out: constant velocity, lines exit their respective edges. */
-    t->vofs_top += TITLE_EASEOUT_VEL;   /* line0 slides off top  */
-    t->vofs_bot -= TITLE_EASEOUT_VEL;   /* line1 slides off bottom */
+    /* Ease-out: constant velocity, lines exit their respective edges.
+       Clamp vofs_bot >= 0: a negative int16_t cast to uint16_t wraps the VOFS 9-bit value past
+       the tilemap boundary and line1 reappears at the TOP of the screen mid-exit. */
+    t->vofs_top += TITLE_EASEOUT_VEL;
+    t->vofs_bot -= TITLE_EASEOUT_VEL;
+    if (t->vofs_bot < 0) t->vofs_bot = 0;
   }
 
   /* Rebuild VOFS HDMA table — HDMA reads WRAM at next vblank automatically, no UpQ needed. */
@@ -330,12 +333,15 @@ static inline void title_begin(Display *d, TitleLayer *t, const char *line0, con
 static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
   display_hold(d, frames);
   t->restore = 1;
-  /* Run ease-out at FULL BRIGHTNESS until both lines clear their respective edges,
-     then fade to black. This keeps the sliding motion visible throughout. */
+  /* Run ease-out at FULL BRIGHTNESS until both lines have cleared their edges, then freeze and
+     fade to black.  vofs_bot is clamped to 0 in _title_emit so the exit condition vofs_bot<=0
+     fires safely; < 0 would require the value to have gone negative, which wraps BG2VOFS and
+     makes line1 reappear at the top of the screen for the duration of display_fade. */
   for (uint8_t g = 0; g < 80u; g++) {
     display_frame(d);
-    if (t->vofs_top > (int16_t)(TITLE_ROW0 * 8u) && t->vofs_bot < 0) break;
+    if (t->vofs_top > (int16_t)(TITLE_ROW0 * 8u) && t->vofs_bot <= 0) break;
   }
+  t->restore = 0;   /* freeze vofs before display_fade to prevent over-scroll past wrap boundary */
   display_fade(d, 0);
   d->tm |= t->demo_tm;               /* restore demo layers before hide_layer removes BG2 */
   display_hide_layer(d, (Drawable *)t);
