@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  cgrade:
+    desc: "#50: Many-argument color-grade kernel — a per-cell grade takes 10 int16 params (3 lifts, 3 gammas, gain, mix, bias + base), forcing the extras onto the soft stack (>register-count argument spilling). The coefficients sweep over time, re-grading a gradient. Assert corpus_result (cgrade_gate_crc 0x783F) == host on MAME + bsnes-jg + disasm gate (color_grade call, Lstatic_stack arg spill, rep/sep). Leaves build/cgrade.sfc + build/cgrade-{mame,jg}.png."
+    cmds:
+      - dev/run.sh cgrade
+
+  cgrade-play:
+    desc: "PLAY the many-arg color-grade demo in a MAME window on this host (builds the ROM first if needed). Shows a scene re-grading through looks."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/cgrade.sfc ]; then
+          echo "==> build/cgrade.sfc missing — building it (dev/run.sh cgrade)…"
+          dev/run.sh cgrade
+        fi
+      - task: mandel-mame
+        vars: { ROM: cgrade }
+
   lzdec:
     desc: "#49: LZ77/LZSS image-decompress reveal — a compressed picture decoded by a byte-stream state machine that copies back-references from its OWN output (LZ77 sliding window), then progressively revealed cell-by-cell. Assert corpus_result (lzdec_gate_crc 0x0100) == host on MAME + bsnes-jg + disasm gate (LZ_STREAM ref, output writes, no arith libcall, rep/sep). Leaves build/lzdec.sfc + build/lzdec-{mame,jg}.png."
     cmds:

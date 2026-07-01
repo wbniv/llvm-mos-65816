@@ -262,7 +262,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | ~~**iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt)~~ | ~~a convergent fixed-point loop, distinct from a single divide libcall~~ | ~~47~~ ✓ [/snes/nrecip/](https://biohack.net/snes/nrecip/) |
 | **recursive feedback (IIR)** — `y[n]=a·y[n−1]+b·y[n−2]+x[n]` dependency chain | #25's FFT is feed-forward + reorderable; an IIR feedback chain can't be reordered | ~~48~~ |
 | ~~**decode state machine + back-reference** — RLE/LZ decompression with output copy-back~~ | ~~a byte-stream decoder writing back-references into its own output (pointer arith)~~ | ~~49~~ ✓ [/snes/lzdec/](https://biohack.net/snes/lzdec/) |
-| **>register-count argument spill** — functions with 8+ params passed on the soft stack | every prior call fits the register-arg budget; argument spilling is untested | 50 |
+| ~~**>register-count argument spill** — functions with 8+ params passed on the soft stack~~ | ~~every prior call fits the register-arg budget; argument spilling is untested~~ | ~~50~~ ✓ [/snes/cgrade/](https://biohack.net/snes/cgrade/) |
 | **resumable functions** — coroutine/protothread static-state switch (cooperative tasks) | local state preserved across re-entry via a saved case index | 51 |
 | **cross-byte-boundary bitfields** — `uint32_t a:5,b:11,c:7,d:9` straddling bytes | #29b's fields fit one `uint16`; straddling fields force multi-byte shift + mask | 52 |
 
@@ -363,10 +363,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     **decode state machine + output back-reference pointer arithmetic**. *Shows:* the classic "image
     loading in" progressive reveal.~~ ✓ [/snes/lzdec/](https://biohack.net/snes/lzdec/) *(LZSS decoder, overlapping back-refs; 56B→256-cell diamond; bit-exact host==default==a16==xy16 `0x0100`; indirect `lda ($zp)` copy, 0 libcalls; no bug)*
 
-50. **Color-grade kernel — many-argument calling convention.** A per-pixel transform taking **8+
+50. ~~**Color-grade kernel — many-argument calling convention.** A per-pixel transform taking **8+
     coefficients** (lift/gamma/gain ×3 + mix), forcing arguments **onto the soft stack**. *Stresses:*
     **>register-count argument spilling** in the calling convention. *Shows:* a live scene re-grade
-    sweeping through looks.
+    sweeping through looks.~~ ✓ [/snes/cgrade/](https://biohack.net/snes/cgrade/) *(10-int16-arg `color_grade`, extras spill to `.noinit..Lstatic_stack`; bit-exact host==default==a16==xy16 `0x783F`; no bug)*
 
 51. **Cooperative critters — coroutines / protothreads.** Dozens of agents, each a **resumable
     switch-state function** (protothread) that yields and resumes, preserving local state across frames.

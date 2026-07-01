@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/bd155f8) | docs(plan-index): point #49 lzdec row at its commit 149bfdf |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/149bfdf) | #49 LZ77 Image-Decompress Reveal SNES demo — back-references from own output (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d936292) | docs(plan-index): point #47 nrecip row at its commit be11fd9 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/be11fd9) | #47 Newton-Raphson Reciprocal Floor SNES demo — multiply-only iterative refinement (clean positive) |
@@ -119,6 +120,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+bd155f8	author	Will Norris
+bd155f8	added	1
+bd155f8	deleted	1
+bd155f8	files	1
+bd155f8	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 149bfdf	author	Will Norris
 149bfdf	added	1
 149bfdf	deleted	0
