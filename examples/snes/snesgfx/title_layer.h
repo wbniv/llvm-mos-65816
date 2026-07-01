@@ -19,10 +19,10 @@
  *   screen_row = tilemap_y − VOFS  (mod tilemap height = 256 px)
  *   line0 @ y=96:  vofs_top 128→0 eases screen_row from −32 (above screen) to 96  (centre)
  *   line1 @ y=240: vofs_bot 0→128 eases screen_row from  240 (below screen) to 112 (centre)
- *   Ease-out (BOTH to bottom): vofs_top falls 0→−128 (screen_row_line0 = 96−vofs_top: 96→224 off
- *     screen); vofs_bot falls 128→0 (screen_row_line1 = 240−vofs_bot: 112→240 off screen). Both
- *     move at 3 px/frame, maintaining 16-px separation. The VOFS HDMA split tracks line0's bottom
- *     edge (split = 104−vofs_top) to prevent line1 (y=240) from also appearing in band A's window.
+ *   Ease-out (counter-slide): vofs_top rises 0→97+ (line0 exits top); vofs_bot falls 128→0
+ *     (line1 exits bottom, screen_row 112→240). "Both exit bottom" is geometrically impossible
+ *     with this layout: line0@y=96 and line1@y=240 are 144 tilemap px apart; a downward VOFS
+ *     sweep for band A simultaneously places line1 in band A's window from the top.
  *
  * Animation timing (at 60 fps):
  *   Ease-in  ~2 s (≈120 frames) — exponential decay, TITLE_FLYIN_SHIFT=6
@@ -264,32 +264,20 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
       if (t->vofs_bot > (int16_t)TITLE_VOFS_BOT_TARGET) t->vofs_bot = (int16_t)TITLE_VOFS_BOT_TARGET;
     }
   } else if (t->restore) {
-    /* Ease-out: BOTH lines exit to the BOTTOM at constant velocity.
-       vofs_top decreases (0→−128): screen_row_line0 = 96−vofs_top rises 96→224 (off screen).
-       vofs_bot decreases (128→0): screen_row_line1 = 240−vofs_bot rises 112→240 (off screen).
-       Both lines move at the same rate (3 px/frame) so they maintain 16-px separation throughout.
-       Clamps: vofs_top ≥ −128 (off-screen bottom for line0); vofs_bot ≥ 0 (off-screen for line1;
-       negative wraps VOFS and line1 reappears at the top). */
-    t->vofs_top -= TITLE_EASEOUT_VEL;
+    /* Ease-out: counter-slide — line0 exits top, line1 exits bottom.
+       vofs_top increases (0→97+): screen_row_line0 = 96−vofs_top falls 96→−1 (off screen top).
+       vofs_bot decreases (128→0): screen_row_line1 = 240−vofs_bot rises 112→240 (off screen bot).
+       Clamp vofs_bot ≥ 0: negative wraps VOFS and line1 reappears at the top.
+       Note: "both exit bottom" is geometrically unsound with this tilemap layout — line0 at y=96
+       and line1 at y=240 are 144 tilemap pixels apart; any downward-VOFS sweep for band A also
+       brings line1 into band A's visible window from the top, causing a double image. */
+    t->vofs_top += TITLE_EASEOUT_VEL;
     t->vofs_bot -= TITLE_EASEOUT_VEL;
-    if (t->vofs_top < -128) t->vofs_top = -128;
-    if (t->vofs_bot < 0)    t->vofs_bot = 0;
+    if (t->vofs_bot < 0) t->vofs_bot = 0;
   }
 
-  /* VOFS HDMA split: during ease-out, track line0's bottom edge so line1 (tilemap y=240) never
-     appears in band A's vofs_top window and causes a double image. During exit: screen_row_line0
-     = 96−vofs_top (linear), so split = (96−vofs_top)+8 = 104−vofs_top, clamped 1..223.
-     During fly-in / hold, use the fixed design split (TITLE_HDMA_SPLIT=108). */
-  uint8_t split;
-  if (t->restore) {
-    int16_t sp = (int16_t)(104 - t->vofs_top);
-    if (sp > 223) sp = 223;
-    if (sp < 1)   sp = 1;
-    split = (uint8_t)sp;
-  } else {
-    split = TITLE_HDMA_SPLIT;
-  }
-  hscroll2_build(&t->vscroll, split, t->vofs_top, t->vofs_bot);
+  /* Rebuild VOFS HDMA table — fixed split throughout; no dynamic tracking needed for counter-slide. */
+  hscroll2_build(&t->vscroll, TITLE_HDMA_SPLIT, t->vofs_top, t->vofs_bot);
 
   t->phase = (uint8_t)(t->phase + 1u);
   if (!t->restore) {
@@ -358,7 +346,7 @@ static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
      makes line1 reappear at the top of the screen for the duration of display_fade. */
   for (uint8_t g = 0; g < 80u; g++) {
     display_frame(d);
-    if (t->vofs_top <= -128 && t->vofs_bot <= 0) break;  /* both off screen below */
+    if (t->vofs_top > (int16_t)(TITLE_ROW0 * 8u) && t->vofs_bot <= 0) break;
   }
   t->restore = 0;   /* freeze vofs before display_fade to prevent over-scroll past wrap boundary */
   display_fade(d, 0);
