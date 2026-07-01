@@ -486,7 +486,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **computational-geometry orientation** — cross-product **sign** tests + angular sort (convex hull) | signed 2-D cross products driving branch decisions; never exercised | ~~65~~ ✓ |
 | **2-D dynamic-programming table** — memoised recurrence + `max`/`min` reductions + backtrack pointer walk | a doubly-indexed table fill with data-dependent reductions; a new loop/GEP shape | ~~66~~ ✓ |
 | **Huffman bit-stream decode** — MSB-first bit reader + pointer-linked tree descent | #49 was *byte*-oriented LZ back-refs; a *bit*-granular reader + tree walk is distinct | ~~67~~ ✓ |
-| **gradient (Perlin) noise** — permutation table + fade **polynomial** + gradient dot + lerp | value-noise/plasma/CA never did the perm-index + Hermite-fade + dot-product-of-gradients pipeline | 68 |
+| **gradient (Perlin) noise** — permutation table + fade **polynomial** + gradient dot + lerp | value-noise/plasma/CA never did the perm-index + Hermite-fade + dot-product-of-gradients pipeline | ~~68~~ ✓ |
 | **barycentric edge-function raster** — 3 cross-product edge fns + per-pixel interpolation | #16 drew wireframe **lines** only; solid interpolated fill is a different inner loop | 69 |
 | **error-diffusion (signed spread)** — Floyd–Steinberg propagate signed residual to neighbours + clamp | #7 doom-fire was decay+PRNG; forward-carried *signed* error with saturation is untested | 70 |
 | **marching-squares contour** — 16-case edge **LUT** + edge-crossing interpolation | #45 rendered the metaball *field*; extracting its iso-contour is a separate case-table + lerp | 71 |
@@ -591,11 +591,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 
 ### Rendering & geometry techniques with distinct codegen
 
-68. **Gradient-noise flow field — Perlin.** A flowing field where **Perlin gradient noise** (permutation
+68. ~~**Gradient-noise flow field — Perlin.** A flowing field where **Perlin gradient noise** (permutation
     table + Hermite **fade polynomial** `6t⁵−15t⁴+10t³` + gradient dot products + lerp) advects particles or
     warps a texture. *Stresses:* the perm-index + fade-polynomial + dot-of-gradients + interpolation pipeline
     — value-noise/plasma/CA never did gradient noise. *Shows:* organic drifting smoke / marble / flow-field
-    streamlines.
+    streamlines.~~ ✓ [/snes/perlin/](https://biohack.net/snes/perlin/) — bit-exact `host==default==a16==xy16==0xA72D`; permutation table (seeded Fisher-Yates) + inline Hermite fade `6t⁵−15t⁴+10t³` (Q0.8, `__mulsi3`-heavy) + 4-way gradient dot + lerp; banded recompute of a drifting smoke/marble field. Clean positive, no bug. ([plan](../plans/2026-06-30-68-snes-perlin.md))
 
 69. **Gouraud triangle tumbler — barycentric edge functions.** A spinning solid whose faces are **filled and
     colour-interpolated** via edge-function rasterisation (three cross-product edge fns; inside = all signs

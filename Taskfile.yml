@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  perlin:
+    desc: "#68: Perlin gradient-noise flow field — each cell's colour is 2-D Perlin noise of its (x,y) plus a scrolling time offset: a permutation table + the Hermite quintic fade polynomial 6t^5-15t^4+10t^3 + gradient dot products + lerp, all fixed-point. Flows like smoke/marble. The perm-index + fade-polynomial + dot-of-gradients + interpolation pipeline, none of the first 67 demos run. Assert corpus_result (perlin_gate_crc 0xA72D) == host on MAME + bsnes-jg + disasm gate (__mulsi3, PN_PERM). Leaves build/perlin.sfc + build/perlin-{mame,jg}.png."
+    cmds:
+      - dev/run.sh perlin
+
+  perlin-play:
+    desc: "PLAY the Perlin Noise demo in a MAME window on this host (builds the ROM first if needed). Shows a flowing smoke/marble field coloured by fixed-point Perlin gradient noise."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/perlin.sfc ]; then
+          echo "==> build/perlin.sfc missing — building it (dev/run.sh perlin)…"
+          dev/run.sh perlin
+        fi
+      - task: mandel-mame
+        vars: { ROM: perlin }
+
   huffman:
     desc: "#67: Huffman decode reveal — a 16x16 image is Huffman-encoded into a bitstream, then decoded bit by bit (pull one bit MSB-first, descend the pointer-linked Huffman tree left/right, emit a symbol at each leaf) and revealed a few pixels per frame — the classic image loading-in. A bit-granular stream reader + tree descent, distinct from #49's byte-oriented LZ. Gate cross-checks decode == original. Assert corpus_result (huffman_gate_crc 0xE8E4) == host on MAME + bsnes-jg + disasm gate (bit-shifts, tree refs). Leaves build/huffman.sfc + build/huffman-{mame,jg}.png."
     cmds:
