@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  msquares:
+    desc: "#71: Marching-squares iso-contours \u2014 a scalar field (sum of moving parabolic metaball domes) is sampled on a grid; each cell's 4 corners are thresholded into a 4-bit CASE index, a 16-entry const edge table (MS_SEG) says which cell edges the contour crosses, and each crossing is placed by edge-crossing interpolation t=(iso-va)/(vb-va) (a signed int32 divide). Bright iso-contour outlines around dim-filled merging/splitting blobs. Extracting the contour (vs #45 rendering the field) is a distinct case-table + lerp loop. Assert corpus_result (msquares_gate_crc 0x33EB) == host on MAME + bsnes-jg + disasm gate (MS_SEG refs, __divsi3). Leaves build/msquares.sfc + build/msquares-{mame,jg}.png."
+    cmds:
+      - dev/run.sh msquares
+
+  msquares-play:
+    desc: "PLAY the Marching-Squares demo in a MAME window on this host (builds the ROM first if needed). Shows iso-contours of a metaball field extracted by marching squares, blobs merging and splitting."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/msquares.sfc ]; then
+          echo "==> build/msquares.sfc missing \u2014 building it (dev/run.sh msquares)\u2026"
+          dev/run.sh msquares
+        fi
+      - task: mandel-mame
+        vars: { ROM: msquares }
+
   dither:
     desc: "#70: Floyd-Steinberg error-diffusion dither — a smooth drifting gradient reduced to 4 grey levels by Floyd-Steinberg error diffusion: each pixel's SIGNED quantisation residual is spread to its down-right neighbours (7/16, 3/16, 5/16, 1/16) so the next pixels see the accumulated error, and the smooth scene resolves into shimmering dither. Forward-carried signed error across a two-row error buffer, distinct from #7's decay+PRNG fire. Assert corpus_result (dither_gate_crc 0x80C4) == host on MAME + bsnes-jg + disasm gate (no wide mul/div libcalls, signed shifts). Leaves build/dither.sfc + build/dither-{mame,jg}.png."
     cmds:

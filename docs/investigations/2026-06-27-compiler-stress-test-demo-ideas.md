@@ -489,7 +489,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **gradient (Perlin) noise** — permutation table + fade **polynomial** + gradient dot + lerp | value-noise/plasma/CA never did the perm-index + Hermite-fade + dot-product-of-gradients pipeline | ~~68~~ ✓ |
 | **barycentric edge-function raster** — 3 cross-product edge fns + per-pixel interpolation | #16 drew wireframe **lines** only; solid interpolated fill is a different inner loop | ~~69~~ ✓ |
 | **error-diffusion (signed spread)** — Floyd–Steinberg propagate signed residual to neighbours + clamp | #7 doom-fire was decay+PRNG; forward-carried *signed* error with saturation is untested | ~~70~~ ✓ |
-| **marching-squares contour** — 16-case edge **LUT** + edge-crossing interpolation | #45 rendered the metaball *field*; extracting its iso-contour is a separate case-table + lerp | 71 |
+| **marching-squares contour** — 16-case edge **LUT** + edge-crossing interpolation | #45 rendered the metaball *field*; extracting its iso-contour is a separate case-table + lerp | ~~71~~ ✓ |
 | **multi-dimensional array indexing** — true `grid[z][y][x]` with non-pow-2 strides | every prior grid was 1-D or hand-indexed `y*W+x`; compiler-generated N-D GEP multiplies are untested | 72 |
 
 ## The twenty (each opens a corner the first 52 never run)
@@ -609,11 +609,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     error propagation + clamp across a scanline sweep — #7's fire was decay+PRNG, not error diffusion.
     *Shows:* a smooth scene resolving into shimmering ordered dither, the error visibly flowing.~~ ✓ [/snes/dither/](https://biohack.net/snes/dither/) — bit-exact `host==default==a16==xy16==0x80C4`, `-verify` clean ×2; two-row signed error buffer, residual split `(e*k)>>4` (arithmetic shift, no division), quantiser = 3 compares + 4-level LUT. A drifting gradient resolves into the 4-grey FS dither. Clean positive, no bug (incidental scene/index multiplies noted, cf #39). ([plan](../plans/2026-06-30-70-snes-dither.md))
 
-71. **Marching-squares contours — 16-case edge LUT.** Extract and animate the **iso-contours** of a scalar
+71. ~~**Marching-squares contours — 16-case edge LUT.** Extract and animate the **iso-contours** of a scalar
     field (drifting metaball sum) via **marching squares**: a 16-entry case table selects which cell edges
     the contour crosses, then linear interpolation places the crossing. *Stresses:* the 16-case edge **LUT
     dispatch** + edge-crossing lerp — #45 rendered the metaball *field*; the contour is a separate case-table
-    + interpolation. *Shows:* glowing iso-lines snaking around merging/splitting blobs.
+    + interpolation. *Shows:* glowing iso-lines snaking around merging/splitting blobs.~~ ✓ [/snes/msquares/](https://biohack.net/snes/msquares/) — correctness green `host==default==a16==xy16==0x86A7` on bsnes-jg; 4-bit corner-sign case → 16-entry `MS_SEG` edge LUT + edge-crossing interpolation divide (`__divsi3`); yellow iso-outline around dim-filled merging blobs. The `-verify` crash is the documented `a16-rc-undef-ra-pure-virtual` XFAIL (divide-heavy, code bit-exact correct). Demo field made multiply-free via incremental second-difference stepping, host-cross-checked vs `ms_field`. ([plan](../plans/2026-06-30-71-snes-msquares.md))
 
 72. **3-D cellular automaton cube — multi-dimensional indexing.** A rotating **voxel cube** running a 3-D
     life-like automaton in a true `uint8 grid[Z][Y][X]` array with non-power-of-2 dimensions. *Stresses:*
