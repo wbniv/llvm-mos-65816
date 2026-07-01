@@ -774,7 +774,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
 
 ### Float sign-bit, rounding and min/max lowering
 
-80. **Fabs Ridgeline: Folded Absolute Terrain.** *Stresses:* G_FABS via __builtin_fabsf(x) as the HOT op in a
+~~80. **Fabs Ridgeline: Folded Absolute Terrain.** *Stresses:* G_FABS via __builtin_fabsf(x) as the HOT op in a
     tent-map iteration x-next = 1.0f - fabsf(2.0f*x - 1.0f), one float op per statement, seeded across 128
     columns. Unlike demo 57 medfilt (integer G_ABS on int16, different opcode/legalizer at 281) and demo 45
     metaball (never takes a float absolute value: union bit-pun through the integer ALU). *Shows:* A 128x112
@@ -785,7 +785,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     (inline sign-clear is the only path); no header uses fabsf. *Differential:* correctly-rounded-float: fabsf
     is an exact single-bit clear (no rounding); other float ops are one-per-statement primitives (FMA-free) so
     host soft-float equals target bit-for-bit; fold quantized int16 pixel heights, not raw float bits; negative-
-    zero edge resolves identically.
+    zero edge resolves identically.~~ ✓ [/snes/fabsridge/](https://biohack.net/snes/fabsridge/) ([plan](../plans/2026-07-01-80-snes-fabsridge.md))
 
 81. **Copysign Compass: Vector-Field Sign Flow.** *Stresses:* G_FCOPYSIGN via __builtin_copysignf(mag,sign) on
     float flow components + __builtin_signbitf for HUD sign reading, mag/sign runtime-derived so not constant-
@@ -965,7 +965,7 @@ Sharpest at opening a code path the first 72 never run:
   terrible (G_FSHL/FSHR .lower() at 317) via two DIFFERENT hi/lo uint16 operands so matchFunnelShiftToRotate
   cannot rescue it. No demo emitted a funnel-shift node; the fragile double-source shift+or expansion is prime
   bug territory, and the CRC over row words catches any bit slip.
-- **#80 fabs-ridgeline** — First driver of the target-CUSTOM float path legalizeFAbs at 3410 (inline sign-bit
+- ~~**#80 fabs-ridgeline**~~ ✓ [/snes/fabsridge/](https://biohack.net/snes/fabsridge/) — First driver of the target-CUSTOM float path legalizeFAbs at 3410 (inline sign-bit
   AND, not the generic helper, no libcall) as the HOT per-column op in a tent-map iteration. Exact (fabsf is a
   pure bit-clear), so host equals target bit-exact while a brand-new custom legalizer runs 128x16 per frame; the
   negative-zero canonicalization edge is uniquely exercised.

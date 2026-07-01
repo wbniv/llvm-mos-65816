@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/91bd3fe) | feat(snes/funnelkal): #73 Funnel-Shift Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/4f1df40) | docs(ideas): add Round 5 (#73-#92) — twenty more new codegen corners |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3676149) | #72 3-D Grid Voxel Life SNES demo — multi-dimensional array indexing (clean positive, FINAL Round-4 demo) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a8e4ba1) | #71 Marching-Squares Iso-Contours SNES demo — 16-case edge LUT + edge interpolation (clean positive + rc-undef XFAIL witness) |
@@ -74,6 +75,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+91bd3fe	author	Will Norris
+91bd3fe	added	3
+91bd3fe	deleted	3
+91bd3fe	files	1
+91bd3fe	body	G_FSHL/G_FSHR two-source funnel shift via __builtin_elementwise_fshl(A,B,k)/fshr\nwith A!=B, so matchFunnelShiftToRotate cannot fold to G_ROTL/G_ROTR, forcing the\n"terrible" .lower() expansion at MOSLegalizerInfo.cpp:317. No prior demo among the\n72 ever formed a two-source funnel node.\n\nGate: host==default==+mos-a16==+mos-xy16==0xEED4 on bsnes-jg (frame 500) and MAME.\nDisasm: ora=2 (OR steps of fshl+fshr), rep/sep=58. 5-way green, no compiler bug.\nPublished: https://biohack.net/snes/funnelkal/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4f1df40	author	Will Norris
 4f1df40	added	349
 4f1df40	deleted	2

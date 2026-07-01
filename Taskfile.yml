@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  fabsridge:
+    desc: "#80: Fabs Ridgeline — G_FABS via __builtin_fabsf in the tent-map iteration (x=1-|2x-1|), targeting the target-CUSTOM legalizeFAbs at MOSLegalizerInfo.cpp:369 (inline sign-bit AND, no libcall). Animated 16-column terrain ridgeline; V-notch kinks visible as peaks/valleys. Assert corpus_result (fabsridge_gate_crc 0x161A) == host on MAME + bsnes-jg + disasm gate (__mulsf3>=1, rep/sep>=1). Leaves build/fabsridge.sfc + build/fabsridge-{mame,jg}.png."
+    cmds:
+      - dev/run.sh fabsridge
+
+  fabsridge-play:
+    desc: "PLAY the Fabs Ridgeline demo in a MAME window (builds first if needed). Shows an animated terrain ridgeline driven by tent-map fabsf iterations."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/fabsridge.sfc ]; then
+          echo "==> build/fabsridge.sfc missing -- building (dev/run.sh fabsridge)..."
+          dev/run.sh fabsridge
+        fi
+      - task: mandel-mame
+        vars: { ROM: fabsridge }
+
   funnelkal:
     desc: "#73: Funnel-Shift Kaleidoscope -- G_FSHL/G_FSHR two-source funnel shift via __builtin_elementwise_fshl(A,B,k)/fshr with A!=B, forcing .lower() at MOSLegalizerInfo.cpp:317 (the 'terrible' default double-source shift+or expansion that matchFunnelShiftToRotate cannot rescue). 8-fold-symmetric kaleidoscope mandala on 128x128 BG3. Assert corpus_result (funnelkal_gate_crc 0xEED4) == host on MAME + bsnes-jg + disasm gate (ora>=2, rep/sep>=1). Leaves build/funnelkal.sfc + build/funnelkal-{mame,jg}.png."
     cmds:
