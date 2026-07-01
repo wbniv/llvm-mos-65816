@@ -472,7 +472,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **finite-field GF(2⁸) / carryless multiply** — XOR-accumulate + log/antilog table, no carry | a whole ALU profile with **no `adc` carry chain** — pure XOR + table; never exercised | ~~55~~ ✓ |
 | **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (`(a*b)>>16` recognised) | fixed-point demos forced full `__mulsi3`; the *high-half* recognition + its extend/trunc is a distinct path | ~~56~~ ✓ |
 | **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281 | select+icmp lowering as the **hot** op (sorting network / clamp); #44 was carry/V-flag, not select | ~~57~~ ✓ |
-| **NaN / unordered float compares** — `__unordsf2`/`__eqsf2`/`__nesf2` | #21/#33 used only ordered `<`; equality + unordered/NaN tests lower to different libcalls | 58 |
+| **NaN / unordered float compares** — `__unordsf2`/`__eqsf2`/`__nesf2` | #21/#33 used only ordered `<`; equality + unordered/NaN tests lower to different libcalls | ~~58~~ ✓ |
 | **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | 59 |
 | **`div_t` struct-return over custom `G_SDIVREM`** — libc `div()`/`ldiv()` (@229, `legalizeDivRem`) | combines aggregate-return ABI **and** the divrem stack-temp legalizer; #39/#43 used bare `/`,`%` | 60 |
 | **64-bit modular exponentiation** — `__umoddi3` as the *hot* op in square-and-multiply | #22 was 64-bit mul/shift/xor (hash), #27 was 16/32-bit `%`; a 64-bit `%`-per-iteration loop is neither | 61 |
@@ -525,12 +525,12 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     op — select+icmp chains, a different lowering from #44's carry/V-flag saturation. *Shows:* snow/speckle
     noise wiped to a clean image, side-by-side before/after, sweeping.~~ ✓ [/snes/medfilt/](https://biohack.net/snes/medfilt/) — bit-exact `host==default==a16==xy16==0x87FE`; 19-comparator median-of-9 network, `(a<b)?a:b` → `G_UMIN/G_UMAX .lower()` (@272) → `cmp`+branch (no cmov on 65816), abs → `G_ABS`; zero mul/div libcalls; gate cross-checks the network median vs an insertion-sort median (0 mismatches / 200k tuples). Clean positive, no bug. ([plan](../plans/2026-06-30-57-snes-medfilt.md))
 
-58. **Complex domain-colouring with poles — NaN/unordered float compares.** Plot a rational complex function
+58. ~~**Complex domain-colouring with poles — NaN/unordered float compares.** Plot a rational complex function
     `f(z) = (z²−1)/(z²+c)` by domain colouring; near its **poles** the divide yields ∞/NaN and the code
     branches on `isnan`/`isinf` (`x != x`) to paint singularities distinctly. *Stresses:* `__unordsf2` /
     `__eqsf2` / `__nesf2` — equality + unordered/NaN tests, never used (only the ordered `<`). *Differential:*
     fold the **colour index**, not raw NaN bits (see gotcha). *Shows:* a smooth phase-coloured field with
-    glowing pole singularities as `c` animates.
+    glowing pole singularities as `c` animates.~~ ✓ [/snes/domcol/](https://biohack.net/snes/domcol/) — bit-exact `host==default==a16==xy16==0xF3FD`; `isnan(x)=(x!=x)` → `__unordsf2` (the corner), one-reciprocal complex divide (`1/0=Inf`, `0*Inf=NaN`), folds the COLOUR INDEX not NaN bits; a guaranteed pole per gate iter. Soft-float is slow → 8×8 live "developing" render + palette shimmer, `GATE_N=4`. Clean positive, no bug. ([plan](../plans/2026-06-30-58-snes-domcol.md))
 
 59. **Powers-of-ten log ruler — 64-bit⇄float conversion.** A continuous logarithmic zoom from Planck length
     to the cosmos: a **`uint64` scale counter converted to `double`** each frame (`__floatdidf`) for

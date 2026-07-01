@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  domcol:
+    desc: "#58: Complex domain-colouring with poles — colours a grid by the rational map f(z)=(z^2-1)/(z^2+c); where z^2+c==0 the divide gives Inf/NaN and the code branches on isnan (x!=x -> __unordsf2, the unordered compare) / isinf to paint the poles, which drift as c moves. Folds the COLOUR INDEX, never raw NaN bits. Soft-float one-op-per-statement. Assert corpus_result (domcol_gate_crc 0x540B) == host on MAME + bsnes-jg + disasm gate (__unordsf2, __divsf3). Leaves build/domcol.sfc + build/domcol-{mame,jg}.png."
+    cmds:
+      - dev/run.sh domcol
+
+  domcol-play:
+    desc: "PLAY the Complex Domain-Colouring demo in a MAME window on this host (builds the ROM first if needed). Shows the poles of a rational complex map gliding across a colour field as the parameter drifts."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/domcol.sfc ]; then
+          echo "==> build/domcol.sfc missing — building it (dev/run.sh domcol)…"
+          dev/run.sh domcol
+        fi
+      - task: mandel-mame
+        vars: { ROM: domcol }
+
   medfilt:
     desc: "#57: Median denoiser — a salt-and-pepper-noised image is cleaned by a 3x3 median filter; a sweeping wipe shows denoised vs raw. The median-of-9 is a 19-comparator branchless sorting network of min/max compare-exchanges (the select idiom (a<b)?a:b = G_UMIN/G_UMAX .lower() @272 -> cmp+branch), + abs (G_ABS @281). Gate cross-checks the network median vs an insertion-sort median. Assert corpus_result (medfilt_gate_crc 0x87FE) == host on MAME + bsnes-jg + disasm gate (cmp density, no mul/div libcall). Leaves build/medfilt.sfc + build/medfilt-{mame,jg}.png."
     cmds:
