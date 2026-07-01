@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0cb5bca) | docs(audit): add biohack.net preview thumbnails to rebuild audit table |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/12041dd) | docs(audit): add VRAM/OAM/CGRAM init sweep to title-screen rebuild audit |
 
 <!--history-meta v1
+0cb5bca	author	Will Norris
+0cb5bca	added	37
+0cb5bca	deleted	37
+0cb5bca	files	1
+0cb5bca	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 12041dd	author	Will Norris
 12041dd	added	155
 12041dd	deleted	0

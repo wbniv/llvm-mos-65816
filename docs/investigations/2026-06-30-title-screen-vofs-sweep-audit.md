@@ -14,43 +14,48 @@ animation + mixed 8×8/16×16 font) and re-published to biohack.net v1.0.151.
 
 ## All-green gate results
 
-| Preview | Demo | Task | Hash | bsnes‑jg | MAME |
-|---|---|---|---|---|---|
-| <img src="https://biohack.net/play/preview/1d-ca.png" width="96"> | 1D Cellular Automaton | `1d-ca` | 0xAB2C | PASS | PASS |
-| <img src="https://biohack.net/play/preview/avalanche.png" width="96"> | 64-bit Avalanche | `avalanche` | 0x27EA | PASS | PASS |
-| <img src="https://biohack.net/play/preview/bhut.png" width="96"> | Barnes-Hut Galaxy | `bhut` | 0xEF0B | PASS | PASS |
-| <img src="https://biohack.net/play/preview/blossom.png" width="96"> | Blossom (Hopalong) | `blossom` | 0x9047 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/boids.png" width="96"> | Boids Flock | `boids` | 0xA8AB | PASS | PASS |
-| <img src="https://biohack.net/play/preview/buddhabrot.png" width="96"> | Buddhabrot | `buddha` | 0x7C31 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/burning-ship.png" width="96"> | Burning Ship | `burning-ship` | 0x6F2D | PASS | PASS |
-| <img src="https://biohack.net/play/preview/cardioid.png" width="96"> | Cardioid Times-Table | `cardioid` | 0x523B | PASS | PASS |
-| <img src="https://biohack.net/play/preview/cordic.png" width="96"> | CORDIC Rotator | `cordic` | 0x4D41 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/doom-fire.png" width="96"> | Doom Fire | `doom-fire` | 0x3C59 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/double-pendulum.png" width="96"> | Double Pendulum | `double-pendulum` | 0xE859 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/epicycles.png" width="96"> | Fourier Epicycles | `epicycles` | 0x4F6C | PASS | PASS |
-| <img src="https://biohack.net/play/preview/factorial.png" width="96"> | Factorial | `factorial` | 0x772F | PASS | PASS |
-| <img src="https://biohack.net/play/preview/fft.png" width="96"> | FFT Spectrum | `fft` | 0x6D7A | PASS | PASS |
-| <img src="https://biohack.net/play/preview/fn-plot.png" width="96"> | fn-plot | `fn-plot` | 0x2EBE | PASS | PASS |
-| <img src="https://biohack.net/play/preview/harmonograph.png" width="96"> | Harmonograph | `harmonograph` | 0x0EBB | PASS | PASS |
-| <img src="https://biohack.net/play/preview/hilbert.png" width="96"> | Hilbert Curve | `hilbert` | 0x5999 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/space-invaders.png" width="96"> | Space Invaders | `dev/run.sh invaders` | 0x9D57 | PASS | SKIP¹ |
-| <img src="https://biohack.net/play/preview/julia.png" width="96"> | Julia Set | `julia` | 0x3490 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/life.png" width="96"> | Conway's Life | `life` | 0xDDF1 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/lsystem.png" width="96"> | L-System Plant | `lsystem` | 0x79C3 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/mandel-float.png" width="96"> | Soft-Float Mandelbrot | `mandel-float` | 0x4169 | PASS | SKIP¹ |
-| <img src="https://biohack.net/play/preview/maze.png" width="96"> | Maze Gen+Solve | `maze` | 0x0749 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/n-body.png" width="96"> | N-Body Orbits | `n-body` | 0xCC65 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/newton.png" width="96"> | Newton Fractal | `newton` | 0x4D8B | PASS | PASS |
-| <img src="https://biohack.net/play/preview/raycaster.png" width="96"> | Raycaster Maze | `raycaster` | 0xB200 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/rdiff.png" width="96"> | React-Diffusion | `rdiff` | 0x5555 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/sort-race.png" width="96"> | Sorting Race | `sort-race` | 0xB28F | PASS | PASS |
-| <img src="https://biohack.net/play/preview/spigot.png" width="96"> | π Spigot + MC | `pi` | 0x7711 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/spirograph.png" width="96"> | Spirograph | `spirograph` | 0x32D4 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/tea.png" width="96"> | TEA Cipher | `tea` | 0xDF0E | PASS | PASS |
-| <img src="https://biohack.net/play/preview/truchet.png" width="96"> | Truchet Bitfields | `truchet` | 0xB3E6 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/turtle-vm.png" width="96"> | Bytecode VM Turtle | `turtle-vm` | 0x4007 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/vaprintf.png" width="96"> | va_arg Lissajous | `vaprintf` | 0xE1F3 | PASS | PASS |
-| <img src="https://biohack.net/play/preview/3d-wireframe.png" width="96"> | 3-D Wireframe | `dev/run.sh wireframe` | 0xE737 | PASS | PASS |
+**VRAM/video init key:**
+- ✓ = clean — all VRAM chr, tilemap, CGRAM, and OAM written before the first video-on frame
+- ⚠ M7 chr window = `m7_tilemap_clear` only DMA's VMDATAL (low bytes = tilemap); VMDATAH (high bytes = chr pixel data) left at random power-on state until the first image DMA completes. On bsnes-jg and real HW this can show garbage pixels for the duration of that window. (`vram_clear_all` in buddha/blossom does two passes — low byte then high byte — and is the correct fix.)
+- BGMODE-1 / snesgfx demos: `display_init` holds force-blank; each drawable's `reserve()` writes every chr tile and tilemap entry it references, and every CGRAM palette entry it uses, before TM enables that layer — verified per-demo below.
+
+| Preview | Demo | Task | Hash | bsnes‑jg | MAME | VRAM / video init |
+|---|---|---|---|---|---|---|
+| <img src="https://biohack.net/play/preview/1d-ca.png" width="96"> | 1D Cellular Automaton | `1d-ca` | 0xAB2C | PASS | PASS | ✓ BG3 2bpp; all tiles zeroed + tilemap written in reserve; palette 0 (4 entries) pushed before first frame |
+| <img src="https://biohack.net/play/preview/avalanche.png" width="96"> | 64-bit Avalanche | `avalanche` | 0x27EA | PASS | PASS | ⚠ M7 chr window — `m7_show()` called before `blit_in()`; chr bytes random until full matrix DMA (~seconds of compute). No `vram_clear_all`. |
+| <img src="https://biohack.net/play/preview/bhut.png" width="96"> | Barnes-Hut Galaxy | `bhut` | 0xEF0B | PASS | PASS | ✓ BG3 canvas: all 256 tiles zeroed + blank tile in reserve; palette 0 pushed; text font loaded |
+| <img src="https://biohack.net/play/preview/blossom.png" width="96"> | Blossom (Hopalong) | `blossom` | 0x9047 | PASS | PASS | ✓ M7 + `vram_clear_all` (two-pass DMA: low + high bytes to 0); palette loaded; progressive reveal |
+| <img src="https://biohack.net/play/preview/boids.png" width="96"> | Boids Flock | `boids` | 0xA8AB | PASS | PASS | ✓ OBJ layer; `sprite_set_init` hides all 128 sprites (Y=0xE0); sprite tile + OBJ palette loaded in reserve before first frame |
+| <img src="https://biohack.net/play/preview/buddhabrot.png" width="96"> | Buddhabrot | `buddha` | 0x7C31 | PASS | PASS | ✓ M7 + `vram_clear_all`; palette loaded; progressive band reveal |
+| <img src="https://biohack.net/play/preview/burning-ship.png" width="96"> | Burning Ship | `burning-ship` | 0x6F2D | PASS | PASS | ✓ BG1 4bpp solid tiles; 16 tiles written in reserve; tilemap cleared to tile 0 (black); palette 0 (16 entries) pushed on first emit |
+| <img src="https://biohack.net/play/preview/cardioid.png" width="96"> | Cardioid Times-Table | `cardioid` | 0x523B | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed before first frame |
+| <img src="https://biohack.net/play/preview/cordic.png" width="96"> | CORDIC Rotator | `cordic` | 0x4D41 | PASS | PASS | ✓ BG3 2bpp; static tilemap + face tiles written in reserve; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/doom-fire.png" width="96"> | Doom Fire | `doom-fire` | 0x3C59 | PASS | PASS | ✓ BG1 4bpp; 16 solid tiles written in reserve; tilemap cleared to tile 0; fire palette (16 entries) pushed on first emit |
+| <img src="https://biohack.net/play/preview/double-pendulum.png" width="96"> | Double Pendulum | `double-pendulum` | 0xE859 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/epicycles.png" width="96"> | Fourier Epicycles | `epicycles` | 0x4F6C | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/factorial.png" width="96"> | Factorial | `factorial` | 0x772F | PASS | PASS | ✓ BG3 text; font glyphs loaded; tilemap pre-filled with space tile; palette 0+2 pushed |
+| <img src="https://biohack.net/play/preview/fft.png" width="96"> | FFT Spectrum | `fft` | 0x6D7A | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/fn-plot.png" width="96"> | fn-plot | `fn-plot` | 0x2EBE | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/harmonograph.png" width="96"> | Harmonograph | `harmonograph` | 0x0EBB | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/hilbert.png" width="96"> | Hilbert Curve | `hilbert` | 0x5999 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/space-invaders.png" width="96"> | Space Invaders | `dev/run.sh invaders` | 0x9D57 | PASS | SKIP¹ | ✓ OBJ; all 128 sprite slots hidden in `sprite_set_init` (Y=0xE0); sprite chr + 8 OBJ palettes loaded before first frame |
+| <img src="https://biohack.net/play/preview/julia.png" width="96"> | Julia Set | `julia` | 0x3490 | PASS | PASS | ⚠ M7 chr window — `m7_show()` before `wipe_in()`; chr bytes random until progressive row reveal completes (~3 s of coarse-grid compute). No `vram_clear_all`. |
+| <img src="https://biohack.net/play/preview/life.png" width="96"> | Conway's Life | `life` | 0xDDF1 | PASS | PASS | ✓ BG3 2bpp; 225 grid tiles + blank zeroed in reserve; tilemap cleared; palette 0 (4 entries: black + green) written in reserve |
+| <img src="https://biohack.net/play/preview/lsystem.png" width="96"> | L-System Plant | `lsystem` | 0x79C3 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/mandel-float.png" width="96"> | Soft-Float Mandelbrot | `mandel-float` | 0x4169 | PASS | SKIP¹ | ⚠ M7 chr window — `m7_show()` before `boot_paint()`; chr bytes random until coarse grid uploaded (~3 s). No `vram_clear_all`. |
+| <img src="https://biohack.net/play/preview/maze.png" width="96"> | Maze Gen+Solve | `maze` | 0x0749 | PASS | PASS | ✓ BG3 2bpp; 48 maze tiles written in reserve; tilemap cleared; palette 0 (4 entries) pushed |
+| <img src="https://biohack.net/play/preview/n-body.png" width="96"> | N-Body Orbits | `n-body` | 0xCC65 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/newton.png" width="96"> | Newton Fractal | `newton` | 0x4D8B | PASS | PASS | ✓ BG1 4bpp; 16 solid tiles in reserve; tilemap shadow → tile 0/palette 0 (black); palettes 0–3 (64 entries) pushed on first emit. Source note: palette field deliberately `<< 10` not `<< 12` to avoid referencing uninitialised palettes 4–5. |
+| <img src="https://biohack.net/play/preview/raycaster.png" width="96"> | Raycaster Maze | `raycaster` | 0xB200 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed; canvas cleared + re-rendered every frame |
+| <img src="https://biohack.net/play/preview/rdiff.png" width="96"> | React-Diffusion | `rdiff` | 0x5555 | PASS | PASS | ✓ BG1 4bpp; 16 solid tiles in reserve; tilemap cleared to tile 0; palette 0 (16 entries: navy→white) pushed on first emit |
+| <img src="https://biohack.net/play/preview/sort-race.png" width="96"> | Sorting Race | `sort-race` | 0xB28F | PASS | PASS | ✓ BG3 2bpp; 9 fill-level tiles + font written in reserve; tilemap pre-filled with space; 4 palettes (16 entries, white/red/green/blue racers) pushed in reserve |
+| <img src="https://biohack.net/play/preview/spigot.png" width="96"> | π Spigot + MC | `pi` | 0x7711 | PASS | PASS | ✓ BG3 canvas + text; tiles zeroed; palette 0 pushed; digit panel pre-filled with spaces |
+| <img src="https://biohack.net/play/preview/spirograph.png" width="96"> | Spirograph | `spirograph` | 0x32D4 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/tea.png" width="96"> | TEA Cipher | `tea` | 0xDF0E | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/truchet.png" width="96"> | Truchet Bitfields | `truchet` | 0xB3E6 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/turtle-vm.png" width="96"> | Bytecode VM Turtle | `turtle-vm` | 0x4007 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/vaprintf.png" width="96"> | va_arg Lissajous | `vaprintf` | 0xE1F3 | PASS | PASS | ✓ BG3 canvas + text; tiles zeroed; palette 0 pushed |
+| <img src="https://biohack.net/play/preview/3d-wireframe.png" width="96"> | 3-D Wireframe | `dev/run.sh wireframe` | 0xE737 | PASS | PASS | ✓ BG3 canvas; tiles zeroed; palette 0 pushed; canvas cleared + redrawn every frame |
 
 ¹ MAME SKIP: no SPC700 IPL ROM (`dev/roms/s_smp/spc700.rom` — gitignored Nintendo content).
 Pre-existing non-blocker; bsnes-jg is the gate emulator.
@@ -116,20 +121,26 @@ hardware OAM every frame, so hardware OAM is clean from frame 1.
 
 **Mode-7 demos — the gap:**
 
-| Demo | `vram_clear_all()` | `m7_tilemap_clear()` | Verdict |
-|---|---|---|---|
-| `buddha.c` | ✓ (clears all 64 KB) | ✓ | Clean |
-| `blossom.c` | ✓ (clears all 64 KB) | ✓ | Clean |
-| `julia.c` | ✗ | ✓ | Partial — chr data VRAM not zeroed, but Mode-7 chr upload overwrites it |
-| `mandel-float.c` | ✗ | ✓ | Same as julia |
-| `mandel-display.c` | ✗ | ✓ | Same as julia |
-| `mandel-double.c` | ✗ | ✓ | **Confirmed garbage** (user-observed) |
+`m7_tilemap_clear()` uses `DMAP=0x08` (fixed source) to `$2118` (VMDATAL only) with
+`VMAIN_INC_LOW_1`. It zeros the tilemap low bytes but **never touches VMDATAH ($2119)**,
+which holds the chr pixel data (one byte per pixel, direct CGRAM index). The chr high bytes
+remain at random power-on state. `vram_clear_all()` (buddha/blossom) does two separate
+fixed-source DMA passes — one to `$2118`, one to `$2119` — and is the correct pattern.
 
-In Mode 7, VRAM holds interleaved tilemap bytes (even addresses) and chr bytes (odd
-addresses). `m7_tilemap_clear()` zeros the tilemap half. The chr half is overwritten by the
-DMA upload of the computed image. However there is a window — between enabling video and
-completing the first full-image upload — where uninitialized chr bytes can show through as
-garbage pixels. `buddha.c` and `blossom.c` avoid this by zeroing all 64 KB upfront.
+| Demo | `vram_clear_all()` | chr window before first image DMA | Verdict |
+|---|---|---|---|
+| `buddha.c` | ✓ (two-pass DMA) | none | ✓ Clean |
+| `blossom.c` | ✓ (two-pass DMA) | none | ✓ Clean |
+| `julia.c` | ✗ | ~3 s (coarse-grid compute before `wipe_in`) | ⚠ chr bytes random |
+| `mandel-float.c` | ✗ | ~3 s (coarse-grid compute before `boot_paint`) | ⚠ chr bytes random |
+| `avalanche.c` | ✗ | seconds (64-col compute before `blit_in`) | ⚠ chr bytes random |
+| `mandel-double.c` | ✗ | very long (double-prec compute) | ✗ Confirmed garbage |
+
+During each window: mode 7 is active, tilemap points to tiles 0–N, chr data for those tiles
+is random (uniform 0–255 CGRAM indices). The escape palette covers only indices 0–DN; values
+DN+1–255 index unwritten CGRAM entries, which are random (snes_ppu_reset_blank skips the
+CGRAM data port). On bsnes-jg (which randomizes power-on VRAM) and on real hardware,
+random chr values in this range produce garbage-colored pixels.
 
 ### Fix for mandel-double
 
