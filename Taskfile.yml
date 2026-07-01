@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  cosmzoom:
+    desc: "#59: Cosmic zoom ruler — a uint64 scale grows exponentially and is placed on a LOG ruler by converting it to float (so exponential growth reads as a linear sweep), then back to uint64 for the read-out. The conversions are __floatundisf / __fixunssfdi / __floatdisf / __fixsfdi — 64-bit int <-> float (#21/#33 converted only 32-bit ints). Assert corpus_result (cosm_gate_crc 0x502F) == host on MAME + bsnes-jg + disasm gate. Leaves build/cosmzoom.sfc + build/cosmzoom-{mame,jg}.png."
+    cmds:
+      - dev/run.sh cosmzoom
+
+  cosmzoom-play:
+    desc: "PLAY the Cosmic Zoom Ruler demo in a MAME window on this host (builds the ROM first if needed). Shows a log-scale bar sweeping linearly as a 64-bit scale grows exponentially through the powers of ten."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/cosmzoom.sfc ]; then
+          echo "==> build/cosmzoom.sfc missing — building it (dev/run.sh cosmzoom)…"
+          dev/run.sh cosmzoom
+        fi
+      - task: mandel-mame
+        vars: { ROM: cosmzoom }
+
   domcol:
     desc: "#58: Complex domain-colouring with poles — colours a grid by the rational map f(z)=(z^2-1)/(z^2+c); where z^2+c==0 the divide gives Inf/NaN and the code branches on isnan (x!=x -> __unordsf2, the unordered compare) / isinf to paint the poles, which drift as c moves. Folds the COLOUR INDEX, never raw NaN bits. Soft-float one-op-per-statement. Assert corpus_result (domcol_gate_crc 0x540B) == host on MAME + bsnes-jg + disasm gate (__unordsf2, __divsf3). Leaves build/domcol.sfc + build/domcol-{mame,jg}.png."
     cmds:

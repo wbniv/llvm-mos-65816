@@ -473,7 +473,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **widening multiply-high** — `G_UMULH`/`G_SMULH.lower()` @300 (`(a*b)>>16` recognised) | fixed-point demos forced full `__mulsi3`; the *high-half* recognition + its extend/trunc is a distinct path | ~~56~~ ✓ |
 | **branchless min/max/abs** — `G_SMIN`/`G_SMAX`/`G_UMIN`/`G_UMAX.lower()` @272, `G_ABS.custom()` @281 | select+icmp lowering as the **hot** op (sorting network / clamp); #44 was carry/V-flag, not select | ~~57~~ ✓ |
 | **NaN / unordered float compares** — `__unordsf2`/`__eqsf2`/`__nesf2` | #21/#33 used only ordered `<`; equality + unordered/NaN tests lower to different libcalls | ~~58~~ ✓ |
-| **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | 59 |
+| **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | ~~59~~ ✓ |
 | **`div_t` struct-return over custom `G_SDIVREM`** — libc `div()`/`ldiv()` (@229, `legalizeDivRem`) | combines aggregate-return ABI **and** the divrem stack-temp legalizer; #39/#43 used bare `/`,`%` | 60 |
 | **64-bit modular exponentiation** — `__umoddi3` as the *hot* op in square-and-multiply | #22 was 64-bit mul/shift/xor (hash), #27 was 16/32-bit `%`; a 64-bit `%`-per-iteration loop is neither | 61 |
 | **union-find / disjoint-set** — parent-array **path compression** (in-place pointer rewrite) | #18 (heap), #31 (tree) never did the find-with-compression pointer-chase-and-flatten idiom | 62 |
@@ -532,11 +532,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     fold the **colour index**, not raw NaN bits (see gotcha). *Shows:* a smooth phase-coloured field with
     glowing pole singularities as `c` animates.~~ ✓ [/snes/domcol/](https://biohack.net/snes/domcol/) — bit-exact `host==default==a16==xy16==0xF3FD`; `isnan(x)=(x!=x)` → `__unordsf2` (the corner), one-reciprocal complex divide (`1/0=Inf`, `0*Inf=NaN`), folds the COLOUR INDEX not NaN bits; a guaranteed pole per gate iter. Soft-float is slow → 8×8 live "developing" render + palette shimmer, `GATE_N=4`. Clean positive, no bug. ([plan](../plans/2026-06-30-58-snes-domcol.md))
 
-59. **Powers-of-ten log ruler — 64-bit⇄float conversion.** A continuous logarithmic zoom from Planck length
+59. ~~**Powers-of-ten log ruler — 64-bit⇄float conversion.** A continuous logarithmic zoom from Planck length
     to the cosmos: a **`uint64` scale counter converted to `double`** each frame (`__floatdidf`) for
     log-scale positioning, tick labels back via `__fixdfdi`. *Stresses:* `__floatdidf` / `__fixdfdi` /
     `__floatdisf` / `__fixsfdi` — 64-bit-integer↔float conversion, never done (correctly-rounded → bit-exact).
-    *Shows:* a smoothly gliding powers-of-ten ruler / scale-of-the-universe zoom.
+    *Shows:* a smoothly gliding powers-of-ten ruler / scale-of-the-universe zoom.~~ ✓ [/snes/cosmzoom/](https://biohack.net/snes/cosmzoom/) — bit-exact `host==default==a16==xy16==0x502F`; uint64 scale → float (`__floatundisf`) for log positioning + round-trip back (`__fixunssfdi`) + signed `__floatdisf`/`__fixsfdi`. Used **float not double** (ROM/speed); `scale<10^18` so `(float)v→(uint64)` can't overflow-UB. Clean positive, no bug. ([plan](../plans/2026-06-30-59-snes-cosmzoom.md))
 
 60. **Multi-base chronometer — `div()`/`ldiv()` `div_t` struct-return.** One instant shown simultaneously in
     decimal, dozenal, hex and sexagesimal, each digit split with the libc **`div()`/`ldiv()` returning
