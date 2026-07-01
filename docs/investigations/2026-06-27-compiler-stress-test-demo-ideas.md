@@ -480,7 +480,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **64-bit⇄float conversion** — `__floatdidf`/`__fixdfdi`/`__floatdisf`/`__fixsfdi` | float demos never converted a 64-bit integer to/from float; a wholly separate conversion libcall set | ~~59~~ ✓ |
 | **`div_t` struct-return over custom `G_SDIVREM`** — libc `div()`/`ldiv()` (@229, `legalizeDivRem`) | combines aggregate-return ABI **and** the divrem stack-temp legalizer; #39/#43 used bare `/`,`%` | ~~60~~ ✓ |
 | **64-bit modular exponentiation** — `__umoddi3` as the *hot* op in square-and-multiply | #22 was 64-bit mul/shift/xor (hash), #27 was 16/32-bit `%`; a 64-bit `%`-per-iteration loop is neither | ~~61~~ ✓ 🐞 |
-| **union-find / disjoint-set** — parent-array **path compression** (in-place pointer rewrite) | #18 (heap), #31 (tree) never did the find-with-compression pointer-chase-and-flatten idiom | 62 |
+| **union-find / disjoint-set** — parent-array **path compression** (in-place pointer rewrite) | #18 (heap), #31 (tree) never did the find-with-compression pointer-chase-and-flatten idiom | ~~62~~ ✓ |
 | **Fenwick / binary-indexed tree** — `i & -i` low-bit isolation in a range-sum loop | the `i += i & -i` two's-complement bit trick is a codegen shape nothing else emits | 63 |
 | **non-comparison sort** — counting/radix: histogram + prefix-sum + scatter, **zero compares** | #17's sorts were all comparison-based; a compare-free scatter sort is a different loop nest | 64 |
 | **computational-geometry orientation** — cross-product **sign** tests + angular sort (convex hull) | signed 2-D cross products driving branch decisions; never exercised | 65 |
@@ -556,11 +556,11 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 
 ### Data structures & algorithms the battery never ran
 
-62. **Percolation / Kruskal maze — union-find path compression.** Randomly union neighbouring cells, watching
+62. ~~**Percolation / Kruskal maze — union-find path compression.** Randomly union neighbouring cells, watching
     clusters merge and a spanning path ignite the instant top connects to bottom (the percolation phase
     transition). *Stresses:* **disjoint-set with path compression** — the `find` that chases parent pointers
     *and rewrites them flat* in place; #18 (heap) / #31 (tree) never did this idiom. *Shows:* a grid of
-    cells fusing into ever-larger coloured regions until one percolates and lights the whole path.
+    cells fusing into ever-larger coloured regions until one percolates and lights the whole path.~~ ✓ [/snes/percol/](https://biohack.net/snes/percol/) — bit-exact `host==default==a16==xy16==0x025B`; disjoint-set `find` with full path compression (walk to root, then re-point the whole path); wet region grows from the top until a white spanning cluster percolates to the bottom. Clean positive, no bug. ([plan](../plans/2026-06-30-62-snes-percol.md))
 
 63. **Dynamic range-sum bars — Fenwick / binary-indexed tree.** A live signal whose windowed sums drive an
     equaliser, maintained by a **Fenwick tree** (`i += i & -i` to update, `i -= i & -i` to query).
@@ -633,8 +633,8 @@ Sharpest at opening a code path the first 52 never run:
   lowering from #44's carry/V-flag saturation.~~ ✓ [/snes/medfilt/](https://biohack.net/snes/medfilt/) — clean positive; min/max `.lower()` → `cmp`+branch (no cmov), zero libcalls.
 - ~~**#60 `div()`/`div_t`** — the libc struct-return-by-value *over* the custom `G_SDIVREM` stack-temp
   legalizer, two ABI paths braided together that #39/#43's bare `/`,`%` never touched.~~ ✓ [/snes/multibase/](https://biohack.net/snes/multibase/) — clean positive; real `div`/`lldiv` calls returning `div_t`/`lldiv_t` by value.
-- **#62 union-find percolation** — path-compression pointer-chase-and-flatten, a data structure neither
-  #18's heap nor #31's tree exercised, with a gorgeous phase-transition visual.
+- ~~**#62 union-find percolation** — path-compression pointer-chase-and-flatten, a data structure neither
+  #18's heap nor #31's tree exercised, with a gorgeous phase-transition visual.~~ ✓ [/snes/percol/](https://biohack.net/snes/percol/) — clean positive; the wet region percolates into a white spanning cluster.
 
 Each would be built on `snesgfx` the same way as the first 52: a shared host+target logic header, a
 `dev/run.sh <name>` differential gate, and a two-emulator screenshot — the picture *is* the proof.

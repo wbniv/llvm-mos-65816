@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  percol:
+    desc: "#62: Union-find percolation — bond percolation on a 16x16 grid: random adjacent bonds union cells' sets (disjoint-set with PATH COMPRESSION: find chases parent pointers to the root and rewrites the whole path); cells connected to the top light up 'wet' until the wet region reaches the bottom (percolation), then reseeds. The corner: the union-find find-with-compression pointer flatten (distinct from #18's heap, #31's tree). Assert corpus_result (percol_gate_crc 0x025B) == host on MAME + bsnes-jg + disasm gate (parent-chase branches). Leaves build/percol.sfc + build/percol-{mame,jg}.png."
+    cmds:
+      - dev/run.sh percol
+
+  percol-play:
+    desc: "PLAY the Union-Find Percolation demo in a MAME window on this host (builds the ROM first if needed). Shows a wet region spreading from the top through random bonds until it percolates to the bottom."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/percol.sfc ]; then
+          echo "==> build/percol.sfc missing — building it (dev/run.sh percol)…"
+          dev/run.sh percol
+        fi
+      - task: mandel-mame
+        vars: { ROM: percol }
+
   dhmix:
     desc: "#61: Diffie-Hellman colour-mixer — two parties publish A=g^a mod p, B=g^b mod p, then both compute the shared secret g^(ab) mod p; three colour bands (Alice/shared/Bob) shift while the shared bands always agree. Hot op = 64-bit modulo (__umoddi3) in a square-and-multiply modpow. 🐞 FOUND+FIXED an a16/xy16 legalizer crash (G_UNMERGE_VALUES s64->s16 / G_ANYEXT s24; patch 0017). Assert corpus_result (dhmix_gate_crc 0xB7C4) == host on MAME + bsnes-jg + disasm gate (__umoddi3, __muldi3). Leaves build/dhmix.sfc + build/dhmix-{mame,jg}.png."
     cmds:
