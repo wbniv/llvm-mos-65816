@@ -1,6 +1,25 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-06-26 (**far-pointer-PHI legalization fix** — a far (addrspace 2) pointer used as a loop
+**Last updated:** 2026-06-30 (**`G_SCMP`/`G_UCMP` legalization fix — READY-TO-POST, upstream-standalone**.
+SNES demo #46 (`qsortviz`, a libc-`qsort` sort visualizer) caught a general backend crash: the standard C
+three-way-compare comparator idiom `return (x>y)-(x<y);` is canonicalized by clang to the generic opcode
+`G_SCMP`, and `MOSLegalizerInfo` had **no rule** for `G_SCMP`/`G_UCMP`, so the backend aborted with
+`unable to legalize instruction: %N:_(s16) = G_SCMP`. Fires in **default 8-bit, +mos-a16, and +mos-xy16
+alike**, at **every** integer width, in **both** `-fno-lto` and the LTO-link path — i.e. any program that
+`qsort`s with a spaceship comparator fails to build. **Unlike the #320/#321 far-pointer fixes below, this
+is NOT gated behind AS2/accum16 — it reproduces on plain vanilla `-mcpu=mosw65816` C, so it is directly
+upstream-standalone-testable** and belongs as its own ready-to-post issue+PR against `llvm-mos/llvm-mos`.
+Fix = one line in `llvm/lib/Target/MOS/MOSLegalizerInfo.cpp` next to the analogous min/max lowering:
+`getActionDefinitionsBuilder({G_SCMP, G_UCMP}).lower();` — routing to LLVM's existing
+`LegalizerHelper::lowerThreewayCompare` (icmp+select expansion the backend already legalizes). No
+generic-LLVM change. Carried as fork patch **`0016-mos-scmp-ucmp-legalize`**; regression-gated by
+`dev/run.sh qsortviz` (`corpus_result==0x8EA5`, 5-way differential + `-verify`) and the minimal repro in
+[`docs/plans/2026-06-30-46-snes-qsortviz.md`](plans/2026-06-30-46-snes-qsortviz.md). **Posting is
+user-triggered.** Suggested: an issue with the minimal repro + a PR with the one-line fix. `gh` commands to
+draft when posting:
+`gh issue create -R llvm-mos/llvm-mos -t "Backend abort: unable to legalize G_SCMP/G_UCMP (three-way compare) on MOS" -b "<minimal repro + backtrace>"`
+then a PR from a fork branch with the `0016` hunk. No GitHub state change yet — nothing posted.)
+Previously 2026-06-26 (**far-pointer-PHI legalization fix** — a far (addrspace 2) pointer used as a loop
 induction variable (`for(;n;p++) *p=…`) forms a `G_PHI` of a far (p2) pointer; the MOS legalizer made `G_PHI`
 legal only for `{s1,s8,p0,p1}`, NOT the 32-bit p2, so the backend ABORTED (`unable to legalize ... G_PHI (p2)`)
 on valid C. This **resolves the follow-up gap the far-memops entry below noted** (the reason `mem-far.c` is written

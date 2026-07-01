@@ -258,7 +258,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | ~~**signed 64-bit divide/mod** — `__divdi3`/`__moddi3` (sign-corrected)~~ | ~~#22 was *unsigned* 64-bit; signed div/mod is a distinct sign-handling libcall~~ | ~~43~~ ✓ [/snes/sodo/](https://biohack.net/snes/sodo/) (fires as combined `__divmoddi4`) |
 | **overflow-checked / saturating arithmetic** — `__builtin_add_overflow`, carry/V-flag tests + clamp | flag-testing add/sub sequences never stressed | ~~44~~ |
 | ~~**union type-punning** — `union{float;uint32}` aliased load/store, bit reinterpret~~ | ~~reading one storage as two types — the aliasing/reinterpret path~~ | ~~45~~ ✓ [/snes/metaball/](https://biohack.net/snes/metaball/) |
-| **indirect comparator ABI** — `qsort` with a function-pointer comparator callback | #17's sorts were hand-written; libc `qsort` calls *back* per compare | 46 |
+| ~~**indirect comparator ABI** — `qsort` with a function-pointer comparator callback~~ | ~~#17's sorts were hand-written; libc `qsort` calls *back* per compare~~ | ~~46~~ ✓ [/snes/qsortviz/](https://biohack.net/snes/qsortviz/) **🐞 caught+fixed `G_SCMP` backend crash** |
 | **iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt) | a convergent fixed-point loop, distinct from a single divide libcall | 47 |
 | **recursive feedback (IIR)** — `y[n]=a·y[n−1]+b·y[n−2]+x[n]` dependency chain | #25's FFT is feed-forward + reorderable; an IIR feedback chain can't be reordered | ~~48~~ |
 | **decode state machine + back-reference** — RLE/LZ decompression with output copy-back | a byte-stream decoder writing back-references into its own output (pointer arith) | 49 |
@@ -343,10 +343,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     **bit-hack reciprocal-sqrt** drives a field of merging blobs. *Stresses:* **union type-punning**
     (aliased load/store + float↔int bit reinterpret). *Shows:* gooey metaballs splitting and fusing.~~ ✓ [/snes/metaball/](https://biohack.net/snes/metaball/) *(Quake fast-inverse-sqrt, magic `0x5f3759df`; bit-exact host==default==a16==xy16 `0xAEBE`; `__mulsf3`+magic-byte immediates, one-op-per-statement soft-float; no bug)*
 
-46. **Sort visualizer — `qsort` + comparator callback.** Bars sorted by **libc `qsort` with a swappable
+46. ~~**Sort visualizer — `qsort` + comparator callback.** Bars sorted by **libc `qsort` with a swappable
     function-pointer comparator** (by height / hue / parity) — an **indirect call per comparison**.
     *Stresses:* the **`qsort` callback / indirect-comparator ABI**. *Shows:* the array animating as
-    different comparators reshuffle it.
+    different comparators reshuffle it.~~ ✓ [/snes/qsortviz/](https://biohack.net/snes/qsortviz/) **🐞 CAUGHT + FIXED A REAL BACKEND BUG** — the `(x>y)-(x<y)` comparator emits `G_SCMP`, which the mos legalizer couldn't lower (backend abort in default/a16/xy16 alike); fix = `G_SCMP`/`G_UCMP` `.lower()` (patch `0016`), queued upstream. Post-fix bit-exact host==default==a16==xy16 `0x8EA5`.
 
 47. **Perspective floor/tunnel — Newton-Raphson reciprocal.** A textured ground plane computing **`1/z`
     per span by iterative Newton refinement** (no hardware divide). *Stresses:* **iterative fixed-point

@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  qsortviz:
+    desc: "#46: libc qsort + comparator-callback sort visualizer — bars reshuffle then re-sort under a rotating function-pointer comparator (ascending / evens-first / descending), each a callback qsort invokes per comparison. CAUGHT A REAL BACKEND BUG: the (x>y)-(x<y) comparator emits G_SCMP which the mos legalizer could not lower (fixed). Assert corpus_result (qsortviz_gate_crc 0x8EA5) == host on MAME + bsnes-jg + disasm gate (qsort call, fn-ptr comparator table, rep/sep). Leaves build/qsortviz.sfc + build/qsortviz-{mame,jg}.png."
+    cmds:
+      - dev/run.sh qsortviz
+
+  qsortviz-play:
+    desc: "PLAY the qsort sort-visualizer demo in a MAME window on this host (builds the ROM first if needed). Shows bars reshuffling and re-sorting under rotating comparators."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/qsortviz.sfc ]; then
+          echo "==> build/qsortviz.sfc missing — building it (dev/run.sh qsortviz)…"
+          dev/run.sh qsortviz
+        fi
+      - task: mandel-mame
+        vars: { ROM: qsortviz }
+
   metaball:
     desc: "#45: Union type-pun fast-inverse-sqrt metaballs — a field of merging blobs whose 1/dist falloff is the Quake fast-inverse-sqrt bit hack (union{float f;uint32 i;} reads a float's storage AS an integer, mangles it with 0x5f3759df, reads it back AS a float). Assert corpus_result (metaball_gate_crc 0xAEBE) == host on MAME + bsnes-jg + disasm gate (__mulsf3, magic 0x5f3759df bytes, rep/sep). Leaves build/metaball.sfc + build/metaball-{mame,jg}.png."
     cmds:

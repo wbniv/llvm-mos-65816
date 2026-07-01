@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ba907ad) | docs(plan-index): point #45 metaball row at its commit 2b0b9a7 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/2b0b9a7) | #45 Union Type-Pun Metaballs SNES demo — Quake fast-inverse-sqrt (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/25b6b8e) | docs(plan-index): point #43 sodo row at its commit ca16265 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ca16265) | #43 Signed 64-bit Odometer SNES demo — sign-corrected __divmoddi4 (clean positive) |
@@ -113,6 +114,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+ba907ad	author	Will Norris
+ba907ad	added	1
+ba907ad	deleted	1
+ba907ad	files	1
+ba907ad	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2b0b9a7	author	Will Norris
 2b0b9a7	added	1
 2b0b9a7	deleted	0
