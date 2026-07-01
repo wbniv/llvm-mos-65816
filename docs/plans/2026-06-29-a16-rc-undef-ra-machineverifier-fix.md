@@ -87,6 +87,21 @@ coalescer leaves the dead copies as separate vregs the dead-MI pass then removes
 | `examples/65816/rcundef.c` (min repro = lifted `newton_step`) | ✅ | ✅ | ✅ | #1 fixed |
 | `newton_sim.c` | ✅ | ⚠️ #2 | ✅ | #1 fixed (`-Os`); `-O1` is #2 |
 | `lsystem_sim.c` | ✅ | ❌ #2 | ❌ #2 | #2 deferred (XFAIL kept) |
+| `gouraud_sim.c` (demo #69 — int32 barycentric-divide raster) | ✅ | ❌ #2 | ❌ #2 | #2 deferred (code bit-exact correct) |
+| `msquares_sim.c` (demo #71 — int32 edge-interpolation divide) | ✅ | ❌ #2 | ❌ #2 | #2 deferred (code bit-exact correct) |
+
+**New witnesses (2026-07-01, Round-4 demo battery).** `gouraud_sim.c` (#69) and `msquares_sim.c` (#71)
+reproduce Cause #2 at `-O1`/`-Os` under BOTH `+mos-a16` and `+mos-xy16` (`-O0` clean — the classic
+pressure signature), measured `Using an undefined physical register` (`renamable $x/$a = COPY killed
+renamable $rcN`). Both are **code-correct**: the full differential is green
+(`host==default==+mos-a16==+mos-xy16` — `0xC5E9` / `0x86A7` on bsnes-jg). These **broaden the known
+trigger population**: before Round 4 the deferred-Cause-#2 witnesses were an L-system (`lsystem_sim.c`)
+and heavy soft-float slices; #69/#71 show it is readily hit by **ordinary high-register-pressure
+`int32`-divide kernels** (a per-pixel barycentric/edge-crossing divide with a live rotation/interpolation
+set) — i.e. common integer-graphics code, not an exotic corner. They are caught by their own demo gates
+(`dev/run.sh gouraud` / `dev/run.sh msquares`, 5-way differential) and classified XFAIL by
+`tools/a16_fuzz.py` `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]`; no action beyond this record until the
+generic-LLVM RA fix lands upstream.
 
 `newton_sim.c` at `-Os` is the **ship/verify** level (`tools/a16_fuzz.py` + every demo/corpus build use
 `-Os`); its `-Os` XPASS guard fires → the **newton** XFAIL drops. The newton ROM **changes bytes** (the fix

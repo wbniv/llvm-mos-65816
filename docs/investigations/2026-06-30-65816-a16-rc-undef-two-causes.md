@@ -41,10 +41,18 @@ masks **both** — which is what conflated them. The asserts traces separate the
 | Cause | Witnesses | Mechanism (one line) | Disposition |
 |---|---|---|---|
 | **#1 coalescer copy-hint** | `rcundef.c`, `newton_step` (`-Os`) | a value `vreg = COPY $rcN` (a libcall result) is folded into an `Imag16` pair across a call that re-clobbers `$rcN`; the allocator re-binds the pair to `$rcN` over the clobber | **FIXED** in `shouldCoalesce` (patch `0002`/`0015`) |
-| **#2 RA undef sub-lane** | `lsystem_sim.c main` (all `-O`), `newton_gate_crc` (`-O1`) | a **pure-virtual** `Imag16` whose high lane is `undef` is bound to an `$rc` pair; a dead full-pair read of the `undef` lane survives RA, and the `undef` flag is lost when lowered to the physical `$rcN` | **DEFERRED** upstream (generic-LLVM RA feature) |
+| **#2 RA undef sub-lane** | `lsystem_sim.c main` (all `-O`), `newton_gate_crc` (`-O1`), `gouraud_sim.c` + `msquares_sim.c` (`-O1`/`-Os`, demos #69/#71) | a **pure-virtual** `Imag16` whose high lane is `undef` is bound to an `$rc` pair; a dead full-pair read of the `undef` lane survives RA, and the `undef` flag is lost when lowered to the physical `$rcN` | **DEFERRED** upstream (generic-LLVM RA feature) |
 
 `-Os` is the canonical ship/verify level (`tools/a16_fuzz.py` + every demo/corpus build are `-Os`; `-O1` is
 never built). At `-Os` cause #1 covers `newton`; cause #2 still covers lsystem.
+
+**Round-4 update (2026-07-01).** Two more Cause-#2 witnesses surfaced from the demo battery:
+`gouraud_sim.c` (#69, per-pixel barycentric divide) and `msquares_sim.c` (#71, per-pixel edge-crossing
+divide) both crash `-verify-machineinstrs` at `-O1`/`-Os` under `+mos-a16` and `+mos-xy16` (`-O0` clean),
+with the identical `Using an undefined physical register` signature — while their full 5-way differentials
+are green (code bit-exact correct). They confirm Cause #2 is **not exotic**: ordinary high-register-pressure
+`int32`-divide graphics kernels hit it, not just the L-system / soft-float slices. No new action — the fix
+is the same deferred generic-LLVM RA change; these are recorded as XFAIL witnesses.
 
 ## Cause #1 — register-coalescer copy-hint (FIXED)
 
