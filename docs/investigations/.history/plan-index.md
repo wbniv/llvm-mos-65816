@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e0ca23) | #51 Protothread Critter Swarm SNES demo — resumable functions (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/38da772) | docs(plan-index): add counter-sliding title screen row (193 plans) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/fcc842e) | docs(plan-index): point #50 cgrade row at its commit 4f6558f |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4f6558f) | #50 Many-Argument Color-Grade Kernel SNES demo — >register-count arg spill (clean positive) |
@@ -123,6 +124,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+0e0ca23	author	Will Norris
+0e0ca23	added	1
+0e0ca23	deleted	0
+0e0ca23	files	1
+0e0ca23	body	A swarm of 24 critters, each a protothread (coroutine) that yields each frame and\nresumes its box-patrol via a saved continuation index (lc) — a switch whose case\nlabels sit inside loops (mid-loop re-entry, à la Duff's device #42) with local\nstate kept in the struct across re-entry.\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0xAD9F on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate: critter_step dispatches on lc at entry (beq/cmp resume), no wide\narith libcall. No compiler bug — the resumable protothread resumes byte-exact\nacross all modes. Live at https://biohack.net/snes/critters/ (biohack v1.0.168).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 38da772	author	Will Norris
 38da772	added	2
 38da772	deleted	0
