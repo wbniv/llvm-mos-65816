@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/6277d7e) | feat(snes/fabsridge): #80 Fabs Ridgeline (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/91bd3fe) | feat(snes/funnelkal): #73 Funnel-Shift Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/4f1df40) | docs(ideas): add Round 5 (#73-#92) — twenty more new codegen corners |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3676149) | #72 3-D Grid Voxel Life SNES demo — multi-dimensional array indexing (clean positive, FINAL Round-4 demo) |
@@ -75,6 +76,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+6277d7e	author	Will Norris
+6277d7e	added	3
+6277d7e	deleted	3
+6277d7e	files	1
+6277d7e	body	G_FABS via __builtin_fabsf in tent-map iteration (x=1-|2x-1|), targeting\nthe target-custom legalizeFAbs path at MOSLegalizerInfo.cpp:369 (inline\nAND src, 0x7FFFFFFF). No fabsf libcall — sign-bit clear only. First demo\nto fire this path; distinct from #57 integer G_ABS and #45 union type-pun.\n\nGate: host==default==+mos-a16==+mos-xy16==0x161A. GATE_N=120 (not a\nmultiple of 16, avoiding rotate-period CRC cancellation). __mulsf3=5,\nrep/sep=11. 5-way green, no compiler bug.\nPublished: https://biohack.net/snes/fabsridge/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 91bd3fe	author	Will Norris
 91bd3fe	added	3
 91bd3fe	deleted	3

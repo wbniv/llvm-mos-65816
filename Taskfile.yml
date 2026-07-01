@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  smulorbit:
+    desc: "#76: Signed Multiply-Overflow Orbit Sentinel — G_SMULO at s16 (lowerMulo widen-multiply-sign-check) + s32 (lowerMulo widen to int64 -> __muldi3) via __builtin_mul_overflow on int16_t and int32_t. First demo to use signed mul-overflow check. Orbit-scatter with overflow teleport sparks. Assert corpus_result (smulorbit_gate_crc 0xD81B) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, rep/sep>=1). Leaves build/smulorbit.sfc + build/smulorbit-{mame,jg}.png."
+    cmds:
+      - dev/run.sh smulorbit
+
+  smulorbit-play:
+    desc: "PLAY the Signed Multiply-Overflow Orbit demo in MAME (builds first if needed). Orbiters trace paths with overflow-triggered teleport sparks."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/smulorbit.sfc ]; then
+          echo "==> build/smulorbit.sfc missing -- building (dev/run.sh smulorbit)..."
+          dev/run.sh smulorbit
+        fi
+      - task: mandel-mame
+        vars: { ROM: smulorbit }
+
   fabsridge:
     desc: "#80: Fabs Ridgeline — G_FABS via __builtin_fabsf in the tent-map iteration (x=1-|2x-1|), targeting the target-CUSTOM legalizeFAbs at MOSLegalizerInfo.cpp:369 (inline sign-bit AND, no libcall). Animated 16-column terrain ridgeline; V-notch kinks visible as peaks/valleys. Assert corpus_result (fabsridge_gate_crc 0x161A) == host on MAME + bsnes-jg + disasm gate (__mulsf3>=1, rep/sep>=1). Leaves build/fabsridge.sfc + build/fabsridge-{mame,jg}.png."
     cmds:

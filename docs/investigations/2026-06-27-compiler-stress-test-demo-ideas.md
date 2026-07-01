@@ -722,7 +722,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     grep: no header uses add_sat/sub_sat. *Differential:* integer-exact: saturating adds/subs on uint8/int16 are
     clamp-defined identically host vs target; CRC folds field + velocity words; no float, no NaN.
 
-76. **Signed Multiply-Overflow Orbit Sentinel.** *Stresses:* G_SMULO via __builtin_mul_overflow(a,b,ptr) on
+~~76. **Signed Multiply-Overflow Orbit Sentinel.** *Stresses:* G_SMULO via __builtin_mul_overflow(a,b,ptr) on
     int16 orbital state and a wider int32 accumulator (drawing __mulosi4). Unlike demo 44 hdr-bloom
     (__builtin_add_overflow=G_UADDO, one carry/V test) and demo 56 rotozoom (G_UMULH/SMULH keeps only the high
     half of a non-checking multiply, no overflow branch). *Shows:* A dense evolving orbit-scatter on the 128x128
@@ -731,7 +731,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     parity. *Verified present:* MOSLegalizerInfo.cpp:301 G_SMULO/G_UMULO .lower(); LegalizerHelper.cpp:2693-2747
     lowerMulo; compiler-rt builtins/mulosi4.c present; mul_overflow in no header. *Differential:* integer-exact:
     __builtin_mul_overflow on int16/int32 is standard-defined identically host vs target; fold the OUTCOME
-    (overflow count) + truncated product, never UB.
+    (overflow count) + truncated product, never UB.~~ ✓ [/snes/smulorbit/](https://biohack.net/snes/smulorbit/) ([plan](../plans/2026-07-01-76-snes-smulorbit.md))
 
 77. **Saturating-Cast Kaleidoscope.** *Stresses:* The saturate-then-convert chain via clamp idiom
     (int16_t)fmaxf(MIN,fminf(MAX,x)) (links SDK fminf/fmaxf + G_FPTOSI), deliberately driving intensity out of
@@ -969,7 +969,7 @@ Sharpest at opening a code path the first 72 never run:
   AND, not the generic helper, no libcall) as the HOT per-column op in a tent-map iteration. Exact (fabsf is a
   pure bit-clear), so host equals target bit-exact while a brand-new custom legalizer runs 128x16 per frame; the
   negative-zero canonicalization edge is uniquely exercised.
-- **#76 smulorbit** — G_SMULO (signed multiply-with-overflow, lowerMulo at 2693) is a two-part high/low sign-
+- ~~**#76 smulorbit**~~ ✓ [/snes/smulorbit/](https://biohack.net/snes/smulorbit/) — G_SMULO (signed multiply-with-overflow, lowerMulo at 2693) is a two-part high/low sign-
   consistency check distinct from demo 44 add-overflow carry/V test, and draws compiler-rt __mulosi4 for int32.
   Overflow is a first-class control signal (teleport-on-overflow); the differential folds the overflow count: a
   clean positive stressing a widen-multiply-then-compare shape no demo runs.
