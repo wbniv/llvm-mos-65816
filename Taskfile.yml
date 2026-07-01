@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  satcast:
+    desc: "#77: Saturating-Cast Kaleidoscope -- fminf→G_FMINNUM + fmaxf→G_FMAXNUM + (int16_t)→G_FPTOSI chain (legalizer:502 NaN guard). First demo to use fminf/fmaxf. 6-fold hex kaleidoscope, GATE_N=16 × 8 tiles. Assert corpus_result (satcast_gate_crc 0xC8CF) == host on MAME + bsnes-jg. Leaves build/satcast.sfc + build/satcast-{mame,jg}.png."
+    cmds:
+      - dev/run.sh satcast
+
+  satcast-play:
+    desc: "PLAY the Saturating-Cast Kaleidoscope demo in a MAME window (builds first if needed)."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/satcast.sfc ]; then
+          echo "==> build/satcast.sfc missing -- building (dev/run.sh satcast)..."
+          dev/run.sh satcast
+        fi
+      - task: mandel-mame
+        vars: { ROM: satcast }
+
   rotkal:
     desc: "#74: Rotate-Register Kaleidoscope -- G_ROTL/G_ROTR byte/16-bit custom lowering (legalizeShiftRotate:1029-1254, ConstantAmt:1046, S8-special:1167) via __builtin_rotateleft8/right8/rotateleft16 with BOTH constant per-ring and runtime amounts. First demo to use any rotate builtin. 8-fold mandala on 128x128 BG3. Assert corpus_result (rotkal_gate_crc 0x300C) == host on MAME + bsnes-jg + disasm gate (asl>=4, ror+rol>=1, rep/sep>=1). Leaves build/rotkal.sfc + build/rotkal-{mame,jg}.png."
     cmds:

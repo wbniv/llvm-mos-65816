@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1f15000) | feat(snes/rotkal): #74 Rotate-Register Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/155f742) | feat(snes/satcomet): #75 Saturating Palette Comet Trails (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/456a8a9) | feat(snes/smulorbit): #76 Signed Multiply-Overflow Orbit (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/6277d7e) | feat(snes/fabsridge): #80 Fabs Ridgeline (Round 5, compiler stress-test) |
@@ -78,6 +79,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+1f15000	author	Will Norris
+1f15000	added	3
+1f15000	deleted	2
+1f15000	files	1
+1f15000	body	G_ROTL/G_ROTR byte/16-bit custom lowering (legalizeShiftRotate:1029-1254) via\n__builtin_rotateleft8/right8/rotateleft16:\n- constant per-ring amounts → ConstantAmt fast path (:1046-1061) + S8 special case (:1167-1178)\n- runtime amount for outer uint16_t word → variable-amount lowering path\nFirst demo in the battery to use any rotate builtin.\n\nState: 8 uint8_t ring registers (rotl/rotr by 1,2,3,1 bits/frame) + uint16_t outer word.\n8-fold mandala via octant fold; counter-rotating rings at different speeds produce moire beats.\nGATE_N=100 (not ≡0 mod 8 — ring period=8, multiples of 8 give CRC=0x0000).\n\nGate: ror+rol=18 >= 8, rep/sep=15 >= 1; 5-way green host==default==+mos-a16==+mos-xy16==0x300C\n(bsnes-jg + MAME). No compiler bug — G_ROTL/G_ROTR lowers correctly across all modes.\nPublished: https://biohack.net/snes/rotkal/ (biohack.net v1.0.206).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 155f742	author	Will Norris
 155f742	added	3
 155f742	deleted	3

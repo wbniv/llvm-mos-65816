@@ -734,7 +734,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     __builtin_mul_overflow on int16/int32 is standard-defined identically host vs target; fold the OUTCOME
     (overflow count) + truncated product, never UB.~~ ✓ [/snes/smulorbit/](https://biohack.net/snes/smulorbit/) ([plan](../plans/2026-07-01-76-snes-smulorbit.md))
 
-77. **Saturating-Cast Kaleidoscope.** *Stresses:* The saturate-then-convert chain via clamp idiom
+~~77. **Saturating-Cast Kaleidoscope.** *Stresses:* The saturate-then-convert chain via clamp idiom
     (int16_t)fmaxf(MIN,fminf(MAX,x)) (links SDK fminf/fmaxf + G_FPTOSI), deliberately driving intensity out of
     int16 range and to +Inf/NaN in one octant. Unlike demo 44 hdr-bloom (integer saturation, no float, no
     G_FPTOSI) and demo 59 cosmzoom (exact 64-bit round-trip, no clamp, no min/max). *Shows:* A 6-fold
@@ -746,7 +746,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     G_FMINNUM/G_FMAXNUM/G_FPTOSI (ship explicit-clamp form, guaranteed to link). *Differential:* correctly-
     rounded-float: fminf/fmaxf exact selections, FPTOSI round-toward-zero IEEE, NaN-detect folded as its OUTCOME
     (colour 0) never NaN bits; poly is mul/add one-per-statement (no FMA); CRC folds uint8 colour indices:
-    integer-exact.
+    integer-exact.~~ ✓ [/snes/satcast/](https://biohack.net/snes/satcast/) ([plan](../plans/2026-07-01-77-snes-satcast.md))
 
 78. **Signed-Bitfield Terrain Sculptor.** *Stresses:* G_SEXT_INREG via a struct int16_t height:5, slope:4,
     flow:4, uint16_t mat:3 reading signed fields back (sign-extend to 16 bits) plus an int8_t signed-narrowing
