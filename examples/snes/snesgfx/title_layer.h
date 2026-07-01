@@ -19,10 +19,10 @@
  *   screen_row = tilemap_y − VOFS  (mod tilemap height = 256 px)
  *   line0 @ y=96:  vofs_top 128→0 eases screen_row from −32 (above screen) to 96  (centre)
  *   line1 @ y=240: vofs_bot 0→128 eases screen_row from  240 (below screen) to 112 (centre)
- *   Ease-out (both to bottom): vofs_top falls 0→−128 (line0 exits bottom — effective VOFS 255→128
- *     walks screen_row 97→223 then enters the 32-px invisible gap at VOFS 97–128; clamped at −128
- *     to avoid −160 where VOFS=96 wraps line0 back to screen_row 0); vofs_bot falls 128→0 (line1
- *     exits bottom, screen_row 112→240).
+ *   Ease-out (BOTH to bottom): vofs_top falls 0→−128 (screen_row_line0 = 96−vofs_top: 96→224 off
+ *     screen); vofs_bot falls 128→0 (screen_row_line1 = 240−vofs_bot: 112→240 off screen). Both
+ *     move at 3 px/frame, maintaining 16-px separation. The VOFS HDMA split tracks line0's bottom
+ *     edge (split = 104−vofs_top) to prevent line1 (y=240) from also appearing in band A's window.
  *
  * Animation timing (at 60 fps):
  *   Ease-in  ~2 s (≈120 frames) — exponential decay, TITLE_FLYIN_SHIFT=6
@@ -264,21 +264,32 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
       if (t->vofs_bot > (int16_t)TITLE_VOFS_BOT_TARGET) t->vofs_bot = (int16_t)TITLE_VOFS_BOT_TARGET;
     }
   } else if (t->restore) {
-    /* Ease-out: BOTH lines exit to the BOTTOM of the screen at constant velocity.
-       vofs_top DECREASES: effective VOFS = (uint16_t)vofs_top & 0x3FF walks 255→129 as vofs_top
-       goes −1→−127, placing line0 at screen_row 97→223 (sliding down). At vofs_top=−128 the
-       effective VOFS enters the 32-px invisible gap (VOFS 97–128) — clamp there; going past −160
-       (effective VOFS=96) would wrap line0 back to screen_row 0.
-       vofs_bot DECREASES: screen_row for line1 = 240−vofs_bot, going 112→240 (slides off bottom).
-       Clamp vofs_bot >= 0: negative values wrap VOFS past 511 and line1 reappears at the top. */
+    /* Ease-out: BOTH lines exit to the BOTTOM at constant velocity.
+       vofs_top decreases (0→−128): screen_row_line0 = 96−vofs_top rises 96→224 (off screen).
+       vofs_bot decreases (128→0): screen_row_line1 = 240−vofs_bot rises 112→240 (off screen).
+       Both lines move at the same rate (3 px/frame) so they maintain 16-px separation throughout.
+       Clamps: vofs_top ≥ −128 (off-screen bottom for line0); vofs_bot ≥ 0 (off-screen for line1;
+       negative wraps VOFS and line1 reappears at the top). */
     t->vofs_top -= TITLE_EASEOUT_VEL;
     t->vofs_bot -= TITLE_EASEOUT_VEL;
     if (t->vofs_top < -128) t->vofs_top = -128;
     if (t->vofs_bot < 0)    t->vofs_bot = 0;
   }
 
-  /* Rebuild VOFS HDMA table — HDMA reads WRAM at next vblank automatically, no UpQ needed. */
-  hscroll2_build(&t->vscroll, TITLE_HDMA_SPLIT, t->vofs_top, t->vofs_bot);
+  /* VOFS HDMA split: during ease-out, track line0's bottom edge so line1 (tilemap y=240) never
+     appears in band A's vofs_top window and causes a double image. During exit: screen_row_line0
+     = 96−vofs_top (linear), so split = (96−vofs_top)+8 = 104−vofs_top, clamped 1..223.
+     During fly-in / hold, use the fixed design split (TITLE_HDMA_SPLIT=108). */
+  uint8_t split;
+  if (t->restore) {
+    int16_t sp = (int16_t)(104 - t->vofs_top);
+    if (sp > 223) sp = 223;
+    if (sp < 1)   sp = 1;
+    split = (uint8_t)sp;
+  } else {
+    split = TITLE_HDMA_SPLIT;
+  }
+  hscroll2_build(&t->vscroll, split, t->vofs_top, t->vofs_bot);
 
   t->phase = (uint8_t)(t->phase + 1u);
   if (!t->restore) {
@@ -347,7 +358,7 @@ static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
      makes line1 reappear at the top of the screen for the duration of display_fade. */
   for (uint8_t g = 0; g < 80u; g++) {
     display_frame(d);
-    if (t->vofs_top <= -128 && t->vofs_bot <= 0) break;
+    if (t->vofs_top <= -128 && t->vofs_bot <= 0) break;  /* both off screen below */
   }
   t->restore = 0;   /* freeze vofs before display_fade to prevent over-scroll past wrap boundary */
   display_fade(d, 0);
