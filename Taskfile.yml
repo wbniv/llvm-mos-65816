@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  nrecip:
+    desc: "#47: Newton-Raphson reciprocal perspective floor — a scrolling checkerboard floor whose 1/z depth mapping is a MULTIPLY-ONLY fixed-point Newton reciprocal (x = x*(2 - m*x), no hardware divide, no divide libcall). Assert corpus_result (nrecip_gate_crc 0x044A) == host on MAME + bsnes-jg + disasm gate (__mulsi3, zero divide libcalls, rep/sep). Leaves build/nrecip.sfc + build/nrecip-{mame,jg}.png."
+    cmds:
+      - dev/run.sh nrecip
+
+  nrecip-play:
+    desc: "PLAY the Newton-reciprocal perspective-floor demo in a MAME window on this host (builds the ROM first if needed). Shows a checkerboard floor rushing forward."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/nrecip.sfc ]; then
+          echo "==> build/nrecip.sfc missing — building it (dev/run.sh nrecip)…"
+          dev/run.sh nrecip
+        fi
+      - task: mandel-mame
+        vars: { ROM: nrecip }
+
   qsortviz:
     desc: "#46: libc qsort + comparator-callback sort visualizer — bars reshuffle then re-sort under a rotating function-pointer comparator (ascending / evens-first / descending), each a callback qsort invokes per comparison. CAUGHT A REAL BACKEND BUG: the (x>y)-(x<y) comparator emits G_SCMP which the mos legalizer could not lower (fixed). Assert corpus_result (qsortviz_gate_crc 0x8EA5) == host on MAME + bsnes-jg + disasm gate (qsort call, fn-ptr comparator table, rep/sep). Leaves build/qsortviz.sfc + build/qsortviz-{mame,jg}.png."
     cmds:

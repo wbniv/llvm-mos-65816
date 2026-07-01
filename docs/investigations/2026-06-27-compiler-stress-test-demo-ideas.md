@@ -259,7 +259,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | **overflow-checked / saturating arithmetic** — `__builtin_add_overflow`, carry/V-flag tests + clamp | flag-testing add/sub sequences never stressed | ~~44~~ |
 | ~~**union type-punning** — `union{float;uint32}` aliased load/store, bit reinterpret~~ | ~~reading one storage as two types — the aliasing/reinterpret path~~ | ~~45~~ ✓ [/snes/metaball/](https://biohack.net/snes/metaball/) |
 | ~~**indirect comparator ABI** — `qsort` with a function-pointer comparator callback~~ | ~~#17's sorts were hand-written; libc `qsort` calls *back* per compare~~ | ~~46~~ ✓ [/snes/qsortviz/](https://biohack.net/snes/qsortviz/) **🐞 caught+fixed `G_SCMP` backend crash** |
-| **iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt) | a convergent fixed-point loop, distinct from a single divide libcall | 47 |
+| ~~**iterative refinement** — Newton-Raphson reciprocal/sqrt (1/z, isqrt)~~ | ~~a convergent fixed-point loop, distinct from a single divide libcall~~ | ~~47~~ ✓ [/snes/nrecip/](https://biohack.net/snes/nrecip/) |
 | **recursive feedback (IIR)** — `y[n]=a·y[n−1]+b·y[n−2]+x[n]` dependency chain | #25's FFT is feed-forward + reorderable; an IIR feedback chain can't be reordered | ~~48~~ |
 | **decode state machine + back-reference** — RLE/LZ decompression with output copy-back | a byte-stream decoder writing back-references into its own output (pointer arith) | 49 |
 | **>register-count argument spill** — functions with 8+ params passed on the soft stack | every prior call fits the register-arg budget; argument spilling is untested | 50 |
@@ -348,10 +348,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     *Stresses:* the **`qsort` callback / indirect-comparator ABI**. *Shows:* the array animating as
     different comparators reshuffle it.~~ ✓ [/snes/qsortviz/](https://biohack.net/snes/qsortviz/) **🐞 CAUGHT + FIXED A REAL BACKEND BUG** — the `(x>y)-(x<y)` comparator emits `G_SCMP`, which the mos legalizer couldn't lower (backend abort in default/a16/xy16 alike); fix = `G_SCMP`/`G_UCMP` `.lower()` (patch `0016`), queued upstream. Post-fix bit-exact host==default==a16==xy16 `0x8EA5`.
 
-47. **Perspective floor/tunnel — Newton-Raphson reciprocal.** A textured ground plane computing **`1/z`
+47. ~~**Perspective floor/tunnel — Newton-Raphson reciprocal.** A textured ground plane computing **`1/z`
     per span by iterative Newton refinement** (no hardware divide). *Stresses:* **iterative fixed-point
     refinement** (a convergent reciprocal/sqrt loop). *Shows:* a racing perspective-mapped checker floor
-    or tunnel.
+    or tunnel.~~ ✓ [/snes/nrecip/](https://biohack.net/snes/nrecip/) *(multiply-only Newton reciprocal `x=x*(2-m*x)`, Q15/Q16; bit-exact host==default==a16==xy16 `0x044A`; `__mulsi3`=6, divide-libcalls=0; no bug)*
 
 48. ~~**Resonant-filter scope — IIR / Goertzel feedback.** A 2-pole **IIR resonator**
     (`y[n] = a·y[n−1] − b·y[n−2] + x[n]`) ringing on an impulse, or a Goertzel tone detector. *Stresses:*

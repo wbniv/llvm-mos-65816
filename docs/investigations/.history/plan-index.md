@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/48f8580) | docs(plan-index): point #46 qsortviz row at its commit 3c2c7a5 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3c2c7a5) | #46 qsort Sort Visualizer SNES demo — caught + FIXED a real backend crash (G_SCMP) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ba907ad) | docs(plan-index): point #45 metaball row at its commit 2b0b9a7 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/2b0b9a7) | #45 Union Type-Pun Metaballs SNES demo — Quake fast-inverse-sqrt (clean positive) |
@@ -115,6 +116,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+48f8580	author	Will Norris
+48f8580	added	1
+48f8580	deleted	1
+48f8580	files	1
+48f8580	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3c2c7a5	author	Will Norris
 3c2c7a5	added	1
 3c2c7a5	deleted	0
