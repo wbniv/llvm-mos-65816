@@ -273,6 +273,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: iir-scope }
 
+  seqvm:
+    desc: "#37: Sparse-switch step-sequencer VM — a register VM whose 14 non-contiguous opcodes force switch(op) to lower to a BINARY-SEARCH COMPARISON TREE (not #29a's jump table / #38's computed goto); the registers drive an 8-bar equalizer. Assert corpus_result (seqvm_gate_crc 0xE8C5) == host on MAME + bsnes-jg + disasm gate (compares>=8, indirect-jmp=0, rep/sep). Leaves build/seqvm.sfc + build/seqvm-{mame,jg}.png."
+    cmds:
+      - dev/run.sh seqvm
+
+  seqvm-play:
+    desc: "PLAY the sparse-switch step-sequencer VM demo in a MAME window on this host (builds the ROM first if needed). Shows an 8-bar equalizer driven by a looping bytecode song."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/seqvm.sfc ]; then
+          echo "==> build/seqvm.sfc missing — building it (dev/run.sh seqvm)…"
+          dev/run.sh seqvm
+        fi
+      - task: mandel-mame
+        vars: { ROM: seqvm }
+
   polyfill:
     desc: "#36: Polygon scanline fill (VLA) — a tumbling star whose vertex count morphs at run time drives an even-odd scanline rasteriser with a RUNTIME-SIZED C99 VLA (int16_t xs[nv]) — the soft-stack alloca/VLA stress. Assert corpus_result (polyfill_gate_crc 0x8ED9) == host on MAME + bsnes-jg + disasm gate (__divsi3/__udivsi3 crossing divide + __mulsi3 vertex + rep/sep). Leaves build/polyfill.sfc + build/polyfill-{mame,jg}.png."
     cmds:

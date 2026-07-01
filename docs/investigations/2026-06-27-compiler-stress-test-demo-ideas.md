@@ -249,7 +249,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | **libm transcendentals** — `sqrtf` (+ self-shipped `sin`/`exp`) | #24 used float *operators*, never a libm *function* call (see the ULP gotcha above) | 34 |
 | **non-local jumps** — `setjmp`/`longjmp` full context save/restore | the whole register + SP + return-addr context spill; never exercised | 35 |
 | ~~**dynamic stack frames** — `alloca` / C99 VLAs (runtime-sized frame)~~ | ~~every frame so far is fixed-size; runtime SP adjustment is untested~~ | ~~36~~ |
-| **sparse-switch binary search** — if-else comparison tree, *not* a jump table | #29a was a *dense* switch → table; non-contiguous cases lower totally differently | 37 |
+| ~~**sparse-switch binary search** — if-else comparison tree, *not* a jump table~~ | ~~#29a was a *dense* switch → table; non-contiguous cases lower totally differently~~ | ~~37~~ |
 | **computed `goto` / label values** — `goto *tab[op]` threaded dispatch | distinct from #29a's switch jump-table; the threaded-code path | ~~38~~ |
 | **constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift | #27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation | 39 |
 | **table-indexed ROM-LUT byte loop** — 256-entry `const` table, long-addressed per byte | reads a big `const` table from ROM via 24-bit addressing every iteration | 40 |
@@ -300,10 +300,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     allocation** (`alloca`/VLA → runtime frame-pointer adjustment); a soft-stack target may not support it
     — a gap is a finding. *Shows:* morphing filled polygons (3→12 sides) tumbling.~~ ✓ [/snes/polyfill/](https://biohack.net/snes/polyfill/) — a tumbling star morphs its point count (3→8) driving a runtime-sized VLA crossing table (`int16_t xs[nv]`) in an even-odd scanline fill; `host==default==+mos-a16==+mos-xy16==0x8ED9` on bsnes-jg, `-verify` clean ×3. **No compiler bug** — the soft-stack target lowers C99 VLAs (runtime SP adjustment) correctly; "the gap" idea #36 anticipated does not exist.
 
-37. **CHIP-8 / step-sequencer — sparse switch.** An opcode interpreter whose cases are **non-contiguous**
+37. ~~**CHIP-8 / step-sequencer — sparse switch.** An opcode interpreter whose cases are **non-contiguous**
     (`0x00E0`, `0x1NNN`, `0xANNN`, `0xFX55`…), forcing a **binary-search if-else tree** instead of #29a's
     dense jump table. *Stresses:* **sparse-switch comparison-tree lowering**. *Shows:* a tiny CHIP-8 game
-    or a step-sequenced light show running its own bytecode.
+    or a step-sequenced light show running its own bytecode.~~ ✓ [/snes/seqvm/](https://biohack.net/snes/seqvm/) — a register VM with 14 non-contiguous opcodes (`0x00..0xF0`) drives an 8-bar equalizer; `switch(op)` lowers to a **comparison tree** (compares=22, indexed-indirect jmp=0 — not a table/computed-goto); `host==default==+mos-a16==+mos-xy16==0xE8C5` on bsnes-jg, `-verify` clean ×3. **No compiler bug.**
 
 38. ~~**Threaded-code VM — computed `goto`.** A Brainfuck/Forth interpreter dispatching with
     **`goto *handlers[op]`** (label-as-value threading) — the fastest interpreter loop, a different path

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f77a7e3) | docs(plan-index): point #36 polyfill row at its commit cdb8641 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/cdb8641) | #36 Polygon Scanline Fill (VLA) SNES demo — runtime-sized C99 VLA edge table |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/14fa754) | docs(plan-index): point #48 iir-scope row at its commit f3e3393 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f3e3393) | #48 IIR Resonant-Filter Scope SNES demo — recursive feedback dependency chain |
@@ -99,6 +100,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+f77a7e3	author	Will Norris
+f77a7e3	added	1
+f77a7e3	deleted	1
+f77a7e3	files	1
+f77a7e3	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 cdb8641	author	Will Norris
 cdb8641	added	1
 cdb8641	deleted	0

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/cdb8641) | #36 Polygon Scanline Fill (VLA) SNES demo — runtime-sized C99 VLA edge table |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f3e3393) | #48 IIR Resonant-Filter Scope SNES demo — recursive feedback dependency chain |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0af9b34) | #44 HDR Additive Bloom SNES demo — saturating / overflow-checked add |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f29be2f) | #38 Brainfuck Threaded-Code VM SNES demo — computed-goto threaded dispatch |
@@ -37,6 +38,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+cdb8641	author	Will Norris
+cdb8641	added	3
+cdb8641	deleted	3
+cdb8641	files	1
+cdb8641	body	Demo #36 of the compiler stress-test battery — the dynamic-stack-frame member.\nA tumbling star morphs its point count (3→8, nv=6→16) driving an even-odd\nscanline fill whose per-scanline x-crossing table is a C99 runtime-sized VLA\n(int16_t xs[nv]) — the soft-stack alloca/VLA runtime SP adjustment no fixed-frame\ndemo had exercised.\n\nClean positive, NO compiler bug: host==default==+mos-a16==+mos-xy16==0x8ED9 on\nbsnes-jg, -verify-machineinstrs clean under a16 and xy16. The soft-stack target\nlowers C99 VLAs correctly across all three modes — "the gap" idea #36 anticipated\n(a soft-stack target that can't do runtime frames) does not exist. Disasm gate:\n__divsi3 (crossing divide), __mulsi3=3 (vertex placement), rep/sep native-16.\nMAME leg SKIP (no SPC700 IPL on this box, non-blocking).\n\nGate area-fold subsamples scanlines (PF_GATE_YSTEP) with GATE_FRAMES=16 so the\nstartup self-check finishes fast (the fill is 32-bit-divide-heavy); the ROM's\nvisual fill is full-resolution via a fast masked horizontal-span writer.\n\nLive: https://biohack.net/snes/polyfill/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f3e3393	author	Will Norris
 f3e3393	added	4
 f3e3393	deleted	4
