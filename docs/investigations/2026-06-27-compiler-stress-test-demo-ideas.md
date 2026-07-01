@@ -482,7 +482,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **64-bit modular exponentiation** — `__umoddi3` as the *hot* op in square-and-multiply | #22 was 64-bit mul/shift/xor (hash), #27 was 16/32-bit `%`; a 64-bit `%`-per-iteration loop is neither | ~~61~~ ✓ 🐞 |
 | **union-find / disjoint-set** — parent-array **path compression** (in-place pointer rewrite) | #18 (heap), #31 (tree) never did the find-with-compression pointer-chase-and-flatten idiom | ~~62~~ ✓ |
 | **Fenwick / binary-indexed tree** — `i & -i` low-bit isolation in a range-sum loop | the `i += i & -i` two's-complement bit trick is a codegen shape nothing else emits | ~~63~~ ✓ |
-| **non-comparison sort** — counting/radix: histogram + prefix-sum + scatter, **zero compares** | #17's sorts were all comparison-based; a compare-free scatter sort is a different loop nest | 64 |
+| **non-comparison sort** — counting/radix: histogram + prefix-sum + scatter, **zero compares** | #17's sorts were all comparison-based; a compare-free scatter sort is a different loop nest | ~~64~~ ✓ |
 | **computational-geometry orientation** — cross-product **sign** tests + angular sort (convex hull) | signed 2-D cross products driving branch decisions; never exercised | 65 |
 | **2-D dynamic-programming table** — memoised recurrence + `max`/`min` reductions + backtrack pointer walk | a doubly-indexed table fill with data-dependent reductions; a new loop/GEP shape | 66 |
 | **Huffman bit-stream decode** — MSB-first bit reader + pointer-linked tree descent | #49 was *byte*-oriented LZ back-refs; a *bit*-granular reader + tree walk is distinct | 67 |
@@ -568,10 +568,10 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     shape nothing else emits. *Shows:* bars whose heights are O(log n) range sums, responding as points are
     added/removed.~~ ✓ [/snes/fenwick/](https://biohack.net/snes/fenwick/) — bit-exact `host==default==a16==xy16==0x3454`; BIT `update`/`query` walk via `i & -i` (width-safe `(uint16_t)(i & (uint16_t)(0u-i))`); a moving signal + its running integral (prefix sum) staircase; gate cross-checks BIT prefix vs a linear reference. Clean positive, no bug. ([plan](../plans/2026-06-30-63-snes-fenwick.md))
 
-64. **Radix-sort bars — non-comparison sort.** Animate a **counting/radix sort** of a bar array: histogram →
+64. ~~**Radix-sort bars — non-comparison sort.** Animate a **counting/radix sort** of a bar array: histogram →
     prefix-sum → scatter, one digit pass at a time, **zero comparisons**. *Stresses:* the compare-free
     scatter-sort loop nest (histogram + prefix scan + stable scatter) — every #17 sort was comparison-based.
-    *Shows:* bars re-bucketing pass by pass, stable within each digit, converging to sorted.
+    *Shows:* bars re-bucketing pass by pass, stable within each digit, converging to sorted.~~ ✓ [/snes/radix/](https://biohack.net/snes/radix/) — bit-exact `host==default==a16==xy16==0x123E`; LSD radix base-16 (histogram + prefix-sum + stable scatter, zero data compares, 0 mul/div libcalls); bars sort into an ascending value-band gradient; gate cross-checks sorted (no inversions) + permutation (xor/sum). Clean positive, no bug. ([plan](../plans/2026-06-30-64-snes-radix.md))
 
 65. **Convex-hull rubber band — orientation cross-products.** Scattered moving points with their **convex
     hull** snapping taut around them (gift-wrap / Graham scan). *Stresses:* signed 2-D **cross-product
