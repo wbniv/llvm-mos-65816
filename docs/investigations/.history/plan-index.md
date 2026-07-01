@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/c007bfe) | docs(plan-index): add #80 fabsridge row |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/8473d5b) | docs(plan-index): add #73 funnelkal row |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1549220) | docs(plan-index): point #72 grid3d row at its commit 3676149 |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3676149) | #72 3-D Grid Voxel Life SNES demo — multi-dimensional array indexing (clean positive, FINAL Round-4 demo) |
@@ -168,6 +169,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+c007bfe	author	Will Norris
+c007bfe	added	1
+c007bfe	deleted	0
+c007bfe	files	1
+c007bfe	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8473d5b	author	Will Norris
 8473d5b	added	1
 8473d5b	deleted	0
