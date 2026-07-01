@@ -253,7 +253,7 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
 | **computed `goto` / label values** — `goto *tab[op]` threaded dispatch | distinct from #29a's switch jump-table; the threaded-code path | ~~38~~ |
 | ~~**constant-divisor strength reduction** — `/10`,`/60`,`/360` → magic-number multiply-high + shift~~ | ~~#27 was a *runtime* divisor (libcall); constant divisors trigger a different optimisation~~ | ~~39~~ (FINDING: llvm-mos does NOT strength-reduce — retains `__udivNi3`, correct on soft-multiply) |
 | ~~**table-indexed ROM-LUT byte loop** — 256-entry `const` table, long-addressed per byte~~ | ~~reads a big `const` table from ROM via 24-bit addressing every iteration~~ | ~~40~~ |
-| **free-list allocator** — manual malloc/free, pointer recycling | #31's pool is append-only (bump + reset); a free list recycles individual nodes | 41 |
+| ~~**free-list allocator** — manual malloc/free, pointer recycling~~ | ~~#31's pool is append-only (bump + reset); a free list recycles individual nodes~~ | ~~41~~ ✓ [/snes/poolfx/](https://biohack.net/snes/poolfx/) |
 | **irreducible control flow** — Duff's device (switch jumping into a loop) | a CFG the structurizer can't reduce; never exercised | 42 |
 | **signed 64-bit divide/mod** — `__divdi3`/`__moddi3` (sign-corrected) | #22 was *unsigned* 64-bit; signed div/mod is a distinct sign-handling libcall | 43 |
 | **overflow-checked / saturating arithmetic** — `__builtin_add_overflow`, carry/V-flag tests + clamp | flag-testing add/sub sequences never stressed | ~~44~~ |
@@ -320,10 +320,10 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     mutating field. *Stresses:* a **256-entry ROM-LUT indexed byte loop**. *Shows:* "checksum rain" /
     hash-marble that flows.~~ ✓ [/snes/crctex/](https://biohack.net/snes/crctex/) — bit-standard CRC-32 (poly 0xEDB88320, `crc32("123456789")==0xCBF43926`), a `const uint32[256]` ROM table indexed per byte colours a flowing hash-marble field; `host==default==+mos-a16==+mos-xy16==0xDBBA` on bsnes-jg, `-verify` clean ×3. **No compiler bug** — the ROM-LUT indexed byte loop is byte-exact across all modes.
 
-41. **Particle fountain — free-list pool allocator.** Particles **allocated on spawn and freed on death**,
+41. ~~**Particle fountain — free-list pool allocator.** Particles **allocated on spawn and freed on death**,
     recycling slots through a manual **free list** (distinct from #31's append-only bump pool). *Stresses:*
     **free-list pointer recycling / manual malloc-free**. *Shows:* a sparking fountain with particles
-    continuously born and dying.
+    continuously born and dying.~~ ✓ [/snes/poolfx/](https://biohack.net/snes/poolfx/) *(free-list LIFO recycle of 48 slots; bit-exact host==default==a16==xy16 `0x2B9B`; ldy-indexed slot chase, 0 arith libcalls; no bug)*
 
 42. **Dissolve transition — Duff's device.** A screen wipe/dissolve copy unrolled with the classic
     **switch-jumping-into-a-loop**. *Stresses:* **irreducible loop-switch control flow** the structurizer

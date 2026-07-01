@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ad34254) | #40 Table-Driven CRC32 Procedural Texture SNES demo — 256-entry ROM-LUT byte loop |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4d20e30) | #39 Constant-Divisor Clock + Odometer SNES demo — strength-reduction probe (finding) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e134e54) | #37 Sparse-Switch Step-Sequencer VM SNES demo — comparison-tree opcode dispatch |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/cdb8641) | #36 Polygon Scanline Fill (VLA) SNES demo — runtime-sized C99 VLA edge table |
@@ -40,6 +41,11 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+ad34254	author	Will Norris
+ad34254	added	3
+ad34254	deleted	3
+ad34254	files	1
+ad34254	body	Demo #40 of the compiler stress-test battery — the 256-entry ROM-LUT indexed\nbyte-loop member. Each cell's colour is a bit-standard CRC-32 (poly 0xEDB88320,\ncrc32("123456789")==0xCBF43926) of its (x,y,time), computed by the byte-at-a-time\ntable algorithm crc=TABLE[(crc^byte)&0xFF]^(crc>>8), where TABLE is a\nconst uint32_t[256] in ROM. Flows as a hash-marble field on the BitmapCanvas.\n\nClean positive, NO compiler bug: host==default==+mos-a16==+mos-xy16==0xDBBA on\nbsnes-jg, -verify-machineinstrs clean under a16 and xy16. Disasm gate confirms\nthe ROM-LUT: CRC32_TAB (1 KiB rodata) referenced, eor cascade=10, rep/sep=18.\nMAME leg SKIP (no SPC700 IPL, non-blocking).\n\nLive: https://biohack.net/snes/crctex/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4d20e30	author	Will Norris
 4d20e30	added	3
 4d20e30	deleted	3

@@ -256,6 +256,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: hdr-bloom }
 
+  poolfx:
+    desc: "#41: Free-list pool allocator — a particle fountain recycles 48 fixed slots through a manual singly-linked LIFO free list threaded through the slots (alloc pops the head, free pushes it back). Continuous births/deaths. Assert corpus_result (poolfx_gate_crc 0x2B9B) == host on MAME + bsnes-jg + disasm gate (ldy-indexed slot chase, no arith libcall, rep/sep). Leaves build/poolfx.sfc + build/poolfx-{mame,jg}.png."
+    cmds:
+      - dev/run.sh poolfx
+
+  poolfx-play:
+    desc: "PLAY the free-list particle-fountain demo in a MAME window on this host (builds the ROM first if needed). Shows sparks continuously born and dying as pool slots recycle."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/poolfx.sfc ]; then
+          echo "==> build/poolfx.sfc missing — building it (dev/run.sh poolfx)…"
+          dev/run.sh poolfx
+        fi
+      - task: mandel-mame
+        vars: { ROM: poolfx }
+
   crctex:
     desc: "#40: Table-driven CRC32 procedural texture — each cell's colour is a real CRC32 (poly 0xEDB88320) of its (x,y,time) via the byte-at-a-time algorithm crc=TABLE[(crc^byte)&0xFF]^(crc>>8), TABLE a const uint32[256] in ROM. Flowing hash-marble field. Assert corpus_result (crctex_gate_crc 0xDBBA) == host on MAME + bsnes-jg + disasm gate (CRC32_TAB ref, eor cascade, rep/sep). Leaves build/crctex.sfc + build/crctex-{mame,jg}.png."
     cmds:

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/6e87c01) | docs(plan-index): point #40 crctex row at its commit ad34254 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ad34254) | #40 Table-Driven CRC32 Procedural Texture SNES demo — 256-entry ROM-LUT byte loop |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e92a366) | docs(plan-index): point #39 divclock row at its commit 4d20e30 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4d20e30) | #39 Constant-Divisor Clock + Odometer SNES demo — strength-reduction probe (finding) |
@@ -105,6 +106,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+6e87c01	author	Will Norris
+6e87c01	added	1
+6e87c01	deleted	1
+6e87c01	files	1
+6e87c01	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ad34254	author	Will Norris
 ad34254	added	1
 ad34254	deleted	0
