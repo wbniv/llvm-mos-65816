@@ -26,7 +26,14 @@ source "$ROOT/dev/_emu.sh"
 require_bios || exit $?
 NOBSNES=(); { [ -x "$ROOT/build/jgxcheck" ] && [ -d "$ROOT/vendor/bsnes-jg/Database" ]; } || NOBSNES=(--no-bsnes)
 
-echo "==> corpus-a16: $(basename "$MANIFEST")  (default == +mos-a16 == +mos-xy16, MAME + bsnes-jg)"
+# Widen the settle window for BOTH emulators: several corpus slices (bhut, the Round-4 demo slices,
+# soft-float kernels) compute their gate CRC well past the historical 60-frame MAME / 180-frame bsnes
+# default, so they read 0x0000 and mis-FAIL there. -nothrottle makes extra emulated frames cheap in
+# wall-clock, so a generous uniform budget is inexpensive. Overridable from the environment.
+export SMOKE_SETTLE="${SMOKE_SETTLE:-1000}"
+export BSNES_FRAMES="${BSNES_FRAMES:-1000}"
+
+echo "==> corpus-a16: $(basename "$MANIFEST")  (default == +mos-a16 == +mos-xy16, MAME + bsnes-jg; settle=$SMOKE_SETTLE)"
 pass=0; fail=0; xfail=0; total=0
 # `desc` soaks up the rest of each line; the `|| [ -n … ]` guard handles a final line
 # with no trailing newline. Only corpus_result rows run (skips hello.c's `sentinel`).

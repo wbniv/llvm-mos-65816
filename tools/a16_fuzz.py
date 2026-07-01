@@ -931,9 +931,13 @@ def run_mame(rom, addr, want, length):
         SMOKE_ADDR="0x%X" % addr, SMOKE_WANT="0x%X" % want, SMOKE_LEN=str(length),
         SMOKE_SETTLE=os.environ.get("SMOKE_SETTLE", "60"),
     )
+    # smoke.lua asserts at frame SMOKE_SETTLE; -seconds_to_run must run at least that many EMULATED
+    # frames (60/s). -nothrottle means those emulated frames are cheap in wall-clock, so a large settle
+    # window costs little — needed for heavy corpus slices whose gate settles well past the 3 s default.
+    secs = max(3, int(env["SMOKE_SETTLE"]) // 60 + 3)
     cmd = ["mame", "snes", "-cart", str(rom), "-rompath", str(ROMPATH),
            "-autoboot_script", str(SMOKE_LUA), "-skip_gameinfo",
-           "-video", "none", "-sound", "none", "-nothrottle", "-seconds_to_run", "3",
+           "-video", "none", "-sound", "none", "-nothrottle", "-seconds_to_run", str(secs),
            "-cfg_directory", str(SCRATCH), "-nvram_directory", str(SCRATCH)]
     p = _run_emu(cmd, timeout=90, env=env)
     m = re.search(r"^SMOKE:.*$", p.stdout, re.M)
@@ -946,7 +950,10 @@ def run_mame(rom, addr, want, length):
 def run_bsnes(rom, off, length, want):
     if not (JGX.exists() and JG_DB.is_dir()):
         return "skip", "(bsnes-jg unavailable)"
-    cmd = [str(JGX), str(rom), str(JG_DB), "0x%X" % off, str(length), "0x%X" % want, "180"]
+    # bsnes-jg frame budget: default 180; BSNES_FRAMES widens it for heavy slices (headless jgxcheck is
+    # unthrottled, so more frames is cheap). Kept in step with the MAME SMOKE_SETTLE window.
+    cmd = [str(JGX), str(rom), str(JG_DB), "0x%X" % off, str(length), "0x%X" % want,
+           os.environ.get("BSNES_FRAMES", "180")]
     p = _run_emu(cmd, timeout=90)
     line = (p.stdout + p.stderr).strip().splitlines()
     line = next((l for l in line if l.startswith("SMOKE:")), "(no SMOKE line)")
