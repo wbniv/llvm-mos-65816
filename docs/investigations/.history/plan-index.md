@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/2b0b9a7) | #45 Union Type-Pun Metaballs SNES demo — Quake fast-inverse-sqrt (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/25b6b8e) | docs(plan-index): point #43 sodo row at its commit ca16265 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ca16265) | #43 Signed 64-bit Odometer SNES demo — sign-corrected __divmoddi4 (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/256a383) | docs(plan-index): point #42 duff row at its commit 5698c17 |
@@ -112,6 +113,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+2b0b9a7	author	Will Norris
+2b0b9a7	added	1
+2b0b9a7	deleted	0
+2b0b9a7	files	1
+2b0b9a7	body	Merging metaballs whose 1/dist falloff is the Quake III fast inverse square root —\nthe union{float f;uint32_t i;} bit hack: reads a float's storage AS an integer,\nmangles it with the magic constant 0x5f3759df, reads it back AS a float. Soft-float\nkept one-op-per-statement so the target never FMA-fuses what the host rounds twice.\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0xAEBE on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate proves the type-pun: __mulsf3 plus the magic constant as byte immediates\n(#$5f #$37 #$59 #$df) with integer shift/subtract on the float's storage. No compiler\nbug — the float<->uint32 reinterpret is byte-exact across all modes; the visual was\ncross-checked against the host grid (frame-500 dimness was blob clustering, not a\nmiscompile — the gate folds q_rsqrt, not mb_field). Live at\nhttps://biohack.net/snes/metaball/ (biohack v1.0.162).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 25b6b8e	author	Will Norris
 25b6b8e	added	1
 25b6b8e	deleted	1
