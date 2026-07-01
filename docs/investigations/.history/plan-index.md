@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/be11fd9) | #47 Newton-Raphson Reciprocal Floor SNES demo — multiply-only iterative refinement (clean positive) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/48f8580) | docs(plan-index): point #46 qsortviz row at its commit 3c2c7a5 |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3c2c7a5) | #46 qsort Sort Visualizer SNES demo — caught + FIXED a real backend crash (G_SCMP) |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ba907ad) | docs(plan-index): point #45 metaball row at its commit 2b0b9a7 |
@@ -116,6 +117,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+be11fd9	author	Will Norris
+be11fd9	added	1
+be11fd9	deleted	0
+be11fd9	files	1
+be11fd9	body	A perspective checkerboard floor whose 1/z depth is a MULTIPLY-ONLY Newton-Raphson\nfixed-point reciprocal x = x*(2 - m*x) — no hardware divide, no divide libcall.\nDistinct from #39's single divide libcall and #45's float bit-hack. Q15/Q16 uint32\nthroughout (products fit 32 bits, no uint64/float).\n\nClean 5-way positive: host==default==+mos-a16==+mos-xy16==0x044A on bsnes-jg,\n-verify clean under a16 and xy16 (MAME leg SKIP — no SPC700 IPL on this box).\nDisasm gate: __mulsi3=6, divide-libcalls=0. No compiler bug — the convergent\nreciprocal loop is byte-exact across all modes. Live at\nhttps://biohack.net/snes/nrecip/ (biohack v1.0.164).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 48f8580	author	Will Norris
 48f8580	added	1
 48f8580	deleted	1
