@@ -14,43 +14,43 @@ animation + mixed 8×8/16×16 font) and re-published to biohack.net v1.0.151.
 
 ## All-green gate results
 
-| Demo | Task | Hash | bsnes-jg | MAME |
-|---|---|---|---|---|
-| 1D Cellular Automaton | `1d-ca` | 0xAB2C | PASS | PASS |
-| 64-bit Avalanche | `avalanche` | 0x27EA | PASS | PASS |
-| Barnes-Hut Galaxy | `bhut` | 0xEF0B | PASS | PASS |
-| Blossom (Hopalong) | `blossom` | 0x9047 | PASS | PASS |
-| Boids Flock | `boids` | 0xA8AB | PASS | PASS |
-| Buddhabrot | `buddha` | 0x7C31 | PASS | PASS |
-| Burning Ship | `burning-ship` | 0x6F2D | PASS | PASS |
-| Cardioid Times-Table | `cardioid` | 0x523B | PASS | PASS |
-| CORDIC Rotator | `cordic` | 0x4D41 | PASS | PASS |
-| Doom Fire | `doom-fire` | 0x3C59 | PASS | PASS |
-| Double Pendulum | `double-pendulum` | 0xE859 | PASS | PASS |
-| Fourier Epicycles | `epicycles` | 0x4F6C | PASS | PASS |
-| Factorial | `factorial` | 0x772F | PASS | PASS |
-| FFT Spectrum | `fft` | 0x6D7A | PASS | PASS |
-| fn-plot | `fn-plot` | 0x2EBE | PASS | PASS |
-| Harmonograph | `harmonograph` | 0x0EBB | PASS | PASS |
-| Hilbert Curve | `hilbert` | 0x5999 | PASS | PASS |
-| Space Invaders | `dev/run.sh invaders` | 0x9D57 | PASS | SKIP¹ |
-| Julia Set | `julia` | 0x3490 | PASS | PASS |
-| Conway's Life | `life` | 0xDDF1 | PASS | PASS |
-| L-System Plant | `lsystem` | 0x79C3 | PASS | PASS |
-| Soft-Float Mandelbrot | `mandel-float` | 0x4169 | PASS | SKIP¹ |
-| Maze Gen+Solve | `maze` | 0x0749 | PASS | PASS |
-| N-Body Orbits | `n-body` | 0xCC65 | PASS | PASS |
-| Newton Fractal | `newton` | 0x4D8B | PASS | PASS |
-| Raycaster Maze | `raycaster` | 0xB200 | PASS | PASS |
-| React-Diffusion | `rdiff` | 0x5555 | PASS | PASS |
-| Sorting Race | `sort-race` | 0xB28F | PASS | PASS |
-| π Spigot + MC | `pi` | 0x7711 | PASS | PASS |
-| Spirograph | `spirograph` | 0x32D4 | PASS | PASS |
-| TEA Cipher | `tea` | 0xDF0E | PASS | PASS |
-| Truchet Bitfields | `truchet` | 0xB3E6 | PASS | PASS |
-| Bytecode VM Turtle | `turtle-vm` | 0x4007 | PASS | PASS |
-| va_arg Lissajous | `vaprintf` | 0xE1F3 | PASS | PASS |
-| 3-D Wireframe | `dev/run.sh wireframe` | 0xE737 | PASS | PASS |
+| Preview | Demo | Task | Hash | bsnes‑jg | MAME |
+|---|---|---|---|---|---|
+| <img src="https://biohack.net/play/preview/1d-ca.png" width="96"> | 1D Cellular Automaton | `1d-ca` | 0xAB2C | PASS | PASS |
+| <img src="https://biohack.net/play/preview/avalanche.png" width="96"> | 64-bit Avalanche | `avalanche` | 0x27EA | PASS | PASS |
+| <img src="https://biohack.net/play/preview/bhut.png" width="96"> | Barnes-Hut Galaxy | `bhut` | 0xEF0B | PASS | PASS |
+| <img src="https://biohack.net/play/preview/blossom.png" width="96"> | Blossom (Hopalong) | `blossom` | 0x9047 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/boids.png" width="96"> | Boids Flock | `boids` | 0xA8AB | PASS | PASS |
+| <img src="https://biohack.net/play/preview/buddhabrot.png" width="96"> | Buddhabrot | `buddha` | 0x7C31 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/burning-ship.png" width="96"> | Burning Ship | `burning-ship` | 0x6F2D | PASS | PASS |
+| <img src="https://biohack.net/play/preview/cardioid.png" width="96"> | Cardioid Times-Table | `cardioid` | 0x523B | PASS | PASS |
+| <img src="https://biohack.net/play/preview/cordic.png" width="96"> | CORDIC Rotator | `cordic` | 0x4D41 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/doom-fire.png" width="96"> | Doom Fire | `doom-fire` | 0x3C59 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/double-pendulum.png" width="96"> | Double Pendulum | `double-pendulum` | 0xE859 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/epicycles.png" width="96"> | Fourier Epicycles | `epicycles` | 0x4F6C | PASS | PASS |
+| <img src="https://biohack.net/play/preview/factorial.png" width="96"> | Factorial | `factorial` | 0x772F | PASS | PASS |
+| <img src="https://biohack.net/play/preview/fft.png" width="96"> | FFT Spectrum | `fft` | 0x6D7A | PASS | PASS |
+| <img src="https://biohack.net/play/preview/fn-plot.png" width="96"> | fn-plot | `fn-plot` | 0x2EBE | PASS | PASS |
+| <img src="https://biohack.net/play/preview/harmonograph.png" width="96"> | Harmonograph | `harmonograph` | 0x0EBB | PASS | PASS |
+| <img src="https://biohack.net/play/preview/hilbert.png" width="96"> | Hilbert Curve | `hilbert` | 0x5999 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/space-invaders.png" width="96"> | Space Invaders | `dev/run.sh invaders` | 0x9D57 | PASS | SKIP¹ |
+| <img src="https://biohack.net/play/preview/julia.png" width="96"> | Julia Set | `julia` | 0x3490 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/life.png" width="96"> | Conway's Life | `life` | 0xDDF1 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/lsystem.png" width="96"> | L-System Plant | `lsystem` | 0x79C3 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/mandel-float.png" width="96"> | Soft-Float Mandelbrot | `mandel-float` | 0x4169 | PASS | SKIP¹ |
+| <img src="https://biohack.net/play/preview/maze.png" width="96"> | Maze Gen+Solve | `maze` | 0x0749 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/n-body.png" width="96"> | N-Body Orbits | `n-body` | 0xCC65 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/newton.png" width="96"> | Newton Fractal | `newton` | 0x4D8B | PASS | PASS |
+| <img src="https://biohack.net/play/preview/raycaster.png" width="96"> | Raycaster Maze | `raycaster` | 0xB200 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/rdiff.png" width="96"> | React-Diffusion | `rdiff` | 0x5555 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/sort-race.png" width="96"> | Sorting Race | `sort-race` | 0xB28F | PASS | PASS |
+| <img src="https://biohack.net/play/preview/spigot.png" width="96"> | π Spigot + MC | `pi` | 0x7711 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/spirograph.png" width="96"> | Spirograph | `spirograph` | 0x32D4 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/tea.png" width="96"> | TEA Cipher | `tea` | 0xDF0E | PASS | PASS |
+| <img src="https://biohack.net/play/preview/truchet.png" width="96"> | Truchet Bitfields | `truchet` | 0xB3E6 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/turtle-vm.png" width="96"> | Bytecode VM Turtle | `turtle-vm` | 0x4007 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/vaprintf.png" width="96"> | va_arg Lissajous | `vaprintf` | 0xE1F3 | PASS | PASS |
+| <img src="https://biohack.net/play/preview/3d-wireframe.png" width="96"> | 3-D Wireframe | `dev/run.sh wireframe` | 0xE737 | PASS | PASS |
 
 ¹ MAME SKIP: no SPC700 IPL ROM (`dev/roms/s_smp/spc700.rom` — gitignored Nintendo content).
 Pre-existing non-blocker; bsnes-jg is the gate emulator.
