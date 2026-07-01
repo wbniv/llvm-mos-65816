@@ -426,6 +426,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: poolfx }
 
+  huffman:
+    desc: "#67: Huffman decode reveal — a 16x16 image is Huffman-encoded into a bitstream, then decoded bit by bit (pull one bit MSB-first, descend the pointer-linked Huffman tree left/right, emit a symbol at each leaf) and revealed a few pixels per frame — the classic image loading-in. A bit-granular stream reader + tree descent, distinct from #49's byte-oriented LZ. Gate cross-checks decode == original. Assert corpus_result (huffman_gate_crc 0xE8E4) == host on MAME + bsnes-jg + disasm gate (bit-shifts, tree refs). Leaves build/huffman.sfc + build/huffman-{mame,jg}.png."
+    cmds:
+      - dev/run.sh huffman
+
+  huffman-play:
+    desc: "PLAY the Huffman Decode demo in a MAME window on this host (builds the ROM first if needed). Shows a Huffman-coded image decoding in bit by bit via a tree walk, the classic progressive reveal."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/huffman.sfc ]; then
+          echo "==> build/huffman.sfc missing — building it (dev/run.sh huffman)…"
+          dev/run.sh huffman
+        fi
+      - task: mandel-mame
+        vars: { ROM: huffman }
+
   editdist:
     desc: "#66: Edit-distance DP — for each word pair the (m+1)x(n+1) Levenshtein table D[i][j] is filled by the min-recurrence D[i][j]=min(sub,del,ins), then the optimal alignment is backtracked from D[m][n] to D[0][0]. Drawn as a cost heat-map with the path lit. A 2-D dynamic-programming table (true D[i][j] addressing) + min-recurrence + backtrack, none of the first 65 demos run. Gate cross-checks symmetry (edit(A,B)==edit(B,A)). Assert corpus_result (editdist_gate_crc 0xFB59) == host on MAME + bsnes-jg + disasm gate. Leaves build/editdist.sfc + build/editdist-{mame,jg}.png."
     cmds:

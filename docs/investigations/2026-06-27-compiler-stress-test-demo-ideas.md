@@ -485,7 +485,7 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
 | **non-comparison sort** — counting/radix: histogram + prefix-sum + scatter, **zero compares** | #17's sorts were all comparison-based; a compare-free scatter sort is a different loop nest | ~~64~~ ✓ |
 | **computational-geometry orientation** — cross-product **sign** tests + angular sort (convex hull) | signed 2-D cross products driving branch decisions; never exercised | ~~65~~ ✓ |
 | **2-D dynamic-programming table** — memoised recurrence + `max`/`min` reductions + backtrack pointer walk | a doubly-indexed table fill with data-dependent reductions; a new loop/GEP shape | ~~66~~ ✓ |
-| **Huffman bit-stream decode** — MSB-first bit reader + pointer-linked tree descent | #49 was *byte*-oriented LZ back-refs; a *bit*-granular reader + tree walk is distinct | 67 |
+| **Huffman bit-stream decode** — MSB-first bit reader + pointer-linked tree descent | #49 was *byte*-oriented LZ back-refs; a *bit*-granular reader + tree walk is distinct | ~~67~~ ✓ |
 | **gradient (Perlin) noise** — permutation table + fade **polynomial** + gradient dot + lerp | value-noise/plasma/CA never did the perm-index + Hermite-fade + dot-product-of-gradients pipeline | 68 |
 | **barycentric edge-function raster** — 3 cross-product edge fns + per-pixel interpolation | #16 drew wireframe **lines** only; solid interpolated fill is a different inner loop | 69 |
 | **error-diffusion (signed spread)** — Floyd–Steinberg propagate signed residual to neighbours + clamp | #7 doom-fire was decay+PRNG; forward-carried *signed* error with saturation is untested | 70 |
@@ -584,10 +584,10 @@ a differential CRC, a `snesgfx` render, the picture *is* the proof.
     pointer walk — a new loop/GEP shape. *Shows:* the DP grid filling with a heat gradient, then the optimal
     alignment / packing path lighting up through it.~~ ✓ [/snes/editdist/](https://biohack.net/snes/editdist/) — bit-exact `host==default==a16==xy16==0xFB59`; Levenshtein `D[i][j]=min(sub,del,ins)` 2-D table + backtrack (min-of-3 `cmp`, doubly-indexed `D[i][j]`); cost heat-map with the traced alignment path, cycling word pairs; gate cross-checks symmetry `edit(A,B)==edit(B,A)`. Clean positive, no bug. ([plan](../plans/2026-06-30-66-snes-editdist.md))
 
-67. **Huffman decode reveal — bit-stream tree walk.** A compressed image decoded by a **bit-granular reader**
+67. ~~**Huffman decode reveal — bit-stream tree walk.** A compressed image decoded by a **bit-granular reader**
     (MSB-first) descending a **pointer-linked Huffman tree**, one bit per edge, emitting a symbol at each
     leaf. *Stresses:* the bit-reader (`code = (code<<1)|nextbit`) + tree-descent — distinct from #49's
-    *byte*-oriented LZ back-refs. *Shows:* the classic progressive "image decoding in" reveal, bit by bit.
+    *byte*-oriented LZ back-refs. *Shows:* the classic progressive "image decoding in" reveal, bit by bit.~~ ✓ [/snes/huffman/](https://biohack.net/snes/huffman/) — bit-exact `host==default==a16==xy16==0xE8E4`; MSB-first bit reader + pointer-linked tree descent (`HF_KID0`/`HF_KID1`/`HF_SYM`), a 16×16 image decodes in bit by bit (concentric diamonds); gate cross-checks decode==original. Distinct from #49's byte LZ. Clean positive, no bug. ([plan](../plans/2026-06-30-67-snes-huffman.md))
 
 ### Rendering & geometry techniques with distinct codegen
 
