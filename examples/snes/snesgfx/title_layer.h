@@ -8,21 +8,22 @@
  * restored in title_end(). Ink shimmer + rainbow backdrop are driven via CGRAM pushes each frame.
  *
  * Layout (always):
- *   line0 — 8×8 font, centred at tilemap row 12 (VOFS=0 → screen row 96)
- *   line1 — 16×16 pixel-doubled font, at tilemap rows 30–31 (VOFS=128 → screen rows 112–127)
+ *   line0 — 8×8 font, centred at tilemap row 12 (y=96;  VOFS=0 → screen row  96)
+ *   line1 — 16×16 pixel-doubled font, at tilemap rows 14–15 (y=112; VOFS=0 → screen rows 112–127)
+ *   (1 blank tilemap row between them; normal reading spacing.)
  *
  *   The two lines share ONE BG2 layer but each band of the screen gets its own VOFS via HDMA:
  *     Band A [scanlines 0..107]   → vofs_top  (governs line0)
  *     Band B [scanlines 108..223] → vofs_bot  (governs line1)
  *
- * VOFS geometry:
+ * VOFS geometry (VOFS=0 is the shared rest position for both lines):
  *   screen_row = tilemap_y − VOFS  (mod tilemap height = 256 px)
- *   line0 @ y=96:  vofs_top 128→0 eases screen_row from −32 (above screen) to 96  (centre)
- *   line1 @ y=240: vofs_bot 0→128 eases screen_row from  240 (below screen) to 112 (centre)
- *   Ease-out (counter-slide): vofs_top rises 0→97+ (line0 exits top); vofs_bot falls 128→0
- *     (line1 exits bottom, screen_row 112→240). "Both exit bottom" is geometrically impossible
- *     with this layout: line0@y=96 and line1@y=240 are 144 tilemap px apart; a downward VOFS
- *     sweep for band A simultaneously places line1 in band A's window from the top.
+ *   line0 @ y=96:  vofs_top 128→0 eases screen_row from gap/top to 96  (fly-in from top)
+ *   line1 @ y=112: vofs_bot −128→0 eases screen_row from 240 (below screen) to 112 (fly-in from bot)
+ *   Ease-out (BOTH to bottom): vofs_top and vofs_bot both decrease 0→−128 (eff VOFS 0→255→128),
+ *     walking line0 from 96→224 and line1 from 112→240 — both exit bottom simultaneously.
+ *     Line1 at y=112 stays at screen_row ≥ 112 > split=108 throughout, so it never appears in
+ *     band A's window regardless of vofs_top. No double-image.
  *
  * Animation timing (at 60 fps):
  *   Ease-in  ~2 s (≈120 frames) — exponential decay, TITLE_FLYIN_SHIFT=6
@@ -65,13 +66,15 @@
 #define TITLE_MAX_CHARS  16u      /* max chars for line1 (16×16 font; 2 tile-cols per glyph)     */
 #define TITLE_L1_TILE    FONT8_N  /* first tile index for 16×16 glyphs (= 64)                   */
 
-#define TITLE_ROW0       12u      /* tilemap row for line0 (8×8); screen row = 96 at VOFS=0     */
-#define TITLE_ROW1       30u      /* tilemap row for line1 top (16×16); screen row=112 at VOFS=128 */
+#define TITLE_ROW0       12u      /* tilemap row for line0 (8×8);  y=96;  screen row = 96  at VOFS=0 */
+#define TITLE_ROW1       14u      /* tilemap row for line1 top (16×16); y=112; screen row=112 at VOFS=0 */
 
-/* VOFS start / target values. Line0: vofs_top 128→0 (enters from top).
-   Line1: vofs_bot 0→128 (enters from bottom; tilemap_y=240 − vofs_bot = screen_row). */
+/* VOFS start / target values.
+   Line0: vofs_top 128→0 (enters from gap/top).
+   Line1: vofs_bot −128→0 (starts below screen: eff VOFS=128 → y=112 at screen_row=240). */
 #define TITLE_VOFS_TOP_START    128
-#define TITLE_VOFS_BOT_TARGET   128
+#define TITLE_VOFS_BOT_START    ((int16_t)-128)
+#define TITLE_VOFS_BOT_TARGET   0
 
 /* Animation parameters */
 #define TITLE_FLYIN_SHIFT    6    /* exponential decay shift — ~2 s ease-in at 60 fps           */
@@ -82,7 +85,7 @@
 #define TITLE_HDMA_CHAN_VOFS  3u  /* BG2VOFS 2-band counter-slide                               */
 #define TITLE_HDMA_CHAN_HOFS  4u  /* BG2HOFS pixel-centring for line0                           */
 
-/* Scanline split: between row 12 (line0) and row 30 (line1); sits in the gap. */
+/* Scanline split: sits in the blank row 13 gap between line0 (rows 12) and line1 (rows 14–15). */
 #define TITLE_HDMA_SPLIT  (uint8_t)((TITLE_ROW0 + 1u) * 8u + 4u)   /* = 108 */
 
 typedef struct {
@@ -223,15 +226,15 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
     }
   }
 
-  /* Initial VOFS: line0 above screen (band A = TITLE_VOFS_TOP_START = 128),
-                   line1 below screen (band B = 0, tilemap_y=240 → screen_row=240 > 223). */
+  /* Initial VOFS: line0 in gap/above (band A = 128 → invisible then pops in at top),
+                   line1 below screen (band B = −128 → eff VOFS 128 → y=112 at screen_row 240). */
   t->vofs_top = TITLE_VOFS_TOP_START;
-  t->vofs_bot = 0;
+  t->vofs_bot = TITLE_VOFS_BOT_START;
   REG_BG2VOFS = (uint8_t)TITLE_VOFS_TOP_START; REG_BG2VOFS = (uint8_t)((uint16_t)TITLE_VOFS_TOP_START >> 8);
 
-  /* VOFS HDMA: 2-band counter-slide (channel 3). Rebuilt each emit() frame. */
+  /* VOFS HDMA: 2-band slide (channel 3). Rebuilt each emit() frame. */
   hscroll2_build(&t->vscroll, TITLE_HDMA_SPLIT,
-                 (int16_t)TITLE_VOFS_TOP_START, (int16_t)0);
+                 (int16_t)TITLE_VOFS_TOP_START, TITLE_VOFS_BOT_START);
   hscroll2_arm(TITLE_HDMA_CHAN_VOFS, VSCROLL_BG2VOFS, &t->vscroll);
 
   /* HOFS HDMA: static pixel-centring for line0 (channel 4). */
@@ -255,7 +258,7 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
       t->vofs_top -= s;
       if (t->vofs_top < 0) t->vofs_top = 0;
     }
-    /* Line1: vofs_bot increases 0→128 (line rises from bottom). */
+    /* Line1: vofs_bot increases −128→0 (rises from below screen to centre). */
     if (t->vofs_bot < (int16_t)TITLE_VOFS_BOT_TARGET) {
       int16_t remain = (int16_t)((int16_t)TITLE_VOFS_BOT_TARGET - t->vofs_bot);
       int16_t s = (int16_t)(remain >> TITLE_FLYIN_SHIFT);
@@ -264,16 +267,16 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
       if (t->vofs_bot > (int16_t)TITLE_VOFS_BOT_TARGET) t->vofs_bot = (int16_t)TITLE_VOFS_BOT_TARGET;
     }
   } else if (t->restore) {
-    /* Ease-out: counter-slide — line0 exits top, line1 exits bottom.
-       vofs_top increases (0→97+): screen_row_line0 = 96−vofs_top falls 96→−1 (off screen top).
-       vofs_bot decreases (128→0): screen_row_line1 = 240−vofs_bot rises 112→240 (off screen bot).
-       Clamp vofs_bot ≥ 0: negative wraps VOFS and line1 reappears at the top.
-       Note: "both exit bottom" is geometrically unsound with this tilemap layout — line0 at y=96
-       and line1 at y=240 are 144 tilemap pixels apart; any downward-VOFS sweep for band A also
-       brings line1 into band A's visible window from the top, causing a double image. */
-    t->vofs_top += TITLE_EASEOUT_VEL;
+    /* Ease-out: BOTH lines exit to the BOTTOM simultaneously.
+       Both vofs_top and vofs_bot decrease 0→−128 (eff VOFS sweeps 0→255→128).
+       line0 @ y=96:  screen_row = 96  → 224 (off screen below).
+       line1 @ y=112: screen_row = 112 → 240 (off screen below).
+       Line1 at y=112 gives screen_row ≥ 112 > split=108 throughout, so it stays in band B
+       and never appears as a double image in band A. Clamp both at −128 (off-screen). */
+    t->vofs_top -= TITLE_EASEOUT_VEL;
     t->vofs_bot -= TITLE_EASEOUT_VEL;
-    if (t->vofs_bot < 0) t->vofs_bot = 0;
+    if (t->vofs_top < -128) t->vofs_top = -128;
+    if (t->vofs_bot < -128) t->vofs_bot = -128;
   }
 
   /* Rebuild VOFS HDMA table — fixed split throughout; no dynamic tracking needed for counter-slide. */
@@ -346,7 +349,7 @@ static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
      makes line1 reappear at the top of the screen for the duration of display_fade. */
   for (uint8_t g = 0; g < 80u; g++) {
     display_frame(d);
-    if (t->vofs_top > (int16_t)(TITLE_ROW0 * 8u) && t->vofs_bot <= 0) break;
+    if (t->vofs_top <= -128 && t->vofs_bot <= -128) break;
   }
   t->restore = 0;   /* freeze vofs before display_fade to prevent over-scroll past wrap boundary */
   display_fade(d, 0);
