@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5ca866d) | feat(snes/mvscrl): #79 Memmove Scroll Slabs (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0ccecd9) | feat(snes/sbitfld): #78 Signed-Bitfield Terrain Sculptor (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/26c2e18) | feat(snes/satcast): #77 Saturating-Cast Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1f15000) | feat(snes/rotkal): #74 Rotate-Register Kaleidoscope (Round 5, compiler stress-test) |
@@ -175,6 +176,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+5ca866d	author	Will Norris
+5ca866d	added	1
+5ca866d	deleted	0
+5ca866d	files	1
+5ca866d	body	G_MEMMOVE both-paths via __builtin_memmove (avoids <string.h> in corpus env):\n- memmove(upper+1, upper, 7×16): dst>src overlapping → Descending=true (:3145-3152)\n- memmove(lower, lower+1, 7×16): dst<src overlapping → Ascending\nSDK memmove: mos-platform/common/c/mem.c:15. First overlapping-memmove demo.\n\nCRC: additive rotate-shift fold h=rotl1(h)+v+step*53 (XOR-based folds cancel to 0\nfor period-4 byte data; additive accumulates 24/step non-zero).\nGate: memmove-refs=2, rep/sep=15; 5-way green 0x72A7.\nNo compiler bug — both G_MEMMOVE paths lower correctly.\nPublished: https://biohack.net/snes/mvscrl/ (biohack.net v1.0.209).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0ccecd9	author	Will Norris
 0ccecd9	added	1
 0ccecd9	deleted	0

@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  compass:
+    desc: "#81: Copysign Compass — G_FCOPYSIGN via __builtin_copysignf(1.0f, x) (inline AND/OR of sign bits; LegalizerHelper:8899) + G_IS_FPCLASS via __builtin_signbitf (inline sign-bit test). 16×16 rotating quadrant vector-field. Assert corpus_result (compass_gate_crc 0xB9CB) == host on MAME + bsnes-jg + disasm gate (__floatsisf>=2, rep/sep>=1). Leaves build/compass.sfc + build/compass-{mame,jg}.png."
+    cmds:
+      - dev/run.sh compass
+
+  compass-play:
+    desc: "PLAY the Copysign Compass demo in a MAME window (builds first if needed). Shows a rotating 16×16 sign-quadrant vector field driven by __builtin_copysignf."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/compass.sfc ]; then
+          echo "==> build/compass.sfc missing -- building (dev/run.sh compass)..."
+          dev/run.sh compass
+        fi
+      - task: mandel-mame
+        vars: { ROM: compass }
+
   mvscrl:
     desc: "#79: Memmove Scroll Slabs -- G_MEMMOVE descending (memmove(upper+1,upper,7×16) dst>src overlapping → Descending=true, :3145-3152) and ascending (memmove(lower,lower+1,7×16) dst<src) paths via __builtin_memmove. First overlapping-memmove demo. Assert corpus_result (mvscrl_gate_crc 0x72A7) == host on MAME + bsnes-jg."
     cmds:
