@@ -1,5 +1,11 @@
 # Plan: real 16×16 Waldo font (with drop-shadow) for demo title screens
 
+**Status: DONE (2026-07-02).** Implemented and verified — shared `snesgfx/title_layer.h` line1 now uploads
+the generated `examples/snes/font16.h` (Waldo face + synthesised +2,+2 SE shadow) instead of pixel-doubling
+`font8.h`. Gate-neutral; `boids` PASS `0xA8AB` host==+mos-a16 on MAME + bsnes-jg; title captures confirm
+shadowed glyphs + authored `-`/`/` + digits. Commits: `7aae608` (llvm-mos), font recovery `e54f2a9`/`3ad2708`
+(home repo). All 5 verification steps below PASS.
+
 **Goal.** Replace the demos' title-card 16×16 line — currently the 8×8 `font8.h` **pixel-doubled** (chunky,
 1-colour) — with the genuine **16×16 Waldo font** recovered in
 `~/waldo/docs/investigations/2026-07-01-great-waldo-search-font-recovery.md` (face + authentic SE
