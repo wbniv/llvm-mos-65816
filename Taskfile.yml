@@ -478,9 +478,21 @@ tasks:
         vars: { ROM: fabsridge }
 
   truncstair:
-    desc: "#83: Truncation Staircase — G_FPTOSI (__fixsfsi) + G_SITOFP (__floatsisf) as the truncf-via-cast pattern; documents floorf/ceilf/truncf .unsupported() SDK gap. ⚠️ SURFACED A REAL COMPILER BUG: whole-program ZP-allocation miscompile (host/corpus 0x02CA vs full ROM 0x1EB5, gate frame $20 vs $69). NOT shipped until fixed. See docs/plans/2026-07-01-83-snes-truncstair.md."
+    desc: "#83: Truncation Staircase — G_FPTOSI (__fixsfsi) + G_SITOFP (__floatsisf) as the truncf-via-cast pattern (floorf/ceilf/truncf .unsupported() in SDK). Three bands (trunc/floor/round) diverging on negatives. Assert corpus_result (truncstair_gate_crc 0x02CA) == host on MAME + bsnes-jg + disasm gate (__fixsfsi>=1, __floatsisf>=1). Leaves build/truncstair.sfc + build/truncstair-{mame,jg}.png."
     cmds:
       - dev/run.sh truncstair
+
+  truncstair-play:
+    desc: "PLAY the Truncation Staircase demo in a MAME window (builds first if needed). Shows three bands comparing trunc/floor/round rounding on a scrolling ramp."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/truncstair.sfc ]; then
+          echo "==> build/truncstair.sfc missing -- building (dev/run.sh truncstair)..."
+          dev/run.sh truncstair
+        fi
+      - task: mandel-mame
+        vars: { ROM: truncstair }
 
   speedcap:
     desc: "#82: Fmin/Fmax Speed Cap — G_FMINNUM/G_FMAXNUM via __builtin_fminf/__builtin_fmaxf (velocity speed governor); both .libcallFor S32 → fminf/fmaxf in SDK (math.cc:18-19). NaN-quieting: fmaxf(NaN,-MAX_V)=-MAX_V. 12 particles on BitmapCanvas. Assert corpus_result (speedcap_gate_crc 0x0116) == host on MAME + bsnes-jg + disasm gate (fminf>=1, fmaxf>=1). Leaves build/speedcap.sfc + build/speedcap-{mame,jg}.png."
