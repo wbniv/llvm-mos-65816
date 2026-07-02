@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  dctbloom:
+    desc: "#88: DCT Bloom — 8x8 separable integer DCT; int32 16x16->32 MAC (__mulsi3) + signed arithmetic-shift descale (G_ASHR) + narrowing cast (G_SEXT_INREG). Distinct from #25 fft (radix-2/twiddles). Split view: source block + coefficient heat grid. Assert corpus_result (dctbloom_gate_crc 0x5364) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1). Leaves build/dctbloom.sfc + build/dctbloom-{mame,jg}.png."
+    cmds:
+      - dev/run.sh dctbloom
+
+  dctbloom-play:
+    desc: "PLAY the DCT Bloom demo in a MAME window (builds first if needed). Shows an animated 8x8 source block and its integer-DCT coefficient heat grid."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/dctbloom.sfc ]; then
+          echo "==> build/dctbloom.sfc missing -- building (dev/run.sh dctbloom)..."
+          dev/run.sh dctbloom
+        fi
+      - task: mandel-mame
+        vars: { ROM: dctbloom }
+
   sobel:
     desc: "#87: Sobelscope — signed 3x3 Sobel edge MAC + saturating magnitude via __builtin_elementwise_add_sat/_sub_sat (G_SADDSAT/G_USUBSAT). Distinct from #57 medfilt (compare-exchange, no MAC). Animated edge-detected field. Assert corpus_result (sobel_gate_crc 0x2849) == host on MAME + bsnes-jg. Leaves build/sobel.sfc + build/sobel-{mame,jg}.png."
     cmds:
