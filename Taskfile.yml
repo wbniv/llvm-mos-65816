@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  ulam:
+    desc: "#85: Ulam Prime Sieve — Sieve of Eratosthenes in a bit-array with VARIABLE-COUNT shifts (arr[i>>3] |= 1u<<(i&7)); the shift amount i&7 is runtime -> variable G_SHL/G_LSHR (distinct from #5 life fixed masks, #28 hilbert). Ulam spiral of primes. Assert corpus_result (ulam_gate_crc 0x1F2F) == host on MAME + bsnes-jg + disasm gate (shift-ops>=1). Leaves build/ulam.sfc + build/ulam-{mame,jg}.png."
+    cmds:
+      - dev/run.sh ulam
+
+  ulam-play:
+    desc: "PLAY the Ulam Prime Sieve demo in a MAME window (builds first if needed). Reveals the Ulam spiral of primes computed by a bit-array sieve."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/ulam.sfc ]; then
+          echo "==> build/ulam.sfc missing -- building (dev/run.sh ulam)..."
+          dev/run.sh ulam
+        fi
+      - task: mandel-mame
+        vars: { ROM: ulam }
+
   montorbit:
     desc: "#84: Montgomery Orbit — Montgomery REDC modular multiplication (a*b mod N via __mulsi3 + >>16 + mask + conditional subtract, NO __udivsi3/__umodsi3). Division-free modmul (distinct from #61 dhmix / #20 factorial). Multiplicative-group orbit as a star-polygon polyline. Assert corpus_result (montorbit_gate_crc 0xBA9B) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1, division-libcalls==0). Leaves build/montorbit.sfc + build/montorbit-{mame,jg}.png."
     cmds:
