@@ -26,10 +26,10 @@
 #include "../snes/sincos.h"     // SINCOS[256], signed 8.8 sine; cos(a)=SINCOS[(a+64)&255]
 
 #ifndef LS_MAX_LEN
-#define LS_MAX_LEN  1700u       // rewrite buffer cap (a generation that would overflow stops cleanly)
+#define LS_MAX_LEN  2400u       // rewrite buffer cap (a generation that would overflow stops cleanly)
 #endif
 #ifndef LS_GEN
-#define LS_GEN      5u          // rewrite generations (gen 5 = 1690 chars / 401 F-segments)
+#define LS_GEN      6u          // rewrite generations (gen 6 = 2388 chars / 567 F-segments)
 #endif
 #ifndef LS_ANGLE
 #define LS_ANGLE    18          // turn per +/- (of 256 = 360 deg ~ 25 deg)

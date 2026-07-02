@@ -1,16 +1,16 @@
 -- dev/lsystem.lua — MAME autoboot: let the L-System Plant run, snapshot the real PPU output, and
 -- assert the gate proof (corpus_result) matches the host oracle. MAME's video:snapshot() needs a
 -- real rendered surface, so dev/lsystem.sh runs MAME under Xvfb. The gate (lsystem_gate_crc) finishes
--- during the title splash and the first morph keyframe sweeps in; we snapshot at SHOT_AT (default
--- 800, past the one-time boot compute) to show the spinning fractal. Inputs:
+-- during the title splash; we snapshot at SHOT_AT (gen 6 / 567 segs: 750+ frames for the build +
+-- interpret; 1200 has plenty of headroom). Inputs:
 --   SHOT_ADDR  program-space addr of corpus_result (e.g. 0x7E____)
---   SHOT_WANT  expected hash (host reference, 0x79C3)
---   SHOT_AT    frame to snapshot/assert at (default 500)
+--   SHOT_WANT  expected hash (host reference, 0x8073 for gen 6)
+--   SHOT_AT    frame to snapshot/assert at (default 1200)
 local function num(name, d) local v = os.getenv(name); if not v or v == "" then return d end
   return tonumber(v) or tonumber(v, 16) or d end
 local ADDR = num("SHOT_ADDR", 0x7E0000)
-local WANT = num("SHOT_WANT", 0x79C3)
-local AT   = num("SHOT_AT", 600)
+local WANT = num("SHOT_WANT", 0x8073)
+local AT   = num("SHOT_AT", 1200)
 
 local f, done = 0, false
 emu.register_periodic(function()

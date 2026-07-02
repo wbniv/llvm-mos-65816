@@ -41,8 +41,8 @@ static const uint16_t bg3_pal[4] = {
 //
 // At startup the canonical lsystem_interp() runs ONCE: its emit callback RECORDS every F-segment
 // (5 bytes: x0,y0,x1,y1,col) into a far buffer at $7E2000 — exercising the +mos-a16 FAR-POINTER
-// STORE path — while the same pass folds the gate CRC into corpus_result (== host == 0x79C3,
-// unchanged, since the CRC is independent of what emit does). Then each frame the loop replays the
+// STORE path — while the same pass folds the gate CRC into corpus_result (== host == 0xA555,
+// unchanged, since the CRC is independent of what emit does). CRC = 0x8073 at gen 6. Then each frame the loop replays the
 // next chunk of segments by READING them back from far memory (the FAR-POINTER LOAD path) and
 // drawing them — a cheap O(1)-per-segment reveal, so the plant grows smoothly stroke by stroke.
 //
@@ -51,10 +51,10 @@ static const uint16_t bg3_pal[4] = {
 // store+load against the 128 KiB WRAM — the high-memory codegen path the low-WRAM-only version never
 // touched. The far buffer makes the ROM +mos-a16-only (a16 ↔ bsnes-jg bar), like julia/buddhabrot.
 #define FAR __attribute__((address_space(2)))
-static FAR uint8_t *const seg = (FAR uint8_t *)0x7E2000u;   // far segment record (≤ 401×5 = 2005 B)
+static FAR uint8_t *const seg = (FAR uint8_t *)0x7E2000u;   // far segment record (≤ 567×5 = 2835 B)
 
-#define SEG_MAX        512u    // far-buffer capacity in segments (2560 B; the plant has ~401)
-#define SEGS_PER_FRAME 3u      // segments revealed per frame (~401 total → ~134 frames ≈ 2.2 s)
+#define SEG_MAX        700u    // far-buffer capacity in segments (3500 B; the plant has ~567)
+#define SEGS_PER_FRAME 3u      // segments revealed per frame (~567 total → ~189 frames ≈ 3.2 s)
 #define HOLD_FRAMES    150u    // frames to hold the finished plant before regrowing
 
 typedef struct {

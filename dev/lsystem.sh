@@ -74,7 +74,7 @@ if [ ! -x "$JGX" ]; then
 fi
 if [ -x "$JGX" ] && [ -d "$VENDOR/Database" ]; then
   echo "==> bsnes-jg: render + framebuffer dump (build/lsystem-jg.png) + assert"
-  "$JGX" "$BUILD/lsystem.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 600 "$BUILD/lsystem-jg.png" || rc=1
+  "$JGX" "$BUILD/lsystem.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 1200 "$BUILD/lsystem-jg.png" || rc=1
 else
   echo "    SKIP bsnes-jg (harness/core absent — run: dev/run.sh xcheck once)"
 fi
@@ -85,10 +85,10 @@ if [ ! -f "$ROOT/dev/roms/s_smp/spc700.rom" ]; then
 elif command -v xvfb-run >/dev/null 2>&1; then
   echo "==> MAME (under Xvfb): snapshot + assert (build/lsystem-mame.png)"
   SNAP="$BUILD/.lsystem-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
-  line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \
+  line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" SHOT_AT=1200 \
     xvfb-run -a mame snes -cart "$BUILD/lsystem.sfc" -rompath "$ROOT/dev/roms" \
       -autoboot_script "$ROOT/dev/lsystem.lua" -skip_gameinfo \
-      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 18 \
+      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 25 \
       -cfg_directory /tmp -nvram_directory /tmp 2>/dev/null | grep -m1 '^SHOT:' || true)"
   echo "    $line"
   if [ -f "$SNAP/snes/0000.png" ]; then mv "$SNAP/snes/0000.png" "$BUILD/lsystem-mame.png"; fi
