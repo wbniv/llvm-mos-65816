@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  matcascade:
+    desc: "#91: Matrix Cascade -- sret hidden-pointer struct-return ABI for mat2 (8 bytes, over getNaturalAlignIndirect threshold MOS.cpp:88) via chained by-value mat_mul; __mulsi3 MACs. Distinct from #26 boids (vec2 32-bit register pair, not sret). Spinning wireframe lattice. Assert corpus_result (matcascade_gate_crc 0x8064) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1, mat_mul sret call sites). Leaves build/matcascade.sfc + build/matcascade-{mame,jg}.png."
+    cmds:
+      - dev/run.sh matcascade
+
+  matcascade-play:
+    desc: "PLAY the Matrix Cascade demo in a MAME window (builds first if needed). Shows a spinning wireframe lattice driven by chained sret matrix multiplies."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/matcascade.sfc ]; then
+          echo "==> build/matcascade.sfc missing -- building (dev/run.sh matcascade)..."
+          dev/run.sh matcascade
+        fi
+      - task: mandel-mame
+        vars: { ROM: matcascade }
+
   scopeguard:
     desc: "#90: Scope-Guard Ripple Tank -- __attribute__((cleanup(fn))) compiler-synthesized scope-exit calls (CGDecl.cpp:2254): guarded locals run their cleanup at every scope exit (fall-through/return/break/nested-block) in reverse declaration order. First battery demo using the cleanup attribute. Fixed-point ripple tank visual. Assert corpus_result (scopeguard_gate_crc 0x05A3) == host on MAME + bsnes-jg + disasm gate (>=3 cleanup call sites). Leaves build/scopeguard.sfc + build/scopeguard-{mame,jg}.png."
     cmds:
