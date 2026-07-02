@@ -1172,10 +1172,10 @@ not a codegen patch) that unblocked idea #35.
 > plain `-mcpu=mosw65816` coalescer miscompile invisible to every `+mos-a16`/`+mos-xy16` gate. Build + gate
 > default-8-bit first (that is where a regression reappears), then a16/xy16 for the standard 5-way contrast.
 
-105. **Bit-Serial CRC Wall (`crcwall`).** *Re-stresses:* `0010` — CRC8, CRC16 and CRC32 computed **bit-at-a-time**
+~~105. **Bit-Serial CRC Wall (`crcwall`).** *Re-stresses:* `0010` — CRC8, CRC16 and CRC32 computed **bit-at-a-time**
     (NOT #40's table) inlined in one hot loop with a loop-carried shift register + back-edge `ROL`, three polys
     under pressure — the exact shape that found `0010`, widened. *Shows:* three hash-marble fields side by side.
-    *Differential:* CRC over all three (a coalescer strand diverges the loop-carried byte); default-8-bit + 5-way.
+    *Differential:* CRC over all three (a coalescer strand diverges the loop-carried byte); default-8-bit + 5-way.~~ ✓ [/snes/crcwall/](https://biohack.net/snes/crcwall/) ([plan](../plans/2026-07-02-105-snes-crcwall.md)) — **clean positive:** default-8bit compiles clean, `asl/rol/lsr/ror=13` (shift-register present); `host==default==+mos-a16==+mos-xy16==0x8E47`, `-verify` clean. Patch `0010` holds under 3 interleaved bit-serial CRCs. *(Display = a single flowing CRC-8 marble, not 3 side-by-side.)*
 106. **Dual-LFSR Scrambler (`lfsr2`).** *Re-stresses:* `0010` with **two** loop-carried shift registers live at
     once — a maximal-length **Galois** LFSR and a **Fibonacci** LFSR, each feeding a rotate, run simultaneously
     (extra pressure). *Shows:* two interleaved pseudo-noise fields. *Differential:* CRC over both streams;
@@ -1280,8 +1280,8 @@ Sharpest at re-breaking an incompletely-generalized fix (highest bug-yield), or 
   ✓ [/snes/ovmove/](https://biohack.net/snes/ovmove/) — **SHIPPED, clean positive** (`0xA990`, 5-way + `-verify`; the #23/`0002` xy16 memmove fix holds).
 - ~~**#97 `spaceship`** — `lowerThreewayCompare` at **s64** is a width qsortviz never emitted; the `G_SCMP`
   fix (`0016`) is unverified at 64-bit.~~ ✓ [/snes/spaceship/](https://biohack.net/snes/spaceship/) — **SHIPPED, clean positive** (`0xF20F`, 5-way + `-verify`; IR probe `scmp.i64=2` — s64 three-way compare lowers correctly).
-- **#105 `crcwall`** — the ONLY default-8-bit bug in the set (`0010`); a regression there is **invisible** to
-  every a16/xy16 gate, so a dedicated 8-bit-primary guard matters most.
+- ~~**#105 `crcwall`** — the ONLY default-8-bit bug in the set (`0010`); a regression there is **invisible** to
+  every a16/xy16 gate, so a dedicated 8-bit-primary guard matters most.~~ ✓ [/snes/crcwall/](https://biohack.net/snes/crcwall/) — **SHIPPED, clean positive** (`0x8E47`, 5-way + `-verify`; default-8bit `asl/rol=13`, `0010` holds under 3 interleaved bit-serial CRCs).
 - **#111 `cfcascade`** — the truest latent-bug shape in cluster E: reads an operand straight out of a
   `__mulsi3`/`__divsi3` return (`$rc`-resident) and keeps it live across the next call — the exact
   coalesce-into-`Imag16`-across-clobber pattern `0015` (rc-undef) guards, chained deep under a16/xy16.

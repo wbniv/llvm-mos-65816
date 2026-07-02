@@ -443,6 +443,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: satcomet }
 
+  crcwall:
+    desc: "#105 (Round 6, harden-the-fixes, Cluster D): Bit-Serial CRC Wall — re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile). Three interleaved bit-serial CRC shift registers (CRC-8/16/32) under register pressure = the shape that found 0010 (the DEFAULT-8-bit leg is load-bearing). Flowing CRC marble. Assert corpus_result (crcwall_gate_crc 0x8E47) == host on MAME + bsnes-jg + disasm gate (default-8bit compile OK, asl/rol shift-register present). Leaves build/crcwall.sfc + build/crcwall-{mame,jg}.png."
+    cmds:
+      - dev/run.sh crcwall
+
+  crcwall-play:
+    desc: "PLAY the Bit-Serial CRC Wall demo in MAME (builds first if needed). A flowing hash-marble from bit-serial CRC-8 of cell coordinates."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/crcwall.sfc ]; then
+          echo "==> build/crcwall.sfc missing -- building (dev/run.sh crcwall)..."
+          dev/run.sh crcwall
+        fi
+      - task: mandel-mame
+        vars: { ROM: crcwall }
+
   spaceship:
     desc: "#97 (Round 6, harden-the-fixes, Cluster B): Width-Sweep Sort Gallery — re-stresses patch 0016 (#46 G_SCMP three-way compare, .lower() -> lowerThreewayCompare) at s16/s32/s64 via qsort callbacks returning (a>b)-(a<b) at int8/16/32/64 keys (s32+s64 are widths qsortviz never reached). Four bar-sort panels. Assert corpus_result (spaceship_gate_crc 0xF20F) == host on MAME + bsnes-jg + G_SCMP IR probe (llvm.scmp>=1, scmp.i64>=1). Leaves build/spaceship.sfc + build/spaceship-{mame,jg}.png."
     cmds:
