@@ -49,6 +49,37 @@ plus a shared-toolchain rebuild (coordinated action). **Escalated to the user fo
 (fix now vs. log + continue the demo loop). The G_FPTOSI/G_SITOFP codegen this demo targets is
 itself correct (corpus is bit-exact) — the bug is orthogonal ZP allocation.
 
+### Update — DEFINITIVE root-cause class (2026-07-01, deeper investigation)
+
+Extended cross-emulator testing proves this is a **read of uninitialized memory in the
+generated code** — the same UB-free source (bit-exact on host) produces **three different
+deterministic results** depending on machine power-on RAM state:
+
+| Config (full display ROM) | Result | vs host `0x02CA` |
+|---------------------------|--------|-------------------|
+| host oracle (x86)         | `0x02CA` | — |
+| **MAME**, +mos-a16        | `0x02CA` | ✅ matches (MAME zero-inits WRAM) |
+| **bsnes-jg**, +mos-a16    | `0x1EB5` | ❌ differs |
+| **bsnes-jg**, default-8bit| `0x0736` | ❌ differs *again* |
+
+Same ROM bytes → MAME and bsnes-jg disagree; and the default-8-bit build (no `rep`/`sep`, so
+not an a16 CPU-emulation edge case) diverges to yet a third value. The only variable is the
+**power-on WRAM pattern** (MAME fills 0x00 → matches the host's zeroed state; bsnes-jg uses a
+non-zero power-on pattern). Therefore the generated code **reads a WRAM location before writing
+it**, and the demo happens to pass only when that location reads as zero. This is a genuine
+backend miscompile (the C never reads uninitialized storage), exposed by the gate's static ZP
+frame landing in the higher-pressure region (`$69`) only when the display/title code is linked.
+
+**Diagnostic wall hit:** the gate's own frame slots are all write-before-read (verified by a
+first-touch trace of the generated `.s`), so the uninitialized read is in a **callee's scratch**
+or a frame/soft-stack slot the gate reads across the soft-float call chain — not visible at the
+gate-`.s` level. MAME lua `install_read_tap` did not fire in this MAME build, and bsnes-jg is not
+lua-instrumentable, so an emulator read-watchpoint could not pinpoint the exact address. The next
+step is **MIR-level**: build a failing repro through `llc -print-after-all -debug-only=…` on a
+throwaway `vendor/llvm-mos` worktree to find the pass that emits the undef read (candidates:
+`MOSZeroPageAlloc` static-frame coloring vs. the soft-float call tree, or a spill/reload of an
+`undef` lane). That requires a shared-toolchain rebuild — pending user go-ahead.
+
 ---
 
 **(Original plan below — the demo design is complete; only the compiler fix blocks publication.)**
@@ -142,3 +173,33 @@ Canvas: 128×128 (16×16 tiles) placed at BOX_COL=8, BOX_ROW=2.
 6. Inspect `build/truncstair-jg.png` — three-band staircase visible, trunc/floor/round diverge.
 7. Copy screenshot → `docs/plans/screenshots/truncstair.png`.
 8. /snes-rom-page publishes.
+
+### Update 2 — mechanism pinned to `.zp.noinit` ZP-allocation collision (2026-07-01)
+
+Linker-map + SDK-linkscript inspection nails the mechanism class:
+
+- `corpus_result` lives at ZP `$67:$68` in **`.zp.bss`** (crt0 **zeroes** it) — the observed value is genuine.
+- The gate's static frame `.Ltruncstair_gate_crc_zp_stk` and every other function's static ZP
+  frame live in **`.zp` / `.zp.noinit`** (`>zp`, `NOLOAD` — crt0 does **NOT** zero it; it is
+  power-on garbage on real hardware and on bsnes-jg). In the failing full ROM the gate frame is
+  colored to `$69–$74` (40-byte `.zp.noinit` region begins at `$69`).
+- The gate's own frame slots are all write-before-read (verified). So the uninitialized read is a
+  **soft-float callee's `.zp.noinit` frame overlapping the gate's live frame** — an interference
+  edge (gate → `__floatsisf`/`__mulsf3`/`__fixsfsi`/`__subsf3`) the ZP allocator **failed to
+  record**, so lld placed the two frames on top of each other. MAME fills `.zp.noinit` with `0x00`
+  at power-on, so the collided read returns 0 and the gate still lands on `0x02CA` (masking the
+  bug); bsnes-jg's non-zero power-on pattern turns the same read into garbage → `0x1EB5`
+  (`+mos-a16`) / `0x0736` (default-8-bit). At the `$20` placement (corpus / bare ROM) there is no
+  overlap, so all emulators agree.
+
+**Fix locus (candidate):** `MOSZeroPageAlloc` / the llvm-mos `.zp` interference model — the static
+ZP frame of a function must be treated as **live across its soft-float (compiler-rt) libcalls**, so
+its frame cannot be colored over a (transitive) callee's `.zp.noinit` frame. Requires backend work
+on a throwaway `vendor/llvm-mos` worktree + a shared-toolchain rebuild.
+
+**Instrumentation wall (why the exact overlapping slot isn't pinned yet):** MAME's zero-init masks
+the read (so its write/read taps show a clean, correct run); MAME `install_read_tap` did not fire in
+this build; bsnes-jg has no lua scripting. Pinpointing the exact colliding slot needs either a
+working emulator read-watchpoint or MIR/`.zp`-layout tracing from a rebuilt debug toolchain. **This
+is where I paused for direction** — the fix is a substantial backend + toolchain-rebuild effort and
+I did not want to burn shared-tree rebuilds on a guess.
