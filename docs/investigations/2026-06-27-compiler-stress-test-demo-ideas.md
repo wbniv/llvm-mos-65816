@@ -1093,11 +1093,11 @@ not a codegen patch) that unblocked idea #35.
     left/right by a runtime k via the three-reversal identity (`rev[0,k) · rev[k,n) · rev[0,n)`), **all in
     place**, so 16-bit indices sweep back and forth across the width-flag boundary. *Shows:* a barber-pole /
     marquee band whose pattern rotates without tearing. *Differential:* CRC over the rotated buffer; 5-way + xy16.~~ ✓ [/snes/rotslab/](https://biohack.net/snes/rotslab/) ([plan](../plans/2026-07-02-94-snes-rotslab.md)) — **clean positive:** the 384-entry `uint16_t` reversal swaps lower to ZP-indirect 16-bit access bracketed by `rep #$20`/`sep #$20` (the `placeIntraBlock` width-flag path, `rep/sep=48`) — a *different addressing form* than #93's `memmove` libcall, so both angles onto `0002` are guarded; `host==default==+mos-a16==+mos-xy16==0xB93A`, `-verify` clean. Measured aside: the runtime `k %= n` folds away (`k ≤ 34 < 384`) — correct optimization, not this demo's corner.
-95. **Gather-Scatter Permutation (`permscat`).** *Re-stresses:* `0002` at its hardest — `dst[perm[i]] = src[i]`
+~~95. **Gather-Scatter Permutation (`permscat`).** *Re-stresses:* `0002` at its hardest — `dst[perm[i]] = src[i]`
     over a >512-entry array with **both an indexed 16-bit load AND an indexed 16-bit store** in the inner loop
     (two 16-bit index values live simultaneously — the exact shape where a stray `sep #$10` would zero one).
     *Shows:* a kaleidoscopic tile-shuffle that must land every tile exactly (a bijection). *Differential:* CRC
-    over the scattered array; a wrong index diverges it AND drops/duplicates a tile; 5-way + xy16.
+    over the scattered array; a wrong index diverges it AND drops/duplicates a tile; 5-way + xy16.~~ ✓ [/snes/permscat/](https://biohack.net/snes/permscat/) ([plan](../plans/2026-07-02-95-snes-permscat.md)) — **clean positive:** a 576-entry (>512) bijective scatter with two live 16-bit indices (counter `i` + data-dependent `perm[i]`); under +mos-xy16 emits **`sta abs,X` with a 16-bit index** (3×) — the literal #23 shape #94 rotslab did NOT produce (rotslab's pointer reversal lowered to ZP-indirect). a16 `rep/sep=41`, `host==default==+mos-a16==+mos-xy16==0x0C2C`, `-verify` clean ×2. Patch 0002 holds on the indexed-store form too.
 96. **Gap-Buffer Rope Editor (`ropeedit`).** *Re-stresses:* `0002` at scale — a >256-byte text gap buffer that
     `memmove`s on **every** insert/delete (a bigger, both-direction lsystem), 16-bit offsets throughout. A
     scripted edit stream (type/delete/jump) exercises grow and shrink. *Shows:* live text edited in place,

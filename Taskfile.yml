@@ -495,7 +495,7 @@ tasks:
         vars: { ROM: ovmove }
 
   rotslab:
-    desc: "#94 (Round 6, harden-the-fixes, Cluster A): In-Place Block Rotate — re-stresses patch 0002 (MOSInsertREPSEP::placeIntraBlock, the #23 +mos-xy16 index-width fix) via a hand-written three-reversal rotate of a 384-entry uint16_t buffer: 16-bit-indexed reversal swaps crossing the M/X width-flag boundary, NO memmove libcall (the #93 angle differs). Assert corpus_result (rotslab_gate_crc 0xB93A) == host on MAME + bsnes-jg + disasm gate (__umodhi>=1, rep/sep>=1, xy16 compile clean). Leaves build/rotslab.sfc + build/rotslab-{mame,jg}.png."
+    desc: "#94 (Round 6, harden-the-fixes, Cluster A): In-Place Block Rotate — re-stresses patch 0002 (MOSInsertREPSEP::placeIntraBlock, the #23 +mos-xy16 index-width fix) via a hand-written three-reversal rotate of a 384-entry uint16_t buffer: 16-bit-indexed reversal swaps crossing the M/X width-flag boundary, NO memmove libcall (the #93 angle differs). Assert corpus_result (rotslab_gate_crc 0xB93A) == host on MAME + bsnes-jg + disasm gate (rep/sep>=1, xy16 compile clean). Leaves build/rotslab.sfc + build/rotslab-{mame,jg}.png."
     cmds:
       - dev/run.sh rotslab
 
@@ -510,6 +510,23 @@ tasks:
         fi
       - task: mandel-mame
         vars: { ROM: rotslab }
+
+  permscat:
+    desc: "#95 (Round 6, harden-the-fixes, Cluster A): Gather-Scatter Permutation — re-stresses patch 0002 (MOSInsertREPSEP::placeIntraBlock, the #23 +mos-xy16 index-width fix) at its hardest: a scatter dst[perm[i]]=src[i] over a 576-entry (>512) grid with TWO 16-bit indices live at once (loop counter i AND the data-dependent scatter index perm[i]). Under +mos-xy16 emits `sta abs,X` with a 16-bit index — the literal #23 shape rotslab did not. Assert corpus_result (permscat_gate_crc 0x0C2C) == host on MAME + bsnes-jg + disasm gate (a16 rep/sep>=1, xy16 sta,X>=1, xy16 compile clean). Leaves build/permscat.sfc + build/permscat-{mame,jg}.png."
+    cmds:
+      - dev/run.sh permscat
+
+  permscat-play:
+    desc: "PLAY the Gather-Scatter Permutation demo in MAME (builds first if needed). A 16x16 window of a 576-cell grid shuffled kaleidoscopically by a bijective scatter each step."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/permscat.sfc ]; then
+          echo "==> build/permscat.sfc missing -- building (dev/run.sh permscat)..."
+          dev/run.sh permscat
+        fi
+      - task: mandel-mame
+        vars: { ROM: permscat }
 
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
@@ -527,6 +544,23 @@ tasks:
         fi
       - task: mandel-mame
         vars: { ROM: mulov64 }
+
+  cpu6502:
+    desc: "#102 (Round 6, harden-the-fixes, Cluster C): 6502/65C02 CPU Disassembler + Simulator — simulates the 6502 assembly equivalent of hello.c (green color register + sentinel 0x42 + 8 ALU gate types). Display: Waldo 16×16 disasm listing (top) + schematic gate symbols AND/OR/XOR/ADD/SUB/SHL/SHR/CMP (bottom). Codegen: 256-entry switch dispatch (jump table), uint16_t PC arithmetic, uint8_t flag bit-ops. Assert corpus_result (cpu6502_gate_crc 0xAC8A) == host on MAME + bsnes-jg + jmp-table probe. Leaves build/cpu6502.sfc + build/cpu6502-{mame,jg}.png."
+    cmds:
+      - dev/run.sh cpu6502
+
+  cpu6502-play:
+    desc: "PLAY the 6502/65C02 CPU Simulator demo in MAME (builds first if needed). Watch the disassembly scroll and gates light up."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/cpu6502.sfc ]; then
+          echo "==> build/cpu6502.sfc missing -- building (dev/run.sh cpu6502)..."
+          dev/run.sh cpu6502
+        fi
+      - task: mandel-mame
+        vars: { ROM: cpu6502 }
 
   smulorbit:
     desc: "#76: Signed Multiply-Overflow Orbit Sentinel — G_SMULO at s16 (lowerMulo widen-multiply-sign-check) + s32 (lowerMulo widen to int64 -> __muldi3) via __builtin_mul_overflow on int16_t and int32_t. First demo to use signed mul-overflow check. Orbit-scatter with overflow teleport sparks. Assert corpus_result (smulorbit_gate_crc 0xD81B) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, rep/sep>=1). Leaves build/smulorbit.sfc + build/smulorbit-{mame,jg}.png."
