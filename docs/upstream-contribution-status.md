@@ -322,7 +322,9 @@ gh issue create --repo llvm-mos/llvm-mos-sdk \
   --body-file docs/investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md   # trim to the repro + root cause + our fix
 ```
 
-Full internal record: [setjmp/longjmp 65816 investigation](investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md).
+Full internal record: [setjmp/longjmp 65816 investigation](investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md)
+(root cause) + [fix analysis report](investigations/2026-07-02-setjmp-longjmp-65816-fix-analysis.md) (design
+rationale + verification, for the PR narrative).
 
 ## Future / blocked (not yet postable — do **not** count these as pending)
 

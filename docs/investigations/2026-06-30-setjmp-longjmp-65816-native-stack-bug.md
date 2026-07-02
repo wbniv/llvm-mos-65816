@@ -122,4 +122,7 @@ hardcoded `$0101`/`$0102`. `setjmp` likewise reads the return address via `1,s`/
 **Verification** — `corpus/setjmp_sim.c` (the repro above, `corpus_result` must end `0x2007`, not the
 pre-`longjmp` sentinel `0x1111`) added as a permanent regression guard and run through the full
 differential: **host == default@MAME == +mos-a16@MAME == +mos-xy16@MAME == +mos-a16@bsnes-jg**, all
-`0x2007`. See the plan `docs/plans/2026-07-02-35-setjmp-longjmp-65816-fix.md`.
+`0x2007`. See the plan `docs/plans/2026-07-02-35-setjmp-longjmp-65816-fix.md` (numbered steps + evidence) and
+the full engineering write-up
+[`2026-07-02-setjmp-longjmp-65816-fix-analysis.md`](2026-07-02-setjmp-longjmp-65816-fix-analysis.md)
+(design decisions, the archive-order shadow, the two non-bug detours, Round 6 hardening).

@@ -3,6 +3,7 @@
 **Status:** implemented + verified 2026-07-02.
 **Supplements:** `CLAUDE.md` (project) + `docs/agent-handoff.md`.
 **Root-cause record:** [`docs/investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md`](../investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md).
+**Analysis report** (the full engineering narrative — design decisions, the two detours, hardening): [`docs/investigations/2026-07-02-setjmp-longjmp-65816-fix-analysis.md`](../investigations/2026-07-02-setjmp-longjmp-65816-fix-analysis.md).
 **Upstream queue:** [`docs/upstream-contribution-status.md`](../upstream-contribution-status.md) §9.
 
 ## Problem
