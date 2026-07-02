@@ -1109,10 +1109,10 @@ not a codegen patch) that unblocked idea #35.
     s64** keys, forcing `G_SCMP` (→ `lowerThreewayCompare`) at all four widths in one ROM. The s64 leg is a
     path qsortviz never reached. *Shows:* four bar-columns sorting in lockstep. *Differential:* CRC over all
     four sorted arrays; 5-way.~~ ✓ [/snes/spaceship/](https://biohack.net/snes/spaceship/) ([plan](../plans/2026-07-02-97-snes-spaceship.md)) — **clean positive:** used qsort callbacks (a direct compare folds the scmp away); IR probe confirms `llvm.scmp=8` incl. `scmp.i64=2`; `host==default==+mos-a16==+mos-xy16==0xF20F`, `-verify` clean. G_SCMP `lowerThreewayCompare` holds at s32/s64 (the widths #46 never reached). *(Distinct G_SCMP widths are s16/s32/s64 — int8 promotes to the s16 path.)*
-98. **Unsigned Rank Percentile Field (`ucmprank`).** *Re-stresses:* the **`G_UCMP`** (unsigned) half of `0016`
+~~98. **Unsigned Rank Percentile Field (`ucmprank`).** *Re-stresses:* the **`G_UCMP`** (unsigned) half of `0016`
     that signed qsortviz never emitted — per-cell rank/percentile of `uint32` and `uint64` values via
     `(a>b)-(a<b)`. *Shows:* a field recoloured by each cell's rank among its neighbours. *Differential:* CRC
-    over the rank grid; 5-way.
+    over the rank grid; 5-way.~~ ✓ [/snes/ucmprank/](https://biohack.net/snes/ucmprank/) ([plan](../plans/2026-07-02-98-snes-ucmprank.md)) — **clean positive:** qsort with unsigned spaceship comparators at uint16/uint32/uint64 forces **`llvm.ucmp` at u16/u32/u64** (`ucmp=6` incl. `ucmp.i64=2`, signed `scmp=0` — no leak), the unsigned `lowerThreewayCompare` path #46/#97 never emitted; `host==default==+mos-a16==+mos-xy16==0x4CDD`, `-verify` clean ×2. The unsigned half of 0016 holds.
 99. **Three-Way Merge Diff (`trimerge`).** *Re-stresses:* `0016` with the spaceship result used **as control
     flow** — a 3-way merge of sorted streams where `−1/0/+1` switches into distinct branches (advance-left /
     emit-both / advance-right), not just a sort key. *Shows:* three lanes braiding into one merged column.

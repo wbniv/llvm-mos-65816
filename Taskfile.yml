@@ -545,6 +545,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: ropeedit }
 
+  ucmprank:
+    desc: "#98 (Round 6, harden-the-fixes, Cluster B): Unsigned Rank Percentile Field — re-stresses the UNSIGNED half of patch 0016 (#46, .lower() → lowerThreewayCompare): qsort with unsigned spaceship comparators (a>b)-(a<b) at uint16/uint32/uint64 forces G_UCMP at u16/u32/u64 — the unsigned three-way lowering #46/#97 (signed G_SCMP) never emitted. Assert corpus_result (ucmprank_gate_crc 0x4CDD) == host on MAME + bsnes-jg + IR probe (llvm.ucmp incl. u64, no signed scmp leak). Leaves build/ucmprank.sfc + build/ucmprank-{mame,jg}.png."
+    cmds:
+      - dev/run.sh ucmprank
+
+  ucmprank-play:
+    desc: "PLAY the Unsigned Rank Percentile Field demo in MAME (builds first if needed). A 16x16 field recoloured by each cell's unsigned rank (percentile band); re-seeds periodically."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/ucmprank.sfc ]; then
+          echo "==> build/ucmprank.sfc missing -- building (dev/run.sh ucmprank)..."
+          dev/run.sh ucmprank
+        fi
+      - task: mandel-mame
+        vars: { ROM: ucmprank }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:
