@@ -596,6 +596,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: keycmp64 }
 
+  oddmask:
+    desc: "#103 (Round 6, harden-the-fixes, Cluster C): Odd-Width Mask Sculptor — re-stresses the odd-width extend + s64 (un)merge legalization of patch 0017 (#61 dhmix): forms s20/s24/s28 intermediates (i32-sourced narrow mask+op → G_ZEXT sN→s64, no s16-lane decomposition) threaded through an s64 multiply — the path that crashed a16/xy16 before 0017. Assert corpus_result (oddmask_gate_crc 0x1FD9) == host on MAME + bsnes-jg + odd-width-extend probe (G_ZEXT s20/s24/s28→s64, __muldi3, xy16 clean). Leaves build/oddmask.sfc + build/oddmask-{mame,jg}.png."
+    cmds:
+      - dev/run.sh oddmask
+
+  oddmask-play:
+    desc: "PLAY the Odd-Width Mask Sculptor demo in MAME (builds first if needed). A terraced field whose four bands mask the 64-bit state to different widths."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/oddmask.sfc ]; then
+          echo "==> build/oddmask.sfc missing -- building (dev/run.sh oddmask)..."
+          dev/run.sh oddmask
+        fi
+      - task: mandel-mame
+        vars: { ROM: oddmask }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:

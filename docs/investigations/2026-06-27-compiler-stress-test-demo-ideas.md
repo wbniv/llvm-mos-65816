@@ -1151,12 +1151,12 @@ not a codegen patch) that unblocked idea #35.
     data-dependent 64-bit shift and a signed 64↔double round-trip. *Differential:* integer-exact shifts +
     correctly-rounded conversions; CRC over the placements; 5-way.
 
-103. **Odd-Width Mask Sculptor (`oddmask`).** *Re-stresses:* the odd-width `G_ANYEXT` routing (`0017` `customIf`
+~~103. **Odd-Width Mask Sculptor (`oddmask`).** *Re-stresses:* the odd-width `G_ANYEXT` routing (`0017` `customIf`
     @109, width-general) as a **validation-widening regression guard** — form **s20/s24/s40/s48** intermediates
     by masking 64-bit values (`v & 0xFFFFF` … `& 0xFFFFFFFFFFFF`) then widen/arith, sweeping the mask each frame.
     *Note:* the routing catches all non-{8,16,32} widths by construction, so this confirms `legalizeAnyExt`→zext
     legalizes each width (dhmix tested only s24) — a guard, not an uncovered path. *Shows:* a terraced field
-    whose band widths track the mask. *Differential:* CRC over the masked results; 5-way.
+    whose band widths track the mask. *Differential:* CRC over the masked results; 5-way.~~ ✓ [/snes/oddmask/](https://biohack.net/snes/oddmask/) ([plan](../plans/2026-07-02-103-snes-oddmask.md)) — **clean positive.** MEASURED CORRECTION to the aspirational spec: odd widths form ONLY from an **i32-sourced narrow-mask+op → G_ZEXT sN→s64** pattern (a `uint64 & mask` stays s64 with known-bits, no odd type), so widths **>32 (s40/s48) are unreachable** — the demo hits **s20/s24/s28** (probe: `G_ZEXT s20/s24/s28→s64 = 3`), each threaded through an s64 `__muldi3` (the (un)merge glue). Extend is `G_ZEXT` not `G_ANYEXT` (the exact dhmix opcode no longer reproduces post-0017), same odd-source-width legalization. `host==default==+mos-a16==+mos-xy16==0x1FD9`, `-verify` clean ×2 (the modes dhmix crashed).
 
 104. **256-bit Modular Exponentiation (`modexp256`).** *Re-stresses:* `0017`'s s64 (un)merge glue as a
     **high-volume / high-pressure regression guard** — dhmix's 64-bit modexp at **256-bit** (4×`uint64`
