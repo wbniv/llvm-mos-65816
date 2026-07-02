@@ -1083,12 +1083,12 @@ not a codegen patch) that unblocked idea #35.
 
 ### Cluster A — REP/SEP index-width & in-place overlap (hardens `0002`, the #23 xy16 `memmove` fix)
 
-93. **Overlap-Move Mosaic (`ovmove`).** *Re-stresses:* `0002` `placeIntraBlock` — a >256-tile image scrolled
+~~93. **Overlap-Move Mosaic (`ovmove`).** *Re-stresses:* `0002` `placeIntraBlock` — a >256-tile image scrolled
     **in place** by `memmove` in all four directions per frame (**ascending AND descending** overlap), 16-bit
     tile indices live across the M/X width-flag transitions. Also re-hits #79's memmove-direction branch. Unlike
     #23 lsystem (one incidental grow) / #79 mvscrl (one direction, isolated), this crosses the width boundary
     continuously with real overlap both ways. *Shows:* a mosaic that scrolls, wraps, and shears — any dropped
-    index high-byte streaks it. *Differential:* byte-CRC over the moved buffer, integer-exact; 5-way + xy16.
+    index high-byte streaks it. *Differential:* byte-CRC over the moved buffer, integer-exact; 5-way + xy16.~~ ✓ [/snes/ovmove/](https://biohack.net/snes/ovmove/) ([plan](../plans/2026-07-02-93-snes-ovmove.md)) — **clean positive:** `memmove-refs=4` (both overlap dirs, >256B → 16-bit index); `host==default==+mos-a16==+mos-xy16==0xA990`, `-verify` clean. The #23/`0002` xy16 in-place-memmove fix HOLDS under escalation.
 94. **In-Place Block Rotate (`rotslab`).** *Re-stresses:* `0002` — rotate a >256-entry `uint16_t` row buffer
     left/right by a runtime k via the three-reversal identity (`rev[0,k) · rev[k,n) · rev[0,n)`), **all in
     place**, so 16-bit indices sweep back and forth across the width-flag boundary. *Shows:* a barber-pole /
@@ -1275,8 +1275,9 @@ Sharpest at re-breaking an incompletely-generalized fix (highest bug-yield), or 
   `G_UMULO`/`G_SMULO` `.lower()` at **s64** is the *only* untested s64 legalizer path, and its expansion must
   thread the S32-mul-clamp that exists to avoid S128 infinite-regress. No demo emits it (smulorbit #76 was s32).~~
   ✓ [/snes/mulov64/](https://biohack.net/snes/mulov64/) — **SHIPPED, clean positive** (`0x3A69`, 5-way + `-verify`; s64 mulh composed from s32 pieces, correct).
-- **#93 `ovmove`** — the highest-risk *intersection*: re-stresses BOTH `0002` (xy16 index width across
-  `memmove`) and #79 (memmove direction) with both-direction overlap and two live 16-bit indices.
+- ~~**#93 `ovmove`** — the highest-risk *intersection*: re-stresses BOTH `0002` (xy16 index width across
+  `memmove`) and #79 (memmove direction) with both-direction overlap and two live 16-bit indices.~~
+  ✓ [/snes/ovmove/](https://biohack.net/snes/ovmove/) — **SHIPPED, clean positive** (`0xA990`, 5-way + `-verify`; the #23/`0002` xy16 memmove fix holds).
 - **#97 `spaceship`** — `lowerThreewayCompare` at **s64** is a width qsortviz never emitted; the `G_SCMP`
   fix (`0016`) is unverified at 64-bit.
 - **#105 `crcwall`** — the ONLY default-8-bit bug in the set (`0010`); a regression there is **invisible** to
