@@ -300,16 +300,26 @@ Surfaced scoping demo #35 (the `setjmp`/`longjmp` battery member). The SDK's com
 via `XCE`) the stack pointer **S is 16-bit and not page-1-bound**, so `longjmp` restores a corrupted S and
 `rts`-es to a garbage address — **`longjmp` never returns**. `setjmp` + normal return works; only the
 `longjmp` restore is broken. Reproduces in **default-8-bit AND `+mos-a16`** → pre-existing upstream, **not**
-the #321 fork. Minimal repro confirmed on bsnes-jg (`corpus_result` stuck at the pre-`longjmp` value). Fix
-direction: a 65816-aware `setjmp.S` (save/restore the full 16-bit S with `tsc`/`tcs`; read/replace the
-return address stack-relative, not at `$0101`/`$0102`; mind M/X widths). **No fork patch yet** (deferred per
-user 2026-06-30 — document + keep deploying demos; a dedicated session can write + test the SDK fix). File it
-against the **SDK** repo:
+the #321 fork.
+
+**FIXED in the fork 2026-07-02** — the fix rides with our **SNES platform** (the natural upstream home, since
+`common/c/setjmp.S` is compiled once as 6502 and merged into every `libc.a`, so an `#ifdef` there would never
+fire for the SNES). New **`platforms/snes/setjmp.S`** (built `-mcpu=mosw65816`, added to `snes-c` ahead of the
+`common-c` merge so it shadows common's 6502 `setjmp.S.obj` by archive order) reconstructs the page-1 16-bit
+`S = $01xx` (`ora #$0100; tcs`) instead of the broken `txs`, and reads/writes the return address
+stack-relative — **no `jmp_buf` ABI change** (the SNES stack is page-1 by crt0 contract). Verified through the
+full differential: **host == default@MAME == +mos-a16@MAME == +mos-xy16@MAME == +mos-a16@bsnes-jg**, all
+`corpus_result = 0x2007` (regression guard `corpus/setjmp_sim.c`). Plan:
+[35-setjmp-longjmp-65816-fix](plans/2026-07-02-35-setjmp-longjmp-65816-fix.md).
+
+**Upstream posture:** this belongs in llvm-mos-sdk's SNES platform. It should land **as part of the SNES
+platform PR** (llvm-mos-sdk#415 reconciliation — see *Future / blocked*), since upstream has no SNES platform
+target yet to compile a 65816 `setjmp.S`. Standalone, still file the bug so it's tracked:
 
 ```
 gh issue create --repo llvm-mos/llvm-mos-sdk \
   --title "[65816] longjmp corrupts the stack pointer in native mode — common setjmp.S is 6502-only (8-bit page-\$0100 stack)" \
-  --body-file docs/investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md   # trim to the repro + root cause
+  --body-file docs/investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md   # trim to the repro + root cause + our fix
 ```
 
 Full internal record: [setjmp/longjmp 65816 investigation](investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md).

@@ -59,6 +59,23 @@ merge_libraries(snes-crt0
 # llvm.memset/memcpy -> recursion into ourselves; generalizes common/c's
 # -fno-builtin-memset), and -fno-lto (pins the far-store codegen at build time,
 # mirroring crt0.c).
-add_platform_library(snes-c mem-far.c)
+# setjmp.S: 65816 native-mode setjmp/longjmp. The common mos-platform/common/c
+# setjmp.S is a 6502 implementation (8-bit page-$0100 hard stack); on the 65816
+# in native mode its `tax; txs` restore drops S into page 0 and longjmp rts-es
+# to garbage (see setjmp.S header + docs/investigations/2026-06-30-setjmp-longjmp-
+# 65816-native-stack-bug.md). This override reconstructs the page-1 16-bit S and
+# reads/writes the return address stack-relative. It is byte-layout-compatible
+# with the common jmp_buf (no <setjmp.h> change), so it is a pure shadow. Added
+# to snes-c *ahead of* add_platform_library's POST_BUILD append of common-c, so
+# its setjmp.S.obj precedes common's in libc.a and the linker resolves
+# setjmp/longjmp from it (common's copy is never pulled). snes-far / snes-hirom
+# (PARENT snes) fall through to snes/lib/libc.a, so they inherit it. Built for
+# the 65816 (rep/sep/tcs/stack-relative are 65816-only); pure asm, so no LTO.
+add_platform_library(snes-c mem-far.c setjmp.S)
 set_source_files_properties(mem-far.c PROPERTIES COMPILE_OPTIONS
   "-fno-builtin;-mcpu=mosw65816;-fno-lto;-Xclang;-target-feature;-Xclang;+mos-a16")
+set_source_files_properties(setjmp.S PROPERTIES COMPILE_OPTIONS
+  "-mcpu=mosw65816")
+# setjmp.S does `.include "imag.inc"` for the __rc* imaginary registers; provide
+# the asminc include path the same way common-c does (mem-far.c needs no include).
+target_link_libraries(snes-c PRIVATE common-asminc)

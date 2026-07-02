@@ -87,3 +87,39 @@ is a genuine correctness defect: **any** C program using `longjmp` on the 65816 
   the demo is **not** reshaped to dodge the bug; it waits on the fix.
 - This is precisely the kind of defect the battery exists to surface (idea #35 was explicitly flagged
   "verify toolchain support first — a gap is a finding"). Logged for the upstream queue.
+
+## Fix (landed 2026-07-02) — `platforms/snes/setjmp.S`, a 65816-aware shadow
+
+The fix rides with the **SNES platform** (not the upstream `common/` tree), because `common/c/setjmp.S`
+is compiled once with the 6502 default (`__mosw65816__` undefined there) and merged into every platform's
+`libc.a`. A new **`platforms/snes/setjmp.S`**, built with `-mcpu=mosw65816` and added to `snes-c`
+**ahead of** `add_platform_library`'s POST-BUILD append of `common-c`, precedes common's 6502
+`setjmp.S.obj` in `libc.a` — so the linker resolves `setjmp`/`longjmp` from it and common's copy is never
+pulled (verified: the two `setjmp.S.obj` members sit at archive indices 1 and 8; index 1 is the snes one).
+`snes-far`/`snes-hirom` (`PARENT snes`) fall through to `snes/lib/libc.a`, so they inherit it. `snes-c`
+also links `common-asminc` so the override's `.include "imag.inc"` resolves the `__rc*` registers.
+
+Design choice — **no `jmp_buf` ABI change.** The SNES hardware stack is confined to page 1 by the platform
+contract (crt0 sets `S = $01FF`; the 256-byte page-1 stack never leaves page 1), so the override saves only
+the **low byte** of `S` (byte-layout-identical to the 6502 `jmp_buf`: `ret_addr[2], s[1], sp[2], csrs[14]`
+= 19 bytes) and **reconstructs** the full 16-bit `S = $01xx` on restore. Concretely, `longjmp` replaces the
+6502 `tax; txs` with:
+
+```asm
+  ldy #2
+  lda (__rc2),y     ; saved low byte of S
+  rep #$20
+  and #$00ff        ; A = $00xx
+  ora #$0100        ; A = $01xx   (reconstruct the invariant page-1 high byte)
+  tcs               ; S = $01xx   (16-bit transfer; not the broken $00xx of `txs`)
+  sep #$20
+```
+
+and reads/writes the return address **stack-relative** (`lda 1,s`/`2,s`, `sta 1,s`/`2,s`) instead of at a
+hardcoded `$0101`/`$0102`. `setjmp` likewise reads the return address via `1,s`/`2,s`. Everything else
+(soft-SP `__rc0/__rc1`, CSRs `__rc18..__rc31`) is unchanged from the common version.
+
+**Verification** — `corpus/setjmp_sim.c` (the repro above, `corpus_result` must end `0x2007`, not the
+pre-`longjmp` sentinel `0x1111`) added as a permanent regression guard and run through the full
+differential: **host == default@MAME == +mos-a16@MAME == +mos-xy16@MAME == +mos-a16@bsnes-jg**, all
+`0x2007`. See the plan `docs/plans/2026-07-02-35-setjmp-longjmp-65816-fix.md`.
