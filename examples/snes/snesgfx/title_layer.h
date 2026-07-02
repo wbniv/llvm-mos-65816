@@ -377,6 +377,11 @@ static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
   REG_BG2HOFS = 0; REG_BG2HOFS = 0; /* clear HOFS latch */
   REG_BG2VOFS = 0; REG_BG2VOFS = 0; /* reset VOFS latch */
   t->active = 0;
+  /* Reset CGRAM[0] (SNES backdrop) to black. The rainbow shimmer writes CGRAM[0] every frame
+     during the animation and leaves it at the last hue when title_end exits. The push is queued
+     here and flushed on the demo's first display_frame call, while brightness is still 0. */
+  static const uint16_t _title_bg_black = 0;
+  upq_push_cgram(&d->q, 0, &_title_bg_black, 0x00, sizeof _title_bg_black);
   display_fade_to(d, INIDISP_ON);    /* fade back up showing demo content */
 }
 
