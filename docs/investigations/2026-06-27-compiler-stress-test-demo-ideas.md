@@ -17,8 +17,8 @@
 > signed-64 divide, saturating/overflow-builtin arithmetic, union type-punning, `qsort` callbacks,
 > Newton-Raphson refinement, IIR feedback, LZ/RLE decode, many-arg calling-convention spill,
 > coroutines/protothreads, and cross-byte-boundary bitfields. **All buildable demos shipped** (18 of 20):
-> only **#34** (no libm `sqrtf` — library gap) and **#35** (`longjmp` broken — 6502-only `setjmp.S`
-> toolchain gap; deferred) are non-buildable and documented as such. **One real compiler bug found +
+> only **#34** (no libm `sqrtf` — library gap) is non-buildable; **#35** (`longjmp` was broken — 6502-only
+> `setjmp.S` toolchain gap) was **fixed 2026-07-02** (`platforms/snes/setjmp.S`) and is now buildable. **One real compiler bug found +
 > fixed:** **#46** surfaced a backend crash — the `(x>y)-(x<y)` comparator idiom emits the newer `G_SCMP`
 > three-way-compare opcode, which `MOSLegalizerInfo` had **no legalization rule for** (`unable to legalize
 > G_SCMP`, in default/a16/xy16 alike). Fixed with a one-line `.lower()` (patch `0016-mos-scmp-ucmp-legalize`,
@@ -75,6 +75,24 @@
 > **scope-exit destructors**, the **sret hidden-pointer** ABI (struct return >32 bits), and **negamax
 > alpha-beta**. Each corner cites the exact `vendor/llvm-mos/` line and is differential-safe. See the
 > `# Round 5` section below.
+>
+> **Round 6 (#93–#112) — DRAFTED** (2026-07-01). A deliberate pivot. Round 5 walked twenty *new* corners and
+> found **zero** new bugs, so Round 6 stops widening and instead **re-stresses every bug the battery (and the
+> broader #321/#320 backend work) already found and fixed** — hardening those exact code paths and probing
+> whether each fix is *complete*. Five clusters of four, one per fixed-bug family, each **escalating the
+> original trigger**: the `+mos-xy16` **REP/SEP index-width / in-place-`memmove`** miscompile (#23, patch
+> `0002` `MOSInsertREPSEP::placeIntraBlock`) via large both-direction overlapping moves with two live 16-bit
+> indices; the **`G_SCMP`/`G_UCMP` three-way-compare** legalization (#46, `0016` `.lower()`) at every width
+> incl. the **s64** qsortviz never reached; the **s64↔s16 (un)merge + odd-width `G_ANYEXT`** glue (#61,
+> `0017`) escalated to **128/256-bit** multi-limb arithmetic and s24/s40/s48 masked intermediates (the user's
+> 64/128/256-bit steer); the **default-8-bit rotate-into-`Ac` coalescer** miscompile (`0010`) via inlined
+> bit-serial CRC/LFSR/UART loops; and the **a16/xy16 flag-liveness + register-pressure** cluster (`0011`
+> scavenger-`$p`, `0012` `LDCImm`-set, `0015` rc-undef, `0009` inc/dec). **Bug-yield hypothesis:** an
+> *incomplete* fix — handles s64 but not s128, ascending overlap but not descending, one odd anyext width but
+> not others — surfaces under escalation; and every demo doubles as a **permanent regression guard** for when
+> these fork patches are refactored or upstreamed. An optional 3-way far-pointer cluster (#113–#115) hardens
+> the silent-wrong-bank fixes (`0001` far-subscript, `0013` far-`memmove`, `0014` far-ptr-`G_PHI`). See the
+> `# Round 6` section below.
 
 ## Compiler/toolchain bugs surfaced by the battery
 
@@ -88,7 +106,7 @@ correctly). Three are codegen/legalizer bugs (fixed in `vendor/llvm-mos`, patche
 | **#23 L-System Plant** (`lsystem`) | 2 | **`+mos-xy16` miscompile** — in-place `memmove`/`memcpy` over a 16-bit-indexed buffer: `sep #$10` between `ldx` (writes 16-bit X) and `lda abs,X16` (reads it) zeroed X's high byte → wrong result (`0x1CC6` vs `0x90AA`) | reload the X-writer after the `rep #$10` in `MOSInsertREPSEP::placeIntraBlock` (in `0002`) | ✅ fixed, 5-way green |
 | **#46 qsortviz** (`qsortviz`) | 3 | **`G_SCMP`/`G_UCMP` backend crash** — the `(x>y)-(x<y)` spaceship comparator libc `qsort` emits had no legalizer rule → `unable to legalize … G_SCMP` abort in **all three modes** | `.lower()` for `G_SCMP`/`G_UCMP` — fork patch **`0016`** (upstream-standalone, ready-to-post) | ✅ fixed, bit-exact `0x8EA5` |
 | **#61 dhmix** (`dhmix`) | 4 | **a16/xy16 legalizer crash** on 64-bit modexp — `unable to legalize G_UNMERGE_VALUES (s64)` + `G_ANYEXT (s24)` (default-8-bit OK) | s64↔s16 (un)merge glue + odd-width anyext routing — fork patch **`0017`** (#321-scoped) | ✅ fixed, bit-exact `0x69AA`, corpus 62/62 |
-| **#35 setjmp/longjmp** (blocked) | 4 (scoping) | **`longjmp` broken on the 65816** — SDK ships a 6502-only `setjmp.S`; a **runtime/library gap**, not a codegen miscompile | none yet — needs a 65816-aware `setjmp.S` | ⚠️ demo deferred; documented as a finding ([investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md)) |
+| **#35 setjmp/longjmp** (fixed) | 4 (scoping) | **`longjmp` broken on the 65816** — SDK ships a 6502-only `setjmp.S`; a **runtime/library gap**, not a codegen miscompile | **`platforms/snes/setjmp.S`** — reconstructs the page-1 16-bit S (`ora #$0100; tcs`) + stack-relative return addr; shadows common by archive order, no `jmp_buf` ABI change | ✅ fixed 2026-07-02; `host==default==a16==xy16=0x2007` @ MAME+bsnes-jg ([plan](../plans/2026-07-02-35-setjmp-longjmp-65816-fix.md), [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md)) |
 
 *Not compiler bugs (excluded):* **#75 satcomet** and **#83 truncstair** each had a **demo-side** OOB write —
 the differential caught them, but the fault was in the demo's renderer, not the compiler (see #83's plan for
@@ -362,14 +380,18 @@ before: a shared host+target header, a differential CRC, a `snesgfx` render, the
     and **`longjmp`s straight back to the last choice point** on a dead end. *Stresses:* **non-local-jump
     context save/restore** (`setjmp`/`longjmp` — full SP + return + callee-saved spill); verify toolchain
     support first. *Shows:* the board filling, then snapping back as it backtracks, live.
-    **⚠ BLOCKED (2026-06-30) — `longjmp` is BROKEN on the 65816.** Scoping this demo surfaced a real bug:
-    the SDK's common `setjmp.S` is 6502-only — it saves/restores only the **8-bit page-$0100 hardware
-    stack**, but the 65816 native-mode stack pointer is **16-bit**, so `longjmp` corrupts S and `rts`-es to
-    garbage (`setjmp` + normal return works; `longjmp` never returns). Fails in **default-8-bit AND
-    `+mos-a16`** → pre-existing upstream `llvm-mos-sdk`, not the #321 fork. The "gap is a finding" outcome
-    idea #35 itself anticipated. Demo deferred until a 65816-aware `setjmp.S` lands (16-bit `tsc`/`tcs` +
-    stack-relative return addr). Full repro + root cause:
-    [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md); queued in
+    **⚠ Surfaced a real bug (2026-06-30), now FIXED (2026-07-02) — `longjmp` was BROKEN on the 65816.**
+    Scoping this demo surfaced it: the SDK's common `setjmp.S` is 6502-only — it saves/restores only the
+    **8-bit page-$0100 hardware stack**, but the 65816 native-mode stack pointer is **16-bit**, so `longjmp`
+    corrupted S and `rts`-ed to garbage (`setjmp` + normal return worked; `longjmp` never returned). Failed in
+    **default-8-bit AND `+mos-a16`** → pre-existing upstream `llvm-mos-sdk`, not the #321 fork. The "gap is a
+    finding" outcome idea #35 itself anticipated. **Fix:** a 65816-aware **`platforms/snes/setjmp.S`** that
+    reconstructs the page-1 16-bit S (`ora #$0100; tcs`) and reads/writes the return address stack-relative,
+    shadowing the common 6502 object by archive order — no `jmp_buf` ABI change. Verified `host == default ==
+    +mos-a16 == +mos-xy16` @ MAME + bsnes-jg = `0x2007` (regression guard `corpus/setjmp_sim.c`). The
+    backtracking-solver demo is now **UNBLOCKED**. Fix plan:
+    [35-setjmp-longjmp-65816-fix](../plans/2026-07-02-35-setjmp-longjmp-65816-fix.md); repro + root cause:
+    [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md); upstream posture in
     [upstream-contribution-status](../upstream-contribution-status.md).
 
 36. ~~**Polygon scanline fill — `alloca` / VLA.** Spinning convex/concave polygons of varying vertex counts,
@@ -699,26 +721,26 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
 
 | New codegen corner | Why bugs hide there | Demo |
 |---|---|---|
-| **G_FSHL/G_FSHR .lower() at 317 (the terrible default funnel lowering)** | Backend source warns (314-316) the default funnel lowering is terrible, normally rescued by combining to rotations; a genuine two-source funnel bypasses that rescue into an untested double-source shift+or expansion where a legalization bug would live, invisible because no prior codegen formed the node. | 73 |
-| **G_ROTL/G_ROTR at 254 byte-sized custom rotate lowering (legalizeShiftRotate 1029-1254)** | The byte/16-bit rotate lowering has four sub-branches (ConstantAmt fast path, runtime-amount libcall, 8-bit special case 1167-1178, byte-by-byte for large amounts) that no demo entered, because the combiner only forms G_ROTL from a specific (x shl n)\|(x lshr (w-n)) idiom none of the 72 wrote. | 74 |
-| **G_UADDSAT/G_USUBSAT + G_SADDSAT/G_SSUBSAT .lower() at 246 (lowerAddSubSatToMinMax, branchless)** | The saturating-op family lowers to a branchless overflow-detect-and-clamp min/max sequence no demo has expanded; signed vs unsigned clamp bounds are easy to get wrong and never validated, and the min/max entry point differs from every clamp the battery wrote by hand. | 75 |
-| **G_SMULO .lower() at 301 (LegalizerHelper lowerMulo at 2693) + compiler-rt __mulosi4 for int32** | Signed multiply-overflow lowers by widening to double width, multiplying, then comparing the high half against the sign-extension of the low half: a two-part high/low sign-consistency check distinct from add-overflow single carry/V test, and the int32 case links __mulosi4 no demo has pulled in. | 76 |
-| **Intrinsic fptosi_sat composite legalizer at 502: G_IS_FPCLASS(fcNan)+G_FMAXNUM+G_FMINNUM+G_FPTOUI+G_SELECT(NaN to 0)** | One intrinsic expands to a five-opcode chain (NaN-detect, clamp-min, clamp-max, convert, select-zero-on-NaN) no prior demo co-emits; the ordering and NaN-to-zero projection are subtle, and a mis-wired MinConst/MaxConst or dropped IsNaN select silently corrupts only out-of-range/NaN pixels. | 77 |
-| **G_SEXT_INREG .lower() at 130 (shl/ashr sign-extension) via SIGNED narrow-bitfield read-back** | Every existing bitfield demo declares UNSIGNED fields (zero-extend, no G_SEXT_INREG); reading a signed narrow field (int16_t h width 5) must sign-extend from bit 4 so 0b10000 reads as minus-16, and a wrong-width sign-extend (host int 32 vs target int 16) silently flips a valley into a mountain, caught because both visual and CRC depend on the sign. | 78 |
-| **G_MEMMOVE .custom() at 422; descending-overlap branch (compareOperandLocations to minus-1, Descending=true, 3145-3152)** | The high-to-low copy branch fires ONLY when the compiler proves dst>src AND regions overlap: a correctness-critical direction G_MEMCPY never takes and no demo has exercised; a wrong direction is silent in most tests but smears an overlapping copy, breaking the byte-CRC and streaking the image. | 79 |
-| **G_FABS .custom() at 369 to legalizeFAbs at 3410 (inline AND src, inverted getSignMask(32))** | A TARGET-custom path (not the generic helper), a single sign-bit clear on 32-bit float storage no demo has fired; the negative-zero to positive-zero canonicalization and the exact sign-mask constant are one-bit details either perfectly right or subtly wrong, running thousands of times per frame. | 80 |
-| **G_FCOPYSIGN .lower() at 371 to lowerFCopySign at 8899 (AND inverted-signmask, AND signmask, OR)** | The dedicated float sign-bit transplant (magnitude from one float, sign from another) is an inline AND/OR bit-shuffle no demo emits; the negative-zero sign preservation the source explicitly guards (comment 8943) is an edge the integer type-pun approach cannot express, so a bug there is undetectable by any existing test. | 81 |
-| **G_FMINNUM at 338 / G_FMAXNUM at 339 .libcallFor S32 S64 to the SDK's ONLY real libm (fminf/fmaxf, math.cc 18-19)** | fminf/fmaxf are the only libm functions actually implemented in this SDK, so this is the sole float-libcall LINK path any demo can exercise; the NaN-quieting selection (fmin(NaN,y)=y) differs from integer min/max and must match host C99 bit-for-bit: a subtle isnan-branch no prior demo linked or validated. | 82 |
-| **G_FPTOSI (__fixsfsi) + G_SITOFP (__floatsisf) .libcallForCartesianProduct at 385, used AS a rounding primitive** | Prior float demos convert once for a scale; none use the 32-bit conversion round-trip as a PER-PIXEL rounding primitive, nor build floor/ceil/round-toward-nearest from correctly-rounded conversions, which also documents the floorf/ceilf/truncf libcall LINK GAP (those symbols .unsupported() and absent from the SDK, so a direct floorf call fails to link, itself a finding). | 83 |
-| **Montgomery REDC: 16x16 to 32 widening __mulsi3 (G_MUL at 226) + constant G_LSHR/G_AND (custom at 249) + conditional-subtract, NO __umodsi3** | Every existing modulo demo reaches a division/remainder libcall; Montgomery form does modular reduction with ONLY multiply/add/shift/mask, stressing the byte-decomposed wide-multiply + constant-shift-mask chain AS a division substitute: a path that must never accidentally emit __umodsi3 (gate-verifiable) and whose m*n correction + conditional normalize are a distinct arithmetic identity. | 84 |
-| **Bit-packed array as a SET: variable-count G_SHL/G_LSHR (1u shl (i and 7), custom at 249) + G_AND/G_OR + indexed abs,x byte load/store** | A packed bit-array as a membership set splits the index into (byte=i lshr 3, bit=i and 7) where the in-byte bit position is a RUNTIME variable feeding a variable-count shift into a byte-indexed read-modify-write: a scatter access pattern (the sieve strike) no demo forms; variable shift by 0..7 plus indexed store is a fresh interaction of the custom shift legalizer and addressing modes. | 85 |
-| **Binary range coder: 32-bit widening multiply-shift (range = range*prob lshr PBITS, __mulsi3/__muldi3) + carry-propagating byte-wise renormalize** | Arithmetic coding MULTIPLIES a probability into a numeric interval and renormalizes with a carry that can propagate BACKWARD into already-buffered output (the cache/carry-count mechanism): a shape distinct from prefix/dictionary coding; the widening multiply-then-shift interacting with the backward-carry ripple is control flow no coder demo has run. | 86 |
-| **Signed multiply-accumulate over a fixed 3x3 kernel (int16 MAC) with G_SADDSAT/G_USUBSAT (.lower() at 246) magnitude clamp** | Signed MAC over a spatial window with signed kernel weights (-2,-1,0,1,2) is a MAC-network shape no demo runs (medfilt is a compare-exchange sort, no multiply), and the \|Gx\|+\|Gy\| magnitude fold uses the never-emitted saturating-intrinsic legalizer node rather than a hand-rolled clamp: the interaction of signed MAC descale + saturating add is untested. | 87 |
-| **Int32 signed MAC over a fixed Q13 cosine basis, then signed arithmetic-descale narrowing (int16_t)(acc ashr 13): the G_SEXT_INREG at 130 path AFTER G_ASHR in a separable transform** | A dense order-N-squared real-valued separable row/column DCT accumulating int32 partials of int16 sample times int16 cosine constant, then descaling via arithmetic shift and a signed narrowing cast: the sign-extend-after-shift narrowing in a transform context is a shape demo 25 fft (complex butterfly, bit-reversal, twiddles) never produces, and the int32-accumulate-then-narrow is prime for an off-by-one descale or wrong-width narrow. | 88 |
-| **G_SADDSAT/G_SSUBSAT (.lower() at 246) inside a SERIAL, non-reorderable feedback loop + data-dependent step-index LUT walk** | The saturating predictor clamp sits inside a strict feedback dependency chain (each decoded sample = clamp(pred +/- diff) feeds the next), so the scheduler cannot reorder or vectorize it: a serial-dependency interaction with the saturating-intrinsic legalizer node that neither a parallel field-accumulate nor a wrapping IIR produces, plus a bounded step-index table walk with a distinct clamp. | 89 |
-| **__attribute__((cleanup(fn))): clang EHStack pushCleanup CallCleanupFunction (CGDecl.cpp:2254) fires one JSR per scope-exit edge; and-g via G_FRAME_INDEX at 97 + G_PTR_ADD at 275** | C++-destructor-shaped codegen in C: the COMPILER (not the author) inserts a call on EVERY exit edge of a lexical scope (fall-through, break, continue, return, nested early exits), replicating the SAME callee across ~5 CFG edges with the guarded object address materialized; a dropped or duplicated cleanup call on any edge is a real defect and no C demo has compiled the cleanup fan-out. | 90 |
-| **Large aggregate return over 32 bits to getNaturalAlignIndirect (MOS.cpp:88) = hidden sret pointer + caller result slot (G_FRAME_INDEX) + G_MEMCPY store (at 422)** | A return record over 32 bits crosses the sret threshold into the hidden-pointer path (caller-allocated slot, memcpy-out) that demo 26 boids (vec2=32 bits) and demo 60 (32 bits) sit at or below and never trip; chained returns force result-slot-to-arg copies, so a wrong slot or missed memcpy limb is a real ABI defect the register-pair getDirect path cannot expose. | 91 |
-| **Alternating-sign recursion: int16 return NEGATED each level (G_SUB 0,x) + fail-soft beta-cutoff early-return + G_SMAX (.lower() at 284) window binding** | Negamax returns a value arithmetically INVERTED before the caller consumes it (a distinct ABI shape) and the beta-cutoff creates an early-return-from-loop prune CFG driven by mutating alpha/beta bounds: sign-flip-on-return + callee-saved spill/restore under the prune is a recursion shape the partition/carve recursion demos never form. | 92 |
+| **Funnel-Shift Kaleidoscope** — `G_FSHL`/`G_FSHR` `.lower()` @317 (the terrible default funnel lowering) | Backend source warns (314-316) the default funnel lowering is terrible, normally rescued by combining to rotations; a genuine two-source funnel bypasses that rescue into an untested double-source shift+or expansion where a legalization bug would live, invisible because no prior codegen formed the node. | ~~73~~ ✓ |
+| **Rotate-Register Kaleidoscope** — `G_ROTL`/`G_ROTR` @254 byte-sized custom rotate lowering (`legalizeShiftRotate` 1029-1254) | The byte/16-bit rotate lowering has four sub-branches (`ConstantAmt` fast path, runtime-amount libcall, 8-bit special case 1167-1178, byte-by-byte for large amounts) that no demo entered, because the combiner only forms `G_ROTL` from a specific `(x shl n)` \| `(x lshr (w-n))` idiom none of the 72 wrote. | ~~74~~ ✓ |
+| **Saturating Palette Comet Trails** — `G_UADDSAT`/`G_USUBSAT` + `G_SADDSAT`/`G_SSUBSAT` `.lower()` @246 (`lowerAddSubSatToMinMax`, branchless) | The saturating-op family lowers to a branchless overflow-detect-and-clamp min/max sequence no demo has expanded; signed vs unsigned clamp bounds are easy to get wrong and never validated, and the min/max entry point differs from every clamp the battery wrote by hand. | ~~75~~ ✓ |
+| **Signed Multiply-Overflow Orbit Sentinel** — `G_SMULO` `.lower()` @301 (`LegalizerHelper::lowerMulo` @2693) + compiler-rt `__mulosi4` for int32 | Signed multiply-overflow lowers by widening to double width, multiplying, then comparing the high half against the sign-extension of the low half: a two-part high/low sign-consistency check distinct from add-overflow single carry/V test, and the int32 case links `__mulosi4` no demo has pulled in. | ~~76~~ ✓ |
+| **Saturating-Cast Kaleidoscope** — intrinsic `fptosi_sat` composite legalizer @502: `G_IS_FPCLASS(fcNan)` + `G_FMAXNUM` + `G_FMINNUM` + `G_FPTOUI` + `G_SELECT` (NaN→0) | One intrinsic expands to a five-opcode chain (NaN-detect, clamp-min, clamp-max, convert, select-zero-on-NaN) no prior demo co-emits; the ordering and NaN-to-zero projection are subtle, and a mis-wired `MinConst`/`MaxConst` or dropped `IsNaN` select silently corrupts only out-of-range/NaN pixels. | ~~77~~ ✓ |
+| **Signed-Bitfield Terrain Sculptor** — `G_SEXT_INREG` `.lower()` @130 (shl/ashr sign-extension) via SIGNED narrow-bitfield read-back | Every existing bitfield demo declares UNSIGNED fields (zero-extend, no `G_SEXT_INREG`); reading a signed narrow field (`int16_t h` width 5) must sign-extend from bit 4 so `0b10000` reads as minus-16, and a wrong-width sign-extend (host int 32 vs target int 16) silently flips a valley into a mountain, caught because both visual and CRC depend on the sign. | ~~78~~ ✓ |
+| **Descending memmove Scroll Slabs** — `G_MEMMOVE` `.custom()` @422; descending-overlap branch (`compareOperandLocations` to minus-1, Descending=true, 3145-3152) | The high-to-low copy branch fires ONLY when the compiler proves dst>src AND regions overlap: a correctness-critical direction `G_MEMCPY` never takes and no demo has exercised; a wrong direction is silent in most tests but smears an overlapping copy, breaking the byte-CRC and streaking the image. | ~~79~~ ✓ |
+| **Fabs Ridgeline** — `G_FABS` `.custom()` @369 → `legalizeFAbs` @3410 (inline AND src, inverted `getSignMask(32)`) | A TARGET-custom path (not the generic helper), a single sign-bit clear on 32-bit float storage no demo has fired; the negative-zero to positive-zero canonicalization and the exact sign-mask constant are one-bit details either perfectly right or subtly wrong, running thousands of times per frame. | ~~80~~ ✓ |
+| **Copysign Compass** — `G_FCOPYSIGN` `.lower()` @371 → `lowerFCopySign` @8899 (AND inverted-signmask, AND signmask, OR) | The dedicated float sign-bit transplant (magnitude from one float, sign from another) is an inline AND/OR bit-shuffle no demo emits; the negative-zero sign preservation the source explicitly guards (comment 8943) is an edge the integer type-pun approach cannot express, so a bug there is undetectable by any existing test. | ~~81~~ ✓ |
+| **Fmin/Fmax Boids** — `G_FMINNUM` @338 / `G_FMAXNUM` @339 `.libcallFor` S32/S64 to the SDK's ONLY real libm (`fminf`/`fmaxf`, math.cc 18-19) | `fminf`/`fmaxf` are the only libm functions actually implemented in this SDK, so this is the sole float-libcall LINK path any demo can exercise; the NaN-quieting selection (`fmin(NaN,y)=y`) differs from integer min/max and must match host C99 bit-for-bit: a subtle isnan-branch no prior demo linked or validated. | ~~82~~ ✓ |
+| **Truncation Staircase** — `G_FPTOSI` (`__fixsfsi`) + `G_SITOFP` (`__floatsisf`) `.libcallForCartesianProduct` @385, used AS a rounding primitive | Prior float demos convert once for a scale; none use the 32-bit conversion round-trip as a PER-PIXEL rounding primitive, nor build floor/ceil/round-toward-nearest from correctly-rounded conversions, which also documents the `floorf`/`ceilf`/`truncf` libcall LINK GAP (those symbols `.unsupported()` and absent from the SDK, so a direct `floorf` call fails to link, itself a finding). | ~~83~~ ✓ |
+| **Montgomery Orbit** — REDC: 16×16→32 widening `__mulsi3` (`G_MUL` @226) + constant `G_LSHR`/`G_AND` (custom @249) + conditional-subtract, NO `__umodsi3` | Every existing modulo demo reaches a division/remainder libcall; Montgomery form does modular reduction with ONLY multiply/add/shift/mask, stressing the byte-decomposed wide-multiply + constant-shift-mask chain AS a division substitute: a path that must never accidentally emit `__umodsi3` (gate-verifiable) and whose m*n correction + conditional normalize are a distinct arithmetic identity. | ~~84~~ ✓ |
+| **Prime Sieve Ulam** — bit-packed array as a SET: variable-count `G_SHL`/`G_LSHR` (`1u shl (i and 7)`, custom @249) + `G_AND`/`G_OR` + indexed `abs,x` byte load/store | A packed bit-array as a membership set splits the index into (byte = `i lshr 3`, bit = `i and 7`) where the in-byte bit position is a RUNTIME variable feeding a variable-count shift into a byte-indexed read-modify-write: a scatter access pattern (the sieve strike) no demo forms; variable shift by 0..7 plus indexed store is a fresh interaction of the custom shift legalizer and addressing modes. | ~~85~~ ✓ |
+| **Range Coder** — 32-bit widening multiply-shift (`range = range*prob lshr PBITS`, `__mulsi3`/`__muldi3`) + carry-propagating byte-wise renormalize | Arithmetic coding MULTIPLIES a probability into a numeric interval and renormalizes with a carry that can propagate BACKWARD into already-buffered output (the cache/carry-count mechanism): a shape distinct from prefix/dictionary coding; the widening multiply-then-shift interacting with the backward-carry ripple is control flow no coder demo has run. | ~~86~~ ✓ |
+| **Sobelscope** — signed multiply-accumulate over a fixed 3×3 kernel (int16 MAC) with `G_SADDSAT`/`G_USUBSAT` (`.lower()` @246) magnitude clamp | Signed MAC over a spatial window with signed kernel weights (-2,-1,0,1,2) is a MAC-network shape no demo runs (medfilt is a compare-exchange sort, no multiply), and the \|Gx\|+\|Gy\| magnitude fold uses the never-emitted saturating-intrinsic legalizer node rather than a hand-rolled clamp: the interaction of signed MAC descale + saturating add is untested. | ~~87~~ ✓ |
+| **DCT Bloom** — int32 signed MAC over a fixed Q13 cosine basis, then signed arithmetic-descale narrowing `(int16_t)(acc ashr 13)`: the `G_SEXT_INREG` @130 path AFTER `G_ASHR` in a separable transform | A dense order-N-squared real-valued separable row/column DCT accumulating int32 partials of int16 sample times int16 cosine constant, then descaling via arithmetic shift and a signed narrowing cast: the sign-extend-after-shift narrowing in a transform context is a shape demo 25 fft (complex butterfly, bit-reversal, twiddles) never produces, and the int32-accumulate-then-narrow is prime for an off-by-one descale or wrong-width narrow. | ~~88~~ ✓ |
+| **ADPCM Waverider** — `G_SADDSAT`/`G_SSUBSAT` (`.lower()` @246) inside a SERIAL, non-reorderable feedback loop + data-dependent step-index LUT walk | The saturating predictor clamp sits inside a strict feedback dependency chain (each decoded sample = `clamp(pred +/- diff)` feeds the next), so the scheduler cannot reorder or vectorize it: a serial-dependency interaction with the saturating-intrinsic legalizer node that neither a parallel field-accumulate nor a wrapping IIR produces, plus a bounded step-index table walk with a distinct clamp. | ~~89~~ ✓ |
+| **Scope-Guard Ripple Tank** — `__attribute__((cleanup(fn)))`: clang EHStack `pushCleanup`/`CallCleanupFunction` (CGDecl.cpp:2254) fires one JSR per scope-exit edge; arg via `G_FRAME_INDEX` @97 + `G_PTR_ADD` @275 | C++-destructor-shaped codegen in C: the COMPILER (not the author) inserts a call on EVERY exit edge of a lexical scope (fall-through, break, continue, return, nested early exits), replicating the SAME callee across ~5 CFG edges with the guarded object address materialized; a dropped or duplicated cleanup call on any edge is a real defect and no C demo has compiled the cleanup fan-out. | ~~90~~ ✓ |
+| **Matrix Cascade** — large aggregate return >32 bits to `getNaturalAlignIndirect` (MOS.cpp:88) = hidden sret pointer + caller result slot (`G_FRAME_INDEX`) + `G_MEMCPY` store (@422) | A return record over 32 bits crosses the sret threshold into the hidden-pointer path (caller-allocated slot, memcpy-out) that demo 26 boids (vec2 = 32 bits) and demo 60 (32 bits) sit at or below and never trip; chained returns force result-slot-to-arg copies, so a wrong slot or missed memcpy limb is a real ABI defect the register-pair getDirect path cannot expose. | ~~91~~ ✓ |
+| **PlyOracle** — alternating-sign recursion: int16 return NEGATED each level (`G_SUB 0,x`) + fail-soft beta-cutoff early-return + `G_SMAX` (`.lower()` @284) window binding | Negamax returns a value arithmetically INVERTED before the caller consumes it (a distinct ABI shape) and the beta-cutoff creates an early-return-from-loop prune CFG driven by mutating alpha/beta bounds: sign-flip-on-return + callee-saved spill/restore under the prune is a recursion shape the partition/carve recursion demos never form. | ~~92~~ ✓ |
 
 ## The twenty (each opens a corner the first 72 never run)
 
@@ -1020,3 +1042,201 @@ Sharpest at opening a code path the first 72 never run:
   getNaturalAlignIndirect at 88 into a hidden sret pointer + caller result slot + G_MEMCPY store. Demo 26 boids
   and demo 60 sit at/below the 32-bit boundary (register-pair getDirect), so the sret hidden-pointer ABI has
   never run; chained returns force result-slot-to-arg copies, all under a CRC catching a botched limb.~~ ✓ [/snes/matcascade/](https://biohack.net/snes/matcascade/)
+
+---
+
+# Round 6 (#93–#112) — hardening the fixes: re-stress every bug we found and fixed
+
+Rounds 1–5 (92 demos) hunted **new** codegen corners; Round 5's twenty found **zero** new bugs — the obvious
+lowering surface is covered. So Round 6 changes tactics: **stop widening, start deepening.** Instead of a
+21st untouched corner, it re-attacks the code paths the battery (and the broader #321/#320 work) *already*
+broke and fixed — hammering each fix from angles the original bug-finding demo did not, and **escalating the
+stress past where the fix was validated.** Two payoffs: (1) each demo is a **permanent regression guard** for
+its patch (invaluable when `0002`/`0016`/`0017`/… are refactored or upstreamed and the vendor pin moves);
+(2) the escalation is a genuine **bug hunt** — a fix that handled the *specific* case that found it but did
+not *generalize* (s64 but not s128, ascending overlap but not descending, an s24 anyext but not s40/s48)
+surfaces here as a fresh crash or differential break. Same bar as every prior round: shared host+target
+header, `host == default == +mos-a16 == +mos-xy16` differential CRC on MAME + bsnes-jg, `-verify` clean, a
+`snesgfx` render — the picture is the proof. Every corner is integer-exact (or correctly-rounded IEEE) by
+construction.
+
+The five clusters below are **one per already-fixed bug family**; the sixth (far-pointer, 3-way bar) is an
+optional stretch. Each cites the patch it hardens and the exact code path.
+
+## Fix-regression coverage map (the point of Round 6)
+
+| Already-fixed bug (patch) | The fix — exact code path | How Round 6 escalates it (where a new bug would hide) | Demos |
+|---|---|---|---|
+| **#23 `lsystem` — `+mos-xy16` in-place `memmove` / 16-bit-index REP/SEP miscompile** (`0002`) | `MOSInsertREPSEP::placeIntraBlock` reloads the X/Y-writer after a `rep #$10`, so a 16-bit index isn't read after a stray `sep #$10` zeroed its high byte | Original found it with ONE incidental `memmove`. Escalate to large **both-direction overlapping** moves and **two live 16-bit indices at once** (indexed load *and* indexed store in the inner loop), under `+mos-xy16` — the width-flag boundary crossed thousands of times/frame. A high-byte drop breaks the byte-CRC *and* smears the image. | 93–96 |
+| **#46 `qsortviz` — `G_SCMP`/`G_UCMP` three-way-compare abort** (`0016`) | `getActionDefinitionsBuilder({G_SCMP,G_UCMP}).lower()` → LLVM's `lowerThreewayCompare` (icmp+select) | qsortviz emitted the spaceship at one modest width. Escalate to **every width s8/s16/s32/s64** and the **unsigned** `G_UCMP` half (qsortviz was signed), and use the −1/0/+1 result **as control flow** (switch), not just a sort key. `lowerThreewayCompare` at **s64** is completely unverified. | 97–100 |
+| **#61 `dhmix` — a16/xy16 `s64` `G_UNMERGE_VALUES` + odd-width `G_ANYEXT` crash** (`0017`) | `legalizeMergeS64FromWords`/`legalizeUnmergeS64ToWords` (2-level `s64↔2×s32↔4×s16`) + route odd-width `G_ANYEXT` through `G_ZEXT`; all `hasAccum16()`-gated | **Coverage-checked (see Cluster C note):** the glue + anyext routing are already broadly green across 5 shipped s64 demos, so widening (128/256-bit) is a *volume guard*. The real untested s64 path is **`G_UMULH`/`G_SMULH` + `G_UMULO`/`G_SMULO` `.lower()`** (threading the S32-mul-clamp), plus minor gaps: variable-count s64 *right* shift and signed/double int64 conversions. | 101–104 |
+| **`0010` coalesce-rotate-`Ac` — DEFAULT-8-BIT silent rotate miscompile** | `MOSRegisterInfo::shouldCoalesce` refuses joining a rotate/shift-referenced loop-carried value into the A-only `Ac` class (back-edge `ROL` would read a stale `A`) | Found by ONE inlined CRC16 bit loop. Escalate to a family of **inlined bit-serial rotate-through-carry** loops (CRC8/16/32, dual LFSRs, bit-reversal, bit-banged UART) under heavy pressure. This bug is **8-bit-only** — invisible to every a16/xy16 gate; the *only* cluster whose primary bar is the default build. | 105–108 |
+| **a16/xy16 flag-liveness & register-pressure** (`0011` scavenger-`$p`, `0012` `LDCImm`-set, `0015` rc-undef, `0009` inc/dec) | `0011` routes a live `$p` through a dead index reg into `RC17`; `0012` lowers a set i1 carry as `SEC`; `0015` `shouldCoalesce` refuses folding a call-clobbered `$rcN` value into an outliving `Imag16` pair; `0009` lowers small-const add/sub to `G_INC`/`G_DEC` chains | These share a root: **N/Z/carry flags or `$rc`-resident values kept live across a spill/call under maximal 16-bit-accum pressure.** Escalate with deep straight-line Q16.16 trees whose compare survives several libcalls, 16-bit borrow-chain subtracts (`LDCImm 1`), Horner chains reading operands straight out of `__mulsi3` returns, and inc/dec-dominated counter sweeps — all at once. | 109–112 |
+
+## The twenty (grouped by the fix each cluster hardens)
+
+### Cluster A — REP/SEP index-width & in-place overlap (hardens `0002`, the #23 xy16 `memmove` fix)
+
+93. **Overlap-Move Mosaic (`ovmove`).** *Re-stresses:* `0002` `placeIntraBlock` — a >256-tile image scrolled
+    **in place** by `memmove` in all four directions per frame (**ascending AND descending** overlap), 16-bit
+    tile indices live across the M/X width-flag transitions. Also re-hits #79's memmove-direction branch. Unlike
+    #23 lsystem (one incidental grow) / #79 mvscrl (one direction, isolated), this crosses the width boundary
+    continuously with real overlap both ways. *Shows:* a mosaic that scrolls, wraps, and shears — any dropped
+    index high-byte streaks it. *Differential:* byte-CRC over the moved buffer, integer-exact; 5-way + xy16.
+94. **In-Place Block Rotate (`rotslab`).** *Re-stresses:* `0002` — rotate a >256-entry `uint16_t` row buffer
+    left/right by a runtime k via the three-reversal identity (`rev[0,k) · rev[k,n) · rev[0,n)`), **all in
+    place**, so 16-bit indices sweep back and forth across the width-flag boundary. *Shows:* a barber-pole /
+    marquee band whose pattern rotates without tearing. *Differential:* CRC over the rotated buffer; 5-way + xy16.
+95. **Gather-Scatter Permutation (`permscat`).** *Re-stresses:* `0002` at its hardest — `dst[perm[i]] = src[i]`
+    over a >512-entry array with **both an indexed 16-bit load AND an indexed 16-bit store** in the inner loop
+    (two 16-bit index values live simultaneously — the exact shape where a stray `sep #$10` would zero one).
+    *Shows:* a kaleidoscopic tile-shuffle that must land every tile exactly (a bijection). *Differential:* CRC
+    over the scattered array; a wrong index diverges it AND drops/duplicates a tile; 5-way + xy16.
+96. **Gap-Buffer Rope Editor (`ropeedit`).** *Re-stresses:* `0002` at scale — a >256-byte text gap buffer that
+    `memmove`s on **every** insert/delete (a bigger, both-direction lsystem), 16-bit offsets throughout. A
+    scripted edit stream (type/delete/jump) exercises grow and shrink. *Shows:* live text edited in place,
+    cursor jumping. *Differential:* CRC over the final buffer after a fixed edit script; 5-way + xy16.
+### Cluster B — three-way compare `G_SCMP`/`G_UCMP` (hardens `0016`, the #46 spaceship fix)
+
+97. **Width-Sweep Sort Gallery (`spaceship`).** *Re-stresses:* `0016` at **every width** — the SAME
+    insertion/selection sort driven ONLY by the spaceship `(a>b)-(a<b)`, run in four panels at **s8, s16, s32,
+    s64** keys, forcing `G_SCMP` (→ `lowerThreewayCompare`) at all four widths in one ROM. The s64 leg is a
+    path qsortviz never reached. *Shows:* four bar-columns sorting in lockstep. *Differential:* CRC over all
+    four sorted arrays; 5-way.
+98. **Unsigned Rank Percentile Field (`ucmprank`).** *Re-stresses:* the **`G_UCMP`** (unsigned) half of `0016`
+    that signed qsortviz never emitted — per-cell rank/percentile of `uint32` and `uint64` values via
+    `(a>b)-(a<b)`. *Shows:* a field recoloured by each cell's rank among its neighbours. *Differential:* CRC
+    over the rank grid; 5-way.
+99. **Three-Way Merge Diff (`trimerge`).** *Re-stresses:* `0016` with the spaceship result used **as control
+    flow** — a 3-way merge of sorted streams where `−1/0/+1` switches into distinct branches (advance-left /
+    emit-both / advance-right), not just a sort key. *Shows:* three lanes braiding into one merged column.
+    *Differential:* CRC over the merged output; 5-way.
+100. **64-bit Multi-Key Record Sort (`keycmp64`).** *Re-stresses:* `0016` at the **extreme width** — libc
+    `qsort` of records with a *chained* comparator: a primary `int64` spaceship, tie-broken by a second `int64`
+    spaceship (`G_SCMP s64` twice per call). *Shows:* records reordering under a two-level key. *Differential:*
+    CRC over the sorted records; 5-way.
+### Cluster C — wide multi-limb `s64↔s16` (un)merge + odd-width anyext (hardens `0017`, the #61 64-bit fix)
+
+> **Coverage-check finding (2026-07-02).** An audit of the live `MOSLegalizerInfo.cpp` against the five
+> shipped s64 demos (avalanche #22, sodo #43, cosmzoom #59, multibase #60, dhmix #61) shows s64 add/sub/mul
+> (`__muldi3`)/div/rem/logic/**variable-left-shift**/unsigned-int64↔float32 are **all already green**, and
+> `0017`'s (un)merge glue + width-general anyext `customIf` are exercised — so *widening the same shapes*
+> (128/256-bit hashes, modexp) is a **volume regression-guard, not a novel-bug probe** (there is no s128 node
+> on a 16-bit target — multi-limb re-runs the green s64 path). The audit found **one genuinely untested s64
+> legalizer path**: `G_UMULH`/`G_SMULH` (`.lower()` @312) and `G_UMULO`/`G_SMULO` (`.lower()` @301) at **s64**
+> — no demo emits either (smulorbit #76 was s32), and their `.lower()` must thread the documented S32-mul-clamp
+> ("*Lowering S128 to S64 would produce infinite regress*", `G_MUL` rule @227-233). Two minor gaps: variable-
+> count s64 **right** shift and **signed**-float / **double** int64 conversions. Cluster C is re-scoped to hit
+> the real gaps first.
+
+101. **64-bit Multiply-Overflow / Multiply-High (`mulov64`).** *Re-stresses:* the **one untested s64 path** —
+    `__builtin_mul_overflow` on `uint64_t`/`int64_t` forces `G_UMULO`/`G_SMULO` (`.lower()` @301) → an s64
+    `G_UMULH`/`G_SMULH` (`.lower()` @312), whose expansion must thread the S32-mul-clamp needle (@227-233) that
+    exists precisely to avoid S128 infinite-regress. No demo emits an s64 mulh/mulo (smulorbit #76 was s32,
+    `__mulosi4`). *Shows:* orbiters that teleport/spark when a 64-bit product overflows (a `smulorbit` at 4× the
+    width), or a field coloured by the high 64 bits of a 64×64 product. *Differential:* overflow is a first-class
+    signal, the high-half is exact; CRC folds both; 5-way. **← the sharp Cluster-C probe.**
+
+102. **Variable-Shift & Wide-Conversion Field (`varconv64`).** *Re-stresses:* the two minor gaps — a
+    **runtime-amount** s64 **right** shift (`v >> k`, k∈0..63 → `__lshrdi3`/`__ashrdi3`; avalanche did only
+    variable-*left* `__ashldi3` + constant rights) plus **signed**-float and **double** int64 conversions
+    (`(int64_t)(double)` / `(double)(int64_t)` → `__fixdfdi`/`__floatdidf`, and float→signed `__fixsfdi`;
+    cosmzoom did only *unsigned* int64↔*float32*). *Shows:* a logarithmic ruler whose bands are placed by a
+    data-dependent 64-bit shift and a signed 64↔double round-trip. *Differential:* integer-exact shifts +
+    correctly-rounded conversions; CRC over the placements; 5-way.
+
+103. **Odd-Width Mask Sculptor (`oddmask`).** *Re-stresses:* the odd-width `G_ANYEXT` routing (`0017` `customIf`
+    @109, width-general) as a **validation-widening regression guard** — form **s20/s24/s40/s48** intermediates
+    by masking 64-bit values (`v & 0xFFFFF` … `& 0xFFFFFFFFFFFF`) then widen/arith, sweeping the mask each frame.
+    *Note:* the routing catches all non-{8,16,32} widths by construction, so this confirms `legalizeAnyExt`→zext
+    legalizes each width (dhmix tested only s24) — a guard, not an uncovered path. *Shows:* a terraced field
+    whose band widths track the mask. *Differential:* CRC over the masked results; 5-way.
+
+104. **256-bit Modular Exponentiation (`modexp256`).** *Re-stresses:* `0017`'s s64 (un)merge glue as a
+    **high-volume / high-pressure regression guard** — dhmix's 64-bit modexp at **256-bit** (4×`uint64`
+    schoolbook mul + reduce). Honest framing: there is no s128/s256 node; this re-runs the *green* s64 path many
+    times, so its value is (a) a permanent regression guard for the glue and (b) stressing the s64 glue × the
+    register-pressure/coalescer cluster (E) — **not** forcing a new legalizer rule. *Shows:* a Diffie-Hellman
+    shared-secret mix at 256-bit. *Differential:* integer modexp is exact; CRC over the residue; 5-way (3-way if
+    a far modulus table is needed).
+
+### Cluster D — rotate/shift-in-loop coalescer (hardens `0010`, the default-8-bit rotate-into-`Ac` miscompile)
+
+> **Note — this cluster's primary bar is the DEFAULT 8-bit build.** `0010` is *not* accum-gated; it is a
+> plain `-mcpu=mosw65816` coalescer miscompile invisible to every `+mos-a16`/`+mos-xy16` gate. Build + gate
+> default-8-bit first (that is where a regression reappears), then a16/xy16 for the standard 5-way contrast.
+
+105. **Bit-Serial CRC Wall (`crcwall`).** *Re-stresses:* `0010` — CRC8, CRC16 and CRC32 computed **bit-at-a-time**
+    (NOT #40's table) inlined in one hot loop with a loop-carried shift register + back-edge `ROL`, three polys
+    under pressure — the exact shape that found `0010`, widened. *Shows:* three hash-marble fields side by side.
+    *Differential:* CRC over all three (a coalescer strand diverges the loop-carried byte); default-8-bit + 5-way.
+106. **Dual-LFSR Scrambler (`lfsr2`).** *Re-stresses:* `0010` with **two** loop-carried shift registers live at
+    once — a maximal-length **Galois** LFSR and a **Fibonacci** LFSR, each feeding a rotate, run simultaneously
+    (extra pressure). *Shows:* two interleaved pseudo-noise fields. *Differential:* CRC over both streams;
+    default-8-bit + 5-way.
+107. **Serial Bit-Reversal Weave (`bitweave`).** *Re-stresses:* `0010` via a **rotate-out/rotate-in carry loop**
+    bit-reversal (contrast to #54 bitshuffle's `__builtin_bitreverse`), loop-carried through the back-edge.
+    *Shows:* an image reweaving through its bit-reversed order. *Differential:* CRC over the reversed words;
+    default-8-bit + 5-way.
+108. **Bit-Banged UART Eye (`uarteye`).** *Re-stresses:* `0010` in a framing loop — a software-UART
+    (start/data/stop bits shifted through a carry-rotated register) drawing an oscilloscope eye-diagram; the
+    loop-carried bit register + rotate under pressure. *Shows:* a serial eye pattern building up. *Differential:*
+    CRC over the decoded frames; default-8-bit + 5-way.
+### Cluster E — a16/xy16 flag-liveness & register pressure (hardens `0011`/`0012`/`0015`/`0009`)
+
+109. **Pressure-Cooker Fixed-Point Evaluator (`pcooker`).** *Re-stresses:* `0011` scavenger-`$p` — one giant
+    Q16.16 straight-line expression (a dozen simultaneously-live 32-bit temps) with an embedded compare whose
+    **N/Z is consumed AFTER several `__mulsi3`/`__divsi3` calls**, forcing the compare result live across the
+    call-clobber under maximal pressure. *Shows:* a per-pixel evaluated implicit surface. *Differential:* CRC
+    over the field; a16 primary + 5-way.
+110. **Borrow-Ladder Odometer (`borrowlad`).** *Re-stresses:* `0012` `LDCImm`-set — a wide multi-precision
+    subtractor built from chained 16-bit `SBC` whose carry-in arrives as a **set i1** (`LDCImm 1`, a 16-bit
+    subtract borrow), in a visible descending odometer/countdown. *Shows:* a giant number ticking down through
+    zero and borrows rippling. *Differential:* CRC over the running value; a16 primary + 5-way.
+111. **Continued-Fraction Cascade (`cfcascade`).** *Re-stresses:* `0015` rc-undef — a Horner / continued-fraction
+    evaluator that reads each operand **straight out of a `__mulsi3`/`__divsi3` return** (a `$rc`-resident value)
+    and keeps it live across the **next** call, chained deep (the coalesce-into-`Imag16`-across-clobber shape).
+    *Shows:* a convergent (φ, √2, π approximants) drawn as it refines. *Differential:* CRC over the approximant
+    sequence; a16 + xy16 + 5-way.
+112. **INC/DEC Pressure Sweep (`incdecsweep`).** *Re-stresses:* `0009` inc/dec relief at the intersection with
+    `0011`/`0015` — a kernel dominated by **small-constant (±1..±3) 32-bit adjustments** to many live counters
+    (the `G_INC`/`G_DEC` chain path) interleaved with a live index and a live compare flag under `+mos-a16`/`+mos-xy16`.
+    *Shows:* a many-counter cellular tally (e.g. neighbour-histogram) animating. *Differential:* CRC over the
+    counter bank; a16/xy16 + 5-way.
+### Cluster F — far-pointer silent-wrong-bank (OPTIONAL stretch; hardens `0001`/`0013`/`0014`, **3-way bar**)
+
+> Far (addrspace 2 / `FAR`) demos run the **3-way bar** (`host == +mos-a16@MAME == +mos-a16@bsnes-jg`) and
+> need HiROM / `platforms/snes-hirom` like the `farindex` gate. Lower priority than A–E (which are all clean
+> 5-way), but these harden three *silent-miscompile* fixes — the most dangerous kind, since a regression
+> produces wrong pixels with no crash.
+
+113. **Cross-Bank LUT Atlas (`farlut`).** *Re-stresses:* `0001` far array-subscript index-width — a `const FAR`
+    table spanning banks with **runtime indices ≥ 32768** (the exact truncation `0001` fixed), read per pixel.
+    *Shows:* a large procedural atlas sampled across bank boundaries. *Differential:* CRC over the sampled
+    values; 3-way.
+
+114. **Far Overlapping Move (`farmove`).** *Re-stresses:* `0013` far `memmove`/`memcpy` wrong-bank routing —
+    an in-place overlapping move over a **far** buffer > one bank (must hit `__memmove_far`, not the near
+    runtime). *Shows:* a large far-buffer image scrolled in place. *Differential:* CRC over the moved far
+    buffer; 3-way.
+
+115. **Far-Pointer Walk (`farwalk`).** *Re-stresses:* `0014` far-ptr `G_PHI` — a far pointer used as a **loop
+    induction variable** (`for(;n;p++) *p=…`), forming the `G_PHI (p2)` the fix legalizes. *Shows:* a far
+    region filled/scanned by a walking pointer. *Differential:* CRC over the written far region; 3-way.
+
+## Round 6 first picks
+
+Sharpest at re-breaking an incompletely-generalized fix (highest bug-yield), or guarding the highest-risk fix:
+
+- **#101 `mulov64`** — the single sharpest probe (per the 2026-07-02 coverage check): `G_UMULH`/`G_SMULH` +
+  `G_UMULO`/`G_SMULO` `.lower()` at **s64** is the *only* untested s64 legalizer path, and its expansion must
+  thread the S32-mul-clamp that exists to avoid S128 infinite-regress. No demo emits it (smulorbit #76 was s32).
+- **#93 `ovmove`** — the highest-risk *intersection*: re-stresses BOTH `0002` (xy16 index width across
+  `memmove`) and #79 (memmove direction) with both-direction overlap and two live 16-bit indices.
+- **#97 `spaceship`** — `lowerThreewayCompare` at **s64** is a width qsortviz never emitted; the `G_SCMP`
+  fix (`0016`) is unverified at 64-bit.
+- **#105 `crcwall`** — the ONLY default-8-bit bug in the set (`0010`); a regression there is **invisible** to
+  every a16/xy16 gate, so a dedicated 8-bit-primary guard matters most.
+- **#111 `cfcascade`** — the truest latent-bug shape in cluster E: reads an operand straight out of a
+  `__mulsi3`/`__divsi3` return (`$rc`-resident) and keeps it live across the next call — the exact
+  coalesce-into-`Imag16`-across-clobber pattern `0015` (rc-undef) guards, chained deep under a16/xy16.
