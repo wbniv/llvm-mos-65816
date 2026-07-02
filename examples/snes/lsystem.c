@@ -108,6 +108,7 @@ int main(void) {
   corpus_result = lsystem_interp(s, len, rec_seg, &nseg);            // record to far + fold CRC
   title_end(&a.screen, &title, 110);
   a.screen.bright = INIDISP_ON; a.screen.btgt = INIDISP_ON;          // full brightness from frame 1
+  upq_push_cgram(&a.screen.q, 0, bg3_pal, 0x00, (uint8_t)sizeof bg3_pal); // reset backdrop: title rainbow left CGRAM[0] at its last hue
 
   // Progressive reveal: each frame replay the next SEGS_PER_FRAME recorded segments from the far
   // buffer (far LOAD) into the canvas — cheap O(1)/segment, so the plant grows smoothly. Once fully
