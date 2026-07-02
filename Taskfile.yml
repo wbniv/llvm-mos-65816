@@ -443,6 +443,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: satcomet }
 
+  spaceship:
+    desc: "#97 (Round 6, harden-the-fixes, Cluster B): Width-Sweep Sort Gallery — re-stresses patch 0016 (#46 G_SCMP three-way compare, .lower() -> lowerThreewayCompare) at s16/s32/s64 via qsort callbacks returning (a>b)-(a<b) at int8/16/32/64 keys (s32+s64 are widths qsortviz never reached). Four bar-sort panels. Assert corpus_result (spaceship_gate_crc 0xF20F) == host on MAME + bsnes-jg + G_SCMP IR probe (llvm.scmp>=1, scmp.i64>=1). Leaves build/spaceship.sfc + build/spaceship-{mame,jg}.png."
+    cmds:
+      - dev/run.sh spaceship
+
+  spaceship-play:
+    desc: "PLAY the Width-Sweep Sort Gallery demo in MAME (builds first if needed). Four bar panels sort in lockstep via the spaceship comparator."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/spaceship.sfc ]; then
+          echo "==> build/spaceship.sfc missing -- building (dev/run.sh spaceship)..."
+          dev/run.sh spaceship
+        fi
+      - task: mandel-mame
+        vars: { ROM: spaceship }
+
   ovmove:
     desc: "#93 (Round 6, harden-the-fixes, Cluster A): Overlap-Move Mosaic — re-stresses #23/patch-0002 (+mos-xy16 in-place-memmove REP/SEP index-width fix) + #79 (G_MEMMOVE both overlap dirs), escalated to a 16x24=384-byte buffer so the SDK memmove indexes with a 16-bit X (the #23 boundary). Four overlapping memmoves/step, ascending + descending. Assert corpus_result (ovmove_gate_crc 0xA990) == host on MAME + bsnes-jg + disasm gate (memmove>=1, rep/sep>=1, xy16 compile clean). Leaves build/ovmove.sfc + build/ovmove-{mame,jg}.png."
     cmds:

@@ -1104,11 +1104,11 @@ not a codegen patch) that unblocked idea #35.
     cursor jumping. *Differential:* CRC over the final buffer after a fixed edit script; 5-way + xy16.
 ### Cluster B — three-way compare `G_SCMP`/`G_UCMP` (hardens `0016`, the #46 spaceship fix)
 
-97. **Width-Sweep Sort Gallery (`spaceship`).** *Re-stresses:* `0016` at **every width** — the SAME
+~~97. **Width-Sweep Sort Gallery (`spaceship`).** *Re-stresses:* `0016` at **every width** — the SAME
     insertion/selection sort driven ONLY by the spaceship `(a>b)-(a<b)`, run in four panels at **s8, s16, s32,
     s64** keys, forcing `G_SCMP` (→ `lowerThreewayCompare`) at all four widths in one ROM. The s64 leg is a
     path qsortviz never reached. *Shows:* four bar-columns sorting in lockstep. *Differential:* CRC over all
-    four sorted arrays; 5-way.
+    four sorted arrays; 5-way.~~ ✓ [/snes/spaceship/](https://biohack.net/snes/spaceship/) ([plan](../plans/2026-07-02-97-snes-spaceship.md)) — **clean positive:** used qsort callbacks (a direct compare folds the scmp away); IR probe confirms `llvm.scmp=8` incl. `scmp.i64=2`; `host==default==+mos-a16==+mos-xy16==0xF20F`, `-verify` clean. G_SCMP `lowerThreewayCompare` holds at s32/s64 (the widths #46 never reached). *(Distinct G_SCMP widths are s16/s32/s64 — int8 promotes to the s16 path.)*
 98. **Unsigned Rank Percentile Field (`ucmprank`).** *Re-stresses:* the **`G_UCMP`** (unsigned) half of `0016`
     that signed qsortviz never emitted — per-cell rank/percentile of `uint32` and `uint64` values via
     `(a>b)-(a<b)`. *Shows:* a field recoloured by each cell's rank among its neighbours. *Differential:* CRC
@@ -1278,8 +1278,8 @@ Sharpest at re-breaking an incompletely-generalized fix (highest bug-yield), or 
 - ~~**#93 `ovmove`** — the highest-risk *intersection*: re-stresses BOTH `0002` (xy16 index width across
   `memmove`) and #79 (memmove direction) with both-direction overlap and two live 16-bit indices.~~
   ✓ [/snes/ovmove/](https://biohack.net/snes/ovmove/) — **SHIPPED, clean positive** (`0xA990`, 5-way + `-verify`; the #23/`0002` xy16 memmove fix holds).
-- **#97 `spaceship`** — `lowerThreewayCompare` at **s64** is a width qsortviz never emitted; the `G_SCMP`
-  fix (`0016`) is unverified at 64-bit.
+- ~~**#97 `spaceship`** — `lowerThreewayCompare` at **s64** is a width qsortviz never emitted; the `G_SCMP`
+  fix (`0016`) is unverified at 64-bit.~~ ✓ [/snes/spaceship/](https://biohack.net/snes/spaceship/) — **SHIPPED, clean positive** (`0xF20F`, 5-way + `-verify`; IR probe `scmp.i64=2` — s64 three-way compare lowers correctly).
 - **#105 `crcwall`** — the ONLY default-8-bit bug in the set (`0010`); a regression there is **invisible** to
   every a16/xy16 gate, so a dedicated 8-bit-primary guard matters most.
 - **#111 `cfcascade`** — the truest latent-bug shape in cluster E: reads an operand straight out of a
