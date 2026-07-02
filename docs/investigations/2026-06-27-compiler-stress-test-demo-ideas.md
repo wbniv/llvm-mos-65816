@@ -48,7 +48,21 @@
 > marching-squares also surfaced two fresh witnesses for the documented `a16-rc-undef-ra-pure-virtual`
 > `-verify` XFAIL — code bit-exact correct; divide-heavy int32 kernels trip it.)
 >
-> **Round 5 (#73–#92) — DRAFTED** (2026-07-01). Twenty *more* corners none of the first 72 execute,
+> **Round 5 (#73–#92) — COMPLETE** (all 20 built + published 2026-07-01, TODO has 0 open demo items).
+> **All 20 corners came back green — no compiler bug surfaced.** The one scare was **#83
+> truncstair**: its cross-emulator differential caught a real defect that I *first misdiagnosed as a
+> `MOSZeroPageAlloc` ZP-allocation miscompile*, but a rigorous instrumented refutation (rebuilt debug
+> toolchain, per-frame bsnes-jg WRAM probe, gate-stub exoneration, address-vs-variable test) proved it
+> was a **demo-side out-of-bounds write** — `draw_band` drew the round band one tile-row past the
+> 16-row canvas, overflowing `cv->chr[4096]` and corrupting `corpus_result` (exposed by bsnes-jg's
+> non-zero power-on WRAM, masked by MAME's zero-init). Fixed with a bounds guard; the G_FPTOSI/G_SITOFP
+> codegen it targets was correct throughout. Lesson: an OOB write in demo C produces the identical
+> "reads uninitialized memory" signature as a miscompile — pin the corrupting write to
+> compiler-emitted code before calling it a compiler bug. Two engineering fixes also landed: `-lm` for
+> libm demos in `dev/_demo5.sh`, and a `#if defined(__clang__)` guard + bit-identical gcc fallback for
+> clang-only saturating builtins (`__builtin_elementwise_add_sat`/`_sub_sat`) so host oracles compile.
+>
+> Round 5 drafting (2026-07-01): twenty *more* corners none of the first 72 execute,
 > chosen by walking `MOSLegalizerInfo.cpp` for lowering routines the battery has never formed the IR node
 > for — the "terrible" two-source **funnel shift** `G_FSHL`/`G_FSHR.lower()` (@317), the byte-custom
 > **rotate** `G_ROTL`/`G_ROTR` (@254), **saturating** add/sub `G_*SAT.lower()` (@246), **signed
@@ -789,7 +803,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     host soft-float equals target bit-for-bit; fold quantized int16 pixel heights, not raw float bits; negative-
     zero edge resolves identically.~~ ✓ [/snes/fabsridge/](https://biohack.net/snes/fabsridge/) ([plan](../plans/2026-07-01-80-snes-fabsridge.md))
 
-81. **Copysign Compass: Vector-Field Sign Flow.** *Stresses:* G_FCOPYSIGN via __builtin_copysignf(mag,sign) on
+~~81. **Copysign Compass: Vector-Field Sign Flow.** *Stresses:* G_FCOPYSIGN via __builtin_copysignf(mag,sign) on
     float flow components + __builtin_signbitf for HUD sign reading, mag/sign runtime-derived so not constant-
     folded. Unlike demo 45 metaball (union float/uint32 type-pun mangling the sign bit through the INTEGER ALU,
     never G_FCOPYSIGN) and demo 57 medfilt (integer G_ABS/G_SMIN on int16, no float sign). *Shows:* A 16x16
@@ -801,9 +815,9 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     Builtins.td 672; no header uses copysign. *Differential:* correctly-rounded-float: copysignf is an exact
     sign-bit transplant (no rounding), (float)(int16_t) conversions correctly-rounded, one-op-per-statement
     forbids FMA; fold the chosen signed step (integer minus-1/0/plus-1 pair) into the CRC, never float bits:
-    integer-exact on the outcome while G_FCOPYSIGN is exercised.
+    integer-exact on the outcome while G_FCOPYSIGN is exercised.~~ ✓ [/snes/compass/](https://biohack.net/snes/compass/) ([plan](../plans/2026-07-01-81-snes-compass.md))
 
-82. **Fmin/Fmax Boids: NaN-Aware Speed Governor.** *Stresses:* G_FMINNUM/G_FMAXNUM via C fminf(x,y)/fmaxf(x,y)
+~~82. **Fmin/Fmax Boids: NaN-Aware Speed Governor.** *Stresses:* G_FMINNUM/G_FMAXNUM via C fminf(x,y)/fmaxf(x,y)
     as a per-agent speed governor, one agent per frame fed a divide-by-zero +/-Inf/NaN to force the NaN branch.
     Unlike demo 57 medfilt (integer G_SMIN/SMAX on int16, no libcall) and demo 26 boids (never calls
     fminf/fmaxf, no float clamping). *Shows:* 12 sprites schooling with the classic cohesion/separation swirl
@@ -813,9 +827,9 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     mos-platform/common/c/math.cc:18-19 rule if isnan(y) return x: the only libm impl file; grep: zero fmin/fmax
     uses in corpus. *Differential:* correctly-rounded-float: fminf/fmaxf are exact selections (return one
     operand, no rounding) and the SDK NaN rule matches host C99; fold the integer clamp OUTCOME (which bound
-    chosen, quantized speed) into uint16: never the NaN payload.
+    chosen, quantized speed) into uint16: never the NaN payload.~~ ✓ [/snes/speedcap/](https://biohack.net/snes/speedcap/) ([plan](../plans/2026-07-01-82-snes-speedcap.md))
 
-83. **Truncation Staircase: Round-Toward-Zero Quantizer.** *Stresses:* __fixsfsi/__floatsisf via
+~~83. **Truncation Staircase: Round-Toward-Zero Quantizer.** *Stresses:* __fixsfsi/__floatsisf via
     (float)(int32_t)x truncation and header-built floorf/ceilf/roundf = truncf +/- correction, the hot per-pixel
     op in a posterize sweep. Unlike demo 59 cosmzoom (64-bit round-trip ONCE for a zoom scale, never derives
     floor/ceil/round) and demo 21 mandel-float (float arithmetic, no integral rounding). *Shows:* Three side-by-
@@ -827,11 +841,11 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     floor/ceil/round from conversions. *Differential:* correctly-rounded-float: G_FPTOSI (round-toward-zero) and
     G_SITOFP are correctly-rounded IEEE conversions identical host vs picolibc; floor/ceil/round corrections are
     integer compares + one exact copysignf; fold quantized integer step indices: integer-exact; avoids the
-    floorf link gap by header impl.
+    floorf link gap by header impl.~~ ✓ [/snes/truncstair/](https://biohack.net/snes/truncstair/) ([plan](../plans/2026-07-01-83-snes-truncstair.md)) *(the differential caught a **demo-side OOB write** in draw_band — a row-16 canvas overflow corrupting corpus_result on bsnes-jg — NOT a compiler bug; first misdiagnosed as a MOSZeroPageAlloc miscompile, then refuted+fixed. G_FPTOSI/G_SITOFP codegen correct.)*
 
 ### Number-theory and coder arithmetic
 
-84. **Montgomery Orbit: Modmul Without Division.** *Stresses:* __mulsi3 (widening) + G_LSHR/G_AND for t = (t +
+~~84. **Montgomery Orbit: Modmul Without Division.** *Stresses:* __mulsi3 (widening) + G_LSHR/G_AND for t = (t +
     (uint32_t)m*n) lshr 16; return t>=n ? t-n : t, explicitly avoiding __umodsi3/__umoddi3. Unlike demo 61 dhmix
     (64-bit modexp via __umoddi3) and demo 27 cardioid (modulo loop, divides) and demo 56 rotozoom (lshr 16
     plain fixed-point scale, no modulus/conditional-subtract). *Shows:* The multiplicative-group orbit of a
@@ -842,9 +856,9 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     __umodsi3 exists (umodsi3.c) but REDC must never emit it. propose-verify: confirm 32-bit REDC stays on
     __mulsi3, no __umodsi3 in the object. *Differential:* integer-exact: Montgomery REDC on uint16/uint32 is
     pure two's-complement multiply/add/shift/mask/compare, bit-identical host vs target; modular result exact,
-    conditional subtract a plain integer compare; no division, no float.
+    conditional subtract a plain integer compare; no division, no float.~~ ✓ [/snes/montorbit/](https://biohack.net/snes/montorbit/) ([plan](../plans/2026-07-01-84-snes-montorbit.md))
 
-85. **Prime Sieve Ulam: Bit-Array as a Set.** *Stresses:* Variable-count G_SHL/G_LSHR via arr[i lshr 3] |=
+~~85. **Prime Sieve Ulam: Bit-Array as a Set.** *Stresses:* Variable-count G_SHL/G_LSHR via arr[i lshr 3] |=
     (uint8_t)(1u shl (i and 7)) and (x lshr (i and 7)) and 1 in a strided Eratosthenes scatter. Unlike demo 5
     life (fixed grid word, static masks), demo 52 disbits (constant-shift multi-bit extract), demo 28 hilbert
     (variable shift interleaves Gray-code bits, no array-as-set), demo 63 fenwick (i and minus-i low-bit
@@ -855,9 +869,9 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     (.maxScalar(1,S8), libcall delegate 1061), G_AND/G_OR legal S8 213-216; indexed byte load/store on all 65816
     modes via legalizeLoad/Store; no header uses a bit-array-as-set with 1u shl (i and 7). *Differential:*
     integer-exact: all uint8/uint16 bit ops; 1 shl (i and 7) with i and 7 masked to 0..7 is well-defined (never
-    the r>=16 UB trap); bit-identical host vs target; folded bitmap + prime count are deterministic integers.
+    the r>=16 UB trap); bit-identical host vs target; folded bitmap + prime count are deterministic integers.~~ ✓ [/snes/ulam/](https://biohack.net/snes/ulam/) ([plan](../plans/2026-07-01-85-snes-ulam.md))
 
-86. **Range Coder: Multiply-Carry Renormalizer.** *Stresses:* range*prob lshr PBITS (widening __mulsi3/__muldi3
+~~86. **Range Coder: Multiply-Carry Renormalizer.** *Stresses:* range*prob lshr PBITS (widening __mulsi3/__muldi3
     + G_LSHR) then a while range<TOP loop (emit; low shl 8; range shl 8) renormalize with a separate carry/cache
     counter. Unlike demo 67 huffman (tree descent, whole bits, no interval multiply), demo 49 lzdec (byte-copy
     back-refs, no probability), demo 19 spigot (big-int digit carries, not interval renorm), demo 40 crctex
@@ -870,11 +884,11 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     emits __mulsi3 (or __muldi3 if 64-bit intermediate). *Differential:* integer-exact: the coder is entirely
     uint32 with a uint64 intermediate only for range*prob (exact integer multiply, bit-identical host vs target)
     plus integer compares/shifts/carry adds; fold the ROUND-TRIP OUTCOME (decoded==original) + byte stream; no
-    float.
+    float.~~ ✓ [/snes/rangecode/](https://biohack.net/snes/rangecode/) ([plan](../plans/2026-07-01-86-snes-rangecode.md))
 
 ### DSP and image-transform signed MAC
 
-87. **Sobelscope: Signed 3x3 MAC Edge Detector.** *Stresses:* Signed int16 MAC (gx = sum of kernel_x[k]*src[k])
+~~87. **Sobelscope: Signed 3x3 MAC Edge Detector.** *Stresses:* Signed int16 MAC (gx = sum of kernel_x[k]*src[k])
     + magnitude via __builtin_elementwise_add_sat((uint8)min(255,abs(gx)),(uint8)min(255,abs(gy))). Unlike demo
     57 medfilt (compare-exchange SORTING network, no multiply, no signed MAC), demo 44 hdr-bloom (saturates via
     __builtin_add_overflow=G_UADDO branch), demo 70 dither (scalar forward-carry error, no window MAC). *Shows:*
@@ -885,9 +899,9 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     MAC; __builtin_elementwise_add_sat/sub_sat Builtins.td 1753; no header does a signed 3x3 MAC with SAT
     magnitude. *Differential:* integer-exact: all int16/uint8 signed MAC, abs, min, and the sat builtins are
     pure two's-complement with exactly-specified clamp bounds, identical host vs target; CRC folds every output
-    magnitude byte + a gx-xor-gy checksum; no float, no NaN.
+    magnitude byte + a gx-xor-gy checksum; no float, no NaN.~~ ✓ [/snes/sobel/](https://biohack.net/snes/sobel/) ([plan](../plans/2026-07-01-87-snes-sobel.md))
 
-88. **DCT Bloom: 8x8 Integer Cosine Transform.** *Stresses:* int32 MAC (acc += (int32_t)sample *
+~~88. **DCT Bloom: 8x8 Integer Cosine Transform.** *Stresses:* int32 MAC (acc += (int32_t)sample *
     (int32_t)cos_const) via 16x16 to 32 __mulsi3-adjacent widening + signed ashr 13 descale + (int16_t)(acc ashr
     13) narrowing (G_ASHR 249 + G_SEXT_INREG 130). Unlike demo 25 fft (complex radix-2 butterfly, bit-reversal,
     re/im twiddles, order N log N) and demo 16 wire3d (3x3 fixed-point projection, not an 8-point orthogonal
@@ -899,9 +913,9 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     cosf, no ULP divergence); no header does a separable integer DCT with signed descale-narrow. *Differential:*
     integer-exact: Q13 cosines are header int16 literals, accumulation int32 two's-complement, descaling
     arithmetic shift plus explicit rounding constant, narrowing a defined signed cast: bit-identical host vs
-    target; CRC folds all 64 output coefficients.
+    target; CRC folds all 64 output coefficients.~~ ✓ [/snes/dctbloom/](https://biohack.net/snes/dctbloom/) ([plan](../plans/2026-07-01-88-snes-dctbloom.md))
 
-89. **ADPCM Waverider: Saturating Predictor Feedback Codec.** *Stresses:* __builtin_elementwise_sub_sat/add_sat
+~~89. **ADPCM Waverider: Saturating Predictor Feedback Codec.** *Stresses:* __builtin_elementwise_sub_sat/add_sat
     on int16 predictor + variable-shift nibble reconstruction (diff = (step lshr 3) + ...) + step-index LUT
     indexing. Unlike demo 49 lzdec (byte-copy state machine, no arithmetic predictor), demo 48 iir-scope
     (ordinary WRAPPING int feedback, no saturating clamp), demo 67 huffman (per-bit tree walk, no arithmetic
@@ -913,11 +927,11 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     clang/docs/LanguageExtensions.rst); no header decodes ADPCM with saturating predictor feedback.
     *Differential:* integer-exact: step/index tables are header int16 LUTs (swept-sine source synthesized by an
     integer generator, NOT sinf, so a fixed deterministic byte stream); all decode is int16/int8 with defined
-    shifts, exact type-bound saturating clamp, and bounded index clamp: bit-identical host vs target.
+    shifts, exact type-bound saturating clamp, and bounded index clamp: bit-identical host vs target.~~ ✓ [/snes/adpcm/](https://biohack.net/snes/adpcm/) ([plan](../plans/2026-07-01-89-snes-adpcm.md))
 
 ### Control-flow, ABI and game-tree
 
-90. **Scope-Guard Ripple Tank: Cleanup-Attr Scope-Exit Destructors.** *Stresses:*
+~~90. **Scope-Guard Ripple Tank: Cleanup-Attr Scope-Exit Destructors.** *Stresses:*
     __attribute__((cleanup(rg_seal))) on block-scope locals in scopes with multiple exits (early return/break
     inside ifs and a for loop). Unlike demo 51 critters (protothread saved-state, no compiler-synthesized
     calls), demo 17 sort-race (recursion/soft-stack, author-written calls), demo 42 duff (irreducible CFG but no
@@ -930,9 +944,9 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     G_PTR_ADD custom; grep of 76 headers: zero uses of cleanup. *Differential:* integer-exact: all state
     int16/int32 fixed-point, damping arithmetic shift; the CRC folds the integer height field AND the seal-
     counter, so a dropped/duplicated cleanup call (wrong seal count) is caught. host==default==a16==xy16 by
-    construction; no float.
+    construction; no float.~~ ✓ [/snes/scopeguard/](https://biohack.net/snes/scopeguard/) ([plan](../plans/2026-07-01-90-snes-scopeguard.md))
 
-91. **Matrix Cascade: sret Hidden-Pointer Struct Return.** *Stresses:* mat2 (int16 m[4], 64 bits) and vec4
+~~91. **Matrix Cascade: sret Hidden-Pointer Struct Return.** *Stresses:* mat2 (int16 m[4], 64 bits) and vec4
     (int16 x,y,z,w, 64 bits) returned by value from noinline mat_mul/mat_apply, chained as
     mat_mul(mat_mul(A,B),C). Unlike demo 26 boids and demo 60 multibase (exactly 32-bit records to register-pair
     getDirect, NOT sret) and demo 50 cgrade (spills ARGUMENTS to soft-stack, does not return an aggregate
@@ -944,9 +958,9 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     G_MEMCPY .custom() for the result copy; demo 26/60 confirmed at/below the boundary. *Differential:* integer-
     exact: sin/cos from a header int16 Q1.14 LUT (no libm), all arithmetic int16/int32 fixed-point with
     arithmetic-shift renormalize; CRC folds every transformed int16 coordinate: a botched sret copy (wrong slot,
-    missed limb) diverges the CRC.
+    missed limb) diverges the CRC.~~ ✓ [/snes/matcascade/](https://biohack.net/snes/matcascade/) ([plan](../plans/2026-07-01-91-snes-matcascade.md))
 
-92. **PlyOracle: Negamax Alpha-Beta Sign-Flip Return ABI.** *Stresses:* Recursion + G_SUB (return negation) +
+~~92. **PlyOracle: Negamax Alpha-Beta Sign-Flip Return ABI.** *Stresses:* Recursion + G_SUB (return negation) +
     G_SMAX (alpha = smax(alpha,score)) + G_ICMP/G_SELECT for the if alpha>=beta break cutoff. Unlike demo 17
     sort-race (recurses to PARTITION in place, no participating return value) and demo 18 maze (recursive carve,
     no scored negated return); neither forms the alpha-beta prune CFG nor the sign-inverted return. *Shows:* A
@@ -957,7 +971,7 @@ Same bar as Rounds 1–4: a shared host+target logic header, a differential CRC 
     handler for 16-bit), 261 G_ICMP custom, 266 G_SELECT legal, 284 G_SMAX .lower(); all reachable, 16-bit
     values widen through S8 to S16; no prior demo runs negamax alpha-beta. *Differential:* integer-exact: board
     masks uint16, scores int16 in minus-32 to plus-32, negation and smax deterministic integer ops identical
-    host vs target; terminal detection pure bit-AND against a const win-mask table; no float, no libc, no NaN.
+    host vs target; terminal detection pure bit-AND against a const win-mask table; no float, no libc, no NaN.~~ ✓ [/snes/plyoracle/](https://biohack.net/snes/plyoracle/) ([plan](../plans/2026-07-01-92-snes-plyoracle.md))
 
 ## Round 5 first picks
 
@@ -979,11 +993,11 @@ Sharpest at opening a code path the first 72 never run:
   unsigned (G_UADDSAT/G_USUBSAT on uint8 glow/decay) via lowerAddSubSatToMinMax (branchless min/max),
   categorically different from demo 44 overflow-flag-plus-branch. Integer-exact, visually vivid, anchoring a
   family six candidates competed for.
-- **#79 memmoveslab** — Correctness-critical and unique: forces the Descending=true high-to-low branch of
+- ~~**#79 memmoveslab** — Correctness-critical and unique: forces the Descending=true high-to-low branch of
   G_MEMMOVE (compareOperandLocations returns minus-1 at 3145) that ONLY memmove takes, plus the ascending
   branch. A wrong direction breaks the byte-CRC AND smears the slab image: the picture is the proof. Demo 23
-  uses memmove incidentally, demo 49 hand-codes overlap; neither verifies the descending branch.
-- **#91 sretmat** — The first demo whose return struct exceeds 32 bits (mat2/vec4 = 64 bits), tripping
+  uses memmove incidentally, demo 49 hand-codes overlap; neither verifies the descending branch.~~ ✓ [/snes/mvscrl/](https://biohack.net/snes/mvscrl/)
+- ~~**#91 sretmat** — The first demo whose return struct exceeds 32 bits (mat2/vec4 = 64 bits), tripping
   getNaturalAlignIndirect at 88 into a hidden sret pointer + caller result slot + G_MEMCPY store. Demo 26 boids
   and demo 60 sit at/below the 32-bit boundary (register-pair getDirect), so the sret hidden-pointer ABI has
-  never run; chained returns force result-slot-to-arg copies, all under a CRC catching a botched limb.
+  never run; chained returns force result-slot-to-arg copies, all under a CRC catching a botched limb.~~ ✓ [/snes/matcascade/](https://biohack.net/snes/matcascade/)
