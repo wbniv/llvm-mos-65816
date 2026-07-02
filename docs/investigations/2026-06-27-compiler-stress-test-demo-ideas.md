@@ -1180,10 +1180,10 @@ not a codegen patch) that unblocked idea #35.
     once — a maximal-length **Galois** LFSR and a **Fibonacci** LFSR, each feeding a rotate, run simultaneously
     (extra pressure). *Shows:* two interleaved pseudo-noise fields. *Differential:* CRC over both streams;
     default-8-bit + 5-way.~~ ✓ [/snes/lfsr2/](https://biohack.net/snes/lfsr2/) ([plan](../plans/2026-07-02-106-snes-lfsr2.md)) — **clean positive:** Galois-8 (shift + tap-XOR gated by shifted-out bit) + Fibonacci-8 (XOR-of-taps → top bit) + a 16-bit Galois, all loop-carried and stepped simultaneously; both 8-bit LFSRs verified maximal-length (period 255). DEFAULT-8-bit compiles clean with `asl/rol/lsr/ror=15`, `host==default==+mos-a16==+mos-xy16==0x6AA3`, `-verify` clean ×3 (incl. default). Patch 0010 holds under two dissimilar loop-carried rotate structures.
-107. **Serial Bit-Reversal Weave (`bitweave`).** *Re-stresses:* `0010` via a **rotate-out/rotate-in carry loop**
+~~107. **Serial Bit-Reversal Weave (`bitweave`).** *Re-stresses:* `0010` via a **rotate-out/rotate-in carry loop**
     bit-reversal (contrast to #54 bitshuffle's `__builtin_bitreverse`), loop-carried through the back-edge.
     *Shows:* an image reweaving through its bit-reversed order. *Differential:* CRC over the reversed words;
-    default-8-bit + 5-way.
+    default-8-bit + 5-way.~~ ✓ [/snes/bitweave/](https://biohack.net/snes/bitweave/) ([plan](../plans/2026-07-02-107-snes-bitweave.md)) — **clean positive:** serial `rev=(rev<<1)|(v&1); v>>=1` carry loop (an 8-bit + a 16-bit reversal interleaved, two loop-carried `rev` regs live), NO `__builtin_bitreverse` (the #54 contrast). Bit-reversal is an INVOLUTION — the gate folds `rev(rev(v))^v` as a self-check witness (0 when correct); `rev8(0x01)=0x80`/`rev8(0xB8)=0x1D` verified. DEFAULT-8bit compiles clean `asl/rol/lsr/ror=20`, `host==default==+mos-a16==+mos-xy16==0x0E03`, `-verify` clean ×3 (incl. default). Patch 0010 holds under a serial rotate-carry bit-reversal.
 108. **Bit-Banged UART Eye (`uarteye`).** *Re-stresses:* `0010` in a framing loop — a software-UART
     (start/data/stop bits shifted through a carry-rotated register) drawing an oscilloscope eye-diagram; the
     loop-carried bit register + rotate under pressure. *Shows:* a serial eye pattern building up. *Differential:*
