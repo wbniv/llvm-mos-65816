@@ -630,6 +630,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: modexp256 }
 
+  lfsr2:
+    desc: "#106 (Round 6, harden-the-fixes, Cluster D): Dual-LFSR Scrambler — re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit register-coalescer miscompile) via TWO loop-carried 8-bit LFSRs (Galois + Fibonacci) + a 16-bit Galois, stepped simultaneously (shift registers + feedbacks live at once). The DEFAULT-8-bit leg is load-bearing (0010 not accum-gated). Assert corpus_result (lfsr2_gate_crc 0x6AA3) == host on MAME + bsnes-jg + disasm gate (default-8bit compile OK, asl/rol/lsr/ror>=3). Leaves build/lfsr2.sfc + build/lfsr2-{mame,jg}.png."
+    cmds:
+      - dev/run.sh lfsr2
+
+  lfsr2-play:
+    desc: "PLAY the Dual-LFSR Scrambler demo in MAME (builds first if needed). Two interleaved pseudo-noise fields from a Galois and a Fibonacci LFSR."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/lfsr2.sfc ]; then
+          echo "==> build/lfsr2.sfc missing -- building (dev/run.sh lfsr2)..."
+          dev/run.sh lfsr2
+        fi
+      - task: mandel-mame
+        vars: { ROM: lfsr2 }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:

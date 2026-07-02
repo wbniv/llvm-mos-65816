@@ -1176,10 +1176,10 @@ not a codegen patch) that unblocked idea #35.
     (NOT #40's table) inlined in one hot loop with a loop-carried shift register + back-edge `ROL`, three polys
     under pressure — the exact shape that found `0010`, widened. *Shows:* three hash-marble fields side by side.
     *Differential:* CRC over all three (a coalescer strand diverges the loop-carried byte); default-8-bit + 5-way.~~ ✓ [/snes/crcwall/](https://biohack.net/snes/crcwall/) ([plan](../plans/2026-07-02-105-snes-crcwall.md)) — **clean positive:** default-8bit compiles clean, `asl/rol/lsr/ror=13` (shift-register present); `host==default==+mos-a16==+mos-xy16==0x8E47`, `-verify` clean. Patch `0010` holds under 3 interleaved bit-serial CRCs. *(Display = a single flowing CRC-8 marble, not 3 side-by-side.)*
-106. **Dual-LFSR Scrambler (`lfsr2`).** *Re-stresses:* `0010` with **two** loop-carried shift registers live at
+~~106. **Dual-LFSR Scrambler (`lfsr2`).** *Re-stresses:* `0010` with **two** loop-carried shift registers live at
     once — a maximal-length **Galois** LFSR and a **Fibonacci** LFSR, each feeding a rotate, run simultaneously
     (extra pressure). *Shows:* two interleaved pseudo-noise fields. *Differential:* CRC over both streams;
-    default-8-bit + 5-way.
+    default-8-bit + 5-way.~~ ✓ [/snes/lfsr2/](https://biohack.net/snes/lfsr2/) ([plan](../plans/2026-07-02-106-snes-lfsr2.md)) — **clean positive:** Galois-8 (shift + tap-XOR gated by shifted-out bit) + Fibonacci-8 (XOR-of-taps → top bit) + a 16-bit Galois, all loop-carried and stepped simultaneously; both 8-bit LFSRs verified maximal-length (period 255). DEFAULT-8-bit compiles clean with `asl/rol/lsr/ror=15`, `host==default==+mos-a16==+mos-xy16==0x6AA3`, `-verify` clean ×3 (incl. default). Patch 0010 holds under two dissimilar loop-carried rotate structures.
 107. **Serial Bit-Reversal Weave (`bitweave`).** *Re-stresses:* `0010` via a **rotate-out/rotate-in carry loop**
     bit-reversal (contrast to #54 bitshuffle's `__builtin_bitreverse`), loop-carried through the back-edge.
     *Shows:* an image reweaving through its bit-reversed order. *Differential:* CRC over the reversed words;
