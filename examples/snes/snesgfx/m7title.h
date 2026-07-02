@@ -119,11 +119,15 @@ static void _m7t_write_line(const char *s, uint8_t row) {
     }
 }
 
-/* Update shimmer: drive CGRAM entry 1 with a triangle-wave luminance. */
-static void _m7t_shimmer(void) {
+/* Advance the shimmer phase and COMPUTE the ink colour (no PPU write — call outside vblank). */
+static uint16_t _m7t_shimmer_color(void) {
     _m7t_phase = (uint8_t)(_m7t_phase + 2u);
     uint8_t lvl = (uint8_t)(22u + (_m7t_tri(_m7t_phase) >> 4u));  /* 22..29, within 0..31 */
-    uint16_t ink = (uint16_t)SNES_RGB(lvl, lvl, lvl);
+    return (uint16_t)SNES_RGB(lvl, lvl, lvl);
+}
+
+/* Write CGRAM entry 1 (title ink). MUST be called inside v-blank (or force-blank). */
+static inline void _m7t_put_ink(uint16_t ink) {
     REG_CGADD = 1u; REG_CGDATA = (uint8_t)ink; REG_CGDATA = (uint8_t)(ink >> 8u);
 }
 
@@ -162,20 +166,22 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
     m7_set_center(128u, 112u);
     m7_set_scroll(0u, 0u);
 
-    /* Zoom-in loop: scale 0x010 → 0x100, no rotation, brightness 0 → INIDISP_ON. */
+    /* Zoom-in loop: scale 0x010 → 0x100, no rotation, brightness 0 → INIDISP_ON.
+       COMPUTE the frame's values BEFORE wait_vblank, then write matrix/CGRAM/INIDISP FIRST inside
+       vblank — a mid-frame m7_set_matrix would shift the Mode-7 transform partway down = bands. */
     int16_t scale = (int16_t)0x010;
     uint8_t bright = 0u;
     _m7t_phase = 0u;
     for (;;) {
-        snes_wait_vblank();
-        /* Exponential approach to 0x100 (shift=3 ≈ 25 frames); minimum step=1 prevents stall. */
         int16_t step = (int16_t)((int16_t)((int16_t)0x100 - scale) >> 3);
         if (step < 1) step = 1;
         scale = (int16_t)(scale + step);
         if (scale >= (int16_t)0x0FE) scale = (int16_t)0x100;
         if (bright < (uint8_t)INIDISP_ON) bright++;
-        _m7t_shimmer();
+        uint16_t ink = _m7t_shimmer_color();
+        snes_wait_vblank();
         m7_set_matrix(scale, 0, 0, scale);
+        _m7t_put_ink(ink);
         REG_INIDISP = bright;
         if (scale == (int16_t)0x100 && bright == (uint8_t)INIDISP_ON) break;
     }
@@ -184,15 +190,18 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
 /* Hold for `hold_frames` v-blanks, then full-360° spin + zoom-out + fade to black.
  * Returns with force-blank active (REG_INIDISP = 0x80). */
 static inline void m7splash_end(uint16_t hold_frames) {
-    /* Hold: shimmer ink, static matrix. */
+    /* Hold: shimmer ink, static matrix. Compute ink, then write inside vblank. */
     for (uint16_t f = 0u; f < hold_frames; f++) {
+        uint16_t ink = _m7t_shimmer_color();
         snes_wait_vblank();
-        _m7t_shimmer();
         m7_set_matrix((int16_t)0x100, 0, 0, (int16_t)0x100);
+        _m7t_put_ink(ink);
         REG_INIDISP = (uint8_t)INIDISP_ON;
     }
 
-    /* Spin-out + zoom-out + fade: 64 frames, full 360° spin, scale → 0, brightness → 0. */
+    /* Spin-out + zoom-out + fade: 64 frames, full 360° spin, scale → 0, brightness → 0.
+       The 4 matrix terms are int32 multiplies (soft __mulsi3, slow); COMPUTE them BEFORE wait_vblank so
+       m7_set_matrix's writes land at the START of vblank, not mid-frame (which shifts the plane = bands). */
     int16_t scale = (int16_t)0x100;
     uint8_t angle = 0u, bright = (uint8_t)INIDISP_ON;
     for (uint8_t g = 0u; g < M7T_SPIN_FRAMES; g++) {
@@ -200,13 +209,14 @@ static inline void m7splash_end(uint16_t hold_frames) {
         scale = (int16_t)(scale - M7T_SCALE_STEP);   /* 4/frame × 64 = 256 → reaches 0 */
         if (scale < 0) scale = 0;
         if ((g & 3u) == 0u && bright > 0u) bright--;/* fade every 4 frames; 15 steps → 0 */
-        snes_wait_vblank();
         int16_t cs = SINCOS[(uint8_t)(angle + 64u)];
         int16_t sn = SINCOS[angle];
-        m7_set_matrix((int16_t)(((int32_t)cs * scale) >> 8),
-                      (int16_t)(-((int32_t)sn * scale) >> 8),
-                      (int16_t)(((int32_t)sn * scale) >> 8),
-                      (int16_t)(((int32_t)cs * scale) >> 8));
+        int16_t ma = (int16_t)(((int32_t)cs * scale) >> 8);
+        int16_t mb = (int16_t)(-((int32_t)sn * scale) >> 8);
+        int16_t mc = (int16_t)(((int32_t)sn * scale) >> 8);
+        int16_t md = (int16_t)(((int32_t)cs * scale) >> 8);
+        snes_wait_vblank();
+        m7_set_matrix(ma, mb, mc, md);
         REG_INIDISP = bright;
     }
     REG_INIDISP = 0x80u;  /* force-blank — caller can now call display_init(). No VRAM wipe here: the
