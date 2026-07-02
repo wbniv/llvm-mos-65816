@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  scopeguard:
+    desc: "#90: Scope-Guard Ripple Tank -- __attribute__((cleanup(fn))) compiler-synthesized scope-exit calls (CGDecl.cpp:2254): guarded locals run their cleanup at every scope exit (fall-through/return/break/nested-block) in reverse declaration order. First battery demo using the cleanup attribute. Fixed-point ripple tank visual. Assert corpus_result (scopeguard_gate_crc 0x05A3) == host on MAME + bsnes-jg + disasm gate (>=3 cleanup call sites). Leaves build/scopeguard.sfc + build/scopeguard-{mame,jg}.png."
+    cmds:
+      - dev/run.sh scopeguard
+
+  scopeguard-play:
+    desc: "PLAY the Scope-Guard Ripple Tank demo in a MAME window (builds first if needed). Shows a fixed-point ripple tank + a cleanup-count HUD."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/scopeguard.sfc ]; then
+          echo "==> build/scopeguard.sfc missing -- building (dev/run.sh scopeguard)..."
+          dev/run.sh scopeguard
+        fi
+      - task: mandel-mame
+        vars: { ROM: scopeguard }
+
   adpcm:
     desc: "#89: ADPCM Waverider — IMA-ADPCM decoder with saturating predictor (G_SADDSAT/G_SSUBSAT via __builtin_elementwise_add_sat/_sub_sat) in a serial feedback loop + step-index LUT walk. Distinct from #48 IIR (wrapping)/#67 huffman. Scrolling waveform oscilloscope. Assert corpus_result (adpcm_gate_crc 0xCA56) == host on MAME + bsnes-jg. Leaves build/adpcm.sfc + build/adpcm-{mame,jg}.png."
     cmds:
