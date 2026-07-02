@@ -1129,13 +1129,13 @@ optional stretch. Each cites the patch it hardens and the exact code path.
 > count s64 **right** shift and **signed**-float / **double** int64 conversions. Cluster C is re-scoped to hit
 > the real gaps first.
 
-101. **64-bit Multiply-Overflow / Multiply-High (`mulov64`).** *Re-stresses:* the **one untested s64 path** —
+~~101. **64-bit Multiply-Overflow / Multiply-High (`mulov64`).** *Re-stresses:* the **one untested s64 path** —
     `__builtin_mul_overflow` on `uint64_t`/`int64_t` forces `G_UMULO`/`G_SMULO` (`.lower()` @301) → an s64
     `G_UMULH`/`G_SMULH` (`.lower()` @312), whose expansion must thread the S32-mul-clamp needle (@227-233) that
     exists precisely to avoid S128 infinite-regress. No demo emits an s64 mulh/mulo (smulorbit #76 was s32,
     `__mulosi4`). *Shows:* orbiters that teleport/spark when a 64-bit product overflows (a `smulorbit` at 4× the
     width), or a field coloured by the high 64 bits of a 64×64 product. *Differential:* overflow is a first-class
-    signal, the high-half is exact; CRC folds both; 5-way. **← the sharp Cluster-C probe.**
+    signal, the high-half is exact; CRC folds both; 5-way. **← the sharp Cluster-C probe.**~~ ✓ [/snes/mulov64/](https://biohack.net/snes/mulov64/) ([plan](../plans/2026-07-02-101-snes-mulov64.md)) — **clean positive:** disasm confirms the s64 mulh composed from s32 `__mulsi3` + `__muldi3` glue (no s128 widening); `host==default==+mos-a16==+mos-xy16==0x3A69`, `-verify` clean. The one untested s64 legalizer path is correct.
 
 102. **Variable-Shift & Wide-Conversion Field (`varconv64`).** *Re-stresses:* the two minor gaps — a
     **runtime-amount** s64 **right** shift (`v >> k`, k∈0..63 → `__lshrdi3`/`__ashrdi3`; avalanche did only
@@ -1228,9 +1228,10 @@ optional stretch. Each cites the patch it hardens and the exact code path.
 
 Sharpest at re-breaking an incompletely-generalized fix (highest bug-yield), or guarding the highest-risk fix:
 
-- **#101 `mulov64`** — the single sharpest probe (per the 2026-07-02 coverage check): `G_UMULH`/`G_SMULH` +
+- ~~**#101 `mulov64`** — the single sharpest probe (per the 2026-07-02 coverage check): `G_UMULH`/`G_SMULH` +
   `G_UMULO`/`G_SMULO` `.lower()` at **s64** is the *only* untested s64 legalizer path, and its expansion must
-  thread the S32-mul-clamp that exists to avoid S128 infinite-regress. No demo emits it (smulorbit #76 was s32).
+  thread the S32-mul-clamp that exists to avoid S128 infinite-regress. No demo emits it (smulorbit #76 was s32).~~
+  ✓ [/snes/mulov64/](https://biohack.net/snes/mulov64/) — **SHIPPED, clean positive** (`0x3A69`, 5-way + `-verify`; s64 mulh composed from s32 pieces, correct).
 - **#93 `ovmove`** — the highest-risk *intersection*: re-stresses BOTH `0002` (xy16 index width across
   `memmove`) and #79 (memmove direction) with both-direction overlap and two live 16-bit indices.
 - **#97 `spaceship`** — `lowerThreewayCompare` at **s64** is a width qsortviz never emitted; the `G_SCMP`
