@@ -29,22 +29,25 @@
 #define SNESGFX_M7TITLE_H
 
 #include <snes.h>
-#include "../font8.h"
+#include "../font16.h"   /* real 16×16 Waldo font (face + SE drop-shadow) rendered as Mode-7 tiles */
 #include "../sincos.h"
 #include "../mode7.h"
 
-/* Tilemap rows (tile units; pixel_y = row * 8). Matches title_layer.h convention:
- *   ROW0 = upper (subtitle, line0, dim)    → screen_y 96
- *   ROW1 = lower (title,    line1, bright) → screen_y 112  ← zoom centre (128,112) */
-#define M7T_ROW0   12u   /* subtitle (line0, dim   ink=2) → screen_y 96  */
-#define M7T_ROW1   14u   /* title    (line1, bright ink=1) → screen_y 112 */
+/* Both lines use the real 16×16 Waldo font (2×2 Mode-7 8×8 tiles per glyph). Mode 7 has exactly 256
+ * tiles = FONT16_N(64) glyphs × 4 tiles — a perfect fit; glyph g → tiles 4g..4g+3 (TL,TR,BL,BR).
+ * Tilemap rows are the TOP row of each 2-row line (pixel_y = row * 8):
+ *   line1 (title)    top row 13 → screen_y 104..119, centred on the zoom centre (128,112).
+ *   line0 (subtitle) top row 10 → screen_y  80.. 95. */
+#define M7T_ROW0   10u   /* subtitle (line0) top row */
+#define M7T_ROW1   13u   /* title    (line1) top row → zoom centre */
 
 /* Visible tile columns at 1:1 scale (256 px / 8 px/tile). */
 #define M7T_VCOLS  32u
+#define M7T_MAXCH  16u   /* max chars/line (2 tile-cols each → ≤ 32 cols) */
 
-/* Palette index for set pixels of each line. */
-#define M7T_INK1   0x01u  /* title    (bright white) */
-#define M7T_INK2   0x02u  /* subtitle (dimmer)       */
+/* Mode-7 8bpp palette indices for the Waldo glyph pixels. */
+#define M7T_FACE    0x01u  /* face  → CGRAM 1 (white, shimmer) */
+#define M7T_SHADOW  0x02u  /* shadow→ CGRAM 2 (fixed dark)     */
 
 /* Spin-out: 64 frames × 4 angle-units/frame = 256 = one full rotation. */
 #define M7T_SPIN_FRAMES  64u
@@ -67,42 +70,53 @@ static inline uint8_t _m7t_len(const char *s, uint8_t max) {
     return n;
 }
 
-/* Write FONT8 glyph g as 8bpp Mode 7 tile at tile index `tile_idx`.
- * Pixels with the source bit set get palette value `ink`; clear bits get 0.
- * Caller must have set VMAIN = VMAIN_INC_HIGH_1 and REG_VMADD = tile_idx * 64. */
-static void _m7t_write_glyph_raw(uint8_t g, uint8_t ink) {
-    for (uint8_t r = 0u; r < 8u; r++) {
-        uint8_t bits = (uint8_t)FONT8[(uint16_t)g * 8u + r]; /* plane 0: bit7=left */
-        for (uint8_t p = 0u; p < 8u; p++)
-            REG_VMDATAH = (uint8_t)(((bits >> (7u - p)) & 1u) ? ink : 0u);
+/* Glyph index for an ASCII char (space / out-of-set → 0). */
+static inline uint8_t _m7t_glyph(uint8_t ch) {
+    return (ch >= FONT16_FIRST && ch < (uint8_t)(FONT16_FIRST + FONT16_N))
+             ? (uint8_t)(ch - FONT16_FIRST) : 0u;
+}
+
+/* Write all 64 Waldo glyphs (× 4 tiles = 256 tiles) as Mode 7 8bpp character data (HIGH bytes),
+ * sequentially from tile 0. FONT16 word = face_byte | shadow_byte<<8 → pixel = FACE / SHADOW / 0.
+ * Tile 4g+q holds glyph g's quadrant q (0=TL,1=TR,2=BL,3=BR). */
+static void _m7t_write_all_glyphs(void) {
+    REG_VMAIN = VMAIN_INC_HIGH_1;
+    REG_VMADD = 0u;   /* sequential: VMADD auto-advances after each HIGH write */
+    for (uint16_t g = 0u; g < FONT16_N; g++) {
+        for (uint8_t q = 0u; q < 4u; q++) {
+            for (uint8_t r = 0u; r < 8u; r++) {
+                uint16_t w = FONT16[(uint16_t)(g * 32u) + (uint16_t)(q * 8u) + r];
+                uint8_t fb = (uint8_t)w, sb = (uint8_t)(w >> 8u);
+                for (uint8_t p = 0u; p < 8u; p++) {
+                    uint8_t bit = (uint8_t)(0x80u >> p);
+                    REG_VMDATAH = (uint8_t)((fb & bit) ? M7T_FACE : ((sb & bit) ? M7T_SHADOW : 0u));
+                }
+            }
+        }
     }
 }
 
-/* Write all 64 FONT8 glyphs as Mode 7 8bpp character data (HIGH bytes).
- * Tile 0..63 = glyphs with ink=M7T_INK1 (title).
- * Tile 64..127 = same glyphs with ink=M7T_INK2 (subtitle). */
-static void _m7t_write_all_glyphs(void) {
-    REG_VMAIN = VMAIN_INC_HIGH_1;
-    /* Tiles 0..63 — ink=M7T_INK1. Sequential: VMADD auto-advances after each HIGH write. */
-    REG_VMADD = 0u;
-    for (uint8_t g = 0u; g < FONT8_N; g++)
-        _m7t_write_glyph_raw(g, M7T_INK1);
-    /* Tiles 64..127 — ink=M7T_INK2. */
-    REG_VMADD = (uint16_t)(FONT8_N * 64u);
-    for (uint8_t g = 0u; g < FONT8_N; g++)
-        _m7t_write_glyph_raw(g, M7T_INK2);
-}
-
-/* Write centred glyph indices into tilemap (LOW bytes) at tile row `row`.
- * `tile_base` is added to the glyph index (0 for ink1 tiles, FONT8_N for ink2 tiles). */
-static void _m7t_write_row(const char *s, uint8_t row, uint8_t tile_base) {
+/* Write one centred 16×16 line into the tilemap (LOW bytes): 2 tiles/glyph across `row` (TL,TR) and
+ * `row+1` (BL,BR). Glyph g → tiles 4g+0..3. */
+static void _m7t_write_line(const char *s, uint8_t row) {
     if (!s) return;
-    uint8_t n  = _m7t_len(s, M7T_VCOLS);
-    uint8_t sc = (uint8_t)((M7T_VCOLS - n) / 2u);
+    uint8_t n  = _m7t_len(s, M7T_MAXCH);
+    uint8_t sc = (uint8_t)((M7T_VCOLS - (uint8_t)(2u * n)) / 2u);   /* left tile-col */
     REG_VMAIN = VMAIN_INC_LOW_1;
+    /* top row: TL,TR */
     REG_VMADD = (uint16_t)((uint16_t)row * 128u + sc);
-    for (uint8_t i = 0u; i < n; i++)
-        REG_VMDATAL = (uint8_t)(tile_base + (uint8_t)s[i] - (uint8_t)FONT8_FIRST);
+    for (uint8_t i = 0u; i < n; i++) {
+        uint8_t g = _m7t_glyph((uint8_t)s[i]);
+        REG_VMDATAL = (uint8_t)(4u * g + 0u);
+        REG_VMDATAL = (uint8_t)(4u * g + 1u);
+    }
+    /* bottom row: BL,BR */
+    REG_VMADD = (uint16_t)((uint16_t)(row + 1u) * 128u + sc);
+    for (uint8_t i = 0u; i < n; i++) {
+        uint8_t g = _m7t_glyph((uint8_t)s[i]);
+        REG_VMDATAL = (uint8_t)(4u * g + 2u);
+        REG_VMDATAL = (uint8_t)(4u * g + 3u);
+    }
 }
 
 /* Update shimmer: drive CGRAM entry 1 with a triangle-wave luminance. */
@@ -126,19 +140,16 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
     /* Character data: write 128 glyph tiles (HIGH bytes). */
     _m7t_write_all_glyphs();
 
-    /* Tilemap: write text rows.
-     * line1 (title, arg2)    → tiles  0..63  (ink=1, bright) at M7T_ROW1=14 (zoom centre).
-     * line0 (subtitle, arg1) → tiles 64..127 (ink=2, dim)   at M7T_ROW0=12 (above centre). */
-    _m7t_write_row(line1, M7T_ROW1, 0u);
-    _m7t_write_row(line0, M7T_ROW0, FONT8_N);
+    /* Tilemap: write both 16×16 lines. line1 (title, arg2) at the zoom centre; line0 (subtitle) above. */
+    _m7t_write_line(line1, M7T_ROW1);
+    _m7t_write_line(line0, M7T_ROW0);
 
-    /* CGRAM: 0=black backdrop, 1=white (shimmer overrides each frame), 2=dim subtitle. */
+    /* CGRAM: 0=black backdrop, 1=white face (shimmer overrides each frame), 2=dark drop-shadow. */
     {
-        uint16_t dim = (uint16_t)SNES_RGB(16u, 16u, 14u);
         REG_CGADD = 0u;
-        REG_CGDATA = 0x00u; REG_CGDATA = 0x00u;               /* 0 = black           */
-        REG_CGDATA = 0xFFu; REG_CGDATA = 0x7Fu;               /* 1 = white (shimmer) */
-        REG_CGDATA = (uint8_t)dim; REG_CGDATA = (uint8_t)(dim >> 8u); /* 2 = dim grey */
+        REG_CGDATA = 0x00u; REG_CGDATA = 0x00u;   /* 0 = black                */
+        REG_CGDATA = 0xFFu; REG_CGDATA = 0x7Fu;   /* 1 = white face (shimmer) */
+        REG_CGDATA = 0x84u; REG_CGDATA = 0x10u;   /* 2 = dark shadow (0x1084) */
     }
 
     /* Mode 7: BG1 only, no wrap, centre=(128,112), scroll=(0,0). */

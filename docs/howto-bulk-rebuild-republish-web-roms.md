@@ -84,9 +84,9 @@ go-ahead.
   the ~4 KB `font16` table, so it builds with **`-DTITLE_FONT16_OFF`** (title_layer.h falls back to the
   no-table pixel-doubled font8; chunky title, but it fits). Add other edge demos here if a future asset
   pushes them over.
-- **Not on the 16×16 title path** (left unchanged by a font16 swap): demos with **no title** (`cordic`,
-  `factorial`) and the one **Mode-7 title** demo `hilbert` (`m7title.h` renders font8 at 8×8 in Mode 7 —
-  a separate system). These are expected byte-identical after a title-font-only rebuild.
+- **No title card** (nothing to change, byte-identical after a title-font rebuild): `cordic`, `factorial`.
+- **Mode-7 title** (`hilbert`, via `m7title.h`) is a *separate* title system but now **also uses the Waldo
+  font16** (rendered as 256 Mode-7 8bpp tiles = 64 glyphs × 4). It changes on a font16 regen too.
 
 ## Gotchas
 
