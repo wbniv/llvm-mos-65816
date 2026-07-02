@@ -494,6 +494,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: ovmove }
 
+  rotslab:
+    desc: "#94 (Round 6, harden-the-fixes, Cluster A): In-Place Block Rotate — re-stresses patch 0002 (MOSInsertREPSEP::placeIntraBlock, the #23 +mos-xy16 index-width fix) via a hand-written three-reversal rotate of a 384-entry uint16_t buffer: 16-bit-indexed reversal swaps crossing the M/X width-flag boundary, NO memmove libcall (the #93 angle differs). Assert corpus_result (rotslab_gate_crc 0xB93A) == host on MAME + bsnes-jg + disasm gate (__umodhi>=1, rep/sep>=1, xy16 compile clean). Leaves build/rotslab.sfc + build/rotslab-{mame,jg}.png."
+    cmds:
+      - dev/run.sh rotslab
+
+  rotslab-play:
+    desc: "PLAY the In-Place Block Rotate demo in MAME (builds first if needed). A 16x16 barber-pole window rotated in place via three reversals per step."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/rotslab.sfc ]; then
+          echo "==> build/rotslab.sfc missing -- building (dev/run.sh rotslab)..."
+          dev/run.sh rotslab
+        fi
+      - task: mandel-mame
+        vars: { ROM: rotslab }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:
