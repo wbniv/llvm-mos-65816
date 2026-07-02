@@ -1117,10 +1117,10 @@ not a codegen patch) that unblocked idea #35.
     flow** — a 3-way merge of sorted streams where `−1/0/+1` switches into distinct branches (advance-left /
     emit-both / advance-right), not just a sort key. *Shows:* three lanes braiding into one merged column.
     *Differential:* CRC over the merged output; 5-way.~~ ✓ [/snes/trimerge/](https://biohack.net/snes/trimerge/) ([plan](../plans/2026-07-02-99-snes-trimerge.md)) — **clean positive:** a 2-input merge branches on the sign of `(a>b)-(a<b)` (advance-left/emit-both/advance-right) at s32+s64, via **noinline comparators** that keep `llvm.scmp` alive as a branch selector (IR `scmp=4` incl. `scmp.i64=2`); the display colours each output cell by which branch emitted it → the merge decisions braid. `host==default==+mos-a16==+mos-xy16==0xCCCC`, `-verify` clean ×2. `lowerThreewayCompare` holds when its result drives control flow.
-100. **64-bit Multi-Key Record Sort (`keycmp64`).** *Re-stresses:* `0016` at the **extreme width** — libc
+~~100. **64-bit Multi-Key Record Sort (`keycmp64`).** *Re-stresses:* `0016` at the **extreme width** — libc
     `qsort` of records with a *chained* comparator: a primary `int64` spaceship, tie-broken by a second `int64`
     spaceship (`G_SCMP s64` twice per call). *Shows:* records reordering under a two-level key. *Differential:*
-    CRC over the sorted records; 5-way.
+    CRC over the sorted records; 5-way.~~ ✓ [/snes/keycmp64/](https://biohack.net/snes/keycmp64/) ([plan](../plans/2026-07-02-100-snes-keycmp64.md)) — **clean positive:** k1 from a small range (−3..3) → 38 tie pairs so the second s64 spaceship genuinely fires; IR probe `scmp.i64=3` (chained, all s64); `host==default==+mos-a16==+mos-xy16==0xB8AD`, `-verify` clean ×2. **Completes Cluster B** — 0016's `lowerThreewayCompare` holds across signed sort (#97), unsigned rank (#98), control-flow branch (#99), and chained-s64 tie-break (#100).
 ### Cluster C — wide multi-limb `s64↔s16` (un)merge + odd-width anyext (hardens `0017`, the #61 64-bit fix)
 
 > **Coverage-check finding (2026-07-02).** An audit of the live `MOSLegalizerInfo.cpp` against the five

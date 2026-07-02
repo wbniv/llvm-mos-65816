@@ -579,6 +579,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: trimerge }
 
+  keycmp64:
+    desc: "#100 (Round 6, harden-the-fixes, Cluster B final): 64-bit Multi-Key Record Sort — re-stresses patch 0016 (#46) at the extreme width: libc qsort of records with a CHAINED comparator (primary int64 spaceship, tie-broken by a second int64 spaceship → G_SCMP s64 twice per call; tie-break fires on frequent primary ties). Assert corpus_result (keycmp64_gate_crc 0xB8AD) == host on MAME + bsnes-jg + IR probe (llvm.scmp.i64>=2). Leaves build/keycmp64.sfc + build/keycmp64-{mame,jg}.png."
+    cmds:
+      - dev/run.sh keycmp64
+
+  keycmp64-play:
+    desc: "PLAY the 64-bit Multi-Key Record Sort demo in MAME (builds first if needed). 16 records as rows (left=primary key, right=secondary), reordering under the two-level key."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/keycmp64.sfc ]; then
+          echo "==> build/keycmp64.sfc missing -- building (dev/run.sh keycmp64)..."
+          dev/run.sh keycmp64
+        fi
+      - task: mandel-mame
+        vars: { ROM: keycmp64 }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:
