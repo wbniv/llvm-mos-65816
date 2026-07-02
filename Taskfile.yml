@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  sobel:
+    desc: "#87: Sobelscope — signed 3x3 Sobel edge MAC + saturating magnitude via __builtin_elementwise_add_sat/_sub_sat (G_SADDSAT/G_USUBSAT). Distinct from #57 medfilt (compare-exchange, no MAC). Animated edge-detected field. Assert corpus_result (sobel_gate_crc 0x2849) == host on MAME + bsnes-jg. Leaves build/sobel.sfc + build/sobel-{mame,jg}.png."
+    cmds:
+      - dev/run.sh sobel
+
+  sobel-play:
+    desc: "PLAY the Sobelscope demo in a MAME window (builds first if needed). Shows a live Sobel edge-detected animated field."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/sobel.sfc ]; then
+          echo "==> build/sobel.sfc missing -- building (dev/run.sh sobel)..."
+          dev/run.sh sobel
+        fi
+      - task: mandel-mame
+        vars: { ROM: sobel }
+
   rangecode:
     desc: "#86: Range Coder — binary arithmetic (range) coder; interval split bound=(range>>PBITS)*prob (__mulsi3+G_LSHR) + byte-wise renormalize carry loop (32-bit G_SHL/G_LSHR). Distinct from #67 huffman/#49 lzdec. Assert corpus_result (rangecode_gate_crc 0x6D21) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1). Leaves build/rangecode.sfc + build/rangecode-{mame,jg}.png."
     cmds:
