@@ -184,6 +184,7 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
         if (scale >= (int16_t)0x0FE) scale = (int16_t)0x100;
         if (bright < (uint8_t)INIDISP_ON) bright++;
         uint16_t ink = _m7t_shimmer_color();
+        (void)REG_RDNMI;      /* clear stale v-blank flag → block until a FRESH v-blank (display.h pattern) */
         snes_wait_vblank();
         m7_set_matrix(scale, 0, 0, scale);
         _m7t_put_ink(ink);
@@ -198,6 +199,7 @@ static inline void m7splash_end(uint16_t hold_frames) {
     /* Hold: shimmer ink, static matrix. Compute ink, then write inside vblank. */
     for (uint16_t f = 0u; f < hold_frames; f++) {
         uint16_t ink = _m7t_shimmer_color();
+        (void)REG_RDNMI;      /* clear stale v-blank flag → block until a FRESH v-blank (display.h pattern) */
         snes_wait_vblank();
         m7_set_matrix((int16_t)0x100, 0, 0, (int16_t)0x100);
         _m7t_put_ink(ink);
@@ -220,6 +222,7 @@ static inline void m7splash_end(uint16_t hold_frames) {
         int16_t mb = (int16_t)(-((int32_t)sn * scale) >> 8);
         int16_t mc = (int16_t)(((int32_t)sn * scale) >> 8);
         int16_t md = (int16_t)(((int32_t)cs * scale) >> 8);
+        (void)REG_RDNMI;      /* clear stale v-blank flag → block until a FRESH v-blank (display.h pattern) */
         snes_wait_vblank();
         m7_set_matrix(ma, mb, mc, md);
         REG_INIDISP = bright;
