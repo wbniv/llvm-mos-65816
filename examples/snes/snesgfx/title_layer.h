@@ -9,7 +9,7 @@
  *
  * Layout (always):
  *   line0 — 8×8 font, centred at tilemap row 12 (y=96;  VOFS=0 → screen row  96)
- *   line1 — 16×16 pixel-doubled font, at tilemap rows 14–15 (y=112; VOFS=0 → screen rows 112–127)
+ *   line1 — real 16×16 Waldo font (font16.h; face + SE drop-shadow), tilemap rows 14–15 (y=112)
  *   (1 blank tilemap row between them; normal reading spacing.)
  *
  *   The two lines share ONE BG2 layer but each band of the screen gets its own VOFS via HDMA:
@@ -32,7 +32,7 @@
  *
  * VRAM layout (single mode, always mixed):
  *   tiles   0– 63  8×8 glyphs (line0)               1 K words at TITLE_CHR_WORD
- *   tiles  64–319  16×16 expanded glyphs (line1)     4 K words at TITLE_CHR_WORD + 0x0400
+ *   tiles  64–319  16×16 Waldo glyphs (line1)        4 K words at TITLE_CHR_WORD + 0x0400
  *   Total 5 K words at TITLE_CHR_WORD = 0x1000.
  *
  * HDMA channels (both free during the title intro — hud.h arms 1–2 only inside demo loops):
@@ -53,6 +53,7 @@
 #include "display.h"
 #include "hdma_hscroll.h"
 #include "../font8.h"
+#include "../font16.h"   /* real 16×16 Waldo font (face + SE drop-shadow) for line1 */
 
 #ifndef TITLE_CHR_WORD
 #define TITLE_CHR_WORD  0x1000u   /* BG2 char base (4K-word granular → BG12NBA high nibble = 1) */
@@ -129,15 +130,6 @@ static inline int16_t _title_hofs(const char *s) {
 /* Triangle wave 0..127..0 — building block for the rainbow backdrop. */
 static inline uint8_t _title_tri(uint8_t x) { return (uint8_t)((x & 0x80u) ? (uint8_t)(255u - x) : x); }
 
-/* Pixel-double one 8-bit plane row to 16 bits: each source bit → 2 adjacent bits (MSB=left). */
-static inline uint16_t _title_expand_byte(uint8_t b) {
-  uint16_t r = 0;
-  for (uint8_t i = 0; i < 8u; i++) {
-    if (b & (uint8_t)(0x80u >> i)) r |= (uint16_t)(0xC000u >> (uint8_t)(i << 1u));
-  }
-  return r;
-}
-
 /* ── reserve ──────────────────────────────────────────────────────────────────────────────────── */
 
 static void _title_reserve(Drawable *d, VramAlloc *va) {
@@ -148,8 +140,9 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
   REG_BG12NBA = (uint8_t)(((TITLE_CHR_WORD >> 12) & 0x0Fu) << 4);
 
   REG_CGADD  = (uint8_t)(TITLE_PAL * 16u);
-  REG_CGDATA = 0x00; REG_CGDATA = 0x00;   /* colour 0 = black (transparent on BG) */
-  REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;   /* colour 1 = white (BGR555 0x7FFF)     */
+  REG_CGDATA = 0x00; REG_CGDATA = 0x00;   /* colour 0 = black (transparent on BG)       */
+  REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;   /* colour 1 = white ink (BGR555 0x7FFF, animated) */
+  REG_CGDATA = 0x84; REG_CGDATA = 0x10;   /* colour 2 = dark grey (BGR555 0x1084) = drop-shadow */
 
   /* 8×8 glyphs: tiles 0–63 (1 K words at TITLE_CHR_WORD).
      2bpp font promoted to 4bpp: planes 2+3 = 0 → ink = colour 1. */
@@ -159,23 +152,16 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
     for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
   }
 
-  /* 16×16 expanded glyphs: tiles 64–319 (4 K words at TITLE_CHR_WORD + 0x0400).
-     Each glyph → 4 tiles: TL (4g+0), TR (4g+1), BL (4g+2), BR (4g+3).
-     Horizontal: each source bit → 2 adjacent bits. Vertical: each row emitted twice. */
+  /* 16×16 real Waldo glyphs: tiles 64–319 (4 K words at TITLE_CHR_WORD + 0x0400).
+     4 tiles/glyph in order TL,TR,BL,BR (tilemap uses 4g+0..3). FONT16 word = face | shadow<<8
+     (planes 0/1); planes 2/3 = 0 → face = colour 1 (animated ink), shadow = colour 2 (fixed dark). */
   snes_vram_addr((uint16_t)(TITLE_CHR_WORD + (uint16_t)(FONT8_N * 16u)));
-  for (uint16_t g = 0; g < FONT8_N; g++) {
-    for (uint8_t r = 0; r < 8u; r++)
-      REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u)]) >> 8);
-    for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)
-      REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u)]) & 0xFFu);
-    for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)
-      REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u) + 4u]) >> 8);
-    for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)
-      REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u) + 4u]) & 0xFFu);
-    for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
+  for (uint16_t g = 0; g < FONT16_N; g++) {
+    for (uint8_t tile = 0; tile < 4u; tile++) {
+      for (uint8_t r = 0; r < 8u; r++)
+        REG_VMDATA = FONT16[(uint16_t)(g * 32u) + (uint16_t)(tile * 8u) + r];
+      for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
+    }
   }
 
   /* Clear tilemap to transparent. */
