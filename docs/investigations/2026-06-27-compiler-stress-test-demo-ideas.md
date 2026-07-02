@@ -1318,11 +1318,11 @@ not a codegen patch) that unblocked idea #35.
     CRC over the decoded frames; default-8-bit + 5-way.~~ ✓ [/snes/uarteye/](https://biohack.net/snes/uarteye/) ([plan](../plans/2026-07-02-108-snes-uarteye.md)) — **clean positive:** frames a byte (start+8data+stop) and shifts it OUT of a carry-rotated TX register + INTO a carry-rotated RX register (two loop-carried shift registers). TX→RX round-trip is the identity (verified all 256 bytes) → gate folds `roundtrip(b)^b` self-check witness. DEFAULT-8bit compiles clean `asl/rol/lsr/ror=19`, `host==default==+mos-a16==+mos-xy16==0x3F09`, `-verify` clean ×3 (incl. default). Renders a clean oscilloscope eye. **Completes Cluster D** — 0010 guarded across 3 bit-serial CRCs (#105), dual LFSR (#106), serial bit-reversal (#107), UART framing (#108).
 ### Cluster E — a16/xy16 flag-liveness & register pressure (hardens `0011`/`0012`/`0015`/`0009`)
 
-109. **Pressure-Cooker Fixed-Point Evaluator (`pcooker`).** *Re-stresses:* `0011` scavenger-`$p` — one giant
+~~109. **Pressure-Cooker Fixed-Point Evaluator (`pcooker`).** *Re-stresses:* `0011` scavenger-`$p` — one giant
     Q16.16 straight-line expression (a dozen simultaneously-live 32-bit temps) with an embedded compare whose
     **N/Z is consumed AFTER several `__mulsi3`/`__divsi3` calls**, forcing the compare result live across the
     call-clobber under maximal pressure. *Shows:* a per-pixel evaluated implicit surface. *Differential:* CRC
-    over the field; a16 primary + 5-way.
+    over the field; a16 primary + 5-way.~~ ✓ [/snes/pcooker/](https://biohack.net/snes/pcooker/) ([plan](../plans/2026-07-02-109-snes-pcooker.md)) — **clean positive:** per-pixel straight-line int32 eval with a dozen live temps; the `cond=(r2-4000>0)` compare is consumed in the final select AFTER `__mulsi3=6`+`__divsi3=4` (its N/Z forced live across the call-clobber — the 0011 shape). `rep/sep=38`, `host==default==+mos-a16==+mos-xy16==0xEE6D`, `-verify` clean ×3. Renders a circular level-set implicit surface. Patch 0011 scavenger-`$p` holds. (Heavy per-pixel eval → both emulator legs read at frame 1500; corpus set at startup so the assert holds — preview timing only.)
 110. **Borrow-Ladder Odometer (`borrowlad`).** *Re-stresses:* `0012` `LDCImm`-set — a wide multi-precision
     subtractor built from chained 16-bit `SBC` whose carry-in arrives as a **set i1** (`LDCImm 1`, a 16-bit
     subtract borrow), in a visible descending odometer/countdown. *Shows:* a giant number ticking down through

@@ -681,6 +681,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: uarteye }
 
+  pcooker:
+    desc: "#109 (Round 6, harden-the-fixes, Cluster E): Pressure-Cooker Fixed-Point Evaluator — re-stresses patch 0011 (scavenger-$p): a giant straight-line 32-bit fixed-point expression per pixel whose compare's N/Z is consumed AFTER several __mulsi3/__divsi3 calls (compare forced live across the call-clobber) under a dozen live 32-bit temps. a16/xy16 legs load-bearing (0011 accum-gated). Assert corpus_result (pcooker_gate_crc 0xEE6D) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1, __divsi3>=1, rep/sep>=1). Leaves build/pcooker.sfc + build/pcooker-{mame,jg}.png."
+    cmds:
+      - dev/run.sh pcooker
+
+  pcooker-play:
+    desc: "PLAY the Pressure-Cooker Fixed-Point Evaluator demo in MAME (builds first if needed). A per-pixel evaluated implicit surface."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/pcooker.sfc ]; then
+          echo "==> build/pcooker.sfc missing -- building (dev/run.sh pcooker)..."
+          dev/run.sh pcooker
+        fi
+      - task: mandel-mame
+        vars: { ROM: pcooker }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:
