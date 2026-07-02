@@ -562,6 +562,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: ucmprank }
 
+  trimerge:
+    desc: "#99 (Round 6, harden-the-fixes, Cluster B): Three-Way Merge Diff — re-stresses patch 0016 (#46) with the three-way-compare result used AS CONTROL FLOW: a 2-input merge branches on the sign of (a>b)-(a<b) — advance-left / emit-both / advance-right — at s32 and s64, via noinline comparators that keep G_SCMP alive. Assert corpus_result (trimerge_gate_crc 0xCCCC) == host on MAME + bsnes-jg + IR probe (llvm.scmp incl. s64, drives control flow). Leaves build/trimerge.sfc + build/trimerge-{mame,jg}.png."
+    cmds:
+      - dev/run.sh trimerge
+
+  trimerge-play:
+    desc: "PLAY the Three-Way Merge Diff demo in MAME (builds first if needed). Each row is a merge round; the merged output braids as the offset animates."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/trimerge.sfc ]; then
+          echo "==> build/trimerge.sfc missing -- building (dev/run.sh trimerge)..."
+          dev/run.sh trimerge
+        fi
+      - task: mandel-mame
+        vars: { ROM: trimerge }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:
