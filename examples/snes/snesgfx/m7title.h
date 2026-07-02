@@ -1,4 +1,4 @@
-/* snesgfx/m7title.h — Mode 7 zoom-in (no spin) + full-360° spin-out title splash.
+/* snesgfx/m7title.h — Mode 7 zoom-in + zoom-out title splash (scale only, no rotation).
  *
  * Standalone: call BEFORE display_init(). Switches to Mode 7 for the animation, then
  * returns with force-blank active. A subsequent display_init() wipes all Mode 7 state and
@@ -17,7 +17,7 @@
  * Animation:
  *   Zoom-in  (~40 frames, exp decay): scale 0x010→0x100, no rotation, fade in.
  *   Hold     (caller-controlled):     shimmer on ink colour, static matrix.
- *   Spin-out (64 frames, linear):     full 360° spin + scale 0x100→0 + fade to black.
+ *   Zoom-out (64 frames, linear):     scale 0x100→0 + fade to black (no rotation → no aliasing).
  *
  * API:
  *   m7splash_begin(line0, line1)  — zoom-in; returns at rest with screen visible.
@@ -158,8 +158,10 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
         REG_CGDATA = 0x84u; REG_CGDATA = 0x10u;   /* 2 = dark shadow (0x1084) */
     }
 
-    /* VRAM/CGRAM are set up under force-blank; now enable NMI so snes_wait_vblank() works in the loops. */
-    REG_NMITIMEN = NMITIMEN_NMI;
+    /* NMI stays OFF for the whole splash. snes_wait_vblank() polls RDNMI directly (the v-blank flag is
+       set regardless of NMITIMEN), so we don't need NMI — and with it OFF the NMI handler can't fire at
+       v-blank start and eat the window before our m7_set_matrix write, which is what pushed the write
+       into active display and tore the frame. display_init() re-arms NMI for the demo afterwards. */
 
     /* Mode 7: BG1 only, centre=(128,112), scroll=(0,0). */
     m7_begin();
@@ -203,24 +205,17 @@ static inline void m7splash_end(uint16_t hold_frames) {
         REG_INIDISP = (uint8_t)INIDISP_ON;
     }
 
-    /* Spin-out + zoom-out + fade: 64 frames, full 360° spin, scale → 0, brightness → 0.
-       The 4 matrix terms are int32 multiplies (soft __mulsi3, slow); COMPUTE them BEFORE wait_vblank so
-       m7_set_matrix's writes land at the START of vblank, not mid-frame (which shifts the plane = bands). */
+    /* Zoom-OUT + fade: 64 frames, scale 0x100 → 0, brightness → 0. NO rotation — rotating pixel art
+       samples the map at a diagonal and aliases; a straight scale is clean. The only PPU write per frame
+       is m7_set_matrix (a pure scale) + INIDISP, done FIRST thing after wait_vblank so it lands in vblank. */
     int16_t scale = (int16_t)0x100;
-    uint8_t angle = 0u, bright = (uint8_t)INIDISP_ON;
+    uint8_t bright = (uint8_t)INIDISP_ON;
     for (uint8_t g = 0u; g < M7T_SPIN_FRAMES; g++) {
-        angle = (uint8_t)(angle + M7T_SPIN_STEP);   /* 4/frame × 64 = 256 = full turn */
         scale = (int16_t)(scale - M7T_SCALE_STEP);   /* 4/frame × 64 = 256 → reaches 0 */
         if (scale < 0) scale = 0;
         if ((g & 3u) == 0u && bright > 0u) bright--;/* fade every 4 frames; 15 steps → 0 */
-        int16_t cs = SINCOS[(uint8_t)(angle + 64u)];
-        int16_t sn = SINCOS[angle];
-        int16_t ma = (int16_t)(((int32_t)cs * scale) >> 8);
-        int16_t mb = (int16_t)(-((int32_t)sn * scale) >> 8);
-        int16_t mc = (int16_t)(((int32_t)sn * scale) >> 8);
-        int16_t md = (int16_t)(((int32_t)cs * scale) >> 8);
         snes_wait_vblank();
-        m7_set_matrix(ma, mb, mc, md);
+        m7_set_matrix(scale, 0, 0, scale);
         REG_INIDISP = bright;
     }
     REG_INIDISP = 0x80u;  /* force-blank — caller can now call display_init(). No VRAM wipe here: the
