@@ -664,6 +664,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: bitweave }
 
+  uarteye:
+    desc: "#108 (Round 6, harden-the-fixes, Cluster D final): Bit-Banged UART Eye — re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit register-coalescer miscompile) via a software-UART framing loop: a byte shifted out of a carry-rotated TX register and into a carry-rotated RX register (two loop-carried shift registers). A correct TX->RX round-trip recovers the byte (self-check). DEFAULT-8-bit leg load-bearing. Assert corpus_result (uarteye_gate_crc 0x3F09) == host on MAME + bsnes-jg + disasm gate (default-8bit OK, asl/rol/lsr/ror>=3). Leaves build/uarteye.sfc + build/uarteye-{mame,jg}.png."
+    cmds:
+      - dev/run.sh uarteye
+
+  uarteye-play:
+    desc: "PLAY the Bit-Banged UART Eye demo in MAME (builds first if needed). An oscilloscope eye diagram built from overlaid serial bit-transition traces."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/uarteye.sfc ]; then
+          echo "==> build/uarteye.sfc missing -- building (dev/run.sh uarteye)..."
+          dev/run.sh uarteye
+        fi
+      - task: mandel-mame
+        vars: { ROM: uarteye }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:

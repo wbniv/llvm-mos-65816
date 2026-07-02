@@ -97,6 +97,134 @@
 > a deep backtracking-`longjmp` unwind, an all-CSRs-live jump, and a re-entrant retry loop escalate past the
 > one-frame `corpus/setjmp_sim.c` guard. See the `# Round 6` section below.
 
+## Published-location audit — every demo lives under `/snes/`
+
+**Convention (enforced 2026-07-02):** every published demo page is at
+`src/pages/snes/<slug>.astro` on biohack.net → route **`/snes/<slug>/`** (Base import
+`../../layouts/Base.astro`). The gallery (`src/pages/snes/index.astro`) links every card to
+`/snes/${slug}/`, so a top-level `src/pages/<slug>.astro` **404s from the gallery**. The
+`snes-rom-page` skill was fixed to place pages under `snes/` (see its SKILL.md step 3).
+
+**Location sweep (2026-07-02):** 14 recent demos had been published to top-level `/<slug>/`
+(broken gallery links) — `cpu6502 crcwall keycmp64 lfsr2 modexp256 mulov64 oddmask ovmove
+permscat ropeedit rotslab spaceship trimerge ucmprank` — all moved under `/snes/`. Audit below
+is the full published set (regenerate: for each `public/play/roms/*.sfc`, check
+`src/pages/snes/<slug>.astro` exists).
+
+<details><summary><b>Location column — all 107 published ROMs (all ✅ under /snes/)</b></summary>
+
+| Slug | Location | OK |
+|---|---|---|
+| `1d-ca` | `/snes/1d-ca/` | ✅ |
+| `3d-wireframe` | `/snes/3d-wireframe/` | ✅ |
+| `adpcm` | `/snes/adpcm/` | ✅ |
+| `avalanche` | `/snes/avalanche/` | ✅ |
+| `bf-vm` | `/snes/bf-vm/` | ✅ |
+| `bhut` | `/snes/bhut/` | ✅ |
+| `bitcensus` | `/snes/bitcensus/` | ✅ |
+| `bitshuffle` | `/snes/bitshuffle/` | ✅ |
+| `blossom` | `/snes/blossom/` | ✅ |
+| `boids` | `/snes/boids/` | ✅ |
+| `buddhabrot` | `/snes/buddhabrot/` | ✅ |
+| `burning-ship` | `/snes/burning-ship/` | ✅ |
+| `cardioid` | `/snes/cardioid/` | ✅ |
+| `cgrade` | `/snes/cgrade/` | ✅ |
+| `compass` | `/snes/compass/` | ✅ |
+| `cordic` | `/snes/cordic/` | ✅ |
+| `cosmzoom` | `/snes/cosmzoom/` | ✅ |
+| `cpu6502` | `/snes/cpu6502/` | ✅ |
+| `crctex` | `/snes/crctex/` | ✅ |
+| `crcwall` | `/snes/crcwall/` | ✅ |
+| `critters` | `/snes/critters/` | ✅ |
+| `dctbloom` | `/snes/dctbloom/` | ✅ |
+| `dhmix` | `/snes/dhmix/` | ✅ |
+| `disbits` | `/snes/disbits/` | ✅ |
+| `dither` | `/snes/dither/` | ✅ |
+| `divclock` | `/snes/divclock/` | ✅ |
+| `domcol` | `/snes/domcol/` | ✅ |
+| `doom-fire` | `/snes/doom-fire/` | ✅ |
+| `double-pendulum` | `/snes/double-pendulum/` | ✅ |
+| `duff` | `/snes/duff/` | ✅ |
+| `editdist` | `/snes/editdist/` | ✅ |
+| `epicycles` | `/snes/epicycles/` | ✅ |
+| `fabsridge` | `/snes/fabsridge/` | ✅ |
+| `factorial` | `/snes/factorial/` | ✅ |
+| `fenwick` | `/snes/fenwick/` | ✅ |
+| `fft` | `/snes/fft/` | ✅ |
+| `fn-plot` | `/snes/fn-plot/` | ✅ |
+| `funnelkal` | `/snes/funnelkal/` | ✅ |
+| `gf256` | `/snes/gf256/` | ✅ |
+| `gouraud` | `/snes/gouraud/` | ✅ |
+| `grid3d` | `/snes/grid3d/` | ✅ |
+| `harmonograph` | `/snes/harmonograph/` | ✅ |
+| `hdr-bloom` | `/snes/hdr-bloom/` | ✅ |
+| `hilbert` | `/snes/hilbert/` | ✅ |
+| `huffman` | `/snes/huffman/` | ✅ |
+| `hull` | `/snes/hull/` | ✅ |
+| `iir-scope` | `/snes/iir-scope/` | ✅ |
+| `julia` | `/snes/julia/` | ✅ |
+| `keycmp64` | `/snes/keycmp64/` | ✅ |
+| `lfsr2` | `/snes/lfsr2/` | ✅ |
+| `life` | `/snes/life/` | ✅ |
+| `lsystem` | `/snes/lsystem/` | ✅ |
+| `lzdec` | `/snes/lzdec/` | ✅ |
+| `mandel-double` | `/snes/mandel-double/` | ✅ |
+| `mandel-float` | `/snes/mandel-float/` | ✅ |
+| `matcascade` | `/snes/matcascade/` | ✅ |
+| `maze` | `/snes/maze/` | ✅ |
+| `medfilt` | `/snes/medfilt/` | ✅ |
+| `metaball` | `/snes/metaball/` | ✅ |
+| `modexp256` | `/snes/modexp256/` | ✅ |
+| `montorbit` | `/snes/montorbit/` | ✅ |
+| `msquares` | `/snes/msquares/` | ✅ |
+| `mulov64` | `/snes/mulov64/` | ✅ |
+| `multibase` | `/snes/multibase/` | ✅ |
+| `mvscrl` | `/snes/mvscrl/` | ✅ |
+| `n-body` | `/snes/n-body/` | ✅ |
+| `newton` | `/snes/newton/` | ✅ |
+| `nrecip` | `/snes/nrecip/` | ✅ |
+| `oddmask` | `/snes/oddmask/` | ✅ |
+| `ovmove` | `/snes/ovmove/` | ✅ |
+| `percol` | `/snes/percol/` | ✅ |
+| `perlin` | `/snes/perlin/` | ✅ |
+| `permscat` | `/snes/permscat/` | ✅ |
+| `plyoracle` | `/snes/plyoracle/` | ✅ |
+| `polyfill` | `/snes/polyfill/` | ✅ |
+| `poolfx` | `/snes/poolfx/` | ✅ |
+| `qsortviz` | `/snes/qsortviz/` | ✅ |
+| `radix` | `/snes/radix/` | ✅ |
+| `rangecode` | `/snes/rangecode/` | ✅ |
+| `raycaster` | `/snes/raycaster/` | ✅ |
+| `rdiff` | `/snes/rdiff/` | ✅ |
+| `ropeedit` | `/snes/ropeedit/` | ✅ |
+| `rotkal` | `/snes/rotkal/` | ✅ |
+| `rotozoom` | `/snes/rotozoom/` | ✅ |
+| `rotslab` | `/snes/rotslab/` | ✅ |
+| `satcast` | `/snes/satcast/` | ✅ |
+| `satcomet` | `/snes/satcomet/` | ✅ |
+| `sbitfld` | `/snes/sbitfld/` | ✅ |
+| `scopeguard` | `/snes/scopeguard/` | ✅ |
+| `seqvm` | `/snes/seqvm/` | ✅ |
+| `smulorbit` | `/snes/smulorbit/` | ✅ |
+| `sobel` | `/snes/sobel/` | ✅ |
+| `sodo` | `/snes/sodo/` | ✅ |
+| `sort-race` | `/snes/sort-race/` | ✅ |
+| `space-invaders` | `/snes/space-invaders/` | ✅ |
+| `spaceship` | `/snes/spaceship/` | ✅ |
+| `speedcap` | `/snes/speedcap/` | ✅ |
+| `spigot` | `/snes/spigot/` | ✅ |
+| `spirograph` | `/snes/spirograph/` | ✅ |
+| `tea` | `/snes/tea/` | ✅ |
+| `trimerge` | `/snes/trimerge/` | ✅ |
+| `truchet` | `/snes/truchet/` | ✅ |
+| `truncstair` | `/snes/truncstair/` | ✅ |
+| `turtle-vm` | `/snes/turtle-vm/` | ✅ |
+| `ucmprank` | `/snes/ucmprank/` | ✅ |
+| `ulam` | `/snes/ulam/` | ✅ |
+| `vaprintf` | `/snes/vaprintf/` | ✅ |
+
+</details>
+
 ## Compiler/toolchain bugs surfaced by the battery
 
 The whole point of these demos is to catch backend defects. Across **#1–#92**, **four** demos surfaced a
@@ -1184,10 +1312,10 @@ not a codegen patch) that unblocked idea #35.
     bit-reversal (contrast to #54 bitshuffle's `__builtin_bitreverse`), loop-carried through the back-edge.
     *Shows:* an image reweaving through its bit-reversed order. *Differential:* CRC over the reversed words;
     default-8-bit + 5-way.~~ ✓ [/snes/bitweave/](https://biohack.net/snes/bitweave/) ([plan](../plans/2026-07-02-107-snes-bitweave.md)) — **clean positive:** serial `rev=(rev<<1)|(v&1); v>>=1` carry loop (an 8-bit + a 16-bit reversal interleaved, two loop-carried `rev` regs live), NO `__builtin_bitreverse` (the #54 contrast). Bit-reversal is an INVOLUTION — the gate folds `rev(rev(v))^v` as a self-check witness (0 when correct); `rev8(0x01)=0x80`/`rev8(0xB8)=0x1D` verified. DEFAULT-8bit compiles clean `asl/rol/lsr/ror=20`, `host==default==+mos-a16==+mos-xy16==0x0E03`, `-verify` clean ×3 (incl. default). Patch 0010 holds under a serial rotate-carry bit-reversal.
-108. **Bit-Banged UART Eye (`uarteye`).** *Re-stresses:* `0010` in a framing loop — a software-UART
+~~108. **Bit-Banged UART Eye (`uarteye`).** *Re-stresses:* `0010` in a framing loop — a software-UART
     (start/data/stop bits shifted through a carry-rotated register) drawing an oscilloscope eye-diagram; the
     loop-carried bit register + rotate under pressure. *Shows:* a serial eye pattern building up. *Differential:*
-    CRC over the decoded frames; default-8-bit + 5-way.
+    CRC over the decoded frames; default-8-bit + 5-way.~~ ✓ [/snes/uarteye/](https://biohack.net/snes/uarteye/) ([plan](../plans/2026-07-02-108-snes-uarteye.md)) — **clean positive:** frames a byte (start+8data+stop) and shifts it OUT of a carry-rotated TX register + INTO a carry-rotated RX register (two loop-carried shift registers). TX→RX round-trip is the identity (verified all 256 bytes) → gate folds `roundtrip(b)^b` self-check witness. DEFAULT-8bit compiles clean `asl/rol/lsr/ror=19`, `host==default==+mos-a16==+mos-xy16==0x3F09`, `-verify` clean ×3 (incl. default). Renders a clean oscilloscope eye. **Completes Cluster D** — 0010 guarded across 3 bit-serial CRCs (#105), dual LFSR (#106), serial bit-reversal (#107), UART framing (#108).
 ### Cluster E — a16/xy16 flag-liveness & register pressure (hardens `0011`/`0012`/`0015`/`0009`)
 
 109. **Pressure-Cooker Fixed-Point Evaluator (`pcooker`).** *Re-stresses:* `0011` scavenger-`$p` — one giant
