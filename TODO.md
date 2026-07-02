@@ -1440,6 +1440,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      immutable`), PASS pasted into the plan's "Verified 2026-06-29" section; fresh-ROM pickup proven by
      the real v1.0.121 republish. Already covered by the curated [x] "biohack.net cache headers" above.
      fp:040872b597cf6793 -->
-- [verify] **2026-06-30-title-screen-counter-slide** — Verification section present but no PASS recorded — run + record the steps. _from [2026-06-30-title-screen-counter-slide.md](docs/plans/2026-06-30-title-screen-counter-slide.md)_  <!-- fp:b133881a09190800 -->
+<!-- triaged 2026-07-01: title-screen-counter-slide verified — hilbert/rdiff/avalanche/sort-race/fft gates all PASS, -verify clean; visual animation behavior gate-neutral. fp:b133881a09190800 -->
 <!-- triaged 2026-07-01: gallery categories plan — verified in-session: task build clean (79 pages), 10 cat-shelf sections confirmed in HTML, 74 cards confirmed, hilbert chip confirmed with href /snes/#cat-motion. fp:933d48bc3dd6368a -->
 <!-- END auto-captured-deferrals -->
