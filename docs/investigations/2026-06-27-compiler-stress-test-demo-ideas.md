@@ -91,8 +91,11 @@
 > *incomplete* fix — handles s64 but not s128, ascending overlap but not descending, one odd anyext width but
 > not others — surfaces under escalation; and every demo doubles as a **permanent regression guard** for when
 > these fork patches are refactored or upstreamed. An optional 3-way far-pointer cluster (#113–#115) hardens
-> the silent-wrong-bank fixes (`0001` far-subscript, `0013` far-`memmove`, `0014` far-ptr-`G_PHI`). See the
-> `# Round 6` section below.
+> the silent-wrong-bank fixes (`0001` far-subscript, `0013` far-`memmove`, `0014` far-ptr-`G_PHI`). **Cluster
+> G (#116–118, added 2026-07-02)** hardens the newest fix — the 65816-native `platforms/snes/setjmp.S` that
+> unblocked idea #35 (`longjmp` was broken in native mode; a **runtime/library** fix, not a codegen patch):
+> a deep backtracking-`longjmp` unwind, an all-CSRs-live jump, and a re-entrant retry loop escalate past the
+> one-frame `corpus/setjmp_sim.c` guard. See the `# Round 6` section below.
 
 ## Compiler/toolchain bugs surfaced by the battery
 
@@ -1045,7 +1048,7 @@ Sharpest at opening a code path the first 72 never run:
 
 ---
 
-# Round 6 (#93–#112) — hardening the fixes: re-stress every bug we found and fixed
+# Round 6 (#93–#118) — hardening the fixes: re-stress every bug we found and fixed
 
 Rounds 1–5 (92 demos) hunted **new** codegen corners; Round 5's twenty found **zero** new bugs — the obvious
 lowering surface is covered. So Round 6 changes tactics: **stop widening, start deepening.** Instead of a
@@ -1061,7 +1064,9 @@ header, `host == default == +mos-a16 == +mos-xy16` differential CRC on MAME + bs
 construction.
 
 The five clusters below are **one per already-fixed bug family**; the sixth (far-pointer, 3-way bar) is an
-optional stretch. Each cites the patch it hardens and the exact code path.
+optional stretch. Each cites the patch it hardens and the exact code path. **Cluster G (#116–118, added
+2026-07-02)** hardens the newest fix — the 65816-native `platforms/snes/setjmp.S` (a runtime/library fix,
+not a codegen patch) that unblocked idea #35.
 
 ## Fix-regression coverage map (the point of Round 6)
 
@@ -1072,6 +1077,7 @@ optional stretch. Each cites the patch it hardens and the exact code path.
 | **#61 `dhmix` — a16/xy16 `s64` `G_UNMERGE_VALUES` + odd-width `G_ANYEXT` crash** (`0017`) | `legalizeMergeS64FromWords`/`legalizeUnmergeS64ToWords` (2-level `s64↔2×s32↔4×s16`) + route odd-width `G_ANYEXT` through `G_ZEXT`; all `hasAccum16()`-gated | **Coverage-checked (see Cluster C note):** the glue + anyext routing are already broadly green across 5 shipped s64 demos, so widening (128/256-bit) is a *volume guard*. The real untested s64 path is **`G_UMULH`/`G_SMULH` + `G_UMULO`/`G_SMULO` `.lower()`** (threading the S32-mul-clamp), plus minor gaps: variable-count s64 *right* shift and signed/double int64 conversions. | 101–104 |
 | **`0010` coalesce-rotate-`Ac` — DEFAULT-8-BIT silent rotate miscompile** | `MOSRegisterInfo::shouldCoalesce` refuses joining a rotate/shift-referenced loop-carried value into the A-only `Ac` class (back-edge `ROL` would read a stale `A`) | Found by ONE inlined CRC16 bit loop. Escalate to a family of **inlined bit-serial rotate-through-carry** loops (CRC8/16/32, dual LFSRs, bit-reversal, bit-banged UART) under heavy pressure. This bug is **8-bit-only** — invisible to every a16/xy16 gate; the *only* cluster whose primary bar is the default build. | 105–108 |
 | **a16/xy16 flag-liveness & register-pressure** (`0011` scavenger-`$p`, `0012` `LDCImm`-set, `0015` rc-undef, `0009` inc/dec) | `0011` routes a live `$p` through a dead index reg into `RC17`; `0012` lowers a set i1 carry as `SEC`; `0015` `shouldCoalesce` refuses folding a call-clobbered `$rcN` value into an outliving `Imag16` pair; `0009` lowers small-const add/sub to `G_INC`/`G_DEC` chains | These share a root: **N/Z/carry flags or `$rc`-resident values kept live across a spill/call under maximal 16-bit-accum pressure.** Escalate with deep straight-line Q16.16 trees whose compare survives several libcalls, 16-bit borrow-chain subtracts (`LDCImm 1`), Horner chains reading operands straight out of `__mulsi3` returns, and inc/dec-dominated counter sweeps — all at once. | 109–112 |
+| **#35 `longjmp` broken on the 65816 — 6502-only common `setjmp.S`** (a **runtime/library** fix: `platforms/snes/setjmp.S`, *not* a codegen patch) | The common `setjmp.S`'s `tax; txs` dropped the 16-bit native S into page 0; the SNES override reconstructs the page-1 S (`ora #$0100; tcs`), reads/writes the return address stack-relative (`1,s`/`2,s`), and restores the soft-SP + the 14-byte `__rc18..31` CSR block | The `corpus/setjmp_sim.c` guard is **one** frame, **one** jump, **zero** live CSRs — the minimum. Escalate to a **deep multi-frame unwind** (recursive backtracking `longjmp` past many `jsr` frames at once, page-1 S reconstruct per jump), **all 14 callee-saved `__rc18..31` live** across the jump (an off-by-one in the renumbered restore offsets corrupts exactly one), and **repeated re-entry** of one `setjmp` site from varying call depths with a **deep soft stack** (soft-SP `__rc0/__rc1` × hard-SP reconstruct × return-addr rewrite interacting). | 116–118 |
 
 ## The twenty (grouped by the fix each cluster hardens)
 
@@ -1224,6 +1230,43 @@ optional stretch. Each cites the patch it hardens and the exact code path.
     induction variable** (`for(;n;p++) *p=…`), forming the `G_PHI (p2)` the fix legalizes. *Shows:* a far
     region filled/scanned by a walking pointer. *Differential:* CRC over the written far region; 3-way.
 
+### Cluster G — non-local jump / `setjmp.S` (hardens the 65816-native `platforms/snes/setjmp.S` fix, **added 2026-07-02**)
+
+> **This cluster hardens a RUNTIME/library fix, not a codegen patch.** The bug (#35): the SDK's common
+> `mos-platform/common/c/setjmp.S` is 6502-only — `longjmp`'s `tax; txs` restore drops the 16-bit native S
+> into page 0, so `longjmp` `rts`-es to garbage and never returns (failed in default-8-bit AND `+mos-a16`).
+> Fixed 2026-07-02 by a shadowing `platforms/snes/setjmp.S` that reconstructs the page-1 16-bit S
+> (`ora #$0100; tcs`) + stack-relative return address, keeping the common `jmp_buf` ABI. It has a permanent
+> regression guard already — `corpus/setjmp_sim.c` (5-way `= 0x2007`) — but that is the *minimum* exercise:
+> one frame, one jump, no live callee-saved registers. This cluster escalates past it to the three corners
+> where a page-1-reconstruct / CSR-restore-offset / re-entry bug would hide. 5-way bar (`setjmp`/`longjmp`
+> must be correct in default **and** `+mos-a16` **and** `+mos-xy16`). Full record:
+> [investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md),
+> [fix plan](../plans/2026-07-02-35-setjmp-longjmp-65816-fix.md).
+
+116. **Backtracking Solver (`backtrack`).** *Re-stresses:* the whole `setjmp.S` restore path — idea **#35**
+    itself, now unblocked. An N-Queens / maze / Sudoku solver that places pieces recursively and **`longjmp`s
+    straight back to the last choice point** on a dead end, unwinding **several `jsr` frames at once**. Each
+    backtrack reconstructs the page-1 S, restores the soft-SP + CSRs, and `rts`-es to the choice-point
+    `setjmp` — from a *different* depth every time, so the multi-frame unwind (which the corpus guard's
+    single frame never touches) runs continuously. *Shows:* the board filling, then **snapping back** as it
+    backtracks, live. *Differential:* CRC over the solution grid + the backtrack/visit counters (a botched
+    unwind corrupts the count *and* the board); 5-way. **← the flagship Cluster-G guard.**
+117. **Register-Save longjmp (`csrjmp`).** *Re-stresses:* the 14-byte `__rc18..__rc31` CSR block + soft-SP
+    (`__rc0/__rc1`) save/restore — the offsets this fix renumbered. A `setjmp` brackets a computation with
+    **many simultaneously-live callee-saved values** (a deep Q16.16 / parametric-curve expression whose ~14
+    coefficients must survive across the `setjmp`→`longjmp` round-trip), so every CSR slot is live at the
+    jump. An off-by-one in the restore offsets corrupts exactly one coefficient. *Shows:* a parametric curve
+    (Lissajous / harmonograph) whose coefficients are the carried values — one wrong CSR warps one axis
+    visibly. *Differential:* CRC over the post-`longjmp` coefficient vector + the rendered curve; 5-way.
+118. **Retry / Exception Loop (`retryjmp`).** *Re-stresses:* **re-entering** one `setjmp` site under repetition
+    × the hard-SP reconstruct. An error-handling pattern where a worker `longjmp`s back to a single `setjmp`
+    on each simulated fault, invoked many times from **varying call depths** and with a **deep soft stack**
+    (many locals pushed) at the jump — so the soft-SP restore × page-1 S reconstruct × return-address rewrite
+    interact, and the `setjmp` site must stay re-enterable. (This is the `setjmp`-as-exceptions idiom, the
+    other half of #35.) *Shows:* a task that fails and retries, a progress bar advancing per successful
+    attempt, the depth gauge bouncing. *Differential:* CRC over the retry-outcome sequence; 5-way.
+
 ## Round 6 first picks
 
 Sharpest at re-breaking an incompletely-generalized fix (highest bug-yield), or guarding the highest-risk fix:
@@ -1241,3 +1284,7 @@ Sharpest at re-breaking an incompletely-generalized fix (highest bug-yield), or 
 - **#111 `cfcascade`** — the truest latent-bug shape in cluster E: reads an operand straight out of a
   `__mulsi3`/`__divsi3` return (`$rc`-resident) and keeps it live across the next call — the exact
   coalesce-into-`Imag16`-across-clobber pattern `0015` (rc-undef) guards, chained deep under a16/xy16.
+- **#116 `backtrack`** — the flagship guard for the *newest* fix (`platforms/snes/setjmp.S`, 2026-07-02) and
+  the realization of the long-blocked idea #35: a recursive backtracking `longjmp` unwinds many frames per
+  jump, exercising the page-1 S reconstruct + CSR/soft-SP restore that the one-frame `corpus/setjmp_sim.c`
+  guard never stresses. Highest-value because the fix is days old and a runtime/library defect is silent.

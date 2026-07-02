@@ -386,7 +386,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. Each hits a
   distinct codegen corner.
-  **Status (2026-07-02): Rounds 1–5 (#1–#92) all shipped + live; Round 6 (harden-the-fixes, #93–#115) DRAFTED, in progress.**
+  **Status (2026-07-02): Rounds 1–5 (#1–#92) all shipped + live; Round 6 (harden-the-fixes, #93–#118) DRAFTED, in progress.**
+  Round 6 **Cluster G (#116–118)** added 2026-07-02 to harden the new `platforms/snes/setjmp.S` fix (#35 longjmp,
+  runtime/library — not a codegen patch): #116 `backtrack` (deep multi-frame longjmp unwind, the unblocked #35
+  backtracking solver — the flagship), #117 `csrjmp` (all 14 `__rc18..31` CSRs live across the jump), #118
+  `retryjmp` (re-entrant setjmp site, varying depth + deep soft stack). Beyond the `corpus/setjmp_sim.c` guard.
   - [x] ~~**#101 mulov64** (Round 6, Cluster C, first pick) — 64-bit Multiply-Overflow / Multiply-High: the one untested s64 legalizer path (`G_UMULO`/`G_SMULO` → `G_UMULH`/`G_SMULH` `.lower()`, found by the 2026-07-02 coverage check). **Clean positive, no compiler bug:** disasm confirms the s64 mulh composed from s32 `__mulsi3` pieces + `__muldi3` glue (threads the S32-mul-clamp, no s128 widening); `host==default==+mos-a16==+mos-xy16==0x3A69` on MAME+bsnes-jg, `-verify` clean.~~ ✓ [/snes/mulov64/](https://biohack.net/snes/mulov64/) ([plan](docs/plans/2026-07-02-101-snes-mulov64.md))
   **Bug scorecard — Round 5 (#73–#92) surfaced ZERO new compiler bugs**: every targeted corner (funnel/rotate
   shifts, all four saturating ops, G_SMULO, fptosi_sat, signed-bitfield sext, descending memmove, float
