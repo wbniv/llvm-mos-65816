@@ -384,8 +384,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [ ] **Compiler stress-test demo battery — algorithm+visual SNES demos**
   ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
-  bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. The selected 9 each hit a
-  distinct codegen corner:
+  bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. Each hits a
+  distinct codegen corner.
+  **Status (2026-07-01): Rounds 1–5 (#1–#92) all shipped + live on biohack.net; 0 open demo items.**
+  **Bug scorecard — Round 5 (#73–#92) surfaced ZERO new compiler bugs**: every targeted corner (funnel/rotate
+  shifts, all four saturating ops, G_SMULO, fptosi_sat, signed-bitfield sext, descending memmove, float
+  sign-bit ops, fminf/fmaxf, fptosi/sitofp, Montgomery modmul, variable-count shifts, range coder, signed MAC
+  Sobel/DCT/ADPCM, `__attribute__((cleanup))`, sret struct-return, negamax) lowers correctly, bit-exact across
+  all modes. The only Round-5 scare (**#83 truncstair**) was a **demo-side OOB write** — first misdiagnosed as
+  a `MOSZeroPageAlloc` miscompile, then refuted+fixed; the compiler was correct. (Earlier rounds *did* find real
+  backend bugs — all fixed: the #23 `+mos-xy16` in-place-memmove miscompile, a Round-3 legalizer bug, a Round-4
+  `G_UNMERGE_VALUES` bug, and the scoped setjmp/longjmp break — see the per-round summaries in the ideas doc.)
   - [x] ~~**#1 Julia set explorer** — `z²+c` Q5.10 **complex multiply** (3 `__mulsi3`/iter) far-stored into high WRAM `$7E2000`, drawn through Mode 7 as `c` orbits `0.7885·e^iθ` (morphs + spins; the grind is the morph, the affine matrix the motion). Gate `julia_gate_crc` `0x3490`; bsnes-jg host==`+mos-a16` + disasm gate (`__mulsi3=3`, `rep/sep=46`). MAME leg SKIP (no SPC700 IPL here; demos-only non-blocker).~~ ✓ [/snes/julia/](https://biohack.net/snes/julia/) ([plan](docs/plans/2026-06-28-1-snes-julia.md))
   - [x] ~~**#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.~~ ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
   - [x] ~~**#3 Burning Ship fractal** — `z=(|Re z|+i|Im z|)²+c`; the abs-fold + 3 `__mulsi3`/iter (Q12), escape-time bands, black ship silhouette, palette-cycled; multiply-only. Gate `bs_gate_crc` `0x6F2D`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/burning-ship/](https://biohack.net/snes/burning-ship/) ([plan](docs/plans/2026-06-28-3-snes-burning-ship.md))
