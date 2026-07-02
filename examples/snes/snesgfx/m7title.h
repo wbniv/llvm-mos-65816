@@ -127,6 +127,25 @@ static void _m7t_shimmer(void) {
     REG_CGADD = 1u; REG_CGDATA = (uint8_t)ink; REG_CGDATA = (uint8_t)(ink >> 8u);
 }
 
+/* Wipe the Mode-7 VRAM region (tilemap LOW bytes + char-data HIGH bytes, words 0..M7_TILEMAP_WORDS)
+ * back to 0. Mode 7 packs the tilemap and the 256 8bpp glyph tiles into the SAME 16 K words, so if
+ * this is left populated the demo's own display (BGMODE_1 reinterprets that VRAM) shows the leftover
+ * glyph pixels as vertical bands / see-through garbage. Call under force-blank at title teardown so the
+ * demo's display_init() starts from clean VRAM. Two DMAs: LOW bytes ($2118) then HIGH bytes ($2119). */
+static void _m7t_wipe_vram(void) {
+    uint16_t src = (uint16_t)(uintptr_t)&_m7t_zero;
+    REG_VMAIN = VMAIN_INC_LOW_1;  REG_VMADD = 0u;
+    REG_DMAP0 = 0x08u; REG_BBAD0 = 0x18u;   /* A->B, FIXED src, dest $2118 (VMDATAL) */
+    REG_A1T0L = (uint8_t)src; REG_A1T0H = (uint8_t)(src >> 8u); REG_A1B0 = 0u;
+    REG_DAS0L = (uint8_t)M7_TILEMAP_WORDS; REG_DAS0H = (uint8_t)(M7_TILEMAP_WORDS >> 8u);
+    REG_MDMAEN = 0x01u;
+    REG_VMAIN = VMAIN_INC_HIGH_1; REG_VMADD = 0u;
+    REG_DMAP0 = 0x08u; REG_BBAD0 = 0x19u;   /* dest $2119 (VMDATAH) — the char-data plane */
+    REG_A1T0L = (uint8_t)src; REG_A1T0H = (uint8_t)(src >> 8u); REG_A1B0 = 0u;
+    REG_DAS0L = (uint8_t)M7_TILEMAP_WORDS; REG_DAS0H = (uint8_t)(M7_TILEMAP_WORDS >> 8u);
+    REG_MDMAEN = 0x01u;
+}
+
 /* ── public API ───────────────────────────────────────────────────────────────────────────────── */
 
 /* Zoom-in (no rotation). Returns when text is at rest and screen is fully bright. */
@@ -205,6 +224,7 @@ static inline void m7splash_end(uint16_t hold_frames) {
         REG_INIDISP = bright;
     }
     REG_INIDISP = 0x80u;  /* force-blank — caller can now call display_init() */
+    _m7t_wipe_vram();     /* clear Mode-7 tilemap + char data so it doesn't bleed into the demo */
 }
 
 /* Convenience wrapper for demos with no compute between begin and end. */

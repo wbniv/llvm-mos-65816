@@ -95,11 +95,19 @@ The one demo on the separate Mode-7 zoom/spin title system (`hilbert`, via `snes
 converted to the Waldo font. Mode 7's 256-tile budget equals `FONT16_N`(64) × 4 tiles exactly, so all 64
 glyphs upload as 256 8bpp Mode-7 tiles (face → CGRAM 1, shadow → CGRAM 2); each glyph is placed as 2×2
 tile-cells (2 tilemap rows). Zoom-in / shimmer / spin-out unchanged. **Gate-neutral: `dev/run.sh hilbert`
-PASS `0x5999` host == +mos-a16 on MAME + bsnes-jg.** (commit `cc7b3cc`)
+PASS `0x5999` host == +mos-a16 on MAME + bsnes-jg.** (commits `cc7b3cc`, `<wipe-fix>`)
+
+**Long-standing "vertical bands / see-through" fixed.** Mode 7 packs the tilemap (LOW bytes) and the 256
+8bpp glyph tiles (HIGH bytes) into the same 16 K words. The title never wiped that region, so when the
+demo took over (BGMODE_1 reinterpreting the same VRAM) the leftover glyph pixels showed as vertical
+bands. `m7splash_end` now calls `_m7t_wipe_vram()` (two DMAs zeroing the LOW+HIGH planes) under
+force-blank at teardown → the demo's `display_init` starts from clean VRAM. Verified: steady demo has
+**zero** per-column luma variance (no banding); gate still `0x5999`.
 
 <img src="screenshots/m7title-waldo-hilbert.png" width="420">
 
-hilbert's "SPACE-FILLING" / "HILBERT CURVE" on the Mode-7 plane, in the shadowed Waldo font.
+hilbert's "SPACE-FILLING" / "HILBERT CURVE" on the Mode-7 plane, in the shadowed Waldo font
+(reconstructed from the VRAM char data — white face + SE shadow, index 1/2).
 
 ## Files
 
