@@ -161,8 +161,12 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
     /* VRAM/CGRAM are set up under force-blank; now enable NMI so snes_wait_vblank() works in the loops. */
     REG_NMITIMEN = NMITIMEN_NMI;
 
-    /* Mode 7: BG1 only, no wrap, centre=(128,112), scroll=(0,0). */
+    /* Mode 7: BG1 only, centre=(128,112), scroll=(0,0). */
     m7_begin();
+    /* m7_begin() leaves M7SEL=0 (WRAP): when the plane scales below 1:1 (zoom-in/out) the 128×128 map
+       repeats and tiles the title across the whole screen → bands. Force no-wrap: outside the map =
+       character 0 (our blank/black tile), so a shrunk plane sits on a clean black field. */
+    REG_M7SEL = 0x80u;
     m7_set_center(128u, 112u);
     m7_set_scroll(0u, 0u);
 
