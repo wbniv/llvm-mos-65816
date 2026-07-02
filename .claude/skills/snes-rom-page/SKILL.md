@@ -49,7 +49,14 @@ safe to distribute.
    copying the engine from the skill's bundled **`engine/`** (self-contained — no external paths).
    Pass `--player-src DIR` only to re-sync the engine from a newer `bsnes-jg-wasm` build.
 
-3. **Write the page** `src/pages/<slug>.astro` from `page-template.astro`:
+3. **Write the page** from `page-template.astro`. **The path is site-specific — get it right or the
+   gallery card 404s:**
+   - **biohack.net** → `src/pages/snes/<slug>.astro` (demo pages live UNDER `/snes/`, because the
+     gallery links every card to `/snes/${slug}/`). The page is one level deeper than the template
+     assumes, so **change the Base import to `../../layouts/Base.astro`** (the template ships
+     `../layouts/…`). A page written to top-level `src/pages/<slug>.astro` here serves at `/<slug>/`
+     but its gallery card points at `/snes/<slug>/` → **live 404**.
+   - **indri.studio** → `src/pages/<slug>.astro` (top-level; keep the template's `../layouts/…`).
    - Replace `{{SLUG}}` `{{TITLE}}` `{{DESC}}` `{{KEYS_LINE}}` `{{INSTRUCTIONS}}`
      `{{CATEGORY_ID}}` `{{CATEGORY_LABEL}}`.
    - Set the `controls` array (keys → action) and the `{{KEYS_LINE}}` one-liner to the ROM's mapping.
@@ -134,15 +141,21 @@ the headless gate live in the tab. `OFF` is the WRAM offset of the symbol (from 
 
 ### biohack.net (`~/SRC/biohack.net`) — Astro 5 static + Cloudflare **Pages**
 - `Base.astro` props: `title`, `description` only.
+- **Demo pages live under `src/pages/snes/<slug>.astro`** (route `/snes/<slug>/`) — see step 3. The
+  gallery at `src/pages/snes/index.astro` links every card to `/snes/${slug}/`.
 - Brand: dark + orange cyberpunk (`--bg #16171a`, `--ink #e8e6e0`, `--accent #c2410c`; fonts Dune
   Rise / Blade Runner / Space Grotesk in `global.css`). Set `--rp-accent: var(--accent);` and use the
   display font for the title (`font-family:'Dune Rise',...; text-transform:uppercase`).
 - Deploy is **tag-driven** (GitHub Actions → Cloudflare Pages): `git add` + `git commit`, then
-  `task publish TAG=vX.Y.Z` (or `task release` to auto-bump the patch) — it tags and pushes
-  `origin master` + the tag. Creds live in CI secrets (`CF_PAGES_API_TOKEN`), not locally.
+  `task bump` (auto-increments the patch tag, e.g. v1.0.244→v1.0.245, and pushes `origin master` +
+  the tag) — or `task publish TAG=vX.Y.Z` for an explicit tag. (There is **no** `task release`.)
+  Creds live in CI secrets (`CF_PAGES_API_TOKEN`), not locally. On a hot tree, a concurrent agent's
+  `git add -A` can sweep your gallery-index/manifest edits into *their* commit — verify the deployed
+  HEAD is consistent (all of card + manifest + page + rom + preview present) before/after `task bump`.
 
 ## Commit discipline
 
 Stage only the files this run created/edited — `public/play/**` (engine, ROM, preview, manifest) and
-`src/pages/<slug>.astro`. Verify `git diff --cached --name-only`. The engine blobs are ~4 MB
-(`bsnes_jg.wasm`); that's expected for the first ROM on a site, free for subsequent ones.
+the page (`src/pages/snes/<slug>.astro` on biohack.net, `src/pages/<slug>.astro` on indri.studio) plus
+`src/pages/snes/index.astro` (gallery entry). Verify `git diff --cached --name-only`. The engine blobs
+are ~4 MB (`bsnes_jg.wasm`); that's expected for the first ROM on a site, free for subsequent ones.

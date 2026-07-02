@@ -1,5 +1,9 @@
 ---
-// src/pages/{{SLUG}}.astro — playable in-browser {{TITLE}} (SNES) + instructions.
+// Playable in-browser {{TITLE}} (SNES) + instructions.
+// PATH: biohack.net -> src/pages/snes/{{SLUG}}.astro (route /snes/{{SLUG}}/); the gallery links
+//       cards to /snes/<slug>/, so a top-level page 404s from the gallery. When placed under
+//       src/pages/snes/, CHANGE the Base import below to '../../layouts/Base.astro' (one level
+//       deeper). indri.studio -> src/pages/{{SLUG}}.astro (top-level; keep '../layouts/…').
 //
 // Boots the shared bsnes-jg WASM player (public/play/app.js — the cycle-accurate core) on
 // roms/{{SLUG}}.sfc. Self-contained: emulator markup + boot script + styles below. Brand the
