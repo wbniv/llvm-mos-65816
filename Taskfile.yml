@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  rangecode:
+    desc: "#86: Range Coder — binary arithmetic (range) coder; interval split bound=(range>>PBITS)*prob (__mulsi3+G_LSHR) + byte-wise renormalize carry loop (32-bit G_SHL/G_LSHR). Distinct from #67 huffman/#49 lzdec. Assert corpus_result (rangecode_gate_crc 0x6D21) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1). Leaves build/rangecode.sfc + build/rangecode-{mame,jg}.png."
+    cmds:
+      - dev/run.sh rangecode
+
+  rangecode-play:
+    desc: "PLAY the Range Coder demo in a MAME window (builds first if needed). Shows the shrinking interval bar + emitted-byte waterfall of an adaptive binary range coder."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/rangecode.sfc ]; then
+          echo "==> build/rangecode.sfc missing -- building (dev/run.sh rangecode)..."
+          dev/run.sh rangecode
+        fi
+      - task: mandel-mame
+        vars: { ROM: rangecode }
+
   ulam:
     desc: "#85: Ulam Prime Sieve — Sieve of Eratosthenes in a bit-array with VARIABLE-COUNT shifts (arr[i>>3] |= 1u<<(i&7)); the shift amount i&7 is runtime -> variable G_SHL/G_LSHR (distinct from #5 life fixed masks, #28 hilbert). Ulam spiral of primes. Assert corpus_result (ulam_gate_crc 0x1F2F) == host on MAME + bsnes-jg + disasm gate (shift-ops>=1). Leaves build/ulam.sfc + build/ulam-{mame,jg}.png."
     cmds:
