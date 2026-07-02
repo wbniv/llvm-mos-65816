@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  montorbit:
+    desc: "#84: Montgomery Orbit — Montgomery REDC modular multiplication (a*b mod N via __mulsi3 + >>16 + mask + conditional subtract, NO __udivsi3/__umodsi3). Division-free modmul (distinct from #61 dhmix / #20 factorial). Multiplicative-group orbit as a star-polygon polyline. Assert corpus_result (montorbit_gate_crc 0xBA9B) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1, division-libcalls==0). Leaves build/montorbit.sfc + build/montorbit-{mame,jg}.png."
+    cmds:
+      - dev/run.sh montorbit
+
+  montorbit-play:
+    desc: "PLAY the Montgomery Orbit demo in a MAME window (builds first if needed). Shows a rotating multiplicative-group star-polygon computed with division-free Montgomery modmul."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/montorbit.sfc ]; then
+          echo "==> build/montorbit.sfc missing -- building (dev/run.sh montorbit)..."
+          dev/run.sh montorbit
+        fi
+      - task: mandel-mame
+        vars: { ROM: montorbit }
+
   truncstair:
     desc: "#83: Truncation Staircase — G_FPTOSI (__fixsfsi) + G_SITOFP (__floatsisf) as the truncf-via-cast pattern (floorf/ceilf/truncf .unsupported() in SDK). Three bands (trunc/floor/round) diverging on negatives. Assert corpus_result (truncstair_gate_crc 0x02CA) == host on MAME + bsnes-jg + disasm gate (__fixsfsi>=1, __floatsisf>=1). Leaves build/truncstair.sfc + build/truncstair-{mame,jg}.png."
     cmds:
