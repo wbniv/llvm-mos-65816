@@ -80,7 +80,30 @@ to this heavy 64-bit-float demo (pre-existing/environmental).
 5. No codegen change → `-verify-machineinstrs` unaffected; boids + cosmzoom both compiled clean.
 **PASS.**
 
+## On-console screenshots (BG2 title)
+
+Real 16×16 Waldo glyphs with the SE drop-shadow — letters + authored `-`, and digits + `/`:
+
+<img src="screenshots/title-waldo-boids.png" width="360"> <img src="screenshots/title-waldo-divclock.png" width="360">
+
+`boids` "STRUCT-BY-VALUE" (letters + hyphen) · `divclock` "CONST /60 /10 /1(2)" (digits + slash; 16-char
+line limit truncates the trailing `2`).
+
+## Follow-on: Mode-7 title (`m7title.h`, hilbert)
+
+The one demo on the separate Mode-7 zoom/spin title system (`hilbert`, via `snesgfx/m7title.h`) was also
+converted to the Waldo font. Mode 7's 256-tile budget equals `FONT16_N`(64) × 4 tiles exactly, so all 64
+glyphs upload as 256 8bpp Mode-7 tiles (face → CGRAM 1, shadow → CGRAM 2); each glyph is placed as 2×2
+tile-cells (2 tilemap rows). Zoom-in / shimmer / spin-out unchanged. **Gate-neutral: `dev/run.sh hilbert`
+PASS `0x5999` host == +mos-a16 on MAME + bsnes-jg.** (commit `cc7b3cc`)
+
+<img src="screenshots/m7title-waldo-hilbert.png" width="420">
+
+hilbert's "SPACE-FILLING" / "HILBERT CURVE" on the Mode-7 plane, in the shadowed Waldo font.
+
 ## Files
+
+- Mode-7 follow-on: edit `examples/snes/snesgfx/m7title.h`; screenshots under `docs/plans/screenshots/`.
 
 - new: `examples/snes/font16.h` (generated), `tools/gen-font16.py`
 - edit: `examples/snes/snesgfx/title_layer.h`
