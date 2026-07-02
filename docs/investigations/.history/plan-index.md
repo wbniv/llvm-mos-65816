@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/478ec59) | feat(snes/speedcap): #82 Fmin/Fmax Speed Cap (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/23e4f27) | feat(snes/compass): #81 Copysign Compass (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5ca866d) | feat(snes/mvscrl): #79 Memmove Scroll Slabs (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0ccecd9) | feat(snes/sbitfld): #78 Signed-Bitfield Terrain Sculptor (Round 5, compiler stress-test) |
@@ -177,6 +178,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+478ec59	author	Will Norris
+478ec59	added	1
+478ec59	deleted	0
+478ec59	files	1
+478ec59	body	G_FMINNUM/G_FMAXNUM via __builtin_fminf/__builtin_fmaxf (velocity speed\ngovernor); both .libcallFor S32 → fminf/fmaxf in SDK (math.cc:18-19).\nNaN-quieting: fmaxf(NaN,-MAX_V)=-MAX_V (IEEE 754-2008 minNum/maxNum).\n12 particles on BitmapCanvas; color-coded by state (teal/orange/red).\nfminf=2, fmaxf=2, __mulsf3=2, rep/sep=35; gate 0x0116; 5-way green.\nNo compiler bug. slug=speedcap (boids taken by #26).\n\nAlso: add -lm to dev/_demo5.sh host oracle for libm-using demos.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 23e4f27	author	Will Norris
 23e4f27	added	1
 23e4f27	deleted	0
