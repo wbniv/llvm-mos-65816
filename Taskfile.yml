@@ -613,6 +613,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: oddmask }
 
+  modexp256:
+    desc: "#104 (Round 6, harden-the-fixes, Cluster C final): 256-bit Modular Exponentiation — re-stresses patch 0017's s64 (un)merge glue (#61 dhmix) as a high-volume regression guard: a 256-bit Diffie-Hellman modexp built from uint32[8] limbs + uint64 multiply-accumulate (no s128/s256 node — re-runs the green s64 path hundreds of times). DH identity A^b==B^a folded as a mismatch witness. Assert corpus_result (modexp256_gate_crc 0x05F0) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, rep/sep>=1, xy16 clean). Leaves build/modexp256.sfc + build/modexp256-{mame,jg}.png."
+    cmds:
+      - dev/run.sh modexp256
+
+  modexp256-play:
+    desc: "PLAY the 256-bit Modular Exponentiation demo in MAME (builds first if needed). A Diffie-Hellman shared-secret mix at 256-bit."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/modexp256.sfc ]; then
+          echo "==> build/modexp256.sfc missing -- building (dev/run.sh modexp256)..."
+          dev/run.sh modexp256
+        fi
+      - task: mandel-mame
+        vars: { ROM: modexp256 }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:

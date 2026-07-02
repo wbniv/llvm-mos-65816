@@ -1158,13 +1158,13 @@ not a codegen patch) that unblocked idea #35.
     legalizes each width (dhmix tested only s24) — a guard, not an uncovered path. *Shows:* a terraced field
     whose band widths track the mask. *Differential:* CRC over the masked results; 5-way.~~ ✓ [/snes/oddmask/](https://biohack.net/snes/oddmask/) ([plan](../plans/2026-07-02-103-snes-oddmask.md)) — **clean positive.** MEASURED CORRECTION to the aspirational spec: odd widths form ONLY from an **i32-sourced narrow-mask+op → G_ZEXT sN→s64** pattern (a `uint64 & mask` stays s64 with known-bits, no odd type), so widths **>32 (s40/s48) are unreachable** — the demo hits **s20/s24/s28** (probe: `G_ZEXT s20/s24/s28→s64 = 3`), each threaded through an s64 `__muldi3` (the (un)merge glue). Extend is `G_ZEXT` not `G_ANYEXT` (the exact dhmix opcode no longer reproduces post-0017), same odd-source-width legalization. `host==default==+mos-a16==+mos-xy16==0x1FD9`, `-verify` clean ×2 (the modes dhmix crashed).
 
-104. **256-bit Modular Exponentiation (`modexp256`).** *Re-stresses:* `0017`'s s64 (un)merge glue as a
+~~104. **256-bit Modular Exponentiation (`modexp256`).** *Re-stresses:* `0017`'s s64 (un)merge glue as a
     **high-volume / high-pressure regression guard** — dhmix's 64-bit modexp at **256-bit** (4×`uint64`
     schoolbook mul + reduce). Honest framing: there is no s128/s256 node; this re-runs the *green* s64 path many
     times, so its value is (a) a permanent regression guard for the glue and (b) stressing the s64 glue × the
     register-pressure/coalescer cluster (E) — **not** forcing a new legalizer rule. *Shows:* a Diffie-Hellman
     shared-secret mix at 256-bit. *Differential:* integer modexp is exact; CRC over the residue; 5-way (3-way if
-    a far modulus table is needed).
+    a far modulus table is needed).~~ ✓ [/snes/modexp256/](https://biohack.net/snes/modexp256/) ([plan](../plans/2026-07-02-104-snes-modexp256.md)) — **clean positive.** 256-bit built from `uint32[8]` + `uint64` MAC, mod `2^256−189` (pseudo-Mersenne fold); DH identity `A^b==B^a` folded with an `s1^s2` mismatch witness. **Cross-checked vs Python**: `g^7 mod (2^256−189)` bit-exact. `__muldi3`(s64 glue)=2, `rep/sep=54`, `host==default==+mos-a16==+mos-xy16==0x31D4`, `-verify` clean ×2. **Timing note:** 256-bit modexp settles frames 500–1500, so both emulator legs read at frame 1500 (`got=0x0000`@500 was harness timing, not a miscompile). **Completes Cluster C.**
 
 ### Cluster D — rotate/shift-in-loop coalescer (hardens `0010`, the default-8-bit rotate-into-`Ac` miscompile)
 
