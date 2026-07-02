@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  speedcap:
+    desc: "#82: Fmin/Fmax Speed Cap — G_FMINNUM/G_FMAXNUM via __builtin_fminf/__builtin_fmaxf (velocity speed governor); both .libcallFor S32 → fminf/fmaxf in SDK (math.cc:18-19). NaN-quieting: fmaxf(NaN,-MAX_V)=-MAX_V. 12 particles on BitmapCanvas. Assert corpus_result (speedcap_gate_crc 0x0116) == host on MAME + bsnes-jg + disasm gate (fminf>=1, fmaxf>=1). Leaves build/speedcap.sfc + build/speedcap-{mame,jg}.png."
+    cmds:
+      - dev/run.sh speedcap
+
+  speedcap-play:
+    desc: "PLAY the Fmin/Fmax Speed Cap demo in a MAME window (builds first if needed). Shows 12 float-velocity particles with NaN-recovery demonstration."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/speedcap.sfc ]; then
+          echo "==> build/speedcap.sfc missing -- building (dev/run.sh speedcap)..."
+          dev/run.sh speedcap
+        fi
+      - task: mandel-mame
+        vars: { ROM: speedcap }
+
   compass:
     desc: "#81: Copysign Compass — G_FCOPYSIGN via __builtin_copysignf(1.0f, x) (inline AND/OR of sign bits; LegalizerHelper:8899) + G_IS_FPCLASS via __builtin_signbitf (inline sign-bit test). 16×16 rotating quadrant vector-field. Assert corpus_result (compass_gate_crc 0xB9CB) == host on MAME + bsnes-jg + disasm gate (__floatsisf>=2, rep/sep>=1). Leaves build/compass.sfc + build/compass-{mame,jg}.png."
     cmds:

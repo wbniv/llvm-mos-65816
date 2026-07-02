@@ -10,7 +10,7 @@ SRC="$ROOT/examples/snes/$SLUG.c"
 VENDOR="$ROOT/vendor/bsnes-jg"
 JGX="$BUILD/jgxcheck"
 
-cc -O2 -I "$ROOT/examples/65816" "$ROOT/tools/$SLUG-sim.c" -o "$BUILD/$SLUG-sim"
+cc -O2 -I "$ROOT/examples/65816" "$ROOT/tools/$SLUG-sim.c" -lm -o "$BUILD/$SLUG-sim"
 EXPECT=$("$BUILD/$SLUG-sim" | grep -oE '0x[0-9A-Fa-f]{4}' | tail -1)
 echo "host oracle = $EXPECT"
 

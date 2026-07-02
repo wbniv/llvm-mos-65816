@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/23e4f27) | feat(snes/compass): #81 Copysign Compass (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5ca866d) | feat(snes/mvscrl): #79 Memmove Scroll Slabs (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0ccecd9) | feat(snes/sbitfld): #78 Signed-Bitfield Terrain Sculptor (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/26c2e18) | feat(snes/satcast): #77 Saturating-Cast Kaleidoscope (Round 5, compiler stress-test) |
@@ -176,6 +177,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+23e4f27	author	Will Norris
+23e4f27	added	1
+23e4f27	deleted	0
+23e4f27	files	1
+23e4f27	body	G_FCOPYSIGN via __builtin_copysignf (lowerFCopySign inline AND/OR of sign\nbits) + G_IS_FPCLASS via __builtin_signbitf (inline sign-bit test). 16×16\nrotating quadrant vector field; sign-zero crossings swirl as phase sweeps.\n__floatsisf=2, rep/sep=38; gate 0xB9CB; 5-way green. No compiler bug.\nFirst demo to fire lowerFCopySign and G_IS_FPCLASS(fcNeg).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5ca866d	author	Will Norris
 5ca866d	added	1
 5ca866d	deleted	0
