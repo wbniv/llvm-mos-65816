@@ -1323,10 +1323,10 @@ not a codegen patch) that unblocked idea #35.
     **N/Z is consumed AFTER several `__mulsi3`/`__divsi3` calls**, forcing the compare result live across the
     call-clobber under maximal pressure. *Shows:* a per-pixel evaluated implicit surface. *Differential:* CRC
     over the field; a16 primary + 5-way.~~ ✓ [/snes/pcooker/](https://biohack.net/snes/pcooker/) ([plan](../plans/2026-07-02-109-snes-pcooker.md)) — **clean positive:** per-pixel straight-line int32 eval with a dozen live temps; the `cond=(r2-4000>0)` compare is consumed in the final select AFTER `__mulsi3=6`+`__divsi3=4` (its N/Z forced live across the call-clobber — the 0011 shape). `rep/sep=38`, `host==default==+mos-a16==+mos-xy16==0xEE6D`, `-verify` clean ×3. Renders a circular level-set implicit surface. Patch 0011 scavenger-`$p` holds. (Heavy per-pixel eval → both emulator legs read at frame 1500; corpus set at startup so the assert holds — preview timing only.)
-110. **Borrow-Ladder Odometer (`borrowlad`).** *Re-stresses:* `0012` `LDCImm`-set — a wide multi-precision
+~~110. **Borrow-Ladder Odometer (`borrowlad`).** *Re-stresses:* `0012` `LDCImm`-set — a wide multi-precision
     subtractor built from chained 16-bit `SBC` whose carry-in arrives as a **set i1** (`LDCImm 1`, a 16-bit
     subtract borrow), in a visible descending odometer/countdown. *Shows:* a giant number ticking down through
-    zero and borrows rippling. *Differential:* CRC over the running value; a16 primary + 5-way.
+    zero and borrows rippling. *Differential:* CRC over the running value; a16 primary + 5-way.~~ ✓ [/snes/borrowlad/](https://biohack.net/snes/borrowlad/) ([plan](../plans/2026-07-02-110-snes-borrowlad.md)) — **clean positive:** a 128-bit descending odometer (8×16-bit limbs) counts down by a decrement each step, borrows rippling; the borrow chain lowers to `sbc=4` preceded by `sec=1` (the set-i1 carry-in / LDCImm 1 that 0012 materializes). `rep/sep=14`, `host==default==+mos-a16==+mos-xy16==0x1BE3`, `-verify` clean ×3. Patch 0012 LDCImm-set holds.
 111. **Continued-Fraction Cascade (`cfcascade`).** *Re-stresses:* `0015` rc-undef — a Horner / continued-fraction
     evaluator that reads each operand **straight out of a `__mulsi3`/`__divsi3` return** (a `$rc`-resident value)
     and keeps it live across the **next** call, chained deep (the coalesce-into-`Imag16`-across-clobber shape).
