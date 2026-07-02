@@ -76,6 +76,25 @@
 > alpha-beta**. Each corner cites the exact `vendor/llvm-mos/` line and is differential-safe. See the
 > `# Round 5` section below.
 
+## Compiler/toolchain bugs surfaced by the battery
+
+The whole point of these demos is to catch backend defects. Across **#1–#92**, **four** demos surfaced a
+real compiler/toolchain bug (all in Rounds 2–4; **Round 5 (#73–#92) surfaced none** — every corner lowered
+correctly). Three are codegen/legalizer bugs (fixed in `vendor/llvm-mos`, patches queued in
+[upstream-contribution-status](upstream-contribution-status.md)); one is a runtime/library gap.
+
+| Demo | Round | Bug | Fix | Status |
+|---|---|---|---|---|
+| **#23 L-System Plant** (`lsystem`) | 2 | **`+mos-xy16` miscompile** — in-place `memmove`/`memcpy` over a 16-bit-indexed buffer: `sep #$10` between `ldx` (writes 16-bit X) and `lda abs,X16` (reads it) zeroed X's high byte → wrong result (`0x1CC6` vs `0x90AA`) | reload the X-writer after the `rep #$10` in `MOSInsertREPSEP::placeIntraBlock` (in `0002`) | ✅ fixed, 5-way green |
+| **#46 qsortviz** (`qsortviz`) | 3 | **`G_SCMP`/`G_UCMP` backend crash** — the `(x>y)-(x<y)` spaceship comparator libc `qsort` emits had no legalizer rule → `unable to legalize … G_SCMP` abort in **all three modes** | `.lower()` for `G_SCMP`/`G_UCMP` — fork patch **`0016`** (upstream-standalone, ready-to-post) | ✅ fixed, bit-exact `0x8EA5` |
+| **#61 dhmix** (`dhmix`) | 4 | **a16/xy16 legalizer crash** on 64-bit modexp — `unable to legalize G_UNMERGE_VALUES (s64)` + `G_ANYEXT (s24)` (default-8-bit OK) | s64↔s16 (un)merge glue + odd-width anyext routing — fork patch **`0017`** (#321-scoped) | ✅ fixed, bit-exact `0x69AA`, corpus 62/62 |
+| **#35 setjmp/longjmp** (blocked) | 4 (scoping) | **`longjmp` broken on the 65816** — SDK ships a 6502-only `setjmp.S`; a **runtime/library gap**, not a codegen miscompile | none yet — needs a 65816-aware `setjmp.S` | ⚠️ demo deferred; documented as a finding ([investigation](2026-06-30-setjmp-longjmp-65816-native-stack-bug.md)) |
+
+*Not compiler bugs (excluded):* **#75 satcomet** and **#83 truncstair** each had a **demo-side** OOB write —
+the differential caught them, but the fault was in the demo's renderer, not the compiler (see #83's plan for
+the misdiagnosis-and-retraction arc). Round 1 also surfaced a handful of *pre-existing* codegen bugs during
+the underlying M2 work, not attributed to specific numbered demos here.
+
 A backlog of candidate demo programs whose job is to **stress the llvm-mos 65816 codegen** — each leans
 on a different corner of the compiler (32-bit/fixed-point multiply, division, recursion + the soft stack,
 multi-precision carry chains, bit manipulation, shift-add, far/high-WRAM pointers under `+mos-a16`, function
