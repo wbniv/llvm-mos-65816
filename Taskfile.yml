@@ -477,6 +477,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: fabsridge }
 
+  plyoracle:
+    desc: "#92: PlyOracle -- negamax + alpha-beta tic-tac-toe: negate-on-return (G_SUB 0,x) + running G_SMAX + alpha-beta cutoff prune CFG; alternating-sign recursion #17/#18 never form. Animated 3x3 AI self-play. Assert corpus_result (plyoracle_gate_crc 0x6146) == host on MAME + bsnes-jg + disasm gate (po_negamax recursion). Leaves build/plyoracle.sfc + build/plyoracle-{mame,jg}.png."
+    cmds:
+      - dev/run.sh plyoracle
+
+  plyoracle-play:
+    desc: "PLAY the PlyOracle demo in a MAME window (builds first if needed). Shows an animated negamax alpha-beta tic-tac-toe self-play."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/plyoracle.sfc ]; then
+          echo "==> build/plyoracle.sfc missing -- building (dev/run.sh plyoracle)..."
+          dev/run.sh plyoracle
+        fi
+      - task: mandel-mame
+        vars: { ROM: plyoracle }
+
   matcascade:
     desc: "#91: Matrix Cascade -- sret hidden-pointer struct-return ABI for mat2 (8 bytes, over getNaturalAlignIndirect threshold MOS.cpp:88) via chained by-value mat_mul; __mulsi3 MACs. Distinct from #26 boids (vec2 32-bit register pair, not sret). Spinning wireframe lattice. Assert corpus_result (matcascade_gate_crc 0x8064) == host on MAME + bsnes-jg + disasm gate (__mulsi3>=1, mat_mul sret call sites). Leaves build/matcascade.sfc + build/matcascade-{mame,jg}.png."
     cmds:
