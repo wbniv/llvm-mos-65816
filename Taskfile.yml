@@ -528,6 +528,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: permscat }
 
+  ropeedit:
+    desc: "#96 (Round 6, harden-the-fixes, Cluster A, final): Gap-Buffer Rope Editor — re-stresses patch 0002 (MOSInsertREPSEP::placeIntraBlock, the #23 +mos-xy16 in-place-memmove index-width fix) + #79 (both directions) AT SCALE: a 576-byte gap buffer that memmoves text across the gap on every cursor move (both directions, >256 bytes → 16-bit offset), driven by a scripted edit stream. Assert corpus_result (ropeedit_gate_crc 0x2361) == host on MAME + bsnes-jg + disasm gate (memmove>=1, rep/sep>=1, xy16 compile clean). Leaves build/ropeedit.sfc + build/ropeedit-{mame,jg}.png."
+    cmds:
+      - dev/run.sh ropeedit
+
+  ropeedit-play:
+    desc: "PLAY the Gap-Buffer Rope Editor demo in MAME (builds first if needed). A 16x16 window of a 576-byte text buffer; typed text blocks slide across the gap as the cursor jumps."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/ropeedit.sfc ]; then
+          echo "==> build/ropeedit.sfc missing -- building (dev/run.sh ropeedit)..."
+          dev/run.sh ropeedit
+        fi
+      - task: mandel-mame
+        vars: { ROM: ropeedit }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:

@@ -1098,10 +1098,10 @@ not a codegen patch) that unblocked idea #35.
     (two 16-bit index values live simultaneously — the exact shape where a stray `sep #$10` would zero one).
     *Shows:* a kaleidoscopic tile-shuffle that must land every tile exactly (a bijection). *Differential:* CRC
     over the scattered array; a wrong index diverges it AND drops/duplicates a tile; 5-way + xy16.~~ ✓ [/snes/permscat/](https://biohack.net/snes/permscat/) ([plan](../plans/2026-07-02-95-snes-permscat.md)) — **clean positive:** a 576-entry (>512) bijective scatter with two live 16-bit indices (counter `i` + data-dependent `perm[i]`); under +mos-xy16 emits **`sta abs,X` with a 16-bit index** (3×) — the literal #23 shape #94 rotslab did NOT produce (rotslab's pointer reversal lowered to ZP-indirect). a16 `rep/sep=41`, `host==default==+mos-a16==+mos-xy16==0x0C2C`, `-verify` clean ×2. Patch 0002 holds on the indexed-store form too.
-96. **Gap-Buffer Rope Editor (`ropeedit`).** *Re-stresses:* `0002` at scale — a >256-byte text gap buffer that
+~~96. **Gap-Buffer Rope Editor (`ropeedit`).** *Re-stresses:* `0002` at scale — a >256-byte text gap buffer that
     `memmove`s on **every** insert/delete (a bigger, both-direction lsystem), 16-bit offsets throughout. A
     scripted edit stream (type/delete/jump) exercises grow and shrink. *Shows:* live text edited in place,
-    cursor jumping. *Differential:* CRC over the final buffer after a fixed edit script; 5-way + xy16.
+    cursor jumping. *Differential:* CRC over the final buffer after a fixed edit script; 5-way + xy16.~~ ✓ [/snes/ropeedit/](https://biohack.net/snes/ropeedit/) ([plan](../plans/2026-07-02-96-snes-ropeedit.md)) — **clean positive:** a 576-byte gap buffer, cursor moves memmove text across the gap (both directions, >256B → 16-bit offset), scripted edit stream; `memmove-refs=2`, a16 `rep/sep=54`, `host==default==+mos-a16==+mos-xy16==0x2361`, `-verify` clean ×2. **Completes Cluster A** — 0002 now guarded across memmove-libcall (#93), ZP-indirect (#94), indexed-store (#95), and editor-primitive-at-scale (#96) forms.
 ### Cluster B — three-way compare `G_SCMP`/`G_UCMP` (hardens `0016`, the #46 spaceship fix)
 
 ~~97. **Width-Sweep Sort Gallery (`spaceship`).** *Re-stresses:* `0016` at **every width** — the SAME
