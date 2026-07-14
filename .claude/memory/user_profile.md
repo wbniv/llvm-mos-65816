@@ -1,1 +1,1 @@
-../../../../.claude/memory/user_profile.md
+../../../.claude/memory/user_profile.md

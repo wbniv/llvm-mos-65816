@@ -1,1 +1,1 @@
-../../../../.claude/memory/user_mammouth_subscription.md
+../../../.claude/memory/user_mammouth_subscription.md

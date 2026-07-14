@@ -1,1 +1,1 @@
-../../../../.claude/memory/feedback_prefer_proper_fix.md
+../../../.claude/memory/feedback_prefer_proper_fix.md

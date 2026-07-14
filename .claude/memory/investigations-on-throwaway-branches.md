@@ -1,1 +1,1 @@
-../../../../.claude/memory/investigations-on-throwaway-branches.md
+../../../.claude/memory/investigations-on-throwaway-branches.md

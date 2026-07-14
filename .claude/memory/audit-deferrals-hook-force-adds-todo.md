@@ -1,1 +1,1 @@
-../../../../.claude/memory/audit-deferrals-hook-force-adds-todo.md
+../../../.claude/memory/audit-deferrals-hook-force-adds-todo.md

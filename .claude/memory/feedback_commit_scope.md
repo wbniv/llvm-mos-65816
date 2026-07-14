@@ -1,1 +1,1 @@
-../../../../.claude/memory/feedback_commit_scope.md
+../../../.claude/memory/feedback_commit_scope.md

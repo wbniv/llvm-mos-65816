@@ -1,1 +1,1 @@
-../../../../.claude/memory/no-false-choice-questions.md
+../../../.claude/memory/no-false-choice-questions.md
