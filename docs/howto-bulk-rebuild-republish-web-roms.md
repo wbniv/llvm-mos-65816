@@ -15,10 +15,10 @@ python3 tools/gen-font16.py > examples/snes/font16.h
 dev/run.sh boids
 
 # 2. rebuild EVERY published ROM (one container, no gate) and sync into the site:
-dev/publish-web-roms.sh            # --site ~/SRC/biohack.net by default
+dev/publish-web-roms.sh            # --site ~/biohack.net by default
 
 # 3. commit the ROMs in the site repo, then deploy:
-cd ~/SRC/biohack.net && git add public/play/roms && git commit -m "…" && task release
+cd ~/biohack.net && git add public/play/roms && git commit -m "…" && task release
 ```
 
 ## Why it's fast (and still correct)
@@ -66,7 +66,7 @@ Slug→source is 1:1 except `3d-wireframe→wireframe`, `buddhabrot→buddha`, `
 `biohack.net` deploys via Cloudflare on a tagged push. After syncing + committing the ROMs:
 
 ```
-cd ~/SRC/biohack.net
+cd ~/biohack.net
 git add public/play/roms                       # the fresh .sfc files only
 git commit -m "snes: rebuild demo ROMs (<what changed>)"
 task release                                    # auto-bump patch tag + push → Cloudflare deploy

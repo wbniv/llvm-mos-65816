@@ -141,12 +141,12 @@ easier to drive headless for byte-level WRAM assertions. A web leg adds latency 
 
 ## Status — became a standalone project (2026-06-25)
 
-The showcase was wanted. It now lives as its own repo, **`~/SRC/bsnes-jg-wasm`** (named for the
+The showcase was wanted. It now lives as its own repo, **`~/bsnes-jg-wasm`** (named for the
 artifact: the WASM build of the gate's cycle-accurate core). Kept separate from this LLVM tree so
 its GPLv3 publish story doesn't entangle the Apache-2.0-w/-LLVM-exception compiler. Scaffolded with
 a reproducible Emscripten build pipeline (`build.sh`), an EmulatorJS loader page (showcase mode
 serves today), `serve.py`, the demo ROMs, GPLv3 `LICENSE`/`NOTICE`, and its own
-plan + TODO. See `~/SRC/bsnes-jg-wasm/docs/plans/2026-06-25-bsnes-jg-wasm.md`.
+plan + TODO. See `~/bsnes-jg-wasm/docs/plans/2026-06-25-bsnes-jg-wasm.md`.
 
 Remaining headline work (in that repo's TODO): build the `bsnes-jg` core pinned to *our*
 `vendor/bsnes-jg` revision, wire the page to it, and prove the in-browser framebuffer CRC ==

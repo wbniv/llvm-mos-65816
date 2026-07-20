@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d65c75e) | fix(fn-plot): add TitleLayer intro + canvas_line curves + 2px/frame; update snes-demo skill |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/1194065) | docs(snes-demo skill): make the prime directive explicit — stress the compiler, never work around it |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/fd4e937) | docs(snes): title-card screenshots on all completed demo plans + skill |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/bfcbe69) | chore(skills): add snes-demo + snes-rom-page as project-local skills |
 
 <!--history-meta v1
+d65c75e	author	Will Norris
+d65c75e	added	57
+d65c75e	deleted	13
+d65c75e	files	1
+d65c75e	body	fn-plot.c:\n  - Add TitleLayer ("FN-PLOT" / "RECURSIVE PARSER") wrapping corpus_result\n    computation — every demo requires the animated title intro card\n  - Replace canvas_plot with canvas_line connecting consecutive columns;\n    track prev_py in App struct to eliminate gaps on steep curve sections\n  - PIXELS_PER_FRAME 1→2 (64 frames per curve, ~1 s draw time)\n  - Fix char buf[7]→buf[21] (progress bar needed 20+NUL)\n\nSKILL.md (snes-demo):\n  - Add TitleLayer row to component guide, marked "Required for every demo"\n  - Add canonical title_begin/title_end pattern with code example\n  - Verification step 6: check demo animation is running (not blank canvas)\n  - Publication step 9: two-stage publish — default-8-bit first, then\n    verified +mos-a16 overwrites after full differential gate confirms\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 1194065	author	Will Norris
 1194065	added	52
 1194065	deleted	6

@@ -17,14 +17,17 @@
 # clang/ + llvm/lib/Target/MOS/, except the two excluded drift/stale files.
 set -euo pipefail
 
-ROOT=/home/will/SRC/llvm-mos-65816
+# Paths derive from this script's location, so the repo can live anywhere. The FF / far-cc
+# worktrees are SIBLINGS of the main checkout ("$ROOT-<slug>", per docs/howto-feature-worktree.md);
+# both must be present to re-run — they were retained per policy but are not guaranteed to exist.
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENDOR="$ROOT/vendor/llvm-mos"
-FF=/home/will/SRC/llvm-mos-65816-far-followups/vendor/llvm-mos
+FF="$ROOT-far-followups/vendor/llvm-mos"
 P="$ROOT/patches/llvm-mos"
 P1="$P/0001-320-far-addrspace.patch"
 P2="$P/0002-321-accum16.patch"
 P3="$P/0003-late-opt-txy-dead-flag.patch"
-P4=/home/will/SRC/llvm-mos-65816-far-cc/patches/llvm-mos/0004-320-far-cc.patch
+P4="$ROOT-far-cc/patches/llvm-mos/0004-320-far-cc.patch"
 WT=/tmp/far-land/wt
 OUT=/tmp/far-land/out
 NEW1="$OUT/0001-320-far-addrspace.patch"

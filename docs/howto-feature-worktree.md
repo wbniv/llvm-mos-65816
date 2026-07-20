@@ -5,7 +5,7 @@ commits off `main`'s hot shared tree, **and** can run the Dockerized differentia
 without the 30–90 min from-source toolchain rebuild.
 
 **When:** any non-trivial change, and *especially* investigations/spikes — per [`CLAUDE.md`](../CLAUDE.md)
-("Investigations go on throwaway worktrees, not `main`") and [`~/SRC/CLAUDE.md`](../../CLAUDE.md)
+("Investigations go on throwaway worktrees, not `main`") and [`~/CLAUDE.md`](../../CLAUDE.md)
 ("Worktree-based feature workflow").
 
 ## Why the obvious shortcut doesn't work
@@ -14,7 +14,7 @@ without the 30–90 min from-source toolchain rebuild.
 `…/build/llvm-mos-install/bin/...` rather than rebuilding. That works for **host-side, compile-only** scripts
 (e.g. `dev/measure-zp-pressure.sh`). It does **not** work for `dev/run.sh`: that wrapper runs everything inside
 Docker with a **single** bind-mount — `-v "$ROOT":/work` — so a path pointing at the *sibling* main checkout
-(`/home/will/SRC/llvm-mos-65816/build/...`) **dangles inside the container** (which only sees `/work` = the
+(`/home/will/llvm-mos-65816/build/...`) **dangles inside the container** (which only sees `/work` = the
 worktree). The worktree therefore needs its **own** self-contained `build/`.
 
 Rebuilding it is 30–90 min. Instead, **hardlink** the prebuilt, read-only bits in: `cp -al` is near-instant,
@@ -25,7 +25,7 @@ worktree root — resolves correctly inside the container.
 
 ```bash
 SLUG=myfeature                          # -> branch wt/321-myfeature
-MAIN=/home/will/SRC/llvm-mos-65816
+MAIN=/home/will/llvm-mos-65816
 WT="$MAIN-$SLUG"
 
 # 1. Worktree off the CURRENT main tip (so it carries the latest committed infra).
@@ -74,7 +74,7 @@ and the **warm** `build/` (cmake tree + ccache) so the first rebuild is a fast *
 uses `/work/...` paths. This is what `wt/320-far-cc` and `wt/321-frame-abi` use.
 
 ```bash
-SLUG=myfeature; MAIN=/home/will/SRC/llvm-mos-65816; WT="$MAIN-$SLUG"
+SLUG=myfeature; MAIN=/home/will/llvm-mos-65816; WT="$MAIN-$SLUG"
 git -C "$MAIN" worktree add -b "wt/NNN-$SLUG" "$WT" main
 mkdir -p "$WT/vendor" "$WT/dev"                          # create vendor/ FIRST (it's gitignored, absent in a fresh worktree)
 cp -a  "$MAIN/vendor/llvm-mos"     "$WT/vendor/llvm-mos"     # REAL copy: editable backend (~5 GB)
@@ -111,4 +111,4 @@ Either way, register the worktree in the **Active worktrees** table at the top o
 - **`set -euo pipefail` in an *inline* shell one-liner** can trip the harness shell-snapshot's unguarded
   `ZSH_VERSION` under `-u` (exit 127). Drop `-u` for ad-hoc one-liners; committed `.sh` scripts are unaffected.
 - **Not yet automated.** This could be wrapped in a `dev/feature-worktree.sh` / `task feature-start NAME=<slug>`
-  (see `~/SRC/CLAUDE.md` "Worktree-based feature workflow"). Until then, the block above is the one-shot setup.
+  (see `~/CLAUDE.md` "Worktree-based feature workflow"). Until then, the block above is the one-shot setup.

@@ -131,7 +131,7 @@ the headless gate live in the tab. `OFF` is the WRAM offset of the symbol (from 
 
 ## Per-site
 
-### indri.studio (`~/SRC/indri.studio`) — Astro 6 + Tailwind + Cloudflare **Workers**
+### indri.studio (`~/indri.studio`) — Astro 6 + Tailwind + Cloudflare **Workers**
 - `Base.astro` props: `title`, `description`, `ogImage`, `ringFlare={false}`. Set
   `ogImage={new URL('/play/preview/<slug>.png', Astro.site ?? 'https://indri.studio').href}`.
 - Brand: grey + neon‑purple. Set `--rp-accent: #b026ff;` (or use the page as-is). Tokens in
@@ -139,7 +139,7 @@ the headless gate live in the tab. `OFF` is the WRAM offset of the symbol (from 
 - Deploy: `task deploy` (build + `wrangler deploy`; `CLOUDFLARE_API_TOKEN` in `.env`). HTML is served
   `no-store`, so it goes live on reload — no cache purge.
 
-### biohack.net (`~/SRC/biohack.net`) — Astro 5 static + Cloudflare **Pages**
+### biohack.net (`~/biohack.net`) — Astro 5 static + Cloudflare **Pages**
 - `Base.astro` props: `title`, `description` only.
 - **Demo pages live under `src/pages/snes/<slug>.astro`** (route `/snes/<slug>/`) — see step 3. The
   gallery at `src/pages/snes/index.astro` links every card to `/snes/${slug}/`.

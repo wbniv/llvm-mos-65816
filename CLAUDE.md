@@ -1,6 +1,6 @@
 # llvm-mos-65816 — project guide
 
-Project-specific guide; **extends the shared `~/SRC/CLAUDE.md`** (generic conventions: plan-first, TODO
+Project-specific guide; **extends the shared `~/CLAUDE.md`** (generic conventions: plan-first, TODO
 format, commit-at-checkpoints, only-commit-your-work, markdown rules). It is **auto-loaded every session**,
 so it is the standing preface for every handoff: each piece of work = this guide (general) **+** a per-task
 `docs/plans/YYYY-MM-DD-<topic>.md` supplement. **Build/test commands, gotchas, the differential gate
@@ -45,7 +45,7 @@ glitch. (Exact commands + the micro-test pattern: `docs/agent-handoff.md`.)
    with the toolchain, so "high-effort / modest-gain" is a *scheduling* input, not a veto. But only
    *genuine* gains — a *blanket* change that regresses common shapes to win a sub-case is wrong; gate it.
 
-## Commit discipline (project specifics; generic rules in `~/SRC/CLAUDE.md`)
+## Commit discipline (project specifics; generic rules in `~/CLAUDE.md`)
 
 - **Stage only your files**, explicitly; then verify `git diff --cached --name-only` is exactly your set —
   never `vendor/`, a foreign patch, or `docs/transcripts/`. When regenerating `0002`, sanity-check it
@@ -61,7 +61,7 @@ glitch. (Exact commands + the micro-test pattern: `docs/agent-handoff.md`.)
   recorded verdict) back; **dead-end** → `dev/worktree-teardown.sh throwaway/<slug> --yes` (raw
   `git worktree remove` is guard-blocked; the wrapper handles `throwaway/<slug>` too — disposable, so no
   retain-until-upstream gate, but `--yes` is still required). (Generic rule + rationale:
-  `~/SRC/CLAUDE.md` "Worktree-based feature workflow".)
+  `~/CLAUDE.md` "Worktree-based feature workflow".)
 - **Commit hooks fire automatically:** `regen-md-history` snapshots edited plans into `docs/plans/.history/`;
   `audit-plan-deferrals` captures plan "Deferred"/unverified bullets into a `## Inbox` in `TODO.md` —
   **triage them** (delete a bullet already covered by a curated TODO item with a short

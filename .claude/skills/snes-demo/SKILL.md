@@ -582,7 +582,7 @@ Invoke `/snes-rom-page` with the **default-8-bit ROM** as the initial publish:
 ```
 --rom build/<slug>-default.sfc
 --slug <slug>
---site ~/SRC/biohack.net
+--site ~/biohack.net
 --title "<Display Title>"
 --preview build/<slug>-jg.png
 --selfcheck "0x<VMA> 2 0x<EXPECT> 500 <label>"
@@ -601,7 +601,7 @@ and bsnes-jg, overwrite the published ROM with the optimised +mos-a16 build:
 /snes-rom-page
   --rom build/<slug>.sfc        ← the +mos-a16 build from the gate run
   --slug <slug>
-  --site ~/SRC/biohack.net
+  --site ~/biohack.net
   --title "<Display Title>"
   --preview build/<slug>-jg.png
   --selfcheck "0x<VMA> 2 0x<EXPECT> 500 <label>"
@@ -614,7 +614,7 @@ then the site redeploys with the stress-tested ROM. The page URL and selfcheck a
 
 - Paste raw output of each verification step into the plan doc, then mark `PASS` or `FAIL`.
 - **Mark the TODO item done with strikethrough.** Flip `[wip]`→`[x]`, move it to the Done section
-  (one tight line, ≤ 150 chars), and **strike the title** `~~…~~` per the shared `~/SRC/CLAUDE.md`
+  (one tight line, ≤ 150 chars), and **strike the title** `~~…~~` per the shared `~/CLAUDE.md`
   "Strike through completed to-do items" rule — with the published URL as the proof, e.g.
   `[x] ~~**#N <Name>**~~ — … ✓ [/snes/<slug>/](https://biohack.net/snes/<slug>/)`.
 - **Strike the entry in the demo-ideas backlog** —

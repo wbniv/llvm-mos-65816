@@ -415,7 +415,7 @@ After the gate passes, invoke the `/snes-rom-page` skill. Inputs:
 
 - `--rom build/<name>.sfc`
 - `--slug <url-slug>` (e.g. `doom-fire`)
-- `--site /home/will/SRC/biohack.net`
+- `--site /home/will/biohack.net`
 - `--title "Doom Fire"` (display name)
 - `--preview /tmp/<name>-preview.png` (256×224 screenshot from the gate)
 - `--selfcheck "0xOFF LEN 0xWANT FRAMES label"` (WRAM gate assert; OFF from the `.map`)

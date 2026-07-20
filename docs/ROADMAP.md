@@ -73,7 +73,7 @@ Stand up the infrastructure every later milestone needs, using the *existing* 65
   [plan](plans/2026-06-14-m0-regression-corpus-5-self-contained-c-programs.md).
 
 Build is fully containerized (host stays clean) — Dockerfile + `build.sh`/`compile.sh`/`validate.sh`
-in the `~/SRC/llvm-mos-snes` workspace.
+in the `~/llvm-mos-snes` workspace.
 
 Deliverable: a merged (or PR-ready) `mos-platform/snes` target + CI smoke. Risk: low — no compiler
 changes, only SDK + build glue. This is the credibility artifact that pulls @asiekierka/@mysterymath

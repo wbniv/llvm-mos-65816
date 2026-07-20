@@ -5,7 +5,7 @@
 # ROM currently published on the site and copies the fresh .sfc files into the site's play/roms dir.
 # It does NOT deploy — review the git diff in the site repo, then deploy per the site (task release).
 #
-#   dev/publish-web-roms.sh [--site DIR]        # default site: ~/SRC/biohack.net
+#   dev/publish-web-roms.sh [--site DIR]        # default site: ~/biohack.net
 #
 # Steps: (1) list slugs from <site>/public/play/roms/*.sfc → build/web-roms.list
 #        (2) dev/run.sh rebuild-web-roms @… (one container, no gate)
@@ -14,7 +14,7 @@
 # Verify one representative demo separately with the full gate: dev/run.sh <demo>.
 set -euo pipefail
 
-SITE="${HOME}/SRC/biohack.net"
+SITE="${HOME}/biohack.net"
 while [ $# -gt 0 ]; do
   case "$1" in
     -h|--help) echo "Usage: dev/publish-web-roms.sh [--site DIR]"; exit 0;;

@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-06-23](https://github.com/wbniv/llvm-mos-65816/commit/0aa1110) | #321 worktree-teardown: handle throwaway/<slug> via the blessed wrapper |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/392030a) | #321 docs: add the feature-worktree howto (target of the agent-handoff + CLAUDE.md pointers) |
 | [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/9148a7b) | docs: investigations go on throwaway worktrees, not main (standing convention) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/6fff2f1) | #321 docs: wire awareness of the upstream-contribution-status queue into CLAUDE.md + TODO |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0083378) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
+0aa1110	author	Will Norris
+0aa1110	added	3
+0aa1110	deleted	1
+0aa1110	files	1
+0aa1110	body	Closes the gap found while tearing down the M1-verify measurement worktree:\nthe wrapper blindly prepended wt/ (so throwaway/<slug> resolved to a nonexistent\nwt/throwaway/<slug>), while raw teardown is guard-blocked outright -- leaving\ndisposable investigation/measurement worktrees with no blessed path.\n\n- Resolve a bare slug -> wt/<slug> (feature, unchanged); an explicit branch\n  (wt/<slug>, throwaway/<slug>, ...) is used verbatim.\n- throwaway/<slug> is disposable: the unmerged-commit + tracked-content gates\n  downgrade from hard-ABORT to a --yes-gated WARN, and the retain-until-upstream\n  policy gate is skipped (teardown still needs --yes -- it is irreversible).\n- usage() now prints just the leading comment block (no trailing code in -h).\n- Tests +3 (guard passthrough for a throwaway branch delete; resolution of\n  throwaway/<slug> verbatim vs bare-slug default to wt/) -> 18/18. Verified\n  end-to-end on a real throwaway worktree (dry-run + --yes teardown).\n- CLAUDE.md dead-end teardown guidance now points at the wrapper.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 392030a	author	Will Norris
 392030a	added	3
 392030a	deleted	1
