@@ -25,6 +25,23 @@
 #define TILES_W  (DW / 8)   // 8
 #define TILES_H  (DH / 8)   // 7
 #define ROW_BYTES 512        // one tile-row of chr data (8 tiles × 64 bytes)
+#define SCRATCH_N (32 * 28)
+
+typedef enum {
+  MANDEL_LOADING_COARSE,
+  MANDEL_LOADING_MEDIUM,
+  MANDEL_LOADING_FINE,
+  MANDEL_LOADING_FINAL,
+  MANDEL_READY
+} MandelBuildPhase;
+
+typedef struct {
+  MandelBuildPhase phase;
+  uint8_t row;
+  uint8_t cw, ch, shx, shy;
+  uint16_t cells_done;
+  uint16_t cells_total;
+} MandelBuild;
 
 // Canonical 64×56 far buffer in high WRAM ($7E2000) — same address as mandel-display.c.
 // Far stores/loads exercise the #320 far-pointer path (sta [dp] / lda [dp]).
@@ -43,7 +60,9 @@ typedef struct {
   uint8_t   pcount;             // frames since last pshift advance
   uint8_t   angle;              // spin angle (wraps 0..255)
   uint8_t   t;                  // zoom phase (wraps 0..255)
-  uint8_t   chrbuf[ROW_BYTES];  // staging buffer for VRAM tile-row uploads (reserve only)
+  MandelBuild build;
+  uint8_t   scratch[SCRATCH_N]; // largest coarse pass (32×28)
+  uint8_t   chrbuf[ROW_BYTES];  // persistent staging for one queued tile-row
 } MandelLayer;
 
 // One zero byte for the fixed-source tilemap-clear DMA.
@@ -80,6 +99,65 @@ static void build_chr_row(MandelLayer *ml, uint8_t trow) {
           fb[(uint16_t)((trow * 8u + r)) * DW + (tcol * 8u + c)];
 }
 
+static void build_begin(MandelLayer *ml, MandelBuildPhase phase) {
+  MandelBuild *b = &ml->build;
+  b->phase = phase;
+  b->row = 0;
+  if (phase == MANDEL_LOADING_COARSE) {
+    b->cw = 8; b->ch = 7; b->shx = 3; b->shy = 3;
+  } else if (phase == MANDEL_LOADING_MEDIUM) {
+    b->cw = 16; b->ch = 14; b->shx = 2; b->shy = 2;
+  } else if (phase == MANDEL_LOADING_FINE) {
+    b->cw = 32; b->ch = 28; b->shx = 1; b->shy = 1;
+  } else {
+    b->cw = DW; b->ch = DH; b->shx = 0; b->shy = 0;
+  }
+  b->cells_done = 0;
+  b->cells_total = (uint16_t)b->cw * b->ch;
+}
+
+// Compute one source row, expand it into the canonical far framebuffer, and queue a completed
+// eight-pixel tile row. This bounds application work between display frames and keeps the loading
+// animation alive throughout all four refinement passes.
+static void build_step(MandelLayer *ml, UploadQueue *q) {
+  MandelBuild *b = &ml->build;
+  if (b->phase == MANDEL_READY) return;
+
+  int16_t dre = (int16_t)(MANDEL_REW / b->cw);
+  int16_t dim = (int16_t)(MANDEL_IMW / b->ch);
+  int16_t ci = (int16_t)(MANDEL_IM0 + (int16_t)b->row * dim);
+  uint8_t *src = ml->scratch;
+
+  for (uint8_t x = 0; x < b->cw; x++) {
+    int16_t cr = (int16_t)(MANDEL_RE0 + (int16_t)x * dre);
+    src[x] = mandel_cell(cr, ci, DN);
+  }
+  b->cells_done = (uint16_t)(b->cells_done + b->cw);
+
+  for (uint8_t sy = 0; sy < (uint8_t)(1u << b->shy); sy++) {
+    uint8_t y = (uint8_t)((b->row << b->shy) + sy);
+    for (uint8_t x = 0; x < DW; x++)
+      fb[(uint16_t)y * DW + x] = src[x >> b->shx];
+  }
+
+  b->row++;
+  if (((uint8_t)(b->row << b->shy) & 7u) == 0u) {
+    uint8_t trow = (uint8_t)(((uint8_t)(b->row << b->shy) >> 3) - 1u);
+    build_chr_row(ml, trow);
+    upq_push_vram(q, (uint16_t)trow * ROW_BYTES, ml->chrbuf, 0x00, ROW_BYTES,
+                  VMAIN_INC_HIGH_1);
+  }
+
+  if (b->row == b->ch) {
+    if (b->phase == MANDEL_LOADING_FINAL) {
+      corpus_result = crc_fb_oop();
+      b->phase = MANDEL_READY;
+    } else {
+      build_begin(ml, (MandelBuildPhase)(b->phase + 1));
+    }
+  }
+}
+
 // Load the base palette (DN+1 colours) into ml->pal and write to CGRAM (force-blank only).
 static void load_palette_cgram(MandelLayer *ml) {
   REG_CGADD = 0;
@@ -94,7 +172,8 @@ static void load_palette_cgram(MandelLayer *ml) {
 }
 
 // reserve(): called once by display_add() while force-blanked.
-// Sets up Mode 7 registers, computes the 64×56 grid, sets corpus_result, uploads to VRAM.
+// Sets up Mode 7 registers and a tiny loading field. Expensive application work belongs in emit()
+// so the first display_frame() can release force-blank immediately after the title.
 // NOTE: we set BGMODE_7 here (overriding display_init's BGMODE_1) and avoid touching REG_TM
 // (Display manages it via its shadow using base.tm_bits = TM_BG1).
 static void _mandel_reserve(Drawable *d, VramAlloc *va) {
@@ -110,21 +189,10 @@ static void _mandel_reserve(Drawable *d, VramAlloc *va) {
   m7_set_center(DW / 2, DH / 2);
   m7_set_scroll((uint16_t)(int16_t)(-(128 - DW / 2)), (uint16_t)(int16_t)(-(112 - DH / 2)));
 
-  // Compute the 64×56 Mandelbrot grid via FAR STORES into $7E2000.
-  {
-    int16_t dre = (int16_t)(MANDEL_REW / DW);
-    int16_t dim = (int16_t)(MANDEL_IMW / DH);
-    for (uint8_t j = 0; j < DH; j++) {
-      int16_t ci = (int16_t)(MANDEL_IM0 + (int16_t)j * dim);
-      for (uint8_t i = 0; i < DW; i++) {
-        int16_t cr = (int16_t)(MANDEL_RE0 + (int16_t)i * dre);
-        fb[(uint16_t)j * DW + i] = mandel_cell(cr, ci, DN);  // FAR STORE
-      }
-    }
-  }
-
-  // CRC the full far buffer — should equal 0x204F on host and target.
-  corpus_result = crc_fb_oop();
+  // A high-contrast checker is visible and moving on the first post-title frame.
+  for (uint8_t y = 0; y < DH; y++)
+    for (uint8_t x = 0; x < DW; x++)
+      fb[(uint16_t)y * DW + x] = (uint8_t)(1u + (((x >> 3) ^ (y >> 3)) & 7u));
 
   // Upload full 64×56 grid to Mode 7 VRAM in tiled order (7 tile-rows × 512 bytes).
   for (uint8_t trow = 0; trow < TILES_H; trow++) {
@@ -134,12 +202,15 @@ static void _mandel_reserve(Drawable *d, VramAlloc *va) {
 
   // Load palette into CGRAM (direct write, force-blanked).
   load_palette_cgram(ml);
+  build_begin(ml, MANDEL_LOADING_COARSE);
 }
 
 // emit(): called every frame by scene_emit() — the single virtual dispatch per drawable.
 // Enqueues the colour-cycle CGRAM upload and Mode 7 matrix spin+zoom via UPQ_REG pokes.
 static void _mandel_emit(Drawable *d, UploadQueue *q) {
   MandelLayer *ml = (MandelLayer *)d;
+
+  build_step(ml, q);
 
   // Advance colour cycle: rotate by 1 every 6 frames (same cadence as mandel-display.c).
   if (++ml->pcount >= 6) {
@@ -166,7 +237,7 @@ static void _mandel_emit(Drawable *d, UploadQueue *q) {
   int16_t a  = (int16_t)(((int32_t)cs  *  zoom) >> 8);
   int16_t b  = (int16_t)(((int32_t)(-sn) * zoom) >> 8);
   int16_t cc = (int16_t)(((int32_t)sn  *  zoom) >> 8);
-  ml->angle = (uint8_t)(ml->angle + 1);
+  ml->angle = (uint8_t)(ml->angle + (ml->build.phase == MANDEL_READY ? 1u : 2u));
   ml->t     = (uint8_t)(ml->t     + 1);
 
   // Queue Mode 7 matrix updates via write-twice UPQ_REG pokes (same mechanism as scroll latches).
@@ -196,9 +267,7 @@ int main(void) {
   display_init(&screen);         // boot bracket: snes_ppu_reset_blank() + NMI + BGMODE_1
   mandel_layer_init(&layer);
   display_add(&screen, (Drawable *)&layer);
-  // reserve() ran above: BGMODE_7 set, grid computed, corpus_result=0x204F, VRAM loaded.
-
-  // Steady-state display: first display_frame() releases force-blank.
+  // reserve() painted the animated loading field; refinement begins on the first visible frame.
   for (;;)
     display_frame(&screen);    // scene_emit → _mandel_emit (1 virtual call/frame) → upq_flush
 }

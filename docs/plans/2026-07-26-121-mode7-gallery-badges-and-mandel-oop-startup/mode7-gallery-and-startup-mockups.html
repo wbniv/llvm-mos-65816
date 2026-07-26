@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode 7 gallery badges and Mandelbrot startup</title>
+<style>
+:root{color-scheme:dark;--bg:#090d0f;--panel:#11181a;--line:#304347;--ink:#edf6f4;--muted:#8fa4a2;--cyan:#6de7e2;--mint:#65e6a4;--gold:#ffd166}
+*{box-sizing:border-box}body{margin:0;padding:32px;color:var(--ink);background:radial-gradient(circle at 15% -10%,#183346,transparent 34%),var(--bg);font:14px/1.5 ui-monospace,monospace}
+header,main{width:min(1120px,100%);margin:auto}h1{margin:0 0 8px;font:750 clamp(27px,4.8vw,52px)/1 system-ui;letter-spacing:-.045em}h2{margin:0 0 16px;font:700 18px system-ui}p{color:var(--muted);max-width:78ch}section{margin-top:36px;padding-top:28px;border-top:1px solid var(--line)}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#12191b;box-shadow:0 18px 42px #0005}.card.indri{background:linear-gradient(145deg,#181d20,#111719)}
+.thumb{position:relative;aspect-ratio:8/7;overflow:hidden;background:#000}.scene{position:absolute;inset:0;background:radial-gradient(ellipse at 48% 50%,transparent 0 11%,#153352 12% 18%,transparent 19%),radial-gradient(ellipse at 49% 51%,#0d0b20 0 23%,#e86543 24%,#ecbd45 29%,#16879a 43%,#07111c 69%)}.scene:after{content:"";position:absolute;inset:0;opacity:.3;background:repeating-linear-gradient(0deg,transparent 0 3px,#fff1 4px)}
+.badge7{position:absolute;z-index:4;top:7px;left:7px;width:27px;height:27px;display:grid;place-items:center;border:1px solid #8df9f1;border-radius:6px;background:#102b3add;color:var(--cyan);font:800 17px/1 system-ui;box-shadow:0 2px 10px #0009}.bug{position:absolute;z-index:4;top:7px;right:7px;padding:3px 7px;border-radius:5px;color:#111;background:var(--gold);font:700 9px/1.2 ui-monospace;text-transform:uppercase}.play{position:absolute;inset:0;display:grid;place-items:center;color:white;font-size:32px;background:#0002;opacity:.72}
+.body{padding:12px 13px 14px}.title{margin:0 0 4px;font:700 14px system-ui}.keys{margin:0;color:var(--muted);font-size:10px}.no7 .badge7{display:none}.annotation{font-size:11px}
+.story{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.beat{min-width:0}.screen{position:relative;aspect-ratio:8/7;overflow:hidden;border:1px solid #3a4b50;background:#020507;box-shadow:0 12px 28px #0007}.label{margin:9px 0 0;color:var(--muted);font-size:10px;line-height:1.35}.label b{display:block;color:var(--ink);font-size:11px}
+.title-screen{display:grid;place-items:center;background:radial-gradient(circle,#132a4b,#03060d 68%)}.word{text-align:center;color:white;font:800 clamp(8px,1.2vw,14px)/1.7 system-ui;text-shadow:3px 3px #123;letter-spacing:.08em}.word small{display:block;color:#77e4de;font-size:.7em}.exit .word{transform:rotate(31deg) scale(.42);opacity:.65}
+.loader{background:repeating-conic-gradient(from 0deg at 50% 50%,#10263e 0 12deg,#09131e 12deg 24deg)}.loader:before{content:"";position:absolute;width:62%;aspect-ratio:1;left:19%;top:14%;border:7px solid var(--mint);border-left-color:transparent;border-radius:50%;animation:spin 1.4s linear infinite;opacity:.82}.loader:after{content:"CALCULATING";position:absolute;left:0;right:0;bottom:12%;text-align:center;color:#a9fff0;font:700 clamp(6px,.9vw,10px)/1 ui-monospace;letter-spacing:.12em;animation:pulse .8s ease-in-out infinite alternate}
+.coarse{background:repeating-conic-gradient(from 15deg at 50% 50%,#10263e 0 10deg,#07101a 10deg 20deg)}.pixels{position:absolute;inset:13% 9%;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(7,1fr);gap:1px}.pixels i{background:#18354b}.pixels i:nth-child(3n){background:#e66d46}.pixels i:nth-child(5n){background:#e9bf51}.pixels i:nth-child(n+35){opacity:.18}.progress{position:absolute;left:8%;right:8%;bottom:6%;height:4px;background:#21343b}.progress:after{content:"";display:block;width:61%;height:100%;background:var(--mint)}
+.final{background:radial-gradient(ellipse at 48% 50%,#03050a 0 9%,#19324d 10% 17%,#f5bf3f 18% 22%,#e65e47 23% 29%,#1d99a5 30% 42%,#071321 58%)}.final:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 25%,#d85c42 0 1%,transparent 2%),radial-gradient(circle at 76% 69%,#efc648 0 1%,transparent 2%);background-size:17px 19px,23px 21px}
+.controls{display:flex;align-items:center;gap:10px;margin-top:18px;color:var(--muted);font-size:11px}button{color:var(--ink);background:#152327;border:1px solid #3c5558;border-radius:6px;padding:7px 11px;cursor:pointer;font:inherit}.paused .loader:before,.paused .loader:after{animation-play-state:paused}@keyframes spin{to{transform:rotate(1turn)}}@keyframes pulse{to{opacity:.35}}
+@media(max-width:780px){body{padding:20px}.cards{grid-template-columns:1fr 1fr}.story{grid-template-columns:1fr 1fr}.beat:last-child{grid-column:1/-1;max-width:50%}}@media(max-width:480px){.cards{grid-template-columns:1fr}.beat:last-child{max-width:none}}
+</style>
+</head>
+<body>
+<header><h1>Mode 7, made visible</h1><p>The badge identifies real Mode 7 displays. The storyboard removes the post-title black hole: motion appears on the first handoff frame and remains alive while the Mandelbrot replaces it.</p></header>
+<main>
+<section><h2>Gallery card badge</h2><div class="cards">
+<article class="card"><div class="thumb"><div class="scene"></div><span class="badge7" aria-label="Mode 7 display">7</span><span class="play">▶</span></div><div class="body"><h3 class="title">Mode 7 Mandelbrot (OOP)</h3><p class="keys">Animated build, coarse-to-fine reveal</p></div></article>
+<article class="card indri"><div class="thumb"><div class="scene"></div><span class="badge7" aria-label="Mode 7 display">7</span><span class="bug">bug found</span><span class="play">▶</span></div><div class="body"><h3 class="title">Mode 7 + bug badge</h3><p class="keys">Opposite corners; play remains centered</p></div></article>
+<article class="card no7"><div class="thumb"><div class="scene" style="filter:grayscale(1)"></div><span class="badge7">7</span><span class="play">▶</span></div><div class="body"><h3 class="title">Ordinary BG demo</h3><p class="keys">No badge—graphics alone do not imply Mode 7</p></div></article>
+</div><p class="annotation">Reference placement: `7` top-left, compiler provenance top-right, play affordance centered.</p></section>
+<section><h2><code>mandel-oop</code> startup storyboard</h2><div class="story">
+<div class="beat"><div class="screen title-screen"><div class="word"><small>OOP DRAWABLE</small>MANDELBROT</div></div><p class="label"><b>1 · Title hold</b>Readable at rest.</p></div>
+<div class="beat"><div class="screen title-screen exit"><div class="word"><small>OOP DRAWABLE</small>MANDELBROT</div></div><p class="label"><b>2 · Full exit</b>Spin, shrink, fade.</p></div>
+<div class="beat"><div class="screen loader"></div><p class="label"><b>3 · Immediate feedback</b>First post-title frame. Never black.</p></div>
+<div class="beat"><div class="screen coarse"><div class="pixels" id="pixels"></div><div class="progress"></div></div><p class="label"><b>4 · Progressive reveal</b>8×7 → 16×14 → 32×28 → 64×56.</p></div>
+<div class="beat"><div class="screen final"></div><p class="label"><b>5 · Ready</b>Final spin, zoom breathe, palette cycle.</p></div>
+</div><div class="controls"><button id="toggle">Pause animation</button><span>Only loading motion loops; the sequence order is fixed.</span></div></section>
+</main>
+<script>
+document.querySelector("#pixels").innerHTML="<i></i>".repeat(56);
+document.querySelector("#toggle").addEventListener("click",e=>{const p=document.body.classList.toggle("paused");e.currentTarget.textContent=p?"Play animation":"Pause animation"});
+</script>
+</body>
+</html>

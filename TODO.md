@@ -1547,4 +1547,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fp:12194fba501ac4d3 -->
 - [verify] **2026-07-26-mode7-title-screen-sweep** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-mode7-title-screen-sweep.md](docs/plans/2026-07-26-mode7-title-screen-sweep.md)_  <!-- fp:a9d784778faac766 -->
 - [verify] **2026-07-26-119-snes-lzss-gallery-carousel** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-119-snes-lzss-gallery-carousel.md](docs/plans/2026-07-26-119-snes-lzss-gallery-carousel.md)_  <!-- fp:4cbe095fb40c04d9 -->
+- [verify] **2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:54bd1a8792430f47 -->
+- [verify] **2026-07-26-123-mode7-gallery-filter** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-123-mode7-gallery-filter.md](docs/plans/2026-07-26-123-mode7-gallery-filter.md)_  <!-- fp:ff1ea8788102f1d7 -->
 <!-- END auto-captured-deferrals -->

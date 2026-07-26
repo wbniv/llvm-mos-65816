@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>indri.studio Mode 7 filter mockups</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101016;color:#ece9f4;font:14px/1.5 Inter,system-ui,sans-serif}.wrap{max-width:1120px;margin:auto;padding:34px 18px 64px}h1{font:700 clamp(25px,4vw,38px)/1.1 system-ui;margin:0 0 8px;letter-spacing:-.02em}.lede{color:#b9b4c6;margin:0 0 28px;max-width:680px}.states{display:grid;grid-template-columns:1fr 1fr;gap:20px}.panel{padding:20px;border:1px solid #393343;border-radius:14px;background:linear-gradient(145deg,rgba(43,38,51,.9),rgba(25,23,31,.96));box-shadow:0 16px 45px #05050766}.state{font:700 10px/1.2 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:#b9a9d2;margin-bottom:15px}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}.chip,.mode{min-height:40px;border:1px solid #50475d;border-radius:7px;background:#26222d;color:#c7c0cf;padding:8px 12px;font:700 11px ui-monospace,monospace;letter-spacing:.04em}.chip.on{border-color:#c8a7ff;background:#382d49;color:#f1e8ff}.filterline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px}.mode{display:flex;align-items:center;gap:8px}.mode.on{border-color:#8ef6e1;background:#153d39;color:#bafff2;box-shadow:inset 3px 0 #8ef6e1}.seven{display:grid;place-items:center;width:24px;height:24px;border:1px solid #8ef6e1;border-radius:5px;background:#081820;color:#8ef6e1;font:800 14px/1 ui-monospace,monospace}.count{color:#aaa3b4;font:12px ui-monospace,monospace}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.card{border:1px solid #423b4d;border-radius:9px;overflow:hidden;background:#201d26}.shot{position:relative;aspect-ratio:8/7;background:radial-gradient(circle at 55% 45%,#52d7be 0 8%,#177c91 9% 25%,#292546 26% 48%,#090a12 49%);image-rendering:pixelated}.badge{position:absolute;left:7px;top:7px}.body{padding:9px}.title{font-weight:700;font-size:12px}.keys{font:9px/1.35 ui-monospace,monospace;color:#a9a1b2;margin-top:4px}.empty{display:grid;place-items:center;min-height:170px;border:1px dashed #51485e;border-radius:9px;color:#bdb5c8;text-align:center;padding:20px}.phone{max-width:320px;margin:auto}.phone .cards{grid-template-columns:1fr 1fr}.phone .count{width:100%}.annotation{margin-top:14px;padding:9px 11px;border-left:3px solid #c8a7ff;background:#251f30;color:#cfc3dc;font-size:12px}@media(max-width:760px){.states{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+  <h1>indri.studio · Mode 7 filter</h1>
+  <p class="lede">Dedicated interaction states for the card grid. Category chips and the Mode 7 toggle remain independent.</p>
+  <main class="states">
+    <section class="panel">
+      <div class="state">01 · default / inactive</div>
+      <div class="chips"><button class="chip on">All</button><button class="chip">Fractals</button><button class="chip">Rendering</button><button class="chip">Classics</button></div>
+      <div class="filterline"><button class="mode" aria-pressed="false"><span class="seven">7</span>Mode 7</button><span class="count">113 demos</span></div>
+      <div class="cards"><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">Mode 7 Mandelbrot</div><div class="keys">reveals, spins and zooms</div></div></article><article class="card"><div class="shot"></div><div class="body"><div class="title">Burning Ship</div><div class="keys">self-running</div></div></article><article class="card"><div class="shot"></div><div class="body"><div class="title">Space Invaders</div><div class="keys">press start</div></div></article></div>
+    </section>
+    <section class="panel">
+      <div class="state">02 · Mode 7 active / all categories</div>
+      <div class="chips"><button class="chip on">All</button><button class="chip">Fractals</button><button class="chip">Rendering</button><button class="chip">Classics</button></div>
+      <div class="filterline"><button class="mode on" aria-pressed="true"><span class="seven">7</span>Mode 7 ✓</button><span class="count">9 Mode 7 demos</span></div>
+      <div class="cards"><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">Mandelbrot OOP</div><div class="keys">animated build</div></div></article><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">Blossom</div><div class="keys">Mode 7 attractor</div></div></article><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">LZSS Gallery</div><div class="keys">ten artworks</div></div></article></div>
+      <div class="annotation">The active toggle is visibly selected and the count confirms the complete nine-demo set.</div>
+    </section>
+    <section class="panel">
+      <div class="state">03 · combined with Fractals</div>
+      <div class="chips"><button class="chip">All</button><button class="chip on">Fractals</button><button class="chip">Rendering</button><button class="chip">Classics</button></div>
+      <div class="filterline"><button class="mode on" aria-pressed="true"><span class="seven">7</span>Mode 7 ✓</button><span class="count">6 Mode 7 fractals</span></div>
+      <div class="cards"><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">Mandelbrot</div><div class="keys">fixed point</div></div></article><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">Mandelbrot OOP</div><div class="keys">Drawable interface</div></div></article><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">Julia</div><div class="keys">morphing set</div></div></article></div>
+      <div class="annotation">Selecting another category does not clear Mode 7; clearing Mode 7 does not clear Fractals.</div>
+    </section>
+    <section class="panel">
+      <div class="state">04 · combined filter / no matches</div>
+      <div class="chips"><button class="chip">All</button><button class="chip">Fractals</button><button class="chip">Rendering</button><button class="chip on">Classics</button></div>
+      <div class="filterline"><button class="mode on" aria-pressed="true"><span class="seven">7</span>Mode 7 ✓</button><span class="count">0 demos</span></div>
+      <div class="empty">No Mode 7 demos in this category.</div>
+    </section>
+    <section class="panel">
+      <div class="state">05 · narrow phone</div>
+      <div class="phone"><div class="chips"><button class="chip on">All</button><button class="chip">Fractals</button><button class="chip">Rendering</button></div><div class="filterline"><button class="mode on" aria-pressed="true"><span class="seven">7</span>Mode 7 ✓</button><span class="count">9 Mode 7 demos</span></div><div class="cards"><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">Avalanche</div></div></article><article class="card"><div class="shot"><span class="seven badge">7</span></div><div class="body"><div class="title">Buddhabrot</div></div></article></div></div>
+      <div class="annotation">The count wraps below the 44px control instead of compressing its touch target.</div>
+    </section>
+  </main>
+</div>
+</html>
