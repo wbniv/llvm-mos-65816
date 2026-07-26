@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f71ecd3) | docs(upstream): 0016 issue+PR bodies drafted; PRs link live SNES proof demos (standing rule) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+f71ecd3	author	Will Norris
+f71ecd3	added	16
+f71ecd3	deleted	1
+f71ecd3	files	1
+f71ecd3	body	User-directed: every PR body now links the playable biohack.net demo(s) that\nexercise its fix — the in-browser bsnes-jg pages re-run the WRAM self-check\nlive, so a maintainer can poke the 'soak-tested' claim in seconds. Campaign\nplan protocol gains the standing step + the full artifact->demo URL map\n(verified live; the four newest demos are top-level, not /snes/).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 9596038	author	Will Norris
 9596038	added	134
 9596038	deleted	0

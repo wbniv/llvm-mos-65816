@@ -33,7 +33,7 @@ same shape to the rest of the queue.
 | `0012-mos-ldcimm-set-lowering` | ✅ | |
 | `0015-321-coalesce-rc-undef` | ✅ | |
 | `0016-mos-scmp-ucmp-legalize` | ✅ | |
-| `0017-321-a16-s64-unmerge-anyext-legalize` | ❌ needs the fork's `0002` legalizer context — rides with the #321 series, as recorded | |
+| `0017-321-a16-s64-unmerge-anyext-legalize` | ❌ (irrelevant) | **Not a submission artifact at all** — it completes OUR OWN a16 legalizer glue, so it dissolves into the #321 series (already folded into `0002`); upstream only ever sees the finished feature. File kept as provenance. Same principle covers `0009`, `0014`, the zp-alloc Imag32 fix, and the xy16 REP/SEP fix (which always lived inside `0002`): **fixes to fork features fold into the feature patch — no introduce-then-fix sequences upstream.** |
 
 ## The waves, in posting order
 
