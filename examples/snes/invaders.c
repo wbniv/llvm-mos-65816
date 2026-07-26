@@ -147,11 +147,11 @@ int main(void) {
   static Game g;
   game_init(&g);
   /* Title on BG2 (OBJ chr lives at 0x4000.., the default title regions 0x1000/0x5000 are free).
-     The immediate complete teardown restores the OBJ layer masked by title_begin and shuts down
-     title HDMA without delaying the deterministic attract gate. */
+     Finish the complete hold/fall/fade sequence before starting the game loop; title_end restores
+     the OBJ layer masked by title_begin and shuts down the title HDMA. */
   static TitleLayer title;
   title_begin16(&g.screen, &title, "SPACE INVADERS", "SPRITES + OAM");
-  title_end_now(&g.screen, &title);
+  title_end(&g.screen, &title, 60u);
   for (;;) {
     game_update(&g);
     render(&g.sim, &g.sprites);

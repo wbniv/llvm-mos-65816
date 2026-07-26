@@ -53,9 +53,10 @@ ADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$VMA )))
 echo "==> built default + a16; corpus_result @ WRAM $OFF"
 
 # Emulator frames to let the attract sim reach the latch point. The game runs ~1 sim step per loop
-# iteration, but a frame's render+update can span up to ~2 v-blanks, so allow 2x + margin.
+# iteration, but a frame's render+update can span up to ~2 v-blanks. The complete title fly-in,
+# hold, fall, and fade run before the simulation starts, so budget those intro frames as margin.
 FRAMES=$(awk '/#define INV_FRAMES/{print $3; exit}' "$ROOT/examples/snes/invaders_logic.h")
-SETTLE=$(( FRAMES * 2 + 200 )); SECS=$(( SETTLE / 40 + 5 ))
+SETTLE=$(( FRAMES * 2 + 600 )); SECS=$(( SETTLE / 40 + 5 ))
 rc=0
 
 # 3. MAME assert (default + a16) via smoke.lua.
