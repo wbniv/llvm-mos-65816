@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/806bb6d) | docs: #102 cpu6502 was already published; rebased ROM is byte-identical |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/febca90) | docs(plan): rebased stack now verified on bsnes-jg (3-way); MAME leg still open |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/7fd4a93) | docs: record rebase verification results + two findings from the rebuild |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/5ad343f) | patches+dev: rebase fork patch stack onto upstream tip; fix toolchain bootstrap |
 
 <!--history-meta v1
+806bb6d	author	Will Norris
+806bb6d	added	23
+806bb6d	deleted	1
+806bb6d	files	1
+806bb6d	body	The #102 plan's "Publish to biohack.net pending" note was stale. The page, ROM,\npreview and manifest selfcheck (off=0xADD len=2 want=0xAC8A frames=1000) were\nalready committed and deployed by biohack.net aff09db / tag v1.0.254 (the\nfull-screen-layout redesign). Verified live: /snes/cpu6502/ HTTP 200, ROM served\nat 32768 bytes. TODO corrected; nothing needed publishing.\n\nBest evidence from this pass: the ROM built by the REBASED toolchain is\nbyte-identical to the one built by the old toolchain now serving in production --\n\n  live deployed : c0df7cfd195ba8bb\n  site repo copy: c0df7cfd195ba8bb\n  fresh rebuild : c0df7cfd195ba8bb\n\nBit-for-bit reproducibility across the upstream bump constrains all 32768 bytes,\nnot just the 16-bit gate CRC, so it is a much stronger statement that the patch\nstack rebase preserved behaviour.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 febca90	author	Will Norris
 febca90	added	48
 febca90	deleted	22

@@ -245,3 +245,19 @@ constrains all 32768 bytes). Nothing needed publishing; TODO corrected instead.
   item 9 above).
 - Posting any new/updated upstream PRs (`0003`/`0008` are already posted+merged; nothing new to post
   from this work — it's fork-side bookkeeping).
+
+## Update 2026-07-26 — steady state reached; per-patch regen scripts retired
+
+Follow-on work (the zp-alloc Imag32 fix, [plan](2026-07-26-zp-alloc-imag32-csr-rename-fix.md)) ran
+`dev/regen-patch.sh`, which folded **`0016`/`0017` into `0002`** — both are MOS-dir-only, so this is
+the documented steady state, and `dev/toolchain.sh`'s bootstrap list shrank to
+**`0001 → 0002 → 0006`(non-MOS-dir hunks)** — verified to apply cleanly to pristine `8be054612`.
+`0016`/`0017`'s files remain on disk as frozen upstream-PR artifacts, exactly like `0004`–`0015`.
+
+The item-9 follow-up (the 11 per-patch `dev/regen-patch-000N.sh` scripts hardcoding deleted
+`0003`/`0008`) is **resolved by retirement**, not repair: under the two-tier model, per-patch
+regeneration from the live tree is impossible *by construction* — the live tree is the sum of all
+patches, so the additive baselines those scripts build (pristine + `0001` + narrow-`0002` + …) no
+longer exist, independent of the `0003`/`0008` references. Each script now fails loudly (`exit 2`)
+with a header explaining why and what to do instead (`-h` still prints usage); the bodies are kept
+as method documentation for posting-time rebases of the standalone artifacts.

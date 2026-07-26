@@ -1,6 +1,16 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-07-25 (**PR #562 and PR #563 both MERGED upstream** — discovered while doing a
+**Last updated:** 2026-07-26 (**standalone patch files `0004`–`0017` are now FROZEN posting artifacts.**
+The `dev/regen-patch.sh` run for the zp-alloc Imag32 fix folded the MOS-dir-only `0016`/`0017` into the
+comprehensive `0002` (build stack now `0001 → 0002 → 0006`-generic-hunks; see the
+[rebase plan §Update 2026-07-26](plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md)). The
+standalone files still on disk — `0004`–`0007`, `0009`–`0017` — are the individually-reviewable
+upstream-PR artifacts referenced by the rows below, but they are no longer regenerable from the live
+tree: the 10 per-patch `dev/regen-patch-000N.sh` scripts are **retired** (loud `exit 2` + explanatory
+header) because their additive baselines no longer exist. To refresh an artifact at posting time,
+rebase the patch file itself against the then-current upstream base by hand. Note their recorded
+"applies cleanly against pristine `c798c3141`" claims are stale — the base has moved past `8be054612`.)
+Previously 2026-07-25 (**PR #562 and PR #563 both MERGED upstream** — discovered while doing a
 from-scratch `dev/run.sh toolchain` build (publishing SNES demo `#102 cpu6502`), which surfaced that
 `0003-late-opt-txy-dead-flag.patch` and `0008-mos-dp-arg-cc.patch` no longer `git apply` because their
 fixes are already present in `llvm-mos/main`: **PR #562** ("F4" TYX/TXY dead-flag fix) merged as commit
