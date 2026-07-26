@@ -181,7 +181,16 @@ Optional fork hygiene at the same time (user-triggered): fast-forward `wbniv/llv
       no-outward-actions guardrail — so it rides the user trigger. Demo links (crcwall/lfsr2/
       bitweave/uarteye) added to the PR body doc + verified 200. Post commands atop
       [`docs/upstream-coalesce-rotate-ac-pr.md`](../upstream-coalesce-rotate-ac-pr.md).
-- [ ] **USER: post Wave 1 item 2** — push the minted branch, then `gh pr create` (commands atop the
-      body doc).
-- [ ] **USER: post Wave 1 item 3** — DWARF PR, postable as-is (command in status doc §5; cherry-pick
-      re-verified clean onto `8b616af94`).
+- [x] ~~**USER: post Wave 1 item 2** — push the minted branch, then `gh pr create` (commands atop the
+      body doc).~~ **DONE 2026-07-26** (user: "finish wave 1; post items 2 and 3") — branch pushed,
+      posted as [PR #578](https://github.com/llvm-mos/llvm-mos/pull/578).
+- [x] ~~**USER: post Wave 1 item 3** — DWARF PR, postable as-is (command in status doc §5; cherry-pick
+      re-verified clean onto `8b616af94`).~~ **DONE 2026-07-26** — posted as
+      [PR #579](https://github.com/llvm-mos/llvm-mos/pull/579); body assembled from the drafted note
+      (status block/metadata/Title/Posting sections stripped, test-half lead paragraph added).
+
+**🏁 WAVE 1 COMPLETE (2026-07-26):** issue [#576](https://github.com/llvm-mos/llvm-mos/issues/576) +
+PRs [#577](https://github.com/llvm-mos/llvm-mos/pull/577) /
+[#578](https://github.com/llvm-mos/llvm-mos/pull/578) /
+[#579](https://github.com/llvm-mos/llvm-mos/pull/579) all live upstream. Next: **Wave 2** (the three
+issues — reentrant soft-stack, rc-undef-ra-pure-virtual, llvm-mos-sdk setjmp) — user-triggered.

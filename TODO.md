@@ -661,16 +661,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
 — keep it in sync (drafted → ready-to-post → posted) with the items in this section._
 
-- [wip] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — Wave 1 item 1
-  POSTED 2026-07-26).** ✅ **`0016` G_SCMP/G_UCMP is live upstream: issue
+- [wip] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — 🏁 WAVE 1
+  COMPLETE 2026-07-26).** ✅ **All three Wave-1 items live upstream:** `0016` G_SCMP/G_UCMP = issue
   [#576](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
-  [#577](https://github.com/llvm-mos/llvm-mos/pull/577)** (`wbniv:mos-scmp-ucmp-legalize`, fix + lit
-  test, `Fixes #576`, live-demo links in body) — posted after the user authed `gh` (as wbniv).
+  [#577](https://github.com/llvm-mos/llvm-mos/pull/577) (`wbniv:mos-scmp-ucmp-legalize`, fix + lit
+  test, `Fixes #576`); `0010` coalesce-rotate-Ac = PR
+  [#578](https://github.com/llvm-mos/llvm-mos/pull/578) (`wbniv:mos-coalesce-rotate-ac`,
+  red/green-proven, four live-demo links); DWARF step-6 = PR
+  [#579](https://github.com/llvm-mos/llvm-mos/pull/579) (`wbniv:mos-dwarf-65816-test-docs`).
   Momentum: **2 PRs already merged** (#562, #563 — our first two, landed essentially as submitted).
   Wave-ordered sequencing + per-item mechanics in
   [docs/plans/2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md):
-  **Wave 1** remaining (`0010` coalesce-rotate-Ac — body drafted, branch to mint; DWARF step-6 —
-  branch cherry-picks clean onto tip `8b616af94`, postable as-is), **Wave 2** issues
+  **Wave 2 next** — issues
   (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0012`/`0015` — user
   judgment: post with honest framing vs hold for #321), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).

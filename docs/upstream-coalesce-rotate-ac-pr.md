@@ -1,6 +1,8 @@
 # [MOS] Don't coalesce two rotate-referenced values into the A-only `Ac` class (silent miscompile)
 
-<!-- STAGED 2026-07-26 (campaign Wave 1, item 2): red/green proven on the pristine tip build
+<!-- POSTED 2026-07-26 as https://github.com/llvm-mos/llvm-mos/pull/578 (campaign Wave 1, item 2;
+     body below minus the H1 and this comment is the as-posted text).
+     Staging record: red/green proven on the pristine tip build
      (RED = lit FAIL on unfixed llc; GREEN = official llvm-lit PASS 100% after fix + rebuild).
      Branch mos-coalesce-rotate-ac minted locally in vendor/llvm-mos @ 18244924b3d3 (cut from
      8be054612, same base as 0016) — push blocked by permission layer, part of the user trigger.

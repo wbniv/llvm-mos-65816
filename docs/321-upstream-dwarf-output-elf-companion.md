@@ -1,6 +1,10 @@
 # Upstream doc note — `ld.lld` writes a `<output>.elf` DWARF companion beside a `FULL`/`TRIM` ROM
 
-> **Status: NOT filed.** Draft of the **"docs" half** of the ROADMAP-step-6 *test+docs* contribution to
+> **Status: POSTED 2026-07-26 as [PR #579](https://github.com/llvm-mos/llvm-mos/pull/579)**
+> (campaign Wave 1, item 3; branch `wbniv:mos-dwarf-65816-test-docs` @ `0ae9415`). The as-posted body
+> = the `## Summary` … `## Why this matters` sections below, prefaced by a test-half lead paragraph;
+> the status block, metadata table, `## Title`, and `## Posting` sections were stripped.
+> Originally: draft of the **"docs" half** of the ROADMAP-step-6 *test+docs* contribution to
 > upstream llvm-mos. The **"test" half** is the staged lit test
 > [`dev/lit/DebugInfo/MOS/dwarf-65816.ll`](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) (drops into
 > `llvm/test/DebugInfo/MOS/`). This note documents an **undocumented, surprising-but-correct** lld

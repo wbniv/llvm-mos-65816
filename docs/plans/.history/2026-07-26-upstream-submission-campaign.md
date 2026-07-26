@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/efe7ef4) | upstream(0010): staged — red/green proven, mos-coalesce-rotate-ac minted locally |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/ff79af7) | upstream(0016): POSTED — G_SCMP/G_UCMP legalization live as issue #576 + PR #577 |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/3b105d6) | docs(upstream): DWARF branch cherry-picks clean onto 8b616af94 — Wave 1 item 3 unblocked |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a460184) | docs(upstream): re-verify campaign against moved tip 8b616af94 (lld-only commit) |
@@ -10,6 +11,11 @@
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+efe7ef4	author	Will Norris
+efe7ef4	added	13
+efe7ef4	deleted	0
+efe7ef4	files	1
+efe7ef4	body	RED: coalesce-rotate-ac.mir FAILS on the unfixed pristine llc (COPY coalesced\naway). GREEN: official llvm-lit PASS 100% after applying 0010 + incremental\nrebuild (build/upstream-llc reused). Branch minted in vendor/llvm-mos @\n18244924b3d3 (cut from 8be054612, same base as 0016); upstream-src restored\nclean. Push blocked by the permission layer per the no-outward-actions\nguardrail — push + gh pr create are the user trigger (commands atop the PR\nbody doc, which now carries the four live-demo links, verified 200).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ff79af7	author	Will Norris
 ff79af7	added	6
 ff79af7	deleted	2
