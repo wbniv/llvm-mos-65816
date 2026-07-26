@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d055629) | docs(plan-index): add the zp-alloc Imag32 CSR-rename fix row (2bfe4f3) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f75e06a) | docs(todo+plan-index): file the far-read codegen bug; triage; index the plan |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a25b326) | docs(todo+plan-index): triage rebase-plan deferrals; add plan-index row |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/092210a) | docs(plan-index): add #110 borrowlad row (8915348) |
@@ -208,6 +209,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+d055629	author	Will Norris
+d055629	added	2
+d055629	deleted	0
+d055629	files	1
+d055629	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f75e06a	author	Will Norris
 f75e06a	added	2
 f75e06a	deleted	0
