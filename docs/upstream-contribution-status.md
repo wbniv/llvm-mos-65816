@@ -4,7 +4,8 @@
 `.debug_frame` GC, PR #567 — no MOS-backend files); all five Wave-1/3 patch artifacts
 (`0010`/`0011`/`0012`/`0015`/`0016`) re-verified `git apply --check` CLEAN against the new tip in a
 shared-object scratch clone. The new commit touches `lld/ELF/Writer.cpp`, one of the two files on the
-DWARF branch (`0ae9415`), so that cherry-pick needs a live conflict re-check before posting. All five
+DWARF branch (`0ae9415`) — re-checked live: **the cherry-pick auto-merges CLEAN onto `8b616af94`**
+(no conflict; DWARF PR postable as-is). All five
 `0016` demo links re-verified HTTP 200. `gh` still unauthenticated on this box — posting Wave 1 item 1
 is blocked on `gh auth login` only.**) Previously 2026-07-26 #2 (**SUBMISSION CAMPAIGN PLANNED — see
 [`docs/plans/2026-07-26-upstream-submission-campaign.md`](plans/2026-07-26-upstream-submission-campaign.md)**,

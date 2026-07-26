@@ -23,10 +23,11 @@ same shape to the rest of the queue.
 > (`0010`/`0011`/`0012`/`0015`/`0016`) still `git apply --check` CLEAN**; the `0016` branch
 > (`e54ef471d546`, MOSLegalizerInfo.cpp + new test only) has no file overlap with #567, so the PR
 > merges clean as-is, and the RED-proof claim ("reproduced on `8be054612`") remains accurate — #567
-> is lld-only, so `llc` behavior at the new tip is identical. **Caveat:** #567 modifies
-> `lld/ELF/Writer.cpp`, one of the two files on the DWARF branch (`0ae9415`) — re-check that
-> cherry-pick against `8b616af94` before posting Wave 1 item 3. All five `0016` demo links
-> re-verified HTTP 200. `gh` remains unauthenticated — Wave 1 item 1 is blocked on `gh auth login`.
+> is lld-only, so `llc` behavior at the new tip is identical. #567 modifies
+> `lld/ELF/Writer.cpp`, one of the two files on the DWARF branch (`0ae9415`) — **re-checked live:
+> the cherry-pick auto-merges CLEAN onto `8b616af94`** (Wave 1 item 3 postable as-is). All five
+> `0016` demo links re-verified HTTP 200. `gh` remains unauthenticated — Wave 1 item 1 is blocked
+> on `gh auth login`.
 
 ## Verified state (2026-07-26, via `git ls-remote` — `gh` unauthenticated on this box)
 

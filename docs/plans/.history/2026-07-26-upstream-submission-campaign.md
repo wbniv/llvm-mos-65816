@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a460184) | docs(upstream): re-verify campaign against moved tip 8b616af94 (lld-only commit) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/dc4be9a) | docs(campaign): canonicalize demo URLs to /snes/<slug>/; verify-at-posting rule |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/1ead2ab) | upstream(0016): red/green proven at tip, branch pushed, artifact gains the lit test |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d473127) | docs(upstream): 0017 is series content, not a postable artifact — state the fold principle |
@@ -7,6 +8,11 @@
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+a460184	author	Will Norris
+a460184	added	12
+a460184	deleted	0
+a460184	files	1
+a460184	body	Tip moved 8be054612 -> 8b616af94 (one commit: lld/ELF .debug_frame GC, #567,\nno MOS-backend files). All five Wave-1/3 artifacts (0010/0011/0012/0015/0016)\nre-verified git-apply-clean at the new tip; 0016 branch has no overlap with\n#567 so the staged PR merges clean. DWARF branch needs a cherry-pick re-check\n(#567 touches lld/ELF/Writer.cpp). Demo links re-verified 200. Posting still\nblocked on gh auth only.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 dc4be9a	author	Will Norris
 dc4be9a	added	8
 dc4be9a	deleted	5
