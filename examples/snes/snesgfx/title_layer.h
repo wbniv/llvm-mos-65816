@@ -45,7 +45,8 @@
  * and the channel's table pointer is re-pointed through the UploadQueue, which runs in v-blank.
  *
  * Animation timing (at 60 fps):
- *   Fly-in   ~1.9 s — both lines move simultaneously, TITLE_FLYIN_SHIFT=6
+ *   Fly-in   ~1.07 s — quadratic ease-out on ONE shared progress counter, so both lines
+ *                      decelerate into place and land on the SAME frame (TITLE_FLYIN_STEP=4)
  *   Hold     2 s    (TITLE_HOLD_FRAMES=120) — lines stationary, shimmer/rainbow continues
  *   Fall     ~0.75 s (≈45 frames) — constant acceleration TITLE_GRAVITY_Q4, one shared velocity so
  *                    the two lines keep their spacing and drop off the bottom as a unit
@@ -121,8 +122,13 @@
 /* Positions are Q4 fixed point (1/16 px) so gravity can accelerate sub-pixel. */
 #define TITLE_Q4(px)     ((int16_t)((int16_t)(px) * 16))
 
-/* Animation parameters */
-#define TITLE_FLYIN_SHIFT    6    /* fly-in decay shift — ~1.9 s at 60 fps, matches the old feel  */
+/* Animation parameters.
+   The fly-in is a quadratic ease-out driven by ONE shared progress counter: both lines start and
+   finish on the same frame whatever distance each has to cover, so they genuinely meet. (Stepping
+   each line by its own remaining distance does not — line0 travels 104 px and line1 112, so at a
+   flat 1 px/frame they arrived 8 frames apart.) TITLE_FLYIN_STEP is progress per frame out of 255:
+   4 → 64 frames ≈ 1.07 s, 2 → 128 frames, 8 → 32 frames. */
+#define TITLE_FLYIN_STEP     4
 #define TITLE_GRAVITY_Q4     2    /* fall acceleration, Q4 px/frame² — 128 px in ≈45 frames       */
 #define TITLE_FALL_MAX     90u    /* safety cap on the fall loop (frames)                         */
 #define TITLE_HOLD_FRAMES  120    /* 2 s hold at 60 fps                                           */
@@ -150,6 +156,7 @@ typedef struct {
   int16_t     y0_q4;     /* line0 top scanline                                              */
   int16_t     y1_q4;     /* line1 top scanline                                              */
   int16_t     vel_q4;    /* shared fall velocity (both lines, so spacing is preserved)       */
+  uint8_t     prog;      /* fly-in progress 0..255, shared so both lines land together       */
   int16_t     hofs0;     /* line0's sub-tile horizontal centring nudge                       */
   uint8_t     phase;     /* animation clock for ink shimmer + rainbow backdrop               */
   uint8_t     active;    /* 1 = emit() is live; 0 = no-op                                   */
@@ -369,17 +376,16 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
 
 /* ── emit ─────────────────────────────────────────────────────────────────────────────────────── */
 
-/* One fly-in step toward `target`: exponential decay with a 1 px floor, so the line always makes
-   progress and lands exactly on target. */
-static int16_t _title_ease(int16_t cur, int16_t target) {
-  int16_t rem = (int16_t)(target - cur);
-  if (rem == 0) return cur;
-  int16_t mag  = rem < 0 ? (int16_t)-rem : rem;
-  int16_t step = (int16_t)((mag >> 4) >> TITLE_FLYIN_SHIFT);   /* px */
-  if (step < 1) step = 1;
-  step = (int16_t)(step << 4);                                 /* → Q4 */
-  if (step > mag) step = mag;
-  return rem < 0 ? (int16_t)(cur - step) : (int16_t)(cur + step);
+/* Position along the fly-in for progress `p` (0..255): a quadratic ease-out, moving fastest at the
+   start and settling gently onto `target`. frac = 256 − ((255−p)²>>8) stays inside 16 bits at every
+   step — (255−p)² ≤ 65025, and |target−start| ≤ 112 px so delta·frac ≤ 28,672 — which keeps the
+   whole curve in int16 with no 32-bit multiply on the 65816.
+   At p = 255 frac is exactly 256, so the line lands ON the target rather than near it. */
+static int16_t _title_flyin_pos(uint8_t p, int16_t start, int16_t target) {
+  uint16_t inv  = (uint16_t)(255u - p);
+  uint16_t frac = (uint16_t)(256u - (uint16_t)((inv * inv) >> 8));
+  int16_t  d    = (int16_t)(target - start);
+  return (int16_t)(start + (int16_t)((int16_t)(d * (int16_t)frac) >> 8));
 }
 
 static void _title_emit(Drawable *d, UploadQueue *q) {
@@ -389,9 +395,12 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
   if (t->flyin) {
     /* Both lines move simultaneously and meet in the middle: line0 descends from above the top
        edge, the 16×16 block rises from below the bottom edge, each to its own tilemap y (so both
-       scroll values land on 0 at rest). A wrapped line1 rises as one 32 px block. */
-    t->y0_q4 = _title_ease(t->y0_q4, (int16_t)(t->ty0 * 16));
-    t->y1_q4 = _title_ease(t->y1_q4, (int16_t)(t->ty1 * 16));
+       scroll values land on 0 at rest). A wrapped line1 rises as one 32 px block.
+       One progress counter drives both, so they decelerate together and arrive on the same frame. */
+    if ((uint16_t)t->prog + TITLE_FLYIN_STEP >= 255u) t->prog = 255u;
+    else                                              t->prog = (uint8_t)(t->prog + TITLE_FLYIN_STEP);
+    t->y0_q4 = (int16_t)(_title_flyin_pos(t->prog, TITLE_Y0_START, t->ty0) * 16);
+    t->y1_q4 = (int16_t)(_title_flyin_pos(t->prog, TITLE_Y1_START, t->ty1) * 16);
   } else if (t->falling) {
     /* Gravity: one shared velocity, so the pair keeps its 16 px spacing and drops off the bottom
        looking like a single falling object. Clamp well past the bottom edge so nothing wraps. */
@@ -442,7 +451,7 @@ static inline void title_init(TitleLayer *t, const char *line0, const char *line
  * Returns when both lines are at rest. */
 static inline void title_begin(Display *d, TitleLayer *t, const char *line0, const char *line1) {
   title_init(t, line0, line1);
-  t->phase = 0; t->active = 1; t->falling = 0; t->exiting = 0; t->flyin = 0;
+  t->phase = 0; t->active = 1; t->falling = 0; t->exiting = 0; t->flyin = 0; t->prog = 0;
   t->ink = (uint16_t)SNES_RGB(31, 31, 31); t->back = 0u;
 
   uint8_t demo_tm = d->tm;            /* save demo drawables' TM bits before title is added */
@@ -454,9 +463,7 @@ static inline void title_begin(Display *d, TitleLayer *t, const char *line0, con
   d->bright = 0;
   display_fade(d, INIDISP_ON);        /* fade in with both lines still off-screen */
   t->flyin = 1;
-  for (uint8_t g = 0;
-       (t->y0_q4 != (int16_t)(t->ty0 * 16) || t->y1_q4 != (int16_t)(t->ty1 * 16)) && g < 200u;
-       g++)
+  for (uint8_t g = 0; t->prog < 255u && g < 200u; g++)
     display_frame(d);
   t->flyin = 0;   /* at rest; clear so title_end's fall branch is reachable */
 }
