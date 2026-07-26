@@ -1499,6 +1499,15 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fp:040872b597cf6793 -->
 <!-- triaged 2026-07-01: title-screen-counter-slide verified — hilbert/rdiff/avalanche/sort-race/fft gates all PASS, -verify clean; visual animation behavior gate-neutral. fp:b133881a09190800 -->
 <!-- triaged 2026-07-01: gallery categories plan — verified in-session: task build clean (79 pages), 10 cat-shelf sections confirmed in HTML, 74 cards confirmed, hilbert chip confirmed with href /snes/#cat-motion. fp:933d48bc3dd6368a -->
-- [ ] **(triage)** Regenerating `0004`–`0015`'s individual patches against the new pristine base (flagged as follow-up, — _from [2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md)_  <!-- fp:adb7cd38a491445a -->
-- [ ] **(triage)** Posting any new/updated upstream PRs (`0003`/`0008` are already posted+merged; nothing new to post — _from [2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md)_  <!-- fp:dcffbc00e6a08c58 -->
+<!-- triaged 2026-07-26: both rebase-plan "Out of scope" captures dispositioned; nothing open here.
+     • "Regenerating 0004-0015's individual patches against the new pristine base" -> the plan's own
+       Out-of-scope, and its actionable half is ALREADY a curated Open item under Test Bench / CI
+       ("Fix dev/regen-patch-000N.sh scripts that hardcode now-deleted 0003/0008 applies"). The other
+       half (their "clean git apply --check vs pristine" claims are stale now the base moved past
+       8be054612) only matters when those patches are actually posted upstream — recorded in the plan,
+       and it rides with the posting, which is user-triggered.
+     • "Posting any new/updated upstream PRs" -> explicitly NOT work: 0003/0008 are already posted AND
+       merged (PR #562/#563); this rebase is fork-side bookkeeping that produces no new postable
+       artifact. Posting remains user-triggered per standing policy.
+     fp:adb7cd38a491445a fp:dcffbc00e6a08c58 -->
 <!-- END auto-captured-deferrals -->

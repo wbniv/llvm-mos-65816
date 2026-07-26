@@ -1,5 +1,33 @@
 | Date | Change |
 |------|--------|
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/092210a) | docs(plan-index): add #110 borrowlad row (8915348) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/61d625f) | docs(plan-index): add #109 pcooker row (bb58a0a) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/69962c4) | docs(plan-index): add #108 uarteye row (8b93bc3) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/43e5c92) | docs(plan-index): add #107 bitweave row (303a25c) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/1266212) | docs(plan-index): add #106 lfsr2 row (bf6ba8c) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/158c2cb) | docs(plan-index): add #104 modexp256 row (fc8ea58) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/e7061ce) | docs(plan-index): add #103 oddmask row (ac8cb1d) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/3d942b9) | docs(plan-index): add #100 keycmp64 row (00b98f1) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/5a98cd9) | docs(plan-index): add #99 trimerge row (3148b89) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/d4bb34e) | docs(plan-index): add #98 ucmprank row (b69d3d1) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/bd2d204) | docs(plan-index): add #96 ropeedit row (3864d44) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/b50b058) | docs(plan-index): add #95 permscat row (f1c6ac5) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/62464ca) | docs(plan-index): add #94 rotslab row (3d0691e) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/7e26470) | docs(plan-index): add #105 crcwall row (419830d) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/d917fdb) | docs(plan-index): add #97 spaceship row (f9ce73a) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/7ce9b0a) | docs(plan-index): add #93 ovmove row (b7e8281) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/9be0141) | docs: cross-link the setjmp fix-analysis report + index the fix plan |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/0c740cc) | docs(plan-index): add #101 mulov64 row (c0a35bf) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/889898e) | feat(snes/plyoracle): #92 PlyOracle (Round 5, final pick, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/2717999) | feat(snes/matcascade): #91 Matrix Cascade (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3d8281a) | feat(snes/scopeguard): #90 Scope-Guard Ripple Tank (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/98178d1) | feat(snes/adpcm): #89 ADPCM Waverider (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/d6ddf07) | feat(snes/dctbloom): #88 DCT Bloom (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/abf28e4) | feat(snes/sobel): #87 Sobelscope (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/bba77cf) | feat(snes/rangecode): #86 Range Coder (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a6c9ffd) | feat(snes/ulam): #85 Ulam Prime Sieve (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3e72658) | feat(snes/montorbit): #84 Montgomery Orbit (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3ab0a2b) | docs(plan-index): add #83 truncstair row (ZP-alloc miscompile, Compiler-bug) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/478ec59) | feat(snes/speedcap): #82 Fmin/Fmax Speed Cap (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/23e4f27) | feat(snes/compass): #81 Copysign Compass (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5ca866d) | feat(snes/mvscrl): #79 Memmove Scroll Slabs (Round 5, compiler stress-test) |
@@ -178,6 +206,146 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+092210a	author	Will Norris
+092210a	added	1
+092210a	deleted	0
+092210a	files	1
+092210a	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+61d625f	author	Will Norris
+61d625f	added	1
+61d625f	deleted	0
+61d625f	files	1
+61d625f	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+69962c4	author	Will Norris
+69962c4	added	1
+69962c4	deleted	0
+69962c4	files	1
+69962c4	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+43e5c92	author	Will Norris
+43e5c92	added	1
+43e5c92	deleted	0
+43e5c92	files	1
+43e5c92	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+1266212	author	Will Norris
+1266212	added	1
+1266212	deleted	0
+1266212	files	1
+1266212	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+158c2cb	author	Will Norris
+158c2cb	added	1
+158c2cb	deleted	0
+158c2cb	files	1
+158c2cb	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+e7061ce	author	Will Norris
+e7061ce	added	1
+e7061ce	deleted	0
+e7061ce	files	1
+e7061ce	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3d942b9	author	Will Norris
+3d942b9	added	1
+3d942b9	deleted	0
+3d942b9	files	1
+3d942b9	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+5a98cd9	author	Will Norris
+5a98cd9	added	1
+5a98cd9	deleted	0
+5a98cd9	files	1
+5a98cd9	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+d4bb34e	author	Will Norris
+d4bb34e	added	1
+d4bb34e	deleted	0
+d4bb34e	files	1
+d4bb34e	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+bd2d204	author	Will Norris
+bd2d204	added	1
+bd2d204	deleted	0
+bd2d204	files	1
+bd2d204	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+b50b058	author	Will Norris
+b50b058	added	1
+b50b058	deleted	0
+b50b058	files	1
+b50b058	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+62464ca	author	Will Norris
+62464ca	added	1
+62464ca	deleted	0
+62464ca	files	1
+62464ca	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+7e26470	author	Will Norris
+7e26470	added	1
+7e26470	deleted	0
+7e26470	files	1
+7e26470	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+d917fdb	author	Will Norris
+d917fdb	added	1
+d917fdb	deleted	0
+d917fdb	files	1
+d917fdb	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+7ce9b0a	author	Will Norris
+7ce9b0a	added	1
+7ce9b0a	deleted	0
+7ce9b0a	files	1
+7ce9b0a	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+9be0141	author	Will Norris
+9be0141	added	1
+9be0141	deleted	0
+9be0141	files	1
+9be0141	body	Wire the new 2026-07-02 analysis report into the connected doc set and add\nthe fix plan to the plan-index:\n- fix plan: add an "Analysis report" reference line\n- root-cause investigation: link the analysis report from the Verification note\n- upstream-contribution-status §9: cite the analysis report for the PR narrative\n- plan-index: add the #35 setjmp fix-plan row (commit 04a8495, Platform)\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+0c740cc	author	Will Norris
+0c740cc	added	1
+0c740cc	deleted	0
+0c740cc	files	1
+0c740cc	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+889898e	author	Will Norris
+889898e	added	1
+889898e	deleted	0
+889898e	files	1
+889898e	body	Negamax + alpha-beta tic-tac-toe: negate-on-return (G_SUB 0,x) + running\nG_SMAX + alpha-beta cutoff prune CFG — the alternating-sign minimax recursion\nshape #17/#18 never form. Animated 3x3 AI self-play. PO_MAXD=3 depth cap keeps\nthe full-width tree in the 500-frame budget (standard game-AI bound; the\nrecursion/negate/max/prune shape is fully present). gate 0x6146; 5-way green.\nNo compiler bug. Completes the Round-5 stress-test battery (#74-#92).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+2717999	author	Will Norris
+2717999	added	1
+2717999	deleted	0
+2717999	files	1
+2717999	body	sret hidden-pointer struct-return ABI: mat2 (8 bytes, over the\ngetNaturalAlignIndirect threshold MOS.cpp:88) returned by value from chained\nmat_mul (each a __mulsi3 MAC). Distinct from #26 boids (vec2 32-bit\nregister-pair return, not sret). Spinning wireframe lattice.\n__mulsi3=8, mat_mul-sret call sites=293, rep/sep=57; gate 0x8064; 5-way green.\nNo compiler bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3d8281a	author	Will Norris
+3d8281a	added	1
+3d8281a	deleted	0
+3d8281a	files	1
+3d8281a	body	__attribute__((cleanup(fn))) compiler-synthesized scope-exit calls\n(CGDecl.cpp:2254): guarded locals fire their cleanup at every scope exit\n(fall-through/return/break/nested-block) in reverse declaration order. First\nbattery demo using the cleanup attribute. sg_guard is noinline to keep the\nrealistic cleanup-CALL shape visible (the differential passed inlined too).\nFixed-point ripple-tank visual + cleanup-count HUD.\ncleanup-calls=31, rep/sep=23; gate 0x05A3; 5-way green. No compiler bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+98178d1	author	Will Norris
+98178d1	added	1
+98178d1	deleted	0
+98178d1	files	1
+98178d1	body	IMA-ADPCM decoder — saturating predictor (G_SADDSAT/G_SSUBSAT via\n__builtin_elementwise_add_sat/_sub_sat) in a serial feedback loop + step-index\nLUT walk. Host gcc uses a bit-identical manual clamp; target uses intrinsics.\nDistinct from #48 IIR (wrapping) / #67 huffman (no feedback). Scrolling scope.\nrep/sep=39, clamp-branches=20; gate 0xCA56; 5-way green. No compiler bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+d6ddf07	author	Will Norris
+d6ddf07	added	1
+d6ddf07	deleted	0
+d6ddf07	files	1
+d6ddf07	body	8x8 separable integer DCT — int32 16x16->32 MAC (__mulsi3) + signed\narithmetic-shift descale (G_ASHR) + narrowing cast (G_SEXT_INREG). Split view:\nsource block + coefficient heat grid. Distinct from #25 fft (radix-2/twiddles).\n__mulsi3=2, rep/sep=74; gate 0x5364; 5-way green. No compiler bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+abf28e4	author	Will Norris
+abf28e4	added	1
+abf28e4	deleted	0
+abf28e4	files	1
+abf28e4	body	Signed 3x3 Sobel edge MAC + saturating magnitude via\n__builtin_elementwise_add_sat/_sub_sat (G_SADDSAT/G_USUBSAT). Host gcc uses a\nbit-identical manual saturating fallback (gcc lacks these builtins); the target\nclang exercises the saturating intrinsics. Distinct from #57 medfilt.\nrep/sep=99, clamp-branches=6; gate 0x2849; 5-way green. No compiler bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+bba77cf	author	Will Norris
+bba77cf	added	1
+bba77cf	deleted	0
+bba77cf	files	1
+bba77cf	body	Binary arithmetic (range) coder: interval split bound=(range>>PBITS)*prob\n(__mulsi3 + G_LSHR) + byte-wise renormalization carry loop (32-bit G_SHL/G_LSHR).\nAdaptive probability. Distinct from #67 huffman (table codes) / #49 lzdec (LZ).\n__mulsi3=1, rep/sep=24; gate 0x6D21; 5-way green. No compiler bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+a6c9ffd	author	Will Norris
+a6c9ffd	added	1
+a6c9ffd	deleted	0
+a6c9ffd	files	1
+a6c9ffd	body	Sieve of Eratosthenes in a bit-array using VARIABLE-COUNT shifts —\narr[i>>3] |= (1u<<(i&7)) to set, (arr[i>>3]>>(i&7))&1 to test — where the\nshift amount i&7 is a runtime value, so the backend emits variable-count\nG_SHL/G_LSHR (shift helpers) not fixed shifts. Distinct from #5 life (fixed\n1<<k masks) and #28 hilbert. Primes render as an Ulam spiral.\nshift-ops=12, rep/sep=35; gate 0x1F2F; 5-way green. No compiler bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3e72658	author	Will Norris
+3e72658	added	2
+3e72658	deleted	1
+3e72658	files	1
+3e72658	body	Montgomery REDC modular multiplication — a*b mod N via __mulsi3/__mulhi3 +\n>>16 (G_LSHR) + mask (G_AND) + conditional subtract, with ZERO division\nlibcalls (gate asserts __udivsi3/__umodsi3/__udivmodsi4 == 0). The\ndivision-free modmul member of the battery (distinct from #61 dhmix 64-bit\nmodexp and #20 factorial base-10000 bignum). Multiplicative-group orbit\ng^i mod N rendered as a rotating star-polygon polyline.\nMontgomery constants verified (N=40961, N'=40959, R^2 mod N=1641; 7*11 mod N=77).\n__mulsi3=5, rep/sep=13, division=0; gate 0xBA9B; 5-way green. No compiler bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3ab0a2b	author	Will Norris
+3ab0a2b	added	1
+3ab0a2b	deleted	0
+3ab0a2b	files	1
+3ab0a2b	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 478ec59	author	Will Norris
 478ec59	added	1
 478ec59	deleted	0
