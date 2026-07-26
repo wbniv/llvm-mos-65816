@@ -30,9 +30,16 @@ CFG="$BUILD/install/bin/mos-snes.cfg"
 
 # slug -> source basename, only where they differ from the slug.
 declare -A SRCMAP=( [3d-wireframe]=wireframe [buddhabrot]=buddha [space-invaders]=invaders )
-# slug -> extra cflags. mandel-double is at the exact 32 KB bank edge, so it can't absorb the ~4 KB
-# font16 table → build it with the legacy no-table title path (chunky font, but it fits).
-declare -A EXTRA_CFLAGS=( [mandel-double]="-DTITLE_FONT16_OFF" )
+# slug -> extra cflags. Currently empty: keep it that way if you can.
+#
+# A demo's own ROM-size/feature constraints belong in the DEMO SOURCE (an #ifndef-guarded #define above
+# the relevant include), not here — a flag that lives only in this table is invisible to the other build
+# paths (dev/build.sh's example loop, the per-demo dev/<demo>.sh gates), which is exactly how
+# mandel-double came to be unbuildable by `dev/run.sh build` while still rebuilding fine here: it needs
+# -DTITLE_FONT16_OFF (the 4 KB font16 table does not fit alongside its double soft-float library) and
+# that flag existed ONLY in this table. It is now self-declared in examples/snes/mandel-double.c, so
+# every path picks it up. Add an entry here only for something genuinely build-path-specific.
+declare -A EXTRA_CFLAGS=()
 # slug -> binary asset extensions (in examples/snes/) objcopy'd to .o and linked (e.g. gfx/palette blobs).
 declare -A ASSET_EXTS=( [space-invaders]="pic pal" )
 OBJCOPY="${MOS_TOOLCHAIN:-$BUILD/llvm-mos-install}/bin/llvm-objcopy"

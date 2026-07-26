@@ -75,7 +75,13 @@ else
 fi
 
 # 5. MAME under Xvfb — snapshot the real PPU output + assert.
-if command -v xvfb-run >/dev/null 2>&1; then
+# The SPC700 IPL is gitignored Nintendo content supplied out-of-band; without it MAME never boots, emits
+# no SHOT: line, and the gate reports a misleading FAIL rather than an honest SKIP. Guard for it exactly
+# as dev/cpu6502.sh does. NB this only skips when the IPL is genuinely ABSENT — with the IPL present a
+# real MAME disagreement still fails the gate.
+if [ ! -f "$ROOT/dev/roms/s_smp/spc700.rom" ]; then
+  echo "    SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content; supply out-of-band)"
+elif command -v xvfb-run >/dev/null 2>&1; then
   echo "==> MAME (under Xvfb): snapshot + assert (build/mandel-double-mame.png)"
   SNAP="$BUILD/.mandel-double-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \
