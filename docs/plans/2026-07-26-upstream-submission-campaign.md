@@ -112,7 +112,22 @@ For each artifact, at posting time and **only after user go-ahead**:
 4. **Mint the branch** on `wbniv/llvm-mos` (named per the status-doc row), commit with a body derived
    from the drafted `docs/*-pr.md`, push the branch.
 5. **Open the PR / issue** with the row's `gh` command (strip the doc's status preamble).
-6. **Same commit**: flip the status-doc row (drafted → posted, with PR number), mirror in TODO's
+6. **Link the live SNES demos** (standing rule, user-directed 2026-07-26): every PR body links the
+   playable biohack.net demo(s) that exercise the fix — the in-browser bsnes-jg pages whose
+   "Verify fidelity" button re-runs the WRAM self-check live. It turns the "soak-tested" claim into
+   something a maintainer can poke in 10 seconds. The map (URLs verified live 2026-07-26; NB the
+   four newest are top-level, not `/snes/`):
+
+   | Artifact | Live proof demos |
+   |---|---|
+   | `0016` scmp/ucmp | [qsortviz](https://biohack.net/snes/qsortviz/) (finder) · [spaceship](https://biohack.net/snes/spaceship/) · [ucmprank](https://biohack.net/snes/ucmprank/) · [trimerge](https://biohack.net/snes/trimerge/) · [keycmp64](https://biohack.net/snes/keycmp64/) |
+   | `0010` coalesce-rotate-Ac | [crcwall](https://biohack.net/snes/crcwall/) · [lfsr2](https://biohack.net/snes/lfsr2/) · [bitweave](https://biohack.net/bitweave/) · [uarteye](https://biohack.net/uarteye/) (Cluster D; default-8-bit leg load-bearing) |
+   | `0011` scavenger live-`$p` | [pcooker](https://biohack.net/pcooker/) (#109 re-stress) |
+   | `0012` LDCImm set | [borrowlad](https://biohack.net/borrowlad/) (#110 re-stress) |
+   | `0015` coalesce-rc-undef | [newton](https://biohack.net/snes/newton/) (validated `0x4D8B`) |
+   | `0017` s64 (un)merge | [dhmix](https://biohack.net/snes/dhmix/) (finder) · [mulov64](https://biohack.net/snes/mulov64/) · [oddmask](https://biohack.net/snes/oddmask/) · [modexp256](https://biohack.net/snes/modexp256/) |
+
+7. **Same commit**: flip the status-doc row (drafted → posted, with PR number), mirror in TODO's
    *Upstream / Contribution* section.
 
 Optional fork hygiene at the same time (user-triggered): fast-forward `wbniv/llvm-mos:main`
