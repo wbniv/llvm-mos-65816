@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/e1a58f9) | fix(snes/fonts): draw every empty glyph slot; fold lowercase; gate title charset |
 | [2026-07-19](https://github.com/wbniv/llvm-mos-65816/commit/da5409b) | docs+dev: repoint ~/SRC references to the flat ~/ layout |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d65c75e) | fix(fn-plot): add TitleLayer intro + canvas_line curves + 2px/frame; update snes-demo skill |
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/1194065) | docs(snes-demo skill): make the prime directive explicit — stress the compiler, never work around it |
@@ -7,6 +8,11 @@
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/bfcbe69) | chore(skills): add snes-demo + snes-rom-page as project-local skills |
 
 <!--history-meta v1
+e1a58f9	author	Will Norris
+e1a58f9	added	22
+e1a58f9	deleted	0
+e1a58f9	files	1
+e1a58f9	body	A character with no font art renders as a SPACE, silently, and nothing gated on\nit. An audit of all 108 title call sites found 12 titles losing characters:\n\n  _  (6 demos)  G_FCOPYSIGN read as "G FCOPYSIGN", also G_MEMMOVE, G_SEXT_INREG,\n                G_FMINNUM, G_FPTOSI, VA_ARG\n  ^  (1 demo)   julia's "Z^2 + C" rendered as "Z 2 + C"\n  a d i l s t v x (5 demos)  domcol "NaN / POLES", multibase "div_t / lldiv_t",\n                medfilt "MEDIAN 3x3", fenwick "i & -i", spaceship "s8/16/32/64"\n\nTwo distinct causes. `_` and `^` were EMPTY SLOTS inside the declared 0x20..0x5F\nrange -- the table already reserved them, zero-filled. Lowercase is outside the\nrange entirely.\n\n- Every empty slot in both fonts is now drawn, authored into the GENERATORS\n  (the headers are generated, "do not edit by hand"). font16 needs face art\n  only: synth() derives the +2,+2 SE drop-shadow, so the new symbols get the\n  same shadow as the recovered Waldo letters.\n- Lowercase folds a-z -> A-Z in _title_glyph at render time. Free, needs no\n  source edits, and keeps titles' real spelling for the day the fonts grow\n  0x60..0x7F glyphs -- deleting two lines is the whole change then.\n\nCost measured, not assumed: ZERO bytes. Both tables are fixed-size arrays over\nthe full range -- 512 and 2048 words before and after; huffman.sfc is 32768 B\neither way. Only extending past 0x5F would cost anything (+512 B font8,\n+2048 B font16 near-window, +5 KB of VRAM clobbered by the title upload), so\nthe range stays put and that is bundled with the eventual lowercase work.\nNo title uses ` { | } ~ -- verified by frequency table and direct grep.\n\ndev/title-charset.sh is the regression guard: it reads which glyphs are\nnon-blank from the GENERATED headers rather than a hardcoded list, so it stays\nhonest as art is added, applies the same a-z fold the renderer does, and exits\nnon-zero on any unrenderable title character. Wired into the snes-demo skill as\na required step before the differential gate.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 da5409b	author	Will Norris
 da5409b	added	3
 da5409b	deleted	3

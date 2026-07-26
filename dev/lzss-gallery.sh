@@ -9,7 +9,12 @@ CFG="$BUILD/install/bin/mos-snes-gallery.cfg"
 SRC="$ROOT/examples/snes/lzss-gallery.c"
 ROM="$BUILD/lzss-gallery.sfc"
 MAP="$BUILD/lzss-gallery.map"
-EXPECT=0x29AF
+EXPECT=$(python3 -c 'import json
+r=json.load(open("/work/assets/snes/lzss-gallery/derived/report.json"));h=0xffff
+for a in r:
+  for x in (a["checksum"]&255,a["checksum"]>>8,a["compressed_bytes"]&255,a["compressed_bytes"]>>8):
+    h=(((h<<1)|(h>>15))&65535)^x
+print(f"0x{h:04X}")')
 
 [ -x "$TOOL/mos-clang" ] || { echo "FATAL: missing toolchain; run dev/run.sh build"; exit 1; }
 [ -f "$CFG" ] || { echo "FATAL: missing snes-gallery SDK platform; run dev/run.sh build"; exit 1; }
@@ -27,12 +32,12 @@ done
 cmp "$BUILD/lzss-gallery-host-O0.txt" "$BUILD/lzss-gallery-host-O2.txt"
 cat "$BUILD/lzss-gallery-host-O2.txt"
 
-echo "==> target build (+mos-a16, 512 KiB LoROM)"
+echo "==> target build (+mos-a16, 1 MiB LoROM)"
 "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
   -Xclang -target-feature -Xclang +mos-a16 -Os \
   -Wl,-Map="$MAP" -o "$ROM" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$ROM"
-[ "$(stat -c %s "$ROM")" = 524288 ]
+[ "$(stat -c %s "$ROM")" = 1048576 ]
 
 VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$MAP")
 [ -n "$VMA" ]
@@ -46,7 +51,7 @@ if [ "${QUICK:-0}" = 1 ]; then
   CHECK_LEN=1
   OUT="$BUILD/lzss-gallery-quick-jg.png"
 else
-  FRAMES="${FRAMES:-45000}"
+  FRAMES="${FRAMES:-75000}"
   CHECK_OFF="$VMA"
   CHECK_WANT="$EXPECT"
   CHECK_LEN=2
@@ -62,4 +67,4 @@ else
 fi
 
 sha256sum "$ROM"
-echo "RESULT: PASS — ten-work LZSS gallery host oracle, relink, header and bsnes-jg gate"
+echo "RESULT: PASS — 19-work LZSS gallery host oracle, relink, header and bsnes-jg gate"

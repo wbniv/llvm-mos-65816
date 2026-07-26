@@ -99,9 +99,20 @@ Add BG1 or BG2 for a full-color layer when you need more than 4 colors per tile.
 - 4bpp: 16 words/tile = 32 bytes.
 
 **CGRAM:** 256 color registers (15-bit BGR555). `SNES_RGB(r,g,b)` where r/g/b ∈ 0–31.
-BG3 palette 0 = CGRAM[0..3], palette 1 = CGRAM[8..11], …, palette 7 = CGRAM[56..63].
+BG3 2bpp palette 0 = CGRAM[0..3], palette 1 = CGRAM[4..7], …, palette 7 = CGRAM[28..31].
 BG1 palette 0 = CGRAM[0..15], …, palette 7 = CGRAM[112..127].
 Upload palette data with `upq_push_cgram()` from inside `emit()`.
+
+**Mode 7 is 8bpp and can address all 256 CGRAM entries.** Do not impose a 16/32-color limit
+merely because other BG modes use palette banks. When Mode 7 shares the screen with Mode 1 text or
+OBJ, define explicit CGRAM ownership and remap dense quantizer indices around the reserved entries.
+For example, reserving index 0, BG3 palette 7 (28–31), BG2 palette 7 (112–127), and OBJ palette 0
+(128–143) leaves 219 artwork indices: `1..27`, `32..111`, and `144..255`.
+
+Never reserve index 0 by blindly adding one to N dense indices unless the uploaded palette really
+contains entries `0..N`; that exact off-by-one produces pixels which read stale CGRAM colors. Asset
+gates must assert that every pixel index has an uploaded palette value and that no artwork pixel
+uses a UI-owned range.
 
 **V-blank DMA budget (NTSC):** ≈ 4 200 CPU cycles ≈ 2 100 bytes/frame.
 Budget conservatively at **1 536 bytes/frame** (1.5 KiB) for safety.
@@ -686,6 +697,22 @@ each frame in `compute_one_frame()`, push in `emit()`. For N ≤ 16 that's 32 by
 
 To use all 8 BG1 palettes (128 colors), push 256 bytes starting at CGRAM[0].
 DMA cost: 256 bytes — fits comfortably in one V-blank.
+
+**Mode 7 full-color images:** a complete palette is 256 colors / 512 bytes. A quantizer may emit a
+dense palette, but the asset pipeline must map its indices into the demo's explicit CGRAM ownership
+table. Upload the full artwork palette while force-blanked or through a correctly budgeted queue,
+then restore every reserved BG/OBJ palette before display. Use a 16-bit byte counter (or DMA);
+`uint8_t i < 512` wraps forever. Re-upload UI palettes for every image because the full artwork
+palette transfer covers their CGRAM addresses.
+
+For generated indexed assets, machine-check:
+
+- palette length is exactly 512 bytes;
+- index 0 has the intended surround color;
+- every artwork pixel belongs to the allowed artwork-index set;
+- no artwork pixel belongs to a font/OBJ-reserved range;
+- every used index has a deterministic BGR555 entry; and
+- emulator captures show no stale-color speckles when switching between dissimilar palettes.
 
 ---
 

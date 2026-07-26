@@ -1,5 +1,10 @@
 # #119 — SNES LZSS Mode 7 Gallery Carousel
 
+> **Resolution update:** the original 128×84–96 cropped corpus documented below has been superseded
+> by [#122](2026-07-26-122-lzss-gallery-maximum-mode7-resolution.md). The implemented gallery now
+> preserves each complete artwork and its original aspect ratio, using 225–252 artwork tiles per
+> slide. Keep #119's old measurements as the baseline, not as current cartridge figures.
+
 **Status:** IMPLEMENTED / PUBLISHED (2026-07-26). Demo **#119**, following the drafted Round 6 battery through
 #118. The ten-work cartridge, host oracle, on-SNES codec, HDMA display split, captions, work meter,
 per-stage frame counters, reproducible gate script, and both website gallery integrations are
@@ -74,6 +79,9 @@ Do not fetch images during a normal ROM or website build. Asset refresh is an ex
 developer operation; the deterministic derived assets needed by ordinary builds are committed.
 
 ## Image preparation and ROM budget
+
+> **Superseded color decision:** #119's 32-color limit is replaced by the 219-artwork-color sparse
+> CGRAM allocation in [#125](2026-07-26-125-lzss-gallery-full-mode7-color.md).
 
 Mode 7 uses an 8bpp character plane even when only a small palette is populated. Use the largest
 image rectangle the 256×224 display permits after reserving only the artist/title lines actually

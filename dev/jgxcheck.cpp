@@ -17,7 +17,7 @@
 #include <bsnes.hpp>
 #include "png_write.h"   // dependency-free RGB8 PNG writer (shared with tools/mandel-render.c)
 
-#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
+#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
 // Interactive-demo input differential (built only by dev/mandel-interactive.sh / dev/mandel-zoom.sh
 // as a separate `jgxcheck-view` / `jgxcheck-zoom` binary, so the plain jgxcheck used by other
 // scripts is unaffected). Drive a scripted controller sequence into pollInput, then replay the
@@ -34,6 +34,20 @@
 #endif
 #ifdef JGX_BLOSSOM
 #include "blossom.h"
+#endif
+#ifdef JGX_NAV
+#define JOY_B 0x8000
+#define JOY_Y 0x4000
+#define JOY_SELECT 0x2000
+#define JOY_START 0x1000
+#define JOY_UP 0x0800
+#define JOY_DOWN 0x0400
+#define JOY_LEFT 0x0200
+#define JOY_RIGHT 0x0100
+#define JOY_A 0x0080
+#define JOY_X 0x0040
+#define JOY_L 0x0020
+#define JOY_R 0x0010
 #endif
 
 static std::vector<uint16_t> g_script;   // per-frame button mask (frame -> JOY_* bits)
@@ -198,7 +212,7 @@ static void dump_vram_hex(const char *label, unsigned wa, unsigned n) {
   fprintf(stderr, "\n");
 }
 static void audioFrame(const void*, size_t) {}                                     // headless: discard
-#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
+#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
 // bsnes calls poll(udata, port, 0) on the controller latch and uses the full 16-bit return as
 // the button word (B in bit15 … R in bit4 — the JOY_* layout). Return the scripted mask for the
 // current frame; held past the script end. Exact frame alignment is irrelevant: the differential
@@ -247,7 +261,7 @@ int main(int argc, char **argv) {
   Bsnes::setInputSpec({0, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
   Bsnes::setInputSpec({1, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
 
-#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
+#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
   if (getenv("JGX_SCRIPT")) parseScript(getenv("JGX_SCRIPT"));
 #endif
 
@@ -260,7 +274,7 @@ int main(int argc, char **argv) {
   for (int i = 0; i < frames; ++i) {
     Bsnes::run();
     if (blankscan) blacktop.push_back(leading_black_rows());
-#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
+#if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
     g_frame++;
 #endif
   }

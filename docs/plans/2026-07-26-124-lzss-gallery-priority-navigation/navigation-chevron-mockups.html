@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LZSS Gallery — Sprite Chevron Mockups</title>
+<style>
+  :root{--ink:#f7d85a;--shadow:#39250f;--paper:#f1ead9;--black:#090a0c;--red:#e34b36}
+  *{box-sizing:border-box} body{margin:0;background:#d8d1c3;color:#171716;font:15px/1.45 system-ui,sans-serif}
+  header,main{max-width:1120px;margin:auto} header{padding:34px 22px 12px}
+  h1{font:800 32px/1.05 Georgia,serif;margin:0 0 9px} h2{font:700 21px Georgia,serif;margin:0 0 12px}
+  p{max-width:78ch}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;padding:18px 22px 40px}
+  article{background:var(--paper);padding:17px;border:1px solid #aaa08d;box-shadow:5px 5px 0 #8e8678}
+  .screen{position:relative;width:256px;height:224px;margin:8px auto;background:#000;image-rendering:pixelated;overflow:hidden;
+    box-shadow:0 0 0 4px #222,0 0 0 5px #777}
+  .art{position:absolute;overflow:hidden;background:#92b3ae}
+  .landscape .art{inset:0 1px 48px 1px;background:
+    radial-gradient(ellipse at 61% 42%,#d9c79d 0 23%,transparent 24%),
+    repeating-radial-gradient(ellipse at 35% 62%,#23495c 0 3px,#d9e2d2 4px 7px,#38697b 8px 11px)}
+  .portrait .art{left:60px;top:0;width:135px;height:168px;background:
+    radial-gradient(circle at 50% 31%,#cc3b2d 0 13px,#eac59e 14px 21px,transparent 22px),
+    linear-gradient(100deg,#839f89,#d6c0a4 48%,#8da484)}
+  .square .art{left:36px;top:0;width:184px;height:184px;background:
+    radial-gradient(circle at 35% 31%,#9b7250 0 6px,transparent 7px),
+    repeating-linear-gradient(90deg,#89a0a0 0 4px,#d3bd8f 5px 9px)}
+  .caption{position:absolute;left:0;right:0;bottom:0;color:white;text-align:center;letter-spacing:1px;font:8px monospace}
+  .caption .artist{color:var(--ink);text-shadow:2px 2px var(--shadow);font:bold 15px/15px monospace;letter-spacing:0}
+  .caption .status{height:8px;color:#d9d9d9;margin-top:2px}.split{position:absolute;left:0;right:0;border-top:1px dashed rgba(255,255,255,.45)}
+  .landscape .split{top:176px}.portrait .split{top:168px}.square .split{top:184px}
+  .sprite{--s:1;position:absolute;width:16px;height:16px;top:80px}
+  .sprite.left{left:3px}.sprite.right{right:3px;transform:scaleX(-1)}
+  .sprite::after,.sprite::before{content:"";position:absolute;inset:0;
+    clip-path:polygon(69% 6%,88% 25%,56% 50%,88% 75%,69% 94%,13% 50%)}
+  .sprite::after{background:var(--shadow);transform:translate(1px,1px)}
+  .sprite::before{background:var(--ink);z-index:1}
+  .portrait .sprite{top:76px}.square .sprite{top:84px}
+  .pressed{animation:pulse .45s steps(2,end) infinite}@keyframes pulse{50%{filter:brightness(1.65)}}
+  .inspection{display:flex;align-items:center;justify-content:center;gap:34px;min-height:150px;background:#18191c;color:white}
+  .big{position:relative;width:128px;height:128px;background:#2b3038;image-rendering:pixelated}
+  .big .sprite{left:0;top:0;right:auto;width:128px;height:128px;filter:drop-shadow(12px 12px 0 var(--shadow))}
+  .pixels{font:12px monospace;color:#bbb}.swatches{display:flex;gap:5px;margin-top:8px}.swatches i{width:25px;height:25px;border:1px solid #888}
+  .controls{text-align:center;margin:10px 0 0}.controls button{font:700 12px monospace;padding:7px 10px;border:1px solid #555;background:#fff}
+  code{font:13px ui-monospace,monospace;background:#e1d8c6;padding:1px 4px}
+  @media(max-width:500px){.grid{padding-inline:10px}article{padding:10px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Priority navigation chevrons</h1>
+  <p>Native 256×224 placement studies for two fixed OAM sprites. Gold is the face, brown is the
+  one-pixel southeast shadow. The arrows remain clear over artwork and black margins without
+  consuming a Mode 7 tile.</p>
+</header>
+<main class="grid">
+  <article><h2>Landscape · 256×176 region</h2>
+    <div class="screen landscape">
+      <div class="art"></div><div class="split"></div>
+      <i class="sprite left"></i><i class="sprite right"></i>
+      <div class="caption"><div class="artist">KATSUSHIKA<br>HOKUSAI</div><div>UNDER THE WAVE OFF KANAGAWA</div><div class="status">REPACK [####......]</div></div>
+    </div>
+    <p>Chevrons sit three pixels from the screen edge and center on the artwork, not the full screen.</p>
+  </article>
+  <article><h2>Portrait · 135×168 fit</h2>
+    <div class="screen portrait">
+      <div class="art"></div><div class="split"></div>
+      <i class="sprite left"></i><i class="sprite right pressed"></i>
+      <div class="caption"><div class="artist">PIERRE-AUGUSTE<br>RENOIR</div><div>TWO SISTERS (ON THE<br>TERRACE)</div><div class="status">NEXT...</div></div>
+    </div>
+    <p>Arrows stay at the screen edges rather than hugging the portrait. The right sprite shows the
+    short pressed-state palette pulse; navigation itself is immediate.</p>
+  </article>
+  <article><h2>Square · 184×184 fit</h2>
+    <div class="screen square">
+      <div class="art"></div><div class="split"></div>
+      <i class="sprite left"></i><i class="sprite right"></i>
+      <div class="caption"><div class="artist">GEORGES SEURAT</div><div>A SUNDAY ON LA GRANDE<br>JATTE - 1884</div><div class="status">COMPARE [########..]</div></div>
+    </div>
+    <p>OBJ is enabled on both sides of the HDMA split, but the Y position keeps the sprites inside
+    the artwork region.</p>
+  </article>
+  <article><h2>4× pixel inspection</h2>
+    <div class="inspection">
+      <div class="big"><i class="sprite"></i></div>
+      <div class="pixels">16×16 OBJ<br>plain ‹ chevron<br>right = H-flip
+        <div class="swatches"><i style="background:#090a0c"></i><i style="background:#39250f"></i><i style="background:#f7d85a"></i><i style="background:#fff4b0"></i></div>
+      </div>
+    </div>
+    <div class="controls"><button id="pulse">Toggle pressed state</button></div>
+    <p>A conventional six-point <code>‹</code> silhouette: two diagonal strokes, no stem, badge,
+    diamond, or decorative notches. Palette index 0 is transparent; indexes 1–3 are shadow, face,
+    and the optional pressed highlight.</p>
+  </article>
+</main>
+<script>
+document.querySelector('#pulse').onclick=()=>document.querySelector('.big .sprite').classList.toggle('pressed');
+</script>
+</body>
+</html>

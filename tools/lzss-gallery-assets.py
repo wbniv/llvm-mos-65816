@@ -1,19 +1,39 @@
 #!/usr/bin/env python3
-"""Fetch pinned ArtIC CC0 works and generate deterministic SNES gallery assets.
+"""Fetch pinned public-domain museum works and generate deterministic SNES gallery assets.
 
 Run only in the development container. Normal ROM builds consume checked-in derived
 files and never access the network.
 """
 from __future__ import annotations
-import hashlib, io, json, pathlib, time, urllib.error, urllib.request
+import hashlib, io, json, math, pathlib, time, urllib.error, urllib.request
 import urllib.parse
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 BASE = ROOT / "assets/snes/lzss-gallery"
 DERIVED = BASE / "derived"
+SOURCE_DIR = BASE / "sources"
 SOURCES = BASE / "sources.json"
-W, COLORS = 128, 32
+ART_INDICES = tuple(range(1,28)) + tuple(range(32,112)) + tuple(range(144,256))
+ART_COLORS = len(ART_INDICES)
+MAX_ART_TILES = 255
+
+def display_height(work: dict) -> int:
+    caption = len(work["display_artist"]) * 16 + len(work["display_title"]) * 8 + 8
+    return 224 - caption
+
+def maximum_aspect_frame(ow: int, oh: int) -> tuple[int,int]:
+    """Largest <=255-tile raster within 0.5% of the complete source aspect."""
+    ratio=ow/oh; best=None
+    for width in range(8,257):
+        height=max(8,round(width/ratio))
+        tiles=math.ceil(width/8)*math.ceil(height/8)
+        error=abs(width/height-ratio)/ratio
+        if tiles>MAX_ART_TILES or error>0.005: continue
+        key=(width*height,-error,width)
+        if best is None or key>best[0]: best=(key,width,height)
+    if best is None: raise RuntimeError(f"no aspect-preserving frame for {ow}x{oh}")
+    return best[1],best[2]
 
 def get(url: str) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent":"llvm-mos-lzss-gallery/1.0 (asset build; contact via github.com/wbniv/llvm-mos-65816)"})
@@ -112,30 +132,57 @@ def cbytes(name, data, cols=16):
 
 def main():
     DERIVED.mkdir(parents=True,exist_ok=True)
+    SOURCE_DIR.mkdir(parents=True,exist_ok=True)
     spec=json.loads(SOURCES.read_text())
-    report=[]; arrays=[]; desc=[]
+    report=[]; arrays=[]; desc=[]; previews=[]
     for idx,w in enumerate(spec["works"],1):
-        if idx > 1: time.sleep(1)
-        api=json.loads(get(f"https://api.artic.edu/api/v1/artworks/{w['id']}?fields=id,title,artist_display,date_display,is_public_domain,image_id"))
-        d=api["data"]
-        if not d.get("is_public_domain") or not d.get("image_id"):
-            raise SystemExit(f"{w['id']}: not public domain or no image")
-        image_id=d["image_id"]
-        commons_title,url,commons_license=commons_named(w["commons_file"])
-        source=get(url); im=Image.open(io.BytesIO(source)).convert("RGB")
-        ow,oh=im.size; h=w["height"]
-        target_ratio=W/h; source_ratio=ow/oh
-        if source_ratio>target_ratio:
-            nw=round(oh*target_ratio); left=(ow-nw)//2; crop=(left,0,left+nw,oh)
+        source_path=SOURCE_DIR/f"{w['slug']}.jpg"
+        if source_path.exists():
+            source=source_path.read_bytes()
+            commons_title=w["commons_file"]
+            commons_license=w.get("license",spec["license"])
+            url=w.get("image_url","cached:"+source_path.name)
         else:
-            nh=round(ow/target_ratio); top=(oh-nh)//2; crop=(0,top,ow,top+nh)
-        resized=im.crop(crop).resize((W,h),Image.Resampling.LANCZOS)
-        q=resized.quantize(colors=COLORS,method=Image.Quantize.MEDIANCUT,dither=Image.Dither.FLOYDSTEINBERG)
-        pal=q.getpalette()[:COLORS*3]
-        # Reserve index 0 for black by shifting every image index and use <=31 art colours.
-        pixels=bytes(x+1 for x in q.tobytes())
-        colors=[(0,0,0)]+[tuple(pal[i:i+3]) for i in range(0,len(pal),3)]
-        colors=colors[:32]
+            if idx > 1: time.sleep(1)
+            if "id" in w:
+                api=json.loads(get(f"https://api.artic.edu/api/v1/artworks/{w['id']}?fields=id,title,artist_display,date_display,is_public_domain,image_id"))
+                d=api["data"]
+                if not d.get("is_public_domain") or not d.get("image_id"):
+                    raise SystemExit(f"{w['id']}: not public domain or no image")
+            commons_title,url,commons_license=commons_named(w["commons_file"])
+            source=get(url)
+            source_path.write_bytes(source)
+        source_hash=hashlib.sha256(source).hexdigest()
+        if w.get("source_sha256") and source_hash != w["source_sha256"]:
+            raise SystemExit(f"{w['slug']}: source SHA-256 changed: {source_hash}")
+        try:
+            im=Image.open(io.BytesIO(source))
+            im.verify()
+            im=Image.open(io.BytesIO(source)).convert("RGB")
+        except Exception as e:
+            raise SystemExit(f"{w['slug']}: source is not a valid image: {e}")
+        if len(source)<16384 or min(im.size)<600:
+            raise SystemExit(f"{w['slug']}: source unexpectedly small: {len(source)} bytes, {im.size}")
+        ow,oh=im.size
+        width,height=maximum_aspect_frame(ow,oh)
+        shown_h=display_height(w)
+        scale=max(width,math.ceil(height*256/shown_h))
+        render_w=(width*256)//scale; render_h=(height*256)//scale
+        cols=math.ceil(width/8); rows=math.ceil(height/8)
+        assert cols*rows<=MAX_ART_TILES
+        crop=(0,0,ow,oh)
+        resized=im.resize((width,height),Image.Resampling.LANCZOS)
+        q=resized.quantize(colors=ART_COLORS,method=Image.Quantize.MEDIANCUT,dither=Image.Dither.FLOYDSTEINBERG)
+        dense_pal=[tuple(q.getpalette()[i:i+3]) for i in range(0,ART_COLORS*3,3)]
+        pixels=bytes(ART_INDICES[x] for x in q.tobytes())
+        colors=[(0,0,0)]*256
+        for dst,color in zip(ART_INDICES,dense_pal): colors[dst]=color
+        assert all(x in ART_INDICES for x in pixels)
+        preview=Image.new("RGB",(256,shown_h),(0,0,0))
+        indexed=Image.new("RGB",(width,height));indexed.putdata([colors[x] for x in pixels])
+        shown=indexed.resize((render_w,render_h),Image.Resampling.NEAREST)
+        preview.paste(shown,((256-render_w)//2,(shown_h-render_h)//2))
+        previews.append((w["slug"],preview))
         palbin=b"".join(bgr555(c).to_bytes(2,"little") for c in colors)
         packed,stats=lzss(pixels)
         assert unlzss(packed,len(pixels))==pixels
@@ -148,17 +195,24 @@ def main():
         symbol=slug.replace("-","_")
         arrays.append(cbytes(f"gallery_{symbol}_lz",packed))
         arrays.append(cbytes(f"gallery_{symbol}_pal",palbin))
-        desc.append((symbol,w,len(pixels),len(packed),idx))
+        desc.append((symbol,w,len(pixels),len(packed),idx,width,height,shown_h,scale,cols,rows))
         report.append({
-          "bank":idx,"slug":slug,"artwork_id":w["id"],"title":d["title"],"artist":w["artist"],
-          "object_url":f"https://www.artic.edu/artworks/{w['id']}","iiif_url":url,
+          "bank":idx,"slug":slug,"artwork_id":w.get("id"),"title":w["title"],"artist":w["artist"],
+          "provider":w.get("provider",spec["provider"]),
+          "object_url":w.get("object_url") or f"https://www.artic.edu/artworks/{w['id']}",
+          "image_url":url,"license":w.get("license",spec["license"]),
+          "license_url":w.get("license_url",spec["license_url"]),
           "commons_file":commons_title,"commons_license":commons_license,
-          "source_dimensions":[ow,oh],"crop":list(crop),"derived_dimensions":[W,h],
+          "source_dimensions":[ow,oh],"crop":list(crop),"derived_dimensions":[width,height],
+          "display_dimensions":[render_w,render_h],"display_region":[256,shown_h],
+          "matrix_scale":scale,"tile_grid":[cols,rows],"artwork_tiles":cols*rows,
           "source_jpeg_bytes":len(source),"raw_indexed_bytes":len(pixels),
           "compressed_bytes":len(packed),"reduction_bytes":len(pixels)-len(packed),
           "reduction_percent":round((1-len(packed)/len(pixels))*100,2),
-          "checksum":fold,
-          "source_sha256":hashlib.sha256(source).hexdigest(),
+          "checksum":fold,"artwork_color_capacity":ART_COLORS,
+          "artwork_colors_used":len(set(pixels)),"artwork_indices_used":sorted(set(pixels)),
+          "palette_sha256":hashlib.sha256(palbin).hexdigest(),
+          "source_sha256":source_hash,
           "derived_sha256":hashlib.sha256(pixels).hexdigest(),
           **stats
         })
@@ -167,21 +221,26 @@ def main():
          "#define GALLERY_BANK(name) __attribute__((section(\".gallery_\" #name))) GALLERY_FAR",""]
     # Section macro needs bank token, not symbol: rewrite array declarations explicitly.
     body=[]
-    for (symbol,w,raw,packed,bank),chunk in zip(desc,[arrays[i:i+2] for i in range(0,len(arrays),2)]):
+    for (symbol,w,raw,packed,bank,width,height,shown_h,scale,cols,rows),chunk in zip(desc,[arrays[i:i+2] for i in range(0,len(arrays),2)]):
         sec=f"{bank:02X}"
         body += [x.replace(f"GALLERY_BANK(gallery_{symbol}_lz)",f'__attribute__((section(".gallery_{sec}"))) GALLERY_FAR')
                  .replace(f"GALLERY_BANK(gallery_{symbol}_pal)",f'__attribute__((section(".gallery_{sec}"))) GALLERY_FAR') for x in chunk]
     hdr += body
     hdr += [f"#define GALLERY_ASSET_COUNT {len(desc)}u",
-            "typedef struct { const GALLERY_FAR uint8_t *lz; const GALLERY_FAR uint8_t *pal; uint16_t raw_len,lz_len,checksum; uint8_t height,artist_rows,title_rows,bank; const char *artist[2]; const char *title[2]; } GalleryAsset;",
+            "typedef struct { const GALLERY_FAR uint8_t *lz; const GALLERY_FAR uint8_t *pal; uint16_t raw_len,lz_len,checksum; uint8_t width,height,display_height,matrix_scale,tile_cols,tile_rows,artist_rows,title_rows,bank; const char *artist[2]; const char *title[2]; } GalleryAsset;",
             f"static const GalleryAsset GALLERY_ASSETS[{len(desc)}] = {{"]
-    for symbol,w,raw,packed,bank in desc:
+    for symbol,w,raw,packed,bank,width,height,shown_h,scale,cols,rows in desc:
         aa=w["display_artist"]+[""]; tt=w["display_title"]+[""]
         fold=report[bank-1]["checksum"]
-        hdr.append(f'  {{gallery_{symbol}_lz,gallery_{symbol}_pal,{raw},{packed},0x{fold:04X},{w["height"]},{len(w["display_artist"])},{len(w["display_title"])},{bank},{{"{aa[0]}","{aa[1]}"}},{{"{tt[0]}","{tt[1]}"}},}},')
+        hdr.append(f'  {{gallery_{symbol}_lz,gallery_{symbol}_pal,{raw},{packed},0x{fold:04X},{width},{height},{shown_h},{scale},{cols},{rows},{len(w["display_artist"])},{len(w["display_title"])},{bank},{{"{aa[0]}","{aa[1]}"}},{{"{tt[0]}","{tt[1]}"}},}},')
     hdr += ["};","#endif"]
     (ROOT/"examples/snes/lzss-gallery-assets.h").write_text("\n".join(hdr)+"\n")
     (DERIVED/"report.json").write_text(json.dumps(report,indent=2)+"\n")
+    sheet=Image.new("RGB",(512,math.ceil(len(previews)/2)*224),(16,16,16))
+    for i,(slug,preview) in enumerate(previews):
+        x=(i%2)*256;y=(i//2)*224
+        sheet.paste(preview,(x,y))
+    sheet.save(DERIVED/"contact-sheet.png",optimize=False)
     print(json.dumps(report,indent=2))
 
 if __name__=="__main__": main()
