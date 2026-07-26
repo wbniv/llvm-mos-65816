@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/47b1a2c) | docs(plan-index): add row for full-rom-galleries-both-sites |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/4ded087) | docs(todo+plan-index): triage campaign-plan capture (review-gated by design); index row |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d055629) | docs(plan-index): add the zp-alloc Imag32 CSR-rename fix row (2bfe4f3) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f75e06a) | docs(todo+plan-index): file the far-read codegen bug; triage; index the plan |
@@ -210,6 +211,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+47b1a2c	author	Will Norris
+47b1a2c	added	1
+47b1a2c	deleted	0
+47b1a2c	files	1
+47b1a2c	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4ded087	author	Will Norris
 4ded087	added	2
 4ded087	deleted	0
