@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/30bb0e3) | docs(snesgfx-dispatch): record decision — keep throwaway/snesgfx-virt-bench for follow-ons |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a859a32) | docs(oop-in-c): refresh + measure the all-virtual-dispatch design question |
 
 <!--history-meta v1
+30bb0e3	author	Will Norris
+30bb0e3	added	2
+30bb0e3	deleted	2
+30bb0e3	files	1
+30bb0e3	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a859a32	author	Will Norris
 a859a32	added	126
 a859a32	deleted	0

@@ -14,6 +14,7 @@
     --grid:           #e4e3df;
     --series-1:       #2a78d6;   /* snesgfx_bench / primary */
     --series-2:       #eb6834;   /* mandel-oop */
+    --series-3:       #1baf7a;   /* invaders */
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     background: var(--surface-1);
     color: var(--text-primary);
@@ -30,6 +31,7 @@
       --grid:           #33332f;
       --series-1:       #3987e5;
       --series-2:       #d95926;
+      --series-3:       #199e70;
     }
   }
   :root[data-theme="dark"] .viz-root {
@@ -40,6 +42,7 @@
     --grid:           #33332f;
     --series-1:       #3987e5;
     --series-2:       #d95926;
+    --series-3:       #199e70;
   }
   h1 { font-size: 1.25rem; margin: 0 0 4px; }
   .sub { color: var(--text-secondary); font-size: .85rem; margin: 0 0 20px; }
@@ -73,34 +76,38 @@
 <div class="viz-root" id="root">
   <h1>snesgfx: static vs all-virtual dispatch</h1>
   <p class="sub">All ~40 member functions across 11 headers, three dispatch modes · 65816 <code>+mos-a16 -Os</code> ·
-  bsnes-jg, 2400 deterministic frames · correctness identical in all modes (bench CRC 0x26EC, mandel-oop 0x204F) · 2026-07-26</p>
+  bsnes-jg deterministic · correctness identical in all modes (bench CRC 0x26EC, mandel-oop 0x204F,
+  invaders attract 0x9D57 — the game still fits its frame budget even all-virtual) · 2026-07-26</p>
 
   <div class="tiles">
     <div class="tile"><div class="v">15% faster</div><div class="k">out-of-line direct vs static inline — forced <code>noinline</code> WINS (a16 register-pressure relief)</div></div>
     <div class="tile"><div class="v">1.35×</div><div class="k">cost of vtable indirection vs direct out-of-line calls (per-pixel dispatch loop)</div></div>
-    <div class="tile"><div class="v">+49%</div><div class="k">mandel-oop <code>.text</code> growth under all-virtual dispatch (3,660 → 5,470 B)</div></div>
-    <div class="tile"><div class="v">0</div><div class="k">vtable calls devirtualized by LTO — all 15 single-target indirect sites survive</div></div>
+    <div class="tile"><div class="v">−10.8%</div><div class="k">invaders <code>.text</code> under out-of-line direct (12,972 → 11,571 B) — dedup beats inlining on a real game</div></div>
+    <div class="tile"><div class="v">+21–49%</div><div class="k"><code>.text</code> growth under all-virtual (invaders +21%, mandel-oop +49%)</div></div>
+    <div class="tile"><div class="v">0</div><div class="k">vtable calls devirtualized by LTO — all single-target indirect sites survive (57 in invaders)</div></div>
   </div>
 
   <h2>Throughput — full canvas redraws completed in 2400 frames</h2>
   <p class="note">canvas_clear + 12-line Bresenham star; mode 2 pays one virtual canvas_plot call per pixel. Higher is better.</p>
   <svg id="c1" width="840" height="230" role="img" aria-label="Bar chart: redraws by dispatch mode"></svg>
 
-  <h2>Code size — <code>.text</code> bytes attributed to the program</h2>
-  <p class="note">Linker-map bytes for each vehicle's LTO object (library/crt excluded). Lower is better.</p>
-  <svg id="c2" width="840" height="250" role="img" aria-label="Grouped bar chart: .text bytes by dispatch mode and vehicle"></svg>
+  <h2>Code size — <code>.text</code>, indexed to each vehicle's mode&nbsp;0 = 100</h2>
+  <p class="note">Indexed because the vehicles differ 8× in absolute size (invaders 12,972 B vs bench 1,918 B at mode 0) —
+  absolute bytes in the tooltips and the data table. Lower is better.</p>
+  <svg id="c2" width="840" height="250" role="img" aria-label="Grouped bar chart: relative .text by dispatch mode and vehicle"></svg>
   <div class="legend">
     <span><span class="sw" style="background:var(--series-1)"></span>snesgfx_bench</span>
     <span><span class="sw" style="background:var(--series-2)"></span>mandel-oop</span>
+    <span><span class="sw" style="background:var(--series-3)"></span>invaders</span>
   </div>
 
   <details>
     <summary>Data table</summary>
     <table class="data">
-      <tr><th>Mode</th><th>Redraws / 2400 f</th><th>bench .text B</th><th>mandel-oop .text B</th><th>Indirect call sites (oop)</th></tr>
-      <tr><td>0 · static inline (today)</td><td>175</td><td>1,918</td><td>3,660</td><td>1</td></tr>
-      <tr><td>1 · out-of-line direct</td><td>201</td><td>1,934</td><td>3,537</td><td>2</td></tr>
-      <tr><td>2 · all-virtual</td><td>149</td><td>2,199</td><td>5,470</td><td>15</td></tr>
+      <tr><th>Mode</th><th>Redraws / 2400 f</th><th>bench .text B</th><th>mandel-oop .text B</th><th>invaders .text B</th><th>Ind. sites (oop / invaders)</th><th>Invaders gate 0x9D57</th></tr>
+      <tr><td>0 · static inline (today)</td><td>175</td><td>1,918</td><td>3,660</td><td>12,972</td><td>1 / 1</td><td>PASS</td></tr>
+      <tr><td>1 · out-of-line direct</td><td>201</td><td>1,934</td><td>3,537</td><td>11,571</td><td>2 / 2</td><td>PASS</td></tr>
+      <tr><td>2 · all-virtual</td><td>149</td><td>2,199</td><td>5,470</td><td>15,647</td><td>15 / 57</td><td>PASS</td></tr>
     </table>
   </details>
 </div>
@@ -117,7 +124,7 @@ function hover(e, html) {
 }
 const MODES = ["0 static inline (today)", "1 out-of-line direct", "2 all-virtual (vtables)"];
 
-function bars(svg, groups, series, colors, unit) {
+function bars(svg, groups, series, unit) {
   const W = +svg.getAttribute("width"), H = +svg.getAttribute("height");
   const m = { l: 46, r: 8, t: 12, b: 34 };
   const max = Math.max(...series.flatMap(s => s.v)) * 1.12;
@@ -141,7 +148,7 @@ function bars(svg, groups, series, colors, unit) {
       const r = 4;
       const d = `M${x},${y(0)} V${y(v) + r} Q${x},${y(v)} ${x + r},${y(v)} H${x + bw - r} Q${x + bw},${y(v)} ${x + bw},${y(v) + r} V${y(0)} Z`;
       const p = el(svg, "path", { d, fill: s.color });
-      hover(p, `<b>${g}</b><br>${s.name ? s.name + ": " : ""}${fmt(v)} ${unit}`);
+      hover(p, `<b>${g}</b><br>${s.name ? s.name + ": " : ""}${s.tip ? s.tip(gi) + " (" + fmt(v) + " " + unit + ")" : fmt(v) + " " + unit}`);
       const lab = el(svg, "text", { x: x + bw / 2, y: y(v) - 5, "text-anchor": "middle", "font-size": 11, fill: "var(--text-primary)" });
       lab.textContent = fmt(v);
     });
@@ -151,9 +158,14 @@ function bars(svg, groups, series, colors, unit) {
 }
 bars(document.getElementById("c1"), MODES,
   [{ name: "", v: [175, 201, 149], color: "var(--series-1)" }], "redraws");
-bars(document.getElementById("c2"), MODES,
-  [{ name: "snesgfx_bench", v: [1918, 1934, 2199], color: "var(--series-1)" },
-   { name: "mandel-oop",    v: [3660, 3537, 5470], color: "var(--series-2)" }], "B");
+// indexed to each vehicle's mode-0 = 100; absolute bytes shown in the tooltip
+const SIZE = [
+  { name: "snesgfx_bench", abs: [1918, 1934, 2199],   color: "var(--series-1)" },
+  { name: "mandel-oop",    abs: [3660, 3537, 5470],   color: "var(--series-2)" },
+  { name: "invaders",      abs: [12972, 11571, 15647], color: "var(--series-3)" },
+].map(s => ({ ...s, v: s.abs.map(b => Math.round(1000 * b / s.abs[0]) / 10),
+              tip: (gi) => `${s.abs[gi].toLocaleString("en-US")} B` }));
+bars(document.getElementById("c2"), MODES, SIZE, "% of mode 0");
 </script>
 </body>
 </html>

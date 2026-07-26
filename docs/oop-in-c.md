@@ -169,17 +169,32 @@ anti-pattern §2 forbids; 2,400 deterministic bsnes-jg frames, `dev/measure-snes
 | 1 out-of-line direct | 1,934 B | 0 | **201** | **0.87× cost — 15% FASTER** |
 | 2 all-virtual | 2,199 B (+15%) | 5 | 149 | 1.35× vs mode 1, 1.17× vs mode 0 |
 
+**Vehicle C — `invaders.c`**, the real multi-drawable game (SpriteSet + TitleLayer + Controller +
+custom drawables; 15 `sprite_set_put`/`hide` sites in nested per-alien loops). Gate = the
+deterministic attract-CRC (`0x9D57`, host oracle `tools/invaders-sim.c`) at a fixed frame — a
+PASS also proves that mode's per-frame cost still fits the v-blank frame budget:
+
+| Mode | `.text` | Ind. calls | Attract gate |
+|---|---|---|---|
+| 0 static inline | 12,972 B | 1 | PASS |
+| 1 out-of-line direct | **11,571 B** (**−10.8%**) | 2 | PASS |
+| 2 all-virtual | 15,647 B (**+20.6%**) | **57** | PASS |
+
 **Findings:**
 
 1. **Naive inlining is not free on the 65816.** Mode 1 *beats* mode 0 by 15% on the
    dispatch-bound loop: inlining `canvas_plot` into the Bresenham loop bloats the caller's
    a16/ZP live set (the same register-budget effect that motivated `canvas_line`'s
-   pre-existing `noinline`). "Static inline everywhere" is a size default, not a speed
-   guarantee — measure, don't assume (governing lesson #1).
+   pre-existing `noinline`). And on the real game it's also **10.8% smaller** — with many
+   call sites, one out-of-line body beats N inlined copies at `-Os`. "Static inline
+   everywhere" is a size default, not a speed guarantee — measure, don't assume
+   (governing lesson #1).
 2. **Virtual dispatch proper costs ~1.35×** on a per-pixel-dispatch loop (mode 1 → mode 2,
    the clean indirection-only comparison), plus **+15–49% `.text`** (vtables, forwarder
-   plumbing, un-folded argument setup). The per-call overhead is the `__call_indir` route:
-   ZP vt-pointer loads + slot load + indirect JSR.
+   plumbing, un-folded argument setup; invaders +20.6% with 57 live indirect sites). The
+   per-call overhead is the `__call_indir` route: ZP vt-pointer loads + slot load + indirect
+   JSR. Notably, even all-virtual invaders still makes its frame budget (gate PASS) — the
+   cost hides inside the v-blank wait until a loop is dispatch-bound.
 3. **The §2 discipline is validated quantitatively**: at one virtual call per drawable per
    frame the cost is unmeasurable (mandel-oop CRC/frames identical across modes); at one
    virtual call per *pixel* it costs a third of the machine. Virtualize interfaces, not

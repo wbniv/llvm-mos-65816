@@ -42,6 +42,8 @@ Adoption decision deferred until numbers exist → experiment runs throwaway-fir
 | bench `.text` | 1,918 B | 1,934 B | 2,199 B (+15%) |
 | mandel-oop `.text` | 3,660 B | 3,537 B (−3.4%) | 5,470 B (+49%) |
 | mandel-oop indirect sites | 1 | 2 | 15 (LTO devirtualizes 0) |
+| invaders `.text` | 12,972 B | **11,571 B (−10.8%)** | 15,647 B (+20.6%) |
+| invaders indirect sites / gate | 1 / PASS | 2 / PASS | 57 / PASS (`0x9D57`) |
 
 ## Verification
 
@@ -124,3 +126,24 @@ Adoption decision deferred until numbers exist → experiment runs throwaway-fir
 
 8. **Teardown** — RESOLVED 2026-07-26: user decided to **keep** `throwaway/snesgfx-virt-bench`
    for follow-on experiments ("more things to consider"). No teardown; branch is live.
+
+9. **invaders.c measurements** (user-requested follow-up, same session) —
+   `BENCH_FRAMES=2400 dev/run.sh measure-snesgfx-dispatch` with the invaders Part-2 extension:
+
+    ```
+    ==> Part 2: invaders.c (attract gate, +mos-a16)
+        host oracle attract CRC16=0x9D57; settle=1400 frames
+      mode 0 gate:    SMOKE: PASS off=0x25 len=2 got=0x9D57 (ran 1400 frames, bsnes-jg)
+      mode 1 gate:    SMOKE: PASS off=0x25 len=2 got=0x9D57 (ran 1400 frames, bsnes-jg)
+      mode 2 gate:    SMOKE: PASS off=0xB6 len=2 got=0x9D57 (ran 1400 frames, bsnes-jg)
+    ==> RESULTS invaders.c (attract gate @1400 frames, oracle 0x9D57)
+      mode                            .text B  ind.calls   gate
+      0 static inline (today)           12972          1   PASS
+      1 out-of-line direct              11571          2   PASS
+      2 all-virtual (vtables)           15647         57   PASS
+    RESULT: PASS — all 3 modes correct; see table
+    ```
+
+    **PASS** — all 3 modes reproduce the canonical attract CRC (also proving mode 2 still fits
+    the frame budget); out-of-line direct is −10.8% `.text` on the real game, all-virtual +20.6%
+    with 57 surviving indirect sites. Bench + mandel-oop numbers unchanged (175/201/149).

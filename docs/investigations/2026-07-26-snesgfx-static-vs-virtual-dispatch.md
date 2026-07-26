@@ -70,17 +70,35 @@ based on main `9bddc38`); toolchain: the 2026-07-25-rebased from-source `mos-cla
 
 (600-frame run reproduced identical ratios — 40/46/34 — deterministic, not noise.)
 
+**invaders.c** (added 2026-07-26, same session — the real multi-drawable game: SpriteSet +
+TitleLayer + Controller + custom drawables, 15 `sprite_set_put`/`hide` sites in nested
+per-alien/per-shield loops; `+mos-a16 -Os`, deterministic attract gate at 1,400 frames vs the
+host oracle `tools/invaders-sim.c`):
+
+| Mode | `.text` | Δ vs 0 | Ind. call sites | Attract gate `0x9D57` |
+|---|---|---|---|---|
+| 0 static inline | 12,972 B | — | 1 | PASS |
+| 1 out-of-line direct | 11,571 B | **−10.8%** | 2 | PASS |
+| 2 all-virtual | 15,647 B | **+20.6%** | 57 | PASS |
+
+A mode-2 gate PASS at the fixed frame is itself a timing statement: the game's per-frame cost
+(57 live indirect sites, virtual `sprite_set_put` per alien) still fits the v-blank frame
+budget — dispatch overhead hides inside the v-blank wait until a loop is dispatch-bound.
+
 ## Findings
 
-1. **Out-of-line direct calls BEAT static inline by 15%** on the dispatch-bound loop. Inlining
-   `canvas_plot` into the Bresenham loop bloats the caller's a16/ZP live set; forcing it
-   out-of-line relieves register pressure — the same effect that motivated `canvas_line`'s
-   pre-existing `noinline` (handoff §4). Governing lesson #1 (measure, don't assume) strikes
-   again: the "obvious" inline-everything baseline is not the fastest shape on this machine.
+1. **Out-of-line direct calls BEAT static inline by 15%** on the dispatch-bound loop — and are
+   **10.8% smaller on the real game** (many call sites → one body beats N inlined copies at
+   `-Os`). Inlining `canvas_plot` into the Bresenham loop bloats the caller's a16/ZP live set;
+   forcing it out-of-line relieves register pressure — the same effect that motivated
+   `canvas_line`'s pre-existing `noinline` (handoff §4). Governing lesson #1 (measure, don't
+   assume) strikes again: the "obvious" inline-everything baseline is neither the fastest nor
+   the smallest shape on this machine.
 2. **The vtable indirection itself costs 1.35×** (mode 1 → 2, the clean comparison) via the
    `__call_indir` route: ZP vt load, slot load, indirect JSR — per pixel, in the bench's case.
-3. **LTO devirtualizes nothing**: all 15 provably-single-target indirect sites survive in
-   mode-2 mandel-oop. "The compiler will devirtualize it" is not an argument on llvm-mos.
+3. **LTO devirtualizes nothing**: all provably-single-target indirect sites survive in mode 2
+   (15 in mandel-oop, 57 in invaders). "The compiler will devirtualize it" is not an argument
+   on llvm-mos.
 4. **The §2 discipline is validated**: 1 coarse virtual call/drawable/frame is unmeasurable;
    1 virtual call/pixel costs a third of the machine and half again the code size.
 5. Also corrected while re-measuring (mandel-oop, hardened gate): the 2026-06-30 "0 indirect

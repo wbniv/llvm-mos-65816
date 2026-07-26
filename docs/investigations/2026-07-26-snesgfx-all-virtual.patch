@@ -1,9 +1,9 @@
 diff --git a/dev/measure-snesgfx-dispatch.sh b/dev/measure-snesgfx-dispatch.sh
 new file mode 100755
-index 0000000..cafced5
+index 0000000..1641d02
 --- /dev/null
 +++ b/dev/measure-snesgfx-dispatch.sh
-@@ -0,0 +1,108 @@
+@@ -0,0 +1,168 @@
 +#!/usr/bin/env bash
 +# dev/measure-snesgfx-dispatch.sh — static vs all-virtual snesgfx dispatch: size + throughput.
 +#
@@ -88,6 +88,56 @@ index 0000000..cafced5
 +  echo "  mode $m iters:   ${ITERS[$m]}  (raw: $line_i)"
 +done
 +
++# ── Part 2: invaders.c — the real multi-drawable game (SpriteSet + TitleLayer + Controller +
++# custom drawables; the densest per-frame static-dispatch site). Metrics: .text, indirect
++# sites, and the deterministic attract-CRC gate (host oracle tools/invaders-sim.c) at a fixed
++# frame — a PASS also proves the mode's per-frame cost still fits the v-blank frame budget
++# (a slowdown past the budget would shift frame pacing and diverge the fixed-frame CRC).
++echo
++echo "==> Part 2: invaders.c (attract gate, +mos-a16)"
++cc -O2 -I "$ROOT/examples/snes" "$ROOT/tools/invaders-sim.c" -o "$BUILD/invaders-sim"
++INV_WANT=$("$BUILD/invaders-sim" | grep -oE '0x[0-9A-Fa-f]{4}' | tail -1)
++INV_FRAMES=$(awk '/#define INV_FRAMES/{print $3; exit}' "$ROOT/examples/snes/invaders_logic.h")
++INV_SETTLE=$(( INV_FRAMES * 2 + 200 ))
++echo "    host oracle attract CRC16=$INV_WANT; settle=$INV_SETTLE frames"
++OBJCOPY="$TOOL/llvm-objcopy"
++ASSETS=()
++for ext in pic pal; do
++  [ -e "$ROOT/examples/snes/invaders.$ext" ] || continue
++  ( cd "$ROOT/examples/snes" && "$OBJCOPY" -I binary -O elf32-mos \
++      --rename-section ".data=.rodata.invaders_${ext},alloc,load,readonly,data,contents" \
++      "invaders.$ext" "$BUILD/invaders.$ext.o" )
++  ASSETS+=("$BUILD/invaders.$ext.o")
++done
++
++declare -A ITEXT IIND IOK
++for m in 0 1 2; do
++  rom="$BUILD/invaders-dispatch-m$m.sfc"
++  map="$BUILD/invaders-dispatch-m$m.map"
++  "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
++    -Xclang -target-feature -Xclang +mos-a16 -Os \
++    -mllvm -verify-machineinstrs \
++    -DSNESGFX_DISPATCH=$m \
++    -Wl,-Map="$map" -o "$rom" "$ROOT/examples/snes/invaders.c" "${ASSETS[@]}"
++  python3 "$ROOT/tools/snes-checksum.py" "$rom" >/dev/null
++
++  sum=0
++  for h in $(awk "/invaders-dispatch-m$m\\.sfc\\.lto\\.o.*\\.text/{print \$3}" "$map"); do
++    sum=$((sum + 16#$h))
++  done
++  ITEXT[$m]=$sum
++
++  elf="$rom.elf"
++  [ -f "$elf" ] || { echo "FATAL: $elf missing"; exit 1; }
++  IIND[$m]=$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$elf" \
++               | grep -cE 'jmp \(|jsr \(|jsr.*<__call_indir>' || true)
++
++  caddr=$(awk '$NF=="corpus_result"{print $1; exit}' "$map")
++  line_g="$("$JGX" "$rom" "$VENDOR/Database" "0x$caddr" 2 "$INV_WANT" "$INV_SETTLE" 2>/dev/null | grep -m1 '^SMOKE:' || true)"
++  echo "  mode $m gate:    $line_g"
++  case "$line_g" in "SMOKE: PASS"*) IOK[$m]=1 ;; *) IOK[$m]=0 ;; esac
++done
++
 +echo
 +echo "==> RESULTS (bsnes-jg, $FRAMES deterministic frames; iters = full canvas redraws)"
 +printf '  %-28s %10s %10s %10s\n' "mode" ".text B" "ind.calls" "iters"
@@ -103,8 +153,18 @@ index 0000000..cafced5
 +  echo "  total virtual cost   (iters0/iters2): ${r02}x"
 +fi
 +
++echo
++echo "==> RESULTS invaders.c (attract gate @$INV_SETTLE frames, oracle $INV_WANT)"
++printf '  %-28s %10s %10s %6s\n' "mode" ".text B" "ind.calls" "gate"
++for m in 0 1 2; do
++  g=FAIL; [ "${IOK[$m]}" = 1 ] && g=PASS
++  case $m in 0) lbl="0 static inline (today)";; 1) lbl="1 out-of-line direct";; 2) lbl="2 all-virtual (vtables)";; esac
++  printf '  %-28s %10s %10s %6s\n' "$lbl" "${ITEXT[$m]}" "${IIND[$m]}" "$g"
++done
++
 +rc=0
-+for m in 0 1 2; do [ "${CRCOK[$m]}" = 1 ] || { echo "FAIL: mode $m corpus_result mismatch"; rc=1; }; done
++for m in 0 1 2; do [ "${CRCOK[$m]}" = 1 ] || { echo "FAIL: bench mode $m corpus_result mismatch"; rc=1; }; done
++for m in 0 1 2; do [ "${IOK[$m]}" = 1 ] || { echo "FAIL: invaders mode $m attract gate"; rc=1; }; done
 +# Mode 1 BEATING mode 0 is a real 65816 effect (out-of-line calls shrink the caller's
 +# a16 register/ZP live set — same reason canvas_line was already noinline). But virtual
 +# dispatch (2) beating direct calls (1) would be nonsense — flag that.
