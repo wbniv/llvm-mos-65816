@@ -1,0 +1,1497 @@
+diff --git a/dev/measure-snesgfx-dispatch.sh b/dev/measure-snesgfx-dispatch.sh
+new file mode 100755
+index 0000000..cafced5
+--- /dev/null
++++ b/dev/measure-snesgfx-dispatch.sh
+@@ -0,0 +1,108 @@
++#!/usr/bin/env bash
++# dev/measure-snesgfx-dispatch.sh — static vs all-virtual snesgfx dispatch: size + throughput.
++#
++# Builds examples/snes/snesgfx_bench.c at SNESGFX_DISPATCH = 0 (static inline, production),
++# 1 (out-of-line direct calls), 2 (per-type vtables), then for each mode:
++#   - .text bytes (the bench's .lto.o lines in the linker map)
++#   - indirect dispatch call sites (jmp-ind + jsr-ind + jsr __call_indir) in the ELF
++#   - correctness: corpus_result == host oracle (tools/snesgfx-bench-oracle.c) on bsnes-jg
++#   - throughput: `iters` (full canvas redraws) completed after BENCH_FRAMES deterministic
++#     bsnes-jg frames — more iters == cheaper dispatch. No MAME leg: the SPC700 IPL is not
++#     present in this environment; the deterministic bsnes-jg core carries the verdict
++#     (the repo's JG_ONLY convention, cf. dev/_emu.sh require_bios).
++#
++# Drive: dev/run.sh measure-snesgfx-dispatch. Env: BENCH_FRAMES (default 600 ≈ 10 s emulated).
++set -euo pipefail
++case "${1-}" in -h|--help)
++  echo "Usage: dev/run.sh measure-snesgfx-dispatch   # 3-mode dispatch-cost benchmark (bsnes-jg)"
++  exit 0;; esac
++
++ROOT=/work
++BUILD="$ROOT/build"
++TOOL="${MOS_TOOLCHAIN:-$BUILD/llvm-mos-install}/bin"
++CFG="$BUILD/install/bin/mos-snes.cfg"
++SRC="$ROOT/examples/snes/snesgfx_bench.c"
++VENDOR="$ROOT/vendor/bsnes-jg"
++JGX="$BUILD/jgxcheck"
++FRAMES="${BENCH_FRAMES:-600}"
++
++[ -x "$TOOL/mos-clang" ] || { echo "FATAL: no from-source toolchain at $TOOL"; exit 1; }
++[ -f "$CFG" ] || { echo "FATAL: SDK/snes not built"; exit 1; }
++[ -x "$JGX" ] || { echo "FATAL: build/jgxcheck missing (run a demo gate once to build it)"; exit 1; }
++
++"$ROOT/dev/sync-platform.sh"
++
++# Host oracle: the expected corpus_result (independent reimplementation).
++cc -O2 -o "$BUILD/snesgfx-bench-oracle" "$ROOT/tools/snesgfx-bench-oracle.c"
++WANT="$("$BUILD/snesgfx-bench-oracle")"
++echo "==> snesgfx dispatch benchmark: host oracle corpus_result=$WANT, frames=$FRAMES"
++echo
++
++declare -A TEXTSZ IND ITERS CRCOK
++
++for m in 0 1 2; do
++  rom="$BUILD/snesgfx-bench-m$m.sfc"
++  map="$BUILD/snesgfx-bench-m$m.map"
++  "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
++    -Xclang -target-feature -Xclang +mos-a16 -Os \
++    -mllvm -verify-machineinstrs \
++    -DSNESGFX_DISPATCH=$m \
++    -Wl,-Map="$map" -o "$rom" "$SRC"
++  python3 "$ROOT/tools/snes-checksum.py" "$rom" >/dev/null
++
++  # .text bytes attributed to the bench's LTO object (library/crt excluded).
++  # (bash 16# arithmetic, not awk strtonum — the container's mawk lacks it.)
++  sum=0
++  for h in $(awk "/snesgfx-bench-m$m\\.sfc\\.lto\\.o.*\\.text/{print \$3}" "$map"); do
++    sum=$((sum + 16#$h))
++  done
++  TEXTSZ[$m]=$sum
++
++  # Indirect dispatch call sites in the ELF (must exist — a missing ELF must FAIL, not read 0).
++  elf="$rom.elf"
++  [ -f "$elf" ] || { echo "FATAL: $elf missing"; exit 1; }
++  IND[$m]=$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$elf" \
++              | grep -cE 'jmp \(|jsr \(|jsr.*<__call_indir>' || true)
++
++  # WRAM offsets from the linker map.
++  caddr=$(awk '$NF=="corpus_result"{print $1; exit}' "$map")
++  iaddr=$(awk '$NF=="iters"{print $1; exit}' "$map")
++  [ -n "$caddr" ] && [ -n "$iaddr" ] || { echo "FATAL: corpus_result/iters not in $map"; exit 1; }
++
++  # Leg 1 — correctness: corpus_result must equal the host oracle after $FRAMES frames.
++  line_c="$("$JGX" "$rom" "$VENDOR/Database" "0x$caddr" 2 "$WANT" "$FRAMES" 2>/dev/null | grep -m1 '^SMOKE:' || true)"
++  echo "  mode $m corpus:  $line_c"
++  case "$line_c" in "SMOKE: PASS"*) CRCOK[$m]=1 ;; *) CRCOK[$m]=0 ;; esac
++
++  # Leg 2 — throughput: read the 4-byte iters counter at the same fixed frame (want
++  # deliberately impossible; the printed got= carries the value on the FAIL line).
++  line_i="$("$JGX" "$rom" "$VENDOR/Database" "0x$iaddr" 4 0xFFFFFFFF "$FRAMES" 2>/dev/null | grep -m1 '^SMOKE:' || true)"
++  got=$(printf '%s' "$line_i" | sed -n 's/.*got=0x\([0-9A-Fa-f]*\).*/\1/p')
++  ITERS[$m]=$((16#${got:-0}))
++  echo "  mode $m iters:   ${ITERS[$m]}  (raw: $line_i)"
++done
++
++echo
++echo "==> RESULTS (bsnes-jg, $FRAMES deterministic frames; iters = full canvas redraws)"
++printf '  %-28s %10s %10s %10s\n' "mode" ".text B" "ind.calls" "iters"
++printf '  %-28s %10s %10s %10s\n' "0 static inline (today)"    "${TEXTSZ[0]}" "${IND[0]}" "${ITERS[0]}"
++printf '  %-28s %10s %10s %10s\n' "1 out-of-line direct"       "${TEXTSZ[1]}" "${IND[1]}" "${ITERS[1]}"
++printf '  %-28s %10s %10s %10s\n' "2 all-virtual (vtables)"    "${TEXTSZ[2]}" "${IND[2]}" "${ITERS[2]}"
++if [ "${ITERS[1]}" -gt 0 ] && [ "${ITERS[2]}" -gt 0 ]; then
++  r01=$(awk "BEGIN{printf \"%.2f\", ${ITERS[0]}/${ITERS[1]}}")
++  r12=$(awk "BEGIN{printf \"%.2f\", ${ITERS[1]}/${ITERS[2]}}")
++  r02=$(awk "BEGIN{printf \"%.2f\", ${ITERS[0]}/${ITERS[2]}}")
++  echo "  inlining-loss cost   (iters0/iters1): ${r01}x"
++  echo "  indirection cost     (iters1/iters2): ${r12}x"
++  echo "  total virtual cost   (iters0/iters2): ${r02}x"
++fi
++
++rc=0
++for m in 0 1 2; do [ "${CRCOK[$m]}" = 1 ] || { echo "FAIL: mode $m corpus_result mismatch"; rc=1; }; done
++# Mode 1 BEATING mode 0 is a real 65816 effect (out-of-line calls shrink the caller's
++# a16 register/ZP live set — same reason canvas_line was already noinline). But virtual
++# dispatch (2) beating direct calls (1) would be nonsense — flag that.
++[ "${ITERS[1]}" -ge "${ITERS[2]}" ] \
++  || echo "NOTE: mode 2 (virtual) outran mode 1 (direct) — implausible; investigate before quoting"
++if [ "$rc" -eq 0 ]; then echo "RESULT: PASS — all 3 modes correct; see table"; else echo "RESULT: FAIL"; fi
++exit $rc
+diff --git a/examples/snes/snesgfx/bitmap_canvas.h b/examples/snes/snesgfx/bitmap_canvas.h
+index 7f579dc..d3b6a1f 100644
+--- a/examples/snes/snesgfx/bitmap_canvas.h
++++ b/examples/snes/snesgfx/bitmap_canvas.h
+@@ -18,6 +18,7 @@
+ #include <snes.h>
+ #include "drawable.h"
+ #include "upload.h"
++#include "dispatch.h"
+ 
+ #define CANVAS_TILES_W  16                       /* canvas width  in 8x8 tiles -> 128 px */
+ #define CANVAS_TILES_H  16                       /* canvas height in 8x8 tiles -> 128 px */
+@@ -31,14 +32,27 @@
+                                                   /* wireframe's crisp full-canvas clear+redraw needs 256 */
+                                                   /* = 4 KB/v-blank, which a real NTSC v-blank can move). */
+ 
++typedef struct BitmapCanvas BitmapCanvas;
++
++#if SNESGFX_DISPATCH == 2
+ typedef struct {
++  void (*plot) (BitmapCanvas *c, int16_t x, int16_t y, uint8_t color);
++  void (*line) (BitmapCanvas *c, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color);
++  void (*clear)(BitmapCanvas *c);
++} BitmapCanvasVT;
++#endif
++
++struct BitmapCanvas {
+   Drawable base;                                  /* member 0 — (Drawable*)&c is a free upcast */
++#if SNESGFX_DISPATCH == 2
++  const BitmapCanvasVT *vt;
++#endif
+   uint8_t  chr[CANVAS_NTILES * CANVAS_TILEBYTES]; /* 2bpp tile shadow (4 KB) */
+   uint16_t lo, hi;                                /* dirty tile range [lo,hi]; lo>hi == empty */
+   uint16_t chr_word;                              /* BG3 char VRAM base (word) */
+   uint16_t map_word;                              /* BG3 tilemap VRAM base (word) */
+   uint8_t  box_col, box_row;                      /* tilemap cell where the 16x16 box starts */
+-} BitmapCanvas;
++};
+ 
+ /* VRAM tile# of canvas tile 0 (2bpp: 8 words/tile) and of the off-box "blank" tile. */
+ #define _CANVAS_BASE_TILE(c)  ((uint16_t)((c)->chr_word >> 3))
+@@ -82,21 +96,9 @@ static void _canvas_emit(Drawable *d, UploadQueue *q) {
+ 
+ static const DrawableVT CANVAS_VT = { _canvas_reserve, _canvas_emit };
+ 
+-static inline void canvas_init(BitmapCanvas *c, uint16_t chr_word, uint16_t map_word,
+-                               uint8_t box_col, uint8_t box_row) {
+-  c->base.vt = &CANVAS_VT;
+-  c->base.tm_bits = TM_BG3;
+-  c->chr_word = chr_word;
+-  c->map_word = map_word;
+-  c->box_col = box_col;
+-  c->box_row = box_row;
+-  for (uint16_t i = 0; i < CANVAS_NTILES * CANVAS_TILEBYTES; i++) c->chr[i] = 0;
+-  c->lo = 0xFFFF; c->hi = 0;
+-}
+-
+ /* Set pixel (x,y) to `color` (1..3; 0 is the transparent background). OR-only — the curve
+    accumulates; canvas_clear is the only eraser. Out-of-range points are dropped (unsigned compare). */
+-static inline void canvas_plot(BitmapCanvas *c, int16_t x, int16_t y, uint8_t color) {
++SNESGFX_IMPL void _canvas_plot_impl(BitmapCanvas *c, int16_t x, int16_t y, uint8_t color) {
+   if ((uint16_t)x >= CANVAS_W || (uint16_t)y >= CANVAS_H) return;
+   uint16_t tile = (uint16_t)(((uint16_t)y >> 3) * CANVAS_TILES_W + ((uint16_t)x >> 3));
+   uint8_t *t = &c->chr[tile * CANVAS_TILEBYTES + ((uint8_t)y & 7) * 2];
+@@ -107,11 +109,13 @@ static inline void canvas_plot(BitmapCanvas *c, int16_t x, int16_t y, uint8_t co
+   if (tile > c->hi) c->hi = tile;
+ }
+ 
++static inline void canvas_plot(BitmapCanvas *c, int16_t x, int16_t y, uint8_t color);
++
+ /* Bresenham line from (x0,y0) to (x1,y1) — connects consecutive curve samples so the rose is a
+    continuous stroke at any point density (and is itself integer-only shift/compare codegen).
+    noinline: keeps its live set out of the caller's a16/xy16 register budget (handoff §4). */
+-__attribute__((noinline))
+-static void canvas_line(BitmapCanvas *c, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color) {
++__attribute__((noinline, unused))
++static void _canvas_line_impl(BitmapCanvas *c, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color) {
+   int16_t dx = (int16_t)(x1 > x0 ? x1 - x0 : x0 - x1);
+   int16_t dy = (int16_t)(y1 > y0 ? y1 - y0 : y0 - y1);
+   int16_t sx = (int16_t)(x0 < x1 ? 1 : -1);
+@@ -126,9 +130,51 @@ static void canvas_line(BitmapCanvas *c, int16_t x0, int16_t y0, int16_t x1, int
+   }
+ }
+ 
+-static inline void canvas_clear(BitmapCanvas *c) {
++SNESGFX_IMPL void _canvas_clear_impl(BitmapCanvas *c) {
+   for (uint16_t i = 0; i < CANVAS_NTILES * CANVAS_TILEBYTES; i++) c->chr[i] = 0;
+   c->lo = 0; c->hi = (uint16_t)(CANVAS_NTILES - 1);  /* re-DMA the whole canvas (capped/frame) */
+ }
+ 
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const BitmapCanvasVT CANVAS_MVT = {
++  _canvas_plot_impl, _canvas_line_impl, _canvas_clear_impl
++};
++#endif
++
++/* Constructor (never virtual — it installs the vtables: DrawableVT + the member VT). */
++SNESGFX_IMPL void canvas_init(BitmapCanvas *c, uint16_t chr_word, uint16_t map_word,
++                              uint8_t box_col, uint8_t box_row) {
++  c->base.vt = &CANVAS_VT;
++  c->base.tm_bits = TM_BG3;
++  SNESGFX_SET_VT(c, CANVAS_MVT);
++  c->chr_word = chr_word;
++  c->map_word = map_word;
++  c->box_col = box_col;
++  c->box_row = box_row;
++  for (uint16_t i = 0; i < CANVAS_NTILES * CANVAS_TILEBYTES; i++) c->chr[i] = 0;
++  c->lo = 0xFFFF; c->hi = 0;
++}
++
++static inline void canvas_plot(BitmapCanvas *c, int16_t x, int16_t y, uint8_t color) {
++#if SNESGFX_DISPATCH == 2
++  c->vt->plot(c, x, y, color);
++#else
++  _canvas_plot_impl(c, x, y, color);
++#endif
++}
++static inline void canvas_line(BitmapCanvas *c, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color) {
++#if SNESGFX_DISPATCH == 2
++  c->vt->line(c, x0, y0, x1, y1, color);
++#else
++  _canvas_line_impl(c, x0, y0, x1, y1, color);
++#endif
++}
++static inline void canvas_clear(BitmapCanvas *c) {
++#if SNESGFX_DISPATCH == 2
++  c->vt->clear(c);
++#else
++  _canvas_clear_impl(c);
++#endif
++}
++
+ #endif /* SNESGFX_BITMAP_CANVAS_H */
+diff --git a/examples/snes/snesgfx/controller.h b/examples/snes/snesgfx/controller.h
+index 071071d..2687f07 100644
+--- a/examples/snes/snesgfx/controller.h
++++ b/examples/snes/snesgfx/controller.h
+@@ -9,13 +9,70 @@
+ #define SNESGFX_CONTROLLER_H
+ 
+ #include <snes.h>
++#include "dispatch.h"
+ 
+-typedef struct { uint16_t cur, prev; } Controller;
++typedef struct Controller Controller;
+ 
+-static inline void controller_init(Controller *c) { c->cur = 0; c->prev = 0; }
+-static inline void controller_poll(Controller *c) { c->prev = c->cur; c->cur = snes_read_pad1(); }
+-static inline uint16_t controller_held    (const Controller *c) { return c->cur; }
+-static inline uint16_t controller_pressed (const Controller *c) { return (uint16_t)(c->cur & (uint16_t)~c->prev); }
+-static inline uint16_t controller_released(const Controller *c) { return (uint16_t)((uint16_t)~c->cur & c->prev); }
++#if SNESGFX_DISPATCH == 2
++typedef struct {
++  void     (*poll)    (Controller *c);
++  uint16_t (*held)    (const Controller *c);
++  uint16_t (*pressed) (const Controller *c);
++  uint16_t (*released)(const Controller *c);
++} ControllerVT;
++#endif
++
++struct Controller {
++#if SNESGFX_DISPATCH == 2
++  const ControllerVT *vt;
++#endif
++  uint16_t cur, prev;
++};
++
++SNESGFX_IMPL void _controller_poll_impl(Controller *c) { c->prev = c->cur; c->cur = snes_read_pad1(); }
++SNESGFX_IMPL uint16_t _controller_held_impl    (const Controller *c) { return c->cur; }
++SNESGFX_IMPL uint16_t _controller_pressed_impl (const Controller *c) { return (uint16_t)(c->cur & (uint16_t)~c->prev); }
++SNESGFX_IMPL uint16_t _controller_released_impl(const Controller *c) { return (uint16_t)((uint16_t)~c->cur & c->prev); }
++
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const ControllerVT CONTROLLER_VT = {
++  _controller_poll_impl, _controller_held_impl, _controller_pressed_impl, _controller_released_impl
++};
++#endif
++
++/* Constructor (never virtual — it installs the vtable). */
++SNESGFX_IMPL void controller_init(Controller *c) {
++  SNESGFX_SET_VT(c, CONTROLLER_VT);
++  c->cur = 0; c->prev = 0;
++}
++
++static inline void controller_poll(Controller *c) {
++#if SNESGFX_DISPATCH == 2
++  c->vt->poll(c);
++#else
++  _controller_poll_impl(c);
++#endif
++}
++static inline uint16_t controller_held(const Controller *c) {
++#if SNESGFX_DISPATCH == 2
++  return c->vt->held(c);
++#else
++  return _controller_held_impl(c);
++#endif
++}
++static inline uint16_t controller_pressed(const Controller *c) {
++#if SNESGFX_DISPATCH == 2
++  return c->vt->pressed(c);
++#else
++  return _controller_pressed_impl(c);
++#endif
++}
++static inline uint16_t controller_released(const Controller *c) {
++#if SNESGFX_DISPATCH == 2
++  return c->vt->released(c);
++#else
++  return _controller_released_impl(c);
++#endif
++}
+ 
+ #endif /* SNESGFX_CONTROLLER_H */
+diff --git a/examples/snes/snesgfx/dispatch.h b/examples/snes/snesgfx/dispatch.h
+new file mode 100644
+index 0000000..26a546c
+--- /dev/null
++++ b/examples/snes/snesgfx/dispatch.h
+@@ -0,0 +1,41 @@
++/* snesgfx — dispatch.h: the SNESGFX_DISPATCH experiment switch (static vs all-virtual).
++ *
++ * Selects how every snesgfx "member function" (`Type_verb(Type *self, …)`) is dispatched:
++ *
++ *   SNESGFX_DISPATCH=0  static inline (production default — byte-identical to the pre-switch code)
++ *   SNESGFX_DISPATCH=1  out-of-line direct calls: impls are noinline, call sites still direct.
++ *                       Isolates the LOSS-OF-INLINING cost (an address-taken impl can't inline).
++ *   SNESGFX_DISPATCH=2  per-type vtable: every member call goes self->vt->verb(self, …).
++ *                       Adds the INDIRECT-DISPATCH cost on top of mode 1.
++ *
++ * Scope exclusions (see docs/oop-in-c.md §8): constructors (*_init — they SET the vt pointer),
++ * HScrollN-receiver functions (HScrollN.tab is the literal DMA-visible HDMA table; a vt member
++ * would corrupt its layout), free functions (splash_show, m7splash* — no receiver), and the
++ * pre-existing DrawableVT (already virtual by design).
++ *
++ * Each Type_verb is a static-inline forwarder around a _Type_verb_impl; all demos compile
++ * unchanged in every mode. Header-only. */
++#ifndef SNESGFX_DISPATCH_H
++#define SNESGFX_DISPATCH_H
++
++#ifndef SNESGFX_DISPATCH
++#define SNESGFX_DISPATCH 0
++#endif
++
++#if SNESGFX_DISPATCH == 0
++#define SNESGFX_IMPL static inline
++#else
++/* noinline: force a real out-of-line function (modes 1 & 2). unused: a demo that includes a
++   header without calling some member must not warn (static non-inline functions do). */
++#define SNESGFX_IMPL static __attribute__((noinline, unused))
++#endif
++
++/* Constructor helper: install a type's vtable in mode 2; expands to nothing otherwise
++   (the vtable symbol does not exist outside mode 2 — the macro must not reference it). */
++#if SNESGFX_DISPATCH == 2
++#define SNESGFX_SET_VT(obj, vtbl) ((obj)->vt = &(vtbl))
++#else
++#define SNESGFX_SET_VT(obj, vtbl) ((void)0)
++#endif
++
++#endif /* SNESGFX_DISPATCH_H */
+diff --git a/examples/snes/snesgfx/display.h b/examples/snes/snesgfx/display.h
+index 2fdbfef..45af5e3 100644
+--- a/examples/snes/snesgfx/display.h
++++ b/examples/snes/snesgfx/display.h
+@@ -17,8 +17,25 @@
+ #include "upload.h"
+ #include "vram.h"
+ #include "scene.h"
++#include "dispatch.h"
+ 
++typedef struct Display Display;
++
++#if SNESGFX_DISPATCH == 2
+ typedef struct {
++  void (*add)       (Display *d, Drawable *layer);
++  void (*hide_layer)(Display *d, Drawable *layer);
++  void (*frame)     (Display *d);
++  void (*fade_to)   (Display *d, uint8_t target);
++  void (*fade)      (Display *d, uint8_t target);
++  void (*hold)      (Display *d, uint16_t frames);
++} DisplayVT;
++#endif
++
++struct Display {
++#if SNESGFX_DISPATCH == 2
++  const DisplayVT *vt;
++#endif
+   UploadQueue q;       /* private collaborator */
+   VramAlloc   va;      /* private collaborator */
+   Scene       scene;   /* the drawables        */
+@@ -26,28 +43,14 @@ typedef struct {
+   uint8_t     shown;   /* force-blank released yet? */
+   uint8_t     bright;  /* current INIDISP master brightness 0..15 (the post-flush value)          */
+   uint8_t     btgt;    /* brightness target — display_frame ramps `bright` one step toward it      */
+-} Display;
++};
+ 
+-/* Constructor: the boot bracket. Force-blank + zero all PPU control regs, init the owned
+-   queue/alloc/scene, select BG mode, arm the v-blank NMI flag. Screen stays force-blanked
+-   until the first complete frame (display_frame releases it). */
+-static inline void display_init(Display *d) {
+-  snes_ppu_reset_blank();                 /* force-blank + zero $2101..$2133 (skips data ports) */
+-  upq_init(&d->q, 0);                      /* GP-DMA channel 0 */
+-  vram_init(&d->va, 0x0000, 0x0000);       /* BG regions bump-allocate from word 0 (OBJ uses a fixed page) */
+-  scene_init(&d->scene);
+-  d->tm = 0;
+-  d->shown = 0;
+-  d->bright = INIDISP_ON;                   /* default full brightness — the ramp is a no-op    */
+-  d->btgt   = INIDISP_ON;                   /* until a fade is requested (display_fade_to)        */
+-  REG_BGMODE   = BGMODE_1;                  /* BG1/BG2 4bpp, BG3 2bpp */
+-  REG_TM       = 0;                          /* all layers off until drawables enable theirs */
+-  REG_NMITIMEN = NMITIMEN_NMI;              /* enable the v-blank NMI flag so snes_wait_vblank() works */
+-}
++/* Forwarder prototypes the impls below call (display_fade/hold loop on display_frame). */
++static inline void display_frame(Display *d);
+ 
+ /* Add a drawable, reserve its VRAM / set its layer registers, and enable its layer on the main
+    screen via the TM shadow (never a read-modify-write of the write-only TM register). */
+-static inline void display_add(Display *d, Drawable *layer) {
++SNESGFX_IMPL void _display_add_impl(Display *d, Drawable *layer) {
+   scene_add(&d->scene, layer);
+   drawable_reserve(layer, &d->va);
+   d->tm = (uint8_t)(d->tm | layer->tm_bits);
+@@ -58,7 +61,7 @@ static inline void display_add(Display *d, Drawable *layer) {
+    write-only TM register. Used to tear down a transient overlay (e.g. a TitleLayer shown during a
+    demo's slow pre-loop compute) so the demo's own layer takes over. TM is a plain PPU control
+    register (not VRAM/CGRAM/OAM), so this is safe to call outside v-blank. */
+-static inline void display_hide_layer(Display *d, Drawable *layer) {
++SNESGFX_IMPL void _display_hide_layer_impl(Display *d, Drawable *layer) {
+   d->tm = (uint8_t)(d->tm & (uint8_t)~layer->tm_bits);
+   REG_TM = d->tm;
+ }
+@@ -68,7 +71,7 @@ static inline void display_hide_layer(Display *d, Drawable *layer) {
+    into active display; force-blank ensures those writes are never rejected).
+    scene_emit() runs BEFORE snes_wait_vblank so it does not eat into the 36-scanline
+    vblank window: it only touches WRAM (no PPU ports) so it is safe at any scanline. */
+-static inline void display_frame(Display *d) {
++SNESGFX_IMPL void _display_frame_impl(Display *d) {
+   (void)REG_RDNMI;                          /* clear a stale flag latched during the compute */
+   scene_emit(&d->scene, &d->q);             /* build upload queue (WRAM only — any scanline) */
+   snes_wait_vblank();                       /* block until the next v-blank actually begins   */
+@@ -83,12 +86,12 @@ static inline void display_frame(Display *d) {
+ }
+ 
+ /* Set the brightness fade target (0 = black .. 15 = full). display_frame ramps toward it 1/frame. */
+-static inline void display_fade_to(Display *d, uint8_t target) { d->btgt = target; }
++SNESGFX_IMPL void _display_fade_to_impl(Display *d, uint8_t target) { d->btgt = target; }
+ 
+ /* Block, ramping the master brightness to `target` (one step per v-blank), so the screen fades to
+    `target` over ~|bright-target| frames. The scene still emits each frame, so a fading title's
+    slide/shimmer/backdrop keep animating through the fade. */
+-static inline void display_fade(Display *d, uint8_t target) {
++SNESGFX_IMPL void _display_fade_impl(Display *d, uint8_t target) {
+   d->btgt = target;
+   while (d->bright != target) display_frame(d);
+ }
+@@ -99,8 +102,77 @@ static inline void display_fade(Display *d, uint8_t target) {
+    pre-loop compute (e.g. Newton's gate hash) need 0 here because the compute itself holds the title.
+    NOTE: these frames shift a fixed-time gate screenshot — re-confirm the demo's render still completes
+    before its dev/<demo>.sh capture (bump -seconds_to_run / jgxcheck frames if not). */
+-static inline void display_hold(Display *d, uint16_t frames) {
++SNESGFX_IMPL void _display_hold_impl(Display *d, uint16_t frames) {
+   while (frames--) display_frame(d);
+ }
+ 
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const DisplayVT DISPLAY_VT = {
++  _display_add_impl, _display_hide_layer_impl, _display_frame_impl,
++  _display_fade_to_impl, _display_fade_impl, _display_hold_impl
++};
++#endif
++
++/* Constructor: the boot bracket. Force-blank + zero all PPU control regs, init the owned
++   queue/alloc/scene, select BG mode, arm the v-blank NMI flag. Screen stays force-blanked
++   until the first complete frame (display_frame releases it). Never virtual — it installs
++   the vtable (and the owned collaborators' constructors install theirs). */
++SNESGFX_IMPL void display_init(Display *d) {
++  SNESGFX_SET_VT(d, DISPLAY_VT);
++  snes_ppu_reset_blank();                 /* force-blank + zero $2101..$2133 (skips data ports) */
++  upq_init(&d->q, 0);                      /* GP-DMA channel 0 */
++  vram_init(&d->va, 0x0000, 0x0000);       /* BG regions bump-allocate from word 0 (OBJ uses a fixed page) */
++  scene_init(&d->scene);
++  d->tm = 0;
++  d->shown = 0;
++  d->bright = INIDISP_ON;                   /* default full brightness — the ramp is a no-op    */
++  d->btgt   = INIDISP_ON;                   /* until a fade is requested (display_fade_to)        */
++  REG_BGMODE   = BGMODE_1;                  /* BG1/BG2 4bpp, BG3 2bpp */
++  REG_TM       = 0;                          /* all layers off until drawables enable theirs */
++  REG_NMITIMEN = NMITIMEN_NMI;              /* enable the v-blank NMI flag so snes_wait_vblank() works */
++}
++
++static inline void display_add(Display *d, Drawable *layer) {
++#if SNESGFX_DISPATCH == 2
++  d->vt->add(d, layer);
++#else
++  _display_add_impl(d, layer);
++#endif
++}
++static inline void display_hide_layer(Display *d, Drawable *layer) {
++#if SNESGFX_DISPATCH == 2
++  d->vt->hide_layer(d, layer);
++#else
++  _display_hide_layer_impl(d, layer);
++#endif
++}
++static inline void display_frame(Display *d) {
++#if SNESGFX_DISPATCH == 2
++  d->vt->frame(d);
++#else
++  _display_frame_impl(d);
++#endif
++}
++static inline void display_fade_to(Display *d, uint8_t target) {
++#if SNESGFX_DISPATCH == 2
++  d->vt->fade_to(d, target);
++#else
++  _display_fade_to_impl(d, target);
++#endif
++}
++static inline void display_fade(Display *d, uint8_t target) {
++#if SNESGFX_DISPATCH == 2
++  d->vt->fade(d, target);
++#else
++  _display_fade_impl(d, target);
++#endif
++}
++static inline void display_hold(Display *d, uint16_t frames) {
++#if SNESGFX_DISPATCH == 2
++  d->vt->hold(d, frames);
++#else
++  _display_hold_impl(d, frames);
++#endif
++}
++
+ #endif /* SNESGFX_DISPLAY_H */
+diff --git a/examples/snes/snesgfx/hdma_hscroll.h b/examples/snes/snesgfx/hdma_hscroll.h
+index 67360df..540058a 100644
+--- a/examples/snes/snesgfx/hdma_hscroll.h
++++ b/examples/snes/snesgfx/hdma_hscroll.h
+@@ -30,6 +30,7 @@
+ 
+ #include <snes.h>
+ #include "upload.h"   /* HScrollDB publishes its pointer swap through the v-blank upload queue */
++#include "dispatch.h"
+ 
+ /* B-bus destination low bytes for the four BG horizontal-scroll latches (for hscrolln_arm `reg_lo`). */
+ #define HSCROLL_BG1HOFS  0x0Du
+@@ -49,20 +50,35 @@
+ #define HSCROLL_MAX_RUNS   8u
+ #define HSCROLL_TAB_BYTES  (HSCROLL_MAX_RUNS * 3u + 1u)
+ 
++/* HScrollN stays a bare byte array — its tab[] IS the DMA-visible HDMA table, so it can never
++   carry a vtable pointer (SNESGFX_DISPATCH scope exclusion; see dispatch.h / oop-in-c §8). */
+ typedef struct { uint8_t tab[HSCROLL_TAB_BYTES]; } HScrollN;
+ 
+ /* Streaming writer: bands are appended one at a time, so a caller computing bands on the fly needs
+    no intermediate array (which on the 65816 would mean a stack-resident struct array — expensive).
+    Usage:  HScrollW w; hscrollw_begin(&w, &tab); hscrollw_band(&w, n, val); …; hscrollw_end(&w); */
+-typedef struct { HScrollN *t; uint8_t w; } HScrollW;
++typedef struct HScrollW HScrollW;
+ 
+-static inline void hscrollw_begin(HScrollW *s, HScrollN *t) { s->t = t; s->w = 0; }
++#if SNESGFX_DISPATCH == 2
++typedef struct {
++  void (*band)(HScrollW *s, uint8_t lines, int16_t val);
++  void (*end) (HScrollW *s);
++} HScrollWVT;
++#endif
++
++struct HScrollW {
++#if SNESGFX_DISPATCH == 2
++  const HScrollWVT *vt;
++#endif
++  HScrollN *t;
++  uint8_t   w;
++};
+ 
+ /* Append one band: `lines` consecutive scanlines all scrolled by `val` (10-bit scroll value; only
+    the low 10 bits reach the latch, so −4 == shift content 4 px right == 0x3FC). Zero-length bands
+    are ignored; bands longer than 127 lines become several same-value runs, since the count byte's
+    bit 7 selects repeat mode. Silently stops at table capacity rather than overrunning. */
+-static inline void hscrollw_band(HScrollW *s, uint8_t lines, int16_t val) {
++SNESGFX_IMPL void _hscrollw_band_impl(HScrollW *s, uint8_t lines, int16_t val) {
+   uint16_t rem = lines;
+   while (rem != 0u && (uint16_t)(s->w + 3u) < HSCROLL_TAB_BYTES) {
+     uint8_t run = (rem > 127u) ? 127u : (uint8_t)rem;
+@@ -76,7 +92,32 @@ static inline void hscrollw_band(HScrollW *s, uint8_t lines, int16_t val) {
+ /* Terminate the table. The caller is responsible for the band lengths summing to 224 — a short
+    table simply leaves the latch at its last value for the remaining scanlines, which is benign but
+    usually unintended. */
+-static inline void hscrollw_end(HScrollW *s) { s->t->tab[s->w] = 0; }
++SNESGFX_IMPL void _hscrollw_end_impl(HScrollW *s) { s->t->tab[s->w] = 0; }
++
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const HScrollWVT HSCROLLW_VT = { _hscrollw_band_impl, _hscrollw_end_impl };
++#endif
++
++/* Constructor (never virtual — it installs the vtable). */
++SNESGFX_IMPL void hscrollw_begin(HScrollW *s, HScrollN *t) {
++  SNESGFX_SET_VT(s, HSCROLLW_VT);
++  s->t = t; s->w = 0;
++}
++
++static inline void hscrollw_band(HScrollW *s, uint8_t lines, int16_t val) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->band(s, lines, val);
++#else
++  _hscrollw_band_impl(s, lines, val);
++#endif
++}
++static inline void hscrollw_end(HScrollW *s) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->end(s);
++#else
++  _hscrollw_end_impl(s);
++#endif
++}
+ 
+ /* Arm HDMA channel `chan` to stream `h->tab` into the write-twice scroll register whose B-bus low
+    byte is `reg_lo` (one of the HSCROLL_/VSCROLL_ macros). The table must be in bank 0 (low WRAM).
+@@ -103,23 +144,61 @@ static inline void hscrolln_arm(uint8_t chan, uint8_t reg_lo, const HScrollN *h)
+  * HDMA-init (start of the next frame), so a v-blank pointer swap is atomic with respect to the
+  * transfer. If the queue is full the flip is skipped and the engine simply re-runs the previous
+  * frame's table — one stale frame, never a torn one. */
+-typedef struct { HScrollN buf[2]; uint8_t cur; } HScrollDB;
++typedef struct HScrollDB HScrollDB;
++
++#if SNESGFX_DISPATCH == 2
++typedef struct {
++  HScrollN *(*back)  (HScrollDB *d);
++  void      (*commit)(HScrollDB *d, UploadQueue *q, uint8_t chan);
++} HScrollDBVT;
++#endif
++
++struct HScrollDB {
++#if SNESGFX_DISPATCH == 2
++  const HScrollDBVT *vt;
++#endif
++  HScrollN buf[2];
++  uint8_t  cur;
++};
+ 
+ /* The half to build into this frame (never the one HDMA is reading). */
+-static inline HScrollN *hscrolldb_back(HScrollDB *d) { return &d->buf[d->cur ^ 1u]; }
++SNESGFX_IMPL HScrollN *_hscrolldb_back_impl(HScrollDB *d) { return &d->buf[d->cur ^ 1u]; }
+ 
+-/* Arm the channel on buffer 0 and make it live. Call once, before HDMAEN enables the channel. */
+-static inline void hscrolldb_arm(uint8_t chan, uint8_t reg_lo, HScrollDB *d) {
+-  d->cur = 0;
+-  hscrolln_arm(chan, reg_lo, &d->buf[0]);
+-}
++static inline HScrollN *hscrolldb_back(HScrollDB *d);
+ 
+ /* Publish the half just built: queue the A1Tx pointer update for the v-blank window. Only advance
+    `cur` if the write was actually queued, so a full queue costs a stale frame, not a torn table. */
+-static inline void hscrolldb_commit(HScrollDB *d, UploadQueue *q, uint8_t chan) {
++SNESGFX_IMPL void _hscrolldb_commit_impl(HScrollDB *d, UploadQueue *q, uint8_t chan) {
+   uint16_t a1t = (uint16_t)(0x4302u + (uint16_t)chan * 0x10u);   /* A1TxL / A1TxH */
+   HScrollN *back = hscrolldb_back(d);
+   if (upq_push_poke16(q, a1t, (uint16_t)(uintptr_t)back->tab)) d->cur ^= 1u;
+ }
+ 
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const HScrollDBVT HSCROLLDB_VT = { _hscrolldb_back_impl, _hscrolldb_commit_impl };
++#endif
++
++/* Arm the channel on buffer 0 and make it live. Call once, before HDMAEN enables the channel.
++   Acts as the constructor (never virtual — it installs the vtable). */
++SNESGFX_IMPL void hscrolldb_arm(uint8_t chan, uint8_t reg_lo, HScrollDB *d) {
++  SNESGFX_SET_VT(d, HSCROLLDB_VT);
++  d->cur = 0;
++  hscrolln_arm(chan, reg_lo, &d->buf[0]);
++}
++
++static inline HScrollN *hscrolldb_back(HScrollDB *d) {
++#if SNESGFX_DISPATCH == 2
++  return d->vt->back(d);
++#else
++  return _hscrolldb_back_impl(d);
++#endif
++}
++static inline void hscrolldb_commit(HScrollDB *d, UploadQueue *q, uint8_t chan) {
++#if SNESGFX_DISPATCH == 2
++  d->vt->commit(d, q, chan);
++#else
++  _hscrolldb_commit_impl(d, q, chan);
++#endif
++}
++
+ #endif /* SNESGFX_HDMA_HSCROLL_H */
+diff --git a/examples/snes/snesgfx/scene.h b/examples/snes/snesgfx/scene.h
+index af1ccd3..1307164 100644
+--- a/examples/snes/snesgfx/scene.h
++++ b/examples/snes/snesgfx/scene.h
+@@ -9,28 +9,74 @@
+ #define SNESGFX_SCENE_H
+ 
+ #include "drawable.h"
++#include "dispatch.h"
+ 
+ #ifndef SCENE_MAX
+ #define SCENE_MAX 4
+ #endif
+ 
++typedef struct Scene Scene;
++
++#if SNESGFX_DISPATCH == 2
+ typedef struct {
++  void (*add)    (Scene *s, Drawable *d);
++  void (*reserve)(Scene *s, VramAlloc *va);
++  void (*emit)   (Scene *s, UploadQueue *q);
++} SceneVT;
++#endif
++
++struct Scene {
++#if SNESGFX_DISPATCH == 2
++  const SceneVT *vt;
++#endif
+   Drawable *items[SCENE_MAX];
+   uint8_t   n;
+-} Scene;
+-
+-static inline void scene_init(Scene *s) { s->n = 0; }
++};
+ 
+-static inline void scene_add(Scene *s, Drawable *d) {
++SNESGFX_IMPL void _scene_add_impl(Scene *s, Drawable *d) {
+   if (s->n < SCENE_MAX) s->items[s->n++] = d;
+ }
+ 
+-static inline void scene_reserve(Scene *s, VramAlloc *va) {
++SNESGFX_IMPL void _scene_reserve_impl(Scene *s, VramAlloc *va) {
+   for (uint8_t i = 0; i < s->n; i++) drawable_reserve(s->items[i], va);
+ }
+ 
+-static inline void scene_emit(Scene *s, UploadQueue *q) {
++SNESGFX_IMPL void _scene_emit_impl(Scene *s, UploadQueue *q) {
+   for (uint8_t i = 0; i < s->n; i++) drawable_emit(s->items[i], q);  /* one indirect call each */
+ }
+ 
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const SceneVT SCENE_VT = {
++  _scene_add_impl, _scene_reserve_impl, _scene_emit_impl
++};
++#endif
++
++/* Constructor (never virtual — it installs the vtable). */
++SNESGFX_IMPL void scene_init(Scene *s) {
++  SNESGFX_SET_VT(s, SCENE_VT);
++  s->n = 0;
++}
++
++static inline void scene_add(Scene *s, Drawable *d) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->add(s, d);
++#else
++  _scene_add_impl(s, d);
++#endif
++}
++static inline void scene_reserve(Scene *s, VramAlloc *va) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->reserve(s, va);
++#else
++  _scene_reserve_impl(s, va);
++#endif
++}
++static inline void scene_emit(Scene *s, UploadQueue *q) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->emit(s, q);
++#else
++  _scene_emit_impl(s, q);
++#endif
++}
++
+ #endif /* SNESGFX_SCENE_H */
+diff --git a/examples/snes/snesgfx/sprite_set.h b/examples/snes/snesgfx/sprite_set.h
+index 83c28f0..9e0d2d1 100644
+--- a/examples/snes/snesgfx/sprite_set.h
++++ b/examples/snes/snesgfx/sprite_set.h
+@@ -15,16 +15,33 @@
+ #include <snes.h>
+ #include "drawable.h"
+ #include "upload.h"
++#include "dispatch.h"
+ 
+ #define SPR_OFFSCREEN_Y 0xE0   /* park Y below the 224-line screen to hide a sprite */
+ 
++typedef struct SpriteSet SpriteSet;
++
++#if SNESGFX_DISPATCH == 2
+ typedef struct {
++  void (*put)    (SpriteSet *s, uint8_t i, int16_t x, uint8_t y,
++                  uint8_t tile, uint8_t attr, uint8_t large);
++  void (*move)   (SpriteSet *s, uint8_t i, int16_t x, uint8_t y);
++  void (*hide)   (SpriteSet *s, uint8_t i);
++  void (*palette)(SpriteSet *s, UploadQueue *q, uint8_t group,
++                  const void *colors, uint8_t nbytes);
++} SpriteSetVT;
++#endif
++
++struct SpriteSet {
+   Drawable base;            /* member 0 — (Drawable*)&s is a free upcast */
++#if SNESGFX_DISPATCH == 2
++  const SpriteSetVT *vt;
++#endif
+   uint8_t  lo[512];         /* low table:  128 x {Xlo, Y, tile, attr}    */
+   uint8_t  hi[32];          /* high table: 2 bits/sprite (X bit8 + size) — MUST follow lo */
+   uint16_t chr_base_word;   /* sprite tile VRAM base (8K-word OBSEL granular) */
+   uint8_t  size_pair;       /* OBSEL bits 7-5: the (small,large) size pair    */
+-} SpriteSet;
++};
+ 
+ static void _sprite_reserve(Drawable *d, VramAlloc *va) {
+   (void)va;                 /* OBJ tile VRAM is a fixed page, not bump-allocated */
+@@ -40,22 +57,10 @@ static void _sprite_emit(Drawable *d, UploadQueue *q) {
+ 
+ static const DrawableVT SPRITE_VT = { _sprite_reserve, _sprite_emit };
+ 
+-/* Construct: wire the vtable, record OBSEL config, hide all 128 sprites. */
+-static inline void sprite_set_init(SpriteSet *s, uint8_t size_pair, uint16_t chr_base_word) {
+-  s->base.vt = &SPRITE_VT;
+-  s->base.tm_bits = TM_OBJ;       /* Display ORs this into its TM shadow */
+-  s->size_pair = size_pair;
+-  s->chr_base_word = chr_base_word;
+-  for (uint16_t o = 0; o < 512; o += 4) {
+-    s->lo[o] = 0; s->lo[o + 1] = SPR_OFFSCREEN_Y; s->lo[o + 2] = 0; s->lo[o + 3] = 0;
+-  }
+-  for (uint8_t i = 0; i < 32; i++) s->hi[i] = 0;
+-}
+-
+ /* Full setter: write sprite i's 4 low-table bytes + its 2-bit high-table field.
+    attr byte = V H pp ppp N (bit7 vflip, bit6 hflip, bits5-4 priority, bits3-1 palette, bit0 tile#8). */
+-static inline void sprite_set_put(SpriteSet *s, uint8_t i, int16_t x, uint8_t y,
+-                                  uint8_t tile, uint8_t attr, uint8_t large) {
++SNESGFX_IMPL void _sprite_set_put_impl(SpriteSet *s, uint8_t i, int16_t x, uint8_t y,
++                                       uint8_t tile, uint8_t attr, uint8_t large) {
+   uint16_t o = (uint16_t)i << 2;
+   s->lo[o]     = (uint8_t)x;
+   s->lo[o + 1] = y;
+@@ -69,7 +74,7 @@ static inline void sprite_set_put(SpriteSet *s, uint8_t i, int16_t x, uint8_t y,
+ }
+ 
+ /* Cheap reposition: X (incl. bit 8) + Y only, keeping tile/attr/size. */
+-static inline void sprite_set_move(SpriteSet *s, uint8_t i, int16_t x, uint8_t y) {
++SNESGFX_IMPL void _sprite_set_move_impl(SpriteSet *s, uint8_t i, int16_t x, uint8_t y) {
+   uint16_t o = (uint16_t)i << 2;
+   s->lo[o]     = (uint8_t)x;
+   s->lo[o + 1] = y;
+@@ -78,15 +83,65 @@ static inline void sprite_set_move(SpriteSet *s, uint8_t i, int16_t x, uint8_t y
+   else           s->hi[i >> 2] &= (uint8_t)~(1u << sh);
+ }
+ 
+-static inline void sprite_set_hide(SpriteSet *s, uint8_t i) {
++SNESGFX_IMPL void _sprite_set_hide_impl(SpriteSet *s, uint8_t i) {
+   s->lo[((uint16_t)i << 2) + 1] = SPR_OFFSCREEN_Y;
+ }
+ 
+ /* Enqueue an upload of `nbytes` of palette into sprite palette group `group` (CGRAM 128 + group*16). */
+-static inline void sprite_set_palette(SpriteSet *s, UploadQueue *q, uint8_t group,
+-                                      const void *colors, uint8_t nbytes) {
++SNESGFX_IMPL void _sprite_set_palette_impl(SpriteSet *s, UploadQueue *q, uint8_t group,
++                                           const void *colors, uint8_t nbytes) {
+   (void)s;
+   upq_push_cgram(q, (uint8_t)(128 + group * 16), colors, 0x00, nbytes);
+ }
+ 
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const SpriteSetVT SPRITE_MVT = {
++  _sprite_set_put_impl, _sprite_set_move_impl, _sprite_set_hide_impl, _sprite_set_palette_impl
++};
++#endif
++
++/* Construct: wire the vtable(s), record OBSEL config, hide all 128 sprites. Never virtual. */
++SNESGFX_IMPL void sprite_set_init(SpriteSet *s, uint8_t size_pair, uint16_t chr_base_word) {
++  s->base.vt = &SPRITE_VT;
++  s->base.tm_bits = TM_OBJ;       /* Display ORs this into its TM shadow */
++  SNESGFX_SET_VT(s, SPRITE_MVT);
++  s->size_pair = size_pair;
++  s->chr_base_word = chr_base_word;
++  for (uint16_t o = 0; o < 512; o += 4) {
++    s->lo[o] = 0; s->lo[o + 1] = SPR_OFFSCREEN_Y; s->lo[o + 2] = 0; s->lo[o + 3] = 0;
++  }
++  for (uint8_t i = 0; i < 32; i++) s->hi[i] = 0;
++}
++
++static inline void sprite_set_put(SpriteSet *s, uint8_t i, int16_t x, uint8_t y,
++                                  uint8_t tile, uint8_t attr, uint8_t large) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->put(s, i, x, y, tile, attr, large);
++#else
++  _sprite_set_put_impl(s, i, x, y, tile, attr, large);
++#endif
++}
++static inline void sprite_set_move(SpriteSet *s, uint8_t i, int16_t x, uint8_t y) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->move(s, i, x, y);
++#else
++  _sprite_set_move_impl(s, i, x, y);
++#endif
++}
++static inline void sprite_set_hide(SpriteSet *s, uint8_t i) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->hide(s, i);
++#else
++  _sprite_set_hide_impl(s, i);
++#endif
++}
++static inline void sprite_set_palette(SpriteSet *s, UploadQueue *q, uint8_t group,
++                                      const void *colors, uint8_t nbytes) {
++#if SNESGFX_DISPATCH == 2
++  s->vt->palette(s, q, group, colors, nbytes);
++#else
++  _sprite_set_palette_impl(s, q, group, colors, nbytes);
++#endif
++}
++
+ #endif /* SNESGFX_SPRITE_SET_H */
+diff --git a/examples/snes/snesgfx/text_layer.h b/examples/snes/snesgfx/text_layer.h
+index 90c6462..668f286 100644
+--- a/examples/snes/snesgfx/text_layer.h
++++ b/examples/snes/snesgfx/text_layer.h
+@@ -16,19 +16,32 @@
+ #include <snes.h>
+ #include "drawable.h"
+ #include "upload.h"
++#include "dispatch.h"
+ #include "../font8.h"
+ 
+ #define TEXT_NROWS  2          // HUD bars: row[0] = top values, row[1] = bottom legend
+ #define TEXT_COLS   32
+ #define TEXT_FONT_BASE 256     // first font glyph tile# (right after canvas tiles 0..255 / blank 256)
+ 
++typedef struct TextLayer TextLayer;
++
++#if SNESGFX_DISPATCH == 2
+ typedef struct {
++  void (*puts)     (TextLayer *t, uint8_t bar, uint8_t col, const char *s);
++  void (*clear_bar)(TextLayer *t, uint8_t bar);
++} TextLayerVT;
++#endif
++
++struct TextLayer {
+   Drawable base;
++#if SNESGFX_DISPATCH == 2
++  const TextLayerVT *vt;
++#endif
+   uint16_t map_word;                       // shared BG3 tilemap base (same as the canvas)
+   uint8_t  trow[TEXT_NROWS];               // tilemap row each HUD bar maps to
+   uint16_t shadow[TEXT_NROWS * TEXT_COLS]; // tilemap-entry shadow for the bars
+   uint8_t  dirty;                          // bit i set => re-DMA bar i
+-} TextLayer;
++};
+ 
+ static void _text_reserve(Drawable *d, VramAlloc *va) {
+   (void)va;
+@@ -50,18 +63,9 @@ static void _text_emit(Drawable *d, UploadQueue *q) {
+ 
+ static const DrawableVT TEXT_VT = { _text_reserve, _text_emit };
+ 
+-static inline void text_init(TextLayer *t, uint16_t map_word, uint8_t top_row, uint8_t bot_row) {
+-  t->base.vt = &TEXT_VT;
+-  t->base.tm_bits = 0;                      // canvas already enables BG3
+-  t->map_word = map_word;
+-  t->trow[0] = top_row; t->trow[1] = bot_row;
+-  for (uint16_t i = 0; i < TEXT_NROWS * TEXT_COLS; i++) t->shadow[i] = TEXT_FONT_BASE;  // all spaces
+-  t->dirty = (uint8_t)((1u << TEXT_NROWS) - 1u);
+-}
+-
+ /* Write NUL-terminated ASCII `s` into HUD bar `bar` (0/1) starting at column `col`. Glyph tile# =
+    FONT_BASE + (ch - FONT8_FIRST); out-of-set chars render as space. Marks the bar dirty. */
+-static inline void text_puts(TextLayer *t, uint8_t bar, uint8_t col, const char *s) {
++SNESGFX_IMPL void _text_puts_impl(TextLayer *t, uint8_t bar, uint8_t col, const char *s) {
+   uint16_t *row = &t->shadow[bar * TEXT_COLS];
+   for (; *s && col < TEXT_COLS; s++, col++) {
+     uint8_t ch = (uint8_t)*s;
+@@ -72,10 +76,42 @@ static inline void text_puts(TextLayer *t, uint8_t bar, uint8_t col, const char
+ }
+ 
+ /* Clear HUD bar `bar` to spaces (marks dirty). */
+-static inline void text_clear_bar(TextLayer *t, uint8_t bar) {
++SNESGFX_IMPL void _text_clear_bar_impl(TextLayer *t, uint8_t bar) {
+   uint16_t *row = &t->shadow[bar * TEXT_COLS];
+   for (uint8_t c = 0; c < TEXT_COLS; c++) row[c] = TEXT_FONT_BASE;
+   t->dirty |= (uint8_t)(1u << bar);
+ }
+ 
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const TextLayerVT TEXT_MVT = {
++  _text_puts_impl, _text_clear_bar_impl
++};
++#endif
++
++/* Constructor (never virtual — it installs the vtables). */
++SNESGFX_IMPL void text_init(TextLayer *t, uint16_t map_word, uint8_t top_row, uint8_t bot_row) {
++  t->base.vt = &TEXT_VT;
++  t->base.tm_bits = 0;                      // canvas already enables BG3
++  SNESGFX_SET_VT(t, TEXT_MVT);
++  t->map_word = map_word;
++  t->trow[0] = top_row; t->trow[1] = bot_row;
++  for (uint16_t i = 0; i < TEXT_NROWS * TEXT_COLS; i++) t->shadow[i] = TEXT_FONT_BASE;  // all spaces
++  t->dirty = (uint8_t)((1u << TEXT_NROWS) - 1u);
++}
++
++static inline void text_puts(TextLayer *t, uint8_t bar, uint8_t col, const char *s) {
++#if SNESGFX_DISPATCH == 2
++  t->vt->puts(t, bar, col, s);
++#else
++  _text_puts_impl(t, bar, col, s);
++#endif
++}
++static inline void text_clear_bar(TextLayer *t, uint8_t bar) {
++#if SNESGFX_DISPATCH == 2
++  t->vt->clear_bar(t, bar);
++#else
++  _text_clear_bar_impl(t, bar);
++#endif
++}
++
+ #endif /* SNESGFX_TEXT_LAYER_H */
+diff --git a/examples/snes/snesgfx/title_layer.h b/examples/snes/snesgfx/title_layer.h
+index 8ccad77..2724636 100644
+--- a/examples/snes/snesgfx/title_layer.h
++++ b/examples/snes/snesgfx/title_layer.h
+@@ -72,6 +72,7 @@
+ #include "drawable.h"
+ #include "display.h"
+ #include "hdma_hscroll.h"
++#include "dispatch.h"
+ #include "../font8.h"
+ #include "../font16.h"   /* real 16×16 Waldo font (face + SE drop-shadow) for line1 — ALWAYS */
+ 
+@@ -134,8 +135,19 @@
+ /* Band budget: 2 glyph bands (≤20 lines each, so never chunked) + at most 5 blank chunks of
+    ≤112 lines = 7 runs, comfortably inside HSCROLL_MAX_RUNS (12). */
+ 
++typedef struct TitleLayer TitleLayer;
++
++#if SNESGFX_DISPATCH == 2
+ typedef struct {
++  void (*end)(Display *d, TitleLayer *t, uint16_t frames);
++} TitleLayerVT;
++#endif
++
++struct TitleLayer {
+   Drawable    base;
++#if SNESGFX_DISPATCH == 2
++  const TitleLayerVT *vt;    /* member vtable (base.vt is the DrawableVT) */
++#endif
+   const char *line0;     /* 8×8 font, centred   (NULL = skip) */
+   const char *line1;     /* 16×16 font, centred; wrapped to two rows past TITLE_MAX_CHARS */
+   /* --- resolved layout (computed in title_init from line1's length) --- */
+@@ -163,7 +175,7 @@ typedef struct {
+   uint16_t    back;      /* live backdrop colour (CGRAM[0])                                 */
+   HScrollDB   vscroll;   /* BG2VOFS band table, double-buffered (rebuilt each emit frame)   */
+   HScrollDB   hscroll;   /* BG2HOFS band table, same boundaries, same frame                 */
+-} TitleLayer;
++};
+ 
+ #define TITLE_INK_IDX  (uint8_t)(TITLE_PAL * 16u + 1u)   /* CGRAM entry for ink (= 113) */
+ 
+@@ -425,9 +437,17 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
+ 
+ static const DrawableVT TITLE_VT = { _title_reserve, _title_emit };
+ 
+-static inline void title_init(TitleLayer *t, const char *line0, const char *line1) {
++#if SNESGFX_DISPATCH == 2
++static inline void title_end(Display *d, TitleLayer *t, uint16_t frames);
++SNESGFX_IMPL void _title_end_impl(Display *d, TitleLayer *t, uint16_t frames);
++static __attribute__((unused)) const TitleLayerVT TITLE_MVT = { _title_end_impl };
++#endif
++
++/* Constructor (never virtual — it installs the vtables). */
++SNESGFX_IMPL void title_init(TitleLayer *t, const char *line0, const char *line1) {
+   t->base.vt = &TITLE_VT;
+   t->base.tm_bits = TM_BG2;
++  SNESGFX_SET_VT(t, TITLE_MVT);
+   t->line0 = line0;
+   t->line1 = line1;
+   _title_layout(t);      /* resolves l1a/l1b + ty0/ty1/h1 — reserve and emit both depend on it */
+@@ -439,8 +459,10 @@ static inline void title_init(TitleLayer *t, const char *line0, const char *line
+  *   line0 = 8×8  (category/subtitle) — descends from the top
+  *   line1 = 16×16 (demo name)        — rises from the bottom
+  * Masks demo drawables' TM bits for the duration (restored in title_end).
+- * Returns when both lines are at rest. */
+-static inline void title_begin(Display *d, TitleLayer *t, const char *line0, const char *line1) {
++ * Returns when both lines are at rest.
++ * Constructor-like (it title_init()s the TitleLayer) — never virtual: the receiver does not
++ * exist yet when it is called. Out-of-line in dispatch modes 1-2 like every other member. */
++SNESGFX_IMPL void title_begin(Display *d, TitleLayer *t, const char *line0, const char *line1) {
+   title_init(t, line0, line1);
+   t->phase = 0; t->active = 1; t->falling = 0; t->exiting = 0; t->flyin = 0;
+   t->ink = (uint16_t)SNES_RGB(31, 31, 31); t->back = 0u;
+@@ -467,7 +489,7 @@ static inline void title_begin(Display *d, TitleLayer *t, const char *line0, con
+ /* title_end — hold for `frames` v-blanks, drop both lines off the bottom under gravity, fade to
+  * black, restore the demo layers.
+  *   Recommended: pass TITLE_HOLD_FRAMES (120 = 2 s) unless the demo has specific needs. */
+-static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
++SNESGFX_IMPL void _title_end_impl(Display *d, TitleLayer *t, uint16_t frames) {
+   display_hold(d, frames);
+   t->falling = 1; t->exiting = 1;
+   /* Run the fall at FULL BRIGHTNESS until line0 (the higher of the two, so the last to leave) has
+@@ -493,10 +515,19 @@ static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
+   display_fade_to(d, INIDISP_ON);    /* fade back up showing demo content */
+ }
+ 
++static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
++#if SNESGFX_DISPATCH == 2
++  t->vt->end(d, t, frames);
++#else
++  _title_end_impl(d, t, frames);
++#endif
++}
++
+ /* splash16 — standalone title splash (no pre-existing display; leaves screen in force-blank).
+  * Drop-in for Mode-7 demos that don't use the display system for their main render.
++ * Free function (no receiver) — excluded from virtualization; out-of-line in modes 1-2.
+  * Recommended: pass TITLE_HOLD_FRAMES (120) for consistent timing. */
+-static inline void splash16(const char *line0, const char *line1, uint16_t frames) {
++SNESGFX_IMPL void splash16(const char *line0, const char *line1, uint16_t frames) {
+   Display _d; display_init(&_d);
+   static TitleLayer _t;
+   title_begin(&_d, &_t, line0, line1);
+diff --git a/examples/snes/snesgfx/upload.h b/examples/snes/snesgfx/upload.h
+index 39338e6..28280f5 100644
+--- a/examples/snes/snesgfx/upload.h
++++ b/examples/snes/snesgfx/upload.h
+@@ -10,6 +10,7 @@
+ #define SNESGFX_UPLOAD_H
+ 
+ #include <snes.h>
++#include "dispatch.h"
+ 
+ #ifndef UPQ_MAX_JOBS
+ #define UPQ_MAX_JOBS 16
+@@ -33,18 +34,34 @@ typedef struct {
+   uint8_t  port;     /* UPQ_VRAM / UPQ_CGRAM / UPQ_OAM               */
+ } UpqJob;
+ 
++typedef struct UploadQueue UploadQueue;
++
++#if SNESGFX_DISPATCH == 2
+ typedef struct {
++  void    (*push_vram)  (UploadQueue *q, uint16_t destword, const void *src,
++                         uint8_t bank, uint16_t nbytes, uint8_t vmain);
++  void    (*push_cgram) (UploadQueue *q, uint8_t cgidx, const void *src,
++                         uint8_t bank, uint16_t nbytes);
++  void    (*push_oam)   (UploadQueue *q, const void *src, uint8_t bank, uint16_t nbytes);
++  void    (*push_scroll)(UploadQueue *q, uint16_t reg, uint16_t value);
++  uint8_t (*push_poke16)(UploadQueue *q, uint16_t addr, uint16_t value);
++  void    (*flush)      (UploadQueue *q);
++} UploadQueueVT;
++#endif
++
++struct UploadQueue {
++#if SNESGFX_DISPATCH == 2
++  const UploadQueueVT *vt;
++#endif
+   UpqJob  job[UPQ_MAX_JOBS];
+   uint8_t n;
+   uint8_t chan;      /* GP-DMA channel (0..7) */
+-} UploadQueue;
+-
+-static inline void upq_init(UploadQueue *q, uint8_t chan) { q->n = 0; q->chan = chan; }
++};
+ 
+ /* Enqueue a VRAM character/tilemap upload to word address `destword`. `vmain` picks the
+    auto-increment (VMAIN_INC_HIGH_1 for the usual word stream via $2118/$2119). */
+-static inline void upq_push_vram(UploadQueue *q, uint16_t destword, const void *src,
+-                                 uint8_t bank, uint16_t nbytes, uint8_t vmain) {
++SNESGFX_IMPL void _upq_push_vram_impl(UploadQueue *q, uint16_t destword, const void *src,
++                                      uint8_t bank, uint16_t nbytes, uint8_t vmain) {
+   if (!nbytes || q->n >= UPQ_MAX_JOBS) return;
+   UpqJob *j = &q->job[q->n++];
+   j->port = UPQ_VRAM; j->dest = destword; j->vmain = vmain;
+@@ -53,8 +70,8 @@ static inline void upq_push_vram(UploadQueue *q, uint16_t destword, const void *
+ }
+ 
+ /* Enqueue a CGRAM palette upload starting at colour index `cgidx`. */
+-static inline void upq_push_cgram(UploadQueue *q, uint8_t cgidx, const void *src,
+-                                  uint8_t bank, uint16_t nbytes) {
++SNESGFX_IMPL void _upq_push_cgram_impl(UploadQueue *q, uint8_t cgidx, const void *src,
++                                       uint8_t bank, uint16_t nbytes) {
+   if (!nbytes || q->n >= UPQ_MAX_JOBS) return;
+   UpqJob *j = &q->job[q->n++];
+   j->port = UPQ_CGRAM; j->dest = cgidx; j->vmain = 0;
+@@ -63,7 +80,7 @@ static inline void upq_push_cgram(UploadQueue *q, uint8_t cgidx, const void *src
+ }
+ 
+ /* Enqueue an OAM upload (typically the whole 544-byte shadow from byte 0). */
+-static inline void upq_push_oam(UploadQueue *q, const void *src, uint8_t bank, uint16_t nbytes) {
++SNESGFX_IMPL void _upq_push_oam_impl(UploadQueue *q, const void *src, uint8_t bank, uint16_t nbytes) {
+   if (!nbytes || q->n >= UPQ_MAX_JOBS) return;
+   UpqJob *j = &q->job[q->n++];
+   j->port = UPQ_OAM; j->dest = 0; j->vmain = 0;
+@@ -75,7 +92,7 @@ static inline void upq_push_oam(UploadQueue *q, const void *src, uint8_t bank, u
+    It is applied inside upq_flush() (the v-blank/force-blank window), NOT during active display:
+    a scroll register written mid-frame shears the picture from that scanline down. `value`'s low
+    byte then high byte are written to the register at address `reg` (e.g. &REG_BG3VOFS). */
+-static inline void upq_push_scroll(UploadQueue *q, uint16_t reg, uint16_t value) {
++SNESGFX_IMPL void _upq_push_scroll_impl(UploadQueue *q, uint16_t reg, uint16_t value) {
+   if (q->n >= UPQ_MAX_JOBS) return;
+   UpqJob *j = &q->job[q->n++];
+   j->port = UPQ_REG; j->dest = reg; j->src = value; j->nbytes = 0;
+@@ -87,7 +104,7 @@ static inline void upq_push_scroll(UploadQueue *q, uint16_t reg, uint16_t value)
+    internal counter at HDMA-init (start of the next frame), so updating it during v-blank swaps
+    tables atomically with respect to the transfer. Returns 1 if queued, 0 if the queue was full —
+    callers that must not lose the write (a double-buffer flip) should only advance on 1. */
+-static inline uint8_t upq_push_poke16(UploadQueue *q, uint16_t addr, uint16_t value) {
++SNESGFX_IMPL uint8_t _upq_push_poke16_impl(UploadQueue *q, uint16_t addr, uint16_t value) {
+   if (q->n >= UPQ_MAX_JOBS) return 0;
+   UpqJob *j = &q->job[q->n++];
+   j->port = UPQ_POKE16; j->dest = addr; j->src = value; j->nbytes = 0;
+@@ -98,7 +115,7 @@ static inline uint8_t upq_push_poke16(UploadQueue *q, uint16_t addr, uint16_t va
+    v-blank (Display guarantees this). The CPU stalls on each MDMAEN until the copy completes.
+    dma_base and mdmaen_bit are hoisted out of the loop so the 65816 never recomputes
+    chan*0x10 or 1<<chan on every iteration (those are variable-cost ops). */
+-static inline void upq_flush(UploadQueue *q) {
++SNESGFX_IMPL void _upq_flush_impl(UploadQueue *q) {
+   volatile uint8_t *dma_base =
+     (volatile uint8_t *)(uintptr_t)(0x4300u + (uint16_t)q->chan * 0x10u);
+   uint8_t mdmaen_bit = (uint8_t)(1u << q->chan);
+@@ -131,4 +148,62 @@ static inline void upq_flush(UploadQueue *q) {
+   q->n = 0;
+ }
+ 
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const UploadQueueVT UPQ_VT = {
++  _upq_push_vram_impl, _upq_push_cgram_impl, _upq_push_oam_impl,
++  _upq_push_scroll_impl, _upq_push_poke16_impl, _upq_flush_impl
++};
++#endif
++
++/* Constructor (never virtual — it installs the vtable). */
++SNESGFX_IMPL void upq_init(UploadQueue *q, uint8_t chan) {
++  SNESGFX_SET_VT(q, UPQ_VT);
++  q->n = 0; q->chan = chan;
++}
++
++static inline void upq_push_vram(UploadQueue *q, uint16_t destword, const void *src,
++                                 uint8_t bank, uint16_t nbytes, uint8_t vmain) {
++#if SNESGFX_DISPATCH == 2
++  q->vt->push_vram(q, destword, src, bank, nbytes, vmain);
++#else
++  _upq_push_vram_impl(q, destword, src, bank, nbytes, vmain);
++#endif
++}
++static inline void upq_push_cgram(UploadQueue *q, uint8_t cgidx, const void *src,
++                                  uint8_t bank, uint16_t nbytes) {
++#if SNESGFX_DISPATCH == 2
++  q->vt->push_cgram(q, cgidx, src, bank, nbytes);
++#else
++  _upq_push_cgram_impl(q, cgidx, src, bank, nbytes);
++#endif
++}
++static inline void upq_push_oam(UploadQueue *q, const void *src, uint8_t bank, uint16_t nbytes) {
++#if SNESGFX_DISPATCH == 2
++  q->vt->push_oam(q, src, bank, nbytes);
++#else
++  _upq_push_oam_impl(q, src, bank, nbytes);
++#endif
++}
++static inline void upq_push_scroll(UploadQueue *q, uint16_t reg, uint16_t value) {
++#if SNESGFX_DISPATCH == 2
++  q->vt->push_scroll(q, reg, value);
++#else
++  _upq_push_scroll_impl(q, reg, value);
++#endif
++}
++static inline uint8_t upq_push_poke16(UploadQueue *q, uint16_t addr, uint16_t value) {
++#if SNESGFX_DISPATCH == 2
++  return q->vt->push_poke16(q, addr, value);
++#else
++  return _upq_push_poke16_impl(q, addr, value);
++#endif
++}
++static inline void upq_flush(UploadQueue *q) {
++#if SNESGFX_DISPATCH == 2
++  q->vt->flush(q);
++#else
++  _upq_flush_impl(q);
++#endif
++}
++
+ #endif /* SNESGFX_UPLOAD_H */
+diff --git a/examples/snes/snesgfx/vram.h b/examples/snes/snesgfx/vram.h
+index e4f9475..4ab89eb 100644
+--- a/examples/snes/snesgfx/vram.h
++++ b/examples/snes/snesgfx/vram.h
+@@ -11,29 +11,64 @@
+ #define SNESGFX_VRAM_H
+ 
+ #include <stdint.h>
++#include "dispatch.h"
+ 
++typedef struct VramAlloc VramAlloc;
++
++#if SNESGFX_DISPATCH == 2
+ typedef struct {
++  uint16_t (*chr)(VramAlloc *v, uint16_t nwords);
++  uint16_t (*map)(VramAlloc *v, uint16_t nwords);
++} VramAllocVT;
++#endif
++
++struct VramAlloc {
++#if SNESGFX_DISPATCH == 2
++  const VramAllocVT *vt;
++#endif
+   uint16_t chr_next;   /* next free char word  */
+   uint16_t map_next;   /* next free tilemap word */
+-} VramAlloc;
++};
++
++SNESGFX_IMPL uint16_t _vram_chr_impl(VramAlloc *v, uint16_t nwords) {
++  uint16_t base = v->chr_next;
++  v->chr_next = (uint16_t)(base + nwords);
++  return base;
++}
+ 
+-static inline void vram_init(VramAlloc *v, uint16_t chr0_word, uint16_t map0_word) {
++SNESGFX_IMPL uint16_t _vram_map_impl(VramAlloc *v, uint16_t nwords) {
++  uint16_t base = v->map_next;
++  v->map_next = (uint16_t)(base + nwords);
++  return base;
++}
++
++#if SNESGFX_DISPATCH == 2
++static __attribute__((unused)) const VramAllocVT VRAM_VT = { _vram_chr_impl, _vram_map_impl };
++#endif
++
++/* Constructor (never virtual — it installs the vtable). */
++SNESGFX_IMPL void vram_init(VramAlloc *v, uint16_t chr0_word, uint16_t map0_word) {
++  SNESGFX_SET_VT(v, VRAM_VT);
+   v->chr_next = chr0_word;
+   v->map_next = map0_word;
+ }
+ 
+ /* Reserve `nwords` of character VRAM; returns its word base. */
+ static inline uint16_t vram_chr(VramAlloc *v, uint16_t nwords) {
+-  uint16_t base = v->chr_next;
+-  v->chr_next = (uint16_t)(base + nwords);
+-  return base;
++#if SNESGFX_DISPATCH == 2
++  return v->vt->chr(v, nwords);
++#else
++  return _vram_chr_impl(v, nwords);
++#endif
+ }
+ 
+ /* Reserve `nwords` of tilemap VRAM; returns its word base. */
+ static inline uint16_t vram_map(VramAlloc *v, uint16_t nwords) {
+-  uint16_t base = v->map_next;
+-  v->map_next = (uint16_t)(base + nwords);
+-  return base;
++#if SNESGFX_DISPATCH == 2
++  return v->vt->map(v, nwords);
++#else
++  return _vram_map_impl(v, nwords);
++#endif
+ }
+ 
+ #endif /* SNESGFX_VRAM_H */
+diff --git a/examples/snes/snesgfx_bench.c b/examples/snes/snesgfx_bench.c
+new file mode 100644
+index 0000000..13b3f02
+--- /dev/null
++++ b/examples/snes/snesgfx_bench.c
+@@ -0,0 +1,54 @@
++// snesgfx dispatch-cost CYCLE benchmark (SNESGFX_DISPATCH-variant-agnostic).
++//
++// Throughput proxy for the static-vs-virtual dispatch measurement
++// (dev/measure-snesgfx-dispatch.sh). Hammers the snesgfx hot path — canvas_clear +
++// a 12-line star via canvas_line (whose Bresenham loop calls canvas_plot per pixel,
++// so dispatch mode 2 pays a virtual call per plotted pixel) — in an INFINITE loop
++// that increments a volatile counter `iters` per full redraw. The harness runs a
++// FIXED number of bsnes-jg frames (deterministic emulation), then reads `iters`:
++// more redraws completed in the same wall of emulated time == cheaper dispatch for
++// that mode. No MAME leg: the SPC700 IPL is not present in this environment, and the
++// deterministic bsnes-jg core carries the verdict (the repo's JG_ONLY convention).
++//
++// corpus_result = CRC16-CCITT of the 4 KB canvas chr shadow after the FIRST redraw —
++// the correctness sentinel: a fast-but-wrong dispatch mode can't score. The host
++// oracle (tools/snesgfx-bench-oracle.c) reimplements plot/line/CRC independently.
++//
++// Variant = build flag: -DSNESGFX_DISPATCH={0,1,2}. Source identical across modes.
++//   mos-clang --config .../mos-snes.cfg -mcpu=mosw65816 +mos-a16 -Os
++// See docs/plans/2026-07-26 (snesgfx all-virtual dispatch benchmark).
++
++#include <stdint.h>
++#include "snesgfx/bitmap_canvas.h"
++
++volatile uint16_t corpus_result;  // CRC16 of chr after redraw #1 (correctness sentinel)
++volatile uint32_t iters;          // full redraws completed; sampled at a fixed frame
++
++static BitmapCanvas canvas;       // 4 KB chr shadow in bank-0 WRAM .bss
++
++// The 12-point star: centre (64,64) to 12 perimeter points of the 128x128 canvas.
++// Endpoints chosen so lines cover all octants (Bresenham takes every branch shape).
++static const int16_t STAR_X[12] = { 64, 96, 120, 120, 96, 64, 32,  8,  8, 32, 127,  0 };
++static const int16_t STAR_Y[12] = {  0,  8,  32,  96, 120, 127, 120, 96, 32,  8, 64, 64 };
++
++static uint16_t crc16_chr(void) {
++  uint16_t crc = 0xFFFF;
++  for (uint16_t i = 0; i < CANVAS_NTILES * CANVAS_TILEBYTES; i++) {
++    crc ^= (uint16_t)((uint16_t)canvas.chr[i] << 8);
++    for (uint8_t b = 0; b < 8; b++)
++      crc = (uint16_t)((crc & 0x8000u) ? (uint16_t)(crc << 1) ^ 0x1021u : (uint16_t)(crc << 1));
++  }
++  return crc;
++}
++
++int main(void) {
++  canvas_init(&canvas, 0x2000, 0x0400, 8, 6);   // VRAM words irrelevant — never uploaded
++  iters = 0;
++  for (;;) {
++    canvas_clear(&canvas);
++    for (uint8_t i = 0; i < 12; i++)
++      canvas_line(&canvas, 64, 64, STAR_X[i], STAR_Y[i], (uint8_t)(1u + (i & 1u)));
++    if (iters == 0) corpus_result = crc16_chr();  // sentinel from redraw #1 only
++    iters = iters + 1;                            // volatile RMW: forces the redraw + counts it
++  }
++}
+diff --git a/tools/snesgfx-bench-oracle.c b/tools/snesgfx-bench-oracle.c
+new file mode 100644
+index 0000000..984b171
+--- /dev/null
++++ b/tools/snesgfx-bench-oracle.c
+@@ -0,0 +1,55 @@
++/* Host oracle for examples/snes/snesgfx_bench.c — INDEPENDENT reimplementation of the
++ * canvas plot/line rasterizer + CRC16 so the ROM's corpus_result can be checked against
++ * host-computed truth (the repo's host-vs-target differential discipline).
++ * Prints the expected 16-bit CRC as 0xXXXX. Build: cc -O2 -o bench-oracle snesgfx-bench-oracle.c */
++#include <stdint.h>
++#include <stdio.h>
++#include <string.h>
++
++#define W 128
++#define H 128
++#define TILES_W 16
++#define TILEBYTES 16
++
++static uint8_t chr[256 * TILEBYTES];
++
++static void plot(int16_t x, int16_t y, uint8_t color) {
++  if ((uint16_t)x >= W || (uint16_t)y >= H) return;
++  uint16_t tile = (uint16_t)(((uint16_t)y >> 3) * TILES_W + ((uint16_t)x >> 3));
++  uint8_t *t = &chr[tile * TILEBYTES + ((uint8_t)y & 7) * 2];
++  uint8_t mask = (uint8_t)(0x80u >> ((uint8_t)x & 7));
++  if (color & 1) t[0] |= mask;
++  if (color & 2) t[1] |= mask;
++}
++
++static void line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color) {
++  int16_t dx = (int16_t)(x1 > x0 ? x1 - x0 : x0 - x1);
++  int16_t dy = (int16_t)(y1 > y0 ? y1 - y0 : y0 - y1);
++  int16_t sx = (int16_t)(x0 < x1 ? 1 : -1);
++  int16_t sy = (int16_t)(y0 < y1 ? 1 : -1);
++  int16_t err = (int16_t)(dx - dy);
++  for (;;) {
++    plot(x0, y0, color);
++    if (x0 == x1 && y0 == y1) break;
++    int16_t e2 = (int16_t)(err * 2);
++    if (e2 > -dy) { err = (int16_t)(err - dy); x0 = (int16_t)(x0 + sx); }
++    if (e2 <  dx) { err = (int16_t)(err + dx); y0 = (int16_t)(y0 + sy); }
++  }
++}
++
++static const int16_t STAR_X[12] = { 64, 96, 120, 120, 96, 64, 32,  8,  8, 32, 127,  0 };
++static const int16_t STAR_Y[12] = {  0,  8,  32,  96, 120, 127, 120, 96, 32,  8, 64, 64 };
++
++int main(void) {
++  memset(chr, 0, sizeof chr);
++  for (uint8_t i = 0; i < 12; i++)
++    line(64, 64, STAR_X[i], STAR_Y[i], (uint8_t)(1u + (i & 1u)));
++  uint16_t crc = 0xFFFF;
++  for (uint16_t i = 0; i < sizeof chr; i++) {
++    crc ^= (uint16_t)((uint16_t)chr[i] << 8);
++    for (uint8_t b = 0; b < 8; b++)
++      crc = (uint16_t)((crc & 0x8000u) ? (uint16_t)(crc << 1) ^ 0x1021u : (uint16_t)(crc << 1));
++  }
++  printf("0x%04X\n", crc);
++  return 0;
++}

@@ -1,13 +1,15 @@
 # OOP-in-C on the 65816 — snesgfx Design Notes
 
-**Verified 2026-06-30** via `examples/snes/mandel-oop.c` (the formal verification client)
-and confirmed across all 29 SNES demos and Space Invaders.
+**Verified 2026-06-30** via `examples/snes/mandel-oop.c` (the formal verification client);
+**counts and measurements refreshed 2026-07-26** (rebased toolchain; hardened measurement in
+`dev/mandel-oop.sh`). Confirmed across all **113** SNES demos that include `snesgfx/`
+(113 of 114 `examples/snes/*.c` — the sole exception is `hello.c`) and Space Invaders.
 
 ---
 
 ## §1 — The library
 
-`snesgfx` is a 12-header header-only OOP-in-C rendering library for the SNES 65816.
+`snesgfx` is a **13-header** header-only OOP-in-C rendering library for the SNES 65816.
 It encapsulates two hardware correctness invariants that are easy to violate:
 
 1. **Boot bracket** — `snes_ppu_reset_blank()` must run exactly once, and force-blank
@@ -20,16 +22,20 @@ pokes in `main()`. Every public call takes the object as receiver (`Type_verb(Ty
 
 ---
 
-## §2 — Dispatch model: three forms
+## §2 — Dispatch model: two forms
 
 | Form | Use | Cost |
 |---|---|---|
-| Static dispatch (direct call) | Inner loops, hot paths — always known type | 0 (inlined by compiler) |
-| Per-object vtable (`DrawableVT`) | `scene_emit` — genuinely heterogeneous: 1 call/drawable/frame | ~8 cycles (JSR + ZP loads); LTO may devirtualize |
-| Selector table | `controller_poll` (joypad event dispatch) — thin per-event dispatch | ~10 cycles |
+| Static dispatch (direct call) | Everything except `Scene`'s drawable loop — always known type | 0 (inlined by compiler) |
+| Per-object vtable (`DrawableVT`) | `scene_emit` — genuinely heterogeneous: 1 call/drawable/frame | **measured**: see §8 — ~1.35× on a dispatch-bound loop; sub-percent at 1 call/frame |
+
+(An earlier revision listed a third "selector table" form for `controller_poll` — that was
+aspirational: `controller.h` is five static-inline accessors over `{cur, prev}`, pure static
+dispatch, cost 0. No selector table exists anywhere in snesgfx.)
 
 The key discipline: **one virtual call per drawable per frame, never per tile/pixel/entity.**
-The expensive loops inside `emit()` are monomorphic and inlinable.
+The expensive loops inside `emit()` are monomorphic and inlinable. §8 quantifies exactly what
+breaking this rule costs.
 
 ---
 
@@ -52,36 +58,41 @@ typedef struct Drawable {
 
 ---
 
-## §4 — Measured dispatch cost (mandel-oop vs mandel-display, 2026-06-30)
+## §4 — Measured dispatch cost (mandel-oop, re-measured 2026-07-26)
 
 | Metric | Result |
 |---|---|
-| Runtime indirect JMPs in `.text` | **0** (LTO devirtualized all vtable calls to direct calls) |
-| OOP `.text` overhead | **+338 bytes** (+10% over procedural mandel-display.c) |
-| ROM size | Both 32,768 bytes (same LoROM footprint) |
-| `corpus_result` | **0x204F** — identical on host, +mos-a16@bsnes-jg |
+| Indirect JMP instructions in `.text` | 0 |
+| **Indirect dispatch call sites** (jmp-ind + jsr-ind + `jsr __call_indir`) | **1** — the `scene_emit` vtable call |
+| `mandel-oop` `.text` | 3,660 bytes |
+| ROM size | 32,768 bytes (LoROM) |
+| `corpus_result` | **0x204F** — identical on host and `+mos-a16`@bsnes-jg; MAME leg SKIP (no SPC700 IPL in this environment — `dev/_emu.sh` gate) |
 
-LTO with `-Os` devirtualizes the single-drawable `scene_emit → _mandel_emit` chain entirely
-(provably one concrete type), eliminating the vtable call overhead at runtime. With multiple
-concrete drawable types in the same `Scene` (e.g. Space Invaders: SpriteSet + TitleLayer),
-LTO cannot devirtualize and the `JSR (abs,X)` or `__call_indir` form appears — but only
-once per drawable per frame.
+**Correction to the 2026-06-30 record:** the original "0 indirect JMPs / LTO devirtualized all
+vtable calls" claim was an artifact of the measurement — the old gate counted only the `jmp (`
+disassembly form (and `|| true`'d over a possibly-missing ELF, reporting 0 either way).
+llvm-mos routes C function-pointer calls through the `__call_indir` helper, which that pattern
+misses. Re-measured with the hardened `dev/mandel-oop.sh` (ELF-existence assert + full pattern):
+**one indirect call survives LTO** — the single `scene_emit → vt->emit` dispatch. LTO does NOT
+devirtualize even this provably-single-target chain. The design consequence is unchanged (one
+coarse virtual call per drawable per frame is noise), but the mechanism claim was wrong.
 
 ---
 
 ## §5 — Size delta (mandel-oop.c vs mandel-display.c)
 
-```
-mandel-oop  .text:     3656 bytes   (OOP: MandelLayer + Display machinery + upload queue)
-mandel-display .text:  3318 bytes   (procedural: manual force-blank + vblank + DMA)
-───────────────────────────────────────────────────────────────────────────────────────
-OOP overhead:           +338 bytes  (+10%)
-```
+The 2026-06-30 measurement (`+338 bytes / +10%` OOP overhead: `mandel-oop` 3,656 B vs
+`mandel-display` 3,318 B `.text`) captured the two programs when they were feature-equivalent.
+**They have since diverged**: `mandel-display.c` grew a coarse-preview progressive-refinement
+pass and a title card, and now measures 8,290 B `.text` vs `mandel-oop`'s 3,660 B — the
+comparison is no longer apples-to-apples and the historical +338 B figure should not be quoted
+as current. The honest current statements are:
 
-The overhead comes from the snesgfx boilerplate (Display, UploadQueue, Scene, VramAlloc) and
-the vtable-based `emit()` path replacing the procedural `wait_vblank_fresh() + dma_chr_to()`
-loop. Across the 29 demos that share these headers (already in each ROM), the marginal cost of
-adding a new Drawable is just its `.text` + vtable (typically 100–400 bytes of emit logic).
+- The OOP machinery itself (Display, UploadQueue, Scene, VramAlloc, vtable `emit()` path)
+  costs a few hundred bytes over a minimal procedural equivalent (the 2026-06-30 measurement,
+  preserved here as history).
+- Across the 113 demos that share these headers, the marginal cost of adding a new Drawable is
+  just its `.text` + vtable (typically 100–400 bytes of emit logic).
 
 ---
 
@@ -113,5 +124,68 @@ display_frame(&screen);   // in loop
 ```
 
 Zero `REG_*` pokes, zero `snes_*` calls. All PPU access is encapsulated in `reserve()` /
-`emit()` / `upq_flush()`. The pattern scales: all 29 demos that use `snesgfx` follow the same
+`emit()` / `upq_flush()`. The pattern scales: all 113 demos that use `snesgfx` follow the same
 structure — `main()` is pure orchestration with no hardware pokes.
+
+---
+
+## §8 — Static vs. all-virtual dispatch (measured 2026-07-26)
+
+**The experiment:** what does it cost to make EVERY snesgfx member function virtual — the
+design §2 forbids? All ~40 receiver-typed member functions across 11 headers were converted to
+a three-mode switch (`SNESGFX_DISPATCH`, experiment branch only — see
+[the investigation](investigations/2026-07-26-snesgfx-static-vs-virtual-dispatch.md) and its
+re-applyable [patch](investigations/2026-07-26-snesgfx-all-virtual.patch)):
+
+- **mode 0** — static inline (production; verified byte-identical `.text` to pre-experiment main)
+- **mode 1** — out-of-line direct calls (`noinline` impls, direct call sites): isolates the
+  **loss-of-inlining** cost — an address-taken function cannot inline
+- **mode 2** — per-type vtables, every member call via `self->vt->verb(self, …)`: adds the
+  **indirect-dispatch** cost on top
+
+Scope exclusions: constructors (`*_init` — they install the vtable), `HScrollN`-receiver
+functions (its `tab[]` IS the DMA-visible HDMA table; a vt member would corrupt the layout),
+free functions (`splash_show`, `m7splash*`, `splash16` — no receiver), and `DrawableVT`
+(already virtual). Mode 2 adds a 2-byte vt pointer per object (WRAM).
+
+**Correctness gate:** `mandel-oop` `corpus_result == 0x204F` and the bench oracle CRC
+`0x26EC` in ALL modes (bsnes-jg; `-verify-machineinstrs` clean).
+
+**Vehicle A — mandel-oop.c** (`+mos-a16 -Os`):
+
+| Mode | `.text` | Indirect call sites |
+|---|---|---|
+| 0 static inline | 3,660 B | 1 |
+| 1 out-of-line direct | **3,537 B** (−3.4%) | 2 |
+| 2 all-virtual | 5,470 B (**+49%**) | 15 |
+
+**Vehicle B — `snesgfx_bench.c` throughput** (canvas star: `canvas_clear` + 12 `canvas_line`,
+whose Bresenham loop pays one `canvas_plot` dispatch **per pixel** in mode 2 — the exact
+anti-pattern §2 forbids; 2,400 deterministic bsnes-jg frames, `dev/measure-snesgfx-dispatch.sh`):
+
+| Mode | `.text` | Ind. calls | Redraws completed | Relative |
+|---|---|---|---|---|
+| 0 static inline | 1,918 B | 0 | 175 | 1.00× |
+| 1 out-of-line direct | 1,934 B | 0 | **201** | **0.87× cost — 15% FASTER** |
+| 2 all-virtual | 2,199 B (+15%) | 5 | 149 | 1.35× vs mode 1, 1.17× vs mode 0 |
+
+**Findings:**
+
+1. **Naive inlining is not free on the 65816.** Mode 1 *beats* mode 0 by 15% on the
+   dispatch-bound loop: inlining `canvas_plot` into the Bresenham loop bloats the caller's
+   a16/ZP live set (the same register-budget effect that motivated `canvas_line`'s
+   pre-existing `noinline`). "Static inline everywhere" is a size default, not a speed
+   guarantee — measure, don't assume (governing lesson #1).
+2. **Virtual dispatch proper costs ~1.35×** on a per-pixel-dispatch loop (mode 1 → mode 2,
+   the clean indirection-only comparison), plus **+15–49% `.text`** (vtables, forwarder
+   plumbing, un-folded argument setup). The per-call overhead is the `__call_indir` route:
+   ZP vt-pointer loads + slot load + indirect JSR.
+3. **The §2 discipline is validated quantitatively**: at one virtual call per drawable per
+   frame the cost is unmeasurable (mandel-oop CRC/frames identical across modes); at one
+   virtual call per *pixel* it costs a third of the machine. Virtualize interfaces, not
+   rasterizers.
+4. LTO devirtualizes **nothing** here (15 indirect sites survive in mode-2 mandel-oop, all
+   provably single-target) — on llvm-mos, "the compiler will devirtualize it" is not an
+   argument for making members virtual.
+5. The earlier "~8 cycles (JSR + ZP loads)" §2 estimate was unsourced; the measured ratios
+   above replace it.

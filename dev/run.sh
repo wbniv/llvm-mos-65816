@@ -419,6 +419,8 @@ docker run --rm \
   ${RUNNER:+-e RUNNER} \
   ${STAGE_REL:+-e STAGE_REL} \
   ${JG_ONLY:+-e JG_ONLY} \
+  ${SNESGFX_CFLAGS:+-e SNESGFX_CFLAGS} \
+  ${BENCH_FRAMES:+-e BENCH_FRAMES} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
   2> >(grep -vF 'different data layouts' | cat -s >&2)
 exit $?

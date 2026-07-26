@@ -28,9 +28,11 @@ EXPECT=0x204F
 echo "==> mandel-oop: OOP Mandelbrot (snesgfx Display + MandelLayer); expected CRC $EXPECT"
 
 # 1. Build mandel-oop.sfc (+mos-a16, -verify-machineinstrs).
+#    SNESGFX_CFLAGS: optional extra flags (e.g. -DSNESGFX_DISPATCH=2 for dispatch experiments).
 "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
   -Xclang -target-feature -Xclang +mos-a16 -Os \
   -mllvm -verify-machineinstrs \
+  ${SNESGFX_CFLAGS:-} \
   -Wl,-Map="$BUILD/mandel-oop.map" -o "$BUILD/mandel-oop.sfc" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$BUILD/mandel-oop.sfc" >/dev/null
 
@@ -78,13 +80,24 @@ else
 fi
 
 # 4. Disasm gate — virtual dispatch must not appear in the inner escape-time loop.
-#    Count indirect JMP instructions in the ROM ELF; scene_emit's single vtable call
-#    per frame is the only justified occurrence.
+#    Count indirect control transfers in the ROM ELF; scene_emit's single vtable call
+#    per frame is the only justified occurrence. The ELF MUST exist — a silent
+#    "0 because the file is missing" is indistinguishable from real devirtualization.
 echo
-echo "==> disasm: indirect jump count (virtual dispatch gate)"
-JMP_COUNT=$(llvm-objdump -d "$BUILD/mandel-oop.sfc.elf" 2>/dev/null \
-  | grep -c 'jmp (' || true)
-echo "    indirect JMP count in .text: $JMP_COUNT"
+echo "==> disasm: indirect dispatch count (virtual dispatch gate)"
+ELF="$BUILD/mandel-oop.sfc.elf"
+if [ ! -f "$ELF" ]; then
+  echo "    FAIL: $ELF missing — cannot count indirect dispatch"
+  rc=1
+else
+  DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$ELF")"
+  JMP_COUNT=$(printf '%s' "$DIS" | grep -cE 'jmp \(' || true)
+  # Call sites only: indirect jmp/jsr addressing forms + calls into the __call_indir
+  # helper (llvm-mos routes C function-pointer calls through it — 'jmp (' alone misses them).
+  IND_COUNT=$(printf '%s' "$DIS" | grep -cE 'jmp \(|jsr \(|jsr.*<__call_indir>' || true)
+  echo "    indirect JMP count in .text: $JMP_COUNT"
+  echo "    indirect dispatch call sites (jmp-ind + jsr-ind + jsr __call_indir): $IND_COUNT"
+fi
 # In the mandel_cell + mandel_fill inner loops there should be zero JMPs —
 # the virtual call to _mandel_emit is NOT in those loops.
 
