@@ -1,6 +1,15 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-07-01 (**`+mos-a16`/`+mos-xy16` s64↔s16 (un)merge + odd-width `G_ANYEXT`
+**Last updated:** 2026-07-25 (**PR #562 and PR #563 both MERGED upstream** — discovered while doing a
+from-scratch `dev/run.sh toolchain` build (publishing SNES demo `#102 cpu6502`), which surfaced that
+`0003-late-opt-txy-dead-flag.patch` and `0008-mos-dp-arg-cc.patch` no longer `git apply` because their
+fixes are already present in `llvm-mos/main`: **PR #562** ("F4" TYX/TXY dead-flag fix) merged as commit
+`9142aebae`; **PR #563** (DP-arg CC fix, `Fixes #561`) merged as commit `8be054612` (which also
+auto-closed **issue #561**). Both patches **retired** from `patches/llvm-mos/` (deleted) per the
+"drop once merged + the vendor pin bumps" plan noted below. Fork branches `mos-late-opt-txy-dead-flag`
+and `mos-dp-arg-cc` can be deleted now they're merged (standing policy: only on explicit user request —
+not done here). See [rebase plan](plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).)
+Previously 2026-07-01 (**`+mos-a16`/`+mos-xy16` s64↔s16 (un)merge + odd-width `G_ANYEXT`
 legalization fix — READY-TO-POST, `#321`-scoped**. SNES demo #61 (Diffie-Hellman 64-bit modular
 exponentiation) caught a backend crash: 64-bit arithmetic under `+mos-a16`/`+mos-xy16` emits
 `G_UNMERGE_VALUES` splitting an `s64` into 16-bit lanes (`{S16,S64}`) and, for a mask-narrowed value, a
@@ -102,13 +111,17 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 
 ## TL;DR
 
-- **Ready to post now: 1 PR + 4 issues + 3 design notes** — eight artifacts (F4 PR + DP-arg issue posted
-  2026-06-22; see *Open on GitHub* below). Strictly *PRs*, that's **one** (the DWARF step-6 test+docs). The
-  4th issue (#9) is the **llvm-mos-sdk** `longjmp`/`setjmp.S` 65816 bug found 2026-06-30 (a different repo).
-- **Open on GitHub right now: 3** — [PR #562](https://github.com/llvm-mos/llvm-mos/pull/562) (F4 — TYX/TXY
-  dead-flag fix), [issue #561](https://github.com/llvm-mos/llvm-mos/issues/561) (DP-arg CC), and
-  [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563) (the **fix** for #561 — `Fixes #561`, auto-closes
-  it on merge). #561+#562 opened 2026-06-22; #563 opened 2026-06-23. (Our first contributions upstream.)
+- **Ready to post now: 4 issues + 3 design notes** — the F4 PR and the DP-arg issue/PR are no longer in
+  this bucket — both **MERGED** (see below). Strictly *PRs* ready-to-post now, that's **zero** open (the
+  DWARF step-6 test+docs is drafted but not yet pushed as its own PR). The 4th issue (#9) is the
+  **llvm-mos-sdk** `longjmp`/`setjmp.S` 65816 bug found 2026-06-30 (a different repo).
+- **Open on GitHub right now: 0** — **all three of our first contributions merged/closed**:
+  [PR #562](https://github.com/llvm-mos/llvm-mos/pull/562) (F4 — TYX/TXY dead-flag fix) merged as commit
+  `9142aebae`; [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563) (the fix for #561) merged as
+  commit `8be054612`, which auto-closed [issue #561](https://github.com/llvm-mos/llvm-mos/issues/561)
+  (`Fixes #561`). Discovered 2026-07-25 (see *Last updated* above) — not re-checked live via `gh`, but
+  both merge commits are directly visible in a fresh `llvm-mos/main` clone. #561+#562 opened 2026-06-22;
+  #563 opened 2026-06-23.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
   llvm-mos-sdk#415 engagement (someone else's existing PR).
 - **Hygiene: 0 leftover fork branches** — `revert-540-…` (a stale revert of merged #540) was **deleted by
@@ -121,14 +134,14 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 
 | # | Item | Type | What it does | Drafted at | Branch |
 |---|------|------|--------------|-----------|--------|
-| 1 | ✅ **POSTED** — **F4** — `mos-late-opt` TYX/TXY dead-flag fix | **PR** | Clears dead/kill flags when rewriting `LDImm`→TYX/TXY (verifier reject on reentrant `+mos-a16`) | [`docs/321-upstream-late-opt-txy-pr.md`](321-upstream-late-opt-txy-pr.md) | [**PR #562**](https://github.com/llvm-mos/llvm-mos/pull/562) (opened 2026-06-22) |
+| 1 | ✅ **MERGED 2026-07-25 (discovered)** — **F4** — `mos-late-opt` TYX/TXY dead-flag fix | **PR** | Clears dead/kill flags when rewriting `LDImm`→TYX/TXY (verifier reject on reentrant `+mos-a16`). Merged upstream as commit `9142aebae`; fork patch `0003-late-opt-txy-dead-flag.patch` **retired** (deleted) — see [rebase plan](plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md). | [`docs/321-upstream-late-opt-txy-pr.md`](321-upstream-late-opt-txy-pr.md) | [**PR #562**](https://github.com/llvm-mos/llvm-mos/pull/562) (opened 2026-06-22, **merged**) |
 | 2 | **P3** — `reentrant` can't force the soft stack | **issue** | Latent footgun: `__attribute__((reentrant))` is a no-op for non-recursive fns (MOSNonReentrant re-stamps `nonreentrant`) | [`docs/321-upstream-reentrant-soft-stack-issue.md`](321-upstream-reentrant-soft-stack-issue.md) | n/a (issue) |
 | 3 | **#320** — far-pointer design note | **note** | Opens the five-address-space ABI-blessing discussion (a Discord/#320 post, not a code change). **Updated 2026-06-21** with the Phase 0/3 corrections: retracts the pow2-pointer-size premise (real reason = MVT has no i24), the C1 single-datalayout finding (`0=far-default` foreclosed → a clang flag), and the packed-24 representable-but-deferred position. Posting-ready (user-triggered). | [`docs/320-upstream-far-pointer-note.md`](320-upstream-far-pointer-note.md) | n/a (note) |
 | 4 | ✅ **FIXED** — **scavenger live-`$p`** — `saveScavengerRegister` can't preserve a live `$p` across an unbalanced stack range | **fix PR** | Upstream crash (was an issue-with-no-fix): a `+mos-a16`/`+mos-xy16` compare keeps N/Z live across a frame-carry spill, forcing the whole `$p` preserved across an *unbalanced* range, but `$p` has no GPR home → illegal `STImag8 $p` + undefined-`$p` `PH $p`. **Fix** = route `$p` hard-stack-neutrally through a dead index reg into `RC17` + drop the stale `assertNZDeadAt`; carried as fork patch `0011` (`a16scavnz.c` now a `0x22A6` positive gate, both emulators, asserts-clean). | [PR body](upstream-scavenger-live-p-pr.md) · patch `patches/llvm-mos/0011-mos-scavenger-live-p-save.patch` | not yet pushed (`wbniv:mos-scavenger-live-p-save` to mint) |
 | 5 | **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | `wbniv:mos-dwarf-65816-test-docs` (pushed `0ae9415`) |
 | 6 | **#321 CC frame-ABI** — measured frame-model evaluation | **note** | Implementation-backed CC evidence: DP-window/stack-relative are feasible but NULL on real code (locals are `__rc`-resident → frames ≈unused); keep the soft static stack, by measurement | [`docs/321-upstream-cc-frame-abi-note.md`](321-upstream-cc-frame-abi-note.md) | n/a (note) |
 | 7 | **#320 far-CC** — measured ABI evaluation (far ptr across a call) | **note** | Implementation-backed CC evidence: all 4 ABIs built behind `+mos-farcc-*` + measured (bytes + round-trips/frame) on MAME+bsnes-jg → **Imag32 wins decisively** (70 B/50441; smallest *and* fastest). Far ptr should pass/return whole in one 4-byte imaginary-register unit, by measurement. **Follow-up to #3** — post after the design note opens the conversation. Shipped as `0004` in-fork. | [`docs/320-upstream-far-cc-measurement-note.md`](320-upstream-far-cc-measurement-note.md) | n/a (note) |
-| 8 | ✅ **POSTED + FIXED** — **DP-arg CC** — `addrspace(1)` 8-bit pointer argument in a 16-bit register | **issue + fix PR** | Upstream crash: `CCIfPtr` (MOSCallingConv.td:65) assigns *every* pointer arg to a 16-bit `RS` pair, so an 8-bit `addrspace(1)` (direct-page) pointer arg → illegal `(p1)=COPY $rs`. **Fix** = a `CCIfPtrAddrSpace<1, CCAssignToReg<[A, X, RC2..RC15]>>` rule (8-bit slot) + a `-verify` CodeGen test; spike-validated (5 shapes, corpus 7/7), carried as fork patch `0008`. | [issue body](320-upstream-dp-arg-cc-issue.md) · [PR body](320-upstream-dp-arg-cc-pr.md) | [**#561**](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22) → fixed by [**PR #563**](https://github.com/llvm-mos/llvm-mos/pull/563) (`wbniv:mos-dp-arg-cc`, 2026-06-23) |
+| 8 | ✅ **MERGED 2026-07-25 (discovered)** — **DP-arg CC** — `addrspace(1)` 8-bit pointer argument in a 16-bit register | **issue + fix PR** | Upstream crash: `CCIfPtr` (MOSCallingConv.td:65) assigns *every* pointer arg to a 16-bit `RS` pair, so an 8-bit `addrspace(1)` (direct-page) pointer arg → illegal `(p1)=COPY $rs`. **Fix** = a `CCIfPtrAddrSpace<1, CCAssignToReg<[A, X, RC2..RC15]>>` rule (8-bit slot) + a `-verify` CodeGen test; spike-validated (5 shapes, corpus 7/7). Merged upstream as commit `8be054612` (auto-closed #561); fork patch `0008-mos-dp-arg-cc.patch` **retired** (deleted) — its content also lived duplicated inside `0002`, which needs the same hunk hand-resolved — see [rebase plan](plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md). | [issue body](320-upstream-dp-arg-cc-issue.md) · [PR body](320-upstream-dp-arg-cc-pr.md) | [**#561**](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22, **closed**) → fixed by [**PR #563**](https://github.com/llvm-mos/llvm-mos/pull/563) (`wbniv:mos-dp-arg-cc`, 2026-06-23, **merged**) |
 | 9 | **coalesce-rotate-Ac** — silent miscompile: rotate value coalesced into A-only `Ac` | **issue + fix PR** | Default-8bit miscompile (no `+mos-a16`): the register coalescer merges two shift/rotate-referenced values into the A-only `Ac` class, stranding a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (inlined CRC16 bit loop under pressure). Both `-verify-machineinstrs`/`-verify-coalescing` clean. **Fix** = `MOSRegisterInfo::shouldCoalesce` refuses the join (`NewRC==Ac` ∧ both operands rotate-referenced) + a `-run-pass=register-coalescer` lit test; carried as fork patch `0010`, validated (repro `0xE60E`→`0xF56C`, corpus 7/7, torture 30/30, csmith 54/60 0-mismatch). | [PR body](upstream-coalesce-rotate-ac-pr.md) · patch `patches/llvm-mos/0010-coalesce-rotate-ac.patch` | not yet pushed (`wbniv:mos-coalesce-rotate-ac` to mint) |
 | 10 | **`LDCImm` set lowering** — `MOSMCInstLower` asserts a single carry-set encoding | **fix PR** | Upstream `llvm_unreachable("Unexpected LDCImm immediate")` (asserts) / silent NDEBUG-UB: `LDCImm` lowered only `0`/`-1`, but a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in). Reproduces on a plain `+mos-a16` 16-bit subtract. Surfaced by `0011` (compilation reached MC lowering once the scavenger stopped crashing). **Fix** = lower any nonzero i1 as `SEC` (differential-neutral); carried as fork patch `0012`. | [PR body](upstream-ldcimm-set-lowering-pr.md) · patch `patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch` | not yet pushed (`wbniv:mos-ldcimm-set-lowering` to mint) |
 | 11 | ⛔ **RETRACTED — MISDIAGNOSIS (do NOT post)** — "LTO + `+mos-a16` bitmask-loop early exit" | ~~issue~~ | **Disproven 2026-06-28** by a controlled rebuild experiment ([plan](plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md)). The `cmp #$10` is the loop's `q->n < UPQ_MAX_JOBS` guard (`UPQ_MAX_JOBS=16=0x10`), **not** the shift counter `r`: overriding `-DUPQ_MAX_JOBS=20` moves the constant to `cmp #$14` (tracks the macro). The `jmp rts` is the correct per-vblank DMA-budget exit (≤16 jobs/frame; 28 rows over 2 frames); the real `r<28` bound `cpy #$1c` is present. No row-skip miscompile exists. The original demo stall is a *separate, unverified* question (possible 32-bit `==0` LTO miscompile or frame ordering) → would need a **fresh, correctly-characterized** issue, not this one. | [issue body (banner-retracted)](321-upstream-lto-a16-bitmask-loop-early-exit-issue.md) | n/a — not to be posted |
@@ -459,6 +472,12 @@ mos-dwarf-65816-test-docs                  # DWARF step-6 PR — pushed, not yet
 $ gh pr view 540 --repo llvm-mos/llvm-mos --json number,title,state,mergedAt
 {"number":540,"title":"fix(MOS): use reserved RS8 for soft stack spill scratch register",
  "state":"MERGED","mergedAt":"2026-01-26T22:23:07Z"}
+```
+
+**Update 2026-07-25 (discovered, not re-verified live via `gh`):** #562 and #563 are merged — found by
+inspecting a fresh `llvm-mos/main` clone (commits `9142aebae` and `8be054612`), not by re-running the
+`gh` commands above. `dev/upstream-status.sh` should be re-run to get a live-verified snapshot and
+replace this note with a proper `gh`-sourced one.
 ```
 
 > **Note — two repos, don't conflate.** The PRs/issues/branches above target **`wbniv/llvm-mos`** (the LLVM

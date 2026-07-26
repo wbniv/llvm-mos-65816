@@ -580,6 +580,29 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
+- [ ] **llvm-mos fork patch-stack — upstream rebase + `dev/toolchain.sh` bootstrap-path fix** — the
+  from-scratch `dev/run.sh toolchain` path (fresh `git clone` + apply `patches/llvm-mos/*.patch`) is
+  broken, discovered while publishing `#102 cpu6502`. Two independent causes: (1) two of our own
+  contributions merged upstream — `0003-late-opt-txy-dead-flag.patch` → **PR #562** (commit
+  `9142aebae`), `0008-mos-dp-arg-cc.patch` → **PR #563** (commit `8be054612`) — so those patches now
+  fail to reapply (fix already present); (2) `0002` (regenerated via `dev/regen-patch.sh`) is a full
+  mirror of the live `llvm/lib/Target/MOS` dir, so it already contains `0004`–`0015`'s **MOS-dir**
+  hunks — `dev/toolchain.sh`'s blind glob-apply-everything loop double-inserts and fails regardless of
+  drift. **Critical subtlety:** `0002`'s mirror covers *only* `llvm/lib/Target/MOS/`, so generic-LLVM
+  and clang hunks are **not** in it — `0006` adds the generic `AsmPrinter::emitNonStandardSizedConstant`
+  virtual hook that `0002`'s `MOSAsmPrinter.cpp` *overrides*, so omitting `0006` breaks the build
+  (`only virtual member functions can be marked 'override'`). Fix: drop `0003`/`0008`, hand-resolve
+  `0002`'s one real conflict (duplicate AS1 CC rule vs PR #563), curate the apply list to
+  `0001→0002→0006`(non-MOS hunks, path-filtered)`→0016→0017`, rebuild, re-run the differential gate,
+  regenerate `0002` properly. Standalone patches `0004`–`0015` are kept (several are still-unposted
+  upstream-PR drafts) but excluded from the build loop.
+  [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
+- [ ] **Fix `dev/regen-patch-000N.sh` scripts that hardcode now-deleted `0003`/`0008` applies** — 11 of
+  12 per-patch regen scripts (`regen-patch-{0001,0004,0005,0006,0007,0009,0011,0012,0013,0014}.sh`)
+  unconditionally `git apply` `0003-late-opt-txy-dead-flag.patch` and/or `0008-mos-dp-arg-cc.patch` as
+  baseline steps; both files were deleted (merged upstream as PR #562/#563, see the row above). Only the
+  generic `dev/regen-patch.sh` (for `0002`) already handles a missing `0003` gracefully. Will fail
+  outright if any of those scripts are next run. [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
 - [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
   The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
   `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
@@ -1476,4 +1499,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fp:040872b597cf6793 -->
 <!-- triaged 2026-07-01: title-screen-counter-slide verified — hilbert/rdiff/avalanche/sort-race/fft gates all PASS, -verify clean; visual animation behavior gate-neutral. fp:b133881a09190800 -->
 <!-- triaged 2026-07-01: gallery categories plan — verified in-session: task build clean (79 pages), 10 cat-shelf sections confirmed in HTML, 74 cards confirmed, hilbert chip confirmed with href /snes/#cat-motion. fp:933d48bc3dd6368a -->
+- [ ] **(triage)** Regenerating `0004`–`0015`'s individual patches against the new pristine base (flagged as follow-up, — _from [2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md)_  <!-- fp:adb7cd38a491445a -->
+- [ ] **(triage)** Posting any new/updated upstream PRs (`0003`/`0008` are already posted+merged; nothing new to post — _from [2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md)_  <!-- fp:dcffbc00e6a08c58 -->
 <!-- END auto-captured-deferrals -->
