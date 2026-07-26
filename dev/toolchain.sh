@@ -58,7 +58,9 @@ if [ ! -d "$SRC/.git" ]; then
   #          half yields "only virtual member functions can be marked 'override'"
   #          at MOSAsmPrinter.cpp. Applied PATH-FILTERED to just the non-MOS-dir
   #          hunks (its MOS-dir half is already in 0002).
-  # (0015's only non-MOS file is a lit test — irrelevant to a build.)
+  # (0015's only non-MOS file is a lit test — irrelevant to a build. 0016/0017
+  # are MOS-dir-only and were folded into 0002 by the 2026-07-26 regen; their
+  # files remain on disk as standalone upstream-PR artifacts like 0004-0015.)
   #
   # When adding a new patch: if it touches only llvm/lib/Target/MOS/, fold it
   # into 0002 via dev/regen-patch.sh and leave this list alone; if it touches
@@ -75,8 +77,6 @@ if [ ! -d "$SRC/.git" ]; then
   # generic-LLVM + clang half only; the MOS-dir half is already inside 0002
   apply_patch 0006-320-packed24 \
     --include='clang/*' --include='llvm/include/*' --include='llvm/lib/CodeGen/*'
-  apply_patch 0016-mos-scmp-ucmp-legalize
-  apply_patch 0017-321-a16-s64-unmerge-anyext-legalize
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

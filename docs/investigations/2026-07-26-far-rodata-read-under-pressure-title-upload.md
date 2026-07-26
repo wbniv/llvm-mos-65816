@@ -1,6 +1,8 @@
 # Far (addrspace 2) rodata read produces wrong data in the title VRAM upload — under realistic pressure
 
-**Status:** open, reproducible. Found 2026-07-26 while trying to keep the 4 KB `FONT16` table on
+**Status:** ✅ **RESOLVED 2026-07-26** — root cause was `MOSZeroPageAlloc`'s CSR renaming missing the
+fork's `Imag32` quad (see §RESOLUTION at the bottom; the "under pressure" framing in the title/body was
+the working hypothesis, superseded). Found 2026-07-26 while trying to keep the 4 KB `FONT16` table on
 `mandel-double` by parking it in bank `$01` far rodata
 ([plan](../plans/2026-07-26-font16-far-rodata-keep-fonts-everywhere.md)).
 
@@ -89,3 +91,25 @@ Do **not** rely on far rodata for data read by a CPU loop inside a large functio
 root-caused. For bulk VRAM data specifically there is a better route regardless: **DMA straight from the
 far bank** (`REG_A1B0` takes a source bank, as `mode7.h` already does), which avoids CPU far loads
 entirely and is much faster than a per-word loop.
+
+## RESOLUTION (2026-07-26) — fixed; the hypothesis was wrong in an instructive way
+
+**Not RA spilling — `-mlto-zp` CSR renaming.** The "register pressure" correlation was real but the
+mechanism was `MOSZeroPageAlloc` (the LTO zero-page pass, enabled by `mos-snes.cfg`'s `-mlto-zp=224`):
+it "silently renames" callee-saved imaginary registers to zp-static-stack slots via `CSRZPOffsets`,
+which `MOSMCInstLower` consults per operand. The pass predates the fork's `Imag32` quad: it renamed the
+far pointer's four **bytes** (`rc20..rc23` → `$c4..$c7`) but had no entry for the **quad super-register
+`RL5`**, so `LDA_IndirectLong [RL5]` fell through to the imag-symbol path and kept reading `[$14]` —
+defs renamed, use stale. Proven by the failing binary (`lda [$14]` with **zero** writes to `$14..$17`)
+and by single-function `llc` replay being correct (no module zp budget → pass idle). Synthetic repros
+passed because tiny programs keep the far pointer in caller-saved quads the pass never touches.
+
+**Fix** (`MOSZeroPageAlloc.cpp`, mirrors the existing Imag16-pair idiom; carried in `0002`): (a) a
+live-use Imag32 quad becomes one atomic **size-4 candidate** (guarantees 4 consecutive slots, which
+`[dp]` requires); (b) the offset-recording arm enters the quad, both `sublo16`/`subhi16` pairs, and all
+four bytes into `CSRZPOffsets`, so every operand width is rewritten consistently. Verification battery
+(all PASS, incl. byte-level near-code inertness and a second silent victim, `mandel-oop`, now green):
+[fix plan](../plans/2026-07-26-zp-alloc-imag32-csr-rename-fix.md).
+
+**Consequence:** `TITLE_FONT16_FAR` works; `mandel-double` ships the real Waldo font from bank `$01`,
+and the `TITLE_FONT16_OFF` legacy path is deleted.
