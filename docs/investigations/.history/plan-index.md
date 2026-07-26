@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f75e06a) | docs(todo+plan-index): file the far-read codegen bug; triage; index the plan |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a25b326) | docs(todo+plan-index): triage rebase-plan deferrals; add plan-index row |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/092210a) | docs(plan-index): add #110 borrowlad row (8915348) |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/61d625f) | docs(plan-index): add #109 pcooker row (bb58a0a) |
@@ -207,6 +208,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+f75e06a	author	Will Norris
+f75e06a	added	2
+f75e06a	deleted	0
+f75e06a	files	1
+f75e06a	body	- TODO: new item for the far-rodata-read-under-pressure bug, with the\n  single-variable isolation and what was ruled out, so whoever picks it up\n  does not redo that work. Flags that the gate CRC passes while the render is\n  wrong -- corpus_result never reads the title.\n- Triaged the captured deferral: "moving other demos to far ROM" is a\n  deliberate non-goal AND a hard constraint (opt-in, so demos that fit keep\n  their single 32 KB bank), not open work.\n- plan-index: added the far-ROM FONT16 row.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a25b326	author	Will Norris
 a25b326	added	2
 a25b326	deleted	0
