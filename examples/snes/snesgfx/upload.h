@@ -41,7 +41,6 @@ typedef struct {
   uint16_t dest;     /* VRAM word addr / CGRAM index / OAM byte addr */
   uint16_t src;      /* A-bus source address (low 16 bits)          */
   uint16_t nbytes;   /* transfer length (0 rejected — DAS=0 = 64KiB) */
-  uint16_t sent;     /* bytes already transferred — a job too big for one v-blank resumes here */
   uint8_t  src_bank; /* A-bus source bank                            */
   uint8_t  bbad;     /* B-bus dest: BBAD_VMDATA / BBAD_CGDATA / BBAD_OAMDATA */
   uint8_t  dmap;     /* DMAP_* (direction | step | unit)             */
@@ -65,7 +64,7 @@ static inline void upq_push_vram(UploadQueue *q, uint16_t destword, const void *
   UpqJob *j = &q->job[q->n++];
   j->port = UPQ_VRAM; j->dest = destword; j->vmain = vmain;
   j->bbad = BBAD_VMDATA; j->dmap = (uint8_t)(DMAP_TO_PPU | DMAP_ADDR_INC | DMAP_UNIT_2);
-  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes; j->sent = 0;
+  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes;
 }
 
 /* Enqueue a CGRAM palette upload starting at colour index `cgidx`. */
@@ -75,7 +74,7 @@ static inline void upq_push_cgram(UploadQueue *q, uint8_t cgidx, const void *src
   UpqJob *j = &q->job[q->n++];
   j->port = UPQ_CGRAM; j->dest = cgidx; j->vmain = 0;
   j->bbad = BBAD_CGDATA; j->dmap = (uint8_t)(DMAP_TO_PPU | DMAP_ADDR_INC | DMAP_UNIT_1);
-  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes; j->sent = 0;
+  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes;
 }
 
 /* Enqueue an OAM upload (typically the whole 544-byte shadow from byte 0). */
@@ -84,7 +83,7 @@ static inline void upq_push_oam(UploadQueue *q, const void *src, uint8_t bank, u
   UpqJob *j = &q->job[q->n++];
   j->port = UPQ_OAM; j->dest = 0; j->vmain = 0;
   j->bbad = BBAD_OAMDATA; j->dmap = (uint8_t)(DMAP_TO_PPU | DMAP_ADDR_INC | DMAP_UNIT_1);
-  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes; j->sent = 0;
+  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes;
 }
 
 /* Enqueue a write-twice PPU register poke — the BGnHOFS/BGnVOFS scroll latches ($210D..$2114).
@@ -120,16 +119,20 @@ static inline uint8_t upq_push_poke16(UploadQueue *q, uint16_t addr, uint16_t va
    an extra frame, which is invisible, whereas the old force-blank made it a flicker at the top of
    the screen.
 
-   A single job larger than the budget is split: `sent` records progress and the destination address
-   is re-derived from it on resume, so the next flush continues where this one stopped.
+   Deferral is per WHOLE JOB, not mid-transfer. Drawables already chunk their own streams to a sane
+   per-frame size — bitmap_canvas caps at CANVAS_FLUSH_TILES (1 KB) and streams the remainder next
+   frame, the OAM shadow is 544 B, palettes are tens of bytes — so no single job comes close to the
+   budget and splitting one would be dead weight. A job that would overrun simply waits for the next
+   v-blank. The one exception keeps it deadlock-free: a job bigger than the entire budget is sent
+   anyway when nothing else has gone yet, since deferring it forever would stall the queue.
 
    dma_base and mdmaen_bit are hoisted out of the loop so the 65816 never recomputes chan*0x10 or
    1<<chan on every iteration (those are variable-cost ops). */
-static inline void upq_flush(UploadQueue *q) {
+__attribute__((noinline)) static void upq_flush(UploadQueue *q) {
   volatile uint8_t *dma_base =
     (volatile uint8_t *)(uintptr_t)(0x4300u + (uint16_t)q->chan * 0x10u);
   uint8_t mdmaen_bit = (uint8_t)(1u << q->chan);
-  uint16_t budget = UPQ_VBLANK_BUDGET;
+  uint16_t spent = 0;
   uint8_t i = 0;
 
   while (i < q->n) {
@@ -148,31 +151,23 @@ static inline void upq_flush(UploadQueue *q) {
       i++; continue;
     }
 
-    uint16_t chunk = (uint16_t)(j->nbytes - j->sent);
-    if (chunk > budget) {
-      if (budget == 0) break;        /* out of window — everything from here waits a frame */
-      chunk = budget;
-    }
+    /* Would this job run past the end of v-blank? Leave it (and the rest) for the next frame. */
+    if (spent && (uint16_t)(spent + j->nbytes) > UPQ_VBLANK_BUDGET) break;
 
-    /* Resume offsets: VRAM/CGRAM/OAM all address in 2-byte units, so bytes>>1 advances them. */
-    uint16_t off = (uint16_t)(j->sent >> 1);
-    if (j->port == UPQ_VRAM)       { REG_VMAIN = j->vmain; REG_VMADD = (uint16_t)(j->dest + off); }
-    else if (j->port == UPQ_CGRAM) { REG_CGADD = (uint8_t)(j->dest + off); }
-    else                           { uint16_t oa = (uint16_t)(j->dest + off);
-                                     REG_OAMADDL = (uint8_t)oa; REG_OAMADDH = (uint8_t)(oa >> 8); }
-    uint16_t s = (uint16_t)(j->src + j->sent);
+    if (j->port == UPQ_VRAM)       { REG_VMAIN = j->vmain; REG_VMADD = j->dest; }
+    else if (j->port == UPQ_CGRAM) { REG_CGADD = (uint8_t)j->dest; }
+    else                           { REG_OAMADDL = (uint8_t)j->dest;
+                                     REG_OAMADDH = (uint8_t)(j->dest >> 8); }
     dma_base[0] = j->dmap;
     dma_base[1] = j->bbad;
-    dma_base[2] = (uint8_t)s;
-    dma_base[3] = (uint8_t)(s >> 8);
+    dma_base[2] = (uint8_t)j->src;
+    dma_base[3] = (uint8_t)(j->src >> 8);
     dma_base[4] = j->src_bank;
-    dma_base[5] = (uint8_t)chunk;
-    dma_base[6] = (uint8_t)(chunk >> 8);
+    dma_base[5] = (uint8_t)j->nbytes;
+    dma_base[6] = (uint8_t)(j->nbytes >> 8);
     REG_MDMAEN = mdmaen_bit;
 
-    j->sent = (uint16_t)(j->sent + chunk);
-    budget  = (uint16_t)(budget - chunk);
-    if (j->sent < j->nbytes) break;  /* partial — this job resumes next flush */
+    spent = (uint16_t)(spent + j->nbytes);
     i++;
   }
 

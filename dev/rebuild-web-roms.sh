@@ -11,6 +11,11 @@
 #   dev/run.sh rebuild-web-roms boids maze cosmzoom ...      # explicit slugs
 #   dev/run.sh rebuild-web-roms @/work/build/web-roms.list   # or a newline/space list file
 #
+# Emits build/<slug>.map alongside each ROM: the site manifest's selfcheck `off` is the WRAM address
+# of corpus_result, which MOVES whenever a shared struct changes size (snesgfx growth shifted huffman
+# from 0x84 to 0x144b). Republishing ROMs without regenerating those offsets leaves every page's
+# in-browser 'Verify fidelity' check asserting the wrong address. See dev/sync-manifest-offsets.py.
+#
 # Outputs build/<slug>.sfc for each. Host side then copies them to the site (see
 # docs/howto-bulk-rebuild-republish-web-roms.md).
 set -euo pipefail
@@ -89,10 +94,12 @@ for slug in "${SLUGS[@]}"; do
   grep -q 'snes-far-platform' "$c" && cfg="$BUILD/install/bin/mos-snes-far.cfg"
   mode=a16
   if ! "$TOOL/mos-clang" --config "$cfg" -mcpu=mosw65816 "${A16[@]}" -Os "${xtra[@]}" \
+        -Wl,-Map="$BUILD/$slug.map" \
         -o "$BUILD/$slug.sfc" "$c" "${assets[@]}" 2>"$BUILD/$slug.buildlog"; then
     # a16 didn't build — fall back to default-8 (still hash-identical by the differential).
     mode=default8
     if ! "$TOOL/mos-clang" --config "$cfg" -mcpu=mosw65816 -Os "${xtra[@]}" \
+          -Wl,-Map="$BUILD/$slug.map" \
           -o "$BUILD/$slug.sfc" "$c" "${assets[@]}" 2>>"$BUILD/$slug.buildlog"; then
       echo "FAIL  $slug  (a16 + default8 both failed; see build/$slug.buildlog)"
       fail=$((fail+1)); failed="$failed $slug"; continue

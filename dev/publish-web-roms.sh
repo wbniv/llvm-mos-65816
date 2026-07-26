@@ -36,7 +36,12 @@ n=$(wc -l < "$LIST")
 echo "==> $(date -u +%Y-%m-%dT%H:%M:%SZ) rebuilding $n web ROMs from $ROMS"
 
 # Build all ROMs in one container (no gate). List file is under build/ → visible at /work/build in-container.
-"$HERE/run.sh" rebuild-web-roms "@/work/build/web-roms.list"
+# A demo that fails to build must NOT abort the sync: under `set -e` that skipped the copy entirely
+# and left the site untouched with no explanation, making one unbuildable demo silently block the
+# other 112. Record the status, sync what did build, and report the gap at the end instead.
+rebuild_rc=0
+"$HERE/run.sh" rebuild-web-roms "@/work/build/web-roms.list" || rebuild_rc=$?
+[ "$rebuild_rc" -eq 0 ] || echo "==> rebuild reported failures (rc=$rebuild_rc) — syncing what built"
 
 echo "==> syncing fresh ROMs into the site"
 copied=0; missing=""
@@ -49,6 +54,10 @@ while IFS= read -r slug; do
 done < "$LIST"
 
 echo "==> copied $copied/$n ROMs into $ROMS"
-[ -n "$missing" ] && echo "==> MISSING (not built):$missing"
+if [ -n "$missing" ]; then
+  echo "==> MISSING (not built, site keeps the previous ROM):$missing"
+  rebuild_rc=1
+fi
 echo "==> next: review 'git -C $SITE status public/play/roms', verify one demo (dev/run.sh <demo>),"
 echo "         commit the ROMs, then deploy per the site (cd $SITE && task release)."
+exit "$rebuild_rc"
