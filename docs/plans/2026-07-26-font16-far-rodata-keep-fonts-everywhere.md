@@ -1,6 +1,6 @@
 # Keep the 16×16 title font on every demo — move `FONT16` to far ROM
 
-**Status:** in progress (2026-07-26).
+**Status:** ✅ **COMPLETED 2026-07-26** (see §COMPLETED at the bottom; first pass blocked on the zp-alloc codegen bug, fixed in `2bfe4f3`).
 
 ## Why
 

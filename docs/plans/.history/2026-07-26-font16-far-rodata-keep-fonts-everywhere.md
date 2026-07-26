@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/ee7e1a4) | docs(plan): far-font plan completed end-to-end after the codegen fix |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/fd79934) | snes: far-rodata FONT16 attempt — codegen bug found, infra landed, demo unchanged |
 
 <!--history-meta v1
+ee7e1a4	author	Will Norris
+ee7e1a4	added	17
+ee7e1a4	deleted	0
+ee7e1a4	files	1
+ee7e1a4	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fd79934	author	Will Norris
 fd79934	added	96
 fd79934	deleted	0
