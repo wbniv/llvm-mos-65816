@@ -16,9 +16,11 @@
 #endif
 
 /* A queued DMA upload. `port` selects which destination-address register to load first.
-   UPQ_REG is the odd one out: not a DMA, just a write-twice register poke (scroll latches)
-   carried in the queue so it lands in the v-blank window like everything else. */
-enum { UPQ_VRAM = 0, UPQ_CGRAM = 1, UPQ_OAM = 2, UPQ_REG = 3 };
+   UPQ_REG and UPQ_POKE16 are the odd ones out: not DMAs, just register pokes carried in the
+   queue so they land in the v-blank window like everything else. UPQ_REG writes both bytes to
+   ONE address (a write-twice scroll latch); UPQ_POKE16 writes them to addr and addr+1 (a normal
+   16-bit register pair, e.g. an HDMA channel's A1TxL/A1TxH table pointer). */
+enum { UPQ_VRAM = 0, UPQ_CGRAM = 1, UPQ_OAM = 2, UPQ_REG = 3, UPQ_POKE16 = 4 };
 
 typedef struct {
   uint16_t dest;     /* VRAM word addr / CGRAM index / OAM byte addr */
@@ -79,6 +81,19 @@ static inline void upq_push_scroll(UploadQueue *q, uint16_t reg, uint16_t value)
   j->port = UPQ_REG; j->dest = reg; j->src = value; j->nbytes = 0;
 }
 
+/* Enqueue a 16-bit write to the consecutive register pair at `addr` / `addr+1`, applied inside
+   upq_flush() (the v-blank window). The motivating use is re-pointing an HDMA channel's table
+   address (A1TxL/A1TxH) at a freshly built double-buffer half: the channel latches A1Tx into its
+   internal counter at HDMA-init (start of the next frame), so updating it during v-blank swaps
+   tables atomically with respect to the transfer. Returns 1 if queued, 0 if the queue was full —
+   callers that must not lose the write (a double-buffer flip) should only advance on 1. */
+static inline uint8_t upq_push_poke16(UploadQueue *q, uint16_t addr, uint16_t value) {
+  if (q->n >= UPQ_MAX_JOBS) return 0;
+  UpqJob *j = &q->job[q->n++];
+  j->port = UPQ_POKE16; j->dest = addr; j->src = value; j->nbytes = 0;
+  return 1;
+}
+
 /* Run every queued job via DMA, then empty the queue. MUST be called in force-blank or
    v-blank (Display guarantees this). The CPU stalls on each MDMAEN until the copy completes.
    dma_base and mdmaen_bit are hoisted out of the loop so the 65816 never recomputes
@@ -93,6 +108,12 @@ static inline void upq_flush(UploadQueue *q) {
       volatile uint8_t *r = (volatile uint8_t *)(uintptr_t)j->dest;
       *r = (uint8_t)j->src;          /* low byte  */
       *r = (uint8_t)(j->src >> 8);   /* high byte */
+      continue;
+    }
+    if (j->port == UPQ_POKE16) {    /* 16-bit register pair poke (addr, addr+1) — not a DMA */
+      volatile uint8_t *r = (volatile uint8_t *)(uintptr_t)j->dest;
+      r[0] = (uint8_t)j->src;
+      r[1] = (uint8_t)(j->src >> 8);
       continue;
     }
     if (j->port == UPQ_VRAM)       { REG_VMAIN = j->vmain; REG_VMADD = j->dest; }
