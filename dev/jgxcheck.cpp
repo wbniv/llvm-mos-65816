@@ -281,6 +281,15 @@ int main(int argc, char **argv) {
   std::pair<void*, unsigned> mem = Bsnes::getMemoryRaw(Bsnes::Memory::MainRAM);
   if (!mem.first || mem.second < off + len) { printf("SMOKE: FAIL (no MainRAM / out of range)\n"); return 1; }
   const uint8_t *wram = (const uint8_t*)mem.first;
+  if (getenv("JGX_WRAM_DUMP")) {
+    unsigned dump_off = (unsigned)strtoul(getenv("JGX_WRAM_DUMP"), nullptr, 16);
+    unsigned dump_len = getenv("JGX_WRAM_DUMP_LEN")
+                          ? (unsigned)strtoul(getenv("JGX_WRAM_DUMP_LEN"), nullptr, 0) : 32;
+    fprintf(stderr, "jgxcheck: WRAM @0x%X:", dump_off);
+    for (unsigned i = 0; i < dump_len && dump_off + i < mem.second; ++i)
+      fprintf(stderr, " %02X", wram[dump_off + i]);
+    fprintf(stderr, "\n");
+  }
   unsigned got = 0;
   for (unsigned i = 0; i < len; ++i) got |= (unsigned)wram[off + i] << (8 * i);
 

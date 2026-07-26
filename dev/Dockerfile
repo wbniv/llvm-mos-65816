@@ -7,7 +7,7 @@ FROM ubuntu:26.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential cmake ninja-build python3 python3-pip \
+      build-essential cmake ninja-build python3 python3-pip python3-pil \
       git curl ca-certificates xz-utils xxd \
     && rm -rf /var/lib/apt/lists/*
 

@@ -1546,4 +1546,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      branch) becomes work only after that review. Covered by the curated campaign item.
      fp:12194fba501ac4d3 -->
 - [verify] **2026-07-26-mode7-title-screen-sweep** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-mode7-title-screen-sweep.md](docs/plans/2026-07-26-mode7-title-screen-sweep.md)_  <!-- fp:a9d784778faac766 -->
+- [verify] **2026-07-26-119-snes-lzss-gallery-carousel** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-119-snes-lzss-gallery-carousel.md](docs/plans/2026-07-26-119-snes-lzss-gallery-carousel.md)_  <!-- fp:4cbe095fb40c04d9 -->
 <!-- END auto-captured-deferrals -->

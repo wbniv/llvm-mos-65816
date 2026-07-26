@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LZSS Gallery — SNES caption mockups</title>
+<style>
+  :root { color-scheme: dark; --ink:#f5efcf; --muted:#9ca3af; --panel:#151922; --line:#343b49; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:32px; background:#0b0e14; color:var(--ink);
+    font:14px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace; }
+  h1 { margin:0 0 8px; font-size:22px; }
+  .intro { max-width:900px; margin:0 0 26px; color:#c5cad3; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:28px; }
+  figure { margin:0; padding:18px; background:var(--panel); border:1px solid var(--line); }
+  figcaption { margin-top:14px; color:#c5cad3; }
+  .screen { position:relative; width:256px; height:224px; margin:auto; overflow:hidden;
+    background:#090b12; image-rendering:pixelated; box-shadow:0 0 0 3px #040507,0 12px 28px #0009; }
+  .art { position:absolute; left:0; top:0; width:256px; height:200px;
+    border:2px solid #d9d0af; box-shadow:0 0 18px #000; }
+  .water { background:
+    radial-gradient(ellipse at 52% 78%,#e8d4a3 0 3%,transparent 4%),
+    repeating-radial-gradient(ellipse at 45% 30%,#dce6ef 0 4px,#537a91 5px 12px,#13384f 13px 22px); }
+  .jatte { background:
+    radial-gradient(circle at 72% 62%,#cf5c35 0 5px,transparent 6px),
+    radial-gradient(circle at 30% 55%,#f0d4b0 0 7px,transparent 8px),
+    linear-gradient(165deg,#8dc2cf 0 35%,#74965c 36% 68%,#244635 69%); }
+  .caption { position:absolute; left:8px; width:240px; text-align:center; text-shadow:2px 2px #15100b;
+    white-space:pre; }
+  .artist { bottom:8px; height:16px; display:flex; justify-content:center; align-items:center;
+    font-family:Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif; font-weight:900;
+    font-size:16px; line-height:16px; letter-spacing:1px; color:#ffd768; }
+  .work { bottom:0; height:8px; font-size:8px; line-height:8px; letter-spacing:0;
+    color:#fff7d6; }
+  .two .art { height:176px; }
+  .two .artist { bottom:16px; height:32px; align-items:flex-start; }
+  .two .work { height:16px; }
+  .transition .art { left:119px; top:62px; width:18px; height:80px; transform:skewY(-18deg);
+    filter:brightness(.55); }
+  .transition .caption { display:none; }
+  .transition::after { content:"MODE 1 CAPTION BGS BLANK DURING SPIN / SWAP"; position:absolute;
+    left:8px; right:8px; bottom:12px; color:#697386; font-size:8px; text-align:center; }
+  .ruler { position:absolute; inset:auto 0 24px; border-top:1px dashed #ffffff55; }
+  .two .ruler { bottom:48px; }
+  .tag { display:inline-block; margin-bottom:9px; padding:2px 6px; color:#0d1117; background:#ffd768;
+    font-weight:bold; }
+  code { color:#ffd768; }
+</style>
+</head>
+<body>
+<h1>LZSS Gallery caption layout</h1>
+<p class="intro">Three 256×224 layout proofs. The final ROM uses HDMA to run Mode 7 above the dashed
+line and Mode 1 below it, with the repository’s real Waldo-16 and font8 bitmaps on BG2/BG3. Browser
+fonts below only demonstrate measured rows, margins, hierarchy, and transition behavior. The split
+moves because only the caption rows actually used are reserved.</p>
+<div class="grid">
+  <figure>
+    <span class="tag">A · common case</span>
+    <div class="screen">
+      <div class="art water"></div><div class="ruler"></div>
+      <div class="caption artist">CLAUDE MONET</div>
+      <div class="caption work">WATER LILIES</div>
+    </div>
+    <figcaption>One 16×16 Waldo artist row and one 8×8 work-title row reserve 24 Mode 1 pixels. HDMA
+    leaves Mode 7 every other scanline: <strong>256×200</strong>.</figcaption>
+  </figure>
+  <figure>
+    <span class="tag">B · maximum selected wrap</span>
+    <div class="screen two">
+      <div class="art jatte"></div><div class="ruler"></div>
+      <div class="caption artist">PIERRE-AUGUSTE
+RENOIR</div>
+      <div class="caption work">TWO SISTERS (ON THE
+TERRACE)</div>
+    </div>
+    <figcaption>Two 16×16 artist rows plus two 8×8 work-title rows. This is the maximum caption
+    height required by the chosen ten works: <strong>48 pixels</strong>. Mode 7 still gets
+    <strong>256×176</strong>.</figcaption>
+  </figure>
+  <figure>
+    <span class="tag">C · carousel transition</span>
+    <div class="screen transition">
+      <div class="art water"></div><div class="ruler"></div>
+      <div class="caption artist">KATSUSHIKA
+HOKUSAI</div>
+      <div class="caption work">UNDER THE WAVE OFF KANAGAWA</div>
+    </div>
+    <figcaption>The Mode 1 BG2/BG3 caption maps blank before the Mode 7 image spins edge-on. Palette,
+    image, compressed stream, and text maps swap while hidden; HDMA keeps the lower scanlines out of
+    Mode 7 throughout the transition.</figcaption>
+  </figure>
+</div>
+</body>
+</html>

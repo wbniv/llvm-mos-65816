@@ -1,0 +1,362 @@
+[
+  {
+    "bank": 1,
+    "slug": "great-wave",
+    "artwork_id": 24645,
+    "title": "Under the Wave off Kanagawa (Kanagawa oki nami ura), also known as The Great Wave, from the series \"Thirty-Six Views of Mount Fuji (Fugaku sanj\u016brokkei)\"",
+    "artist": "Katsushika Hokusai",
+    "object_url": "https://www.artic.edu/artworks/24645",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/1952.343_-_Under_the_Wave_off_Kanagawa_%28Kanagawa_oki_nami.jpg/1280px-1952.343_-_Under_the_Wave_off_Kanagawa_%28Kanagawa_oki_nami.jpg",
+    "commons_file": "File:1952.343 - Under the Wave off Kanagawa (Kanagawa oki nami.jpg",
+    "commons_license": "CC0",
+    "source_dimensions": [
+      1280,
+      885
+    ],
+    "crop": [
+      0,
+      2,
+      1280,
+      882
+    ],
+    "derived_dimensions": [
+      128,
+      88
+    ],
+    "source_jpeg_bytes": 422694,
+    "raw_indexed_bytes": 11264,
+    "compressed_bytes": 6661,
+    "reduction_bytes": 4603,
+    "reduction_percent": 40.86,
+    "checksum": 14548,
+    "source_sha256": "c487c955370b0e25796131cd55b83c0b5b43b990c5602bc13def96401f781586",
+    "derived_sha256": "0703e50b925547f85bdbdbb8a07ad7d938dd3d8283ebd5d03ceaadd7d3b9e060",
+    "literals": 1988,
+    "matches": 2082,
+    "longest": 18
+  },
+  {
+    "bank": 2,
+    "slug": "bedroom",
+    "artwork_id": 28560,
+    "title": "The Bedroom",
+    "artist": "Vincent van Gogh",
+    "object_url": "https://www.artic.edu/artworks/28560",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/1926.417_-_The_Bedroom_Vincent_van_Gogh_1889.jpg/1280px-1926.417_-_The_Bedroom_Vincent_van_Gogh_1889.jpg",
+    "commons_file": "File:1926.417 - The Bedroom Vincent van Gogh 1889.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      1013
+    ],
+    "crop": [
+      0,
+      66,
+      1280,
+      946
+    ],
+    "derived_dimensions": [
+      128,
+      88
+    ],
+    "source_jpeg_bytes": 473199,
+    "raw_indexed_bytes": 11264,
+    "compressed_bytes": 6753,
+    "reduction_bytes": 4511,
+    "reduction_percent": 40.05,
+    "checksum": 14013,
+    "source_sha256": "c8a6df37c3f5ef571530a46dda8ef768a161becf1084d7fda3a763193e78bfa2",
+    "derived_sha256": "06ca11893e68c163d16a9c55354903658b85197e86e9f41f6f47d43153253d05",
+    "literals": 1839,
+    "matches": 2204,
+    "longest": 18
+  },
+  {
+    "bank": 3,
+    "slug": "grande-jatte",
+    "artwork_id": 27992,
+    "title": "A Sunday on La Grande Jatte \u2014 1884",
+    "artist": "Georges Seurat",
+    "object_url": "https://www.artic.edu/artworks/27992",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Georges_Seurat_-_A_Sunday_on_La_Grande_Jatte_--_1884_-_Google_Art_Project-x0-y1.jpg/1280px-Georges_Seurat_-_A_Sunday_on_La_Grande_Jatte_--_1884_-_Google_Art_Project-x0-y1.jpg",
+    "commons_file": "File:Georges Seurat - A Sunday on La Grande Jatte -- 1884 - Google Art Project-x0-y1.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      1280
+    ],
+    "crop": [
+      0,
+      180,
+      1280,
+      1100
+    ],
+    "derived_dimensions": [
+      128,
+      92
+    ],
+    "source_jpeg_bytes": 742544,
+    "raw_indexed_bytes": 11776,
+    "compressed_bytes": 6768,
+    "reduction_bytes": 5008,
+    "reduction_percent": 42.53,
+    "checksum": 30556,
+    "source_sha256": "c61e984a2352b0ec2bfb83b17297c2091a2a5262e22eb7d7e1c67969c6089030",
+    "derived_sha256": "45d8de5fe9f6a969e4d642020f3d27421c4a3be38229ceab2c7f1502821e3a45",
+    "literals": 1607,
+    "matches": 2334,
+    "longest": 18
+  },
+  {
+    "bank": 4,
+    "slug": "two-sisters",
+    "artwork_id": 14655,
+    "title": "Two Sisters (On the Terrace)",
+    "artist": "Pierre-Auguste Renoir",
+    "object_url": "https://www.artic.edu/artworks/14655",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Pierre-Auguste_Renoir_-_Two_Sisters_%28On_the_Terrace%29_-_1933.455_-_Art_Institute_of_Chicago.jpg/1280px-Pierre-Auguste_Renoir_-_Two_Sisters_%28On_the_Terrace%29_-_1933.455_-_Art_Institute_of_Chicago.jpg",
+    "commons_file": "File:Pierre-Auguste Renoir - Two Sisters (On the Terrace) - 1933.455 - Art Institute of Chicago.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      1589
+    ],
+    "crop": [
+      0,
+      374,
+      1280,
+      1214
+    ],
+    "derived_dimensions": [
+      128,
+      84
+    ],
+    "source_jpeg_bytes": 963484,
+    "raw_indexed_bytes": 10752,
+    "compressed_bytes": 7581,
+    "reduction_bytes": 3171,
+    "reduction_percent": 29.49,
+    "checksum": 2053,
+    "source_sha256": "0bb1c0f061b40dfe9e97ae342e113b3a90a2cec9faca85722f0b1ad15ad4d643",
+    "derived_sha256": "1138f555b8eb6a6fbd2a252dfef9f0bd0304b0704d9e4afc114d82b8af0aefaa",
+    "literals": 2677,
+    "matches": 2150,
+    "longest": 18
+  },
+  {
+    "bank": 5,
+    "slug": "water-lilies",
+    "artwork_id": 16568,
+    "title": "Water Lilies",
+    "artist": "Claude Monet",
+    "object_url": "https://www.artic.edu/artworks/16568",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Claude_Monet_-_Water_Lilies_-_1933.1157_-_Art_Institute_of_Chicago.jpg/1280px-Claude_Monet_-_Water_Lilies_-_1933.1157_-_Art_Institute_of_Chicago.jpg",
+    "commons_file": "File:Claude Monet - Water Lilies - 1933.1157 - Art Institute of Chicago.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      1232
+    ],
+    "crop": [
+      0,
+      136,
+      1280,
+      1096
+    ],
+    "derived_dimensions": [
+      128,
+      96
+    ],
+    "source_jpeg_bytes": 679210,
+    "raw_indexed_bytes": 12288,
+    "compressed_bytes": 7498,
+    "reduction_bytes": 4790,
+    "reduction_percent": 38.98,
+    "checksum": 7377,
+    "source_sha256": "01fa9a785ceb8b24bad307458cd646d33c6a5b783b0756ec02f9d891582c577d",
+    "derived_sha256": "967a2060999c11a10739a2a9ad74288f6a84d5a2f8448cdcfd71f3744c1c293e",
+    "literals": 2099,
+    "matches": 2417,
+    "longest": 18
+  },
+  {
+    "bank": 6,
+    "slug": "basket-apples",
+    "artwork_id": 111436,
+    "title": "The Basket of Apples",
+    "artist": "Paul C\u00e9zanne",
+    "object_url": "https://www.artic.edu/artworks/111436",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Paul_C%C3%A9zanne%2C_The_Basket_of_Apples.jpg/1280px-Paul_C%C3%A9zanne%2C_The_Basket_of_Apples.jpg",
+    "commons_file": "File:Paul C\u00e9zanne, The Basket of Apples.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      1020
+    ],
+    "crop": [
+      0,
+      30,
+      1280,
+      990
+    ],
+    "derived_dimensions": [
+      128,
+      96
+    ],
+    "source_jpeg_bytes": 484555,
+    "raw_indexed_bytes": 12288,
+    "compressed_bytes": 7145,
+    "reduction_bytes": 5143,
+    "reduction_percent": 41.85,
+    "checksum": 50583,
+    "source_sha256": "4ca54f290273266a4e1997edcb9b63159661da23f25ab81bb13da54925c6572b",
+    "derived_sha256": "a8eae7dddbc2aabef491986755a1c66078dc2960039a9ce1e1b6e05732c3907d",
+    "literals": 1950,
+    "matches": 2330,
+    "longest": 16
+  },
+  {
+    "bank": 7,
+    "slug": "stack-wheat",
+    "artwork_id": 111318,
+    "title": "Stack of Wheat",
+    "artist": "Claude Monet",
+    "object_url": "https://www.artic.edu/artworks/111318",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Claude_Monet_-_Stack_of_Wheat_-_1983.29_-_Art_Institute_of_Chicago.jpg/1280px-Claude_Monet_-_Stack_of_Wheat_-_1983.29_-_Art_Institute_of_Chicago.jpg",
+    "commons_file": "File:Claude Monet - Stack of Wheat - 1983.29 - Art Institute of Chicago.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      901
+    ],
+    "crop": [
+      39,
+      0,
+      1240,
+      901
+    ],
+    "derived_dimensions": [
+      128,
+      96
+    ],
+    "source_jpeg_bytes": 575722,
+    "raw_indexed_bytes": 12288,
+    "compressed_bytes": 7277,
+    "reduction_bytes": 5011,
+    "reduction_percent": 40.78,
+    "checksum": 27816,
+    "source_sha256": "ac0ca26c9ec7d703e49f65f20743c73f765d763a81ef2ea243d9fa04e01bc1f9",
+    "derived_sha256": "b00c8a5d3d5dc247d34c4f36074bbb5fb8449e9fcfb1e6bb19d3215ceb24c445",
+    "literals": 1661,
+    "matches": 2545,
+    "longest": 17
+  },
+  {
+    "bank": 8,
+    "slug": "self-portrait",
+    "artwork_id": 80607,
+    "title": "Self-Portrait",
+    "artist": "Vincent van Gogh",
+    "object_url": "https://www.artic.edu/artworks/80607",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Vincent_van_Gogh_-_Self-Portrait_-_1954.326_-_Art_Institute_of_Chicago.jpg/1280px-Vincent_van_Gogh_-_Self-Portrait_-_1954.326_-_Art_Institute_of_Chicago.jpg",
+    "commons_file": "File:Vincent van Gogh - Self-Portrait - 1954.326 - Art Institute of Chicago.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      1623
+    ],
+    "crop": [
+      0,
+      371,
+      1280,
+      1251
+    ],
+    "derived_dimensions": [
+      128,
+      88
+    ],
+    "source_jpeg_bytes": 1018060,
+    "raw_indexed_bytes": 11264,
+    "compressed_bytes": 7731,
+    "reduction_bytes": 3533,
+    "reduction_percent": 31.37,
+    "checksum": 9135,
+    "source_sha256": "8d3aaf545a81f55a91ea45f3bcc922c0ace6fec5280e63039651bc0934c8b95c",
+    "derived_sha256": "1daa836d36aa5faf3b01e99a301966aca9b3bfd7a154f0bad3be4fda28b1a6bd",
+    "literals": 2612,
+    "matches": 2255,
+    "longest": 18
+  },
+  {
+    "bank": 9,
+    "slug": "paris-street",
+    "artwork_id": 20684,
+    "title": "Paris Street; Rainy Day",
+    "artist": "Gustave Caillebotte",
+    "object_url": "https://www.artic.edu/artworks/20684",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Gustave_Caillebotte_-_Paris_Street%2C_Rainy_Day_-_1964.336_-_Art_Institute_of_Chicago.jpg/1280px-Gustave_Caillebotte_-_Paris_Street%2C_Rainy_Day_-_1964.336_-_Art_Institute_of_Chicago.jpg",
+    "commons_file": "File:Gustave Caillebotte - Paris Street, Rainy Day - 1964.336 - Art Institute of Chicago.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      994
+    ],
+    "crop": [
+      0,
+      57,
+      1280,
+      937
+    ],
+    "derived_dimensions": [
+      128,
+      88
+    ],
+    "source_jpeg_bytes": 356186,
+    "raw_indexed_bytes": 11264,
+    "compressed_bytes": 6704,
+    "reduction_bytes": 4560,
+    "reduction_percent": 40.48,
+    "checksum": 39598,
+    "source_sha256": "8c4a03247198231f018147f655f57ea59d7e80b3b54f0f4786d504150289aeb0",
+    "derived_sha256": "d5f3f5902027f5acc88b6710c007f29f6c4d67344fdfb07122071e36289c7ee0",
+    "literals": 1990,
+    "matches": 2101,
+    "longest": 18
+  },
+  {
+    "bank": 10,
+    "slug": "poppy-field",
+    "artwork_id": 4783,
+    "title": "Poppy Field (Giverny)",
+    "artist": "Claude Monet",
+    "object_url": "https://www.artic.edu/artworks/4783",
+    "iiif_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Claude_Monet_-_Poppy_Field_%28Giverny%29_-_1922.4465_-_Art_Institute_of_Chicago.jpg/1280px-Claude_Monet_-_Poppy_Field_%28Giverny%29_-_1922.4465_-_Art_Institute_of_Chicago.jpg",
+    "commons_file": "File:Claude Monet - Poppy Field (Giverny) - 1922.4465 - Art Institute of Chicago.jpg",
+    "commons_license": "Public domain",
+    "source_dimensions": [
+      1280,
+      833
+    ],
+    "crop": [
+      84,
+      0,
+      1195,
+      833
+    ],
+    "derived_dimensions": [
+      128,
+      96
+    ],
+    "source_jpeg_bytes": 530711,
+    "raw_indexed_bytes": 12288,
+    "compressed_bytes": 6337,
+    "reduction_bytes": 5951,
+    "reduction_percent": 48.43,
+    "checksum": 22861,
+    "source_sha256": "4c8028ef22d5d1520fa3f642610552feb2ba807683b53a7ea7d9165b028bf23d",
+    "derived_sha256": "a87ea790a8639263a737976a7770a0f63d96716cc62dce206535064596e8092e",
+    "literals": 1061,
+    "matches": 2420,
+    "longest": 18
+  }
+]

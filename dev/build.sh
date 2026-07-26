@@ -92,6 +92,7 @@ for src in "$ROOT"/examples/snes/**/*.c; do
   # made this demo unbuildable here in the first place).
   cfg="$INSTALL/bin/mos-snes.cfg"
   if grep -q 'snes-far-platform' "$src"; then cfg="$INSTALL/bin/mos-snes-far.cfg"; fi
+  if grep -q 'snes-gallery-platform' "$src"; then cfg="$INSTALL/bin/mos-snes-gallery.cfg"; fi
   # Sidecar binary assets: objcopy committed examples/snes/<name>.{pic,pal,map,chr,bin} into
   # bank-$00 .rodata objects and link them (Option B — raw gfx4snes output, no compiled C arrays;
   # symbols _binary_<name>_<ext>_start/_end/_size). Run from the asset dir so symbol names are clean.
