@@ -132,9 +132,12 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 
 ## TL;DR
 
-- **Ready to post (campaign Wave 1): 3 PRs** — `0016` G_SCMP/G_UCMP (body still to draft; the best
-  next post — stock-llvm-mos crash, one-line fix), `0010` coalesce-rotate-Ac (body drafted), DWARF
-  step-6 (branch pushed `0ae9415`, re-verify at `8be054612`). **Wave 2: 3 issues** (+ the llvm-mos-sdk
+- **Ready to post (campaign Wave 1): 3 PRs** — `0016` G_SCMP/G_UCMP **FULLY STAGED 2026-07-26**:
+  red/green proven on a pristine tip build (official `llvm-lit` PASS), branch pushed
+  (`wbniv:mos-scmp-ucmp-legalize` @ `e54ef471d546`, fix + new `scmp-ucmp.ll`), issue+PR bodies drafted
+  (`docs/upstream-scmp-ucmp-{issue,pr}.md`, live demo links in) — **one `gh` command each away**;
+  `0010` coalesce-rotate-Ac (body drafted), DWARF step-6 (branch `0ae9415` cherry-picks clean onto
+  tip). **Wave 2: 3 issues** (+ the llvm-mos-sdk
   `setjmp.S` bug, a different repo). **Wave 3 (user judgment): 3 more PRs** — `0011`/`0012`/`0015`,
   latent stock bugs currently reachable only via the fork's a16/xy16; all apply clean to tip.
   **Wave 4: 3 design notes** → unblock the Wave-5 #320/#321 series. Full sequencing + per-item

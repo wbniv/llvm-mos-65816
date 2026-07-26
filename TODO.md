@@ -17,6 +17,19 @@ Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TOD
 
 ## Open
 
+- [ ] **Full ROM galleries on both biohack.net and indri.studio (+ fork now public).** Target 113
+  demos (111 existing + `mandel-display` + `mandel-oop`) live and content-identical on both sites.
+  `wbniv/llvm-mos-65816` flipped private→public 2026-07-26 (secrets sweep clean; confirmed via
+  `curl -s https://api.github.com/repos/wbniv/llvm-mos-65816` → `"private": false`) — also serves
+  as a followup to an Anthropic security block hit in a different session while bisecting when
+  certain compiler bugs were introduced. biohack.net gets the 2 missing demos + a fix for 4
+  demos (`bitweave`/`uarteye`/`pcooker`/`borrowlad`) currently 404ing from the `/snes/` gallery
+  (off-convention top-level URLs). indri.studio gets a genuinely new full per-slug gallery
+  (currently just one embedded player) via a data-driven route, not 113 hand files. 11 demos get a
+  new "🐛 compiler bug this demo guards against" callout linking the public fix commit (4
+  pre-existing-compiler bugs: `0010`/`0011`/`0012`/`0016` — `0002`/`0017` excluded, those are bugs
+  in code *we* wrote for the accum16 feature, not the existing compiler). [plan](docs/plans/2026-07-26-full-rom-galleries-both-sites.md)
+
 - [x] ~~**`+mos-xy16` miscompile — iterative in-place `memmove`/`memcpy` rewrite over a 16-bit-indexed buffer** — FIXED in `MOSInsertREPSEP::placeIntraBlock`: `sep #$10` between `ldx` (writes 16-bit X) and `lda abs,X16` (reads 16-bit X) zeroed X's high byte; fix inserts a clone of the last X-writer after the subsequent `rep #$10` to restore the correct value. Repro `examples/65816/xy16-inplace-memmove-repro.c` CAP=1700: `xy16=0x90AA` (was `0x1CC6`). Unblocked #23 L-system 5-way-green. ([investigation](docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md))~~
 
 ### M0 — Test Bench
@@ -648,8 +661,10 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   before anything is posted).** Momentum: **2 PRs already merged** (#562, #563 — our first two, landed
   essentially as submitted). Wave-ordered sequencing + per-item mechanics in
   [docs/plans/2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md):
-  **Wave 1** standalone PRs (`0016` G_SCMP/G_UCMP — best next post, body still to draft; `0010`
-  coalesce-rotate-Ac — body drafted; DWARF step-6 — branch pushed, re-verify at tip), **Wave 2** issues
+  **Wave 1** standalone PRs (`0016` G_SCMP/G_UCMP — **FULLY STAGED**: red/green at pristine tip
+  (llvm-lit PASS), branch `wbniv:mos-scmp-ucmp-legalize` pushed, bodies drafted — awaiting the user's
+  two `gh` commands; `0010` coalesce-rotate-Ac — body drafted; DWARF step-6 — branch cherry-picks
+  clean onto tip), **Wave 2** issues
   (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0012`/`0015` — user
   judgment: post with honest framing vs hold for #321), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
