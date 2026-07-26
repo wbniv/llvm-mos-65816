@@ -133,6 +133,28 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
   ~1h46m; cached thereafter); `torture`/`fuzz-csmith` are locally green (sampled 4-way), on-runner dispatch
   pending.
 
+### Title-card tooling (host-side, not `dev/run.sh` targets)
+
+The demo title card (`examples/snes/snesgfx/title_layer.h`) has two failure modes no WRAM gate value
+can see, so both get their own check:
+
+- **`dev/title-charset.sh`** — every title string in `examples/snes/*.c` against the glyphs actually
+  drawn in the *generated* `font8.h` (line0) / `font16.h` (line1). A character with no art renders as
+  a **space, silently**; that shipped for months (`G_FCOPYSIGN` read as `G FCOPYSIGN` in six demos,
+  `Z^2 + C` lost its caret). Exits non-zero on any offender; `--list` shows empty font slots. **Run it
+  before the gate when adding a demo** (the `snes-demo` skill lists it as a required step). Fonts
+  cover ASCII `0x20..0x5F` with **no empty slots**; `_title_glyph` folds `a-z`→`A-Z` at render time,
+  so only `` ` `` `{` `|` `}` `~` are unrenderable. Fix by drawing the glyph in
+  `tools/gen-font{8,16}.py` and regenerating — slots inside the range cost **zero bytes** (the tables
+  are fixed-size over the whole range). Extending past `0x5F` is +512 B / +2048 B and widens the
+  title's VRAM clobber by 5 KB — bundle that with the eventual lowercase glyphs.
+- **`dev/title.sh [FRAMES...]`** — builds a probe ROM that runs only `title_begin16`→`title_end` and
+  snapshots it at each frame into `build/title-sheet.png` (labelled contact sheet). Frame N means the
+  same animation instant every run, which a real demo's pre-loop compute would smear.
+  `TITLE_LINE0` / `TITLE_LINE1` override the strings. Use it whenever the banding or motion changes:
+  the regression class is a line's *wrapped* tilemap copy bleeding into the other line's HDMA band
+  (both lines arriving from both edges), and it is only visible mid-slide.
+
 ## The correctness gate + micro-test pattern
 
 The bar is the **differential**: host-computed == default(non-`+mos-a16`)@MAME == `+mos-a16`@MAME ==
