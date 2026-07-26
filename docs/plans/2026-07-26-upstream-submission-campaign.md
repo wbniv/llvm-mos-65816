@@ -16,6 +16,18 @@ auto-closed issue #561). Both landed essentially as submitted. That's the proof 
 small, self-contained, test-carrying fixes with honest write-ups get merged. This campaign applies the
 same shape to the rest of the queue.
 
+> **Update 2026-07-26 (later, campaign continuation):** upstream tip moved `8be054612` →
+> **`8b616af94`** — exactly one new commit, `feat(lld/ELF): support garbage collection of
+> .debug_frame sections (#567)`, touching only `lld/ELF/*` + two lld tests (no `llvm/` or MOS-backend
+> files). Re-verified in a shared-object scratch clone at the new tip: **all five Wave-1/3 artifacts
+> (`0010`/`0011`/`0012`/`0015`/`0016`) still `git apply --check` CLEAN**; the `0016` branch
+> (`e54ef471d546`, MOSLegalizerInfo.cpp + new test only) has no file overlap with #567, so the PR
+> merges clean as-is, and the RED-proof claim ("reproduced on `8be054612`") remains accurate — #567
+> is lld-only, so `llc` behavior at the new tip is identical. **Caveat:** #567 modifies
+> `lld/ELF/Writer.cpp`, one of the two files on the DWARF branch (`0ae9415`) — re-check that
+> cherry-pick against `8b616af94` before posting Wave 1 item 3. All five `0016` demo links
+> re-verified HTTP 200. `gh` remains unauthenticated — Wave 1 item 1 is blocked on `gh auth login`.
+
 ## Verified state (2026-07-26, via `git ls-remote` — `gh` unauthenticated on this box)
 
 | Fact | Value |

@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/dc4be9a) | docs(campaign): canonicalize demo URLs to /snes/<slug>/; verify-at-posting rule |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/1ead2ab) | upstream(0016): red/green proven at tip, branch pushed, artifact gains the lit test |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d473127) | docs(upstream): 0017 is series content, not a postable artifact — state the fold principle |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f71ecd3) | docs(upstream): 0016 issue+PR bodies drafted; PRs link live SNES proof demos (standing rule) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+dc4be9a	author	Will Norris
+dc4be9a	added	8
+dc4be9a	deleted	5
+dc4be9a	files	1
+dc4be9a	body	Gallery reorg (in flight today) normalized all demos under /snes/ — the four\nnewest now serve there too (top-level still answers, mid-migration). Map\nupdated to the canonical form, all 16 re-verified HTTP 200. Standing rule\nsharpened: re-verify every demo link live immediately before pasting into a\nPR body; never post a cached link. The 0016 bodies already used /snes/ forms\n(all five re-verified 200) — unchanged.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 1ead2ab	author	Will Norris
 1ead2ab	added	12
 1ead2ab	deleted	7
