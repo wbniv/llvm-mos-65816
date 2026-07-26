@@ -103,6 +103,61 @@ static void videoFrame(const void*, unsigned width, unsigned height, unsigned pi
 // JGX_FULLFRAME=1, dump the raw native frame (512 x g_h, no crop/downsample) — useful
 // for diagnosing crop/offset; otherwise downsample to the true 256 px and crop to the
 // `rows` visible scanlines starting at JGX_YOFF (default 0).
+// ---- force-blank bleed scan (JGX_BLANKSCAN) --------------------------------------------------
+//
+// A force-blank released LATE — asserted in v-blank for a DMA that then overruns into active
+// display — blanks the TOP N scanlines of the picture for that one frame. Nothing in the bench
+// caught that class of bug; it only shows as a brief flicker to a human watching the ROM boot.
+//
+// Metric per frame: how many leading rows of the ACTIVE picture are entirely black. A demo whose
+// artwork happens to be black at the top gives a steady high count, which is fine — the signature
+// of bleed is a one-frame SPIKE against its neighbours, so blank_scan_report looks for spikes, not
+// for absolute blackness.
+//
+// yoff mirrors the web player (public/play/app.js): the 240-line buffer carries the 224-line
+// picture at an 8-line offset, so the active picture starts at row 8. jgxcheck's PNG dump defaults
+// to yoff=0 and is therefore shifted 8 lines from what a browser shows — do not confuse the two.
+static int leading_black_rows(void) {
+  if (!g_pitch || !vbuf || !g_h) return -1;
+  const int yoff = (g_h >= 232) ? 8 : 0;
+  const int rows = ((int)g_h - yoff) < 224 ? ((int)g_h - yoff) : 224;
+  const int step = (g_w >= 512) ? 2 : 1;
+  const int cols = (int)g_w / step;
+  int n = 0;
+  for (int y = 0; y < rows; y++) {
+    bool black = true;
+    for (int x = 0; x < cols && black; x++)
+      if (vbuf[(size_t)(y + yoff) * g_pitch + (size_t)x * step] & 0x00FFFFFFu) black = false;
+    if (!black) break;
+    n++;
+  }
+  return n;
+}
+
+// Flag frames whose leading-black-row count is a LOCAL MAXIMUM exceeding both neighbours by
+// >= threshold. Comparing against the HIGHER neighbour is what makes this specific: the title
+// card's gravity exit walks the black top band monotonically from 0 to 224 over ~40 frames, and
+// every frame of that ramp beats its predecessor — but none is a local max, so none is flagged.
+// Force-blank bleed is a one-frame excursion, which is.
+static int blank_scan_report(const std::vector<int> &v, int threshold) {
+  int flagged = 0;
+  for (size_t i = 1; i + 1 < v.size(); i++) {
+    int nb = v[i - 1] > v[i + 1] ? v[i - 1] : v[i + 1];   // the HIGHER neighbour
+    if (v[i] - nb >= threshold) {
+      if (flagged < 20)
+        printf("BLANKSCAN: frame %zu has %d black rows at top (neighbours %d / %d)\n",
+               i, v[i], v[i - 1], v[i + 1]);
+      flagged++;
+    }
+  }
+  if (flagged == 0)
+    printf("BLANKSCAN: PASS %zu frames, no force-blank bleed (threshold %d rows)\n",
+           v.size(), threshold);
+  else
+    printf("BLANKSCAN: FAIL %d frame(s) with a transient black band at the top\n", flagged);
+  return flagged;
+}
+
 static int dump_png(const char *path, int rows) {
   if (!g_pitch || !vbuf) { fprintf(stderr, "jgxcheck: no video frame to dump\n"); return 1; }
   bool full = getenv("JGX_FULLFRAME") != nullptr;
@@ -196,11 +251,23 @@ int main(int argc, char **argv) {
   if (getenv("JGX_SCRIPT")) parseScript(getenv("JGX_SCRIPT"));
 #endif
 
+  // JGX_BLANKSCAN=1 — per-frame force-blank-bleed scan (see blank_scan_report). One emulator run
+  // covers every frame, so this is O(frames), not the O(frames^2) of dumping a PNG per frame.
+  const bool blankscan = getenv("JGX_BLANKSCAN") != nullptr;
+  std::vector<int> blacktop;
+  if (blankscan) blacktop.reserve((size_t)frames);
+
   for (int i = 0; i < frames; ++i) {
     Bsnes::run();
+    if (blankscan) blacktop.push_back(leading_black_rows());
 #if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM)
     g_frame++;
 #endif
+  }
+
+  if (blankscan) {
+    int thr = getenv("JGX_BLANKSCAN_ROWS") ? atoi(getenv("JGX_BLANKSCAN_ROWS")) : 4;
+    if (blank_scan_report(blacktop, thr) != 0) return 3;
   }
 
   if (png_out) dump_png(png_out, 224);

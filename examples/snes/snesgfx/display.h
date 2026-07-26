@@ -2,10 +2,13 @@
  *
  * Owns the boot bracket, the UploadQueue, the VramAlloc, and the Scene as PRIVATE collaborators.
  * The two hardware correctness invariants live here and cannot be bypassed by the client:
- *   - the boot bracket: snes_ppu_reset_blank() zeroes ALL PPU control regs + holds force-blank,
- *     and force-blank is released LAST (after the first complete upload) — handoff §1's #1
- *     determinism trap, owned by the constructor;
- *   - the access window: the queue flushes (DMA) only inside the v-blank display_frame waits for.
+ *   - the boot bracket: snes_ppu_reset_blank() zeroes ALL PPU control regs + holds force-blank.
+ *     This is the ONLY force-blank in snesgfx — the console powers on blanked, drawables do their
+ *     bulk VRAM setup inside that window, and the first display_frame() releases it. It is never
+ *     re-asserted: blanking mid-run to widen the DMA window blanks the top of the picture if the
+ *     transfer overruns v-blank, which is a visible flicker. Clear the screen instead;
+ *   - the access window: the queue flushes (DMA) only inside the v-blank display_frame waits for,
+ *     and only up to UPQ_VBLANK_BUDGET bytes of it.
  * The client constructs a Display, hands it drawables, and calls display_frame() — no bare
  * snes_ / REG_ pokes (no-bare-functions rule).
  *
@@ -23,7 +26,8 @@ typedef struct {
   VramAlloc   va;      /* private collaborator */
   Scene       scene;   /* the drawables        */
   uint8_t     tm;      /* TM ($212C) shadow — TM is WRITE-ONLY, so we never read-modify-write it */
-  uint8_t     shown;   /* force-blank released yet? */
+  uint8_t     shown;   /* boot force-blank released yet? (set by the first display_frame) */
+  uint8_t     late_add;/* 1 = a display_add arrived after `shown` — see display_add()      */
   uint8_t     bright;  /* current INIDISP master brightness 0..15 (the post-flush value)          */
   uint8_t     btgt;    /* brightness target — display_frame ramps `bright` one step toward it      */
 } Display;
@@ -38,6 +42,7 @@ static inline void display_init(Display *d) {
   scene_init(&d->scene);
   d->tm = 0;
   d->shown = 0;
+  d->late_add = 0;
   d->bright = INIDISP_ON;                   /* default full brightness — the ramp is a no-op    */
   d->btgt   = INIDISP_ON;                   /* until a fade is requested (display_fade_to)        */
   REG_BGMODE   = BGMODE_1;                  /* BG1/BG2 4bpp, BG3 2bpp */
@@ -46,8 +51,16 @@ static inline void display_init(Display *d) {
 }
 
 /* Add a drawable, reserve its VRAM / set its layer registers, and enable its layer on the main
-   screen via the TM shadow (never a read-modify-write of the write-only TM register). */
+   screen via the TM shadow (never a read-modify-write of the write-only TM register).
+
+   MUST be called before the first display_frame(). reserve() implementations bulk-write VRAM
+   through REG_VMDATA, which is only legal while the boot force-blank is still up; the first
+   display_frame() releases it and it is never re-asserted, so a later display_add would write
+   VRAM during active display and silently corrupt it. `late_add` records the violation rather
+   than letting it pass unnoticed — all current demos call app_init (display_init + every
+   display_add, no frames) before title_begin, which is the shape that keeps this true. */
 static inline void display_add(Display *d, Drawable *layer) {
+  if (d->shown) d->late_add = 1;
   scene_add(&d->scene, layer);
   drawable_reserve(layer, &d->va);
   d->tm = (uint8_t)(d->tm | layer->tm_bits);
@@ -63,17 +76,22 @@ static inline void display_hide_layer(Display *d, Drawable *layer) {
   REG_TM = d->tm;
 }
 
-/* One frame: wait a FRESH v-blank, force-blank during DMA (allows VRAM writes at any
-   scanline — timing drift from a slightly-over-budget compute loop can push the DMA tail
-   into active display; force-blank ensures those writes are never rejected).
-   scene_emit() runs BEFORE snes_wait_vblank so it does not eat into the 36-scanline
-   vblank window: it only touches WRAM (no PPU ports) so it is safe at any scanline. */
+/* One frame: build the queue, then flush it inside a FRESH v-blank.
+   NO force-blank. This used to bracket the flush in force-blank so an over-long DMA could not be
+   rejected — but a force-blank released after v-blank has already ended blanks the top scanlines
+   of the picture, which the viewer sees as a flicker at the top of the screen. The queue now
+   stays inside the window on its own (UPQ_VBLANK_BUDGET), so nothing needs blanking.
+   scene_emit() runs BEFORE snes_wait_vblank so it does not eat into the ~38-scanline v-blank
+   window: it only touches WRAM (no PPU ports) so it is safe at any scanline.
+   The RDNMI clear sits AFTER scene_emit deliberately — emit can be slow enough to span a
+   v-blank, and consuming that stale flag would let the flush start in ACTIVE DISPLAY, which
+   without force-blank means dropped/corrupt VRAM writes. Clearing here costs at most one frame
+   of latency and guarantees the flush begins at the top of a real v-blank. */
 static inline void display_frame(Display *d) {
-  (void)REG_RDNMI;                          /* clear a stale flag latched during the compute */
   scene_emit(&d->scene, &d->q);             /* build upload queue (WRAM only — any scanline) */
+  (void)REG_RDNMI;                          /* discard any v-blank that elapsed during emit   */
   snes_wait_vblank();                       /* block until the next v-blank actually begins   */
-  REG_INIDISP = 0x80;                       /* force-blank: DMA succeeds at any vcounter      */
-  upq_flush(&d->q);                         /* DMA — CPU stalls per job until transfer done   */
+  upq_flush(&d->q);                         /* DMA, budgeted to fit the window                */
   /* Ramp the master brightness one step toward its target (the title-screen fade in/out). With
      btgt == bright (the default) this is a no-op and the screen is simply full-on. */
   if (d->bright < d->btgt)      d->bright++;

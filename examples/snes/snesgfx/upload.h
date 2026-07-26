@@ -1,9 +1,10 @@
-/* snesgfx — UploadQueue: the v-blank/force-blank-gated DMA upload queue.
+/* snesgfx — UploadQueue: the v-blank-gated DMA upload queue.
  *
  * INTERNAL collaborator (owned by Display). THE access-window rule lives here and nowhere
- * else: VRAM/CGRAM/OAM are writable only during force-blank or v-blank (handoff §1/§2).
- * Clients (drawables) ENQUEUE typed jobs whenever; upq_flush() runs them all via DMA and is
- * the only code that touches the PPU data ports — and Display only calls it inside a v-blank.
+ * else: VRAM/CGRAM/OAM are writable only during v-blank (or force-blank, which snesgfx uses
+ * exactly once, at boot — see display.h). Clients (drawables) ENQUEUE typed jobs whenever;
+ * upq_flush() runs them via DMA and is the only code that touches the PPU data ports — and
+ * Display only calls it inside a v-blank, spending at most UPQ_VBLANK_BUDGET bytes there.
  *
  * Header-only (static inline). Built on the snes.h HAL (DMA + PPU register map). */
 #ifndef SNESGFX_UPLOAD_H
@@ -13,6 +14,20 @@
 
 #ifndef UPQ_MAX_JOBS
 #define UPQ_MAX_JOBS 16
+#endif
+
+/* Bytes of DMA that fit in ONE NTSC v-blank, and therefore the hard cap on what a single flush may
+ * transfer. 38 v-blank lines x 1364 master cycles = 51,832; GP-DMA moves a byte per 8 master
+ * cycles = 6,479 B theoretical; ~20% is reserved for per-job register setup and for the fact that
+ * the flush does not begin exactly at the first v-blank cycle.
+ *
+ * This is a CORRECTNESS limit, not a performance tweak. snesgfx used to force-blank around the
+ * flush so an over-long transfer could not be rejected — but a force-blank released after v-blank
+ * has ended blanks the top scanlines of the picture, which is a visible flicker. With that removed,
+ * the queue must instead stay inside the window on its own: upq_flush spends at most this many
+ * bytes and leaves the remainder queued for the next frame. */
+#ifndef UPQ_VBLANK_BUDGET
+#define UPQ_VBLANK_BUDGET 5100u
 #endif
 
 /* A queued DMA upload. `port` selects which destination-address register to load first.
@@ -26,6 +41,7 @@ typedef struct {
   uint16_t dest;     /* VRAM word addr / CGRAM index / OAM byte addr */
   uint16_t src;      /* A-bus source address (low 16 bits)          */
   uint16_t nbytes;   /* transfer length (0 rejected — DAS=0 = 64KiB) */
+  uint16_t sent;     /* bytes already transferred — a job too big for one v-blank resumes here */
   uint8_t  src_bank; /* A-bus source bank                            */
   uint8_t  bbad;     /* B-bus dest: BBAD_VMDATA / BBAD_CGDATA / BBAD_OAMDATA */
   uint8_t  dmap;     /* DMAP_* (direction | step | unit)             */
@@ -49,7 +65,7 @@ static inline void upq_push_vram(UploadQueue *q, uint16_t destword, const void *
   UpqJob *j = &q->job[q->n++];
   j->port = UPQ_VRAM; j->dest = destword; j->vmain = vmain;
   j->bbad = BBAD_VMDATA; j->dmap = (uint8_t)(DMAP_TO_PPU | DMAP_ADDR_INC | DMAP_UNIT_2);
-  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes;
+  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes; j->sent = 0;
 }
 
 /* Enqueue a CGRAM palette upload starting at colour index `cgidx`. */
@@ -59,7 +75,7 @@ static inline void upq_push_cgram(UploadQueue *q, uint8_t cgidx, const void *src
   UpqJob *j = &q->job[q->n++];
   j->port = UPQ_CGRAM; j->dest = cgidx; j->vmain = 0;
   j->bbad = BBAD_CGDATA; j->dmap = (uint8_t)(DMAP_TO_PPU | DMAP_ADDR_INC | DMAP_UNIT_1);
-  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes;
+  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes; j->sent = 0;
 }
 
 /* Enqueue an OAM upload (typically the whole 544-byte shadow from byte 0). */
@@ -68,7 +84,7 @@ static inline void upq_push_oam(UploadQueue *q, const void *src, uint8_t bank, u
   UpqJob *j = &q->job[q->n++];
   j->port = UPQ_OAM; j->dest = 0; j->vmain = 0;
   j->bbad = BBAD_OAMDATA; j->dmap = (uint8_t)(DMAP_TO_PPU | DMAP_ADDR_INC | DMAP_UNIT_1);
-  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes;
+  j->src = (uint16_t)(uintptr_t)src; j->src_bank = bank; j->nbytes = nbytes; j->sent = 0;
 }
 
 /* Enqueue a write-twice PPU register poke — the BGnHOFS/BGnVOFS scroll latches ($210D..$2114).
@@ -94,41 +110,80 @@ static inline uint8_t upq_push_poke16(UploadQueue *q, uint16_t addr, uint16_t va
   return 1;
 }
 
-/* Run every queued job via DMA, then empty the queue. MUST be called in force-blank or
-   v-blank (Display guarantees this). The CPU stalls on each MDMAEN until the copy completes.
-   dma_base and mdmaen_bit are hoisted out of the loop so the 65816 never recomputes
-   chan*0x10 or 1<<chan on every iteration (those are variable-cost ops). */
+/* Run queued jobs via DMA until UPQ_VBLANK_BUDGET bytes are spent, then STOP and keep whatever is
+   left queued for the next frame. MUST be called inside v-blank (Display guarantees it). The CPU
+   stalls on each MDMAEN until the copy completes.
+
+   Stopping early is the point. There is no force-blank around this any more, so a transfer that ran
+   past the end of v-blank would be writing VRAM during active display — silently dropped or
+   corrupt. Budgeting keeps every transfer inside the window; a batch that does not fit simply takes
+   an extra frame, which is invisible, whereas the old force-blank made it a flicker at the top of
+   the screen.
+
+   A single job larger than the budget is split: `sent` records progress and the destination address
+   is re-derived from it on resume, so the next flush continues where this one stopped.
+
+   dma_base and mdmaen_bit are hoisted out of the loop so the 65816 never recomputes chan*0x10 or
+   1<<chan on every iteration (those are variable-cost ops). */
 static inline void upq_flush(UploadQueue *q) {
   volatile uint8_t *dma_base =
     (volatile uint8_t *)(uintptr_t)(0x4300u + (uint16_t)q->chan * 0x10u);
   uint8_t mdmaen_bit = (uint8_t)(1u << q->chan);
-  for (uint8_t i = 0; i < q->n; i++) {
-    const UpqJob *j = &q->job[i];
+  uint16_t budget = UPQ_VBLANK_BUDGET;
+  uint8_t i = 0;
+
+  while (i < q->n) {
+    UpqJob *j = &q->job[i];
+
     if (j->port == UPQ_REG) {       /* write-twice register poke (scroll latch) — not a DMA */
       volatile uint8_t *r = (volatile uint8_t *)(uintptr_t)j->dest;
       *r = (uint8_t)j->src;          /* low byte  */
       *r = (uint8_t)(j->src >> 8);   /* high byte */
-      continue;
+      i++; continue;
     }
     if (j->port == UPQ_POKE16) {    /* 16-bit register pair poke (addr, addr+1) — not a DMA */
       volatile uint8_t *r = (volatile uint8_t *)(uintptr_t)j->dest;
       r[0] = (uint8_t)j->src;
       r[1] = (uint8_t)(j->src >> 8);
-      continue;
+      i++; continue;
     }
-    if (j->port == UPQ_VRAM)       { REG_VMAIN = j->vmain; REG_VMADD = j->dest; }
-    else if (j->port == UPQ_CGRAM) { REG_CGADD = (uint8_t)j->dest; }
-    else                           { REG_OAMADDL = (uint8_t)j->dest; REG_OAMADDH = (uint8_t)(j->dest >> 8); }
+
+    uint16_t chunk = (uint16_t)(j->nbytes - j->sent);
+    if (chunk > budget) {
+      if (budget == 0) break;        /* out of window — everything from here waits a frame */
+      chunk = budget;
+    }
+
+    /* Resume offsets: VRAM/CGRAM/OAM all address in 2-byte units, so bytes>>1 advances them. */
+    uint16_t off = (uint16_t)(j->sent >> 1);
+    if (j->port == UPQ_VRAM)       { REG_VMAIN = j->vmain; REG_VMADD = (uint16_t)(j->dest + off); }
+    else if (j->port == UPQ_CGRAM) { REG_CGADD = (uint8_t)(j->dest + off); }
+    else                           { uint16_t oa = (uint16_t)(j->dest + off);
+                                     REG_OAMADDL = (uint8_t)oa; REG_OAMADDH = (uint8_t)(oa >> 8); }
+    uint16_t s = (uint16_t)(j->src + j->sent);
     dma_base[0] = j->dmap;
     dma_base[1] = j->bbad;
-    dma_base[2] = (uint8_t)j->src;
-    dma_base[3] = (uint8_t)(j->src >> 8);
+    dma_base[2] = (uint8_t)s;
+    dma_base[3] = (uint8_t)(s >> 8);
     dma_base[4] = j->src_bank;
-    dma_base[5] = (uint8_t)j->nbytes;
-    dma_base[6] = (uint8_t)(j->nbytes >> 8);
+    dma_base[5] = (uint8_t)chunk;
+    dma_base[6] = (uint8_t)(chunk >> 8);
     REG_MDMAEN = mdmaen_bit;
+
+    j->sent = (uint16_t)(j->sent + chunk);
+    budget  = (uint16_t)(budget - chunk);
+    if (j->sent < j->nbytes) break;  /* partial — this job resumes next flush */
+    i++;
   }
-  q->n = 0;
+
+  /* Keep the tail (the unfinished job, if any, plus everything after it). */
+  if (i >= q->n) {
+    q->n = 0;
+  } else if (i) {
+    uint8_t k = 0;
+    while (i < q->n) q->job[k++] = q->job[i++];
+    q->n = k;
+  }
 }
 
 #endif /* SNESGFX_UPLOAD_H */
