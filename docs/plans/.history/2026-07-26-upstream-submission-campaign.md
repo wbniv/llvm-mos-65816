@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/1ead2ab) | upstream(0016): red/green proven at tip, branch pushed, artifact gains the lit test |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d473127) | docs(upstream): 0017 is series content, not a postable artifact — state the fold principle |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f71ecd3) | docs(upstream): 0016 issue+PR bodies drafted; PRs link live SNES proof demos (standing rule) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+1ead2ab	author	Will Norris
+1ead2ab	added	12
+1ead2ab	deleted	7
+1ead2ab	files	1
+1ead2ab	body	RED on pristine 8be054612: LLVM ERROR unable to legalize G_SCMP (exact line in\nthe issue body). GREEN: official llvm-lit PASS with the one-line fix + new\nllvm/test/CodeGen/MOS/scmp-ucmp.ll (s8/s16 results x s8-s64 operands, signed +\nunsigned, -verify-machineinstrs). 0016 artifact regenerated = fix + test,\nbyte-identical to the pushed branch wbniv:mos-scmp-ucmp-legalize @ e54ef471d546.\nDWARF branch cherry-picks clean onto tip. Pristine build dir kept for later\nwaves. Posting the issue+PR remains the user's move (gh commands atop each body).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 d473127	author	Will Norris
 d473127	added	1
 d473127	deleted	1

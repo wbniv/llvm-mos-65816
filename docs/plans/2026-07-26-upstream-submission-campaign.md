@@ -115,15 +115,18 @@ For each artifact, at posting time and **only after user go-ahead**:
 6. **Link the live SNES demos** (standing rule, user-directed 2026-07-26): every PR body links the
    playable biohack.net demo(s) that exercise the fix — the in-browser bsnes-jg pages whose
    "Verify fidelity" button re-runs the WRAM self-check live. It turns the "soak-tested" claim into
-   something a maintainer can poke in 10 seconds. The map (URLs verified live 2026-07-26; NB the
-   four newest are top-level, not `/snes/`):
+   something a maintainer can poke in 10 seconds. **Canonical URL form is
+   `https://biohack.net/snes/<slug>/`** — the gallery evolves (it was being reorganized the day this
+   was written), so **re-verify every link returns HTTP 200 (`curl -s -o /dev/null -w '%{http_code}'`)
+   immediately before pasting into a PR body**; never post a cached link. The map (all 16 verified
+   200 at the canonical form, 2026-07-26):
 
    | Artifact | Live proof demos |
    |---|---|
    | `0016` scmp/ucmp | [qsortviz](https://biohack.net/snes/qsortviz/) (finder) · [spaceship](https://biohack.net/snes/spaceship/) · [ucmprank](https://biohack.net/snes/ucmprank/) · [trimerge](https://biohack.net/snes/trimerge/) · [keycmp64](https://biohack.net/snes/keycmp64/) |
-   | `0010` coalesce-rotate-Ac | [crcwall](https://biohack.net/snes/crcwall/) · [lfsr2](https://biohack.net/snes/lfsr2/) · [bitweave](https://biohack.net/bitweave/) · [uarteye](https://biohack.net/uarteye/) (Cluster D; default-8-bit leg load-bearing) |
-   | `0011` scavenger live-`$p` | [pcooker](https://biohack.net/pcooker/) (#109 re-stress) |
-   | `0012` LDCImm set | [borrowlad](https://biohack.net/borrowlad/) (#110 re-stress) |
+   | `0010` coalesce-rotate-Ac | [crcwall](https://biohack.net/snes/crcwall/) · [lfsr2](https://biohack.net/snes/lfsr2/) · [bitweave](https://biohack.net/snes/bitweave/) · [uarteye](https://biohack.net/snes/uarteye/) (Cluster D; default-8-bit leg load-bearing) |
+   | `0011` scavenger live-`$p` | [pcooker](https://biohack.net/snes/pcooker/) (#109 re-stress) |
+   | `0012` LDCImm set | [borrowlad](https://biohack.net/snes/borrowlad/) (#110 re-stress) |
    | `0015` coalesce-rc-undef | [newton](https://biohack.net/snes/newton/) (validated `0x4D8B`) |
    | `0017` s64 (un)merge | [dhmix](https://biohack.net/snes/dhmix/) (finder) · [mulov64](https://biohack.net/snes/mulov64/) · [oddmask](https://biohack.net/snes/oddmask/) · [modexp256](https://biohack.net/snes/modexp256/) |
 
