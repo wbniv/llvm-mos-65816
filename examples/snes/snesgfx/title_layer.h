@@ -87,13 +87,20 @@
 #define TITLE_MAX_CHARS  16u      /* max chars for line1 (16×16 font; 2 tile-cols per glyph)     */
 #define TITLE_L1_TILE    FONT8_N  /* first tile index for 16×16 glyphs (= 64)                   */
 
-#define TITLE_ROW0       12u      /* tilemap row for line0 (8×8)                                 */
-#define TITLE_ROW1       14u      /* tilemap row for line1 top (16×16)                           */
 #define TITLE_H0         8        /* line0 height, px                                            */
-#define TITLE_H1        16        /* line1 height, px                                            */
-#define TITLE_TY0       (int16_t)(TITLE_ROW0 * 8u)   /*  96 — tilemap y of line0 */
-#define TITLE_TY1       (int16_t)(TITLE_ROW1 * 8u)   /* 112 — tilemap y of line1 */
+#define TITLE_H1        16        /* height of ONE 16×16 row                                     */
 #define TITLE_SCREEN_H  224       /* visible scanlines                                           */
+
+/* Tilemap y of each line, per layout. line1 wraps to a second 16×16 row when it exceeds
+   TITLE_MAX_CHARS, and the whole block shifts up 8 px so it stays vertically centred:
+     one row : 8 + 8 gap + 16      = 32 px → top at (224−32)/2 =  96
+     two rows: 8 + 8 gap + 16 + 16 = 48 px → top at (224−48)/2 =  88
+   Both rows of a wrapped line1 are contiguous in the tilemap AND on screen, so they share one
+   scroll value and travel as a single 32 px band — the banding scheme needs no third band. */
+#define TITLE_TY0_1      96       /* 1-row line1: 8×8 at tilemap y 96,  16×16 at 112 */
+#define TITLE_TY1_1     112
+#define TITLE_TY0_2      88       /* 2-row line1: 8×8 at tilemap y 88,  16×16 at 104..135 */
+#define TITLE_TY1_2     104
 
 /* Band margin: each glyph band is this many px taller on each side than the glyphs themselves. The
    extra rows land on blank tilemap (row 95 above line0 / 104–105 below it; 110–111 above line1 /
@@ -101,14 +108,13 @@
 #define TITLE_MARGIN     2
 
 /* Blank bands: anchored at this tilemap row, chunked to this many scanlines, so every blank window
-   is a subset of tilemap rows [136,248) — well inside the blank region, clear of both lines. */
-#define TITLE_BLANK_ROW  136
+   is a subset of tilemap rows [144,256) — blank in BOTH layouts (text ends at 127 with one row,
+   135 with two) with ≥8 rows of clearance, and clear of the wrap back into rows 0..87. */
+#define TITLE_BLANK_ROW  144
 #define TITLE_BLANK_MAX  112
 
-/* Screen-space rest / start positions (y = the line's top scanline). At rest each line sits at its
-   own tilemap y, so both scroll values are 0 — the easy case to reason about. */
-#define TITLE_Y0_REST    TITLE_TY0                          /*  96 */
-#define TITLE_Y1_REST    TITLE_TY1                          /* 112 */
+/* Screen-space start positions (y = the line's top scanline). At rest each line sits at its own
+   tilemap y, so both scroll values are 0 — the easy case to reason about. */
 #define TITLE_Y0_START   (int16_t)(-TITLE_H0)               /*  −8 — fully above the screen */
 #define TITLE_Y1_START   (int16_t)(TITLE_SCREEN_H)          /* 224 — fully below the screen */
 
@@ -130,8 +136,16 @@
 
 typedef struct {
   Drawable    base;
-  const char *line0;     /* 8×8 font, centred on tilemap row 12   (NULL = skip) */
-  const char *line1;     /* 16×16 font, centred on tilemap rows 14–15 (NULL = skip) */
+  const char *line0;     /* 8×8 font, centred   (NULL = skip) */
+  const char *line1;     /* 16×16 font, centred; wrapped to two rows past TITLE_MAX_CHARS */
+  /* --- resolved layout (computed in title_init from line1's length) --- */
+  const char *l1a;       /* first  16×16 row (not NUL-terminated — use l1a_len)  */
+  const char *l1b;       /* second 16×16 row, NULL when line1 fits on one row     */
+  uint8_t     l1a_len;
+  uint8_t     l1b_len;
+  int16_t     ty0;       /* tilemap y of line0                                    */
+  int16_t     ty1;       /* tilemap y of the 16×16 block                          */
+  int16_t     h1;        /* height of the 16×16 block: 16 or 32                   */
   /* --- cinematics state (screen-space tops, Q4 = 1/16 px) --- */
   int16_t     y0_q4;     /* line0 top scanline                                              */
   int16_t     y1_q4;     /* line1 top scanline                                              */
@@ -177,6 +191,33 @@ static inline int16_t _title_hofs(const char *s) {
 #endif
 }
 
+/* Resolve line1 into one or two 16×16 rows and pick the matching vertical layout. Wrapping prefers
+   the last space at or before TITLE_MAX_CHARS so words stay intact; a run of non-space longer than
+   a row (a URL, a long identifier) hard-splits at the row width rather than dropping characters.
+   Anything past two full rows is truncated — 32 glyphs is already the full screen twice over. */
+static inline void _title_layout(TitleLayer *t) {
+  const char *s = t->line1;
+  uint8_t len = 0;
+  /* Measure up to 2·MAX + 1: two full rows plus the ONE space that the wrap consumes. Stopping at
+     2·MAX would clip the last character of a title that exactly fills both rows. */
+  if (s) for (const char *p = s; *p && len < 2u * TITLE_MAX_CHARS + 1u; p++) len++;
+
+  t->l1a = s; t->l1a_len = len; t->l1b = 0; t->l1b_len = 0;
+
+  if (len > TITLE_MAX_CHARS) {
+    uint8_t brk = 0;                                  /* split point; 0 = no space found */
+    for (uint8_t i = TITLE_MAX_CHARS; i > 0u; i--)
+      if (s[i] == ' ') { brk = i; break; }             /* s[brk] is the space itself */
+    if (brk) { t->l1a_len = brk; t->l1b = s + brk + 1u; }
+    else     { t->l1a_len = TITLE_MAX_CHARS; t->l1b = s + TITLE_MAX_CHARS; }
+    uint8_t rest = (uint8_t)(len - (uint8_t)(t->l1b - s));
+    t->l1b_len = rest > TITLE_MAX_CHARS ? TITLE_MAX_CHARS : rest;
+  }
+
+  if (t->l1b) { t->ty0 = TITLE_TY0_2; t->ty1 = TITLE_TY1_2; t->h1 = 2 * TITLE_H1; }
+  else        { t->ty0 = TITLE_TY0_1; t->ty1 = TITLE_TY1_1; t->h1 = TITLE_H1;     }
+}
+
 /* Triangle wave 0..127..0 — building block for the rainbow backdrop. */
 static inline uint8_t _title_tri(uint8_t x) { return (uint8_t)((x & 0x80u) ? (uint8_t)(255u - x) : x); }
 
@@ -220,14 +261,34 @@ static void _title_build(TitleLayer *t, int16_t y0, int16_t y1, HScrollN *vt, HS
   int16_t cur = 0;
   hscrollw_begin(&v, vt);
   hscrollw_begin(&h, ht);
-  _title_glyph_band(&v, &h, &cur, y0, TITLE_H0, TITLE_TY0, t->hofs0);
-  _title_glyph_band(&v, &h, &cur, y1, TITLE_H1, TITLE_TY1, 0);
+  _title_glyph_band(&v, &h, &cur, y0, TITLE_H0, t->ty0, t->hofs0);
+  _title_glyph_band(&v, &h, &cur, y1, t->h1,    t->ty1, 0);
   _title_blank(&v, &h, cur, TITLE_SCREEN_H);
   hscrollw_end(&v);
   hscrollw_end(&h);
 }
 
 /* ── reserve ──────────────────────────────────────────────────────────────────────────────────── */
+
+/* Write one 16×16 text row, centred, into tilemap rows `row` (glyph top halves) and `row+1`
+   (bottom halves). `s` is NOT NUL-terminated — `len` bounds it, so a wrapped line1 can point into
+   the caller's single string without copying it. */
+static void _title_write16(const char *s, uint8_t len, uint8_t row) {
+  uint8_t sc = (uint8_t)((TITLE_COLS - (uint8_t)(2u * len)) / 2u);
+  for (uint8_t half = 0; half < 2u; half++) {
+    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)(row + half) * TITLE_COLS));
+    for (uint8_t i = 0; i < TITLE_COLS; i++) {
+      uint16_t tile = 0;
+      if (s && i >= sc && i < (uint8_t)(sc + 2u * len)) {
+        uint8_t ci = (uint8_t)((i - sc) >> 1u);
+        uint8_t hs = (uint8_t)((i - sc) & 1u);
+        tile = (uint16_t)((uint16_t)TITLE_L1_TILE + 4u * _title_glyph((uint8_t)s[ci])
+                          + (uint16_t)(half ? 2u : 0u) + hs);
+      }
+      REG_VMDATA = (uint16_t)((uint16_t)(TITLE_PAL << 10) | tile);
+    }
+  }
+}
 
 static void _title_reserve(Drawable *d, VramAlloc *va) {
   (void)va;
@@ -269,13 +330,13 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
   for (uint16_t i = 0; i < (uint16_t)(TITLE_COLS * TITLE_ROWS); i++)
     REG_VMDATA = (uint16_t)(TITLE_PAL << 10);
 
-  /* Write line0 (8×8) at tilemap row 12, centred. */
+  /* Write line0 (8×8), centred on its tilemap row. */
   {
     const char *s = t->line0;
     uint8_t len = 0;
     if (s) for (const char *p = s; *p && len < TITLE_COLS; p++) len++;
     uint8_t sc = (uint8_t)((TITLE_COLS - len) / 2u);
-    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)TITLE_ROW0 * TITLE_COLS));
+    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)(t->ty0 >> 3) * TITLE_COLS));
     for (uint8_t i = 0; i < TITLE_COLS; i++) {
       uint16_t tile = (s && i >= sc && i < (uint8_t)(sc + len))
                         ? _title_glyph((uint8_t)s[i - sc]) : 0u;
@@ -283,33 +344,10 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
     }
   }
 
-  /* Write line1 (16×16) at tilemap rows 14 (top half) and 15 (bottom half), centred. */
-  {
-    const char *s = t->line1;
-    uint8_t len = 0;
-    if (s) for (const char *p = s; *p && len < TITLE_MAX_CHARS; p++) len++;
-    uint8_t sc = (uint8_t)((TITLE_COLS - (uint8_t)(2u * len)) / 2u);
-    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)TITLE_ROW1 * TITLE_COLS));
-    for (uint8_t i = 0; i < TITLE_COLS; i++) {
-      uint16_t tile = 0;
-      if (s && i >= sc && i < (uint8_t)(sc + 2u * len)) {
-        uint8_t ci = (uint8_t)((i - sc) >> 1u);
-        uint8_t hs = (uint8_t)((i - sc) & 1u);
-        tile = (uint16_t)((uint16_t)TITLE_L1_TILE + 4u * _title_glyph((uint8_t)s[ci]) + hs);
-      }
-      REG_VMDATA = (uint16_t)((uint16_t)(TITLE_PAL << 10) | tile);
-    }
-    snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)(TITLE_ROW1 + 1u) * TITLE_COLS));
-    for (uint8_t i = 0; i < TITLE_COLS; i++) {
-      uint16_t tile = 0;
-      if (s && i >= sc && i < (uint8_t)(sc + 2u * len)) {
-        uint8_t ci = (uint8_t)((i - sc) >> 1u);
-        uint8_t hs = (uint8_t)((i - sc) & 1u);
-        tile = (uint16_t)((uint16_t)TITLE_L1_TILE + 4u * _title_glyph((uint8_t)s[ci]) + 2u + hs);
-      }
-      REG_VMDATA = (uint16_t)((uint16_t)(TITLE_PAL << 10) | tile);
-    }
-  }
+  /* Write each 16×16 row (two tilemap rows apiece: glyph top halves then bottom halves), centred.
+     2 tile-columns per glyph makes (32 − 2·len)/2 exact, so no HOFS nudge is needed. */
+  _title_write16(t->l1a, t->l1a_len, (uint8_t)(t->ty1 >> 3));
+  if (t->l1b) _title_write16(t->l1b, t->l1b_len, (uint8_t)((t->ty1 >> 3) + 2u));
 
   /* Both lines start fully off-screen; the shared scroll latch is parked on blank tilemap so
      nothing flashes between here and the first HDMA frame. */
@@ -350,9 +388,10 @@ static void _title_emit(Drawable *d, UploadQueue *q) {
 
   if (t->flyin) {
     /* Both lines move simultaneously and meet in the middle: line0 descends from above the top
-       edge to y=96, line1 rises from below the bottom edge to y=112. */
-    t->y0_q4 = _title_ease(t->y0_q4, TITLE_Q4(TITLE_Y0_REST));
-    t->y1_q4 = _title_ease(t->y1_q4, TITLE_Q4(TITLE_Y1_REST));
+       edge, the 16×16 block rises from below the bottom edge, each to its own tilemap y (so both
+       scroll values land on 0 at rest). A wrapped line1 rises as one 32 px block. */
+    t->y0_q4 = _title_ease(t->y0_q4, (int16_t)(t->ty0 * 16));
+    t->y1_q4 = _title_ease(t->y1_q4, (int16_t)(t->ty1 * 16));
   } else if (t->falling) {
     /* Gravity: one shared velocity, so the pair keeps its 16 px spacing and drops off the bottom
        looking like a single falling object. Clamp well past the bottom edge so nothing wraps. */
@@ -391,6 +430,7 @@ static inline void title_init(TitleLayer *t, const char *line0, const char *line
   t->base.tm_bits = TM_BG2;
   t->line0 = line0;
   t->line1 = line1;
+  _title_layout(t);      /* resolves l1a/l1b + ty0/ty1/h1 — reserve and emit both depend on it */
 }
 
 /* ── public API ───────────────────────────────────────────────────────────────────────────────── */
@@ -415,7 +455,7 @@ static inline void title_begin(Display *d, TitleLayer *t, const char *line0, con
   display_fade(d, INIDISP_ON);        /* fade in with both lines still off-screen */
   t->flyin = 1;
   for (uint8_t g = 0;
-       (t->y0_q4 != TITLE_Q4(TITLE_Y0_REST) || t->y1_q4 != TITLE_Q4(TITLE_Y1_REST)) && g < 200u;
+       (t->y0_q4 != (int16_t)(t->ty0 * 16) || t->y1_q4 != (int16_t)(t->ty1 * 16)) && g < 200u;
        g++)
     display_frame(d);
   t->flyin = 0;   /* at rest; clear so title_end's fall branch is reachable */
