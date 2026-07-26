@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/febca90) | docs(plan): rebased stack now verified on bsnes-jg (3-way); MAME leg still open |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/7fd4a93) | docs: record rebase verification results + two findings from the rebuild |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/5ad343f) | patches+dev: rebase fork patch stack onto upstream tip; fix toolchain bootstrap |
 
 <!--history-meta v1
+febca90	author	Will Norris
+febca90	added	48
+febca90	deleted	22
+febca90	files	1
+febca90	body	Retracts the previous "both emulator legs unavailable" note. dev/xcheck.sh\nfetches (pinned + sha256) and builds the bsnes-jg core and jgxcheck harness\nitself, so that leg was obtainable here after all -- built, run, and now cached\nfor future gates on this box.\n\n  - xcheck: 16/16 far ROMs PASS on bsnes-jg. packed24_e2e (0xF3) and\n    packed24_table (0xA5) are the load-bearing ones: they exercise 0006's\n    emitNonStandardSizedConstant hook (3-byte packed far pointer, ADDR24\n    SEGMENT_LO/HI/BANK relocs), so their passing proves the path-filtered 0006\n    apply reconstructs that behaviour rather than merely compiling.\n  - cpu6502: PASS with real execution -- the +mos-a16 ROM ran 1000 frames on\n    the cycle-accurate core and produced 0xAC8A at WRAM 0xADD, matching both\n    the host oracle and the pre-rebase recorded value. Disasm probe reproduces\n    jmp_table=4 / rep/sep=97 exactly.\n  - Visual: read back build/cpu6502-jg.png -- 0019 CMP highlighted with the CMP\n    gate lit (the demo's core invariant), A:42 X:04 Y:00, PC $001B.\n\nStill open: the MAME leg needs the SPC700 IPL at dev/roms/s_smp/spc700.rom\n(copyrighted Nintendo firmware, supplied out-of-band), so this is a 3-way\n(host/default/a16 on bsnes-jg), not the full 4-way with MAME cross-confirmation.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 7fd4a93	author	Will Norris
 7fd4a93	added	35
 7fd4a93	deleted	2

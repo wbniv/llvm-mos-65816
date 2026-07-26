@@ -215,7 +215,29 @@ layout difference), but it is the offset any `--selfcheck` wiring must use now.
 
 5. cpu6502 published + live at `https://biohack.net/snes/cpu6502/`.
 
-_(pending)_
+**PASS — and it turns out it was already published.** The #102 plan's "Publish to biohack.net pending"
+note was **stale**: the page, ROM, preview and manifest selfcheck (`off=0xADD len=2 want=0xAC8A
+frames=1000`) were all already committed and deployed on biohack.net by `aff09db` / tag `v1.0.254` (the
+full-screen-layout redesign). Verified live:
+
+```
+page: HTTP 200            https://biohack.net/snes/cpu6502/
+rom:  HTTP 200  (32768 bytes)
+<title>6502 CPU Simulator — bioHACK•NET</title>
+```
+
+**The strongest result of this whole pass** — the ROM built by the *rebased* toolchain is
+**byte-identical** to the one built by the *old* toolchain that is currently deployed:
+
+```
+live deployed : c0df7cfd195ba8bb
+site repo copy: c0df7cfd195ba8bb
+fresh rebuild : c0df7cfd195ba8bb
+```
+
+Bit-for-bit reproducibility across the upstream bump + patch-stack rebase is much stronger evidence of
+behaviour preservation than the gate CRC alone (a CRC match only constrains one 16-bit observable; this
+constrains all 32768 bytes). Nothing needed publishing; TODO corrected instead.
 
 ## Out of scope (this pass)
 
