@@ -5,11 +5,19 @@ three governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics
 live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 
-**Preparing the upstream submission?** The reviewer-facing synthesis of the whole `0001`–`0009` patch stack —
-per-patch *need / patch / proof*, the dependency + sequencing + timeline diagrams, and the testing / SNES /
-dead-end appendices — is [`65816-patch-series-review-guide.md`](65816-patch-series-review-guide.md) (with an
+**Preparing the upstream submission?** Start at the **[submission campaign plan](plans/2026-07-26-upstream-submission-campaign.md)**
+(wave-ordered posting queue + per-item mechanics; 2 PRs merged so far — #562/#563). The reviewer-facing
+synthesis of the patch stack — per-patch *need / patch / proof*, diagrams, appendices — is
+[`65816-patch-series-review-guide.md`](65816-patch-series-review-guide.md) (with an
 [LLVM primer](llvm-primer-for-65816-review.md) for readers new to LLVM). It is the "how to review this" map;
 this file remains the "how to build/test/navigate it" mechanics.
+
+**Patch model (two-tier, steady state since 2026-07-26):** `0002` is a comprehensive rsync mirror of
+`llvm/lib/Target/MOS/` regenerated only by `dev/regen-patch.sh`; the fresh-clone bootstrap applies
+**`0001 → 0002 → 0006`(non-MOS-dir hunks)** (see `dev/toolchain.sh`'s comments). All other numbered
+patch files are **frozen upstream-PR artifacts** — never applied at build time, never regenerated from
+the live tree (the per-patch `regen-patch-000N.sh` scripts are retired and exit 2 with an explanation).
+Fixes to fork features fold into `0002`; only stock-llvm-mos defects get standalone artifacts.
 
 **Need the 65816 ISA itself** (registers, addressing modes, opcode matrix, cycle counts, native/emulation
 mode, `rep`/`sep`, `M`/`X` semantics)? [`65816-references.md`](65816-references.md) collects the canonical,
