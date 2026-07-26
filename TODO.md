@@ -17,6 +17,23 @@ Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TOD
 
 ## Open
 
+- [ ] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card.** The
+  title-card fix (`5f51be1` per-line HDMA bands + gravity exit, `e1a58f9` the `_`/`^` glyphs and
+  lowercase folding) is header-only, so every demo needs a rebuild to pick it up — the ROMs already
+  on biohack.net still show both lines arriving from both edges, `G_FCOPYSIGN` as `G FCOPYSIGN`, and
+  julia's `Z^2 + C` as `Z 2 + C`. Bulk rebuild + re-run each `dev/<slug>.sh` gate + re-publish via
+  `/snes-rom-page`. Note the intro is ~6 frames shorter than before, well inside the demos'
+  fixed-frame screenshot margins, but the published preview PNGs will change.
+
+- [ ] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
+  folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
+  case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
+  costs +512 B font8, +2048 B font16 in the near-code window (`mandel-double` already needs
+  `TITLE_FONT16_FAR` at 4 KB), and widens the title's VRAM CHR footprint by 5 KB — check no demo's
+  VRAM lands in the newly clobbered window. `` ` ``, `{`, `|`, `}`, `~` come free with the same
+  extension (none is used by any title today; `dev/title-charset.sh` gates them). Deleting the two
+  folding lines is the whole render-side change.
+
 - [ ] **Full ROM galleries on both biohack.net and indri.studio (+ fork now public).** Target 113
   demos (111 existing + `mandel-display` + `mandel-oop`) live and content-identical on both sites.
   `wbniv/llvm-mos-65816` flipped private→public 2026-07-26 (secrets sweep clean; confirmed via
