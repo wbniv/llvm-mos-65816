@@ -90,10 +90,9 @@
     var oh = avail < 224 ? avail : 224;
     var heap = Module.HEAPU32;               // re-fetch each frame (may grow)
     var base = Module._bjg_video() >>> 2;    // uint32 index
-    // Hold the baked preview until the SNES emits its first non-black frame: mandel-display
-    // force-blanks (solid black) while it computes pass 1, and drawing those boot frames
-    // would flash the preview to black for ~0.3 s before the first coarse image lands.
-    // Sample a sparse grid — a revealed Mandelbrot lights up far more than one in 64 pixels.
+    // Pre-ROM only: hold the poster until the core emits a non-black frame. loadRomBytes() sets
+    // `revealed` as soon as the ROM is accepted, so from that point every frame is drawn — black
+    // boot frames included. This branch now only covers the window before a ROM is loaded.
     if (!revealed) {
       var lit = false;
       for (var sy = yoff; sy < yoff + oh && !lit; sy += 8) {
@@ -150,6 +149,17 @@
     Module.HEAPU8.set(bytes, ptr);
     var ok = Module._bjg_load(ptr, bytes.length);
     Module._free(ptr);
+    // The ROM is about to run, so the poster has done its job: clear to black and let present()
+    // draw every frame from here, including the black ones. Holding the preview until the first
+    // *lit* frame (the old `revealed` behaviour) meant the page opened on a screenshot of the
+    // FINISHED demo, which reads as leftover state from a previous session — and every demo now
+    // fades its title card up from black, so the hold fired on all 113 pages rather than just the
+    // one long-force-blanking demo it was added for.
+    if (ok === 1 && ctx) {
+      revealed = true;
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     return ok === 1;
   }
 
@@ -302,11 +312,11 @@
     }, { threshold: 0.05 }).observe(target);
   }
 
-  // Paint the baked coarse preview onto the canvas right away, so a recognizable fractal
-  // (not a black box) shows while the ~3.9 MB core downloads and the ROM force-blanks through
-  // its first compute pass. Replaced by the live framebuffer on the first non-black frame
-  // (see `revealed` in present()). Only mandel-display ships an asset; any ROM without a
-  // preview/<id>.png just 404s the image and shows the default black — no error path needed.
+  // Paint the baked preview onto the canvas as a LOADING POSTER, so the page shows the demo
+  // rather than a black box while the ~3.9 MB core downloads. It is cleared to black the moment
+  // the ROM is accepted (see loadRomBytes), so the emulator always starts from a blank screen and
+  // the title card fades up over black. A ROM without a preview/<id>.png just 404s the image and
+  // keeps the default black — no error path needed.
   function paintPreview(id) {
     if (!id || !ctx) return;
     var img = new Image();
