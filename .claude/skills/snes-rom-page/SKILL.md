@@ -66,6 +66,12 @@ safe to distribute.
    - Keep `<div id="game">`/`#screen`/`#status`/`#verify`/`#fullscreen`/`#banner` ids and the boot
      `<script>` — app.js drives them and pauses when the canvas scrolls out of view. `#fullscreen`
      wires a Fullscreen button (hidden automatically on browsers without the API).
+   - ⚠️ **Never hand-edit `engine/app.js` while doing ROM work.** Its Fullscreen handler has been
+     deleted twice by unrelated ROM-rebuild commits, each time shipping ~111 pages with a button that
+     only highlights on hover. The handler also injects the `:fullscreen` CSS (Astro scopes component
+     styles, so it cannot live in the template). `scaffold.sh` now greps the installed `play/app.js`
+     for `requestFullscreen`/`fullscreenchange` and aborts the publish if either is gone — if you see
+     that FATAL, restore the block rather than working around it.
 
 4. **Register the demo on the gallery page** (`src/pages/snes/index.astro` on biohack.net, skipped for
    indri.studio unless it has one). Add a new entry to the `demos` array:

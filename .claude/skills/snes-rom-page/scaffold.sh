@@ -68,6 +68,20 @@ for f in app.js cores/bsnes_jg.js cores/bsnes_jg.wasm cores/PROVENANCE.json; do
   fi
 done
 
+# 1b. engine sanity — the Fullscreen handler has been silently deleted TWICE by unrelated ROM-rebuild
+#     commits, each time leaving a button that only changes colour on hover. The page markup always
+#     emits #fullscreen, so a copy without the handler is a broken publish, not a variant. Assert on
+#     the INSTALLED file (what actually ships), not the source.
+for probe in requestFullscreen fullscreenchange; do
+  grep -q "$probe" "$PLAY/app.js" || {
+    echo "scaffold.sh: FATAL: play/app.js has no '$probe' — the Fullscreen handler is missing." >&2
+    echo "  Restore it in $PLAYER_SRC/app.js (see the DO-NOT-DELETE block near the #verify" >&2
+    echo "  listener); publishing now would ship ~111 pages with a dead Fullscreen button." >&2
+    exit 2
+  }
+done
+echo "  engine  play/app.js: Fullscreen handler present"
+
 # 2. ROM
 cp "$ROM" "$PLAY/roms/$SLUG.sfc"
 echo "  rom     play/roms/$SLUG.sfc ($(stat -c%s "$PLAY/roms/$SLUG.sfc") bytes)"
