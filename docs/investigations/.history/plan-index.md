@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a25b326) | docs(todo+plan-index): triage rebase-plan deferrals; add plan-index row |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/092210a) | docs(plan-index): add #110 borrowlad row (8915348) |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/61d625f) | docs(plan-index): add #109 pcooker row (bb58a0a) |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/69962c4) | docs(plan-index): add #108 uarteye row (8b93bc3) |
@@ -206,6 +207,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+a25b326	author	Will Norris
+a25b326	added	2
+a25b326	deleted	0
+a25b326	files	1
+a25b326	body	Pre-commit hook follow-ups from 5ad343f.\n\nTriaged both auto-captured deferrals as non-work:\n  - "Regenerating 0004-0015 against the new pristine base" — its actionable\n    half is already a curated Open item (fix the regen-patch-000N.sh scripts\n    that hardcode the now-deleted 0003/0008); the rest only matters at\n    upstream-posting time, which is user-triggered.\n  - "Posting any new/updated upstream PRs" — explicitly not work: 0003/0008\n    are already posted and merged; this rebase produces no postable artifact.\n\nplan-index: added the rebase-plan row (Toolchain). The audit also flags three\nolder committed plans as missing rows (#102 cpu6502, cpu6502 full-screen\nlayout, Mode-7 title Waldo font) — left for their authors rather than\nsummarised second-hand, and noted as outstanding in the footer.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 092210a	author	Will Norris
 092210a	added	1
 092210a	deleted	0

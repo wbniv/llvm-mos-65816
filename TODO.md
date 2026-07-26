@@ -597,6 +597,22 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   regenerate `0002` properly. Standalone patches `0004`–`0015` are kept (several are still-unposted
   upstream-PR drafts) but excluded from the build loop.
   [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
+- [ ] **Far (addrspace 2) rodata read returns wrong data in the title VRAM upload — under realistic
+  register pressure.** Found 2026-07-26 trying to keep the real 16×16 font on `mandel-double` by parking
+  `FONT16` in bank `$01` far rodata. Build any `title_layer.h` demo `-DTITLE_FONT16_FAR` on `snes-far`
+  and line 1 renders wrong — `fft` loses it entirely, `mandel-double` shows solid bars — while the gate
+  CRC still **PASSES** (`corpus_result` never reads the title, so only a screenshot catches it).
+  **Isolated by single-variable builds:** `snes-far` platform alone is fine (near font on `snes-far`
+  renders perfectly); only the *far* font breaks. **Not the far read itself:** standalone far-table
+  reads return host-exact CRCs at constant indices, in the exact nested computed-index font-loop shape,
+  and with an interleaved `volatile` store. Placement and ROM bytes are correct, and the emitted
+  sequence looks right on inspection. **Hypothesis:** register pressure — a far pointer needs a 4-byte
+  `Imag32` `__rc` quad, and the passing repros are tiny leaf loops while the real upload sits inside
+  `_title_reserve` (0x57b) in a large program (Lesson 1). Next: cvise-reduce, check the `__rc`
+  allocation in passing vs failing builds, run `-verify-machineinstrs`. Blocks putting the real font on
+  `mandel-double`; for bulk VRAM data, DMA straight from the far bank (`REG_A1B0`) is the better route
+  regardless. [investigation](docs/investigations/2026-07-26-far-rodata-read-under-pressure-title-upload.md) ·
+  [plan](docs/plans/2026-07-26-font16-far-rodata-keep-fonts-everywhere.md).
 - [ ] **Make `dev/build.sh`'s example loop continue-on-error + report a summary.** Split out from the
   `mandel-double` fix below (now done). The loop is a plain `for` under `set -e`, so ONE unbuildable
   demo aborts the rest — `mandel-double` silently cost the 56 examples after it (`mandel-float`…
@@ -1517,5 +1533,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        merged (PR #562/#563); this rebase is fork-side bookkeeping that produces no new postable
        artifact. Posting remains user-triggered per standing policy.
      fp:adb7cd38a491445a fp:dcffbc00e6a08c58 -->
-- [ ] **(triage)** Moving other demos to far ROM. Only `mandel-double` needs it; the rest fit comfortably — and must not — _from [2026-07-26-font16-far-rodata-keep-fonts-everywhere.md](docs/plans/2026-07-26-font16-far-rodata-keep-fonts-everywhere.md)_  <!-- fp:e5c3e9ac6e56c865 -->
+<!-- triaged 2026-07-26: not a deferral — it is a deliberate NON-goal plus a hard constraint. Far ROM is
+     opt-in per demo (TITLE_FONT16_FAR + the snes-far-platform marker) precisely so a demo that already
+     fits keeps its single 32 KB bank and does NOT double to 64 KB; the plan states it as a requirement
+     and verifies it empirically rather than assuming. Only mandel-double would ever opt in, and it
+     currently does NOT (the far-font path is blocked on the codegen bug below). Nothing open.
+     fp:e5c3e9ac6e56c865 -->
 <!-- END auto-captured-deferrals -->
