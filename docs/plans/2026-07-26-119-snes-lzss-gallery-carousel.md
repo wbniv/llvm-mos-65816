@@ -1,10 +1,10 @@
 # #119 — SNES LZSS Mode 7 Gallery Carousel
 
-**Status:** IMPLEMENTED / PUBLISHING (2026-07-26). Demo **#119**, following the drafted Round 6 battery through
+**Status:** IMPLEMENTED / PUBLISHED (2026-07-26). Demo **#119**, following the drafted Round 6 battery through
 #118. The ten-work cartridge, host oracle, on-SNES codec, HDMA display split, captions, work meter,
 per-stage frame counters, reproducible gate script, and both website gallery integrations are
-implemented. Both production site builds pass; deployment and live hash verification are the final
-publication operations.
+implemented. Both production site builds and deployments pass, and both live sites serve the exact
+verified cartridge.
 This is a new showcase/stress demo, not a replacement for #49 `lzdec`.
 
 ## Goal
@@ -601,6 +601,17 @@ After the ROM and visual gates pass:
 
 The task is not complete when only the ROM builds locally. Completion requires both live sites to
 serve the exact verified ROM and current gallery metadata.
+
+### Publication evidence
+
+- implementation commit: `5cea8ec` (`llvm-mos-65816` `main`);
+- biohack.net commit/tag: `4f80e24` / `v1.0.266`, production workflow `30223110493` passed;
+- indri.studio commit/tag: `0330f3e` / `v0.1.92`;
+- local, biohack.net live, and indri.studio live ROM SHA-256 are identical:
+  `c8b55a787f7ec649ba994d63dcad56dab6f2d9b3f65c5afac592cc342090a4e1`;
+- biohack.net production page: `https://biohack.net/snes/lzss-gallery/`;
+- indri.studio production page:
+  `https://indri.studio/apps/llvm-mos-65816/snes/lzss-gallery/`.
 
 ## Implementation order
 
