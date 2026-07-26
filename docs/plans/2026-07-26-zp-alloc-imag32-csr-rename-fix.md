@@ -97,3 +97,19 @@ the near-font control.
 The pass is upstream llvm-mos; `Imag32` is fork-only (#320). The fix rides with the #320 series (fold
 into `0002` via regen), not a standalone upstream PR — noted in
 [upstream-contribution-status](../upstream-contribution-status.md) only when #320 goes up.
+
+## Residual: dedicated lit test — findings from the 2026-07-26 attempt
+
+Two IR-level attempts (loop-carried far-ptr phi across a call; +4 live accumulators for pressure) did
+NOT reproduce the CSR-quad binding under `llc -zp-avail=224`: greedy RA prefers spilling the pointer
+and reloading into caller-saved `RL1` (`lda [__rc4]`) around the call, so `MOSZeroPageAlloc` never sees
+a callee-saved quad. Confirmed useful facts: the pass IS in the plain `llc` pipeline
+(`MOSTargetMachine.cpp:315`) gated on `-zp-avail`; `-mattr=+mos-a16` + p2 datalayout works in `llc`.
+
+**Right design (next session): a MIR test, not IR** — pre-assign the far pointer to `RL5`
+(`$rs10_rs11` quad) in hand-written MIR with a call in the loop, run
+`llc -run-pass=mos-zp-alloc -zp-avail=224`, and FileCheck that the `LDA_IndirectLong` pointer operand
+is rewritten to the same `<fn>_zp_stk` slot the byte defs get (capture the slot with a FileCheck
+variable). This bypasses RA (the nondeterministic part) and pins exactly the rename-map property the
+fix added — the same `-run-pass` pattern `0010`/`0015` use for their coalescer tests. Do NOT commit an
+IR-shaped test that fails to bind the quad: a test that doesn't exercise the rename is false comfort.
