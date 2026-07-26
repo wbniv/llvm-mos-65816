@@ -76,14 +76,19 @@ mos-clang --config build/install/bin/mos-snes-far.cfg -mcpu=mosw65816 \
 
 Requires `TITLE_FONT16_FAR` support in `examples/snes/font16.h` (the `FONT16_STORAGE` macro).
 
-## Next steps (not done)
+## Next steps — dispositioned 2026-07-26 (see §RESOLUTION; this section predates it)
 
-1. cvise-reduce `fft` + `TITLE_FONT16_FAR` to a minimal failing far-read-under-pressure case, the way
-   the xy16 seed-445 miscompile was reduced.
-2. Confirm/refute the pressure hypothesis directly — compare `_title_reserve`'s `__rc` allocation in the
-   passing (synthetic) vs failing (real) builds, and check whether the far pointer's `Imag32` quad
-   overlaps something live across the loop.
-3. Check `-verify-machineinstrs` on the failing build.
+1. ~~cvise-reduce `fft` + `TITLE_FONT16_FAR` to a minimal failing case~~ — **SUPERSEDED, never
+   needed**: the failing binary's disassembly (`lda [$14]` with defs at `$c4..$c7`) led straight to
+   `MOSZeroPageAlloc` without reduction. **Residual:** the fix has no dedicated lit test (guarded
+   today by the demo renders + fork gates); an upstream-shaped test (`llc -zp-avail=…` forcing the
+   CSR rename over a live far quad) rides Wave-5 series prep in the
+   [submission campaign](../plans/2026-07-26-upstream-submission-campaign.md).
+2. ~~Confirm/refute the pressure hypothesis~~ — **DONE, hypothesis REFUTED**: single-function `llc`
+   replay (correct) vs full-module (broken) isolated the delta to the `-mlto-zp` zp budget — CSR
+   renaming, not RA spilling.
+3. ~~Check `-verify-machineinstrs` on the failing build~~ — **DONE**: clean on the failing build
+   (the bug is post-verifier, in the MC-lowering rename map) and clean ×2 on the fixed builds.
 
 ## Practical consequence
 
