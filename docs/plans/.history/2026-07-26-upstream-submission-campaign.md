@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d473127) | docs(upstream): 0017 is series content, not a postable artifact — state the fold principle |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f71ecd3) | docs(upstream): 0016 issue+PR bodies drafted; PRs link live SNES proof demos (standing rule) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+d473127	author	Will Norris
+d473127	added	1
+d473127	deleted	1
+d473127	files	1
+d473127	body	User question exposed the smell: fixes to our OWN fork features (0017 s64 glue,\n0009, 0014, zp-alloc Imag32, the xy16 REP/SEP fix already inside 0002) must\nnever be presented upstream as separate introduce-then-fix patches. They exist\nas separate numbered files only for fork-workflow reasons (append-only stack,\nper-patch provenance/bisection); the 2026-07-26 regen already folded their\ncontent into 0002, so the Wave-5 series presents finished features. Status-doc\nrow 14 reclassified out of the postable set; campaign plan states the principle.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f71ecd3	author	Will Norris
 f71ecd3	added	16
 f71ecd3	deleted	1

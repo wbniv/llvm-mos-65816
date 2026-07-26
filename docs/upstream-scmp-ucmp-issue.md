@@ -30,7 +30,8 @@ Practical impact: any program that sorts with a spaceship comparator — the idi
 callback — fails to build for MOS. We hit it via a SNES demo sorting with `qsort` at `-Os`
 (both the `-fno-lto` object path and the LTO link path reproduce).
 
-IR repro (same crash under `llc -mtriple=mos`):
+IR repro (same crash under `llc`, reproduced 2026-07-26 on a pristine build of `main` @ `8be054612` —
+`LLVM ERROR: unable to legalize instruction: %2:_(s8) = G_SCMP %0:_(s8), %1:_ (in function: scmp_i8)`):
 
 ```llvm
 define i16 @cmp(i16 %a, i16 %b) {

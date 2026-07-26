@@ -140,10 +140,15 @@ Optional fork hygiene at the same time (user-triggered): fast-forward `wbniv/llv
 - One artifact per PR; never bundle waves.
 - Every posted PR body links repro + test; no claims beyond what the fork's gates actually verified.
 
-## Immediate next actions (all local/doc-only, safe before review)
+## Immediate next actions — DONE 2026-07-26 (post-"ready")
 
-- [ ] Draft the `0016` **issue body** (minimal repro + backtrace) and **PR body** as
-      `docs/upstream-scmp-ucmp-issue.md` / `docs/upstream-scmp-ucmp-pr.md`, and extract an
-      upstream-shaped lit test into the artifact.
-- [ ] Re-verify the DWARF branch content applies/passes at `8be054612`.
-- [ ] User reviews this plan → green-lights Wave 1 item by item.
+- [x] `0016` issue + PR bodies drafted (`docs/upstream-scmp-ucmp-{issue,pr}.md`, live demo links in).
+- [x] **Red/green proven on a pristine tip build** (`build/upstream-llc`, reusable for later waves):
+      RED = `LLVM ERROR: unable to legalize instruction: %2:_(s8) = G_SCMP …` on unpatched
+      `8be054612`; GREEN = official `llvm-lit` **`Passed: 1 (100.00%)`** with the fix + new
+      `llvm/test/CodeGen/MOS/scmp-ucmp.ll` (folded into the `0016` artifact — now fix + test).
+- [x] **Branch minted + pushed**: `wbniv:mos-scmp-ucmp-legalize` @ `e54ef471d546` (cut from tip).
+- [x] DWARF branch (`0ae9415`) **cherry-picks clean onto `8be054612`** (`lld/ELF/Writer.cpp` +
+      the test) — postable as-is; optionally rebase at posting time.
+- [ ] **USER: post Wave 1 item 1** — open the issue, then the PR (commands atop each body doc),
+      appending `Fixes #<issue>` to the PR body.
