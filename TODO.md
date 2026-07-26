@@ -661,20 +661,22 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
 — keep it in sync (drafted → ready-to-post → posted) with the items in this section._
 
-- [ ] **Upstream submission campaign — post the queue, wave by wave (AWAITING USER REVIEW of the plan
-  before anything is posted).** Momentum: **2 PRs already merged** (#562, #563 — our first two, landed
-  essentially as submitted). Wave-ordered sequencing + per-item mechanics in
+- [wip] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — Wave 1 item 1
+  POSTED 2026-07-26).** ✅ **`0016` G_SCMP/G_UCMP is live upstream: issue
+  [#576](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
+  [#577](https://github.com/llvm-mos/llvm-mos/pull/577)** (`wbniv:mos-scmp-ucmp-legalize`, fix + lit
+  test, `Fixes #576`, live-demo links in body) — posted after the user authed `gh` (as wbniv).
+  Momentum: **2 PRs already merged** (#562, #563 — our first two, landed essentially as submitted).
+  Wave-ordered sequencing + per-item mechanics in
   [docs/plans/2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md):
-  **Wave 1** standalone PRs (`0016` G_SCMP/G_UCMP — **FULLY STAGED**: red/green at pristine tip
-  (llvm-lit PASS), branch `wbniv:mos-scmp-ucmp-legalize` pushed, bodies drafted — awaiting the user's
-  two `gh` commands; `0010` coalesce-rotate-Ac — body drafted; DWARF step-6 — branch cherry-picks
-  clean onto tip), **Wave 2** issues
+  **Wave 1** remaining (`0010` coalesce-rotate-Ac — body drafted, branch to mint; DWARF step-6 —
+  branch cherry-picks clean onto tip `8b616af94`, postable as-is), **Wave 2** issues
   (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0012`/`0015` — user
   judgment: post with honest framing vs hold for #321), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
-  Verified 2026-07-26: upstream tip `8be054612` == our base; `0010/0011/0012/0015/0016` all
-  `apply --check` clean against it. **Every outward action (branch push, PR, issue) is individually
-  user-triggered.**
+  Re-verified 2026-07-26 (post-move): upstream tip `8b616af94` (lld-only #567 on top of our base);
+  `0010/0011/0012/0015/0016` all `apply --check` clean against it. **Every outward action (branch
+  push, PR, issue) is individually user-triggered.**
 - [ ] **Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR).** Build ON @Phillip-May's
   stalled-but-working SDK scaffolding, don't replace it: reuse his `snesxc` register lib + multi-bank
   linker (with credit); contribute on top our native-mode crt0 (unlocks 16-bit codegen) + the

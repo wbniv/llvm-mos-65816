@@ -1,6 +1,12 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-07-26 #3 (**tip moved `8be054612` → `8b616af94` (one commit: lld/ELF
+**Last updated:** 2026-07-26 #4 (**🚀 CAMPAIGN WAVE 1 ITEM 1 POSTED — `0016` G_SCMP/G_UCMP is live
+upstream as issue [#576](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
+[#577](https://github.com/llvm-mos/llvm-mos/pull/577)** (head `wbniv:mos-scmp-ucmp-legalize` @
+`e54ef471d546`, fix + `scmp-ucmp.ll` lit test, body carries `Fixes #576` + the five live-demo links).
+Posted 2026-07-26 after the user ran `gh auth login` (account `wbniv`, keyring) — the auth blocker is
+gone for the rest of the campaign. Next up: Wave 1 item 2 (`0010` coalesce-rotate-Ac, branch to mint)
+and item 3 (DWARF, postable as-is) — both user-triggered.) Previously 2026-07-26 #3 (**tip moved `8be054612` → `8b616af94` (one commit: lld/ELF
 `.debug_frame` GC, PR #567 — no MOS-backend files); all five Wave-1/3 patch artifacts
 (`0010`/`0011`/`0012`/`0015`/`0016`) re-verified `git apply --check` CLEAN against the new tip in a
 shared-object scratch clone. The new commit touches `lld/ELF/Writer.cpp`, one of the two files on the
@@ -139,12 +145,13 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 
 ## TL;DR
 
-- **Ready to post (campaign Wave 1): 3 PRs** — `0016` G_SCMP/G_UCMP **FULLY STAGED 2026-07-26**:
-  red/green proven on a pristine tip build (official `llvm-lit` PASS), branch pushed
-  (`wbniv:mos-scmp-ucmp-legalize` @ `e54ef471d546`, fix + new `scmp-ucmp.ll`), issue+PR bodies drafted
-  (`docs/upstream-scmp-ucmp-{issue,pr}.md`, live demo links in) — **one `gh` command each away**;
-  `0010` coalesce-rotate-Ac (body drafted), DWARF step-6 (branch `0ae9415` cherry-picks clean onto
-  tip). **Wave 2: 3 issues** (+ the llvm-mos-sdk
+- **✅ POSTED (campaign Wave 1, item 1, 2026-07-26):** `0016` G_SCMP/G_UCMP — issue
+  [**#576**](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
+  [**#577**](https://github.com/llvm-mos/llvm-mos/pull/577) (`wbniv:mos-scmp-ucmp-legalize` @
+  `e54ef471d546`, fix + `scmp-ucmp.ll`, `Fixes #576`, live-demo links in body).
+- **Ready to post (campaign Wave 1 remainder): 2 PRs** —
+  `0010` coalesce-rotate-Ac (body drafted, branch to mint), DWARF step-6 (branch `0ae9415`
+  cherry-picks clean onto tip `8b616af94`). **Wave 2: 3 issues** (+ the llvm-mos-sdk
   `setjmp.S` bug, a different repo). **Wave 3 (user judgment): 3 more PRs** — `0011`/`0012`/`0015`,
   latent stock bugs currently reachable only via the fork's a16/xy16; all apply clean to tip.
   **Wave 4: 3 design notes** → unblock the Wave-5 #320/#321 series. Full sequencing + per-item

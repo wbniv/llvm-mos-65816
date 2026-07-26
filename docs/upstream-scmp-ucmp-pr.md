@@ -1,7 +1,9 @@
 # [DRAFT — PR body for llvm-mos/llvm-mos; strip this preamble when posting]
 #
-# Status: drafted 2026-07-26 (campaign Wave 1, item 1b). Branch: wbniv:mos-scmp-ucmp-legalize
-# (cut from current main tip 8be054612; carries the one-line fix + llvm/test/CodeGen/MOS/scmp-ucmp.ll).
+# Status: POSTED 2026-07-26 as https://github.com/llvm-mos/llvm-mos/pull/577 ("Fixes #576"
+# substituted for the #NNN placeholder below; body below is otherwise the as-posted text).
+# Branch: wbniv:mos-scmp-ucmp-legalize
+# (cut from main tip 8be054612; carries the one-line fix + llvm/test/CodeGen/MOS/scmp-ucmp.ll).
 # Post command (after the issue is opened and `gh auth login`):
 #   gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-scmp-ucmp-legalize --base main \
 #     --title "[MOS] Legalize G_SCMP/G_UCMP via lowerThreewayCompare" \

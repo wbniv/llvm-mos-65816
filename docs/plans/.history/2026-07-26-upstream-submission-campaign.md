@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/3b105d6) | docs(upstream): DWARF branch cherry-picks clean onto 8b616af94 — Wave 1 item 3 unblocked |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a460184) | docs(upstream): re-verify campaign against moved tip 8b616af94 (lld-only commit) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/dc4be9a) | docs(campaign): canonicalize demo URLs to /snes/<slug>/; verify-at-posting rule |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/1ead2ab) | upstream(0016): red/green proven at tip, branch pushed, artifact gains the lit test |
@@ -8,6 +9,11 @@
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+3b105d6	author	Will Norris
+3b105d6	added	5
+3b105d6	deleted	4
+3b105d6	files	1
+3b105d6	body	Live check: 0ae9415 (Writer.cpp doc comment + dwarf-65816.ll test) auto-merges\nonto the new tip despite #567's Writer.cpp changes. All three Wave-1 items now\nverified against the current tip; posting blocked on gh auth only.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 a460184	author	Will Norris
 a460184	added	12
 a460184	deleted	0

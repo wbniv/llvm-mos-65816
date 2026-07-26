@@ -1,7 +1,7 @@
 # [DRAFT — issue body for llvm-mos/llvm-mos; strip this preamble when posting]
 #
-# Status: drafted 2026-07-26 (campaign Wave 1, item 1a). Post together with the fix PR
-# (upstream-scmp-ucmp-pr.md); the PR says "Fixes #<this>".
+# Status: POSTED 2026-07-26 as https://github.com/llvm-mos/llvm-mos/issues/576
+# (campaign Wave 1, item 1a; fix PR = #577, body says "Fixes #576"). Body below is the as-posted text.
 # Post command (after `gh auth login`):
 #   gh issue create -R llvm-mos/llvm-mos \
 #     -t "Backend abort: unable to legalize G_SCMP/G_UCMP (C three-way compare) " \

@@ -166,5 +166,9 @@ Optional fork hygiene at the same time (user-triggered): fast-forward `wbniv/llv
 - [x] **Branch minted + pushed**: `wbniv:mos-scmp-ucmp-legalize` @ `e54ef471d546` (cut from tip).
 - [x] DWARF branch (`0ae9415`) **cherry-picks clean onto `8be054612`** (`lld/ELF/Writer.cpp` +
       the test) — postable as-is; optionally rebase at posting time.
-- [ ] **USER: post Wave 1 item 1** — open the issue, then the PR (commands atop each body doc),
-      appending `Fixes #<issue>` to the PR body.
+- [x] ~~**USER: post Wave 1 item 1** — open the issue, then the PR (commands atop each body doc),
+      appending `Fixes #<issue>` to the PR body.~~ **DONE 2026-07-26** — user ran `gh auth login`
+      (wbniv); posted as issue [#576](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
+      [#577](https://github.com/llvm-mos/llvm-mos/pull/577) (`Fixes #576` appended, demo links
+      re-verified 200 same-day). Next: Wave 1 item 2 (`0010`, branch to mint) / item 3 (DWARF,
+      postable as-is) — user-triggered.
