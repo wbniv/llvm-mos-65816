@@ -471,6 +471,19 @@ static inline void title_begin(Display *d, TitleLayer *t, const char *line0, con
 /* title_begin16 — backward-compat alias (all pre-existing call sites used this name). */
 #define title_begin16 title_begin
 
+/* Remove a title immediately after its fly-in/rest pose. Unlike display_hide_layer alone this
+ * restores the demo layers masked by title_begin and disables the title's HDMA channels. */
+static inline void title_end_now(Display *d, TitleLayer *t) {
+  d->tm |= t->demo_tm;
+  display_hide_layer(d, (Drawable *)t);
+  REG_HDMAEN = 0;
+  REG_BG2HOFS = 0; REG_BG2HOFS = 0;
+  REG_BG2VOFS = 0; REG_BG2VOFS = 0;
+  t->active = 0;
+  static const uint16_t _title_bg_black = 0;
+  upq_push_cgram(&d->q, 0, &_title_bg_black, 0x00, sizeof _title_bg_black);
+}
+
 /* title_end — hold for `frames` v-blanks, drop both lines off the bottom under gravity, fade to
  * black, restore the demo layers.
  *   Recommended: pass TITLE_HOLD_FRAMES (120 = 2 s) unless the demo has specific needs. */

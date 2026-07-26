@@ -146,16 +146,15 @@ static void game_update(Game *g) {
 int main(void) {
   static Game g;
   game_init(&g);
-  /* Title overlay on BG2 (OBJ chr lives at 0x4000.., the default title regions 0x1000/0x5000 are
-     free). Overlaid on the first 60 attract frames and hidden IN-loop — no pre-loop hold frames, so
-     the gate's frame-INV_FRAMES corpus latch is unaffected (gate-neutral). */
+  /* Title on BG2 (OBJ chr lives at 0x4000.., the default title regions 0x1000/0x5000 are free).
+     The immediate complete teardown restores the OBJ layer masked by title_begin and shuts down
+     title HDMA without delaying the deterministic attract gate. */
   static TitleLayer title;
   title_begin16(&g.screen, &title, "SPACE INVADERS", "SPRITES + OAM");
-  uint16_t tf = 0;
+  title_end_now(&g.screen, &title);
   for (;;) {
     game_update(&g);
     render(&g.sim, &g.sprites);
-    if (tf < 60u && ++tf == 60u) display_hide_layer(&g.screen, (Drawable *)&title);
     display_frame(&g.screen);     // wait v-blank, emit OAM, flush DMA, release force-blank on frame 1
   }
 }
