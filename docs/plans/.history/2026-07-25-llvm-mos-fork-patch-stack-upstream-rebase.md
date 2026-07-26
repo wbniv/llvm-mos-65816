@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/7fd4a93) | docs: record rebase verification results + two findings from the rebuild |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/5ad343f) | patches+dev: rebase fork patch stack onto upstream tip; fix toolchain bootstrap |
 
 <!--history-meta v1
+7fd4a93	author	Will Norris
+7fd4a93	added	35
+7fd4a93	deleted	2
+7fd4a93	files	1
+7fd4a93	body	Verification (honest status, written into the plan):\n  - toolchain: PASS. Cold `rm -rf vendor/llvm-mos` + `dev/run.sh toolchain`\n    builds clean against upstream tip 8be054612 on the corrected stack.\n  - 4-way differential: NOT RUN. Neither emulator leg exists on this box --\n    bsnes-jg needs a vendored+built vendor/bsnes-jg (no fetch script; manual\n    prereq, absent here) and MAME needs the SPC700 IPL, which is copyrighted\n    Nintendo firmware ("supply out-of-band"). This is a real gap, not a pass;\n    the rebased stack is NOT differentially validated yet.\n  - cpu6502 gate: PARTIAL PASS. Host oracle recomputes 0xAC8A (identical to the\n    2026-07-02 pre-rebase value) and the disasm probe reproduces the recorded\n    shape exactly (jmp_table=4, rep/sep=97), so the 256-entry switch still\n    lowers to a real jump table. But the gate's trailing "host==+mos-a16" is\n    printed unconditionally -- with both emulator legs skipped, no +mos-a16\n    value was observed at runtime. Noted in the plan so it isn't misread later.\n\nTwo findings filed as TODO items:\n  - mandel-double now overflows the 32 KiB bank by 2904 B on the rebased\n    toolchain. It has always been on the edge (#33 records an earlier 2289 B\n    overflow fixed by const-folding); newer upstream LLVM pushes it back over.\n    Impact is wider than one demo: dev/build.sh's ROM loop runs under set -e,\n    so this aborts the remaining 56 examples (mandel-float..wireframe) --\n    worth making that loop continue-on-error regardless.\n  - corpus_result moved WRAM 0x70 -> 0xadd (confirmed in cpu6502.map). Benign\n    layout change, but it is the offset any --selfcheck wiring must use now.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5ad343f	author	Will Norris
 5ad343f	added	166
 5ad343f	deleted	0

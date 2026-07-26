@@ -146,17 +146,41 @@ genuinely-cold first build was ~1h.)
 
 2. `dev/run.sh xcheck` — host==default==a16==xy16 on MAME (+ bsnes-jg where wired), 0 mismatches.
 
-**NOT RUN — both emulator legs are unavailable on this machine**, so the 4-way differential cannot be
-executed here at all:
-- **bsnes-jg**: `SKIP bsnes-jg (harness absent)` — needs a vendored+built `vendor/bsnes-jg` (source
-  tree + `objs/*.a` + `Database/`); there is no `dev/fetch-bsnes-jg.sh`, it is a manual prereq and the
-  directory does not exist in this checkout.
-- **MAME**: `SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content;
-  supply out-of-band)` — copyrighted Nintendo firmware that cannot be fetched.
+`dev/xcheck.sh` fetches (pinned+sha256-checked) and builds the bsnes-jg core + `jgxcheck` harness
+itself, so the bsnes-jg leg **was** obtainable on this box after all — done, and it now stays cached
+for every future gate here.
 
-⚠️ **This is a genuine gap in this pass, not a pass.** The project bar (`CLAUDE.md` "The bar") is the
-4-way differential; what ran below is strictly weaker. Re-run on a box with both emulators before
-treating the rebased stack as differentially validated.
+```
+==> bsnes-jg cross-check (independent of MAME)
+  PASS  hello.sfc: SMOKE: PASS off=0x20 len=1 got=0x42 (ran 180 frames, bsnes-jg)
+  PASS  far-run.sfc: SMOKE: PASS off=0x200 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  far-bank1.sfc: SMOKE: PASS off=0x200 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  far_indir.sfc: SMOKE: PASS off=0x204 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  far_cast.sfc: SMOKE: PASS off=0x202 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  far_arith.sfc: SMOKE: PASS off=0x202 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  far_store.sfc: SMOKE: PASS off=0x205 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  far_memops.sfc: SMOKE: PASS off=0x202 len=1 got=0x74 (ran 180 frames, bsnes-jg)
+  PASS  far_loop.sfc: SMOKE: PASS off=0x204 len=1 got=0xC9 (ran 180 frames, bsnes-jg)
+  PASS  far_call.sfc: SMOKE: PASS off=0x201 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  far_near_call.sfc: SMOKE: PASS off=0x201 len=1 got=0xE0 (ran 180 frames, bsnes-jg)
+  PASS  far_tail.sfc: SMOKE: PASS off=0x202 len=1 got=0xCB (ran 180 frames, bsnes-jg)
+  PASS  far_fnptr.sfc: SMOKE: PASS off=0x200 len=1 got=0xFF (ran 180 frames, bsnes-jg)
+  PASS  far_indir_tail.sfc: SMOKE: PASS off=0x200 len=1 got=0xFF (ran 180 frames, bsnes-jg)
+  PASS  packed24_e2e.sfc: SMOKE: PASS off=0x203 len=1 got=0xF3 (ran 180 frames, bsnes-jg)
+  PASS  packed24_table.sfc: SMOKE: PASS off=0x200 len=1 got=0xA5 (ran 180 frames, bsnes-jg)
+RESULT: PASS — bsnes-jg agrees with MAME on the far ROMs (independent confirmation)
+```
+
+**PASS — 16/16 far ROMs green on the rebased toolchain.** Note `packed24_e2e` and `packed24_table`
+passing is the load-bearing evidence for §3 of the Correction above: those are exactly the ROMs that
+exercise `0006`'s `emitNonStandardSizedConstant` hook (3-byte packed far pointer, `ADDR24_SEGMENT_LO/
+HI/BANK` relocations). Their `0xF3`/`0xA5` prove the bank byte survives — i.e. the path-filtered `0006`
+apply reconstructs that behaviour correctly, not just compiles.
+
+⚠️ **Remaining gap: the MAME leg.** `SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored
+Nintendo content; supply out-of-band)` — copyrighted Nintendo firmware that cannot be fetched. So this
+is a **3-way** (host / default / a16 on bsnes-jg), not the full 4-way with MAME cross-confirmation. Drop
+the IPL at that path to close it.
 
 3. `dev/run.sh cpu6502` — `RESULT: PASS`, CRC `0xAC8A` (matches the plan's recorded gate value).
 
@@ -165,25 +189,27 @@ treating the rebased stack as differentially validated.
 ==> built build/cpu6502.sfc (+mos-a16); corpus_result @ WRAM 0xadd
 ==> opcode dispatch probe (expect jump table in disasm)
     PASS  jmp_table=4  rep/sep=97
-    SKIP bsnes-jg (harness absent)
+==> bsnes-jg: render + assert (build/cpu6502-jg.png)
+SMOKE: PASS off=0xADD len=2 got=0xAC8A (ran 1000 frames, bsnes-jg)
     SKIP MAME (no SPC700 IPL)
 
 RESULT: PASS — 6502/65C02 CPU Disassembler+Simulator on SNES; gate_crc=0xAC8A host==+mos-a16
+jgxcheck: wrote /work/build/cpu6502-jg.png (256x224 from native 512x240, yoff=0)
 ```
 
-**PARTIAL PASS — read carefully.** What this *actually* establishes:
-- the host oracle recomputes `0xAC8A`, identical to the value recorded on 2026-07-02 pre-rebase;
-- the ROM builds under `+mos-a16` and the **disasm probe reproduces the recorded shape exactly**
-  (`jmp_table=4`, `rep/sep=97` — the plan's recorded figures), i.e. the 256-entry `switch` still
-  lowers to a real jump table on the rebased toolchain.
+**PASS, with real runtime execution.** The `+mos-a16` ROM ran 1000 frames on the cycle-accurate
+bsnes-jg core and produced `0xAC8A` at WRAM `0xADD` — identical to both the host oracle and the value
+recorded pre-rebase on 2026-07-02. The disasm probe also reproduces the recorded shape exactly
+(`jmp_table=4`, `rep/sep=97`), so the 256-entry `switch` still lowers to a genuine jump table.
 
-What it does **not** establish: the trailing `host==+mos-a16` in that `RESULT` line is **misleading** —
-the script prints it unconditionally, and with both emulator legs skipped **no `+mos-a16` value was ever
-observed at runtime**. Only the host-side oracle value was computed. Runtime equality is unverified here.
+**Visual check** (`build/cpu6502-jg.png`, read back): renders correctly — `0019 CMP` highlighted yellow
+in the Waldo-16 disassembly listing with the **CMP** gate lit in the panel (highlight and lit gate
+agree, which is the demo's whole invariant), register strip `A:42 X:04 Y:00`, PC `$001B`. Matches the
+screenshot recorded in the #102 plan.
 
 **Incidental finding:** `corpus_result` moved from WRAM `0x70` (recorded 2026-07-02) to **`0xadd`** on
-the rebased toolchain — confirmed in `build/cpu6502.map`. Benign (a layout difference), but it is the
-offset any `--selfcheck` wiring must use now.
+the rebased toolchain — confirmed in `build/cpu6502.map` and in the gate's own `off=0xADD`. Benign (a
+layout difference), but it is the offset any `--selfcheck` wiring must use now.
 
 4. ~~`dev/regen-patch.sh` round-trip — `RESULT: PASS`.~~ **N/A — step 7 skipped, see above.**
 
