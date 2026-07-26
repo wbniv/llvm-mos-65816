@@ -144,6 +144,27 @@ title_end(&a.screen, &title, 90);                          // ~1.5 s dwell then 
 
 Call `title_begin` **after** `display_add()` for all demo drawables, and **before** any demo-specific HDMA is armed. `title_end` tears down the card and fades into the demo.
 
+Note the argument order matches the layout, not the emphasis: **line0 is the small 8×8 top line**
+(category / what it is) and **line1 is the big 16×16 name** below it — e.g.
+`title_begin16(&a.screen, &title, "HUFFMAN", "BIT-TREE DECODE")`.
+
+**Title charset — the fonts only cover ASCII `0x20..0x5F`.** A character with no glyph renders as a
+**space, silently**; that is how six shipped titles lost their underscore (`G_FCOPYSIGN` read as
+`G FCOPYSIGN`) and julia lost the caret in `Z^2 + C`. Lowercase is safe — `_title_glyph` folds `a-z`
+to `A-Z` at render time — but anything else above `0x5F` (`` ` ``, `{`, `|`, `}`, `~`) has no glyph
+and no fallback. Every slot **inside** `0x20..0x5F` is drawn, so uppercase, digits and all ASCII
+punctuation are fine. Before running the gate:
+
+```bash
+dev/title-charset.sh          # PASS required; --list shows any empty font slots
+```
+
+If it fails, prefer **drawing the glyph** — add its art to `tools/gen-font8.py` /
+`tools/gen-font16.py` and regenerate. Slots in `0x20..0x5F` already exist in both tables, so filling
+one costs **zero bytes**. Reword the title as the second choice. Extending the range past `0x5F` is a
+real cost (+512 B font8, +2048 B font16 near-window, +5 KB of VRAM clobbered by the title upload) and
+should be bundled with the eventual lowercase-glyph work, not done for one character.
+
 **`TextLayer` limitation:** it only supports 2 HUD rows. For full-screen text (e.g. a
 digit display covering 27+ rows), write a **custom Drawable** — see the `PiHud` pattern in
 `examples/snes/spigot.c:44–200` as the canonical model.
@@ -534,6 +555,7 @@ Wire into `Taskfile.yml`:
 ### 7 — Run the gate
 
 ```bash
+dev/title-charset.sh    # every title character has a glyph (see the TitleLayer section)
 dev/run.sh <slug>
 ```
 
