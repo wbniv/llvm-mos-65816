@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/ff79af7) | upstream(0016): POSTED — G_SCMP/G_UCMP legalization live as issue #576 + PR #577 |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/3b105d6) | docs(upstream): DWARF branch cherry-picks clean onto 8b616af94 — Wave 1 item 3 unblocked |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a460184) | docs(upstream): re-verify campaign against moved tip 8b616af94 (lld-only commit) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/dc4be9a) | docs(campaign): canonicalize demo URLs to /snes/<slug>/; verify-at-posting rule |
@@ -9,6 +10,11 @@
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+ff79af7	author	Will Norris
+ff79af7	added	6
+ff79af7	deleted	2
+ff79af7	files	1
+ff79af7	body	Campaign Wave 1 item 1 executed after the user authed gh (wbniv): issue\nllvm-mos/llvm-mos#576 (spaceship-comparator backend abort, minimal repro,\nlive demo links) + PR #577 from wbniv:mos-scmp-ucmp-legalize (one-line\n.lower() fix + scmp-ucmp.ll lit test, Fixes #576). Live gh snapshot via\ndev/upstream-status.sh: #577/#576 OPEN; #562 merged 2026-07-05, #563 merged\n2026-07-13. Status doc, campaign plan checkbox, TODO campaign item, and both\nbody-doc preambles flipped drafted -> posted. Next user-triggered: Wave 1\nitem 2 (0010, branch to mint) / item 3 (DWARF, postable as-is).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3b105d6	author	Will Norris
 3b105d6	added	5
 3b105d6	deleted	4

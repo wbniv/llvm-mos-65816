@@ -150,7 +150,9 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
   [**#577**](https://github.com/llvm-mos/llvm-mos/pull/577) (`wbniv:mos-scmp-ucmp-legalize` @
   `e54ef471d546`, fix + `scmp-ucmp.ll`, `Fixes #576`, live-demo links in body).
 - **Ready to post (campaign Wave 1 remainder): 2 PRs** —
-  `0010` coalesce-rotate-Ac (body drafted, branch to mint), DWARF step-6 (branch `0ae9415`
+  `0010` coalesce-rotate-Ac (**STAGED 2026-07-26**: red/green proven on the pristine build, branch
+  `mos-coalesce-rotate-ac` minted locally @ `18244924b3d3` — push + `gh pr create` are the user
+  trigger, commands atop the body doc), DWARF step-6 (branch `0ae9415`
   cherry-picks clean onto tip `8b616af94`). **Wave 2: 3 issues** (+ the llvm-mos-sdk
   `setjmp.S` bug, a different repo). **Wave 3 (user judgment): 3 more PRs** — `0011`/`0012`/`0015`,
   latent stock bugs currently reachable only via the fork's a16/xy16; all apply clean to tip.

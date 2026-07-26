@@ -1,5 +1,17 @@
 # [MOS] Don't coalesce two rotate-referenced values into the A-only `Ac` class (silent miscompile)
 
+<!-- STAGED 2026-07-26 (campaign Wave 1, item 2): red/green proven on the pristine tip build
+     (RED = lit FAIL on unfixed llc; GREEN = official llvm-lit PASS 100% after fix + rebuild).
+     Branch mos-coalesce-rotate-ac minted locally in vendor/llvm-mos @ 18244924b3d3 (cut from
+     8be054612, same base as 0016) — push blocked by permission layer, part of the user trigger.
+     Post commands (title = the H1 above; body = this doc minus the H1 and this comment):
+       git -C vendor/llvm-mos push https://github.com/wbniv/llvm-mos.git mos-coalesce-rotate-ac
+       gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-coalesce-rotate-ac --base main \
+         --title "[MOS] Don't coalesce two rotate-referenced values into the A-only Ac class (silent miscompile)" \
+         --body-file <(sed '2,/^-->$/d; 1d' docs/upstream-coalesce-rotate-ac-pr.md)
+     Demo links below verified HTTP 200 on 2026-07-26 — re-verify at posting time.
+-->
+
 ## Summary
 
 On the 65816 (and any MOS subtarget), the register coalescer can merge two
@@ -70,6 +82,13 @@ vreg) and passes after.
 - Zero regressions: corpus differential 7/7, c-torture 30/30 (default == a16 ==
   xy16), Csmith 54/60 (0 mismatch / 0 crash / 0 error), `-verify-machineinstrs` clean.
 - Code-size impact: a few bytes per affected CRC-style loop (the preserved copy).
+- Four SNES demos exercising CRC/LFSR rotate-under-pressure loops are **playable in-browser**
+  (bsnes-jg WASM; each page's "Verify fidelity" button re-runs the WRAM self-check live, comparing
+  the on-console result against the host-computed reference):
+  [crcwall](https://biohack.net/snes/crcwall/) ·
+  [lfsr2](https://biohack.net/snes/lfsr2/) ·
+  [bitweave](https://biohack.net/snes/bitweave/) ·
+  [uarteye](https://biohack.net/snes/uarteye/)
 
 ## The patch
 

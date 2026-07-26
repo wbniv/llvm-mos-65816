@@ -172,3 +172,16 @@ Optional fork hygiene at the same time (user-triggered): fast-forward `wbniv/llv
       [#577](https://github.com/llvm-mos/llvm-mos/pull/577) (`Fixes #576` appended, demo links
       re-verified 200 same-day). Next: Wave 1 item 2 (`0010`, branch to mint) / item 3 (DWARF,
       postable as-is) — user-triggered.
+- [x] **`0010` staged (2026-07-26, post-#577):** red/green proven on the same pristine build —
+      RED = the new `coalesce-rotate-ac.mir` FAILS on unfixed `llc` (COPY coalesced away); GREEN =
+      official `llvm-lit` **`Passed: 1 (100.00%)`** after applying `0010` + incremental `llc`
+      rebuild. Branch **`mos-coalesce-rotate-ac` minted locally** in `vendor/llvm-mos` @
+      `18244924b3d3` (cut from `8be054612`, the same base as `0016`; upstream-src worktree restored
+      clean to `e54ef471`). The push was blocked by the permission layer — correctly, per the
+      no-outward-actions guardrail — so it rides the user trigger. Demo links (crcwall/lfsr2/
+      bitweave/uarteye) added to the PR body doc + verified 200. Post commands atop
+      [`docs/upstream-coalesce-rotate-ac-pr.md`](../upstream-coalesce-rotate-ac-pr.md).
+- [ ] **USER: post Wave 1 item 2** — push the minted branch, then `gh pr create` (commands atop the
+      body doc).
+- [ ] **USER: post Wave 1 item 3** — DWARF PR, postable as-is (command in status doc §5; cherry-pick
+      re-verified clean onto `8b616af94`).
