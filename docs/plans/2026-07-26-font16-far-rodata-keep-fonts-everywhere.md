@@ -94,3 +94,20 @@ rather than argued from the code.
 
 - Moving other demos to far ROM. Only `mandel-double` needs it; the rest fit comfortably — and must not
   grow (see above).
+
+## COMPLETED (2026-07-26, second pass — after the codegen fix)
+
+The first pass landed the infrastructure but hit the `[dp]` read-garbage bug and reverted the demo flip.
+With the root cause fixed ([zp-alloc Imag32 CSR-rename plan](2026-07-26-zp-alloc-imag32-csr-rename-fix.md),
+commit `2bfe4f3`), the plan completed end-to-end (`db6660a`):
+
+1. Spike far-table read — **PASS** (`0xACDB`, first pass).
+2. `dev/run.sh mandel-double` with the real font — **PASS**, `0x0EDF`, disasm shape unchanged.
+3. Title capture — **PASS**: "MANDELBROT" in true shadowed 16×16 Waldo (`build/md-title-fixed.png`).
+4. `dev/run.sh build` — **232 programs**, no link errors.
+5. No-growth proof — **PASS**: pre/post hash diff shows exactly one demo ROM changed (`mandel-oop`,
+   from the compiler fix itself — its gate green `0x204F`); every other demo ROM byte-identical and
+   32768 B; `mandel-double` is the sole 64 KB ROM.
+6. Republished — biohack.net `v1.0.255` (ROM `aae8b971…`, 65536 B; manifest selfcheck unchanged).
+
+`TITLE_FONT16_OFF` deleted outright per the user's direction — there is no font-less path left.
