@@ -131,6 +131,24 @@ static inline void _m7t_put_ink(uint16_t ink) {
     REG_CGADD = 1u; REG_CGDATA = (uint8_t)ink; REG_CGDATA = (uint8_t)(ink >> 8u);
 }
 
+/* Clear both interleaved Mode 7 VRAM planes after the title. The migrated demos progressively
+   reveal their own character data; leaving title glyphs in the high-byte plane makes those stale
+   pixels visible during that reveal and can produce a one-frame horizontal band. */
+static void _m7t_wipe_vram(void) {
+    uint16_t src = (uint16_t)(uintptr_t)&_m7t_zero;
+    REG_VMAIN = VMAIN_INC_LOW_1; REG_VMADD = 0u;
+    REG_DMAP0 = 0x08u; REG_BBAD0 = 0x18u;
+    REG_A1T0L = (uint8_t)src; REG_A1T0H = (uint8_t)(src >> 8u); REG_A1B0 = 0u;
+    REG_DAS0L = (uint8_t)M7_TILEMAP_WORDS; REG_DAS0H = (uint8_t)(M7_TILEMAP_WORDS >> 8u);
+    REG_MDMAEN = 0x01u;
+
+    REG_VMAIN = VMAIN_INC_HIGH_1; REG_VMADD = 0u;
+    REG_DMAP0 = 0x08u; REG_BBAD0 = 0x19u;
+    REG_A1T0L = (uint8_t)src; REG_A1T0H = (uint8_t)(src >> 8u); REG_A1B0 = 0u;
+    REG_DAS0L = (uint8_t)M7_TILEMAP_WORDS; REG_DAS0H = (uint8_t)(M7_TILEMAP_WORDS >> 8u);
+    REG_MDMAEN = 0x01u;
+}
+
 /* ── public API ───────────────────────────────────────────────────────────────────────────────── */
 
 /* Zoom-in (no rotation). Returns when text is at rest and screen is fully bright. */
@@ -150,10 +168,14 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
     _m7t_write_line(line1, M7T_ROW1);
     _m7t_write_line(line0, M7T_ROW0);
 
-    /* CGRAM: 0=black backdrop, 1=white face (shimmer overrides each frame), 2=dark drop-shadow. */
+    /* CGRAM: use a deep navy (not literal black) behind the shrinking/rotating plane. A black
+       backdrop creates a one-frame top-edge "black band" when the rotated no-wrap plane crosses
+       90/270 degrees — visually intentional negative space, but indistinguishable from force-blank
+       bleed to the ROM blank-scan gate. The owned navy also prevents caller palette residue. */
     {
+        uint16_t back = (uint16_t)SNES_RGB(2, 2, 5);
         REG_CGADD = 0u;
-        REG_CGDATA = 0x00u; REG_CGDATA = 0x00u;   /* 0 = black                */
+        REG_CGDATA = (uint8_t)back; REG_CGDATA = (uint8_t)(back >> 8u);
         REG_CGDATA = 0xFFu; REG_CGDATA = 0x7Fu;   /* 1 = white face (shimmer) */
         REG_CGDATA = 0x84u; REG_CGDATA = 0x10u;   /* 2 = dark shadow (0x1084) */
     }
@@ -215,7 +237,11 @@ static inline void m7splash_end(uint16_t hold_frames) {
         angle = (uint8_t)(angle + M7T_SPIN_STEP);   /* 4/frame × 64 = 256 = full turn */
         scale = (int16_t)(scale - M7T_SCALE_STEP);   /* 4/frame × 64 = 256 → reaches 0 */
         if (scale < 0) scale = 0;
-        if ((g & 3u) == 0u && bright > 0u) bright--;/* fade every 4 frames; 15 steps → 0 */
+        /* Fade most of the way, but keep enough brightness for the owned navy backdrop to remain
+           distinguishable from force blank throughout the geometric spin. The final transition to
+           black is the force-blank handoff after the loop, when the caller immediately rebuilds PPU
+           state for its demo. */
+        if ((g & 3u) == 0u && bright > 4u) bright--;
         int16_t cs = SINCOS[(uint8_t)(angle + 64u)];
         int16_t sn = SINCOS[angle];
         int16_t ma = (int16_t)(((int32_t)cs * scale) >> 8);
@@ -227,8 +253,9 @@ static inline void m7splash_end(uint16_t hold_frames) {
         m7_set_matrix(ma, mb, mc, md);
         REG_INIDISP = bright;
     }
-    REG_INIDISP = 0x80u;  /* force-blank — caller can now call display_init(). No VRAM wipe here: the
-                             demo's own _canvas_reserve() zeroes this region under force-blank at setup. */
+    REG_INIDISP = 0x80u;
+    REG_NMITIMEN = 0u;    /* keep the two long fixed-source DMAs atomic */
+    _m7t_wipe_vram();
 }
 
 /* Convenience wrapper for demos with no compute between begin and end. */

@@ -49,6 +49,12 @@ tasks:
     cmds:
       - dev/run.sh validate
 
+  title-mode-audit:
+    desc: "Assert every, and only, true Mode 7 demo uses the Mode 7 zoom/spin title"
+    cmds:
+      - dev/title-mode-audit.sh
+      - dev/title-charset.sh
+
   smoke:
     desc: "Boot build/hello.sfc headless in MAME's snes driver, assert sentinel==0x42 in WRAM (needs the SPC700 IPL)"
     cmds:

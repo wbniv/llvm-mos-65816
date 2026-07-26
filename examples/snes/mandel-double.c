@@ -41,7 +41,7 @@
 
 #include <snes.h>
 #include "mode7.h"
-#include "snesgfx/title_layer.h"
+#include "snesgfx/m7title.h"
 #include "../65816/mandel-double.h"
 #include "sincos.h"
 
@@ -68,9 +68,11 @@ static const uint8_t m7_zero = 0;       // fixed-source byte for the tilemap-cle
 static uint16_t pal[DN + 1];           // base BGR555 palette, cached for the colour cycle
 static uint8_t pshift = 0, pcount = 0;  // colour-cycle state
 
+#define MD_MINSIZE __attribute__((minsize))
+
 // DN+1 CGRAM entries (escape 0..DN) = the Mandelbrot palette. 8bpp direct index: the Mode 7 pixel value
 // == escape count == the palette index. Also cached in pal[] for cycling.
-static void load_palette(void) {
+MD_MINSIZE static void load_palette(void) {
   REG_CGADD = 0;
   for (uint8_t n = 0; n <= DN; n++) {
     uint8_t r, g, b;
@@ -83,7 +85,7 @@ static void load_palette(void) {
 }
 
 // Steady colour cycle: rotate the escape colours (indices 0..DN-1), interior (index DN) stays black.
-static void cycle_palette(uint8_t shift) {
+MD_MINSIZE static void cycle_palette(uint8_t shift) {
   REG_CGADD = 0;
   for (uint8_t n = 0; n < DN; n++) {
     uint8_t j = (uint8_t)(n + shift);
@@ -97,12 +99,12 @@ static void cycle_palette(uint8_t shift) {
 
 // Block until the NEXT true vblank, clearing the stale RDNMI flag first (reveal points follow long
 // computes, many vblanks elapse unread).
-static void wait_vblank_fresh(void) {
+MD_MINSIZE static void wait_vblank_fresh(void) {
   (void)REG_RDNMI;
   snes_wait_vblank();
 }
 
-static void tick_cycle(uint8_t every) {
+MD_MINSIZE static void tick_cycle(uint8_t every) {
   if (++pcount >= every) { pcount = 0; if (++pshift >= DN) pshift = 0; cycle_palette(pshift); }
 }
 
@@ -113,7 +115,7 @@ static void tick_cycle(uint8_t every) {
 // __divdf3/__divsf3 — keeping the ROM inside one 32 KiB LoROM bank; the float-divide corner is already
 // #21's, and #33's stress is the double mul/add/sub/cmp + conversions, all preserved). The noinline cells
 // keep the per-pixel escape math as REAL runtime soft-float libcalls. Called ONE ROW PER SPIN FRAME.
-static void compute_coarse_row(uint8_t j) {
+MD_MINSIZE static void compute_coarse_row(uint8_t j) {
   uint8_t *row = &coarse[(uint16_t)j * CW];
   if (j < CH_HALF) {
     double re0 = MD_WIN[0][0], im0 = MD_WIN[0][1];
@@ -146,7 +148,7 @@ static void compute_coarse_row(uint8_t j) {
 
 // Reveal the freshly-computed coarse grid: UPSCALE 4x into fb (FAR STORES) and FAR-LOAD each image line
 // into Mode 7 character VRAM in vblank. The new image sweeps in top-to-bottom.
-static void wipe_in(void) {
+MD_MINSIZE static void wipe_in(void) {
   m7_set_matrix(0x0040, 0x0000, 0x0000, 0x0040);
   for (uint8_t j = 0; j < DH; j++) {
     uint8_t trow = (uint8_t)(j >> 3), r = (uint8_t)(j & 7);
@@ -168,7 +170,7 @@ static void wipe_in(void) {
 // rows, so the very first image grinds in top-to-bottom AS it is computed — there is never a long blank
 // screen, and the visible crawl IS the proof that each fat pixel costs dozens of soft-float libcalls (the
 // top half noticeably slower: those are 64-bit __muldf3, the bottom 32-bit __mulsf3).
-static void boot_paint(void) {
+MD_MINSIZE static void boot_paint(void) {
   m7_set_matrix(0x0040, 0x0000, 0x0000, 0x0040);
   for (uint8_t jc = 0; jc < CH; jc++) {
     compute_coarse_row(jc);                                       // slow soft-float grind, one row
@@ -191,7 +193,7 @@ static void boot_paint(void) {
 }
 
 // One smooth Mode 7 frame: rotate + zoom-breathe about the image centre, colour-cycle.
-static void spin_frame(uint8_t k) {
+MD_MINSIZE static void spin_frame(uint8_t k) {
   wait_vblank_fresh();
   int16_t zoom = (int16_t)(0x0030 + (((int32_t)SINCOS[(uint8_t)(k >> 1)] * 0x0010) >> 8));
   int16_t cs = SINCOS[(uint8_t)(k + 64)];
@@ -203,13 +205,17 @@ static void spin_frame(uint8_t k) {
   tick_cycle(6);
 }
 
+// This is the one web demo whose double-precision compiler-rt payload nearly fills bank $00.
+// Keep main size-optimised so shared presentation code (notably TitleLayer) can evolve without
+// pushing the fixed near-code window into the cartridge header.
+__attribute__((minsize))
 int main(void) {
   snes_ppu_reset_blank();
 
   // Brand FIRST so the boot isn't a blank screen: the soft-float gate below grinds for several seconds
   // (every op a 64-bit libcall), so show "DOUBLE-PRECISION MANDELBROT" up front — the ensuing compute
   // reads as "working", not "broken".
-  splash16("DOUBLE-FLOAT", "MANDELBROT", 150);
+  m7splash("DOUBLE-FLOAT", "MANDELBROT", 150);
 
   // Differential proof: fold the double + float escape buffers + bit-exact double orbit witness + the
   // conversion witness (all low WRAM, far-pointer-free) into corpus_result.

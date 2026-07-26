@@ -11,6 +11,7 @@
 // See docs/plans/2026-06-30-snesgfx-mandel-oop-verification.md.
 #include <snes.h>
 #include "snesgfx/display.h"
+#include "snesgfx/m7title.h"
 #include "snesgfx/drawable.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/vram.h"
@@ -191,6 +192,7 @@ int main(void) {
   static Display    screen;
   static MandelLayer layer;
 
+  m7splash("OOP DRAWABLE", "MANDELBROT", 90);
   display_init(&screen);         // boot bracket: snes_ppu_reset_blank() + NMI + BGMODE_1
   mandel_layer_init(&layer);
   display_add(&screen, (Drawable *)&layer);

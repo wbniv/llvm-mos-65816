@@ -18,7 +18,7 @@
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"
 #include "snesgfx/text_layer.h"
-#include "snesgfx/m7title.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/drawable.h"
 #include "snesgfx/vram.h"
@@ -113,12 +113,13 @@ static void app_init(App *a) {
 }
 
 int main(void) {
-    m7splash_begin("SPACE-FILLING", "HILBERT CURVE");
-    corpus_result = hilbert_gate_crc();   /* runs during hold; screen shows last frame */
-    m7splash_end(90);
-
     static App a;
-    app_init(&a);   /* display_init wipes Mode 7 state; re-uploads BGMODE_1 content */
+    static TitleLayer title;
+    app_init(&a);
+
+    title_begin16(&a.screen, &title, "SPACE-FILLING", "HILBERT CURVE");
+    corpus_result = hilbert_gate_crc();
+    title_end(&a.screen, &title, 90);
 
     text_clear_bar(&a.text, 1);
     text_puts(&a.text, 1, 0, "ORDER:4  256 PTS  ASHLSI3");

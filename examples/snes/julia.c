@@ -20,7 +20,7 @@
 // host oracle tools/julia-sim == 0x3490.
 #include <snes.h>
 #include "mode7.h"
-#include "snesgfx/title_layer.h"
+#include "snesgfx/m7title.h"
 #include "../65816/julia.h"
 #include "sincos.h"
 
@@ -146,7 +146,7 @@ int main(void) {
 
   // Title splash (Mode 7 has no spare BG): ~1.5 s, then it restores force-blank and self-clears its
   // VRAM so the Mode 7 setup below starts clean.
-  splash16("JULIA SET", "Z^2 + C", 90);
+  m7splash("Z^2 + C", "JULIA SET", 90);
 
   // One-time Mode 7 setup (force-blanked): enter Mode 7, clear the 128x128 tilemap, lay the 8x7
   // identity, load the palette, frame the 64x56 image at 4x (a=d=0x0040 -> fills 256x224).

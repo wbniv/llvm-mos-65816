@@ -21,7 +21,7 @@
 // 0x4169.
 #include <snes.h>
 #include "mode7.h"
-#include "snesgfx/title_layer.h"
+#include "snesgfx/m7title.h"
 #include "../65816/mandel-float.h"
 #include "sincos.h"
 
@@ -177,7 +177,7 @@ int main(void) {
   // Brand FIRST so the boot isn't a blank screen: the soft-float gate below grinds ~9 s (every op a
   // libcall), so show "SOFT-FLOAT MANDELBROT" up front — the ensuing compute reads as "working", not
   // "broken".
-  splash16("SOFT-FLOAT", "MANDELBROT", 150);
+  m7splash("SOFT-FLOAT", "MANDELBROT", 150);
 
   // Differential proof: fold the 2-window 6x6 gate + bit-exact orbit witness (low WRAM, far-pointer-
   // free) into corpus_result. Slow (soft-float) but stable well before any snapshot deadline.

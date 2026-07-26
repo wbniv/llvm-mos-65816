@@ -44,7 +44,7 @@ declare -A SRCMAP=( [3d-wireframe]=wireframe [buddhabrot]=buddha [space-invaders
 # -DTITLE_FONT16_OFF (the 4 KB font16 table does not fit alongside its double soft-float library) and
 # that flag existed ONLY in this table. It is now self-declared in examples/snes/mandel-double.c, so
 # every path picks it up. Add an entry here only for something genuinely build-path-specific.
-declare -A EXTRA_CFLAGS=()
+declare -A EXTRA_CFLAGS=( [mandel-double]="-Oz" )
 # slug -> binary asset extensions (in examples/snes/) objcopy'd to .o and linked (e.g. gfx/palette blobs).
 declare -A ASSET_EXTS=( [space-invaders]="pic pal" )
 OBJCOPY="${MOS_TOOLCHAIN:-$BUILD/llvm-mos-install}/bin/llvm-objcopy"

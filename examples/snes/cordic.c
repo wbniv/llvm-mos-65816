@@ -21,6 +21,7 @@
 #include "snesgfx/drawable.h"
 #include "snesgfx/vram.h"
 #include "snesgfx/text_layer.h"
+#include "snesgfx/title_layer.h"
 #include "font8.h"
 #include "../65816/cordic.h"
 
@@ -270,8 +271,12 @@ int main(void) {
   static App a;
   app_init(&a);
 
-  // Self-verify: the on-console CRC the gate reads back from WRAM (independent of the display rotor).
+  static TitleLayer title;
+  title_begin16(&a.screen, &title, "SHIFT + ADD", "CORDIC ROTATOR");
+  // Self-verify while the title is visible: the on-console CRC the gate reads back from WRAM
+  // (independent of the display rotor).
   corpus_result = cordic_gate_crc();
+  title_end(&a.screen, &title, 90);
 
   for (;;) {
     rotor cur = a.hand;                              // snapshot angle for the hand + HUD

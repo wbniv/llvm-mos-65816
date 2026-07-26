@@ -1545,4 +1545,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      action is individually user-triggered. The checklist (draft 0016 bodies, re-verify the DWARF
      branch) becomes work only after that review. Covered by the curated campaign item.
      fp:12194fba501ac4d3 -->
+- [verify] **2026-07-26-mode7-title-screen-sweep** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-mode7-title-screen-sweep.md](docs/plans/2026-07-26-mode7-title-screen-sweep.md)_  <!-- fp:a9d784778faac766 -->
 <!-- END auto-captured-deferrals -->

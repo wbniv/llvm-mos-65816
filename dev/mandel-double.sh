@@ -38,7 +38,7 @@ echo "==> host oracle: soft-float Mandelbrot gate hash = $EXPECT"
 
 # 2. Build the on-console demo ROM (+mos-a16) and find corpus_result's WRAM address.
 "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os \
-  -Wl,-Map="$BUILD/mandel-double.map" -o "$BUILD/mandel-double.sfc" "$SRC"
+  -Oz -Wl,-Map="$BUILD/mandel-double.map" -o "$BUILD/mandel-double.sfc" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$BUILD/mandel-double.sfc" >/dev/null
 VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$BUILD/mandel-double.map")
 OFF="0x$VMA"
