@@ -141,6 +141,38 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
   ~1h46m; cached thereafter); `torture`/`fuzz-csmith` are locally green (sampled 4-way), on-runner dispatch
   pending.
 
+### Never force-blank outside boot — and the v-blank budget
+
+**Standing rule for every SNES program here: do not blank. Clear the screen instead, and transfer to
+VRAM/CGRAM/OAM only during h-blank and v-blank.** The one permitted force-blank is the boot window —
+the console powers on blanked (`INIDISP = $8F`), drawables do their bulk `REG_VMDATA` setup inside it,
+and the first `display_frame()` releases it. It is never re-asserted.
+
+Why it matters concretely: `display_frame` used to bracket the DMA in force-blank so an over-long
+transfer "succeeds at any vcounter". A flush that outran the remaining v-blank then left force-blank
+asserted into active display, **blanking the top scanlines** — a visible flicker. That was a real
+shipped bug (`1dd9317`).
+
+With force-blank gone, staying inside the window is the queue's job:
+
+- **`UPQ_VBLANK_BUDGET` = 5100 B** — 38 v-blank lines × 1364 master cycles = 51,832, at 8 master
+  cycles/byte = 6,479 B, less ~20% for per-job setup. `upq_flush` spends at most this much and leaves
+  the rest queued; a job bigger than the budget splits and resumes via `UpqJob.sent`.
+- The `RDNMI` clear sits **after** `scene_emit`: emit can span a v-blank, and consuming that stale
+  flag would start the flush in active display.
+- **`display_add` must precede the first `display_frame`** (`reserve()` bulk-writes VRAM). `Display.late_add`
+  records a violation.
+
+**Gate: `JGX_BLANKSCAN=1 build/jgxcheck <rom> <db> <off> <len> <want> <frames>`** — scans every frame
+for leading all-black rows of the active picture and fails (exit 3) on a one-frame spike above *both*
+neighbours (`JGX_BLANKSCAN_ROWS`, default 4). One emulator run covers all frames. Comparing against
+the *higher* neighbour is deliberate: the title's gravity exit ramps the black band 0→224 over ~40
+frames, and every frame of that ramp beats its predecessor without being a local maximum. Run it on
+any demo whose upload volume or frame pacing changes.
+
+Still to convert (they re-open the window): `snesgfx/m7title.h`, `snesgfx/splash.h`, `splash16` in
+`title_layer.h`, and the seven Mode-7 demo `main()`s.
+
 ### Title-card tooling (host-side, not `dev/run.sh` targets)
 
 The demo title card (`examples/snes/snesgfx/title_layer.h`) has two failure modes no WRAM gate value
