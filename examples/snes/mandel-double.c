@@ -22,18 +22,21 @@
 // gate hash (md_gate_crc, a far-pointer-free fold of a double escape buffer + a float escape buffer + a
 // bit-exact double orbit witness + a double<->float conversion witness — so the corpus slice is a full
 // 5-way test) == the host oracle tools/mandel-double-sim == 0x0EDF.
+// snes-far-platform — build against platforms/snes-far (mos-snes-far.cfg), NOT plain snes. Grepped by
+// every build path (dev/build.sh, dev/rebuild-web-roms.sh, dev/mandel-double.sh) so the platform choice
+// cannot drift into one script the way -DTITLE_FONT16_OFF once did.
+//
 // ROM-SIZE CONSTRAINT — must precede the title_layer.h include. The double soft-float library alone is
-// ~20 KB of this 32 KB LoROM bank (__adddf3 6728 B + __muldf3 5431 B + the float twin's __addsf3 3179 B
-// + __mulsf3 2311 B + the float<->int/compare helpers), so there is no room for title_layer's 4 KB
-// FONT16 Waldo table. TITLE_FONT16_OFF selects the legacy title path, which pixel-doubles the 8x8 font8
-// into 16x16 glyphs instead — same title, ~4 KB cheaper, and it is what the shipped/published ROM has
-// always been built with. This lives HERE, not in a per-example flag table in one build script, so every
-// build path (dev/build.sh's example loop, dev/rebuild-web-roms.sh, dev/mandel-double.sh) gets it — the
-// flag previously existed ONLY in dev/rebuild-web-roms.sh's EXTRA_CFLAGS, so `dev/run.sh build` could
-// never link this demo. Guarded so an explicit -DTITLE_FONT16_OFF on the command line is not a
-// redefinition.
-#ifndef TITLE_FONT16_OFF
-#define TITLE_FONT16_OFF
+// ~20 KB of the 32 KB NEAR-code window $8000-$FFAF (__adddf3 6728 B + __muldf3 5431 B + the float twin's
+// __addsf3 3179 B + __mulsf3 2311 B + the float<->int/compare helpers), leaving no room there for
+// title_layer's 4 KB FONT16 Waldo table. That near window is fixed by the LoROM bank mapping — you don't
+// enlarge it, you go PAST it by banking. TITLE_FONT16_FAR parks the font table in bank $01 .far_rodata:
+// it is const, read exactly once at title upload, and the 24-bit loads cost nothing that matters. The
+// demo keeps the REAL Waldo font and the ROM becomes 64 KB — trivial for a cartridge. (Needs the
+// MOSZeroPageAlloc Imag32-CSR-rename fix, 2026-07-26 — without it the [dp] far read under -mlto-zp
+// renaming read garbage; see docs/plans/2026-07-26-zp-alloc-imag32-csr-rename-fix.md.)
+#ifndef TITLE_FONT16_FAR
+#define TITLE_FONT16_FAR
 #endif
 
 #include <snes.h>

@@ -53,9 +53,7 @@
 #include "display.h"
 #include "hdma_hscroll.h"
 #include "../font8.h"
-#ifndef TITLE_FONT16_OFF
-#include "../font16.h"   /* real 16×16 Waldo font (face + SE drop-shadow) for line1 */
-#endif
+#include "../font16.h"   /* real 16×16 Waldo font (face + SE drop-shadow) for line1 — ALWAYS */
 
 #ifndef TITLE_CHR_WORD
 #define TITLE_CHR_WORD  0x1000u   /* BG2 char base (4K-word granular → BG12NBA high nibble = 1) */
@@ -132,17 +130,6 @@ static inline int16_t _title_hofs(const char *s) {
 /* Triangle wave 0..127..0 — building block for the rainbow backdrop. */
 static inline uint8_t _title_tri(uint8_t x) { return (uint8_t)((x & 0x80u) ? (uint8_t)(255u - x) : x); }
 
-#ifdef TITLE_FONT16_OFF
-/* Legacy path (font16 disabled to save ~4 K ROM on size-tight demos, e.g. mandel-double): pixel-double
-   one 8-bit plane row to 16 bits — each source bit → 2 adjacent bits (MSB=left). */
-static inline uint16_t _title_expand_byte(uint8_t b) {
-  uint16_t r = 0;
-  for (uint8_t i = 0; i < 8u; i++)
-    if (b & (uint8_t)(0x80u >> i)) r |= (uint16_t)(0xC000u >> (uint8_t)(i << 1u));
-  return r;
-}
-#endif
-
 /* ── reserve ──────────────────────────────────────────────────────────────────────────────────── */
 
 static void _title_reserve(Drawable *d, VramAlloc *va) {
@@ -167,9 +154,10 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
 
   /* 16×16 line1 glyphs: tiles 64–319 (4 K words at TITLE_CHR_WORD + 0x0400). */
   snes_vram_addr((uint16_t)(TITLE_CHR_WORD + (uint16_t)(FONT8_N * 16u)));
-#ifndef TITLE_FONT16_OFF
   /* Real Waldo font: 4 tiles/glyph TL,TR,BL,BR (tilemap uses 4g+0..3). FONT16 word = face | shadow<<8
-     (planes 0/1); planes 2/3 = 0 → face = colour 1 (animated ink), shadow = colour 2 (fixed dark). */
+     (planes 0/1); planes 2/3 = 0 → face = colour 1 (animated ink), shadow = colour 2 (fixed dark).
+     There is no font-less fallback: every demo gets the real font. A demo too tight for the 4 KB table
+     in its near window parks it in far ROM (TITLE_FONT16_FAR, see font16.h) rather than dropping it. */
   for (uint16_t g = 0; g < FONT16_N; g++) {
     for (uint8_t tile = 0; tile < 4u; tile++) {
       for (uint8_t r = 0; r < 8u; r++)
@@ -177,24 +165,6 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
       for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
     }
   }
-#else
-  /* Legacy: pixel-double the 8×8 font8 into each glyph's 4 tiles (no 4 K font16 table — for ROM-size-
-     tight demos). Chunky 1-colour form; shadow colour 2 simply goes unused. */
-  for (uint16_t g = 0; g < FONT8_N; g++) {
-    for (uint8_t r = 0; r < 8u; r++)
-      REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u)]) >> 8);
-    for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)
-      REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u)]) & 0xFFu);
-    for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)
-      REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u) + 4u]) >> 8);
-    for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-    for (uint8_t r = 0; r < 8u; r++)
-      REG_VMDATA = (uint16_t)(_title_expand_byte((uint8_t)FONT8[g * 8u + (r >> 1u) + 4u]) & 0xFFu);
-    for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;
-  }
-#endif
 
   /* Clear tilemap to transparent. */
   snes_vram_addr(TITLE_MAP_WORD);
