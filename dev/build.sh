@@ -72,6 +72,7 @@ case "$a16probe" in
 esac
 OBJCOPY="$MOS_TOOLCHAIN/bin/llvm-objcopy"
 count=0
+failed=()
 for src in "$ROOT"/examples/snes/**/*.c; do
   name="$(basename "$src" .c)"
   rom="$BUILD/$name.sfc"
@@ -94,20 +95,40 @@ for src in "$ROOT"/examples/snes/**/*.c; do
   # Sidecar binary assets: objcopy committed examples/snes/<name>.{pic,pal,map,chr,bin} into
   # bank-$00 .rodata objects and link them (Option B — raw gfx4snes output, no compiled C arrays;
   # symbols _binary_<name>_<ext>_start/_end/_size). Run from the asset dir so symbol names are clean.
+  # Continue-on-error: one unbuildable demo must not abort the loop and silently skip
+  # every demo that sorts after it. Each stage is guarded; a failure records $name in
+  # $failed and moves on to the next demo instead of letting `set -e` kill the script.
+  ok=1
   assets=()
   for ext in pic pal map chr bin; do
     a="$ROOT/examples/snes/$name.$ext"
     [ -e "$a" ] || continue
     o="$BUILD/$name.$ext.o"
-    ( cd "$ROOT/examples/snes" && "$OBJCOPY" -I binary -O elf32-mos \
+    if ! ( cd "$ROOT/examples/snes" && "$OBJCOPY" -I binary -O elf32-mos \
         --rename-section ".data=.rodata.${name}_${ext},alloc,load,readonly,data,contents" \
-        "$name.$ext" "$o" )
+        "$name.$ext" "$o" ); then
+      ok=0
+      break
+    fi
     assets+=("$o")
   done
-  "$MOS_CLANG" --config "$cfg" "${a16[@]}" \
-    -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src" "${assets[@]}"
-  python3 "$ROOT/tools/snes-checksum.py" "$rom"
+  if [ "$ok" = 1 ] && ! "$MOS_CLANG" --config "$cfg" "${a16[@]}" \
+      -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src" "${assets[@]}"; then
+    ok=0
+  fi
+  if [ "$ok" = 1 ] && ! python3 "$ROOT/tools/snes-checksum.py" "$rom"; then
+    ok=0
+  fi
+  if [ "$ok" = 0 ]; then
+    printf '    %-14s BUILD FAILED\n' "$name"
+    failed+=("$name")
+    continue
+  fi
   printf '    %-14s %6s bytes\n' "$name" "$(stat -c%s "$rom")"
   count=$((count + 1))
 done
 echo "==> built $count program(s)"
+if [ "${#failed[@]}" -gt 0 ]; then
+  echo "==> FAILED (${#failed[@]}): ${failed[*]}"
+  exit 1
+fi
