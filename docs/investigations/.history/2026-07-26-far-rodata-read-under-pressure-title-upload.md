@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/6190ac1) | docs(investigation): disposition the stale Next-steps — 2 done, 1 superseded; lit-test residual flagged |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/2bfe4f3) | fix(zp-alloc): rename Imag32 far-pointer quads atomically — [dp] read-garbage fixed |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/fd79934) | snes: far-rodata FONT16 attempt — codegen bug found, infra landed, demo unchanged |
 
 <!--history-meta v1
+6190ac1	author	Will Norris
+6190ac1	added	13
+6190ac1	deleted	8
+6190ac1	files	1
+6190ac1	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2bfe4f3	author	Will Norris
 2bfe4f3	added	25
 2bfe4f3	deleted	1

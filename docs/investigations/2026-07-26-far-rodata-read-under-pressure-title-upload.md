@@ -90,12 +90,12 @@ Requires `TITLE_FONT16_FAR` support in `examples/snes/font16.h` (the `FONT16_STO
 3. ~~Check `-verify-machineinstrs` on the failing build~~ — **DONE**: clean on the failing build
    (the bug is post-verifier, in the MC-lowering rename map) and clean ×2 on the fixed builds.
 
-## Practical consequence
+## Practical consequence (updated — root-caused and FIXED, see §RESOLUTION)
 
-Do **not** rely on far rodata for data read by a CPU loop inside a large function until this is
-root-caused. For bulk VRAM data specifically there is a better route regardless: **DMA straight from the
-far bank** (`REG_A1B0` takes a source bank, as `mode7.h` already does), which avoids CPU far loads
-entirely and is much faster than a per-word loop.
+Far rodata CPU reads are safe again as of the `MOSZeroPageAlloc` Imag32 fix (`2bfe4f3`); the earlier
+warning here no longer applies. Still true on its own merits: for bulk VRAM data, **DMA straight from
+the far bank** (`REG_A1B0` takes a source bank, as `mode7.h` already does) beats a per-word CPU loop —
+an optimization option, no longer a workaround.
 
 ## RESOLUTION (2026-07-26) — fixed; the hypothesis was wrong in an instructive way
 
