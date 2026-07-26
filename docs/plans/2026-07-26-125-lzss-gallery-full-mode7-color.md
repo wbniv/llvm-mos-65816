@@ -1,6 +1,6 @@
 # #125 — LZSS Gallery: Full Mode 7 Color
 
-**Status:** IMPLEMENTED AND VERIFIED (2026-07-26); publication in progress. Corrective follow-up to
+**Status:** IMPLEMENTED, VERIFIED, AND PUBLISHED (2026-07-26). Corrective follow-up to
 [#122](2026-07-26-122-lzss-gallery-maximum-mode7-resolution.md) and
 [#124](2026-07-26-124-lzss-gallery-priority-navigation.md).
 
@@ -218,6 +218,15 @@ Total measured codec/check work is 68,889 frames. The final cartridge remains 51
 
 Final local ROM header checksum is `0xE19A`; SHA-256 is
 `340e48d1f3c62c0dc8288c6c613530044dda644b4a2b12473257436264e2ac74`.
+
+Publication evidence:
+
+- implementation commit: `0c1572d`;
+- biohack.net commit/tag: `7c0be64` / `v1.0.270`, deployment workflow `30226205262` passed;
+- indri.studio commit/tag: `372c706` / `v0.1.96`, deployment workflow `30226209275` passed;
+- both live manifests use WRAM offset `0x21`, oracle `0xBFAB`, and 75,000 frames; and
+- both live ROM downloads have SHA-256
+  `340e48d1f3c62c0dc8288c6c613530044dda644b4a2b12473257436264e2ac74`.
 
 ## Definition of done
 
