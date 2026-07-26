@@ -1132,14 +1132,18 @@ exhaustive accounting — every PR/issue/design-note, the exact `gh` post comman
 the single source of truth in [`upstream-contribution-status.md`](upstream-contribution-status.md); this is
 the reviewer's slice of it.
 
-**Last verified: 2026-06-26** (#561/#562/#563 all still open, none merged; `0010`/`0011`/`0012` drafted, not
-posted). Refresh: [`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
+**Last verified: 2026-07-26** — **#562 and #563 are MERGED** (upstream commits `9142aebae` / `8be054612`;
+#561 auto-closed), so `0003`/`0008` are **dropped from the fork stack** — the "on merge" column below has
+been executed for both. `0010`/`0011`/`0012` (and `0015`/`0016`, added since) remain drafted, not posted;
+all verified `git apply --check`-clean against the current tip `8be054612`. The posting sequence is now
+planned: [submission campaign](plans/2026-07-26-upstream-submission-campaign.md). Refresh:
+[`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
 (or `gh pr list --repo llvm-mos/llvm-mos --author wbniv --state all`).
 
 | Patch | Upstream defect | Repro on stock? | Upstream | Status | On merge | Test |
 |-------|-----------------|-----------------|----------|--------|----------|------|
-| `0003` | `mos-late-opt` reuses a dead `LDImm` as `TXY`/`TYX` without clearing the dead flag → verifier reject (`Using an undefined physical register`) | yes (`mosw65816`) | [PR&nbsp;#562](https://github.com/llvm-mos/llvm-mos/pull/562) | **POSTED · open** | drop `0003` + bump vendor pin | `late-opt-65816.mir` |
-| `0008` | the calling convention gives an 8-bit `addrspace(1)` direct-page pointer **argument** a 16-bit register → illegal size-mismatched `COPY` | yes (plain `mos6502`) | [#561](https://github.com/llvm-mos/llvm-mos/issues/561) → [PR&nbsp;#563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`) | **POSTED · open** | drop `0008` + bump vendor pin | `dp-pointer-arg.ll` |
+| `0003` | `mos-late-opt` reuses a dead `LDImm` as `TXY`/`TYX` without clearing the dead flag → verifier reject (`Using an undefined physical register`) | yes (`mosw65816`) | [PR&nbsp;#562](https://github.com/llvm-mos/llvm-mos/pull/562) | **MERGED** (`9142aebae`) | ✅ done — `0003` dropped 2026-07-25 | `late-opt-65816.mir` |
+| `0008` | the calling convention gives an 8-bit `addrspace(1)` direct-page pointer **argument** a 16-bit register → illegal size-mismatched `COPY` | yes (plain `mos6502`) | [#561](https://github.com/llvm-mos/llvm-mos/issues/561) → [PR&nbsp;#563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`) | **MERGED** (`8be054612`, #561 auto-closed) | ✅ done — `0008` dropped 2026-07-25 | `dp-pointer-arg.ll` |
 | `0010` | the register coalescer merges two rotate-referenced values into the A-only `Ac` class → strands a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (silent miscompile; both `-verify-machineinstrs`/`-verify-coalescing` clean) | yes (default-8bit `mosw65816`; standalone `llc`) | [PR draft](upstream-coalesce-rotate-ac-pr.md) (`wbniv:mos-coalesce-rotate-ac` to mint) | **DRAFTED · not posted** | drop `0010` + bump vendor pin | `coalesce-rotate-ac.mir` |
 | `0011` | `saveScavengerRegister` assumed N/Z dead + a live `$p` only balanced-saveable, but `+mos-a16` keeps a compare/ALU flag live across a frame-vreg spill in an unbalanced range → illegal `$p is not a GPR` + undefined-`$p` `PH $p` | yes (assert exposed by `+mos-a16`) | [PR draft](upstream-scavenger-live-p-pr.md) (`wbniv:mos-scavenger-live-p-save` to mint) | **DRAFTED · not posted** | drop `0011` + bump vendor pin | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
 | `0012` | `MOSMCInstLower` lowered `LDCImm` only for `0`/`-1`; a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG) | yes (`+mos-a16` 16-bit subtract; asserts build) | [PR draft](upstream-ldcimm-set-lowering-pr.md) (`wbniv:mos-ldcimm-set-lowering` to mint) | **DRAFTED · not posted** | drop `0012` + bump vendor pin | `a16scavnz` / a16 sub |

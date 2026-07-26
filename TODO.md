@@ -644,6 +644,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
 — keep it in sync (drafted → ready-to-post → posted) with the items in this section._
 
+- [ ] **Upstream submission campaign — post the queue, wave by wave (AWAITING USER REVIEW of the plan
+  before anything is posted).** Momentum: **2 PRs already merged** (#562, #563 — our first two, landed
+  essentially as submitted). Wave-ordered sequencing + per-item mechanics in
+  [docs/plans/2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md):
+  **Wave 1** standalone PRs (`0016` G_SCMP/G_UCMP — best next post, body still to draft; `0010`
+  coalesce-rotate-Ac — body drafted; DWARF step-6 — branch pushed, re-verify at tip), **Wave 2** issues
+  (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0012`/`0015` — user
+  judgment: post with honest framing vs hold for #321), **Wave 4** design notes (#320 ABI → far-CC →
+  frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
+  Verified 2026-07-26: upstream tip `8be054612` == our base; `0010/0011/0012/0015/0016` all
+  `apply --check` clean against it. **Every outward action (branch push, PR, issue) is individually
+  user-triggered.**
 - [ ] **Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR).** Build ON @Phillip-May's
   stalled-but-working SDK scaffolding, don't replace it: reuse his `snesxc` register lib + multi-bank
   linker (with credit); contribute on top our native-mode crt0 (unlocks 16-bit codegen) + the
@@ -1503,4 +1515,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      and verifies it empirically rather than assuming. Only mandel-double would ever opt in, and it
      currently does NOT (the far-font path is blocked on the codegen bug below). Nothing open.
      fp:e5c3e9ac6e56c865 -->
+- [verify] **2026-07-26-upstream-submission-campaign** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md)_  <!-- fp:12194fba501ac4d3 -->
 <!-- END auto-captured-deferrals -->

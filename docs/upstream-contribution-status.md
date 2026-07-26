@@ -1,6 +1,17 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-07-26 (**standalone patch files `0004`–`0017` are now FROZEN posting artifacts.**
+**Last updated:** 2026-07-26 #2 (**SUBMISSION CAMPAIGN PLANNED — see
+[`docs/plans/2026-07-26-upstream-submission-campaign.md`](plans/2026-07-26-upstream-submission-campaign.md)**,
+the wave-ordered posting sequence with per-item mechanics; posting stays user-triggered and NOTHING is
+posted yet. Live state re-verified via `git ls-remote` (gh unauthenticated): `llvm-mos/main` tip is
+**still `8be054612`** — identical to our rebase base, so the whole stack is verified against the
+*current* tip; the two merged-PR fork branches (`mos-late-opt-txy-dead-flag`, `mos-dp-arg-cc`) are
+deleted post-merge (normal cleanup — the retain-until-merged condition was satisfied), leaving `main`
+(stale `c798c3141`) + `mos-dwarf-65816-test-docs` (`0ae9415`). **Per-artifact `git apply --check`
+against pristine `8be054612`:** `0010`/`0011`/`0012`/`0015`/`0016` ALL apply clean — the stale-base
+concern from earlier today is moot for every Wave-1/Wave-3 artifact; only `0017` needs the fork's
+`0002` context (rides with #321, as recorded).) Previously 2026-07-26
+(**standalone patch files `0004`–`0017` are now FROZEN posting artifacts.**
 The `dev/regen-patch.sh` run for the zp-alloc Imag32 fix folded the MOS-dir-only `0016`/`0017` into the
 comprehensive `0002` (build stack now `0001 → 0002 → 0006`-generic-hunks; see the
 [rebase plan §Update 2026-07-26](plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md)). The
@@ -121,10 +132,13 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 
 ## TL;DR
 
-- **Ready to post now: 4 issues + 3 design notes** — the F4 PR and the DP-arg issue/PR are no longer in
-  this bucket — both **MERGED** (see below). Strictly *PRs* ready-to-post now, that's **zero** open (the
-  DWARF step-6 test+docs is drafted but not yet pushed as its own PR). The 4th issue (#9) is the
-  **llvm-mos-sdk** `longjmp`/`setjmp.S` 65816 bug found 2026-06-30 (a different repo).
+- **Ready to post (campaign Wave 1): 3 PRs** — `0016` G_SCMP/G_UCMP (body still to draft; the best
+  next post — stock-llvm-mos crash, one-line fix), `0010` coalesce-rotate-Ac (body drafted), DWARF
+  step-6 (branch pushed `0ae9415`, re-verify at `8be054612`). **Wave 2: 3 issues** (+ the llvm-mos-sdk
+  `setjmp.S` bug, a different repo). **Wave 3 (user judgment): 3 more PRs** — `0011`/`0012`/`0015`,
+  latent stock bugs currently reachable only via the fork's a16/xy16; all apply clean to tip.
+  **Wave 4: 3 design notes** → unblock the Wave-5 #320/#321 series. Full sequencing + per-item
+  mechanics: [campaign plan](plans/2026-07-26-upstream-submission-campaign.md).
 - **Open on GitHub right now: 0** — **all three of our first contributions merged/closed**:
   [PR #562](https://github.com/llvm-mos/llvm-mos/pull/562) (F4 — TYX/TXY dead-flag fix) merged as commit
   `9142aebae`; [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563) (the fix for #561) merged as
@@ -134,11 +148,12 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
   #563 opened 2026-06-23.
 - **Future / blocked (not yet draftable): 2** — the #320 five-address-space PR (ABI-blessing-gated) and the
   llvm-mos-sdk#415 engagement (someone else's existing PR).
-- **Hygiene: 0 leftover fork branches** — `revert-540-…` (a stale revert of merged #540) was **deleted by
-  the user 2026-06-23** on explicit request (re-verified gone 2026-06-24); the 3 remaining (`mos-dp-arg-cc`,
-  `mos-late-opt-txy-dead-flag`, `mos-dwarf-65816-test-docs`) are **active** PR/queue branches. Standing
-  policy unchanged: keep fork branches until merged upstream; **do not auto-propose deletion** (delete only
-  on explicit request).
+- **Hygiene (re-verified 2026-07-26 via `ls-remote`):** the two merged-PR branches (`mos-dp-arg-cc`,
+  `mos-late-opt-txy-dead-flag`) are **deleted** post-merge — the retain-until-merged condition was
+  satisfied, so this is normal cleanup, not drift. Remaining: `main` (stale at `c798c3141`; optionally
+  fast-forward to `8be054612` at posting time so PR diffs render fresh — user-triggered) and the active
+  queue branch `mos-dwarf-65816-test-docs` (`0ae9415`). Standing policy unchanged: keep fork branches
+  until merged upstream; **do not auto-propose deletion**.
 
 ## Ready to post now
 
@@ -488,6 +503,23 @@ $ gh pr view 540 --repo llvm-mos/llvm-mos --json number,title,state,mergedAt
 inspecting a fresh `llvm-mos/main` clone (commits `9142aebae` and `8be054612`), not by re-running the
 `gh` commands above. `dev/upstream-status.sh` should be re-run to get a live-verified snapshot and
 replace this note with a proper `gh`-sourced one.
+
+**Update 2026-07-26 (`git ls-remote` — real remote state, no auth needed; `gh` still unauthenticated
+here so PR/issue metadata is still not live-queried):**
+
+```
+$ git ls-remote https://github.com/llvm-mos/llvm-mos.git refs/heads/main
+8be0546128a5...  refs/heads/main          # == our rebase base; tip has NOT moved
+$ git ls-remote https://github.com/wbniv/llvm-mos.git   # branches only
+c798c3141...  main                        # stale; FF to 8be054612 at posting time (user-triggered)
+0ae94157b...  mos-dwarf-65816-test-docs   # active queue branch (campaign Wave 1, item 3)
+# mos-dp-arg-cc + mos-late-opt-txy-dead-flag: DELETED post-merge (normal cleanup)
+$ git ls-remote https://github.com/llvm-mos/llvm-mos-sdk.git refs/heads/main
+61e4e1ad5e85...  refs/heads/main          # setjmp-issue target repo
+```
+
+Plus per-artifact `git apply --check` vs pristine `8be054612` (clean worktree):
+`0010` ✅ · `0011` ✅ · `0012` ✅ · `0015` ✅ · `0016` ✅ · `0017` ❌ (needs `0002` context; rides #321).
 ```
 
 > **Note — two repos, don't conflate.** The PRs/issues/branches above target **`wbniv/llvm-mos`** (the LLVM
