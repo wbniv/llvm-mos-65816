@@ -472,6 +472,72 @@ scaffold.sh's Pillow step).
   false alarm, not a real deploy gap. Worth remembering for future indri.studio (Workers) verification:
   use the header, not a query-string buster.
 
+## Post-launch fix (2026-07-26) — stale-ROM-after-nav bug
+
+**User report:** demo pages on indri.studio showed the *previous* demo's ROM until a hard refresh.
+
+**Root cause:** `Base.astro` uses Astro's `<ClientRouter />`, so navigating between pages under it
+is a client-side view transition, not a full reload. Astro does **not** re-execute inline `<script>`
+tags on a transition — only the `astro:page-load` listener registered by whichever page's script
+happened to run *first in the whole browsing session* ever fires again. All three emulator-boot
+scripts (`EmulatorEmbed.astro`, `blossom.astro`, the new `[slug].astro` gallery route) closed over
+their ROM's slug + cache-bust map via `define:vars`, so every later navigation — even to a
+completely different demo page — replayed whichever page loaded first's stale closure. This bug
+predates today's work in `EmulatorEmbed.astro`/`blossom.astro` (their `astro:page-load` pattern was
+never previously exercised by navigating to a *different* ROM without a full reload — the new
+gallery is what first made that a common path) but was only ever *symptomatic* on the new gallery,
+since that's the first place multiple different-ROM pages under `ClientRouter` actually exist.
+
+**Fix:** read `slug`/`appV`/`bust` off `#bjg-embed`'s `data-slug`/`data-appv`/`data-bust` attributes
+at call time instead of closing over them. The transition swap *does* correctly replace DOM content
+(including attributes) on every nav — only script re-execution is the gotcha. Applied identically to
+all three files so that whichever page's listener wins the once-per-session registration race, it
+reads the *current* page's own data every time, not just when the gallery's own pages navigate among
+themselves.
+
+**Verified with a real client-side-navigation test** (Playwright, not just static HTML — a JS-closure
+bug across a SPA-style transition can't be caught by curl/headless-screenshot alone):
+```
+$ node test-nav.mjs   # gallery->crcwall, gallery->lfsr2, product-page->gallery->qsortviz
+After nav 1 (gallery -> crcwall): crcwall
+After nav 2 (gallery -> lfsr2): lfsr2
+Status text on lfsr2 page: running lfsr2.sfc · 256×224
+Product page initial ROM: mandel-display
+After nav (product page -> gallery -> qsortviz): qsortviz
+PASS
+```
+The last case (`product-page -> gallery -> qsortviz`) is the critical regression: without the fix,
+clicking "Browse the full demo gallery" from the product page (the primary funnel this plan built in
+Step 5) and then any demo card would have rebooted `mandel-display` instead. Deployed as tag
+`v0.1.86`.
+
+**A second, deeper bug surfaced during that same investigation.** The `data-*` fix solved
+stale-ROM-after-nav, but the `astro:page-load` *listener* was still only ever registered by
+whichever component's script ran on the session's first page load — gated behind that component's
+own `#bjg-embed` existing on the page. A session landing first on the **gallery index** (a plain
+card grid, no `#bjg-embed` at all) and only click-navigating after that never registered any
+listener — clicking into any demo page hung on "loading core…" forever. **Fix:** moved the shared
+`bootEmulator` function + its one-time registration into `Base.astro` (the one thing every page,
+including the index, shares), and stripped the now-redundant duplicate script blocks from
+`EmulatorEmbed.astro`/`blossom.astro`/`[slug].astro` down to just their `data-*`-bearing
+`#bjg-embed` markup. Deployed as tag `v0.1.87`.
+
+**Live re-verification** (Playwright against `https://indri.studio`, starting fresh from the gallery
+index — the scenario that exposed the second bug — 3 consecutive runs, no flakes):
+```
+After nav 1 (gallery -> crcwall): crcwall
+After nav 2 (gallery -> lfsr2): lfsr2
+Product page initial ROM: mandel-display
+After nav (product page -> gallery -> qsortviz): qsortviz
+```
+(One earlier live run right after the `v0.1.87` deploy returned `undefined` for the first two —
+traced to Cloudflare edge-propagation lag: the freshness check before running the test only
+confirmed one edge PoP had the new build, not global propagation. Not a real regression; 3/3 clean
+runs a short time later confirm the fix holds.)
+
+biohack.net does not have either bug — no `<ClientRouter />` there, so every navigation is a full
+page reload and each page's own script always runs fresh.
+
 ## Risks / scope notes
 
 - **No silent truncation**: all 113 demos ship on both sites — if any asset is missing (e.g. a
