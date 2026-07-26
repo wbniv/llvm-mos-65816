@@ -122,5 +122,5 @@ Adoption decision deferred until numbers exist → experiment runs throwaway-fir
     uncommitted `snesgfx/display.h`/`upload.h` edits in main's working tree (left untouched per
     the shared-tree rule); the experiment's quotable numbers are the clean-worktree ones.
 
-8. **Teardown** — DEFERRED by design: `throwaway/snesgfx-virt-bench` retained pending the user's
-   adopt / land-flag / discard decision (investigation doc "Status / decision").
+8. **Teardown** — RESOLVED 2026-07-26: user decided to **keep** `throwaway/snesgfx-virt-bench`
+   for follow-on experiments ("more things to consider"). No teardown; branch is live.

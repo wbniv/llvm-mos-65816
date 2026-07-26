@@ -110,8 +110,8 @@ landed on main — the patch carries only the experiment proper.)
 
 ## Status / decision
 
-Measured and recorded; the experiment code stays on `throwaway/snesgfx-virt-bench` pending the
-user's call (adopt / land the flag default-off / discard + teardown). Per the numbers, the
+Measured and recorded. **2026-07-26: user decided to KEEP `throwaway/snesgfx-virt-bench`** —
+further experiments planned on it; do not tear down. Per the numbers alone, the
 recommendation is **discard the all-virtual variant** (it exists to be re-appliable from the
 patch) — but the mode-1 finding suggests a separate, genuinely promising follow-up:
 **selective `noinline` on fat snesgfx members** (`canvas_plot`? `text_puts`? `upq_push_*`?) could
