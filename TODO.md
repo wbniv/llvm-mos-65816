@@ -1515,5 +1515,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      and verifies it empirically rather than assuming. Only mandel-double would ever opt in, and it
      currently does NOT (the far-font path is blocked on the codegen bug below). Nothing open.
      fp:e5c3e9ac6e56c865 -->
-- [verify] **2026-07-26-upstream-submission-campaign** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md)_  <!-- fp:12194fba501ac4d3 -->
+<!-- triaged 2026-07-26: false positive — the campaign plan has no verification section to run; the
+     hook keyed on its "Immediate next actions" checklist, which is DELIBERATELY unrun: the whole plan
+     is gated on user review ("AWAITING USER REVIEW" in the curated Upstream item) and every outward
+     action is individually user-triggered. The checklist (draft 0016 bodies, re-verify the DWARF
+     branch) becomes work only after that review. Covered by the curated campaign item.
+     fp:12194fba501ac4d3 -->
 <!-- END auto-captured-deferrals -->
