@@ -146,11 +146,44 @@ genuinely-cold first build was ~1h.)
 
 2. `dev/run.sh xcheck` — host==default==a16==xy16 on MAME (+ bsnes-jg where wired), 0 mismatches.
 
-_(pending)_
+**NOT RUN — both emulator legs are unavailable on this machine**, so the 4-way differential cannot be
+executed here at all:
+- **bsnes-jg**: `SKIP bsnes-jg (harness absent)` — needs a vendored+built `vendor/bsnes-jg` (source
+  tree + `objs/*.a` + `Database/`); there is no `dev/fetch-bsnes-jg.sh`, it is a manual prereq and the
+  directory does not exist in this checkout.
+- **MAME**: `SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content;
+  supply out-of-band)` — copyrighted Nintendo firmware that cannot be fetched.
+
+⚠️ **This is a genuine gap in this pass, not a pass.** The project bar (`CLAUDE.md` "The bar") is the
+4-way differential; what ran below is strictly weaker. Re-run on a box with both emulators before
+treating the rebased stack as differentially validated.
 
 3. `dev/run.sh cpu6502` — `RESULT: PASS`, CRC `0xAC8A` (matches the plan's recorded gate value).
 
-_(pending)_
+```
+==> host oracle: cpu6502 gate_crc = 0xAC8A
+==> built build/cpu6502.sfc (+mos-a16); corpus_result @ WRAM 0xadd
+==> opcode dispatch probe (expect jump table in disasm)
+    PASS  jmp_table=4  rep/sep=97
+    SKIP bsnes-jg (harness absent)
+    SKIP MAME (no SPC700 IPL)
+
+RESULT: PASS — 6502/65C02 CPU Disassembler+Simulator on SNES; gate_crc=0xAC8A host==+mos-a16
+```
+
+**PARTIAL PASS — read carefully.** What this *actually* establishes:
+- the host oracle recomputes `0xAC8A`, identical to the value recorded on 2026-07-02 pre-rebase;
+- the ROM builds under `+mos-a16` and the **disasm probe reproduces the recorded shape exactly**
+  (`jmp_table=4`, `rep/sep=97` — the plan's recorded figures), i.e. the 256-entry `switch` still
+  lowers to a real jump table on the rebased toolchain.
+
+What it does **not** establish: the trailing `host==+mos-a16` in that `RESULT` line is **misleading** —
+the script prints it unconditionally, and with both emulator legs skipped **no `+mos-a16` value was ever
+observed at runtime**. Only the host-side oracle value was computed. Runtime equality is unverified here.
+
+**Incidental finding:** `corpus_result` moved from WRAM `0x70` (recorded 2026-07-02) to **`0xadd`** on
+the rebased toolchain — confirmed in `build/cpu6502.map`. Benign (a layout difference), but it is the
+offset any `--selfcheck` wiring must use now.
 
 4. ~~`dev/regen-patch.sh` round-trip — `RESULT: PASS`.~~ **N/A — step 7 skipped, see above.**
 

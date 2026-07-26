@@ -597,6 +597,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   regenerate `0002` properly. Standalone patches `0004`–`0015` are kept (several are still-unposted
   upstream-PR drafts) but excluded from the build loop.
   [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
+- [ ] **`mandel-double` overflows the 32 KiB bank on the rebased toolchain → `dev/run.sh build` aborts,
+  56 later ROMs never build.** Surfaced 2026-07-26 by the upstream rebase (see the row above).
+  `ld.lld: section '.rodata' will not fit in region 'rom': overflowed by 2904 bytes` +
+  `.rodata` range `[0xF4EA,0x10B07]` overlapping `.snes_header` `[0xFFB0,0xFFDF]`. **Not new-in-kind:**
+  #33's Done entry records it *already* overflowed by 2289 B once and was made to fit by const-folding
+  the coordinate divides — it has always sat on the edge because the double soft-float library is huge
+  (`__adddf3`=6728 B, `__muldf3`=5431 B). The newer upstream LLVM (tip `8be054612`) evidently emits
+  somewhat more code, pushing it back over. **Impact is bigger than one demo:** `dev/build.sh`'s ROM
+  loop is a plain `for` with `set -e`, so the first failure aborts the rest — everything alphabetically
+  after `mandel-double` (56 examples: `mandel-float`…`wireframe`) silently never builds. Options: trim
+  `mandel-double` again, move it to HiROM/`snes-hirom`, or make the build loop continue-on-error and
+  report a summary (probably worth doing regardless, so one fat demo can't mask 56 others).
+  [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md) · [#33 plan](docs/plans/2026-06-30-33-snes-mandel-double.md).
 - [ ] **Fix `dev/regen-patch-000N.sh` scripts that hardcode now-deleted `0003`/`0008` applies** — 11 of
   12 per-patch regen scripts (`regen-patch-{0001,0004,0005,0006,0007,0009,0011,0012,0013,0014}.sh`)
   unconditionally `git apply` `0003-late-opt-txy-dead-flag.patch` and/or `0008-mos-dp-arg-cc.patch` as
