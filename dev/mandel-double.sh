@@ -17,8 +17,13 @@ case "${1-}" in -h|--help)
 ROOT=/work
 BUILD="$ROOT/build"
 TOOL="${MOS_TOOLCHAIN:-$BUILD/llvm-mos-install}/bin"
-CFG="$BUILD/install/bin/mos-snes.cfg"
 SRC="$ROOT/examples/snes/mandel-double.c"
+# Platform from the SOURCE marker, never hardcoded here — this demo needs snes-far (bank $01 holds the
+# 4 KB FONT16 table via TITLE_FONT16_FAR, because its double soft-float library fills the 32 KB near
+# window). Reading it from the source keeps this gate, dev/build.sh and dev/rebuild-web-roms.sh in
+# agreement; a per-script copy of that fact is exactly what previously left this demo unbuildable.
+CFG="$BUILD/install/bin/mos-snes.cfg"
+grep -q 'snes-far-platform' "$SRC" && CFG="$BUILD/install/bin/mos-snes-far.cfg"
 VENDOR="$ROOT/vendor/bsnes-jg"
 
 [ -x "$TOOL/mos-clang" ] || { echo "FATAL: no from-source toolchain at $TOOL (run: dev/run.sh toolchain)"; exit 1; }

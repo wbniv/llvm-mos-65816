@@ -6,7 +6,21 @@
 #include <stdint.h>
 #define FONT16_FIRST 0x20
 #define FONT16_N 64
-static const uint16_t FONT16[FONT16_N * 4 * 8] = {
+
+// STORAGE — the table is 4096 B, which is a large slice of the 32 KB near-code window ($8000-$FFAF).
+// A demo whose code genuinely cannot spare that (mandel-double: ~20 KB of double soft-float library)
+// defines TITLE_FONT16_FAR and links against the snes-far platform, parking the table in bank $01
+// .far_rodata instead. It is read exactly once, at title upload, so the 24-bit loads cost nothing that
+// matters -- and the demo keeps the REAL Waldo font rather than falling back to chunky pixel-doubled
+// 8x8 glyphs. Indexing is identical either way; the compiler emits far loads for the qualified array.
+// Requires +mos-a16 (far pointers are 32-bit). See docs/plans/2026-07-26-font16-far-rodata-keep-fonts-everywhere.md.
+#ifdef TITLE_FONT16_FAR
+#define FONT16_STORAGE __attribute__((section(".far_rodata"))) const __attribute__((address_space(2)))
+#else
+#define FONT16_STORAGE static const
+#endif
+
+FONT16_STORAGE uint16_t FONT16[FONT16_N * 4 * 8] = {
   0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,  // 0x20 'spc' TL,TR
   0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,  //           BL,BR
   0x000F, 0x000F, 0x000F, 0x000F, 0x000F, 0x000F, 0x000F, 0x000F, 0x00C0, 0x00C0, 0x30C0, 0x30C0, 0x30C0, 0x30C0, 0x30C0, 0x30C0,  // 0x21 '!' TL,TR

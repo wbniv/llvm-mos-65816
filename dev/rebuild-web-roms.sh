@@ -82,12 +82,17 @@ for slug in "${SLUGS[@]}"; do
 
   # shellcheck disable=SC2086
   xtra=( ${EXTRA_CFLAGS[$slug]:-} )
+  # Platform from the SOURCE marker (same rule as dev/build.sh and the per-demo gates): a demo needing a
+  # second bank for far rodata self-declares `snes-far-platform`. Default stays plain snes, so a demo
+  # that already fits keeps its single 32 KB bank and does NOT grow to 64 KB.
+  cfg="$CFG"
+  grep -q 'snes-far-platform' "$c" && cfg="$BUILD/install/bin/mos-snes-far.cfg"
   mode=a16
-  if ! "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 "${A16[@]}" -Os "${xtra[@]}" \
+  if ! "$TOOL/mos-clang" --config "$cfg" -mcpu=mosw65816 "${A16[@]}" -Os "${xtra[@]}" \
         -o "$BUILD/$slug.sfc" "$c" "${assets[@]}" 2>"$BUILD/$slug.buildlog"; then
     # a16 didn't build — fall back to default-8 (still hash-identical by the differential).
     mode=default8
-    if ! "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 -Os "${xtra[@]}" \
+    if ! "$TOOL/mos-clang" --config "$cfg" -mcpu=mosw65816 -Os "${xtra[@]}" \
           -o "$BUILD/$slug.sfc" "$c" "${assets[@]}" 2>>"$BUILD/$slug.buildlog"; then
       echo "FAIL  $slug  (a16 + default8 both failed; see build/$slug.buildlog)"
       fail=$((fail+1)); failed="$failed $slug"; continue

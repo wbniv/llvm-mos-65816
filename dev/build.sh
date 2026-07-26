@@ -83,6 +83,14 @@ for src in "$ROOT"/examples/snes/**/*.c; do
     [ "$A16_OK" = 1 ] || { printf '    %-14s SKIP (mos-a16-only; toolchain lacks +mos-a16)\n' "$name"; continue; }
     a16=(-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16)
   fi
+  # Platform: default `snes` (single 32 KB LoROM bank). A demo that needs a second bank — because its
+  # code fills the 32 KB NEAR window and it parks const data in bank $01 .far_rodata (mandel-double's
+  # 4 KB FONT16, via TITLE_FONT16_FAR) — self-declares a `snes-far-platform` marker. Same
+  # marker-in-the-source discipline as `mos-a16-only`: a linker config can't be a #define, so it must be
+  # discoverable by EVERY build path rather than living in one script's per-demo table (the drift that
+  # made this demo unbuildable here in the first place).
+  cfg="$INSTALL/bin/mos-snes.cfg"
+  if grep -q 'snes-far-platform' "$src"; then cfg="$INSTALL/bin/mos-snes-far.cfg"; fi
   # Sidecar binary assets: objcopy committed examples/snes/<name>.{pic,pal,map,chr,bin} into
   # bank-$00 .rodata objects and link them (Option B — raw gfx4snes output, no compiled C arrays;
   # symbols _binary_<name>_<ext>_start/_end/_size). Run from the asset dir so symbol names are clean.
@@ -96,7 +104,7 @@ for src in "$ROOT"/examples/snes/**/*.c; do
         "$name.$ext" "$o" )
     assets+=("$o")
   done
-  "$MOS_CLANG" --config "$INSTALL/bin/mos-snes.cfg" "${a16[@]}" \
+  "$MOS_CLANG" --config "$cfg" "${a16[@]}" \
     -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src" "${assets[@]}"
   python3 "$ROOT/tools/snes-checksum.py" "$rom"
   printf '    %-14s %6s bytes\n' "$name" "$(stat -c%s "$rom")"

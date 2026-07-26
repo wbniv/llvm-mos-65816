@@ -765,7 +765,25 @@ def main():
     out.append("#include <stdint.h>")
     out.append("#define FONT16_FIRST 0x20")
     out.append("#define FONT16_N 64")
-    out.append("static const uint16_t FONT16[FONT16_N * 4 * 8] = {")
+    out.append("")
+    # STORAGE — keep in sync with the hand-written note in examples/snes/font16.h. The 4096 B table is a
+    # large slice of the 32 KB near-code window; a demo that cannot spare it (mandel-double) defines
+    # TITLE_FONT16_FAR + links snes-far to park it in bank $01 .far_rodata, keeping the REAL font instead
+    # of falling back to pixel-doubled 8x8. Emitted by the generator so a regen does not drop it.
+    out.append("// STORAGE — the table is 4096 B, which is a large slice of the 32 KB near-code window ($8000-$FFAF).")
+    out.append("// A demo whose code genuinely cannot spare that (mandel-double: ~20 KB of double soft-float library)")
+    out.append("// defines TITLE_FONT16_FAR and links against the snes-far platform, parking the table in bank $01")
+    out.append("// .far_rodata instead. It is read exactly once, at title upload, so the 24-bit loads cost nothing that")
+    out.append("// matters -- and the demo keeps the REAL Waldo font rather than falling back to chunky pixel-doubled")
+    out.append("// 8x8 glyphs. Indexing is identical either way; the compiler emits far loads for the qualified array.")
+    out.append("// Requires +mos-a16 (far pointers are 32-bit). See docs/plans/2026-07-26-font16-far-rodata-keep-fonts-everywhere.md.")
+    out.append("#ifdef TITLE_FONT16_FAR")
+    out.append('#define FONT16_STORAGE __attribute__((section(".far_rodata"))) const __attribute__((address_space(2)))')
+    out.append("#else")
+    out.append("#define FONT16_STORAGE static const")
+    out.append("#endif")
+    out.append("")
+    out.append("FONT16_STORAGE uint16_t FONT16[FONT16_N * 4 * 8] = {")
     for i in range(N):
         ch = chr(FIRST + i)
         g = synth(glyph_for(ch))

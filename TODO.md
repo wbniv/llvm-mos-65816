@@ -1517,4 +1517,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        merged (PR #562/#563); this rebase is fork-side bookkeeping that produces no new postable
        artifact. Posting remains user-triggered per standing policy.
      fp:adb7cd38a491445a fp:dcffbc00e6a08c58 -->
+- [ ] **(triage)** Moving other demos to far ROM. Only `mandel-double` needs it; the rest fit comfortably — and must not — _from [2026-07-26-font16-far-rodata-keep-fonts-everywhere.md](docs/plans/2026-07-26-font16-far-rodata-keep-fonts-everywhere.md)_  <!-- fp:e5c3e9ac6e56c865 -->
 <!-- END auto-captured-deferrals -->
