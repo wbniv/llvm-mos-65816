@@ -62,7 +62,7 @@ def bank_card(bank: int, items: list[tuple[int, str, int, str]]) -> str:
     if not lines:
         lines = '<div class="detail">32,768 bytes free</div>'
     return f"""<section class="bank{' reserve' if not items else ''}">
-<div class="head"><span class="num">Bank ${bank:02X}</span><span class="used">{used:,} / 32,768</span></div>
+<div class="head"><span class="num">Bank ${bank:02X}</span><span class="used">{used:,} used · {free:,} free</span></div>
 <div class="bar">{''.join(segments)}</div>
 <div class="label"><div class="title">{len(items)} packed item{'s' if len(items)!=1 else ''}</div>{lines}</div>
 </section>"""
@@ -125,7 +125,7 @@ def main() -> None:
 <span class="key" style="--c:var(--stream)">LZSS stream</span><span class="key" style="--c:var(--palette)">512-byte palette</span>
 <span class="key" style="--c:var(--shared)">shared font data</span>
 <span class="key" style="--c:var(--free)">free / padding</span></div>
-<section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong><span>{bank0:,} / 32,768 bytes</span></div>
+<section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong><span>{bank0:,} used · {BANK_BYTES-bank0:,} free</span></div>
 <div class="bar"><span class="seg" style="width:{bank0/BANK_BYTES*100:.4f}%;background:var(--code)"></span>
 <span class="seg free" style="width:{(BANK_BYTES-bank0)/BANK_BYTES*100:.4f}%"></span></div>
 <div class="label">Runtime, startup, navigation, descriptors, tables, header, and vectors.
