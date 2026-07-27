@@ -23,6 +23,8 @@
 #define CHR8 0x6000u
 #define PAL16 7u
 #define PAL8 7u
+/* Leave OBJ range/time headroom for both 16x16 navigation sprites. */
+#define OAM_VISUAL_MAX 16u
 #ifndef GALLERY_START
 #define GALLERY_START 0u
 #endif
@@ -54,6 +56,7 @@ static uint8_t gallery_completed_count;
 static uint8_t chrbuf[1216];
 static uint8_t objpix[256];
 static uint16_t objchr[64];
+static uint8_t oam_visual[OAM_VISUAL_MAX*4u];
 static uint8_t bgmode_tab[7], tm_tab[7];
 static const uint8_t zero=0;
 static const GalleryAsset *active_asset;
@@ -108,40 +111,8 @@ asm(".text\n"
     "  lda nav_pad_now\n"
     "  sta nav_pad_previous\n"
     /*
-     * Reassert both complete navigation sprites every VBlank.  One-time OAM
-     * writes are not stable across the title/gallery handoff and the first
-     * slide can otherwise inherit partially latched coordinates/size bits.
-     */
-    "  lda #$00\n"
-    "  sta $2102\n"
-    "  sta $2103\n"
-    "  lda #$02\n"
-    "  sta $2104\n"
-    "  lda arrow_anim_y\n"
-    "  sta $2104\n"
-    "  lda #$40\n"
-    "  sta $2104\n"
-    "  lda #$30\n"
-    "  sta $2104\n"
-    "  lda #$ee\n"
-    "  sta $2104\n"
-    "  lda arrow_anim_y\n"
-    "  sta $2104\n"
-    "  lda #$40\n"
-    "  sta $2104\n"
-    "  lda #$70\n"
-    "  sta $2104\n"
-    "  lda #$00\n"
-    "  sta $2102\n"
-    "  lda #$01\n"
-    "  sta $2103\n"
-    "  lda #$0a\n"
-    "  sta $2104\n"
-    "  lda #$00\n"
-    "  sta $2104\n"
-    /*
      * Animate only the accepted direction during decode.  OAM writes happen
-     * here in NMI/VBlank, after the stable base entries above.
+     * here in NMI/VBlank, so the moving overlay cannot corrupt either arrow.
      */
     "  lda arrow_anim\n"
     "  beq 9f\n"
@@ -418,26 +389,33 @@ static void oam_init(void){
   for(uint8_t i=0;i<128;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=0;REG_OAMDATA=0;}
   REG_OAMADDL=0;REG_OAMADDH=1;for(uint8_t i=0;i<32;i++)REG_OAMDATA=0;
 }
+static void oam_arrow_sizes(void){
+  REG_OAMADDL=0;REG_OAMADDH=1;
+  REG_OAMDATA=0x0a;REG_OAMDATA=0;
+}
 static void oam_arrows(uint8_t y,uint8_t hide){
   if(hide)y=240;
-  arrow_anim_y=y;
   REG_OAMADDL=0;REG_OAMADDH=0;
   REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=0x30;
   REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=0x70;
-  /*
-   * OAMDATA is a two-write latch even in the high table.  A lone byte leaves
-   * the size bits pending, so the first slide can render only one 8x8
-   * quadrant of each nominal 16x16 arrow.  Commit a full high-table word.
-   */
-  REG_OAMADDL=0;REG_OAMADDH=1;REG_OAMDATA=0x0a;REG_OAMDATA=0;
+  oam_arrow_sizes();
+}
+static void oam_upload_visual(void){
+  snes_wait_vblank();
+  REG_OAMADDL=4;REG_OAMADDH=0; /* sprite 2 = OAM word address 4 */
+  REG_DMAP0=0;REG_BBAD0=0x04;
+  REG_A1T0L=(uint8_t)(uintptr_t)oam_visual;
+  REG_A1T0H=(uint8_t)((uintptr_t)oam_visual>>8);REG_A1B0=0;
+  REG_DAS0L=(uint8_t)sizeof(oam_visual);REG_DAS0H=0;
+  REG_MDMAEN=1;
+}
+static void oam_stage(uint8_t i,uint8_t x,uint8_t y,uint8_t tile){
+  uint8_t *p=&oam_visual[(uint16_t)i*4u];
+  p[0]=x;p[1]=y;p[2]=tile;p[3]=0x30;
 }
 static void oam_hide_compression(void){
-  snes_wait_vblank();
-  REG_OAMADDL=8;REG_OAMADDH=0;
-  for(uint8_t i=0;i<30;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=72;REG_OAMDATA=0x30;}
-}
-static void oam_put(uint8_t x,uint8_t y,uint8_t tile){
-  REG_OAMDATA=x;REG_OAMDATA=y;REG_OAMDATA=tile;REG_OAMDATA=0x30;
+  for(uint8_t i=0;i<OAM_VISUAL_MAX;i++)oam_stage(i,0,240,72);
+  oam_upload_visual();
 }
 static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y){
   uint16_t rw=((uint16_t)active_asset->width*256u)/active_asset->matrix_scale;
@@ -448,13 +426,14 @@ static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y){
   *y=(uint8_t)(oy+(py*256u)/active_asset->matrix_scale);
 }
 static uint8_t oam_span(uint16_t pos,uint8_t len,uint8_t tile,uint8_t used){
-  while(len&&used<18u){
+  while(len&&used<OAM_VISUAL_MAX){
     uint16_t row_left=(uint16_t)(active_asset->width-pos%active_asset->width);
     uint8_t part=(uint8_t)(len<row_left?len:row_left),x,y,xe,ye;
     project_offset(pos,&x,&y);project_offset((uint16_t)(pos+part),&xe,&ye);
     uint8_t pixels=(uint8_t)(xe>x?xe-x:3u),count=(uint8_t)((pixels+7u)/8u);
     if(count<1u)count=1u;if(count>6u)count=6u;
-    for(uint8_t i=0;i<count&&used<18u;i++,used++)oam_put((uint8_t)(x+i*8u),y,tile);
+    for(uint8_t i=0;i<count&&used<OAM_VISUAL_MAX;i++,used++)
+      oam_stage(used,(uint8_t)(x+i*8u),y,tile);
     pos=(uint16_t)(pos+part);len=(uint8_t)(len-part);
   }
   return used;
@@ -467,22 +446,22 @@ static void oam_compression(void){
   v.source_offset=gallery_repack_visual.source_offset;
   v.kind=gallery_repack_visual.kind;v.length=gallery_repack_visual.length;
   if(seq!=gallery_repack_visual.sequence)return;
-  snes_wait_vblank();
-  REG_OAMADDL=8;REG_OAMADDH=0;
   uint8_t used=0;
   if(v.kind==REPACK_LITERAL){
-    uint8_t x,y;project_offset(v.current_offset,&x,&y);oam_put((uint8_t)(x-3u),(uint8_t)(y-3u),76);used=1;
+    uint8_t x,y;project_offset(v.current_offset,&x,&y);
+    oam_stage(0,(uint8_t)(x-3u),(uint8_t)(y-3u),76);used=1;
   }else if(v.kind==REPACK_MATCH){
     used=oam_span(v.source_offset,v.length,75,used);
     used=oam_span(v.current_offset,v.length,72,used);
     uint8_t sx,sy,dx,dy;project_offset(v.source_offset,&sx,&sy);project_offset(v.current_offset,&dx,&dy);
-    for(uint8_t i=1;i<=5u&&used<29u;i++,used++){
+    for(uint8_t i=1;i<=5u&&used<OAM_VISUAL_MAX;i++,used++){
       int16_t x=(int16_t)sx+((int16_t)dx-(int16_t)sx)*(int16_t)i/6;
       int16_t y=(int16_t)sy+((int16_t)dy-(int16_t)sy)*(int16_t)i/6;
-      oam_put((uint8_t)x,(uint8_t)y,77);
+      oam_stage(used,(uint8_t)x,(uint8_t)y,77);
     }
   }
-  while(used++<30u)oam_put(0,240,72);
+  while(used<OAM_VISUAL_MAX){oam_stage(used,0,240,72);used++;}
+  oam_upload_visual();
 }
 static void blank_maps(void){
   REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=MAP2;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(PAL16<<10);
