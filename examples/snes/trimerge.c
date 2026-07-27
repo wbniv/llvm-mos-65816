@@ -4,15 +4,19 @@
 // s64, via noinline comparators that keep G_SCMP alive. Distinct from #97/#98 which fed the compare
 // to qsort (compared to 0). Builds default-8-bit AND +mos-a16 AND +mos-xy16 (5-way bar).
 //
-// Visual (#99b waterfall rework, 2026-07-27): the window is a 16-row merge-round HISTORY. Once per
-// sweep a fresh round is merged at the top and older rounds flow down; each cell is coloured by
-// WHICH branch of the three-way compare emitted it (advance-left / advance-right / EMIT-BOTH). The
-// offset steps in whole stride units (0x10001) so consecutive rounds genuinely differ and the
-// equal/emit-both branch fires periodically — the braid flows and yellow tie cells migrate through
-// it. The branch palette breathes ±2/32 luma on a slow triangle wave. A wrong three-way branch
-// would tear the ordering AND diverge the CRC. (Was: static rows — the old ×7 offset step was 4
-// orders of magnitude below one stride unit, so no merge decision ever flipped; see
-// docs/plans/2026-07-27-99b-trimerge-visual-fix.md.)
+// Visual (#99c 60 fps scroll-waterfall, 2026-07-27; supersedes the #99b repaint waterfall): the
+// canvas's 16 tile rows are a 128-px VERTICAL SCROLL RING shown through a 15-row/120-px window —
+// motion is BG3VOFS moving 1 px EVERY frame (true 60 fps), via per-scanline banded scroll
+// (snesgfx/hdma_hscroll.h, double-buffered) so the HUD stays put and the ring wraps invisibly. The
+// one always-off-screen row is the STAGING row: once every 8 frames the next merge round is
+// painted there (16 tiles, 256 B — never a full-canvas repaint) and scrolls in at the top pixel by
+// pixel. Each cell is coloured by WHICH branch of the three-way compare emitted it (advance-left /
+// advance-right / EMIT-BOTH); the offset steps in whole stride units (0x10001) so consecutive
+// rounds genuinely differ and the equal/emit-both branch fires periodically. The branch palette
+// breathes ±2/32 luma. A wrong three-way branch would tear the ordering AND diverge the CRC.
+// History: #99 shipped static rows (offset 4 orders below one stride unit — no decision ever
+// flipped); #99b made it flow at ~10 Hz by full-canvas repaint. See
+// docs/plans/2026-07-27-99c-trimerge-60fps-scroll-waterfall.md.
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256
 #include "snesgfx/display.h"
@@ -20,6 +24,7 @@
 #include "snesgfx/text_layer.h"
 #include "snesgfx/title_layer.h"
 #include "snesgfx/backdrop_gradient.h"
+#include "snesgfx/hdma_hscroll.h"
 #include "../65816/trimerge.h"
 
 #define CANVAS_CHR  0x0000u
@@ -27,11 +32,13 @@
 #define BOX_COL     8
 #define BOX_ROW     6
 #define HUD_TOP_ROW 1
-#define HUD_BOT_ROW 25
+#define HUD_BOT_ROW 26          // bottom band scrolls +8, so row 26 lands at the old row-25 spot
 #define NCOL        4
-#define BAND        4
 #define WIN_W       16
-#define WIN_H       16
+#define WIN_H       16          // ring height in tile rows (128 px)
+#define VIS_PX      120u        // visible window: 15 rows; the 16th is the off-screen staging row
+#define RING_PX     128u
+#define CH_VSCROLL  6           // HDMA: ring scroll on ch6, backdrop vignette on ch7, upq GP-DMA ch0
 
 static const uint16_t bg3_pal[NCOL] = {
     SNES_RGB( 2,  4, 16),    // 0
@@ -44,37 +51,75 @@ typedef struct {
     Display      screen;
     BitmapCanvas canvas;
     TextLayer    text;
-    uint8_t      cellcol[WIN_H][WIN_W];   // merge-round history (row 0 newest, flows down)
+    HScrollDB    vdb;                     // double-buffered vscroll band tables (bank-0 bss)
     uint16_t     pal[NCOL];               // breathing palette (queued by pointer — must persist)
     uint16_t     phase;
     uint16_t     t;
-    uint8_t      band;
+    uint8_t      pos;                     // ring offset P in [0,128): visible top = ring pixel P
 } App;
 
 volatile uint16_t corpus_result;
 
-// One waterfall step: history shifts down a row, then a fresh merge round enters at row 0. The
-// offset steps in WHOLE stride units (0x10001) — cmp(L[i],R[j]) = sign((3i'-2j')*0x10001 + 2*off),
-// so each phase step moves the decision boundary by 2 units of (3i'-2j') and ties (3i'-2j' == -2m,
-// the emit-both branch) fire periodically. 64-phase cycle keeps |off| <= 32*0x10001 (~2.1M): stream
+static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color);
+
+// Merge one fresh round and paint it into ring row `row` (16 tiles, marked dirty -> a 256 B flush;
+// rows are painted once and never moved — the scroll ring does the reordering). The offset steps
+// in WHOLE stride units (0x10001) — cmp(L[i],R[j]) = sign((3i'-2j')*0x10001 + 2*off), so each
+// phase step moves the decision boundary by 2 units of (3i'-2j') and ties (3i'-2j' == -2m, the
+// emit-both branch) fire periodically. 64-phase cycle keeps |off| <= 32*0x10001 (~2.1M): stream
 // values stay well inside int32. Each output cell is coloured by WHICH branch of the three-way
 // compare emitted it — advance-left (1), advance-right (2), or emit-both (3).
-static void push_row(App *a) {
-    for (uint8_t r = (uint8_t)(WIN_H - 1u); r > 0u; r--)
-        for (uint8_t c = 0u; c < (uint8_t)WIN_W; c++)
-            a->cellcol[r][c] = a->cellcol[r - 1u][c];
+// Display-only incremental stream fill: same values as tm_fill32 (a[i] = (i - n/2)*u*mul + off,
+// u = 0x10001) but built by repeated addition — tm_fill32's per-element 32-bit multiply is a
+// __mulsi3 libcall, and 40 of them made the paint frame overrun v-blank (the measured every-9th-
+// frame scroll stall). The GATE still uses the header's tm_fill32 untouched; the merge itself
+// still calls the noinline tm_cmp32 (the G_SCMP under test) for every cell.
+static void fill_ramp32(int32_t *dst, int32_t step, int32_t off) {
+    int32_t v = (int32_t)(-(int32_t)(TM_N / 2u)) * step + off;   // one mul at entry, adds after
+    for (uint16_t i = 0u; i < (uint16_t)TM_N; i++) { dst[i] = v; v += step; }
+}
+
+static void paint_row(App *a, uint8_t row) {
     int32_t off = (int32_t)((int32_t)(a->phase & 63u) - (int32_t)32) * (int32_t)0x00010001;
-    tm_fill32(_tm_l32, (uint16_t)TM_N, (int32_t)3, off);
-    tm_fill32(_tm_r32, (uint16_t)TM_N, (int32_t)2, (int32_t)(-off));
+    fill_ramp32(_tm_l32, (int32_t)3 * (int32_t)0x00010001, off);
+    fill_ramp32(_tm_r32, (int32_t)2 * (int32_t)0x00010001, (int32_t)(-off));
+    uint8_t col[WIN_W];
     uint16_t i = 0u, j = 0u; uint8_t c = 0u;
     while (i < (uint16_t)TM_N && j < (uint16_t)TM_N && c < (uint8_t)WIN_W) {
         int cmp = tm_cmp32(_tm_l32[i], _tm_r32[j]);   // the three-way compare drives the branch
-        if (cmp < 0)      { a->cellcol[0][c++] = 1u; i++; }                         // advance left
-        else if (cmp > 0) { a->cellcol[0][c++] = 2u; j++; }                         // advance right
-        else { a->cellcol[0][c++] = 3u; if (c < (uint8_t)WIN_W) a->cellcol[0][c++] = 3u; i++; j++; }  // emit both
+        if (cmp < 0)      { col[c++] = 1u; i++; }                         // advance left
+        else if (cmp > 0) { col[c++] = 2u; j++; }                         // advance right
+        else { col[c++] = 3u; if (c < (uint8_t)WIN_W) col[c++] = 3u; i++; j++; }  // emit both
     }
-    while (c < (uint8_t)WIN_W) a->cellcol[0][c++] = (i < (uint16_t)TM_N) ? 1u : 2u;  // drained tail
+    while (c < (uint8_t)WIN_W) col[c++] = (i < (uint16_t)TM_N) ? 1u : 2u;  // drained tail
+    for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++)
+        cell_fill(&a->canvas, cx, row, col[cx]);
+    uint16_t lo = (uint16_t)((uint16_t)row * (uint16_t)CANVAS_TILES_W);
+    uint16_t hi = (uint16_t)(lo + (uint16_t)(WIN_W - 1u));
+    if (a->canvas.lo > lo) a->canvas.lo = lo;
+    if (a->canvas.hi < hi) a->canvas.hi = hi;
     a->phase = (uint16_t)(a->phase + 1u);
+}
+
+// Rebuild the per-scanline vertical-scroll band table for ring offset P (into the back half of the
+// double buffer; committed through the v-blank queue so the engine never reads a half-built table).
+// Screen bands (sum 224): title area 48 @ 0 · ring window part A · ring wrap part B (P > 8 only) ·
+// bottom 56 @ +8 (skips the ring's last row so the staging row never shows; HUD text lives at map
+// row 26, displayed at the old row-25 spot). At scanline y, mapY = y + vofs: part A shows ring
+// pixels P..min(127, P+119), part B wraps to ring pixels 0..P-9.
+static void build_bands(App *a, HScrollN *t) {
+    HScrollW w;
+    uint8_t P = a->pos;
+    hscrollw_begin(&w, t);
+    hscrollw_band(&w, 48u, (int16_t)0);
+    if (P <= 8u) {
+        hscrollw_band(&w, (uint8_t)VIS_PX, (int16_t)P);
+    } else {
+        hscrollw_band(&w, (uint8_t)(RING_PX - P), (int16_t)P);
+        hscrollw_band(&w, (uint8_t)(P - 8u), (int16_t)((int16_t)P - (int16_t)RING_PX));
+    }
+    hscrollw_band(&w, 56u, (int16_t)8);
+    hscrollw_end(&w);
 }
 
 // Shift every 5-bit channel of a BGR555 colour by d, clamped to 0..31.
@@ -127,20 +172,6 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
     for (uint8_t r = 0u; r < 8u; r++) { t[r * 2u] = p0; t[r * 2u + 1u] = p1; }
 }
 
-// Paint one 4-row band of the shadow. Deliberately does NOT mark the canvas dirty: the shadow is
-// painted over 4 frames (CPU spreading) while the screen keeps showing the previous complete field,
-// and the whole canvas is marked dirty in one shot when the last band lands — so the flush is a
-// single 4 KB DMA inside ONE v-blank (fits UPQ_VBLANK_BUDGET 5100 B) and the visible update is
-// atomic. Marking per-band flushed each band as it was painted, which tore the waterfall: for 3 of
-// every 4 frames the screen showed shifted rows above a marching boundary and stale rows below it.
-__attribute__((noinline))
-static void field_band(App *a) {
-    uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
-    for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++)
-        for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++)
-            cell_fill(&a->canvas, cx, cy, a->cellcol[cy][cx]);
-}
-
 static void update_hud(App *a) {
     static const char H[] = "0123456789ABCDEF";
     char buf[21];
@@ -163,8 +194,9 @@ static void app_init(App *a) {
     upq_push_cgram(&a->screen.q, 0, bg3_pal, 0x00u, (uint8_t)sizeof bg3_pal);
     a->phase = (uint16_t)0u;
     a->t = (uint16_t)0u;
-    a->band = (uint8_t)0u;
-    for (uint8_t k = 0u; k < (uint8_t)WIN_H; k++) push_row(a);   // pre-fill the history window
+    a->pos = (uint8_t)0u;
+    // Pre-fill the ring bottom-up so at pos==0 the top row (0) holds the newest round.
+    for (int8_t r = (int8_t)(WIN_H - 1); r >= 0; r--) paint_row(a, (uint8_t)r);
     text_puts(&a->text, 0, 2, "THREE-WAY MERGE DIFF");
 }
 
@@ -175,20 +207,26 @@ int main(void) {
     title_begin16(&a.screen, &title, "TRIMERGE", "SPACESHIP AS CONTROL FLOW");
     corpus_result = trimerge_gate_crc();   // runs during title; expected 0xCCCC
     title_end(&a.screen, &title, 90);
+    build_bands(&a, &a.vdb.buf[0]);        // fill the live half before arming
+    hscrolldb_arm(CH_VSCROLL, VSCROLL_BG3VOFS, &a.vdb);
     bdrop_arm(7, grad_tab);                // after title_end (which writes HDMAEN = 0)
-    REG_HDMAEN = 0x80u;                    // ch7 only — title's channels stay off
+    REG_HDMAEN = 0xC0u;                    // ch6 (ring scroll) + ch7 (vignette); title's stay off
     for (;;) {
-        field_band(&a);
-        a.band++;
-        if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
-            a.band = (uint8_t)0u;
+        build_bands(&a, hscrolldb_back(&a.vdb));   // this frame's 1-px scroll step
+        hscrolldb_commit(&a.vdb, &a.screen.q, CH_VSCROLL);
+        uint8_t sub = (uint8_t)(a.pos & 7u);
+        if (sub == 0u) {
+            // The staging row (the one row fully off-screen right now) gets the next merge round;
+            // its 256 B flush lands this v-blank, and it scrolls in at the top pixel by pixel.
+            uint8_t staged = (uint8_t)(((uint8_t)(a.pos >> 3) + (uint8_t)(WIN_H - 1u)) & (uint8_t)(WIN_H - 1u));
+            paint_row(&a, staged);
             a.t = (uint16_t)(a.t + (uint16_t)1u);
-            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
-            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
-            push_row(&a);            // waterfall: one new round at the top, history flows down
+        } else if (sub == 4u) {
+            // Staggered off the paint frame so no single iteration overruns the frame budget.
             breathe_palette(&a);
             update_hud(&a);
         }
         display_frame(&a.screen);
+        a.pos = (uint8_t)((a.pos == 0u) ? (uint8_t)(RING_PX - 1u) : (uint8_t)(a.pos - 1u));
     }
 }
