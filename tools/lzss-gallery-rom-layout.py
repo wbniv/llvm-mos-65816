@@ -142,11 +142,12 @@ def main() -> None:
         f'<span class="seg {kind}" style="width:{size/BANK_BYTES*100:.4f}%" '
         f'title="{html.escape(name)}: {size:,} bytes"></span>'
         for name,_,size,kind in bank0_parts)
+    bank0_list_parts=sorted(bank0_parts,key=lambda part: part[3]=="free")
     bank0_list="".join(
         f'<div class="bank0-item"><span class="swatch" style="--c:var(--{kind if kind in ("code","free") else kind})"></span>'
         f'<span>{html.escape(name)} <code>$00:{addr:04X}–{addr+size-1:04X}</code></span>'
         f'<strong>{size:,} B</strong></div>'
-        for name,addr,size,kind in bank0_parts)
+        for name,addr,size,kind in bank0_list_parts)
     cards = []
     for bank in range(1, banks):
         cards.append(bank_card(bank, packed.get(bank, [])))
