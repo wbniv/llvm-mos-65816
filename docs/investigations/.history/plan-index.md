@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/e1e5068) | docs(plan-index): #99c row (299 plans, coverage stays complete) |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/189718f) | docs(plan-index): clear the drift — rows for all 14 committed-but-unindexed plans (298 total, complete) |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/405e39f) | docs(99b): plan screenshots (before/waterfall/final) + plan-index row (199 plans) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/3441929) | docs(plan-index): row for the snesgfx all-virtual dispatch benchmark (198 plans) |
@@ -214,6 +215,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+e1e5068	author	Will Norris
+e1e5068	added	2
+e1e5068	deleted	1
+e1e5068	files	1
+e1e5068	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 189718f	author	Will Norris
 189718f	added	16
 189718f	deleted	2
