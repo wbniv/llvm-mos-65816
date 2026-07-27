@@ -253,6 +253,8 @@ After the ROM passes:
 
 ## Implementation record
 
+**Verification: PASS.**
+
 Implemented as a 1 MiB LoROM with nineteen dedicated artwork banks. The final
 corpus is 295,880 indexed bytes and 288,631 LZSS bytes (2.45% reduction), with
 oracle `0x9497` and ROM SHA-256
