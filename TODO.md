@@ -17,7 +17,7 @@ Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TOD
 
 ## Open
 
-- [ ] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card.** The
+- [T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card.** The
   title-card fix (`5f51be1` per-line HDMA bands + gravity exit, `e1a58f9` the `_`/`^` glyphs and
   lowercase folding) is header-only, so every demo needs a rebuild to pick it up — the ROMs already
   on biohack.net still show both lines arriving from both edges, `G_FCOPYSIGN` as `G FCOPYSIGN`, and
@@ -25,7 +25,7 @@ Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TOD
   `/snes-rom-page`. Note the intro is ~6 frames shorter than before, well inside the demos'
   fixed-frame screenshot margins, but the published preview PNGs will change.
 
-- [ ] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
+- [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
   costs +512 B font8, +2048 B font16 in the near-code window (`mandel-double` already needs
@@ -65,7 +65,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   No fork fix. Evidence: `dev/measure-far-ptr-value-state.sh`.
   [plan §Re-evaluation](docs/plans/2026-06-21-320-five-address-space-model.md) ·
   [F2 hand-off](docs/plans/2026-06-21-320-far-calls-followups.md).
-- [ ] **#320 five-address-space model — Phase 0+3 DONE; new spaces (AS3 packed-24, AS4 zero-bank) DEFERRED
+- [T4] **#320 five-address-space model — Phase 0+3 DONE; new spaces (AS3 packed-24, AS4 zero-bank) DEFERRED
   (premature, not nulls).** asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/
   `3`=packed-24/`4`=zero-bank); we ship 3 additive (`0`=near-default/`1`=DP/`2`=32-bit far). **Two hard
   constraints:** (C1) one MOS datalayout shared with the 6502 ⇒ `0`=far-default is **architecturally
@@ -113,7 +113,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   post the upstream note (C1 + pow2 + census) — user-triggered.
   [incB handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
   [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md).
-- [ ] **#320 post design note upstream** (user-triggered). Post the drafted note
+- [T5] **#320 post design note upstream** (user-triggered). Post the drafted note
   ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
   llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
@@ -121,7 +121,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
-- [ ] **Un-work-around `maze.h`'s two-pass split** now that the legalizer indexed-addr domination
+- [T3] **Un-work-around `maze.h`'s two-pass split** now that the legalizer indexed-addr domination
   fix is live (`fb528d8`). `examples/65816/maze.h` splits the fold-while-walk loop into
   `maze_path_build` + `maze_fold_path` purely to dodge the old `-verify` abort; the single
   fold-while-walk loop should now compile `-verify`-clean (the `legalindexdom` gate proves the shape).
@@ -262,7 +262,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
   [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
-- [ ] **#321 `a16-newton-step-rc-undef` MachineVerifier false-positive — investigate root cause.**
+- [T4] **#321 `a16-newton-step-rc-undef` MachineVerifier false-positive — investigate root cause.**
   `+mos-a16 -Os` compilation of `newton_step()` (6 simultaneous `int16_t×int16_t→int32_t` temps) triggers
   "Bad machine code: Using an undefined physical register" from `-verify-machineinstrs` for a COPY of ZP-pair
   `$rc3` into `$x`. The code **runs correctly** (5-way differential PASS on real hardware and both emulators);
@@ -346,7 +346,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   un-landed (a)/(b) `0002` spike; tear down only when told; (2) post the prepared #321 CC design note
   (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
   [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
-- [ ] **#3 SNES Blossom on-screen interactive port — CORE + HUD DONE, verified, landed on `main`; only optional polish left.**
+- [T2] **#3 SNES Blossom on-screen interactive port — CORE + HUD DONE, verified, landed on `main`; only optional polish left.**
   **Landed** (`task blossom` / `dev/run.sh blossom`, RESULT PASS): the Hopalong attractor renders + blooms
   live on the SNES via Mode 7 (`examples/snes/blossom.c`) — far read-modify-write accumulation into a
   128×128 hit grid (`$7E2000`), revealed band-by-band (far grid → near `chrbuf` → VRAM DMA), hue-wheel
@@ -371,7 +371,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~ *(2026‑07‑26 refresh: now 13 headers / 113 demos; the "0 indirect JMPs / LTO devirtualized" claim was a measurement artifact — 1 `__call_indir` call survives; mandel-display has since diverged so +338 B is historical. Corrected in `docs/oop-in-c.md` §4–§5 + new §8 static-vs-virtual benchmark.)*
 - [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
-- [ ] **SNES demos — startup garbage fix + title screens** ([plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)).
+- [T3] **SNES demos — startup garbage fix + title screens** ([plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)).
   User-reported: Newton "starts off with garbage" + "takes too long to show anything". **Part A (garbage) root-caused
   + fixed in source:** commit `ac9c0b2` regressed Newton's tilemap palette field to `root<<12` (selects uninitialised
   CGRAM palettes 4–5 = garbage); reverted to `root<<10` (palette field is bits 10-12, per `hud.h:46`). Battery audit:
@@ -398,7 +398,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   k≈0.062) + full-grid noise seeding → real Turing spots/worms. Grid 32×24 (RAM fit). New gate hash 0x5555
   (was 0x8484); `expected.tsv` + manifest updated. Differential host==default==a16==xy16==0x5555 on bsnes-jg,
   disasm `__mulsi3=6`. [plan §Update 2026-06-28](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md). Re-published.
-- [ ] **Compiler stress-test demo battery — algorithm+visual SNES demos**
+- [T3] **Compiler stress-test demo battery — algorithm+visual SNES demos**
   ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. Each hits a
@@ -408,8 +408,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   runtime/library — not a codegen patch): #116 `backtrack` (deep multi-frame longjmp unwind, the unblocked #35
   backtracking solver — the flagship), #117 `csrjmp` (all 14 `__rc18..31` CSRs live across the jump), #118
   `retryjmp` (re-entrant setjmp site, varying depth + deep soft stack). Beyond the `corpus/setjmp_sim.c` guard.
-  - [ ] **#102 cpu6502** — 6502/65C02 CPU Disassembler + Simulator (a genuinely NEW showcase demo, not a hardening re-stress). Simulates a pure 6502/65C02 (8-bit A/X/Y, 16-bit PC) running the 6502-assembly equivalent of `hello.c` (green color reg + sentinel 0x42, then a loop exercising every ALU gate). On-screen: a scrolling **Waldo 16×16** disassembly listing (highlighted current instruction) + 8 schematic ALU gate symbols (AND/OR/XOR as classic shapes; ADD/SUB/SHL/SHR/CMP blocks) — the gate for the just-executed instruction lights yellow; live register + flag strip. Codegen stressed: **256-entry `switch` → jump table** (`jmp_table=4`), uint16_t PC arithmetic, uint8_t flag bit-ops. **Gate-green, clean positive:** `host==default==+mos-a16==+mos-xy16==0xAC8A` on MAME + bsnes-jg (pixel-identical render), `-verify` clean, `rep/sep=97`. ~~**Publish to biohack.net pending** (`/snes-rom-page`).~~ **ALREADY PUBLISHED — stale note, corrected 2026-07-26.** Live at ✓ [/snes/cpu6502/](https://biohack.net/snes/cpu6502/) (HTTP 200; shipped by biohack.net `aff09db` / tag `v1.0.254`, the full-screen-layout redesign — the page, ROM, preview and a manifest selfcheck `off=0xADD len=2 want=0xAC8A frames=1000` were all already in place). **Re-verified on the rebased toolchain (2026-07-26):** rebuilt ROM is **byte-identical** to both the site-repo copy and the live-served ROM (`sha256 c0df7cfd195ba8bb…`), and re-passes the gate on bsnes-jg (`SMOKE: PASS off=0xADD got=0xAC8A`, 1000 frames) with the render correct (`0019 CMP` highlighted + CMP gate lit). ([plan](docs/plans/2026-07-02-102-snes-cpu6502.md) · [rebase](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md))
-  - [ ] **Compiler-bug videos via the cpu6502 demo.** The cpu6502 simulator is a natural vehicle for showing compiler miscompiles visually — a wrong gate sequence or corrupted register value is immediately on-screen. Produce short MAME/bsnes-jg clips illustrating each known battery-caught bug (wrong output → fixed output). Depends on #102 shipping.
+  - [T4] **#102 cpu6502** — 6502/65C02 CPU Disassembler + Simulator (a genuinely NEW showcase demo, not a hardening re-stress). Simulates a pure 6502/65C02 (8-bit A/X/Y, 16-bit PC) running the 6502-assembly equivalent of `hello.c` (green color reg + sentinel 0x42, then a loop exercising every ALU gate). On-screen: a scrolling **Waldo 16×16** disassembly listing (highlighted current instruction) + 8 schematic ALU gate symbols (AND/OR/XOR as classic shapes; ADD/SUB/SHL/SHR/CMP blocks) — the gate for the just-executed instruction lights yellow; live register + flag strip. Codegen stressed: **256-entry `switch` → jump table** (`jmp_table=4`), uint16_t PC arithmetic, uint8_t flag bit-ops. **Gate-green, clean positive:** `host==default==+mos-a16==+mos-xy16==0xAC8A` on MAME + bsnes-jg (pixel-identical render), `-verify` clean, `rep/sep=97`. ~~**Publish to biohack.net pending** (`/snes-rom-page`).~~ **ALREADY PUBLISHED — stale note, corrected 2026-07-26.** Live at ✓ [/snes/cpu6502/](https://biohack.net/snes/cpu6502/) (HTTP 200; shipped by biohack.net `aff09db` / tag `v1.0.254`, the full-screen-layout redesign — the page, ROM, preview and a manifest selfcheck `off=0xADD len=2 want=0xAC8A frames=1000` were all already in place). **Re-verified on the rebased toolchain (2026-07-26):** rebuilt ROM is **byte-identical** to both the site-repo copy and the live-served ROM (`sha256 c0df7cfd195ba8bb…`), and re-passes the gate on bsnes-jg (`SMOKE: PASS off=0xADD got=0xAC8A`, 1000 frames) with the render correct (`0019 CMP` highlighted + CMP gate lit). ([plan](docs/plans/2026-07-02-102-snes-cpu6502.md) · [rebase](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md))
+  - [T3] **Compiler-bug videos via the cpu6502 demo.** The cpu6502 simulator is a natural vehicle for showing compiler miscompiles visually — a wrong gate sequence or corrupted register value is immediately on-screen. Produce short MAME/bsnes-jg clips illustrating each known battery-caught bug (wrong output → fixed output). Depends on #102 shipping.
   - [x] ~~**#105 crcwall** (Round 6, Cluster D) — Bit-Serial CRC Wall: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) via three interleaved bit-serial CRC shift registers (CRC-8/16/32) under register pressure — the DEFAULT-8-bit leg is load-bearing (0010 is not accum-gated). **Clean positive, fix holds:** default-8bit compiles clean, `asl/rol/lsr/ror=13`, `host==default==+mos-a16==+mos-xy16==0x8E47`, `-verify` clean.~~ ✓ [/snes/crcwall/](https://biohack.net/snes/crcwall/) ([plan](docs/plans/2026-07-02-105-snes-crcwall.md))
   - [x] ~~**#106 lfsr2** (Round 6, Cluster D) — Dual-LFSR Scrambler: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) with TWO dissimilar loop-carried shift registers live at once — a maximal-length **Galois** LFSR (shift + tap-XOR gated by the shifted-out bit) + a **Fibonacci** LFSR (XOR-of-taps → top bit) + a 16-bit Galois, stepped simultaneously (extra pressure). DEFAULT-8-bit leg load-bearing (0010 not accum-gated). **Clean positive, fix holds:** both 8-bit LFSRs maximal-length (period 255); default-8bit compiles clean `asl/rol/lsr/ror=15`, `host==default==+mos-a16==+mos-xy16==0x6AA3`, `-verify` clean ×3 (incl. default).~~ ✓ [/snes/lfsr2/](https://biohack.net/snes/lfsr2/) ([plan](docs/plans/2026-07-02-106-snes-lfsr2.md))
   - [x] ~~**#107 bitweave** (Round 6, Cluster D) — Serial Bit-Reversal Weave: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) via a serial **rotate-out/rotate-in carry loop** bit-reversal (`rev=(rev<<1)|(v&1); v>>=1`), loop-carried through the back edge — an 8-bit + a 16-bit reversal interleaved (two rev regs live). NO `__builtin_bitreverse` (the #54 bitshuffle contrast). DEFAULT-8-bit leg load-bearing. **Clean positive, fix holds:** bit-reversal is an INVOLUTION, gate folds `rev(rev(v))^v` self-check witness; default-8bit compiles clean `asl/rol/lsr/ror=20`, `host==default==+mos-a16==+mos-xy16==0x0E03`, `-verify` clean ×3 (incl. default).~~ ✓ [/snes/bitweave/](https://biohack.net/snes/bitweave/) ([plan](docs/plans/2026-07-02-107-snes-bitweave.md))
@@ -597,7 +597,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [ ] **Make `dev/build.sh`'s example loop continue-on-error + report a summary.** Split out from the
+- [T1] **Make `dev/build.sh`'s example loop continue-on-error + report a summary.** Split out from the
   `mandel-double` fix below (now done). The loop is a plain `for` under `set -e`, so ONE unbuildable
   demo aborts the rest — `mandel-double` silently cost the 56 examples after it (`mandel-float`…
   `wireframe`), and the run still exits looking like it merely stopped. Collect failures, keep going,
@@ -661,7 +661,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
 — keep it in sync (drafted → ready-to-post → posted) with the items in this section._
 
-- [wip] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — 🏁 WAVE 1
+- [wip T5] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — 🏁 WAVE 1
   COMPLETE 2026-07-26).** ✅ **All three Wave-1 items live upstream:** `0016` G_SCMP/G_UCMP = issue
   [#576](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
   [#577](https://github.com/llvm-mos/llvm-mos/pull/577) (`wbniv:mos-scmp-ucmp-legalize`, fix + lit
@@ -679,21 +679,21 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   Re-verified 2026-07-26 (post-move): upstream tip `8b616af94` (lld-only #567 on top of our base);
   `0010/0011/0012/0015/0016` all `apply --check` clean against it. **Every outward action (branch
   push, PR, issue) is individually user-triggered.**
-- [ ] **Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR).** Build ON @Phillip-May's
+- [T4] **Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR).** Build ON @Phillip-May's
   stalled-but-working SDK scaffolding, don't replace it: reuse his `snesxc` register lib + multi-bank
   linker (with credit); contribute on top our native-mode crt0 (unlocks 16-bit codegen) + the
   dual-emulator CI bench his PR lacks; keep the backend codegen (#320/#321) entirely separate (it
   lands in `llvm-mos`, targets any `-mcpu=mosw65816` platform). Strategy + the tier-1/tier-2
   positioning note for engaging @asiekierka on #321 are drafted in
   [415-snes-target-reconciliation](docs/415-snes-target-reconciliation.md). User-triggered (posting).
-- [wip] **Upstream the F4 `mos-late-opt` TXY/TYX dead-flag fix** — ✅ **PR
+- [wip T3] **Upstream the F4 `mos-late-opt` TXY/TYX dead-flag fix** — ✅ **PR
   [#562](https://github.com/llvm-mos/llvm-mos/pull/562) opened 2026-06-22.** Upstream llvm-mos bug
   (`MOSLateOptimization.cpp`); **breaking commit = `dbce7ad1e9cd2`** ("Support emitting TXY/TYX on
   W65816/65EL02", #299, 2023-06-17) — added the TYX/TXY rewrite branches without setting `Load`, so they
   skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
   `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
   [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
-- [ ] **Post the register-scavenger live-`$p` fix PR (`0011`) + the `LDCImm` set-lowering fix PR (`0012`)**
+- [T3] **Post the register-scavenger live-`$p` fix PR (`0011`) + the `LDCImm` set-lowering fix PR (`0012`)**
   (user-triggered). The scavenger N/Z crash is now **FIXED** (was an issue-with-no-fix): route a live `$p`
   hard-stack-neutrally through a dead index reg into `RC17` for the unbalanced case + drop the stale
   `assertNZDeadAt`. Fixing it surfaced a second pristine-upstream bug (`LDCImm 1` → `MCInstLower` unreachable),
@@ -701,7 +701,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 4) · bodies
   [scavenger](docs/upstream-scavenger-live-p-pr.md) + [LDCImm](docs/upstream-ldcimm-set-lowering-pr.md) ·
   [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
-- [wip] **DP-pointer-argument calling-convention crash — reported + FIXED upstream** — ✅ **issue
+- [wip T2] **DP-pointer-argument calling-convention crash — reported + FIXED upstream** — ✅ **issue
   [#561](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22) + fix [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563)
   (2026-06-23, `Fixes #561` → auto-closes on merge).** Passing an `addrspace(1)` (8-bit direct-page) pointer
   **argument** crashed the MOS backend: the CC materialized it into a 16-bit `RS` reg → illegal `(p1)=COPY
@@ -713,18 +713,18 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   (`e0e8bd4`); drop on merge + bump the vendor pin. **Awaiting upstream review.**
   [plan](docs/plans/2026-06-22-320-far-value-residuals.md) (Part A) · issue body
   `docs/320-upstream-dp-arg-cc-issue.md` · PR body `docs/320-upstream-dp-arg-cc-pr.md`.
-- [ ] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
+- [T5] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
   `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
   [docs/321-upstream-dwarf-output-elf-companion.md](docs/321-upstream-dwarf-output-elf-companion.md).
-- [ ] **Post the #321 CC frame-ABI design note** (user-triggered; note, not a PR). Implementation-backed
+- [T5] **Post the #321 CC frame-ABI design note** (user-triggered; note, not a PR). Implementation-backed
   evidence for the calling-convention discussion: the per-frame DP-window/stack-relative ABIs are feasible
   but NULL on real code (0/13 functions profit — locals are `__rc`-resident), so keep the soft static stack
   by measurement. Exact `gh issue comment 321` (and/or Discord CC thread) in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 6) · body
   [docs/321-upstream-cc-frame-abi-note.md](docs/321-upstream-cc-frame-abi-note.md) · record
   [frame-ABI study §Outcome](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
-- [ ] **#320 far-pointer codegen body — feature-complete, but Future/blocked** (not a postable artifact yet).
+- [T4] **#320 far-pointer codegen body — feature-complete, but Future/blocked** (not a postable artifact yet).
   The fork's whole far-pointer slice (far calls (b); far function pointers (a) incl. the clang `far`/`long_call`
   attribute, typed `far_fn_t` variable, `sizeof(far*)==4`, the far_indir/`isFarSymbol` crash fix) is now
   feature-complete + pushed `origin/wt/320-far-followups`, verified both emulators. It forms the bulk of the
@@ -745,13 +745,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `__memset_far` "blocker" was a `MOS_TOOLCHAIN` host-vs-container path footgun (pass
   `/work/build/llvm-mos-install`, not `$PWD/...`), not a snes-far defect.
   [evidence](docs/plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md).
-- [ ] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
+- [T1] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
   `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
   uncomment the two trigger lines in the `on:` block.
 
 ### Distribution / Packaging
 
-- [ ] **#321 Cross-platform toolchain builds — interim `linux-arm64` + `windows-x86_64` (keep `linux-x86_64`),
+- [T4] **#321 Cross-platform toolchain builds — interim `linux-arm64` + `windows-x86_64` (keep `linux-x86_64`),
   cross-compiled from the existing Linux x86-64 Docker** (no mac/Win CI runners; scope locked 2026-06-25).
   Until #321 merges/fixes upstream, upstream CI emits no binary carrying these patches, so arm64-Linux /
   Windows devs have no prebuilt fork — ship those two. Only the host binaries (clang/lld/llvm-*) differ per
@@ -771,7 +771,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   functional self-test needs a real Mac) — out of interim scope, likely retired by upstream CI. Whole
   capability retires when `0001–0009` land upstream. [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
-- [ ] **Clean-room test of the *published* SNES compiler — wired into the publish gate** — in a throwaway
+- [T3] **Clean-room test of the *published* SNES compiler — wired into the publish gate** — in a throwaway
   Docker container with NO dev toolchain, acquire the published compiler and compile a **sound-free**
   reference Mandelbrot (`examples/snes/mandel-display.c`, 64×56 N=15, CRC `0x204F` — now the far/16-bit
   tester, so **`+mos-a16`-only**; secondary `examples/65816/k_mandel.c` `0x820B`, default-8bit + `+mos-a16`),
@@ -813,11 +813,11 @@ revisit) rather than active work._
 
 ## Parked
 
-- [ ] **Mesen2 as a third emulator** — abandoned for now: the prebuilt crashes on 26.04
+- [T3] **Mesen2 as a third emulator** — abandoned for now: the prebuilt crashes on 26.04
   (glibc-2.43) and headless `--testrunner` won't run Lua; would need a source build against 26.04.
   MAME + bsnes-jg already give a two-emulator cross-check, so this is shelved unless a third opinion
   is needed. [second-emulator plan](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
-- [ ] **Formal #320/#321 psABI document** — deferred as premature: llvm-mos is implementation-first
+- [T4] **Formal #320/#321 psABI document** — deferred as premature: llvm-mos is implementation-first
   (@mysterymath won't bless an ABI ahead of a high-quality implementation). Promote once a credible
   implementation exists or the maintainers ask. Overlaps the WDC816CC/ORCA-C prior-art item above.
   [upstream design-note plan](docs/plans/2026-06-14-320-upstream-design-note.md).
