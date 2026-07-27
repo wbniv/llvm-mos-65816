@@ -312,10 +312,23 @@ static void load_fonts(void){
 }
 static void load_chevrons(void){
   for(uint16_t i=0;i<256;i++)objpix[i]=0;
+  /*
+   * A transparent three-pixel stroke disappears into high-frequency artwork
+   * and looks like corrupt OBJ data.  Give the navigation mark an opaque,
+   * rounded 16x16 badge, then draw a thick gold chevron over it.  Horizontal
+   * OBJ flip supplies the right-facing version.
+   */
   for(uint8_t y=0;y<16;y++){
-    uint8_t x=(uint8_t)(4u+(y<8u?7u-y:y-8u));
-    if(y&&x<13u)for(uint8_t n=0;n<3;n++)objpix[(uint16_t)y*16u+x+n+1u]=1;
-    for(uint8_t n=0;n<3;n++)objpix[(uint16_t)y*16u+x+n]=2;
+    uint8_t inset=(uint8_t)((y==0u||y==15u)?3u:
+                            (y==1u||y==14u)?1u:0u);
+    for(uint8_t x=inset;x<(uint8_t)(16u-inset);x++)
+      objpix[(uint16_t)y*16u+x]=1;
+  }
+  for(uint8_t y=2;y<14;y++){
+    uint8_t d=(uint8_t)(y<8u?7u-y:y-8u);
+    uint8_t x=(uint8_t)(3u+d);
+    for(uint8_t n=0;n<4u;n++)
+      objpix[(uint16_t)y*16u+x+n]=2;
   }
   for(uint8_t ty=0;ty<2;ty++)for(uint8_t tx=0;tx<2;tx++)for(uint8_t y=0;y<8;y++){
     uint8_t p0=0,p1=0;
