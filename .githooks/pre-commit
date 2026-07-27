@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(git rev-parse --show-toplevel)
+shared_hooks=$(git config --global --get core.hooksPath || true)
+if [[ -n "$shared_hooks" ]]; then
+    case "$shared_hooks" in
+        /*) shared_pre_commit="$shared_hooks/pre-commit" ;;
+        *) shared_pre_commit="$HOME/$shared_hooks/pre-commit" ;;
+    esac
+    if [[ -x "$shared_pre_commit" && "$shared_pre_commit" != "$repo_root/.githooks/pre-commit" ]]; then
+        "$shared_pre_commit"
+    fi
+fi
+
+if [[ "${SNESDQ_SKIP:-0}" == 1 ]]; then
+    echo "SNESDQ: BYPASSED by SNESDQ_SKIP=1" >&2
+    exit 0
+fi
+
+exec "$repo_root/dev/snes-display-quality.py"

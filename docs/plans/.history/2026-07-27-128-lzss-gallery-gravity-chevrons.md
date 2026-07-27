@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/a326ae5) | docs(plan #128): OAM budget proven, not assumed — 11-sprite worst case |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/d4471a4) | docs(plan): #128 gravity-chevrons — review pass + TODO entry |
 
 <!--history-meta v1
+a326ae5	author	Will Norris
+a326ae5	added	17
+a326ae5	deleted	4
+a326ae5	files	1
+a326ae5	body	User amendment: replace the review pass's "worst case can exceed 16\nsprites" claim with the actual projection arithmetic — 18-px max match x\nmin matrix_scale 152 = 31 screen px = <=4 rail tiles, <=1 row crossing,\nso source <=5 + destination <=5 + packet 1 = 11 <= 16 for the whole\n26-work corpus (verified against lzss-gallery-assets.h: scale min 152,\nwidth min 88). The degradation order is retained as future-proofing with\na new invariant: compute the sprite count before staging, never discover\noverflow by partially filling OAM. Verification split accordingly: real\nassets must fit outright; the degradation path is exercised by a\ndeliberately synthetic future-format span (the old "forced worst case"\ntest was unreachable with real codec output).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 d4471a4	author	Will Norris
 d4471a4	added	376
 d4471a4	deleted	0

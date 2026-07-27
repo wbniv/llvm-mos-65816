@@ -1,0 +1,1637 @@
+{
+  "schema": 1,
+  "purpose": "Reviewed legacy direct PPU/force-blank access sites; new sites fail.",
+  "findings": [
+    {
+      "id": "295d5f164baabba74f98",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 66,
+      "text": "REG_CGDATA = (uint8_t)PAL_DEAD; REG_CGDATA = (uint8_t)(PAL_DEAD >> 8); // colour 0"
+    },
+    {
+      "id": "199598ae4357ea6f24ca",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 67,
+      "text": "REG_CGDATA = (uint8_t)PAL_DEAD; REG_CGDATA = (uint8_t)(PAL_DEAD >> 8); // colour 1"
+    },
+    {
+      "id": "15ac25c68529e935dfcc",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 68,
+      "text": "REG_CGDATA = (uint8_t)PAL_DEAD; REG_CGDATA = (uint8_t)(PAL_DEAD >> 8); // colour 2"
+    },
+    {
+      "id": "2e0744d301aad1b23c91",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 69,
+      "text": "REG_CGDATA = (uint8_t)cad->live_colour; // colour 3 low"
+    },
+    {
+      "id": "ec765a0337696096b0dc",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 70,
+      "text": "REG_CGDATA = (uint8_t)(cad->live_colour >> 8); // colour 3 high"
+    },
+    {
+      "id": "9d8b96bc116ecaf02e5a",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 73,
+      "text": "snes_vram_addr(CA_CHR_WORD);"
+    },
+    {
+      "id": "4ece8ffbff3a2206cb6b",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 74,
+      "text": "for (uint16_t w = 0; w < (uint16_t)(1024u * 8u); w++) REG_VMDATA = 0;"
+    },
+    {
+      "id": "4dd1e053ac702fcee650",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 77,
+      "text": "snes_vram_addr(CA_MAP_WORD);"
+    },
+    {
+      "id": "c3e7d76ed35c7caf287c",
+      "kind": "ppu-write",
+      "path": "examples/snes/1d-ca.c",
+      "line": 80,
+      "text": "REG_VMDATA = (uint16_t)(r * 32u + c);"
+    },
+    {
+      "id": "bbf9f64fd102a3838843",
+      "kind": "ppu-write",
+      "path": "examples/snes/avalanche.c",
+      "line": 42,
+      "text": "REG_CGDATA = (uint8_t)(c & 0xFF);"
+    },
+    {
+      "id": "c364b8451ba4986d214a",
+      "kind": "ppu-write",
+      "path": "examples/snes/avalanche.c",
+      "line": 43,
+      "text": "REG_CGDATA = (uint8_t)(c >> 8);"
+    },
+    {
+      "id": "22824a0e53db2e4fac9f",
+      "kind": "ppu-write",
+      "path": "examples/snes/avalanche.c",
+      "line": 51,
+      "text": "REG_CGDATA = (uint8_t)(pal[0] & 0xFF); // black stays put"
+    },
+    {
+      "id": "ea9780f2937ac2fddc33",
+      "kind": "ppu-write",
+      "path": "examples/snes/avalanche.c",
+      "line": 52,
+      "text": "REG_CGDATA = (uint8_t)(pal[0] >> 8);"
+    },
+    {
+      "id": "4e68341474f106352321",
+      "kind": "ppu-write",
+      "path": "examples/snes/avalanche.c",
+      "line": 56,
+      "text": "REG_CGDATA = (uint8_t)(pal[1 + j] & 0xFF);"
+    },
+    {
+      "id": "821a0a5117c94054e272",
+      "kind": "ppu-write",
+      "path": "examples/snes/avalanche.c",
+      "line": 57,
+      "text": "REG_CGDATA = (uint8_t)(pal[1 + j] >> 8);"
+    },
+    {
+      "id": "b500633c09ffdbdbe1e5",
+      "kind": "ppu-write",
+      "path": "examples/snes/avalanche.c",
+      "line": 131,
+      "text": "snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));"
+    },
+    {
+      "id": "738b6e0d156973b8a063",
+      "kind": "ppu-write",
+      "path": "examples/snes/avalanche.c",
+      "line": 133,
+      "text": "for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = mat[base + c];"
+    },
+    {
+      "id": "f01ac826a12a65e92edd",
+      "kind": "ppu-write",
+      "path": "examples/snes/bf-vm.c",
+      "line": 67,
+      "text": "snes_vram_addr((uint16_t)(FONT_BASE * 8));"
+    },
+    {
+      "id": "50adad6e4d14831dadcc",
+      "kind": "ppu-write",
+      "path": "examples/snes/bf-vm.c",
+      "line": 68,
+      "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8; i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "84d837d1e40f1a164aae",
+      "kind": "ppu-write",
+      "path": "examples/snes/bf-vm.c",
+      "line": 76,
+      "text": "snes_vram_addr(h->map_word);"
+    },
+    {
+      "id": "5024a7944d2993f6b3c2",
+      "kind": "ppu-write",
+      "path": "examples/snes/bf-vm.c",
+      "line": 78,
+      "text": "for (uint16_t i = 0; i < 32u * 32u; i++) REG_VMDATA = blank;"
+    },
+    {
+      "id": "adf011d0b3438e0925be",
+      "kind": "ppu-write",
+      "path": "examples/snes/blossom.c",
+      "line": 114,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "adf011d0b3438e0925be",
+      "kind": "ppu-write",
+      "path": "examples/snes/blossom.c",
+      "line": 136,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "adf011d0b3438e0925be",
+      "kind": "ppu-write",
+      "path": "examples/snes/blossom.c",
+      "line": 175,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "adf011d0b3438e0925be",
+      "kind": "ppu-write",
+      "path": "examples/snes/blossom.c",
+      "line": 180,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "94c2ca5665a2fcb9b94f",
+      "kind": "ppu-write",
+      "path": "examples/snes/buddha.c",
+      "line": 109,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "94c2ca5665a2fcb9b94f",
+      "kind": "ppu-write",
+      "path": "examples/snes/buddha.c",
+      "line": 118,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "94c2ca5665a2fcb9b94f",
+      "kind": "ppu-write",
+      "path": "examples/snes/buddha.c",
+      "line": 129,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "94c2ca5665a2fcb9b94f",
+      "kind": "ppu-write",
+      "path": "examples/snes/buddha.c",
+      "line": 134,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "8a89926c92749eaffe13",
+      "kind": "ppu-write",
+      "path": "examples/snes/burning-ship.c",
+      "line": 64,
+      "text": "snes_vram_addr(BS_CHR);"
+    },
+    {
+      "id": "8a75d562daf5ceb2c542",
+      "kind": "ppu-write",
+      "path": "examples/snes/burning-ship.c",
+      "line": 68,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp01;"
+    },
+    {
+      "id": "9ef2678093db9ea4b55b",
+      "kind": "ppu-write",
+      "path": "examples/snes/burning-ship.c",
+      "line": 69,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp23;"
+    },
+    {
+      "id": "2682c88439288a70b3b5",
+      "kind": "ppu-write",
+      "path": "examples/snes/burning-ship.c",
+      "line": 71,
+      "text": "snes_vram_addr(BS_MAP);"
+    },
+    {
+      "id": "0adee66614f3304f1844",
+      "kind": "ppu-write",
+      "path": "examples/snes/burning-ship.c",
+      "line": 72,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(32u * 32u); i++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "e157aaabf6d85ee29598",
+      "kind": "ppu-write",
+      "path": "examples/snes/cordic.c",
+      "line": 116,
+      "text": "snes_vram_addr(c->map_word);"
+    },
+    {
+      "id": "89b4437d975e2bddd334",
+      "kind": "ppu-write",
+      "path": "examples/snes/cordic.c",
+      "line": 122,
+      "text": "REG_VMDATA = tile;"
+    },
+    {
+      "id": "5208f16d1435ccc644b2",
+      "kind": "ppu-write",
+      "path": "examples/snes/cordic.c",
+      "line": 138,
+      "text": "snes_vram_addr(c->chr_word);"
+    },
+    {
+      "id": "435c98540069cc21b898",
+      "kind": "ppu-write",
+      "path": "examples/snes/cordic.c",
+      "line": 145,
+      "text": "REG_VMDATA = lo;"
+    },
+    {
+      "id": "9f799d2a6a49986afc01",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 105,
+      "text": "snes_vram_addr((uint16_t)(T_F16 * 8));"
+    },
+    {
+      "id": "d413cd43f0ad5296580f",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 106,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(FONT16_N * 4 * 8); i++) REG_VMDATA = FONT16[i];"
+    },
+    {
+      "id": "325577d0ff6ecdd33145",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 108,
+      "text": "snes_vram_addr((uint16_t)(T_F8 * 8));"
+    },
+    {
+      "id": "89426f62492e13bd7f52",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 109,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(FONT8_N * 8); i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "76e71b7d761a3bc109a5",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 111,
+      "text": "snes_vram_addr((uint16_t)((T_F8 + 3) * 8));"
+    },
+    {
+      "id": "de64fdd817f0d8de6887",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 112,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = GLYPH_HASH[r];"
+    },
+    {
+      "id": "c4128144c8282f1c7fe2",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 113,
+      "text": "snes_vram_addr((uint16_t)((T_F8 + 4) * 8));"
+    },
+    {
+      "id": "70027583b1318e311587",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 114,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = GLYPH_DOLLAR[r];"
+    },
+    {
+      "id": "3fa896893c8b01a5495e",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 117,
+      "text": "snes_vram_addr((uint16_t)(T_GATE * 8));"
+    },
+    {
+      "id": "001683cca7050afbdf2b",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 118,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(8*6*8); i++) REG_VMDATA = gate_chr[i];"
+    },
+    {
+      "id": "0470e39141eaff3d9465",
+      "kind": "ppu-write",
+      "path": "examples/snes/cpu6502.c",
+      "line": 121,
+      "text": "for (uint8_t i = 0; i < 16; i++) { REG_CGDATA = (uint8_t)cgram[i]; REG_CGDATA = (uint8_t)(cgram[i] >> 8); }"
+    },
+    {
+      "id": "1f1af7297294fc2f7202",
+      "kind": "ppu-write",
+      "path": "examples/snes/doom-fire.c",
+      "line": 67,
+      "text": "snes_vram_addr(FIRE_CHR);"
+    },
+    {
+      "id": "fba28e6939b83c2f5767",
+      "kind": "ppu-write",
+      "path": "examples/snes/doom-fire.c",
+      "line": 71,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp01;"
+    },
+    {
+      "id": "0dec4105a7f0ae207fb5",
+      "kind": "ppu-write",
+      "path": "examples/snes/doom-fire.c",
+      "line": 72,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp23;"
+    },
+    {
+      "id": "c564edf6e4f5bf98f0e5",
+      "kind": "ppu-write",
+      "path": "examples/snes/doom-fire.c",
+      "line": 77,
+      "text": "snes_vram_addr(FIRE_MAP);"
+    },
+    {
+      "id": "4c9adcd9d00043770a55",
+      "kind": "ppu-write",
+      "path": "examples/snes/doom-fire.c",
+      "line": 78,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(32u * 32u); i++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "b92972ac33d3d1a4e947",
+      "kind": "ppu-write",
+      "path": "examples/snes/factorial.c",
+      "line": 62,
+      "text": "snes_vram_addr((uint16_t)(FONT_BASE * 8u));"
+    },
+    {
+      "id": "a5fe30fec53dd0088f19",
+      "kind": "ppu-write",
+      "path": "examples/snes/factorial.c",
+      "line": 63,
+      "text": "for (uint16_t i = 0u; i < (uint16_t)FONT8_N * 8u; i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "53412ee9f1cddba6b87c",
+      "kind": "ppu-write",
+      "path": "examples/snes/factorial.c",
+      "line": 70,
+      "text": "snes_vram_addr(fd->map_word);"
+    },
+    {
+      "id": "79837156ae53b6b33b6c",
+      "kind": "ppu-write",
+      "path": "examples/snes/factorial.c",
+      "line": 71,
+      "text": "for (uint16_t i = 0u; i < 32u * 32u; i++) REG_VMDATA = (uint16_t)FONT_BASE;"
+    },
+    {
+      "id": "765315070256c42d5ee2",
+      "kind": "ppu-write",
+      "path": "examples/snes/hdr-bloom.c",
+      "line": 51,
+      "text": "snes_vram_addr(BLOOM_CHR);"
+    },
+    {
+      "id": "f4aab9587ab1ddc54362",
+      "kind": "ppu-write",
+      "path": "examples/snes/hdr-bloom.c",
+      "line": 55,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp01;"
+    },
+    {
+      "id": "0d5fe313f6428c54096b",
+      "kind": "ppu-write",
+      "path": "examples/snes/hdr-bloom.c",
+      "line": 56,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp23;"
+    },
+    {
+      "id": "63b0bd39a6d3ecc3234e",
+      "kind": "ppu-write",
+      "path": "examples/snes/hdr-bloom.c",
+      "line": 60,
+      "text": "snes_vram_addr(BLOOM_MAP);"
+    },
+    {
+      "id": "24925fd27060f195c13b",
+      "kind": "ppu-write",
+      "path": "examples/snes/hdr-bloom.c",
+      "line": 61,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(32u * 32u); i++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "c48f0e0ea35cc0805ae4",
+      "kind": "ppu-write",
+      "path": "examples/snes/hello.c",
+      "line": 15,
+      "text": "REG_CGDATA = SNES_RGB(0, 31, 0) & 0xFF;"
+    },
+    {
+      "id": "3a50e662ae186294dc69",
+      "kind": "ppu-write",
+      "path": "examples/snes/hello.c",
+      "line": 16,
+      "text": "REG_CGDATA = SNES_RGB(0, 31, 0) >> 8;"
+    },
+    {
+      "id": "d61a5fc297c4a8655828",
+      "kind": "ppu-write",
+      "path": "examples/snes/hud.h",
+      "line": 39,
+      "text": "for (uint16_t i = 0; i < nwords; i++) REG_VMDATA = src[i];"
+    },
+    {
+      "id": "cb580b422bdb1c0227dd",
+      "kind": "ppu-write",
+      "path": "examples/snes/hud.h",
+      "line": 54,
+      "text": "REG_VMDATA = (ch >= FONT8_FIRST && ch < FONT8_FIRST + FONT8_N) ? (uint16_t)(ch - FONT8_FIRST) : 0;"
+    },
+    {
+      "id": "af2b10cabebfda87af64",
+      "kind": "ppu-write",
+      "path": "examples/snes/hud.h",
+      "line": 62,
+      "text": "for (uint8_t i = 0; i < n; i++) REG_VMDATA = 0x0000;"
+    },
+    {
+      "id": "d314e2aef3694bbbbb48",
+      "kind": "ppu-write",
+      "path": "examples/snes/hud.h",
+      "line": 86,
+      "text": "for (uint16_t i = 0; i < (uint16_t)HUD_COLS * 32; i++) REG_VMDATA = 0x0000; // blank (tile 0 = space)"
+    },
+    {
+      "id": "ee19d5e3419301803194",
+      "kind": "ppu-write",
+      "path": "examples/snes/julia.c",
+      "line": 59,
+      "text": "REG_CGDATA = (uint8_t)(c & 0xFF);"
+    },
+    {
+      "id": "e54c88d4d4b036e5f742",
+      "kind": "ppu-write",
+      "path": "examples/snes/julia.c",
+      "line": 60,
+      "text": "REG_CGDATA = (uint8_t)(c >> 8);"
+    },
+    {
+      "id": "c8a01cefca4251f47e8b",
+      "kind": "ppu-write",
+      "path": "examples/snes/julia.c",
+      "line": 71,
+      "text": "REG_CGDATA = (uint8_t)(pal[j] & 0xFF);"
+    },
+    {
+      "id": "5327110eb8836a70b135",
+      "kind": "ppu-write",
+      "path": "examples/snes/julia.c",
+      "line": 72,
+      "text": "REG_CGDATA = (uint8_t)(pal[j] >> 8);"
+    },
+    {
+      "id": "1c17dbd15be877e1e67e",
+      "kind": "ppu-write",
+      "path": "examples/snes/julia.c",
+      "line": 74,
+      "text": "REG_CGDATA = (uint8_t)(pal[DN] & 0xFF); // interior stays put (black)"
+    },
+    {
+      "id": "4f09093599aa0988f46a",
+      "kind": "ppu-write",
+      "path": "examples/snes/julia.c",
+      "line": 75,
+      "text": "REG_CGDATA = (uint8_t)(pal[DN] >> 8);"
+    },
+    {
+      "id": "49be1464e8b9a458a2f7",
+      "kind": "ppu-write",
+      "path": "examples/snes/julia.c",
+      "line": 119,
+      "text": "snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));"
+    },
+    {
+      "id": "4547fbc7b20081432257",
+      "kind": "ppu-write",
+      "path": "examples/snes/julia.c",
+      "line": 121,
+      "text": "for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = fb[base + c]; // FAR LOAD"
+    },
+    {
+      "id": "5bb2f3326e9d9a85b314",
+      "kind": "ppu-write",
+      "path": "examples/snes/life.c",
+      "line": 71,
+      "text": "REG_CGDATA = (uint8_t)LIFE_DEAD; REG_CGDATA = (uint8_t)(LIFE_DEAD >> 8); /* colour 0 */"
+    },
+    {
+      "id": "51073084784591b58455",
+      "kind": "ppu-write",
+      "path": "examples/snes/life.c",
+      "line": 72,
+      "text": "REG_CGDATA = (uint8_t)LIFE_DEAD; REG_CGDATA = (uint8_t)(LIFE_DEAD >> 8); /* colour 1 */"
+    },
+    {
+      "id": "2d6db47269fd4e6a0753",
+      "kind": "ppu-write",
+      "path": "examples/snes/life.c",
+      "line": 73,
+      "text": "REG_CGDATA = (uint8_t)LIFE_DEAD; REG_CGDATA = (uint8_t)(LIFE_DEAD >> 8); /* colour 2 */"
+    },
+    {
+      "id": "015e12fadd1a0190b81e",
+      "kind": "ppu-write",
+      "path": "examples/snes/life.c",
+      "line": 74,
+      "text": "REG_CGDATA = (uint8_t)LIFE_LIVE; REG_CGDATA = (uint8_t)(LIFE_LIVE >> 8); /* colour 3 */"
+    },
+    {
+      "id": "553756800ede421a7e51",
+      "kind": "ppu-write",
+      "path": "examples/snes/life.c",
+      "line": 77,
+      "text": "snes_vram_addr(LIFE_CHR);"
+    },
+    {
+      "id": "32c7f38f0474b0267ed2",
+      "kind": "ppu-write",
+      "path": "examples/snes/life.c",
+      "line": 78,
+      "text": "for (uint16_t w = 0; w < (uint16_t)((LIFE_NTILES + 1u) * 8u); w++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "28a07f62a2af9914457b",
+      "kind": "ppu-write",
+      "path": "examples/snes/life.c",
+      "line": 83,
+      "text": "snes_vram_addr(LIFE_MAP);"
+    },
+    {
+      "id": "f1c275bb81c8f876598e",
+      "kind": "ppu-write",
+      "path": "examples/snes/life.c",
+      "line": 89,
+      "text": "REG_VMDATA = tile;"
+    },
+    {
+      "id": "15f38497009938535230",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 394,
+      "text": "REG_DAS0L=0;REG_DAS0H=0x80;REG_MDMAEN=1;"
+    },
+    {
+      "id": "15f38497009938535230",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 396,
+      "text": "REG_DAS0L=0;REG_DAS0H=0x80;REG_MDMAEN=1;"
+    },
+    {
+      "id": "4d2d9e6082d25b8411bb",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 399,
+      "text": "REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=at;while(n--)REG_VMDATA=*p++;"
+    },
+    {
+      "id": "2c71a7df07a93d786d6e",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 406,
+      "text": "for(uint8_t r=0;r<8;r++)REG_VMDATA=FONT16[g*32u+(uint16_t)tile*8u+r];"
+    },
+    {
+      "id": "88e83ee192bdda797ffe",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 407,
+      "text": "for(uint8_t r=0;r<8;r++)REG_VMDATA=0;"
+    },
+    {
+      "id": "711cbeae9a15afb6c2ae",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 488,
+      "text": "REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;"
+    },
+    {
+      "id": "b3038ac9d158ebbec857",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 489,
+      "text": "uint16_t c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "121056e17d14b4fe9f95",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 490,
+      "text": "c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "c2b5be2d0ea3b213ff69",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 493,
+      "text": "c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "63243281c4055db252fe",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 494,
+      "text": "c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "f698ad225bf4ec3be1b5",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 499,
+      "text": "for(uint8_t i=0;i<128;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=0;REG_OAMDATA=0;}"
+    },
+    {
+      "id": "69f1a273217549397fb8",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 500,
+      "text": "REG_OAMADDL=0;REG_OAMADDH=1;for(uint8_t i=0;i<32;i++)REG_OAMDATA=0;"
+    },
+    {
+      "id": "3de20dd0fc4ec665c072",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 504,
+      "text": "REG_OAMDATA=0x0a;REG_OAMDATA=0;"
+    },
+    {
+      "id": "0181f636b0853b1e263c",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 509,
+      "text": "REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=ARROW_L_REST;REG_OAMDATA=0x30;"
+    },
+    {
+      "id": "41667ca7be0ef7af5e01",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 510,
+      "text": "REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=ARROW_R_REST;REG_OAMDATA=0x30;"
+    },
+    {
+      "id": "501a435c5a641e8ddf29",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 520,
+      "text": "REG_MDMAEN=1;"
+    },
+    {
+      "id": "8c7f7d1b5b2c572ff394",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 589,
+      "text": "REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=MAP2;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(PAL16<<10);"
+    },
+    {
+      "id": "438b19d44a3537ce714d",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 590,
+      "text": "REG_VMADD=MAP3;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(PAL8<<10);"
+    },
+    {
+      "id": "8f92934b7bdc4280a5bd",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 598,
+      "text": "REG_VMDATA=t;REG_VMDATA=(uint16_t)(t+1u);"
+    },
+    {
+      "id": "eed377eee73fec34dd0a",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 600,
+      "text": "REG_VMDATA=(uint16_t)(t+2u);REG_VMDATA=(uint16_t)(t+3u);"
+    },
+    {
+      "id": "4b3da8c4ec1a01fcecba",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 609,
+      "text": "REG_VMDATA=(uint16_t)(tile|(PAL8<<10));}"
+    },
+    {
+      "id": "cde39bdd47781561afda",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 704,
+      "text": "for(uint8_t line=0;line<3;line++){REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)(row+line)*32u);for(uint8_t i=0;i<32;i++)REG_VMDATA=0;}"
+    },
+    {
+      "id": "87dc584aa96e8d05264e",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 720,
+      "text": "REG_CGADD=0;for(uint16_t i=0;i<512u;i++)REG_CGDATA=a->pal[i];"
+    },
+    {
+      "id": "b6061205e039a579ad71",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 722,
+      "text": "REG_CGADD=28;REG_CGDATA=0;REG_CGDATA=0;"
+    },
+    {
+      "id": "121056e17d14b4fe9f95",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 723,
+      "text": "c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "6ee00ad56829f21cea48",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 724,
+      "text": "c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "bd36e20d1d6ce1da2138",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 725,
+      "text": "REG_CGDATA=0;REG_CGDATA=0;"
+    },
+    {
+      "id": "ddf78efdb8dfa566e31c",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 726,
+      "text": "REG_CGADD=(uint8_t)(PAL16*16u);REG_CGDATA=0;REG_CGDATA=0;"
+    },
+    {
+      "id": "121056e17d14b4fe9f95",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 727,
+      "text": "c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "6ee00ad56829f21cea48",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 728,
+      "text": "c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "711cbeae9a15afb6c2ae",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 729,
+      "text": "REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;"
+    },
+    {
+      "id": "6ee00ad56829f21cea48",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 730,
+      "text": "c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "121056e17d14b4fe9f95",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 731,
+      "text": "c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "c2b5be2d0ea3b213ff69",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 734,
+      "text": "c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "63243281c4055db252fe",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 735,
+      "text": "c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+    },
+    {
+      "id": "59a0b4d23dad364133d3",
+      "kind": "ppu-write",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 748,
+      "text": "REG_DAS0L=(uint8_t)n;REG_DAS0H=(uint8_t)(n>>8);REG_MDMAEN=1;"
+    },
+    {
+      "id": "d20c017017fcd83eaa73",
+      "kind": "force-blank",
+      "path": "examples/snes/lzss-gallery.c",
+      "line": 764,
+      "text": "active_asset=a;REG_HDMAEN=0;REG_INIDISP=INIDISP_FORCE_BLANK;"
+    },
+    {
+      "id": "7d9d334d4988a1fc7557",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 54,
+      "text": "REG_CGDATA = (uint8_t)(c & 0xFF);"
+    },
+    {
+      "id": "15cdb16b09b21c1bc2fb",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 55,
+      "text": "REG_CGDATA = (uint8_t)(c >> 8);"
+    },
+    {
+      "id": "d32e81ae131dcd8eb969",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 67,
+      "text": "REG_CGDATA = (uint8_t)(pal[j] & 0xFF);"
+    },
+    {
+      "id": "ed68dd99d1383da72d4b",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 68,
+      "text": "REG_CGDATA = (uint8_t)(pal[j] >> 8);"
+    },
+    {
+      "id": "61cf4b2a85b107f73255",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 70,
+      "text": "REG_CGDATA = (uint8_t)(pal[DN] & 0xFF); // interior stays put (black)"
+    },
+    {
+      "id": "c70f1d4c511a98091bd3",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 71,
+      "text": "REG_CGDATA = (uint8_t)(pal[DN] >> 8);"
+    },
+    {
+      "id": "39368b614acf0c356b48",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 94,
+      "text": "REG_MDMAEN = 0x01; // trigger ch0 (CPU stalls until done)"
+    },
+    {
+      "id": "66ccb2f4977d37227c6d",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 175,
+      "text": "snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));"
+    },
+    {
+      "id": "8f16335897d99f963a82",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-display.c",
+      "line": 177,
+      "text": "for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = fb[base + c]; // FAR LOAD"
+    },
+    {
+      "id": "9e93c5bcab174f195fc3",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 82,
+      "text": "REG_CGDATA = (uint8_t)(c & 0xFF);"
+    },
+    {
+      "id": "e290b63c4b5228a8cb28",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 83,
+      "text": "REG_CGDATA = (uint8_t)(c >> 8);"
+    },
+    {
+      "id": "c785185bdd14c819f9ed",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 93,
+      "text": "REG_CGDATA = (uint8_t)(pal[j] & 0xFF);"
+    },
+    {
+      "id": "3025ee8759bb405d378f",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 94,
+      "text": "REG_CGDATA = (uint8_t)(pal[j] >> 8);"
+    },
+    {
+      "id": "9e9570988f3afc527d7f",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 96,
+      "text": "REG_CGDATA = (uint8_t)(pal[DN] & 0xFF);"
+    },
+    {
+      "id": "a51669a8aefd0e2baef8",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 97,
+      "text": "REG_CGDATA = (uint8_t)(pal[DN] >> 8);"
+    },
+    {
+      "id": "044de6a46536fd410ec0",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 162,
+      "text": "snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));"
+    },
+    {
+      "id": "8b4690be636d9a8476a2",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 164,
+      "text": "for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = fb[base + c]; // FAR LOAD"
+    },
+    {
+      "id": "044de6a46536fd410ec0",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 187,
+      "text": "snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));"
+    },
+    {
+      "id": "8b4690be636d9a8476a2",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-double.c",
+      "line": 189,
+      "text": "for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = fb[base + c]; // FAR LOAD"
+    },
+    {
+      "id": "3ddd7eec67522b7b7222",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 66,
+      "text": "REG_CGDATA = (uint8_t)(c & 0xFF);"
+    },
+    {
+      "id": "78d74ba51ae959e94f85",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 67,
+      "text": "REG_CGDATA = (uint8_t)(c >> 8);"
+    },
+    {
+      "id": "c95194875ee9bf81218f",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 77,
+      "text": "REG_CGDATA = (uint8_t)(pal[j] & 0xFF);"
+    },
+    {
+      "id": "7d65b8ee62a8b78718d9",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 78,
+      "text": "REG_CGDATA = (uint8_t)(pal[j] >> 8);"
+    },
+    {
+      "id": "e014d07281cdd5c167d6",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 80,
+      "text": "REG_CGDATA = (uint8_t)(pal[DN] & 0xFF);"
+    },
+    {
+      "id": "bfc62d6b9f85eb3960bd",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 81,
+      "text": "REG_CGDATA = (uint8_t)(pal[DN] >> 8);"
+    },
+    {
+      "id": "266d0682f3df75f010f6",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 127,
+      "text": "snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));"
+    },
+    {
+      "id": "04e3d49902187824c77b",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 129,
+      "text": "for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = fb[base + c]; // FAR LOAD"
+    },
+    {
+      "id": "266d0682f3df75f010f6",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 153,
+      "text": "snes_vram_addr((uint16_t)((uint16_t)(trow * TILES_W + tcol) * 64 + (uint16_t)r * 8));"
+    },
+    {
+      "id": "04e3d49902187824c77b",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-float.c",
+      "line": 155,
+      "text": "for (uint8_t c = 0; c < 8; c++) REG_VMDATAH = fb[base + c]; // FAR LOAD"
+    },
+    {
+      "id": "693ebd30168deb23d9d8",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-oop.c",
+      "line": 90,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "96299fe877b5a9f4b672",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-oop.c",
+      "line": 169,
+      "text": "REG_CGDATA = (uint8_t)(c & 0xFF);"
+    },
+    {
+      "id": "b2544e326ab7afc94d3e",
+      "kind": "ppu-write",
+      "path": "examples/snes/mandel-oop.c",
+      "line": 170,
+      "text": "REG_CGDATA = (uint8_t)(c >> 8);"
+    },
+    {
+      "id": "6b8595edc8417206c428",
+      "kind": "ppu-write",
+      "path": "examples/snes/maze.c",
+      "line": 81,
+      "text": "snes_vram_addr(MV_CHR);"
+    },
+    {
+      "id": "431d97e24f9a080db313",
+      "kind": "ppu-write",
+      "path": "examples/snes/maze.c",
+      "line": 86,
+      "text": "for (uint8_t r = 0u; r < 8u; r++) REG_VMDATA = w[r];"
+    },
+    {
+      "id": "30e95558eae0c023c11b",
+      "kind": "ppu-write",
+      "path": "examples/snes/maze.c",
+      "line": 90,
+      "text": "snes_vram_addr(v->map_word);"
+    },
+    {
+      "id": "a0a65678260d5a10b8c0",
+      "kind": "ppu-write",
+      "path": "examples/snes/maze.c",
+      "line": 91,
+      "text": "for (uint16_t i = 0u; i < 32u * 32u; i++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "a90b469ee4069baf6d7f",
+      "kind": "ppu-write",
+      "path": "examples/snes/mode7.h",
+      "line": 25,
+      "text": "REG_MDMAEN = 0x01;"
+    },
+    {
+      "id": "7062c52fc28520e3b4fc",
+      "kind": "ppu-write",
+      "path": "examples/snes/mode7.h",
+      "line": 31,
+      "text": "REG_VMAIN = VMAIN_INC_HIGH_1; REG_VMADD = word; REG_VMDATAL = tile;"
+    },
+    {
+      "id": "d864e3ac0f8bb7d0305e",
+      "kind": "ppu-write",
+      "path": "examples/snes/multibase.c",
+      "line": 43,
+      "text": "snes_vram_addr((uint16_t)(FONT_BASE * 8));"
+    },
+    {
+      "id": "8e92f4dd65671acbc11e",
+      "kind": "ppu-write",
+      "path": "examples/snes/multibase.c",
+      "line": 44,
+      "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8u; i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "583758872dfa67eec402",
+      "kind": "ppu-write",
+      "path": "examples/snes/multibase.c",
+      "line": 49,
+      "text": "snes_vram_addr(l->map_word);"
+    },
+    {
+      "id": "5305642892320cd23a81",
+      "kind": "ppu-write",
+      "path": "examples/snes/multibase.c",
+      "line": 50,
+      "text": "for (uint16_t i = 0; i < 32u * 32u; i++) REG_VMDATA = FONT_BASE;"
+    },
+    {
+      "id": "ff2fb87c319773eba00d",
+      "kind": "ppu-write",
+      "path": "examples/snes/newton.c",
+      "line": 71,
+      "text": "snes_vram_addr(NEWTON_CHR);"
+    },
+    {
+      "id": "650bd2a6608334dad199",
+      "kind": "ppu-write",
+      "path": "examples/snes/newton.c",
+      "line": 75,
+      "text": "for (uint8_t row = 0; row < 8u; row++) REG_VMDATA = bp01;"
+    },
+    {
+      "id": "826f92283adb53da39a2",
+      "kind": "ppu-write",
+      "path": "examples/snes/newton.c",
+      "line": 76,
+      "text": "for (uint8_t row = 0; row < 8u; row++) REG_VMDATA = bp23;"
+    },
+    {
+      "id": "fbbd68b46e94d5127b4e",
+      "kind": "ppu-write",
+      "path": "examples/snes/newton.c",
+      "line": 83,
+      "text": "snes_vram_addr(NEWTON_MAP);"
+    },
+    {
+      "id": "d1f8b3cbcd175d8baeca",
+      "kind": "ppu-write",
+      "path": "examples/snes/newton.c",
+      "line": 84,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(32u * 32u); i++) REG_VMDATA = 0;"
+    },
+    {
+      "id": "a1f57fd9108a285a1b71",
+      "kind": "ppu-write",
+      "path": "examples/snes/rdiff.c",
+      "line": 69,
+      "text": "snes_vram_addr(RDIFF_CHR);"
+    },
+    {
+      "id": "942076b16e3a9da0e7d1",
+      "kind": "ppu-write",
+      "path": "examples/snes/rdiff.c",
+      "line": 73,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp01;"
+    },
+    {
+      "id": "0deaf69e821ab2e906ab",
+      "kind": "ppu-write",
+      "path": "examples/snes/rdiff.c",
+      "line": 74,
+      "text": "for (uint8_t r = 0; r < 8; r++) REG_VMDATA = bp23;"
+    },
+    {
+      "id": "fd8d2b34a939905c21ab",
+      "kind": "ppu-write",
+      "path": "examples/snes/rdiff.c",
+      "line": 79,
+      "text": "snes_vram_addr(RDIFF_MAP);"
+    },
+    {
+      "id": "1f2cff6ca0211a5c4691",
+      "kind": "ppu-write",
+      "path": "examples/snes/rdiff.c",
+      "line": 80,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(32u * 32u); i++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "e92d027e31423f47cdbc",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/bitmap_canvas.h",
+      "line": 57,
+      "text": "snes_vram_addr(c->map_word);"
+    },
+    {
+      "id": "3c36b3148a2757d2babc",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/bitmap_canvas.h",
+      "line": 63,
+      "text": "REG_VMDATA = tile;"
+    },
+    {
+      "id": "fa5d03a76dba4eb563f6",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/bitmap_canvas.h",
+      "line": 66,
+      "text": "snes_vram_addr(c->chr_word);"
+    },
+    {
+      "id": "a81db7f47be0c137ff6c",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/bitmap_canvas.h",
+      "line": 67,
+      "text": "for (uint16_t w = 0; w < (uint16_t)(CANVAS_NTILES * 8 + 8); w++) REG_VMDATA = 0;"
+    },
+    {
+      "id": "39804e2b0145c6ddef48",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/display.h",
+      "line": 57,
+      "text": "through REG_VMDATA, which is only legal while the boot force-blank is still up; the first"
+    },
+    {
+      "id": "ddaac4a5082e3b034d43",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 92,
+      "text": "REG_VMDATAH = (uint8_t)((fb & bit) ? M7T_FACE : ((sb & bit) ? M7T_SHADOW : 0u));"
+    },
+    {
+      "id": "1194e613c683853cd0d5",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 110,
+      "text": "REG_VMDATAL = (uint8_t)(4u * g + 0u);"
+    },
+    {
+      "id": "efc075f2e2f8b4227a08",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 111,
+      "text": "REG_VMDATAL = (uint8_t)(4u * g + 1u);"
+    },
+    {
+      "id": "4dbd863b991e321af4a8",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 117,
+      "text": "REG_VMDATAL = (uint8_t)(4u * g + 2u);"
+    },
+    {
+      "id": "0cdb3dbd58bdbc235914",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 118,
+      "text": "REG_VMDATAL = (uint8_t)(4u * g + 3u);"
+    },
+    {
+      "id": "b9827a732e13261093ee",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 131,
+      "text": "REG_CGADD = 1u; REG_CGDATA = (uint8_t)ink; REG_CGDATA = (uint8_t)(ink >> 8u);"
+    },
+    {
+      "id": "0e9628ec430f495b610c",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 143,
+      "text": "REG_MDMAEN = 0x01u;"
+    },
+    {
+      "id": "0e9628ec430f495b610c",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 149,
+      "text": "REG_MDMAEN = 0x01u;"
+    },
+    {
+      "id": "9a4cab6f818410549971",
+      "kind": "force-blank",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 159,
+      "text": "REG_INIDISP = 0x80u; /* force-blank while we write VRAM / CGRAM */"
+    },
+    {
+      "id": "711e0fbffd00952436ef",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 178,
+      "text": "REG_CGDATA = (uint8_t)back; REG_CGDATA = (uint8_t)(back >> 8u);"
+    },
+    {
+      "id": "acf3f41684bec48ca260",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 179,
+      "text": "REG_CGDATA = 0xFFu; REG_CGDATA = 0x7Fu; /* 1 = white face (shimmer) */"
+    },
+    {
+      "id": "d7c30237d3f672e44fc3",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 180,
+      "text": "REG_CGDATA = 0x84u; REG_CGDATA = 0x10u; /* 2 = dark shadow (0x1084) */"
+    },
+    {
+      "id": "6fda71b65437fe6e1f25",
+      "kind": "force-blank",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 219,
+      "text": "* Returns with force-blank active (REG_INIDISP = 0x80). */"
+    },
+    {
+      "id": "8e7243f500d2fe43884f",
+      "kind": "force-blank",
+      "path": "examples/snes/snesgfx/m7title.h",
+      "line": 256,
+      "text": "REG_INIDISP = 0x80u;"
+    },
+    {
+      "id": "f22fb5e5ff629e4f60ee",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 34,
+      "text": "snes_vram_addr((uint16_t)(SPLASH_MAP_WORD + row * SPLASH_COLS + col));"
+    },
+    {
+      "id": "b99fb172bbb0c0f0697b",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 39,
+      "text": "REG_VMDATA = tile;"
+    },
+    {
+      "id": "3fa43b6672aba734810b",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 51,
+      "text": "REG_CGDATA = 0x00; REG_CGDATA = 0x00;"
+    },
+    {
+      "id": "bf846fba4cc7d07120c3",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 52,
+      "text": "REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;"
+    },
+    {
+      "id": "30e974b10d11ec37c6d5",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 55,
+      "text": "snes_vram_addr(SPLASH_CHR_WORD);"
+    },
+    {
+      "id": "4d51df524981bf882dd9",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 56,
+      "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8u; i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "1efdc2b1f9338ff33c04",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 59,
+      "text": "snes_vram_addr(SPLASH_MAP_WORD);"
+    },
+    {
+      "id": "2f001aa51c68d3289dcd",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 60,
+      "text": "for (uint16_t i = 0; i < (uint16_t)(SPLASH_COLS * 32u); i++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "583c7b4ca5c8051910b3",
+      "kind": "force-blank",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 70,
+      "text": "REG_INIDISP = 0x80;"
+    },
+    {
+      "id": "d47670dc88b0aee0339d",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 72,
+      "text": "snes_vram_addr(0x0000);"
+    },
+    {
+      "id": "12e7186dd7f62e5fbfb2",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/splash.h",
+      "line": 73,
+      "text": "for (uint16_t i = 0; i < SPLASH_CLEAR_WORDS; i++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "ba07e0f128d936d55b68",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/text_layer.h",
+      "line": 38,
+      "text": "snes_vram_addr((uint16_t)(TEXT_FONT_BASE * 8));"
+    },
+    {
+      "id": "54017d90170e33d65fb8",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/text_layer.h",
+      "line": 39,
+      "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8; i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "e603edffde010017fbea",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 286,
+      "text": "snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)(row + half) * TITLE_COLS));"
+    },
+    {
+      "id": "92cb11756249187937f7",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 295,
+      "text": "REG_VMDATA = (uint16_t)((uint16_t)(TITLE_PAL << 10) | tile);"
+    },
+    {
+      "id": "c12c60bdf27a664ca073",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 308,
+      "text": "REG_CGDATA = 0x00; REG_CGDATA = 0x00; /* colour 0 = black (transparent on BG) */"
+    },
+    {
+      "id": "994eb1dcdf21ad227d40",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 309,
+      "text": "REG_CGDATA = 0xFF; REG_CGDATA = 0x7F; /* colour 1 = white ink (BGR555 0x7FFF, animated) */"
+    },
+    {
+      "id": "8db53f853ce4a64b2bbe",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 310,
+      "text": "REG_CGDATA = 0x84; REG_CGDATA = 0x10; /* colour 2 = dark grey (BGR555 0x1084) = drop-shadow */"
+    },
+    {
+      "id": "9f890fc6ac328c214485",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 314,
+      "text": "snes_vram_addr(TITLE_CHR_WORD);"
+    },
+    {
+      "id": "baad36e27427d2bbd47e",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 316,
+      "text": "for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = FONT8[g * 8u + r];"
+    },
+    {
+      "id": "a1a97ff068696656acf6",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 317,
+      "text": "for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "9591e96e1e1e6eceee39",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 321,
+      "text": "snes_vram_addr((uint16_t)(TITLE_CHR_WORD + (uint16_t)(FONT8_N * 16u)));"
+    },
+    {
+      "id": "0b3d0bf2155ac7c94e7c",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 329,
+      "text": "REG_VMDATA = FONT16[(uint16_t)(g * 32u) + (uint16_t)(tile * 8u) + r];"
+    },
+    {
+      "id": "a1a97ff068696656acf6",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 330,
+      "text": "for (uint8_t r = 0; r < 8u; r++) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "97f44e2f5e3e2b5f1032",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 336,
+      "text": "snes_vram_addr(TITLE_MAP_WORD);"
+    },
+    {
+      "id": "c0894c703b7571e5d49d",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 338,
+      "text": "REG_VMDATA = (uint16_t)(TITLE_PAL << 10);"
+    },
+    {
+      "id": "5cfbb394b24553203058",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 346,
+      "text": "snes_vram_addr((uint16_t)(TITLE_MAP_WORD + (uint16_t)(t->ty0 >> 3) * TITLE_COLS));"
+    },
+    {
+      "id": "92cb11756249187937f7",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 350,
+      "text": "REG_VMDATA = (uint16_t)((uint16_t)(TITLE_PAL << 10) | tile);"
+    },
+    {
+      "id": "b5eacd22175169f73a1a",
+      "kind": "force-blank",
+      "path": "examples/snes/snesgfx/title_layer.h",
+      "line": 511,
+      "text": "REG_INIDISP = 0x80; /* re-enter force-blank for Mode 7 / VRAM setup */"
+    },
+    {
+      "id": "ec671609bff50ea14588",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/upload.h",
+      "line": 168,
+      "text": "REG_MDMAEN = mdmaen_bit;"
+    },
+    {
+      "id": "60f4e990104bae38b756",
+      "kind": "ppu-write",
+      "path": "examples/snes/sodo.c",
+      "line": 45,
+      "text": "snes_vram_addr((uint16_t)(FONT_BASE * 8u));"
+    },
+    {
+      "id": "44d131ea4a0fd56928cf",
+      "kind": "ppu-write",
+      "path": "examples/snes/sodo.c",
+      "line": 46,
+      "text": "for (uint16_t i = 0u; i < (uint16_t)FONT8_N * 8u; i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "5a5b8f18c42968cdf10a",
+      "kind": "ppu-write",
+      "path": "examples/snes/sodo.c",
+      "line": 49,
+      "text": "snes_vram_addr(t->map_word);"
+    },
+    {
+      "id": "c33a3dcf8dbd33bd7676",
+      "kind": "ppu-write",
+      "path": "examples/snes/sodo.c",
+      "line": 50,
+      "text": "for (uint16_t i = 0u; i < 32u * 32u; i++) REG_VMDATA = (uint16_t)FONT_BASE;"
+    },
+    {
+      "id": "5a29b826ff8d86e031a5",
+      "kind": "ppu-write",
+      "path": "examples/snes/sort-race.c",
+      "line": 71,
+      "text": "snes_vram_addr(0x0000u);"
+    },
+    {
+      "id": "083b6124a68e4078feeb",
+      "kind": "ppu-write",
+      "path": "examples/snes/sort-race.c",
+      "line": 74,
+      "text": "REG_VMDATA = (row >= (uint8_t)(8u - k)) ? 0x00FFu : 0x0000u;"
+    },
+    {
+      "id": "239523bdbe1d1e88d783",
+      "kind": "ppu-write",
+      "path": "examples/snes/sort-race.c",
+      "line": 76,
+      "text": "snes_vram_addr((uint16_t)(FONT_BASE * 8));"
+    },
+    {
+      "id": "4da0986047454bafdac6",
+      "kind": "ppu-write",
+      "path": "examples/snes/sort-race.c",
+      "line": 77,
+      "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8u; i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "207e86c5f0071ab315f7",
+      "kind": "ppu-write",
+      "path": "examples/snes/spigot.c",
+      "line": 70,
+      "text": "snes_vram_addr((uint16_t)(FONT_BASE * 8));"
+    },
+    {
+      "id": "9ecc0f7619f158ac8768",
+      "kind": "ppu-write",
+      "path": "examples/snes/spigot.c",
+      "line": 71,
+      "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8; i++) REG_VMDATA = FONT8[i];"
+    }
+  ]
+}

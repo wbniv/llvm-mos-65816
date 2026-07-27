@@ -55,6 +55,16 @@ tasks:
       - dev/title-mode-audit.sh
       - dev/title-charset.sh
 
+  snes-display-quality:
+    desc: "Fast SNES display contract gate (PPU access, force blank, VBlank order, upload budget)"
+    cmds:
+      - dev/snes-display-quality.py
+
+  snes-display-quality-emulator:
+    desc: "Slow published-ROM self-check + force-blank-bleed scan (SITE=/path/to/site)"
+    cmds:
+      - SITE="{{.SITE}}" dev/snes-display-quality-emulator.sh {{.CLI_ARGS}}
+
   smoke:
     desc: "Boot build/hello.sfc headless in MAME's snes driver, assert sentinel==0x42 in WRAM (needs the SPC700 IPL)"
     cmds:

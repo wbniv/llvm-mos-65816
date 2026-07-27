@@ -1581,4 +1581,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** Canvas widening beyond 16×16 tiles (needs `bitmap_canvas.h` geometry work — a snesgfx library — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:f9122100c1e60a3f -->
 - [ ] **(triage)** HDMA backdrop gradient (same reason: no library support yet). — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:9e322e197981b057 -->
 <!-- triaged 2026-07-27: #128 is planned-not-yet-implemented; its verification runs with the implementation, tracked by the curated [T3] "#128 lzss-gallery" battery sub-item. fp:8b0a76b3e990a0e0 -->
+- [verify] **2026-07-27-129-lzss-gallery-zipper-visualization** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-129-lzss-gallery-zipper-visualization.md](docs/plans/2026-07-27-129-lzss-gallery-zipper-visualization.md)_  <!-- fp:ea5c80990ef038e3 -->
 <!-- END auto-captured-deferrals -->

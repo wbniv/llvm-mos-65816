@@ -96,12 +96,14 @@ static inline void display_frame(Display *d) {
      btgt == bright (the default) this is a no-op and the screen is simply full-on. */
   if (d->bright < d->btgt)      d->bright++;
   else if (d->bright > d->btgt) d->bright--;
-  REG_INIDISP = d->bright;                  /* 0..15 brightness (force-blank bit clear)       */
+  REG_INIDISP = (uint8_t)(d->bright & 0x0Fu); /* force-blank bit can never escape this API     */
   d->shown = 1;
 }
 
 /* Set the brightness fade target (0 = black .. 15 = full). display_frame ramps toward it 1/frame. */
-static inline void display_fade_to(Display *d, uint8_t target) { d->btgt = target; }
+static inline void display_fade_to(Display *d, uint8_t target) {
+  d->btgt = (uint8_t)(target & 0x0Fu);
+}
 
 /* Block, ramping the master brightness to `target` (one step per v-blank), so the screen fades to
    `target` over ~|bright-target| frames. The scene still emits each frame, so a fading title's

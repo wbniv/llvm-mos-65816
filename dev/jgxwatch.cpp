@@ -85,6 +85,11 @@ int main(int argc, char **argv) {
     unsigned got = 0;
     for (unsigned k = 0; k < len; ++k) got |= (unsigned)wram[off + k] << (8 * k);
     if (got == want) { printf("FRAME %d\n", i); return 0; }
+    if ((i % 1000) == 0) {
+      fprintf(stderr, "jgxwatch: frame %d/%d got=0x%0*X\n",
+              i, maxframes, 2 * len, got);
+      fflush(stderr);
+    }
   }
   printf("NOMATCH (after %d frames)\n", maxframes);
   return 1;

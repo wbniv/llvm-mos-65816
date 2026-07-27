@@ -25,6 +25,17 @@
 #define PAL8 7u
 /* Leave OBJ range/time headroom for both 16x16 navigation sprites. */
 #define OAM_VISUAL_MAX 16u
+#define ARROW_TAKEOFF ((int16_t)-0x00c0)
+#define ARROW_GRAVITY ((int16_t)0x0010)
+enum {
+  ARROW_L_REST=64, ARROW_R_REST=66,
+  ARROW_L_RISE=68, ARROW_R_RISE=70,
+  ARROW_L_APEX=72, ARROW_R_APEX=74,
+  ARROW_L_FALL=76, ARROW_R_FALL=78,
+  ARROW_L_LAND=96, ARROW_R_LAND=98,
+  TRACK_ZIP_UP=128, TRACK_ZIP_DOWN=129, TRACK_ZIP_HEAD=130,
+  TRACK_LITERAL=131
+};
 #ifndef GALLERY_START
 #define GALLERY_START 0u
 #endif
@@ -47,8 +58,9 @@ volatile uint8_t gallery_current_asset;
 volatile uint16_t gallery_canceled;
 volatile uint16_t gallery_last_z;
 volatile uint8_t gallery_last_work,gallery_last_ok;
-volatile uint8_t arrow_anim,arrow_anim_phase,arrow_anim_y,arrow_anim_offset;
+volatile uint8_t arrow_anim,arrow_anim_y,arrow_pose,arrow_previous_direction;
 volatile uint8_t arrow_direction;
+volatile int16_t arrow_position,arrow_velocity;
 static uint16_t gallery_z[GALLERY_ASSET_COUNT];
 static uint8_t gallery_done[GALLERY_ASSET_COUNT];
 static uint8_t gallery_failed[GALLERY_ASSET_COUNT];
@@ -68,6 +80,8 @@ typedef struct {
 } RepackVisual;
 volatile RepackVisual gallery_repack_visual;
 static uint8_t token_kind[12],token_len[12],token_count;
+static uint8_t flight_active,flight_phase;
+static uint16_t flight_source,flight_destination;
 
 asm(".text\n"
     ".global nmi\n"
@@ -111,60 +125,144 @@ asm(".text\n"
     "  lda nav_pad_now\n"
     "  sta nav_pad_previous\n"
     /*
-     * Animate only the accepted direction during decode.  OAM writes happen
-     * here in NMI/VBlank, so the moving overlay cannot corrupt either arrow.
+     * Restore a deselected direction before animating the newly accepted one.
+     * All OAM writes remain inside NMI/VBlank.
      */
-    "  lda arrow_anim\n"
-    "  beq 9f\n"
-    "  inc arrow_anim_phase\n"
-    "  lda arrow_anim_phase\n"
-    "  and #$07\n"
-    "  cmp #$04\n"
-    "  bcc 3f\n"
-    "  eor #$07\n"
-    "3:\n"
-    "  sta arrow_anim_offset\n"
-    "  lda arrow_direction\n"
+    "  lda arrow_previous_direction\n"
+    "  beq 3f\n"
+    "  cmp arrow_direction\n"
+    "  beq 2f\n"
     "  cmp #$02\n"
-    "  beq 4f\n"
-    "  lda #$02\n"              /* right-arrow OAM word address */
+    "  beq 10f\n"
+    "  lda #$02\n"              /* right entry */
     "  sta $2102\n"
     "  lda #$00\n"
     "  sta $2103\n"
-    "  lda #$ee\n"              /* x = 238 */
+    "  lda #$ee\n"
+    "  sta $2104\n"
+    "  lda arrow_anim_y\n"
+    "  sta $2104\n"
+    "  lda #$42\n"              /* dedicated right rest tile */
+    "  sta $2104\n"
+    "  lda #$30\n"
     "  sta $2104\n"
     "  clv\n"
-    "  bvc 5f\n"
-    "4:\n"
-    "  lda #$00\n"              /* left-arrow OAM word address */
+    "  bvc 2f\n"
+    "10:\n"
+    "  lda #$00\n"              /* left entry */
     "  sta $2102\n"
     "  sta $2103\n"
     "  lda #$02\n"
     "  sta $2104\n"
-    "5:\n"
     "  lda arrow_anim_y\n"
-    "  sec\n"
-    "  sbc arrow_anim_offset\n"
     "  sta $2104\n"
-    "  lda arrow_anim_phase\n"
-    "  and #$03\n"
-    "  beq 6f\n"
-    "  lda #$49\n"              /* bright 16x16 chevron at tiles 73/74/89/90 */
-    "  clv\n"
-    "  bvc 7f\n"
-    "6:\n"
-    "  lda #$40\n"              /* normal gold chevron */
-    "7:\n"
+    "  lda #$40\n"
     "  sta $2104\n"
+    "  lda #$30\n"
+    "  sta $2104\n"
+    "2:\n"
+    "  lda #$00\n"
+    "  sta arrow_previous_direction\n"
+    "3:\n"
+    "  lda arrow_anim\n"
+    "  bne 16f\n"
+    "  jmp 9f\n"
+    "16:\n"
+    /*
+     * Signed 8.8 ballistic step: position += velocity; velocity += 1/16.
+     * Down is positive. Landing clamps to zero and supplies a new -0.75
+     * px/frame upward impulse instead of reflecting accumulated velocity.
+     */
+    "  .byte $c2, $20\n"
+    "  lda arrow_position\n"
+    "  clc\n"
+    "  adc arrow_velocity\n"
+    "  sta arrow_position\n"
+    "  lda arrow_velocity\n"
+    "  clc\n"
+    "  .byte $69, $10, $00\n"   /* adc #$0010 in 16-bit accumulator mode */
+    "  sta arrow_velocity\n"
+    "  lda arrow_position\n"
+    "  bmi 4f\n"
+    "  .byte $a9, $00, $00\n"   /* lda #$0000 */
+    "  sta arrow_position\n"
+    "  .byte $a9, $40, $ff\n"   /* lda #$ff40 */
+    "  sta arrow_velocity\n"
+    "  .byte $e2, $20\n"
     "  lda arrow_direction\n"
     "  cmp #$02\n"
-    "  beq 8f\n"
-    "  lda #$70\n"              /* right: horizontal flip */
+    "  beq 11f\n"
+    "  lda #$62\n"              /* right landing-compression pose */
     "  clv\n"
-    "  bvc 3f\n"
+    "  bvc 8f\n"
+    "11:\n"
+    "  lda #$60\n"              /* left landing-compression pose */
+    "  clv\n"
+    "  bvc 8f\n"
+    "4:\n"
+    "  .byte $e2, $20\n"
+    "  lda arrow_position+1\n"
+    "  cmp #$fe\n"              /* upper half of the 4.5px arc */
+    "  bcc 5f\n"
+    "  lda arrow_velocity+1\n"
+    "  bmi 6f\n"
+    "  lda arrow_direction\n"
+    "  cmp #$02\n"
+    "  beq 12f\n"
+    "  lda #$4e\n"              /* right falling pose */
+    "  clv\n"
+    "  bvc 8f\n"
+    "12:\n"
+    "  lda #$4c\n"              /* left falling pose */
+    "  clv\n"
+    "  bvc 8f\n"
+    "6:\n"
+    "  lda arrow_direction\n"
+    "  cmp #$02\n"
+    "  beq 13f\n"
+    "  lda #$46\n"              /* right rising pose */
+    "  clv\n"
+    "  bvc 8f\n"
+    "13:\n"
+    "  lda #$44\n"              /* left rising pose */
+    "  clv\n"
+    "  bvc 8f\n"
+    "5:\n"
+    "  lda arrow_direction\n"
+    "  cmp #$02\n"
+    "  beq 14f\n"
+    "  lda #$4a\n"              /* right apex pose */
+    "  clv\n"
+    "  bvc 8f\n"
+    "14:\n"
+    "  lda #$48\n"              /* left apex pose */
     "8:\n"
-    "  lda #$30\n"              /* left */
-    "3:\n"
+    "  sta arrow_pose\n"
+    "  lda arrow_direction\n"
+    "  cmp #$02\n"
+    "  beq 7f\n"
+    "  lda #$02\n"
+    "  sta $2102\n"
+    "  lda #$00\n"
+    "  sta $2103\n"
+    "  lda #$ee\n"
+    "  sta $2104\n"
+    "  clv\n"
+    "  bvc 15f\n"
+    "7:\n"
+    "  lda #$00\n"
+    "  sta $2102\n"
+    "  sta $2103\n"
+    "  lda #$02\n"
+    "  sta $2104\n"
+    "15:\n"
+    "  lda arrow_anim_y\n"
+    "  clc\n"
+    "  adc arrow_position+1\n"
+    "  sta $2104\n"
+    "  lda arrow_pose\n"
+    "  sta $2104\n"
+    "  lda #$30\n"              /* no horizontal flip; dedicated direction art */
     "  sta $2104\n"
     "9:\n"
     "  .byte $c2, $20\n"
@@ -313,73 +411,85 @@ static void load_fonts(void){
      the gallery's split BG3 path on hardware/core despite correct source data. */
   vram_words((uint16_t)(CHR8+63u*8u),FONT8+(uint16_t)('T'-FONT8_FIRST)*8u,8u);
 }
-static void load_chevrons(void){
-  for(uint16_t i=0;i<256;i++)objpix[i]=0;
-  /*
-   * A transparent three-pixel stroke disappears into high-frequency artwork
-   * and looks like corrupt OBJ data.  Give the navigation mark an opaque,
-   * rounded 16x16 badge, then draw a thick gold chevron over it.  Horizontal
-   * OBJ flip supplies the right-facing version.
-   */
-  for(uint8_t y=0;y<16;y++){
-    uint8_t inset=(uint8_t)((y==0u||y==15u)?3u:
-                            (y==1u||y==14u)?1u:0u);
-    for(uint8_t x=inset;x<(uint8_t)(16u-inset);x++)
-      objpix[(uint16_t)y*16u+x]=1;
-  }
-  for(uint8_t y=2;y<14;y++){
-    uint8_t d=(uint8_t)(y<8u?7u-y:y-8u);
-    uint8_t x=(uint8_t)(3u+d);
-    for(uint8_t n=0;n<4u;n++)
-      objpix[(uint16_t)y*16u+x+n]=2;
-  }
+static void pack_chevron_tiles(void){
   for(uint8_t ty=0;ty<2;ty++)for(uint8_t tx=0;tx<2;tx++)for(uint8_t y=0;y<8;y++){
-    uint8_t p0=0,p1=0;
-    for(uint8_t x=0;x<8;x++){uint8_t p=objpix[(uint16_t)(ty*8u+y)*16u+tx*8u+x];
-      if(p&1u)p0|=(uint8_t)(0x80u>>x);if(p&2u)p1|=(uint8_t)(0x80u>>x);}
-    objchr[(uint16_t)(ty*2u+tx)*16u+y]=(uint16_t)(p0|((uint16_t)p1<<8));
-    objchr[(uint16_t)(ty*2u+tx)*16u+8u+y]=0;
+    uint8_t p0=0,p1=0,p2=0,p3=0;
+    for(uint8_t x=0;x<8;x++){
+      uint8_t p=objpix[(uint16_t)(ty*8u+y)*16u+tx*8u+x],m=(uint8_t)(0x80u>>x);
+      if(p&1u)p0|=m;if(p&2u)p1|=m;if(p&4u)p2|=m;if(p&8u)p3|=m;
+    }
+    uint16_t q=(uint16_t)(ty*2u+tx)*16u+y;
+    objchr[q]=(uint16_t)(p0|((uint16_t)p1<<8));
+    objchr[q+8u]=(uint16_t)(p2|((uint16_t)p3<<8));
   }
-  vram_words(0x6400u,objchr,32);
-  vram_words(0x6500u,objchr+32,32);
-  /*
-   * Bright chevron copy: remap normal colors 1/2 to reserved colors 4/5.
-   * Tile 73 is laid out as 73/74 + 89/90 by the SNES 16x16 OBJ rule.
-   */
-  for(uint8_t tile=0;tile<4;tile++)for(uint8_t y=0;y<8;y++){
-    uint16_t q=objchr[(uint16_t)tile*16u+y];
-    uint8_t p0=(uint8_t)q,p1=(uint8_t)(q>>8);
-    objchr[(uint16_t)tile*16u+y]=p1;
-    objchr[(uint16_t)tile*16u+8u+y]=(uint16_t)(p0|p1);
+}
+static void upload_chevron_pose(uint8_t base,uint8_t right,uint8_t pose){
+  for(uint16_t i=0;i<256;i++)objpix[i]=0;
+  uint8_t face=(uint8_t)(pose?4u:2u);
+  /* Draw the lower-right extrusion first, then the face. */
+  for(uint8_t y=2;y<14;y++){
+    uint8_t d=(uint8_t)(y<8u?7u-y:y-8u),lx=(uint8_t)(3u+d);
+    uint8_t x=(uint8_t)(right?(12u-d):lx),thick=(uint8_t)(pose==2u?3u:4u);
+    uint8_t fy=y;
+    if(pose==1u&&fy)fy--;
+    else if(pose==3u&&fy<15u)fy++;
+    else if(pose==4u){
+      if(y==2u||y==13u)continue;
+      fy=(uint8_t)(y<8u?y+1u:y-1u);
+    }
+    for(uint8_t n=0;n<thick;n++){
+      uint8_t sx=(uint8_t)(x+n+1u),sy=(uint8_t)(y+1u);
+      if(sx<16u&&sy<16u)objpix[(uint16_t)sy*16u+sx]=1u;
+    }
+    for(uint8_t n=0;n<thick;n++){
+      uint8_t fx=(uint8_t)(x+n);
+      if(fx<16u&&fy<16u)objpix[(uint16_t)fy*16u+fx]=face;
+    }
   }
-  vram_words(0x6490u,objchr,32);
-  vram_words(0x6590u,objchr+32,32);
-  /* 8x8 compression outline: cyan box used as single/cap/span sprites. */
+  /* Fixed upper-left light: one pale edge pixel per occupied row. */
+  for(uint8_t y=0;y<16;y++)for(uint8_t x=0;x<16;x++){
+    uint16_t at=(uint16_t)y*16u+x;
+    if(objpix[at]==face){objpix[at]=5u;break;}
+  }
+  pack_chevron_tiles();
+  for(uint8_t t=0;t<2;t++)vram_words((uint16_t)(0x6000u+(uint16_t)(base+t)*16u),objchr+(uint16_t)t*16u,16);
+  for(uint8_t t=0;t<2;t++)vram_words((uint16_t)(0x6000u+(uint16_t)(base+16u+t)*16u),objchr+(uint16_t)(2u+t)*16u,16);
+}
+static void upload_tracker_tile(uint8_t tile,uint8_t shape,uint8_t color){
+  for(uint8_t i=0;i<64;i++)objpix[i]=0;
+  if(shape<2u){
+    /* Bright opposing zipper teeth; never draw a closed edge or filled cell. */
+    uint8_t y=(uint8_t)(shape?5u:2u),tip=(uint8_t)(shape?y-1u:y+1u);
+    for(uint8_t x=1u;x<7u;x++)objpix[(uint16_t)y*8u+x]=(uint8_t)(x==3u||x==4u?5u:color);
+    objpix[(uint16_t)tip*8u+3u]=color;objpix[(uint16_t)tip*8u+4u]=color;
+  }else{
+    static const uint8_t width[8]={0,2,4,6,6,4,2,0};
+    for(uint8_t y=0;y<8;y++){
+      uint8_t w=width[y],start=(uint8_t)((8u-w)/2u);
+      for(uint8_t x=0;x<w;x++)objpix[(uint16_t)y*8u+start+x]=(uint8_t)(y==3u||y==4u?5u:color);
+    }
+  }
   for(uint8_t y=0;y<8;y++){
-    uint8_t p=(uint8_t)((y==0u||y==7u)?0xffu:0x81u);
-    /* Plane 2 selects OBJ palette-0 color 4, reserved outside artwork indices. */
-    objchr[y]=0;objchr[8u+y]=(uint16_t)p;
+    uint8_t p0=0,p1=0,p2=0,p3=0;
+    for(uint8_t x=0;x<8;x++){uint8_t p=objpix[(uint16_t)y*8u+x],m=(uint8_t)(0x80u>>x);
+      if(p&1u)p0|=m;if(p&2u)p1|=m;if(p&4u)p2|=m;if(p&8u)p3|=m;}
+    objchr[y]=(uint16_t)(p0|((uint16_t)p1<<8));objchr[8u+y]=(uint16_t)(p2|((uint16_t)p3<<8));
   }
-  vram_words(0x6480u,objchr,16);
-  /* Gold source bracket (tile 75), bright literal diamond (76), gold dot (77). */
-  for(uint8_t y=0;y<8;y++){
-    uint8_t edge=(uint8_t)((y==1u||y==6u)?0x7eu:((y>1u&&y<6u)?0x42u:0));
-    objchr[y]=(uint16_t)(edge<<8);objchr[8u+y]=0;
-  }
-  vram_words(0x64b0u,objchr,16);
-  for(uint8_t y=0;y<8;y++){
-    uint8_t d=(uint8_t)(y<4u?(uint8_t)(0x18u>>(3u-y)):(uint8_t)(0x18u>>(y-4u)));
-    if(y==3u||y==4u)d=0xffu;
-    objchr[y]=0;objchr[8u+y]=d;
-  }
-  vram_words(0x64c0u,objchr,16);
-  for(uint8_t y=0;y<8;y++){objchr[y]=(uint16_t)((y==3u||y==4u)?0x18u<<8:0);objchr[8u+y]=0;}
-  vram_words(0x64d0u,objchr,16);
+  vram_words((uint16_t)(0x6000u+(uint16_t)tile*16u),objchr,16);
+}
+static void load_chevrons(void){
+  upload_chevron_pose(ARROW_L_REST,0,0);upload_chevron_pose(ARROW_R_REST,1,0);
+  upload_chevron_pose(ARROW_L_RISE,0,1);upload_chevron_pose(ARROW_R_RISE,1,1);
+  upload_chevron_pose(ARROW_L_APEX,0,2);upload_chevron_pose(ARROW_R_APEX,1,2);
+  upload_chevron_pose(ARROW_L_FALL,0,3);upload_chevron_pose(ARROW_R_FALL,1,3);
+  upload_chevron_pose(ARROW_L_LAND,0,4);upload_chevron_pose(ARROW_R_LAND,1,4);
+  upload_tracker_tile(TRACK_ZIP_UP,0,4);upload_tracker_tile(TRACK_ZIP_DOWN,1,4);
+  upload_tracker_tile(TRACK_ZIP_HEAD,2,4);upload_tracker_tile(TRACK_LITERAL,2,4);
   REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;
   uint16_t c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  /* Palette-0 colors 4/5 are reserved; never overwrite artwork 144..255. */
-  REG_CGADD=132;REG_CGDATA=0;REG_CGDATA=0;
+  /* Palette-0 colors 4/5 are accent/white; 134..255 remain artwork-owned. */
+  REG_CGADD=132;
   c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   REG_OBSEL=3u;
@@ -396,8 +506,8 @@ static void oam_arrow_sizes(void){
 static void oam_arrows(uint8_t y,uint8_t hide){
   if(hide)y=240;
   REG_OAMADDL=0;REG_OAMADDH=0;
-  REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=0x30;
-  REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=0x70;
+  REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=ARROW_L_REST;REG_OAMDATA=0x30;
+  REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=ARROW_R_REST;REG_OAMDATA=0x30;
   oam_arrow_sizes();
 }
 static void oam_upload_visual(void){
@@ -414,7 +524,8 @@ static void oam_stage(uint8_t i,uint8_t x,uint8_t y,uint8_t tile){
   p[0]=x;p[1]=y;p[2]=tile;p[3]=0x30;
 }
 static void oam_hide_compression(void){
-  for(uint8_t i=0;i<OAM_VISUAL_MAX;i++)oam_stage(i,0,240,72);
+  flight_active=0;
+  for(uint8_t i=0;i<OAM_VISUAL_MAX;i++)oam_stage(i,0,240,TRACK_ZIP_UP);
   oam_upload_visual();
 }
 static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y){
@@ -425,18 +536,10 @@ static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y){
   *x=(uint8_t)(ox+(px*256u)/active_asset->matrix_scale);
   *y=(uint8_t)(oy+(py*256u)/active_asset->matrix_scale);
 }
-static uint8_t oam_span(uint16_t pos,uint8_t len,uint8_t tile,uint8_t used){
-  while(len&&used<OAM_VISUAL_MAX){
-    uint16_t row_left=(uint16_t)(active_asset->width-pos%active_asset->width);
-    uint8_t part=(uint8_t)(len<row_left?len:row_left),x,y,xe,ye;
-    project_offset(pos,&x,&y);project_offset((uint16_t)(pos+part),&xe,&ye);
-    uint8_t pixels=(uint8_t)(xe>x?xe-x:3u),count=(uint8_t)((pixels+7u)/8u);
-    if(count<1u)count=1u;if(count>6u)count=6u;
-    for(uint8_t i=0;i<count&&used<OAM_VISUAL_MAX;i++,used++)
-      oam_stage(used,(uint8_t)(x+i*8u),y,tile);
-    pos=(uint16_t)(pos+part);len=(uint8_t)(len-part);
-  }
-  return used;
+static uint8_t sprite_origin(int16_t v){
+  if(v<3)return 0;
+  if(v>250)return 247;
+  return (uint8_t)(v-3);
 }
 static void oam_compression(void){
   if(!active_asset)return;
@@ -446,21 +549,40 @@ static void oam_compression(void){
   v.source_offset=gallery_repack_visual.source_offset;
   v.kind=gallery_repack_visual.kind;v.length=gallery_repack_visual.length;
   if(seq!=gallery_repack_visual.sequence)return;
-  uint8_t used=0;
-  if(v.kind==REPACK_LITERAL){
-    uint8_t x,y;project_offset(v.current_offset,&x,&y);
-    oam_stage(0,(uint8_t)(x-3u),(uint8_t)(y-3u),76);used=1;
-  }else if(v.kind==REPACK_MATCH){
-    used=oam_span(v.source_offset,v.length,75,used);
-    used=oam_span(v.current_offset,v.length,72,used);
-    uint8_t sx,sy,dx,dy;project_offset(v.source_offset,&sx,&sy);project_offset(v.current_offset,&dx,&dy);
-    for(uint8_t i=1;i<=5u&&used<OAM_VISUAL_MAX;i++,used++){
-      int16_t x=(int16_t)sx+((int16_t)dx-(int16_t)sx)*(int16_t)i/6;
-      int16_t y=(int16_t)sy+((int16_t)dy-(int16_t)sy)*(int16_t)i/6;
-      oam_stage(used,(uint8_t)x,(uint8_t)y,77);
-    }
+  if(flight_active&&flight_phase>=8u)flight_active=0;
+  if(!flight_active&&v.kind==REPACK_MATCH){
+    flight_active=1;flight_source=v.source_offset;flight_destination=v.current_offset;
+    flight_phase=0;
   }
-  while(used<OAM_VISUAL_MAX){oam_stage(used,0,240,72);used++;}
+  uint8_t used=0;
+  if(flight_active){
+    uint8_t sx,sy,dx,dy;project_offset(flight_source,&sx,&sy);project_offset(flight_destination,&dx,&dy);
+    uint8_t teeth=15u,reveal=(uint8_t)(flight_phase*2u+1u);
+    if(reveal>teeth)reveal=teeth;
+    uint8_t step=(uint8_t)((uint16_t)(reveal-1u)*31u/(teeth-1u));
+    /*
+     * Close a luminous zipper from source to destination. Fifteen alternating
+     * teeth are enough to read as a seam without turning short byte runs into
+     * boxes; successive presentation hooks reveal the teeth progressively.
+     */
+    if(sx!=dx||sy!=dy){
+      for(uint8_t i=0;i<reveal;i++){
+        uint8_t phase=(uint8_t)((uint16_t)i*31u/(teeth-1u));
+        int16_t x=(int16_t)sx+((int16_t)dx-(int16_t)sx)*(int16_t)phase/31;
+        int16_t y=(int16_t)sy+((int16_t)dy-(int16_t)sy)*(int16_t)phase/31;
+        oam_stage(used++,sprite_origin(x),sprite_origin(y),
+                  (uint8_t)(i&1u?TRACK_ZIP_DOWN:TRACK_ZIP_UP));
+      }
+      int16_t hx=(int16_t)sx+((int16_t)dx-(int16_t)sx)*(int16_t)step/31;
+      int16_t hy=(int16_t)sy+((int16_t)dy-(int16_t)sy)*(int16_t)step/31;
+      oam_stage(used++,sprite_origin(hx),sprite_origin(hy),TRACK_ZIP_HEAD);
+    }
+    flight_phase++;
+  }else if(v.kind==REPACK_LITERAL){
+    uint8_t x,y;project_offset(v.current_offset,&x,&y);
+    oam_stage(0,sprite_origin(x),sprite_origin(y),TRACK_LITERAL);used=1;
+  }
+  while(used<OAM_VISUAL_MAX){oam_stage(used,0,240,TRACK_ZIP_UP);used++;}
   oam_upload_visual();
 }
 static void blank_maps(void){
@@ -608,7 +730,7 @@ static void palette(const GalleryAsset*a){
   c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   /* Restore reserved OBJ colors after the artwork's full 256-color upload. */
-  REG_CGADD=132;REG_CGDATA=0;REG_CGDATA=0;
+  REG_CGADD=132;
   c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
 }
@@ -650,7 +772,8 @@ static uint8_t prepare_slide(const GalleryAsset*a){
                                   (int16_t)(-((int16_t)(a->display_height-render_h)/2)));
   if(!upload_image(a))return 0;
   palette(a);caption(a,0);
-  arrow_anim=0;arrow_direction=0;arrow_anim_phase=0;
+  arrow_anim=0;arrow_direction=0;arrow_previous_direction=0;arrow_pose=ARROW_L_REST;
+  arrow_position=0;arrow_velocity=0;
   arrow_anim_y=(uint8_t)(a->display_height/2u-8u);
   oam_arrows(arrow_anim_y,0);
   if(nav_cancel)return 0;
@@ -738,12 +861,14 @@ static uint8_t nav_target(uint8_t k){
   uint8_t r=nav_request;nav_request=0;nav_cancel=0;
   gallery_canceled++;
   if(r==1u){
-    arrow_direction=1;arrow_anim_phase=0;arrow_anim=1;
+    if(arrow_anim&&arrow_direction!=1u)arrow_previous_direction=arrow_direction;
+    arrow_direction=1;arrow_position=0;arrow_velocity=ARROW_TAKEOFF;arrow_anim=1;
     arrow_anim_y=(uint8_t)(active_asset->display_height/2u-8u);
     return (uint8_t)(k+1u==GALLERY_ASSET_COUNT?0u:k+1u);
   }
   if(r==2u){
-    arrow_direction=2;arrow_anim_phase=0;arrow_anim=1;
+    if(arrow_anim&&arrow_direction!=2u)arrow_previous_direction=arrow_direction;
+    arrow_direction=2;arrow_position=0;arrow_velocity=ARROW_TAKEOFF;arrow_anim=1;
     arrow_anim_y=(uint8_t)(active_asset->display_height/2u-8u);
     return (uint8_t)(k? k-1u:GALLERY_ASSET_COUNT-1u);
   }
@@ -756,6 +881,11 @@ int main(void){
    * finishes on force blank, so doing the expensive decode after it used to
    * leave the screen black for the entire first-image load.
    */
+  gallery_clock_lo=gallery_clock_hi=0;
+  nav_pad_now=nav_pad_previous=nav_request=nav_cancel=0;
+  arrow_anim=arrow_direction=arrow_previous_direction=0;
+  arrow_position=arrow_velocity=0;arrow_anim_y=0;arrow_pose=ARROW_L_REST;
+  flight_active=0;
   snes_ppu_reset_blank();m7splash_begin("PACK UNPACK", "LZSS GALLERY");
   uint8_t k=GALLERY_START;
   const GalleryAsset*a=&GALLERY_ASSETS[k];
@@ -771,7 +901,18 @@ int main(void){
    * and rebuild every gallery-owned resource from a known force-blank state.
    */
   snes_ppu_reset_blank();
-  vram_clear();load_fonts();load_chevrons();oam_init();m7_begin();m7_set_matrix(0x0080,0,0,0x0080);
+  vram_clear();load_fonts();load_chevrons();oam_init();m7_begin();
+  m7_set_matrix(0x0080,0,0,0x0080);
+  /*
+   * These hot variables live in .zp.noinit. Initialize every NMI-consumed
+   * field before enabling interrupts; otherwise the first VBlank can mistake
+   * power-on residue for an active animation and write arbitrary OAM state.
+   */
+  gallery_clock_lo=gallery_clock_hi=0;
+  nav_pad_now=nav_pad_previous=nav_request=nav_cancel=0;
+  arrow_anim=arrow_direction=arrow_previous_direction=0;
+  arrow_position=arrow_velocity=0;arrow_anim_y=0;arrow_pose=ARROW_L_REST;
+  flight_active=0;
   REG_NMITIMEN=NMITIMEN_NMI;uint16_t gate=0xffff;uint8_t decoded=1;
   for(;;){
     a=&GALLERY_ASSETS[k];

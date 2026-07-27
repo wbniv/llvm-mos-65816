@@ -6,7 +6,7 @@
 **Updated 2026-07-27 (review pass):** corrected the gate facts (26 works, generated oracle
 `0x3D44` — the draft's "20-artwork / `0xB5D7`" was stale), fixed the takeoff-impulse sign
 contradiction, added the reserved-palette audit (today's destination visuals actually render
-black), specified the packet flight clock against the 256-byte hook cadence, and pinned the
+black), specified the zipper flight clock against the 256-byte hook cadence, and pinned the
 OAM/tile budgets with an explicit degradation order.
 
 Mockup: [transparent gravity-chevron motion study](2026-07-27-128-lzss-gallery-gravity-chevrons/gravity-chevron-mockup.html)
@@ -181,105 +181,79 @@ total is exactly **10 sprites** (5 poses × 2 directions), not poses × glow tre
 Index 1 is allowed only in pixels directly adjoining the face; the tile transparency test treats
 any detached dark region as a failed reintroduction of the black ground.
 
-## Repack tracker: continuous brackets + one packet
+## Repack tracker: luminous zipper seam
 
-Replace the current compression tracker in the same pass. Its defects are structural:
+The bracket experiment is rejected. Its defects are structural:
 
 - tile 72 is a complete 8×8 outline, so repeating it over a run produces a row of separate squares;
 - a match deliberately draws both its source and destination, which explains reports of seeing two
   squares; and
-- the source bracket plus five interpolated dots converging on the destination reads as a
-  three-pronged “chicken foot.”
+- even a corrected three-pixel-high outline makes short single-line matches look like selected
+  blocks, which is confusing rather than explanatory.
 
-The first implementation will use one restrained source/destination diagram:
+Replace all source/destination outlines with a luminous zipper:
 
 ```text
-source, dim gold                    destination, bright site accent
-〔━━━━━━━━〕                              〔━━━━━━━━〕
-                  ·  →  ·
+source                                      destination
+  ✦  ·  ⋮  ·  ⋮  ·  ⋮  ·  ✦  ───────────────→
+     teeth progressively appear along the seam
 ```
 
-This is a schematic; the ROM uses pixel-art caps, rails, and one packet, not text glyphs.
+This is schematic. The ROM uses small alternating upper/lower pixel-art teeth in the site's accent
+color and a brighter zipper head. No closed outline, cap, rail, run-length box, or persistent source
+marker remains.
 
-### Bracket construction
+### Zipper construction
 
-Generate separate 8×8 tiles for:
+Generate three transparent 8×8 tiles:
 
-- single-segment bracket (both caps, for a projected run ≤8 px);
-- start cap plus top/bottom rails;
-- rail-only middle;
-- top/bottom rails plus end cap; and
-- a small packet diamond.
+- upper tooth;
+- lower/interlocking tooth; and
+- bright zipper head.
 
-Only the two outer tiles contain vertical edges. Middle tiles contain horizontal rails only, so a
-multi-tile span reads as one continuous outline rather than adjacent boxes. Split a source or
-destination that crosses an artwork row into separately capped row segments. Clamp projected spans
-to the artwork bounds.
+The visible pixels occupy only a few rows of each sprite cell. Place eight alternating teeth at
+evenly interpolated points from the projected source to destination. Reveal them progressively over
+the flight, and move one bright head over the same path. Visually coincident endpoints omit the
+zipper. Literal tokens retain the existing small bright diamond.
 
-The source bracket is dim gold and the destination bracket is the site's bright accent. The source
-exists to explain where an LZSS match came from; it is secondary and fades/hides after 6–8 display
-frames if the event remains on screen. The destination persists until the next visualization event.
-Literal tokens use the existing small bright diamond only—no bracket and no square.
+### Flight sampling and cadence
 
-Animate exactly one packet from the source endpoint toward the destination endpoint. It advances
-along a straight interpolated path at a calm fixed cadence and then disappears. Do not draw the
-current five-dot trail. A zero-distance or visually coincident projection omits the packet.
+The compressor redraws the scene from its progress hook (`oam_compression()` fires every
+256 input bytes from `compress_far()`'s meter). Measurements show adjacent hooks can be more than
+32 frames apart, so a frame-expiring latch repeatedly restarted at step zero and displayed only its
+head. Advance by presentation hooks instead:
 
-### Flight sampling and clock
-
-The compressor only redraws the scene from its progress hook (`oam_compression()` fires every
-256 input bytes from `compress_far()`'s meter), so the packet cannot be advanced per frame at the
-point where it is drawn — and "newest event wins" at every hook would mean a packet never travels,
-because each hook lands on a different token. Latch instead:
-
-- On a hook with a fresh match event and no active flight, latch the event's projected endpoints
-  and `flight_start = clock_read()` (the NMI frame counter).
-- Every later hook re-renders the **latched** event, ignoring newer events for OAM purposes:
-  packet position = lerp(source → destination) by `(clock_read() − flight_start) / FLIGHT_FRAMES`
-  with `FLIGHT_FRAMES` ≈ 24–32; the source bracket hides once 6–8 frames have elapsed; the
-  destination persists.
+- On a hook with a fresh match event and no active zipper, latch its projected endpoints and set
+  `flight_phase = 0`.
+- Every later hook re-renders the **latched** event, ignoring newer events for OAM purposes,
+  reveals one additional tooth, and advances the head to that tooth.
 - Newer match/literal events during an active flight update only the text telemetry rows. "The
   destination persists until the next visualization event" therefore means the next **latched**
   event, not every token.
-- When the flight's frame budget elapses, the next hook latches its newest match event. Hooks
-  normally arrive every few frames, so a flight renders at several distinct positions; if the
-  hash-chain search stalls, the packet skips ahead — completion is measured in frames, never hook
-  counts, so cadence stays bounded.
+- After eight hook presentations, the next hook latches its newest match event.
 - A literal event with no active flight draws only its diamond; during a flight it leaves the
   scene untouched.
 
 ### OAM budget
 
 The visualization owns sprites 2..17 (`OAM_VISUAL_MAX` = 16), all 8×8, X in 0..255, hidden at
-Y = 240. **The current format fits:** LZSS matches are at most 18 source pixels and the smallest
-current `matrix_scale` is 152, so a run projects to at most
-`ceil(18 × 256 / 152) = 31` screen pixels. That is at most four rail tiles before row-split cap
-overhead. A match crosses at most one source row and one destination row; splitting one 31-pixel
-run into two separately capped segments raises its bound by at most one tile, to five. Therefore
-source ≤5 + destination ≤5 + packet 1 = **11 sprites maximum**, leaving five spare entries in the
-16-sprite allocation for today's 26-work corpus.
-
-Retain a deterministic overflow policy as future-proofing for a later codec with longer matches,
-more aggressive Mode 7 enlargement, or a different projection rule. If an injected/projected scene
-would exceed 16 sprites, degrade in exactly this order: drop the source bracket's middle rails
-(keep its caps), then drop the source bracket entirely. Never truncate the destination bracket or
-the packet. The implementation must calculate required sprites before staging them; it must not
-discover overflow by partially filling OAM.
+Y = 240. Eight teeth plus one head use at most **9 sprites**, leaving seven spare entries. Literal
+events use one sprite.
 
 ### Atomic lifetime
 
 Treat the visualization as a complete OAM scene, never as incremental sprite edits:
 
 1. clear every compression-visual entry in the WRAM OAM shadow to hidden Y;
-2. stage source bracket, destination bracket, and at most one packet;
+2. stage the revealed zipper teeth, head, or literal diamond;
 3. publish the whole low-table range during one VBlank DMA;
 4. keep every visualization sprite 8×8 with X in 0..255, so the OAM high-table nibbles for the
    range never change after `oam_init()` — assert that invariant instead of rewriting the high
    table; and
 5. explicitly hide the complete scene on phase exit, cancellation, and slide preparation.
 
-The packet animation rebuilds the same complete shadow each step. No old cap, rail, packet, literal,
-or source marker may survive merely because the new event uses fewer sprites.
+The zipper animation rebuilds the same complete shadow each step. No old tooth, head, literal, or
+source marker may survive merely because the new event uses fewer sprites.
 
 ## Implementation
 
@@ -289,7 +263,7 @@ or source marker may survive merely because the new event uses fewer sprites.
 2. Stop using horizontal flip for Right. Assign dedicated base tiles and audit the OBJ VRAM layout
    so all ten 16×16 poses avoid the compression-outline/cap/span tiles. Add named tile constants
    rather than embedding tile numbers in NMI assembly. Budget: 10 poses × 4 tiles = 40 OBJ tiles,
-   plus the five bracket tiles and the retained literal diamond — lay the 16×16 poses out in
+   plus four 8×8 tracker tiles (upper tooth, lower tooth, zipper head, and literal). Lay the 16×16 poses out in
    row-pairs from tile 64 upward (each row-pair holds eight sprites, so two row-pairs suffice) and
    keep the 8×8 visualization tiles in a row no pose pair touches.
 3. Replace `arrow_anim_phase` / triangle offset with signed 16-bit 8.8 position and velocity plus the
@@ -308,13 +282,19 @@ or source marker may survive merely because the new event uses fewer sprites.
    happens to run.
 7. On `prepare_slide()`, clear velocity/position, restore both arrows at rest, and leave compression
    visualization OAM entries untouched.
-8. Replace the full-box compression tile and five-dot trail with bracket cap/rail tiles and one
-   packet. Build each visualization from an all-hidden WRAM OAM shadow and upload it atomically.
+8. Replace the full-box compression tile and five-dot trail with the progressively closing zipper.
+   Build each visualization from an all-hidden WRAM OAM shadow and upload it atomically.
    Add the flight latch (event endpoints + `flight_start`) implementing the sampling rules above.
 9. Give source and destination distinct palette roles (dim gold source, site-accent destination)
    without changing artwork CGRAM or the chevron palette contract. Apply the reserved-palette
    audit in the same pass: accent to CGRAM 132 (index 4), white to 133 (index 5), deleting the
    stray zero pair and the 134 write in both `load_chevrons()` and `palette()`.
+10. Treat the NMI as emitted-machine-code-sensitive. Use branch-over-`JMP` control flow for any
+    conditional target that may grow beyond ±127 bytes, encode 16-bit immediates explicitly until
+    the MOS assembler has accumulator-width directives, and audit the emitted NMI bytes in the
+    build. Upstream, make `MOSAsmBackend::applyFixup()` diagnose any resolved PCRel8/PCRel16 value
+    that remains out of range after relaxation; add an MC negative test so truncation can never
+    silently turn a forward branch into a backward one again.
 
 ## Verification
 
@@ -337,8 +317,8 @@ or source marker may survive merely because the new event uses fewer sprites.
 5. Repack-cursor sprite test:
    - 1–8 px, 9–16 px, and 17+ px runs contain vertical pixels only at their outer caps;
    - wrapped runs receive fresh caps on both row segments;
-   - exactly one packet sprite is visible;
-   - literals contain no bracket;
+   - at most eight teeth and one zipper head are visible;
+   - literals contain no zipper;
    - a shorter event following a long match leaves zero stale sprites;
    - the OAM high-table nibbles for sprites 2..17 never change after init;
    - every real asset's maximum 18-pixel double-wrapped span fits within 16 sprites;
@@ -346,7 +326,7 @@ or source marker may survive merely because the new event uses fewer sprites.
      source-first per the OAM budget order without partially drawing a scene; and
    - phase exit/cancel hides every visualization entry.
 6. Capture match events over light/dark/busy works. Confirm one dim source, one bright continuous
-   destination, and one unambiguous moving packet—no square grid and no chicken-foot trail. Assert
+   destination, and one unambiguous closing seam—no square grid and no chicken-foot trail. Assert
    each flight lasts 24–32 NMI-clock frames regardless of hook cadence.
 7. Run the complete 150,000-frame, 26-work gallery gate; `corpus_result` equals the generated
    `GALLERY_CORPUS_ORACLE` (currently `0x3D44`). The gate script recomputes the oracle from
@@ -364,26 +344,25 @@ or source marker may survive merely because the new event uses fewer sprites.
 - The cadence is calm: approximately 24 frames per bounce, with no rapid frame-parity flashing.
 - Glow follows the arc and uses the correct site accent.
 - The opposite arrow does not move, jump, disappear, or become obscured.
-- Match runs render as continuous capped brackets with no internal vertical seams.
-- At most one traveling packet connects source to destination; the old five-dot trail is absent.
-- A literal, short match, cancellation, or phase change cannot leave stale square/bracket sprites.
-- Destination brackets, the packet, and literal diamonds render in the site accent — the reserved
+- Matches render as a progressively closing luminous zipper with no outline boxes.
+- At most eight teeth and one head connect source to destination; the old five-dot trail is absent.
+- A literal, short match, cancellation, or phase change cannot leave stale zipper sprites.
+- Zipper teeth, head, and literal diamonds render in the site accent — the reserved
   CGRAM slots hold the contract colors (132 accent, 133 white), not the pre-fix black.
 - Navigation stays responsive and all corpus/CRC gates pass.
 - The cartridge ROM map continues to be generated from the linker map as required by #126.
 
 ## Possible follow-ups (recorded, not in #128 scope)
 
-Keep these alternatives for later visual experiments after the continuous-bracket version runs on
+Keep these alternatives for later visual experiments after the zipper version runs on
 hardware. Each should get its own mockup and A/B capture before replacing the selected design:
 
 1. **Corner frame:** four detached corner marks surround the run, leaving its center unobstructed.
 2. **Underline ruler:** a thin line below the run with bright start/end ticks.
-3. **Zipper:** a luminous seam closes progressively from source to destination.
-4. **Scanner beam:** one vertical needle sweeps across the span and leaves a fading underline.
-5. **Compression calipers:** opposing jaws squeeze inward around matched bytes.
-6. **Endpoint packet:** source/destination diamonds with a traveling particle but no span outline.
-7. **Heat ribbon:** a dotted ribbon whose intensity communicates match length.
+3. **Scanner beam:** one vertical needle sweeps across the span and leaves a fading underline.
+4. **Compression calipers:** opposing jaws squeeze inward around matched bytes.
+5. **Endpoint packet:** source/destination diamonds with a traveling particle but no span outline.
+6. **Heat ribbon:** a dotted ribbon whose intensity communicates match length.
 
 Do not implement multiple selectable tracker modes in the shipping ROM yet. They would consume OBJ
 tiles/OAM budget and complicate evaluation before the clean baseline has been judged.

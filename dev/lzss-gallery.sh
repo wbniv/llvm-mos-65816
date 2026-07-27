@@ -39,12 +39,33 @@ if [ -n "${GALLERY_RUN_COLOR:-}" ]; then
   EXTRA_DEFS+=("-DGALLERY_RUN_COLOR=$GALLERY_RUN_COLOR")
 fi
 "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
-  -Xclang -target-feature -Xclang +mos-a16 -Os \
+  -Xclang -target-feature -Xclang +mos-a16 -Oz \
   -DGALLERY_START="${GALLERY_START:-0}" \
   "${EXTRA_DEFS[@]}" \
   -Wl,-Map="$MAP" -o "$ROM" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 [ "$(stat -c %s "$ROM")" = 1048576 ]
+# The MOS assembler currently neither diagnoses a resolved wrapped PCRel8
+# fixup nor tracks 65816 M width through REP/SEP. Fail this build if the NMI's
+# deliberately safe branch-over-JMP or explicit ADC #$0010 encoding regresses.
+NMI_VMA=$(awk '$NF=="nmi"{print $1; exit}' "$MAP")
+python3 - "$ROM" "$NMI_VMA" <<'PY'
+from pathlib import Path
+import sys
+rom = Path(sys.argv[1]).read_bytes()
+start = int(sys.argv[2], 16) & 0x7fff
+nmi = rom[start:start + 0x400]
+required = {
+    "branch-over-JMP": bytes.fromhex("d0 03 4c"),
+    "16-bit ADC #$0010": bytes.fromhex("69 10 00"),
+}
+missing = [name for name, opcode in required.items() if opcode not in nmi]
+if missing:
+    raise SystemExit("FATAL: NMI opcode audit failed: missing " + ", ".join(missing))
+if bytes.fromhex("f0 a2") in nmi:
+    raise SystemExit("FATAL: NMI opcode audit found the formerly wrapped BEQ")
+print("NMI opcode audit: PASS (long conditional and 16-bit immediate are explicit)")
+PY
 python3 "$ROOT/tools/snes-rom-map.py" "$MAP" \
   "$ROOT/assets/snes/lzss-gallery/derived/report.json" \
   "$ROOT/assets/snes/lzss-gallery/derived/rom-map.md"

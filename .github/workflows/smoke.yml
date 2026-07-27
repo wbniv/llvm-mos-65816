@@ -66,6 +66,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: SNES display-quality contract
+        run: dev/snes-display-quality.py
+
       # Builds the dev image (toolchain + MAME), vendors llvm-mos-sdk, injects
       # platforms/snes, and compiles examples/snes/hello.c -> build/hello.sfc.
       - name: Build SDK + smoke ROM
