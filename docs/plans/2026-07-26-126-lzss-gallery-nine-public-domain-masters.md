@@ -286,22 +286,26 @@ Every accepted Previous/Next input must produce immediate visible feedback on
 the corresponding on-cartridge chevron, regardless of whether it originated
 from a keyboard, gamepad, or a tap on the left/right half of the phone canvas.
 
-- On trigger, change the selected gold chevron to the reserved bright
-  cyan/white highlight palette and give it a short outward pulse.
-- Hold the peak highlight for at least three frames, then return to gold over a
-  total animation of roughly 8–12 frames.
+- On trigger, animate the selected chevron instead of printing `LOADING
+  NEXT...` or `LOADING PREVIOUS...`.
+- Give the selected chevron a small vertical bounce (for example
+  `0,-1,-2,-3,-2,-1,0,+1,0` pixels) plus a bright palette pulse/glow. Preserve
+  its horizontal anchor so Previous/Next never appears to jump inward or become
+  clipped at the screen edge.
+- Hold the peak glow for at least three frames, then return to gold over a
+  total animation of roughly 10–16 frames. Loop a gentler bounce/pulse while
+  decode remains busy, and settle cleanly when the new work is ready.
 - Begin the highlight on the first vblank after the accepted input. The next
   image's decode starts concurrently; feedback must not wait for decoding and
   must not add an artificial loading pause.
 - Animate only the triggered direction. The opposite arrow remains gold.
 - Ignore key/button auto-repeat already rejected by navigation debouncing;
   a newly accepted input restarts the appropriate arrow animation.
-- Keep the feedback visible over the outgoing artwork and its `LOADING...`
-  state. It must not disappear when the outgoing picture begins its final
-  transition.
-- Pair the flash with the complete direction-specific status `LOADING
-  NEXT...` or `LOADING PREVIOUS...`. Never abbreviate it to `NEX`, truncate a
-  word, or briefly show a competing generic status.
+- Keep the feedback visible over the outgoing artwork throughout decode. It
+  must not disappear when the outgoing picture begins its final transition.
+- Do not display direction-specific loading prose. Preserve the console rows
+  for phase progress, timings, and corpus state; the animated chevron alone
+  communicates Previous versus Next.
 - Use the existing reserved UI colors/sprite budget, without consuming artwork
   palette entries or changing the LZSS timing/oracle.
 
@@ -337,10 +341,9 @@ existing frame counters and completion state.
 - Render `PASS` in the reserved success color and `FAIL` in the reserved error
   color. A corpus is only `PASS` after all 20 fixed-order oracle contributions
   are complete; before then label it `RUNNING`.
-- Direction-specific loading text and the arrow flash occupy the same console
-  without erasing the last completed timing result. For example, animate
-  `NEXT > DECODE [##......]` on one row while the other two timing/corpus rows
-  remain stable.
+- Chevron animation must not erase or replace the last completed timing
+  result. During navigation, keep the console devoted to decode progress and
+  the other timing/corpus rows.
 - Prefer three telemetry rows. A layout may use two where a two-line title
   requires the space, but every work must show phase animation, all three final
   timings, per-work result, and corpus progress without scrolling.
@@ -389,6 +392,31 @@ Use reserved UI palette colors: current match cyan/white, match-source marker
 gold, and fading history in darker cyan. Assert no scanline exceeds 32 OBJ
 sprites and no frame exceeds 128; if necessary, reduce trail length before
 dropping the current run.
+
+#### Site-specific REPACK colors
+
+Build two functionally identical ROM variants whose only intended difference
+is the current-run outline color:
+
+| Site | Requested color | SNES BGR555 |
+|---|---|---:|
+| biohack.net | **neon cyan** (an intentional gallery exception to the site's normal orange `--accent`) | `SNES_RGB(8,31,30)` / `0x7BE8` |
+| indri.studio | indri-eye neon green `#B8EF00` from `--color-primary-container` | `SNES_RGB(22,29,0)` / `0x03B6` |
+
+Do not substitute biohack.net's general `#C2410C` orange token: the requested
+gallery visualization is neon cyan. Keep all non-palette ROM behavior, asset
+streams, checksums, WRAM offsets, and the `0xB5D7` oracle identical. Record and
+verify a separate ROM SHA-256 for each site.
+
+Store the site-color outline in reserved OBJ palette-0 colors 4/5 (CGRAM
+132/133) and encode the outline tile with color index 4. Do **not** select OBJ
+palette 1 or write CGRAM 144–159: those indices are part of the 219-color
+artwork palette and overwriting them visibly corrupts the image.
+
+All compression-overlay OAM writes must occur immediately after their own
+VBlank wait. They must never share or corrupt the two navigation-chevron OAM
+entries: throughout `REPACK`, the left and right chevrons remain complete,
+stationary, and visible while the run outline moves independently.
 
 The benchmark timing remains wall-clock performance with the visualization
 enabled, including its bounded NMI cost. Add a headless build/run comparison
@@ -529,7 +557,8 @@ BGR555 output.
   banding, stale palettes, caption overlap, and incorrect black padding.
 - Capture both Previous and Next at peak highlight and assert the first changed
   frame occurs immediately after the accepted navigation input while decode is
-  in progress.
+  in progress. Capture the full bounce/glow sequence and assert horizontal
+  position, complete 16×16 shape, and the opposite chevron remain unchanged.
 - Record the console at every phase and after completion. Assert that progress
   animation advances during long work, final decode/repack/verify timings
   remain visible, and corpus progress reaches `20/20 PASS` only when the oracle
@@ -547,13 +576,15 @@ BGR555 output.
 
 ### Website parity
 
-- Copy the exact verified ROM and generated poster/contact sheet to both sites.
+- Copy each verified site-color ROM variant and the common generated
+  poster/contact sheet to its corresponding site.
 - Update both descriptions to say 20 works and up to 219 artwork colors.
 - Add all ten titles/artists and the source/license attribution to both pages.
 - Keep the Mode 7 badge/filter behavior unchanged.
 - Build both sites in their existing containers.
-- Compare SHA-256 for the source ROM, both repository copies, and both live
-  downloads.
+- Compare each variant's SHA-256 with its corresponding repository copy and
+  live download; the two site ROM hashes are expected to differ only because
+  of the requested outline palette.
 - Compare the ordered 20-work metadata rendered by biohack.net and indri.studio.
 
 ## Publication and documentation

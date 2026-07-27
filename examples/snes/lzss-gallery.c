@@ -27,8 +27,8 @@
 #define GALLERY_START 0u
 #endif
 #ifndef GALLERY_RUN_COLOR
-/* biohack.net --accent #C2410C, quantized to BGR555. */
-#define GALLERY_RUN_COLOR SNES_RGB(24,8,1)
+/* biohack.net gallery-specific neon cyan. */
+#define GALLERY_RUN_COLOR SNES_RGB(8,31,30)
 #endif
 
 volatile uint16_t corpus_result;
@@ -238,14 +238,15 @@ static void load_chevrons(void){
   /* 8x8 compression outline: cyan box used as single/cap/span sprites. */
   for(uint8_t y=0;y<8;y++){
     uint8_t p=(uint8_t)((y==0u||y==7u)?0xffu:0x81u);
-    objchr[y]=(uint16_t)p;objchr[8u+y]=0;
+    /* Plane 2 selects OBJ palette-0 color 4, reserved outside artwork indices. */
+    objchr[y]=0;objchr[8u+y]=(uint16_t)p;
   }
   vram_words(0x6480u,objchr,16);
   REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;
   uint16_t c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  /* Compression sprites use OBJ palette 1 (attribute bits ppp=001). */
-  REG_CGADD=144;REG_CGDATA=0;REG_CGDATA=0;
+  /* Palette-0 colors 4/5 are reserved; never overwrite artwork 144..255. */
+  REG_CGADD=132;REG_CGDATA=0;REG_CGDATA=0;
   c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   REG_OBSEL=3u;
@@ -265,7 +266,7 @@ static void oam_arrows(uint8_t y,uint8_t hide){
 static void oam_hide_compression(void){
   snes_wait_vblank();
   REG_OAMADDL=8;REG_OAMADDH=0;
-  for(uint8_t i=0;i<6;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=72;REG_OAMDATA=0x32;}
+  for(uint8_t i=0;i<6;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=72;REG_OAMDATA=0x30;}
 }
 static void oam_compression(uint16_t pos,uint8_t len,uint8_t literal){
   if(!active_asset)return;
@@ -283,7 +284,7 @@ static void oam_compression(uint16_t pos,uint8_t len,uint8_t literal){
   for(uint8_t i=0;i<6;i++){
     uint8_t hide=(uint8_t)(i>=count);
     REG_OAMDATA=(uint8_t)(x+i*8u);REG_OAMDATA=hide?240u:y;
-    REG_OAMDATA=72;REG_OAMDATA=0x32;
+    REG_OAMDATA=72;REG_OAMDATA=0x30;
   }
 }
 static void blank_maps(void){
