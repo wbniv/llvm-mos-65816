@@ -185,6 +185,12 @@ is valid and retained rather than hiding difficult inputs. The new canonical ora
 The uninterrupted 75,000-frame bsnes-jg run passed `corpus_result == 0xBFAB`. Measured stage
 times:
 
+### Cartridge visualization
+
+[Open the proportional 4 Mbit ROM bank map](2026-07-26-125-lzss-gallery-full-mode7-color/rom-layout.html).
+It distinguishes runtime/shared data, each work's LZSS stream, its 512-byte palette, and remaining
+space across all sixteen 32 KiB LoROM banks.
+
 | Work | Unpack frames | Repack frames | Verify frames |
 |---|---:|---:|---:|
 | Great Wave | 346 | 6,195 | 465 |

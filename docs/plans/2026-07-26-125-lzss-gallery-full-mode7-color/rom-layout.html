@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LZSS Gallery — 4 Mbit ROM layout</title>
+<style>
+  :root{color-scheme:dark;--bg:#100f0d;--panel:#1d1a16;--ink:#f4ead6;--muted:#a99d8a;
+    --code:#e4a853;--stream:#65b7a6;--palette:#f0d277;--free:#302b25;--rule:#4b4338}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace}
+  main{max-width:1180px;margin:auto;padding:30px 24px 48px}
+  h1{font:700 28px/1.1 system-ui,sans-serif;margin:0 0 7px;color:#fff4dc}
+  .lede{color:var(--muted);margin:0 0 22px}.summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .pill{border:1px solid var(--rule);background:var(--panel);padding:7px 11px;border-radius:999px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0;color:var(--muted)}
+  .key:before{content:"";display:inline-block;width:12px;height:12px;margin-right:7px;vertical-align:-1px;
+    background:var(--c);border-radius:2px}
+  .cart{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:12px}
+  .bank{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+  .head{display:flex;justify-content:space-between;padding:9px 10px;border-bottom:1px solid var(--rule)}
+  .num{font-weight:800;color:#fff}.used{color:var(--muted)}
+  .bar{height:52px;display:flex;background:var(--free);position:relative}
+  .seg{height:100%;min-width:2px}.code{background:var(--code)}.stream{background:var(--stream)}
+  .palette{background:var(--palette)}.free{background:var(--free)}
+  .label{padding:9px 10px 11px;min-height:72px}.title{font-weight:700;color:#fff4dc}
+  .detail{font-size:12px;color:var(--muted);margin-top:4px}
+  .axis{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin:7px 1px 0}
+  .note{margin-top:18px;padding:13px 15px;border-left:3px solid var(--palette);background:var(--panel);
+    color:var(--muted)}
+  @media(max-width:950px){.cart{grid-template-columns:repeat(2,minmax(210px,1fr))}}
+  @media(max-width:520px){.cart{grid-template-columns:1fr}}
+</style>
+<main>
+  <h1>LZSS Gallery cartridge layout</h1>
+  <p class="lede">4 Mbit (512 KiB) LoROM · 16 banks × 32 KiB · full-color 219-index corpus</p>
+  <div class="summary">
+    <span class="pill">ROM used: 183,379 bytes (35.0%)</span>
+    <span class="pill">Corpus streams: 154,761 bytes</span>
+    <span class="pill">Palettes: 5,120 bytes</span>
+    <span class="pill">Reserved: banks $0B–$0F</span>
+  </div>
+  <div class="legend">
+    <span class="key" style="--c:var(--code)">code / metadata</span>
+    <span class="key" style="--c:var(--stream)">LZSS stream</span>
+    <span class="key" style="--c:var(--palette)">512-byte palette</span>
+    <span class="key" style="--c:var(--free)">free / $FF padding</span>
+  </div>
+  <div class="cart" id="cart"></div>
+  <div class="axis"><span>each bar begins at bank offset $8000</span><span>bank capacity 32,768 bytes</span></div>
+  <p class="note">Bank $08 is the fullest image bank at 17,434 bytes (53.2%). The cartridge has
+    substantial per-bank headroom, but adding works consumes whole bank assignments before it
+    consumes the nominal 4 Mbit capacity uniformly.</p>
+</main>
+<script>
+const cap=32768;
+const banks=[
+ {n:"00",title:"Runtime + shared assets",parts:[["code",17042],["palette",6376],["code",80]],
+  detail:"17,042 code/startup/navigation · 6,376 metadata/fonts/tables · 80 header/vectors"},
+ {n:"01",title:"Great Wave",stream:15259},{n:"02",title:"Bedroom",stream:15836},
+ {n:"03",title:"Grande Jatte",stream:14846},{n:"04",title:"Two Sisters",stream:16055},
+ {n:"05",title:"Water Lilies",stream:14958},{n:"06",title:"Basket of Apples",stream:15200},
+ {n:"07",title:"Stack of Wheat",stream:15699},{n:"08",title:"Self-Portrait",stream:16922},
+ {n:"09",title:"Paris Street",stream:15171},{n:"0A",title:"Poppy Field",stream:14815},
+ ...["0B","0C","0D","0E","0F"].map(n=>({n,title:"Reserved",parts:[],detail:"32,768 bytes free"}))
+];
+for(const b of banks){
+  const parts=b.parts??[["stream",b.stream],["palette",512]];
+  const used=parts.reduce((s,p)=>s+p[1],0), free=cap-used;
+  const detail=b.detail??`${b.stream.toLocaleString()} stream · 512 palette · ${free.toLocaleString()} free`;
+  const node=document.createElement("section");node.className="bank";
+  node.innerHTML=`<div class="head"><span class="num">Bank $${b.n}</span><span class="used">${used.toLocaleString()} / 32,768</span></div>
+    <div class="bar" aria-label="${used} bytes used, ${free} free">${
+      [...parts,["free",free]].map(([c,v])=>`<span class="seg ${c}" style="width:${v/cap*100}%" title="${c}: ${v.toLocaleString()} bytes"></span>`).join("")
+    }</div><div class="label"><div class="title">${b.title}</div><div class="detail">${detail}</div></div>`;
+  document.querySelector("#cart").append(node);
+}
+</script>
+</html>
