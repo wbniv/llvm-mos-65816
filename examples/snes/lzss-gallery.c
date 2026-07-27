@@ -30,6 +30,9 @@
 /* biohack.net gallery-specific neon cyan. */
 #define GALLERY_RUN_COLOR SNES_RGB(8,31,30)
 #endif
+#ifndef GALLERY_VISUAL
+#define GALLERY_VISUAL 1
+#endif
 
 volatile uint16_t corpus_result;
 volatile uint8_t gallery_progress;
@@ -54,8 +57,14 @@ static uint16_t objchr[64];
 static uint8_t bgmode_tab[7], tm_tab[7];
 static const uint8_t zero=0;
 static const GalleryAsset *active_asset;
-static uint16_t viz_pos,viz_dist,viz_out;
-static uint8_t viz_len,viz_literal;
+enum { REPACK_NONE=0,REPACK_LITERAL=1,REPACK_MATCH=2,REPACK_CANCELED=3 };
+typedef struct {
+  uint16_t sequence,current_offset,source_offset,raw_done,packed_done;
+  uint16_t literals,matches,distance;
+  uint8_t kind,value,length,copy_progress;
+} RepackVisual;
+volatile RepackVisual gallery_repack_visual;
+static uint8_t token_kind[12],token_len[12],token_count;
 
 asm(".text\n"
     ".global nmi\n"
@@ -196,23 +205,42 @@ static uint8_t hash_far(const FAR uint8_t *p,uint16_t pos,uint16_t len){
 }
 
 static void progress_line(const char *phase,uint16_t done,uint16_t total);
-static void oam_compression(uint16_t pos,uint8_t len,uint8_t literal);
+static void oam_compression(void);
 static uint8_t decimal(char*s,uint8_t n,uint16_t v);
+
+static void repack_publish(uint8_t kind,uint16_t pos,uint16_t source,uint16_t raw,
+                           uint16_t packed,const LzssStats *st,uint16_t distance,
+                           uint8_t value,uint8_t length,uint8_t copied){
+  gallery_repack_visual.kind=kind;
+  gallery_repack_visual.current_offset=pos;
+  gallery_repack_visual.source_offset=source;
+  gallery_repack_visual.raw_done=raw;
+  gallery_repack_visual.packed_done=packed;
+  gallery_repack_visual.literals=st->literals;
+  gallery_repack_visual.matches=st->matches;
+  gallery_repack_visual.distance=distance;
+  gallery_repack_visual.value=value;
+  gallery_repack_visual.length=length;
+  gallery_repack_visual.copy_progress=copied;
+  gallery_repack_visual.sequence++;
+}
 
 __attribute__((optnone,noinline))
 static uint16_t compress_far(const FAR uint8_t *src,uint16_t len,FAR uint8_t *dst,LzssStats *st){
   uint16_t pos=0,op=0;
-  uint16_t next_meter=512;
+  uint16_t next_meter=256;
   for(uint16_t i=0;i<256;i++)HEAD[i]=0xffff;
   st->literals=st->matches=st->longest=0;
+  token_count=0;
+  repack_publish(REPACK_NONE,0,0,0,0,st,0,0,0,0);
   while(pos<len){
-    if(nav_cancel)return 0;
+    if(nav_cancel){repack_publish(REPACK_CANCELED,pos,0,pos,op,st,0,0,0,0);return 0;}
     if(op>=PACK_CAP)return 0;
     uint16_t flagpos=op++;uint8_t flags=0;
     for(uint8_t bit=0;bit<8&&pos<len;bit++){
       uint8_t hv=hash_far(src,pos,len);uint16_t p=HEAD[hv],best=0,distbest=0;uint8_t seen=0;
       while(p!=0xffff&&(uint16_t)(pos-p)<=4095u&&seen<64u){
-        if(nav_cancel)return 0;
+        if(nav_cancel){repack_publish(REPACK_CANCELED,pos,0,pos,op,st,0,0,0,0);return 0;}
         uint16_t n=0;
         while(n<18u&&(uint16_t)(pos+n)<len&&src[p+n]==src[pos+n]){if(nav_cancel)return 0;n++;}
         uint16_t dist=(uint16_t)(pos-p);
@@ -225,13 +253,14 @@ static uint16_t compress_far(const FAR uint8_t *src,uint16_t len,FAR uint8_t *ds
         flags|=(uint8_t)(1u<<bit);dst[op++]=(uint8_t)distbest;
         dst[op++]=(uint8_t)(((distbest>>8)<<4)|(best-3u));
         advance=best;st->matches++;if(best>st->longest)st->longest=best;
-        viz_pos=pos;viz_dist=distbest;viz_len=(uint8_t)best;viz_literal=0;
+        repack_publish(REPACK_MATCH,pos,(uint16_t)(pos-distbest),
+                       (uint16_t)(pos+best),op,st,distbest,0,(uint8_t)best,(uint8_t)best);
       }else{
         if(op>=PACK_CAP)return 0;dst[op++]=src[pos];advance=1;st->literals++;
-        viz_pos=pos;viz_dist=0;viz_len=1;viz_literal=1;
+        repack_publish(REPACK_LITERAL,pos,pos,(uint16_t)(pos+1u),op,st,0,src[pos],1,1);
       }
       for(uint16_t n=0;n<advance;n++){
-        if(nav_cancel)return 0;
+        if(nav_cancel){repack_publish(REPACK_CANCELED,pos,0,pos,op,st,0,0,0,0);return 0;}
         uint16_t q=(uint16_t)(pos+n);uint8_t h=hash_far(src,q,len);
         PREV[q&4095u]=HEAD[h];HEAD[h]=q;
       }
@@ -240,16 +269,21 @@ static uint16_t compress_far(const FAR uint8_t *src,uint16_t len,FAR uint8_t *ds
     dst[flagpos]=flags;
     if(pos>=next_meter){
       /*
-       * progress_line() waits for VBlank.  Update OAM after that wait, while
-       * the PPU is not scanning the arrow sprites; writing OAM first corrupted
-       * both navigation arrows as soon as repacking began.
+       * Presentation consumes only the newest complete event.  Token history
+       * advances here, not in the codec's byte-emission path.
        */
-      viz_out=op;progress_line("REPACK",pos,len);
-      oam_compression(viz_pos,viz_len,viz_literal);
-      next_meter=(uint16_t)(next_meter+512u);
+#if GALLERY_VISUAL
+      for(uint8_t i=0;i<11;i++){token_kind[i]=token_kind[i+1u];token_len[i]=token_len[i+1u];}
+      token_kind[11]=gallery_repack_visual.kind;token_len[11]=gallery_repack_visual.length;
+      if(token_count<12u)token_count++;
+      progress_line("REPACK",pos,len);oam_compression();
+#endif
+      next_meter=(uint16_t)(next_meter+256u);
     }
   }
+#if GALLERY_VISUAL
   progress_line("REPACK",len,len);
+#endif
   return op;
 }
 
@@ -311,6 +345,20 @@ static void load_chevrons(void){
     objchr[y]=0;objchr[8u+y]=(uint16_t)p;
   }
   vram_words(0x6480u,objchr,16);
+  /* Gold source bracket (tile 75), bright literal diamond (76), gold dot (77). */
+  for(uint8_t y=0;y<8;y++){
+    uint8_t edge=(uint8_t)((y==1u||y==6u)?0x7eu:((y>1u&&y<6u)?0x42u:0));
+    objchr[y]=(uint16_t)(edge<<8);objchr[8u+y]=0;
+  }
+  vram_words(0x64b0u,objchr,16);
+  for(uint8_t y=0;y<8;y++){
+    uint8_t d=(uint8_t)(y<4u?(uint8_t)(0x18u>>(3u-y)):(uint8_t)(0x18u>>(y-4u)));
+    if(y==3u||y==4u)d=0xffu;
+    objchr[y]=0;objchr[8u+y]=d;
+  }
+  vram_words(0x64c0u,objchr,16);
+  for(uint8_t y=0;y<8;y++){objchr[y]=(uint16_t)((y==3u||y==4u)?0x18u<<8:0);objchr[8u+y]=0;}
+  vram_words(0x64d0u,objchr,16);
   REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;
   uint16_t c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
@@ -335,26 +383,55 @@ static void oam_arrows(uint8_t y,uint8_t hide){
 static void oam_hide_compression(void){
   snes_wait_vblank();
   REG_OAMADDL=8;REG_OAMADDH=0;
-  for(uint8_t i=0;i<6;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=72;REG_OAMDATA=0x30;}
+  for(uint8_t i=0;i<30;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=72;REG_OAMDATA=0x30;}
 }
-static void oam_compression(uint16_t pos,uint8_t len,uint8_t literal){
-  if(!active_asset)return;
+static void oam_put(uint8_t x,uint8_t y,uint8_t tile){
+  REG_OAMDATA=x;REG_OAMDATA=y;REG_OAMDATA=tile;REG_OAMDATA=0x30;
+}
+static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y){
   uint16_t rw=((uint16_t)active_asset->width*256u)/active_asset->matrix_scale;
   uint16_t rh=((uint16_t)active_asset->height*256u)/active_asset->matrix_scale;
   uint8_t ox=(uint8_t)((256u-rw)/2u),oy=(uint8_t)((active_asset->display_height-rh)/2u);
   uint16_t px=(uint16_t)(pos%active_asset->width),py=(uint16_t)(pos/active_asset->width);
-  uint8_t x=(uint8_t)(ox+(px*256u)/active_asset->matrix_scale);
-  uint8_t y=(uint8_t)(oy+(py*256u)/active_asset->matrix_scale);
-  uint8_t w=(uint8_t)(((uint16_t)len*256u+active_asset->matrix_scale-1u)/active_asset->matrix_scale);
-  if(w<3u)w=3u;if(literal)w=3u;
-  uint8_t count=(uint8_t)((w+7u)/8u);if(count>3u)count=3u;
+  *x=(uint8_t)(ox+(px*256u)/active_asset->matrix_scale);
+  *y=(uint8_t)(oy+(py*256u)/active_asset->matrix_scale);
+}
+static uint8_t oam_span(uint16_t pos,uint8_t len,uint8_t tile,uint8_t used){
+  while(len&&used<18u){
+    uint16_t row_left=(uint16_t)(active_asset->width-pos%active_asset->width);
+    uint8_t part=(uint8_t)(len<row_left?len:row_left),x,y,xe,ye;
+    project_offset(pos,&x,&y);project_offset((uint16_t)(pos+part),&xe,&ye);
+    uint8_t pixels=(uint8_t)(xe>x?xe-x:3u),count=(uint8_t)((pixels+7u)/8u);
+    if(count<1u)count=1u;if(count>6u)count=6u;
+    for(uint8_t i=0;i<count&&used<18u;i++,used++)oam_put((uint8_t)(x+i*8u),y,tile);
+    pos=(uint16_t)(pos+part);len=(uint8_t)(len-part);
+  }
+  return used;
+}
+static void oam_compression(void){
+  if(!active_asset)return;
+  uint16_t seq=gallery_repack_visual.sequence;
+  RepackVisual v;
+  v.current_offset=gallery_repack_visual.current_offset;
+  v.source_offset=gallery_repack_visual.source_offset;
+  v.kind=gallery_repack_visual.kind;v.length=gallery_repack_visual.length;
+  if(seq!=gallery_repack_visual.sequence)return;
   snes_wait_vblank();
   REG_OAMADDL=8;REG_OAMADDH=0;
-  for(uint8_t i=0;i<6;i++){
-    uint8_t hide=(uint8_t)(i>=count);
-    REG_OAMDATA=(uint8_t)(x+i*8u);REG_OAMDATA=hide?240u:y;
-    REG_OAMDATA=72;REG_OAMDATA=0x30;
+  uint8_t used=0;
+  if(v.kind==REPACK_LITERAL){
+    uint8_t x,y;project_offset(v.current_offset,&x,&y);oam_put((uint8_t)(x-3u),(uint8_t)(y-3u),76);used=1;
+  }else if(v.kind==REPACK_MATCH){
+    used=oam_span(v.source_offset,v.length,75,used);
+    used=oam_span(v.current_offset,v.length,72,used);
+    uint8_t sx,sy,dx,dy;project_offset(v.source_offset,&sx,&sy);project_offset(v.current_offset,&dx,&dy);
+    for(uint8_t i=1;i<=5u&&used<29u;i++,used++){
+      int16_t x=(int16_t)sx+((int16_t)dx-(int16_t)sx)*(int16_t)i/6;
+      int16_t y=(int16_t)sy+((int16_t)dy-(int16_t)sy)*(int16_t)i/6;
+      oam_put((uint8_t)x,(uint8_t)y,77);
+    }
   }
+  while(used++<30u)oam_put(0,240,72);
 }
 static void blank_maps(void){
   REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=MAP2;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(PAL16<<10);
@@ -382,8 +459,18 @@ static void text8_at(uint8_t row,uint8_t col,const char*s){
 static void text8(uint8_t row,const char*s){
   uint8_t n=slen(s,30);text8_at(row,(uint8_t)((32u-n)/2u),s);
 }
+static void text8_replace(uint8_t row,char*s){
+  uint8_t n=slen(s,30);while(n<30u)s[n++]=' ';s[30]=0;
+  snes_wait_vblank();text8_at(row,1,s);
+}
 static uint8_t console_row(const GalleryAsset*a){
-  return (uint8_t)(a->display_height/8u+2u+a->title_rows+1u);
+  /*
+   * Three telemetry rows must finish at row 26.  The last metadata row is
+   * deliberately reused while a benchmark is active; caption() restores it
+   * for the next work.
+   */
+  uint8_t row=(uint8_t)(a->display_height/8u+2u+a->title_rows);
+  return row>24u?24u:row;
 }
 static void artist_line(uint8_t row,const GalleryAsset*a){
   uint8_t nb=slen(a->artist_small_before,31),nl=slen(a->artist_large,16),na=slen(a->artist_small_after,31);
@@ -404,27 +491,54 @@ static void caption(const GalleryAsset*a,const char*status){
 }
 static void progress_line(const char *phase,uint16_t done,uint16_t total){
   char s[31];uint8_t n=0,is_repack=(uint8_t)(phase[0]=='R'&&phase[1]=='E');
+  uint8_t row=console_row(active_asset);
+  if(is_repack){
+    uint16_t seq=gallery_repack_visual.sequence;
+    RepackVisual v;
+    v.current_offset=gallery_repack_visual.current_offset;v.raw_done=gallery_repack_visual.raw_done;
+    v.packed_done=gallery_repack_visual.packed_done;v.literals=gallery_repack_visual.literals;
+    v.matches=gallery_repack_visual.matches;v.distance=gallery_repack_visual.distance;
+    v.kind=gallery_repack_visual.kind;v.value=gallery_repack_visual.value;
+    v.length=gallery_repack_visual.length;v.copy_progress=gallery_repack_visual.copy_progress;
+    if(seq!=gallery_repack_visual.sequence)return;
+    const char*p="R ";while(*p)s[n++]=*p++;n=decimal(s,n,v.raw_done);s[n++]='/';n=decimal(s,n,total);
+    p=" P";while(*p)s[n++]=*p++;n=decimal(s,n,v.packed_done);s[n++]=' ';
+    if(!v.raw_done){p="--.-%";while(*p)s[n++]=*p++;}
+    else{
+      int16_t tenth=(int16_t)(((int32_t)v.raw_done-(int32_t)v.packed_done)*1000l/(int32_t)v.raw_done);
+      s[n++]=tenth<0?'-':'+';if(tenth<0)tenth=(int16_t)-tenth;
+      n=decimal(s,n,(uint16_t)(tenth/10));s[n++]='.';s[n++]=(char)('0'+tenth%10);s[n++]='%';
+    }
+    s[n]=0;text8_replace(row,s);n=0;
+    if(v.kind==REPACK_MATCH){
+      p="MATCH L";while(*p)s[n++]=*p++;n=decimal(s,n,v.length);p=" D";while(*p)s[n++]=*p++;
+      n=decimal(s,n,v.distance);p=" COPY ";while(*p)s[n++]=*p++;n=decimal(s,n,v.copy_progress);
+      s[n++]='/';n=decimal(s,n,v.length);
+    }else{
+      static const char hex[]="0123456789ABCDEF";
+      p="LITERAL $";while(*p)s[n++]=*p++;s[n++]=hex[v.value>>4];s[n++]=hex[v.value&15u];
+      p="  L ";while(*p)s[n++]=*p++;n=decimal(s,n,v.literals);p=" M ";while(*p)s[n++]=*p++;n=decimal(s,n,v.matches);
+    }
+    s[n]=0;text8_replace((uint8_t)(row+1u),s);n=0;p="TOK ";while(*p)s[n++]=*p++;
+    uint8_t first=(uint8_t)(12u-token_count);
+    for(uint8_t i=0;i<12u;i++){
+      if(i<first)s[n++]='.';
+      else{s[n++]=token_kind[i]==REPACK_MATCH?(token_len[i]>=12u?'M':'m'):'L';}
+    }
+    p="  L";while(*p)s[n++]=*p++;n=decimal(s,n,v.literals);p=" M";while(*p)s[n++]=*p++;n=decimal(s,n,v.matches);
+    s[n]=0;text8_replace((uint8_t)(row+2u),s);
+    return;
+  }
   while(*phase&&n<8)s[n++]=*phase++;
   while(n<8)s[n++]=' ';s[n++]='[';
   uint8_t fill=(uint8_t)(((uint32_t)done*10u)/total);
   for(uint8_t i=0;i<10;i++)s[n++]=i<fill?'#':'.';
-  s[n++]=']';s[n]=0;
-  uint8_t row=console_row(active_asset);
-  snes_wait_vblank();REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)row*32u);
-  for(uint8_t i=0;i<32;i++)REG_VMDATA=0;
-  text8(row,s);
-  if(is_repack){
-    n=0;const char*p="RAW ";while(*p)s[n++]=*p++;n=decimal(s,n,done);
-    p=" OUT ";while(*p)s[n++]=*p++;n=decimal(s,n,viz_out);
-    s[n++]=' ';s[n++]=(char)('0'+viz_len/10u);s[n++]=(char)('0'+viz_len%10u);s[n++]='P';s[n]=0;
-    REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)(row+1u)*32u);
-    for(uint8_t i=0;i<32;i++)REG_VMDATA=0;text8((uint8_t)(row+1u),s);
-  }
+  s[n++]=']';s[n]=0;text8_replace(row,s);
   n=0;const char*q="CORPUS ";while(*q)s[n++]=*q++;
   n=decimal(s,n,gallery_completed_count);s[n++]='/';n=decimal(s,n,GALLERY_ASSET_COUNT);
   q=gallery_completed_count==GALLERY_ASSET_COUNT?" PASS":" RUNNING";while(*q)s[n++]=*q++;s[n]=0;
   REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)(row+2u)*32u);
-  for(uint8_t i=0;i<32;i++)REG_VMDATA=0;text8((uint8_t)(row+2u),s);
+  text8_replace((uint8_t)(row+2u),s);
 }
 static uint8_t decimal(char*s,uint8_t n,uint16_t v){
   char r[5];uint8_t k=0;do{r[k++]=(char)('0'+v%10u);v/=10u;}while(v&&k<5);
@@ -463,6 +577,10 @@ static void palette(const GalleryAsset*a){
   REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;
   c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  /* Restore reserved OBJ colors after the artwork's full 256-color upload. */
+  REG_CGADD=132;REG_CGDATA=0;REG_CGDATA=0;
+  c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
 }
 static uint8_t upload_image(const GalleryAsset*a){
   for(uint8_t ty=0;ty<a->tile_rows;ty++){
@@ -513,9 +631,13 @@ static uint8_t prepare_slide(const GalleryAsset*a){
 
 __attribute__((noinline))
 static uint16_t repack_slide(const GalleryAsset*a){
+#if GALLERY_VISUAL
   progress_line("REPACK",0,a->raw_len);
+#endif
   LzssStats st;uint16_t z=compress_far(FB_A,a->raw_len,PACK,&st);
+#if GALLERY_VISUAL
   oam_hide_compression();
+#endif
   return z;
 }
 

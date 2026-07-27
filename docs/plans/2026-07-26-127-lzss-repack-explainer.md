@@ -1,7 +1,10 @@
 # #127 — LZSS Gallery: Repack Explainer
 
-**Status:** PLAN (2026-07-26). Supersedes the minimal run-outline visualization
+**Status:** IMPLEMENTED (2026-07-26). Supersedes the minimal run-outline visualization
 specified in [#126](2026-07-26-126-lzss-gallery-nine-public-domain-masters.md).
+
+Native bsnes-jg capture:
+[live repack explainer](2026-07-26-127-lzss-repack-explainer/repack-native.png).
 
 ## Goal
 
@@ -348,3 +351,39 @@ After all gates pass:
 - Left/Right cancels immediately and clears all compression sprites.
 - Visual and headless builds emit identical LZSS bytes and `0xB5D7`.
 - Measured overhead, captures, and both published ROM hashes are documented.
+
+## Implementation record
+
+Implemented in `examples/snes/lzss-gallery.c`:
+
+- coherent sequence-last `RepackVisual` publication from the target encoder;
+- distinct gold dictionary-source and site-color destination spans;
+- a site-color literal diamond and sparse gold source-to-destination connector;
+- row-aware span splitting using the artwork's generated width, scale, margins,
+  and Mode 7 height;
+- a twelve-event `L`/`m`/`M` recent-token strip;
+- live raw and packed byte counts with signed reduction percentage;
+- literal byte/count and match length/distance/copy/count telemetry;
+- a bounded 30-entry compression-overlay OAM range after the two navigation
+  chevrons; and
+- compile-time `GALLERY_VISUAL=0` and shipping `GALLERY_VISUAL=1` builds.
+
+The three benchmark rows reuse the final metadata row only during `REPACK`.
+This avoids shrinking or distorting the artwork; the next slide's caption
+restores artist, work, and date metadata.
+
+### Verification completed
+
+- Shipping and headless target variants both link as **8 Mbit (1 MiB)** LoROM.
+- Header checksum/complement validation passes for both target variants.
+- Host encoders at `-O0` and `-O2` emit identical streams for all twenty works.
+- The canonical host corpus remains `0xB5D7`.
+- A native 256×224 bsnes-jg capture verifies live signed percentage, literal
+  semantics, token history, and bounded in-artwork markers.
+- Scripted Right during active work reaches work 1.
+- Scripted Left during active work wraps immediately to work 19.
+- `git diff --check` passes.
+
+The target-side twenty-work `0xB5D7` gate is deliberately still the canonical
+150,000-frame publication gate. It was not replaced by a misleading short
+smoke run; it must run when the two site cartridges are published.
