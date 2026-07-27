@@ -108,8 +108,40 @@ asm(".text\n"
     "  lda nav_pad_now\n"
     "  sta nav_pad_previous\n"
     /*
+     * Reassert both complete navigation sprites every VBlank.  One-time OAM
+     * writes are not stable across the title/gallery handoff and the first
+     * slide can otherwise inherit partially latched coordinates/size bits.
+     */
+    "  lda #$00\n"
+    "  sta $2102\n"
+    "  sta $2103\n"
+    "  lda #$02\n"
+    "  sta $2104\n"
+    "  lda arrow_anim_y\n"
+    "  sta $2104\n"
+    "  lda #$40\n"
+    "  sta $2104\n"
+    "  lda #$30\n"
+    "  sta $2104\n"
+    "  lda #$ee\n"
+    "  sta $2104\n"
+    "  lda arrow_anim_y\n"
+    "  sta $2104\n"
+    "  lda #$40\n"
+    "  sta $2104\n"
+    "  lda #$70\n"
+    "  sta $2104\n"
+    "  lda #$00\n"
+    "  sta $2102\n"
+    "  lda #$01\n"
+    "  sta $2103\n"
+    "  lda #$0a\n"
+    "  sta $2104\n"
+    "  lda #$00\n"
+    "  sta $2104\n"
+    /*
      * Animate only the accepted direction during decode.  OAM writes happen
-     * here in NMI/VBlank, so the moving overlay cannot corrupt either arrow.
+     * here in NMI/VBlank, after the stable base entries above.
      */
     "  lda arrow_anim\n"
     "  beq 9f\n"
@@ -388,10 +420,16 @@ static void oam_init(void){
 }
 static void oam_arrows(uint8_t y,uint8_t hide){
   if(hide)y=240;
+  arrow_anim_y=y;
   REG_OAMADDL=0;REG_OAMADDH=0;
   REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=0x30;
   REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=0x70;
-  REG_OAMADDL=0;REG_OAMADDH=1;REG_OAMDATA=0x0a;
+  /*
+   * OAMDATA is a two-write latch even in the high table.  A lone byte leaves
+   * the size bits pending, so the first slide can render only one 8x8
+   * quadrant of each nominal 16x16 arrow.  Commit a full high-table word.
+   */
+  REG_OAMADDL=0;REG_OAMADDH=1;REG_OAMDATA=0x0a;REG_OAMDATA=0;
 }
 static void oam_hide_compression(void){
   snes_wait_vblank();
@@ -746,6 +784,14 @@ int main(void){
   gallery_unpack_frames[k]=(uint16_t)(clock_read()-t);
   nav_request=0;nav_cancel=0;
   m7splash_end(0);
+  /*
+   * The title owns Mode 7, TM, scroll/centre latches, CGRAM, and NMI state.
+   * VRAM clearing alone leaves those live during the first gallery setup,
+   * which can expose a stale title/background plane for the first work only.
+   * The decoded pixels are already in WRAM, so reset the complete PPU here
+   * and rebuild every gallery-owned resource from a known force-blank state.
+   */
+  snes_ppu_reset_blank();
   vram_clear();load_fonts();load_chevrons();oam_init();m7_begin();m7_set_matrix(0x0080,0,0,0x0080);
   REG_NMITIMEN=NMITIMEN_NMI;uint16_t gate=0xffff;uint8_t decoded=1;
   for(;;){
