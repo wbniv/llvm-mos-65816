@@ -4,6 +4,9 @@
 > (campaign Wave 1, item 3; branch `wbniv:mos-dwarf-65816-test-docs` @ `0ae9415`). The as-posted body
 > = the `## Summary` … `## Why this matters` sections below, prefaced by a test-half lead paragraph;
 > the status block, metadata table, `## Title`, and `## Posting` sections were stripped.
+> **Body amended 2026-07-27** (user request): the drmon mention now links to
+> [developer-resources-co/drdevtools](https://github.com/developer-resources-co/drdevtools)
+> (via `gh api PATCH` — `gh pr edit` fails on the Projects-classic GraphQL deprecation).
 > Originally: draft of the **"docs" half** of the ROADMAP-step-6 *test+docs* contribution to
 > upstream llvm-mos. The **"test" half** is the staged lit test
 > [`dev/lit/DebugInfo/MOS/dwarf-65816.ll`](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) (drops into
@@ -132,7 +135,9 @@ Neither changes a single output byte; they make a correct-but-hidden behavior di
 ## Why this matters (the round-trip)
 
 ROADMAP step 6 closes *compile → optimized SNES ROM → DWARF → source-level debug*. The debugger
-(drmon/DAP) loads `game.sfc.elf`, resolves a source breakpoint via the DWARF line table, and stops the
+([drmon](https://github.com/developer-resources-co/drdevtools) — Developer Resources Monitor, a
+source-level debugger with SNES-via-MAME backend and TUI/DAP adapters) loads `game.sfc.elf`, resolves
+a source breakpoint via the DWARF line table, and stops the
 matching PC live in MAME — verified end-to-end (`a16local.c:17 → $8074`). That entire round-trip rests on
 the companion `.elf` existing and being found; documenting it is what lets the *next* debugger integrator
 find it without rediscovering it by accident.
