@@ -1,9 +1,9 @@
 # 129 — LZSS Gallery Luminous Zipper Visualization
 
-**Status:** Draft; prototype implemented, visual and full-corpus acceptance pending  
-**Sites:** biohack.net and indri.studio  
-**ROM:** `lzss-gallery.sfc`  
-**Supersedes:** the compression brackets in plan #128  
+**Status:** Draft; prototype implemented, visual and full-corpus acceptance pending
+**Sites:** biohack.net and indri.studio
+**ROM:** `lzss-gallery.sfc`
+**Supersedes:** the compression brackets in plan #128
 **Mockup:** [zipper-visualization-mockup.html](2026-07-27-129-lzss-gallery-zipper-visualization/zipper-visualization-mockup.html)
 
 ## Goal
