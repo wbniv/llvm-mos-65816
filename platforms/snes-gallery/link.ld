@@ -1,6 +1,6 @@
-/* 512 KiB LoROM: bank $00 code/header plus named asset banks $01..$0A.
- * Banks $0B..$0F are retained as explicit padding so the cartridge is a valid
- * power-of-two image and its header/checksum describe the complete 512 KiB ROM. */
+/* 1 MiB LoROM: bank $00 code/header plus named asset banks $01..$13.
+ * Banks $14..$1F are retained as explicit padding so the cartridge is a valid
+ * power-of-two image and its header/checksum describe the complete 1 MiB ROM. */
 
 __rc0 = 0x00;
 INCLUDE imag-regs.ld
@@ -27,6 +27,22 @@ MEMORY {
   rom0D  : ORIGIN = 0x0D8000,   LENGTH = 0x8000
   rom0E  : ORIGIN = 0x0E8000,   LENGTH = 0x8000
   rom0F  : ORIGIN = 0x0F8000,   LENGTH = 0x8000
+  rom10  : ORIGIN = 0x108000,   LENGTH = 0x8000
+  rom11  : ORIGIN = 0x118000,   LENGTH = 0x8000
+  rom12  : ORIGIN = 0x128000,   LENGTH = 0x8000
+  rom13  : ORIGIN = 0x138000,   LENGTH = 0x8000
+  rom14  : ORIGIN = 0x148000,   LENGTH = 0x8000
+  rom15  : ORIGIN = 0x158000,   LENGTH = 0x8000
+  rom16  : ORIGIN = 0x168000,   LENGTH = 0x8000
+  rom17  : ORIGIN = 0x178000,   LENGTH = 0x8000
+  rom18  : ORIGIN = 0x188000,   LENGTH = 0x8000
+  rom19  : ORIGIN = 0x198000,   LENGTH = 0x8000
+  rom1A  : ORIGIN = 0x1A8000,   LENGTH = 0x8000
+  rom1B  : ORIGIN = 0x1B8000,   LENGTH = 0x8000
+  rom1C  : ORIGIN = 0x1C8000,   LENGTH = 0x8000
+  rom1D  : ORIGIN = 0x1D8000,   LENGTH = 0x8000
+  rom1E  : ORIGIN = 0x1E8000,   LENGTH = 0x8000
+  rom1F  : ORIGIN = 0x1F8000,   LENGTH = 0x8000
 }
 
 REGION_ALIAS("c_readonly", rom)
@@ -56,6 +72,10 @@ SECTIONS {
   .gallery_0D : { KEEP(*(.gallery_0D)) } >rom0D
   .gallery_0E : { KEEP(*(.gallery_0E)) } >rom0E
   .gallery_0F : { KEEP(*(.gallery_0F)) } >rom0F
+  .gallery_10 : { KEEP(*(.gallery_10)) } >rom10
+  .gallery_11 : { KEEP(*(.gallery_11)) } >rom11
+  .gallery_12 : { KEEP(*(.gallery_12)) } >rom12
+  .gallery_13 : { KEEP(*(.gallery_13)) } >rom13
 
   .snes_header 0x00FFB0 : { KEEP(*(.snes_header)) } >romhdr
   .snes_vectors_native 0x00FFE0 : {
@@ -71,4 +91,7 @@ OUTPUT_FORMAT {
   FULL(rom01) FULL(rom02) FULL(rom03) FULL(rom04) FULL(rom05)
   FULL(rom06) FULL(rom07) FULL(rom08) FULL(rom09) FULL(rom0A)
   FULL(rom0B) FULL(rom0C) FULL(rom0D) FULL(rom0E) FULL(rom0F)
+  FULL(rom10) FULL(rom11) FULL(rom12) FULL(rom13) FULL(rom14)
+  FULL(rom15) FULL(rom16) FULL(rom17) FULL(rom18) FULL(rom19)
+  FULL(rom1A) FULL(rom1B) FULL(rom1C) FULL(rom1D) FULL(rom1E) FULL(rom1F)
 }

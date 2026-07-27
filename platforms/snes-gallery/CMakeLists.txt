@@ -1,4 +1,4 @@
-# snes-gallery — 512 KiB LoROM child platform for the ten-bank LZSS art gallery.
+# snes-gallery — 1 MiB LoROM child platform for the 19-work LZSS art gallery.
 platform(snes-gallery COMPLETE PARENT snes)
 
 if(NOT CMAKE_CROSSCOMPILING)

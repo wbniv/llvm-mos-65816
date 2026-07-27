@@ -35,6 +35,7 @@ cat "$BUILD/lzss-gallery-host-O2.txt"
 echo "==> target build (+mos-a16, 1 MiB LoROM)"
 "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
   -Xclang -target-feature -Xclang +mos-a16 -Os \
+  -DGALLERY_START="${GALLERY_START:-0}" \
   -Wl,-Map="$MAP" -o "$ROM" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 [ "$(stat -c %s "$ROM")" = 1048576 ]
@@ -51,7 +52,7 @@ if [ "${QUICK:-0}" = 1 ]; then
   CHECK_LEN=1
   OUT="$BUILD/lzss-gallery-quick-jg.png"
 else
-  FRAMES="${FRAMES:-75000}"
+  FRAMES="${FRAMES:-150000}"
   CHECK_OFF="$VMA"
   CHECK_WANT="$EXPECT"
   CHECK_LEN=2

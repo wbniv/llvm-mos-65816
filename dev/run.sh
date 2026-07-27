@@ -421,6 +421,8 @@ docker run --rm \
   ${JG_ONLY:+-e JG_ONLY} \
   ${SNESGFX_CFLAGS:+-e SNESGFX_CFLAGS} \
   ${BENCH_FRAMES:+-e BENCH_FRAMES} \
+  ${QUICK:+-e QUICK} \
+  ${GALLERY_START:+-e GALLERY_START} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
   2> >(grep -vF 'different data layouts' | cat -s >&2)
 exit $?
