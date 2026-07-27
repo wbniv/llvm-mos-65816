@@ -251,9 +251,20 @@ because each hook lands on a different token. Latch instead:
 ### OAM budget
 
 The visualization owns sprites 2..17 (`OAM_VISUAL_MAX` = 16), all 8×8, X in 0..255, hidden at
-Y = 240. A worst case with both brackets row-wrapped at maximum projected span can exceed 16
-sprites; degrade in exactly this order: drop the source bracket's middle rails (keep its caps),
-then drop the source bracket entirely. Never truncate the destination bracket or the packet.
+Y = 240. **The current format fits:** LZSS matches are at most 18 source pixels and the smallest
+current `matrix_scale` is 152, so a run projects to at most
+`ceil(18 × 256 / 152) = 31` screen pixels. That is at most four rail tiles before row-split cap
+overhead. A match crosses at most one source row and one destination row; splitting one 31-pixel
+run into two separately capped segments raises its bound by at most one tile, to five. Therefore
+source ≤5 + destination ≤5 + packet 1 = **11 sprites maximum**, leaving five spare entries in the
+16-sprite allocation for today's 26-work corpus.
+
+Retain a deterministic overflow policy as future-proofing for a later codec with longer matches,
+more aggressive Mode 7 enlargement, or a different projection rule. If an injected/projected scene
+would exceed 16 sprites, degrade in exactly this order: drop the source bracket's middle rails
+(keep its caps), then drop the source bracket entirely. Never truncate the destination bracket or
+the packet. The implementation must calculate required sprites before staging them; it must not
+discover overflow by partially filling OAM.
 
 ### Atomic lifetime
 
@@ -330,7 +341,9 @@ or source marker may survive merely because the new event uses fewer sprites.
    - literals contain no bracket;
    - a shorter event following a long match leaves zero stale sprites;
    - the OAM high-table nibbles for sprites 2..17 never change after init;
-   - a forced worst-case double-wrapped span degrades source-first per the OAM budget order; and
+   - every real asset's maximum 18-pixel double-wrapped span fits within 16 sprites;
+   - a synthetic future-format span, deliberately larger than today's codec permits, degrades
+     source-first per the OAM budget order without partially drawing a scene; and
    - phase exit/cancel hides every visualization entry.
 6. Capture match events over light/dark/busy works. Confirm one dim source, one bright continuous
    destination, and one unambiguous moving packet—no square grid and no chicken-foot trail. Assert
