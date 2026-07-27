@@ -69,6 +69,32 @@ PY
 python3 "$ROOT/tools/snes-rom-map.py" "$MAP" \
   "$ROOT/assets/snes/lzss-gallery/derived/report.json" \
   "$ROOT/assets/snes/lzss-gallery/derived/rom-map.md"
+python3 - "$MAP" <<'PY'
+import re, sys
+lines=open(sys.argv[1],encoding="utf-8").read().splitlines()
+symbols={}
+high=0
+for line in lines:
+    m=re.match(r"\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+(\S+)$",line)
+    if not m:
+        continue
+    addr,size,name=int(m[1],16),int(m[2],16),m[3]
+    if name in ("FONT8","FONT16"):
+        symbols[name]=(addr,size)
+    if 0x8000 <= addr < 0xffb0 and not name.startswith(".snes_"):
+        high=max(high,addr+size)
+expected={"FONT16":4096,"FONT8":1024}
+if set(symbols) != set(expected) or any(
+        symbols[name][1] != size or symbols[name][0] >> 16 == 0
+        for name,size in expected.items()):
+    raise SystemExit(f"FATAL: immutable font placement changed: {symbols!r}")
+margin=0xffb0-high
+if margin < 4096:
+    raise SystemExit(f"FATAL: bank $00 safety margin {margin} B is below 4096 B")
+placed=", ".join(f"{name}=${addr>>16:02X}:{addr&0xffff:04X}"
+                 for name,(addr,_) in sorted(symbols.items()))
+print(f"bank $00 asset gate: PASS ({placed}; {margin} B before header)")
+PY
 
 VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$MAP")
 [ -n "$VMA" ]

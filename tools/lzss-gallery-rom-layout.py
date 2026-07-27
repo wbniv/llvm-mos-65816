@@ -8,7 +8,7 @@ BANKS_PER_MIB = 32
 
 CSS = """
 :root{color-scheme:dark;--bg:#100f0d;--panel:#1d1a16;--ink:#f4ead6;--muted:#a99d8a;
---code:#e4a853;--stream:#65b7a6;--palette:#f0d277;--free:#302b25;--rule:#4b4338}
+--code:#e4a853;--stream:#65b7a6;--palette:#f0d277;--shared:#7dd3fc;--free:#302b25;--rule:#4b4338}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 ui-monospace,monospace}
 main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4dc;font:700 28px/1.1 system-ui}
 .lede,.detail,.note{color:var(--muted)}.summary,.legend{display:flex;gap:12px;flex-wrap:wrap;margin:17px 0}
@@ -19,7 +19,7 @@ main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4
 .cart{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:10px}.bank{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
 .head{border-bottom:1px solid var(--rule)}.num,.title{font-weight:800;color:#fff4dc}.used{color:var(--muted)}
 .bar{height:45px;display:flex;background:var(--free)}.seg{height:100%;min-width:1px}.stream{background:var(--stream)}
-.palette{background:var(--palette)}.free{background:var(--free)}.label{padding:8px 10px;min-height:91px}
+.palette{background:var(--palette)}.shared{background:var(--shared)}.free{background:var(--free)}.label{padding:8px 10px;min-height:91px}
 .item{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reserve{opacity:.55}
 .boundary{grid-column:1/-1;display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;
 color:var(--palette);font-weight:800;letter-spacing:.04em;margin:7px 0}
@@ -34,7 +34,8 @@ def map_data(path: pathlib.Path) -> tuple[dict[str, int], dict[str, tuple[int, i
     symbols: dict[str, tuple[int, int]] = {}
     pattern = re.compile(r"^\s*[0-9a-f]+\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+(\.\S+)")
     symbol_pattern = re.compile(
-        r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+(gallery_\S+_(?:lz|pal))$")
+        r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+"
+        r"(gallery_\S+_(?:lz|pal)|FONT8|FONT16)$")
     for line in path.read_text().splitlines():
         if m := pattern.match(line):
             sections[m.group(2)] = int(m.group(1), 16)
@@ -93,6 +94,12 @@ def main() -> None:
             assert size == expected and addr >> 16 == bank
             offset=(addr & 0xffff)-0x8000
             packed.setdefault(bank, []).append((offset,f'{asset["slug"]} {label}',size,kind))
+    for symbol, expected in (("FONT16",4096),("FONT8",1024)):
+        addr,size=symbols[symbol]
+        bank=addr >> 16
+        assert bank >= 1 and size == expected
+        packed.setdefault(bank, []).append(
+            ((addr & 0xffff)-0x8000,symbol,size,"shared"))
     assert max(packed, default=0) < banks
     bank0 = sections.get(".text", 0) + sections.get(".rodata", 0)
     bank0 += sum(v for k, v in sections.items() if k.startswith(".snes_"))
@@ -111,16 +118,17 @@ def main() -> None:
 <title>LZSS Gallery — romopt cartridge layout</title><style>{CSS}</style><main>
 <h1><code>romopt</code> asset packing</h1>
 <p class="lede">{rom_bytes*8//1048576} Mbit ({rom_bytes//1048576} MiB) LoROM · bank $00 locked · assets begin at bank $01</p>
-<div class="summary"><span class="pill">{len(report)} works</span><span class="pill">{len(report)*2} indivisible items</span>
+<div class="summary"><span class="pill">{len(report)} works</span><span class="pill">{len(report)*2+2} indivisible items</span>
 <span class="pill">{used_banks} packed asset banks</span><span class="pill">{banks-1-used_banks} reserved banks</span>
 <span class="pill">{asset_bytes:,} asset bytes</span></div>
 <div class="legend"><span class="key" style="--c:var(--code)">bank $00: runtime/shared only</span>
 <span class="key" style="--c:var(--stream)">LZSS stream</span><span class="key" style="--c:var(--palette)">512-byte palette</span>
+<span class="key" style="--c:var(--shared)">shared font data</span>
 <span class="key" style="--c:var(--free)">free / padding</span></div>
 <section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong><span>{bank0:,} / 32,768 bytes</span></div>
 <div class="bar"><span class="seg" style="width:{bank0/BANK_BYTES*100:.4f}%;background:var(--code)"></span>
 <span class="seg free" style="width:{(BANK_BYTES-bank0)/BANK_BYTES*100:.4f}%"></span></div>
-<div class="label">Runtime, startup, navigation, descriptors, fonts, tables, header, and vectors.
+<div class="label">Runtime, startup, navigation, descriptors, tables, header, and vectors.
 No artwork stream or palette is eligible for this bank.</div></section>
 <div class="cart">{''.join(cards)}</div>
 <p class="note"><strong>Algorithm:</strong> stable first-fit decreasing. Sort streams and palettes

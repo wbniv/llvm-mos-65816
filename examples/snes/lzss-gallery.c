@@ -2,10 +2,15 @@
 // mos-a16-only
 // snes-gallery-platform
 #include <snes.h>
+#include "lzss-gallery-layout.h"
+#define FONT8_STORAGE __attribute__((section(GALLERY_FONT8_SECTION))) const __attribute__((address_space(2)))
+#define FONT16_STORAGE __attribute__((section(GALLERY_FONT16_SECTION))) const __attribute__((address_space(2)))
 #include "mode7.h"
 #include "snesgfx/m7title.h"
 #include "font8.h"
 #include "font16.h"
+#undef FONT8_STORAGE
+#undef FONT16_STORAGE
 #include "sincos.h"
 #include "../65816/lzss.h"
 #include "lzss-gallery-assets.h"
@@ -416,6 +421,9 @@ static void vram_clear(void){
 static void vram_words(uint16_t at,const uint16_t *p,uint16_t n){
   REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=at;while(n--)REG_VMDATA=*p++;
 }
+static void vram_words_far(uint16_t at,const FAR uint16_t *p,uint16_t n){
+  REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=at;while(n--)REG_VMDATA=*p++;
+}
 static void load_fonts(void){
   REG_BG2SC=SNES_BGSC(MAP2,0);REG_BG3SC=SNES_BGSC(MAP3,0);
   REG_BG12NBA=(uint8_t)(5u<<4);REG_BG34NBA=6u;
@@ -424,10 +432,10 @@ static void load_fonts(void){
     for(uint8_t r=0;r<8;r++)REG_VMDATA=FONT16[g*32u+(uint16_t)tile*8u+r];
     for(uint8_t r=0;r<8;r++)REG_VMDATA=0;
   }
-  vram_words(CHR8,FONT8,FONT8_N*8u);
+  vram_words_far(CHR8,FONT8,FONT8_N*8u);
   /* Keep a dedicated copy of the 8x8 T at tile 63.  Tile 52 is corrupted on
      the gallery's split BG3 path on hardware/core despite correct source data. */
-  vram_words((uint16_t)(CHR8+63u*8u),FONT8+(uint16_t)('T'-FONT8_FIRST)*8u,8u);
+  vram_words_far((uint16_t)(CHR8+63u*8u),FONT8+(uint16_t)('T'-FONT8_FIRST)*8u,8u);
 }
 static void pack_chevron_tiles(void){
   for(uint8_t ty=0;ty<2;ty++)for(uint8_t tx=0;tx<2;tx++)for(uint8_t y=0;y<8;y++){

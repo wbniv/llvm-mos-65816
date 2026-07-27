@@ -12,13 +12,27 @@ p.add_argument("output")
 a = p.parse_args()
 
 sections = {}
+symbols = {}
 for line in Path(a.map).read_text().splitlines():
     m = re.match(r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+1\s+(\.\S+)$", line)
     if m:
         sections[m.group(3)] = (int(m.group(1), 16), int(m.group(2), 16))
+    m = re.match(r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+(FONT8|FONT16)$", line)
+    if m:
+        symbols[m.group(3)] = (int(m.group(1),16),int(m.group(2),16))
 
 works = json.loads(Path(a.report).read_text())
-bank_count = max(max(work["stream_bank"], work["palette_bank"]) for work in works)
+shared_assets = {}
+for symbol,label,expected in (
+        ("FONT16","Waldo 16x16 font",4096),("FONT8","8x8 font",1024)):
+    addr,size=symbols[symbol]
+    if size != expected or addr >> 16 == 0:
+        raise SystemExit(f"{symbol}: invalid far placement {addr:06X}/{size}")
+    shared_assets.setdefault(addr >> 16,[]).append((label,size))
+bank_count = max(
+    max(max(work["stream_bank"], work["palette_bank"]) for work in works),
+    max(shared_assets),
+)
 TOTAL_BANKS = 32
 LAST_BANK = 31
 ROM_MIB = 1
@@ -45,7 +59,8 @@ for bank in range(1, bank_count + 1):
     if addr >> 16 != bank or linked > 32768:
         raise SystemExit(f"{sec}: invalid bank/size {addr:06X}/{linked}")
     stream = sum(work["compressed_bytes"] for work in stream_items)
-    expected = stream + 512 * len(palette_items)
+    shared = shared_assets.get(bank, [])
+    expected = stream + 512 * len(palette_items) + sum(size for _, size in shared)
     if linked != expected:
         raise SystemExit(f"{sec}: linked {linked}, expected stream+palette {expected}")
     free = 32768 - linked
@@ -55,11 +70,13 @@ for bank in range(1, bank_count + 1):
         "palette_items": palette_items,
         "stream": stream,
         "palette": 512 * len(palette_items),
+        "shared": shared,
         "used": linked,
         "free": free,
     })
     detail = [f"{work['title']} stream — {work['compressed_bytes']:,}" for work in stream_items]
     detail += [f"{work['title']} palette — 512" for work in palette_items]
+    detail += [f"{name} — {size:,}" for name, size in shared]
     contents = "<br/>".join(detail)
     rows.append(f"| `${bank:02X}` | {contents} | {stream:,} | {512*len(palette_items):,} | {linked:,} | {free:,} |")
 

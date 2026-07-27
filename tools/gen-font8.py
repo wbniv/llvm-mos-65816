@@ -99,7 +99,10 @@ def main():
     out.append("#include <stdint.h>")
     out.append("#define FONT8_FIRST 0x20")
     out.append("#define FONT8_N 64")
-    out.append("static const uint16_t FONT8[FONT8_N * 8] = {")
+    out.append("#ifndef FONT8_STORAGE")
+    out.append("#define FONT8_STORAGE static const")
+    out.append("#endif")
+    out.append("FONT8_STORAGE uint16_t FONT8[FONT8_N * 8] = {")
     for code in range(0x20, 0x60):
         ch = chr(code)
         art = G.get(ch, ["........"] * 8)

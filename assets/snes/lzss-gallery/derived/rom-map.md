@@ -2,7 +2,7 @@
 ```mermaid
 %%{init: {'treemap': {'padding': 6, 'diagramPadding': 8, 'showValues': false}}}%%
 treemap-beta
-"8 Mbit (1 MiB) LoROM · $00-$1F · 946,093 B gallery · 0 B padding":::root
+"8 Mbit (1 MiB) LoROM · $00-$1F · 951,213 B gallery · 0 B padding":::root
   "Q0 · $00-$07 · 256 KiB · 7 occupied + system · 228,307 B gallery":::quadrant
     "$00-$01 · 64 KiB · system pair":::cell
       "$00 SYSTEM · CODE / RODATA / HEADER": 32768:::system
@@ -15,7 +15,7 @@ treemap-beta
       "$05 EARTHLY DELIGHTS + ICE SKATERS · 32,505 used · 263 free": 32768:::packed
     "$06-$07 · 64 KiB · 64,838 B gallery":::cell
       "$06 MOUNTAIN WATERFALL + THAI ELEPHANT DUEL · 32,284 used · 484 free": 32768:::packed
-      "$07 DRAGON + LOUVRE RAIN + 2 pal · 32,554 used · 214 free": 32768:::tight
+      "$07 DRAGON + LOUVRE RAIN · 32,554 used · 214 free": 32768:::tight
   "Q1 · $08-$0F · 256 KiB · 8 occupied · 259,964 B gallery":::quadrant
     "$08-$09 · 64 KiB · 64,781 B gallery":::cell
       "$08 PANTHEON INTERIOR + THAI BUDDHA DESCENDING + 2 pal · 32,479 used · 289 free": 32768:::packed
@@ -29,18 +29,18 @@ treemap-beta
     "$0E-$0F · 64 KiB · 64,733 B gallery":::cell
       "$0E BASKET APPLES + PARIS STREET + 4 pal · 32,419 used · 349 free": 32768:::packed
       "$0F HOUSES PARLIAMENT + THAI RAVANA WAR + 4 pal · 32,314 used · 454 free": 32768:::packed
-  "Q2 · $10-$17 · 256 KiB · 8 occupied · 247,969 B gallery":::quadrant
+  "Q2 · $10-$17 · 256 KiB · 8 occupied · 253,089 B gallery":::quadrant
     "$10-$11 · 64 KiB · 64,863 B gallery":::cell
       "$10 WATER LILIES + WIDE RIVER + 5 pal · 32,539 used · 229 free": 32768:::tight
       "$11 GRANDE JATTE + MARLY LE ROI + 5 pal · 32,324 used · 444 free": 32768:::packed
     "$12-$13 · 64 KiB · 65,035 B gallery":::cell
       "$12 POPPY FIELD + THIRD OF MAY + 6 pal · 32,541 used · 227 free": 32768:::tight
       "$13 WIJK WINDMILL + WOODED MERRYMAKERS + 7 pal · 32,494 used · 274 free": 32768:::packed
-    "$14-$15 · 64 KiB · 62,181 B gallery":::cell
-      "$14 STORMY SUNSET + MOUNT AKIHA + 8 pal · 32,750 used · 18 free": 32768:::critical
-      "$15 VOYAGE YOUTH + FUJISAWA SHUKU + 2 pal · 29,431 used · 3,337 free": 32768:::used
-    "$16-$17 · 64 KiB · 55,890 B gallery":::cell
-      "$16 FOG MOUNT DESERT + APPROACH VENICE · 28,051 used · 4,717 free": 32768:::used
+    "$14-$15 · 64 KiB · 65,253 B gallery":::cell
+      "$14 STORMY SUNSET + MOUNT AKIHA · 32,750 used · 18 free": 32768:::critical
+      "$15 VOYAGE YOUTH + FUJISAWA SHUKU + 8 pal · 32,503 used · 265 free": 32768:::packed
+    "$16-$17 · 64 KiB · 57,938 B gallery":::cell
+      "$16 FOG MOUNT DESERT + APPROACH VENICE + 4 pal · 30,099 used · 2,669 free": 32768:::used
       "$17 THAI TEMPLE PAINTING + THAI SURASA HANUMAN · 27,839 used · 4,929 free": 32768:::used
   "Q3 · $18-$1F · 256 KiB · 8 occupied · 209,853 B gallery":::quadrant
     "$18-$19 · 64 KiB · 54,958 B gallery":::cell
@@ -76,22 +76,22 @@ classDef empty fill:#161c25,stroke:#303a48,color:#788796;
 | `$04` | Sunset in the Woods stream — 16,107<br/>The Willows stream — 16,642 | 32,749 | 0 | 32,749 | 19 |
 | `$05` | The Garden of Earthly Delights stream — 16,459<br/>Winter Landscape with Ice Skaters stream — 16,046 | 32,505 | 0 | 32,505 | 263 |
 | `$06` | Mountainous Landscape with Waterfall stream — 15,903<br/>Naresuan of Ayutthaya's Elephant Duel with Mingyi Swa of Toungoo stream — 16,381 | 32,284 | 0 | 32,284 | 484 |
-| `$07` | Dragon stream — 15,765<br/>The Louvre, Afternoon, Rainy Weather stream — 15,765<br/>Under the Wave off Kanagawa palette — 512<br/>A Sunday on La Grande Jatte — 1884 palette — 512 | 31,530 | 1,024 | 32,554 | 214 |
-| `$08` | Interior of the Pantheon, Rome stream — 15,760<br/>The Buddha Descending from Trayastrimsa Heaven at Sankissa stream — 15,695<br/>Water Lilies palette — 512<br/>The Basket of Apples palette — 512 | 31,455 | 1,024 | 32,479 | 289 |
-| `$09` | The Kiss (Lovers) stream — 15,625<br/>Hanuman Destroys the Golden City of Longka stream — 15,653<br/>Stack of Wheat palette — 512<br/>Self-Portrait palette — 512 | 31,278 | 1,024 | 32,302 | 466 |
-| `$0A` | The Home of the Heron stream — 15,533<br/>Hanuman — Ramakien stream — 15,552<br/>Paris Street; Rainy Day palette — 512<br/>Poppy Field (Giverny) palette — 512<br/>The Garden of Earthly Delights palette — 512 | 31,085 | 1,536 | 32,621 | 147 |
-| `$0B` | Tableau No. VII stream — 15,304<br/>Mortlake Terrace stream — 15,322<br/>The Scream palette — 512<br/>The Third of May 1808 palette — 512<br/>The Kiss (Lovers) palette — 512<br/>View of Delft palette — 512 | 30,626 | 2,048 | 32,674 | 94 |
-| `$0C` | Scholar in Landscape stream — 15,288<br/>Tornado in an American Forest stream — 15,274<br/>The Windmill at Wijk bij Duurstede palette — 512<br/>Flower Still Life palette — 512<br/>Sunflowers palette — 512<br/>Tableau No. VII palette — 512 | 30,562 | 2,048 | 32,610 | 158 |
-| `$0D` | Under the Wave off Kanagawa stream — 15,259<br/>The Scream stream — 15,238<br/>Winter Landscape with Ice Skaters palette — 512<br/>The Home of the Heron palette — 512<br/>Dragon palette — 512<br/>Scholar in Landscape palette — 512 | 30,497 | 2,048 | 32,545 | 223 |
-| `$0E` | The Basket of Apples stream — 15,200<br/>Paris Street; Rainy Day stream — 15,171<br/>Houses of Parliament, London palette — 512<br/>Thistles palette — 512<br/>The Starry Night palette — 512<br/>River View by Moonlight palette — 512 | 30,371 | 2,048 | 32,419 | 349 |
-| `$0F` | Houses of Parliament, London stream — 15,127<br/>Ravana Prepares for War with Rama stream — 15,139<br/>Mountainous Landscape with Waterfall palette — 512<br/>Wooded Landscape with Merrymakers in a Cart palette — 512<br/>Panoramic View of a Wide River palette — 512<br/>Sailing Vessels on an Inland Body of Water palette — 512 | 30,266 | 2,048 | 32,314 | 454 |
-| `$10` | Water Lilies stream — 14,958<br/>Panoramic View of a Wide River stream — 15,021<br/>Ships near the Coast during a Calm palette — 512<br/>Interior of the Sint-Odulphuskerk in Assendelft palette — 512<br/>The Voyage of Life: Childhood palette — 512<br/>The Voyage of Life: Youth palette — 512<br/>The Voyage of Life: Manhood palette — 512 | 29,979 | 2,560 | 32,539 | 229 |
-| `$11` | A Sunday on La Grande Jatte — 1884 stream — 14,846<br/>Marly-le-Roi stream — 14,918<br/>The Voyage of Life: Old Age palette — 512<br/>Tornado in an American Forest palette — 512<br/>Niagara palette — 512<br/>Fog off Mount Desert palette — 512<br/>Buffalo Trail: The Impending Storm palette — 512 | 29,764 | 2,560 | 32,324 | 444 |
-| `$12` | Poppy Field (Giverny) stream — 14,815<br/>The Third of May 1808 stream — 14,654<br/>Mount Corcoran palette — 512<br/>Sunset in the Woods palette — 512<br/>Harvest Moon palette — 512<br/>Wivenhoe Park, Essex palette — 512<br/>Cloud Study: Stormy Sunset palette — 512<br/>Keelmen Heaving in Coals by Moonlight palette — 512 | 29,469 | 3,072 | 32,541 | 227 |
-| `$13` | The Windmill at Wijk bij Duurstede stream — 14,366<br/>Wooded Landscape with Merrymakers in a Cart stream — 14,544<br/>Approach to Venice palette — 512<br/>Mortlake Terrace palette — 512<br/>Interior of the Pantheon, Rome palette — 512<br/>Entrance to the Grand Canal from the Molo, Venice palette — 512<br/>The Louvre, Afternoon, Rainy Weather palette — 512<br/>Marly-le-Roi palette — 512<br/>The Willows palette — 512 | 28,910 | 3,584 | 32,494 | 274 |
-| `$14` | Cloud Study: Stormy Sunset stream — 14,330<br/>Distant View of Mount Akiha, Kakegawa stream — 14,324<br/>Distant View of Mount Akiha, Kakegawa palette — 512<br/>Fujisawa-shuku palette — 512<br/>Buddhist Temple Painting palette — 512<br/>The Buddha Descending from Trayastrimsa Heaven at Sankissa palette — 512<br/>Naresuan of Ayutthaya's Elephant Duel with Mingyi Swa of Toungoo palette — 512<br/>Ravan in His Palace in Lanka palette — 512<br/>Surasa Challenges Hanuman palette — 512<br/>Hanuman — Ramakien palette — 512 | 28,654 | 4,096 | 32,750 | 18 |
-| `$15` | The Voyage of Life: Youth stream — 14,088<br/>Fujisawa-shuku stream — 14,319<br/>Hanuman Destroys the Golden City of Longka palette — 512<br/>Ravana Prepares for War with Rama palette — 512 | 28,407 | 1,024 | 29,431 | 3,337 |
-| `$16` | Fog off Mount Desert stream — 14,006<br/>Approach to Venice stream — 14,045 | 28,051 | 0 | 28,051 | 4,717 |
+| `$07` | Dragon stream — 15,765<br/>The Louvre, Afternoon, Rainy Weather stream — 15,765<br/>8x8 font — 1,024 | 31,530 | 0 | 32,554 | 214 |
+| `$08` | Interior of the Pantheon, Rome stream — 15,760<br/>The Buddha Descending from Trayastrimsa Heaven at Sankissa stream — 15,695<br/>Under the Wave off Kanagawa palette — 512<br/>A Sunday on La Grande Jatte — 1884 palette — 512 | 31,455 | 1,024 | 32,479 | 289 |
+| `$09` | The Kiss (Lovers) stream — 15,625<br/>Hanuman Destroys the Golden City of Longka stream — 15,653<br/>Water Lilies palette — 512<br/>The Basket of Apples palette — 512 | 31,278 | 1,024 | 32,302 | 466 |
+| `$0A` | The Home of the Heron stream — 15,533<br/>Hanuman — Ramakien stream — 15,552<br/>Stack of Wheat palette — 512<br/>Self-Portrait palette — 512<br/>Paris Street; Rainy Day palette — 512 | 31,085 | 1,536 | 32,621 | 147 |
+| `$0B` | Tableau No. VII stream — 15,304<br/>Mortlake Terrace stream — 15,322<br/>Poppy Field (Giverny) palette — 512<br/>The Garden of Earthly Delights palette — 512<br/>The Scream palette — 512<br/>The Third of May 1808 palette — 512 | 30,626 | 2,048 | 32,674 | 94 |
+| `$0C` | Scholar in Landscape stream — 15,288<br/>Tornado in an American Forest stream — 15,274<br/>The Kiss (Lovers) palette — 512<br/>View of Delft palette — 512<br/>The Windmill at Wijk bij Duurstede palette — 512<br/>Flower Still Life palette — 512 | 30,562 | 2,048 | 32,610 | 158 |
+| `$0D` | Under the Wave off Kanagawa stream — 15,259<br/>The Scream stream — 15,238<br/>Sunflowers palette — 512<br/>Tableau No. VII palette — 512<br/>Winter Landscape with Ice Skaters palette — 512<br/>The Home of the Heron palette — 512 | 30,497 | 2,048 | 32,545 | 223 |
+| `$0E` | The Basket of Apples stream — 15,200<br/>Paris Street; Rainy Day stream — 15,171<br/>Dragon palette — 512<br/>Scholar in Landscape palette — 512<br/>Houses of Parliament, London palette — 512<br/>Thistles palette — 512 | 30,371 | 2,048 | 32,419 | 349 |
+| `$0F` | Houses of Parliament, London stream — 15,127<br/>Ravana Prepares for War with Rama stream — 15,139<br/>The Starry Night palette — 512<br/>River View by Moonlight palette — 512<br/>Mountainous Landscape with Waterfall palette — 512<br/>Wooded Landscape with Merrymakers in a Cart palette — 512 | 30,266 | 2,048 | 32,314 | 454 |
+| `$10` | Water Lilies stream — 14,958<br/>Panoramic View of a Wide River stream — 15,021<br/>Panoramic View of a Wide River palette — 512<br/>Sailing Vessels on an Inland Body of Water palette — 512<br/>Ships near the Coast during a Calm palette — 512<br/>Interior of the Sint-Odulphuskerk in Assendelft palette — 512<br/>The Voyage of Life: Childhood palette — 512 | 29,979 | 2,560 | 32,539 | 229 |
+| `$11` | A Sunday on La Grande Jatte — 1884 stream — 14,846<br/>Marly-le-Roi stream — 14,918<br/>The Voyage of Life: Youth palette — 512<br/>The Voyage of Life: Manhood palette — 512<br/>The Voyage of Life: Old Age palette — 512<br/>Tornado in an American Forest palette — 512<br/>Niagara palette — 512 | 29,764 | 2,560 | 32,324 | 444 |
+| `$12` | Poppy Field (Giverny) stream — 14,815<br/>The Third of May 1808 stream — 14,654<br/>Fog off Mount Desert palette — 512<br/>Buffalo Trail: The Impending Storm palette — 512<br/>Mount Corcoran palette — 512<br/>Sunset in the Woods palette — 512<br/>Harvest Moon palette — 512<br/>Wivenhoe Park, Essex palette — 512 | 29,469 | 3,072 | 32,541 | 227 |
+| `$13` | The Windmill at Wijk bij Duurstede stream — 14,366<br/>Wooded Landscape with Merrymakers in a Cart stream — 14,544<br/>Cloud Study: Stormy Sunset palette — 512<br/>Keelmen Heaving in Coals by Moonlight palette — 512<br/>Approach to Venice palette — 512<br/>Mortlake Terrace palette — 512<br/>Interior of the Pantheon, Rome palette — 512<br/>Entrance to the Grand Canal from the Molo, Venice palette — 512<br/>The Louvre, Afternoon, Rainy Weather palette — 512 | 28,910 | 3,584 | 32,494 | 274 |
+| `$14` | Cloud Study: Stormy Sunset stream — 14,330<br/>Distant View of Mount Akiha, Kakegawa stream — 14,324<br/>Waldo 16x16 font — 4,096 | 28,654 | 0 | 32,750 | 18 |
+| `$15` | The Voyage of Life: Youth stream — 14,088<br/>Fujisawa-shuku stream — 14,319<br/>Marly-le-Roi palette — 512<br/>The Willows palette — 512<br/>Distant View of Mount Akiha, Kakegawa palette — 512<br/>Fujisawa-shuku palette — 512<br/>Buddhist Temple Painting palette — 512<br/>The Buddha Descending from Trayastrimsa Heaven at Sankissa palette — 512<br/>Naresuan of Ayutthaya's Elephant Duel with Mingyi Swa of Toungoo palette — 512<br/>Ravan in His Palace in Lanka palette — 512 | 28,407 | 4,096 | 32,503 | 265 |
+| `$16` | Fog off Mount Desert stream — 14,006<br/>Approach to Venice stream — 14,045<br/>Surasa Challenges Hanuman palette — 512<br/>Hanuman — Ramakien palette — 512<br/>Hanuman Destroys the Golden City of Longka palette — 512<br/>Ravana Prepares for War with Rama palette — 512 | 28,051 | 2,048 | 30,099 | 2,669 |
 | `$17` | Buddhist Temple Painting stream — 13,901<br/>Surasa Challenges Hanuman stream — 13,938 | 27,839 | 0 | 27,839 | 4,929 |
 | `$18` | Flower Still Life stream — 13,881<br/>Wivenhoe Park, Essex stream — 13,768 | 27,649 | 0 | 27,649 | 5,119 |
 | `$19` | Interior of the Sint-Odulphuskerk in Assendelft stream — 13,620<br/>Harvest Moon stream — 13,689 | 27,309 | 0 | 27,309 | 5,459 |

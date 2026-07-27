@@ -14,10 +14,12 @@
 // matters -- and the demo keeps the REAL Waldo font rather than falling back to chunky pixel-doubled
 // 8x8 glyphs. Indexing is identical either way; the compiler emits far loads for the qualified array.
 // Requires +mos-a16 (far pointers are 32-bit). See docs/plans/2026-07-26-font16-far-rodata-keep-fonts-everywhere.md.
+#ifndef FONT16_STORAGE
 #ifdef TITLE_FONT16_FAR
 #define FONT16_STORAGE __attribute__((section(".far_rodata"))) const __attribute__((address_space(2)))
 #else
 #define FONT16_STORAGE static const
+#endif
 #endif
 
 FONT16_STORAGE uint16_t FONT16[FONT16_N * 4 * 8] = {

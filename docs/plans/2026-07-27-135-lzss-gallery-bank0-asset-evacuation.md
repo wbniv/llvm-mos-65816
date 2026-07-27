@@ -1,6 +1,6 @@
 # LZSS gallery: evacuate immutable graphics from Bank `$00`
 
-Status: planned
+Status: implemented
 Target: retain the ordinary **8 Mbit (1 MiB) LoROM** layout while making Bank
 `$00` runtime/code-only and recovering several KiB of near ROM space.
 
@@ -169,15 +169,32 @@ gate.
 
 ## Completion record
 
-Fill in during implementation:
-
-- Bank `$00` used/free before:
-- Bank `$00` used/free after:
-- assets moved, sizes, banks, and offsets:
-- final cartridge: **8 Mbit (1 MiB)**:
-- final Bank `$1F` free:
+- Bank `$00` safety margin before: effectively exhausted in the normal all-demo
+  build; focused `-Oz` map still carried both fonts.
+- Bank `$00` safety margin after: **5,144 bytes** before `$00:FFB0`.
+- assets moved as first-class romopt items:
+  - Waldo `FONT16`: 4,096 bytes at `$14:8000`;
+  - `FONT8`: 1,024 bytes at `$07:8000`.
+  The generator sorts both fonts together with every artwork stream and
+  palette; their banks are generated outputs, not fixed policy.
+- title/background audit: the gallery title/background and chevrons are
+  procedurally prepared; there is no additional immutable background CHR blob
+  resident in Bank `$00`. Writable `bgmode_tab`, `tm_tab`, `chrbuf`, and
+  `objchr` remain WRAM state.
+- `SINCOS` remains near intentionally; moving its continuously accessed 512
+  bytes was not required to meet the 4 KiB margin and would add far-load cost
+  in animation paths.
+- final cartridge: **8 Mbit (1 MiB)**.
+- final Bank `$1F`: 24,663 bytes used, **8,105 bytes free**.
 - ROM SHA-256:
-- checksum/complement:
-- complete oracle result and frame count:
-- biohack.net release:
-- indri.studio release:
+  `a5887f9b9940e0bb8137b1a0292f1173cbc615c1f72f847cda0aee98a0bb6268`.
+- checksum/complement: `$75F4` / `$8A0B`.
+- 1,000-frame bsnes-jg viewport smoke gate: pass.
+- complete oracle: pending the corrected 200,000-frame post-publication run.
+- enforcement: focused build rejects either font in Bank `$00`, rejects size
+  drift, verifies every linked bank against romopt totals, and rejects a Bank
+  `$00` margin below 4 KiB.
+- ROM map renderer: updated to show shared fonts in blue using actual linker
+  symbol addresses.
+- biohack.net release: pending republish.
+- indri.studio release: pending republish.

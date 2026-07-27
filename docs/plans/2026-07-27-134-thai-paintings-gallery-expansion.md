@@ -345,11 +345,12 @@ and The Bedroom.
 - weighted reduction: **4.54%**;
 - streams plus 62 palettes: **946,093 bytes**;
 - romopt result: 31 asset banks, `$01–$1F`;
-- final Bank `$1F`: 24,663 bytes used, **8,105 bytes free**;
+- final Bank `$1F`: 24,663 bytes used, **8,105 bytes free**; romopt places
+  `FONT16` in `$14` and `FONT8` in `$07`;
 - final cartridge: **8 Mbit (1 MiB) LoROM**;
-- checksum/complement: `$51D6` / `$AE29`;
+- checksum/complement: `$75F4` / `$8A0B`;
 - WRAM corpus oracle: `$5CF0` at `$0376`;
-- ROM SHA-256: `11b1de428d5fc3d3dab04d6cb964da62c54659dee4ca7f0153bab7dd56c7c769`;
+- ROM SHA-256: `a5887f9b9940e0bb8137b1a0292f1173cbc615c1f72f847cda0aee98a0bb6268`;
 - 1,000-frame bsnes-jg first-image/viewport smoke gate: pass;
 - 150,000-frame run: clean display but corpus not yet complete (`$0000`), proving that the former
   default was too short rather than reporting an oracle mismatch;
