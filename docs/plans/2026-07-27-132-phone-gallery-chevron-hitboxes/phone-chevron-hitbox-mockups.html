@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phone Gallery Chevron Hitbox Mockups</title>
+<style>
+  :root{color-scheme:dark;--cyan:#18f7ff;--green:#b8ef00;--gold:#ffc84a}
+  *{box-sizing:border-box}body{margin:0;background:#080b12;color:#e9f1f7;font:14px/1.4 system-ui,sans-serif}
+  main{max-width:1080px;margin:auto;padding:28px}h1{margin:0 0 8px}p{max-width:76ch;color:#aebdca}
+  .grid{display:grid;grid-template-columns:1fr 1.5fr;gap:24px;align-items:start;margin-top:24px}
+  figure{margin:0}.phone{margin:auto;padding:13px;background:#171b22;border:2px solid #56606d;border-radius:25px}
+  .portrait{width:320px}.landscape{width:620px}.screen{position:relative;aspect-ratio:8/7;overflow:hidden;
+    background:linear-gradient(145deg,#223e54,#967950);border:2px solid #050608}
+  .wave{position:absolute;inset:15% 8% 28%;opacity:.38;background:repeating-radial-gradient(ellipse at 40% 80%,#d8edf0 0 3px,#355c73 4px 10px)}
+  .chev{position:absolute;top:32%;width:6.25%;aspect-ratio:1;color:var(--gold);font:bold 28px/1 monospace;
+    display:grid;place-items:center;text-shadow:0 0 6px currentColor}.left{left:.8%}.right{right:.8%}
+  .hit{position:absolute;top:31.25%;width:9.375%;aspect-ratio:1;border:2px dashed var(--cyan);
+    background:#18f7ff18;box-shadow:0 0 10px #18f7ff88}.hit.left{left:0}.hit.right{left:auto;right:0}
+  .dead{position:absolute;left:9.375%;right:9.375%;top:0;bottom:0;display:grid;place-items:center;
+    color:#ff8090;font-weight:700;text-align:center}.dead:before,.dead:after{content:"";position:absolute;width:80%;height:2px;background:#ff6677aa}
+  .dead:before{transform:rotate(18deg)}.dead:after{transform:rotate(-18deg)}
+  .status{position:absolute;left:5%;right:5%;bottom:5%;font:9px monospace;color:#ffd95e}
+  figcaption{margin-top:9px;color:#b9c8d4;text-align:center}.legend{margin-top:20px;padding:14px;border:1px solid #283747;background:#101722}
+  code{color:#9ce7ef}@media(max-width:800px){.grid{grid-template-columns:1fr}.landscape{width:min(620px,100%)}}
+</style>
+<main>
+  <h1>Gallery touch scope: chevron squares only</h1>
+  <p>Dashed cyan squares are review overlays. They represent 24×24 SNES logical pixels and do not
+  ship. Everything between them is inert for Previous/Next.</p>
+  <section class="grid">
+    <figure><div class="phone portrait"><div class="screen"><i class="wave"></i>
+      <b class="chev left">‹</b><b class="chev right">›</b><i class="hit left"></i><i class="hit right"></i>
+      <div class="dead">NO NAVIGATION<br>FROM ARTWORK TAPS</div><div class="status">REPACK · MATCH · CORPUS RUNNING</div>
+    </div></div><figcaption>Portrait / embedded</figcaption></figure>
+    <figure><div class="phone landscape"><div class="screen"><i class="wave"></i>
+      <b class="chev left">‹</b><b class="chev right">›</b><i class="hit left"></i><i class="hit right"></i>
+      <div class="dead">HALF-SCREEN HIT AREAS REMOVED</div><div class="status">REPACK · MATCH · CORPUS RUNNING</div>
+    </div></div><figcaption>Landscape / fullscreen</figcaption></figure>
+  </section>
+  <div class="legend"><code>Previous: x 0–23, y 70–93</code> &nbsp;·&nbsp;
+    <code>Next: x 232–255, y 70–93</code></div>
+</main>
+</html>

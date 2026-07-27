@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SNES Cartridge Quadtree Mockup</title>
+<style>
+  :root{color-scheme:dark;--bg:#080b11;--panel:#111926;--line:#43566b;--ink:#e5edf5}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 system-ui,sans-serif}
+  main{max-width:1200px;margin:auto;padding:28px}h1{margin:0 0 7px}p{color:#aebdca;max-width:78ch}
+  .rom{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;border:2px solid #7891aa;background:#0c121c}
+  .quad{padding:10px;border:1px solid var(--line);background:var(--panel)}
+  .quad>h2{font-size:14px;margin:0 0 8px;color:#a9c6de}.cells{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .cell{padding:6px;border:1px dashed #3b4c60}.cell>small{display:block;margin-bottom:5px;color:#8095a8}
+  .banks{display:grid;grid-template-columns:1fr 1fr;gap:4px}.bank{min-height:72px;padding:7px;border-radius:3px;font:11px/1.25 ui-monospace,monospace}
+  .system{background:#263967;border:1px solid #7092e6}.critical{background:#5c202d;border:1px solid #ff647d}
+  .tight{background:#623c20;border:1px solid #f49a4a}.packed{background:#554d1c;border:1px solid #dbcb54}
+  .used{background:#193f38;border:1px solid #4dcaa9}.empty{background:#161c25;border:1px solid #303a48;color:#788796}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}.legend i{display:inline-block;width:12px;height:12px;margin-right:5px}
+  @media(max-width:800px){.rom{grid-template-columns:1fr}.bank{min-height:60px}}
+</style>
+<main>
+  <h1>1 MiB LoROM quadtree</h1>
+  <p>Four 256 KiB quadrants contain four 64 KiB cells; every cell resolves to its two physical
+  32 KiB LoROM banks. Exact item names remain in the generated table.</p>
+  <div class="legend">
+    <span><i style="background:#263967"></i>system</span><span><i style="background:#5c202d"></i>critical</span>
+    <span><i style="background:#623c20"></i>tight</span><span><i style="background:#554d1c"></i>packed</span>
+    <span><i style="background:#193f38"></i>used</span><span><i style="background:#161c25"></i>padding</span>
+  </div>
+  <section class="rom" id="rom"></section>
+</main>
+<script>
+const used=[-1,32752,32745,32758,32514,32323,32694,32640,32545,32419,32645,32221,29020,26178];
+const names=["SYSTEM","WHEAT + THISTLES","SUNFLOWERS + STARRY","BEDROOM + SELF","SISTERS + EARTHLY",
+"SKATERS + DRAGON","KISS + HERON","TABLEAU + SCHOLAR","WAVE + SCREAM","APPLES + PARIS",
+"LILIES + HOUSES","JATTE + POPPY","MAY + WINDMILL","DELFT + FLOWERS"];
+const rom=document.querySelector("#rom");
+for(let q=0;q<4;q++){
+  const quad=document.createElement("article");quad.className="quad";
+  quad.innerHTML=`<h2>Q${q} · $${(q*8).toString(16).padStart(2,"0")}–$${(q*8+7).toString(16).padStart(2,"0")} · 256 KiB</h2><div class="cells"></div>`;
+  const cells=quad.querySelector(".cells");
+  for(let c=0;c<4;c++){
+    const cell=document.createElement("section");cell.className="cell";
+    const first=q*8+c*2;cell.innerHTML=`<small>64 KiB · $${first.toString(16).padStart(2,"0")}–$${(first+1).toString(16).padStart(2,"0")}</small><div class="banks"></div>`;
+    const banks=cell.querySelector(".banks");
+    for(let j=0;j<2;j++){
+      const b=first+j,u=used[b]??0,free=u<0?"system":32768-u;
+      let cls=b===0?"system":u===0?"empty":free<32?"critical":free<256?"tight":free<1024?"packed":"used";
+      const leaf=document.createElement("div");leaf.className=`bank ${cls}`;
+      leaf.innerHTML=`<b>$${b.toString(16).padStart(2,"0")}</b><br>${names[b]??"PADDING"}<br>${u>0?u.toLocaleString()+" B":"32 KiB"}${u>0?"<br>"+free.toLocaleString()+" B free":""}`;
+      banks.append(leaf);
+    }
+    cells.append(cell);
+  }
+  rom.append(quad);
+}
+</script>
+</html>
