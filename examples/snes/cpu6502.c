@@ -14,6 +14,7 @@
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/drawable.h"
+#include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "../65816/cpu6502.h"
 #include "font16.h"
@@ -292,7 +293,10 @@ int main(void) {
   a.hh = 0;
   for (uint8_t i = 0; i < 6u; i++) a.hist[i] = a.cpu.pc;
 
+  static TitleLayer title;
+  title_begin16(&a.screen, &title, "DISASSEMBLER + ALU", "6502 SIMULATOR");
   corpus_result = cpu6502_gate_crc();
+  title_end(&a.screen, &title, 90);
 
   draw_all(&a);
   for (;;) {
