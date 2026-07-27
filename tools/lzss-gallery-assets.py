@@ -153,7 +153,10 @@ def main():
                 if not d.get("is_public_domain") or not d.get("image_id"):
                     raise SystemExit(f"{w['id']}: not public domain or no image")
             if w.get("image_url"):
-                commons_title=w.get("commons_file",f"Art Institute of Chicago image {w['id']}")
+                commons_title=w.get(
+                    "commons_file",
+                    f"{w.get('provider', spec['provider'])} image: {w['title']}",
+                )
                 url=w["image_url"]
                 commons_license=w.get("license",spec["license"])
             else:

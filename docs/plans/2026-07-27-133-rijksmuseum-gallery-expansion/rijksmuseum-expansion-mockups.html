@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rijksmuseum Gallery Expansion Mockups</title>
+<style>
+:root{color-scheme:dark;--bg:#071011;--panel:#102022;--ink:#e9fffb;--cyan:#22f7ff;--green:#b8ef00;--gold:#ffd166;--muted:#82a5a5}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#14363a,var(--bg) 40%);color:var(--ink);font:15px/1.45 system-ui,sans-serif}
+main{max-width:1180px;margin:auto;padding:32px}h1,h2{letter-spacing:.04em}h1{color:var(--cyan)}section{margin:28px 0;padding:20px;border:1px solid #275156;background:#091719cc}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.work{aspect-ratio:8/7;border:1px solid #31575a;background:#061011;display:grid;grid-template-rows:1fr auto;overflow:hidden}
+.art{position:relative;overflow:hidden;background:linear-gradient(160deg,#27445e 0 35%,#c2a478 36% 42%,#183b38 43% 100%)}
+.art:before,.art:after{content:"";position:absolute}.moon:before{width:44px;height:44px;border-radius:50%;background:#fff3bf;right:26px;top:20px;box-shadow:0 0 28px #fff}
+.falls{background:linear-gradient(120deg,#183428 0 34%,#d9e8d8 35% 42%,#315e66 43% 49%,#101c14 50%)}
+.woods{background:radial-gradient(ellipse at 50% 100%,#d1b67b 0 15%,transparent 16%),linear-gradient(100deg,#0b2114,#637b40 44%,#122818)}
+.river{background:linear-gradient(#94b5b8 0 48%,#556e6a 49% 65%,#182c24 66%)}.ship{background:linear-gradient(#849eb3 0 55%,#1b4253 56%)}
+.ship:before{left:48%;top:24%;height:60%;border-left:3px solid #15130e;box-shadow:-42px 16px 0 -1px #1b1510}.inside{background:linear-gradient(120deg,#d8b481,#79543a 55%,#172b2e 56%)}
+.church{background:repeating-linear-gradient(90deg,#d8d2b9 0 20px,#8c8d82 21px 24px);clip-path:polygon(0 12%,100% 0,100% 100%,0 86%)}
+.flowers{background:radial-gradient(circle at 50% 52%,#ffd15c 0 6%,#a50e45 7% 13%,transparent 14%),radial-gradient(circle at 30% 35%,#ece8dd 0 7%,#314f9c 8% 14%,transparent 15%),radial-gradient(circle at 70% 35%,#ff7a3d 0 8%,#6d122d 9% 15%,transparent 16%),#18291c}
+.caption{height:58px;padding:5px 24px;color:#fff;font:8px monospace;position:relative}.caption strong{display:block;color:var(--cyan);font-size:12px}.caption i{position:absolute;top:8px;font:22px monospace;color:var(--cyan);font-style:normal}.caption .l{left:3px}.caption .r{right:3px}
+.banks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.quad{border:2px solid var(--cyan);padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px}.bank{min-height:52px;padding:5px;background:#173e39;border:1px solid #49b99f;font:10px monospace}.bank.empty{background:#182124;color:#789}.bank.new{background:#514319;border-color:var(--gold)}
+table{width:100%;border-collapse:collapse}th,td{padding:7px;border-bottom:1px solid #29484b;text-align:left}th{color:var(--green)}small{color:var(--muted)}
+</style>
+</head>
+<body><main>
+<h1>Rijksmuseum Gallery Expansion</h1>
+<p>Plan mockups: composition coverage, final SNES presentation, provenance gate, and linker-derived cartridge occupancy.</p>
+<section><h2>Ten-work contact-sheet target</h2><div class="grid">
+<div class="work"><div class="art moon"></div><div class="caption"><i class="l">‹</i><strong>RIVER BY MOONLIGHT</strong>AERT <b>VAN DER NEER</b> · C. 1650<i class="r">›</i></div></div>
+<div class="work"><div class="art falls"></div><div class="caption"><strong>LANDSCAPE WITH WATERFALL</strong>JACOB <b>VAN RUISDAEL</b></div></div>
+<div class="work"><div class="art woods"></div><div class="caption"><strong>THE WOODED ROAD</strong>MEINDERT <b>HOBBEMA</b></div></div>
+<div class="work"><div class="art river"></div><div class="caption"><strong>RIVER LANDSCAPE</strong>JAN <b>VAN GOYEN</b></div></div>
+<div class="work"><div class="art river"></div><div class="caption"><strong>THE FERRY</strong>SALOMON <b>VAN RUYSDAEL</b></div></div>
+<div class="work"><div class="art ship"></div><div class="caption"><strong>SHIPS IN A CALM</strong>WILLEM <b>VAN DE VELDE</b></div></div>
+<div class="work"><div class="art inside"></div><div class="caption"><strong>DOMESTIC INTERIOR</strong>PIETER <b>DE HOOCH</b></div></div>
+<div class="work"><div class="art church"></div><div class="caption"><strong>CHURCH INTERIOR</strong>PIETER <b>SAENREDAM</b></div></div>
+<div class="work"><div class="art flowers"></div><div class="caption"><strong>STILL LIFE WITH FLOWERS</strong>RACHEL <b>RUYSCH</b></div></div>
+<div class="work"><div class="art flowers"></div><div class="caption"><strong>FRUIT AND FLOWERS</strong>JAN DAVIDSZ. <b>DE HEEM</b></div></div>
+</div></section>
+<section><h2>Linker-derived 1 MiB cartridge</h2><div class="banks">
+<div class="quad"><div class="bank">00 system</div><div class="bank">01–07 current</div><div class="bank">08–0B current</div><div class="bank new">0C–0F repacked</div></div>
+<div class="quad"><div class="bank new">10 new streams</div><div class="bank new">11 new streams</div><div class="bank new">12 new + palettes</div><div class="bank empty">13–17 free</div></div>
+<div class="quad"><div class="bank empty">18–1F free</div><div class="bank empty">exact sizes</div><div class="bank empty">from .map</div><div class="bank empty">not estimates</div></div>
+<div class="quad"><div class="bank empty">treemap Q3</div><div class="bank empty">physical banks</div><div class="bank empty">item labels</div><div class="bank empty">free bytes</div></div>
+</div><small>The real document is regenerated after linking; these blocks only mock the required hierarchy.</small></section>
+<section><h2>Source acceptance</h2><table><thead><tr><th>Gate</th><th>Required evidence</th><th>Failure behavior</th></tr></thead><tbody>
+<tr><td>Identity</td><td>canonical Rijksmuseum object record</td><td>reject</td></tr>
+<tr><td>Rights</td><td>CC0 or Public Domain Mark</td><td>reject</td></tr>
+<tr><td>Master</td><td>pinned URL/file + SHA-256</td><td>reject</td></tr>
+<tr><td>Visual</td><td>complete aspect, readable 219-colour preview</td><td>substitute work</td></tr>
+<tr><td>ROM</td><td>host round-trip + emulator PASS</td><td>do not publish</td></tr>
+</tbody></table></section>
+</main></body></html>
