@@ -1,15 +1,9 @@
 | Date | Change |
 |------|--------|
-| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/4fc642c) | feat(snesgfx): backdrop_gradient.h — reusable HDMA backdrop vignette; trimerge first consumer |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/ab35c87) | fix(trimerge): atomic single-v-blank field flush — close the waterfall tear |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/bc83003) | feat(trimerge): #99b visual rework — waterfall braid + stride-unit offset + palette breathing |
 
 <!--history-meta v1
-4fc642c	author	Will Norris
-4fc642c	added	40
-4fc642c	deleted	1
-4fc642c	files	1
-4fc642c	body	New library helper (hdma_hscroll.h conventions: header-only, generic chan,\ncaller owns write-only HDMAEN): BDROP_SPAN/BDROP_END declare a static ROM\ntable, bdrop_arm(chan, tab) points mode-3 HDMA at $2121 — per-scanline\nCGRAM colour-0 gradient, zero per-frame CPU, zero v-blank budget. trimerge\narms ch7 post-title with a 28-band (8-line) vignette (16-line first cut was\nvisibly stripey); breathe_palette now pushes cgidx 1..3 since HDMA owns\ncolour 0. Gate PASS 0xCCCC (scmp probe intact), tear check ATOMIC with HDMA\nactive, backdrop samples ramp smoothly. Published biohack.net v1.0.288.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ab35c87	author	Will Norris
 ab35c87	added	43
 ab35c87	deleted	0
