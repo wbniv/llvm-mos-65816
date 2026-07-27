@@ -234,7 +234,8 @@ static void load_chevrons(void){
   REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;
   uint16_t c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  REG_CGADD=132;REG_CGDATA=0;REG_CGDATA=0;
+  /* Compression sprites use OBJ palette 1 (attribute bits ppp=001). */
+  REG_CGADD=144;REG_CGDATA=0;REG_CGDATA=0;
   c=SNES_RGB(8,31,30);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   REG_OBSEL=3u;
