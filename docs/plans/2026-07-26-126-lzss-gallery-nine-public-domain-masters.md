@@ -1,16 +1,16 @@
-# #126 — Add Nine Public-Domain Masters to the Mode 7 LZSS Gallery
+# #126 — Add Ten Public-Domain Masters to the Mode 7 LZSS Gallery
 
 **Status:** IMPLEMENTED AND PUBLISHED (2026-07-26). Extends the ten-work gallery from
 [#119](2026-07-26-119-snes-lzss-gallery-carousel.md), using the 219-color CGRAM
 layout from [#125](2026-07-26-125-lzss-gallery-full-mode7-color.md).
 
-Mockups: [nine-work contact sheet and 19-work player](2026-07-26-126-lzss-gallery-nine-public-domain-masters/gallery-expansion-mockups.html)
+Mockups: [ten-work contact sheet and 20-work player](2026-07-26-126-lzss-gallery-nine-public-domain-masters/gallery-expansion-mockups.html)
 
 ## Goal
 
-Add nine visually distinct, royalty-free masterworks to the existing Mode 7
+Add ten visually distinct, royalty-free masterworks to the existing Mode 7
 LZSS gallery without replacing its current ten works. The finished cartridge
-contains **19 works**, each rendered from the complete uncropped composition at
+contains **20 works**, each rendered from the complete uncropped composition at
 the largest aspect-preserving Mode 7 raster that fits 256 tiles and quantized
 to at most **219 artwork colors**.
 
@@ -30,8 +30,9 @@ Append these works after the existing ten in this order:
 | 15 | `view-of-delft` | Johannes Vermeer | *View of Delft* | Mauritshuis |
 | 16 | `wijk-windmill` | Jacob van Ruisdael | *The Windmill at Wijk bij Duurstede* | Rijksmuseum |
 | 17 | `flower-still-life` | Ambrosius Bosschaert the Elder | *Flower Still Life* | Rijksmuseum |
-| 18 | `tableau-vii` | Piet Mondriaan | *Tableau No. VII* | public-domain museum/Commons scan |
-| 19 | `ice-skaters` | Hendrick Avercamp | *Winter Landscape with Ice Skaters* | Rijksmuseum |
+| 18 | `sunflowers` | Vincent van Gogh | *Sunflowers* | National Gallery, London |
+| 19 | `tableau-vii` | Piet Mondriaan | *Tableau No. VII* | public-domain museum/Commons scan |
+| 20 | `ice-skaters` | Hendrick Avercamp | *Winter Landscape with Ice Skaters* | Rijksmuseum |
 
 Use the Rijksmuseum’s public-domain c. 1608 Avercamp image, object
 `SK-A-1718`, not a similarly titled canal scene or a cropped detail. The
@@ -110,9 +111,9 @@ The new corpus intentionally exercises different failure modes:
 Do not reduce these additions to 31 colors. Reports and gallery copy must say
 “up to 219 artwork colors.”
 
-## Nineteen-work cartridge scaling
+## Twenty-work cartridge scaling
 
-The current ten-work runtime uses 16-bit completion and failure masks. Nineteen
+The current ten-work runtime uses 16-bit completion and failure masks. Twenty
 assets cannot be represented by `1u << i` on the 16-bit SNES target. Replace
 the masks with bounded per-work state arrays plus explicit counters:
 
@@ -122,23 +123,26 @@ static uint8_t gallery_failed[GALLERY_ASSET_COUNT];
 static uint8_t gallery_completed_count;
 ```
 
-The canonical corpus oracle must still fold every work exactly once in fixed
-manifest order, independent of browse order. Re-visiting an already completed
-work must not increment the count or change its recorded timing/oracle result.
-Canceled work remains incomplete.
+The asset generator must fold every work exactly once in fixed manifest order
+and emit the canonical host oracle as `GALLERY_CORPUS_ORACLE`. The ROM exposes
+that value only after every target-side exact-stream, second-decode, checksum,
+and byte comparison passes. Re-visiting an already completed work must not
+increment the count or change its recorded result. Canceled work remains
+incomplete.
 
 Extend generated asset tables, bank-section names, and the linker map from ten
-through nineteen works. Keep one work’s compressed stream and 512-byte palette
-together in a known LoROM bank when possible. Add generated assertions for:
+through twenty works. Treat every compressed stream and every 512-byte palette
+as an independently placeable item; their independent far pointers let the
+small palettes fill holes left by large streams. Add generated assertions for:
 
 - every section exists and maps to the intended ROM bank;
 - no stream or palette crosses an illegal bank boundary;
 - all far pointers have the expected bank;
 - the ROM size/header match the expanded image;
 - the largest recompression result fits the WRAM buffer; and
-- `GALLERY_ASSET_COUNT == 19`.
+- `GALLERY_ASSET_COUNT == 20`.
 
-If nineteen dedicated banks do not fit the present cartridge layout, increase
+If twenty dedicated banks do not fit the present cartridge layout, increase
 the smallest valid LoROM size and update its header rather than packing data
 across banks ad hoc. Record occupied/free bytes per gallery bank in
 `report.json` and the linker map.
@@ -146,14 +150,329 @@ across banks ad hoc. Record occupied/free bytes per gallery bank in
 Navigation remains circular:
 
 ```text
-Left from work 1  -> work 19
-Right from work 19 -> work 1
+Left from work 1  -> work 20
+Right from work 20 -> work 1
 ```
 
-Waldo captions and the small title/status layer must accept all new artist and
-work names without overflow. Prefer two intentional lines over abbreviation;
-use `MONDRIAAN` in the displayed artist name. Show position as `11/19` through
-`19/19` and keep progress/timing text clear of the chevrons.
+## Cartridge ROM map
+
+This is a **1 MiB LoROM**: 32 banks of 32,768 bytes. The authoritative
+[generated ROM map](../../assets/snes/lzss-gallery/derived/rom-map.md) is
+regenerated from `build/lzss-gallery.map` after every link; asset-array
+estimates are not a substitute for linked section sizes.
+
+### Cartridge-size ceilings
+
+Keep three different limits explicit:
+
+| Target | Maximum useful mapperless ROM | Meaning |
+|---|---:|---|
+| Physical SNES cartridge | **64 Mbit (8 MiB)** | The largest standard CPU-visible image is an ExHiROM/ExLoROM layout. Ordinary LoROM/HiROM reaches 32 Mbit (4 MiB). A cartridge with custom bank-switching hardware can contain more, so 64 Mbit (8 MiB) is the standard mapperless limit rather than an absolute limit on custom PCBs. |
+| MAME SNES cartridge slot | **64 Mbit (8 MiB)** | MAME's standard slot has 256 ROM-bank-map entries, each representing 32 KiB. Its loader can allocate a larger input, but more than 64 Mbit (8 MiB) cannot be represented safely by that bank map and is not a supported mapperless cartridge. |
+| bundled bsnes-jg core | **8 MiB (64 Mbit)** | The core detects ExLoROM/ExHiROM headers and its board database maps the two 4 MiB halves. A larger host-side byte vector is not additional CPU-visible ROM unless a supported cartridge coprocessor/mapper exposes it. |
+
+Consequently this gallery has ample room to grow from its current 1 MiB image,
+but each proposed growth step must select the smallest power-of-two ROM image
+that fits and must remain at or below 8 MiB unless the plan also specifies,
+implements, and tests a real custom mapper. Add boundary fixtures at 4 MiB and
+8 MiB when this project first changes from LoROM to an extended mapping; reject
+an accidentally oversized mapperless image during the build.
+
+Capacity evidence:
+
+- [SNESdev HiROM/ExHiROM memory map](https://snes.nesdev.org/wiki/HiROM)
+  documents the normal 4 MiB range and the additional ExHiROM half.
+- MAME's
+  [`snes_slot.h`](https://github.com/mamedev/mame/blob/master/src/devices/bus/snes/snes_slot.h)
+  defines the 256-entry bank map consumed by
+  [`snes_slot.cpp`](https://github.com/mamedev/mame/blob/master/src/devices/bus/snes/snes_slot.cpp).
+- The bundled bsnes-jg evidence is
+  `vendor/bsnes-jg/src/heuristics.cpp` (extended-header detection) and
+  `vendor/bsnes-jg/Database/boards.bml` (`EXHIROM`/`EXLOROM` mappings).
+
+Packing uses William B. Norris IV's 1992 `romopt` algorithm: sort all indivisible
+items largest-to-smallest, then place each item in the first bank where it
+fits. LZSS streams and 512-byte palettes are **separate items** because their
+far pointers are independent and the small palettes are useful hole-fillers.
+
+The current result uses ten asset banks:
+
+```mermaid
+flowchart LR
+  B00["$00<br/>CODE / RODATA / HEADER"]
+  B01["$01<br/>32,758 B"]
+  B02["$02<br/>32,514 B"]
+  B03["$03<br/>32,353 B"]
+  B04["$04<br/>32,348 B"]
+  B05["$05<br/>32,611 B"]
+  B06["$06<br/>32,486 B"]
+  B07["$07<br/>32,689 B"]
+  B08["$08<br/>31,709 B"]
+  B09["$09<br/>29,020 B"]
+  B0A["$0A<br/>26,178 B"]
+  PAD["$0B-$1F<br/>21 PADDING BANKS"]
+  B00 --> B01 --> B02 --> B03 --> B04 --> B05 --> B06 --> B07 --> B08 --> B09 --> B0A --> PAD
+```
+
+### Superseded one-artwork-per-bank baseline
+
+The following baseline is retained to make the packing improvement auditable;
+it is not the shipped layout.
+
+```mermaid
+flowchart LR
+  B00["$00<br/>CODE + RODATA<br/>26,856 B<br/>HEADER/VECTORS 80 B"]
+  B01["$01<br/>GREAT WAVE<br/>15,771 B"]
+  B02["$02<br/>BEDROOM<br/>16,348 B"]
+  B03["$03<br/>GRANDE JATTE<br/>15,358 B"]
+  B04["$04<br/>TWO SISTERS<br/>16,567 B"]
+  B05["$05<br/>WATER LILIES<br/>15,470 B"]
+  B06["$06<br/>BASKET APPLES<br/>15,712 B"]
+  B07["$07<br/>STACK WHEAT<br/>16,211 B"]
+  B08["$08<br/>SELF PORTRAIT<br/>17,434 B"]
+  B09["$09<br/>PARIS STREET<br/>15,683 B"]
+  B0A["$0A<br/>POPPY FIELD<br/>15,327 B"]
+  B0B["$0B<br/>EARTHLY DELIGHTS<br/>16,971 B"]
+  B0C["$0C<br/>THE SCREAM<br/>15,750 B"]
+  B0D["$0D<br/>THIRD OF MAY<br/>15,166 B"]
+  B0E["$0E<br/>THE KISS<br/>16,137 B"]
+  B0F["$0F<br/>VIEW OF DELFT<br/>12,809 B"]
+  B10["$10<br/>WIJK WINDMILL<br/>14,878 B"]
+  B11["$11<br/>FLOWER STILL LIFE<br/>14,393 B"]
+  B12["$12<br/>SUNFLOWERS<br/>16,307 B"]
+  B13["$13<br/>TABLEAU VII<br/>15,816 B"]
+  B14["$14<br/>ICE SKATERS<br/>16,558 B"]
+  PAD["$15-$1F<br/>11 EMPTY PADDING BANKS<br/>360,448 B"]
+  B00 --> B01 --> B02 --> B03 --> B04 --> B05 --> B06 --> B07 --> B08 --> B09 --> B0A
+  B0A --> B0B --> B0C --> B0D --> B0E --> B0F --> B10 --> B11 --> B12 --> B13 --> B14 --> PAD
+```
+
+Bank `$00` contains `.text` 19,543 B and `.rodata` 7,313 B, leaving 5,832 B
+in its `$8000-$FFAF` program region; its separate cartridge header and vectors
+occupy the final 80 B. Each artwork bank contains one LZSS stream plus its
+512-byte BGR555 palette:
+
+| Bank | Work | Stream | Palette | Used | Free |
+|---:|---|---:|---:|---:|---:|
+| `$01` | Great Wave | 15,259 | 512 | 15,771 | 16,997 |
+| `$02` | Bedroom | 15,836 | 512 | 16,348 | 16,420 |
+| `$03` | Grande Jatte | 14,846 | 512 | 15,358 | 17,410 |
+| `$04` | Two Sisters | 16,055 | 512 | 16,567 | 16,201 |
+| `$05` | Water Lilies | 14,958 | 512 | 15,470 | 17,298 |
+| `$06` | Basket of Apples | 15,200 | 512 | 15,712 | 17,056 |
+| `$07` | Stack of Wheat | 15,699 | 512 | 16,211 | 16,557 |
+| `$08` | Self-Portrait | 16,922 | 512 | 17,434 | 15,334 |
+| `$09` | Paris Street | 15,171 | 512 | 15,683 | 17,085 |
+| `$0A` | Poppy Field | 14,815 | 512 | 15,327 | 17,441 |
+| `$0B` | Earthly Delights | 16,459 | 512 | 16,971 | 15,797 |
+| `$0C` | The Scream | 15,238 | 512 | 15,750 | 17,018 |
+| `$0D` | Third of May | 14,654 | 512 | 15,166 | 17,602 |
+| `$0E` | The Kiss | 15,625 | 512 | 16,137 | 16,631 |
+| `$0F` | View of Delft | 12,297 | 512 | 12,809 | 19,959 |
+| `$10` | Wijk Windmill | 14,366 | 512 | 14,878 | 17,890 |
+| `$11` | Flower Still Life | 13,881 | 512 | 14,393 | 18,375 |
+| `$12` | Sunflowers | 15,795 | 512 | 16,307 | 16,461 |
+| `$13` | Tableau VII | 15,304 | 512 | 15,816 | 16,952 |
+| `$14` | Ice Skaters | 16,046 | 512 | 16,558 | 16,210 |
+| `$15-$1F` | Explicit power-of-two padding | 0 | 0 | 0 each | 32,768 each |
+
+Add a reusable map-to-Markdown generator to the verification path. It must fail
+if any section is absent, crosses a bank, exceeds 32,768 bytes, overlaps the
+header bank, or if the documented totals differ from the final link map.
+
+### Navigation feedback
+
+Every accepted Previous/Next input must produce immediate visible feedback on
+the corresponding on-cartridge chevron, regardless of whether it originated
+from a keyboard, gamepad, or a tap on the left/right half of the phone canvas.
+
+- On trigger, change the selected gold chevron to the reserved bright
+  cyan/white highlight palette and give it a short outward pulse.
+- Hold the peak highlight for at least three frames, then return to gold over a
+  total animation of roughly 8–12 frames.
+- Begin the highlight on the first vblank after the accepted input. The next
+  image's decode starts concurrently; feedback must not wait for decoding and
+  must not add an artificial loading pause.
+- Animate only the triggered direction. The opposite arrow remains gold.
+- Ignore key/button auto-repeat already rejected by navigation debouncing;
+  a newly accepted input restarts the appropriate arrow animation.
+- Keep the feedback visible over the outgoing artwork and its `LOADING...`
+  state. It must not disappear when the outgoing picture begins its final
+  transition.
+- Pair the flash with the complete direction-specific status `LOADING
+  NEXT...` or `LOADING PREVIOUS...`. Never abbreviate it to `NEX`, truncate a
+  word, or briefly show a competing generic status.
+- Use the existing reserved UI colors/sprite budget, without consuming artwork
+  palette entries or changing the LZSS timing/oracle.
+
+The linked player mockup shows the right/Next arrow at peak highlight. Test
+Previous and Next independently, including touch input in fullscreen portrait
+mode and circular wraparound at works 1 and 20.
+
+### Visible test-battery console
+
+The gallery is an on-cartridge LZSS test battery, not merely a slideshow. Make
+that purpose continuously legible in the caption band by reserving up to three
+additional 8×8 rows below the artist/title/date metadata:
+
+```text
+TEST 20/20  DECODE  143F
+REPACK 982F  VERIFY 211F
+CORPUS 19/20  RUNNING [#######.]
+```
+
+The exact numbers above are illustrative. Runtime values always come from the
+existing frame counters and completion state.
+
+- During decode, repack, stream comparison, and decoded-byte verification,
+  animate the appropriate phase label plus a spinner or eight-cell progress
+  bar. Update at least every 8–16 frames so a slow operation never looks
+  frozen.
+- Once a work completes, retain its measured `DECODE`, `REPACK`, and `VERIFY`
+  frame counts together on screen; do not immediately replace them with a
+  generic `OK`.
+- Show the current work number out of 20 separately from the canonical corpus
+  completion count. Browsing a previously completed work must not falsely
+  advance corpus progress.
+- Render `PASS` in the reserved success color and `FAIL` in the reserved error
+  color. A corpus is only `PASS` after all 20 fixed-order oracle contributions
+  are complete; before then label it `RUNNING`.
+- Direction-specific loading text and the arrow flash occupy the same console
+  without erasing the last completed timing result. For example, animate
+  `NEXT > DECODE [##......]` on one row while the other two timing/corpus rows
+  remain stable.
+- Prefer three telemetry rows. A layout may use two where a two-line title
+  requires the space, but every work must show phase animation, all three final
+  timings, per-work result, and corpus progress without scrolling.
+- Recompute the artwork/caption split as needed; never cover or crop artwork,
+  overlap the chevrons, or write beyond scanline 223.
+- Console updates are presentation work outside the timed codec intervals.
+  Keep the benchmark counters honest and preserve the host-generated `0xB5D7`
+  oracle.
+
+### Live compression visualization
+
+Make the repack phase visible on top of the artwork. The primary visualization
+is a sprite-based outline of the LZSS run currently being encoded:
+
+- expose a small volatile visualization record from the compressor containing
+  token kind, current source offset, match source offset, match length, bytes
+  consumed, and bytes emitted;
+- convert the current linear source offset back to artwork `(x, y)` and project
+  it through the same centered Mode 7 display scale used by the image;
+- for a match token, assemble a thin bright outline from reusable OBJ endpoint
+  and span tiles. Its horizontal length represents the match length at the
+  exact place in the image being compressed;
+- split a run that crosses a raster row into two outlined segments rather than
+  drawing through the black surround;
+- distinguish literals with a compact one-pixel/crosshair marker instead of a
+  false run box;
+- show the current match brightly and retain several prior outlines as a
+  short, progressively dimmer trail, bounded by the available OBJ and
+  per-scanline limits;
+- sample/coalesce compressor events to at most one visible update per frame.
+  The compressor may produce many tokens between vblanks; display the newest
+  representative event rather than stalling once per token;
+- perform OAM selection/placement from NMI-visible state so compression
+  continues while the overlay animates. Do not mutate framebuffer indices,
+  Mode 7 tiles, compressed bytes, or the canonical oracle;
+- show `MATCH L=18 D=0421` or `LITERAL $7C` in an 8×8 telemetry row, together
+  with raw bytes consumed, packed bytes emitted, and live compression ratio;
+  and
+- hide all compression sprites outside `REPACK`, restoring the normal
+  navigation-chevron sprite state afterward.
+
+Build the outline from a small fixed sprite vocabulary—single/literal marker,
+left cap, repeatable middle span, right cap, and row-wrap caps—selected and
+positioned dynamically. Do not generate character data during compression.
+Use reserved UI palette colors: current match cyan/white, match-source marker
+gold, and fading history in darker cyan. Assert no scanline exceeds 32 OBJ
+sprites and no frame exceeds 128; if necessary, reduce trail length before
+dropping the current run.
+
+The benchmark timing remains wall-clock performance with the visualization
+enabled, including its bounded NMI cost. Add a headless build/run comparison
+to quantify that cost separately, while requiring identical compressed bytes,
+statistics, checksums, and corpus oracle in both modes.
+
+#### Ten candidate compression views
+
+These are compatible ideas, not ten simultaneous overlays. Implement the run
+outline first, then select at most one or two secondary treatments after
+native-resolution captures:
+
+1. **Current-run outline:** outline the exact destination pixels covered by
+   the current match; width directly communicates match length.
+2. **Source-to-match link:** place a gold marker at the earlier dictionary
+   source and a cyan marker at the current run, with a short dotted sprite
+   trail suggesting the backward reference.
+3. **Fading run history:** retain the last 4–8 match outlines, dimming with age
+   so compressible regions visibly accumulate activity.
+4. **Token scanner:** sweep a one-pixel vertical cursor across the raster in
+   source order, changing color for literal versus match tokens.
+5. **Compression heatmap trail:** stamp tiny translucent-looking dither
+   sprites where long matches occur; hotter/brighter stamps represent longer
+   runs.
+6. **Dictionary window ribbon:** use one 8×8 text row as a 32-cell moving
+   ribbon, marking the current byte, lookback distance, and matched interval.
+7. **Literal/match lane:** animate tokens into two small sprite lanes below the
+   artwork—dots for literals, bars proportional to match length—like a live
+   logic analyzer.
+8. **Ratio gauge:** maintain `RAW`, `PACKED`, and live percentage text plus a
+   horizontal sprite bar that expands or contracts around the 100% break-even
+   point.
+9. **Match-length histogram:** use 18 tiny columns, one for each supported
+   match length, updated during repack to reveal the stream’s token shape.
+10. **Bank/tape spool:** animate raw bytes entering one sprite spool and packed
+    bytes leaving another; spool speed is proportional to input/output rate,
+    while the text rows retain exact counts.
+
+### Caption metadata contract
+
+Each caption includes the work's museum-supported creation date. Preserve the
+source's uncertainty: use `C. 1608`, a range such as `1503-1515`, or another
+short museum form where appropriate instead of inventing a single year. Record
+the unabridged source date in `sources.json`; keep the on-screen rendering
+within the existing caption area.
+
+Artist display names have a strict, standing **mixed-font policy**:
+
+- if the artist's full conventional name is 16 characters or fewer (including
+  spaces), display the full name in the 16×16 font;
+- if it is longer than 16 characters, keep the entire artist name on **one
+  horizontal line**, rendering the given-name/prefix portion in the 8×8 font
+  and the surname in the 16×16 font;
+- vertically align the 8×8 portion within the 16-pixel-tall surname row and
+  place the surname immediately after one normal inter-word space; do not put
+  either portion above or below the other;
+- preserve surname particles with the surname where that is the conventional
+  display form, and preserve suffixes such as `THE ELDER` in the 8×8 portion;
+- measure the complete mixed-font run before emitting it; if it exceeds the
+  256-pixel line, render the complete conventional name in 8×8 instead;
+- do not discard names, wrap the artist across lines, or use initials as a
+  workaround; and
+- apply this rule to every current asset and every gallery addition going
+  forward.
+
+The 20-work sweep therefore changes these existing display labels:
+
+| Slug | 8×8 portion | 16×16 portion |
+|---|---|---|
+| `great-wave` | `KATSUSHIKA` | `HOKUSAI` |
+| `two-sisters` | `PIERRE-AUGUSTE` | `RENOIR` |
+| `paris-street` | `GUSTAVE` | `CAILLEBOTTE` |
+| `third-of-may` | `FRANCISCO` | `DE GOYA` |
+| `wijk-windmill` | `JACOB` | `VAN RUISDAEL` |
+| `flower-still-life` | fallback: complete `AMBROSIUS BOSSCHAERT THE ELDER` in 8×8 | — |
+| `ice-skaters` | `HENDRICK` | `AVERCAMP` |
+
+Names at exactly 16 characters, including `VINCENT VAN GOGH`, `HIERONYMUS
+BOSCH`, and `JOHANNES VERMEER`, remain unabbreviated. Keep `PIET MONDRIAAN`
+with the agreed Dutch spelling. The asset generator must measure the final
+pixel width, center the combined run as one unit, apply the all-8×8 fallback
+when necessary, and reject any final caption wider than 256 pixels. Show
+position as `11/20` through `20/20` and keep the date, progress/timing text,
+and chevrons from overlapping.
 
 ### Display-layer contract
 
@@ -179,8 +498,8 @@ The linked mockup defines two acceptance views:
 
 1. a 3×3 addition sheet that makes the exact selected works and order
    unmistakable; and
-2. the on-cartridge experience at work 19, with preserved landscape aspect
-   ratio, black surround, two-line caption, `19/19`, and left/right controls.
+2. the on-cartridge experience at work 20, with preserved landscape aspect
+   ratio, black surround, two-line caption, `20/20`, and left/right controls.
 
 The mockup uses stylized stand-ins, not source reproductions. Generated
 references during implementation must use the licensed scans and actual
@@ -193,7 +512,7 @@ BGR555 output.
 - Validate every source hash and rights record.
 - Assert every derived raster uses only index 0 or the 219 allowed indices.
 - Assert index 0 appears only outside the artwork or in partial-tile padding.
-- Round-trip every one of the 19 streams with host `-O0` and `-O2` compressors.
+- Round-trip every one of the 20 streams with host `-O0` and `-O2` compressors.
 - Assert both compressors emit identical bytes.
 - Decode emitted indices through the emitted BGR555 palette and compare with
   the deterministic reference.
@@ -201,32 +520,47 @@ BGR555 output.
 
 ### SNES gates
 
-- Decode, upload, display, recompress, byte-compare, and checksum all 19 works.
-- Run the uninterrupted canonical 19-work oracle.
+- Decode, upload, display, recompress, byte-compare, and checksum all 20 works.
+- Run the uninterrupted canonical 20-work oracle.
 - Re-run after adversarial Left/Right navigation, wraparound, cancellation,
   and repeated visits.
-- Capture work 11, work 18, and work 19 at native 256×224.
+- Capture work 11, work 18, work 19, and work 20 at native 256×224.
 - Inspect all additions for crop, aspect distortion, forbidden-color speckles,
   banding, stale palettes, caption overlap, and incorrect black padding.
+- Capture both Previous and Next at peak highlight and assert the first changed
+  frame occurs immediately after the accepted navigation input while decode is
+  in progress.
+- Record the console at every phase and after completion. Assert that progress
+  animation advances during long work, final decode/repack/verify timings
+  remain visible, and corpus progress reaches `20/20 PASS` only when the oracle
+  completes.
+- Capture literal, same-row match, row-wrapping match, maximum-length match,
+  and dense-trail compression frames. Verify outline placement against the
+  source offsets and audit OBJ totals on every scanline.
+- Compare instrumented and headless recompression outputs byte-for-byte and
+  report the visualization's frame/cycle overhead without hiding it from the
+  displayed benchmark timing.
+- Assert every rendered artist label follows the mixed-font, single-line
+  policy and that every work renders its recorded creation date.
 - Verify the detailed Bosch and Avercamp images remain readable enough at rest
   to justify their chosen raster dimensions.
 
 ### Website parity
 
 - Copy the exact verified ROM and generated poster/contact sheet to both sites.
-- Update both descriptions to say 19 works and up to 219 artwork colors.
-- Add all nine titles/artists and the source/license attribution to both pages.
+- Update both descriptions to say 20 works and up to 219 artwork colors.
+- Add all ten titles/artists and the source/license attribution to both pages.
 - Keep the Mode 7 badge/filter behavior unchanged.
 - Build both sites in their existing containers.
 - Compare SHA-256 for the source ROM, both repository copies, and both live
   downloads.
-- Compare the ordered 19-work metadata rendered by biohack.net and indri.studio.
+- Compare the ordered 20-work metadata rendered by biohack.net and indri.studio.
 
 ## Publication and documentation
 
 After the ROM passes:
 
-1. update #119, #122, and #125 with the final 19-work measurements;
+1. update #119, #122, and #125 with the final 20-work measurements;
 2. record source and derived hashes, dimensions, colors used, raw/LZSS sizes,
    reduction, timings, checksums, and bank occupancy for every addition;
 3. replace both sites’ ROM, poster/contact sheet, cache-busting metadata, and
@@ -237,35 +571,45 @@ After the ROM passes:
 
 ## Definition of done
 
-- The original ten works remain and the agreed nine are appended in the stated
+- The original ten works remain and the agreed ten are appended in the stated
   order.
-- The cartridge and both websites expose the same 19 works.
+- The cartridge and both websites expose the same 20 works.
 - Every new scan has explicit reusable public-domain provenance and a pinned
   source hash.
 - Every complete composition preserves aspect ratio and may use up to 219
   artwork colors.
-- Nineteen-work completion, failure, timing, cancellation, wraparound, and
+- Twenty-work completion, failure, timing, cancellation, wraparound, and
   oracle logic work without a 16-bit mask.
-- All 19 host/SNES LZSS round trips and visual gates pass.
-- Captions, position, chevrons, Mode 7 badge/filter, and fixed UI colors remain
-  correct.
+- All 20 host/SNES LZSS round trips and visual gates pass.
+- Captions include source-supported dates; artist labels obey the standing
+  mixed-font, single-line rule; position, chevrons, Mode 7 badge/filter, and
+  fixed UI colors remain correct.
+- Previous and Next inputs visibly flash only their corresponding chevron,
+  including phone taps, without delaying the next-image decode.
+- The on-screen console visibly identifies the gallery as a 20-work test
+  battery and exposes animated phases, retained per-work timings, result, and
+  canonical corpus progress.
+- During repack, sprite outlines identify where matches occur and how long they
+  are, while literal/match text and live byte/ratio counters update without
+  changing compressed output or exceeding SNES OBJ limits.
 - Both live ROM hashes equal the locally verified ROM hash.
 
 ## Implementation record
 
 **Verification: PASS.**
 
-Implemented as a 1 MiB LoROM with nineteen dedicated artwork banks. The final
-corpus is 295,880 indexed bytes and 288,631 LZSS bytes (2.45% reduction), with
-oracle `0x9497` and ROM SHA-256
-`8b551b9228a2ea3457fdb324a33f91a3ccbe3ea73151b782c06c8f90459388ab`.
-All nineteen host `-O0`/`-O2` streams match exactly, and bsnes-jg reached the
-oracle after 150,000 frames.
+Implemented as a 1 MiB LoROM with twenty artworks packed into ten asset banks
+using first-fit decreasing. The final corpus is 311,784 indexed bytes and
+304,426 LZSS bytes (2.36% reduction), with host-generated oracle `0xB5D7`.
+All twenty host `-O0`/`-O2` streams match exactly. The ROM independently
+requires every artwork's exact compressed stream, second decode, checksum, and
+byte comparison to pass before it publishes that oracle. bsnes-jg reached
+`0xB5D7` after 150,000 normal-timing frames; the verified ROM SHA-256 is
+`992a575cca7e1bee26bdf894e8c37656dc546e7456914c622126a036cd46cbbf`.
 
-The nine additions occupy banks `$0B`–`$13`; the largest new section is
-`$424B` bytes, safely below the `$8000`-byte LoROM bank boundary. Native
-captures were inspected for Bosch, Mondriaan, and Avercamp. The Avercamp
-capture is the new gallery poster.
+The generated linker-map report proves every stream and independent 512-byte
+palette fits its assigned `$8000`-byte LoROM bank. Native captures were
+inspected for Bosch, Bosschaert, Sunflowers, Mondriaan, and Avercamp.
 
 The web player now treats touch input on the left/right half of the canvas as
 a momentary SNES Left/Right press, including in fullscreen. Both sites expose

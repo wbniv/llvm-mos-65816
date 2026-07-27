@@ -459,6 +459,14 @@ ASCII art of the 32×28 tile grid, showing BG assignments, palette regions, HUD.
 Which drawables. Which BG layers. VRAM layout (chr base word, tilemap base word). Palette map.
 V-blank DMA budget (bytes per frame for each upload).
 
+## Cartridge ROM map
+A visual Mermaid bank map plus an exact table generated from the final linker
+map. Cover every bank in the cartridge image, including code/rodata,
+header/vectors, assets, and padding. For each occupied bank list every section
+or asset and its byte size; for every bank list used, capacity, and free bytes.
+The plan must name the mapping type and total ROM size. Never infer these
+figures from source arrays when the linker map can provide final aligned sizes.
+
 ## Files
 Table: new files + modified files, one-line purpose each.
 
@@ -493,6 +501,8 @@ one-line entry to `docs/investigations/plan-index.md` and mark the TODO item `[x
 Before calling a demo "done":
 
 - [ ] Plan doc written, TODO item marked `[wip]` (not `[x]` yet).
+- [ ] Plan contains a generated visual cartridge ROM map and exact per-bank
+      used/free/section-size table from the final link map.
 - [ ] `examples/65816/<name>.h` compiles both host-side and as part of the SNES ROM.
 - [ ] `examples/snes/corpus/<name>_sim.c` wired into `corpus-a16` and **PASS**.
 - [ ] `tools/<name>-sim.c` prints the same hash the corpus slice produces on SNES.

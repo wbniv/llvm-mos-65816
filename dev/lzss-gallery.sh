@@ -39,6 +39,9 @@ echo "==> target build (+mos-a16, 1 MiB LoROM)"
   -Wl,-Map="$MAP" -o "$ROM" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 [ "$(stat -c %s "$ROM")" = 1048576 ]
+python3 "$ROOT/tools/snes-rom-map.py" "$MAP" \
+  "$ROOT/assets/snes/lzss-gallery/derived/report.json" \
+  "$ROOT/assets/snes/lzss-gallery/derived/rom-map.md"
 
 VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$MAP")
 [ -n "$VMA" ]
@@ -68,4 +71,4 @@ else
 fi
 
 sha256sum "$ROM"
-echo "RESULT: PASS — 19-work LZSS gallery host oracle, relink, header and bsnes-jg gate"
+echo "RESULT: PASS — 20-work LZSS gallery host oracle, relink, header and bsnes-jg gate"
