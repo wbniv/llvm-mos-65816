@@ -142,8 +142,47 @@ scaffold should not overwrite an existing site `app.js` on update runs.**
 `/snes-rom-page` update flow for slug `trimerge` on biohack.net (`want` stays `0xCCCC`, `frames`
 500); then `dev/verify-web-roms.sh --only trimerge` against the site checkout before deploy.
 
+## Phase 3 (user-directed 2026-07-27): HDMA backdrop gradient
+
+Promoted from Deferred on user request — and then **librarized** (user: "come up with something for
+the library that can be reused by other demos"): new **`snesgfx/backdrop_gradient.h`**, written in
+`hdma_hscroll.h`'s conventions (header-only, generic `chan`, computed `$43x0` register base, caller
+owns the write-only `HDMAEN`). API = `BDROP_SPAN(lines, r, g, b)` / `BDROP_END` table macros +
+`bdrop_arm(chan, tab)`. Any demo declares a `static const` ROM table and arms a free channel —
+trimerge is the first consumer.
+
+- **Mechanism:** channel 7 (clear of `upq`'s GP-DMA channel 0 and the title's HDMA channels, which
+  are disarmed at `title_end` via `REG_HDMAEN = 0`), transfer **mode 3** → B-bus `$2121`: each table
+  entry writes `CGADD, CGADD, CGDATA lo, CGDATA hi` = re-points CGRAM colour 0 (the backdrop) per
+  line group during h-blank — the canonical SNES backdrop gradient. Table = `static const` in ROM
+  (14 × 16-line `BDROP_SPAN`s + `BDROP_END`, ~71 B), armed once after `title_end`.
+  **Zero per-frame CPU and zero v-blank budget cost.**
+- **Palette interplay:** HDMA owns colour 0 from scanline 0, so `breathe_palette` now pushes
+  `cgidx 1` (colours 1–3 only, 6 B) — breathing stays on the branch colours, gradient on the
+  backdrop.
+- **Gradient:** near-black at the top → deep blue-violet mid → near-black at the bottom, so the
+  braid box floats on a vignette instead of a flat navy field. Cell colour 0 does not appear inside
+  the painted 16×16 field, so the gradient only shows outside the box.
+- **Verify:** gate re-run (`0xCCCC`), tear check still ATOMIC, screenshot shows the vertical
+  gradient, `verify-web-roms` (blankscan) clean, republish.
+
+**Verification results (2026-07-27):** first cut used 14 × 16-line bands — visibly stripey — and was
+smoothed to **28 × 8-line bands** (linear interp to peak `(4,6,22)`; table-only change, the library
+made it a 2-minute tweak). Final ROM:
+
+```
+    PASS  llvm.scmp=4  scmp.i64=2  rep/sep=198  (G_SCMP formed incl. s64, drives control flow)
+SMOKE: PASS off=0x39 len=2 got=0xCCCC (ran 500 frames, bsnes-jg)
+RESULT: PASS — Three-Way Merge Diff on SNES; MAME + bsnes-jg + corpus hash 0xCCCC host == +mos-a16
+500->501: y-span 121px -> ATOMIC          # tear check holds with HDMA active
+backdrop@y=8/40/72/112/176/216: (0,4,32)(4,17,75)(10,25,122)(25,40,181)(10,17,103)(0,4,40)
+```
+
+Backdrop samples ramp smoothly edge→mid→edge — the braid box floats on the vignette.
+`verify-web-roms --only trimerge` PASS (incl. blankscan). **Published: biohack.net v1.0.288**
+(v1.0.286 carried the tear fix; v1.0.284 the original rework).
+
 ## Deferred / out of scope
 
 - Canvas widening beyond 16×16 tiles (needs `bitmap_canvas.h` geometry work — a snesgfx library
   change, not a demo fix).
-- HDMA backdrop gradient (same reason: no library support yet).

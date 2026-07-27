@@ -19,6 +19,7 @@
 #include "snesgfx/bitmap_canvas.h"
 #include "snesgfx/text_layer.h"
 #include "snesgfx/title_layer.h"
+#include "snesgfx/backdrop_gradient.h"
 #include "../65816/trimerge.h"
 
 #define CANVAS_CHR  0x0000u
@@ -90,15 +91,33 @@ static uint16_t shade(uint16_t rgb, int8_t d) {
 }
 
 // Branch-palette breathing: +/-2 luma triangle over 32 sweeps; hue identity (teal/orange/yellow)
-// preserved so the colours still read as the -1/0/+1 branches. 8-byte CGRAM job per sweep.
+// preserved so the colours still read as the -1/0/+1 branches. Pushes cgidx 1..3 only (6 B/sweep):
+// colour 0 (the backdrop) is owned per-scanline by the HDMA gradient below.
 static void breathe_palette(App *a) {
     uint8_t ph = (uint8_t)(a->t & 31u);
     uint8_t tri = (ph <= 16u) ? ph : (uint8_t)(32u - ph);       // 0..16..0
     int8_t d = (int8_t)((int8_t)(tri >> 2) - (int8_t)2);        // -2..+2
-    a->pal[0] = bg3_pal[0];
     for (uint8_t k = 1u; k < (uint8_t)NCOL; k++) a->pal[k] = shade(bg3_pal[k], d);
-    upq_push_cgram(&a->screen.q, 0, a->pal, 0x00u, (uint8_t)sizeof a->pal);
+    upq_push_cgram(&a->screen.q, 1, &a->pal[1], 0x00u, (uint8_t)(sizeof a->pal - sizeof a->pal[0]));
 }
+
+// HDMA backdrop vignette (snesgfx/backdrop_gradient.h): near-black at the frame edges, deep
+// blue-violet mid, so the braid box floats. Colour 0 never appears inside the painted field, so
+// the gradient only shows outside the box. Channel 7 — clear of upq's GP-DMA ch0 and the title's
+// HDMA channels (disarmed at title_end); armed once post-title, zero per-frame cost.
+static const uint8_t grad_tab[] = {
+    BDROP_SPAN(8, 0, 1,  5), BDROP_SPAN(8, 0, 1,  6), BDROP_SPAN(8, 1, 2,  8),
+    BDROP_SPAN(8, 1, 2,  9), BDROP_SPAN(8, 1, 3, 10), BDROP_SPAN(8, 2, 3, 12),
+    BDROP_SPAN(8, 2, 3, 13), BDROP_SPAN(8, 2, 4, 14), BDROP_SPAN(8, 2, 4, 15),
+    BDROP_SPAN(8, 3, 4, 17), BDROP_SPAN(8, 3, 5, 18), BDROP_SPAN(8, 3, 5, 19),
+    BDROP_SPAN(8, 4, 6, 21), BDROP_SPAN(8, 4, 6, 22), BDROP_SPAN(8, 4, 6, 22),
+    BDROP_SPAN(8, 4, 6, 21), BDROP_SPAN(8, 3, 5, 19), BDROP_SPAN(8, 3, 5, 18),
+    BDROP_SPAN(8, 3, 4, 17), BDROP_SPAN(8, 2, 4, 15), BDROP_SPAN(8, 2, 4, 14),
+    BDROP_SPAN(8, 2, 3, 13), BDROP_SPAN(8, 2, 3, 12), BDROP_SPAN(8, 1, 3, 10),
+    BDROP_SPAN(8, 1, 2,  9), BDROP_SPAN(8, 1, 2,  8), BDROP_SPAN(8, 0, 1,  6),
+    BDROP_SPAN(8, 0, 1,  5),
+    BDROP_END,
+};
 
 static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
     uint16_t tile = (uint16_t)((uint16_t)cy * (uint16_t)CANVAS_TILES_W + (uint16_t)cx);
@@ -156,6 +175,8 @@ int main(void) {
     title_begin16(&a.screen, &title, "TRIMERGE", "SPACESHIP AS CONTROL FLOW");
     corpus_result = trimerge_gate_crc();   // runs during title; expected 0xCCCC
     title_end(&a.screen, &title, 90);
+    bdrop_arm(7, grad_tab);                // after title_end (which writes HDMAEN = 0)
+    REG_HDMAEN = 0x80u;                    // ch7 only — title's channels stay off
     for (;;) {
         field_band(&a);
         a.band++;

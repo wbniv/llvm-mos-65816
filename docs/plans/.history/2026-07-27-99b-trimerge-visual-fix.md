@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/ab35c87) | fix(trimerge): atomic single-v-blank field flush — close the waterfall tear |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/bc83003) | feat(trimerge): #99b visual rework — waterfall braid + stride-unit offset + palette breathing |
 
 <!--history-meta v1
+ab35c87	author	Will Norris
+ab35c87	added	43
+ab35c87	deleted	0
+ab35c87	files	1
+ab35c87	body	User-reported tearing: the band painter marked each 4-row band dirty as it\npainted, flushing bands in separate v-blanks while the waterfall shifted\nthe whole field -> marching shear boundary 15x/s. field_band now paints the\nshadow only; the sweep-boundary branch marks the whole canvas dirty once\nthe shadow completes -> one atomic 4 KB flush (4440 B worst-case v-blank\nincl. HUD+CGRAM, budget 5100 B; CANVAS_FLUSH_TILES 256 prevents re-split).\nGate re-run PASS (0xCCCC, scmp probe intact); new tear check in the plan:\nconsecutive-frame canvas diffs are full-span (121 px) or nil, 500..507.\nSite: biohack.net v1.0.286.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 bc83003	author	Will Norris
 bc83003	added	106
 bc83003	deleted	0
