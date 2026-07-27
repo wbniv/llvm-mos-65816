@@ -4,9 +4,15 @@
 // s64, via noinline comparators that keep G_SCMP alive. Distinct from #97/#98 which fed the compare
 // to qsort (compared to 0). Builds default-8-bit AND +mos-a16 AND +mos-xy16 (5-way bar).
 //
-// Visual: each of the 16 window rows is one merge round with a rotating offset; the merged output
-// (40 values, first 16 shown) is drawn as colour cells by value band. As the offset animates, the
-// braided merge pattern flows — a wrong three-way branch would tear the ordering AND diverge the CRC.
+// Visual (#99b waterfall rework, 2026-07-27): the window is a 16-row merge-round HISTORY. Once per
+// sweep a fresh round is merged at the top and older rounds flow down; each cell is coloured by
+// WHICH branch of the three-way compare emitted it (advance-left / advance-right / EMIT-BOTH). The
+// offset steps in whole stride units (0x10001) so consecutive rounds genuinely differ and the
+// equal/emit-both branch fires periodically — the braid flows and yellow tie cells migrate through
+// it. The branch palette breathes ±2/32 luma on a slow triangle wave. A wrong three-way branch
+// would tear the ordering AND diverge the CRC. (Was: static rows — the old ×7 offset step was 4
+// orders of magnitude below one stride unit, so no merge decision ever flipped; see
+// docs/plans/2026-07-27-99b-trimerge-visual-fix.md.)
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256
 #include "snesgfx/display.h"
@@ -37,7 +43,8 @@ typedef struct {
     Display      screen;
     BitmapCanvas canvas;
     TextLayer    text;
-    uint8_t      cellcol[WIN_H][WIN_W];   // precomputed colour bands (16 merge rounds × 16 cols)
+    uint8_t      cellcol[WIN_H][WIN_W];   // merge-round history (row 0 newest, flows down)
+    uint16_t     pal[NCOL];               // breathing palette (queued by pointer — must persist)
     uint16_t     phase;
     uint16_t     t;
     uint8_t      band;
@@ -45,23 +52,52 @@ typedef struct {
 
 volatile uint16_t corpus_result;
 
-// Recompute all 16 rows: row r = a merge round at offset (phase + r). Each output cell is coloured
-// by WHICH branch of the three-way compare emitted it — advance-left (1), advance-right (2), or
-// emit-both (3) — so the picture literally shows the −1/0/+1 merge decisions braiding.
-static void recompute(App *a) {
-    for (uint8_t r = 0u; r < (uint8_t)WIN_H; r++) {
-        int32_t off = (int32_t)((int32_t)(a->phase + (uint16_t)r) * (int32_t)7 - (int32_t)16);
-        tm_fill32(_tm_l32, (uint16_t)TM_N, (int32_t)3, off);
-        tm_fill32(_tm_r32, (uint16_t)TM_N, (int32_t)2, (int32_t)(-off));
-        uint16_t i = 0u, j = 0u; uint8_t c = 0u;
-        while (i < (uint16_t)TM_N && j < (uint16_t)TM_N && c < (uint8_t)WIN_W) {
-            int cmp = tm_cmp32(_tm_l32[i], _tm_r32[j]);   // the three-way compare drives the branch
-            if (cmp < 0)      { a->cellcol[r][c++] = 1u; i++; }                         // advance left
-            else if (cmp > 0) { a->cellcol[r][c++] = 2u; j++; }                         // advance right
-            else { a->cellcol[r][c++] = 3u; if (c < (uint8_t)WIN_W) a->cellcol[r][c++] = 3u; i++; j++; }  // emit both
-        }
-        while (c < (uint8_t)WIN_W) a->cellcol[r][c++] = (i < (uint16_t)TM_N) ? 1u : 2u;  // drained tail
+// One waterfall step: history shifts down a row, then a fresh merge round enters at row 0. The
+// offset steps in WHOLE stride units (0x10001) — cmp(L[i],R[j]) = sign((3i'-2j')*0x10001 + 2*off),
+// so each phase step moves the decision boundary by 2 units of (3i'-2j') and ties (3i'-2j' == -2m,
+// the emit-both branch) fire periodically. 64-phase cycle keeps |off| <= 32*0x10001 (~2.1M): stream
+// values stay well inside int32. Each output cell is coloured by WHICH branch of the three-way
+// compare emitted it — advance-left (1), advance-right (2), or emit-both (3).
+static void push_row(App *a) {
+    for (uint8_t r = (uint8_t)(WIN_H - 1u); r > 0u; r--)
+        for (uint8_t c = 0u; c < (uint8_t)WIN_W; c++)
+            a->cellcol[r][c] = a->cellcol[r - 1u][c];
+    int32_t off = (int32_t)((int32_t)(a->phase & 63u) - (int32_t)32) * (int32_t)0x00010001;
+    tm_fill32(_tm_l32, (uint16_t)TM_N, (int32_t)3, off);
+    tm_fill32(_tm_r32, (uint16_t)TM_N, (int32_t)2, (int32_t)(-off));
+    uint16_t i = 0u, j = 0u; uint8_t c = 0u;
+    while (i < (uint16_t)TM_N && j < (uint16_t)TM_N && c < (uint8_t)WIN_W) {
+        int cmp = tm_cmp32(_tm_l32[i], _tm_r32[j]);   // the three-way compare drives the branch
+        if (cmp < 0)      { a->cellcol[0][c++] = 1u; i++; }                         // advance left
+        else if (cmp > 0) { a->cellcol[0][c++] = 2u; j++; }                         // advance right
+        else { a->cellcol[0][c++] = 3u; if (c < (uint8_t)WIN_W) a->cellcol[0][c++] = 3u; i++; j++; }  // emit both
     }
+    while (c < (uint8_t)WIN_W) a->cellcol[0][c++] = (i < (uint16_t)TM_N) ? 1u : 2u;  // drained tail
+    a->phase = (uint16_t)(a->phase + 1u);
+}
+
+// Shift every 5-bit channel of a BGR555 colour by d, clamped to 0..31.
+static uint16_t shade(uint16_t rgb, int8_t d) {
+    uint16_t out = 0u;
+    for (uint8_t sh = 0u; sh < 15u; sh = (uint8_t)(sh + 5u)) {
+        int8_t ch = (int8_t)((rgb >> sh) & 0x1Fu);
+        ch = (int8_t)(ch + d);
+        if (ch < 0) ch = 0;
+        if (ch > 31) ch = 31;
+        out |= (uint16_t)((uint16_t)ch << sh);
+    }
+    return out;
+}
+
+// Branch-palette breathing: +/-2 luma triangle over 32 sweeps; hue identity (teal/orange/yellow)
+// preserved so the colours still read as the -1/0/+1 branches. 8-byte CGRAM job per sweep.
+static void breathe_palette(App *a) {
+    uint8_t ph = (uint8_t)(a->t & 31u);
+    uint8_t tri = (ph <= 16u) ? ph : (uint8_t)(32u - ph);       // 0..16..0
+    int8_t d = (int8_t)((int8_t)(tri >> 2) - (int8_t)2);        // -2..+2
+    a->pal[0] = bg3_pal[0];
+    for (uint8_t k = 1u; k < (uint8_t)NCOL; k++) a->pal[k] = shade(bg3_pal[k], d);
+    upq_push_cgram(&a->screen.q, 0, a->pal, 0x00u, (uint8_t)sizeof a->pal);
 }
 
 static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
@@ -108,7 +144,7 @@ static void app_init(App *a) {
     a->phase = (uint16_t)0u;
     a->t = (uint16_t)0u;
     a->band = (uint8_t)0u;
-    recompute(a);
+    for (uint8_t k = 0u; k < (uint8_t)WIN_H; k++) push_row(a);   // pre-fill the history window
     text_puts(&a->text, 0, 2, "THREE-WAY MERGE DIFF");
 }
 
@@ -125,8 +161,8 @@ int main(void) {
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
             a.band = (uint8_t)0u;
             a.t = (uint16_t)(a.t + (uint16_t)1u);
-            a.phase = (uint16_t)(a.phase + (uint16_t)1u);
-            recompute(&a);
+            push_row(&a);            // waterfall: one new round at the top, history flows down
+            breathe_palette(&a);
             update_hud(&a);
         }
         display_frame(&a.screen);

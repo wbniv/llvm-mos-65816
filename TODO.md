@@ -386,6 +386,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~ *(2026‑07‑26 refresh: now 13 headers / 113 demos; the "0 indirect JMPs / LTO devirtualized" claim was a measurement artifact — 1 `__call_indir` call survives; mandel-display has since diverged so +338 B is historical. Corrected in `docs/oop-in-c.md` §4–§5 + new §8 static-vs-virtual benchmark.)*
 - [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
+- [wip T2] **#99b trimerge visual rework — waterfall history + stride-unit offset + palette
+  breathing** — the published [trimerge](https://biohack.net/snes/trimerge/) field was measured
+  static (frames 500→900 differ by 105 B = HUD only): the old `×7` offset step is 4 orders of
+  magnitude below one stream stride (`0x10001`), so no merge decision ever flipped and the
+  emit-both/yellow branch never fired. Rework (display-only; gate stays `0xCCCC`): offset steps in
+  whole stride units (braid actually flows, ties fire), 16-row waterfall history (newest at top),
+  ±2/32-luma palette breathing. Then: liveness check (>5% framebuffer delta over 60 frames + yellow
+  present), republish, refresh screenshot. [plan](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)
 - [T3] **SNES demos — startup garbage fix + title screens** ([plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)).
   User-reported: Newton "starts off with garbage" + "takes too long to show anything". **Part A (garbage) root-caused
   + fixed in source:** commit `ac9c0b2` regressed Newton's tilemap palette field to `root<<12` (selects uninitialised
@@ -1566,4 +1574,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-07-26-123-mode7-gallery-filter** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-123-mode7-gallery-filter.md](docs/plans/2026-07-26-123-mode7-gallery-filter.md)_  <!-- fp:ff1ea8788102f1d7 -->
 - [verify] **2026-07-26-125-lzss-gallery-full-mode7-color** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-125-lzss-gallery-full-mode7-color.md](docs/plans/2026-07-26-125-lzss-gallery-full-mode7-color.md)_  <!-- fp:3cc268f3e382586f -->
 - [verify] **2026-07-26-127-lzss-repack-explainer** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-127-lzss-repack-explainer.md](docs/plans/2026-07-26-127-lzss-repack-explainer.md)_  <!-- fp:7794d6d35096b0b8 -->
+- [ ] **(triage)** Canvas widening beyond 16×16 tiles (needs `bitmap_canvas.h` geometry work — a snesgfx library — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:f9122100c1e60a3f -->
+- [ ] **(triage)** HDMA backdrop gradient (same reason: no library support yet). — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:9e322e197981b057 -->
 <!-- END auto-captured-deferrals -->
