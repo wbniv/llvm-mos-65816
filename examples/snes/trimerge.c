@@ -108,17 +108,18 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
     for (uint8_t r = 0u; r < 8u; r++) { t[r * 2u] = p0; t[r * 2u + 1u] = p1; }
 }
 
+// Paint one 4-row band of the shadow. Deliberately does NOT mark the canvas dirty: the shadow is
+// painted over 4 frames (CPU spreading) while the screen keeps showing the previous complete field,
+// and the whole canvas is marked dirty in one shot when the last band lands — so the flush is a
+// single 4 KB DMA inside ONE v-blank (fits UPQ_VBLANK_BUDGET 5100 B) and the visible update is
+// atomic. Marking per-band flushed each band as it was painted, which tore the waterfall: for 3 of
+// every 4 frames the screen showed shifted rows above a marching boundary and stale rows below it.
 __attribute__((noinline))
 static void field_band(App *a) {
     uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
     for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++)
         for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++)
             cell_fill(&a->canvas, cx, cy, a->cellcol[cy][cx]);
-    uint16_t lo = (uint16_t)((uint16_t)y0 * (uint16_t)CANVAS_TILES_W);
-    uint16_t hi = (uint16_t)((uint16_t)(y0 + (uint8_t)BAND) * (uint16_t)CANVAS_TILES_W - (uint16_t)1u);
-    if (hi >= (uint16_t)CANVAS_NTILES) hi = (uint16_t)(CANVAS_NTILES - (uint16_t)1u);
-    if (a->canvas.lo > lo) a->canvas.lo = lo;
-    if (a->canvas.hi < hi) a->canvas.hi = hi;
 }
 
 static void update_hud(App *a) {
@@ -161,6 +162,8 @@ int main(void) {
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
             a.band = (uint8_t)0u;
             a.t = (uint16_t)(a.t + (uint16_t)1u);
+            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
+            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
             push_row(&a);            // waterfall: one new round at the top, history flows down
             breathe_palette(&a);
             update_hud(&a);

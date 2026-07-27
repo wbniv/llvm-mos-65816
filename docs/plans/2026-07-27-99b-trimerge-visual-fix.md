@@ -86,6 +86,49 @@ offsets (`GATE_N` rounds), not the display path. Expected value stays **`0xCCCC`
    screenshot of the built site page confirms the emulator boots the new ROM, the braid is live
    (`T=0018 CRC=CCCC` HUD), player centred, no clipping. **PASS**.
 
+## Follow-up fix (same day, user-reported): multi-v-blank update tearing
+
+**Report:** the live page visibly updated the field across more than one v-blank — needless, and it
+tears. **Confirmed and root-caused:** the 4-rows/frame band painter (inherited from the static
+original, where repainting identical content was invisible) marked each band dirty *as it painted*,
+so each band flushed in its own v-blank. Under the waterfall every sweep shifts the whole field one
+row → for 3 of every 4 frames the screen showed shifted rows above a marching boundary and stale
+rows below it — a 15 Hz tear. The banding is also unnecessary at the DMA layer: the full canvas is
+256 tiles × 16 B = **4096 B ≤ `UPQ_VBLANK_BUDGET` 5100 B**, so a whole-field flush fits ONE v-blank.
+
+**Fix:** `field_band` still paints the shadow over 4 frames (CPU spreading — the shadow isn't on
+screen), but no longer marks dirty; the sweep-boundary branch marks the **whole canvas** once the
+shadow is complete → a single atomic 4 KB flush. `CANVAS_FLUSH_TILES 256` (already set) keeps the
+queue from re-splitting it. Worst v-blank = 4096 canvas + ~336 HUD + 8 CGRAM = 4440 B ≤ 5100 B, so
+field + HUD + palette land in the *same* v-blank, atomically together.
+
+**Verification (re-run):**
+
+1. `dev/run.sh trimerge` — PASS, unchanged:
+
+   ```
+       PASS  llvm.scmp=4  scmp.i64=2  rep/sep=198  (G_SCMP formed incl. s64, drives control flow)
+   SMOKE: PASS off=0x39 len=2 got=0xCCCC (ran 500 frames, bsnes-jg)
+   RESULT: PASS — Three-Way Merge Diff on SNES; MAME + bsnes-jg + corpus hash 0xCCCC host == +mos-a16
+   ```
+
+2. **Tear check** (new): frames 500–507 dumped via `jgxcheck`; for every consecutive pair, any
+   canvas-region diff must span the full field (atomic), never a band-confined 32 px stripe:
+
+   ```
+   500->501: 121 rows differ, y-span 121px -> ATOMIC
+   501->502: canvas identical (paint frame)
+   502->503: canvas identical (paint frame)
+   503->504: canvas identical (paint frame)
+   504->505: canvas identical (paint frame)
+   505->506: canvas identical (paint frame)
+   506->507: 121 rows differ, y-span 121px -> ATOMIC
+   TEAR CHECK: PASS
+   ```
+
+   Update cadence settled at ~10 Hz (the shadow paint spans an extra frame or two per sweep);
+   the visible update is one v-blank.
+
 ## Published
 
 biohack.net `9c13b3d`, tag **v1.0.284** (tag-driven Pages deploy). Manifest selfcheck `off` updated
