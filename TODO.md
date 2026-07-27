@@ -14,6 +14,14 @@ not yet run+recorded (run the linked plan's verification steps, paste raw output
 back into the plan, then promote to `[x]`) · `[x]` done (moved to Done, one tight line).
 Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TODO entry.
 
+**Delegation tier:** the bracket also carries a `T0`–`T5` rank, tier last — `[T4]`,
+`[wip T2]`, `[verify T3]`. It says how much *thinking* the item needs, and `/next` uses it
+to dispatch to the cheapest model that can do the work: `T0` lookup (haiku, read-only) ·
+`T1` mechanical edit · `T2` bounded implementation · `T3` multi-file work against a settled
+plan (**the default when unranked**) · `T4` design + implementation · `T5` do it inline, no
+subagent. Done lines drop the tier. On this project most codegen work is T3–T4, and the
+user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
+
 
 ## Open
 
