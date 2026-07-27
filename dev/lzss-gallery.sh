@@ -15,6 +15,7 @@ for a in r:
   for x in (a["checksum"]&255,a["checksum"]>>8,a["compressed_bytes"]&255,a["compressed_bytes"]>>8):
     h=(((h<<1)|(h>>15))&65535)^x
 print(f"0x{h:04X}")')
+WORKS=$(python3 -c 'import json; print(len(json.load(open("/work/assets/snes/lzss-gallery/derived/report.json"))))')
 
 [ -x "$TOOL/mos-clang" ] || { echo "FATAL: missing toolchain; run dev/run.sh build"; exit 1; }
 [ -f "$CFG" ] || { echo "FATAL: missing snes-gallery SDK platform; run dev/run.sh build"; exit 1; }
@@ -76,4 +77,4 @@ else
 fi
 
 sha256sum "$ROM"
-echo "RESULT: PASS — 20-work LZSS gallery host oracle, relink, header and bsnes-jg gate"
+echo "RESULT: PASS — $WORKS-work LZSS gallery host oracle, relink, header and bsnes-jg gate"

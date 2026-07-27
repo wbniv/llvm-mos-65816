@@ -673,3 +673,27 @@ Publication:
 Both deployment workflows passed. The two live ROM downloads match the local
 SHA-256 above, and both live cache-busted player scripts contain the touch
 navigation handler.
+
+### 2026-07-26 corpus expansion
+
+The rebuilt cartridge contains **26 enabled works** in **8 Mbit (1 MiB)**:
+404,576 indexed bytes compress to 400,142 LZSS bytes, a weighted **1.10%**
+reduction. Six exact public-domain masters were added:
+
+- George Inness, *The Home of the Heron*;
+- unknown Chinese artist, *Dragon*;
+- after Gao Kegong, *Scholar in Landscape*;
+- Claude Monet, *Houses of Parliament, London*;
+- John Singer Sargent, *Thistles*; and
+- Vincent van Gogh, *The Starry Night*.
+
+The generated oracle is `0x3D44`. Romopt uses thirteen asset banks (`$01`–`$0D`);
+bank `$00` remains exclusively code/shared data. The address-based
+[ROM visualization](2026-07-26-126-lzss-gallery-nine-public-domain-masters/romopt-layout.html)
+and `assets/snes/lzss-gallery/derived/rom-map.md` were regenerated from the new
+linker map.
+
+Three additional Art Institute works remain recorded as disabled candidates:
+their metadata is public domain, but the museum IIIF server blocked the exact
+master download and no exact Commons equivalent was found. No substitute image
+was used.

@@ -20,7 +20,7 @@ During `REPACK`, a viewer should be able to answer:
 5. Is this artwork compressing or expanding, and why?
 
 The benchmark remains authoritative. Visualization must not change token
-selection, emitted bytes, checksums, the `0xB5D7` corpus oracle, or Left/Right
+selection, emitted bytes, checksums, the generated corpus oracle, or Left/Right
 cancellation semantics.
 
 ## Visual design
@@ -309,7 +309,7 @@ Required states:
 - Assert no scanline exceeds 32 visible sprites in worst-case generated states.
 - Assert overlay CGRAM writes touch only reserved UI entries.
 - Script Left and Right during literal and match events.
-- Compare `VISUAL=0` and `VISUAL=1` compressed buffers for all twenty works.
+- Compare `VISUAL=0` and `VISUAL=1` compressed buffers for every enabled work.
 - Run the full host `-O0`/`-O2` stream oracle.
 - Run the canonical bsnes-jg corpus gate.
 - Capture at least one literal, long match, distant connector, and expanding
@@ -349,7 +349,7 @@ After all gates pass:
 - Artwork remains uncropped, aspect-correct, and unobscured outside the bounded
   current-token overlay.
 - Left/Right cancels immediately and clears all compression sprites.
-- Visual and headless builds emit identical LZSS bytes and `0xB5D7`.
+- Visual and headless builds emit identical LZSS bytes and the generated oracle.
 - Measured overhead, captures, and both published ROM hashes are documented.
 
 ## Implementation record
@@ -376,14 +376,14 @@ restores artist, work, and date metadata.
 
 - Shipping and headless target variants both link as **8 Mbit (1 MiB)** LoROM.
 - Header checksum/complement validation passes for both target variants.
-- Host encoders at `-O0` and `-O2` emit identical streams for all twenty works.
-- The canonical host corpus remains `0xB5D7`.
+- Host encoders at `-O0` and `-O2` emit identical streams for all enabled works.
+- The expanded 26-work canonical host corpus is `0x3D44`.
 - A native 256×224 bsnes-jg capture verifies live signed percentage, literal
   semantics, token history, and bounded in-artwork markers.
 - Scripted Right during active work reaches work 1.
 - Scripted Left during active work wraps immediately to work 19.
 - `git diff --check` passes.
 
-The target-side twenty-work `0xB5D7` gate is deliberately still the canonical
+The target-side 26-work `0x3D44` gate is deliberately still the canonical
 150,000-frame publication gate. It was not replaced by a misleading short
 smoke run; it must run when the two site cartridges are published.

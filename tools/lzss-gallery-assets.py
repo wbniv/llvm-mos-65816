@@ -23,14 +23,15 @@ def display_height(work: dict) -> int:
     caption = 16 + len(work["display_title"]) * 8 + 8 + 24
     return 224 - caption
 
-def maximum_aspect_frame(ow: int, oh: int) -> tuple[int,int]:
+def maximum_aspect_frame(ow: int, oh: int, shown_h: int) -> tuple[int,int]:
     """Largest <=255-tile raster within 0.5% of the complete source aspect."""
     ratio=ow/oh; best=None
     for width in range(8,257):
         height=max(8,round(width/ratio))
         tiles=math.ceil(width/8)*math.ceil(height/8)
         error=abs(width/height-ratio)/ratio
-        if tiles>MAX_ART_TILES or error>0.005: continue
+        scale=max(width,math.ceil(height*256/shown_h))
+        if tiles>MAX_ART_TILES or error>0.005 or scale>255: continue
         key=(width*height,-error,width)
         if best is None or key>best[0]: best=(key,width,height)
     if best is None: raise RuntimeError(f"no aspect-preserving frame for {ow}x{oh}")
@@ -136,7 +137,8 @@ def main():
     SOURCE_DIR.mkdir(parents=True,exist_ok=True)
     spec=json.loads(SOURCES.read_text())
     report=[]; arrays=[]; desc=[]; previews=[]
-    for idx,w in enumerate(spec["works"],1):
+    works=[w for w in spec["works"] if w.get("enabled",True)]
+    for idx,w in enumerate(works,1):
         source_path=SOURCE_DIR/f"{w['slug']}.jpg"
         if source_path.exists():
             source=source_path.read_bytes()
@@ -150,7 +152,12 @@ def main():
                 d=api["data"]
                 if not d.get("is_public_domain") or not d.get("image_id"):
                     raise SystemExit(f"{w['id']}: not public domain or no image")
-            commons_title,url,commons_license=commons_named(w["commons_file"])
+            if w.get("image_url"):
+                commons_title=w.get("commons_file",f"Art Institute of Chicago image {w['id']}")
+                url=w["image_url"]
+                commons_license=w.get("license",spec["license"])
+            else:
+                commons_title,url,commons_license=commons_named(w["commons_file"])
             source=get(url)
             source_path.write_bytes(source)
         source_hash=hashlib.sha256(source).hexdigest()
@@ -165,8 +172,8 @@ def main():
         if len(source)<16384 or min(im.size)<600:
             raise SystemExit(f"{w['slug']}: source unexpectedly small: {len(source)} bytes, {im.size}")
         ow,oh=im.size
-        width,height=maximum_aspect_frame(ow,oh)
         shown_h=display_height(w)
+        width,height=maximum_aspect_frame(ow,oh,shown_h)
         scale=max(width,math.ceil(height*256/shown_h))
         render_w=(width*256)//scale; render_h=(height*256)//scale
         cols=math.ceil(width/8); rows=math.ceil(height/8)
