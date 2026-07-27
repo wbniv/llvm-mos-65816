@@ -9,6 +9,13 @@ Background: [docs/investigations/llvm-overview.md](docs/investigations/llvm-over
 [docs/investigations/plan-index.md](docs/investigations/plan-index.md) — a one-row-per-plan
 table-of-contents (summary · commits · category), sorted oldest → newest.
 
+<!-- todo-lint: disable=stray-done -->
+<!-- ^ Deliberate: ~132 completed entries live inline in their milestone sections
+     rather than in ## Done. Each carries its evidence — the backend bug it caught,
+     disasm notes, verification detail — and most have no linked plan to recover that
+     from, so collapsing them into one-line Done entries would destroy the record.
+     Decided 2026-07-26. Every other check still applies to this file. -->
+
 **Status markers:** `[ ]` open · `[wip]` in progress · `[verify]` implemented, verification
 not yet run+recorded (run the linked plan's verification steps, paste raw output + PASS/FAIL
 back into the plan, then promote to `[x]`) · `[x]` done (moved to Done, one tight line).
