@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#128 transparent 3D gravity chevrons</title>
+<style>
+  :root { color-scheme: dark; font-family: ui-monospace, monospace; }
+  body { margin: 0; padding: 28px; background: #080a0c; color: #e8edf2; }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  p { color: #9ba7b4; max-width: 78ch; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 18px; }
+  figure { margin: 0; }
+  .stage {
+    position: relative; overflow: hidden; aspect-ratio: 8/7; border: 1px solid #35404b;
+    background:
+      radial-gradient(circle at 65% 35%,#dfc786 0 8%,transparent 9%),
+      repeating-linear-gradient(155deg,#20384b 0 8px,#d0b879 9px 13px,#496574 14px 23px);
+  }
+  .stage.dark { background: radial-gradient(circle,#69381f,#171c25 58%,#050608); }
+  .stage.busy { background: repeating-conic-gradient(#d6bb75 0 7deg,#243c56 8deg 15deg,#9c493c 16deg 23deg); }
+  .arrow {
+    --face:#ffd84a; --edge:#fff0a5; --depth:#65420b;
+    position: absolute; top: calc(50% - 8px); z-index:1;
+    width:18px; height:22px; font: 900 30px/18px sans-serif; color:var(--face);
+    filter:drop-shadow(2px 2px 0 var(--depth));
+    text-shadow:-1px -1px 0 var(--edge);
+  }
+  .left { left: 3px; }
+  .right { right: 3px; }
+  .active { --face:#25fff5; --edge:#d9fffd; --depth:#075b62; animation: gravity 1600ms linear infinite; }
+  .green .active { --face:#b8ef00; --edge:#efffb2; --depth:#365500; }
+  @keyframes gravity {
+    0%   { transform: translateY(0) scaleY(.92); filter:drop-shadow(2px 2px 0 var(--depth)); }
+    4%   { transform: translateY(-1px) skewY(-3deg); }
+    38%  { transform: translateY(-4px) skewY(-2deg); filter:brightness(1.35) drop-shadow(2px 2px 0 var(--depth)) drop-shadow(0 0 2px var(--face)); }
+    50%  { transform: translateY(-5px) scaleX(.96); filter:brightness(1.65) drop-shadow(2px 2px 0 var(--depth)) drop-shadow(0 0 4px var(--face)); }
+    62%  { transform: translateY(-4px) skewY(2deg); filter:brightness(1.3) drop-shadow(2px 2px 0 var(--depth)) drop-shadow(0 0 2px var(--face)); }
+    96%  { transform: translateY(-1px) skewY(3deg); }
+    100% { transform: translateY(0) scaleY(.92); filter:drop-shadow(2px 2px 0 var(--depth)); }
+  }
+  figcaption { padding: 8px 2px 0; color: #b9c3cd; font-size: 12px; }
+  .strip { display:flex; gap:18px; align-items:end; margin:28px 0 10px; min-height:70px; }
+  .phase { width:80px; text-align:center; color:#8995a1; font-size:11px; }
+  .phase b { display:block; color:#25fff5; font:900 30px/1 sans-serif; margin-bottom:8px;
+    text-shadow:-1px -1px #d9fffd; filter:drop-shadow(2px 2px #075b62); }
+  .rise b { transform:translateY(-2px) skewY(-3deg); }
+  .apex b { transform:translateY(-5px) scaleX(.96); filter:brightness(1.8) drop-shadow(2px 2px #075b62) drop-shadow(0 0 4px #25fff5); }
+  .fall b { transform:translateY(-3px) skewY(3deg); }
+  h2 { margin:32px 0 8px; font-size:16px; }
+  .tracker { position:relative; height:150px; border:1px solid #35404b; overflow:hidden;
+    background:linear-gradient(140deg,#315069,#d2b873 42%,#725044 70%,#172a38); }
+  .bracket { position:absolute; height:18px; border-top:2px solid currentColor;
+    border-bottom:2px solid currentColor; color:#ffd84a; }
+  .bracket::before,.bracket::after { content:""; position:absolute; top:-2px; height:18px;
+    width:5px; border-top:2px solid currentColor; border-bottom:2px solid currentColor; }
+  .bracket::before { left:0; border-left:2px solid currentColor; }
+  .bracket::after { right:0; border-right:2px solid currentColor; }
+  .source { left:28px; top:35px; width:82px; opacity:.68; }
+  .dest { right:24px; bottom:28px; width:116px; color:#25fff5;
+    filter:drop-shadow(0 0 3px #25fff5); }
+  .packet { position:absolute; left:112px; top:57px; width:7px; height:7px; background:#fff;
+    transform:rotate(45deg); box-shadow:0 0 4px #25fff5; animation:packet 1800ms ease-in-out infinite; }
+  @keyframes packet { 0%{translate:0 0;opacity:0} 12%{opacity:1} 82%{opacity:1}
+    100%{translate:89px 48px;opacity:0} }
+  .followups { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px;
+    color:#92a0ad; font-size:11px; }
+  .followups div { padding:10px; border:1px dashed #35404b; }
+</style>
+</head>
+<body>
+<h1>#128 — transparent 3D, gravity-driven gallery chevrons</h1>
+<p>The artwork remains visible around every stroke. Only the triggered direction moves; the other
+arrow remains gold and fixed. A pale upper-left highlight, colored face, and darker lower-right
+extrusion give both dedicated arrow drawings depth without introducing a backing tile.</p>
+<div class="grid">
+  <figure><div class="stage"><span class="arrow left">‹</span><span class="arrow right active">›</span></div>
+    <figcaption>biohack.net · cyan beveled face · no black badge</figcaption></figure>
+  <figure><div class="stage dark green"><span class="arrow left active">‹</span><span class="arrow right">›</span></div>
+    <figcaption>indri.studio · green 3D face · dark artwork</figcaption></figure>
+  <figure><div class="stage busy"><span class="arrow left">‹</span><span class="arrow right active">›</span></div>
+    <figcaption>busy artwork · transparent pixels expose image</figcaption></figure>
+</div>
+<div class="strip" aria-label="one bounce phase study">
+  <div class="phase"><b>›</b>ground<br>push up</div>
+  <div class="phase rise"><b>›</b>rising<br>slowing</div>
+  <div class="phase apex"><b>›</b>apex<br>brightest</div>
+  <div class="phase fall"><b>›</b>falling<br>accelerating</div>
+  <div class="phase"><b>›</b>land<br>push up again</div>
+</div>
+<h2>Selected repack tracker</h2>
+<p>One dim source bracket, one continuous accent destination bracket, and one traveling packet.
+Only the outer caps have vertical edges, so long runs no longer become rows of squares.</p>
+<div class="tracker">
+  <span class="bracket source"></span>
+  <span class="packet"></span>
+  <span class="bracket dest"></span>
+</div>
+<h2>Possible follow-ups—not part of #128</h2>
+<div class="followups">
+  <div>Corner frame</div><div>Underline ruler</div><div>Zipper seam</div>
+  <div>Scanner beam</div><div>Compression calipers</div><div>Endpoint packet</div>
+  <div>Heat ribbon</div>
+</div>
+</body>
+</html>
