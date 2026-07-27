@@ -21,6 +21,11 @@ main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4
 .bank0-list{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:0 18px;padding:9px 11px}
 .bank0-item{display:grid;grid-template-columns:12px 1fr auto;gap:7px;padding:3px 0;border-bottom:1px solid #ffffff0b}
 .swatch{width:10px;height:10px;margin-top:4px;background:var(--c)}.bank0-item code{color:var(--muted)}
+.code-detail{margin:4px 11px 12px;padding:11px;border:1px solid var(--rule);border-radius:7px;background:#15120f}
+.code-detail h2{margin:0 0 3px;font:800 15px/1.2 system-ui;color:#fff4dc}
+.code-detail .bar{height:28px;margin:9px 0}.code-list{display:grid;grid-template-columns:repeat(3,minmax(210px,1fr));gap:0 16px}
+.code-item{display:grid;grid-template-columns:1fr auto;gap:8px;padding:2px 0;border-bottom:1px solid #ffffff0b}
+.code-item code{overflow:hidden;text-overflow:ellipsis;color:var(--ink)}.code-item span{white-space:nowrap;color:var(--muted)}
 .cart{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:10px}.bank{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
 .head{border-bottom:1px solid var(--rule)}.num,.title{font-weight:800;color:#fff4dc}
 .used{display:grid;text-align:right;color:var(--muted)}.used span{white-space:nowrap}
@@ -35,7 +40,8 @@ color:var(--palette);font-weight:800;letter-spacing:.04em;margin:7px 0}
 .boundary:before,.boundary:after{content:"";height:2px;background:linear-gradient(90deg,transparent,var(--palette))}
 .boundary:after{background:linear-gradient(90deg,var(--palette),transparent)}
 .note{margin-top:18px;border-left:3px solid var(--palette)}@media(max-width:980px){.cart{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:620px){.cart{grid-template-columns:1fr}.bank0-list{grid-template-columns:1fr}}
+@media(max-width:980px){.code-list{grid-template-columns:repeat(2,minmax(210px,1fr))}}
+@media(max-width:620px){.cart{grid-template-columns:1fr}.bank0-list,.code-list{grid-template-columns:1fr}}
 """
 
 def map_data(path: pathlib.Path) -> tuple[dict[str, int], dict[str, tuple[int, int]]]:
@@ -116,7 +122,22 @@ def main() -> None:
     for line in args.mapfile.read_text().splitlines():
         if m := section_re.match(line):
             section_rows[m.group(4)]=tuple(int(m.group(i),16) for i in (1,2,3))
+    code_re=re.compile(
+        r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+"
+        r"(\S+):\(\.text(?:\.([^)]+))?\)$")
+    code_parts=[]
+    for line in args.mapfile.read_text().splitlines():
+        if m := code_re.match(line):
+            source=m.group(3).rsplit("/",1)[-1]
+            name=m.group(4) or ("interrupt / LTO-local code"
+                                if source.endswith(".lto.o") else source)
+            code_parts.append((name,int(m.group(1),16),int(m.group(2),16)))
     text_vma,_,text_size=section_rows[".text"]
+    linked_code_size=sum(size for _,_,size in code_parts)
+    startup_size=text_size-linked_code_size
+    assert startup_size >= 0
+    if startup_size:
+        code_parts.insert(0,("startup / initialization",text_vma,startup_size))
     ro_vma,_,ro_size=section_rows[".rodata"]
     desc_addr,desc_size=symbols["GALLERY_ASSETS"]
     sin_addr,sin_size=symbols["SINCOS"]
@@ -148,6 +169,22 @@ def main() -> None:
         f'<span>{html.escape(name)} <code>$00:{addr:04X}–{addr+size-1:04X}</code></span>'
         f'<strong>{size:,} B</strong></div>'
         for name,addr,size,kind in bank0_list_parts)
+    code_bar="".join(
+        f'<span class="seg" style="width:{size/text_size*100:.4f}%;'
+        f'background:hsl({(index*47)%360} 58% 58%)" '
+        f'title="{html.escape(name)}: {size:,} bytes"></span>'
+        for index,(name,_,size) in enumerate(code_parts))
+    ranked_code=sorted(code_parts,key=lambda part:part[2],reverse=True)
+    shown_code=ranked_code[:15]
+    remaining_code=ranked_code[15:]
+    if remaining_code:
+        shown_code.append(
+            (f"Other linked sections ({len(remaining_code)})",0,
+             sum(size for _,_,size in remaining_code)))
+    code_list="".join(
+        f'<div class="code-item"><code>{html.escape(name)}</code>'
+        f'<span>{size:,} B · {size/text_size*100:.1f}%</span></div>'
+        for name,_,size in shown_code)
     cards = []
     for bank in range(1, banks):
         cards.append(bank_card(bank, packed.get(bank, [])))
@@ -173,6 +210,9 @@ def main() -> None:
 <section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong>
 <span>{bank0_used:,} used · {bank0_free:,} free</span></div>
 <div class="bar">{bank0_bar}</div><div class="bank0-list">{bank0_list}</div>
+<div class="code-detail"><h2>Runtime code breakdown · {text_size:,} bytes</h2>
+<div class="detail">Final linked function/section sizes; percentages are of runtime code.</div>
+<div class="bar">{code_bar}</div><div class="code-list">{code_list}</div></div>
 <div class="label">Physical ROM-address breakdown from the final linker map. Writable BSS/WRAM is
 not cartridge content. No packed stream, palette, font, or static graphic is eligible for this bank.</div></section>
 <div class="cart">{''.join(cards)}</div>
