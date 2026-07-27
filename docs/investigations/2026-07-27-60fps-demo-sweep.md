@@ -179,9 +179,11 @@ cheap paint; `ok` = no action warranted.
 
 ## Recommended batches
 
-- **Batch A (mechanical, do now — user-ordered):** F1 atomic flush for the 19 per-band demos
+- ~~**Batch A (mechanical, do now — user-ordered):** F1 atomic flush for the 19 per-band demos
   (+ `hull`/`truchet`/`truncstair` after verifying their marking). Each is the #99b change: stop
-  marking dirty in the band painter, full-mark at sweep end. No gate values change (display-only).
+  marking dirty in the band painter, full-mark at sweep end. No gate values change (display-only).~~
+  **DONE 2026-07-27** — see *Applied fixes*; `hull`/`truchet`/`truncstair` verified as false
+  positives (no per-band marking; different "band" meanings), left untouched.
 - **Batch B (per-demo design, #99c-sized):** F2 scroll-rings for `ovmove`, `mvscrl`, `truncstair`
   (+`lfsr2` pending drift verification).
 - **Batch C (opportunistic):** F3 stall hunts on any Batch-A demo whose paint frame measurably
@@ -192,4 +194,30 @@ site gets one coherent ROM refresh.
 
 ## Applied fixes
 
-*(updated as work lands — see below)*
+**Batch A — F1 atomic flush applied to all 19 per-band demos (2026-07-27).** The marking blocks
+were textually identical to trimerge's pre-#99b painter across every file, so the patch was applied
+by exact-match replacement (fail-loud, 19/19 matched; −95/+38 lines): the band painter no longer
+marks dirty, and the sweep-boundary branch full-marks the canvas → one ≤4 KB flush in one v-blank.
+
+**Verification (fresh full rebuild, then per demo: map-derived `corpus_result` selfcheck vs the
+manifest `want`/`frames` + atomicity over 6 consecutive frames — per-band flushing would change
+EVERY pair):**
+
+```
+bitweave  PASS off=0x31 changing_pairs=1    oddmask   PASS off=0x31   changing_pairs=0
+borrowlad PASS off=0x31 changing_pairs=1    ovmove    PASS off=0x31   changing_pairs=1
+compass   PASS off=0x31 changing_pairs=0    pcooker   PASS off=0x39   changing_pairs=0
+crcwall   PASS off=0x31 changing_pairs=1    permscat  PASS off=0x31   changing_pairs=1
+keycmp64  PASS off=0x31 changing_pairs=0    ropeedit  PASS off=0x31   changing_pairs=1
+lfsr2     PASS off=0x31 changing_pairs=1    rotkal    PASS off=0x13F2 changing_pairs=0
+modexp256 PASS off=0x39 changing_pairs=1    rotslab   PASS off=0x31   changing_pairs=1
+mvscrl    PASS off=0x31 changing_pairs=0    satcast   PASS off=0x41   changing_pairs=0
+                                            sbitfld   PASS off=0x31   changing_pairs=1
+                                            uarteye   PASS off=0x31   changing_pairs=0
+                                            ucmprank  PASS off=0x31   changing_pairs=0
+```
+
+**19/19 PASS.** ⚠️ Republish caveat: the rebuilt ROMs' `corpus_result` WRAM offsets moved on most
+demos (old manifests are stale) — the bulk republish MUST regenerate each manifest selfcheck `off`
+from the fresh `.map` (the flow `verify-web-roms.sh` gates already assumes manifest-vs-ROM
+coherence, so a stale manifest fails loudly rather than silently).

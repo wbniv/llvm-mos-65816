@@ -64,11 +64,6 @@ static void field_band(App *a) {
             cell_fill(&a->canvas, cx, cy, (uint8_t)(cur[idx] & 3u));
         }
     }
-    uint16_t lo = (uint16_t)((uint16_t)y0 * (uint16_t)CANVAS_TILES_W);
-    uint16_t hi = (uint16_t)((uint16_t)(y0 + (uint8_t)BAND) * (uint16_t)CANVAS_TILES_W - (uint16_t)1u);
-    if (hi >= (uint16_t)CANVAS_NTILES) hi = (uint16_t)(CANVAS_NTILES - (uint16_t)1u);
-    if (a->canvas.lo > lo) a->canvas.lo = lo;
-    if (a->canvas.hi < hi) a->canvas.hi = hi;
 }
 
 static void update_hud(App *a) {
@@ -115,6 +110,8 @@ int main(void) {
         a.band++;
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
             a.band = (uint8_t)0u;
+            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
+            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
             update_hud(&a);
             a.t = (uint16_t)(a.t + (uint16_t)1u);   // advance the permutation phase
         }
