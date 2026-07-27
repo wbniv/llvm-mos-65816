@@ -1,5 +1,8 @@
 | Date | Change |
 |------|--------|
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/189718f) | docs(plan-index): clear the drift — rows for all 14 committed-but-unindexed plans (298 total, complete) |
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/405e39f) | docs(99b): plan screenshots (before/waterfall/final) + plan-index row (199 plans) |
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/3441929) | docs(plan-index): row for the snesgfx all-virtual dispatch benchmark (198 plans) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/47b1a2c) | docs(plan-index): add row for full-rom-galleries-both-sites |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/4ded087) | docs(todo+plan-index): triage campaign-plan capture (review-gated by design); index row |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d055629) | docs(plan-index): add the zp-alloc Imag32 CSR-rename fix row (2bfe4f3) |
@@ -211,6 +214,21 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+189718f	author	Will Norris
+189718f	added	16
+189718f	deleted	2
+189718f	files	1
+189718f	body	rc-undef two-cause MachineVerifier fix (Compiler), Waldo 16x16 title font,\nMode-7 hilbert title + VRAM wipe, #102 cpu6502 + fullscreen layout, Mode-7\ntitle sweep, and the LZSS gallery arc #119/121/123/122/124/125/126/127\n(Platform) — each summarized from its plan's TL;DR and inserted at its\ncreation-commit position; the #99b row re-slotted to correct date order.\nCoverage now complete: 298 unique plan links == 298 tracked plan files\n(prior footers' counts were drifting undercounts). Only the untracked\nin-flight #120 plan remains, indexed by its author on landing.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+405e39f	author	Will Norris
+405e39f	added	3
+405e39f	deleted	2
+405e39f	files	1
+405e39f	body	Embedded the three-stage visual record in the plan per convention (static\nbars -> flowing braid -> vignette) with the before/intermediate frames saved\nas named screenshots; added the 99b row to plan-index (creation commit\nbc83003) and bumped the footer; fixed the #11 spirograph row's naked URL to\nthe canonical /snes/ link (md-linkcheck hook).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3441929	author	Will Norris
+3441929	added	2
+3441929	deleted	0
+3441929	files	1
+3441929	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 47b1a2c	author	Will Norris
 47b1a2c	added	1
 47b1a2c	deleted	0
