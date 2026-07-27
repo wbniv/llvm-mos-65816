@@ -198,6 +198,18 @@ Bank `$00` is excluded from the allocator and remains dedicated to runtime and
 shared data; asset packing begins at bank `$01`.
 
 [Open the proportional `romopt` cartridge visualization](2026-07-26-126-lzss-gallery-nine-public-domain-masters/romopt-layout.html).
+It is generated from `report.json`, the final linker map, and the cartridge itself:
+
+```bash
+python3 tools/lzss-gallery-rom-layout.py \
+  --report assets/snes/lzss-gallery/derived/report.json \
+  --map build/lzss-gallery.map \
+  --rom build/lzss-gallery.sfc \
+  --output docs/plans/2026-07-26-126-lzss-gallery-nine-public-domain-masters/romopt-layout.html
+```
+
+The renderer inserts a labeled divider after every 32 LoROM banks, marking each
+8 Mbit (1 MiB) cartridge boundary.
 
 The current result uses ten asset banks:
 
