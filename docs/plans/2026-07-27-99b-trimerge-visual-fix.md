@@ -4,6 +4,15 @@
 published [trimerge](https://biohack.net/snes/trimerge/) demo (#99, [plan](2026-07-02-99-snes-trimerge.md))
 without touching its compiler-stress purpose or gate value.
 
+<p align="center"><img src="screenshots/trimerge.png" width="512" alt="Final: waterfall braid with all three branch colours over the HDMA backdrop vignette (bsnes-jg, frame 500)"></p>
+
+**Before → after (all bsnes-jg dumps at a field frame):**
+
+| Before (#99 as shipped) | Waterfall rework (phase 1+2) | Final (tear fix + HDMA vignette) |
+|---|---|---|
+| <img src="screenshots/trimerge-99b-before.png" width="256" alt="Static vertical teal/orange bars — no yellow, no motion"> | <img src="screenshots/trimerge-99b-waterfall.png" width="256" alt="Flowing braid with yellow emit-both cells on a flat navy backdrop"> | <img src="screenshots/trimerge.png" width="256" alt="Braid over a smooth 28-band blue vignette"> |
+| static bars, 2 colours, 0.007 % motion | braid flows, ties fire (gold), flat navy | atomic 1-v-blank flush, 28-band vignette |
+
 ## The defect (measured 2026-07-27)
 
 The demo's stated visual intent — *"As the offset animates, the braided merge pattern flows"* — does
