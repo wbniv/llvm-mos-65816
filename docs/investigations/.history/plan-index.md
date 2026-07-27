@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/f369e6c) | docs(todo+plan-index): triage the #128 inbox deferral; index the plan |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/e1e5068) | docs(plan-index): #99c row (299 plans, coverage stays complete) |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/189718f) | docs(plan-index): clear the drift — rows for all 14 committed-but-unindexed plans (298 total, complete) |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/405e39f) | docs(99b): plan screenshots (before/waterfall/final) + plan-index row (199 plans) |
@@ -215,6 +216,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+f369e6c	author	Will Norris
+f369e6c	added	2
+f369e6c	deleted	1
+f369e6c	files	1
+f369e6c	body	The auto-captured [UNVERIFIED] bullet duplicates the curated [T3] battery\nsub-item (verification runs with the implementation); plan-index gains the\n#128 row (300 plans, complete coverage).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e1e5068	author	Will Norris
 e1e5068	added	2
 e1e5068	deleted	1
