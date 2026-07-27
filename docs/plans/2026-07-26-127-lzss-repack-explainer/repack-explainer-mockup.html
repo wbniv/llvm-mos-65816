@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LZSS repack explainer mockup</title>
+<style>
+:root{color-scheme:dark;--bg:#100f0d;--screen:#050708;--gold:#f5cc54;--cyan:#4fffea;--green:#b8ef00;--ink:#eee4d0;--dim:#817968}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 ui-monospace,monospace}
+main{max-width:1080px;margin:auto;padding:28px}h1{font:700 27px system-ui;margin:0}.lede{color:var(--dim)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}.case{background:#1b1814;padding:16px;border:1px solid #453e34;border-radius:9px}
+.screen{position:relative;width:512px;max-width:100%;aspect-ratio:256/224;background:var(--screen);overflow:hidden;image-rendering:pixelated}
+.art{position:absolute;left:5%;right:5%;top:0;height:68%;background:
+linear-gradient(145deg,#46677b 0 28%,#ba8c42 29% 45%,#69774a 46% 62%,#7e4a31 63%);
+filter:saturate(.75)}.caption{position:absolute;inset:68% 0 0;background:#050505;padding:4% 5%;font-size:clamp(8px,1.45vw,14px)}
+.artist{text-align:center;color:var(--gold);font-size:1.4em;font-weight:bold}.rows{margin-top:3%;color:#ddd}.tokens{color:var(--cyan);white-space:nowrap}
+.src,.dst{position:absolute;height:8%;border-top:3px solid;border-bottom:3px solid}.src{left:18%;top:24%;width:18%;border-color:var(--gold)}
+.dst{left:64%;top:43%;width:22%;border-color:var(--run)}.fill{height:100%;width:62%;background:color-mix(in srgb,var(--run) 25%,transparent)}
+.dot{position:absolute;width:5px;height:5px;background:var(--run);transform:rotate(45deg)}
+.arrow{position:absolute;left:59%;top:39%;color:var(--run);font-size:20px}.lit{position:absolute;left:71%;top:35%;color:var(--run);font-size:26px;font-weight:bold}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}.sw{display:inline-block;width:12px;height:12px;margin-right:6px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+</style><main><h1>Repack explainer — native-screen contract</h1>
+<p class=lede>Illustrative geometry. Emulator captures and actual artwork remain authoritative.</p>
+<div class=grid>
+<section class=case style="--run:var(--cyan)"><h2>Match token · biohack cyan</h2><div class=screen>
+<div class=art></div><div class=src></div><div class=dst><div class=fill></div></div>
+<i class=dot style="left:39%;top:30%"></i><i class=dot style="left:45%;top:33%"></i><i class=dot style="left:51%;top:36%"></i><i class=dot style="left:57%;top:39%"></i><b class=arrow>›</b>
+<div class=caption><div class=artist>VINCENT VAN GOGH</div><div class=rows>REPACK RAW 08432 PACK 08190<br>MATCH L18 D0421 COPY 11/18<br>RATIO 97.1% LIT 6112 M 0734<br><span class=tokens>L M18 L M04 M12 L L M07 &gt;</span></div></div></div></section>
+<section class=case style="--run:var(--green)"><h2>Literal token · indri green</h2><div class=screen>
+<div class=art></div><div class=lit>◇</div>
+<div class=caption><div class=artist>CLAUDE MONET</div><div class=rows>REPACK RAW 09216 PACK 09340<br>LIT $7C · NO DICTIONARY SOURCE<br>RATIO 101.3% LIT 7481 M 0412<br><span class=tokens>L L M03 L L L M05 L &gt;</span></div></div></div></section>
+</div><div class=legend><span><i class=sw style="background:var(--gold)"></i>earlier source</span>
+<span><i class=sw style="background:var(--cyan)"></i>biohack destination</span>
+<span><i class=sw style="background:var(--green)"></i>indri destination</span></div></main></html>
