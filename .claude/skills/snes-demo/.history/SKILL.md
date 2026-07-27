@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/0c1572d) | feat: add full-color navigable LZSS gallery |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/e1a58f9) | fix(snes/fonts): draw every empty glyph slot; fold lowercase; gate title charset |
 | [2026-07-19](https://github.com/wbniv/llvm-mos-65816/commit/da5409b) | docs+dev: repoint ~/SRC references to the flat ~/ layout |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d65c75e) | fix(fn-plot): add TitleLayer intro + canvas_line curves + 2px/frame; update snes-demo skill |
@@ -8,6 +9,10 @@
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/bfcbe69) | chore(skills): add snes-demo + snes-rom-page as project-local skills |
 
 <!--history-meta v1
+0c1572d	author	Will Norris
+0c1572d	added	28
+0c1572d	deleted	1
+0c1572d	files	1
 e1a58f9	author	Will Norris
 e1a58f9	added	22
 e1a58f9	deleted	0

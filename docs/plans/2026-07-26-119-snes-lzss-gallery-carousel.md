@@ -509,7 +509,7 @@ derive it. Each bank also carries its work's 64-byte BGR555 palette.
 | `$0A` | Poppy Field (Giverny) | 1280×833 | 128×96 | 12,288 | 6,337 | 48.43% |
 |  | **Corpus** |  |  | **116,736** | **70,455** | **39.65% weighted** |
 
-The finalized cartridge is **524,288 bytes (512 KiB)**. Its LoROM header declares size byte `$09`;
+The finalized cartridge is **4 Mbit (512 KiB; 524,288 bytes)**. Its LoROM header declares size byte `$09`;
 the relinked checksum/complement are `$9996/$6669`, and the current ROM SHA-256 is
 `c8b55a787f7ec649ba994d63dcad56dab6f2d9b3f65c5afac592cc342090a4e1`.
 
@@ -566,7 +566,7 @@ Treat ten as the first corpus, not a fixed program limit:
 - generate descriptors, checksums, captions, reports, and linker-section assignments from
   `sources.json`;
 - keep codec buffers sized by the maximum generated frame with link/build assertions;
-- the initial 512 KiB LoROM reserves banks `$0B`–`$0F` for five more one-image banks;
+- the initial 4 Mbit (512 KiB) LoROM reserves banks `$0B`–`$0F` for five more one-image banks;
 - when those fill, grow to the next power-of-two cartridge and generate additional bank regions;
 - never make adding an image require hand-editing the compressor, carousel state machine, or
   benchmark table; and

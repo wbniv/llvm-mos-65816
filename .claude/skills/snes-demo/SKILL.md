@@ -85,6 +85,13 @@ Gather these before writing a line of code:
 
 **Display:** 256×224 pixels NTSC.
 
+**Cartridge-size notation:** discuss SNES ROM cartridge capacity **primarily in megabits**. If a
+byte-oriented equivalent is useful, put it second as supporting information in parentheses:
+`4 Mbit (512 KiB)`, `32 Mbit (4 MiB)`, etc. Use KiB in the parenthetical below 1 MiB and MiB at or
+above 1 MiB. This matches the historical cartridge convention. Never lead with or substitute
+KiB/MiB when describing a whole cartridge. Bank, section, buffer, and individual asset sizes remain
+byte/KiB quantities.
+
 **PPU Mode 1** (selected by `display_init()`, never changed):
 - **BG1** — 4bpp tilemap, 16 colors × 8 palettes = 128 unique colors.
 - **BG2** — 4bpp tilemap (same range).

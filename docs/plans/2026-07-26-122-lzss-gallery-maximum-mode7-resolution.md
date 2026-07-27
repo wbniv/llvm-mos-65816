@@ -185,7 +185,7 @@ measurement:
 
 Total measured codec/check work is 53,837 frames, about 14m56s of SNES time at 60.0988 Hz.
 
-The cartridge remains 512 KiB. Measured bank occupancy after the aspect-preserving relink:
+The cartridge remains 4 Mbit (512 KiB). Measured bank occupancy after the aspect-preserving relink:
 
 | Bank | Used | Contents |
 |---:|---:|---|

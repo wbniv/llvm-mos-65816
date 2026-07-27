@@ -199,7 +199,7 @@ times:
 | Poppy Field | 335 | 5,746 | 449 |
 | **Corpus** | **3,441** | **60,819** | **4,629** |
 
-Total measured codec/check work is 68,889 frames. The final cartridge remains 512 KiB:
+Total measured codec/check work is 68,889 frames. The final cartridge remains 4 Mbit (512 KiB):
 
 | Bank | Used | Contents |
 |---:|---:|---|
