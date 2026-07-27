@@ -17,7 +17,8 @@ main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4
 .locked{margin:12px 0 20px;border:2px solid var(--code);border-radius:9px;background:var(--panel);overflow:hidden}
 .locked .row,.head{display:flex;justify-content:space-between;padding:9px 11px}.locked .row{border-bottom:1px solid var(--rule)}
 .cart{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:10px}.bank{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
-.head{border-bottom:1px solid var(--rule)}.num,.title{font-weight:800;color:#fff4dc}.used{color:var(--muted)}
+.head{border-bottom:1px solid var(--rule)}.num,.title{font-weight:800;color:#fff4dc}
+.used{display:grid;text-align:right;color:var(--muted)}.used span{white-space:nowrap}
 .bar{height:45px;display:flex;background:var(--free)}.seg{height:100%;min-width:1px}.stream{background:var(--stream)}
 .palette{background:var(--palette)}.shared{background:var(--shared)}.free{background:var(--free)}.label{padding:8px 10px;min-height:91px}
 .item{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reserve{opacity:.55}
@@ -62,7 +63,7 @@ def bank_card(bank: int, items: list[tuple[int, str, int, str]]) -> str:
     if not lines:
         lines = '<div class="detail">32,768 bytes free</div>'
     return f"""<section class="bank{' reserve' if not items else ''}">
-<div class="head"><span class="num">Bank ${bank:02X}</span><span class="used">{used:,} used · {free:,} free</span></div>
+<div class="head"><span class="num">Bank ${bank:02X}</span><span class="used"><span>{used:,} used</span><span>{free:,} free</span></span></div>
 <div class="bar">{''.join(segments)}</div>
 <div class="label"><div class="title">{len(items)} packed item{'s' if len(items)!=1 else ''}</div>{lines}</div>
 </section>"""
