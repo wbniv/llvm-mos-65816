@@ -2,58 +2,58 @@
 ```mermaid
 %%{init: {'treemap': {'padding': 6, 'diagramPadding': 8, 'showValues': false}}}%%
 treemap-beta
-"1 MiB LoROM · $00-$1F · 563,383 B gallery · 425,984 B padding":::root
-  "Q0 · $00-$07 · 256 KiB · 7 occupied + system · 228,314 B gallery":::quadrant
+"1 MiB LoROM · $00-$1F · 914,827 B gallery · 32,768 B padding":::root
+  "Q0 · $00-$07 · 256 KiB · 7 occupied + system · 228,533 B gallery":::quadrant
     "$00-$01 · 64 KiB · system pair":::cell
       "$00 SYSTEM · CODE / RODATA / HEADER": 32768:::system
       "$01 STACK WHEAT + THISTLES · 32,752 used · 16 free": 32768:::critical
     "$02-$03 · 64 KiB · 65,503 B gallery":::cell
       "$02 SUNFLOWERS + STARRY NIGHT · 32,745 used · 23 free": 32768:::critical
       "$03 BEDROOM + SELF PORTRAIT · 32,758 used · 10 free": 32768:::critical
-    "$04-$05 · 64 KiB · 64,975 B gallery":::cell
-      "$04 TWO SISTERS + EARTHLY DELIGHTS · 32,514 used · 254 free": 32768:::tight
-      "$05 ICE SKATERS + MOUNTAIN WATERFALL + 1 pal · 32,461 used · 307 free": 32768:::packed
-    "$06-$07 · 64 KiB · 65,084 B gallery":::cell
-      "$06 THE KISS + DRAGON + 2 pal · 32,414 used · 354 free": 32768:::packed
-      "$07 HOME HERON + DE HEEM FLOWERS + 3 pal · 32,670 used · 98 free": 32768:::tight
-  "Q1 · $08-$0F · 256 KiB · 8 occupied · 255,294 B gallery":::quadrant
-    "$08-$09 · 64 KiB · 65,185 B gallery":::cell
-      "$08 TABLEAU VII + SCHOLAR LANDSCAPE + 4 pal · 32,640 used · 128 free": 32768:::tight
-      "$09 GREAT WAVE + THE SCREAM + 4 pal · 32,545 used · 223 free": 32768:::tight
-    "$0A-$0B · 64 KiB · 64,703 B gallery":::cell
-      "$0A BASKET APPLES + PARIS STREET + 4 pal · 32,419 used · 349 free": 32768:::packed
-      "$0B HOUSES PARLIAMENT + LINEN CUPBOARD + 4 pal · 32,284 used · 484 free": 32768:::packed
-    "$0C-$0D · 64 KiB · 64,979 B gallery":::cell
-      "$0C WIDE RIVER + RUYSCH FLOWERS + 5 pal · 32,615 used · 153 free": 32768:::tight
-      "$0D GRANDE JATTE + WATER LILIES + 5 pal · 32,364 used · 404 free": 32768:::packed
-    "$0E-$0F · 64 KiB · 60,427 B gallery":::cell
-      "$0E POPPY FIELD + THIRD OF MAY + 4 pal · 31,517 used · 1,251 free": 32768:::used
-      "$0F WIJK WINDMILL + WOODED MERRYMAKERS · 28,910 used · 3,858 free": 32768:::used
-  "Q2 · $10-$17 · 256 KiB · 3 occupied · 79,775 B gallery":::quadrant
-    "$10-$11 · 64 KiB · 54,351 B gallery":::cell
-      "$10 FLOWER STILL LIFE + ST ODULPHUS · 27,501 used · 5,267 free": 32768:::used
-      "$11 RIVER MOONLIGHT + SHIPS CALM · 26,850 used · 5,918 free": 32768:::used
-    "$12-$13 · 64 KiB · 25,424 B gallery":::cell
-      "$12 VIEW OF DELFT + SAILING VESSELS · 25,424 used · 7,344 free": 32768:::used
-      "$13 EMPTY · 32,768 B padding": 32768:::empty
-    "$14-$15 · 64 KiB · empty":::cell
-      "$14 EMPTY · 32,768 B padding": 32768:::empty
-      "$15 EMPTY · 32,768 B padding": 32768:::empty
-    "$16-$17 · 64 KiB · empty":::cell
-      "$16 EMPTY · 32,768 B padding": 32768:::empty
-      "$17 EMPTY · 32,768 B padding": 32768:::empty
-  "Q3 · $18-$1F · 256 KiB · 0 occupied · 0 B gallery":::quadrant
-    "$18-$19 · 64 KiB · empty":::cell
-      "$18 EMPTY · 32,768 B padding": 32768:::empty
-      "$19 EMPTY · 32,768 B padding": 32768:::empty
-    "$1A-$1B · 64 KiB · empty":::cell
-      "$1A EMPTY · 32,768 B padding": 32768:::empty
-      "$1B EMPTY · 32,768 B padding": 32768:::empty
-    "$1C-$1D · 64 KiB · empty":::cell
-      "$1C EMPTY · 32,768 B padding": 32768:::empty
-      "$1D EMPTY · 32,768 B padding": 32768:::empty
-    "$1E-$1F · 64 KiB · empty":::cell
-      "$1E EMPTY · 32,768 B padding": 32768:::empty
+    "$04-$05 · 64 KiB · 65,263 B gallery":::cell
+      "$04 SUNSET WOODS + THE WILLOWS · 32,749 used · 19 free": 32768:::critical
+      "$05 TWO SISTERS + EARTHLY DELIGHTS · 32,514 used · 254 free": 32768:::tight
+    "$06-$07 · 64 KiB · 65,015 B gallery":::cell
+      "$06 ICE SKATERS + MOUNTAIN WATERFALL + 1 pal · 32,461 used · 307 free": 32768:::packed
+      "$07 DRAGON + LOUVRE RAIN + 2 pal · 32,554 used · 214 free": 32768:::tight
+  "Q1 · $08-$0F · 256 KiB · 8 occupied · 260,226 B gallery":::quadrant
+    "$08-$09 · 64 KiB · 65,079 B gallery":::cell
+      "$08 THE KISS + PANTHEON INTERIOR + 2 pal · 32,409 used · 359 free": 32768:::packed
+      "$09 HOME HERON + DE HEEM FLOWERS + 3 pal · 32,670 used · 98 free": 32768:::tight
+    "$0A-$0B · 64 KiB · 65,284 B gallery":::cell
+      "$0A TABLEAU VII + MORTLAKE TERRACE + 4 pal · 32,674 used · 94 free": 32768:::tight
+      "$0B SCHOLAR LANDSCAPE + TORNADO FOREST + 4 pal · 32,610 used · 158 free": 32768:::tight
+    "$0C-$0D · 64 KiB · 64,964 B gallery":::cell
+      "$0C GREAT WAVE + THE SCREAM + 4 pal · 32,545 used · 223 free": 32768:::tight
+      "$0D BASKET APPLES + PARIS STREET + 4 pal · 32,419 used · 349 free": 32768:::packed
+    "$0E-$0F · 64 KiB · 64,899 B gallery":::cell
+      "$0E HOUSES PARLIAMENT + LINEN CUPBOARD + 4 pal · 32,284 used · 484 free": 32768:::packed
+      "$0F WIDE RIVER + RUYSCH FLOWERS + 5 pal · 32,615 used · 153 free": 32768:::tight
+  "Q2 · $10-$17 · 256 KiB · 8 occupied · 243,864 B gallery":::quadrant
+    "$10-$11 · 64 KiB · 65,169 B gallery":::cell
+      "$10 WATER LILIES + MARLY LE ROI + 5 pal · 32,436 used · 332 free": 32768:::packed
+      "$11 GRANDE JATTE + POPPY FIELD + 6 pal · 32,733 used · 35 free": 32768:::tight
+    "$12-$13 · 64 KiB · 64,550 B gallery":::cell
+      "$12 THIRD OF MAY + WOODED MERRYMAKERS + 6 pal · 32,270 used · 498 free": 32768:::packed
+      "$13 WIJK WINDMILL + STORMY SUNSET + 7 pal · 32,280 used · 488 free": 32768:::packed
+    "$14-$15 · 64 KiB · 58,445 B gallery":::cell
+      "$14 MOUNT AKIHA + FUJISAWA SHUKU + 3 pal · 30,179 used · 2,589 free": 32768:::used
+      "$15 VOYAGE YOUTH + EAST HAMPTON BEACH · 28,266 used · 4,502 free": 32768:::used
+    "$16-$17 · 64 KiB · 55,700 B gallery":::cell
+      "$16 FOG MOUNT DESERT + APPROACH VENICE · 28,051 used · 4,717 free": 32768:::used
+      "$17 FLOWER STILL LIFE + WIVENHOE PARK · 27,649 used · 5,119 free": 32768:::used
+  "Q3 · $18-$1F · 256 KiB · 7 occupied · 182,204 B gallery":::quadrant
+    "$18-$19 · 64 KiB · 54,159 B gallery":::cell
+      "$18 ST ODULPHUS + HARVEST MOON · 27,309 used · 5,459 free": 32768:::used
+      "$19 RIVER MOONLIGHT + SHIPS CALM · 26,850 used · 5,918 free": 32768:::used
+    "$1A-$1B · 64 KiB · 52,848 B gallery":::cell
+      "$1A VOYAGE MANHOOD + KEELMEN MOONLIGHT · 26,628 used · 6,140 free": 32768:::used
+      "$1B SAILING VESSELS + BUFFALO STORM · 26,220 used · 6,548 free": 32768:::used
+    "$1C-$1D · 64 KiB · 50,534 B gallery":::cell
+      "$1C VOYAGE CHILDHOOD + VOYAGE OLD AGE · 25,620 used · 7,148 free": 32768:::used
+      "$1D MOUNT CORCORAN + GRAND CANAL MOLO · 24,914 used · 7,854 free": 32768:::used
+    "$1E-$1F · 64 KiB · 24,663 B gallery":::cell
+      "$1E VIEW OF DELFT + NIAGARA · 24,663 used · 8,105 free": 32768:::used
       "$1F EMPTY · 32,768 B padding": 32768:::empty
 classDef root fill:#111827,stroke:#91b4d8,color:#f4f8ff,stroke-width:3px;
 classDef quadrant fill:#202b3d,stroke:#6784a0,color:#e8f1fa,stroke-width:2px;
@@ -73,19 +73,31 @@ classDef empty fill:#161c25,stroke:#303a48,color:#788796;
 | `$01` | Stack of Wheat stream — 15,699<br/>Thistles stream — 17,053 | 32,752 | 0 | 32,752 | 16 |
 | `$02` | Sunflowers stream — 15,795<br/>The Starry Night stream — 16,950 | 32,745 | 0 | 32,745 | 23 |
 | `$03` | The Bedroom stream — 15,836<br/>Self-Portrait stream — 16,922 | 32,758 | 0 | 32,758 | 10 |
-| `$04` | Two Sisters (On the Terrace) stream — 16,055<br/>The Garden of Earthly Delights stream — 16,459 | 32,514 | 0 | 32,514 | 254 |
-| `$05` | Winter Landscape with Ice Skaters stream — 16,046<br/>Mountainous Landscape with Waterfall stream — 15,903<br/>Under the Wave off Kanagawa palette — 512 | 31,949 | 512 | 32,461 | 307 |
-| `$06` | The Kiss (Lovers) stream — 15,625<br/>Dragon stream — 15,765<br/>The Bedroom palette — 512<br/>A Sunday on La Grande Jatte — 1884 palette — 512 | 31,390 | 1,024 | 32,414 | 354 |
-| `$07` | The Home of the Heron stream — 15,533<br/>Still Life with Flowers in a Glass Vase stream — 15,601<br/>Two Sisters (On the Terrace) palette — 512<br/>Water Lilies palette — 512<br/>The Basket of Apples palette — 512 | 31,134 | 1,536 | 32,670 | 98 |
-| `$08` | Tableau No. VII stream — 15,304<br/>Scholar in Landscape stream — 15,288<br/>Stack of Wheat palette — 512<br/>Self-Portrait palette — 512<br/>Paris Street; Rainy Day palette — 512<br/>Poppy Field (Giverny) palette — 512 | 30,592 | 2,048 | 32,640 | 128 |
-| `$09` | Under the Wave off Kanagawa stream — 15,259<br/>The Scream stream — 15,238<br/>The Garden of Earthly Delights palette — 512<br/>The Scream palette — 512<br/>The Third of May 1808 palette — 512<br/>The Kiss (Lovers) palette — 512 | 30,497 | 2,048 | 32,545 | 223 |
-| `$0A` | The Basket of Apples stream — 15,200<br/>Paris Street; Rainy Day stream — 15,171<br/>View of Delft palette — 512<br/>The Windmill at Wijk bij Duurstede palette — 512<br/>Flower Still Life palette — 512<br/>Sunflowers palette — 512 | 30,371 | 2,048 | 32,419 | 349 |
-| `$0B` | Houses of Parliament, London stream — 15,127<br/>Interior with Women beside a Linen Cupboard stream — 15,109<br/>Tableau No. VII palette — 512<br/>Winter Landscape with Ice Skaters palette — 512<br/>The Home of the Heron palette — 512<br/>Dragon palette — 512 | 30,236 | 2,048 | 32,284 | 484 |
-| `$0C` | Panoramic View of a Wide River stream — 15,021<br/>Still Life with Flowers on a Marble Tabletop stream — 15,034<br/>Scholar in Landscape palette — 512<br/>Houses of Parliament, London palette — 512<br/>Thistles palette — 512<br/>The Starry Night palette — 512<br/>River View by Moonlight palette — 512 | 30,055 | 2,560 | 32,615 | 153 |
-| `$0D` | A Sunday on La Grande Jatte — 1884 stream — 14,846<br/>Water Lilies stream — 14,958<br/>Mountainous Landscape with Waterfall palette — 512<br/>Wooded Landscape with Merrymakers in a Cart palette — 512<br/>Panoramic View of a Wide River palette — 512<br/>Sailing Vessels on an Inland Body of Water palette — 512<br/>Ships near the Coast during a Calm palette — 512 | 29,804 | 2,560 | 32,364 | 404 |
-| `$0E` | Poppy Field (Giverny) stream — 14,815<br/>The Third of May 1808 stream — 14,654<br/>Interior with Women beside a Linen Cupboard palette — 512<br/>Interior of the Sint-Odulphuskerk in Assendelft palette — 512<br/>Still Life with Flowers on a Marble Tabletop palette — 512<br/>Still Life with Flowers in a Glass Vase palette — 512 | 29,469 | 2,048 | 31,517 | 1,251 |
-| `$0F` | The Windmill at Wijk bij Duurstede stream — 14,366<br/>Wooded Landscape with Merrymakers in a Cart stream — 14,544 | 28,910 | 0 | 28,910 | 3,858 |
-| `$10` | Flower Still Life stream — 13,881<br/>Interior of the Sint-Odulphuskerk in Assendelft stream — 13,620 | 27,501 | 0 | 27,501 | 5,267 |
-| `$11` | River View by Moonlight stream — 13,478<br/>Ships near the Coast during a Calm stream — 13,372 | 26,850 | 0 | 26,850 | 5,918 |
-| `$12` | View of Delft stream — 12,297<br/>Sailing Vessels on an Inland Body of Water stream — 13,127 | 25,424 | 0 | 25,424 | 7,344 |
-| `$13-$1F` | Explicit power-of-two padding | 0 | 0 | 0 each | 32,768 each |
+| `$04` | Sunset in the Woods stream — 16,107<br/>The Willows stream — 16,642 | 32,749 | 0 | 32,749 | 19 |
+| `$05` | Two Sisters (On the Terrace) stream — 16,055<br/>The Garden of Earthly Delights stream — 16,459 | 32,514 | 0 | 32,514 | 254 |
+| `$06` | Winter Landscape with Ice Skaters stream — 16,046<br/>Mountainous Landscape with Waterfall stream — 15,903<br/>Under the Wave off Kanagawa palette — 512 | 31,949 | 512 | 32,461 | 307 |
+| `$07` | Dragon stream — 15,765<br/>The Louvre, Afternoon, Rainy Weather stream — 15,765<br/>The Bedroom palette — 512<br/>A Sunday on La Grande Jatte — 1884 palette — 512 | 31,530 | 1,024 | 32,554 | 214 |
+| `$08` | The Kiss (Lovers) stream — 15,625<br/>Interior of the Pantheon, Rome stream — 15,760<br/>Two Sisters (On the Terrace) palette — 512<br/>Water Lilies palette — 512 | 31,385 | 1,024 | 32,409 | 359 |
+| `$09` | The Home of the Heron stream — 15,533<br/>Still Life with Flowers in a Glass Vase stream — 15,601<br/>The Basket of Apples palette — 512<br/>Stack of Wheat palette — 512<br/>Self-Portrait palette — 512 | 31,134 | 1,536 | 32,670 | 98 |
+| `$0A` | Tableau No. VII stream — 15,304<br/>Mortlake Terrace stream — 15,322<br/>Paris Street; Rainy Day palette — 512<br/>Poppy Field (Giverny) palette — 512<br/>The Garden of Earthly Delights palette — 512<br/>The Scream palette — 512 | 30,626 | 2,048 | 32,674 | 94 |
+| `$0B` | Scholar in Landscape stream — 15,288<br/>Tornado in an American Forest stream — 15,274<br/>The Third of May 1808 palette — 512<br/>The Kiss (Lovers) palette — 512<br/>View of Delft palette — 512<br/>The Windmill at Wijk bij Duurstede palette — 512 | 30,562 | 2,048 | 32,610 | 158 |
+| `$0C` | Under the Wave off Kanagawa stream — 15,259<br/>The Scream stream — 15,238<br/>Flower Still Life palette — 512<br/>Sunflowers palette — 512<br/>Tableau No. VII palette — 512<br/>Winter Landscape with Ice Skaters palette — 512 | 30,497 | 2,048 | 32,545 | 223 |
+| `$0D` | The Basket of Apples stream — 15,200<br/>Paris Street; Rainy Day stream — 15,171<br/>The Home of the Heron palette — 512<br/>Dragon palette — 512<br/>Scholar in Landscape palette — 512<br/>Houses of Parliament, London palette — 512 | 30,371 | 2,048 | 32,419 | 349 |
+| `$0E` | Houses of Parliament, London stream — 15,127<br/>Interior with Women beside a Linen Cupboard stream — 15,109<br/>Thistles palette — 512<br/>The Starry Night palette — 512<br/>River View by Moonlight palette — 512<br/>Mountainous Landscape with Waterfall palette — 512 | 30,236 | 2,048 | 32,284 | 484 |
+| `$0F` | Panoramic View of a Wide River stream — 15,021<br/>Still Life with Flowers on a Marble Tabletop stream — 15,034<br/>Wooded Landscape with Merrymakers in a Cart palette — 512<br/>Panoramic View of a Wide River palette — 512<br/>Sailing Vessels on an Inland Body of Water palette — 512<br/>Ships near the Coast during a Calm palette — 512<br/>Interior with Women beside a Linen Cupboard palette — 512 | 30,055 | 2,560 | 32,615 | 153 |
+| `$10` | Water Lilies stream — 14,958<br/>Marly-le-Roi stream — 14,918<br/>Interior of the Sint-Odulphuskerk in Assendelft palette — 512<br/>Still Life with Flowers on a Marble Tabletop palette — 512<br/>Still Life with Flowers in a Glass Vase palette — 512<br/>The Voyage of Life: Childhood palette — 512<br/>The Voyage of Life: Youth palette — 512 | 29,876 | 2,560 | 32,436 | 332 |
+| `$11` | A Sunday on La Grande Jatte — 1884 stream — 14,846<br/>Poppy Field (Giverny) stream — 14,815<br/>The Voyage of Life: Manhood palette — 512<br/>The Voyage of Life: Old Age palette — 512<br/>Tornado in an American Forest palette — 512<br/>Niagara palette — 512<br/>Fog off Mount Desert palette — 512<br/>Buffalo Trail: The Impending Storm palette — 512 | 29,661 | 3,072 | 32,733 | 35 |
+| `$12` | The Third of May 1808 stream — 14,654<br/>Wooded Landscape with Merrymakers in a Cart stream — 14,544<br/>Mount Corcoran palette — 512<br/>Sunset in the Woods palette — 512<br/>Harvest Moon palette — 512<br/>East Hampton Beach, Long Island palette — 512<br/>Wivenhoe Park, Essex palette — 512<br/>Cloud Study: Stormy Sunset palette — 512 | 29,198 | 3,072 | 32,270 | 498 |
+| `$13` | The Windmill at Wijk bij Duurstede stream — 14,366<br/>Cloud Study: Stormy Sunset stream — 14,330<br/>Keelmen Heaving in Coals by Moonlight palette — 512<br/>Approach to Venice palette — 512<br/>Mortlake Terrace palette — 512<br/>Interior of the Pantheon, Rome palette — 512<br/>Entrance to the Grand Canal from the Molo, Venice palette — 512<br/>The Louvre, Afternoon, Rainy Weather palette — 512<br/>Marly-le-Roi palette — 512 | 28,696 | 3,584 | 32,280 | 488 |
+| `$14` | Distant View of Mount Akiha, Kakegawa stream — 14,324<br/>Fujisawa-shuku stream — 14,319<br/>The Willows palette — 512<br/>Distant View of Mount Akiha, Kakegawa palette — 512<br/>Fujisawa-shuku palette — 512 | 28,643 | 1,536 | 30,179 | 2,589 |
+| `$15` | The Voyage of Life: Youth stream — 14,088<br/>East Hampton Beach, Long Island stream — 14,178 | 28,266 | 0 | 28,266 | 4,502 |
+| `$16` | Fog off Mount Desert stream — 14,006<br/>Approach to Venice stream — 14,045 | 28,051 | 0 | 28,051 | 4,717 |
+| `$17` | Flower Still Life stream — 13,881<br/>Wivenhoe Park, Essex stream — 13,768 | 27,649 | 0 | 27,649 | 5,119 |
+| `$18` | Interior of the Sint-Odulphuskerk in Assendelft stream — 13,620<br/>Harvest Moon stream — 13,689 | 27,309 | 0 | 27,309 | 5,459 |
+| `$19` | River View by Moonlight stream — 13,478<br/>Ships near the Coast during a Calm stream — 13,372 | 26,850 | 0 | 26,850 | 5,918 |
+| `$1A` | The Voyage of Life: Manhood stream — 13,285<br/>Keelmen Heaving in Coals by Moonlight stream — 13,343 | 26,628 | 0 | 26,628 | 6,140 |
+| `$1B` | Sailing Vessels on an Inland Body of Water stream — 13,127<br/>Buffalo Trail: The Impending Storm stream — 13,093 | 26,220 | 0 | 26,220 | 6,548 |
+| `$1C` | The Voyage of Life: Childhood stream — 13,048<br/>The Voyage of Life: Old Age stream — 12,572 | 25,620 | 0 | 25,620 | 7,148 |
+| `$1D` | Mount Corcoran stream — 12,416<br/>Entrance to the Grand Canal from the Molo, Venice stream — 12,498 | 24,914 | 0 | 24,914 | 7,854 |
+| `$1E` | View of Delft stream — 12,297<br/>Niagara stream — 12,366 | 24,663 | 0 | 24,663 | 8,105 |
+| `$1F-$1F` | Explicit power-of-two padding | 0 | 0 | 0 each | 32,768 each |

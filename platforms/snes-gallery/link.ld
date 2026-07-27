@@ -1,6 +1,4 @@
-/* 1 MiB LoROM: bank $00 code/header plus named asset banks $01..$14.
- * Banks $15..$1F are retained as explicit padding so the cartridge is a valid
- * power-of-two image and its header/checksum describe the complete 1 MiB ROM. */
+/* 1 MiB LoROM: bank $00 code/header plus named asset banks $01..$1F. */
 
 __rc0 = 0x00;
 INCLUDE imag-regs.ld
@@ -77,6 +75,17 @@ SECTIONS {
   .gallery_12 : { KEEP(*(.gallery_12)) } >rom12
   .gallery_13 : { KEEP(*(.gallery_13)) } >rom13
   .gallery_14 : { KEEP(*(.gallery_14)) } >rom14
+  .gallery_15 : { KEEP(*(.gallery_15)) } >rom15
+  .gallery_16 : { KEEP(*(.gallery_16)) } >rom16
+  .gallery_17 : { KEEP(*(.gallery_17)) } >rom17
+  .gallery_18 : { KEEP(*(.gallery_18)) } >rom18
+  .gallery_19 : { KEEP(*(.gallery_19)) } >rom19
+  .gallery_1A : { KEEP(*(.gallery_1A)) } >rom1A
+  .gallery_1B : { KEEP(*(.gallery_1B)) } >rom1B
+  .gallery_1C : { KEEP(*(.gallery_1C)) } >rom1C
+  .gallery_1D : { KEEP(*(.gallery_1D)) } >rom1D
+  .gallery_1E : { KEEP(*(.gallery_1E)) } >rom1E
+  .gallery_1F : { KEEP(*(.gallery_1F)) } >rom1F
 
   .snes_header 0x00FFB0 : { KEEP(*(.snes_header)) } >romhdr
   .snes_vectors_native 0x00FFE0 : {
