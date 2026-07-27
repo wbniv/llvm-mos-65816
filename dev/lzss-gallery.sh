@@ -33,9 +33,14 @@ cmp "$BUILD/lzss-gallery-host-O0.txt" "$BUILD/lzss-gallery-host-O2.txt"
 cat "$BUILD/lzss-gallery-host-O2.txt"
 
 echo "==> target build (+mos-a16, 1 MiB LoROM)"
+EXTRA_DEFS=()
+if [ -n "${GALLERY_RUN_COLOR:-}" ]; then
+  EXTRA_DEFS+=("-DGALLERY_RUN_COLOR=$GALLERY_RUN_COLOR")
+fi
 "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
   -Xclang -target-feature -Xclang +mos-a16 -Os \
   -DGALLERY_START="${GALLERY_START:-0}" \
+  "${EXTRA_DEFS[@]}" \
   -Wl,-Map="$MAP" -o "$ROM" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 [ "$(stat -c %s "$ROM")" = 1048576 ]

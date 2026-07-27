@@ -423,6 +423,7 @@ docker run --rm \
   ${BENCH_FRAMES:+-e BENCH_FRAMES} \
   ${QUICK:+-e QUICK} \
   ${GALLERY_START:+-e GALLERY_START} \
+  ${GALLERY_RUN_COLOR:+-e GALLERY_RUN_COLOR} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
   2> >(grep -vF 'different data layouts' | cat -s >&2)
 exit $?

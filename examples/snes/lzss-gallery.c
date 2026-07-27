@@ -26,6 +26,9 @@
 #ifndef GALLERY_START
 #define GALLERY_START 0u
 #endif
+#ifndef GALLERY_RUN_COLOR
+#define GALLERY_RUN_COLOR SNES_RGB(8,31,30)
+#endif
 
 volatile uint16_t corpus_result;
 volatile uint8_t gallery_progress;
@@ -178,8 +181,14 @@ static uint16_t compress_far(const FAR uint8_t *src,uint16_t len,FAR uint8_t *ds
     }
     dst[flagpos]=flags;
     if(pos>=next_meter){
-      viz_out=op;oam_compression(viz_pos,viz_len,viz_literal);
-      progress_line("REPACK",pos,len);next_meter=(uint16_t)(next_meter+512u);
+      /*
+       * progress_line() waits for VBlank.  Update OAM after that wait, while
+       * the PPU is not scanning the arrow sprites; writing OAM first corrupted
+       * both navigation arrows as soon as repacking began.
+       */
+      viz_out=op;progress_line("REPACK",pos,len);
+      oam_compression(viz_pos,viz_len,viz_literal);
+      next_meter=(uint16_t)(next_meter+512u);
     }
   }
   progress_line("REPACK",len,len);
@@ -236,7 +245,7 @@ static void load_chevrons(void){
   c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   /* Compression sprites use OBJ palette 1 (attribute bits ppp=001). */
   REG_CGADD=144;REG_CGDATA=0;REG_CGDATA=0;
-  c=SNES_RGB(8,31,30);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   REG_OBSEL=3u;
 }
@@ -253,6 +262,7 @@ static void oam_arrows(uint8_t y,uint8_t hide){
   REG_OAMADDL=0;REG_OAMADDH=1;REG_OAMDATA=0x0a;
 }
 static void oam_hide_compression(void){
+  snes_wait_vblank();
   REG_OAMADDL=8;REG_OAMADDH=0;
   for(uint8_t i=0;i<6;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=72;REG_OAMDATA=0x32;}
 }
@@ -267,6 +277,7 @@ static void oam_compression(uint16_t pos,uint8_t len,uint8_t literal){
   uint8_t w=(uint8_t)(((uint16_t)len*256u+active_asset->matrix_scale-1u)/active_asset->matrix_scale);
   if(w<3u)w=3u;if(literal)w=3u;
   uint8_t count=(uint8_t)((w+7u)/8u);if(count>3u)count=3u;
+  snes_wait_vblank();
   REG_OAMADDL=8;REG_OAMADDH=0;
   for(uint8_t i=0;i<6;i++){
     uint8_t hide=(uint8_t)(i>=count);
