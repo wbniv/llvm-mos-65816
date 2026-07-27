@@ -86,7 +86,7 @@ Keep the artwork as large as the caption budget permits while reserving:
 ARTIST / WORK / DATE              existing metadata
 REPACK  RAW 08432  PACK 08190     work-based progress
 MATCH   L18 D0421  COPY 11/18     current token
-RATIO   97.1%  LIT 6112 M 0734    live totals
+COMP    +2.9%  LIT 6112 M 0734    live totals
 [L M18 L M04 M12 L L M07 ...]     recent-token strip
 ```
 
@@ -94,6 +94,42 @@ The exact row count remains artwork-dependent. Prefer four repack rows and
 reduce to three only for a two-line artist plus two-line title. In the compact
 case, combine progress and ratio; never remove current-token semantics or the
 token strip.
+
+### Live textual indicators
+
+At a minimum, always show **compression percentage while repacking is still
+in progress**. It is not sufficient to reveal the percentage only after the
+work finishes.
+
+Use reduction percentage as the primary number:
+
+```text
+compression_percent = 100 × (raw_done - packed_done) / raw_done
+```
+
+- show `COMP +12.4%` when the stream is smaller than the bytes consumed;
+- show `COMP  +0.0%` at break-even;
+- show `COMP  -3.1%` when LZSS overhead is currently expanding the stream;
+- show `COMP   --.-%` before the first raw byte is committed; and
+- settle to the exact generated final reduction for the work.
+
+Update the value from the coherent `raw_done`/`packed_done` visual snapshot at
+least once every 8 frames and whenever another 256 raw bytes have completed,
+whichever produces the next visible update. Avoid 32-bit division in NMI:
+format the percentage in foreground presentation work and publish completed
+text/tile data for the next vblank.
+
+Also show, space permitting:
+
+- raw bytes consumed and total raw bytes;
+- packed bytes emitted;
+- literal count;
+- match count;
+- current match length and distance, or literal byte;
+- copy progress within the current match; and
+- a compact packed/raw ratio or projected final size.
+
+Compression percentage has priority over every optional textual indicator.
 
 Recompute each work's available Mode 7 height through the asset capacity
 solver. Continue to preserve the complete composition and original aspect
@@ -304,6 +340,8 @@ After all gates pass:
 - A viewer can visually distinguish literals from matches without reading text.
 - Every match visibly relates earlier source pixels to the current destination.
 - Copy length and progress are legible.
+- Live textual compression percentage updates throughout `REPACK`, including
+  negative values when the stream expands.
 - The token strip makes compressible versus incompressible regions apparent.
 - Artwork remains uncropped, aspect-correct, and unobscured outside the bounded
   current-token overlay.
