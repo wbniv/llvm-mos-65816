@@ -189,7 +189,10 @@ times:
 
 [Open the proportional 4 Mbit ROM bank map](2026-07-26-125-lzss-gallery-full-mode7-color/rom-layout.html).
 It distinguishes runtime/shared data, each work's LZSS stream, its 512-byte palette, and remaining
-space across all sixteen 32 KiB LoROM banks.
+space across all sixteen 32 KiB LoROM banks. This is the historical ten-work layout. The expanded
+corpus supersedes its one-work-per-bank allocation with the
+[`romopt` packed layout](2026-07-26-126-lzss-gallery-nine-public-domain-masters/romopt-layout.html),
+which excludes bank `$00` and packs assets beginning at bank `$01`.
 
 | Work | Unpack frames | Repack frames | Verify frames |
 |---|---:|---:|---:|

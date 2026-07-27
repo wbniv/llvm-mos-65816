@@ -194,6 +194,10 @@ Packing uses William B. Norris IV's 1992 `romopt` algorithm: sort all indivisibl
 items largest-to-smallest, then place each item in the first bank where it
 fits. LZSS streams and 512-byte palettes are **separate items** because their
 far pointers are independent and the small palettes are useful hole-fillers.
+Bank `$00` is excluded from the allocator and remains dedicated to runtime and
+shared data; asset packing begins at bank `$01`.
+
+[Open the proportional `romopt` cartridge visualization](2026-07-26-126-lzss-gallery-nine-public-domain-masters/romopt-layout.html).
 
 The current result uses ten asset banks:
 

@@ -231,6 +231,10 @@ def main():
                 bins[bank-1]+=size;bank_for[(symbol,part)]=bank;break
         else:
             bins.append(size);bank_for[(symbol,part)]=len(bins)
+    # Bank $00 is exclusively runtime/shared data. romopt's asset bins are
+    # deliberately one-based and may never place a stream or palette there.
+    assert bank_for and min(bank_for.values()) == 1
+    assert 0 not in bank_for.values()
     for item in report:
         item["manifest_order"]=item["bank"]
         symbol=item["slug"].replace("-","_")

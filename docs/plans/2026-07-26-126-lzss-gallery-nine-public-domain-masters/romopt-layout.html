@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LZSS Gallery — romopt cartridge layout</title>
+<style>
+:root{color-scheme:dark;--bg:#100f0d;--panel:#1d1a16;--ink:#f4ead6;--muted:#a99d8a;
+--code:#e4a853;--stream:#65b7a6;--palette:#f0d277;--free:#302b25;--rule:#4b4338}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 ui-monospace,monospace}
+main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4dc;font:700 28px/1.1 system-ui}
+.lede,.detail,.note{color:var(--muted)}.summary,.legend{display:flex;gap:12px;flex-wrap:wrap;margin:17px 0}
+.pill,.note{border:1px solid var(--rule);background:var(--panel);padding:8px 11px;border-radius:8px}
+.key:before{content:"";display:inline-block;width:12px;height:12px;background:var(--c);margin-right:7px;vertical-align:-2px}
+.locked{margin:12px 0 20px;border:2px solid var(--code);border-radius:9px;background:var(--panel);overflow:hidden}
+.locked .row,.head{display:flex;justify-content:space-between;padding:9px 11px}.locked .row{border-bottom:1px solid var(--rule)}
+.cart{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:10px}.bank{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.head{border-bottom:1px solid var(--rule)}.num,.title{font-weight:800;color:#fff4dc}.used{color:var(--muted)}
+.bar{height:45px;display:flex;background:var(--free)}.seg{height:100%;min-width:1px}.stream{background:var(--stream)}
+.palette{background:var(--palette)}.free{background:var(--free)}.label{padding:8px 10px;min-height:91px}
+.item{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reserve{opacity:.55}
+.note{margin-top:18px;border-left:3px solid var(--palette)}@media(max-width:980px){.cart{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:620px){.cart{grid-template-columns:1fr}}
+</style>
+<main>
+<h1><code>romopt</code> asset packing</h1>
+<p class="lede">8 Mbit (1 MiB) LoROM · bank $00 locked · assets begin at bank $01</p>
+<div class="summary"><span class="pill">20 works</span><span class="pill">40 indivisible items</span>
+<span class="pill">10 packed asset banks</span><span class="pill">21 reserved banks</span></div>
+<div class="legend"><span class="key" style="--c:var(--code)">bank $00: runtime/shared only</span>
+<span class="key" style="--c:var(--stream)">LZSS stream</span><span class="key" style="--c:var(--palette)">512-byte palette</span>
+<span class="key" style="--c:var(--free)">free / padding</span></div>
+<section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong><span>26,864 / 32,768 bytes</span></div>
+<div class="bar"><span class="seg" style="width:82%;background:var(--code)"></span><span class="seg free" style="width:18%"></span></div>
+<div class="label">Runtime, startup, navigation, descriptors, fonts, tables, header, and vectors.
+No artwork stream or palette is eligible for this bank.</div></section>
+<div class="cart" id="cart"></div>
+<p class="note"><strong>Algorithm:</strong> stable first-fit decreasing. Sort streams and palettes
+largest-to-smallest, retain manifest order as the tie-breaker, and place each item in the first
+32 KiB bank where it fits. Palettes remain separate 512-byte items so they fill stream-sized holes.</p>
+</main>
+<script>
+const cap=32768,B={
+1:[["bedroom stream",15836],["self-portrait stream",16922]],
+2:[["two-sisters stream",16055],["earthly-delights stream",16459]],
+3:[["great-wave palette",512],["sunflowers stream",15795],["ice-skaters stream",16046]],
+4:[["bedroom palette",512],["grande-jatte palette",512],["stack-wheat stream",15699],["the-kiss stream",15625]],
+5:[["great-wave stream",15259],["two-sisters palette",512],["water-lilies palette",512],["basket-apples palette",512],["stack-wheat palette",512],["tableau-vii stream",15304]],
+6:[["basket-apples stream",15200],["self-portrait palette",512],["paris-street palette",512],["poppy-field palette",512],["earthly-delights palette",512],["the-scream stream",15238]],
+7:[["water-lilies stream",14958],["paris-street stream",15171],["the-scream palette",512],["third-of-may palette",512],["the-kiss palette",512],["view-of-delft palette",512],["wijk-windmill palette",512]],
+8:[["grande-jatte stream",14846],["poppy-field stream",14815],["flower-still-life palette",512],["sunflowers palette",512],["tableau-vii palette",512],["ice-skaters palette",512]],
+9:[["third-of-may stream",14654],["wijk-windmill stream",14366]],
+10:[["view-of-delft stream",12297],["flower-still-life stream",13881]]
+};
+for(let n=1;n<32;n++){const items=B[n]||[],used=items.reduce((s,x)=>s+x[1],0),free=cap-used;
+const e=document.createElement("section");e.className="bank"+(items.length?"":" reserve");
+e.innerHTML=`<div class=head><span class=num>Bank $${n.toString(16).toUpperCase().padStart(2,"0")}</span><span class=used>${used.toLocaleString()} / 32,768</span></div>
+<div class=bar>${items.map(([x,v])=>`<span class="seg ${x.endsWith("palette")?"palette":"stream"}" style="width:${v/cap*100}%" title="${x}: ${v} bytes"></span>`).join("")}<span class="seg free" style="width:${free/cap*100}%"></span></div>
+<div class=label><div class=title>${items.length?`${items.length} packed item${items.length>1?"s":""}`:"Reserved"}</div>${items.map(([x,v])=>`<div class=item>${x} · ${v.toLocaleString()} B</div>`).join("")||'<div class=detail>32,768 bytes free</div>'}</div>`;
+document.querySelector("#cart").append(e)}
+</script>
+</html>

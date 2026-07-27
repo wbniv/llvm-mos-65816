@@ -1,11 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/e8102ca) | fix: isolate gallery overlay palette |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/237c5a5) | feat: expand Mode 7 LZSS gallery |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d25eaa2) | docs: record gallery production verification |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/b2d80ea) | docs: record gallery verification pass |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/5ac833b) | feat: expand LZSS gallery to 19 works |
 
 <!--history-meta v1
+e8102ca	author	Will Norris
+e8102ca	added	49
+e8102ca	deleted	18
+e8102ca	files	1
 237c5a5	author	Will Norris
 237c5a5	added	393
 237c5a5	deleted	49
