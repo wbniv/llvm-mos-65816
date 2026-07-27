@@ -19,8 +19,11 @@ for line in Path(a.map).read_text().splitlines():
 
 works = json.loads(Path(a.report).read_text())
 bank_count = max(max(work["stream_bank"], work["palette_bank"]) for work in works)
-if bank_count > 31:
-    raise SystemExit("too many gallery banks for 1 MiB LoROM")
+TOTAL_BANKS = 32
+LAST_BANK = 31
+ROM_MIB = 1
+if bank_count > LAST_BANK:
+    raise SystemExit(f"too many gallery banks for {ROM_MIB} MiB LoROM")
 
 rows = []
 banks = [{
@@ -61,8 +64,8 @@ for bank in range(1, bank_count + 1):
     rows.append(f"| `${bank:02X}` | {contents} | {stream:,} | {512*len(palette_items):,} | {linked:,} | {free:,} |")
 
 last = bank_count
-pad = 31 - last
-for bank in range(bank_count + 1, 32):
+pad = LAST_BANK - last
+for bank in range(bank_count + 1, TOTAL_BANKS):
     banks.append({
         "bank": bank,
         "stream_items": [],
@@ -73,8 +76,8 @@ for bank in range(bank_count + 1, 32):
         "free": 32768,
     })
 
-if len(banks) != 32 or [bank["bank"] for bank in banks] != list(range(32)):
-    raise SystemExit("internal error: cartridge model must contain banks $00-$1F exactly once")
+if len(banks) != TOTAL_BANKS or [bank["bank"] for bank in banks] != list(range(TOTAL_BANKS)):
+    raise SystemExit(f"internal error: cartridge model must contain banks $00-${LAST_BANK:02X} exactly once")
 
 def bank_summary(model):
     bank = model["bank"]
@@ -113,10 +116,11 @@ tree = [
     "```mermaid",
     "%%{init: {'treemap': {'padding': 6, 'diagramPadding': 8, 'showValues': false}}}%%",
     "treemap-beta",
-    f'"1 MiB LoROM · $00-$1F · {gallery_used:,} B gallery · {pad*32768:,} B padding":::root',
+    f'"{ROM_MIB * 8} Mbit ({ROM_MIB} MiB) LoROM · $00-${LAST_BANK:02X}'
+    f' · {gallery_used:,} B gallery · {pad*32768:,} B padding":::root',
 ]
 
-for quadrant in range(4):
+for quadrant in range(TOTAL_BANKS // 8):
     first = quadrant * 8
     qmodels = banks[first:first + 8]
     qused = sum(model["used"] or 0 for model in qmodels)
@@ -161,6 +165,6 @@ out = [
     "green = occupied · blue = system · gray = padding", "",
     "| Bank | Contents | Stream | Palette | Used | Free |",
     "|---:|---|---:|---:|---:|---:|", *rows,
-    f"| `${last+1:02X}-$1F` | Explicit power-of-two padding | 0 | 0 | 0 each | 32,768 each |", "",
+    f"| `${last+1:02X}-${LAST_BANK:02X}` | Explicit power-of-two padding | 0 | 0 | 0 each | 32,768 each |", "",
 ]
 Path(a.output).write_text("\n".join(out))

@@ -1,0 +1,498 @@
+[
+  {
+    "slug": "great-wave",
+    "artist": "Katsushika Hokusai",
+    "title": "Under the Wave off Kanagawa",
+    "date": "c. 1830-1832",
+    "object_url": "https://www.artic.edu/artworks/24645",
+    "preview": "/play/preview/lzss-gallery/great-wave-web.png"
+  },
+  {
+    "slug": "grande-jatte",
+    "artist": "Georges Seurat",
+    "title": "A Sunday on La Grande Jatte — 1884",
+    "date": "1884-1886; border added 1888-1889",
+    "object_url": "https://www.artic.edu/artworks/27992",
+    "preview": "/play/preview/lzss-gallery/grande-jatte-web.png"
+  },
+  {
+    "slug": "water-lilies",
+    "artist": "Claude Monet",
+    "title": "Water Lilies",
+    "date": "1906",
+    "object_url": "https://www.artic.edu/artworks/16568",
+    "preview": "/play/preview/lzss-gallery/water-lilies-web.png"
+  },
+  {
+    "slug": "basket-apples",
+    "artist": "Paul Cézanne",
+    "title": "The Basket of Apples",
+    "date": "c. 1893",
+    "object_url": "https://www.artic.edu/artworks/111436",
+    "preview": "/play/preview/lzss-gallery/basket-apples-web.png"
+  },
+  {
+    "slug": "stack-wheat",
+    "artist": "Claude Monet",
+    "title": "Stack of Wheat",
+    "date": "1890-1891",
+    "object_url": "https://www.artic.edu/artworks/111318",
+    "preview": "/play/preview/lzss-gallery/stack-wheat-web.png"
+  },
+  {
+    "slug": "self-portrait",
+    "artist": "Vincent van Gogh",
+    "title": "Self-Portrait",
+    "date": "1887",
+    "object_url": "https://www.artic.edu/artworks/80607",
+    "preview": "/play/preview/lzss-gallery/self-portrait-web.png"
+  },
+  {
+    "slug": "paris-street",
+    "artist": "Gustave Caillebotte",
+    "title": "Paris Street; Rainy Day",
+    "date": "1877",
+    "object_url": "https://www.artic.edu/artworks/20684",
+    "preview": "/play/preview/lzss-gallery/paris-street-web.png"
+  },
+  {
+    "slug": "poppy-field",
+    "artist": "Claude Monet",
+    "title": "Poppy Field (Giverny)",
+    "date": "1890",
+    "object_url": "https://www.artic.edu/artworks/4783",
+    "preview": "/play/preview/lzss-gallery/poppy-field-web.png"
+  },
+  {
+    "slug": "earthly-delights",
+    "artist": "Hieronymus Bosch",
+    "title": "The Garden of Earthly Delights",
+    "date": "1490-1500",
+    "object_url": "https://www.museodelprado.es/en/the-collection/art-work/the-garden-of-earthly-delights-triptych/02388242-6d6a-4e9e-a992-e1311eab3609",
+    "preview": "/play/preview/lzss-gallery/earthly-delights-web.png"
+  },
+  {
+    "slug": "the-scream",
+    "artist": "Edvard Munch",
+    "title": "The Scream",
+    "date": "1893",
+    "object_url": "https://www.nasjonalmuseet.no/en/collection/object/NG.M.00939",
+    "preview": "/play/preview/lzss-gallery/the-scream-web.png"
+  },
+  {
+    "slug": "third-of-may",
+    "artist": "Francisco de Goya",
+    "title": "The Third of May 1808",
+    "date": "1814",
+    "object_url": "https://www.museodelprado.es/en/the-collection/art-work/the-3rd-of-may-1808-in-madrid-or-the-executions/5e177409-2993-4240-97fb-847a02c6496c",
+    "preview": "/play/preview/lzss-gallery/third-of-may-web.png"
+  },
+  {
+    "slug": "the-kiss",
+    "artist": "Gustav Klimt",
+    "title": "The Kiss (Lovers)",
+    "date": "1908-1909",
+    "object_url": "https://www.belvedere.at/en/kiss-gustav-klimt",
+    "preview": "/play/preview/lzss-gallery/the-kiss-web.png"
+  },
+  {
+    "slug": "view-of-delft",
+    "artist": "Johannes Vermeer",
+    "title": "View of Delft",
+    "date": "c. 1660-1661",
+    "object_url": "https://www.mauritshuis.nl/en/our-collection/artworks/92-view-of-delft",
+    "preview": "/play/preview/lzss-gallery/view-of-delft-web.png"
+  },
+  {
+    "slug": "wijk-windmill",
+    "artist": "Jacob van Ruisdael",
+    "title": "The Windmill at Wijk bij Duurstede",
+    "date": "c. 1670",
+    "object_url": "https://www.rijksmuseum.nl/en/collection/SK-C-211",
+    "preview": "/play/preview/lzss-gallery/wijk-windmill-web.png"
+  },
+  {
+    "slug": "flower-still-life",
+    "artist": "Ambrosius Bosschaert the Elder",
+    "title": "Flower Still Life",
+    "date": "1614",
+    "object_url": "https://www.getty.edu/art/collection/object/103REY",
+    "preview": "/play/preview/lzss-gallery/flower-still-life-web.png"
+  },
+  {
+    "slug": "sunflowers",
+    "artist": "Vincent van Gogh",
+    "title": "Sunflowers",
+    "date": "August 1888",
+    "object_url": "https://www.nationalgallery.org.uk/paintings/vincent-van-gogh-sunflowers",
+    "preview": "/play/preview/lzss-gallery/sunflowers-web.png"
+  },
+  {
+    "slug": "tableau-vii",
+    "artist": "Piet Mondriaan",
+    "title": "Tableau No. VII",
+    "date": "1913",
+    "object_url": "https://commons.wikimedia.org/wiki/File:Piet_Mondrian_Tableau_N_VII.jpg",
+    "preview": "/play/preview/lzss-gallery/tableau-vii-web.png"
+  },
+  {
+    "slug": "ice-skaters",
+    "artist": "Hendrick Avercamp",
+    "title": "Winter Landscape with Ice Skaters",
+    "date": "c. 1608",
+    "object_url": "https://www.rijksmuseum.nl/en/collection/SK-A-1718",
+    "preview": "/play/preview/lzss-gallery/ice-skaters-web.png"
+  },
+  {
+    "slug": "home-heron",
+    "artist": "George Inness",
+    "title": "The Home of the Heron",
+    "date": "1893",
+    "object_url": "https://www.artic.edu/artworks/64724/the-home-of-the-heron",
+    "preview": "/play/preview/lzss-gallery/home-heron-web.png"
+  },
+  {
+    "slug": "dragon",
+    "artist": "Artist unknown",
+    "title": "Dragon",
+    "date": "Late Yuan dynasty (1279-1368) or early Ming dynasty (1368-1644)",
+    "object_url": "https://www.artic.edu/artworks/140610/dragon",
+    "preview": "/play/preview/lzss-gallery/dragon-web.png"
+  },
+  {
+    "slug": "scholar-landscape",
+    "artist": "After Gao Kegong",
+    "title": "Scholar in Landscape",
+    "date": "Yuan dynasty (1280-1368), 14th century or later",
+    "object_url": "https://www.artic.edu/artworks/12314/scholar-in-landscape",
+    "preview": "/play/preview/lzss-gallery/scholar-landscape-web.png"
+  },
+  {
+    "slug": "houses-parliament",
+    "artist": "Claude Monet",
+    "title": "Houses of Parliament, London",
+    "date": "1900-1901",
+    "object_url": "https://www.artic.edu/artworks/16584/houses-of-parliament-london",
+    "preview": "/play/preview/lzss-gallery/houses-parliament-web.png"
+  },
+  {
+    "slug": "thistles",
+    "artist": "John Singer Sargent",
+    "title": "Thistles",
+    "date": "1883-1889",
+    "object_url": "https://www.artic.edu/artworks/145807/thistles",
+    "preview": "/play/preview/lzss-gallery/thistles-web.png"
+  },
+  {
+    "slug": "starry-night",
+    "artist": "Vincent van Gogh",
+    "title": "The Starry Night",
+    "date": "1889",
+    "object_url": "https://www.moma.org/collection/works/79802",
+    "preview": "/play/preview/lzss-gallery/starry-night-web.png"
+  },
+  {
+    "slug": "river-moonlight",
+    "artist": "Aert van der Neer",
+    "title": "River View by Moonlight",
+    "date": "c. 1650-c. 1655",
+    "object_url": "https://id.rijksmuseum.nl/200107781",
+    "preview": "/play/preview/lzss-gallery/river-moonlight-web.png"
+  },
+  {
+    "slug": "mountain-waterfall",
+    "artist": "Jacob van Ruisdael",
+    "title": "Mountainous Landscape with Waterfall",
+    "date": "1650-1682",
+    "object_url": "https://id.rijksmuseum.nl/200108484",
+    "preview": "/play/preview/lzss-gallery/mountain-waterfall-web.png"
+  },
+  {
+    "slug": "wooded-merrymakers",
+    "artist": "Meindert Hobbema",
+    "title": "Wooded Landscape with Merrymakers in a Cart",
+    "date": "c. 1665",
+    "object_url": "https://id.rijksmuseum.nl/200445746",
+    "preview": "/play/preview/lzss-gallery/wooded-merrymakers-web.png"
+  },
+  {
+    "slug": "wide-river",
+    "artist": "Jan van Goyen",
+    "title": "Panoramic View of a Wide River",
+    "date": "in or after 1644",
+    "object_url": "https://id.rijksmuseum.nl/200109337",
+    "preview": "/play/preview/lzss-gallery/wide-river-web.png"
+  },
+  {
+    "slug": "sailing-vessels",
+    "artist": "Salomon van Ruysdael",
+    "title": "Sailing Vessels on an Inland Body of Water",
+    "date": "c. 1640-c. 1645",
+    "object_url": "https://id.rijksmuseum.nl/20026241",
+    "preview": "/play/preview/lzss-gallery/sailing-vessels-web.png"
+  },
+  {
+    "slug": "ships-calm",
+    "artist": "Willem van de Velde",
+    "title": "Ships near the Coast during a Calm",
+    "date": "c. 1650-c. 1707",
+    "object_url": "https://id.rijksmuseum.nl/20026835",
+    "preview": "/play/preview/lzss-gallery/ships-calm-web.png"
+  },
+  {
+    "slug": "st-odulphus",
+    "artist": "Pieter Saenredam",
+    "title": "Interior of the Sint-Odulphuskerk in Assendelft",
+    "date": "1649",
+    "object_url": "https://id.rijksmuseum.nl/200107965",
+    "preview": "/play/preview/lzss-gallery/st-odulphus-web.png"
+  },
+  {
+    "slug": "voyage-childhood",
+    "artist": "Thomas Cole",
+    "title": "The Voyage of Life: Childhood",
+    "date": "1842",
+    "object_url": "https://www.nga.gov/artworks/52450-voyage-life-childhood",
+    "preview": "/play/preview/lzss-gallery/voyage-childhood-web.png"
+  },
+  {
+    "slug": "voyage-youth",
+    "artist": "Thomas Cole",
+    "title": "The Voyage of Life: Youth",
+    "date": "1842",
+    "object_url": "https://www.nga.gov/artworks/52451-voyage-life-youth",
+    "preview": "/play/preview/lzss-gallery/voyage-youth-web.png"
+  },
+  {
+    "slug": "voyage-manhood",
+    "artist": "Thomas Cole",
+    "title": "The Voyage of Life: Manhood",
+    "date": "1842",
+    "object_url": "https://www.nga.gov/artworks/52452-voyage-life-manhood",
+    "preview": "/play/preview/lzss-gallery/voyage-manhood-web.png"
+  },
+  {
+    "slug": "voyage-old-age",
+    "artist": "Thomas Cole",
+    "title": "The Voyage of Life: Old Age",
+    "date": "1842",
+    "object_url": "https://www.nga.gov/artworks/52453-voyage-life-old-age",
+    "preview": "/play/preview/lzss-gallery/voyage-old-age-web.png"
+  },
+  {
+    "slug": "tornado-forest",
+    "artist": "Thomas Cole",
+    "title": "Tornado in an American Forest",
+    "date": "1831",
+    "object_url": "https://www.nga.gov/artworks/195574-tornado-american-forest",
+    "preview": "/play/preview/lzss-gallery/tornado-forest-web.png"
+  },
+  {
+    "slug": "niagara",
+    "artist": "Frederic Edwin Church",
+    "title": "Niagara",
+    "date": "1857",
+    "object_url": "https://www.nga.gov/artworks/166436-niagara",
+    "preview": "/play/preview/lzss-gallery/niagara-web.png"
+  },
+  {
+    "slug": "fog-mount-desert",
+    "artist": "Frederic Edwin Church",
+    "title": "Fog off Mount Desert",
+    "date": "1850",
+    "object_url": "https://www.nga.gov/artworks/126132-fog-mount-desert",
+    "preview": "/play/preview/lzss-gallery/fog-mount-desert-web.png"
+  },
+  {
+    "slug": "buffalo-storm",
+    "artist": "Albert Bierstadt",
+    "title": "Buffalo Trail: The Impending Storm",
+    "date": "1869",
+    "object_url": "https://www.nga.gov/artworks/166427-buffalo-trail-impending-storm",
+    "preview": "/play/preview/lzss-gallery/buffalo-storm-web.png"
+  },
+  {
+    "slug": "mount-corcoran",
+    "artist": "Albert Bierstadt",
+    "title": "Mount Corcoran",
+    "date": "c. 1876-1877",
+    "object_url": "https://www.nga.gov/artworks/166428-mount-corcoran",
+    "preview": "/play/preview/lzss-gallery/mount-corcoran-web.png"
+  },
+  {
+    "slug": "sunset-woods",
+    "artist": "George Inness",
+    "title": "Sunset in the Woods",
+    "date": "1891",
+    "object_url": "https://www.nga.gov/artworks/166496-sunset-woods",
+    "preview": "/play/preview/lzss-gallery/sunset-woods-web.png"
+  },
+  {
+    "slug": "harvest-moon",
+    "artist": "George Inness",
+    "title": "Harvest Moon",
+    "date": "1891",
+    "object_url": "https://www.nga.gov/artworks/178273-harvest-moon",
+    "preview": "/play/preview/lzss-gallery/harvest-moon-web.png"
+  },
+  {
+    "slug": "wivenhoe-park",
+    "artist": "John Constable",
+    "title": "Wivenhoe Park, Essex",
+    "date": "1816",
+    "object_url": "https://www.nga.gov/artworks/1147-wivenhoe-park-essex",
+    "preview": "/play/preview/lzss-gallery/wivenhoe-park-web.png"
+  },
+  {
+    "slug": "stormy-sunset",
+    "artist": "John Constable",
+    "title": "Cloud Study: Stormy Sunset",
+    "date": "1821-1822",
+    "object_url": "https://www.nga.gov/artworks/104243-cloud-study-stormy-sunset",
+    "preview": "/play/preview/lzss-gallery/stormy-sunset-web.png"
+  },
+  {
+    "slug": "keelmen-moonlight",
+    "artist": "Joseph Mallord William Turner",
+    "title": "Keelmen Heaving in Coals by Moonlight",
+    "date": "1835",
+    "object_url": "https://www.nga.gov/artworks/1225-keelmen-heaving-coals-moonlight",
+    "preview": "/play/preview/lzss-gallery/keelmen-moonlight-web.png"
+  },
+  {
+    "slug": "approach-venice",
+    "artist": "Joseph Mallord William Turner",
+    "title": "Approach to Venice",
+    "date": "1844",
+    "object_url": "https://www.nga.gov/artworks/117-approach-venice",
+    "preview": "/play/preview/lzss-gallery/approach-venice-web.png"
+  },
+  {
+    "slug": "mortlake-terrace",
+    "artist": "Joseph Mallord William Turner",
+    "title": "Mortlake Terrace",
+    "date": "1827",
+    "object_url": "https://www.nga.gov/artworks/116-mortlake-terrace",
+    "preview": "/play/preview/lzss-gallery/mortlake-terrace-web.png"
+  },
+  {
+    "slug": "pantheon-interior",
+    "artist": "Giovanni Paolo Panini",
+    "title": "Interior of the Pantheon, Rome",
+    "date": "c. 1734",
+    "object_url": "https://www.nga.gov/artworks/165-interior-pantheon-rome",
+    "preview": "/play/preview/lzss-gallery/pantheon-interior-web.png"
+  },
+  {
+    "slug": "grand-canal-molo",
+    "artist": "Canaletto",
+    "title": "Entrance to the Grand Canal from the Molo, Venice",
+    "date": "1742-1744",
+    "object_url": "https://www.nga.gov/artworks/32589-entrance-grand-canal-molo-venice",
+    "preview": "/play/preview/lzss-gallery/grand-canal-molo-web.png"
+  },
+  {
+    "slug": "louvre-rain",
+    "artist": "Camille Pissarro",
+    "title": "The Louvre, Afternoon, Rainy Weather",
+    "date": "1900",
+    "object_url": "https://www.nga.gov/artworks/195850-louvre-afternoon-rainy-weather",
+    "preview": "/play/preview/lzss-gallery/louvre-rain-web.png"
+  },
+  {
+    "slug": "marly-le-roi",
+    "artist": "Alfred Sisley",
+    "title": "Marly-le-Roi",
+    "date": "c. 1875",
+    "object_url": "https://www.nga.gov/artworks/177090-marly-le-roi",
+    "preview": "/play/preview/lzss-gallery/marly-le-roi-web.png"
+  },
+  {
+    "slug": "the-willows",
+    "artist": "Claude Monet",
+    "title": "The Willows",
+    "date": "1880",
+    "object_url": "https://www.nga.gov/artworks/178254-willows",
+    "preview": "/play/preview/lzss-gallery/the-willows-web.png"
+  },
+  {
+    "slug": "mount-akiha",
+    "artist": "Ando Hiroshige",
+    "title": "Distant View of Mount Akiha, Kakegawa",
+    "date": "1833-1835",
+    "object_url": "https://www.nga.gov/artworks/224457-distant-view-mount-akiha-kakegawa",
+    "preview": "/play/preview/lzss-gallery/mount-akiha-web.png"
+  },
+  {
+    "slug": "fujisawa-shuku",
+    "artist": "Ando Hiroshige",
+    "title": "Fujisawa-shuku",
+    "date": "1855",
+    "object_url": "https://www.nga.gov/artworks/181425-fujisawa-shuku",
+    "preview": "/play/preview/lzss-gallery/fujisawa-shuku-web.png"
+  },
+  {
+    "slug": "thai-temple-painting",
+    "artist": "Unknown Thai artist",
+    "title": "Buddhist Temple Painting",
+    "date": "18th century",
+    "object_url": "https://www.metmuseum.org/art/collection/search/38063",
+    "preview": "/play/preview/lzss-gallery/thai-temple-painting-web.png"
+  },
+  {
+    "slug": "thai-buddha-descending",
+    "artist": "Unknown Thai artist",
+    "title": "The Buddha Descending from Trayastrimsa Heaven at Sankissa",
+    "date": "19th century",
+    "object_url": "https://www.metmuseum.org/art/collection/search/38070",
+    "preview": "/play/preview/lzss-gallery/thai-buddha-descending-web.png"
+  },
+  {
+    "slug": "thai-elephant-duel",
+    "artist": "Chan Chittrakon",
+    "title": "Naresuan of Ayutthaya's Elephant Duel with Mingyi Swa of Toungoo",
+    "date": "1931",
+    "object_url": "https://commons.wikimedia.org/wiki/File:Naresuan_of_Ayutthaya_Elephant_Duel_with_Mingyi_Swa_of_Toungoo_Painting.jpg",
+    "preview": "/play/preview/lzss-gallery/thai-elephant-duel-web.png"
+  },
+  {
+    "slug": "thai-ravan-palace",
+    "artist": "Unknown Thai artists",
+    "title": "Ravan in His Palace in Lanka",
+    "date": "18th century",
+    "object_url": "https://commons.wikimedia.org/wiki/File:Ramakien_00.jpg",
+    "preview": "/play/preview/lzss-gallery/thai-ravan-palace-web.png"
+  },
+  {
+    "slug": "thai-surasa-hanuman",
+    "artist": "Unknown Thai artists",
+    "title": "Surasa Challenges Hanuman",
+    "date": "18th century",
+    "object_url": "https://commons.wikimedia.org/wiki/File:Ramakien_02.jpg",
+    "preview": "/play/preview/lzss-gallery/thai-surasa-hanuman-web.png"
+  },
+  {
+    "slug": "thai-hanuman",
+    "artist": "Unknown Thai artists",
+    "title": "Hanuman — Ramakien",
+    "date": "18th century",
+    "object_url": "https://commons.wikimedia.org/wiki/File:Ramakien_06.jpg",
+    "preview": "/play/preview/lzss-gallery/thai-hanuman-web.png"
+  },
+  {
+    "slug": "thai-hanuman-longka",
+    "artist": "Unknown Thai artists",
+    "title": "Hanuman Destroys the Golden City of Longka",
+    "date": "18th century",
+    "object_url": "https://commons.wikimedia.org/wiki/File:Ramakien_09.jpg",
+    "preview": "/play/preview/lzss-gallery/thai-hanuman-longka-web.png"
+  },
+  {
+    "slug": "thai-ravana-war",
+    "artist": "Unknown Thai artists",
+    "title": "Ravana Prepares for War with Rama",
+    "date": "18th century",
+    "object_url": "https://commons.wikimedia.org/wiki/File:Ramakien_12.jpg",
+    "preview": "/play/preview/lzss-gallery/thai-ravana-war-web.png"
+  }
+]

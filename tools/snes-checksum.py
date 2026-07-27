@@ -9,7 +9,7 @@ value, so a single pass suffices.
 
 LoROM (default): the internal header lives in the first 32 KiB at file 0x7FB0-0x7FFF.
 Accepts 32 KiB (bank $00), 64 KiB (banks $00+$01, #320 Increment 2b LoROM), 128 KiB,
-256 KiB, 512 KiB, or 1 MiB — all power-of-two
+256 KiB, 512 KiB, 1 MiB, 2 MiB, or 4 MiB — all power-of-two
 LoROM images that fully fill their space, so the simple sum-of-all-bytes checksum holds.
 
 HiROM (--hirom): banks $C0+ map the full 64 KiB contiguously, so the header lives at
@@ -45,8 +45,9 @@ def main(argv: list[str]) -> int:
     else:
         # LoROM header lives in the first 32 KiB regardless of total size.
         base = 0x7FB0
-        if len(rom) not in (0x8000, 0x10000, 0x20000, 0x40000, 0x80000, 0x100000):
-            print(f"error: expected a 32/64/128/256/512/1024 KiB LoROM image, got {len(rom)} bytes", file=sys.stderr)
+        if len(rom) not in (0x8000, 0x10000, 0x20000, 0x40000, 0x80000,
+                            0x100000, 0x200000, 0x400000):
+            print(f"error: expected a power-of-two LoROM image from 32 KiB through 4096 KiB, got {len(rom)} bytes", file=sys.stderr)
             return 1
 
     MAPMODE_OFF = base + 0x25      # $FFD5

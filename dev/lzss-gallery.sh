@@ -82,7 +82,7 @@ if [ "${QUICK:-0}" = 1 ]; then
   CHECK_LEN=1
   OUT="$BUILD/lzss-gallery-quick-jg.png"
 else
-  FRAMES="${FRAMES:-150000}"
+  FRAMES="${FRAMES:-200000}"
   CHECK_OFF="$VMA"
   CHECK_WANT="$EXPECT"
   CHECK_LEN=2

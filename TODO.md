@@ -32,6 +32,16 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 ## Open
 
+- [T4] **Implement extended SNES cartridge mapping when the gallery grows above 32 Mbit.**
+  Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
+  normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
+  model, header and ROM-size fields, reset/vector placement, far-address handling, checksum gate,
+  emulator coverage, and ROM-map visualization. Conventional cartridges may use two independently
+  sized mask ROMs of up to 32 Mbit each. References:
+  [Nintendo development manual](https://gamingdoc.org/technical-documentation/consoles/super-nintendo/official/sdk/book-i/),
+  [SNESdev ROM format documentation](https://snes.nesdev.org/wiki/ROM_file_formats), and
+  [map-mode table](https://wiki.superfamicom.org/map-mode-table).
+
 - [T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card — now
   ALSO carries the 19 F1 atomic-flush tear fixes (2026-07-27).** The
   title-card fix (`5f51be1` per-line HDMA bands + gravity exit, `e1a58f9` the `_`/`^` glyphs and
@@ -1584,4 +1594,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-07-27-129-lzss-gallery-zipper-visualization** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-129-lzss-gallery-zipper-visualization.md](docs/plans/2026-07-27-129-lzss-gallery-zipper-visualization.md)_  <!-- fp:ea5c80990ef038e3 -->
 - [verify] **2026-07-27-131-snes-cartridge-map-mermaid-quadtree** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md](docs/plans/2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md)_  <!-- fp:5e21a496a7540ac0 -->
 - [verify] **2026-07-27-132-phone-gallery-chevron-hitboxes** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-132-phone-gallery-chevron-hitboxes.md](docs/plans/2026-07-27-132-phone-gallery-chevron-hitboxes.md)_  <!-- fp:92b872c936ff9d49 -->
+- [verify] **2026-07-27-134-thai-paintings-gallery-expansion** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-134-thai-paintings-gallery-expansion.md](docs/plans/2026-07-27-134-thai-paintings-gallery-expansion.md)_  <!-- fp:ad5d46a73f327609 -->
 <!-- END auto-captured-deferrals -->

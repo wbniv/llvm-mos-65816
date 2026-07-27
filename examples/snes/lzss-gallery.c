@@ -72,6 +72,24 @@ static uint8_t oam_visual[OAM_VISUAL_MAX*4u];
 static uint8_t bgmode_tab[7], tm_tab[7];
 static const uint8_t zero=0;
 static const GalleryAsset *active_asset;
+
+static inline uint8_t asset_cols(const GalleryAsset *a){
+  return (uint8_t)((a->width+7u)/8u);
+}
+static inline uint8_t asset_rows(const GalleryAsset *a){
+  return (uint8_t)((a->height+7u)/8u);
+}
+static inline uint8_t asset_title_rows(const GalleryAsset *a){
+  return (uint8_t)(a->title[1][0]?2u:1u);
+}
+static inline uint8_t asset_display_height(const GalleryAsset *a){
+  return (uint8_t)(176u-asset_title_rows(a)*8u);
+}
+static inline uint8_t asset_matrix_scale(const GalleryAsset *a){
+  uint8_t shown_h=asset_display_height(a);
+  uint16_t height_scale=((uint16_t)a->height*256u+shown_h-1u)/shown_h;
+  return (uint8_t)(height_scale>a->width?height_scale:a->width);
+}
 enum { REPACK_NONE=0,REPACK_LITERAL=1,REPACK_MATCH=2,REPACK_CANCELED=3 };
 typedef struct {
   uint16_t sequence,current_offset,source_offset,raw_done,packed_done;
@@ -529,12 +547,13 @@ static void oam_hide_compression(void){
   oam_upload_visual();
 }
 static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y){
-  uint16_t rw=((uint16_t)active_asset->width*256u)/active_asset->matrix_scale;
-  uint16_t rh=((uint16_t)active_asset->height*256u)/active_asset->matrix_scale;
-  uint8_t ox=(uint8_t)((256u-rw)/2u),oy=(uint8_t)((active_asset->display_height-rh)/2u);
+  uint8_t scale=asset_matrix_scale(active_asset);
+  uint16_t rw=((uint16_t)active_asset->width*256u)/scale;
+  uint16_t rh=((uint16_t)active_asset->height*256u)/scale;
+  uint8_t ox=(uint8_t)((256u-rw)/2u),oy=(uint8_t)((asset_display_height(active_asset)-rh)/2u);
   uint16_t px=(uint16_t)(pos%active_asset->width),py=(uint16_t)(pos/active_asset->width);
-  *x=(uint8_t)(ox+(px*256u)/active_asset->matrix_scale);
-  *y=(uint8_t)(oy+(py*256u)/active_asset->matrix_scale);
+  *x=(uint8_t)(ox+(px*256u)/scale);
+  *y=(uint8_t)(oy+(py*256u)/scale);
 }
 static uint8_t sprite_origin(int16_t v){
   if(v<3)return 0;
@@ -621,7 +640,7 @@ static uint8_t console_row(const GalleryAsset*a){
    * deliberately reused while a benchmark is active; caption() restores it
    * for the next work.
    */
-  uint8_t row=(uint8_t)(a->display_height/8u+2u+a->title_rows);
+  uint8_t row=(uint8_t)(asset_display_height(a)/8u+2u+asset_title_rows(a));
   return row>24u?24u:row;
 }
 static void artist_line(uint8_t row,const GalleryAsset*a){
@@ -635,10 +654,11 @@ static void artist_line(uint8_t row,const GalleryAsset*a){
   if(na){col++;text8_at((uint8_t)(row+1u),col,a->artist_small_after);}
 }
 static void caption(const GalleryAsset*a,const char*status){
-  blank_maps();uint8_t row=(uint8_t)(a->display_height/8u);
+  blank_maps();uint8_t row=(uint8_t)(asset_display_height(a)/8u);
   artist_line(row,a);row=(uint8_t)(row+2u);
-  for(uint8_t i=0;i<a->title_rows;i++)text8((uint8_t)(row+i),a->title[i]);
-  row=(uint8_t)(row+a->title_rows);text8(row,a->date);
+  uint8_t title_rows=asset_title_rows(a);
+  for(uint8_t i=0;i<title_rows;i++)text8((uint8_t)(row+i),a->title[i]);
+  row=(uint8_t)(row+title_rows);text8(row,a->date);
   if(status)text8((uint8_t)(row+1u),status);
 }
 static void progress_line(const char *phase,uint16_t done,uint16_t total){
@@ -735,14 +755,15 @@ static void palette(const GalleryAsset*a){
   c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
 }
 static uint8_t upload_image(const GalleryAsset*a){
-  for(uint8_t ty=0;ty<a->tile_rows;ty++){
+  uint8_t tile_rows=asset_rows(a),tile_cols=asset_cols(a);
+  for(uint8_t ty=0;ty<tile_rows;ty++){
     if(nav_cancel)return 0;
-    for(uint8_t tx=0;tx<a->tile_cols;tx++)for(uint8_t y=0;y<8;y++)for(uint8_t x=0;x<8;x++){
+    for(uint8_t tx=0;tx<tile_cols;tx++)for(uint8_t y=0;y<8;y++)for(uint8_t x=0;x<8;x++){
       uint16_t py=(uint16_t)ty*8u+y;
       uint16_t px=(uint16_t)tx*8u+x;
       chrbuf[(uint16_t)tx*64u+(uint16_t)y*8u+x]=(py<a->height&&px<a->width)?FB_A[py*a->width+px]:0;
     }
-    uint16_t n=(uint16_t)a->tile_cols*64u;
+    uint16_t n=(uint16_t)tile_cols*64u;
     REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(64u+(uint16_t)ty*n);REG_DMAP0=0;REG_BBAD0=0x19;
     REG_A1T0L=(uint8_t)(uintptr_t)chrbuf;REG_A1T0H=(uint8_t)((uintptr_t)chrbuf>>8);REG_A1B0=0;
     REG_DAS0L=(uint8_t)n;REG_DAS0H=(uint8_t)(n>>8);REG_MDMAEN=1;
@@ -762,22 +783,24 @@ static uint8_t unpack_slide(const GalleryAsset*a){
 __attribute__((noinline))
 static uint8_t prepare_slide(const GalleryAsset*a){
   active_asset=a;REG_HDMAEN=0;REG_INIDISP=INIDISP_FORCE_BLANK;
-  m7_set_matrix(a->matrix_scale,0,0,a->matrix_scale);
+  uint8_t scale=asset_matrix_scale(a),shown_h=asset_display_height(a);
+  m7_set_matrix(scale,0,0,scale);
   m7_tilemap_clear(0,(uint16_t)(uintptr_t)&zero,M7_TILEMAP_WORDS);
-  for(uint8_t ty=0;ty<a->tile_rows;ty++)for(uint8_t tx=0;tx<a->tile_cols;tx++)
-    m7_tilemap_set((uint16_t)((uint16_t)ty*128u+tx),(uint8_t)(1u+ty*a->tile_cols+tx));
-  uint16_t render_w=((uint16_t)a->width*256u)/a->matrix_scale;
-  uint16_t render_h=((uint16_t)a->height*256u)/a->matrix_scale;
+  uint8_t tile_rows=asset_rows(a),tile_cols=asset_cols(a);
+  for(uint8_t ty=0;ty<tile_rows;ty++)for(uint8_t tx=0;tx<tile_cols;tx++)
+    m7_tilemap_set((uint16_t)((uint16_t)ty*128u+tx),(uint8_t)(1u+ty*tile_cols+tx));
+  uint16_t render_w=((uint16_t)a->width*256u)/scale;
+  uint16_t render_h=((uint16_t)a->height*256u)/scale;
   m7_set_center(0,0);m7_set_scroll((int16_t)(-((int16_t)(256u-render_w)/2)),
-                                  (int16_t)(-((int16_t)(a->display_height-render_h)/2)));
+                                  (int16_t)(-((int16_t)(shown_h-render_h)/2)));
   if(!upload_image(a))return 0;
   palette(a);caption(a,0);
   arrow_anim=0;arrow_direction=0;arrow_previous_direction=0;arrow_pose=ARROW_L_REST;
   arrow_position=0;arrow_velocity=0;
-  arrow_anim_y=(uint8_t)(a->display_height/2u-8u);
+  arrow_anim_y=(uint8_t)(shown_h/2u-8u);
   oam_arrows(arrow_anim_y,0);
   if(nav_cancel)return 0;
-  split_arm(a->display_height);REG_INIDISP=INIDISP_ON;
+  split_arm(shown_h);REG_INIDISP=INIDISP_ON;
   gallery_current_asset=(uint8_t)(a-GALLERY_ASSETS);
   return 1;
 }
@@ -863,13 +886,13 @@ static uint8_t nav_target(uint8_t k){
   if(r==1u){
     if(arrow_anim&&arrow_direction!=1u)arrow_previous_direction=arrow_direction;
     arrow_direction=1;arrow_position=0;arrow_velocity=ARROW_TAKEOFF;arrow_anim=1;
-    arrow_anim_y=(uint8_t)(active_asset->display_height/2u-8u);
+    arrow_anim_y=(uint8_t)(asset_display_height(active_asset)/2u-8u);
     return (uint8_t)(k+1u==GALLERY_ASSET_COUNT?0u:k+1u);
   }
   if(r==2u){
     if(arrow_anim&&arrow_direction!=2u)arrow_previous_direction=arrow_direction;
     arrow_direction=2;arrow_position=0;arrow_velocity=ARROW_TAKEOFF;arrow_anim=1;
-    arrow_anim_y=(uint8_t)(active_asset->display_height/2u-8u);
+    arrow_anim_y=(uint8_t)(asset_display_height(active_asset)/2u-8u);
     return (uint8_t)(k? k-1u:GALLERY_ASSET_COUNT-1u);
   }
   return k;

@@ -135,6 +135,12 @@ def cbytes(name, data, cols=16):
 def main():
     DERIVED.mkdir(parents=True,exist_ok=True)
     SOURCE_DIR.mkdir(parents=True,exist_ok=True)
+    # The manifest is authoritative. Without pruning, removed works remain in
+    # wildcard-based host-oracle runs and make the reported corpus disagree
+    # with the generated header, ROM, contact sheet, and web catalog.
+    for pattern in ("*.idx", "*.pal", "*.lz", "*-web.png"):
+        for stale in DERIVED.glob(pattern):
+            stale.unlink()
     spec=json.loads(SOURCES.read_text())
     report=[]; arrays=[]; desc=[]; previews=[]
     works=[w for w in spec["works"] if w.get("enabled",True)]
@@ -172,7 +178,10 @@ def main():
             im=Image.open(io.BytesIO(source)).convert("RGB")
         except Exception as e:
             raise SystemExit(f"{w['slug']}: source is not a valid image: {e}")
-        if len(source)<16384 or min(im.size)<600:
+        # Tall scrolls and murals can have a smaller short edge while still
+        # exceeding the gallery's <=256-pixel derived raster. Keep enough
+        # source resolution for a clean downsample without excluding them.
+        if len(source)<16384 or min(im.size)<384:
             raise SystemExit(f"{w['slug']}: source unexpectedly small: {len(source)} bytes, {im.size}")
         ow,oh=im.size
         shown_h=display_height(w)
@@ -184,7 +193,9 @@ def main():
         crop=(0,0,ow,oh)
         resized=im.resize((width,height),Image.Resampling.LANCZOS)
         q=resized.quantize(colors=ART_COLORS,method=Image.Quantize.MEDIANCUT,dither=Image.Dither.FLOYDSTEINBERG)
-        dense_pal=[tuple(q.getpalette()[i:i+3]) for i in range(0,ART_COLORS*3,3)]
+        qpal=list(q.getpalette() or [])
+        qpal += [0] * max(0, ART_COLORS * 3 - len(qpal))
+        dense_pal=[tuple(qpal[i:i+3]) for i in range(0,ART_COLORS*3,3)]
         pixels=bytes(ART_INDICES[x] for x in q.tobytes())
         colors=[(0,0,0)]*256
         for dst,color in zip(ART_INDICES,dense_pal): colors[dst]=color
@@ -194,6 +205,10 @@ def main():
         shown=indexed.resize((render_w,render_h),Image.Resampling.NEAREST)
         preview.paste(shown,((256-render_w)//2,(shown_h-render_h)//2))
         previews.append((w["slug"],preview))
+        # A compact, one-file-per-work catalog lets the website expose every
+        # candidate at a useful size instead of hiding them in a tall contact
+        # sheet. This is the exact indexed artwork the SNES displays.
+        preview.save(DERIVED/f"{w['slug']}-web.png",optimize=True)
         palbin=b"".join(bgr555(c).to_bytes(2,"little") for c in colors)
         packed,stats=lzss(pixels)
         assert unlzss(packed,len(pixels))==pixels
@@ -270,7 +285,7 @@ def main():
             corpus_oracle^=value
     hdr += [f"#define GALLERY_ASSET_COUNT {len(desc)}u",
             f"#define GALLERY_CORPUS_ORACLE 0x{corpus_oracle:04X}u",
-            "typedef struct { const GALLERY_FAR uint8_t *lz; const GALLERY_FAR uint8_t *pal; uint16_t raw_len,lz_len,checksum; uint8_t width,height,display_height,matrix_scale,tile_cols,tile_rows,title_rows,lz_bank,pal_bank; const char *artist_small_before,*artist_large,*artist_small_after,*date; const char *title[2]; } GalleryAsset;",
+            "typedef struct { const GALLERY_FAR uint8_t *lz; const GALLERY_FAR uint8_t *pal; uint16_t raw_len,lz_len,checksum; uint8_t width,height; const char *artist_small_before,*artist_large,*artist_small_after,*date; const char *title[2]; } GalleryAsset;",
             f"static const GalleryAsset GALLERY_ASSETS[{len(desc)}] = {{"]
     folds={item["slug"]:item["checksum"] for item in report}
     for symbol,w,raw,packed,order,width,height,shown_h,scale,cols,rows in desc:
@@ -279,10 +294,16 @@ def main():
         assert len(before)*8 + len(large)*16 + len(after)*8 <= 256
         tt=w["display_title"]+[""]
         fold=folds[w["slug"]]
-        hdr.append(f'  {{gallery_{symbol}_lz,gallery_{symbol}_pal,{raw},{packed},0x{fold:04X},{width},{height},{shown_h},{scale},{cols},{rows},{len(w["display_title"])},{lzbank},{palbank},"{before}","{large}","{after}","{w["display_date"]}",{{"{tt[0]}","{tt[1]}"}},}},')
+        hdr.append(f'  {{gallery_{symbol}_lz,gallery_{symbol}_pal,{raw},{packed},0x{fold:04X},{width},{height},"{before}","{large}","{after}","{w["display_date"]}",{{"{tt[0]}","{tt[1]}"}},}},')
     hdr += ["};","#endif"]
     (ROOT/"examples/snes/lzss-gallery-assets.h").write_text("\n".join(hdr)+"\n")
     (DERIVED/"report.json").write_text(json.dumps(report,indent=2)+"\n")
+    catalog=[{
+        "slug":item["slug"],"artist":item["artist"],"title":item["title"],
+        "date":item["date"],"object_url":item["object_url"],
+        "preview":f"/play/preview/lzss-gallery/{item['slug']}-web.png",
+    } for item in report]
+    (DERIVED/"catalog.json").write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+"\n")
     sheet=Image.new("RGB",(512,math.ceil(len(previews)/2)*224),(16,16,16))
     for i,(slug,preview) in enumerate(previews):
         x=(i%2)*256;y=(i//2)*224
