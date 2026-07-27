@@ -8,7 +8,9 @@ BANKS_PER_MIB = 32
 
 CSS = """
 :root{color-scheme:dark;--bg:#100f0d;--panel:#1d1a16;--ink:#f4ead6;--muted:#a99d8a;
---code:#e4a853;--stream:#65b7a6;--palette:#f0d277;--shared:#7dd3fc;--free:#302b25;--rule:#4b4338}
+--code:#e4a853;--stream:#65b7a6;--palette:#f0d277;--shared:#7dd3fc;--free:#302b25;--rule:#4b4338;
+--b0strings:#d17bd8;--b0desc:#7da4ed;--b0lookup:#e68d68;--b0const:#94a36b;
+--b0init:#b78a57;--b0system:#efc86f}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 ui-monospace,monospace}
 main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4dc;font:700 28px/1.1 system-ui}
 .lede,.detail,.note{color:var(--muted)}.summary,.legend{display:flex;gap:12px;flex-wrap:wrap;margin:17px 0}
@@ -16,18 +18,24 @@ main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4
 .key:before{content:"";display:inline-block;width:12px;height:12px;background:var(--c);margin-right:7px;vertical-align:-2px}
 .locked{margin:12px 0 20px;border:2px solid var(--code);border-radius:9px;background:var(--panel);overflow:hidden}
 .locked .row,.head{display:flex;justify-content:space-between;padding:9px 11px}.locked .row{border-bottom:1px solid var(--rule)}
+.bank0-list{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:0 18px;padding:9px 11px}
+.bank0-item{display:grid;grid-template-columns:12px 1fr auto;gap:7px;padding:3px 0;border-bottom:1px solid #ffffff0b}
+.swatch{width:10px;height:10px;margin-top:4px;background:var(--c)}.bank0-item code{color:var(--muted)}
 .cart{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:10px}.bank{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
 .head{border-bottom:1px solid var(--rule)}.num,.title{font-weight:800;color:#fff4dc}
 .used{display:grid;text-align:right;color:var(--muted)}.used span{white-space:nowrap}
 .bar{height:45px;display:flex;background:var(--free)}.seg{height:100%;min-width:1px}.stream{background:var(--stream)}
 .palette{background:var(--palette)}.shared{background:var(--shared)}.free{background:var(--free)}.label{padding:8px 10px;min-height:91px}
+.code{background:var(--code)}.b0strings{background:var(--b0strings)}.b0desc{background:var(--b0desc)}
+.b0lookup{background:var(--b0lookup)}.b0const{background:var(--b0const)}
+.b0init{background:var(--b0init)}.b0system{background:var(--b0system)}
 .item{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reserve{opacity:.55}
 .boundary{grid-column:1/-1;display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;
 color:var(--palette);font-weight:800;letter-spacing:.04em;margin:7px 0}
 .boundary:before,.boundary:after{content:"";height:2px;background:linear-gradient(90deg,transparent,var(--palette))}
 .boundary:after{background:linear-gradient(90deg,var(--palette),transparent)}
 .note{margin-top:18px;border-left:3px solid var(--palette)}@media(max-width:980px){.cart{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:620px){.cart{grid-template-columns:1fr}}
+@media(max-width:620px){.cart{grid-template-columns:1fr}.bank0-list{grid-template-columns:1fr}}
 """
 
 def map_data(path: pathlib.Path) -> tuple[dict[str, int], dict[str, tuple[int, int]]]:
@@ -36,7 +44,7 @@ def map_data(path: pathlib.Path) -> tuple[dict[str, int], dict[str, tuple[int, i
     pattern = re.compile(r"^\s*[0-9a-f]+\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+(\.\S+)")
     symbol_pattern = re.compile(
         r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+"
-        r"(gallery_\S+_(?:lz|pal)|FONT8|FONT16)$")
+        r"(gallery_\S+_(?:lz|pal)|FONT8|FONT16|GALLERY_ASSETS|SINCOS)$")
     for line in path.read_text().splitlines():
         if m := pattern.match(line):
             sections[m.group(2)] = int(m.group(1), 16)
@@ -102,8 +110,43 @@ def main() -> None:
         packed.setdefault(bank, []).append(
             ((addr & 0xffff)-0x8000,symbol,size,"shared"))
     assert max(packed, default=0) < banks
-    bank0 = sections.get(".text", 0) + sections.get(".rodata", 0)
-    bank0 += sum(v for k, v in sections.items() if k.startswith(".snes_"))
+    section_rows={}
+    section_re=re.compile(
+        r"^\s*([0-9a-f]+)\s+([0-9a-f]+)\s+([0-9a-f]+)\s+\d+\s+(\.\S+)$")
+    for line in args.mapfile.read_text().splitlines():
+        if m := section_re.match(line):
+            section_rows[m.group(4)]=tuple(int(m.group(i),16) for i in (1,2,3))
+    text_vma,_,text_size=section_rows[".text"]
+    ro_vma,_,ro_size=section_rows[".rodata"]
+    desc_addr,desc_size=symbols["GALLERY_ASSETS"]
+    sin_addr,sin_size=symbols["SINCOS"]
+    zp_vma,zp_lma,zp_size=section_rows[".zp.data"]
+    header_vma,_,header_size=section_rows[".snes_header"]
+    nv_vma,_,nv_size=section_rows[".snes_vectors_native"]
+    ev_vma,_,ev_size=section_rows[".snes_vectors_emu"]
+    bank0_parts=[
+        ("Runtime code",text_vma,text_size,"code"),
+        ("Strings",ro_vma,desc_addr-ro_vma,"b0strings"),
+        ("Gallery descriptors",desc_addr,desc_size,"b0desc"),
+        ("Sine/cosine table",sin_addr,sin_size,"b0lookup"),
+        ("Other constants",sin_addr+sin_size,ro_vma+ro_size-(sin_addr+sin_size),"b0const"),
+        ("WRAM initializers",zp_lma,zp_size,"b0init"),
+        ("Unallocated",zp_lma+zp_size,header_vma-(zp_lma+zp_size),"free"),
+        ("SNES header",header_vma,header_size,"b0system"),
+        ("Native vectors",nv_vma,nv_size,"b0system"),
+        ("Emulation vectors",ev_vma,ev_size,"b0system"),
+    ]
+    bank0_used=sum(size for name,_,size,kind in bank0_parts if kind!="free")
+    bank0_free=sum(size for name,_,size,kind in bank0_parts if kind=="free")
+    bank0_bar="".join(
+        f'<span class="seg {kind}" style="width:{size/BANK_BYTES*100:.4f}%" '
+        f'title="{html.escape(name)}: {size:,} bytes"></span>'
+        for name,_,size,kind in bank0_parts)
+    bank0_list="".join(
+        f'<div class="bank0-item"><span class="swatch" style="--c:var(--{kind if kind in ("code","free") else kind})"></span>'
+        f'<span>{html.escape(name)} <code>$00:{addr:04X}–{addr+size-1:04X}</code></span>'
+        f'<strong>{size:,} B</strong></div>'
+        for name,addr,size,kind in bank0_parts)
     cards = []
     for bank in range(1, banks):
         cards.append(bank_card(bank, packed.get(bank, [])))
@@ -126,11 +169,11 @@ def main() -> None:
 <span class="key" style="--c:var(--stream)">LZSS stream</span><span class="key" style="--c:var(--palette)">512-byte palette</span>
 <span class="key" style="--c:var(--shared)">shared font data</span>
 <span class="key" style="--c:var(--free)">free / padding</span></div>
-<section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong><span>{bank0:,} used · {BANK_BYTES-bank0:,} free</span></div>
-<div class="bar"><span class="seg" style="width:{bank0/BANK_BYTES*100:.4f}%;background:var(--code)"></span>
-<span class="seg free" style="width:{(BANK_BYTES-bank0)/BANK_BYTES*100:.4f}%"></span></div>
-<div class="label">Runtime, startup, navigation, descriptors, tables, header, and vectors.
-No artwork stream or palette is eligible for this bank.</div></section>
+<section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong>
+<span>{bank0_used:,} used · {bank0_free:,} free</span></div>
+<div class="bar">{bank0_bar}</div><div class="bank0-list">{bank0_list}</div>
+<div class="label">Physical ROM-address breakdown from the final linker map. Writable BSS/WRAM is
+not cartridge content. No packed stream, palette, font, or static graphic is eligible for this bank.</div></section>
 <div class="cart">{''.join(cards)}</div>
 <p class="note"><strong>Algorithm:</strong> stable first-fit decreasing. Sort streams and palettes
 largest-to-smallest, retain manifest order as the tie-breaker, and place each item in the first
