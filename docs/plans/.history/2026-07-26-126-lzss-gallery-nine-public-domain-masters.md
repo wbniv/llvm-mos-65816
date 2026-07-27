@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/b7b6add) | docs: generate romopt cartridge map |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/97e4430) | docs: visualize romopt asset packing |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/e8102ca) | fix: isolate gallery overlay palette |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/237c5a5) | feat: expand Mode 7 LZSS gallery |
@@ -8,6 +9,10 @@
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/5ac833b) | feat: expand LZSS gallery to 19 works |
 
 <!--history-meta v1
+b7b6add	author	Will Norris
+b7b6add	added	12
+b7b6add	deleted	0
+b7b6add	files	1
 97e4430	author	Will Norris
 97e4430	added	4
 97e4430	deleted	0

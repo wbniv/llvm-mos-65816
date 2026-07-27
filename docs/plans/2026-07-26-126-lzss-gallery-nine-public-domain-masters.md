@@ -210,6 +210,9 @@ python3 tools/lzss-gallery-rom-layout.py \
 
 The renderer inserts a labeled divider after every 32 LoROM banks, marking each
 8 Mbit (1 MiB) cartridge boundary.
+`romopt` determines which items share a bank; it does not constrain their
+physical order inside that bank. The visualization reads symbol addresses from
+the final linker map and therefore shows the linker's actual ordering.
 
 The current result uses ten asset banks:
 

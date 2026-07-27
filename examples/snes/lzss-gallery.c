@@ -42,6 +42,8 @@ volatile uint8_t gallery_current_asset;
 volatile uint16_t gallery_canceled;
 volatile uint16_t gallery_last_z;
 volatile uint8_t gallery_last_work,gallery_last_ok;
+volatile uint8_t arrow_anim,arrow_anim_phase,arrow_anim_y,arrow_anim_offset;
+volatile uint8_t arrow_direction;
 static uint16_t gallery_z[GALLERY_ASSET_COUNT];
 static uint8_t gallery_done[GALLERY_ASSET_COUNT];
 static uint8_t gallery_failed[GALLERY_ASSET_COUNT];
@@ -52,10 +54,8 @@ static uint16_t objchr[64];
 static uint8_t bgmode_tab[7], tm_tab[7];
 static const uint8_t zero=0;
 static const GalleryAsset *active_asset;
-static uint8_t directed_load_status;
 static uint16_t viz_pos,viz_dist,viz_out;
 static uint8_t viz_len,viz_literal;
-static uint8_t arrow_flash;
 
 asm(".text\n"
     ".global nmi\n"
@@ -98,6 +98,63 @@ asm(".text\n"
     "2:\n"
     "  lda nav_pad_now\n"
     "  sta nav_pad_previous\n"
+    /*
+     * Animate only the accepted direction during decode.  OAM writes happen
+     * here in NMI/VBlank, so the moving overlay cannot corrupt either arrow.
+     */
+    "  lda arrow_anim\n"
+    "  beq 9f\n"
+    "  inc arrow_anim_phase\n"
+    "  lda arrow_anim_phase\n"
+    "  and #$07\n"
+    "  cmp #$04\n"
+    "  bcc 3f\n"
+    "  eor #$07\n"
+    "3:\n"
+    "  sta arrow_anim_offset\n"
+    "  lda arrow_direction\n"
+    "  cmp #$02\n"
+    "  beq 4f\n"
+    "  lda #$02\n"              /* right-arrow OAM word address */
+    "  sta $2102\n"
+    "  lda #$00\n"
+    "  sta $2103\n"
+    "  lda #$ee\n"              /* x = 238 */
+    "  sta $2104\n"
+    "  clv\n"
+    "  bvc 5f\n"
+    "4:\n"
+    "  lda #$00\n"              /* left-arrow OAM word address */
+    "  sta $2102\n"
+    "  sta $2103\n"
+    "  lda #$02\n"
+    "  sta $2104\n"
+    "5:\n"
+    "  lda arrow_anim_y\n"
+    "  sec\n"
+    "  sbc arrow_anim_offset\n"
+    "  sta $2104\n"
+    "  lda arrow_anim_phase\n"
+    "  and #$03\n"
+    "  beq 6f\n"
+    "  lda #$49\n"              /* bright 16x16 chevron at tiles 73/74/89/90 */
+    "  clv\n"
+    "  bvc 7f\n"
+    "6:\n"
+    "  lda #$40\n"              /* normal gold chevron */
+    "7:\n"
+    "  sta $2104\n"
+    "  lda arrow_direction\n"
+    "  cmp #$02\n"
+    "  beq 8f\n"
+    "  lda #$70\n"              /* right: horizontal flip */
+    "  clv\n"
+    "  bvc 3f\n"
+    "8:\n"
+    "  lda #$30\n"              /* left */
+    "3:\n"
+    "  sta $2104\n"
+    "9:\n"
     "  .byte $c2, $20\n"
     "  pla\n"
     "  plp\n"
@@ -235,6 +292,18 @@ static void load_chevrons(void){
   }
   vram_words(0x6400u,objchr,32);
   vram_words(0x6500u,objchr+32,32);
+  /*
+   * Bright chevron copy: remap normal colors 1/2 to reserved colors 4/5.
+   * Tile 73 is laid out as 73/74 + 89/90 by the SNES 16x16 OBJ rule.
+   */
+  for(uint8_t tile=0;tile<4;tile++)for(uint8_t y=0;y<8;y++){
+    uint16_t q=objchr[(uint16_t)tile*16u+y];
+    uint8_t p0=(uint8_t)q,p1=(uint8_t)(q>>8);
+    objchr[(uint16_t)tile*16u+y]=p1;
+    objchr[(uint16_t)tile*16u+8u+y]=(uint16_t)(p0|p1);
+  }
+  vram_words(0x6490u,objchr,32);
+  vram_words(0x6590u,objchr+32,32);
   /* 8x8 compression outline: cyan box used as single/cap/span sprites. */
   for(uint8_t y=0;y<8;y++){
     uint8_t p=(uint8_t)((y==0u||y==7u)?0xffu:0x81u);
@@ -259,8 +328,8 @@ static void oam_init(void){
 static void oam_arrows(uint8_t y,uint8_t hide){
   if(hide)y=240;
   REG_OAMADDL=0;REG_OAMADDH=0;
-  REG_OAMDATA=(uint8_t)(arrow_flash==2u?0u:2u);REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=(uint8_t)(0x30u|(arrow_flash==2u?2u:0u));
-  REG_OAMDATA=(uint8_t)(arrow_flash==1u?240u:238u);REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=(uint8_t)(0x70u|(arrow_flash==1u?2u:0u));
+  REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=0x30;
+  REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=64;REG_OAMDATA=0x70;
   REG_OAMADDL=0;REG_OAMADDH=1;REG_OAMDATA=0x0a;
 }
 static void oam_hide_compression(void){
@@ -357,11 +426,6 @@ static void progress_line(const char *phase,uint16_t done,uint16_t total){
   REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)(row+2u)*32u);
   for(uint8_t i=0;i<32;i++)REG_VMDATA=0;text8((uint8_t)(row+2u),s);
 }
-static void status_text(const char*s){
-  uint8_t row=console_row(active_asset);
-  snes_wait_vblank();REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)row*32u);
-  for(uint8_t i=0;i<32;i++)REG_VMDATA=0;text8(row,s);
-}
 static uint8_t decimal(char*s,uint8_t n,uint16_t v){
   char r[5];uint8_t k=0;do{r[k++]=(char)('0'+v%10u);v/=10u;}while(v&&k<5);
   while(k)s[n++]=r[--k];return n;
@@ -437,7 +501,10 @@ static uint8_t prepare_slide(const GalleryAsset*a){
   m7_set_center(0,0);m7_set_scroll((int16_t)(-((int16_t)(256u-render_w)/2)),
                                   (int16_t)(-((int16_t)(a->display_height-render_h)/2)));
   if(!upload_image(a))return 0;
-  palette(a);caption(a,0);oam_arrows((uint8_t)(a->display_height/2u-8u),0);
+  palette(a);caption(a,0);
+  arrow_anim=0;arrow_direction=0;arrow_anim_phase=0;
+  arrow_anim_y=(uint8_t)(a->display_height/2u-8u);
+  oam_arrows(arrow_anim_y,0);
   if(nav_cancel)return 0;
   split_arm(a->display_height);REG_INIDISP=INIDISP_ON;
   gallery_current_asset=(uint8_t)(a-GALLERY_ASSETS);
@@ -507,7 +574,7 @@ static uint16_t record_result(const GalleryAsset*a,uint8_t k,uint16_t z,uint16_t
 
 __attribute__((noinline))
 static uint8_t spinout(void){
-  snes_wait_vblank();oam_arrows(0,1);
+  snes_wait_vblank();if(!arrow_anim)oam_arrows(0,1);
   m7_set_center((uint16_t)(active_asset->width/2u),(uint16_t)(active_asset->height/2u));
   m7_set_scroll(0,0);
   for(uint8_t f=0;f<32;f++){if(nav_cancel)return 0;uint8_t angle=(uint8_t)(f*2u);int16_t co=SINCOS[(uint8_t)(angle+64u)];int16_t si=SINCOS[angle];
@@ -517,20 +584,17 @@ static uint8_t spinout(void){
 
 static uint8_t nav_target(uint8_t k){
   uint8_t r=nav_request;nav_request=0;nav_cancel=0;
-  gallery_canceled++;directed_load_status=1;
+  gallery_canceled++;
   if(r==1u){
-    arrow_flash=1;oam_arrows((uint8_t)(active_asset->display_height/2u-8u),0);
-    status_text("LOADING NEXT...");for(uint8_t i=0;i<3;i++)snes_wait_vblank();arrow_flash=0;
-    oam_arrows((uint8_t)(active_asset->display_height/2u-8u),0);
+    arrow_direction=1;arrow_anim_phase=0;arrow_anim=1;
+    arrow_anim_y=(uint8_t)(active_asset->display_height/2u-8u);
     return (uint8_t)(k+1u==GALLERY_ASSET_COUNT?0u:k+1u);
   }
   if(r==2u){
-    arrow_flash=2;oam_arrows((uint8_t)(active_asset->display_height/2u-8u),0);
-    status_text("LOADING PREVIOUS...");for(uint8_t i=0;i<3;i++)snes_wait_vblank();arrow_flash=0;
-    oam_arrows((uint8_t)(active_asset->display_height/2u-8u),0);
+    arrow_direction=2;arrow_anim_phase=0;arrow_anim=1;
+    arrow_anim_y=(uint8_t)(active_asset->display_height/2u-8u);
     return (uint8_t)(k? k-1u:GALLERY_ASSET_COUNT-1u);
   }
-  status_text("LOADING AGAIN...");
   return k;
 }
 
@@ -557,8 +621,6 @@ int main(void){
        * decoded.  Previously spinout ran first and left only a collapsed,
        * effectively black Mode 7 plane throughout this work.
        */
-      if(!directed_load_status)status_text("LOADING NEXT...");
-      directed_load_status=0;
       t=clock_read();ok=unpack_slide(a);
       if(nav_cancel){k=nav_target(k);continue;}
       gallery_unpack_frames[k]=(uint16_t)(clock_read()-t);
