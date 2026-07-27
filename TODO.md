@@ -32,13 +32,23 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 ## Open
 
-- [T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card.** The
+- [T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card — now
+  ALSO carries the 19 F1 atomic-flush tear fixes (2026-07-27).** The
   title-card fix (`5f51be1` per-line HDMA bands + gravity exit, `e1a58f9` the `_`/`^` glyphs and
   lowercase folding) is header-only, so every demo needs a rebuild to pick it up — the ROMs already
   on biohack.net still show both lines arriving from both edges, `G_FCOPYSIGN` as `G FCOPYSIGN`, and
   julia's `Z^2 + C` as `Z 2 + C`. Bulk rebuild + re-run each `dev/<slug>.sh` gate + re-publish via
   `/snes-rom-page`. Note the intro is ~6 frames shorter than before, well inside the demos'
-  fixed-frame screenshot margins, but the published preview PNGs will change.
+  fixed-frame screenshot margins, but the published preview PNGs will change. **F1 addition
+  (`673cb42`, [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md)): the 19 patched
+  demos' `corpus_result` WRAM offsets MOVED (most `0x31`, `rotkal` `0x13F2`) — regenerate each
+  manifest selfcheck `off` from the fresh `.map` at publish; `dev/verify-web-roms.sh` gates the lot.**
+- [T4] **60 fps Batch B — F2 scroll-rings for `ovmove`, `mvscrl`, `truncstair` (+`lfsr2` if its
+  drift is a real translation).** Apply the #99c HDMA scroll-ring design per demo (V-ring for the
+  memmove pair — the memmove stress stays, only the display repaint goes; H-bands for truncstair's
+  ramp). Batch C rides along: F3 stall hunts on any Batch-A demo whose paint frame still overruns.
+  [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md) ·
+  [#99c pattern](docs/plans/2026-07-27-99c-trimerge-60fps-scroll-waterfall.md)
 
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
