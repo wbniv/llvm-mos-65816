@@ -6,55 +6,55 @@ treemap-beta
   "Q0 · $00-$07 · 256 KiB · 7 occupied + system · 228,307 B gallery":::quadrant
     "$00-$01 · 64 KiB · system pair":::cell
       "$00 SYSTEM · CODE / RODATA / HEADER": 32768:::system
-      "$01 STACK WHEAT + THISTLES · 32,752 used · 16 free": 32768:::critical
+      "$01 THISTLES + STACK WHEAT · 32,752 used · 16 free": 32768:::critical
     "$02-$03 · 64 KiB · 65,463 B gallery":::cell
       "$02 STARRY NIGHT + THAI RAVAN PALACE · 32,746 used · 22 free": 32768:::critical
       "$03 SELF PORTRAIT + SUNFLOWERS · 32,717 used · 51 free": 32768:::tight
     "$04-$05 · 64 KiB · 65,254 B gallery":::cell
-      "$04 SUNSET WOODS + THE WILLOWS · 32,749 used · 19 free": 32768:::critical
+      "$04 THE WILLOWS + SUNSET WOODS · 32,749 used · 19 free": 32768:::critical
       "$05 EARTHLY DELIGHTS + ICE SKATERS · 32,505 used · 263 free": 32768:::packed
     "$06-$07 · 64 KiB · 64,838 B gallery":::cell
-      "$06 MOUNTAIN WATERFALL + THAI ELEPHANT DUEL · 32,284 used · 484 free": 32768:::packed
+      "$06 THAI ELEPHANT DUEL + MOUNTAIN WATERFALL · 32,284 used · 484 free": 32768:::packed
       "$07 DRAGON + LOUVRE RAIN · 32,554 used · 214 free": 32768:::tight
   "Q1 · $08-$0F · 256 KiB · 8 occupied · 259,964 B gallery":::quadrant
     "$08-$09 · 64 KiB · 64,781 B gallery":::cell
       "$08 PANTHEON INTERIOR + THAI BUDDHA DESCENDING + 2 pal · 32,479 used · 289 free": 32768:::packed
-      "$09 THE KISS + THAI HANUMAN LONGKA + 2 pal · 32,302 used · 466 free": 32768:::packed
+      "$09 THAI HANUMAN LONGKA + THE KISS + 2 pal · 32,302 used · 466 free": 32768:::packed
     "$0A-$0B · 64 KiB · 65,295 B gallery":::cell
-      "$0A HOME HERON + THAI HANUMAN + 3 pal · 32,621 used · 147 free": 32768:::tight
-      "$0B TABLEAU VII + MORTLAKE TERRACE + 4 pal · 32,674 used · 94 free": 32768:::tight
+      "$0A THAI HANUMAN + HOME HERON + 3 pal · 32,621 used · 147 free": 32768:::tight
+      "$0B MORTLAKE TERRACE + TABLEAU VII + 4 pal · 32,674 used · 94 free": 32768:::tight
     "$0C-$0D · 64 KiB · 65,155 B gallery":::cell
       "$0C SCHOLAR LANDSCAPE + TORNADO FOREST + 4 pal · 32,610 used · 158 free": 32768:::tight
       "$0D GREAT WAVE + THE SCREAM + 4 pal · 32,545 used · 223 free": 32768:::tight
     "$0E-$0F · 64 KiB · 64,733 B gallery":::cell
       "$0E BASKET APPLES + PARIS STREET + 4 pal · 32,419 used · 349 free": 32768:::packed
-      "$0F HOUSES PARLIAMENT + THAI RAVANA WAR + 4 pal · 32,314 used · 454 free": 32768:::packed
+      "$0F THAI RAVANA WAR + HOUSES PARLIAMENT + 4 pal · 32,314 used · 454 free": 32768:::packed
   "Q2 · $10-$17 · 256 KiB · 8 occupied · 253,089 B gallery":::quadrant
     "$10-$11 · 64 KiB · 64,863 B gallery":::cell
-      "$10 WATER LILIES + WIDE RIVER + 5 pal · 32,539 used · 229 free": 32768:::tight
-      "$11 GRANDE JATTE + MARLY LE ROI + 5 pal · 32,324 used · 444 free": 32768:::packed
+      "$10 WIDE RIVER + WATER LILIES + 5 pal · 32,539 used · 229 free": 32768:::tight
+      "$11 MARLY LE ROI + GRANDE JATTE + 5 pal · 32,324 used · 444 free": 32768:::packed
     "$12-$13 · 64 KiB · 65,035 B gallery":::cell
       "$12 POPPY FIELD + THIRD OF MAY + 6 pal · 32,541 used · 227 free": 32768:::tight
-      "$13 WIJK WINDMILL + WOODED MERRYMAKERS + 7 pal · 32,494 used · 274 free": 32768:::packed
+      "$13 WOODED MERRYMAKERS + WIJK WINDMILL + 7 pal · 32,494 used · 274 free": 32768:::packed
     "$14-$15 · 64 KiB · 65,253 B gallery":::cell
       "$14 STORMY SUNSET + MOUNT AKIHA · 32,750 used · 18 free": 32768:::critical
-      "$15 VOYAGE YOUTH + FUJISAWA SHUKU + 8 pal · 32,503 used · 265 free": 32768:::packed
+      "$15 FUJISAWA SHUKU + VOYAGE YOUTH + 8 pal · 32,503 used · 265 free": 32768:::packed
     "$16-$17 · 64 KiB · 57,938 B gallery":::cell
-      "$16 FOG MOUNT DESERT + APPROACH VENICE + 4 pal · 30,099 used · 2,669 free": 32768:::used
-      "$17 THAI TEMPLE PAINTING + THAI SURASA HANUMAN · 27,839 used · 4,929 free": 32768:::used
+      "$16 APPROACH VENICE + FOG MOUNT DESERT + 4 pal · 30,099 used · 2,669 free": 32768:::used
+      "$17 THAI SURASA HANUMAN + THAI TEMPLE PAINTING · 27,839 used · 4,929 free": 32768:::used
   "Q3 · $18-$1F · 256 KiB · 8 occupied · 209,853 B gallery":::quadrant
     "$18-$19 · 64 KiB · 54,958 B gallery":::cell
       "$18 FLOWER STILL LIFE + WIVENHOE PARK · 27,649 used · 5,119 free": 32768:::used
-      "$19 ST ODULPHUS + HARVEST MOON · 27,309 used · 5,459 free": 32768:::used
+      "$19 HARVEST MOON + ST ODULPHUS · 27,309 used · 5,459 free": 32768:::used
     "$1A-$1B · 64 KiB · 53,478 B gallery":::cell
       "$1A RIVER MOONLIGHT + SHIPS CALM · 26,850 used · 5,918 free": 32768:::used
-      "$1B VOYAGE MANHOOD + KEELMEN MOONLIGHT · 26,628 used · 6,140 free": 32768:::used
+      "$1B KEELMEN MOONLIGHT + VOYAGE MANHOOD · 26,628 used · 6,140 free": 32768:::used
     "$1C-$1D · 64 KiB · 51,840 B gallery":::cell
       "$1C SAILING VESSELS + BUFFALO STORM · 26,220 used · 6,548 free": 32768:::used
       "$1D VOYAGE CHILDHOOD + VOYAGE OLD AGE · 25,620 used · 7,148 free": 32768:::used
     "$1E-$1F · 64 KiB · 49,577 B gallery":::cell
-      "$1E MOUNT CORCORAN + GRAND CANAL MOLO · 24,914 used · 7,854 free": 32768:::used
-      "$1F VIEW OF DELFT + NIAGARA · 24,663 used · 8,105 free": 32768:::used
+      "$1E GRAND CANAL MOLO + MOUNT CORCORAN · 24,914 used · 7,854 free": 32768:::used
+      "$1F NIAGARA + VIEW OF DELFT · 24,663 used · 8,105 free": 32768:::used
 classDef root fill:#111827,stroke:#91b4d8,color:#f4f8ff,stroke-width:3px;
 classDef quadrant fill:#202b3d,stroke:#6784a0,color:#e8f1fa,stroke-width:2px;
 classDef cell fill:#17202c,stroke:#46596d,color:#bdcad6,stroke-width:1px;
@@ -70,35 +70,35 @@ classDef empty fill:#161c25,stroke:#303a48,color:#788796;
 
 | Bank | Contents | Stream | Palette | Used | Free |
 |---:|---|---:|---:|---:|---:|
-| `$01` | Stack of Wheat stream — 15,699<br/>Thistles stream — 17,053 | 32,752 | 0 | 32,752 | 16 |
+| `$01` | Thistles stream — 17,053<br/>Stack of Wheat stream — 15,699 | 32,752 | 0 | 32,752 | 16 |
 | `$02` | The Starry Night stream — 16,950<br/>Ravan in His Palace in Lanka stream — 15,796 | 32,746 | 0 | 32,746 | 22 |
 | `$03` | Self-Portrait stream — 16,922<br/>Sunflowers stream — 15,795 | 32,717 | 0 | 32,717 | 51 |
-| `$04` | Sunset in the Woods stream — 16,107<br/>The Willows stream — 16,642 | 32,749 | 0 | 32,749 | 19 |
+| `$04` | The Willows stream — 16,642<br/>Sunset in the Woods stream — 16,107 | 32,749 | 0 | 32,749 | 19 |
 | `$05` | The Garden of Earthly Delights stream — 16,459<br/>Winter Landscape with Ice Skaters stream — 16,046 | 32,505 | 0 | 32,505 | 263 |
-| `$06` | Mountainous Landscape with Waterfall stream — 15,903<br/>Naresuan of Ayutthaya's Elephant Duel with Mingyi Swa of Toungoo stream — 16,381 | 32,284 | 0 | 32,284 | 484 |
+| `$06` | Naresuan of Ayutthaya's Elephant Duel with Mingyi Swa of Toungoo stream — 16,381<br/>Mountainous Landscape with Waterfall stream — 15,903 | 32,284 | 0 | 32,284 | 484 |
 | `$07` | Dragon stream — 15,765<br/>The Louvre, Afternoon, Rainy Weather stream — 15,765<br/>8x8 font — 1,024 | 31,530 | 0 | 32,554 | 214 |
 | `$08` | Interior of the Pantheon, Rome stream — 15,760<br/>The Buddha Descending from Trayastrimsa Heaven at Sankissa stream — 15,695<br/>Under the Wave off Kanagawa palette — 512<br/>A Sunday on La Grande Jatte — 1884 palette — 512 | 31,455 | 1,024 | 32,479 | 289 |
-| `$09` | The Kiss (Lovers) stream — 15,625<br/>Hanuman Destroys the Golden City of Longka stream — 15,653<br/>Water Lilies palette — 512<br/>The Basket of Apples palette — 512 | 31,278 | 1,024 | 32,302 | 466 |
-| `$0A` | The Home of the Heron stream — 15,533<br/>Hanuman — Ramakien stream — 15,552<br/>Stack of Wheat palette — 512<br/>Self-Portrait palette — 512<br/>Paris Street; Rainy Day palette — 512 | 31,085 | 1,536 | 32,621 | 147 |
-| `$0B` | Tableau No. VII stream — 15,304<br/>Mortlake Terrace stream — 15,322<br/>Poppy Field (Giverny) palette — 512<br/>The Garden of Earthly Delights palette — 512<br/>The Scream palette — 512<br/>The Third of May 1808 palette — 512 | 30,626 | 2,048 | 32,674 | 94 |
+| `$09` | Hanuman Destroys the Golden City of Longka stream — 15,653<br/>The Kiss (Lovers) stream — 15,625<br/>Water Lilies palette — 512<br/>The Basket of Apples palette — 512 | 31,278 | 1,024 | 32,302 | 466 |
+| `$0A` | Hanuman — Ramakien stream — 15,552<br/>The Home of the Heron stream — 15,533<br/>Stack of Wheat palette — 512<br/>Self-Portrait palette — 512<br/>Paris Street; Rainy Day palette — 512 | 31,085 | 1,536 | 32,621 | 147 |
+| `$0B` | Mortlake Terrace stream — 15,322<br/>Tableau No. VII stream — 15,304<br/>Poppy Field (Giverny) palette — 512<br/>The Garden of Earthly Delights palette — 512<br/>The Scream palette — 512<br/>The Third of May 1808 palette — 512 | 30,626 | 2,048 | 32,674 | 94 |
 | `$0C` | Scholar in Landscape stream — 15,288<br/>Tornado in an American Forest stream — 15,274<br/>The Kiss (Lovers) palette — 512<br/>View of Delft palette — 512<br/>The Windmill at Wijk bij Duurstede palette — 512<br/>Flower Still Life palette — 512 | 30,562 | 2,048 | 32,610 | 158 |
 | `$0D` | Under the Wave off Kanagawa stream — 15,259<br/>The Scream stream — 15,238<br/>Sunflowers palette — 512<br/>Tableau No. VII palette — 512<br/>Winter Landscape with Ice Skaters palette — 512<br/>The Home of the Heron palette — 512 | 30,497 | 2,048 | 32,545 | 223 |
 | `$0E` | The Basket of Apples stream — 15,200<br/>Paris Street; Rainy Day stream — 15,171<br/>Dragon palette — 512<br/>Scholar in Landscape palette — 512<br/>Houses of Parliament, London palette — 512<br/>Thistles palette — 512 | 30,371 | 2,048 | 32,419 | 349 |
-| `$0F` | Houses of Parliament, London stream — 15,127<br/>Ravana Prepares for War with Rama stream — 15,139<br/>The Starry Night palette — 512<br/>River View by Moonlight palette — 512<br/>Mountainous Landscape with Waterfall palette — 512<br/>Wooded Landscape with Merrymakers in a Cart palette — 512 | 30,266 | 2,048 | 32,314 | 454 |
-| `$10` | Water Lilies stream — 14,958<br/>Panoramic View of a Wide River stream — 15,021<br/>Panoramic View of a Wide River palette — 512<br/>Sailing Vessels on an Inland Body of Water palette — 512<br/>Ships near the Coast during a Calm palette — 512<br/>Interior of the Sint-Odulphuskerk in Assendelft palette — 512<br/>The Voyage of Life: Childhood palette — 512 | 29,979 | 2,560 | 32,539 | 229 |
-| `$11` | A Sunday on La Grande Jatte — 1884 stream — 14,846<br/>Marly-le-Roi stream — 14,918<br/>The Voyage of Life: Youth palette — 512<br/>The Voyage of Life: Manhood palette — 512<br/>The Voyage of Life: Old Age palette — 512<br/>Tornado in an American Forest palette — 512<br/>Niagara palette — 512 | 29,764 | 2,560 | 32,324 | 444 |
+| `$0F` | Ravana Prepares for War with Rama stream — 15,139<br/>Houses of Parliament, London stream — 15,127<br/>The Starry Night palette — 512<br/>River View by Moonlight palette — 512<br/>Mountainous Landscape with Waterfall palette — 512<br/>Wooded Landscape with Merrymakers in a Cart palette — 512 | 30,266 | 2,048 | 32,314 | 454 |
+| `$10` | Panoramic View of a Wide River stream — 15,021<br/>Water Lilies stream — 14,958<br/>Panoramic View of a Wide River palette — 512<br/>Sailing Vessels on an Inland Body of Water palette — 512<br/>Ships near the Coast during a Calm palette — 512<br/>Interior of the Sint-Odulphuskerk in Assendelft palette — 512<br/>The Voyage of Life: Childhood palette — 512 | 29,979 | 2,560 | 32,539 | 229 |
+| `$11` | Marly-le-Roi stream — 14,918<br/>A Sunday on La Grande Jatte — 1884 stream — 14,846<br/>The Voyage of Life: Youth palette — 512<br/>The Voyage of Life: Manhood palette — 512<br/>The Voyage of Life: Old Age palette — 512<br/>Tornado in an American Forest palette — 512<br/>Niagara palette — 512 | 29,764 | 2,560 | 32,324 | 444 |
 | `$12` | Poppy Field (Giverny) stream — 14,815<br/>The Third of May 1808 stream — 14,654<br/>Fog off Mount Desert palette — 512<br/>Buffalo Trail: The Impending Storm palette — 512<br/>Mount Corcoran palette — 512<br/>Sunset in the Woods palette — 512<br/>Harvest Moon palette — 512<br/>Wivenhoe Park, Essex palette — 512 | 29,469 | 3,072 | 32,541 | 227 |
-| `$13` | The Windmill at Wijk bij Duurstede stream — 14,366<br/>Wooded Landscape with Merrymakers in a Cart stream — 14,544<br/>Cloud Study: Stormy Sunset palette — 512<br/>Keelmen Heaving in Coals by Moonlight palette — 512<br/>Approach to Venice palette — 512<br/>Mortlake Terrace palette — 512<br/>Interior of the Pantheon, Rome palette — 512<br/>Entrance to the Grand Canal from the Molo, Venice palette — 512<br/>The Louvre, Afternoon, Rainy Weather palette — 512 | 28,910 | 3,584 | 32,494 | 274 |
+| `$13` | Wooded Landscape with Merrymakers in a Cart stream — 14,544<br/>The Windmill at Wijk bij Duurstede stream — 14,366<br/>Cloud Study: Stormy Sunset palette — 512<br/>Keelmen Heaving in Coals by Moonlight palette — 512<br/>Approach to Venice palette — 512<br/>Mortlake Terrace palette — 512<br/>Interior of the Pantheon, Rome palette — 512<br/>Entrance to the Grand Canal from the Molo, Venice palette — 512<br/>The Louvre, Afternoon, Rainy Weather palette — 512 | 28,910 | 3,584 | 32,494 | 274 |
 | `$14` | Cloud Study: Stormy Sunset stream — 14,330<br/>Distant View of Mount Akiha, Kakegawa stream — 14,324<br/>Waldo 16x16 font — 4,096 | 28,654 | 0 | 32,750 | 18 |
-| `$15` | The Voyage of Life: Youth stream — 14,088<br/>Fujisawa-shuku stream — 14,319<br/>Marly-le-Roi palette — 512<br/>The Willows palette — 512<br/>Distant View of Mount Akiha, Kakegawa palette — 512<br/>Fujisawa-shuku palette — 512<br/>Buddhist Temple Painting palette — 512<br/>The Buddha Descending from Trayastrimsa Heaven at Sankissa palette — 512<br/>Naresuan of Ayutthaya's Elephant Duel with Mingyi Swa of Toungoo palette — 512<br/>Ravan in His Palace in Lanka palette — 512 | 28,407 | 4,096 | 32,503 | 265 |
-| `$16` | Fog off Mount Desert stream — 14,006<br/>Approach to Venice stream — 14,045<br/>Surasa Challenges Hanuman palette — 512<br/>Hanuman — Ramakien palette — 512<br/>Hanuman Destroys the Golden City of Longka palette — 512<br/>Ravana Prepares for War with Rama palette — 512 | 28,051 | 2,048 | 30,099 | 2,669 |
-| `$17` | Buddhist Temple Painting stream — 13,901<br/>Surasa Challenges Hanuman stream — 13,938 | 27,839 | 0 | 27,839 | 4,929 |
+| `$15` | Fujisawa-shuku stream — 14,319<br/>The Voyage of Life: Youth stream — 14,088<br/>Marly-le-Roi palette — 512<br/>The Willows palette — 512<br/>Distant View of Mount Akiha, Kakegawa palette — 512<br/>Fujisawa-shuku palette — 512<br/>Buddhist Temple Painting palette — 512<br/>The Buddha Descending from Trayastrimsa Heaven at Sankissa palette — 512<br/>Naresuan of Ayutthaya's Elephant Duel with Mingyi Swa of Toungoo palette — 512<br/>Ravan in His Palace in Lanka palette — 512 | 28,407 | 4,096 | 32,503 | 265 |
+| `$16` | Approach to Venice stream — 14,045<br/>Fog off Mount Desert stream — 14,006<br/>Surasa Challenges Hanuman palette — 512<br/>Hanuman — Ramakien palette — 512<br/>Hanuman Destroys the Golden City of Longka palette — 512<br/>Ravana Prepares for War with Rama palette — 512 | 28,051 | 2,048 | 30,099 | 2,669 |
+| `$17` | Surasa Challenges Hanuman stream — 13,938<br/>Buddhist Temple Painting stream — 13,901 | 27,839 | 0 | 27,839 | 4,929 |
 | `$18` | Flower Still Life stream — 13,881<br/>Wivenhoe Park, Essex stream — 13,768 | 27,649 | 0 | 27,649 | 5,119 |
-| `$19` | Interior of the Sint-Odulphuskerk in Assendelft stream — 13,620<br/>Harvest Moon stream — 13,689 | 27,309 | 0 | 27,309 | 5,459 |
+| `$19` | Harvest Moon stream — 13,689<br/>Interior of the Sint-Odulphuskerk in Assendelft stream — 13,620 | 27,309 | 0 | 27,309 | 5,459 |
 | `$1A` | River View by Moonlight stream — 13,478<br/>Ships near the Coast during a Calm stream — 13,372 | 26,850 | 0 | 26,850 | 5,918 |
-| `$1B` | The Voyage of Life: Manhood stream — 13,285<br/>Keelmen Heaving in Coals by Moonlight stream — 13,343 | 26,628 | 0 | 26,628 | 6,140 |
+| `$1B` | Keelmen Heaving in Coals by Moonlight stream — 13,343<br/>The Voyage of Life: Manhood stream — 13,285 | 26,628 | 0 | 26,628 | 6,140 |
 | `$1C` | Sailing Vessels on an Inland Body of Water stream — 13,127<br/>Buffalo Trail: The Impending Storm stream — 13,093 | 26,220 | 0 | 26,220 | 6,548 |
 | `$1D` | The Voyage of Life: Childhood stream — 13,048<br/>The Voyage of Life: Old Age stream — 12,572 | 25,620 | 0 | 25,620 | 7,148 |
-| `$1E` | Mount Corcoran stream — 12,416<br/>Entrance to the Grand Canal from the Molo, Venice stream — 12,498 | 24,914 | 0 | 24,914 | 7,854 |
-| `$1F` | View of Delft stream — 12,297<br/>Niagara stream — 12,366 | 24,663 | 0 | 24,663 | 8,105 |
+| `$1E` | Entrance to the Grand Canal from the Molo, Venice stream — 12,498<br/>Mount Corcoran stream — 12,416 | 24,914 | 0 | 24,914 | 7,854 |
+| `$1F` | Niagara stream — 12,366<br/>View of Delft stream — 12,297 | 24,663 | 0 | 24,663 | 8,105 |
 | `$20-$1F` | Explicit power-of-two padding | 0 | 0 | 0 each | 32,768 each |

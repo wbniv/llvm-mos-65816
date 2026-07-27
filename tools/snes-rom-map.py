@@ -17,18 +17,24 @@ for line in Path(a.map).read_text().splitlines():
     m = re.match(r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+1\s+(\.\S+)$", line)
     if m:
         sections[m.group(3)] = (int(m.group(1), 16), int(m.group(2), 16))
-    m = re.match(r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+(FONT8|FONT16)$", line)
+    m = re.match(
+        r"^\s*([0-9a-f]+)\s+[0-9a-f]+\s+([0-9a-f]+)\s+\d+\s+"
+        r"(FONT8|FONT16|gallery_\S+_(?:lz|pal))$", line)
     if m:
         symbols[m.group(3)] = (int(m.group(1),16),int(m.group(2),16))
 
 works = json.loads(Path(a.report).read_text())
+for work in works:
+    stem=work["slug"].replace("-","_")
+    work["stream_addr"]=symbols[f"gallery_{stem}_lz"][0]
+    work["palette_addr"]=symbols[f"gallery_{stem}_pal"][0]
 shared_assets = {}
 for symbol,label,expected in (
         ("FONT16","Waldo 16x16 font",4096),("FONT8","8x8 font",1024)):
     addr,size=symbols[symbol]
     if size != expected or addr >> 16 == 0:
         raise SystemExit(f"{symbol}: invalid far placement {addr:06X}/{size}")
-    shared_assets.setdefault(addr >> 16,[]).append((label,size))
+    shared_assets.setdefault(addr >> 16,[]).append((label,size,addr))
 bank_count = max(
     max(max(work["stream_bank"], work["palette_bank"]) for work in works),
     max(shared_assets),
@@ -50,8 +56,12 @@ banks = [{
     "free": None,
 }]
 for bank in range(1, bank_count + 1):
-    stream_items = [work for work in works if work["stream_bank"] == bank]
-    palette_items = [work for work in works if work["palette_bank"] == bank]
+    stream_items = sorted(
+        (work for work in works if work["stream_bank"] == bank),
+        key=lambda work:work["stream_addr"])
+    palette_items = sorted(
+        (work for work in works if work["palette_bank"] == bank),
+        key=lambda work:work["palette_addr"])
     sec = f".gallery_{bank:02X}"
     if sec not in sections:
         raise SystemExit(f"missing linked section {sec}")
@@ -60,7 +70,7 @@ for bank in range(1, bank_count + 1):
         raise SystemExit(f"{sec}: invalid bank/size {addr:06X}/{linked}")
     stream = sum(work["compressed_bytes"] for work in stream_items)
     shared = shared_assets.get(bank, [])
-    expected = stream + 512 * len(palette_items) + sum(size for _, size in shared)
+    expected = stream + 512 * len(palette_items) + sum(size for _, size, _ in shared)
     if linked != expected:
         raise SystemExit(f"{sec}: linked {linked}, expected stream+palette {expected}")
     free = 32768 - linked
@@ -74,10 +84,13 @@ for bank in range(1, bank_count + 1):
         "used": linked,
         "free": free,
     })
-    detail = [f"{work['title']} stream — {work['compressed_bytes']:,}" for work in stream_items]
-    detail += [f"{work['title']} palette — 512" for work in palette_items]
-    detail += [f"{name} — {size:,}" for name, size in shared]
-    contents = "<br/>".join(detail)
+    detail = [(work["stream_addr"],
+               f"{work['title']} stream — {work['compressed_bytes']:,}")
+              for work in stream_items]
+    detail += [(work["palette_addr"],f"{work['title']} palette — 512")
+               for work in palette_items]
+    detail += [(addr,f"{name} — {size:,}") for name,size,addr in shared]
+    contents = "<br/>".join(label for _,label in sorted(detail))
     rows.append(f"| `${bank:02X}` | {contents} | {stream:,} | {512*len(palette_items):,} | {linked:,} | {free:,} |")
 
 last = bank_count

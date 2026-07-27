@@ -6,13 +6,709 @@
     {
       "symbol": "FONT16",
       "bytes": 4096,
-      "bank": 20
+      "bank": 20,
+      "slot": 2
     },
     {
       "symbol": "FONT8",
       "bytes": 1024,
-      "bank": 7
+      "bank": 7,
+      "slot": 2
     }
+  ],
+  "bank_items": [
+    [
+      {
+        "symbol": "thistles",
+        "part": "lz",
+        "bytes": 17053
+      },
+      {
+        "symbol": "stack_wheat",
+        "part": "lz",
+        "bytes": 15699
+      }
+    ],
+    [
+      {
+        "symbol": "starry_night",
+        "part": "lz",
+        "bytes": 16950
+      },
+      {
+        "symbol": "thai_ravan_palace",
+        "part": "lz",
+        "bytes": 15796
+      }
+    ],
+    [
+      {
+        "symbol": "self_portrait",
+        "part": "lz",
+        "bytes": 16922
+      },
+      {
+        "symbol": "sunflowers",
+        "part": "lz",
+        "bytes": 15795
+      }
+    ],
+    [
+      {
+        "symbol": "the_willows",
+        "part": "lz",
+        "bytes": 16642
+      },
+      {
+        "symbol": "sunset_woods",
+        "part": "lz",
+        "bytes": 16107
+      }
+    ],
+    [
+      {
+        "symbol": "earthly_delights",
+        "part": "lz",
+        "bytes": 16459
+      },
+      {
+        "symbol": "ice_skaters",
+        "part": "lz",
+        "bytes": 16046
+      }
+    ],
+    [
+      {
+        "symbol": "thai_elephant_duel",
+        "part": "lz",
+        "bytes": 16381
+      },
+      {
+        "symbol": "mountain_waterfall",
+        "part": "lz",
+        "bytes": 15903
+      }
+    ],
+    [
+      {
+        "symbol": "dragon",
+        "part": "lz",
+        "bytes": 15765
+      },
+      {
+        "symbol": "louvre_rain",
+        "part": "lz",
+        "bytes": 15765
+      },
+      {
+        "symbol": "FONT8",
+        "part": "shared",
+        "bytes": 1024
+      }
+    ],
+    [
+      {
+        "symbol": "pantheon_interior",
+        "part": "lz",
+        "bytes": 15760
+      },
+      {
+        "symbol": "thai_buddha_descending",
+        "part": "lz",
+        "bytes": 15695
+      },
+      {
+        "symbol": "great_wave",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "grande_jatte",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "thai_hanuman_longka",
+        "part": "lz",
+        "bytes": 15653
+      },
+      {
+        "symbol": "the_kiss",
+        "part": "lz",
+        "bytes": 15625
+      },
+      {
+        "symbol": "water_lilies",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "basket_apples",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "thai_hanuman",
+        "part": "lz",
+        "bytes": 15552
+      },
+      {
+        "symbol": "home_heron",
+        "part": "lz",
+        "bytes": 15533
+      },
+      {
+        "symbol": "stack_wheat",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "self_portrait",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "paris_street",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "mortlake_terrace",
+        "part": "lz",
+        "bytes": 15322
+      },
+      {
+        "symbol": "tableau_vii",
+        "part": "lz",
+        "bytes": 15304
+      },
+      {
+        "symbol": "poppy_field",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "earthly_delights",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "the_scream",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "third_of_may",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "scholar_landscape",
+        "part": "lz",
+        "bytes": 15288
+      },
+      {
+        "symbol": "tornado_forest",
+        "part": "lz",
+        "bytes": 15274
+      },
+      {
+        "symbol": "the_kiss",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "view_of_delft",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "wijk_windmill",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "flower_still_life",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "great_wave",
+        "part": "lz",
+        "bytes": 15259
+      },
+      {
+        "symbol": "the_scream",
+        "part": "lz",
+        "bytes": 15238
+      },
+      {
+        "symbol": "sunflowers",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "tableau_vii",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "ice_skaters",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "home_heron",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "basket_apples",
+        "part": "lz",
+        "bytes": 15200
+      },
+      {
+        "symbol": "paris_street",
+        "part": "lz",
+        "bytes": 15171
+      },
+      {
+        "symbol": "dragon",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "scholar_landscape",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "houses_parliament",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "thistles",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "thai_ravana_war",
+        "part": "lz",
+        "bytes": 15139
+      },
+      {
+        "symbol": "houses_parliament",
+        "part": "lz",
+        "bytes": 15127
+      },
+      {
+        "symbol": "starry_night",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "river_moonlight",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "mountain_waterfall",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "wooded_merrymakers",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "wide_river",
+        "part": "lz",
+        "bytes": 15021
+      },
+      {
+        "symbol": "water_lilies",
+        "part": "lz",
+        "bytes": 14958
+      },
+      {
+        "symbol": "wide_river",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "sailing_vessels",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "ships_calm",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "st_odulphus",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "voyage_childhood",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "marly_le_roi",
+        "part": "lz",
+        "bytes": 14918
+      },
+      {
+        "symbol": "grande_jatte",
+        "part": "lz",
+        "bytes": 14846
+      },
+      {
+        "symbol": "voyage_youth",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "voyage_manhood",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "voyage_old_age",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "tornado_forest",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "niagara",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "poppy_field",
+        "part": "lz",
+        "bytes": 14815
+      },
+      {
+        "symbol": "third_of_may",
+        "part": "lz",
+        "bytes": 14654
+      },
+      {
+        "symbol": "fog_mount_desert",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "buffalo_storm",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "mount_corcoran",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "sunset_woods",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "harvest_moon",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "wivenhoe_park",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "wooded_merrymakers",
+        "part": "lz",
+        "bytes": 14544
+      },
+      {
+        "symbol": "wijk_windmill",
+        "part": "lz",
+        "bytes": 14366
+      },
+      {
+        "symbol": "stormy_sunset",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "keelmen_moonlight",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "approach_venice",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "mortlake_terrace",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "pantheon_interior",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "grand_canal_molo",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "louvre_rain",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "stormy_sunset",
+        "part": "lz",
+        "bytes": 14330
+      },
+      {
+        "symbol": "mount_akiha",
+        "part": "lz",
+        "bytes": 14324
+      },
+      {
+        "symbol": "FONT16",
+        "part": "shared",
+        "bytes": 4096
+      }
+    ],
+    [
+      {
+        "symbol": "fujisawa_shuku",
+        "part": "lz",
+        "bytes": 14319
+      },
+      {
+        "symbol": "voyage_youth",
+        "part": "lz",
+        "bytes": 14088
+      },
+      {
+        "symbol": "marly_le_roi",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "the_willows",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "mount_akiha",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "fujisawa_shuku",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "thai_temple_painting",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "thai_buddha_descending",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "thai_elephant_duel",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "thai_ravan_palace",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "approach_venice",
+        "part": "lz",
+        "bytes": 14045
+      },
+      {
+        "symbol": "fog_mount_desert",
+        "part": "lz",
+        "bytes": 14006
+      },
+      {
+        "symbol": "thai_surasa_hanuman",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "thai_hanuman",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "thai_hanuman_longka",
+        "part": "pal",
+        "bytes": 512
+      },
+      {
+        "symbol": "thai_ravana_war",
+        "part": "pal",
+        "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "thai_surasa_hanuman",
+        "part": "lz",
+        "bytes": 13938
+      },
+      {
+        "symbol": "thai_temple_painting",
+        "part": "lz",
+        "bytes": 13901
+      }
+    ],
+    [
+      {
+        "symbol": "flower_still_life",
+        "part": "lz",
+        "bytes": 13881
+      },
+      {
+        "symbol": "wivenhoe_park",
+        "part": "lz",
+        "bytes": 13768
+      }
+    ],
+    [
+      {
+        "symbol": "harvest_moon",
+        "part": "lz",
+        "bytes": 13689
+      },
+      {
+        "symbol": "st_odulphus",
+        "part": "lz",
+        "bytes": 13620
+      }
+    ],
+    [
+      {
+        "symbol": "river_moonlight",
+        "part": "lz",
+        "bytes": 13478
+      },
+      {
+        "symbol": "ships_calm",
+        "part": "lz",
+        "bytes": 13372
+      }
+    ],
+    [
+      {
+        "symbol": "keelmen_moonlight",
+        "part": "lz",
+        "bytes": 13343
+      },
+      {
+        "symbol": "voyage_manhood",
+        "part": "lz",
+        "bytes": 13285
+      }
+    ],
+    [
+      {
+        "symbol": "sailing_vessels",
+        "part": "lz",
+        "bytes": 13127
+      },
+      {
+        "symbol": "buffalo_storm",
+        "part": "lz",
+        "bytes": 13093
+      }
+    ],
+    [
+      {
+        "symbol": "voyage_childhood",
+        "part": "lz",
+        "bytes": 13048
+      },
+      {
+        "symbol": "voyage_old_age",
+        "part": "lz",
+        "bytes": 12572
+      }
+    ],
+    [
+      {
+        "symbol": "grand_canal_molo",
+        "part": "lz",
+        "bytes": 12498
+      },
+      {
+        "symbol": "mount_corcoran",
+        "part": "lz",
+        "bytes": 12416
+      }
+    ],
+    [
+      {
+        "symbol": "niagara",
+        "part": "lz",
+        "bytes": 12366
+      },
+      {
+        "symbol": "view_of_delft",
+        "part": "lz",
+        "bytes": 12297
+      }
+    ]
   ],
   "bank_used": [
     32752,
