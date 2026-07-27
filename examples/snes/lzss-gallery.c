@@ -27,7 +27,8 @@
 #define GALLERY_START 0u
 #endif
 #ifndef GALLERY_RUN_COLOR
-#define GALLERY_RUN_COLOR SNES_RGB(8,31,30)
+/* biohack.net --accent #C2410C, quantized to BGR555. */
+#define GALLERY_RUN_COLOR SNES_RGB(24,8,1)
 #endif
 
 volatile uint16_t corpus_result;
