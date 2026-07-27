@@ -275,3 +275,7 @@ Publication:
 
 - biohack.net commit `40d4590`, tag `v1.0.271`;
 - indri.studio commit `118988d`, tag `v0.1.97`.
+
+Both deployment workflows passed. The two live ROM downloads match the local
+SHA-256 above, and both live cache-busted player scripts contain the touch
+navigation handler.
