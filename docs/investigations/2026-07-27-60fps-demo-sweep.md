@@ -385,8 +385,17 @@ period. Gate unchanged (`0x02CA`, identical disasm counts); renders 9.7 % non-bl
    fixed 500.
 2. **A green corpus gate says nothing about the picture.** This is now the second demo in two days
    (with `mvscrl`) whose gate passed while the display was broken, for the same structural reason —
-   `corpus_result` is computed during the title, before the display loop matters. A cheap
-   "is the screen non-black and changing after title_end" check would have caught both.
+   `corpus_result` is computed during the title, before the display loop matters. `dev/display-check.py`
+   (added 2026-07-28) now tests this directly.
+
+   **Correction to an earlier claim in this section:** I first wrote that such a check "would have
+   caught both". It would not. It catches the *truncstair* class — blank screen, reset loop, frozen
+   on the title — and indeed flags the published truncstair ROM (`RESET/UNSTABLE corpus_result
+   ['0x02ca', '0x0100', '0x01f6']`). It does **not** catch the *mvscrl* class: that demo rendered a
+   live, changing, non-black picture the whole time; it was simply the *wrong data* (a decorative
+   pattern instead of the memmove buffers). Detecting that needs a demo-specific claim about what
+   the pixels mean, which no generic checker can make. A PASS means "something is on screen and
+   running", never "the visual is correct".
 
 Remaining on truncstair: the ramp wrap supplies the periodicity an `HOFS` ring needs, so **half the
 F2 prerequisite is now cleared**; the 32-column-canvas half (bank-0 WRAM, measured above) still

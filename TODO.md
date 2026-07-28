@@ -57,7 +57,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   fixed-frame screenshot margins, but the published preview PNGs will change. **F1 addition
   (`673cb42`, [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md)): the 19 patched
   demos' `corpus_result` WRAM offsets MOVED (most `0x31`, `rotkal` `0x13F2`) — regenerate each
-  manifest selfcheck `off` from the fresh `.map` at publish; `dev/verify-web-roms.sh` gates the lot.**
+  manifest selfcheck `off` from the fresh `.map` at publish; `dev/verify-web-roms.sh` gates the lot.** **Also run `dev/display-check.py` before publishing** (added 2026-07-28): `verify-web-roms.sh`
+  asserts the corpus CRC and scans for force-blank *bleed*, but cannot see a wholly dead screen —
+  and it samples at the manifest `frames`, which is usually still the title card. That blind spot
+  shipped a black `truncstair` for weeks. Three demos in this batch have display fixes that only
+  reach users on a republish: `mvscrl` (regression + 60 fps ring), `truncstair` (black screen), and
+  the gallery CGRAM fix.
 - [T4] **60 fps Batch B — F2 scroll-ring for `mvscrl` (the only qualifying demo).** ~~F2 scroll-rings
   for `ovmove`, `mvscrl`, `truncstair` (+`lfsr2` if its drift is a real translation).~~
   **Candidacy resolved 2026-07-27 — 3 of the 4 candidates are closed, no work to do:** `ovmove`
