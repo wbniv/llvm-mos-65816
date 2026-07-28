@@ -99,7 +99,19 @@ static uint16_t gallery_z[GALLERY_ASSET_COUNT];
 static uint8_t gallery_done[GALLERY_ASSET_COUNT];
 static uint8_t gallery_failed[GALLERY_ASSET_COUNT];
 static uint8_t gallery_completed_count;
-static uint8_t chrbuf[1216];
+/*
+ * One tile row of Mode 7 characters, staged for the VRAM DMA: tile_cols * 64
+ * bytes. Sized to the STRUCTURAL maximum, not to the current corpus — width is
+ * a uint8_t, so tile_cols is at most (255+7)/8 = 32, hence 32*64 = 2048.
+ *
+ * It was 1216 (19 columns). Nine of the 62 works are wider than 152 px —
+ * thai-elephant-duel is 200 px, 25 columns, 1600 bytes — so upload_image() ran
+ * off the end of this buffer and into objpix/objchr/oam_visual/bgmode_tab/
+ * tm_tab, i.e. into the HDMA tables, and the DMA then uploaded those bytes as
+ * picture data. Sizing by the type's range means adding a wider work can never
+ * silently reintroduce this.
+ */
+static uint8_t chrbuf[2048];
 static uint8_t objpix[256];
 static uint16_t objchr[64];
 static uint8_t oam_visual[OAM_VISUAL_MAX*4u];
@@ -903,13 +915,36 @@ static void split_arm(uint8_t split){
     cgdata_tab[q++]=color2[run][0];cgdata_tab[q++]=color2[run][1];
   }
   cgadd_tab[p]=0;cgdata_tab[q]=0;
-  /* Channel order is significant: mode 3 writes CGADD,CGADD,CGDATA,CGDATA;
-   * channel 4 then writes the following CGDATA word in mode 2. */
-  REG_DMAP3=3;REG_BBAD3=0x21;
-  REG_A1T3L=(uint8_t)(uintptr_t)cgadd_tab;REG_A1T3H=(uint8_t)((uintptr_t)cgadd_tab>>8);REG_A1B3=0;
-  REG_DMAP4=2;REG_BBAD4=0x22;
-  REG_A1T4L=(uint8_t)(uintptr_t)cgdata_tab;REG_A1T4H=(uint8_t)((uintptr_t)cgdata_tab>>8);REG_A1B4=0;
-  REG_HDMAEN=0x1e;
+  /*
+   * CGRAM is NOT re-armed mid-frame.
+   *
+   * #139 drove CGRAM 1..2 from HDMA at the raster split so the dashboard could
+   * borrow two entries the painting also owned, buying 223 painting colours.
+   * That does not work: CGRAM is only safely writable during VBlank or forced
+   * blank, and an HDMA write lands in HBlank while the PPU is still fetching
+   * colours for the frame. The writes scatter across CGRAM instead of hitting
+   * entries 1..2, which is what corrupted every painting from 3e3f054 onward
+   * (measured: only 52 of 223 palette entries survived, 89 foreign colours
+   * appeared, and disabling exactly these two channels renders the corpus
+   * clean again).
+   *
+   * The cgadd_tab/cgdata_tab construction above is now dead — nothing reads
+   * those tables once the channels are unarmed. It is left in place rather
+   * than deleted so #139's follow-up keeps its scaffolding, and because the
+   * published gallery_palette_1/2 bytes still feed the NMI's VBlank restore,
+   * which is a legal time to touch CGRAM.
+   *
+   * Channels 1 and 2 (BGMODE/TM) remain armed — those target PPU registers
+   * that ARE safe to write mid-frame, and they are what actually performs the
+   * Mode 7 -> Mode 1 split.
+   *
+   * Consequence: the caption renders in the painting's own entry 1/2 rather
+   * than the brand gold. Every one of the 62 works quantises a bright colour
+   * into entry 1 (luma 123..255), so the caption stays legible; restoring the
+   * exact gold needs the painting range narrowed to 3..223 (221 colours) and
+   * an asset regeneration, which is a separate decision.
+   */
+  REG_HDMAEN=0x06;
 }
 static void palette(const GalleryAsset*a){
   /* Keep NMI from disturbing CGADD's auto-increment during the bulk upload. */
