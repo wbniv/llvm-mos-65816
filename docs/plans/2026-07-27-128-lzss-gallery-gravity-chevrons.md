@@ -9,6 +9,15 @@ contradiction, added the reserved-palette audit (today's destination visuals act
 black), specified the zipper flight clock against the 256-byte hook cadence, and pinned the
 OAM/tile budgets with an explicit degradation order.
 
+**Updated 2026-07-27 (zipper retired; Will, via the biohack.net session):** the **chevron** half of
+this plan stands unchanged and is now the consumer of #136's sprite accent shading ramp (pens
+`8–10` rising into the accent at pen `14`). The **repack-tracker half is superseded**: everything
+from "Repack tracker: luminous zipper seam" onward describing teeth/head/seam is retired along with
+#129 — see [#137](2026-07-27-137-lzss-gallery-new-repack-visualization.md), which **has shipped** the
+replacement: a scanner beam (one vertical needle sweeping the span, leaving a fading underline). The
+OAM-budget and atomic-lifetime discipline named below is technique-agnostic and carried over to it
+intact, as did #129's hook-based flight clock.
+
 Mockup: [transparent gravity-chevron motion study](2026-07-27-128-lzss-gallery-gravity-chevrons/gravity-chevron-mockup.html)
 
 ## Goal
@@ -39,7 +48,13 @@ offset = 0,1,2,3,3,2,1,0, repeat
 It has no velocity or acceleration, repeats at about 7.5 Hz, and switches between normal and bright
 tiles on three of every four frames. The result reads as nervous vibration rather than weight.
 
-### Reserved-palette audit (pre-existing; fix in this pass)
+### Reserved-palette audit (pre-existing)
+
+> **Partly fixed 2026-07-27 by #137.** The CGRAM-131 half of this audit is closed: the two divergent
+> inline palette writers were replaced by a single `write_reserved_obj_palette()` that emits 128–133
+> as one contiguous run, so pen 3 is written (as the scanner beam's dim-accent fade step) instead of
+> holding an artwork leftover. The chevron-facing parts of the audit below still stand.
+
 
 `load_chevrons()` and `palette()` both write the reserved OBJ colors as CGRAM 132 = 0,
 133 = `GALLERY_RUN_COLOR`, 134 = white: the leading `REG_CGDATA=0;REG_CGDATA=0;` pair after
@@ -182,6 +197,14 @@ Index 1 is allowed only in pixels directly adjoining the face; the tile transpar
 any detached dark region as a failed reintroduction of the black ground.
 
 ## Repack tracker: luminous zipper seam
+
+> **SUPERSEDED 2026-07-27 by [#137](2026-07-27-137-lzss-gallery-new-repack-visualization.md)**, which
+> is now **implemented** — the zipper tiles and staging are gone from the ROM and the scanner beam
+> ships in their place. Read
+> this section as history: the **rejection of the bracket tracker below still stands** (do not
+> resurrect brackets), and the OAM-budget / atomic-lifetime rules still bind the replacement — but
+> the teeth/head/seam construction, its flight sampling, and the zipper items in this plan's
+> Implementation / Verification / Acceptance sections are no longer to be built.
 
 The bracket experiment is rejected. Its defects are structural:
 

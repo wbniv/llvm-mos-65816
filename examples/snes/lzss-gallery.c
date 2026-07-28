@@ -38,10 +38,16 @@ enum {
   ARROW_L_APEX=72, ARROW_R_APEX=74,
   ARROW_L_FALL=76, ARROW_R_FALL=78,
   ARROW_L_LAND=96, ARROW_R_LAND=98,
-  /* Match-copy diagram (#137): dim source and bright destination anchors stay
-   * fixed while one vertical needle travels between them. */
-  TRACK_NEEDLE=128, TRACK_UNDER_HOT=129, TRACK_UNDER_MID=130,
-  TRACK_UNDER_DIM=131, TRACK_LITERAL=132, TRACK_CURSOR=133
+  /*
+   * The repack stage draws exactly one sprite: the live compressor cursor.
+   * The match-copy diagram and scanner beam (#137), the zipper before them
+   * (#129), and the bracket tracker before that all tried to draw the match
+   * *span*, and every one ended up reading as a selected region. The cursor
+   * shows the compressor's position instead; telemetry carries the rest.
+   *
+   * 133 is load-bearing: the NMI stages the cursor with a literal `lda #$85`.
+   */
+  TRACK_CURSOR=133
 };
 #ifndef GALLERY_START
 #define GALLERY_START 0u
@@ -63,6 +69,20 @@ volatile uint16_t gallery_repack_frames[GALLERY_ASSET_COUNT];
 volatile uint16_t gallery_verify_frames[GALLERY_ASSET_COUNT];
 volatile uint8_t gallery_clock_lo, gallery_clock_hi;
 volatile uint8_t gallery_cursor_x,gallery_cursor_y,gallery_cursor_visible;
+/*
+ * Live compressor cursor colour, published as CGRAM bytes for the NMI to install
+ * into the cursor's reserved sprite entry. The cursor cycles instead of holding
+ * one red, so the mark reads as *working* rather than as a static marker parked
+ * on the artwork.
+ *
+ * The colour advances on the same 256-byte hook that republishes the cursor
+ * position, so a colour step and a movement step are the same event. That keeps
+ * the cycle tied to compression progress (fast through dense literal runs, slow
+ * through long matches) and keeps the NMI free of indexed table reads — this
+ * routine's own comments already record one index/width bug that cost corpus
+ * determinism, and it is not worth risking a second for a colour effect.
+ */
+volatile uint8_t gallery_cursor_color_lo,gallery_cursor_color_hi;
 volatile uint8_t gallery_palette_split;
 volatile uint8_t gallery_palette_1_lo,gallery_palette_1_hi;
 volatile uint8_t gallery_palette_2_lo,gallery_palette_2_hi;
@@ -114,8 +134,6 @@ typedef struct {
 } RepackVisual;
 volatile RepackVisual gallery_repack_visual;
 static uint8_t token_kind[12],token_len[12],token_count;
-static uint8_t flight_active,flight_phase;
-static uint16_t flight_source,flight_destination;
 
 asm(".text\n"
     ".global nmi\n"
@@ -339,6 +357,17 @@ asm(".text\n"
     "  sta $2104\n"
     "  lda gallery_obj_attr\n"
     "  sta $2104\n"
+    /*
+     * Install the cursor's cycling colour while the cursor is visible. Same
+     * shape as the #139 palette 1..2 restore above: two published bytes, no
+     * index register, VBlank-only so the write always lands.
+     */
+    "  lda #$e6\n"              /* CGRAM 230 = cursor entry (sprite block 224+6) */
+    "  sta $2121\n"
+    "  lda gallery_cursor_color_lo\n"
+    "  sta $2122\n"
+    "  lda gallery_cursor_color_hi\n"
+    "  sta $2122\n"
     "  clv\n"
     "  bvc 18f\n"
     "17:\n"
@@ -430,6 +459,33 @@ static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y);
 static uint8_t sprite_origin(int16_t v);
 static uint8_t decimal(char*s,uint8_t n,uint16_t v);
 
+/*
+ * Cursor colour cycle: a 16-step hue wheel walked one step per publish.
+ *
+ * Full-saturation BGR555 hue wheel, hand-placed rather than computed so the
+ * steps are perceptually even on a CRT and each entry stays bright enough to
+ * hold against both dark and light artwork — a computed HSV walk spends too
+ * many steps in dim blues. Sixteen steps at 5-bit depth is the point where
+ * adjacent entries stop being distinguishable, so a longer table would only
+ * cost ROM.
+ */
+static const uint16_t cursor_wheel[16]={
+  SNES_RGB(31, 5, 4), SNES_RGB(31,13, 4), SNES_RGB(31,21, 4), SNES_RGB(31,28, 5),
+  SNES_RGB(24,31, 5), SNES_RGB(15,31, 6), SNES_RGB( 6,31, 9), SNES_RGB( 5,31,18),
+  SNES_RGB( 5,30,27), SNES_RGB( 5,22,31), SNES_RGB( 6,14,31), SNES_RGB(10, 7,31),
+  SNES_RGB(18, 5,31), SNES_RGB(26, 5,29), SNES_RGB(31, 5,22), SNES_RGB(31, 5,12),
+};
+static uint8_t cursor_phase;
+
+static void cursor_cycle_step(void){
+  uint16_t c=cursor_wheel[cursor_phase&15u];
+  cursor_phase++;
+  /* Publish low byte first; the NMI reads both only when the cursor is visible,
+   * and the caller clears gallery_cursor_visible around the whole update. */
+  gallery_cursor_color_lo=(uint8_t)c;
+  gallery_cursor_color_hi=(uint8_t)(c>>8);
+}
+
 static void repack_publish(uint8_t kind,uint16_t pos,uint16_t source,uint16_t raw,
                            uint16_t packed,const LzssStats *st,uint16_t distance,
                            uint8_t value,uint8_t length,uint8_t copied){
@@ -494,6 +550,7 @@ static uint16_t compress_far(const FAR uint8_t *src,uint16_t len,FAR uint8_t *ds
       gallery_cursor_visible=0;
       gallery_cursor_x=sprite_origin(cursor_x);
       gallery_cursor_y=sprite_origin(cursor_y);
+      cursor_cycle_step();
       gallery_cursor_visible=1;
 #endif
     }
@@ -588,32 +645,11 @@ static void upload_chevron_pose(uint8_t base,uint8_t right,uint8_t pose){
   for(uint8_t t=0;t<2;t++)vram_words((uint16_t)(0x6000u+(uint16_t)(base+t)*16u),objchr+(uint16_t)t*16u,16);
   for(uint8_t t=0;t<2;t++)vram_words((uint16_t)(0x6000u+(uint16_t)(base+16u+t)*16u),objchr+(uint16_t)(2u+t)*16u,16);
 }
-static void upload_tracker_tile(uint8_t tile,uint8_t shape,uint8_t color){
+static void upload_tracker_tile(uint8_t tile,uint8_t color){
   for(uint8_t i=0;i<64;i++)objpix[i]=0;
-  if(shape==0u){
-    /* Needle: one vertical stroke, white core with pale shoulders. Never a
-     * closed edge or filled cell — a stroke cannot enclose a region. */
-    for(uint8_t y=0u;y<7u;y++){
-      objpix[(uint16_t)y*8u+3u]=5u;objpix[(uint16_t)y*8u+4u]=5u;
-      objpix[(uint16_t)y*8u+2u]=color;objpix[(uint16_t)y*8u+5u]=color;
-    }
-  }else if(shape==1u){
-    /* Underline dash: four pixels two rows below the sweep centre, so the
-     * needle crosses its trail instead of overlapping it. One pen per fade
-     * step; the dash never touches its neighbours, so the trail stays dashed
-     * and cannot read as a solid selected bar. */
-    for(uint8_t x=2u;x<6u;x++)objpix[(uint16_t)5u*8u+x]=color;
-  }else if(shape==2u){
-    static const uint8_t width[8]={0,2,4,6,6,4,2,0};
-    for(uint8_t y=0;y<8;y++){
-      uint8_t w=width[y],start=(uint8_t)((8u-w)/2u);
-      for(uint8_t x=0;x<w;x++)objpix[(uint16_t)y*8u+start+x]=(uint8_t)(y==3u||y==4u?5u:color);
-    }
-  }else{
-    /* A compact red playhead, distinct from every match/literal glyph. */
-    for(uint8_t y=3u;y<5u;y++)for(uint8_t x=3u;x<5u;x++)
-      objpix[(uint16_t)y*8u+x]=color;
-  }
+  /* A compact playhead: 2x2 at the cell centre. Deliberately not a span glyph. */
+  for(uint8_t y=3u;y<5u;y++)for(uint8_t x=3u;x<5u;x++)
+    objpix[(uint16_t)y*8u+x]=color;
   for(uint8_t y=0;y<8;y++){
     uint8_t p0=0,p1=0,p2=0,p3=0;
     for(uint8_t x=0;x<8;x++){uint8_t p=objpix[(uint16_t)y*8u+x],m=(uint8_t)(0x80u>>x);
@@ -649,7 +685,11 @@ static void write_reserved_obj_palette(void){
   REG_CGDATA=(uint8_t)dim;REG_CGDATA=(uint8_t)(dim>>8);
   REG_CGDATA=(uint8_t)a;REG_CGDATA=(uint8_t)(a>>8);
   c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  c=SNES_RGB(31,5,4);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  /* Cursor entry (CGRAM 230): seeded with the wheel's current step, not a fixed
+   * red — the NMI overwrites it every VBlank while the cursor is visible, and
+   * seeding from the wheel keeps the restore path and the cycle in agreement
+   * instead of flashing the old constant red for one frame after each artwork. */
+  c=cursor_wheel[cursor_phase&15u];REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
   /* Clear the rest of OBJ palettes 6 and 7, including palette 7 pen 0. */
   for(uint8_t i=7u;i<32u;i++){REG_CGDATA=0;REG_CGDATA=0;}
 }
@@ -659,12 +699,7 @@ static void load_chevrons(void){
   upload_chevron_pose(ARROW_L_APEX,0,2);upload_chevron_pose(ARROW_R_APEX,1,2);
   upload_chevron_pose(ARROW_L_FALL,0,3);upload_chevron_pose(ARROW_R_FALL,1,3);
   upload_chevron_pose(ARROW_L_LAND,0,4);upload_chevron_pose(ARROW_R_LAND,1,4);
-  upload_tracker_tile(TRACK_NEEDLE,0,4);
-  upload_tracker_tile(TRACK_UNDER_HOT,1,4);
-  upload_tracker_tile(TRACK_UNDER_MID,1,3);
-  upload_tracker_tile(TRACK_UNDER_DIM,1,1);
-  upload_tracker_tile(TRACK_LITERAL,2,4);
-  upload_tracker_tile(TRACK_CURSOR,3,6);
+  upload_tracker_tile(TRACK_CURSOR,6);
   write_reserved_obj_palette();
   REG_OBSEL=3u;
 }
@@ -698,8 +733,7 @@ static void oam_stage(uint8_t i,uint8_t x,uint8_t y,uint8_t tile){
   p[0]=x;p[1]=y;p[2]=tile;p[3]=gallery_obj_attr;
 }
 static void oam_hide_compression(void){
-  flight_active=0;
-  for(uint8_t i=0;i<OAM_VISUAL_MAX;i++)oam_stage(i,0,240,TRACK_NEEDLE);
+  for(uint8_t i=0;i<OAM_VISUAL_MAX;i++)oam_stage(i,0,240,TRACK_CURSOR);
   oam_upload_visual();
 }
 static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y){
@@ -1091,7 +1125,6 @@ int main(void){
   gallery_palette_split=0;gallery_obj_attr=0x3cu;dashboard_pal=0;
   arrow_anim=arrow_direction=arrow_previous_direction=0;
   arrow_position=arrow_velocity=0;arrow_anim_y=0;arrow_pose=ARROW_L_REST;
-  flight_active=0;
   snes_ppu_reset_blank();m7splash_begin("PACK UNPACK", "LZSS GALLERY");
   uint8_t k=GALLERY_START;
   const GalleryAsset*a=&GALLERY_ASSETS[k];
@@ -1118,7 +1151,6 @@ int main(void){
   gallery_palette_split=0;gallery_obj_attr=0x3cu;dashboard_pal=0;
   arrow_anim=arrow_direction=arrow_previous_direction=0;
   arrow_position=arrow_velocity=0;arrow_anim_y=0;arrow_pose=ARROW_L_REST;
-  flight_active=0;
   REG_NMITIMEN=NMITIMEN_NMI;uint16_t gate=0xffff;uint8_t decoded=1;
   for(;;){
     a=&GALLERY_ASSETS[k];

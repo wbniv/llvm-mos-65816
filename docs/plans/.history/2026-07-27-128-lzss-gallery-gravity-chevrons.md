@@ -1,9 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/69fe2db) | Add SNES display quality enforcement |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/a326ae5) | docs(plan #128): OAM budget proven, not assumed — 11-sprite worst case |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/d4471a4) | docs(plan): #128 gravity-chevrons — review pass + TODO entry |
 
 <!--history-meta v1
+69fe2db	author	Will Norris
+69fe2db	added	57
+69fe2db	deleted	78
+69fe2db	files	1
 a326ae5	author	Will Norris
 a326ae5	added	17
 a326ae5	deleted	4

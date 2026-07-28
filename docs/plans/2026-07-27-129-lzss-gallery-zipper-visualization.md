@@ -1,6 +1,10 @@
 # 129 — LZSS Gallery Luminous Zipper Visualization
 
-**Status:** Draft; prototype implemented, visual and full-corpus acceptance pending
+**Status:** RETIRED 2026-07-27 — **removed from the ROM**, not merely deprecated: the tooth/head
+tiles and their staging are gone from `examples/snes/lzss-gallery.c`, replaced by the **scanner
+beam** in [#137](2026-07-27-137-lzss-gallery-new-repack-visualization.md). Kept as the historical
+record of the zipper design, and of why the bracket tracker it replaced was rejected — that
+rejection still binds (see #137's "Why this one").
 **Sites:** biohack.net and indri.studio
 **ROM:** `lzss-gallery.sfc`
 **Supersedes:** the compression brackets in plan #128

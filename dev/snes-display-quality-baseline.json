@@ -601,203 +601,203 @@
       "id": "15f38497009938535230",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 524,
+      "line": 581,
       "text": "REG_DAS0L=0;REG_DAS0H=0x80;REG_MDMAEN=1;"
     },
     {
       "id": "15f38497009938535230",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 526,
+      "line": 583,
       "text": "REG_DAS0L=0;REG_DAS0H=0x80;REG_MDMAEN=1;"
     },
     {
       "id": "4d2d9e6082d25b8411bb",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 529,
+      "line": 586,
       "text": "REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=at;while(n--)REG_VMDATA=*p++;"
     },
     {
       "id": "4d2d9e6082d25b8411bb",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 532,
+      "line": 589,
       "text": "REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=at;while(n--)REG_VMDATA=*p++;"
     },
     {
       "id": "2c71a7df07a93d786d6e",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 539,
+      "line": 596,
       "text": "for(uint8_t r=0;r<8;r++)REG_VMDATA=FONT16[g*32u+(uint16_t)tile*8u+r];"
     },
     {
       "id": "88e83ee192bdda797ffe",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 540,
+      "line": 597,
       "text": "for(uint8_t r=0;r<8;r++)REG_VMDATA=0;"
     },
     {
       "id": "f53ce8eeb6f055b01179",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 646,
+      "line": 682,
       "text": "REG_CGADD=224u;REG_CGDATA=0;REG_CGDATA=0;"
     },
     {
       "id": "b3038ac9d158ebbec857",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 647,
+      "line": 683,
       "text": "uint16_t c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
     },
     {
       "id": "121056e17d14b4fe9f95",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 648,
+      "line": 684,
       "text": "c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
     },
     {
       "id": "e8bad62eecb565cca821",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 649,
+      "line": 685,
       "text": "REG_CGDATA=(uint8_t)dim;REG_CGDATA=(uint8_t)(dim>>8);"
     },
     {
       "id": "6ee0d76bb31a8c2f6226",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 650,
+      "line": 686,
       "text": "REG_CGDATA=(uint8_t)a;REG_CGDATA=(uint8_t)(a>>8);"
     },
     {
       "id": "63243281c4055db252fe",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 651,
+      "line": 687,
       "text": "c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
     },
     {
-      "id": "f0606558a55e4defc917",
+      "id": "171b5297a135a43329e4",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 652,
-      "text": "c=SNES_RGB(31,5,4);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
+      "line": 692,
+      "text": "c=cursor_wheel[cursor_phase&15u];REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);"
     },
     {
       "id": "14c574f6a2b1f5dda522",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 654,
+      "line": 694,
       "text": "for(uint8_t i=7u;i<32u;i++){REG_CGDATA=0;REG_CGDATA=0;}"
     },
     {
       "id": "f698ad225bf4ec3be1b5",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 673,
+      "line": 708,
       "text": "for(uint8_t i=0;i<128;i++){REG_OAMDATA=0;REG_OAMDATA=240;REG_OAMDATA=0;REG_OAMDATA=0;}"
     },
     {
       "id": "69f1a273217549397fb8",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 674,
+      "line": 709,
       "text": "REG_OAMADDL=0;REG_OAMADDH=1;for(uint8_t i=0;i<32;i++)REG_OAMDATA=0;"
     },
     {
       "id": "3de20dd0fc4ec665c072",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 678,
+      "line": 713,
       "text": "REG_OAMDATA=0x0a;REG_OAMDATA=0;"
     },
     {
       "id": "e0842c64aedeef0f288e",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 683,
+      "line": 718,
       "text": "REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=ARROW_L_REST;REG_OAMDATA=gallery_obj_attr;"
     },
     {
       "id": "eb6b88fcc2ca1b695007",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 684,
+      "line": 719,
       "text": "REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=ARROW_R_REST;REG_OAMDATA=gallery_obj_attr;"
     },
     {
       "id": "501a435c5a641e8ddf29",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 694,
+      "line": 729,
       "text": "REG_MDMAEN=1;"
     },
     {
       "id": "e43517eb4fa3abc31bfb",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 720,
+      "line": 754,
       "text": "REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=MAP2;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(dashboard_pal<<10);"
     },
     {
       "id": "4a67f0535d4ca572ce1b",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 721,
+      "line": 755,
       "text": "REG_VMADD=MAP3;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(dashboard_pal<<10);"
     },
     {
       "id": "8f92934b7bdc4280a5bd",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 729,
+      "line": 763,
       "text": "REG_VMDATA=t;REG_VMDATA=(uint16_t)(t+1u);"
     },
     {
       "id": "eed377eee73fec34dd0a",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 731,
+      "line": 765,
       "text": "REG_VMDATA=(uint16_t)(t+2u);REG_VMDATA=(uint16_t)(t+3u);"
     },
     {
       "id": "d40f79c588f8fa7e9fca",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 740,
+      "line": 774,
       "text": "REG_VMDATA=(uint16_t)(tile|((uint16_t)dashboard_pal<<10));}"
     },
     {
       "id": "cde39bdd47781561afda",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 838,
+      "line": 872,
       "text": "for(uint8_t line=0;line<3;line++){REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)(row+line)*32u);for(uint8_t i=0;i<32;i++)REG_VMDATA=0;}"
     },
     {
       "id": "87dc584aa96e8d05264e",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 885,
+      "line": 919,
       "text": "REG_CGADD=0;for(uint16_t i=0;i<512u;i++)REG_CGDATA=a->pal[i];"
     },
     {
       "id": "59a0b4d23dad364133d3",
       "kind": "ppu-write",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 903,
+      "line": 937,
       "text": "REG_DAS0L=(uint8_t)n;REG_DAS0H=(uint8_t)(n>>8);REG_MDMAEN=1;"
     },
     {
       "id": "d20c017017fcd83eaa73",
       "kind": "force-blank",
       "path": "examples/snes/lzss-gallery.c",
-      "line": 946,
+      "line": 980,
       "text": "active_asset=a;REG_HDMAEN=0;REG_INIDISP=INIDISP_FORCE_BLANK;"
     },
     {
