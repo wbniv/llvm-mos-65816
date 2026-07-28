@@ -53,11 +53,20 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   (`673cb42`, [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md)): the 19 patched
   demos' `corpus_result` WRAM offsets MOVED (most `0x31`, `rotkal` `0x13F2`) — regenerate each
   manifest selfcheck `off` from the fresh `.map` at publish; `dev/verify-web-roms.sh` gates the lot.**
-- [T4] **60 fps Batch B — F2 scroll-rings for `ovmove`, `mvscrl`, `truncstair` (+`lfsr2` if its
-  drift is a real translation).** Apply the #99c HDMA scroll-ring design per demo (V-ring for the
-  memmove pair — the memmove stress stays, only the display repaint goes; H-bands for truncstair's
-  ramp). Batch C rides along: F3 stall hunts on any Batch-A demo whose paint frame still overruns.
-  [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md) ·
+- [T4] **60 fps Batch B — F2 scroll-ring for `mvscrl` (the only qualifying demo).** ~~F2 scroll-rings
+  for `ovmove`, `mvscrl`, `truncstair` (+`lfsr2` if its drift is a real translation).~~
+  **Candidacy resolved 2026-07-27 — 3 of the 4 candidates are closed, no work to do:** `ovmove`
+  **rejected** (its flat buffer shifts ±17/−18 bytes = diagonal with a row-crossing wrap, and
+  reverses direction every frame), `lfsr2` **rejected** (two noise fields drift at *different* rates
+  and the interleave mask is position-fixed — nothing rigidly translates), `truncstair` **deferred**
+  (a real horizontal translation, but an `HOFS` ring wraps at the 32-column tilemap while
+  `BitmapCanvas` fills only 16, so blank tiles would scroll in — needs a wider-canvas decision).
+  **Remaining: `mvscrl` only** (two pure whole-row translations, upper down / lower up → V-ring ×2;
+  the memmove stress stays, only the display repaint goes). ⚠️ **Blocked:** `examples/snes/mvscrl.c`
+  has uncommitted concurrent edits — and that in-flight diff drops `mv_step()` from the main loop,
+  so the picture no longer renders the memmove (the gate can't catch it; `gate_crc` runs in the
+  title). Resolve that first. Batch C rides along: F3 stall hunts on any Batch-A demo whose paint
+  frame still overruns. [investigation §Batch B](docs/investigations/2026-07-27-60fps-demo-sweep.md) ·
   [#99c pattern](docs/plans/2026-07-27-99c-trimerge-60fps-scroll-waterfall.md)
 
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently

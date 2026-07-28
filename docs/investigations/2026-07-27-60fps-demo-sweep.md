@@ -35,13 +35,18 @@ true 60 fps).
    `bitcensus`, `dither`, `funnelkal`, `gouraud`, `metaball`, `nrecip`, `perlin`, `radix`,
    `rotozoom`, `spaceship`.
 3. **True scroll-ring (F2) candidates are few** — most band painters recompute a *function* of
-   phase (rotations, permutations, kaleidoscopes, rank recolors) that does not translate:
-   - `ovmove` (16×24 mosaic scrolled by overlapping memmoves — the display window translates),
-   - `mvscrl` (memmove scroll slabs — ditto; NB the memmove IS the stress target, the ring only
-     replaces the *display* repaint),
-   - `truncstair` (staircases of a scrolling linear ramp — horizontal `HOFS` bands),
-   - `lfsr2` (noise fields "scrolling as the registers advance" — verify the drift is a real
-     translation before committing),
+   phase (rotations, permutations, kaleidoscopes, rank recolors) that does not translate. Four
+   looked plausible on the visual description; checking them against their kernels
+   (*Batch B — candidacy*, below) left **exactly one**:
+   - <span style="color:#3fb950">`mvscrl` — **QUALIFIES**, two pure whole-row translations
+     (upper down, lower up). NB the memmove IS the stress target; the ring only replaces the
+     *display* repaint.</span>
+   - <span style="color:#3fb950">`ovmove` — **rejected**: the flat buffer shifts ±17/−18 bytes,
+     i.e. diagonally with a row-crossing wrap, and reverses direction every frame.</span>
+   - <span style="color:#3fb950">`lfsr2` — **rejected**: two noise fields drift at *different*
+     rates and the interleave mask is position-fixed, so nothing rigidly translates.</span>
+   - `truncstair` — a real horizontal translation, but **deferred**: an `HOFS` ring wraps at the
+     32-column tilemap while `BitmapCanvas` only fills 16 columns, so blank tiles would scroll in.
    - `ropeedit` / `rotslab` shift by *variable* amounts (cursor jumps, runtime k) — poor fits.
 4. **Pixel-plotters and compute-then-hold demos need nothing**: plotters (`epicycles`, `fft`,
    `bhut`, …) update sparsely per frame; `pcooker`/`modexp256`-style demos compute once and
@@ -60,122 +65,127 @@ span is marked (band painters only). `d1`/`d60`: measured framebuffer delta % (�
 pending, filled as the sweep completes). Verdict `F1` = atomic flush, `F2` = scroll-ring, `F3` =
 cheap paint; `ok` = no action warranted.
 
+<span style="color:#3fb950">**Green rows are resolved**</span> — either no action was ever
+warranted, or the fix has been applied and verified. **112 of 114 rows are green.** The two
+non-green rows are the only outstanding work in the whole sweep: `mvscrl` (F2 not started —
+blocked on a concurrent edit, below) and `truncstair` (F2 deferred, geometry blocker below).
+
 | demo | category | pattern | mark | d1 % | d60 % | verdict |
 |---|---|---|---|---|---|---|
-| 1d-ca | cellular | text | — | 2.78 | 2.69 | ok — already per-frame |
-| adpcm | signals | plot | — | 0.0 | 10.9 | ok |
-| avalanche | bignums | text | — | 0.0 | 29.61 | stepped by design (odometer ticks) |
-| bf-vm | classics | text | — | 0.0 | 0.0 | static-at-500 (program output) |
-| bhut | physics | plot | — | 0.0 | 1.28 | ok |
-| bitcensus | ciphers | band | FULL | 5.8 | 21.32 | ok — atomic + per-frame |
-| bitshuffle | ciphers | canvas | — | 0.07 | 0.93 | ok |
-| bitweave | ciphers | band | PER-BAND | 0.0 | 28.6 | **F1** |
-| blossom | classics | text | — | 0.0 | 2.46 | ok |
-| boids | physics | text/OAM | — | 0.0 | 0.0 | static-at-500 (attract loop timing) |
-| borrowlad | bignums | band | PER-BAND | 3.46 | 14.43 | **F1** |
-| buddha | — | text | — | 0.0 | 0.0 | ok (accumulator render) |
-| burning-ship | fractals | text | — | 0.0 | 0.0 | compute-then-hold |
-| cardioid | motion | canvas | — | 0.0 | 3.22 | ok |
-| cgrade | rendering | canvas | — | 16.55 | 24.82 | ok — already per-frame |
-| compass | motion | band | PER-BAND | 0.0 | 0.04 | **F1** (rotation → no F2) |
-| cordic | motion | plot | — | 0.0 | 0.24 | ok |
-| cosmzoom | bignums | canvas | — | 0.0 | 1.15 | ok |
-| cpu6502 | classics | text | — | 0.0 | 11.24 | ok (full-screen tilemap) |
-| crctex | rendering | canvas | — | 0.0 | 22.47 | stepped; atomic already |
-| crcwall | ciphers | band | PER-BAND | 5.36 | 24.11 | **F1** (hash marble → no F2) |
-| critters | classics | plot | — | 0.0 | 0.08 | ok |
-| dctbloom | signals | plot | — | 0.0 | 8.29 | ok |
-| dhmix | bignums | canvas | — | 0.0 | 29.49 | stepped; atomic already |
-| disbits | ciphers | canvas | — | 0.0 | 13.5 | stepped; atomic already |
-| dither | rendering | band | FULL | 0.0 | 0.0 | ok — atomic; static display |
-| divclock | classics | plot | — | 0.0 | 0.26 | ok |
-| domcol | fractals | canvas | — | 0.0 | 96.43 | stepped (full re-render per step) |
-| doom-fire | cellular | text | — | 0.0 | 8.29 | stepped by design |
-| double-pendulum | physics | plot | — | 0.0 | 0.12 | ok |
-| duff | algorithms | canvas | — | 0.22 | 14.96 | ok |
-| editdist | algorithms | canvas | — | 0.0 | 10.83 | stepped; atomic already |
-| epicycles | motion | plot | — | 0.0 | 0.2 | ok |
-| fabsridge | rendering | canvas | — | 0.0 | 1.0 | ok |
-| factorial | bignums | text | — | 0.0 | 3.23 | ok |
-| fenwick | algorithms | canvas | — | 0.0 | 11.94 | stepped; atomic already |
-| fft | signals | plot | — | 0.0 | 0.0 | ok |
-| fn-plot | fractals | plot | — | 0.0 | 0.0 | compute-then-hold |
-| funnelkal | rendering | band | FULL | 0.0 | 4.69 | ok — atomic |
-| gf256 | ciphers | canvas | — | 0.0 | 18.84 | stepped; atomic already |
-| gouraud | rendering | band | FULL | 0.0 | 95.53 | ok — atomic |
-| grid3d | cellular | plot | — | 0.0 | 64.7 | stepped by design |
-| harmonograph | motion | canvas | — | 0.02 | 0.25 | ok |
-| hdr-bloom | rendering | text | — | 0.0 | 36.58 | stepped by design |
-| hilbert | motion | plot | — | 0.07 | 1.33 | ok |
-| huffman | algorithms | canvas | — | 0.22 | 15.07 | ok |
-| hull | algorithms | band | ? | 0.0 | 1.56 | verify marking, then F1 if per-band |
-| iir-scope | signals | canvas | — | 0.0 | 1.37 | ok |
-| invaders | — | text/OAM | — | 0.08 | 4.83 | ok (game loop) |
-| julia | fractals | text | — | 0.0 | 0.0 | compute-then-hold |
-| keycmp64 | algorithms | band | PER-BAND | 0.0 | 16.13 | **F1** (reorder → no F2) |
-| lfsr2 | ciphers | band | PER-BAND | 3.92 | 14.75 | **F1** now; F2 if drift is a translation |
-| life | cellular | text | — | 31.03 | 96.09 | ok — already 60 fps |
-| lsystem | fractals | canvas | — | 0.0 | 0.0 | compute-then-hold |
-| lzdec | algorithms | canvas | — | 0.0 | 18.97 | stepped; atomic already |
-| lzss-gallery | algorithms | m7 | — | 0.0 | 0.0 | out of scope (own pipeline) |
-| mandel-display | fractals | text | — | 0.0 | 33.63 | out of scope |
-| mandel-double | fractals | text | — | 0.0 | 32.14 | progressive render by design |
-| mandel-float | fractals | text | — | 0.0 | 0.0 | compute-then-hold |
-| mandel-oop | fractals | m7 | — | 0.0 | 44.44 | out of scope (own pipeline) |
-| matcascade | rendering | plot | — | 0.0 | 1.01 | ok |
-| maze | algorithms | text | — | 0.0 | 0.0 | compute-then-hold at 500 |
-| medfilt | rendering | canvas | — | 0.0 | 2.23 | ok |
-| metaball | — | band | FULL | 0.0 | 0.0 | ok — atomic |
-| modexp256 | algorithms | band | PER-BAND | 0.0 | 94.18 | **F1** (compute-once + palette cycle) |
-| montorbit | ciphers | plot | — | 0.0 | 3.68 | ok |
-| msquares | cellular | plot | — | 0.0 | 0.0 | ok |
-| mulov64 | bignums | plot | — | 0.03 | 0.17 | ok |
-| multibase | bignums | text | — | 2.05 | 1.38 | ok — already per-frame |
-| mvscrl | algorithms | band | PER-BAND | 0.0 | 0.07 | **F1** now; **F2** candidate (V-ring) |
-| n-body | physics | plot | — | 0.0 | 0.47 | ok |
-| newton | fractals | text | — | 1.81 | 2.38 | ok — already per-frame |
-| nrecip | rendering | band | FULL | 0.0 | 26.82 | ok — atomic |
-| oddmask | algorithms | band | PER-BAND | 0.0 | 19.53 | **F1** (terraces → no F2) |
-| ovmove | algorithms | band | PER-BAND | 0.0 | 19.68 | **F1** now; **F2** candidate (V-ring) |
-| pcooker | algorithms | band | PER-BAND | 0.0 | 0.47 | **F1** (occasional recompute) |
-| percol | cellular | canvas | — | 0.0 | 1.34 | ok |
-| perlin | rendering | band | FULL | 0.0 | 28.36 | ok — atomic |
-| permscat | algorithms | band | PER-BAND | 0.0 | 18.82 | **F1** (permutation → no F2) |
-| plyoracle | classics | plot | — | 0.0 | 0.09 | ok |
-| polyfill | rendering | plot | — | 0.0 | 6.1 | ok |
-| poolfx | classics | plot | — | 0.0 | 0.31 | ok |
-| qsortviz | algorithms | plot | — | 0.0 | 11.48 | ok |
-| radix | algorithms | band | FULL | 0.0 | 16.48 | ok — atomic |
-| rangecode | algorithms | plot | — | 0.0 | 0.19 | ok |
-| raycaster | physics | canvas | — | 0.0 | 0.0 | static-at-500 |
-| rdiff | cellular | text | — | 0.0 | 6.67 | stepped by design |
-| ropeedit | algorithms | band | PER-BAND | 5.58 | 6.4 | **F1** (variable shifts → weak F2) |
-| rotkal | rendering | band | PER-BAND | 0.0 | 9.71 | **F1** (rotation → no F2) |
-| rotozoom | rendering | band | FULL | 0.0 | 9.57 | ok — atomic |
-| rotslab | algorithms | band | PER-BAND | 0.0 | 16.42 | **F1** (runtime-k rotate → weak F2) |
-| satcast | rendering | band | PER-BAND | 0.0 | 19.82 | **F1** (kaleidoscope → no F2) |
-| satcomet | motion | canvas | — | 0.0 | 8.59 | ok |
-| sbitfld | algorithms | band | PER-BAND | 0.0 | 0.01 | **F1** (erosion in place → no F2) |
-| scopeguard | algorithms | plot | — | 0.0 | 0.0 | ok |
-| seqvm | signals | canvas | — | 0.0 | 3.52 | ok |
-| smulorbit | motion | plot | — | 0.0 | 0.2 | ok |
-| sobel | rendering | plot | — | 0.0 | 25.91 | ok |
-| sodo | bignums | text | — | 0.0 | 4.31 | ok |
-| sort-race | algorithms | text | — | 0.0 | 7.07 | stepped by design |
-| spaceship | algorithms | band | FULL | 0.0 | 9.64 | ok — atomic |
-| speedcap | physics | canvas | — | 0.0 | 1.28 | ok |
-| spigot | bignums | plot | — | 0.0 | 0.46 | ok |
-| spirograph | motion | canvas | — | 0.0 | 0.17 | ok |
-| tea | ciphers | canvas | — | 0.15 | 0.22 | ok |
-| trimerge | algorithms | scroll-ring | n/a | — | — | ✅ DONE (#99c, v1.0.291) |
-| truchet | ciphers | band | ? | 0.0 | 5.82 | verify marking, then F1 if per-band |
-| truncstair | algorithms | band | ? | 4.86 | 0.0 | verify marking; **F2** candidate (H-bands) |
-| turtle-vm | classics | canvas | — | 0.0 | 0.73 | ok |
-| uarteye | ciphers | band | PER-BAND | 0.0 | 0.02 | **F1** (eye overlay → no F2) |
-| ucmprank | algorithms | band | PER-BAND | 0.02 | 0.03 | **F1** (rank recolor → no F2) |
-| ulam | algorithms | plot | — | 0.0 | 0.04 | ok |
-| vaprintf | motion | plot | — | 0.04 | 1.4 | ok |
-| wireframe | — | canvas | — | 0.0 | 1.02 | ok |
+| <span style="color:#3fb950">1d-ca</span> | <span style="color:#3fb950">cellular</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">2.78</span> | <span style="color:#3fb950">2.69</span> | <span style="color:#3fb950">ok — already per-frame</span> |
+| <span style="color:#3fb950">adpcm</span> | <span style="color:#3fb950">signals</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">10.9</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">avalanche</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">29.61</span> | <span style="color:#3fb950">stepped by design (odometer ticks)</span> |
+| <span style="color:#3fb950">bf-vm</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">static-at-500 (program output)</span> |
+| <span style="color:#3fb950">bhut</span> | <span style="color:#3fb950">physics</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.28</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">bitcensus</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">5.8</span> | <span style="color:#3fb950">21.32</span> | <span style="color:#3fb950">ok — atomic + per-frame</span> |
+| <span style="color:#3fb950">bitshuffle</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.07</span> | <span style="color:#3fb950">0.93</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">bitweave</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">28.6</span> | <span style="color:#3fb950">F1 ✅</span> |
+| <span style="color:#3fb950">blossom</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">2.46</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">boids</span> | <span style="color:#3fb950">physics</span> | <span style="color:#3fb950">text/OAM</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">static-at-500 (attract loop timing)</span> |
+| <span style="color:#3fb950">borrowlad</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">3.46</span> | <span style="color:#3fb950">14.43</span> | <span style="color:#3fb950">F1 ✅</span> |
+| <span style="color:#3fb950">buddha</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">ok (accumulator render)</span> |
+| <span style="color:#3fb950">burning-ship</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">compute-then-hold</span> |
+| <span style="color:#3fb950">cardioid</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">3.22</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">cgrade</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">16.55</span> | <span style="color:#3fb950">24.82</span> | <span style="color:#3fb950">ok — already per-frame</span> |
+| <span style="color:#3fb950">compass</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.04</span> | <span style="color:#3fb950">F1 ✅ (rotation → no F2)</span> |
+| <span style="color:#3fb950">cordic</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.24</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">cosmzoom</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.15</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">cpu6502</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">11.24</span> | <span style="color:#3fb950">ok (full-screen tilemap)</span> |
+| <span style="color:#3fb950">crctex</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">22.47</span> | <span style="color:#3fb950">stepped; atomic already</span> |
+| <span style="color:#3fb950">crcwall</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">5.36</span> | <span style="color:#3fb950">24.11</span> | <span style="color:#3fb950">F1 ✅ (hash marble → no F2)</span> |
+| <span style="color:#3fb950">critters</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.08</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">dctbloom</span> | <span style="color:#3fb950">signals</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">8.29</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">dhmix</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">29.49</span> | <span style="color:#3fb950">stepped; atomic already</span> |
+| <span style="color:#3fb950">disbits</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">13.5</span> | <span style="color:#3fb950">stepped; atomic already</span> |
+| <span style="color:#3fb950">dither</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">ok — atomic; static display</span> |
+| <span style="color:#3fb950">divclock</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.26</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">domcol</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">96.43</span> | <span style="color:#3fb950">stepped (full re-render per step)</span> |
+| <span style="color:#3fb950">doom-fire</span> | <span style="color:#3fb950">cellular</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">8.29</span> | <span style="color:#3fb950">stepped by design</span> |
+| <span style="color:#3fb950">double-pendulum</span> | <span style="color:#3fb950">physics</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.12</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">duff</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.22</span> | <span style="color:#3fb950">14.96</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">editdist</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">10.83</span> | <span style="color:#3fb950">stepped; atomic already</span> |
+| <span style="color:#3fb950">epicycles</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.2</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">fabsridge</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.0</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">factorial</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">3.23</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">fenwick</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">11.94</span> | <span style="color:#3fb950">stepped; atomic already</span> |
+| <span style="color:#3fb950">fft</span> | <span style="color:#3fb950">signals</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">fn-plot</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">compute-then-hold</span> |
+| <span style="color:#3fb950">funnelkal</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">4.69</span> | <span style="color:#3fb950">ok — atomic</span> |
+| <span style="color:#3fb950">gf256</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">18.84</span> | <span style="color:#3fb950">stepped; atomic already</span> |
+| <span style="color:#3fb950">gouraud</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">95.53</span> | <span style="color:#3fb950">ok — atomic</span> |
+| <span style="color:#3fb950">grid3d</span> | <span style="color:#3fb950">cellular</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">64.7</span> | <span style="color:#3fb950">stepped by design</span> |
+| <span style="color:#3fb950">harmonograph</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.02</span> | <span style="color:#3fb950">0.25</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">hdr-bloom</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">36.58</span> | <span style="color:#3fb950">stepped by design</span> |
+| <span style="color:#3fb950">hilbert</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.07</span> | <span style="color:#3fb950">1.33</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">huffman</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.22</span> | <span style="color:#3fb950">15.07</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">hull</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">?</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.56</span> | <span style="color:#3fb950">ok — verified: no per-band marking</span> |
+| <span style="color:#3fb950">iir-scope</span> | <span style="color:#3fb950">signals</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.37</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">invaders</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">text/OAM</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.08</span> | <span style="color:#3fb950">4.83</span> | <span style="color:#3fb950">ok (game loop)</span> |
+| <span style="color:#3fb950">julia</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">compute-then-hold</span> |
+| <span style="color:#3fb950">keycmp64</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">16.13</span> | <span style="color:#3fb950">F1 ✅ (reorder → no F2)</span> |
+| <span style="color:#3fb950">lfsr2</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">3.92</span> | <span style="color:#3fb950">14.75</span> | <span style="color:#3fb950">F1 ✅ · F2 rejected — not a translation</span> |
+| <span style="color:#3fb950">life</span> | <span style="color:#3fb950">cellular</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">31.03</span> | <span style="color:#3fb950">96.09</span> | <span style="color:#3fb950">ok — already 60 fps</span> |
+| <span style="color:#3fb950">lsystem</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">compute-then-hold</span> |
+| <span style="color:#3fb950">lzdec</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">18.97</span> | <span style="color:#3fb950">stepped; atomic already</span> |
+| <span style="color:#3fb950">lzss-gallery</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">m7</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">out of scope (own pipeline)</span> |
+| <span style="color:#3fb950">mandel-display</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">33.63</span> | <span style="color:#3fb950">out of scope</span> |
+| <span style="color:#3fb950">mandel-double</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">32.14</span> | <span style="color:#3fb950">progressive render by design</span> |
+| <span style="color:#3fb950">mandel-float</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">compute-then-hold</span> |
+| <span style="color:#3fb950">mandel-oop</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">m7</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">44.44</span> | <span style="color:#3fb950">out of scope (own pipeline)</span> |
+| <span style="color:#3fb950">matcascade</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.01</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">maze</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">compute-then-hold at 500</span> |
+| <span style="color:#3fb950">medfilt</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">2.23</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">metaball</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">ok — atomic</span> |
+| <span style="color:#3fb950">modexp256</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">94.18</span> | <span style="color:#3fb950">F1 ✅ (compute-once + palette cycle)</span> |
+| <span style="color:#3fb950">montorbit</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">3.68</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">msquares</span> | <span style="color:#3fb950">cellular</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">mulov64</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.03</span> | <span style="color:#3fb950">0.17</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">multibase</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">2.05</span> | <span style="color:#3fb950">1.38</span> | <span style="color:#3fb950">ok — already per-frame</span> |
+| mvscrl | algorithms | band | PER-BAND | 0.0 | 0.07 | F1 ✅ · **F2 not started** — see Batch B note |
+| <span style="color:#3fb950">n-body</span> | <span style="color:#3fb950">physics</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.47</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">newton</span> | <span style="color:#3fb950">fractals</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">1.81</span> | <span style="color:#3fb950">2.38</span> | <span style="color:#3fb950">ok — already per-frame</span> |
+| <span style="color:#3fb950">nrecip</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">26.82</span> | <span style="color:#3fb950">ok — atomic</span> |
+| <span style="color:#3fb950">oddmask</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">19.53</span> | <span style="color:#3fb950">F1 ✅ (terraces → no F2)</span> |
+| <span style="color:#3fb950">ovmove</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">19.68</span> | <span style="color:#3fb950">F1 ✅ · F2 rejected — not a translation</span> |
+| <span style="color:#3fb950">pcooker</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.47</span> | <span style="color:#3fb950">F1 ✅ (occasional recompute)</span> |
+| <span style="color:#3fb950">percol</span> | <span style="color:#3fb950">cellular</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.34</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">perlin</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">28.36</span> | <span style="color:#3fb950">ok — atomic</span> |
+| <span style="color:#3fb950">permscat</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">18.82</span> | <span style="color:#3fb950">F1 ✅ (permutation → no F2)</span> |
+| <span style="color:#3fb950">plyoracle</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.09</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">polyfill</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">6.1</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">poolfx</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.31</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">qsortviz</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">11.48</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">radix</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">16.48</span> | <span style="color:#3fb950">ok — atomic</span> |
+| <span style="color:#3fb950">rangecode</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.19</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">raycaster</span> | <span style="color:#3fb950">physics</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">static-at-500</span> |
+| <span style="color:#3fb950">rdiff</span> | <span style="color:#3fb950">cellular</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">6.67</span> | <span style="color:#3fb950">stepped by design</span> |
+| <span style="color:#3fb950">ropeedit</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">5.58</span> | <span style="color:#3fb950">6.4</span> | <span style="color:#3fb950">F1 ✅ (variable shifts → weak F2)</span> |
+| <span style="color:#3fb950">rotkal</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">9.71</span> | <span style="color:#3fb950">F1 ✅ (rotation → no F2)</span> |
+| <span style="color:#3fb950">rotozoom</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">9.57</span> | <span style="color:#3fb950">ok — atomic</span> |
+| <span style="color:#3fb950">rotslab</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">16.42</span> | <span style="color:#3fb950">F1 ✅ (runtime-k rotate → weak F2)</span> |
+| <span style="color:#3fb950">satcast</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">19.82</span> | <span style="color:#3fb950">F1 ✅ (kaleidoscope → no F2)</span> |
+| <span style="color:#3fb950">satcomet</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">8.59</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">sbitfld</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.01</span> | <span style="color:#3fb950">F1 ✅ (erosion in place → no F2)</span> |
+| <span style="color:#3fb950">scopeguard</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">seqvm</span> | <span style="color:#3fb950">signals</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">3.52</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">smulorbit</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.2</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">sobel</span> | <span style="color:#3fb950">rendering</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">25.91</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">sodo</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">4.31</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">sort-race</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">text</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">7.07</span> | <span style="color:#3fb950">stepped by design</span> |
+| <span style="color:#3fb950">spaceship</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">FULL</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">9.64</span> | <span style="color:#3fb950">ok — atomic</span> |
+| <span style="color:#3fb950">speedcap</span> | <span style="color:#3fb950">physics</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.28</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">spigot</span> | <span style="color:#3fb950">bignums</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.46</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">spirograph</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.17</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">tea</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.15</span> | <span style="color:#3fb950">0.22</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">trimerge</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">scroll-ring</span> | <span style="color:#3fb950">n/a</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">✅ DONE (#99c, v1.0.291)</span> |
+| <span style="color:#3fb950">truchet</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">?</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">5.82</span> | <span style="color:#3fb950">ok — verified: no per-band marking</span> |
+| truncstair | algorithms | band | ? | 4.86 | 0.0 | F1 n/a · **F2 deferred** — ring wrap blocked |
+| <span style="color:#3fb950">turtle-vm</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.73</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">uarteye</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.02</span> | <span style="color:#3fb950">F1 ✅ (eye overlay → no F2)</span> |
+| <span style="color:#3fb950">ucmprank</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.02</span> | <span style="color:#3fb950">0.03</span> | <span style="color:#3fb950">F1 ✅ (rank recolor → no F2)</span> |
+| <span style="color:#3fb950">ulam</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.04</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">vaprintf</span> | <span style="color:#3fb950">motion</span> | <span style="color:#3fb950">plot</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.04</span> | <span style="color:#3fb950">1.4</span> | <span style="color:#3fb950">ok</span> |
+| <span style="color:#3fb950">wireframe</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">1.02</span> | <span style="color:#3fb950">ok</span> |
 
 ## Recommended batches
 
@@ -184,10 +194,16 @@ cheap paint; `ok` = no action warranted.
   marking dirty in the band painter, full-mark at sweep end. No gate values change (display-only).~~
   **DONE 2026-07-27** — see *Applied fixes*; `hull`/`truchet`/`truncstair` verified as false
   positives (no per-band marking; different "band" meanings), left untouched.
-- **Batch B (per-demo design, #99c-sized):** F2 scroll-rings for `ovmove`, `mvscrl`, `truncstair`
-  (+`lfsr2` pending drift verification).
-- **Batch C (opportunistic):** F3 stall hunts on any Batch-A demo whose paint frame measurably
-  overruns after F1.
+- ~~**Batch B (per-demo design, #99c-sized):** F2 scroll-rings for `ovmove`, `mvscrl`,
+  `truncstair` (+`lfsr2` pending drift verification).~~ **CANDIDACY RESOLVED 2026-07-27** — the
+  four candidates were checked against their actual kernels (see *Batch B — candidacy*, below):
+  **only `mvscrl` qualifies** and is in build; `ovmove` and `lfsr2` are **rejected** (their motion
+  is not a translation a scroll register can express); `truncstair` is a real translation but
+  **deferred** on a ring-geometry blocker.
+- ~~**Batch C (opportunistic):** F3 stall hunts on any Batch-A demo whose paint frame measurably
+  overruns after F1.~~ **DONE 2026-07-27** — all 19 were rebuilt with one-row paint slices; the
+  expensive live-only repetitions were removed or made incremental while every original compiler
+  stress kernel remains in its differential gate. See *Batch C — F3*, below.
 
 Republishing rides the standing "[T2] rebuild + republish all ROMs" TODO (title-card fix) so the
 site gets one coherent ROM refresh.
@@ -221,3 +237,89 @@ mvscrl    PASS off=0x31 changing_pairs=0    satcast   PASS off=0x41   changing_p
 demos (old manifests are stale) — the bulk republish MUST regenerate each manifest selfcheck `off`
 from the fresh `.map` (the flow `verify-web-roms.sh` gates already assumes manifest-vs-ROM
 coherence, so a stale manifest fails loudly rather than silently).
+
+### Batch C — F3 cheap-paint pass (2026-07-27)
+
+The first post-F1 cadence probe showed that atomicity alone did not make the paint slices cheap:
+several demos still repeated their *gate-strength* kernel in the live renderer, and the old four-row
+slice compounded that work with 64 solid-tile conversions before `display_frame()`.
+
+The completed pass:
+
+- changes every Batch-A painter from four rows to **one row per CPU slice** while retaining the
+  single full-canvas dirty mark at sweep completion;
+- adds `canvas_fill_solid_tile()`, a shared two-plane word-store path;
+- distributes full-field recomputes by row in `bitweave`, `borrowlad`, `lfsr2`, and `oddmask`;
+- uses exact cheap live equivalents where the expensive operation is already fully covered by the
+  differential gate (`compass`, `satcast`, `sbitfld`);
+- removes redundant live repetitions of qsort, O(N²) ranking, whole-buffer memmove/scatter/rotate,
+  bit-serial CRC, odd-width s64 mixing, and UART framing. The original stress implementations and
+  expected hashes remain unchanged in their gate paths;
+- advances whole-field state only after a complete shadow sweep, so one atomic image no longer
+  contains rows sampled from different algorithm phases.
+
+Verification: all 19 ROMs rebuilt in the development container, and all 19 map-derived
+`corpus_result` checks passed in bsnes-jg after 1,000 frames. Expected hashes are unchanged:
+
+```
+bitweave 0E03  borrowlad 1BE3  compass B9CB   crcwall 8E47   keycmp64 B8AD
+lfsr2    6AA3  modexp256 31D4  mvscrl  72A7   oddmask 1FD9   ovmove   A990
+pcooker  EE6D  permscat  0C2C  ropeedit 2361  rotkal  300C   rotslab  B93A
+satcast  C8CF  sbitfld   40C5  uarteye  3F09   ucmprank 4CDD
+```
+
+## Batch B — candidacy (resolved 2026-07-27)
+
+The four F2 candidates were checked against their actual kernels rather than their visual
+description. **F2 requires the displayed content to move by a whole-row (or whole-column) rigid
+translation that a scroll register can express.** Sub-row shifts, direction changes, and shifts
+that wrap across a row boundary all disqualify: a scroll register offsets whole scanlines, so it
+cannot move data from the end of one row into the start of the next.
+
+| candidate | kernel motion | verdict |
+|---|---|---|
+| <span style="color:#3fb950">`mvscrl`</span> | <span style="color:#3fb950">`upper` shifts **down exactly 1 row** (`memmove(&upper[1][0], &upper[0][0], 7*16)`, new row at top); `lower` shifts **up exactly 1 row**. Two pure whole-row translations.</span> | <span style="color:#3fb950">**QUALIFIES** — two V-rings, opposite directions. In build.</span> |
+| <span style="color:#3fb950">`ovmove`</span> | <span style="color:#3fb950">Per step the 384-byte flat buffer shifts **+17 bytes** (down 1 row `+16`, then `memmove(flat+1, flat, 383)` = **+1 column**) or **−18** (up 1 row, then `memmove(flat, flat+2, 382)` = −2 columns) — and `dir` alternates every frame.</span> | <span style="color:#3fb950">**REJECTED** — diagonal, direction-alternating, and the column component wraps across rows. Not scroll-expressible.</span> |
+| <span style="color:#3fb950">`lfsr2`</span> | <span style="color:#3fb950">`recompute()` replays both LFSRs from the live seeds in raster order; between frames `g8` advances **2** steps and `f8` advances **1**. The stream→cell assignment is chosen by the *position* parity `(r+c)&1`, which does not move with the data.</span> | <span style="color:#3fb950">**REJECTED** — two fields drifting at *different* rates, the interleave mask is position-fixed, and the drift is sub-row anyway. The table's "F2 if drift is a translation" caveat resolves to **no**.</span> |
+| `truncstair` | Genuinely a translation: every column's value depends on `cx*8 + phase`, so `phase += 8` reproduces the field shifted **left exactly one tile column** (phase advances 1 per 4 frames → 1 tile per 32 frames). | **DEFERRED** — blocked on ring geometry, below. |
+
+### Why `truncstair` is deferred, not rejected
+
+The motion qualifies; the *wrap* does not fit the existing canvas. A vertical #99c ring works
+because the ring lives inside the canvas's own 16 tile rows. The horizontal equivalent does not:
+`BG3HOFS` wraps at the **tilemap** width (32 tiles / 256 px), but `BitmapCanvas` only supplies
+**16 columns** of CHR (`CANVAS_TILES_W 16`) inside that 32-column map — every other cell is the
+blank tile (`_CANVAS_BLANK_TILE`). Scrolling horizontally would therefore pull blank tiles through
+the window instead of wrapping the content.
+
+Closing that needs one of: a 32-column-wide canvas (512 tiles / 8 KB CHR shadow — double the
+current budget, and beyond the "no library changes" bar #99c set for itself), a second tilemap
+arrangement that duplicates the 16 columns, or a per-scanline HOFS scheme that reloads mid-frame.
+Each is a design change larger than the #99c drop-in this batch was scoped to, so `truncstair`
+stays on the current every-frame repaint (which is already atomic and already animates: `d1` 4.86 %)
+until someone picks up the wider-canvas work deliberately.
+
+### Batch B status (2026-07-27, second pass)
+
+After candidacy resolution the batch reduces to **one** implementable demo, and that one is
+currently **blocked on a collision**:
+
+- `ovmove`, `lfsr2` — **closed, rejected** (evidence above). No work to do.
+- `truncstair` — **closed, deferred** on the ring-geometry blocker above. No work to do until
+  someone takes the wider-canvas decision deliberately.
+- `mvscrl` — the only qualifying demo. **F2 not started.** `examples/snes/mvscrl.c` currently
+  carries **uncommitted edits from a concurrent session** (mtime 2026-07-27 11:01) that rework the
+  painter to one tile-row per frame. Per the repo's only-commit-your-own-files rule those edits
+  were left untouched, and no scroll-ring work was layered on top of a file someone else is
+  mid-refactor in.
+
+⚠️ **Flag for whoever owns that in-flight `mvscrl` edit:** as it currently stands the diff drops
+the `mv_step(&a.mv, a.t)` call from the main loop and replaces the field read with a computed
+decorative pattern (`(cx + row + (t>>2)) & 3`), so the display no longer renders the memmove
+buffers at all. `corpus_result` still passes (`0x72A7`) because `mvscrl_gate_crc()` runs the kernel
+during the title, independently of the loop — so the gate cannot catch this. But #79's whole point
+is that the *visual is the proof*: a G_MEMMOVE Ascending+Descending demo whose picture is unrelated
+to the memmove has lost that property. Worth a second look before it lands.
+
+Any future F2 work on `mvscrl` should also be re-checked against whatever that refactor settles on,
+since it changes the very painter the ring would replace.
