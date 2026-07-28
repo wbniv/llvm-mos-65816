@@ -14,7 +14,23 @@ BASE = ROOT / "assets/snes/lzss-gallery"
 DERIVED = BASE / "derived"
 SOURCE_DIR = BASE / "sources"
 SOURCES = BASE / "sources.json"
-ART_INDICES = tuple(range(1,224))
+# CGRAM ownership (see #136/#139).
+#
+#   0        black: Mode 7 surround, partial-tile padding, font background
+#   1        dashboard gold ink   (STATIC - never an artwork colour)
+#   2        dashboard dark ink   (STATIC - never an artwork colour)
+#   3..223   221 adaptive artwork colours
+#   224..255 reserved sprite block
+#
+# 1 and 2 are baked into every generated palette rather than written by the
+# runtime, so the .pal file IS the CGRAM image and no mid-frame palette work is
+# needed. #139 tried to lend 1..2 to the artwork and swap them at the raster
+# split with HDMA; CGRAM is only writable during VBlank/forced blank, so those
+# writes scattered and corrupted every painting. Static inks cost two colours
+# (223 -> 221) and are correct on hardware.
+DASHBOARD_INK = (0xFF, 0xC8, 0x42)   # gold, matches SNES_RGB(31,25,8)
+DASHBOARD_DARK = (0x29, 0x21, 0x18)  # shadow, matches SNES_RGB(5,4,3)
+ART_INDICES = tuple(range(3,224))
 ART_COLORS = len(ART_INDICES)
 MAX_ART_TILES = 255
 
@@ -198,6 +214,7 @@ def main():
         dense_pal=[tuple(qpal[i:i+3]) for i in range(0,ART_COLORS*3,3)]
         pixels=bytes(ART_INDICES[x] for x in q.tobytes())
         colors=[(0,0,0)]*256
+        colors[1]=DASHBOARD_INK; colors[2]=DASHBOARD_DARK
         for dst,color in zip(ART_INDICES,dense_pal): colors[dst]=color
         assert all(x in ART_INDICES for x in pixels)
         preview=Image.new("RGB",(256,shown_h),(0,0,0))
@@ -237,7 +254,7 @@ def main():
           "compressed_bytes":len(packed),"reduction_bytes":len(pixels)-len(packed),
           "reduction_percent":round((1-len(packed)/len(pixels))*100,2),
           "checksum":fold,"artwork_color_capacity":ART_COLORS,
-          "palette_mapping":"contiguous-1-223",
+          "palette_mapping":"contiguous-3-223-static-inks",
           "artwork_colors_used":len(set(pixels)),"artwork_indices_used":sorted(set(pixels)),
           "palette_sha256":hashlib.sha256(palbin).hexdigest(),
           "source_sha256":source_hash,

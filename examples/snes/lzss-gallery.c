@@ -928,21 +928,22 @@ static void split_arm(uint8_t split){
    * appeared, and disabling exactly these two channels renders the corpus
    * clean again).
    *
-   * The cgadd_tab/cgdata_tab construction above is now dead — nothing reads
-   * those tables once the channels are unarmed. It is left in place rather
-   * than deleted so #139's follow-up keeps its scaffolding, and because the
-   * published gallery_palette_1/2 bytes still feed the NMI's VBlank restore,
-   * which is a legal time to touch CGRAM.
+   * The replacement is static inks: the generator now confines the painting to
+   * CGRAM 3..223 (221 adaptive colours) and bakes the dashboard gold at 1 and
+   * the shadow at 2 into every .pal. The bulk upload in palette() therefore
+   * puts the correct inks in place by itself — the caption renders in the exact
+   * brand gold with no mid-frame palette work at all, on any painting.
+   *
+   * The cgadd_tab/cgdata_tab construction above is consequently dead; nothing
+   * reads those tables once the channels are unarmed. Left in place so #139's
+   * scaffolding survives for whoever revisits it, and because the published
+   * gallery_palette_1/2 bytes still feed the NMI's VBlank restore — a legal
+   * time to touch CGRAM, and now a no-op that rewrites the inks with their own
+   * values.
    *
    * Channels 1 and 2 (BGMODE/TM) remain armed — those target PPU registers
    * that ARE safe to write mid-frame, and they are what actually performs the
    * Mode 7 -> Mode 1 split.
-   *
-   * Consequence: the caption renders in the painting's own entry 1/2 rather
-   * than the brand gold. Every one of the 62 works quantises a bright colour
-   * into entry 1 (luma 123..255), so the caption stays legible; restoring the
-   * exact gold needs the painting range narrowed to 3..223 (221 colours) and
-   * an asset regeneration, which is a separate decision.
    */
   REG_HDMAEN=0x06;
 }
