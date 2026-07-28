@@ -37,6 +37,7 @@
 #define BAND_TRUNC   0u
 #define BAND_FLOOR   6u
 #define BAND_ROUND   12u
+#define BAND_ROUND_H 4u   // rows 12..15 — the canvas ends at 15, so this band is SHORTER
 #define DIVIDER_T    5u
 #define DIVIDER_F    11u
 
@@ -74,14 +75,24 @@ static inline uint8_t level_color(int16_t q) {
 // Draw one staircase band: for each tile column cx in [0..15],
 // compute the quantized level and fill the tile row at a scaled height within the band.
 // Uses only 1 tile height per column (the "step" position).
-static void draw_band(App *a, uint8_t band_top, uint8_t mode) {
+// `band_h` is the band's OWN height. It used to be BAND_H (5) for all three, but the round band
+// starts at row 12, so rows 12..16 were written into a canvas that only has rows 0..15. Tile row 16
+// is chr[4096..], and chr[] is immediately followed by lo/hi/chr_word/map_word — so every frame the
+// overflow rewrote the canvas's own VRAM addresses with tile bitmap bytes (0x00/0xFF). _canvas_emit
+// then DMA'd to a garbage VRAM address, wiping the tilemap: the demo rendered a BLACK SCREEN and
+// reset in a loop. The gate never saw it (corpus_result is computed during the title).
+static void draw_band(App *a, uint8_t band_top, uint8_t band_h, uint8_t mode) {
     BitmapCanvas *cv = &a->canvas;
     uint8_t cx;
     for (cx = 0u; cx < (uint8_t)CANVAS_TILES_W; cx++) {
-        // Float input: center of this tile column, with scroll offset.
-        float x_f = (float)((int16_t)((uint16_t)cx * (uint16_t)8u + (uint16_t)4u)
-                             - (int16_t)64 + (int16_t)a->phase)
-                    * (1.0f / 16.0f);                       // G_SITOFP + G_FMUL
+        // Float input: centre of this tile column, with scroll offset, WRAPPED into one 128 px
+        // period. With an unbounded phase q grew without limit and row_offset = 2 - q clamped to 0
+        // for every column within ~13 s, flattening all three staircases even without the overflow
+        // above. Wrapping also makes the field periodic across the canvas width — the property an
+        // HOFS scroll-ring needs (see the 60 fps sweep, F2).
+        int16_t xw = (int16_t)((uint16_t)(((uint16_t)cx * (uint16_t)8u + (uint16_t)4u
+                                           + a->phase) & (uint16_t)127u)) - (int16_t)64;
+        float x_f = (float)xw * (1.0f / 16.0f);             // G_SITOFP + G_FMUL
 
         int16_t q;
         if (mode == 0u) {
@@ -96,12 +107,12 @@ static void draw_band(App *a, uint8_t band_top, uint8_t mode) {
         // q in [-3..3] → row in [BAND_H-1 .. 0] (clamp to band).
         int16_t row_offset = (int16_t)(2 - q);  // q=2 → row 0 (top), q=-2 → row 4 (bot)
         if (row_offset < 0) row_offset = 0;
-        if (row_offset >= (int16_t)BAND_H) row_offset = (int16_t)(BAND_H - 1u);
+        if (row_offset >= (int16_t)band_h) row_offset = (int16_t)(band_h - 1u);
         uint8_t tile_row = (uint8_t)((uint8_t)band_top + (uint8_t)row_offset);
 
         // Clear all rows in this band column, then fill the step row.
         uint8_t r;
-        for (r = 0u; r < (uint8_t)BAND_H; r++) {
+        for (r = 0u; r < band_h; r++) {
             uint8_t ty = (uint8_t)(band_top + r);
             uint16_t tile = (uint16_t)((uint16_t)ty * (uint16_t)CANVAS_TILES_W + (uint16_t)cx);
             uint8_t *tp = &cv->chr[tile * (uint16_t)CANVAS_TILEBYTES];
@@ -169,11 +180,11 @@ int main(void) {
         if ((a.frame & 3u) == 0u)
             a.phase = (uint16_t)(a.phase + 1u);
         // Redraw all three bands each frame.
-        draw_band(&a, BAND_TRUNC, 0u);
+        draw_band(&a, BAND_TRUNC, BAND_H, 0u);
         draw_divider(&a, DIVIDER_T);
-        draw_band(&a, BAND_FLOOR, 1u);
+        draw_band(&a, BAND_FLOOR, BAND_H, 1u);
         draw_divider(&a, DIVIDER_F);
-        draw_band(&a, BAND_ROUND, 2u);
+        draw_band(&a, BAND_ROUND, BAND_ROUND_H, 2u);
         update_hud(&a);
         display_frame(&a.screen);
     }
