@@ -6,7 +6,7 @@
     {
       "symbol": "FONT16",
       "bytes": 4096,
-      "bank": 20,
+      "bank": 21,
       "slot": 2
     },
     {
@@ -21,84 +21,84 @@
       {
         "symbol": "thistles",
         "part": "lz",
-        "bytes": 17053
+        "bytes": 17077
       },
       {
-        "symbol": "stack_wheat",
+        "symbol": "the_kiss",
         "part": "lz",
-        "bytes": 15699
+        "bytes": 15637
       }
     ],
     [
       {
         "symbol": "starry_night",
         "part": "lz",
-        "bytes": 16950
+        "bytes": 16986
       },
       {
-        "symbol": "thai_ravan_palace",
+        "symbol": "dragon",
         "part": "lz",
-        "bytes": 15796
+        "bytes": 15774
       }
     ],
     [
       {
         "symbol": "self_portrait",
         "part": "lz",
-        "bytes": 16922
+        "bytes": 16939
       },
       {
-        "symbol": "sunflowers",
+        "symbol": "louvre_rain",
         "part": "lz",
-        "bytes": 15795
+        "bytes": 15815
       }
     ],
     [
       {
         "symbol": "the_willows",
         "part": "lz",
-        "bytes": 16642
+        "bytes": 16663
       },
       {
-        "symbol": "sunset_woods",
+        "symbol": "ice_skaters",
         "part": "lz",
-        "bytes": 16107
+        "bytes": 16101
       }
     ],
     [
       {
         "symbol": "earthly_delights",
         "part": "lz",
-        "bytes": 16459
+        "bytes": 16488
       },
       {
-        "symbol": "ice_skaters",
+        "symbol": "sunset_woods",
         "part": "lz",
-        "bytes": 16046
+        "bytes": 16124
       }
     ],
     [
       {
         "symbol": "thai_elephant_duel",
         "part": "lz",
-        "bytes": 16381
+        "bytes": 16393
       },
       {
         "symbol": "mountain_waterfall",
         "part": "lz",
-        "bytes": 15903
+        "bytes": 15947
       }
     ],
     [
       {
-        "symbol": "dragon",
+        "symbol": "sunflowers",
         "part": "lz",
-        "bytes": 15765
+        "bytes": 15852
       },
       {
-        "symbol": "louvre_rain",
+        "symbol": "thai_ravan_palace",
         "part": "lz",
-        "bytes": 15765
+        "bytes": 15830
       },
       {
         "symbol": "FONT8",
@@ -110,12 +110,12 @@
       {
         "symbol": "pantheon_interior",
         "part": "lz",
-        "bytes": 15760
+        "bytes": 15798
       },
       {
-        "symbol": "thai_buddha_descending",
+        "symbol": "stack_wheat",
         "part": "lz",
-        "bytes": 15695
+        "bytes": 15740
       },
       {
         "symbol": "great_wave",
@@ -130,14 +130,14 @@
     ],
     [
       {
-        "symbol": "thai_hanuman_longka",
+        "symbol": "thai_buddha_descending",
         "part": "lz",
-        "bytes": 15653
+        "bytes": 15715
       },
       {
-        "symbol": "the_kiss",
+        "symbol": "thai_hanuman_longka",
         "part": "lz",
-        "bytes": 15625
+        "bytes": 15703
       },
       {
         "symbol": "water_lilies",
@@ -154,12 +154,12 @@
       {
         "symbol": "thai_hanuman",
         "part": "lz",
-        "bytes": 15552
+        "bytes": 15599
       },
       {
         "symbol": "home_heron",
         "part": "lz",
-        "bytes": 15533
+        "bytes": 15588
       },
       {
         "symbol": "stack_wheat",
@@ -181,12 +181,12 @@
       {
         "symbol": "mortlake_terrace",
         "part": "lz",
-        "bytes": 15322
+        "bytes": 15359
       },
       {
-        "symbol": "tableau_vii",
+        "symbol": "scholar_landscape",
         "part": "lz",
-        "bytes": 15304
+        "bytes": 15344
       },
       {
         "symbol": "poppy_field",
@@ -211,14 +211,14 @@
     ],
     [
       {
-        "symbol": "scholar_landscape",
+        "symbol": "great_wave",
         "part": "lz",
-        "bytes": 15288
+        "bytes": 15330
       },
       {
-        "symbol": "tornado_forest",
+        "symbol": "tableau_vii",
         "part": "lz",
-        "bytes": 15274
+        "bytes": 15315
       },
       {
         "symbol": "the_kiss",
@@ -243,14 +243,14 @@
     ],
     [
       {
-        "symbol": "great_wave",
+        "symbol": "tornado_forest",
         "part": "lz",
-        "bytes": 15259
+        "bytes": 15286
       },
       {
         "symbol": "the_scream",
         "part": "lz",
-        "bytes": 15238
+        "bytes": 15260
       },
       {
         "symbol": "sunflowers",
@@ -277,12 +277,12 @@
       {
         "symbol": "basket_apples",
         "part": "lz",
-        "bytes": 15200
+        "bytes": 15240
       },
       {
         "symbol": "paris_street",
         "part": "lz",
-        "bytes": 15171
+        "bytes": 15222
       },
       {
         "symbol": "dragon",
@@ -309,12 +309,12 @@
       {
         "symbol": "thai_ravana_war",
         "part": "lz",
-        "bytes": 15139
+        "bytes": 15191
       },
       {
         "symbol": "houses_parliament",
         "part": "lz",
-        "bytes": 15127
+        "bytes": 15187
       },
       {
         "symbol": "starry_night",
@@ -341,12 +341,12 @@
       {
         "symbol": "wide_river",
         "part": "lz",
-        "bytes": 15021
+        "bytes": 15068
       },
       {
         "symbol": "water_lilies",
         "part": "lz",
-        "bytes": 14958
+        "bytes": 15027
       },
       {
         "symbol": "wide_river",
@@ -378,12 +378,12 @@
       {
         "symbol": "marly_le_roi",
         "part": "lz",
-        "bytes": 14918
+        "bytes": 14959
       },
       {
         "symbol": "grande_jatte",
         "part": "lz",
-        "bytes": 14846
+        "bytes": 14911
       },
       {
         "symbol": "voyage_youth",
@@ -415,12 +415,12 @@
       {
         "symbol": "poppy_field",
         "part": "lz",
-        "bytes": 14815
+        "bytes": 14884
       },
       {
         "symbol": "third_of_may",
         "part": "lz",
-        "bytes": 14654
+        "bytes": 14716
       },
       {
         "symbol": "fog_mount_desert",
@@ -457,12 +457,12 @@
       {
         "symbol": "wooded_merrymakers",
         "part": "lz",
-        "bytes": 14544
+        "bytes": 14603
       },
       {
         "symbol": "wijk_windmill",
         "part": "lz",
-        "bytes": 14366
+        "bytes": 14433
       },
       {
         "symbol": "stormy_sunset",
@@ -504,29 +504,12 @@
       {
         "symbol": "stormy_sunset",
         "part": "lz",
-        "bytes": 14330
+        "bytes": 14380
       },
       {
         "symbol": "mount_akiha",
         "part": "lz",
-        "bytes": 14324
-      },
-      {
-        "symbol": "FONT16",
-        "part": "shared",
-        "bytes": 4096
-      }
-    ],
-    [
-      {
-        "symbol": "fujisawa_shuku",
-        "part": "lz",
-        "bytes": 14319
-      },
-      {
-        "symbol": "voyage_youth",
-        "part": "lz",
-        "bytes": 14088
+        "bytes": 14374
       },
       {
         "symbol": "marly_le_roi",
@@ -562,23 +545,40 @@
         "symbol": "thai_elephant_duel",
         "part": "pal",
         "bytes": 512
+      }
+    ],
+    [
+      {
+        "symbol": "fujisawa_shuku",
+        "part": "lz",
+        "bytes": 14369
+      },
+      {
+        "symbol": "approach_venice",
+        "part": "lz",
+        "bytes": 14144
+      },
+      {
+        "symbol": "FONT16",
+        "part": "shared",
+        "bytes": 4096
+      }
+    ],
+    [
+      {
+        "symbol": "voyage_youth",
+        "part": "lz",
+        "bytes": 14133
+      },
+      {
+        "symbol": "fog_mount_desert",
+        "part": "lz",
+        "bytes": 14053
       },
       {
         "symbol": "thai_ravan_palace",
         "part": "pal",
         "bytes": 512
-      }
-    ],
-    [
-      {
-        "symbol": "approach_venice",
-        "part": "lz",
-        "bytes": 14045
-      },
-      {
-        "symbol": "fog_mount_desert",
-        "part": "lz",
-        "bytes": 14006
       },
       {
         "symbol": "thai_surasa_hanuman",
@@ -605,7 +605,7 @@
       {
         "symbol": "thai_surasa_hanuman",
         "part": "lz",
-        "bytes": 13938
+        "bytes": 14005
       },
       {
         "symbol": "thai_temple_painting",
@@ -617,130 +617,130 @@
       {
         "symbol": "flower_still_life",
         "part": "lz",
-        "bytes": 13881
+        "bytes": 13882
       },
       {
         "symbol": "wivenhoe_park",
         "part": "lz",
-        "bytes": 13768
+        "bytes": 13837
       }
     ],
     [
       {
         "symbol": "harvest_moon",
         "part": "lz",
-        "bytes": 13689
+        "bytes": 13777
       },
       {
         "symbol": "st_odulphus",
         "part": "lz",
-        "bytes": 13620
+        "bytes": 13674
       }
     ],
     [
       {
         "symbol": "river_moonlight",
         "part": "lz",
-        "bytes": 13478
+        "bytes": 13529
       },
       {
         "symbol": "ships_calm",
         "part": "lz",
-        "bytes": 13372
+        "bytes": 13435
       }
     ],
     [
       {
         "symbol": "keelmen_moonlight",
         "part": "lz",
-        "bytes": 13343
+        "bytes": 13384
       },
       {
         "symbol": "voyage_manhood",
         "part": "lz",
-        "bytes": 13285
+        "bytes": 13365
       }
     ],
     [
       {
         "symbol": "sailing_vessels",
         "part": "lz",
-        "bytes": 13127
+        "bytes": 13186
       },
       {
         "symbol": "buffalo_storm",
         "part": "lz",
-        "bytes": 13093
+        "bytes": 13130
       }
     ],
     [
       {
         "symbol": "voyage_childhood",
         "part": "lz",
-        "bytes": 13048
+        "bytes": 13098
       },
       {
         "symbol": "voyage_old_age",
         "part": "lz",
-        "bytes": 12572
+        "bytes": 12640
       }
     ],
     [
       {
         "symbol": "grand_canal_molo",
         "part": "lz",
-        "bytes": 12498
+        "bytes": 12539
       },
       {
-        "symbol": "mount_corcoran",
+        "symbol": "niagara",
         "part": "lz",
-        "bytes": 12416
+        "bytes": 12455
       }
     ],
     [
       {
-        "symbol": "niagara",
+        "symbol": "mount_corcoran",
         "part": "lz",
-        "bytes": 12366
+        "bytes": 12449
       },
       {
         "symbol": "view_of_delft",
         "part": "lz",
-        "bytes": 12297
+        "bytes": 12343
       }
     ]
   ],
   "bank_used": [
-    32752,
-    32746,
-    32717,
-    32749,
-    32505,
-    32284,
-    32554,
-    32479,
-    32302,
-    32621,
-    32674,
-    32610,
-    32545,
-    32419,
-    32314,
-    32539,
-    32324,
-    32541,
-    32494,
-    32750,
-    32503,
-    30099,
-    27839,
-    27649,
-    27309,
-    26850,
-    26628,
-    26220,
-    25620,
-    24914,
-    24663
+    32714,
+    32760,
+    32754,
+    32764,
+    32612,
+    32340,
+    32706,
+    32562,
+    32442,
+    32723,
+    32751,
+    32693,
+    32594,
+    32510,
+    32426,
+    32655,
+    32430,
+    32672,
+    32620,
+    32338,
+    32609,
+    30746,
+    27906,
+    27719,
+    27451,
+    26964,
+    26749,
+    26316,
+    25738,
+    24994,
+    24792
   ]
 }

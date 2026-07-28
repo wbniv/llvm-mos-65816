@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HBlank palette swap vs forced-blank scanline</title>
+<style>
+  :root{color-scheme:dark;--bg:#0a0d12;--panel:#151a23;--rule:#303847;--ink:#eff4fa;--dim:#9aa8b7;
+    --good:#5ce1a1;--bad:#ff6470}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui}
+  main{max-width:1060px;margin:auto;padding:30px 18px 60px}h1{font-size:clamp(26px,4vw,42px);margin:0 0 8px}
+  .lede{color:var(--dim);max-width:780px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+  article{border:1px solid var(--rule);border-radius:14px;background:var(--panel);padding:16px}
+  article.good{border-top:4px solid var(--good)}article.bad{border-top:4px solid var(--bad)}
+  h2{margin:0 0 4px;font-size:18px}.tag{font:11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.12em}
+  .good .tag{color:var(--good)}.bad .tag{color:var(--bad)}
+  canvas{display:block;width:100%;aspect-ratio:256/224;background:#000;margin:14px 0;border:1px solid #566274;
+    image-rendering:pixelated}.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font-size:12px}
+  .facts b{color:var(--dim)}button{background:#10151e;color:var(--ink);border:1px solid var(--rule);
+    border-radius:8px;padding:8px 12px;cursor:pointer}.bad button{border-color:#ff647077}
+  .note{margin-top:20px;padding:14px;border-left:3px solid #e0b84f;background:#14130e;color:#d8d0ba}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+</style>
+</head><body>
+<main>
+  <h1>Palette split: safe transfer vs blanked line</h1>
+  <p class="lede">Both panels show the same frame. The production design changes two CGRAM words
+    entirely inside HBlank. The diagnostic fallback forces one active scanline blank.</p>
+  <div class="grid">
+    <article class="good">
+      <div class="tag">Production</div><h2>Two-color HBlank HDMA</h2>
+      <canvas id="safe" width="256" height="224"></canvas>
+      <div class="facts"><b>Visible seam</b><span>None</span><b>Transfer</b><span>CGADD + 4 CGDATA bytes</span>
+        <b>Result</b><span>Painting meets dashboard normally</span></div>
+    </article>
+    <article class="bad">
+      <div class="tag">Diagnostic only</div><h2>One forced-blank scanline</h2>
+      <canvas id="blank" width="256" height="224"></canvas>
+      <button id="toggle">Toggle blank-line jitter</button>
+      <div class="facts"><b>Visible seam</b><span>Stable black horizontal band</span>
+        <b>With jitter</b><span>Band edge shimmers between scanlines</span><b>Result</b><span>Rejected for shipping</span></div>
+    </article>
+  </div>
+  <div class="note"><b>Not whole-frame flicker:</b> a correctly fixed forced-blank scanline is a spatial
+    defect at one Y coordinate. Timing jitter can make that line shimmer, but does not make blanking invisible.</div>
+</main>
+<script>
+  let jitter=false,t=0;
+  function frame(c,blank){
+    const x=c.getContext('2d'),w=c.width,h=c.height,split=168;
+    const g=x.createLinearGradient(0,0,w,split);g.addColorStop(0,'#23445b');g.addColorStop(.35,'#d2b36f');
+    g.addColorStop(.62,'#436c76');g.addColorStop(1,'#d8d0a5');x.fillStyle=g;x.fillRect(0,0,w,split);
+    x.globalAlpha=.38;for(let i=0;i<80;i++){x.fillStyle=i%3?'#173545':'#edf0bf';
+      x.fillRect((i*47)%w,(i*29)%split,2+(i%5),1+(i%3))}x.globalAlpha=1;
+    x.fillStyle='#04060a';x.fillRect(0,split,w,h-split);x.fillStyle='#f1c957';x.font='8px monospace';
+    x.fillText('MATCH L12 D884 COPY 7/12',52,190);x.fillStyle='#987d45';x.fillText('TOK ...LmMMmLLm',76,205);
+    if(blank){const y=split+(jitter&&t%2?0:-1);x.fillStyle='#000';x.fillRect(0,y,w,1)}
+  }
+  function tick(){frame(safe,false);frame(blank,true);t++;requestAnimationFrame(tick)}tick();
+  toggle.onclick=()=>{jitter=!jitter;toggle.textContent=jitter?'Stop blank-line jitter':'Toggle blank-line jitter'};
+</script>
+</body></html>

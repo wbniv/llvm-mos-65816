@@ -16,9 +16,9 @@
 #include "lzss-gallery-assets.h"
 
 #define FAR __attribute__((address_space(2)))
-#define FB_A ((FAR uint8_t*)0x7E2000u)
+#define FB_B ((FAR uint8_t*)0x7E2000u)
 #define PACK ((FAR uint8_t*)0x7E6000u)
-#define FB_B ((FAR uint8_t*)0x7EA800u)
+#define FB_A ((FAR uint8_t*)0x7EA800u)
 #define HEAD ((FAR uint16_t*)0x7EE800u)
 #define PREV ((FAR uint16_t*)0x7F0000u)
 #define PACK_CAP 18144u
@@ -38,8 +38,10 @@ enum {
   ARROW_L_APEX=72, ARROW_R_APEX=74,
   ARROW_L_FALL=76, ARROW_R_FALL=78,
   ARROW_L_LAND=96, ARROW_R_LAND=98,
-  TRACK_ZIP_UP=128, TRACK_ZIP_DOWN=129, TRACK_ZIP_HEAD=130,
-  TRACK_LITERAL=131
+  /* Match-copy diagram (#137): dim source and bright destination anchors stay
+   * fixed while one vertical needle travels between them. */
+  TRACK_NEEDLE=128, TRACK_UNDER_HOT=129, TRACK_UNDER_MID=130,
+  TRACK_UNDER_DIM=131, TRACK_LITERAL=132, TRACK_CURSOR=133
 };
 #ifndef GALLERY_START
 #define GALLERY_START 0u
@@ -55,9 +57,16 @@ enum {
 volatile uint16_t corpus_result;
 volatile uint8_t gallery_progress;
 volatile uint16_t gallery_unpack_frames[GALLERY_ASSET_COUNT];
+volatile uint16_t gallery_stage_frames[GALLERY_ASSET_COUNT];
+volatile uint16_t gallery_near_frames[GALLERY_ASSET_COUNT];
 volatile uint16_t gallery_repack_frames[GALLERY_ASSET_COUNT];
 volatile uint16_t gallery_verify_frames[GALLERY_ASSET_COUNT];
 volatile uint8_t gallery_clock_lo, gallery_clock_hi;
+volatile uint8_t gallery_cursor_x,gallery_cursor_y,gallery_cursor_visible;
+volatile uint8_t gallery_palette_split;
+volatile uint8_t gallery_palette_1_lo,gallery_palette_1_hi;
+volatile uint8_t gallery_palette_2_lo,gallery_palette_2_hi;
+volatile uint8_t gallery_obj_attr;
 volatile uint8_t nav_pad_now,nav_pad_previous,nav_request,nav_cancel;
 volatile uint8_t gallery_current_asset;
 volatile uint16_t gallery_canceled;
@@ -75,6 +84,8 @@ static uint8_t objpix[256];
 static uint16_t objchr[64];
 static uint8_t oam_visual[OAM_VISUAL_MAX*4u];
 static uint8_t bgmode_tab[7], tm_tab[7];
+static uint8_t cgadd_tab[16], cgdata_tab[10];
+static uint8_t dashboard_pal=0;
 static const uint8_t zero=0;
 static const GalleryAsset *active_asset;
 
@@ -110,6 +121,9 @@ asm(".text\n"
     ".global nmi\n"
     "nmi:\n"
     "  php\n"
+    "  .byte $8b\n"
+    "  .byte $4b\n"
+    "  .byte $ab\n"
     /*
      * Save the complete 16-bit accumulator before entering the 8-bit I/O
      * sequence.  Saving after SEP discarded B whenever NMI interrupted the
@@ -122,6 +136,24 @@ asm(".text\n"
     "  bne 1f\n"
     "  inc gallery_clock_hi\n"
     "1:\n"
+    /*
+     * #139 proof: the dashboard borrows CGRAM 1..2 below the raster split.
+     * Restore the first painting's original words at the start of VBlank;
+     * HDMA will install the dashboard inks again at the next split.
+     */
+    "  lda gallery_palette_split\n"
+    "  beq 19f\n"
+    "  lda #$01\n"
+    "  sta $2121\n"
+    "  lda gallery_palette_1_lo\n"
+    "  sta $2122\n"
+    "  lda gallery_palette_1_hi\n"
+    "  sta $2122\n"
+    "  lda gallery_palette_2_lo\n"
+    "  sta $2122\n"
+    "  lda gallery_palette_2_hi\n"
+    "  sta $2122\n"
+    "19:\n"
     "  lda #$01\n"
     "  sta $4016\n"
     "  lda #$00\n"
@@ -167,7 +199,7 @@ asm(".text\n"
     "  sta $2104\n"
     "  lda #$42\n"              /* dedicated right rest tile */
     "  sta $2104\n"
-    "  lda #$30\n"
+    "  lda gallery_obj_attr\n"
     "  sta $2104\n"
     "  clv\n"
     "  bvc 2f\n"
@@ -181,7 +213,7 @@ asm(".text\n"
     "  sta $2104\n"
     "  lda #$40\n"
     "  sta $2104\n"
-    "  lda #$30\n"
+    "  lda gallery_obj_attr\n"
     "  sta $2104\n"
     "2:\n"
     "  lda #$00\n"
@@ -285,11 +317,43 @@ asm(".text\n"
     "  sta $2104\n"
     "  lda arrow_pose\n"
     "  sta $2104\n"
-    "  lda #$30\n"              /* no horizontal flip; dedicated direction art */
+    "  lda gallery_obj_attr\n"  /* priority 3; palette 0 legacy / palette 6 proof */
     "  sta $2104\n"
     "9:\n"
+    /*
+     * Sprite 2 is the live compressor cursor. Rewrite it every VBlank from the
+     * newest foreground-published coordinates; match/literal DMA starts at
+     * sprite 3 and therefore cannot overwrite it.
+     */
+    "  lda #$04\n"
+    "  sta $2102\n"
+    "  lda #$00\n"
+    "  sta $2103\n"
+    "  lda gallery_cursor_visible\n"
+    "  beq 17f\n"
+    "  lda gallery_cursor_x\n"
+    "  sta $2104\n"
+    "  lda gallery_cursor_y\n"
+    "  sta $2104\n"
+    "  lda #$85\n"
+    "  sta $2104\n"
+    "  lda gallery_obj_attr\n"
+    "  sta $2104\n"
+    "  clv\n"
+    "  bvc 18f\n"
+    "17:\n"
+    "  lda #$00\n"
+    "  sta $2104\n"
+    "  lda #$f0\n"
+    "  sta $2104\n"
+    "  lda #$85\n"
+    "  sta $2104\n"
+    "  lda gallery_obj_attr\n"
+    "  sta $2104\n"
+    "18:\n"
     "  .byte $c2, $20\n"
     "  pla\n"
+    "  .byte $ab\n"
     "  plp\n"
     "  rti\n");
 
@@ -303,11 +367,10 @@ static uint16_t fold_far(const FAR uint8_t *p,uint16_t n){
   uint16_t h=0xffff;while(n--)h=lzss_fold(h,*p++);return h;
 }
 
-__attribute__((optnone,noinline))
+__attribute__((noinline))
 static uint16_t decode_far(const FAR uint8_t *src,uint16_t slen,FAR uint8_t *dst,uint16_t want){
   uint16_t sp=0,dp=0;
   while(sp<slen&&dp<want){
-    if(nav_cancel)return 0;
     uint8_t flags=src[sp++];
     for(uint8_t bit=0;bit<8&&dp<want;bit++){
       if(flags&(uint8_t)(1u<<bit)){
@@ -316,12 +379,46 @@ static uint16_t decode_far(const FAR uint8_t *src,uint16_t slen,FAR uint8_t *dst
         uint16_t dist=(uint16_t)(a|((uint16_t)(b>>4)<<8));
         uint8_t n=(uint8_t)((b&15u)+3u);
         if(!dist||dist>dp)return 0;
-        while(n--&&dp<want){if(nav_cancel)return 0;dst[dp]=dst[(uint16_t)(dp-dist)];dp++;}
+        while(n--&&dp<want){dst[dp]=dst[(uint16_t)(dp-dist)];dp++;}
       }else{if(sp>=slen)return 0;dst[dp++]=src[sp++];}
     }
   }
   return dp==want?dp:0;
 }
+
+__attribute__((noinline,used))
+uint16_t decode_near(const uint8_t *src,uint16_t slen,uint8_t *dst,uint16_t want){
+  uint16_t sp=0,dp=0;
+  while(sp<slen&&dp<want){
+    uint8_t flags=src[sp++];
+    for(uint8_t bit=0;bit<8&&dp<want;bit++){
+      if(flags&(uint8_t)(1u<<bit)){
+        if((uint16_t)(sp+2u)>slen)return 0;
+        uint8_t a=src[sp++],b=src[sp++];
+        uint16_t dist=(uint16_t)(a|((uint16_t)(b>>4)<<8));
+        uint8_t n=(uint8_t)((b&15u)+3u);
+        if(!dist||dist>dp)return 0;
+        while(n--&&dp<want){dst[dp]=dst[(uint16_t)(dp-dist)];dp++;}
+      }else{if(sp>=slen)return 0;dst[dp++]=src[sp++];}
+    }
+  }
+  return dp==want?dp:0;
+}
+
+asm(".text\n"
+    ".global decode_bank7e\n"
+    "decode_bank7e:\n"
+    "  php\n"
+    "  .byte $e2, $20\n"
+    "  .byte $8b\n"
+    "  lda #$7e\n"
+    "  pha\n"
+    "  .byte $ab\n"
+    "  jsr decode_near\n"
+    "  .byte $ab\n"
+    "  plp\n"
+    "  rts\n");
+uint16_t decode_bank7e(const uint8_t *src,uint16_t slen,uint8_t *dst,uint16_t want);
 
 static uint8_t hash_far(const FAR uint8_t *p,uint16_t pos,uint16_t len){
   if((uint16_t)(pos+2u)>=len)return 0;
@@ -329,7 +426,8 @@ static uint8_t hash_far(const FAR uint8_t *p,uint16_t pos,uint16_t len){
 }
 
 static void progress_line(const char *phase,uint16_t done,uint16_t total);
-static void oam_compression(void);
+static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y);
+static uint8_t sprite_origin(int16_t v);
 static uint8_t decimal(char*s,uint8_t n,uint16_t v);
 
 static void repack_publish(uint8_t kind,uint16_t pos,uint16_t source,uint16_t raw,
@@ -389,6 +487,15 @@ static uint16_t compress_far(const FAR uint8_t *src,uint16_t len,FAR uint8_t *ds
         PREV[q&4095u]=HEAD[h];HEAD[h]=q;
       }
       pos=(uint16_t)(pos+advance);
+#if GALLERY_VISUAL
+      /* NMI copies these pre-projected bytes directly into cursor OAM. */
+      uint8_t cursor_x,cursor_y;
+      project_offset(pos,&cursor_x,&cursor_y);
+      gallery_cursor_visible=0;
+      gallery_cursor_x=sprite_origin(cursor_x);
+      gallery_cursor_y=sprite_origin(cursor_y);
+      gallery_cursor_visible=1;
+#endif
     }
     dst[flagpos]=flags;
     if(pos>=next_meter){
@@ -400,7 +507,7 @@ static uint16_t compress_far(const FAR uint8_t *src,uint16_t len,FAR uint8_t *ds
       for(uint8_t i=0;i<11;i++){token_kind[i]=token_kind[i+1u];token_len[i]=token_len[i+1u];}
       token_kind[11]=gallery_repack_visual.kind;token_len[11]=gallery_repack_visual.length;
       if(token_count<12u)token_count++;
-      progress_line("REPACK",pos,len);oam_compression();
+      progress_line("REPACK",pos,len);
 #endif
       next_meter=(uint16_t)(next_meter+256u);
     }
@@ -483,17 +590,29 @@ static void upload_chevron_pose(uint8_t base,uint8_t right,uint8_t pose){
 }
 static void upload_tracker_tile(uint8_t tile,uint8_t shape,uint8_t color){
   for(uint8_t i=0;i<64;i++)objpix[i]=0;
-  if(shape<2u){
-    /* Bright opposing zipper teeth; never draw a closed edge or filled cell. */
-    uint8_t y=(uint8_t)(shape?5u:2u),tip=(uint8_t)(shape?y-1u:y+1u);
-    for(uint8_t x=1u;x<7u;x++)objpix[(uint16_t)y*8u+x]=(uint8_t)(x==3u||x==4u?5u:color);
-    objpix[(uint16_t)tip*8u+3u]=color;objpix[(uint16_t)tip*8u+4u]=color;
-  }else{
+  if(shape==0u){
+    /* Needle: one vertical stroke, white core with pale shoulders. Never a
+     * closed edge or filled cell — a stroke cannot enclose a region. */
+    for(uint8_t y=0u;y<7u;y++){
+      objpix[(uint16_t)y*8u+3u]=5u;objpix[(uint16_t)y*8u+4u]=5u;
+      objpix[(uint16_t)y*8u+2u]=color;objpix[(uint16_t)y*8u+5u]=color;
+    }
+  }else if(shape==1u){
+    /* Underline dash: four pixels two rows below the sweep centre, so the
+     * needle crosses its trail instead of overlapping it. One pen per fade
+     * step; the dash never touches its neighbours, so the trail stays dashed
+     * and cannot read as a solid selected bar. */
+    for(uint8_t x=2u;x<6u;x++)objpix[(uint16_t)5u*8u+x]=color;
+  }else if(shape==2u){
     static const uint8_t width[8]={0,2,4,6,6,4,2,0};
     for(uint8_t y=0;y<8;y++){
       uint8_t w=width[y],start=(uint8_t)((8u-w)/2u);
       for(uint8_t x=0;x<w;x++)objpix[(uint16_t)y*8u+start+x]=(uint8_t)(y==3u||y==4u?5u:color);
     }
+  }else{
+    /* A compact red playhead, distinct from every match/literal glyph. */
+    for(uint8_t y=3u;y<5u;y++)for(uint8_t x=3u;x<5u;x++)
+      objpix[(uint16_t)y*8u+x]=color;
   }
   for(uint8_t y=0;y<8;y++){
     uint8_t p0=0,p1=0,p2=0,p3=0;
@@ -503,21 +622,50 @@ static void upload_tracker_tile(uint8_t tile,uint8_t shape,uint8_t color){
   }
   vram_words((uint16_t)(0x6000u+(uint16_t)tile*16u),objchr,16);
 }
+/*
+ * Write the gallery's sprite colors to OBJ palettes 6..7.
+ *
+ * Pen 3 (CGRAM 131) used to be skipped — the old code wrote 128..130 and then
+ * jumped to 132, leaving 131 holding whatever the artwork's 256-color upload
+ * had put there. That is exactly the defect class #128's reserved-palette audit
+ * flagged. The scanner beam needs a mid fade step anyway, so 131 now holds a
+ * half-brightness accent: the latent bug and the fade ramp are the same fix.
+ *
+ *   128 transparent · 129 dark · 130 gold · 131 dim accent · 132 accent
+ *   133 white · 134 cursor red
+ *
+ * The proof owns the complete 224..255 block even though the current sprite
+ * set needs only six visible pens.
+ */
+static void write_reserved_obj_palette(void){
+  uint16_t a=GALLERY_RUN_COLOR;
+  /* Halve each 5-bit BGR555 field so the dim step tracks any site accent. */
+  uint16_t dim=(uint16_t)(((a&31u)>>1)
+                          |((((a>>5)&31u)>>1)<<5)
+                          |((((a>>10)&31u)>>1)<<10));
+  REG_CGADD=224u;REG_CGDATA=0;REG_CGDATA=0;
+  uint16_t c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  REG_CGDATA=(uint8_t)dim;REG_CGDATA=(uint8_t)(dim>>8);
+  REG_CGDATA=(uint8_t)a;REG_CGDATA=(uint8_t)(a>>8);
+  c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  c=SNES_RGB(31,5,4);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  /* Clear the rest of OBJ palettes 6 and 7, including palette 7 pen 0. */
+  for(uint8_t i=7u;i<32u;i++){REG_CGDATA=0;REG_CGDATA=0;}
+}
 static void load_chevrons(void){
   upload_chevron_pose(ARROW_L_REST,0,0);upload_chevron_pose(ARROW_R_REST,1,0);
   upload_chevron_pose(ARROW_L_RISE,0,1);upload_chevron_pose(ARROW_R_RISE,1,1);
   upload_chevron_pose(ARROW_L_APEX,0,2);upload_chevron_pose(ARROW_R_APEX,1,2);
   upload_chevron_pose(ARROW_L_FALL,0,3);upload_chevron_pose(ARROW_R_FALL,1,3);
   upload_chevron_pose(ARROW_L_LAND,0,4);upload_chevron_pose(ARROW_R_LAND,1,4);
-  upload_tracker_tile(TRACK_ZIP_UP,0,4);upload_tracker_tile(TRACK_ZIP_DOWN,1,4);
-  upload_tracker_tile(TRACK_ZIP_HEAD,2,4);upload_tracker_tile(TRACK_LITERAL,2,4);
-  REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;
-  uint16_t c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  /* Palette-0 colors 4/5 are accent/white; 134..255 remain artwork-owned. */
-  REG_CGADD=132;
-  c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  upload_tracker_tile(TRACK_NEEDLE,0,4);
+  upload_tracker_tile(TRACK_UNDER_HOT,1,4);
+  upload_tracker_tile(TRACK_UNDER_MID,1,3);
+  upload_tracker_tile(TRACK_UNDER_DIM,1,1);
+  upload_tracker_tile(TRACK_LITERAL,2,4);
+  upload_tracker_tile(TRACK_CURSOR,3,6);
+  write_reserved_obj_palette();
   REG_OBSEL=3u;
 }
 static void oam_init(void){
@@ -532,13 +680,13 @@ static void oam_arrow_sizes(void){
 static void oam_arrows(uint8_t y,uint8_t hide){
   if(hide)y=240;
   REG_OAMADDL=0;REG_OAMADDH=0;
-  REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=ARROW_L_REST;REG_OAMDATA=0x30;
-  REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=ARROW_R_REST;REG_OAMDATA=0x30;
+  REG_OAMDATA=2;REG_OAMDATA=y;REG_OAMDATA=ARROW_L_REST;REG_OAMDATA=gallery_obj_attr;
+  REG_OAMDATA=238;REG_OAMDATA=y;REG_OAMDATA=ARROW_R_REST;REG_OAMDATA=gallery_obj_attr;
   oam_arrow_sizes();
 }
 static void oam_upload_visual(void){
   snes_wait_vblank();
-  REG_OAMADDL=4;REG_OAMADDH=0; /* sprite 2 = OAM word address 4 */
+  REG_OAMADDL=6;REG_OAMADDH=0; /* sprite 3 = OAM word address 6 */
   REG_DMAP0=0;REG_BBAD0=0x04;
   REG_A1T0L=(uint8_t)(uintptr_t)oam_visual;
   REG_A1T0H=(uint8_t)((uintptr_t)oam_visual>>8);REG_A1B0=0;
@@ -547,11 +695,11 @@ static void oam_upload_visual(void){
 }
 static void oam_stage(uint8_t i,uint8_t x,uint8_t y,uint8_t tile){
   uint8_t *p=&oam_visual[(uint16_t)i*4u];
-  p[0]=x;p[1]=y;p[2]=tile;p[3]=0x30;
+  p[0]=x;p[1]=y;p[2]=tile;p[3]=gallery_obj_attr;
 }
 static void oam_hide_compression(void){
   flight_active=0;
-  for(uint8_t i=0;i<OAM_VISUAL_MAX;i++)oam_stage(i,0,240,TRACK_ZIP_UP);
+  for(uint8_t i=0;i<OAM_VISUAL_MAX;i++)oam_stage(i,0,240,TRACK_NEEDLE);
   oam_upload_visual();
 }
 static void project_offset(uint16_t pos,uint8_t *x,uint8_t *y){
@@ -568,59 +716,15 @@ static uint8_t sprite_origin(int16_t v){
   if(v>250)return 247;
   return (uint8_t)(v-3);
 }
-static void oam_compression(void){
-  if(!active_asset)return;
-  uint16_t seq=gallery_repack_visual.sequence;
-  RepackVisual v;
-  v.current_offset=gallery_repack_visual.current_offset;
-  v.source_offset=gallery_repack_visual.source_offset;
-  v.kind=gallery_repack_visual.kind;v.length=gallery_repack_visual.length;
-  if(seq!=gallery_repack_visual.sequence)return;
-  if(flight_active&&flight_phase>=8u)flight_active=0;
-  if(!flight_active&&v.kind==REPACK_MATCH){
-    flight_active=1;flight_source=v.source_offset;flight_destination=v.current_offset;
-    flight_phase=0;
-  }
-  uint8_t used=0;
-  if(flight_active){
-    uint8_t sx,sy,dx,dy;project_offset(flight_source,&sx,&sy);project_offset(flight_destination,&dx,&dy);
-    uint8_t teeth=15u,reveal=(uint8_t)(flight_phase*2u+1u);
-    if(reveal>teeth)reveal=teeth;
-    uint8_t step=(uint8_t)((uint16_t)(reveal-1u)*31u/(teeth-1u));
-    /*
-     * Close a luminous zipper from source to destination. Fifteen alternating
-     * teeth are enough to read as a seam without turning short byte runs into
-     * boxes; successive presentation hooks reveal the teeth progressively.
-     */
-    if(sx!=dx||sy!=dy){
-      for(uint8_t i=0;i<reveal;i++){
-        uint8_t phase=(uint8_t)((uint16_t)i*31u/(teeth-1u));
-        int16_t x=(int16_t)sx+((int16_t)dx-(int16_t)sx)*(int16_t)phase/31;
-        int16_t y=(int16_t)sy+((int16_t)dy-(int16_t)sy)*(int16_t)phase/31;
-        oam_stage(used++,sprite_origin(x),sprite_origin(y),
-                  (uint8_t)(i&1u?TRACK_ZIP_DOWN:TRACK_ZIP_UP));
-      }
-      int16_t hx=(int16_t)sx+((int16_t)dx-(int16_t)sx)*(int16_t)step/31;
-      int16_t hy=(int16_t)sy+((int16_t)dy-(int16_t)sy)*(int16_t)step/31;
-      oam_stage(used++,sprite_origin(hx),sprite_origin(hy),TRACK_ZIP_HEAD);
-    }
-    flight_phase++;
-  }else if(v.kind==REPACK_LITERAL){
-    uint8_t x,y;project_offset(v.current_offset,&x,&y);
-    oam_stage(0,sprite_origin(x),sprite_origin(y),TRACK_LITERAL);used=1;
-  }
-  while(used<OAM_VISUAL_MAX){oam_stage(used,0,240,TRACK_ZIP_UP);used++;}
-  oam_upload_visual();
-}
 static void blank_maps(void){
-  REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=MAP2;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(PAL16<<10);
-  REG_VMADD=MAP3;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(PAL8<<10);
+  REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=MAP2;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(dashboard_pal<<10);
+  REG_VMADD=MAP3;for(uint16_t i=0;i<1024;i++)REG_VMDATA=(uint16_t)(dashboard_pal<<10);
 }
 static uint8_t slen(const char*s,uint8_t max){uint8_t n=0;while(s&&*s++&&n<max)n++;return n;}
 static void text16_at(uint8_t row,uint8_t col,const char*s){
   uint8_t n=slen(s,16);
   for(uint8_t i=0;i<n;i++){
-    uint8_t g=(uint8_t)s[i]-FONT16_FIRST;uint16_t t=(uint16_t)(g*4u)|(uint16_t)(PAL16<<10);
+    uint8_t g=(uint8_t)s[i]-FONT16_FIRST;uint16_t t=(uint16_t)(g*4u)|(uint16_t)(dashboard_pal<<10);
     REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP2+(uint16_t)row*32u+col+i*2u);
     REG_VMDATA=t;REG_VMDATA=(uint16_t)(t+1u);
     REG_VMADD=(uint16_t)(MAP2+(uint16_t)(row+1u)*32u+col+i*2u);
@@ -633,7 +737,7 @@ static void text16(uint8_t row,const char*s){
 static void text8_at(uint8_t row,uint8_t col,const char*s){
   REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)row*32u+col);
   while(*s){uint8_t ch=(uint8_t)*s++;uint8_t tile=(uint8_t)(ch=='T'?63u:ch-FONT8_FIRST);
-    REG_VMDATA=(uint16_t)(tile|(PAL8<<10));}
+    REG_VMDATA=(uint16_t)(tile|((uint16_t)dashboard_pal<<10));}
 }
 static void text8(uint8_t row,const char*s){
   uint8_t n=slen(s,30);text8_at(row,(uint8_t)((32u-n)/2u),s);
@@ -724,16 +828,18 @@ static uint8_t decimal(char*s,uint8_t n,uint16_t v){
   char r[5];uint8_t k=0;do{r[k++]=(char)('0'+v%10u);v/=10u;}while(v&&k<5);
   while(k)s[n++]=r[--k];return n;
 }
-static void result_line(uint8_t ok,uint16_t unpack,uint16_t repack,uint16_t verify){
+static void result_line(uint8_t ok,uint16_t far_decode,uint16_t stage,uint16_t near_decode,
+                        uint16_t repack,uint16_t verify){
   char s[31];uint8_t n=0;
-  uint8_t row=console_row(active_asset);const char*p=ok?"PASS DECODE ":"FAIL DECODE ";while(*p)s[n++]=*p++;
-  n=decimal(s,n,unpack);s[n++]='F';s[n]=0;
+  uint8_t row=console_row(active_asset);const char*p=ok?"PASS FAR ":"FAIL FAR ";while(*p)s[n++]=*p++;
+  n=decimal(s,n,far_decode);s[n++]='F';p=" RAM ";while(*p)s[n++]=*p++;
+  n=decimal(s,n,(uint16_t)(stage+near_decode));s[n++]='F';s[n]=0;
   snes_wait_vblank();
   for(uint8_t line=0;line<3;line++){REG_VMAIN=VMAIN_INC_HIGH_1;REG_VMADD=(uint16_t)(MAP3+(uint16_t)(row+line)*32u);for(uint8_t i=0;i<32;i++)REG_VMDATA=0;}
-  text8(row,s);n=0;p="REPACK ";while(*p)s[n++]=*p++;n=decimal(s,n,repack);
-  p="F VERIFY ";while(*p)s[n++]=*p++;n=decimal(s,n,verify);s[n++]='F';s[n]=0;text8((uint8_t)(row+1u),s);
-  n=0;p="CORPUS ";while(*p)s[n++]=*p++;n=decimal(s,n,gallery_completed_count);
-  s[n++]='/';n=decimal(s,n,GALLERY_ASSET_COUNT);p=" COMPLETE";while(*p)s[n++]=*p++;s[n]=0;text8((uint8_t)(row+2u),s);
+  text8(row,s);n=0;p="COPY ";while(*p)s[n++]=*p++;n=decimal(s,n,stage);
+  p="F NEAR ";while(*p)s[n++]=*p++;n=decimal(s,n,near_decode);s[n++]='F';s[n]=0;text8((uint8_t)(row+1u),s);
+  n=0;p="REPACK ";while(*p)s[n++]=*p++;n=decimal(s,n,repack);
+  p="F VERIFY ";while(*p)s[n++]=*p++;n=decimal(s,n,verify);s[n++]='F';s[n]=0;text8((uint8_t)(row+2u),s);
 }
 static void split_arm(uint8_t split){
   uint8_t rest=(uint8_t)(split-127u),bottom=(uint8_t)(224u-split);
@@ -742,25 +848,45 @@ static void split_arm(uint8_t split){
   for(uint8_t i=0;i<7;i++){bgmode_tab[i]=a[i];tm_tab[i]=b[i];}
   REG_DMAP1=0;REG_BBAD1=0x05;REG_A1T1L=(uint8_t)(uintptr_t)bgmode_tab;REG_A1T1H=(uint8_t)((uintptr_t)bgmode_tab>>8);REG_A1B1=0;
   REG_DMAP2=0;REG_BBAD2=0x2c;REG_A1T2L=(uint8_t)(uintptr_t)tm_tab;REG_A1T2H=(uint8_t)((uintptr_t)tm_tab>>8);REG_A1B2=0;
-  REG_HDMAEN=0x06;
+  uint16_t gold=SNES_RGB(31,25,8),dark=SNES_RGB(5,4,3);
+  uint8_t counts[3]={127,rest,bottom};
+  uint8_t color1[3][2]={
+    {gallery_palette_1_lo,gallery_palette_1_hi},
+    {gallery_palette_1_lo,gallery_palette_1_hi},
+    {(uint8_t)gold,(uint8_t)(gold>>8)}
+  };
+  uint8_t color2[3][2]={
+    {gallery_palette_2_lo,gallery_palette_2_hi},
+    {gallery_palette_2_lo,gallery_palette_2_hi},
+    {(uint8_t)dark,(uint8_t)(dark>>8)}
+  };
+  uint8_t p=0,q=0;
+  for(uint8_t run=0;run<3u;run++){
+    cgadd_tab[p++]=counts[run];
+    cgadd_tab[p++]=1u;cgadd_tab[p++]=1u;
+    cgadd_tab[p++]=color1[run][0];cgadd_tab[p++]=color1[run][1];
+    cgdata_tab[q++]=counts[run];
+    cgdata_tab[q++]=color2[run][0];cgdata_tab[q++]=color2[run][1];
+  }
+  cgadd_tab[p]=0;cgdata_tab[q]=0;
+  /* Channel order is significant: mode 3 writes CGADD,CGADD,CGDATA,CGDATA;
+   * channel 4 then writes the following CGDATA word in mode 2. */
+  REG_DMAP3=3;REG_BBAD3=0x21;
+  REG_A1T3L=(uint8_t)(uintptr_t)cgadd_tab;REG_A1T3H=(uint8_t)((uintptr_t)cgadd_tab>>8);REG_A1B3=0;
+  REG_DMAP4=2;REG_BBAD4=0x22;
+  REG_A1T4L=(uint8_t)(uintptr_t)cgdata_tab;REG_A1T4H=(uint8_t)((uintptr_t)cgdata_tab>>8);REG_A1B4=0;
+  REG_HDMAEN=0x1e;
 }
 static void palette(const GalleryAsset*a){
+  /* Keep NMI from disturbing CGADD's auto-increment during the bulk upload. */
+  gallery_palette_split=0;
+  dashboard_pal=0u;
+  gallery_obj_attr=0x3cu;
   REG_CGADD=0;for(uint16_t i=0;i<512u;i++)REG_CGDATA=a->pal[i];
-  uint16_t c=0;
-  REG_CGADD=28;REG_CGDATA=0;REG_CGDATA=0;
-  c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  REG_CGDATA=0;REG_CGDATA=0;
-  REG_CGADD=(uint8_t)(PAL16*16u);REG_CGDATA=0;REG_CGDATA=0;
-  c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  REG_CGADD=128;REG_CGDATA=0;REG_CGDATA=0;
-  c=SNES_RGB(5,4,3);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  c=SNES_RGB(31,25,8);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  /* Restore reserved OBJ colors after the artwork's full 256-color upload. */
-  REG_CGADD=132;
-  c=GALLERY_RUN_COLOR;REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
-  c=SNES_RGB(31,31,31);REG_CGDATA=(uint8_t)c;REG_CGDATA=(uint8_t)(c>>8);
+  gallery_palette_1_lo=a->pal[2];gallery_palette_1_hi=a->pal[3];
+  gallery_palette_2_lo=a->pal[4];gallery_palette_2_hi=a->pal[5];
+  gallery_palette_split=1;
+  write_reserved_obj_palette();
 }
 static uint8_t upload_image(const GalleryAsset*a){
   uint8_t tile_rows=asset_rows(a),tile_cols=asset_cols(a);
@@ -784,8 +910,35 @@ static uint8_t exact_stream(const GalleryAsset*a,uint16_t n){
 static uint8_t hold(uint16_t n){while(n--){if(nav_cancel)return 0;snes_wait_vblank();}return 1;}
 
 __attribute__((noinline))
+static uint8_t benchmark_far_decode(const GalleryAsset*a,uint8_t k){
+  uint16_t t=clock_read();
+  uint8_t far_ok=(uint8_t)(decode_far(a->lz,a->lz_len,FB_B,a->raw_len)!=0);
+  gallery_unpack_frames[k]=(uint16_t)(clock_read()-t);
+  return (uint8_t)(far_ok&&!nav_cancel);
+}
+__attribute__((noinline))
+static uint8_t benchmark_stage(const GalleryAsset*a,uint8_t k){
+  uint16_t t=clock_read();
+  for(uint16_t i=0;i<a->lz_len;i++)PACK[i]=a->lz[i];
+  gallery_stage_frames[k]=(uint16_t)(clock_read()-t);
+  return (uint8_t)!nav_cancel;
+}
+__attribute__((noinline))
+static uint8_t benchmark_near_decode(const GalleryAsset*a,uint8_t k){
+  uint16_t t=clock_read();
+  uint8_t near_ok=(uint8_t)(decode_bank7e((const uint8_t*)0x6000u,a->lz_len,
+                                          (uint8_t*)0xa800u,a->raw_len)!=0);
+  gallery_near_frames[k]=(uint16_t)(clock_read()-t);
+  return (uint8_t)(near_ok&&!nav_cancel);
+}
+__attribute__((noinline))
 static uint8_t unpack_slide(const GalleryAsset*a){
-  return (uint8_t)(decode_far(a->lz,a->lz_len,FB_A,a->raw_len)!=0&&fold_far(FB_A,a->raw_len)==a->checksum);
+  uint8_t k=(uint8_t)(a-GALLERY_ASSETS);
+  if(nav_cancel||!benchmark_far_decode(a,k)||nav_cancel||
+     !benchmark_stage(a,k)||nav_cancel||!benchmark_near_decode(a,k)||
+     fold_far(FB_A,a->raw_len)!=a->checksum||
+     fold_far(FB_B,a->raw_len)!=a->checksum)return 0;
+  return 1;
 }
 
 __attribute__((noinline))
@@ -816,10 +969,17 @@ static uint8_t prepare_slide(const GalleryAsset*a){
 __attribute__((noinline))
 static uint16_t repack_slide(const GalleryAsset*a){
 #if GALLERY_VISUAL
+  uint8_t cursor_x,cursor_y;
+  project_offset(0,&cursor_x,&cursor_y);
+  gallery_cursor_visible=0;
+  gallery_cursor_x=sprite_origin(cursor_x);
+  gallery_cursor_y=sprite_origin(cursor_y);
+  gallery_cursor_visible=1;
   progress_line("REPACK",0,a->raw_len);
 #endif
   LzssStats st;uint16_t z=compress_far(FB_A,a->raw_len,PACK,&st);
 #if GALLERY_VISUAL
+  gallery_cursor_visible=0;
   oam_hide_compression();
 #endif
   return z;
@@ -907,6 +1067,20 @@ static uint8_t nav_target(uint8_t k){
 }
 
 int main(void){
+#ifdef GALLERY_BENCH_ONLY
+  gallery_clock_lo=gallery_clock_hi=0;
+  nav_cancel=0;
+  snes_ppu_reset_blank();
+  REG_NMITIMEN=NMITIMEN_NMI;
+  uint8_t failed=0;
+  for(uint8_t k=0;k<GALLERY_ASSET_COUNT;k++){
+    const GalleryAsset *a=&GALLERY_ASSETS[k];
+    failed|=(uint8_t)!unpack_slide(a);
+    gallery_progress=(uint8_t)(k+1u);
+  }
+  corpus_result=(uint16_t)(failed?0xA50Fu:0x5CF0u);
+  for(;;)snes_wait_vblank();
+#else
   /*
    * Decode the first work behind the fully visible title card.  m7splash_end()
    * finishes on force blank, so doing the expensive decode after it used to
@@ -914,14 +1088,14 @@ int main(void){
    */
   gallery_clock_lo=gallery_clock_hi=0;
   nav_pad_now=nav_pad_previous=nav_request=nav_cancel=0;
+  gallery_palette_split=0;gallery_obj_attr=0x3cu;dashboard_pal=0;
   arrow_anim=arrow_direction=arrow_previous_direction=0;
   arrow_position=arrow_velocity=0;arrow_anim_y=0;arrow_pose=ARROW_L_REST;
   flight_active=0;
   snes_ppu_reset_blank();m7splash_begin("PACK UNPACK", "LZSS GALLERY");
   uint8_t k=GALLERY_START;
   const GalleryAsset*a=&GALLERY_ASSETS[k];
-  uint16_t t=clock_read();uint8_t ok=unpack_slide(a);
-  gallery_unpack_frames[k]=(uint16_t)(clock_read()-t);
+  uint16_t t;uint8_t ok=unpack_slide(a);
   nav_request=0;nav_cancel=0;
   m7splash_end(0);
   /*
@@ -941,6 +1115,7 @@ int main(void){
    */
   gallery_clock_lo=gallery_clock_hi=0;
   nav_pad_now=nav_pad_previous=nav_request=nav_cancel=0;
+  gallery_palette_split=0;gallery_obj_attr=0x3cu;dashboard_pal=0;
   arrow_anim=arrow_direction=arrow_previous_direction=0;
   arrow_position=arrow_velocity=0;arrow_anim_y=0;arrow_pose=ARROW_L_REST;
   flight_active=0;
@@ -953,9 +1128,8 @@ int main(void){
        * decoded.  Previously spinout ran first and left only a collapsed,
        * effectively black Mode 7 plane throughout this work.
        */
-      t=clock_read();ok=unpack_slide(a);
+      ok=unpack_slide(a);
       if(nav_cancel){k=nav_target(k);continue;}
-      gallery_unpack_frames[k]=(uint16_t)(clock_read()-t);
       if(!spinout()){k=nav_target(k);continue;}
     }
     decoded=0;
@@ -968,8 +1142,10 @@ int main(void){
     if(nav_cancel){k=nav_target(k);continue;}
     gallery_verify_frames[k]=(uint16_t)(clock_read()-t);
     gate=record_result(a,k,z,gate,ok);
-    result_line(ok,gallery_unpack_frames[k],gallery_repack_frames[k],gallery_verify_frames[k]);
+    result_line(ok,gallery_unpack_frames[k],gallery_stage_frames[k],gallery_near_frames[k],
+                gallery_repack_frames[k],gallery_verify_frames[k]);
     if(!hold(180)){k=nav_target(k);continue;}
     k=(uint8_t)(k+1u==GALLERY_ASSET_COUNT?0u:k+1u);
   }
+#endif
 }

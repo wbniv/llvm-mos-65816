@@ -14,7 +14,7 @@ BASE = ROOT / "assets/snes/lzss-gallery"
 DERIVED = BASE / "derived"
 SOURCE_DIR = BASE / "sources"
 SOURCES = BASE / "sources.json"
-ART_INDICES = tuple(range(1,28)) + tuple(range(32,112)) + tuple(range(144,256))
+ART_INDICES = tuple(range(1,224))
 ART_COLORS = len(ART_INDICES)
 MAX_ART_TILES = 255
 
@@ -237,6 +237,7 @@ def main():
           "compressed_bytes":len(packed),"reduction_bytes":len(pixels)-len(packed),
           "reduction_percent":round((1-len(packed)/len(pixels))*100,2),
           "checksum":fold,"artwork_color_capacity":ART_COLORS,
+          "palette_mapping":"contiguous-1-223",
           "artwork_colors_used":len(set(pixels)),"artwork_indices_used":sorted(set(pixels)),
           "palette_sha256":hashlib.sha256(palbin).hexdigest(),
           "source_sha256":source_hash,

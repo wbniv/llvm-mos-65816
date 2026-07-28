@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HBlank palette reuse — frame and CGRAM mockup</title>
+<style>
+  :root{color-scheme:dark;--bg:#0b0e14;--panel:#151a24;--rule:#30394a;--ink:#edf2f7;
+    --dim:#9aa8ba;--cyan:#55e8e0;--gold:#ffd45c;--red:#ff5964}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% 0,#182237,var(--bg) 50%);
+    color:var(--ink);font:14px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+  main{max-width:1120px;margin:auto;padding:28px 18px 56px} h1{font:700 clamp(25px,4vw,42px)/1.05 system-ui;
+    margin:0 0 8px} .lede{color:var(--dim);max-width:820px;margin:0 0 24px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.controls button{border:1px solid var(--rule);
+    border-radius:999px;padding:8px 13px;background:#101620;color:var(--ink);cursor:pointer;font:inherit}
+  .controls button.active{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 0 1px #55e8e033 inset}
+  .grid{display:grid;grid-template-columns:minmax(300px,480px) 1fr;gap:20px;align-items:start}
+  .card{background:#121722dd;border:1px solid var(--rule);border-radius:14px;padding:16px;box-shadow:0 18px 50px #0008}
+  .screen{position:relative;aspect-ratio:256/224;overflow:hidden;border:1px solid #546174;background:#000;
+    image-rendering:pixelated}.painting{position:absolute;inset:0 0 25% 0;
+    background:
+      radial-gradient(circle at 52% 38%,#e7d9aa 0 4%,transparent 5%),
+      linear-gradient(155deg,transparent 0 38%,#315c6d 39% 43%,#d6b46c 44% 47%,#1a3448 48% 57%,#75959a 58% 64%,#203743 65%),
+      repeating-linear-gradient(12deg,#203947 0 3px,#4f7881 4px 6px,#cfb77d 7px 8px)}
+  .painting:after{content:"MODE 7 · PAINTING · CGRAM 1–223";position:absolute;top:8px;left:8px;
+    padding:3px 6px;background:#081018bb;color:#fff;font-size:10px}
+  .dashboard{position:absolute;inset:75% 0 0;background:#05070b;border-top:1px solid var(--cyan);
+    display:grid;place-content:center;text-align:center;color:var(--gold);letter-spacing:.11em;font-size:clamp(8px,1.1vw,13px)}
+  .dashboard span{color:#9a7544}.split{position:absolute;left:0;right:0;top:75%;height:0;border-top:1px dashed #fff;
+    filter:drop-shadow(0 0 4px var(--cyan))}
+  .split-label{position:absolute;right:4px;top:calc(75% - 21px);background:#111a;color:var(--cyan);
+    padding:2px 5px;font-size:9px}.dot{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--red);
+    box-shadow:0 0 5px var(--red);left:54%;top:31%}
+  h2{font:700 16px system-ui;margin:0 0 11px}.palette{display:grid;grid-template-columns:repeat(16,1fr);
+    gap:2px;margin:9px 0}.sw{height:28px;border-radius:2px;position:relative}.sw:after{content:attr(data-i);
+    position:absolute;inset:auto 2px 1px;color:#fff;font-size:7px;text-shadow:0 1px 2px #000}
+  .legend{display:grid;grid-template-columns:auto 1fr;gap:6px 9px;color:var(--dim);font-size:12px}
+  .key{width:16px;height:10px;border-radius:2px;margin-top:4px}.timeline{display:grid;grid-template-columns:92px 1fr;
+    gap:7px 10px;margin-top:16px}.bar{height:22px;border:1px solid var(--rule);border-radius:4px;overflow:hidden;
+    display:flex}.bar i{display:block;height:100%}.small{font-size:11px;color:var(--dim)}
+  .callout{margin-top:14px;padding:11px;border-left:3px solid var(--cyan);background:#0c131d;color:#cbd5e1}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <h1>One palette, two raster regions</h1>
+  <p class="lede">Plan #139 reuses painting entries 1–2 only after their scanlines have rendered.
+    Switch views to see the same CGRAM addresses change meaning at the HBlank split.</p>
+  <div class="controls">
+    <button class="active" data-view="painting">Painting scanlines</button>
+    <button data-view="hblank">Split HBlank</button>
+    <button data-view="dashboard">Dashboard scanlines</button>
+  </div>
+  <div class="grid">
+    <section class="card">
+      <div class="screen">
+        <div class="painting"></div><div class="dot" title="red compressor cursor"></div>
+        <div class="dashboard">MATCH L12 D884 COPY 7/12<br><span>TOK ...LmMMmLLm</span></div>
+        <div class="split"></div><div class="split-label">6-byte HDMA payload</div>
+      </div>
+      <p class="small">The screen itself never blanks. Only two palette words change at the dashed boundary.</p>
+    </section>
+    <section class="card">
+      <h2 id="phase-title">Painting palette is active</h2>
+      <div class="palette" id="palette"></div>
+      <div class="legend">
+        <i class="key" style="background:#000"></i><span>CGRAM 0 · permanent black</span>
+        <i class="key" style="background:linear-gradient(90deg,#345,#edc,#678)"></i><span>CGRAM 1–223 · adaptive painting colors</span>
+        <i class="key" style="background:linear-gradient(90deg,#455,#ff5964,#55e8e0,#fff)"></i><span>CGRAM 224–255 · sprite-only</span>
+      </div>
+      <div class="timeline">
+        <b>VBlank</b><div class="bar"><i style="width:100%;background:#284366"></i></div>
+        <b>Painting</b><div class="bar"><i style="width:75%;background:#3e747b"></i><i style="width:25%;background:#151a24"></i></div>
+        <b>Split HBlank</b><div class="bar"><i style="width:75%;background:#151a24"></i><i style="width:2%;background:#55e8e0"></i></div>
+        <b>Dashboard</b><div class="bar"><i style="width:75%;background:#151a24"></i><i style="width:25%;background:#826b2d"></i></div>
+      </div>
+      <div class="callout" id="callout">VBlank restores the painting’s original colors 1–2 before scanline 0.</div>
+    </section>
+  </div>
+</main>
+<script>
+  const palette=document.querySelector('#palette'), title=document.querySelector('#phase-title'),
+    callout=document.querySelector('#callout');
+  const colors=Array.from({length:32},(_,i)=>`hsl(${185+i*7} ${32+(i%4)*9}% ${22+(i%5)*8}%)`);
+  function draw(view){
+    palette.innerHTML='';
+    for(let i=0;i<32;i++){
+      const e=document.createElement('i');e.className='sw';e.dataset.i=i;
+      let c=i===0?'#000':colors[i];
+      if(view==='dashboard'&&i===1)c='#ffd45c';
+      if(view==='dashboard'&&i===2)c='#5a4934';
+      if(view==='hblank'&&i===1)c='linear-gradient(90deg,'+colors[1]+' 50%,#ffd45c 50%)';
+      if(view==='hblank'&&i===2)c='linear-gradient(90deg,'+colors[2]+' 50%,#5a4934 50%)';
+      e.style.background=c;palette.appendChild(e);
+    }
+    const data={
+      painting:['Painting palette is active','Entries 1–223 all belong to the painting; the dashboard has no persistent allocation.'],
+      hblank:['Only entries 1–2 change','HDMA sets CGADD=1 and writes gold + dark in the same HBlank as the Mode 7 → Mode 1 split.'],
+      dashboard:['Dashboard palette is active','Font tiles reference only 0–2. Entries 3–223 remain untouched and irrelevant below the split.']
+    }[view];title.textContent=data[0];callout.textContent=data[1];
+  }
+  document.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    document.querySelector('.active').classList.remove('active');b.classList.add('active');draw(b.dataset.view);
+  });draw('painting');
+</script>
+</body>
+</html>
