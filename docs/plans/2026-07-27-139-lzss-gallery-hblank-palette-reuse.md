@@ -1,6 +1,26 @@
 # #139 — LZSS Gallery: HBlank Palette Reuse, 223 Painting Colors, 32 Sprite Entries
 
-**Status:** IMPLEMENTED 2026-07-27  
+**Status:** RETIRED 2026-07-28 — **the premise does not hold on hardware.** Implemented
+2026-07-27, then withdrawn after it was found to corrupt every painting.
+
+> CGRAM is only writable during VBlank or forced blank. An HDMA transfer lands in HBlank while the
+> PPU is still fetching colours for the frame, so the writes intended for entries 1..2 scattered
+> across CGRAM instead. Measured on `great-wave`: only 52 of 223 palette entries survived and 89
+> foreign colours appeared, identical frame to frame (static damage, not an animation artefact).
+> Unarming exactly these two channels rendered the corpus clean; isolated-spike speckle fell from
+> 1.69% to 0.24%, the latter being the artwork's own Floyd–Steinberg dither. The assets were never
+> at fault — rendering `great-wave.idx` through `great-wave.pal` on the host produced a perfect
+> image throughout.
+>
+> **Replaced by static inks** (`dcc80d9`): the painting is confined to CGRAM `3..223` (221 adaptive
+> colours) and the dashboard gold/dark are baked into every generated palette at entries `1..2`, so
+> the `.pal` file *is* the CGRAM image and no mid-frame palette work exists at all. Two colours
+> (223 → 221) is what correctness costs here.
+>
+> Retain this document for the raster-split analysis and the sprite-block reasoning, both of which
+> stand. Do not re-attempt CGRAM HDMA without new hardware evidence.
+
+
 **Depends on:** [#136 — contiguous artwork palette](2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md)  
 **Touches:** gallery asset generation, Mode 7/Mode 1 split HDMA, NMI palette restore, emulator/hardware
 validation, and the repository's general SNES graphics guidance.
