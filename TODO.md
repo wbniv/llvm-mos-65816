@@ -32,6 +32,11 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 ## Open
 
+
+- [verify T2] **#137 — scanner beam repack visualization** — implemented + quick-gated; awaiting the
+  full 200 000-frame corpus result and the two site deploys, then promote to Done. See
+  [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
+  the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
 - [T4] **Implement extended SNES cartridge mapping when the gallery grows above 32 Mbit.**
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
   normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
@@ -68,6 +73,19 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   title). Resolve that first. Batch C rides along: F3 stall hunts on any Batch-A demo whose paint
   frame still overruns. [investigation §Batch B](docs/investigations/2026-07-27-60fps-demo-sweep.md) ·
   [#99c pattern](docs/plans/2026-07-27-99c-trimerge-60fps-scroll-waterfall.md)
+
+- [T3] **`truncstair` renders a BLACK SCREEN — shipping live, gate can't see it.** Found 2026-07-28
+  while scoping its F2 work. The demo never draws: frames 700/900/1100/1300 are 100% black (frame
+  1200 shows the title card on a magenta backdrop that isn't in its palette), and the **published**
+  ROM behaves identically — so this is live on the site, not a local regression. `corpus_result`
+  stays green (`0x02CA`) because it is computed during the title, the same blind spot that hid the
+  `mvscrl` regression. Two facts confirmed: the staircase **saturates** (unbounded `phase` →
+  `row_offset = 2 - q` clamps to 0 for every column by phase ≈ 200, ~13 s in, replayed in host
+  arithmetic), and the ramp **never wraps**. Not yet root-caused: saturation alone would leave three
+  coloured lines + dividers, not 100% black with a black/title flicker — suspect force-blank timing
+  or a CGRAM overwrite. Fix the render first; **the F2 ring is moot until it renders**, and making
+  `phase` wrap at the ring width fixes the saturation *and* supplies the periodicity the ring needs.
+  [investigation §truncstair](docs/investigations/2026-07-27-60fps-demo-sweep.md)
 
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
@@ -1600,8 +1618,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** Canvas widening beyond 16×16 tiles (needs `bitmap_canvas.h` geometry work — a snesgfx library — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:f9122100c1e60a3f -->
 - [ ] **(triage)** HDMA backdrop gradient (same reason: no library support yet). — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:9e322e197981b057 -->
 <!-- triaged 2026-07-27: #128 is planned-not-yet-implemented; its verification runs with the implementation, tracked by the curated [T3] "#128 lzss-gallery" battery sub-item. fp:8b0a76b3e990a0e0 -->
-- [verify] **2026-07-27-129-lzss-gallery-zipper-visualization** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-129-lzss-gallery-zipper-visualization.md](docs/plans/2026-07-27-129-lzss-gallery-zipper-visualization.md)_  <!-- fp:ea5c80990ef038e3 -->
 - [verify] **2026-07-27-131-snes-cartridge-map-mermaid-quadtree** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md](docs/plans/2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md)_  <!-- fp:5e21a496a7540ac0 -->
 - [verify] **2026-07-27-132-phone-gallery-chevron-hitboxes** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-132-phone-gallery-chevron-hitboxes.md](docs/plans/2026-07-27-132-phone-gallery-chevron-hitboxes.md)_  <!-- fp:92b872c936ff9d49 -->
 - [verify] **2026-07-27-134-thai-paintings-gallery-expansion** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-134-thai-paintings-gallery-expansion.md](docs/plans/2026-07-27-134-thai-paintings-gallery-expansion.md)_  <!-- fp:ad5d46a73f327609 -->
+- [verify] **2026-07-27-139-lzss-gallery-hblank-palette-reuse** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-139-lzss-gallery-hblank-palette-reuse.md](docs/plans/2026-07-27-139-lzss-gallery-hblank-palette-reuse.md)_  <!-- fp:ee3908e30f424828 -->
 <!-- END auto-captured-deferrals -->

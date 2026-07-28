@@ -68,7 +68,7 @@ cheap paint; `ok` = no action warranted.
 <span style="color:#3fb950">**Green rows are resolved**</span> — either no action was ever
 warranted, or the fix has been applied and verified. **112 of 114 rows are green.** The two
 non-green rows are the only outstanding work in the whole sweep: `mvscrl` (F2 not started —
-blocked on a concurrent edit, below) and `truncstair` (F2 deferred, geometry blocker below).
+blocked on a concurrent edit, below) and `truncstair` (**broken — renders black**, below; F2 is moot until it renders at all).
 
 | demo | category | pattern | mark | d1 % | d60 % | verdict |
 |---|---|---|---|---|---|---|
@@ -179,7 +179,7 @@ blocked on a concurrent edit, below) and `truncstair` (F2 deferred, geometry blo
 | <span style="color:#3fb950">tea</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.15</span> | <span style="color:#3fb950">0.22</span> | <span style="color:#3fb950">ok</span> |
 | <span style="color:#3fb950">trimerge</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">scroll-ring</span> | <span style="color:#3fb950">n/a</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">✅ DONE (#99c, v1.0.291)</span> |
 | <span style="color:#3fb950">truchet</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">?</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">5.82</span> | <span style="color:#3fb950">ok — verified: no per-band marking</span> |
-| truncstair | algorithms | band | ? | 4.86 | 0.0 | F1 n/a · **F2 deferred** — ring wrap blocked |
+| truncstair | algorithms | band | ? | 4.86* | 0.0* | **BROKEN — renders black/flashing**; F2 moot until fixed |
 | <span style="color:#3fb950">turtle-vm</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.73</span> | <span style="color:#3fb950">ok</span> |
 | <span style="color:#3fb950">uarteye</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.02</span> | <span style="color:#3fb950">F1 ✅ (eye overlay → no F2)</span> |
 | <span style="color:#3fb950">ucmprank</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.02</span> | <span style="color:#3fb950">0.03</span> | <span style="color:#3fb950">F1 ✅ (rank recolor → no F2)</span> |
@@ -323,3 +323,45 @@ to the memmove has lost that property. Worth a second look before it lands.
 
 Any future F2 work on `mvscrl` should also be re-checked against whatever that refactor settles on,
 since it changes the very painter the ring would replace.
+
+### ⚠️ truncstair does not render (found 2026-07-28, while scoping its F2 work)
+
+Building the scroll-ring required looking at the demo running, which nobody had done — the sweep's
+empirical pass sampled frames 500/560, and **at those frames truncstair is still showing its title
+card** (its float-heavy `truncstair_gate_crc()` runs during the title). So the `d1 4.86 / d60 0.0`
+figures in the table above describe the *title animation*, not the demo — marked `*` accordingly.
+
+Captured further in, the demo never appears:
+
+```
+frame  700 : 100% black      frame 1200 : title card on magenta (96.4% non-black)
+frame  900 : 100% black      frame 1300 : 100% black
+frame 1100 : 100% black      frame 2000+: 100% black
+```
+
+It is **not** a regression from this batch, and not something the F1 work caused (truncstair was
+explicitly excluded from Batch A): the **currently published ROM**
+(`biohack.net/public/play/roms/truncstair.sfc`) is black at frame 2000 too. This is shipping.
+
+`corpus_result` cannot catch it — `0x02CA` is computed during the title, before the display loop
+matters — which is the same blind spot that hid the `mvscrl` regression. Two contributing facts are
+already confirmed; the third is not yet root-caused:
+
+1. **The staircase saturates.** `x_f` grows with an unbounded `phase`, so `q` grows and
+   `row_offset = 2 - q` clamps to 0 for every column by phase ≈ 200 (~13 s in): all three bands
+   collapse onto their top row. Replayed in host arithmetic:
+   `phase 0 → q -3..3` (a real staircase) vs `phase 200 → q 8..16, row_offset 0..0` (flat).
+2. **The ramp never wraps**, which is the same root fact that blocks an `HOFS` ring: a ring needs
+   content periodic over its width. Making `phase` wrap at the ring width would fix the saturation
+   *and* supply the periodicity F2 needs — one change, both problems.
+3. **Unexplained:** saturation alone would leave three coloured lines plus the dividers, not a 100%
+   black screen, and not the black/title flicker seen across frames 1100–1300. Something further —
+   force-blank timing, a palette/CGRAM overwrite (the magenta backdrop at 1200 is not in
+   `bg3_pal`), or the display loop not running — is still unaccounted for. **Do not design the ring
+   until this is root-caused**; per the repo's rule, an anomaly needs a concrete cause, not a guess.
+
+Prerequisite note for whoever takes this: the *other* blocker recorded above (a 32-column canvas for
+the `HOFS` ring) is now measured and **harder than it looked** — `_canvas_emit` hardcodes DMA source
+bank `0x00`, so the shadow must live in bank-0 low WRAM, and truncstair's `.bss` already runs
+`0x200..0x13E9` with only ~3 KB of headroom below `$1FFF`. Doubling the shadow to 8 KB overflows it;
+widening therefore also requires teaching the canvas/upload path to DMA from bank `$7E`.
