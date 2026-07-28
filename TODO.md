@@ -74,19 +74,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   frame still overruns. [investigation §Batch B](docs/investigations/2026-07-27-60fps-demo-sweep.md) ·
   [#99c pattern](docs/plans/2026-07-27-99c-trimerge-60fps-scroll-waterfall.md)
 
-- [T3] **`truncstair` renders a BLACK SCREEN — shipping live, gate can't see it.** Found 2026-07-28
-  while scoping its F2 work. The demo never draws: frames 700/900/1100/1300 are 100% black (frame
-  1200 shows the title card on a magenta backdrop that isn't in its palette), and the **published**
-  ROM behaves identically — so this is live on the site, not a local regression. `corpus_result`
-  stays green (`0x02CA`) because it is computed during the title, the same blind spot that hid the
-  `mvscrl` regression. Two facts confirmed: the staircase **saturates** (unbounded `phase` →
-  `row_offset = 2 - q` clamps to 0 for every column by phase ≈ 200, ~13 s in, replayed in host
-  arithmetic), and the ramp **never wraps**. Not yet root-caused: saturation alone would leave three
-  coloured lines + dividers, not 100% black with a black/title flicker — suspect force-blank timing
-  or a CGRAM overwrite. Fix the render first; **the F2 ring is moot until it renders**, and making
-  `phase` wrap at the ring width fixes the saturation *and* supplies the periodicity the ring needs.
-  [investigation §truncstair](docs/investigations/2026-07-27-60fps-demo-sweep.md)
-
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -887,6 +874,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-28 — [truncstair-black] Canvas overflow (BAND_ROUND+BAND_H wrote tile row 16) clobbered chr_word/map_word -> VRAM wipe + reset loop; demo renders again. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
 
 - [x] 2026-07-27 — [99b-trimerge-visual] Frozen trimerge braid fixed (offset was 4 orders below stride) — waterfall + ties/yellow + palette breathing; gate 0xCCCC; live v1.0.284. See [plan](docs/plans/2026-07-27-99b-trimerge-visual-fix.md).
 - 2026-07-26 — [full-rom-galleries] **113-demo SNES gallery live on both biohack.net + indri.studio (11 with bug-fix callouts); `wbniv/llvm-mos-65816` made public.** [plan](docs/plans/2026-07-26-full-rom-galleries-both-sites.md)

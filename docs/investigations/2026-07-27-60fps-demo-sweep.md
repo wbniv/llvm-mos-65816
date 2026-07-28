@@ -179,7 +179,7 @@ blocked on a concurrent edit, below) and `truncstair` (**broken — renders blac
 | <span style="color:#3fb950">tea</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.15</span> | <span style="color:#3fb950">0.22</span> | <span style="color:#3fb950">ok</span> |
 | <span style="color:#3fb950">trimerge</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">scroll-ring</span> | <span style="color:#3fb950">n/a</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">✅ DONE (#99c, v1.0.291)</span> |
 | <span style="color:#3fb950">truchet</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">?</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">5.82</span> | <span style="color:#3fb950">ok — verified: no per-band marking</span> |
-| truncstair | algorithms | band | ? | 4.86* | 0.0* | **BROKEN — renders black/flashing**; F2 moot until fixed |
+| <span style="color:#3fb950">truncstair</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">?</span> | <span style="color:#3fb950">4.86*</span> | <span style="color:#3fb950">0.0*</span> | <span style="color:#3fb950">render bug FIXED ✅ (6f6d4df); F2 now unblocked, F3 candidate</span> |
 | <span style="color:#3fb950">turtle-vm</span> | <span style="color:#3fb950">classics</span> | <span style="color:#3fb950">canvas</span> | <span style="color:#3fb950">—</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.73</span> | <span style="color:#3fb950">ok</span> |
 | <span style="color:#3fb950">uarteye</span> | <span style="color:#3fb950">ciphers</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.0</span> | <span style="color:#3fb950">0.02</span> | <span style="color:#3fb950">F1 ✅ (eye overlay → no F2)</span> |
 | <span style="color:#3fb950">ucmprank</span> | <span style="color:#3fb950">algorithms</span> | <span style="color:#3fb950">band</span> | <span style="color:#3fb950">PER-BAND</span> | <span style="color:#3fb950">0.02</span> | <span style="color:#3fb950">0.03</span> | <span style="color:#3fb950">F1 ✅ (rank recolor → no F2)</span> |
@@ -365,3 +365,30 @@ the `HOFS` ring) is now measured and **harder than it looked** — `_canvas_emit
 bank `0x00`, so the shadow must live in bank-0 low WRAM, and truncstair's `.bss` already runs
 `0x200..0x13E9` with only ~3 KB of headroom below `$1FFF`. Doubling the shadow to 8 KB overflows it;
 widening therefore also requires teaching the canvas/upload path to DMA from bank `$7E`.
+
+#### Resolved 2026-07-28 — root cause was a buffer overflow, not a drawing bug
+
+`BAND_ROUND (12) + BAND_H (5)` made `draw_band` write tile rows 12..**16** into a 16-row canvas.
+Tile row 16 is `chr[4096..]`, and `BitmapCanvas` places `lo, hi, chr_word, map_word` immediately
+after `chr[]` — so each frame the round band overwrote the canvas's own **VRAM base addresses** with
+tile bitmap bytes, `_canvas_emit` DMA'd to a garbage address and wiped the tilemap, and the wild DMA
+restarted the program. Fixed in `6f6d4df` by giving each band its own height (`BAND_ROUND_H = 4`,
+which is what the file's own layout comment always said) and wrapping the ramp into one 128 px
+period. Gate unchanged (`0x02CA`, identical disasm counts); renders 9.7 % non-black at frames
+700–4000 where it was 100 % black, and `corpus_result` no longer shows partial folds.
+
+**Two things this changes for the sweep's method**, worth carrying into any future pass:
+
+1. **Sampling at a fixed frame is unsafe.** The empirical pass read frames 500/560 for every demo;
+   truncstair is still on its title card there, so its `d1`/`d60` measured the title animation. Any
+   demo whose gate runs during the title needs its sample point chosen *after* `title_end`, not at a
+   fixed 500.
+2. **A green corpus gate says nothing about the picture.** This is now the second demo in two days
+   (with `mvscrl`) whose gate passed while the display was broken, for the same structural reason —
+   `corpus_result` is computed during the title, before the display loop matters. A cheap
+   "is the screen non-black and changing after title_end" check would have caught both.
+
+Remaining on truncstair: the ramp wrap supplies the periodicity an `HOFS` ring needs, so **half the
+F2 prerequisite is now cleared**; the 32-column-canvas half (bank-0 WRAM, measured above) still
+stands. Separately it is a good **F3** candidate — all three bands redraw with software floats every
+iteration, so the loop runs at roughly 5 fps.
