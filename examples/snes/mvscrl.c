@@ -16,7 +16,8 @@
 // (scrolling UP) bands.  Bands meet at the centre where fresh coloured rows spawn.
 // Each tile colour = upper[row][col] or lower[row][col] (uint8 0..3).  A 4-level
 // BG3 2bpp palette shows the bands as vivid counter-scrolling slabs.
-// Band update: 4 rows/frame (1024 B DMA, safe for V-blank).
+// Shadow update: one tile-row per frame; the full canvas is flushed atomically (F1), and one
+// mv_step (both memmoves) runs per completed shadow so every painted row is one coherent state.
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256
 #include "snesgfx/display.h"
@@ -32,7 +33,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define NTILES_W    16
 #define NTILES_H    16
 #define UPPER_ROWS  8u   // tile rows 0..7: scroll DOWN (memmove descending)
@@ -57,27 +58,20 @@ typedef struct {
 
 volatile uint16_t corpus_result;
 
-static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
-    uint16_t tile = (uint16_t)((uint16_t)cy * (uint16_t)CANVAS_TILES_W + (uint16_t)cx);
-    uint8_t *t = &cv->chr[tile * (uint16_t)CANVAS_TILEBYTES];
-    uint8_t p0 = (uint8_t)((color & 1u) ? 0xFFu : 0u);
-    uint8_t p1 = (uint8_t)((color & 2u) ? 0xFFu : 0u);
-    for (uint8_t r = 0u; r < 8u; r++) { t[r * 2u] = p0; t[r * 2u + 1u] = p1; }
-}
 
+// Paint one tile row straight from the memmove buffers. The picture MUST be a read of
+// mv.upper/mv.lower — this demo's premise (#79) is that the visual IS the proof that
+// G_MEMMOVE's Ascending and Descending paths moved the right bytes, so a decorative
+// stand-in pattern would silently void it. corpus_result cannot catch that: the gate
+// runs mvscrl_gate_crc() during the title, independently of this loop.
 __attribute__((noinline))
 static void field_band(App *a) {
-    uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
-    for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)NTILES_H; cy++) {
-        for (uint8_t cx = 0u; cx < (uint8_t)NTILES_W; cx++) {
-            uint8_t col;
-            if (cy < (uint8_t)UPPER_ROWS) {
-                col = a->mv.upper[cy][cx];
-            } else {
-                col = a->mv.lower[cy - (uint8_t)UPPER_ROWS][cx];
-            }
-            cell_fill(&a->canvas, cx, cy, col);
-        }
+    uint8_t cy = a->band;
+    for (uint8_t cx = 0u; cx < (uint8_t)NTILES_W; cx++) {
+        uint8_t col = (cy < (uint8_t)UPPER_ROWS)
+                    ? a->mv.upper[cy][cx]
+                    : a->mv.lower[cy - (uint8_t)UPPER_ROWS][cx];
+        canvas_fill_solid_tile(&a->canvas, cx, cy, col);
     }
 }
 
@@ -114,16 +108,18 @@ int main(void) {
     title_begin16(&a.screen, &title, "G_MEMMOVE", "DESCEND+ASCEND");
     corpus_result = mvscrl_gate_crc();   // runs during title; expected 0x72A7
     title_end(&a.screen, &title, 90);
+    update_hud(&a); display_frame(&a.screen);
     for (;;) {
-        // Advance: scroll upper DOWN (descending memmove) and lower UP (ascending).
-        mv_step(&a.mv, a.t);
-        a.t = (uint16_t)(a.t + (uint16_t)7u);
         field_band(&a);
         a.band++;
-        if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)NTILES_H) {
+        if (a.band >= NTILES_H) {
             a.band = (uint8_t)0u;
-            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
-            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
+            a.canvas.lo=0u; a.canvas.hi=(uint16_t)(CANVAS_NTILES-1u);
+            // One scroll step per completed shadow, so all 16 painted rows come from a
+            // single coherent buffer state: upper scrolls DOWN (descending memmove),
+            // lower scrolls UP (ascending). This is the stress under test — it must run.
+            mv_step(&a.mv, a.t);
+            a.t = (uint16_t)(a.t + (uint16_t)7u);
             update_hud(&a);
         }
         display_frame(&a.screen);
