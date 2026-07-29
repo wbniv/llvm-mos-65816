@@ -115,26 +115,60 @@ GALLERY_ASSETS[0].lz_len     15305 bytes  (0x3BC9)
   (`lzss-gallery.c:527,533,553`), and `verify_stream` short-circuits on `z==0`. A non-zero 15254 is
   therefore a *complete* compression run, not a partial one.
 
-### Leading hypothesis (unproven)
+### Second-pass probe — 2026-07-28 (supersedes the first hypothesis)
 
-Not a codec miscompile — **the buffer being compressed is not a clean decode of asset 0.**
-`repack_slide` compresses `FB_A`, and two details in the main loop point at `FB_A` being wrong
-rather than the compressor being wrong:
+An earlier revision of this section claimed work 0 skips `unpack_slide` and repacks a stale `FB_A`.
+**That is wrong and is retracted.** Work 0 *is* decoded, by `ok = unpack_slide(a)` behind the title
+card (`lzss-gallery.c:1167`), before the loop is entered with `decoded = 1`.
 
-1. The loop is entered with `decoded = 1` (`lzss-gallery.c:1190`), so the **first** work skips
-   `unpack_slide` entirely — work 0's `FB_A` is whatever the title/prepare path left behind, not a
-   fresh decode.
-2. `record_result` rewrites `gallery_last_z` on **every** completed work, but `gallery_progress`
-   only increments when `gallery_done[k]` is still clear. So the same `k` can be recorded twice
-   with `progress` unchanged — which is the missing explanation for the previously unexplained
-   drift `0x3B96` (frame 9000) → `0x3B98` (frame 12000) while `progress` stayed at 1.
+Two probes on the shipped ROM (`build/jgxcheck`, `JGX_WRAM_DUMP`):
 
-Two different compressed lengths for the same artwork is the strongest evidence here: a
-deterministic compressor over identical input cannot produce both, so the *input* is varying.
+**1. Stage counters for work 0, at 9000 frames** (`gallery_*_frames[0]`, one entry per array
+non-zero — only work 0 had run):
 
-Stopped at the repo's three-hypothesis limit. Next probe would be to read `gallery_last_ok` /
-`last_z` across the first two full work cycles, and to check whether work 0 passes when it is
-reached on the *second* pass (i.e. after a real `unpack_slide`), which would confirm (1) directly.
+```
+unpack_frames[0] @0x2FA =  127 frames
+stage_frames[0]  @0x376 =   52 frames
+near_frames[0]   @0x3F2 =  118 frames
+```
+
+`unpack_slide` short-circuits with `||`, so reaching `benchmark_near_decode` proves
+`benchmark_far_decode` **and** `benchmark_stage` both returned 1 — each of which requires
+`!nav_cancel`. **The decode pipeline ran in full; nothing bailed early on spurious input.** The
+failure is therefore one of the three data-mismatch conditions: `near_ok`, or either
+`fold_far(FB_A/FB_B, raw_len) != a->checksum`.
+
+**2. Per-work verdicts at 40 000 frames** (`gallery_failed[62]` @ `0xdfe`, `gallery_done[62]` @
+`0xe3c`, contiguous — one 124-byte dump):
+
+```
+done[k]   : 1111000000...      4 works completed
+failed[k] : 1011000000...
+failed: [0, 2, 3]      passed: [1]
+```
+
+**This is not work-0-specific — 3 of the first 4 artworks fail their own repack differential.**
+The title-path explanation is dead: works 1–3 decode inside the loop, with the splash long gone.
+
+### What still holds
+
+- `record_result` rewrites `gallery_last_z` on every completed work while `gallery_progress` only
+  increments when `gallery_done[k]` is clear, so one `k` can be recorded twice with `progress`
+  unchanged — the explanation for the `0x3B96` → `0x3B98` drift.
+- 15254 is **99.7%** of 15305. Garbage or zeros would compress to a fraction of that, so `FB_A`
+  holds a *nearly* correct image with a small corruption — and the run-to-run drift makes that
+  corruption timing-dependent.
+
+### Open question — for direction
+
+Three of four works failing a byte-exact differential is either a genuine miscompile in the far
+decode / LZSS path (which is exactly the class this demo exists to catch) or a demo-level buffer
+bug. Deciding that needs the host-vs-target comparison run per work, not per corpus. Stopped here
+at the repo's three-hypothesis limit rather than guessing further.
+
+Note: `dev/lzss-gallery.sh`'s offline gate is being raised 200000 → 700000 in parallel by another
+worker (uncommitted at the time of writing), with an independently measured ~10k frames/work that
+agrees with the ~9.1k measured here. That fixes the *budget*, not this correctness failure.
 
 ## Note on scope
 

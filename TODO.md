@@ -36,7 +36,9 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 - [verify T2] **#137 — scanner beam repack visualization** — implemented + deployed; steps 1–5 and 7
   PASS. **Step 6 (the full 200 000-frame corpus result) FAILS and is blocked** — not merely unrun:
   the ROM never reaches `corpus_result` at that budget (200 000 frames completes 22 of 62 works),
-  and work 0 itself reports `gallery_last_ok = 0` (root-cause analysis:
+  and the corpus is genuinely failing: at 40 000 frames **3 of the first 4 works fail** their own
+  repack differential (`gallery_failed[] = [0,2,3]`, only work 1 passes), with the decode pipeline
+  confirmed to run in full rather than bail on `nav_cancel` (root-cause analysis:
   [per-image selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)). See
   [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
   the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
