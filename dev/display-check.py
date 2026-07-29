@@ -68,11 +68,19 @@ def same(a, b):
     return all(pa[x, y] == pb[x, y] for y in range(0, 224, 4) for x in range(0, 256, 4))
 
 
-def check(demo, rom, off, ln, want, frames, min_ink, margins, td):
-    """One demo. Returns (ok, note)."""
+def check(demo, rom, off, ln, want, frames, min_ink, margins, td, max_gate):
+    """One demo. Returns (ok, note).
+
+    Sampling is capped: emulation costs ~85 fps here, and a few demos have huge gate frames
+    (lzss-gallery is 200_000), so sampling at `frames + margin` for those would cost ~800k frames
+    for one ROM. Display liveness does not need the gate frame at all -- it only needs to be past
+    title_end. So we sample at min(frames, max_gate) + margins. The corpus_result reset check DOES
+    need the gate to have completed, so it is skipped (and said so) when frames > max_gate."""
+    eff = min(frames, max_gate)
+    do_corpus = frames <= max_gate
     base = os.path.join(td, f"{demo}_base.png")
-    run(rom, off, ln, want, frames, base)          # the gate's own frame (often the title)
-    late = [frames + m for m in margins]
+    run(rom, off, ln, want, eff, base)             # the gate's own frame (often the title)
+    late = [eff + m for m in margins]
     inks, gots, pngs = [], [], []
     for i, f in enumerate(late):
         png = os.path.join(td, f"{demo}_{i}.png")
@@ -83,7 +91,7 @@ def check(demo, rom, off, ln, want, frames, min_ink, margins, td):
 
     # 1. reset loop: corpus_result is written once per boot, so late samples must agree with `want`
     w = want.lower()
-    if any(g is not None and g != w for g in gots):
+    if do_corpus and any(g is not None and g != w for g in gots):
         return False, f"RESET/UNSTABLE corpus_result {gots} (want {w}) — program is restarting"
     # 2. blank screen
     if max(inks) < min_ink:
@@ -91,7 +99,8 @@ def check(demo, rom, off, ln, want, frames, min_ink, margins, td):
     # 3. still showing the title card long after the gate frame
     if os.path.exists(base) and all(same(base, p) for p in pngs if os.path.exists(p)):
         return False, "FROZEN — identical to the gate frame at every late sample (loop never ran?)"
-    return True, f"ink {min(inks):.1f}–{max(inks):.1f}%"
+    tag = "" if do_corpus else "  [ink-only: gate frame > max-gate, reset check skipped]"
+    return True, f"ink {min(inks):.1f}–{max(inks):.1f}%{tag}"
 
 
 def main():
@@ -102,7 +111,9 @@ def main():
     ap.add_argument("--len", type=int, default=2); ap.add_argument("--frames", type=int, default=500)
     ap.add_argument("--min-ink", type=float, default=0.5,
                     help="percent of non-black pixels required at some late sample")
-    ap.add_argument("--margins", default="600,1500,3000",
+    ap.add_argument("--max-gate", type=int, default=4000,
+                    help="cap the gate frame used as the sampling base (see check() docstring)")
+    ap.add_argument("--margins", default="900,2000",
                     help="frames to add to the gate frame when sampling (past title_end)")
     a = ap.parse_args()
 
@@ -130,7 +141,7 @@ def main():
         for demo, rom, off, ln, want, frames in rows:
             if not os.path.exists(rom):
                 print(f"  {demo:<18} MISSING {rom}"); bad.append(demo); continue
-            ok, note = check(demo, rom, off, ln, want, frames, a.min_ink, margins, td)
+            ok, note = check(demo, rom, off, ln, want, frames, a.min_ink, margins, td, a.max_gate)
             # flush per demo: a full sweep is ~100 ROMs x 4 emulator runs, so buffered output
             # would show nothing for many minutes and look like a hang.
             print(f"  {demo:<18} {'PASS' if ok else 'FAIL'}  {note}", flush=True)
