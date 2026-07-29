@@ -33,8 +33,11 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 ## Open
 
 
-- [verify T2] **#137 — scanner beam repack visualization** — implemented + quick-gated; awaiting the
-  full 200 000-frame corpus result and the two site deploys, then promote to Done. See
+- [verify T2] **#137 — scanner beam repack visualization** — implemented + deployed; steps 1–5 and 7
+  PASS. **Step 6 (the full 200 000-frame corpus result) FAILS and is blocked** — not merely unrun:
+  the ROM never reaches `corpus_result` at that budget (200 000 frames completes 22 of 62 works),
+  and work 0 itself reports `gallery_last_ok = 0` (root-cause analysis:
+  [per-image selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)). See
   [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
   the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
 - [T4] **Implement extended SNES cartridge mapping when the gallery grows above 32 Mbit.**
@@ -1616,4 +1619,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-07-27-134-thai-paintings-gallery-expansion** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-134-thai-paintings-gallery-expansion.md](docs/plans/2026-07-27-134-thai-paintings-gallery-expansion.md)_  <!-- fp:ad5d46a73f327609 -->
 - [verify] **2026-07-27-139-lzss-gallery-hblank-palette-reuse** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-139-lzss-gallery-hblank-palette-reuse.md](docs/plans/2026-07-27-139-lzss-gallery-hblank-palette-reuse.md)_  <!-- fp:ee3908e30f424828 -->
 - [verify] **2026-07-27-136-lzss-gallery-contiguous-artwork-palette** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md](docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md)_  <!-- fp:62c4bd721c304ad6 -->
+- [verify] **2026-07-28-gallery-per-image-selfcheck** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-28-gallery-per-image-selfcheck.md](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)_  <!-- fp:c1b8375f773427e9 -->
 <!-- END auto-captured-deferrals -->
