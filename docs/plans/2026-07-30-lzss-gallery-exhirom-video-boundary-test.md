@@ -356,11 +356,61 @@ After the synthetic reel passes, the same converter may ingest a short public-do
 3. quantize/dither every frame against that fixed palette;
 4. burn a small frame counter and boundary marker into the image;
 5. emit raw keyframes first; and
-6. evaluate tile-delta/RLE/LZSS only as a later storage experiment.
+6. select the storage codec by measurement — see **Codec selection** below. LZSS is a comparison
+   baseline there, not the assumed winner.
 
 Raw frames are preferred for the mapping milestone because decompressor performance must not hide
 an address-decoder error. Audio is deferred; BRR/SPC streaming is a separate subsystem and does not
 help prove ExHiROM.
+
+### Codec selection (post-milestone)
+
+LZSS is a poor default video codec: it is intraframe-only and ignores frame-to-frame similarity,
+which is the largest compression opportunity in this footage (stationary star fields and
+backgrounds, coherent launch/ascent motion). The boundary reel's LZSS-refill consumer is a
+**mapping-test fixture**, not a codec endorsement — do not let it anoint LZSS by default.
+
+The expected winner is a small custom interframe codec:
+
+- periodic raw keyframes (which double as the seek/slate targets);
+- the fixed 223-color palette, unchanged;
+- frames divided into 8 × 8 blocks (70 per frame);
+- per-block commands: unchanged from previous frame; copy another block from the previous frame;
+  solid color; two-color bitmap; XOR/RLE delta; raw 64-byte block;
+- decode into a 4,480-byte WRAM framebuffer during active display, then DMA the completed
+  framebuffer to the hidden Mode 7 tile set during VBlank; and
+- each compressed packet stays logically contiguous while deliberately spanning ROM banks, so the
+  refill path keeps exercising the mapper.
+
+Two implementation constraints:
+
+- **Double-buffer the WRAM framebuffer.** Motion-copy commands reference the *previous* frame;
+  in-place update would corrupt source blocks consumed after they are overwritten. Two 4,480-byte
+  buffers cost 8,960 bytes of the 128 KiB WRAM — cheap and removes the ordering hazard.
+- **The codec must not replace the mapping gates.** A WRAM-framebuffer path moves the presentation
+  DMA source from ROM to WRAM (`$7E`, fixed bank, no boundary to cross), so it silently bypasses
+  the segmented ROM-DMA consumer. The synthetic reel's raw-from-ROM DMA fixtures remain mandatory
+  gates regardless of the shipped codec; the codec path proves the mapper through its ROM refill
+  reads instead.
+
+Decode cost is predictable: the all-raw worst case is a block move at ~7 cycles/byte (`MVN`),
+≈ 31k of the ~178k CPU cycles per 30 fps period, and typical frames cost roughly in proportion to
+changed blocks. That predictability matters at 2.68 MHz slow ROM.
+
+Benchmark these candidates over the quantized clip frames before choosing (add a benchmark mode to
+`tools/snes-video-pack.py` that reports bytes/frame, worst-case decode cycles, and keyframe
+spacing):
+
+1. raw frames — correctness baseline;
+2. PackBits/RLE scanlines — simplest compression;
+3. XOR against previous frame plus RLE;
+4. changed 8 × 8 blocks with raw fallback;
+5. changed blocks plus tile-aligned motion copies;
+6. changed blocks with solid/two-color/XOR/raw modes; and
+7. LZSS — comparison only.
+
+Pick on the measured table, per the project's measure-don't-assume rule; the selection and its
+numbers go in the completion record.
 
 ### Selected clip: Artemis I launch and return
 
