@@ -89,7 +89,12 @@ def main():
             worst = min(matches)
             bad = stalls or worst < a.min_match
             rc |= bool(bad)
-            print(f"{name:8s} axis={axis}{step:+d}  stalls={stalls or 'NONE':<10} "
+            # Render the stall list to a string FIRST: `stalls or 'NONE'` yields a list when stalls
+            # is non-empty, and `list.__format__` rejects a width spec — so the failure path crashed
+            # with a TypeError instead of reporting the stalled frames. Only the passing path had
+            # ever run (mvscrl), which is exactly how a checker that cannot report failure hides.
+            stall_txt = ",".join(str(s) for s in stalls) if stalls else "NONE"
+            print(f"{name:8s} axis={axis}{step:+d}  stalls={stall_txt:<10} "
                   f"shift-match min {worst:.1f}% mean {sum(matches)/len(matches):.1f}%  "
                   f"{'FAIL' if bad else 'PASS'}")
         print("60FPS CHECK:", "FAIL" if rc else "PASS")

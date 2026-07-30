@@ -25,6 +25,14 @@
 #define CANVAS_H       (CANVAS_TILES_H * 8)       /* 128 */
 #define CANVAS_NTILES  (CANVAS_TILES_W * CANVAS_TILES_H)   /* 256 */
 #define CANVAS_TILEBYTES 16                       /* 2bpp: 8 rows x 2 planes */
+/* CANVAS_HTILE: repeat the canvas columns across the full 32-column tilemap so a BGnHOFS scroll ring
+   wraps on content rather than on blank tiles. Requires a power-of-two CANVAS_TILES_W and a drawn
+   field that is periodic at the canvas width. Off by default -- it changes what every cell of the
+   tilemap shows, so it must never be implicit. */
+#ifndef CANVAS_HTILE
+#define CANVAS_HTILE 0
+#endif
+
 #ifndef CANVAS_FLUSH_TILES
 #define CANVAS_FLUSH_TILES 64                     /* max tiles DMA'd per frame (64*16 = 1 KB/v-blank). */
 #endif                                            /* A demo may #define it higher before include (e.g.   */
@@ -58,8 +66,20 @@ static void _canvas_reserve(Drawable *d, VramAlloc *va) {
   for (uint8_t sy = 0; sy < 32; sy++)
     for (uint8_t sx = 0; sx < 32; sx++) {
       uint8_t inx = (uint8_t)(sx - c->box_col), iny = (uint8_t)(sy - c->box_row);
+#if CANVAS_HTILE
+      /* Horizontal ring mode: repeat the canvas's columns across the whole 32-column tilemap, so a
+         BGnHOFS scroll WRAPS on content instead of pulling in blank tiles. Only the map changes --
+         the chr shadow stays CANVAS_TILES_W wide (4 KB), and emit() keeps its bank-0 DMA, so this
+         costs no extra WRAM and needs no bank-$7E upload path. Valid ONLY when what you draw is
+         periodic at the canvas width; otherwise the repeat is a visible seam. */
+      uint16_t tile = (iny < CANVAS_TILES_H)
+                        ? (uint16_t)(base + iny * CANVAS_TILES_W
+                                     + (uint16_t)(inx & (uint8_t)(CANVAS_TILES_W - 1u)))
+                        : blank;
+#else
       uint16_t tile = (inx < CANVAS_TILES_W && iny < CANVAS_TILES_H)
                         ? (uint16_t)(base + iny * CANVAS_TILES_W + inx) : blank;
+#endif
       REG_VMDATA = tile;
     }
   /* Zero the blank tile (8 words) and the whole canvas chr region (matches the .bss-cleared shadow). */
@@ -92,6 +112,16 @@ static inline void canvas_init(BitmapCanvas *c, uint16_t chr_word, uint16_t map_
   c->box_row = box_row;
   for (uint16_t i = 0; i < CANVAS_NTILES * CANVAS_TILEBYTES; i++) c->chr[i] = 0;
   c->lo = 0xFFFF; c->hi = 0;
+}
+
+/* Paint one tile a solid 2bpp colour. Word stores write both interleaved plane bytes together. */
+static inline void canvas_fill_solid_tile(BitmapCanvas *c, uint8_t tx, uint8_t ty, uint8_t color) {
+  uint16_t tile = (uint16_t)((uint16_t)ty * (uint16_t)CANVAS_TILES_W + (uint16_t)tx);
+  uint16_t *dst = (uint16_t *)&c->chr[tile * (uint16_t)CANVAS_TILEBYTES];
+  uint16_t row = (uint16_t)((color & 1u) ? 0x00FFu : 0u)
+               | (uint16_t)((color & 2u) ? 0xFF00u : 0u);
+  dst[0] = row; dst[1] = row; dst[2] = row; dst[3] = row;
+  dst[4] = row; dst[5] = row; dst[6] = row; dst[7] = row;
 }
 
 /* Set pixel (x,y) to `color` (1..3; 0 is the transparent background). OR-only — the curve

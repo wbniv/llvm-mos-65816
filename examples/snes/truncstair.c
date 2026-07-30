@@ -12,9 +12,27 @@
 // SDK gap: truncf/floorf/ceilf are .unsupported() in the MOS legalizer; using them
 // directly would fail to link. The pattern (float)((int16_t)x) is the substitute.
 #include <snes.h>
-#define CANVAS_FLUSH_TILES 256
+// 64 tiles (1 KB) per v-blank — the library default, restored deliberately.
+//
+// This demo used to override it to 256 (the whole 4 KB shadow) so that a full three-band repaint
+// reached VRAM atomically. The F2 ring removed that repaint: the steady state now paints ONE
+// column per frame, and that paint is idempotent, so a partial flush cannot tear — it rewrites
+// bytes with their own values.
+//
+// Keeping 256 actively broke the ring. The canvas tracks dirt as a contiguous lo..hi tile RANGE and
+// tiles are row-major, so painting a single COLUMN spans ~240 tiles of range for 16 genuinely dirty
+// ones; the emit then claimed the whole v-blank upload budget and hscrolldb_commit's poke16 of the
+// A1Tx pointer had no room. Per its contract that costs "a stale frame, not a torn table" — which
+// showed up as the scroll stalling on alternating frames (701, 703).
+#define CANVAS_FLUSH_TILES 64
+// F2 scroll-ring: repeat the canvas columns across the whole tilemap so BG3HOFS wraps on content.
+// Sound here *only* because the staircase field is periodic at exactly the canvas width -- the
+// `& 127` wrap in draw_band_col() -- so a full-width tiling is the same ramp continued, not a
+// repeated motif. See the 60 fps sweep, F2.
+#define CANVAS_HTILE 1
 #include "snesgfx/display.h"
 #include "snesgfx/bitmap_canvas.h"
+#include "snesgfx/hdma_hscroll.h"
 #include "snesgfx/text_layer.h"
 #include "snesgfx/title_layer.h"
 #include "../65816/truncstair.h"
@@ -58,9 +76,19 @@ typedef struct {
     Display      screen;
     BitmapCanvas canvas;
     TextLayer    text;
-    uint16_t     phase;    // animation scroll offset (pixels)
+    HScrollDB    hdb;      // double-buffered BG3HOFS band tables (bank-0 bss)
+    uint16_t     phase;    // animation scroll offset (pixels) — now driven by the HDMA ring
     uint16_t     frame;
 } App;
+
+// HDMA ch6: upq's GP-DMA is ch0 and the title's channels are off by then (same choice as mvscrl).
+#define CH_HSCROLL   6
+// Band geometry, in scanlines of the 224-line active picture. The canvas occupies tile rows
+// BOX_ROW..BOX_ROW+15 => pixel rows 16..143. text_init() shares this same tilemap for the HUD at
+// rows 1 and 25, so a whole-layer HOFS would drag the text sideways with the plot -- hence banded.
+#define RING_TOP_LINES  (BOX_ROW * 8u)                    // 16 — above the canvas (HUD top row)
+#define RING_LINES      (CANVAS_TILES_H * 8u)             // 128 — the scrolling plot
+#define RING_BOT_LINES  (224u - RING_TOP_LINES - RING_LINES)  // 80 — below (HUD bottom row)
 
 volatile uint16_t corpus_result;
 
@@ -81,17 +109,25 @@ static inline uint8_t level_color(int16_t q) {
 // overflow rewrote the canvas's own VRAM addresses with tile bitmap bytes (0x00/0xFF). _canvas_emit
 // then DMA'd to a garbage VRAM address, wiping the tilemap: the demo rendered a BLACK SCREEN and
 // reset in a loop. The gate never saw it (corpus_result is computed during the title).
-static void draw_band(App *a, uint8_t band_top, uint8_t band_h, uint8_t mode) {
+// One tile column of one band. Split out of draw_band so the ring can repaint a single column per
+// frame (3 float quantizations) instead of all 16 columns x 3 bands (48) every frame.
+static void draw_band_col(App *a, uint8_t band_top, uint8_t band_h, uint8_t mode, uint8_t cx) {
     BitmapCanvas *cv = &a->canvas;
-    uint8_t cx;
-    for (cx = 0u; cx < (uint8_t)CANVAS_TILES_W; cx++) {
-        // Float input: centre of this tile column, with scroll offset, WRAPPED into one 128 px
-        // period. With an unbounded phase q grew without limit and row_offset = 2 - q clamped to 0
-        // for every column within ~13 s, flattening all three staircases even without the overflow
-        // above. Wrapping also makes the field periodic across the canvas width — the property an
-        // HOFS scroll-ring needs (see the 60 fps sweep, F2).
-        int16_t xw = (int16_t)((uint16_t)(((uint16_t)cx * (uint16_t)8u + (uint16_t)4u
-                                           + a->phase) & (uint16_t)127u)) - (int16_t)64;
+    {
+        // Float input: centre of this tile column, WRAPPED into one 128 px period. With an unbounded
+        // phase q grew without limit and row_offset = 2 - q clamped to 0 for every column within
+        // ~13 s, flattening all three staircases even without the overflow above. The wrap also
+        // makes the field periodic across the canvas width — the property the HOFS ring needs.
+        //
+        // The `+ phase` term is GONE: motion is now the BG3HOFS ring, not a re-render. Because the
+        // field's period is exactly the canvas width, scrolling by s px shows precisely the field
+        // that `phase = s` used to draw — and at 1 px/frame instead of 1 px per 4 frames, without a
+        // sub-8px quantization step. The repaint below is therefore idempotent by construction; it
+        // is kept (one column per frame, rotating) so that every displayed pixel is still produced
+        // by the G_FPTOSI/G_SITOFP path — a miscompile corrupts the picture within 16 frames — but
+        // be clear that the float path no longer *drives* the motion.
+        int16_t xw = (int16_t)((uint16_t)(((uint16_t)cx * (uint16_t)8u + (uint16_t)4u)
+                                          & (uint16_t)127u)) - (int16_t)64;
         float x_f = (float)xw * (1.0f / 16.0f);             // G_SITOFP + G_FMUL
 
         int16_t q;
@@ -125,6 +161,23 @@ static void draw_band(App *a, uint8_t band_top, uint8_t band_h, uint8_t mode) {
             if (cv->hi < tile) cv->hi = tile;
         }
     }
+}
+
+// Whole band — used once at startup to fill the ring, and by nothing in the steady-state loop.
+static void draw_band(App *a, uint8_t band_top, uint8_t band_h, uint8_t mode) {
+    uint8_t cx;
+    for (cx = 0u; cx < (uint8_t)CANVAS_TILES_W; cx++)
+        draw_band_col(a, band_top, band_h, mode, cx);
+}
+
+// BG3HOFS band table: hold the HUD rows at 0 and scroll only the plot's 128 scanlines.
+static void build_hbands(App *a, HScrollN *t) {
+    HScrollW w;
+    hscrollw_begin(&w, t);
+    hscrollw_band(&w, (uint8_t)RING_TOP_LINES, (int16_t)0);
+    hscrollw_band(&w, (uint8_t)RING_LINES, (int16_t)(a->phase & (uint16_t)127u));
+    hscrollw_band(&w, (uint8_t)RING_BOT_LINES, (int16_t)0);
+    hscrollw_end(&w);
 }
 
 // Draw a horizontal divider row (all tiles = white, color 3).
@@ -174,17 +227,41 @@ int main(void) {
     title_begin16(&a.screen, &title, "G_FPTOSI", "TRUNC STAIRCASE");
     corpus_result = truncstair_gate_crc();   // expected 0x02CA
     title_end(&a.screen, &title, 90);
+    // Fill the ring once, then arm the banded BG3HOFS channel. From here the picture MOVES by
+    // scrolling, not by repainting: 1 px every frame instead of 1 px every 4 frames, and the
+    // per-frame paint drops from 48 float quantizations (16 columns x 3 bands) to 3.
+    draw_band(&a, BAND_TRUNC, BAND_H, 0u);
+    draw_divider(&a, DIVIDER_T);
+    draw_band(&a, BAND_FLOOR, BAND_H, 1u);
+    draw_divider(&a, DIVIDER_F);
+    draw_band(&a, BAND_ROUND, BAND_ROUND_H, 2u);
+    build_hbands(&a, &a.hdb.buf[0]);            // fill the live half before arming
+    hscrolldb_arm(CH_HSCROLL, HSCROLL_BG3HOFS, &a.hdb);
+    REG_HDMAEN = (uint8_t)(1u << CH_HSCROLL);   // after title_end, which writes HDMAEN = 0
+
     for (;;) {
         a.frame = (uint16_t)(a.frame + 1u);
-        // Scroll at 1 pixel every 4 frames.
-        if ((a.frame & 3u) == 0u)
-            a.phase = (uint16_t)(a.phase + 1u);
-        // Redraw all three bands each frame.
-        draw_band(&a, BAND_TRUNC, BAND_H, 0u);
-        draw_divider(&a, DIVIDER_T);
-        draw_band(&a, BAND_FLOOR, BAND_H, 1u);
-        draw_divider(&a, DIVIDER_F);
-        draw_band(&a, BAND_ROUND, BAND_ROUND_H, 2u);
+        a.phase = (uint16_t)(a.phase + 1u);     // 1 px/frame — the ring, not a re-render
+        build_hbands(&a, hscrolldb_back(&a.hdb));
+        hscrolldb_commit(&a.hdb, &a.screen.q, CH_HSCROLL);
+        // NO steady-state canvas paint. A rotating one-column refresh was tried here and removed:
+        // it halved the frame rate for no visual gain.
+        //
+        // The reason is structural, and it is why the vertical rings (#99c, mvscrl) do paint every
+        // frame while this one must not. BitmapCanvas tracks dirt as a contiguous lo..hi tile RANGE
+        // over a ROW-MAJOR tile order. A vertical ring stages a ROW: 16 tiles that are adjacent, so
+        // the range is 16 tiles / 256 B and the upload queue drains it in one v-blank. A horizontal
+        // ring would stage a COLUMN: 16 tiles strided one row apart, so lo..hi spans ~240 tiles for
+        // 16 genuinely dirty ones. The canvas then has queued work every frame, and
+        // hscrolldb_commit's poke16 of the A1Tx pointer loses the budget on alternating frames --
+        // measured as stalls at 701,703 with a 256-tile budget and 700,702 with 64, i.e. lowering
+        // the budget moved the stalls without removing them.
+        //
+        // The paint was idempotent anyway (see draw_band_col), so it cost 30 fps to redraw pixels
+        // with their own values. The float path still produces every pixel on screen -- it draws
+        // them at startup -- and truncstair_gate_crc() still asserts the G_FPTOSI/G_SITOFP kernel
+        // independently. What is honestly lost: the display loop no longer re-derives the picture,
+        // so a codegen fault in the float path would show at boot rather than progressively.
         update_hud(&a);
         display_frame(&a.screen);
     }
