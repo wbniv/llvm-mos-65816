@@ -205,6 +205,43 @@ blocked on a concurrent edit, below) and `truncstair` (**broken — renders blac
   expensive live-only repetitions were removed or made incremental while every original compiler
   stress kernel remains in its differential gate. See *Batch C — F3*, below.
 
+**Batch B VERIFIED 2026-07-30.** `mvscrl` was the only remaining candidate; both legs pass.
+
+1. Differential gate — `dev/run.sh mvscrl`:
+
+```
+==> host oracle: mvscrl gate hash = 0x72A7
+==> built build/mvscrl.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (memmove SDK calls + __mulhi3 from fold + rep/sep)
+    memmove-refs=2  rep/sep=15
+    PASS  memmove descending+ascending confirmed (refs=2 >= 2, rep/sep=15 >= 1)
+==> bsnes-jg: render + assert (build/mvscrl-jg.png)
+SMOKE: PASS off=0x31 len=2 got=0x72A7 (ran 500 frames, bsnes-jg)
+    SKIP MAME (no SPC700 IPL)
+
+RESULT: PASS — Descending memmove Scroll Slabs on SNES; MAME + bsnes-jg + corpus hash 0x72A7 host == +mos-a16
+```
+
+PASS — `host == +mos-a16`, and the memmove stress kernel is still present in the shipped code
+(`memmove-refs=2`). MAME is skipped for a missing SPC700 IPL, which is environmental, not a result.
+
+2. Per-band ring motion — the check the gate structurally *cannot* do, since `corpus_result` is
+computed during the title and says nothing about whether the scroll ring actually moves:
+
+```
+python3 dev/scroll-ring-check.py --rom build/mvscrl.sfc --off 0x31 --want 0x72A7 \
+  --band upper:48:104:y:+1 --band lower:104:160:y:-1 --start 700 --frames 6
+
+upper    axis=y+1  stalls=NONE       shift-match min 98.6% mean 98.6%  PASS
+lower    axis=y-1  stalls=NONE       shift-match min 95.0% mean 95.4%  PASS
+60FPS CHECK: PASS
+```
+
+PASS — both bands advance every frame (no stalled pairs) and each frame matches its predecessor
+under the expected ±1 px translation, upper flowing down and lower flowing up. The sub-100%
+shift-match is expected: the HUD text and the staging row at the ring seam are not part of the
+translating content.
+
 Republishing rides the standing "[T2] rebuild + republish all ROMs" TODO (title-card fix) so the
 site gets one coherent ROM refresh.
 

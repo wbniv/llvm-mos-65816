@@ -68,22 +68,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   shipped a black `truncstair` for weeks. Three demos in this batch have display fixes that only
   reach users on a republish: `mvscrl` (regression + 60 fps ring), `truncstair` (black screen), and
   the gallery CGRAM fix.
-- [T4] **60 fps Batch B — F2 scroll-ring for `mvscrl` (the only qualifying demo).** ~~F2 scroll-rings
-  for `ovmove`, `mvscrl`, `truncstair` (+`lfsr2` if its drift is a real translation).~~
-  **Candidacy resolved 2026-07-27 — 3 of the 4 candidates are closed, no work to do:** `ovmove`
-  **rejected** (its flat buffer shifts ±17/−18 bytes = diagonal with a row-crossing wrap, and
-  reverses direction every frame), `lfsr2` **rejected** (two noise fields drift at *different* rates
-  and the interleave mask is position-fixed — nothing rigidly translates), `truncstair` **deferred**
-  (a real horizontal translation, but an `HOFS` ring wraps at the 32-column tilemap while
-  `BitmapCanvas` fills only 16, so blank tiles would scroll in — needs a wider-canvas decision).
-  **Remaining: `mvscrl` only** (two pure whole-row translations, upper down / lower up → V-ring ×2;
-  the memmove stress stays, only the display repaint goes). ⚠️ **Blocked:** `examples/snes/mvscrl.c`
-  has uncommitted concurrent edits — and that in-flight diff drops `mv_step()` from the main loop,
-  so the picture no longer renders the memmove (the gate can't catch it; `gate_crc` runs in the
-  title). Resolve that first. Batch C rides along: F3 stall hunts on any Batch-A demo whose paint
-  frame still overruns. [investigation §Batch B](docs/investigations/2026-07-27-60fps-demo-sweep.md) ·
-  [#99c pattern](docs/plans/2026-07-27-99c-trimerge-60fps-scroll-waterfall.md)
-
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -884,6 +868,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-30 — [60fps-batch-b] `mvscrl` dual V-ring shipped (only qualifying F2 candidate; other 3 closed, Batch C done): gate `0x72A7` host==+mos-a16, both bands 1 px/frame no stalls. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
 - [x] 2026-07-28 — [truncstair-black] Canvas overflow (BAND_ROUND+BAND_H wrote tile row 16) clobbered chr_word/map_word -> VRAM wipe + reset loop; demo renders again. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
 
 - [x] 2026-07-27 — [99b-trimerge-visual] Frozen trimerge braid fixed (offset was 4 orders below stride) — waterfall + ties/yellow + palette breathing; gate 0xCCCC; live v1.0.284. See [plan](docs/plans/2026-07-27-99b-trimerge-visual-fix.md).
