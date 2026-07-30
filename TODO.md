@@ -68,6 +68,13 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [Nintendo development manual](https://gamingdoc.org/technical-documentation/consoles/super-nintendo/official/sdk/book-i/),
   [SNESdev ROM format documentation](https://snes.nesdev.org/wiki/ROM_file_formats), and
   [map-mode table](https://wiki.superfamicom.org/map-mode-table).
+- [T2] **Deferred ordinary-ROM canary matrix** — the non-milestone rows trimmed from the ExHiROM
+  video plan: full LoROM size/speed matrix, remaining HiROM sizes + FastROM, SRAM header variants,
+  copier-header/legacy-header inputs, PAL headers. Generate from the same authoritative mapping
+  model once the milestone rows (HiROM 4 MiB; ExHiROM 6/8 MiB) pass. Blocked on the `[T4]`
+  extended-mapping item's Phase 0. See
+  [plan](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test.md) §Cartridge-configuration
+  coverage. (T2: bounded fixture generation against a settled model.)
 
 - [T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card — now
   ALSO carries the 19 F1 atomic-flush tear fixes (2026-07-27).** The
