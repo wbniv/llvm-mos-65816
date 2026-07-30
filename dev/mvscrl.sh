@@ -50,6 +50,36 @@ else
   echo "    FAIL  memmove-refs=$mmv (expected >=2) rep/sep=$rs (expected >=1)"; rc=1
 fi
 
+# 3b. Premise gate: the PICTURE must be a read of the memmove buffers.
+#
+# #79's premise is that the visual IS the proof that G_MEMMOVE's Ascending and Descending paths
+# moved the right bytes. corpus_result cannot defend that: mvscrl_gate_crc() runs the kernel during
+# the title, independently of the display loop, so a decorative stand-in pattern still gates green.
+# That is not hypothetical -- an in-flight edit once dropped mv_step() from the loop and painted
+# `(cx + row + (t>>2)) & 3` instead, and the gate passed at 0x72A7 throughout. Assert the two
+# properties that make the picture memmove output:
+#   (a) mv_step() is called from the display loop, and
+#   (b) the per-step ring paints read the FAR END of each buffer (upper[UPPER_ROWS-1] / lower[0]) --
+#       the rows carried by seven memmoves, so the pixels on screen are memmove OUTPUT.
+#
+# (b) deliberately checks the far-end reads rather than "any mv.upper/mv.lower read": the initial
+# full paint also reads the buffers, so a coarse count stays satisfied even if the per-step ring
+# paints are swapped for a computed pattern -- verified when this gate was written.
+echo "==> premise gate (the picture reads the memmove buffers)"
+SRC="$ROOT/examples/snes/mvscrl.c"
+steps=$(grep -cE 'mv_step\(&a\.mv' "$SRC" || true)
+far_up=$(grep -cE 'a\.mv\.upper\[\s*UPPER_ROWS\s*-\s*1u?\s*\]' "$SRC" || true)
+far_lo=$(grep -cE 'a\.mv\.lower\[\s*0u?\s*\]' "$SRC" || true)
+echo "    mv_step-calls=$steps  far-end-reads: upper=$far_up lower=$far_lo"
+if [ "$steps" -ge 1 ] && [ "$far_up" -ge 1 ] && [ "$far_lo" -ge 1 ]; then
+  echo "    PASS  loop steps the memmove and paints its far-end output (upper[7] / lower[0])"
+else
+  echo "    FAIL  the picture is no longer driven by the memmove buffers —"
+  echo "          mv_step-calls=$steps (expected >=1), far-end reads upper=$far_up lower=$far_lo (expected >=1 each)."
+  echo "          #79's visual-as-proof premise is void even if corpus_result still matches 0x72A7."
+  rc=1
+fi
+
 # 4. bsnes-jg.
 JGX="$BUILD/jgxcheck"
 if [ ! -x "$JGX" ]; then
