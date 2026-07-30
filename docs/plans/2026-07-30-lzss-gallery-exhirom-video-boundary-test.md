@@ -35,9 +35,10 @@ Bundle: [`2026-07-30-lzss-gallery-exhirom-video-boundary-test/`](2026-07-30-lzss
 
 [![Boundary slate — player states](2026-07-30-lzss-gallery-exhirom-video-boundary-test/boundary-slate.png)](2026-07-30-lzss-gallery-exhirom-video-boundary-test/boundary-slate.html)
 
-Three player states: a `PRE_4M` slate in aspect-preserving letterbox, the `EDGE_4M` transition in
-full-screen stretch with the ROM 1 → ROM 2 sprite indicator lit, and the distinct mirror-fault
-failure screen. The publication-page layout gets its own mockup in Phase 4.
+Three player states: a `PRE_4M` slate in aspect-preserving letterbox with the `hud.h`-style BG3
+text bars, the `EDGE_4M` transition in full-screen stretch (sprite badges only, bars disabled),
+and the distinct mirror-fault failure screen. The publication-page layout gets its own mockup in
+Phase 4.
 
 ## Why ExHiROM
 
@@ -189,7 +190,7 @@ complete file-offset/CPU-address table.
 | Bytes per frame | **4,480** |
 | Buffers in VRAM | 2 × 70 tiles = **140 of 256 tiles** |
 | Presentation cadence | **30 fps NTSC**, one new frame every two VBlanks |
-| Palette | one fixed 223-color video palette (CGRAM 1–127 and 160–255); index 0 reserved transparent; CGRAM 128–159 sprite-owned |
+| Palette | one fixed 223-color video palette, CGRAM 1–223 contiguous (entry 1 pinned white as HUD text ink); index 0 reserved transparent; CGRAM 224–255 sprite-owned (OBJ palettes 6–7, gallery convention) |
 | Audio | none in milestone 1 |
 | Scaling | Mode 7 affine matrix scales and centers the raster in the 256 × 224 display |
 
@@ -211,7 +212,8 @@ block-beta
 ```
 
 The block widths are schematic. Exact tile-number ownership is normative in the generated report.
-There is no Mode 7 UI tile allocation: live UI is sprites only (see Mode 7 mechanics below).
+There is no Mode 7 UI tile allocation: text readouts live on HDMA-split BG3 bars and the few
+overlay badges are sprites (see Mode 7 mechanics below).
 
 ### Mode 7 mechanics (normative)
 
@@ -232,18 +234,30 @@ on console while passing every host gate.
 - **Index 0 is transparent.** A Mode 7 pixel value of 0 shows the backdrop, not CGRAM entry 0. The
   quantizer never emits index 0; the backdrop color is black and is part of the format contract.
 - **Sprite-owned CGRAM.** Sprite palettes occupy fixed 16-entry groups in CGRAM 128–255; this
-  format reserves exactly CGRAM 128–159 (OBJ palettes 0–1). Because Mode 7 pixels index the same
-  0–255 space, a frame pixel mapped to a reserved index passes every host gate and fails only
-  visually on console — so the packer asserts no frame pixel uses index 0 or 128–159.
-- **Live UI is sprites only.** Mode 7 has a single background layer, and at 3.2–4× zoom the visible
-  map window is exactly the 10 × 7 frame — no Mode 7 tiles can composite over the video. Burned-in
-  per-frame data covers the deterministic content; all live indicators (ROM 1 → ROM 2 marker,
-  fold/CRC readout, pause and slip state) are OBJ sprites using CGRAM 128–159. OBJ character data
-  lives at a VRAM word address of `$4000` or above, clear of the Mode 7 map/tile region; the linker
-  layout and generated report must budget it explicitly.
-- **Letterbox surround.** Map entries outside the 80 × 56 frame reference a dedicated
-  all-black border tile (tile 140, every pixel a non-zero black index); together with the black
-  backdrop this produces the letterbox/pillarbox surround in aspect-preserving mode.
+  format reserves exactly CGRAM 224–255 (OBJ palettes 6–7), matching the `lzss-gallery.c`
+  convention (the gallery's proof "owns the complete 224..255 block") and keeping the video range
+  contiguous at 1–223. Because Mode 7 pixels index the same 0–255 space, a frame pixel mapped to a
+  reserved index passes every host gate and fails only visually on console — so the packer asserts
+  no frame pixel uses index 0 or 224–255. Entry 1 is additionally pinned to white: it doubles as
+  the BG3 HUD ink color (the `hud.h`/blossom convention) while remaining usable as a video color.
+- **Live UI = HDMA-split BG3 bars plus a few sprites.** Mode 7 has no spare BG layer, and at
+  3.2–4× zoom the visible map window is exactly the 10 × 7 frame — no Mode 7 tiles can composite
+  over the video. Burned-in per-frame data covers the deterministic content. Live *text* readouts
+  (frame ID, descriptor address, fold/CRC) reuse the repo's established pattern
+  (`examples/snes/hud.h`, proven in `blossom.c`): an HDMA scanline split streams `BGMODE`/`TM` so
+  the top/bottom bars render in Mode 1 with a tiled BG3 2bpp text layer while the middle band
+  stays Mode 7 — no per-scanline OBJ limit, and drawing a string is a tilemap poke. In
+  aspect-preserving mode the bars sit inside the letterbox bands; in full-screen stretch mode the
+  bars are disabled (per-mode HDMA line tables, swapped during VBlank) and only the *overlay
+  badges* remain — device marker, pause and slip state — as OBJ sprites using CGRAM 224–255. HDMA
+  channels 1–2 are owned by the split and frame GP-DMA stays on channel 0, per `hud.h`. VRAM
+  budget: BG3 tilemap at word `$4000`, 2bpp font at `$5000`, OBJ character data at `$6000`+ — all
+  clear of the Mode 7 map/tile region; the linker layout and generated report must budget all
+  three explicitly.
+- **Letterbox surround.** In aspect-preserving mode the 16-line HUD bars occupy most of each
+  ~22-line letterbox band; the remaining Mode 7 lines between bar and video, and any map area
+  outside the 80 × 56 frame, reference a dedicated all-black border tile (tile 140, every pixel a
+  non-zero black index) over the black backdrop.
 - **VBlank margin arithmetic.** 37 usable VBlank lines × (1,364 − 40 refresh) master cycles ÷ 8
   cycles per DMA byte = 6,123 bytes — that is where the ceiling figure above comes from. The frame
   (4,480 bytes ≈ 27 lines) + flip map DMA (70 bytes) + OAM (≤ 544 bytes ≈ 3.3 lines) leaves about
@@ -347,6 +361,39 @@ After the synthetic reel passes, the same converter may ingest a short public-do
 Raw frames are preferred for the mapping milestone because decompressor performance must not hide
 an address-decoder error. Audio is deferred; BRR/SPC streaming is a separate subsystem and does not
 help prove ExHiROM.
+
+### Selected clip: Artemis I launch and return
+
+Use candidate **#29, Artemis I launch and return animations**, as the normative presentation clip.
+The synthetic reel remains the mapping/cross-bank correctness oracle; Artemis I is the visually
+interesting demonstration payload that follows it.
+
+Source both segments from NASA Scientific Visualization Studio item
+[14191](https://svs.gsfc.nasa.gov/14191/):
+
+| Order | Source asset | Selected action | Target duration |
+|---:|---|---|---:|
+| 1 | `Pre-launch_through_launch.webm` | final pre-launch moment through tower clearance | 8–10 seconds |
+| 2 | `Return_to_Earth.webm` | Orion approach/reentry portion with the clearest large-scale motion | 8–10 seconds |
+
+Use the explicitly no-audio downloadable versions. Do not ingest the surrounding interview,
+broadcast package, music, NASA logo slate, captions, or third-party montage material. Record exact
+in/out timestamps and source SHA-256 values after downloading the masters.
+
+Join the two excerpts with one hard cut—no generated dissolve—then:
+
+1. crop or letterbox consistently to the 80 × 56 source raster;
+2. retime to 30 fps without optical-flow interpolation;
+3. quantize both excerpts against one shared 223-color BGR555 palette;
+4. show an unobtrusive `LAUNCH` or `RETURN` test label and monotonically increasing frame number;
+5. place at least one required bank-spanning frame in each excerpt;
+6. place the physical 4 MiB `EDGE_4M` span within a motion-heavy portion of the launch; and
+7. emit a contact sheet containing the first/last frame of each excerpt, the hard cut, every
+   bank-spanning frame, and the physical-device transition.
+
+If the selected launch or return interval contains a protected NASA identifier as part of the
+animation, choose a nearby clean interval or crop it out; do not paint over a logo frame and then
+represent the result as unmodified NASA material.
 
 ### Thirty clip candidates
 
@@ -492,8 +539,9 @@ Runtime requirements:
   LZSS-refill fixtures are excluded from seek and always restart from their descriptor start;
 - Start pauses; Select toggles scaling mode;
 - a visible indicator changes when playback crosses ROM 1 → ROM 2;
-- all live UI (indicators, fold readout, pause/slip state) is OBJ sprites using CGRAM 128–159; no
-  Mode 7 tiles composite over the video;
+- live text readouts (frame ID, descriptor address, fold/CRC) render on the HDMA-split BG3 bars
+  (`hud.h` pattern) in aspect-preserving mode; overlay badges (device, pause/slip) are OBJ sprites
+  using CGRAM 224–255; stretch mode shows badges only; no Mode 7 tiles composite over the video;
 - a running fold (fixture frames only — see the consumer CPU budget) includes frame ID, descriptor
   address, first/last pixel, and per-frame expected CRC;
 - the source cursor is `(canonical CPU address, bytes remaining, segment index)` and advances
@@ -549,6 +597,7 @@ flowchart TB
 | `tools/lzss-gallery-rom-layout.py` | extended map/device/boundary HTML |
 | `tools/snes-rom-map.py` | ExHiROM-aware Markdown/diagram report |
 | `examples/snes/lzss-gallery-video.c` | minimal isolated player fixture |
+| `examples/snes/hud.h` | reused HDMA `BGMODE`/`TM` split HUD; player adds per-mode line tables |
 | `examples/snes/lzss-gallery.c` | optional gallery integration after fixture passes |
 | `dev/lzss-gallery-video.sh` | build, structural, emulator, and frame-readback gate |
 | `test/snes/cartridge-maps/*` | generated LoROM/HiROM/ExHiROM mapper and header matrix |
@@ -605,14 +654,14 @@ block beneath the step with a PASS/FAIL note.
    with independent calculation.
 3. `dev/lzss-gallery-video.sh --gate descriptors` — every emitted descriptor round-trips CPU
    address ↔ file offset; PRE/POST boundary canaries are distinct and at exact offsets; no frame
-   pixel uses palette index 0 or 128–159.
+   pixel uses palette index 0 or 224–255, and entry 1 is white.
 4. `dev/lzss-gallery-video.sh --gate segments` — every required logical span is present; no
    individual DMA segment crosses a 64 KiB bank; concatenating each segment list exactly reproduces
    its source object with neither gaps nor duplicated bytes.
 5. `dev/lzss-gallery-video.sh --gate consumers-host` — `BANK_SPAN`, `MULTIBANK_SPAN`, and
    `EDGE_4M` pass through host-model raw DMA, CPU CRC, and LZSS refill.
 6. `dev/lzss-gallery-video.sh --gate map` — every padding/mirror byte is deterministic; the visual
-   map covers every physical byte exactly once, including the OBJ VRAM budget.
+   map covers every physical byte exactly once, including the BG3 map/font and OBJ VRAM budgets.
 
 (Exact gate names may be refined during implementation; keep one command per numbered step.)
 
@@ -630,7 +679,8 @@ block beneath the step with a PASS/FAIL note.
 6. The final oracle, latched on the first complete pass, proves both physical devices were read.
 7. Pause, seek (slate boundaries only), scaling toggle, and cancellation remain responsive.
 8. No forced-blank frame or black band appears.
-9. Red-dot/gallery sprite palettes remain isolated if integrated (CGRAM 128–159 only).
+9. Red-dot/gallery sprite palettes remain isolated if integrated (CGRAM 224–255, OBJ palettes
+   6–7 — the block the gallery already owns).
 
 ### Emulator/browser matrix
 
@@ -674,7 +724,7 @@ Update the cookbook and hardware summary with:
 - DMA source bank wrapping;
 - Mode 7's 256-tile limit, high-byte-only tile DMA, and index-0 transparency;
 - the measured VBlank upload budget; and
-- the 80 × 56 double-buffered video recipe.
+- the 80 × 56 double-buffered video recipe and its `hud.h` HDMA-split HUD.
 
 References:
 

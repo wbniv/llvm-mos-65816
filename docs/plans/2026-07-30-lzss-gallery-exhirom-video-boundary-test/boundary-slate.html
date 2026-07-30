@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ExHiROM video boundary test — player state mockups</title>
+<style>
+  html,body{margin:0;padding:0;background:#101014;color:#d8d8e0;
+    font-family:"DejaVu Sans Mono",Menlo,Consolas,monospace}
+  .canvas{width:1440px;height:900px;box-sizing:border-box;padding:24px 20px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 4px;color:#fff;font-weight:600}
+  .sub{font-size:12px;color:#8a8a99;margin:0 0 18px}
+  .row{display:flex;gap:20px}
+  .panel{width:456px}
+  .panel h2{font-size:13px;margin:0 0 6px;color:#b8c6ff;font-weight:600}
+  .panel .cap{font-size:11px;color:#8a8a99;line-height:1.5;margin-top:8px}
+  /* the SNES 256x224 screen scaled 1.75x = 448x392 */
+  .tv{position:relative;width:448px;height:392px;background:#000;border:4px solid #2a2a33;
+      border-radius:6px;overflow:hidden}
+  /* 80x56 video raster; aspect-preserving = uniform 3.2x -> 256x179.2 -> scaled 1.75 = 448x313 */
+  .vid{position:absolute;left:0;width:448px;image-rendering:pixelated}
+  .letterbox .vid{top:39px;height:314px}
+  .stretch .vid{top:0;height:392px}
+  /* slate content built from CSS blocks */
+  .bars{position:absolute;left:0;top:0;width:100%;height:26%;display:flex}
+  .bars div{flex:1}
+  .checker{position:absolute;left:0;bottom:0;width:100%;height:12%;
+    background:repeating-conic-gradient(#fff 0 25%,#000 0 50%);background-size:11px 11px}
+  .slate{position:absolute;left:0;top:26%;width:100%;height:62%;
+    display:flex;flex-direction:column;justify-content:center;gap:2px;
+    padding-left:5%;box-sizing:border-box}
+  .slate .big{font-size:30px;font-weight:700;letter-spacing:1px}
+  .slate .fld{font-size:14px;line-height:1.45}
+  .fld b{color:#9aa7ff;font-weight:600}
+  /* sprite UI overlays */
+  .spr{position:absolute;font-size:12px;font-weight:700;padding:2px 6px;background:rgba(0,0,0,.65);
+       border:1px solid #444;border-radius:2px}
+  .spr.dev{right:8px;top:8px;color:#7CFC9A}
+  .spr.dev.rom2{color:#ffb36b;border-color:#ffb36b}
+  .spr.slip{right:8px;bottom:8px;color:#888}
+  /* hud.h-style Mode 1 BG3 text bars: 16 scanlines = 28px at 1.75x */
+  .hudbar{position:absolute;left:0;width:100%;height:28px;background:#04040a;color:#fff;
+    font-size:13px;font-weight:700;letter-spacing:1px;line-height:28px;padding:0 10px;
+    box-sizing:border-box;display:flex;justify-content:space-between;z-index:2}
+  /* fault screen */
+  .fault{position:absolute;inset:0;background:#180000;border:6px solid #d22;box-sizing:border-box;
+     display:flex;flex-direction:column;justify-content:center;padding-left:36px;gap:6px}
+  .fault .code{color:#ff5b5b;font-size:34px;font-weight:800}
+  .fault .l{font-size:15px;color:#e8c8c8;line-height:1.6}
+  .fault .l b{color:#fff}
+  .legend{margin-top:16px;font-size:11px;color:#70707e;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <h1>ExHiROM 48 Mbit video boundary test — player states (mockup)</h1>
+  <p class="sub">80 × 56 Mode 7 reel on a 256 × 224 screen · slate data burned into video pixels · text = HDMA-split BG3 bars (hud.h) · badges = OBJ sprites (CGRAM 224–255)</p>
+  <div class="row">
+
+    <div class="panel">
+      <h2>1 · PRE_4M slate — aspect-preserving, HUD bars</h2>
+      <div class="tv letterbox">
+        <div class="hudbar" style="top:0"><span>EXHIROM 48MBIT BOUNDARY REEL</span><span>PLAY</span></div>
+        <div class="hudbar" style="bottom:0"><span>F0912 $3FEE40 $FF:EE40</span><span>FOLD 7A31 &#10003; SLIP 0</span></div>
+        <div class="vid">
+          <div class="bars">
+            <div style="background:#c0c0c0"></div><div style="background:#c0c000"></div>
+            <div style="background:#00c0c0"></div><div style="background:#00c000"></div>
+            <div style="background:#c000c0"></div><div style="background:#c00000"></div>
+            <div style="background:#0000c0"></div>
+          </div>
+          <div class="slate">
+            <div class="big">PRE_4M</div>
+            <div class="fld"><b>FRAME</b> 0912  <b>DEV</b> ROM1</div>
+            <div class="fld"><b>OFF</b> $3FEE40</div>
+            <div class="fld"><b>CPU</b> $FF:EE40</div>
+            <div class="fld"><b>CRC</b> 7A31</div>
+          </div>
+          <div class="checker"></div>
+        </div>
+        <div class="spr dev" style="top:36px">ROM 1</div>
+      </div>
+      <div class="cap">Uniform 3.2× scale → 256 × 179 raster. Top/bottom bars are the hud.h HDMA
+      BGMODE/TM split: Mode 1 BG3 2bpp text (ink = pinned CGRAM entry 1) inside the letterbox
+      bands; remaining band lines show border tile 140. Device badge is an OBJ sprite.</div>
+    </div>
+
+    <div class="panel">
+      <h2>2 · EDGE_4M slate — full-screen stretch, device transition</h2>
+      <div class="tv stretch">
+        <div class="vid">
+          <div class="bars">
+            <div style="background:#c0c0c0"></div><div style="background:#c0c000"></div>
+            <div style="background:#00c0c0"></div><div style="background:#00c000"></div>
+            <div style="background:#c000c0"></div><div style="background:#c00000"></div>
+            <div style="background:#0000c0"></div>
+          </div>
+          <div class="slate">
+            <div class="big" style="color:#ffb36b">EDGE_4M</div>
+            <div class="fld"><b>FRAME</b> 0937  <b>DEV</b> ROM1→ROM2</div>
+            <div class="fld"><b>OFF</b> $3FFF20 → $400CA0</div>
+            <div class="fld"><b>CPU</b> $FF:FF20 → $40:0CA0</div>
+            <div class="fld"><b>SEG</b> 2 of 2  <b>CRC</b> 1CE8</div>
+          </div>
+          <div class="checker"></div>
+        </div>
+        <div class="spr dev rom2">ROM 1→2</div>
+        <div class="spr slip">SLIP 0</div>
+      </div>
+      <div class="cap">Select toggled to 3.2× / 4× independent stretch — video fills 256 × 224 and
+      the HUD bars are disabled (per-mode HDMA line tables); only sprite badges remain. This
+      logical frame begins below file $400000 and ends above it; the CPU windows are
+      non-contiguous, so the cursor walks a 2-segment list. Device badge flips color.</div>
+    </div>
+
+    <div class="panel">
+      <h2>3 · Fault state — wrong ExHiROM mirror</h2>
+      <div class="tv">
+        <div class="fault">
+          <div class="code">FAULT $E3</div>
+          <div class="l"><b>WRONG MIRROR</b></div>
+          <div class="l"><b>CPU</b> $40:0000 canary</div>
+          <div class="l">expect <b>$B2 'ROM2'</b></div>
+          <div class="l">actual <b>$47 'ROM1'</b></div>
+          <div class="l"><b>FRAME</b> 0938 <b>SEG</b> 2</div>
+        </div>
+      </div>
+      <div class="cap">Each injected fault (unsplit DMA, bad bank carry, skipped/duplicated byte,
+      wrong mirror) halts with a distinct code plus expected/actual canary bytes — never a
+      plausible-looking picture.</div>
+    </div>
+
+  </div>
+  <div class="legend">Mockup only — 1440 × 900 logical canvas, states rendered with inline CSS.
+  Real slates are generated by tools/snes-video-pack.py and verified against host references.</div>
+</div>
+</body>
+</html>

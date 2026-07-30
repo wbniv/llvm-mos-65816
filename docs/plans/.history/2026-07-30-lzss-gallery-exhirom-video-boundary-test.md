@@ -1,8 +1,13 @@
 | Date | Change |
 |------|--------|
+| [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/97b1ce3) | docs: link ExHiROM video clip candidates |
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/1ae32f8) | docs: plan ExHiROM video boundary test |
 
 <!--history-meta v1
+97b1ce3	author	Will Norris
+97b1ce3	added	182
+97b1ce3	deleted	86
+97b1ce3	files	1
 1ae32f8	author	Will Norris
 1ae32f8	added	608
 1ae32f8	deleted	0
