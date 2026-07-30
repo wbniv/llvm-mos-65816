@@ -42,6 +42,23 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [per-image selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)). See
   [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
   the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
+- [wip T4] **`lzss-gallery` repack differential fails for most works — root-cause: miscompile or
+  demo bug, then land the per-image "Verify fidelity" button.** <!-- agent:a75e8ca02cfc98209 -->
+  At 40 000 frames works 0, 2, 3 FAIL their own decode→repack→byte-compare while work 1 passes;
+  work 0 recompresses to 15254 vs its embedded `lz_len` 15305 (99.7% — a *nearly* correct buffer,
+  and `gallery_last_z` drifts run-to-run, so the corruption is timing-dependent). The decode
+  pipeline is proven to run in full (stage counters non-zero; not a `nav_cancel` bail), so the
+  failure is a data mismatch: `near_ok` or a `fold_far` checksum. Ruled out: asset/oracle desync,
+  mis-indexed artwork, truncated compress, title-path theory. The verdict decides whether this is
+  the far-decode/LZSS miscompile class this demo exists to catch or a demo buffer bug — it gates
+  #137 step 6 and the gallery half of the republish item. Blocks the per-image selfcheck (manifest
+  `frames` doubles as the in-browser verify budget, so it cannot be raised to ~710 000).
+  [plan + probe evidence](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)
+- [T3] **`lsystem` BLANKSCAN gate failure — one frame with a transient black band.** Found by
+  `dev/verify-web-roms.sh` during the 2026-07-28 republish: force-blank bleed at the top of the
+  picture for a single frame. Pre-existing (not introduced by that republish) and unexamined —
+  needs the frame localized, the blank source identified (force-blank timing vs HDMA setup), and
+  the fix gated. Blocks promoting the republish item to Done.
 - [T4] **Implement extended SNES cartridge mapping when the gallery grows above 32 Mbit.**
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
   normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
@@ -76,6 +93,13 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   VRAM lands in the newly clobbered window. `` ` ``, `{`, `|`, `}`, `~` come free with the same
   extension (none is used by any title today; `dev/title-charset.sh` gates them). Deleting the two
   folding lines is the whole render-side change.
+- [T2] **`truncstair` F3 cheap-paint — stop re-deriving all three bands with software floats every
+  iteration (~5 fps today).** The ramp is periodic in `phase & 127` (the 2026-07-28 wrap fix made
+  that explicit), so per-column values recur; cache the per-column float results and repaint only
+  the one column whose value changed per step — or precompute the 128-phase column table once at
+  startup. The `G_FPTOSI`/`G_SITOFP` stress kernel must stay in the gate slice (`0x02CA` fixed);
+  only the display loop gets cheaper. Orphaned from the Batch B close-out (2026-07-30) where it was
+  recorded as a good F3 candidate. [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md)
 
 - [x] ~~**`+mos-xy16` miscompile — iterative in-place `memmove`/`memcpy` rewrite over a 16-bit-indexed buffer** — FIXED in `MOSInsertREPSEP::placeIntraBlock`: `sep #$10` between `ldx` (writes 16-bit X) and `lda abs,X16` (reads 16-bit X) zeroed X's high byte; fix inserts a clone of the last X-writer after the subsequent `rep #$10` to restore the correct value. Repro `examples/65816/xy16-inplace-memmove-repro.c` CAP=1700: `xy16=0x90AA` (was `0x1CC6`). Unblocked #23 L-system 5-way-green. ([investigation](docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md))~~
 
@@ -857,6 +881,15 @@ revisit) rather than active work._
 
 ## Parked
 
+- **`truncstair` F2 `HOFS` scroll-ring — blocked on a 32-column canvas, which is now measured as a
+  library change.** The motion qualifies (pure horizontal translation; the ramp wrap supplies the
+  periodicity), but `BG3HOFS` wraps at the 32-column tilemap while `BitmapCanvas` fills 16, so blank
+  tiles would scroll in — and doubling the CHR shadow to 8 KB overflows truncstair's bank-0 `.bss`
+  (~3 KB headroom below `$1FFF`), while `_canvas_emit` hardcodes DMA source bank `0x00`. Widening
+  therefore requires teaching the canvas/upload path to DMA from bank `$7E` — a deliberate snesgfx
+  design decision, not a demo drop-in. Overlaps the inbox-captured "canvas widening beyond 16×16"
+  library need from #99b. Promote when someone takes the wider-canvas decision.
+  [investigation §Batch B](docs/investigations/2026-07-27-60fps-demo-sweep.md)
 - **Mesen2 as a third emulator** — abandoned for now: the prebuilt crashes on 26.04
   (glibc-2.43) and headless `--testrunner` won't run Lua; would need a source build against 26.04.
   MAME + bsnes-jg already give a two-emulator cross-check, so this is shelved unless a third opinion
@@ -1598,7 +1631,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-07-26-123-mode7-gallery-filter** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-123-mode7-gallery-filter.md](docs/plans/2026-07-26-123-mode7-gallery-filter.md)_  <!-- fp:ff1ea8788102f1d7 -->
 - [verify] **2026-07-26-125-lzss-gallery-full-mode7-color** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-125-lzss-gallery-full-mode7-color.md](docs/plans/2026-07-26-125-lzss-gallery-full-mode7-color.md)_  <!-- fp:3cc268f3e382586f -->
 - [verify] **2026-07-26-127-lzss-repack-explainer** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-127-lzss-repack-explainer.md](docs/plans/2026-07-26-127-lzss-repack-explainer.md)_  <!-- fp:7794d6d35096b0b8 -->
-- [ ] **(triage)** Canvas widening beyond 16×16 tiles (needs `bitmap_canvas.h` geometry work — a snesgfx library — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:f9122100c1e60a3f -->
+<!-- triaged 2026-07-30: same library work as the Parked "truncstair F2 HOFS scroll-ring / 32-column canvas" entry, which carries the measured constraints (bank-0 .bss overflow, _canvas_emit bank-0x00 DMA) and both motivating demos (#99b trimerge, truncstair). fp:f9122100c1e60a3f -->
 - [ ] **(triage)** HDMA backdrop gradient (same reason: no library support yet). — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:9e322e197981b057 -->
 <!-- triaged 2026-07-27: #128 is planned-not-yet-implemented; its verification runs with the implementation, tracked by the curated [T3] "#128 lzss-gallery" battery sub-item. fp:8b0a76b3e990a0e0 -->
 - [verify] **2026-07-27-131-snes-cartridge-map-mermaid-quadtree** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md](docs/plans/2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md)_  <!-- fp:5e21a496a7540ac0 -->
