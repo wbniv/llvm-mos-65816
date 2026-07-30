@@ -3,6 +3,15 @@
 **Status:** planned 2026-07-28, user-directed ("make the button per image, not entire gallery").
 Blocks [#137](2026-07-27-137-lzss-gallery-new-repack-visualization.md) step 6.
 
+> **2026-07-30 — the per-work failures investigated below are ROOT-CAUSED AND FIXED.** Not a
+> miscompile: the hand-written `decode_bank7e` thunk did `lda #$7e / pha / plb`, and the MOS
+> convention passes `decode_near`'s `slen` in `A:X`, so every stream whose `(lz_len & 0xFF) > $7E`
+> was truncated to `(lz_len & 0xFF00) | $7E`. 29 of 62 works. Full write-up, evidence and the
+> `PEA`-based fix: [`2026-07-30-gallery-near-decode-abi-clobber.md`](2026-07-30-gallery-near-decode-abi-clobber.md).
+> The "timing-dependent" clue in *Second-pass probe* was a red herring — bsnes-jg randomises the
+> WRAM power-on fill, and the un-decoded tail of `FB_A` *was* that fill, feeding different bytes
+> into the compressor each run. The truncation itself is fully deterministic.
+
 ## Problem
 
 The site manifest's `selfcheck` is not only the offline gate — **it is what the in-page "Verify

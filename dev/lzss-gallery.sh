@@ -66,6 +66,35 @@ if bytes.fromhex("f0 a2") in nmi:
     raise SystemExit("FATAL: NMI opcode audit found the formerly wrapped BEQ")
 print("NMI opcode audit: PASS (long conditional and 16-bit immediate are explicit)")
 PY
+
+# decode_bank7e must set DB=$7E WITHOUT touching the accumulator.  The MOS
+# convention passes decode_near's `slen` in A:X, so the natural
+# `lda #$7e / pha / plb` idiom silently truncated every stream whose
+# (lz_len & 0xFF) > $7E to (lz_len & 0xFF00) | $7E -- 29 of the 62 works, each
+# leaving the tail of FB_A un-decoded and failing its own repack self-check.
+# Assert the A-safe PEA/PLB form is what shipped.
+BANK7E_VMA=$(awk '$NF=="decode_bank7e"{print $1; exit}' "$MAP")
+[ -n "$BANK7E_VMA" ]
+python3 - "$ROM" "$BANK7E_VMA" <<'PY'
+from pathlib import Path
+import sys
+rom = Path(sys.argv[1]).read_bytes()
+start = int(sys.argv[2], 16) & 0x7fff
+# The thunk is a dozen bytes; 32 covers it without running into the callee.
+thunk = rom[start:start + 32]
+end = thunk.find(b"\x60")            # first RTS terminates the thunk
+if end < 0:
+    raise SystemExit("FATAL: decode_bank7e audit: no RTS found")
+thunk = thunk[:end + 1]
+if bytes.fromhex("f4 7e 7e") not in thunk:
+    raise SystemExit(f"FATAL: decode_bank7e must use PEA $7E7E; got {thunk.hex(' ')}")
+if b"\xa9" in thunk:
+    raise SystemExit(
+        "FATAL: decode_bank7e contains LDA #imm -- it clobbers the A-passed "
+        f"`slen` argument; got {thunk.hex(' ')}")
+print(f"decode_bank7e ABI audit: PASS (A-safe PEA/PLB; {thunk.hex(' ')})")
+PY
+
 python3 "$ROOT/tools/snes-rom-map.py" "$MAP" \
   "$ROOT/assets/snes/lzss-gallery/derived/report.json" \
   "$ROOT/assets/snes/lzss-gallery/derived/rom-map.md"
@@ -95,6 +124,34 @@ placed=", ".join(f"{name}=${addr>>16:02X}:{addr&0xffff:04X}"
                  for name,(addr,_) in sorted(symbols.items()))
 print(f"bank $00 asset gate: PASS ({placed}; {margin} B before header)")
 PY
+
+# ---------------------------------------------------------------------------
+# Fast all-62-work decode gate (~6 min, vs ~2.5 h for the full visual corpus).
+#
+# The near-decode ABI bug this guards was invisible to every cheap check in
+# this script: the host oracle passed, the ROM linked, the header was valid,
+# and `QUICK=1` only asserts that gallery_progress is still 0.  It needed the
+# target to actually decode a stream and check the result.
+#
+# GALLERY_BENCH_ONLY strips the presentation and runs unpack_slide over every
+# work -- far decode, stage, near decode, and both fold_far checksums -- then
+# latches corpus_result to 0x5CF0 (all pass) or 0xA50F (any failure).  One
+# unambiguous value, full corpus coverage of the codec paths, no repack/hold
+# time.  Prefer this over sampling gallery_last_ok on the visual ROM, which is
+# a rolling per-work field a later work can overwrite.
+echo "==> fast decode gate (GALLERY_BENCH_ONLY, all $WORKS works)"
+BENCH_ROM="$BUILD/lzss-gallery-bench.sfc"
+BENCH_MAP="$BUILD/lzss-gallery-bench.map"
+"$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
+  -Xclang -target-feature -Xclang +mos-a16 -Oz \
+  -DGALLERY_BENCH_ONLY=1 "${EXTRA_DEFS[@]}" \
+  -Wl,-Map="$BENCH_MAP" -o "$BENCH_ROM" "$SRC"
+python3 "$ROOT/tools/snes-checksum.py" "$BENCH_ROM"
+BENCH_VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$BENCH_MAP")
+[ -n "$BENCH_VMA" ]
+"$BUILD/jgxcheck" "$BENCH_ROM" "$ROOT/vendor/bsnes-jg/Database" \
+  "0x$BENCH_VMA" 2 0x5CF0 "${BENCH_FRAMES:-30000}" "$BUILD/lzss-gallery-bench-jg.png"
+echo "fast decode gate: PASS (all $WORKS works far-decoded, staged, near-decoded, checksummed)"
 
 VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$MAP")
 [ -n "$VMA" ]
