@@ -29,6 +29,16 @@ that its pointer, remaining-length, checksum, and decoder state survive every se
 The first deliverable is a deterministic synthetic **boundary test reel**, not a codec showcase.
 An optional public-domain film excerpt may be added after the mapping and playback gates pass.
 
+## Mockups
+
+Bundle: [`2026-07-30-lzss-gallery-exhirom-video-boundary-test/`](2026-07-30-lzss-gallery-exhirom-video-boundary-test/)
+
+[![Boundary slate — player states](2026-07-30-lzss-gallery-exhirom-video-boundary-test/boundary-slate.png)](2026-07-30-lzss-gallery-exhirom-video-boundary-test/boundary-slate.html)
+
+Three player states: a `PRE_4M` slate in aspect-preserving letterbox, the `EDGE_4M` transition in
+full-screen stretch with the ROM 1 → ROM 2 sprite indicator lit, and the distinct mirror-fault
+failure screen. The publication-page layout gets its own mockup in Phase 4.
+
 ## Why ExHiROM
 
 Ordinary LoROM and HiROM expose at most 4 MiB. The test must use the conventional extended mapping,
@@ -50,20 +60,36 @@ The 48 Mbit reel is the largest runtime fixture, but it does **not** by itself c
 cartridge. Treat this work as the ordinary-ROM mapper suite: direct ROM plus optional SRAM, without
 an address-decoding coprocessor.
 
-Generate small canary ROMs from the same authoritative mapping model before the large video test:
+Generate small canary ROMs from the same authoritative mapping model before the large video test.
+The matrix is split by what actually gates this milestone: only the rows that de-risk ExHiROM are
+required before Phase 1; the rest are a follow-up item so Phase 0 does not absorb the budget.
+
+**Required for this milestone:**
 
 | Family | Required configurations | What they prove |
 |---|---|---|
+| HiROM | slow ROM; 4 MiB | 64 KiB linear banks, `$00FFC0` file header, LoROM-area mirrors, cross-bank reads — the ordinary-map baseline the extended map builds on |
+| ExHiROM | slow ROM; 6 MiB, 8 MiB | `$40FFC0` file header, inverted A23/region transition, second-device mirroring, extended spans |
+
+6 MiB (the Tales of Phantasia 48 Mbit configuration) and 8 MiB are the two ExHiROM sizes with
+commercial precedent — which is what database/heuristic emulators actually detect. **5 MiB
+(`4 + 1`) is a stretch fixture, not a gate:** a plain 40 Mbit ExHiROM cart has essentially no
+precedent, so a failure there is likely an emulator-heuristic edge case rather than a mapping bug.
+FastROM (`$35`) variants follow once slow `$25` passes.
+
+**Deferred to a follow-up item (same generator and mapping model; separate TODO entry):**
+
+| Family | Configurations | What they prove |
+|---|---|---|
 | LoROM | slow and fast ROM; 512 KiB, 1 MiB, 3 MiB, 4 MiB | 32 KiB bank order, `$007FC0` file header, upper-half windows, mirrors, compound-size checksum |
-| HiROM | slow and fast ROM; 512 KiB, 2 MiB, 3 MiB, 4 MiB | 64 KiB linear banks, `$00FFC0` file header, LoROM-area mirrors, cross-bank reads |
-| ExHiROM | slow and fast ROM; 5 MiB, 6 MiB, 8 MiB | `$40FFC0` file header, inverted A23/region transition, second-device mirroring, extended spans |
+| HiROM (rest) | fast ROM; 512 KiB, 2 MiB, 3 MiB | remaining ordinary-HiROM size/speed matrix |
 | SRAM | LoROM and HiROM/ExHiROM, volatile and battery-backed header variants | RAM aperture does not collide with ROM windows; size/header/save-file agreement |
 | Header/input | legacy and expanded internal header; unheadered `.sfc`; detected 512-byte copier input | header selection, normalization, vectors, size, chipset, region, checksum/complement |
 
-For every row, test emulation and native CPU modes, reset/native vectors, canonical address
-round-trips, first/last byte of every decoded window, intended mirrors, rejected holes, and
-slow/FastROM timing selection. Include NTSC and PAL header variants, but keep video cadence testing
-separate from address-decoder correctness.
+For every generated row, test emulation and native CPU modes, reset/native vectors, canonical
+address round-trips, first/last byte of every decoded window, intended mirrors, rejected holes, and
+slow/FastROM timing selection. This milestone uses NTSC headers only; PAL header variants ride with
+the deferred matrix, and video cadence testing stays separate from address-decoder correctness.
 
 Required size classes are:
 
@@ -128,7 +154,8 @@ The mapping specification must explicitly identify:
 - the CPU windows for file offsets `0x400000–0x5FFFFF`;
 - header location, map-mode byte, reset vector, native vectors, and emulation vectors;
 - which mirrors are accepted but never emitted into descriptors;
-- the inaccessible holes around WRAM/I/O banks;
+- the inaccessible holes — these affect only the `$00–$3F`/`$80–$BF` upper-half mirror windows and
+  the `$7E`/`$7F` WRAM cap; the canonical windows `$C0–$FF` and `$40–$5F` are hole-free full banks;
 - the maximum contiguous DMA source span before a 16-bit A-bus address wraps; and
 - how a 6 MiB physical image is mirrored for checksum purposes.
 
@@ -139,16 +166,16 @@ flowchart LR
     F1["$400000–$5FFFFF<br/>ROM 2 · 2 MiB"]
   end
   subgraph CPU["65816 CPU-visible ExHiROM windows"]
-    C0["canonical first-region banks<br/>full 64 KiB windows"]
-    C1["canonical extended-region banks<br/>with WRAM/I/O holes excluded"]
+    C0["banks $C0–$FF<br/>full 64 KiB windows"]
+    C1["banks $40–$5F<br/>full hole-free 64 KiB windows"]
   end
   F0 --> C0
   F1 --> C1
   C1 --> BOOT["header + reset vectors<br/>map mode $25"]
 ```
 
-Before implementation, replace the descriptive bank labels in this diagram with exact bank ranges
-derived from the chosen ExHiROM decoder model and add a complete file-offset/CPU-address table.
+Before implementation, confirm these bank ranges against the chosen ExHiROM decoder model and add a
+complete file-offset/CPU-address table.
 
 ## Video format
 
@@ -162,12 +189,12 @@ derived from the chosen ExHiROM decoder model and add a complete file-offset/CPU
 | Bytes per frame | **4,480** |
 | Buffers in VRAM | 2 × 70 tiles = **140 of 256 tiles** |
 | Presentation cadence | **30 fps NTSC**, one new frame every two VBlanks |
-| Palette | one fixed 223-color video palette; 32 CGRAM entries remain sprite-owned |
+| Palette | one fixed 223-color video palette (CGRAM 1–127 and 160–255); index 0 reserved transparent; CGRAM 128–159 sprite-owned |
 | Audio | none in milestone 1 |
 | Scaling | Mode 7 affine matrix scales and centers the raster in the 256 × 224 display |
 
-Mode 7 has a 128 × 128-byte tilemap but only 256 available 8 × 8 chunky tiles. Two 80 × 56 frames
-fit simultaneously; two 160 × 96 frames do not.
+Mode 7 has a 128 × 128-entry tilemap (one byte per entry) but only 256 available 8 × 8 chunky
+tiles. Two 80 × 56 frames fit simultaneously; two 160 × 96 frames do not.
 
 At 80 × 56, a complete frame is 4,480 DMA bytes. The theoretical 224-line NTSC VBlank ceiling is
 6,123 bytes before setup/interrupt overhead. Reserve the remainder for OAM, bounded palette work,
@@ -177,24 +204,66 @@ frame presentation.
 ```mermaid
 block-beta
   columns 16
-  front["front frame<br/>tiles 0–69"]:5
-  back["back frame<br/>tiles 70–139"]:5
-  ui["UI / test glyphs<br/>tiles 140–191"]:3
-  free["free<br/>tiles 192–255"]:3
+  front["front frame<br/>tiles 0–69"]:6
+  back["back frame<br/>tiles 70–139"]:6
+  black["border<br/>tile 140"]:1
+  free["free<br/>tiles 141–255"]:3
 ```
 
 The block widths are schematic. Exact tile-number ownership is normative in the generated report.
+There is no Mode 7 UI tile allocation: live UI is sprites only (see Mode 7 mechanics below).
+
+### Mode 7 mechanics (normative)
+
+These hardware details are contractual; a first implementation that guesses any of them will fail
+on console while passing every host gate.
+
+- **VRAM interleaving.** Mode 7 map entries are the *low* bytes and tile pixels the *high* bytes of
+  VRAM words `$0000–$3FFF`. Frame pixel DMA targets `$2119` only, single-byte transfer unit, with
+  `VMAIN = $80`; tilemap writes target `$2118` with `VMAIN = $00`. The 4,480-byte frame figure is
+  valid only in this high-byte-only DMA mode.
+- **Buffer flip = tilemap-entry rewrite.** There is no Mode 7 tilemap base register. The flip
+  rewrites the 70 visible map entries (one small low-byte DMA) from tiles 0–69 to 70–139 or back,
+  in the same VBlank as the frame's final DMA segment. The scroll-anchor alternative — two
+  pre-written map regions plus `M7HOFS`/`M7VOFS`/matrix-center retarget — is rejected: it needs
+  per-mode, per-buffer anchor bookkeeping for no saving.
+- **Write-twice registers.** `M7HOFS`/`M7VOFS`, matrix `M7A–M7D`, and center `M7X`/`M7Y` are
+  write-twice registers; "atomic" means all writes complete inside one VBlank in a fixed order.
+- **Index 0 is transparent.** A Mode 7 pixel value of 0 shows the backdrop, not CGRAM entry 0. The
+  quantizer never emits index 0; the backdrop color is black and is part of the format contract.
+- **Sprite-owned CGRAM.** Sprite palettes occupy fixed 16-entry groups in CGRAM 128–255; this
+  format reserves exactly CGRAM 128–159 (OBJ palettes 0–1). Because Mode 7 pixels index the same
+  0–255 space, a frame pixel mapped to a reserved index passes every host gate and fails only
+  visually on console — so the packer asserts no frame pixel uses index 0 or 128–159.
+- **Live UI is sprites only.** Mode 7 has a single background layer, and at 3.2–4× zoom the visible
+  map window is exactly the 10 × 7 frame — no Mode 7 tiles can composite over the video. Burned-in
+  per-frame data covers the deterministic content; all live indicators (ROM 1 → ROM 2 marker,
+  fold/CRC readout, pause and slip state) are OBJ sprites using CGRAM 128–159. OBJ character data
+  lives at a VRAM word address of `$4000` or above, clear of the Mode 7 map/tile region; the linker
+  layout and generated report must budget it explicitly.
+- **Letterbox surround.** Map entries outside the 80 × 56 frame reference a dedicated
+  all-black border tile (tile 140, every pixel a non-zero black index); together with the black
+  backdrop this produces the letterbox/pillarbox surround in aspect-preserving mode.
+- **VBlank margin arithmetic.** 37 usable VBlank lines × (1,364 − 40 refresh) master cycles ÷ 8
+  cycles per DMA byte = 6,123 bytes — that is where the ceiling figure above comes from. The frame
+  (4,480 bytes ≈ 27 lines) + flip map DMA (70 bytes) + OAM (≤ 544 bytes ≈ 3.3 lines) leaves about
+  6 lines of margin: adequate but thin, which is why the playback gate uses the measured budget,
+  not the theoretical ceiling.
 
 ### Frame presentation
 
 1. During active display, prepare the next frame descriptor and DMA registers only.
-2. On the chosen presentation VBlank, DMA all 4,480 pixel bytes into the hidden tile set.
-3. Change the Mode 7 tilemap selection or precomputed viewport/scroll anchor atomically so the
-   completed buffer becomes visible.
+2. On the chosen presentation VBlank, DMA all 4,480 pixel bytes into the hidden tile set
+   (high-byte-only mode; see Mode 7 mechanics).
+3. In the same VBlank, rewrite the 70 visible tilemap entries (low-byte DMA) so the completed
+   buffer becomes visible — there is no Mode 7 tilemap base register to switch.
 4. Never reveal a partially uploaded frame.
 5. Alternate front/back tile sets.
-6. Advance at 30 fps using a `0, 2, 4, ...` VBlank cadence; define PAL behavior explicitly
-   (25 fps conversion or cadence-correct duplicate/drop policy).
+6. Advance at 30 fps using a `0, 2, 4, ...` VBlank cadence. **NTSC lag policy:** if a presentation
+   deadline is missed (seek landing mid-upload, a long fixture fold), hold the current frame and
+   re-arm for the next even VBlank — slip, never tear — and increment a visible slip counter so
+   cadence gates can distinguish slip from drop. Define PAL behavior explicitly (25 fps conversion
+   or cadence-correct duplicate/drop policy).
 
 The logical frame may span banks, but each physical DMA command must stop at the end of its current
 64 KiB A-bus bank. The runtime then advances through the mapper-aware segment list and resumes the
@@ -204,8 +273,9 @@ segments have completed.
 
 ### Scaling
 
-Default to aspect-preserving scale with black letterbox/pillarbox surround. Add an optional
-full-screen stretch mode for the requested Mode 7 effect:
+Default to aspect-preserving scale with black letterbox/pillarbox surround (border tile + black
+backdrop; see Mode 7 mechanics). Add an optional full-screen stretch mode for the requested Mode 7
+effect:
 
 - `A`/`D` matrix terms scale 80 × 56 independently to 256 × 224;
 - nearest-neighbor sampling preserves the indexed-video character;
@@ -251,6 +321,15 @@ Run the same span matrix through three consumers:
 3. LZSS refill/decode into a bounded staging buffer, proving stateful consumption across mapper
    discontinuities rather than only direct DMA.
 
+**Consumer CPU budget.** The CPU-CRC and LZSS-refill consumers run only on the fixture frames of
+the span matrix, not on every frame: at 2.68 MHz slow-ROM (`$25`) execution there are ~178k CPU
+cycles per 30 fps period, and a ~15–20 cycle/byte fold over 4,480 bytes costs 67–90k of them —
+affordable occasionally, ruinous continuously. Record the measured per-consumer CPU cost alongside
+the DMA budget.
+
+**End of reel.** The reel loops. The final oracle latches on the first complete pass (both physical
+regions displayed, all fixture consumers run); subsequent passes are presentation-only.
+
 The reel should fill essentially all remaining cartridge capacity. At 4,480 bytes/frame and
 30 frames/second, about 5 MiB of frame payload represents roughly 39 seconds of raw video.
 
@@ -277,39 +356,39 @@ agency-produced master—not a restoration, social-media repost, colorization, o
 
 | # | Candidate excerpt | Why it should survive 80 × 56 | Candidate source/status |
 |---:|---|---|---|
-| 1 | *The Great Train Robbery* — bandits advancing toward camera | strong figures and lateral motion | LOC Public Domain Films set |
-| 2 | *The Great Train Robbery* — final gunshot close-up | iconic high-contrast close-up | LOC Public Domain Films set |
-| 3 | *May Irwin Kiss* — central close-up | two large faces; almost no background detail | LOC Public Domain Films set |
-| 4 | *Panorama of Machine Co. Aisle* — Westinghouse factory pan | repeating machinery makes corruption obvious | LOC Public Domain Films set |
-| 5 | *San Francisco Earthquake and Fire* — street panorama | strong parallax and documentary motion | LOC Public Domain Films set |
-| 6 | *President McKinley Taking the Oath* — oath platform | stable composition plus human movement | LOC Public Domain Films set |
-| 7 | *Popeye the Sailor Meets Sindbad the Sailor* — giant bird/ship action | bold cel-animation outlines and saturated shapes | LOC Public Domain Films set |
-| 8 | *St. Louis Blues* — performance close-up | expressive faces and rhythmic motion | LOC Public Domain Films set |
-| 9 | *The Middleton Family at the New York World's Fair* — fair machinery | geometric exhibits and mechanical movement | LOC Public Domain Films set |
-| 10 | *Master Hands* — assembly-line machinery | excellent motion/detail stress material | LOC Public Domain Films set |
-| 11 | *The Memphis Belle* — bomber takeoff or formation | large aircraft silhouettes and sky gradients | LOC Public Domain Films set |
-| 12 | *Duck and Cover* — animated turtle sequence | simple graphic animation ideal for low resolution | LOC Public Domain Films set |
-| 13 | *Trance and Dance in Bali* — dance passage | full-body rhythmic motion and costume texture | LOC Public Domain Films set |
-| 14 | *Within Our Gates* — outdoor or train-platform movement | readable staging and historical visual character | LOC Public Domain Films set |
-| 15 | *The Hitch-Hiker* — road/car passage | headlights, road motion, and noir contrast | LOC Public Domain Films set |
-| 16 | Apollo 11 Saturn V launch | huge central object, smoke, and continuous vertical motion | NASA-produced footage candidate |
-| 17 | Apollo 11 lunar-module descent | terrain flow provides a natural codec stress pattern | NASA-produced footage candidate |
-| 18 | Apollo 11 first step on the Moon | unmistakable silhouette at very low resolution | NASA-produced footage candidate |
-| 19 | Apollo 15 hammer-and-feather drop | two trackable objects and a clean scientific action | NASA-produced footage candidate |
-| 20 | Apollo 17 lunar-rover drive | landscape scrolling, wheel motion, and dust | NASA-produced footage candidate |
-| 21 | STS-1 Columbia launch | bright flame and strong vertical composition | NASA-produced footage candidate |
-| 22 | Space Shuttle solid-rocket-booster onboard view | rapid rotation and Earth/horizon movement | NASA-produced footage candidate |
-| 23 | ISS Earth-limb daylight time-lapse | smooth full-frame motion and cloud texture | NASA-produced footage candidate |
-| 24 | ISS aurora time-lapse | dark field with bright moving color structures | NASA-produced footage candidate |
-| 25 | Perseverance rover descent-camera sequence | fast terrain expansion and a historic landing | NASA/JPL-produced footage candidate |
-| 26 | Ingenuity helicopter first flight | small moving subject against textured ground | NASA/JPL-produced footage candidate |
-| 27 | DART impact on Dimorphos | dramatic expanding target and terminal motion | NASA-produced footage candidate |
-| 28 | OSIRIS-REx sample capsule return | bright moving capsule/parachute silhouette | NASA-produced footage candidate |
-| 29 | Artemis I launch | modern high-contrast launch and exhaust plume | NASA-produced footage candidate |
-| 30 | Solar Dynamics Observatory flare/prominence | fixed framing, organic motion, extreme color gradients | NASA-produced visualization candidate |
+| 1 | [*The Great Train Robbery*](https://www.loc.gov/item/00694220/) — bandits advancing toward camera | strong figures and lateral motion | LOC downloadable public-domain item |
+| 2 | [*The Great Train Robbery*](https://www.loc.gov/item/00694220/) — final gunshot close-up | iconic high-contrast close-up | LOC downloadable public-domain item |
+| 3 | [*May Irwin Kiss*](https://www.loc.gov/item/00694131/) — central close-up | two large faces; almost no background detail | LOC downloadable public-domain item |
+| 4 | [*Panorama of Machine Co. Aisle*](https://www.loc.gov/item/96522104/) — Westinghouse factory pan | repeating machinery makes corruption obvious | LOC downloadable public-domain item |
+| 5 | [*San Francisco Earthquake and Fire*](https://www.loc.gov/item/00694425/) — street panorama | strong parallax and documentary motion | LOC downloadable public-domain item |
+| 6 | [*President McKinley Taking the Oath*](https://www.loc.gov/item/00694336/) — oath platform | stable composition plus human movement | LOC downloadable public-domain item |
+| 7 | [*Popeye the Sailor Meets Sindbad the Sailor*](https://www.loc.gov/item/mbrs00068306/) — giant bird/ship action | bold cel-animation outlines and saturated shapes | LOC downloadable public-domain item |
+| 8 | [*St. Louis Blues*](https://www.loc.gov/item/mbrs00063365/) — performance close-up | expressive faces and rhythmic motion | LOC downloadable public-domain item |
+| 9 | [*The Middleton Family at the New York World's Fair*](https://www.loc.gov/item/mbrs00021068/) — fair machinery | geometric exhibits and mechanical movement | LOC downloadable public-domain item |
+| 10 | [*Master Hands*](https://www.loc.gov/item/mbrs02297907/) — assembly-line machinery | excellent motion/detail stress material | LOC downloadable public-domain item |
+| 11 | [*The Memphis Belle*](https://www.loc.gov/item/mbrs00009301/) — bomber takeoff or formation | large aircraft silhouettes and sky gradients | LOC downloadable public-domain item |
+| 12 | [*Duck and Cover*](https://www.loc.gov/item/mbrs01836081/) — animated turtle sequence | simple graphic animation ideal for low resolution | LOC downloadable public-domain item |
+| 13 | [*Trance and Dance in Bali*](https://www.loc.gov/item/mbrs02425201/) — dance passage | full-body rhythmic motion and costume texture | LOC downloadable public-domain item |
+| 14 | [*Within Our Gates*](https://www.loc.gov/item/mbrs00046435/) — outdoor or train-platform movement | readable staging and historical visual character | LOC downloadable public-domain item |
+| 15 | [*The Hitch-Hiker*](https://www.loc.gov/item/mbrs00047382/) — road/car passage | headlights, road motion, and noir contrast | LOC downloadable public-domain item |
+| 16 | [Apollo 11 Saturn V launch](https://www.nasa.gov/missions/apollo-11-hd-videos/) | huge central object, smoke, and continuous vertical motion | NASA HD download page |
+| 17 | [Apollo 11 first step and moonwalk](https://www.nasa.gov/missions/apollo-11-hd-videos/) | unmistakable silhouette at very low resolution | NASA HD download page |
+| 18 | [Apollo 11 flag raising](https://www.nasa.gov/missions/apollo-11-hd-videos/) | two large figures and strong geometric motion | NASA HD download page |
+| 19 | [Apollo 15 hammer-and-feather drop](https://science.nasa.gov/resource/the-apollo-15-hammer-feather-drop/) | two trackable objects and a clean scientific action | NASA MP4/MOV download page |
+| 20 | [Perseverance descent and touchdown](https://svs.gsfc.nasa.gov/31250/) | fast terrain expansion and a historic landing | NASA SVS movies and frame-set downloads |
+| 21 | [Ingenuity helicopter b-roll](https://svs.gsfc.nasa.gov/13828/) | small moving subject against textured ground | NASA SVS MP4 download |
+| 22 | [DART terminal approach to Dimorphos](https://www.nasa.gov/solar-system/darts-final-images-prior-to-impact/) | dramatic expanding target and terminal motion | NASA source-image movie page |
+| 23 | [ISS Aurora Australis time-lapse](https://svs.gsfc.nasa.gov/30179/) | dark field with bright moving color structures | NASA SVS download page |
+| 24 | [ISS Earth-limb airglow time-lapse](https://svs.gsfc.nasa.gov/GOLDresources/12833/5488) | smooth horizon motion and limited bright colors | NASA SVS MP4/WebM download page |
+| 25 | [SDO moderate solar flare](https://svs.gsfc.nasa.gov/14126/) | fixed framing, organic motion, extreme gradients | NASA SVS source-footage toolkit |
+| 26 | [Four days of Solar Dynamics Observatory imagery](https://svs.gsfc.nasa.gov/5649/) | continuous texture, rotation, flares, and eclipses | NASA SVS movie download |
+| 27 | [OSIRIS-REx capsule atmospheric entry](https://svs.gsfc.nasa.gov/20381/) | bright moving capsule and reentry glow | NASA SVS isolated shot/frame-set downloads |
+| 28 | [OSIRIS-REx parachute descent](https://svs.gsfc.nasa.gov/20381/) | clean silhouette and slow vertical motion | NASA SVS isolated shot/frame-set downloads |
+| 29 | [Artemis I launch and return animations](https://svs.gsfc.nasa.gov/14191/) | modern high-contrast launch and exhaust plume | NASA SVS no-audio downloadable clips |
+| 30 | [Apollo 17 Taurus-Littrow flyover](https://svs.gsfc.nasa.gov/4717/) | continuous terrain motion and readable lunar relief | NASA SVS MP4 and frame-set downloads |
 
 Best first visual trials are **#12 Duck and Cover animation**, **#16 Apollo 11 launch**, **#19
-hammer-and-feather**, **#23 ISS Earth limb**, and **#30 solar flare**. Test all five through the
+hammer-and-feather**, **#24 ISS Earth limb**, and **#25 SDO solar flare**. Test all five through the
 fixed 223-color quantizer and choose using measured compressed size plus a side-by-side 80 × 56
 contact sheet, not the HD source alone.
 
@@ -402,13 +481,21 @@ READ_DESCRIPTOR
   -> NEXT_FRAME
 ```
 
+`VERIFY_FRAME_ID` is a source-side check: VRAM cannot be read during active display, so the runtime
+re-reads the frame's source bytes (or its recorded descriptor CRC) and folds them. Display-side
+correctness is proven by the emulator readback gates, not on console.
+
 Runtime requirements:
 
 - controller remains responsive every VBlank;
-- Left/Right seek to previous/next boundary slate;
+- Left/Right seek to previous/next boundary slate — seek targets raw-frame slate boundaries only;
+  LZSS-refill fixtures are excluded from seek and always restart from their descriptor start;
 - Start pauses; Select toggles scaling mode;
 - a visible indicator changes when playback crosses ROM 1 → ROM 2;
-- a running fold includes frame ID, descriptor address, first/last pixel, and per-frame expected CRC;
+- all live UI (indicators, fold readout, pause/slip state) is OBJ sprites using CGRAM 128–159; no
+  Mode 7 tiles composite over the video;
+- a running fold (fixture frames only — see the consumer CPU budget) includes frame ID, descriptor
+  address, first/last pixel, and per-frame expected CRC;
 - the source cursor is `(canonical CPU address, bytes remaining, segment index)` and advances
   through generated mapper segments without assuming that bank-byte increment is always valid;
 - raw DMA, CPU-copy/CRC, and LZSS-refill paths consume the required spanning fixtures;
@@ -506,35 +593,44 @@ layout visualization, boundary contact sheet, and verification evidence.
 
 ### Host structural gates
 
-- every required ordinary-ROM mapper configuration has a generated passing canary;
-- known coprocessor/custom mapper inputs are recognized but rejected as unsupported;
-- exact ROM length is 6,291,456 bytes;
-- physical decomposition is exactly 4 MiB + 2 MiB;
-- header is found only at the intended ExHiROM location;
-- map mode is `$25`;
-- reset and interrupt vectors point to linked executable code;
-- every emitted descriptor round-trips CPU address ↔ file offset;
-- PRE/POST boundary canaries are distinct and at exact offsets;
-- every required logical span is present and no individual DMA segment crosses a 64 KiB bank;
-- concatenating each segment list exactly reproduces its source object with neither gaps nor
-  duplicated bytes;
-- `BANK_SPAN`, `MULTIBANK_SPAN`, and `EDGE_4M` pass through raw DMA, CPU CRC, and LZSS refill;
-- checksum/complement agree with independent calculation;
-- every padding/mirror byte is deterministic; and
-- the visual map covers every physical byte exactly once.
+Each step is a runnable command; per the house verification format, paste the raw output in a code
+block beneath the step with a PASS/FAIL note.
+
+1. `dev/lzss-gallery-video.sh --gate canaries` — every required mapper configuration (HiROM 4 MiB;
+   ExHiROM 6 MiB and 8 MiB) has a generated passing canary, and known coprocessor/custom mapper
+   inputs are recognized but rejected as unsupported.
+2. `tools/snes-checksum.py --inspect <rom>` — exact ROM length is 6,291,456 bytes; physical
+   decomposition is exactly 4 MiB + 2 MiB; header is found only at the ExHiROM location; map mode
+   is `$25`; reset and interrupt vectors point to linked executable code; checksum/complement agree
+   with independent calculation.
+3. `dev/lzss-gallery-video.sh --gate descriptors` — every emitted descriptor round-trips CPU
+   address ↔ file offset; PRE/POST boundary canaries are distinct and at exact offsets; no frame
+   pixel uses palette index 0 or 128–159.
+4. `dev/lzss-gallery-video.sh --gate segments` — every required logical span is present; no
+   individual DMA segment crosses a 64 KiB bank; concatenating each segment list exactly reproduces
+   its source object with neither gaps nor duplicated bytes.
+5. `dev/lzss-gallery-video.sh --gate consumers-host` — `BANK_SPAN`, `MULTIBANK_SPAN`, and
+   `EDGE_4M` pass through host-model raw DMA, CPU CRC, and LZSS refill.
+6. `dev/lzss-gallery-video.sh --gate map` — every padding/mirror byte is deterministic; the visual
+   map covers every physical byte exactly once, including the OBJ VRAM budget.
+
+(Exact gate names may be refined during implementation; keep one command per numbered step.)
 
 ### Playback gates
 
-- native 80 × 56 frame readback equals the host frame before scaling;
-- 30 fps cadence has no partial-frame exposure;
-- worst-case VBlank DMA remains below the measured project budget, not merely the 6,123-byte
-  theoretical ceiling;
-- first, PRE_4M, POST_4M, ROM2_MID, and ROM2_LAST screenshots match host references;
-- the visible `BANK_SPAN`, `MULTIBANK_SPAN`, and `EDGE_4M` frames match host references;
-- final oracle proves both physical devices were read;
-- pause, seek, scaling toggle, and cancellation remain responsive;
-- no forced-blank frame or black band appears; and
-- red-dot/gallery sprite palettes remain isolated if integrated.
+1. Native 80 × 56 frame readback equals the host frame before scaling. Instrument: an emulator VRAM
+   dump of the high bytes of words `$0000–$3FFF` (MAME debugger or a bsnes-jg hook) — not a scaled
+   screenshot.
+2. 30 fps cadence has no partial-frame exposure; the slip counter reads 0 in the unstressed run,
+   and a stressed run (held seek) shows slips, never tearing.
+3. Worst-case VBlank DMA bytes and per-consumer CPU cycles are measured and remain below the
+   recorded project budget, not merely the 6,123-byte theoretical ceiling.
+4. First, `PRE_4M`, `POST_4M`, `ROM2_MID`, and `ROM2_LAST` screenshots match host references.
+5. The visible `BANK_SPAN`, `MULTIBANK_SPAN`, and `EDGE_4M` frames match host references.
+6. The final oracle, latched on the first complete pass, proves both physical devices were read.
+7. Pause, seek (slate boundaries only), scaling toggle, and cancellation remain responsive.
+8. No forced-blank frame or black band appears.
+9. Red-dot/gallery sprite palettes remain isolated if integrated (CGRAM 128–159 only).
 
 ### Emulator/browser matrix
 
@@ -576,7 +672,7 @@ Update the cookbook and hardware summary with:
 - physical device size versus logical header size;
 - checksum mirroring for non-power-of-two sums;
 - DMA source bank wrapping;
-- Mode 7's 256-tile limit;
+- Mode 7's 256-tile limit, high-byte-only tile DMA, and index-0 transparency;
 - the measured VBlank upload budget; and
 - the 80 × 56 double-buffered video recipe.
 
