@@ -190,9 +190,66 @@ Run 2026-07-27 against the isolated change (see the note below).
     PASS — needle leads, trail fades, dashes stay separate, nothing encloses. Short spans and
     literals show as single marks (frames 1600/2000), as specified.
 
-6. **Full 200 000-frame corpus at the oracle** — see the completion record below.
+6. **Full 200 000-frame corpus at the oracle** — **FAIL, BLOCKED.** Recorded-from-prior-probe (not
+   re-run here — the 200 000-frame corpus run is explicitly blocked; see
+   [per-image selfcheck plan](2026-07-28-gallery-per-image-selfcheck.md)):
 
-7. **Both site builds green; deploy** — see the completion record below.
+    ```
+    works completed at 200000 frames: 22 of 62
+    linear need = 200000 * 62/22 = 563636 frames; +25% margin = 704545
+    ```
+
+    The ROM never reaches `corpus_result` at the shipped `frames: 200000` budget — not merely unrun,
+    genuinely too short by ~3.5×. Separately, at 40 000 frames the corpus fails its own repack
+    differential regardless of budget (`gallery_failed[62]`/`gallery_done[62]` dump):
+
+    ```
+    done[k]   : 1111000000...      4 works completed
+    failed[k] : 1011000000...
+    failed: [0, 2, 3]      passed: [1]
+    ```
+
+    with per-stage counters (`unpack_frames[0]`, `stage_frames[0]`, `near_frames[0]`, all non-zero)
+    confirming the decode pipeline runs to completion rather than bailing early on `nav_cancel`. FAIL
+    — blocked on `[wip T4]` **"`lzss-gallery` repack differential fails for most works"**
+    (TODO.md), which owns the root-cause (miscompile vs. demo bug) and gates raising the budget.
+
+7. **Both site builds green; deploy** — PASS. Cheap re-checks run 2026-07-30 (no redeploy, no
+   emulator run):
+
+    ```
+    $ sha256sum ~/biohack.net/public/play/roms/lzss-gallery.sfc \
+                ~/indri.studio/public/apps/llvm-mos-65816/play/roms/lzss-gallery.sfc
+    686ce9d6cab46875fdf57f58f60f48dd19559f58f5c2dcc10c9693f9eb9c7ce9  biohack.net .../lzss-gallery.sfc
+    686ce9d6cab46875fdf57f58f60f48dd19559f58f5c2dcc10c9693f9eb9c7ce9  indri.studio .../lzss-gallery.sfc
+    ```
+
+    Both site repos are fully pushed (local `HEAD` == the tracked remote branch, both directions
+    ancestor-equal) through the republish that carries #137's final "red dot only" commit
+    (`4aed503`) plus three later gallery fixes (`dd10d2b` CGRAM/HDMA, `dcc80d9` 221-colour,
+    `8856df6` `decode_bank7e`): biohack.net `530bf5c` ("snes: republish all 114 ROMs …", explicitly
+    lists `lzss-gallery`) and indri.studio `4a8c988` ("sync the 114-ROM republish from biohack.net"),
+    both 2026-07-28. Confirmed **live in production**, not just committed:
+
+    ```
+    $ curl -sL -o /dev/null -w '%{http_code}\n' https://biohack.net/snes/lzss-gallery
+    200
+    $ curl -sL -o /dev/null -w '%{http_code}\n' https://indri.studio/apps/llvm-mos-65816/snes/lzss-gallery
+    200
+    $ curl -s https://biohack.net/play/roms/lzss-gallery.sfc | sha256sum
+    686ce9d6cab46875fdf57f58f60f48dd19559f58f5c2dcc10c9693f9eb9c7ce9  -
+    $ curl -s https://indri.studio/apps/llvm-mos-65816/play/roms/lzss-gallery.sfc | sha256sum
+    686ce9d6cab46875fdf57f58f60f48dd19559f58f5c2dcc10c9693f9eb9c7ce9  -
+    ```
+
+    Both live ROMs are byte-identical to the site checkouts and to each other. Note: a local
+    `npm run build` re-check was also attempted in both site checkouts as extra diligence beyond
+    what PASS required; biohack.net's failed on an unresolved `@wbniv/bsnes-jg-player` import and
+    indri.studio's "succeeded" while mostly reusing cached entries — both attributed to this sandbox's
+    stale/incomplete `node_modules` and a broken local `pnpm`/corepack (not run via the project's
+    actual `pnpm` build), **not** to the deployed site — the live-production fetch above is the
+    stronger, decisive evidence and it is unambiguous. PASS stands on the live-site + SHA-256
+    evidence.
 
 ### Note on isolation
 
@@ -206,7 +263,21 @@ change (`write_reserved_obj_palette` → 2).
 
 ## Completion record
 
-_Pending: full corpus result, commit hashes, site tags._
+Filled in 2026-07-30 during `[verify T2]` (steps 6–7; steps 1–5 already carried their own evidence).
+
+- **Full corpus result:** FAIL/BLOCKED — see step 6 above. Not simply unrun: 200 000 frames completes
+  only 22/62 works (need ~704 545 with margin), and independently the corpus fails its own repack
+  differential at 40 000 frames (`gallery_failed[] = [0,2,3]`). Root-cause owned by `[wip T4]`
+  "`lzss-gallery` repack differential fails for most works" (TODO.md); full analysis in the
+  [per-image selfcheck plan](2026-07-28-gallery-per-image-selfcheck.md).
+- **Commit hashes:** compiler-repo final implementation `4aed503` ("cycle the compressor cursor;
+  retire the span visualizations" — the "red dot only" decision above). Site republishes:
+  biohack.net `530bf5c`, indri.studio `4a8c988` (both 2026-07-28).
+- **Site tags/deploy:** no separate release tag mechanism in either site repo — deploy is
+  push-to-`main`/`master`-triggers-build. Both repos' local `HEAD` is ancestor-equal to their tracked
+  remote branch (fully pushed), and both live sites serve the identical ROM SHA-256
+  (`686ce9d6cab46875fdf57f58f60f48dd19559f58f5c2dcc10c9693f9eb9c7ce9`) confirmed by direct fetch —
+  see step 7 above.
 
 ## Readability revision — anchored match copy (2026-07-27)
 
