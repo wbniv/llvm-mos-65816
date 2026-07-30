@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/f44bd89) | docs(gallery): #137 [verify T2] steps 6-7 — record raw evidence in the plan |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/4aed503) | feat(snes/gallery): cycle the compressor cursor; retire the span visualizations |
 
 <!--history-meta v1
+f44bd89	author	Will Norris
+f44bd89	added	74
+f44bd89	deleted	3
+f44bd89	files	1
+f44bd89	body	Step 6: FAIL/BLOCKED, recorded-from-prior-probe (not re-run — the 200k-frame\ncorpus run is explicitly blocked). Cites the per-image-selfcheck plan's\nmeasured "22 of 62 works at 200000 frames" and the 40000-frame\ngallery_failed=[0,2,3] differential, both already established there.\n\nStep 7: PASS, established properly instead of resting on an empty completion\nrecord. Cheap re-checks only (no redeploy, no emulator run): both site repos'\ndeployed ROM SHA-256 match each other and the live production fetch from\nbiohack.net and indri.studio; both repos are fully pushed through the\nrepublish commits that carry #137's final implementation. A local `npm run\nbuild` re-check was attempted as extra diligence and was inconclusive\n(stale node_modules / broken local pnpm in this sandbox) — noted but not\nload-bearing, since the live-site fetch is decisive.\n\nFilled in the "Completion record" section (was "_Pending_") with the commit\nhashes and the same evidence. TODO.md marker unchanged — step 6 failing\nmeans the item stays [verify T2], not promoted to Done.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 4aed503	author	Will Norris
 4aed503	added	343
 4aed503	deleted	0

@@ -242,14 +242,22 @@ Run 2026-07-27 against the isolated change (see the note below).
     686ce9d6cab46875fdf57f58f60f48dd19559f58f5c2dcc10c9693f9eb9c7ce9  -
     ```
 
-    Both live ROMs are byte-identical to the site checkouts and to each other. Note: a local
-    `npm run build` re-check was also attempted in both site checkouts as extra diligence beyond
-    what PASS required; biohack.net's failed on an unresolved `@wbniv/bsnes-jg-player` import and
-    indri.studio's "succeeded" while mostly reusing cached entries — both attributed to this sandbox's
-    stale/incomplete `node_modules` and a broken local `pnpm`/corepack (not run via the project's
-    actual `pnpm` build), **not** to the deployed site — the live-production fetch above is the
-    stronger, decisive evidence and it is unambiguous. PASS stands on the live-site + SHA-256
-    evidence.
+    Both live ROMs are byte-identical to the site checkouts and to each other. "Builds green" is
+    additionally evidenced by the canonical build path — CI, not a host build (`deploy.yml`:
+    `pnpm install --frozen-lockfile` + `pnpm build` on a GitHub Actions runner):
+
+    ```
+    $ cd ~/biohack.net && gh run list --workflow deploy.yml ...
+    success 530bf5c 2026-07-29T02:19:50Z snes: republish all 114 ROMs — gallery corruption, ...
+    $ cd ~/indri.studio && gh run list ...
+    success 4a8c988 2026-07-29T02:22:13Z snes: sync the 114-ROM republish from biohack.net
+    ```
+
+    (Correction 2026-07-30: an earlier revision of this note recorded a host-side `npm run build`
+    attempt and its failure on an unresolved `@wbniv/bsnes-jg-player` import. That attempt was
+    out-of-band — the sites build only in CI with `pnpm` from a frozen lockfile — so its result is
+    void as evidence in either direction and has been replaced by the CI run records above.)
+    PASS stands on the CI-success + live-site + SHA-256 evidence.
 
 ### Note on isolation
 
