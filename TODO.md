@@ -1622,7 +1622,14 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-07-27-139-lzss-gallery-hblank-palette-reuse** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-139-lzss-gallery-hblank-palette-reuse.md](docs/plans/2026-07-27-139-lzss-gallery-hblank-palette-reuse.md)_  <!-- fp:ee3908e30f424828 -->
 - [verify] **2026-07-27-136-lzss-gallery-contiguous-artwork-palette** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md](docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md)_  <!-- fp:62c4bd721c304ad6 -->
 <!-- triaged 2026-07-28: verification is deliberately unrun — the plan's own assertion is BLOCKED by the work-0 repack divergence (ROM 15254 vs embedded lz_len 15305). Covered by the curated [verify T2] "#137" item, which records step 6 as FAIL and links this plan. fp:c1b8375f773427e9 -->
-- [ ] **(triage)** **Not merged to `main`.** The fix lives on this worktree branch. `main`'s — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:4e675c3ad0ba3ad5 -->
-- [ ] **(triage)** **The full 62-work *visual* corpus gate was not re-run** (~2.5 h). Coverage of the codec — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:d674d7d5be702bb7 -->
-- [ ] **(triage)** **Unrelated compiler crash found in passing.** `mos-clang ... -fno-lto -S` on — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:dd1e1ad204ea7356 -->
+<!-- triaged 2026-07-30: not-a-backlog-item — merge state, not work to schedule. The branch
+     `wt/119-gallery-near-decode-abi` is registered in the agent-handoff.md Active-worktrees
+     table with its verified status; taking it to `main` is the orchestrator's call (main's
+     dev/lzss-gallery.sh carries another worker's uncommitted FRAMES change). fp:4e675c3ad0ba3ad5 -->
+<!-- triaged 2026-07-30: covered. All 62 works ARE gated on the codec paths by the new
+     GALLERY_BENCH_ONLY decode gate landed with the fix (corpus_result 0x5CF0, verified to
+     latch 0xA50F on the pre-fix thunk). The remaining full-visual 62-work run is the existing
+     700000-frame corpus gate, already being raised 200000 -> 700000 by the in-flight
+     2026-07-28-gallery-per-image-selfcheck work. Nothing new to track. fp:d674d7d5be702bb7 -->
+- [ ] **(triage)** **`mos-clang -fno-lto -S` segfaults in `MOS Late Optimizations` on `@unpack_slide`** (`examples/snes/lzss-gallery.c`; reproduces at `-O0` and `-Oz`, clean at `-O1`; the LTO path does not crash, so no shipped ROM is affected). Found while debugging the gallery near-decode ABI bug; a real backend crash, not investigated. Needs ranking. — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:dd1e1ad204ea7356 -->
 <!-- END auto-captured-deferrals -->
