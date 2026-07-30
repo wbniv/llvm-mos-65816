@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/e1d4a6c) | docs(60fps): Batch B verified and closed — mvscrl dual V-ring passes both legs |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/009415c) | dev: add display-check.py — catch demos whose gate is green but screen is dead |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/d0e34d7) | docs: truncstair render bug fixed — record cause and two method lessons |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/f0fc0d8) | docs: truncstair renders a black screen (live) — F2 blocked on a render bug |
@@ -8,6 +9,11 @@
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/0a5e007) | docs(investigation): 60 fps demo sweep — full static+empirical table, fix batches |
 
 <!--history-meta v1
+e1d4a6c	author	Will Norris
+e1d4a6c	added	37
+e1d4a6c	deleted	0
+e1d4a6c	files	1
+e1d4a6c	body	mvscrl was the only remaining F2 candidate (ovmove and lfsr2 rejected as\nnon-translations, truncstair deferred on ring geometry, Batch C already done), so\nverifying it closes Batch B.\n\nDifferential gate (dev/run.sh mvscrl): RESULT PASS -- host == +mos-a16 at\ncorpus hash 0x72A7 on bsnes-jg, with memmove-refs=2 / rep-sep=15 confirming the\nmemmove stress kernel is still present in the shipped code. MAME is skipped for a\nmissing SPC700 IPL (environmental, not a result).\n\nPer-band ring motion (dev/scroll-ring-check.py) -- the check the corpus gate\nstructurally cannot perform, since corpus_result is computed during the title and\nsays nothing about whether the ring moves:\n\n  upper  axis=y+1  stalls=NONE  shift-match min 98.6% mean 98.6%  PASS\n  lower  axis=y-1  stalls=NONE  shift-match min 95.0% mean 95.4%  PASS\n  60FPS CHECK: PASS\n\nBoth bands advance every frame and match their predecessor under the expected\n+/-1 px translation, upper flowing down and lower up. Sub-100% shift-match is\nexpected: the HUD text and the staging row at the ring seam are not part of the\ntranslating content.\n\nRaw output recorded in the investigation; TODO item promoted to Done.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 009415c	author	Will Norris
 009415c	added	11
 009415c	deleted	2

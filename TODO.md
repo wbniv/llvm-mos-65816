@@ -93,13 +93,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   VRAM lands in the newly clobbered window. `` ` ``, `{`, `|`, `}`, `~` come free with the same
   extension (none is used by any title today; `dev/title-charset.sh` gates them). Deleting the two
   folding lines is the whole render-side change.
-- [T2] **`truncstair` F3 cheap-paint — stop re-deriving all three bands with software floats every
-  iteration (~5 fps today).** The ramp is periodic in `phase & 127` (the 2026-07-28 wrap fix made
-  that explicit), so per-column values recur; cache the per-column float results and repaint only
-  the one column whose value changed per step — or precompute the 128-phase column table once at
-  startup. The `G_FPTOSI`/`G_SITOFP` stress kernel must stay in the gate slice (`0x02CA` fixed);
-  only the display loop gets cheaper. Orphaned from the Batch B close-out (2026-07-30) where it was
-  recorded as a good F3 candidate. [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md)
 
 - [x] ~~**`+mos-xy16` miscompile — iterative in-place `memmove`/`memcpy` rewrite over a 16-bit-indexed buffer** — FIXED in `MOSInsertREPSEP::placeIntraBlock`: `sep #$10` between `ldx` (writes 16-bit X) and `lda abs,X16` (reads 16-bit X) zeroed X's high byte; fix inserts a clone of the last X-writer after the subsequent `rep #$10` to restore the correct value. Repro `examples/65816/xy16-inplace-memmove-repro.c` CAP=1700: `xy16=0x90AA` (was `0x1CC6`). Unblocked #23 L-system 5-way-green. ([investigation](docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md))~~
 
@@ -881,15 +874,6 @@ revisit) rather than active work._
 
 ## Parked
 
-- **`truncstair` F2 `HOFS` scroll-ring — blocked on a 32-column canvas, which is now measured as a
-  library change.** The motion qualifies (pure horizontal translation; the ramp wrap supplies the
-  periodicity), but `BG3HOFS` wraps at the 32-column tilemap while `BitmapCanvas` fills 16, so blank
-  tiles would scroll in — and doubling the CHR shadow to 8 KB overflows truncstair's bank-0 `.bss`
-  (~3 KB headroom below `$1FFF`), while `_canvas_emit` hardcodes DMA source bank `0x00`. Widening
-  therefore requires teaching the canvas/upload path to DMA from bank `$7E` — a deliberate snesgfx
-  design decision, not a demo drop-in. Overlaps the inbox-captured "canvas widening beyond 16×16"
-  library need from #99b. Promote when someone takes the wider-canvas decision.
-  [investigation §Batch B](docs/investigations/2026-07-27-60fps-demo-sweep.md)
 - **Mesen2 as a third emulator** — abandoned for now: the prebuilt crashes on 26.04
   (glibc-2.43) and headless `--testrunner` won't run Lua; would need a source build against 26.04.
   MAME + bsnes-jg already give a two-emulator cross-check, so this is shelved unless a third opinion
@@ -901,6 +885,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-30 — [truncstair-f2-f3] F3 repaint-on-change + F2 banded BG3HOFS ring (1 px/frame): `CANVAS_HTILE` tilemap repeat made the recorded 8 KB/bank-$7E blocker moot; gate `0x02CA` unchanged, ring stalls=NONE. See [plan](docs/plans/2026-07-30-truncstair-f2-f3-scroll-ring.md).
 - [x] 2026-07-30 — [60fps-batch-b] `mvscrl` dual V-ring shipped (only qualifying F2 candidate; other 3 closed, Batch C done): gate `0x72A7` host==+mos-a16, both bands 1 px/frame no stalls. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
 - [x] 2026-07-28 — [truncstair-black] Canvas overflow (BAND_ROUND+BAND_H wrote tile row 16) clobbered chr_word/map_word -> VRAM wipe + reset loop; demo renders again. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
 

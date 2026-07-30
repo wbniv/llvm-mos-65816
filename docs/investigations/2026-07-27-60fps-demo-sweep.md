@@ -338,28 +338,33 @@ until someone picks up the wider-canvas work deliberately.
 
 ### Batch B status (2026-07-27, second pass)
 
-After candidacy resolution the batch reduces to **one** implementable demo, and that one is
-currently **blocked on a collision**:
+After candidacy resolution the batch reduces to **one** implementable demo. ~~That one is currently
+**blocked on a collision**.~~ **Collision resolved; batch CLOSED 2026-07-30** — see *Batch B
+VERIFIED* above for the raw gate output.
 
 - `ovmove`, `lfsr2` — **closed, rejected** (evidence above). No work to do.
-- `truncstair` — **closed, deferred** on the ring-geometry blocker above. No work to do until
-  someone takes the wider-canvas decision deliberately.
-- `mvscrl` — the only qualifying demo. **F2 not started.** `examples/snes/mvscrl.c` currently
-  carries **uncommitted edits from a concurrent session** (mtime 2026-07-27 11:01) that rework the
-  painter to one tile-row per frame. Per the repo's only-commit-your-own-files rule those edits
-  were left untouched, and no scroll-ring work was layered on top of a file someone else is
-  mid-refactor in.
+- `truncstair` — **closed, deferred** on the ring-geometry blocker above. Now tracked in `TODO.md`
+  (F2 → Parked, F3 → `[T2]`); see the end of this document.
+- ~~`mvscrl` — the only qualifying demo. **F2 not started.**~~ **DONE + verified 2026-07-30.** The
+  concurrent session's edits were reconciled rather than reverted: `a9f7f6d` restored `mv_step()` and
+  the buffer reads, then `dfd467d` layered the dual V-ring on top (upper flows down / lower up).
+  Verified both legs — gate `0x72A7` `host == +mos-a16` with `memmove-refs=2`, and per-band motion
+  with zero stalls at 98.6 % / 95.0 % shift-match.
 
-⚠️ **Flag for whoever owns that in-flight `mvscrl` edit:** as it currently stands the diff drops
+~~⚠️ **Flag for whoever owns that in-flight `mvscrl` edit:** as it currently stands the diff drops
 the `mv_step(&a.mv, a.t)` call from the main loop and replaces the field read with a computed
 decorative pattern (`(cx + row + (t>>2)) & 3`), so the display no longer renders the memmove
 buffers at all. `corpus_result` still passes (`0x72A7`) because `mvscrl_gate_crc()` runs the kernel
 during the title, independently of the loop — so the gate cannot catch this. But #79's whole point
 is that the *visual is the proof*: a G_MEMMOVE Ascending+Descending demo whose picture is unrelated
-to the memmove has lost that property. Worth a second look before it lands.
+to the memmove has lost that property. Worth a second look before it lands.~~
 
-Any future F2 work on `mvscrl` should also be re-checked against whatever that refactor settles on,
-since it changes the very painter the ring would replace.
+**RESOLVED 2026-07-30.** The flagged diff never landed in that form — `a9f7f6d` restored
+`mv_step()` and the buffer reads, and the shipped painter reads the *far end* of each buffer
+(`upper[UPPER_ROWS-1]` / `lower[0]`), rows carried by seven memmoves, so the pixels on screen are
+memmove **output**. The flag's structural point outlived its instance, though: nothing *enforced*
+it, and `corpus_result` structurally cannot. `e663c2d` adds a **premise gate** to `dev/mvscrl.sh`
+that asserts both properties, tested against the regression it targets. See method lesson 3 below.
 
 ### ⚠️ truncstair does not render (found 2026-07-28, while scoping its F2 work)
 
@@ -434,7 +439,78 @@ period. Gate unchanged (`0x02CA`, identical disasm counts); renders 9.7 % non-bl
    the pixels mean, which no generic checker can make. A PASS means "something is on screen and
    running", never "the visual is correct".
 
-Remaining on truncstair: the ramp wrap supplies the periodicity an `HOFS` ring needs, so **half the
-F2 prerequisite is now cleared**; the 32-column-canvas half (bank-0 WRAM, measured above) still
-stands. Separately it is a good **F3** candidate — all three bands redraw with software floats every
-iteration, so the loop runs at roughly 5 fps.
+3. **What a generic checker can't do, a per-demo premise gate can** (added 2026-07-30). Lesson 2
+   concedes that no generic tool catches the `mvscrl` class, because it needs "a demo-specific claim
+   about what the pixels mean". That claim is exactly what a demo's own gate script *can* assert. A
+   review flag on an in-flight `mvscrl` edit — which dropped `mv_step()` and painted
+   `(cx + row + (t>>2)) & 3` instead, while `corpus_result` stayed green at `0x72A7` throughout —
+   prompted a **premise gate** in `dev/mvscrl.sh` (`e663c2d`): assert `mv_step()` is called from the
+   display loop *and* that the ring paints read the far-end rows `upper[UPPER_ROWS-1]` / `lower[0]`,
+   the rows carried by seven memmoves. Two notes for anyone copying the pattern: check the specific
+   reads, not "any buffer read" — the initial full paint also reads the buffers, so a coarse count
+   still passes when only the per-step paints are swapped (verified); and test the guard against the
+   regression it targets, since a guard that cannot fail is worthless.
+
+4. **A "one-frame spike" detector flags apexes, not just bleed** (added 2026-07-30). The F1 tear work
+   leans on `JGX_BLANKSCAN`, which fails on a leading-black-row count exceeding both neighbours. It
+   deliberately compares against the *higher* neighbour so the title's monotonic gravity ramp is not
+   flagged — but an **apex**, where a descending and an ascending ramp meet, is a local maximum by
+   construction. `lsystem` hit precisely that: `canvas_clear()` dirties all 256 tiles while
+   `CANVAS_FLUSH_TILES` caps the flush at 64/frame, so the clear crawls top-down over 4 frames while
+   the regrowth restarts from the trunk. Measured `47,79,111,143,[149],142,135,128` with total ink
+   collapsing `189 → 11 → 26` — a wholesale content change, the opposite of bleed's "picture
+   unchanged, top rows forced black". Locally the apex is *indistinguishable* from real bleed
+   (shoulders 143/142, a 6-row excursion between them), so no threshold on the 3-point comparison
+   separates them; only a wider window shows the sweep. Fixed by requiring a quiescent baseline
+   ([plan](../plans/2026-07-30-blankscan-quiescence-gate.md)), at a cost worth knowing: bleed landing
+   *inside* a wipe or scene change is now missed.
+
+5. **A row-major dirty RANGE makes vertical and horizontal rings structurally different** (added
+   2026-07-30, from truncstair F2). `BitmapCanvas` tracks dirt as a contiguous `lo..hi` tile range
+   over a row-major tile order, so *what a ring stages* decides whether it can paint every frame:
+
+   | ring | stages | tiles | dirty range | can paint per frame? |
+   |---|---|---|---|---|
+   | vertical (#99c, `mvscrl`) | a **row** | 16 adjacent | 16 tiles / 256 B | **yes** — drains in one v-blank |
+   | horizontal (truncstair) | a **column** | 16 strided one row apart | **~240 tiles** | **no** — queue never empties |
+
+   With work queued every frame, `hscrolldb_commit`'s `upq_push_poke16` of the A1Tx pointer loses the
+   v-blank budget and, per its contract, costs "a stale frame, not a torn table" — the scroll stalls.
+   This is a property of the data structure, not a tunable: lowering `CANVAS_FLUSH_TILES` from 256 to
+   64 **moved** the stalls (701,703 → 700,702) instead of removing them, which is what disproved the
+   "flush budget too large" diagnosis. Removing the steady-state paint gave `stalls=NONE`.
+
+   So F2's per-demo cost is not uniform, and the sweep's F2 candidacy analysis should have asked
+   *which axis* a candidate scrolls before assuming the #99c pattern transfers. For a horizontal
+   ring, plan on no steady-state repaint — or on a dirty-tile **set** rather than a range.
+
+   Also found here: `dev/scroll-ring-check.py` **crashed** rather than reporting a stall
+   (`stalls or 'NONE':<10` formats a `list`). Only its passing path had ever run, so a checker that
+   could not report failure had shipped — the same shape as lessons 3 and 4.
+
+   This also corroborates lesson 1 from the other direction: `lsystem`'s row in the Full table reads
+   `compute-then-hold` with `d1`/`d60` of `0.0`/`0.0`, because the fixed 500/560 sample landed inside
+   its 150-frame hold — after the plant finished growing and before the wipe. The demo's most active
+   phase is invisible at the sampled frames, which is precisely why the clear-and-regrow behaviour
+   surfaced only when a per-frame scan ran over the whole 1200-frame budget.
+
+~~Remaining on truncstair — both halves are now tracked rather than living only in this document.~~
+**BOTH DONE 2026-07-30** (`bb460a4`), user-directed after this document had deferred F2 three times.
+See [the plan](../plans/2026-07-30-truncstair-f2-f3-scroll-ring.md).
+
+- **F3 cheap paint** — ~~all three bands redraw every iteration~~ **done.** The loop advanced `phase`
+  every 4th iteration but redrew all three bands, and re-DMA'd the whole 4 KB shadow, *every*
+  iteration: 3 of every 4 repaints spent 48 float quantizations on a byte-identical picture.
+- **F2 `HOFS` ring** — ~~blocked on a 32-column canvas~~ **done, and the blocker never applied.** The
+  recorded obstacle (8 KB shadow overflowing bank-0 `.bss`; `_canvas_emit` hardcodes DMA bank `0x00`)
+  is about *widening the canvas*. Widening is unnecessary: `_canvas_init` writes a **static** tilemap
+  that never changes per frame — only chr does. The ring is therefore a **one-time map change**,
+  repeating the 16 columns across all 32 as `inx & 15` (`CANVAS_HTILE`, default off). The shadow
+  stays 4 KB and emit keeps its bank-0 DMA. Sound only because the `& 127` wrap makes the field
+  periodic at exactly the canvas width. The HUD shares BG3's tilemap, so the scroll is HDMA-banded.
+  Motion: 1 px per 4 frames → **1 px per frame**.
+
+**Correction to this document's own verdict.** The section above says truncstair "stays on the
+current every-frame repaint … until someone picks up the wider-canvas work deliberately". That
+framing was wrong — it treated a *canvas-width* problem as the ring's prerequisite, when the ring
+only ever needed the *tilemap* to repeat. Cost of the error: F2 was deferred three times.
