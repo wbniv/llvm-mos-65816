@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/9aa36cb) | docs(gallery): second-pass probe — 3 of 4 works fail; retract the work-0 hypothesis |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/66d59c9) | docs(gallery): root-cause notes for the work-0 repack divergence; #137 step 6 is FAIL |
 
 <!--history-meta v1
+9aa36cb	author	Will Norris
+9aa36cb	added	54
+9aa36cb	deleted	20
+9aa36cb	files	1
+9aa36cb	body	Ran the second-pass probe on the shipped ROM. It disproves the explanation\ncommitted in 66d59c9, which is retracted in the plan.\n\nWork 0 does NOT skip unpack_slide: it is decoded by `ok = unpack_slide(a)`\nbehind the title card (lzss-gallery.c:1167) before the loop is entered with\ndecoded = 1.\n\nProbe 1 -- stage counters for work 0 at 9000 frames:\n  unpack_frames[0] = 127, stage_frames[0] = 52, near_frames[0] = 118\nunpack_slide short-circuits with ||, so reaching benchmark_near_decode proves\nbenchmark_far_decode and benchmark_stage both returned 1, each requiring\n!nav_cancel. The decode pipeline ran in full; it did not bail early on spurious\ninput. The failure is a data mismatch: near_ok, or either fold_far checksum.\n\nProbe 2 -- per-work verdicts at 40000 frames (gallery_failed/gallery_done):\n  done   = 1111000...   failed = 1011000...\n  failed: [0, 2, 3]     passed: [1]\nThree of the first four artworks fail their own repack differential. This is not\nwork-0-specific, so the title-path explanation is dead -- works 1-3 decode inside\nthe loop with the splash long gone.\n\nStill standing: record_result rewrites gallery_last_z without advancing\ngallery_progress on a revisit (explains the 0x3B96 -> 0x3B98 drift), and 15254 is\n99.7% of 15305, so FB_A holds a nearly-correct image with a small,\ntiming-dependent corruption rather than garbage.\n\nOpen question left for direction rather than guessed at: whether this is a\nmiscompile in the far-decode/LZSS path (the class this demo exists to catch) or a\ndemo-level buffer bug.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 66d59c9	author	Will Norris
 66d59c9	added	144
 66d59c9	deleted	0

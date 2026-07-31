@@ -446,17 +446,36 @@ uint16_t decode_near(const uint8_t *src,uint16_t slen,uint8_t *dst,uint16_t want
   return dp==want?dp:0;
 }
 
+/*
+ * Enter decode_near() with DB=$7E, WITHOUT touching the accumulator.
+ *
+ * The llvm-mos calling convention hands `slen` to decode_near in A:X (low
+ * byte in A, high byte in X) -- benchmark_near_decode ends in
+ * `sep #$20 / ldx __rc9 / lda __rc8 / jsr decode_bank7e`. The obvious
+ * `lda #$7e / pha / plb` idiom therefore overwrote the LOW BYTE of slen
+ * with $7E before the callee ever saw it: great_wave's 15305-byte stream
+ * (0x3BC9) was decoded as 0x3B7E = 15230 bytes, so decode_near ran out of
+ * source 142 output bytes early, returned 0, and left the tail of FB_A as
+ * un-decoded power-on WRAM. Every work whose (lz_len & 0xFF) > $7E failed
+ * its self-check; the works with a low byte <= $7E silently passed, because
+ * the *inflated* slen still stopped the decode on `dp == want`.
+ *
+ * PEA pushes a 16-bit immediate without using A; the second PLB discards
+ * the duplicated byte (both are $7E, so DB is unchanged). Nothing here
+ * depends on the M/X widths, so the SEP that the old sequence needed for
+ * its one-byte PHA/PLB pairing is gone too. The NMI above already used the
+ * A-safe PHK/PLB form -- this is the same discipline.
+ */
 asm(".text\n"
     ".global decode_bank7e\n"
     "decode_bank7e:\n"
     "  php\n"
-    "  .byte $e2, $20\n"
-    "  .byte $8b\n"
-    "  lda #$7e\n"
-    "  pha\n"
-    "  .byte $ab\n"
+    "  .byte $8b\n"            /* PHB       - save caller's data bank    */
+    "  .byte $f4, $7e, $7e\n"  /* PEA $7E7E - two $7E bytes, A untouched */
+    "  .byte $ab\n"            /* PLB       - DB = $7E                   */
+    "  .byte $ab\n"            /* PLB       - drop the duplicate $7E     */
     "  jsr decode_near\n"
-    "  .byte $ab\n"
+    "  .byte $ab\n"            /* PLB       - restore caller's data bank */
     "  plp\n"
     "  rts\n");
 uint16_t decode_bank7e(const uint8_t *src,uint16_t slen,uint8_t *dst,uint16_t want);
