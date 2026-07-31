@@ -704,10 +704,111 @@ block beneath the step with a PASS/FAIL note.
 1. `dev/exhirom-video.sh --gate canaries` — every required mapper configuration (HiROM 4 MiB;
    ExHiROM 6 MiB and 8 MiB) has a generated passing canary, and known coprocessor/custom mapper
    inputs are recognized but rejected as unsupported.
+
+   Implemented as **`dev/run.sh cartsize-canary`** (the video script is Phase 2; the plan permits
+   refining gate names). Run 2026-07-31 on `feature/exhirom-canaries` @ `3e80748`:
+
+   ```
+   ==> 1) host model + tooling unit tests
+     PASS: 53 address-model tests
+     PASS: 20 header/checksum fixture tests
+   MISSING SNES BIOS: /work/dev/roms/s_smp/spc700.rom
+     NOTE: MAME leg unavailable (no SPC700 IPL) — continuing with the bsnes-jg leg only.
+
+   ######## hirom4 — hirom 4M ########
+   fill: 4194304 bytes, code $008000-$00FFFF, 5 canaries verified, 2 spans verified
+       BANK_SPAN        file $01FF00 +1024   2 segment(s) across 2 bank(s) -> fold $B4BB
+       MULTIBANK_SPAN   file $1FFF80 +131328 6 segment(s) across 4 bank(s) -> fold $3D91
+     PASS: file length : 4194304 bytes (0x400000, 32 Mbit / 4 MiB); physical devices : 32Mbit
+           @ $000000; header at file : $00FFB0; map mode byte : $21
+     PASS: -verify-machineinstrs clean
+     PASS: far load (lda [dp], a7) present
+     generated oracle: 0x48EE
+     corpus_result: SMOKE: PASS off=0x202 len=2 got=0x48EE (ran 900 frames, bsnes-jg)
+     canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 900 frames, bsnes-jg)
+     ROM SHA-256: c0b4630a215aa7e29188a42167fc6c94af5cf6dafa4d22a0dc0390cf0a20b7a5
+
+   ######## exhirom6 — exhirom 6M ########
+   fill: 6291456 bytes, code $408000-$40FFFF, 8 canaries verified, 4 spans verified
+       BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+       MULTIBANK_SPAN   file $1FFF80 +131328 6 segment(s) across 4 bank(s) -> fold $3D91
+       EDGE_4M          file $3FFE00 +1024   2 segment(s) across 2 bank(s) -> fold $BBC8
+       ROM2_BANK_SPAN   file $41FF00 +1024   2 segment(s) across 2 bank(s) -> fold $B272
+     PASS: file length : 6291456 bytes (0x600000, 48 Mbit / 6 MiB); physical devices : 32Mbit
+           @ $000000 + 16Mbit @ $400000; header at file : $40FFB0; map mode byte : $25
+     PASS: -verify-machineinstrs clean
+     PASS: far load (lda [dp], a7) present
+     generated oracle: 0xA274
+     corpus_result: SMOKE: PASS off=0x202 len=2 got=0xA274 (ran 900 frames, bsnes-jg)
+     canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 900 frames, bsnes-jg)
+     ROM SHA-256: 1d53ebd932f7e07e1d9f108fa790dec73781066983b4766b29466dc6d23ef2e8
+
+   ######## exhirom8 — exhirom 8M ########
+   fill: 8388608 bytes, code $408000-$40FFFF, 14 canaries verified, 4 spans verified
+     PASS: file length : 8388608 bytes (0x800000, 64 Mbit / 8 MiB); physical devices : 64Mbit
+           @ $000000; header at file : $40FFB0; map mode byte : $25
+     PASS: -verify-machineinstrs clean
+     PASS: far load (lda [dp], a7) present
+     generated oracle: 0x29B9
+     corpus_result: SMOKE: PASS off=0x202 len=2 got=0x29B9 (ran 900 frames, bsnes-jg)
+     canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 900 frames, bsnes-jg)
+     ROM SHA-256: 0a08a25f8b094c2d1148655a9650fd16ddaca60dd9a2119d27969fb9e8d3ac07
+
+   RESULT: PASS — every decoded window, accepted mirror and cross-bank/cross-device span of the
+   HiROM 4 MiB and ExHiROM 6/8 MiB canary cartridges reads the modelled byte, bsnes-jg confirmed
+   (MAME skipped)
+   ```
+
+   **PASS**, with one caveat and one gap:
+
+   - **MAME could not run in this environment** — `dev/roms/s_smp/spc700.rom` (the SPC700 IPL,
+     gitignored Nintendo content) is absent from the machine, so MAME's `snes` driver aborts with
+     "Required files are missing". The gate detects this and falls back to `JG_ONLY`, so the
+     emulator evidence here is **bsnes-jg only**. Supply the IPL and re-run for the MAME leg.
+   - Coprocessor/custom-mapper rejection is covered by the host fixtures
+     (`test_snes_checksum.py`: SuperFX, SA-1, S-DD1, Cx4, BS-X, Super Game Boy, ST010, S-RTC,
+     SPC7110 — each recognised by name and refused), not by a generated ROM.
+
 2. `tools/snes-checksum.py --inspect <rom>` — exact ROM length is 6,291,456 bytes; physical
    decomposition is exactly 4 MiB + 2 MiB; header is found only at the ExHiROM location; map mode
    is `$25`; reset and interrupt vectors point to linked executable code; checksum/complement agree
    with independent calculation.
+
+   ```
+   $ python3 tools/snes-checksum.py --inspect --mapping exhirom build/cartsize-exhirom6.sfc
+   build/cartsize-exhirom6.sfc
+   mapping           : exhirom (slow ROM), map mode $25
+   file length       : 6291456 bytes (0x600000, 48 Mbit / 6 MiB)
+   physical devices  : 32Mbit @ $000000 + 16Mbit @ $400000
+   logical (mirrored): 0x800000 (8 MiB) -> ROM-size byte $0D
+   header at file    : $40FFB0
+   canonical windows :
+       $C0-$FF:0000-FFFF  <- file $000000-$3FFFFF
+       $40-$5F:0000-FFFF  <- file $400000-$5FFFFF
+   addressing holes  : none
+   title             : 'LLVM-MOS SNES        '
+   map mode byte     : $25
+   cartridge type    : $00
+   ROM-size byte     : $0D
+   RAM-size byte     : $00
+   region byte       : $01
+   reset vector      : $00:8000 -> file $408000 (first opcode $78)
+   native vectors    : COP=$0000 BRK=$8030 ABT=$0000 NMI=$8031 IRQ=$8030
+   emu vectors       : COP=$0000 ABT=$0000 NMI=$8031 RES=$8000 IRQ=$8030
+   checksum stored   : $C00E   complement $3FF1
+   checksum recomputed: $C00E (mirrored image) / $C00E (multiplier formula)
+   bsnes-jg heuristic: detects exhirom  lorom=0  hirom=0  exlorom=0  exhirom=16
+
+   PASS: header, size, decomposition, vectors and checksum all agree.
+   ```
+
+   **PASS** on every clause. Length is exactly 6,291,456; decomposition is exactly 32 Mbit +
+   16 Mbit; the header scores at the ExHiROM location **only** (`exhirom=16`, the other three
+   candidates `0`, so no decoy header exists at `$7FB0`/`$FFB0`/`$407FB0`); map mode is `$25`;
+   the reset vector `$00:8000` decodes — through the model — to file `$408000`, whose first byte
+   is `$78` (`sei`), i.e. linked executable code, and the NMI/IRQ vectors point into the near
+   window; and the checksum agrees between two independent computations (materialising the
+   mirrored logical image vs the `sum(big) + 2*sum(small)` multiplier rule).
 3. `dev/exhirom-video.sh --gate descriptors` — every emitted descriptor round-trips CPU
    address ↔ file offset; PRE/POST boundary canaries are distinct and at exact offsets; no frame
    pixel uses palette index 0 or 224–255, and entry 1 is white.
