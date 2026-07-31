@@ -33,15 +33,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 ## Open
 
 
-- [verify T2] **#137 — scanner beam repack visualization** <!-- agent:a3501a599fc93b36b --> — implemented + deployed; steps 1–5 and 7
-  PASS. **Step 6 (the full 200 000-frame corpus result) FAILS and is blocked** — not merely unrun:
-  the ROM never reaches `corpus_result` at that budget (200 000 frames completes 22 of 62 works),
-  and the corpus is genuinely failing: at 40 000 frames **3 of the first 4 works fail** their own
-  repack differential (`gallery_failed[] = [0,2,3]`, only work 1 passes), with the decode pipeline
-  confirmed to run in full rather than bail on `nav_cancel` (root-cause analysis:
-  [per-image selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)). See
-  [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
-  the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
 - [wip T4] **Per-image "Verify fidelity" button — mechanism DECIDED + ROM half DONE
   (2026-07-31); player-package half ESCALATED.** <!-- agent:a44b395bf4fcdd1fc -->
   Chosen mechanism (c), superseding both briefed candidates: the ROM already verifies each work
@@ -985,6 +976,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-31 — [137-verify] All 7 steps PASS (step 6 via bench gate post-`2932bcf`, `45d1a6c`; visual sweep tracked separately). See [plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md).
 - [x] 2026-07-31 — [gallery-repack] Root cause: `decode_bank7e` thunk clobbered A-passed arg (demo bug; compiler exonerated). Fix `2932bcf`, 62/62 bench. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
 - [x] 2026-07-30 — [truncstair-f2-f3] F3 repaint-on-change + F2 banded BG3HOFS ring (1 px/frame): `CANVAS_HTILE` tilemap repeat made the recorded 8 KB/bank-$7E blocker moot; gate `0x02CA` unchanged, ring stalls=NONE. See [plan](docs/plans/2026-07-30-truncstair-f2-f3-scroll-ring.md).
 - [x] 2026-07-30 — [60fps-batch-b] `mvscrl` dual V-ring shipped (only qualifying F2 candidate; other 3 closed, Batch C done): gate `0x72A7` host==+mos-a16, both bands 1 px/frame no stalls. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
