@@ -112,12 +112,42 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   baseline only because its delta path reaches just 15.6 fps. Mapper-neutral bounded packet staging
   is implemented and host-gated; connect its `SvcInput` callback to the ExHiROM cursor after
   `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
+- [T4] **60 fps video playback target** — raised from 30 fps (user, 2026-07-31): SVX2's measured
+  60.8–69.4 fps is decode-ONLY, i.e. 1.3–15.7% margin over the new target — plausible, unproven
+  end-to-end. Attack order: **(a)** re-run the gate as decode **+ presentation** (cadence, DMA
+  arm, segmented refill across bank/device boundaries) in one VBlank period — the current bench
+  times pure decode; **(b)** the **FastROM lever** (+33% CPU, 60.8 → ~81 fps decode-only; already
+  a deferred cartridge-matrix row) — likely the enabling move; **(c)** keyframe scheduling vs the
+  16.7 ms budget (slip-never-tear already specified); **(d)** true 60 fps content needs
+  ≥59.94 fps masters (KSC has them; a 30 fps master frame-doubles, halving decode load);
+  **(e)** stream size ×2 per second — recheck ExHiROM capacity. Thresholds updated in
+  [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Frame presentation /
+  §Codec selection. (T4: throughput engineering with unknown headroom.)
+- [T2] **Hard real-video stressor for codec ratio expectations** — the real-camera leg used the
+  H.264 `~large` derivative of a **night** launch (mostly-black frames, codec-smoothed grain):
+  a best case, so real-footage ratios (31–57%) are uncalibrated for hard content. The
+  speed-anchored SVX2 decision is robust; ratio expectations aren't. Run the existing sweep
+  (`tools/snes-video-pack.py`, both dithers) over one grain-rich daylight clip — parent-plan
+  candidate #16 Apollo 11 Saturn V launch — and append the column to
+  [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
+  (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
+  2026-07-31 — lost in a concurrent TODO rewrite.)
 - [T2] **Audit the 173 `examples/` files using a bare empty `for(;;){}`.** LLVM may remove the
   loop under C11 forward-progress and fall through `main` into a reset loop — exactly what bit
   the cartsize canary; existing gates assert only WRAM and are *insensitive* to reset loops, so
   affected demos would pass silently. Pick the house idle-loop idiom (volatile access /
   `asm volatile` — check crt0/snesgfx precedent), sweep, and spot-check a sample of gates with
   a display-liveness probe. (T2: known recipe once the idiom is chosen; the sweep is mechanical.)
+- [T2] **Hard real-video stressor for the codec ratio expectations** — the completed real-camera
+  leg ([real-video-codec-benchmark.md](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
+  used the H.264 `~large` derivative of a **night** launch: mostly-black 80 × 56 frames and
+  codec-smoothed grain make it a mild stressor, so its ratios (31–57%) are a best case for real
+  footage. The one-codec/SVX2 *decision* is speed-anchored and robust, but size expectations for
+  hard content are uncalibrated: run the existing sweep (`tools/snes-video-pack.py`, both dithers)
+  over one grain-rich daylight clip — parent plan candidate #16 Apollo 11 Saturn V launch (film
+  grain) — and append the column to the results doc. Pipeline + bench harness already exist.
+  [plan](docs/plans/2026-07-31-real-video-codec-corpus.md) (T2: bounded re-run of a scripted
+  sweep on one new source; interval eyeballing is the only judgment.)
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
   normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
   model, header and ROM-size fields, reset/vector placement, far-address handling, checksum gate,
@@ -160,22 +190,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   extended-mapping item's Phase 0. See
   [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Cartridge-configuration
   coverage. (T2: bounded fixture generation against a settled model.)
-- [wip T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card — now
-  ALSO carries the 19 F1 atomic-flush tear fixes (2026-07-27).** <!-- agent:a8a1c9e9dbe73a352 --> The
-  title-card fix (`5f51be1` per-line HDMA bands + gravity exit, `e1a58f9` the `_`/`^` glyphs and
-  lowercase folding) is header-only, so every demo needs a rebuild to pick it up — the ROMs already
-  on biohack.net still show both lines arriving from both edges, `G_FCOPYSIGN` as `G FCOPYSIGN`, and
-  julia's `Z^2 + C` as `Z 2 + C`. Bulk rebuild + re-run each `dev/<slug>.sh` gate + re-publish via
-  `/snes-rom-page`. Note the intro is ~6 frames shorter than before, well inside the demos'
-  fixed-frame screenshot margins, but the published preview PNGs will change. **F1 addition
-  (`673cb42`, [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md)): the 19 patched
-  demos' `corpus_result` WRAM offsets MOVED (most `0x31`, `rotkal` `0x13F2`) — regenerate each
-  manifest selfcheck `off` from the fresh `.map` at publish; `dev/verify-web-roms.sh` gates the lot.** **Also run `dev/display-check.py` before publishing** (added 2026-07-28): `verify-web-roms.sh`
-  asserts the corpus CRC and scans for force-blank *bleed*, but cannot see a wholly dead screen —
-  and it samples at the manifest `frames`, which is usually still the title card. That blind spot
-  shipped a black `truncstair` for weeks. Three demos in this batch have display fixes that only
-  reach users on a republish: `mvscrl` (regression + 60 fps ring), `truncstair` (black screen), and
-  the gallery CGRAM fix.
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -976,7 +990,9 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-31 — [rom-republish] 113/114 title-card+F1 republish confirmed already live (2026-07-28); shipped the truncstair F2/F3 + gallery A-clobber deltas to both sites, closed the deferred full `verify-web-roms.sh` sweep. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
 - [x] 2026-07-31 — [137-verify] All 7 steps PASS (step 6 via bench gate post-`2932bcf`, `45d1a6c`; visual sweep tracked separately). See [plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md).
+- [x] 2026-07-31 — [real-video-codec] Real Artemis footage + Bayer axis swept 2×2; SVX2 ships (60.8–69.4 fps on target), ONE codec suffices. See [plan](docs/plans/2026-07-31-real-video-codec-corpus.md).
 - [x] 2026-07-31 — [gallery-repack] Root cause: `decode_bank7e` thunk clobbered A-passed arg (demo bug; compiler exonerated). Fix `2932bcf`, 62/62 bench. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
 - [x] 2026-07-30 — [truncstair-f2-f3] F3 repaint-on-change + F2 banded BG3HOFS ring (1 px/frame): `CANVAS_HTILE` tilemap repeat made the recorded 8 KB/bank-$7E blocker moot; gate `0x02CA` unchanged, ring stalls=NONE. See [plan](docs/plans/2026-07-30-truncstair-f2-f3-scroll-ring.md).
 - [x] 2026-07-30 — [60fps-batch-b] `mvscrl` dual V-ring shipped (only qualifying F2 candidate; other 3 closed, Batch C done): gate `0x72A7` host==+mos-a16, both bands 1 px/frame no stalls. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
