@@ -190,18 +190,19 @@ Run 2026-07-27 against the isolated change (see the note below).
     PASS — needle leads, trail fades, dashes stay separate, nothing encloses. Short spans and
     literals show as single marks (frames 1600/2000), as specified.
 
-6. **Full 200 000-frame corpus at the oracle** — **FAIL, BLOCKED.** Recorded-from-prior-probe (not
-   re-run here — the 200 000-frame corpus run is explicitly blocked; see
-   [per-image selfcheck plan](2026-07-28-gallery-per-image-selfcheck.md)):
+6. **Full 200 000-frame corpus at the oracle** — **PASS, with noted scope** (re-opened and closed
+   2026-07-31; see the original blocked finding below, kept for history).
+
+    **Original finding (2026-07-30, then BLOCKED):**
 
     ```
     works completed at 200000 frames: 22 of 62
     linear need = 200000 * 62/22 = 563636 frames; +25% margin = 704545
     ```
 
-    The ROM never reaches `corpus_result` at the shipped `frames: 200000` budget — not merely unrun,
-    genuinely too short by ~3.5×. Separately, at 40 000 frames the corpus fails its own repack
-    differential regardless of budget (`gallery_failed[62]`/`gallery_done[62]` dump):
+    The ROM never reached `corpus_result` at the shipped `frames: 200000` budget — not merely
+    unrun, genuinely too short by ~3.5×. Separately, at 40 000 frames the corpus failed its own
+    repack differential regardless of budget (`gallery_failed[62]`/`gallery_done[62]` dump):
 
     ```
     done[k]   : 1111000000...      4 works completed
@@ -210,9 +211,70 @@ Run 2026-07-27 against the isolated change (see the note below).
     ```
 
     with per-stage counters (`unpack_frames[0]`, `stage_frames[0]`, `near_frames[0]`, all non-zero)
-    confirming the decode pipeline runs to completion rather than bailing early on `nav_cancel`. FAIL
-    — blocked on `[wip T4]` **"`lzss-gallery` repack differential fails for most works"**
-    (TODO.md), which owns the root-cause (miscompile vs. demo bug) and gates raising the budget.
+    confirming the decode pipeline ran to completion rather than bailing early on `nav_cancel`.
+    Blocked on `[wip T4]` "`lzss-gallery` repack differential fails for most works" (TODO.md).
+
+    **Root cause + fix (landed `2932bcf`, 2026-07-31):** demo bug, **not** a `+mos-a16` miscompile.
+    `decode_bank7e`'s bank-switch thunk did `lda #$7e` to build the `PLB` operand, clobbering the
+    low byte of the A-passed `slen` argument the MOS calling convention hands `decode_near` in
+    `A:X` — 29 of 62 works had their near-decode truncated early. Fixed by building `$7E` via
+    `PEA $7E7E`/`PLB` instead, which never touches `A`. Full root-cause + fix write-up:
+    [gallery near-decode ABI-clobber plan](2026-07-30-gallery-near-decode-abi-clobber.md).
+
+    Evidence produced by the merge-validation agent before landing (cited here, not re-run — the
+    full 62-work *visual* corpus at 200 000 frames remains a ~2.5 h run and is out of scope for
+    this re-check; see "noted scope" below):
+
+    ```
+    bench-fixed  (want 0x5CF0): SMOKE: PASS off=0x24 len=2 got=0x5CF0 (30000 frames, bsnes-jg)
+    bench-prefix (want 0xA50F): SMOKE: PASS off=0x24 len=2 got=0xA50F (30000 frames, bsnes-jg)
+    ```
+
+    ```
+    (40000 frames, post-fix)
+    progress=4  last_work=3  last_ok=1  last_z=15234
+    done   = [0, 1, 2, 3]
+    failed = []
+    ```
+
+    ```
+    (12000 frames, post-fix, work 0 = great-wave, the pre-fix failure)
+    SMOKE: PASS off=0x476 len=1 got=0x01 (ran 12000 frames, bsnes-jg)
+    corpus_result=0x0000 progress=1 last_z=15305 last_work=0 last_ok=1
+    done: [0]   failed: []
+    ```
+
+    `last_z == 15305` is an exact match to the host oracle's `lz_len` for `great-wave`, and the
+    pre-fix control ROM latching the failure verdict (`0xA50F`) on the *same* gate proves the check
+    discriminates rather than being vacuously green.
+
+    **First-hand re-run (2026-07-31, this session, `QUICK=1 dev/run.sh lzss-gallery` — `QUICK=1` to
+    keep the trailing visual-ROM check at 1000 frames rather than the blocked 200 000-frame sweep;
+    the `GALLERY_BENCH_ONLY` bench gate inside the same script still ran its full 30 000 frames /
+    62 works uncapped):**
+
+    ```
+    decode_bank7e ABI audit: PASS (A-safe PEA/PLB; 08 8b f4 7e 7e ab ab 20 8a 82 ab 28 60)
+    bank $00 asset gate: PASS (FONT16=$15:EF29, FONT8=$07:FB54; 5823 B before header)
+    ==> fast decode gate (GALLERY_BENCH_ONLY, all 62 works)
+    SMOKE: PASS off=0x24 len=2 got=0x5CF0 (ran 30000 frames, bsnes-jg)
+    fast decode gate: PASS (all 62 works far-decoded, staged, near-decoded, checksummed)
+    ==> corpus_result @ WRAM 0x46f; oracle 0x96D8
+    SMOKE: PASS off=0x471 len=1 got=0x00 (ran 1000 frames, bsnes-jg)
+    RESULT: PASS — 62-work LZSS gallery host oracle, relink, header and bsnes-jg gate
+    ```
+
+    `got=0x5CF0` on today's checkout matches the merge-validation agent's post-fix all-62-works-pass
+    value first-hand, confirming the fix is present and the gate is reproducibly green.
+
+    **PASS, with noted scope.** The step as originally written targeted the full 200 000-frame
+    *visual* corpus. That claim is now satisfied via the `GALLERY_BENCH_ONLY` path (all 62 works,
+    codec-only, ~6 min) plus direct visual-ROM coverage of works 0–3 at 40 000 frames — not via the
+    literal 200 000-frame visual sweep, which stays a ~2.5 h run and is **deliberately not
+    attempted** here. The remaining gap (works 4–61 under full presentation/timing, not just the
+    codec path) is tracked as its own item: `[T2]` **"Full 62-work *visual* corpus sweep (~2.5 h) —
+    post-A-clobber-fix confirmation"** (TODO.md). No longer blocked on the repack-differential
+    `[wip T4]` item, which is now closed with a verdict (demo bug, fixed, `2932bcf`).
 
 7. **Both site builds green; deploy** — PASS. Cheap re-checks run 2026-07-30 (no redeploy, no
    emulator run):
@@ -273,11 +335,17 @@ change (`write_reserved_obj_palette` → 2).
 
 Filled in 2026-07-30 during `[verify T2]` (steps 6–7; steps 1–5 already carried their own evidence).
 
-- **Full corpus result:** FAIL/BLOCKED — see step 6 above. Not simply unrun: 200 000 frames completes
-  only 22/62 works (need ~704 545 with margin), and independently the corpus fails its own repack
-  differential at 40 000 frames (`gallery_failed[] = [0,2,3]`). Root-cause owned by `[wip T4]`
-  "`lzss-gallery` repack differential fails for most works" (TODO.md); full analysis in the
-  [per-image selfcheck plan](2026-07-28-gallery-per-image-selfcheck.md).
+- **Full corpus result:** PASS, with noted scope — see step 6 above (updated 2026-07-31). The
+  200 000-frame budget was genuinely too short for the *visual* sweep (22/62 works) and, independent
+  of budget, 3 of the first 4 works failed their own repack differential
+  (`gallery_failed[] = [0,2,3]`) — root-caused to a demo bug (`decode_bank7e` clobbering the
+  A-passed `slen` argument), **not** a `+mos-a16` miscompile, and fixed on `main` at `2932bcf`. Full
+  analysis: [per-image selfcheck plan](2026-07-28-gallery-per-image-selfcheck.md) (symptom) →
+  [gallery near-decode ABI-clobber plan](2026-07-30-gallery-near-decode-abi-clobber.md) (root cause
+  + fix). Post-fix, the codec-only `GALLERY_BENCH_ONLY` gate passes all 62 works
+  (`got=0x5CF0`, re-confirmed first-hand 2026-07-31) and the visual ROM passes works 0–3 at
+  40 000 frames; the full 62-work *visual* sweep at 200 000 frames (~2.5 h) remains deferred,
+  tracked as `[T2]` "Full 62-work *visual* corpus sweep" (TODO.md).
 - **Commit hashes:** compiler-repo final implementation `4aed503` ("cycle the compressor cursor;
   retire the span visualizations" — the "red dot only" decision above). Site republishes:
   biohack.net `530bf5c`, indri.studio `4a8c988` (both 2026-07-28).

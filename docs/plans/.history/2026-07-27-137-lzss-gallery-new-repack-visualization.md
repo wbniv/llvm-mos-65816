@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/c844745) | docs(137): step 7 — replace the void host-npm build note with CI run evidence |
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/f44bd89) | docs(gallery): #137 [verify T2] steps 6-7 — record raw evidence in the plan |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/4aed503) | feat(snes/gallery): cycle the compressor cursor; retire the span visualizations |
 
 <!--history-meta v1
+c844745	author	Will Norris
+c844745	added	16
+c844745	deleted	8
+c844745	files	1
+c844745	body	The sites build only in CI (deploy.yml: pnpm install --frozen-lockfile +\npnpm build on a GitHub Actions runner); the subagent's host-side npm run\nbuild was out-of-band and its failure meaningless. Recorded the actual\ndeploy-run conclusions (success at biohack.net 530bf5c / indri.studio\n4a8c988) as the builds-green evidence.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f44bd89	author	Will Norris
 f44bd89	added	74
 f44bd89	deleted	3
