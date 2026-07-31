@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdint>
+#include <climits>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -153,23 +154,83 @@ static int leading_black_rows(void) {
 // card's gravity exit walks the black top band monotonically from 0 to 224 over ~40 frames, and
 // every frame of that ramp beats its predecessor — but none is a local max, so none is flagged.
 // Force-blank bleed is a one-frame excursion, which is.
-static int blank_scan_report(const std::vector<int> &v, int threshold) {
-  int flagged = 0;
+// ...and require the spike to sit on a QUIESCENT baseline. Bleed is a one-frame excursion on an
+// otherwise stable picture; a local max inside an active transition is not evidence of it.
+//
+// The case that forced this: lsystem holds a grown plant, then canvas_clear() dirties all 256 tiles
+// while bitmap_canvas caps the flush at CANVAS_FLUSH_TILES(64)/frame, so the clear reaches VRAM over
+// 4 frames sweeping top-down while the regrowth restarts from the trunk at the bottom. The frame
+// where the descending clear front crosses the ascending regrowth is a local maximum BY
+// CONSTRUCTION (measured: 47,79,111,143,[149],142,135,128 with total ink 189->11->26 — a wholesale
+// content change, the opposite of bleed). Locally it is indistinguishable from real bleed: its
+// neighbours are 143 and 142, a textbook 6-row excursion between near-equal shoulders. Only the
+// wider window reveals the sweep, so no threshold on the 3-point comparison can separate them.
+//
+// TRADE-OFF, deliberately accepted: a genuine bleed landing inside a wipe/fade/scene change is now
+// MISSED. Bleed is a DMA/v-blank-overrun artifact that shows on otherwise stable frames, and a
+// standing false FAIL is worse — it trains us to ignore the gate, which is how a black truncstair
+// shipped for weeks. Skips are reported, never silent.
+static int blank_scan_report(const std::vector<int> &v, int threshold, int win, int quiet) {
+  int flagged = 0, skipped = 0;
   for (size_t i = 1; i + 1 < v.size(); i++) {
     int nb = v[i - 1] > v[i + 1] ? v[i - 1] : v[i + 1];   // the HIGHER neighbour
-    if (v[i] - nb >= threshold) {
-      if (flagged < 20)
-        printf("BLANKSCAN: frame %zu has %d black rows at top (neighbours %d / %d)\n",
-               i, v[i], v[i - 1], v[i + 1]);
-      flagged++;
+    if (v[i] - nb < threshold) continue;
+    // Spread of the surrounding window, EXCLUDING the candidate itself.
+    size_t lo = (i > (size_t)win) ? i - (size_t)win : 0;
+    size_t hi = i + (size_t)win + 1 < v.size() ? i + (size_t)win : v.size() - 1;
+    int wmin = INT_MAX, wmax = INT_MIN;
+    for (size_t j = lo; j <= hi; j++) {
+      if (j == i) continue;
+      if (v[j] < wmin) wmin = v[j];
+      if (v[j] > wmax) wmax = v[j];
     }
+    const int spread = (wmax >= wmin) ? wmax - wmin : 0;
+    if (spread >= quiet) {
+      if (skipped < 20)
+        printf("BLANKSCAN: frame %zu spike %d ignored — window spread %d >= %d "
+               "(picture in transition, not force-blank bleed)\n", i, v[i], spread, quiet);
+      skipped++;
+      continue;
+    }
+    if (flagged < 20)
+      printf("BLANKSCAN: frame %zu has %d black rows at top (neighbours %d / %d, window spread %d)\n",
+             i, v[i], v[i - 1], v[i + 1], spread);
+    flagged++;
   }
   if (flagged == 0)
-    printf("BLANKSCAN: PASS %zu frames, no force-blank bleed (threshold %d rows)\n",
-           v.size(), threshold);
+    printf("BLANKSCAN: PASS %zu frames, no force-blank bleed (threshold %d rows, %d transition spike(s) ignored)\n",
+           v.size(), threshold, skipped);
   else
     printf("BLANKSCAN: FAIL %d frame(s) with a transient black band at the top\n", flagged);
   return flagged;
+}
+
+// Synthetic self-test (JGX_BLANKSCAN_SELFTEST=1). The real signal costs ~15 s of emulation per
+// frame to reproduce, so the discrimination logic is pinned here instead.
+static int blank_scan_selftest(int threshold, int win, int quiet) {
+  struct Case { const char *name; std::vector<int> v; bool expect_flag; };
+  const std::vector<Case> cases = {
+    // Force-blank bleed on a static scene: one 12-row excursion, flat shoulders. MUST flag.
+    {"bleed on quiescent baseline",
+     {40,40,40,40,40,40,52,40,40,40,40,40,40}, true},
+    // The measured lsystem clear-and-regrow V-apex. MUST NOT flag.
+    {"lsystem clear/regrow apex",
+     {47,47,47,47,47,79,111,143,149,142,135,128,123,115,112,108}, false},
+    // The title's gravity exit: monotonic ramp, no local max. MUST NOT flag.
+    {"title gravity ramp (monotonic)",
+     {0,6,12,24,40,60,84,110,140,170,196,212,224}, false},
+  };
+  int bad = 0;
+  for (const Case &c : cases) {
+    printf("SELFTEST: %s\n", c.name);
+    const bool got = blank_scan_report(c.v, threshold, win, quiet) > 0;
+    const bool ok = (got == c.expect_flag);
+    printf("SELFTEST: %-32s expect %-8s got %-8s %s\n\n", c.name,
+           c.expect_flag ? "FLAG" : "no-flag", got ? "FLAG" : "no-flag", ok ? "PASS" : "FAIL");
+    if (!ok) bad++;
+  }
+  printf("SELFTEST: %s (%zu cases, %d failed)\n", bad ? "FAIL" : "PASS", cases.size(), bad);
+  return bad;
 }
 
 static int dump_png(const char *path, int rows) {
@@ -227,6 +288,14 @@ static int pollInput(const void*, unsigned, unsigned) { return 0; }
 #endif
 
 int main(int argc, char **argv) {
+  // JGX_BLANKSCAN_SELFTEST=1 — exercise the bleed-vs-transition discrimination on synthetic
+  // series. Needs no ROM, so it runs before argument checking.
+  if (getenv("JGX_BLANKSCAN_SELFTEST")) {
+    int thr = getenv("JGX_BLANKSCAN_ROWS") ? atoi(getenv("JGX_BLANKSCAN_ROWS")) : 4;
+    int win = getenv("JGX_BLANKSCAN_WIN") ? atoi(getenv("JGX_BLANKSCAN_WIN")) : 5;
+    int quiet = getenv("JGX_BLANKSCAN_QUIET") ? atoi(getenv("JGX_BLANKSCAN_QUIET")) : 8;
+    return blank_scan_selftest(thr, win, quiet) ? 1 : 0;
+  }
   if (argc < 6) {
     fprintf(stderr, "Usage: %s <rom.sfc> <datadir> <offset_hex> <len> <want_hex> [frames] [out.png]\n", argv[0]);
     return 2;
@@ -281,7 +350,9 @@ int main(int argc, char **argv) {
 
   if (blankscan) {
     int thr = getenv("JGX_BLANKSCAN_ROWS") ? atoi(getenv("JGX_BLANKSCAN_ROWS")) : 4;
-    if (blank_scan_report(blacktop, thr) != 0) return 3;
+    int win = getenv("JGX_BLANKSCAN_WIN") ? atoi(getenv("JGX_BLANKSCAN_WIN")) : 5;
+    int quiet = getenv("JGX_BLANKSCAN_QUIET") ? atoi(getenv("JGX_BLANKSCAN_QUIET")) : 8;
+    if (blank_scan_report(blacktop, thr, win, quiet) != 0) return 3;
   }
 
   if (png_out) dump_png(png_out, 224);

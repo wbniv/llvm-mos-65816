@@ -170,6 +170,18 @@ the *higher* neighbour is deliberate: the title's gravity exit ramps the black b
 frames, and every frame of that ramp beats its predecessor without being a local maximum. Run it on
 any demo whose upload volume or frame pacing changes.
 
+A spike must also sit on a **quiescent baseline** — the window `±JGX_BLANKSCAN_WIN` (default 5)
+around it, excluding the candidate, must span less than `JGX_BLANKSCAN_QUIET` (default 8) rows.
+Excluding the monotonic ramp was not enough: an **apex**, where a descending and an ascending ramp
+meet, is a local maximum by construction. `lsystem` hit exactly that — `canvas_clear()` dirties all
+256 tiles while `CANVAS_FLUSH_TILES` caps the flush at 64/frame, so the clear crawls top-down over 4
+frames while the regrowth restarts from the trunk. Locally that apex is indistinguishable from bleed
+(shoulders 143/142, a 6-row excursion between them), so no threshold on the 3-point comparison can
+separate them; only the wider window shows the sweep. **Know the cost:** a genuine bleed inside a
+wipe/fade/scene change is now missed. Suppressions print their window spread, never silent.
+`JGX_BLANKSCAN_SELFTEST=1 build/jgxcheck` (no ROM needed) pins the discrimination on synthetic
+series. See [the plan](plans/2026-07-30-blankscan-quiescence-gate.md).
+
 Still to convert (they re-open the window): `snesgfx/m7title.h`, `snesgfx/splash.h`, `splash16` in
 `title_layer.h`, and the seven Mode-7 demo `main()`s.
 

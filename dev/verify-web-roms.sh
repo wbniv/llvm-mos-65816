@@ -10,6 +10,14 @@
 # Each ROM is also scanned for force-blank bleed (JGX_BLANKSCAN — a one-frame black band at the top
 # of the picture, the signature of a DMA that overran v-blank while force-blanked).
 #
+# The bleed scan requires the spike to sit on a QUIESCENT baseline, because a demo that wipes or
+# rebuilds its picture produces local maxima that are not bleed: lsystem's canvas_clear() reaches
+# VRAM over 4 frames (CANVAS_FLUSH_TILES caps the flush) while its regrowth restarts from the trunk,
+# and the frame where those two fronts cross is a local max by construction. Consequence to know
+# about: a genuine bleed landing INSIDE a wipe/fade/scene change is not reported. Suppressions are
+# always printed with their window spread, never silent.
+# See docs/plans/2026-07-30-blankscan-quiescence-gate.md.
+#
 # Host-side; uses the prebuilt build/jgxcheck harness. Exits non-zero if any demo fails.
 #
 #   dev/verify-web-roms.sh                 # verify ~/biohack.net
@@ -68,14 +76,22 @@ while IFS=$'\t' read -r id off len want frames; do
     printf '  %-16s MISSING %s\n' "$id" "$rom"; missing=$((missing+1)); continue
   fi
   out=$(JGX_BLANKSCAN=1 "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
-  smoke=$(printf '%s' "$out" | grep -o 'SMOKE: [A-Z]*' | head -1)
-  blank=$(printf '%s' "$out" | grep -o 'BLANKSCAN: [A-Z]*' | head -1)
+  # `|| true`: a grep that matches nothing exits 1, and under `set -e` that kills the run mid-way
+  # with no summary — which is exactly how an earlier version of this script silently stopped at
+  # demo 33 of 113 and looked like a clean pass.
+  # Match the VERDICT line explicitly, not "BLANKSCAN: <anything>". jgxcheck also prints
+  # informational lines BEFORE the verdict (e.g. "BLANKSCAN: frame 1154 spike 149 ignored — …"),
+  # and `BLANKSCAN: [A-Z]*` matches those with an empty capture, so `head -1` yielded a bare
+  # "BLANKSCAN: " and failed a demo that had passed both checks.
+  smoke=$(printf '%s' "$out" | grep -oE 'SMOKE: (PASS|FAIL)' | head -1 || true)
+  blank=$(printf '%s' "$out" | grep -oE 'BLANKSCAN: (PASS|FAIL)' | head -1 || true)
   if [ "$smoke" = "SMOKE: PASS" ] && [ "$blank" = "BLANKSCAN: PASS" ]; then
     printf '  %-16s PASS  (%s frames, want %s)\n' "$id" "$frames" "$want"
     pass=$((pass+1))
   else
     printf '  %-16s FAIL  %s %s\n' "$id" "${smoke:-no-smoke}" "${blank:-no-blankscan}"
-    printf '%s\n' "$out" | grep -E 'SMOKE|BLANKSCAN' | sed 's/^/                     /'
+    printf '%s\n' "$out" | grep -E 'SMOKE|BLANKSCAN' | sed 's/^/                     /' || true
+    printf '%s\n' "$out" | tail -3 | sed 's/^/                     /' || true
     fail=$((fail+1)); failed="$failed $id"
   fi
 done <<< "$ROWS"
