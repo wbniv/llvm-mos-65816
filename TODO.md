@@ -88,9 +88,27 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [Nintendo development manual](https://gamingdoc.org/technical-documentation/consoles/super-nintendo/official/sdk/book-i/),
   [SNESdev ROM format documentation](https://snes.nesdev.org/wiki/ROM_file_formats), and
   [map-mode table](https://wiki.superfamicom.org/map-mode-table).
-- [wip T4] **#138 — MOS Late Optimizations crash on `@unpack_slide` (`-O0`/`-Oz`, `-fno-lto`).**
-  <!-- agent:a6e464f54cf3834fb (2026-07-31: Phase A investigation read-only; toolchain-rebuild
-  Phase B gated on build-tree quiescence) -->
+- [wip T4] **#138 — MOS Late Optimizations crash — Phase A DONE (2026-07-31): upstream bug,
+  root-caused; Phase B (fix+rebuild) awaiting quiescence green light.**
+  <!-- agent:a6e464f54cf3834fb (message to green-light Phase B when build tree is quiescent) -->
+  `combineLdImm` (`MOSLateOptimization.cpp:399`) stores through a null `ImmLoad*` when `LDImm`'s
+  dest is not A/X/Y — legal MIR on SPC700 (`Anyi8RegClass` widening, `MOSInstrInfo.cpp:1107`), so
+  it reproduces on **pristine upstream** `llc` (rc=139) with zero fork features; both #138 repro
+  paths are this one bug (the gallery's malformed `$rl1 = LDImm` producer vanished with the
+  07-31 vendor rebuild, likely `0018-320-imag32-spill`, but the defect stayed live). Severity: an
+  immediate fault, never a silent miscompile — no shipped-ROM re-validation needed. Deliverables
+  on `throwaway/138-late-opt-crash` @ `cc14fb2` (worktree `~/llvm-mos-65816-138-late-opt`):
+  versioned plan with provenance matrix, `late-opt-spc700.mir` regression test, 7-line C repro,
+  and `fix-combineldimm-nongpr-dest.patch` (`git apply --check` clean, GPR-class guard — skipping
+  is semantically correct, not just safe). Upstream: standalone fix+PR decision made; artifact +
+  `upstream-contribution-status.md` update land with Phase B. Phase B sequence in the plan;
+  gated on no live builds (9 processes at report time).
+- [T3] **`lowerCmpZeros` sticky loop-carried `Changed` (`MOSLateOptimization.cpp:142`) — found
+  in passing by #138 Phase A.** After the first successful fold in a block, every later
+  un-foldable `CmpZero` is *skipped* instead of lowered, and nothing downstream lowers that
+  pseudo — a survivor reaches the asm printer. Separate bug, separate change; no triggering case
+  built yet. (T3: defect line pinpointed, needs a repro + bounded fix + validation; escalate if
+  the repro shows silent-miscompile reach.)
   Backend segfault reproduced in passing during the abi-clobber investigation: `mos-clang ...
   -fno-lto -S` on `examples/snes/lzss-gallery.c` crashes in `MOS Late Optimizations` at `-O0` and
   `-Oz` (clean at `-O1`; shipped ROMs use LTO where the pass doesn't crash, so no demo impact —
