@@ -11,6 +11,10 @@
        gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-late-opt-nongpr-ldimm --base main \
          --title "[MOS] Fix null-pointer crash in mos-late-opt on an LDImm with a non-GPR destination (SPC700)" \
          --body-file <(sed '2,/^-->$/d; 1d' docs/upstream-late-opt-nongpr-ldimm-pr.md)
+     After posting: (1) flip item 15 in docs/upstream-contribution-status.md to posted with the
+     PR number; (2) refresh wald3n.com's public contributions snapshot — in ~/wald3n.com run
+     `task open-source:refresh` (auto-discovers the new PR), then commit/deploy per that repo's
+     flow; its refresh:check gate fails on a stale snapshot otherwise.
 -->
 
 ## Summary
