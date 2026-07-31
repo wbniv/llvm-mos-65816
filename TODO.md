@@ -42,8 +42,16 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [per-image selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)). See
   [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
   the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
-- [wip T4] **`lzss-gallery` repack differential fails for most works — root-cause: miscompile or
-  demo bug, then land the per-image "Verify fidelity" button.** <!-- agent:a1a412514588ed4c9 (took over 2026-07-31; prior agent a75e8ca02cfc98209 unreachable from orchestrating session) -->
+- [wip T4] **`lzss-gallery` repack differential — VERDICT IN (2026-07-30): demo bug, not a
+  miscompile; merge + validate the fix.** <!-- agent:a1a412514588ed4c9 (pivoted 2026-07-31 to merge+validate) -->
+  The prior session root-caused it: the hand-written thunk `decode_bank7e` clobbers the A-passed
+  argument (`sep #$20; lda #$7e` before `plb`); `+mos-a16` codegen is byte-exact throughout —
+  compiler exonerated. Fix + regression guards verified (62/62 under `GALLERY_BENCH_ONLY`) on
+  branch `wt/119-gallery-near-decode-abi`, unmerged.
+  [Root-cause plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md). Remaining: merge to
+  main, re-run the 40k differential (works 0–3) + bench gate, record what this unblocks (#137
+  step 6, per-image selfcheck, gallery republish half). Deferred: the ~2.5 h full visual corpus
+  gate.
   At 40 000 frames works 0, 2, 3 FAIL their own decode→repack→byte-compare while work 1 passes;
   work 0 recompresses to 15254 vs its embedded `lz_len` 15305 (99.7% — a *nearly* correct buffer,
   and `gallery_last_z` drifts run-to-run, so the corruption is timing-dependent). The decode
@@ -80,6 +88,13 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [Nintendo development manual](https://gamingdoc.org/technical-documentation/consoles/super-nintendo/official/sdk/book-i/),
   [SNESdev ROM format documentation](https://snes.nesdev.org/wiki/ROM_file_formats), and
   [map-mode table](https://wiki.superfamicom.org/map-mode-table).
+- [T4] **#138 — MOS Late Optimizations crash on `@unpack_slide` (`-O0`/`-Oz`, `-fno-lto`).**
+  Backend segfault reproduced in passing during the abi-clobber investigation: `mos-clang ...
+  -fno-lto -S` on `examples/snes/lzss-gallery.c` crashes in `MOS Late Optimizations` at `-O0` and
+  `-Oz` (clean at `-O1`; shipped ROMs use LTO where the pass doesn't crash, so no demo impact —
+  but it is a real backend bug). Existing plan:
+  [#138](docs/plans/2026-07-27-138-lzss-far-decode-mos-late-optimization-crash.md) (PLANNED —
+  fold this fresh repro in). (T4: unknown-root-cause backend debugging.)
 - [T2] **Deferred ordinary-ROM canary matrix** — the non-milestone rows trimmed from the ExHiROM
   video plan: full LoROM size/speed matrix, remaining HiROM sizes + FastROM, SRAM header variants,
   copier-header/legacy-header inputs, PAL headers. Generate from the same authoritative mapping
@@ -1645,7 +1660,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-07-27-136-lzss-gallery-contiguous-artwork-palette** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md](docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md)_  <!-- fp:62c4bd721c304ad6 -->
 <!-- triaged 2026-07-28: verification is deliberately unrun — the plan's own assertion is BLOCKED by the work-0 repack divergence (ROM 15254 vs embedded lz_len 15305). Covered by the curated [verify T2] "#137" item, which records step 6 as FAIL and links this plan. fp:c1b8375f773427e9 -->
 - [verify] **2026-07-30-exhirom-video-boundary-test** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-30-exhirom-video-boundary-test.md](docs/plans/2026-07-30-exhirom-video-boundary-test.md)_  <!-- fp:753923ba3d3bd83c -->
-- [ ] **(triage)** **Not merged to `main`.** The fix lives on this worktree branch. `main`'s — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:4e675c3ad0ba3ad5 -->
-- [ ] **(triage)** **The full 62-work *visual* corpus gate was not re-run** (~2.5 h). Coverage of the codec — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:d674d7d5be702bb7 -->
-- [ ] **(triage)** **Unrelated compiler crash found in passing.** `mos-clang ... -fno-lto -S` on — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:dd1e1ad204ea7356 -->
+<!-- triaged 2026-07-31: all three abi-clobber deferrals dispositioned.
+     • "Not merged to main" + "62-work visual corpus gate not re-run" -> folded into the curated
+       [wip T4] repack-differential bullet, which now records the verdict and tasks the merge,
+       the 40k differential + bench gate, and lists the ~2.5 h visual gate as the deferral.
+     • "Unrelated compiler crash" -> PROMOTED to the curated [T4] "#138 — MOS Late Optimizations
+       crash on @unpack_slide" bullet, pointing at the existing #138 plan. fp:4e675c3ad0ba3ad5
+       fp:d674d7d5be702bb7 fp:dd1e1ad204ea7356 -->
 <!-- END auto-captured-deferrals -->
