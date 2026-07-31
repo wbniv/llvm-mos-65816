@@ -63,12 +63,13 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   retained) — authored **uncommitted** by another session on 2026-07-30
   ([plan](docs/plans/2026-07-30-blankscan-quiescence-gate.md), steps 1–2 recorded PASS).
   With the rebuilt `build/jgxcheck`, `verify-web-roms.sh --only lsystem` passes (1200 frames, 1
-  transition spike correctly ignored). Remaining: the adoption commit (per Will 2026-07-31, the
-  T3 agent is committing the detector fix with attribution to its 2026-07-30 author), and the full
-  114-ROM sweep (satisfied by the in-flight republish's gate run — record its summary into the
-  quiescence plan). No longer blocks publishing lsystem; the republish agent was told to ship it
-  if gates pass.
-- [wip T4] **Implement extended SNES cartridge mapping when the gallery grows above 32 Mbit.**
+  transition spike correctly ignored). Adoption commit landed 2026-07-31: `5587462` (attributed to
+  its 2026-07-30 author; plan steps 1–2b recorded PASS). Remaining: only the full 114-ROM sweep
+  record (satisfied by the in-flight republish's gate run — record its summary into the quiescence
+  plan, then promote this item). No longer blocks publishing lsystem.
+- [wip T4] **Implement extended SNES cartridge mapping (ExHiROM) — general cartridge/mapper test
+  coverage via three standalone size-test ROMs (HiROM 4 MiB; ExHiROM 6/8 MiB), not driven by
+  gallery size; gallery integration is a later optional phase.**
   <!-- agent:a75d84d7b58466d17 (2026-07-31: dispatched Phase 0–1 + cartridge-size test publication;
   the video-player phases 2+ wait on the repack verdict) -->
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
@@ -84,7 +85,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   copier-header/legacy-header inputs, PAL headers. Generate from the same authoritative mapping
   model once the milestone rows (HiROM 4 MiB; ExHiROM 6/8 MiB) pass. Blocked on the `[T4]`
   extended-mapping item's Phase 0. See
-  [plan](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test.md) §Cartridge-configuration
+  [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Cartridge-configuration
   coverage. (T2: bounded fixture generation against a settled model.)
 
 - [wip T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card — now
@@ -1643,5 +1644,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-07-27-139-lzss-gallery-hblank-palette-reuse** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-139-lzss-gallery-hblank-palette-reuse.md](docs/plans/2026-07-27-139-lzss-gallery-hblank-palette-reuse.md)_  <!-- fp:ee3908e30f424828 -->
 - [verify] **2026-07-27-136-lzss-gallery-contiguous-artwork-palette** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md](docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md)_  <!-- fp:62c4bd721c304ad6 -->
 <!-- triaged 2026-07-28: verification is deliberately unrun — the plan's own assertion is BLOCKED by the work-0 repack divergence (ROM 15254 vs embedded lz_len 15305). Covered by the curated [verify T2] "#137" item, which records step 6 as FAIL and links this plan. fp:c1b8375f773427e9 -->
-- [verify] **2026-07-30-lzss-gallery-exhirom-video-boundary-test** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-30-lzss-gallery-exhirom-video-boundary-test.md](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test.md)_  <!-- fp:753923ba3d3bd83c -->
+- [verify] **2026-07-30-exhirom-video-boundary-test** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-30-exhirom-video-boundary-test.md](docs/plans/2026-07-30-exhirom-video-boundary-test.md)_  <!-- fp:753923ba3d3bd83c -->
+- [ ] **(triage)** **Not merged to `main`.** The fix lives on this worktree branch. `main`'s — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:4e675c3ad0ba3ad5 -->
+- [ ] **(triage)** **The full 62-work *visual* corpus gate was not re-run** (~2.5 h). Coverage of the codec — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:d674d7d5be702bb7 -->
+- [ ] **(triage)** **Unrelated compiler crash found in passing.** `mos-clang ... -fno-lto -S` on — _from [2026-07-30-gallery-near-decode-abi-clobber.md](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md)_  <!-- fp:dd1e1ad204ea7356 -->
 <!-- END auto-captured-deferrals -->

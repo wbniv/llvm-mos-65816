@@ -1,15 +1,20 @@
-# LZSS Gallery ExHiROM Video Boundary Test
+# ExHiROM Video Boundary Test
 
 **Status:** PLANNED 2026-07-30  
-**Tracks:** TODO.md `[T4] Implement extended SNES cartridge mapping when the gallery grows above
-32 Mbit`  
+**Tracks:** TODO.md `[T4] Implement extended SNES cartridge mapping (ExHiROM) — general
+cartridge/mapper test coverage, not driven by gallery size`  
 **Target cartridge:** **48 Mbit (6 MiB) ExHiROM**, map mode `$25`, modeled as one 32 Mbit
 (4 MiB) mask ROM plus one 16 Mbit (2 MiB) mask ROM.
 
 ## Goal
 
-Build a deliberately larger-than-32-Mbit gallery cartridge that proves the complete extended
+Build a deliberately larger-than-32-Mbit test cartridge that proves the complete extended
 cartridge path, rather than padding an ordinary LoROM until an emulator happens to accept it.
+The motivation is **general cartridge/mapper test coverage** — exercising the toolchain and
+runtime across cartridge configurations — not a present gallery-capacity need. The deliverables
+are **standalone test ROMs** (the milestone matrix: HiROM 4 MiB; ExHiROM 6 MiB and 8 MiB), not a
+gallery variant; gallery integration (Phase 3) is optional, later, and independent of this
+milestone.
 
 The test payload is a real-time Mode 7 video player. Video is useful here because it:
 
@@ -31,9 +36,9 @@ An optional public-domain film excerpt may be added after the mapping and playba
 
 ## Mockups
 
-Bundle: [`2026-07-30-lzss-gallery-exhirom-video-boundary-test/`](2026-07-30-lzss-gallery-exhirom-video-boundary-test/)
+Bundle: [`2026-07-30-exhirom-video-boundary-test/`](2026-07-30-exhirom-video-boundary-test/)
 
-[![Boundary slate — player states](2026-07-30-lzss-gallery-exhirom-video-boundary-test/boundary-slate.png)](2026-07-30-lzss-gallery-exhirom-video-boundary-test/boundary-slate.html)
+[![Boundary slate — player states](2026-07-30-exhirom-video-boundary-test/boundary-slate.png)](2026-07-30-exhirom-video-boundary-test/boundary-slate.html)
 
 Three player states: a `PRE_4M` slate in aspect-preserving letterbox with the `hud.h`-style BG3
 text bars, the `EDGE_4M` transition in full-screen stretch (sprite badges only, bars disabled),
@@ -445,11 +450,14 @@ If the selected launch or return interval contains a protected NASA identifier a
 animation, choose a nearby clean interval or crop it out; do not paint over a logo frame and then
 represent the result as unmodified NASA material.
 
-### Thirty clip candidates
+### Eligible clip candidates
 
 The target excerpt is 8–20 seconds with large motion, bold silhouettes, limited cuts, and no
 necessary dialogue. Prefer the downloadable Library of Congress item or an original
 agency-produced master—not a restoration, social-media repost, colorization, or rescored edition.
+
+**Hard exclusion:** never use *Duck and Cover* or its animated turtle sequence as source material,
+a fallback, or a visual reference for this test.
 
 | # | Candidate excerpt | Why it should survive 80 × 56 | Candidate source/status |
 |---:|---|---|---|
@@ -464,7 +472,6 @@ agency-produced master—not a restoration, social-media repost, colorization, o
 | 9 | [*The Middleton Family at the New York World's Fair*](https://www.loc.gov/item/mbrs00021068/) — fair machinery | geometric exhibits and mechanical movement | LOC downloadable public-domain item |
 | 10 | [*Master Hands*](https://www.loc.gov/item/mbrs02297907/) — assembly-line machinery | excellent motion/detail stress material | LOC downloadable public-domain item |
 | 11 | [*The Memphis Belle*](https://www.loc.gov/item/mbrs00009301/) — bomber takeoff or formation | large aircraft silhouettes and sky gradients | LOC downloadable public-domain item |
-| 12 | [*Duck and Cover*](https://www.loc.gov/item/mbrs01836081/) — animated turtle sequence | simple graphic animation ideal for low resolution | LOC downloadable public-domain item |
 | 13 | [*Trance and Dance in Bali*](https://www.loc.gov/item/mbrs02425201/) — dance passage | full-body rhythmic motion and costume texture | LOC downloadable public-domain item |
 | 14 | [*Within Our Gates*](https://www.loc.gov/item/mbrs00046435/) — outdoor or train-platform movement | readable staging and historical visual character | LOC downloadable public-domain item |
 | 15 | [*The Hitch-Hiker*](https://www.loc.gov/item/mbrs00047382/) — road/car passage | headlights, road motion, and noir contrast | LOC downloadable public-domain item |
@@ -484,10 +491,9 @@ agency-produced master—not a restoration, social-media repost, colorization, o
 | 29 | [Artemis I launch and return animations](https://svs.gsfc.nasa.gov/14191/) | modern high-contrast launch and exhaust plume | NASA SVS no-audio downloadable clips |
 | 30 | [Apollo 17 Taurus-Littrow flyover](https://svs.gsfc.nasa.gov/4717/) | continuous terrain motion and readable lunar relief | NASA SVS MP4 and frame-set downloads |
 
-Best first visual trials are **#12 Duck and Cover animation**, **#16 Apollo 11 launch**, **#19
-hammer-and-feather**, **#24 ISS Earth limb**, and **#25 SDO solar flare**. Test all five through the
-fixed 223-color quantizer and choose using measured compressed size plus a side-by-side 80 × 56
-contact sheet, not the HD source alone.
+Artemis I is selected. Keep **#16 Apollo 11 launch**, **#19 hammer-and-feather**, **#24 ISS Earth
+limb**, and **#25 SDO solar flare** as fallbacks if item-level rights review or the 80 × 56
+conversion exposes a problem with the selected source.
 
 “Public domain collection” is not a substitute for recording the exact asset used. Before checking
 media into the repository, add a provenance record containing:
@@ -646,10 +652,10 @@ flowchart TB
 | `tools/snes-video-pack.py` | deterministic Mode 7 test-reel converter/packer |
 | `tools/lzss-gallery-rom-layout.py` | extended map/device/boundary HTML |
 | `tools/snes-rom-map.py` | ExHiROM-aware Markdown/diagram report |
-| `examples/snes/lzss-gallery-video.c` | minimal isolated player fixture |
+| `examples/snes/exhirom-video.c` | minimal isolated player fixture |
 | `examples/snes/hud.h` | reused HDMA `BGMODE`/`TM` split HUD; player adds per-mode line tables |
 | `examples/snes/lzss-gallery.c` | optional gallery integration after fixture passes |
-| `dev/lzss-gallery-video.sh` | build, structural, emulator, and frame-readback gate |
+| `dev/exhirom-video.sh` | build, structural, emulator, and frame-readback gate |
 | `test/snes/cartridge-maps/*` | generated LoROM/HiROM/ExHiROM mapper and header matrix |
 | `dev/run.sh` | target routing and test knobs |
 | `docs/snes-demo-cookbook.md` | extended cartridge and video-DMA recipe |
@@ -695,22 +701,22 @@ layout visualization, boundary contact sheet, and verification evidence.
 Each step is a runnable command; per the house verification format, paste the raw output in a code
 block beneath the step with a PASS/FAIL note.
 
-1. `dev/lzss-gallery-video.sh --gate canaries` — every required mapper configuration (HiROM 4 MiB;
+1. `dev/exhirom-video.sh --gate canaries` — every required mapper configuration (HiROM 4 MiB;
    ExHiROM 6 MiB and 8 MiB) has a generated passing canary, and known coprocessor/custom mapper
    inputs are recognized but rejected as unsupported.
 2. `tools/snes-checksum.py --inspect <rom>` — exact ROM length is 6,291,456 bytes; physical
    decomposition is exactly 4 MiB + 2 MiB; header is found only at the ExHiROM location; map mode
    is `$25`; reset and interrupt vectors point to linked executable code; checksum/complement agree
    with independent calculation.
-3. `dev/lzss-gallery-video.sh --gate descriptors` — every emitted descriptor round-trips CPU
+3. `dev/exhirom-video.sh --gate descriptors` — every emitted descriptor round-trips CPU
    address ↔ file offset; PRE/POST boundary canaries are distinct and at exact offsets; no frame
    pixel uses palette index 0 or 224–255, and entry 1 is white.
-4. `dev/lzss-gallery-video.sh --gate segments` — every required logical span is present; no
+4. `dev/exhirom-video.sh --gate segments` — every required logical span is present; no
    individual DMA segment crosses a 64 KiB bank; concatenating each segment list exactly reproduces
    its source object with neither gaps nor duplicated bytes.
-5. `dev/lzss-gallery-video.sh --gate consumers-host` — `BANK_SPAN`, `MULTIBANK_SPAN`, and
+5. `dev/exhirom-video.sh --gate consumers-host` — `BANK_SPAN`, `MULTIBANK_SPAN`, and
    `EDGE_4M` pass through host-model raw DMA, CPU CRC, and LZSS refill.
-6. `dev/lzss-gallery-video.sh --gate map` — every padding/mirror byte is deterministic; the visual
+6. `dev/exhirom-video.sh --gate map` — every padding/mirror byte is deterministic; the visual
    map covers every physical byte exactly once, including the BG3 map/font and OBJ VRAM budgets.
 
 (Exact gate names may be refined during implementation; keep one command per numbered step.)
