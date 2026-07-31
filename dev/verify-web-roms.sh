@@ -56,7 +56,17 @@ MANIFEST="$SITE/public/play/roms/manifest.json"
 [ -d "$DB" ]       || { echo "FATAL: no bsnes-jg Database at $DB"; exit 1; }
 [ -f "$MANIFEST" ] || { echo "FATAL: no manifest at $MANIFEST"; exit 1; }
 
-# id<TAB>off<TAB>len<TAB>want<TAB>frames
+# A `live-record` self-check (the gallery's "verify the artwork on screen" button) is not a scalar
+# compare, so it cannot be replayed as one: the ROM publishes WHICH work is on screen alongside what
+# it repacked that work to, and the assertion is `ok == 1 && z == oracle[work]` against a table the
+# host compressor produced. Replay it in two halves — jgxcheck asserts the record reached its ready
+# state within `frames` (that is the scalar part, and it is what bounds the wait), and a post-check
+# reads the 5-byte record out of the same run's WRAM dump and does the oracle lookup.
+#
+# Headless, this deterministically lands on the FIRST work: the machine starts at frame 0 with the
+# record zeroed, exactly as the browser's `?verify=1` path does. Reproducible, not display-dependent.
+#
+# id<TAB>off<TAB>len<TAB>want<TAB>frames<TAB>mode<TAB>base
 ROWS=$(ONLY="$ONLY" python3 - "$MANIFEST" <<'PY'
 import json, os, sys
 only = {s for s in os.environ.get("ONLY", "").split(",") if s}
@@ -64,18 +74,65 @@ for r in json.load(open(sys.argv[1]))["roms"]:
     sc = r.get("selfcheck")
     if not sc or (only and r["id"] not in only):
         continue
-    print("\t".join([r["id"], str(sc["off"]), str(sc["len"]), str(sc["want"]), str(sc["frames"])]))
+    if sc.get("mode") == "live-record":
+        base = int(str(sc["off"]), 16)
+        # the scalar half: poll `state` until it reaches `ready`
+        row = [r["id"], hex(base + sc["record"]["state"]), "1", str(sc["ready"]),
+               str(sc["frames"]), "live-record", hex(base)]
+    else:
+        row = [r["id"], str(sc["off"]), str(sc["len"]), str(sc["want"]), str(sc["frames"]),
+               "scalar", "-"]
+    print("\t".join(row))
 PY
 )
 
+# Post-check for a live-record row: given the jgxcheck WRAM dump line, resolve the record and assert
+# it against the manifest's host oracle. Prints one PASS/FAIL line; exits non-zero on FAIL.
+record_check() {  # record_check <id> <output>
+  MANIFEST="$MANIFEST" python3 - "$1" <<'PY'
+import json, os, re, sys
+sc = next(r["selfcheck"] for r in json.load(open(os.environ["MANIFEST"]))["roms"]
+          if r["id"] == sys.argv[1])
+rec, dump = sc["record"], os.environ.get("JGXOUT", "")
+m = re.search(r"jgxcheck: WRAM @0x[0-9A-Fa-f]+:((?: [0-9A-Fa-f]{2})+)", dump)
+if not m:
+    print("no WRAM dump in jgxcheck output"); sys.exit(1)
+b = [int(x, 16) for x in m.group(1).split()]
+state, work = b[rec["state"]], b[rec["work"]]
+z, ok = b[rec["z"][0]] | (b[rec["z"][0] + 1] << 8), b[rec["ok"]]
+name = (sc.get("titles") or [])[work] if work < len(sc.get("titles") or []) else f"work {work}"
+if state != sc["ready"]:
+    print(f"record never reached ready (state={state})"); sys.exit(1)
+want = sc["oracle"][work]
+if ok != 1:
+    print(f"{name}: the ROM's own byte-compare rejected its repack (ok=0)"); sys.exit(1)
+if z != want:
+    print(f"{name}: repacked {z} B, host oracle says {want} B"); sys.exit(1)
+print(f"{name}: repacked on-SNES to {z} B == host oracle")
+PY
+}
+
 pass=0; fail=0; missing=0; failed=""
-while IFS=$'\t' read -r id off len want frames; do
+while IFS=$'\t' read -r id off len want frames mode base; do
   [ -n "$id" ] || continue
   rom="$SITE/public/play/roms/$id.sfc"
   if [ ! -f "$rom" ]; then
     printf '  %-16s MISSING %s\n' "$id" "$rom"; missing=$((missing+1)); continue
   fi
-  out=$(JGX_BLANKSCAN=1 "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
+  if [ "$mode" = "live-record" ]; then
+    # JGX_POLL: `frames` is the player's budget, not a rendezvous — stop the instant the record
+    # reaches `ready`, exactly as the browser's chunked poll does. Without it a fixed frame count
+    # would have to land inside the ~530-frame ready window of a ~9100-frame cycle.
+    out=$(JGX_BLANKSCAN=1 JGX_POLL=1 JGX_WRAM_DUMP="$base" JGX_WRAM_DUMP_LEN=5 \
+            "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
+    detail=$(JGXOUT="$out" record_check "$id" 2>&1) || {
+      printf '  %-16s FAIL  live-record: %s\n' "$id" "$detail"
+      fail=$((fail+1)); failed="$failed $id"; continue
+    }
+  else
+    out=$(JGX_BLANKSCAN=1 "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
+    detail=""
+  fi
   # `|| true`: a grep that matches nothing exits 1, and under `set -e` that kills the run mid-way
   # with no summary — which is exactly how an earlier version of this script silently stopped at
   # demo 33 of 113 and looked like a clean pass.
@@ -86,7 +143,11 @@ while IFS=$'\t' read -r id off len want frames; do
   smoke=$(printf '%s' "$out" | grep -oE 'SMOKE: (PASS|FAIL)' | head -1 || true)
   blank=$(printf '%s' "$out" | grep -oE 'BLANKSCAN: (PASS|FAIL)' | head -1 || true)
   if [ "$smoke" = "SMOKE: PASS" ] && [ "$blank" = "BLANKSCAN: PASS" ]; then
-    printf '  %-16s PASS  (%s frames, want %s)\n' "$id" "$frames" "$want"
+    if [ -n "$detail" ]; then
+      printf '  %-16s PASS  (%s frames, %s)\n' "$id" "$frames" "$detail"
+    else
+      printf '  %-16s PASS  (%s frames, want %s)\n' "$id" "$frames" "$want"
+    fi
     pass=$((pass+1))
   else
     printf '  %-16s FAIL  %s %s\n' "$id" "${smoke:-no-smoke}" "${blank:-no-blankscan}"

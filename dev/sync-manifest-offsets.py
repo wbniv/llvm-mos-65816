@@ -18,6 +18,24 @@ at the wrong field. `lzss-gallery` is the first: its button asserts one artwork'
 `gallery_last_z`, not the whole-corpus `corpus_result`
 (see docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
 
+The same file also carries the second thing that drifts: a per-work ORACLE TABLE. A `live-record`
+self-check (the gallery's "verify the artwork on screen" button) does not compare against a scalar
+`want` — the ROM publishes which work is displayed and what it repacked that work to, and the
+player looks the expected size up in a table the HOST compressor produced. Hand-maintaining 62
+numbers across every corpus regeneration is exactly the drift that left `frames` at 200000 through
+five corpus expansions, so the table is generated, not written:
+
+  "selfcheck": {
+    "oracleFrom": {"report": "assets/snes/lzss-gallery/derived/report.json",
+                   "value": "compressed_bytes", "title": "title"},
+    "oracle": [15305, ...],          <- materialized here, in report.json array order
+    "titles": ["Under the Wave …"]   <- materialized only when `title` is declared
+  }
+
+Resyncing it is gated on the same "built ROM is byte-identical to the shipped ROM" check as `off`:
+a table describing a corpus the shipped ROM was not built from is worse than a stale one, because
+it reports a per-artwork MISMATCH to visitors for a ROM that is in fact correct.
+
   dev/sync-manifest-offsets.py                 # update ~/biohack.net's manifest in place
   dev/sync-manifest-offsets.py --check         # report drift, change nothing (exit 1 if any)
   dev/sync-manifest-offsets.py --site DIR
@@ -42,6 +60,32 @@ def symbol_addr(mapfile: pathlib.Path, symbol: str = "corpus_result"):
     return None
 
 
+def oracle_tables(spec: dict):
+    """Return {"oracle": [...], "titles": [...]} built from the host report `spec` names.
+
+    Raises SystemExit on a malformed spec — a silently skipped table would ship a stale oracle,
+    which is the exact failure this generator exists to prevent.
+    """
+    report = ROOT / spec["report"]
+    rows = json.loads(report.read_text())
+    if not isinstance(rows, list) or not rows:
+        raise SystemExit(f"FATAL: {report} is not a non-empty JSON array")
+    out = {}
+    value_key = spec["value"]
+    try:
+        out["oracle"] = [int(r[value_key]) for r in rows]
+    except KeyError:
+        raise SystemExit(f"FATAL: {report} rows have no '{value_key}' field")
+    # The record the player reads publishes `z` as a uint16; an oracle entry that cannot be
+    # represented there would compare unequal forever rather than fail loudly.
+    bad = [v for v in out["oracle"] if not 0 <= v <= 0xffff]
+    if bad:
+        raise SystemExit(f"FATAL: {report} '{value_key}' out of uint16 range: {bad[:4]}")
+    if spec.get("title"):
+        out["titles"] = [str(r[spec["title"]]) for r in rows]
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--site", default=str(pathlib.Path.home() / "biohack.net"))
@@ -51,7 +95,7 @@ def main():
     manifest = pathlib.Path(args.site) / "public/play/roms/manifest.json"
     data = json.loads(manifest.read_text())
 
-    changed, missing, same = [], [], 0
+    changed, missing, same, tables = [], [], 0, []
     for rom in data["roms"]:
         sc = rom.get("selfcheck")
         if not sc:
@@ -78,15 +122,26 @@ def main():
             changed.append((rom["id"], old, addr, symbol))
             sc["off"] = f"0x{addr:x}"
 
+        # Per-work oracle table, regenerated from the host report (see module docstring).
+        spec = sc.get("oracleFrom")
+        if spec:
+            for key, values in oracle_tables(spec).items():
+                if sc.get(key) != values:
+                    tables.append((rom["id"], key, len(sc.get(key) or []), len(values)))
+                    sc[key] = values
+
     for slug, old, new, symbol in changed:
         print(f"  {slug:16s} {symbol:18s} off 0x{old:x} -> 0x{new:x}")
+    for slug, key, was, now in tables:
+        print(f"  {slug:16s} {key:18s} table {was} -> {now} entries (regenerated)")
     if missing:
         print(f"  no map for: {' '.join(missing)}")
-    print(f"\n{len(changed)} offset(s) changed, {same} unchanged, {len(missing)} without a map")
+    print(f"\n{len(changed)} offset(s) changed, {same} unchanged, "
+          f"{len(tables)} table(s) regenerated, {len(missing)} without a map")
 
     if args.check:
-        return 1 if changed else 0
-    if changed:
+        return 1 if (changed or tables) else 0
+    if changed or tables:
         manifest.write_text(json.dumps(data, indent=2) + "\n")
         print(f"wrote {manifest}")
     if missing:

@@ -56,13 +56,21 @@ visitor did not ask, and would keep reporting "verified" no matter how far they 
 is the same category of mistake as the whole-corpus assertion this plan replaced: a check whose
 subject is not the thing on screen.
 
-> **This respecification is NOT implemented.** The verification recorded below was performed against
-> the superseded work‑0 design, and it stands as evidence that the *codec* is correct — but the
-> button itself now needs the mechanism worked out (below) and is queued as this item's next phase.
+> **Status of this respecification — 2026‑07‑31.** Mechanism chosen and the **ROM half + the
+> offline tooling are implemented and gated** (*Chosen mechanism* and verification steps 5–9 below,
+> branch `feature/verify-fidelity-button`). The **player half is specified and escalated** — it
+> lives in `@wbniv/bsnes-jg-player`, a separate package with its own release cycle, and no button
+> can honour "the displayed artwork" until it ships, because today's `verify()` power-cycles the
+> ROM and destroys the visitor's position before reading anything. Until then the manifest carries
+> the measured work‑0 fallback, which is at least *true*. The verification recorded further below
+> was performed against that superseded work‑0 design and stands as evidence that the *codec* is
+> correct.
 
 ## Design
 
-The ROM already publishes per-work state (`record_result()`), so no ROM change is needed:
+The ROM already publishes per-work state (`record_result()`) — this was read, in 2026‑07‑28, as
+meaning no ROM change is needed. It does not: the fields below describe the last *processed* work,
+not the displayed one (see *Chosen mechanism*).
 
 | symbol | addr | meaning |
 |---|---|---|
@@ -86,7 +94,11 @@ produced *exactly* the byte count the host compressor produces. A miscompile in 
 > the `decode_bank7e` A‑clobber; with the fix landed on `main` (`2932bcf`) a 12 000‑frame run reads
 > `gallery_last_z = 0x3BC9` with `gallery_last_ok = 1`. Raw output under *Verification* below.
 
-### Design notes for "currently displayed" — mechanism not yet chosen
+### Design notes for "currently displayed" — the two candidates costed on 2026‑07‑31
+
+> **Superseded by *Chosen mechanism* below (2026‑07‑31).** Both candidates below assumed the check
+> has to be *made to happen* on demand. It already happens — see the next section. Retained because
+> the cost analysis is what led there.
 
 **The core obstacle: one manifest entry can only assert one static value.** The manifest's
 `off`/`len`/`want`/`frames` tuple is a single constant comparison — the player powers on, runs
@@ -136,23 +148,330 @@ Rejected alternatives:
 `frames` becomes "long enough that the displayed work has been verified", measured rather than
 guessed — under the superseded work‑0 design that was 12 000, measured below.
 
+## Chosen mechanism — 2026‑07‑31
+
+**(c) Publish the displayed work's verdict; verify it *in place* against a host oracle table.**
+
+Neither (a) nor (b) as written. Reading the player harness and the ROM's main loop turned up three
+facts that reshape the problem, and the third dissolves most of it.
+
+**Fact 1 — the button power-cycles the ROM, so "displayed" is unreachable without a player change.**
+`verify()` in `@wbniv/bsnes-jg-player`'s `web/app.js` does not check the running machine. It
+re-fetches the `.sfc`, calls `loadRomBytes()` (a cold power-on), runs `frames` frames from boot,
+and only then reads WRAM:
+
+```js
+    stopLoop();
+    // re-load this ROM to power on cleanly, like the gate's harness.
+    fetch(bust("roms/" + current + ".sfc"))
+      .then(...)
+      .then(function (buf) {
+        loadRomBytes(new Uint8Array(buf));
+```
+
+Whatever the visitor had navigated to is destroyed by the act of pressing the button. A
+power-cycling button can only ever verify `GALLERY_START` — which *is* the superseded work‑0
+design, reached by accident. **This forecloses the "no player change" branch of candidate (b): the
+manifest staying a scalar comparison does not buy a working button, because the thing being
+compared is no longer the thing the visitor was looking at.** A player change is unavoidable, and
+once it is on the table the marginal cost of also doing a table lookup (candidate (a)) is small
+next to the cost of the in-place-verify change itself.
+
+**Fact 2 — the gallery already verifies every work in the frames it is displaying it.** The main
+loop is not browse-then-check; it is a display-and-check pipeline (`lzss-gallery.c:1210`):
+`prepare_slide(a)` puts work *k* on screen → `repack_slide(a)` recompresses the decoded pixels →
+`verify_slide(a,z,ok)` byte-compares the repacked stream against the embedded one, decodes it
+again and re-checksums → `record_result(...)`. Candidate (b)'s "ROM-side check-on-display" is
+already built and shipping. There is nothing to add and no on-demand decode→repack to schedule.
+
+**Fact 3 — `gallery_last_*` names the wrong subject, and the divergence window is the long one.**
+Tracing the loop: `prepare_slide` changes the screen; `record_result` moves `gallery_last_work`.
+Between those two calls sits the entire repack + verify phase, which is ~97% of a work's wall time
+(measured below). So for almost the whole time a work is on screen, `gallery_last_work` still names
+its **predecessor**. Outside that window the two agree — during `hold(180)`, and during the *next*
+work's `unpack_slide`/`spinout`, where the screen still shows the old work. The gap is therefore
+not "the ROM lacks a browsing cursor" (`gallery_current_asset` at `0x472` has been published all
+along); it is that the *verdict* is published against the pipeline cursor rather than the screen.
+
+So the mechanism is: **publish the existing verdict against the displayed work, coherently, and let
+the player compare it to a host-computed table.**
+
+### What the ROM publishes
+
+One contiguous, padding-free record — `examples/snes/lzss-gallery.c`:
+
+```c
+#define GALLERY_SHOWN_NONE     0u  /* fields in flux, or nothing on screen yet */
+#define GALLERY_SHOWN_PENDING  1u  /* `work` is on screen, verdict not in yet */
+#define GALLERY_SHOWN_VERIFIED 2u  /* `work`/`z`/`ok` are a coherent verdict */
+typedef struct{uint16_t z;uint8_t work,ok,state;}GalleryShown;
+volatile GalleryShown gallery_shown;
+```
+
+| member | offset | meaning |
+|---|---|---|
+| `z` | base+0 | uint16 LE — repacked byte count of the displayed work |
+| `work` | base+2 | index of the work **on screen** |
+| `ok` | base+3 | 1 iff that work cleared every stage |
+| `state` | base+4 | `0` none/in-flux, `1` on screen unverified, `2` verdict valid |
+
+Written in exactly two places:
+
+- **`prepare_slide()`**, right after `REG_INIDISP=INIDISP_ON` — a new work owns the screen, so the
+  previous verdict is stale: `state=NONE`, then `z=0; ok=0; work=k`, then `state=PENDING`.
+- **`record_result()`**, first thing — `state=NONE`, then `z=z; work=k; ok=ok`, then
+  `state=VERIFIED`. The whole record is rewritten rather than patching the `PENDING` one, so it
+  stays correct if the loop is ever restructured to reach `record_result` by another route.
+
+**`state` is the publication barrier**: cleared before any other field is touched, raised after all
+of them. A reader that samples `state == 2` is guaranteed `work`/`z`/`ok` describe the same work; a
+reader must ignore every other field while `state == 0`. This matters even though the player reads
+WRAM only between frames, because a frame boundary can fall between the individual stores.
+
+`uint16_t` goes first so the record is padding-free on any ABI and the member offsets above are
+fixed constants the manifest can carry. **The base is still a link address** — read it from the
+shipped ROM's `.map` (`dev/sync-manifest-offsets.py` does this via `selfcheck.symbol`), never from
+this document. In the 2026‑07‑31 build it is `0x477`, and adding it moved `gallery_failed`/
+`gallery_done` from `0xdf9`/`0xe37` to `0xdfe`/`0xe3c` — the warning at the top of this plan,
+demonstrated again by this very change.
+
+`gallery_last_z`/`_work`/`_ok` and `gallery_current_asset` are left untouched: the offline gate,
+`dev/jgxcheck.cpp` probes and the recorded evidence in this plan all reference them.
+
+### The player / manifest contract
+
+A new optional `selfcheck.mode`. **Absent ⇒ today's behaviour, byte-identical** — all 100+ other
+demos are unaffected, and this is what makes the change safe to release.
+
+```jsonc
+"selfcheck": {
+  "mode":   "live-record",              // opt in; absent = legacy power-on scalar assert
+  "symbol": "gallery_shown",            // sync-manifest-offsets.py resolves `off` from this
+  "off":    "0x477",                    // RESYNCED FROM THE MAP — never hand-written
+  "record": { "z": [0,2], "work": 2, "ok": 3, "state": 4 },   // member offsets from `off`
+  "ready":  2,                          // poll until state == this
+  "oracle": [15305, 15234, ...],        // 62 host compressed_bytes, report.json array order
+  "titles": ["Under the Wave off Kanagawa", ...],   // optional, for the badge text
+  "frames": 24000,                      // poll budget (see Frames budget)
+  "poll":   120,                        // frames per chunk, as today
+  "label":  "displayed artwork repacked on-SNES == host oracle"
+}
+```
+
+Player algorithm when `mode == "live-record"`:
+
+1. **Do not reload the ROM and do not power-cycle.** Verify the machine that is running.
+2. Chunk `poll` frames at a time, up to `frames` total. After each chunk read the `record` bytes at
+   `off`.
+3. While `state != ready`: badge `verifying <titles[work]>… n/frames` (when `state != 0`, so `work`
+   is trustworthy; otherwise just `verifying…`).
+4. On `state == ready`: **PASS iff `ok === 1 && z === oracle[work]`.**
+   - pass → `✓ FIDELITY <titles[work]> — repacked on-SNES to <z> B == host oracle`
+   - `z` mismatch → `✗ MISMATCH <titles[work]> got <z> want <oracle[work]>`
+   - `ok === 0` → `✗ FAILED <titles[work]> — the ROM's own byte-compare rejected its repack`
+5. If `work` changes mid-poll (the visitor navigated), re-target once and reset the frame counter,
+   badging `following your navigation to <titles[work]>`; on a second change, stop with
+   `navigation kept restarting the check — hold on one artwork and try again`.
+6. On budget exhaustion: `⏱ still verifying <titles[work]> — not finished within <frames> frames`.
+   **Indeterminate, not a failure** — it must not render as a red ✗.
+7. Resume the live loop from wherever it reached. Because there is no reload, **the visitor's
+   browsing position survives the button**, which today it does not.
+
+Why the oracle stays on the player side: the ROM embeds its own `lz_len` per work and compares
+against it, so `ok` alone is the ROM grading its own homework — candidate (b)'s objection, and it
+is a real one. `oracle[]` is generated from `assets/snes/lzss-gallery/derived/report.json`, which
+the **host** compressor produced; the browser does the comparison. That is what "reproduce the
+gate's assert in this tab" means, and it also makes a corpus regeneration that outruns the ROM show
+up as a loud mismatch instead of silent drift. Asserting `ok === 1` *as well* costs nothing and
+catches the stages `z` cannot see (the second decode, both `fold_far` checksums, the byte compare).
+
+**`?verify=1` keeps working, and stays deterministic.** `playUrl()` auto-fires `verify()` when the
+query string carries `verify=1` — that is what `dev/verify-web-roms.sh` and the hook CI drive. On a
+fresh page load the machine is at frame 0, so `gallery_shown.state == NONE` and the poll runs until
+the *first* work verifies: under `?verify=1` the live-record mode degenerates exactly to the
+work‑0 assertion, unattended and reproducible. The displayed-work behaviour only diverges from it
+for a human who has actually navigated. **This is why in-place verification does not cost the
+headless gate anything** — and why the budget below is sized on work 0, the one `?verify=1` waits
+for.
+
+Implementation shape, against the current `verify()` (`~/bsnes-jg-wasm/web/app.js:235`) — the
+legacy path is the `else` branch and must stay byte-for-byte what it is today:
+
+```js
+  function verify() {
+    var meta = romMeta(current); if (!meta || !meta.selfcheck) return;
+    var sc = meta.selfcheck;
+    if (sc.mode !== "live-record") { /* ...existing power-on path, unchanged... */ return; }
+
+    // No stopLoop(), no fetch, no loadRomBytes: verify the machine that is running.
+    var rec = sc.record, poll = sc.poll || 120, total = sc.frames, done = 0;
+    var target = null, retargets = 0;
+    checkEl.className = "badge running";
+    (function chunk() {
+      for (var i = 0; i < poll; i++) Module._bjg_run();
+      done += poll; present();
+      var wram = Module._bjg_wram() >>> 0, u8 = Module.HEAPU8, base = wram + Number(sc.off);
+      var state = u8[base + rec.state];
+      var work  = state ? u8[base + rec.work] : null;          // ignore every field while state==0
+      var name  = (sc.titles && work != null) ? sc.titles[work] : ("work " + work);
+      if (work != null && target != null && work !== target) {  // the visitor navigated
+        if (++retargets > 1) return badge("fail", "navigation kept restarting the check…");
+        target = work; done = 0;
+        badge("running", "following your navigation to " + name);
+      } else if (work != null && target == null) { target = work; }
+      if (state !== sc.ready) {
+        if (done >= total) return badge("warn", "⏱ still verifying " + name + " — …");
+        return setTimeout(chunk, 0);                            // and keep the badge counting
+      }
+      var z = u8[base + rec.z[0]] | (u8[base + rec.z[0] + 1] << 8), ok = u8[base + rec.ok];
+      var want = sc.oracle[work];
+      if (ok === 1 && z === want) badge("pass", "✓ FIDELITY " + name + " — repacked on-SNES to " + z + " B == host oracle");
+      else if (ok !== 1)          badge("fail", "✗ FAILED " + name + " — the ROM's own byte-compare rejected its repack");
+      else                        badge("fail", "✗ MISMATCH " + name + " got " + z + " want " + want);
+    })();
+  }
+```
+
+Note `badge("warn", …)` needs a third badge class alongside `pass`/`fail` — timeout is
+indeterminate and must not render red (failure mode table below).
+
+### Frames budget
+
+**The button is a real wait, and that is the honest answer — but it is not extra work.** The ROM
+is already recompressing the displayed artwork; the button waits for a computation that was going
+to happen regardless, and the wait is *visible on the SNES screen the whole time* (the `REPACK`
+progress line and the live compressor cursor sweeping the image). That is the UX contract: the
+badge counts frames next to a picture that is visibly being worked on, so it reads as watching,
+not as hanging. It must never present as a spinner with nothing behind it.
+
+Measured per-work stage costs (frames), read out of `gallery_repack_frames`/`gallery_verify_frames`
+and the three decode counters at 30 000 frames:
+
+| k | slug | unpack | stage | near | repack | verify | repack+verify | full work |
+|---|---|---|---|---|---|---|---|---|
+| 0 | great-wave | 144 | 53 | 123 | 8169 | 336 | **8505** | 8825 |
+| 1 | grande-jatte | 140 | 54 | 120 | 7559 | 317 | **7876** | 8190 |
+| 2 | water-lilies | 143 | 54 | 121 | 7688 | 325 | **8013** | 8331 |
+
+So the two cases the budget has to cover are:
+
+- **In-place, worst case** — the visitor presses the button one frame after a new work took the
+  screen: `prepare_slide` + `hold(60)` + repack + verify ≈ **8 600 frames** for the works measured.
+- **From a cold power-on** (`?verify=1`, and `dev/verify-web-roms.sh`) — splash + the first
+  `unpack_slide` + `prepare_slide` + `hold(60)` + repack + verify. Measured exactly, not bracketed:
+  `JGX_POLL` reports **frame 9 376** (step 8 below). The larger of the two, so it sets the budget.
+
+`frames: 24000` — **2.56×** the measured cold-boot case, with headroom for the corpus's larger and
+denser works (raw lengths run 12 692–16 184 B, and a literal-heavy image such as `thistles`, 14 186
+literals, does more search per byte than `great-wave`'s 11 252). **This is a budget, not a
+rendezvous:** both the browser and `dev/verify-web-roms.sh` stop the instant `state` reaches
+`ready`, so the typical cost is ~8 500–9 400 frames and 24 000 is only ever reached by something
+genuinely wrong.
+
+> **Why a fixed frame count could not work here, and what it cost.** `VERIFIED` persists only from
+> `record_result` until the *next* `prepare_slide` — `hold(180)` plus the next work's
+> `unpack_slide` and `spinout`, ≈ 530 frames out of a ≈ 9 100-frame cycle. A harness that runs a
+> fixed count and reads once lands inside that window ~6% of the time and would fail a correct ROM
+> the other 94%. `dev/jgxcheck.cpp` therefore gained **`JGX_POLL=1`**: stop as soon as the asserted
+> value appears, up to `frames`, and report the frame it matched on. That makes the headless replay
+> the same algorithm as the browser's chunked poll instead of an approximation of it — and it is
+> what makes the budget above measurable rather than guessed.
+
+### Failure modes
+
+| mode | behaviour | why it is safe |
+|---|---|---|
+| **Wrong work displayed mid-check** | `work` changes during the poll | Step 5: re-target once, then stop with an explanatory badge. The `state` barrier means a changed `work` can never be paired with the old `z`/`ok`. |
+| **Check interrupted by navigation** | `nav_cancel` aborts repack; the loop re-enters `unpack_slide`/`prepare_slide` | `prepare_slide` drops `state` to `NONE` before naming the new work, so the player sees "not ready" rather than a stale verdict, and step 5 handles the rest. |
+| **Stale oracle vs rebuilt ROM** | corpus regenerated, manifest `oracle[]` not | Loud per-artwork `✗ MISMATCH got/want`. `dev/sync-manifest-offsets.py --check` reports the drift offline before it ships. |
+| **Stale `off` after a relink** | any struct change moves `gallery_shown` | Same guard as every other demo: `sync-manifest-offsets.py` resyncs `off` from the map via `selfcheck.symbol`, and refuses a map whose `build/<slug>.sfc` is not byte-identical to the shipped ROM. |
+| **Torn read across a frame boundary** | player samples mid-`record_result` | `state` is the barrier; a partial record always reads `state == 0`. |
+| **Power-on residue read as a verdict** | fresh boot, nothing displayed yet | `gallery_shown` is `.bss` (crt0-zeroed) and `GALLERY_SHOWN_NONE == 0`, so a fresh machine reads "not ready". |
+| **Budget exhausted** | slow device, or the visitor pressed the button one frame after navigating | Indeterminate badge, not a red ✗ (step 6). The check never claims a failure it did not observe. |
+| **Player still on the legacy build** | site not yet resynced | `mode` is unknown to it, so it takes the legacy path against `off`/`len`/`want`. Sequencing below keeps that path pointing at something true. |
+
+### Rejected — and why
+
+- **(a) as specified: player-side oracle table on top of a power-on run.** The lookup half is kept;
+  the power-on half is what fails. Reaching an arbitrary displayed work from boot means replaying
+  the visitor's navigation into a fresh machine, or waiting for the sweep to reach that work (up to
+  ~62 works × the per-work cost). Both are worse than not power-cycling.
+- **(b) as specified: ROM self-certifies, manifest stays scalar.** The "no player change" benefit
+  is illusory (Fact 1), so its cost — the independent host oracle dropping out of the loop — buys
+  nothing. `ok` is retained as a *secondary* assertion, not the primary one.
+- **Infer readiness from the existing symbols** (`gallery_last_work == gallery_current_asset`, then
+  read `gallery_last_z`). Tempting because it looks like a zero-ROM-change design, and the four
+  bytes at `0x472`–`0x476` are conveniently contiguous today. It is not zero-change: (i)
+  `record_result` writes `gallery_last_ok` *after* `gallery_last_work`, so a reader that trusts the
+  equality can pair work *k* with work *k−1*'s `ok` — a real torn read needing a ROM reorder anyway;
+  (ii) the contiguity is a linker accident of declaration order, not a declared layout; (iii) the
+  reader has to infer a state machine that nothing in the ROM asserts. Given a ROM change is needed
+  either way, an explicit five-byte record with a stated coherence rule costs the same rebuild and
+  removes all three hazards.
+- **A pad-injected "verify now" command** (player presses a chord, ROM re-runs decode→repack for the
+  displayed work on demand). Adds a second verification path to the ROM, a button-mapping contract,
+  and a full decode→repack the pipeline was about to do anyway. Fact 2 makes it redundant.
+- The alternatives already rejected above (work‑0 only, `gallery_progress >= 1`, `corpus_result`
+  with `frames ≈ 710 000`) stand rejected for the reasons given there.
+
+### Sequencing — what lands where
+
+The ROM half and the tooling half land in this repo and are inert to the current player: the record
+is additive, and a legacy player ignores `mode`. The player half is a separate package
+(`@wbniv/bsnes-jg-player`, `~/bsnes-jg-wasm`, `web/app.js` → `dist/engine/app.js`, synced to sites
+by `bin/sync.mjs`) with its own release cycle — **specified above, escalated, not edited from here.**
+
+Until that release, the manifest entry keeps the **legacy scalar form**, pointed at the measured
+work‑0 fallback (`symbol: gallery_last_z`, `want 0x3BC9`, `frames 12000`). That is the superseded
+design — but it is *true*, whereas the currently shipped entry (`off 0x46e`, `want 0x839F`,
+`frames 200000`) is stale on all three counts and fails for every visitor. Restoring a true
+assertion now and switching `mode` on when the player ships is strictly better than leaving the
+button broken while waiting.
+
+**Interim edit, ready to apply with the in-flight republish** (verification step 6 shows it is
+valid against *both* the record-carrying ROM and the one without it, because this change moves no
+previously published address):
+
+```jsonc
+"selfcheck": {
+  "off":    "0x473",          // sync-manifest-offsets.py rewrites this from the map — do not hand-set
+  "len":    2,
+  "want":   "0x3BC9",         // 15305 = report.json[0].compressed_bytes, great-wave
+  "frames": 12000,
+  "symbol": "gallery_last_z", // MANDATORY, or the next resync points it back at corpus_result
+  "label":  "first artwork repacked on-SNES == host oracle"
+}
+```
+
+This repo does **not** edit `~/biohack.net` — the manifest edit belongs to whoever runs the
+republish, immediately after `dev/sync-manifest-offsets.py`, and `dev/verify-web-roms.sh --only
+lzss-gallery` must pass before the deploy.
+
 ## Steps
 
 1. ~~Measure the frame at which work 0 completes (`gallery_progress` becomes 1); add margin.~~
    **Done 2026‑07‑31** — work 0 is complete well before 12 000 frames (`progress = 1`,
    `last_ok = 1`); 12 000 is the measured budget with margin.
-2. **RESPECIFIED 2026‑07‑31, not implemented.** Choose mechanism (a) or (b) from *Design notes for
-   "currently displayed"*, publish the browsing cursor from the ROM, and wire the button to the
-   displayed work.
+2. ~~**RESPECIFIED 2026‑07‑31.** Choose mechanism (a) or (b), publish the browsing cursor from the
+   ROM, and wire the button to the displayed work.~~ **Mechanism chosen and ROM half done
+   2026‑07‑31** — neither (a) nor (b) but (c), *Chosen mechanism* above. `gallery_shown` is
+   published by `prepare_slide()`/`record_result()`; verification steps 5–8 below.
 
-   > The superseded work‑0 wiring, kept because it is measured and ready if the fallback is taken:
-   > `off` = the map's `gallery_last_z` (`0x473` in the 2026‑07‑31 build — re-read it),
-   > `len 2`, `want 0x3BC9`, `frames 12000`, `"symbol": "gallery_last_z"`.
+   > The superseded work‑0 wiring, kept because it is measured and is what the manifest carries
+   > until the player ships: `off` = the map's `gallery_last_z` (`0x473` in the 2026‑07‑31 build —
+   > re-read it), `len 2`, `want 0x3BC9`, `frames 12000`, `"symbol": "gallery_last_z"`.
 
-3. Verify the new selfcheck passes headlessly before publishing.
-4. Republish (biohack.net only — indri.studio has no `public/play/roms/manifest.json`).
+3. ~~Verify the new selfcheck passes headlessly before publishing.~~ **Tooling done 2026‑07‑31** —
+   `dev/verify-web-roms.sh` learned `mode: "live-record"` and replays it headlessly (jgxcheck
+   asserts `state` reached `ready`; a post-check does the `ok == 1 && z == oracle[work]` lookup out
+   of the same run's WRAM dump). `dev/sync-manifest-offsets.py` learned `oracleFrom` and generates
+   the 62-entry table. **The manifest edit itself still waits on the republish** (below).
+4. Republish (biohack.net only — indri.studio has no `public/play/roms/manifest.json`), then wire
+   the manifest entry. **BLOCKED on the gallery republish** — see *Sequencing* above.
 5. ~~Record the full-corpus expectation in `dev/lzss-gallery.sh`~~ **Done** — the all-62-work
    `GALLERY_BENCH_ONLY` decode gate (`0x5CF0` all-pass / `0xA50F` any-failure) landed with the fix.
+6. **Player package** — implement `mode: "live-record"` in `@wbniv/bsnes-jg-player` per *The player
+   / manifest contract*, release, resync the sites. **ESCALATED — not landable from this repo.**
 
 > **The `"symbol"` field is mandatory here, not decorative.** `dev/sync-manifest-offsets.py`
 > rewrites every selfcheck's `off` to the freshly rebuilt ROM's link address, and it used to
@@ -225,6 +544,234 @@ failed[k] : 000000000000...      failed = []
 
 **PASS** — against the recorded pre-fix observation `failed = [0, 2, 3]`. All four works now pass
 their own decode → repack → byte-compare.
+
+### Added 2026‑07‑31 — mechanism (c): the displayed-work record
+
+Built on `feature/verify-fidelity-button` (worktree, hardlinked toolchain per
+`docs/howto-feature-worktree.md`). All addresses below are read from that build's
+`build/lzss-gallery.map`, never from prose.
+
+5. **The full-corpus decode gate still passes with the record added** —
+   `QUICK=1 BENCH_FRAMES=30000 dev/run.sh lzss-gallery`.
+
+```
+==> target build (+mos-a16, 1 MiB LoROM)
+/work/build/lzss-gallery.sfc: LoROM size=1024KiB map_mode=0x20 rom_size_byte=0x0A checksum=0x63E2 complement=0x9C1D
+NMI opcode audit: PASS (long conditional and 16-bit immediate are explicit)
+decode_bank7e ABI audit: PASS (A-safe PEA/PLB; 08 8b f4 7e 7e ab ab 20 8a 82 ab 28 60)
+bank $00 asset gate: PASS (FONT16=$15:EF29, FONT8=$07:FB54; 5779 B before header)
+==> fast decode gate (GALLERY_BENCH_ONLY, all 62 works)
+/work/build/lzss-gallery-bench.sfc: LoROM size=1024KiB map_mode=0x20 rom_size_byte=0x0A checksum=0xD65A complement=0x29A5
+SMOKE: PASS off=0x24 len=2 got=0x5CF0 (ran 30000 frames, bsnes-jg)
+fast decode gate: PASS (all 62 works far-decoded, staged, near-decoded, checksummed)
+==> corpus_result @ WRAM 0x46f; oracle 0x96D8
+SMOKE: PASS off=0x471 len=1 got=0x00 (ran 1000 frames, bsnes-jg)
+aa3b7f278ac689ca377bf4999cd316aa9fb0d5ac2e080796cc439a7d606f741f  /work/build/lzss-gallery.sfc
+RESULT: PASS — 62-work LZSS gallery host oracle, relink, header and bsnes-jg gate
+```
+
+**PASS** — `0x5CF0` is the all-62-pass latch. Note `corpus_result`'s own oracle for the *visual*
+ROM is `0x96D8`, not the `0x839F` the shipped manifest still asserts: a third independent way the
+live entry is stale.
+
+6. **The record is additive — every previously published address is unmoved.**
+
+```
+  corpus_result          main=46f    mine=46f    same
+  gallery_progress       main=471    mine=471    same
+  gallery_current_asset  main=472    mine=472    same
+  gallery_last_z         main=473    mine=473    same
+  gallery_last_work      main=475    mine=475    same
+  gallery_last_ok        main=476    mine=476    same
+  gallery_shown          main=-      mine=477    DIFFERS
+```
+
+**PASS** — `gallery_shown` lands at `0x477`, size 5 (padding-free, as the layout requires).
+`gallery_failed`/`gallery_done` shift `0xdf9`→`0xdfe` and `0xe37`→`0xe3c`; nothing published
+references them. The practical consequence is that **the interim work‑0 fallback wiring is valid
+against both ROMs**, so it can be wired at the in-flight republish without waiting for this change.
+
+7. **The state machine tracks the screen, and `gallery_last_*` demonstrably does not.** One
+   4096-byte WRAM dump per frame count, decoded against the map:
+
+```
+gallery_shown @ 0x477 size 5
+frame   3000 | shown: state=PENDING  work= 0 z=    0 ok=0 | last_work= 0 last_z=    0 last_ok=0 | current_asset= 0 progress=0
+             | done=[] failed=[]
+frame   9000 | shown: state=PENDING  work= 0 z=    0 ok=0 | last_work= 0 last_z=    0 last_ok=0 | current_asset= 0 progress=0
+             | done=[] failed=[]
+frame  12000 | shown: state=PENDING  work= 1 z=    0 ok=0 | last_work= 0 last_z=15305 last_ok=1 | current_asset= 1 progress=1
+             | done=[0] failed=[]
+frame  20000 | shown: state=PENDING  work= 2 z=    0 ok=0 | last_work= 1 last_z=14879 last_ok=1 | current_asset= 2 progress=2
+             | done=[0, 1] failed=[]
+frame  30000 | shown: state=PENDING  work= 3 z=    0 ok=0 | last_work= 2 last_z=14986 last_ok=1 | current_asset= 3 progress=3
+             | done=[0, 1, 2] failed=[]
+frame  40000 | shown: state=PENDING  work= 4 z=    0 ok=0 | last_work= 3 last_z=15234 last_ok=1 | current_asset= 4 progress=4
+             | done=[0, 1, 2, 3] failed=[]
+```
+
+**PASS**, and it is the whole argument for the respec in one table:
+
+- **`gallery_last_work` names the wrong painting, every time we looked.** At frame 12 000 the ROM
+  is *displaying work 1* while `gallery_last_z` reads `15305` — work 0's answer. The superseded
+  work‑0 wiring (`gallery_last_z == 0x3BC9`, `frames 12000`) passes at exactly that frame, and it
+  is telling the visitor about a painting that left the screen. Same at 20 000, 30 000, 40 000:
+  `shown.work` is always `last_work + 1`. This is not an edge case, it is the steady state.
+- **`gallery_shown.work` tracks the screen** — it agrees with `gallery_current_asset` at all six
+  samples.
+- **The barrier holds.** Every sample reads `PENDING` with `z = 0, ok = 0`. That is the design
+  working: `VERIFIED` is only ~530 frames of a ~9 100-frame cycle, so six blind samples landing
+  outside it is the expected result — and in every one of them the record correctly refuses to
+  offer a verdict rather than handing back a stale one.
+- **The "infer it from the existing symbols" alternative would have reported a false failure.** At
+  frame 3 000, `gallery_last_work == gallery_current_asset == 0` — the equality test says "ready" —
+  but `gallery_last_z` is still `0` because `record_result` has not run yet. A player trusting that
+  equality reads 0, compares against 15305, and shows the visitor `✗ MISMATCH` for a ROM that is
+  perfectly correct. The `state` barrier is what makes that unrepresentable.
+- **Works 0–3 remain clean** (`done=[0,1,2,3] failed=[]`), reproducing the pre-existing 40 000-frame
+  differential above with the record added, and `last_z` matches the host oracle at each step:
+  `15305, 14879, 14986, 15234` == `oracle[0..3]`.
+
+7b. **The compiler emitted the barrier ordering** — the coherence rule is only real if the stores
+   land in the written order. Absolute stores into `gallery_shown` (`0x477`–`0x47b`), scanned out
+   of the linked ROM:
+
+```
+=== record_result @ 0xa857 — absolute stores into gallery_shown (0x477..0x47b) ===
+  +0x01c  stz $047b      <- state
+  +0x023  sta $0477      <- z.lo
+  +0x028  sty $0479      <- work
+  +0x02b  stx $047a      <- ok
+  +0x030  sta $047b      <- state
+=== prepare_slide @ 0x9c91 — absolute stores into gallery_shown (0x477..0x47b) ===
+  +0x9f8  stz $047b      <- state
+  +0x9fd  stz $0477      <- z.lo
+  +0xa02  stz $047a      <- ok
+  +0xa05  sta $0479      <- work
+  +0xa0a  sta $047b      <- state
+```
+
+**PASS** — `state` is stored first and last in both writers, so no reordering collapsed the
+barrier. A bonus the layout buys: under `+mos-a16` (`M=0`) the single `sta $0477` writes both bytes
+of `z` in one instruction, so `z` cannot tear even without the barrier.
+
+8. **End-to-end headless replay of the live-record contract.**
+
+The whole contract, minus the browser: a fixture site whose ROM is byte-identical to the built one,
+a `live-record` manifest entry with `off` and the 62-entry `oracle`/`titles` tables generated by
+`dev/sync-manifest-offsets.py`, replayed by `dev/verify-web-roms.sh` in bsnes-jg.
+
+```
+  lzss-gallery     PASS  (24000 frames, Under the Wave off Kanagawa: repacked on-SNES to 15305 B == host oracle)
+
+verify-web-roms: 1 passed, 0 failed, 0 missing
+ALL PASS — safe to publish
+
+real	2m21.464s
+```
+
+The record itself, read out of the same run (`JGX_POLL=1 JGX_WRAM_DUMP=0x477 JGX_WRAM_DUMP_LEN=5`,
+asserting `state` at `0x47b` reaches `2`):
+
+```
+jgxcheck: JGX_POLL matched at frame 9376 of 24000 budgeted
+jgxcheck: WRAM @0x477: C9 3B 00 01 02
+                       ^^^^^ ^^ ^^ ^^
+                     z=0x3BC9  |  |  state=2 (VERIFIED)
+                        15305  |  ok=1
+                            work=0
+SMOKE: PASS off=0x47B len=1 got=0x02 (ran 24000 frames, bsnes-jg)
+```
+
+**PASS** — every field of the record decodes as designed, and `z = 15305` is `oracle[0]`, the value
+the *host* compressor produced for `great-wave`. The match at frame 9 376 is the measured cold-boot
+budget.
+
+**And the negative case — a one-byte oracle corruption must be caught.** Same fixture with
+`oracle[0]` edited `15305 → 15304`:
+
+```
+  lzss-gallery     FAIL  live-record: Under the Wave off Kanagawa: repacked 15305 B, host oracle says 15304 B
+
+verify-web-roms: 0 passed, 1 failed, 0 missing
+FAILED: lzss-gallery
+```
+
+**PASS (as a negative test)** — this is the regression guard for the whole chain. It proves the
+replay is genuinely comparing the ROM's number against the host table rather than passing on
+liveness, it names the artwork the visitor was looking at, and it is the exact failure a stale
+`oracle[]` after a corpus regeneration would produce.
+
+9. **The oracle table is generated, not hand-written** — `dev/sync-manifest-offsets.py` against a
+   fixture site whose ROM is byte-identical to the built one.
+
+```
+=== --check (expect drift, exit 1) ===
+  oracle-fixture   gallery_shown      off 0x0 -> 0x477
+  oracle-fixture   oracle             table 0 -> 62 entries (regenerated)
+  oracle-fixture   titles             table 0 -> 62 entries (regenerated)
+
+1 offset(s) changed, 0 unchanged, 2 table(s) regenerated, 0 without a map
+EXIT=1
+
+=== write ===
+wrote .../manifest.json
+EXIT=0
+
+=== --check again (expect clean, exit 0) ===
+
+0 offset(s) changed, 1 unchanged, 0 table(s) regenerated, 0 without a map
+EXIT=0
+
+=== resulting entry ===
+off      = 0x477
+oracle   = 62 entries; first 4 = [15305, 14879, 14986, 15234]
+titles   = 62 entries; first 2 = ['Under the Wave off Kanagawa', 'A Sunday on La Grande Jatte — 1884']
+```
+
+**PASS** — `oracle[0] = 15305` is `great-wave`, the value this plan already recorded as work 0's
+answer; `oracle[3] = 15234` is `basket-apples`, matching the work‑3 figure in the 40 000-frame
+evidence above. That agreement is also the proof that `report.json`'s array order is
+`GALLERY_ASSETS`' order, which is what makes `oracle[work]` a legal indexing.
+
+### Incidental finding — the gallery ROM does not build reproducibly (PRE-EXISTING, not this change)
+
+Confirming that the gated ROM is what the final source builds turned up something else:
+`examples/snes/lzss-gallery.c` compiles to **two different ROM images**, roughly 50/50 across
+repeated identical invocations.
+
+```
+=== 6 builds of UNMODIFIED main-HEAD lzss-gallery.c (git show HEAD:…) ===
+  base build 1: ff4071716ba4      base build 4: ff4071716ba4
+  base build 2: cad7bfccffb5      base build 5: ff4071716ba4
+  base build 3: cad7bfccffb5      base build 6: cad7bfccffb5
+      3 cad7bfccffb5
+      3 ff4071716ba4
+```
+
+Scoped as far as three hypotheses allow, then stopped:
+
+- **Not introduced by this change** — reproduced on `git show HEAD:examples/snes/lzss-gallery.c`,
+  the unmodified source.
+- **Not linker parallelism** — `-Wl,--threads=1` and `-Wl,--thinlto-jobs=1` both still produce two
+  distinct outputs.
+- **Not ASLR** — `setarch -R` still produces two distinct outputs, which also rules out the usual
+  pointer-keyed-container iteration-order explanation in its simplest form.
+- **Not host-vs-Docker** — the Docker gate's artifact (`aa3b7f27…`, the sha the gate log prints)
+  is byte-identical to one of the two host outputs.
+
+**Why it does not invalidate anything above.** The two variants have **identical symbol addresses**
+— diffing the two link maps over every `gallery_*`/`corpus_result` symbol reports no difference —
+so every WRAM address in this plan, `gallery_shown` at `0x477`, and `dev/sync-manifest-offsets.py`'s
+`off` resync are unaffected. The divergence is code bytes only (a 2-byte size difference cascading
+into ~19.5 KB of shifted addresses). And the publish flow builds once and gates *that* artifact, so
+it cannot ship an ungated variant; what breaks is only "rebuild later and compare bytes".
+
+**Severity: reproducibility, not correctness — but it deserves its own item.** `dev/lzss-gallery.sh`
+prints a `sha256sum` as though it were reproducible, and `dev/sync-manifest-offsets.py` gates on
+`build/<slug>.sfc` being byte-identical to the shipped ROM, which will intermittently refuse (it
+fails *safe* — it declines to resync rather than resyncing wrongly). Root-causing it means bisecting
+the responsible pass; not attempted here.
 
 ## Findings — 2026-07-28 (why this is blocked)
 

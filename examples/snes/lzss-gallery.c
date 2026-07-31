@@ -92,6 +92,40 @@ volatile uint8_t gallery_current_asset;
 volatile uint16_t gallery_canceled;
 volatile uint16_t gallery_last_z;
 volatile uint8_t gallery_last_work,gallery_last_ok;
+/*
+ * The DISPLAYED-work verdict — the record the site's "Verify fidelity" button reads.
+ *
+ * `gallery_last_*` is the *pipeline's* cursor: it names the work most recently
+ * PROCESSED. That lags the screen for the whole repack+verify phase, which is the
+ * long one, so a visitor who presses the button while looking at work k would be
+ * told about work k-1. This record tracks the work that is ON SCREEN instead.
+ *
+ * Nothing new is computed for it. The gallery already verifies every work in the
+ * very frames it is displaying that work — prepare_slide() puts work k on screen, then
+ * repack_slide()/verify_slide() decode it, recompress it and byte-compare the
+ * result. This record just publishes that existing verdict against the right
+ * subject, coherently.
+ *
+ * COHERENCE RULE — `state` is the publication barrier. It is cleared to
+ * GALLERY_SHOWN_NONE *before* any other field is touched and raised *after* all of
+ * them, so a reader that samples `state == GALLERY_SHOWN_VERIFIED` is guaranteed
+ * `work`/`z`/`ok` all describe that same work. A reader must ignore every other
+ * field while `state == GALLERY_SHOWN_NONE`. The emulator is only read between
+ * frames, but a frame boundary can still fall in the middle of these stores, so
+ * the barrier is load-bearing rather than decorative.
+ *
+ * LAYOUT — the uint16_t is first, so the record is padding-free and its member
+ * offsets are fixed: z@+0, work@+2, ok@+3, state@+4. The manifest mirrors those
+ * offsets as constants; the record's BASE address is still a link address and must
+ * be read from the shipped ROM's .map (dev/sync-manifest-offsets.py does that via
+ * `selfcheck.symbol`). Zero-initialised in .bss by crt0, and GALLERY_SHOWN_NONE is
+ * 0, so power-on residue cannot be mistaken for a verdict.
+ */
+#define GALLERY_SHOWN_NONE     0u  /* fields in flux, or nothing on screen yet */
+#define GALLERY_SHOWN_PENDING  1u  /* `work` is on screen, verdict not in yet */
+#define GALLERY_SHOWN_VERIFIED 2u  /* `work`/`z`/`ok` are a coherent verdict */
+typedef struct{uint16_t z;uint8_t work,ok,state;}GalleryShown;
+volatile GalleryShown gallery_shown;
 volatile uint8_t arrow_anim,arrow_anim_y,arrow_pose,arrow_previous_direction;
 volatile uint8_t arrow_direction;
 volatile int16_t arrow_position,arrow_velocity;
@@ -1052,6 +1086,15 @@ static uint8_t prepare_slide(const GalleryAsset*a){
   if(nav_cancel)return 0;
   split_arm(shown_h);REG_INIDISP=INIDISP_ON;
   gallery_current_asset=(uint8_t)(a-GALLERY_ASSETS);
+  /*
+   * A new work now owns the screen, so the previous work's verdict is stale the
+   * instant the display changes. Drop the barrier BEFORE naming the new work, so
+   * no reader can ever pair work k's index with work k-1's verdict.
+   */
+  gallery_shown.state=GALLERY_SHOWN_NONE;
+  gallery_shown.z=0;gallery_shown.ok=0;
+  gallery_shown.work=(uint8_t)(a-GALLERY_ASSETS);
+  gallery_shown.state=GALLERY_SHOWN_PENDING;
   return 1;
 }
 
@@ -1107,6 +1150,15 @@ static uint8_t verify_slide(const GalleryAsset*a,uint16_t z,uint8_t ok){
 __attribute__((noinline))
 static uint16_t record_result(const GalleryAsset*a,uint8_t k,uint16_t z,uint16_t gate,uint8_t ok){
   gallery_last_z=z;gallery_last_work=k;gallery_last_ok=ok;
+  /*
+   * Publish the same verdict against the DISPLAYED work. `state` down first, up
+   * last (see GalleryShown) — writing the whole record here rather than patching
+   * the one prepare_slide() left PENDING keeps this correct even if the loop is
+   * ever restructured so record_result() is reached by another route.
+   */
+  gallery_shown.state=GALLERY_SHOWN_NONE;
+  gallery_shown.z=z;gallery_shown.work=k;gallery_shown.ok=ok;
+  gallery_shown.state=GALLERY_SHOWN_VERIFIED;
   if(!ok){REG_COLDATA=0x3f;gallery_failed[k]=1;}else gallery_failed[k]=0;
   gallery_z[k]=z;
   if(!gallery_done[k]){gallery_done[k]=1;gallery_completed_count++;}

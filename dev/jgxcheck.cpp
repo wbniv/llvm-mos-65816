@@ -340,12 +340,49 @@ int main(int argc, char **argv) {
   std::vector<int> blacktop;
   if (blankscan) blacktop.reserve((size_t)frames);
 
+  // JGX_POLL=1 — stop as soon as the asserted value appears, rather than running a fixed count.
+  //
+  // Some self-checks are a POLL in the browser, not a rendezvous. The gallery's displayed-artwork
+  // button runs frames in chunks until the ROM's `gallery_shown` record reaches its ready state,
+  // then reads it. Replaying that as a fixed frame count cannot work: the ready state is a
+  // ~530-frame window inside a ~9100-frame per-artwork cycle, so a fixed count lands outside it
+  // ~94% of the time and would report a failure for a ROM that is entirely correct.
+  //
+  // Under JGX_POLL, `frames` is a BUDGET (the same budget the manifest gives the player), and the
+  // matched frame is reported so the budget can be measured rather than guessed. Note the
+  // blank-scan then only covers the frames actually run — which is the honest window anyway, since
+  // that is all the browser runs too.
+  const bool poll = getenv("JGX_POLL") != nullptr;
+  int polled_at = -1;
+  const uint8_t *poll_ram = nullptr;
+  unsigned poll_ram_len = 0;
+  if (poll) {
+    std::pair<void*, unsigned> pm = Bsnes::getMemoryRaw(Bsnes::Memory::MainRAM);
+    poll_ram = (const uint8_t*)pm.first;
+    poll_ram_len = pm.second;
+    if (!poll_ram || poll_ram_len < off + len) {
+      printf("SMOKE: FAIL (JGX_POLL: no MainRAM / out of range)\n");
+      return 1;
+    }
+  }
+
   for (int i = 0; i < frames; ++i) {
     Bsnes::run();
     if (blankscan) blacktop.push_back(leading_black_rows());
 #if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
     g_frame++;
 #endif
+    if (poll) {
+      unsigned v = 0;
+      for (unsigned k = 0; k < len; ++k) v |= (unsigned)poll_ram[off + k] << (8 * k);
+      if (v == want) { polled_at = i + 1; break; }
+    }
+  }
+  if (poll) {
+    if (polled_at >= 0)
+      fprintf(stderr, "jgxcheck: JGX_POLL matched at frame %d of %d budgeted\n", polled_at, frames);
+    else
+      fprintf(stderr, "jgxcheck: JGX_POLL never matched within %d frames\n", frames);
   }
 
   if (blankscan) {
