@@ -147,7 +147,8 @@ passes after it.
 
 ## Real-world sighting
 
-Found while compiling a 65816 LZSS decompression gallery demo for the SNES,
-where a 32-bit imaginary (far-pointer) register reached the same null store from
-a different direction. The SPC700 path above is the minimal, upstream-only
-formulation and needs none of that context to reproduce.
+Found while compiling a 65816 LZSS decompression gallery demo for the SNES
+([playable here](https://biohack.net/snes/lzss-gallery/)), where a 32-bit
+imaginary (far-pointer) register reached the same null store from a different
+direction. The SPC700 path above is the minimal, upstream-only formulation and
+needs none of that context to reproduce.
