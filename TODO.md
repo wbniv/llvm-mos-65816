@@ -68,7 +68,9 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   114-ROM sweep (satisfied by the in-flight republish's gate run — record its summary into the
   quiescence plan). No longer blocks publishing lsystem; the republish agent was told to ship it
   if gates pass.
-- [T4] **Implement extended SNES cartridge mapping when the gallery grows above 32 Mbit.**
+- [wip T4] **Implement extended SNES cartridge mapping when the gallery grows above 32 Mbit.**
+  <!-- agent:a75d84d7b58466d17 (2026-07-31: dispatched Phase 0–1 + cartridge-size test publication;
+  the video-player phases 2+ wait on the repack verdict) -->
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
   normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
   model, header and ROM-size fields, reset/vector placement, far-address handling, checksum gate,
