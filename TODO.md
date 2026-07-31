@@ -42,9 +42,29 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [per-image selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)). See
   [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
   the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
-- [wip T4] **Per-image "Verify fidelity" button — assert the *displayed* artwork (Will's respec
-  2026-07-31).** <!-- agent:a44b395bf4fcdd1fc (2026-07-31: agent proposes the mechanism; design →
-  ROM impl on feature worktree; player-package half is spec+escalate) --> Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
+- [wip T4] **Per-image "Verify fidelity" button — mechanism DECIDED + ROM half DONE
+  (2026-07-31); player-package half ESCALATED.** <!-- agent:a44b395bf4fcdd1fc -->
+  Chosen mechanism (c), superseding both briefed candidates: the ROM already verifies each work
+  as it displays it, so it publishes a 5-byte `gallery_shown{z,work,ok,state}` record (state =
+  publication barrier) and the player polls it in a new `mode: "live-record"`, comparing `z`
+  against a host-generated 62-entry oracle table — the ROM never grades its own homework. Both
+  briefed candidates died on facts: the player's `verify()` power-cycles (destroys the visitor's
+  position → can only ever verify work 0), and infer-from-existing-symbols provably false-fails
+  (at frame 3000 `last_work==current_asset` while `last_z` still 0). ROM half + harness
+  (`JGX_POLL`, live-record replay, oracle-table generation) implemented and gated on
+  `feature/verify-fidelity-button` @ `f0d903d` — deliberately UNMERGED until the republish
+  gallery leg completes. Remaining: (1) merge after republish; (2) the `@wbniv/bsnes-jg-player`
+  `live-record` implementation (separate repo — exact JS/manifest/badge spec in the
+  [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md); **user-gated**);
+  (3) browser-exercise the badge states; (4) confirm the 24000-frame worst-case budget from
+  `gallery_repack_frames[]` over all 62 works.
+- [T4] **Gallery ROM does not build reproducibly — two stable images ~50/50 from identical
+  source.** Found incidentally by the button work; reproduced from `git show HEAD:` sources, not
+  the working tree. Ruled out: linker threading (`--threads=1`, `--thinlto-jobs=1`), ASLR
+  (`setarch -R`). Symbol addresses are identical between variants, so correctness and manifest
+  offsets are unaffected — but `dev/lzss-gallery.sh` prints a `sha256sum` as if reproducible and
+  `sync-manifest-offsets.py`'s byte-identity guard intermittently refuses (fails safe). Needs a
+  pass bisect. (T4: unknown root cause in the toolchain pipeline.) Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
   host `report.json`) keyed by a ROM-published index, vs ROM-side check-on-display publishing a
   uniform `(work-id, pass/fail)` pair — both costed in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md). The ROM must first
