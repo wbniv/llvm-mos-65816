@@ -73,19 +73,22 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   obsolete `TODO.md`, `.deferrals-seen` ledger, one `agent-handoff.md` worktree-registry row worth
   cherry-picking once that file is clean of other sessions' dirty edits. Then `-s ours` merge (or
   branch delete) + tear down `/home/will/llvm-mos-65816-gallery-repack`.
-- [wip T3] **`lsystem` BLANKSCAN gate failure — root-caused 2026-07-31: detector false positive,
-  no demo bug.** <!-- agent:a8342e0a4ffaa143e --> Frame 1154's "black band" is the
-  `canvas_clear()` 64-tiles/frame top-down flush front crossing the bottom-up regrowth — a content
-  apex, not force-blank bleed (`lsystem.c` asserts force blank exactly once, at boot; no `INIDISP`
-  write in the frame loop). The fix is to the *detector*: a quiescence guard in `dev/jgxcheck.cpp`
-  (+ `JGX_BLANKSCAN_WIN/QUIET`, synthetic selftest incl. a real-bleed case proving sensitivity is
-  retained) — authored **uncommitted** by another session on 2026-07-30
-  ([plan](docs/plans/2026-07-30-blankscan-quiescence-gate.md), steps 1–2 recorded PASS).
-  With the rebuilt `build/jgxcheck`, `verify-web-roms.sh --only lsystem` passes (1200 frames, 1
-  transition spike correctly ignored). Adoption commit landed 2026-07-31: `5587462` (attributed to
-  its 2026-07-30 author; plan steps 1–2b recorded PASS). Remaining: only the full 114-ROM sweep
-  record (satisfied by the in-flight republish's gate run — record its summary into the quiescence
-  plan, then promote this item). No longer blocks publishing lsystem.
+- [T3] **`turtle-vm`/`truchet`/`lzdec` flagged FROZEN by the `display-check.py` full sweep —
+  discriminate detector artifact vs real freeze.** Found by the 2026-07-31 republish batch
+  ("identical at every late sample" for all three); pre-existing — none were touched in that
+  batch, and none appear in prior display investigations as known-frozen. All three show nonzero
+  `d60` motion in the 60fps investigation table, so an infrequent-step sampling false positive is
+  plausible (the BLANKSCAN precedent) but unconfirmed. First step is a bounded discriminating
+  test: dense-sample captures per demo; fix the detector or the demo accordingly. (T3: likely a
+  detector-sampling artifact per precedent, but each demo needs a real look; escalate any true
+  freeze with an unknown cause.)
+- [T2] **`/snes-rom-page` `scaffold.sh` silently downgrades the site's WASM engine.** Caught
+  pre-ship by the republish batch: the skill's bundled `engine/` copy (2026-06-25) overwrote
+  biohack.net's live `app.js`/`bsnes_jg.wasm`/`PROVENANCE.json` (2026-07-27) — a month-stale
+  downgrade that only a manual revert stopped. Fix the skill: refuse or warn when the bundled
+  engine is older than the site's (compare PROVENANCE stamps), and document that engine sync is
+  owned by the `@wbniv/bsnes-jg-player` CLI, not the scaffold. (T2: bounded script fix in the
+  skill, clear spec.)
 - [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE + PASSING
   (2026-07-31); publication held on two escalations.** <!-- agent:a75d84d7b58466d17 -->
   Authoritative model `tools/snes_cartmap.py` ported from bsnes-jg's own bus decode
@@ -112,12 +115,42 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   baseline only because its delta path reaches just 15.6 fps. Mapper-neutral bounded packet staging
   is implemented and host-gated; connect its `SvcInput` callback to the ExHiROM cursor after
   `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
+- [T4] **60 fps video playback target** — raised from 30 fps (user, 2026-07-31): SVX2's measured
+  60.8–69.4 fps is decode-ONLY, i.e. 1.3–15.7% margin over the new target — plausible, unproven
+  end-to-end. Attack order: **(a)** re-run the gate as decode **+ presentation** (cadence, DMA
+  arm, segmented refill across bank/device boundaries) in one VBlank period — the current bench
+  times pure decode; **(b)** the **FastROM lever** (+33% CPU, 60.8 → ~81 fps decode-only; already
+  a deferred cartridge-matrix row) — likely the enabling move; **(c)** keyframe scheduling vs the
+  16.7 ms budget (slip-never-tear already specified); **(d)** true 60 fps content needs
+  ≥59.94 fps masters (KSC has them; a 30 fps master frame-doubles, halving decode load);
+  **(e)** stream size ×2 per second — recheck ExHiROM capacity. Thresholds updated in
+  [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Frame presentation /
+  §Codec selection. (T4: throughput engineering with unknown headroom.)
+- [T2] **Hard real-video stressor for codec ratio expectations** — the real-camera leg used the
+  H.264 `~large` derivative of a **night** launch (mostly-black frames, codec-smoothed grain):
+  a best case, so real-footage ratios (31–57%) are uncalibrated for hard content. The
+  speed-anchored SVX2 decision is robust; ratio expectations aren't. Run the existing sweep
+  (`tools/snes-video-pack.py`, both dithers) over one grain-rich daylight clip — parent-plan
+  candidate #16 Apollo 11 Saturn V launch — and append the column to
+  [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
+  (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
+  2026-07-31 — lost in a concurrent TODO rewrite.)
 - [T2] **Audit the 173 `examples/` files using a bare empty `for(;;){}`.** LLVM may remove the
   loop under C11 forward-progress and fall through `main` into a reset loop — exactly what bit
   the cartsize canary; existing gates assert only WRAM and are *insensitive* to reset loops, so
   affected demos would pass silently. Pick the house idle-loop idiom (volatile access /
   `asm volatile` — check crt0/snesgfx precedent), sweep, and spot-check a sample of gates with
   a display-liveness probe. (T2: known recipe once the idiom is chosen; the sweep is mechanical.)
+- [T2] **Hard real-video stressor for the codec ratio expectations** — the completed real-camera
+  leg ([real-video-codec-benchmark.md](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
+  used the H.264 `~large` derivative of a **night** launch: mostly-black 80 × 56 frames and
+  codec-smoothed grain make it a mild stressor, so its ratios (31–57%) are a best case for real
+  footage. The one-codec/SVX2 *decision* is speed-anchored and robust, but size expectations for
+  hard content are uncalibrated: run the existing sweep (`tools/snes-video-pack.py`, both dithers)
+  over one grain-rich daylight clip — parent plan candidate #16 Apollo 11 Saturn V launch (film
+  grain) — and append the column to the results doc. Pipeline + bench harness already exist.
+  [plan](docs/plans/2026-07-31-real-video-codec-corpus.md) (T2: bounded re-run of a scripted
+  sweep on one new source; interval eyeballing is the only judgment.)
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
   normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
   model, header and ROM-size fields, reset/vector placement, far-address handling, checksum gate,
@@ -960,7 +993,9 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-31 — [wt119-retire] Branch verified fully landed, retired via `-s ours` merge `143dbf1`; worktree torn down (495 M reclaimed). Handoff registry row deferred (file was dirty).
 - [x] 2026-07-31 — [rom-republish] 113/114 title-card+F1 republish confirmed already live (2026-07-28); shipped the truncstair F2/F3 + gallery A-clobber deltas to both sites, closed the deferred full `verify-web-roms.sh` sweep. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
+- [x] 2026-07-31 — [lsystem-blankscan] Detector false positive (clear/regrow apex, frame 1154); quiescence guard adopted `5587462`, 114-ROM sweep green `c29abce`. See [plan](docs/plans/2026-07-30-blankscan-quiescence-gate.md).
 - [x] 2026-07-31 — [137-verify] All 7 steps PASS (step 6 via bench gate post-`2932bcf`, `45d1a6c`; visual sweep tracked separately). See [plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md).
 - [x] 2026-07-31 — [real-video-codec] Real Artemis footage + Bayer axis swept 2×2; SVX2 ships (60.8–69.4 fps on target), ONE codec suffices. See [plan](docs/plans/2026-07-31-real-video-codec-corpus.md).
 - [x] 2026-07-31 — [gallery-repack] Root cause: `decode_bank7e` thunk clobbered A-passed arg (demo bug; compiler exonerated). Fix `2932bcf`, 62/62 bench. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
