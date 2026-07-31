@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f11eaff) | fix(snes-rom-page): restore the Fullscreen handler + block a third deletion |
 | [2026-07-19](https://github.com/wbniv/llvm-mos-65816/commit/da5409b) | docs+dev: repoint ~/SRC references to the flat ~/ layout |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/996f4b4) | docs+skill: SNES demos live under /snes/ — audit location column + skill path fix |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/bdbae81) | feat(skill): add category to snes-rom-page + page template chip |
@@ -7,6 +8,11 @@
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/bfcbe69) | chore(skills): add snes-demo + snes-rom-page as project-local skills |
 
 <!--history-meta v1
+f11eaff	author	Will Norris
+f11eaff	added	6
+f11eaff	deleted	0
+f11eaff	files	1
+f11eaff	body	engine/app.js is the source of truth — scaffold.sh unconditionally copies it\nover <site>/public/play/app.js on every ROM publish — so fixing only the site\nwould be silently clobbered by the next demo.\n\nThe handler has now been deleted twice by unrelated ROM-rebuild commits\n(biohack.net 3733e8b, and earlier the Gray-Scott commit that 97035c7 undid),\neach time leaving ~111 pages with a button that highlights on hover and does\nnothing. Restored verbatim from 3733e8b^, with a DO-NOT-DELETE comment naming\nboth incidents.\n\nscaffold.sh now greps the INSTALLED play/app.js for requestFullscreen and\nfullscreenchange after the copy and aborts the publish if either is missing —\nasserting on what ships, not on the source. Verified the guard fires: a copy of\nthe engine with those identifiers stripped exits 2, the real engine passes.\nbiohack.net's deploy workflow carries the same check against dist/.\n\nSKILL.md's claim that app.js "wires a Fullscreen button" was true, then false,\nthen true again, with nothing to notice the middle state — that unverified claim\nis what let both deletions pass. Replaced with a warning that points at the\nguard.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 da5409b	author	Will Norris
 da5409b	added	2
 da5409b	deleted	2

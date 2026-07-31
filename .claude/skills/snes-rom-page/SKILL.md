@@ -18,6 +18,24 @@ is `scaffold.sh`; the page is written from `page-template.astro`. The bsnes-jg e
 vendored in `engine/`, so the skill is **fully self-contained** — no external/machine-local paths,
 safe to distribute.
 
+## Engine ownership — read before touching a site's `public/play/`
+
+**The `@wbniv/bsnes-jg-player` package's own CLI owns engine sync, not this skill.** The `engine/`
+bundled here is a self-contained *fallback* copy so `scaffold.sh` works standalone, but it drifts —
+a site's live engine is routinely newer than whatever snapshot happens to be checked into this skill.
+On 2026-07-31 that drift caused a real incident: `scaffold.sh` unconditionally copied its bundled
+engine (dated 2026-06-25) over biohack.net's live engine (dated 2026-07-27), silently downgrading
+`app.js`/`bsnes_jg.wasm`/`PROVENANCE.json` on a routine ROM republish. Only a manual pre-commit revert
+stopped it from shipping.
+
+`scaffold.sh` now gates every engine copy on the two `cores/PROVENANCE.json` **`built`** timestamps
+(bundled vs. the target site's) before touching anything, and **refuses by default** — naming both
+stamps — whenever the site's engine is already newer, or either stamp can't be read at all. See
+`scaffold.sh --help` for `--force-engine` (the explicit override for a deliberate downgrade) and
+`scaffold.sh --selftest` (exercises all three gate outcomes against synthetic PROVENANCE files; no
+site touched). **Never bypass the gate to "just get the publish out" — if it refuses, the fix is to
+sync the site's engine via the package CLI, not to force-copy the skill's bundle.**
+
 ## Inputs
 
 - **ROM** — path to the `.sfc` (required).
@@ -138,8 +156,10 @@ the headless gate live in the tab. `OFF` is the WRAM offset of the symbol (from 
 ## Per-site
 
 ### indri.studio (`~/indri.studio`) — Astro 6 + Tailwind + Cloudflare **Workers**
-- `Base.astro` props: `title`, `description`, `ogImage`, `ringFlare={false}`. Set
-  `ogImage={new URL('/play/preview/<slug>.png', Astro.site ?? 'https://indri.studio').href}`.
+- `Base.astro` props: `title`, `description`, `ogImage`, `ringFlare={false}`. Set `ogImage`:
+  ```js
+  ogImage={new URL('/play/preview/<slug>.png', Astro.site ?? 'https://indri.studio').href}
+  ```
 - Brand: grey + neon‑purple. Set `--rp-accent: #b026ff;` (or use the page as-is). Tokens in
   `src/styles/global.css`.
 - Deploy: `task deploy` (build + `wrangler deploy`; `CLOUDFLARE_API_TOKEN` in `.env`). HTML is served
