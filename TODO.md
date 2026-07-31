@@ -42,26 +42,25 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [per-image selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)). See
   [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
   the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
-- [wip T4] **`lzss-gallery` repack differential — VERDICT IN (2026-07-30): demo bug, not a
-  miscompile; merge + validate the fix.** <!-- agent:a1a412514588ed4c9 (pivoted 2026-07-31 to merge+validate) -->
-  The prior session root-caused it: the hand-written thunk `decode_bank7e` clobbers the A-passed
-  argument (`sep #$20; lda #$7e` before `plb`); `+mos-a16` codegen is byte-exact throughout —
-  compiler exonerated. Fix + regression guards verified (62/62 under `GALLERY_BENCH_ONLY`) on
-  branch `wt/119-gallery-near-decode-abi`, unmerged.
-  [Root-cause plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md). Remaining: merge to
-  main, re-run the 40k differential (works 0–3) + bench gate, record what this unblocks (#137
-  step 6, per-image selfcheck, gallery republish half). Deferred: the ~2.5 h full visual corpus
-  gate.
-  At 40 000 frames works 0, 2, 3 FAIL their own decode→repack→byte-compare while work 1 passes;
-  work 0 recompresses to 15254 vs its embedded `lz_len` 15305 (99.7% — a *nearly* correct buffer,
-  and `gallery_last_z` drifts run-to-run, so the corruption is timing-dependent). The decode
-  pipeline is proven to run in full (stage counters non-zero; not a `nav_cancel` bail), so the
-  failure is a data mismatch: `near_ok` or a `fold_far` checksum. Ruled out: asset/oracle desync,
-  mis-indexed artwork, truncated compress, title-path theory. The verdict decides whether this is
-  the far-decode/LZSS miscompile class this demo exists to catch or a demo buffer bug — it gates
-  #137 step 6 and the gallery half of the republish item. Blocks the per-image selfcheck (manifest
-  `frames` doubles as the in-browser verify budget, so it cannot be raised to ~710 000).
-  [plan + probe evidence](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)
+- [T4] **Per-image "Verify fidelity" button — assert the *displayed* artwork (Will's respec
+  2026-07-31).** Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
+  host `report.json`) keyed by a ROM-published index, vs ROM-side check-on-display publishing a
+  uniform `(work-id, pass/fail)` pair — both costed in the
+  [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md). The ROM must first
+  publish the *browsing cursor* (it only publishes the sweep's last-*processed* work today);
+  `sync-manifest-offsets.py` already honours `selfcheck.symbol`. Manifest wiring blocked until the
+  post-fix gallery republish ships a byte-identical rebuilt ROM. (T4: mechanism is a design call
+  spanning ROM + player.)
+- [T2] **Full 62-work *visual* corpus sweep (~2.5 h) — post-A-clobber-fix confirmation.** Bench
+  gate (presentation stripped) covers all 62; the visual ROM is verified only over works 0–3 at
+  40k frames — a presentation-path interaction beyond work 3 would slip both. Run once, record
+  into the [abi-clobber plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md) and the
+  #137 completion record.
+- [T1] **Retire `wt/119-gallery-near-decode-abi` remnants.** Code content landed on `main`
+  (`2932bcf`, `3af0df8`, `4c08ead`; verified identical). Branch residue is bookkeeping only:
+  obsolete `TODO.md`, `.deferrals-seen` ledger, one `agent-handoff.md` worktree-registry row worth
+  cherry-picking once that file is clean of other sessions' dirty edits. Then `-s ours` merge (or
+  branch delete) + tear down `/home/will/llvm-mos-65816-gallery-repack`.
 - [wip T3] **`lsystem` BLANKSCAN gate failure — root-caused 2026-07-31: detector false positive,
   no demo bug.** <!-- agent:a8342e0a4ffaa143e --> Frame 1154's "black band" is the
   `canvas_clear()` 64-tiles/frame top-down flush front crossing the bottom-up regrowth — a content
@@ -921,6 +920,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-31 — [gallery-repack] Root cause: `decode_bank7e` thunk clobbered A-passed arg (demo bug; compiler exonerated). Fix `2932bcf`, 62/62 bench. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
 - [x] 2026-07-30 — [truncstair-f2-f3] F3 repaint-on-change + F2 banded BG3HOFS ring (1 px/frame): `CANVAS_HTILE` tilemap repeat made the recorded 8 KB/bank-$7E blocker moot; gate `0x02CA` unchanged, ring stalls=NONE. See [plan](docs/plans/2026-07-30-truncstair-f2-f3-scroll-ring.md).
 - [x] 2026-07-30 — [60fps-batch-b] `mvscrl` dual V-ring shipped (only qualifying F2 candidate; other 3 closed, Batch C done): gate `0x72A7` host==+mos-a16, both bands 1 px/frame no stalls. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
 - [x] 2026-07-28 — [truncstair-black] Canvas overflow (BAND_ROUND+BAND_H wrote tile row 16) clobbered chr_word/map_word -> VRAM wipe + reset loop; demo renders again. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
