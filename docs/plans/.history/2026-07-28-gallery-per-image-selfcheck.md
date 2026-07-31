@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/3af0df8) | docs(gallery)+dev: record the repack verdict; let a selfcheck name its symbol |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/2932bcf) | fix(lzss-gallery): land the decode_bank7e A-clobber fix onto main |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/9aa36cb) | docs(gallery): second-pass probe — 3 of 4 works fail; retract the work-0 hypothesis |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/66d59c9) | docs(gallery): root-cause notes for the work-0 repack divergence; #137 step 6 is FAIL |
 
 <!--history-meta v1
+3af0df8	author	Will Norris
+3af0df8	added	109
+3af0df8	deleted	18
+3af0df8	files	1
+3af0df8	body	Closes the investigation that blocked the per-image "Verify fidelity" button.\n\nVerdict: demo bug, not a +mos-a16 miscompile. Verified independently before\nthe fix was landed in 2932bcf -- the ABI read off the shipped ROMs (caller\npasses `slen` in A:X, the pre-fix thunk's `lda #$7e` destroyed A), a model\nthat *predicts* 29/62 corpus-wide and 4/4 for works 0-3, and a rebuilt\n62-work gate that latches 0x5CF0 on the fix and 0xA50F on a pre-fix control.\n\nPlan updates:\n\n  - The works 0-3 repack differential now passes at 40000 frames --\n    done=[0,1,2,3] failed=[], against the recorded pre-fix failed=[0,2,3].\n  - The button's assertion is verified: gallery_last_z == 0x3BC9 with\n    gallery_last_ok == 1 at 12000 frames.\n  - Steps 3 and 4 are recorded as NOT RUN, blocked on the republish, rather\n    than left ambiguous. Scope correction: only biohack.net has a manifest.\n\nTwo hazards found while wiring the button, both fixed here:\n\n  - The plan's address table was stale (0x470/0x471/0x473/0x474). The live\n    build links these one to two bytes higher, so `off 0x471` -- the value\n    the plan told an implementer to use for gallery_last_z -- is actually\n    gallery_progress. The table is re-measured and now carries a warning to\n    read the symbol from the shipped ROM's map rather than from prose.\n\n  - dev/sync-manifest-offsets.py resolved `corpus_result` for EVERY demo\n    unconditionally. Pointing this button at gallery_last_z would therefore\n    have survived exactly until the next republish, which would silently\n    rewrite `off` back to corpus_result's address and fail the check for\n    visitors. It now honours an optional selfcheck.symbol defaulting to\n    corpus_result, so all 114 existing entries are unaffected (--check:\n    0 changed, 8 unchanged). Symbol matching is also tightened to an exact\n    last-token match, so a name ending in "corpus_result" can no longer\n    match by accident.\n\nPlan: docs/plans/2026-07-28-gallery-per-image-selfcheck.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2932bcf	author	Will Norris
 2932bcf	added	9
 2932bcf	deleted	0

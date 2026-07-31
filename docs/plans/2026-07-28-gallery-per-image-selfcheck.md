@@ -44,10 +44,21 @@ wants one image.
 
 ## Decision — split the two audiences
 
-- **The button (site manifest):** assert the *first artwork* only.
+- **The button (site manifest):** assert **the artwork the gallery is currently displaying**.
+  *(Will's call, 2026‑07‑31 — supersedes the original "first artwork only".)*
 - **The full 62-work corpus:** stays exactly where it belongs, in `dev/lzss-gallery.sh`, which
   already drives its own `FRAMES` independently of the manifest. **No coverage is lost** — it moves
   from a check nobody could run to one that already runs offline.
+
+Why the change matters: a visitor who has browsed to *Water Lilies* and presses **Verify fidelity**
+is making a claim about *Water Lilies*. A button hard-wired to work 0 would answer a question the
+visitor did not ask, and would keep reporting "verified" no matter how far they navigated — which
+is the same category of mistake as the whole-corpus assertion this plan replaced: a check whose
+subject is not the thing on screen.
+
+> **This respecification is NOT implemented.** The verification recorded below was performed against
+> the superseded work‑0 design, and it stands as evidence that the *codec* is correct — but the
+> button itself now needs the mechanism worked out (below) and is queued as this item's next phase.
 
 ## Design
 
@@ -66,34 +77,78 @@ The ROM already publishes per-work state (`record_result()`), so no ROM change i
 > asserted `gallery_progress` instead of `gallery_last_z`. **Always read the symbol out of the map
 > of the exact ROM being shipped** — never copy an address out of this document.
 
-Assert **`gallery_last_z == 0x3BC9`** (15305 — work 0's `compressed_bytes` from the host oracle
-`report.json`). That is a genuine correctness claim, not a liveness ping: reaching it requires the
-ROM to have decoded the LZSS stream, recompressed it, and produced *exactly* the byte count the host
-compressor produces. A miscompile in the codec moves it.
+The superseded work‑0 design asserted **`gallery_last_z == 0x3BC9`** (15305 — work 0's
+`compressed_bytes` from the host oracle `report.json`). That is a genuine correctness claim, not a
+liveness ping: reaching it requires the ROM to have decoded the LZSS stream, recompressed it, and
+produced *exactly* the byte count the host compressor produces. A miscompile in the codec moves it.
 
 > **UNBLOCKED 2026‑07‑31 — the ROM now produces exactly 15305.** The `0x3B96` (15254) reading was
 > the `decode_bank7e` A‑clobber; with the fix landed on `main` (`2932bcf`) a 12 000‑frame run reads
 > `gallery_last_z = 0x3BC9` with `gallery_last_ok = 1`. Raw output under *Verification* below.
 
+### Design notes for "currently displayed" — mechanism not yet chosen
+
+**The core obstacle: one manifest entry can only assert one static value.** The manifest's
+`off`/`len`/`want`/`frames` tuple is a single constant comparison — the player powers on, runs
+`frames`, reads `len` bytes at `off`, and compares to `want`. "Whatever is on screen right now" is
+by definition not a constant, so *something* has to bridge that. Two ways:
+
+**(a) Player-side oracle table.** Ship the 62 `compressed_bytes` values from
+`assets/snes/lzss-gallery/derived/report.json` to the player, and have the ROM publish the
+**displayed-work index**. The button reads the index, looks up the expected size, and compares
+against the ROM's reported size for that work.
+*Cost:* the manifest schema grows from a scalar `want` to a keyed table, and the player needs a
+lookup path it does not have today. *Benefit:* the oracle stays host-computed and independent —
+the ROM never gets to assert its own correctness, which is what makes the check meaningful.
+
+**(b) ROM-side check-on-display.** The ROM verifies the work it is displaying and publishes a
+uniform pass/fail byte plus the work id. The button asserts the constant "pass", and shows the id.
+*Cost:* the ROM becomes its own judge, so a codec bug that is symmetric between decode and repack
+could self-certify; the independent host oracle drops out of the loop. Needs a ROM change.
+*Benefit:* the manifest stays a scalar comparison — no player or schema change at all.
+
+**What the ROM would have to publish either way.** The existing trio is the wrong state:
+`gallery_last_work` / `gallery_last_z` / `gallery_last_ok` describe the **last *processed*** work —
+the decode/repack pipeline's cursor, written by `record_result()` as the benchmark sweeps forward.
+The **browsing cursor** — which artwork the viewer has navigated to and is looking at — is separate
+state that the ROM does not currently expose. A "currently displayed" button needs that cursor
+published (and, for (a), the per-work repacked size retained for the displayed work rather than
+overwritten by the sweep, since `record_result()` rewrites `gallery_last_z` on every completed
+work).
+
+> The link-address warning above applies to every one of these symbols: whatever the ROM ends up
+> publishing, its address must be read from the shipped ROM's `.map`, never copied from this
+> document. `dev/sync-manifest-offsets.py` resyncs `off` via `selfcheck.symbol`.
+
 Rejected alternatives:
 
+- **Assert the *first* artwork only (work 0)** — the original decision here, superseded by Will on
+  2026‑07‑31: it verifies a work the visitor may not be looking at, and reports "verified"
+  regardless of where they have navigated. Retained as the fallback if the mechanism above proves
+  disproportionate to the value.
 - `gallery_progress >= 1` — reachable without the output being *right*; a liveness ping, not a gate.
 - `gallery_last_ok == 1` — correct but a 1-byte value, far weaker evidence than a 16-bit length that
   must match an independently computed oracle. Worth adding as a second assertion if the manifest
-  ever supports more than one field per demo.
+  ever supports more than one field per demo. (Note this is close to mechanism (b), and carries the
+  same self-certification caveat.)
 - Keeping `corpus_result` and raising `frames` to ~710 000 — the unusable-button case above.
 
-`frames` becomes "just past the first work's completion", measured rather than guessed.
+`frames` becomes "long enough that the displayed work has been verified", measured rather than
+guessed — under the superseded work‑0 design that was 12 000, measured below.
 
 ## Steps
 
 1. ~~Measure the frame at which work 0 completes (`gallery_progress` becomes 1); add margin.~~
    **Done 2026‑07‑31** — work 0 is complete well before 12 000 frames (`progress = 1`,
    `last_ok = 1`); 12 000 is the measured budget with margin.
-2. Point the site manifest's `lzss-gallery` selfcheck at **`off` = the map's `gallery_last_z`**
-   (`0x473` in the 2026‑07‑31 build — re-read it, see the warning above), `len 2`,
-   `want 0x3BC9`, `frames 12000`, plus **`"symbol": "gallery_last_z"`**, and label it so the page
-   says it is verifying one artwork.
+2. **RESPECIFIED 2026‑07‑31, not implemented.** Choose mechanism (a) or (b) from *Design notes for
+   "currently displayed"*, publish the browsing cursor from the ROM, and wire the button to the
+   displayed work.
+
+   > The superseded work‑0 wiring, kept because it is measured and ready if the fallback is taken:
+   > `off` = the map's `gallery_last_z` (`0x473` in the 2026‑07‑31 build — re-read it),
+   > `len 2`, `want 0x3BC9`, `frames 12000`, `"symbol": "gallery_last_z"`.
+
 3. Verify the new selfcheck passes headlessly before publishing.
 4. Republish (biohack.net only — indri.studio has no `public/play/roms/manifest.json`).
 5. ~~Record the full-corpus expectation in `dev/lzss-gallery.sh`~~ **Done** — the all-62-work
@@ -113,6 +168,11 @@ Rejected alternatives:
 > rebuilt from the fix and published.
 
 ## Verification
+
+> **Scope of this evidence.** Steps 1–2 below were run against the **superseded work‑0 design**.
+> They remain valid as proof that the *codec* and the *repack differential* are correct — which is
+> what unblocked this plan — but they are not a validation of the respecified
+> "currently displayed" button, which is unimplemented.
 
 1. `gallery_last_z` reads `0x3BC9` at the chosen frame (raw jgxcheck output pasted below).
 
