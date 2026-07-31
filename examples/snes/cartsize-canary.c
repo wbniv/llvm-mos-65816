@@ -145,7 +145,17 @@ int main(void) {
 
   screen((status == 0) && (h == CANARY_ORACLE));
 
+  // The idle loop has a side effect on purpose: an empty `for (;;) {}` is
+  // removable under C11's forward-progress rule, so main() could fall out of
+  // crt0. Re-storing the volatile result keeps it, per examples/snes/hello.c.
+  // (173 example files here still use the bare empty form.)
+  //
+  // NOTE: this was tried as the fix for the unstable backdrop described above
+  // and did NOT resolve it -- the captured frame still differs per
+  // configuration and per frame count. It is kept because it is correct
+  // regardless; the display defect's real cause is still unknown.
   for (;;) {
+    corpus_result = h;
   }
   return 0;
 }
