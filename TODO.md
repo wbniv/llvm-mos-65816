@@ -42,8 +42,9 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [per-image selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)). See
   [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
   the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
-- [T4] **Per-image "Verify fidelity" button — assert the *displayed* artwork (Will's respec
-  2026-07-31).** Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
+- [wip T4] **Per-image "Verify fidelity" button — assert the *displayed* artwork (Will's respec
+  2026-07-31).** <!-- agent:a44b395bf4fcdd1fc (2026-07-31: agent proposes the mechanism; design →
+  ROM impl on feature worktree; player-package half is spec+escalate) --> Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
   host `report.json`) keyed by a ROM-published index, vs ROM-side check-on-display publishing a
   uniform `(work-id, pass/fail)` pair — both costed in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md). The ROM must first
