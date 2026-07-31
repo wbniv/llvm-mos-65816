@@ -346,6 +346,11 @@ Filled in 2026-07-30 during `[verify T2]` (steps 6–7; steps 1–5 already carr
   (`got=0x5CF0`, re-confirmed first-hand 2026-07-31) and the visual ROM passes works 0–3 at
   40 000 frames; the full 62-work *visual* sweep at 200 000 frames (~2.5 h) remains deferred,
   tracked as `[T2]` "Full 62-work *visual* corpus sweep" (TODO.md).
+- **2026-07-31: full 62-work visual sweep PASS** — `FRAMES=700000 dev/run.sh lzss-gallery`
+  latched `corpus_result got=0x96D8 == oracle` after 700 000 frames on bsnes-jg (1 h 25 m),
+  confirming the #137 gallery visualization end-to-end over all 62 works post-A-clobber-fix;
+  raw output + the `FRAMES`-forwarding gotcha recorded in the
+  [abi-clobber plan](2026-07-30-gallery-near-decode-abi-clobber.md) ("Not done / follow-ups").
 - **Commit hashes:** compiler-repo final implementation `4aed503` ("cycle the compressor cursor;
   retire the span visualizations" — the "red dot only" decision above). Site republishes:
   biohack.net `530bf5c`, indri.studio `4a8c988` (both 2026-07-28).

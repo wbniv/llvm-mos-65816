@@ -226,6 +226,33 @@ This is the check that would have caught the bug, in ~6 min instead of ~2.5 h.
 * **The full 62-work *visual* corpus gate was not re-run** (~2.5 h). Coverage of the codec
   paths for all 62 works comes from the `GALLERY_BENCH_ONLY` gate in step 6 instead; the
   visual ROM was verified over works 0–3 only.
+
+  **2026-07-31 full visual sweep:** now run — `FRAMES=700000 dev/run.sh lzss-gallery` (no
+  `GALLERY_BENCH_ONLY`, no `QUICK`; throwaway worktree `throwaway/visual-sweep` off `main`
+  HEAD `2343db7`, which carries the fix). The visual jgxcheck leg took 1 h 25 m (700 000
+  frames, ~137 fps); whole script ~1 h 31 m:
+
+  ```
+  SMOKE: PASS off=0x24 len=2 got=0x5CF0 (ran 30000 frames, bsnes-jg)
+  fast decode gate: PASS (all 62 works far-decoded, staged, near-decoded, checksummed)
+  ==> corpus_result @ WRAM 0x46f; oracle 0x96D8
+  SMOKE: PASS off=0x46F len=2 got=0x96D8 (ran 700000 frames, bsnes-jg)
+  cad7bfccffb5bd2e567da62e8b4fc7c8475ec5853d5a1452cf92bb3150e091d6  /work/build/lzss-gallery.sfc
+  RESULT: PASS — 62-work LZSS gallery host oracle, relink, header and bsnes-jg gate
+  ```
+
+  **PASS** — the presentation ROM's `corpus_result` latched the full 62-work rolling hash
+  (`0x96D8`, one `(checksum, compressed_bytes)` fold per work), so every work decoded,
+  displayed, repacked and self-checked clean through the *visual* path, not just the
+  bench-only codec path. No FROZEN/BLANKSCAN flags: this gate does not arm `JGX_BLANKSCAN`,
+  so the known turtle-vm/truchet/lzdec suspected-false-positive detectors were not in play.
+  Gotcha found en route: **committed `dev/run.sh` does not forward `FRAMES` into Docker**
+  (only `BENCH_FRAMES`/`GALLERY_START`/`GALLERY_RUN_COLOR`; the `${FRAMES:+-e FRAMES}`
+  forward exists only as an uncommitted edit in `main`'s dirty tree), so a first attempt
+  silently ran the committed 200 000-frame default and reported the known budget-too-short
+  symptom `got=0x0000` at ~36 min (≈ 20 of 62 works). The worktree re-run above added the
+  forward locally; landing that forward (and the 700 000 default) on `main` is the
+  committed-tree fix.
 * **Unrelated compiler crash found in passing.** `mos-clang ... -fno-lto -S` on
   `examples/snes/lzss-gallery.c` segfaults in `MOS Late Optimizations` on `@unpack_slide`
   at `-O0` and `-Oz` (clean at `-O1`). The shipped ROM builds with LTO, where the pass does

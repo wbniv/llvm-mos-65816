@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/45d1a6c) | docs(gallery): #137 [verify T2] step 6 unblocked — PASS with noted scope |
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/c844745) | docs(137): step 7 — replace the void host-npm build note with CI run evidence |
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/f44bd89) | docs(gallery): #137 [verify T2] steps 6-7 — record raw evidence in the plan |
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/4aed503) | feat(snes/gallery): cycle the compressor cursor; retire the span visualizations |
 
 <!--history-meta v1
+45d1a6c	author	Will Norris
+45d1a6c	added	82
+45d1a6c	deleted	14
+45d1a6c	files	1
+45d1a6c	body	The repack-differential root cause landed on main (2932bcf): decode_bank7e's\nlda #$7e clobbered the A-passed slen argument to decode_near (MOS calling\nconvention passes it in A:X), truncating 29 of 62 works' near-decode early.\nDemo bug, not a +mos-a16 miscompile — compiler exonerated. Fixed via\nPEA $7E7E/PLB, which never touches A.\n\nRecords step 6 as PASS-with-noted-scope: the GALLERY_BENCH_ONLY codec-only\ngate now passes all 62 works (got=0x5CF0, cited from the merge-validation\nagent's evidence and re-confirmed first-hand this session via\nQUICK=1 dev/run.sh lzss-gallery), and the visual ROM passes works 0-3 at\n40000 frames. The literal 200000-frame *visual* sweep (~2.5 h) is\ndeliberately not re-run — tracked as its own TODO item ("Full 62-work visual\ncorpus sweep") rather than re-blocking this step. Kept the original\n2026-07-30 blocked finding in place for history. Updated the completion\nrecord to match.\n\nAll 7 verification steps now stand recorded PASS (steps 1-5 and 7 were\nalready recorded; step 6 closes here) — ready for the orchestrator to\npromote the TODO item.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 c844745	author	Will Norris
 c844745	added	16
 c844745	deleted	8
