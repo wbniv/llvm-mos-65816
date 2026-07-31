@@ -241,6 +241,20 @@
       "text": "for (uint16_t i = 0; i < (uint16_t)(32u * 32u); i++) REG_VMDATA = 0u;"
     },
     {
+      "id": "f30ee5797e26dc623cac",
+      "kind": "ppu-write",
+      "path": "examples/snes/cartsize-canary.c",
+      "line": 102,
+      "text": "REG_CGDATA = bg & 0xFF;"
+    },
+    {
+      "id": "69984d21f4d694d285b2",
+      "kind": "ppu-write",
+      "path": "examples/snes/cartsize-canary.c",
+      "line": 103,
+      "text": "REG_CGDATA = bg >> 8;"
+    },
+    {
       "id": "e157aaabf6d85ee29598",
       "kind": "ppu-write",
       "path": "examples/snes/cordic.c",

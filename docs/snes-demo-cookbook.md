@@ -414,6 +414,62 @@ nearly every cell changes, use a dirty bitmask or just re-upload the full field 
 
 ---
 
+## Extended cartridges — past the 4 MiB wall
+
+Default to LoROM (`platforms/snes`). Reach for a bigger mapping only when the *data* demands it,
+and never by padding an image: LoROM and HiROM both top out at exactly 4 MiB, so a 6 MiB LoROM
+file is just a 6 MiB file whose top 2 MiB no address reaches.
+
+| Need | Platform | Map mode | Ceiling |
+|---|---|---|---:|
+| ≤ 32 KiB near code, small assets | `snes` | `$20` | 4 MiB |
+| one array > 32 KiB (LoROM's bank window) | `snes-hirom` | `$21` | 4 MiB |
+| more than 4 MiB of assets | `snes-exhirom` | `$25` | 8 MiB |
+
+**The one fact to internalise about ExHiROM.** The image is split in two and selected on the
+bank's high bit, *inverted*: file `$000000-$3FFFFF` is banks `$C0-$FF`, and file `$400000+` is
+banks `$40-$7D`. Because the CPU fetches RESET from `$00:FFFC` and bank `$00`'s upper half
+belongs to the **second** region, the header, the vectors and the near-code window live at file
+`$408000-$40FFFF` — the boot code is in bank `$40`, not `$C0`. `crt0` needs no change.
+
+That also makes the file **non-monotonic in CPU space**: file `$3FFFFF` is `$FF:FFFF`, and the
+next byte, file `$400000`, is `$40:0000`. Anything crossing it must be walked as an ordered
+segment list. Combined with the DMA source address not carrying into the bank byte, the rule for
+any large asset is the same: **one descriptor per logical object, plus a list of bank-bounded
+physical segments** — never a pointer you increment and hope.
+
+**Do not do the arithmetic yourself.** [`tools/snes_cartmap.py`](../tools/snes_cartmap.py) is the
+single authoritative model (a port of bsnes-jg's own bus decode). Import it; do not re-derive a
+mapping in a packer, a linker generator or a report renderer:
+
+```python
+from snes_cartmap import CartMap
+cm = CartMap("exhirom", 6 << 20)
+cm.describe(0x400000)     # {'physical_rom': 1, 'cpu_bank': 0x40, 'cpu_address': 0x0000, ...}
+cm.file_to_cpu(0x5FFFFF)  # (0x5F, 0xFFFF) -- the ONE canonical address; raises on a hole
+cm.max_dma_span(0x3FFE00) # bytes before the transfer must be split
+cm.holes()                # ranges present in the file that nothing can address
+```
+
+Checklist for an over-4-MiB demo:
+
+- link with `platforms/snes-exhirom` (its `link.ld` is generated from the model, and a host test
+  asserts the checked-in copy still matches);
+- patch the header with `tools/snes-checksum.py --mapping exhirom` — the ROM-size byte and the
+  checksum describe the **mirrored logical** size (4+2 MiB checksums as 8 MiB:
+  `sum(big) + 2*sum(small)`), not the file length;
+- verify with `tools/snes-checksum.py --inspect`, which also reports what bsnes-jg's heuristics
+  will actually detect the image as; and
+- before trusting a new size, add it to `dev/run.sh cartsize-canary` — the canary ROM reads the
+  first and last byte of every decoded window, every accepted mirror, and spans crossing one
+  bank, several banks and the physical device boundary, on real emulators.
+
+Plan: [`docs/plans/2026-07-30-exhirom-video-boundary-test.md`](plans/2026-07-30-exhirom-video-boundary-test.md).
+Geometry, holes and checksum rules:
+[`docs/refs/snes-hardware/snes-hardware-summary.md`](refs/snes-hardware/snes-hardware-summary.md).
+
+---
+
 ## V-blank timing rule
 
 The SNES V-blank is short. Never run game logic inside the V-blank; only the

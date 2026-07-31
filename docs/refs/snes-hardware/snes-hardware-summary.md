@@ -59,6 +59,70 @@ WRAM port (`$2180`–`$2183`) or with a 65816 far pointer (the `+mos-a16` far pa
 A **FastROM** board + `MEMSEL` ($420D) bit 0 run banks `$80`+ at 3.58 MHz instead of
 2.68 MHz.
 
+### Cartridge mappings, sizes, and the 4 MiB wall
+
+The authoritative model for all of this is [`tools/snes_cartmap.py`](../../../tools/snes_cartmap.py)
+— a port of bsnes-jg's own bus decode (`Database/boards.bml` + `Bus::map`/`mirror`/`reduce`), not a
+paraphrase of the table below. Anything needing a file-offset ↔ CPU-address answer should import it
+rather than restate these rules.
+
+| Mapping | Map mode | Header at file | Window | Max size |
+|---|---|---|---|---:|
+| LoROM | `$20` (`$30` fast) | `$007FB0` | 32 KiB per bank, `$xx:8000-FFFF` | 4 MiB |
+| HiROM | `$21` (`$31` fast) | `$00FFB0` | full 64 KiB banks, `$C0-$FF` | 4 MiB |
+| ExHiROM | `$25` (`$35` fast) | `$40FFB0` | two regions — see below | 8 MiB |
+
+**Why LoROM cannot simply be appended past 4 MiB.** LoROM's window is 32 KiB per bank across banks
+`$00`–`$7D` plus the `$80`–`$FF` mirror; 128 bank-slots × 32 KiB is exactly 4 MiB, and there is no
+bank left for a 129th. HiROM's 64 KiB × 64 banks (`$C0`–`$FF`) hits the same ceiling from the other
+direction. Padding a LoROM image to 6 MiB does not make it an extended cartridge — it makes a 6 MiB
+file whose top 2 MiB no address reaches.
+
+**ExHiROM geometry.** The extended map splits the image in two and selects between them on A23 (the
+bank's high bit), *inverted* relative to intuition:
+
+```
+  file $000000–$3FFFFF  →  banks $C0–$FF (full 64 KiB) · $80–$BF upper halves    region A
+  file $400000–…        →  banks $40–$7D (full 64 KiB) · $00–$3F upper halves    region B
+```
+
+The consequence that catches everyone: the 65816 resets with `PBR=$00` and fetches RESET from
+`$00:FFFC`, and bank `$00`'s upper half is **region B** — so the header and vectors live at file
+`$40FFB0`/`$40FFFC` and the near-code window `$00:8000-$FFFF` is file `$408000-$40FFFF`. **The boot
+code sits in bank `$40`, not bank `$C0`.** An unchanged `crt0` still runs: all it requires is that
+`$00:8000-$FFFF` be ROM, which it is under every one of these mappings.
+
+The file is therefore **not monotonic in CPU space**: file `$3FFFFF` is `$FF:FFFF` and the very next
+byte, file `$400000`, is `$40:0000`. An object crossing that boundary must be consumed as an ordered
+list of segments, never by incrementing a pointer.
+
+**Addressing holes.** Banks `$7E`/`$7F` are WRAM, so in an 8 MiB ExHiROM image the region-B window
+stops at bank `$7D` = file `$7DFFFF`. The last 128 KiB is reachable only through the `$3E`/`$3F`
+upper-half mirrors, leaving file `$7E0000-$7E7FFF` and `$7F0000-$7F7FFF` — 64 KiB — physically
+present but addressable by nothing. Do not place data there; `CartMap.holes()` reports them.
+
+**Physical device size vs logical header size.** A 6 MiB cartridge is two mask ROMs, 32 Mbit +
+16 Mbit. The smaller device is mirrored across its slot until it is as large as the larger one, so
+the address decoder sees a **logical 8 MiB** image — and both the ROM-size header byte (`$FFD7` =
+`$0D`, i.e. 2^13 KiB) and the checksum describe that logical size, not the file length. This is what
+the 48 Mbit commercial ExHiROM carts carry.
+
+**Checksum mirroring for non-power-of-two sums.** The internal checksum is the sum of the *logical*
+image mod `$10000`: `sum(big) + k * sum(small)` with `k = big/small`. So 4 + 2 MiB is
+`sum(first 4 MiB) + 2 * sum(last 2 MiB)`, and 4 + 1 MiB is `+ 4 *`. Summing each byte once gives the
+wrong value. [`tools/snes-checksum.py`](../../../tools/snes-checksum.py) computes it by materialising
+the mirrored image and cross-checks that against the multiplier formula.
+
+**DMA source bank wrapping.** A DMA channel's source address increments only its **16-bit** half
+(`$43x2/$43x3`); it does **not** carry into the bank byte (`$43x4`). A transfer running past
+`$xxFFFF` wraps to `$xx0000` instead of advancing to bank `$xx+1`. Every transfer must be split at
+the 64 KiB bank edge with the bank byte reloaded from its segment descriptor — which is what
+`CartMap.max_dma_span()` computes.
+
+**Test cartridges.** `dev/run.sh cartsize-canary` builds and gates one canary ROM per configuration
+(HiROM 4 MiB, ExHiROM 6 MiB and 8 MiB); see
+[`docs/plans/2026-07-30-exhirom-video-boundary-test.md`](../../plans/2026-07-30-exhirom-video-boundary-test.md).
+
 ## Controller input: automatic by default
 
 For an ordinary frame-driven game or demo, enable the SNES automatic joypad reader and consume its
