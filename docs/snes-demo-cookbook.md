@@ -522,10 +522,19 @@ Before calling a demo "done":
 | Demo | ROM | Algorithm header | Gate script | Key technique |
 |------|-----|-----------------|-------------|---------------|
 | **π Spigot + Monte-Carlo (#19)** | `examples/snes/spigot.c` | `examples/65816/pi_spigot.h` | `dev/pi.sh` | Carry-chain div/mod + 16×16→32 mul; custom `PiHud` drawable |
+| **Descending memmove Scroll Slabs (#79)** | `examples/snes/mvscrl.c` | `examples/65816/mvscrl.h` | `dev/mvscrl.sh` | Overlapping `G_MEMMOVE` both directions (Descending/Ascending legalization); full 5-way bar; dual V-ring 60 fps scroll presentation |
+| **Truncation Staircase (#83)** | `examples/snes/truncstair.c` | `examples/65816/truncstair.h` | `dev/truncstair.sh` | `G_FPTOSI`/`G_SITOFP` softfloat casts (truncf-via-cast); 60 fps repaint-on-change + banded `BG3HOFS` scroll ring |
 | **N-body Orbits (#13)** | `examples/snes/n-body.c` | `examples/65816/n-body.h` | `dev/n-body.sh` | `__mulsi3` (r²) + `__udivsi3` (1/r²); `noinline` to cap RA pressure; CGRAM palette fade |
-| **Spirograph (#11)** | `examples/snes/spirograph.c` | `examples/65816/spiro.h` | `dev/spirograph.sh` | Sin/cos LUT + mul; `BitmapCanvas` + `TextLayer` |
-| **Blossom (Hopalong)** | `examples/snes/blossom.c` | (inline) | `dev/blossom.sh` | Far high-WRAM scatter (a16-only); CGRAM palette cycling |
+| **Blossom (Hopalong)** | `examples/snes/blossom.c` | (inline) | `dev/blossom.sh` | `hud.h` HDMA `BGMODE`/`TM` screen split (Mode 7 plot band + BG3 text bars); far high-WRAM scatter (a16-only); CGRAM palette cycling |
+| **Mandelbrot, doubles** | `examples/snes/mandel-double.c` | `examples/65816/mandel-double.h` | `dev/mandel-double.sh` | `mandel-display.c` shared Mode 7 chunky module; line-at-a-time reveal; `BGMODE_1` title splash; far 16×16 title font (`TITLE_FONT16_FAR`) |
 | **Space Invaders** | `examples/snes/invaders.c` | `examples/snes/invaders_logic.h` | `dev/invaders*` | `SpriteSet`; the full OOP `snesgfx` showcase |
+| **LZSS Gallery** | `examples/snes/lzss-gallery.c` | `examples/65816/lzss.h` | `dev/lzss-gallery.sh` | Far ROM asset descriptors + LZSS far→near decode; on-console repack self-check differential; reserved sprite CGRAM 224–255; hand-written asm thunks must preserve the A:X argument ABI (the `decode_bank7e` lesson) |
 
-The `spigot.c` + `pi_spigot.h` pair is the **canonical template**: the most recent, cleanest,
-and best-commented example of the full pattern end-to-end. Read it before writing a new demo.
+The `spigot.c` + `pi_spigot.h` pair remains the **canonical template** for the full pattern
+end-to-end; `mvscrl.c` is the most **modern gate/corpus exemplar** (5-way bar + 60 fps
+presentation + precise legalizer-corner comments) — read both before writing a new demo. The
+**LZSS Gallery** is a *reference*, not a template: by far the largest demo, read it for the
+far-data, self-check, and dashboard patterns rather than as a starting skeleton.
+
+(Dropped from this table 2026-07-31: Spirograph (#11) — its techniques, sin/cos LUT + mul on
+`BitmapCanvas`+`TextLayer`, are now fully covered by the spigot and truncstair rows.)
