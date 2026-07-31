@@ -20,7 +20,9 @@ The ROM-size header byte is set from the image length (the tool owns it, so the 
 header.s placeholder is corrected for whichever size/mapping was linked), before the sum, so
 the checksum covers the corrected bytes.
 
-Usage: snes-checksum.py [--hirom] <rom.sfc>
+Use --fastrom to set the mapping's speed bit after selecting LoROM or HiROM.
+
+Usage: snes-checksum.py [--hirom] [--fastrom] <rom.sfc>
 """
 import sys
 
@@ -28,6 +30,7 @@ import sys
 def main(argv: list[str]) -> int:
     args = [a for a in argv[1:] if not a.startswith("-")]
     hirom = "--hirom" in argv
+    fastrom = "--fastrom" in argv
     if len(args) != 1 or "-h" in argv or "--help" in argv:
         print(__doc__)
         return 0 if ("-h" in argv or "--help" in argv) else 2
@@ -60,8 +63,11 @@ def main(argv: list[str]) -> int:
     size_kib = len(rom) // 1024
     rom[ROMSIZE_OFF] = size_kib.bit_length() - 1
 
-    if hirom:
-        rom[MAPMODE_OFF] = 0x21    # HiROM, slow
+    # The checksum tool owns the complete mapping byte, not merely the speed bit;
+    # this also repairs blank or stale header placeholders deterministically.
+    rom[MAPMODE_OFF] = 0x21 if hirom else 0x20
+    if fastrom:
+        rom[MAPMODE_OFF] |= 0x10   # FastROM speed bit: LoROM $30 / HiROM $31
 
     rom[COMPLEMENT_OFF:COMPLEMENT_OFF + 2] = b"\xff\xff"
     rom[CHECKSUM_OFF:CHECKSUM_OFF + 2] = b"\x00\x00"
@@ -77,7 +83,7 @@ def main(argv: list[str]) -> int:
     with open(path, "wb") as f:
         f.write(rom)
 
-    print(f"{path}: {'HiROM' if hirom else 'LoROM'} size={size_kib}KiB "
+    print(f"{path}: {'FastROM ' if fastrom else ''}{'HiROM' if hirom else 'LoROM'} size={size_kib}KiB "
           f"map_mode=0x{rom[MAPMODE_OFF]:02X} rom_size_byte=0x{rom[ROMSIZE_OFF]:02X} "
           f"checksum=0x{checksum:04X} complement=0x{complement:04X}")
     return 0
