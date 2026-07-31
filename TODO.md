@@ -95,11 +95,38 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   its 2026-07-30 author; plan steps 1–2b recorded PASS). Remaining: only the full 114-ROM sweep
   record (satisfied by the in-flight republish's gate run — record its summary into the quiescence
   plan, then promote this item). No longer blocks publishing lsystem.
-- [wip T4] **Implement extended SNES cartridge mapping (ExHiROM) — general cartridge/mapper test
-  coverage via three standalone size-test ROMs (HiROM 4 MiB; ExHiROM 6/8 MiB), not driven by
-  gallery size; gallery integration is a later optional phase.**
-  <!-- agent:a75d84d7b58466d17 (2026-07-31: dispatched Phase 0–1 + cartridge-size test publication;
-  the video-player phases 2+ wait on the repack verdict) -->
+- [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE + PASSING
+  (2026-07-31); publication held on two escalations.** <!-- agent:a75d84d7b58466d17 -->
+  Authoritative model `tools/snes_cartmap.py` ported from bsnes-jg's own bus decode
+  (`boards.bml` + `Bus::map`) — everything (linker, descriptors, checksum, fill, oracles)
+  generated from it; emit-side canonical-only, read-side mirror-aware. All three ROMs PASS
+  (`canary_status=0`: HiROM 4 MiB `0x48EE`, ExHiROM 6 MiB `0xA274`, 8 MiB `0x29B9`); 101 host
+  tests; checksum tool byte-identical on all 267 existing `.sfc`. Truth table pinned: boot
+  code lives in **bank `$40`** (file `$408000+`), file→CPU non-monotonic at 4 MiB, 6 MiB →
+  logical 8 MiB → size byte `$0D`. Commits `a2355fb`/`3e80748` on `feature/exhirom-canaries`
+  (rebased, unmerged); plan records `ac773f4`/`f2fd61b` on main. **Held:** (1) unresolved
+  display defect — backdrop verdict renders inconsistently per config/frame while the WRAM
+  oracle is fully deterministic; 3-hypothesis budget spent (timing, tile base, idle-loop
+  removal), root cause unknown — publish would look broken; (2) MAME leg has **zero evidence**:
+  `dev/roms/s_smp/spc700.rom` (SPC700 IPL) absent on this machine, gate fell back to
+  `JG_ONLY` — needs the IPL supplied. WASM ExHiROM: statically positive (wasm embeds the
+  EXHIROM boards + map lines), not runtime-proven. Publish commands ready in the agent report;
+  sparse fill → ~141 KiB gzipped per ROM.
+  **Video-codec corpus COMPLETE (2026-07-31):** animation + real Artemis I press-camera footage,
+  Floyd/Bayer matrix, and all codec baselines measured. SVX1 wins all four cells; one codec is
+  sufficient. Floyd is the quality-first default; Bayer is size-optimized. Target gate now has a
+  raw `MVN` baseline: 87.6 fps. SVX2 replacement/copy spans pass byte correctness and reach
+  60.8–69.4 fps over 600 VBlanks, clearing both the 20 fps shipping gate and 30 fps optimization
+  gate with >2× margin. Corpus cost versus SVX1 is +2.29–4.54 ratio points; SVX1 remains a size
+  baseline only because its delta path reaches just 15.6 fps. Mapper-neutral bounded packet staging
+  is implemented and host-gated; connect its `SvcInput` callback to the ExHiROM cursor after
+  `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
+- [T2] **Audit the 173 `examples/` files using a bare empty `for(;;){}`.** LLVM may remove the
+  loop under C11 forward-progress and fall through `main` into a reset loop — exactly what bit
+  the cartsize canary; existing gates assert only WRAM and are *insensitive* to reset loops, so
+  affected demos would pass silently. Pick the house idle-loop idiom (volatile access /
+  `asm volatile` — check crt0/snesgfx precedent), sweep, and spot-check a sample of gates with
+  a display-liveness probe. (T2: known recipe once the idiom is chosen; the sweep is mechanical.)
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
   normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
   model, header and ROM-size fields, reset/vector placement, far-address handling, checksum gate,
@@ -142,7 +169,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   extended-mapping item's Phase 0. See
   [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Cartridge-configuration
   coverage. (T2: bounded fixture generation against a settled model.)
-
 - [wip T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card — now
   ALSO carries the 19 F1 atomic-flush tear fixes (2026-07-27).** <!-- agent:a8a1c9e9dbe73a352 --> The
   title-card fix (`5f51be1` per-line HDMA bands + gravity exit, `e1a58f9` the `_`/`^` glyphs and
