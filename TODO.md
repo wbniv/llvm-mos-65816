@@ -88,7 +88,9 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [Nintendo development manual](https://gamingdoc.org/technical-documentation/consoles/super-nintendo/official/sdk/book-i/),
   [SNESdev ROM format documentation](https://snes.nesdev.org/wiki/ROM_file_formats), and
   [map-mode table](https://wiki.superfamicom.org/map-mode-table).
-- [T4] **#138 — MOS Late Optimizations crash on `@unpack_slide` (`-O0`/`-Oz`, `-fno-lto`).**
+- [wip T4] **#138 — MOS Late Optimizations crash on `@unpack_slide` (`-O0`/`-Oz`, `-fno-lto`).**
+  <!-- agent:a6e464f54cf3834fb (2026-07-31: Phase A investigation read-only; toolchain-rebuild
+  Phase B gated on build-tree quiescence) -->
   Backend segfault reproduced in passing during the abi-clobber investigation: `mos-clang ...
   -fno-lto -S` on `examples/snes/lzss-gallery.c` crashes in `MOS Late Optimizations` at `-O0` and
   `-Oz` (clean at `-O1`; shipped ROMs use LTO where the pass doesn't crash, so no demo impact —
