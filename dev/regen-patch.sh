@@ -9,11 +9,21 @@
 #
 # Method (baseline = pristine vendor HEAD + 0001 + 0003 committed):
 #   1. fresh detached worktree at pristine HEAD;
-#   2. apply 0001 (the #320 far-pointer patch) AND 0003 (the upstream-bound F4
+#   2. apply 0001 (the #320 far-pointer patch) AND 0003 (the upstream-bound
 #      mos-late-opt fix, if present) and commit them — this becomes the baseline so
 #      the regenerated 0002 captures ONLY the accum16 delta. 0003 lives inside
 #      llvm/lib/Target/MOS (MOSLateOptimization.cpp), so without it in the baseline
-#      the mirror+diff below would wrongly absorb the F4 edit into 0002;
+#      the mirror+diff below would wrongly absorb that edit into 0002;
+#
+#   ⚠ STALE BASELINE (2026-07-31): 0018-320-imag32-spill and
+#     0019-mos-branch-range-diagnostic are applied AFTER 0002 by dev/toolchain.sh
+#     and are NOT baked into the baseline here, but they DO touch
+#     llvm/lib/Target/MOS (MOSInstrInfo.cpp / MCTargetDesc/MOSAsmBackend.cpp).
+#     Running this script as-is therefore ABSORBS them into 0002, after which
+#     toolchain.sh's `apply_patch 0018` fails on a fresh clone. Bake them into
+#     the baseline (the P3 pattern) before the next regen. Verified 2026-07-31:
+#     `git apply --check 0018` succeeds on pristine+0001+0002, i.e. 0002 does not
+#     contain it today.
 #   3. mirror the live llvm/lib/Target/MOS dir over the worktree (all 0002 files
 #      live there) with rsync --delete;
 #   4. `git diff --cached` against the baseline -> 0002 (0003's MOSLateOptimization.cpp
@@ -34,7 +44,7 @@ VENDOR="$ROOT/vendor/llvm-mos"
 PATCHES="$ROOT/patches/llvm-mos"
 P1="$PATCHES/0001-320-far-addrspace.patch"
 P2="$PATCHES/0002-321-accum16.patch"
-P3="$PATCHES/0003-late-opt-txy-dead-flag.patch"   # upstream-bound F4 fix; optional (dropped once merged)
+P3="$PATCHES/0003-late-opt-nongpr-ldimm-dest.patch"  # upstream-bound mos-late-opt fix; optional (dropped once merged)
 MOSREL="llvm/lib/Target/MOS"
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
@@ -56,7 +66,7 @@ GIT_ID=(-c user.email=patchgen@local -c user.name=patchgen)
 echo "==> [gen] worktree @ pristine + commit 0001 (+0003) as baseline"
 git -C "$VENDOR" worktree add --detach "$WT_GEN" "$PRISTINE" >/dev/null
 git -C "$WT_GEN" apply "$P1"
-[ -f "$P3" ] && { echo "    baking 0003 (F4) into baseline so it drops out of 0002"; git -C "$WT_GEN" apply "$P3"; }
+[ -f "$P3" ] && { echo "    baking 0003 into baseline so it drops out of 0002"; git -C "$WT_GEN" apply "$P3"; }
 git -C "$WT_GEN" add -A
 git "${GIT_ID[@]}" -C "$WT_GEN" commit -q -m "0001(+0003) baseline"
 
@@ -70,7 +80,7 @@ echo "==> [verify] apply 0001 + new 0002 (+0003) to a fresh pristine worktree"
 git -C "$VENDOR" worktree add --detach "$WT_VFY" "$PRISTINE" >/dev/null
 git -C "$WT_VFY" apply "$P1"
 git -C "$WT_VFY" apply "$P2"
-[ -f "$P3" ] && git -C "$WT_VFY" apply "$P3"   # 0003 restores MOSLateOptimization.cpp to the live (F4) state
+[ -f "$P3" ] && git -C "$WT_VFY" apply "$P3"   # 0003 restores MOSLateOptimization.cpp to the live (fixed) state
 
 echo "==> [verify] diff -rq reapplied MOS dir vs live vendor MOS dir"
 if diff -rq "$WT_VFY/$MOSREL" "$VENDOR/$MOSREL"; then

@@ -77,6 +77,12 @@ if [ ! -d "$SRC/.git" ]; then
   # generic-LLVM + clang half only; the MOS-dir half is already inside 0002
   apply_patch 0006-320-packed24 \
     --include='clang/*' --include='llvm/include/*' --include='llvm/lib/CodeGen/*'
+  # Upstream-bound standalone fix, carried until it merges — the same slot and
+  # lifecycle as the retired 0003-late-opt-txy-dead-flag (-> PR #562). Applies
+  # after 0002 because both touch MOSLateOptimization.cpp, and it is BAKED INTO
+  # THE BASELINE by dev/regen-patch.sh so a 0002 regen never absorbs it. Drop
+  # this line and the patch file once it lands upstream and the vendor pin moves.
+  apply_patch 0003-late-opt-nongpr-ldimm-dest
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

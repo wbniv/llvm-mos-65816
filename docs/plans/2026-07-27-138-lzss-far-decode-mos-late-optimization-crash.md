@@ -1,7 +1,9 @@
 # #138 — LZSS far decode: investigate and fix MOS Late Optimizations crash
 
-**Status:** ROOT-CAUSED 2026-07-31 (Phase A complete; Phase B — apply fix + rebuild + validate —
-gated on toolchain quiescence)  
+**Status:** FIXED 2026-07-31 — root-caused, fixed, regression-tested, toolchain rebuilt and
+validated. Upstream PR package drafted and ready; **posting is user-triggered.** Two validation items
+(5, 9) are blocked by a missing out-of-band SNES BIOS on this box, and item 8 is deferred to a
+concurrent full visual sweep.  
 **Trigger:** removing `optnone` from `decode_far()` in
 `examples/snes/lzss-gallery.c` crashes `ld.lld` during LTO. *Superseded:* that trigger no longer
 fires; the live reproducer is 4 lines of MIR on the upstream SPC700 target (see **Root cause**).  
@@ -284,10 +286,13 @@ Add the smallest regression at the lowest useful layer:
 The test must crash before the fix and pass after it. Add output checks only for behavior essential
 to the bug; the primary regression is “no crash + machine verification succeeds.”
 
-**Proposed fix — ready to implement, Phase B gated on toolchain quiescence.**
+**The fix — LANDED 2026-07-31.**
 
-`docs/plans/2026-07-27-138-…/fix-combineldimm-nongpr-dest.patch`, verified to apply cleanly to the
-current `vendor/llvm-mos` with `git apply --check`:
+Tracked as `patches/llvm-mos/0003-late-opt-nongpr-ldimm-dest.patch` (guard + regression test),
+verified `patch -p1 --dry-run` clean against **pristine upstream** and wired into `dev/toolchain.sh`.
+The guard-only hunk is also kept as `docs/plans/2026-07-27-138-…/fix-combineldimm-nongpr-dest.patch`
+— that is the file used to revert and restore the guard for the red/green A/B rebuild below, so it
+stays as the reproducible A/B tool rather than as a second source of truth for the fix.
 
 ```diff
      // Process LD_ #.
@@ -341,6 +346,134 @@ Required evidence:
 8. full 62-work, 200,000-frame gallery reaches `corpus_result == 0x5CF0`;
 9. MAME and bsnes-jg agree on the final WRAM oracle; and
 10. bank-$00 margin is measured and the normal 4096-byte safety gate is restored if possible.
+
+### Results — 2026-07-31 (Phase B)
+
+Toolchain rebuilt with the fix: `build/llvm-mos-install/bin/clang-23` advanced
+`10:44:04 → 13:25:45` (size `124805840 → 124806096`). `build/llvm-mos/bin/llc` needed a **separate**
+rebuild (`2026-07-27 16:56 → 13:25:46`) because `dev/run.sh toolchain` builds only the clang+lld
+distribution target — the first "green" MIR run failed against a stale `llc`, which is the
+`stale-clang-23` gotcha wearing a different hat. Worth adding to the handoff notes.
+
+**1. Minimized test: red before, green after — PASS.** Proven by an A/B rebuild rather than by
+argument: the guard was reverted, `llc` rebuilt, the suite re-run, then the guard restored.
+
+```console
+$ # guard REVERTED, llc rebuilt
+Total Discovered Tests: 80
+  Unsupported:  1 (1.25%)
+  Passed     : 71 (88.75%)
+  Failed     :  8 (10.00%)
+    ... LLVM :: CodeGen/MOS/late-opt-spc700.mir   <-- RED
+$ # guard RESTORED, llc rebuilt
+Total Discovered Tests: 80
+  Unsupported:  1 (1.25%)
+  Passed     : 72 (90.00%)
+  Failed     :  7 (8.75%)
+```
+
+The 7 remaining failures are identical in both runs (`indexiv.ll`, `indvar-simplify-20230930.ll`,
+`leaf-20231021.ll`, `legalizer.mir`, `nonreentrant-nointerrupts.ll`, `nonreentrant.ll`,
+`shift-rotate.ll`) — pre-existing fork-vs-upstream divergence; none is an SPC700 test and none
+mentions `mos-late-opt` or `LDImm`.
+
+Direct reproducer checks:
+
+```console
+$ build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt \
+      -verify-machineinstrs -o - vendor/…/late-opt-spc700.mir
+    $rc2 = LDImm 42
+    RTS implicit $rc2
+    …
+    $a = LDImm 7
+    $rc2 = LDImm 7
+    $x = TA $a
+    RTS implicit $a, implicit $x, implicit $rc2
+rc=0
+$ build/upstream-llc/bin/llc   # pristine upstream, unfixed — RED control
+rc=139
+$ mos-clang --target=mos -mcpu=mosspc700 -O{0,1,2,s,z} -S repro-spc700.c
+  -O0 clean   -O1 clean   -O2 clean   -Os clean   -Oz clean
+```
+
+The `$x = LDImm 7` → `$x = TA $a` rewrite firing *across* the intervening `$rc2 = LDImm 7` is the
+observed confirmation that an imaginary destination is transparent to the A/X/Y tracking — exactly
+what the fix's "skip, don't invalidate" reasoning predicted, and it settles the one piece of the
+design that had been reasoned rather than measured.
+
+**2. Optimized `decode_far()` gallery build with no `optnone` — PASS.**
+
+```console
+$ sed 's/__attribute__((optnone,noinline))/__attribute__((noinline))/' examples/snes/lzss-gallery.c > g-nooptnone.c
+$ grep -c optnone g-nooptnone.c
+0
+$ mos-clang --config mos-snes-gallery.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 \
+      -Oz -DGALLERY_START=0 -o nooptnone2.sfc g-nooptnone.c
+exit=0
+-rw-rw-r-- 1 will will 1048576 Jul 31 13:30 nooptnone2.sfc
+```
+
+**3. `-verify-machineinstrs` — PASS on the reproducer; PRE-EXISTING failure on the gallery.**
+
+The SPC700 reproducer verifies clean. The gallery is clean at `-O0` and reports the *same two*
+errors at `-O1`/`-O2`/`-Oz` that were already present before the fix (recorded in the §2 reduction
+log against the 2026-07-26 toolchain — same function, same message, same count):
+
+```text
+*** Bad machine code: Using an undefined physical register ***
+- function:    prepare_slide
+- instruction: 4000B	renamable $y = COPY killed renamable $rc11
+*** Bad machine code: Using an undefined physical register ***
+- function:    prepare_slide
+- instruction: 6196B	renamable $x = COPY killed renamable $rc3
+fatal error: error in backend: Found 2 machine code errors.
+```
+
+These are `COPY`s out of imaginary registers, not `LDImm`, and they are already filed as **item 13**
+(`rc-undef-ra-pure-virtual`) in [`docs/upstream-contribution-status.md`](../upstream-contribution-status.md),
+tracked downstream as `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]`. Unrelated to this change.
+
+**4. MOS lit suite — PASS** (72/80, 1 unsupported, 7 pre-existing; see item 1).
+
+**5. Repository corpus suite — BLOCKED (environment, not a regression).** `dev/run.sh corpus` stops
+before running anything:
+
+```text
+MISSING SNES BIOS: /work/dev/roms/s_smp/spc700.rom
+  MAME's snes driver needs the SPC700 IPL ROM (sha1 97e352553e94242ae823547cd853eecda55c20f0).
+```
+
+`dev/roms/` is absent from **every** checkout on this box (`main` and all three sibling worktrees),
+so the MAME leg of the differential gate — and with it items 5 and 9 — cannot run here. The BIOS is
+gitignored and supplied out of band; nothing to do with the fix.
+
+**6/7. LZSS host oracle + bsnes-jg gallery gate — PASS through the compile and audit stages.**
+`QUICK=1 dev/run.sh lzss-gallery` on the rebuilt toolchain: the host `-O0`/`-O2` codec oracles
+compared equal (the script `cmp`s them before printing the 62 per-work hashes, so reaching that
+output *is* item 6), then:
+
+```text
+==> target build (+mos-a16, 1 MiB LoROM)
+/work/build/lzss-gallery.sfc: LoROM size=1024KiB map_mode=0x20 rom_size_byte=0x0A checksum=0xD08E complement=0x2F71
+NMI opcode audit: PASS (long conditional and 16-bit immediate are explicit)
+decode_bank7e ABI audit: PASS (A-safe PEA/PLB; 08 8b f4 7e 7e ab ab 20 8a 82 ab 28 60)
+bank $00 asset gate: PASS (FONT16=$15:EF29, FONT8=$07:FB54; 5821 B before header)
+==> fast decode gate (GALLERY_BENCH_ONLY, all 62 works)
+/work/build/lzss-gallery-bench.sfc: LoROM size=1024KiB map_mode=0x20 rom_size_byte=0x0A checksum=0xD65A complement=0x29A5
+```
+
+The ROM checksum `0xD08E` is unchanged from the pre-fix build of the same source, which is the
+expected outcome: the guard cannot fire on 65816 codegen, where every `LDImm` destination is a GPR.
+
+**8. Full 62-work 200,000-frame gallery — NOT RUN HERE.** A concurrent session dispatched the full
+visual sweep (`FRAMES=700000`) in its own worktree while this work was in flight; duplicating it
+would only contend for CPU. Deferred to that run's result.
+
+**9. MAME vs bsnes-jg agreement — BLOCKED** by the same missing SPC700 IPL ROM as item 5.
+
+**10. Bank-$00 margin / 4096-byte safety gate — NOT ADDRESSED.** That is `lzss-gallery.c` source
+work rather than compiler work; it is untouched here and stays open. The gate currently passes at
+its reduced threshold with 5821 B before the header.
 
 ## Fair benchmark rerun
 
@@ -421,16 +554,44 @@ Done (Phase A, 2026-07-31):
 - ~~upstream-tip applicability decision~~ — reproduces on pristine upstream `llvm-mos`, so this is a
   **standalone upstream bug fix and PR**, not something to fold into the fork's far-pointer series.
 
-Pending (Phase B, gated on toolchain quiescence — a rebuild swaps `build/llvm-mos-install` under
-every concurrent agent, and several `dev/run.sh` jobs were live when Phase A closed):
+Done (Phase B, 2026-07-31):
 
-- fix commit and regression test — patch and test are written and the patch is `git apply --check`
-  clean; applying it needs a `dev/run.sh toolchain` rebuild to validate;
-- red/green validation §4 items 1–10;
-- full suite/corpus results;
-- fair benchmark table;
-- draft issue/PR documents;
-- upstream branch/commit and submission URL.
+- ~~fix commit and regression test~~ — the guard is live in `vendor/llvm-mos`, the regression is
+  `llvm/test/CodeGen/MOS/late-opt-spc700.mir` (CHECK lines regenerated with
+  `update_mir_test_checks.py`), and both are carried as tracked patch
+  `patches/llvm-mos/0003-late-opt-nongpr-ldimm-dest.patch`, wired into `dev/toolchain.sh` and baked
+  into `dev/regen-patch.sh`'s baseline via the existing `P3` mechanism so a `0002` regen can never
+  absorb it;
+- ~~red/green validation §4 items 1–10~~ — 1, 2, 4, 6, 7 PASS; 3 PASS on the reproducer with a
+  documented pre-existing gallery failure (upstream item 13); 5 and 9 blocked by a missing SNES BIOS;
+  8 deferred to a concurrent sweep; 10 out of scope. Full records above;
+- ~~draft issue/PR documents~~ — [`docs/upstream-late-opt-nongpr-ldimm-pr.md`](../upstream-late-opt-nongpr-ldimm-pr.md),
+  a PR-only submission (the crash narrative fits in the PR body, as with `0010`), plus row 15 in
+  [`docs/upstream-contribution-status.md`](../upstream-contribution-status.md).
+
+Pending:
+
+- upstream branch/commit and submission URL — `wbniv:mos-late-opt-nongpr-ldimm` still to mint and
+  push; **posting is user-triggered**;
+- fair benchmark table (below) — unblocked now that optimized `decode_far()` compiles, but it is
+  benchmark work, not compiler work;
+- bank-$00 4096-byte safety gate restoration (§4 item 10).
+
+### Do not run `dev/regen-patch.sh` as-is
+
+Carrying the fix as `0003` rather than folding it into `0002` was deliberate. `dev/regen-patch.sh`
+regenerates `0002` by mirroring the whole live `llvm/lib/Target/MOS/` directory over a baseline, so it
+absorbs **anything** in that directory that is not in the baseline. As of 2026-07-31 that includes two
+other workers' in-flight patches, `0018-320-imag32-spill` and `0019-mos-branch-range-diagnostic`,
+which `dev/toolchain.sh` applies *after* `0002` and which are **not** baked into the baseline —
+verified by `git apply --check 0018` succeeding on pristine + `0001` + `0002`. Running the script
+today would fold them into `0002` and then break `apply_patch 0018` on the next fresh clone. A
+warning to that effect is now in the script's header. `0003` avoids the same trap for this fix by
+using the `P3` slot, which *is* baked into the baseline.
+
+Separately, `dev/regen-patch.sh`'s cleanup calls `git worktree remove --force`, which the repo's
+worktree-teardown guard hook now denies — the script will leave its two temporary worktrees behind
+until that is reconciled. Noted, not fixed.
 
 ### Severity — no shipped-ROM risk
 
