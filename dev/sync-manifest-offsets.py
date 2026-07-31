@@ -11,6 +11,13 @@ fidelity failure to visitors.
 Reads build/<slug>.map (emitted by dev/rebuild-web-roms.sh) for each demo in the manifest and
 rewrites `off` where it changed. Never touches `want`, `len` or `frames`.
 
+Most demos assert `corpus_result`, so that is the default symbol. A demo whose self-check targets a
+different field declares it as `"symbol": "<name>"` inside its `selfcheck` object — without that,
+this script would resync such an entry to `corpus_result`'s address and silently point the button
+at the wrong field. `lzss-gallery` is the first: its button asserts one artwork's repacked size via
+`gallery_last_z`, not the whole-corpus `corpus_result`
+(see docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
+
   dev/sync-manifest-offsets.py                 # update ~/biohack.net's manifest in place
   dev/sync-manifest-offsets.py --check         # report drift, change nothing (exit 1 if any)
   dev/sync-manifest-offsets.py --site DIR
@@ -20,12 +27,13 @@ import argparse, json, pathlib, re, sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
-def corpus_result_addr(mapfile: pathlib.Path):
-    """Return the WRAM address of corpus_result from an ld.lld map, or None."""
+def symbol_addr(mapfile: pathlib.Path, symbol: str = "corpus_result"):
+    """Return the WRAM address of `symbol` from an ld.lld map, or None."""
     try:
         for line in mapfile.read_text(errors="replace").splitlines():
             # map rows end with the symbol name; the first column is the address
-            if line.rstrip().endswith("corpus_result"):
+            row = line.rstrip()
+            if row.endswith(symbol) and row.split()[-1] == symbol:
                 m = re.match(r"\s*([0-9a-fA-F]+)\s", line)
                 if m:
                     return int(m.group(1), 16)
@@ -58,7 +66,8 @@ def main():
                 and built.read_bytes() == shipped.read_bytes()):
             missing.append(rom["id"])
             continue
-        addr = corpus_result_addr(ROOT / "build" / f"{rom['id']}.map")
+        symbol = sc.get("symbol", "corpus_result")
+        addr = symbol_addr(ROOT / "build" / f"{rom['id']}.map", symbol)
         if addr is None:
             missing.append(rom["id"])
             continue
@@ -66,11 +75,11 @@ def main():
         if old == addr:
             same += 1
         else:
-            changed.append((rom["id"], old, addr))
+            changed.append((rom["id"], old, addr, symbol))
             sc["off"] = f"0x{addr:x}"
 
-    for slug, old, new in changed:
-        print(f"  {slug:16s} off 0x{old:x} -> 0x{new:x}")
+    for slug, old, new, symbol in changed:
+        print(f"  {slug:16s} {symbol:18s} off 0x{old:x} -> 0x{new:x}")
     if missing:
         print(f"  no map for: {' '.join(missing)}")
     print(f"\n{len(changed)} offset(s) changed, {same} unchanged, {len(missing)} without a map")
