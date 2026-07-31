@@ -196,10 +196,23 @@ ships with this fix.
 
 3. Full corpus sweep green, with the skip count reported.
 
-_(pending — being satisfied by the **2026-07-31 republish gate run**: the concurrent republish
-agent is executing `dev/verify-web-roms.sh` over the whole batch and will record its sweep summary
-here when it lands. Expect 114/114, no newly-silenced demo. Deliberately not run a second time in
-parallel — two concurrent full sweeps would contend for the same harness.)_
+    Recorded 2026-07-31 from the republish batch's full `dev/verify-web-roms.sh` sweep (run with
+    the quiescence-gated `build/jgxcheck`, all 114 ROMs, against the live sites):
+
+    ```
+    verify-web-roms full sweep: 113 passed, 1 failed
+      lzss-gallery  FAIL  got=0x0000   (stale live manifest: corpus_result/200000 — structurally
+                                        broken assertion, unrelated to BLANKSCAN; ~20–35/62 works
+                                        finish full-presentation decode in that budget)
+    post-publish re-check (gallery republished with interim gallery_last_z selfcheck):
+      verify-web-roms.sh --only lzss-gallery,truncstair  ->  both PASS
+    ```
+
+    PASS — 113/114 green through the quiescence-gated detector with **no newly-silenced demo**
+    (lsystem passes on its real content; the single failure was a stale manifest assertion, fixed
+    and re-verified in the same batch). Separately, the batch's `display-check.py` sweep flagged
+    `turtle-vm`/`truchet`/`lzdec` as FROZEN — a different detector, pre-existing, tracked as its
+    own TODO item; not a BLANKSCAN regression.
 
 ## Visible surface
 
