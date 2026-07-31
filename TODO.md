@@ -112,42 +112,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   baseline only because its delta path reaches just 15.6 fps. Mapper-neutral bounded packet staging
   is implemented and host-gated; connect its `SvcInput` callback to the ExHiROM cursor after
   `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
-- [T4] **60 fps video playback target** — raised from 30 fps (user, 2026-07-31): SVX2's measured
-  60.8–69.4 fps is decode-ONLY, i.e. 1.3–15.7% margin over the new target — plausible, unproven
-  end-to-end. Attack order: **(a)** re-run the gate as decode **+ presentation** (cadence, DMA
-  arm, segmented refill across bank/device boundaries) in one VBlank period — the current bench
-  times pure decode; **(b)** the **FastROM lever** (+33% CPU, 60.8 → ~81 fps decode-only; already
-  a deferred cartridge-matrix row) — likely the enabling move; **(c)** keyframe scheduling vs the
-  16.7 ms budget (slip-never-tear already specified); **(d)** true 60 fps content needs
-  ≥59.94 fps masters (KSC has them; a 30 fps master frame-doubles, halving decode load);
-  **(e)** stream size ×2 per second — recheck ExHiROM capacity. Thresholds updated in
-  [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Frame presentation /
-  §Codec selection. (T4: throughput engineering with unknown headroom.)
-- [T2] **Hard real-video stressor for codec ratio expectations** — the real-camera leg used the
-  H.264 `~large` derivative of a **night** launch (mostly-black frames, codec-smoothed grain):
-  a best case, so real-footage ratios (31–57%) are uncalibrated for hard content. The
-  speed-anchored SVX2 decision is robust; ratio expectations aren't. Run the existing sweep
-  (`tools/snes-video-pack.py`, both dithers) over one grain-rich daylight clip — parent-plan
-  candidate #16 Apollo 11 Saturn V launch — and append the column to
-  [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
-  (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
-  2026-07-31 — lost in a concurrent TODO rewrite.)
 - [T2] **Audit the 173 `examples/` files using a bare empty `for(;;){}`.** LLVM may remove the
   loop under C11 forward-progress and fall through `main` into a reset loop — exactly what bit
   the cartsize canary; existing gates assert only WRAM and are *insensitive* to reset loops, so
   affected demos would pass silently. Pick the house idle-loop idiom (volatile access /
   `asm volatile` — check crt0/snesgfx precedent), sweep, and spot-check a sample of gates with
   a display-liveness probe. (T2: known recipe once the idiom is chosen; the sweep is mechanical.)
-- [T2] **Hard real-video stressor for the codec ratio expectations** — the completed real-camera
-  leg ([real-video-codec-benchmark.md](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
-  used the H.264 `~large` derivative of a **night** launch: mostly-black 80 × 56 frames and
-  codec-smoothed grain make it a mild stressor, so its ratios (31–57%) are a best case for real
-  footage. The one-codec/SVX2 *decision* is speed-anchored and robust, but size expectations for
-  hard content are uncalibrated: run the existing sweep (`tools/snes-video-pack.py`, both dithers)
-  over one grain-rich daylight clip — parent plan candidate #16 Apollo 11 Saturn V launch (film
-  grain) — and append the column to the results doc. Pipeline + bench harness already exist.
-  [plan](docs/plans/2026-07-31-real-video-codec-corpus.md) (T2: bounded re-run of a scripted
-  sweep on one new source; interval eyeballing is the only judgment.)
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
   normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
   model, header and ROM-size fields, reset/vector placement, far-address handling, checksum gate,
