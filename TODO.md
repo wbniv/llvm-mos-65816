@@ -33,7 +33,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 ## Open
 
 
-- [verify T2] **#137 — scanner beam repack visualization** — implemented + deployed; steps 1–5 and 7
+- [verify T2] **#137 — scanner beam repack visualization** <!-- agent:a3501a599fc93b36b --> — implemented + deployed; steps 1–5 and 7
   PASS. **Step 6 (the full 200 000-frame corpus result) FAILS and is blocked** — not merely unrun:
   the ROM never reaches `corpus_result` at that budget (200 000 frames completes 22 of 62 works),
   and the corpus is genuinely failing: at 40 000 frames **3 of the first 4 works fail** their own
@@ -43,7 +43,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [the plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md) (zipper removed from
   the ROM; #129 retired; the CGRAM-131 half of #128's reserved-palette audit closed as a side effect).
 - [wip T4] **`lzss-gallery` repack differential fails for most works — root-cause: miscompile or
-  demo bug, then land the per-image "Verify fidelity" button.** <!-- agent:a75e8ca02cfc98209 -->
+  demo bug, then land the per-image "Verify fidelity" button.** <!-- agent:a1a412514588ed4c9 (took over 2026-07-31; prior agent a75e8ca02cfc98209 unreachable from orchestrating session) -->
   At 40 000 frames works 0, 2, 3 FAIL their own decode→repack→byte-compare while work 1 passes;
   work 0 recompresses to 15254 vs its embedded `lz_len` 15305 (99.7% — a *nearly* correct buffer,
   and `gallery_last_z` drifts run-to-run, so the corruption is timing-dependent). The decode
@@ -54,11 +54,20 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   #137 step 6 and the gallery half of the republish item. Blocks the per-image selfcheck (manifest
   `frames` doubles as the in-browser verify budget, so it cannot be raised to ~710 000).
   [plan + probe evidence](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)
-- [T3] **`lsystem` BLANKSCAN gate failure — one frame with a transient black band.** Found by
-  `dev/verify-web-roms.sh` during the 2026-07-28 republish: force-blank bleed at the top of the
-  picture for a single frame. Pre-existing (not introduced by that republish) and unexamined —
-  needs the frame localized, the blank source identified (force-blank timing vs HDMA setup), and
-  the fix gated. Blocks promoting the republish item to Done.
+- [wip T3] **`lsystem` BLANKSCAN gate failure — root-caused 2026-07-31: detector false positive,
+  no demo bug.** <!-- agent:a8342e0a4ffaa143e --> Frame 1154's "black band" is the
+  `canvas_clear()` 64-tiles/frame top-down flush front crossing the bottom-up regrowth — a content
+  apex, not force-blank bleed (`lsystem.c` asserts force blank exactly once, at boot; no `INIDISP`
+  write in the frame loop). The fix is to the *detector*: a quiescence guard in `dev/jgxcheck.cpp`
+  (+ `JGX_BLANKSCAN_WIN/QUIET`, synthetic selftest incl. a real-bleed case proving sensitivity is
+  retained) — authored **uncommitted** by another session on 2026-07-30
+  ([plan](docs/plans/2026-07-30-blankscan-quiescence-gate.md), steps 1–2 recorded PASS).
+  With the rebuilt `build/jgxcheck`, `verify-web-roms.sh --only lsystem` passes (1200 frames, 1
+  transition spike correctly ignored). Remaining: the adoption commit (per Will 2026-07-31, the
+  T3 agent is committing the detector fix with attribution to its 2026-07-30 author), and the full
+  114-ROM sweep (satisfied by the in-flight republish's gate run — record its summary into the
+  quiescence plan). No longer blocks publishing lsystem; the republish agent was told to ship it
+  if gates pass.
 - [T4] **Implement extended SNES cartridge mapping when the gallery grows above 32 Mbit.**
   Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
   normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
@@ -76,8 +85,8 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [plan](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test.md) §Cartridge-configuration
   coverage. (T2: bounded fixture generation against a settled model.)
 
-- [T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card — now
-  ALSO carries the 19 F1 atomic-flush tear fixes (2026-07-27).** The
+- [wip T2] **Rebuild + republish the ~111 demo ROMs so the shipped pages get the fixed title card — now
+  ALSO carries the 19 F1 atomic-flush tear fixes (2026-07-27).** <!-- agent:a8a1c9e9dbe73a352 --> The
   title-card fix (`5f51be1` per-line HDMA bands + gravity exit, `e1a58f9` the `_`/`^` glyphs and
   lowercase folding) is header-only, so every demo needs a rebuild to pick it up — the ROMs already
   on biohack.net still show both lines arriving from both edges, `G_FCOPYSIGN` as `G FCOPYSIGN`, and
