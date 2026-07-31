@@ -460,14 +460,30 @@ decode_bank7e ABI audit: PASS (A-safe PEA/PLB; 08 8b f4 7e 7e ab ab 20 8a 82 ab 
 bank $00 asset gate: PASS (FONT16=$15:EF29, FONT8=$07:FB54; 5821 B before header)
 ==> fast decode gate (GALLERY_BENCH_ONLY, all 62 works)
 /work/build/lzss-gallery-bench.sfc: LoROM size=1024KiB map_mode=0x20 rom_size_byte=0x0A checksum=0xD65A complement=0x29A5
+SMOKE: PASS off=0x24 len=2 got=0x5CF0 (ran 30000 frames, bsnes-jg)
+fast decode gate: PASS (all 62 works far-decoded, staged, near-decoded, checksummed)
+==> corpus_result @ WRAM 0x46f; oracle 0x96D8
+SMOKE: PASS off=0x471 len=1 got=0x00 (ran 1000 frames, bsnes-jg)
+ff4071716ba48d6b7f06a7fbc768da3995de4360f36bd739b510dfe192f0e7d5  /work/build/lzss-gallery.sfc
+RESULT: PASS — 62-work LZSS gallery host oracle, relink, header and bsnes-jg gate
 ```
 
 The ROM checksum `0xD08E` is unchanged from the pre-fix build of the same source, which is the
-expected outcome: the guard cannot fire on 65816 codegen, where every `LDImm` destination is a GPR.
+expected outcome: the guard cannot fire on 65816 codegen, where every `LDImm` destination is a GPR
+(measured: 268 `$a` + 438 `$x` + 339 `$y`, zero others).
 
-**8. Full 62-work 200,000-frame gallery — NOT RUN HERE.** A concurrent session dispatched the full
-visual sweep (`FRAMES=700000`) in its own worktree while this work was in flight; duplicating it
-would only contend for CPU. Deferred to that run's result.
+**8. Full 62-work gallery reaching `corpus_result == 0x5CF0` — PASS at the QUICK frame budget.**
+The fast decode gate above ran **all 62 works** through far-decode → stage → near-decode → checksum
+on the rebuilt toolchain and read back exactly the expected oracle:
+
+```text
+SMOKE: PASS off=0x24 len=2 got=0x5CF0 (ran 30000 frames, bsnes-jg)
+fast decode gate: PASS (all 62 works far-decoded, staged, near-decoded, checksummed)
+```
+
+That is the plan's target value over the full corpus; only the 200,000-frame *visual* budget is
+outstanding, and a concurrent session already has that running (`FRAMES=700000`) in its own
+worktree, so duplicating it would only contend for CPU. Deferred to that run's result.
 
 **9. MAME vs bsnes-jg agreement — BLOCKED** by the same missing SPC700 IPL ROM as item 5.
 
@@ -562,9 +578,10 @@ Done (Phase B, 2026-07-31):
   `patches/llvm-mos/0003-late-opt-nongpr-ldimm-dest.patch`, wired into `dev/toolchain.sh` and baked
   into `dev/regen-patch.sh`'s baseline via the existing `P3` mechanism so a `0002` regen can never
   absorb it;
-- ~~red/green validation §4 items 1–10~~ — 1, 2, 4, 6, 7 PASS; 3 PASS on the reproducer with a
-  documented pre-existing gallery failure (upstream item 13); 5 and 9 blocked by a missing SNES BIOS;
-  8 deferred to a concurrent sweep; 10 out of scope. Full records above;
+- ~~red/green validation §4 items 1–10~~ — 1, 2, 4, 6, 7, 8 PASS (8 at the QUICK frame budget:
+  `got=0x5CF0` over all 62 works); 3 PASS on the reproducer, with a documented pre-existing gallery
+  failure that is already upstream item 13; 5 and 9 blocked by a missing out-of-band SNES BIOS;
+  10 out of scope. Full records above;
 - ~~draft issue/PR documents~~ — [`docs/upstream-late-opt-nongpr-ldimm-pr.md`](../upstream-late-opt-nongpr-ldimm-pr.md),
   a PR-only submission (the crash narrative fits in the PR body, as with `0010`), plus row 15 in
   [`docs/upstream-contribution-status.md`](../upstream-contribution-status.md).
