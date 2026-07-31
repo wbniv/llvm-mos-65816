@@ -46,7 +46,9 @@ TOOL="${MOS_TOOLCHAIN:-$BUILD/llvm-mos-install}/bin"
 SRC="$ROOT/examples/snes/cartsize-canary.c"
 GEN="$BUILD/cartsize-gen"
 A16=(-Xclang -target-feature -Xclang +mos-a16)
-JG_FRAMES="${JG_FRAMES:-900}"
+JG_FRAMES="${JG_FRAMES:-1800}"  # comfortably past the ~500-frame canary work; the
+                                # 900-frame default used to capture the exact
+                                # frame the verdict appeared
 export SMOKE_SETTLE="${SMOKE_SETTLE:-600}"
 export SMOKE_SECONDS="${SMOKE_SECONDS:-14}"
 
