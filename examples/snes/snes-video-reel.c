@@ -14,7 +14,7 @@
 #endif
 
 volatile uint8_t video_reel_result;
-volatile uint8_t video_reel_frame;
+volatile uint16_t video_reel_frame;
 volatile uint16_t video_reel_decoded;
 volatile uint32_t video_reel_presented_total;
 volatile uint16_t video_reel_crc_failures;
@@ -104,14 +104,32 @@ static uint16_t crc16(const uint8_t *data, uint16_t bytes) {
   return crc;
 }
 
-static uint8_t stage_frame(uint8_t frame) {
+static uint8_t stage_frame(uint16_t frame) {
   SvcSnesDmaContext context = {3u, 1u};
+#ifdef VIDEO_REEL_PACKED_FAR
+  uint32_t offset = reel_packet_offsets[frame];
+  uint16_t remaining = (uint16_t)(reel_packet_offsets[frame + 1u] - offset);
+  uint16_t copied = 0u;
+  while (remaining) {
+    uint16_t address = (uint16_t)offset;
+    uint16_t segment = (uint16_t)(0u - address);
+    if (!segment || segment > remaining) segment = remaining;
+    if (!svc_snes_dma_copy_segment(&context,
+        (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16)), address,
+        (uint8_t *)(uintptr_t)(STAGE_ADDRESS + copied), segment)) return 0u;
+    offset += segment;
+    copied = (uint16_t)(copied + segment);
+    remaining = (uint16_t)(remaining - segment);
+  }
+  return 1u;
+#else
   return svc_snes_dma_copy_segment(&context, 0x80u,
       (uint16_t)(uintptr_t)reel_packets[frame],
       (uint8_t *)(uintptr_t)STAGE_ADDRESS, reel_packet_sizes[frame]);
+#endif
 }
 
-static void decode_frame(uint8_t frame) {
+static void decode_frame(uint16_t frame) {
   if (!stage_frame(frame)) stop(1u);
   svx_decode_payload_wram_fast((uint16_t)(STAGE_ADDRESS + 9u), frame == 0u,
                                framebuffer, framebuffer);
@@ -159,7 +177,7 @@ static void wait_vblank_fresh(void) {
 }
 
 void video_reel_run(void) {
-  uint8_t frame;
+  uint16_t frame;
   uint16_t deadline;
   snes_ppu_reset_blank();
   video_reel_result = 0xffu;
@@ -173,6 +191,7 @@ void video_reel_run(void) {
 
   /* Target proof: validate the exact embedded sequence and its keyframe reset
      behind the title before allowing video playback to begin. */
+#if VIDEO_REEL_FRAME_COUNT <= 4u
   for (frame = 0; frame != VIDEO_REEL_FRAME_COUNT; ++frame) {
     decode_frame(frame);
     video_reel_last_crc = crc16(framebuffer, SVC_FRAME_SIZE);
@@ -181,8 +200,28 @@ void video_reel_run(void) {
       stop(2u);
     }
   }
+#else
+  /* Decode the complete chain once and CRC every packet that crosses a HiROM
+     bank. These are the staging cases a four-frame fixture cannot exercise. */
+  for (frame = 0; frame != VIDEO_REEL_FRAME_COUNT; ++frame) {
+    uint32_t first = reel_packet_offsets[frame];
+    uint32_t last = reel_packet_offsets[frame + 1u] - 1u;
+    video_reel_frame = frame;
+    decode_frame(frame);
+    if ((first >> 16) != (last >> 16)) {
+      video_reel_last_crc = crc16(framebuffer, SVC_FRAME_SIZE);
+      if (video_reel_last_crc != reel_frame_crcs[frame]) {
+        ++video_reel_crc_failures;
+        stop(2u);
+      }
+    }
+  }
+#endif
   decode_frame(0u);
-  if (crc16(framebuffer, SVC_FRAME_SIZE) != reel_frame_crcs[0]) stop(3u);
+  if (crc16(framebuffer, SVC_FRAME_SIZE) != reel_frame_crcs[0]) {
+    ++video_reel_crc_failures;
+    stop(3u);
+  }
   m7splash_end(30u);
 
   setup_display();
@@ -202,7 +241,7 @@ void video_reel_run(void) {
   m7_show();
 
   for (;;) {
-    frame = (uint8_t)(video_reel_frame + 1u);
+    frame = (uint16_t)(video_reel_frame + 1u);
     if (frame == VIDEO_REEL_FRAME_COUNT) frame = 0u;
     decode_frame(frame);
     while ((int16_t)((uint16_t)video_reel_vblanks - deadline) < 0)

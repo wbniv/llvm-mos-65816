@@ -22,6 +22,10 @@ def main() -> int:
     parser.add_argument("palette", type=Path, help="448-byte BGR555 palette")
     parser.add_argument("output", type=Path, help="generated C header")
     parser.add_argument("--frames", type=int, default=4)
+    parser.add_argument("--packed-far", action="store_true",
+                        help="emit one contiguous HiROM far-data stream and offsets")
+    parser.add_argument("--stream-output", type=Path,
+                        help="write packed bytes separately instead of a C initializer")
     args = parser.parse_args()
 
     data = args.tiles.read_bytes()
@@ -58,15 +62,39 @@ def main() -> int:
         "static const uint8_t reel_palette[448] = {",
         f"    {byte_rows(palette)}",
         "};",
-        f"static const uint8_t reel_packets[{len(frames)}][{maximum}] = {{",
     ]
-    for packet in packets:
-        lines.extend(("  {", f"    {byte_rows(packet)}", "  },"))
+    if args.packed_far:
+        stream = b"".join(packets)
+        if args.stream_output:
+            args.stream_output.write_bytes(stream)
+        offsets = [0]
+        for packet in packets:
+            offsets.append(offsets[-1] + len(packet))
+        if not args.stream_output:
+            lines.extend((
+                "static const uint8_t reel_packet_stream[]",
+                "    __attribute__((section(\".far_rodata\"))) = {",
+                f"    {byte_rows(stream)}",
+                "};",
+            ))
+        lines.extend((
+            "#define VIDEO_REEL_PACKED_FAR 1",
+            "#define VIDEO_REEL_HIROM_BASE_BANK 0xc1u",
+            f"static const uint32_t reel_packet_offsets[{len(offsets)}] = {{",
+            "  " + ", ".join(f"{offset}ul" for offset in offsets),
+            "};",
+        ))
+    else:
+        lines.append(f"static const uint8_t reel_packets[{len(frames)}][{maximum}] = {{")
+        for packet in packets:
+            lines.extend(("  {", f"    {byte_rows(packet)}", "  },"))
+        lines.extend((
+            "};",
+            f"static const uint16_t reel_packet_sizes[{len(frames)}] = {{",
+            "  " + ", ".join(f"{len(packet)}u" for packet in packets),
+            "};",
+        ))
     lines.extend((
-        "};",
-        f"static const uint16_t reel_packet_sizes[{len(frames)}] = {{",
-        "  " + ", ".join(f"{len(packet)}u" for packet in packets),
-        "};",
         f"static const uint16_t reel_frame_crcs[{len(frames)}] = {{",
         "  " + ", ".join(f"0x{packet[7] | (packet[8] << 8):04x}u" for packet in packets),
         "};",

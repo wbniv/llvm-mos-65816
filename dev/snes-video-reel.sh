@@ -8,23 +8,38 @@ CC="$BUILD/llvm-mos-install/bin/mos-clang"
 CONFIG="$BUILD/install/bin/mos-snes.cfg"
 TILES=${VIDEO_REEL_TILES:-$BUILD/real-video-floyd.tiles}
 PALETTE=${VIDEO_REEL_PALETTE:-$BUILD/real-video-floyd.pal}
-FRAMES=${VIDEO_REEL_FRAMES:-4}
+FRAMES=${VIDEO_REEL_FRAMES:-300}
 CADENCE=${VIDEO_REEL_VBLANKS_PER_FRAME:-2}
 HEADER="$BUILD/snes-video-reel-assets.h"
 ASSET_INCLUDE="$BUILD"
 ROM="$BUILD/svx2-video-reel.sfc"
 MAP="$BUILD/svx2-video-reel.map"
 SCREENSHOT="$BUILD/svx2-video-reel.png"
+STREAM="$BUILD/snes-video-reel-stream.bin"
 
 [ -x "$CC" ] || { echo "FATAL: missing compiler $CC"; exit 1; }
 if [ -f "$TILES" ] && [ -f "$PALETTE" ]; then
-  python3 "$ROOT/tools/snes-video-reel-assets.py" --frames "$FRAMES" \
-    "$TILES" "$PALETTE" "$HEADER"
+  if [ "$FRAMES" -gt 4 ]; then
+    python3 "$ROOT/tools/snes-video-reel-assets.py" --frames "$FRAMES" --packed-far \
+      --stream-output "$STREAM" "$TILES" "$PALETTE" "$HEADER"
+  else
+    python3 "$ROOT/tools/snes-video-reel-assets.py" --frames "$FRAMES" \
+      "$TILES" "$PALETTE" "$HEADER"
+  fi
 else
-  [ "$FRAMES" = 4 ] || { echo "FATAL: custom frame counts require tile corpus and palette"; exit 1; }
   HEADER="$ROOT/examples/snes/snes-video-reel-assets.h"
   ASSET_INCLUDE="$ROOT/examples/snes"
-  echo "using checked-in four-frame reel asset"
+  if [ "$FRAMES" -gt 4 ]; then
+    STREAM="$ROOT/assets/snes/video/svx2-full-reel.bin"
+    [ -f "$STREAM" ] || { echo "FATAL: missing checked-in full reel stream"; exit 1; }
+    echo "using checked-in full reel asset"
+  else
+    echo "using checked-in four-frame reel asset"
+  fi
+fi
+
+if [ "$FRAMES" -gt 4 ]; then
+  CONFIG="$BUILD/install/bin/mos-snes-hirom.cfg"
 fi
 
 "$CC" --config "$CONFIG" -mcpu=mosw65816 \
@@ -36,7 +51,12 @@ fi
   "$ROOT/examples/snes/snes-video-codec.c" \
   "$ROOT/examples/snes/snes-video-dma.c" \
   "$ROOT/examples/snes/snes-video-codec-fast.s"
-python3 "$ROOT/tools/snes-checksum.py" --fastrom "$ROM" >/dev/null
+if [ "$FRAMES" -gt 4 ]; then
+  python3 "$ROOT/tools/snes-video-pack-hirom.py" "$ROM" "$STREAM"
+  python3 "$ROOT/tools/snes-checksum.py" --hirom --fastrom "$ROM" >/dev/null
+else
+  python3 "$ROOT/tools/snes-checksum.py" --fastrom "$ROM" >/dev/null
+fi
 
 result_vma=$(awk '$NF=="video_reel_result" {print $1; exit}' "$MAP")
 loop_gate_vma=$(awk '$NF=="video_reel_loop_gate" {print $1; exit}' "$MAP")
@@ -58,23 +78,27 @@ case "$CADENCE" in
   *) echo "FATAL: VIDEO_REEL_VBLANKS_PER_FRAME must be 1, 2, or 3"; exit 1 ;;
 esac
 expected_presented=${VIDEO_REEL_EXPECTED_PRESENTED:-$default_presented}
-result_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$result_off" 1 0 1200 "$SCREENSHOT" || true)
-case "$result_line" in *"got=0x00"*) ;; *) echo "FAIL: $result_line"; exit 1;; esac
-loop_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$loop_gate_off" 1 0 1200 || true)
-case "$loop_line" in *"got=0x00"*) ;; *) echo "FAIL: two-loop gate: $loop_line"; exit 1;; esac
-crc_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$crc_failures_off" 2 0 1200 || true)
-case "$crc_line" in *"got=0x0000"*) ;; *) echo "FAIL: CRC gate: $crc_line"; exit 1;; esac
-slips_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$deadline_slips_off" 2 0 1200 || true)
-case "$slips_line" in *"got=0x0000"*) ;; *) echo "FAIL: deadline gate: $slips_line"; exit 1;; esac
-presented_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$presented_off" 2 "$expected_presented" 1200 || true)
+gate_frames=1200
+screenshot_frame=0
+if [ "$FRAMES" -gt 4 ]; then
+  gate_frames=2400
+  expected_presented=2cc
+  screenshot_frame=115
+fi
+# These four contiguous bytes are result, two-loop gate, and the 16-bit
+# deadline-slip count. A single emulator run therefore proves all three; CRC
+# failures stop with a nonzero result before playback can satisfy the loop gate.
+result_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$result_off" 4 0 "$gate_frames" "$SCREENSHOT" || true)
+case "$result_line" in *"got=0x00000000"*) ;; *) echo "FAIL: composite health gate: $result_line"; exit 1;; esac
+presented_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$presented_off" 2 "$expected_presented" "$gate_frames" || true)
 case "$presented_line" in *"PASS"*) ;; *) echo "FAIL: cadence gate: $presented_line"; exit 1;; esac
 if [ -f "$TILES" ] && [ -f "$PALETTE" ]; then
-  python3 "$ROOT/tools/snes-video-screenshot-check.py" --frame 0 \
+  python3 "$ROOT/tools/snes-video-screenshot-check.py" --frame "$screenshot_frame" \
+    --video-height 192 \
+    --matrix-d 75 \
+    --minimum-exact 0.68 --maximum-mae 4.0 \
     "$SCREENSHOT" "$TILES" "$PALETTE"
 fi
 echo "$result_line"
-echo "$loop_line"
-echo "$crc_line"
-echo "$slips_line"
 echo "$presented_line"
 echo "ROM=$ROM"

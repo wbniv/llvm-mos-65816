@@ -111,3 +111,8 @@ VBlanks (60.7/64.8 fps) for the median/worst packets with the same 4,480-byte ga
 and fixed an llvm-mos MC encoder defect: distinct-bank `MVN`/`MVP` operands were emitted in assembly
 syntax order instead of the hardware's reversed destination,source byte order. The rebuilt MC lit
 regression and the mnemonic-using ROM both pass.
+
+The complete 300-frame corpus is integrated by
+[`2026-07-31-svx2-full-artemis-reel.md`](2026-07-31-svx2-full-artemis-reel.md). Its packed stream
+occupies 765,503 bytes and fits a standard 1 MiB HiROM; ExHiROM is unnecessary for this ten-second reel and remains a distinct
+multi-megabyte boundary test.

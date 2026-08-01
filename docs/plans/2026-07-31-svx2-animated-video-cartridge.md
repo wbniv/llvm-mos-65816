@@ -1,9 +1,11 @@
 # SVX2 Animated Video Cartridge
 
 **Date:** 2026-07-31
-**Status:** Bounded LoROM cartridge complete; 60 fps optimization and ExHiROM follow-up remain
+**Status:** Full 300-frame HiROM cartridge complete; 60 fps optimization and ExHiROM follow-up remain
 **Depends on:** `2026-07-31-real-video-codec-corpus.md`
 **Feeds:** `2026-07-30-exhirom-video-boundary-test.md`
+
+**Full-reel continuation:** [`2026-07-31-svx2-full-artemis-reel.md`](2026-07-31-svx2-full-artemis-reel.md)
 
 ## Goal
 
@@ -92,7 +94,8 @@ on the final frame.
   the same window, so the verified/default cartridge remains 30 fps pending further optimization.
 - [x] Publish the verified `.sfc` and gallery player entry, with codec, dimensions, cadence,
   frame count, source attribution, checksum, and an explicit fidelity-verification result.
-- [ ] Reuse the same player/stream boundary for the larger ExHiROM boundary-crossing reel.
+- [x] Reuse the same player/stream boundary for the complete 300-frame HiROM reel.
+- [ ] Exercise the same boundary logic across the separate 4 MiB ExHiROM boundary fixture.
 
 ## Verification gates
 
@@ -141,6 +144,15 @@ Completed 2026-07-31:
 - ROM SHA-256 `825e3848917c669481c6da1eac6212d857aa1c399d6a1c2ffba8d264d0708c99`;
   and
 - gallery commit `bd102e8`, release tag `v1.0.317`, with its 1,200-frame live self-check passing.
+
+Full-reel continuation completed 2026-07-31:
+
+- all 300 approved Artemis frames in a 765,503-byte packed SVX2 stream;
+- 1 MiB Fast HiROM with 16-bit frame indexing and DMA split at 64 KiB ROM-bank boundaries;
+- complete host round trip plus target CRCs for every bank-crossing packet and the reset keyframe;
+- 716 exact presentations in 2,400 VBlanks, over two complete loops, with zero decoder errors and
+  zero deadline slips; and
+- frame-115 emulator/host visual gate passes with the corrected Mode 7 dashboard split model.
 
 The integration also exposed a second staged-keyframe defect: the parser selected DBR `$7F` for
 high-WRAM token reads, but ordinary indirect run stores and absolute parser-state loads then used

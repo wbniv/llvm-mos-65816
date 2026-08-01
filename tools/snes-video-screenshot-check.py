@@ -11,7 +11,8 @@ from PIL import Image, ImageChops
 FRAME_SIZE = 4480
 
 
-def render_frame(tiles: bytes, palette: bytes, index: int) -> Image.Image:
+def render_frame(tiles: bytes, palette: bytes, index: int, height: int,
+                 matrix_d: int | None = None) -> Image.Image:
     frame = tiles[index * FRAME_SIZE:(index + 1) * FRAME_SIZE]
     if len(frame) != FRAME_SIZE:
         raise ValueError(f"frame {index} is outside the tile corpus")
@@ -28,7 +29,20 @@ def render_frame(tiles: bytes, palette: bytes, index: int) -> Image.Image:
         colors.extend(((word & 31) << 3, ((word >> 5) & 31) << 3, ((word >> 10) & 31) << 3))
     image = Image.frombytes("P", (80, 56), bytes(raster))
     image.putpalette(colors + [0] * (768 - len(colors)))
-    return image.convert("RGB").resize((256, 224), Image.Resampling.NEAREST)
+    image = image.convert("RGB")
+    if matrix_d is None:
+        return image.resize((256, height), Image.Resampling.NEAREST)
+    # Match the integer sampling performed by Mode 7.  The vertical origin is
+    # one source pixel above scanline zero for this dashboard split; Pillow's
+    # affine pixel-centre convention is close, but differs at scaling edges.
+    source = image.load()
+    scaled = Image.new("RGB", (256, height))
+    destination = scaled.load()
+    for y in range(height):
+        source_y = max(0, min(55, (matrix_d * y - 256) >> 8))
+        for x in range(256):
+            destination[x, y] = source[min(79, (80 * x) >> 8), source_y]
+    return scaled
 
 
 def main() -> int:
@@ -37,6 +51,8 @@ def main() -> int:
     parser.add_argument("tiles", type=Path)
     parser.add_argument("palette", type=Path)
     parser.add_argument("--frame", type=int, required=True)
+    parser.add_argument("--video-height", type=int, default=224)
+    parser.add_argument("--matrix-d", type=int)
     parser.add_argument("--minimum-exact", type=float, default=0.90)
     parser.add_argument("--maximum-mae", type=float, default=2.5)
     args = parser.parse_args()
@@ -46,7 +62,11 @@ def main() -> int:
     actual = Image.open(args.screenshot).convert("RGB")
     if actual.size != (256, 224):
         parser.error(f"screenshot must be 256x224, got {actual.size}")
-    expected = render_frame(args.tiles.read_bytes(), palette, args.frame)
+    if not 1 <= args.video_height <= 224:
+        parser.error("--video-height must be between 1 and 224")
+    actual = actual.crop((0, 0, 256, args.video_height))
+    expected = render_frame(args.tiles.read_bytes(), palette, args.frame, args.video_height,
+                            args.matrix_d)
     difference = ImageChops.difference(actual, expected)
     histogram = difference.histogram()
     samples = actual.width * actual.height * 3
