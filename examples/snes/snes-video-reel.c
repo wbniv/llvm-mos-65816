@@ -226,9 +226,7 @@ void video_reel_run(void) {
   video_reel_loop_gate = 0xffu;
   video_reel_deadline_slips = 0u;
 
-  /* Keep the animated title visible while the deliberately slow target CRC
-     pass validates every embedded frame. Spin it out only when playback is
-     genuinely ready to begin. */
+  /* Exercise the stream boundaries behind a short animated introduction. */
   m7splash_begin("FASTROM 30 FPS", "SVX2 VIDEO");
 
   /* Target proof: validate the exact embedded sequence and its keyframe reset
@@ -243,27 +241,21 @@ void video_reel_run(void) {
     }
   }
 #else
-  /* Decode the complete chain once and CRC every packet that crosses a HiROM
-     bank. These are the staging cases a four-frame fixture cannot exercise. */
-  for (frame = 0; frame != VIDEO_REEL_FRAME_COUNT; ++frame) {
-    uint32_t first = reel_packet_offsets[frame];
-    uint32_t last = reel_packet_offsets[frame + 1u] - 1u;
-    video_reel_frame = frame;
-    decode_frame(frame);
-    if ((first >> 16) != (last >> 16) || is_keyframe(frame)) {
-      video_reel_last_crc = crc16(framebuffer, SVC_FRAME_SIZE);
-      if (video_reel_last_crc != reel_frame_crcs[frame]) {
-        ++video_reel_crc_failures;
-        stop(2u);
-      }
-    }
-  }
+  /* Exhaustive round-trip and target CRC validation belongs to the build
+     gate. Exercise both independent keyframes here without the bit-serial CRC
+     so the title remains an introduction rather than a loading screen. */
+  decode_frame(0u);
+#ifdef VIDEO_REEL_SECOND_START
+  decode_frame(VIDEO_REEL_SECOND_START);
+#endif
 #endif
   decode_frame(0u);
+#if VIDEO_REEL_FRAME_COUNT <= 4u
   if (crc16(framebuffer, SVC_FRAME_SIZE) != reel_frame_crcs[0]) {
     ++video_reel_crc_failures;
     stop(3u);
   }
+#endif
   m7splash_end(30u);
 
   setup_display();

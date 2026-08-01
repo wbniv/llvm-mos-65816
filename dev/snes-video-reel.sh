@@ -70,15 +70,13 @@ fi
 
 result_vma=$(awk '$NF=="video_reel_result" {print $1; exit}' "$MAP")
 loop_gate_vma=$(awk '$NF=="video_reel_loop_gate" {print $1; exit}' "$MAP")
-crc_failures_vma=$(awk '$NF=="video_reel_crc_failures" {print $1; exit}' "$MAP")
 deadline_slips_vma=$(awk '$NF=="video_reel_deadline_slips" {print $1; exit}' "$MAP")
 presented_vma=$(awk '$NF=="video_reel_presented_total" {print $1; exit}' "$MAP")
-[ -n "$result_vma" ] && [ -n "$loop_gate_vma" ] && [ -n "$crc_failures_vma" ] && \
+[ -n "$result_vma" ] && [ -n "$loop_gate_vma" ] && \
   [ -n "$deadline_slips_vma" ] && [ -n "$presented_vma" ] || \
   { echo "FATAL: diagnostic symbols missing"; exit 1; }
 result_off=$(printf '%x' "$((16#$result_vma))")
 loop_gate_off=$(printf '%x' "$((16#$loop_gate_vma))")
-crc_failures_off=$(printf '%x' "$((16#$crc_failures_vma))")
 deadline_slips_off=$(printf '%x' "$((16#$deadline_slips_vma))")
 presented_off=$(printf '%x' "$((16#$presented_vma))")
 case "$CADENCE" in
@@ -100,9 +98,9 @@ check_palette=$PALETTE
 minimum_exact=0.68
 maximum_mae=4.0
 if [ "$combined" = 1 ] || { [ "$FRAMES" -gt 4 ] && grep -q VIDEO_REEL_SECOND_START "$HEADER"; }; then
-  gate_frames=6500
-  expected_presented=788
-  screenshot_frame=127
+  gate_frames=4000
+  expected_presented=774
+  screenshot_frame=107
   check_tiles=$FIRST_TILES
   check_palette=$FIRST_PALETTE
   minimum_exact=0.35

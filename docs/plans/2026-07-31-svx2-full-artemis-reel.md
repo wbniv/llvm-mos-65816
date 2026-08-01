@@ -1,7 +1,7 @@
 # SVX2 Two-Video Artemis Reel
 
 **Date:** 2026-07-31
-**Status:** Corrected two-video implementation published 2026-07-31
+**Status:** Fast-start correction implemented 2026-07-31; publishing
 **Depends on:** `2026-07-31-real-video-codec-corpus.md`,
 `2026-07-31-svx2-animated-video-cartridge.md`, and
 `2026-07-31-svx2-cartridge-video-dashboard.md`
@@ -42,10 +42,10 @@ footage at frame 600, and the frame-899 to frame-0 loop while retaining the dash
 
 ## Validation policy
 
-The generator host-decodes and byte-compares all 900 packets. The shipping ROM walks the full chain
-behind the animated title and target-CRCs both independent keyframes plus every packet crossing a
-64 KiB ROM bank. The emulator gate observes at least two complete 900-frame loops, both palette
-transitions, zero decoder errors, and zero deadline slips.
+The generator host-decodes and byte-compares all 900 packets. Exhaustive target CRC work remains in
+the build gate; the shipping ROM exercises both independent keyframes behind a short title and
+begins playback before emulator frame 240. The emulator gate observes at least two complete
+900-frame loops, both palette transitions, zero decoder errors, and zero deadline slips.
 
 ## Dashboard
 
@@ -86,9 +86,9 @@ transitions, zero decoder errors, and zero deadline slips.
 - Corrected build: 900 packets, 2,355,828 stream bytes, maximum packet 3,820 bytes.
 - 4,194,304-byte Fast HiROM; stream begins at file offset `$010000` / canonical bank `$C1`.
 - Clean-checkout build succeeds from the checked-in metadata and packed stream.
-- At 6,500 VBlanks, the composite target gate at WRAM `$0040` is `$00000000`: decoder healthy,
+- At 4,000 VBlanks, the composite target gate at WRAM `$0040` is `$00000000`: decoder healthy,
   two complete loops observed, and zero missed deadlines.
-- Exact cadence oracle: 1,928 presentations (`$0788`) in the same emulator run.
+- Exact cadence oracle: 1,908 presentations (`$0774`) in the reproducible source-corpus build.
 - Representative frame 115 visual gate: 69.6696% exact RGB pixels and 3.3463 mean absolute
   channel error after modeling the non-integer Mode 7 vertical scale and dashboard split.
 - Superseded one-video artifact: release `v1.0.328`, SHA-256 `31cfed53799fa9d3674a75cc3ea9434d8c37ae16706dca645222e11c51388baf`.
@@ -96,3 +96,5 @@ transitions, zero decoder errors, and zero deadline slips.
   `488f03001919f3c83006b13c39bc99dee8563886e88e21a07d564c0ff68b5af3`.
 - Published by gallery commit `d9dd125`, release `v1.0.329`; deployment succeeded, the downloaded
   4 MiB ROM hash is identical, and that live artifact passes the 6,500-frame composite gate.
+- Fast-start correction removes the roughly 42-second boot-time stream walk. Corrected artifact
+  SHA-256: `ca22da27741b1c9533811580245cc61bb57f147b07076230fbc86d9101e2212c`.
