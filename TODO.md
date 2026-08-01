@@ -128,28 +128,28 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   bank-contained ROM span into either WRAM bank with `$2180` GP-DMA; host tests cover its register
   plan and rejection boundaries, and llvm-mos compiles the target MMIO path. Wire that adapter into
   the player after `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
-- [wip T4] **60 fps video playback target** — <!-- agent:a0f879ca71db8cabe --> raised from 30 fps (user, 2026-07-31): SVX2's slow-ROM
-  pipeline timing proxy now charges the real segment cursor, packet staging DMA, decode, and
-  4,480-byte presentation DMA. After optimizing per-command count/completion bookkeeping and
-  direct-page state accesses, slow-ROM median/worst are **542/581 per 600 VBlanks = 54.2/58.1
-  fps**; 20/30 remain green but slow ROM does not meet 60.
-  The decoder still reads the identical ROM packet rather than the staged high-WRAM copy, so this
-  is a cost-complete proxy, not the final functional refill gate. FastROM is now correctly gated
-  with header `$30` + `MEMSEL=$01` + execution in bank `$80`: median/worst now reach **605/647 per
-  600 = 60.5/64.7 fps**, so the cost-complete timing proxy passes both cases. Remaining work:
-  **(a)** make the decoder functionally consume staged high-WRAM/ring-refill input without losing
-  the 60 fps margin; **(b)** keyframe scheduling vs the
-  16.7 ms budget (slip-never-tear already specified); **(c)** true 60 fps content needs
-  ≥59.94 fps masters (KSC has them; a 30 fps master frame-doubles, halving decode load);
-  **(d)** stream size ×2 per second — recheck ExHiROM capacity. Thresholds updated in
-  [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Frame presentation /
-  §Codec selection. (T4: throughput engineering with unknown headroom.)
-  **Visible proof correction (2026-07-31):** the initially corrupted display was not a compiler
-  `ptrtoint` miscompile. `svx_decode_payload_asm` clobbered ABI-owned `__rc0` (the caller's
-  software-stack pointer), invalidating a correct spill reload used by the C DMA setup. The decoder
-  now preserves/restores `__rc0`; the temporary assembly DMA workaround is removed, the 4,480-byte
-  gate passes, and the C-path render is pixel-identical to the reference capture (SHA-256
-  `d0bd439a…c04c92`).
+- [T3] **60 fps video — FUNCTIONAL REFILL PASSES (2026-08-01); remaining = keyframe policy
+  decision + merge + master acquisition.** <!-- agent:a0f879ca71db8cabe (feature/60fps-video, merge-tree clean vs main) -->
+  Brief correction: staged-WRAM decode already existed at HEAD; the real gap was multi-packet
+  ring refill — implemented as a no-split wrapping ring in `$7F:2000–F000` fed from a packed
+  HiROM stream (rejected: DMA/decode overlap — GP-DMA halts the CPU, no concurrency to win;
+  batched refill — bursts don't fit a 1.2% margin). **Measured: hardest stream slice (3,290
+  B/pkt) 553 slow / 620 FastROM per 600 VBlanks — 60 fps holds on the functional path**; gate
+  non-vacuous (single corrupted stream byte → FAIL), 28 ring wraps proven taken. Keyframes
+  measured for the first time: 2.90 → 2.00 VBlanks after an `MVN` literal fix (byte-correct,
+  svx-median/worst unchanged 607/648, 17/17 host tests); residual is token-dispatch-bound
+  (290 tokens/4,480 B under Floyd fragmentation), so **periodic keyframes and a strict 600/600
+  gate are incompatible today** — DECISION (user/transport plan): schedule keyframes as
+  deterministic 2-VBlank slots (59.0 effective @ interval 60) or keep them out of linear
+  playback (what the shipped reel does). Unproven lead recorded: staged-keyframe
+  specialization (fix bank `$7F`, drop per-token far-check + rep/sep at 3 read sites) may make
+  keyframes free. Capacity NOT binding: 6 MiB = 39.4 s true-60 (77.4 s frame-doubled); 8 MiB =
+  53.0/104.3 s. Content: no fetch path exists in tools/; needs one ffprobe per NASA SVS 14191
+  master (user-gated acquisition). Commits on `feature/60fps-video`
+  ([plan](docs/plans/2026-08-01-svx2-60fps-ring-refill.md)); `snes-video-codec-fast.s` is
+  shared with the reel corridor — merge after the reel worker's uncommitted edits land.
+  (T3: remaining work is decided-scope integration; the T4 unknown-headroom question is
+  answered.)
 - [T2] **Hard real-video stressor for codec ratio expectations** — the real-camera leg used the
   H.264 `~large` derivative of a **night** launch (mostly-black frames, codec-smoothed grain):
   a best case, so real-footage ratios (31–57%) are uncalibrated for hard content. The
