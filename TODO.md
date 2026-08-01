@@ -61,7 +61,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [T3] **seamdemo — P0 DONE (`e30673f`); next: P1 Act-1 ROM (VM + PC ticker + seam event).**
+- [wip T3] **seamdemo — P0 DONE (`e30673f`); P1 Act-1 ROM DISPATCHED (VM + PC ticker + seam event).**
   <!-- agent:a3f76f15f3f53c44e (P0 done; holds full generator/oracle/ISA context — reuse for P1) -->
   P0 contract settled: `decode_cells()` model extension (380 cells, 5 new regression tests,
   58+25,044 subtests), one-slot-record layout, 16-op ISA + 8-entry ALU fn-ptr table, 24-bit
