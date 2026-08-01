@@ -734,7 +734,113 @@ answer; `oracle[3] = 15234` is `basket-apples`, matching the work‑3 figure in 
 evidence above. That agreement is also the proof that `report.json`'s array order is
 `GALLERY_ASSETS`' order, which is what makes `oracle[work]` a legal indexing.
 
+### Added 2026‑08‑01 — the budget, the record off work 0, and the reproducible build
+
+10. **`frames: 24000` covers all 62 works, not just the three it was sized on.**
+
+The budget above was extrapolated from works 0–2 with a hand-waved "headroom for the corpus's
+larger and denser works". That is the same shape of reasoning that left `frames` at 200000 through
+five corpus expansions, so it is now computed and re-runnable:
+**[`dev/measure-repack-budget.py`](../../dev/measure-repack-budget.py)**.
+
+Reading `gallery_repack_frames[]` for all 62 works off the target costs a ~620 000-frame bsnes-jg
+sweep (≈3 h) and has to be redone on every corpus regeneration. It is not necessary. `compress_far`
+is a deterministic function of the decoded image, and the decoded image *is* the `.idx` the host
+packer produced — so the work the 65816 will do can be counted on the host. Two things make that
+trustworthy rather than plausible:
+
+- **The re-implementation must reproduce the encoder's output before it is allowed to talk about
+  its runtime.** All 62 simulated stream sizes equal `report.json`'s `compressed_bytes` exactly.
+- **The result is a bound, not a fit.** Cost is counted in five classes (raw bytes, tokens, chain
+  steps, byte compares, outer groups). `compress_far` is `optnone` straight-line C, so its frame
+  cost is *some* non-negative linear combination of those counts — and for **any** such
+  combination, `cost(k)/cost(0)` is bounded by the largest per-class ratio. One measured work
+  therefore calibrates a bound over all 62 without knowing the per-class constants.
+
+```
+corpus: 62 works from assets/snes/lzss-gallery/derived
+encoder self-validation: PASS (62/62 works reproduce report.json compressed_bytes exactly)
+
+anchor: k=0 great-wave repack=8169 verify=336 frames (measured)
+per-class envelope over the corpus (max_k class_k / class_anchor):
+  raw     1.0306  at k=21 (houses-parliament)
+  tokens  1.1772  at k=22 (thistles)
+  chain   1.1731  at k=22 (thistles)
+  cmpb    1.1266  at k=8 (earthly-delights)
+  outer   1.1766  at k=22 (thistles)
+envelope bound = 1.1772 (binding class: tokens) -- valid for ANY non-negative linear cost model
+
+worst-case cold-boot frame at which gallery_shown.state reaches VERIFIED:
+  splash + hold(60)        558   (does not scale with the artwork)
+  unpack+stage+near        330   (<= 1.0306 x anchor)
+  repack                  9616   (<= 1.1772 x anchor)
+  verify                   375   (<= 1.1156 x anchor)
+  TOTAL                 10879
+
+validation against works measured on the target (built -DGALLERY_START=k):
+  k=22  thistles           repack 9352 <= 9616 OK  | poll 10617 <= 10879 OK
+  k=8   earthly-delights   repack 9023 <= 9616 OK  | poll 10253 <= 10879 OK
+
+budget 24000 frames -> margin 2.21x (45.3% of budget used by the worst case)
+PASS: 24000 frames covers every work in the corpus.
+```
+
+**PASS** — no work in the corpus can reach `VERIFIED` later than frame **10 879**, so 24 000 carries
+a **2.21×** margin against the worst case rather than 2.56× against work 0. The script exits 1 if a
+corpus regeneration ever breaks that, which is the point: the budget stops being a number somebody
+has to remember to re-derive.
+
+11. **The record is correct for a work that is not work 0** — every previous run verified
+    `great-wave`, so nothing had yet exercised `oracle[work]` at a non-zero index.
+
+The two validation works above were chosen as the argmax of two different cost predictors
+*before* being measured, built with `-DGALLERY_START=k`, and polled from cold boot with
+`JGX_POLL=1` against `gallery_shown.state`:
+
+```
+=== k=22  gallery_shown=0x477  state=0x47b  budget 24000 ===
+jgxcheck: JGX_POLL matched at frame 10617 of 24000 budgeted
+SMOKE: PASS off=0x47B len=1 got=0x02 (ran 24000 frames, bsnes-jg)
+  gallery_shown         = z=17075 work=22 ok=1 state=2      oracle[22]=17075  MATCH
+  gallery_repack_frames[22] = 9352   gallery_verify_frames[22] = 357
+
+=== k=8   gallery_shown=0x477  state=0x47b  budget 24000 ===
+jgxcheck: JGX_POLL matched at frame 10253 of 24000 budgeted
+SMOKE: PASS off=0x47B len=1 got=0x02 (ran 24000 frames, bsnes-jg)
+  gallery_shown         = z=16473 work=8  ok=1 state=2      oracle[8]=16473   MATCH
+  gallery_repack_frames[8]  = 9023   gallery_verify_frames[8]  = 353
+```
+
+**PASS** — `work` names the artwork actually on screen (22 and 8, agreeing with
+`gallery_current_asset` in both dumps), and `z` equals that artwork's *own* host oracle entry.
+The lookup `oracle[work]` is what is being exercised here, not a constant that happens to be
+`oracle[0]`; a player that ignored `work` and compared against `oracle[0]` would report
+`✗ MISMATCH` on both of these runs.
+
+12. **The ROM now builds reproducibly** — `dev/lzss-gallery.sh`'s relink-once check, on the
+    toolchain carrying `patches/llvm-mos/0021-mos-zp-alloc-deterministic.patch`, with the
+    `gallery_shown` record present:
+
+```
+==> reproducible-build check (relink and compare)
+reproducible build: PASS (5768147529a4d147fc497e25dea5a2071816f4f46eaa324a868f9d02fbf3a95d)
+RESULT: PASS — 62-work LZSS gallery host oracle, relink, header and bsnes-jg gate
+```
+
+**PASS**, and it is the precondition the whole rollout was blocked on: `dev/sync-manifest-offsets.py`
+refuses to trust a link map unless `build/<slug>.sfc` is byte-identical to the shipped ROM, and
+before 0021 that comparison was a coin flip. The same run re-confirms the record is additive —
+`corpus_result 0x46f`, `gallery_progress 0x471`, `gallery_current_asset 0x472`,
+`gallery_last_z 0x473`, `gallery_last_work 0x475`, `gallery_last_ok 0x476` are all unmoved, with
+`gallery_shown` at `0x477` size 5 — and that all 62 works still decode (`corpus_result 0x5CF0`).
+
 ### Incidental finding — the gallery ROM does not build reproducibly (PRE-EXISTING, not this change)
+
+> **RESOLVED 2026‑08‑01.** Root-caused and fixed upstream: `MOSZeroPageAlloc` broke benefit ties
+> for zero-page placement in heap-address order, so identical sources produced one of two stable
+> images. `patches/llvm-mos/0021-mos-zp-alloc-deterministic.patch` makes that container a
+> `MapVector`; `dev/lzss-gallery.sh` gained the relink-once check whose PASS is step 12 above.
+> The scoping below stands as the record of how it was narrowed.
 
 Confirming that the gated ROM is what the final source builds turned up something else:
 `examples/snes/lzss-gallery.c` compiles to **two different ROM images**, roughly 50/50 across
@@ -882,4 +988,56 @@ agrees with the ~9.1k measured here. That fixes the *budget*, not this correctne
 This does not fix, and does not claim to fix, the two pre-existing gate failures found on
 2026-07-28: `lzss-gallery`'s selfcheck (this plan) and `lsystem`'s BLANKSCAN (one frame with a
 transient black band at the top — force-blank bleed, still unexamined). Neither was introduced by
-that day's republish.
+that day's republish. *(Both since resolved elsewhere: the selfcheck failure was the
+`decode_bank7e` A-clobber, fixed `2932bcf`; the BLANKSCAN flag was a detector false positive,
+quiescence guard adopted `5587462`.)*
+
+## Status (2026-07-31)
+
+- **Interim selfcheck is live**: the republished gallery ships `selfcheck.symbol: gallery_last_z`,
+  `want 0x3BC9` (work 0's exact host byte count), `frames 12000` — a genuine codec correctness
+  assertion replacing the structurally broken `corpus_result/200000` entry.
+- **ROM half of `live-record` done** on `feature/verify-fidelity-button` @ `f0d903d` (unmerged
+  pending the post-republish window): `gallery_shown{z,work,ok,state}` record with verified store
+  ordering, `JGX_POLL` harness, `verify-web-roms` live-record replay, oracle/titles generation in
+  `sync-manifest-offsets.py`.
+- **Player half in progress** in `~/bsnes-jg-wasm` (implement+test authorized; release/sync not
+  yet): scenarios A (PASS badge), B (mismatch FAIL), C (warn/timeout) exercised; D
+  (re-target-once) blocked on headless keyboard input reaching the emulator — being retried via
+  direct pad injection; will land as an honest partial if the input harness cannot drive it.
+- **Rollout chain**: player release + site sync → merge button branch → gallery republish with
+  `gallery_shown` → manifest flips to `mode: "live-record"` with the 62-entry oracle table.
+
+## Status (2026-08-01)
+
+- ~~**ROM half unmerged**~~ — **merged to `main`.** The branch was rebased onto `main` and
+  fast-forwarded; `f0d903d` above is the pre-rebase SHA and no longer exists.
+- ~~**`frames: 24000` extrapolated from three works**~~ — **confirmed corpus-wide** (verification
+  step 10). Worst case is frame 10 879 of 24 000; the check is `dev/measure-repack-budget.py` and
+  it fails loudly if a corpus regeneration ever breaks it.
+- ~~**The gallery ROM does not build reproducibly**~~ — **fixed** by
+  `patches/llvm-mos/0021-mos-zp-alloc-deterministic.patch`; `dev/lzss-gallery.sh` reports
+  `reproducible build: PASS` for the record-carrying ROM (verification step 12). This was the
+  precondition for `dev/sync-manifest-offsets.py` to be trusted, and therefore for the manifest to
+  be wired at all.
+- ~~**`oracle[work]` only ever exercised at `work == 0`**~~ — **exercised at 22 and 8**
+  (verification step 11), each matching that artwork's own host oracle entry.
+
+### Still open
+
+- **Player package release.** `~/bsnes-jg-wasm` carries a `verifyLiveRecord` implementation
+  matching the contract above, and `~/biohack.net/public/play/app.js` is byte-identical to that
+  repo's `dist/engine/app.js` — but **neither is committed**, `public/play/ENGINE_VERSION` still
+  stamps the previous `app.js` sha256, and no version has been published. **USER-GATED.**
+- **The badge is unstyled, and has been all along.** `SnesPlayer.astro` renders
+  `<span id="checkresult" class="rp-badge">`, and biohack.net styles `.rp-badge.pass` /
+  `.rp-badge.fail` / `.rp-badge.running` — but `badge()` in `app.js` assigns
+  `checkEl.className = "badge " + cls`, which *replaces* `rp-badge`. No `.badge` rule exists
+  anywhere on the site, so the green PASS pill and red FAIL pill have never applied on any demo
+  page. **Pre-existing** (the released `app.js` at biohack.net HEAD does the same at lines
+  247/265/268) and not introduced by `live-record` — but it means the `warn` class this plan asks
+  for is only half the gap: `warn` needs a rule *and* the class name needs to be `rp-badge`.
+  Fixing it belongs with the player package release.
+- **Gallery republish.** The manifest still carries the interim work‑0 scalar entry. Flipping it
+  to `mode: "live-record"` needs the republished ROM (`sync-manifest-offsets.py` gates on the
+  built ROM being byte-identical to the shipped one) *and* a player that understands `mode`.
