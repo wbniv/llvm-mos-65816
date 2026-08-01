@@ -138,6 +138,91 @@ PackBits *literal* path in `svx_decode_payload_asm` copies one byte at a time �
 `LDA long / STA abs,Y / INX / INY / DEC dp / BNE` ≈ 24 cycles/byte. A PackBits literal run is
 exactly a block copy, so it should use the same `MVN` the delta path already proves.
 
+### Keyframe fix, and where the rest of the cycles actually go
+
+Replacing the literal byte loop with `MVN` (`snes-video-codec-fast.s:157`) improves the keyframe case
+**207 → 300** decodes/600 FastROM (2.90 → **2.00** VBlanks), byte-correct, with **no delta
+regression** — `svx-median` and `svx-worst` stay at exactly 607 and 648.
+
+It does not close the gap, and the reason is measured rather than guessed. Token histogram of the
+frame-180 keyframe packet:
+
+| | tokens | bytes emitted | mean run length |
+|---|---:|---:|---:|
+| literal | 143 | 3,007 | 21.0 |
+| run | 147 | 1,473 | 10.0 |
+
+290 tokens for 4,480 output bytes. Floyd–Steinberg dithering fragments PackBits, so the kernel is
+**token-dispatch-bound, not copy-bound** — which is exactly why optimizing the copy bought 45 % and
+no more. The identified next lever is a *staged keyframe specialization*, mirroring what
+`svx_decode_payload_wram_asm` already does for deltas: with the source bank fixed at `$7F` the
+per-token `lda __rc12 / beq` test and its `sep`/`rep` mode flips disappear from all three read sites.
+Not attempted here — see "Not finished" below.
+
+### Schedule recommendation (scope b)
+
+With keyframes at 2.00 VBlanks, presentation VBlank-locked, and delta slack unbankable, the honest
+options are:
+
+1. **Deterministic 2-VBlank keyframe slot.** Schedule the keyframe as a planned two-VBlank frame
+   rather than letting it slip. Visually identical to a slip, but deterministic, so the cadence gate
+   can encode it exactly (`expected = 600 − keyframes`) instead of tolerating slop. Preserves
+   slip-never-tear. Costs 1 VBlank per keyframe interval — 59.0 fps effective at interval 60.
+2. **No periodic keyframes for linear playback** — keyframes only at frame 0 and hard cuts, which is
+   what the shipped reel already does (`snes-video-reel.c:44`). Costs nothing and holds a true
+   600/600. Price: no mid-stream seek targets.
+
+These differ only in whether mid-stream seek is required, which the transport/scrubbing plan owns,
+not this one. Recommended: (2) for the linear reel now, (1) as the shape to adopt the moment
+scrubbing lands — with the staged-keyframe specialization as the way to make (1) free.
+
+### Scope (c) — true-60 content, analysis only
+
+- **No content acquired, and none should be**: there is no documented video-fetch path in `tools/`
+  or `dev/`. The `dev/fetch-*.sh` scripts fetch compiler torture suites and the 65816 oracle, not
+  video masters. Acquiring masters would mean inventing a fetch path, which this task excludes.
+- The requirement stands as the boundary plan states it: true 60 fps motion needs **≥ 59.94 fps
+  masters**; the nominated source is NASA SVS item 14191 (`Pre-launch_through_launch.webm`,
+  `Return_to_Earth.webm`), whose frame rates are unverified here because verifying them requires
+  downloading them. **This is the missing evidence** — one `ffprobe` of each master settles it.
+- A 29.97/30 fps master frame-doubled to the 60 fps cadence is not a compromise on *throughput*: it
+  halves decode load. It is a compromise on *motion*, which stays 30 fps. Never interpolate.
+
+### Scope (d) — ExHiROM capacity at 60 fps, rechecked
+
+Measured SVX2 ratios: real-camera corpus 2,553 B/frame mean (300 frames, 765,969 B); the shipped
+900-frame reel agrees closely at 2,569 B/frame. A **duplicated** frame encodes to exactly **44 bytes**
+(all-copy delta) — measured, constant across the corpus.
+
+Video budget = capacity − 256 KiB reserved for runtime, boundary fixtures and header.
+
+| Capacity | 30 fps native | 60 fps **true** | 60 fps frame-doubled 30 fps master |
+|---|---:|---:|---:|
+| 6 MiB (48 Mbit: ROM 1 4 MiB + ROM 2 2 MiB) | 78.7 s | **39.4 s** | 77.4 s |
+| 8 MiB | 106.1 s | **53.0 s** | 104.3 s |
+
+**Verdict.** The "stream size ×2/second" concern is real but applies only to *true* 60 fps content:
+6 MiB holds ~39 s of it, against the plan's 8–10 s per excerpt × 2 excerpts, so **the nominated
+Artemis reel fits in 6 MiB at true 60 fps with ~2× headroom**. Frame-doubling a 30 fps master costs
+1.7 % over 30 fps native (44 B per duplicate), i.e. capacity is a non-issue on that path. Capacity is
+therefore *not* the binding constraint at 60 fps — decode throughput and keyframe scheduling are.
+
+## Not finished
+
+- The staged-keyframe specialization (bank fixed at `$7F`, no per-token bank test) is identified and
+  motivated by the token histogram but **not implemented**. Expected to be what makes option (1)
+  above free; unproven.
+- Reel-side integration is untouched by design — see below.
+
+## Merge-ready state
+
+Branch `feature/60fps-video`, not pushed, not merged. Clean against `main` for everything this plan
+touches **except** that the reel corridor was deliberately avoided: `examples/snes/snes-video-reel.c`,
+`examples/snes/video_hud.h` and `dev/snes-video-reel.sh` carry another worker's uncommitted edits on
+`main`. `snes-video-codec-fast.s` **is** shared with the reel — the keyframe `MVN` change affects it,
+and it is verified byte-correct with no delta regression, but that reconciliation is the other
+worker's call, not this branch's.
+
 ## Out of scope, stated plainly
 
 - Scope (c) is **analysis only** — no content acquisition; no fetch path is being added.

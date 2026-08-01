@@ -150,36 +150,29 @@ svx_decode_payload_asm:
   xba
   rep #$20
   sta __rc8
-  sta __rc10
   ldx __rc0
   inx
   ldy __rc4
-  /* Keep keyframe literals explicit. Token/payload reads may be in high WRAM,
-     while the near framebuffer is bank $00; long reads plus bank-$00 stores
-     make that crossing unambiguous and avoid MVN changing DBR mid-parser. */
-  sep #$20
-  lda #0
+  /* A PackBits literal run is exactly a block copy, so move it with MVN at
+     ~7 cycles/byte instead of the former LDA-long/STA/INX/INY/DEC/BNE byte loop
+     at ~24. MVN sets DBR to its destination bank ($00, the near framebuffer),
+     which is what every following parser access already expects; the staged
+     source bank is named explicitly, so the high-WRAM crossing stays unambiguous.
+     A holds count-1, parked on the stack across the 8-bit bank test. */
+  dec
   pha
-  plb
+  sep #$20
   lda __rc12
-  beq .Lsvx_key_literal_loop_bank0
-.Lsvx_key_literal_loop:
-  .byte $bf,$00,$00,$7f /* LDA $7F0000,X. */
-  .byte $99,$00,$00     /* STA $0000,Y through DBR=$00. */
-  inx
-  iny
-  dec __rc10
-  bne .Lsvx_key_literal_loop
-  bra .Lsvx_key_literal_done
-.Lsvx_key_literal_loop_bank0:
-  .byte $bd,$00,$00     /* LDA $0000,X through DBR=$00. */
-  .byte $99,$00,$00     /* STA $0000,Y through DBR=$00. */
-  inx
-  iny
-  dec __rc10
-  bne .Lsvx_key_literal_loop_bank0
-.Lsvx_key_literal_done:
+  beq .Lsvx_key_literal_bank0
   rep #$20
+  pla
+  mvn #$7f, #$00
+  bra .Lsvx_key_literal_done
+.Lsvx_key_literal_bank0:
+  rep #$20
+  pla
+  mvn #$00, #$00
+.Lsvx_key_literal_done:
   stx __rc0
   sty __rc4
   lda __rc6
