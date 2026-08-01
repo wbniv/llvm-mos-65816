@@ -462,11 +462,27 @@ bench case 7 (`svx-keyframe`) was added: **207 per 600 VBlanks — 2.90 VBlanks 
 byte at a time at ~24 cycles/byte) improved it to **300 (2.00 VBlanks)** with no delta regression
 (`svx-median`/`svx-worst` unchanged at 607/648). It remains over budget because the kernel is
 **token-dispatch-bound**: the frame-180 keyframe carries 290 tokens for 4,480 output bytes (literal
-mean 21 B, run mean 10 B) because Floyd–Steinberg dithering fragments PackBits. Since presentation is
-VBlank-locked, delta slack is not bankable and each keyframe costs a whole extra VBlank. A strict
-600/600 gate and periodic keyframes are therefore incompatible with the current kernel: either
-schedule keyframes as deterministic two-VBlank slots (59.0 fps effective at interval 60), or keep
-periodic keyframes out of linear playback, which is what the shipped reel already does.
+mean 21 B, run mean 10 B) because Floyd–Steinberg dithering fragments PackBits.
+
+That dispatch overhead was then removed by a **staged-keyframe specialization**,
+`svx_decode_payload_wram_key_asm` — a separate entry point pinning the source bank to `$7F`, keeping
+both cursors in registers, terminating on an output-end compare, and filling runs with an overlapping
+`MVN`. Case 7 reaches **537 per 600 VBlanks (1.12 VBlanks per keyframe)** — 2.6× the original 207 —
+with `svx-median`/`svx-worst` still **exactly 607/648**, 17/17 host codec tests passing, and the
+ring-refill stream up to **630/600** on the hardest slice.
+
+**1.12 still exceeds one VBlank, so periodic keyframes remain a two-VBlank slot.** The kernel is now
+copy-bound rather than dispatch-bound, and the residue is irreducible on this hardware: both `MVN`
+operands are WRAM, which runs at 2.68 MHz **regardless of FastROM** (~46 master cycles/byte), giving
+a 0.755 VBlank floor for 4,480 bytes plus DMA before any token is dispatched. A keyframe must
+materialize the whole frame where a delta touches only changed spans — which is why deltas sit near
+0.9 VBlank and keyframes near 1.1. Further gains are encoder-side (longer PackBits tokens), not
+decoder-side.
+
+**Policy:** schedule keyframes as deterministic two-VBlank slots, effective `60 × K/(K+1)` fps —
+**recommended interval K = 120** (2-second seek granularity, 59.50 fps); K = 60 gives 1-second
+granularity at 59.02 fps. Alternatively keep periodic keyframes out of linear playback entirely, as
+the shipped reel already does, for a true 600/600 at the cost of mid-stream seek anchors.
 
 **Capacity recheck at 60 fps (scope d).** Measured SVX2 mean is 2,553 B/frame (real-camera corpus;
 the 900-frame shipped reel agrees at 2,569 B), and a duplicated frame encodes to exactly 44 B.

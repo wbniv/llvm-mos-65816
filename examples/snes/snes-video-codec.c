@@ -281,6 +281,7 @@ uint8_t svx_asm_keyframe;
 uint8_t svx_asm_source_bank;
 extern void svx_decode_payload_asm(void);
 extern void svx_decode_payload_wram_asm(void);
+extern void svx_decode_payload_wram_key_asm(void);
 extern void svc_copy_frame_asm(void);
 
 #if 0 /* Defined in snes-video-codec-fast.s so the assembler sees mosw65816. */
@@ -504,8 +505,10 @@ void svx_decode_payload_wram_fast(uint16_t source_address, uint8_t keyframe,
   svx_asm_output = output;
   svx_asm_keyframe = keyframe;
   svx_asm_source_bank = 0x7fu;
+  /* Both staged paths are bank-pinned specializations; svx_decode_payload_asm
+     stays the bank-agnostic reference for the non-staged entry point. */
   if (keyframe)
-    svx_decode_payload_asm();
+    svx_decode_payload_wram_key_asm();
   else
     svx_decode_payload_wram_asm();
 }

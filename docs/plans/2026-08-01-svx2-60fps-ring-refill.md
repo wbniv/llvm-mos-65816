@@ -157,9 +157,12 @@ frame-180 keyframe packet:
 no more. The identified next lever is a *staged keyframe specialization*, mirroring what
 `svx_decode_payload_wram_asm` already does for deltas: with the source bank fixed at `$7F` the
 per-token `lda __rc12 / beq` test and its `sep`/`rep` mode flips disappear from all three read sites.
-Not attempted here — see "Not finished" below.
+**Implemented and settled — see "Option C settled" below.**
 
 ### Schedule recommendation (scope b)
+
+(Superseded in detail by "Option C settled" below, which measured the specialization and picked
+Option A with K = 120. Retained because it frames the choice.)
 
 With keyframes at 2.00 VBlanks, presentation VBlank-locked, and delta slack unbankable, the honest
 options are:
@@ -207,11 +210,106 @@ Artemis reel fits in 6 MiB at true 60 fps with ~2× headroom**. Frame-doubling a
 1.7 % over 30 fps native (44 B per duplicate), i.e. capacity is a non-issue on that path. Capacity is
 therefore *not* the binding constraint at 60 fps — decode throughput and keyframe scheduling are.
 
+## Option C settled — staged-keyframe specialization (measured 2026-08-01)
+
+Implemented as `svx_decode_payload_wram_key_asm` (`examples/snes/snes-video-codec-fast.s:23`), a
+**separate entry point** beside the bank-agnostic `svx_decode_payload_asm`, which is left untouched
+and still serves the non-staged path. The specialization pins the source bank to `$7F` and therefore:
+
+- deletes the per-token `lda __rc12 / beq` far-check and its `sep`/`rep` pair at all three read sites
+  (token, literal, run value);
+- keeps `X` (staged source) and `Y` (output) live in registers across tokens instead of spilling to
+  `__rc0`/`__rc4`;
+- terminates on `cpy __rc6` against the output end rather than maintaining a remaining-byte counter;
+- fills runs with an **overlapping `MVN`** (seed one byte, then block-move `dest → dest+1`) at
+  ~7 cycles/byte instead of a 15-cycle `sta (dp),y` loop; and
+- holds DBR at `$00` for the whole kernel, since every `MVN` here names `$00` as its destination.
+
+### Result
+
+| case 7 `svx-keyframe`, 600 VBlanks | slow ROM | FastROM | VBlanks/keyframe (FastROM) |
+|---|---:|---:|---:|
+| general kernel, byte-at-a-time literals (start of day) | 176 | 207 | 2.90 |
+| general kernel, `MVN` literals | 259 | 300 | 2.00 |
+| **staged specialization (Option C)** | **474** | **537** | **1.12** |
+
+**2.6× faster than where the day started.** No regression anywhere: `svx-median`/`svx-worst` remain
+**exactly 607/648**, every other case is unchanged, 17/17 host codec tests pass, and the ring-refill
+stream — which carries two keyframes per loop — improved to **630/600 FastROM on the hardest slice**
+(from 620) and 563 slow.
+
+### Verdict: Option C misses the threshold — fall back to Option A
+
+The decision threshold was ≤ 1 VBlank (case 7 ≥ 600). Measured **1.12 VBlanks (537)**. Option C does
+**not** win outright, so a keyframe still occupies a two-VBlank slot and **Option A — scheduled
+2-VBlank keyframe slots — is the policy.**
+
+### Where the remaining cycles go
+
+Measured iteration cost at 1.117 VBlanks FastROM = 399,178 master cycles. DMA within it is exact:
+staging 3,453 B × 8 = 27,624, presentation 4,480 B × 8 = 35,840, leaving ~335,700 for decode.
+Modelled against that budget (a model, not instrumented cycle counts):
+
+| component | master cycles | share of iteration |
+|---|---:|---:|
+| `MVN` block moves, all 4,480 output bytes | ~206,000 | ~52 % |
+| token dispatch, 290 tokens | ~93,000 | ~23 % |
+| staging + presentation DMA | 63,464 | 16 % |
+
+**The kernel has flipped from token-dispatch-bound to copy-bound** — which is what the specialization
+was for, and also why it cannot reach 1.00. Both `MVN` operands are WRAM, and **WRAM runs at
+2.68 MHz regardless of FastROM**: ~46 master cycles per byte (two WRAM accesses at 8, plus ~5
+internal cycles at 6). The floor is therefore 4,480 × 46 ≈ 206,080 master = 0.577 VBlank of pure
+block move plus 0.178 VBlank of unavoidable DMA — a **0.755 VBlank hard floor** before a single token
+is dispatched. Clearing 1.00 would need all dispatch under 0.245 VBlank; it sits at ~0.26. The
+residue is memory traffic, not overhead.
+
+This is structural rather than a missed optimization: a keyframe must materialize all 4,480 bytes,
+while a delta touches only changed spans and copy spans are free in the in-place decode. That is
+exactly why deltas sit at ~0.9 VBlank and keyframes at ~1.1. **FastROM cannot close it** — it
+accelerates ROM fetches, and this cost is WRAM↔WRAM. The remaining levers are encoder-side (fewer,
+longer tokens), not decoder-side.
+
+### Recommended interval for Option A
+
+A keyframe costs one extra VBlank slot, so the effective rate is `60 × K/(K+1)`:
+
+| keyframe interval K | seek granularity | effective fps |
+|---:|---:|---:|
+| 60 | 1.0 s | 59.02 |
+| **120** | **2.0 s** | **59.50** |
+| 300 | 5.0 s | 59.80 |
+
+**Recommended: K = 120** — 2-second seek granularity at 59.5 fps. Use K = 60 only if 1-second scrub
+granularity is required.
+
+Option C pays for itself even though it lost the threshold: at 2.00 VBlanks the keyframe filled its
+two-slot budget with **zero** margin, so any denser keyframe would spill to three slots and break the
+cadence gate. At 1.12 it uses 56 % of the slot, leaving real headroom for harder content.
+
+### Encoding hazard worth knowing
+
+The first version of this kernel produced `corpus_result = 0x82` — a runaway write clobbering low
+WRAM. Cause: this assembler sizes an immediate by the **literal's magnitude, not the `M` flag**, so
+`and #$00ff` in 16-bit mode assembled to the 2-byte `29 ff` and the CPU swallowed the following `dec`
+opcode as the immediate's high byte:
+
+```
+45: c2 20    rep #$20     ; 16-bit accumulator
+47: 29 ff    and #$ff     ; 2-byte form -- the #$00ff I wrote was truncated
+49: 3a       dec          ; eaten as the immediate's high byte
+```
+
+This is the same hazard the surrounding kernels already hand-encode around with `.byte` directives.
+Fixed by widening through the file's existing `xba / lda #0 / xba` idiom, which has no such hazard.
+**Disassemble any new 16-bit immediate in this file before trusting it.**
+
 ## Not finished
 
-- The staged-keyframe specialization (bank fixed at `$7F`, no per-token bank test) is identified and
-  motivated by the token histogram but **not implemented**. Expected to be what makes option (1)
-  above free; unproven.
+- Encoder-side keyframe cost reduction (longer PackBits tokens — Floyd–Steinberg dithering fragments
+  them; ordered Bayer would run longer) is the only remaining lever that could reach ≤ 1 VBlank. Not
+  attempted: it trades dither quality for token length, so it is a content decision, not a decoder
+  one.
 - Reel-side integration is untouched by design — see below.
 
 ## Merge-ready state

@@ -20,6 +20,101 @@ svc_copy_frame_asm:
 
 .global svx_decode_payload_asm
 .global svx_decode_payload_wram_asm
+.global svx_decode_payload_wram_key_asm
+
+/* Staged-keyframe specialization: PackBits, staged source bank pinned to $7F.
+
+   The general kernel is bank-agnostic, so it re-tests svx_asm_source_bank at
+   all three read sites (token, literal, run value) and flips M around each
+   test. It also spills the cursors to __rc0/__rc4 and recomputes a remaining-
+   byte count every token. On dithered content that overhead dominates: a
+   representative keyframe carries 290 tokens for 4,480 output bytes (literal
+   mean 21 B, run mean 10 B), so per-token cost, not per-byte cost, sets the
+   time.
+
+   This variant therefore:
+     - pins the source bank, deleting every far-check and its sep/rep pair;
+     - keeps X (staged source) and Y (output) live in registers across tokens;
+     - terminates on `cpy` against the output end instead of maintaining a
+       remaining-byte counter; and
+     - fills runs with an overlapping MVN (store one byte, then block-move
+       dest -> dest+1) at ~7 cycles/byte instead of a 15-cycle store loop.
+   DBR is $00 on entry and every MVN here names $00 as its destination, so DBR
+   is invariant and the per-token reload disappears too.
+
+   The general path is left exactly as it was; this is a separate entry point. */
+svx_decode_payload_wram_key_asm:
+  php
+  phb
+  rep #$30
+  phx
+  phy
+  sep #$20
+  lda #0
+  pha
+  plb /* DBR := $00 for the whole kernel; MVN destinations keep it there. */
+  rep #$20
+  lda svx_asm_output
+  tay
+  clc
+  adc #4480
+  sta __rc6 /* Output end: the only loop bound. */
+  lda svx_asm_source
+  tax
+.Lkey_token:
+  sep #$20
+  .byte $bf,$00,$00,$7f /* LDA $7F0000,X: PackBits control byte. */
+  inx
+  cmp #$80
+  beq .Lkey_token /* $80 is a no-op token; output did not advance. */
+  bcs .Lkey_run
+  /* Literal run of A+1 bytes: a straight block copy from staged WRAM.
+     Widen through XBA rather than AND #$00ff: this assembler sizes an
+     immediate by the literal's magnitude and not by the M flag, so a 16-bit
+     AND of a byte-sized constant silently assembles to the 8-bit form and
+     swallows the next opcode as its high operand byte. */
+  inc
+  xba
+  lda #0
+  xba
+  rep #$20
+  dec
+  mvn #$7f, #$00
+  cpy __rc6
+  bne .Lkey_token
+  bra .Lkey_done
+.Lkey_run:
+  /* Run of 257-control bytes of one value. */
+  sta __rc10
+  .byte $bf,$00,$00,$7f /* LDA $7F0000,X: the run value. */
+  inx
+  .byte $99,$00,$00     /* STA $0000,Y: seed byte, through DBR=$00. */
+  lda #1
+  sec
+  sbc __rc10 /* A = 257-control, taken mod 256; runs are always 2..128. */
+  xba
+  lda #0
+  xba
+  rep #$20
+  dec
+  dec
+  /* Overlapping block move: source is the byte just written, destination the
+     next one, so each copied byte re-reads the value and the run propagates. */
+  phx
+  tyx
+  iny
+  mvn #$00, #$00
+  plx
+  cpy __rc6
+  bne .Lkey_token
+.Lkey_done:
+  rep #$30
+  ply
+  plx
+  plb
+  plp
+  rts
+
 /* Staged-delta specialization. Long-indexed token reads avoid switching DBR
    back to $7F after every MVN; MVN's encoded operands are destination,source. */
 svx_decode_payload_wram_asm:
