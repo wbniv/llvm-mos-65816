@@ -136,7 +136,8 @@ cadence. Other gallery ROMs must continue to work with no new required fields.
 - [x] Exercise time/FPS startup, ROM reset, paused, health, and missing-metadata paths in the local
   browser integration; reset windows are discarded rather than displayed as unsigned-rate spikes.
 - [x] Run the ROM CRC/two-loop/cadence/fidelity suite and the complete gallery build/self-check.
-- [ ] Replace the published ROM and deploy the updated player only after every gate passes.
+- [x] Replace the published ROM and deploy the updated player only after every gate passes
+  (gallery release `v1.0.320`).
 
 ## Verification record
 
@@ -146,6 +147,9 @@ cadence. Other gallery ROMs must continue to work with no new required fields.
 - Frame-zero fidelity: exact pixel agreement `90.4402%`, mean absolute error `2.0452`.
 - Gallery self-check: `svx2-fastrom-video PASS (1200 frames, want 0x00)`.
 - Gallery static build: 122 pages built successfully.
+- Production deployment: release `v1.0.320`, workflow `30681155267`; engine drift, links,
+  propagation, Lighthouse, CLS, and threshold gates all passed.
+- Live ROM and player bytes exactly match the committed release artifacts.
 - Dashboard reset regression: a cartridge reset returns to `TIME 00:00 / FPS —`; it cannot turn
   a decreasing 32-bit counter into a false multi-billion-frame delta.
 
