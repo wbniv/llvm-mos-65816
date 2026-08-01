@@ -297,42 +297,42 @@
     "image_url": "cached:grande-jatte.jpg",
     "license": "CC0-1.0",
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-    "commons_file": "File:Georges Seurat - A Sunday on La Grande Jatte -- 1884 - Google Art Project-x0-y1.jpg",
+    "commons_file": "File:A Sunday on La Grande Jatte, Georges Seurat, 1884.jpg",
     "commons_license": "CC0-1.0",
     "source_dimensions": [
       1280,
-      1280
+      852
     ],
     "crop": [
       0,
       0,
       1280,
-      1280
+      852
     ],
     "derived_dimensions": [
-      120,
-      120
+      152,
+      101
     ],
     "display_dimensions": [
-      160,
-      160
+      240,
+      159
     ],
     "display_region": [
       256,
       160
     ],
-    "matrix_scale": 192,
+    "matrix_scale": 162,
     "tile_grid": [
-      15,
-      15
+      19,
+      13
     ],
-    "artwork_tiles": 225,
-    "source_jpeg_bytes": 742544,
-    "raw_indexed_bytes": 14400,
-    "compressed_bytes": 14879,
-    "reduction_bytes": -479,
-    "reduction_percent": -3.33,
-    "checksum": 41344,
+    "artwork_tiles": 247,
+    "source_jpeg_bytes": 539653,
+    "raw_indexed_bytes": 15352,
+    "compressed_bytes": 14463,
+    "reduction_bytes": 889,
+    "reduction_percent": 5.79,
+    "checksum": 24478,
     "artwork_color_capacity": 221,
     "palette_mapping": "contiguous-3-223-static-inks",
     "artwork_colors_used": 221,
@@ -559,16 +559,16 @@
       222,
       223
     ],
-    "palette_sha256": "79fb2780c78c364cdef7bbea8481df687e7721d3abe2f1ae3761db61280e9830",
-    "source_sha256": "c61e984a2352b0ec2bfb83b17297c2091a2a5262e22eb7d7e1c67969c6089030",
-    "derived_sha256": "2024bbe6570d0307abcdda371c4871a0ffb06cbbd0e71fe259616b77e97fd357",
-    "literals": 11561,
-    "matches": 881,
-    "longest": 11,
+    "palette_sha256": "d5e731b930df32b4fe1587304c7d547711f742ee35ee5b91fa9c9a8a0732820d",
+    "source_sha256": "131ac8fcd2bfb74a7c189c7956ebaef4295e22d3efdcfed7e950ad7fccaf31db",
+    "derived_sha256": "9fa99672ada7cd5e9de54f96ae5e3bbf8b015e4a9c9b011ce2a18f1d6ea8eddf",
+    "literals": 9907,
+    "matches": 1561,
+    "longest": 13,
     "manifest_order": 2,
-    "stream_bank": 17,
+    "stream_bank": 19,
     "palette_bank": 8,
-    "stream_slot": 1,
+    "stream_slot": 0,
     "palette_slot": 3
   },
   {
@@ -2282,9 +2282,9 @@
     "matches": 1318,
     "longest": 12,
     "manifest_order": 8,
-    "stream_bank": 18,
+    "stream_bank": 17,
     "palette_bank": 11,
-    "stream_slot": 0,
+    "stream_slot": 1,
     "palette_slot": 2
   },
   {
@@ -3142,7 +3142,7 @@
     "manifest_order": 11,
     "stream_bank": 18,
     "palette_bank": 11,
-    "stream_slot": 1,
+    "stream_slot": 0,
     "palette_slot": 5
   },
   {
@@ -7713,9 +7713,9 @@
     "matches": 1351,
     "longest": 17,
     "manifest_order": 27,
-    "stream_bank": 19,
+    "stream_bank": 18,
     "palette_bank": 15,
-    "stream_slot": 0,
+    "stream_slot": 1,
     "palette_slot": 5
   },
   {

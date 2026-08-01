@@ -636,3 +636,13 @@ end-to-end; `mvscrl.c` is the most **modern gate/corpus exemplar** (5-way bar + 
 presentation + precise legalizer-corner comments) — read both before writing a new demo. The
 **LZSS Gallery** is a *reference*, not a template: by far the largest demo, read it for the
 far-data, self-check, and dashboard patterns rather than as a starting skeleton.
+
+Gallery source integrity is part of correctness. Vendor one reproducible,
+full-composition master for every work and record its object page, exact file
+identity, dimensions, license, and SHA-256. Reject detail crops, presentation
+frames, watermarks, and gigapixel tiles such as filenames ending in `x0-y1`;
+those can produce a technically valid palette and LZSS stream for the wrong
+image. The 2026-08-01 La Grande Jatte correction is the regression example:
+the former tile was replaced by the complete 1280×852 public-domain master,
+then every indexed, palette, stream, packing, target-decode, and preview
+artifact was regenerated from it.

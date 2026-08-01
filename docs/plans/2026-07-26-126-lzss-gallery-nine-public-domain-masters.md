@@ -78,7 +78,10 @@ be decoded in the project container.
 
 Where several versions exist, choose the named museum’s straight, full-frame
 reproduction. Do not use colorized, AI-upscaled, framed, watermarked, poster,
-detail, or perspective-corrected third-party derivatives. For *The Scream*,
+detail, gigapixel tile, or perspective-corrected third-party derivatives. A
+filename suffix such as `x0-y1` is a tile coordinate and must fail the source
+review unless the manifest explicitly describes a multi-tile reconstruction.
+For *The Scream*,
 pin the exact version selected in metadata rather than treating the title as a
 unique image.
 
@@ -697,3 +700,21 @@ Three additional Art Institute works remain recorded as disabled candidates:
 their metadata is public domain, but the museum IIIF server blocked the exact
 master download and no exact Commons equivalent was found. No substitute image
 was used.
+
+### 2026-08-01 La Grande Jatte source correction
+
+The original `grande-jatte.jpg` was incorrectly vendored from Wikimedia's
+gigapixel tile set as `...-x0-y1.jpg`. It contained only one region of Seurat's
+painting, contradicting this plan's complete-composition requirement. It has
+been replaced with the complete public-domain master
+`File:A Sunday on La Grande Jatte, Georges Seurat, 1884.jpg`, linked to Art
+Institute object 27992.
+
+The vendored 1280×852 JPEG has SHA-256
+`131ac8fcd2bfb74a7c189c7956ebaef4295e22d3efdcfed7e950ad7fccaf31db`.
+The regenerated SNES raster is 152×101 and displays at 240×159, retaining the
+entire painted composition and its painted border. Its palette SHA-256 is
+`d5e731b930df32b4fe1587304c7d547711f742ee35ee5b91fa9c9a8a0732820d`;
+15,352 indexed bytes encode to 14,463 LZSS bytes. The 62-work host oracle,
+all-work target decode gate, automatic-joypad navigation gate, and reproducible
+ROM link all pass.
