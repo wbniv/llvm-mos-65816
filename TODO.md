@@ -61,7 +61,17 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [wip T4] **seamdemo — the ExHiROM three-act boundary synthesis cartridge.** <!-- agent:a3f76f15f3f53c44e (P0 generator+oracle) --> One 48 Mbit cart,
+- [T3] **seamdemo — P0 DONE (`e30673f`); next: P1 Act-1 ROM (VM + PC ticker + seam event).**
+  <!-- agent:a3f76f15f3f53c44e (P0 done; holds full generator/oracle/ISA context — reuse for P1) -->
+  P0 contract settled: `decode_cells()` model extension (380 cells, 5 new regression tests,
+  58+25,044 subtests), one-slot-record layout, 16-op ISA + 8-entry ALU fn-ptr table, 24-bit
+  file-offset PC, the seam chapter hand-laid as ONE instruction straddling the device boundary
+  (opcode file `$3FFFFF`=`$FF:FFFF`, operand `$400000`=`$40:0000`). Coverage: 374/374 available
+  cells in-degree ≥1; 1,122 edges (755 seam-, 748 mirror-, 1,118 bank-crossing). Oracle:
+  act1 `$93CF` act2 `$B596` act3 `$6D21` → **corpus_result `$2B43`**; ALL selfchecks PASS;
+  deterministic rebuild. P1 cautions recorded in the plan: re-derive the reserved code range
+  from the actual link script (don't trust slot 129), diff non-zero extents before first
+  `fill`, Act-1 pacing unmeasured (SYNC is the lever), download-size lever changes act3_crc. One 48 Mbit cart,
   three acts in a loop, each reading the full image with a different access pattern: Act 1 a
   VM executing the whole cart as one bytecode stream (PC ticker; the $3FFFFF→$400000 seam
   crossing is an on-screen event), Act 2 a boundary-hostile pointer-graph walk (every decode
