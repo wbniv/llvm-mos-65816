@@ -1,7 +1,8 @@
 # [DRAFT — PR body for llvm-mos/llvm-mos; strip this preamble when posting]
 #
-# Status: POSTED 2026-07-26 as https://github.com/llvm-mos/llvm-mos/pull/577 ("Fixes #576"
-# substituted for the #NNN placeholder below; body below is otherwise the as-posted text).
+# Status: POSTED 2026-07-26 as [PR #577](https://github.com/llvm-mos/llvm-mos/pull/577) ("Fixes #576"
+# substituted for the #NNN placeholder below; body below is otherwise the as-posted text;
+# test paragraph updated 2026-07-31, critique-improvements pass).
 # Branch: wbniv:mos-scmp-ucmp-legalize
 # (cut from main tip 8be054612; carries the one-line fix + llvm/test/CodeGen/MOS/scmp-ucmp.ll).
 # Post command (after the issue is opened and `gh auth login`):
@@ -25,8 +26,12 @@ icmp+select expansion the backend already legalizes end to end). No generic-LLVM
 pseudo, no effect on any currently-compiling code (the opcodes previously always aborted).
 
 Includes `llvm/test/CodeGen/MOS/scmp-ucmp.ll`: `llc -verify-machineinstrs` over signed and unsigned
-three-way compares with s8/s16 results and s8/s16/s32/s64 operands — every case aborts without the
-fix and compiles verifier-clean with it.
+three-way compares with s8/s16/s32 results and s8/s16/s32/s64 operands — every case aborts without
+the fix and compiles verifier-clean with it. Each function also pins that the expansion stays
+inline (`CHECK-NOT: jsr` between its label and its `rts`): no width falls back to a libcall.
+<!-- test paragraph updated 2026-07-31 (critique-improvements pass) to match the strengthened
+     scmp-ucmp.ll pushed to the PR branch -->
+
 
 Testing beyond the lit test: the identical change has been soak-tested in our 65816 development
 fork, where five qsort-based SNES demos are differentially verified — host-computed result ==
