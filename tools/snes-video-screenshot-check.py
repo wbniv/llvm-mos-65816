@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import math
 from pathlib import Path
 
 from PIL import Image, ImageChops
@@ -26,7 +27,13 @@ def render_frame(tiles: bytes, palette: bytes, index: int, height: int,
     colors: list[int] = []
     for offset in range(0, 448, 2):
         word = palette[offset] | palette[offset + 1] << 8
-        colors.extend(((word & 31) << 3, ((word >> 5) & 31) << 3, ((word >> 10) & 31) << 3))
+        def bsnes_channel(value: int) -> int:
+            expanded = ((value << 3) | (value >> 2)) * 257
+            corrected = (32767 * math.pow(expanded / 32767, 1.2)
+                         if expanded <= 32767 else expanded)
+            return min(int(corrected), 65535) >> 8
+        colors.extend((bsnes_channel(word & 31), bsnes_channel((word >> 5) & 31),
+                       bsnes_channel((word >> 10) & 31)))
     image = Image.frombytes("P", (80, 56), bytes(raster))
     image.putpalette(colors + [0] * (768 - len(colors)))
     image = image.convert("RGB")

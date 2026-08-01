@@ -29,6 +29,10 @@ volatile uint32_t video_reel_vblanks;
 static uint8_t framebuffer[SVC_FRAME_SIZE];
 static uint8_t blank_tile = 70u;
 static uint8_t blank_pixels[64];
+#ifdef VIDEO_REEL_SECOND_START
+static uint8_t active_palette_first[448];
+static uint8_t active_palette_second[448];
+#endif
 static uint16_t fps_presented_sample;
 static uint16_t fps_vblank_sample;
 static volatile uint16_t fps_tenths;
@@ -36,6 +40,14 @@ static uint8_t dashboard_frame_tick;
 static uint8_t dashboard_seconds;
 static uint8_t dashboard_minutes;
 static char dashboard_fps[5] = "00.0";
+
+static uint8_t is_keyframe(uint16_t frame) {
+#ifdef VIDEO_REEL_SECOND_START
+  return frame == 0u || frame == VIDEO_REEL_SECOND_START;
+#else
+  return frame == 0u;
+#endif
+}
 
 static char *decimal(char *out, uint16_t value, uint8_t width) {
   char digits[5];
@@ -131,7 +143,7 @@ static uint8_t stage_frame(uint16_t frame) {
 
 static void decode_frame(uint16_t frame) {
   if (!stage_frame(frame)) stop(1u);
-  svx_decode_payload_wram_fast((uint16_t)(STAGE_ADDRESS + 9u), frame == 0u,
+  svx_decode_payload_wram_fast((uint16_t)(STAGE_ADDRESS + 9u), is_keyframe(frame),
                                framebuffer, framebuffer);
   ++video_reel_decoded;
 }
@@ -150,6 +162,33 @@ static void present_frame(void) {
   ++video_reel_presented_total;
 }
 
+#ifdef VIDEO_REEL_SECOND_START
+static void prepare_palettes(void) {
+  uint16_t i;
+  for (i = 0; i != 448u; ++i) {
+    active_palette_first[i] = reel_palette[i];
+    active_palette_second[i] = reel_palette_second[i];
+  }
+}
+
+static void upload_palette(uint8_t second) {
+  REG_CGADD = 0u;
+  REG_DMAP3 = 0u;
+  REG_BBAD3 = 0x22u;
+  if (second) {
+    REG_A1T3L = (uint8_t)(uintptr_t)active_palette_second;
+    REG_A1T3H = (uint8_t)((uint16_t)(uintptr_t)active_palette_second >> 8);
+  } else {
+    REG_A1T3L = (uint8_t)(uintptr_t)active_palette_first;
+    REG_A1T3H = (uint8_t)((uint16_t)(uintptr_t)active_palette_first >> 8);
+  }
+  REG_A1B3 = 0u;
+  REG_DAS3L = 0xc0u;
+  REG_DAS3H = 0x01u;
+  REG_MDMAEN = 8u;
+}
+#endif
+
 static void setup_display(void) {
   uint16_t i;
   m7_begin();
@@ -161,6 +200,9 @@ static void setup_display(void) {
   m7_tilemap_identity(10u, 7u);
   REG_CGADD = 0u;
   for (i = 0; i != 448u; ++i) REG_CGDATA = reel_palette[i];
+#ifdef VIDEO_REEL_SECOND_START
+  prepare_palettes();
+#endif
   m7_set_matrix(0x0050, 0, 0, 0x004bu);
   m7_set_center(0, 0);
   m7_set_scroll(0, 0);
@@ -208,7 +250,7 @@ void video_reel_run(void) {
     uint32_t last = reel_packet_offsets[frame + 1u] - 1u;
     video_reel_frame = frame;
     decode_frame(frame);
-    if ((first >> 16) != (last >> 16)) {
+    if ((first >> 16) != (last >> 16) || is_keyframe(frame)) {
       video_reel_last_crc = crc16(framebuffer, SVC_FRAME_SIZE);
       if (video_reel_last_crc != reel_frame_crcs[frame]) {
         ++video_reel_crc_failures;
@@ -253,6 +295,10 @@ void video_reel_run(void) {
       deadline = (uint16_t)video_reel_vblanks + 1u;
       while ((uint16_t)video_reel_vblanks != deadline) __asm__ volatile("wai");
     }
+#ifdef VIDEO_REEL_SECOND_START
+    if (frame == VIDEO_REEL_SECOND_START) upload_palette(1u);
+    else if (frame == 0u) upload_palette(0u);
+#endif
     present_frame();
     dashboard_presented();
     video_reel_frame = frame;

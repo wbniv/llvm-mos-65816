@@ -112,7 +112,7 @@ and fixed an llvm-mos MC encoder defect: distinct-bank `MVN`/`MVP` operands were
 syntax order instead of the hardware's reversed destination,source byte order. The rebuilt MC lit
 regression and the mnemonic-using ROM both pass.
 
-The complete 300-frame corpus is integrated by
-[`2026-07-31-svx2-full-artemis-reel.md`](2026-07-31-svx2-full-artemis-reel.md). Its packed stream
-occupies 765,503 bytes and fits a standard 1 MiB HiROM; ExHiROM is unnecessary for this ten-second reel and remains a distinct
-multi-megabyte boundary test.
+Both benchmark corpora are integrated by
+[`2026-07-31-svx2-full-artemis-reel.md`](2026-07-31-svx2-full-artemis-reel.md): 600 animation
+frames followed by 300 real-camera frames, with independent palettes and keyframes. The combined
+2,355,828-byte stream fits a standard 4 MiB HiROM; ExHiROM remains a distinct boundary test.

@@ -26,6 +26,11 @@ def main() -> int:
                         help="emit one contiguous HiROM far-data stream and offsets")
     parser.add_argument("--stream-output", type=Path,
                         help="write packed bytes separately instead of a C initializer")
+    parser.add_argument("--first-tiles", type=Path,
+                        help="optional first video corpus, placed before positional corpus")
+    parser.add_argument("--first-palette", type=Path,
+                        help="448-byte palette for --first-tiles")
+    parser.add_argument("--first-frames", type=int, default=0)
     args = parser.parse_args()
 
     data = args.tiles.read_bytes()
@@ -41,10 +46,29 @@ def main() -> int:
         parser.error(f"--frames must be between 2 and {available}")
 
     frames = [data[i * FRAME_SIZE:(i + 1) * FRAME_SIZE] for i in range(args.frames)]
+    palettes = [palette]
+    second_start = 0
+    if args.first_tiles or args.first_palette or args.first_frames:
+        if not (args.first_tiles and args.first_palette and args.first_frames):
+            parser.error("--first-tiles, --first-palette, and --first-frames are required together")
+        first_data = args.first_tiles.read_bytes()
+        first_palette = args.first_palette.read_bytes()
+        if len(first_data) % FRAME_SIZE or args.first_frames > len(first_data) // FRAME_SIZE:
+            parser.error("first tile corpus does not contain the requested whole frames")
+        if len(first_palette) != 448 or first_palette[:4] != bytes((0, 0, 0xff, 0x7f)):
+            parser.error("first palette must be 448 bytes with dashboard black/white entries")
+        first = [first_data[i * FRAME_SIZE:(i + 1) * FRAME_SIZE]
+                 for i in range(args.first_frames)]
+        second_start = len(first)
+        frames = first + frames
+        palettes = [first_palette, palette]
     packets: list[bytes] = []
     previous = None
     for index, frame in enumerate(frames):
-        packet = encode_xor_frame(frame, previous, keyframe=index == 0)
+        keyframe = index == 0 or index == second_start
+        if keyframe:
+            previous = None
+        packet = encode_xor_frame(frame, previous, keyframe=keyframe)
         if decode_xor_frame(packet, previous) != frame:
             raise RuntimeError(f"frame {index}: SVX2 host round trip failed")
         packets.append(packet)
@@ -60,9 +84,16 @@ def main() -> int:
         f"#define VIDEO_REEL_PACKET_CAPACITY {maximum}u",
         f"#define VIDEO_REEL_TOTAL_PACKET_BYTES {sum(map(len, packets))}u",
         "static const uint8_t reel_palette[448] = {",
-        f"    {byte_rows(palette)}",
+        f"    {byte_rows(palettes[0])}",
         "};",
     ]
+    if second_start:
+        lines.extend((
+            f"#define VIDEO_REEL_SECOND_START {second_start}u",
+            "static const uint8_t reel_palette_second[448] = {",
+            f"    {byte_rows(palettes[1])}",
+            "};",
+        ))
     if args.packed_far:
         stream = b"".join(packets)
         if args.stream_output:

@@ -1,7 +1,7 @@
 # SVX2 Animated Video Cartridge
 
 **Date:** 2026-07-31
-**Status:** Full 300-frame HiROM cartridge complete; 60 fps optimization and ExHiROM follow-up remain
+**Status:** Full two-video 900-frame HiROM cartridge complete; 60 fps optimization and ExHiROM follow-up remain
 **Depends on:** `2026-07-31-real-video-codec-corpus.md`
 **Feeds:** `2026-07-30-exhirom-video-boundary-test.md`
 
@@ -145,10 +145,11 @@ Completed 2026-07-31:
   and
 - gallery commit `bd102e8`, release tag `v1.0.317`, with its 1,200-frame live self-check passing.
 
-Full-reel continuation completed 2026-07-31:
+Full two-video continuation completed 2026-07-31:
 
-- all 300 approved Artemis frames in a 765,503-byte packed SVX2 stream;
-- 1 MiB Fast HiROM with 16-bit frame indexing and DMA split at 64 KiB ROM-bank boundaries;
+- 600 NASA SVS animation frames plus all 300 approved real-camera frames in a 2,355,828-byte
+  packed SVX2 stream, with separate palettes and independent keyframes;
+- 4 MiB Fast HiROM with 16-bit frame indexing and DMA split at 64 KiB ROM-bank boundaries;
 - complete host round trip plus target CRCs for every bank-crossing packet and the reset keyframe;
 - 716 exact presentations in 2,400 VBlanks, over two complete loops, with zero decoder errors and
   zero deadline slips; and
