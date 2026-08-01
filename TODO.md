@@ -160,14 +160,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
   (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
   2026-07-31 — lost in a concurrent TODO rewrite.)
-- [wip T2] **Apply `snes_ppu_reset_blank()` to the 4 demos that drive `INIDISP` bare** — <!-- agent:aa74860a8207d6108 -->
-  `hello.c`, `boids.c`, `lsystem.c`, `turtle-vm.c` carry the same power-on-entropy display
-  defect the cartsize canary just closed (`811c1f8`): every unwritten PPU register is random
-  per boot under bsnes-jg entropy, so their published pictures are boot-dependent
-  (lsystem/turtle-vm's screenshot flakiness that motivated `d3000d7` is suggestive,
-  unestablished). Everything else goes through `snesgfx/display.h`, which already calls it.
-  Fix + re-gate + republish the four pages; extend gate 6b-style entropy fingerprinting where
-  cheap. (T2: diagnosed fix, known recipe, bounded set.)
 - [T1] **Apply the wai idle-loop idiom to the 18 skipped-dirty `examples/snes/*.c` files** —
   the `903de3e` sweep fixed 216 bare loops in 214 files but skipped bitweave, borrowlad, compass,
   crcwall, keycmp64, lfsr2, modexp256, oddmask, ovmove, pcooker, permscat, ropeedit, rotkal,
@@ -1050,6 +1042,17 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [ppu-reset-blank-bare] Re-checked the premise before fixing (measure, don't
+  assume): only `hello.c` actually drove `INIDISP` bare — `boids.c`/`lsystem.c`/`turtle-vm.c`
+  already call `snes_ppu_reset_blank()` transitively via `display_init()` (in `snesgfx/display.h`
+  since `1d753fef`, which predates all three files), confirmed by 6/6 identical bsnes-jg boots
+  each at their existing gate frame counts — no source change, no defect. `hello.c` fixed
+  (`snes_ppu_reset_blank()` first line of `main`): 5/6 distinct picture hashes pre-fix → 6/6
+  identical post-fix at 700 frames, WRAM sentinel `0x42` unchanged both sides; re-gated `dev/run.sh
+  {build,validate,xcheck,boids,lsystem,turtle-vm}` all PASS, oracles unchanged (`0xA8AB`/`0x8073`/
+  `0x4007`). `hello.c` has no published page on either site (M0 smoke test only) — nothing to
+  republish; the other three demos' currently-deployed ROMs differ from `HEAD` for unrelated drift,
+  out of scope here. See [plan](docs/plans/2026-08-01-cartsize-canary-display-nondeterminism.md).
 - [x] 2026-08-01 — [idle-loop-audit] 338 raw `for(;;)`/`while(1)` hits classified (107 real-body safe, 216 bare fixed across 214 files, 0 unreachable); wai idiom per house pattern, disasm-verified no fall-through (`903de3e`); no shipped ROM found already miscompiled. 18 dirty files deferred to a T1.
 - [x] 2026-07-31 — [gallery-visual-sweep] Full 62-work visual corpus sweep PASS: `corpus_result got=0x96D8 == oracle` after 700 000 frames on bsnes-jg (1 h 25 m jgxcheck leg, ~1 h 31 m whole script), `throwaway/visual-sweep` off `main` HEAD `2343db7`. Already recorded (`b5ea1a6`); this pass verified the record and closed out the TODO marker. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
 - [x] 2026-08-01 — [snes-rom-page-routes] Skill now authors pages via the sites' data-driven routes (`3b212bd`): per-slug `page-template.astro` deleted; per-site registry schemas documented from live HEADs (biohack `src/content/snes/*.json` + count guard, indri `SNES_DEMOS` + non-default playdir gap fixed); dry-run validated both registries.
