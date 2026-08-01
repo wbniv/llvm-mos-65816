@@ -31,10 +31,11 @@ static uint8_t blank_tile = 70u;
 static uint8_t blank_pixels[64];
 static uint16_t fps_presented_sample;
 static uint16_t fps_vblank_sample;
-static uint16_t fps_tenths;
+static volatile uint16_t fps_tenths;
 static uint8_t dashboard_frame_tick;
 static uint8_t dashboard_seconds;
 static uint8_t dashboard_minutes;
+static char dashboard_fps[5] = "00.0";
 
 static char *decimal(char *out, uint16_t value, uint8_t width) {
   char digits[5];
@@ -51,15 +52,12 @@ static void update_dashboard_fields(void) {
   p = decimal(p, dashboard_minutes, 2u); *p++ = ':';
   p = decimal(p, dashboard_seconds, 2u);
   *p = 0;
-  video_hud_text(25u, 6u, line);
-  p = line;
-  p = decimal(p, (uint16_t)(fps_tenths / 10u), 2u); *p++ = '.';
-  *p++ = (char)('0' + fps_tenths % 10u); *p = 0;
-  video_hud_text(25u, 27u, line);
+  video_hud_text(26u, 6u, line);
+  video_hud_text(26u, 27u, dashboard_fps);
   if (video_reel_result != 0u && video_reel_result != 0xffu)
-    video_hud_text(24u, 25u, "ERROR  ");
+    video_hud_text(25u, 25u, "ERROR  ");
   else if (video_reel_deadline_slips)
-    video_hud_text(24u, 25u, "SLIP   ");
+    video_hud_text(25u, 25u, "SLIP   ");
 }
 
 static void dashboard_presented(void) {
@@ -77,7 +75,12 @@ static void dashboard_presented(void) {
   if (dv >= 60u) {
     uint16_t now_presented = (uint16_t)video_reel_presented_total;
     uint16_t dp = (uint16_t)(now_presented - fps_presented_sample);
-    fps_tenths = (uint16_t)((dp * 601u + dv / 2u) / dv);
+    uint16_t measured = (uint16_t)((dp * 601u + dv / 2u) / dv);
+    fps_tenths = measured;
+    dashboard_fps[0] = (char)('0' + measured / 100u);
+    measured %= 100u;
+    dashboard_fps[1] = (char)('0' + measured / 10u);
+    dashboard_fps[3] = (char)('0' + measured % 10u);
     fps_presented_sample = now_presented;
     fps_vblank_sample = now_vblank;
   }
@@ -144,10 +147,10 @@ static void setup_display(void) {
   m7_set_center(0, 0);
   m7_set_scroll(0, 0);
   video_hud_begin();
-  video_hud_text(24u, 1u, "SVX2 VIDEO");
-  video_hud_text(24u, 28u, "PLAY");
-  video_hud_text(25u, 1u, "TIME");
-  video_hud_text(25u, 23u, "FPS");
+  video_hud_text(25u, 1u, "SVX2 VIDEO");
+  video_hud_text(25u, 28u, "PLAY");
+  video_hud_text(26u, 1u, "TIME");
+  video_hud_text(26u, 23u, "FPS");
 }
 
 static void wait_vblank_fresh(void) {

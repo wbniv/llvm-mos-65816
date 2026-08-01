@@ -149,6 +149,15 @@ its existing running status, fidelity button, and fullscreen control.
   fullscreen, Cloudflare propagation, Lighthouse, CLS, and threshold gates.
 - The live `v1.0.323` ROM has the exact same SHA-256 as the locally gated artifact.
 
+### Post-publication display correction
+
+The first published cartridge-dashboard build exposed two visible defects: the FPS field stayed at
+its initialized `0.0`, and the first glyph row intersected the Mode 7/Mode 1 boundary. The corrected
+build formats the measured value immediately when its 60-VBlank sample closes, then stores the four
+display characters directly. Moving both text rows from tilemap rows 24/25 to 25/26 leaves one
+blank tile row below the raster boundary, so no glyph scanline can be clipped. The corrected gate
+shows `FPS 30.0` with intact glyph tops.
+
 ## Acceptance gates
 
 1. No green strip or green uncovered Mode 7 pixels appear at any point.
