@@ -84,7 +84,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 - [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
   absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
   `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
-- [T3] **60 fps video — DONE except branch merge; keyframe policy DECIDED (Option A, K=120
+- [wip T3] **60 fps video — DONE except branch merge; keyframe policy DECIDED (Option A, K=120
   recommended).** <!-- agent:a0f879ca71db8cabe (holds bench + merge-conflict context) -->
   Option C measured (2026-08-01): staged-keyframe specialization reaches **1.12 VBlanks**
   (537/600 FastROM case 7; was 2.90 at session start) — misses the ≤1.00 threshold on a
@@ -1772,4 +1772,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** reference the animated ROM as the real-world reproducer, without coupling the upstream patch to — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:012a72598ce748d6 -->
 - [verify] **2026-07-31-svx2-animated-video-cartridge** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:40c1c2b870d73873 -->
 <!-- triaged 2026-08-01: seamdemo plan is PLANNED-status; verification runs per phase and is covered by the curated [T4] seamdemo item (blocked on the exhirom-canaries merge). fp:c3a1de9e87d9d4ca -->
+- [verify] **2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)_  <!-- fp:a76fa89a8079cd65 -->
 <!-- END auto-captured-deferrals -->
