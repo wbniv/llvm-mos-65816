@@ -85,10 +85,17 @@ clang: error: clang frontend command failed due to signal
 
 Crashes at `-O1`, `-O2`, `-Os` and `-Oz`; clean at `-O0`, where nothing is
 allocated to an imaginary register. The eight live bytes are headroom rather
-than a threshold: sweeping the same shape (MIR captured with
-`-mllvm -stop-before=mos-late-opt`, fed to an unfixed
-`llc -run-pass=mos-late-opt`) shows three simultaneously-live bytes already
-crash at every level above `-O0`, and two crash at `-Oz`.
+than a threshold — sweeping the same shape with fewer locals:
+
+| simultaneously-live bytes | `-O1` | `-O2` | `-Os` | `-Oz` |
+|---|---|---|---|---|
+| 2 | ok | ok | ok | crash |
+| 3–8 | crash | crash | crash | crash |
+
+(Sweep method: MIR captured from the unmodified compiler with
+`-mllvm -stop-before=mos-late-opt`, replayed through an
+`llc -run-pass=mos-late-opt` built without this fix; every "crash" is the
+same null store in `combineLdImm`.)
 
 Reduced to MIR, the whole trigger is one instruction:
 
