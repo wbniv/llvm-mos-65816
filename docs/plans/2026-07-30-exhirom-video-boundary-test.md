@@ -423,6 +423,16 @@ spacing):
 Pick on the measured table, per the project's measure-don't-assume rule; the selection and its
 numbers go in the completion record.
 
+**Hard-content stressor (2026-08-01):** the real-camera leg above used a *night* launch — mostly
+black frames, codec-smoothed grain — a best case for "real footage." A grain-rich *daylight* clip
+(this candidate #16, Apollo 11 Saturn V launch, real 16 mm film) was added to the same
+[results doc](2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md#hard-content-stressor-apollo-11-saturn-v-daylight-launch-2026-08-01):
+hard film grain costs +5.3 SVX2/Floyd ratio points (57.04% → 62.33%) and +19.8 points under Bayer
+(33.49% → 53.29%), and on this content gallery LZSS is actually smaller than shipping SVX2 at the
+Floyd dither. The one-codec/SVX2 decision survives regardless — it is speed-anchored (SVX2
+60.8–69.4 fps vs. LZSS 2.1–2.3 fps decode-only), and no size result closes a throughput gap that
+large — but budget ~62% of raw for hard grain-rich daylight content, not the night leg's ~57%.
+
 The completed [real-camera corpus benchmark](2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md)
 selects one codec for both animation and camera footage: replacement/copy spans with PackBits
 keyframes (`SVX2`) at a 60-frame keyframe interval. SVX1 remains smaller, but fails target delta

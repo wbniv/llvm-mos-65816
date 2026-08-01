@@ -104,33 +104,19 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   Corridor note: reel files (`snes-video-reel.c`, `video_hud.h`, `snes-video-reel.sh`) are
   STILL dirty in main — coordinate the merge with that worker or stash-restore per house rule.
   (T3: resolution decided, mechanical merge + re-measure.)
-- [T2] **Hard real-video stressor for codec ratio expectations** — the real-camera leg used the
-  H.264 `~large` derivative of a **night** launch (mostly-black frames, codec-smoothed grain):
-  a best case, so real-footage ratios (31–57%) are uncalibrated for hard content. The
-  speed-anchored SVX2 decision is robust; ratio expectations aren't. Run the existing sweep
-  (`tools/snes-video-pack.py`, both dithers) over one grain-rich daylight clip — parent-plan
-  candidate #16 Apollo 11 Saturn V launch — and append the column to
-  [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
-  (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
-  2026-07-31 — lost in a concurrent TODO rewrite.)
 - [T1] **Apply the wai idle-loop idiom to the 18 skipped-dirty `examples/snes/*.c` files** —
   the `903de3e` sweep fixed 216 bare loops in 214 files but skipped bitweave, borrowlad, compass,
   crcwall, keycmp64, lfsr2, modexp256, oddmask, ovmove, pcooker, permscat, ropeedit, rotkal,
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
-- [wip T2] **Hard real-video stressor for the codec ratio expectations** — <!-- agent:ae6560527ebfad116 --> the completed real-camera
-  leg ([real-video-codec-benchmark.md](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
-  used the H.264 `~large` derivative of a **night** launch: mostly-black 80 × 56 frames and
-  codec-smoothed grain make it a mild stressor, so its ratios (31–57%) are a best case for real
-  footage. The one-codec/SVX2 *decision* is speed-anchored and robust, but size expectations for
-  hard content are uncalibrated: run the existing sweep (`tools/snes-video-pack.py`, both dithers)
-  over one grain-rich daylight clip — parent plan candidate #16 Apollo 11 Saturn V launch (film
-  grain) — and append the column to the results doc. Pipeline + bench harness already exist.
-  [plan](docs/plans/2026-07-31-real-video-codec-corpus.md) (T2: bounded re-run of a scripted
-  sweep on one new source; interval eyeballing is the only judgment.)
-  Ordinary LoROM cannot simply be enlarged past **32 Mbit (4 MiB)**. Add an extended mapping,
-  normally map Mode `$25`/ExHiROM, together with the corresponding linker layout, cartridge decoder
+- [T4] **Implement extended SNES cartridge mapping (ExHiROM)** — general cartridge/mapper test
+  coverage, not driven by gallery size. <!-- todo-lint: recovered 2026-08-01, orphaned by an
+  earlier concurrent TODO rewrite that dropped this bullet's own marker; see the completed/newer
+  tracking at the ExHiROM merge Done entry and the "three-act synthesis cart" T4 item above before
+  re-triaging this one's current status. --> Ordinary LoROM cannot simply be enlarged past
+  **32 Mbit (4 MiB)**. Add an extended mapping, normally map Mode `$25`/ExHiROM, together with the
+  corresponding linker layout, cartridge decoder
   model, header and ROM-size fields, reset/vector placement, far-address handling, checksum gate,
   emulator coverage, and ROM-map visualization. Conventional cartridges may use two independently
   sized mask ROMs of up to 32 Mbit each. References:
@@ -995,6 +981,10 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [apollo-daylight-stressor] Hard-content sweep (NASA Apollo 11 Saturn V daylight
+  launch, real film grain) added to the codec results doc: SVX2/Floyd costs +5.3 ratio points and
+  +19.8 under Bayer vs. the night leg; LZSS beats SVX2 on size here but decision stays SVX2
+  (speed-anchored). See [results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
 - [x] 2026-08-01 — [exhirom-merged] `feature/exhirom-canaries` MERGED to main (`d0d6b39`, ff): cartmap model + ExHiROM platform + 3 canary ROMs + entropy display fix + cartridge SPEED attribute (280/280 tool byte-identity, gate PASS ×3, 108 host tests). AUTOJOY doc sections landed user-directed (`6943ee9`); jgxcheck overlap stash-restored.
 - [x] 2026-08-01 — [cartsize-republish] Three entropy-fixed canary ROMs LIVE ([fc366ba](https://github.com/wbniv/biohack.net/commit/fc366ba79546905086f9a4e95a3df64856cc927e), v1.0.338, CI success, 3/3 live shas match); verdict paints green deterministically in WASM — display defect closed end-to-end, user-confirmed on the live pages.
 - [x] 2026-08-01 — [gallery-republish+retire] Record-carrying reproducible gallery ROM LIVE on biohack.net (`e1e21d6`, v1.0.337, CI success, live sha == 5768…3a95d; manifest unchanged; user-gated app.js untouched); verify-button worktree retired (492M reclaimed, durability check passed).

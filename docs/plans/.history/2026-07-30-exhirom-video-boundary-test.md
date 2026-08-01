@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/d71d298) | Add animated SVX2 video cartridge |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/ac773f4) | docs(plan): record Phase 0-1 verification — host structural gates 1 and 2 PASS |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/6d50fd3) | docs(plan+todo): reframe extended-cartridge work — general mapper testing, standalone ROMs; rename plan |
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/e5dcc03) | docs(plan): ExHiROM video — codec selection: interframe block codec over LZSS-by-default |
@@ -8,6 +9,10 @@
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/1ae32f8) | docs: plan ExHiROM video boundary test |
 
 <!--history-meta v1
+d71d298	author	Will Norris
+d71d298	added	102
+d71d298	deleted	8
+d71d298	files	1
 ac773f4	author	Will Norris
 ac773f4	added	101
 ac773f4	deleted	0
