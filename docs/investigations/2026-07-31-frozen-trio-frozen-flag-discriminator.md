@@ -501,3 +501,94 @@ repo convention.
 - `turtle-vm`'s `STATIC` outcome is reported as a passing note. If the roster grows many
   compute-then-hold demos it may be worth a manifest field so the intent is declared rather than
   inferred, but that is a schema decision and is deliberately not taken here.
+
+---
+
+## 2026-08-01 — full sweep with the patched detector, vs the 2026-07-31 baseline
+
+The follow-up above ("a full 100-ROM sweep ... was not run") is now closed. Ran the patched
+`dev/display-check.py` (commit `d3000d7`, plus another session's still-unstaged docstring-only
+hunk — verified with `git diff dev/display-check.py` to touch comment prose only, not `same()` /
+`check()` / `burst_probe()`, so it does not affect this result and was deliberately left untouched)
+against the full live manifest:
+
+```
+$ python3 dev/display-check.py
+  <118 demo lines>
+display-check: 117 passed, 1 failed — svx2-fastrom-video
+```
+
+### Baseline scope
+
+The 2026-07-31 baseline (this doc's own reproduction, and `docs/plans/2026-07-30-blankscan-quiescence-gate.md`
+line 213: "the batch's `display-check.py` sweep flagged `turtle-vm`/`truchet`/`lzdec` as FROZEN")
+ran against the 114-ROM manifest published by `~/biohack.net`'s `530bf5c` (2026-07-28) and was not
+touched again until `7890ce3` (2026-07-31 09:53) — after the baseline sweep. No other failure was
+named in either doc, so the baseline is: **114 ROMs, 111 implicit PASS, 3 FROZEN-FAIL** (the trio).
+
+Between the baseline sweep and this one, `~/biohack.net`'s manifest grew by 4 ROMs with no prior
+`display-check.py` verdict to diff against (confirmed via `git log -- public/play/roms/manifest.json`):
+`09eb0fb` (13:44) added the three `cartsize-*` ROMs, `cdaa6f4` (15:10) added `svx2-fastrom-video`.
+114 baseline + 4 new = 118, matching this sweep's total.
+
+### Delta table (114 baseline-covered demos)
+
+| class | count | demos |
+|---|---|---|
+| (a) expected trio fix (FAIL→PASS, by predicted mechanism) | 3 | `turtle-vm`, `truchet`, `lzdec` |
+| (b) new FAIL exposed by full-pixel `same()` (previously blind PASS) | 0 | none |
+| (c) FROZEN/STATIC reclassification (tag changed, PASS/FAIL didn't) | 0 | none |
+| (d) unchanged (PASS before, PASS now, no tag) | 111 | all remaining baseline demos |
+
+Verdict-change rate: 3/114 = 2.6% — well under the 20% threshold that would suggest a detector bug
+rather than reclassification.
+
+**(a) — the trio, each clearing by its diagnosed mechanism, exactly as predicted above:**
+
+| demo | baseline | new | evidence |
+|---|---|---|---|
+| `turtle-vm` | FAIL FROZEN | PASS | `ink 7.6–7.6% [STATIC: rendered by frame 600, then holds — differs from frame 180; compute-then-hold, not a freeze]` |
+| `truchet` | FAIL FROZEN | PASS | `ink 6.9–6.9%` — full-pixel `same()` now sees the late samples differ, so it never even enters the FROZEN-suspicion branch |
+| `lzdec` | FAIL FROZEN | PASS | `ink 22.9–22.9% [CYCLIC: the cheap samples aliased the demo's period; frame 1450 differs from the gate frame]` |
+
+**(b) — none.** The fix's own "not done" note worried that some *other* demo might have been
+PASSing only because the old decimated `same()` happened to see the sampled points move while the
+demo was actually stuck. Not the case: zero baseline PASS demos flipped to FAIL.
+
+**(c) — none.** Grepping every bracket-tagged line in the full output, the only `STATIC`/`CYCLIC`
+tags belong to the trio itself (already counted in (a)). No other baseline demo tripped the new
+suspicion → confirmation branch (`all(same(base, p) ...)` in `check()`). The four
+`[ink-only: gate frame > max-gate, reset check skipped]` tags seen on `buddhabrot`, `mandel-display`,
+`mandel-oop`, `lzss-gallery` are pre-existing, unrelated behavior (gated on `frames > max_gate`,
+unchanged by this patch).
+
+**(d) — 111 demos**, PASS in both sweeps with the same plain `ink X–Y%` shape.
+
+### New ROMs (no baseline verdict — added to the manifest after the baseline sweep)
+
+| demo | result | evidence |
+|---|---|---|
+| `cartsize-hirom-4m` | PASS | `ink 95.7–96.4%` |
+| `cartsize-exhirom-6m` | PASS | `ink 47.5–95.7%` |
+| `cartsize-exhirom-8m` | PASS | `ink 95.7–96.4%` |
+| `svx2-fastrom-video` | **FAIL** | `RESET/UNSTABLE corpus_result ['0x4f', '0x4f'] (want 0x00) — program is restarting` |
+
+### The one FAIL — a finding, not a fix
+
+`svx2-fastrom-video` fails the very first check in `check()` (`corpus_result` vs `want`), a code
+path that is byte-for-byte unchanged by this patch — unrelated to `same()`, `STATIC`, or `CYCLIC`.
+Both late samples read a *stable* `0x4f` against a manifest that expects `0x00`, so this is a
+consistently-wrong self-check value rather than literal frame-to-frame instability; the branch name
+("RESET/UNSTABLE") covers both shapes. This ROM's `selfcheck` (`off=0x29`, `want=0x00`,
+`frames=1200`) was last revised in `~/biohack.net` commit `d28abc3` (2026-07-31 21:54, "fix SVX2 FPS
+and dashboard alignment"), same day as this sweep, and has no prior `display-check.py` result to
+compare against. **Reporting only — not investigated or fixed here**, per the svx2 cartridge work's
+own plan (`docs/plans/2026-07-31-svx2-animated-video-cartridge.md`), which is still in progress
+("60 fps optimization and ExHiROM follow-up remain") and out of this task's scope.
+
+### Verdict
+
+The patched detector's full-sweep behavior matches its design intent exactly: it downgraded only
+the three demos it was built to fix, by their diagnosed mechanisms, and introduced zero new FAILs
+or reclassifications among the 111 demos it left alone. The one FAIL in the sweep belongs to a ROM
+that postdates the baseline entirely and fails on an unrelated, pre-existing check.
