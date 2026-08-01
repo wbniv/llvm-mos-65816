@@ -87,14 +87,13 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   0 sampled): other demos may have been PASSING only through that blindness, and the new
   confirmation burst may reclassify others' FROZEN/STATIC. One sweep, record deltas vs the
   2026-07-31 baseline. Depends on the `[T1]` apply above. (T2: mechanical long run + diff.)
-- [wip T2] **Migrate the project-local `snes-rom-page` skill copy to CLI-delegated engine sync.** <!-- agent:aba9552ae1683d818 -->
-  Root cause behind the engine-downgrade incident: `.claude/skills/snes-rom-page/` in THIS repo
-  (added `bfcbe69`) is a divergent copy that still bundles a raw `engine/` (stale, built
-  2026-06-25), while the canonical `~/.claude/skills` copy was migrated 2026-07-27 to delegate
-  engine sync entirely to the `@wbniv/bsnes-jg-player` CLI. Port that architecture here — drop
-  the bundled `engine/` outright (preferred) or minimally resync the bundle. The PROVENANCE gate
-  (`9d0d0f3`) makes the stale bundle safe but not correct. (T2: the canonical copy is the
-  reference implementation.)
+- [T2] **snes-rom-page skill: port the page-authoring workflow to the sites' data-driven
+  routes.** Found by the engine-sync migration (`5e75e65`): the skill's kept
+  `page-template.astro`/`demos`-array workflow is ALSO stale — biohack.net now renders every
+  demo page from `src/content/snes/*.json` + one dynamic `[slug].astro` route, indri.studio
+  from `src/data/snes-demos.ts` + one dynamic route; per-slug page files are the old model.
+  Update `SKILL.md`/`scaffold.sh` to author into the data-driven model per site. (T2: two live
+  reference implementations to copy from.)
 - [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
   test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:a75d84d7b58466d17 -->
   Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
@@ -1049,6 +1048,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-31 — [snes-rom-page-migrate] Repo skill copy migrated to CLI-delegated engine sync (`5e75e65`): bundled `engine/` + PROVENANCE gate dropped (retired-mechanism note kept), `--touchnav` restored; synthetic e2e green. Follow-up filed: data-driven-routes port.
 - [x] 2026-07-31 — [frozen-detector-apply] Verified FROZEN-detector fix applied to `dev/display-check.py` (`d3000d7`); trio spot-check 3/3 by predicted mechanism; foreign docstring hunk left unstaged. See [investigation](docs/investigations/2026-07-31-frozen-trio-frozen-flag-discriminator.md).
 - [x] 2026-07-31 — [pr-critique] All critique items landed on PRs #577/#578/#584 (tests, bodies, TA-hardening) + #579 body; RA issue drafted. See [plan](docs/plans/2026-07-31-upstream-pr-critique-improvements.md).
 - [x] 2026-07-31 — [wt119-registry-row] NO-OP close: the `wt/119-gallery-near-decode-abi` registry row never existed in `docs/agent-handoff.md` (full-history `git log -S` empty; 17 rows, none match) — the wt119-retire deferral recorded a removal that had nothing to remove.
