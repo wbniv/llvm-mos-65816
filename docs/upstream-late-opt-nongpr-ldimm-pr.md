@@ -40,7 +40,7 @@ with a `switch` over the destination register:
 
 `Load` starts each iteration as `nullptr` and is only ever assigned inside
 switches over `{A, X, Y}`, but the store through it is unconditional. Any
-`LDImm` whose destination is none of those three writes to address `0`.
+`LDImm` whose destination is none of those three writes through null.
 
 That is not a hypothetical destination. On SPC700, `MOSInstrInfo::getRegClass`
 deliberately widens `LDImm`'s destination class so the pseudo can model
@@ -53,7 +53,7 @@ deliberately widens `LDImm`'s destination class so the pseudo can model
 ```
 
 So `$rcN = LDImm imm` is legal, `-verify-machineinstrs`-clean MIR that the
-allocator produces from ordinary C, and `mos-late-opt` segfaults on it.
+allocator produces from ordinary C, and `mos-late-opt` crashes on it.
 
 ## Reproduction
 
@@ -108,13 +108,17 @@ Segmentation fault
 The input MIR round-trips clean through `-run-pass=none -verify-machineinstrs`,
 so this is not a garbage-in case — the pass has to handle it.
 
-The crash is a null-pointer *store* that faults immediately, so it is always a
-hard crash and never a silent miscompile: a build that completes cannot have
-been mis-optimized through this path.
+The defect is a null-pointer *store*, which in practice faults immediately
+(page zero is unmapped on every host we build on), so a build that completes
+has not been mis-optimized through this path.
 
 ## Fix
 
-Skip the tracking entirely for a non-GPR destination:
+Skip the tracking for a non-GPR destination — and, defensively, invalidate any
+tracked GPR such an instruction reports modifying. No destination that aliases
+a GPR exists today, so the invalidation checks are expected to do nothing; they
+are there so a future widening of `LDImm`'s destination class cannot turn the
+skip into a stale-value rewrite.
 
 ```cpp
     // Process LD_ #.
@@ -141,26 +145,23 @@ Skip the tracking entirely for a non-GPR destination:
     int64_t Val = MI.getOperand(1).getImm();
 ```
 
-Skipping is the correct semantic rather than merely a safe one: `$rcN = LDImm imm`
-writes no GPR, so the values tracked for `A`, `X` and `Y` remain valid across it
-and must *not* be invalidated. The second test case pins that — a `TAX` rewrite
-still fires across an intervening imaginary-destination load.
+An imaginary-destination load writes no GPR, so the values tracked for `A`,
+`X` and `Y` remain valid across it. The second test case pins that — a `TAX`
+rewrite still fires across an intervening imaginary-destination load.
 
-The `modifiesRegister` checks are dead code today — every current non-GPR
-`LDImm` destination is an imaginary register that aliases nothing in
-`A`/`X`/`Y` — but they mirror the invalidation the loop already performs for
-non-`LDImm` instructions, so the guard's correctness no longer rests on an
-invariant the register file merely happens to satisfy. (The `TA` handler
-earlier in the loop has the same switch-then-store shape, but nothing widens
-`TA`'s destination class, so it is left untouched.)
+Alternatives considered, briefly: `default: llvm_unreachable(...)` is wrong
+because the case is legal and reachable (and is UB rather than a diagnostic in
+release builds); giving SPC700 its own opcode would remove the surprise at
+source but rewrites a deliberate modelling decision across ISel, the asm
+printer and the post-RA expanders — a large blast radius for a missing guard
+in one consumer.
 
-`default: llvm_unreachable(...)` would be wrong here: the case is legal, and in a
-release build it is UB rather than a diagnostic, which is exactly how this stayed
-a silent segfault. Giving SPC700 its own opcode instead of widening `LDImm`'s
-destination class would remove the surprise at source, but it rewrites a
-deliberate modelling decision across instruction selection, the asm printer and
-the post-RA expanders — a large blast radius for what is a missing guard in one
-consumer.
+The PR also hardens the sibling `TA` handler earlier in `combineLdImm`, which
+has the same shape: a `switch` over `{X, Y}` feeding an unconditional store
+through the selected pointer. It is unreachable today (`TA`'s destination
+class is XY-only), but this function is exactly where "unreachable today"
+already failed once, so the handler now falls through to the generic
+invalidation path instead of trusting the switch to be exhaustive.
 
 ## Tests
 
