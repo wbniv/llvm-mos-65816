@@ -61,7 +61,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [T4] **seamdemo — the ExHiROM three-act boundary synthesis cartridge.** One 48 Mbit cart,
+- [wip T4] **seamdemo — the ExHiROM three-act boundary synthesis cartridge.** <!-- agent:a3f76f15f3f53c44e (P0 generator+oracle) --> One 48 Mbit cart,
   three acts in a loop, each reading the full image with a different access pattern: Act 1 a
   VM executing the whole cart as one bytecode stream (PC ticker; the $3FFFFF→$400000 seam
   crossing is an on-screen event), Act 2 a boundary-hostile pointer-graph walk (every decode
