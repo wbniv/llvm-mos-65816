@@ -1,7 +1,7 @@
 # SVX2 Two-Video Artemis Reel
 
 **Date:** 2026-07-31
-**Status:** Fast-start correction implemented 2026-07-31; publishing
+**Status:** Fast-start correction published 2026-07-31
 **Depends on:** `2026-07-31-real-video-codec-corpus.md`,
 `2026-07-31-svx2-animated-video-cartridge.md`, and
 `2026-07-31-svx2-cartridge-video-dashboard.md`
@@ -98,3 +98,5 @@ begins playback before emulator frame 240. The emulator gate observes at least t
   4 MiB ROM hash is identical, and that live artifact passes the 6,500-frame composite gate.
 - Fast-start correction removes the roughly 42-second boot-time stream walk. Corrected artifact
   SHA-256: `ca22da27741b1c9533811580245cc61bb57f147b07076230fbc86d9101e2212c`.
+- Gallery commit `e344090`, release `v1.0.330`; deployment succeeded, the downloaded hash matches,
+  and the live artifact passes the 4,000-frame composite gate.

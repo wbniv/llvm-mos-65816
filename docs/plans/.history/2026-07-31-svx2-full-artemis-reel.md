@@ -1,11 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/6c03717) | snes: start two-video reel without validation delay |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/395da91) | docs: record two-video reel publication |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/427632a) | snes: combine both Artemis video corpora |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/d985ed1) | docs: record full SVX2 reel publication |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/bd344a1) | snes: ship complete 300-frame SVX2 reel |
 
 <!--history-meta v1
+6c03717	author	Will Norris
+6c03717	added	9
+6c03717	deleted	7
+6c03717	files	1
 395da91	author	Will Norris
 395da91	added	3
 395da91	deleted	1
