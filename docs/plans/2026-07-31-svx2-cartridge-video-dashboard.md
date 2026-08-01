@@ -158,6 +158,10 @@ display characters directly. Moving both text rows from tilemap rows 24/25 to 25
 blank tile row below the raster boundary, so no glyph scanline can be clipped. The corrected gate
 shows `FPS 30.0` with intact glyph tops.
 
+The correction shipped in gallery release `v1.0.325`. Production workflow `30682895865` completed
+successfully, and the live ROM matches the locally gated SHA-256
+`45b3e748f0d75759c5bb09d30a437e96e8820cb6c7a72ed92bab77a0067e4bd3`.
+
 ## Acceptance gates
 
 1. No green strip or green uncovered Mode 7 pixels appear at any point.
