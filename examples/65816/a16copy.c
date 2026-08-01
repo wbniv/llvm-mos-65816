@@ -24,6 +24,5 @@ volatile unsigned short corpus_result;
 int main(void) {
   da = *psa;                    // abs <- indir copy (fused: lda (psa); sta da)
   corpus_result = da + 0x1111;  // 0x2345 + 0x1111 = 0x3456
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

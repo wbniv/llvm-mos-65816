@@ -26,6 +26,5 @@ volatile unsigned short corpus_result;
 
 int main(void) {
     corpus_result = *(volatile unsigned short *)(g_ptr + g_off);  // (zp),Y16; expect 0x7E5A
-    for (;;) {
-    }
+    for (;;) __asm__ volatile("wai");
 }

@@ -18,5 +18,5 @@ int main(void) {
   /* Read 16-bit value at byte offset 4 -> 0x9ABC */
   unsigned short val = *(volatile unsigned short *)(g_bytes + off);
   corpus_result = val;   /* expect 0x9ABC */
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

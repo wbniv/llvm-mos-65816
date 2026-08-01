@@ -37,6 +37,5 @@ __attribute__((section(".far_text"), noinline)) static uint8_t far_leaf(uint8_t 
 int main(void) {
   seed = 0xA9;
   corpus_result = far_leaf(seed); // JSL far_leaf (bank $01); RTL back; 0xA9 ^ 0x5A = 0xF3
-  for (;;) {                      // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

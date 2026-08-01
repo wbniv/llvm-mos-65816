@@ -25,5 +25,5 @@ int main(void) {
   for (i = 0; i < 8; i++) r += ram[i];          // 62
 
   corpus_result = r;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

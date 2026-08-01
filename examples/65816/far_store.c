@@ -35,6 +35,5 @@ int main(void) {
   FAR volatile uint8_t *fp = (FAR volatile uint8_t *)a; // runtime far ptr to target
   *fp = 0xF3;                                     // sta [dp]  (the thing under test)
   corpus_result = target;                         // read back near; == 0xF3 iff store landed
-  for (;;) {                                      // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

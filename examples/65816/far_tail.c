@@ -71,6 +71,5 @@ int main(void) {
   // far_pick(1,0xBA) = far_addk(0xBA)  = 0xBA + 0x11 = 0xCB   (correct, path A)
   //   a broken block-A tail jump would fall through to far_xork(0xBA)=0xBA^0x5A=0xE0.
   corpus_result = far_pick(sel, far_outer(seed));
-  for (;;) { // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

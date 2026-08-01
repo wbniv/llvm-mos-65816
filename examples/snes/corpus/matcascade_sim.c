@@ -4,4 +4,4 @@
    (vec2 32-bit register-pair return, not sret). */
 #include "../../65816/matcascade.h"
 volatile uint16_t corpus_result;
-int main(void) { corpus_result = matcascade_gate_crc(); for (;;) {} return 0; }
+int main(void) { corpus_result = matcascade_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

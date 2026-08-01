@@ -21,5 +21,5 @@ int main(void) {
   h16 = u;
   i16 = w;
   corpus_result = x + t;            // 0x227E + 0x1122 = 0x33A0  (reuse t again)
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

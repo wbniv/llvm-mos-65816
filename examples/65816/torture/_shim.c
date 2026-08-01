@@ -32,16 +32,16 @@ int torture_test_main();
 
 void __torture_abort(void) {
   corpus_result = TORTURE_FAIL;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }
 
 void __torture_exit(int code) {
   corpus_result = (unsigned short)(code ? TORTURE_FAIL : TORTURE_PASS);
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }
 
 int main(void) {
   int r = torture_test_main();
   corpus_result = (unsigned short)(r ? TORTURE_FAIL : TORTURE_PASS);
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

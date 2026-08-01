@@ -57,6 +57,6 @@ int main(void) {
   grid_clear(grid);                               // WRAM is not zeroed at boot (bsnes randomises)
   grid_plot(grid, &p, pa, pb, pc, K_GATE);        // far RMW accumulation
   corpus_result = grid_hash(grid);                // far-load hash == host reference
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }
 #endif

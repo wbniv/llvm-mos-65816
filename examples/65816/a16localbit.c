@@ -10,5 +10,5 @@ int main(void){
   unsigned short w = u ^ a16v;      // 0x0FFF ^ 0x0FF0 = 0x000F
   g16 = t; h16 = u; i16 = w;
   corpus_result = w;                // 0x000F
-  for(;;){}
+  for (;;) __asm__ volatile("wai");
 }

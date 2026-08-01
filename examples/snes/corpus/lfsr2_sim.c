@@ -6,4 +6,4 @@
    See docs/plans/2026-07-02-106-snes-lfsr2.md. */
 #include "../../65816/lfsr2.h"
 volatile uint16_t corpus_result;
-int main(void){ corpus_result = lfsr2_gate_crc(); for(;;){} return 0; }
+int main(void){ corpus_result = lfsr2_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

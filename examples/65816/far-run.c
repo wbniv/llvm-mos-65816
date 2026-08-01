@@ -33,6 +33,5 @@ volatile FAR unsigned char corpus_result;
 
 int main(void) {
   corpus_result = far_src ^ 0x5A;   // far load (LDA long) + far store (STA long)
-  for (;;) {                        // stay alive while MAME settles, then it samples
-  }
+  for (;;) __asm__ volatile("wai");
 }

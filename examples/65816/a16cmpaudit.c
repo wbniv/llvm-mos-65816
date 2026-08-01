@@ -82,7 +82,6 @@ int main(void) {
   printf("0x%04X\n", (unsigned)corpus_result);
   return 0;
 #else
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 #endif
 }

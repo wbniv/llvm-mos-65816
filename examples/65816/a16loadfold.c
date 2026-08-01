@@ -9,5 +9,5 @@ volatile unsigned short g16, h16, corpus_result;
 int main(void){
   unsigned short t = a16v + b16v;       // 0x2345, both operands global loads
   g16 = t; h16 = t; corpus_result = t;  // multi-use -> store-fuse can't fire
-  for(;;){}
+  for (;;) __asm__ volatile("wai");
 }

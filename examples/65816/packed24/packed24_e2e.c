@@ -37,6 +37,5 @@ int main(void) {
   const FAR unsigned char *fp =
       (const FAR unsigned char *)slot;           // 3-byte load, p3 -> p2 (pad = 0)
   corpus_result = (*fp) ^ 0x5A;                  // far deref bank $01: 0xA9 ^ 0x5A = 0xF3
-  for (;;) {                                     // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

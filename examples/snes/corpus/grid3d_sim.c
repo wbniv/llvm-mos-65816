@@ -6,6 +6,6 @@ volatile uint16_t corpus_result;
 
 int main(void) {
     corpus_result = grid3d_gate_crc();
-    for (;;) {}
+    for (;;) __asm__ volatile("wai");
     return 0;
 }

@@ -33,6 +33,5 @@ int main(void) {
   r += loc | a16v;             // 0x0F3F  (OR,  B=global)
   r += loc ^ a16v;             // 0x0F3C  (XOR, B=global)
   corpus_result = r;           // 0x2DC0
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

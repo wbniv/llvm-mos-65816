@@ -33,5 +33,5 @@ int main(void) {
   r += pts[1].y;                          // 832
 
   corpus_result = r;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

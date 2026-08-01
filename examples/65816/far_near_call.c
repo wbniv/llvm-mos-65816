@@ -50,6 +50,5 @@ int main(void) {
   seed = 0xA9;
   // 0xA9 + 0x11 = 0xBA; 0xBA ^ 0x5A = 0xE0.
   corpus_result = far_caller(seed);
-  for (;;) { // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

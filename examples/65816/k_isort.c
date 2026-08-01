@@ -28,5 +28,5 @@ int main(void) {
     h = (unsigned short)((unsigned)rot ^ (unsigned)a[i]);
   }
   corpus_result = h;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

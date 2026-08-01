@@ -70,6 +70,5 @@ int main(void) {
     acc += hi[0x100 + i];
 
   corpus_result = acc;  // == 0x74 iff both memops landed in bank $7E
-  for (;;) {            // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

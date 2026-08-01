@@ -64,6 +64,5 @@ int main(void) {
 
   FAR const uint8_t *fp = make_far_ptr(opaque_addr); // far ptr RETURNED across a call
   corpus_result = deref_far(fp) ^ 0x5A;              // far ptr PASSED across a call; 0xA9^0x5A=0xF3
-  for (;;) {                                         // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

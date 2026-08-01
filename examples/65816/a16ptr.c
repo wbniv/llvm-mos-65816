@@ -22,6 +22,5 @@ volatile unsigned short corpus_result;
 int main(void) {
   *p = v;                 // 16-bit indirect store
   corpus_result = *p + 1; // 16-bit indirect load -> 0xABCE
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

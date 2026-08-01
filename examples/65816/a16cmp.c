@@ -16,5 +16,5 @@ int main(void){
   if (b16v  <= a16v)  r += 0x1000;   // true
   if (loval <  hival) r += 0x0002;   // 0x0099 < 0x0200  -> true (high-byte-differs)
   corpus_result = r;                 // 0x0001+0x0100+0x1000+0x0002 = 0x1103
-  for(;;){}
+  for (;;) __asm__ volatile("wai");
 }

@@ -17,6 +17,5 @@ volatile unsigned short corpus_result;
 int main(void) {
   *p_var = g_val;          // *volatile_ptr_var = global: the indir-dst pattern
   corpus_result = dst_mem; // read it back
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

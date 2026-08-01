@@ -26,5 +26,5 @@ int main(void){
   }
 done:;
   uint16_t h=0; for(uint16_t i=0;i<len;i++) h=(uint16_t)((uint16_t)(((unsigned)h<<1)|((unsigned)h>>15))^(uint16_t)(uint8_t)buf[i]);
-  corpus_result=h; for(;;){} return 0;
+  corpus_result=h; for (;;) __asm__ volatile("wai"); return 0;
 }

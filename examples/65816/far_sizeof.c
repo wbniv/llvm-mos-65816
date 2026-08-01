@@ -50,6 +50,5 @@ int main(void) {
   h.p = (FAR const uint8_t *)&arr[0]; // near->far cast, stored as a 4-byte far ptr
   uint8_t v = h.p[0];                 // deref the STORED far pointer -> 0x12
   corpus_result = (uint8_t)(v ^ h.tag); // 0x12 ^ 0xC3 = 0xD1 (tag not clobbered)
-  for (;;) { // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

@@ -23,5 +23,5 @@ int main(void) {
     acc = (unsigned short)((unsigned)acc + (unsigned)r + (unsigned)pc);
   }
   corpus_result = acc;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

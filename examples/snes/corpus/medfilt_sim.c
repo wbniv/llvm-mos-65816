@@ -3,4 +3,4 @@
    Exercises branchless min/max (median-of-9 network -> G_UMIN/G_UMAX .lower @272) + abs (G_ABS @281). */
 #include "../../65816/medfilt.h"
 volatile uint16_t corpus_result;
-int main(void){ corpus_result = medfilt_gate_crc(); for(;;){} return 0; }
+int main(void){ corpus_result = medfilt_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

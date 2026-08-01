@@ -47,5 +47,5 @@ int main(void) {
     jump();                    // non-local return back to setjmp with r = 7
   }
   corpus_result = (uint16_t)(0x2000u + r);   // expected 0x2007
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

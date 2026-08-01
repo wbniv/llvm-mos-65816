@@ -28,6 +28,5 @@ int main(void) {
   unsigned short t = a16v + b16v;  // 0x2345 (16-bit add)
   t = ext(t);                      // 0x3345 (call — 8-bit at the boundary)
   corpus_result = t + b16v;        // 0x4456 (16-bit add after the call)
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

@@ -24,6 +24,5 @@ int main(void) {
   if (a != c) r |= 0x0010;   // differ -> true
   if (a == c) r |= 0x0100;   // differ -> false (stays clear)
   corpus_result = r;          // 0x0011
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

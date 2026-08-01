@@ -34,7 +34,7 @@ static void platform_main_begin(void) { }
 static void platform_main_end(uint32_t crc, int flag) {
   (void)flag;
   corpus_result = (unsigned short)(crc ^ (crc >> 16)); /* 16-bit fold of the 32-bit CRC */
-  for (;;) { }                                         /* halt; harness samples corpus_result */
+  for (;;) __asm__ volatile("wai");                                         /* halt; harness samples corpus_result */
 }
 
 #endif /* CSMITH_SNES_H */

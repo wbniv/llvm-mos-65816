@@ -36,6 +36,5 @@ __attribute__((noinline)) static unsigned short work(unsigned short n) {
 
 int main(void) {
   corpus_result = work(3);
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

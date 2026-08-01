@@ -8,5 +8,5 @@ volatile unsigned short corpus_result;
 int main(void) {
   g16 = a16v + b16v + c16v;   // 0x1000 + 0x0200 + 0x0030 = 0x1230
   corpus_result = g16;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

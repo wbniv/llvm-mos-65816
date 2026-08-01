@@ -14,6 +14,6 @@ volatile uint16_t corpus_result;
 
 int main(void) {
   corpus_result = inv_run_crc((uint16_t)INV_FRAMES);
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
   return 0;
 }

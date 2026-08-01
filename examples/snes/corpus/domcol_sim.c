@@ -3,4 +3,4 @@
    COLOUR INDEX (branch outcome), never raw NaN bits. */
 #include "../../65816/domcol.h"
 volatile uint16_t corpus_result;
-int main(void){ corpus_result = domcol_gate_crc(); for(;;){} return 0; }
+int main(void){ corpus_result = domcol_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

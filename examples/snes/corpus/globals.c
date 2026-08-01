@@ -30,5 +30,5 @@ int main(void) {
   if (bsssum != 0) r += 0xF000;   // poison: crt0 failed to clear .bss
 
   corpus_result = r;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

@@ -50,6 +50,5 @@ int main(void) {
   clobber();                                            // call: X narrowed to 8; idx must survive
   unsigned short b = post_arr[idx];                     // indexed use AFTER call (idx -> Xc16)
   corpus_result = (unsigned short)((unsigned)a ^ (unsigned)b);  // 0x1234 ^ 0x6C6E = 0x7E5A
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

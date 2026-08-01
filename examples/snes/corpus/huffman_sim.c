@@ -2,4 +2,4 @@
    Exercises a bit-granular stream reader + pointer-linked Huffman tree descent (decode). */
 #include "../../65816/huffman.h"
 volatile uint16_t corpus_result;
-int main(void){ corpus_result = huffman_gate_crc(); for(;;){} return 0; }
+int main(void){ corpus_result = huffman_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

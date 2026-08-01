@@ -71,7 +71,6 @@ int main(void) {
 #else
 int main(void) {
   compute();
-  for (;;) {                                       // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }
 #endif

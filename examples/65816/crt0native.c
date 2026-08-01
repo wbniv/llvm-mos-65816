@@ -17,6 +17,5 @@ volatile unsigned short corpus_result;
 
 int main(void) {
   corpus_result = seed + 0x1111;  // 0x2345 via 8-bit abs (DBR-relative) global access
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

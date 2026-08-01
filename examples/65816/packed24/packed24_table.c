@@ -57,6 +57,5 @@ int main(void) {
   for (unsigned i = 0; i < 8; i++)
     s += *(const FAR unsigned char *)table[i]; // load entry (3 or 4 B) -> p2 -> far deref bank $01
   corpus_result = (unsigned char)s ^ 0x5A;     // 0xFF ^ 0x5A = 0xA5
-  for (;;) {                                    // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

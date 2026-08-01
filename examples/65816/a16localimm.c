@@ -8,5 +8,5 @@ volatile unsigned short g16, h16, corpus_result;
 int main(void){
   unsigned short t = a16v + 0x0345;     // -> adc #$0345 ; 0x1200 + 0x0345 = 0x1545
   g16 = t; h16 = t; corpus_result = t;  // multi-use forces the native path
-  for(;;){}
+  for (;;) __asm__ volatile("wai");
 }

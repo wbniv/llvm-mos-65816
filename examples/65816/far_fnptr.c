@@ -51,6 +51,5 @@ int main(void) {
   // 24-bit address into __mos_far_target and dispatches through __call_indir_far.
   // far_leaf(0x5A) = 0x5A ^ 0xA5 = 0xFF (the value crossed the bank).
   corpus_result = far_leaf(0x5A);
-  for (;;) { // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

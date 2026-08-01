@@ -18,5 +18,5 @@ int main(void) {
     }
   }
   corpus_result = crc;     // 0x29B1
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

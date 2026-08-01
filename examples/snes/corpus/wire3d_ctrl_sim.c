@@ -35,5 +35,5 @@ static uint16_t wire3d_ctrl_crc(void) {
 int main(void) { printf("0x%04X\n", wire3d_ctrl_crc()); return 0; }
 #else
 volatile uint16_t corpus_result;
-int main(void) { corpus_result = wire3d_ctrl_crc(); for (;;) {} return 0; }
+int main(void) { corpus_result = wire3d_ctrl_crc(); for (;;) __asm__ volatile("wai"); return 0; }
 #endif

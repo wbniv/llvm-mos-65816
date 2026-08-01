@@ -14,5 +14,5 @@ int main(void) {
     acc = s;
   }
   corpus_result = acc;      // saturates to 0xFFFF
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

@@ -32,6 +32,5 @@ int main(void) {
   unsigned short e3 = (unsigned short)(ab == 0x1234);
   corpus_result = (unsigned short)((unsigned)e0 | ((unsigned)e1 << 4) |
                                    ((unsigned)e2 << 8) | ((unsigned)e3 << 12));
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

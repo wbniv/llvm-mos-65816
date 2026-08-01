@@ -25,5 +25,5 @@ int main(void) {
   k = 5; lim = 0xFFFF; if (lim >  arr[k])  r += 0x1000; // 0xFFFF > 0x8000 -> T (LHS-indexed, +0x1000)
   k = 6; lim = 0x0000; if (lim <  arr[k])  r += 0x0010; // 0x0000 < 0x0001 -> T (+0x0010)
   corpus_result = r;   // 0x0001+0x0100+0x1000+0x0010 = 0x1111
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

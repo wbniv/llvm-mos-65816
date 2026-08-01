@@ -15,6 +15,6 @@ volatile uint16_t corpus_result;
 
 int main(void) {
     corpus_result = pi_gate_crc(&sp, &mc);
-    for (;;) {}
+    for (;;) __asm__ volatile("wai");
     return 0;
 }

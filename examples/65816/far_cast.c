@@ -30,6 +30,5 @@ int main(void) {
   const uint8_t *np = (const uint8_t *)(uintptr_t)opaque_near; // runtime near ptr (AS0)
   FAR const uint8_t *fp = (FAR const uint8_t *)np;             // addrspacecast AS0->AS2
   corpus_result = *fp ^ 0x5A;                                  // lda [dp] (bank $00); 0xA9 ^ 0x5A = 0xF3
-  for (;;) {                                                   // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

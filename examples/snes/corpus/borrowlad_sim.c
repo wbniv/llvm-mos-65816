@@ -5,4 +5,4 @@
    See docs/plans/2026-07-02-110-snes-borrowlad.md. */
 #include "../../65816/borrowlad.h"
 volatile uint16_t corpus_result;
-int main(void){ corpus_result = borrowlad_gate_crc(); for(;;){} return 0; }
+int main(void){ corpus_result = borrowlad_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

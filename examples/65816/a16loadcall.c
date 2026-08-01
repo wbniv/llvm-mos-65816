@@ -52,6 +52,5 @@ int main(void) {
   g = 0x4321;
   r = (unsigned short)((unsigned)r + viaabs());   // 0x4321 + 0xBCDF = 0x0000
   corpus_result = r;                               // expected 0x0100
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

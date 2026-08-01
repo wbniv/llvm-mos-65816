@@ -38,5 +38,5 @@ __attribute__((noinline)) int check(void) {
 int main(void) {
   int r = check();
   corpus_result = (unsigned short)(r ? r : 0xDEAD);
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

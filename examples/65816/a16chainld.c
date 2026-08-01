@@ -23,6 +23,5 @@ int main(void) {
   g = t;
   h = t;
   corpus_result = t;                  // 0x1234
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

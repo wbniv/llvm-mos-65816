@@ -27,5 +27,5 @@ int main(void) {
   r += (uint16_t)(a16 << 1);
   r += (uint16_t)(a16 >> 2);
   corpus_result = r;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

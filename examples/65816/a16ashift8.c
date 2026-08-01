@@ -18,5 +18,5 @@ int main(void) {
   r ^= (unsigned short)((short)spos >> 8);    // 0x0012
   r ^= (unsigned short)((short)spos >> 13);   // 0x0000
   corpus_result = r;                          // 0xFFF2 ^ 0xFFFF ^ 0x0012 = 0x001F
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

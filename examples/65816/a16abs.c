@@ -18,6 +18,5 @@ volatile unsigned short corpus_result;
 int main(void) {
   g = gg;                 // 16-bit absolute load + store
   corpus_result = g + 1;  // 0x5A3D
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

@@ -10,6 +10,6 @@ volatile uint16_t corpus_result;
 
 int main(void) {
     corpus_result = maze_gate_crc(&g_maze);
-    for (;;) {}
+    for (;;) __asm__ volatile("wai");
     return 0;
 }

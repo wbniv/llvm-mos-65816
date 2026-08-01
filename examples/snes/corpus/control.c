@@ -37,5 +37,5 @@ int main(void) {
   r += s;                                           // 30
 
   corpus_result = r;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

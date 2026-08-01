@@ -62,7 +62,7 @@ int main(void) {
   grid_clear(grid);                               // WRAM is not zeroed at boot (bsnes randomises)
   grid_accum(grid, &rng, (uint16_t)K_GATE);       // far scatter-write accumulation
   corpus_result = grid_hash(grid);                // far-load hash == host reference
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
   return 0;
 }
 #endif

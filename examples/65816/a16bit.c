@@ -9,5 +9,5 @@ int main(void) {
   g_or  = a16v | b16v;       // 0xFF0F | 0x0FF0 = 0xFFFF
   g_xor = a16v ^ b16v;       // 0xFF0F ^ 0x0FF0 = 0xF0FF
   corpus_result = g_and;     // read back the AND result
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

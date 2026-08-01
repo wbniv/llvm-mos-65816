@@ -21,5 +21,5 @@ static unsigned short mul16(unsigned short a, unsigned short b) {
 int main(void) {
   unsigned short p = mul16(fa, fb);            // 0x0280 * 0x0140 = 0x32000 -> low16 0x2000
   corpus_result = (unsigned short)((unsigned)p >> 8);  // Q8.8 -> 0x0020 (= 3.125)
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

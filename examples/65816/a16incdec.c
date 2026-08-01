@@ -27,6 +27,5 @@ int main(void) {
   o3 = y + 1;                // inc a
   o4 = x - 1;                // dec a
   corpus_result = o1 + o2 + o3 + o4;   // 0x2668
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

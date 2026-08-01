@@ -47,6 +47,5 @@ int main(void) {
   // far_outer(0x5A) -> far_leaf(0x5A) = 0x5A ^ 0xA5 = 0xFF (returned straight to main
   // by far_leaf's RTL, past the folded far_outer tail).
   corpus_result = far_outer(0x5A);
-  for (;;) { // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

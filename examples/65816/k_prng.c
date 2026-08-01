@@ -18,5 +18,5 @@ int main(void) {
   for (unsigned char i = 0; i < 64; i++)
     x = xs16(x);
   corpus_result = x;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

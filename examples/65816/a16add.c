@@ -7,5 +7,5 @@ volatile unsigned short corpus_result;
 int main(void) {
   g16 = a16v + b16v;        // 0x1234 + 0x1111 = 0x2345
   corpus_result = g16;      // read back by the harness
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

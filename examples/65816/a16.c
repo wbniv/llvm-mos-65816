@@ -21,6 +21,5 @@ int main(void) {
   // so no test-local `clc; xce` is needed — this is plain C.
   g16 = 0;                         // fused 16-bit store -> rep #$20; stz; sep #$20
   corpus_result = g16 + 0x42;      // 0x0000 + 0x42 = 0x0042 iff g16 fully zeroed
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

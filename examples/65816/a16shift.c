@@ -24,6 +24,5 @@ int main(void) {
   unsigned short l = x << 4;   // 0x1230
   unsigned short r = x >> 2;   // 0x0048
   corpus_result = l + r;       // 0x1278
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

@@ -41,5 +41,5 @@ int main(void) {
                                          (unsigned short)0x1CBCu) >
                              (unsigned short)((unsigned)gs0 ^ (unsigned)(*p))));
   }
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

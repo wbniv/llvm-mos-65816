@@ -65,7 +65,6 @@ int main(void) {
 volatile uint32_t corpus_result;
 int main(void) {
   corpus_result = run();
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }
 #endif

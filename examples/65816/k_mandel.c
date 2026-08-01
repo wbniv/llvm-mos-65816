@@ -32,5 +32,5 @@ volatile uint16_t corpus_result;
 int main(void) {
   mandel_fill(fb, GATE_W, GATE_H, GATE_N);
   corpus_result = mandel_crc(fb, (uint16_t)(GATE_W * GATE_H));
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

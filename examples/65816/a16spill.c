@@ -57,5 +57,5 @@ int main(void) {
     lb0 = (unsigned char)(((unsigned short)((unsigned)f0((unsigned short)((unsigned)gs0), (unsigned short)((unsigned short)0x1CBCu))) > (unsigned short)((unsigned short)((unsigned)gs0 ^ (unsigned)(*p)))));
   }
   gu1 = (unsigned short)(((unsigned short)((unsigned short)((unsigned)(unsigned short)((unsigned)in_b0) >> 2)) == (unsigned short)((unsigned short)((unsigned short)0x55BEu & (unsigned)in_b0))));
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

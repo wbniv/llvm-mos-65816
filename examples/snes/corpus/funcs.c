@@ -26,5 +26,5 @@ int main(void) {
   r += fib(fn);               // 144
   r += add3(a, b, 100);       // 142
   corpus_result = r;
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

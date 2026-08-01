@@ -60,6 +60,6 @@ int main(void) {
 volatile unsigned short corpus_result;
 int main(void) {
   corpus_result = hopalong_run();
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }
 #endif

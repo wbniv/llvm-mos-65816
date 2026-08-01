@@ -2,4 +2,4 @@
    Exercises signed 2-D cross-product orientation tests (gift-wrap convex hull). */
 #include "../../65816/hull.h"
 volatile uint16_t corpus_result;
-int main(void){ corpus_result = hull_gate_crc(); for(;;){} return 0; }
+int main(void){ corpus_result = hull_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

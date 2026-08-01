@@ -29,5 +29,5 @@ int main(void) {
   unsigned short y = a16 + c16;   // 0x2224
   sink = y - d16;                 // 0x21E4  (forces y's store to persist)
   corpus_result = x + y;          // 0x0320 + 0x2224 = 0x2544
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

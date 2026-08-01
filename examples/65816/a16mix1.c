@@ -24,5 +24,5 @@ int main(void) {
   for (unsigned char i = 0; i < 5; i++)                                             // loop accumulate (8-bit ctr)
     t = (unsigned short)((unsigned)t + (unsigned)a);
   corpus_result = (unsigned short)((unsigned)t ^ (unsigned)s);
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

@@ -31,6 +31,5 @@ int main(void) {
   if (n5 <  n2) r |= 0x0010;   // -5 < -2  -> true
   if (p7 >= n9) r |= 0x0100;   // 7 >= -9  -> true
   corpus_result = r;            // 0x0111
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

@@ -41,5 +41,5 @@ int main(void) {
     s += bb;
     out = r + s;
     corpus_result = out;                                  // expose the result for the gate
-    for (;;) {}
+    for (;;) __asm__ volatile("wai");
 }

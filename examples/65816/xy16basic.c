@@ -21,6 +21,5 @@ volatile unsigned short corpus_result;
 int main(void) {
   g16 = 0;                          // rep #$20; stz g16; sep #$20 (same as +mos-a16)
   corpus_result = g16 + 0x42;       // 0x0000 + 0x42 = 0x0042 iff g16 fully zeroed
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

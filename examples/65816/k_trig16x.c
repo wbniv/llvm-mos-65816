@@ -127,7 +127,7 @@ int main(void) {
 volatile uint32_t corpus_result;
 int main(void) {
   corpus_result = trig_run();
-  for (;;) { }
+  for (;;) __asm__ volatile("wai");
 }
 #endif
 #endif /* TRIG_NO_MAIN */

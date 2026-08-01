@@ -27,6 +27,5 @@ int main(void) {
   g = t;
   h = t;
   corpus_result = oand + oxor + t;   // 0x6261
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

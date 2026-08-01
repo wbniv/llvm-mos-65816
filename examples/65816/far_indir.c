@@ -43,6 +43,5 @@ int main(void) {
   uint32_t a = opaque_addr;                          // opaque -> no fold
   FAR const uint8_t *fp = (FAR const uint8_t *)a;    // inttoptr -> runtime far ptr
   corpus_result = *fp ^ 0x5A;                        // lda [dp]; 0xA9 ^ 0x5A = 0xF3
-  for (;;) {                                         // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

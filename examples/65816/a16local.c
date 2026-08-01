@@ -14,5 +14,5 @@ int main(void) {
   g16 = t;                          // use 1
   h16 = t;                          // use 2
   corpus_result = t;                // use 3 -> harness reads 0x1122
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

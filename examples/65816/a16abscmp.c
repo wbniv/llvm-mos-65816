@@ -31,6 +31,5 @@ int main(void) {
   if (y  <  x)  r |= 0x4000;   // true
   if (lo <  hi) r |= 0x0002;   // true (high-byte-differs)
   corpus_result = r;            // 0x0001 | 0x0300 | 0x4000 | 0x0002 = 0x4303
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

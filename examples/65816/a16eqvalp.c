@@ -28,6 +28,5 @@ int main(void) {
   unsigned short e2 = (unsigned short)(*pp != c);
   corpus_result =
       (unsigned short)((unsigned)e0 | ((unsigned)e1 << 4) | ((unsigned)e2 << 8));
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

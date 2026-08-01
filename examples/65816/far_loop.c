@@ -57,6 +57,5 @@ int main(void) {
     acc += *q;  // sum hi[0..49] via a far-ptr IV load (lda [dp])
 
   corpus_result = acc;  // sum(0..49) = 1225 -> 0xC9 iff the IV stores hit bank $7E
-  for (;;) {            // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

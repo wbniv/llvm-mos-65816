@@ -38,6 +38,5 @@ int main(void) {
   FAR const uint8_t *fp = (FAR const uint8_t *)(uintptr_t)(uint32_t)opaque_near;
   fp++;                                 // G_PTR_ADD {PF,S32}: &arr[0] -> &arr[1]
   corpus_result = *fp ^ 0x5A;           // lda [dp] of arr[1]=0xA9; 0xA9 ^ 0x5A = 0xF3
-  for (;;) {                            // stay alive while MAME settles
-  }
+  for (;;) __asm__ volatile("wai");
 }

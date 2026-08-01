@@ -3,4 +3,4 @@
    (G_SADDSAT/G_USUBSAT). Distinct from #57 medfilt (compare-exchange, no MAC). */
 #include "../../65816/sobel.h"
 volatile uint16_t corpus_result;
-int main(void) { corpus_result = sobel_gate_crc(); for (;;) {} return 0; }
+int main(void) { corpus_result = sobel_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

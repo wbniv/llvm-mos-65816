@@ -16,5 +16,5 @@ int main(void) {
      the offset is G_ZEXT(y_off) -> tryIndexedAddressing16 emits G_LOAD16_INDIR_IDX. */
   corpus_result = *(volatile unsigned short *)
                     ((volatile unsigned char *)g_pptr + y_off);  /* expect 0x5678 */
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

@@ -19,6 +19,5 @@ unsigned short arr[64] = {
 
 int main(void) {
     corpus_result = arr[in_idx];            // G_LOAD_ABS_IDX16: rep#16/ldx/rep#32/lda arr,x
-    for (;;) {
-    }
+    for (;;) __asm__ volatile("wai");
 }

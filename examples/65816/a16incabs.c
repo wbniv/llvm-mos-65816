@@ -24,6 +24,5 @@ int main(void) {
   g2 = g2 - 1;   // dec a
   o = a + 1;     // inc a (cross-global)
   corpus_result = g1 + g2 + o;   // 0x1002 + 0x1FFF + 0x0501 = 0x3502
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

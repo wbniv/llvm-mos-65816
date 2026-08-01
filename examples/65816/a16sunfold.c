@@ -32,6 +32,5 @@ int main(void) {
   r += (a - b) | d;   // 0x0127  (SUB)
   r += (a & b) + c;   // 0x1052  (AND)
   corpus_result = r;  // 0x3480
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

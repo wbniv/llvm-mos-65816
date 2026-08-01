@@ -27,6 +27,5 @@ volatile FAR unsigned char corpus_result;
 
 int main(void) {
   corpus_result = far_src ^ 0x5A;   // far LOAD from bank $01 -> far STORE to bank $00 WRAM
-  for (;;) {                        // stay alive while MAME settles, then it samples
-  }
+  for (;;) __asm__ volatile("wai");
 }

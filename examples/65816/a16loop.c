@@ -36,6 +36,5 @@ int main(void) {
   while (acc < lim) // 16-bit compare on zp locals (M16, no byte copies)
     acc += s;       // 16-bit accumulate on zp locals (M16)
   corpus_result = acc; // 0x2340 (16 * 0x0234)
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

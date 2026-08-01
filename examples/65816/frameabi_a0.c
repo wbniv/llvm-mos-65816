@@ -68,6 +68,5 @@ int main(void) {
     ::: "a", "memory");
 
   corpus_result = *(volatile unsigned short *)0x1F00;
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

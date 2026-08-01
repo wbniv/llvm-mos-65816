@@ -3,4 +3,4 @@
    cutoff prune CFG — alternating-sign recursion #17/#18 never form. */
 #include "../../65816/plyoracle.h"
 volatile uint16_t corpus_result;
-int main(void) { corpus_result = plyoracle_gate_crc(); for (;;) {} return 0; }
+int main(void) { corpus_result = plyoracle_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

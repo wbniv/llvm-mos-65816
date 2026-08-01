@@ -24,5 +24,5 @@ int main(void) {
       sum = (unsigned short)((unsigned)sum + (unsigned)i);                    // 8-bit counter into 16-bit
   }
   corpus_result = (unsigned short)((unsigned)acc + (unsigned)sum);
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

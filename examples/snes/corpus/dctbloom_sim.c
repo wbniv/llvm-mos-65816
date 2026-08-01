@@ -3,4 +3,4 @@
    (G_ASHR + G_SEXT_INREG). Distinct from #25 fft (radix-2 butterflies/twiddles). */
 #include "../../65816/dctbloom.h"
 volatile uint16_t corpus_result;
-int main(void) { corpus_result = dctbloom_gate_crc(); for (;;) {} return 0; }
+int main(void) { corpus_result = dctbloom_gate_crc(); for (;;) __asm__ volatile("wai"); return 0; }

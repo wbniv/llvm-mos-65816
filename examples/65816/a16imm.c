@@ -9,5 +9,5 @@ int main(void) {
   g_sub = a16v - 0x0100;     // 0x1100 (folds to add #$FF00)
   g_and = a16v & 0x0FF0;     // 0x1200 & 0x0FF0 = 0x0200
   corpus_result = g_add;     // read back the add result
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

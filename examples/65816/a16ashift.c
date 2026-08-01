@@ -23,6 +23,5 @@ int main(void) {
   short x = sv;                          // multi-use signed local -> Imag16
   short r = x >> 3;                       // arithmetic: 0xF000 >> 3 = 0xFE00
   corpus_result = (unsigned short)r + 1;  // 0xFE01
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

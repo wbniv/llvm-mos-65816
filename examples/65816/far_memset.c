@@ -33,5 +33,5 @@ int main(void) {
   i = 0;
   do { acc = (uint16_t)(acc + grid[i]); } while (++i != 4096);
   corpus_result = acc;                 // == 0x42 * 4096 mod 2^16 = 0x2000 iff the fill is correct
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }

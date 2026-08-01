@@ -48,6 +48,5 @@ int main(void) {
   unsigned short r16 = add16(a, b);
   unsigned char r8 = add8(p, q);
   corpus_result = (unsigned short)((unsigned)r16 + (unsigned)r8);
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

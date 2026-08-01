@@ -41,6 +41,5 @@ __attribute__((noinline)) static unsigned short f0(unsigned short p0, unsigned s
 
 int main(void) {
   corpus_result = f0(2, 0xCDD5u);
-  for (;;) {
-  }
+  for (;;) __asm__ volatile("wai");
 }

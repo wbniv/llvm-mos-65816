@@ -44,5 +44,5 @@ int main(void) {
                            : (uint16_t)(crc << 1);
   }
   corpus_result = crc;                 // == 0x820B (host reference, same grid as k_mandel)
-  for (;;) {}
+  for (;;) __asm__ volatile("wai");
 }
