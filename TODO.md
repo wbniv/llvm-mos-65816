@@ -49,13 +49,27 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md); **user-gated**);
   (3) browser-exercise the badge states; (4) confirm the 24000-frame worst-case budget from
   `gallery_repack_frames[]` over all 62 works.
-- [T4] **Gallery ROM does not build reproducibly — two stable images ~50/50 from identical
-  source.** Found incidentally by the button work; reproduced from `git show HEAD:` sources, not
-  the working tree. Ruled out: linker threading (`--threads=1`, `--thinlto-jobs=1`), ASLR
-  (`setarch -R`). Symbol addresses are identical between variants, so correctness and manifest
-  offsets are unaffected — but `dev/lzss-gallery.sh` prints a `sha256sum` as if reproducible and
-  `sync-manifest-offsets.py`'s byte-identity guard intermittently refuses (fails safe). Needs a
-  pass bisect. (T4: unknown root cause in the toolchain pipeline.) Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
+- [T3] **Gallery ROM non-reproducible build — ROOT-CAUSED 2026-08-01 (upstream
+  `MOSZeroPageAlloc` DenseMap tie-break); remaining = apply `MapVector` fix + verify +
+  upstream package.** <!-- agent:a758b3836d195822b --> `MOSZeroPageAlloc` iterates a
+  pointer-keyed `DenseMap<GlobalVariable*, float>` (`MOSZeroPageAlloc.cpp:499/:523`) and
+  `stable_sort`s by benefit, so equal-benefit candidates are ordered by heap address — when ZP
+  is full the tie-break decides who gets the last byte (gallery: `arrow_pose` ↔
+  `arrow_previous_direction`, 2 B→3 B accesses, `.text` ±2 B, 1509/2291 ROM symbols shift).
+  Proven on pristine upstream `8be0546128a5` (12-line `.ll`, 8 tied globals, `-zp-avail=4` →
+  6 winner sets in 20 single-threaded `llc` runs); `-mlto-zp=0` A/B → 15/15 byte-identical.
+  Affects every `-mlto-zp` platform. **Two TODO premises corrected:** symbol addresses are NOT
+  identical (only WRAM symbols hold — which is why gates never drifted); the ASLR rule-out was
+  a false negative (driver's random temp-object path re-randomizes the heap; `setarch -R` +
+  fixed input path IS deterministic). Fix recorded NOT applied: `DenseMap`→`MapVector` one-liner
+  (+ two flagged same-class siblings `CalleeFreqs`/`SCCCallees`). Artifacts on
+  `throwaway/gallery-repro-bisect` (`13c3542`): plan
+  `docs/plans/2026-08-01-gallery-nonreproducible-build.md` + `dev/measure-gallery-repro.sh`
+  (modes rom/rom-nozp/llc/tie/zpdiff). Remaining: apply fix to vendor, rebuild, `tie 20` →
+  1 line + `rom 20` → 1 hash, ship the 8-global `.ll` as an upstream lit test + PR, then restore
+  `dev/lzss-gallery.sh`'s sha256 claim to honest. Prefer re-messaging the stamped agent (full
+  context) over a fresh brief. (T3: fix is decided + validation scripted; toolchain rebuild
+  coordination is the only care point.) Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
   host `report.json`) keyed by a ROM-published index, vs ROM-side check-on-display publishing a
   uniform `(work-id, pass/fail)` pair — both costed in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md). The ROM must first
@@ -63,34 +77,38 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   `sync-manifest-offsets.py` already honours `selfcheck.symbol`. Manifest wiring blocked until the
   post-fix gallery republish ships a byte-identical rebuilt ROM. (T4: mechanism is a design call
   spanning ROM + player.)
-- [T2] **Full 62-work *visual* corpus sweep (~2.5 h) — post-A-clobber-fix confirmation.** Bench
+- [wip T2] **Full 62-work *visual* corpus sweep (~2.5 h) — post-A-clobber-fix confirmation.** <!-- agent:a2109aee659307654 --> Bench
   gate (presentation stripped) covers all 62; the visual ROM is verified only over works 0–3 at
   40k frames — a presentation-path interaction beyond work 3 would slip both. Run once, record
   into the [abi-clobber plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md) and the
   #137 completion record.
-- [T1] **Retire `wt/119-gallery-near-decode-abi` remnants.** Code content landed on `main`
-  (`2932bcf`, `3af0df8`, `4c08ead`; verified identical). Branch residue is bookkeeping only:
-  obsolete `TODO.md`, `.deferrals-seen` ledger, one `agent-handoff.md` worktree-registry row worth
-  cherry-picking once that file is clean of other sessions' dirty edits. Then `-s ours` merge (or
-  branch delete) + tear down `/home/will/llvm-mos-65816-gallery-repack`.
-- [T3] **`turtle-vm`/`truchet`/`lzdec` flagged FROZEN by the `display-check.py` full sweep —
-  discriminate detector artifact vs real freeze.** Found by the 2026-07-31 republish batch
-  ("identical at every late sample" for all three); pre-existing — none were touched in that
-  batch, and none appear in prior display investigations as known-frozen. All three show nonzero
-  `d60` motion in the 60fps investigation table, so an infrequent-step sampling false positive is
-  plausible (the BLANKSCAN precedent) but unconfirmed. First step is a bounded discriminating
-  test: dense-sample captures per demo; fix the detector or the demo accordingly. (T3: likely a
-  detector-sampling artifact per precedent, but each demo needs a real look; escalate any true
-  freeze with an unknown cause.)
-- [T2] **`/snes-rom-page` `scaffold.sh` silently downgrades the site's WASM engine.** Caught
-  pre-ship by the republish batch: the skill's bundled `engine/` copy (2026-06-25) overwrote
-  biohack.net's live `app.js`/`bsnes_jg.wasm`/`PROVENANCE.json` (2026-07-27) — a month-stale
-  downgrade that only a manual revert stopped. Fix the skill: refuse or warn when the bundled
-  engine is older than the site's (compare PROVENANCE stamps), and document that engine sync is
-  owned by the `@wbniv/bsnes-jg-player` CLI, not the scaffold. (T2: bounded script fix in the
-  skill, clear spec.)
-- [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE + PASSING
-  (2026-07-31); publication held on two escalations.** <!-- agent:a75d84d7b58466d17 -->
+- [wip T2] **Re-run the full ~100-ROM display sweep with the patched detector** — <!-- agent:a600f8d98aa87a91f --> the fix can only
+  downgrade FAIL→PASS, but the old subsampled `same()` was blind (truchet: 2048 differing pixels,
+  0 sampled): other demos may have been PASSING only through that blindness, and the new
+  confirmation burst may reclassify others' FROZEN/STATIC. One sweep, record deltas vs the
+  2026-07-31 baseline. Depends on the `[T1]` apply above. (T2: mechanical long run + diff.)
+- [T2] **Migrate the project-local `snes-rom-page` skill copy to CLI-delegated engine sync.**
+  Root cause behind the engine-downgrade incident: `.claude/skills/snes-rom-page/` in THIS repo
+  (added `bfcbe69`) is a divergent copy that still bundles a raw `engine/` (stale, built
+  2026-06-25), while the canonical `~/.claude/skills` copy was migrated 2026-07-27 to delegate
+  engine sync entirely to the `@wbniv/bsnes-jg-player` CLI. Port that architecture here — drop
+  the bundled `engine/` outright (preferred) or minimally resync the bundle. The PROVENANCE gate
+  (`9d0d0f3`) makes the stale bundle safe but not correct. (T2: the canonical copy is the
+  reference implementation.)
+- [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
+  test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:a75d84d7b58466d17 -->
+  Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
+  uninitialised VRAM; CGRAM written during active display, now HVBJOY-synced — plus a repo-wide
+  harness finding: `jgxcheck` PNG dumps of *static-picture* ROMs can capture stale/partial frames,
+  proven against known-good `hello.c`; recorded in-source. PNG `yoff=0` vs player `yoff=8` noted).
+  Re-gated PASS ×3 configs at frames 700+1800; fix `92c1b74`. Live pages:
+  [4 MiB HiROM](https://biohack.net/snes/cartsize-hirom-4m/) ·
+  [6 MiB ExHiROM](https://biohack.net/snes/cartsize-exhirom-6m/) ·
+  [8 MiB ExHiROM](https://biohack.net/snes/cartsize-exhirom-8m/).
+  Remaining: **manual WASM check** (open the 6 MiB page, click the canvas, Verify fidelity →
+  expect `$A274`; headless can't click); merge `feature/exhirom-canaries`
+  (`--ff-only`, once the cookbook's foreign uncommitted hunk clears); MAME leg on the SPC700
+  IPL; then the video phases (2+) per the plan.
   Authoritative model `tools/snes_cartmap.py` ported from bsnes-jg's own bus decode
   (`boards.bml` + `Bus::map`) — everything (linker, descriptors, checksum, fill, oracles)
   generated from it; emit-side canonical-only, read-side mirror-aware. All three ROMs PASS
@@ -113,19 +131,33 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   60.8–69.4 fps over 600 VBlanks, clearing both the 20 fps shipping gate and 30 fps optimization
   gate with >2× margin. Corpus cost versus SVX1 is +2.29–4.54 ratio points; SVX1 remains a size
   baseline only because its delta path reaches just 15.6 fps. Mapper-neutral bounded packet staging
-  is implemented and host-gated; connect its `SvcInput` callback to the ExHiROM cursor after
-  `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
-- [T4] **60 fps video playback target** — raised from 30 fps (user, 2026-07-31): SVX2's measured
-  60.8–69.4 fps is decode-ONLY, i.e. 1.3–15.7% margin over the new target — plausible, unproven
-  end-to-end. Attack order: **(a)** re-run the gate as decode **+ presentation** (cadence, DMA
-  arm, segmented refill across bank/device boundaries) in one VBlank period — the current bench
-  times pure decode; **(b)** the **FastROM lever** (+33% CPU, 60.8 → ~81 fps decode-only; already
-  a deferred cartridge-matrix row) — likely the enabling move; **(c)** keyframe scheduling vs the
-  16.7 ms budget (slip-never-tear already specified); **(d)** true 60 fps content needs
+  and the bulk bank-contained segment cursor are implemented and host-gated, including a real SVX2
+  packet split across two synthetic canonical ROM banks. Its SNES bulk-copy adapter now stages each
+  bank-contained ROM span into either WRAM bank with `$2180` GP-DMA; host tests cover its register
+  plan and rejection boundaries, and llvm-mos compiles the target MMIO path. Wire that adapter into
+  the player after `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
+- [T4] **60 fps video playback target** — raised from 30 fps (user, 2026-07-31): SVX2's slow-ROM
+  pipeline timing proxy now charges the real segment cursor, packet staging DMA, decode, and
+  4,480-byte presentation DMA. After optimizing per-command count/completion bookkeeping and
+  direct-page state accesses, slow-ROM median/worst are **542/581 per 600 VBlanks = 54.2/58.1
+  fps**; 20/30 remain green but slow ROM does not meet 60.
+  The decoder still reads the identical ROM packet rather than the staged high-WRAM copy, so this
+  is a cost-complete proxy, not the final functional refill gate. FastROM is now correctly gated
+  with header `$30` + `MEMSEL=$01` + execution in bank `$80`: median/worst now reach **605/647 per
+  600 = 60.5/64.7 fps**, so the cost-complete timing proxy passes both cases. Remaining work:
+  **(a)** make the decoder functionally consume staged high-WRAM/ring-refill input without losing
+  the 60 fps margin; **(b)** keyframe scheduling vs the
+  16.7 ms budget (slip-never-tear already specified); **(c)** true 60 fps content needs
   ≥59.94 fps masters (KSC has them; a 30 fps master frame-doubles, halving decode load);
-  **(e)** stream size ×2 per second — recheck ExHiROM capacity. Thresholds updated in
+  **(d)** stream size ×2 per second — recheck ExHiROM capacity. Thresholds updated in
   [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Frame presentation /
   §Codec selection. (T4: throughput engineering with unknown headroom.)
+  **Visible proof correction (2026-07-31):** the initially corrupted display was not a compiler
+  `ptrtoint` miscompile. `svx_decode_payload_asm` clobbered ABI-owned `__rc0` (the caller's
+  software-stack pointer), invalidating a correct spill reload used by the C DMA setup. The decoder
+  now preserves/restores `__rc0`; the temporary assembly DMA workaround is removed, the 4,480-byte
+  gate passes, and the C-path render is pixel-identical to the reference capture (SHA-256
+  `d0bd439a…c04c92`).
 - [T2] **Hard real-video stressor for codec ratio expectations** — the real-camera leg used the
   H.264 `~large` derivative of a **night** launch (mostly-black frames, codec-smoothed grain):
   a best case, so real-footage ratios (31–57%) are uncalibrated for hard content. The
@@ -159,27 +191,51 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [Nintendo development manual](https://gamingdoc.org/technical-documentation/consoles/super-nintendo/official/sdk/book-i/),
   [SNESdev ROM format documentation](https://snes.nesdev.org/wiki/ROM_file_formats), and
   [map-mode table](https://wiki.superfamicom.org/map-mode-table).
-- [wip T4] **#138 — MOS Late Optimizations crash — Phase A DONE (2026-07-31): upstream bug,
-  root-caused; Phase B (fix+rebuild) awaiting quiescence green light.**
-  <!-- agent:a6e464f54cf3834fb (message to green-light Phase B when build tree is quiescent) -->
-  `combineLdImm` (`MOSLateOptimization.cpp:399`) stores through a null `ImmLoad*` when `LDImm`'s
-  dest is not A/X/Y — legal MIR on SPC700 (`Anyi8RegClass` widening, `MOSInstrInfo.cpp:1107`), so
-  it reproduces on **pristine upstream** `llc` (rc=139) with zero fork features; both #138 repro
-  paths are this one bug (the gallery's malformed `$rl1 = LDImm` producer vanished with the
-  07-31 vendor rebuild, likely `0018-320-imag32-spill`, but the defect stayed live). Severity: an
-  immediate fault, never a silent miscompile — no shipped-ROM re-validation needed. Deliverables
-  on `throwaway/138-late-opt-crash` @ `cc14fb2` (worktree `~/llvm-mos-65816-138-late-opt`):
-  versioned plan with provenance matrix, `late-opt-spc700.mir` regression test, 7-line C repro,
-  and `fix-combineldimm-nongpr-dest.patch` (`git apply --check` clean, GPR-class guard — skipping
-  is semantically correct, not just safe). Upstream: standalone fix+PR decision made; artifact +
-  `upstream-contribution-status.md` update land with Phase B. Phase B sequence in the plan;
-  gated on no live builds (9 processes at report time).
+- [wip T4] **#138 — MOS Late Optimizations crash — Phase B COMPLETE (2026-07-31): fixed,
+  A/B-validated, upstream **PR #584 POSTED + hardened**; remaining = merge branch → main.**
+  <!-- agent:a6e464f54cf3834fb --> Upstream bug: `combineLdImm` (`MOSLateOptimization.cpp:399`)
+  null-`ImmLoad*` store on non-A/X/Y `LDImm` dests — legal on SPC700, reproduces on pristine
+  upstream from 7 lines of C. Fix: GPR-class guard (skip is semantically correct). Red/green by
+  A/B toolchain rebuild (guard reverted → `late-opt-spc700.mir` RED; restored → GREEN; other 7
+  suite failures byte-identical pre-existing divergence). C repro clean at all opt levels;
+  gallery LTO link with `optnone` removed now succeeds; gallery gate PASS on the rebuilt
+  toolchain (`0x5CF0`, 62/62; ROM checksum unchanged — guard can't fire on 65816 codegen, 0
+  non-AXY `LDImm`s measured). Patch landed as **`0003-late-opt-nongpr-ldimm-dest.patch`**
+  (reused retired slot; deliberately did NOT `regen-patch.sh` — it would absorb the untracked
+  in-flight `0018`/`0019` patches and break their `apply_patch` on fresh clones; hazard warning
+  added to the script header). Commits `cc14fb2`/`d48f709`/`4bb67f8` on
+  `throwaway/138-late-opt-crash`. Upstream
+  **[PR #584](https://github.com/llvm-mos/llvm-mos/pull/584) POSTED** (`f1f5cd1`), then
+  **hardened 2026-07-31 after a post-hoc review** ([follow-up
+  plan](docs/plans/2026-07-31-138-guard-hardening-followup.md)): guard now invalidates any
+  aliased GPR tracking before the skip (upstream `7eedb14a2597`; fork carry `0999cfa`), the PR
+  body's live-byte claim was corrected to the measured matrix (3 live bytes crash at O1+, 2 at
+  `-Oz` — "8 is the smallest / 4 doesn't crash" was false both halves), CI re-running at last
+  check.
+  Remaining: merge branch → main (needs the other session's dirty `dev/toolchain.sh` `0018`/`0019`
+  hunks coordinated first); MAME legs (§4 items 5/9) blocked on the missing SPC700 IPL
+  (`dev/roms/s_smp/spc700.rom` — same gap blocking the ExHiROM canary MAME evidence); §4 item 10
+  (bank-$00 4096-byte gate) is source-side follow-up; `regen-patch.sh`'s `worktree remove
+  --force` now collides with the teardown guard hook (policy call, flagged in-script).
 - [T3] **`lowerCmpZeros` sticky loop-carried `Changed` (`MOSLateOptimization.cpp:142`) — found
   in passing by #138 Phase A.** After the first successful fold in a block, every later
   un-foldable `CmpZero` is *skipped* instead of lowered, and nothing downstream lowers that
   pseudo — a survivor reaches the asm printer. Separate bug, separate change; no triggering case
   built yet. (T3: defect line pinpointed, needs a repro + bounded fix + validation; escalate if
   the repro shows silent-miscompile reach.)
+- [T3] **#138 loose end — the vanished `$rl1 = LDImm` Imag32 producer + a standing non-GPR-`LDImm`
+  scan.** The gallery only hit the `combineLdImm` null store because the 2026-07-26 toolchain
+  emitted `$rl1 = LDImm -1`/`0` (Imag32 dest — malformed MIR on 65816) in `@unpack_slide`; that
+  producer "went away" with the 2026-07-31 vendor rebuild with **no identified fixing delta**
+  (violates every-anomaly-has-a-cause). Post-fix this matters more, not less: the crash was the
+  only release-mode detector of that producer class — a returning producer is now *silent*
+  outside `-verify-machineinstrs` builds. Two halves: (a) identify the vendor/patch delta that
+  removed the Imag32-`LDImm` emission (or bound it: bisect the 0018/0019-era patch stack against
+  the archived 2026-07-26 `@unpack_slide` MIR shape) — escalate to T4 if it's live-but-latent
+  rather than fixed; (b) promote the already-scripted "0 non-AXY `LDImm`s" disasm count
+  (4bb67f8's measurement: 268 `$a` + 438 `$x` + 339 `$y`, zero others) into a standing check in
+  the gallery gate. Filed from the [guard-hardening follow-up
+  plan](docs/plans/2026-07-31-138-guard-hardening-followup.md) finding 3.
   Backend segfault reproduced in passing during the abi-clobber investigation: `mos-clang ...
   -fno-lto -S` on `examples/snes/lzss-gallery.c` crashes in `MOS Late Optimizations` at `-O0` and
   `-Oz` (clean at `-O1`; shipped ROMs use LTO where the pass doesn't crash, so no demo impact —
@@ -993,8 +1049,13 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-31 — [frozen-detector-apply] Verified FROZEN-detector fix applied to `dev/display-check.py` (`d3000d7`); trio spot-check 3/3 by predicted mechanism; foreign docstring hunk left unstaged. See [investigation](docs/investigations/2026-07-31-frozen-trio-frozen-flag-discriminator.md).
+- [x] 2026-07-31 — [pr-critique] All critique items landed on PRs #577/#578/#584 (tests, bodies, TA-hardening) + #579 body; RA issue drafted. See [plan](docs/plans/2026-07-31-upstream-pr-critique-improvements.md).
+- [x] 2026-07-31 — [wt119-registry-row] NO-OP close: the `wt/119-gallery-near-decode-abi` registry row never existed in `docs/agent-handoff.md` (full-history `git log -S` empty; 17 rows, none match) — the wt119-retire deferral recorded a removal that had nothing to remove.
+- [x] 2026-07-31 — [frozen-trio] All 3 FROZEN flags false positives (lzdec phase-aliasing P=142, truchet stride-4 blind grid, turtle-vm designed endpoint); detector fix verified, `20d0b9f`. See [investigation](docs/investigations/2026-07-31-frozen-trio-frozen-flag-discriminator.md).
 - [x] 2026-07-31 — [wt119-retire] Branch verified fully landed, retired via `-s ours` merge `143dbf1`; worktree torn down (495 M reclaimed). Handoff registry row deferred (file was dirty).
 - [x] 2026-07-31 — [rom-republish] 113/114 title-card+F1 republish confirmed already live (2026-07-28); shipped the truncstair F2/F3 + gallery A-clobber deltas to both sites, closed the deferred full `verify-web-roms.sh` sweep. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
+- [x] 2026-07-31 — [scaffold-engine-gate] `scaffold.sh` now refuses PROVENANCE downgrades (site-newer/missing cases, `--force-engine`, `--selftest` 4/4) — fix `9d0d0f3`; live-site dry-run refused correctly, zero writes.
 - [x] 2026-07-31 — [lsystem-blankscan] Detector false positive (clear/regrow apex, frame 1154); quiescence guard adopted `5587462`, 114-ROM sweep green `c29abce`. See [plan](docs/plans/2026-07-30-blankscan-quiescence-gate.md).
 - [x] 2026-07-31 — [137-verify] All 7 steps PASS (step 6 via bench gate post-`2932bcf`, `45d1a6c`; visual sweep tracked separately). See [plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md).
 - [x] 2026-07-31 — [real-video-codec] Real Artemis footage + Bayer axis swept 2×2; SVX2 ships (60.8–69.4 fps on target), ONE codec suffices. See [plan](docs/plans/2026-07-31-real-video-codec-corpus.md).
@@ -1042,7 +1103,6 @@ revisit) rather than active work._
 - 2026-06-26 — [321-scavenger-live-p] **#321 `+mos-a16`/`+mos-xy16` register-scavenger crash (`$p is not a GPR`) — FIXED, pristine-upstream fork patch `0011` (+ `0012` for the bug it surfaced).** The 8/500-seed scavenger crash (`a16scavnz.c`; family 169/173/196/268/271/272/306/420) was *previously* deferred as an upstream issue-with-no-fix. **Root cause** (asserts-confirmed): `MOSRegisterInfo::saveScavengerRegister` assumed N/Z dead at every scavenge point AND that a live `$p` is only preserved across a *balanced* hard-stack range; both break under 16-bit-accumulator flag live ranges, where a 16-bit compare keeps N (or Z) live across a frame-index materialization whose carry the scavenger places in `$c` (a sub-register of `$p`) — forcing the whole `$p` preserved across an *unbalanced* range → illegal `STImag8 $p` + undefined-`$p` `PH $p`. **Fix (`0011`):** for the unbalanced case, route `$p` **hard-stack-neutrally** through a dead 8-bit index register into the reserved `RC17` slot (`PHP;PL<idx>;ST<idx> RC17` / `LD<idx> RC17;PH<idx>;PLP`) — each half net-0 on the stack, so independent of the imbalance; width-safe because `MOSInsertREPSEP` (runs after scavenging) forces index ops to `XW_X8` even under `+mos-xy16`. Plus: flag the no-reaching-def `PHP` `undef` (verifier), drop the stale `assertNZDeadAt` (its premise is the false invariant; flag preservation is holistic via the scavenger's interleaved P-saves). **Second bug found while validating** (compilation reached MC lowering once the scavenger no longer crashed): `MOSMCInstLower` lowered `LDCImm` only for `0`/`-1`, but a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG); a plain `+mos-a16` 16-bit subtract reproduces it. **Fix (`0012`):** lower any nonzero i1 as `SEC`. Both pristine-upstream (drop on merge); `0011`/`0012` round-trip (`0001..0012` == live tree). DEFAULT 8-bit unaffected; corpus 7/7; `a16scavnz.c` promoted to a **positive gate** (`dev/run.sh a16scavnz` → `0x22A6`, host==default==`+mos-a16`==`+mos-xy16`, MAME+bsnes-jg, **asserts-clean**); `KNOWN_ISSUES["scavenger-p-not-gpr"]` + its repro row dropped; differential fuzzer 0 mismatch/0 crash. [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-scavenger-nz-liveness.md) · [scavenger PR](docs/upstream-scavenger-live-p-pr.md) · [LDCImm PR](docs/upstream-ldcimm-set-lowering-pr.md).
 - 2026-06-25 — [321-a16-pressure-fix] **#321 `+mos-a16 -O1/-Os` regalloc out-of-registers crash on real code (`globals.c`) — FIXED, fork patch `0009`.** The `globals.c`/`a16regpress.c` *"ran out of registers during register allocation"* deadlock under `+mos-a16 -O1/-Os` (DEFAULT 8-bit + `+mos-a16 -O0` always compiled clean) is fixed. **Root cause** (fresh asserts pinpoint, `-debug-only=regalloc`): the final blocker was **not** `Ac16`-residency but a single **A-pinned i8 loop counter** — the strength-reduced array byte index (stepped `i += 2`) selects to `add Ac,imm → ADCImm` (class `Ac`={A}; `adc` is hardware-A-only), held live across the 16-bit indexed-load `Ac16`=A:B transit → collides on physical A; last-chance recolor fails (singleton `{A}`) and the 1-instr INF transit can't spill. **Fix (`0009`, `ad506ed`):** under `hasAccum16()`, `MOSInstructionSelector::selectAddSub` lowers a small-constant i8 add/sub (`|amt| ≤ 2`) to a relocatable `G_INC`/`G_DEC` chain (Anyi8 = A/X/Y/zp) instead of the A-pinned `ADCImm`, so the byte index coalesces into the X array index (`inx; inx; cpx`) and frees A16 — **one spillable/relocatable change, no RA rework**. Refutes the 2026-06-18 *"no targeted fix, only the general Phase-3 `Ac16`-residency rework"* conclusion **for this crash** (coalescing still ruled out — it's an orthogonal de-pin). DEFAULT 8-bit byte-identical (gated); **−123 B over 122 c-torture programs (0 worse)**; both `a16regpress.c` and the original `globals.c` compile + run clean (release + asserts). `KNOWN_ISSUES["regalloc-out-of-registers"]` dropped + repro row removed; `examples/65816/a16regpress.c` promoted to a **positive gate** (`dev/run.sh a16regpress` → `0x01A7`, both emulators). `regen-patch-0009.sh` round-trips (`0001..0009` == live `MOSInstructionSelector.cpp`). **NOT fixed by `0009`** (still XFAIL — the genuinely-deferred s16-pressure core): the scavenger-N/Z crash (`a16scavnz.c`, `scavenger-p-not-gpr`) + the `pr15296.c` link-time ZP overflow (`a16-zp-pressure-overflow`), both byte-identical pre/post. [plan](docs/plans/2026-06-24-321-a16-pressure-fix-implementation.md) · [handoff](docs/plans/2026-06-23-321-a16-pressure-scavenger-fix-handoff.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-regalloc-pressure-failure.md).
 - 2026-06-25 — [321-mandel-zoom-pyramid] **Mandelbrot ZOOM PYRAMID — true increasing detail on zoom-in (#321 M2), Phases 1 + 2.** The interactive demo only *magnifies* its baked bitmap; this adds genuinely-deeper detail. The host bakes a STACK of Mandelbrot levels, each 2× finer zoom centered on the real-axis mini-Mandelbrot (`c=-1.7548776662`, finalized by rendering several centres to PNG — Lesson 1); on the SNES, Mode 7 hardware-zooms the current level and the ROM **DMAs the next finer level** as zoom crosses each 2× threshold — so the dive runs into NEW structure (whole set → down the antenna → a complete tiny copy of the set) with **zero on-console fractal math**. 64×64 × 6 levels = 32× deep fits one 32 KiB LoROM bank (no linker change); builds **both default-8bit and `+mos-a16`** (near ROM DMA, no far pointer). New `tools/mandel-bake-pyramid.c` (host `double` renderer → gitignored `examples/snes/pyramid_image.h`: per-level tiled chr, one shared normalized palette, `MANDEL_PYR[]`/`MANDEL_PYR_HASH[]`, per-level PNGs), `examples/snes/{zoom.h (pure host-replayable level-swap state machine — `[S0/2,2·S0]` hysteresis, R/L dive, Y/A rotate), mandel-zoom.c}`, `dev/mandel-zoom.sh`; `mode7.h` gains parametric `m7_tilemap_identity`; `jgxcheck.cpp` gains `JGX_ZOOM`. **Differential PASS** (`dev/run.sh mandel-zoom`): per-level image hash all 6 levels host==default==`+mos-a16` (SMOKE 0x9191 + HASH) on MAME + bsnes-jg; scripted-zoom view-math host==target both builds (ZOOM, swaps=3); `-verify` clean; 32 KiB fit. Regressions green (`mandel-interactive` 0xF99C, `mandel-mode7` 0x75E8). **The gate caught a real DEFAULT-8bit matrix-fold-loop MISCOMPILE** (loop `m[i]` folds 0x456E vs correct 0xB115; unrolled form correct; context-sensitive, independent of #321 — see the new follow-up item). **Phase 2 DONE+green (`6fb3d1b`): multi-bank LoROM, 128×128 × 8 levels = 256× deep, 256 KiB / 8 banks** — new `platforms/snes-zoom` platform (one bank-aligned level per bank), bake `PYR_MULTIBANK` mode (per-level `.rodata_levelK` + `MANDEL_PYR_BANK[]`), the swap DMAs from `(bank : addr16)` (no far pointer → still builds default+`+mos-a16`), `snes-checksum.py` 256 KiB, a `jgxcheck` VRAM-readback gate + host ROM-file per-bank hash. `dev/run.sh mandel-zoom` (PYR_MODE=hd default | sd) PASS both modes/builds. **Found the vblank limit** (a 16 KiB swap DMA overruns vblank → truncated mid-transfer; fixed by force-blanking the large swap — the VRAM gate caught it). Live: `task mandel-zoom-play`. [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md).
-- [x] 2026-07-31 — [pr-critique] All critique items landed on PRs #577/#578/#584 (tests, bodies, TA-hardening) + #579 body; RA issue drafted. See [plan](docs/plans/2026-07-31-upstream-pr-critique-improvements.md).
 - 2026-06-25 — [321-interactive-mandelbrot] **Interactive SNES Mandelbrot — a real-time Mode 7 joypad fly-around (#321 M2), INSTANT boot, host==default==+mos-a16.** The static `mandel-mode7` was too slow (~4 min on-console compute); this bakes the 128×128 image host-side TILED into Mode 7 character order (`tools/mandel-bake.c` → gitignored `examples/snes/mandel_image.h`) and DMAs it straight ROM→VRAM at boot — no compute, no de-linearize loop (measured the reused `build_vbuf` at ~5–6 s of black boot and redesigned around it). Removing the far staging buffer means the demo builds **both default-8bit and `+mos-a16`**. New `examples/snes/{mandel-interactive.c, mode7.h (shared Mode 7 upload + DMA + matrix setters, refactored out of mandel-mode7.c), view.h (pure pan/zoom/rotate state + the 8.8 Mode 7 matrix 16×16→32 multiplies)}`, joypad HAL in `platforms/snes/snes.h` (`snes_read_pad1`/`snes_wait_vblank` + `JOY_*` + `VMAIN_INC_LOW_1`). **Differential PASS:** displayed-image hash **`0xF99C`** host==default==`+mos-a16` on MAME (Xvfb snapshot) + bsnes-jg; a **scripted-input view-math gate** (`dev/jgxcheck.cpp -DJGX_VIEW` replays `view.h` over the ROM's ground-truth pad log) host==target for BOTH builds; `-verify-machineinstrs` clean; 32 KiB fit. The gate caught a real 8/16 promotion bug (`h>>15` on the 16-bit-int target → negative-int arithmetic shift). Bonus fixes: a pre-existing dep-tracking bug (`dev/sync-platform.sh` — editing `platforms/snes/snes.h` now reaches the build) and `dev/build.sh` (bake the header + build `mos-a16-only`-marked far examples with +mos-a16; `dev/run.sh build` was broken on main since the beefy merge). Regressions green: `mandel-mode7` 0x75E8, `k_mandel` 0x820B, corpus 7/7. Controls: D-pad pan / L-R zoom / Y-A rotate / Select palette / Start reset (`task mandel-play`). [plan](docs/plans/2026-06-25-321-interactive-mandelbrot-mode7.md).
 - 2026-06-25 — [321-csmith-fuzzer] **#321 Csmith differential fuzzer DONE (Phases 0–5) + consolidated into a single-file reference.** Off-the-shelf [Csmith](https://github.com/csmith-project/csmith) replaced the hand-rolled generator as the `dev/run.sh fuzz` default (builtin kept via `--gen builtin`): per-seed gen (`tools/csmith_run.py`) → host-side fit pre-filter → the 4-way **default-as-oracle** differential (`host`≡`default@MAME` == `+mos-a16` == `+mos-xy16` == `+mos-a16@bsnes-jg`), sound because `platform.info` (int=2) + kept `safe_math` make output UB-free at the target's 16-bit `int`. SNES adapter `examples/65816/csmith/{csmith_snes.h,platform.info}` folds Csmith's 32-bit CRC into `corpus_result`; `vendor/csmith` built on demand (`dev/fetch-csmith.sh`). **Caught + drove fixes:** the a16 `G_UNMERGE`/`G_MERGE` s32 legalizer gaps (seeds 11, 113) + the `+mos-xy16` high-byte clobber (seeds 247+445) — all FIXED on `main`. **Phase 5 (`e865dff`):** sampled/full `fuzz-csmith` CI job (host-side, `needs: xcheck`, secret-gated, nightly `schedule:` ready-but-commented). Merged `dd5616b` (2026-06-19); consolidated 2026-06-25 — mechanism + state + open residue (nightly schedule, far/AS2/AS3 out-of-scope-by-design, regression-seed extraction, Yarpgen) + the WDC816CC/Plum Hall motivation — into [investigation](docs/investigations/csmith-differential-harness.md). [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
 - 2026-06-24 — [blossom-snes-kernel] **Blossom (Hopalong attractor) ported to SNES — Phase 1 headless Q8.8 math kernel, 4-way verified.** The math heart of Blossom 4.0 (`~/Downloads/blossom.html`) the 1989 way: fixed-point + a 512 B sqrt LUT (`BLOSSOM.TBL`-style), no FPU. New `examples/65816/k_hopalong.c` (Q8.8 `short` orbit, `volatile` params so the 1024-iter loop can't fold, `tools/gen-sqrt-lut.py`-generated `SQRT_LUT`, rotate-xor fold → `corpus_result`; `#ifdef HOST` oracle), `dev/k_hopalong.sh` (`dev/run.sh k_hopalong`). `sign(x)*sqrt` written as a conditional negate (not `__mulhi3`) → a16 +46 B shrank to **+14 B**. **Differential PASS:** host == default == `+mos-a16` == **`0x1BBC`** on MAME + bsnes-jg; `-verify-machineinstrs` clean; native 16-bit active (12 rep/13 sep). a16 is **+14 B** vs default — the expected 8/16-interleave regression class (`b*x` `__mulsi3` + sign/clamp branches through 16-bit math), a measurement not a defect. On-screen interactive renderer = #3 (Open/M2). [plan](docs/plans/2026-06-24-blossom-snes.md).
@@ -1748,4 +1808,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "Unrelated compiler crash" -> PROMOTED to the curated [T4] "#138 — MOS Late Optimizations
        crash on @unpack_slide" bullet, pointing at the existing #138 plan. fp:4e675c3ad0ba3ad5
        fp:d674d7d5be702bb7 fp:dd1e1ad204ea7356 -->
+- [verify] **2026-07-31-real-video-codec-corpus** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-real-video-codec-corpus.md](docs/plans/2026-07-31-real-video-codec-corpus.md)_  <!-- fp:06fb2d23bfdea209 -->
+- [ ] **(triage)** reduce the `MVN`/`MVP` failure to the MC opcode test; — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:18d3e98ba8af63d9 -->
+- [ ] **(triage)** confirm syntax and encoded byte order against WDC documentation and accepted llvm-mos assembly — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:ab59f4d9ffd69c48 -->
+- [ ] **(triage)** run the focused MC test and the relevant llvm-mos test suite; — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:adfc593c2e2d3f65 -->
+- [ ] **(triage)** prepare a minimal commit/PR containing the TableGen fix and regression only; and — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:788f433367fcd177 -->
+- [ ] **(triage)** reference the animated ROM as the real-world reproducer, without coupling the upstream patch to — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:012a72598ce748d6 -->
+- [verify] **2026-07-31-svx2-animated-video-cartridge** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:40c1c2b870d73873 -->
 <!-- END auto-captured-deferrals -->
