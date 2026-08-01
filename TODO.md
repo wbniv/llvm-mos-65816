@@ -129,7 +129,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
   (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
   2026-07-31 — lost in a concurrent TODO rewrite.)
-- [T2] **Audit the 173 `examples/` files using a bare empty `for(;;){}`.** LLVM may remove the
+- [wip T2] **Audit the 173 `examples/` files using a bare empty `for(;;){}`.** <!-- agent:a34e0a55351a15411 --> LLVM may remove the
   loop under C11 forward-progress and fall through `main` into a reset loop — exactly what bit
   the cartsize canary; existing gates assert only WRAM and are *insensitive* to reset loops, so
   affected demos would pass silently. Pick the house idle-loop idiom (volatile access /
