@@ -33,30 +33,34 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 ## Open
 
 
-- [wip T4] **Per-image "Verify fidelity" button — mechanism DECIDED + ROM half DONE
-  (2026-07-31); player-package half ESCALATED.** <!-- agent:a5850a8d3df7af344 -->
-  Chosen mechanism (c), superseding both briefed candidates: the ROM already verifies each work
-  as it displays it, so it publishes a 5-byte `gallery_shown{z,work,ok,state}` record (state =
-  publication barrier) and the player polls it in a new `mode: "live-record"`, comparing `z`
-  against a host-generated 62-entry oracle table — the ROM never grades its own homework. Both
-  briefed candidates died on facts: the player's `verify()` power-cycles (destroys the visitor's
-  position → can only ever verify work 0), and infer-from-existing-symbols provably false-fails
-  (at frame 3000 `last_work==current_asset` while `last_z` still 0). ROM half + harness
-  (`JGX_POLL`, live-record replay, oracle-table generation) implemented and gated on
-  `feature/verify-fidelity-button` @ `f0d903d` — deliberately UNMERGED until the republish
-  gallery leg completes. Remaining: (1) merge after republish; (2) the `@wbniv/bsnes-jg-player`
-  `live-record` implementation (separate repo — exact JS/manifest/badge spec in the
-  [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md); **user-gated**);
-  (3) browser-exercise the badge states; (4) confirm the 24000-frame worst-case budget from
-  `gallery_repack_frames[]` over all 62 works.
-  Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
-  host `report.json`) keyed by a ROM-published index, vs ROM-side check-on-display publishing a
-  uniform `(work-id, pass/fail)` pair — both costed in the
-  [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md). The ROM must first
-  publish the *browsing cursor* (it only publishes the sweep's last-*processed* work today);
-  `sync-manifest-offsets.py` already honours `selfcheck.symbol`. Manifest wiring blocked until the
-  post-fix gallery republish ships a byte-identical rebuilt ROM. (T4: mechanism is a design call
-  spanning ROM + player.)
+- [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
+  (2026-08-01); only the player-package release is left, and it is USER-GATED.**
+  <!-- agent:a5850a8d3df7af344 -->
+  Mechanism (c): the ROM already verifies each work as it displays it, so it publishes a 5-byte
+  `gallery_shown{z,work,ok,state}` record (state = publication barrier) and the player polls it in
+  a new `mode: "live-record"`, comparing `z` against a host-generated 62-entry oracle table — the
+  ROM never grades its own homework. Landed on `main` as `78889c7` + `de4cd34` (`--ff-only`, was
+  `feature/verify-fidelity-button`): the record, `JGX_POLL`, the live-record replay in
+  `verify-web-roms.sh`, oracle/titles generation in `sync-manifest-offsets.py`, and
+  `dev/measure-repack-budget.py`.
+  **~~(4) 24000-frame budget~~ CONFIRMED corpus-wide** — worst case is frame 10879 of 24000
+  (2.21× margin), computed by re-simulating `compress_far` on the host (all 62 stream sizes
+  reproduce `report.json` exactly) and bounded per-class so it holds for any non-negative cost
+  model; validated on the target at k=22 (10617) and k=8 (10253), which also exercised
+  `oracle[work]` at a non-zero index for the first time.
+  **~~(1) merge~~ DONE.** **~~reproducible build~~ PASS** on the 0021 toolchain — the precondition
+  for `sync-manifest-offsets.py` to be trusted.
+  Remaining: **(2)** the `@wbniv/bsnes-jg-player` `live-record` release — an implementation
+  matching the contract exists in `~/bsnes-jg-wasm` and is synced byte-identically into
+  `~/biohack.net/public/play/app.js`, but **neither is committed**, `ENGINE_VERSION` still stamps
+  the previous `app.js`, and nothing is published (**user-gated**);
+  **(3)** browser badge states — blocked on (2); the headless replay covers PASS and MISMATCH, and
+  a **pre-existing** defect was found meanwhile: `badge()` assigns `className = "badge " + cls`,
+  which drops the `rp-badge` class the markup carries, so **no** badge CSS has ever applied on any
+  demo page (the `warn` class this needs is only half the gap);
+  **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
+  site, so it is one mechanical step once (2) ships. Spec + all evidence in the
+  [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
 - [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
   test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:af681e8a1b2ac9191 -->
   Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
