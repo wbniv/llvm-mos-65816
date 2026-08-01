@@ -33,6 +33,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 ## Open
 
 
+- [T1] **Retire the verify-fidelity worktree AFTER the gallery republish** — `dev/worktree-teardown.sh feature/verify-fidelity-button --yes`. BLOCKED until the republish ships: `/home/will/llvm-mos-65816-verify-button/build/lzss-gallery.sfc` is the record-carrying reproducible ROM the republish deploys (main's `build/` copy is stale pre-0021). (T1: one command once unblocked.)
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
   (2026-08-01); only the player-package release is left, and it is USER-GATED.**
   <!-- agent:a5850a8d3df7af344 -->
@@ -133,12 +134,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
   (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
   2026-07-31 — lost in a concurrent TODO rewrite.)
-- [wip T2] **Audit the 173 `examples/` files using a bare empty `for(;;){}`.** <!-- agent:a34e0a55351a15411 --> LLVM may remove the
-  loop under C11 forward-progress and fall through `main` into a reset loop — exactly what bit
-  the cartsize canary; existing gates assert only WRAM and are *insensitive* to reset loops, so
-  affected demos would pass silently. Pick the house idle-loop idiom (volatile access /
-  `asm volatile` — check crt0/snesgfx precedent), sweep, and spot-check a sample of gates with
-  a display-liveness probe. (T2: known recipe once the idiom is chosen; the sweep is mechanical.)
+- [T1] **Apply the wai idle-loop idiom to the 18 skipped-dirty `examples/snes/*.c` files** —
+  the `903de3e` sweep fixed 216 bare loops in 214 files but skipped bitweave, borrowlad, compass,
+  crcwall, keycmp64, lfsr2, modexp256, oddmask, ovmove, pcooker, permscat, ropeedit, rotkal,
+  rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
+  one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
+  (T1: known recipe, mechanical.)
 - [T2] **Hard real-video stressor for the codec ratio expectations** — the completed real-camera
   leg ([real-video-codec-benchmark.md](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
   used the H.264 `~large` derivative of a **night** launch: mostly-black 80 × 56 frames and
@@ -1015,6 +1016,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [idle-loop-audit] 338 raw `for(;;)`/`while(1)` hits classified (107 real-body safe, 216 bare fixed across 214 files, 0 unreachable); wai idiom per house pattern, disasm-verified no fall-through (`903de3e`); no shipped ROM found already miscompiled. 18 dirty files deferred to a T1.
 - [x] 2026-07-31 — [gallery-visual-sweep] Full 62-work visual corpus sweep PASS: `corpus_result got=0x96D8 == oracle` after 700 000 frames on bsnes-jg (1 h 25 m jgxcheck leg, ~1 h 31 m whole script), `throwaway/visual-sweep` off `main` HEAD `2343db7`. Already recorded (`b5ea1a6`); this pass verified the record and closed out the TODO marker. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
 - [x] 2026-08-01 — [snes-rom-page-routes] Skill now authors pages via the sites' data-driven routes (`3b212bd`): per-slug `page-template.astro` deleted; per-site registry schemas documented from live HEADs (biohack `src/content/snes/*.json` + count guard, indri `SNES_DEMOS` + non-default playdir gap fixed); dry-run validated both registries.
 - [x] 2026-08-01 — [display-sweep-patched] Full 118-ROM sweep on the patched detector: 117 PASS / 1 FAIL; deltas vs 2026-07-31 baseline = exactly the predicted trio FAIL→PASS, 0 new full-pixel FAILs, 0 reclassifications (3/114 = 2.6% change, `fdb044a`). The 1 FAIL is `svx2-fastrom-video` (corpus_result 0x4f≠0x00) — a post-baseline WIP ROM owned by the in-flight SVX2 plan, reported there.
