@@ -1,7 +1,7 @@
 # SVX2 Two-Video Artemis Reel
 
 **Date:** 2026-07-31
-**Status:** Shared-palette dashboard correction implemented and verified 2026-08-01; publishing
+**Status:** Shared-palette dashboard correction published and live-verified 2026-08-01
 **Depends on:** `2026-07-31-real-video-codec-corpus.md`,
 `2026-07-31-svx2-animated-video-cartridge.md`, and
 `2026-07-31-svx2-cartridge-video-dashboard.md`
@@ -109,3 +109,6 @@ begins playback before emulator frame 240. The emulator gate observes at least t
   Separate animation and real-camera screenshot gates require dashboard ink, and the 4,000-frame
   blank-scan gate rejects any transient full-screen blanking. Corrected SHA-256:
   `fc1890860d75c01e598cf315e7a9d9814ea51905ed76ac048d4ccff72ebcdee4`.
+- Main implementation commit `79bb73b`; gallery commit `c556890`; release `v1.0.335`.
+  Deployment succeeded, the downloaded live ROM has the same SHA-256, and the live artifact passes
+  the 4,000-frame composite (`$00000000`) and exact cadence (`$0775`) gates.

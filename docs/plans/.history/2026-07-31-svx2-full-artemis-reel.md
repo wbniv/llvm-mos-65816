@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/79bb73b) | Keep SVX2 dashboard active across video cut |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/a69ee9c) | docs: record SVX2 fast-start publication |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/6c03717) | snes: start two-video reel without validation delay |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/395da91) | docs: record two-video reel publication |
@@ -8,6 +9,10 @@
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/bd344a1) | snes: ship complete 300-frame SVX2 reel |
 
 <!--history-meta v1
+79bb73b	author	Will Norris
+79bb73b	added	18
+79bb73b	deleted	9
+79bb73b	files	1
 a69ee9c	author	Will Norris
 a69ee9c	added	3
 a69ee9c	deleted	1
