@@ -284,6 +284,42 @@ class Window:
         )
 
 
+@dataclass(frozen=True)
+class DecodeCell:
+    """One 32 KiB CPU view of cartridge ROM -- canonical OR mirror.
+
+    `windows()` names the single blessed CPU address for each file byte; a
+    DecodeCell is any address the decoder accepts, which is what a test that
+    means to cover the whole decode has to enumerate."""
+
+    bank: int
+    addr_lo: int
+    file_start: int
+    canonical: bool
+
+    @property
+    def addr_hi(self) -> int:
+        return self.addr_lo + 0x7FFF
+
+    @property
+    def far(self) -> int:
+        """The 24-bit CPU address of this cell's first byte."""
+        return self.bank << 16 | self.addr_lo
+
+    @property
+    def file_end(self) -> int:  # exclusive
+        return self.file_start + 0x8000
+
+    @property
+    def key(self) -> tuple[int, int]:
+        return self.bank, self.addr_lo
+
+    def __str__(self) -> str:
+        kind = "canonical" if self.canonical else "mirror   "
+        return (f"${self.bank:02X}:{self.addr_lo:04X}-{self.addr_hi:04X}  {kind}"
+                f"  <- file ${self.file_start:06X}-${self.file_end - 1:06X}")
+
+
 class CartMap:
     """The address model for one concrete cartridge (mapping + exact length)."""
 
@@ -498,6 +534,83 @@ class CartMap:
             out.append((at, self.size))
         return tuple(out)
 
+    # ---- decode cells: every CPU view of ROM, mirrors included ----------
+    #: Granularity of the decode-cell enumeration.  The board `map` lines only
+    #: ever split a bank at $8000 (`address=...:0000-ffff` or `8000-ffff`), and
+    #: `decompose` forces every device length to be a multiple of 32 KiB, so a
+    #: 32 KiB cell is the finest unit at which `decode` can change slope.
+    #: `decode_cells` asserts that, rather than assuming it.
+    CELL = 0x8000
+
+    def decode_cells(self) -> tuple["DecodeCell", ...]:
+        """EVERY 32 KiB CPU view of cartridge ROM -- canonical and mirror alike.
+
+        `windows()` answers "where may a descriptor point"; this answers "what
+        can the decoder be asked to decode", which is the coverage denominator
+        for a test that means to exercise the whole address decode rather than
+        the one blessed path to each byte.  Derived entirely from `decode`, so
+        a mirror the model knows about cannot be missed by an enumeration that
+        forgot it.
+
+        Cells are yielded in (bank, addr) order.  `canonical` is true for the
+        one cell per file unit that `file_to_cpu` hands back.
+        """
+        canon = set()
+        for w in self._windows:
+            for off in range(w.file_start, w.file_end, self.CELL):
+                canon.add(self.file_to_cpu(off))
+        cells = []
+        for bank in range(0x100):
+            for addr in range(0x0000, 0x10000, self.CELL):
+                start = self.decode(bank, addr)
+                if start is None:
+                    continue
+                end = self.decode(bank, addr + self.CELL - 1)
+                if end is None or end - start != self.CELL - 1:
+                    raise AssertionError(
+                        f"${bank:02X}:{addr:04X} does not decode to a contiguous "
+                        f"{self.CELL}-byte run: first ${start:06X}, last "
+                        + ("not-ROM" if end is None else f"${end:06X}")
+                        + " -- the decode-cell granularity assumption is wrong "
+                        "for this mapping/size"
+                    )
+                cells.append(
+                    DecodeCell(bank=bank, addr_lo=addr, file_start=start,
+                               canonical=(bank, addr) in canon)
+                )
+        got = {c.file_start for c in cells if c.canonical}
+        want = {off for w in self._windows
+                for off in range(w.file_start, w.file_end, self.CELL)}
+        if got != want:
+            raise AssertionError(
+                f"decode_cells found {len(got)} canonical file units, windows() "
+                f"describes {len(want)}"
+            )
+        return tuple(cells)
+
+    def decode_regions(self) -> tuple[tuple[int, int, int, int, int, bool], ...]:
+        """`decode_cells` merged into maximal runs, for human-readable reports.
+
+        A run is (bank_lo, addr_lo, bank_hi, addr_hi, file_start, canonical);
+        cells merge when they are adjacent in BOTH CPU and file order and agree
+        on `canonical`, which is exactly when a reader may walk them with one
+        incrementing 24-bit pointer."""
+        out: list[list] = []
+        for c in self.decode_cells():
+            cpu = c.bank << 16 | c.addr_lo
+            if out:
+                b_lo, a_lo, b_hi, a_hi, fs, canon = out[-1]
+                prev_end = (b_hi << 16 | a_hi) + 1
+                if (cpu == prev_end and canon == c.canonical
+                        and c.file_start == fs + (prev_end - (b_lo << 16 | a_lo))):
+                    out[-1][2] = (cpu + self.CELL - 1) >> 16
+                    out[-1][3] = (cpu + self.CELL - 1) & 0xFFFF
+                    continue
+            out.append([c.bank, c.addr_lo,
+                        (cpu + self.CELL - 1) >> 16, (cpu + self.CELL - 1) & 0xFFFF,
+                        c.file_start, c.canonical])
+        return tuple(tuple(r) for r in out)
+
     def max_dma_span(self, off: int) -> int:
         """Bytes readable by one DMA command starting at `off`.
 
@@ -691,6 +804,10 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--fast", "--fastrom", dest="fast", action="store_true",
                     help="shorthand for --speed fast")
     ap.add_argument("--table", action="store_true", help="print the file/CPU truth table")
+    ap.add_argument("--cells", action="store_true",
+                    help="print every 32 KiB decode cell (canonical AND mirror)")
+    ap.add_argument("--regions", action="store_true",
+                    help="print the decode cells merged into maximal runs")
     ap.add_argument("--offset", type=lambda s: int(s, 0), help="describe one file offset")
     args = ap.parse_args(argv[1:])
 
@@ -703,6 +820,22 @@ def main(argv: list[str]) -> int:
             f"\nfile ${d['file_offset']:06X} -> ROM {d['physical_rom'] + 1} "
             f"+${d['physical_offset']:06X} = CPU ${d['cpu_bank']:02X}:{d['cpu_address']:04X}"
         )
+    if args.cells or args.regions:
+        cells = cm.decode_cells()
+        ncan = sum(1 for c in cells if c.canonical)
+        print(f"\ndecode cells      : {len(cells)} "
+              f"({ncan} canonical + {len(cells) - ncan} mirror) "
+              f"over {len({c.file_start for c in cells})} file units")
+    if args.cells:
+        for c in cells:
+            print(f"    {c}")
+    if args.regions:
+        print("\ndecode regions (maximal runs):")
+        for b_lo, a_lo, b_hi, a_hi, fs, canon in cm.decode_regions():
+            n = ((b_hi << 16 | a_hi) - (b_lo << 16 | a_lo)) + 1
+            print(f"    ${b_lo:02X}:{a_lo:04X}-${b_hi:02X}:{a_hi:04X}  "
+                  f"{'canonical' if canon else 'mirror   '}  <- file ${fs:06X}"
+                  f"-${fs + n - 1:06X}")
     if args.table:
         print("\nfile offset  device  dev offset  CPU address")
         for row in cm.truth_table():

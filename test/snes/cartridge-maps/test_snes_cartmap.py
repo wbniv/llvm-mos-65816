@@ -553,6 +553,95 @@ class TestHeaderDetection(unittest.TestCase):
         )
 
 
+class TestDecodeCells(unittest.TestCase):
+    """`decode_cells` is the coverage DENOMINATOR for the seamdemo cartridge
+    (docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md): a test that
+    means to exercise the whole address decode has to enumerate every CPU view
+    of ROM, not just the one blessed window per byte.  If this enumeration is
+    wrong the coverage assertion is vacuous, so it is checked against `decode`
+    itself rather than against a written-down list."""
+
+    CASES = (("exhirom", 0x600000), ("exhirom", 0x800000),
+             ("hirom", 0x400000), ("hirom", 0x10000), ("lorom", 0x400000))
+
+    def test_cells_partition_the_decoding_address_space(self):
+        """Every CPU address that decodes to ROM belongs to exactly one cell,
+        and its offset is that cell's start plus the in-cell displacement."""
+        for mapping, size in self.CASES:
+            with self.subTest(mapping=mapping, size=hex(size)):
+                cm = CartMap(mapping, size)
+                index = {c.key: c for c in cm.decode_cells()}
+                step = 1 if EXHAUSTIVE else 0x111
+                for bank in range(0x100):
+                    for addr in range(0, 0x10000, step):
+                        off = cm.decode(bank, addr)
+                        key = (bank, addr & 0x8000)
+                        if off is None:
+                            self.assertNotIn(key, index,
+                                             f"${bank:02X}:{addr:04X} decodes to nothing "
+                                             "but its cell exists")
+                            continue
+                        self.assertIn(key, index,
+                                      f"${bank:02X}:{addr:04X} decodes to ${off:06X} "
+                                      "but no cell covers it")
+                        self.assertEqual(off, index[key].file_start + (addr & 0x7FFF))
+
+    def test_canonical_cells_are_exactly_the_windows(self):
+        for mapping, size in self.CASES:
+            with self.subTest(mapping=mapping, size=hex(size)):
+                cm = CartMap(mapping, size)
+                got = sorted(c.file_start for c in cm.decode_cells() if c.canonical)
+                want = sorted(off for w in cm.windows()
+                              for off in range(w.file_start, w.file_end, cm.CELL))
+                self.assertEqual(got, want)
+                # ... and each one is the address `file_to_cpu` hands back.
+                for c in cm.decode_cells():
+                    if c.canonical:
+                        self.assertEqual(cm.file_to_cpu(c.file_start), c.key)
+
+    def test_every_cell_lies_inside_the_image(self):
+        for mapping, size in self.CASES:
+            with self.subTest(mapping=mapping, size=hex(size)):
+                cm = CartMap(mapping, size)
+                for c in cm.decode_cells():
+                    self.assertGreaterEqual(c.file_start, 0)
+                    self.assertLessEqual(c.file_end, cm.size)
+
+    def test_regions_reexpand_to_cells(self):
+        """The merged view is a presentation of the same facts, not new ones."""
+        for mapping, size in self.CASES:
+            with self.subTest(mapping=mapping, size=hex(size)):
+                cm = CartMap(mapping, size)
+                rebuilt = []
+                for b_lo, a_lo, b_hi, a_hi, fs, canon in cm.decode_regions():
+                    lo, hi = (b_lo << 16 | a_lo), (b_hi << 16 | a_hi)
+                    for k, cpu in enumerate(range(lo, hi + 1, cm.CELL)):
+                        rebuilt.append(((cpu >> 16) & 0xFF, cpu & 0xFFFF,
+                                        fs + k * cm.CELL, canon))
+                self.assertEqual(
+                    rebuilt,
+                    [(c.bank, c.addr_lo, c.file_start, c.canonical)
+                     for c in cm.decode_cells()])
+
+    def test_exhirom_6mib_shape(self):
+        """The seamdemo cartridge's exact numbers, pinned.
+
+        380 = 64 upper halves in $00-$3F + 124 in $40-$7D (banks $7E/$7F are
+        WRAM) + 64 in $80-$BF + 128 in $C0-$FF; 192 of them are canonical (the
+        6 MiB image is 192 units of 32 KiB) and the other 188 are mirrors."""
+        cm = CartMap("exhirom", 0x600000)
+        cells = cm.decode_cells()
+        self.assertEqual(len(cells), 380)
+        self.assertEqual(sum(1 for c in cells if c.canonical), 192)
+        self.assertEqual(sum(1 for c in cells if not c.canonical), 188)
+        self.assertEqual(len({c.file_start for c in cells}), 192)
+        # The four aliases of the linked-code unit are the ones a payload
+        # generator has to leave alone.
+        code = [c for c in cells if c.file_start == 0x408000]
+        self.assertEqual(sorted(c.key for c in code),
+                         [(0x00, 0x8000), (0x20, 0x8000), (0x40, 0x8000), (0x60, 0x8000)])
+
+
 if __name__ == "__main__":
     sys.argv = [a for a in sys.argv if a != "--exhaustive"]
     unittest.main(verbosity=2)
