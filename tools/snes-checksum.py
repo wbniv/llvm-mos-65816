@@ -20,7 +20,16 @@ Mappings
       the CPU fetches from $00:FFFC live at file $40FFB0/$40FFFC, in the SECOND
       region. Map mode $25. 4 MiB (exclusive) through 8 MiB. Used by
       platforms/snes-exhirom.
-  --fast  selects the FastROM map-mode variant ($30/$31/$35).
+Speed
+-----
+Bit 4 of the map-mode byte is the cartridge bus SPEED, orthogonal to the
+mapping: `--speed fast` (aliases `--fast`, `--fastrom`) selects the FastROM
+variant of whichever mapping was chosen -- $30 / $31 / $35. The byte is derived
+by the model (`CartMap.map_mode`); this tool never ORs the bit in itself.
+
+Under `--inspect` the speed is read back from the header unless one is given
+explicitly, so inspecting a FastROM image does not report a spurious map-mode
+mismatch.
 
 Sizes and physical devices
 --------------------------
@@ -44,8 +53,8 @@ number of times either way.
 
 Usage
 -----
-  snes-checksum.py [--mapping M | --hirom | --exhirom] [--fast] <rom.sfc>
-  snes-checksum.py --inspect [--mapping M] <rom.sfc>      # read-only, patches nothing
+  snes-checksum.py [--mapping M | --hirom | --exhirom] [--fastrom] <rom.sfc>
+  snes-checksum.py --inspect [--mapping M] [--speed S] <rom.sfc>  # read-only
 """
 from __future__ import annotations
 
@@ -56,7 +65,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from snes_cartmap import (  # noqa: E402
+    HEADER_FILE_OFFSET,
     MAPPINGS,
+    SPEEDS,
     OFF_CHECKSUM,
     OFF_COMPLEMENT,
     OFF_MAP_MODE,
@@ -265,7 +276,8 @@ def do_patch(cm: CartMap, rom: bytearray, path: str) -> int:
         f.write(rom)
 
     devs = "+".join(d.label for d in cm.devices)
-    print(f"{path}: {cm.mapping} size={len(rom) // 1024}KiB devices={devs} "
+    print(f"{path}: {cm.mapping}{' (fast)' if cm.fast else ''} "
+          f"size={len(rom) // 1024}KiB devices={devs} "
           f"map_mode=0x{rom[base + OFF_MAP_MODE]:02X} "
           f"rom_size_byte=0x{rom[base + OFF_ROM_SIZE]:02X} "
           f"checksum=0x{checksum:04X} complement=0x{complement:04X}")
@@ -282,7 +294,11 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--mapping", choices=MAPPINGS)
     ap.add_argument("--hirom", action="store_true", help="shorthand for --mapping hirom")
     ap.add_argument("--exhirom", action="store_true", help="shorthand for --mapping exhirom")
-    ap.add_argument("--fast", action="store_true", help="FastROM map-mode variant")
+    ap.add_argument("--speed", choices=SPEEDS,
+                    help="cartridge bus speed; default slow when patching, "
+                         "read from the header when inspecting")
+    ap.add_argument("--fast", "--fastrom", dest="fast", action="store_true",
+                    help="shorthand for --speed fast (--fastrom is the legacy spelling)")
     ap.add_argument("--inspect", action="store_true",
                     help="read-only report + structural checks; patches nothing")
     args = ap.parse_args(argv[1:])
@@ -293,6 +309,8 @@ def main(argv: list[str]) -> int:
     if args.exhirom:
         mapping = "exhirom"
 
+    speed = "fast" if args.fast else args.speed
+
     try:
         rom = load(args.rom)
         if mapping is None:
@@ -302,7 +320,21 @@ def main(argv: list[str]) -> int:
                     "image looks like unofficial ExLoROM, which this project does not "
                     "support; pass --mapping explicitly if that is wrong"
                 )
-        cm = CartMap(mapping, len(rom), fast=args.fast)
+        if speed is None:
+            # Patching: the tool owns the header, and slow is the default board.
+            # Inspecting: speed is a property of the image being read, so take it
+            # from the byte -- otherwise every FastROM image would be reported as
+            # a map-mode mismatch against a slow model it was never built as.
+            if args.inspect:
+                off = HEADER_FILE_OFFSET[mapping] + OFF_MAP_MODE
+                if off >= len(rom):
+                    raise HeaderError(
+                        f"image is {len(rom)} bytes; too short to hold a {mapping} header"
+                    )
+                speed = CartMap.speed_from_map_mode(rom[off])
+            else:
+                speed = "slow"
+        cm = CartMap(mapping, len(rom), speed=speed)
     except (HeaderError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 1

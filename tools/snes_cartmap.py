@@ -66,8 +66,18 @@ BOARDS_BML = {
 MAPPINGS = tuple(BOARDS_BML)
 
 #: Internal-header map-mode byte ($FFD5) per mapping, slow-ROM variant.
-#: The FastROM variant is this | 0x10 ($30/$31/$35).
+#: The FastROM variant is this | FAST_BIT ($30/$31/$35).
 MAP_MODE = {"lorom": 0x20, "hirom": 0x21, "exhirom": 0x25}
+
+#: Bit 4 of the map-mode byte is the cartridge SPEED, not part of the mapping:
+#: set = FastROM (3.58 MHz bus when the CPU enables it via $420D), clear =
+#: SlowROM (2.68 MHz).  Speed and mapping are orthogonal -- every mapping has
+#: both variants -- so the model carries speed as its own attribute and derives
+#: the byte, rather than letting callers OR a magic constant into the header.
+FAST_BIT = 0x10
+
+#: The two speeds, as the model names them.
+SPEEDS = ("slow", "fast")
 
 #: Where the internal header starts in the FILE for each mapping.  These are
 #: the four addresses bsnes-jg's heuristics probe (heuristics.cpp:468-478).
@@ -277,9 +287,14 @@ class Window:
 class CartMap:
     """The address model for one concrete cartridge (mapping + exact length)."""
 
-    def __init__(self, mapping: str, size: int, fast: bool = False):
+    def __init__(self, mapping: str, size: int, fast: bool = False,
+                 speed: str | None = None):
         if mapping not in BOARDS:
             raise ValueError(f"unknown mapping {mapping!r}; expected one of {MAPPINGS}")
+        if speed is not None:
+            if speed not in SPEEDS:
+                raise ValueError(f"unknown speed {speed!r}; expected one of {SPEEDS}")
+            fast = speed == "fast"
         self.mapping = mapping
         self.size = size
         self.fast = fast
@@ -318,8 +333,20 @@ class CartMap:
                 )
 
     @property
+    def speed(self) -> str:
+        """'slow' or 'fast' -- the cartridge bus speed the header advertises."""
+        return "fast" if self.fast else "slow"
+
+    @property
     def map_mode(self) -> int:
-        return MAP_MODE[self.mapping] | (0x10 if self.fast else 0x00)
+        """Header byte $FFD5, derived: mapping nibble OR the speed bit.  This is
+        the ONE place the byte is composed; nothing else may OR in FAST_BIT."""
+        return MAP_MODE[self.mapping] | (FAST_BIT if self.fast else 0x00)
+
+    @staticmethod
+    def speed_from_map_mode(byte: int) -> str:
+        """The inverse of the speed half of `map_mode`, for reading a header."""
+        return "fast" if byte & FAST_BIT else "slow"
 
     @property
     def header_file_offset(self) -> int:
@@ -521,7 +548,7 @@ class CartMap:
         score = 0
         if len(data) < address + 0x50:
             return 0
-        map_mode = data[address + 0x25] & ~0x10
+        map_mode = data[address + 0x25] & ~FAST_BIT  # speed bit is not part of the mapping
         complement = data[address + 0x2C] | data[address + 0x2D] << 8
         checksum = data[address + 0x2E] | data[address + 0x2F] << 8
         reset = data[address + 0x4C] | data[address + 0x4D] << 8
@@ -585,7 +612,7 @@ class CartMap:
             f"{d.label} @ ${d.file_start:06X}" for d in self.devices
         )
         lines = [
-            f"mapping           : {self.mapping} ({'fast' if self.fast else 'slow'} ROM), "
+            f"mapping           : {self.mapping} ({self.speed} ROM), "
             f"map mode ${self.map_mode:02X}",
             f"file length       : {self.size} bytes (0x{self.size:X}, "
             f"{self.size * 8 // 1024 // 1024} Mbit / {self.size // 1024 // 1024} MiB)",
@@ -659,12 +686,16 @@ def main(argv: list[str]) -> int:
     )
     ap.add_argument("--mapping", choices=MAPPINGS, required=True)
     ap.add_argument("--size", type=parse_size, required=True, help="e.g. 6M, 48Mbit, 0x600000")
-    ap.add_argument("--fast", action="store_true", help="FastROM map-mode variant")
+    ap.add_argument("--speed", choices=SPEEDS, default="slow",
+                    help="cartridge bus speed (default slow); sets map-mode bit 4")
+    ap.add_argument("--fast", "--fastrom", dest="fast", action="store_true",
+                    help="shorthand for --speed fast")
     ap.add_argument("--table", action="store_true", help="print the file/CPU truth table")
     ap.add_argument("--offset", type=lambda s: int(s, 0), help="describe one file offset")
     args = ap.parse_args(argv[1:])
 
-    cm = CartMap(args.mapping, args.size, fast=args.fast)
+    cm = CartMap(args.mapping, args.size,
+                 speed="fast" if args.fast else args.speed)
     print(cm.summary())
     if args.offset is not None:
         d = cm.describe(args.offset)

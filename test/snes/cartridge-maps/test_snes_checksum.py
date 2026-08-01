@@ -321,5 +321,131 @@ class TestNegativeFixtures(Fixture):
                 self.assertIn(name, r.stdout)
 
 
+def legacy_patch(rom: bytearray, hirom: bool, fastrom: bool) -> bytearray:
+    """The pre-rewrite tools/snes-checksum.py, transcribed verbatim from main's
+    `5038454` version. It is the compatibility oracle for `--fastrom`: the
+    rewritten tool must reproduce it byte-for-byte on every image the old one
+    accepted, or main's SVX2 FastROM ROMs silently change."""
+    rom = bytearray(rom)
+    base = 0xFFB0 if hirom else 0x7FB0
+    MAPMODE_OFF, ROMSIZE_OFF = base + 0x25, base + 0x27
+    COMPLEMENT_OFF, CHECKSUM_OFF = base + 0x2C, base + 0x2E
+    size_kib = len(rom) // 1024
+    rom[ROMSIZE_OFF] = size_kib.bit_length() - 1
+    rom[MAPMODE_OFF] = 0x21 if hirom else 0x20
+    if fastrom:
+        rom[MAPMODE_OFF] |= 0x10
+    rom[COMPLEMENT_OFF:COMPLEMENT_OFF + 2] = b"\xff\xff"
+    rom[CHECKSUM_OFF:CHECKSUM_OFF + 2] = b"\x00\x00"
+    checksum = sum(rom) & 0xFFFF
+    complement = checksum ^ 0xFFFF
+    rom[COMPLEMENT_OFF] = complement & 0xFF
+    rom[COMPLEMENT_OFF + 1] = complement >> 8
+    rom[CHECKSUM_OFF] = checksum & 0xFF
+    rom[CHECKSUM_OFF + 1] = checksum >> 8
+    return rom
+
+
+class TestSpeed(Fixture):
+    """Cartridge bus speed is a model attribute; the map-mode byte derives from
+    it. Guards the `--fastrom` contract main's video ROMs are built against."""
+
+    def test_model_derives_the_map_mode_byte(self):
+        for mapping, size, slow, fast in (
+            ("lorom", 1 << 20, 0x20, 0x30),
+            ("hirom", 4 << 20, 0x21, 0x31),
+            ("exhirom", 6 << 20, 0x25, 0x35),
+        ):
+            with self.subTest(m=mapping):
+                self.assertEqual(CartMap(mapping, size).map_mode, slow)
+                self.assertEqual(CartMap(mapping, size).speed, "slow")
+                self.assertEqual(CartMap(mapping, size, fast=True).map_mode, fast)
+                self.assertEqual(CartMap(mapping, size, speed="fast").map_mode, fast)
+                self.assertEqual(CartMap(mapping, size, speed="fast").speed, "fast")
+                self.assertEqual(CartMap.speed_from_map_mode(fast), "fast")
+                self.assertEqual(CartMap.speed_from_map_mode(slow), "slow")
+
+    def test_unknown_speed_is_rejected(self):
+        with self.assertRaises(ValueError):
+            CartMap("hirom", 4 << 20, speed="turbo")
+
+    def test_speed_does_not_disturb_anything_else(self):
+        """Only the one header byte may differ between a slow and a fast build
+        of the same image -- and the checksum that byte feeds."""
+        for mapping, size in (("lorom", 1 << 20), ("hirom", 4 << 20),
+                              ("exhirom", 6 << 20)):
+            with self.subTest(m=mapping):
+                cm = CartMap(mapping, size)
+                img = bytes(build_image(mapping, size))
+                s = self.write(f"{mapping}-slow.sfc", img)
+                f = self.write(f"{mapping}-fast.sfc", img)
+                self.assertEqual(run("--mapping", mapping, s).returncode, 0)
+                self.assertEqual(
+                    run("--mapping", mapping, "--fastrom", f).returncode, 0)
+                a, b = open(s, "rb").read(), open(f, "rb").read()
+                base = cm.header_file_offset
+                differ = {i for i in range(len(a)) if a[i] != b[i]}
+                allowed = {base + 0x25, base + 0x2C, base + 0x2D,
+                           base + 0x2E, base + 0x2F}
+                # (the high halves need not move -- +0x10 on the sum usually
+                # does not carry -- so this is a subset, but 0x25 always moves)
+                self.assertLessEqual(
+                    differ, allowed,
+                    "a speed change must touch only the map-mode byte and the "
+                    "checksum/complement pair",
+                )
+                self.assertIn(base + 0x25, differ)
+                self.assertEqual(b[base + 0x25], a[base + 0x25] | 0x10)
+
+    def test_fast_and_fastrom_and_speed_fast_are_the_same_flag(self):
+        img = bytes(build_image("hirom", 4 << 20))
+        outs = []
+        for flag in (["--fast"], ["--fastrom"], ["--speed", "fast"]):
+            p = self.write(f"h{len(outs)}.sfc", img)
+            r = run("--mapping", "hirom", *flag, p)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            outs.append(open(p, "rb").read())
+        self.assertEqual(outs[0], outs[1])
+        self.assertEqual(outs[1], outs[2])
+
+    def test_matches_the_pre_rewrite_tool_byte_for_byte(self):
+        """Both constituencies at once: the LoROM/HiROM shapes main's callers
+        use (`--fastrom`, `--hirom --fastrom`), slow and fast."""
+        for mapping, size in (("lorom", 32 << 10), ("lorom", 1 << 20),
+                              ("lorom", 4 << 20), ("hirom", 64 << 10),
+                              ("hirom", 1 << 20), ("hirom", 4 << 20)):
+            for fast in (False, True):
+                with self.subTest(m=mapping, size=hex(size), fast=fast):
+                    img = bytes(build_image(mapping, size))
+                    p = self.write(f"{mapping}-{size}-{fast}.sfc", img)
+                    args = ["--mapping", mapping] + (["--fastrom"] if fast else [])
+                    r = run(*args, p)
+                    self.assertEqual(r.returncode, 0, r.stderr)
+                    self.assertEqual(
+                        open(p, "rb").read(),
+                        bytes(legacy_patch(bytearray(img), mapping == "hirom", fast)),
+                    )
+
+    def test_inspect_reads_the_speed_back_from_the_header(self):
+        """A FastROM image inspects clean without being told it is fast."""
+        img = bytes(build_image("hirom", 4 << 20))
+        p = self.write("fast.sfc", img)
+        self.assertEqual(run("--mapping", "hirom", "--fastrom", p).returncode, 0)
+        r = run("--inspect", "--mapping", "hirom", p)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("fast ROM", r.stdout)
+        self.assertIn("$31", r.stdout)
+        self.assertIn("PASS", r.stdout)
+
+    def test_inspect_with_an_explicit_wrong_speed_still_fails(self):
+        """The read-back must not make the map-mode check unfalsifiable."""
+        img = bytes(build_image("hirom", 4 << 20))
+        p = self.write("fast2.sfc", img)
+        run("--mapping", "hirom", "--fastrom", p)
+        r = run("--inspect", "--mapping", "hirom", "--speed", "slow", p)
+        self.assertEqual(r.returncode, 1, r.stdout)
+        self.assertIn("map mode byte $31", r.stdout)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
