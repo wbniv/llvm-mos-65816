@@ -146,6 +146,8 @@ def main() -> int:
     parser.add_argument("--dither", choices=("floyd", "bayer", "none"), default="floyd",
                         help="palette dither for --rgb24 (default: floyd)")
     parser.add_argument("--palette-output", type=Path, help="write 224-entry BGR555 palette")
+    parser.add_argument("--tiles-output", type=Path,
+                        help="write quantized tile-major frames (requires --rgb24)")
     parser.add_argument("--compare-keyframes", default="15,30,60,120",
                         help="comma-separated intervals used by --benchmark")
     args = parser.parse_args()
@@ -155,10 +157,14 @@ def main() -> int:
         frames, palette = quantize_rgb24(args.input, args.dither)
         if args.palette_output:
             args.palette_output.write_bytes(palette)
+        if args.tiles_output:
+            args.tiles_output.write_bytes(b"".join(frames))
     else:
         frames = frames_from_file(args.input)
         if args.palette_output:
             parser.error("--palette-output requires --rgb24")
+        if args.tiles_output:
+            parser.error("--tiles-output requires --rgb24")
     try:
         intervals = [int(value) for value in args.compare_keyframes.split(",")]
     except ValueError:

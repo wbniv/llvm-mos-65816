@@ -114,5 +114,7 @@ regression and the mnemonic-using ROM both pass.
 
 Both benchmark corpora are integrated by
 [`2026-07-31-svx2-full-artemis-reel.md`](2026-07-31-svx2-full-artemis-reel.md): 600 animation
-frames followed by 300 real-camera frames, with independent palettes and keyframes. The combined
-2,355,828-byte stream fits a standard 4 MiB HiROM; ExHiROM remains a distinct boundary test.
+frames followed by 300 real-camera frames, with independent keyframes. The benchmark retains a
+separate palette per corpus for fair codec measurement; the shipping reel learns one shared
+palette across all 900 frames so playback needs no runtime CGRAM transition. Its combined
+2,311,832-byte stream fits a standard 4 MiB HiROM; ExHiROM remains a distinct boundary test.

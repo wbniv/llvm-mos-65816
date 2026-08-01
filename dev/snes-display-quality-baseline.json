@@ -1217,21 +1217,21 @@
       "id": "fd07ad68c22d8f45f82e",
       "kind": "ppu-write",
       "path": "examples/snes/snes-video-reel.c",
-      "line": 188,
+      "line": 186,
       "text": "REG_MDMAEN = 8u;"
     },
     {
       "id": "1bd13b30690ebf4a9185",
       "kind": "ppu-write",
       "path": "examples/snes/snes-video-reel.c",
-      "line": 198,
+      "line": 197,
       "text": "for (i = 0; i != 64u; ++i) REG_VMDATAH = blank_pixels[i];"
     },
     {
       "id": "3a02bdd2137ddc3ba0ad",
       "kind": "ppu-write",
       "path": "examples/snes/snes-video-reel.c",
-      "line": 202,
+      "line": 201,
       "text": "for (i = 0; i != 448u; ++i) REG_CGDATA = reel_palette[i];"
     },
     {
@@ -1665,7 +1665,7 @@
       "id": "af50b60d563bbc402dde",
       "kind": "ppu-write",
       "path": "examples/snes/video_hud.h",
-      "line": 44,
+      "line": 57,
       "text": "for (i = 0; i != VIDEO_HUD_COLS * 32u; ++i) REG_VMDATA = 0u;"
     }
   ]

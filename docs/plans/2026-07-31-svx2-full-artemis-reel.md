@@ -1,7 +1,7 @@
 # SVX2 Two-Video Artemis Reel
 
 **Date:** 2026-07-31
-**Status:** Fast-start correction published 2026-07-31
+**Status:** Shared-palette dashboard correction implemented and verified 2026-08-01; publishing
 **Depends on:** `2026-07-31-real-video-codec-corpus.md`,
 `2026-07-31-svx2-animated-video-cartridge.md`, and
 `2026-07-31-svx2-cartridge-video-dashboard.md`
@@ -18,7 +18,7 @@ LZSS.
 
 ## Cartridge choice
 
-The measured combined SVX2 stream is 2,355,828 bytes, so the finished cartridge is a standard
+The measured combined SVX2 stream is 2,311,832 bytes, so the finished cartridge is a standard
 4 MiB HiROM. It does not require ExHiROM.
 
 HiROM provides contiguous 64 KiB banks `$C1+` for a packed far-data stream. Near bank `$00` keeps
@@ -28,24 +28,26 @@ code, tables, dashboard state, and vectors.
 
 [Open the full-reel title, playback, and loop mockups](2026-07-31-svx2-full-artemis-reel/mockups.html).
 
-The mockup covers the animation launch/return video, the keyframe-and-palette cut to real camera
+The mockup covers the animation launch/return video, the independent-keyframe cut to real camera
 footage at frame 600, and the frame-899 to frame-0 loop while retaining the dashboard.
 
 ## Stream layout
 
 - Concatenate all SVX2 packets into one `.far_rodata` byte stream.
-- Emit a 901-entry offset table, 900 decoded CRCs, two palettes, and the frame-600 cut as metadata.
+- Emit a 901-entry offset table, 900 decoded CRCs, one shared shipping palette, and the frame-600
+  cut as metadata.
 - Use a 16-bit frame index; frame 900 wraps to frame zero.
 - Convert each stream offset to canonical HiROM bank/address.
 - Split ROM-to-WRAM DMA at a 64 KiB bank boundary; no DMA descriptor may wrap `$ffff->$0000`.
-- Frames 0 and 600 are independent keyframes; each video therefore resets codec and palette state.
+- Frames 0 and 600 are independent keyframes; each video therefore resets codec state without a
+  runtime CGRAM transition.
 
 ## Validation policy
 
 The generator host-decodes and byte-compares all 900 packets. Exhaustive target CRC work remains in
 the build gate; the shipping ROM exercises both independent keyframes behind a short title and
 begins playback before emulator frame 240. The emulator gate observes at least two complete
-900-frame loops, both palette transitions, zero decoder errors, and zero deadline slips.
+900-frame loops, the independent frame-600 keyframe, zero decoder errors, and zero deadline slips.
 
 ## Dashboard
 
@@ -74,7 +76,7 @@ begins playback before emulator frame 240. The emulator gate observes at least t
 2. Every packet host-round-trips to its 4,480-byte source frame.
 3. ROM is valid Fast HiROM and all far-stream bytes are mapped.
 4. Packets crossing a 64 KiB bank boundary stage without gaps or duplication.
-5. Frames advance 0…899, reset codec/palette state at 600 and 0, for at least two complete loops.
+5. Frames advance 0…899 and reset codec state at 600 and 0 for at least two complete loops.
 6. Presentation remains at the selected 30 fps cadence with zero deadline slips.
 7. Dashboard time crosses `00:30`; FPS settles near `30.0`; glyph tops remain intact.
 8. No excluded footage is present.
@@ -83,12 +85,12 @@ begins playback before emulator frame 240. The emulator gate observes at least t
 ## Implementation result
 
 - Superseded first publication: 300 packets / one real-camera video only.
-- Corrected build: 900 packets, 2,355,828 stream bytes, maximum packet 3,820 bytes.
+- Corrected build: 900 packets, 2,311,832 stream bytes, maximum packet 3,812 bytes.
 - 4,194,304-byte Fast HiROM; stream begins at file offset `$010000` / canonical bank `$C1`.
 - Clean-checkout build succeeds from the checked-in metadata and packed stream.
 - At 4,000 VBlanks, the composite target gate at WRAM `$0040` is `$00000000`: decoder healthy,
   two complete loops observed, and zero missed deadlines.
-- Exact cadence oracle: 1,908 presentations (`$0774`) in the reproducible source-corpus build.
+- Exact cadence oracle: 1,909 presentations (`$0775`) after 4,000 VBlanks.
 - Representative frame 115 visual gate: 69.6696% exact RGB pixels and 3.3463 mean absolute
   channel error after modeling the non-integer Mode 7 vertical scale and dashboard split.
 - Superseded one-video artifact: release `v1.0.328`, SHA-256 `31cfed53799fa9d3674a75cc3ea9434d8c37ae16706dca645222e11c51388baf`.
@@ -100,3 +102,10 @@ begins playback before emulator frame 240. The emulator gate observes at least t
   SHA-256: `ca22da27741b1c9533811580245cc61bb57f147b07076230fbc86d9101e2212c`.
 - Gallery commit `e344090`, release `v1.0.330`; deployment succeeded, the downloaded hash matches,
   and the live artifact passes the 4,000-frame composite gate.
+- The first fast-start build lost the dashboard after palette changes because runtime CGRAM DMA
+  destabilized the active HDMA split. Force blank avoided corruption but introduced visible black
+  frames, so the final reel instead learns one shared 223-color palette across both corpora. It
+  performs no runtime palette upload while retaining independent keyframes at frames 0 and 600.
+  Separate animation and real-camera screenshot gates require dashboard ink, and the 4,000-frame
+  blank-scan gate rejects any transient full-screen blanking. Corrected SHA-256:
+  `fc1890860d75c01e598cf315e7a9d9814ea51905ed76ac048d4ccff72ebcdee4`.

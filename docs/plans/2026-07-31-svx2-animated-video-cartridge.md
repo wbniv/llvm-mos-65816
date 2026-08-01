@@ -147,8 +147,8 @@ Completed 2026-07-31:
 
 Full two-video continuation completed 2026-07-31:
 
-- 600 NASA SVS animation frames plus all 300 approved real-camera frames in a 2,355,828-byte
-  packed SVX2 stream, with separate palettes and independent keyframes;
+- 600 NASA SVS animation frames plus all 300 approved real-camera frames in a 2,311,832-byte
+  packed SVX2 stream, with one shared shipping palette and independent keyframes;
 - 4 MiB Fast HiROM with 16-bit frame indexing and DMA split at 64 KiB ROM-bank boundaries;
 - complete host round trip plus target CRCs for every bank-crossing packet and the reset keyframe;
 - 716 exact presentations in 2,400 VBlanks, over two complete loops, with zero decoder errors and

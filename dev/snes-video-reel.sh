@@ -6,11 +6,11 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 BUILD="$ROOT/build"
 CC="$BUILD/llvm-mos-install/bin/mos-clang"
 CONFIG="$BUILD/install/bin/mos-snes.cfg"
-TILES=${VIDEO_REEL_TILES:-$BUILD/real-video-floyd.tiles}
-PALETTE=${VIDEO_REEL_PALETTE:-$BUILD/real-video-floyd.pal}
+TILES=${VIDEO_REEL_TILES:-/tmp/real-shared.tiles}
+PALETTE=${VIDEO_REEL_PALETTE:-/tmp/artemis-shared.pal}
 FRAMES=${VIDEO_REEL_FRAMES:-300}
-FIRST_TILES=${VIDEO_REEL_FIRST_TILES:-/tmp/animation-floyd.tiles}
-FIRST_PALETTE=${VIDEO_REEL_FIRST_PALETTE:-/tmp/animation-floyd.pal}
+FIRST_TILES=${VIDEO_REEL_FIRST_TILES:-/tmp/animation-shared.tiles}
+FIRST_PALETTE=${VIDEO_REEL_FIRST_PALETTE:-/tmp/artemis-shared.pal}
 FIRST_FRAMES=${VIDEO_REEL_FIRST_FRAMES:-600}
 CADENCE=${VIDEO_REEL_VBLANKS_PER_FRAME:-2}
 HEADER="$BUILD/snes-video-reel-assets.h"
@@ -18,6 +18,7 @@ ASSET_INCLUDE="$BUILD"
 ROM="$BUILD/svx2-video-reel.sfc"
 MAP="$BUILD/svx2-video-reel.map"
 SCREENSHOT="$BUILD/svx2-video-reel.png"
+TRANSITION_SCREENSHOT="$BUILD/svx2-video-reel-transition.png"
 STREAM="$BUILD/snes-video-reel-stream.bin"
 
 [ -x "$CC" ] || { echo "FATAL: missing compiler $CC"; exit 1; }
@@ -72,13 +73,15 @@ result_vma=$(awk '$NF=="video_reel_result" {print $1; exit}' "$MAP")
 loop_gate_vma=$(awk '$NF=="video_reel_loop_gate" {print $1; exit}' "$MAP")
 deadline_slips_vma=$(awk '$NF=="video_reel_deadline_slips" {print $1; exit}' "$MAP")
 presented_vma=$(awk '$NF=="video_reel_presented_total" {print $1; exit}' "$MAP")
+frame_vma=$(awk '$NF=="video_reel_frame" {print $1; exit}' "$MAP")
 [ -n "$result_vma" ] && [ -n "$loop_gate_vma" ] && \
-  [ -n "$deadline_slips_vma" ] && [ -n "$presented_vma" ] || \
+  [ -n "$deadline_slips_vma" ] && [ -n "$presented_vma" ] && [ -n "$frame_vma" ] || \
   { echo "FATAL: diagnostic symbols missing"; exit 1; }
 result_off=$(printf '%x' "$((16#$result_vma))")
 loop_gate_off=$(printf '%x' "$((16#$loop_gate_vma))")
 deadline_slips_off=$(printf '%x' "$((16#$deadline_slips_vma))")
 presented_off=$(printf '%x' "$((16#$presented_vma))")
+frame_off=$(printf '%x' "$((16#$frame_vma))")
 case "$CADENCE" in
   3) default_presented=109 ;;
   2) default_presented=18d ;;
@@ -99,8 +102,8 @@ minimum_exact=0.68
 maximum_mae=4.0
 if [ "$combined" = 1 ] || { [ "$FRAMES" -gt 4 ] && grep -q VIDEO_REEL_SECOND_START "$HEADER"; }; then
   gate_frames=4000
-  expected_presented=774
-  screenshot_frame=107
+  expected_presented=775
+  screenshot_frame=108
   check_tiles=$FIRST_TILES
   check_palette=$FIRST_PALETTE
   minimum_exact=0.35
@@ -117,8 +120,18 @@ if [ -f "$check_tiles" ] && [ -f "$check_palette" ]; then
   python3 "$ROOT/tools/snes-video-screenshot-check.py" --frame "$screenshot_frame" \
     --video-height 192 \
     --matrix-d 75 \
+    --require-dashboard \
     --minimum-exact "$minimum_exact" --maximum-mae "$maximum_mae" \
     "$SCREENSHOT" "$check_tiles" "$check_palette"
+fi
+if [ "$combined" = 1 ]; then
+  transition_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" \
+    "$frame_off" 2 2bc 1584 "$TRANSITION_SCREENSHOT" || true)
+  case "$transition_line" in *"PASS"*) ;; *) echo "FAIL: real-video transition: $transition_line"; exit 1;; esac
+  python3 "$ROOT/tools/snes-video-screenshot-check.py" --frame 100 --video-height 192 \
+    --matrix-d 75 --require-dashboard --minimum-exact 0.65 --maximum-mae 8.0 \
+    "$TRANSITION_SCREENSHOT" "$TILES" "$PALETTE"
+  echo "$transition_line"
 fi
 echo "$result_line"
 echo "$presented_line"

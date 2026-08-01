@@ -88,12 +88,14 @@ def main() -> int:
         "};",
     ]
     if second_start:
-        lines.extend((
-            f"#define VIDEO_REEL_SECOND_START {second_start}u",
-            "static const uint8_t reel_palette_second[448] = {",
-            f"    {byte_rows(palettes[1])}",
-            "};",
-        ))
+        lines.append(f"#define VIDEO_REEL_SECOND_START {second_start}u")
+        if palettes[1] != palettes[0]:
+            lines.extend((
+                "#define VIDEO_REEL_SECOND_PALETTE 1",
+                "static const uint8_t reel_palette_second[448] = {",
+                f"    {byte_rows(palettes[1])}",
+                "};",
+            ))
     if args.packed_far:
         stream = b"".join(packets)
         if args.stream_output:

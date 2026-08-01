@@ -29,7 +29,7 @@ volatile uint32_t video_reel_vblanks;
 static uint8_t framebuffer[SVC_FRAME_SIZE];
 static uint8_t blank_tile = 70u;
 static uint8_t blank_pixels[64];
-#ifdef VIDEO_REEL_SECOND_START
+#ifdef VIDEO_REEL_SECOND_PALETTE
 static uint8_t active_palette_first[448];
 static uint8_t active_palette_second[448];
 #endif
@@ -162,7 +162,7 @@ static void present_frame(void) {
   ++video_reel_presented_total;
 }
 
-#ifdef VIDEO_REEL_SECOND_START
+#ifdef VIDEO_REEL_SECOND_PALETTE
 static void prepare_palettes(void) {
   uint16_t i;
   for (i = 0; i != 448u; ++i) {
@@ -172,9 +172,9 @@ static void prepare_palettes(void) {
 }
 
 static void upload_palette(uint8_t second) {
+  REG_HDMAEN = 0u;
   REG_CGADD = 0u;
-  REG_DMAP3 = 0u;
-  REG_BBAD3 = 0x22u;
+  REG_DMAP3 = 0u; REG_BBAD3 = 0x22u;
   if (second) {
     REG_A1T3L = (uint8_t)(uintptr_t)active_palette_second;
     REG_A1T3H = (uint8_t)((uint16_t)(uintptr_t)active_palette_second >> 8);
@@ -182,10 +182,9 @@ static void upload_palette(uint8_t second) {
     REG_A1T3L = (uint8_t)(uintptr_t)active_palette_first;
     REG_A1T3H = (uint8_t)((uint16_t)(uintptr_t)active_palette_first >> 8);
   }
-  REG_A1B3 = 0u;
-  REG_DAS3L = 0xc0u;
-  REG_DAS3H = 0x01u;
+  REG_A1B3 = 0u; REG_DAS3L = 0xc0u; REG_DAS3H = 0x01u;
   REG_MDMAEN = 8u;
+  video_hud_arm();
 }
 #endif
 
@@ -200,7 +199,7 @@ static void setup_display(void) {
   m7_tilemap_identity(10u, 7u);
   REG_CGADD = 0u;
   for (i = 0; i != 448u; ++i) REG_CGDATA = reel_palette[i];
-#ifdef VIDEO_REEL_SECOND_START
+#ifdef VIDEO_REEL_SECOND_PALETTE
   prepare_palettes();
 #endif
   m7_set_matrix(0x0050, 0, 0, 0x004bu);
@@ -275,8 +274,14 @@ void video_reel_run(void) {
   m7_show();
 
   for (;;) {
+    uint8_t palette_cut;
     frame = (uint16_t)(video_reel_frame + 1u);
     if (frame == VIDEO_REEL_FRAME_COUNT) frame = 0u;
+#ifdef VIDEO_REEL_SECOND_PALETTE
+    palette_cut = frame == VIDEO_REEL_SECOND_START || frame == 0u;
+#else
+    palette_cut = 0u;
+#endif
     decode_frame(frame);
     while ((int16_t)((uint16_t)video_reel_vblanks - deadline) < 0)
       __asm__ volatile("wai");
@@ -287,9 +292,10 @@ void video_reel_run(void) {
       deadline = (uint16_t)video_reel_vblanks + 1u;
       while ((uint16_t)video_reel_vblanks != deadline) __asm__ volatile("wai");
     }
-#ifdef VIDEO_REEL_SECOND_START
-    if (frame == VIDEO_REEL_SECOND_START) upload_palette(1u);
-    else if (frame == 0u) upload_palette(0u);
+#ifdef VIDEO_REEL_SECOND_PALETTE
+    if (palette_cut) {
+      upload_palette(frame == VIDEO_REEL_SECOND_START);
+    }
 #endif
     present_frame();
     dashboard_presented();

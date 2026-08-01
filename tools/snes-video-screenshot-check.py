@@ -60,6 +60,7 @@ def main() -> int:
     parser.add_argument("--frame", type=int, required=True)
     parser.add_argument("--video-height", type=int, default=224)
     parser.add_argument("--matrix-d", type=int)
+    parser.add_argument("--require-dashboard", action="store_true")
     parser.add_argument("--minimum-exact", type=float, default=0.90)
     parser.add_argument("--maximum-mae", type=float, default=2.5)
     args = parser.parse_args()
@@ -71,6 +72,13 @@ def main() -> int:
         parser.error(f"screenshot must be 256x224, got {actual.size}")
     if not 1 <= args.video_height <= 224:
         parser.error("--video-height must be between 1 and 224")
+    if args.require_dashboard:
+        dashboard = actual.crop((0, args.video_height, 256, 224))
+        ink = sum(pixel != (0, 0, 0) for pixel in dashboard.get_flattened_data())
+        if ink < 40:
+            print(f"DASHBOARD: FAIL ink_pixels={ink}")
+            return 1
+        print(f"DASHBOARD: PASS ink_pixels={ink}")
     actual = actual.crop((0, 0, 256, args.video_height))
     expected = render_frame(args.tiles.read_bytes(), palette, args.frame, args.video_height,
                             args.matrix_d)

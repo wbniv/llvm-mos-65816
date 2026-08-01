@@ -32,6 +32,19 @@ static inline void video_hud_text(uint8_t row, uint8_t col, const char *text) {
   }
 }
 
+static inline void video_hud_arm(void) {
+  REG_HDMAEN = 0u;
+  REG_DMAP1 = 0u; REG_BBAD1 = 0x05u;
+  REG_A1T1L = (uint8_t)(uintptr_t)video_hud_bgmode;
+  REG_A1T1H = (uint8_t)((uintptr_t)video_hud_bgmode >> 8);
+  REG_A1B1 = 0u;
+  REG_DMAP2 = 0u; REG_BBAD2 = 0x2cu;
+  REG_A1T2L = (uint8_t)(uintptr_t)video_hud_tm;
+  REG_A1T2H = (uint8_t)((uintptr_t)video_hud_tm >> 8);
+  REG_A1B2 = 0u;
+  REG_HDMAEN = 0x06u;
+}
+
 static inline void video_hud_begin(void) {
   uint16_t i;
   REG_BG3SC = SNES_BGSC(VIDEO_HUD_MAP_WORD, 0);
@@ -42,15 +55,6 @@ static inline void video_hud_begin(void) {
   REG_VMAIN = VMAIN_INC_HIGH_1;
   REG_VMADD = VIDEO_HUD_MAP_WORD;
   for (i = 0; i != VIDEO_HUD_COLS * 32u; ++i) REG_VMDATA = 0u;
-
-  REG_DMAP1 = 0u; REG_BBAD1 = 0x05u;
-  REG_A1T1L = (uint8_t)(uintptr_t)video_hud_bgmode;
-  REG_A1T1H = (uint8_t)((uintptr_t)video_hud_bgmode >> 8);
-  REG_A1B1 = 0u;
-  REG_DMAP2 = 0u; REG_BBAD2 = 0x2cu;
-  REG_A1T2L = (uint8_t)(uintptr_t)video_hud_tm;
-  REG_A1T2H = (uint8_t)((uintptr_t)video_hud_tm >> 8);
-  REG_A1B2 = 0u;
-  REG_HDMAEN = 0x06u;
+  video_hud_arm();
 }
 #endif
