@@ -129,7 +129,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   bank-contained ROM span into either WRAM bank with `$2180` GP-DMA; host tests cover its register
   plan and rejection boundaries, and llvm-mos compiles the target MMIO path. Wire that adapter into
   the player after `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
-- [T4] **60 fps video playback target** — raised from 30 fps (user, 2026-07-31): SVX2's slow-ROM
+- [wip T4] **60 fps video playback target** — <!-- agent:a0f879ca71db8cabe --> raised from 30 fps (user, 2026-07-31): SVX2's slow-ROM
   pipeline timing proxy now charges the real segment cursor, packet staging DMA, decode, and
   4,480-byte presentation DMA. After optimizing per-command count/completion bookkeeping and
   direct-page state accesses, slow-ROM median/worst are **542/581 per 600 VBlanks = 54.2/58.1
