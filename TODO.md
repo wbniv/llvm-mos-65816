@@ -93,11 +93,15 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   `JGX_ENTROPY` in jgxcheck. **Manual WASM check DONE/PASS** (user, live 6 MiB page: `0xA274 ==
   gate`). Remaining: **republish the 3 cartsize pages with fixed ROMs** (also settles the
   persistent-blue WASM question — if blue survives a deterministic picture it is a separate
-  WASM-path defect, cleanly isolated); merge `feature/exhirom-canaries` — **BLOCKED ×3**:
-  cookbook foreign hunk still dirty, `--ff-only` impossible (main +54 commits, needs rebase),
-  and a SEMANTIC conflict in `tools/snes-checksum.py` <!-- agent:abdd4a48f462f8550 (dispatched 2026-08-01: speed attribute + rebase) --> (main's `5038454` `--fastrom` OR-0x10 vs
-  the branch's cartmap-driven rewrite with no speed concept — needs a speed attribute in the
-  cartmap model; do not resolve by picking a side); MAME leg on the SPC700
+  WASM-path defect, cleanly isolated); merge `feature/exhirom-canaries` — **READY (2026-08-01): rebase + speed attribute DONE**
+  (agent abdd4a48: cartmap `speed` attribute + `--fastrom` alias, 280/280 ROM byte-identical
+  vs legacy tool incl. the 4 FastROM images, rebased to `e0a5dd1` on `53729d5`, ff-mergeable,
+  canary gate PASS 0x48EE/0xA274/0x29B9 + entropy 6b ×3, 108 host tests). Merge command:
+  `git merge --ff-only feature/exhirom-canaries` — SOLE remaining blocker: two doc files
+  another session holds uncommitted in main's tree (`docs/snes-demo-cookbook.md`,
+  `docs/refs/snes-hardware/snes-hardware-summary.md`; the latter's hunk collides at the same
+  anchor as the branch's — stash-merge-pop would conflict in their prose; wait for their
+  commit or user authorizes committing their hunks); MAME leg on the SPC700
   IPL (user-gated); then Phase 2 per the **superseding plan**
   [2026-08-01-exhirom-three-act-synthesis-cart.md](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md)
   (shape decided by user 2026-08-01: three synthesis acts in a loop, no second video path).
