@@ -1822,5 +1822,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** prepare a minimal commit/PR containing the TableGen fix and regression only; and — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:788f433367fcd177 -->
 - [ ] **(triage)** reference the animated ROM as the real-world reproducer, without coupling the upstream patch to — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:012a72598ce748d6 -->
 - [verify] **2026-07-31-svx2-animated-video-cartridge** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:40c1c2b870d73873 -->
-- [verify] **2026-08-01-exhirom-three-act-synthesis-cart** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-exhirom-three-act-synthesis-cart.md](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md)_  <!-- fp:c3a1de9e87d9d4ca -->
+<!-- triaged 2026-08-01: seamdemo plan is PLANNED-status; verification runs per phase and is covered by the curated [T4] seamdemo item (blocked on the exhirom-canaries merge). fp:c3a1de9e87d9d4ca -->
 <!-- END auto-captured-deferrals -->
