@@ -153,6 +153,20 @@ BENCH_VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$BENCH_MAP")
   "0x$BENCH_VMA" 2 0x5CF0 "${BENCH_FRAMES:-30000}" "$BUILD/lzss-gallery-bench-jg.png"
 echo "fast decode gate: PASS (all $WORKS works far-decoded, staged, near-decoded, checksummed)"
 
+# Script a real Right press through bsnes-jg and poll until the target accepts
+# asset 1. This proves the automatic-latch NMI path remains responsive while
+# foreground decode is active; the no-input corpus gate cannot cover that path.
+NAV_JGX="$BUILD/jgxcheck-nav"
+ARCHIVE=$(find "$ROOT/vendor/bsnes-jg/objs" -name '*.a' | head -1)
+g++ -O2 -std=c++11 -DJGX_NAV -I"$ROOT/vendor/bsnes-jg/src" -I"$ROOT/tools" \
+  -c "$ROOT/dev/jgxcheck.cpp" -o "$BUILD/jgxcheck-nav.o"
+g++ "$BUILD/jgxcheck-nav.o" "$ARCHIVE" -lsamplerate -lm -o "$NAV_JGX"
+NAV_VMA=$(awk '$NF=="gallery_current_asset"{print $1; exit}' "$MAP")
+[ -n "$NAV_VMA" ]
+JGX_SCRIPT='NONE:1000,RIGHT:3,NONE:30000' JGX_POLL=1 \
+  "$NAV_JGX" "$ROM" "$ROOT/vendor/bsnes-jg/Database" "0x$NAV_VMA" 1 0x01 40000
+echo "automatic joypad navigation gate: PASS (Right accepted during foreground decode)"
+
 VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$MAP")
 [ -n "$VMA" ]
 OFF="0x$VMA"
@@ -165,7 +179,12 @@ if [ "${QUICK:-0}" = 1 ]; then
   CHECK_LEN=1
   OUT="$BUILD/lzss-gallery-quick-jg.png"
 else
-  FRAMES="${FRAMES:-200000}"
+  # 62 works complete in ~620k frames (measured 2026-07-28: gallery_progress
+  # reached 10 works at 100k frames, i.e. ~10k frames/work). 200000 only
+  # covered about 20 works, so the gate was asserting an oracle the ROM had not
+  # finished computing and reported got=0x0000. 700000 leaves ~13% headroom;
+  # overshooting is free because corpus_result stays latched once written.
+  FRAMES="${FRAMES:-700000}"
   CHECK_OFF="$VMA"
   CHECK_WANT="$EXPECT"
   CHECK_LEN=2

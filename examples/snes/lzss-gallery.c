@@ -218,19 +218,10 @@ asm(".text\n"
     "  lda gallery_palette_2_hi\n"
     "  sta $2122\n"
     "19:\n"
-    "  lda #$01\n"
-    "  sta $4016\n"
-    "  lda #$00\n"
-    "  sta $4016\n"
-    "  sta nav_pad_now\n"
-    "  .rept 8\n"
-    "  asl nav_pad_now\n"
-    "  lda $4016\n"
-    "  and #$01\n"
-    "  ora nav_pad_now\n"
-    "  sta nav_pad_now\n"
-    "  .endr\n"
-    "  lda nav_pad_now\n"
+    /* Read the previous frame's completed automatic latch. This occurs before
+       the current auto-read commits its new JOY1 value, avoids waiting on
+       JOYBUSY inside VBlank, and removes the serial loop from the NMI budget. */
+    "  lda $4219\n"
     "  and #$03\n"
     "  sta nav_pad_now\n"
     "  lda nav_pad_previous\n"
@@ -1212,7 +1203,7 @@ int main(void){
   gallery_clock_lo=gallery_clock_hi=0;
   nav_cancel=0;
   snes_ppu_reset_blank();
-  REG_NMITIMEN=NMITIMEN_NMI;
+  REG_NMITIMEN=NMITIMEN_NMI|NMITIMEN_AUTOJOY;
   uint8_t failed=0;
   for(uint8_t k=0;k<GALLERY_ASSET_COUNT;k++){
     const GalleryAsset *a=&GALLERY_ASSETS[k];
@@ -1258,7 +1249,7 @@ int main(void){
   gallery_palette_split=0;gallery_obj_attr=0x3cu;dashboard_pal=0;
   arrow_anim=arrow_direction=arrow_previous_direction=0;
   arrow_position=arrow_velocity=0;arrow_anim_y=0;arrow_pose=ARROW_L_REST;
-  REG_NMITIMEN=NMITIMEN_NMI;uint16_t gate=0xffff;uint8_t decoded=1;
+  REG_NMITIMEN=NMITIMEN_NMI|NMITIMEN_AUTOJOY;uint16_t gate=0xffff;uint8_t decoded=1;
   for(;;){
     a=&GALLERY_ASSETS[k];
     if(!decoded){
