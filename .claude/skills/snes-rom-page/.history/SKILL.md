@@ -1,7 +1,5 @@
 | Date | Change |
 |------|--------|
-| [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/5e75e65) | chore(skills): migrate snes-rom-page to CLI-delegated engine sync (drop stale bundled engine/) |
-| [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/9d0d0f3) | fix(snes-rom-page): gate scaffold.sh's engine copy on PROVENANCE stamps |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f11eaff) | fix(snes-rom-page): restore the Fullscreen handler + block a third deletion |
 | [2026-07-19](https://github.com/wbniv/llvm-mos-65816/commit/da5409b) | docs+dev: repoint ~/SRC references to the flat ~/ layout |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/996f4b4) | docs+skill: SNES demos live under /snes/ — audit location column + skill path fix |
@@ -10,16 +8,6 @@
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/bfcbe69) | chore(skills): add snes-demo + snes-rom-page as project-local skills |
 
 <!--history-meta v1
-5e75e65	author	Will Norris
-5e75e65	added	39
-5e75e65	deleted	41
-5e75e65	files	1
-5e75e65	body	The repo-local .claude/skills/snes-rom-page copy diverged from the canonical\n~/.claude/skills/snes-rom-page in bfcbe69 (2026-06-29), before the canonical\ncopy's 2026-07-27 migration to delegating engine sync entirely to the\n@wbniv/bsnes-jg-player npm package's own CLI. The repo copy instead kept\nbundling a raw engine/ fallback (stale, built 2026-06-25) with its own\nPROVENANCE-timestamp gate added in 9d0d0f3 after that bundle silently\ndowngraded biohack.net's live engine (dated 2026-07-27) on a routine ROM\nrepublish.\n\nThis commit ports the canonical CLI-delegated architecture: scaffold.sh no\nlonger vendors an engine/ fallback or gates on PROVENANCE timestamps\n(--force-engine/--selftest removed); it syncs app.js/cores/* straight from\nthe site's installed @wbniv/bsnes-jg-player package via that package's own\nsync.mjs CLI, matching biohack.net's and indri.studio's actual sync-engine\nscripts and biohack.net's CI `sync --check` drift gate (verified against\nboth live site repos). The 2026-07-31 incident that 9d0d0f3 fixed can no\nlonger recur under this architecture because there is no bundled snapshot\nleft to go stale — SKILL.md documents this as a retired-mechanism note\nrather than carrying the gate forward.\n\nRestored --touchnav (canvas tap-rect) support in scaffold.sh, which this\nrepo's fork had dropped — directly relevant since this repo ships the\nlzss-gallery demo, which uses it.\n\nKept as-is (repo-specific, out of scope for this migration): the\npage-template.astro-based page-authoring workflow (per-slug .astro files +\na gallery `demos` array), which is this repo's own independent lineage\npredating and separate from the canonical copy's page authoring approach.\nSpot-checked against the live sites and found ALSO stale relative to\ncurrent reality (both biohack.net and indri.studio now render demo pages\nfrom a single dynamic route driven by a content collection / data array,\nnot per-slug files or a gallery array) -- flagging for a separate TODO\nrather than folding an unrelated architecture change into this one.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
-9d0d0f3	author	Will Norris
-9d0d0f3	added	22
-9d0d0f3	deleted	2
-9d0d0f3	files	1
-9d0d0f3	body	The 2026-07-31 incident: scaffold.sh unconditionally copied its bundled\nengine/ (dated 2026-06-25) over biohack.net's live app.js/bsnes_jg.wasm/\nPROVENANCE.json (dated 2026-07-27), silently downgrading the deployed\nplayer on a routine ROM republish. Only a manual pre-commit revert\nstopped it from shipping.\n\nscaffold.sh now reads both PROVENANCE.json "built" stamps before copying\nand refuses by default whenever the site's engine is already newer, or\neither stamp can't be read — naming both stamps and stating that engine\nsync is owned by the @wbniv/bsnes-jg-player CLI, not this scaffold.\n--force-engine overrides for a deliberate downgrade. --selftest exercises\nall three gate outcomes (site-newer, bundle-newer, missing PROVENANCE)\nplus a first-publish case against synthetic PROVENANCE files, no site\ntouched. SKILL.md documents the ownership rule up front.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f11eaff	author	Will Norris
 f11eaff	added	6
 f11eaff	deleted	0

@@ -62,13 +62,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   40k frames — a presentation-path interaction beyond work 3 would slip both. Run once, record
   into the [abi-clobber plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md) and the
   #137 completion record.
-- [T2] **snes-rom-page skill: port the page-authoring workflow to the sites' data-driven
-  routes.** Found by the engine-sync migration (`5e75e65`): the skill's kept
-  `page-template.astro`/`demos`-array workflow is ALSO stale — biohack.net now renders every
-  demo page from `src/content/snes/*.json` + one dynamic `[slug].astro` route, indri.studio
-  from `src/data/snes-demos.ts` + one dynamic route; per-slug page files are the old model.
-  Update `SKILL.md`/`scaffold.sh` to author into the data-driven model per site. (T2: two live
-  reference implementations to copy from.)
 - [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
   test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:a75d84d7b58466d17 -->
   Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
@@ -1023,6 +1016,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [snes-rom-page-routes] Skill now authors pages via the sites' data-driven routes (`3b212bd`): per-slug `page-template.astro` deleted; per-site registry schemas documented from live HEADs (biohack `src/content/snes/*.json` + count guard, indri `SNES_DEMOS` + non-default playdir gap fixed); dry-run validated both registries.
 - [x] 2026-08-01 — [display-sweep-patched] Full 118-ROM sweep on the patched detector: 117 PASS / 1 FAIL; deltas vs 2026-07-31 baseline = exactly the predicted trio FAIL→PASS, 0 new full-pixel FAILs, 0 reclassifications (3/114 = 2.6% change, `fdb044a`). The 1 FAIL is `svx2-fastrom-video` (corpus_result 0x4f≠0x00) — a post-baseline WIP ROM owned by the in-flight SVX2 plan, reported there.
 - [x] 2026-08-01 — [gallery-repro] Non-reproducible build root-caused (upstream `MOSZeroPageAlloc` DenseMap tie-break), FIXED (patch `0021`, `3500adb`) + VERIFIED (tie 20/20 one set, rom 20/20 one hash `a4e00f3b…`, lit RED→GREEN, suite 7 pre-existing only, `bd6ca35`); upstream package READY-TO-POST (status row 17, user-triggered). Investigation on `throwaway/gallery-repro-bisect`.
 - [x] 2026-07-31 — [snes-rom-page-migrate] Repo skill copy migrated to CLI-delegated engine sync (`5e75e65`): bundled `engine/` + PROVENANCE gate dropped (retired-mechanism note kept), `--touchnav` restored; synthetic e2e green. Follow-up filed: data-driven-routes port.
