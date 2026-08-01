@@ -409,6 +409,29 @@ via `(void)REG_RDNMI`), calls each drawable's `emit()` to fill the queue, then c
 
 ---
 
+## Idle-loop rule (forward progress)
+
+**Never write a bare `for (;;) {}` / `while (1);` — including a body that is only a
+comment.** C11 forward-progress rules let LLVM delete a side-effect-free infinite loop, and
+`main` then falls through into a reset loop. The differential gates assert only WRAM and are
+*insensitive* to reset loops, so an affected demo passes silently with a broken display —
+this bit the cartsize canary (`3e80748`/`92c1b74`) before the repo-wide sweep (`903de3e`,
+2026-08-01: 338 sites audited, 216 bare loops fixed across 214 files).
+
+The house idiom for a terminal halt:
+
+```c
+for (;;) __asm__ volatile("wai");
+```
+
+Inline asm is never DCE'd, so the loop survives at any optimization level; `wai` also
+parks the CPU. It is correct with or without NMI enabled — these are terminal halts, and
+the gates read memory, not continued execution. A *frame loop* needs no idiom: a body that
+calls `display_frame()` (or otherwise touches volatile MMIO every iteration) is not
+removable.
+
+---
+
 ## Publication (`/snes-rom-page`)
 
 After the gate passes, invoke the `/snes-rom-page` skill. Inputs:
