@@ -111,7 +111,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
-- [T2] **Hard real-video stressor for the codec ratio expectations** — the completed real-camera
+- [wip T2] **Hard real-video stressor for the codec ratio expectations** — <!-- agent:ae6560527ebfad116 --> the completed real-camera
   leg ([real-video-codec-benchmark.md](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
   used the H.264 `~large` derivative of a **night** launch: mostly-black 80 × 56 frames and
   codec-smoothed grain make it a mild stressor, so its ratios (31–57%) are a best case for real
