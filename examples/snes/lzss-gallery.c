@@ -221,6 +221,8 @@ asm(".text\n"
     /* Read the previous frame's completed automatic latch. This occurs before
        the current auto-read commits its new JOY1 value, avoids waiting on
        JOYBUSY inside VBlank, and removes the serial loop from the NMI budget. */
+    /* The auto-read word uses the conventional B=$8000..Right=$0100 masks,
+       so byte-addressed D-pad Right/Left are bits 0/1 at $4219. */
     "  lda $4219\n"
     "  and #$03\n"
     "  sta nav_pad_now\n"
@@ -1180,19 +1182,21 @@ static uint8_t spinout(void){
   return 1;
 }
 
+static void arrow_launch(uint8_t direction){
+  if(arrow_anim&&arrow_direction!=direction)arrow_previous_direction=arrow_direction;
+  arrow_direction=direction;arrow_position=0;arrow_velocity=ARROW_TAKEOFF;arrow_anim=1;
+  arrow_anim_y=(uint8_t)(asset_display_height(active_asset)/2u-8u);
+}
+
 static uint8_t nav_target(uint8_t k){
   uint8_t r=nav_request;nav_request=0;nav_cancel=0;
   gallery_canceled++;
   if(r==1u){
-    if(arrow_anim&&arrow_direction!=1u)arrow_previous_direction=arrow_direction;
-    arrow_direction=1;arrow_position=0;arrow_velocity=ARROW_TAKEOFF;arrow_anim=1;
-    arrow_anim_y=(uint8_t)(asset_display_height(active_asset)/2u-8u);
+    arrow_launch(1u);
     return (uint8_t)(k+1u==GALLERY_ASSET_COUNT?0u:k+1u);
   }
   if(r==2u){
-    if(arrow_anim&&arrow_direction!=2u)arrow_previous_direction=arrow_direction;
-    arrow_direction=2;arrow_position=0;arrow_velocity=ARROW_TAKEOFF;arrow_anim=1;
-    arrow_anim_y=(uint8_t)(asset_display_height(active_asset)/2u-8u);
+    arrow_launch(2u);
     return (uint8_t)(k? k-1u:GALLERY_ASSET_COUNT-1u);
   }
   return k;
@@ -1275,6 +1279,7 @@ int main(void){
     result_line(ok,gallery_unpack_frames[k],gallery_stage_frames[k],gallery_near_frames[k],
                 gallery_repack_frames[k],gallery_verify_frames[k]);
     if(!hold(180)){k=nav_target(k);continue;}
+    arrow_launch(1u);
     k=(uint8_t)(k+1u==GALLERY_ASSET_COUNT?0u:k+1u);
   }
 #endif

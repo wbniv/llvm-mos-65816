@@ -718,3 +718,17 @@ entire painted composition and its painted border. Its palette SHA-256 is
 15,352 indexed bytes encode to 14,463 LZSS bytes. The 62-work host oracle,
 all-work target decode gate, automatic-joypad navigation gate, and reproducible
 ROM link all pass.
+
+### 2026-08-01 navigation pulse and automatic-advance animation
+
+Timed slideshow advances now launch the same right-chevron animation as a
+manual Next request, without incrementing the manual-cancellation counter or
+adding a blocking transition delay. Browser and phone chevron taps are held as
+a 120 ms synthetic joypad pulse so an immediate `pointerup` cannot erase a
+click between emulator samples. The ROM retains the correct byte-sized
+automatic-reader mapping: `$4219 & $03` is Right/Left for the conventional
+`B=$8000` through `Right=$0100` controller word.
+
+The full 62-work target gate and scripted Right-during-decode gate pass. The
+reproducible ROM SHA-256 is
+`726c421fb708956ccadbdf677c2d856eb4ae1103cd91cec7a590b8ba66ec8dcd`.

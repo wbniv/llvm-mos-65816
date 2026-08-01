@@ -82,6 +82,13 @@ exceptions. Never combine the two mechanisms, and never restore `$4200` with a l
 their exact cadence/slip gate; the SVX2 transport work demonstrated that an otherwise small manual
 poll was enough to create presentation slips.
 
+The automatic JOY1 result is split across two byte registers and exposed as the conventional
+16-bit mask (`B=$8000` through `Right=$0100`). On the little-endian 65816, `$4218` therefore holds
+A/X/L/R in its upper nibble, while `$4219` holds B, Y, Select, Start, Up, Down, Left, and Right in
+bits 7 through 0. Thus byte-sized D-pad code reads `$4219`; Right/Left are bits 0/1. Prefer the
+16-bit `REG_JOY1`/`Controller` interface unless a measured NMI path specifically needs one byte,
+and add a scripted input gate when selecting the byte manually.
+
 ---
 
 ## snesgfx component guide

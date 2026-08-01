@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/ec96233) | fix(gallery): restore full Grande Jatte composition |
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/372bc89) | feat: expand LZSS gallery to 26 works |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/07db76e) | feat: animate gallery navigation chevrons |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/b7b6add) | docs: generate romopt cartridge map |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/97e4430) | docs: visualize romopt asset packing |
@@ -10,6 +12,14 @@
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/5ac833b) | feat: expand LZSS gallery to 19 works |
 
 <!--history-meta v1
+ec96233	author	Will Norris
+ec96233	added	22
+ec96233	deleted	1
+ec96233	files	1
+372bc89	author	Will Norris
+372bc89	added	24
+372bc89	deleted	0
+372bc89	files	1
 07db76e	author	Will Norris
 07db76e	added	3
 07db76e	deleted	0
