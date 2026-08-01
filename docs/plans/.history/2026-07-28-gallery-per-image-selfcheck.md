@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/b0b8e0d) | docs(gallery)+todo: badge-state matrix; the badge has never been styled |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/de4cd34) | docs(gallery)+dev: confirm the 24000-frame budget over all 62 works |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/78889c7) | feat(gallery): publish the DISPLAYED work's verdict — ROM + offline half of the per-image button |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/4c08ead) | docs(gallery): button asserts the DISPLAYED artwork, not work 0 (Will, 2026-07-31) |
@@ -10,6 +11,11 @@
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/66d59c9) | docs(gallery): root-cause notes for the work-0 repack divergence; #137 step 6 is FAIL |
 
 <!--history-meta v1
+b0b8e0d	author	Will Norris
+b0b8e0d	added	69
+b0b8e0d	deleted	0
+b0b8e0d	files	1
+b0b8e0d	body	Verification step 13: the live-record chain end-to-end on a fixture site built from the merged,\n0021-built ROM -- sync-manifest-offsets.py resolves `off` to 0x477 and generates the 62-entry\noracle/titles tables, and verify-web-roms.sh replays it to PASS. oracle[8]=16473 and\noracle[22]=17075 are the values the ROM independently published in step 11, so the generator and\nthe target agree without either consulting the other.\n\nThe badge decisions are one three-branch comparison, and record_check() in verify-web-roms.sh\nruns the identical one; driving it with synthetic records exercises PASS, MISMATCH, FAILED (ok=0)\nand both not-ready states with the exact messages. Budget exhaustion reproduces by replaying the\nfixture with frames: 500 -- which also surfaces an honest asymmetry: the gate renders it FAIL\nwhile the browser spec requires `warn`. Correct for a gate; the indeterminate rendering is\nbrowser-only.\n\nFour badge rows stay unexercised -- both `running` texts, the re-target text, and the\nnavigation-kept-restarting failure. All four are player-runtime behaviour needing live input into\na running machine, i.e. blocked on the package release (step 6), not on anything in this repo.\n\nFound while doing it: SnesPlayer.astro renders <span id="checkresult" class="rp-badge"> and\nbiohack.net styles .rp-badge.pass/.fail/.running, but badge() assigns\n`checkEl.className = "badge " + cls`, which REPLACES rp-badge. No `.badge` rule exists anywhere on\nthe site, so the green PASS pill and red FAIL pill have never applied on any demo page.\nPre-existing -- the released app.js at biohack.net HEAD does the same at lines 247/265/268 -- and\nnot introduced by live-record. It changes the remaining work: adding a `.rp-badge.warn` rule alone\nwould style nothing; badge() has to write `rp-badge`, which belongs with the player release.\n\nTODO item updated: (1) merge and (4) budget struck; (2) player release and (3) browser badge\nstates restated with what is actually blocking them.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 de4cd34	author	Will Norris
 de4cd34	added	159
 de4cd34	deleted	1

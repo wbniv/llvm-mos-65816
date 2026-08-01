@@ -1109,4 +1109,22 @@ quiescence guard adopted `5587462`.)*
   Fixing it belongs with the player package release.
 - **Gallery republish.** The manifest still carries the interim work‑0 scalar entry. Flipping it
   to `mode: "live-record"` needs the republished ROM (`sync-manifest-offsets.py` gates on the
-  built ROM being byte-identical to the shipped one) *and* a player that understands `mode`.
+  built ROM being byte-identical to the shipped one) *and* a player that understands `mode`, so
+  per *Sequencing* it stays scalar until the package ships.
+
+  **The ROM half of the republish is decoupled from that, and is verified safe.** Replaying the
+  live manifest entry *verbatim* against the newly built record-carrying ROM:
+
+  ```
+  live entry: {"symbol": "gallery_last_z", "off": "0x473", "len": 2, "want": "0x3BC9", "frames": 12000}
+
+    lzss-gallery     PASS  (12000 frames, want 0x3BC9)
+  verify-web-roms: 1 passed, 0 failed, 0 missing
+  ALL PASS — safe to publish
+  ```
+
+  So the new ROM can be shipped at any time without touching the manifest and without the button
+  changing behaviour for a single visitor — it just puts `gallery_shown` on the site and makes the
+  byte-identity guard satisfiable, leaving the `mode` flip as the only step that waits on the
+  player. (The same replay against the *currently shipped* ROM also still passes, so the merge
+  regressed nothing.)
