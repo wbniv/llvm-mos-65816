@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "mode7.h"
+#include "snesgfx/m7title.h"
 #include "snes-video-codec.h"
 #include "snes-video-dma.h"
 #include <snes-video-reel-assets.h>
@@ -14,12 +15,12 @@
 volatile uint8_t video_reel_result;
 volatile uint8_t video_reel_frame;
 volatile uint16_t video_reel_decoded;
-volatile uint16_t video_reel_presented;
+volatile uint32_t video_reel_presented_total;
 volatile uint16_t video_reel_crc_failures;
 volatile uint16_t video_reel_deadline_slips;
 volatile uint16_t video_reel_last_crc;
 volatile uint8_t video_reel_loop_gate;
-volatile uint16_t video_reel_vblanks;
+volatile uint32_t video_reel_vblanks;
 
 /* SVX2's delta spans advance source and destination together. Replacement
    spans overwrite bytes that no later span can reference, so one framebuffer
@@ -70,7 +71,7 @@ static void present_frame(void) {
   REG_DAS0L = (uint8_t)SVC_FRAME_SIZE;
   REG_DAS0H = (uint8_t)(SVC_FRAME_SIZE >> 8);
   REG_MDMAEN = 1u;
-  ++video_reel_presented;
+  ++video_reel_presented_total;
 }
 
 static void setup_display(void) {
@@ -105,8 +106,13 @@ void video_reel_run(void) {
   video_reel_loop_gate = 0xffu;
   video_reel_deadline_slips = 0u;
 
-  /* Force-blanked target proof: validate the exact embedded sequence and its
-     keyframe reset before allowing any image to be shown. */
+  /* Keep the animated title visible while the deliberately slow target CRC
+     pass validates every embedded frame. Spin it out only when playback is
+     genuinely ready to begin. */
+  m7splash_begin("FASTROM 30 FPS", "SVX2 VIDEO");
+
+  /* Target proof: validate the exact embedded sequence and its keyframe reset
+     behind the title before allowing video playback to begin. */
   for (frame = 0; frame != VIDEO_REEL_FRAME_COUNT; ++frame) {
     decode_frame(frame);
     video_reel_last_crc = crc16(framebuffer, SVC_FRAME_SIZE);
@@ -117,12 +123,13 @@ void video_reel_run(void) {
   }
   decode_frame(0u);
   if (crc16(framebuffer, SVC_FRAME_SIZE) != reel_frame_crcs[0]) stop(3u);
+  m7splash_end(30u);
 
   setup_display();
   REG_NMITIMEN = NMITIMEN_NMI;
   wait_vblank_fresh();
   present_frame();
-  deadline = (uint16_t)(video_reel_vblanks + VIDEO_REEL_VBLANKS_PER_FRAME);
+  deadline = (uint16_t)video_reel_vblanks + VIDEO_REEL_VBLANKS_PER_FRAME;
   video_reel_frame = 0u;
   video_reel_result = 0u;
   m7_show();
@@ -131,14 +138,14 @@ void video_reel_run(void) {
     frame = (uint8_t)(video_reel_frame + 1u);
     if (frame == VIDEO_REEL_FRAME_COUNT) frame = 0u;
     decode_frame(frame);
-    while ((int16_t)(video_reel_vblanks - deadline) < 0)
+    while ((int16_t)((uint16_t)video_reel_vblanks - deadline) < 0)
       __asm__ volatile("wai");
-    if (video_reel_vblanks != deadline) {
-      video_reel_deadline_slips += (uint16_t)(video_reel_vblanks - deadline);
+    if ((uint16_t)video_reel_vblanks != deadline) {
+      video_reel_deadline_slips += (uint16_t)video_reel_vblanks - deadline;
       /* A missed VBlank is no longer a safe VRAM window. Resynchronize on the
          next NMI and resume the requested interval from there. */
-      deadline = (uint16_t)(video_reel_vblanks + 1u);
-      while (video_reel_vblanks != deadline) __asm__ volatile("wai");
+      deadline = (uint16_t)video_reel_vblanks + 1u;
+      while ((uint16_t)video_reel_vblanks != deadline) __asm__ volatile("wai");
     }
     present_frame();
     video_reel_frame = frame;

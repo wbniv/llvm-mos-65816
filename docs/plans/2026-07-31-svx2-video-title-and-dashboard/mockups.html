@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVX2 video title and dashboard mockups</title>
+<style>
+:root{color-scheme:dark;--bg:#16171a;--panel:#1f2125;--ink:#e8e6e0;--dim:#8a857a;--rule:#34363c;--orange:#c2410c;--navy:#101027;--gold:#ffd45c;--green:#54d98c;--red:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:32px 20px 60px}h1{font-size:clamp(28px,5vw,52px);margin:0}.lede{color:var(--dim);max-width:720px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}.tabs button{background:var(--panel);color:var(--dim);border:1px solid var(--rule);border-radius:6px;padding:8px 12px;cursor:pointer}.tabs button.active{color:var(--ink);border-color:var(--orange)}.grid{display:grid;grid-template-columns:minmax(320px,544px) minmax(270px,1fr);gap:28px;align-items:start}.player{width:100%}.screen{aspect-ratio:8/7;background:#000;border:1px solid var(--rule);border-radius:6px;overflow:hidden;position:relative;image-rendering:pixelated}.titlecard{position:absolute;inset:0;display:grid;place-content:center;text-align:center;background:var(--navy);font-family:ui-monospace,monospace;letter-spacing:.12em;transition:.2s}.titlecard b{font-size:clamp(25px,6vw,48px);text-shadow:4px 4px #211d2d}.titlecard span{color:#b9b6bc;font-size:clamp(12px,2.5vw,18px);margin-bottom:10px}.titlecard.zoom{transform:scale(.38);opacity:.55}.titlecard.hold{transform:scale(1)}.titlecard.spin{transform:rotate(28deg) scale(.34);opacity:.62}.video{position:absolute;inset:0;background:radial-gradient(circle at 50% 72%,#fff1db 0 3%,#b56536 4% 9%,#44251f 10% 18%,transparent 24%),linear-gradient(#030505 0 54%,#160d0b 55% 100%);opacity:0}.screen.video-phase .titlecard{display:none}.screen.video-phase .video{opacity:1}.dash{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;color:var(--dim);font:12px/1.4 ui-monospace,monospace}.status{flex:1 1 190px}.telemetry{display:flex;gap:12px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}.telemetry strong{color:var(--gold);font-weight:600}.actions{display:flex;gap:8px;margin-left:auto}.actions button{background:transparent;color:var(--dim);border:1px solid #6b2407;border-radius:6px;padding:6px 10px}.badge{margin-top:12px;border:1px solid var(--rule);border-radius:7px;background:var(--panel);padding:14px}.badge h2{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#7dd3fc;margin:0 0 8px}.badge p{margin:5px 0;color:var(--dim)}code{color:var(--gold)}.state{display:inline-block;border-radius:4px;padding:1px 6px;background:var(--green);color:#08120c;font-weight:700}.warn{background:var(--red);color:#190707}.mobile{max-width:360px;margin-top:24px}.mobile .dash{display:grid;grid-template-columns:1fr auto}.mobile .status{grid-column:1/-1}.mobile .telemetry{grid-column:1}.mobile .actions{grid-column:2;grid-row:2}.mobile .actions button:first-child{display:none}@media(max-width:760px){.grid{grid-template-columns:1fr}.mobile{max-width:none}}
+</style>
+</head>
+<body><main>
+<h1>SVX2 title + dashboard</h1>
+<p class="lede">Interaction mockup for the immediate title sequence, validation hold, spin handoff, and cartridge-sourced time/FPS dashboard. Select a phase below.</p>
+<div class="tabs" role="tablist">
+  <button class="active" data-phase="zoom">1 · Zoom in</button>
+  <button data-phase="hold">2 · Validate behind title</button>
+  <button data-phase="spin">3 · Spin out</button>
+  <button data-phase="video">4 · Video + telemetry</button>
+  <button data-phase="paused">Paused</button>
+  <button data-phase="slip">Deadline slip</button>
+</div>
+<div class="grid">
+  <section>
+    <div class="player">
+      <div class="screen" id="screen"><div class="video"></div><div class="titlecard zoom" id="title"><span>FASTROM 30 FPS</span><b>SVX2 VIDEO</b></div></div>
+      <div class="dash">
+        <span class="status">running svx2-fastrom-video.sfc · 256×224</span>
+        <span class="telemetry" aria-live="off"><span>TIME <strong id="time">--:--</strong></span><span>FPS <strong id="fps">—</strong></span></span>
+        <span class="actions"><button>Verify fidelity</button><button>Fullscreen</button></span>
+      </div>
+    </div>
+    <div class="player mobile">
+      <div class="dash"><span class="status">running svx2-fastrom-video.sfc · 256×224</span><span class="telemetry"><span>TIME <strong>03:27</strong></span><span>FPS <strong>30.0</strong></span></span><span class="actions"><button>Verify</button><button>Fullscreen</button></span></div>
+    </div>
+  </section>
+  <aside class="badge">
+    <h2 id="phaseTitle">Zoom-in title</h2>
+    <p id="phaseText">The first visible pixels belong to the title. No black CRC wait precedes it.</p>
+    <p>Clock source: <code>video_reel_presented_total / 30</code></p>
+    <p>Rate source: <code>Δpresented × NTSC Hz / Δvblanks</code></p>
+    <p>Health: <span class="state" id="health">VALIDATING</span></p>
+  </aside>
+</div>
+</main>
+<script>
+const states={
+ zoom:{title:'Zoom-in title',text:'The first visible pixels belong to the title. No black CRC wait precedes it.',time:'--:--',fps:'—',health:'VALIDATING'},
+ hold:{title:'Validation hold',text:'All embedded frames and the loop-reset keyframe are decoded and CRC-checked while this readable title remains on screen.',time:'--:--',fps:'—',health:'VALIDATING'},
+ spin:{title:'Spin-out handoff',text:'Only a successful validation permits the title to spin away. Video Mode 7 state is rebuilt under force blank.',time:'--:--',fps:'—',health:'READY'},
+ video:{title:'Measured playback',text:'Time begins on the first successful video presentation. The rolling rate comes from target counters, not browser RAF.',time:'03:27',fps:'30.0',health:'HEALTHY'},
+ paused:{title:'Paused player',text:'The cartridge counters stop, elapsed media time freezes, and the dashboard must not retain a live-looking FPS.',time:'03:27',fps:'PAUSED',health:'PAUSED'},
+ slip:{title:'Deadline-slip state',text:'A nonzero deadline-slip counter is visible immediately; the dashboard never presents an unqualified healthy 30.0.',time:'03:28',fps:'27.6',health:'1 SLIP'}
+};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x===b));const p=b.dataset.phase,s=states[p],screen=document.querySelector('#screen'),title=document.querySelector('#title'),health=document.querySelector('#health');screen.classList.toggle('video-phase',['video','paused','slip'].includes(p));title.className='titlecard '+(p==='hold'?'hold':p==='spin'?'spin':'zoom');document.querySelector('#time').textContent=s.time;document.querySelector('#fps').textContent=s.fps;document.querySelector('#phaseTitle').textContent=s.title;document.querySelector('#phaseText').textContent=s.text;health.textContent=s.health;health.classList.toggle('warn',p==='slip');});
+</script></body></html>

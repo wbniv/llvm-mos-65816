@@ -15,6 +15,11 @@ nmi:
   lda video_reel_vblanks
   inc
   sta video_reel_vblanks
+  bne .Lnmi_done
+  lda video_reel_vblanks+2
+  inc
+  sta video_reel_vblanks+2
+.Lnmi_done:
   pla
   plp
   rti
