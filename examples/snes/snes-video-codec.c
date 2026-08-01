@@ -278,7 +278,9 @@ const uint8_t *svx_asm_source;
 const uint8_t *svx_asm_previous;
 uint8_t *svx_asm_output;
 uint8_t svx_asm_keyframe;
+uint8_t svx_asm_source_bank;
 extern void svx_decode_payload_asm(void);
+extern void svx_decode_payload_wram_asm(void);
 extern void svc_copy_frame_asm(void);
 
 #if 0 /* Defined in snes-video-codec-fast.s so the assembler sees mosw65816. */
@@ -462,6 +464,7 @@ void svx_decode_payload_fast(const uint8_t *source, uint8_t keyframe,
   svx_asm_previous = previous;
   svx_asm_output = output;
   svx_asm_keyframe = keyframe;
+  svx_asm_source_bank = 0u;
   svx_decode_payload_asm();
 #else
   uint16_t remaining = SVC_FRAME_SIZE;
@@ -492,3 +495,18 @@ void svx_decode_payload_fast(const uint8_t *source, uint8_t keyframe,
   }
 #endif
 }
+
+#ifdef __mos__
+void svx_decode_payload_wram_fast(uint16_t source_address, uint8_t keyframe,
+                                  const uint8_t *previous, uint8_t *output) {
+  svx_asm_source = (const uint8_t *)(uintptr_t)source_address;
+  svx_asm_previous = previous;
+  svx_asm_output = output;
+  svx_asm_keyframe = keyframe;
+  svx_asm_source_bank = 0x7fu;
+  if (keyframe)
+    svx_decode_payload_asm();
+  else
+    svx_decode_payload_wram_asm();
+}
+#endif

@@ -53,6 +53,7 @@ for case_id in $cases; do
     "$ROOT/examples/snes/snes-video-codec.c" \
     "$ROOT/examples/snes/snes-video-stream.c" \
     "$ROOT/examples/snes/snes-video-dma.c" \
+    "$ROOT/examples/snes/snes-video-codec-bench-fast.s" \
     "$ROOT/examples/snes/snes-video-codec-fast.s"
   checksum_args=()
   [ "${VIDEO_BENCH_FASTROM:-0}" = 1 ] && checksum_args=(--fastrom)

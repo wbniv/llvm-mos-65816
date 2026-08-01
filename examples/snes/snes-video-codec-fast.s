@@ -1,11 +1,4 @@
 .text
-.global video_bench_enter_fast
-.extern video_bench_run
-video_bench_enter_fast:
-  .byte $5c /* JML $80:video_bench_run: execute the LoROM mirror at FastROM speed. */
-  .word video_bench_run
-  .byte $80
-
 .global svc_copy_frame_asm
 .global svx_asm_source
 .global svx_asm_output
@@ -18,7 +11,7 @@ svc_copy_frame_asm:
   lda #4479
   ldx svx_asm_source
   ldy svx_asm_output
-  .byte $54,$00,$00 /* MVN $00,$00. */
+  mvn #$00, #$00
   ply
   plx
   plb
@@ -26,6 +19,74 @@ svc_copy_frame_asm:
   rts
 
 .global svx_decode_payload_asm
+.global svx_decode_payload_wram_asm
+/* Staged-delta specialization. Long-indexed token reads avoid switching DBR
+   back to $7F after every MVN; MVN's encoded operands are destination,source. */
+svx_decode_payload_wram_asm:
+  php
+  phb
+  rep #$30
+  phx
+  phy
+  lda __rc0
+  pha
+  lda svx_asm_source
+  sta __rc0
+  lda svx_asm_previous
+  sta __rc2
+  lda svx_asm_output
+  sta __rc4
+  clc
+  adc #4480
+  sta __rc6
+  stz __rc8
+.Lsvx_wram_delta_token:
+  ldx __rc0
+.Lsvx_wram_delta_token_x:
+  sep #$20
+  .byte $bf,$00,$00,$7f /* LDA $7F0000,X. */
+  bmi .Lsvx_wram_delta_copy
+  inc
+  sta __rc8
+  rep #$20
+  lda __rc8
+  dec
+  inx
+  ldy __rc4
+  mvn #$7f, #$00
+  sty __rc4
+  lda __rc2
+  clc
+  adc __rc8
+  sta __rc2
+  cpy __rc6
+  bne .Lsvx_wram_delta_token_x
+  bra .Lsvx_wram_done
+.Lsvx_wram_delta_copy:
+  and #$7f
+  inc
+  sta __rc8
+  rep #$20
+  lda __rc8
+  dec
+  inx
+  stx __rc0 /* Save the staged cursor before X becomes the previous-frame cursor. */
+  ldx __rc2
+  ldy __rc4
+  mvn #$00, #$00
+  stx __rc2
+  sty __rc4
+  cpy __rc6
+  bne .Lsvx_wram_delta_token
+.Lsvx_wram_done:
+  pla
+  sta __rc0
+  ply
+  plx
+  plb
+  plp
+  rts
+
 svx_decode_payload_asm:
   php
   phb
@@ -45,8 +106,15 @@ svx_decode_payload_asm:
   lda #4480
   sta __rc6
   stz __rc8 /* Count high byte stays zero; the 8-bit path writes only __rc8. */
+  stz __rc12 /* Source bank is kept as a 16-bit branchable value. */
   sep #$20
   lda svx_asm_keyframe
+  pha
+  lda svx_asm_source_bank
+  sta __rc12
+  pha
+  plb /* Token reads use the staged source bank through (__rc0),Y. */
+  pla
   bne .Lsvx_key_token
   rep #$20
   lda __rc4
@@ -56,8 +124,21 @@ svx_decode_payload_asm:
   sep #$20
   brl .Lsvx_delta_token
 .Lsvx_key_token:
-  .byte $a0,$00,$00 /* LDY #$0000 with 16-bit index. */
-  lda (__rc0),y
+  /* Keyframe output and parser state are in bank $00. Keep DBR there and use
+     a long load only when the staged source is in bank $7F. */
+  lda #0
+  pha
+  plb
+  rep #$10
+  ldx __rc0
+  sep #$20
+  lda __rc12
+  beq .Lsvx_key_token_bank0
+  .byte $bf,$00,$00,$7f /* LDA $7F0000,X. */
+  bra .Lsvx_key_token_read
+.Lsvx_key_token_bank0:
+  .byte $bd,$00,$00     /* LDA $0000,X through DBR=$00. */
+.Lsvx_key_token_read:
   cmp #$80
   bne .Lsvx_key_not_nop
   brl .Lsvx_key_nop
@@ -69,11 +150,36 @@ svx_decode_payload_asm:
   xba
   rep #$20
   sta __rc8
-  dec
+  sta __rc10
   ldx __rc0
   inx
   ldy __rc4
-  .byte $54,$00,$00 /* MVN $00,$00; integrated assembler lacks spelling. */
+  /* Keep keyframe literals explicit. Token/payload reads may be in high WRAM,
+     while the near framebuffer is bank $00; long reads plus bank-$00 stores
+     make that crossing unambiguous and avoid MVN changing DBR mid-parser. */
+  sep #$20
+  lda #0
+  pha
+  plb
+  lda __rc12
+  beq .Lsvx_key_literal_loop_bank0
+.Lsvx_key_literal_loop:
+  .byte $bf,$00,$00,$7f /* LDA $7F0000,X. */
+  .byte $99,$00,$00     /* STA $0000,Y through DBR=$00. */
+  inx
+  iny
+  dec __rc10
+  bne .Lsvx_key_literal_loop
+  bra .Lsvx_key_literal_done
+.Lsvx_key_literal_loop_bank0:
+  .byte $bd,$00,$00     /* LDA $0000,X through DBR=$00. */
+  .byte $99,$00,$00     /* STA $0000,Y through DBR=$00. */
+  inx
+  iny
+  dec __rc10
+  bne .Lsvx_key_literal_loop_bank0
+.Lsvx_key_literal_done:
+  rep #$20
   stx __rc0
   sty __rc4
   lda __rc6
@@ -87,8 +193,17 @@ svx_decode_payload_asm:
   brl .Lsvx_key_token
 .Lsvx_key_run:
   sta __rc10
-  .byte $a0,$01,$00 /* LDY #$0001 with 16-bit index. */
-  lda (__rc0),y
+  rep #$10
+  ldx __rc0
+  inx
+  sep #$20
+  lda __rc12
+  beq .Lsvx_key_run_value_bank0
+  .byte $bf,$00,$00,$7f /* LDA $7F0000,X. */
+  bra .Lsvx_key_run_value_read
+.Lsvx_key_run_value_bank0:
+  .byte $bd,$00,$00     /* LDA $0000,X through DBR=$00. */
+.Lsvx_key_run_value_read:
   sta __rc11
   lda #1
   sec
@@ -100,6 +215,12 @@ svx_decode_payload_asm:
   sta __rc8
   .byte $a0,$00,$00 /* LDY #$0000 with 16-bit index. */
   sep #$20
+  /* Token reads use DBR=$7F, but the near framebuffer is in bank $00.
+     Run stores are ordinary (dp),Y accesses rather than MVN, so select the
+     destination bank explicitly and restore the staged-source bank after. */
+  lda #0
+  pha
+  plb
   lda __rc11
 .Lsvx_key_run_loop:
   sta (__rc4),y
@@ -139,13 +260,27 @@ svx_decode_payload_asm:
   .byte $a6,$00 /* LDX __rc0, direct page. */
   inx
   .byte $a4,$04 /* LDY __rc4, direct page. */
-  .byte $54,$00,$00 /* MVN $00,$00: absolute replacement span. */
+  pha
+  lda __rc12
+  beq .Lsvx_delta_replace_bank0
+  pla
+  mvn #$7f, #$00
+  bra .Lsvx_delta_replace_moved
+.Lsvx_delta_replace_bank0:
+  pla
+  mvn #$00, #$00
+.Lsvx_delta_replace_moved:
   .byte $86,$00 /* STX __rc0, direct page. */
   .byte $84,$04 /* STY __rc4, direct page. */
   .byte $a5,$02 /* LDA __rc2, direct page. */
   clc
   .byte $65,$08 /* ADC __rc8, direct page. */
   .byte $85,$02 /* STA __rc2, direct page. */
+  sep #$20
+  lda __rc12
+  pha
+  plb
+  rep #$20
   bra .Lsvx_delta_span_finish
 .Lsvx_delta_copy:
   and #$7f
@@ -156,10 +291,15 @@ svx_decode_payload_asm:
   dec
   .byte $a6,$02 /* LDX __rc2, direct page. */
   .byte $a4,$04 /* LDY __rc4, direct page. */
-  .byte $54,$00,$00 /* MVN $00,$00: previous-frame copy span. */
+  mvn #$00, #$00
   .byte $86,$02 /* STX __rc2, direct page. */
   .byte $84,$04 /* STY __rc4, direct page. */
   .byte $e6,$00 /* INC __rc0, direct page, 16-bit M. */
+  sep #$20
+  lda __rc12
+  pha
+  plb
+  rep #$20
 .Lsvx_delta_span_finish:
   .byte $c4,$06 /* CPY __rc6, direct page. */
   sep #$20

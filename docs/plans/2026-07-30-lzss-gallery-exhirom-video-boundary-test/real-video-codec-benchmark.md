@@ -135,7 +135,29 @@ The optimized delta loop removes the per-command remaining-byte subtraction, kee
 high byte zero instead of converting through `XBA`, and uses direct-page encodings for its known
 `$00–$08` state rather than the assembler's 24-bit accumulator accesses. This raises FastROM to
 **605/647: both representative cases pass 60 fps**, while slow ROM improves to 542/581 but remains
-below 60. The functional high-WRAM/ring-refill integration caveat above still applies.
+below 60.
+
+The follow-up functional gate now makes the decoder consume the payload staged at `$7F:2009`
+rather than its ROM duplicate. A staged-delta specialization reads control bytes with long-indexed
+addressing and uses `MVN` directly from bank `$7F` for replacement spans; copy spans still read the
+previous frame from bank 0. Avoiding redundant cursor reloads after replacement spans recovers the
+last timing margin:
+
+| Functional FastROM pipeline | Packet | Decodes / 600 VBlanks | Approx. frames/s |
+|---|---:|---:|---:|
+| SVX2 median | 3,127 B | **607** | **60.7** |
+| SVX2 worst-size | 3,529 B | **648** | **64.8** |
+
+Both cases therefore retain the full-frame byte gate and clear 60 fps while consuming the staged
+high-WRAM payload. A future multi-packet player still needs refill scheduling/ring ownership, but
+the codec's functional far-source path and its measured budget are no longer proxies.
+
+This integration exposed an llvm-mos MC bug hidden by every prior same-bank use: 65816 `MVN`/`MVP`
+assembly syntax is source,destination, while the instruction bytes encode destination,source. The
+TableGen encoder emitted the operands in syntax order. The fix swaps the encoded fields; distinct
+bank regression cases now pin `mvn #$7f,#$00` to `[54 00 7f]` and `mvp #$12,#$34` to
+`[44 34 12]`. The rebuilt toolchain's MC lit test passes, and the functional ROM uses the mnemonic
+rather than raw opcode bytes, so its fidelity/performance gate exercises the fix end to end.
 
 ## Visible proof-ROM correction
 

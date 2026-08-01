@@ -104,3 +104,10 @@ frame, so the post-call spill reload addressed unrelated memory. The decoder now
 the 4,480-byte fidelity gate and produces the same 256 × 224 render (SHA-256
 `d0bd439a2a8909f2905ae3000e037b17f180ccdc365e7b6bf7f460b1d9c04c92`) as the temporary
 known-good assembly presentation path.
+
+The next independent integration step is also complete: SVX2 now consumes the compressed payload
+actually staged at `$7F:2009`. The functional FastROM pipeline reaches 607/648 decodes per 600
+VBlanks (60.7/64.8 fps) for the median/worst packets with the same 4,480-byte gate. This work found
+and fixed an llvm-mos MC encoder defect: distinct-bank `MVN`/`MVP` operands were emitted in assembly
+syntax order instead of the hardware's reversed destination,source byte order. The rebuilt MC lit
+regression and the mnemonic-using ROM both pass.

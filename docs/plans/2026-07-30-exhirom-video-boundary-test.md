@@ -194,7 +194,7 @@ complete file-offset/CPU-address table.
 | Pixel format | 8-bit indexed / Mode 7 chunky |
 | Bytes per frame | **4,480** |
 | Buffers in VRAM | 2 × 70 tiles = **140 of 256 tiles** |
-| Presentation cadence | **30 fps NTSC**, one new frame every two VBlanks |
+| Presentation cadence | **20 fps NTSC milestone**, one new frame every three VBlanks; 30 fps intermediate gate, every two VBlanks; **60 fps target** (raised 2026-07-31 after SVX2 measured 60.8–69.4 fps decode-only), one new frame **every** VBlank |
 | Palette | one fixed 223-color video palette, CGRAM 1–223 contiguous (entry 1 pinned white as HUD text ink); index 0 reserved transparent; CGRAM 224–255 sprite-owned (OBJ palettes 6–7, gallery convention) |
 | Audio | none in milestone 1 |
 | Scaling | Mode 7 affine matrix scales and centers the raster in the 256 × 224 display |
@@ -278,7 +278,13 @@ on console while passing every host gate.
    buffer becomes visible — there is no Mode 7 tilemap base register to switch.
 4. Never reveal a partially uploaded frame.
 5. Alternate front/back tile sets.
-6. Advance at 30 fps using a `0, 2, 4, ...` VBlank cadence. **NTSC lag policy:** if a presentation
+6. Ship the first milestone at 20 fps using a `0, 3, 6, ...` VBlank cadence. Once measured decode
+   throughput clears the higher gates with margin, enable 30 fps using `0, 2, 4, ...`, then the
+   **60 fps target** using every VBlank (`0, 1, 2, ...`) — raised from 30 on 2026-07-31 when SVX2
+   measured 60.8–69.4 fps decode-only; see the 60 fps TODO item for what must still be proven
+   (presentation + segmented-refill overhead inside the same VBlank, keyframe scheduling, and the
+   FastROM lever). **NTSC lag
+   policy:** if a presentation
    deadline is missed (seek landing mid-upload, a long fixture fold), hold the current frame and
    re-arm for the next even VBlank — slip, never tear — and increment a visible slip counter so
    cadence gates can distinguish slip from drop. Define PAL behavior explicitly (25 fps conversion
@@ -399,8 +405,8 @@ Two implementation constraints:
   reads instead.
 
 Decode cost is predictable: the all-raw worst case is a block move at ~7 cycles/byte (`MVN`),
-≈ 31k of the ~178k CPU cycles per 30 fps period, and typical frames cost roughly in proportion to
-changed blocks. That predictability matters at 2.68 MHz slow ROM.
+≈ 31k of the ~268k CPU cycles per 20 fps period (~178k at 30 fps), and typical frames cost roughly
+in proportion to changed blocks. That predictability matters at 2.68 MHz slow ROM.
 
 Benchmark these candidates over the quantized clip frames before choosing (add a benchmark mode to
 `tools/snes-video-pack.py` that reports bytes/frame, worst-case decode cycles, and keyframe
@@ -416,6 +422,31 @@ spacing):
 
 Pick on the measured table, per the project's measure-don't-assume rule; the selection and its
 numbers go in the completion record.
+
+The completed [real-camera corpus benchmark](2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md)
+selects one codec for both animation and camera footage: replacement/copy spans with PackBits
+keyframes (`SVX2`) at a 60-frame keyframe interval. SVX1 remains smaller, but fails target delta
+throughput; SVX2 reaches 60.8–69.4 fps in the 600-VBlank correctness-gated run. Use
+Floyd–Steinberg as the quality-first default; retain ordered Bayer only as a size-optimized option.
+The first acceptance threshold is 20 fps (200 completed decodes in a 600-VBlank target run);
+30 fps (300/600) is the intermediate gate. **The target is 60 fps (600/600) — raised from 30 on
+2026-07-31.** The first slow-ROM pipeline proxy now charges mapper-segment cursor setup, real
+ROM-to-high-WRAM `$2180` staging DMA, assembly decode, and the 4,480-byte presentation DMA:
+median/worst reach 501/553 per 600 VBlanks (50.1/55.3 fps), versus 608/694 decode-only. Thus slow
+ROM does not meet 60 fps, though it retains ample 20/30 fps margin. The proxy's decoder still reads
+the identical bank-0 ROM packet rather than the staged high-WRAM bytes, so functional far/ring
+refill integration remains required. The next measured gate is FastROM (3.58 MHz CPU versus 2.68
+MHz; DMA time is unchanged). That gate is now measured with all three required controls—map byte
+`$30`, `MEMSEL=$01`, and execution moved to the `$80` mirror. The initial 564/618 mixed result led
+to a command-loop optimization: eliminate remaining-byte arithmetic and long state accesses on
+each span. FastROM now reaches **605/647 per 600 VBlanks (60.5/64.7 fps)** with full-frame
+correctness, so the timing proxy passes 60 fps in both representative cases. Optimized slow ROM is
+542/581 (54.2/58.1 fps). The subsequent functional FastROM gate consumes the payload actually
+staged at `$7F:2009` and reaches **607/648 per 600 VBlanks (60.7/64.8 fps)** with full-frame byte
+correctness. The far-source codec path is therefore green rather than a timing proxy. Multi-packet
+ring ownership/refill scheduling remains player work, but it no longer blocks the codec or 60 fps
+decision. This gate also surfaced and fixed llvm-mos's reversed `MVN`/`MVP` bank-byte encoding;
+distinct-bank MC tests now prevent the same-bank-only coverage hole from recurring.
 
 ### Selected clip: Artemis I launch and return
 
@@ -438,7 +469,10 @@ in/out timestamps and source SHA-256 values after downloading the masters.
 Join the two excerpts with one hard cut—no generated dissolve—then:
 
 1. crop or letterbox consistently to the 80 × 56 source raster;
-2. retime to 30 fps without optical-flow interpolation;
+2. retime to 30 fps without optical-flow interpolation — **60 fps note (2026-07-31):** true
+   60 fps content requires ≥59.94 fps source masters (many KSC items are 59.94); a 29.97/30 fps
+   master frame-doubles at the 60 fps cadence (decode load halves, motion stays 30 fps) —
+   never interpolate frames;
 3. quantize both excerpts against one shared 223-color BGR555 palette;
 4. show an unobtrusive `LAUNCH` or `RETURN` test label and monotonically increasing frame number;
 5. place at least one required bank-spanning frame in each excerpt;
@@ -653,6 +687,9 @@ flowchart TB
 | `tools/lzss-gallery-rom-layout.py` | extended map/device/boundary HTML |
 | `tools/snes-rom-map.py` | ExHiROM-aware Markdown/diagram report |
 | `examples/snes/exhirom-video.c` | minimal isolated player fixture |
+| `examples/snes/snes-video-codec.{h,c}` | SVX2 checked/assembly decoder plus mapper-neutral packet staging API |
+| `examples/snes/snes-video-stream.{h,c}` | bank-contained bulk segment cursor and staged SVX2 decode adapter |
+| `examples/snes/snes-video-dma.{h,c}` | SNES ROM-segment to WRAM `$2180` GP-DMA callback and validated register plan |
 | `examples/snes/hud.h` | reused HDMA `BGMODE`/`TM` split HUD; player adds per-mode line tables |
 | `examples/snes/lzss-gallery.c` | optional gallery integration after fixture passes |
 | `dev/exhirom-video.sh` | build, structural, emulator, and frame-readback gate |
@@ -681,8 +718,27 @@ Pass in MAME and bsnes-jg. This isolates mapping and cross-bank cursor behavior 
 ### Phase 2 — video-only boundary fixture
 
 Add the 80 × 56 double-buffered synthetic reel. Prove correct sustained playback and boundary
-crossing without the painting gallery. Exercise raw segmented DMA and LZSS refill/decode with
+crossing without the painting gallery. Exercise raw segmented DMA and SVX2 refill/decode with
 logical frames/chunks that span the required boundaries.
+
+Codec prerequisite complete 2026-07-31: `svx_stage_and_decode_fast()` consumes one exact packet
+through the generic `SvcInput` refill callback into bounded WRAM staging, validates the SVX2
+header/length/previous-buffer contract, and dispatches the fast contiguous payload decoder. The
+ExHiROM cursor supplies that callback after the canary platform branch lands; raw segmented-DMA
+fixtures remain separate mandatory mapping gates.
+
+The independent cursor layer is also complete: generated descriptors provide `(bank, address,
+bytes)` segments, initialization rejects zero-length, bank-crossing, and total-length mismatches,
+and refill copies the largest available bank-contained chunk per callback. Host gates concatenate
+`$40:$FFF8` and `$41:$FFF8` segments and decode a real SVX2 packet split across two synthetic ROM
+banks to the exact expected 4,480-byte frame.
+
+The SNES bulk-copy callback is complete as well. `svc_snes_dma_copy_segment()` translates each
+cursor chunk into mode-0 A-bus-to-`$2180` GP-DMA, with a selectable channel and `$7E`/`$7F`
+destination bank. Its pure register planner rejects zero-byte transfers, invalid channels/banks,
+and source or destination spans that would wrap at 64 KiB. The host gate checks the exact `$43x0`
+register image and all rejection boundaries; llvm-mos also compiles the real MMIO path. The caller
+owns the selected channel and must not enable that same channel for HDMA.
 
 ### Phase 3 — gallery integration
 
@@ -827,8 +883,9 @@ block beneath the step with a PASS/FAIL note.
 1. Native 80 × 56 frame readback equals the host frame before scaling. Instrument: an emulator VRAM
    dump of the high bytes of words `$0000–$3FFF` (MAME debugger or a bsnes-jg hook) — not a scaled
    screenshot.
-2. 30 fps cadence has no partial-frame exposure; the slip counter reads 0 in the unstressed run,
-   and a stressed run (held seek) shows slips, never tearing.
+2. The 20 fps `0, 3, 6, ...` cadence has no partial-frame exposure and a zero slip counter in the
+   unstressed milestone run; the same gate is rerun at 30 fps before enabling that mode. A stressed
+   run (held seek) shows slips, never tearing.
 3. Worst-case VBlank DMA bytes and per-consumer CPU cycles are measured and remain below the
    recorded project budget, not merely the 6,123-byte theoretical ceiling.
 4. First, `PRE_4M`, `POST_4M`, `ROM2_MID`, and `ROM2_LAST` screenshots match host references.
@@ -909,3 +966,40 @@ When implemented, append:
 - final oracle and ROM SHA-256;
 - cartridge-map screenshots; and
 - source/site commits and release tags.
+
+### Phase 0–1 completion record (2026-07-31)
+
+**Cartridge-size test pages published live** (biohack.net CI `v1.0.314` success; ROMs full-length,
+~140 KiB gzipped via sparse fill):
+[4 MiB HiROM](https://biohack.net/snes/cartsize-hirom-4m/) ·
+[6 MiB ExHiROM](https://biohack.net/snes/cartsize-exhirom-6m/) ·
+[8 MiB ExHiROM](https://biohack.net/snes/cartsize-exhirom-8m/).
+
+- **Decoder model:** `tools/snes_cartmap.py`, ported from bsnes-jg's own bus decode
+  (`boards.bml` + `Bus::map`); emit-side canonical-only, read-side mirror-aware; 101 pure-host
+  tests. Truth table highlights: boot code in **bank `$40`** (file `$408000+`); file→CPU
+  non-monotonic at 4 MiB; 6 MiB → logical 8 MiB → size byte `$0D`; 8 MiB has 64 KiB physically
+  present but unaddressable (`$7E`/`$7F` are WRAM).
+- **Oracles (stable across every iteration):** HiROM 4 MiB `corpus_result=0x48EE`, ExHiROM 6 MiB
+  `0xA274`, ExHiROM 8 MiB `0x29B9`; `canary_status=$0000` ×3. `dev/run.sh cartsize-canary`
+  `RESULT: PASS` exit 0.
+- **Checksum tool:** ExHiROM two-device model; byte-identical output on all 267 pre-existing
+  `.sfc` (back-compat proof).
+- **Display defect (was publication-blocking) root-caused via instrumentation:** `.noinit` boot
+  counters ruled out reset-looping (boots exactly once; paints after ~500 frames of folding). Two
+  real canary PPU bugs fixed in `92c1b74` — layers never disabled (uninitialised VRAM composited
+  over the backdrop) and CGRAM written during active display (now `HVBJOY`-synced; NMI never
+  enabled, so `RDNMI` cannot latch). Residual per-frame variation proven to be a **harness
+  artifact**: `jgxcheck` PNG dumps of static-picture ROMs can capture stale/partial frames
+  (identical behaviour on known-good `hello.c`); recorded in-source. PNG `yoff=0` vs web player
+  `yoff=8` noted.
+- **Emulator matrix:** bsnes-jg native PASS ×3 (frames 700 + 1800). MAME leg **not run** —
+  `dev/roms/s_smp/spc700.rom` (SPC700 IPL) absent machine-wide. WASM ExHiROM statically positive
+  (core embeds `board: EXHIROM` + all four map lines); runtime proof requires a human click on
+  the 6 MiB page → Verify fidelity → expect `$A274` (headless cannot supply the start gesture).
+- **Commits:** `a2355fb`/`3e80748`/`92c1b74` on `feature/exhirom-canaries` (rebased onto main,
+  merge pending a foreign uncommitted cookbook hunk clearing); plan-verification records
+  `ac773f4`/`f2fd61b`; site `09eb0fb` + tag `v1.0.313`→`v1.0.314`.
+- **Video phases (2+)** proceed separately; codec selection resolved by the
+  [real-camera benchmark](2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md)
+  (SVX2, one codec).

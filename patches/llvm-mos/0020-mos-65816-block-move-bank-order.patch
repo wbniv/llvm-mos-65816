@@ -1,0 +1,21 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
+--- a/llvm/lib/Target/MOS/MOSInstrFormats.td
++++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
+@@ -738,4 +738,6 @@ class Inst816MemoryMove<string opcodestr, Opcode op = DefaultOpcode> :
+   let Inst{7-0} = opcode.op;
+-  let Inst{15-8} = sourceBank;
+-  let Inst{23-16} = destinationBank;
++  // The 65816 encodes block-move operands in destination,source byte order,
++  // opposite their source,destination assembly syntax.
++  let Inst{15-8} = destinationBank;
++  let Inst{23-16} = sourceBank;
+   let AsmString = opcodestr # " " # OperandsStr;
+diff --git a/llvm/test/MC/MOS/65816-block-move-bank-order.s b/llvm/test/MC/MOS/65816-block-move-bank-order.s
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/MC/MOS/65816-block-move-bank-order.s
+@@ -0,0 +1,4 @@
++; RUN: llvm-mc -assemble --print-imm-hex --show-encoding -triple mos -motorola-integers --mcpu=mosw65816 < %s | FileCheck %s
++
++	mvn	#$7f, #$00 ; CHECK: encoding: [0x54,0x00,0x7f]
++	mvp	#$12, #$34 ; CHECK: encoding: [0x44,0x34,0x12]

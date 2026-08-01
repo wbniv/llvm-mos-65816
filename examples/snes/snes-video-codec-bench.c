@@ -62,10 +62,7 @@ static uint8_t stage_packet(void) {
       svc_snes_dma_copy_segment, &dma_context);
   if (video_bench_stage_result != SVC_OK)
     return 0;
-  /* The timing fixture stages into otherwise-unused high WRAM at $7F:2000.
-     The present decoder is bank-0-only, so it still consumes the identical ROM
-     packet directly; this measures the exact staging cost without pretending
-     the two have been integrated into one far-aware decoder. */
+  /* Stage the complete packet into otherwise-unused high WRAM at $7F:2000. */
   video_bench_stage_result = svc_segment_cursor_read(
       &cursor, (uint8_t *)(uintptr_t)0x2000u, VIDEO_BENCH_PACKET_SIZE);
   return video_bench_stage_result == SVC_OK;
@@ -109,8 +106,13 @@ static uint8_t decode_once(void) {
   SvcInput input = {read_byte, &memory, VIDEO_BENCH_PACKET_SIZE};
   uint16_t crc;
 #if defined(VIDEO_BENCH_CODEC_SVX)
+#if defined(VIDEO_BENCH_PIPELINE)
+  svx_decode_payload_wram_fast(0x2009u, bench_packet[4] & 1u,
+                               VIDEO_BENCH_PREVIOUS, output);
+#else
   svx_decode_payload_fast(bench_packet + 9u, bench_packet[4] & 1u,
                           VIDEO_BENCH_PREVIOUS, output);
+#endif
   goto decoded;
 #else
   if (svc_decode_frame(&input, VIDEO_BENCH_PREVIOUS, output, &crc) != SVC_OK) return 0;

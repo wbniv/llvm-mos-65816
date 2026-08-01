@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/ac773f4) | docs(plan): record Phase 0-1 verification — host structural gates 1 and 2 PASS |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/6d50fd3) | docs(plan+todo): reframe extended-cartridge work — general mapper testing, standalone ROMs; rename plan |
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/e5dcc03) | docs(plan): ExHiROM video — codec selection: interframe block codec over LZSS-by-default |
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/1d48bb4) | docs(plan): ExHiROM video boundary test — review fixes, hud.h HUD amendment, mockups |
@@ -7,6 +8,11 @@
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/1ae32f8) | docs: plan ExHiROM video boundary test |
 
 <!--history-meta v1
+ac773f4	author	Will Norris
+ac773f4	added	101
+ac773f4	deleted	0
+ac773f4	files	1
+ac773f4	body	Gate 1 (implemented as `dev/run.sh cartsize-canary`; the video script is Phase 2\nand the plan permits refining gate names) and gate 2 (`snes-checksum.py\n--inspect`) recorded in the house format: original step text kept verbatim, raw\noutput beneath, PASS/FAIL note.\n\nAll three milestone configurations pass on bsnes-jg — HiROM 4 MiB (oracle\n$48EE), ExHiROM 6 MiB ($A274) and ExHiROM 8 MiB ($29B9) — with canary_status\n$0000 in each. Gate 2 confirms the 6 MiB image is exactly 6,291,456 bytes,\ndecomposes as exactly 32 Mbit + 16 Mbit, carries its header only at $40FFB0\n(bsnes-jg heuristic scores exhirom=16 and lorom/hirom/exlorom 0, so there is no\ndecoy header), maps mode $25, resets into linked code at file $408000 (first\nopcode $78 = sei), and checksums identically under two independent computations.\n\nTwo limits are recorded rather than glossed: MAME could not run at all on this\nmachine (no SPC700 IPL at dev/roms/s_smp — the gate falls back to JG_ONLY, so\nthe emulator evidence is bsnes-jg only), and coprocessor-cartridge rejection is\nproven by host fixtures rather than generated ROMs.\n\nImplementation is on branch feature/exhirom-canaries (a2355fb, 3e80748), rebased\nonto this commit's parent and not yet merged.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 6d50fd3	author	Will Norris
 6d50fd3	added	810
 6d50fd3	deleted	0

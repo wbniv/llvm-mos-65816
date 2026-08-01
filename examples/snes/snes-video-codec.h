@@ -46,6 +46,10 @@ uint8_t svx_stage_and_decode_fast(SvcInput *input, uint8_t *staging,
 /* Trusted hot loop for a packet already accepted by the checked decoder/host gates. */
 void svx_decode_payload_fast(const uint8_t *payload, uint8_t keyframe,
                              const uint8_t *previous, uint8_t *output);
+#ifdef __mos__
+void svx_decode_payload_wram_fast(uint16_t source_address, uint8_t keyframe,
+                                  const uint8_t *previous, uint8_t *output);
+#endif
 /* Native block-move control used to establish the no-codec CPU-copy ceiling. */
 void svc_copy_frame_fast(const uint8_t *source, uint8_t *output);
 
