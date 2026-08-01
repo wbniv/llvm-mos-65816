@@ -84,28 +84,26 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 - [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
   absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
   `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
-- [T3] **60 fps video — FUNCTIONAL REFILL PASSES (2026-08-01); remaining = keyframe policy
-  decision + merge + master acquisition.** <!-- agent:a0f879ca71db8cabe (feature/60fps-video, merge-tree clean vs main) -->
-  Brief correction: staged-WRAM decode already existed at HEAD; the real gap was multi-packet
-  ring refill — implemented as a no-split wrapping ring in `$7F:2000–F000` fed from a packed
-  HiROM stream (rejected: DMA/decode overlap — GP-DMA halts the CPU, no concurrency to win;
-  batched refill — bursts don't fit a 1.2% margin). **Measured: hardest stream slice (3,290
-  B/pkt) 553 slow / 620 FastROM per 600 VBlanks — 60 fps holds on the functional path**; gate
-  non-vacuous (single corrupted stream byte → FAIL), 28 ring wraps proven taken. Keyframes
-  measured for the first time: 2.90 → 2.00 VBlanks after an `MVN` literal fix (byte-correct,
-  svx-median/worst unchanged 607/648, 17/17 host tests); residual is token-dispatch-bound
-  (290 tokens/4,480 B under Floyd fragmentation), so **periodic keyframes and a strict 600/600
-  gate are incompatible today** — DECISION (user/transport plan): schedule keyframes as
-  deterministic 2-VBlank slots (59.0 effective @ interval 60) or keep them out of linear
-  playback (what the shipped reel does). Unproven lead recorded: staged-keyframe
-  specialization (fix bank `$7F`, drop per-token far-check + rep/sep at 3 read sites) may make
-  keyframes free. Capacity NOT binding: 6 MiB = 39.4 s true-60 (77.4 s frame-doubled); 8 MiB =
-  53.0/104.3 s. Content: no fetch path exists in tools/; needs one ffprobe per NASA SVS 14191
-  master (user-gated acquisition). Commits on `feature/60fps-video`
-  ([plan](docs/plans/2026-08-01-svx2-60fps-ring-refill.md)); `snes-video-codec-fast.s` is
-  shared with the reel corridor — merge after the reel worker's uncommitted edits land.
-  (T3: remaining work is decided-scope integration; the T4 unknown-headroom question is
-  answered.)
+- [T3] **60 fps video — DONE except branch merge; keyframe policy DECIDED (Option A, K=120
+  recommended).** <!-- agent:a0f879ca71db8cabe (holds bench + merge-conflict context) -->
+  Option C measured (2026-08-01): staged-keyframe specialization reaches **1.12 VBlanks**
+  (537/600 FastROM case 7; was 2.90 at session start) — misses the ≤1.00 threshold on a
+  STRUCTURAL floor: WRAM runs 2.68 MHz regardless of FastROM, so 4,480 bytes = 0.577 VBl +
+  0.178 DMA = 0.755 hard floor before any dispatch; the kernel is now copy-bound, remaining
+  levers are encoder-side (Floyd fragments PackBits tokens). **Policy: Option A — keyframes as
+  scheduled 2-VBlank slots; K=120 → 59.50 fps effective, 2 s seek granularity (final K belongs
+  to the transport/scrubbing plan).** Option C still ships: 56% of the 2-slot budget vs 100%
+  at 2.00 — denser content can no longer spill to 3 slots. Bonus find, recorded in the plan:
+  the assembler sizes immediates by literal magnitude, not the M flag (`and #$00ff` in 16-bit
+  mode ate the next opcode — fixed with the file's `xba` idiom). Byte-correct throughout;
+  ring-refill re-verified 630/600 hardest slice; svx-median/worst untouched at 607/648.
+  Remaining: merge `feature/60fps-video` (`29c2b90`) — main's `21179d7` (SVX2 pipeline proof)
+  independently made the same general-kernel MVN change + an in-place delta optimization;
+  exactly ONE conflict hunk, resolution decided = take main's side (the branch's general-kernel
+  edit is redundant now); then RE-BASELINE case-7/stream numbers against post-merge main.
+  Corridor note: reel files (`snes-video-reel.c`, `video_hud.h`, `snes-video-reel.sh`) are
+  STILL dirty in main — coordinate the merge with that worker or stash-restore per house rule.
+  (T3: resolution decided, mechanical merge + re-measure.)
 - [T2] **Hard real-video stressor for codec ratio expectations** — the real-camera leg used the
   H.264 `~large` derivative of a **night** launch (mostly-black frames, codec-smoothed grain):
   a best case, so real-footage ratios (31–57%) are uncalibrated for hard content. The
