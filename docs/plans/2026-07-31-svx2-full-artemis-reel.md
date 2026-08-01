@@ -68,7 +68,7 @@ slips.
   in the interactive mockups.
 - [x] Run host round-trip, target keyframe CRC, two-loop, cadence, slip, blanking, screenshot,
   checksum, and gallery gates.
-- [ ] Replace and publish the gallery ROM; verify the live SHA-256.
+- [x] Replace and publish the gallery ROM; verify the live SHA-256.
 
 ## Acceptance gates
 
@@ -93,3 +93,5 @@ slips.
 - Representative frame 115 visual gate: 69.6696% exact RGB pixels and 3.3463 mean absolute
   channel error after modeling the non-integer Mode 7 vertical scale and dashboard split.
 - Local/publish artifact SHA-256: `31cfed53799fa9d3674a75cc3ea9434d8c37ae16706dca645222e11c51388baf`.
+- Published by gallery commit `f2ab4c9`, release `v1.0.328`; the deployment completed successfully,
+  the downloaded ROM hash is identical, and its live artifact passes the 2,400-frame composite gate.
