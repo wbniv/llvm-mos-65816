@@ -33,7 +33,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 ## Open
 
 
-- [T1] **Retire the verify-fidelity worktree AFTER the gallery republish** — `dev/worktree-teardown.sh feature/verify-fidelity-button --yes`. BLOCKED until the republish ships: `/home/will/llvm-mos-65816-verify-button/build/lzss-gallery.sfc` is the record-carrying reproducible ROM the republish deploys (main's `build/` copy is stale pre-0021). (T1: one command once unblocked.)
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
   (2026-08-01); only the player-package release is left, and it is USER-GATED.**
   <!-- agent:a5850a8d3df7af344 -->
@@ -1042,6 +1041,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [gallery-republish+retire] Record-carrying reproducible gallery ROM LIVE on biohack.net (`e1e21d6`, v1.0.337, CI success, live sha == 5768…3a95d; manifest unchanged; user-gated app.js untouched); verify-button worktree retired (492M reclaimed, durability check passed).
 - [x] 2026-08-01 — [ppu-reset-blank-bare] Re-checked the premise before fixing (measure, don't
   assume): only `hello.c` actually drove `INIDISP` bare — `boids.c`/`lsystem.c`/`turtle-vm.c`
   already call `snes_ppu_reset_blank()` transitively via `display_init()` (in `snesgfx/display.h`
