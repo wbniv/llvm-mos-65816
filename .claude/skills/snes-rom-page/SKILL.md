@@ -2,11 +2,11 @@
 name: snes-rom-page
 description: >-
   Publish a playable in-browser SNES emulator page for a .sfc ROM on an Astro static site
-  (indri.studio or biohack.net). Copies the shared bsnes-jg WASM player, adds the ROM + a
-  manifest entry, scaffolds a /<slug> page (centred player + controls/instructions) from a
-  template, then builds + deploys per the site. Use when the user wants to put a SNES ROM
-  online as a playable page. Triggers: "publish <rom> to <site>", "add an emulator page",
-  "put this rom on the site", "make a playable page for <rom>".
+  (indri.studio or biohack.net). The player engine comes from the @wbniv/bsnes-jg-player npm
+  package (synced + drift-stamped by its CLI), scaffolds a /<slug> page (centred player +
+  controls/instructions) from a template, then builds + deploys per the site. Use when the user
+  wants to put a SNES ROM online as a playable page. Triggers: "publish <rom> to <site>", "add an
+  emulator page", "put this rom on the site", "make a playable page for <rom>".
 ---
 
 # snes-rom-page
@@ -14,27 +14,18 @@ description: >-
 Turn a SNES `.sfc` ROM into a playable `/<slug>` page on an Astro static site. The page boots the
 **bsnes-jg WASM** core (the same cycle-accurate core the llvm-mos-65816 differential gate trusts),
 shows the ROM on a centred canvas, and carries the controls/instructions. The mechanical asset setup
-is `scaffold.sh`; the page is written from `page-template.astro`. The bsnes-jg engine (~4 MB) is
-vendored in `engine/`, so the skill is **fully self-contained** — no external/machine-local paths,
-safe to distribute.
+is `scaffold.sh`; the page is written from `page-template.astro`. The engine (app.js + cores) is
+**not vendored here** — it ships in the
+[`@wbniv/bsnes-jg-player`](https://github.com/wbniv/bsnes-jg-wasm) npm package, which each site
+installs and syncs via the package's own CLI (drift-gated in the site's CI by `sync --check`).
 
-## Engine ownership — read before touching a site's `public/play/`
-
-**The `@wbniv/bsnes-jg-player` package's own CLI owns engine sync, not this skill.** The `engine/`
-bundled here is a self-contained *fallback* copy so `scaffold.sh` works standalone, but it drifts —
-a site's live engine is routinely newer than whatever snapshot happens to be checked into this skill.
-On 2026-07-31 that drift caused a real incident: `scaffold.sh` unconditionally copied its bundled
-engine (dated 2026-06-25) over biohack.net's live engine (dated 2026-07-27), silently downgrading
-`app.js`/`bsnes_jg.wasm`/`PROVENANCE.json` on a routine ROM republish. Only a manual pre-commit revert
-stopped it from shipping.
-
-`scaffold.sh` now gates every engine copy on the two `cores/PROVENANCE.json` **`built`** timestamps
-(bundled vs. the target site's) before touching anything, and **refuses by default** — naming both
-stamps — whenever the site's engine is already newer, or either stamp can't be read at all. See
-`scaffold.sh --help` for `--force-engine` (the explicit override for a deliberate downgrade) and
-`scaffold.sh --selftest` (exercises all three gate outcomes against synthetic PROVENANCE files; no
-site touched). **Never bypass the gate to "just get the publish out" — if it refuses, the fix is to
-sync the site's engine via the package CLI, not to force-copy the skill's bundle.**
+> **History:** this skill's repo-local copy previously bundled a raw `engine/` fallback with its own
+> PROVENANCE-timestamp gate (`--force-engine`/`--selftest`), after a 2026-07-31 incident where an
+> unconditional copy of that stale bundle (dated 2026-06-25) downgraded biohack.net's live engine
+> (dated 2026-07-27). That bundle-and-gate approach is now retired in favor of delegating sync
+> entirely to the package's own CLI (`bsnes-jg-player sync`), matching the canonical
+> `~/.claude/skills/snes-rom-page` copy migrated on 2026-07-27 — the incident can't recur because
+> there's no bundled snapshot left to go stale.
 
 ## Inputs
 
@@ -49,23 +40,29 @@ sync the site's engine via the package CLI, not to force-copy the skill's bundle
   if unclear). The keys are fixed by the player (below) — you map them to the ROM's actions.
 - optional **preview** PNG (256×224) shown while the core downloads.
 - optional **selfcheck** — a WRAM assert that mirrors the build gate (see below).
+- optional **touchNav** — canvas tap rects for ROMs that draw their own prev/next chevrons (e.g.
+  lzss-gallery): `--touchnav "LX LY LW LH RX RY RW RH"` (logical px, mapped to pad Left/Right).
 
 ## Steps
 
 1. **Pick the site** from the request and `cd` to its repo (see *Per-site* below). Confirm it's an
-   Astro site (`src/pages/`, `src/layouts/Base.astro`).
+   Astro site (`src/pages/`, `src/layouts/Base.astro`). If `@wbniv/bsnes-jg-player` isn't in its
+   `package.json` yet: `pnpm add @wbniv/bsnes-jg-player` (or the git URL
+   `github:wbniv/bsnes-jg-wasm#npm-package` until the first npm publish).
 
-2. **Scaffold the assets** (engine + ROM + preview + manifest):
+2. **Scaffold the assets** (engine sync + ROM + preview + manifest):
 
    ```sh
-   "$(git rev-parse --show-toplevel)/.claude/skills/snes-rom-page/scaffold.sh" \
+   ~/llvm-mos-65816/.claude/skills/snes-rom-page/scaffold.sh \
      --rom /path/to/<slug>.sfc --slug <slug> --site <SITE_DIR> \
      --title "Title" --preview /path/to/preview.png \
      --selfcheck "0xOFF 2 0xWANT FRAMES label text"     # optional
    ```
    It writes `public/play/{app.js,cores/*,roms/<slug>.sfc,roms/manifest.json,preview/<slug>.png}`,
-   copying the engine from the skill's bundled **`engine/`** (self-contained — no external paths).
-   Pass `--player-src DIR` only to re-sync the engine from a newer `bsnes-jg-wasm` build.
+   syncing the engine from the site's installed `@wbniv/bsnes-jg-player` package (via the package's
+   own CLI) — ROMs, preview, and manifest are site content the CLI never touches. (The scaffold path
+   above is absolute so it resolves regardless of the site repo you've `cd`'d into — `git rev-parse
+   --show-toplevel` at that point would resolve to the *site's* root, not this one.)
 
 3. **Write the page** from `page-template.astro`. **The path is site-specific — get it right or the
    gallery card 404s:**
@@ -84,12 +81,12 @@ sync the site's engine via the package CLI, not to force-copy the skill's bundle
    - Keep `<div id="game">`/`#screen`/`#status`/`#verify`/`#fullscreen`/`#banner` ids and the boot
      `<script>` — app.js drives them and pauses when the canvas scrolls out of view. `#fullscreen`
      wires a Fullscreen button (hidden automatically on browsers without the API).
-   - ⚠️ **Never hand-edit `engine/app.js` while doing ROM work.** Its Fullscreen handler has been
-     deleted twice by unrelated ROM-rebuild commits, each time shipping ~111 pages with a button that
-     only highlights on hover. The handler also injects the `:fullscreen` CSS (Astro scopes component
-     styles, so it cannot live in the template). `scaffold.sh` now greps the installed `play/app.js`
-     for `requestFullscreen`/`fullscreenchange` and aborts the publish if either is gone — if you see
-     that FATAL, restore the block rather than working around it.
+   - ⚠️ **Never hand-edit the installed `public/play/app.js`.** It's synced from the
+     `@wbniv/bsnes-jg-player` package, not authored here — a hand-edit gets silently clobbered by the
+     next `scaffold.sh`/`sync` run on any ROM. Its Fullscreen handler has been deleted twice in this
+     project's history by unrelated hand-edits, each time shipping ~111 pages with a button that only
+     highlights on hover. If it's missing, fix it upstream in `@wbniv/bsnes-jg-player` and re-sync —
+     don't patch the site copy.
 
 4. **Register the demo on the gallery page** (`src/pages/snes/index.astro` on biohack.net, skipped for
    indri.studio unless it has one). Add a new entry to the `demos` array:
@@ -181,7 +178,8 @@ the headless gate live in the tab. `OFF` is the WRAM offset of the symbol (from 
 
 ## Commit discipline
 
-Stage only the files this run created/edited — `public/play/**` (engine, ROM, preview, manifest) and
-the page (`src/pages/snes/<slug>.astro` on biohack.net, `src/pages/<slug>.astro` on indri.studio) plus
-`src/pages/snes/index.astro` (gallery entry). Verify `git diff --cached --name-only`. The engine blobs
-are ~4 MB (`bsnes_jg.wasm`); that's expected for the first ROM on a site, free for subsequent ones.
+Stage only the files this run created/edited — `public/play/**` (ROM, preview, manifest — engine
+files only when the `@wbniv/bsnes-jg-player` package version was bumped, since sync is otherwise a
+no-op) and the page (`src/pages/snes/<slug>.astro` on biohack.net, `src/pages/<slug>.astro` on
+indri.studio) plus `src/pages/snes/index.astro` (gallery entry). Verify
+`git diff --cached --name-only`.

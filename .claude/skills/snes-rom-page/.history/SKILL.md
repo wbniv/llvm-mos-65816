@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/9d0d0f3) | fix(snes-rom-page): gate scaffold.sh's engine copy on PROVENANCE stamps |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f11eaff) | fix(snes-rom-page): restore the Fullscreen handler + block a third deletion |
 | [2026-07-19](https://github.com/wbniv/llvm-mos-65816/commit/da5409b) | docs+dev: repoint ~/SRC references to the flat ~/ layout |
 | [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/996f4b4) | docs+skill: SNES demos live under /snes/ — audit location column + skill path fix |
@@ -8,6 +9,11 @@
 | [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/bfcbe69) | chore(skills): add snes-demo + snes-rom-page as project-local skills |
 
 <!--history-meta v1
+9d0d0f3	author	Will Norris
+9d0d0f3	added	22
+9d0d0f3	deleted	2
+9d0d0f3	files	1
+9d0d0f3	body	The 2026-07-31 incident: scaffold.sh unconditionally copied its bundled\nengine/ (dated 2026-06-25) over biohack.net's live app.js/bsnes_jg.wasm/\nPROVENANCE.json (dated 2026-07-27), silently downgrading the deployed\nplayer on a routine ROM republish. Only a manual pre-commit revert\nstopped it from shipping.\n\nscaffold.sh now reads both PROVENANCE.json "built" stamps before copying\nand refuses by default whenever the site's engine is already newer, or\neither stamp can't be read — naming both stamps and stating that engine\nsync is owned by the @wbniv/bsnes-jg-player CLI, not this scaffold.\n--force-engine overrides for a deliberate downgrade. --selftest exercises\nall three gate outcomes (site-newer, bundle-newer, missing PROVENANCE)\nplus a first-publish case against synthetic PROVENANCE files, no site\ntouched. SKILL.md documents the ownership rule up front.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 f11eaff	author	Will Norris
 f11eaff	added	6
 f11eaff	deleted	0
