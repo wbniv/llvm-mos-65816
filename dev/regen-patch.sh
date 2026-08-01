@@ -37,6 +37,17 @@ P2="$PATCHES/0002-321-accum16.patch"
 P3="$PATCHES/0003-late-opt-txy-dead-flag.patch"   # upstream-bound F4 fix; optional (dropped once merged)
 MOSREL="llvm/lib/Target/MOS"
 
+# Standalone upstream-bound patches that live INSIDE $MOSREL and are therefore
+# absorbed into 0002 by the mirror+diff below unless they are in the baseline.
+# Each is optional (dropped once it merges upstream and the vendor pin is bumped).
+# NOTE: 0018/0019/0020 are deliberately absent — they are other workers' in-flight
+# patches; add them here when their owners fold them in. Until then, do not run
+# this script while they are un-landed (see the stale-baseline hazard note in
+# docs/plans/2026-08-01-gallery-nonreproducible-build.md).
+BASELINE_MOSDIR=(
+  "$PATCHES/0021-mos-zp-alloc-deterministic.patch"
+)
+
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
 command -v rsync >/dev/null || { echo "FATAL: rsync not found"; exit 1; }
 
@@ -57,6 +68,11 @@ echo "==> [gen] worktree @ pristine + commit 0001 (+0003) as baseline"
 git -C "$VENDOR" worktree add --detach "$WT_GEN" "$PRISTINE" >/dev/null
 git -C "$WT_GEN" apply "$P1"
 [ -f "$P3" ] && { echo "    baking 0003 (F4) into baseline so it drops out of 0002"; git -C "$WT_GEN" apply "$P3"; }
+for p in "${BASELINE_MOSDIR[@]}"; do
+  [ -f "$p" ] || continue
+  echo "    baking $(basename "$p") into baseline so it drops out of 0002"
+  git -C "$WT_GEN" apply "$p"
+done
 git -C "$WT_GEN" add -A
 git "${GIT_ID[@]}" -C "$WT_GEN" commit -q -m "0001(+0003) baseline"
 
@@ -71,6 +87,9 @@ git -C "$VENDOR" worktree add --detach "$WT_VFY" "$PRISTINE" >/dev/null
 git -C "$WT_VFY" apply "$P1"
 git -C "$WT_VFY" apply "$P2"
 [ -f "$P3" ] && git -C "$WT_VFY" apply "$P3"   # 0003 restores MOSLateOptimization.cpp to the live (F4) state
+for p in "${BASELINE_MOSDIR[@]}"; do          # ditto for the other in-baseline MOS-dir patches
+  [ -f "$p" ] && git -C "$WT_VFY" apply "$p"
+done
 
 echo "==> [verify] diff -rq reapplied MOS dir vs live vendor MOS dir"
 if diff -rq "$WT_VFY/$MOSREL" "$VENDOR/$MOSREL"; then

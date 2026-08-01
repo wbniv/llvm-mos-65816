@@ -180,5 +180,39 @@ else
   exit 1
 fi
 
-sha256sum "$ROM"
+# A bare `sha256sum "$ROM"` here read as a provenance stamp, which it was not:
+# this ROM did not build reproducibly. MOSZeroPageAlloc broke benefit ties for
+# zero-page placement in heap-address order, so identical sources produced one
+# of two stable images (~18/12 over 30 links) -- the delta being one 1-byte
+# global moving in or out of .zp.bss, worth +/-2 B in one function and a +2 B
+# shift in 1476 of 2291 linked symbols. See
+# docs/plans/2026-08-01-gallery-nonreproducible-build.md and the upstream fix
+# patches/llvm-mos/0021-mos-zp-alloc-deterministic.patch.
+#
+# Rather than print a hash that may or may not mean anything, relink once and
+# say so. Non-fatal by default so a toolchain predating 0021 still completes the
+# gate; set GALLERY_REPRO_STRICT=1 to make a non-reproducible build an error.
+echo "==> reproducible-build check (relink and compare)"
+REPRO_ROM="$BUILD/lzss-gallery-repro.sfc"
+"$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
+  -Xclang -target-feature -Xclang +mos-a16 -Oz \
+  -DGALLERY_START="${GALLERY_START:-0}" \
+  "${EXTRA_DEFS[@]}" \
+  -o "$REPRO_ROM" "$SRC"
+python3 "$ROOT/tools/snes-checksum.py" "$REPRO_ROM" >/dev/null
+ROM_SHA=$(sha256sum "$ROM" | cut -d' ' -f1)
+REPRO_SHA=$(sha256sum "$REPRO_ROM" | cut -d' ' -f1)
+rm -f "$REPRO_ROM"
+if [ "$ROM_SHA" = "$REPRO_SHA" ]; then
+  echo "reproducible build: PASS ($ROM_SHA)"
+else
+  echo "reproducible build: FAIL — two links of identical sources disagree"
+  echo "  $ROM_SHA (gated ROM)"
+  echo "  $REPRO_SHA (relink)"
+  echo "  known cause + fix: docs/plans/2026-08-01-gallery-nonreproducible-build.md"
+  if [ "${GALLERY_REPRO_STRICT:-0}" = 1 ]; then
+    echo "FATAL: GALLERY_REPRO_STRICT=1 and the build is not reproducible"
+    exit 1
+  fi
+fi
 echo "RESULT: PASS — $WORKS-work LZSS gallery host oracle, relink, header and bsnes-jg gate"

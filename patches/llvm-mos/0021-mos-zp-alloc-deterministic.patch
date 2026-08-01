@@ -1,0 +1,119 @@
+diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
++++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+@@ -20,8 +20,10 @@
+ #include "MOSMachineFunctionInfo.h"
+ #include "MOSRegisterInfo.h"
+ #include "MOSSubtarget.h"
++#include "llvm/ADT/MapVector.h"
+ #include "llvm/ADT/PostOrderIterator.h"
+ #include "llvm/ADT/SCCIterator.h"
++#include "llvm/ADT/SetVector.h"
+ #include "llvm/Analysis/BasicAliasAnalysis.h"
+ #include "llvm/Analysis/BlockFrequencyInfo.h"
+ #include "llvm/Analysis/CallGraph.h"
+@@ -414,7 +416,11 @@
+   LLVM_DEBUG(CG.dump());
+ 
+   std::vector<SCC> SCCs;
+-  std::vector<SmallSet<const CallGraphNode *, 4>> SCCCallees;
++  // SmallSetVector, not SmallSet: past its inline capacity SmallSet degrades to
++  // std::set, which orders const CallGraphNode * by pointer VALUE. SCC::Callees
++  // seeds the EntryGraph list, and entry graphs are served ZP round-robin, so an
++  // address-ordered callee list makes the assignment differ between runs.
++  std::vector<SmallSetVector<const CallGraphNode *, 4>> SCCCallees;
+   DenseMap<const CallGraphNode *, size_t> SCCIdx;
+   std::vector<std::unique_ptr<Candidate>> Candidates;
+   DenseMap<GlobalVariable *, Candidate *> GVCandidates;
+@@ -482,7 +488,14 @@
+   auto &BFI =
+       getAnalysis<BlockFrequencyInfoWrapperPass>(MF.getFunction()).getBFI();
+ 
+-  DenseMap<GlobalVariable *, float> GlobalBenefit;
++  // MapVector, not DenseMap: the iteration below turns this into the candidate
++  // list, and the only ordering applied later is a stable_sort on benefit -- so
++  // equal-benefit candidates keep this order. A DenseMap keyed by
++  // GlobalVariable * iterates in pointer-hash order, i.e. by heap address, so
++  // ties were broken differently on every process execution and the zero page's
++  // last free byte went to a different global each build. MapVector keeps the
++  // deterministic MachineInstr walk order below.
++  MapVector<GlobalVariable *, float> GlobalBenefit;
+   for (MachineBasicBlock &MBB : MF) {
+     for (MachineInstr &MI : MBB) {
+       for (const MachineOperand &MO : MI.operands()) {
+@@ -701,7 +714,11 @@
+ 
+       // Find all calls within the SCC and propagate entry frequencies across
+       // the edges.
+-      DenseMap<const Function *, float> CalleeFreqs;
++      // MapVector, not DenseMap: the iteration below accumulates these into
++      // EntryFreqs with float +=, which is not associative, so a pointer-hash
++      // iteration order perturbed every derived benefit in its last ULP and
++      // broke near-ties as well as exact ones.
++      MapVector<const Function *, float> CalleeFreqs;
+       for (Function *F : Component->Funcs) {
+         LLVM_DEBUG(dbgs() << "    " << F->getName() << "\n");
+         MachineFunction *MF = MMI->getMachineFunction(*F);
+diff --git a/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll
+@@ -0,0 +1,58 @@
++; RUN: llc -mtriple=mos -zp-avail=4 -verify-machineinstrs < %s | FileCheck %s
++
++; Zero page allocation must be deterministic.
++;
++; Every one of these globals is stored exactly once from the same basic block,
++; so MOSZeroPageAlloc computes the identical benefit (2 * 1.0 / 1) for all eight
++; and only four of them fit in the zero page. The winners are therefore decided
++; entirely by the order in which candidates were collected, which must be the
++; MachineInstr walk order -- i.e. module order, g0 through g3.
++;
++; Before the fix, collectCandidates() accumulated benefits in a
++; DenseMap<GlobalVariable *, float> and iterated it to build the candidate list;
++; that iterates in pointer-hash order, i.e. by heap address, and the subsequent
++; stable_sort on benefit leaves ties in exactly that order. The winning set then
++; differed on every process execution: 20 runs of this file produced six
++; distinct outcomes, of which the correct one below occurred 3 times in 40.
++
++target triple = "mos"
++
++@g0 = global i8 undef, align 1
++@g1 = global i8 undef, align 1
++@g2 = global i8 undef, align 1
++@g3 = global i8 undef, align 1
++@g4 = global i8 undef, align 1
++@g5 = global i8 undef, align 1
++@g6 = global i8 undef, align 1
++@g7 = global i8 undef, align 1
++
++; The first four globals collected win the zero page and are addressed with
++; mos8(); the rest keep absolute addressing.
++
++; CHECK-LABEL: main:
++; CHECK:      stx mos8(g0)
++; CHECK:      stx mos8(g1)
++; CHECK:      stx mos8(g2)
++; CHECK:      stx mos8(g3)
++; CHECK:      stx g4
++; CHECK:      stx g5
++; CHECK:      stx g6
++; CHECK:      stx g7
++
++; CHECK:      .type g0,@object
++; CHECK-NEXT: .section .zp.noinit
++; CHECK:      .type g4,@object
++; CHECK-NEXT: .section .noinit
++
++define void @main() {
++entry:
++  store volatile i8 1, ptr @g0, align 1
++  store volatile i8 2, ptr @g1, align 1
++  store volatile i8 3, ptr @g2, align 1
++  store volatile i8 4, ptr @g3, align 1
++  store volatile i8 5, ptr @g4, align 1
++  store volatile i8 6, ptr @g5, align 1
++  store volatile i8 7, ptr @g6, align 1
++  store volatile i8 8, ptr @g7, align 1
++  ret void
++}

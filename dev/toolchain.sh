@@ -75,6 +75,7 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0001-320-far-addrspace
   apply_patch 0002-321-accum16
   apply_patch 0020-mos-65816-block-move-bank-order
+  apply_patch 0021-mos-zp-alloc-deterministic
   # generic-LLVM + clang half only; the MOS-dir half is already inside 0002
   apply_patch 0006-320-packed24 \
     --include='clang/*' --include='llvm/include/*' --include='llvm/lib/CodeGen/*'
