@@ -32,6 +32,17 @@ static inline void video_hud_text(uint8_t row, uint8_t col, const char *text) {
   }
 }
 
+static inline void video_hud_line(uint8_t row, const char *text) {
+  uint8_t col = 0u;
+  REG_VMAIN = VMAIN_INC_HIGH_1;
+  REG_VMADD = (uint16_t)(VIDEO_HUD_MAP_WORD + (uint16_t)row * VIDEO_HUD_COLS);
+  while (col++ != VIDEO_HUD_COLS) {
+    uint8_t ch = *text ? (uint8_t)*text++ : (uint8_t)' ';
+    REG_VMDATA = (ch >= FONT8_FIRST && ch < FONT8_FIRST + FONT8_N)
+        ? (uint16_t)(ch - FONT8_FIRST) : 0u;
+  }
+}
+
 static inline void video_hud_arm(void) {
   REG_HDMAEN = 0u;
   REG_DMAP1 = 0u; REG_BBAD1 = 0x05u;

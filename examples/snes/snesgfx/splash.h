@@ -62,7 +62,7 @@ static void splash_show(const char *l0, const char *l1, uint16_t frames) {
   _splash_line(14u, l1);
 
   REG_TM       = TM_BG3;
-  REG_NMITIMEN = NMITIMEN_NMI;
+  REG_NMITIMEN = NMITIMEN_NMI | NMITIMEN_AUTOJOY;
   REG_INIDISP  = INIDISP_ON;                 /* screen on */
   while (frames--) { (void)REG_RDNMI; snes_wait_vblank(); }
 

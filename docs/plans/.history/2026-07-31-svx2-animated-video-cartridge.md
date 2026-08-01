@@ -1,10 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/79bb73b) | Keep SVX2 dashboard active across video cut |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/427632a) | snes: combine both Artemis video corpora |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/bd344a1) | snes: ship complete 300-frame SVX2 reel |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/d71d298) | Add animated SVX2 video cartridge |
 
 <!--history-meta v1
+79bb73b	author	Will Norris
+79bb73b	added	2
+79bb73b	deleted	2
+79bb73b	files	1
 427632a	author	Will Norris
 427632a	added	5
 427632a	deleted	4

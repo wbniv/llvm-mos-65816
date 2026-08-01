@@ -3,7 +3,9 @@
 
 /* SNES controller input.
  *
- * Two ways to read pads:
+ * Two ways to read pads. Automatic reading is the default for ordinary
+ * frame-driven programs; reserve manual serial reads for documented timing or
+ * peripheral requirements.
  *  - Automatic: set NMITIMEN bit 0 (AUTOJOY); the CPU latches all four pads each
  *    frame into JOY1..JOY4 ($4218..$421F). Read them after the auto-read finishes
  *    (HVBJOY bit 0 clear), i.e. a little after v-blank starts.
@@ -13,7 +15,7 @@
  *
  * Facts: nocash "fullsnes", SNESdev wiki (docs/refs/snes-hardware/SOURCES.md). */
 
-#include "snes_mmio.h"
+#include "snes_cpu.h"
 
 /* ---- Manual (serial) controller access ---- */
 
@@ -96,10 +98,23 @@
 
 /* ============================ helpers ============================ */
 
+/* Wait until the hardware automatic reader has completed, then consume pad 1's
+ * coherent 16-bit sample. AUTOJOY must be enabled in NMITIMEN. Do not use this
+ * helper or REG_JOY1 as a fresh-frame sample while JOYBUSY is set. */
+static inline void snes_wait_autojoy(void) {
+  while (REG_HVBJOY & HVBJOY_JOYBUSY) { }
+}
+
+static inline uint16_t snes_read_pad1_auto(void) {
+  snes_wait_autojoy();
+  return REG_JOY1;
+}
+
 /* Read controller 1 by the MANUAL serial protocol: strobe $4016 (write 1 then 0 to latch the
  * button state), then shift 16 bits out of $4016 bit 0, MSB first. Returns the JOY_* bitmask
  * (B,Y,Select,Start,U,D,L,R,A,X,L,R in bits 15..4; the low nibble is the controller signature).
- * Requires auto-joypad read OFF (NMITIMEN bit0 = 0 — crt0 leaves it 0); otherwise the hardware
+ * This is not the normal frame-loop API. Requires auto-joypad read OFF (NMITIMEN bit0 = 0 —
+ * crt0 leaves it 0); otherwise the hardware
  * auto-reader and this manual read fight over $4016. (Auto-read alternative: set NMITIMEN bit0,
  * wait HVBJOY bit0 == 0 each frame, then read the REG_JOY1 word.) */
 static inline uint16_t snes_read_pad1(void) {

@@ -7,6 +7,8 @@
 
 **Full-reel continuation:** [`2026-07-31-svx2-full-artemis-reel.md`](2026-07-31-svx2-full-artemis-reel.md)
 
+**60 fps continuation:** [`2026-08-01-svx2-60-fps-full-pipeline.md`](2026-08-01-svx2-60-fps-full-pipeline.md)
+
 ## Goal
 
 Build and publish a real SNES ROM that continuously plays computer-graphics video from the

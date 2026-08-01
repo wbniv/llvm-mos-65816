@@ -47,7 +47,7 @@ static inline void display_init(Display *d) {
   d->btgt   = INIDISP_ON;                   /* until a fade is requested (display_fade_to)        */
   REG_BGMODE   = BGMODE_1;                  /* BG1/BG2 4bpp, BG3 2bpp */
   REG_TM       = 0;                          /* all layers off until drawables enable theirs */
-  REG_NMITIMEN = NMITIMEN_NMI;              /* enable the v-blank NMI flag so snes_wait_vblank() works */
+  REG_NMITIMEN = NMITIMEN_NMI | NMITIMEN_AUTOJOY; /* v-blank pacing + default automatic pad latch */
 }
 
 /* Add a drawable, reserve its VRAM / set its layer registers, and enable its layer on the main

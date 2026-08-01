@@ -67,6 +67,13 @@ svx_decode_payload_wram_asm:
   inc
   sta __rc8
   rep #$20
+  /* The video reel deliberately decodes in place. A previous-copy span is
+     then already present at the destination; advancing the two equal cursors
+     is sufficient and avoids an MVN of bytes onto themselves. Keep the
+     original path for callers that provide distinct previous/output buffers. */
+  lda __rc2
+  cmp __rc4
+  beq .Lsvx_wram_delta_copy_inplace
   lda __rc8
   dec
   inx
@@ -78,6 +85,18 @@ svx_decode_payload_wram_asm:
   sty __rc4
   cpy __rc6
   bne .Lsvx_wram_delta_token
+  bra .Lsvx_wram_done
+.Lsvx_wram_delta_copy_inplace:
+  inx
+  stx __rc0
+  lda __rc4
+  clc
+  adc __rc8
+  sta __rc2
+  sta __rc4
+  cmp __rc6
+  beq .Lsvx_wram_done
+  brl .Lsvx_wram_delta_token
 .Lsvx_wram_done:
   pla
   sta __rc0
@@ -163,14 +182,16 @@ svx_decode_payload_asm:
   plb
   lda __rc12
   beq .Lsvx_key_literal_loop_bank0
-.Lsvx_key_literal_loop:
-  .byte $bf,$00,$00,$7f /* LDA $7F0000,X. */
-  .byte $99,$00,$00     /* STA $0000,Y through DBR=$00. */
-  inx
-  iny
-  dec __rc10
-  bne .Lsvx_key_literal_loop
-  bra .Lsvx_key_literal_done
+  /* Staged keyframe literals have a fixed high-WRAM source and bank-$00
+     destination. MVN copies the whole literal span and leaves DBR at the
+     destination bank, exactly what the parser needs. */
+  rep #$20
+  lda __rc8
+  dec
+  mvn #$7f, #$00
+  stx __rc0
+  sty __rc4
+  bra .Lsvx_key_literal_remaining
 .Lsvx_key_literal_loop_bank0:
   .byte $bd,$00,$00     /* LDA $0000,X through DBR=$00. */
   .byte $99,$00,$00     /* STA $0000,Y through DBR=$00. */
@@ -182,6 +203,7 @@ svx_decode_payload_asm:
   rep #$20
   stx __rc0
   sty __rc4
+.Lsvx_key_literal_remaining:
   lda __rc6
   sec
   sbc __rc8

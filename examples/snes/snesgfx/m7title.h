@@ -182,7 +182,7 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
 
     /* VRAM/CGRAM are set up under force-blank; enable NMI now so snes_wait_vblank() actually blocks
        (it needs the NMI to pace frames on this setup — without it the whole animation runs instantly). */
-    REG_NMITIMEN = NMITIMEN_NMI;
+    REG_NMITIMEN = NMITIMEN_NMI | NMITIMEN_AUTOJOY;
 
     /* Mode 7: BG1 only, centre=(128,112), scroll=(0,0). */
     m7_begin();

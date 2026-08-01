@@ -12,6 +12,7 @@
 #ifndef VIDEO_REEL_VBLANKS_PER_FRAME
 #define VIDEO_REEL_VBLANKS_PER_FRAME 2u
 #endif
+#define VIDEO_REEL_SOURCE_FPS (60u / VIDEO_REEL_VBLANKS_PER_FRAME)
 
 volatile uint8_t video_reel_result;
 volatile uint16_t video_reel_frame;
@@ -22,6 +23,55 @@ volatile uint16_t video_reel_deadline_slips;
 volatile uint16_t video_reel_last_crc;
 volatile uint8_t video_reel_loop_gate;
 volatile uint32_t video_reel_vblanks;
+volatile uint8_t video_reel_transport_state;
+volatile uint8_t video_reel_transport_rate;
+volatile uint8_t video_reel_seek_decode_count;
+
+#ifdef VIDEO_REEL_PROFILE
+typedef struct {
+  uint8_t stage_q1024;
+  uint8_t decode_q1024;
+  uint8_t present_q1024;
+} VideoReelProfile;
+
+volatile VideoReelProfile video_reel_profile[VIDEO_REEL_FRAME_COUNT];
+volatile uint16_t video_reel_profile_samples;
+
+typedef struct {
+  uint32_t vblank;
+  uint32_t raster;
+} VideoReelStamp;
+
+static VideoReelStamp profile_stamp(void) {
+  VideoReelStamp stamp;
+  uint16_t h, v;
+  uint8_t lo;
+  (void)REG_SLHV;
+  lo = REG_OPHCT;
+  h = (uint16_t)(lo | ((uint16_t)(REG_OPHCT & 1u) << 8));
+  lo = REG_OPVCT;
+  v = (uint16_t)(lo | ((uint16_t)(REG_OPVCT & 1u) << 8));
+  stamp.vblank = video_reel_vblanks;
+  /* video_reel_vblanks advances at the NMI boundary (scanline 225), not at
+     raster line zero. Rotate the raster coordinate to the same origin before
+     composing an absolute timestamp. */
+  v = (uint16_t)((v + 262u - 225u) % 262u);
+  stamp.raster = (uint32_t)v * 341u + h;
+  return stamp;
+}
+
+static uint32_t profile_elapsed(VideoReelStamp begin, VideoReelStamp end) {
+  /* NMI occurs once per 262-line NTSC frame. Pairing it with the raster
+     position preserves durations when a phase crosses one or more frames. */
+  return (end.vblank * (262ul * 341ul) + end.raster) -
+         (begin.vblank * (262ul * 341ul) + begin.raster);
+}
+
+static uint8_t profile_quantize(uint32_t dots) {
+  dots = (dots + 512u) >> 10;
+  return dots > 255u ? 255u : (uint8_t)dots;
+}
+#endif
 
 /* SVX2's delta spans advance source and destination together. Replacement
    spans overwrite bytes that no later span can reference, so one framebuffer
@@ -40,13 +90,28 @@ static uint8_t dashboard_frame_tick;
 static uint8_t dashboard_seconds;
 static uint8_t dashboard_minutes;
 static char dashboard_fps[5] = "00.0";
+static uint16_t transport_pad_previous;
+static uint8_t transport_hold;
+static uint8_t transport_visible;
+static uint8_t transport_hide;
+static uint8_t transport_resume;
+
+enum {
+  TRANSPORT_PLAY = 0u,
+  TRANSPORT_PAUSE = 1u,
+  TRANSPORT_STEP = 2u,
+  TRANSPORT_REVERSE = 3u,
+  TRANSPORT_FORWARD = 4u
+};
 
 static uint8_t is_keyframe(uint16_t frame) {
-#ifdef VIDEO_REEL_SECOND_START
-  return frame == 0u || frame == VIDEO_REEL_SECOND_START;
-#else
   return frame == 0u;
-#endif
+}
+
+static uint16_t wrapped_frame(int16_t frame) {
+  while (frame < 0) frame = (int16_t)(frame + VIDEO_REEL_FRAME_COUNT);
+  while (frame >= VIDEO_REEL_FRAME_COUNT) frame = (int16_t)(frame - VIDEO_REEL_FRAME_COUNT);
+  return (uint16_t)frame;
 }
 
 static char *decimal(char *out, uint16_t value, uint8_t width) {
@@ -64,6 +129,7 @@ static void update_dashboard_fields(void) {
   p = decimal(p, dashboard_minutes, 2u); *p++ = ':';
   p = decimal(p, dashboard_seconds, 2u);
   *p = 0;
+  if (transport_visible) return;
   video_hud_text(26u, 6u, line);
   video_hud_text(26u, 27u, dashboard_fps);
   if (video_reel_result != 0u && video_reel_result != 0xffu)
@@ -72,10 +138,48 @@ static void update_dashboard_fields(void) {
     video_hud_text(25u, 25u, "SLIP   ");
 }
 
+static void dashboard_normal(void) {
+  video_hud_line(25u, " SVX2 VIDEO                 PLAY");
+  video_hud_line(26u, " TIME                  FPS     ");
+  transport_visible = 0u;
+  update_dashboard_fields();
+}
+
+static void transport_draw(uint8_t state, uint8_t rate) {
+  char top[33], bottom[33];
+  char *p;
+  uint8_t i;
+  uint8_t marker = (uint8_t)(((uint32_t)video_reel_frame * 19u) /
+                             (VIDEO_REEL_FRAME_COUNT - 1u));
+  for (i = 0u; i != 32u; ++i) top[i] = bottom[i] = ' ';
+  top[32] = bottom[32] = 0;
+  p = top;
+  if (state == TRANSPORT_PAUSE) { *p++='P';*p++='A';*p++='U';*p++='S';*p++='E'; }
+  else if (state == TRANSPORT_STEP) { *p++='S';*p++='T';*p++='E';*p++='P'; }
+  else if (state == TRANSPORT_REVERSE) { *p++='R';*p++='E';*p++='V';*p++=' ';*p++=(char)('0'+rate);*p++='X'; }
+  else if (state == TRANSPORT_FORWARD) { *p++='F';*p++='W';*p++='D';*p++=' ';*p++=(char)('0'+rate);*p++='X'; }
+  else { *p++='P';*p++='L';*p++='A';*p++='Y'; }
+  top[8] = '<'; top[29] = '>';
+  for (i = 0u; i != 20u; ++i) top[9u+i] = i == marker ? '|' : (i < marker ? '=' : '-');
+  p = bottom;
+  p = decimal(p, (uint16_t)(video_reel_frame / (VIDEO_REEL_SOURCE_FPS * 60u)), 2u); *p++ = ':';
+  p = decimal(p, (uint16_t)((video_reel_frame / VIDEO_REEL_SOURCE_FPS) % 60u), 2u); *p++ = '.';
+  *p++ = (char)('0' + ((video_reel_frame % VIDEO_REEL_SOURCE_FPS) * 10u) /
+                       VIDEO_REEL_SOURCE_FPS);
+  *p++ = ' '; *p++ = '/'; *p++ = ' '; *p++ = '0'; *p++ = '0'; *p++ = ':';
+  p = decimal(p, (uint16_t)(VIDEO_REEL_FRAME_COUNT / VIDEO_REEL_SOURCE_FPS), 2u); *p++ = '.'; *p++ = '0';
+  bottom[25] = 'F';
+  p = &bottom[27]; decimal(p, video_reel_frame, 4u);
+  video_hud_line(25u, top);
+  video_hud_line(26u, bottom);
+  transport_visible = 1u;
+  transport_hide = state == TRANSPORT_PLAY ? 90u : 0u;
+}
+
 static void dashboard_presented(void) {
   uint16_t now_vblank = (uint16_t)video_reel_vblanks;
   uint16_t dv = (uint16_t)(now_vblank - fps_vblank_sample);
-  if (++dashboard_frame_tick == 30u) {
+  if (++dashboard_frame_tick == VIDEO_REEL_SOURCE_FPS) {
     dashboard_frame_tick = 0u;
     if (dashboard_minutes != 99u || dashboard_seconds != 59u) {
       if (++dashboard_seconds == 60u) {
@@ -141,14 +245,123 @@ static uint8_t stage_frame(uint16_t frame) {
 #endif
 }
 
+#ifdef VIDEO_REEL_SEEK_COUNT
+static uint8_t stage_seek_keyframe(uint8_t index) {
+  SvcSnesDmaContext context = {3u, 1u};
+  uint32_t offset = reel_seek_packet_offsets[index];
+  uint16_t remaining = (uint16_t)(reel_seek_packet_offsets[index + 1u] - offset);
+  uint16_t copied = 0u;
+  while (remaining) {
+    uint16_t address = (uint16_t)offset;
+    uint16_t segment = (uint16_t)(0u - address);
+    if (!segment || segment > remaining) segment = remaining;
+    if (!svc_snes_dma_copy_segment(&context,
+        (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16)), address,
+        (uint8_t *)(uintptr_t)(STAGE_ADDRESS + copied), segment)) return 0u;
+    offset += segment;
+    copied = (uint16_t)(copied + segment);
+    remaining = (uint16_t)(remaining - segment);
+  }
+  return 1u;
+}
+#endif
+
+#ifdef VIDEO_REEL_LOOP_DELTA
+static uint8_t stage_loop_delta(void) {
+  SvcSnesDmaContext context = {3u, 1u};
+  uint32_t offset = VIDEO_REEL_LOOP_PACKET_OFFSET;
+  uint16_t remaining = VIDEO_REEL_LOOP_PACKET_SIZE;
+  uint16_t copied = 0u;
+  while (remaining) {
+    uint16_t address = (uint16_t)offset;
+    uint16_t segment = (uint16_t)(0u - address);
+    if (!segment || segment > remaining) segment = remaining;
+    if (!svc_snes_dma_copy_segment(&context,
+        (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16)), address,
+        (uint8_t *)(uintptr_t)(STAGE_ADDRESS + copied), segment)) return 0u;
+    offset += segment;
+    copied = (uint16_t)(copied + segment);
+    remaining = (uint16_t)(remaining - segment);
+  }
+  return 1u;
+}
+#endif
+
 static void decode_frame(uint16_t frame) {
+#ifdef VIDEO_REEL_PROFILE
+  VideoReelStamp begin = profile_stamp();
+  VideoReelStamp staged;
+#endif
   if (!stage_frame(frame)) stop(1u);
+#ifdef VIDEO_REEL_PROFILE
+  staged = profile_stamp();
+#endif
   svx_decode_payload_wram_fast((uint16_t)(STAGE_ADDRESS + 9u), is_keyframe(frame),
                                framebuffer, framebuffer);
+#ifdef VIDEO_REEL_PROFILE
+  video_reel_profile[frame].stage_q1024 = profile_quantize(profile_elapsed(begin, staged));
+  video_reel_profile[frame].decode_q1024 =
+      profile_quantize(profile_elapsed(staged, profile_stamp()));
+  if (video_reel_profile_samples != VIDEO_REEL_FRAME_COUNT) ++video_reel_profile_samples;
+#endif
   ++video_reel_decoded;
 }
 
-static void present_frame(void) {
+static void decode_sequential_frame(uint16_t frame) {
+#ifdef VIDEO_REEL_LOOP_DELTA
+  if (frame == 0u) {
+#ifdef VIDEO_REEL_PROFILE
+    VideoReelStamp begin = profile_stamp();
+    VideoReelStamp staged;
+#endif
+    if (!stage_loop_delta()) stop(1u);
+#ifdef VIDEO_REEL_PROFILE
+    staged = profile_stamp();
+#endif
+    svx_decode_payload_wram_fast((uint16_t)(STAGE_ADDRESS + 9u), 0u,
+                                 framebuffer, framebuffer);
+#ifdef VIDEO_REEL_PROFILE
+    video_reel_profile[0].stage_q1024 = profile_quantize(profile_elapsed(begin, staged));
+    video_reel_profile[0].decode_q1024 =
+        profile_quantize(profile_elapsed(staged, profile_stamp()));
+#endif
+    ++video_reel_decoded;
+    return;
+  }
+#endif
+  decode_frame(frame);
+}
+
+static void seek_frame(uint16_t destination) {
+  uint16_t frame;
+#ifdef VIDEO_REEL_SEEK_INTERVAL
+  frame = (uint16_t)(destination - destination % VIDEO_REEL_SEEK_INTERVAL);
+  if (!stage_seek_keyframe((uint8_t)(frame / VIDEO_REEL_SEEK_INTERVAL))) stop(1u);
+  svx_decode_payload_wram_fast((uint16_t)(STAGE_ADDRESS + 9u), 1u, framebuffer, framebuffer);
+  ++video_reel_decoded;
+  video_reel_seek_decode_count = 1u;
+  if (frame == destination) return;
+#else
+#ifdef VIDEO_REEL_SECOND_START
+  frame = destination >= VIDEO_REEL_SECOND_START ? VIDEO_REEL_SECOND_START : 0u;
+#else
+  frame = 0u;
+#endif
+  decode_frame(frame);
+  video_reel_seek_decode_count = 1u;
+  if (frame == destination) return;
+#endif
+  while (frame != destination) {
+    ++frame;
+    decode_frame(frame);
+    ++video_reel_seek_decode_count;
+  }
+}
+
+static void present_frame(uint16_t frame) {
+#ifdef VIDEO_REEL_PROFILE
+  VideoReelStamp begin = profile_stamp();
+#endif
   REG_VMAIN = VMAIN_INC_HIGH_1;
   REG_VMADD = 0u;
   REG_DMAP0 = 0u;
@@ -159,6 +372,10 @@ static void present_frame(void) {
   REG_DAS0L = (uint8_t)SVC_FRAME_SIZE;
   REG_DAS0H = (uint8_t)(SVC_FRAME_SIZE >> 8);
   REG_MDMAEN = 1u;
+#ifdef VIDEO_REEL_PROFILE
+  video_reel_profile[frame].present_q1024 =
+      profile_quantize(profile_elapsed(begin, profile_stamp()));
+#endif
   ++video_reel_presented_total;
 }
 
@@ -206,15 +423,77 @@ static void setup_display(void) {
   m7_set_center(0, 0);
   m7_set_scroll(0, 0);
   video_hud_begin();
-  video_hud_text(25u, 1u, "SVX2 VIDEO");
-  video_hud_text(25u, 28u, "PLAY");
-  video_hud_text(26u, 1u, "TIME");
-  video_hud_text(26u, 23u, "FPS");
+  dashboard_normal();
 }
 
 static void wait_vblank_fresh(void) {
   (void)REG_RDNMI;
   snes_wait_vblank();
+}
+
+static uint8_t transport_seek(int16_t delta, uint8_t state, uint8_t rate) {
+  uint16_t destination = wrapped_frame((int16_t)video_reel_frame + delta);
+  seek_frame(destination);
+  wait_vblank_fresh();
+  present_frame(destination);
+  video_reel_frame = destination;
+  video_reel_transport_state = state;
+  video_reel_transport_rate = rate;
+  transport_draw(state, rate);
+  return 1u;
+}
+
+static uint8_t transport_poll(void) {
+  uint16_t pad = snes_read_pad1_auto();
+  uint16_t pressed = (uint16_t)(pad & (uint16_t)~transport_pad_previous);
+  uint8_t changed = 0u;
+  transport_pad_previous = pad;
+  if (pressed & JOY_START) {
+    video_reel_transport_state = video_reel_transport_state == TRANSPORT_PLAY
+        ? TRANSPORT_PAUSE : TRANSPORT_PLAY;
+    video_reel_transport_rate = 0u;
+    transport_draw(video_reel_transport_state, 0u);
+    changed = 1u;
+  } else if (pressed & JOY_A) {
+    video_reel_transport_state = TRANSPORT_PLAY;
+    video_reel_transport_rate = 0u;
+    transport_draw(TRANSPORT_PLAY, 0u);
+    changed = 1u;
+  } else if (pressed & JOY_L) {
+    video_reel_transport_state = TRANSPORT_PAUSE;
+    changed = transport_seek(-1, TRANSPORT_STEP, 0u);
+  } else if (pressed & JOY_R) {
+    video_reel_transport_state = TRANSPORT_PAUSE;
+    changed = transport_seek(1, TRANSPORT_STEP, 0u);
+  }
+  if ((pad & (JOY_LEFT | JOY_RIGHT)) == (JOY_LEFT | JOY_RIGHT)) {
+    transport_hold = 0u;
+  } else if (pad & (JOY_LEFT | JOY_RIGHT)) {
+    uint8_t rate;
+    uint8_t period;
+    if (transport_hold == 0u)
+      transport_resume = video_reel_transport_state == TRANSPORT_PLAY;
+    if (transport_hold != 255u) ++transport_hold;
+    rate = transport_hold >= 60u ? 8u : transport_hold >= 30u ? 4u : 2u;
+    period = rate == 8u ? 2u : rate == 4u ? 4u : 8u;
+    if (transport_hold == 1u || transport_hold % period == 0u) {
+      int16_t delta = (pad & JOY_LEFT) ? -30 : 30;
+      changed = transport_seek(delta, (pad & JOY_LEFT) ? TRANSPORT_REVERSE : TRANSPORT_FORWARD,
+                               rate);
+    }
+  } else {
+    if (transport_hold) {
+      video_reel_transport_state = transport_resume ? TRANSPORT_PLAY : TRANSPORT_PAUSE;
+      video_reel_transport_rate = 0u;
+      transport_draw(video_reel_transport_state, 0u);
+      changed = 1u;
+    }
+    transport_hold = 0u;
+  }
+  if (video_reel_transport_state == TRANSPORT_PLAY && transport_visible && transport_hide) {
+    if (--transport_hide == 0u) dashboard_normal();
+  }
+  return changed;
 }
 
 void video_reel_run(void) {
@@ -224,9 +503,16 @@ void video_reel_run(void) {
   video_reel_result = 0xffu;
   video_reel_loop_gate = 0xffu;
   video_reel_deadline_slips = 0u;
+  video_reel_transport_state = TRANSPORT_PLAY;
+  video_reel_transport_rate = 0u;
+  video_reel_seek_decode_count = 0u;
 
   /* Exercise the stream boundaries behind a short animated introduction. */
+#if VIDEO_REEL_VBLANKS_PER_FRAME == 1u
+  m7splash_begin("FASTROM 60 TEST", "SVX2 VIDEO");
+#else
   m7splash_begin("FASTROM 30 FPS", "SVX2 VIDEO");
+#endif
 
   /* Target proof: validate the exact embedded sequence and its keyframe reset
      behind the title before allowing video playback to begin. */
@@ -245,7 +531,7 @@ void video_reel_run(void) {
      so the title remains an introduction rather than a loading screen. */
   decode_frame(0u);
 #ifdef VIDEO_REEL_SECOND_START
-  decode_frame(VIDEO_REEL_SECOND_START);
+  seek_frame(VIDEO_REEL_SECOND_START);
 #endif
 #endif
   decode_frame(0u);
@@ -258,9 +544,9 @@ void video_reel_run(void) {
   m7splash_end(30u);
 
   setup_display();
-  REG_NMITIMEN = NMITIMEN_NMI;
+  REG_NMITIMEN = NMITIMEN_NMI | NMITIMEN_AUTOJOY;
   wait_vblank_fresh();
-  present_frame();
+  present_frame(0u);
   deadline = (uint16_t)video_reel_vblanks + VIDEO_REEL_VBLANKS_PER_FRAME;
   video_reel_frame = 0u;
   video_reel_result = 0u;
@@ -275,6 +561,13 @@ void video_reel_run(void) {
 
   for (;;) {
     uint8_t palette_cut;
+    if (transport_poll())
+      deadline = (uint16_t)video_reel_vblanks + VIDEO_REEL_VBLANKS_PER_FRAME;
+    if (video_reel_transport_state != TRANSPORT_PLAY) {
+      uint16_t now = (uint16_t)video_reel_vblanks;
+      while ((uint16_t)video_reel_vblanks == now) __asm__ volatile("wai");
+      continue;
+    }
     frame = (uint16_t)(video_reel_frame + 1u);
     if (frame == VIDEO_REEL_FRAME_COUNT) frame = 0u;
 #ifdef VIDEO_REEL_SECOND_PALETTE
@@ -282,7 +575,7 @@ void video_reel_run(void) {
 #else
     palette_cut = 0u;
 #endif
-    decode_frame(frame);
+    decode_sequential_frame(frame);
     while ((int16_t)((uint16_t)video_reel_vblanks - deadline) < 0)
       __asm__ volatile("wai");
     if ((uint16_t)video_reel_vblanks != deadline) {
@@ -297,9 +590,11 @@ void video_reel_run(void) {
       upload_palette(frame == VIDEO_REEL_SECOND_START);
     }
 #endif
-    present_frame();
+    present_frame(frame);
     dashboard_presented();
     video_reel_frame = frame;
+    if (transport_visible)
+      transport_draw(video_reel_transport_state, video_reel_transport_rate);
     deadline = (uint16_t)(deadline + VIDEO_REEL_VBLANKS_PER_FRAME);
     if (frame == 0u && video_reel_loop_gate != 0u) {
       static uint8_t loops;
