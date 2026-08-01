@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <bsnes.hpp>
+#include "settings.hpp"  // SuperFamicom::configuration — entropy is not on the public Bsnes API
 #include "png_write.h"   // dependency-free RGB8 PNG writer (shared with tools/mandel-render.c)
 
 #if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
@@ -147,6 +148,56 @@ static int leading_black_rows(void) {
     n++;
   }
   return n;
+}
+
+// ---- per-frame picture change log (JGX_FRAMESCAN) ---------------------------------------------
+//
+// "Does this ROM's picture SETTLE, or does it keep changing?" A PNG dump answers that for exactly
+// one frame. Answering it for a whole run by re-emulating to frame N for every N is O(frames^2) —
+// ~9 s per sample at 1800 frames. This walks the same buffer the PNG dump walks, once per frame,
+// and prints only the frames where the picture CHANGED. A settled ROM prints two or three lines;
+// a flickering one prints hundreds. One run, O(frames).
+//
+// The state fingerprinted after run() number k is EXACTLY the state a separate `frames=k` run would
+// have dumped to PNG (same buffer, same point in the loop, deterministic core) — that equivalence
+// is what lets a single scan stand in for a whole sweep of PNG dumps, and dev/cartsize-canary.sh
+// re-checks it against real dumps.
+//
+// Crop matches leading_black_rows (yoff 8 on a 240-line buffer) — i.e. what a browser shows, NOT
+// the yoff=0 default of dump_png, whose top 8 rows are buffer lines the PPU never writes.
+struct FrameFp { uint32_t hash; uint32_t dom; int dompct; bool overflow; };
+
+static FrameFp frame_fingerprint(void) {
+  FrameFp f = {0u, 0u, -1, false};
+  if (!g_pitch || !vbuf || !g_h) return f;
+  const int yoff = (g_h >= 232) ? 8 : 0;
+  const int rows = ((int)g_h - yoff) < 224 ? ((int)g_h - yoff) : 224;
+  const int step = (g_w >= 512) ? 2 : 1;
+  const int cols = (int)g_w / step;
+  // Flat-backdrop pictures have a handful of distinct colours, so a 16-entry direct table finds the
+  // modal colour without a real histogram; `overflow` marks the pictures too busy for it to mean
+  // anything, and the hash (which is exact, over every pixel) carries the change detection either way.
+  uint32_t col[16]; long cnt[16]; int ncol = 0;
+  uint32_t h = 2166136261u;
+  long total = 0;
+  for (int y = 0; y < rows; y++) {
+    for (int x = 0; x < cols; x++) {
+      uint32_t px = vbuf[(size_t)(y + yoff) * g_pitch + (size_t)x * step] & 0x00FFFFFFu;
+      h ^= px; h *= 16777619u;
+      total++;
+      int k = 0;
+      for (; k < ncol; k++) if (col[k] == px) { cnt[k]++; break; }
+      if (k == ncol) {
+        if (ncol < 16) { col[ncol] = px; cnt[ncol] = 1; ncol++; }
+        else f.overflow = true;
+      }
+    }
+  }
+  int best = 0;
+  for (int k = 1; k < ncol; k++) if (cnt[k] > cnt[best]) best = k;
+  f.hash = h;
+  if (ncol) { f.dom = col[best]; f.dompct = total ? (int)((cnt[best] * 100) / total) : -1; }
+  return f;
 }
 
 // Flag frames whose leading-black-row count is a LOCAL MAXIMUM exceeding both neighbours by
@@ -325,6 +376,23 @@ int main(int argc, char **argv) {
   Bsnes::setAudioSpec({48000.0, (48000 / 60) << 1, 0, inbuf, nullptr, &audioFrame});
   Bsnes::setVideoSpec({vbuf, nullptr, &videoFrame});
 
+  // JGX_ENTROPY — power-on randomness. 0 = None, 1 = Low (bsnes-jg's default), 2 = High.
+  //
+  // This is NOT a cosmetic knob. System::power() calls random.entropy(configuration.entropy), and
+  // Random::seed() seeds from clock() — so at the default (Low) EVERY RUN OF THE SAME ROM POWERS ON
+  // WITH DIFFERENT STATE: WRAM (cpu.cpp), and, decisively for anything that looks at the picture,
+  // PPU registers the ROM never wrote — per-BG tiledata/screen address, tile size, the BG and OBJ
+  // *enable* bits, window enables, interlace (ppu.cpp power()). A ROM that leaves any of that
+  // unset renders a DIFFERENT PICTURE run to run while its computed WRAM result stays perfectly
+  // deterministic. That is a real ROM defect (incomplete PPU init), but it is invisible to a WRAM
+  // assert and it makes any screenshot gate irreproducible, so the two have to be separated:
+  //   * a picture gate sets JGX_ENTROPY=0 and gets a reproducible reference frame;
+  //   * a robustness gate sweeps 1/2 and asserts the picture is the SAME as the entropy=0 one,
+  //     which is what proves the ROM initialises everything it depends on. Real hardware powers on
+  //     with arbitrary state, and the site's WASM player is this same core at its default entropy.
+  // Not on the public Bsnes API, hence the settings.hpp include.
+  if (const char *e = getenv("JGX_ENTROPY")) SuperFamicom::configuration.entropy = (unsigned)atoi(e);
+
   if (!Bsnes::load()) { printf("SMOKE: FAIL (bsnes-jg load failed)\n"); return 1; }
   Bsnes::power();
   Bsnes::setInputSpec({0, Bsnes::Input::Device::Gamepad, nullptr, pollInput});
@@ -366,9 +434,31 @@ int main(int argc, char **argv) {
     }
   }
 
+  // JGX_FRAMESCAN=1 — per-frame picture change log (see frame_fingerprint). Also O(frames).
+  const bool framescan = getenv("JGX_FRAMESCAN") != nullptr;
+  const int framescan_max = getenv("JGX_FRAMESCAN_MAX") ? atoi(getenv("JGX_FRAMESCAN_MAX")) : 40;
+  FrameFp prev = {1u, 0u, -2, false};   // hash 1 never collides with a real FNV-1a run here
+  FrameFp last = prev;
+  int changes = 0, first_change = -1, last_change = -1;
+
   for (int i = 0; i < frames; ++i) {
     Bsnes::run();
     if (blankscan) blacktop.push_back(leading_black_rows());
+    if (framescan) {
+      FrameFp f = frame_fingerprint();
+      if (f.hash != prev.hash) {
+        if (changes < framescan_max)
+          printf("FRAMESCAN: f=%d hash=%08X dom=#%06X pct=%d%s\n",
+                 i + 1, f.hash, f.dom, f.dompct, f.overflow ? " (>16 colours)" : "");
+        else if (changes == framescan_max)
+          printf("FRAMESCAN: ... (further changes suppressed; raise JGX_FRAMESCAN_MAX)\n");
+        changes++;
+        if (first_change < 0) first_change = i + 1;
+        last_change = i + 1;
+        prev = f;
+      }
+      last = f;
+    }
 #if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
     g_frame++;
 #endif
@@ -383,6 +473,14 @@ int main(int argc, char **argv) {
       fprintf(stderr, "jgxcheck: JGX_POLL matched at frame %d of %d budgeted\n", polled_at, frames);
     else
       fprintf(stderr, "jgxcheck: JGX_POLL never matched within %d frames\n", frames);
+  }
+
+  if (framescan) {
+    printf("FRAMESCAN: %d change(s) in %d frames; first=%d last=%d; "
+           "held %d frame(s) to the end; final hash=%08X dom=#%06X pct=%d\n",
+           changes, frames, first_change, last_change,
+           last_change > 0 ? frames - last_change : frames,
+           last.hash, last.dom, last.dompct);
   }
 
   if (blankscan) {

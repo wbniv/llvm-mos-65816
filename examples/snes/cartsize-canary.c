@@ -95,7 +95,7 @@ static uint16_t fold_span(uint8_t first, uint8_t nseg) {
 // The visible verdict: a full-screen backdrop colour. GREEN = every canary,
 // mirror and span read the modelled byte; RED = at least one did not.
 //
-// Two real bugs were fixed getting here, and one red herring resolved:
+// Three real bugs were fixed getting here:
 //
 //   1. Layers were never disabled. This ROM uploads no tiles, so whatever the
 //      PPU still had enabled composited uninitialised VRAM over the backdrop --
@@ -103,14 +103,25 @@ static uint16_t fold_span(uint8_t first, uint8_t nseg) {
 //   2. CGRAM was written during active display. It is only writable in v-blank
 //      or force-blank (the repo's standing rule), so the palette landed
 //      half-applied and the picture came out split.
-//   3. RED HERRING: the picture still differed per capture frame afterwards.
-//      That is NOT this ROM. jgxcheck dumps whatever is in its video buffer
-//      after N Bsnes::run() calls, which for a ROM holding a static picture can
-//      be a stale or partially rendered frame. examples/snes/hello.c -- 25
-//      lines, known good, its published page solid green -- shows the same
-//      thing: green at 700 frames, mixed at 1100, 100% black at 1800. A browser
-//      renders continuously and shows a steady picture, which is why nobody had
-//      noticed. Do not "fix" a ROM against a single jgxcheck screenshot.
+//   3. The rest of the PPU was still inherited, not set. Fixing (1) by zeroing
+//      TM/TS/BGMODE covered 3 of the ~48 control registers; mosaic, the window
+//      masks and colour math stayed at their power-on values. bsnes-jg
+//      RANDOMISES those at every power-on, from a clock() seed
+//      (settings.hpp entropy=1 "Low" -> system.cpp System::power ->
+//      random.cpp seed()), so the same ROM at the same frame count rendered a
+//      different picture every run: a random colour-math enable adds or
+//      subtracts a random fixed colour from the green backdrop (#8CFFCE,
+//      #003A00, #EF20B5 ...), and a random window mask clips it to black.
+//      The WRAM oracle never wavered because the ROM COMPUTES it; the backdrop
+//      wavered because the ROM INHERITED it. snes_ppu_reset_blank() below is
+//      the SDK's remedy for exactly this, and its doc comment says so.
+//
+//      This is what the note that used to sit here called a jgxcheck capture
+//      artifact -- "hello.c is green at 700 frames, mixed at 1100, black at
+//      1800". Those are three separate RUNS, not three frames of one run; with
+//      the power-on pinned (JGX_ENTROPY=0) hello.c is solid green at all three.
+//      The claim is withdrawn. Measure a picture across REPEATED runs at one
+//      frame count before blaming the harness for changing it.
 //
 // The authoritative verdict remains the WRAM pair `canary_status` /
 // `corpus_result`, which both emulator gates assert directly; the backdrop is
@@ -135,10 +146,10 @@ static void wait_vblank_poll(void) {
 // display is what left the picture half one colour and half another.
 static void paint(uint16_t bg) {
   wait_vblank_poll();
-  // Disable every layer. This ROM uploads no tiles, so anything the PPU still
-  // has enabled composites uninitialised VRAM over the backdrop -- which is
-  // what the tan/green tile field was. Never rely on a register's power-on
-  // value when you depend on it.
+  // Layers off. snes_ppu_reset_blank() already did this at boot along with
+  // every other control register; re-asserting the three that would actually
+  // put pixels over the backdrop keeps the picture correct after a stray write,
+  // and costs three stores a frame.
   REG_TM = 0;  // main screen: no BG, no OBJ
   REG_TS = 0;  // sub screen likewise
   REG_BGMODE = 0;
@@ -162,6 +173,12 @@ static void screen_running(void) {
 int main(void) {
   uint16_t h = 0;
   uint16_t status = 0;
+
+  // FIRST, before anything touches the screen: force-blank and zero every PPU
+  // control register. Power-on leaves them indeterminate and bsnes-jg fills
+  // them with clock()-seeded noise, so without this the picture -- though not
+  // the WRAM verdict -- is different on every single boot. See note 3 above.
+  snes_ppu_reset_blank();
 
   // Reset detector: if main() is re-entered, boot_magic already holds the magic
   // and boot_count climbs. progress records how far the previous pass got.

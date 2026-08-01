@@ -151,13 +151,52 @@ print(m.group(1))")
       # verdict on screen, so the PNG is both the publication preview and a
       # second, human-readable witness that the WRAM value is not a fluke.
       png=""; [ "$sym" = "corpus_result" ] && png="$BUILD/cartsize-$tag.png"
-      if line="$("$BUILD/jgxcheck" "$ROM" "$ROOT/vendor/bsnes-jg/Database" "0x$vma" "$len" "$want" "$JG_FRAMES" ${png:+"$png"} 2>&1)"; then
+      if line="$(JGX_ENTROPY=0 "$BUILD/jgxcheck" "$ROM" "$ROOT/vendor/bsnes-jg/Database" "0x$vma" "$len" "$want" "$JG_FRAMES" ${png:+"$png"} 2>&1)"; then
         echo "  $sym: $line"
         [ -n "$png" ] && [ -f "$png" ] && echo "  screenshot: $png"
       else
         echo "  $sym: $line"; rc=1
       fi
     done
+
+    # 6b) THE PICTURE MUST NOT DEPEND ON POWER-ON STATE.
+    #
+    # bsnes-jg reseeds from clock() at every power-on (settings.hpp entropy
+    # defaults to 1 = Low) and fills the PPU control registers the ROM never
+    # wrote with noise -- BG/OBJ enables, mosaic, window masks, colour math. A
+    # ROM that inherits any of them renders a different picture every single
+    # boot while its computed WRAM result stays perfectly deterministic, so the
+    # assertions above cannot see it. That is exactly how the unstable backdrop
+    # got mistaken for a jgxcheck capture artifact
+    # (docs/plans/2026-08-01-cartsize-canary-display-nondeterminism.md).
+    #
+    # So: fingerprint the picture across None/Low/High, twice each at the SAME
+    # frame count. All six must be the one hash. This fails on any register the
+    # ROM depends on but does not set, and it does not care which random value
+    # happened to come up. Repeats matter -- a single Low run agrees with None
+    # by luck often enough to be useless as evidence.
+    echo "==> 6b) picture is independent of power-on entropy (None/Low/High x2)"
+    fps=""
+    for ent in 0 0 1 1 2 2; do
+      fp="$(JGX_ENTROPY=$ent JGX_FRAMESCAN=1 JGX_FRAMESCAN_MAX=0 \
+            "$BUILD/jgxcheck" "$ROM" "$ROOT/vendor/bsnes-jg/Database" 0x0 1 0x00 "$JG_FRAMES" 2>/dev/null \
+            | sed -n 's/.*final hash=\([0-9A-F]*\) dom=#\([0-9A-F]*\).*/\1:#\2/p')"
+      fps="$fps $ent=${fp:-NONE}"
+    done
+    uniq_n=$(printf '%s\n' $fps | sed 's/^[0-9]*=//' | sort -u | wc -l)
+    if printf '%s\n' $fps | grep -q '=NONE$'; then
+      # An older jgxcheck ignores JGX_FRAMESCAN and prints nothing, which would make all six
+      # "agree" on the empty string and pass this guard vacuously. Say so instead.
+      echo "  FAIL: jgxcheck printed no FRAMESCAN line -- rebuild it (dev/run.sh xcheck)"
+      rc=1
+    elif [ "$uniq_n" = 1 ]; then
+      echo "  PASS: one picture across all six boots ($(printf '%s\n' $fps | head -1 | sed 's/^[0-9]*=//'))"
+    else
+      echo "  FAIL: $uniq_n distinct pictures across six boots -- the ROM inherits PPU state it"
+      echo "        never sets. Call snes_ppu_reset_blank() before touching the screen."
+      for f in $fps; do echo "          entropy $f"; done
+      rc=1
+    fi
   else
     echo "==> 6) bsnes-jg: SKIP (run dev/run.sh xcheck first to build build/jgxcheck)"
   fi
