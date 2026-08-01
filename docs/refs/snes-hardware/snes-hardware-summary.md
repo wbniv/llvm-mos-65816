@@ -59,6 +59,32 @@ WRAM port (`$2180`–`$2183`) or with a 65816 far pointer (the `+mos-a16` far pa
 A **FastROM** board + `MEMSEL` ($420D) bit 0 run banks `$80`+ at 3.58 MHz instead of
 2.68 MHz.
 
+## Controller input: automatic by default
+
+For an ordinary frame-driven game or demo, enable the SNES automatic joypad reader and consume its
+latched result instead of bit-banging the serial ports in the main loop:
+
+```c
+REG_NMITIMEN = NMITIMEN_NMI | NMITIMEN_AUTOJOY;
+
+/* Once per frame, after the automatic reader has completed. */
+uint16_t pad = snes_read_pad1_auto();
+```
+
+AUTOJOY starts a hardware read each frame and publishes controller 1 at `$4218/$4219`. The latch is
+not a coherent fresh sample while `$4212.JOYBUSY` is set; `snes_read_pad1_auto()` waits for that bit
+to clear. Keep a previous sample in WRAM to derive pressed and released edges.
+
+Use manual `$4016/$4017` polling only for a documented timing or peripheral requirement. Automatic
+and manual reads must not run together because both operate the controller serial interface. Also
+remember that `$4200` is a control register with NMI, IRQ, and AUTOJOY bits: a later literal write of
+`NMITIMEN_NMI` silently disables automatic input. Display, title, and interrupt transitions must
+restore the complete intended mask.
+
+A time-critical NMI may deliberately consume the previous frame's already completed `$4218` latch
+instead of waiting for the current JOYBUSY interval. That is a one-frame-latency architecture and
+must be documented and tested; it is not permission to read a latch while it is being updated.
+
 ## Video (PPU)
 
 The PPU has **no linear framebuffer**. You upload three things into its private memories

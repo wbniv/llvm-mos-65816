@@ -60,6 +60,28 @@ for overhead. `BitmapCanvas` caps its per-frame flush at `CANVAS_FLUSH_TILES = 6
 16 bytes = **1 024 bytes** — designed to fit. A 32×28 full-screen tilemap (896 × 2 = 1 792
 bytes) does NOT fit one V-blank; either cap with a dirty-range window or split across frames.
 
+**Joypad input:** automatic reading is the default. `display_init()` enables
+`NMITIMEN_AUTOJOY`; poll the completed latch through the shared controller object:
+
+```c
+Controller pad;
+controller_init(&pad);
+
+for (;;) {
+  controller_poll(&pad);              /* waits out JOYBUSY, then reads REG_JOY1 */
+  uint16_t held = controller_held(&pad);
+  uint16_t pressed = controller_pressed(&pad);
+  /* update, draw, display_frame() */
+}
+```
+
+Do not call `snes_read_pad1()` in a normal frame loop: it performs a manual `$4016` serial read and
+requires AUTOJOY to be disabled. Manual polling is reserved for reviewed timing/peripheral
+exceptions. Never combine the two mechanisms, and never restore `$4200` with a literal
+`NMITIMEN_NMI` if the program owns automatic input. Deadline-sensitive demos must include input in
+their exact cadence/slip gate; the SVX2 transport work demonstrated that an otherwise small manual
+poll was enough to create presentation slips.
+
 ---
 
 ## snesgfx component guide
@@ -558,6 +580,3 @@ end-to-end; `mvscrl.c` is the most **modern gate/corpus exemplar** (5-way bar + 
 presentation + precise legalizer-corner comments) — read both before writing a new demo. The
 **LZSS Gallery** is a *reference*, not a template: by far the largest demo, read it for the
 far-data, self-check, and dashboard patterns rather than as a starting skeleton.
-
-(Dropped from this table 2026-07-31: Spirograph (#11) — its techniques, sin/cos LUT + mul on
-`BitmapCanvas`+`TextLayer`, are now fully covered by the spigot and truncstair rows.)
