@@ -34,7 +34,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 - [wip T4] **Per-image "Verify fidelity" button — mechanism DECIDED + ROM half DONE
-  (2026-07-31); player-package half ESCALATED.** <!-- agent:a44b395bf4fcdd1fc -->
+  (2026-07-31); player-package half ESCALATED.** <!-- agent:a5850a8d3df7af344 -->
   Chosen mechanism (c), superseding both briefed candidates: the ROM already verifies each work
   as it displays it, so it publishes a 5-byte `gallery_shown{z,work,ok,state}` record (state =
   publication barrier) and the player polls it in a new `mode: "live-record"`, comparing `z`
@@ -57,13 +57,13 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   `sync-manifest-offsets.py` already honours `selfcheck.symbol`. Manifest wiring blocked until the
   post-fix gallery republish ships a byte-identical rebuilt ROM. (T4: mechanism is a design call
   spanning ROM + player.)
-- [wip T2] **Full 62-work *visual* corpus sweep (~2.5 h) — post-A-clobber-fix confirmation.** <!-- agent:a2109aee659307654 --> Bench
+- [wip T2] **Full 62-work *visual* corpus sweep (~2.5 h) — post-A-clobber-fix confirmation.** <!-- agent:a08fd2c816716414c --> Bench
   gate (presentation stripped) covers all 62; the visual ROM is verified only over works 0–3 at
   40k frames — a presentation-path interaction beyond work 3 would slip both. Run once, record
   into the [abi-clobber plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md) and the
   #137 completion record.
 - [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
-  test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:a75d84d7b58466d17 -->
+  test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:af681e8a1b2ac9191 -->
   Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
   uninitialised VRAM; CGRAM written during active display, now HVBJOY-synced — plus a repo-wide
   harness finding: `jgxcheck` PNG dumps of *static-picture* ROMs can capture stale/partial frames,
