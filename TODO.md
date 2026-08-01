@@ -65,17 +65,32 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 - [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
   test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:af681e8a1b2ac9191 -->
   Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
-  uninitialised VRAM; CGRAM written during active display, now HVBJOY-synced — plus a repo-wide
-  harness finding: `jgxcheck` PNG dumps of *static-picture* ROMs can capture stale/partial frames,
-  proven against known-good `hello.c`; recorded in-source. PNG `yoff=0` vs player `yoff=8` noted).
+  uninitialised VRAM; CGRAM written during active display, now HVBJOY-synced — plus a since-WITHDRAWN
+  harness claim — the "jgxcheck captures stale/partial frames" finding was three separate RUNS,
+  not three frames; root cause was bsnes-jg power-on entropy, see below. PNG `yoff=0` vs player
+  `yoff=8` noted).
   Re-gated PASS ×3 configs at frames 700+1800; fix `92c1b74`. Live pages:
   [4 MiB HiROM](https://biohack.net/snes/cartsize-hirom-4m/) ·
   [6 MiB ExHiROM](https://biohack.net/snes/cartsize-exhirom-6m/) ·
   [8 MiB ExHiROM](https://biohack.net/snes/cartsize-exhirom-8m/).
-  Remaining: **manual WASM check** (open the 6 MiB page, click the canvas, Verify fidelity →
-  expect `$A274`; headless can't click); merge `feature/exhirom-canaries`
-  (`--ff-only`, once the cookbook's foreign uncommitted hunk clears); MAME leg on the SPC700
-  IPL; then the video phases (2+) per the plan.
+  **Display defect ROOT-CAUSED + FIXED 2026-08-01 (`811c1f8` on the branch):** bsnes-jg reseeds
+  its PRNG from `clock()` at every power-on (entropy "Low"), randomizing every PPU register the
+  ROM never wrote — the canary hand-set only 3 of ~48 control regs, so the picture (incl. the
+  user's live black stripe = a random window mask, reproduced 4/24 boots from the exact deployed
+  bytes) was random per boot while WRAM stayed deterministic. Fix = `snes_ppu_reset_blank()` at
+  boot (the SDK's own doc names this failure); fixed ROM 24/24 boots one picture `11D41DC5`
+  green across entropy None/Low/High; regression gate step 6b added; per-frame `JGX_FRAMESCAN` +
+  `JGX_ENTROPY` in jgxcheck. **Manual WASM check DONE/PASS** (user, live 6 MiB page: `0xA274 ==
+  gate`). Remaining: **republish the 3 cartsize pages with fixed ROMs** (also settles the
+  persistent-blue WASM question — if blue survives a deterministic picture it is a separate
+  WASM-path defect, cleanly isolated); merge `feature/exhirom-canaries` — **BLOCKED ×3**:
+  cookbook foreign hunk still dirty, `--ff-only` impossible (main +54 commits, needs rebase),
+  and a SEMANTIC conflict in `tools/snes-checksum.py` (main's `5038454` `--fastrom` OR-0x10 vs
+  the branch's cartmap-driven rewrite with no speed concept — needs a speed attribute in the
+  cartmap model; do not resolve by picking a side); MAME leg on the SPC700
+  IPL (user-gated); then the video phases (2+) — **plan-shape decision needed**: the plan
+  predates main's SVX2 pipeline, Phase 2 should probably drive the existing SVX2 decoder across
+  the 4 MiB boundary instead of the plan's second LZSS video path.
   Authoritative model `tools/snes_cartmap.py` ported from bsnes-jg's own bus decode
   (`boards.bml` + `Bus::map`) — everything (linker, descriptors, checksum, fill, oracles)
   generated from it; emit-side canonical-only, read-side mirror-aware. All three ROMs PASS
@@ -134,6 +149,14 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
   (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
   2026-07-31 — lost in a concurrent TODO rewrite.)
+- [T2] **Apply `snes_ppu_reset_blank()` to the 4 demos that drive `INIDISP` bare** —
+  `hello.c`, `boids.c`, `lsystem.c`, `turtle-vm.c` carry the same power-on-entropy display
+  defect the cartsize canary just closed (`811c1f8`): every unwritten PPU register is random
+  per boot under bsnes-jg entropy, so their published pictures are boot-dependent
+  (lsystem/turtle-vm's screenshot flakiness that motivated `d3000d7` is suggestive,
+  unestablished). Everything else goes through `snesgfx/display.h`, which already calls it.
+  Fix + re-gate + republish the four pages; extend gate 6b-style entropy fingerprinting where
+  cheap. (T2: diagnosed fix, known recipe, bounded set.)
 - [T1] **Apply the wai idle-loop idiom to the 18 skipped-dirty `examples/snes/*.c` files** —
   the `903de3e` sweep fixed 216 bare loops in 214 files but skipped bitweave, borrowlad, compass,
   crcwall, keycmp64, lfsr2, modexp256, oddmask, ovmove, pcooker, permscat, ropeedit, rotkal,
