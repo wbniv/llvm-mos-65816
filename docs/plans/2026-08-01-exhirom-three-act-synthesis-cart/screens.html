@@ -1,0 +1,108 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>seamdemo — four screen states</title>
+<style>
+  html,body{margin:0;padding:0;background:#101018;color:#cfd2e0;font-family:ui-monospace,'Cascadia Mono',monospace}
+  .board{width:1440px;height:900px;box-sizing:border-box;padding:26px 30px;display:grid;
+         grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:18px 22px}
+  h1{grid-column:1/3;margin:0 0 2px;font-size:19px;font-weight:600;color:#e8eaf4}
+  h1 small{color:#7d8199;font-weight:400;font-size:13px;margin-left:14px}
+  .panel{background:#181826;border:1px solid #2a2a3e;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column}
+  .panel h2{margin:0 0 8px;font-size:13px;font-weight:600;color:#9aa0c0}
+  .screen{flex:1;position:relative;background:#0a1140;border-radius:3px;overflow:hidden;
+          image-rendering:pixelated;box-shadow:inset 0 0 0 1px #000}
+  /* --- shared HUD bars --- */
+  .hud{position:absolute;left:0;right:0;bottom:0;height:15%;background:#05050c;border-top:2px solid #23233a;
+       display:flex;align-items:center;gap:16px;padding:0 12px;font-size:12px;color:#8fe08f}
+  .hud .addr{color:#ffd27a;letter-spacing:1px}
+  .hud .dim{color:#5a5f7d}
+  /* --- act 1: VM march --- */
+  .vmfield{position:absolute;inset:0 0 15% 0;background:
+    repeating-linear-gradient(90deg,#0a1140 0 12px,#0c1450 12px 24px)}
+  .glyphs{position:absolute;top:8%;left:6%;right:6%;height:56%;display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
+  .g{background:#1e3fae;border-radius:1px}
+  .g.on{background:#54d06a}.g.hi{background:#ffd24a}.g.mg{background:#c65ae0}
+  .pcbar{position:absolute;left:6%;right:6%;bottom:22%;height:7px;background:#151c53;border:1px solid #2a3a90}
+  .pcbar i{position:absolute;top:0;bottom:0;left:0;background:#54d06a}
+  .pcbar em{position:absolute;top:-3px;width:2px;bottom:-3px;background:#fff}
+  .seammark{position:absolute;top:-4px;bottom:-4px;width:2px;background:#ff5470;left:66.6%}
+  /* --- act 1b: seam event --- */
+  .flash{position:absolute;inset:0 0 15% 0;background:radial-gradient(circle at 66% 45%,#3d1450 0%,#0a1140 70%)}
+  .bigaddr{position:absolute;top:34%;left:0;right:0;text-align:center;font-size:30px;color:#ffd24a;text-shadow:0 0 14px #ff5470}
+  .bigaddr small{display:block;font-size:13px;color:#ff8aa0;margin-top:8px}
+  /* --- act 2: graph web --- */
+  .web{position:absolute;inset:0 0 15% 0;background:#0b0b16}
+  .web svg{width:100%;height:100%}
+  /* --- act 3: mode 7 --- */
+  .m7{position:absolute;inset:0 0 15% 0;background:linear-gradient(#1a2a66 0 34%,#274b18 34% 100%)}
+  .m7 .grid{position:absolute;left:-30%;right:-30%;top:34%;bottom:0;
+    background:repeating-linear-gradient(#3a6a28 0 2px,transparent 2px 26px),
+               repeating-linear-gradient(90deg,#3a6a28 0 2px,transparent 2px 46px);
+    transform:perspective(230px) rotateX(55deg);transform-origin:50% 0}
+  .m7 .ridge{position:absolute;top:26%;left:0;right:0;height:9%;
+    background:linear-gradient(90deg,transparent 0 8%,#4d8a33 20%,#2f5a1e 34%,#57a03c 52%,#2f5a1e 70%,#4d8a33 86%,transparent 96%);
+    border-radius:50% 50% 0 0/100% 100% 0 0}
+  .verdict{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:8px;font-size:11px}
+  .verdict b{background:#0f2c12;border:1px solid #2f7a3a;color:#7ce08a;border-radius:3px;padding:2px 7px;font-weight:500}
+  .verdict b.wait{background:#26260f;border-color:#7a6f2f;color:#e0d47c}
+  .cap{margin-top:8px;font-size:11px;color:#7d8199;line-height:1.5}
+</style></head><body>
+<div class="board">
+  <h1>seamdemo — ExHiROM three-act synthesis cartridge <small>4 states · SNES 256×224 mock · verdict oracle unchanged (WRAM CRC)</small></h1>
+
+  <div class="panel"><h2>ACT 1 · “the cartridge is the program” — mid-march</h2>
+    <div class="screen">
+      <div class="vmfield"></div>
+      <div class="glyphs">
+        <i class="g on"></i><i class="g"></i><i class="g on"></i><i class="g hi"></i><i class="g"></i><i class="g on"></i><i class="g mg"></i><i class="g"></i><i class="g on"></i><i class="g"></i><i class="g hi"></i><i class="g on"></i><i class="g"></i><i class="g mg"></i><i class="g on"></i><i class="g"></i>
+        <i class="g"></i><i class="g on"></i><i class="g mg"></i><i class="g"></i><i class="g on"></i><i class="g hi"></i><i class="g"></i><i class="g on"></i><i class="g"></i><i class="g on"></i><i class="g"></i><i class="g mg"></i><i class="g hi"></i><i class="g"></i><i class="g on"></i><i class="g"></i>
+        <i class="g mg"></i><i class="g"></i><i class="g on"></i><i class="g"></i><i class="g hi"></i><i class="g"></i><i class="g on"></i><i class="g mg"></i><i class="g"></i><i class="g on"></i><i class="g"></i><i class="g on"></i><i class="g"></i><i class="g hi"></i><i class="g"></i><i class="g on"></i>
+        <i class="g"></i><i class="g hi"></i><i class="g"></i><i class="g on"></i><i class="g"></i><i class="g mg"></i><i class="g on"></i><i class="g"></i><i class="g hi"></i><i class="g"></i><i class="g on"></i><i class="g"></i><i class="g mg"></i><i class="g on"></i><i class="g"></i><i class="g hi"></i>
+      </div>
+      <div class="pcbar"><i style="width:41%"></i><em style="left:41%"></em><span class="seammark"></span></div>
+      <div class="hud"><span class="dim">PC</span><span class="addr">FILE $28C4F1 · CPU $E8:C4F1</span><span class="dim">op</span><span>DRAW.ARC</span><span class="dim">fold</span><span>1C9A</span></div>
+    </div>
+    <div class="cap">VM executes a 6 MiB bytecode stream; generative canvas above, 24-bit PC ticker + running fold below. Red tick on the progress bar = the 4 MiB device seam.</div>
+  </div>
+
+  <div class="panel"><h2>ACT 1 · the seam event (file $3FFFFF → $400000)</h2>
+    <div class="screen">
+      <div class="flash"></div>
+      <div class="bigaddr">$FF:FFFF → $40:0000<small>DEVICE 1 → DEVICE 2 · non-monotonic CPU map · fold intact</small></div>
+      <div class="hud"><span class="dim">PC</span><span class="addr">FILE $400000 · CPU $40:0000</span><span class="dim">seam</span><span style="color:#ff8aa0">CROSSED ✓</span><span class="dim">fold</span><span>7ED2</span></div>
+    </div>
+    <div class="cap">The boundary crossing is the show: one-beat freeze-frame with both address forms. A decode defect here breaks the fold — and the picture.</div>
+  </div>
+
+  <div class="panel"><h2>ACT 2 · boundary-hostile graph walk</h2>
+    <div class="screen">
+      <div class="web"><svg viewBox="0 0 256 190">
+        <g stroke="#2c4bd8" stroke-width="0.7" opacity="0.7">
+          <path d="M30 160 L70 90 L128 130 L96 40 L180 70 L150 150 L220 120 L200 30"/>
+          <path d="M70 90 L40 30 L128 130 M180 70 L128 20 L96 40 M220 120 L240 60 L200 30"/>
+        </g>
+        <g stroke="#ff5470" stroke-width="1.1">
+          <path d="M96 40 L180 70 M128 20 L150 150"/>
+        </g>
+        <g fill="#7ce08a">
+          <circle cx="30" cy="160" r="2.2"/><circle cx="70" cy="90" r="2.2"/><circle cx="128" cy="130" r="2.2"/>
+          <circle cx="96" cy="40" r="2.2"/><circle cx="180" cy="70" r="2.6"/><circle cx="150" cy="150" r="2.2"/>
+          <circle cx="220" cy="120" r="2.2"/><circle cx="40" cy="30" r="2.2"/><circle cx="128" cy="20" r="2.2"/>
+          <circle cx="240" cy="60" r="2.2"/><circle cx="200" cy="30" r="2.2"/>
+        </g>
+        <circle cx="180" cy="70" r="5" fill="none" stroke="#ffd24a" stroke-width="1.2"/>
+      </svg></div>
+      <div class="hud"><span class="dim">node</span><span class="addr">$52:9B10</span><span class="dim">edges</span><span>4 811 / 12 288</span><span class="dim">seam-edges</span><span style="color:#ff8aa0">37 ✓</span><span class="dim">fold</span><span>B34E</span></div>
+    </div>
+    <div class="cap">Pointer-chasing a baked graph; every decode window has in-degree > 0. Pink edges hop the device seam. Scattered access = densest mapping coverage.</div>
+  </div>
+
+  <div class="panel"><h2>ACT 3 · Mode 7 flyover + loop-glue verdict strip</h2>
+    <div class="screen">
+      <div class="m7"><div class="ridge"></div><div class="grid"></div></div>
+      <div class="verdict"><b>ACT1 7ED2 ✓</b><b>ACT2 B34E ✓</b><b class="wait">ACT3 …</b><b class="wait">FOLD —</b></div>
+      <div class="hud"><span class="dim">tex page</span><span class="addr">FILE $3F8000 → $402000</span><span class="dim">cam</span><span>x 512 y 1284 θ 42°</span><span class="dim">t</span><span>0:21</span></div>
+    </div>
+    <div class="cap">Flyover streams a cart-spanning atlas; the path crosses seam-mapped texture pages (HUD shows the page straddle). Verdict strip carries per-act CRCs; backdrop goes green only after one full three-act cycle folds correctly.</div>
+  </div>
+</div>
+</body></html>

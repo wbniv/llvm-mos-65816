@@ -62,6 +62,17 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
+- [T4] **seamdemo — the ExHiROM three-act boundary synthesis cartridge.** One 48 Mbit cart,
+  three acts in a loop, each reading the full image with a different access pattern: Act 1 a
+  VM executing the whole cart as one bytecode stream (PC ticker; the $3FFFFF→$400000 seam
+  crossing is an on-screen event), Act 2 a boundary-hostile pointer-graph walk (every decode
+  window in-degree > 0), Act 3 a Mode 7 flyover over a cart-spanning atlas. House pattern
+  unchanged: generator + host oracle from `tools/snes_cartmap.py`, per-act sub-CRCs, folded
+  `corpus_result`, entropy-fingerprint gate, `snes_ppu_reset_blank()` at boot. Supersedes the
+  video-reel Phase 2. **Blocked on the `feature/exhirom-canaries` merge** (needs the branch's
+  ExHiROM platform + cartmap model; the checksum speed-attribute conflict is the substantive
+  prerequisite). [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md) (T4: new
+  generator architecture + VM design; phases P1-P3 drop to T3 once P0 settles the contract.)
 - [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
   test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:af681e8a1b2ac9191 -->
   Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
@@ -88,9 +99,9 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   and a SEMANTIC conflict in `tools/snes-checksum.py` (main's `5038454` `--fastrom` OR-0x10 vs
   the branch's cartmap-driven rewrite with no speed concept — needs a speed attribute in the
   cartmap model; do not resolve by picking a side); MAME leg on the SPC700
-  IPL (user-gated); then the video phases (2+) — **plan-shape decision needed**: the plan
-  predates main's SVX2 pipeline, Phase 2 should probably drive the existing SVX2 decoder across
-  the 4 MiB boundary instead of the plan's second LZSS video path.
+  IPL (user-gated); then Phase 2 per the **superseding plan**
+  [2026-08-01-exhirom-three-act-synthesis-cart.md](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md)
+  (shape decided by user 2026-08-01: three synthesis acts in a loop, no second video path).
   Authoritative model `tools/snes_cartmap.py` ported from bsnes-jg's own bus decode
   (`boards.bml` + `Bus::map`) — everything (linker, descriptors, checksum, fill, oracles)
   generated from it; emit-side canonical-only, read-side mirror-aware. All three ROMs PASS
@@ -149,7 +160,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [the results doc](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
   (T2: bounded re-run of a scripted sweep; interval eyeballing is the only judgment. Re-filed
   2026-07-31 — lost in a concurrent TODO rewrite.)
-- [T2] **Apply `snes_ppu_reset_blank()` to the 4 demos that drive `INIDISP` bare** —
+- [wip T2] **Apply `snes_ppu_reset_blank()` to the 4 demos that drive `INIDISP` bare** — <!-- agent:aa74860a8207d6108 -->
   `hello.c`, `boids.c`, `lsystem.c`, `turtle-vm.c` carry the same power-on-entropy display
   defect the cartsize canary just closed (`811c1f8`): every unwritten PPU register is random
   per boot under bsnes-jg entropy, so their published pictures are boot-dependent
@@ -1811,4 +1822,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** prepare a minimal commit/PR containing the TableGen fix and regression only; and — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:788f433367fcd177 -->
 - [ ] **(triage)** reference the animated ROM as the real-world reproducer, without coupling the upstream patch to — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:012a72598ce748d6 -->
 - [verify] **2026-07-31-svx2-animated-video-cartridge** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:40c1c2b870d73873 -->
+- [verify] **2026-08-01-exhirom-three-act-synthesis-cart** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-exhirom-three-act-synthesis-cart.md](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md)_  <!-- fp:c3a1de9e87d9d4ca -->
 <!-- END auto-captured-deferrals -->
