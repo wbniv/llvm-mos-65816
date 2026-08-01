@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVX2 cartridge dashboard mockups</title>
+<style>
+:root{color-scheme:dark;--bg:#12100f;--panel:#201b18;--ink:#f3e8d6;--dim:#a89480;--gold:#ffd45c;--red:#ff685f;--green:#00ff00}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#33251d,var(--bg) 55%);color:var(--ink);font:15px/1.5 system-ui,sans-serif}
+main{max-width:1120px;margin:auto;padding:32px 20px 64px}h1{margin:0 0 6px;font-size:clamp(25px,4vw,42px)}p{color:var(--dim);max-width:72ch}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}
+button{border:1px solid #665143;border-radius:999px;background:#271f1b;color:var(--ink);padding:8px 13px;cursor:pointer}button[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}.card{background:#1b1715;border:1px solid #44372f;border-radius:14px;padding:18px}.card h2{margin:0 0 12px;font-size:16px;color:var(--gold)}
+.snes{width:min(100%,512px);aspect-ratio:256/224;background:#000;position:relative;overflow:hidden;image-rendering:pixelated;box-shadow:0 0 0 1px #000,0 18px 45px #0008}.video{position:absolute;inset:0 0 32px;background:linear-gradient(135deg,#050707 0 18%,#20140d 18% 31%,#090b09 31% 47%,#55301e 47% 55%,#14110d 55% 71%,#8e5838 71% 77%,#090806 77%);}
+.video:before{content:"";position:absolute;left:36%;top:7%;width:9%;height:78%;background:linear-gradient(#eee6cf,#995c32 20%,#17110c 48%,#f5e8c9 73%,#73371d);filter:blur(.4px)}
+.hud{position:absolute;left:0;right:0;bottom:0;height:32px;background:#050505;color:var(--gold);font:8px/8px ui-monospace,monospace;letter-spacing:0;display:grid;grid-template-columns:1fr 1fr;padding:7px 8px 5px;text-transform:uppercase}.hud span:nth-child(even){text-align:right}.health{color:var(--ink)}.bad{color:var(--red)}
+.broken .video{bottom:0}.broken .hud{display:none}.broken:after{content:"PALETTE 224 DIAGNOSTIC";position:absolute;left:0;right:0;bottom:0;height:13px;background:var(--green);color:#001900;font:8px/13px monospace;text-align:center}
+.title .video{inset:0;background:radial-gradient(circle,#6d4425 0,#17100c 24%,#020202 62%)}.title .video:before{display:none}.title .video:after{content:"SVX2 VIDEO\A FASTROM 30 FPS";white-space:pre;position:absolute;inset:38% 0 auto;text-align:center;color:var(--gold);font:bold 15px/1.8 ui-monospace,monospace;transform:scale(1.15)}.title .hud{display:none}
+.legend{margin-top:12px;color:var(--dim);font-size:13px}.bands{display:flex;height:16px;margin-top:10px;border-radius:4px;overflow:hidden}.bands b{font:10px/16px monospace;text-align:center}.bands .m7{width:85.714%;background:#794a2e}.bands .m1{width:14.286%;background:#375b70}
+@media(max-width:520px){main{padding-inline:12px}.card{padding:12px}.snes{width:100%}}
+</style>
+</head>
+<body><main>
+<h1>SVX2 cartridge-native dashboard</h1>
+<p>The dashboard is part of the SNES picture: Mode 7 video above, conventional Mode 1 BG3 text below. Choose a state to review the exact 256x224 composition.</p>
+<div class="controls" role="group" aria-label="Mockup state">
+<button data-state="play" aria-pressed="true">Playing</button><button data-state="title">Title</button><button data-state="pause">Paused</button><button data-state="slip">Deadline slip</button><button data-state="error">Error</button><button data-state="broken">Current green bar</button>
+</div>
+<div class="grid">
+<section class="card"><h2>Preferred two-row dashboard</h2><div id="primary" class="snes"><div class="video"></div><div class="hud"><span>SVX2 VIDEO</span><span class="health">PLAY</span><span>TIME 00:12</span><span>FPS 30.0</span></div></div><div class="bands"><b class="m7">192 lines · MODE 7 BG1</b><b class="m1">32 · M1 BG3</b></div><div class="legend">Native tiled text remains crisp and independent of the video pixels.</div></section>
+<section class="card"><h2>Compact single-line alternative</h2><div id="compact" class="snes"><div class="video"></div><div class="hud" style="display:flex;align-items:center;justify-content:space-between;padding-top:12px"><span>TIME 00:12</span><span class="health">PLAY</span><span>FPS 30.0</span></div></div><div class="legend">More empty space, but weaker cartridge identity and health-state hierarchy.</div></section>
+</div>
+<script>
+const buttons=[...document.querySelectorAll('button[data-state]')],screens=[...document.querySelectorAll('.snes')];
+function setState(state){buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state)));screens.forEach(s=>{s.className='snes'+(state==='title'?' title':state==='broken'?' broken':'');const h=s.querySelector('.health');if(!h)return;h.className='health';h.textContent=state==='pause'?'PAUSE':state==='slip'?'SLIP 1':state==='error'?'ERROR 2':'PLAY';if(state==='slip'||state==='error')h.classList.add('bad');const fps=[...s.querySelectorAll('span')].find(x=>x.textContent.startsWith('FPS'));if(fps)fps.textContent=state==='pause'?'FPS PAUSED':state==='slip'?'FPS 29.4':state==='error'?'FPS --':'FPS 30.0';});}
+buttons.forEach(b=>b.addEventListener('click',()=>setState(b.dataset.state)));
+</script>
+</main></body></html>

@@ -5,6 +5,7 @@
 #include "snesgfx/m7title.h"
 #include "snes-video-codec.h"
 #include "snes-video-dma.h"
+#include "video_hud.h"
 #include <snes-video-reel-assets.h>
 
 #define STAGE_ADDRESS 0x2000u
@@ -28,6 +29,60 @@ volatile uint32_t video_reel_vblanks;
 static uint8_t framebuffer[SVC_FRAME_SIZE];
 static uint8_t blank_tile = 70u;
 static uint8_t blank_pixels[64];
+static uint16_t fps_presented_sample;
+static uint16_t fps_vblank_sample;
+static uint16_t fps_tenths;
+static uint8_t dashboard_frame_tick;
+static uint8_t dashboard_seconds;
+static uint8_t dashboard_minutes;
+
+static char *decimal(char *out, uint16_t value, uint8_t width) {
+  char digits[5];
+  uint8_t used = 0u;
+  do { digits[used++] = (char)('0' + value % 10u); value /= 10u; } while (value);
+  while (width > used) { *out++ = '0'; --width; }
+  while (used) *out++ = digits[--used];
+  return out;
+}
+
+static void update_dashboard_fields(void) {
+  char line[33];
+  char *p = line;
+  p = decimal(p, dashboard_minutes, 2u); *p++ = ':';
+  p = decimal(p, dashboard_seconds, 2u);
+  *p = 0;
+  video_hud_text(25u, 6u, line);
+  p = line;
+  p = decimal(p, (uint16_t)(fps_tenths / 10u), 2u); *p++ = '.';
+  *p++ = (char)('0' + fps_tenths % 10u); *p = 0;
+  video_hud_text(25u, 27u, line);
+  if (video_reel_result != 0u && video_reel_result != 0xffu)
+    video_hud_text(24u, 25u, "ERROR  ");
+  else if (video_reel_deadline_slips)
+    video_hud_text(24u, 25u, "SLIP   ");
+}
+
+static void dashboard_presented(void) {
+  uint16_t now_vblank = (uint16_t)video_reel_vblanks;
+  uint16_t dv = (uint16_t)(now_vblank - fps_vblank_sample);
+  if (++dashboard_frame_tick == 30u) {
+    dashboard_frame_tick = 0u;
+    if (dashboard_minutes != 99u || dashboard_seconds != 59u) {
+      if (++dashboard_seconds == 60u) {
+        dashboard_seconds = 0u;
+        ++dashboard_minutes;
+      }
+    }
+  }
+  if (dv >= 60u) {
+    uint16_t now_presented = (uint16_t)video_reel_presented_total;
+    uint16_t dp = (uint16_t)(now_presented - fps_presented_sample);
+    fps_tenths = (uint16_t)((dp * 601u + dv / 2u) / dv);
+    fps_presented_sample = now_presented;
+    fps_vblank_sample = now_vblank;
+  }
+  update_dashboard_fields();
+}
 
 static void stop(uint8_t result) {
   video_reel_result = result;
@@ -77,7 +132,7 @@ static void present_frame(void) {
 static void setup_display(void) {
   uint16_t i;
   m7_begin();
-  for (i = 0; i != 64u; ++i) blank_pixels[i] = 224u;
+  for (i = 0; i != 64u; ++i) blank_pixels[i] = 0u;
   REG_VMAIN = VMAIN_INC_HIGH_1;
   REG_VMADD = 70u * 64u;
   for (i = 0; i != 64u; ++i) REG_VMDATAH = blank_pixels[i];
@@ -85,12 +140,14 @@ static void setup_display(void) {
   m7_tilemap_identity(10u, 7u);
   REG_CGADD = 0u;
   for (i = 0; i != 448u; ++i) REG_CGDATA = reel_palette[i];
-  REG_CGADD = 224u;
-  REG_CGDATA = 0xe0u;
-  REG_CGDATA = 0x03u;
-  m7_set_matrix(0x0050, 0, 0, 0x0040);
+  m7_set_matrix(0x0050, 0, 0, 0x004bu);
   m7_set_center(0, 0);
   m7_set_scroll(0, 0);
+  video_hud_begin();
+  video_hud_text(24u, 1u, "SVX2 VIDEO");
+  video_hud_text(24u, 28u, "PLAY");
+  video_hud_text(25u, 1u, "TIME");
+  video_hud_text(25u, 23u, "FPS");
 }
 
 static void wait_vblank_fresh(void) {
@@ -132,6 +189,13 @@ void video_reel_run(void) {
   deadline = (uint16_t)video_reel_vblanks + VIDEO_REEL_VBLANKS_PER_FRAME;
   video_reel_frame = 0u;
   video_reel_result = 0u;
+  fps_presented_sample = (uint16_t)video_reel_presented_total;
+  fps_vblank_sample = (uint16_t)video_reel_vblanks;
+  fps_tenths = 0u;
+  dashboard_frame_tick = 1u;
+  dashboard_seconds = 0u;
+  dashboard_minutes = 0u;
+  update_dashboard_fields();
   m7_show();
 
   for (;;) {
@@ -148,6 +212,7 @@ void video_reel_run(void) {
       while ((uint16_t)video_reel_vblanks != deadline) __asm__ volatile("wai");
     }
     present_frame();
+    dashboard_presented();
     video_reel_frame = frame;
     deadline = (uint16_t)(deadline + VIDEO_REEL_VBLANKS_PER_FRAME);
     if (frame == 0u && video_reel_loop_gate != 0u) {

@@ -1203,43 +1203,29 @@
       "id": "e16fb57bf37dfdf84b2f",
       "kind": "force-blank",
       "path": "examples/snes/snes-video-reel.c",
-      "line": 33,
+      "line": 89,
       "text": "REG_INIDISP = INIDISP_FORCE_BLANK;"
     },
     {
       "id": "9dd761b068117021db1b",
       "kind": "ppu-write",
       "path": "examples/snes/snes-video-reel.c",
-      "line": 72,
+      "line": 128,
       "text": "REG_MDMAEN = 1u;"
     },
     {
       "id": "1bd13b30690ebf4a9185",
       "kind": "ppu-write",
       "path": "examples/snes/snes-video-reel.c",
-      "line": 82,
+      "line": 138,
       "text": "for (i = 0; i != 64u; ++i) REG_VMDATAH = blank_pixels[i];"
     },
     {
       "id": "3a02bdd2137ddc3ba0ad",
       "kind": "ppu-write",
       "path": "examples/snes/snes-video-reel.c",
-      "line": 86,
+      "line": 142,
       "text": "for (i = 0; i != 448u; ++i) REG_CGDATA = reel_palette[i];"
-    },
-    {
-      "id": "e3b5a00fe91f1d7fd9f1",
-      "kind": "ppu-write",
-      "path": "examples/snes/snes-video-reel.c",
-      "line": 88,
-      "text": "REG_CGDATA = 0xe0u;"
-    },
-    {
-      "id": "3ce029147316f1059ade",
-      "kind": "ppu-write",
-      "path": "examples/snes/snes-video-reel.c",
-      "line": 89,
-      "text": "REG_CGDATA = 0x03u;"
     },
     {
       "id": "e92d027e31423f47cdbc",
@@ -1653,6 +1639,27 @@
       "path": "examples/snes/spigot.c",
       "line": 71,
       "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8; i++) REG_VMDATA = FONT8[i];"
+    },
+    {
+      "id": "0d8cd03ceb642259eb2c",
+      "kind": "ppu-write",
+      "path": "examples/snes/video_hud.h",
+      "line": 22,
+      "text": "while (count--) REG_VMDATA = *src++;"
+    },
+    {
+      "id": "3d7892263298acf6a014",
+      "kind": "ppu-write",
+      "path": "examples/snes/video_hud.h",
+      "line": 30,
+      "text": "REG_VMDATA = (ch >= FONT8_FIRST && ch < FONT8_FIRST + FONT8_N)"
+    },
+    {
+      "id": "af50b60d563bbc402dde",
+      "kind": "ppu-write",
+      "path": "examples/snes/video_hud.h",
+      "line": 44,
+      "text": "for (i = 0; i != VIDEO_HUD_COLS * 32u; ++i) REG_VMDATA = 0u;"
     }
   ]
 }

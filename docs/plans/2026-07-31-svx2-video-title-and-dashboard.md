@@ -4,6 +4,11 @@
 **Status:** Implemented and locally verified
 **Parent:** `2026-07-31-svx2-animated-video-cartridge.md`
 
+> **Dashboard placement correction:** The browser-dashboard portion of this plan was superseded by
+> [`2026-07-31-svx2-cartridge-video-dashboard.md`](2026-07-31-svx2-cartridge-video-dashboard.md).
+> `TIME` and `FPS` now render inside the SNES picture on a Mode 1 BG3 raster band below the Mode 7
+> video. The title-sequence work and target counters remain valid.
+
 ## Goal
 
 Finish the animated-video presentation around the verified SVX2 cartridge:

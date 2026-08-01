@@ -49,7 +49,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md); **user-gated**);
   (3) browser-exercise the badge states; (4) confirm the 24000-frame worst-case budget from
   `gallery_repack_frames[]` over all 62 works.
-- [T3] **Gallery ROM non-reproducible build — ROOT-CAUSED 2026-08-01 (upstream
+- [wip T3] **Gallery ROM non-reproducible build — ROOT-CAUSED 2026-08-01 (upstream
   `MOSZeroPageAlloc` DenseMap tie-break); remaining = apply `MapVector` fix + verify +
   upstream package.** <!-- agent:a758b3836d195822b --> `MOSZeroPageAlloc` iterates a
   pointer-keyed `DenseMap<GlobalVariable*, float>` (`MOSZeroPageAlloc.cpp:499/:523`) and
@@ -87,7 +87,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   0 sampled): other demos may have been PASSING only through that blindness, and the new
   confirmation burst may reclassify others' FROZEN/STATIC. One sweep, record deltas vs the
   2026-07-31 baseline. Depends on the `[T1]` apply above. (T2: mechanical long run + diff.)
-- [T2] **Migrate the project-local `snes-rom-page` skill copy to CLI-delegated engine sync.**
+- [wip T2] **Migrate the project-local `snes-rom-page` skill copy to CLI-delegated engine sync.** <!-- agent:aba9552ae1683d818 -->
   Root cause behind the engine-downgrade incident: `.claude/skills/snes-rom-page/` in THIS repo
   (added `bfcbe69`) is a divergent copy that still bundles a raw `engine/` (stale, built
   2026-06-25), while the canonical `~/.claude/skills` copy was migrated 2026-07-27 to delegate

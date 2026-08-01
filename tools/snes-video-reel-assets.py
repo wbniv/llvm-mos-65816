@@ -30,6 +30,8 @@ def main() -> int:
         parser.error("tile corpus must contain whole 4480-byte frames")
     if len(palette) != 448:
         parser.error(f"palette must be exactly 448 bytes, got {len(palette)}")
+    if palette[:4] != bytes((0x00, 0x00, 0xff, 0x7f)):
+        parser.error("palette entries 0/1 must remain dashboard black/white")
     available = len(data) // FRAME_SIZE
     if args.frames < 2 or args.frames > available:
         parser.error(f"--frames must be between 2 and {available}")
