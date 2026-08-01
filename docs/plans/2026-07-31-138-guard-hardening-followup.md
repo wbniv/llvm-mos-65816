@@ -20,6 +20,12 @@ are correct but surfaced four follow-ups. This plan is the contract for closing 
 2. **Sibling pattern.** The `TA` handler (~`MOSLateOptimization.cpp:278`) has the identical
    switch-then-unconditional-store shape. Not live (nothing widens `TA`'s def class) — do NOT
    change the code; preempt the reviewer question with a note in the PR.
+   **SUPERSEDED 2026-08-01:** a concurrent session's PR-critique sweep
+   ([plan](2026-07-31-upstream-pr-critique-improvements.md)) hardened the `TA` handler anyway —
+   upstream `3ce98fed82de` wraps the slot store in `if (Load)` with fall-through to the generic
+   invalidation, the same defensive treatment as our LDImm guard, reviewed here as sound. The
+   "leave it untouched" note in the PR body/comment was theirs to reconcile and they did; the
+   decision conflict is resolved in favour of hardening both siblings.
 3. **Unexplained producer.** The gallery's original trigger — `$rl1 = LDImm -1` (Imag32 dest,
    malformed on 65816) from the 2026-07-26 toolchain — vanished with the 2026-07-31 vendor
    rebuild without an identified fixing delta. Post-fix, a returning producer is *silent* in
@@ -188,6 +194,8 @@ register makes it fire.
     ```
 
     **PASS (CI pending)** — the follow-up commit is the PR head; body + comment live. CI conclusion to be recorded when it lands (all three legs were green on `ae5c399eb277`; the delta is behaviour-identical and lit-clean locally).
+
+    **Amendment 2026-08-01:** the `7eedb14a2597` CI run (30680048082) finished **cancelled ×3, not failed** — superseded via the workflow's per-PR-ref `cancel-in-progress` concurrency group when a concurrent session's PR-critique sweep pushed `3ce98fed82de` (TA-handler hardening) onto the same branch at 03:06. That session's body re-sync also **regressed the Reproduction paragraph back to the falsified count claim** and dropped the matrix; re-corrected on top of their version at 03:11 (verified: 0 "smallest count" matches, matrix + TA paragraph both present; mirror re-synced, branch commits `fd3ff18` + their prose adopted). New CI run 30681345370 on `3ce98fed82de` in progress — watch running; conclusion to be recorded here.
 
 7. TODO: new producer item present; #138 entry says POSTED; no foreign hunks staged in any commit (`git diff --cached --name-only` = exactly our files).
 
