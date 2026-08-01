@@ -14,9 +14,10 @@
  * {A, X, Y} only and then unconditionally writes through the resulting
  * ImmLoad*, which is null for an imaginary destination.
  *
- * Eight simultaneously-live bytes is the smallest count that reliably spills a
- * constant into an imaginary register here; four (see the reduction log in the
- * plan) stays entirely in A/X/Y and does not crash.
+ * The eight simultaneously-live bytes are headroom, not a threshold: a sweep
+ * (2026-07-31, MIR via -mllvm -stop-before=mos-late-opt fed to an unfixed
+ * llc -run-pass=mos-late-opt) shows THREE live bytes crash at every level
+ * above -O0, and two crash at -Oz. See the guard-hardening follow-up plan.
  */
 volatile unsigned char io;
 

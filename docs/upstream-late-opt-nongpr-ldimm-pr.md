@@ -84,9 +84,11 @@ clang: error: clang frontend command failed due to signal
 ```
 
 Crashes at `-O1`, `-O2`, `-Os` and `-Oz`; clean at `-O0`, where nothing is
-allocated to an imaginary register. Eight simultaneously-live bytes is the
-smallest count that reliably pushes one of the constants out of `A`/`X`/`Y`;
-with four it stays in the GPRs and does not crash.
+allocated to an imaginary register. The eight live bytes are headroom rather
+than a threshold: sweeping the same shape (MIR captured with
+`-mllvm -stop-before=mos-late-opt`, fed to an unfixed
+`llc -run-pass=mos-late-opt`) shows three simultaneously-live bytes already
+crash at every level above `-O0`, and two crash at `-Oz`.
 
 Reduced to MIR, the whole trigger is one instruction:
 
@@ -114,10 +116,20 @@ Skip the tracking entirely for a non-GPR destination:
     // LDImm's destination is not always a GPR. MOSInstrInfo::getRegClass
     // widens it to Anyi8 on SPC700, where `$rcN = LDImm imm` is how
     // `mov dp, #imm` is modelled. Only A, X and Y take part in the rewrites
-    // below, and an imaginary destination writes none of them, so there is
-    // nothing to rewrite here and no tracked value to invalidate.
-    if (!MOS::GPRRegClass.contains(Dst))
+    // below; an imaginary destination writes none of them, so there is
+    // nothing to rewrite. Invalidate any tracked GPR the instruction does
+    // modify so a future widening of LDImm's destination class cannot turn
+    // this skip into a stale-value rewrite (no such destination exists
+    // today; these checks are expected to do nothing).
+    if (!MOS::GPRRegClass.contains(Dst)) {
+      if (MI.modifiesRegister(MOS::A, TRI))
+        LoadA.MI = nullptr;
+      if (MI.modifiesRegister(MOS::X, TRI))
+        LoadX.MI = nullptr;
+      if (MI.modifiesRegister(MOS::Y, TRI))
+        LoadY.MI = nullptr;
       continue;
+    }
 
     int64_t Val = MI.getOperand(1).getImm();
 ```
@@ -126,6 +138,14 @@ Skipping is the correct semantic rather than merely a safe one: `$rcN = LDImm im
 writes no GPR, so the values tracked for `A`, `X` and `Y` remain valid across it
 and must *not* be invalidated. The second test case pins that — a `TAX` rewrite
 still fires across an intervening imaginary-destination load.
+
+The `modifiesRegister` checks are dead code today — every current non-GPR
+`LDImm` destination is an imaginary register that aliases nothing in
+`A`/`X`/`Y` — but they mirror the invalidation the loop already performs for
+non-`LDImm` instructions, so the guard's correctness no longer rests on an
+invariant the register file merely happens to satisfy. (The `TA` handler
+earlier in the loop has the same switch-then-store shape, but nothing widens
+`TA`'s destination class, so it is left untouched.)
 
 `default: llvm_unreachable(...)` would be wrong here: the case is legal, and in a
 release build it is UB rather than a diagnostic, which is exactly how this stayed
