@@ -96,7 +96,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   persistent-blue WASM question — if blue survives a deterministic picture it is a separate
   WASM-path defect, cleanly isolated); merge `feature/exhirom-canaries` — **BLOCKED ×3**:
   cookbook foreign hunk still dirty, `--ff-only` impossible (main +54 commits, needs rebase),
-  and a SEMANTIC conflict in `tools/snes-checksum.py` (main's `5038454` `--fastrom` OR-0x10 vs
+  and a SEMANTIC conflict in `tools/snes-checksum.py` <!-- agent:abdd4a48f462f8550 (dispatched 2026-08-01: speed attribute + rebase) --> (main's `5038454` `--fastrom` OR-0x10 vs
   the branch's cartmap-driven rewrite with no speed concept — needs a speed attribute in the
   cartmap model; do not resolve by picking a side); MAME leg on the SPC700
   IPL (user-gated); then Phase 2 per the **superseding plan**
