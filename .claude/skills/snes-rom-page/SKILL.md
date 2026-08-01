@@ -3,39 +3,48 @@ name: snes-rom-page
 description: >-
   Publish a playable in-browser SNES emulator page for a .sfc ROM on an Astro static site
   (indri.studio or biohack.net). The player engine comes from the @wbniv/bsnes-jg-player npm
-  package (synced + drift-stamped by its CLI), scaffolds a /<slug> page (centred player +
-  controls/instructions) from a template, then builds + deploys per the site. Use when the user
-  wants to put a SNES ROM online as a playable page. Triggers: "publish <rom> to <site>", "add an
-  emulator page", "put this rom on the site", "make a playable page for <rom>".
+  package (synced + drift-stamped by its CLI); this skill adds the ROM + manifest entry and the
+  site's data-driven registry entry (a content-collection JSON file on biohack.net, a TS array
+  entry on indri.studio — both sites render every demo page from one shared route), then builds +
+  deploys per the site. Use when the user wants to put a SNES ROM online as a playable page.
+  Triggers: "publish <rom> to <site>", "add an emulator page", "put this rom on the site", "make a
+  playable page for <rom>".
 ---
 
 # snes-rom-page
 
-Turn a SNES `.sfc` ROM into a playable `/<slug>` page on an Astro static site. The page boots the
-**bsnes-jg WASM** core (the same cycle-accurate core the llvm-mos-65816 differential gate trusts),
-shows the ROM on a centred canvas, and carries the controls/instructions. The mechanical asset setup
-is `scaffold.sh`; the page is written from `page-template.astro`. The engine (app.js + cores) is
-**not vendored here** — it ships in the
+Turn a SNES `.sfc` ROM into a playable page on an Astro static site. The page boots the
+**bsnes-jg WASM** core (the same cycle-accurate core the llvm-mos-65816 differential gate trusts).
+Both sites render **every** demo from one shared dynamic route (`src/pages/snes/[slug].astro` on
+biohack.net, `src/pages/apps/llvm-mos-65816/snes/[slug].astro` on indri.studio) driven by a
+per-site data registry — there is no per-ROM page file to write or edit. `scaffold.sh` does the
+mechanical asset work (engine sync + ROM + preview + manifest); the per-site registry entry is
+written by the skill/agent per *Per-site* below. The engine (app.js + cores) is **not vendored
+here** — it ships in the
 [`@wbniv/bsnes-jg-player`](https://github.com/wbniv/bsnes-jg-wasm) npm package, which each site
 installs and syncs via the package's own CLI (drift-gated in the site's CI by `sync --check`).
 
-> **History:** this skill's repo-local copy previously bundled a raw `engine/` fallback with its own
-> PROVENANCE-timestamp gate (`--force-engine`/`--selftest`), after a 2026-07-31 incident where an
-> unconditional copy of that stale bundle (dated 2026-06-25) downgraded biohack.net's live engine
-> (dated 2026-07-27). That bundle-and-gate approach is now retired in favor of delegating sync
-> entirely to the package's own CLI (`bsnes-jg-player sync`), matching the canonical
-> `~/.claude/skills/snes-rom-page` copy migrated on 2026-07-27 — the incident can't recur because
-> there's no bundled snapshot left to go stale.
+> ⚠️ **Never hand-edit the installed `public/play/app.js`.** It's synced from the
+> `@wbniv/bsnes-jg-player` package, not authored here — a hand-edit gets silently clobbered by the
+> next `scaffold.sh`/`sync` run on any ROM. Fix it upstream in `@wbniv/bsnes-jg-player` and re-sync.
+
+> **History:** this skill's repo-local copy previously (1) bundled a raw `engine/` fallback with its
+> own PROVENANCE-timestamp gate, retired in [`5e75e65`](https://github.com/wbniv/llvm-mos-65816/commit/5e75e65)
+> in favor of the CLI-delegated sync above, matching the canonical `~/.claude/skills/snes-rom-page`
+> copy's 2026-07-27 migration; and (2) scaffolded a per-slug `page-template.astro` file + a
+> hand-maintained gallery `demos` array, both retired here in favor of the two sites' actual current
+> architecture — a single shared route per site reading a data registry (content collection JSON on
+> biohack.net, a TS array on indri.studio) — confirmed against both sites' live HEAD, not assumed.
 
 ## Inputs
 
 - **ROM** — path to the `.sfc` (required).
 - **slug** — URL path + manifest id, lowercase `[a-z0-9-]` (e.g. `blossom`).
 - **title** + one-line **description**.
-- **category** — one of the ids from `index.astro`'s `categories` list (e.g. `motion`). Derive
-  the human label from that list too (e.g. `Motion & Curves`) for `{{CATEGORY_LABEL}}`. Current
-  ids: `fractals`, `physics`, `cellular`, `motion`, `algorithms`, `rendering`, `signals`,
-  `bignums`, `ciphers`, `classics`.
+- **category** — one of: `fractals`, `physics`, `cellular`, `motion`, `algorithms`, `rendering`,
+  `signals`, `bignums`, `ciphers`, `classics` (biohack.net: `src/data/snes-categories.ts`; indri.studio
+  hardcodes the same ten as a label map in its gallery + demo route). Drives the category chip and
+  gallery grouping automatically — no separate label to write.
 - **controls / instructions** — what the buttons do + a short "what is it" (the ROM author knows; ask
   if unclear). The keys are fixed by the player (below) — you map them to the ROM's actions.
 - optional **preview** PNG (256×224) shown while the core downloads.
@@ -56,79 +65,46 @@ installs and syncs via the package's own CLI (drift-gated in the site's CI by `s
    ~/llvm-mos-65816/.claude/skills/snes-rom-page/scaffold.sh \
      --rom /path/to/<slug>.sfc --slug <slug> --site <SITE_DIR> \
      --title "Title" --preview /path/to/preview.png \
+     --playdir public/play \
      --selfcheck "0xOFF 2 0xWANT FRAMES label text"     # optional
    ```
-   It writes `public/play/{app.js,cores/*,roms/<slug>.sfc,roms/manifest.json,preview/<slug>.png}`,
-   syncing the engine from the site's installed `@wbniv/bsnes-jg-player` package (via the package's
-   own CLI) — ROMs, preview, and manifest are site content the CLI never touches. (The scaffold path
-   above is absolute so it resolves regardless of the site repo you've `cd`'d into — `git rev-parse
-   --show-toplevel` at that point would resolve to the *site's* root, not this one.)
+   It writes `<playdir>/{app.js,cores/*,roms/<slug>.sfc,roms/manifest.json,preview/<slug>.png}`.
+   `--playdir` defaults to `public/play`; **indri.studio needs
+   `--playdir public/apps/llvm-mos-65816/play`** instead (see *Per-site*). The engine is synced from
+   the site's installed `@wbniv/bsnes-jg-player` package (via the package's own CLI) — ROMs, preview,
+   and manifest are site content the CLI never touches. (The scaffold path above is absolute so it
+   resolves regardless of the site repo you've `cd`'d into — `git rev-parse --show-toplevel` at that
+   point would resolve to the *site's* root, not this one.)
 
-3. **Write the page** from `page-template.astro`. **The path is site-specific — get it right or the
-   gallery card 404s:**
-   - **biohack.net** → `src/pages/snes/<slug>.astro` (demo pages live UNDER `/snes/`, because the
-     gallery links every card to `/snes/${slug}/`). The page is one level deeper than the template
-     assumes, so **change the Base import to `../../layouts/Base.astro`** (the template ships
-     `../layouts/…`). A page written to top-level `src/pages/<slug>.astro` here serves at `/<slug>/`
-     but its gallery card points at `/snes/<slug>/` → **live 404**.
-   - **indri.studio** → `src/pages/<slug>.astro` (top-level; keep the template's `../layouts/…`).
-   - Replace `{{SLUG}}` `{{TITLE}}` `{{DESC}}` `{{KEYS_LINE}}` `{{INSTRUCTIONS}}`
-     `{{CATEGORY_ID}}` `{{CATEGORY_LABEL}}`.
-   - Set the `controls` array (keys → action) and the `{{KEYS_LINE}}` one-liner to the ROM's mapping.
-   - Brand it to the site (set `--rp-accent`, swap colours/props — *Per-site*). The template's layout
-     + the **natural-aspect canvas** (no `overflow:hidden`/`object-fit`) and **centred player**
-     (`margin-inline:auto`) are load-bearing — keep them; they fix a top-scanline clip and centre it.
-   - Keep `<div id="game">`/`#screen`/`#status`/`#verify`/`#fullscreen`/`#banner` ids and the boot
-     `<script>` — app.js drives them and pauses when the canvas scrolls out of view. `#fullscreen`
-     wires a Fullscreen button (hidden automatically on browsers without the API).
-   - ⚠️ **Never hand-edit the installed `public/play/app.js`.** It's synced from the
-     `@wbniv/bsnes-jg-player` package, not authored here — a hand-edit gets silently clobbered by the
-     next `scaffold.sh`/`sync` run on any ROM. Its Fullscreen handler has been deleted twice in this
-     project's history by unrelated hand-edits, each time shipping ~111 pages with a button that only
-     highlights on hover. If it's missing, fix it upstream in `@wbniv/bsnes-jg-player` and re-sync —
-     don't patch the site copy.
+3. **Add the site's registry entry.** Neither site has a per-ROM page file or a separate
+   "register on the gallery" step any more — the gallery, the homepage count, and the per-demo
+   route all read the *same* entry, so writing it once is the whole job. See *Per-site* for the
+   exact file, schema, and an example to copy the shape from.
 
-4. **Register the demo on the gallery page** (`src/pages/snes/index.astro` on biohack.net, skipped for
-   indri.studio unless it has one). Add a new entry to the `demos` array:
-
-   ```js
-   {
-     slug: '<slug>',
-     title: '<Title>',
-     desc: '<One or two sentences: what it renders, the technique, any notable constraint.>',
-     keys: '<compact key-hint line matching the page's controls, e.g. "← → move · Z/X fire">',
-     category: '<category-id>',
-   },
-   ```
-
-   Keep `desc` to 2 sentences max — the card is small. The `keys` line is rendered in monospace at
-   11 px; keep it under ~60 chars so it doesn't truncate on a 2-column card.
-
-5. **Build, then VERIFY before deploying.** Two distinct things to check:
+4. **Build, then VERIFY before deploying.** Two distinct things to check:
 
    - **Does the ROM render?** A **bsnes-jg screenshot of the ROM is sufficient** — the page boots the
      *same* bsnes-jg WASM core, so the build gate's `build/<slug>-jg.png` (or any bsnes-jg render of
      the exact ROM you're shipping; confirm the sha matches what's deployed) already proves the picture
      renders. **No Chrome needed for this** — don't block the publish on a browser screenshot you can't
      run. (When in doubt that the deployed `.sfc` is the one you rendered: `sha256sum` both.)
-   - **Is the page shell intact?** (core boots in-browser, HUD/text not clipped, player centred.) This is
-     a per-*page* concern, unchanged by the ROM, so it only needs checking when you edited the
-     `.astro`/template — and it's the *only* thing the Chrome shot adds over the bsnes-jg render. If
-     Chrome is available and you changed the page, screenshot it; otherwise verify the page serves
-     (`curl -o/dev/null -w '%{http_code}'`) and trust the unchanged template.
+   - **Did the build's collection/array count check pass?** biohack.net's `[slug].astro` throws at
+     build time if `src/content/snes/` doesn't have as many entries as `roms/manifest.json` has ROMs
+     — `task build` failing with a "SNES demo count mismatch" error means the registry entry is
+     missing or the manifest has a stale extra ROM. There's no shared page template to break any
+     more, so a normal ROM-only publish needs no browser screenshot at all — the build's own count
+     check plus the bsnes-jg render is the verification.
+   - **Only if you edited the shared route itself** (`[slug].astro`, rare): screenshot it —
+     `google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars --window-size=1000,1400
+     --virtual-time-budget=9000 --screenshot=/tmp/<slug>.png "http://localhost:8799/snes/<slug>/"`
+     against `task build && python3 -m http.server 8799 --directory dist` — and confirm nothing is
+     clipped and the player is centred, since that change is shared across every demo page.
 
    ```sh
    cd <SITE_DIR> && task build
-   # Optional page-shell shot (only if Chrome is present AND you edited the page):
-   ( python3 -m http.server 8799 --directory dist & sleep 1
-     google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars \
-       --window-size=1000,1400 --virtual-time-budget=9000 \
-       --screenshot=/tmp/<slug>.png "http://localhost:8799/<slug>/" )
    ```
-   (`--virtual-time-budget` fast-forwards so the ROM runs to a live frame.) On a republish that only
-   swaps the ROM/preview/manifest, the bsnes-jg render + an HTTP 200 check is the verification.
 
-6. **Commit, then deploy** per the site (*Per-site*).
+5. **Commit, then deploy** per the site (*Per-site*).
 
 ## The player's keyboard map (fixed, from app.js)
 
@@ -152,34 +128,64 @@ the headless gate live in the tab. `OFF` is the WRAM offset of the symbol (from 
 
 ## Per-site
 
-### indri.studio (`~/indri.studio`) — Astro 6 + Tailwind + Cloudflare **Workers**
-- `Base.astro` props: `title`, `description`, `ogImage`, `ringFlare={false}`. Set `ogImage`:
-  ```js
-  ogImage={new URL('/play/preview/<slug>.png', Astro.site ?? 'https://indri.studio').href}
-  ```
-- Brand: grey + neon‑purple. Set `--rp-accent: #b026ff;` (or use the page as-is). Tokens in
-  `src/styles/global.css`.
-- Deploy: `task deploy` (build + `wrangler deploy`; `CLOUDFLARE_API_TOKEN` in `.env`). HTML is served
-  `no-store`, so it goes live on reload — no cache purge.
+Both routes below are **shared, stable code that a normal ROM publish never touches** — page title,
+og-image, branding colours, and the Fullscreen/canvas markup are all derived generically from the
+registry entry (`demo.title`/`demo.desc`/`demo.slug`/`demo.category`) inside the route itself.
+Authoring a new ROM means writing *only* the registry entry below; there is nothing else to set.
 
 ### biohack.net (`~/biohack.net`) — Astro 5 static + Cloudflare **Pages**
-- `Base.astro` props: `title`, `description` only.
-- **Demo pages live under `src/pages/snes/<slug>.astro`** (route `/snes/<slug>/`) — see step 3. The
-  gallery at `src/pages/snes/index.astro` links every card to `/snes/${slug}/`.
-- Brand: dark + orange cyberpunk (`--bg #16171a`, `--ink #e8e6e0`, `--accent #c2410c`; fonts Dune
-  Rise / Blade Runner / Space Grotesk in `global.css`). Set `--rp-accent: var(--accent);` and use the
-  display font for the title (`font-family:'Dune Rise',...; text-transform:uppercase`).
+- **Registry**: create `src/content/snes/<slug>.json` — one JSON file per ROM, the `snes` content
+  collection (schema: `src/content.config.ts`; route: `src/pages/snes/[slug].astro`; gallery:
+  `src/pages/snes/index.astro`; also feeds the homepage's demo count). Fields:
+  - `order` (int) — gallery position; append = current max + 1.
+  - `slug`, `title`, `desc` (≤2 sentences — the gallery card is small), `keys` (compact key-hint
+    line, e.g. `"← → move · Z/X fire"`, ~60 chars — it's rendered in 11 px monospace on a
+    2-column card).
+  - `category` — one of the ids above.
+  - `displayMode` (optional int, e.g. `7` for a Mode 7 demo).
+  - `pageTitle` (`"<Title> — bioHACK•NET"`), `pageDesc` (meta description), `heading` (h1 inner
+    HTML), `lede` (hero paragraph inner HTML), `keysHtml` (array of key-help line(s), inner HTML),
+    `doc` (the whole notes section inner HTML — `<h2>` sections, `<p>`, `<pre class="rp-code">`,
+    `.rp-table` rows, `.rp-foot`). Required for a normal demo — `[slug].astro` only *skips*
+    generating a page for entries that omit `doc` (used for the one demo, `lzss-gallery`, that
+    keeps a hand-written page because its content derives from a build-time catalog); such entries
+    still need order/slug/title/desc/keys/category for the gallery card + count.
+  - Copy an existing entry (e.g. `src/content/snes/julia.json`) as the shape reference — prose
+    fields are HTML strings rendered with `set:html`, not markdown.
+  - The build's `getStaticPaths` **throws** if the collection's entry count ≠ `roms/manifest.json`'s
+    ROM count — the registry entry and the manifest entry from step 2 must land together.
 - Deploy is **tag-driven** (GitHub Actions → Cloudflare Pages): `git add` + `git commit`, then
   `task bump` (auto-increments the patch tag, e.g. v1.0.244→v1.0.245, and pushes `origin master` +
   the tag) — or `task publish TAG=vX.Y.Z` for an explicit tag. (There is **no** `task release`.)
   Creds live in CI secrets (`CF_PAGES_API_TOKEN`), not locally. On a hot tree, a concurrent agent's
-  `git add -A` can sweep your gallery-index/manifest edits into *their* commit — verify the deployed
-  HEAD is consistent (all of card + manifest + page + rom + preview present) before/after `task bump`.
+  `git add -A` can sweep your content-entry/manifest edits into *their* commit — verify the deployed
+  HEAD is consistent (all of registry entry + manifest + rom + preview present) before/after `task bump`.
+
+### indri.studio (`~/indri.studio`) — Astro 6 + Tailwind + Cloudflare **Workers**
+- **Assets live under `public/apps/llvm-mos-65816/play/`, not `public/play/`** — pass
+  `--playdir public/apps/llvm-mos-65816/play` to `scaffold.sh` in step 2, or it writes to the wrong
+  place. (`scripts/sync-llvm-mos-emulator.sh`, which `pnpm run sync-engine` wraps, hardcodes the same
+  path for a standalone re-sync.)
+- **Registry**: append one object to the `SNES_DEMOS` array in `src/data/snes-demos.ts` (interface
+  `SnesDemo`, same file; route: `src/pages/apps/llvm-mos-65816/snes/[slug].astro`; gallery:
+  `src/pages/apps/llvm-mos-65816/snes/index.astro`). Fields:
+  - `slug`, `displayMode?` (e.g. `7`), `title`, `desc`, `keys`, `category` (same ids as biohack.net —
+    the route hardcodes its own id→label map, so no separate label file to touch).
+  - `controls` — `[key, action][]` tuples (e.g. `[["← →", "move"], ["Z / X", "fire"]]`), or `null`
+    for a self-running demo (the route checks `demo.keys.toLowerCase().startsWith("self-running")`
+    for wording elsewhere, but `controls: null` is what suppresses the Controls table).
+  - `selfcheck` — `{off, len, want, frames, label}`, matching the `--selfcheck` value passed to
+    `scaffold.sh` **exactly**: the page displays it in the footer, but `app.js` re-reads the real
+    check from `roms/manifest.json` at runtime — the two must agree or the footer text lies.
+  - `bugFound?` / `works?` — optional fields used by a handful of existing entries (a guarded
+    pre-existing compiler bug; the lzss-gallery corpus catalog). Omit both for a normal ROM.
+- Deploy: `task deploy` (build + `wrangler deploy`; `CLOUDFLARE_API_TOKEN` in `.env`). HTML is served
+  `no-store`, so it goes live on reload — no cache purge.
 
 ## Commit discipline
 
-Stage only the files this run created/edited — `public/play/**` (ROM, preview, manifest — engine
-files only when the `@wbniv/bsnes-jg-player` package version was bumped, since sync is otherwise a
-no-op) and the page (`src/pages/snes/<slug>.astro` on biohack.net, `src/pages/<slug>.astro` on
-indri.studio) plus `src/pages/snes/index.astro` (gallery entry). Verify
-`git diff --cached --name-only`.
+Stage only the files this run created/edited — `public/apps/llvm-mos-65816/play/**` or
+`public/play/**` (ROM, preview, manifest — engine files only when the `@wbniv/bsnes-jg-player`
+package version was bumped, since sync is otherwise a no-op) and the registry entry
+(`src/content/snes/<slug>.json` on biohack.net, the appended object in `src/data/snes-demos.ts` on
+indri.studio). Verify `git diff --cached --name-only`.
