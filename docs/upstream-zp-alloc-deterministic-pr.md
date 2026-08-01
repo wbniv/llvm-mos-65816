@@ -1,13 +1,12 @@
 # [MOS] Make zero page allocation deterministic (pointer-hash iteration order decided the winners)
 
-<!-- DRAFT 2026-08-01 — NOT POSTED. Provenance: the lzss-gallery non-reproducible-build
-     investigation, docs/plans/2026-08-01-gallery-nonreproducible-build.md (throwaway branch
+<!-- DRAFT 2026-08-01 — READY TO POST (posting is user-triggered; branch not yet minted).
+     Provenance: the lzss-gallery non-reproducible-build investigation,
+     docs/plans/2026-08-01-gallery-nonreproducible-build.md (throwaway branch
      throwaway/gallery-repro-bisect, worktree /home/will/llvm-mos-65816-gallery-repro).
      Fork patch: patches/llvm-mos/0021-mos-zp-alloc-deterministic.patch.
-     BLOCKED BEFORE POSTING: the fix is authored and applies cleanly both ways, but the
-     toolchain rebuild + post-fix measurement (dev/measure-gallery-repro.sh tie/rom, MOS lit
-     suite) has NOT been run — the build was denied by the sandbox permission classifier.
-     Do not post until the Verification section carries real numbers. -->
+     Verified 2026-07-31 on a rebuilt toolchain — see the Verification section below; the
+     earlier "do not post until verified" block is cleared. -->
 
 ## Summary
 
@@ -130,8 +129,35 @@ insertion-order answer) via their `mos8()` operands and `.zp.noinit` placement.
 
 Nondeterminism is awkward to test directly; this pins the now-deterministic output instead,
 which is a sound proxy because the correct answer is a specific one of the eight-choose-four
-possibilities. Red/green measured on the unfixed compiler: **0 pass / 20 fail out of 20
-runs** — the address-ordered result never coincided with insertion order in that sample.
+possibilities.
+
+## Verification
+
+Red/green on the same machine, before and after the change.
+
+**The minimal case** — 20 runs of `llc -mtriple=mos -zp-avail=4` on the module above,
+tallying the winning set:
+
+| | distinct winner sets in 20 runs |
+|---|---|
+| before | **6** (`g1 g5 g6 g7` ×6, `g1 g2 g3 g4` ×6, `g2 g3 g4 g6` ×2, `g0 g2 g3 g4` ×2, `g0 g1 g6 g7` ×2, `g0 g1 g5 g7` ×2) |
+| after | **1** — `g0 g1 g2 g3`, 20/20 |
+
+`g0 g1 g2 g3` is the declaration order, which is what `MapVector` predicts: the candidate
+list now follows the MachineInstr walk.
+
+**The lit test** — `zp-alloc-deterministic.ll`: **0 pass / 20 fail** before, **passes** after.
+
+**Whole-program** — a 1 MiB SNES ROM (single TU, full LTO, `-mlto-zp=224`) linked 20 times
+from identical sources:
+
+| | distinct images in 20 links |
+|---|---|
+| before | **2**, split ~18/12 over 30 links |
+| after | **1** — `a4e00f3bfc7491aa7cc129008e7b6cd8933bb117ea90d3361e5363b94903427e`, 20/20 |
+
+**Regressions** — `llvm/test/CodeGen/MOS/`: 81 tests, 7 failures, exactly the pre-existing
+set that fails on this fork before the change. No new failures.
 
 ## Real-world sighting
 

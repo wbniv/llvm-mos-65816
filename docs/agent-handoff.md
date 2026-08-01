@@ -70,6 +70,13 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
   `build/llvm-mos-install/bin/clang` is a symlink with a *stale mtime*; the real binary is **`clang-23`**.
   Confirm a rebuild took by checking `clang-23`'s mtime advanced (or `nm` it for a new symbol) — a stale
   build silently serving old codegen has burned this project before.
+  **SECOND GOTCHA (2026-07-31):** `dev/run.sh toolchain` does **not** rebuild `build/llvm-mos/bin/llc`
+  (it is not in the installed distribution component list), so a green toolchain build can still leave
+  `llc` months stale — it reproduced an already-fixed nondeterminism bug and failed the new lit test
+  after the fix had built fine. Any verification that drives `llc` directly (`dev/measure-gallery-repro.sh`,
+  MIR/lit work) must refresh it explicitly:
+  `docker run --rm -v $ROOT:/work --user $(id -u):$(id -g) -e HOME=/work/build llvm-mos-65816-dev
+  cmake --build /work/build/llvm-mos --target llc --parallel 8`.
 - **Compile + MIR-verify on the host** (no container needed; `mos-clang` is the built compiler):
   ```
   build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 \
