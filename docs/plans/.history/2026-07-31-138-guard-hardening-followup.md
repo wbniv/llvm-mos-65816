@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/16021b2) | docs(plan): 138 follow-up — record the CI cancel/supersede, the concurrent TA hardening (3ce98fed82de), and the body-regression re-correction |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/8334efa) | docs(plan): #138 guard-hardening follow-up — hardened guard shipped (PR #584 @ 7eedb14a2597), overclaimed repro count corrected to measured matrix |
 
 <!--history-meta v1
+16021b2	author	Will Norris
+16021b2	added	8
+16021b2	deleted	0
+16021b2	files	1
+16021b2	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8334efa	author	Will Norris
 8334efa	added	194
 8334efa	deleted	0

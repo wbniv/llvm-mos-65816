@@ -49,27 +49,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md); **user-gated**);
   (3) browser-exercise the badge states; (4) confirm the 24000-frame worst-case budget from
   `gallery_repack_frames[]` over all 62 works.
-- [wip T3] **Gallery ROM non-reproducible build — ROOT-CAUSED 2026-08-01 (upstream
-  `MOSZeroPageAlloc` DenseMap tie-break); remaining = apply `MapVector` fix + verify +
-  upstream package.** <!-- agent:a758b3836d195822b --> `MOSZeroPageAlloc` iterates a
-  pointer-keyed `DenseMap<GlobalVariable*, float>` (`MOSZeroPageAlloc.cpp:499/:523`) and
-  `stable_sort`s by benefit, so equal-benefit candidates are ordered by heap address — when ZP
-  is full the tie-break decides who gets the last byte (gallery: `arrow_pose` ↔
-  `arrow_previous_direction`, 2 B→3 B accesses, `.text` ±2 B, 1509/2291 ROM symbols shift).
-  Proven on pristine upstream `8be0546128a5` (12-line `.ll`, 8 tied globals, `-zp-avail=4` →
-  6 winner sets in 20 single-threaded `llc` runs); `-mlto-zp=0` A/B → 15/15 byte-identical.
-  Affects every `-mlto-zp` platform. **Two TODO premises corrected:** symbol addresses are NOT
-  identical (only WRAM symbols hold — which is why gates never drifted); the ASLR rule-out was
-  a false negative (driver's random temp-object path re-randomizes the heap; `setarch -R` +
-  fixed input path IS deterministic). Fix recorded NOT applied: `DenseMap`→`MapVector` one-liner
-  (+ two flagged same-class siblings `CalleeFreqs`/`SCCCallees`). Artifacts on
-  `throwaway/gallery-repro-bisect` (`13c3542`): plan
-  `docs/plans/2026-08-01-gallery-nonreproducible-build.md` + `dev/measure-gallery-repro.sh`
-  (modes rom/rom-nozp/llc/tie/zpdiff). Remaining: apply fix to vendor, rebuild, `tie 20` →
-  1 line + `rom 20` → 1 hash, ship the 8-global `.ll` as an upstream lit test + PR, then restore
-  `dev/lzss-gallery.sh`'s sha256 claim to honest. Prefer re-messaging the stamped agent (full
-  context) over a fresh brief. (T3: fix is decided + validation scripted; toolchain rebuild
-  coordination is the only care point.) Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
+  Mechanism undecided: player-side 62-entry oracle table (compressed_bytes from
   host `report.json`) keyed by a ROM-published index, vs ROM-side check-on-display publishing a
   uniform `(work-id, pass/fail)` pair — both costed in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md). The ROM must first
@@ -1048,6 +1028,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [gallery-repro] Non-reproducible build root-caused (upstream `MOSZeroPageAlloc` DenseMap tie-break), FIXED (patch `0021`, `3500adb`) + VERIFIED (tie 20/20 one set, rom 20/20 one hash `a4e00f3b…`, lit RED→GREEN, suite 7 pre-existing only, `bd6ca35`); upstream package READY-TO-POST (status row 17, user-triggered). Investigation on `throwaway/gallery-repro-bisect`.
 - [x] 2026-07-31 — [snes-rom-page-migrate] Repo skill copy migrated to CLI-delegated engine sync (`5e75e65`): bundled `engine/` + PROVENANCE gate dropped (retired-mechanism note kept), `--touchnav` restored; synthetic e2e green. Follow-up filed: data-driven-routes port.
 - [x] 2026-07-31 — [frozen-detector-apply] Verified FROZEN-detector fix applied to `dev/display-check.py` (`d3000d7`); trio spot-check 3/3 by predicted mechanism; foreign docstring hunk left unstaged. See [investigation](docs/investigations/2026-07-31-frozen-trio-frozen-flag-discriminator.md).
 - [x] 2026-07-31 — [pr-critique] All critique items landed on PRs #577/#578/#584 (tests, bodies, TA-hardening) + #579 body; RA issue drafted. See [plan](docs/plans/2026-07-31-upstream-pr-critique-improvements.md).

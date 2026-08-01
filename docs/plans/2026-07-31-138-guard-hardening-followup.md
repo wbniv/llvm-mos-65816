@@ -197,6 +197,8 @@ register makes it fire.
 
     **Amendment 2026-08-01:** the `7eedb14a2597` CI run (30680048082) finished **cancelled ×3, not failed** — superseded via the workflow's per-PR-ref `cancel-in-progress` concurrency group when a concurrent session's PR-critique sweep pushed `3ce98fed82de` (TA-handler hardening) onto the same branch at 03:06. That session's body re-sync also **regressed the Reproduction paragraph back to the falsified count claim** and dropped the matrix; re-corrected on top of their version at 03:11 (verified: 0 "smallest count" matches, matrix + TA paragraph both present; mirror re-synced, branch commits `fd3ff18` + their prose adopted). New CI run 30681345370 on `3ce98fed82de` in progress — watch running; conclusion to be recorded here.
 
+    **CI conclusion (recorded 2026-08-01):** all three legs SUCCESS on `3ce98fed82de` — Lit Tests ubuntu-24.04, macOS-15, windows-2022. Step 6 fully closed.
+
 7. TODO: new producer item present; #138 entry says POSTED; no foreign hunks staged in any commit (`git diff --cached --name-only` = exactly our files).
 
     **PASS** — `[T3]` producer/standing-scan item added next to the `lowerCmpZeros` item; the `[wip T4]` #138 entry now records PR #584 POSTED + hardened (`7eedb14a2597` upstream, `0999cfa`/`299b9be` fork branch). `TODO.md` carries pre-existing foreign unstaged edits, so it is deliberately left **uncommitted** on the hot tree (the edit rides with the next TODO commit); the plan file commits alone.
