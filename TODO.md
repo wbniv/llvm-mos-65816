@@ -57,11 +57,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   `sync-manifest-offsets.py` already honours `selfcheck.symbol`. Manifest wiring blocked until the
   post-fix gallery republish ships a byte-identical rebuilt ROM. (T4: mechanism is a design call
   spanning ROM + player.)
-- [wip T2] **Full 62-work *visual* corpus sweep (~2.5 h) — post-A-clobber-fix confirmation.** <!-- agent:a08fd2c816716414c --> Bench
-  gate (presentation stripped) covers all 62; the visual ROM is verified only over works 0–3 at
-  40k frames — a presentation-path interaction beyond work 3 would slip both. Run once, record
-  into the [abi-clobber plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md) and the
-  #137 completion record.
 - [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
   test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:af681e8a1b2ac9191 -->
   Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
@@ -1016,6 +1011,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-31 — [gallery-visual-sweep] Full 62-work visual corpus sweep PASS: `corpus_result got=0x96D8 == oracle` after 700 000 frames on bsnes-jg (1 h 25 m jgxcheck leg, ~1 h 31 m whole script), `throwaway/visual-sweep` off `main` HEAD `2343db7`. Already recorded (`b5ea1a6`); this pass verified the record and closed out the TODO marker. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
 - [x] 2026-08-01 — [snes-rom-page-routes] Skill now authors pages via the sites' data-driven routes (`3b212bd`): per-slug `page-template.astro` deleted; per-site registry schemas documented from live HEADs (biohack `src/content/snes/*.json` + count guard, indri `SNES_DEMOS` + non-default playdir gap fixed); dry-run validated both registries.
 - [x] 2026-08-01 — [display-sweep-patched] Full 118-ROM sweep on the patched detector: 117 PASS / 1 FAIL; deltas vs 2026-07-31 baseline = exactly the predicted trio FAIL→PASS, 0 new full-pixel FAILs, 0 reclassifications (3/114 = 2.6% change, `fdb044a`). The 1 FAIL is `svx2-fastrom-video` (corpus_result 0x4f≠0x00) — a post-baseline WIP ROM owned by the in-flight SVX2 plan, reported there.
 - [x] 2026-08-01 — [gallery-repro] Non-reproducible build root-caused (upstream `MOSZeroPageAlloc` DenseMap tie-break), FIXED (patch `0021`, `3500adb`) + VERIFIED (tie 20/20 one set, rom 20/20 one hash `a4e00f3b…`, lit RED→GREEN, suite 7 pre-existing only, `bd6ca35`); upstream package READY-TO-POST (status row 17, user-triggered). Investigation on `throwaway/gallery-repro-bisect`.
