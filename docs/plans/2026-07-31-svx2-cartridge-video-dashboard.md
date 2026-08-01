@@ -1,7 +1,7 @@
 # SVX2 Cartridge-Native Video Dashboard
 
 **Date:** 2026-07-31
-**Status:** Implemented and locally verified; publication in progress
+**Status:** Complete and published
 **Supersedes dashboard placement in:** `2026-07-31-svx2-video-title-and-dashboard.md`
 
 ## Correction
@@ -132,7 +132,7 @@ its existing running status, fidelity button, and fullscreen control.
   dashboard states.
 - [x] Re-run frame CRC, two-loop, exact cadence, deadline, fidelity, display-quality, gallery
   self-check, static-build, engine-drift, and Lighthouse gates.
-- [ ] Publish a new ROM/player/gallery release and verify live bytes against local artifacts.
+- [x] Publish gallery release `v1.0.323` and verify live bytes against local artifacts.
 
 ## Implementation record
 
@@ -145,6 +145,9 @@ its existing running status, fidelity button, and fullscreen control.
 - Gallery target self-check passes for 1,200 frames at the linked loop-gate offset `$0044`, with no
   force-blank bleed.
 - Locally gated ROM SHA-256: `30f1c0834b2724f80363a86f77fe49e175720036cebe6e30da6dc4a6119e0d07`.
+- Production workflow `30682613250` passed install, build, engine drift, page count, links,
+  fullscreen, Cloudflare propagation, Lighthouse, CLS, and threshold gates.
+- The live `v1.0.323` ROM has the exact same SHA-256 as the locally gated artifact.
 
 ## Acceptance gates
 
