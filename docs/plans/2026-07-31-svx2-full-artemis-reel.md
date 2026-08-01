@@ -1,7 +1,7 @@
 # SVX2 Two-Video Artemis Reel
 
 **Date:** 2026-07-31
-**Status:** Corrected two-video implementation complete 2026-07-31; publishing
+**Status:** Corrected two-video implementation published 2026-07-31
 **Depends on:** `2026-07-31-real-video-codec-corpus.md`,
 `2026-07-31-svx2-animated-video-cartridge.md`, and
 `2026-07-31-svx2-cartridge-video-dashboard.md`
@@ -94,3 +94,5 @@ transitions, zero decoder errors, and zero deadline slips.
 - Superseded one-video artifact: release `v1.0.328`, SHA-256 `31cfed53799fa9d3674a75cc3ea9434d8c37ae16706dca645222e11c51388baf`.
 - Corrected two-video artifact SHA-256:
   `488f03001919f3c83006b13c39bc99dee8563886e88e21a07d564c0ff68b5af3`.
+- Published by gallery commit `d9dd125`, release `v1.0.329`; deployment succeeded, the downloaded
+  4 MiB ROM hash is identical, and that live artifact passes the 6,500-frame composite gate.
