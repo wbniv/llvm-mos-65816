@@ -62,11 +62,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   40k frames — a presentation-path interaction beyond work 3 would slip both. Run once, record
   into the [abi-clobber plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md) and the
   #137 completion record.
-- [wip T2] **Re-run the full ~100-ROM display sweep with the patched detector** — <!-- agent:a600f8d98aa87a91f --> the fix can only
-  downgrade FAIL→PASS, but the old subsampled `same()` was blind (truchet: 2048 differing pixels,
-  0 sampled): other demos may have been PASSING only through that blindness, and the new
-  confirmation burst may reclassify others' FROZEN/STATIC. One sweep, record deltas vs the
-  2026-07-31 baseline. Depends on the `[T1]` apply above. (T2: mechanical long run + diff.)
 - [T2] **snes-rom-page skill: port the page-authoring workflow to the sites' data-driven
   routes.** Found by the engine-sync migration (`5e75e65`): the skill's kept
   `page-template.astro`/`demos`-array workflow is ALSO stale — biohack.net now renders every
@@ -1028,6 +1023,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [display-sweep-patched] Full 118-ROM sweep on the patched detector: 117 PASS / 1 FAIL; deltas vs 2026-07-31 baseline = exactly the predicted trio FAIL→PASS, 0 new full-pixel FAILs, 0 reclassifications (3/114 = 2.6% change, `fdb044a`). The 1 FAIL is `svx2-fastrom-video` (corpus_result 0x4f≠0x00) — a post-baseline WIP ROM owned by the in-flight SVX2 plan, reported there.
 - [x] 2026-08-01 — [gallery-repro] Non-reproducible build root-caused (upstream `MOSZeroPageAlloc` DenseMap tie-break), FIXED (patch `0021`, `3500adb`) + VERIFIED (tie 20/20 one set, rom 20/20 one hash `a4e00f3b…`, lit RED→GREEN, suite 7 pre-existing only, `bd6ca35`); upstream package READY-TO-POST (status row 17, user-triggered). Investigation on `throwaway/gallery-repro-bisect`.
 - [x] 2026-07-31 — [snes-rom-page-migrate] Repo skill copy migrated to CLI-delegated engine sync (`5e75e65`): bundled `engine/` + PROVENANCE gate dropped (retired-mechanism note kept), `--touchnav` restored; synthetic e2e green. Follow-up filed: data-driven-routes port.
 - [x] 2026-07-31 — [frozen-detector-apply] Verified FROZEN-detector fix applied to `dev/display-check.py` (`d3000d7`); trio spot-check 3/3 by predicted mechanism; foreign docstring hunk left unstaged. See [investigation](docs/investigations/2026-07-31-frozen-trio-frozen-flag-discriminator.md).
