@@ -68,70 +68,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   window in-degree > 0), Act 3 a Mode 7 flyover over a cart-spanning atlas. House pattern
   unchanged: generator + host oracle from `tools/snes_cartmap.py`, per-act sub-CRCs, folded
   `corpus_result`, entropy-fingerprint gate, `snes_ppu_reset_blank()` at boot. Supersedes the
-  video-reel Phase 2. **Blocked on the `feature/exhirom-canaries` merge** (needs the branch's
-  ExHiROM platform + cartmap model; the checksum speed-attribute conflict is the substantive
-  prerequisite). [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md) (T4: new
+  video-reel Phase 2. **UNBLOCKED 2026-08-01: the merge landed (`d0d6b39`)** — cartmap model,
+  ExHiROM platform, and speed attribute are on main; P0 is dispatchable. [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md) (T4: new
   generator architecture + VM design; phases P1-P3 drop to T3 once P0 settles the contract.)
-- [wip T4] **Extended SNES cartridge mapping (ExHiROM) — Phase 0–1 COMPLETE; cartridge-size
-  test pages PUBLISHED LIVE (2026-07-31, biohack.net v1.0.314).** <!-- agent:af681e8a1b2ac9191 -->
-  Display defect root-caused (two real canary PPU bugs — layers never disabled compositing
-  uninitialised VRAM; CGRAM written during active display, now HVBJOY-synced — plus a since-WITHDRAWN
-  harness claim — the "jgxcheck captures stale/partial frames" finding was three separate RUNS,
-  not three frames; root cause was bsnes-jg power-on entropy, see below. PNG `yoff=0` vs player
-  `yoff=8` noted).
-  Re-gated PASS ×3 configs at frames 700+1800; fix `92c1b74`. Live pages:
-  [4 MiB HiROM](https://biohack.net/snes/cartsize-hirom-4m/) ·
-  [6 MiB ExHiROM](https://biohack.net/snes/cartsize-exhirom-6m/) ·
-  [8 MiB ExHiROM](https://biohack.net/snes/cartsize-exhirom-8m/).
-  **Display defect ROOT-CAUSED + FIXED 2026-08-01 (`811c1f8` on the branch):** bsnes-jg reseeds
-  its PRNG from `clock()` at every power-on (entropy "Low"), randomizing every PPU register the
-  ROM never wrote — the canary hand-set only 3 of ~48 control regs, so the picture (incl. the
-  user's live black stripe = a random window mask, reproduced 4/24 boots from the exact deployed
-  bytes) was random per boot while WRAM stayed deterministic. Fix = `snes_ppu_reset_blank()` at
-  boot (the SDK's own doc names this failure); fixed ROM 24/24 boots one picture `11D41DC5`
-  green across entropy None/Low/High; regression gate step 6b added; per-frame `JGX_FRAMESCAN` +
-  `JGX_ENTROPY` in jgxcheck. **Manual WASM check DONE/PASS** (user, live 6 MiB page: `0xA274 ==
-  gate`). Remaining: **republish the 3 cartsize pages with fixed ROMs** (also settles the
-  persistent-blue WASM question — if blue survives a deterministic picture it is a separate
-  WASM-path defect, cleanly isolated); merge `feature/exhirom-canaries` — **READY (2026-08-01): rebase + speed attribute DONE**
-  (agent abdd4a48: cartmap `speed` attribute + `--fastrom` alias, 280/280 ROM byte-identical
-  vs legacy tool incl. the 4 FastROM images, rebased to `e0a5dd1` on `53729d5`, ff-mergeable,
-  canary gate PASS 0x48EE/0xA274/0x29B9 + entropy 6b ×3, 108 host tests). Merge command:
-  `git merge --ff-only feature/exhirom-canaries` — SOLE remaining blocker: two doc files
-  another session holds uncommitted in main's tree (`docs/snes-demo-cookbook.md`,
-  `docs/refs/snes-hardware/snes-hardware-summary.md`; the latter's hunk collides at the same
-  anchor as the branch's — stash-merge-pop would conflict in their prose; wait for their
-  commit or user authorizes committing their hunks); MAME leg on the SPC700
-  IPL (user-gated); then Phase 2 per the **superseding plan**
-  [2026-08-01-exhirom-three-act-synthesis-cart.md](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md)
-  (shape decided by user 2026-08-01: three synthesis acts in a loop, no second video path).
-  Authoritative model `tools/snes_cartmap.py` ported from bsnes-jg's own bus decode
-  (`boards.bml` + `Bus::map`) — everything (linker, descriptors, checksum, fill, oracles)
-  generated from it; emit-side canonical-only, read-side mirror-aware. All three ROMs PASS
-  (`canary_status=0`: HiROM 4 MiB `0x48EE`, ExHiROM 6 MiB `0xA274`, 8 MiB `0x29B9`); 101 host
-  tests; checksum tool byte-identical on all 267 existing `.sfc`. Truth table pinned: boot
-  code lives in **bank `$40`** (file `$408000+`), file→CPU non-monotonic at 4 MiB, 6 MiB →
-  logical 8 MiB → size byte `$0D`. Commits `a2355fb`/`3e80748` on `feature/exhirom-canaries`
-  (rebased, unmerged); plan records `ac773f4`/`f2fd61b` on main. **Held:** (1) unresolved
-  display defect — backdrop verdict renders inconsistently per config/frame while the WRAM
-  oracle is fully deterministic; 3-hypothesis budget spent (timing, tile base, idle-loop
-  removal), root cause unknown — publish would look broken; (2) MAME leg has **zero evidence**:
-  `dev/roms/s_smp/spc700.rom` (SPC700 IPL) absent on this machine, gate fell back to
-  `JG_ONLY` — needs the IPL supplied. WASM ExHiROM: statically positive (wasm embeds the
-  EXHIROM boards + map lines), not runtime-proven. Publish commands ready in the agent report;
-  sparse fill → ~141 KiB gzipped per ROM.
-  **Video-codec corpus COMPLETE (2026-07-31):** animation + real Artemis I press-camera footage,
-  Floyd/Bayer matrix, and all codec baselines measured. SVX1 wins all four cells; one codec is
-  sufficient. Floyd is the quality-first default; Bayer is size-optimized. Target gate now has a
-  raw `MVN` baseline: 87.6 fps. SVX2 replacement/copy spans pass byte correctness and reach
-  60.8–69.4 fps over 600 VBlanks, clearing both the 20 fps shipping gate and 30 fps optimization
-  gate with >2× margin. Corpus cost versus SVX1 is +2.29–4.54 ratio points; SVX1 remains a size
-  baseline only because its delta path reaches just 15.6 fps. Mapper-neutral bounded packet staging
-  and the bulk bank-contained segment cursor are implemented and host-gated, including a real SVX2
-  packet split across two synthetic canonical ROM banks. Its SNES bulk-copy adapter now stages each
-  bank-contained ROM span into either WRAM bank with `$2180` GP-DMA; host tests cover its register
-  plan and rejection boundaries, and llvm-mos compiles the target MMIO path. Wire that adapter into
-  the player after `feature/exhirom-canaries` lands. ([results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md))
+- [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
+  absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
+  `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
 - [T3] **60 fps video — FUNCTIONAL REFILL PASSES (2026-08-01); remaining = keyframe policy
   decision + merge + master acquisition.** <!-- agent:a0f879ca71db8cabe (feature/60fps-video, merge-tree clean vs main) -->
   Brief correction: staged-WRAM decode already existed at HEAD; the real gap was multi-packet
@@ -1045,6 +987,8 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [exhirom-merged] `feature/exhirom-canaries` MERGED to main (`d0d6b39`, ff): cartmap model + ExHiROM platform + 3 canary ROMs + entropy display fix + cartridge SPEED attribute (280/280 tool byte-identity, gate PASS ×3, 108 host tests). AUTOJOY doc sections landed user-directed (`6943ee9`); jgxcheck overlap stash-restored.
+- [x] 2026-08-01 — [cartsize-republish] Three entropy-fixed canary ROMs LIVE ([fc366ba](https://github.com/wbniv/biohack.net/commit/fc366ba79546905086f9a4e95a3df64856cc927e), v1.0.338, CI success, 3/3 live shas match); verdict paints green deterministically in WASM — display defect closed end-to-end, user-confirmed on the live pages.
 - [x] 2026-08-01 — [gallery-republish+retire] Record-carrying reproducible gallery ROM LIVE on biohack.net (`e1e21d6`, v1.0.337, CI success, live sha == 5768…3a95d; manifest unchanged; user-gated app.js untouched); verify-button worktree retired (492M reclaimed, durability check passed).
 - [x] 2026-08-01 — [ppu-reset-blank-bare] Re-checked the premise before fixing (measure, don't
   assume): only `hello.c` actually drove `INIDISP` bare — `boids.c`/`lsystem.c`/`turtle-vm.c`
