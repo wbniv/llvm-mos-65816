@@ -66,7 +66,7 @@ MANIFEST="$SITE/public/play/roms/manifest.json"
 # Headless, this deterministically lands on the FIRST work: the machine starts at frame 0 with the
 # record zeroed, exactly as the browser's `?verify=1` path does. Reproducible, not display-dependent.
 #
-# id<TAB>off<TAB>len<TAB>want<TAB>frames<TAB>mode<TAB>base
+# id<TAB>off<TAB>len<TAB>want<TAB>frames<TAB>mode<TAB>base<TAB>blankscan_rows
 ROWS=$(ONLY="$ONLY" python3 - "$MANIFEST" <<'PY'
 import json, os, sys
 only = {s for s in os.environ.get("ONLY", "").split(",") if s}
@@ -78,10 +78,10 @@ for r in json.load(open(sys.argv[1]))["roms"]:
         base = int(str(sc["off"]), 16)
         # the scalar half: poll `state` until it reaches `ready`
         row = [r["id"], hex(base + sc["record"]["state"]), "1", str(sc["ready"]),
-               str(sc["frames"]), "live-record", hex(base)]
+               str(sc["frames"]), "live-record", hex(base), str(sc.get("blankscanRows", 4))]
     else:
         row = [r["id"], str(sc["off"]), str(sc["len"]), str(sc["want"]), str(sc["frames"]),
-               "scalar", "-"]
+               "scalar", "-", str(sc.get("blankscanRows", 4))]
     print("\t".join(row))
 PY
 )
@@ -113,7 +113,7 @@ PY
 }
 
 pass=0; fail=0; missing=0; failed=""
-while IFS=$'\t' read -r id off len want frames mode base; do
+while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
   [ -n "$id" ] || continue
   rom="$SITE/public/play/roms/$id.sfc"
   if [ ! -f "$rom" ]; then
@@ -123,14 +123,15 @@ while IFS=$'\t' read -r id off len want frames mode base; do
     # JGX_POLL: `frames` is the player's budget, not a rendezvous — stop the instant the record
     # reaches `ready`, exactly as the browser's chunked poll does. Without it a fixed frame count
     # would have to land inside the ~530-frame ready window of a ~9100-frame cycle.
-    out=$(JGX_BLANKSCAN=1 JGX_POLL=1 JGX_WRAM_DUMP="$base" JGX_WRAM_DUMP_LEN=5 \
+    out=$(JGX_BLANKSCAN=1 JGX_BLANKSCAN_ROWS="$blankscan_rows" JGX_POLL=1 JGX_WRAM_DUMP="$base" JGX_WRAM_DUMP_LEN=5 \
             "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
     detail=$(JGXOUT="$out" record_check "$id" 2>&1) || {
       printf '  %-16s FAIL  live-record: %s\n' "$id" "$detail"
       fail=$((fail+1)); failed="$failed $id"; continue
     }
   else
-    out=$(JGX_BLANKSCAN=1 "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
+    out=$(JGX_BLANKSCAN=1 JGX_BLANKSCAN_ROWS="$blankscan_rows" \
+            "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
     detail=""
   fi
   # `|| true`: a grep that matches nothing exits 1, and under `set -e` that kills the run mid-way
