@@ -73,6 +73,143 @@ NASA item; do not substitute a different interval without recording new provenan
 4. Entropy fingerprint one picture; `-verify` clean.
 5. Published page live; served ROM sha matches the gate-verified binary.
 
+---
+
+## Results (2026-08-02, `dev/apollo-reel.sh`)
+
+**Status: IMPLEMENTED.** Deliverables landed as `examples/snes/apollo-reel.c`,
+`examples/snes/apollo-reel-fast.s`, `dev/apollo-reel.sh`, and three opt-in flags on the existing
+`tools/snes-video-reel-assets.py`. Full gate output below.
+
+### Open questions, answered
+
+**1. Capacity / mapping — ordinary HiROM, comfortably.** The packed stream is **848,527 B**
+(837,028 sequential delta packets + 8,465 seek keyframes + 3,034 loop delta), against the Artemis
+reel's 2,360,380 B. Apollo is *denser per frame* (2,790 B/frame vs 2,622, +6.4%) but only a third
+as long, so the whole cartridge is **1,048,576 B = 8 Mbit HiROM** — code in bank `$C0`, stream from
+`$C1`. HiROM's `$C1`–`$FF` holds 4,128,768 B, so the stream uses 13 of 63 available banks.
+**No ExHiROM path is needed and none was used.**
+
+**2. Keyframe policy — Option A K=120 stands, unchanged.** Measured seek-keyframe cost at three
+intervals:
+
+| K | seek keyframes | seek bytes | B/keyframe | total stream |
+|---:|---:|---:|---:|---:|
+| 30 | 10 | 28,112 | 2,811 | 868,174 |
+| 60 | 5 | 14,055 | 2,811 | 854,117 |
+| **120** | **3** | **8,465** | **2,822** | **848,527** |
+
+An Apollo seek keyframe costs **2,822 B vs the Artemis reel's 2,793 B — +1.0%**, i.e. essentially
+unchanged: a PackBits keyframe is near-incompressible on both. Nothing here argues for moving K,
+and larger K is strictly smaller in this structure, so K=120 was kept.
+
+*Note on an apparent conflict:* the benchmark doc's keyframe sweep concludes "keep the existing
+60-frame interval." That sweep measures a **different structure** — keyframes interleaved *inside*
+the sequential stream (where a larger interval trades against delta drift). The reel/Apollo emitter
+puts only frame 0 in the sequential stream and keeps seek keyframes in a **separate table**, so
+raising K only removes table entries and is monotonically smaller. Both statements are correct
+about their own structure.
+
+**3. Asset emitter — extends cleanly; no sibling needed.** `tools/snes-video-reel-assets.py` gained
+three opt-in flags and no new file: `--frame-checks` (per-frame Fletcher16 + the final decoded
+frame, for the whole-loop gate), `--dashboard-palette-fixup` (the Apollo corpus quantizer used
+palette entry 1 for near-white `0x77ff`; the flag rewrites entries 0/1 to the HUD's black/white —
+**tiles and stream are untouched**, display colour only), and `--palette-output` (writes the
+effective palette for the screenshot checker). Behaviour-preservation was proven, not assumed:
+old-vs-new emitter on identical input produced a **byte-identical header and stream**.
+
+### Cadence, next to the Artemis figures
+
+| ROM | content | presented / 600 VBlanks | deadline slips |
+|---|---|---:|---:|
+| Artemis reel (baseline) | night launch, smoothed | 674/600 hardest slice | 0 |
+| **Apollo, slow ROM** | **daylight film grain** | **300 / 600** | **0** |
+| **Apollo, FastROM** | **daylight film grain** | **300 / 600** | **0** |
+
+**No regression.** At the 2-VBlank cadence both builds present exactly 300 frames per 600 VBlanks —
+a locked 30 fps — with zero deadline slips. The +5.29 ratio points of hard-content cost land as
+cartridge bytes, not dropped frames: a larger packet still stages and decodes inside the 2-VBlank
+budget. (The Artemis 674/600 figure is its 1-VBlank/60 fps slice and is not the same operating
+point; the like-for-like statement is that neither content slips at its target cadence.)
+
+Boot-time note, measured: the whole-loop validation pass costs ~2,200 VBlanks on FastROM and
+~2,400 on slow ROM for 301 checked decodes. The C Fletcher loop (4,480 iterations/frame over WRAM)
+dominates, which is why FastROM barely helps — it is a one-time boot cost, not a playback cost.
+
+### Raw gate output
+
+```
+==> 1) asset bake reproduces the recorded corpus SHA-256
+  PASS: RGB24 corpus a78c4c8c96ba7a00e99475b9545466b21cd12a041597d867994318a33f514080
+frames=300 packets=837028 seek=8465 loop=3034 total=848527 max=3034
+  tiles  sha256 fe7df9734b2419cc53784eb246e4dde62b4a6c898becb4a6fb307fbfbb1dd931
+  stream sha256 e15f0b2ea933bbef6f58549e17dd496ebefa74d31510140637d4be78da06abaa
+  stream bytes  848527
+
+==> 2) whole-loop byte-correct decode (all 300 frames + loop delta)
+  PASS: slow corpus gate: SMOKE: PASS off=0x2B len=1 got=0x00 (ran 6000 frames, bsnes-jg)
+  PASS: slow composite health: SMOKE: PASS off=0x2C len=4 got=0x00000000 (ran 6000 frames, bsnes-jg)
+  PASS: fastrom corpus gate: SMOKE: PASS off=0x2B len=1 got=0x00 (ran 6000 frames, bsnes-jg)
+  PASS: fastrom composite health: SMOKE: PASS off=0x2C len=4 got=0x00000000 (ran 6000 frames, bsnes-jg)
+
+==> 2b) negative control: one flipped stream byte must FAIL the gate
+  flipped stream byte 400000: 0x78 -> 0x79
+  PASS: corrupted stream rejected: SMOKE: FAIL off=0x2B len=1 got=0x02 want=0x00
+
+==> 3) cadence: presented frames per 600 VBlanks
+  build       presented    vblanks     per600      slips
+  slow              300        600        300          0
+  fastrom           300        600        300          0
+  (reported, not gated — a slower number on this content is the measurement)
+
+==> 4a) -verify-machineinstrs clean
+  PASS: no verifier complaints
+
+==> 4b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (A414FAD1:#000000)
+
+==> 5) frame capture
+  PASS: captured frame 150: SMOKE: PASS off=0x36 len=2 got=0x0096 (ran 6000 frames, bsnes-jg)
+
+ROM=build/apollo-daylight.sfc
+ROM_SHA256=262f62e7db3cdecbd0d3622bddebaeb4c0ad5ed1542efbeb78933ae38b09df3c
+GATE: PASS
+```
+
+**Steps 1–4: PASS.**
+
+### Picture is real, not a green-gate-on-a-blank-screen
+
+`dom=#000000` in the entropy fingerprint prompted an explicit check, because a black-dominant
+picture would be a red flag on a *daylight* clip. Three frames captured well into playback:
+
+| probe | unique colours | black (video region) | mean non-black RGB |
+|---|---:|---:|---|
+| frame 30 | 151 | 41.7% | (114, 156, 163) |
+| frame 150 | 152 | 41.7% | (96, 124, 119) |
+| frame 260 | 157 | 41.2% | (74, 112, 119) |
+
+Pairwise over the 256×192 video region: **54.8–57.8% of pixels differ** between probes, mean |Δ|
+12.9–29.6. The picture is bright blue-teal with real motion, and visibly progresses (flame grows,
+rocket climbs, HUD clock advances 00:05 → 00:08). `dom=#000000` is simply the Mode 7 letterbox
+border, which is the most common single colour in a 256×224 raster holding an inset video.
+**Not a vacuous gate.**
+
+### Deviations from the plan
+
+- **The plan cites "the reel's whole-loop Fletcher check" as precedent; the reel has no such
+  check.** `snes-video-reel.c` only CRCs a whole loop when `FRAME_COUNT <= 4`, and explicitly
+  delegates exhaustive validation to the build gate. The real precedent is the **bench** ROM
+  (`examples/snes/snes-video-codec-bench.c` `validate_stream()` + `tools/snes-video-bench-assets.py`
+  `frame_check()`). This ROM follows the bench's mechanism and mirrors its Fletcher byte for byte.
+- **No transport controls.** The reel's pause/step/shuttle transport was not carried over; this is
+  a measurement cartridge and the plan asked only for looping playback. The dashboard (title, clock,
+  live FPS, slip indicator) is kept.
+- **No `technical` block on the published page.** The site schema makes `technical` all-or-nothing
+  (it requires per-codec decode *rates* and profile *phases*). Those were not measured for this
+  ROM, so rather than fabricate them the block was omitted and the real measured figures were put
+  in the page prose instead.
+
 
 ## Progress (2026-08-02)
 

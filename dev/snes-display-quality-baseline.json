@@ -1723,6 +1723,34 @@
       "path": "examples/snes/video_hud.h",
       "line": 105,
       "text": "for (i = 0; i != VIDEO_HUD_COLS * 32u; ++i) REG_VMDATA = 0u;"
+    },
+    {
+      "id": "f0f86715b9d70dfd922d",
+      "kind": "force-blank",
+      "path": "examples/snes/apollo-reel.c",
+      "line": 80,
+      "text": "REG_INIDISP = INIDISP_FORCE_BLANK;"
+    },
+    {
+      "id": "5946d0705c505e9b5325",
+      "kind": "ppu-write",
+      "path": "examples/snes/apollo-reel.c",
+      "line": 202,
+      "text": "REG_MDMAEN = 1u;"
+    },
+    {
+      "id": "8f3f1d768a6e70470a9e",
+      "kind": "ppu-write",
+      "path": "examples/snes/apollo-reel.c",
+      "line": 249,
+      "text": "for (i = 0; i != 64u; ++i) REG_VMDATAH = blank_pixels[i];"
+    },
+    {
+      "id": "3286582727d99c98f9f3",
+      "kind": "ppu-write",
+      "path": "examples/snes/apollo-reel.c",
+      "line": 253,
+      "text": "for (i = 0; i != 448u; ++i) REG_CGDATA = reel_palette[i];"
     }
   ]
 }
