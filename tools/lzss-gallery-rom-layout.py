@@ -15,6 +15,10 @@ CSS = """
 main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4dc;font:700 28px/1.1 system-ui}
 .lede,.detail,.note{color:var(--muted)}.summary,.legend{display:flex;gap:12px;flex-wrap:wrap;margin:17px 0}
 .pill,.note{border:1px solid var(--rule);background:var(--panel);padding:8px 11px;border-radius:8px}
+.algorithm{margin:17px 0 20px;padding:15px 17px;border:1px solid var(--rule);border-left:3px solid var(--stream);
+border-radius:8px;background:var(--panel)}.algorithm h2{margin:0 0 8px;color:#fff4dc;font:800 18px/1.2 system-ui}
+.algorithm p{margin:7px 0}.algorithm ol{margin:9px 0;padding-left:24px}.algorithm li{margin:5px 0}
+.algorithm pre{margin:11px 0 8px;padding:11px 13px;overflow:auto;border-radius:7px;background:#11100e;color:#e9dfca}
 .key:before{content:"";display:inline-block;width:12px;height:12px;background:var(--c);margin-right:7px;vertical-align:-2px}
 .locked{margin:12px 0 20px;border:2px solid var(--code);border-radius:9px;background:var(--panel);overflow:hidden}
 .locked .row,.head{display:flex;justify-content:space-between;padding:9px 11px}.locked .row{border-bottom:1px solid var(--rule)}
@@ -203,6 +207,25 @@ def main() -> None:
 <div class="summary"><span class="pill">{len(report)} works</span><span class="pill">{len(report)*2+2} indivisible items</span>
 <span class="pill">{used_banks} packed asset banks</span><span class="pill">{banks-1-used_banks} reserved banks</span>
 <span class="pill">{asset_bytes:,} asset bytes</span></div>
+<section class="algorithm"><h2>How <code>romopt</code> packs the cartridge</h2>
+<p><code>romopt</code> uses deterministic <strong>stable first-fit decreasing</strong>, the
+bank-packing algorithm William B. Norris IV first used for cartridge layout in 1992.</p>
+<ol><li>Treat every LZSS stream, every independent 512-byte palette, and each shared font as an
+indivisible item. Nothing may straddle a 32 KiB LoROM bank.</li>
+<li>Exclude bank <code>$00</code>; it is reserved for runtime code, constants, startup data, the
+SNES header, and vectors.</li>
+<li>Sort items from largest to smallest. Equal sizes retain manifest order, then item-kind order,
+so identical inputs always produce identical packing.</li>
+<li>For each item, scan banks from <code>$01</code> upward and place it in the first bank whose
+remaining capacity is large enough. If none fits, open the next bank.</li>
+<li>Give the chosen bank and slot to the linker. The visualization below is read back from the
+final linker map, so its addresses describe the emitted ROM rather than an estimate.</li></ol>
+<pre><code>for item in stable_sort(items, key = (-bytes, manifest_order, kind)):
+    bank = first bank where used[bank] + item.bytes &lt;= 32768
+    place(item, bank); used[bank] += item.bytes</code></pre>
+<p class="detail">Streams and palettes are separate because their far pointers are independent;
+small palettes can fill holes left by large streams. First-fit decreasing is a fast heuristic,
+not an exhaustive proof of the minimum possible bank count.</p></section>
 <div class="legend"><span class="key" style="--c:var(--code)">bank $00: runtime/shared only</span>
 <span class="key" style="--c:var(--stream)">LZSS stream</span><span class="key" style="--c:var(--palette)">512-byte palette</span>
 <span class="key" style="--c:var(--shared)">shared font data</span>
@@ -216,10 +239,8 @@ def main() -> None:
 <div class="label">Physical ROM-address breakdown from the final linker map. Writable BSS/WRAM is
 not cartridge content. No packed stream, palette, font, or static graphic is eligible for this bank.</div></section>
 <div class="cart">{''.join(cards)}</div>
-<p class="note"><strong>Algorithm:</strong> stable first-fit decreasing. Sort streams and palettes
-largest-to-smallest, retain manifest order as the tie-breaker, and place each item in the first
-32 KiB bank where it fits. This determines bank membership, not order inside a bank. The bars and
-address-prefixed listings show the linker's actual intra-bank order from the final map.</p>
+<p class="note"><strong>Reading the map:</strong> colored spans are linked bytes; dark spans are
+unused capacity. The address-prefixed listings and bank-$00 breakdown come from the final map.</p>
 </main></html>"""
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(body)

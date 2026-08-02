@@ -3,166 +3,206 @@
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LZSS Gallery — romopt cartridge layout</title><style>
 :root{color-scheme:dark;--bg:#100f0d;--panel:#1d1a16;--ink:#f4ead6;--muted:#a99d8a;
---code:#e4a853;--stream:#65b7a6;--palette:#f0d277;--free:#302b25;--rule:#4b4338}
+--code:#e4a853;--stream:#65b7a6;--palette:#f0d277;--shared:#7dd3fc;--free:#302b25;--rule:#4b4338;
+--b0strings:#d17bd8;--b0desc:#7da4ed;--b0lookup:#e68d68;--b0const:#94a36b;
+--b0init:#b78a57;--b0system:#efc86f}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 ui-monospace,monospace}
 main{max-width:1240px;margin:auto;padding:28px 22px 46px}h1{margin:0;color:#fff4dc;font:700 28px/1.1 system-ui}
 .lede,.detail,.note{color:var(--muted)}.summary,.legend{display:flex;gap:12px;flex-wrap:wrap;margin:17px 0}
 .pill,.note{border:1px solid var(--rule);background:var(--panel);padding:8px 11px;border-radius:8px}
+.algorithm{margin:17px 0 20px;padding:15px 17px;border:1px solid var(--rule);border-left:3px solid var(--stream);
+border-radius:8px;background:var(--panel)}.algorithm h2{margin:0 0 8px;color:#fff4dc;font:800 18px/1.2 system-ui}
+.algorithm p{margin:7px 0}.algorithm ol{margin:9px 0;padding-left:24px}.algorithm li{margin:5px 0}
+.algorithm pre{margin:11px 0 8px;padding:11px 13px;overflow:auto;border-radius:7px;background:#11100e;color:#e9dfca}
 .key:before{content:"";display:inline-block;width:12px;height:12px;background:var(--c);margin-right:7px;vertical-align:-2px}
 .locked{margin:12px 0 20px;border:2px solid var(--code);border-radius:9px;background:var(--panel);overflow:hidden}
 .locked .row,.head{display:flex;justify-content:space-between;padding:9px 11px}.locked .row{border-bottom:1px solid var(--rule)}
+.bank0-list{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:0 18px;padding:9px 11px}
+.bank0-item{display:grid;grid-template-columns:12px 1fr auto;gap:7px;padding:3px 0;border-bottom:1px solid #ffffff0b}
+.swatch{width:10px;height:10px;margin-top:4px;background:var(--c)}.bank0-item code{color:var(--muted)}
+.code-detail{margin:4px 11px 12px;padding:11px;border:1px solid var(--rule);border-radius:7px;background:#15120f}
+.code-detail h2{margin:0 0 3px;font:800 15px/1.2 system-ui;color:#fff4dc}
+.code-detail .bar{height:28px;margin:9px 0}.code-list{display:grid;grid-template-columns:repeat(3,minmax(210px,1fr));gap:0 16px}
+.code-item{display:grid;grid-template-columns:1fr auto;gap:8px;padding:2px 0;border-bottom:1px solid #ffffff0b}
+.code-item code{overflow:hidden;text-overflow:ellipsis;color:var(--ink)}.code-item span{white-space:nowrap;color:var(--muted)}
 .cart{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:10px}.bank{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
-.head{border-bottom:1px solid var(--rule)}.num,.title{font-weight:800;color:#fff4dc}.used{color:var(--muted)}
+.head{border-bottom:1px solid var(--rule)}.num,.title{font-weight:800;color:#fff4dc}
+.used{display:grid;text-align:right;color:var(--muted)}.used span{white-space:nowrap}
 .bar{height:45px;display:flex;background:var(--free)}.seg{height:100%;min-width:1px}.stream{background:var(--stream)}
-.palette{background:var(--palette)}.free{background:var(--free)}.label{padding:8px 10px;min-height:91px}
+.palette{background:var(--palette)}.shared{background:var(--shared)}.free{background:var(--free)}.label{padding:8px 10px;min-height:91px}
+.code{background:var(--code)}.b0strings{background:var(--b0strings)}.b0desc{background:var(--b0desc)}
+.b0lookup{background:var(--b0lookup)}.b0const{background:var(--b0const)}
+.b0init{background:var(--b0init)}.b0system{background:var(--b0system)}
 .item{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reserve{opacity:.55}
 .boundary{grid-column:1/-1;display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;
 color:var(--palette);font-weight:800;letter-spacing:.04em;margin:7px 0}
 .boundary:before,.boundary:after{content:"";height:2px;background:linear-gradient(90deg,transparent,var(--palette))}
 .boundary:after{background:linear-gradient(90deg,var(--palette),transparent)}
 .note{margin-top:18px;border-left:3px solid var(--palette)}@media(max-width:980px){.cart{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:620px){.cart{grid-template-columns:1fr}}
+@media(max-width:980px){.code-list{grid-template-columns:repeat(2,minmax(210px,1fr))}}
+@media(max-width:620px){.cart{grid-template-columns:1fr}.bank0-list,.code-list{grid-template-columns:1fr}}
 </style><main>
 <h1><code>romopt</code> asset packing</h1>
 <p class="lede">8 Mbit (1 MiB) LoROM · bank $00 locked · assets begin at bank $01</p>
-<div class="summary"><span class="pill">26 works</span><span class="pill">52 indivisible items</span>
-<span class="pill">13 packed asset banks</span><span class="pill">18 reserved banks</span>
-<span class="pill">413,454 asset bytes</span></div>
+<div class="summary"><span class="pill">62 works</span><span class="pill">126 indivisible items</span>
+<span class="pill">31 packed asset banks</span><span class="pill">0 reserved banks</span>
+<span class="pill">952,240 asset bytes</span></div>
+<section class="algorithm"><h2>How <code>romopt</code> packs the cartridge</h2>
+<p><code>romopt</code> uses deterministic <strong>stable first-fit decreasing</strong>, the
+bank-packing algorithm William B. Norris IV first used for cartridge layout in 1992.</p>
+<ol><li>Treat every LZSS stream, every independent 512-byte palette, and each shared font as an
+indivisible item. Nothing may straddle a 32 KiB LoROM bank.</li>
+<li>Exclude bank <code>$00</code>; it is reserved for runtime code, constants, startup data, the
+SNES header, and vectors.</li>
+<li>Sort items from largest to smallest. Equal sizes retain manifest order, then item-kind order,
+so identical inputs always produce identical packing.</li>
+<li>For each item, scan banks from <code>$01</code> upward and place it in the first bank whose
+remaining capacity is large enough. If none fits, open the next bank.</li>
+<li>Give the chosen bank and slot to the linker. The visualization below is read back from the
+final linker map, so its addresses describe the emitted ROM rather than an estimate.</li></ol>
+<pre><code>for item in stable_sort(items, key = (-bytes, manifest_order, kind)):
+    bank = first bank where used[bank] + item.bytes &lt;= 32768
+    place(item, bank); used[bank] += item.bytes</code></pre>
+<p class="detail">Streams and palettes are separate because their far pointers are independent;
+small palettes can fill holes left by large streams. First-fit decreasing is a fast heuristic,
+not an exhaustive proof of the minimum possible bank count.</p></section>
 <div class="legend"><span class="key" style="--c:var(--code)">bank $00: runtime/shared only</span>
 <span class="key" style="--c:var(--stream)">LZSS stream</span><span class="key" style="--c:var(--palette)">512-byte palette</span>
+<span class="key" style="--c:var(--shared)">shared font data</span>
 <span class="key" style="--c:var(--free)">free / padding</span></div>
-<section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong><span>31,383 / 32,768 bytes</span></div>
-<div class="bar"><span class="seg" style="width:95.7733%;background:var(--code)"></span>
-<span class="seg free" style="width:4.2267%"></span></div>
-<div class="label">Runtime, startup, navigation, descriptors, fonts, tables, header, and vectors.
-No artwork stream or palette is eligible for this bank.</div></section>
+<section class="locked"><div class="row"><strong>Bank $00 — excluded from romopt</strong>
+<span>26,822 used · 5,946 free</span></div>
+<div class="bar"><span class="seg code" style="width:66.3940%" title="Runtime code: 21,756 bytes"></span><span class="seg b0strings" style="width:8.2306%" title="Strings: 2,697 bytes"></span><span class="seg b0desc" style="width:5.2979%" title="Gallery descriptors: 1,736 bytes"></span><span class="seg b0lookup" style="width:1.5625%" title="Sine/cosine table: 512 bytes"></span><span class="seg b0const" style="width:0.1007%" title="Other constants: 33 bytes"></span><span class="seg b0init" style="width:0.0244%" title="WRAM initializers: 8 bytes"></span><span class="seg free" style="width:18.1458%" title="Unallocated: 5,946 bytes"></span><span class="seg b0system" style="width:0.1465%" title="SNES header: 48 bytes"></span><span class="seg b0system" style="width:0.0488%" title="Native vectors: 16 bytes"></span><span class="seg b0system" style="width:0.0488%" title="Emulation vectors: 16 bytes"></span></div><div class="bank0-list"><div class="bank0-item"><span class="swatch" style="--c:var(--code)"></span><span>Runtime code <code>$00:8000–D4FB</code></span><strong>21,756 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--b0strings)"></span><span>Strings <code>$00:D4FC–DF84</code></span><strong>2,697 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--b0desc)"></span><span>Gallery descriptors <code>$00:DF85–E64C</code></span><strong>1,736 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--b0lookup)"></span><span>Sine/cosine table <code>$00:E64D–E84C</code></span><strong>512 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--b0const)"></span><span>Other constants <code>$00:E84D–E86D</code></span><strong>33 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--b0init)"></span><span>WRAM initializers <code>$00:E86E–E875</code></span><strong>8 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--b0system)"></span><span>SNES header <code>$00:FFB0–FFDF</code></span><strong>48 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--b0system)"></span><span>Native vectors <code>$00:FFE0–FFEF</code></span><strong>16 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--b0system)"></span><span>Emulation vectors <code>$00:FFF0–FFFF</code></span><strong>16 B</strong></div><div class="bank0-item"><span class="swatch" style="--c:var(--free)"></span><span>Unallocated <code>$00:E876–FFAF</code></span><strong>5,946 B</strong></div></div>
+<div class="code-detail"><h2>Runtime code breakdown · 21,756 bytes</h2>
+<div class="detail">Final linked function/section sizes; percentages are of runtime code.</div>
+<div class="bar"><span class="seg" style="width:0.2206%;background:hsl(0 58% 58%)" title="startup / initialization: 48 bytes"></span><span class="seg" style="width:0.0092%;background:hsl(47 58% 58%)" title="crt0.o: 2 bytes"></span><span class="seg" style="width:0.0873%;background:hsl(94 58% 58%)" title="__zero_bss: 19 bytes"></span><span class="seg" style="width:0.0873%;background:hsl(141 58% 58%)" title="__zero_zp_bss: 19 bytes"></span><span class="seg" style="width:0.1057%;background:hsl(188 58% 58%)" title="__copy_zp_data: 23 bytes"></span><span class="seg" style="width:1.9029%;background:hsl(235 58% 58%)" title="interrupt / LTO-local code: 414 bytes"></span><span class="seg" style="width:2.8452%;background:hsl(282 58% 58%)" title="decode_near: 619 bytes"></span><span class="seg" style="width:16.1519%;background:hsl(329 58% 58%)" title="main: 3,514 bytes"></span><span class="seg" style="width:0.4505%;background:hsl(16 58% 58%)" title="snes_ppu_reset_blank: 98 bytes"></span><span class="seg" style="width:0.1931%;background:hsl(63 58% 58%)" title="m7_tilemap_clear: 42 bytes"></span><span class="seg" style="width:0.9147%;background:hsl(110 58% 58%)" title="_m7t_write_line: 199 bytes"></span><span class="seg" style="width:0.0276%;background:hsl(157 58% 58%)" title="snes_wait_vblank: 6 bytes"></span><span class="seg" style="width:1.4663%;background:hsl(204 58% 58%)" title="unpack_slide: 319 bytes"></span><span class="seg" style="width:0.1701%;background:hsl(251 58% 58%)" title="m7_set_matrix: 37 bytes"></span><span class="seg" style="width:0.5562%;background:hsl(298 58% 58%)" title="vram_words_far: 121 bytes"></span><span class="seg" style="width:5.5571%;background:hsl(345 58% 58%)" title="upload_chevron_pose: 1,209 bytes"></span><span class="seg" style="width:0.2712%;background:hsl(32 58% 58%)" title="vram_words: 59 bytes"></span><span class="seg" style="width:0.4642%;background:hsl(79 58% 58%)" title="write_reserved_obj_palette: 101 bytes"></span><span class="seg" style="width:0.2896%;background:hsl(126 58% 58%)" title="nav_target: 63 bytes"></span><span class="seg" style="width:0.7262%;background:hsl(173 58% 58%)" title="spinout: 158 bytes"></span><span class="seg" style="width:11.8312%;background:hsl(220 58% 58%)" title="prepare_slide: 2,574 bytes"></span><span class="seg" style="width:0.1655%;background:hsl(267 58% 58%)" title="hold: 36 bytes"></span><span class="seg" style="width:0.1609%;background:hsl(314 58% 58%)" title="clock_read: 35 bytes"></span><span class="seg" style="width:1.0434%;background:hsl(1 58% 58%)" title="repack_slide: 227 bytes"></span><span class="seg" style="width:0.6527%;background:hsl(48 58% 58%)" title="verify_slide: 142 bytes"></span><span class="seg" style="width:0.6251%;background:hsl(95 58% 58%)" title="record_result: 136 bytes"></span><span class="seg" style="width:0.4964%;background:hsl(142 58% 58%)" title="decimal: 108 bytes"></span><span class="seg" style="width:0.2482%;background:hsl(189 58% 58%)" title="text8: 54 bytes"></span><span class="seg" style="width:0.3126%;background:hsl(236 58% 58%)" title="arrow_launch: 68 bytes"></span><span class="seg" style="width:0.2574%;background:hsl(283 58% 58%)" title="slen: 56 bytes"></span><span class="seg" style="width:0.3263%;background:hsl(330 58% 58%)" title="text8_at: 71 bytes"></span><span class="seg" style="width:0.7492%;background:hsl(17 58% 58%)" title="verify_stream: 163 bytes"></span><span class="seg" style="width:6.3569%;background:hsl(64 58% 58%)" title="progress_line: 1,383 bytes"></span><span class="seg" style="width:0.5975%;background:hsl(111 58% 58%)" title="verify_decode: 130 bytes"></span><span class="seg" style="width:0.8825%;background:hsl(158 58% 58%)" title="verify_bytes: 192 bytes"></span><span class="seg" style="width:3.4933%;background:hsl(205 58% 58%)" title="decode_far: 760 bytes"></span><span class="seg" style="width:0.4964%;background:hsl(252 58% 58%)" title="fold_far: 108 bytes"></span><span class="seg" style="width:0.4091%;background:hsl(299 58% 58%)" title="text8_replace: 89 bytes"></span><span class="seg" style="width:1.1169%;background:hsl(346 58% 58%)" title="project_offset: 243 bytes"></span><span class="seg" style="width:25.5837%;background:hsl(33 58% 58%)" title="compress_far: 5,566 bytes"></span><span class="seg" style="width:0.5010%;background:hsl(80 58% 58%)" title="repack_publish: 109 bytes"></span><span class="seg" style="width:0.7400%;background:hsl(127 58% 58%)" title="hash_far: 161 bytes"></span><span class="seg" style="width:0.1747%;background:hsl(174 58% 58%)" title="sprite_origin: 38 bytes"></span><span class="seg" style="width:0.1195%;background:hsl(221 58% 58%)" title="cursor_cycle_step: 26 bytes"></span><span class="seg" style="width:0.3999%;background:hsl(268 58% 58%)" title="asset_matrix_scale: 87 bytes"></span><span class="seg" style="width:0.2942%;background:hsl(315 58% 58%)" title="oam_arrows: 64 bytes"></span><span class="seg" style="width:0.6389%;background:hsl(2 58% 58%)" title="benchmark_far_decode: 139 bytes"></span><span class="seg" style="width:0.8366%;background:hsl(49 58% 58%)" title="benchmark_stage: 182 bytes"></span><span class="seg" style="width:1.2364%;background:hsl(96 58% 58%)" title="benchmark_near_decode: 269 bytes"></span><span class="seg" style="width:0.0230%;background:hsl(143 58% 58%)" title="exit: 5 bytes"></span><span class="seg" style="width:0.0827%;background:hsl(190 58% 58%)" title="__ashlhi3: 18 bytes"></span><span class="seg" style="width:0.0414%;background:hsl(237 58% 58%)" title="__lshrqi3: 9 bytes"></span><span class="seg" style="width:0.8320%;background:hsl(284 58% 58%)" title="__udivhi3: 181 bytes"></span><span class="seg" style="width:1.6317%;background:hsl(331 58% 58%)" title="__udivsi3: 355 bytes"></span><span class="seg" style="width:0.7584%;background:hsl(18 58% 58%)" title="__umodhi3: 165 bytes"></span><span class="seg" style="width:0.9515%;background:hsl(65 58% 58%)" title="__udivmodhi4: 207 bytes"></span><span class="seg" style="width:0.5010%;background:hsl(112 58% 58%)" title="__divhi3: 109 bytes"></span><span class="seg" style="width:0.8457%;background:hsl(159 58% 58%)" title="__divsi3: 184 bytes"></span><span class="seg" style="width:0.2022%;background:hsl(206 58% 58%)" title="memcpy: 44 bytes"></span><span class="seg" style="width:0.1379%;background:hsl(253 58% 58%)" title="__memset: 30 bytes"></span><span class="seg" style="width:0.2298%;background:hsl(300 58% 58%)" title="__mulhi3: 50 bytes"></span><span class="seg" style="width:0.5194%;background:hsl(347 58% 58%)" title="__mulsi3: 113 bytes"></span></div><div class="code-list"><div class="code-item"><code>compress_far</code><span>5,566 B · 25.6%</span></div><div class="code-item"><code>main</code><span>3,514 B · 16.2%</span></div><div class="code-item"><code>prepare_slide</code><span>2,574 B · 11.8%</span></div><div class="code-item"><code>progress_line</code><span>1,383 B · 6.4%</span></div><div class="code-item"><code>upload_chevron_pose</code><span>1,209 B · 5.6%</span></div><div class="code-item"><code>decode_far</code><span>760 B · 3.5%</span></div><div class="code-item"><code>decode_near</code><span>619 B · 2.8%</span></div><div class="code-item"><code>interrupt / LTO-local code</code><span>414 B · 1.9%</span></div><div class="code-item"><code>__udivsi3</code><span>355 B · 1.6%</span></div><div class="code-item"><code>unpack_slide</code><span>319 B · 1.5%</span></div><div class="code-item"><code>benchmark_near_decode</code><span>269 B · 1.2%</span></div><div class="code-item"><code>project_offset</code><span>243 B · 1.1%</span></div><div class="code-item"><code>repack_slide</code><span>227 B · 1.0%</span></div><div class="code-item"><code>__udivmodhi4</code><span>207 B · 1.0%</span></div><div class="code-item"><code>_m7t_write_line</code><span>199 B · 0.9%</span></div><div class="code-item"><code>Other linked sections (47)</code><span>3,898 B · 17.9%</span></div></div></div>
+<div class="label">Physical ROM-address breakdown from the final linker map. Writable BSS/WRAM is
+not cartridge content. No packed stream, palette, font, or static graphic is eligible for this bank.</div></section>
 <div class="cart"><section class="bank">
-<div class="head"><span class="num">Bank $01</span><span class="used">32,752 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:47.9095%" title="stack-wheat stream: $0000–$3D52"></span><span class="seg stream" style="width:52.0416%" title="thistles stream: $3D53–$7FEF"></span><span class="seg free" style="width:0.0488%"></span></div>
-<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · stack-wheat stream · 15,699 B</div><div class="item">$3D53 · thistles stream · 17,053 B</div></div>
+<div class="head"><span class="num">Bank $01</span><span class="used"><span>32,759 used</span><span>9 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:52.1088%" title="thistles stream: $0000–$42B2"></span><span class="seg stream" style="width:47.8638%" title="thai-hanuman-longka stream: $42B3–$7FF6"></span><span class="seg free" style="width:0.0275%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · thistles stream · 17,075 B</div><div class="item">$42B3 · thai-hanuman-longka stream · 15,684 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $02</span><span class="used">32,745 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:48.2025%" title="sunflowers stream: $0000–$3DB2"></span><span class="seg stream" style="width:51.7273%" title="starry-night stream: $3DB3–$7FE8"></span><span class="seg free" style="width:0.0702%"></span></div>
-<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · sunflowers stream · 15,795 B</div><div class="item">$3DB3 · starry-night stream · 16,950 B</div></div>
+<div class="head"><span class="num">Bank $02</span><span class="used"><span>32,749 used</span><span>19 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:51.7914%" title="starry-night stream: $0000–$424A"></span><span class="seg stream" style="width:48.1506%" title="louvre-rain stream: $424B–$7FEC"></span><span class="seg free" style="width:0.0580%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · starry-night stream · 16,971 B</div><div class="item">$424B · louvre-rain stream · 15,778 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $03</span><span class="used">32,758 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:48.3276%" title="bedroom stream: $0000–$3DDB"></span><span class="seg stream" style="width:51.6418%" title="self-portrait stream: $3DDC–$7FF5"></span><span class="seg free" style="width:0.0305%"></span></div>
-<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · bedroom stream · 15,836 B</div><div class="item">$3DDC · self-portrait stream · 16,922 B</div></div>
+<div class="head"><span class="num">Bank $03</span><span class="used"><span>32,754 used</span><span>14 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:51.6724%" title="self-portrait stream: $0000–$4223"></span><span class="seg stream" style="width:48.2849%" title="sunflowers stream: $4224–$7FF1"></span><span class="seg free" style="width:0.0427%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · self-portrait stream · 16,932 B</div><div class="item">$4224 · sunflowers stream · 15,822 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $04</span><span class="used">32,514 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:48.9960%" title="two-sisters stream: $0000–$3EB6"></span><span class="seg stream" style="width:50.2289%" title="earthly-delights stream: $3EB7–$7F01"></span><span class="seg free" style="width:0.7751%"></span></div>
-<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · two-sisters stream · 16,055 B</div><div class="item">$3EB7 · earthly-delights stream · 16,459 B</div></div>
+<div class="head"><span class="num">Bank $04</span><span class="used"><span>32,757 used</span><span>11 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:50.8118%" title="the-willows stream: $0000–$4109"></span><span class="seg stream" style="width:49.1547%" title="sunset-woods stream: $410A–$7FF4"></span><span class="seg free" style="width:0.0336%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · the-willows stream · 16,650 B</div><div class="item">$410A · sunset-woods stream · 16,107 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $05</span><span class="used">32,323 / 32,768</span></div>
-<div class="bar"><span class="seg palette" style="width:1.5625%" title="great-wave palette: $0000–$01FF"></span><span class="seg stream" style="width:48.9685%" title="ice-skaters stream: $0200–$40AD"></span><span class="seg stream" style="width:48.1110%" title="dragon stream: $40AE–$7E42"></span><span class="seg free" style="width:1.3580%"></span></div>
-<div class="label"><div class="title">3 packed items</div><div class="item">$0000 · great-wave palette · 512 B</div><div class="item">$0200 · ice-skaters stream · 16,046 B</div><div class="item">$40AE · dragon stream · 15,765 B</div></div>
+<div class="head"><span class="num">Bank $05</span><span class="used"><span>32,557 used</span><span>211 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:50.2716%" title="earthly-delights stream: $0000–$4058"></span><span class="seg stream" style="width:49.0845%" title="ice-skaters stream: $4059–$7F2C"></span><span class="seg free" style="width:0.6439%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · earthly-delights stream · 16,473 B</div><div class="item">$4059 · ice-skaters stream · 16,084 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $06</span><span class="used">32,694 / 32,768</span></div>
-<div class="bar"><span class="seg palette" style="width:1.5625%" title="bedroom palette: $0000–$01FF"></span><span class="seg palette" style="width:1.5625%" title="grande-jatte palette: $0200–$03FF"></span><span class="seg palette" style="width:1.5625%" title="two-sisters palette: $0400–$05FF"></span><span class="seg stream" style="width:47.6837%" title="the-kiss stream: $0600–$4308"></span><span class="seg stream" style="width:47.4030%" title="home-heron stream: $4309–$7FB5"></span><span class="seg free" style="width:0.2258%"></span></div>
-<div class="label"><div class="title">5 packed items</div><div class="item">$0000 · bedroom palette · 512 B</div><div class="item">$0200 · grande-jatte palette · 512 B</div><div class="item">$0400 · two-sisters palette · 512 B</div><div class="item">$0600 · the-kiss stream · 15,625 B</div><div class="item">$4309 · home-heron stream · 15,533 B</div></div>
+<div class="head"><span class="num">Bank $06</span><span class="used"><span>32,302 used</span><span>466 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:49.9878%" title="thai-elephant-duel stream: $0000–$3FFB"></span><span class="seg stream" style="width:48.5901%" title="mountain-waterfall stream: $3FFC–$7E2D"></span><span class="seg free" style="width:1.4221%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · thai-elephant-duel stream · 16,380 B</div><div class="item">$3FFC · mountain-waterfall stream · 15,922 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $07</span><span class="used">32,640 / 32,768</span></div>
-<div class="bar"><span class="seg palette" style="width:1.5625%" title="water-lilies palette: $0000–$01FF"></span><span class="seg palette" style="width:1.5625%" title="basket-apples palette: $0200–$03FF"></span><span class="seg palette" style="width:1.5625%" title="stack-wheat palette: $0400–$05FF"></span><span class="seg palette" style="width:1.5625%" title="self-portrait palette: $0600–$07FF"></span><span class="seg stream" style="width:46.7041%" title="tableau-vii stream: $0800–$43C7"></span><span class="seg stream" style="width:46.6553%" title="scholar-landscape stream: $43C8–$7F7F"></span><span class="seg free" style="width:0.3906%"></span></div>
-<div class="label"><div class="title">6 packed items</div><div class="item">$0000 · water-lilies palette · 512 B</div><div class="item">$0200 · basket-apples palette · 512 B</div><div class="item">$0400 · stack-wheat palette · 512 B</div><div class="item">$0600 · self-portrait palette · 512 B</div><div class="item">$0800 · tableau-vii stream · 15,304 B</div><div class="item">$43C8 · scholar-landscape stream · 15,288 B</div></div>
+<div class="head"><span class="num">Bank $07</span><span class="used"><span>32,596 used</span><span>172 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:48.2178%" title="thai-ravan-palace stream: $0000–$3DB7"></span><span class="seg stream" style="width:48.1323%" title="dragon stream: $3DB8–$7B53"></span><span class="seg shared" style="width:3.1250%" title="FONT8: $7B54–$7F53"></span><span class="seg free" style="width:0.5249%"></span></div>
+<div class="label"><div class="title">3 packed items</div><div class="item">$0000 · thai-ravan-palace stream · 15,800 B</div><div class="item">$3DB8 · dragon stream · 15,772 B</div><div class="item">$7B54 · FONT8 · 1,024 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $08</span><span class="used">32,545 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:46.5668%" title="great-wave stream: $0000–$3B9A"></span><span class="seg palette" style="width:1.5625%" title="paris-street palette: $3B9B–$3D9A"></span><span class="seg palette" style="width:1.5625%" title="poppy-field palette: $3D9B–$3F9A"></span><span class="seg stream" style="width:46.5027%" title="the-scream stream: $3F9B–$7B20"></span><span class="seg palette" style="width:1.5625%" title="the-scream palette: $7B21–$7D20"></span><span class="seg palette" style="width:1.5625%" title="earthly-delights palette: $7D21–$7F20"></span><span class="seg free" style="width:0.6805%"></span></div>
-<div class="label"><div class="title">6 packed items</div><div class="item">$0000 · great-wave stream · 15,259 B</div><div class="item">$3B9B · paris-street palette · 512 B</div><div class="item">$3D9B · poppy-field palette · 512 B</div><div class="item">$3F9B · the-scream stream · 15,238 B</div><div class="item">$7B21 · the-scream palette · 512 B</div><div class="item">$7D21 · earthly-delights palette · 512 B</div></div>
+<div class="head"><span class="num">Bank $08</span><span class="used"><span>32,508 used</span><span>260 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:48.1293%" title="pantheon-interior stream: $0000–$3D9A"></span><span class="seg stream" style="width:47.9523%" title="thai-buddha-descending stream: $3D9B–$7AFB"></span><span class="seg palette" style="width:1.5625%" title="great-wave palette: $7AFC–$7CFB"></span><span class="seg palette" style="width:1.5625%" title="grande-jatte palette: $7CFC–$7EFB"></span><span class="seg free" style="width:0.7935%"></span></div>
+<div class="label"><div class="title">4 packed items</div><div class="item">$0000 · pantheon-interior stream · 15,771 B</div><div class="item">$3D9B · thai-buddha-descending stream · 15,713 B</div><div class="item">$7AFC · great-wave palette · 512 B</div><div class="item">$7CFC · grande-jatte palette · 512 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $09</span><span class="used">32,419 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:46.3867%" title="basket-apples stream: $0000–$3B5F"></span><span class="seg stream" style="width:46.2982%" title="paris-street stream: $3B60–$76A2"></span><span class="seg palette" style="width:1.5625%" title="third-of-may palette: $76A3–$78A2"></span><span class="seg palette" style="width:1.5625%" title="the-kiss palette: $78A3–$7AA2"></span><span class="seg palette" style="width:1.5625%" title="view-of-delft palette: $7AA3–$7CA2"></span><span class="seg palette" style="width:1.5625%" title="wijk-windmill palette: $7CA3–$7EA2"></span><span class="seg free" style="width:1.0651%"></span></div>
-<div class="label"><div class="title">6 packed items</div><div class="item">$0000 · basket-apples stream · 15,200 B</div><div class="item">$3B60 · paris-street stream · 15,171 B</div><div class="item">$76A3 · third-of-may palette · 512 B</div><div class="item">$78A3 · the-kiss palette · 512 B</div><div class="item">$7AA3 · view-of-delft palette · 512 B</div><div class="item">$7CA3 · wijk-windmill palette · 512 B</div></div>
+<div class="head"><span class="num">Bank $09</span><span class="used"><span>32,365 used</span><span>403 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:47.9401%" title="stack-wheat stream: $0000–$3D5C"></span><span class="seg stream" style="width:47.7051%" title="the-kiss stream: $3D5D–$7A6C"></span><span class="seg palette" style="width:1.5625%" title="water-lilies palette: $7A6D–$7C6C"></span><span class="seg palette" style="width:1.5625%" title="basket-apples palette: $7C6D–$7E6C"></span><span class="seg free" style="width:1.2299%"></span></div>
+<div class="label"><div class="title">4 packed items</div><div class="item">$0000 · stack-wheat stream · 15,709 B</div><div class="item">$3D5D · the-kiss stream · 15,632 B</div><div class="item">$7A6D · water-lilies palette · 512 B</div><div class="item">$7C6D · basket-apples palette · 512 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $0A</span><span class="used">32,645 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:45.6482%" title="water-lilies stream: $0000–$3A6D"></span><span class="seg palette" style="width:1.5625%" title="flower-still-life palette: $3A6E–$3C6D"></span><span class="seg palette" style="width:1.5625%" title="sunflowers palette: $3C6E–$3E6D"></span><span class="seg palette" style="width:1.5625%" title="tableau-vii palette: $3E6E–$406D"></span><span class="seg palette" style="width:1.5625%" title="ice-skaters palette: $406E–$426D"></span><span class="seg palette" style="width:1.5625%" title="home-heron palette: $426E–$446D"></span><span class="seg stream" style="width:46.1639%" title="houses-parliament stream: $446E–$7F84"></span><span class="seg free" style="width:0.3754%"></span></div>
-<div class="label"><div class="title">7 packed items</div><div class="item">$0000 · water-lilies stream · 14,958 B</div><div class="item">$3A6E · flower-still-life palette · 512 B</div><div class="item">$3C6E · sunflowers palette · 512 B</div><div class="item">$3E6E · tableau-vii palette · 512 B</div><div class="item">$406E · ice-skaters palette · 512 B</div><div class="item">$426E · home-heron palette · 512 B</div><div class="item">$446E · houses-parliament stream · 15,127 B</div></div>
+<div class="head"><span class="num">Bank $0A</span><span class="used"><span>32,665 used</span><span>103 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:47.5037%" title="home-heron stream: $0000–$3CCD"></span><span class="seg stream" style="width:47.4945%" title="thai-hanuman stream: $3CCE–$7998"></span><span class="seg palette" style="width:1.5625%" title="stack-wheat palette: $7999–$7B98"></span><span class="seg palette" style="width:1.5625%" title="self-portrait palette: $7B99–$7D98"></span><span class="seg palette" style="width:1.5625%" title="paris-street palette: $7D99–$7F98"></span><span class="seg free" style="width:0.3143%"></span></div>
+<div class="label"><div class="title">5 packed items</div><div class="item">$0000 · home-heron stream · 15,566 B</div><div class="item">$3CCE · thai-hanuman stream · 15,563 B</div><div class="item">$7999 · stack-wheat palette · 512 B</div><div class="item">$7B99 · self-portrait palette · 512 B</div><div class="item">$7D99 · paris-street palette · 512 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $0B</span><span class="used">32,221 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:45.3064%" title="grande-jatte stream: $0000–$39FD"></span><span class="seg stream" style="width:45.2118%" title="poppy-field stream: $39FE–$73DC"></span><span class="seg palette" style="width:1.5625%" title="dragon palette: $73DD–$75DC"></span><span class="seg palette" style="width:1.5625%" title="scholar-landscape palette: $75DD–$77DC"></span><span class="seg palette" style="width:1.5625%" title="houses-parliament palette: $77DD–$79DC"></span><span class="seg palette" style="width:1.5625%" title="thistles palette: $79DD–$7BDC"></span><span class="seg palette" style="width:1.5625%" title="starry-night palette: $7BDD–$7DDC"></span><span class="seg free" style="width:1.6693%"></span></div>
-<div class="label"><div class="title">7 packed items</div><div class="item">$0000 · grande-jatte stream · 14,846 B</div><div class="item">$39FE · poppy-field stream · 14,815 B</div><div class="item">$73DD · dragon palette · 512 B</div><div class="item">$75DD · scholar-landscape palette · 512 B</div><div class="item">$77DD · houses-parliament palette · 512 B</div><div class="item">$79DD · thistles palette · 512 B</div><div class="item">$7BDD · starry-night palette · 512 B</div></div>
+<div class="head"><span class="num">Bank $0B</span><span class="used"><span>32,706 used</span><span>62 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:46.8262%" title="mortlake-terrace stream: $0000–$3BEF"></span><span class="seg stream" style="width:46.7346%" title="scholar-landscape stream: $3BF0–$77C1"></span><span class="seg palette" style="width:1.5625%" title="poppy-field palette: $77C2–$79C1"></span><span class="seg palette" style="width:1.5625%" title="earthly-delights palette: $79C2–$7BC1"></span><span class="seg palette" style="width:1.5625%" title="the-scream palette: $7BC2–$7DC1"></span><span class="seg palette" style="width:1.5625%" title="third-of-may palette: $7DC2–$7FC1"></span><span class="seg free" style="width:0.1892%"></span></div>
+<div class="label"><div class="title">6 packed items</div><div class="item">$0000 · mortlake-terrace stream · 15,344 B</div><div class="item">$3BF0 · scholar-landscape stream · 15,314 B</div><div class="item">$77C2 · poppy-field palette · 512 B</div><div class="item">$79C2 · earthly-delights palette · 512 B</div><div class="item">$7BC2 · the-scream palette · 512 B</div><div class="item">$7DC2 · third-of-may palette · 512 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $0C</span><span class="used">29,020 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:44.7205%" title="third-of-may stream: $0000–$393D"></span><span class="seg stream" style="width:43.8416%" title="wijk-windmill stream: $393E–$715B"></span><span class="seg free" style="width:11.4380%"></span></div>
-<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · third-of-may stream · 14,654 B</div><div class="item">$393E · wijk-windmill stream · 14,366 B</div></div>
+<div class="head"><span class="num">Bank $0C</span><span class="used"><span>32,659 used</span><span>109 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:46.7102%" title="tableau-vii stream: $0000–$3BC9"></span><span class="seg stream" style="width:46.7072%" title="great-wave stream: $3BCA–$7792"></span><span class="seg palette" style="width:1.5625%" title="the-kiss palette: $7793–$7992"></span><span class="seg palette" style="width:1.5625%" title="view-of-delft palette: $7993–$7B92"></span><span class="seg palette" style="width:1.5625%" title="wijk-windmill palette: $7B93–$7D92"></span><span class="seg palette" style="width:1.5625%" title="flower-still-life palette: $7D93–$7F92"></span><span class="seg free" style="width:0.3326%"></span></div>
+<div class="label"><div class="title">6 packed items</div><div class="item">$0000 · tableau-vii stream · 15,306 B</div><div class="item">$3BCA · great-wave stream · 15,305 B</div><div class="item">$7793 · the-kiss palette · 512 B</div><div class="item">$7993 · view-of-delft palette · 512 B</div><div class="item">$7B93 · wijk-windmill palette · 512 B</div><div class="item">$7D93 · flower-still-life palette · 512 B</div></div>
 </section><section class="bank">
-<div class="head"><span class="num">Bank $0D</span><span class="used">26,178 / 32,768</span></div>
-<div class="bar"><span class="seg stream" style="width:37.5275%" title="view-of-delft stream: $0000–$3008"></span><span class="seg stream" style="width:42.3615%" title="flower-still-life stream: $3009–$6641"></span><span class="seg free" style="width:20.1111%"></span></div>
-<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · view-of-delft stream · 12,297 B</div><div class="item">$3009 · flower-still-life stream · 13,881 B</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $0E</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $0F</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $10</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $11</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $12</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $13</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $14</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $15</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $16</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $17</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $18</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $19</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $1A</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $1B</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $1C</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $1D</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $1E</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
-</section><section class="bank reserve">
-<div class="head"><span class="num">Bank $1F</span><span class="used">0 / 32,768</span></div>
-<div class="bar"><span class="seg free" style="width:100.0000%"></span></div>
-<div class="label"><div class="title">0 packed items</div><div class="detail">32,768 bytes free</div></div>
+<div class="head"><span class="num">Bank $0D</span><span class="used"><span>32,564 used</span><span>204 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:46.5729%" title="tornado-forest stream: $0000–$3B9C"></span><span class="seg stream" style="width:46.5546%" title="the-scream stream: $3B9D–$7733"></span><span class="seg palette" style="width:1.5625%" title="sunflowers palette: $7734–$7933"></span><span class="seg palette" style="width:1.5625%" title="tableau-vii palette: $7934–$7B33"></span><span class="seg palette" style="width:1.5625%" title="ice-skaters palette: $7B34–$7D33"></span><span class="seg palette" style="width:1.5625%" title="home-heron palette: $7D34–$7F33"></span><span class="seg free" style="width:0.6226%"></span></div>
+<div class="label"><div class="title">6 packed items</div><div class="item">$0000 · tornado-forest stream · 15,261 B</div><div class="item">$3B9D · the-scream stream · 15,255 B</div><div class="item">$7734 · sunflowers palette · 512 B</div><div class="item">$7934 · tableau-vii palette · 512 B</div><div class="item">$7B34 · ice-skaters palette · 512 B</div><div class="item">$7D34 · home-heron palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $0E</span><span class="used"><span>32,482 used</span><span>286 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:46.4905%" title="basket-apples stream: $0000–$3B81"></span><span class="seg stream" style="width:46.3867%" title="paris-street stream: $3B82–$76E1"></span><span class="seg palette" style="width:1.5625%" title="dragon palette: $76E2–$78E1"></span><span class="seg palette" style="width:1.5625%" title="scholar-landscape palette: $78E2–$7AE1"></span><span class="seg palette" style="width:1.5625%" title="houses-parliament palette: $7AE2–$7CE1"></span><span class="seg palette" style="width:1.5625%" title="thistles palette: $7CE2–$7EE1"></span><span class="seg free" style="width:0.8728%"></span></div>
+<div class="label"><div class="title">6 packed items</div><div class="item">$0000 · basket-apples stream · 15,234 B</div><div class="item">$3B82 · paris-street stream · 15,200 B</div><div class="item">$76E2 · dragon palette · 512 B</div><div class="item">$78E2 · scholar-landscape palette · 512 B</div><div class="item">$7AE2 · houses-parliament palette · 512 B</div><div class="item">$7CE2 · thistles palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $0F</span><span class="used"><span>32,379 used</span><span>389 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:46.2982%" title="thai-ravana-war stream: $0000–$3B42"></span><span class="seg stream" style="width:46.2646%" title="houses-parliament stream: $3B43–$767A"></span><span class="seg palette" style="width:1.5625%" title="starry-night palette: $767B–$787A"></span><span class="seg palette" style="width:1.5625%" title="river-moonlight palette: $787B–$7A7A"></span><span class="seg palette" style="width:1.5625%" title="mountain-waterfall palette: $7A7B–$7C7A"></span><span class="seg palette" style="width:1.5625%" title="wooded-merrymakers palette: $7C7B–$7E7A"></span><span class="seg free" style="width:1.1871%"></span></div>
+<div class="label"><div class="title">6 packed items</div><div class="item">$0000 · thai-ravana-war stream · 15,171 B</div><div class="item">$3B43 · houses-parliament stream · 15,160 B</div><div class="item">$767B · starry-night palette · 512 B</div><div class="item">$787B · river-moonlight palette · 512 B</div><div class="item">$7A7B · mountain-waterfall palette · 512 B</div><div class="item">$7C7B · wooded-merrymakers palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $10</span><span class="used"><span>32,592 used</span><span>176 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:45.9167%" title="wide-river stream: $0000–$3AC5"></span><span class="seg stream" style="width:45.7336%" title="water-lilies stream: $3AC6–$754F"></span><span class="seg palette" style="width:1.5625%" title="wide-river palette: $7550–$774F"></span><span class="seg palette" style="width:1.5625%" title="sailing-vessels palette: $7750–$794F"></span><span class="seg palette" style="width:1.5625%" title="ships-calm palette: $7950–$7B4F"></span><span class="seg palette" style="width:1.5625%" title="st-odulphus palette: $7B50–$7D4F"></span><span class="seg palette" style="width:1.5625%" title="voyage-childhood palette: $7D50–$7F4F"></span><span class="seg free" style="width:0.5371%"></span></div>
+<div class="label"><div class="title">7 packed items</div><div class="item">$0000 · wide-river stream · 15,046 B</div><div class="item">$3AC6 · water-lilies stream · 14,986 B</div><div class="item">$7550 · wide-river palette · 512 B</div><div class="item">$7750 · sailing-vessels palette · 512 B</div><div class="item">$7950 · ships-calm palette · 512 B</div><div class="item">$7B50 · st-odulphus palette · 512 B</div><div class="item">$7D50 · voyage-childhood palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $11</span><span class="used"><span>32,353 used</span><span>415 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:45.5688%" title="marly-le-roi stream: $0000–$3A53"></span><span class="seg stream" style="width:45.3522%" title="poppy-field stream: $3A54–$7460"></span><span class="seg palette" style="width:1.5625%" title="voyage-youth palette: $7461–$7660"></span><span class="seg palette" style="width:1.5625%" title="voyage-manhood palette: $7661–$7860"></span><span class="seg palette" style="width:1.5625%" title="voyage-old-age palette: $7861–$7A60"></span><span class="seg palette" style="width:1.5625%" title="tornado-forest palette: $7A61–$7C60"></span><span class="seg palette" style="width:1.5625%" title="niagara palette: $7C61–$7E60"></span><span class="seg free" style="width:1.2665%"></span></div>
+<div class="label"><div class="title">7 packed items</div><div class="item">$0000 · marly-le-roi stream · 14,932 B</div><div class="item">$3A54 · poppy-field stream · 14,861 B</div><div class="item">$7461 · voyage-youth palette · 512 B</div><div class="item">$7661 · voyage-manhood palette · 512 B</div><div class="item">$7861 · voyage-old-age palette · 512 B</div><div class="item">$7A61 · tornado-forest palette · 512 B</div><div class="item">$7C61 · niagara palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $12</span><span class="used"><span>32,354 used</span><span>414 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:44.8517%" title="third-of-may stream: $0000–$3968"></span><span class="seg stream" style="width:44.5099%" title="wooded-merrymakers stream: $3969–$7261"></span><span class="seg palette" style="width:1.5625%" title="fog-mount-desert palette: $7262–$7461"></span><span class="seg palette" style="width:1.5625%" title="buffalo-storm palette: $7462–$7661"></span><span class="seg palette" style="width:1.5625%" title="mount-corcoran palette: $7662–$7861"></span><span class="seg palette" style="width:1.5625%" title="sunset-woods palette: $7862–$7A61"></span><span class="seg palette" style="width:1.5625%" title="harvest-moon palette: $7A62–$7C61"></span><span class="seg palette" style="width:1.5625%" title="wivenhoe-park palette: $7C62–$7E61"></span><span class="seg free" style="width:1.2634%"></span></div>
+<div class="label"><div class="title">8 packed items</div><div class="item">$0000 · third-of-may stream · 14,697 B</div><div class="item">$3969 · wooded-merrymakers stream · 14,585 B</div><div class="item">$7262 · fog-mount-desert palette · 512 B</div><div class="item">$7462 · buffalo-storm palette · 512 B</div><div class="item">$7662 · mount-corcoran palette · 512 B</div><div class="item">$7862 · sunset-woods palette · 512 B</div><div class="item">$7A62 · harvest-moon palette · 512 B</div><div class="item">$7C62 · wivenhoe-park palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $13</span><span class="used"><span>32,437 used</span><span>331 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:44.1376%" title="grande-jatte stream: $0000–$387E"></span><span class="seg stream" style="width:43.9148%" title="wijk-windmill stream: $387F–$70B4"></span><span class="seg palette" style="width:1.5625%" title="stormy-sunset palette: $70B5–$72B4"></span><span class="seg palette" style="width:1.5625%" title="keelmen-moonlight palette: $72B5–$74B4"></span><span class="seg palette" style="width:1.5625%" title="approach-venice palette: $74B5–$76B4"></span><span class="seg palette" style="width:1.5625%" title="mortlake-terrace palette: $76B5–$78B4"></span><span class="seg palette" style="width:1.5625%" title="pantheon-interior palette: $78B5–$7AB4"></span><span class="seg palette" style="width:1.5625%" title="grand-canal-molo palette: $7AB5–$7CB4"></span><span class="seg palette" style="width:1.5625%" title="louvre-rain palette: $7CB5–$7EB4"></span><span class="seg free" style="width:1.0101%"></span></div>
+<div class="label"><div class="title">9 packed items</div><div class="item">$0000 · grande-jatte stream · 14,463 B</div><div class="item">$387F · wijk-windmill stream · 14,390 B</div><div class="item">$70B5 · stormy-sunset palette · 512 B</div><div class="item">$72B5 · keelmen-moonlight palette · 512 B</div><div class="item">$74B5 · approach-venice palette · 512 B</div><div class="item">$76B5 · mortlake-terrace palette · 512 B</div><div class="item">$78B5 · pantheon-interior palette · 512 B</div><div class="item">$7AB5 · grand-canal-molo palette · 512 B</div><div class="item">$7CB5 · louvre-rain palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $14</span><span class="used"><span>32,293 used</span><span>475 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:43.8446%" title="stormy-sunset stream: $0000–$381E"></span><span class="seg stream" style="width:43.7683%" title="fujisawa-shuku stream: $381F–$7024"></span><span class="seg palette" style="width:1.5625%" title="marly-le-roi palette: $7025–$7224"></span><span class="seg palette" style="width:1.5625%" title="the-willows palette: $7225–$7424"></span><span class="seg palette" style="width:1.5625%" title="mount-akiha palette: $7425–$7624"></span><span class="seg palette" style="width:1.5625%" title="fujisawa-shuku palette: $7625–$7824"></span><span class="seg palette" style="width:1.5625%" title="thai-temple-painting palette: $7825–$7A24"></span><span class="seg palette" style="width:1.5625%" title="thai-buddha-descending palette: $7A25–$7C24"></span><span class="seg palette" style="width:1.5625%" title="thai-elephant-duel palette: $7C25–$7E24"></span><span class="seg free" style="width:1.4496%"></span></div>
+<div class="label"><div class="title">9 packed items</div><div class="item">$0000 · stormy-sunset stream · 14,367 B</div><div class="item">$381F · fujisawa-shuku stream · 14,342 B</div><div class="item">$7025 · marly-le-roi palette · 512 B</div><div class="item">$7225 · the-willows palette · 512 B</div><div class="item">$7425 · mount-akiha palette · 512 B</div><div class="item">$7625 · fujisawa-shuku palette · 512 B</div><div class="item">$7825 · thai-temple-painting palette · 512 B</div><div class="item">$7A25 · thai-buddha-descending palette · 512 B</div><div class="item">$7C25 · thai-elephant-duel palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $15</span><span class="used"><span>32,553 used</span><span>215 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:43.7469%" title="mount-akiha stream: $0000–$37FE"></span><span class="seg stream" style="width:43.0969%" title="approach-venice stream: $37FF–$6F28"></span><span class="seg shared" style="width:12.5000%" title="FONT16: $6F29–$7F28"></span><span class="seg free" style="width:0.6561%"></span></div>
+<div class="label"><div class="title">3 packed items</div><div class="item">$0000 · mount-akiha stream · 14,335 B</div><div class="item">$37FF · approach-venice stream · 14,122 B</div><div class="item">$6F29 · FONT16 · 4,096 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $16</span><span class="used"><span>30,674 used</span><span>2,094 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:43.0084%" title="voyage-youth stream: $0000–$370C"></span><span class="seg stream" style="width:42.7887%" title="fog-mount-desert stream: $370D–$6DD1"></span><span class="seg palette" style="width:1.5625%" title="thai-ravan-palace palette: $6DD2–$6FD1"></span><span class="seg palette" style="width:1.5625%" title="thai-surasa-hanuman palette: $6FD2–$71D1"></span><span class="seg palette" style="width:1.5625%" title="thai-hanuman palette: $71D2–$73D1"></span><span class="seg palette" style="width:1.5625%" title="thai-hanuman-longka palette: $73D2–$75D1"></span><span class="seg palette" style="width:1.5625%" title="thai-ravana-war palette: $75D2–$77D1"></span><span class="seg free" style="width:6.3904%"></span></div>
+<div class="label"><div class="title">7 packed items</div><div class="item">$0000 · voyage-youth stream · 14,093 B</div><div class="item">$370D · fog-mount-desert stream · 14,021 B</div><div class="item">$6DD2 · thai-ravan-palace palette · 512 B</div><div class="item">$6FD2 · thai-surasa-hanuman palette · 512 B</div><div class="item">$71D2 · thai-hanuman palette · 512 B</div><div class="item">$73D2 · thai-hanuman-longka palette · 512 B</div><div class="item">$75D2 · thai-ravana-war palette · 512 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $17</span><span class="used"><span>27,867 used</span><span>4,901 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:42.6208%" title="thai-surasa-hanuman stream: $0000–$368D"></span><span class="seg stream" style="width:42.4225%" title="thai-temple-painting stream: $368E–$6CDA"></span><span class="seg free" style="width:14.9567%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · thai-surasa-hanuman stream · 13,966 B</div><div class="item">$368E · thai-temple-painting stream · 13,901 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $18</span><span class="used"><span>27,687 used</span><span>5,081 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:42.3615%" title="flower-still-life stream: $0000–$3638"></span><span class="seg stream" style="width:42.1326%" title="wivenhoe-park stream: $3639–$6C26"></span><span class="seg free" style="width:15.5060%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · flower-still-life stream · 13,881 B</div><div class="item">$3639 · wivenhoe-park stream · 13,806 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $19</span><span class="used"><span>27,375 used</span><span>5,393 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:41.9159%" title="harvest-moon stream: $0000–$35A6"></span><span class="seg stream" style="width:41.6260%" title="st-odulphus stream: $35A7–$6AEE"></span><span class="seg free" style="width:16.4581%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · harvest-moon stream · 13,735 B</div><div class="item">$35A7 · st-odulphus stream · 13,640 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $1A</span><span class="used"><span>26,892 used</span><span>5,876 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:41.1835%" title="river-moonlight stream: $0000–$34B6"></span><span class="seg stream" style="width:40.8844%" title="ships-calm stream: $34B7–$690B"></span><span class="seg free" style="width:17.9321%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · river-moonlight stream · 13,495 B</div><div class="item">$34B7 · ships-calm stream · 13,397 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $1B</span><span class="used"><span>26,694 used</span><span>6,074 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:40.7715%" title="keelmen-moonlight stream: $0000–$342F"></span><span class="seg stream" style="width:40.6921%" title="voyage-manhood stream: $3430–$6845"></span><span class="seg free" style="width:18.5364%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · keelmen-moonlight stream · 13,360 B</div><div class="item">$3430 · voyage-manhood stream · 13,334 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $1C</span><span class="used"><span>26,276 used</span><span>6,492 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:40.2130%" title="sailing-vessels stream: $0000–$3378"></span><span class="seg stream" style="width:39.9750%" title="buffalo-storm stream: $3379–$66A3"></span><span class="seg free" style="width:19.8120%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · sailing-vessels stream · 13,177 B</div><div class="item">$3379 · buffalo-storm stream · 13,099 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $1D</span><span class="used"><span>25,700 used</span><span>7,068 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:39.9200%" title="voyage-childhood stream: $0000–$3318"></span><span class="seg stream" style="width:38.5101%" title="voyage-old-age stream: $3319–$6463"></span><span class="seg free" style="width:21.5698%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · voyage-childhood stream · 13,081 B</div><div class="item">$3319 · voyage-old-age stream · 12,619 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $1E</span><span class="used"><span>24,964 used</span><span>7,804 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:38.2324%" title="grand-canal-molo stream: $0000–$30EF"></span><span class="seg stream" style="width:37.9517%" title="mount-corcoran stream: $30F0–$6183"></span><span class="seg free" style="width:23.8159%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · grand-canal-molo stream · 12,528 B</div><div class="item">$30F0 · mount-corcoran stream · 12,436 B</div></div>
+</section><section class="bank">
+<div class="head"><span class="num">Bank $1F</span><span class="used"><span>24,727 used</span><span>8,041 free</span></span></div>
+<div class="bar"><span class="seg stream" style="width:37.8571%" title="niagara stream: $0000–$3074"></span><span class="seg stream" style="width:37.6038%" title="view-of-delft stream: $3075–$6096"></span><span class="seg free" style="width:24.5392%"></span></div>
+<div class="label"><div class="title">2 packed items</div><div class="item">$0000 · niagara stream · 12,405 B</div><div class="item">$3075 · view-of-delft stream · 12,322 B</div></div>
 </section><div class="boundary">8 Mbit (1 MiB) boundary · end of bank $1F</div></div>
-<p class="note"><strong>Algorithm:</strong> stable first-fit decreasing. Sort streams and palettes
-largest-to-smallest, retain manifest order as the tie-breaker, and place each item in the first
-32 KiB bank where it fits. This determines bank membership, not order inside a bank. The bars and
-address-prefixed listings show the linker's actual intra-bank order from the final map.</p>
+<p class="note"><strong>Reading the map:</strong> colored spans are linked bytes; dark spans are
+unused capacity. The address-prefixed listings and bank-$00 breakdown come from the final map.</p>
 </main></html>
