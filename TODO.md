@@ -61,17 +61,17 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [wip T3] **seamdemo — P0 DONE (`e30673f`); P1 Act-1 ROM DISPATCHED (VM + PC ticker + seam event).**
+- [T3] **seamdemo — P1 Act-1 ROM DONE (`dd954dd`, gate PASS, 34 s act); next: P2 graph-walk act.**
   <!-- agent:a3f76f15f3f53c44e (P0 done; holds full generator/oracle/ISA context — reuse for P1) -->
   P0 contract settled: `decode_cells()` model extension (380 cells, 5 new regression tests,
   58+25,044 subtests), one-slot-record layout, 16-op ISA + 8-entry ALU fn-ptr table, 24-bit
   file-offset PC, the seam chapter hand-laid as ONE instruction straddling the device boundary
   (opcode file `$3FFFFF`=`$FF:FFFF`, operand `$400000`=`$40:0000`). Coverage: 374/374 available
   cells in-degree ≥1; 1,122 edges (755 seam-, 748 mirror-, 1,118 bank-crossing). Oracle:
-  act1 `$93CF` act2 `$B596` act3 `$6D21` → **corpus_result `$2B43`**; ALL selfchecks PASS;
+  act1 `$F0E2` act2 `$36B6` act3 `$6D21` → **corpus_result `$3277`** (P0 regenerated for measured pacing: 48 B chapters, MOVE 1-in-23, 10,494 ops/367 segments; coverage invariants held 374/374); ALL selfchecks PASS;
   deterministic rebuild. P1 cautions recorded in the plan: re-derive the reserved code range
   from the actual link script (don't trust slot 129), diff non-zero extents before first
-  `fill`, Act-1 pacing unmeasured (SYNC is the lever), download-size lever changes act3_crc. One 48 Mbit cart,
+  `fill`, Act-1 pacing MEASURED (34 s by lap-bisect; dirty-tile flush is a per-vblank throughput wall — cost is NOT linear in ops), download-size lever changes act3_crc. One 48 Mbit cart,
   three acts in a loop, each reading the full image with a different access pattern: Act 1 a
   VM executing the whole cart as one bytecode stream (PC ticker; the $3FFFFF→$400000 seam
   crossing is an on-screen event), Act 2 a boundary-hostile pointer-graph walk (every decode
@@ -90,6 +90,14 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
+- [T2] **Re-run `dev/cartsize-canary.sh` with the rebuilt `jgxcheck` + fix its latent `rc0`
+  pipefail trap.** seamdemo P1 found `build/jgxcheck` predated FRAMESCAN support, so the canary
+  gate's 6b entropy fingerprint had been passing VACUOUSLY; P1 rebuilt the binary (harness
+  relink). Also latent in the canary's probe block: WRAM `$0000` is imaginary `rc0` (not zero)
+  and `jgxcheck` exits non-zero on deliberate probe mismatch — both need `|| true` inside the
+  command substitution (seamdemo's gate has the fix; the canary's copy survives only by luck).
+  Re-run the full canary gate and record whether 6b still passes non-vacuously. (T2: known
+  recipe, one gate run + a two-line script fix.)
 - [T2] **ROM-map visualization for the cartsize/seamdemo pages** — the one deliverable of the
   original extended-mapping umbrella item not shipped by the `d0d6b39` merge (everything else —
   mapping, linker layout, decoder model, header/size fields, vectors, far addressing, checksum
