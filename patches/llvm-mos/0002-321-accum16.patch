@@ -5357,7 +5357,7 @@ index 868f6c712..b62986d09 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 8e9b57fc9..b391a8427 100644
+index 8e9b57fc9..23e75b581 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -20,8 +20,10 @@
@@ -5371,7 +5371,7 @@ index 8e9b57fc9..b391a8427 100644
  #include "llvm/CodeGen/LivePhysRegs.h"
  #include "llvm/CodeGen/MachineBasicBlock.h"
  #include "llvm/CodeGen/MachineFrameInfo.h"
-@@ -156,23 +158,53 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
+@@ -156,23 +158,81 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
    return !PushCount;
  }
  
@@ -5386,12 +5386,6 @@ index 8e9b57fc9..b391a8427 100644
 -           E = MachineBasicBlock::reverse_iterator(Pos);
 -       I != E; ++I) {
 -    LiveRegs.stepBackward(*I);
--  }
--  assert(!LiveRegs.contains(MOS::N) &&
--         "expected N to be free when saving scavenger register");
--  assert(!LiveRegs.contains(MOS::Z) &&
--         "expected Z to be free when saving scavenger register");
--#endif
 +// Liveness immediately before Pos (i.e. into the instruction at Pos), computed
 +// by stepping a basic-block live-out set backward to Pos.
 +static void computeLiveBefore(MachineBasicBlock::iterator Pos,
@@ -5421,28 +5415,61 @@ index 8e9b57fc9..b391a8427 100644
 +  return MOS::NoRegister;
 +}
 +
-+// Does Reg have no reaching definition at Pos — i.e. it is neither live-in to
-+// the block nor defined by any earlier instruction? The scavenger borrows $c (a
-+// sub-register of $p) for a frame-index carry, which forces the whole $p to be
-+// preserved even where $p carries no live value; the resulting PHP then reads an
-+// undef $p, which the machine verifier rejects unless the operand is flagged
-+// undef. (This is a *reaching-definition* test, not liveness: $p may be "live"
-+// by backward dataflow — used by a later PHP — yet still have no def above.)
-+static bool hasNoReachingDef(Register Reg, MachineBasicBlock::iterator Pos) {
++// Does no part of Reg hold an available value on entry to Pos? The scavenger
++// borrows $c (a sub-register of $p) for a frame-index carry, which forces the
++// whole $p to be preserved even where $p carries no live value; the resulting
++// PHP then reads an undef $p, which the machine verifier rejects unless the
++// operand is flagged undef.
++//
++// This must mirror the verifier's own notion of "defined" exactly, because that
++// is the thing being satisfied. MachineVerifier tracks a FORWARD availability
++// set (block live-ins, plus each def, minus each kill/dead operand) and accepts
++// a use of a composite register when *any* of its sub-registers is in that set
++// (`We are fine if just any subregister has a defined value`). So the predicate
++// is "no sub-register of $p is available here", not "no def of $p appears
++// above": $c may well be defined earlier in the block and then killed or
++// dead-flagged before Pos, which leaves $p wholly undefined at Pos even though
++// a reaching-definition scan finds a modifier. That is precisely the shape a
++// 16-bit-accumulator ALU chain produces — every ADC in the chain defines $c,
++// and the last one marks it dead — and it is what a reaching-def test missed.
++//
++// Note this is deliberately *not* a backward-liveness test: $p is "live" by
++// backward dataflow at this very point (this PHP uses it), so LivePhysRegs
++// stepped backward would never report it free. Forward availability is both the
++// verifier-faithful and the semantically correct question here — if nothing
++// above produced a flag value, the byte this PHP pushes is undefined, and the
++// matching PLP restores an undefined byte that nothing reads.
++//
++// Erring is one-sided: reporting "available" when nothing is leaves the operand
++// un-flagged (a verifier complaint, never a miscompile), whereas a spurious
++// `undef` on a genuinely live $p would let the flag def move or die. Matching
++// the verifier's set exactly keeps that asymmetry intact.
++static bool hasNoAvailableValue(Register Reg, MachineBasicBlock::iterator Pos) {
 +  MachineBasicBlock &MBB = *Pos->getParent();
-+  const TargetRegisterInfo &TRI =
-+      *MBB.getParent()->getSubtarget().getRegisterInfo();
-+  for (const MachineBasicBlock::RegisterMaskPair &LI : MBB.liveins())
-+    if (TRI.regsOverlap(LI.PhysReg, Reg))
-+      return false;
-+  for (MachineBasicBlock::iterator J = MBB.begin(); J != Pos; ++J)
-+    if (J->modifiesRegister(Reg, &TRI))
-+      return false;
-+  return true;
++  const MachineFunction &MF = *MBB.getParent();
++  const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
++  const MachineRegisterInfo &MRI = MF.getRegInfo();
++
++  LivePhysRegs LPR(TRI);
++  LPR.addLiveIns(MBB);
++  SmallVector<std::pair<MCPhysReg, const MachineOperand *>, 4> Clobbers;
++  for (MachineBasicBlock::iterator J = MBB.begin(); J != Pos; ++J) {
++    Clobbers.clear();
++    LPR.stepForward(*J, Clobbers);
+   }
+-  assert(!LiveRegs.contains(MOS::N) &&
+-         "expected N to be free when saving scavenger register");
+-  assert(!LiveRegs.contains(MOS::Z) &&
+-         "expected Z to be free when saving scavenger register");
+-#endif
++  // available() is false when any alias (here: any sub-register) of Reg is
++  // live, which is exactly the verifier's "any subregister has a defined
++  // value" escape hatch.
++  return LPR.available(MRI, Reg.asMCReg());
  }
  
  bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
-@@ -181,11 +213,6 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -181,11 +241,6 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
                                              const TargetRegisterClass *RC,
                                              Register Reg) const {
  
@@ -5454,7 +5481,7 @@ index 8e9b57fc9..b391a8427 100644
    // Consider the regions in a basic block where a physical register is live.
    // The register scavenger will select one of these regions to spill and mark
    // the physical register as available within that region. Such a region cannot
-@@ -201,19 +228,22 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -201,19 +256,22 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
      errs() << "Register: " << getName(Reg) << "\n";
      report_fatal_error("Scavenger spill for register not yet implemented.");
    case MOS::A:
@@ -5486,7 +5513,7 @@ index 8e9b57fc9..b391a8427 100644
  
      if (UseHardStack)
        Builder.buildInstr(MOS::PH, {}, {Reg});
-@@ -228,6 +258,62 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -228,6 +286,62 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
        Builder.buildInstr(MOS::LDImag8, {Reg}, {Save});
      break;
    }
@@ -5502,7 +5529,7 @@ index 8e9b57fc9..b391a8427 100644
 +    // which forces the whole $p to be preserved even where $p carries no live
 +    // value (the carry vreg is Pc-class). In that case the PHP reads an undef
 +    // $p, which the verifier rejects unless the operand is flagged undef.
-+    bool PUndef = hasNoReachingDef(MOS::P, I);
++    bool PUndef = hasNoAvailableValue(MOS::P, I);
 +
 +    if (pushPullBalanced(I, UseMI)) {
 +      // Balanced hard-stack range: PHP / PLP round-trips P and all its flags.
@@ -5549,7 +5576,7 @@ index 8e9b57fc9..b391a8427 100644
    }
    return true;
  }
-@@ -235,18 +321,24 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -235,18 +349,24 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
  bool MOSRegisterInfo::canSaveScavengerRegister(
      Register Reg, MachineBasicBlock::iterator I,
      MachineBasicBlock::iterator UseMI) const {
@@ -5577,7 +5604,7 @@ index 8e9b57fc9..b391a8427 100644
    bool UseHardStack =
        (Reg == MOS::A || STI.hasGPRStackRegs()) && pushPullBalanced(I, UseMI);
    if (UseHardStack)
-@@ -279,11 +371,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
+@@ -279,11 +399,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
  
    int Idx = MI->getOperand(FIOperandNum).getIndex();
    int64_t Offset = MFI.getObjectOffset(Idx);
@@ -5606,7 +5633,7 @@ index 8e9b57fc9..b391a8427 100644
  
    if (MFI.getStackID(Idx) == TargetStackID::Default) {
      // All offsets are relative to the incoming SP
-@@ -442,10 +548,25 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -442,10 +576,25 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
        IsLoad ? MI->getOperand(0).getReg() : MI->getOperand(1).getReg();
    int64_t Offset = MI->getOperand(3).getImm();
  
@@ -5635,7 +5662,7 @@ index 8e9b57fc9..b391a8427 100644
      Register NewBase =
          IsLoad ? MI->getOperand(1).getReg() : MI->getOperand(0).getReg();
      // We can't scavenge a 16-bit register, so this can't be virtual here
-@@ -476,6 +597,69 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -476,6 +625,69 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
      return;
    }
  
@@ -5705,7 +5732,7 @@ index 8e9b57fc9..b391a8427 100644
    if (MOS::Imag16RegClass.contains(Loc)) {
      if (!IsLoad) {
        // Loc may not be fully alive at this point, which would create uses of
-@@ -515,6 +699,15 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -515,6 +727,15 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
    if (Loc8)
      Loc = Loc8;
  
@@ -5721,7 +5748,7 @@ index 8e9b57fc9..b391a8427 100644
    assert(Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc));
  
    Register A = Loc;
-@@ -656,12 +849,77 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
+@@ -656,12 +877,77 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
    return true;
  }
  

@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 1979853fa7b5..d8c220dba489 100644
+index baf6de604cb7..c56c87316419 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -156,23 +156,53 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
+@@ -141,23 +141,81 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
    return !PushCount;
  }
  
@@ -17,12 +17,6 @@ index 1979853fa7b5..d8c220dba489 100644
 -           E = MachineBasicBlock::reverse_iterator(Pos);
 -       I != E; ++I) {
 -    LiveRegs.stepBackward(*I);
--  }
--  assert(!LiveRegs.contains(MOS::N) &&
--         "expected N to be free when saving scavenger register");
--  assert(!LiveRegs.contains(MOS::Z) &&
--         "expected Z to be free when saving scavenger register");
--#endif
 +// Liveness immediately before Pos (i.e. into the instruction at Pos), computed
 +// by stepping a basic-block live-out set backward to Pos.
 +static void computeLiveBefore(MachineBasicBlock::iterator Pos,
@@ -52,28 +46,61 @@ index 1979853fa7b5..d8c220dba489 100644
 +  return MOS::NoRegister;
 +}
 +
-+// Does Reg have no reaching definition at Pos — i.e. it is neither live-in to
-+// the block nor defined by any earlier instruction? The scavenger borrows $c (a
-+// sub-register of $p) for a frame-index carry, which forces the whole $p to be
-+// preserved even where $p carries no live value; the resulting PHP then reads an
-+// undef $p, which the machine verifier rejects unless the operand is flagged
-+// undef. (This is a *reaching-definition* test, not liveness: $p may be "live"
-+// by backward dataflow — used by a later PHP — yet still have no def above.)
-+static bool hasNoReachingDef(Register Reg, MachineBasicBlock::iterator Pos) {
++// Does no part of Reg hold an available value on entry to Pos? The scavenger
++// borrows $c (a sub-register of $p) for a frame-index carry, which forces the
++// whole $p to be preserved even where $p carries no live value; the resulting
++// PHP then reads an undef $p, which the machine verifier rejects unless the
++// operand is flagged undef.
++//
++// This must mirror the verifier's own notion of "defined" exactly, because that
++// is the thing being satisfied. MachineVerifier tracks a FORWARD availability
++// set (block live-ins, plus each def, minus each kill/dead operand) and accepts
++// a use of a composite register when *any* of its sub-registers is in that set
++// (`We are fine if just any subregister has a defined value`). So the predicate
++// is "no sub-register of $p is available here", not "no def of $p appears
++// above": $c may well be defined earlier in the block and then killed or
++// dead-flagged before Pos, which leaves $p wholly undefined at Pos even though
++// a reaching-definition scan finds a modifier. That is precisely the shape a
++// 16-bit-accumulator ALU chain produces — every ADC in the chain defines $c,
++// and the last one marks it dead — and it is what a reaching-def test missed.
++//
++// Note this is deliberately *not* a backward-liveness test: $p is "live" by
++// backward dataflow at this very point (this PHP uses it), so LivePhysRegs
++// stepped backward would never report it free. Forward availability is both the
++// verifier-faithful and the semantically correct question here — if nothing
++// above produced a flag value, the byte this PHP pushes is undefined, and the
++// matching PLP restores an undefined byte that nothing reads.
++//
++// Erring is one-sided: reporting "available" when nothing is leaves the operand
++// un-flagged (a verifier complaint, never a miscompile), whereas a spurious
++// `undef` on a genuinely live $p would let the flag def move or die. Matching
++// the verifier's set exactly keeps that asymmetry intact.
++static bool hasNoAvailableValue(Register Reg, MachineBasicBlock::iterator Pos) {
 +  MachineBasicBlock &MBB = *Pos->getParent();
-+  const TargetRegisterInfo &TRI =
-+      *MBB.getParent()->getSubtarget().getRegisterInfo();
-+  for (const MachineBasicBlock::RegisterMaskPair &LI : MBB.liveins())
-+    if (TRI.regsOverlap(LI.PhysReg, Reg))
-+      return false;
-+  for (MachineBasicBlock::iterator J = MBB.begin(); J != Pos; ++J)
-+    if (J->modifiesRegister(Reg, &TRI))
-+      return false;
-+  return true;
++  const MachineFunction &MF = *MBB.getParent();
++  const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
++  const MachineRegisterInfo &MRI = MF.getRegInfo();
++
++  LivePhysRegs LPR(TRI);
++  LPR.addLiveIns(MBB);
++  SmallVector<std::pair<MCPhysReg, const MachineOperand *>, 4> Clobbers;
++  for (MachineBasicBlock::iterator J = MBB.begin(); J != Pos; ++J) {
++    Clobbers.clear();
++    LPR.stepForward(*J, Clobbers);
+   }
+-  assert(!LiveRegs.contains(MOS::N) &&
+-         "expected N to be free when saving scavenger register");
+-  assert(!LiveRegs.contains(MOS::Z) &&
+-         "expected Z to be free when saving scavenger register");
+-#endif
++  // available() is false when any alias (here: any sub-register) of Reg is
++  // live, which is exactly the verifier's "any subregister has a defined
++  // value" escape hatch.
++  return LPR.available(MRI, Reg.asMCReg());
  }
  
  bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
-@@ -181,11 +211,6 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -166,11 +224,6 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
                                              const TargetRegisterClass *RC,
                                              Register Reg) const {
  
@@ -85,7 +112,7 @@ index 1979853fa7b5..d8c220dba489 100644
    // Consider the regions in a basic block where a physical register is live.
    // The register scavenger will select one of these regions to spill and mark
    // the physical register as available within that region. Such a region cannot
-@@ -201,19 +226,22 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -186,19 +239,22 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
      errs() << "Register: " << getName(Reg) << "\n";
      report_fatal_error("Scavenger spill for register not yet implemented.");
    case MOS::A:
@@ -117,7 +144,7 @@ index 1979853fa7b5..d8c220dba489 100644
  
      if (UseHardStack)
        Builder.buildInstr(MOS::PH, {}, {Reg});
-@@ -228,6 +256,62 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -213,6 +269,62 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
        Builder.buildInstr(MOS::LDImag8, {Reg}, {Save});
      break;
    }
@@ -133,7 +160,7 @@ index 1979853fa7b5..d8c220dba489 100644
 +    // which forces the whole $p to be preserved even where $p carries no live
 +    // value (the carry vreg is Pc-class). In that case the PHP reads an undef
 +    // $p, which the verifier rejects unless the operand is flagged undef.
-+    bool PUndef = hasNoReachingDef(MOS::P, I);
++    bool PUndef = hasNoAvailableValue(MOS::P, I);
 +
 +    if (pushPullBalanced(I, UseMI)) {
 +      // Balanced hard-stack range: PHP / PLP round-trips P and all its flags.
@@ -180,7 +207,7 @@ index 1979853fa7b5..d8c220dba489 100644
    }
    return true;
  }
-@@ -235,18 +319,24 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
+@@ -220,18 +332,24 @@ bool MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &MBB,
  bool MOSRegisterInfo::canSaveScavengerRegister(
      Register Reg, MachineBasicBlock::iterator I,
      MachineBasicBlock::iterator UseMI) const {
@@ -208,3 +235,73 @@ index 1979853fa7b5..d8c220dba489 100644
    bool UseHardStack =
        (Reg == MOS::A || STI.hasGPRStackRegs()) && pushPullBalanced(I, UseMI);
    if (UseHardStack)
+diff --git a/llvm/test/CodeGen/MOS/scavenger-p-undef.mir b/llvm/test/CodeGen/MOS/scavenger-p-undef.mir
+new file mode 100644
+index 000000000000..f46401ff95c8
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/scavenger-p-undef.mir
+@@ -0,0 +1,64 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=prologepilog -verify-machineinstrs -o - %s | FileCheck %s
++
++# The register scavenger must borrow $p to hold a frame-index carry. $p is a
++# composite status register whose sub-registers ($c, $nz, $v) are what codegen
++# actually defines, so the PHP it emits can read a $p that holds no value at all
++# — and the machine verifier rejects that unless the operand is flagged undef.
++#
++# The predicate that decides this has to match the verifier's own notion of
++# "defined", which is a FORWARD availability set (block live-ins, plus defs,
++# minus kills/dead defs), accepting the use when *any* sub-register is in it. A
++# reaching-definition scan is not the same thing: the `dead $c` produced by the
++# ASL below IS a modifier of $p above the scavenge point, yet leaves nothing
++# available there.
++#
++# This function pins both directions in one block:
++#   * the first spill follows `dead renamable $c = ASL`  -> nothing available
++#                                                        -> PH undef $p
++#   * the second follows `renamable $c = LDImm1 0`       -> $c available
++#                                                        -> PH $p (no undef)
++# An over-eager undef would let a live flag def move or die, so the second case
++# is as load-bearing as the first.
++
++--- |
++  target triple = "mos"
++  define void @scavenge_p_no_available_flag() { unreachable }
++...
++---
++name: scavenge_p_no_available_flag
++tracksRegLiveness: true
++stack:
++  - { id: 0, type: spill-slot, size: 2, alignment: 1 }
++  - { id: 1, type: spill-slot, size: 8, alignment: 1 }
++body: |
++  ; The prologue lands in bb.0 so that its own scavenged $p save does not leave
++  ; $p defined on entry to the block under test.
++  bb.0:
++    successors: %bb.1
++    liveins: $a16, $y
++
++    BRA %bb.1
++
++  bb.1:
++    successors: %bb.2
++    liveins: $a16, $y
++
++    ; CHECK-LABEL: name: scavenge_p_no_available_flag
++    ; CHECK: bb.1:
++    ; CHECK: renamable $a, dead renamable $c = ASL killed renamable $a
++    ; CHECK-NEXT: PH $a
++    ; CHECK-NEXT: PH undef $p
++    ; CHECK: renamable $c = LDImm1 0
++    ; CHECK-NEXT: PH $p
++    ; CHECK-NOT: PH undef $p
++    renamable $a = COPY killed renamable $y
++    renamable $a, dead renamable $c = ASL killed renamable $a
++    dead early-clobber renamable $rs3 = STStk killed renamable $a16, %stack.0, 0
++    renamable $c = LDImm1 0
++    renamable $a16, dead early-clobber renamable $rs4 = LDStk %stack.0, 0
++    renamable $a, dead renamable $c, dead renamable $v = ADCImm killed renamable $a, 0, killed renamable $c
++    BRA %bb.2
++
++  bb.2:
++    RTS
++...

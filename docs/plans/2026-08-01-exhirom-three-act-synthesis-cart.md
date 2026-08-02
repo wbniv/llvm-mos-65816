@@ -381,7 +381,26 @@ re-solved in the generator against these measurements (see "Act 1 — the VM ISA
 overran v-blank ~14× and the PC ticker updated once every 14 frames. It stays a runtime dial for
 fine trim in P2/P3, as does the `SYNC` cadence.
 
-### Known backend defect: `PH $p` uses an undefined physical register
+### ~~Known backend defect: `PH $p` uses an undefined physical register~~ — FIXED 2026-08-01
+
+**RESOLVED.** Fixed in `MOSRegisterInfo::saveScavengerRegister` (fork patch `0002`); the
+`dev/seamdemo.sh` tolerance is removed and the gate is strict again. Regression test:
+`llvm/test/CodeGen/MOS/scavenger-p-undef.mir`. Two corrections to the account below:
+
+- The root cause is **not** "sub-registers are not modelled as partial defs of `$p`" — the machine
+  verifier explicitly accepts a use of a composite register when *any* sub-register is defined
+  ("We are fine if just any subregister has a defined value"). The real fault was that the existing
+  `undef`-flagging predicate was a **reaching-definition** scan, while the verifier tracks **forward
+  availability**: `$c` is defined repeatedly by the a16 ADC chain above and then dead-flagged, so a
+  reaching-def scan finds a modifier and declines to flag `undef`, yet nothing is available at the
+  `PH`. The predicate now mirrors the verifier's availability set exactly.
+- The `examples/snes/seqvm.c` claim was **wrong**. `seqvm.c` `draw_frame` does trip
+  `-verify-machineinstrs` at `-O1`/`-O2`/`-Os`, but with a **different** signature —
+  `renamable $x = COPY killed renamable $rc3`, a prematurely-killed `$rc3` (the high byte of an
+  `$rs1` pair) read again later. That is a separate, still-open defect with real miscompile
+  potential (a wrong kill flag licenses a later pass to clobber the byte); it is filed on its own.
+
+The original account, for the record:
 
 `-verify-machineinstrs` trips on the Act-1 VM:
 

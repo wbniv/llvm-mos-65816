@@ -712,6 +712,13 @@ Runtime requirements:
 
 ## ROM-map visualization
 
+**Stub landed 2026-08-01:** [`tools/snes-cartmap-viz.py`](../../tools/snes-cartmap-viz.py) renders
+the HiROM 4 MiB / ExHiROM 6 MiB / ExHiROM 8 MiB decode maps described below as self-contained inline
+SVGs (16×16 bank-fold grid, canonical/mirror/WRAM/hole fills, device split + seam callouts), derived
+entirely from `decode_cells()`/`windows()`/`holes()`; embedded on the three `cartsize-*` pages'
+`doc` HTML on biohack.net. This is the standalone decode-map picture only — the gallery/video-layout
+tool work below (`lzss-gallery-rom-layout.py`, `snes-rom-map.py`) is unstarted.
+
 Update `tools/lzss-gallery-rom-layout.py` and `tools/snes-rom-map.py` to understand ExHiROM:
 
 - show file offsets and canonical CPU addresses together;

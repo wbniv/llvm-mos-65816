@@ -147,40 +147,22 @@ OBJ="$GEN/seamdemo.o"
   -mllvm -verify-machineinstrs -I "$GEN" -I "$ROOT/examples/snes" \
   -c -o "$OBJ" "$SRC" 2>"$GEN/verify.log" && verify_rc=0 || verify_rc=$?
 
-# KNOWN PRE-EXISTING BACKEND DEFECT — see the plan's P1 section.
-#
-#   *** Bad machine code: Using an undefined physical register ***
-#   - instruction: PH $p
-#
-# `php` pushes the whole P register, but the MIR only ever defines the individual
-# flag sub-registers ($c, $v, ...) — they are not modelled as partial defs of $p —
-# so the verifier sees `PH $p` reading an undefined register. The emitted `php`
-# is correct on hardware; the LIVENESS MODEL is what is wrong.
-#
-# This is NOT introduced by seamdemo: it reproduces in the already-committed
-# examples/snes/seqvm.c (function draw_frame) at -O0/-O1/-O2/-Os with +mos-a16,
-# and is clean at -Oz. dev/seqvm.sh simply never ran the verifier, so nothing had
-# caught it. This gate is the first to.
-#
-# The exception is deliberately NARROW: only this exact signature is tolerated,
-# and only while the backend item is open. Any OTHER verifier error still fails.
+# The 'PH $p uses an undefined physical register' tolerance that used to live here
+# is GONE: the defect it named is fixed (MOSRegisterInfo::saveScavengerRegister now
+# flags the PHP's $p operand undef whenever no sub-register of $p holds an
+# available value, matching the verifier's own forward availability set instead of
+# a reaching-definition scan). Regression test:
+# llvm/test/CodeGen/MOS/scavenger-p-undef.mir. This gate is now strict again.
 if [ "$verify_rc" -eq 0 ]; then
   echo "  PASS: -verify-machineinstrs clean"
-elif grep -q 'Using an undefined physical register' "$GEN/verify.log" \
-     && grep -q 'instruction: PH \$p' "$GEN/verify.log" \
-     && [ "$(grep -c 'Bad machine code' "$GEN/verify.log")" = "1" ]; then
-  echo "  KNOWN: -verify-machineinstrs trips the pre-existing 'PH \$p undefined' liveness"
-  echo "         defect (also in examples/snes/seqvm.c at -Os +mos-a16; clean at -Oz)."
-  echo "         Not a seamdemo defect — see the plan's P1 section. Any OTHER verifier"
-  echo "         error still fails this gate."
 else
-  echo "  FAIL: -verify-machineinstrs (a NEW error, not the known PH \$p one)"
+  echo "  FAIL: -verify-machineinstrs"
   grep -iE 'error|Bad machine' "$GEN/verify.log" | head -5
   rc=1
 fi
 
-# The disasm probe needs an object; -Oz is clean of the known defect and emits the
-# same three shapes, so it is what the probe reads when -Os could not produce one.
+# The disasm probe needs an object; -Oz emits the same three shapes, so it is what
+# the probe reads if the -Os compile above failed to produce one.
 if [ ! -s "$OBJ" ]; then
   "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 "${A16[@]}" -Oz -fno-lto \
     -I "$GEN" -I "$ROOT/examples/snes" -c -o "$OBJ" "$SRC" 2>/dev/null \

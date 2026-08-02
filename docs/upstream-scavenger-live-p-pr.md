@@ -89,10 +89,24 @@ int main(void) { out = f0(2, 0xCDD5u); for (;;) {} }
   **index register** (not A) makes it width-safe: `MOSInsertREPSEP` runs after scavenging and classifies any
   index push/pull/load/store as `XW_X8`, so the couriers stay 8-bit even under `+mos-xy16`.
 
-- **Flag a `PHP` of a not-reaching-def `$p` as `undef`.** Because the carry vreg is `Pc`-class, the scavenger
-  may preserve `$p` even where `$p` holds no live value; the resulting `PHP` reads an undef `$p`, which the
-  verifier rejects unless the operand is flagged `undef` (a reaching-definition test, distinct from
-  liveness).
+- **Flag a `PHP` of a wholly-unavailable `$p` as `undef`.** Because the carry vreg is `Pc`-class, the
+  scavenger may preserve `$p` even where `$p` holds no value at all; the resulting `PHP` reads an undef `$p`,
+  which the verifier rejects unless the operand is flagged `undef`.
+
+  The predicate (`hasNoAvailableValue`) mirrors `MachineVerifier`'s own bookkeeping rather than
+  approximating it. The verifier maintains a **forward availability** set — block live-ins, plus each def,
+  minus each kill/dead operand — and accepts a use of a composite register when *any* sub-register is in it
+  ("We are fine if just any subregister has a defined value"). So the question is "is any sub-register of
+  `$p` available here", answered with `LivePhysRegs::addLiveIns` + `stepForward` + `available()`.
+
+  It is deliberately neither of the two nearby approximations. A *reaching-definition* scan under-fires: an
+  ALU chain defines `$c` repeatedly and dead-flags the last one, so a modifier is found above while nothing
+  is available at the `PHP`. A *backward-liveness* query never fires at all: `$p` is live by backward
+  dataflow at this very point, because this `PHP` uses it.
+
+  Erring is one-sided and the test pins both sides. Failing to flag `undef` is a verifier complaint;
+  flagging a genuinely live `$p` would let a flag def move or die, so `scavenger-p-undef.mir` asserts the
+  plain `PH $p` in the case where `$c` *is* available as well as the `PH undef $p` where it is not.
 
 - **Drop `assertNZDeadAt`.** Its premise (N/Z dead at every scavenge point) is exactly the false invariant
   above. Under longer flag live ranges N/Z can be live across A/Y saves too; the A/Y restore (`LD`/`PL`)

@@ -271,8 +271,20 @@ independently postable, each drops from the stack on merge:
   every scavenge point and that a live `$p` only needs preserving across a *balanced* range; both break under
   16-bit-accumulator flag live ranges → illegal `STImag8 $p` (`$p is not a GPR`) + undefined-`$p` `PH $p`.
   Fix: route `$p` hard-stack-neutrally through a dead 8-bit index register into `RC17` for the unbalanced
-  case, flag the no-reaching-def `PHP` `undef`, drop the stale `assertNZDeadAt`, widen
+  case, flag the wholly-undefined `PHP` `undef`, drop the stale `assertNZDeadAt`, widen
   `canSaveScavengerRegister(P)`. PR body: [`docs/upstream-scavenger-live-p-pr.md`](upstream-scavenger-live-p-pr.md).
+  **Revised 2026-08-01 (still unposted, so the revision lands in the same patch):** the `undef`
+  predicate was a *reaching-definition* scan (`hasNoReachingDef`) and therefore under-fired — the
+  machine verifier tracks **forward availability** and accepts the composite use when *any*
+  sub-register is available, so a `$c` that is defined above and then killed/dead-flagged leaves
+  `$p` wholly undefined at the `PHP` while a reaching-def scan still sees a modifier and declines
+  to flag it. `-verify-machineinstrs` tripped on exactly that shape in `examples/snes/seamdemo.c`
+  (`seamvm_step`), where an a16 ADC chain defines `$c` repeatedly and dead-flags the last one. The
+  predicate is now `hasNoAvailableValue`, built on `LivePhysRegs::addLiveIns` + `stepForward` +
+  `available()` — the verifier's own set. `0011` now also carries the regression test
+  `llvm/test/CodeGen/MOS/scavenger-p-undef.mir`, which pins **both** directions in one function
+  (`PH undef $p` where nothing is available; plain `PH $p` where `$c` is), so an over-eager `undef`
+  — the only direction that could miscompile — fails the test too.
 - **`0012-mos-ldcimm-set-lowering.patch`** — surfaced once the scavenger no longer crashed (compilation
   reached MC lowering): `MOSMCInstLower` only lowered `LDCImm` for `0`/`-1`, but a *set* i1 carry can arrive
   as `1` (e.g. a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG). Fix: lower
