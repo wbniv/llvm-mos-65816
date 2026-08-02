@@ -45,6 +45,38 @@ fi
   -Wl,-Map="$MAP" -o "$ROM" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 [ "$(stat -c %s "$ROM")" = 1048576 ]
+
+# Standing producer gate (#138). The 2026-07-26 toolchain emitted `$rl1 = LDImm`
+# in @unpack_slide -- an Imag32 (far-pointer) destination on a GPR-only opcode,
+# i.e. malformed MIR -- which crashed mos-late-opt. That producer was fixed by
+# patch 0018-320-imag32-spill (far-pointer stack slots were being split through
+# a single GPR), and the consumer crash it hit was fixed upstream-bound as 0003.
+# With BOTH fixed, a returning producer would now be SILENT: 0003's guard skips
+# the malformed instruction instead of crashing on it. So assert the shape
+# directly -- on 65816 every LDImm destination must be $a/$x/$y.
+echo "==> producer gate: no non-GPR LDImm destinations (#138)"
+# -fno-lto on purpose: the shipped ROM is an LTO link, so codegen (and this
+# pass) runs at link time and a compile-step dump would be empty. The MIR shape
+# is what is being asserted, not this object.
+LDIMM_DUMP="$("$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
+  -Xclang -target-feature -Xclang +mos-a16 -Oz -fno-lto \
+  -DGALLERY_START="${GALLERY_START:-0}" "${EXTRA_DEFS[@]}" \
+  -mllvm -print-before=mos-late-opt -S -o /dev/null "$SRC" 2>&1 \
+  | grep -E '=[[:space:]]*LDImm ' || true)"
+# Destinations may carry `renamable` and/or `dead` flags before the register.
+NONGPR="$(printf '%s\n' "$LDIMM_DUMP" | grep -vE '^[[:space:]]*(dead |renamable |killed )*\$(a|x|y)[[:space:]]*=' | grep -c . || true)"
+TOTAL="$(printf '%s\n' "$LDIMM_DUMP" | grep -c . || true)"
+if [ "$NONGPR" = 0 ] && [ "$TOTAL" -gt 0 ]; then
+  echo "  PASS: all $TOTAL LDImm destinations are GPRs"
+elif [ "$TOTAL" = 0 ]; then
+  echo "  FAIL: no LDImm found at all — the dump is empty, so this gate proved nothing"
+  exit 1
+else
+  echo "  FAIL: $NONGPR of $TOTAL LDImm(s) have a non-GPR destination — the #138 producer is back"
+  printf '%s\n' "$LDIMM_DUMP" | grep -vE '^[[:space:]]*(dead |renamable |killed )*\$(a|x|y)[[:space:]]*=' | head -5
+  echo "        0003's guard now SKIPS these instead of crashing, so nothing else will tell you."
+  exit 1
+fi
 # The MOS assembler currently neither diagnoses a resolved wrapped PCRel8
 # fixup nor tracks 65816 M width through REP/SEP. Fail this build if the NMI's
 # deliberately safe branch-over-JMP or explicit ADC #$0010 encoding regresses.
