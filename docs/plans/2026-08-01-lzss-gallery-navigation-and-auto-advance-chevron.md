@@ -147,3 +147,11 @@ Verification passed: JavaScript syntax checks, the 62-work host oracle, target
 far/stage/near decode and checksum gate, scripted automatic-joypad Right press
 during foreground decode, and reproducible ROM link. Verified ROM SHA-256:
 `726c421fb708956ccadbdf677c2d856eb4ae1103cd91cec7a590b8ba66ec8dcd`.
+
+The guaranteed-duration touch pulse was fixed in the canonical shared player
+(`bsnes-jg-wasm` commit `642d3c9`) and then pinned by both consumers. Published
+site releases are biohack.net `v1.0.343` (`00fdc5a`) and indri.studio
+`v0.1.133` (`2c6a7a3`). Both deployment workflows passed. The two live player
+scripts are byte-identical with SHA-256
+`100f4b5122e43114aac833dcc11a48fd164ce2509fa4540a705f8ce95a8ab7ce`,
+and both live ROM downloads match the verified ROM hash above.
