@@ -149,6 +149,17 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   (`dev/roms/s_smp/spc700.rom` — same gap blocking the ExHiROM canary MAME evidence); §4 item 10
   (bank-$00 4096-byte gate) is source-side follow-up; `regen-patch.sh`'s `worktree remove
   --force` now collides with the teardown guard hook (policy call, flagged in-script).
+- [T3] **Backend: `PH $p` verifier trip — `php` reads undefined physical register P under
+  `+mos-a16`.** Found by seamdemo P1's gate (2026-08-01): `-verify-machineinstrs` reports
+  "Using an undefined physical register — instruction: PH $p" because the MIR defines only the
+  individual flag sub-registers while `php` pushes all of P, so P's liveness is unmodelled.
+  **Pre-existing**: reproduces in the already-committed `examples/snes/seqvm.c` (`draw_frame`)
+  at `-O0/-O1/-O2/-Os` with `+mos-a16` (clean at `-Oz`); `dev/seqvm.sh` never ran the verifier,
+  so it went uncaught. The seamdemo gate tolerates exactly this signature and fails on any
+  other verifier error — remove that tolerance when this is fixed. Fix direction: model P (or
+  its flag sub-register set) as defined at the push site / mark PH's P use as reading
+  sub-registers. Repro notes in the seamdemo plan + P1 commit. (T3: symptom pinpointed with a
+  committed repro; escalate if the fix needs P-register re-modelling across the backend.)
 - [T3] **`lowerCmpZeros` sticky loop-carried `Changed` (`MOSLateOptimization.cpp:142`) — found
   in passing by #138 Phase A.** After the first successful fold in a block, every later
   un-foldable `CmpZero` is *skipped* instead of lowered, and nothing downstream lowers that
