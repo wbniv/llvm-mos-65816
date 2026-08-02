@@ -61,23 +61,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [T3] **seamdemo — P1+P2+P3 DONE (`f3aa4ab`): all three acts on console, full-cycle latch
-  `corpus_result $3277`, gate PASS; next = P4 publication (two decisions first).**
-  <!-- agent:a3f76f15f3f53c44e (holds the whole contract) --> Act 3 Mode 7 flyover + loop glue
-  landed: 8/8 console assertions (act1 `$F0E2`, act2 `$36B6`, act3 `$6D21`, cycle_status 0,
-  corpus `$3277`), four-way oracle agreement, `-verify-machineinstrs` clean with the PH
-  tolerance removed, entropy fingerprint one picture ×6 boots, JG_FRAMES 7,200 (~1,200 margin
-  over the measured ~6,000-frame cycle). Measured by latch-bisect: act1 ~34 s, act2 ~29–35 s,
-  act3 ~23–34 s, **cycle ~100 s**. Notable: Mode 7 de-tiling done on the way to VRAM (64×8-byte
-  DMAs, one tile-row per v-blank) — 0.7 vs ~4.6 frames/page for a WRAM reorder, and it is why
-  act3 cadence is 2 samples/frame. **P4 decisions needed BEFORE publishing:** (a) ~100 s cycle
-  is long for a web page (viewer waits ~34 s for Act 2) — publish as-is or trim cadence
-  (runtime dial, no CRC impact); (b) ~872 KB gzipped from the full-entropy texture nibble — the
-  fix (restrict the nibble to path-sampled texels) **changes `act3_crc`**, so decide first.
-  **Deferred, reported:** the live Mode 7 page-address HUD needs either an HDMA BGMODE/TM
-  scanline split (which also needs the font moved above VRAM `$4000`, risking Acts 1–2) or OBJ
-  sprites — presentation, not correctness; both routes recorded in the plan.
-  (T3: P4 is a settled pipeline once the two dials are decided.)
 - [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
   absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
   `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
@@ -934,6 +917,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-02 — [seamdemo] P0–P4 COMPLETE. Three-act ExHiROM boundary cartridge LIVE at [/snes/seamdemo/](https://biohack.net/snes/seamdemo/) (site `445121a`, v1.0.350, CI success, live ROM sha `29dafeb5…` verified, decode-map SVG embedded). Console: act1 `$F0E2` / act2 `$36B6` / act3 `$6D21` → full-cycle `corpus_result $3277`, four-way oracle agreement, `-verify` clean, entropy fingerprint one picture ×6, ~100 s cycle. Coverage 374/374 decode cells, 1,122 edges (755 seam-crossing), one instruction split across the physical device seam. New gallery category **Cartridge & Mapping Tests** carries it plus the three canary pages. Published as-is: cycle length is a runtime dial (no CRC impact); the ~872 KB gzip lever would change `act3_crc`, so it stays open. Deferred: live Mode 7 page-address HUD (needs HDMA mode-split or OBJ; presentation only). See [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md).
 - [x] 2026-08-02 — [lowercmpzeros] Sticky loop-carried `Changed` FIXED (`6249aae`): after a block's first fold every later `CmpZero` went unlowered and the asm printer emitted NOTHING for the survivor — silent dropped flag test, verifier-invisible. Reproduces on PRISTINE upstream → standalone patch `0022` + PR package READY TO POST (row 18). Red/green lit test; suite 83 w/ exactly the 7 known failures; measured in-tree incidence ZERO (17,403 blocks, max 1 CmpZero/block) so the fix is inert here. Corpus differential COMPLETE: 59/61 value rows, **59/59 host==a16@bsnes, 0 mismatches** (the harness's `0/61 passed` is the missing-SPC700-IPL MAME columns, not disagreements). See [plan](docs/plans/2026-08-02-lowercmpzeros-sticky-changed.md).
 - [x] 2026-08-01 — [138-branch-merged] `throwaway/138-late-opt-crash` MERGED to main (`98231c1`): patch `0003-late-opt-nongpr-ldimm-dest` + PR-doc mirror (verified == live #584 body) + toolchain/regen wiring reconciled with the 0021-era `BASELINE_MOSDIR`; status row 15 unified. Upstream PR #584 open, CI green ×3. Foreign toolchain.sh 0018/0019 hunk stash-restored intact.
 - [x] 2026-08-01 — [rom-map-viz] Decode-map SVGs LIVE on all three cartsize pages (site `cfdb7cb`/v1.0.345, CI success, spot-checked; llvm tool commit w/ selftest 380-cell counts asserted vs the model both ways). Seamdemo-page figure lands with P4.
