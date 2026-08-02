@@ -104,6 +104,10 @@ boundary plan's 542.
 Measurement is now two-point — iterations are read at the warmup mark and again 600 VBlanks later,
 and the difference is reported — so the whole-loop validation pass no longer dilutes the number.
 
+> **All figures above are PRE-MERGE CONTROLS**, measured against base `f25d58e`. They are superseded
+> by the post-merge re-baseline in "Post-merge re-baseline" below, and retained only as the controls
+> the deltas are measured against.
+
 ### The gate is not vacuous
 
 Flipping one byte inside the packed stream (file `$01C350`) makes the run stop with
@@ -303,6 +307,48 @@ opcode as the immediate's high byte:
 This is the same hazard the surrounding kernels already hand-encode around with `.byte` directives.
 Fixed by widening through the file's existing `xba / lda #0 / xba` idiom, which has no such hazard.
 **Disassemble any new 16-bit immediate in this file before trusting it.**
+
+## Post-merge re-baseline (merge `5a25872`, measured on `30e3abb`)
+
+Everything above was measured against base `f25d58e`. Merging brought in main's `21179d7`, whose
+delta-kernel **in-place copy-span optimization** (`.Lsvx_wram_delta_copy_inplace`) changes the
+numbers in both directions. Re-measured on the merged tree, same harness, 600 VBlanks:
+
+| case | pre-merge slow | **post slow** | pre-merge Fast | **post Fast** |
+|---|---:|---:|---:|---:|
+| `svx-median` (distinct buffers) | 540 | **530** | 607 | **596** |
+| `svx-worst` (distinct buffers) | 581 | **576** | 648 | **643** |
+| `svx-keyframe` (staged specialization) | 474 | **474** | 537 | **537** |
+| **stream, hardest slice 160** | 553 | **674** | 630 | **754** |
+| stream, slice 0 | 591 | **1023** | 665 | **1159** |
+
+Three things to read out of that, none of them obvious:
+
+1. **The single-packet delta cases got slower (607 → 596), and that is expected, not a regression to
+   chase.** Main's optimization guards each copy span with `lda __rc2 / cmp __rc4 / beq` and skips the
+   `MVN` when previous and output are the same buffer. The `VIDEO_BENCH_PIPELINE` cases pass
+   *distinct* buffers (`bench_previous` in ROM, `output` in WRAM), so they can never take the fast
+   path and pay the test as pure overhead. **That configuration is not player-representative** — a
+   player decodes in place.
+2. **The stream cases, which are player-representative, improved sharply — hardest slice
+   630 → 754 FastROM (+20 %).** The stream decodes in place (`output, output`), exactly like
+   `snes-video-reel.c`, so copy spans collapse to cursor advances instead of moving bytes onto
+   themselves.
+3. **Slow ROM now clears 60 fps.** The hardest slice reaches **674/600 = 67.4 fps** without FastROM,
+   where it previously fell short at 553. FastROM is therefore **no longer required** for 60 fps on
+   this content — it remains a margin lever, not a prerequisite. That supersedes the earlier
+   "slow ROM does not meet 60 fps" finding.
+
+`svx-keyframe` is **unchanged at exactly 537/474**, which is the control confirming the staged
+keyframe specialization is genuinely orthogonal to main's delta work — it shares no code path.
+
+The correctness gate was re-proven non-vacuous on the merged tree, not assumed: the unmodified
+stream ROM passes `got=0x00` over 1,200 VBlanks, and flipping one byte at file `$01C350` still stops
+the run with `corpus_result = 2`.
+
+**Keyframe policy is unaffected by the merge.** At 537/600 the keyframe still costs 1.12 VBlanks and
+still occupies a two-VBlank slot, so Option A with **K = 120 (59.50 fps effective)** stands as
+recorded above.
 
 ## Not finished
 

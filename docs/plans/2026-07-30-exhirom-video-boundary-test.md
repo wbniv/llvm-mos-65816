@@ -462,9 +462,18 @@ prevent the same-bank-only coverage hole from recurring.
 purposes.** `VIDEO_BENCH_STREAM=1` walks a real packed HiROM stream through a 32-bit offset table,
 the A-bus 64 KiB bank split, and a no-split wrapping high-WRAM ring, gated on whole-loop byte
 correctness. On the **hardest** 120-frame slice (mean 3,290 B/packet; the obvious slice 0 is
-unrepresentative at 1,523 B) FastROM reaches **620 per 600 VBlanks (62.0 fps)** and slow ROM 553
-(55.3 fps). The stream walk therefore costs within noise of the fixed-address proxy, and **60 fps
-holds on the functional refill path.**
+unrepresentative at 1,523 B) FastROM reaches **754 per 600 VBlanks (75.4 fps)** and slow ROM **674
+(67.4 fps)**, so **60 fps holds on the functional refill path.**
+
+**Slow ROM now clears 60 fps as well, superseding the "slow ROM does not meet 60 fps" finding
+above.** Those earlier slow-ROM figures (501/553, and 553 for the first stream measurement) predate
+the merge of the delta kernel's in-place copy-span optimization. A player decodes in place
+(`snes-video-reel.c` passes one buffer as both previous and output), so copy spans collapse to
+cursor advances rather than moving bytes onto themselves. **FastROM is therefore a margin lever for
+this content, not a prerequisite.** Note the single-packet `svx-median`/`svx-worst` cases moved the
+other way (607/648 → 596/643 FastROM) because they pass *distinct* previous/output buffers and so
+pay the in-place test without ever taking its fast path — that configuration is not
+player-representative, and the stream figures are the ones to quote.
 
 The residual 60 fps risk is **keyframes, not refill.** Keyframe decode was never measured until
 bench case 7 (`svx-keyframe`) was added: **207 per 600 VBlanks — 2.90 VBlanks per frame**, nearly
