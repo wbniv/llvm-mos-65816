@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/95340f0) | docs: record lowerCmpZeros verification (4/5 PASS, differential partial on OOM) and close the item |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/6249aae) | fix(mos-late-opt): lower every CmpZero, not just those before the block's first fold |
 
 <!--history-meta v1
+95340f0	author	Will Norris
+95340f0	added	30
+95340f0	deleted	1
+95340f0	files	1
+95340f0	body	SNESDQ_SKIP=1: whole-tree gate, out-of-scope dirty files.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 6249aae	author	Will Norris
 6249aae	added	75
 6249aae	deleted	0

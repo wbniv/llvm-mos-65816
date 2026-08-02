@@ -84,12 +84,14 @@ function while reporting "no change".
 2. **MOS lit suite.** 83 tests, 7 failures = exactly the known fork-divergence set
    (`indexiv`, `indvar-simplify-20230930`, `leaf-20231021`, `legalizer.mir`, `nonreentrant`,
    `nonreentrant-nointerrupts`, `shift-rotate`); the new test is green. **PASS**
-3. **Corpus differential** (`JG_ONLY=1 dev/run.sh corpus-a16`). The run was **OOM-killed at row
-   8 of 61** — this box has **no swap** and seamdemo P3's emulator gate was running
-   concurrently (same failure mode the PH-$p work documented; exit 137). Of the 8 rows that
-   completed, **8/8 have `host == a16@bsnes`** and **0 genuine value mismatches**; every row's
-   `FAIL` label is the missing-SPC700-BIOS artifact (`*@MAME=None`), not a value disagreement.
-   **PARTIAL PASS — 8/8 completed rows agree; full sweep to be re-run when the box is idle.**
+3. **Corpus differential** (`JG_ONLY=1 dev/run.sh corpus-a16`). Two earlier attempts were
+   OOM-killed (exit 137 — this box has no swap and seamdemo's emulator gate was running); the
+   re-run on the quiet box completed the full sweep: **59 value rows, 59/59
+   `host == a16@bsnes`, 0 genuine mismatches.** The harness prints `0/61 passed` and labels
+   every row `FAIL` **only** because the MAME legs read `None` — the SPC700 IPL is absent on
+   this machine (`JG_ONLY` does not suppress those columns in `a16_fuzz.py check`), which is
+   the same environment gap the `PH $p` work documented. No row shows a value disagreement.
+   **PASS (bsnes-jg leg; MAME leg environment-blocked).**
 4. **Real-world incidence + reach.** 140 files × 4 configs (`-O1/-O2/-Os`, with and without
    `+mos-a16`), 17,403 basic blocks scanned via `-print-before=mos-late-opt`: **maximum 1
    `CmpZero` per block, zero blocks meet the ≥2 precondition.** The fix is therefore inert for
