@@ -90,15 +90,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
-- [wip T2] **Re-run `dev/cartsize-canary.sh` with the rebuilt `jgxcheck` + fix its latent `rc0`
-  <!-- inline: orchestrator session, gate running in background -->
-  pipefail trap.** seamdemo P1 found `build/jgxcheck` predated FRAMESCAN support, so the canary
-  gate's 6b entropy fingerprint had been passing VACUOUSLY; P1 rebuilt the binary (harness
-  relink). Also latent in the canary's probe block: WRAM `$0000` is imaginary `rc0` (not zero)
-  and `jgxcheck` exits non-zero on deliberate probe mismatch — both need `|| true` inside the
-  command substitution (seamdemo's gate has the fix; the canary's copy survives only by luck).
-  Re-run the full canary gate and record whether 6b still passes non-vacuously. (T2: known
-  recipe, one gate run + a two-line script fix.)
 - [wip T2] **ROM-map visualization for the cartsize/seamdemo pages** — <!-- agent:a398d4033e75f7b9e --> the one deliverable of the
   original extended-mapping umbrella item not shipped by the `d0d6b39` merge (everything else —
   mapping, linker layout, decoder model, header/size fields, vectors, far addressing, checksum
@@ -132,17 +123,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   (`dev/roms/s_smp/spc700.rom` — same gap blocking the ExHiROM canary MAME evidence); §4 item 10
   (bank-$00 4096-byte gate) is source-side follow-up; `regen-patch.sh`'s `worktree remove
   --force` now collides with the teardown guard hook (policy call, flagged in-script).
-- [wip T3] **Backend: `PH $p` verifier trip — `php` reads undefined physical register P under
-  `+mos-a16`.** <!-- agent:aca592b5d33c83736 --> Found by seamdemo P1's gate (2026-08-01): `-verify-machineinstrs` reports
-  "Using an undefined physical register — instruction: PH $p" because the MIR defines only the
-  individual flag sub-registers while `php` pushes all of P, so P's liveness is unmodelled.
-  **Pre-existing**: reproduces in the already-committed `examples/snes/seqvm.c` (`draw_frame`)
-  at `-O0/-O1/-O2/-Os` with `+mos-a16` (clean at `-Oz`); `dev/seqvm.sh` never ran the verifier,
-  so it went uncaught. The seamdemo gate tolerates exactly this signature and fails on any
-  other verifier error — remove that tolerance when this is fixed. Fix direction: model P (or
-  its flag sub-register set) as defined at the push site / mark PH's P use as reading
-  sub-registers. Repro notes in the seamdemo plan + P1 commit. (T3: symptom pinpointed with a
-  committed repro; escalate if the fix needs P-register re-modelling across the backend.)
 - [T3] **`lowerCmpZeros` sticky loop-carried `Changed` (`MOSLateOptimization.cpp:142`) — found
   in passing by #138 Phase A.** After the first successful fold in a block, every later
   un-foldable `CmpZero` is *skipped* instead of lowered, and nothing downstream lowers that
@@ -975,6 +955,8 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [canary-6b-revalidate] Canary gate re-run with rebuilt jgxcheck: 3/3 PASS, 6b NON-vacuous — one picture `11D41DC5:#00FF28` across six entropy boots per config; `rc0` pipefail guard added to the gate script (seamdemo pattern). Live 8 MiB sha matches.
+- [x] 2026-08-01 — [scavenger-php-undef] `PH $p` verifier trip fixed: the `undef`-flag predicate in `saveScavengerRegister` is now the verifier's forward-availability set, not a reaching-def scan (`0002` + upstream `0011`, new `scavenger-p-undef.mir`); seamdemo tolerance removed. See [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md).
 - [x] 2026-08-01 — [60fps-video] DONE: ring refill + staged keyframes merged (`5a25872`), post-merge re-baseline recorded (`3273195`) — **slow ROM now clears 60 fps (674/600 hardest slice)**, FastROM is margin not prerequisite (supersedes the pre-optimization claim); keyframe policy Option A K=120 stands (1.12 VBl, structural WRAM floor); negative control re-proven post-merge. Bonus: assembler immediate-sizing gotcha recorded.
 - [x] 2026-08-01 — [apollo-daylight-stressor] Hard-content sweep (NASA Apollo 11 Saturn V daylight
   launch, real film grain) added to the codec results doc: SVX2/Floyd costs +5.3 ratio points and
@@ -1769,4 +1751,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-08-01: seamdemo plan is PLANNED-status; verification runs per phase and is covered by the curated [T4] seamdemo item (blocked on the exhirom-canaries merge). fp:c3a1de9e87d9d4ca -->
 - [verify] **2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)_  <!-- fp:a76fa89a8079cd65 -->
 <!-- triaged 2026-08-01: both are scope statements of the curated 60 fps video item, not new work — (c) is analysis-only by that item's own wording, and reel-side integration is held pending another worker's in-flight snes-video-reel.c edits. fp:3a823bd1aa076872 fp:838c40fb50c90609 -->
+- [ ] **(triage)** 3/3 configs PASS (`0x48EE`/`0xA274`/`0x29B9`, `canary_status=0`), bsnes-jg leg (MAME still — _from [2026-08-01-cartsize-canary-display-nondeterminism.md](docs/plans/2026-08-01-cartsize-canary-display-nondeterminism.md)_  <!-- fp:8bd02423f82e515c -->
+- [ ] **(triage)** 6b genuinely comparing: **one picture across all six boots per config, `11D41DC5:#00FF28`** — _from [2026-08-01-cartsize-canary-display-nondeterminism.md](docs/plans/2026-08-01-cartsize-canary-display-nondeterminism.md)_  <!-- fp:296dbe20a6aa20e4 -->
+- [ ] **(triage)** 8 MiB ROM SHA `b4359721…` == the live deployed binary. — _from [2026-08-01-cartsize-canary-display-nondeterminism.md](docs/plans/2026-08-01-cartsize-canary-display-nondeterminism.md)_  <!-- fp:89b5e6bf073a6ac8 -->
 <!-- END auto-captured-deferrals -->

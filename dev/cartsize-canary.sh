@@ -178,9 +178,12 @@ print(m.group(1))")
     echo "==> 6b) picture is independent of power-on entropy (None/Low/High x2)"
     fps=""
     for ent in 0 0 1 1 2 2; do
+      # || true: jgxcheck exits non-zero when the WRAM $0000 probe mismatches (rc0 is an
+      # imaginary register, not guaranteed zero) — under pipefail that would abort the whole
+      # gate instead of reaching the NONE-guard below. Same guard as dev/seamdemo.sh.
       fp="$(JGX_ENTROPY=$ent JGX_FRAMESCAN=1 JGX_FRAMESCAN_MAX=0 \
             "$BUILD/jgxcheck" "$ROM" "$ROOT/vendor/bsnes-jg/Database" 0x0 1 0x00 "$JG_FRAMES" 2>/dev/null \
-            | sed -n 's/.*final hash=\([0-9A-F]*\) dom=#\([0-9A-F]*\).*/\1:#\2/p')"
+            | sed -n 's/.*final hash=\([0-9A-F]*\) dom=#\([0-9A-F]*\).*/\1:#\2/p' || true)"
       fps="$fps $ent=${fp:-NONE}"
     done
     uniq_n=$(printf '%s\n' $fps | sed 's/^[0-9]*=//' | sort -u | wc -l)

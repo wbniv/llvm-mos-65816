@@ -218,3 +218,18 @@ established — none of that is in this change's scope.
 
 The three published cartridge-size pages still serve the **pre-fix** ROMs, so they still render a
 random picture per visitor; they need republishing from this build once the branch lands.
+
+
+## Addendum (2026-08-01, later): gate 6b re-validated non-vacuously
+
+seamdemo P1 found `build/jgxcheck` predated FRAMESCAN, so 6b had nothing to compare (the
+script's own `=NONE` guard would have caught it loudly on the next run, but the step had not
+re-run since the binary rebuild). With the rebuilt jgxcheck and the `|| true` probe guard added
+to `dev/cartsize-canary.sh` (same pattern as `dev/seamdemo.sh`; without it a non-zero probe
+exit aborts the whole gate under pipefail), the full gate re-ran:
+
+- 3/3 configs PASS (`0x48EE`/`0xA274`/`0x29B9`, `canary_status=0`), bsnes-jg leg (MAME still
+  IPL-gated).
+- 6b genuinely comparing: **one picture across all six boots per config, `11D41DC5:#00FF28`**
+  — the deterministic green verdict, matching the pre-republish evidence.
+- 8 MiB ROM SHA `b4359721…` == the live deployed binary.
