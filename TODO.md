@@ -90,13 +90,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
-- [wip T2] **ROM-map visualization for the cartsize/seamdemo pages** — <!-- agent:a398d4033e75f7b9e --> the one deliverable of the
-  original extended-mapping umbrella item not shipped by the `d0d6b39` merge (everything else —
-  mapping, linker layout, decoder model, header/size fields, vectors, far addressing, checksum
-  gate, emulator coverage — is Done; see the exhirom-merged Done entry). Render the decode map
-  (windows/mirrors/holes/seam, from `tools/snes_cartmap.py --cells/--regions`) as a figure on
-  the cartsize pages and/or the future seamdemo page — the diagram the 48 Mbit page's prose
-  currently describes in words. (T2: the model exposes all the data; this is presentation.)
 - [wip T4] **#138 — MOS Late Optimizations crash — Phase B COMPLETE (2026-07-31): fixed,
   A/B-validated, upstream **PR #584 POSTED + hardened**; remaining = merge branch → main.**
   <!-- agent:a6e464f54cf3834fb --> Upstream bug: `combineLdImm` (`MOSLateOptimization.cpp:399`)
@@ -955,6 +948,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [rom-map-viz] Decode-map SVGs LIVE on all three cartsize pages (site `cfdb7cb`/v1.0.345, CI success, spot-checked; llvm tool commit w/ selftest 380-cell counts asserted vs the model both ways). Seamdemo-page figure lands with P4.
 - [x] 2026-08-01 — [canary-6b-revalidate] Canary gate re-run with rebuilt jgxcheck: 3/3 PASS, 6b NON-vacuous — one picture `11D41DC5:#00FF28` across six entropy boots per config; `rc0` pipefail guard added to the gate script (seamdemo pattern). Live 8 MiB sha matches.
 - [x] 2026-08-01 — [scavenger-php-undef] `PH $p` verifier trip fixed: the `undef`-flag predicate in `saveScavengerRegister` is now the verifier's forward-availability set, not a reaching-def scan (`0002` + upstream `0011`, new `scavenger-p-undef.mir`); seamdemo tolerance removed. See [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md).
 - [x] 2026-08-01 — [60fps-video] DONE: ring refill + staged keyframes merged (`5a25872`), post-merge re-baseline recorded (`3273195`) — **slow ROM now clears 60 fps (674/600 hardest slice)**, FastROM is margin not prerequisite (supersedes the pre-optimization claim); keyframe policy Option A K=120 stands (1.12 VBl, structural WRAM floor); negative control re-proven post-merge. Bonus: assembler immediate-sizing gotcha recorded.
