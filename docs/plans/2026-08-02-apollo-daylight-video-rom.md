@@ -1,6 +1,7 @@
 # Apollo 11 daylight launch — the hard-content video cartridge
 
-**Date:** 2026-08-02 · **Status:** PLANNED
+**Date:** 2026-08-02 · **Status:** IN PROGRESS — ROM + gate built, gate green; publication pending
+one open doubt (below)
 **Provenance:** the codec corpus already exists and is measured — see
 [real-video-codec-benchmark.md §Hard-content stressor](2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md)
 (2026-08-01). This plan turns that measurement into a running cartridge.
@@ -71,3 +72,21 @@ NASA item; do not substitute a different interval without recording new provenan
 3. Cadence table: slow/FastROM, presented frames per 600 VBlanks, next to the Artemis figures.
 4. Entropy fingerprint one picture; `-verify` clean.
 5. Published page live; served ROM sha matches the gate-verified binary.
+
+
+## Progress (2026-08-02)
+
+`examples/snes/apollo-reel.c` and `dev/apollo-reel.sh` are written and the gate reports green.
+
+**Open doubt, being settled before publication:** the gate's entropy probe reported a dominant
+picture colour of `#000000`. For a *daylight* clip — bright sky, smoke, exhaust flame — a
+black-dominant frame is suspicious, and "gate green, screen blank" is a failure mode this project
+has already been bitten by (the cartsize canary's entropy step passed vacuously for weeks against a
+stale `jgxcheck`, and #138's producer would now be skipped silently by its own fix). So the picture
+is being proven directly — frames sampled well into playback, checked for non-black content and for
+*differing from each other over time* — before anything is published. If it is blank or static,
+that is the finding and it outranks shipping the demo.
+
+Still owed at close: the three open questions answered numerically, the cadence table (presented
+frames per 600 VBlanks, slow and FastROM, beside the Artemis figures), and the negative-control
+result.
