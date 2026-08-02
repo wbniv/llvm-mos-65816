@@ -18,6 +18,7 @@ PROFILE=${VIDEO_REEL_PROFILE:-0}
 EXHIROM=${VIDEO_REEL_EXHIROM:-0}
 EXHIROM_SEAM_FRAME=${VIDEO_REEL_EXHIROM_SEAM_FRAME:-0}
 SEGMENTS=${VIDEO_REEL_SEGMENTS:-}
+GATE_FRAMES_OVERRIDE=${VIDEO_REEL_GATE_FRAMES:-0}
 HEADER="$BUILD/snes-video-reel-assets.h"
 ASSET_INCLUDE="$BUILD"
 ROM="$BUILD/svx2-video-reel.sfc"
@@ -185,7 +186,10 @@ if [ "$combined" = 1 ] || { [ "$FRAMES" -gt 4 ] && grep -q VIDEO_REEL_SECOND_STA
   minimum_exact=0.35
   maximum_mae=55.0
 fi
+minimum_exact=${VIDEO_REEL_MINIMUM_EXACT:-$minimum_exact}
+maximum_mae=${VIDEO_REEL_MAXIMUM_MAE:-$maximum_mae}
 expected_presented=${VIDEO_REEL_EXPECTED_PRESENTED:-$expected_presented}
+[ "$GATE_FRAMES_OVERRIDE" -gt 0 ] && gate_frames=$GATE_FRAMES_OVERRIDE
 # This explicit oracle replaces the old accidental adjacency of three globals.
 # It becomes zero only after two loops with no result, CRC, or deadline failure.
 health_off=$composite_health_off
