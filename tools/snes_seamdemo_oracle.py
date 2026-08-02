@@ -72,13 +72,30 @@ code_region = _canary.code_region
 #: place their payload inside slots at these fixed offsets, so the three acts
 #: cannot collide by construction and the layout report is one table.
 SLOT = 0x8000
-STRADDLE_IN_OFF, STRADDLE_IN_LEN = 0x0000, 0x0100   # bytecode running IN from the previous slot
 DATA_OFF, DATA_LEN = 0x0100, 0x1000                 # act3 texture page, 64x64 8bpp; act1 LOAD source
 HGT_OFF, HGT_LEN = 0x1100, 0x0100                   # act3 heights, 16x16
 META_OFF, META_LEN = 0x1200, 0x0100                 # act3 page metadata (self-describing)
 NODE_OFF, NODE_LEN = 0x2000, 0x2000                 # act2 nodes, 16 B each, up to 512 per slot
-CHAP_OFF, CHAP_LEN = 0x4000, 0x0100                 # act1 chapter (bytecode)
-STRADDLE_OUT_OFF, STRADDLE_OUT_LEN = 0x7F80, 0x0080  # bytecode running OUT into the next slot
+
+#: Act 1 chapter length.  SIZED BY MEASUREMENT, not taste (dev/seamdemo.sh step
+#: 5b, bsnes-jg, SlowROM).  Drawing dominates the act and does NOT scale linearly
+#: with segment count -- the canvas dirty-tile flush is budgeted at
+#: CANVAS_FLUSH_TILES per v-blank, so past some density it is a throughput wall
+#: rather than a per-line cost -- which is why this took two rounds:
+#:
+#:   256 B chapters, MOVE 2-in-9 : 65,961 ops / 12,729 seg -> ~245 s
+#:    48 B chapters, MOVE 1-in-10:  10,224 ops /   689 seg -> ~38 s
+#:    48 B chapters, MOVE 1-in-23:  10,494 ops /   367 seg -> ~34 s   <- shipping
+#:
+#: against the plan's 20-30 s.  Every slot still gets its own chapter, so the
+#: march still spans the whole 6 MiB.
+CHAP_OFF, CHAP_LEN = 0x4000, 0x0030
+
+#: The seam chapter is split down the middle across the device boundary: half of
+#: it is the last bytes of physical ROM 1, half the first bytes of ROM 2.
+STRADDLE_OUT_LEN = CHAP_LEN // 2
+STRADDLE_OUT_OFF = SLOT - STRADDLE_OUT_LEN          # bytecode running OUT into the next slot
+STRADDLE_IN_OFF, STRADDLE_IN_LEN = 0x0000, CHAP_LEN // 2  # ... and IN from the previous slot
 
 NODE_BYTES = 16
 TEX_W = TEX_H = 64

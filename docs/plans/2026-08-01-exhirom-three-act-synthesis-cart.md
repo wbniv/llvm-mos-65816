@@ -135,13 +135,16 @@ offsets inside slots, so they cannot collide by construction and the layout repo
 
 | offset | length | contents |
 |---|---:|---|
-| `+0x0000` | `0x0100` | straddle-in — bytecode continuing from the previous slot (used only at the seam) |
+| `+0x0000` | `0x0018` | straddle-in — bytecode continuing from the previous slot (used only at the seam) |
 | `+0x0100` | `0x1000` | data page — 64×64 8bpp; act 3's texture and act 1's `LOAD` source |
 | `+0x1100` | `0x0100` | heights — 16×16 |
 | `+0x1200` | `0x0100` | page metadata — self-describing |
 | `+0x2000` | `0x2000` | act 2 nodes — 16 B each, up to 512 |
-| `+0x4000` | `0x0100` | act 1 chapter |
-| `+0x7F80` | `0x0080` | straddle-out — bytecode running off the end of this slot |
+| `+0x4000` | `0x0030` | act 1 chapter |
+| `+0x7FE8` | `0x0018` | straddle-out — bytecode running off the end of this slot |
+
+The straddle pair is `CHAP_LEN/2` each, so the seam chapter is split down the middle across the
+device boundary whatever the chapter length is.
 
 **Reserved slots** are `129` (file `$408000-$40FFFF`, the linked near code + header — the range
 comes from the canary tool's model-derived `layout()`, reused verbatim so the two fixture
@@ -151,7 +154,7 @@ cells, leaving **374 available**. `fill` refuses to write if the linker put anyt
 slot, so a ROM that outgrows the far arena fails loudly instead of losing code to the atlas.
 
 The payload is **sparse** — only bytes a traversal reads are non-zero (the canary tool's lesson:
-these ROMs are published to an in-browser player). 929,888 bytes, 14.8 % of the image.
+these ROMs are published to an in-browser player). 890,576 bytes, 14.2 % of the image.
 
 ### Act 1 — the VM ISA
 
@@ -191,20 +194,29 @@ provably never writes that counter (`LOOP_REGS` = `r6`,`r7`, excluded from every
 contains no branches. The oracle still carries an op budget and treats exhausting it as a **defect**,
 not a normal exit.
 
-**The march.** One ~256-byte chapter per available slot, `JFAR`-chained in ascending *file* order,
-each opening with `MARK`. 189 chapters, 191 marks, 65,961 ops, 12,729 drawn segments.
+**The march.** One 48-byte chapter per available slot, `JFAR`-chained in ascending *file* order,
+each opening with `MARK`. 189 chapters, 191 marks, 10,494 ops, 367 drawn segments.
 
-**The seam chapter is hand-laid, not generated.** It sits at `+0x7F80` of slot 127 and runs 256
-bytes, so its body crosses the 4 MiB device boundary:
+**Chapter length and MOVE density are set by the frame budget, not by taste.** The first cut used
+256-byte chapters and drew `MOVE` 2 times in 9, giving 65,961 ops and 12,729 segments — which P1
+measured on target as a **~245 s** act against this plan's 20–30 s. Drawing dominates (~5.6× the
+VM) and does not scale linearly with segment count, so the two knobs were re-solved empirically
+against the measurements tabulated under "Pacing" below: 48-byte chapters and one `MOVE` slot in
+each of the generator's instruction menus (1 in 23 wide, 1 in 15 narrow) give
+**10,494 ops / 367 segments ≈ 34 s measured**.
+Every coverage invariant is untouched — one chapter per slot, so the march still spans all 6 MiB.
+
+**The seam chapter is hand-laid, not generated.** It sits at `+0x7FE8` of slot 127 and runs 48
+bytes — half either side of the boundary — so its body crosses the 4 MiB device seam:
 
 ```
-file $3FFF80  MARK          folds pc $3FFF81
+file $3FFFE8  MARK          folds pc $3FFFE9
 file $3FFFFE  MARK          folds pc $3FFFFF
 file $3FFFFF  SYNC opcode   <- $FF:FFFF, last byte of physical ROM 1
 file $400000  SYNC operand  <- $40:0000, first byte of physical ROM 2   ** THE SEAM **
 file $400001  MARK          folds pc $400002
 file $400002  IMM r0,$10 ; LOAD r0,r1 ; EMIT r1   <- a data read on the far side
-file $40007C  JFAR next
+file $400014  JFAR next
 ```
 
 One VM instruction is split across the non-monotonic device boundary. Slot 128 therefore has no
@@ -283,20 +295,117 @@ pre-link prediction equal to the linked ROM's value.
 
 | | value |
 |---|---|
-| act 1 CRC | `$93CF` (65,961 ops, 12,729 segments, 191 marks) |
-| act 2 CRC | `$B596` (374 nodes, cycle closed) |
+| act 1 CRC | `$F0E2` (10,494 ops, 367 segments, 191 marks) |
+| act 2 CRC | `$36B6` (374 nodes, cycle closed) |
 | act 3 CRC | `$6D21` (3040 samples, 190 pages) |
-| **`corpus_result`** | **`$2B43`** |
-| cartridge reads per cycle | 187,019 |
+| **`corpus_result`** | **`$3277`** |
+
+These supersede the first cut's `$93CF` / `$B596` / `$6D21` / `$2B43` (256-byte chapters, before
+P1 measured the frame cost) and the intermediate `$0040` / `$CC6F` / `$0F57` (48-byte chapters at
+the first MOVE weighting, measured at ~38 s). Nothing had been published, so the churn was
+free; act 3 is unchanged because the atlas did not move.
 
 ### Open for P1–P3
 
-- **Act 1 pacing.** 65,961 ops is roughly 3 s of 65816 at a plausible cycle cost; `SYNC` is the
-  pacing lever and P1 must decide ops-per-frame to reach the 20–30 s act.
+- ~~**Act 1 pacing.** 65,961 ops is roughly 3 s of 65816 at a plausible cycle cost; `SYNC` is the
+  pacing lever and P1 must decide ops-per-frame to reach the 20–30 s act.~~ **RESOLVED.** The
+  estimate was wrong by ~70×; P1 measured the real costs and P0 was regenerated against them — see
+  "P1 — Act 1" below.
 - **Download size.** The full-entropy low nibble makes the image gzip to ~872 KB. On console act 3
   DMAs whole pages, so those bytes really are read — but if P4 needs a smaller download, restricting
   the pattern nibble to path-sampled texels is the lever, and it changes `act3_crc`.
 - **`--far-slots`** is 1. If P1–P3's far code outgrows 32 KiB, widen it; `fill` will say so.
+  Measured: the linked Act-1 ROM occupies slot `129` only, so the arena is still empty.
+
+## P1 — Act 1: the ROM
+
+[`examples/snes/seamdemo.c`](../../examples/snes/seamdemo.c) runs the VM against the generated
+image. The VM itself is [`examples/65816/seamdemo_vm.h`](../../examples/65816/seamdemo_vm.h),
+compiled **twice from one source** — by `mos-clang` for the 65816 and by the host `cc` in
+[`tools/seamdemo-sim.c`](../../tools/seamdemo-sim.c) — so an ISA transcription slip is caught on
+the host before any emulator run, with the Python oracle as the independent third implementation.
+Gate: [`dev/seamdemo.sh`](../../dev/seamdemo.sh) (`dev/run.sh seamdemo`).
+
+**The differential.** `host Python oracle == host C == +mos-a16 @ bsnes-jg`, all `$F0E2`, with
+`act1_status == 0`. a16-only, like `cartsize-canary`: a runtime far pointer is a 32-bit value and
+32-bit value legalization exists only under `+mos-a16`. The MAME leg is still blocked on the
+SPC700 IPL gap.
+
+**The seam is verified on console, not just on the host.** `boot_checks()` reads file `$3FFFFF`
+through the same far cursor the VM uses and asserts it is the contract's `SYNC` opcode
+(`SEAMVM_ST_SEAM_SHAPE`), and `act1_seam_hits == 1` proves the split instruction actually executed —
+its opcode fetched from the last byte of physical ROM 1, its operand from the first byte of ROM 2.
+
+**Codegen shapes**, asserted in the disassembly: `a7` (`lda [dp]`, the 24-bit cartridge cursor),
+`7c` (`jmp (abs,X)` — the 16-way dense switch really does become a jump table; the MIR shows
+`%jump-table.0` with all 16 blocks), and `__call_indir` (the function-pointer ALU table).
+
+### Pacing — measured, and it moved the P0 contract
+
+The P0 estimate ("roughly 3 s") was wrong by ~70×. Everything below is measured on bsnes-jg,
+SlowROM 2.68 MHz, by building the same source several ways and reading a per-frame `act1_ops`
+counter out of WRAM.
+
+**Isolating the cost** (on the original 256-byte-chapter payload):
+
+| build | ops/frame |
+|---|---:|
+| VM alone (`-DSEAMDEMO_NO_DRAW`) | 25.6 |
+| VM + drawing, no HUD (`-DSEAMDEMO_NO_HUD`) | 4.6 |
+| shipping build | 4.5 |
+| bare (`-DSEAMDEMO_NO_DRAW -DSEAMDEMO_NO_HUD`) | 25.9 |
+
+So **drawing is ~5.6× the VM and the HUD is free** — the HUD was rewritten from decimal (~17
+32-bit divide/modulo pairs a frame) to hex anyway, but the isolation shows it was never the
+bottleneck.
+
+**Drawing does not scale linearly with segment count**, which is why sizing took two rounds: the
+canvas dirty-tile flush is budgeted at `CANVAS_FLUSH_TILES` per v-blank, so past some density it is
+a throughput wall rather than a per-line cost. A two-parameter linear model fitted to one payload
+mispredicts the next — do not trust one here, measure the payload you are shipping.
+
+| payload | ops | segments | measured act |
+|---|---:|---:|---:|
+| 256 B chapters, `MOVE` 2-in-9 | 65,961 | 12,729 | ~245 s |
+| 48 B chapters, `MOVE` 1-in-10 | 10,224 | 689 | ~38 s |
+| **48 B chapters, `MOVE` 1-in-23** | **10,494** | **367** | **~34 s** |
+
+The last row ships — measured directly by bisecting the frame at which `act1_laps` latches:
+still 0 at frame 2,000, 1 at frame 2,100, so the act is **~2,050 frames ≈ 34 s**. (Step 5b's
+extrapolation from a mid-act ops/frame sample reads ~30 s; the bisect is the authoritative number
+and the extrapolation is mildly optimistic because drawing density is not uniform across the act.) The plan's 20–30 s was unreachable by any P1-side tuning at the original op
+count — even zero drawing is ~43 s for 65,961 ops — so the op count and `MOVE` density were
+re-solved in the generator against these measurements (see "Act 1 — the VM ISA" above).
+
+`OPS_PER_FRAME` is **8**, against a measured 5.69 ops/frame achievable; at the original 64 the loop
+overran v-blank ~14× and the PC ticker updated once every 14 frames. It stays a runtime dial for
+fine trim in P2/P3, as does the `SYNC` cadence.
+
+### Known backend defect: `PH $p` uses an undefined physical register
+
+`-verify-machineinstrs` trips on the Act-1 VM:
+
+```
+*** Bad machine code: Using an undefined physical register ***
+- function:    seamvm_step
+- basic block: %bb.231
+- instruction: PH $p
+```
+
+`php` pushes the whole P register, but the MIR only ever defines the individual flag
+sub-registers (`$c`, `$v`, …) — they are not modelled as partial defs of `$p` — so the verifier
+sees `PH $p` reading an undefined register. The emitted `php` is correct on hardware; the
+**liveness model** is what is wrong. It appears in the spill-around sequence that saves A and P
+across an 8-bit address computation while A is 16-bit.
+
+**Pre-existing, not introduced here.** It reproduces in the already-committed
+[`examples/snes/seqvm.c`](../../examples/snes/seqvm.c) (function `draw_frame`) at `-O0`, `-O1`,
+`-O2` and `-Os` with `+mos-a16`, and is clean at `-Oz`. `dev/seqvm.sh` never ran the verifier, so
+nothing had caught it; this gate is the first to. Tracked as its own backlog item.
+
+`dev/seamdemo.sh` tolerates **exactly** this signature (undefined-physical-register **and**
+`instruction: PH $p` **and** exactly one error) and fails on any other verifier error; the disasm
+probe falls back to the `-Oz` object, which emits the same three shapes.
 
 ## Verification (to be executed per phase; format per house rules)
 
@@ -309,27 +418,27 @@ pre-link prediction equal to the linked ROM's value.
       [PASS] SIN256 is reproducible on this platform
 
     -- miniature: hirom 0x10000 --
-      slots 2 (1 available, reserved [1]), nodes 126, payload 6880 bytes
-      act1 $EBFA (397 ops)  act2 $CB9E  act3 $7BE0  corpus $3847
+      slots 2 (1 available, reserved [1]), nodes 126, payload 6672 bytes
+      act1 $B4D1 (47 ops)  act2 $D69B  act3 $7BE0  corpus $2FCB
       [PASS] act1 halted (the stream terminates)
-      [PASS] act2 fold: image-read oracle == independent recomputation  $CB9E vs $CB9E
+      [PASS] act2 fold: image-read oracle == independent recomputation  $D69B vs $D69B
       [PASS] act3 fold: image-read oracle == independent recomputation  $7BE0 vs $7BE0
       [PASS] corpus_result == fold(act1, act2, act3)
       [PASS] generation is deterministic (byte-identical rebuild)
       [PASS] no traversal reads a reserved slot (miniature)
 
     -- full cartridge: exhirom 0x600000 --
-      slots 192 (190 available, reserved [129, 130]), nodes 374, payload 929888 bytes (14.8% of the image)
-      act1 $93CF (65961 ops, 191 marks)  act2 $B596  act3 $6D21  corpus $2B43
+      slots 192 (190 available, reserved [129, 130]), nodes 374, payload 890576 bytes (14.2% of the image)
+      act1 $F0E2 (10494 ops, 191 marks)  act2 $36B6  act3 $6D21  corpus $3277
       decode cells 380 = 192 canonical + 188 mirror; 6 reserved, 374 available; covered 374
-      edges 1122 total, 755 seam-crossing, 748 mirror-addressed, 1118 bank-crossing; min in-degree 1
+      edges 1122 total, 776 seam-crossing, 739 mirror-addressed, 1122 bank-crossing; min in-degree 1
       [PASS] every AVAILABLE decode cell has in-degree > 0
       [PASS] covered + reserved == all decode cells  374 + 6 vs 380
       [PASS] act1 halted (the stream terminates)
       [PASS] act1 crosses the device seam inside one instruction  $400000
       [PASS] act1 marks one PC per chapter  191 marks / 190 available slots
       [PASS] act3 sweeps every available slot  190 / 190
-      [PASS] act2 fold: image-read oracle == independent recomputation  $B596 vs $B596
+      [PASS] act2 fold: image-read oracle == independent recomputation  $36B6 vs $36B6
       [PASS] act3 fold: image-read oracle == independent recomputation  $6D21 vs $6D21
       [PASS] no traversal reads a reserved slot (6 MiB)
       [PASS] payload never overlaps the linked-code range
@@ -342,8 +451,82 @@ pre-link prediction equal to the linked ROM's value.
     `CartMap.decode_cells()`, 380 of them including all 188 mirrors, which is a far stronger
     denominator than the 2 canonical windows. The model extension is covered by 5 new cases in
     `test/snes/cartridge-maps/test_snes_cartmap.py` (58 passed, 25044 subtests).
-2. P1: Act 1 gate — `host == +mos-a16 @ bsnes-jg` fold; disasm shows jump-table dispatch +
-   `__call_indir` + far fetches; seam event fires at the modeled file offset.
+2. ~~P1: Act 1 gate — `host == +mos-a16 @ bsnes-jg` fold; disasm shows jump-table dispatch +
+   `__call_indir` + far fetches; seam event fires at the modeled file offset.~~
+   **DONE 2026-08-01.** `dev/run.sh seamdemo`
+
+    ```
+    ==> 1) host: P0 generator self-check + address-model unit tests
+      PASS: 18 self-checks
+          slots 2 (1 available, reserved [1]), nodes 126, payload 6672 bytes
+          slots 192 (190 available, reserved [129, 130]), nodes 374, payload 890576 bytes (14.2% of the image)
+          decode cells 380 = 192 canonical + 188 mirror; 6 reserved, 374 available; covered 374
+          edges 1122 total, 776 seam-crossing, 739 mirror-addressed, 1122 bank-crossing; min in-degree 1
+      PASS: 58 address-model tests
+      NOTE: MAME leg unavailable (no SPC700 IPL) — continuing with the bsnes-jg leg only.
+
+    ==> 2) generate the ExHiROM 6 MiB platform + data header, link
+    platform snes-cart-seamdemo: /work/build/install/mos-platform/snes-cart-seamdemo/lib/link.ld + /work/build/install/bin/mos-snes-cart-seamdemo.cfg
+    header /work/build/seamdemo-gen/seamdemo-data.h: 374 nodes, 374/380 decode cells covered, corpus_result $3277
+    report /work/build/seamdemo-gen/seamdemo-layout.json: 890576 payload bytes
+      linked /work/build/seamdemo.sfc: 6291456 bytes
+
+    ==> 3) extents: everything the linker wrote is inside the reserved slots
+      linker wrote slots [129]; reserved [129, 130]; last used slot 129 is 100.0% full
+        PASS: all linker output is inside the reserved slots
+
+    ==> 4) fill the payload, patch header + checksum, structural inspect
+    fill /work/build/seamdemo.sfc: 890576 payload bytes, act1 $F0E2 act2 $36B6 act3 $6D21 -> corpus_result $3277
+    /work/build/seamdemo.sfc: exhirom size=6144KiB devices=32Mbit+16Mbit map_mode=0x25 rom_size_byte=0x0D checksum=0x5D37 complement=0xA2C8
+      PASS: file length : 6291456 bytes (0x600000, 48 Mbit / 6 MiB);physical devices : 32Mbit @ $000000 + 16Mbit @ $400000 header at file : $40FFB0;map mode byte : $25
+
+    ==> 5) disasm: far fetch + jump-table dispatch + function-pointer ALU table
+      KNOWN: -verify-machineinstrs trips the pre-existing 'PH $p undefined' liveness
+             defect (also in examples/snes/seqvm.c at -Os +mos-a16; clean at -Oz).
+             Not a seamdemo defect — see the plan's P1 section. Any OTHER verifier
+             error still fails this gate.
+      NOTE: disasm probe reads the -Oz object (the -Os one was not emitted)
+      PASS: 1 far fetch(es) (lda [dp], a7) — the 24-bit cartridge cursor
+      PASS: 1 jump-table dispatch (jmp (abs,X), 7c) — the 16-way switch
+      PASS: 3 __call_indir reference(s) — the function-pointer ALU table
+
+    ==> 6) host oracle over the BUILT image == the header's baked CRCs
+      act1 CRC $F0E2  (10494 ops, 367 segments, 191 marks)
+      act2 CRC $36B6  (374 nodes, cycle closed)
+      act3 CRC $6D21  (3040 samples over 190 pages)
+      corpus_result $3277  (42811 cartridge reads)
+      PASS: oracle act1 0xF0E2 == header 0xF0E2
+
+    ==> 6b) host C: the SAME VM source the ROM runs, over the built image
+      act1 CRC $F0E2 (want $F0E2)  ops=10494 segments=367 syncs=51 seam-hits=1 status=$0000
+      PASS: host C == the generated oracle
+      PASS: host C == Python oracle == the header's baked CRC
+
+    ==> 5b) pacing: ops/frame achieved on target
+      VM alone (no drawing) : 52 ops/frame
+      shipping build        : 5.69 ops/frame
+                              (canvas_line is the cost: the VM alone manages 52)
+      projected act length  : ~1844 frames = ~30 s
+      PASS: OPS_PER_FRAME=8 is matched to the achievable 5 ops/frame
+
+    ==> 7) bsnes-jg: act1_crc == 0xF0E2, act1_status == 0x0000
+      act1_crc: jgxcheck: wrote /work/build/seamdemo.png (256x224 from native 512x240, yoff=0)
+    SMOKE: PASS off=0x6B len=2 got=0xF0E2 (ran 2400 frames, bsnes-jg)
+      screenshot: /work/build/seamdemo.png
+      act1_status: SMOKE: PASS off=0x65 len=2 got=0x0000 (ran 2400 frames, bsnes-jg)
+      corpus_result: SMOKE: PASS off=0x6D len=2 got=0xF0E2 (ran 2400 frames, bsnes-jg)
+    ==> 7b) picture is independent of power-on entropy (None/Low/High x2)
+      PASS: one picture across all six boots (3903EBAF:#000000)
+
+      ROM SHA-256: 74bd219cbf188150ea73ddba9a10bfc5808aa5393b3f2ead6fed221f6f32bd27
+    RESULT: PASS — Act 1's bytecode VM marched its 24-bit file PC across the whole 6 MiB ExHiROM image, executed the instruction split across the physical device seam, and folded to the generated oracle
+    GATE_EXIT=0
+    ```
+
+    **PASS.** All three legs fold to `$F0E2` with `act1_status == 0`; `act1_seam_hits == 1`
+    proves the split instruction at file `$3FFFFF`/`$400000` executed. The one non-PASS line is
+    the pre-existing `PH $p` verifier defect (reproduces in committed `seqvm.c`), reported as
+    KNOWN and tracked separately. MAME leg still blocked on the SPC700 IPL gap.
 3. P2/P3: per-act sub-CRC gates + full-cycle `corpus_result` latch inside the frame budget.
 4. All phases: entropy fingerprint (one picture hash across None/Low/High × 2).
 5. P4: live-page WASM Verify fidelity == gate value.

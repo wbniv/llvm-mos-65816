@@ -267,28 +267,47 @@ class ChapterWriter:
     def emit(self, *bs: int) -> None:
         self.buf.extend(bs)
 
+    #: The instruction menu for generated chapter bodies, as a weighted list.
+    #:
+    #: MOVE is deliberately RARE -- one slot in each menu. On target a drawn
+    #: segment costs ~0.94 frames of `canvas_line` while an executed op costs
+    #: ~1/24 of a frame, so MOVE density, not op count, is what sets the act's
+    #: duration: the first cut drew MOVE 2 times in 9 and spent 81% of a 245 s act
+    #: inside canvas_line. These weights put the drawing floor inside the frame
+    #: budget while keeping every opcode in the ISA exercised.
+    #: Written as base + MOVE + base so the MOVE rate is one slot in the whole
+    #: menu and is re-tuned by changing the base length alone.
+    _WIDE_BASE = ("IMM", "IMMH", "ALU", "LOAD", "TURN", "PEN", "EMIT",
+                  "TURN", "EMIT", "PEN", "ALU")
+    WIDE_MENU = _WIDE_BASE + ("MOVE",) + _WIDE_BASE          # 1 MOVE in 23
+    _NARROW_BASE = ("TURN", "PEN", "EMIT", "TURN", "EMIT", "PEN", "EMIT")
+    NARROW_MENU = _NARROW_BASE + ("MOVE",) + _NARROW_BASE    # 1 MOVE in 15
+
     def _straight(self, avoid: tuple[int, ...] = ()) -> int:
         """One instruction with no control flow.  Returns its byte length."""
         rng = self.rng
         pool = [r for r in GEN_REGS if r not in avoid]
-        wide = self.room >= 3
-        pick = rng.randrange(9) if wide else 4 + rng.randrange(5)
-        if pick == 0:
+        if self.room >= 3:
+            op = rng.choice(self.WIDE_MENU)
+        elif self.room >= 2:
+            op = rng.choice(self.NARROW_MENU)
+        else:
+            self.emit(OP["NOP"])
+            return 1
+        if op == "IMM":
             self.emit(OP["IMM"], rng.choice(pool), rng.randrange(256)); return 3
-        if pick == 1:
+        if op == "IMMH":
             self.emit(OP["IMMH"], rng.choice(pool), rng.randrange(256)); return 3
-        if pick == 2:
+        if op == "ALU":
             d, s = rng.choice(pool), rng.choice(pool)
             self.emit(OP["ALU"], rng.randrange(8), (d << 4) | s); return 3
-        if pick == 3:
+        if op == "LOAD":
             self.emit(OP["LOAD"], rng.choice(pool), rng.choice(pool)); return 3
-        if self.room < 2:
-            self.emit(OP["NOP"]); return 1
-        if pick == 4:
+        if op == "TURN":
             self.emit(OP["TURN"], rng.choice((13, 23, 29, 37, 47, 61))); return 2
-        if pick == 5:
+        if op == "PEN":
             self.emit(OP["PEN"], rng.randrange(4)); return 2
-        if pick == 6:
+        if op == "EMIT":
             self.emit(OP["EMIT"], rng.choice(pool)); return 2
         self.emit(OP["MOVE"], rng.choice(pool)); return 2
 
@@ -781,6 +800,43 @@ def do_fill(b: Build, path: str) -> dict:
     return rep
 
 
+def check_extents(b: Build, path: str) -> dict:
+    """Diff a LINKED (pre-fill) image's non-zero extents against `plan_slots()`.
+
+    The P0 CRCs are predicted before the ROM is linked, which is only legitimate
+    if the linker's output lives entirely inside the reserved slots.  This is the
+    check that proves it on the real artefact rather than trusting the reserved
+    set: it reports every slot the linker actually wrote to, so a ROM that
+    outgrows `--far-slots` is a named failure instead of a payload that silently
+    overwrites `.far_text`."""
+    with open(path, "rb") as f:
+        rom = f.read()
+    if len(rom) != b.cm.size:
+        raise SystemExit(f"{path}: linked image is {len(rom)} bytes, model expects {b.cm.size}")
+    used = [s for s in range(b.plan.n) if any(rom[s * SLOT:(s + 1) * SLOT])]
+    res = set(b.plan.reserved)
+    stray = [s for s in used if s not in res]
+    unused_reserved = [s for s in b.plan.reserved if s not in set(used)]
+    # How much of the LAST used reserved slot is actually occupied -- the headroom
+    # number P1-P3 need when deciding whether to widen --far-slots.
+    tail = max(used) if used else -1
+    fill_pct = 0.0
+    if tail >= 0:
+        chunk = rom[tail * SLOT:(tail + 1) * SLOT]
+        last_nz = max((i for i, v in enumerate(chunk) if v), default=-1) + 1
+        fill_pct = 100.0 * last_nz / SLOT
+    return {
+        "path": os.path.abspath(path),
+        "slots_used_by_linker": used,
+        "slots_reserved": list(b.plan.reserved),
+        "stray": stray,
+        "reserved_but_empty": unused_reserved,
+        "last_used_slot": tail,
+        "last_used_slot_fill_pct": round(fill_pct, 1),
+        "ok": not stray,
+    }
+
+
 def assert_payload_only(b: Build) -> None:
     """The CRCs are computed before the ROM is linked, so no traversal may read
     a byte the linker owns.  `Image.slots_read` is the evidence."""
@@ -929,16 +985,16 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(prog="snes-seamdemo-gen.py", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("emit-header", "report", "fill"):
+    for name in ("emit-header", "report", "fill", "check-extents"):
         p = sub.add_parser(name)
         p.add_argument("--mapping", default="exhirom")
         p.add_argument("--size", type=parse_size, default=0x600000)
         p.add_argument("--far-slots", type=int, default=1,
                        help="32 KiB slots reserved after the code for .far_text/.far_rodata")
         p.add_argument("--seed", type=lambda s: int(s, 0), default=SEED)
-        if name == "fill":
+        if name in ("fill", "check-extents"):
             p.add_argument("--rom", required=True)
-            p.add_argument("--report")
+            p.add_argument("--report" if name == "fill" else "--json")
         else:
             p.add_argument("--out", required=True)
     sc = sub.add_parser("selfcheck")
@@ -958,6 +1014,23 @@ def main(argv: list[str]) -> int:
         print(f"header {args.out}: {len(b.nodes)} nodes, "
               f"{cov['covered']}/{cov['cells']} decode cells covered, "
               f"corpus_result ${b.result['corpus_result']:04X}")
+        return 0
+
+    if args.cmd == "check-extents":
+        ext = check_extents(b, args.rom)
+        if args.json:
+            with open(args.json, "w") as f:
+                json.dump(ext, f, indent=2)
+        print(f"linker wrote slots {ext['slots_used_by_linker']}; "
+              f"reserved {ext['slots_reserved']}; "
+              f"last used slot {ext['last_used_slot']} is "
+              f"{ext['last_used_slot_fill_pct']}% full")
+        if ext["stray"]:
+            print("  FAIL: linker output in payload slots "
+                  + ", ".join(f"{s} (file ${s * SLOT:06X})" for s in ext["stray"])
+                  + " -- widen --far-slots")
+            return 1
+        print("  PASS: all linker output is inside the reserved slots")
         return 0
 
     if args.cmd == "report":
