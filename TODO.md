@@ -61,7 +61,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [wip T3] **seamdemo — P1 Act-1 ROM DONE (`dd954dd`, gate PASS, 34 s act); P2 graph-walk act DISPATCHED.** <!-- agent:a3f76f15f3f53c44e -->
+- [T3] **seamdemo — P2 graph-walk act DONE (`47172e2`: act2 `$36B6` 3-way, 25 s, fingerprint `FBDCB9F3`, margin 1,550 frames); next: P3 Act-3 flyover + loop glue (full-cycle `corpus_result $3277`), then P4 publish.** <!-- agent:a3f76f15f3f53c44e (holds full contract context) --> P3 notes from P2: direct post-change bisect of Act-2 length; rename stale `act1_frames`; PH-tolerance stays dormant (seqvm still reproduces).
   <!-- agent:a3f76f15f3f53c44e (P0 done; holds full generator/oracle/ISA context — reuse for P1) -->
   P0 contract settled: `decode_cells()` model extension (380 cells, 5 new regression tests,
   58+25,044 subtests), one-slot-record layout, 16-op ISA + 8-entry ALU fn-ptr table, 24-bit
