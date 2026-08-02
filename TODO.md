@@ -64,12 +64,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 - [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
   absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
   `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
-- [T1] **Apply the wai idle-loop idiom to the 18 skipped-dirty `examples/snes/*.c` files** —
-  the `903de3e` sweep fixed 216 bare loops in 214 files but skipped bitweave, borrowlad, compass,
-  crcwall, keycmp64, lfsr2, modexp256, oddmask, ovmove, pcooker, permscat, ropeedit, rotkal,
-  rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
-  one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
-  (T1: known recipe, mechanical.)
 - [T3] **Backend: `rc-undef` cause #2 (item 13) — SECOND MANIFESTATION found + MISDIAGNOSIS
   corrected (2026-08-02).** The `seqvm.c draw_frame` trip is NOT a premature kill flag (that
   was the initial read of the physical MIR, filed as T4). Vreg-level MIR settles it: the value
@@ -898,6 +892,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-02 — [wai-residual] NO-OP close: the 18 files the `903de3e` sweep skipped as dirty turn out to have **no bare idle loops at all** — comment-aware scan finds 0 empty/comment-only infinite loops; each file's single `for (;;)` is its live frame loop with a real body (`recompute_row`/`field_band`/`display_frame`), i.e. the already-safe class, not removable under C11 forward progress. The sweep skipped them for dirtiness without classifying them; nothing was owed. (Files are clean since `d93499a`.)
 - [x] 2026-08-02 — [138-producer] Vanished `$rl1 = LDImm` producer ROOT-CAUSED + standing gate added (`c95ca7b`). Cause: another worker's `0018-320-imag32-spill` (created 07-27 16:58 — after the crashing 07-26 build, before the clean 07-31 one; its stated failure mode "one byte through a GPR → illegal GPR-to-Imag32 COPY" is exactly the observed malformation, and `unpack_slide` is the far-pointer spiller). Counterfactual rebuild not run — evidence is temporal + shape, strong not airtight. Gate: `dev/lzss-gallery.sh` now asserts every LDImm destination is a GPR (1,043 found, 0 non-GPR); uses `-fno-lto` because the LTO link defers codegen — the first draft passed VACUOUSLY on an empty dump, which the gate now fails loudly on. Needed because 0003's guard skips a returning producer silently instead of crashing.
 - [x] 2026-08-02 — [band-sweep-adopted] Dormant session's BAND 4→1 per-frame refresh sweep adopted across 19 demos (`d93499a`) after verification: 19/19 differential gates PASS (oracles host-derived, unchanged), display-check 6/6 PASS with stable ink. SVX2 reel corridor deliberately left untouched (still mid-edit when that session stopped). Unblocks the wai-idiom residual.
 - [x] 2026-08-02 — [seamdemo] P0–P4 COMPLETE. Three-act ExHiROM boundary cartridge LIVE at [/snes/seamdemo/](https://biohack.net/snes/seamdemo/) (site `445121a`, v1.0.350, CI success, live ROM sha `29dafeb5…` verified, decode-map SVG embedded). Console: act1 `$F0E2` / act2 `$36B6` / act3 `$6D21` → full-cycle `corpus_result $3277`, four-way oracle agreement, `-verify` clean, entropy fingerprint one picture ×6, ~100 s cycle. Coverage 374/374 decode cells, 1,122 edges (755 seam-crossing), one instruction split across the physical device seam. New gallery category **Cartridge & Mapping Tests** carries it plus the three canary pages. Published as-is: cycle length is a runtime dial (no CRC impact); the ~872 KB gzip lever would change `act3_crc`, so it stays open. Deferred: live Mode 7 page-address HUD (needs HDMA mode-split or OBJ; presentation only). See [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md).
