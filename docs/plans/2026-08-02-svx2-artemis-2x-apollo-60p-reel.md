@@ -1,7 +1,7 @@
 # SVX2 Artemis 2× + Apollo 59.94p ExHiROM reel
 
 **Date:** 2026-08-02
-**Status:** In progress
+**Status:** Complete
 **Supersedes:** [SVX2 native-60-fps ExHiROM seam reel](2026-08-02-svx2-native-60fps-exhirom-seam-reel.md)
 
 ## Outcome
@@ -86,15 +86,27 @@ forward seek, and reverse seek all exercise the region-A/file-`$410000` seam on 
 - [x] Present exactly 9,000 eligible frames with zero deadline slips or decode errors.
 - [x] Pass dashboard and fidelity checks in all three sections and on both seam-adjacent frames.
 - [x] Pass scripted pause, step, resume, ±1-second seek, shuttle, and bidirectional seam crossings.
-- [ ] Build the website, replay its manifest self-check, and pass blank-scan.
+- [x] Build the website, replay its manifest self-check, and pass blank-scan.
 
 ## Publication
 
-- [ ] Replace the public XRISM ROM and page—not merely add another hidden artifact.
+- [x] Replace the public XRISM ROM and page—not merely add another hidden artifact.
 - [x] State the mixed cadence honestly: two 29.97p animations at 2×, one Apollo segment at ~59.94p.
 - [x] Describe the cartridge as 64 Mbit (8 MiB) Fast ExHiROM, 1,200 frames, 20 seconds.
-- [ ] Publish only the exact gated ROM and verify the downloaded live SHA-256.
-- [ ] Record toolchain commit, site commit, release tag, checksum, and live verification here.
+- [x] Publish only the exact gated ROM and verify the downloaded live SHA-256.
+- [x] Record toolchain commit, site commit, release tag, checksum, and live verification here.
+
+## Published result
+
+- Toolchain implementation: `f61472a`; blank-scan corpus-threshold follow-up: `3e8bcca`.
+- Site commit: `2345332`; release: `v1.0.360`; deployment workflow `30761621847` passed.
+- ROM SHA-256: `c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2`.
+- The downloaded live ROM matched that hash, and the live page exposed the same hash plus the
+  1,200-frame, 20-second mixed-cadence description.
+- `pytest -q tests/test_snes_video_codec.py`: 24 passed. The site manifest replay passed 4,000
+  frames, composite health zero, and blank-scan with the reel's five-row threshold. Four rows was
+  a measured false positive caused by a stable four-row change in naturally black Artemis source
+  imagery; the ordinary threshold remains unchanged for every other ROM.
 
 ## Acceptance
 
