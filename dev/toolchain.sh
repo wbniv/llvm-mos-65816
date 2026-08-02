@@ -85,6 +85,12 @@ if [ ! -d "$SRC/.git" ]; then
   # THE BASELINE by dev/regen-patch.sh so a 0002 regen never absorbs it. Drop
   # this line and the patch file once it lands upstream and the vendor pin moves.
   apply_patch 0003-late-opt-nongpr-ldimm-dest
+  # Same slot lifecycle as 0003: an upstream-bound standalone fix in the same
+  # file (lowerCmpZeros' fold flag was the function's loop-carried `Changed`,
+  # so every CmpZero after a block's first fold went unlowered and the pseudo
+  # was silently dropped by the asm printer). Reproduces on pristine upstream.
+  # Also baked into dev/regen-patch.sh's baseline. Drop on upstream merge.
+  apply_patch 0022-mos-late-opt-cmpzero-lowering
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

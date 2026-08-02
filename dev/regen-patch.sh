@@ -56,6 +56,7 @@ MOSREL="llvm/lib/Target/MOS"
 # docs/plans/2026-08-01-gallery-nonreproducible-build.md).
 BASELINE_MOSDIR=(
   "$PATCHES/0021-mos-zp-alloc-deterministic.patch"
+  "$PATCHES/0022-mos-late-opt-cmpzero-lowering.patch"
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
