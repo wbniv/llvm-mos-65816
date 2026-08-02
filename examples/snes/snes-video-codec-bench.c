@@ -44,8 +44,72 @@ static void show_decoded_frame(void) {
 }
 #endif
 
-#if defined(VIDEO_BENCH_PIPELINE)
+#if defined(VIDEO_BENCH_STREAM)
+/* Functional multi-packet refill. Packets live in the separately packed HiROM
+   stream and are reached through a 32-bit offset table, so every frame pays the
+   real table lookup, the A-bus 64 KiB bank split, and the ring bookkeeping.
+
+   The ring is no-split by construction: svx_decode_payload_wram_asm walks its
+   staged cursor with a 16-bit X and has no wrap handling, so a packet that would
+   straddle VIDEO_BENCH_RING_END restarts at VIDEO_BENCH_RING_BASE instead. */
+#define VIDEO_BENCH_RING_BASE 0x2000u
+#define VIDEO_BENCH_RING_END 0xf000u
+
 volatile uint8_t video_bench_stage_result;
+/* Target-readable proof that the no-split wrap is actually taken, rather than
+   the ring being a straight buffer that never reaches its end. */
+volatile uint16_t video_bench_ring_wraps;
+static uint16_t ring_write = VIDEO_BENCH_RING_BASE;
+
+/* Returns the bank-$7F address the packet was staged at, or 0 on failure. */
+static uint16_t stage_stream_frame(uint16_t frame) {
+  SvcSnesDmaContext dma_context = {3u, 1u};
+  uint32_t offset = bench_stream_offsets[frame];
+  uint16_t remaining = (uint16_t)(bench_stream_offsets[frame + 1u] - offset);
+  uint16_t start;
+  uint16_t copied = 0u;
+  if ((uint32_t)ring_write + remaining > VIDEO_BENCH_RING_END) {
+    ring_write = VIDEO_BENCH_RING_BASE;
+    ++video_bench_ring_wraps;
+  }
+  start = ring_write;
+  while (remaining) {
+    uint16_t address = (uint16_t)offset;
+    /* Bytes left in this A-bus bank; 0 means the transfer starts bank-aligned
+       and 65,536 bytes remain, which cannot be a uint16_t. */
+    uint16_t segment = (uint16_t)(0u - address);
+    if (!segment || segment > remaining) segment = remaining;
+    if (!svc_snes_dma_copy_segment(&dma_context,
+            (uint8_t)(VIDEO_BENCH_STREAM_BASE_BANK + (uint8_t)(offset >> 16)),
+            address, (uint8_t *)(uintptr_t)(start + copied), segment)) {
+      video_bench_stage_result = SVC_ERR_TRUNCATED;
+      return 0u;
+    }
+    offset += segment;
+    copied = (uint16_t)(copied + segment);
+    remaining = (uint16_t)(remaining - segment);
+  }
+  ring_write = (uint16_t)(start + copied);
+  video_bench_stage_result = SVC_OK;
+  return start;
+}
+
+/* Mirrors frame_check() in tools/snes-video-bench-assets.py byte for byte. */
+static uint16_t frame_check(const uint8_t *frame) {
+  uint16_t a = 0u, b = 0u, i;
+  for (i = 0; i != SVC_FRAME_SIZE; ++i) {
+    a = (uint16_t)(a + frame[i]);
+    b = (uint16_t)(b + a);
+  }
+  return (uint16_t)(a ^ b);
+}
+#endif
+
+#if defined(VIDEO_BENCH_PIPELINE) || defined(VIDEO_BENCH_STREAM)
+#if !defined(VIDEO_BENCH_STREAM)
+volatile uint8_t video_bench_stage_result;
+#endif
+#if !defined(VIDEO_BENCH_STREAM)
 static uint8_t stage_packet(void) {
   SvcRomSegment segment;
   SvcSegmentCursor cursor;
@@ -67,6 +131,7 @@ static uint8_t stage_packet(void) {
       &cursor, (uint8_t *)(uintptr_t)0x2000u, VIDEO_BENCH_PACKET_SIZE);
   return video_bench_stage_result == SVC_OK;
 }
+#endif
 
 static void present_frame(void) {
   REG_VMAIN = VMAIN_INC_HIGH_1;
@@ -90,6 +155,23 @@ static uint8_t read_byte(void *opaque, uint8_t *value) {
   return 1;
 }
 
+#if defined(VIDEO_BENCH_STREAM)
+static uint16_t stream_frame;
+
+/* One complete player step: refill this frame's packet through the ring, decode
+   it in place from high WRAM, present it. SVX2 delta spans advance source and
+   destination together, so `output` is legitimately both previous and output. */
+static uint8_t decode_once(void) {
+  uint16_t staged = stage_stream_frame(stream_frame);
+  if (!staged) return 0;
+  svx_decode_payload_wram_fast((uint16_t)(staged + 9u),
+                               bench_stream_keyframes[stream_frame],
+                               output, output);
+  present_frame();
+  if (++stream_frame == VIDEO_BENCH_STREAM_FRAMES) stream_frame = 0u;
+  return 1u;
+}
+#else
 static uint8_t decode_once(void) {
 #if defined(VIDEO_BENCH_PIPELINE)
   if (!stage_packet()) return 0;
@@ -125,6 +207,30 @@ decoded:
 #endif
   return 1u;
 }
+#endif
+
+#if defined(VIDEO_BENCH_STREAM)
+/* Byte-correctness gate for the whole loop, run once before timing starts.
+   Every frame's decode is checked; the final frame is additionally compared
+   byte for byte, so the complete delta chain is pinned to the host oracle. */
+static void validate_stream(void) {
+  uint16_t frame, i;
+  for (frame = 0; frame != VIDEO_BENCH_STREAM_FRAMES; ++frame) {
+    if (!decode_once()) { corpus_result = 1u; for (;;) __asm__ volatile("wai"); }
+    if (frame_check(output) != bench_stream_checks[frame]) {
+      corpus_result = 2u;
+      for (;;) __asm__ volatile("wai");
+    }
+  }
+  for (i = 0; i != SVC_FRAME_SIZE; ++i)
+    if (output[i] != bench_stream_final[i]) {
+      corpus_result = 4u;
+      for (;;) __asm__ volatile("wai");
+    }
+  /* decode_once() wrapped stream_frame back to 0, so the timed loop restarts on
+     the independent keyframe and never depends on the final frame. */
+}
+#endif
 
 void video_bench_run(void) {
   uint16_t i;
@@ -133,9 +239,14 @@ void video_bench_run(void) {
 #endif
   corpus_result = 0xffu;
   video_bench_iters = 0;
+#if defined(VIDEO_BENCH_STREAM)
+  (void)i;
+  validate_stream();
+#else
   if (!decode_once()) { corpus_result = 1u; for (;;) __asm__ volatile("wai"); }
   for (i = 0; i != SVC_FRAME_SIZE; ++i)
     if (output[i] != bench_expected[i]) { corpus_result = 2u; for (;;) __asm__ volatile("wai"); }
+#endif
 #if defined(VIDEO_BENCH_VISIBLE)
   show_decoded_frame();
 #endif

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/0c7c1f7) | Add Apollo 11 daylight-launch stressor to the real-video codec corpus |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/d71d298) | Add animated SVX2 video cartridge |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/ac773f4) | docs(plan): record Phase 0-1 verification — host structural gates 1 and 2 PASS |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/6d50fd3) | docs(plan+todo): reframe extended-cartridge work — general mapper testing, standalone ROMs; rename plan |
@@ -9,6 +10,11 @@
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/1ae32f8) | docs: plan ExHiROM video boundary test |
 
 <!--history-meta v1
+0c7c1f7	author	Will Norris
+0c7c1f7	added	10
+0c7c1f7	deleted	0
+0c7c1f7	files	1
+0c7c1f7	body	The Artemis real-camera leg was a night launch (mostly-black frames,\ncodec-smoothed grain) — a best case for "real footage." Adds parent-plan\ncandidate #16 (Apollo 11 Saturn V launch, real 16 mm KSC film) to calibrate\nratio expectations for hard grain-rich daylight content: SVX2/Floyd costs\n+5.3 ratio points (57.04% -> 62.33%) and +19.8 under Bayer (33.49% -> 53.29%)\nvs. the night leg, and gallery LZSS actually beats shipping SVX2 on size here.\nThe one-codec/SVX2 decision survives — it's speed-anchored (60.8-69.4 fps vs.\nLZSS's 2.1-2.3 fps decode-only) — but size budgets should use ~62%, not ~57%.\n\nDrift gate: snes_video_codec.py is byte-identical since the recorded run\n(5038454); the surviving real-camera Floyd tile corpus reproduces every\nrecorded number exactly. The literal "SVX1@60" figure from the TODO item is\nunreproducible for a documented reason: SVX1 (whole-frame XOR delta) was\ndeleted from the harness after the SVX2-only shipping decision, not drift.\n\nAdds tools/snes-video-rgb24-convert.sh, scripting the ffmpeg retime/Lanczos/\npad/RGB24 conversion that prior corpora only ran by hand, so the next drift\ncheck has something to reproduce.\n\nAlso repairs a TODO.md structural casualty: removing the completed/duplicate\n"hard real-video stressor" bullets exposed an orphaned ExHiROM paragraph that\na prior concurrent rewrite had already stripped of its own bullet marker;\nrestored as its own [T4] item with a triage note rather than guessing its\ncurrent status.\n\nSNESDQ_SKIP=1: the display-quality gate scans the whole examples/snes/ tree\non disk, not just staged files, and failed on another worker's in-progress,\nnot-yet-baselined video_hud.h edit (REG_MDMAEN write). This commit touches\nno examples/snes/ file; the trip is out of scope for it.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 d71d298	author	Will Norris
 d71d298	added	102
 d71d298	deleted	8
