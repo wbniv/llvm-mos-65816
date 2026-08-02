@@ -65,9 +65,10 @@ A16=(-Xclang -target-feature -Xclang +mos-a16)
 # from bisecting the WRAM latches, not from a cycle model:
 #   Act 1  10,494 ops / 367 segments -> ~2,050 frames (~34 s)
 #   Act 2  374 nodes at ACT2_FRAME_DIV=4 -> ~1,500 frames (~25 s)
-# plus two verdict holds and the title card. 5,400 is real margin, not the 350
-# frames P1 shipped with.
-JG_FRAMES="${JG_FRAMES:-5400}"
+#   Act 3  3,040 samples at 2/frame       -> ~1,520 frames (~25 s)
+# plus two verdict holds and the title card: a full cycle is ~5,400 frames, and
+# corpus_result only latches at the END of it. 7,200 is real margin.
+JG_FRAMES="${JG_FRAMES:-7200}"
 # The entropy fingerprint only needs a STABLE picture at a fixed frame count, not
 # a completed act, so it runs its six boots at a small budget — otherwise step 7b
 # alone would be six 20,000-frame runs.
@@ -306,13 +307,19 @@ fi
 
 if [ -x "$BUILD/jgxcheck" ] && [ -d "$ROOT/vendor/bsnes-jg/Database" ]; then
   echo
-  echo "==> 7) bsnes-jg: both acts fold to the generated oracle"
+  echo "==> 7) bsnes-jg: all three acts fold, and the cycle latches"
   WANT_A2=0x$(sed -n 's/^#define SEAMDEMO_ACT2_CRC 0x\([0-9A-F]*\)u$/\1/p' "$HDR")
-  WANT_C12=0x$(sed -n 's/^#define SEAMDEMO_CORPUS_ACT12 0x\([0-9A-F]*\)u$/\1/p' "$HDR")
-  echo "  (act2 $WANT_A2, corpus(act1,act2) $WANT_C12)"
+  WANT_A3=0x$(sed -n 's/^#define SEAMDEMO_ACT3_CRC 0x\([0-9A-F]*\)u$/\1/p' "$HDR")
+  WANT_C=0x$(sed -n 's/^#define SEAMDEMO_CORPUS_RESULT 0x\([0-9A-F]*\)u$/\1/p' "$HDR")
+  echo "  (act2 $WANT_A2, act3 $WANT_A3, three-act corpus_result $WANT_C)"
+  # cycle_status is the ONE word that says a full three-act cycle verified: it ORs
+  # the three act statuses and flags a corpus mismatch, so it cannot read 0 unless
+  # every act ran AND the fold landed.
   for sym_want in "act1_crc:$WANT_A1" "act1_status:0x0000" \
                   "act2_crc:$WANT_A2" "act2_status:0x0000" \
-                  "corpus_result:$WANT_C12"; do
+                  "act3_crc:$WANT_A3" "act3_status:0x0000" \
+                  "cycle_status:0x0000" \
+                  "corpus_result:$WANT_C"; do
     sym="${sym_want%%:*}"; want="${sym_want##*:}"
     read -r vma size2 < <(_emu_map_lookup "$MAP" "$sym") || true
     if [ -z "${vma:-}" ]; then echo "  FAIL: $sym not in the map"; rc=1; continue; fi
@@ -363,5 +370,5 @@ fi
 
 echo
 echo "  ROM SHA-256: $(sha256sum "$ROM" | cut -c1-64)"
-emu_verdict "$rc" "Act 1's bytecode VM marched its 24-bit file PC across the whole 6 MiB ExHiROM image and executed the instruction split across the physical device seam; Act 2 walked the covering cycle through all 374 decode cells, mirrors included, and closed on its entry — both folded to the generated oracle"
+emu_verdict "$rc" "all three acts read the 6 MiB ExHiROM cartridge with different access patterns and folded to the generated oracle: Act 1 marched its 24-bit file PC across the whole image and executed the instruction split across the physical device seam, Act 2 walked the covering cycle through all 374 decode cells (mirrors included) and closed on its entry, Act 3 swept the atlas over every available page — and corpus_result latched the three-act fold"
 exit $rc

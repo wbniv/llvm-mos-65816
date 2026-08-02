@@ -498,6 +498,90 @@ here so P3 inherits them.
    signature-exact tolerance in `dev/seamdemo.sh` is currently dormant rather than removed — the
    right state, since `seqvm.c` still reproduces it. Useful evidence for the backlog item.
 
+## P3 — Act 3: the atlas flyover, and the loop glue
+
+[`examples/65816/seamdemo_atlas.h`](../../examples/65816/seamdemo_atlas.h) holds the traversal, on
+the same one-source-three-consumers discipline as Acts 1 and 2. All three implementations fold to
+**`$6D21`** over 3,040 samples across 190 pages.
+
+**The path is scripted, the data is not.** Act 3's camera is a boustrophedon sweep regenerated from
+four numbers plus the reserved-slot skip list — it is a camera, not a data-driven walk. What comes
+off the cartridge is what it *reads*: per sample the texel under the camera, the height sample, and
+the page metadata's first byte (the low byte of the page's own file offset, which is what catches a
+mis-decoded page).
+
+### Mode 7 rendering
+
+Act 3 takes the screen over rather than running as a `Drawable`: Mode 7 needs BG1 and the whole of
+VRAM `$0000-$3FFF` interleaved, which is exactly where the BG3 canvas lives. It runs its own frame
+loop (the `m7splash` precedent) and returns force-blanked; the caller rebuilds the BG3 world with
+`app_init()`, which re-asserts force-blank and resets the VRAM allocator so the re-`display_add` is
+legal again.
+
+**De-tiling is the interesting constraint.** Mode 7 character data is *tiled* — tile `t` occupies
+VRAM words `t*64 … t*64+63` as an 8×8 block — while the payload's page is *linear* row-major. The
+payload is frozen this phase and the CRCs must not move, so the re-ordering happens on the way to
+VRAM: **64 short DMAs of 8 bytes**, one tile-row per v-blank, spread across the 8 frames the camera
+spends on each page. Reading the 4,096 bytes with far loads and de-tiling in WRAM instead would
+cost ~4.6 frames per page (~875 frames over the act); the DMAs cost ~0.7. The 128×128 tile grid is
+tiled with the current page's 64 tiles, so the camera flies over a repeating field of whatever page
+is streaming.
+
+The tilemap scratch buffer is the **canvas's own 4 KiB `chr` array** — WRAM Act 3 does not otherwise
+use, and `app_init()` re-initialises it for the next cycle — rather than a second 4 KiB static in a
+7.5 KiB RAM budget.
+
+Palette: the atlas texel is `(terrain << 4) | (pattern & 0x0F)`, so the 256-entry Mode 7 palette
+ramps water → land → snow on the high nibble and dithers gently on the low one. The picture reads
+as terrain and every texel still carries its decode probe.
+
+### Loop glue
+
+Acts hand off through the verdict strip, which now carries all three folds and the cumulative one
+(`1:… 2:… 3:… SUM:…`; Act 3's column fills from the previous cycle, so after one full loop the strip
+is complete). `corpus_result` latches the full three-act fold **`$3277`** at the end of the first
+complete cycle and is recomputed identically on every later one, so it never moves once correct.
+
+`cycle_status` is the single word that says a cycle verified: it ORs the three act statuses and
+flags a corpus mismatch, so it cannot read `0` unless every act ran *and* the fold landed. The BG3
+backdrop goes **green only after `cycle_status == 0`** — the plan's "green once all three acts have
+folded correctly at least once".
+
+### Pacing
+
+Measured by bisecting the frame at which each act's WRAM CRC latches (each row is a *bracket* —
+the sub-CRC was still `$0000` at the low frame and correct at the high one), plus the 150-frame
+verdict hold between acts:
+
+| act | cadence | latch bracket | act length |
+|---|---|---|---:|
+| Act 1 | `OPS_PER_FRAME = 8` | (2,000, 2,100] | ~2,050 frames ≈ 34 s |
+| Act 2 | `ACT2_FRAME_DIV = 4` | (3,800, 4,300] | ~1,750–2,100 frames ≈ 29–35 s |
+| Act 3 | `ACT3_SAMPLES_PER_FRAME = 2` | (5,500, 6,300] | ~1,350–2,050 frames ≈ 23–34 s |
+| **full cycle** | | | **~6,000 frames ≈ 100 s** |
+
+All three land in or at the top of the 20–35 s window. Two corrections to earlier estimates worth
+recording: Act 2's *design* figure was 374 × 4 = 1,496 frames, but the measured length is longer —
+at `DIV = 4` the dirty-tile flush, not the divider, is still what binds for part of the walk, so the
+divider is a floor rather than the rate. And the P2 note that a full cycle would be ~5,400 frames
+was short; it is ~6,000.
+
+Act 3's cadence is not free choice: 2 samples/frame leaves the camera exactly 8 frames on each page,
+which is exactly the 8 tile-rows a page upload is split into. `JG_FRAMES` is **7,200** — the corpus
+latch only happens at the *end* of a cycle, so the budget has to cover the whole thing; against a
+~6,000-frame cycle that is ~1,200 frames of margin.
+
+### Deferred: the live Mode 7 page-address HUD
+
+The plan's Act-3 panel shows the current texture page's file address on screen. **Not landed.** In
+Mode 7 there is no BG3, so a fixed-position overlay needs either the HDMA `BGMODE`/`TM` scanline
+split (the `lzss-gallery` pattern) or OBJ sprites — and the split additionally needs the text
+layer's font moved above VRAM `$4000`, because Mode 7 overwrites the glyph tiles at the canvas chr
+base. That is a change to the shared BG3 layout with a real chance of disturbing Acts 1–2's display,
+and it buys presentation rather than correctness: the gate asserts folds, and the page address is
+already carried by `act3_pages` in WRAM and by the metadata block the fold reads. Left for P4 to
+pick up alongside publication polish, with the two routes recorded here.
+
 ## Verification (to be executed per phase; format per house rules)
 
 1. ~~P0: generator self-check — oracle reproduces a hand-computed fold on a 64 KiB miniature
@@ -570,12 +654,12 @@ here so P3 inherits them.
 
     ==> 4) fill the payload, patch header + checksum, structural inspect
     fill /work/build/seamdemo.sfc: 890576 payload bytes, act1 $F0E2 act2 $36B6 act3 $6D21 -> corpus_result $3277
-    /work/build/seamdemo.sfc: exhirom size=6144KiB devices=32Mbit+16Mbit map_mode=0x25 rom_size_byte=0x0D checksum=0x92C7 complement=0x6D38
+    /work/build/seamdemo.sfc: exhirom size=6144KiB devices=32Mbit+16Mbit map_mode=0x25 rom_size_byte=0x0D checksum=0x34CB complement=0xCB34
       PASS: file length : 6291456 bytes (0x600000, 48 Mbit / 6 MiB);physical devices : 32Mbit @ $000000 + 16Mbit @ $400000 header at file : $40FFB0;map mode byte : $25
 
     ==> 5) disasm: far fetch + jump-table dispatch + function-pointer ALU table
       PASS: -verify-machineinstrs clean
-      PASS: 25 far fetch(es) (lda [dp], a7) — the 24-bit cartridge cursor
+      PASS: 28 far fetch(es) (lda [dp], a7) — the 24-bit cartridge cursor
       PASS: 1 jump-table dispatch (jmp (abs,X), 7c) — the 16-way switch
       PASS: 8 __call_indir reference(s) — the function-pointer ALU table
 
@@ -589,8 +673,10 @@ here so P3 inherits them.
     ==> 6b) host C: the SAME VM source the ROM runs, over the built image
       act1 CRC $F0E2 (want $F0E2)  ops=10494 segments=367 syncs=51 seam-hits=1 status=$0000
       act2 CRC $36B6 (want $36B6)  nodes=374 edges=1122 seam=776 mirror=739 status=$0000
+      act3 CRC $6D21 (want $6D21)  samples=3040 (want 3040) pages=190 status=$0000
       corpus(act1,act2) $0C72 (want $0C72)
-      PASS: host C == the generated oracle (acts 1 and 2)
+      corpus(act1,act2,act3) $3277 (want $3277)
+      PASS: host C == the generated oracle (all three acts)
       PASS: host C == Python oracle == the header's baked CRC
 
     ==> 5b) pacing: ops/frame achieved on target
@@ -601,20 +687,22 @@ here so P3 inherits them.
       PASS: OPS_PER_FRAME=8 is matched to the achievable 5 ops/frame
 
     ==> 7) bsnes-jg: both acts fold to the generated oracle
-      (act2 0x36B6, corpus(act1,act2) 0x0C72)
+      (act2 0x36B6, act3 0x6D21, three-act corpus_result 0x3277)
       act1_crc: jgxcheck: wrote /work/build/seamdemo.png (256x224 from native 512x240, yoff=0)
-    SMOKE: PASS off=0x6F len=2 got=0xF0E2 (ran 5400 frames, bsnes-jg)
+    SMOKE: PASS off=0x61 len=2 got=0xF0E2 (ran 7200 frames, bsnes-jg)
       screenshot: /work/build/seamdemo.png
-      act1_status: SMOKE: PASS off=0x69 len=2 got=0x0000 (ran 5400 frames, bsnes-jg)
-      act2_crc: SMOKE: PASS off=0x71 len=2 got=0x36B6 (ran 5400 frames, bsnes-jg)
-      act2_status: SMOKE: PASS off=0x73 len=2 got=0x0000 (ran 5400 frames, bsnes-jg)
-      corpus_result: SMOKE: PASS off=0x79 len=2 got=0x0C72 (ran 5400 frames, bsnes-jg)
+      act1_status: SMOKE: PASS off=0x55 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+      act2_crc: SMOKE: PASS off=0x63 len=2 got=0x36B6 (ran 7200 frames, bsnes-jg)
+      act2_status: SMOKE: PASS off=0x6B len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+      act3_crc: SMOKE: PASS off=0x5B len=2 got=0x6D21 (ran 7200 frames, bsnes-jg)
+      act3_status: SMOKE: PASS off=0x5D len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+      cycle_status: SMOKE: PASS off=0x67 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+      corpus_result: SMOKE: PASS off=0x65 len=2 got=0x3277 (ran 7200 frames, bsnes-jg)
     ==> 7b) picture is independent of power-on entropy (None/Low/High x2)
       PASS: one picture across all six boots (FBDCB9F3:#000000)
 
-      ROM SHA-256: 75d6cd45cdfaa95371effe0594574285ea061ead064210fab9a173daf5e855d3
+      ROM SHA-256: 29dafeb5cad15e4356b21d6446ba1ff221ac495cc87690912bdf9d68bbdcbb5c
     RESULT: PASS — Act 1's bytecode VM marched its 24-bit file PC across the whole 6 MiB ExHiROM image and executed the instruction split across the physical device seam; Act 2 walked the covering cycle through all 374 decode cells, mirrors included, and closed on its entry — both folded to the generated oracle
-    GATE_EXIT=0
     ```
 
     **PASS.** All three legs fold to `$F0E2` with `act1_status == 0`; `act1_seam_hits == 1`
@@ -623,9 +711,10 @@ here so P3 inherits them.
     KNOWN and tracked separately. MAME leg still blocked on the SPC700 IPL gap.
 3. P2/P3: per-act sub-CRC gates + full-cycle `corpus_result` latch inside the frame budget.
    **P2 half DONE 2026-08-01** — `dev/run.sh seamdemo` asserts, on bsnes-jg at 5,400 frames:
-   `act1_crc $F0E2`, `act1_status 0x0000`, `act2_crc $36B6`, `act2_status 0x0000`, and the
-   two-act progression `corpus_result $0C72` (`SEAMDEMO_CORPUS_ACT12`). Act 2 measured at
-   ~1,500 frames ≈ 25 s (`ACT2_FRAME_DIV = 4`); full cycle ≈ 3,850 frames inside the 5,400
-   budget. The full three-act `corpus_result $3277` latch is P3. Raw output under step 2.
+   **P2 + P3 DONE 2026-08-02.** `dev/run.sh seamdemo` asserts, on bsnes-jg at 7,200 frames:
+   `act1_crc $F0E2`, `act1_status 0x0000`, `act2_crc $36B6`, `act2_status 0x0000`,
+   `act3_crc $6D21`, `act3_status 0x0000`, `cycle_status 0x0000`, and the full three-act
+   **`corpus_result $3277`** — which only latches at the END of a complete cycle, so the
+   assertion is itself the full-cycle evidence. Raw output under step 2.
 4. All phases: entropy fingerprint (one picture hash across None/Low/High × 2).
 5. P4: live-page WASM Verify fidelity == gate value.

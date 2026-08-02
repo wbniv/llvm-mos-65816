@@ -105,6 +105,9 @@ static uint8_t host_far8(unsigned long far) {
 #define SEAMGRAPH_FAR8(a) host_far8(a)
 #include "seamdemo_graph.h"
 
+#define SEAMATLAS_FILE8(o) host_mem8(o)
+#include "seamdemo_atlas.h"
+
 int main(int argc, char **argv) {
   if (argc < 2) {
     fprintf(stderr, "Usage: %s <rom.sfc>\n", argv[0]);
@@ -166,6 +169,18 @@ int main(int argc, char **argv) {
          g2, (unsigned)SEAMDEMO_ACT2_CRC, (unsigned)g.visited, (unsigned)g.edges,
          (unsigned)g.seam_edges, (unsigned)g.mirror_edges, (unsigned)g.status);
 
+  // --- act 3 ---------------------------------------------------------------
+  SeamAtlas at;
+  at.status = 0;
+  seamatlas_init(&at);
+  while (!at.done) seamatlas_step(&at, NULL);
+  uint16_t a3 = seamatlas_final_crc(&at);
+  if (a3 != SEAMDEMO_ACT3_CRC) at.status |= SEAMATLAS_ST_CRC;
+  if (at.samples != SEAMDEMO_ACT3_SAMPLES) at.status |= SEAMATLAS_ST_PAGES;
+  printf("act3 CRC $%04X (want $%04X)  samples=%u (want %lu) pages=%u status=$%04X\n",
+         a3, (unsigned)SEAMDEMO_ACT3_CRC, (unsigned)at.samples,
+         (unsigned long)SEAMDEMO_ACT3_SAMPLES, (unsigned)at.pages, (unsigned)at.status);
+
   unsigned corpus12 = 0;
   {
     uint16_t h = 0;
@@ -179,11 +194,25 @@ int main(int argc, char **argv) {
   printf("corpus(act1,act2) $%04X (want $%04X)\n",
          corpus12, (unsigned)SEAMDEMO_CORPUS_ACT12);
 
-  if (v.status || g.status || corpus12 != SEAMDEMO_CORPUS_ACT12) {
-    printf("FAIL: act1 status $%04X, act2 status $%04X\n",
-           (unsigned)v.status, (unsigned)g.status);
+  unsigned corpus123 = 0;
+  {
+    uint16_t h = 0;
+    uint16_t acts[3] = { crc, g2, a3 };
+    for (int i = 0; i < 3; i++) {
+      h = seamvm_fold(h, (uint8_t)(acts[i] & 0xFFu));
+      h = seamvm_fold(h, (uint8_t)(acts[i] >> 8));
+    }
+    corpus123 = h;
+  }
+  printf("corpus(act1,act2,act3) $%04X (want $%04X)\n",
+         corpus123, (unsigned)SEAMDEMO_CORPUS_RESULT);
+
+  if (v.status || g.status || at.status || corpus12 != SEAMDEMO_CORPUS_ACT12
+      || corpus123 != SEAMDEMO_CORPUS_RESULT) {
+    printf("FAIL: act1 status $%04X, act2 status $%04X, act3 status $%04X\n",
+           (unsigned)v.status, (unsigned)g.status, (unsigned)at.status);
     return 1;
   }
-  printf("PASS: host C == the generated oracle (acts 1 and 2)\n");
+  printf("PASS: host C == the generated oracle (all three acts)\n");
   return 0;
 }

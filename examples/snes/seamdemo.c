@@ -44,6 +44,8 @@
 // Generated: VMOP_*/VMALU_*, seamdemo_xlat_*, seamdemo_dir16, SEAMDEMO_ACT1_*,
 // SEAMDEMO_SEAM0_FILE, SEAMDEMO_DATA_OFF, SEAMDEMO_SLOT.
 #include "seamdemo-data.h"
+#include "mode7.h"
+#include "sincos.h"
 
 #define FAR __attribute__((address_space(2)))
 
@@ -104,11 +106,16 @@ volatile uint16_t act2_crc;
 volatile uint16_t act2_status;
 volatile uint16_t act2_nodes;       // nodes walked in the completed lap
 volatile uint16_t act2_seam_edges;  // ... of which crossed the physical device boundary
+volatile uint16_t act3_crc;
+volatile uint16_t act3_status;
+volatile uint16_t act3_pages;       // pages the camera swept in the completed lap
+volatile uint16_t cycle_status;     // 0 once a full three-act cycle has verified
+volatile uint16_t cycles;           // completed three-act cycles
 // Pacing instrumentation, updated every frame: a WRAM dump at frame N gives the
 // real ops/frame INCLUDING all display cost, which is the number that decides
 // how long the act takes. (The SEAMDEMO_BENCH build measures the VM alone.)
 volatile unsigned long act1_ops;
-volatile uint16_t act1_frames;
+volatile uint16_t demo_frames;  // frames across the whole cycle, not just act 1
 volatile unsigned long bench_ops;  // SEAMDEMO_BENCH only: ops executed in 60 v-blanks
 
 // ---------------------------------------------------------------- far reads
@@ -156,6 +163,24 @@ static inline uint8_t rom_far8(unsigned long far) {
 #endif
 #include "../65816/seamdemo_graph.h"
 
+// ---------------------------------------------------------------- act 3
+// Mode 7 flyover over the cart-spanning atlas. The traversal (and therefore the
+// fold) is seamdemo_atlas.h; everything below is rendering.
+//
+// A page upload is 4 KiB of Mode 7 character data, and Mode 7 char data is TILED
+// (tile t occupies VRAM words t*64..t*64+63, 8x8 texels) while the payload's page
+// is LINEAR row-major. The payload cannot be re-ordered -- it is frozen and the
+// CRCs must not move -- so the de-tiling happens on the way to VRAM, as 64 short
+// DMAs of 8 bytes each, one tile-row per v-blank across the 8 frames the camera
+// spends on a page. Reading the 4096 bytes with far loads instead would cost
+// ~4.6 frames per page (~875 frames over the act); the DMAs cost ~0.7.
+static volatile uint16_t m7_page_slot;   // page whose upload is in flight
+static volatile uint8_t m7_page_row;     // next tile-row to push (0..7), 8 = idle
+
+#define SEAMATLAS_FILE8(o) rom_mem8(o)
+#define SEAMATLAS_PAGE(ctx, slot) (m7_page_slot = (slot), m7_page_row = 0)
+#include "../65816/seamdemo_atlas.h"
+
 // ---------------------------------------------------------------- the app
 #define MODE_RUN 0
 #define MODE_SEAM 1
@@ -167,7 +192,9 @@ typedef struct {
   TextLayer text;
   SeamVm vm;
   SeamGraph gr;
-  uint8_t act;            // 1 or 2 -- which act is on screen
+  SeamAtlas at;
+  uint8_t act;            // 1 or 2 -- which act is on screen (3 runs its own loop)
+  uint8_t cycle_ok;       // a full three-act cycle has verified
   uint8_t tick;           // act-2 cadence divider
   uint16_t pause;
   uint16_t laps;
@@ -184,6 +211,11 @@ static const uint16_t PAL_RUN[4] = {
 // the physical device seam -- the accent the mockup asks for.
 static const uint16_t PAL_WEB[4] = {
     SNES_RGB(0, 0, 2), SNES_RGB(8, 16, 28), SNES_RGB(18, 24, 31), SNES_RGB(31, 14, 2),
+};
+// The backdrop goes green ONLY after a full three-act cycle has verified -- the
+// plan's "green once all three acts have folded correctly at least once".
+static const uint16_t PAL_RUN_OK[4] = {
+    SNES_RGB(0, 8, 3), SNES_RGB(10, 24, 31), SNES_RGB(31, 26, 8), SNES_RGB(28, 10, 31),
 };
 static const uint16_t PAL_SEAM[4] = {
     SNES_RGB(6, 0, 0), SNES_RGB(31, 31, 31), SNES_RGB(31, 20, 0), SNES_RGB(31, 6, 0),
@@ -231,9 +263,17 @@ static void hud_build(App *a) {
     put_hex16(hud_top + 24, SEAMDEMO_ACT2_NODES, 4);
 
     if (a->mode == MODE_VERDICT) {
-      put_str(hud_bot, "ACT1 OK  ACT2 CRC=$");
-      put_hex16(hud_bot + 19, a->gr.crc, 4);
-      put_str(hud_bot + 24, a->pass ? "  OK" : " BAD");
+      // The verdict strip: both folds so far plus the cumulative one. Act 3's
+      // column fills in from the previous cycle, so after one full loop the strip
+      // carries all three.
+      put_str(hud_bot, "1:");
+      put_hex16(hud_bot + 2, a->vm.crc, 4);
+      put_str(hud_bot + 7, "2:");
+      put_hex16(hud_bot + 9, a->gr.crc, 4);
+      put_str(hud_bot + 14, "3:");
+      put_hex16(hud_bot + 16, act3_crc, 4);
+      put_str(hud_bot + 21, "SUM:");
+      put_hex16(hud_bot + 25, corpus_result, 4);
     } else {
       put_str(hud_bot, "EDGE=$");
       put_hex16(hud_bot + 6, a->gr.edges, 4);
@@ -281,13 +321,146 @@ static void hud_build(App *a) {
   text_puts(&a->text, 1, 0, hud_bot);
 }
 
+// ---------------------------------------------------------------- mode 7
+// The atlas texel is (terrain << 4) | (pattern & 0x0F): the high nibble is smooth
+// terrain, the low nibble the discriminating file-offset hash. So the palette
+// ramps on the high nibble and dithers slightly on the low one -- the picture
+// reads as terrain, and every texel still carries its decode probe.
+static uint16_t m7_pal[256];
+
+static void m7_build_palette(void) {
+  for (uint16_t i = 0; i < 256u; i++) {
+    uint8_t band = (uint8_t)(i >> 4);        // 0..15 terrain height
+    uint8_t dith = (uint8_t)(i & 0x0Fu);     // 0..15 hash dither
+    uint8_t r, g, b;
+    if (band < 5u) {                          // water
+      r = 0u; g = (uint8_t)(4u + band); b = (uint8_t)(14u + band * 2u);
+    } else if (band < 11u) {                  // land
+      r = (uint8_t)(4u + band); g = (uint8_t)(10u + band); b = (uint8_t)(4u + band / 2u);
+    } else {                                  // rock -> snow
+      r = (uint8_t)(12u + band); g = (uint8_t)(12u + band); b = (uint8_t)(12u + band);
+    }
+    uint8_t d = (uint8_t)(dith >> 2);         // +0..3, a gentle dither
+    r = (uint8_t)((r + d) & 31u); g = (uint8_t)((g + d) & 31u); b = (uint8_t)((b + d) & 31u);
+    m7_pal[i] = SNES_RGB(r, g, b);
+  }
+}
+
+// The 128x128 Mode 7 tile grid is tiled with the 64 tiles of the current page, so
+// the camera flies over a repeating field of whatever page it is on. Written once
+// per act, under force-blank.
+static void m7_build_tilemap(uint8_t *scratch) {
+  for (uint8_t ty = 0; ty < 8u; ty++)
+    for (uint16_t tx = 0; tx < 128u; tx++)
+      scratch[(uint16_t)ty * 128u + tx] = (uint8_t)(ty * 8u + (tx & 7u));
+  for (uint8_t row = 0; row < 128u; row++) {
+    REG_VMAIN = VMAIN_INC_LOW_1;
+    REG_VMADD = (uint16_t)((uint16_t)row * 128u);
+    REG_DMAP0 = 0x00;                       // A->B, incrementing source
+    REG_BBAD0 = 0x18;                       // $2118 VMDATAL (low bytes = tilemap)
+    uint16_t src = (uint16_t)(uintptr_t)&scratch[(uint16_t)(row & 7u) * 128u];
+    REG_A1T0L = (uint8_t)src; REG_A1T0H = (uint8_t)(src >> 8); REG_A1B0 = 0x00;
+    REG_DAS0L = 128u; REG_DAS0H = 0u;
+    REG_MDMAEN = 0x01;
+  }
+}
+
+// Push one tile-row (8 tiles) of the pending page into Mode 7 character data.
+// MUST be called inside v-blank. 64 DMAs of 8 bytes; see the note above.
+static void m7_push_tile_row(uint16_t slot, uint8_t ty) {
+  unsigned long base = far_of((unsigned long)slot * (unsigned long)SEAMDEMO_SLOT)
+                       + (unsigned long)SEAMDEMO_DATA_OFF;
+  uint8_t bank = (uint8_t)(base >> 16);
+  for (uint8_t tx = 0; tx < 8u; tx++) {
+    uint16_t tile = (uint16_t)((uint16_t)ty * 8u + tx);
+    for (uint8_t row = 0; row < 8u; row++) {
+      REG_VMAIN = VMAIN_INC_HIGH_1;
+      REG_VMADD = (uint16_t)(tile * 64u + (uint16_t)row * 8u);
+      REG_DMAP0 = 0x00;
+      REG_BBAD0 = 0x19;                     // $2119 VMDATAH (high bytes = char data)
+      unsigned long src = base + (unsigned long)((uint16_t)ty * 8u + row) * 64u
+                          + (unsigned long)tx * 8u;
+      REG_A1T0L = (uint8_t)src; REG_A1T0H = (uint8_t)(src >> 8); REG_A1B0 = bank;
+      REG_DAS0L = 8u; REG_DAS0H = 0u;
+      REG_MDMAEN = 0x01;
+    }
+  }
+}
+
+// 3040 samples at 2 per frame is ~1,520 frames = ~25 s, and it leaves the camera
+// 8 frames on each page -- exactly the 8 tile-rows a page upload is split into.
+#define ACT3_SAMPLES_PER_FRAME 2
+#define ACT3_SPIN 1
+
+// Act 3 takes the screen over: Mode 7 needs BG1 and the whole of VRAM
+// $0000-$3FFF interleaved, which is where the BG3 canvas lives. It runs its own
+// frame loop (the m7splash precedent) and returns force-blanked; the caller
+// rebuilds the BG3 world with app_init() for the next cycle.
+static void act3_run(App *a) {
+  REG_NMITIMEN = 0u;                        // no NMI during the bulk VRAM writes
+  REG_HDMAEN = 0u;
+  REG_INIDISP = INIDISP_FORCE_BLANK;
+
+  m7_build_palette();
+  // The canvas chr buffer is 4 KiB of WRAM that Act 3 does not otherwise use, and
+  // app_init() re-initialises it for the next cycle -- so it is the tilemap
+  // scratch rather than a second 4 KiB static.
+  m7_build_tilemap(a->canvas.chr);
+
+  REG_CGADD = 0u;
+  for (uint16_t i = 0; i < 256u; i++) {
+    REG_CGDATA = (uint8_t)m7_pal[i];
+    REG_CGDATA = (uint8_t)(m7_pal[i] >> 8);
+  }
+
+  m7_begin();                               // BGMODE 7, BG1 only, wrap
+  m7_set_center(128u, 112u);
+  m7_set_scroll(0u, 0u);
+  m7_set_matrix((int16_t)0x100, 0, 0, (int16_t)0x100);
+  REG_NMITIMEN = NMITIMEN_NMI | NMITIMEN_AUTOJOY;
+
+  // Idle BEFORE init: seamatlas_init fires SEAMATLAS_PAGE itself if slot 0 is
+  // reserved, and setting this afterwards would drop that first page's upload.
+  // (Not reachable with the current skip list of {129, 130}, but the ordering
+  // should not depend on that.)
+  m7_page_row = 8u;
+  seamatlas_init(&a->at);
+
+  uint8_t angle = 0u;
+  uint16_t drift = 0u;
+  while (!a->at.done) {
+    for (uint8_t n = 0; n < ACT3_SAMPLES_PER_FRAME && !a->at.done; n++)
+      seamatlas_step(&a->at, a);
+
+    angle = (uint8_t)(angle + ACT3_SPIN);
+    drift = (uint16_t)(drift + 3u);
+    int16_t co = SINCOS[(uint8_t)(angle + 64u)];
+    int16_t si = SINCOS[angle];
+
+    (void)REG_RDNMI;
+    snes_wait_vblank();
+    // v-blank only: the transform first, then at most one tile-row of the page.
+    m7_set_matrix(co, (int16_t)-si, si, co);
+    m7_set_scroll(drift, (uint16_t)(drift >> 1));
+    if (m7_page_row < 8u) {
+      m7_push_tile_row(m7_page_slot, m7_page_row);
+      m7_page_row++;
+    }
+    REG_INIDISP = INIDISP_ON;
+  }
+
+  REG_INIDISP = INIDISP_FORCE_BLANK;
+  REG_NMITIMEN = 0u;
+}
+
 static void app_init(App *a) {
   display_init(&a->screen);
   canvas_init(&a->canvas, CANVAS_CHR, CANVAS_MAP, BOX_COL, BOX_ROW);
   text_init(&a->text, CANVAS_MAP, HUD_TOP_ROW, HUD_BOT_ROW);
   display_add(&a->screen, (Drawable *)&a->canvas);
   display_add(&a->screen, (Drawable *)&a->text);
-  upq_push_cgram(&a->screen.q, 0, PAL_RUN, 0x00, (uint8_t)sizeof PAL_RUN);
+  upq_push_cgram(&a->screen.q, 0, a->cycle_ok ? PAL_RUN_OK : PAL_RUN, 0x00,
+                 (uint8_t)sizeof PAL_RUN);
 }
 
 // Lift the generated file->CPU table into the three numbers far_of() uses, and
@@ -366,6 +539,8 @@ int main(void) {
   a.gr.status = 0;
   a.act = 1;
   a.tick = 0;
+  a.cycle_ok = 0;
+  a.at.status = 0;
   a.mode = MODE_RUN;
   a.pause = 0;
   a.laps = 0;
@@ -388,18 +563,46 @@ int main(void) {
             seamgraph_init(&a.gr);
             upq_push_cgram(&a.screen.q, 0, PAL_WEB, 0x00, (uint8_t)sizeof PAL_WEB);
           } else {
-            // Full cycle done: back to Act 1. Both folds are recomputed
-            // identically every lap, so the latched WRAM verdicts never move.
+            // Act 2's verdict is up; run Act 3, then start the next cycle.
+            // act3_run() takes the screen over (Mode 7 needs the VRAM the BG3
+            // canvas occupies) and returns force-blanked.
+            act3_run(&a);
+            uint16_t h3 = seamatlas_final_crc(&a.at);
+            if (h3 != SEAMDEMO_ACT3_CRC) a.at.status |= SEAMATLAS_ST_CRC;
+            if (a.at.samples != SEAMDEMO_ACT3_SAMPLES) a.at.status |= SEAMATLAS_ST_PAGES;
+            act3_crc = h3;
+            act3_status = a.at.status;
+            act3_pages = a.at.pages;
+
+            // The full three-act fold. This is the value the plan says latches
+            // after one complete cycle, and it is recomputed identically on every
+            // later cycle, so it never moves once correct.
+            corpus_result = seamvm_fold(
+                seamvm_fold(seamvm_fold(seamvm_fold(seamvm_fold(seamvm_fold(0,
+                    (uint8_t)(act1_crc & 0xFFu)), (uint8_t)(act1_crc >> 8)),
+                    (uint8_t)(act2_crc & 0xFFu)), (uint8_t)(act2_crc >> 8)),
+                    (uint8_t)(h3 & 0xFFu)), (uint8_t)(h3 >> 8));
+
+            uint16_t cyc = (uint16_t)(a.vm.status | a.gr.status | a.at.status);
+            if (corpus_result != SEAMDEMO_CORPUS_RESULT) cyc |= 0x8000u;
+            cycle_status = cyc;
+            a.cycle_ok = (uint8_t)(cyc == 0u);
+            cycles = (uint16_t)(cycles + 1u);
+
+            // Rebuild the BG3 world Act 3 overwrote. display_init() re-asserts
+            // force-blank and resets the VRAM allocator, so the re-reserve is
+            // legal again and the first display_frame below releases the blank.
+            app_init(&a);
             a.act = 1;
             a.laps = (uint16_t)(a.laps + 1u);
             act1_laps = a.laps;
             uint16_t keep = a.vm.status;
             seamvm_init(&a.vm);
             a.vm.status = keep;
-            upq_push_cgram(&a.screen.q, 0, PAL_RUN, 0x00, (uint8_t)sizeof PAL_RUN);
           }
         } else {
-          upq_push_cgram(&a.screen.q, 0, PAL_RUN, 0x00, (uint8_t)sizeof PAL_RUN);
+          upq_push_cgram(&a.screen.q, 0, a.cycle_ok ? PAL_RUN_OK : PAL_RUN, 0x00,
+                         (uint8_t)sizeof PAL_RUN);
         }
         a.mode = MODE_RUN;
       }
@@ -467,7 +670,7 @@ int main(void) {
     hud_build(&a);
 #endif
     act1_ops = a.vm.ops;
-    act1_frames = (uint16_t)(act1_frames + 1u);
+    demo_frames = (uint16_t)(demo_frames + 1u);
     display_frame(&a.screen);
   }
   return 0;
