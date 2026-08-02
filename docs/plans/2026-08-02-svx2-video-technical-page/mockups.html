@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>SVX2 video technical page mockups</title>
+<style>
+:root{color-scheme:dark;--bg:#17191c;--panel:#22262b;--line:#444b53;--gold:#e2ad36;--cyan:#7fd6ef;--muted:#9ca5ae}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#ececec;font:15px/1.5 system-ui;padding:28px}
+h1{font-size:26px;margin:0 0 8px}h2{font-size:18px;color:var(--gold);letter-spacing:.06em}p{max-width:76ch}.note{color:var(--muted)}
+.mockups{display:grid;grid-template-columns:minmax(600px,900px) 390px;gap:26px;align-items:start}.page{background:#111315;border:1px solid var(--line);border-radius:14px;padding:24px;overflow:hidden}
+.phone{padding:14px}.hero{font-size:28px;font-weight:750}.lede{color:#bbb}.player{aspect-ratio:256/224;background:linear-gradient(145deg,#030609,#17354b 40%,#c97536);display:grid;place-items:center;color:#fff;border:1px solid #555}.dashboard{width:100%;align-self:end;background:#050505;padding:8px;font:12px monospace}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}.stat b{display:block;color:var(--cyan);font-size:17px}
+.flow{display:flex;align-items:stretch;gap:7px}.stage{flex:1;background:#17232a;border:1px solid #3f7180;border-radius:7px;padding:10px;text-align:center}.arrow{display:grid;place-items:center;color:var(--gold);font-size:20px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}caption{text-align:left;color:var(--muted);padding-bottom:7px}th,td{padding:7px;border-bottom:1px solid #3d4248;text-align:right}th:first-child,td:first-child{text-align:left}.win{color:var(--cyan);font-weight:bold}
+.budget{margin:12px 0}.bar{height:14px;background:#343a40;border-radius:7px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#3da3c3,#e1ac37);width:94%}.phone .stats{grid-template-columns:1fr 1fr}.phone .flow{display:grid}.phone .arrow{transform:rotate(90deg)}.phone .tablewrap{overflow:auto}.phone .hero{font-size:22px}.phone h2{margin-top:24px}
+@media(max-width:1100px){.mockups{grid-template-columns:1fr}.phone{max-width:390px}}
+</style></head><body>
+<h1>SVX2 technical case-study mockups</h1><p class="note">Desktop keeps the emulator dominant; phone stacks the same evidence without hover-only detail.</p>
+<div class="mockups">
+<main class="page"><div class="hero">SVX2 60 FPS FastROM Video</div><p class="lede">Two Artemis videos, decoded and presented by a stock SNES cartridge.</p>
+<div class="player">LIVE SNES EMULATOR<div class="dashboard">NASA SVS / LAUNCH &nbsp; PLAY<br>TIME 00:07 &nbsp;&nbsp;&nbsp; FPS 59.9</div></div>
+<section class="stats"><div class="stat"><b>3,819 / 3,819</b>presentations</div><div class="stat"><b>0 / 0</b>slips / errors</div><div class="stat"><b>4,480 B</b>per frame</div><div class="stat"><b>4 MiB</b>Fast HiROM</div></section>
+<h2>HOW ONE FRAME MOVES</h2><div class="flow"><div class="stage">FastROM<br>packet</div><div class="arrow">→</div><div class="stage">$7F WRAM<br>stage</div><div class="arrow">→</div><div class="stage">SVX2<br>in-place decode</div><div class="arrow">→</div><div class="stage">VBlank DMA<br>Mode 7 VRAM</div></div>
+<h2>WHY SVX2?</h2><div class="tablewrap"><table><caption>Real-camera/Floyd corpus and target decoder</caption><tr><th>Path</th><th>Ratio</th><th>Measured rate</th></tr><tr><td>Raw copy</td><td>101.83%</td><td>87.6 fps</td></tr><tr><td>LZSS</td><td>55.62%</td><td>2.1–2.3 fps</td></tr><tr><td>SVX1</td><td>52.50%</td><td>15.6–34.3 fps</td></tr><tr class="win"><td>SVX2</td><td>57.04%</td><td>60.8–69.4 fps</td></tr></table></div>
+<h2>FULL-PIPELINE BUDGET</h2><p>p99 combined: <b>89,088</b> of <b>89,342</b> NTSC PPU dots</p><div class="budget"><div class="bar"><div class="fill"></div></div></div><p class="note">Sequential playback keeps slow independent keyframes in the seek table, outside the real-time stream.</p>
+</main>
+<aside class="page phone"><div class="hero">SVX2 60 FPS Video</div><p class="lede">A playable SNES proof, then the measurements.</p><div class="player">LIVE PLAYER</div>
+<section class="stats"><div class="stat"><b>3,819</b>of 3,819</div><div class="stat"><b>0</b>slips</div><div class="stat"><b>80×56</b>video</div><div class="stat"><b>4 MiB</b>ROM</div></section>
+<h2>HOW ONE FRAME MOVES</h2><div class="flow"><div class="stage">FastROM packet</div><div class="arrow">→</div><div class="stage">WRAM stage</div><div class="arrow">→</div><div class="stage">SVX2 decode</div><div class="arrow">→</div><div class="stage">VBlank DMA</div></div>
+<h2>WHY SVX2?</h2><div class="tablewrap"><table><tr><th>Path</th><th>Ratio</th><th>Rate</th></tr><tr><td>LZSS</td><td>55.62%</td><td>2.3</td></tr><tr class="win"><td>SVX2</td><td>57.04%</td><td>60.8+</td></tr></table></div><p class="note">Swipe table for all codec rows →</p>
+</aside></div></body></html>
