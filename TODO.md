@@ -31,22 +31,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
-- [wip T3] **Apollo 11 daylight-launch video cartridge — the codec's hardest realistic input.**
-  <!-- agent:a4872524aaacffb25 --> Turns the 2026-08-01 hard-content stressor measurement into a
-  running ROM: 300 frames of 16 mm KSC tracking-camera film (daylight, heavy grain, bright
-  exhaust) through the existing SVX2 decoder, versus the published reel's night-launch Artemis
-  footage. Costs measured already: **+5.3 ratio points Floyd (57.0→62.3%), +19.8 Bayer
-  (33.5→53.3%)**. The point is the cadence table — presented frames per 600 VBlanks, slow AND
-  FastROM, next to the Artemis figures — since this is where a throughput regression surfaces
-  first; a worse number is a finding to record, not to hide. Corpus + packed streams already
-  exist and are provenance-recorded; sibling ROM to `snes-video-reel.c`, which is NOT to be
-  edited. Gate: whole-loop byte-correct decode + negative control, entropy fingerprint,
-  `-verify` clean. Open questions the implementer must answer with numbers: capacity/mapping
-  (may want the now-landed ExHiROM path), keyframe cost vs the decided Option A K=120, and
-  whether the asset emitter extends cleanly. [plan](docs/plans/2026-08-02-apollo-daylight-video-rom.md)
-  (T3: settled pattern — the reel is the template, the corpus is measured, the decoder is done.)
-
-
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
   (2026-08-01); only the player-package release is left, and it is USER-GATED.**
   <!-- agent:a5850a8d3df7af344 -->
@@ -899,6 +883,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-02 — [apollo-video-rom] Apollo 11 daylight cartridge LIVE at [/snes/apollo-daylight/](https://biohack.net/snes/apollo-daylight/) (llvm `c1a667f`+`8d4261a`+`70ad999`; site `ad87374`/`0a4f2da`/`c75b0e2`, tags v1.0.357/358/361, CI green, live sha `35fc0807…` == gate-built). **Cadence held: 300/600 VBlanks, ZERO slips on slow ROM AND FastROM** — the hard content costs bytes (SVX2 79.62% of raw vs Artemis 57.04%), not frames. Mapping: ordinary 2 MiB Fast HiROM, 17 of 63 banks — no ExHiROM needed. Keyframe policy K=120 stands (K=15→120 spans only 3,233 B), though the ordering INVERTS vs the first cut: on genuinely moving content a delta packet costs about as much as a keyframe. Emitter extended in place (3 opt-in flags, byte-identical output proven on old input). **Two defects shipped then fixed:** (1) 37 s of black — validation ran force-blanked before the title, and EVERY gate passed because all sampled VBlank 3000+; regression guard added (render at VBlank 180, fail if ≥98% black); (2) boring clip — first interval was a tracking shot with 3–4× less motion than any other corpus (0.93 vs 2.88–3.93 mean|Δ|); recut to the colour ignition/ascent segment, cropped + 2× speed, motion 23.69→50.81 on the running ROM. **Finding worth keeping:** on this content intraframe LZSS beats interframe SVX2 by 14.31 points (up from 2.67) — the codec decision is unaffected (speed-anchored, LZSS ~27× too slow) but that is where delta coding stops paying. See [plan](docs/plans/2026-08-02-apollo-daylight-video-rom.md).
 - [x] 2026-08-02 — [cartcanary-matrix] Deferred ordinary-ROM canary matrix GENERATED + GATED GREEN: 11 new rows (LoROM 512K/1M/3M/4M slow+fast, HiROM 512K/2M/3M fast) all PASS `dev/run.sh cartsize-canary` (host tests, structural inspect, `-verify-machineinstrs`, bsnes-jg oracle + entropy fingerprint); 3 milestone rows re-verified unchanged. Two real generator bugs found+fixed exercising new sizes for the first time: `sites()`'s span-fit check had no bounds check (crashed on <4 MiB images), and `mirror_probes()` used the HiROM mirror pair for LoROM too (wrong for a compound 3+ MiB device — caught by the generator's own internal assertion before any ROM was built). Model extensions: SRAM aperture (`RAM_BOARDS_BML`/`ram_decode`/`ram_windows`/`ram_header_byte`, ported from bsnes-jg's plain `*-RAM` boards, 69→ host tests, collision-checked against ROM decode) and PAL region byte (`REGION_BYTE`/`video_standard_from_region_byte`, ported `videoRegion()` classifier) in `tools/snes_cartmap.py`; `--ram`/`--battery`/`--region` in `tools/snes-checksum.py`. Legacy-vs-expanded-header and 5 new invalid/truncated/ambiguous negative fixtures added. A real regression (unconditional RAM-size/cart-type default-write clobbering a pre-set coprocessor test fixture) caught by its own new regression-guard test before shipping. Host suite 58+27+28 → 69+44+28 tests. `dev/run.sh` gained `JG_FRAMES`/`CANARY_ONLY` docker-env passthrough (pre-existing gap). See [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Deferred matrix — results.
 - [x] 2026-08-02 — [wai-residual] NO-OP close: the 18 files the `903de3e` sweep skipped as dirty turn out to have **no bare idle loops at all** — comment-aware scan finds 0 empty/comment-only infinite loops; each file's single `for (;;)` is its live frame loop with a real body (`recompute_row`/`field_band`/`display_frame`), i.e. the already-safe class, not removable under C11 forward progress. The sweep skipped them for dirtiness without classifying them; nothing was owed. (Files are clean since `d93499a`.)
 - [x] 2026-08-02 — [138-producer] Vanished `$rl1 = LDImm` producer ROOT-CAUSED + standing gate added (`c95ca7b`). Cause: another worker's `0018-320-imag32-spill` (created 07-27 16:58 — after the crashing 07-26 build, before the clean 07-31 one; its stated failure mode "one byte through a GPR → illegal GPR-to-Imag32 COPY" is exactly the observed malformation, and `unpack_slide` is the far-pointer spiller). Counterfactual rebuild not run — evidence is temporal + shape, strong not airtight. Gate: `dev/lzss-gallery.sh` now asserts every LDImm destination is a GPR (1,043 found, 0 non-GPR); uses `-fno-lto` because the LTO link defers codegen — the first draft passed VACUOUSLY on an empty dump, which the gate now fails loudly on. Needed because 0003's guard skips a returning producer silently instead of crashing.
