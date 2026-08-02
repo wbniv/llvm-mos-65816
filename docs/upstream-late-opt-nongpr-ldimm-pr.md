@@ -1,13 +1,20 @@
-# [MOS] Fix null-pointer crash in mos-late-opt on an LDImm with a non-GPR destination (SPC700)
+# [MOS] Fix null-pointer crash in `mos-late-opt` on an `LDImm` with a non-GPR destination (SPC700)
 
-<!-- POSTED 2026-07-31 as https://github.com/llvm-mos/llvm-mos/pull/584 (from the 138 LZSS-gallery
-     far-decode investigation; see docs/plans/2026-07-27-138-lzss-far-decode-mos-late-optimization-crash.md
-     and docs/plans/2026-07-31-138-guard-hardening-followup.md for provenance).
-     UPDATED 2026-07-31 (critique-improvements pass, see
-     docs/plans/2026-07-31-upstream-pr-critique-improvements.md): body below is the as-posted v2
-     text — Fix section shows the shipped defensive-invalidation guard (branch commit 7eedb14),
-     sibling TA-handler hardening added, null-store crash claim softened to "in practice".
-     Branch wbniv:mos-late-opt-nongpr-ldimm (v1 ae5c399e, defensive guard 7eedb14a).
+<!-- NOT POSTED. Ready-to-post artifact; posting is user-triggered.
+     Body below minus the H1 and this comment is the as-posted text.
+     Staging record: red/green proven — RED = SIGSEGV on the unfixed
+     build/upstream-llc (pristine tip) AND on the fork toolchain; GREEN = llvm-lit
+     PASS after the fix + rebuild.
+     Branch mos-late-opt-nongpr-ldimm to mint from the current upstream tip.
+     Post commands (title = the H1 above; body = this doc minus the H1 and this comment):
+       git -C vendor/llvm-mos push https://github.com/wbniv/llvm-mos.git mos-late-opt-nongpr-ldimm
+       gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-late-opt-nongpr-ldimm --base main \
+         --title "[MOS] Fix null-pointer crash in mos-late-opt on an LDImm with a non-GPR destination (SPC700)" \
+         --body-file <(sed '2,/^-->$/d; 1d' docs/upstream-late-opt-nongpr-ldimm-pr.md)
+     After posting: (1) flip item 15 in docs/upstream-contribution-status.md to posted with the
+     PR number; (2) refresh wald3n.com's public contributions snapshot — in ~/wald3n.com run
+     `task open-source:refresh` (auto-discovers the new PR), then commit/deploy per that repo's
+     flow; its refresh:check gate fails on a stale snapshot otherwise.
 -->
 
 ## Summary
@@ -77,9 +84,18 @@ clang: error: clang frontend command failed due to signal
 ```
 
 Crashes at `-O1`, `-O2`, `-Os` and `-Oz`; clean at `-O0`, where nothing is
-allocated to an imaginary register. Eight simultaneously-live bytes is the
-smallest count that reliably pushes one of the constants out of `A`/`X`/`Y`;
-with four it stays in the GPRs and does not crash.
+allocated to an imaginary register. The eight live bytes are headroom rather
+than a threshold — sweeping the same shape with fewer locals:
+
+| simultaneously-live bytes | `-O1` | `-O2` | `-Os` | `-Oz` |
+|---|---|---|---|---|
+| 2 | ok | ok | ok | crash |
+| 3–8 | crash | crash | crash | crash |
+
+(Sweep method: MIR captured from the unmodified compiler with
+`-mllvm -stop-before=mos-late-opt`, replayed through an
+`llc -run-pass=mos-late-opt` built without this fix; every "crash" is the
+same null store in `combineLdImm`.)
 
 Reduced to MIR, the whole trigger is one instruction:
 
