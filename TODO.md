@@ -99,7 +99,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   command substitution (seamdemo's gate has the fix; the canary's copy survives only by luck).
   Re-run the full canary gate and record whether 6b still passes non-vacuously. (T2: known
   recipe, one gate run + a two-line script fix.)
-- [T2] **ROM-map visualization for the cartsize/seamdemo pages** — the one deliverable of the
+- [wip T2] **ROM-map visualization for the cartsize/seamdemo pages** — <!-- agent:a398d4033e75f7b9e --> the one deliverable of the
   original extended-mapping umbrella item not shipped by the `d0d6b39` merge (everything else —
   mapping, linker layout, decoder model, header/size fields, vectors, far addressing, checksum
   gate, emulator coverage — is Done; see the exhirom-merged Done entry). Render the decode map
