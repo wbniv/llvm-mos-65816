@@ -105,3 +105,42 @@ register-coalescer copy-hint cause (`vreg = COPY $rcN` folded into a pair across
 clobbering call) is fixed separately in `MOSRegisterInfo::shouldCoalesce` — see
 [`upstream-coalesce-rc-undef-pr.md`](upstream-coalesce-rc-undef-pr.md). That fix
 does **not** address this one (there is no `$rcN` copy hint here to refuse).
+
+---
+
+## Second manifestation (2026-08-02): the undef lane feeds a *store*, not a dead read
+
+The original report characterises the surviving read as **dead** (`$x = COPY $rcN` with `$x`
+immediately overwritten), which supports the "code-correct, verifier-only" framing. A second
+instance found in `examples/snes/seqvm.c` (`draw_frame`, `+mos-a16`, `-O1/-O2/-Os`, clean at
+`-O0`/`-Oz`) has the same cause but a live consumer:
+
+```
+; pre-rewriter (virtual)
+464B  %91:imag16  = STAImag16 %306:ac16
+480B  undef %371.sublo:imag16 = COPY %91.subhi:imag16     ; high lane never defined
+712B  undef %375.sublo:imag16 = COPY %371.sublo:imag16    ; ditto, propagated
+716B  %376:imag16 = COPY %375:imag16
+724B  %377:gpr = COPY %376.sublo:imag16
+728B  STAbs %377:gpr, %stack.2
+736B  %378:gpr = COPY %376.subhi:imag16                   ; reads the undefined lane
+740B  STAbs %378:gpr, %stack.2 + 1                        ; ... and STORES it
+
+; after Virtual Register Rewriter
+480B  renamable $rc4 = COPY killed renamable $rc3
+736B  renamable $x = COPY killed renamable $rc3           ; *** Using an undefined physical register
+```
+
+Notes that may help whoever fixes this:
+
+- The `killed` flag at 480B is **correct** — that vreg's use genuinely ends there. The later
+  physical read belongs to a different vreg whose high lane is undef by construction; RA
+  assigned both to `$rc3`. Diagnosing this from the post-RA MIR alone invites a
+  "premature kill flag" misreading (we made exactly that mistake first).
+- The high-lane copy of `%376 = COPY %375` is elided during rewriting because the source lane
+  is undef; the `undef` flag is not transferred to the surviving physical *read*, which is what
+  the verifier then rejects.
+- Enabling sub-register liveness (`-mllvm -enable-subreg-liveness`) does **not** suppress it.
+- Still code-correct: the compiler itself declared the lane a don't-care, and the demo's
+  differential gate passes (`dev/run.sh seqvm` → `0xE8C5`). The store simply writes a
+  don't-care byte to a stack slot whose high half is never read.

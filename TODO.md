@@ -90,17 +90,27 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
-- [T4] **Backend: premature kill flag on `$rc3` — `seqvm.c draw_frame` reads a killed
-  imaginary sub-register ~250 slots later.** Found by the PH-$p fix agent while correcting that
-  item's misattribution (seqvm never reproduced PH $p — it trips THIS instead). After the
-  Virtual Register Rewriter at `-O1/-O2/-Os` `+mos-a16` (clean `-O0`/`-Oz`): `$rs1`
-  (=`$rc2`:`$rc3`) defined by `STAImag16`; `$rc3` KILLED by `renamable $rc4 = COPY killed
-  renamable $rc3`; read ~250 slots later to store the pair's high byte. A wrong kill licenses a
-  later pass to clobber the byte — genuine miscompile potential, unknown root cause. Repro:
-  `mos-clang --config mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16
-  -Os -fno-lto -mllvm -verify-machineinstrs -c examples/snes/seqvm.c`. Possibly related to the
-  item-13 rc-undef-ra-pure-virtual family — establish that before fixing. (T4:
-  unknown-root-cause backend debugging with miscompile reach.)
+- [T3] **Backend: `rc-undef` cause #2 (item 13) — SECOND MANIFESTATION found + MISDIAGNOSIS
+  corrected (2026-08-02).** The `seqvm.c draw_frame` trip is NOT a premature kill flag (that
+  was the initial read of the physical MIR, filed as T4). Vreg-level MIR settles it: the value
+  is built with the `undef %N.sublo:imag16 = COPY …` idiom, so its HIGH lane is undefined **by
+  construction** — `480B undef %371.sublo = COPY %91.subhi` → `712B undef %375.sublo = COPY
+  %371.sublo` → `716B %376 = COPY %375` → `736B %378 = COPY %376.subhi` reads a lane nothing
+  ever defined. The `$rc3` kill at 480B is legitimate (that vreg's use really ends there); the
+  later physical `$rc3` read is a *different* vreg's undef lane that RA put in the same
+  register, and the `undef` flag is lost when the pair COPY's high-lane copy is elided during
+  rewriting. **So: same family as status-doc item 13** (rc-undef-ra-pure-virtual), but a new
+  consequence — item 13's read is DEAD, this one FEEDS A STORE (`STAbs %378, %stack.2+1`).
+  **Code-correct** (the compiler itself declared the lane a don't-care, and `dev/run.sh seqvm`
+  passes `0xE8C5`), so verifier-noise, not miscompile — the T4 "miscompile potential" framing
+  is withdrawn. Ruled out: sub-register liveness (`-mllvm -enable-subreg-liveness` leaves both
+  errors). Fix direction unchanged from item 13: propagate `undef` onto the physreg read (or
+  materialize the lane) — toolchain-wide, needs the full regression sweep, hence still filed
+  rather than patched. Repro: `mos-clang --config mos-snes.cfg -mcpu=mosw65816 -Xclang
+  -target-feature -Xclang +mos-a16 -Os -fno-lto -mllvm -verify-machineinstrs -c
+  examples/snes/seqvm.c` (2 errors: `$rc3` bb.2, `$rc5` bb.5; clean at `-O0`/`-Oz`).
+  (T3: analysis complete and recorded; remaining work is folding this evidence into the
+  item-13 upstream issue and, separately, deciding whether to attempt the toolchain-wide fix.)
 - [T3] **#138 loose end — the vanished `$rl1 = LDImm` Imag32 producer + a standing non-GPR-`LDImm`
   scan.** The gallery only hit the `combineLdImm` null store because the 2026-07-26 toolchain
   emitted `$rl1 = LDImm -1`/`0` (Imag32 dest — malformed MIR on 65816) in `@unpack_slide`; that
