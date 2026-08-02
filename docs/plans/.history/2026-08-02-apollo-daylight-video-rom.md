@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/c1a667f) | feat(snes): add the Apollo 11 daylight-launch video cartridge |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/c9d81f3) | docs: consolidate the compiler defects the demo battery has exposed; record Apollo ROM progress |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8828247) | plan+todo: Apollo 11 daylight video cartridge — turn the hard-content stressor into a ROM (wip T3) |
 
 <!--history-meta v1
+c1a667f	author	Will Norris
+c1a667f	added	137
+c1a667f	deleted	0
+c1a667f	files	1
+c1a667f	body	The SVX2 codec's hardest realistic input, built to be measured. Where the\npublished reel plays Artemis I -- a night launch whose mostly-black frames an\nH.264 derivative had already smoothed -- this is 16 mm KSC tracking-camera film:\ndaylight, heavy grain, bright continuous exhaust against sky. Measured cost of\nthat hardness is +5.29 ratio points under Floyd (57.04% -> 62.33%).\n\nA sibling of snes-video-reel.c, not a modification of it; those files are\nuntouched. Deliverables:\n\n  examples/snes/apollo-reel.c       300-frame looping cartridge\n  examples/snes/apollo-reel-fast.s  FastROM trampoline + VBlank counter\n  dev/apollo-reel.sh                the gate\n\nHeadline measurement: no throughput regression. Both the slow-ROM and FastROM\nbuilds present exactly 300 frames per 600 VBlanks -- a locked 30 fps -- with\nzero deadline slips. The hard-content cost lands as cartridge bytes, not as\ndropped frames, because a larger packet still stages and decodes inside the\n2-VBlank budget.\n\nCorrectness is gated hard, throughput only reported. Before a pixel is shown the\nROM decodes all 300 frames force-blanked, Fletcher-checks each against the host\nencoder's oracle, compares the final frame byte for byte, then decodes the\nwrap-around delta and re-checks frame 0 -- a frame-zero-only check would pass on\na decoder that corrupted every delta. The gate carries a negative control:\nflipping one stream byte makes it fail.\n\nCapacity: 848,527 B of stream in an 8 Mbit HiROM cartridge, so no ExHiROM path\nis needed. Keyframe cost is unchanged from the reel (2,822 vs 2,793 B), so the\ndecided Option A K=120 policy stands.\n\nThe four PPU access sites this adds are registered in the display-quality\nbaseline: a force-blank before a wai halt, the VBlank-gated frame DMA, and the\nblank-tile and palette uploads done during force-blanked setup. All mirror the\nreel's already-reviewed sites.\n\nThe emitter extension this depends on (--frame-checks,\n--dashboard-palette-fixup, --palette-output on tools/snes-video-reel-assets.py)\nlanded separately in 81364d7; it is behaviour-preserving, proven by an\nold-vs-new run producing a byte-identical header and stream.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 c9d81f3	author	Will Norris
 c9d81f3	added	20
 c9d81f3	deleted	1

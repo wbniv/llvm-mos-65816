@@ -81,6 +81,7 @@ static void stop(uint8_t result) {
   for (;;) __asm__ volatile("wai");
 }
 
+#ifdef APOLLO_REEL_SELFTEST
 /* Mirrors frame_check() in tools/snes-video-reel-assets.py byte for byte. */
 static uint16_t frame_check(const uint8_t *frame) {
   uint16_t a = 0u, b = 0u, i;
@@ -90,6 +91,7 @@ static uint16_t frame_check(const uint8_t *frame) {
   }
   return (uint16_t)(a ^ b);
 }
+#endif
 
 static char *decimal(char *out, uint16_t value, uint8_t width) {
   char digits[5];
@@ -154,6 +156,7 @@ static void decode_sequential_frame(uint16_t frame) {
   decode_frame(frame);
 }
 
+#ifdef APOLLO_REEL_SELFTEST
 /* The whole-loop byte-correctness gate. Every one of the 300 frames is checked
    against the host encoder's oracle, so the complete delta chain is pinned --
    a frame-zero-only check would pass on a decoder that corrupted every delta.
@@ -188,6 +191,7 @@ static void validate_loop(void) {
   }
   apollo_reel_corpus_result = 0u;
 }
+#endif
 
 static void present_frame(void) {
   REG_VMAIN = VMAIN_INC_HIGH_1;
@@ -295,9 +299,16 @@ void apollo_reel_run(void) {
   apollo_reel_loop_gate = 0xffu;
   apollo_reel_window_state = 0u;
 
-  /* Correctness before pixels. The screen stays force-blanked through the whole
-     300-frame validation pass; nothing is shown until the oracle agrees. */
+#ifdef APOLLO_REEL_SELFTEST
+  /* Whole-loop validation is a bit-serial sweep over 301 decoded frames and
+     costs ~2,200 VBlanks (~37 s) with the screen force-blanked. That belongs to
+     the build gate, NOT to the shipped cartridge: running it ahead of the title
+     turns the boot into 37 seconds of black screen, which is exactly what
+     snes-video-reel.c warns about ("...so the title remains an introduction
+     rather than a loading screen"). dev/apollo-reel.sh builds this variant and
+     gates it; the published ROM goes straight to the title. */
   validate_loop();
+#endif
 
   m7splash_begin("DAYLIGHT LAUNCH", "APOLLO 11");
   m7splash_end(30u);
@@ -353,9 +364,11 @@ void apollo_reel_run(void) {
       static uint8_t loops;
       if (++loops == 2u) {
         apollo_reel_loop_gate = 0u;
+        /* corpus_result is deliberately NOT folded in: it is 0xFF in the
+           published build, which never runs the boot validation. The gate
+           asserts it separately on the -DAPOLLO_REEL_SELFTEST build. */
         apollo_reel_health = (uint32_t)apollo_reel_result |
-            ((uint32_t)apollo_reel_check_failures << 8) |
-            ((uint32_t)apollo_reel_corpus_result << 16);
+            ((uint32_t)apollo_reel_check_failures << 8);
       }
     }
   }

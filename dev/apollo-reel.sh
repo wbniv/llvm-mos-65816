@@ -90,14 +90,18 @@ echo "  stream sha256 $(sha256sum "$STREAM" | cut -d' ' -f1)"
 echo "  stream bytes  $(stat -c%s "$STREAM")"
 
 # ---------------------------------------------------------------------------
-build_rom() { # <rom> <map> <fastrom 0|1> <stream>
-  local rom=$1 map=$2 fast=$3 stream=$4
+build_rom() { # <rom> <map> <fastrom 0|1> <stream> [selftest 0|1]
+  local rom=$1 map=$2 fast=$3 stream=$4 selftest=${5:-0}
   local defines=(-DAPOLLO_REEL_VBLANKS_PER_FRAME="$CADENCE")
   local checksum=(--hirom)
   if [ "$fast" = 1 ]; then
     defines+=(-DAPOLLO_REEL_FASTROM)
     checksum+=(--fastrom)
   fi
+  # The self-test build runs the 300-frame whole-loop validation at boot, which
+  # costs ~2,200 force-blanked VBlanks. That is a gate artefact only — the
+  # published ROM must reach its title screen immediately (see step 6).
+  [ "$selftest" = 1 ] && defines+=(-DAPOLLO_REEL_SELFTEST)
   "$CC" --config "$CONFIG" -mcpu=mosw65816 \
     -Xclang -target-feature -Xclang +mos-a16 -Os -DSVC_USE_ASM \
     "${defines[@]}" -I"$BUILD" -I"$ROOT/examples/snes" \
@@ -126,13 +130,21 @@ read_value() { # <rom> <offset> <len> <frames> -> decimal
   printf '%d\n' "$((16#$hex))"
 }
 
+# Published artefacts (no boot validation — these are what ships).
 SLOW_ROM="$BUILD/apollo-daylight-slow.sfc"
 SLOW_MAP="$BUILD/apollo-daylight-slow.map"
 FAST_ROM="$BUILD/apollo-daylight.sfc"
 FAST_MAP="$BUILD/apollo-daylight.map"
+# Self-test artefacts (boot validation on — gate only, never published).
+ST_SLOW_ROM="$BUILD/apollo-daylight-selftest-slow.sfc"
+ST_SLOW_MAP="$BUILD/apollo-daylight-selftest-slow.map"
+ST_FAST_ROM="$BUILD/apollo-daylight-selftest.sfc"
+ST_FAST_MAP="$BUILD/apollo-daylight-selftest.map"
 
-build_rom "$SLOW_ROM" "$SLOW_MAP" 0 "$STREAM"
-build_rom "$FAST_ROM" "$FAST_MAP" 1 "$STREAM"
+build_rom "$SLOW_ROM"    "$SLOW_MAP"    0 "$STREAM" 0
+build_rom "$FAST_ROM"    "$FAST_MAP"    1 "$STREAM" 0
+build_rom "$ST_SLOW_ROM" "$ST_SLOW_MAP" 0 "$STREAM" 1
+build_rom "$ST_FAST_ROM" "$ST_FAST_MAP" 1 "$STREAM" 1
 
 corpus_off=$(sym "$FAST_MAP" apollo_reel_corpus_result)
 health_off=$(sym "$FAST_MAP" apollo_reel_health)
@@ -150,19 +162,24 @@ GATE_FRAMES=${APOLLO_REEL_GATE_FRAMES:-6000}
 
 echo
 echo "==> 2) whole-loop byte-correct decode (all $FRAMES frames + loop delta)"
+echo "     [self-test builds; the published ROMs skip this boot pass by design]"
 for label in slow fastrom; do
-  if [ "$label" = slow ]; then rom=$SLOW_ROM; map=$SLOW_MAP; else rom=$FAST_ROM; map=$FAST_MAP; fi
+  if [ "$label" = slow ]; then rom=$ST_SLOW_ROM; map=$ST_SLOW_MAP
+  else rom=$ST_FAST_ROM; map=$ST_FAST_MAP; fi
   c_off=$(sym "$map" apollo_reel_corpus_result)
-  h_off=$(sym "$map" apollo_reel_health)
   line=$("$JGX" "$rom" "$DATABASE" "$c_off" 1 0 "$GATE_FRAMES" || true)
   case "$line" in
     *PASS*) echo "  PASS: $label corpus gate: $line" ;;
     *) echo "  FAIL: $label corpus gate: $line"; rc=1 ;;
   esac
+done
+for label in slow fastrom; do
+  if [ "$label" = slow ]; then rom=$SLOW_ROM; map=$SLOW_MAP; else rom=$FAST_ROM; map=$FAST_MAP; fi
+  h_off=$(sym "$map" apollo_reel_health)
   line=$("$JGX" "$rom" "$DATABASE" "$h_off" 4 0 "$GATE_FRAMES" || true)
   case "$line" in
-    *PASS*) echo "  PASS: $label composite health: $line" ;;
-    *) echo "  FAIL: $label composite health: $line"; rc=1 ;;
+    *PASS*) echo "  PASS: $label (published) composite health: $line" ;;
+    *) echo "  FAIL: $label (published) composite health: $line"; rc=1 ;;
   esac
 done
 
@@ -184,7 +201,7 @@ data[at] ^= 0x01
 dst.write_bytes(bytes(data))
 print(f"  flipped stream byte {at}: 0x{before:02x} -> 0x{data[at]:02x}")
 PY
-build_rom "$BAD_ROM" "$BAD_MAP" 1 "$BAD_STREAM"
+build_rom "$BAD_ROM" "$BAD_MAP" 1 "$BAD_STREAM" 1
 bad_off=$(sym "$BAD_MAP" apollo_reel_corpus_result)
 bad_line=$("$JGX" "$BAD_ROM" "$DATABASE" "$bad_off" 1 0 "$GATE_FRAMES" || true)
 case "$bad_line" in
@@ -256,6 +273,36 @@ else
   echo "        state it never sets. Call snes_ppu_reset_blank() before drawing."
   for f in $fps; do echo "          entropy $f"; done
   rc=1
+fi
+
+echo
+echo "==> 6) REGRESSION GUARD: the published ROM shows a picture promptly"
+# The first cut of this ROM ran the whole-loop validation force-blanked ahead of
+# the title, so the published page was 100% black for its first 36.6 seconds and
+# every WRAM gate above still passed — they only ever looked at VBlank 3000+.
+# A published cartridge must reach visible pixels within a couple of seconds.
+BLACK_AT=${APOLLO_REEL_BLACK_GUARD_VBLANKS:-180}
+guard_png="$BUILD/apollo-black-guard.png"
+"$JGX" "$FAST_ROM" "$DATABASE" 0x0 1 0 "$BLACK_AT" "$guard_png" >/dev/null 2>&1 || true
+if [ -f "$guard_png" ]; then
+  if python3 - "$guard_png" "$BLACK_AT" <<'PY'
+import sys
+from PIL import Image
+png, at = sys.argv[1], int(sys.argv[2])
+px = list(Image.open(png).convert('RGB').getdata())
+black = sum(1 for p in px if p == (0, 0, 0)) / len(px)
+uniq = len(set(px))
+print(f"  at VBlank {at} (~{at/60.0988:.1f}s): black={100*black:.1f}%  unique_colours={uniq}")
+# A title card or video frame has many colours; a force-blanked screen has one.
+sys.exit(0 if (black < 0.98 and uniq > 2) else 1)
+PY
+  then echo "  PASS: picture is up well before the first loop completes"
+  else echo "  FAIL: screen is still blank — the published ROM boots to black."
+       echo "        Boot-time validation belongs to the -DAPOLLO_REEL_SELFTEST build only."
+       rc=1
+  fi
+else
+  echo "  FAIL: jgxcheck wrote no PNG for the black-screen guard"; rc=1
 fi
 
 echo

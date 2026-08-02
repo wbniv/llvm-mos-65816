@@ -77,9 +77,10 @@ NASA item; do not substitute a different interval without recording new provenan
 
 ## Results (2026-08-02, `dev/apollo-reel.sh`)
 
-**Status: IMPLEMENTED.** Deliverables landed as `examples/snes/apollo-reel.c`,
-`examples/snes/apollo-reel-fast.s`, `dev/apollo-reel.sh`, and three opt-in flags on the existing
-`tools/snes-video-reel-assets.py`. Full gate output below.
+**Status: SHIPPED — [live at biohack.net/snes/apollo-daylight/](https://biohack.net/snes/apollo-daylight/).**
+Deliverables landed as `examples/snes/apollo-reel.c`, `examples/snes/apollo-reel-fast.s`,
+`dev/apollo-reel.sh`, and three opt-in flags on the existing `tools/snes-video-reel-assets.py`.
+Commits: `c1a667f` (llvm-mos-65816), `ad87374` + tag `v1.0.357` (biohack.net). Full gate output below.
 
 ### Open questions, answered
 
@@ -178,6 +179,44 @@ GATE: PASS
 
 **Steps 1–4: PASS.**
 
+### Step 5 — published page live; served ROM sha matches the gate-verified binary
+
+Verified the CI-only way (per the `site-builds-are-ci-only` memory: a host `pnpm build` is void as
+evidence in either direction, so the evidence is the deploy-run conclusion plus live fetches).
+
+```
+$ gh run list --workflow deploy.yml --limit 2
+completed  success  feat(snes): publish the Apollo 11 daylight-launch video cartridge  Deploy site  v1.0.357  push  30760109164  2m46s  2026-08-02T18:00:04Z
+completed  success  feat(snes): publish native 60fps ExHiROM reel                      Deploy site  v1.0.356  push  30759485452  2m50s  2026-08-02T17:42:48Z
+
+$ curl -fsSL https://biohack.net/play/roms/apollo-daylight.sfc | sha256sum
+262f62e7db3cdecbd0d3622bddebaeb4c0ad5ed1542efbeb78933ae38b09df3c
+$ sha256sum build/apollo-daylight.sfc
+262f62e7db3cdecbd0d3622bddebaeb4c0ad5ed1542efbeb78933ae38b09df3c
+MATCH — the served ROM is the gate-verified binary (1,048,576 B)
+
+page   /snes/apollo-daylight/  HTTP 200   <title>Apollo 11 Daylight Launch — bioHACK•NET</title>
+preview                        HTTP 200
+manifest roms: 120             apollo entry present: True
+selfcheck: {"off":"0x2C","len":4,"want":"0x00000000","frames":4000}
+category rendered: Video Playback
+```
+
+Live URL: **[https://biohack.net/snes/apollo-daylight/](https://biohack.net/snes/apollo-daylight/)**.
+Filed under **Video Playback**, not
+Cartridge & Mapping Tests — that shelf is for mapper canaries; this is content. The collection
+(120 entries) and `roms/manifest.json` (120 roms) moved together, so the build-time count guard
+passed. The page's **Verify fidelity** button runs the build gate's own assert; the negative-control
+ROM fails that same assert (`got=0xFFFFFFFF want=0x00000000`), so the button is not decorative.
+
+**Step 5: PASS.**
+
+Incidental fix shipped alongside: `public/play/ENGINE_VERSION` recorded per-file hashes that had
+drifted from the committed core files. CI gates that manifest only by its *version string* (which
+was already correct), so this was never a failing gate — just an inaccurate record.
+`bsnes-jg-player sync --check public/play` now reports a clean match against
+`@wbniv/bsnes-jg-player@1.0.0`.
+
 ### Picture is real, not a green-gate-on-a-blank-screen
 
 `dom=#000000` in the entropy fingerprint prompted an explicit check, because a black-dominant
@@ -194,6 +233,52 @@ Pairwise over the 256×192 video region: **54.8–57.8% of pixels differ** betwe
 rocket climbs, HUD clock advances 00:05 → 00:08). `dom=#000000` is simply the Mode 7 letterbox
 border, which is the most common single colour in a 256×224 raster holding an inset video.
 **Not a vacuous gate.**
+
+### Post-publication defect: the shipped ROM booted to 37 seconds of black (FIXED)
+
+**Reported by the user against the live page: "no title screen, no video, always black."** They were
+right, and every gate above had passed anyway — this is the important part.
+
+Root cause was a design error in this ROM, not in the codec. The first cut ran `validate_loop()`
+**force-blanked, ahead of the title screen**. That pass is a bit-serial Fletcher sweep over 301
+decoded frames and costs ~2,200 VBlanks, so the cartridge showed a **100% black screen for its
+first 36.6 s**. Measured on the shipped binary:
+
+```
+VBlank    60 (~ 1.0s): black=100.0%  unique_colours=  1  BLACK SCREEN
+VBlank   900 (~15.0s): black=100.0%  unique_colours=  1  BLACK SCREEN
+VBlank  1800 (~30.0s): black=100.0%  unique_colours=  1  BLACK SCREEN
+VBlank  2200 (~36.6s): black=  3.6%  unique_colours=  4  has picture
+VBlank  2400 (~39.9s): black= 48.8%  unique_colours=138  has picture
+```
+
+`snes-video-reel.c` warns about exactly this and I did not heed it: *"Exhaustive round-trip and
+target CRC validation belongs to the build gate … so the title remains an introduction rather than
+a loading screen."*
+
+**Why the gate missed it:** every WRAM assert ran with a 3,000–6,000 VBlank budget and only ever
+sampled the *end* state. Nothing looked at the screen during the first minute. A gate that only
+inspects the destination cannot see a broken journey.
+
+**Fix.** Boot validation is now `-DAPOLLO_REEL_SELFTEST`, built and gated by `dev/apollo-reel.sh`
+but never shipped. The published ROM goes straight to the title. New boot timeline:
+
+```
+VBlank  30 (~0.5s): black=100.0% colours=  1  BLACK (normal power-on)
+VBlank  60 (~1.0s): black=  3.6% colours=  4  title card
+VBlank 180 (~3.0s): black= 49.4% colours=158  video playing
+```
+
+The whole-loop byte-correct requirement is **undiminished** — it is still proven on bsnes-jg, on
+both slow and FastROM self-test builds, with the same negative control. Only its *location* moved,
+from the shipped cartridge to the gate, which is where the plan's own bar ("byte-correct decode …
+on bsnes-jg") always placed it.
+
+**Regression guard, shipped in the same commit as the fix.** `dev/apollo-reel.sh` step 6 renders the
+*published* ROM at VBlank 180 and fails if the frame is ≥98% black or has ≤2 distinct colours. It
+reproduces the defect on the old binary and passes on the new one. Two page claims that the fix
+falsified were also corrected rather than left standing: the manifest `selfcheck` label (which said
+the button ran the whole-loop check) and the page's "Before a single pixel is shown…" paragraph.
 
 ### Deviations from the plan
 
