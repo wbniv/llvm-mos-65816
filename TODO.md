@@ -31,6 +31,20 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
+- [wip T3] **Apollo 11 daylight-launch video cartridge — the codec's hardest realistic input.**
+  <!-- agent:a4872524aaacffb25 --> Turns the 2026-08-01 hard-content stressor measurement into a
+  running ROM: 300 frames of 16 mm KSC tracking-camera film (daylight, heavy grain, bright
+  exhaust) through the existing SVX2 decoder, versus the published reel's night-launch Artemis
+  footage. Costs measured already: **+5.3 ratio points Floyd (57.0→62.3%), +19.8 Bayer
+  (33.5→53.3%)**. The point is the cadence table — presented frames per 600 VBlanks, slow AND
+  FastROM, next to the Artemis figures — since this is where a throughput regression surfaces
+  first; a worse number is a finding to record, not to hide. Corpus + packed streams already
+  exist and are provenance-recorded; sibling ROM to `snes-video-reel.c`, which is NOT to be
+  edited. Gate: whole-loop byte-correct decode + negative control, entropy fingerprint,
+  `-verify` clean. Open questions the implementer must answer with numbers: capacity/mapping
+  (may want the now-landed ExHiROM path), keyframe cost vs the decided Option A K=120, and
+  whether the asset emitter extends cleanly. [plan](docs/plans/2026-08-02-apollo-daylight-video-rom.md)
+  (T3: settled pattern — the reel is the template, the corpus is measured, the decoder is done.)
 
 
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
