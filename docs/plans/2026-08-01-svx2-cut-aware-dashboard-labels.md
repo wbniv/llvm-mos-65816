@@ -123,6 +123,13 @@ minute/second/subsecond state, and dirties the dashboard row for the same VBlank
 Testing `frame == 0` alone was deliberately avoided because transport can also seek or step to
 frame 0. A dedicated target latch proves the loop reset occurred during the exhaustive run.
 
+Dashboard formatting now runs during active display, before the VBlank rendezvous. This leaves
+VBlank for the bounded HUD-row DMA followed by the 4,480-byte video DMA; the earlier ordering did
+formatting after NMI and delayed the video DMA tail into active display, producing a persistent
+strip on every frame. The real-video fidelity gate is tightened to MAE 3.0 and the corrected capture
+passes at MAE 2.6257. The FPS field reports the nominal player cadence (`60.0`), while the technical
+profile separately documents the approximately 60.099 Hz physical NTSC refresh.
+
 ## Deliverables
 
 - generated segment metadata for all three Artemis cuts;

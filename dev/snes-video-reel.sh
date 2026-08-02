@@ -238,7 +238,7 @@ if [ "$combined" = 1 ]; then
     "$frame_off" 2 "$transition_want" 3000 "$TRANSITION_SCREENSHOT" || true)
   case "$transition_line" in *"PASS"*) ;; *) echo "FAIL: real-video transition: $transition_line"; exit 1;; esac
   python3 "$ROOT/tools/snes-video-screenshot-check.py" --frame 100 --video-height 192 \
-    --matrix-d 75 --require-dashboard --minimum-exact 0.65 --maximum-mae 8.0 \
+    --matrix-d 75 --require-dashboard --minimum-exact 0.65 --maximum-mae 3.0 \
     "$TRANSITION_SCREENSHOT" "$TILES" "$PALETTE"
   echo "$transition_line"
 fi

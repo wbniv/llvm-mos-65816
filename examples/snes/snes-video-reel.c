@@ -235,7 +235,7 @@ static void transport_draw(uint8_t state, uint8_t rate) {
   transport_hide = state == TRANSPORT_PLAY ? 90u : 0u;
 }
 
-static void dashboard_presented(uint16_t frame, uint8_t looped) {
+static void dashboard_prepare(uint16_t frame, uint8_t looped) {
   uint16_t now_vblank = (uint16_t)video_reel_vblanks;
   uint16_t dv = (uint16_t)(now_vblank - fps_vblank_sample);
   if (looped) {
@@ -255,7 +255,7 @@ static void dashboard_presented(uint16_t frame, uint8_t looped) {
   if (dv >= 60u) {
     uint16_t now_presented = (uint16_t)video_reel_presented_total;
     uint16_t dp = (uint16_t)(now_presented - fps_presented_sample);
-    uint16_t measured = (uint16_t)((dp * 601u + dv / 2u) / dv);
+    uint16_t measured = (uint16_t)((dp * 600u + dv / 2u) / dv);
     fps_tenths = measured;
     dashboard_fps[0] = (char)('0' + measured / 100u);
     measured %= 100u;
@@ -266,7 +266,6 @@ static void dashboard_presented(uint16_t frame, uint8_t looped) {
   }
   dashboard_segment(frame, 0u);
   update_dashboard_fields();
-  video_hud_flush();
 }
 
 static void stop(uint8_t result) {
@@ -660,6 +659,9 @@ void video_reel_run(void) {
     palette_cut = 0u;
 #endif
     decode_sequential_frame(frame);
+    /* Format the next dashboard during active display. VBlank is too short
+       for formatting plus both HUD and full-frame video DMA at 60 packets/s. */
+    dashboard_prepare(frame, looped);
     while ((int16_t)((uint16_t)video_reel_vblanks - deadline) < 0)
       __asm__ volatile("wai");
     if ((uint16_t)video_reel_vblanks != deadline) {
@@ -675,10 +677,10 @@ void video_reel_run(void) {
     }
 #endif
     video_reel_frame = frame;
-    dashboard_presented(frame, looped);
     /* Upload the small dashboard first. The full 4,480-byte video DMA uses
        nearly the rest of the VBlank budget; HUD writes after it are too late
        on real timing and were intermittently ignored by the PPU. */
+    video_hud_flush();
     present_frame(frame);
     if (transport_visible)
       transport_draw(video_reel_transport_state, video_reel_transport_rate);
