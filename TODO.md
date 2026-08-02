@@ -99,13 +99,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   examples/snes/seqvm.c` (2 errors: `$rc3` bb.2, `$rc5` bb.5; clean at `-O0`/`-Oz`).
   (T3: analysis complete and recorded; remaining work is folding this evidence into the
   item-13 upstream issue and, separately, deciding whether to attempt the toolchain-wide fix.)
-- [wip T2] **Deferred ordinary-ROM canary matrix** — <!-- agent:a17cb9b37e9e389f4 --> the non-milestone rows trimmed from the ExHiROM
-  video plan: full LoROM size/speed matrix, remaining HiROM sizes + FastROM, SRAM header variants,
-  copier-header/legacy-header inputs, PAL headers. Generate from the same authoritative mapping
-  model. **UNBLOCKED 2026-08-02** — the model, canary generator, speed attribute and gate all
-  landed in `d0d6b39`; the milestone rows pass. See
-  [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Cartridge-configuration
-  coverage. (T2: bounded fixture generation against a settled model.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -906,6 +899,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-02 — [cartcanary-matrix] Deferred ordinary-ROM canary matrix GENERATED + GATED GREEN: 11 new rows (LoROM 512K/1M/3M/4M slow+fast, HiROM 512K/2M/3M fast) all PASS `dev/run.sh cartsize-canary` (host tests, structural inspect, `-verify-machineinstrs`, bsnes-jg oracle + entropy fingerprint); 3 milestone rows re-verified unchanged. Two real generator bugs found+fixed exercising new sizes for the first time: `sites()`'s span-fit check had no bounds check (crashed on <4 MiB images), and `mirror_probes()` used the HiROM mirror pair for LoROM too (wrong for a compound 3+ MiB device — caught by the generator's own internal assertion before any ROM was built). Model extensions: SRAM aperture (`RAM_BOARDS_BML`/`ram_decode`/`ram_windows`/`ram_header_byte`, ported from bsnes-jg's plain `*-RAM` boards, 69→ host tests, collision-checked against ROM decode) and PAL region byte (`REGION_BYTE`/`video_standard_from_region_byte`, ported `videoRegion()` classifier) in `tools/snes_cartmap.py`; `--ram`/`--battery`/`--region` in `tools/snes-checksum.py`. Legacy-vs-expanded-header and 5 new invalid/truncated/ambiguous negative fixtures added. A real regression (unconditional RAM-size/cart-type default-write clobbering a pre-set coprocessor test fixture) caught by its own new regression-guard test before shipping. Host suite 58+27+28 → 69+44+28 tests. `dev/run.sh` gained `JG_FRAMES`/`CANARY_ONLY` docker-env passthrough (pre-existing gap). See [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Deferred matrix — results.
 - [x] 2026-08-02 — [wai-residual] NO-OP close: the 18 files the `903de3e` sweep skipped as dirty turn out to have **no bare idle loops at all** — comment-aware scan finds 0 empty/comment-only infinite loops; each file's single `for (;;)` is its live frame loop with a real body (`recompute_row`/`field_band`/`display_frame`), i.e. the already-safe class, not removable under C11 forward progress. The sweep skipped them for dirtiness without classifying them; nothing was owed. (Files are clean since `d93499a`.)
 - [x] 2026-08-02 — [138-producer] Vanished `$rl1 = LDImm` producer ROOT-CAUSED + standing gate added (`c95ca7b`). Cause: another worker's `0018-320-imag32-spill` (created 07-27 16:58 — after the crashing 07-26 build, before the clean 07-31 one; its stated failure mode "one byte through a GPR → illegal GPR-to-Imag32 COPY" is exactly the observed malformation, and `unpack_slide` is the far-pointer spiller). Counterfactual rebuild not run — evidence is temporal + shape, strong not airtight. Gate: `dev/lzss-gallery.sh` now asserts every LDImm destination is a GPR (1,043 found, 0 non-GPR); uses `-fno-lto` because the LTO link defers codegen — the first draft passed VACUOUSLY on an empty dump, which the gate now fails loudly on. Needed because 0003's guard skips a returning producer silently instead of crashing.
 - [x] 2026-08-02 — [band-sweep-adopted] Dormant session's BAND 4→1 per-frame refresh sweep adopted across 19 demos (`d93499a`) after verification: 19/19 differential gates PASS (oracles host-derived, unchanged), display-check 6/6 PASS with stable ink. SVX2 reel corridor deliberately left untouched (still mid-edit when that session stopped). Unblocks the wai-idiom residual.
@@ -1713,4 +1707,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-08-02: verification recorded in the plan; item closed in Done. -->
 - [verify] **2026-08-02-svx2-video-technical-page** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-02-svx2-video-technical-page.md](docs/plans/2026-08-02-svx2-video-technical-page.md)_  <!-- fp:6fcb6e55539d0d13 -->
 - [verify] **2026-08-01-svx2-cut-aware-dashboard-labels** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-svx2-cut-aware-dashboard-labels.md](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md)_  <!-- fp:4f251e5d7b449bd4 -->
+<!-- triaged 2026-08-02: all five are the plan's "Required size classes" list, not deferred work
+     — the audit hook flagged them as unverified bullets. The [cartcanary-matrix] Done entry now
+     covers every class: exact power of two (lorom512k/1m/4m, hirom512k/2m), sum of two descending
+     powers of two (lorom3m, hirom3m = 2+1 MiB), maximum ordinary-map size (4 MiB, lorom4m/hirom4),
+     minimum/maximum extended-map size (exhirom6/8, milestone rows), and invalid/truncated/
+     ambiguously-padded rejection (5 new TestNegativeFixtures cases). fp:a7d670bfc9b8f6d4
+     fp:633d71862b454a38 fp:984f9ef55eda44a3 fp:aa51f3c1c9cffc38 fp:662c5e80d93b1529 -->
 <!-- END auto-captured-deferrals -->

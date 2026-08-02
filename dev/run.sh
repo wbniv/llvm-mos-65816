@@ -419,9 +419,13 @@ docker run --rm \
   ${RUNNER:+-e RUNNER} \
   ${STAGE_REL:+-e STAGE_REL} \
   ${JG_ONLY:+-e JG_ONLY} \
+  ${JG_FRAMES:+-e JG_FRAMES} \
+  ${CANARY_ONLY:+-e CANARY_ONLY} \
   ${SNESGFX_CFLAGS:+-e SNESGFX_CFLAGS} \
   ${BENCH_FRAMES:+-e BENCH_FRAMES} \
   ${QUICK:+-e QUICK} \
+  ${FRAMES:+-e FRAMES} \
+  ${GALLERY_BENCH_ONLY:+-e GALLERY_BENCH_ONLY} \
   ${GALLERY_START:+-e GALLERY_START} \
   ${GALLERY_RUN_COLOR:+-e GALLERY_RUN_COLOR} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \

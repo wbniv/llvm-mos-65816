@@ -65,6 +65,33 @@ BOARDS_BML = {
 
 MAPPINGS = tuple(BOARDS_BML)
 
+#: bsnes-jg's plain (no coprocessor) battery/volatile-SRAM board variants --
+#: `LOROM-RAM`, `HIROM-RAM`, `EXHIROM-RAM` in boards.bml -- transcribed the
+#: same way as BOARDS_BML: verbatim `map address=...` lines, checked against
+#: the vendored file by test_snes_cartmap.py. This is the ordinary battery/SRAM
+#: cartridge aperture, not the small-ROM `LOROM-RAM#A` variant (a different,
+#: bank-shifted window bsnes-jg only selects when `romSize() <= 0x200000`) --
+#: that variant is a real, documented gap this model does not cover; see
+#: `ram_windows`.
+RAM_BOARDS_BML = {
+    "lorom": """\
+    map address=70-7d,f0-ff:0000-7fff mask=0x8000
+""",
+    "hirom": """\
+    map address=20-3f,a0-bf:6000-7fff mask=0xe000
+""",
+    "exhirom": """\
+    map address=20-3f,a0-bf:6000-7fff mask=0xe000
+""",
+}
+
+#: Cartridge-type byte ($FFD6) for the plain (non-coprocessor) RAM variants.
+#: 0x00 ROM only, 0x01 ROM+RAM (volatile), 0x02 ROM+RAM+Battery. Named here
+#: because callers must never spell $01/$02 themselves.
+CART_TYPE_ROM_ONLY = 0x00
+CART_TYPE_ROM_RAM = 0x01
+CART_TYPE_ROM_RAM_BATTERY = 0x02
+
 #: Internal-header map-mode byte ($FFD5) per mapping, slow-ROM variant.
 #: The FastROM variant is this | FAST_BIT ($30/$31/$35).
 MAP_MODE = {"lorom": 0x20, "hirom": 0x21, "exhirom": 0x25}
@@ -99,6 +126,27 @@ OFF_RESET = 0x4C  # $FFFC
 
 #: Banks the S-CPU hard-wires to WRAM; a cartridge map never reaches them.
 WRAM_BANKS = (0x7E, 0x7F)
+
+#: Video-standard header byte ($FFD9/file OFF_REGION). Real cartridges carry
+#: many per-territory values (Nintendo's byte enumerates specific countries),
+#: but this project only ever ships one of the two DOMINANT choices, so the
+#: model exposes just those two names; --region takes the byte's actual value
+#: only from these two named cases, never a hand-picked literal at a call site.
+REGION_BYTE = {"ntsc": 0x01, "pal": 0x02}  # 0x01 USA, 0x02 Europe
+REGIONS = tuple(REGION_BYTE)
+
+#: Region bytes bsnes-jg's `videoRegion()` (heuristics.cpp:634-646) classifies
+#: as NTSC; every other byte value is PAL. Ported verbatim so a generated
+#: header is checked against the SAME classifier an emulator will use, not a
+#: guess at which bytes "should" mean NTSC.
+_NTSC_REGION_BYTES = frozenset({0x00, 0x01, 0x0B, 0x0D, 0x0F, 0x10})
+
+
+def video_standard_from_region_byte(byte: int) -> str:
+    """Port of `SuperFamicom::videoRegion`: the byte -> "ntsc"/"pal", the way
+    an emulator picks a refresh rate from the header regardless of what the
+    cartridge's own region byte was actually meant to encode."""
+    return "ntsc" if byte in _NTSC_REGION_BYTES else "pal"
 
 
 # --------------------------------------------------------------------------
@@ -183,6 +231,7 @@ def parse_board(text: str) -> tuple[BoardMap, ...]:
 
 
 BOARDS = {name: parse_board(text) for name, text in BOARDS_BML.items()}
+RAM_BOARDS = {name: parse_board(text) for name, text in RAM_BOARDS_BML.items()}
 
 
 # --------------------------------------------------------------------------
@@ -498,6 +547,94 @@ class CartMap:
             raise ValueError(f"${bank:02X}:{addr:04X} is not cartridge ROM")
         return off
 
+    # ---- SRAM aperture: a second, independent bus decode --------------------
+    # This is a SEPARATE address space from ROM (its own file, conventionally a
+    # `.srm` save file, not a region of the `.sfc`): a cartridge with save RAM
+    # exposes it through a small window carved out of banks the ROM board does
+    # NOT cover (verified disjoint by `test_sram_never_collides_with_rom`, not
+    # merely assumed from the board tables looking non-overlapping). Ported
+    # from bsnes-jg's `LOROM-RAM` / `HIROM-RAM` / `EXHIROM-RAM` boards the same
+    # way the ROM board was: same bus_reduce/bus_mirror primitives, same
+    # provenance check against the vendored boards.bml.
+    @staticmethod
+    def ram_size_from_header_byte(byte: int) -> int:
+        """Port of `SuperFamicom::ramSize` (heuristics.cpp:953-956): header
+        byte $FFD8 -> bytes, `0 -> 0`, otherwise `1024 << min(byte & 0xF, 8)`
+        (256 KiB cap)."""
+        n = byte & 0x0F
+        if n == 0:
+            return 0
+        return 1024 << min(n, 8)
+
+    @staticmethod
+    def ram_header_byte(ram_bytes: int) -> int:
+        """The checked inverse: SRAM size in bytes -> header byte $FFD8.
+        Raises for anything that is not 0 or an exact power-of-two number of
+        KiB the header byte can express (2 KiB through 256 KiB)."""
+        if ram_bytes == 0:
+            return 0
+        kib = ram_bytes // 1024
+        n = kib.bit_length() - 1
+        if ram_bytes % 1024 or (1 << n) != kib or not (1 <= n <= 8):
+            raise ValueError(
+                f"{ram_bytes} bytes is not an SRAM size this header byte can "
+                "express (0, or a power-of-two KiB size from 2 KiB to 256 KiB)"
+            )
+        return n
+
+    def ram_decode(self, bank: int, addr: int, ram_size: int) -> Optional[int]:
+        """CPU address -> SRAM file (`.srm`) offset, or None if this address is
+        not the cartridge's save RAM. `ram_size` is a parameter, not a `CartMap`
+        attribute, because SRAM capacity is independent of ROM capacity and
+        this project has no header/model coupling reason to store the two
+        together on one object."""
+        if not (0 <= bank <= 0xFF and 0 <= addr <= 0xFFFF):
+            raise ValueError(f"address out of range: ${bank:02X}:{addr:04X}")
+        if ram_size <= 0 or bank in WRAM_BANKS:
+            return None
+        full = bank << 16 | addr
+        for bm in RAM_BOARDS[self.mapping]:
+            if not bm.covers(bank, addr):
+                continue
+            offset = bus_reduce(full, bm.mask)
+            base = bus_mirror(bm.base, ram_size)
+            return base + bus_mirror(offset, ram_size - base)
+        return None
+
+    def ram_windows(self, ram_size: int) -> tuple[Window, ...]:
+        """The canonical SRAM window(s) a descriptor may name, mirroring how
+        `windows()` restricts ROM to one address per file byte.
+
+        NOTE (documented gap, not silently papered over): bsnes-jg selects a
+        DIFFERENT LoROM SRAM board -- `LOROM-RAM#A`, full banks $70-$7D/$F0-$FF
+        instead of just their low halves -- once `romSize() <= 0x200000` (2
+        MiB). This model always uses the plain `LOROM-RAM` aperture regardless
+        of ROM size, so a LoROM cartridge <=2 MiB whose SRAM exceeds what the
+        plain aperture can address (i.e. bigger than fits in $0000-$7FFF times
+        the bank count) is a real, uncovered emulator-heuristic case, not
+        something this method silently gets right.
+        """
+        if ram_size <= 0:
+            return ()
+        bm = RAM_BOARDS[self.mapping][0]
+        bank_lo, bank_hi = bm.banks[0]  # the LOWER bank range is canonical, the
+        addr_lo, addr_hi = bm.addrs[0]  # second (mirror) range is not emitted
+        addr_span = addr_hi - addr_lo + 1
+        banks_needed = -(-ram_size // addr_span)  # ceil
+        if banks_needed > (bank_hi - bank_lo + 1):
+            raise ValueError(
+                f"{ram_size} bytes of SRAM needs {banks_needed} banks of "
+                f"${addr_span:04X} each; only {bank_hi - bank_lo + 1} are in the "
+                f"{self.mapping} aperture (${bank_lo:02X}-${bank_hi:02X})"
+            )
+        out, at = [], 0
+        for i in range(banks_needed):
+            b = bank_lo + i
+            n = min(addr_span, ram_size - at)  # the last bank may be partial
+            out.append(Window(b, b, addr_lo, addr_lo + n - 1, at))
+            at += n
+        return tuple(out)
+
     def physical(self, off: int) -> tuple[int, int]:
         """file offset -> (physical device index, offset within that device)."""
         for d in self.devices:
@@ -728,10 +865,10 @@ class CartMap:
             f"mapping           : {self.mapping} ({self.speed} ROM), "
             f"map mode ${self.map_mode:02X}",
             f"file length       : {self.size} bytes (0x{self.size:X}, "
-            f"{self.size * 8 // 1024 // 1024} Mbit / {self.size // 1024 // 1024} MiB)",
+            f"{self.size * 8 // 1024 // 1024} Mbit / {_byte_size_label(self.size)})",
             f"physical devices  : {devs}",
             f"logical (mirrored): 0x{self.logical_size:X} "
-            f"({self.logical_size // 1024 // 1024} MiB) -> ROM-size byte "
+            f"({_byte_size_label(self.logical_size)}) -> ROM-size byte "
             f"${self.rom_size_byte:02X}",
             f"header at file    : ${self.header_file_offset:06X}",
         ]
@@ -765,6 +902,16 @@ class CartMap:
             except ValueError:
                 rows.append({"file_offset": off, "hole": True})
         return rows
+
+
+def _byte_size_label(n: int) -> str:
+    """Human MiB/KiB label -- the same sub-1-MiB KiB fallback `Device.label`
+    already uses, applied to a whole-image size. Without it a 512 KiB row's
+    summary printed "... / 0 MiB)", which is exactly the kind of thing nobody
+    noticed until a sub-1-MiB row actually existed to print it."""
+    if n >= 1 << 20:
+        return f"{n // 1024 // 1024} MiB"
+    return f"{n // 1024} KiB"
 
 
 def parse_size(text: str) -> int:

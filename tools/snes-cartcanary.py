@@ -35,7 +35,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from snes_cartmap import CartMap, parse_size  # noqa: E402
+from snes_cartmap import CartMap, SPEEDS, parse_size  # noqa: E402
 
 # --------------------------------------------------------------------------
 # Deterministic padding pattern
@@ -128,6 +128,30 @@ def layout(cm: CartMap) -> list[Region]:
                            "internal header + vectors"))
         regs.append(Region("rom_far", 0xC10000, cm.size - 0x10000, 0x010000,
                            "far data: banks $C1 upward"))
+    elif cm.mapping == "lorom":
+        # LoROM only maps the UPPER half of each bank ($8000-$FFFF) -- unlike
+        # HiROM's full 64 KiB banks, a flat multi-bank MEMORY region here would
+        # silently span the unmapped lower halves too. So bank $00 (near code +
+        # header) gets its usual two regions, and every remaining 32 KiB file
+        # unit gets its OWN region at its real modelled CPU address (this is
+        # the same one-region-per-bank shape platforms/snes-gallery/link.ld
+        # already hand-writes for its asset banks). None of these far regions
+        # hold any section for this program -- OUTPUT_FORMAT's FULL() just pads
+        # them -- so their only job is to make the file the right size in the
+        # right order; `cm.file_to_cpu` (not bank-index arithmetic) supplies
+        # each one's real address, so the $7E/$7F-is-WRAM wraparound onto the
+        # $FE/$FF mirror (only reachable window for the top 64 KiB of a 4 MiB
+        # image) falls out for free instead of being special-cased here.
+        regs.append(Region("rom", NEAR_ORIGIN, NEAR_LENGTH, 0x000000,
+                           "near code: CPU $00:8000"))
+        regs.append(Region("romhdr", HDR_ORIGIN, HDR_LENGTH, 0x007FB0,
+                           "internal header + vectors"))
+        off = 0x008000
+        while off < cm.size:
+            bank, addr = cm.file_to_cpu(off)
+            regs.append(Region(f"rom_{bank:02x}", (bank << 16) | addr, 0x8000, off,
+                               f"far data: CPU ${bank:02X}:{addr:04X}"))
+            off += 0x8000
     else:
         raise SystemExit(f"no canary layout for mapping {cm.mapping}")
     total = sum(r.length for r in regs)
@@ -214,7 +238,15 @@ def emit_linker_script(cm: CartMap) -> str:
         "  .ram (NOLOAD) : { *(.ram .ram.*) } >ram",
         "",
     ]
-    far_region = "rom_b" if cm.mapping == "exhirom" else "rom_far"
+    if cm.mapping == "exhirom":
+        far_region = "rom_b"
+    elif cm.mapping == "hirom":
+        far_region = "rom_far"
+    else:
+        # LoROM has one region per far 32 KiB unit (see layout()); any of them
+        # is a fine placeholder since this program never actually emits a
+        # .far_rodata/.far_text object -- pick the first.
+        far_region = next(r.name for r in regs if r.name.startswith("rom_"))
     lines += [
         f"  .far_rodata : {{ *(.far_rodata .far_rodata.*) }} >{far_region}",
         f"  .far_text   : {{ *(.far_text .far_text.*)     }} >{far_region}",
@@ -320,7 +352,12 @@ def sites(cm: CartMap) -> tuple[list[Canary], list[Span]]:
     lo, hi = code_region(cm)
 
     def free(off: int, n: int = 1) -> bool:
-        return not (off < hi and off + n > lo)
+        # In range AND clear of the linked-code region. The range check only
+        # started to matter once this generator grew sub-1-MiB rows: every
+        # size this generator used to see was comfortably larger than the
+        # largest literal span offset below, so nothing had ever asked
+        # whether a candidate actually fit inside a small image.
+        return off + n <= cm.size and not (off < hi and off + n > lo)
 
     canaries: list[Canary] = []
     seen: set[int] = set()
@@ -352,10 +389,20 @@ def sites(cm: CartMap) -> tuple[list[Canary], list[Span]]:
         if free(cand, 0x400):
             spans.append(Span("BANK_SPAN", cand, 0x400, cm))
             break
-    # MULTIBANK_SPAN: at least three CPU banks.
-    base = 0x1FFF80 if cm.size > 0x300000 else 0x0FFF80
-    if free(base, 0x20100):
-        spans.append(Span("MULTIBANK_SPAN", base, 0x20100, cm))
+    # MULTIBANK_SPAN: at least three CPU banks. The first candidate is the
+    # original literal (unchanged, so the already-verified hirom4/exhirom6/8
+    # oracles do not move); it starts 0x80 bytes before a 64 KiB boundary,
+    # crossing into the next bank almost immediately. For an image too small
+    # to hold that literal, fall back to the same shape -- 0x80 bytes before
+    # the first 64 KiB boundary strictly past the linked-code region -- rather
+    # than dropping the fixture for every sub-1-MiB row.
+    mb_len = 0x20100
+    next_bank_boundary = ((hi // 0x10000) + 1) * 0x10000
+    for base in (0x1FFF80 if cm.size > 0x300000 else 0x0FFF80,
+                 next_bank_boundary - 0x80):
+        if free(base, mb_len):
+            spans.append(Span("MULTIBANK_SPAN", base, mb_len, cm))
+            break
     # EDGE_4M: begins below and ends above the physical 4 MiB boundary. In CPU
     # space that is a discontinuity ($FF:FFFF -> $40:0000), so it can only be
     # consumed through the segment list -- a single incrementing pointer fails.
@@ -386,9 +433,21 @@ def mirror_probes(cm: CartMap) -> list[tuple[str, int, int, int]]:
         if cm.size == 0x600000:
             # A 2 MiB device in a 4 MiB slot: $20-$3F repeat $00-$1F.
             cases.append(("MIRROR_B_21", (0x41, 0x9000), (0x21, 0x9000)))
-    else:
+    elif cm.mapping == "hirom":
         cases = [("MIRROR_01", (0xC1, 0x8000), (0x01, 0x8000)),
                  ("MIRROR_02", (0xC2, 0x9000), (0x02, 0x9000))]
+    else:
+        # LoROM's `mask=0x8000` reduce keys off the RAW bank byte (banks
+        # $7E/$7F are excluded by the WRAM check before reaching board logic,
+        # but the reduce arithmetic does not compact around that 2-bank gap),
+        # so bank+$C0 is NOT a mirror of bank+$00 at every size -- e.g. for a
+        # compound 3 MiB device, $C1:8000 lands on file $208000, not $01:8000's
+        # file $008000. bank+$80 IS a genuine mirror at every LoROM size this
+        # generator emits (0x400000, the address delta it contributes, is an
+        # exact multiple of how a <=4 MiB LoROM device wraps); the assertion
+        # below still checks it rather than trusting this comment.
+        cases = [("MIRROR_01", (0x01, 0x8000), (0x81, 0x8000)),
+                 ("MIRROR_02", (0x02, 0x9000), (0x82, 0x9000))]
     lo, hi = code_region(cm)
     for tag, (cb, ca), (mb, ma) in cases:
         off = cm.cpu_to_file(cb, ca)
@@ -562,6 +621,13 @@ def main(argv: list[str]) -> int:
         p = sub.add_parser(name)
         p.add_argument("--mapping", required=True)
         p.add_argument("--size", type=parse_size, required=True)
+        p.add_argument("--speed", choices=SPEEDS, default="slow",
+                       help="cartridge bus speed (default slow); cosmetic here -- it only "
+                            "reaches the generated map-mode comment/constant, since speed "
+                            "never changes an address, layout region or oracle value -- "
+                            "snes-checksum.py --speed is what actually patches the header")
+        p.add_argument("--fast", "--fastrom", dest="fast", action="store_true",
+                       help="shorthand for --speed fast")
         if name == "emit-platform":
             p.add_argument("--name", required=True)
             p.add_argument("--install", required=True)
@@ -572,7 +638,7 @@ def main(argv: list[str]) -> int:
             p.add_argument("--rom", required=True)
             p.add_argument("--json")
     args = ap.parse_args(argv[1:])
-    cm = CartMap(args.mapping, args.size)
+    cm = CartMap(args.mapping, args.size, speed="fast" if args.fast else args.speed)
 
     if args.cmd == "emit-platform":
         libdir = os.path.join(args.install, "mos-platform", args.name, "lib")

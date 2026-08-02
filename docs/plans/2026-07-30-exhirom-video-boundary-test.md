@@ -97,6 +97,176 @@ address round-trips, first/last byte of every decoded window, intended mirrors, 
 slow/FastROM timing selection. This milestone uses NTSC headers only; PAL header variants ride with
 the deferred matrix, and video cadence testing stays separate from address-decoder correctness.
 
+### Deferred matrix — results (2026-08-02)
+
+**All required rows generated and gated green** (`dev/run.sh cartsize-canary`, `JG_ONLY=1`,
+bsnes-jg leg only — MAME unavailable, same `dev/roms/s_smp/spc700.rom` gap as Phase 0–1). The
+blocker recorded above is closed: `tools/snes-cartcanary.py` grew a LoROM linker layout (one
+32 KiB region per far bank, since LoROM — unlike HiROM's full 64 KiB banks — only maps the upper
+half of each) and `--speed`/`--fast` passthrough; `dev/cartsize-canary.sh`'s `CONFIGS` grew 11
+rows; nothing forked into a second generator or gate script.
+
+| Row | Mapping/size/speed | Oracle | bsnes-jg | ROM SHA-256 |
+|---|---|---:|---|---|
+| lorom512k_slow | LoROM 512 KiB slow | `0x044F` | PASS | `4ff1acb458f4c09cfc57c09838a535877876a0d55df37b25a8b15932c38607d7` |
+| lorom512k_fast | LoROM 512 KiB fast | `0x044F` | PASS | `f3d1535416020c464a9da9670a9f707e37870ad0c27cb597aaecd6288ca1d033` |
+| lorom1m_slow | LoROM 1 MiB slow | `0xB04E` | PASS | `8159c5597a4acd612b50bba553080b59de944e418d42db15acdf67be0a934aa4` |
+| lorom1m_fast | LoROM 1 MiB fast | `0xB04E` | PASS | `c63662a0039838836b168fefb37357134b2622140334bc87e8f789e4a9f132cb` |
+| lorom3m_slow | LoROM 3 MiB (2+1 MiB) slow | `0x6FFB` | PASS | `a81127c11b465f28f6dd695b022fb507041b3562b8f88f324ee3c89a558508cd` |
+| lorom3m_fast | LoROM 3 MiB (2+1 MiB) fast | `0x6FFB` | PASS | `c29dd84adcfb033b6e7b7c20468f0ef7dc50b71176fe5ffd572911f944639be4` |
+| lorom4m_slow | LoROM 4 MiB slow | `0xA5EE` | PASS | `b4d671e19ba39da0710d2517026d865e1bd9b6da10c49962c8e216e3408104eb` |
+| lorom4m_fast | LoROM 4 MiB fast | `0xA5EE` | PASS | `e1e3562d447571910faafed8501561947bc4c6056987132fc57ce0a86ac79733` |
+| hirom512k_fast | HiROM 512 KiB fast | `0xC1CA` | PASS | `5f2cbcffa5ddc1ddf8c63a4b5d9599e55e253409b96f08212174819eab188f67` |
+| hirom2m_fast | HiROM 2 MiB fast | `0x98FA` | PASS | `77fa481f5b120638563a9923cf4d11f73ede831ac68aea1114a1e2e0a7a6686a` |
+| hirom3m_fast | HiROM 3 MiB (2+1 MiB) fast | `0x330D` | PASS | `d2785e100073300a93189eac3d38410b728706c4edbb0c83b8cf0d359b9c292d` |
+
+Every row: host model tests PASS, structural inspection (`snes-checksum.py --inspect`) PASS,
+`-verify-machineinstrs` clean, far load present, bsnes-jg `corpus_result`/`canary_status` match the
+generated oracle, and the six-boot entropy-independence check (`None`/`Low`/`High` ×2) agrees on one
+picture. Representative raw output (the two structurally hardest new rows — a compound two-device
+LoROM size, and the 4 MiB wraparound onto the `$FE`/`$FF` mirror under FastROM):
+
+```
+######## lorom3m_slow — lorom 3M (slow ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+header ...: 4 canaries, 2 spans (8 segments), 2 mirror probes
+  linked .../cartsize-lorom3m_slow.sfc: 3145728 bytes
+fill ...: 3145728 bytes, code $000000-$007FFF, 4 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $0FFF80 +131328 6 segment(s) across 6 bank(s) -> fold $9B71
+.../cartsize-lorom3m_slow.sfc: lorom size=3072KiB devices=16Mbit+8Mbit map_mode=0x20 rom_size_byte=0x0C checksum=0x4375 complement=0xBC8A
+==> 3) structural inspection
+  PASS: file length : 3145728 bytes (0x300000, 24 Mbit / 3 MiB);physical devices : 16Mbit @ $000000 + 8Mbit @ $200000 header at file : $007FB0;map mode byte : $20
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x6FFB
+==> 6) bsnes-jg: the same two assertions, independently
+SMOKE: PASS off=0x4E len=2 got=0x6FFB (ran 900 frames, bsnes-jg)
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 900 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: a81127c11b465f28f6dd695b022fb507041b3562b8f88f324ee3c89a558508cd
+
+RESULT: PASS
+
+######## lorom4m_fast — lorom 4M (fast ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+header ...: 6 canaries, 2 spans (8 segments), 2 mirror probes
+  linked .../cartsize-lorom4m_fast.sfc: 4194304 bytes
+.../cartsize-lorom4m_fast.sfc: lorom (fast) size=4096KiB devices=32Mbit map_mode=0x30 rom_size_byte=0x0C checksum=0x4D13 complement=0xB2EC
+==> 3) structural inspection
+  PASS: file length : 4194304 bytes (0x400000, 32 Mbit / 4 MiB);physical devices : 32Mbit @ $000000 header at file : $007FB0;map mode byte : $30
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0xA5EE
+==> 6) bsnes-jg: the same two assertions, independently
+SMOKE: PASS off=0x58 len=2 got=0xA5EE (ran 900 frames, bsnes-jg)
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 900 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: e1e3562d447571910faafed8501561947bc4c6056987132fc57ce0a86ac79733
+
+RESULT: PASS
+```
+
+**Two real generator bugs found and fixed while exercising these sizes for the first time**
+(the point of building this matrix, not incidental noise):
+
+1. **`sites()`'s `free()` bounds check was missing.** Every size this generator had ever produced
+   (4/6/8 MiB) was comfortably larger than the largest literal span offset it tries
+   (`0x1FFF80 + 0x20100`), so nothing had ever asked whether a candidate span actually fit inside
+   the image. A 512 KiB row crashed immediately (`file offset $0FFF80 outside a 524288 byte image`).
+   Fixed by bounds-checking `free()` against `cm.size` and adding a size-derived fallback base for
+   `MULTIBANK_SPAN` (anchored just past the linked-code region) that only activates when the
+   original literal doesn't fit — the three already-verified milestone rows take the unchanged
+   literal and are byte-for-byte unaffected (re-verified below).
+2. **`mirror_probes()`'s LoROM case used the HiROM mirror pair.** `("MIRROR_01", ($C1,$8000),
+   ($01,$8000))` is a genuine mirror for HiROM (full 64 KiB banks, verified across every size in
+   this matrix) but NOT for LoROM at every size: LoROM's `mask=0x8000` reduce keys off the RAW bank
+   byte, and banks $7E/$7F are excluded by the WRAM check before reaching board logic without the
+   reduce arithmetic compacting around that 2-bank gap — so for a compound 3 MiB device, `$C1:8000`
+   decodes to file `$208000`, not `$01:8000`'s file `$008000` (`AssertionError: MIRROR_01: not a
+   mirror of the same byte`, caught by the generator's own internal check, before any ROM was even
+   built). Root-caused via direct model interrogation (`cm.cpu_to_file`), not guessed: bank+`$80`
+   (not bank+`$C0`) is the address delta that survives `bus_mirror` at every LoROM size in this
+   matrix (verified, not assumed — see `mirror_probes`'s comment). Fixed by splitting the `hirom`
+   and `lorom` cases in `mirror_probes()`; the `lorom3m_*` and `lorom4m_*` rows above are exactly
+   the sizes that would have shipped a silently-wrong mirror probe.
+
+**Regression check on the three original milestone rows** (same command, no `CANARY_ONLY`): `hirom4`
+`0x48EE`, `exhirom6` `0xA274`, `exhirom8` `0x29B9` — all three oracles and SHA-256 values unchanged
+from the Phase 0–1 completion record below, all three PASS, confirming the `free()`/`mirror_probes`
+fixes above are additive and did not move the already-published canary ROMs.
+
+**SRAM aperture (LoROM/HiROM/ExHiROM, volatile and battery-backed).** Extended
+`tools/snes_cartmap.py` with a SEPARATE bus decode (`RAM_BOARDS_BML`/`RAM_BOARDS`, ported the same
+way as the ROM boards from bsnes-jg's plain `LOROM-RAM`/`HIROM-RAM`/`EXHIROM-RAM` boards —
+provenance-checked against the vendored `boards.bml` the same way): `CartMap.ram_decode`,
+`.ram_windows`, `.ram_size_from_header_byte`/`.ram_header_byte` ($FFD8 encoding, ported from
+`SuperFamicom::ramSize`), and `CART_TYPE_ROM_ONLY`/`_ROM_RAM`/`_ROM_RAM_BATTERY` constants.
+`tools/snes-checksum.py` grew `--ram {none,2k,8k,32k,256k}` and `--battery`. Host-proven (69 tests in
+`test_snes_cartmap.py::TestSRAMAperture`/`TestSRAMHeaderByte`, 12 in
+`test_snes_checksum.py::TestSRAM`) across every mapping/size in this matrix plus the milestone
+ExHiROM sizes: the SRAM decode never collides with the ROM decode (checked via `cm.decode()` at
+every claimed SRAM cell, not by eyeballing the board ranges), round-trips through the same
+checked-inverse discipline as `file_to_cpu`/`cpu_to_file`, and an oversized request (512 KiB LoROM
+SRAM against the 448 KiB plain aperture) is rejected rather than silently truncated.
+**Documented gap, not silently papered over:** bsnes-jg selects a DIFFERENT LoROM SRAM board
+(`LOROM-RAM#A`, full banks instead of low halves) once `romSize() <= 0x200000`; this model always
+uses the plain aperture regardless of ROM size, so a <=2 MiB LoROM cartridge is not modelled with
+full heuristic fidelity — flagged in `ram_windows`'s docstring, not fixed here. **Also out of scope
+by design:** a live console/emulator SRAM read/write canary (an actual `$2140`-style save-file
+harness) — the deliverable here is the address-model + header-field level ("aperture does not
+collide, size/header agree"), which is what the deferred table's wording asks for; a runtime save
+harness is a materially larger increment and would be its own TODO item if wanted.
+
+**Header/input (legacy vs. expanded internal header, unheadered `.sfc`, copier-header rejection).**
+The copier-header negative fixture already existed (`test_reject_copier_header`, exhirom only) —
+extended with a LoROM instance. New: `test_snes_checksum.py::TestHeaderVariants` proves the
+post-~1994 extended-header block (`$FFB0`-relative bytes `$00`-`$0F`: maker/game code, expansion
+RAM/flash size, special version, cartridge sub-type) is read and written by NOTHING in this tool
+(`TITLE_OFF` starts right after it) — a legacy zero-filled block and a plausible expanded one patch
+and inspect identically except for the checksum itself (which legitimately differs, since it sums
+the whole image) and the extended-header bytes the fixture deliberately varied.
+
+**PAL header variants.** `tools/snes_cartmap.py` gained `REGION_BYTE`/`REGIONS`/
+`video_standard_from_region_byte` (the last a port of bsnes-jg's `SuperFamicom::videoRegion`
+classifier — NTSC iff the region byte is one of `{0x00, 0x01, 0x0B, 0x0D, 0x0F, 0x10}`, else PAL);
+`tools/snes-checksum.py` gained `--region {ntsc,pal}`, enforced as a structural check under
+`--inspect` when given explicitly. `test_snes_checksum.py::TestRegion` proves PAL patches/inspects
+clean, that a plain patch always owns and defaults the byte to NTSC even over garbage input
+(unlike RAM-size/cartridge-type, which the patcher must NOT default-own — see the regression guard
+below), and that an explicit `--inspect --region` mismatch is caught.
+
+**Negative fixtures (invalid/truncated/ambiguously-padded images).** Added to
+`test_snes_checksum.py::TestNegativeFixtures`: LoROM copier-header rejection, LoROM `>4 MiB`
+rejection, a LoROM image truncated mid-bank (not a multiple of 32 KiB), a HiROM image that is a
+whole number of 32 KiB units but not of 64 KiB ones (HiROM banks are a full 64 KiB), and a LoROM
+3.5 MiB image (`2 + 1 + 0.5 MiB`) that fits under the 4 MiB ceiling but ambiguously decomposes into
+three mask ROMs. All five reject with the expected message; none is a copy of an existing case under
+a new mapping name only — each exercises a size class this generator had not exercised before.
+
+**A real regression caught by its own new test, not shipped:** the first version of `--ram` support
+made `do_patch` unconditionally default-own the RAM-size/cartridge-type bytes, which silently
+clobbered the pre-set coprocessor cartridge-type byte in
+`TestNegativeFixtures::test_recognises_but_refuses_unsupported_coprocessor_cartridges` (8 subtests
+went from correctly failing to falsely passing — a coprocessor fixture patched clean instead of
+being refused). Fixed by making RAM-size/cartridge-type ownership activate only when `--ram` is
+explicitly given, matching the tool's existing "I don't own this field unless told to" contract for
+every header byte except map mode/ROM-size/region. Guarded by
+`TestSRAM::test_no_ram_flag_leaves_ram_and_cart_type_bytes_untouched`, which states this exact
+failure mode in its docstring so it cannot regress silently a second time.
+
+**Host suite growth:** `test_snes_cartmap.py` 58 → 69 tests, `test_snes_checksum.py` 27 → 44 tests
+(both files still fully pass); `test_snes_cartcanary.py` unchanged at 28 (its `CONFIGS` list is
+independent of the gate script's and was not touched). `dev/run.sh` gained `JG_FRAMES`/`CANARY_ONLY`
+passthrough to the container (both were already read by `dev/cartsize-canary.sh` and several other
+`dev/*.sh` scripts, but had no path through `dev/run.sh`'s docker env allowlist — a pre-existing gap
+this work needed fixed to test one configuration at a time without a 14-config, ~15-minute run for
+every iteration).
+
 Required size classes are:
 
 - exact power of two;

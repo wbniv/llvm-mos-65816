@@ -74,10 +74,18 @@ if [ "${bios_rc:-0}" -ne 0 ]; then
   require_bios
 fi
 
-# tag  mapping  size  platform-name
-CONFIGS="hirom4:hirom:4M exhirom6:exhirom:6M exhirom8:exhirom:8M"
+# tag  mapping  size  speed (speed defaults to "slow" if the 4th field is omitted,
+# so the original three milestone entries need not be touched)
+CONFIGS="hirom4:hirom:4M exhirom6:exhirom:6M exhirom8:exhirom:8M \
+lorom512k_slow:lorom:512K:slow lorom512k_fast:lorom:512K:fast \
+lorom1m_slow:lorom:1M:slow lorom1m_fast:lorom:1M:fast \
+lorom3m_slow:lorom:3M:slow lorom3m_fast:lorom:3M:fast \
+lorom4m_slow:lorom:4M:slow lorom4m_fast:lorom:4M:fast \
+hirom512k_fast:hirom:512K:fast hirom2m_fast:hirom:2M:fast hirom3m_fast:hirom:3M:fast"
 for entry in $CONFIGS; do
-  tag="${entry%%:*}"; rest="${entry#*:}"; mapping="${rest%%:*}"; size="${rest##*:}"
+  tag="${entry%%:*}"; rest="${entry#*:}"; mapping="${rest%%:*}"; rest2="${rest#*:}"
+  size="${rest2%%:*}"
+  if [ "$rest2" = "$size" ]; then speed=slow; else speed="${rest2##*:}"; fi
   [ -z "${CANARY_ONLY:-}" ] || [ "${CANARY_ONLY}" = "$tag" ] || continue
 
   ROM="$BUILD/cartsize-$tag.sfc"; MAP="$BUILD/cartsize-$tag.map"
@@ -85,13 +93,13 @@ for entry in $CONFIGS; do
   PLAT="snes-cart-$tag"; CFG="$INSTALL/bin/mos-$PLAT.cfg"
 
   echo
-  echo "######## $tag — $mapping $size ########"
+  echo "######## $tag — $mapping $size ($speed ROM) ########"
 
   echo "==> 2) generate the platform layout + descriptor header, link, fill, checksum"
   python3 "$ROOT/tools/snes-cartcanary.py" emit-platform \
-    --mapping "$mapping" --size "$size" --name "$PLAT" --install "$INSTALL"
+    --mapping "$mapping" --size "$size" --speed "$speed" --name "$PLAT" --install "$INSTALL"
   python3 "$ROOT/tools/snes-cartcanary.py" emit-header \
-    --mapping "$mapping" --size "$size" --out "$HDR" --label "$tag $mapping $size"
+    --mapping "$mapping" --size "$size" --speed "$speed" --out "$HDR" --label "$tag $mapping $size $speed"
 
   "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 "${A16[@]}" -Os \
     -I "$GEN" -I "$ROOT/examples/snes" \
@@ -101,10 +109,10 @@ for entry in $CONFIGS; do
 
   python3 "$ROOT/tools/snes-cartcanary.py" fill --mapping "$mapping" --size "$size" \
     --rom "$ROM" --json "$GEN/$tag.json" || { echo "  FAIL: fill"; rc=1; continue; }
-  python3 "$ROOT/tools/snes-checksum.py" --mapping "$mapping" "$ROM"
+  python3 "$ROOT/tools/snes-checksum.py" --mapping "$mapping" --speed "$speed" "$ROM"
 
   echo "==> 3) structural inspection"
-  if python3 "$ROOT/tools/snes-checksum.py" --inspect --mapping "$mapping" "$ROM" >"$GEN/$tag-inspect.log" 2>&1; then
+  if python3 "$ROOT/tools/snes-checksum.py" --inspect --mapping "$mapping" --speed "$speed" "$ROM" >"$GEN/$tag-inspect.log" 2>&1; then
     echo "  PASS: $(grep -E '^(file length|physical devices|header at file|map mode byte)' "$GEN/$tag-inspect.log" | tr -s ' ' | paste -sd'; ')"
   else
     echo "  FAIL: structural inspection"; cat "$GEN/$tag-inspect.log"; rc=1

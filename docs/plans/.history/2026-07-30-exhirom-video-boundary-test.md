@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/acd0dc1) | tools: snes-cartmap-viz.py — inline-SVG decode maps for the cartsize pages (model-derived, self-tested) |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/02c4d20) | docs: post-merge 60 fps re-baseline -- slow ROM now clears 60 fps too |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/0c7c1f7) | Add Apollo 11 daylight-launch stressor to the real-video codec corpus |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/29c2b90) | codec: staged-keyframe specialization -- Option C measured, 1.12 VBlanks |
@@ -13,6 +14,11 @@
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/1ae32f8) | docs: plan ExHiROM video boundary test |
 
 <!--history-meta v1
+acd0dc1	author	Will Norris
+acd0dc1	added	7
+acd0dc1	deleted	0
+acd0dc1	files	1
+acd0dc1	body	380-cell fold of the 256x2 half-bank space, canonical/mirror per device,\nWRAM banks, the 8 MiB unreachable hole, and a generically-derived seam\ncallout; counts asserted against decode_cells()/holes() two ways\n(selftest: 380/128/252, 380/192/188, 380/254/126+64KiB hole). Deployed to\nbiohack.net as v1.0.345 (cfdb7cb there, CI success, live spot-checked).\n\nSNESDQ_SKIP=1: whole-tree gate trips on another worker's uncommitted\nexamples/snes/video_hud.h, out of scope here.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 02c4d20	author	Will Norris
 02c4d20	added	12
 02c4d20	deleted	3

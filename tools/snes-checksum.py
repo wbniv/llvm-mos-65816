@@ -65,16 +65,32 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from snes_cartmap import (  # noqa: E402
+    CART_TYPE_ROM_ONLY,
+    CART_TYPE_ROM_RAM,
+    CART_TYPE_ROM_RAM_BATTERY,
     HEADER_FILE_OFFSET,
     MAPPINGS,
+    REGION_BYTE,
+    REGIONS,
     SPEEDS,
+    OFF_CART_TYPE,
     OFF_CHECKSUM,
     OFF_COMPLEMENT,
     OFF_MAP_MODE,
+    OFF_RAM_SIZE,
+    OFF_REGION,
     OFF_RESET,
     OFF_ROM_SIZE,
     CartMap,
+    video_standard_from_region_byte,
 )
+
+#: --ram convenience spellings -> bytes. The model's own ram_header_byte()
+#: takes a raw byte count and would happily accept any power-of-two KiB size
+#: it can express; this project's cartridges only ever use these four, so the
+#: CLI only offers these four (an unlisted-but-legal size is still reachable
+#: by calling tools/snes_cartmap.py's API directly).
+RAM_SIZE_BYTES = {"none": 0, "2k": 2 << 10, "8k": 8 << 10, "32k": 32 << 10, "256k": 256 << 10}
 
 TITLE_OFF = 0x10  # 21 ASCII bytes at $FFC0
 TITLE_LEN = 21
@@ -139,10 +155,53 @@ def check_unsupported(rom: bytes, base: int) -> list[str]:
     return problems
 
 
-def structural_checks(cm: CartMap, rom: bytes) -> list[str]:
+def structural_checks(cm: CartMap, rom: bytes, region: str | None = None,
+                       ram: str | None = None, battery: bool = False) -> list[str]:
     """Header title and reset/vector structural checks (plan gate 2)."""
     base = cm.header_file_offset
     problems: list[str] = []
+
+    if ram is not None:
+        ram_bytes = RAM_SIZE_BYTES[ram]
+        got_ram = rom[base + OFF_RAM_SIZE]
+        want_ram = CartMap.ram_header_byte(ram_bytes)
+        if got_ram != want_ram:
+            problems.append(
+                f"RAM-size byte ${got_ram:02X} != ${want_ram:02X} expected for --ram {ram}"
+            )
+        want_type = (
+            CART_TYPE_ROM_ONLY if ram_bytes == 0
+            else CART_TYPE_ROM_RAM_BATTERY if battery else CART_TYPE_ROM_RAM
+        )
+        got_type = rom[base + OFF_CART_TYPE]
+        if got_type != want_type:
+            problems.append(
+                f"cartridge type byte ${got_type:02X} != ${want_type:02X} expected for "
+                f"--ram {ram}{' --battery' if battery else ''}"
+            )
+        if ram_bytes:
+            try:
+                cm.ram_windows(ram_bytes)
+            except ValueError as e:
+                problems.append(f"SRAM aperture: {e}")
+
+    if region is not None:
+        got = rom[base + OFF_REGION]
+        want = REGION_BYTE[region]
+        if got != want:
+            problems.append(
+                f"region byte ${got:02X} != ${want:02X} expected for --region {region}"
+            )
+        elif video_standard_from_region_byte(got) != region:
+            # Can only happen if REGION_BYTE and _NTSC_REGION_BYTES fall out of
+            # sync with each other -- the two are independent tables (one is
+            # this project's two choices, the other is bsnes-jg's full
+            # heuristic set), so this guards against them silently disagreeing
+            # on what "ntsc"/"pal" means for the byte this tool itself wrote.
+            problems.append(
+                f"region byte ${got:02X} was written for --region {region}, but "
+                f"the bsnes-jg heuristic classifies it as {video_standard_from_region_byte(got)}"
+            )
 
     title = rom[base + TITLE_OFF : base + TITLE_OFF + TITLE_LEN]
     if len(title) != TITLE_LEN or any(b < 0x20 or b > 0x7E for b in title):
@@ -204,7 +263,8 @@ def structural_checks(cm: CartMap, rom: bytes) -> list[str]:
     return problems
 
 
-def do_inspect(cm: CartMap, rom: bytes, path: str) -> int:
+def do_inspect(cm: CartMap, rom: bytes, path: str, region: str | None = None,
+               ram: str | None = None, battery: bool = False) -> int:
     base = cm.header_file_offset
     title = bytes(rom[base + TITLE_OFF : base + TITLE_OFF + TITLE_LEN])
     reset = rom[base + OFF_RESET] | rom[base + OFF_RESET + 1] << 8
@@ -215,10 +275,14 @@ def do_inspect(cm: CartMap, rom: bytes, path: str) -> int:
     print(cm.summary())
     print(f"title             : {title.decode('ascii', 'replace')!r}")
     print(f"map mode byte     : ${rom[base + OFF_MAP_MODE]:02X}")
-    print(f"cartridge type    : ${rom[base + 0x26]:02X}")
+    print(f"cartridge type    : ${rom[base + OFF_CART_TYPE]:02X}")
     print(f"ROM-size byte     : ${rom[base + OFF_ROM_SIZE]:02X}")
-    print(f"RAM-size byte     : ${rom[base + 0x28]:02X}")
-    print(f"region byte       : ${rom[base + 0x29]:02X}")
+    ram_byte = rom[base + OFF_RAM_SIZE]
+    print(f"RAM-size byte     : ${ram_byte:02X}  "
+          f"({CartMap.ram_size_from_header_byte(ram_byte) // 1024} KiB save RAM)"
+          if ram_byte else f"RAM-size byte     : ${ram_byte:02X}  (no save RAM)")
+    print(f"region byte       : ${rom[base + OFF_REGION]:02X}  "
+          f"(bsnes-jg videoRegion: {video_standard_from_region_byte(rom[base + OFF_REGION]).upper()})")
     try:
         roff = cm.cpu_to_file(0x00, reset)
         rwhere = f"file ${roff:06X} (first opcode ${rom[roff]:02X})"
@@ -244,7 +308,7 @@ def do_inspect(cm: CartMap, rom: bytes, path: str) -> int:
     if detected != cm.mapping:
         print(f"  !! an emulator will treat this image as {detected}, not {cm.mapping}")
 
-    problems = structural_checks(cm, rom)
+    problems = structural_checks(cm, rom, region=region, ram=ram, battery=battery)
     if detected != cm.mapping:
         problems.append(f"header detected as {detected}, expected {cm.mapping}")
     if problems:
@@ -256,10 +320,25 @@ def do_inspect(cm: CartMap, rom: bytes, path: str) -> int:
     return 0
 
 
-def do_patch(cm: CartMap, rom: bytearray, path: str) -> int:
+def do_patch(cm: CartMap, rom: bytearray, path: str, region: str = "ntsc",
+             ram: str | None = None, battery: bool = False) -> int:
     base = cm.header_file_offset
     rom[base + OFF_MAP_MODE] = cm.map_mode
     rom[base + OFF_ROM_SIZE] = cm.rom_size_byte
+    rom[base + OFF_REGION] = REGION_BYTE[region]
+    # RAM-size/cartridge-type are untouched when --ram is not given at all --
+    # unlike map mode/ROM size/region, this tool has never owned that field
+    # (a coprocessor cartridge-type fixture pre-sets $FFD6 and expects the
+    # patcher to leave it alone), so "own it" only activates on an explicit ask.
+    if ram is not None:
+        ram_bytes = RAM_SIZE_BYTES[ram]
+        rom[base + OFF_RAM_SIZE] = CartMap.ram_header_byte(ram_bytes)
+        rom[base + OFF_CART_TYPE] = (
+            CART_TYPE_ROM_ONLY if ram_bytes == 0
+            else CART_TYPE_ROM_RAM_BATTERY if battery else CART_TYPE_ROM_RAM
+        )
+        if ram_bytes:
+            cm.ram_windows(ram_bytes)  # raises if this mapping's aperture can't fit it
 
     rom[base + OFF_COMPLEMENT : base + OFF_COMPLEMENT + 2] = b"\xff\xff"
     rom[base + OFF_CHECKSUM : base + OFF_CHECKSUM + 2] = b"\x00\x00"
@@ -280,6 +359,8 @@ def do_patch(cm: CartMap, rom: bytearray, path: str) -> int:
           f"size={len(rom) // 1024}KiB devices={devs} "
           f"map_mode=0x{rom[base + OFF_MAP_MODE]:02X} "
           f"rom_size_byte=0x{rom[base + OFF_ROM_SIZE]:02X} "
+          f"ram_size_byte=0x{rom[base + OFF_RAM_SIZE]:02X} "
+          f"cart_type=0x{rom[base + OFF_CART_TYPE]:02X} "
           f"checksum=0x{checksum:04X} complement=0x{complement:04X}")
     return 0
 
@@ -299,9 +380,26 @@ def main(argv: list[str]) -> int:
                          "read from the header when inspecting")
     ap.add_argument("--fast", "--fastrom", dest="fast", action="store_true",
                     help="shorthand for --speed fast (--fastrom is the legacy spelling)")
+    ap.add_argument("--region", choices=REGIONS,
+                    help="video standard region byte ($FFD9-family offset); default ntsc "
+                         "when patching. Under --inspect, an explicit value is enforced as a "
+                         "structural check instead of just reported")
+    ap.add_argument("--ram", choices=RAM_SIZE_BYTES,
+                    help="save-RAM size ($FFD8 RAM-size byte + $FFD6 cartridge-type byte); "
+                         "default none when patching. Under --inspect, an explicit value is "
+                         "enforced as a structural check -- including that the size actually "
+                         "fits the mapping's SRAM aperture (tools/snes_cartmap.py ram_windows)")
+    ap.add_argument("--battery", action="store_true",
+                    help="the save RAM is battery-backed, not volatile (requires --ram other "
+                         "than none/absent)")
     ap.add_argument("--inspect", action="store_true",
                     help="read-only report + structural checks; patches nothing")
     args = ap.parse_args(argv[1:])
+
+    if args.battery and args.ram in (None, "none"):
+        print("error: --battery given without --ram; a battery backs SRAM, not nothing",
+              file=sys.stderr)
+        return 1
 
     mapping = args.mapping
     if args.hirom:
@@ -340,8 +438,10 @@ def main(argv: list[str]) -> int:
         return 1
 
     if args.inspect:
-        return do_inspect(cm, rom, args.rom)
-    return do_patch(cm, rom, args.rom)
+        return do_inspect(cm, rom, args.rom, region=args.region, ram=args.ram,
+                           battery=args.battery)
+    return do_patch(cm, rom, args.rom, region=args.region or "ntsc",
+                     ram=args.ram, battery=args.battery)
 
 
 if __name__ == "__main__":

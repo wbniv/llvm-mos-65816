@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 from snes_cartmap import (  # noqa: E402
     BOARDS_BML,
+    RAM_BOARDS_BML,
     CartMap,
     Device,
     bus_mirror,
@@ -62,6 +63,128 @@ class TestProvenance(unittest.TestCase):
                 transcript.strip(),
                 f"{name}: transcription drifted from vendor/bsnes-jg/Database/boards.bml",
             )
+
+    def test_ram_board_definitions_match_vendored_boards_bml(self):
+        """Same proof, for the plain (non-coprocessor) battery/SRAM boards --
+        `LOROM-RAM` / `HIROM-RAM` / `EXHIROM-RAM` -- scoped to their
+        `memory type=RAM content=Save` sub-block so a change to the ROM half of
+        one of these boards cannot silently pass as a RAM-aperture match."""
+        if not os.path.exists(BOARDS_BML_PATH):
+            self.skipTest(f"vendored boards.bml absent at {BOARDS_BML_PATH}")
+        with open(BOARDS_BML_PATH, encoding="utf-8") as f:
+            text = f.read()
+        want_board = {"lorom": "LOROM-RAM", "hirom": "HIROM-RAM", "exhirom": "EXHIROM-RAM"}
+        for name, transcript in RAM_BOARDS_BML.items():
+            marker = f"\nboard: {want_board[name]}\n"
+            self.assertIn(marker, text, f"no `board: {want_board[name]}` entry")
+            block = text.split(marker, 1)[1].split("\n\n", 1)[0]
+            ram_marker = "memory type=RAM content=Save\n"
+            self.assertIn(ram_marker, block, f"{want_board[name]}: no RAM/Save memory block")
+            ram_block = block.split(ram_marker, 1)[1]
+            got = "\n".join(
+                l for l in ram_block.splitlines() if l.strip().startswith("map address=")
+            )
+            self.assertEqual(
+                got.strip(),
+                transcript.strip(),
+                f"{name}: RAM aperture drifted from vendor/bsnes-jg/Database/boards.bml",
+            )
+
+
+class TestSRAMAperture(unittest.TestCase):
+    """The SRAM decode is a SEPARATE bus decode from ROM's -- its own board
+    lines, its own file (a `.srm` save, never a region of the `.sfc`). These
+    prove it never collides with the ROM decode and round-trips through the
+    same checked-inverse discipline as `file_to_cpu`/`cpu_to_file`, across
+    every mapping and RAM size this project's header byte can express."""
+
+    #: 2 KiB, 8 KiB, 32 KiB, 256 KiB -- the header-byte-expressible sizes this
+    #: project actually intends to test (see TestSRAMHeaderByte for the byte
+    #: encoding's own boundaries).
+    RAM_SIZES = (2 << 10, 8 << 10, 32 << 10, 256 << 10)
+    CASES = [("lorom", 512 << 10), ("lorom", 4 << 20),
+             ("hirom", 4 << 20), ("exhirom", 6 << 20), ("exhirom", 8 << 20)]
+
+    def test_ram_never_collides_with_rom(self):
+        """Every CPU cell an SRAM window claims must be UNCLAIMED by the ROM
+        decode -- checked by calling `decode()` itself, not by eyeballing that
+        the board bank/address ranges look disjoint."""
+        for mapping, size in self.CASES:
+            cm = CartMap(mapping, size)
+            for ram in self.RAM_SIZES:
+                for w in cm.ram_windows(ram):
+                    for bank in range(w.bank_lo, w.bank_hi + 1):
+                        for addr in (w.addr_lo, w.addr_hi, (w.addr_lo + w.addr_hi) // 2):
+                            with self.subTest(m=mapping, size=hex(size), ram=ram,
+                                              bank=hex(bank), addr=hex(addr)):
+                                self.assertIsNone(cm.decode(bank, addr))
+
+    def test_ram_windows_round_trip(self):
+        for mapping, size in self.CASES:
+            cm = CartMap(mapping, size)
+            for ram in self.RAM_SIZES:
+                for w in cm.ram_windows(ram):
+                    for off in (w.file_start, w.file_end - 1):
+                        with self.subTest(m=mapping, ram=ram, off=off):
+                            bank, addr = w.cpu_of(off)
+                            self.assertEqual(cm.ram_decode(bank, addr, ram), off)
+
+    def test_ram_windows_tile_the_save_file_exactly_once(self):
+        """Concatenating the windows in order reproduces every save-file byte
+        with no gap and no overlap -- the same property `windows()` guarantees
+        for ROM, checked the same way (via decode_cells-style enumeration
+        rather than trusting the window list's own bookkeeping)."""
+        for mapping, size in self.CASES:
+            cm = CartMap(mapping, size)
+            for ram in self.RAM_SIZES:
+                ws = cm.ram_windows(ram)
+                total = sum(w.length for w in ws)
+                self.assertEqual(total, ram, f"{mapping} ram={ram}: windows cover {total} bytes")
+                at = 0
+                for w in ws:
+                    self.assertEqual(w.file_start, at)
+                    at = w.file_end
+
+    def test_ram_zero_size_has_no_windows_and_never_decodes(self):
+        for mapping, size in self.CASES:
+            cm = CartMap(mapping, size)
+            self.assertEqual(cm.ram_windows(0), ())
+            self.assertIsNone(cm.ram_decode(0x70, 0x0000, 0))
+
+    def test_oversized_ram_is_rejected(self):
+        """The plain (non-`#A`) LoROM aperture is banks $70-$7D * 32 KiB = 448
+        KiB; 512 KiB does not fit and must raise, not silently truncate."""
+        cm = CartMap("lorom", 4 << 20)
+        with self.assertRaises(ValueError):
+            cm.ram_windows(512 << 10)
+
+
+class TestSRAMHeaderByte(unittest.TestCase):
+    """`ram_size_from_header_byte` / `ram_header_byte` -- the $FFD8 encoding,
+    ported from `SuperFamicom::ramSize` (heuristics.cpp:953-956)."""
+
+    def test_zero_is_no_ram(self):
+        self.assertEqual(CartMap.ram_size_from_header_byte(0), 0)
+        self.assertEqual(CartMap.ram_header_byte(0), 0)
+
+    def test_round_trips_every_expressible_size(self):
+        for kib in (2, 4, 8, 16, 32, 64, 128, 256):
+            byte = CartMap.ram_header_byte(kib << 10)
+            self.assertEqual(CartMap.ram_size_from_header_byte(byte), kib << 10)
+
+    def test_byte_is_capped_at_256_kib_per_the_heuristic(self):
+        """bsnes-jg clamps `byte & 0xF` to 8 before shifting -- a header lying
+        about a bigger size is read back as 256 KiB, not honoured."""
+        self.assertEqual(CartMap.ram_size_from_header_byte(0x0F), 256 << 10)
+        self.assertEqual(CartMap.ram_size_from_header_byte(0x09), 256 << 10)
+
+    def test_rejects_non_power_of_two_kib(self):
+        with self.assertRaises(ValueError):
+            CartMap.ram_header_byte(3 << 10)
+
+    def test_rejects_over_256_kib(self):
+        with self.assertRaises(ValueError):
+            CartMap.ram_header_byte(512 << 10)
 
 
 class TestBusPrimitives(unittest.TestCase):
