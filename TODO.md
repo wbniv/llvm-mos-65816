@@ -90,6 +90,17 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
+- [T4] **Backend: premature kill flag on `$rc3` — `seqvm.c draw_frame` reads a killed
+  imaginary sub-register ~250 slots later.** Found by the PH-$p fix agent while correcting that
+  item's misattribution (seqvm never reproduced PH $p — it trips THIS instead). After the
+  Virtual Register Rewriter at `-O1/-O2/-Os` `+mos-a16` (clean `-O0`/`-Oz`): `$rs1`
+  (=`$rc2`:`$rc3`) defined by `STAImag16`; `$rc3` KILLED by `renamable $rc4 = COPY killed
+  renamable $rc3`; read ~250 slots later to store the pair's high byte. A wrong kill licenses a
+  later pass to clobber the byte — genuine miscompile potential, unknown root cause. Repro:
+  `mos-clang --config mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16
+  -Os -fno-lto -mllvm -verify-machineinstrs -c examples/snes/seqvm.c`. Possibly related to the
+  item-13 rc-undef-ra-pure-virtual family — establish that before fixing. (T4:
+  unknown-root-cause backend debugging with miscompile reach.)
 - [T3] **`lowerCmpZeros` sticky loop-carried `Changed` (`MOSLateOptimization.cpp:142`) — found
   in passing by #138 Phase A.** After the first successful fold in a block, every later
   un-foldable `CmpZero` is *skipped* instead of lowered, and nothing downstream lowers that
