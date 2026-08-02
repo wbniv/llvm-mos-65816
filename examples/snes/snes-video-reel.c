@@ -287,11 +287,13 @@ static uint16_t crc16(const uint8_t *data, uint16_t bytes) {
 
 static uint8_t reel_stream_bank(uint32_t offset) {
 #ifdef VIDEO_REEL_EXHIROM
-  /* Stream offset $000000-$3FFFFF is file region A / banks $C0-$FF.
-     The packed continuation skips file $400000-$40FFFF (boot/header) and
-     resumes at file $410000 / bank $41. */
-  if (offset >= 0x400000ul)
-    return (uint8_t)(0x41u + (uint8_t)((offset - 0x400000ul) >> 16));
+  /* File bank $C0 is a FastROM mirror of the linked $40 boot/code window.
+     Stream offset zero therefore begins at file $010000 / bank $C1.  Its
+     continuation skips file $400000-$40FFFF (boot/header) and resumes at
+     file $410000 / bank $41.  All boundaries are bank aligned, so the low
+     16 address bits remain the logical stream offset's low bits. */
+  if (offset >= 0x3f0000ul)
+    return (uint8_t)(0x41u + (uint8_t)((offset - 0x3f0000ul) >> 16));
 #endif
   return (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16));
 }
@@ -547,17 +549,17 @@ static uint8_t transport_poll(void) {
     transport_hold = 0u;
   } else if (pad & (JOY_LEFT | JOY_RIGHT)) {
     uint8_t rate;
-    uint8_t period;
+    int16_t delta;
     if (transport_hold == 0u)
       transport_resume = video_reel_transport_state == TRANSPORT_PLAY;
     if (transport_hold != 255u) ++transport_hold;
     rate = transport_hold >= 60u ? 8u : transport_hold >= 30u ? 4u : 2u;
-    period = rate == 8u ? 2u : rate == 4u ? 4u : 8u;
-    if (transport_hold == 1u || transport_hold % period == 0u) {
-      int16_t delta = (pad & JOY_LEFT) ? -30 : 30;
-      changed = transport_seek(delta, (pad & JOY_LEFT) ? TRANSPORT_REVERSE : TRANSPORT_FORWARD,
-                               rate);
-    }
+    /* A tap is exactly one authored second at either cadence.  Once held,
+       advance the advertised 2/4/8 source frames per transport tick. */
+    delta = transport_hold == 1u ? (int16_t)VIDEO_REEL_SOURCE_FPS : (int16_t)rate;
+    if (pad & JOY_LEFT) delta = (int16_t)-delta;
+    changed = transport_seek(delta,
+        (pad & JOY_LEFT) ? TRANSPORT_REVERSE : TRANSPORT_FORWARD, rate);
   } else {
     if (transport_hold) {
       video_reel_transport_state = transport_resume ? TRANSPORT_PLAY : TRANSPORT_PAUSE;
@@ -685,9 +687,9 @@ void video_reel_run(void) {
     if (transport_visible)
       transport_draw(video_reel_transport_state, video_reel_transport_rate);
     deadline = (uint16_t)(deadline + VIDEO_REEL_VBLANKS_PER_FRAME);
-    if (frame == 0u && video_reel_loop_gate != 0u) {
+    if (frame == 0u) {
       static uint8_t loops;
-      if (++loops == 2u) {
+      if (++loops >= 2u) {
         video_reel_loop_gate = 0u;
         video_reel_composite_health = (uint32_t)video_reel_result |
             ((uint32_t)video_reel_crc_failures << 8) |

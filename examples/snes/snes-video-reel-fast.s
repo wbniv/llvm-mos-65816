@@ -4,7 +4,10 @@
 video_reel_enter_fast:
   .byte $5c
   .word video_reel_run
-  .byte $80
+  /* Banks $C0-$FF are FastROM-visible in both HiROM and ExHiROM.  Bank $80
+     mirrors the near window in HiROM, but selects ExHiROM region A instead
+     of the boot/code window in region B. */
+  .byte $c0
 
 .global nmi
 .extern video_reel_vblanks

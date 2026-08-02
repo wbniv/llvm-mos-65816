@@ -1,4 +1,5 @@
 import random
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -231,5 +232,21 @@ def test_rgb_quantizer_reserves_indices_and_tiles(tmp_path):
         outputs[dither] = frames
         assert len(frames) == 2 and all(len(frame) == FRAME_SIZE for frame in frames)
         assert len(palette) == 448
-        assert min(frames[0]) >= 1 and max(frames[0]) <= 223
+        assert palette[:4] == bytes((0x00, 0x00, 0xff, 0x7f))
+        assert min(frames[0]) >= 2 and max(frames[0]) <= 223
     assert outputs["floyd"] != outputs["bayer"]
+
+
+def test_reel_assets_can_pin_a_frame_to_exhirom_region_b(tmp_path):
+    stream = tmp_path / "stream.bin"
+    process, output = run_reel_assets(
+        tmp_path, "--packed-far", "--exhirom", "--exhirom-seam-frame", "1",
+        "--stream-output", str(stream))
+    assert process.returncode == 0, process.stderr
+    header = output.read_text()
+    assert "#define VIDEO_REEL_HIROM_BASE_BANK 0xc1u" in header
+    assert "#define VIDEO_REEL_EXHIROM_SEAM_FRAME 1u" in header
+    offsets_body = header.split("reel_packet_offsets", 1)[1].split("};", 1)[0]
+    offsets = [int(value) for value in re.findall(r"(\d+)ul", offsets_body)]
+    assert offsets[1] == 0x3f0000
+    assert len(stream.read_bytes()) > 0x3f0000

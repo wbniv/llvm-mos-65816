@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Convert one source-video interval to the codec-corpus RGB24 format, exactly per
-# docs/plans/2026-07-31-real-video-codec-corpus.md's Method step 2: retime to 30 fps
-# (no optical flow), Lanczos-scale to 80x45, pad 5 black rows above + 6 below to the
+# docs/plans/2026-07-31-real-video-codec-corpus.md's Method step 2: select an explicit
+# frame rate (no optical flow), Lanczos-scale to 80x45, pad 5 black rows above + 6 below to the
 # 80x56 raster, concatenated raw RGB24. Every corpus in that plan (and its successors)
 # used this exact filter chain by hand; this script exists so the next one is
 # reproducible instead of re-derived from prose. Feed the output straight into
@@ -10,10 +10,11 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-usage: snes-video-rgb24-convert.sh --start SECONDS --duration SECONDS INPUT OUTPUT.rgb
+usage: snes-video-rgb24-convert.sh --start SECONDS --duration SECONDS [--fps RATE] INPUT OUTPUT.rgb
 
   --start SECONDS     interval start, in seconds, within INPUT
-  --duration SECONDS  interval length, in seconds (frame count = duration * 30)
+  --duration SECONDS  interval length, in seconds (frame count = duration × rate)
+  --fps RATE          output rate (default: 30); frame selection only, never interpolation
   INPUT               source video (any ffmpeg-readable container/codec)
   OUTPUT.rgb           concatenated 80x56 row-major RGB24 frames
 
@@ -24,12 +25,14 @@ EOF
 
 start=""
 duration=""
+fps=30
 args=()
 while [ $# -gt 0 ]; do
   case "$1" in
     -h|--help) usage; exit 0 ;;
     --start) start=$2; shift 2 ;;
     --duration) duration=$2; shift 2 ;;
+    --fps) fps=$2; shift 2 ;;
     *) args+=("$1"); shift ;;
   esac
 done
@@ -42,7 +45,7 @@ output=${args[1]}
 [ -f "$input" ] || { echo "FATAL: missing input $input" >&2; exit 1; }
 
 ffmpeg -y -v error -ss "$start" -i "$input" -t "$duration" \
-  -vf "fps=30,scale=80:45:flags=lanczos,pad=80:56:0:5:black,format=rgb24" \
+  -vf "fps=$fps,scale=80:45:flags=lanczos,pad=80:56:0:5:black,format=rgb24" \
   -f rawvideo -pix_fmt rgb24 "$output"
 
 size=$(stat -c%s "$output")

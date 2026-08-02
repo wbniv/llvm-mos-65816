@@ -31,8 +31,11 @@ def quantize_rgb24(path: Path, dither: str = "floyd") -> tuple[list[bytes], byte
         raise ValueError(f"{path}: RGB24 size must be a non-zero multiple of {raster_size}")
     rgb_frames = [data[i:i + raster_size] for i in range(0, len(data), raster_size)]
     atlas = Image.frombytes("RGB", (80, 56 * len(rgb_frames)), b"".join(rgb_frames))
-    learned = atlas.quantize(colors=223, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
-    palette_rgb = learned.getpalette()[:223 * 3]
+    # Entries 0 and 1 belong to the dashboard (black and white).  Learn 222
+    # content colours and offset every video pixel by two so content can never
+    # be recoloured when the HUD palette is installed.
+    learned = atlas.quantize(colors=222, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    palette_rgb = learned.getpalette()[:222 * 3]
     palette_image = Image.new("P", (1, 1))
     palette_image.putpalette(palette_rgb + [0] * (768 - len(palette_rgb)))
     bayer8 = (
@@ -61,7 +64,7 @@ def quantize_rgb24(path: Path, dither: str = "floyd") -> tuple[list[bytes], byte
         else:
             raise ValueError(f"unknown dither mode: {dither}")
         indexed = image.quantize(palette=palette_image, dither=pillow_dither)
-        raster = bytes(value + 1 for value in indexed.tobytes())
+        raster = bytes(value + 2 for value in indexed.tobytes())
         tiled = bytearray()
         for tile_y in range(7):
             for tile_x in range(10):
@@ -69,7 +72,7 @@ def quantize_rgb24(path: Path, dither: str = "floyd") -> tuple[list[bytes], byte
                     start = (tile_y * 8 + y) * 80 + tile_x * 8
                     tiled.extend(raster[start:start + 8])
         tiled_frames.append(bytes(tiled))
-    bgr555 = bytearray((0, 0))  # index 0 is reserved/transparent
+    bgr555 = bytearray((0x00, 0x00, 0xff, 0x7f))  # HUD black and white
     for offset in range(0, len(palette_rgb), 3):
         red, green, blue = palette_rgb[offset:offset + 3]
         word = (red >> 3) | ((green >> 3) << 5) | ((blue >> 3) << 10)

@@ -16,6 +16,7 @@ CADENCE=${VIDEO_REEL_VBLANKS_PER_FRAME:-2}
 KEYFRAME_INTERVAL=${VIDEO_REEL_KEYFRAME_INTERVAL:-$((60 / CADENCE))}
 PROFILE=${VIDEO_REEL_PROFILE:-0}
 EXHIROM=${VIDEO_REEL_EXHIROM:-0}
+EXHIROM_SEAM_FRAME=${VIDEO_REEL_EXHIROM_SEAM_FRAME:-0}
 SEGMENTS=${VIDEO_REEL_SEGMENTS:-}
 HEADER="$BUILD/snes-video-reel-assets.h"
 ASSET_INCLUDE="$BUILD"
@@ -38,7 +39,11 @@ if [ -f "$TILES" ] && [ -f "$PALETTE" ] && \
       combined=1
     fi
     exhirom_args=()
-    [ "$EXHIROM" = 1 ] && exhirom_args=(--exhirom)
+    if [ "$EXHIROM" = 1 ]; then
+      exhirom_args=(--exhirom)
+      [ "$EXHIROM_SEAM_FRAME" -gt 0 ] && \
+        exhirom_args+=(--exhirom-seam-frame "$EXHIROM_SEAM_FRAME")
+    fi
     segment_args=()
     if [ -z "$SEGMENTS" ] && [ "$FIRST_FRAMES" -eq 600 ] && [ "$FRAMES" -eq 300 ]; then
       SEGMENTS='0:NASA SVS / LAUNCH|300:NASA SVS / RETURN|600:PRESS-SITE CAMERA'
@@ -159,6 +164,11 @@ if [ "$FRAMES" -gt 4 ]; then
   expected_presented=2cc
   screenshot_frame=115
 fi
+if [ "$CADENCE" -eq 1 ] && [ "$FRAMES" -ge 1800 ]; then
+  # Animated title plus two complete 1,800-frame loops.
+  gate_frames=4000
+  expected_presented=eef
+fi
 check_tiles=$TILES
 check_palette=$PALETTE
 minimum_exact=0.68
@@ -221,6 +231,11 @@ fi
 if [ "$combined" = 1 ]; then
   screenshot_line=$(JGX_POLL=1 "$BUILD/jgxcheck" "$ROM" "$ROOT/vendor/bsnes-jg/Database" \
     "$frame_off" 2 6c 4000 "$SCREENSHOT" || true)
+  case "$screenshot_line" in *"PASS"*) ;; *) echo "FAIL: screenshot rendezvous: $screenshot_line"; exit 1;; esac
+elif [ "$FRAMES" -gt 4 ]; then
+  screenshot_want=$(printf '%x' "$screenshot_frame")
+  screenshot_line=$(JGX_POLL=1 "$BUILD/jgxcheck" "$ROM" "$ROOT/vendor/bsnes-jg/Database" \
+    "$frame_off" 2 "$screenshot_want" "$gate_frames" "$SCREENSHOT" || true)
   case "$screenshot_line" in *"PASS"*) ;; *) echo "FAIL: screenshot rendezvous: $screenshot_line"; exit 1;; esac
 fi
 if [ -f "$check_tiles" ] && [ -f "$check_palette" ]; then
