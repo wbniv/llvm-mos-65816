@@ -123,8 +123,8 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   (`dev/roms/s_smp/spc700.rom` — same gap blocking the ExHiROM canary MAME evidence); §4 item 10
   (bank-$00 4096-byte gate) is source-side follow-up; `regen-patch.sh`'s `worktree remove
   --force` now collides with the teardown guard hook (policy call, flagged in-script).
-- [T3] **Backend: `PH $p` verifier trip — `php` reads undefined physical register P under
-  `+mos-a16`.** Found by seamdemo P1's gate (2026-08-01): `-verify-machineinstrs` reports
+- [wip T3] **Backend: `PH $p` verifier trip — `php` reads undefined physical register P under
+  `+mos-a16`.** <!-- agent:aca592b5d33c83736 --> Found by seamdemo P1's gate (2026-08-01): `-verify-machineinstrs` reports
   "Using an undefined physical register — instruction: PH $p" because the MIR defines only the
   individual flag sub-registers while `php` pushes all of P, so P's liveness is unmodelled.
   **Pre-existing**: reproduces in the already-committed `examples/snes/seqvm.c` (`draw_frame`)
