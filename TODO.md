@@ -85,11 +85,11 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   examples/snes/seqvm.c` (2 errors: `$rc3` bb.2, `$rc5` bb.5; clean at `-O0`/`-Oz`).
   (T3: analysis complete and recorded; remaining work is folding this evidence into the
   item-13 upstream issue and, separately, deciding whether to attempt the toolchain-wide fix.)
-- [T2] **Deferred ordinary-ROM canary matrix** — the non-milestone rows trimmed from the ExHiROM
+- [wip T2] **Deferred ordinary-ROM canary matrix** — <!-- agent:a17cb9b37e9e389f4 --> the non-milestone rows trimmed from the ExHiROM
   video plan: full LoROM size/speed matrix, remaining HiROM sizes + FastROM, SRAM header variants,
   copier-header/legacy-header inputs, PAL headers. Generate from the same authoritative mapping
-  model once the milestone rows (HiROM 4 MiB; ExHiROM 6/8 MiB) pass. Blocked on the `[T4]`
-  extended-mapping item's Phase 0. See
+  model. **UNBLOCKED 2026-08-02** — the model, canary generator, speed attribute and gate all
+  landed in `d0d6b39`; the milestone rows pass. See
   [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Cartridge-configuration
   coverage. (T2: bounded fixture generation against a settled model.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
