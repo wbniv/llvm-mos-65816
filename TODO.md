@@ -101,12 +101,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   -Os -fno-lto -mllvm -verify-machineinstrs -c examples/snes/seqvm.c`. Possibly related to the
   item-13 rc-undef-ra-pure-virtual family — establish that before fixing. (T4:
   unknown-root-cause backend debugging with miscompile reach.)
-- [T3] **`lowerCmpZeros` sticky loop-carried `Changed` (`MOSLateOptimization.cpp:142`) — found
-  in passing by #138 Phase A.** After the first successful fold in a block, every later
-  un-foldable `CmpZero` is *skipped* instead of lowered, and nothing downstream lowers that
-  pseudo — a survivor reaches the asm printer. Separate bug, separate change; no triggering case
-  built yet. (T3: defect line pinpointed, needs a repro + bounded fix + validation; escalate if
-  the repro shows silent-miscompile reach.)
 - [T3] **#138 loose end — the vanished `$rl1 = LDImm` Imag32 producer + a standing non-GPR-`LDImm`
   scan.** The gallery only hit the `combineLdImm` null store because the 2026-07-26 toolchain
   emitted `$rl1 = LDImm -1`/`0` (Imag32 dest — malformed MIR on 65816) in `@unpack_slide`; that
@@ -933,6 +927,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-02 — [lowercmpzeros] Sticky loop-carried `Changed` FIXED (`6249aae`): after a block's first fold every later `CmpZero` went unlowered and the asm printer emitted NOTHING for the survivor — silent dropped flag test, verifier-invisible. Reproduces on PRISTINE upstream → standalone patch `0022` + PR package READY TO POST (row 18). Red/green lit test; suite 83 w/ exactly the 7 known failures; measured in-tree incidence ZERO (17,403 blocks, max 1 CmpZero/block) so the fix is inert here. Corpus differential 8/8 completed rows agree (run OOM-killed at row 8 — no swap + concurrent gate; re-run pending). See [plan](docs/plans/2026-08-02-lowercmpzeros-sticky-changed.md).
 - [x] 2026-08-01 — [138-branch-merged] `throwaway/138-late-opt-crash` MERGED to main (`98231c1`): patch `0003-late-opt-nongpr-ldimm-dest` + PR-doc mirror (verified == live #584 body) + toolchain/regen wiring reconciled with the 0021-era `BASELINE_MOSDIR`; status row 15 unified. Upstream PR #584 open, CI green ×3. Foreign toolchain.sh 0018/0019 hunk stash-restored intact.
 - [x] 2026-08-01 — [rom-map-viz] Decode-map SVGs LIVE on all three cartsize pages (site `cfdb7cb`/v1.0.345, CI success, spot-checked; llvm tool commit w/ selftest 380-cell counts asserted vs the model both ways). Seamdemo-page figure lands with P4.
 - [x] 2026-08-01 — [canary-6b-revalidate] Canary gate re-run with rebuilt jgxcheck: 3/3 PASS, 6b NON-vacuous — one picture `11D41DC5:#00FF28` across six entropy boots per config; `rc0` pipefail guard added to the gate script (seamdemo pattern). Live 8 MiB sha matches.
@@ -1732,5 +1727,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)_  <!-- fp:a76fa89a8079cd65 -->
 <!-- triaged 2026-08-01: both are scope statements of the curated 60 fps video item, not new work — (c) is analysis-only by that item's own wording, and reel-side integration is held pending another worker's in-flight snes-video-reel.c edits. fp:3a823bd1aa076872 fp:838c40fb50c90609 -->
 <!-- triaged 2026-08-01: three canary-6b addendum bullets are recorded RESULTS (gate PASS evidence), not deferred work — covered by the canary-6b-revalidate Done entry. fp:8bd02423f82e515c fp:296dbe20a6aa20e4 fp:89b5e6bf073a6ac8 -->
-- [verify] **2026-08-02-lowercmpzeros-sticky-changed** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-02-lowercmpzeros-sticky-changed.md](docs/plans/2026-08-02-lowercmpzeros-sticky-changed.md)_  <!-- fp:eaec1ada9beb4e8c -->
+<!-- triaged 2026-08-02: verification recorded in the plan; item closed in Done. -->
 <!-- END auto-captured-deferrals -->

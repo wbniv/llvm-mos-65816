@@ -1,6 +1,6 @@
 # `lowerCmpZeros` sticky loop-carried `Changed` — silently dropped flag tests
 
-**Date:** 2026-08-02 · **Status:** FIX APPLIED, validation in progress
+**Date:** 2026-08-02 · **Status:** FIXED + VALIDATED 2026-08-02; upstream package READY TO POST (status row 18)
 **Item:** TODO `[T3]` (found in passing by the #138 Phase A investigation, 2026-07-31)
 **Visible surface:** none — compiler pass. No mockups.
 
@@ -73,3 +73,32 @@ function while reporting "no change".
    Inertness here is the opposite of the usual expectation — diffs are the finding.
 5. Upstream reproducibility: the pass is upstream MOS code, so check whether pristine
    `llc` (no fork features) reproduces → determines standalone-patch + PR vs fold into `0002`.
+
+
+## Verification record (2026-08-02)
+
+1. **Red/green on the repro.** Pre-fix `llc -run-pass=mos-late-opt` leaves `CmpZero $x` in the
+   output and the asm printer emits an empty line for it; post-fix it lowers to
+   `dead $a = T_A $x, implicit-def $nz` → a real `txa`. New lit test
+   `late-opt-cmpzero-after-fold.mir` PASSES. **PASS**
+2. **MOS lit suite.** 83 tests, 7 failures = exactly the known fork-divergence set
+   (`indexiv`, `indvar-simplify-20230930`, `leaf-20231021`, `legalizer.mir`, `nonreentrant`,
+   `nonreentrant-nointerrupts`, `shift-rotate`); the new test is green. **PASS**
+3. **Corpus differential** (`JG_ONLY=1 dev/run.sh corpus-a16`). The run was **OOM-killed at row
+   8 of 61** — this box has **no swap** and seamdemo P3's emulator gate was running
+   concurrently (same failure mode the PH-$p work documented; exit 137). Of the 8 rows that
+   completed, **8/8 have `host == a16@bsnes`** and **0 genuine value mismatches**; every row's
+   `FAIL` label is the missing-SPC700-BIOS artifact (`*@MAME=None`), not a value disagreement.
+   **PARTIAL PASS — 8/8 completed rows agree; full sweep to be re-run when the box is idle.**
+4. **Real-world incidence + reach.** 140 files × 4 configs (`-O1/-O2/-Os`, with and without
+   `+mos-a16`), 17,403 basic blocks scanned via `-print-before=mos-late-opt`: **maximum 1
+   `CmpZero` per block, zero blocks meet the ≥2 precondition.** The fix is therefore inert for
+   this tree — which is also why no demo ever caught it — and no object-diff evidence of the
+   bug firing in shipped code exists or can exist here. Reach: latent, mechanism proven by
+   construction. **PASS (zero incidence)**
+5. **Upstream reproducibility.** `build/upstream-llc` (pristine `8be0546128a5`, no fork
+   features) leaves the same survivor on the same MIR → genuine upstream defect. Carried as
+   standalone patch `0022` (wired into `dev/toolchain.sh`, baked into `regen-patch.sh`'s
+   `BASELINE_MOSDIR`), PR package drafted in
+   [upstream-late-opt-cmpzero-lowering-pr.md](../upstream-late-opt-cmpzero-lowering-pr.md);
+   posting is user-triggered. **PASS**
