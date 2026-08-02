@@ -161,10 +161,10 @@ ARCHIVE=$(find "$ROOT/vendor/bsnes-jg/objs" -name '*.a' | head -1)
 g++ -O2 -std=c++11 -DJGX_NAV -I"$ROOT/vendor/bsnes-jg/src" -I"$ROOT/tools" \
   -c "$ROOT/dev/jgxcheck.cpp" -o "$BUILD/jgxcheck-nav.o"
 g++ "$BUILD/jgxcheck-nav.o" "$ARCHIVE" -lsamplerate -lm -o "$NAV_JGX"
-NAV_VMA=$(awk '$NF=="gallery_current_asset"{print $1; exit}' "$MAP")
+NAV_VMA=$(awk '$NF=="gallery_canceled"{print $1; exit}' "$MAP")
 [ -n "$NAV_VMA" ]
-JGX_SCRIPT='NONE:1000,RIGHT:3,NONE:30000' JGX_POLL=1 \
-  "$NAV_JGX" "$ROM" "$ROOT/vendor/bsnes-jg/Database" "0x$NAV_VMA" 1 0x01 40000
+JGX_SCRIPT='NONE:1000,RIGHT:3,NONE:3000' JGX_POLL=1 \
+  "$NAV_JGX" "$ROM" "$ROOT/vendor/bsnes-jg/Database" "0x$NAV_VMA" 2 0x01 5000
 echo "automatic joypad navigation gate: PASS (Right accepted during foreground decode)"
 
 VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$MAP")

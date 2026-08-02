@@ -86,8 +86,10 @@ The automatic JOY1 result is split across two byte registers and exposed as the 
 16-bit mask (`B=$8000` through `Right=$0100`). On the little-endian 65816, `$4218` therefore holds
 A/X/L/R in its upper nibble, while `$4219` holds B, Y, Select, Start, Up, Down, Left, and Right in
 bits 7 through 0. Thus byte-sized D-pad code reads `$4219`; Right/Left are bits 0/1. Prefer the
-16-bit `REG_JOY1`/`Controller` interface unless a measured NMI path specifically needs one byte,
-and add a scripted input gate when selecting the byte manually.
+16-bit `REG_JOY1`/`Controller` interface unless a measured NMI path specifically needs one byte.
+The LZSS gallery is a documented manual-latch exception: its automatic-reader migration dropped
+every edge in both native and browser bsnes. Its scripted gate asserts the input-only
+`gallery_canceled` counter so auto-advance cannot make a broken controller path pass.
 
 ---
 

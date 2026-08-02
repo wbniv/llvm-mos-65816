@@ -12,11 +12,15 @@ same direction regardless of whether a person or the timer initiated the cut.
 
 ## Confirmed regressions
 
-### ROM automatic-joypad path is already correct
+### ROM input path must remain observable
 
-The gallery enables `NMITIMEN_AUTOJOY`; its NMI correctly reads `$4219` and
-masks `#$03`. In the conventional 16-bit result (`B=$8000`, `Right=$0100`),
-the D-pad byte is at `$4219` on the little-endian 65816. Keep this mapping:
+The gallery currently uses its proven manual serial latch in NMI. An attempted
+automatic-reader migration stopped accepting input in both native and browser
+bsnes. The old gate missed this because it waited for artwork 1, which normal
+auto-advance eventually reaches without input. The navigation gate now asserts
+the dedicated `gallery_canceled` counter instead.
+
+The serial result keeps this mapping:
 
 - `1` = Right = next artwork;
 - `2` = Left = previous artwork.
