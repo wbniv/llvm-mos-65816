@@ -75,6 +75,15 @@
 // frames. At 8 the iteration fits one or two frames and the ticker is smooth.
 // It stays a runtime dial for fine trim, as does the SYNC cadence.
 #define OPS_PER_FRAME 8
+// Act 2's cadence, MEASURED. At one node per frame the walk is draw-bound at
+// ~1.9 frames/node -- Act 2's edges are far cheaper than Act 1's, because they
+// join two points in the address-space picture rather than sweeping a turtle
+// across the canvas -- so 374 nodes came to ~700 frames = ~12 s, under the
+// plan's 20-30 s. The payload is fixed at this phase (the CRCs must not move),
+// so the dial is the cadence: advance the walk once every ACT2_FRAME_DIV frames.
+// 374 x 4 = ~1,500 frames = ~25 s, and 4 > 1.9 so the divider binds rather than
+// the flush.
+#define ACT2_FRAME_DIV 4
 #define SEAM_BEAT_FRAMES 90      // 1.5 s freeze-frame on the device seam
 #define VERDICT_FRAMES 150       // verdict hold before the act loops
 
@@ -91,6 +100,10 @@ volatile uint16_t act1_crc;
 volatile uint16_t act1_status;
 volatile uint16_t act1_seam_hits;  // times the split instruction at the device seam executed
 volatile uint16_t act1_laps;
+volatile uint16_t act2_crc;
+volatile uint16_t act2_status;
+volatile uint16_t act2_nodes;       // nodes walked in the completed lap
+volatile uint16_t act2_seam_edges;  // ... of which crossed the physical device boundary
 // Pacing instrumentation, updated every frame: a WRAM dump at frame N gives the
 // real ops/frame INCLUDING all display cost, which is the number that decides
 // how long the act takes. (The SEAMDEMO_BENCH build measures the VM alone.)
@@ -130,6 +143,19 @@ static inline uint8_t rom_mem8(unsigned long file) {
 #endif
 #include "../65816/seamdemo_vm.h"
 
+// Act 2 addresses the cartridge by 24-bit CPU address directly -- no file->CPU
+// translation, because a mirror-addressed node IS the test.
+static inline uint8_t rom_far8(unsigned long far) {
+  return *(FAR const uint8_t *)far;
+}
+#define SEAMGRAPH_FAR8(a) rom_far8(a)
+#ifndef SEAMDEMO_NO_DRAW
+#define SEAMGRAPH_EDGE(ctx, x0, y0, x1, y1, accent)                              \
+  canvas_line((BitmapCanvas *)(ctx), (int16_t)(x0), (int16_t)(y0), (int16_t)(x1), \
+              (int16_t)(y1), (uint8_t)((accent) ? 3u : 1u))
+#endif
+#include "../65816/seamdemo_graph.h"
+
 // ---------------------------------------------------------------- the app
 #define MODE_RUN 0
 #define MODE_SEAM 1
@@ -140,6 +166,9 @@ typedef struct {
   BitmapCanvas canvas;
   TextLayer text;
   SeamVm vm;
+  SeamGraph gr;
+  uint8_t act;            // 1 or 2 -- which act is on screen
+  uint8_t tick;           // act-2 cadence divider
   uint16_t pause;
   uint16_t laps;
   uint8_t mode;
@@ -150,6 +179,11 @@ typedef struct {
 // the accent set so the crossing reads as an event, not a caption.
 static const uint16_t PAL_RUN[4] = {
     SNES_RGB(0, 0, 0), SNES_RGB(10, 24, 31), SNES_RGB(31, 26, 8), SNES_RGB(28, 10, 31),
+};
+// Act 2's web: dim blue for an ordinary edge, hot orange for one that crosses
+// the physical device seam -- the accent the mockup asks for.
+static const uint16_t PAL_WEB[4] = {
+    SNES_RGB(0, 0, 2), SNES_RGB(8, 16, 28), SNES_RGB(18, 24, 31), SNES_RGB(31, 14, 2),
 };
 static const uint16_t PAL_SEAM[4] = {
     SNES_RGB(6, 0, 0), SNES_RGB(31, 31, 31), SNES_RGB(31, 20, 0), SNES_RGB(31, 6, 0),
@@ -183,9 +217,39 @@ static void hud_build(App *a) {
   hud_top[TEXT_COLS] = 0;
   hud_bot[TEXT_COLS] = 0;
 
-  // Top bar: the 24-bit PC in BOTH forms -- the file offset the stream is
-  // written in, and the CPU bank:address the cartridge is decoded at. The device
-  // seam is exactly the point where those two stop moving together.
+  if (a->act == 2) {
+    // Act 2's top bar is the node's own CPU address -- which is also its position
+    // in the web, since the canvas axes ARE bank and offset.
+    unsigned long p = a->gr.p;
+    put_str(hud_top, "NODE $");
+    put_hex16(hud_top + 6, (uint16_t)(p >> 16), 2);
+    hud_top[8] = ':';
+    put_hex16(hud_top + 9, (uint16_t)p, 4);
+    put_str(hud_top + 15, "N=$");
+    put_hex16(hud_top + 18, a->gr.visited, 4);
+    put_str(hud_top + 22, "/$");
+    put_hex16(hud_top + 24, SEAMDEMO_ACT2_NODES, 4);
+
+    if (a->mode == MODE_VERDICT) {
+      put_str(hud_bot, "ACT1 OK  ACT2 CRC=$");
+      put_hex16(hud_bot + 19, a->gr.crc, 4);
+      put_str(hud_bot + 24, a->pass ? "  OK" : " BAD");
+    } else {
+      put_str(hud_bot, "EDGE=$");
+      put_hex16(hud_bot + 6, a->gr.edges, 4);
+      put_str(hud_bot + 11, "SEAM=$");
+      put_hex16(hud_bot + 17, a->gr.seam_edges, 4);
+      put_str(hud_bot + 22, "MIR=$");
+      put_hex16(hud_bot + 27, a->gr.mirror_edges, 4);
+    }
+    text_puts(&a->text, 0, 0, hud_top);
+    text_puts(&a->text, 1, 0, hud_bot);
+    return;
+  }
+
+  // Act 1: the 24-bit PC in BOTH forms -- the file offset the stream is written
+  // in, and the CPU bank:address the cartridge is decoded at. The device seam is
+  // exactly the point where those two stop moving together.
   unsigned long pc = a->vm.pc;
   unsigned long far = far_of(pc);
   put_str(hud_top, "F=");
@@ -196,8 +260,6 @@ static void hud_build(App *a) {
   hud_top[13] = ':';
   put_hex16(hud_top + 14, (uint16_t)far, 4);
   put_str(hud_top + 19, "SLOT=");
-  // A shift, not a divide: SEAMDEMO_SLOT is 0x8000, and the slot index of a
-  // 6 MiB image fits a byte.
   put_hex16(hud_top + 24, (uint16_t)(pc >> 15), 2);
 
   if (a->mode == MODE_SEAM) {
@@ -301,6 +363,9 @@ int main(void) {
 
   seamvm_init(&a.vm);
   a.vm.status = boot_st;
+  a.gr.status = 0;
+  a.act = 1;
+  a.tick = 0;
   a.mode = MODE_RUN;
   a.pause = 0;
   a.laps = 0;
@@ -314,19 +379,31 @@ int main(void) {
       a.pause--;
       if (a.pause == 0) {
         if (a.mode == MODE_VERDICT) {
-          // Loop the act forever (the plan's three-act cycle; P2/P3 hand off to
-          // the next act here instead of restarting). The fold is recomputed
-          // identically every lap, so the latched WRAM verdict never moves.
           canvas_clear(&a.canvas);
-          uint16_t keep = a.vm.status;
-          seamvm_init(&a.vm);
-          a.vm.status = keep;
+          if (a.act == 1) {
+            // Hand off to Act 2 -- the plan's three-act cycle. P3 replaces the
+            // wrap-around below with the hand-off to Act 3.
+            a.act = 2;
+            a.tick = 0;
+            seamgraph_init(&a.gr);
+            upq_push_cgram(&a.screen.q, 0, PAL_WEB, 0x00, (uint8_t)sizeof PAL_WEB);
+          } else {
+            // Full cycle done: back to Act 1. Both folds are recomputed
+            // identically every lap, so the latched WRAM verdicts never move.
+            a.act = 1;
+            a.laps = (uint16_t)(a.laps + 1u);
+            act1_laps = a.laps;
+            uint16_t keep = a.vm.status;
+            seamvm_init(&a.vm);
+            a.vm.status = keep;
+            upq_push_cgram(&a.screen.q, 0, PAL_RUN, 0x00, (uint8_t)sizeof PAL_RUN);
+          }
         } else {
           upq_push_cgram(&a.screen.q, 0, PAL_RUN, 0x00, (uint8_t)sizeof PAL_RUN);
         }
         a.mode = MODE_RUN;
       }
-    } else {
+    } else if (a.act == 1) {
       for (uint8_t n = OPS_PER_FRAME; n != 0; n--) {
         seamvm_step(&a.vm, &a.canvas);
         if (a.vm.seam_hit) {
@@ -354,15 +431,33 @@ int main(void) {
         a.vm.crc = h;
         if (h != SEAMDEMO_ACT1_CRC) a.vm.status |= SEAMVM_ST_CRC;
         a.pass = (uint8_t)(a.vm.status == 0);
-        a.laps = (uint16_t)(a.laps + 1u);
-
         act1_crc = h;
         act1_status = a.vm.status;
-        act1_laps = a.laps;
-        // P1: the corpus channel carries act 1 alone. P2/P3 replace this with
-        // fold(act1, act2, act3) once the other two acts exist.
-        corpus_result = h;
-
+        a.mode = MODE_VERDICT;
+        a.pause = VERDICT_FRAMES;
+      }
+    } else {
+      a.tick++;
+      if (a.tick >= ACT2_FRAME_DIV) {
+        a.tick = 0;
+        if (!a.gr.done) seamgraph_step(&a.gr, &a.canvas);
+      }
+      if (a.gr.done && a.mode != MODE_VERDICT) {
+        uint16_t h = seamgraph_final_crc(&a.gr);
+        a.gr.crc = h;
+        if (h != SEAMDEMO_ACT2_CRC) a.gr.status |= SEAMGRAPH_ST_CRC;
+        a.pass = (uint8_t)((a.gr.status == 0) && (a.vm.status == 0));
+        act2_crc = h;
+        act2_status = a.gr.status;
+        act2_nodes = a.gr.visited;
+        act2_seam_edges = a.gr.seam_edges;
+        // P2: the corpus channel carries acts 1 and 2. P3 replaces this with the
+        // full three-act fold (SEAMDEMO_CORPUS_RESULT).
+        corpus_result = seamvm_fold(
+            seamvm_fold(seamvm_fold(seamvm_fold(0, (uint8_t)(act1_crc & 0xFFu)),
+                                    (uint8_t)(act1_crc >> 8)),
+                        (uint8_t)(h & 0xFFu)),
+            (uint8_t)(h >> 8));
         a.mode = MODE_VERDICT;
         a.pause = VERDICT_FRAMES;
       }

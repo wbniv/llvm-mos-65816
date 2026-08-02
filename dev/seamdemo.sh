@@ -61,10 +61,13 @@ BMAP="$BUILD/seamdemo-bench.map"
 HDR="$GEN/seamdemo-data.h"
 A16=(-Xclang -target-feature -Xclang +mos-a16)
 
-# MEASURED, not estimated: on target an executed op costs ~1/24 frame and a drawn
-# drawing dominates, so the shipping payload's 10,494 ops / 367 segments put the
-# verdict near frame 2,050 (~34 s, bisected on act1_laps). 2,400 leaves margin.
-JG_FRAMES="${JG_FRAMES:-2400}"
+# MEASURED, not estimated. Drawing dominates both acts, so the frame budget comes
+# from bisecting the WRAM latches, not from a cycle model:
+#   Act 1  10,494 ops / 367 segments -> ~2,050 frames (~34 s)
+#   Act 2  374 nodes at ACT2_FRAME_DIV=4 -> ~1,500 frames (~25 s)
+# plus two verdict holds and the title card. 5,400 is real margin, not the 350
+# frames P1 shipped with.
+JG_FRAMES="${JG_FRAMES:-5400}"
 # The entropy fingerprint only needs a STABLE picture at a fixed frame count, not
 # a completed act, so it runs its six boots at a small budget — otherwise step 7b
 # alone would be six 20,000-frame runs.
@@ -103,6 +106,8 @@ python3 "$ROOT/tools/snes-cartcanary.py" emit-platform \
   --mapping "$MAPPING" --size "$SIZE" --name "$PLAT" --install "$INSTALL"
 python3 "$ROOT/tools/snes-seamdemo-gen.py" emit-header \
   --mapping "$MAPPING" --size "$SIZE" --out "$HDR"
+python3 "$ROOT/tools/snes-seamdemo-gen.py" emit-decode \
+  --mapping "$MAPPING" --size "$SIZE" --out "$GEN/seamdemo-decode.h"
 python3 "$ROOT/tools/snes-seamdemo-gen.py" report \
   --mapping "$MAPPING" --size "$SIZE" --out "$GEN/seamdemo-layout.json"
 
@@ -301,8 +306,13 @@ fi
 
 if [ -x "$BUILD/jgxcheck" ] && [ -d "$ROOT/vendor/bsnes-jg/Database" ]; then
   echo
-  echo "==> 7) bsnes-jg: act1_crc == $WANT_A1, act1_status == 0x0000"
-  for sym_want in "act1_crc:$WANT_A1" "act1_status:0x0000" "corpus_result:$WANT_A1"; do
+  echo "==> 7) bsnes-jg: both acts fold to the generated oracle"
+  WANT_A2=0x$(sed -n 's/^#define SEAMDEMO_ACT2_CRC 0x\([0-9A-F]*\)u$/\1/p' "$HDR")
+  WANT_C12=0x$(sed -n 's/^#define SEAMDEMO_CORPUS_ACT12 0x\([0-9A-F]*\)u$/\1/p' "$HDR")
+  echo "  (act2 $WANT_A2, corpus(act1,act2) $WANT_C12)"
+  for sym_want in "act1_crc:$WANT_A1" "act1_status:0x0000" \
+                  "act2_crc:$WANT_A2" "act2_status:0x0000" \
+                  "corpus_result:$WANT_C12"; do
     sym="${sym_want%%:*}"; want="${sym_want##*:}"
     read -r vma size2 < <(_emu_map_lookup "$MAP" "$sym") || true
     if [ -z "${vma:-}" ]; then echo "  FAIL: $sym not in the map"; rc=1; continue; fi
@@ -353,5 +363,5 @@ fi
 
 echo
 echo "  ROM SHA-256: $(sha256sum "$ROM" | cut -c1-64)"
-emu_verdict "$rc" "Act 1's bytecode VM marched its 24-bit file PC across the whole 6 MiB ExHiROM image, executed the instruction split across the physical device seam, and folded to the generated oracle"
+emu_verdict "$rc" "Act 1's bytecode VM marched its 24-bit file PC across the whole 6 MiB ExHiROM image and executed the instruction split across the physical device seam; Act 2 walked the covering cycle through all 374 decode cells, mirrors included, and closed on its entry — both folded to the generated oracle"
 exit $rc

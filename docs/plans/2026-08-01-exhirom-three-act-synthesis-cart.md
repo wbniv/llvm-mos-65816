@@ -426,6 +426,78 @@ nothing had caught it; this gate is the first to. Tracked as its own backlog ite
 `instruction: PH $p` **and** exactly one error) and fails on any other verifier error; the disasm
 probe falls back to the `-Oz` object, which emits the same three shapes.
 
+## P2 — Act 2: the boundary-hostile graph walk
+
+[`examples/65816/seamdemo_graph.h`](../../examples/65816/seamdemo_graph.h) holds the walk, on the
+same one-source-three-consumers discipline as Act 1: `mos-clang` compiles it for the 65816,
+the host `cc` compiles it inside [`tools/seamdemo-sim.c`](../../tools/seamdemo-sim.c), and
+`run_act2()` in the Python oracle is the independent third implementation. All three fold to
+**`$36B6`**.
+
+**The traversal is the P0 contract, unchanged.** For each of the 374 nodes: fold all 16 node
+bytes, then the byte at `peek0`, then the byte at `peek1`; advance along `next`; after the last
+node fold the node count low byte then high. Following `next` from the entry visits every decode
+cell exactly once and must land back on the entry — checked separately as `SEAMGRAPH_ST_CYCLE`,
+because a decoder that mis-resolved one mirror would break the *chain* rather than merely perturb
+the fold, and that deserves its own signal.
+
+Addresses here are 24-bit CPU addresses straight out of the payload — no file→CPU translation,
+because a mirror-addressed node *is* the test.
+
+**The web is the address space.** A node's canvas position is derived from its own CPU address:
+`x = bank >> 1` (256 banks folded into 128 columns), `y = addr >> 9` (64 KiB into 128 rows). So a
+seam-crossing edge is visibly a long jump across the picture and the `$FF`→`$40` discontinuity
+reads as one. Edges draw in dim blue, seam-crossing edges in the hot accent (`PAL_WEB`). The HUD
+shows the live node address and the edge counters (`EDGE` / `SEAM` / `MIR`), and the verdict strip
+carries `ACT1 OK  ACT2 CRC=$36B6` — the partial strip this phase calls for; the full three-act
+strip lands with P3.
+
+### Pacing — measured, tuned on cadence, payload untouched
+
+| | measured |
+|---|---:|
+| Act 2 at one node per frame | ~700 frames ≈ 12 s |
+| implied cost | ~1.9 frames/node |
+| **shipping (`ACT2_FRAME_DIV = 4`)** | **~1,500 frames ≈ 25 s** |
+
+Act 2's edges are far cheaper than Act 1's — they join two points in the address-space picture
+rather than sweeping a turtle across the canvas — so one-node-per-frame came in *under* the 20–30 s
+window rather than over it. The payload is frozen at this phase (the CRCs must not move), so the
+dial is the cadence: the walk advances once every `ACT2_FRAME_DIV` frames. At 4 the divider binds
+(4 > 1.9) rather than the dirty-tile flush, which makes the act length predictable.
+
+Full cycle: Act 1 (~2,050) + verdict (150) + Act 2 (~1,500) + verdict (150) ≈ 3,850 frames, so the
+gate's `JG_FRAMES` is **5,400** — real margin, replacing the 350 frames P1 shipped with.
+
+### Corpus progression
+
+`corpus_fold(*crcs)` folds a run of act CRCs, low byte then high. A partially-built cartridge
+reports the same primitive over the acts that exist: P1 shipped act 1 alone, **P2 ships
+`SEAMDEMO_CORPUS_ACT12` = `$0C72`**, and P3 replaces it with the full three-act
+`SEAMDEMO_CORPUS_RESULT` = `$3277`. The partial value is not a different kind of thing from the
+final one.
+
+### Contract friction (P0 feedback)
+
+Three things the P0 contract did not anticipate. None required a payload change; all are recorded
+here so P3 inherits them.
+
+1. **The host harness needed a mirror-aware decode, and P0 only emitted the canonical one.** Act 1's
+   PC is a file offset, so the two-entry `far = file + delta` table was sufficient. Act 2 dereferences
+   *mirror* CPU addresses by design, and the inverse of that table only covers canonical windows. The
+   console gets the decode free from the cartridge; the host does not, and re-deriving the mapping in
+   C would have forked the model. Fixed by emitting the model's own decode-cell table as a separate
+   host-only header (`snes-seamdemo-gen.py emit-decode` → `seamdemo-decode.h`, 380 cells). Kept out
+   of `seamdemo-data.h` so the ROM never links a table it has no use for.
+2. **`corpus_result` had no defined value for a partially-built cartridge.** Added `corpus_fold`
+   (above) rather than letting P2 invent an ad-hoc constant.
+3. **The `PH $p` verifier defect stopped reproducing once Act 2 was linked in.** P1 recorded it as a
+   `-verify-machineinstrs` failure in `seamvm_step`; with Act 2 present the same build is
+   **`-verify-machineinstrs` clean**. That is consistent with the diagnosis (a liveness-modelling gap
+   in a register-pressure-dependent spill-around sequence, not a wrong instruction) and it means the
+   signature-exact tolerance in `dev/seamdemo.sh` is currently dormant rather than removed — the
+   right state, since `seqvm.c` still reproduces it. Useful evidence for the backlog item.
+
 ## Verification (to be executed per phase; format per house rules)
 
 1. ~~P0: generator self-check — oracle reproduces a hand-computed fold on a 64 KiB miniature
@@ -472,7 +544,8 @@ probe falls back to the `-Oz` object, which emits the same three shapes.
     `test/snes/cartridge-maps/test_snes_cartmap.py` (58 passed, 25044 subtests).
 2. ~~P1: Act 1 gate — `host == +mos-a16 @ bsnes-jg` fold; disasm shows jump-table dispatch +
    `__call_indir` + far fetches; seam event fires at the modeled file offset.~~
-   **DONE 2026-08-01.** `dev/run.sh seamdemo`
+   **DONE 2026-08-01.** `dev/run.sh seamdemo` — the log below is the CURRENT run of that one
+   gate script, so it covers step 3's Act-2 assertions too rather than duplicating the output.
 
     ```
     ==> 1) host: P0 generator self-check + address-model unit tests
@@ -487,6 +560,7 @@ probe falls back to the `-Oz` object, which emits the same three shapes.
     ==> 2) generate the ExHiROM 6 MiB platform + data header, link
     platform snes-cart-seamdemo: /work/build/install/mos-platform/snes-cart-seamdemo/lib/link.ld + /work/build/install/bin/mos-snes-cart-seamdemo.cfg
     header /work/build/seamdemo-gen/seamdemo-data.h: 374 nodes, 374/380 decode cells covered, corpus_result $3277
+    decode /work/build/seamdemo-gen/seamdemo-decode.h: 380 cells (host harness only)
     report /work/build/seamdemo-gen/seamdemo-layout.json: 890576 payload bytes
       linked /work/build/seamdemo.sfc: 6291456 bytes
 
@@ -496,18 +570,14 @@ probe falls back to the `-Oz` object, which emits the same three shapes.
 
     ==> 4) fill the payload, patch header + checksum, structural inspect
     fill /work/build/seamdemo.sfc: 890576 payload bytes, act1 $F0E2 act2 $36B6 act3 $6D21 -> corpus_result $3277
-    /work/build/seamdemo.sfc: exhirom size=6144KiB devices=32Mbit+16Mbit map_mode=0x25 rom_size_byte=0x0D checksum=0x5D37 complement=0xA2C8
+    /work/build/seamdemo.sfc: exhirom size=6144KiB devices=32Mbit+16Mbit map_mode=0x25 rom_size_byte=0x0D checksum=0x92C7 complement=0x6D38
       PASS: file length : 6291456 bytes (0x600000, 48 Mbit / 6 MiB);physical devices : 32Mbit @ $000000 + 16Mbit @ $400000 header at file : $40FFB0;map mode byte : $25
 
     ==> 5) disasm: far fetch + jump-table dispatch + function-pointer ALU table
-      KNOWN: -verify-machineinstrs trips the pre-existing 'PH $p undefined' liveness
-             defect (also in examples/snes/seqvm.c at -Os +mos-a16; clean at -Oz).
-             Not a seamdemo defect — see the plan's P1 section. Any OTHER verifier
-             error still fails this gate.
-      NOTE: disasm probe reads the -Oz object (the -Os one was not emitted)
-      PASS: 1 far fetch(es) (lda [dp], a7) — the 24-bit cartridge cursor
+      PASS: -verify-machineinstrs clean
+      PASS: 25 far fetch(es) (lda [dp], a7) — the 24-bit cartridge cursor
       PASS: 1 jump-table dispatch (jmp (abs,X), 7c) — the 16-way switch
-      PASS: 3 __call_indir reference(s) — the function-pointer ALU table
+      PASS: 8 __call_indir reference(s) — the function-pointer ALU table
 
     ==> 6) host oracle over the BUILT image == the header's baked CRCs
       act1 CRC $F0E2  (10494 ops, 367 segments, 191 marks)
@@ -518,7 +588,9 @@ probe falls back to the `-Oz` object, which emits the same three shapes.
 
     ==> 6b) host C: the SAME VM source the ROM runs, over the built image
       act1 CRC $F0E2 (want $F0E2)  ops=10494 segments=367 syncs=51 seam-hits=1 status=$0000
-      PASS: host C == the generated oracle
+      act2 CRC $36B6 (want $36B6)  nodes=374 edges=1122 seam=776 mirror=739 status=$0000
+      corpus(act1,act2) $0C72 (want $0C72)
+      PASS: host C == the generated oracle (acts 1 and 2)
       PASS: host C == Python oracle == the header's baked CRC
 
     ==> 5b) pacing: ops/frame achieved on target
@@ -528,17 +600,20 @@ probe falls back to the `-Oz` object, which emits the same three shapes.
       projected act length  : ~1844 frames = ~30 s
       PASS: OPS_PER_FRAME=8 is matched to the achievable 5 ops/frame
 
-    ==> 7) bsnes-jg: act1_crc == 0xF0E2, act1_status == 0x0000
+    ==> 7) bsnes-jg: both acts fold to the generated oracle
+      (act2 0x36B6, corpus(act1,act2) 0x0C72)
       act1_crc: jgxcheck: wrote /work/build/seamdemo.png (256x224 from native 512x240, yoff=0)
-    SMOKE: PASS off=0x6B len=2 got=0xF0E2 (ran 2400 frames, bsnes-jg)
+    SMOKE: PASS off=0x6F len=2 got=0xF0E2 (ran 5400 frames, bsnes-jg)
       screenshot: /work/build/seamdemo.png
-      act1_status: SMOKE: PASS off=0x65 len=2 got=0x0000 (ran 2400 frames, bsnes-jg)
-      corpus_result: SMOKE: PASS off=0x6D len=2 got=0xF0E2 (ran 2400 frames, bsnes-jg)
+      act1_status: SMOKE: PASS off=0x69 len=2 got=0x0000 (ran 5400 frames, bsnes-jg)
+      act2_crc: SMOKE: PASS off=0x71 len=2 got=0x36B6 (ran 5400 frames, bsnes-jg)
+      act2_status: SMOKE: PASS off=0x73 len=2 got=0x0000 (ran 5400 frames, bsnes-jg)
+      corpus_result: SMOKE: PASS off=0x79 len=2 got=0x0C72 (ran 5400 frames, bsnes-jg)
     ==> 7b) picture is independent of power-on entropy (None/Low/High x2)
-      PASS: one picture across all six boots (3903EBAF:#000000)
+      PASS: one picture across all six boots (FBDCB9F3:#000000)
 
-      ROM SHA-256: 74bd219cbf188150ea73ddba9a10bfc5808aa5393b3f2ead6fed221f6f32bd27
-    RESULT: PASS — Act 1's bytecode VM marched its 24-bit file PC across the whole 6 MiB ExHiROM image, executed the instruction split across the physical device seam, and folded to the generated oracle
+      ROM SHA-256: 75d6cd45cdfaa95371effe0594574285ea061ead064210fab9a173daf5e855d3
+    RESULT: PASS — Act 1's bytecode VM marched its 24-bit file PC across the whole 6 MiB ExHiROM image and executed the instruction split across the physical device seam; Act 2 walked the covering cycle through all 374 decode cells, mirrors included, and closed on its entry — both folded to the generated oracle
     GATE_EXIT=0
     ```
 
@@ -547,5 +622,10 @@ probe falls back to the `-Oz` object, which emits the same three shapes.
     the pre-existing `PH $p` verifier defect (reproduces in committed `seqvm.c`), reported as
     KNOWN and tracked separately. MAME leg still blocked on the SPC700 IPL gap.
 3. P2/P3: per-act sub-CRC gates + full-cycle `corpus_result` latch inside the frame budget.
+   **P2 half DONE 2026-08-01** — `dev/run.sh seamdemo` asserts, on bsnes-jg at 5,400 frames:
+   `act1_crc $F0E2`, `act1_status 0x0000`, `act2_crc $36B6`, `act2_status 0x0000`, and the
+   two-act progression `corpus_result $0C72` (`SEAMDEMO_CORPUS_ACT12`). Act 2 measured at
+   ~1,500 frames ≈ 25 s (`ACT2_FRAME_DIV = 4`); full cycle ≈ 3,850 frames inside the 5,400
+   budget. The full three-act `corpus_result $3277` latch is P3. Raw output under step 2.
 4. All phases: entropy fingerprint (one picture hash across None/Low/High × 2).
 5. P4: live-page WASM Verify fidelity == gate value.

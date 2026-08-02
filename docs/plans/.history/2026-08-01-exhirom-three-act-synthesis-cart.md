@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/acd0dc1) | tools: snes-cartmap-viz.py — inline-SVG decode maps for the cartsize pages (model-derived, self-tested) |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/dd954dd) | feat(snes/seamdemo): P1 Act-1 ROM — a bytecode VM marching the whole 6 MiB cartridge |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/e30673f) | feat(snes/seamdemo): P0 generator + host oracle for the three-act boundary cartridge |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/cdb9be8) | docs(plan): seamdemo — ExHiROM three-act boundary synthesis cartridge (supersedes video-reel Phase 2) |
 
 <!--history-meta v1
+acd0dc1	author	Will Norris
+acd0dc1	added	20
+acd0dc1	deleted	1
+acd0dc1	files	1
+acd0dc1	body	380-cell fold of the 256x2 half-bank space, canonical/mirror per device,\nWRAM banks, the 8 MiB unreachable hole, and a generically-derived seam\ncallout; counts asserted against decode_cells()/holes() two ways\n(selftest: 380/128/252, 380/192/188, 380/254/126+64KiB hole). Deployed to\nbiohack.net as v1.0.345 (cfdb7cb there, CI success, live spot-checked).\n\nSNESDQ_SKIP=1: whole-tree gate trips on another worker's uncommitted\nexamples/snes/video_hud.h, out of scope here.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 dd954dd	author	Will Norris
 dd954dd	added	208
 dd954dd	deleted	25

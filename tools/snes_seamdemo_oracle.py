@@ -453,12 +453,22 @@ def run_act3(img: Image, desc: dict) -> Act3Result:
 # --------------------------------------------------------------------------
 # The fold every act reports into
 # --------------------------------------------------------------------------
-def corpus_result(a1: int, a2: int, a3: int) -> int:
+def corpus_fold(*crcs: int) -> int:
+    """Fold a run of act CRCs, low byte then high, in act order.
+
+    Taking a variable number of acts is what lets a partially-built cartridge
+    report a meaningful progression value: P2 ships `corpus_fold(act1, act2)`
+    and P3 replaces it with the full three-act fold.  Same primitive either way,
+    so the partial value is not a different kind of thing from the final one."""
     h = 0
-    for v in (a1, a2, a3):
+    for v in crcs:
         h = fold(h, v & 0xFF)
         h = fold(h, (v >> 8) & 0xFF)
     return h
+
+
+def corpus_result(a1: int, a2: int, a3: int) -> int:
+    return corpus_fold(a1, a2, a3)
 
 
 def run_all(cm: CartMap, data: bytes, desc: dict) -> dict:

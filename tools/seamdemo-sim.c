@@ -78,6 +78,33 @@ static uint8_t host_mem8(unsigned long file) {
 #define SEAMVM_MEM8(f) host_mem8(f)
 #include "seamdemo_vm.h"
 
+// --- act 2 needs the MIRROR-aware decode ---------------------------------
+// Act 2's node addresses are deliberately a mix of canonical and mirror CPU
+// addresses. The console gets that decode free from the cartridge; the host does
+// not, and must not re-derive it here -- tools/snes_cartmap.py is the one model.
+// So the generator emits its decode-cell table and this walks it.
+#include "seamdemo-decode.h"
+
+static uint8_t host_far8(unsigned long far) {
+  unsigned bank = (unsigned)((far >> 16) & 0xFFUL);
+  unsigned half = (unsigned)((far >> 15) & 1UL);
+  for (int i = 0; i < SEAMDEMO_CELL_COUNT; i++) {
+    if (seamdemo_cell_bank[i] == bank && seamdemo_cell_half[i] == half) {
+      unsigned long off = seamdemo_cell_file[i] + (far & 0x7FFFUL);
+      if (off >= g_size) {
+        fprintf(stderr, "seamdemo-sim: CPU $%06lX -> file $%06lX past the image\n", far, off);
+        exit(2);
+      }
+      return g_rom[off];
+    }
+  }
+  fprintf(stderr, "seamdemo-sim: CPU $%06lX is not a decode cell\n", far);
+  exit(2);
+}
+
+#define SEAMGRAPH_FAR8(a) host_far8(a)
+#include "seamdemo_graph.h"
+
 int main(int argc, char **argv) {
   if (argc < 2) {
     fprintf(stderr, "Usage: %s <rom.sfc>\n", argv[0]);
@@ -124,10 +151,39 @@ int main(int argc, char **argv) {
   printf("act1 CRC $%04X (want $%04X)  ops=%lu segments=%u syncs=%lu seam-hits=%lu status=$%04X\n",
          crc, (unsigned)SEAMDEMO_ACT1_CRC, v.ops, (unsigned)v.nseg, syncs, seams,
          (unsigned)v.status);
-  if (v.status) {
-    printf("FAIL: status $%04X\n", (unsigned)v.status);
+
+  // --- act 2 ---------------------------------------------------------------
+  SeamGraph g;
+  g.status = 0;
+  seamgraph_init(&g);
+  while (!g.done) {
+    seamgraph_step(&g, NULL);
+    if (g.visited > SEAMDEMO_ACT2_NODES) break;  // cannot happen; cheap guard
+  }
+  uint16_t g2 = seamgraph_final_crc(&g);
+  if (g2 != SEAMDEMO_ACT2_CRC) g.status |= SEAMGRAPH_ST_CRC;
+  printf("act2 CRC $%04X (want $%04X)  nodes=%u edges=%u seam=%u mirror=%u status=$%04X\n",
+         g2, (unsigned)SEAMDEMO_ACT2_CRC, (unsigned)g.visited, (unsigned)g.edges,
+         (unsigned)g.seam_edges, (unsigned)g.mirror_edges, (unsigned)g.status);
+
+  unsigned corpus12 = 0;
+  {
+    uint16_t h = 0;
+    uint16_t acts[2] = { crc, g2 };
+    for (int i = 0; i < 2; i++) {
+      h = seamvm_fold(h, (uint8_t)(acts[i] & 0xFFu));
+      h = seamvm_fold(h, (uint8_t)(acts[i] >> 8));
+    }
+    corpus12 = h;
+  }
+  printf("corpus(act1,act2) $%04X (want $%04X)\n",
+         corpus12, (unsigned)SEAMDEMO_CORPUS_ACT12);
+
+  if (v.status || g.status || corpus12 != SEAMDEMO_CORPUS_ACT12) {
+    printf("FAIL: act1 status $%04X, act2 status $%04X\n",
+           (unsigned)v.status, (unsigned)g.status);
     return 1;
   }
-  printf("PASS: host C == the generated oracle\n");
+  printf("PASS: host C == the generated oracle (acts 1 and 2)\n");
   return 0;
 }
