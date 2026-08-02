@@ -8,6 +8,11 @@
 #define VIDEO_HUD_CHR_WORD 0x5000u
 #define VIDEO_HUD_COLS 32u
 #define VIDEO_HUD_FIRST_ROW 24u
+#define VIDEO_HUD_SHADOW_FIRST_ROW 25u
+#define VIDEO_HUD_SHADOW_ROWS 2u
+
+static uint16_t video_hud_shadow[VIDEO_HUD_COLS * VIDEO_HUD_SHADOW_ROWS];
+static uint8_t video_hud_dirty;
 
 static const uint8_t video_hud_bgmode[] = {
   127u, BGMODE_7, 65u, BGMODE_7, 32u, BGMODE_1, 0u
@@ -23,24 +28,56 @@ static inline void video_hud_words(uint16_t dst, const uint16_t *src, uint16_t c
 }
 
 static inline void video_hud_text(uint8_t row, uint8_t col, const char *text) {
-  REG_VMAIN = VMAIN_INC_HIGH_1;
-  REG_VMADD = (uint16_t)(VIDEO_HUD_MAP_WORD + (uint16_t)row * VIDEO_HUD_COLS + col);
-  while (*text) {
+  uint16_t *dst = &video_hud_shadow[(uint16_t)(row - VIDEO_HUD_SHADOW_FIRST_ROW) *
+                                    VIDEO_HUD_COLS + col];
+  while (*text && col++ != VIDEO_HUD_COLS) {
     uint8_t ch = (uint8_t)*text++;
-    REG_VMDATA = (ch >= FONT8_FIRST && ch < FONT8_FIRST + FONT8_N)
+    uint16_t tile = (ch >= FONT8_FIRST && ch < FONT8_FIRST + FONT8_N)
         ? (uint16_t)(ch - FONT8_FIRST) : 0u;
+    if (*dst != tile) {
+      *dst = tile;
+      video_hud_dirty |= (uint8_t)(1u << (row - VIDEO_HUD_SHADOW_FIRST_ROW));
+    }
+    ++dst;
   }
 }
 
 static inline void video_hud_line(uint8_t row, const char *text) {
   uint8_t col = 0u;
-  REG_VMAIN = VMAIN_INC_HIGH_1;
-  REG_VMADD = (uint16_t)(VIDEO_HUD_MAP_WORD + (uint16_t)row * VIDEO_HUD_COLS);
+  uint16_t *dst = &video_hud_shadow[(uint16_t)(row - VIDEO_HUD_SHADOW_FIRST_ROW) *
+                                    VIDEO_HUD_COLS];
   while (col++ != VIDEO_HUD_COLS) {
     uint8_t ch = *text ? (uint8_t)*text++ : (uint8_t)' ';
-    REG_VMDATA = (ch >= FONT8_FIRST && ch < FONT8_FIRST + FONT8_N)
+    uint16_t tile = (ch >= FONT8_FIRST && ch < FONT8_FIRST + FONT8_N)
         ? (uint16_t)(ch - FONT8_FIRST) : 0u;
+    if (*dst != tile) {
+      *dst = tile;
+      video_hud_dirty |= (uint8_t)(1u << (row - VIDEO_HUD_SHADOW_FIRST_ROW));
+    }
+    ++dst;
   }
+}
+
+static inline void video_hud_flush_row(uint8_t row) {
+  volatile uint8_t *dma = (volatile uint8_t *)(uintptr_t)0x4300u;
+  uint16_t source = (uint16_t)(uintptr_t)&video_hud_shadow[(uint16_t)row * VIDEO_HUD_COLS];
+  REG_VMAIN = VMAIN_INC_HIGH_1;
+  REG_VMADD = (uint16_t)(VIDEO_HUD_MAP_WORD +
+      (VIDEO_HUD_SHADOW_FIRST_ROW + row) * VIDEO_HUD_COLS);
+  dma[0] = 1u;
+  dma[1] = 0x18u;
+  dma[2] = (uint8_t)source;
+  dma[3] = (uint8_t)(source >> 8);
+  dma[4] = 0u;
+  dma[5] = (uint8_t)(VIDEO_HUD_COLS * 2u);
+  dma[6] = 0u;
+  REG_MDMAEN = 0x01u;
+}
+
+static inline void video_hud_flush(void) {
+  if (video_hud_dirty & 1u) video_hud_flush_row(0u);
+  if (video_hud_dirty & 2u) video_hud_flush_row(1u);
+  video_hud_dirty = 0u;
 }
 
 static inline void video_hud_arm(void) {
@@ -66,6 +103,9 @@ static inline void video_hud_begin(void) {
   REG_VMAIN = VMAIN_INC_HIGH_1;
   REG_VMADD = VIDEO_HUD_MAP_WORD;
   for (i = 0; i != VIDEO_HUD_COLS * 32u; ++i) REG_VMDATA = 0u;
+  for (i = 0; i != VIDEO_HUD_COLS * VIDEO_HUD_SHADOW_ROWS; ++i)
+    video_hud_shadow[i] = 0u;
+  video_hud_dirty = 0u;
   video_hud_arm();
 }
 #endif

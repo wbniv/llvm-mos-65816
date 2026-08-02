@@ -1698,4 +1698,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-08-01: three canary-6b addendum bullets are recorded RESULTS (gate PASS evidence), not deferred work — covered by the canary-6b-revalidate Done entry. fp:8bd02423f82e515c fp:296dbe20a6aa20e4 fp:89b5e6bf073a6ac8 -->
 <!-- triaged 2026-08-02: verification recorded in the plan; item closed in Done. -->
 - [verify] **2026-08-02-svx2-video-technical-page** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-02-svx2-video-technical-page.md](docs/plans/2026-08-02-svx2-video-technical-page.md)_  <!-- fp:6fcb6e55539d0d13 -->
+- [verify] **2026-08-01-svx2-cut-aware-dashboard-labels** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-svx2-cut-aware-dashboard-labels.md](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md)_  <!-- fp:4f251e5d7b449bd4 -->
 <!-- END auto-captured-deferrals -->

@@ -17,13 +17,13 @@ table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}capt
 <div class="mockups">
 <main class="page"><div class="hero">SVX2 60 FPS FastROM Video</div><p class="lede">Two Artemis videos, decoded and presented by a stock SNES cartridge.</p>
 <div class="player">LIVE SNES EMULATOR<div class="dashboard">NASA SVS / LAUNCH &nbsp; PLAY<br>TIME 00:07 &nbsp;&nbsp;&nbsp; FPS 59.9</div></div>
-<section class="stats"><div class="stat"><b>3,819 / 3,819</b>presentations</div><div class="stat"><b>0 / 0</b>slips / errors</div><div class="stat"><b>4,480 B</b>per frame</div><div class="stat"><b>4 MiB</b>Fast HiROM</div></section>
+<section class="stats"><div class="stat"><b>3,822 / 3,822</b>presentations</div><div class="stat"><b>0 / 0</b>slips / errors</div><div class="stat"><b>4,480 B</b>per frame</div><div class="stat"><b>32 Mbit</b>Fast HiROM (4 MiB)</div></section>
 <h2>HOW ONE FRAME MOVES</h2><div class="flow"><div class="stage">FastROM<br>packet</div><div class="arrow">→</div><div class="stage">$7F WRAM<br>stage</div><div class="arrow">→</div><div class="stage">SVX2<br>in-place decode</div><div class="arrow">→</div><div class="stage">VBlank DMA<br>Mode 7 VRAM</div></div>
 <h2>WHY SVX2?</h2><div class="tablewrap"><table><caption>Real-camera/Floyd corpus and target decoder</caption><tr><th>Path</th><th>Ratio</th><th>Measured rate</th></tr><tr><td>Raw copy</td><td>101.83%</td><td>87.6 fps</td></tr><tr><td>LZSS</td><td>55.62%</td><td>2.1–2.3 fps</td></tr><tr><td>SVX1</td><td>52.50%</td><td>15.6–34.3 fps</td></tr><tr class="win"><td>SVX2</td><td>57.04%</td><td>60.8–69.4 fps</td></tr></table></div>
 <h2>FULL-PIPELINE BUDGET</h2><p>p99 combined: <b>89,088</b> of <b>89,342</b> NTSC PPU dots</p><div class="budget"><div class="bar"><div class="fill"></div></div></div><p class="note">Sequential playback keeps slow independent keyframes in the seek table, outside the real-time stream.</p>
 </main>
 <aside class="page phone"><div class="hero">SVX2 60 FPS Video</div><p class="lede">A playable SNES proof, then the measurements.</p><div class="player">LIVE PLAYER</div>
-<section class="stats"><div class="stat"><b>3,819</b>of 3,819</div><div class="stat"><b>0</b>slips</div><div class="stat"><b>80×56</b>video</div><div class="stat"><b>4 MiB</b>ROM</div></section>
+<section class="stats"><div class="stat"><b>3,822</b>of 3,822</div><div class="stat"><b>0</b>slips</div><div class="stat"><b>80×56</b>video</div><div class="stat"><b>32 Mbit</b>ROM (4 MiB)</div></section>
 <h2>HOW ONE FRAME MOVES</h2><div class="flow"><div class="stage">FastROM packet</div><div class="arrow">→</div><div class="stage">WRAM stage</div><div class="arrow">→</div><div class="stage">SVX2 decode</div><div class="arrow">→</div><div class="stage">VBlank DMA</div></div>
 <h2>WHY SVX2?</h2><div class="tablewrap"><table><tr><th>Path</th><th>Ratio</th><th>Rate</th></tr><tr><td>LZSS</td><td>55.62%</td><td>2.3</td></tr><tr class="win"><td>SVX2</td><td>57.04%</td><td>60.8+</td></tr></table></div><p class="note">Swipe table for all codec rows →</p>
 </aside></div></body></html>

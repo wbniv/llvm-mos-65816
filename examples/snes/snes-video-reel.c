@@ -26,6 +26,10 @@ volatile uint32_t video_reel_vblanks;
 volatile uint8_t video_reel_transport_state;
 volatile uint8_t video_reel_transport_rate;
 volatile uint8_t video_reel_seek_decode_count;
+volatile uint8_t video_reel_segment;
+volatile uint8_t video_reel_segment_gate;
+volatile uint8_t video_reel_time_reset_gate;
+volatile uint32_t video_reel_composite_health;
 
 #ifdef VIDEO_REEL_PROFILE
 typedef struct {
@@ -96,6 +100,58 @@ static uint8_t transport_visible;
 static uint8_t transport_hide;
 static uint8_t transport_resume;
 
+static uint8_t segment_for_frame(uint16_t frame) {
+#ifdef VIDEO_REEL_SEGMENT_COUNT
+  uint8_t segment = 0u;
+  while ((uint8_t)(segment + 1u) < VIDEO_REEL_SEGMENT_COUNT &&
+         frame >= reel_segment_starts[segment + 1u])
+    ++segment;
+  return segment;
+#else
+  (void)frame;
+  return 0u;
+#endif
+}
+
+static void dashboard_segment(uint16_t frame, uint8_t force) {
+  uint8_t segment = segment_for_frame(frame);
+  if (!force && segment == video_reel_segment) return;
+  video_reel_segment = segment;
+#ifdef VIDEO_REEL_SEGMENT_COUNT
+  /* A full sequential loop must visit every Artemis cut in order. This
+     target-visible state gives the emulator gate an exact transition proof. */
+  if (video_reel_segment_gate == 0xffu && frame == 0u && segment == 0u)
+    video_reel_segment_gate = 1u;
+  else if (video_reel_segment_gate < VIDEO_REEL_SEGMENT_COUNT &&
+           frame == reel_segment_starts[video_reel_segment_gate] &&
+           segment == video_reel_segment_gate)
+    ++video_reel_segment_gate;
+  else if (video_reel_segment_gate == VIDEO_REEL_SEGMENT_COUNT &&
+           frame == 0u && segment == 0u)
+    video_reel_segment_gate = 0xa5u;
+#endif
+  if (transport_visible) return;
+#ifdef VIDEO_REEL_SEGMENT_COUNT
+  {
+    char field[19];
+    uint8_t i = segment;
+    const char *label = &reel_segment_labels[0][0];
+    /* Keep the ROM-table walk explicit. This avoids relying on target
+       lowering of a variable-indexed pointer-to-array multiplication. */
+    while (i--) label += 19u;
+    i = 0u;
+    while (i != 18u) {
+      field[i] = *label ? *label++ : ' ';
+      ++i;
+    }
+    field[18] = 0;
+    video_hud_text(25u, 1u, field);
+  }
+#else
+  video_hud_text(25u, 1u, "SVX2 VIDEO         ");
+#endif
+}
+
 enum {
   TRANSPORT_PLAY = 0u,
   TRANSPORT_PAUSE = 1u,
@@ -139,10 +195,12 @@ static void update_dashboard_fields(void) {
 }
 
 static void dashboard_normal(void) {
-  video_hud_line(25u, " SVX2 VIDEO                 PLAY");
+  video_hud_line(25u, "                           PLAY ");
   video_hud_line(26u, " TIME                  FPS     ");
   transport_visible = 0u;
+  dashboard_segment(video_reel_frame, 1u);
   update_dashboard_fields();
+  video_hud_flush();
 }
 
 static void transport_draw(uint8_t state, uint8_t rate) {
@@ -172,14 +230,20 @@ static void transport_draw(uint8_t state, uint8_t rate) {
   p = &bottom[27]; decimal(p, video_reel_frame, 4u);
   video_hud_line(25u, top);
   video_hud_line(26u, bottom);
+  video_hud_flush();
   transport_visible = 1u;
   transport_hide = state == TRANSPORT_PLAY ? 90u : 0u;
 }
 
-static void dashboard_presented(void) {
+static void dashboard_presented(uint16_t frame, uint8_t looped) {
   uint16_t now_vblank = (uint16_t)video_reel_vblanks;
   uint16_t dv = (uint16_t)(now_vblank - fps_vblank_sample);
-  if (++dashboard_frame_tick == VIDEO_REEL_SOURCE_FPS) {
+  if (looped) {
+    dashboard_frame_tick = 0u;
+    dashboard_seconds = 0u;
+    dashboard_minutes = 0u;
+    if (frame == 0u) video_reel_time_reset_gate = 0xa5u;
+  } else if (++dashboard_frame_tick == VIDEO_REEL_SOURCE_FPS) {
     dashboard_frame_tick = 0u;
     if (dashboard_minutes != 99u || dashboard_seconds != 59u) {
       if (++dashboard_seconds == 60u) {
@@ -200,7 +264,9 @@ static void dashboard_presented(void) {
     fps_presented_sample = now_presented;
     fps_vblank_sample = now_vblank;
   }
+  dashboard_segment(frame, 0u);
   update_dashboard_fields();
+  video_hud_flush();
 }
 
 static void stop(uint8_t result) {
@@ -220,6 +286,17 @@ static uint16_t crc16(const uint8_t *data, uint16_t bytes) {
   return crc;
 }
 
+static uint8_t reel_stream_bank(uint32_t offset) {
+#ifdef VIDEO_REEL_EXHIROM
+  /* Stream offset $000000-$3FFFFF is file region A / banks $C0-$FF.
+     The packed continuation skips file $400000-$40FFFF (boot/header) and
+     resumes at file $410000 / bank $41. */
+  if (offset >= 0x400000ul)
+    return (uint8_t)(0x41u + (uint8_t)((offset - 0x400000ul) >> 16));
+#endif
+  return (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16));
+}
+
 static uint8_t stage_frame(uint16_t frame) {
   SvcSnesDmaContext context = {3u, 1u};
 #ifdef VIDEO_REEL_PACKED_FAR
@@ -231,7 +308,7 @@ static uint8_t stage_frame(uint16_t frame) {
     uint16_t segment = (uint16_t)(0u - address);
     if (!segment || segment > remaining) segment = remaining;
     if (!svc_snes_dma_copy_segment(&context,
-        (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16)), address,
+        reel_stream_bank(offset), address,
         (uint8_t *)(uintptr_t)(STAGE_ADDRESS + copied), segment)) return 0u;
     offset += segment;
     copied = (uint16_t)(copied + segment);
@@ -256,7 +333,7 @@ static uint8_t stage_seek_keyframe(uint8_t index) {
     uint16_t segment = (uint16_t)(0u - address);
     if (!segment || segment > remaining) segment = remaining;
     if (!svc_snes_dma_copy_segment(&context,
-        (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16)), address,
+        reel_stream_bank(offset), address,
         (uint8_t *)(uintptr_t)(STAGE_ADDRESS + copied), segment)) return 0u;
     offset += segment;
     copied = (uint16_t)(copied + segment);
@@ -277,7 +354,7 @@ static uint8_t stage_loop_delta(void) {
     uint16_t segment = (uint16_t)(0u - address);
     if (!segment || segment > remaining) segment = remaining;
     if (!svc_snes_dma_copy_segment(&context,
-        (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16)), address,
+        reel_stream_bank(offset), address,
         (uint8_t *)(uintptr_t)(STAGE_ADDRESS + copied), segment)) return 0u;
     offset += segment;
     copied = (uint16_t)(copied + segment);
@@ -437,6 +514,7 @@ static uint8_t transport_seek(int16_t delta, uint8_t state, uint8_t rate) {
   wait_vblank_fresh();
   present_frame(destination);
   video_reel_frame = destination;
+  dashboard_segment(destination, 0u);
   video_reel_transport_state = state;
   video_reel_transport_rate = rate;
   transport_draw(state, rate);
@@ -506,6 +584,10 @@ void video_reel_run(void) {
   video_reel_transport_state = TRANSPORT_PLAY;
   video_reel_transport_rate = 0u;
   video_reel_seek_decode_count = 0u;
+  video_reel_segment = 0xffu;
+  video_reel_segment_gate = 0xffu;
+  video_reel_time_reset_gate = 0xffu;
+  video_reel_composite_health = 0xfffffffful;
 
   /* Exercise the stream boundaries behind a short animated introduction. */
 #if VIDEO_REEL_VBLANKS_PER_FRAME == 1u
@@ -561,6 +643,7 @@ void video_reel_run(void) {
 
   for (;;) {
     uint8_t palette_cut;
+    uint8_t looped;
     if (transport_poll())
       deadline = (uint16_t)video_reel_vblanks + VIDEO_REEL_VBLANKS_PER_FRAME;
     if (video_reel_transport_state != TRANSPORT_PLAY) {
@@ -569,7 +652,8 @@ void video_reel_run(void) {
       continue;
     }
     frame = (uint16_t)(video_reel_frame + 1u);
-    if (frame == VIDEO_REEL_FRAME_COUNT) frame = 0u;
+    looped = frame == VIDEO_REEL_FRAME_COUNT;
+    if (looped) frame = 0u;
 #ifdef VIDEO_REEL_SECOND_PALETTE
     palette_cut = frame == VIDEO_REEL_SECOND_START || frame == 0u;
 #else
@@ -590,15 +674,23 @@ void video_reel_run(void) {
       upload_palette(frame == VIDEO_REEL_SECOND_START);
     }
 #endif
-    present_frame(frame);
-    dashboard_presented();
     video_reel_frame = frame;
+    dashboard_presented(frame, looped);
+    /* Upload the small dashboard first. The full 4,480-byte video DMA uses
+       nearly the rest of the VBlank budget; HUD writes after it are too late
+       on real timing and were intermittently ignored by the PPU. */
+    present_frame(frame);
     if (transport_visible)
       transport_draw(video_reel_transport_state, video_reel_transport_rate);
     deadline = (uint16_t)(deadline + VIDEO_REEL_VBLANKS_PER_FRAME);
     if (frame == 0u && video_reel_loop_gate != 0u) {
       static uint8_t loops;
-      if (++loops == 2u) video_reel_loop_gate = 0u;
+      if (++loops == 2u) {
+        video_reel_loop_gate = 0u;
+        video_reel_composite_health = (uint32_t)video_reel_result |
+            ((uint32_t)video_reel_crc_failures << 8) |
+            ((uint32_t)video_reel_deadline_slips << 16);
+      }
     }
   }
 }

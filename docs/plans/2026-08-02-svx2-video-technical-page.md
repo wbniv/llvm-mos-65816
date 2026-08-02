@@ -38,11 +38,11 @@ cartridge-native dashboard explanation. Add a compact result strip immediately b
 
 | Result | Published value |
 |---|---:|
-| Presentation cadence | 3,819 / 3,819 eligible intervals |
+| Presentation cadence | 3,822 / 3,822 eligible intervals |
 | Deadline slips / decoder errors | 0 / 0 |
 | Visible frame | 80 × 56, 8-bit indexed Mode 7 |
 | Frame payload | 4,480 bytes / 70 tiles |
-| Cartridge | 4 MiB Fast HiROM |
+| Cartridge | 32 Mbit (4 MiB) Fast HiROM |
 
 The values must come from a small checked-in data object used by both prose and tables; do not
 duplicate benchmark literals in hand-maintained HTML.
@@ -108,7 +108,7 @@ headline result:
 
 Annotate the NTSC interval at 89,342 PPU dots. Explain why the maximum is not part of sequential
 playback: independent keyframes were moved to the seek table; the continuous stream uses deltas.
-Then show the integrated endurance evidence: 3,819 presentations in 3,819 eligible intervals of a
+Then show the integrated endurance evidence: 3,822 presentations in 3,822 eligible intervals of a
 4,000-frame run, zero deadline slips and zero decode errors. Do not turn the decode-only 60.8 fps
 number into an integrated-player claim.
 
@@ -173,4 +173,3 @@ regressions. Prefer stable repository permalinks once the implementation commit 
 - direct benchmark/provenance/source links and artifact checksum enforcement;
 - desktop and phone screenshots from the production build; and
 - updated video/codec documentation pointing readers to the published case study.
-

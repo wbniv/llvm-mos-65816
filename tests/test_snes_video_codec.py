@@ -165,6 +165,45 @@ def test_snes_dma_segment_copy_plan(tmp_path):
     subprocess.run([str(executable)], check=True)
 
 
+def run_reel_assets(tmp_path, *extra):
+    root = Path(__file__).parents[1]
+    tiles = tmp_path / "frames.tiles"
+    palette = tmp_path / "palette.bin"
+    output = tmp_path / "assets.h"
+    tiles.write_bytes(bytes(FRAME_SIZE * 3))
+    palette.write_bytes(bytes((0, 0, 0xff, 0x7f)) + bytes(444))
+    return subprocess.run(
+        [sys.executable, str(root / "tools/snes-video-reel-assets.py"),
+         "--frames", "3", *extra, str(tiles), str(palette), str(output)],
+        text=True, capture_output=True), output
+
+
+def test_reel_assets_emit_cut_aware_dashboard_segments(tmp_path):
+    process, output = run_reel_assets(
+        tmp_path, "--segment", "0:LAUNCH", "--segment", "1:RETURN",
+        "--segment", "2:PRESS-SITE CAMERA")
+    assert process.returncode == 0, process.stderr
+    header = output.read_text()
+    assert "#define VIDEO_REEL_SEGMENT_COUNT 3u" in header
+    assert "0u, 1u, 2u" in header
+    assert '"LAUNCH"' in header
+    assert '"PRESS-SITE CAMERA"' in header
+
+
+@pytest.mark.parametrize("segments, message", [
+    (("1:FIRST",), "first segment must start at frame zero"),
+    (("0:FIRST", "0:SECOND"), "strictly increasing"),
+    (("0:",), "1 through 18"),
+    (("0:THIS LABEL IS FAR TOO LONG",), "1 through 18"),
+    (("0:FIRST", "3:PAST END"), "outside the 3-frame reel"),
+])
+def test_reel_assets_reject_invalid_dashboard_segments(tmp_path, segments, message):
+    args = tuple(item for segment in segments for item in ("--segment", segment))
+    process, _ = run_reel_assets(tmp_path, *args)
+    assert process.returncode != 0
+    assert message in process.stderr
+
+
 def test_checksum_tool_marks_fastrom_and_recomputes_checksum(tmp_path):
     root = Path(__file__).parents[1]
     rom_path = tmp_path / "fast.sfc"

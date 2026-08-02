@@ -24,6 +24,8 @@ def main() -> int:
     parser.add_argument("--frames", type=int, default=4)
     parser.add_argument("--packed-far", action="store_true",
                         help="emit one contiguous HiROM far-data stream and offsets")
+    parser.add_argument("--exhirom", action="store_true",
+                        help="map packed stream offset zero to ExHiROM file zero / bank $C0")
     parser.add_argument("--stream-output", type=Path,
                         help="write packed bytes separately instead of a C initializer")
     parser.add_argument("--first-tiles", type=Path,
@@ -33,6 +35,8 @@ def main() -> int:
     parser.add_argument("--first-frames", type=int, default=0)
     parser.add_argument("--keyframe-interval", type=int, default=0,
                         help="emit a seek keyframe at this frame interval")
+    parser.add_argument("--segment", action="append", default=[], metavar="START:LABEL",
+                        help="dashboard segment start frame and label (repeatable)")
     args = parser.parse_args()
 
     data = args.tiles.read_bytes()
@@ -66,6 +70,24 @@ def main() -> int:
         palettes = [first_palette, palette]
     if args.keyframe_interval < 0:
         parser.error("--keyframe-interval must be non-negative")
+    segments: list[tuple[int, str]] = []
+    for spec in args.segment:
+        try:
+            start_text, label = spec.split(":", 1)
+            start = int(start_text, 10)
+        except ValueError:
+            parser.error(f"invalid --segment {spec!r}; expected START:LABEL")
+        if not label or len(label) > 18:
+            parser.error("segment labels must contain 1 through 18 characters")
+        if any(ord(ch) < 0x20 or ord(ch) > 0x7e for ch in label):
+            parser.error("segment labels must contain printable ASCII only")
+        if start < 0 or start >= len(frames):
+            parser.error(f"segment start {start} is outside the {len(frames)}-frame reel")
+        if segments and start <= segments[-1][0]:
+            parser.error("segment starts must be strictly increasing")
+        segments.append((start, label))
+    if segments and segments[0][0] != 0:
+        parser.error("the first segment must start at frame zero")
     packets: list[bytes] = []
     previous = None
     for index, frame in enumerate(frames):
@@ -109,6 +131,18 @@ def main() -> int:
     ]
     if args.keyframe_interval:
         lines.append(f"#define VIDEO_REEL_SEEK_INTERVAL {args.keyframe_interval}u")
+    if segments:
+        lines.extend((
+            f"#define VIDEO_REEL_SEGMENT_COUNT {len(segments)}u",
+            f"static const uint16_t reel_segment_starts[{len(segments)}] = {{",
+            "  " + ", ".join(f"{start}u" for start, _ in segments),
+            "};",
+            f"static const char reel_segment_labels[{len(segments)}][19] = {{",
+        ))
+        for _, label in segments:
+            escaped = label.replace("\\", "\\\\").replace('"', '\\"')
+            lines.append(f'  "{escaped}",')
+        lines.append("};")
     if second_start:
         lines.append(f"#define VIDEO_REEL_SECOND_START {second_start}u")
         if palettes[1] != palettes[0]:
@@ -137,11 +171,13 @@ def main() -> int:
             ))
         lines.extend((
             "#define VIDEO_REEL_PACKED_FAR 1",
-            "#define VIDEO_REEL_HIROM_BASE_BANK 0xc1u",
+            f"#define VIDEO_REEL_HIROM_BASE_BANK {('0xc0u' if args.exhirom else '0xc1u')}",
             f"static const uint32_t reel_packet_offsets[{len(offsets)}] = {{",
             "  " + ", ".join(f"{offset}ul" for offset in offsets),
             "};",
         ))
+        if args.exhirom:
+            lines.append("#define VIDEO_REEL_EXHIROM 1")
         if seek_packets:
             lines.extend((
                 f"#define VIDEO_REEL_SEEK_COUNT {len(seek_packets)}u",

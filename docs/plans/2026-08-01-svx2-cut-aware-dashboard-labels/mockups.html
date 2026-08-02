@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>SVX2 cut-aware dashboard mockups</title>
+<style>
+body{margin:0;background:#16191d;color:#ddd;font:16px system-ui;padding:28px}h1{font-size:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:22px;max-width:1100px}
+.card{background:#22272d;border:1px solid #454d57;border-radius:12px;padding:16px}.video{height:190px;background:linear-gradient(145deg,#07101a,#66442b);display:grid;place-items:center;color:#bbb}
+.hud{background:#050505;color:#fff;font:18px/1.5 monospace;white-space:pre;padding:10px 12px;overflow:hidden}.cut{color:#8dd6ff;font-weight:700}.note{color:#9da7b3;font-size:14px}
+</style></head><body><h1>Cut-aware cartridge dashboard</h1><p class="note">The highlighted field changes with the frame that is actually visible.</p>
+<div class="grid">
+<section class="card"><div class="video">NASA SVS launch animation</div><div class="hud"><span class="cut">NASA SVS / LAUNCH</span>          PLAY
+TIME 00:07             FPS 59.9</div><p>Frames 0–599</p></section>
+<section class="card"><div class="video">NASA SVS return animation</div><div class="hud"><span class="cut">NASA SVS / RETURN</span>          PLAY
+TIME 00:10             FPS 59.9</div><p>Frames 600–1199</p></section>
+<section class="card"><div class="video">Artemis I press-site camera</div><div class="hud"><span class="cut">PRESS-SITE CAMERA</span>          PLAY
+TIME 00:20             FPS 59.9</div><p>Frames 1200–1799</p></section>
+</div></body></html>
