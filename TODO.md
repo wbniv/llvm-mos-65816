@@ -91,25 +91,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   examples/snes/seqvm.c` (2 errors: `$rc3` bb.2, `$rc5` bb.5; clean at `-O0`/`-Oz`).
   (T3: analysis complete and recorded; remaining work is folding this evidence into the
   item-13 upstream issue and, separately, deciding whether to attempt the toolchain-wide fix.)
-- [T3] **#138 loose end — the vanished `$rl1 = LDImm` Imag32 producer + a standing non-GPR-`LDImm`
-  scan.** The gallery only hit the `combineLdImm` null store because the 2026-07-26 toolchain
-  emitted `$rl1 = LDImm -1`/`0` (Imag32 dest — malformed MIR on 65816) in `@unpack_slide`; that
-  producer "went away" with the 2026-07-31 vendor rebuild with **no identified fixing delta**
-  (violates every-anomaly-has-a-cause). Post-fix this matters more, not less: the crash was the
-  only release-mode detector of that producer class — a returning producer is now *silent*
-  outside `-verify-machineinstrs` builds. Two halves: (a) identify the vendor/patch delta that
-  removed the Imag32-`LDImm` emission (or bound it: bisect the 0018/0019-era patch stack against
-  the archived 2026-07-26 `@unpack_slide` MIR shape) — escalate to T4 if it's live-but-latent
-  rather than fixed; (b) promote the already-scripted "0 non-AXY `LDImm`s" disasm count
-  (4bb67f8's measurement: 268 `$a` + 438 `$x` + 339 `$y`, zero others) into a standing check in
-  the gallery gate. Filed from the [guard-hardening follow-up
-  plan](docs/plans/2026-07-31-138-guard-hardening-followup.md) finding 3.
-  Backend segfault reproduced in passing during the abi-clobber investigation: `mos-clang ...
-  -fno-lto -S` on `examples/snes/lzss-gallery.c` crashes in `MOS Late Optimizations` at `-O0` and
-  `-Oz` (clean at `-O1`; shipped ROMs use LTO where the pass doesn't crash, so no demo impact —
-  but it is a real backend bug). Existing plan:
-  [#138](docs/plans/2026-07-27-138-lzss-far-decode-mos-late-optimization-crash.md) (PLANNED —
-  fold this fresh repro in). (T4: unknown-root-cause backend debugging.)
 - [T2] **Deferred ordinary-ROM canary matrix** — the non-milestone rows trimmed from the ExHiROM
   video plan: full LoROM size/speed matrix, remaining HiROM sizes + FastROM, SRAM header variants,
   copier-header/legacy-header inputs, PAL headers. Generate from the same authoritative mapping
@@ -917,6 +898,8 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-02 — [138-producer] Vanished `$rl1 = LDImm` producer ROOT-CAUSED + standing gate added (`c95ca7b`). Cause: another worker's `0018-320-imag32-spill` (created 07-27 16:58 — after the crashing 07-26 build, before the clean 07-31 one; its stated failure mode "one byte through a GPR → illegal GPR-to-Imag32 COPY" is exactly the observed malformation, and `unpack_slide` is the far-pointer spiller). Counterfactual rebuild not run — evidence is temporal + shape, strong not airtight. Gate: `dev/lzss-gallery.sh` now asserts every LDImm destination is a GPR (1,043 found, 0 non-GPR); uses `-fno-lto` because the LTO link defers codegen — the first draft passed VACUOUSLY on an empty dump, which the gate now fails loudly on. Needed because 0003's guard skips a returning producer silently instead of crashing.
+- [x] 2026-08-02 — [band-sweep-adopted] Dormant session's BAND 4→1 per-frame refresh sweep adopted across 19 demos (`d93499a`) after verification: 19/19 differential gates PASS (oracles host-derived, unchanged), display-check 6/6 PASS with stable ink. SVX2 reel corridor deliberately left untouched (still mid-edit when that session stopped). Unblocks the wai-idiom residual.
 - [x] 2026-08-02 — [seamdemo] P0–P4 COMPLETE. Three-act ExHiROM boundary cartridge LIVE at [/snes/seamdemo/](https://biohack.net/snes/seamdemo/) (site `445121a`, v1.0.350, CI success, live ROM sha `29dafeb5…` verified, decode-map SVG embedded). Console: act1 `$F0E2` / act2 `$36B6` / act3 `$6D21` → full-cycle `corpus_result $3277`, four-way oracle agreement, `-verify` clean, entropy fingerprint one picture ×6, ~100 s cycle. Coverage 374/374 decode cells, 1,122 edges (755 seam-crossing), one instruction split across the physical device seam. New gallery category **Cartridge & Mapping Tests** carries it plus the three canary pages. Published as-is: cycle length is a runtime dial (no CRC impact); the ~872 KB gzip lever would change `act3_crc`, so it stays open. Deferred: live Mode 7 page-address HUD (needs HDMA mode-split or OBJ; presentation only). See [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md).
 - [x] 2026-08-02 — [lowercmpzeros] Sticky loop-carried `Changed` FIXED (`6249aae`): after a block's first fold every later `CmpZero` went unlowered and the asm printer emitted NOTHING for the survivor — silent dropped flag test, verifier-invisible. Reproduces on PRISTINE upstream → standalone patch `0022` + PR package READY TO POST (row 18). Red/green lit test; suite 83 w/ exactly the 7 known failures; measured in-tree incidence ZERO (17,403 blocks, max 1 CmpZero/block) so the fix is inert here. Corpus differential COMPLETE: 59/61 value rows, **59/59 host==a16@bsnes, 0 mismatches** (the harness's `0/61 passed` is the missing-SPC700-IPL MAME columns, not disagreements). See [plan](docs/plans/2026-08-02-lowercmpzeros-sticky-changed.md).
 - [x] 2026-08-01 — [138-branch-merged] `throwaway/138-late-opt-crash` MERGED to main (`98231c1`): patch `0003-late-opt-nongpr-ldimm-dest` + PR-doc mirror (verified == live #584 body) + toolchain/regen wiring reconciled with the 0021-era `BASELINE_MOSDIR`; status row 15 unified. Upstream PR #584 open, CI green ×3. Foreign toolchain.sh 0018/0019 hunk stash-restored intact.
