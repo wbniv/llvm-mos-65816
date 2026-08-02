@@ -61,26 +61,23 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [wip T3] **seamdemo — P2 graph-walk act DONE (`47172e2`: act2 `$36B6` 3-way, 25 s, fingerprint `FBDCB9F3`, margin 1,550 frames); next: P3 Act-3 flyover + loop glue (full-cycle `corpus_result $3277`), then P4 publish.** <!-- agent:a3f76f15f3f53c44e (holds full contract context) --> P3 notes from P2: direct post-change bisect of Act-2 length; rename stale `act1_frames`; PH-tolerance stays dormant (seqvm still reproduces).
-  <!-- agent:a3f76f15f3f53c44e (P0 done; holds full generator/oracle/ISA context — reuse for P1) -->
-  P0 contract settled: `decode_cells()` model extension (380 cells, 5 new regression tests,
-  58+25,044 subtests), one-slot-record layout, 16-op ISA + 8-entry ALU fn-ptr table, 24-bit
-  file-offset PC, the seam chapter hand-laid as ONE instruction straddling the device boundary
-  (opcode file `$3FFFFF`=`$FF:FFFF`, operand `$400000`=`$40:0000`). Coverage: 374/374 available
-  cells in-degree ≥1; 1,122 edges (755 seam-, 748 mirror-, 1,118 bank-crossing). Oracle:
-  act1 `$F0E2` act2 `$36B6` act3 `$6D21` → **corpus_result `$3277`** (P0 regenerated for measured pacing: 48 B chapters, MOVE 1-in-23, 10,494 ops/367 segments; coverage invariants held 374/374); ALL selfchecks PASS;
-  deterministic rebuild. P1 cautions recorded in the plan: re-derive the reserved code range
-  from the actual link script (don't trust slot 129), diff non-zero extents before first
-  `fill`, Act-1 pacing MEASURED (34 s by lap-bisect; dirty-tile flush is a per-vblank throughput wall — cost is NOT linear in ops), download-size lever changes act3_crc. One 48 Mbit cart,
-  three acts in a loop, each reading the full image with a different access pattern: Act 1 a
-  VM executing the whole cart as one bytecode stream (PC ticker; the $3FFFFF→$400000 seam
-  crossing is an on-screen event), Act 2 a boundary-hostile pointer-graph walk (every decode
-  window in-degree > 0), Act 3 a Mode 7 flyover over a cart-spanning atlas. House pattern
-  unchanged: generator + host oracle from `tools/snes_cartmap.py`, per-act sub-CRCs, folded
-  `corpus_result`, entropy-fingerprint gate, `snes_ppu_reset_blank()` at boot. Supersedes the
-  video-reel Phase 2. **UNBLOCKED 2026-08-01: the merge landed (`d0d6b39`)** — cartmap model,
-  ExHiROM platform, and speed attribute are on main; P0 is dispatchable. [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md) (T4: new
-  generator architecture + VM design; phases P1-P3 drop to T3 once P0 settles the contract.)
+- [T3] **seamdemo — P1+P2+P3 DONE (`f3aa4ab`): all three acts on console, full-cycle latch
+  `corpus_result $3277`, gate PASS; next = P4 publication (two decisions first).**
+  <!-- agent:a3f76f15f3f53c44e (holds the whole contract) --> Act 3 Mode 7 flyover + loop glue
+  landed: 8/8 console assertions (act1 `$F0E2`, act2 `$36B6`, act3 `$6D21`, cycle_status 0,
+  corpus `$3277`), four-way oracle agreement, `-verify-machineinstrs` clean with the PH
+  tolerance removed, entropy fingerprint one picture ×6 boots, JG_FRAMES 7,200 (~1,200 margin
+  over the measured ~6,000-frame cycle). Measured by latch-bisect: act1 ~34 s, act2 ~29–35 s,
+  act3 ~23–34 s, **cycle ~100 s**. Notable: Mode 7 de-tiling done on the way to VRAM (64×8-byte
+  DMAs, one tile-row per v-blank) — 0.7 vs ~4.6 frames/page for a WRAM reorder, and it is why
+  act3 cadence is 2 samples/frame. **P4 decisions needed BEFORE publishing:** (a) ~100 s cycle
+  is long for a web page (viewer waits ~34 s for Act 2) — publish as-is or trim cadence
+  (runtime dial, no CRC impact); (b) ~872 KB gzipped from the full-entropy texture nibble — the
+  fix (restrict the nibble to path-sampled texels) **changes `act3_crc`**, so decide first.
+  **Deferred, reported:** the live Mode 7 page-address HUD needs either an HDMA BGMODE/TM
+  scanline split (which also needs the font moved above VRAM `$4000`, risking Acts 1–2) or OBJ
+  sprites — presentation, not correctness; both routes recorded in the plan.
+  (T3: P4 is a settled pipeline once the two dials are decided.)
 - [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
   absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
   `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
