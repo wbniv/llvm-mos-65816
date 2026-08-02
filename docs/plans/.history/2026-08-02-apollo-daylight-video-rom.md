@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8d4261a) | fix(snes): apollo cartridge booted to 37 seconds of black |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/c1a667f) | feat(snes): add the Apollo 11 daylight-launch video cartridge |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/c9d81f3) | docs: consolidate the compiler defects the demo battery has exposed; record Apollo ROM progress |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8828247) | plan+todo: Apollo 11 daylight video cartridge — turn the hard-content stressor into a ROM (wip T3) |
 
 <!--history-meta v1
+8d4261a	author	Will Norris
+8d4261a	added	88
+8d4261a	deleted	3
+8d4261a	files	1
+8d4261a	body	Reported against the live page: "no title screen, no video, always black."\nCorrect, and every gate still passed -- which is the part worth fixing.\n\nThe ROM ran its 300-frame whole-loop validation force-blanked AHEAD of the\ntitle screen. That pass is a bit-serial Fletcher sweep over 301 decoded frames\ncosting ~2,200 VBlanks, so the published cartridge showed a 100% black screen\nfor its first 36.6 seconds:\n\n  VBlank   900 (~15.0s)  black=100.0%  colours=1\n  VBlank  1800 (~30.0s)  black=100.0%  colours=1\n  VBlank  2200 (~36.6s)  black=  3.6%  colours=4   <- title finally appears\n\nsnes-video-reel.c warns about exactly this and I did not heed it: "Exhaustive\nround-trip and target CRC validation belongs to the build gate ... so the title\nremains an introduction rather than a loading screen."\n\nWhy the gate missed it: every WRAM assert ran a 3,000-6,000 VBlank budget and\nsampled only the end state. Nothing ever looked at the screen during the first\nminute. A gate that inspects only the destination cannot see a broken journey.\n\nBoot validation is now -DAPOLLO_REEL_SELFTEST, built and gated but never\nshipped. The published ROM goes straight to its title:\n\n  VBlank  60 (~1.0s)  title card\n  VBlank 180 (~3.0s)  video playing\n\nThe whole-loop byte-correct requirement is undiminished -- still proven on\nbsnes-jg for both slow and FastROM self-test builds with the same one-flipped-\nbyte negative control. Only its location moved, from the shipped cartridge to\nthe gate, which is where the plan's bar always placed it.\n\nRegression guard in the same commit: dev/apollo-reel.sh step 6 renders the\npublished ROM at VBlank 180 and fails if the frame is >=98% black or has <=2\ndistinct colours. It reproduces the defect on the old binary.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 c1a667f	author	Will Norris
 c1a667f	added	137
 c1a667f	deleted	0

@@ -42,7 +42,7 @@ CONFIG="$BUILD/install/bin/mos-snes-hirom.cfg"
 JGX="$BUILD/jgxcheck"
 DATABASE="$ROOT/vendor/bsnes-jg/Database"
 
-CORPUS=${APOLLO_REEL_CORPUS:-/tmp/claude-1000/-home-will-llvm-mos-65816/a18c5d7f-022f-40ce-9bd4-41fe3d290b79/scratchpad/apollo-work}
+CORPUS=${APOLLO_REEL_CORPUS:-/tmp/claude-1000/-home-will-llvm-mos-65816/a18c5d7f-022f-40ce-9bd4-41fe3d290b79/scratchpad/apollo-v2}
 DITHER=${APOLLO_REEL_DITHER:-floyd}
 FRAMES=${APOLLO_REEL_FRAMES:-300}
 KEYFRAME=${APOLLO_REEL_KEYFRAME:-120}
@@ -51,8 +51,18 @@ CADENCE=${APOLLO_REEL_CADENCE:-2}
 TILES="$CORPUS/apollo-daylight-$DITHER.tiles"
 PALETTE="$CORPUS/apollo-daylight-$DITHER.pal"
 RGB="$CORPUS/apollo-daylight.rgb"
-# Recorded in docs/plans/.../real-video-codec-benchmark.md §Hard-content stressor.
-RGB_SHA=a78c4c8c96ba7a00e99475b9545466b21cd12a041597d867994318a33f514080
+# The v2 recut. The first interval (56:50, uncropped, 30 fps) was a TRACKING shot:
+# the camera follows the rocket, so at 80x56 almost nothing moved frame to frame
+# (mean|d| 1.48 against 2.9-4.0 for every other corpus) and it looked static. This
+# is the colour segment cropped to the action and sampled at 15 fps over 20 s, so
+# it plays back at 2x and the rocket visibly climbs. Reproduce with:
+#
+#   tools/snes-video-rgb24-convert.sh --start 3410 --duration 20 --fps 15 \
+#       --crop 'iw/2:ih/2:iw/4:ih/3' <master>.mp4 apollo-daylight.rgb
+#
+# Provenance for the master is in
+# docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md.
+RGB_SHA=${APOLLO_REEL_RGB_SHA:-2779e0793eda3ad89fec1d81a946f30e840dee307659b699d27c98a8df6810f5}
 
 HEADER="$BUILD/apollo-reel-assets.h"
 STREAM="$BUILD/apollo-reel-stream.bin"

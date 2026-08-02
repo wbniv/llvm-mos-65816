@@ -280,6 +280,55 @@ reproduces the defect on the old binary and passes on the new one. Two page clai
 falsified were also corrected rather than left standing: the manifest `selfcheck` label (which said
 the button ran the whole-loop check) and the page's "Before a single pixel is shown…" paragraph.
 
+### Recut to interval v2 — the shipped clip was visually static (FIXED)
+
+The v1 interval passed every gate and was still the wrong clip: **a tracking shot**. The camera
+follows the rocket, so at 80×56 the subject barely moves and the demo looked frozen. Measured at the
+RGB24 stage, v1 had 3–4× less motion than any other corpus in the battery (mean|Δ| 0.93 vs
+2.88–3.93). The gate could not have caught this — "is this interesting to watch" is not a
+correctness property — but it is a real defect in a demo whose job is to be watched.
+
+Recut per the authorized parameters, using the **same master and the same colour segment**, cropped
+to the action and sampled below source rate so playback is 2×:
+
+```
+tools/snes-video-rgb24-convert.sh --start 3410 --duration 20 --fps 15 \
+    --crop 'iw/2:ih/2:iw/4:ih/3' <master>.mp4 apollo-daylight.rgb
+```
+
+`--crop` and sub-source `--fps` were **added to that script** rather than hand-run, because
+reproducibility is exactly why the script exists. RGB24 SHA-256 `2779e079…10f5` (300 frames,
+4,032,000 B).
+
+Motion, confirmed to survive quantization, dithering and packing all the way to the console — three
+frames captured from the running ROM, pairwise over the 256×192 video region:
+
+| | v1 (shipped) | v2 (recut) |
+|---|---:|---:|
+| mean\|Δ\|, frame 30 vs 150 | 23.69 | **50.81** |
+| mean\|Δ\|, frame 150 vs 260 | 12.91 | **30.34** |
+| % pixels differing | 54.8–57.8% | **78.7–80.0%** |
+| black in video region (letterbox) | 41.7% | **20.0%** |
+
+The crop also halved the letterbox, so the picture fills more of the screen.
+
+**The content got much harder, which is the point.** SVX2 now compresses to **79.62%** of raw
+(v1: 62.33%; Artemis night launch: 57.04%). Both intervals are recorded side by side in the
+benchmark doc — the v1 numbers were not overwritten. Two findings worth carrying:
+
+- The keyframe-interval ordering **inverts**: on v2, shorter K wins (K=15 → 1,066,921 vs
+  K=120 → 1,070,154), because a delta packet on genuinely moving content costs about as much as a
+  fresh keyframe. The spread is still only 3,233 B across an 8× range of K, so K=120 stays.
+- The LZSS-beats-SVX2 inversion v1 hinted at (2.67 points) becomes a **14.31-point** gap
+  (877,809 vs 1,070,154). Within-frame compression decisively beats between-frame compression once
+  frames stop resembling each other. The codec decision is unaffected — it was speed-anchored, and
+  LZSS is still ~27× too slow.
+
+**Cadence is unchanged: 300/600 VBlanks, zero slips, on both slow ROM and FastROM.** Even a
+near-worst-case 3,696-byte packet stages and decodes inside the 2-VBlank budget. The cartridge grew
+to **16 Mbit (2 MiB)** Fast HiROM for the 1,083,714-byte stream; still ordinary HiROM, still no
+ExHiROM.
+
 ### Deviations from the plan
 
 - **The plan cites "the reel's whole-loop Fletcher check" as precedent; the reel has no such

@@ -10,22 +10,33 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-usage: snes-video-rgb24-convert.sh --start SECONDS --duration SECONDS [--fps RATE] INPUT OUTPUT.rgb
+usage: snes-video-rgb24-convert.sh --start SECONDS --duration SECONDS
+                                  [--fps RATE] [--crop W:H:X:Y] INPUT OUTPUT.rgb
 
   --start SECONDS     interval start, in seconds, within INPUT
   --duration SECONDS  interval length, in seconds (frame count = duration × rate)
   --fps RATE          output rate (default: 30); frame selection only, never interpolation
+  --crop W:H:X:Y      ffmpeg crop spec applied BEFORE the Lanczos scale, so the
+                      kept region fills the 80x45 raster instead of being shrunk
+                      into it. Accepts ffmpeg expressions (iw, ih). Default: none.
   INPUT               source video (any ffmpeg-readable container/codec)
-  OUTPUT.rgb           concatenated 80x56 row-major RGB24 frames
+  OUTPUT.rgb          concatenated 80x56 row-major RGB24 frames
 
-Frame count sanity: duration * 30 must be an integer frame count; the script
-verifies the output size is an exact multiple of 80*56*3 = 13,440 bytes.
+Sampling below the source rate is deliberate and is how a clip is sped up: 20 s
+at --fps 15 yields 300 frames, which played back at 30 fps is 2x speed. This
+matters for the SNES corpora because at 80x56 a *tracking* shot barely changes
+frame to frame -- crop to the action and raise the effective speed to put real
+motion in the delta stream.
+
+Frame count sanity: the script verifies the output size is an exact multiple of
+80*56*3 = 13,440 bytes.
 EOF
 }
 
 start=""
 duration=""
 fps=30
+crop=""
 args=()
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -33,6 +44,7 @@ while [ $# -gt 0 ]; do
     --start) start=$2; shift 2 ;;
     --duration) duration=$2; shift 2 ;;
     --fps) fps=$2; shift 2 ;;
+    --crop) crop=$2; shift 2 ;;
     *) args+=("$1"); shift ;;
   esac
 done
@@ -44,8 +56,16 @@ input=${args[0]}
 output=${args[1]}
 [ -f "$input" ] || { echo "FATAL: missing input $input" >&2; exit 1; }
 
+# Crop sits between the frame-rate selection and the scale: cropping first means
+# the kept region is what Lanczos resamples to 80x45, rather than the whole frame
+# being shrunk and the subject occupying a handful of pixels.
+filter="fps=$fps"
+[ -n "$crop" ] && filter="$filter,crop=$crop"
+filter="$filter,scale=80:45:flags=lanczos,pad=80:56:0:5:black,format=rgb24"
+echo "filter: $filter" >&2
+
 ffmpeg -y -v error -ss "$start" -i "$input" -t "$duration" \
-  -vf "fps=$fps,scale=80:45:flags=lanczos,pad=80:56:0:5:black,format=rgb24" \
+  -vf "$filter" \
   -f rawvideo -pix_fmt rgb24 "$output"
 
 size=$(stat -c%s "$output")

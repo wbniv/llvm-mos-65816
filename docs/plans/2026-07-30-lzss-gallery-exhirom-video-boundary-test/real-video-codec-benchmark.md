@@ -343,6 +343,67 @@ background pixel indices stable frame to frame — depends on the source itself 
 film grain reintroduces per-pixel decorrelation that Bayer's fixed dither pattern cannot suppress,
 so most of Bayer's edge over Floyd (23.55 points on the night leg) evaporates to 9.04 points here.
 
+### Recut (2026-08-02): interval v2, and why v1 understated the difficulty
+
+Everything above this heading measures **interval v1** — `--start 3410 --duration 10 --fps 30`,
+uncropped. Those numbers stand and are not overwritten; but v1 turned out to be a poor stressor for
+a reason that only became visible once it was on a screen.
+
+**v1 is a *tracking* shot.** The camera follows the rocket, so the subject stays put in frame and,
+at 80×56, almost nothing changes frame to frame. Measured against the other corpora at the RGB24
+stage:
+
+| corpus | mean\|Δ\| | % pixels changing |
+|---|---:|---:|
+| Artemis return | 3.93 | 12.4% |
+| Artemis animation | 3.51 | 10.4% |
+| Artemis launch | 2.88 | 8.1% |
+| **Apollo v1 (56:50, tracking)** | **0.93** | **1.4%** |
+| **Apollo v2 (recut)** | **3.51** | **8.5%** |
+
+So v1's "hard content" ratio of 62.33% was measuring *film grain alone*, with the interframe codec
+still getting an easy ride from a near-static frame. It also looked static as a demo.
+
+**v2** keeps the same master and the same colour segment but crops to the action and raises the
+effective speed, so the rocket visibly climbs:
+
+```
+tools/snes-video-rgb24-convert.sh --start 3410 --duration 20 --fps 15 \
+    --crop 'iw/2:ih/2:iw/4:ih/3' <master>.mp4 apollo-daylight.rgb
+```
+
+(`--crop` and sub-source `--fps` were added to that script for this recut, so the interval is
+reproducible rather than hand-derived.) 20 s sampled at 15 fps = 300 frames, played back at 30 fps
+= 2× speed. Centre half-frame crop, offset `ih/3` vertically. RGB24 SHA-256
+`2779e0793eda3ad89fec1d81a946f30e840dee307659b699d27c98a8df6810f5`; Floyd tiles
+`1c763fabd558e9e7bc9feccc6aec0d5639d916b658df7ae12ac5fb5a717b86e6`; palette
+`c3df3e2117ab05ff8c5f6db934d29d64465108e50566a27705c9e4dd3b5c59bf`.
+
+Note the shot selection also had to avoid the reel's **camera cuts**: the B&W tracking cameras carry
+burned-in camera-ID tags (005, 027) that the provenance review excludes, so v2 sits inside the
+continuous colour run spanning roughly t=3403..3426.
+
+**Both intervals, Floyd, 300 frames, raw 1,344,000 B:**
+
+| Variant | v1 (56:50, tracking) | v2 (recut, cropped 2×) |
+|---|---:|---:|
+| raw blocks | 1,368,600 (101.83%) | 1,368,600 (101.83%) |
+| scanline PackBits | 830,562 (61.80%) | 1,009,643 (75.12%) |
+| gallery LZSS, comparison only | **801,766 (59.66%)** | **877,809 (65.31%)** |
+| **SVX2 replacement/copy, K=120 (shipping)** | 837,693 (62.33%) | 1,070,154 (79.62%) |
+
+SVX2 keyframe sweep on v2: K=15 → 1,066,921; K=30 → 1,068,841; K=60 → 1,069,897;
+K=120 → 1,070,154. The ordering **inverts** relative to v1 — shorter intervals now win, because a
+delta packet on genuinely moving content costs about as much as a fresh keyframe, so extra
+keyframes are nearly free. The spread is still tiny (3,233 B over an 8× range of K), so this does
+not argue for changing the shipped K either.
+
+**Revised size expectation.** Hard, *moving*, grain-rich daylight film costs **~80% of raw** under
+SVX2 at Floyd, not v1's ~62% and not the night leg's ~57%. And the LZSS-beats-SVX2 inversion that
+v1 hinted at (2.67 points) is on v2 a **14.31-point** gap — within-frame compression decisively
+beats between-frame compression once the frames genuinely stop resembling each other. The
+throughput argument below is unaffected and still decides the codec choice.
+
 ### Does the one-codec/SVX2 decision survive?
 
 **Yes — the decision was speed-anchored, and this content doesn't change the speed numbers.** The
@@ -355,4 +416,7 @@ the 2.67-point size gap it would need to close. SVX2 + Floyd–Steinberg remains
 What *does* change is size expectations: budget for **~62% of raw** on hard grain-rich daylight
 content at the quality-first Floyd default (not the night leg's ~57%), and treat Bayer's
 size-optimized savings as content-dependent — large on smooth/dark footage, modest on real film
-grain — rather than a fixed discount.
+grain — rather than a fixed discount. *(Revised by the v2 recut above: once the subject actually
+moves in frame, budget **~80%**. The 2.67-point LZSS gap likewise widens to 14.31 points, which
+strengthens rather than weakens the argument in this section — the throughput gap it would have to
+close is unchanged and still ~27×.)*
