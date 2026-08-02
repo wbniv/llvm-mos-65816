@@ -84,26 +84,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 - [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
   absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
   `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
-- [wip T3] **60 fps video — DONE except branch merge; keyframe policy DECIDED (Option A, K=120
-  recommended).** <!-- agent:a0f879ca71db8cabe (holds bench + merge-conflict context) -->
-  Option C measured (2026-08-01): staged-keyframe specialization reaches **1.12 VBlanks**
-  (537/600 FastROM case 7; was 2.90 at session start) — misses the ≤1.00 threshold on a
-  STRUCTURAL floor: WRAM runs 2.68 MHz regardless of FastROM, so 4,480 bytes = 0.577 VBl +
-  0.178 DMA = 0.755 hard floor before any dispatch; the kernel is now copy-bound, remaining
-  levers are encoder-side (Floyd fragments PackBits tokens). **Policy: Option A — keyframes as
-  scheduled 2-VBlank slots; K=120 → 59.50 fps effective, 2 s seek granularity (final K belongs
-  to the transport/scrubbing plan).** Option C still ships: 56% of the 2-slot budget vs 100%
-  at 2.00 — denser content can no longer spill to 3 slots. Bonus find, recorded in the plan:
-  the assembler sizes immediates by literal magnitude, not the M flag (`and #$00ff` in 16-bit
-  mode ate the next opcode — fixed with the file's `xba` idiom). Byte-correct throughout;
-  ring-refill re-verified 630/600 hardest slice; svx-median/worst untouched at 607/648.
-  Remaining: merge `feature/60fps-video` (`29c2b90`) — main's `21179d7` (SVX2 pipeline proof)
-  independently made the same general-kernel MVN change + an in-place delta optimization;
-  exactly ONE conflict hunk, resolution decided = take main's side (the branch's general-kernel
-  edit is redundant now); then RE-BASELINE case-7/stream numbers against post-merge main.
-  Corridor note: reel files (`snes-video-reel.c`, `video_hud.h`, `snes-video-reel.sh`) are
-  STILL dirty in main — coordinate the merge with that worker or stash-restore per house rule.
-  (T3: resolution decided, mechanical merge + re-measure.)
 - [T1] **Apply the wai idle-loop idiom to the 18 skipped-dirty `examples/snes/*.c` files** —
   the `903de3e` sweep fixed 216 bare loops in 214 files but skipped bitweave, borrowlad, compass,
   crcwall, keycmp64, lfsr2, modexp256, oddmask, ovmove, pcooker, permscat, ropeedit, rotkal,
@@ -992,6 +972,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [60fps-video] DONE: ring refill + staged keyframes merged (`5a25872`), post-merge re-baseline recorded (`3273195`) — **slow ROM now clears 60 fps (674/600 hardest slice)**, FastROM is margin not prerequisite (supersedes the pre-optimization claim); keyframe policy Option A K=120 stands (1.12 VBl, structural WRAM floor); negative control re-proven post-merge. Bonus: assembler immediate-sizing gotcha recorded.
 - [x] 2026-08-01 — [apollo-daylight-stressor] Hard-content sweep (NASA Apollo 11 Saturn V daylight
   launch, real film grain) added to the codec results doc: SVX2/Floyd costs +5.3 ratio points and
   +19.8 under Bayer vs. the night leg; LZSS beats SVX2 on size here but decision stays SVX2
