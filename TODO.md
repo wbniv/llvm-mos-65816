@@ -90,32 +90,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
-- [wip T4] **#138 — MOS Late Optimizations crash — Phase B COMPLETE (2026-07-31): fixed,
-  A/B-validated, upstream **PR #584 POSTED + hardened**; remaining = merge branch → main.**
-  <!-- agent:a6e464f54cf3834fb --> Upstream bug: `combineLdImm` (`MOSLateOptimization.cpp:399`)
-  null-`ImmLoad*` store on non-A/X/Y `LDImm` dests — legal on SPC700, reproduces on pristine
-  upstream from 7 lines of C. Fix: GPR-class guard (skip is semantically correct). Red/green by
-  A/B toolchain rebuild (guard reverted → `late-opt-spc700.mir` RED; restored → GREEN; other 7
-  suite failures byte-identical pre-existing divergence). C repro clean at all opt levels;
-  gallery LTO link with `optnone` removed now succeeds; gallery gate PASS on the rebuilt
-  toolchain (`0x5CF0`, 62/62; ROM checksum unchanged — guard can't fire on 65816 codegen, 0
-  non-AXY `LDImm`s measured). Patch landed as **`0003-late-opt-nongpr-ldimm-dest.patch`**
-  (reused retired slot; deliberately did NOT `regen-patch.sh` — it would absorb the untracked
-  in-flight `0018`/`0019` patches and break their `apply_patch` on fresh clones; hazard warning
-  added to the script header). Commits `cc14fb2`/`d48f709`/`4bb67f8` on
-  `throwaway/138-late-opt-crash`. Upstream
-  **[PR #584](https://github.com/llvm-mos/llvm-mos/pull/584) POSTED** (`f1f5cd1`), then
-  **hardened 2026-07-31 after a post-hoc review** ([follow-up
-  plan](docs/plans/2026-07-31-138-guard-hardening-followup.md)): guard now invalidates any
-  aliased GPR tracking before the skip (upstream `7eedb14a2597`; fork carry `0999cfa`), the PR
-  body's live-byte claim was corrected to the measured matrix (3 live bytes crash at O1+, 2 at
-  `-Oz` — "8 is the smallest / 4 doesn't crash" was false both halves), CI re-running at last
-  check.
-  Remaining: merge branch → main (needs the other session's dirty `dev/toolchain.sh` `0018`/`0019`
-  hunks coordinated first); MAME legs (§4 items 5/9) blocked on the missing SPC700 IPL
-  (`dev/roms/s_smp/spc700.rom` — same gap blocking the ExHiROM canary MAME evidence); §4 item 10
-  (bank-$00 4096-byte gate) is source-side follow-up; `regen-patch.sh`'s `worktree remove
-  --force` now collides with the teardown guard hook (policy call, flagged in-script).
 - [T3] **`lowerCmpZeros` sticky loop-carried `Changed` (`MOSLateOptimization.cpp:142`) — found
   in passing by #138 Phase A.** After the first successful fold in a block, every later
   un-foldable `CmpZero` is *skipped* instead of lowered, and nothing downstream lowers that
@@ -948,6 +922,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-01 — [138-branch-merged] `throwaway/138-late-opt-crash` MERGED to main (`98231c1`): patch `0003-late-opt-nongpr-ldimm-dest` + PR-doc mirror (verified == live #584 body) + toolchain/regen wiring reconciled with the 0021-era `BASELINE_MOSDIR`; status row 15 unified. Upstream PR #584 open, CI green ×3. Foreign toolchain.sh 0018/0019 hunk stash-restored intact.
 - [x] 2026-08-01 — [rom-map-viz] Decode-map SVGs LIVE on all three cartsize pages (site `cfdb7cb`/v1.0.345, CI success, spot-checked; llvm tool commit w/ selftest 380-cell counts asserted vs the model both ways). Seamdemo-page figure lands with P4.
 - [x] 2026-08-01 — [canary-6b-revalidate] Canary gate re-run with rebuilt jgxcheck: 3/3 PASS, 6b NON-vacuous — one picture `11D41DC5:#00FF28` across six entropy boots per config; `rc0` pipefail guard added to the gate script (seamdemo pattern). Live 8 MiB sha matches.
 - [x] 2026-08-01 — [scavenger-php-undef] `PH $p` verifier trip fixed: the `undef`-flag predicate in `saveScavengerRegister` is now the verifier's forward-availability set, not a reaching-def scan (`0002` + upstream `0011`, new `scavenger-p-undef.mir`); seamdemo tolerance removed. See [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md).
