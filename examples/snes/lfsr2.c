@@ -23,7 +23,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define WIN_W       16
 #define WIN_H       16
 
@@ -63,6 +63,16 @@ static void recompute(App *a) {
     }
 }
 
+static void recompute_row(App *a, uint8_t r) {
+    uint8_t g=a->g8, f=a->f8;
+    uint16_t skip=(uint16_t)r*WIN_W;
+    while(skip--) { g=lf_gal8_next(g); f=lf_fib8_next(f); }
+    for(uint8_t c=0;c<WIN_W;c++) {
+        g=lf_gal8_next(g); f=lf_fib8_next(f);
+        a->cellcol[r][c]=((r+c)&1u)?(uint8_t)((f>>2)&3u):(uint8_t)(1u+(((g>>3)&1u)*2u));
+    }
+}
+
 static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
     uint16_t tile = (uint16_t)((uint16_t)cy * (uint16_t)CANVAS_TILES_W + (uint16_t)cx);
     uint8_t *t = &cv->chr[tile * (uint16_t)CANVAS_TILEBYTES];
@@ -76,7 +86,7 @@ static void field_band(App *a) {
     uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
     for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++)
         for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++)
-            cell_fill(&a->canvas, cx, cy, a->cellcol[cy][cx]);
+            canvas_fill_solid_tile(&a->canvas, cx, cy, a->cellcol[cy][cx]);
 }
 
 static void update_hud(App *a) {
@@ -115,6 +125,7 @@ int main(void) {
     corpus_result = lfsr2_gate_crc();   // runs during title; expected 0x6AA3
     title_end(&a.screen, &title, 90);
     for (;;) {
+        recompute_row(&a, a.band);
         field_band(&a);
         a.band++;
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
@@ -125,7 +136,6 @@ int main(void) {
             a.g8 = lf_gal8_next(a.g8);
             a.g8 = lf_gal8_next(a.g8);
             a.f8 = lf_fib8_next(a.f8);
-            recompute(&a);
             a.t = (uint16_t)(a.t + (uint16_t)1u);
             update_hud(&a);
         }

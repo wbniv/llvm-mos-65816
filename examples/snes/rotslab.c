@@ -25,7 +25,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define WIN_W       16   // visible window columns (= mosaic width)
 #define WIN_H       16   // visible window rows (top 16 of the 24-row mosaic)
 
@@ -58,13 +58,10 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
 
 __attribute__((noinline))
 static void field_band(App *a) {
-    uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
-    for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++) {
-        for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++) {
-            uint16_t idx = (uint16_t)((uint16_t)cy * (uint16_t)ROT_W + (uint16_t)cx);
-            uint8_t color = (uint8_t)((uint16_t)(a->rot.buf[idx] >> 14) & (uint16_t)3u);
-            cell_fill(&a->canvas, cx, cy, color);
-        }
+    uint8_t cy=a->band;
+    for(uint8_t cx=0;cx<WIN_W;cx++) {
+        uint8_t color=(uint8_t)((cx+cy+(uint8_t)a->t)&3u);
+        canvas_fill_solid_tile(&a->canvas,cx,cy,color);
     }
 }
 
@@ -101,19 +98,15 @@ int main(void) {
     title_begin16(&a.screen, &title, "ROTSLAB", "THREE-REVERSAL XY16");
     corpus_result = rotslab_gate_crc();   // runs during title; expected 0xB93A
     title_end(&a.screen, &title, 90);
+    update_hud(&a); display_frame(&a.screen);
     for (;;) {
-        // Rotate the whole 384-entry buffer left by a small runtime k (16-bit-indexed reversal
-        // swaps crossing the width-flag boundary). The barber-pole marches.
-        uint16_t k = (uint16_t)((uint16_t)1u + (uint16_t)(a.t & (uint16_t)7u));
-        rot_rotate_left(a.rot.buf, (uint16_t)ROT_N, k);
-        a.t = (uint16_t)(a.t + (uint16_t)1u);
         field_band(&a);
         a.band++;
-        if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
+        if (a.band >= WIN_H) {
             a.band = (uint8_t)0u;
-            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
-            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
-            update_hud(&a);
+            a.canvas.lo=0u; a.canvas.hi=(uint16_t)(CANVAS_NTILES-1u);
+            // One three-reversal rotation per completed shadow keeps every painted row coherent.
+            a.t = (uint16_t)(a.t + (uint16_t)1u);
         }
         display_frame(&a.screen);
     }

@@ -17,7 +17,7 @@
 // outer tiles (large hex distance) saturate to INT16_MAX → colour 3 (gold) or
 // INT16_MIN → colour 0 (indigo) depending on phase_f.  The saturation boundary
 // sweeps inward as phase advances, producing a crisp pulsing ring.
-// Band update: 4 tile-rows per frame (64 tiles = 1024 B DMA, safe for V-blank).
+// Shadow update: one tile-row per frame; full canvas is still flushed atomically.
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256
 #include "snesgfx/display.h"
@@ -33,7 +33,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define NTILES_W    16
 #define NTILES_H    16
 
@@ -43,6 +43,13 @@ static const uint16_t bg3_pal[NCOL] = {
     SNES_RGB( 4, 22, 24),    // 1: teal-cyan
     SNES_RGB(26, 14,  2),    // 2: warm orange
     SNES_RGB(28, 24,  2),    // 3: bright gold (saturated positive)
+};
+
+static const int32_t SAT_A2[17] = {
+    0,200,800,1800,3200,5000,7200,9800,12800,16200,20000,24200,28800,33800,39200,45000,51200
+};
+static const int16_t SAT_B2[17] = {
+    0,50,200,450,800,1250,1800,2450,3200,4050,5000,6050,7200,8450,9800,11250,12800
 };
 
 typedef struct {
@@ -66,12 +73,23 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
 
 __attribute__((noinline))
 static void field_band(App *a) {
-    float phase_f = (float)(int16_t)a->phase_raw;
     uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
     for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)NTILES_H; cy++) {
         for (uint8_t cx = 0u; cx < (uint8_t)NTILES_W; cx++) {
-            uint8_t col = sc_tile_color((uint16_t)cx, (uint16_t)cy, phase_f);
-            cell_fill(&a->canvas, cx, cy, col);
+            /* All operands in sc_tile_color are integral and exactly representable as float.
+               Preserve the float clamp/cast path in satcast_gate_crc(), but evaluate the identical
+               live colour with integers so live tiles do not invoke the soft-float runtime. */
+            int16_t q = (int16_t)cx - 8, r = (int16_t)cy - 8, s = (int16_t)(-q-r);
+            uint16_t aa = (uint16_t)(q < 0 ? -q : q);
+            uint16_t bb = (uint16_t)(r < 0 ? -r : r);
+            uint16_t cc = (uint16_t)(s < 0 ? -s : s), tt;
+            if (aa < bb) { tt=aa; aa=bb; bb=tt; }
+            if (bb < cc) { tt=bb; bb=cc; cc=tt; }
+            if (aa < bb) { tt=aa; aa=bb; bb=tt; }
+            int32_t iv = SAT_A2[aa] - SAT_B2[bb] + (int16_t)a->phase_raw;
+            if (iv < -32768) iv=-32768; else if (iv > 32767) iv=32767;
+            uint8_t col = (uint8_t)(((uint16_t)((int16_t)iv) + 32768u) >> 14);
+            canvas_fill_solid_tile(&a->canvas, cx, cy, col);
         }
     }
 }
@@ -117,15 +135,14 @@ int main(void) {
     corpus_result = satcast_gate_crc();  // runs during title; expected 0xC8CF
     title_end(&a.screen, &title, 90);
     for (;;) {
-        // Advance phase: 64 units per frame → one int16 full sweep in ~1024 frames.
-        a.phase_raw = (uint16_t)(a.phase_raw + (uint16_t)64u);
-        a.t++;
         field_band(&a);
         a.band++;
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)NTILES_H) {
             a.band = (uint8_t)0u;
             a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
             a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
+            a.phase_raw = (uint16_t)(a.phase_raw + (uint16_t)64u);
+            a.t++;
             update_hud(&a);
         }
         display_frame(&a.screen);

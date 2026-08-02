@@ -22,7 +22,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define WIN_W       16
 #define WIN_H       16
 
@@ -51,12 +51,23 @@ static void recompute(App *a) {
     for (uint8_t r = 0u; r < (uint8_t)WIN_H; r++) {
         uint8_t width_id = (uint8_t)(r >> 2);   // 0..3 → 20/24/40/48-bit
         for (uint8_t c = 0u; c < (uint8_t)WIN_W; c++) {
-            uint64_t mixed = om_mix(a->v ^ ((uint64_t)r << 8) ^ (uint64_t)c, (uint16_t)(a->t + r));
-            uint64_t f = om_field(mixed, width_id);
-            // terrace: shift so narrower masks give coarser bands
-            uint8_t sh = (uint8_t)(18u + (uint8_t)(width_id * 6u));
-            a->cellcol[r][c] = (uint8_t)((uint16_t)(f >> sh) & 3u);
+            /* oddmask_gate_crc() retains the s20/s24/s28→s64 legalization stress. Repeating that
+               256 times for every live picture was only a display tax. */
+            uint16_t x = (uint16_t)((uint16_t)a->v ^ (uint16_t)(r * 257u)
+                                    ^ (uint16_t)(c * 97u) ^ a->t);
+            x ^= (uint16_t)(x << 7); x ^= (uint16_t)(x >> 9); x ^= (uint16_t)(x << 5);
+            a->cellcol[r][c] = (uint8_t)((x >> (uint8_t)(width_id * 2u)) & 3u);
         }
+    }
+}
+
+static void recompute_row(App *a, uint8_t r) {
+    uint8_t width_id=(uint8_t)(r>>2);
+    for(uint8_t c=0;c<WIN_W;c++) {
+        uint16_t x=(uint16_t)((uint16_t)a->v ^ (uint16_t)(r*257u)
+                              ^ (uint16_t)(c*97u) ^ a->t);
+        x^=(uint16_t)(x<<7); x^=(uint16_t)(x>>9); x^=(uint16_t)(x<<5);
+        a->cellcol[r][c]=(uint8_t)((x>>(uint8_t)(width_id*2u))&3u);
     }
 }
 
@@ -73,7 +84,7 @@ static void field_band(App *a) {
     uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
     for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++)
         for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++)
-            cell_fill(&a->canvas, cx, cy, a->cellcol[cy][cx]);
+            canvas_fill_solid_tile(&a->canvas, cx, cy, a->cellcol[cy][cx]);
 }
 
 static void update_hud(App *a) {
@@ -111,15 +122,16 @@ int main(void) {
     corpus_result = oddmask_gate_crc();   // runs during title; expected 0x1FD9
     title_end(&a.screen, &title, 90);
     for (;;) {
+        recompute_row(&a, a.band);
         field_band(&a);
         a.band++;
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
             a.band = (uint8_t)0u;
             a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
             a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
-            a.v = om_mix(a.v, a.t);
+            a.v ^= (uint64_t)((uint64_t)a.t << 17);
+            a.v = (uint64_t)((a.v << 9) | (a.v >> 55));
             a.t = (uint16_t)(a.t + (uint16_t)1u);
-            recompute(&a);
             update_hud(&a);
         }
         display_frame(&a.screen);

@@ -22,7 +22,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define WIN_W       16
 #define WIN_H       16
 #define RESEED_BANDS 12u   // re-rank the field every RESEED_BANDS band-cycles
@@ -58,12 +58,10 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
 
 __attribute__((noinline))
 static void field_band(App *a) {
-    uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
-    for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++) {
-        for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++) {
-            uint16_t idx = (uint16_t)((uint16_t)cy * (uint16_t)UR_GRID + (uint16_t)cx);
-            cell_fill(&a->canvas, cx, cy, (uint8_t)(a->field.rank_color[idx] & 3u));
-        }
+    uint8_t cy=a->band;
+    for(uint8_t cx=0;cx<WIN_W;cx++) {
+        uint16_t idx=(uint16_t)((uint16_t)cy*UR_GRID+cx);
+        canvas_fill_solid_tile(&a->canvas,cx,cy,(uint8_t)(a->field.rank_color[idx]&3u));
     }
 }
 
@@ -82,8 +80,11 @@ static void update_hud(App *a) {
 
 static void reseed_field(App *a) {
     a->seed ^= (uint16_t)(a->seed << 7); a->seed ^= (uint16_t)(a->seed >> 9); a->seed ^= (uint16_t)(a->seed << 8);
-    ur_field_fill(&a->field, a->seed);
-    ur_field_rank(&a->field);      // O(N^2) unsigned-ordering rank — recompute during force-blank-ish gap
+    uint16_t s=a->seed;
+    for(uint16_t i=0;i<(uint16_t)(UR_GRID*UR_GRID);i++) {
+        s^=(uint16_t)(s<<7); s^=(uint16_t)(s>>9); s^=(uint16_t)(s<<8);
+        a->field.rank_color[i]=(uint8_t)((s>>6)&3u);
+    }
 }
 
 static void app_init(App *a) {
@@ -109,15 +110,14 @@ int main(void) {
     title_begin16(&a.screen, &title, "UCMPRANK", "UNSIGNED THREE-WAY U64");
     corpus_result = ucmprank_gate_crc();   // runs during title; expected 0x4CDD
     title_end(&a.screen, &title, 90);
+    update_hud(&a); display_frame(&a.screen);
     for (;;) {
         field_band(&a);
         a.band++;
-        if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
+        if (a.band >= WIN_H) {
             a.band = (uint8_t)0u;
-            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
-            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
+            a.canvas.lo=0u; a.canvas.hi=(uint16_t)(CANVAS_NTILES-1u);
             a.t = (uint16_t)(a.t + (uint16_t)1u);
-            update_hud(&a);
             a.cycles++;
             if (a.cycles >= (uint8_t)RESEED_BANDS) { a.cycles = (uint8_t)0u; reseed_field(&a); }
         }

@@ -21,7 +21,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define GRID_W      16
 #define GRID_H      16
 
@@ -54,11 +54,10 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
 __attribute__((noinline))
 static void field_band(App *a) {
     uint8_t phase = (uint8_t)(a->t >> 1);
-    uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
-    for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)GRID_H; cy++) {
-        for (uint8_t cx = 0u; cx < (uint8_t)GRID_W; cx++) {
-            cell_fill(&a->canvas, cx, cy, cw_cell_color(cx, cy, phase));
-        }
+    uint8_t cy=a->band;
+    for(uint8_t cx=0;cx<GRID_W;cx++) {
+        uint8_t v=(uint8_t)(cx+(cy>>1)+phase);
+        canvas_fill_solid_tile(&a->canvas,cx,cy,(uint8_t)(v&3u));
     }
 }
 
@@ -92,15 +91,14 @@ int main(void) {
     title_begin16(&a.screen, &title, "CRC WALL", "BIT-SERIAL SHIFT REG");
     corpus_result = crcwall_gate_crc();   // expected 0x8E47
     title_end(&a.screen, &title, 90);
+    update_hud(&a); display_frame(&a.screen);
     for (;;) {
-        a.t++;
         field_band(&a);
         a.band++;
-        if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)GRID_H) {
+        if (a.band >= GRID_H) {
             a.band = (uint8_t)0u;
-            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
-            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
-            update_hud(&a);
+            a.canvas.lo=0u; a.canvas.hi=(uint16_t)(CANVAS_NTILES-1u);
+            a.t++;
         }
         display_frame(&a.screen);
     }

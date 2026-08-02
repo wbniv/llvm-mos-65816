@@ -15,7 +15,7 @@
 // indigo=SW (-,-). As phase sweeps, the field rotates and the quadrant
 // boundaries swirl across the canvas, sign-flipping crisply at zero-crossings
 // where copysignf switches between ±1.
-// Band update: 4 rows/frame (1024 B DMA, safe for V-blank).
+// Shadow update: one tile-row per frame; full canvas is still flushed atomically.
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256
 #include "snesgfx/display.h"
@@ -31,7 +31,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define NTILES_W    16
 #define NTILES_H    16
 
@@ -66,8 +66,13 @@ static void field_band(App *a) {
     uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
     for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)NTILES_H; cy++) {
         for (uint8_t cx = 0u; cx < (uint8_t)NTILES_W; cx++) {
-            uint8_t col = cs_cell((uint16_t)cx, (uint16_t)cy, a->phase);
-            cell_fill(&a->canvas, cx, cy, col);
+            /* The gate above retains the float G_FCOPYSIGN/G_IS_FPCLASS stress. Its displayed
+               result is exactly the signs of these two integer sources, so do not pay two
+               __floatsisf calls per live tile. */
+            int16_t sx = (int16_t)((int16_t)cx - (int16_t)8 + a->phase);
+            int16_t sy = (int16_t)((int16_t)cy - (int16_t)8 - a->phase);
+            uint8_t col = (uint8_t)((sx < 0 ? 1u : 0u) | (sy < 0 ? 2u : 0u));
+            canvas_fill_solid_tile(&a->canvas, cx, cy, col);
         }
     }
 }
@@ -107,13 +112,13 @@ int main(void) {
     corpus_result = compass_gate_crc();  // runs during title; expected 0xB9CB
     title_end(&a.screen, &title, 90);
     for (;;) {
-        a.phase = (int16_t)(a.phase + (int16_t)1);
         field_band(&a);
         a.band++;
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)NTILES_H) {
             a.band = (uint8_t)0u;
             a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
             a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
+            a.phase = (int16_t)(a.phase + (int16_t)1);
             update_hud(&a);
         }
         display_frame(&a.screen);

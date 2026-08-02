@@ -15,7 +15,7 @@
 // 1,2,3,1 bits/frame right), producing counter-rotating petals.  The outer 16-bit
 // word rotates by a runtime amount k = (frame & 14)+1, XOR'ing the top 2 bits into
 // the color, producing moire shimmer beats between rings.  The mandala is tiled
-// 4-fold and refreshed in 4 row-bands per frame (64 tiles/frame, fits in V-blank).
+// 4-fold and refreshed one tile-row per frame; the completed shadow flush remains atomic.
 // A TextLayer HUD shows the live outer word and the gate CRC.
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256       // full 16x16 = 256 tiles; band flush handles budget
@@ -32,7 +32,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4               // BG3 2bpp: 4 colours
-#define BAND        4               // tile-rows updated per frame (64 tiles = 1024 B DMA)
+#define BAND        1
 #define NTILES_W    16
 #define NTILES_H    16
 
@@ -71,7 +71,7 @@ static void field_band(App *a) {
     for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)NTILES_H; cy++) {
         for (uint8_t cx = 0u; cx < (uint8_t)NTILES_W; cx++) {
             uint8_t col = rk_cell(&a->state, (uint16_t)cx, (uint16_t)cy);
-            cell_fill(&a->canvas, cx, cy, col);
+            canvas_fill_solid_tile(&a->canvas, cx, cy, col);
         }
     }
 }
@@ -124,11 +124,6 @@ int main(void) {
     corpus_result = rotkal_gate_crc();  // runs during title hold; expected 0x300C
     title_end(&a.screen, &title, 90);
     for (;;) {
-        // Advance state: runtime k = (t & 14) + 1 (1..15, always non-zero).
-        uint16_t k = (uint16_t)((uint16_t)(a.t & (uint16_t)14u) + (uint16_t)1u);
-        rk_step(&a.state, k);
-        a.t++;
-        // Update one band of tiles.
         field_band(&a);
         a.band++;
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)NTILES_H) {
@@ -136,6 +131,9 @@ int main(void) {
             a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
             a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
             update_hud(&a);
+            uint16_t k = (uint16_t)((uint16_t)(a.t & (uint16_t)14u) + (uint16_t)1u);
+            rk_step(&a.state, k);
+            a.t++;
         }
         display_frame(&a.screen);
     }

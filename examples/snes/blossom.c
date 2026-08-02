@@ -203,7 +203,7 @@ int main(void) {
   hud_text(HUD_BOT_ROW, 1, "LR ZOOM AY ATTR SEL COL ST RST");   // static control legend
   stage_palette(0); dma_cgram();          // load CGRAM before display (no garbage-colour first frame)
   m7_show();                              // release force-blank; the attractor BLOOMS in live below
-  REG_NMITIMEN = NMITIMEN_NMI;            // VBlank NMI -> snes_wait_vblank pacing
+  REG_NMITIMEN = NMITIMEN_NMI | NMITIMEN_AUTOJOY; // VBlank pacing + automatic pad latch
 
   // Accumulation is CAPPED at K_GATE points per attractor: the orbit visits a fixed support, so a
   // capped bloom keeps the background dark (an uncapped accumulate eventually fills every cell). The
@@ -213,7 +213,7 @@ int main(void) {
   uint8_t  nf = 0, trow = 0, gated = 0;
   uint8_t  hud_p = 0xFF, hud_pal = 0xFF, hud_need = 0; int16_t hud_z = 0;   // HUD value-bar shadow
   for (;;) {
-    uint16_t pad = snes_read_pad1();
+    uint16_t pad = snes_read_pad1_auto();
     blossom_step(&v, pad);
     short a = BLOSSOM_PA[v.preset], b = BLOSSOM_PB[v.preset], c = BLOSSOM_PC[v.preset];
     if (v.preset != hud_p || v.pal != hud_pal || v.zoom != hud_z) {  // value bar changed -> rebuild

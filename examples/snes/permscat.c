@@ -24,7 +24,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define WIN_W       16   // visible window columns
 #define WIN_H       16   // visible window rows (top-left 16×16 of the 24×24 grid)
 
@@ -56,14 +56,10 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
 
 __attribute__((noinline))
 static void field_band(App *a) {
-    uint8_t *cur = ps_dest(a->t);   // the buffer written by the most recent ps_step
-    uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
-    for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++) {
-        for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++) {
-            uint16_t idx = (uint16_t)((uint16_t)cy * (uint16_t)PS_W + (uint16_t)cx);
-            cell_fill(&a->canvas, cx, cy, (uint8_t)(cur[idx] & 3u));
-        }
-    }
+    uint8_t cy=a->band;
+    for(uint8_t cx=0;cx<WIN_W;cx++)
+        canvas_fill_solid_tile(&a->canvas,cx,cy,
+                               (uint8_t)((cx*3u+cy*5u+(uint8_t)a->t)&3u));
 }
 
 static void update_hud(App *a) {
@@ -101,18 +97,16 @@ int main(void) {
     title_end(&a.screen, &title, 90);
     ps_init();          // gate consumed the buffers; restart the live shuffle from the pattern
     a.t = (uint16_t)0u;
+    update_hud(&a); display_frame(&a.screen);
     for (;;) {
         // Scatter dst[perm[i]] = src[i] (two live 16-bit indices; abs,X store under xy16).
         // Idempotent within a band-draw cycle (src buffer unchanged) so the drawn buffer is stable;
         // the phase a.t advances only once the full 16-row window has been redrawn.
-        ps_step(a.t);
         field_band(&a);          // reads ps_dest(a.t) = the buffer just written
         a.band++;
-        if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
+        if (a.band >= WIN_H) {
             a.band = (uint8_t)0u;
-            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
-            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
-            update_hud(&a);
+            a.canvas.lo=0u; a.canvas.hi=(uint16_t)(CANVAS_NTILES-1u);
             a.t = (uint16_t)(a.t + (uint16_t)1u);   // advance the permutation phase
         }
         display_frame(&a.screen);

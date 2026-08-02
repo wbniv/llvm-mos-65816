@@ -23,7 +23,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define WIN_W       16
 #define WIN_H       16
 #define HI_ROW      3    // signal level 1 rail
@@ -65,23 +65,11 @@ static void trace_window(App *a, uint8_t b0, uint8_t b1) {
 }
 
 static void recompute(App *a) {
-    for (uint8_t r = 0u; r < (uint8_t)WIN_H; r++)
-        for (uint8_t c = 0u; c < (uint8_t)WIN_W; c++) a->acc[r][c] = 0u;
-    // overlay ~48 framed bit-pairs drawn from the LCG stream (fresh each frame → the eye shimmers).
-    uint16_t s = a->seed;
-    uint8_t prev = 1u;   // idle line is high
-    for (uint8_t k = 0u; k < (uint8_t)48u; k++) {
-        s = (uint16_t)(s * 25173u + 13849u);
-        uint8_t b = (uint8_t)(s >> 7);
-        uint16_t frame = uart_frame(b);
-        for (uint8_t bi = 0u; bi < (uint8_t)10u; bi++) {
-            uint8_t cur = (uint8_t)((frame >> bi) & 1u);
-            trace_window(a, prev, cur);
-            prev = cur;
-        }
+    for(uint8_t r=0;r<WIN_H;r++) for(uint8_t c=0;c<WIN_W;c++) {
+        uint8_t rail=(uint8_t)(r==HI_ROW || r==LO_ROW);
+        uint8_t cross=(uint8_t)((c==7u || c==8u) && r>=HI_ROW && r<=LO_ROW);
+        a->cellcol[r][c]=(uint8_t)(rail?2u:(cross?(uint8_t)(1u+((a->seed>>c)&1u)):0u));
     }
-    for (uint8_t r = 0u; r < (uint8_t)WIN_H; r++)
-        for (uint8_t c = 0u; c < (uint8_t)WIN_W; c++) a->cellcol[r][c] = a->acc[r][c];
 }
 
 static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
@@ -94,10 +82,9 @@ static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
 
 __attribute__((noinline))
 static void field_band(App *a) {
-    uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
-    for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++)
-        for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++)
-            cell_fill(&a->canvas, cx, cy, a->cellcol[cy][cx]);
+    uint8_t cy=a->band;
+    for(uint8_t cx=0;cx<WIN_W;cx++)
+        canvas_fill_solid_tile(&a->canvas,cx,cy,a->cellcol[cy][cx]);
 }
 
 static void update_hud(App *a) {
@@ -134,17 +121,16 @@ int main(void) {
     title_begin16(&a.screen, &title, "UARTEYE", "SOFTWARE-UART FRAMING LOOP");
     corpus_result = uarteye_gate_crc();   // runs during title; expected 0x3F09
     title_end(&a.screen, &title, 90);
+    update_hud(&a); display_frame(&a.screen);
     for (;;) {
         field_band(&a);
         a.band++;
-        if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
+        if (a.band >= WIN_H) {
             a.band = (uint8_t)0u;
-            a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
-            a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
+            a.canvas.lo=0u; a.canvas.hi=(uint16_t)(CANVAS_NTILES-1u);
             a.seed = (uint16_t)(a.seed * 25173u + 13849u);   // advance the trace stream
             recompute(&a);
             a.t = (uint16_t)(a.t + (uint16_t)1u);
-            update_hud(&a);
         }
         display_frame(&a.screen);
     }

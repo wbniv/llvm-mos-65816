@@ -13,7 +13,7 @@
 // ridge=orange, high ridge=gold).  Each frame one erosion step advances: positive
 // slope erodes ridges, negative slope fills valleys; the wavefront of signed change
 // sweeps across the grid. Signed valleys (impossible with unsigned) are the proof.
-// Band update: 4 rows/frame (1024 B DMA, safe for V-blank).
+// Shadow update: one tile-row per frame; full canvas is still flushed atomically.
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256
 #include "snesgfx/display.h"
@@ -29,7 +29,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define NTILES_W    16
 #define NTILES_H    16
 
@@ -67,8 +67,19 @@ static void field_band(App *a) {
         for (uint8_t cx = 0u; cx < (uint8_t)NTILES_W; cx++) {
             int16_t h = a->grid[cy][cx].height;  // G_SEXT_INREG: 5-bit signed
             uint8_t col = sb_color(h);
-            cell_fill(&a->canvas, cx, cy, col);
+            canvas_fill_solid_tile(&a->canvas, cx, cy, col);
         }
+    }
+}
+
+/* Live erosion is row-incremental; the full 256-cell signed-bitfield stress remains in the gate. */
+static void step_band(App *a) {
+    uint8_t y0 = (uint8_t)(a->band * BAND);
+    for (uint8_t y=y0; y<(uint8_t)(y0+BAND); y++) for (uint8_t x=0; x<NTILES_W; x++) {
+        int16_t h=a->grid[y][x].height, s=a->grid[y][x].slope, f=a->grid[y][x].flow;
+        if (s>0 && h>-16) h--; else if (s<0 && h<15) h++;
+        f=(int16_t)((f+s)>>1); if(f>7)f=7; if(f< -8)f=-8;
+        a->grid[y][x].height=h; a->grid[y][x].flow=f;
     }
 }
 
@@ -112,7 +123,7 @@ int main(void) {
     corpus_result = sbitfld_gate_crc();  // runs during title; expected 0x40C5
     title_end(&a.screen, &title, 90);
     for (;;) {
-        sb_step(a.grid);     // erode terrain (signed read-back × 3 per cell)
+        step_band(&a);       // erode only the rows painted this frame
         a.t++;
         field_band(&a);
         a.band++;

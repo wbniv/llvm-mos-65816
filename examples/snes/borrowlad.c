@@ -22,7 +22,7 @@
 #define HUD_TOP_ROW 1
 #define HUD_BOT_ROW 25
 #define NCOL        4
-#define BAND        4
+#define BAND        1
 #define WIN_W       16
 #define WIN_H       16
 
@@ -61,6 +61,15 @@ static void recompute(App *a) {
     }
 }
 
+static void recompute_row(App *a, uint8_t r) {
+    for (uint8_t c=0; c<WIN_W; c++) {
+        uint16_t bit_index=(uint16_t)((uint16_t)(r&7u)*WIN_W+c);
+        uint8_t bit=(uint8_t)((a->odo.w[bit_index>>4]>>(bit_index&15u))&1u);
+        uint8_t upper=(uint8_t)(r<8u);
+        a->cellcol[r][c]=(uint8_t)(bit?(upper?3u:2u):(upper?0u:1u));
+    }
+}
+
 static void cell_fill(BitmapCanvas *cv, uint8_t cx, uint8_t cy, uint8_t color) {
     uint16_t tile = (uint16_t)((uint16_t)cy * (uint16_t)CANVAS_TILES_W + (uint16_t)cx);
     uint8_t *t = &cv->chr[tile * (uint16_t)CANVAS_TILEBYTES];
@@ -74,7 +83,7 @@ static void field_band(App *a) {
     uint8_t y0 = (uint8_t)((uint8_t)(a->band) * (uint8_t)BAND);
     for (uint8_t cy = y0; cy < (uint8_t)(y0 + (uint8_t)BAND) && cy < (uint8_t)WIN_H; cy++)
         for (uint8_t cx = 0u; cx < (uint8_t)WIN_W; cx++)
-            cell_fill(&a->canvas, cx, cy, a->cellcol[cy][cx]);
+            canvas_fill_solid_tile(&a->canvas, cx, cy, a->cellcol[cy][cx]);
 }
 
 static void update_hud(App *a) {
@@ -122,6 +131,7 @@ int main(void) {
     title_end(&a.screen, &title, 90);
     reset_odo(&a); recompute(&a);
     for (;;) {
+        recompute_row(&a, a.band);
         field_band(&a);
         a.band++;
         if ((uint8_t)((uint8_t)(a.band) * (uint8_t)BAND) >= (uint8_t)WIN_H) {
@@ -129,7 +139,6 @@ int main(void) {
             a.canvas.lo = (uint16_t)0u;                        // shadow complete: mark the WHOLE
             a.canvas.hi = (uint16_t)(CANVAS_NTILES - 1u);      // canvas -> one atomic v-blank flush
             bl_sub(&a.odo, &a.dec);     // tick the odometer down (borrows ripple)
-            recompute(&a);
             a.t = (uint16_t)(a.t + (uint16_t)1u);
             update_hud(&a);
         }
