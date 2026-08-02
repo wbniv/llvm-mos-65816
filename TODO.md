@@ -90,19 +90,13 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
-- [T4] **Implement extended SNES cartridge mapping (ExHiROM)** — general cartridge/mapper test
-  coverage, not driven by gallery size. <!-- todo-lint: recovered 2026-08-01, orphaned by an
-  earlier concurrent TODO rewrite that dropped this bullet's own marker; see the completed/newer
-  tracking at the ExHiROM merge Done entry and the "three-act synthesis cart" T4 item above before
-  re-triaging this one's current status. --> Ordinary LoROM cannot simply be enlarged past
-  **32 Mbit (4 MiB)**. Add an extended mapping, normally map Mode `$25`/ExHiROM, together with the
-  corresponding linker layout, cartridge decoder
-  model, header and ROM-size fields, reset/vector placement, far-address handling, checksum gate,
-  emulator coverage, and ROM-map visualization. Conventional cartridges may use two independently
-  sized mask ROMs of up to 32 Mbit each. References:
-  [Nintendo development manual](https://gamingdoc.org/technical-documentation/consoles/super-nintendo/official/sdk/book-i/),
-  [SNESdev ROM format documentation](https://snes.nesdev.org/wiki/ROM_file_formats), and
-  [map-mode table](https://wiki.superfamicom.org/map-mode-table).
+- [T2] **ROM-map visualization for the cartsize/seamdemo pages** — the one deliverable of the
+  original extended-mapping umbrella item not shipped by the `d0d6b39` merge (everything else —
+  mapping, linker layout, decoder model, header/size fields, vectors, far addressing, checksum
+  gate, emulator coverage — is Done; see the exhirom-merged Done entry). Render the decode map
+  (windows/mirrors/holes/seam, from `tools/snes_cartmap.py --cells/--regions`) as a figure on
+  the cartsize pages and/or the future seamdemo page — the diagram the 48 Mbit page's prose
+  currently describes in words. (T2: the model exposes all the data; this is presentation.)
 - [wip T4] **#138 — MOS Late Optimizations crash — Phase B COMPLETE (2026-07-31): fixed,
   A/B-validated, upstream **PR #584 POSTED + hardened**; remaining = merge branch → main.**
   <!-- agent:a6e464f54cf3834fb --> Upstream bug: `combineLdImm` (`MOSLateOptimization.cpp:399`)
