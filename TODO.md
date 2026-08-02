@@ -61,7 +61,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [T3] **seamdemo — P1 Act-1 ROM DONE (`dd954dd`, gate PASS, 34 s act); next: P2 graph-walk act.**
+- [wip T3] **seamdemo — P1 Act-1 ROM DONE (`dd954dd`, gate PASS, 34 s act); P2 graph-walk act DISPATCHED.** <!-- agent:a3f76f15f3f53c44e -->
   <!-- agent:a3f76f15f3f53c44e (P0 done; holds full generator/oracle/ISA context — reuse for P1) -->
   P0 contract settled: `decode_cells()` model extension (380 cells, 5 new regression tests,
   58+25,044 subtests), one-slot-record layout, 16-op ISA + 8-entry ALU fn-ptr table, 24-bit
@@ -90,7 +90,8 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rotslab, satcast, sbitfld, uarteye, ucmprank (another worker's in-progress edits). Same
   one-line recipe (`for (;;) __asm__ volatile("wai");`) once each file is clean in `git status`.
   (T1: known recipe, mechanical.)
-- [T2] **Re-run `dev/cartsize-canary.sh` with the rebuilt `jgxcheck` + fix its latent `rc0`
+- [wip T2] **Re-run `dev/cartsize-canary.sh` with the rebuilt `jgxcheck` + fix its latent `rc0`
+  <!-- inline: orchestrator session, gate running in background -->
   pipefail trap.** seamdemo P1 found `build/jgxcheck` predated FRAMESCAN support, so the canary
   gate's 6b entropy fingerprint had been passing VACUOUSLY; P1 rebuilt the binary (harness
   relink). Also latent in the canary's probe block: WRAM `$0000` is imaginary `rc0` (not zero)
