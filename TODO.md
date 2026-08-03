@@ -919,7 +919,12 @@ planned/gated/superseded/stale — dispositions recorded as comments in the Inbo
 into the plan, then promote to Done. **Serialize the runs — they share the hot build tree.**_
 
 - [verify T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — implemented locally 07-26
-  (`bdbf516`), still-live mode7-gallery features, verification never recorded.
+  (`bdbf516`), still-live mode7-gallery features. Run 2026-08-03 (`631ffe9`): **18/23 gates PASS**
+  — all 7 ROM gates green (host `0x204F`, bsnes-jg + MAME, 3× byte-identical capture,
+  `-verify` clean, 1 indirect dispatch), 8/9 startup-timeline gates green. **5 FAIL:** 24 black
+  frames (f 239–262) between title exit and loading field; 11 badges not 9 (`cdaa6f4`/`ad87374`
+  added two later Mode 7 demos); deployed ROMs (`0dd52e6`) ≠ fresh build (`849a6a9`) though
+  behaviourally identical; no browser smoke test run; no ROM/preview cache-busting exists.
   [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)
 - [verify T3] **123-mode7-gallery-filter** — same commit/state as 121; run after it (shared
   surface). [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md)
