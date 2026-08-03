@@ -419,3 +419,175 @@ with frames in front of you, not in advance.
    and the manifest's selfcheck if the oracle moves. Verify live sha == gate-verified binary.
 5. If the measured cadence does **not** hold 60 with the harder per-frame budget, that is the
    finding — report it and keep the 30 fps cartridge live rather than shipping a slipping one.
+
+---
+
+## Results: fixed in place at true 59.94 fps (2026-08-03)
+
+**Status: the cadence holds. 600 presented frames per 600 VBlanks, ZERO deadline slips, on slow ROM
+*and* FastROM.** The cartridge is republished over the same slug, same page, same identity; no
+second ROM exists.
+
+### 1. Corpus re-derived at 59.94 fps
+
+`tools/snes-video-rgb24-convert.sh` needed **no extension** — its `--fps` is passed straight through
+to ffmpeg's `fps` filter and already accepts an exact NTSC fraction, and `--duration` already accepts
+a fractional value. Both were exercised rather than assumed:
+
+```
+tools/snes-video-rgb24-convert.sh --start 3410 --duration 20.02 --fps 30000/1001 \
+    --crop 'iw/2:ih/2:iw/4:ih/3' /tmp/apollo11-press-site-large.mp4 apollo-daylight.rgb
+filter: fps=30000/1001,crop=iw/2:ih/2:iw/4:ih/3,scale=80:45:flags=lanczos,pad=80:56:0:5:black,format=rgb24
+wrote apollo-daylight.rgb: 600 frames, 8064000 bytes
+```
+
+Exactly 600 frames, no trimming needed. RGB24 SHA-256
+`aa29061311e022e8bafb0e013c09da5ea11d4c9114df4732f9b1452157573cad`, recorded in the benchmark doc
+**alongside** v2's `2779e079…10f5`, which is untouched. The script's usage text now documents that
+fractional NTSC rates are accepted, so the next person does not have to discover it.
+
+### 2. Speed treatment: the 2× is KEPT
+
+Decided with frames in front of me, not in advance. Both candidates were built and measured at the
+RGB24 stage:
+
+| candidate | sampling | frames | mean\|Δ\| consecutive | first-vs-last mean\|Δ\| |
+|---|---|---:|---:|---:|
+| v2, currently shipped | 15 fps over 20 s | 300 | 4.27 | 57.67 |
+| **A — keep 2×** (chosen) | **29.97 fps over 20.02 s** | **600** | **2.82** | **58.72** |
+| B — drop 2×, real time | 59.94 fps over 10.01 s | 600 | 1.62 | 42.73 |
+
+**Chosen: A.** Two reasons, both about the defect this demo has already been bitten by. First,
+dropping the 2× cuts the on-screen travel by 26 % (58.72 → 42.73) — the viewer sees the rocket climb
+half as far in the same 10 s of playback. Second, consecutive-frame motion falls to **1.62**, heading
+back toward the **0.93** that made the v1 tracking shot unwatchable at 80×56 and forced the recut;
+2.82 sits inside the 2.88–3.93 band of every healthy corpus in the battery. True 60 is worth spending
+on *smoothness*, which is what it is for — not on quietly undoing the recut that fixed a real defect.
+Keeping the 2× also means this is the **identical shot at the identical pace** as the published
+version, which is what "fix in place" should mean: the same demo, better.
+
+### 3. Packed size, and the mapping computed from it
+
+```
+frames=600 packets=2120365 seek=17042 loop=3673 padding=0 total=2141080 max=3685
+stream sha256 95f1e0e4acf1b8d1c1b41de6a30f52876470c76eddaccd4d75f6b16588c6a8b6
+```
+
+**2,141,080 B** — not the naive 2 × 1,083,714 = 2,167,428, but only 1.2 % under it. The predicted
+"frames resemble each other more at 59.94" effect is **real but nearly negligible** (see the
+crossover measurement below); it does not change a mapping decision.
+
+| mapping | verdict |
+|---|---|
+| 2 MiB Fast HiROM (what shipped) | **ruled out** — 0x10000 + 2,141,080 = 2,206,616 B > 2,097,152 |
+| **4 MiB Fast HiROM** | **chosen** — image exactly 4,194,304 B, stream uses **33 of the 63 banks** `$C1`–`$FF` |
+| ExHiROM | **not needed** — nothing here exceeds ordinary HiROM's 4 MiB reach |
+
+Header verified rather than assumed: map mode `$31`, ROM-size byte `$0C`, single 32 Mbit device at
+`$000000`, canonical window `$C0`–`$FF:0000-FFFF`, no addressing holes, stored checksum `$DF0B` ==
+recomputed `$DF0B`.
+
+Keyframe policy **K = 120 stands**, now buying 2.0 s of seek granularity instead of 4.0 s. The sweep
+inverts as it did on v2 (K=15 → 2,115,279 vs K=120 → 2,121,044) but spans only 5,765 B over an 8×
+range, which does not argue for a change.
+
+### 4. Full gate output (`dev/apollo-reel.sh`, 59.94 fps build)
+
+```
+==> 1) asset bake reproduces the recorded corpus SHA-256
+  PASS: RGB24 corpus aa29061311e022e8bafb0e013c09da5ea11d4c9114df4732f9b1452157573cad
+frames=600 packets=2120365 seek=17042 loop=3673 padding=0 total=2141080 max=3685
+  tiles  sha256 08c24756b982fec8703d5959cf8b6af06e8981beef1a6bdc55edd20c1675ce10
+  stream sha256 95f1e0e4acf1b8d1c1b41de6a30f52876470c76eddaccd4d75f6b16588c6a8b6
+  stream bytes  2141080
+
+==> 2) whole-loop byte-correct decode (all 600 frames + loop delta)
+     [self-test builds; the published ROMs skip this boot pass by design]
+  PASS: slow corpus gate: SMOKE: PASS off=0x2B len=1 got=0x00 (ran 9000 frames, bsnes-jg)
+  PASS: fastrom corpus gate: SMOKE: PASS off=0x2B len=1 got=0x00 (ran 9000 frames, bsnes-jg)
+  PASS: slow (published) composite health: SMOKE: PASS off=0x2C len=4 got=0x00000000 (ran 9000 frames, bsnes-jg)
+  PASS: fastrom (published) composite health: SMOKE: PASS off=0x2C len=4 got=0x00000000 (ran 9000 frames, bsnes-jg)
+
+==> 2b) negative control: one flipped stream byte must FAIL the gate
+  flipped stream byte 400000: 0x2d -> 0x2c
+  PASS: corrupted stream rejected: SMOKE: FAIL off=0x2B len=1 got=0x02 want=0x00
+
+==> 3) cadence: presented frames per 600 VBlanks (1-VBlank operating point)
+  build       presented    vblanks     per600      slips
+  slow              600        600        600          0
+  fastrom           600        600        600          0
+  (reported, not gated — a slower number on this content is the measurement)
+
+==> 4a) -verify-machineinstrs clean
+  PASS: no verifier complaints
+
+==> 4b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (8B506DC5:#000000)
+
+==> 6) REGRESSION GUARD: the published ROM shows a picture promptly
+  at VBlank 180 (~3.0s): black=30.8%  unique_colours=103
+  PASS: picture is up well before the first loop completes
+
+==> 5) frame capture
+jgxcheck: JGX_POLL matched at frame 328 of 9000 budgeted
+  PASS: captured frame 96: SMOKE: PASS off=0x36 len=2 got=0x0096 (ran 9000 frames, bsnes-jg)
+
+SLOW_ROM=build/apollo-daylight-slow.sfc
+ROM=build/apollo-daylight.sfc
+ROM_SHA256=bf62a2992546f87f8ec4d46de1c14a30bdfdd5a553f0e114dfb1beea961ecdbe
+GATE: PASS
+```
+
+### 5. Cadence at the 1-VBlank operating point — the metric that decided this
+
+| ROM | content | operating point | presented / 600 VBlanks | slips |
+|---|---|---|---:|---:|
+| Apollo v2 (previous ship) | daylight film grain | 2 VBlank | 300 / 600 (30 fps) | 0 |
+| **Apollo v3, slow ROM** | **daylight film grain** | **1 VBlank** | **600 / 600 (59.94 fps)** | **0** |
+| **Apollo v3, FastROM** | **daylight film grain** | **1 VBlank** | **600 / 600 (59.94 fps)** | **0** |
+| ring-refill bench, hardest slice | Artemis night launch | 1 VBlank | 674 / 600 slow, 754 / 600 Fast | — |
+
+**Slow ROM clears it too.** The mean packet here is 3,534 B against the bench's hardest-slice
+3,290 B (+7.4 %) and the worst is 3,685 B, and the player still lands every frame with a full window
+to spare — consistent with the post-merge re-baseline's 674/600 headroom on slow ROM. FastROM is a
+margin lever, not a prerequisite, exactly as the 60 fps plan concluded. The published build stays
+FastROM anyway; the slow build is the control that proves the margin is real.
+
+Picture proven on the running ROM, not inferred — three frames captured from the published binary,
+pairwise over the 256×192 video region:
+
+| | v2 (30 fps) | **v3 (59.94 fps)** |
+|---|---:|---:|
+| mean\|Δ\|, frames 60 vs 300 | 50.81 | **50.03** |
+| mean\|Δ\|, frames 300 vs 540 | 30.34 | **30.06** |
+| % pixels differing | 78.7–80.0 % | **78.6–79.7 %** |
+| black in video region (letterbox) | 20.0 % | **20.3 %** |
+
+Identical within noise, which is the point: the shot and its pacing are unchanged, only the temporal
+resolution doubled.
+
+### 6. Free measurement: LZSS vs SVX2 at 59.94 fps
+
+Recorded in full in the benchmark doc. The crossover item asked whether closer-together frames let
+interframe SVX2 claw back its deficit to intraframe LZSS. **Second point on the curve: barely.**
+
+| corpus | frame spacing | LZSS | SVX2 K=120 | LZSS advantage |
+|---|---|---:|---:|---:|
+| v2, 30 fps | 1/15 s | 65.31 % | 79.62 % | 14.31 pts |
+| **v3, 59.94 fps (ships)** | **1/30 s** | **65.51 %** | **78.91 %** | **13.40 pts** |
+| real-time control | 1/59.94 s | 67.93 % | 78.06 % | 10.13 pts |
+
+Halving the temporal gap recovers **0.91 points**; quartering it recovers 4.18. The residual between
+consecutive frames on this content is dominated by **Floyd–Steinberg dither noise, which is
+decorrelated no matter how close the frames are** — so the crossover is not reachable by frame rate.
+That is a property of the dither, not the footage, and it is the same mechanism that makes keyframe
+interval nearly free here. The codec decision is untouched: LZSS is still ~27× too slow.
+
+### Deviations from the plan
+
+- **The plan said to extend `tools/snes-video-rgb24-convert.sh` if it lacked a source-fps option.**
+  It did not lack one — `--fps` already forwards any ffmpeg rate expression. Rather than add a
+  redundant flag, its usage text was corrected to say so. No behaviour change.
+- **`APOLLO_REEL_GATE_FRAMES` raised 6,000 → 9,000.** The self-test build now Fletcher-checks 601
+  frames instead of 301, roughly doubling the boot validation pass on the slow build. This is a gate
+  budget, not a shipped artefact.

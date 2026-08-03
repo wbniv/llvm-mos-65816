@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/8374a21) | docs(apollo): note the true-60 master shelf another session staged in assets/snes/video/ |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/c8287bd) | docs: the Apollo master is 59.94 fps — correct the 'no true-60 master' claim, plan the in-place fix |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/70ad999) | feat(snes): recut the Apollo cartridge to a shot that actually moves |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8d4261a) | fix(snes): apollo cartridge booted to 37 seconds of black |
@@ -8,6 +9,11 @@
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8828247) | plan+todo: Apollo 11 daylight video cartridge — turn the hard-content stressor into a ROM (wip T3) |
 
 <!--history-meta v1
+8374a21	author	Will Norris
+8374a21	added	1
+8374a21	deleted	0
+8374a21	files	1
+8374a21	body	Beyond the Apollo 59.94 fps reel: three Artemis II 1080p60 cuts (exactly\n60/1 fps) and a 4K 60 fps XRISM clip are already on disk, plus a\npurpose-named apollo11-daylight-5994p.mp4. The 'no true-60 content\nacquired' claim was wrong twice over.\n\nSNESDQ_SKIP=1: whole-tree gate, other sessions' files.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 c8287bd	author	Will Norris
 c8287bd	added	57
 c8287bd	deleted	0

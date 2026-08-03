@@ -3,12 +3,16 @@
  * A sibling of snes-video-reel.c, not a modification of it. The reel plays
  * Artemis I: a night launch whose mostly-black frames an H.264 derivative had
  * already smoothed. This plays 16 mm KSC tracking-camera film — daylight, heavy
- * grain, bright continuous exhaust against sky — which costs the codec +5.3
- * ratio points under Floyd (57.0% -> 62.3%).
+ * grain, bright continuous exhaust against sky — which costs the codec ~22
+ * ratio points under Floyd (57.0% -> 78.9%).
+ *
+ * The corpus is sampled at 29.97 fps from a 59.9401 fps master and presented one
+ * frame per VBlank, so playback is true 59.94 fps at 2x real-time speed: 20.02 s
+ * of ascent in 10.01 s, 600 frames.
  *
  * This ROM exists to be measured. Its cadence window is reported, never gated:
  * a throughput regression on this content is the finding, not a failure.
- * Correctness is gated, and gated hard — the whole 300-frame loop is checked
+ * Correctness is gated, and gated hard — the whole 600-frame loop is checked
  * against the host encoder's oracle before playback is allowed to start.
  */
 #include <snes.h>
@@ -143,7 +147,7 @@ static void decode_frame(uint16_t frame) {
   ++apollo_reel_decoded;
 }
 
-/* Wrapping to frame zero uses the loop delta against frame 299, so a running
+/* Wrapping to frame zero uses the loop delta against frame 599, so a running
    loop never re-pays for a keyframe. */
 static void decode_sequential_frame(uint16_t frame) {
   if (frame == 0u) {
@@ -157,7 +161,7 @@ static void decode_sequential_frame(uint16_t frame) {
 }
 
 #ifdef APOLLO_REEL_SELFTEST
-/* The whole-loop byte-correctness gate. Every one of the 300 frames is checked
+/* The whole-loop byte-correctness gate. Every one of the 600 frames is checked
    against the host encoder's oracle, so the complete delta chain is pinned --
    a frame-zero-only check would pass on a decoder that corrupted every delta.
    The final frame is additionally compared byte for byte, because a Fletcher
@@ -180,7 +184,7 @@ static void validate_loop(void) {
       stop(4u);
     }
   }
-  /* Prove the loop closes too: the delta that takes frame 299 back to frame 0
+  /* Prove the loop closes too: the delta that takes frame 599 back to frame 0
      is the one packet straight-line playback depends on every lap. */
   decode_sequential_frame(0u);
   if (frame_check(framebuffer) != reel_frame_checks[0]) {
@@ -300,10 +304,10 @@ void apollo_reel_run(void) {
   apollo_reel_window_state = 0u;
 
 #ifdef APOLLO_REEL_SELFTEST
-  /* Whole-loop validation is a bit-serial sweep over 301 decoded frames and
-     costs ~2,200 VBlanks (~37 s) with the screen force-blanked. That belongs to
+  /* Whole-loop validation is a bit-serial sweep over 601 decoded frames and
+     costs ~4,400 VBlanks (~73 s) with the screen force-blanked. That belongs to
      the build gate, NOT to the shipped cartridge: running it ahead of the title
-     turns the boot into 37 seconds of black screen, which is exactly what
+     turns the boot into over a minute of black screen, which is exactly what
      snes-video-reel.c warns about ("...so the title remains an introduction
      rather than a loading screen"). dev/apollo-reel.sh builds this variant and
      gates it; the published ROM goes straight to the title. */

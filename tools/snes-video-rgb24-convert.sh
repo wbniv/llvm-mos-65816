@@ -15,12 +15,19 @@ usage: snes-video-rgb24-convert.sh --start SECONDS --duration SECONDS
 
   --start SECONDS     interval start, in seconds, within INPUT
   --duration SECONDS  interval length, in seconds (frame count = duration × rate)
-  --fps RATE          output rate (default: 30); frame selection only, never interpolation
+  --fps RATE          output rate (default: 30); frame selection only, never interpolation.
+                      Any ffmpeg rate expression works, including exact NTSC
+                      fractions -- `--fps 60000/1001` (59.94) and `--fps 30000/1001`
+                      (29.97) decimate a 59.94 fps master cleanly 1:1 and 2:1,
+                      where a plain `--fps 30` would drop a frame every ~1000.
   --crop W:H:X:Y      ffmpeg crop spec applied BEFORE the Lanczos scale, so the
                       kept region fills the 80x45 raster instead of being shrunk
                       into it. Accepts ffmpeg expressions (iw, ih). Default: none.
   INPUT               source video (any ffmpeg-readable container/codec)
   OUTPUT.rgb          concatenated 80x56 row-major RGB24 frames
+
+--duration also accepts a fractional value, so an exact frame count is reachable
+without post-trimming: `--duration 20.02 --fps 30000/1001` yields exactly 600.
 
 Sampling below the source rate is deliberate and is how a clip is sped up: 20 s
 at --fps 15 yields 300 frames, which played back at 30 fps is 2x speed. This

@@ -15,17 +15,18 @@ Bakes the Apollo daylight corpus into a linkable asset header, builds the slow
 and FastROM cartridges, and runs the gate:
 
   1. asset bake reproduces the recorded corpus SHA-256
-  2. whole-loop byte-correct decode on bsnes-jg (all 300 frames + loop delta)
+  2. whole-loop byte-correct decode on bsnes-jg (all 600 frames + loop delta)
   2b. negative control: one flipped stream byte must FAIL the gate
   3. cadence: presented frames per 600 VBlanks, slow ROM and FastROM
   4. entropy fingerprint (None/Low/High x2) and -verify-machineinstrs
+  6. black-screen guard: the published ROM shows a picture by VBlank 180
 
 Environment:
   APOLLO_REEL_CORPUS   corpus directory holding apollo-daylight-floyd.{tiles,pal}
   APOLLO_REEL_DITHER   floyd (default; the shipping dither) or bayer
-  APOLLO_REEL_FRAMES   frames to bake (default 300)
+  APOLLO_REEL_FRAMES   frames to bake (default 600)
   APOLLO_REEL_KEYFRAME seek-keyframe interval K (default 120, policy Option A)
-  APOLLO_REEL_CADENCE  VBlanks per presented frame (default 2)
+  APOLLO_REEL_CADENCE  VBlanks per presented frame (default 1 == 59.94 fps)
 EOF
 }
 
@@ -42,27 +43,30 @@ CONFIG="$BUILD/install/bin/mos-snes-hirom.cfg"
 JGX="$BUILD/jgxcheck"
 DATABASE="$ROOT/vendor/bsnes-jg/Database"
 
-CORPUS=${APOLLO_REEL_CORPUS:-/tmp/claude-1000/-home-will-llvm-mos-65816/a18c5d7f-022f-40ce-9bd4-41fe3d290b79/scratchpad/apollo-v2}
+CORPUS=${APOLLO_REEL_CORPUS:-/tmp/claude-1000/-home-will-llvm-mos-65816/a18c5d7f-022f-40ce-9bd4-41fe3d290b79/scratchpad/apollo-v3}
 DITHER=${APOLLO_REEL_DITHER:-floyd}
-FRAMES=${APOLLO_REEL_FRAMES:-300}
+FRAMES=${APOLLO_REEL_FRAMES:-600}
 KEYFRAME=${APOLLO_REEL_KEYFRAME:-120}
-CADENCE=${APOLLO_REEL_CADENCE:-2}
+CADENCE=${APOLLO_REEL_CADENCE:-1}
 
 TILES="$CORPUS/apollo-daylight-$DITHER.tiles"
 PALETTE="$CORPUS/apollo-daylight-$DITHER.pal"
 RGB="$CORPUS/apollo-daylight.rgb"
-# The v2 recut. The first interval (56:50, uncropped, 30 fps) was a TRACKING shot:
-# the camera follows the rocket, so at 80x56 almost nothing moved frame to frame
-# (mean|d| 1.48 against 2.9-4.0 for every other corpus) and it looked static. This
-# is the colour segment cropped to the action and sampled at 15 fps over 20 s, so
-# it plays back at 2x and the rocket visibly climbs. Reproduce with:
+# The v3 recut: same master, same interval, same crop as v2 -- only the sampling
+# rate changed. The master is 59.9401 fps (ffprobe r_frame_rate=220999/3687) and
+# every earlier corpus threw half of it away, so v2's 15 fps sampling is now
+# 29.97 (30000/1001) and presentation moved to one frame per VBlank. The 2x
+# playback speed of v2 is DELIBERATELY KEPT -- it is what made the recut watchable
+# at 80x56 -- so this is the identical shot at the identical pace with twice the
+# temporal resolution: 20.02 s of ascent in 10.01 s of playback, 600 frames.
 #
-#   tools/snes-video-rgb24-convert.sh --start 3410 --duration 20 --fps 15 \
+#   tools/snes-video-rgb24-convert.sh --start 3410 --duration 20.02 --fps 30000/1001 \
 #       --crop 'iw/2:ih/2:iw/4:ih/3' <master>.mp4 apollo-daylight.rgb
 #
 # Provenance for the master is in
 # docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md.
-RGB_SHA=${APOLLO_REEL_RGB_SHA:-2779e0793eda3ad89fec1d81a946f30e840dee307659b699d27c98a8df6810f5}
+# (v2, 300 frames at 15 fps sampling: RGB24 SHA-256 2779e079...10f5, cadence 2.)
+RGB_SHA=${APOLLO_REEL_RGB_SHA:-aa29061311e022e8bafb0e013c09da5ea11d4c9114df4732f9b1452157573cad}
 
 HEADER="$BUILD/apollo-reel-assets.h"
 STREAM="$BUILD/apollo-reel-stream.bin"
@@ -87,7 +91,8 @@ if [ -f "$RGB" ]; then
   fi
 else
   echo "  WARN: $RGB absent; regenerate with tools/snes-video-rgb24-convert.sh"
-  echo "        --start 3410 --duration 10 <master>.mp4 (provenance in the benchmark doc)"
+  echo "        --start 3410 --duration 20.02 --fps 30000/1001 --crop 'iw/2:ih/2:iw/4:ih/3'"
+  echo "        <master>.mp4 (provenance in the benchmark doc)"
 fi
 
 PYTHONPATH="$ROOT/tools" python3 "$ROOT/tools/snes-video-reel-assets.py" \
@@ -165,10 +170,10 @@ frame_off=$(sym "$FAST_MAP" apollo_reel_frame)
 
 # The boot validation pass is the long pole, and it is much longer on the slow
 # ROM: the C Fletcher loop runs 4,480 iterations per frame on top of the decode,
-# so 301 checked decodes cost ~2,400 VBlanks there (measured) versus ~700 on
-# FastROM. Two playback loops at cadence 2 add a further 1,200. 6,000 clears
-# both builds with margin; the health word only latches after those two loops.
-GATE_FRAMES=${APOLLO_REEL_GATE_FRAMES:-6000}
+# so 601 checked decodes cost ~4,800 VBlanks there versus ~1,400 on FastROM.
+# Two playback loops at cadence 1 add a further 1,200. 9,000 clears both builds
+# with margin; the health word only latches after those two loops.
+GATE_FRAMES=${APOLLO_REEL_GATE_FRAMES:-9000}
 
 echo
 echo "==> 2) whole-loop byte-correct decode (all $FRAMES frames + loop delta)"
@@ -220,7 +225,7 @@ case "$bad_line" in
 esac
 
 echo
-echo "==> 3) cadence: presented frames per $((CADENCE * 300)) VBlanks"
+echo "==> 3) cadence: presented frames per 600 VBlanks (1-VBlank operating point)"
 printf '  %-10s %10s %10s %10s %10s\n' build presented vblanks per600 slips
 for label in slow fastrom; do
   if [ "$label" = slow ]; then rom=$SLOW_ROM; map=$SLOW_MAP; else rom=$FAST_ROM; map=$FAST_MAP; fi
@@ -320,7 +325,7 @@ echo "==> 5) frame capture"
 shot_line=$(JGX_POLL=1 "$JGX" "$FAST_ROM" "$DATABASE" "$frame_off" 2 96 "$GATE_FRAMES" \
   "$SCREENSHOT" || true)
 case "$shot_line" in
-  *PASS*) echo "  PASS: captured frame 150: $shot_line" ;;
+  *PASS*) echo "  PASS: captured frame 96: $shot_line" ;;
   *) echo "  WARN: capture rendezvous missed: $shot_line" ;;
 esac
 

@@ -420,3 +420,89 @@ grain — rather than a fixed discount. *(Revised by the v2 recut above: once th
 moves in frame, budget **~80%**. The 2.67-point LZSS gap likewise widens to 14.31 points, which
 strengthens rather than weakens the argument in this section — the throughput gap it would have to
 close is unchanged and still ~27×.)*
+
+## Retime to 59.94 fps (2026-08-03): interval v3, same shot, twice the temporal resolution
+
+**Nothing above is overwritten.** The v1 and v2 rows stay exactly as recorded; this section adds a
+*second data point at a different frame rate* on the same interval, same crop, same master.
+
+The master is **59.9401 fps** (`ffprobe r_frame_rate=220999/3687`, 1280×720, 217,855 frames), and
+both earlier corpora retimed it to 30 or 15 fps by discarding frames. v3 keeps the v2 shot and the
+v2 **2× playback speed** and simply stops throwing frames away — 29.97 fps sampling presented one
+frame per VBlank instead of 15 fps sampling presented every second VBlank:
+
+```
+tools/snes-video-rgb24-convert.sh --start 3410 --duration 20.02 --fps 30000/1001 \
+    --crop 'iw/2:ih/2:iw/4:ih/3' <master>.mp4 apollo-daylight.rgb
+```
+
+600 frames, 8,064,000 B. RGB24 SHA-256 `aa29061311e022e8bafb0e013c09da5ea11d4c9114df4732f9b1452157573cad`;
+Floyd tiles `08c24756b982fec8703d5959cf8b6af06e8981beef1a6bdc55edd20c1675ce10`; palette
+`9d03a6d40db385e782bda34f5beddd95420e76c7293c2e9e236d905e422e27a0`.
+
+A **real-time** variant was also built and measured as a control — `--duration 10.01
+--fps 60000/1001`, i.e. every source frame, 10.01 s of ascent in 10.01 s of playback. RGB24 SHA-256
+`cb0bc84512a30a0130886e1f976b1a35d448027523ad09d8ba6f139e94b9d5d3`. It is **not** what ships; see
+"Which retime ships" below.
+
+### Motion, measured at the RGB24 stage
+
+The v1 defect was a shot too static to watch (mean\|Δ\| 0.93 against 2.88–3.93 for every healthy
+corpus). Consecutive-frame mean\|Δ\| over the whole corpus, plus how far the picture travels from
+first frame to last:
+
+| corpus | frames | mean\|Δ\| consecutive | first-vs-last mean\|Δ\| |
+|---|---:|---:|---:|
+| v2 (15 fps sample, 2×, shipped at 30 fps) | 300 | 4.27 | 57.67 |
+| **v3 (29.97 fps sample, 2×, 59.94 fps)** | **600** | **2.82** | **58.72** |
+| real-time control (59.94 fps sample, 1×) | 600 | 1.62 | 42.73 |
+
+### Codec comparison at 59.94 fps
+
+`tools/snes-video-pack.py --benchmark --compare-keyframes 15,30,60,120`, raw 2,688,000 B
+(600 × 4,480):
+
+| variant | v3 (2×, ships) | real-time control |
+|---|---:|---:|
+| raw blocks | 2,737,200 (101.83%) | 2,737,200 (101.83%) |
+| scanline PackBits | 2,020,300 (75.16%) | 2,035,958 (75.74%) |
+| **gallery LZSS, comparison only** | **1,760,997 (65.51%)** | **1,826,062 (67.93%)** |
+| xor-PackBits, K=120 | 2,130,890 (79.27%) | 2,095,363 (77.95%) |
+| full SVC1, K=120 | 2,126,712 (79.12%) | 2,094,365 (77.92%) |
+| **SVX2 replacement/copy, K=120 (shipping)** | **2,121,044 (78.91%)** | 2,098,219 (78.06%) |
+
+SVX2 keyframe sweep on v3: K=15 → 2,115,279; K=30 → 2,118,719; K=60 → 2,120,207;
+K=120 → 2,121,044. Same inversion as v2 (shorter K wins), same negligible spread — 5,765 B over an
+8× range — so **K=120 stands**, now buying 2.0 s of seek granularity at 60 fps instead of 4.0 s at
+30 fps.
+
+### The crossover item gets its second point, and the answer is "barely"
+
+The open question was whether interframe SVX2 claws back its 14.31-point deficit to intraframe LZSS
+once frames are closer together in time. **It does not, to a first approximation:**
+
+| corpus | frame spacing | LZSS | SVX2 K=120 | LZSS advantage |
+|---|---|---:|---:|---:|
+| v2, 30 fps presentation | 1/15 s | 65.31% | 79.62% | **14.31 pts** |
+| **v3, 59.94 fps presentation** | **1/30 s** | **65.51%** | **78.91%** | **13.40 pts** |
+| real-time control | 1/59.94 s | 67.93% | 78.06% | **10.13 pts** |
+
+Halving the temporal gap recovers **0.91 points**; quartering it recovers 4.18. Extrapolating, the
+delta path would need frames roughly an order of magnitude closer in time than 59.94 fps to reach
+parity — i.e. the crossover is not reachable by frame rate on this content. The reason is that the
+residual between consecutive frames here is dominated by **Floyd–Steinberg dither noise, which is
+decorrelated regardless of how close the frames are**, not by subject motion. That is the same
+mechanism that makes keyframe interval nearly free on this content, and it is a property of the
+dither, not of the footage.
+
+**The codec decision is still untouched**, on the same grounds as before: LZSS decodes ~27× too
+slow to ship, and a 13.40-point size gap does not close a 27× throughput gap.
+
+### Which retime ships: the 2× is kept
+
+A look-and-feel call, made with frames in front of it rather than in advance. Keeping the 2× means
+the shipped cartridge shows the *identical shot at the identical pace* as the version already
+published — 20.02 s of ascent in 10.01 s — with twice the temporal resolution. Dropping it would
+have halved the on-screen travel (first-vs-last 58.72 → 42.73) and cut consecutive-frame motion to
+1.62, drifting back toward the 0.93 that made v1 unwatchable. True 60 fps was spent on *smoothness*,
+which is what it is for, rather than on undoing the recut that fixed a real defect.
