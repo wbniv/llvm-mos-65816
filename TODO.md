@@ -31,7 +31,16 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
-- [ ] **Extract the on-screen FPS gauge to one shared component, and gate it.** The Apollo cart
+- [T3] **Round 7 demo battery (#119–#138) — twenty new defect-hunting ROMs.** Targets chosen by
+  the scoreboard's yield pattern: combiner-formed opcodes (`G_ABDS/U`, s64 ctpop/clz/ctz/abs),
+  the **declared-`unsupported` s32→4×s8 unmerge** (guaranteed finding either way), first-ever
+  interrupt-CC / inline-asm / mixed-per-function-width mode-state demos, far-pointer third pass,
+  >256 B frames, volatile/atomic discipline, float↔s64 libcalls, s64 limb-seam shifts. First
+  picks: #122 unmerge32, #123 nmitally, #126 mixedwidth, #125 asmisland, #119 absdiff,
+  #131 farspill. Per-demo plans + `/snes-demo` per item.
+  See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md). (T3: each demo is settled-plan
+  implementation; the round's selection/design was done inline.)
+- [T3] **Extract the on-screen FPS gauge to one shared component, and gate it.** The Apollo cart
   shipped a gauge reading 59.1 then 60.1 to the live page (fixed, `2db2cf0`). The sweep that
   followed found the class of bug, not just the instance: **only two ROMs draw a gauge**
   (`snes-video-reel.c`, `apollo-reel.c`; the other seven only mention fps in comments), the reel's
