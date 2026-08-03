@@ -65,6 +65,11 @@ tasks:
     cmds:
       - SITE="{{.SITE}}" dev/snes-display-quality-emulator.sh {{.CLI_ARGS}}
 
+  publish-snes-rom-both-sites:
+    desc: "Fail-closed paired ROM publication to biohack.net + indri.studio (pass --slug, --rom, optional --preview/--publish after --)"
+    cmds:
+      - dev/publish-snes-rom-both-sites.sh {{.CLI_ARGS}}
+
   smoke:
     desc: "Boot build/hello.sfc headless in MAME's snes driver, assert sentinel==0x42 in WRAM (needs the SPC700 IPL)"
     cmds:
