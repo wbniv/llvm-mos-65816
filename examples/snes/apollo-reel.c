@@ -216,9 +216,39 @@ static void dashboard_static(void) {
   video_hud_line(26u, " TIME                  FPS     ");
 }
 
-static void dashboard_update(uint8_t looped) {
+/* Recompute the displayed rate. Called AFTER present_frame(), never before:
+   apollo_reel_presented_total must already include the frame just sent. Sampling
+   ahead of the present made the FIRST window one frame short -- dp=59 over
+   dv=60 -- so the cartridge printed 59.1 once at startup and only then settled,
+   which reads as a stutter that the hardware never had (deadline_slips is 0 and
+   the gate measures a flat 600/600).
+
+   Units are frames per 600 VBlanks shown with one decimal -- deliberately the
+   same measurement the build gate's cadence table reports, so the HUD and the
+   published number cannot disagree. One frame per VBlank reads 60.0. The console
+   VBlank rate is really 60.0988 Hz, so scaling by 601 instead would be a truer
+   presents-per-wall-second and would read 60.1; that is accurate and useless --
+   it invites "why does the 59.94 fps demo say 60.1?" every time. The source rate
+   belongs to the source, not to the presentation gauge. */
+static void fps_sample(void) {
   uint16_t now_vblank = (uint16_t)apollo_reel_vblanks;
   uint16_t dv = (uint16_t)(now_vblank - fps_vblank_sample);
+  if (dv >= 60u) {
+    uint16_t now_presented = (uint16_t)apollo_reel_presented_total;
+    uint16_t dp = (uint16_t)(now_presented - fps_presented_sample);
+    uint16_t measured = (uint16_t)((dp * 600u + dv / 2u) / dv);
+    dashboard_fps[0] = (char)('0' + measured / 100u);
+    measured %= 100u;
+    dashboard_fps[1] = (char)('0' + measured / 10u);
+    dashboard_fps[3] = (char)('0' + measured % 10u);
+    fps_presented_sample = now_presented;
+    fps_vblank_sample = now_vblank;
+  }
+}
+
+/* Draws whatever fps_sample() last computed; the reading therefore lags the
+   present by one frame, which is invisible at a 60-frame sample interval. */
+static void dashboard_update(uint8_t looped) {
   char line[8];
   char *p = line;
   if (looped) {
@@ -227,17 +257,6 @@ static void dashboard_update(uint8_t looped) {
   } else if (++dashboard_frame_tick == APOLLO_REEL_SOURCE_FPS) {
     dashboard_frame_tick = 0u;
     if (dashboard_seconds != 99u) ++dashboard_seconds;
-  }
-  if (dv >= 60u) {
-    uint16_t now_presented = (uint16_t)apollo_reel_presented_total;
-    uint16_t dp = (uint16_t)(now_presented - fps_presented_sample);
-    uint16_t measured = (uint16_t)((dp * 601u + dv / 2u) / dv);
-    dashboard_fps[0] = (char)('0' + measured / 100u);
-    measured %= 100u;
-    dashboard_fps[1] = (char)('0' + measured / 10u);
-    dashboard_fps[3] = (char)('0' + measured % 10u);
-    fps_presented_sample = now_presented;
-    fps_vblank_sample = now_vblank;
   }
   p = decimal(p, 0u, 2u); *p++ = ':';
   p = decimal(p, dashboard_seconds, 2u);
@@ -361,6 +380,7 @@ void apollo_reel_run(void) {
        real timing and are intermittently ignored by the PPU. */
     dashboard_update(looped);
     present_frame();
+    fps_sample();
     cadence_window();
     deadline = (uint16_t)(deadline + APOLLO_REEL_VBLANKS_PER_FRAME);
 

@@ -622,3 +622,46 @@ gained a section on the frame-rate experiment, since "we doubled the frame rate 
 barely noticed" is the most interesting thing this rebuild produced.
 
 Commits: `e275733` (llvm-mos-65816), `73aec47` + tag `v1.0.363` (biohack.net).
+
+### 8. Post-publication defect: the FPS gauge read 59.1 then 60.1 (FIXED)
+
+**Reported by the user against the live page.** Neither number was a cadence problem —
+`apollo_reel_deadline_slips` is 0 and the gate measures a flat 600/600 — but a gauge that reads
+59.1 and then 60.1 on a cartridge billed as 59.94 fps looks exactly like a stutter the hardware
+never had. Two separate causes, both arithmetic:
+
+**59.1, once at startup — an off-by-one in the sampler.** The loop ran `dashboard_update()` *then*
+`present_frame()`, and the FPS sample lived inside `dashboard_update()`, so it latched
+`apollo_reel_presented_total` **before** the frame it was about to send. The first window therefore
+counted `dp=59` over `dv=60`: `(59*601+30)/60 = 591` → `"59.1"`. Every later window has both
+endpoints shifted equally and reads `dp=60`, which is why it appeared exactly once. Fixed by
+splitting `fps_sample()` out and calling it *after* `present_frame()`.
+
+**60.1, steady state — an accurate number that answers the wrong question.** The scale constant 601
+is the NTSC VBlank rate (60.0988 Hz) ×10, so one frame per VBlank really is 60.1 presents per wall
+second. True, and useless: it invites "why does the 59.94 fps demo say 60.1?" forever. Rescaled to
+600, so the HUD now reports **frames per 600 VBlanks with one decimal — deliberately the same
+measurement the gate's cadence table reports**, and the two can no longer disagree. One frame per
+VBlank reads 60.0. (The 59.94 belongs to the *source*; the gauge measures the *presentation*.)
+
+Verified by reading the `dashboard_fps` string straight out of WRAM `$0020` on the built ROM at six
+points, rather than by squinting at a screenshot:
+
+```
+VBlank   100  got=0x302E3030  "00.0"   (not yet sampled)
+VBlank   160  got=0x302E3030  "00.0"
+VBlank   300  got=0x302E3036  "60.0"
+VBlank   700  got=0x302E3036  "60.0"   (past the first loop wrap)
+VBlank  1400  got=0x302E3036  "60.0"
+VBlank  2600  got=0x302E3036  "60.0"
+```
+
+No 59.1, no 60.1. The leading `"00.0"` is left deliberately — it means "not measured yet" for the
+first second of playback, and seeding it with a number the ROM has not measured is precisely the
+kind of decorative gauge this project avoids.
+
+Re-gated in full (nothing carried over): whole-loop byte-correct decode on both self-test builds,
+negative control rejected, 600/600 with zero slips on slow ROM and FastROM, `-verify-machineinstrs`
+clean, one picture across six entropy boots, VBlank-180 black-screen guard PASS. The stream is
+byte-identical (`95f1e0e4…`); only the HUD arithmetic moved. New ROM sha256
+`a74142914170bec0a3bdce060928581ef2d979b426f011a552ce42b90441eda4`.

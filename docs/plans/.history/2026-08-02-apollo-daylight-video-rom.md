@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/b5035a6) | docs(apollo): record the 59.94 fps republication and promote the item to Done |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/e275733) | feat(snes): retime the Apollo cartridge to true 59.94 fps in place |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/8374a21) | docs(apollo): note the true-60 master shelf another session staged in assets/snes/video/ |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/c8287bd) | docs: the Apollo master is 59.94 fps — correct the 'no true-60 master' claim, plan the in-place fix |
@@ -10,6 +11,11 @@
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8828247) | plan+todo: Apollo 11 daylight video cartridge — turn the hard-content stressor into a ROM (wip T3) |
 
 <!--history-meta v1
+b5035a6	author	Will Norris
+b5035a6	added	31
+b5035a6	deleted	0
+b5035a6	files	1
+b5035a6	body	Live sha bf62a299...ecdbe == the gate-verified binary, deploy run 30819885405\ngreen, page 200 at the same slug. Collection (120) and roms/manifest.json (120)\nmoved together so the build-time count guard passed.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 e275733	author	Will Norris
 e275733	added	172
 e275733	deleted	0
