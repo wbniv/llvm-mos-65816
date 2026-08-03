@@ -13,9 +13,12 @@ if [[ -n "$shared_hooks" ]]; then
     fi
 fi
 
-if [[ "${SNESDQ_SKIP:-0}" == 1 ]]; then
-    echo "SNESDQ: BYPASSED by SNESDQ_SKIP=1" >&2
-    exit 0
-fi
-
-exec "$repo_root/dev/snes-display-quality.py"
+# --staged: judge what this commit will contain (staged blobs + HEAD), never the
+# dirty worktree. On this shared checkout the old whole-tree scan meant one
+# concurrent worker's unstaged file blocked everyone's commits, so the
+# SNESDQ_SKIP escape hatch it shipped with was used in 40 of 100 commits --
+# a gate bypassed that often is not a gate. The hatch is gone; if this fails,
+# the finding is in YOUR commit. Register a reviewed site with
+# `dev/snes-display-quality.py --update-baseline` (and review the diff).
+# CI keeps the whole-tree scan, where the tree really is the commit.
+exec "$repo_root/dev/snes-display-quality.py" --staged
