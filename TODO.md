@@ -31,6 +31,21 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
+- [T3] **Apollo cartridge → true 60 fps (fix the SHIPPED cart, do not add a second ROM).**
+  The published cartridge presents 30 fps, but that was never a decoder limit: the master is
+  **59.9401 fps** (`ffprobe r_frame_rate=220999/3687`) and every corpus built from it discards
+  every other frame at conversion time. User decision 2026-08-03: rebuild the existing cart in
+  place — same slug, same page — rather than shipping a near-duplicate. Have already: the master,
+  the validated interval/crop (t=3410, climbing plume), and decoder headroom at the 1-VBlank
+  operating point (hardest slice 674/600 slow, 754/600 FastROM). **The open number is capacity**:
+  300 frames pack to 1,083,714 B in a 2 MiB Fast HiROM (17/63 banks); 600 frames will not fit a
+  2 MiB image, so measure the packed size and choose 4 MiB HiROM or ExHiROM from the number — do
+  not assume. Bonus measurement for free: at 59.94 the frames resemble each other more, so this
+  puts a second point on the [interframe-crossover curve](#) at a different frame rate. Re-gate in
+  full incl. the VBlank-180 black-screen guard and a cadence table at the 1-VBlank budget; if it
+  cannot hold 60, say so and leave the 30 fps cart live.
+  [plan](docs/plans/2026-08-02-apollo-daylight-video-rom.md) §Follow-up. (T3: settled contract —
+  the ROM, gate, pipeline and interval all exist; this is a re-derive + re-measure + republish.)
 - [T4] **Interframe coding stops paying on hard content — measure the crossover, decide whether a
   per-frame codec chooser is worth building.** Found by the Apollo recut (2026-08-02): on that
   content intraframe **LZSS beats interframe SVX2 by 14.31 points** (877,809 vs 1,070,154 B), up
@@ -1711,4 +1726,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      minimum/maximum extended-map size (exhirom6/8, milestone rows), and invalid/truncated/
      ambiguously-padded rejection (5 new TestNegativeFixtures cases). fp:a7d670bfc9b8f6d4
      fp:633d71862b454a38 fp:984f9ef55eda44a3 fp:aa51f3c1c9cffc38 fp:662c5e80d93b1529 -->
+- [ ] **(triage)** Scope (c) was **analysis only** at the time; superseded 2026-08-03 — a 59.94 fps master (the Apollo 11 press-site reel) was already on disk. See the scope-(c) section. — _from [2026-08-01-svx2-60fps-ring-refill.md](docs/plans/2026-08-01-svx2-60fps-ring-refill.md)_  <!-- fp:f00bdab37db1c64a -->
 <!-- END auto-captured-deferrals -->

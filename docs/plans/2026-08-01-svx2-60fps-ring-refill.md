@@ -183,15 +183,27 @@ These differ only in whether mid-stream seek is required, which the transport/sc
 not this one. Recommended: (2) for the linear reel now, (1) as the shape to adopt the moment
 scrubbing lands — with the staged-keyframe specialization as the way to make (1) free.
 
-### Scope (c) — true-60 content, analysis only
+### Scope (c) — true-60 content
 
-- **No content acquired, and none should be**: there is no documented video-fetch path in `tools/`
-  or `dev/`. The `dev/fetch-*.sh` scripts fetch compiler torture suites and the 65816 oracle, not
-  video masters. Acquiring masters would mean inventing a fetch path, which this task excludes.
+> **SUPERSEDED 2026-08-03 — a qualifying master was already on disk when this was written.**
+> The Apollo 11 press-site reel acquired the day before by the hard-content stressor sweep is
+> **59.9401 fps** (`ffprobe`: `r_frame_rate=220999/3687`, 1280×720, 217,855 frames, 3,634 s), and
+> its own provenance block records "~59.94 fps … retimed 59.94→30 fps (frame selection, no optical
+> flow)". Every corpus built from it — the stressor and the shipped cartridge — **discards every
+> other frame**. So true-60 source material is in hand, not missing.
+>
+> How the gap happened is worth keeping: this task and the stressor sweep ran concurrently and
+> neither could see the other's work, so "no fetch path exists, therefore no master exists"
+> was true of *this* task's world and false of the tree. Two agents, adjacent facts, no shared
+> view. The check that would have caught it is the one this section itself named — a single
+> `ffprobe`.
+
+- Original finding, retained for the record: there is no documented video-fetch path in `tools/` or
+  `dev/` (the `dev/fetch-*.sh` scripts fetch compiler torture suites and the 65816 oracle, not
+  video masters), and this task correctly declined to invent one. The nominated NASA SVS item 14191
+  masters remain unverified — but moot, since a qualifying master already exists locally.
 - The requirement stands as the boundary plan states it: true 60 fps motion needs **≥ 59.94 fps
-  masters**; the nominated source is NASA SVS item 14191 (`Pre-launch_through_launch.webm`,
-  `Return_to_Earth.webm`), whose frame rates are unverified here because verifying them requires
-  downloading them. **This is the missing evidence** — one `ffprobe` of each master settles it.
+  masters**.
 - A 29.97/30 fps master frame-doubled to the 60 fps cadence is not a compromise on *throughput*: it
   halves decode load. It is a compromise on *motion*, which stays 30 fps. Never interpolate.
 
@@ -369,6 +381,6 @@ worker's call, not this branch's.
 
 ## Out of scope, stated plainly
 
-- Scope (c) is **analysis only** — no content acquisition; no fetch path is being added.
+- Scope (c) was **analysis only** at the time; superseded 2026-08-03 — a 59.94 fps master (the Apollo 11 press-site reel) was already on disk. See the scope-(c) section.
 - Reel-side integration is deliberately not attempted: `examples/snes/snes-video-reel.c`,
   `video_hud.h` and `dev/snes-video-reel.sh` carry another worker's uncommitted edits on `main`.

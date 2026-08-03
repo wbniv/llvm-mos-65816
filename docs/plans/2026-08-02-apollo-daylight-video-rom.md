@@ -361,3 +361,60 @@ that is the finding and it outranks shipping the demo.
 Still owed at close: the three open questions answered numerically, the cadence table (presented
 frames per 600 VBlanks, slow and FastROM, beside the Artemis figures), and the negative-control
 result.
+
+
+## Follow-up: the master is 59.94 fps — true-60 is available (2026-08-03)
+
+The shipped cartridge presents at **30 fps** (300 frames, 2 VBlanks each, zero slips). That was
+never a decoder limit: `ffprobe` on the master gives **59.9401 fps**
+(`r_frame_rate=220999/3687`, 1280×720, 217,855 frames), and both corpora built from it retime
+59.94→30 by *discarding every other frame*. The temporal resolution is being thrown away at
+conversion time, not lost to the console.
+
+**Decision (user, 2026-08-03): fix the existing cartridge — do not add a second ROM.** Same slug,
+same page, same ROM identity; the 30 fps stream is replaced by the 59.94 fps one. Two demos that
+differ only in frame rate would split the story and double the maintenance for no gain, and the
+30 fps version has no independent reason to exist once the source's real rate is available.
+Rebuild in place from material already on disk:
+
+| piece | state |
+|---|---|
+| ≥59.94 fps master | **have it** — same file, same provenance, no new acquisition |
+| decoder headroom at the 1-VBlank operating point | **have it** — hardest slice 674/600 slow ROM, 754/600 FastROM |
+| interval + framing | **have it** — t=3410, cropped, the climbing-plume shot, motion-validated |
+| capacity | **the open question** — see below |
+
+**Capacity is the one thing that needs deciding.** 300 frames pack to 1,083,714 B and sit in a
+2 MiB Fast HiROM using 17 of 63 banks. 600 frames land near ~2.1 MB of stream, which no longer
+fits a 2 MiB image: it wants 4 MiB HiROM or the ExHiROM path (both now proven by the cartridge-size
+canaries and the ordinary-ROM matrix). Compute it properly before choosing — the ratio on
+doubled-rate frames will not be exactly 2× the 30 fps stream, because consecutive frames at 59.94
+resemble each other *more*, which is the one thing that favours the delta codec on this content.
+
+That last point ties directly to the open crossover item: at 30 fps this footage made intraframe
+LZSS beat interframe SVX2 by 14.31 points; at 59.94 fps the frames are half as far apart, so the
+delta path should claw some of that back. Measuring both rates on the same interval would put a
+second point on that curve for free.
+
+Also note: at true 60 the current **2× speed-up becomes unnecessary** — the same interval plays at
+real-time ascent speed with full temporal resolution, which is likely a better watch than the
+sped-up version. Whether to keep the 2× (yielding a 20 s real-time span in 10 s of playback, now
+at full temporal resolution) or drop it (10 s of real-time ascent) is a look-and-feel call to make
+with frames in front of you, not in advance.
+
+### What "fix in place" requires
+
+1. Re-derive the corpus at `fps=59.94` (equivalently `60000/1001`) from the **same** interval and
+   crop, via the extended `tools/snes-video-rgb24-convert.sh`; record the new SHA-256 alongside the
+   30 fps one — the 30 fps ratios stay in the benchmark doc as a *second data point at a different
+   rate*, not overwritten.
+2. Repack Floyd, re-measure the ratio, and decide capacity from the measured stream size (2 MiB is
+   already ruled out for a naive doubling; do not assume 4 MiB without the number).
+3. Rebuild the ROM at whatever mapping the size demands, re-gate in full: whole-loop byte-correct
+   decode, negative control, entropy fingerprint, the VBlank-180 black-screen guard, and the
+   cadence table at the **1-VBlank** operating point — the metric that decides whether it really
+   presents 60.
+4. Republish over the same slug; update the page prose (it currently describes 2× speed and 30 fps)
+   and the manifest's selfcheck if the oracle moves. Verify live sha == gate-verified binary.
+5. If the measured cadence does **not** hold 60 with the harder per-frame budget, that is the
+   finding — report it and keep the 30 fps cartridge live rather than shipping a slipping one.
