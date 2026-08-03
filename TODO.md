@@ -923,9 +923,23 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)
 - [verify T3] **123-mode7-gallery-filter** — same commit/state as 121; run after it (shared
   surface). [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md)
-- [verify T3] **svx2-animated-video-cartridge** — the flagship video cartridge; implementation
-  record is rich but the plan's numbered verification steps were never run + recorded.
+- [verify T3] **svx2-animated-video-cartridge — BLOCKED on the [T4] decision below.** Run
+  2026-08-03 (`f536d25`): gates 1–6 PASS against the delivered 900-frame HiROM reel (24 pytest,
+  zero CRC failures over 4,000 VBlanks, fidelity + dashboard PASS, 1,911 presentations, checksum
+  clean); preliminary + gate 7 FAIL — the plan's original artifacts are invalidated by successor
+  work (next bullet). Re-run/close once the anchors are re-pointed.
   [plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)
+- [T4] **svx2 plan anchors invalidated by successor work — restore-or-retire decision (svx2
+  owner).** Found by the verification run above. (a) The plan's 4-frame LoROM "first cartridge"
+  is **uncompilable on `main`**: `examples/snes/snes-video-reel.c:287` references
+  `VIDEO_REEL_HIROM_BASE_BANK` unconditionally, but `tools/snes-video-reel-assets.py:231` emits
+  it only on the `--packed-far` (>4-frame) path — suspected commit `bd344a1`. Either restore the
+  small-reel path (a one-line `#ifndef` default would do) or formally retire it in the plan.
+  (b) Gate 7 has no truthful reading: the plan's `825e3848…` 32 KiB LoROM exists nowhere in the
+  tree; the gallery serves the 8 MiB ExHiROM 59.94 fps successor (`c3d7cd9e…`, `v1.0.360`),
+  gated by `dev/svx2-emulator-validation.sh` under a different plan. Decide which ROM this plan
+  owns and mark the LoROM implementation-record figures historical. (T4: plan-level ownership
+  decision + cross-session file — `snes-video-reel.c` has in-flight edits from another worker.)
 - [verify T3] **lzss-gallery-navigation-and-auto-advance-chevron** — implemented, live, chevron
   input re-fixed `3b8a559`; verify against current main.
   [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)
