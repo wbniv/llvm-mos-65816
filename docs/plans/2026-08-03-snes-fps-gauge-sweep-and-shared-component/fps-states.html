@@ -1,0 +1,115 @@
+<meta charset="utf-8">
+<title>SNES video HUD — FPS field states</title>
+<style>
+  :root { --bg:#12141a; --ink:#e8ecf4; --dim:#8b94a8; --ok:#4ec9a7; --bad:#e5636b; --warn:#e0a33e; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  .page { width:1440px; min-height:900px; margin:0 auto; padding:44px 56px; }
+  h1 { font-size:26px; margin:0 0 6px; letter-spacing:.2px; }
+  .sub { color:var(--dim); margin:0 0 30px; font-size:14px; }
+  .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:26px; }
+  .card { background:#181b23; border:1px solid #262b36; border-radius:10px; padding:20px 22px; }
+  .card h2 { font-size:15px; margin:0 0 3px; letter-spacing:.3px; }
+  .card .note { color:var(--dim); font-size:13px; margin:0 0 16px; min-height:38px; }
+  .tag { display:inline-block; font-size:11px; letter-spacing:.6px; text-transform:uppercase;
+         padding:2px 8px; border-radius:99px; margin-left:8px; vertical-align:2px; }
+  .t-ok { background:rgba(78,201,167,.15); color:var(--ok); border:1px solid rgba(78,201,167,.35); }
+  .t-bad { background:rgba(229,99,107,.15); color:var(--bad); border:1px solid rgba(229,99,107,.35); }
+  .t-warn { background:rgba(224,163,62,.15); color:var(--warn); border:1px solid rgba(224,163,62,.35); }
+
+  /* The SNES frame: 256x224 logical, 2x. Video occupies rows 0..191, HUD 192..223. */
+  .snes { width:512px; height:448px; background:#000; border-radius:4px; overflow:hidden;
+          margin:0 auto; position:relative; }
+  .video { height:384px; background:
+      radial-gradient(120px 90px at 54% 66%, #cfe4ea 0%, #7fb0bd 38%, #3d6f80 68%, #23404d 100%),
+      linear-gradient(#4d7f92 0%, #2b5566 62%, #12222b 100%); position:relative; }
+  .video::after { content:""; position:absolute; inset:0;
+      background:linear-gradient(#000 0 20%, transparent 20% 80%, #000 80% 100%); }
+  .hud { height:64px; background:#000; color:#dfe6ef; padding:8px 10px 0;
+         font:700 16px/26px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+         letter-spacing:2.6px; white-space:pre; }
+  .fps { color:#fff; }
+  .fps.bad { color:var(--bad); }
+  .fps.pend { color:#6f7a8d; }
+  .slip { color:var(--bad); }
+  .caption { text-align:center; color:var(--dim); font-size:12.5px; margin-top:12px;
+             font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  footer { margin-top:34px; color:var(--dim); font-size:13px; border-top:1px solid #262b36;
+           padding-top:16px; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:#cbd4e4; }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f6f7fa; --ink:#161a22; --dim:#5d6678; }
+    .card { background:#fff; border-color:#e0e4ec; }
+    footer { border-top-color:#e0e4ec; }
+    code { color:#2c3444; }
+  }
+  :root[data-theme="dark"] { --bg:#12141a; --ink:#e8ecf4; --dim:#8b94a8; }
+  :root[data-theme="dark"] .card { background:#181b23; border-color:#262b36; }
+  :root[data-theme="light"] { --bg:#f6f7fa; --ink:#161a22; --dim:#5d6678; }
+  :root[data-theme="light"] .card { background:#fff; border-color:#e0e4ec; }
+</style>
+
+<div class="page">
+  <h1>SNES video HUD — the FPS field, all four states</h1>
+  <p class="sub">Bottom two text rows of the 256×224 raster (shown 2×). Only the
+    <code>FPS</code> field differs between cards; everything else is the shipped dashboard.</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>Not yet sampled<span class="tag t-ok">keep</span></h2>
+      <p class="note">First ~1 s of playback, before the 60-VBlank window closes. Means
+        “not measured yet”. Deliberately <em>not</em> seeded with a plausible number.</p>
+      <div class="snes">
+        <div class="video"></div>
+        <div class="hud">APOLLO 11 / KSC 16MM       PLAY
+ TIME  00:00          FPS <span class="fps pend">00.0</span></div>
+      </div>
+      <p class="caption">dashboard_fps = "00.0" · fps_tenths = 0</p>
+    </div>
+
+    <div class="card">
+      <h2>Locked, one frame per VBlank<span class="tag t-ok">target</span></h2>
+      <p class="note">Steady state. 600 presented frames per 600 VBlanks — the same measurement the
+        build gate’s cadence table publishes.</p>
+      <div class="snes">
+        <div class="video"></div>
+        <div class="hud">APOLLO 11 / KSC 16MM       PLAY
+ TIME  00:04          FPS <span class="fps">60.0</span></div>
+      </div>
+      <p class="caption">dashboard_fps = "60.0" · fps_tenths = 600</p>
+    </div>
+
+    <div class="card">
+      <h2>The shipped defect<span class="tag t-bad">fixed</span></h2>
+      <p class="note">What the live page showed: <b>59.1</b> once (sampler read the counter one
+        frame before the present it was about to do), then <b>60.1</b> forever (scaled by the
+        60.0988 Hz VBlank rate instead of the cadence metric).</p>
+      <div class="snes">
+        <div class="video"></div>
+        <div class="hud">APOLLO 11 / KSC 16MM       PLAY
+ TIME  00:01          FPS <span class="fps bad">59.1</span> → <span class="fps bad">60.1</span></div>
+      </div>
+      <p class="caption">first window dp=59 / dv=60 → 591 · then dp=dv → 601</p>
+    </div>
+
+    <div class="card">
+      <h2>Slipping build<span class="tag t-warn">diagnostic</span></h2>
+      <p class="note">A rate below 60.0 plus the <code>SLIP</code> flag. The gauge must be able to
+        show this honestly — a readout that can only say 60.0 proves nothing.</p>
+      <div class="snes">
+        <div class="video"></div>
+        <div class="hud">APOLLO 11 / KSC 16MM       <span class="slip">SLIP</span>
+ TIME  00:04          FPS <span class="fps bad">52.3</span></div>
+      </div>
+      <p class="caption">dashboard_fps = "52.3" · deadline_slips &gt; 0</p>
+    </div>
+
+  </div>
+
+  <footer>
+    Units: presented frames per 600 VBlanks, one decimal. A 2-VBlank cadence build reads
+    <code>30.0</code> in the same field — the number is cadence-derived, never hardcoded.
+  </footer>
+</div>

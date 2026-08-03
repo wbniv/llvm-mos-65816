@@ -31,6 +31,21 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
+- [ ] **Extract the on-screen FPS gauge to one shared component, and gate it.** The Apollo cart
+  shipped a gauge reading 59.1 then 60.1 to the live page (fixed, `2db2cf0`). The sweep that
+  followed found the class of bug, not just the instance: **only two ROMs draw a gauge**
+  (`snes-video-reel.c`, `apollo-reel.c`; the other seven only mention fps in comments), the reel's
+  is **correct only by an accident of call placement** — it samples one VBlank early *and* one
+  present early, so two off-by-ones cancel — and **no gate anywhere asserts the displayed number**
+  (`fps_tenths` is exported and read by nothing). Apollo broke the cancellation by moving the call
+  after the deadline wait for an unrelated and correct reason. Extract `examples/snes/video_fps.h`
+  (header-only `static inline`, matching `video_hud.h`), make "sample AFTER the present" the
+  explicit contract, and add a gate step to both scripts that reads `dashboard_fps` out of WRAM.
+  Both gauge readings already captured from the running consoles as the before-baseline.
+  [plan](docs/plans/2026-08-03-snes-fps-gauge-sweep-and-shared-component.md).
+  *Unranked deliberately: the ranking hook denies a tier marker written by anyone but Fable.
+  Suggested tier 2 — the sweep is done, the design is written, and it is one new header plus two
+  call-site moves in a corridor with existing gates.*
 - [T4] **Interframe coding stops paying on hard content — measure the crossover, decide whether a
   per-frame codec chooser is worth building.** Found by the Apollo recut (2026-08-02): on that
   content intraframe **LZSS beats interframe SVX2 by 14.31 points** (877,809 vs 1,070,154 B), up
@@ -1722,4 +1737,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fp:633d71862b454a38 fp:984f9ef55eda44a3 fp:aa51f3c1c9cffc38 fp:662c5e80d93b1529 -->
 - [ ] **(triage)** Scope (c) was **analysis only** at the time; superseded 2026-08-03 — a 59.94 fps master (the Apollo 11 press-site reel) was already on disk. See the scope-(c) section. — _from [2026-08-01-svx2-60fps-ring-refill.md](docs/plans/2026-08-01-svx2-60fps-ring-refill.md)_  <!-- fp:f00bdab37db1c64a -->
 - [verify] **2026-08-03-interframe-crossover** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-03-interframe-crossover.md](docs/plans/2026-08-03-interframe-crossover.md)_  <!-- fp:3285846755321e74 -->
+- [verify] **2026-08-03-snes-fps-gauge-sweep-and-shared-component** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-03-snes-fps-gauge-sweep-and-shared-component.md](docs/plans/2026-08-03-snes-fps-gauge-sweep-and-shared-component.md)_  <!-- fp:e7f32215206709ed -->
 <!-- END auto-captured-deferrals -->
