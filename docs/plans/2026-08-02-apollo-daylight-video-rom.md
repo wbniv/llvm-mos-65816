@@ -380,6 +380,7 @@ Rebuild in place from material already on disk:
 | piece | state |
 |---|---|
 | ≥59.94 fps master | **have it** — same file, same provenance, no new acquisition |
+| (and more, found 2026-08-03) | `assets/snes/video/` now holds a whole shelf of true-60 masters another session staged: `apollo11-daylight-5994p.mp4`, three Artemis II `1080p60` cuts (exactly 60/1 fps, 1920×1080) and `XRISM_360_4k_60fps_h264.mp4`. The "no true-60 content" claim was doubly wrong. |
 | decoder headroom at the 1-VBlank operating point | **have it** — hardest slice 674/600 slow ROM, 754/600 FastROM |
 | interval + framing | **have it** — t=3410, cropped, the climbing-plume shot, motion-validated |
 | capacity | **the open question** — see below |

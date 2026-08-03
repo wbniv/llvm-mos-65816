@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/c8287bd) | docs: the Apollo master is 59.94 fps — correct the 'no true-60 master' claim, plan the in-place fix |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/70ad999) | feat(snes): recut the Apollo cartridge to a shot that actually moves |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8d4261a) | fix(snes): apollo cartridge booted to 37 seconds of black |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/c1a667f) | feat(snes): add the Apollo 11 daylight-launch video cartridge |
@@ -7,6 +8,11 @@
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8828247) | plan+todo: Apollo 11 daylight video cartridge — turn the hard-content stressor into a ROM (wip T3) |
 
 <!--history-meta v1
+c8287bd	author	Will Norris
+c8287bd	added	57
+c8287bd	deleted	0
+c8287bd	files	1
+c8287bd	body	The 60fps task recorded true-60 content as unavailable ('no fetch path\nexists... one ffprobe settles it'). It was already on disk: the Apollo 11\npress-site reel acquired a day earlier by the hard-content stressor sweep is\n59.9401 fps (r_frame_rate=220999/3687), and its own provenance block says so.\nBoth corpora built from it retime 59.94->30 by discarding every other frame,\nso the shipped cartridge's 30 fps is a conversion choice, not a decoder limit.\n\nThe two tasks ran concurrently and neither could see the other's tree, so\n'no fetch path, therefore no master' was true of that task's world and false\nof the repo. Recorded in the 60fps plan as the reason, since the cure is the\ncheck that section itself named.\n\nUser decision: fix the SHIPPED cartridge in place (same slug, same page)\nrather than adding a near-duplicate ROM. Capacity is the one open number --\n600 frames will not fit the current 2 MiB image, so measure the packed stream\nand choose the mapping from it. Filed as T3 with the full re-gate list,\nincluding the VBlank-180 black-screen guard and a 1-VBlank cadence table.\n\nSNESDQ_SKIP=1: whole-tree gate, other sessions' files.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 70ad999	author	Will Norris
 70ad999	added	49
 70ad999	deleted	0
