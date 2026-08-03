@@ -53,9 +53,27 @@ frames where keyframe < delta, and by how much, per corpus and per dither. If th
 small and concentrated (e.g. only at shot cuts), a chooser is not worth building and this closes
 with a recorded answer.
 
-**P0b — a second frame rate, free.** The Apollo true-60 work (`[T3]`, in flight) re-derives this
-exact interval at 59.94 fps. Frames half as far apart should resemble each other more and claw back
-some of the 14.31 points. Capture it as a second point on the curve rather than re-deriving it here.
+**P0b — a second frame rate — ✅ ANSWERED 2026-08-03, and it reshapes the question.** The Apollo
+true-60 work re-derived this exact interval at three temporal spacings:
+
+| frame spacing | LZSS | SVX2 K=120 | LZSS ahead |
+|---|---:|---:|---:|
+| 1/15 s (the 30 fps cut) | 65.31% | 79.62% | 14.31 pts |
+| 1/30 s (59.94 fps, ships) | 65.51% | 78.91% | **13.40 pts** |
+| 1/59.94 s (real-time control) | 67.93% | 78.06% | 10.13 pts |
+
+Halving the temporal gap recovers **0.91 points**; quartering it, 4.18. So the hypothesis behind
+this phase — "frames closer together will resemble each other more and delta coding will recover" —
+is **true but almost irrelevant at achievable frame rates**. The reason is the important part: the
+residual between consecutive frames here is **Floyd–Steinberg dither noise, which is decorrelated
+no matter how close the frames are**. The crossover is a property of the *dither*, not of the
+footage or the frame rate, and it cannot be escaped by shooting or sampling faster.
+
+That redirects P0. The per-frame question is no longer only "delta or keyframe" but "how much of
+each delta is dither noise" — which suggests a cheap prior experiment: re-pack one corpus with an
+*ordered* (Bayer) dither, which is deterministic and frame-stable, and see whether SVX2's advantage
+returns. The recorded Artemis Bayer row already hints at it (SVX2 ahead by 19.38 points there,
+its largest win anywhere in the table).
 
 **P1 — the cadence model.** Given a per-frame chooser and a target rate, how many keyframe slots fit
 in a 600-VBlank window before the stream slips? Existing measurements to build on: hardest stream
