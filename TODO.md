@@ -31,7 +31,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
-- [T3] **Apollo cartridge → true 60 fps (fix the SHIPPED cart, do not add a second ROM).**
+- [wip T3] **Apollo cartridge → true 60 fps (fix the SHIPPED cart, do not add a second ROM).** <!-- agent:ac6fc8f8e1c5127eb -->
   The published cartridge presents 30 fps, but that was never a decoder limit: the master is
   **59.9401 fps** (`ffprobe r_frame_rate=220999/3687`) and every corpus built from it discards
   every other frame at conversion time. User decision 2026-08-03: rebuild the existing cart in
