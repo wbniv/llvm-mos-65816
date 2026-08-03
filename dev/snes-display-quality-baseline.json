@@ -1751,6 +1751,20 @@
       "path": "examples/snes/apollo-reel.c",
       "line": 253,
       "text": "for (i = 0; i != 448u; ++i) REG_CGDATA = reel_palette[i];"
+    },
+    {
+      "id": "b534ba8b33f29887f094",
+      "kind": "ppu-write",
+      "path": "examples/snes/nmitally.c",
+      "line": 90,
+      "text": "snes_vram_addr((uint16_t)(FONT_BASE * 8)); // force-blank: direct write is legal"
+    },
+    {
+      "id": "51a93097e363415d6351",
+      "kind": "ppu-write",
+      "path": "examples/snes/nmitally.c",
+      "line": 91,
+      "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8; i++) REG_VMDATA = FONT8[i];"
     }
   ]
 }
