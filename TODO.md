@@ -31,6 +31,18 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
+- [T4] **Interframe coding stops paying on hard content — measure the crossover, decide whether a
+  per-frame codec chooser is worth building.** Found by the Apollo recut (2026-08-02): on that
+  content intraframe **LZSS beats interframe SVX2 by 14.31 points** (877,809 vs 1,070,154 B), up
+  from 2.67 points on the first, near-static cut. The direction is intuitive — once consecutive
+  frames stop resembling each other, between-frame coding earns less than coding each frame fresh
+  — but the *size* of the gap says the crossover is a real operating region, not a curiosity.
+  The shipped decision is unaffected and safe: it is speed-anchored, and LZSS decodes ~27× too
+  slow to ship. The open question is whether a **per-frame chooser** (emit a delta packet or an
+  intraframe packet, whichever is smaller) is worth building — which needs a *fast* intraframe
+  path, so the real work is a throughput budget for one, not the chooser itself. Data already in
+  hand: both corpora packed both ways, ratios recorded per clip in the benchmark doc. (T4: design
+  question with unknown headroom — needs its own plan before any code.)
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
   (2026-08-01); only the player-package release is left, and it is USER-GATED.**
   <!-- agent:a5850a8d3df7af344 -->
