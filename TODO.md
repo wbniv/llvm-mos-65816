@@ -49,7 +49,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   Per-demo plans + `/snes-demo` per item.
   See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md). (T3: each demo is settled-plan
   implementation; the round's selection/design was done inline.)
-- [ ] **Does `G_ADD`/`G_SUB` miss 16-bit lanes under `+mos-a16`?** Measured while withdrawing #122:
+- [T4] **Does `G_ADD`/`G_SUB` miss 16-bit lanes under `+mos-a16`?** Measured while withdrawing #122:
   `MOSLegalizerInfo` gives add/sub `.legalFor({S8}).widenScalarToNextMultipleOf(0,8).custom()` with
   **no `maxScalar`**, so an s32 add narrows to **4×s8 `G_UADDE` lanes even under a16** — verified
   identical MIR with and without the feature. Only the bitwise ops get s16 lanes
@@ -785,6 +785,17 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0012`/`0015` — user
   judgment: post with honest framing vs hold for #321), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
+- [T2] **Upstream the `MVN`/`MVP` block-move bank-order MC fix (`0020`).** The svx2 video work
+  found and fixed an llvm-mos 65816 `MVN` operand-encoding defect (bank order in the MC
+  instruction format) — fix + opcode regression already carried as
+  `patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch`. Remaining is submission polish
+  (the five steps from the [svx2 plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)
+  §Upstream compiler follow-up): reduce to the MC opcode test, confirm syntax + encoded byte
+  order against WDC docs and llvm-mos asm conventions, run the focused MC test + relevant suite,
+  mint a minimal branch/PR (TableGen fix + regression only), and frame the animated ROM as the
+  real-world reproducer without coupling to this repo's assets. Draft only — posting stays
+  user-triggered; queue in [upstream-contribution-status.md](docs/upstream-contribution-status.md)
+  row 17. (T2: fix exists and is validated; remaining is bounded reduce/verify/mint work.)
   Re-verified 2026-07-26 (post-move): upstream tip `8b616af94` (lld-only #567 on top of our base);
   `0010/0011/0012/0015/0016` all `apply --check` clean against it. **Every outward action (branch
   push, PR, issue) is individually user-triggered.**
@@ -922,6 +933,10 @@ revisit) rather than active work._
 
 ## Parked
 
+- **HDMA backdrop gradient for the trimerge page** — visual-polish idea deferred from the
+  [99b trimerge visual fix](docs/plans/2026-07-27-99b-trimerge-visual-fix.md) because snesgfx has
+  no HDMA-gradient support yet; revisit if/when the library grows one (the blossom HUD's HDMA
+  mode-split is the closest existing machinery).
 - **Mesen2 as a third emulator** — abandoned for now: the prebuilt crashes on 26.04
   (glibc-2.43) and headless `--testrunner` won't run Lua; would need a source build against 26.04.
   MAME + bsnes-jg already give a two-emulator cross-check, so this is shelved unless a third opinion
@@ -1715,7 +1730,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [verify] **2026-07-26-125-lzss-gallery-full-mode7-color** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-125-lzss-gallery-full-mode7-color.md](docs/plans/2026-07-26-125-lzss-gallery-full-mode7-color.md)_  <!-- fp:3cc268f3e382586f -->
 - [verify] **2026-07-26-127-lzss-repack-explainer** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-127-lzss-repack-explainer.md](docs/plans/2026-07-26-127-lzss-repack-explainer.md)_  <!-- fp:7794d6d35096b0b8 -->
 <!-- triaged 2026-07-30: same library work as the Parked "truncstair F2 HOFS scroll-ring / 32-column canvas" entry, which carries the measured constraints (bank-0 .bss overflow, _canvas_emit bank-0x00 DMA) and both motivating demos (#99b trimerge, truncstair). fp:f9122100c1e60a3f -->
-- [ ] **(triage)** HDMA backdrop gradient (same reason: no library support yet). — _from [2026-07-27-99b-trimerge-visual-fix.md](docs/plans/2026-07-27-99b-trimerge-visual-fix.md)_  <!-- fp:9e322e197981b057 -->
+<!-- triaged 2026-08-03: HDMA backdrop gradient (99b trimerge visual polish idea, blocked on
+     snesgfx library support) -> moved to ## Parked as an idea; not scheduled work. -->
 <!-- triaged 2026-07-27: #128 is planned-not-yet-implemented; its verification runs with the implementation, tracked by the curated [T3] "#128 lzss-gallery" battery sub-item. fp:8b0a76b3e990a0e0 -->
 - [verify] **2026-07-27-131-snes-cartridge-map-mermaid-quadtree** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md](docs/plans/2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md)_  <!-- fp:5e21a496a7540ac0 -->
 - [verify] **2026-07-27-132-phone-gallery-chevron-hitboxes** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-132-phone-gallery-chevron-hitboxes.md](docs/plans/2026-07-27-132-phone-gallery-chevron-hitboxes.md)_  <!-- fp:92b872c936ff9d49 -->
@@ -1732,11 +1748,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        crash on @unpack_slide" bullet, pointing at the existing #138 plan. fp:4e675c3ad0ba3ad5
        fp:d674d7d5be702bb7 fp:dd1e1ad204ea7356 -->
 - [verify] **2026-07-31-real-video-codec-corpus** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-real-video-codec-corpus.md](docs/plans/2026-07-31-real-video-codec-corpus.md)_  <!-- fp:06fb2d23bfdea209 -->
-- [ ] **(triage)** reduce the `MVN`/`MVP` failure to the MC opcode test; — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:18d3e98ba8af63d9 -->
-- [ ] **(triage)** confirm syntax and encoded byte order against WDC documentation and accepted llvm-mos assembly — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:ab59f4d9ffd69c48 -->
-- [ ] **(triage)** run the focused MC test and the relevant llvm-mos test suite; — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:adfc593c2e2d3f65 -->
-- [ ] **(triage)** prepare a minimal commit/PR containing the TableGen fix and regression only; and — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:788f433367fcd177 -->
-- [ ] **(triage)** reference the animated ROM as the real-world reproducer, without coupling the upstream patch to — _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:012a72598ce748d6 -->
+<!-- triaged 2026-08-03: the five svx2 "Upstream compiler follow-up" bullets (MVN/MVP MC fix:
+     reduce to MC test, WDC-doc syntax confirmation, run suites, minimal commit/PR, reproducer
+     framing) are ONE workstream — consolidated into a single curated T2 bullet under
+     Upstream / Contribution ("MVN/MVP block-move bank-order MC fix (0020)") + status-doc row 17.
+     Nothing dropped; the five steps are the new bullet's checklist. -->
 - [verify] **2026-07-31-svx2-animated-video-cartridge** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:40c1c2b870d73873 -->
 <!-- triaged 2026-08-01: seamdemo plan is PLANNED-status; verification runs per phase and is covered by the curated [T4] seamdemo item (blocked on the exhirom-canaries merge). fp:c3a1de9e87d9d4ca -->
 - [verify] **2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)_  <!-- fp:a76fa89a8079cd65 -->
@@ -1752,7 +1768,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      minimum/maximum extended-map size (exhirom6/8, milestone rows), and invalid/truncated/
      ambiguously-padded rejection (5 new TestNegativeFixtures cases). fp:a7d670bfc9b8f6d4
      fp:633d71862b454a38 fp:984f9ef55eda44a3 fp:aa51f3c1c9cffc38 fp:662c5e80d93b1529 -->
-- [ ] **(triage)** Scope (c) was **analysis only** at the time; superseded 2026-08-03 — a 59.94 fps master (the Apollo 11 press-site reel) was already on disk. See the scope-(c) section. — _from [2026-08-01-svx2-60fps-ring-refill.md](docs/plans/2026-08-01-svx2-60fps-ring-refill.md)_  <!-- fp:f00bdab37db1c64a -->
+<!-- triaged 2026-08-03: the 60fps-ring-refill scope-(c) bullet self-describes as analysis-only
+     and superseded 2026-08-03 (59.94 fps master already on disk) — non-work, dropped. -->
 - [verify] **2026-08-03-interframe-crossover** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-03-interframe-crossover.md](docs/plans/2026-08-03-interframe-crossover.md)_  <!-- fp:3285846755321e74 -->
 <!-- triaged 2026-08-03: not a deferral — the plan is PLANNED, not executed. Its Verification section is the spec for work that has not run yet, and the curated Open item above tracks doing it. fp:e7f32215206709ed -->
 <!-- END auto-captured-deferrals -->
