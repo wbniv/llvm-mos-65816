@@ -22,6 +22,7 @@
 #include "snesgfx/m7title.h"
 #include "snes-video-codec.h"
 #include "snes-video-dma.h"
+#include "video_fps.h"
 #include "video_hud.h"
 #include <apollo-reel-assets.h>
 
@@ -73,9 +74,6 @@ static uint8_t blank_pixels[64];
 
 static uint16_t window_base_presented;
 static uint16_t window_start_vblank;
-static uint16_t fps_presented_sample;
-static uint16_t fps_vblank_sample;
-static char dashboard_fps[5] = "00.0";
 static uint8_t dashboard_frame_tick;
 static uint8_t dashboard_seconds;
 
@@ -216,38 +214,9 @@ static void dashboard_static(void) {
   video_hud_line(26u, " TIME                  FPS     ");
 }
 
-/* Recompute the displayed rate. Called AFTER present_frame(), never before:
-   apollo_reel_presented_total must already include the frame just sent. Sampling
-   ahead of the present made the FIRST window one frame short -- dp=59 over
-   dv=60 -- so the cartridge printed 59.1 once at startup and only then settled,
-   which reads as a stutter that the hardware never had (deadline_slips is 0 and
-   the gate measures a flat 600/600).
-
-   Units are frames per 600 VBlanks shown with one decimal -- deliberately the
-   same measurement the build gate's cadence table reports, so the HUD and the
-   published number cannot disagree. One frame per VBlank reads 60.0. The console
-   VBlank rate is really 60.0988 Hz, so scaling by 601 instead would be a truer
-   presents-per-wall-second and would read 60.1; that is accurate and useless --
-   it invites "why does the 59.94 fps demo say 60.1?" every time. The source rate
-   belongs to the source, not to the presentation gauge. */
-static void fps_sample(void) {
-  uint16_t now_vblank = (uint16_t)apollo_reel_vblanks;
-  uint16_t dv = (uint16_t)(now_vblank - fps_vblank_sample);
-  if (dv >= 60u) {
-    uint16_t now_presented = (uint16_t)apollo_reel_presented_total;
-    uint16_t dp = (uint16_t)(now_presented - fps_presented_sample);
-    uint16_t measured = (uint16_t)((dp * 600u + dv / 2u) / dv);
-    dashboard_fps[0] = (char)('0' + measured / 100u);
-    measured %= 100u;
-    dashboard_fps[1] = (char)('0' + measured / 10u);
-    dashboard_fps[3] = (char)('0' + measured % 10u);
-    fps_presented_sample = now_presented;
-    fps_vblank_sample = now_vblank;
-  }
-}
-
-/* Draws whatever fps_sample() last computed; the reading therefore lags the
-   present by one frame, which is invisible at a 60-frame sample interval. */
+/* Draws whatever video_fps_sample() last computed; the reading therefore lags
+   the present by one frame, which is invisible at a 60-frame sample interval.
+   The arithmetic and the after-the-present contract live in video_fps.h. */
 static void dashboard_update(uint8_t looped) {
   char line[8];
   char *p = line;
@@ -262,7 +231,7 @@ static void dashboard_update(uint8_t looped) {
   p = decimal(p, dashboard_seconds, 2u);
   *p = 0;
   video_hud_text(26u, 6u, line);
-  video_hud_text(26u, 27u, dashboard_fps);
+  video_hud_text(26u, 27u, video_fps_text);
   if (apollo_reel_deadline_slips) video_hud_text(25u, 27u, "SLIP");
   video_hud_flush();
 }
@@ -350,8 +319,8 @@ void apollo_reel_run(void) {
   /* apollo_reel_health is deliberately NOT cleared here. It stays 0xFFFFFFFF
      until two full playback loops have completed, so a gate that reads it is
      asserting "the loop ran twice cleanly", not merely "playback started". */
-  fps_presented_sample = (uint16_t)apollo_reel_presented_total;
-  fps_vblank_sample = (uint16_t)apollo_reel_vblanks;
+  video_fps_reset((uint16_t)apollo_reel_presented_total,
+                  (uint16_t)apollo_reel_vblanks);
   dashboard_frame_tick = 1u;
   m7_show();
 
@@ -380,7 +349,8 @@ void apollo_reel_run(void) {
        real timing and are intermittently ignored by the PPU. */
     dashboard_update(looped);
     present_frame();
-    fps_sample();
+    video_fps_sample((uint16_t)apollo_reel_presented_total,
+                     (uint16_t)apollo_reel_vblanks);
     cadence_window();
     deadline = (uint16_t)(deadline + APOLLO_REEL_VBLANKS_PER_FRAME);
 

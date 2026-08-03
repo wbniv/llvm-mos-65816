@@ -120,6 +120,7 @@ frame_vma=$(awk '$NF=="video_reel_frame" {print $1; exit}' "$MAP")
 segment_gate_vma=$(awk '$NF=="video_reel_segment_gate" {print $1; exit}' "$MAP")
 segment_vma=$(awk '$NF=="video_reel_segment" {print $1; exit}' "$MAP")
 time_reset_gate_vma=$(awk '$NF=="video_reel_time_reset_gate" {print $1; exit}' "$MAP")
+fps_tenths_vma=$(awk '$NF=="video_fps_tenths" {print $1; exit}' "$MAP")
 [ -n "$result_vma" ] && [ -n "$composite_health_vma" ] && [ -n "$loop_gate_vma" ] && \
   [ -n "$deadline_slips_vma" ] && [ -n "$presented_vma" ] && [ -n "$frame_vma" ] && \
   [ -n "$segment_gate_vma" ] && [ -n "$segment_vma" ] && [ -n "$time_reset_gate_vma" ] || \
@@ -210,6 +211,25 @@ if [ "$PROFILE" = 1 ]; then
 fi
 presented_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$presented_off" 2 "$expected_presented" "$gate_frames" || true)
 case "$presented_line" in *"PASS"*) ;; *) echo "FAIL: cadence gate: $presented_line"; exit 1;; esac
+# The DISPLAYED rate, which no gate looked at until the Apollo cartridge shipped
+# a gauge reading 59.1-then-60.1 to a live page. Asserted twice: just past the
+# first sample window, where the off-by-one that printed 59.1 exactly once shows
+# up as 590; and at the end, where a wrong scale constant (601 -> 60.1) lives.
+if [ -n "$fps_tenths_vma" ]; then
+  fps_tenths_off=$(printf '%x' "$((16#$fps_tenths_vma))")
+  fps_want=$(printf '%x' "$((600 / CADENCE))")
+  for fps_budget in 400 "$gate_frames"; do
+    fps_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" \
+      "$fps_tenths_off" 2 "$fps_want" "$fps_budget" || true)
+    case "$fps_line" in
+      *"PASS"*) ;;
+      *) echo "FAIL: displayed FPS gauge at VBlank $fps_budget: $fps_line"; exit 1;;
+    esac
+  done
+  echo "displayed FPS gauge: $((600 / CADENCE / 10)).$((600 / CADENCE % 10)) at VBlank 400 and $gate_frames"
+else
+  echo "FATAL: video_fps_tenths missing from $MAP"; exit 1
+fi
 time_reset_line=$(JGX_POLL=1 $BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" \
   "$time_reset_gate_off" 1 a5 "$gate_frames" || true)
 case "$time_reset_line" in *"PASS"*) ;; *) echo "FAIL: dashboard loop-time reset: $time_reset_line"; exit 1;; esac

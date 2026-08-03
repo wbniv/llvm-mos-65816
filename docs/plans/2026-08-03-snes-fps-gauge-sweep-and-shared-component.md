@@ -133,3 +133,104 @@ Low and bounded: no codec, stream, DMA or timing path is touched, and both strea
 byte-identical. The real risk is the refactor perturbing VBlank timing in the reel, whose margin is
 thinner than Apollo's — so step 5 runs the reel's full cadence gate rather than trusting that a
 header-only change is free.
+
+---
+
+## Verification results (2026-08-03)
+
+**1. `video_fps.h` exists; both ROMs include it; neither carries its own copy of the arithmetic.**
+
+```
+$ grep -c 'dp \* 60' examples/snes/*.c
+0 (none)
+$ grep -n video_fps examples/snes/apollo-reel.c examples/snes/snes-video-reel.c | head -4
+apollo-reel.c:25:#include "video_fps.h"
+apollo-reel.c:234:  video_hud_text(26u, 27u, video_fps_text);
+snes-video-reel.c:8:#include "video_fps.h"
+snes-video-reel.c:187:  video_hud_text(26u, 27u, video_fps_text);
+```
+
+**PASS.** All gauge state and arithmetic now exists once. Both ROMs kept their own
+`*_presented_total` counters and pass them in, so the two binaries remain separately linkable.
+
+**2. Reel gauge unchanged by the refactor.** Built pristine and refactored from the *same* stream
+(`build/snes-video-reel-stream.bin`, 2,401,142 B) at the same cadence, and read the string out of
+WRAM `$0020` on both:
+
+```
+--- control (dashboard_fps @ $20)      --- mine (video_fps_text @ $20)
+    VBlank   100  '00.0'                   VBlank   100  '00.0'
+    VBlank   200  '00.0'                   VBlank   200  '00.0'
+    VBlank   400  '30.0'                   VBlank   400  '30.0'
+    VBlank   900  '30.0'                   VBlank   900  '30.0'
+    VBlank  1800  '30.0'                   VBlank  1800  '30.0'
+```
+
+**PASS — identical at all five points.**
+
+*Two false starts on this step, recorded because both produced confident-looking garbage:* the first
+comparison built both ROMs against `assets/snes/video/svx2-full-reel.bin` (2,360,380 B) instead of
+the stream the gate actually generates (2,401,142 B), so both ROMs ran on a mismatched stream and
+printed random WRAM; and the symbol lookup used `awk '{print ("0x" $1)+0}'`, which yields **0** under
+this box's `awk` (**mawk**, not gawk — gawk is not installed), because POSIX string-to-number
+conversion stops at the first non-numeric character. The repo's own `sym()` helpers use bash
+`$((16#$vma))` for exactly this reason.
+
+**3. Apollo gauge unchanged.**
+
+```
+VBlank 100 '00.0'   VBlank 160 '00.0'   VBlank  300 '60.0'
+VBlank 700 '60.0'   VBlank 1400 '60.0'  VBlank 2600 '60.0'
+```
+
+**PASS** — byte for byte the pre-refactor capture.
+
+**4. A 2-VBlank-cadence build reads `30.0`.** The reel gate's own new step printed
+`displayed FPS gauge: 30.0 at VBlank 400 and 4000` on the default cadence-2 build, and Apollo's
+printed `60.0` at cadence 1. **PASS** — the units are cadence-derived, not hardcoded.
+
+**5. Both ROMs' existing gates.**
+
+- `dev/apollo-reel.sh`: **PASS in full** — whole-loop byte-correct decode on both self-test builds,
+  negative control rejected, 600/600 VBlanks with zero slips on slow ROM and FastROM, entropy
+  fingerprint, VBlank-180 black-screen guard, frame capture. `ROM_SHA256
+  94de6a375f46d887bb70fce4a2395fd9d069ed50b68a0836656bafcc194feb9e`.
+- `dev/snes-video-reel.sh`: **PASS end-to-end only with `VIDEO_REEL_EXPECTED_PRESENTED=777`** —
+  see the blocker below. Composite health, dashboard segment gates, both cut screenshots, fidelity
+  (`exact=47.9% mae=10.3`), transition (`exact=78.3% mae=2.6`) and the new gauge step all pass.
+
+**6. New gate step in both scripts.** `dev/apollo-reel.sh` step 3b and the equivalent block in
+`dev/snes-video-reel.sh`. Each asserts the displayed rate twice — just past the first sample window
+(where the off-by-one that printed 59.1 shows up as 590) and at the end of the run (where a wrong
+scale constant lives). **PASS.**
+
+```
+==> 3b) the DISPLAYED frame rate, not just the internal counter
+  PASS: gauge reads 60.0 at VBlank 300
+  PASS: gauge reads 60.0 at VBlank 9000
+  displayed string: 60.0
+```
+
+**7. `-verify-machineinstrs` clean** on both `apollo-reel.c` (gate step 4a) and
+`snes-video-reel.c` (run standalone). **PASS.**
+
+### Blocker found, NOT caused by this change: the reel's cadence expectation is stale
+
+`dev/snes-video-reel.sh` fails its cadence gate on `main` **before** this change:
+
+```
+FAIL: cadence gate: SMOKE: FAIL off=0x2F len=2 got=0x0777 want=0x0776
+```
+
+Proven pre-existing rather than assumed: the reel source was reverted to pristine, rebuilt and
+re-run, and the failure is **byte-identical** — `got=0x0777 want=0x0776`, one frame over, with and
+without the refactor. So the refactor is cadence-neutral, and the constant went stale on someone
+else's change. `expected_presented=776` was last set in `d6030cf` (2026-08-02, "restore cut-aware
+video dashboard"); `snes-video-reel.c` was last changed in `81364d7` (2026-08-02, "publish native
+60fps ExHiROM video reel").
+
+**Deliberately not fixed here.** Whether 1,911 is correct (constant stale) or the reel presents one
+frame too many (ROM wrong) needs someone who owns that dashboard change; silently bumping another
+worker's expectation constant to make a red gate green is precisely the wrong move. Filed as its own
+TODO item. This run used the script's existing `VIDEO_REEL_EXPECTED_PRESENTED` override rather than
+editing the file.

@@ -5,6 +5,7 @@
 #include "snesgfx/m7title.h"
 #include "snes-video-codec.h"
 #include "snes-video-dma.h"
+#include "video_fps.h"
 #include "video_hud.h"
 #include <snes-video-reel-assets.h>
 
@@ -87,13 +88,9 @@ static uint8_t blank_pixels[64];
 static uint8_t active_palette_first[448];
 static uint8_t active_palette_second[448];
 #endif
-static uint16_t fps_presented_sample;
-static uint16_t fps_vblank_sample;
-static volatile uint16_t fps_tenths;
 static uint8_t dashboard_frame_tick;
 static uint8_t dashboard_seconds;
 static uint8_t dashboard_minutes;
-static char dashboard_fps[5] = "00.0";
 static uint16_t transport_pad_previous;
 static uint8_t transport_hold;
 static uint8_t transport_visible;
@@ -187,7 +184,7 @@ static void update_dashboard_fields(void) {
   *p = 0;
   if (transport_visible) return;
   video_hud_text(26u, 6u, line);
-  video_hud_text(26u, 27u, dashboard_fps);
+  video_hud_text(26u, 27u, video_fps_text);
   if (video_reel_result != 0u && video_reel_result != 0xffu)
     video_hud_text(25u, 25u, "ERROR  ");
   else if (video_reel_deadline_slips)
@@ -235,9 +232,13 @@ static void transport_draw(uint8_t state, uint8_t rate) {
   transport_hide = state == TRANSPORT_PLAY ? 90u : 0u;
 }
 
+/* Formats the dashboard during active display -- VBlank is too short for
+   formatting plus both HUD and full-frame video DMA at 60 packets/s. The rate
+   itself is sampled by video_fps_sample() AFTER the present, not here: this
+   function used to do both, and got the right answer only because sampling one
+   VBlank early cancelled reading the presented counter one frame early. Apollo
+   inherited that pair, moved this call, and shipped 59.1/60.1 to a live page. */
 static void dashboard_prepare(uint16_t frame, uint8_t looped) {
-  uint16_t now_vblank = (uint16_t)video_reel_vblanks;
-  uint16_t dv = (uint16_t)(now_vblank - fps_vblank_sample);
   if (looped) {
     dashboard_frame_tick = 0u;
     dashboard_seconds = 0u;
@@ -251,18 +252,6 @@ static void dashboard_prepare(uint16_t frame, uint8_t looped) {
         ++dashboard_minutes;
       }
     }
-  }
-  if (dv >= 60u) {
-    uint16_t now_presented = (uint16_t)video_reel_presented_total;
-    uint16_t dp = (uint16_t)(now_presented - fps_presented_sample);
-    uint16_t measured = (uint16_t)((dp * 600u + dv / 2u) / dv);
-    fps_tenths = measured;
-    dashboard_fps[0] = (char)('0' + measured / 100u);
-    measured %= 100u;
-    dashboard_fps[1] = (char)('0' + measured / 10u);
-    dashboard_fps[3] = (char)('0' + measured % 10u);
-    fps_presented_sample = now_presented;
-    fps_vblank_sample = now_vblank;
   }
   dashboard_segment(frame, 0u);
   update_dashboard_fields();
@@ -633,9 +622,8 @@ void video_reel_run(void) {
   deadline = (uint16_t)video_reel_vblanks + VIDEO_REEL_VBLANKS_PER_FRAME;
   video_reel_frame = 0u;
   video_reel_result = 0u;
-  fps_presented_sample = (uint16_t)video_reel_presented_total;
-  fps_vblank_sample = (uint16_t)video_reel_vblanks;
-  fps_tenths = 0u;
+  video_fps_reset((uint16_t)video_reel_presented_total,
+                  (uint16_t)video_reel_vblanks);
   dashboard_frame_tick = 1u;
   dashboard_seconds = 0u;
   dashboard_minutes = 0u;
@@ -684,6 +672,10 @@ void video_reel_run(void) {
        on real timing and were intermittently ignored by the PPU. */
     video_hud_flush();
     present_frame(frame);
+    /* AFTER the present: presented_total must already include the frame just
+       sent. See video_fps.h for what breaks when it does not. */
+    video_fps_sample((uint16_t)video_reel_presented_total,
+                     (uint16_t)video_reel_vblanks);
     if (transport_visible)
       transport_draw(video_reel_transport_state, video_reel_transport_rate);
     deadline = (uint16_t)(deadline + VIDEO_REEL_VBLANKS_PER_FRAME);

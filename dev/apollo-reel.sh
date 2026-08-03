@@ -245,6 +245,32 @@ done
 echo "  (reported, not gated — a slower number on this content is the measurement)"
 
 echo
+echo "==> 3b) the DISPLAYED frame rate, not just the internal counter"
+# Until this step existed, no gate on any ROM looked at the number the cartridge
+# actually shows, and a gauge reading 59.1-then-60.1 reached the published page
+# and was found by a human watching it. Both readings are asserted:
+#   - just past the first sample window, which is where the off-by-one that
+#     printed 59.1 exactly once would show up (590 instead of 600);
+#   - at the end of the run, which is where a wrong scale constant lives (601
+#     printed 60.1 forever).
+fps_off=$(sym "$FAST_MAP" video_fps_tenths)
+text_off=$(sym "$FAST_MAP" video_fps_text)
+want_tenths=$(( 600 / CADENCE ))
+want_hex=$(printf '%x' "$want_tenths")
+fps_rc=0
+for budget in 300 "$GATE_FRAMES"; do
+  line=$("$JGX" "$FAST_ROM" "$DATABASE" "$fps_off" 2 "$want_hex" "$budget" || true)
+  case "$line" in
+    *PASS*) echo "  PASS: gauge reads $((want_tenths / 10)).$((want_tenths % 10)) at VBlank $budget" ;;
+    *) echo "  FAIL: gauge at VBlank $budget: $line"; fps_rc=1 ;;
+  esac
+done
+shown=$(read_value "$FAST_ROM" "$text_off" 4 "$GATE_FRAMES" 2>/dev/null || echo 0)
+printf '  displayed string: %s\n' \
+  "$(python3 -c "print(bytes.fromhex(f'{$shown:08x}')[::-1].decode('latin1'))")"
+[ "$fps_rc" = 0 ] || rc=1
+
+echo
 echo "==> 4a) -verify-machineinstrs clean"
 vlog="$BUILD/apollo-reel.vlog"
 if "$CC" --config "$CONFIG" -mcpu=mosw65816 \
