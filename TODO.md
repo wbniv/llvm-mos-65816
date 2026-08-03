@@ -31,13 +31,16 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
-- [T4] **`__attribute__((interrupt))` prologue is unsafe under `+mos-a16`/`+mos-xy16` — found by
+- [x] ~~**`__attribute__((interrupt))` prologue is unsafe under `+mos-a16`/`+mos-xy16` — found by
   Round 7 #123 `nmitally`.** Default mode passes the deterministic 120-NMI tally (`0xDA3B`), while
   a16 produced `0xF4F4` then `0x0000`/`0x0000`, and xy16 `0x0000`. The ISR starts `cld; pha`
   before establishing M/X, so an interrupt inherits the mainline width and even the first push has
   variable size; later saves/restores cannot balance reliably. `-verify-machineinstrs` is clean.
   The ROM gate stays intentionally RED; fix the backend interrupt entry contract, not the demo with
-  an assembly wrapper. See [plan](docs/plans/2026-08-03-123-snes-nmitally.md).
+  an assembly wrapper.**~~ **FIXED:** `MOSInsertREPSEP` now adds a full-width A/X/Y outer save
+  envelope, establishes M8/X8 for the C body, restores in M16/X16, then lets RTI restore stacked P.
+  Host/default/a16/xy16 all `0xDA3B`; a16 3× deterministic. See
+  [report](docs/investigations/2026-08-03-65816-interrupt-width-prologue.md).
 - [T3] **Round 7 demo battery (#119–#138, now nineteen) — new defect-hunting ROMs.** Targets chosen by
   the scoreboard's yield pattern: combiner-formed opcodes (`G_ABDS/U`, s64 ctpop/clz/ctz/abs),
   first-ever interrupt-CC / inline-asm / mixed-per-function-width mode-state demos, far-pointer third pass,
@@ -908,6 +911,28 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `dev/test-release.sh` + `dev/release-report.py` + `task release-test`.
   [plan](docs/plans/2026-06-25-test-published-snes-compiler.md).
 
+### Verification backlog (triaged out of Inbox 2026-08-03)
+
+_The runnable survivors of the 18 auto-captured `[verify]` flags (T0-classified; the other 13 were
+planned/gated/superseded/stale — dispositions recorded as comments in the Inbox). Workflow per
+`[verify]` items: run the linked plan's numbered verification steps, paste raw output + PASS/FAIL
+into the plan, then promote to Done. **Serialize the runs — they share the hot build tree.**_
+
+- [verify T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — implemented locally 07-26
+  (`bdbf516`), still-live mode7-gallery features, verification never recorded.
+  [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)
+- [verify T3] **123-mode7-gallery-filter** — same commit/state as 121; run after it (shared
+  surface). [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md)
+- [verify T3] **svx2-animated-video-cartridge** — the flagship video cartridge; implementation
+  record is rich but the plan's numbered verification steps were never run + recorded.
+  [plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)
+- [verify T3] **lzss-gallery-navigation-and-auto-advance-chevron** — implemented, live, chevron
+  input re-fixed `3b8a559`; verify against current main.
+  [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)
+- [verify T3] **svx2-cut-aware-dashboard-labels** — implemented + wired into the shipping
+  59.94 fps build; status claims target-verified but the steps were never recorded.
+  [plan](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md)
+
 
 ## Watch
 
@@ -1723,23 +1748,36 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      action is individually user-triggered. The checklist (draft 0016 bodies, re-verify the DWARF
      branch) becomes work only after that review. Covered by the curated campaign item.
      fp:12194fba501ac4d3 -->
-- [verify] **2026-07-26-mode7-title-screen-sweep** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-mode7-title-screen-sweep.md](docs/plans/2026-07-26-mode7-title-screen-sweep.md)_  <!-- fp:a9d784778faac766 -->
-- [verify] **2026-07-26-119-snes-lzss-gallery-carousel** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-119-snes-lzss-gallery-carousel.md](docs/plans/2026-07-26-119-snes-lzss-gallery-carousel.md)_  <!-- fp:4cbe095fb40c04d9 -->
-- [verify] **2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:54bd1a8792430f47 -->
-- [verify] **2026-07-26-123-mode7-gallery-filter** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-123-mode7-gallery-filter.md](docs/plans/2026-07-26-123-mode7-gallery-filter.md)_  <!-- fp:ff1ea8788102f1d7 -->
-- [verify] **2026-07-26-125-lzss-gallery-full-mode7-color** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-125-lzss-gallery-full-mode7-color.md](docs/plans/2026-07-26-125-lzss-gallery-full-mode7-color.md)_  <!-- fp:3cc268f3e382586f -->
-- [verify] **2026-07-26-127-lzss-repack-explainer** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-26-127-lzss-repack-explainer.md](docs/plans/2026-07-26-127-lzss-repack-explainer.md)_  <!-- fp:7794d6d35096b0b8 -->
+<!-- triaged 2026-08-03 (T0-classified, all 18 [verify] flags dispositioned — see the
+     verification-backlog block above ## Watch for the 5 kept):
+     • mode7-title-screen-sweep — Status: planned, never implemented; verification intentionally
+       unrun (same class as the indirect-s16-load precedent). Not a missed step.
+     • 119-carousel — implemented/published 07-26 but its corpus + 32/31-color design are
+       explicitly superseded (125/136/139 palette contract, 26→62-work expansions); the published
+       gallery states since carry their own gates. Verification of the 07-26 state is moot.
+     • 125-full-mode7-color — status records IMPLEMENTED, VERIFIED, AND PUBLISHED; design since
+       superseded by the settled 221-colour palette contract (4b690b3). Moot.
+     • 127-repack-explainer — implemented/published, then superseded by the 26-work expansion
+       (372bc89) and later repack-visualization work (#137, verified separately). Moot.
+     121-badges and 123-filter are KEPT as runnable [verify T3] (implemented, still-live mode7
+     gallery features, no supersession found). -->
 <!-- triaged 2026-07-30: same library work as the Parked "truncstair F2 HOFS scroll-ring / 32-column canvas" entry, which carries the measured constraints (bank-0 .bss overflow, _canvas_emit bank-0x00 DMA) and both motivating demos (#99b trimerge, truncstair). fp:f9122100c1e60a3f -->
 <!-- triaged 2026-08-03: HDMA backdrop gradient (99b trimerge visual polish idea, blocked on
      snesgfx library support) -> moved to ## Parked as an idea; not scheduled work. -->
 <!-- triaged 2026-07-27: #128 is planned-not-yet-implemented; its verification runs with the implementation, tracked by the curated [T3] "#128 lzss-gallery" battery sub-item. fp:8b0a76b3e990a0e0 -->
-- [verify] **2026-07-27-131-snes-cartridge-map-mermaid-quadtree** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md](docs/plans/2026-07-27-131-snes-cartridge-map-mermaid-quadtree.md)_  <!-- fp:5e21a496a7540ac0 -->
-- [verify] **2026-07-27-132-phone-gallery-chevron-hitboxes** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-132-phone-gallery-chevron-hitboxes.md](docs/plans/2026-07-27-132-phone-gallery-chevron-hitboxes.md)_  <!-- fp:92b872c936ff9d49 -->
-- [verify] **2026-07-27-134-thai-paintings-gallery-expansion** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-134-thai-paintings-gallery-expansion.md](docs/plans/2026-07-27-134-thai-paintings-gallery-expansion.md)_  <!-- fp:ad5d46a73f327609 -->
-- [verify] **2026-07-27-139-lzss-gallery-hblank-palette-reuse** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-139-lzss-gallery-hblank-palette-reuse.md](docs/plans/2026-07-27-139-lzss-gallery-hblank-palette-reuse.md)_  <!-- fp:ee3908e30f424828 -->
-- [verify] **2026-07-27-136-lzss-gallery-contiguous-artwork-palette** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md](docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md)_  <!-- fp:62c4bd721c304ad6 -->
+<!-- triaged 2026-08-03:
+     • 131-cartridge-treemap + 132-chevron-hitboxes — Status: Ready to implement; nothing built,
+       verification runs when implementation happens. Not missed steps.
+     • 134-thai-paintings — Status: explicitly queued behind tranche #133 ("do not implement
+       until…"). Gated, not missed.
+     • 139-hblank-palette-reuse — Status: RETIRED 2026-07-28 (premise fails on hardware); the
+       retirement + its PASS evidence are recorded in the plan. Nothing to run.
+     • 136-contiguous-artwork-palette — Status: PLANNED; unimplemented. Not a missed step. -->
 <!-- triaged 2026-07-28: verification is deliberately unrun — the plan's own assertion is BLOCKED by the work-0 repack divergence (ROM 15254 vs embedded lz_len 15305). Covered by the curated [verify T2] "#137" item, which records step 6 as FAIL and links this plan. fp:c1b8375f773427e9 -->
-- [verify] **2026-07-30-exhirom-video-boundary-test** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-30-exhirom-video-boundary-test.md](docs/plans/2026-07-30-exhirom-video-boundary-test.md)_  <!-- fp:753923ba3d3bd83c -->
+<!-- triaged 2026-08-03: exhirom-video-boundary-test — STALE FLAG: flagged 07-30 when unrun, but
+     verification has since been run and recorded (24×PASS in the plan as of dd40ce3 2026-08-02;
+     the single "FAIL" string match is the boilerplate "with a PASS/FAIL note" instruction, not a
+     failure). Nothing open. -->
 <!-- triaged 2026-07-31: all three abi-clobber deferrals dispositioned.
      • "Not merged to main" + "62-work visual corpus gate not re-run" -> folded into the curated
        [wip T4] repack-differential bullet, which now records the verdict and tasks the merge,
@@ -1747,20 +1785,29 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "Unrelated compiler crash" -> PROMOTED to the curated [T4] "#138 — MOS Late Optimizations
        crash on @unpack_slide" bullet, pointing at the existing #138 plan. fp:4e675c3ad0ba3ad5
        fp:d674d7d5be702bb7 fp:dd1e1ad204ea7356 -->
-- [verify] **2026-07-31-real-video-codec-corpus** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-real-video-codec-corpus.md](docs/plans/2026-07-31-real-video-codec-corpus.md)_  <!-- fp:06fb2d23bfdea209 -->
+<!-- triaged 2026-08-03: real-video-codec-corpus — STALE FLAG: plan is Status: COMPLETE
+     2026-07-31 with PASS evidence recorded since. Nothing open. -->
 <!-- triaged 2026-08-03: the five svx2 "Upstream compiler follow-up" bullets (MVN/MVP MC fix:
      reduce to MC test, WDC-doc syntax confirmation, run suites, minimal commit/PR, reproducer
      framing) are ONE workstream — consolidated into a single curated T2 bullet under
      Upstream / Contribution ("MVN/MVP block-move bank-order MC fix (0020)") + status-doc row 17.
      Nothing dropped; the five steps are the new bullet's checklist. -->
-- [verify] **2026-07-31-svx2-animated-video-cartridge** — Verification section present but no PASS recorded — run + record the steps. _from [2026-07-31-svx2-animated-video-cartridge.md](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)_  <!-- fp:40c1c2b870d73873 -->
+<!-- triaged 2026-08-03: svx2-animated-video-cartridge — implemented + live; verification
+     genuinely unrecorded -> KEPT as runnable [verify T3] in the verification-backlog block
+     above ## Watch. -->
 <!-- triaged 2026-08-01: seamdemo plan is PLANNED-status; verification runs per phase and is covered by the curated [T4] seamdemo item (blocked on the exhirom-canaries merge). fp:c3a1de9e87d9d4ca -->
-- [verify] **2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)_  <!-- fp:a76fa89a8079cd65 -->
+<!-- triaged 2026-08-03: lzss-gallery-navigation-chevron — implemented + live (chevron input
+     re-fixed 3b8a559 2026-08-02); verification genuinely unrecorded -> KEPT as runnable
+     [verify T3] in the verification-backlog block above ## Watch. -->
 <!-- triaged 2026-08-01: both are scope statements of the curated 60 fps video item, not new work — (c) is analysis-only by that item's own wording, and reel-side integration is held pending another worker's in-flight snes-video-reel.c edits. fp:3a823bd1aa076872 fp:838c40fb50c90609 -->
 <!-- triaged 2026-08-01: three canary-6b addendum bullets are recorded RESULTS (gate PASS evidence), not deferred work — covered by the canary-6b-revalidate Done entry. fp:8bd02423f82e515c fp:296dbe20a6aa20e4 fp:89b5e6bf073a6ac8 -->
 <!-- triaged 2026-08-02: verification recorded in the plan; item closed in Done. -->
-- [verify] **2026-08-02-svx2-video-technical-page** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-02-svx2-video-technical-page.md](docs/plans/2026-08-02-svx2-video-technical-page.md)_  <!-- fp:6fcb6e55539d0d13 -->
-- [verify] **2026-08-01-svx2-cut-aware-dashboard-labels** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-01-svx2-cut-aware-dashboard-labels.md](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md)_  <!-- fp:4f251e5d7b449bd4 -->
+<!-- triaged 2026-08-03:
+     • svx2-video-technical-page — Status: Ready to implement; unbuilt, verification runs when
+       implementation happens. Not a missed step.
+     • svx2-cut-aware-dashboard-labels — implemented + wired into the shipping 59.94 fps build;
+       verification genuinely unrecorded -> KEPT as runnable [verify T3] in the
+       verification-backlog block above ## Watch. -->
 <!-- triaged 2026-08-02: all five are the plan's "Required size classes" list, not deferred work
      — the audit hook flagged them as unverified bullets. The [cartcanary-matrix] Done entry now
      covers every class: exact power of two (lorom512k/1m/4m, hirom512k/2m), sum of two descending
@@ -1770,6 +1817,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fp:633d71862b454a38 fp:984f9ef55eda44a3 fp:aa51f3c1c9cffc38 fp:662c5e80d93b1529 -->
 <!-- triaged 2026-08-03: the 60fps-ring-refill scope-(c) bullet self-describes as analysis-only
      and superseded 2026-08-03 (59.94 fps master already on disk) — non-work, dropped. -->
-- [verify] **2026-08-03-interframe-crossover** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-03-interframe-crossover.md](docs/plans/2026-08-03-interframe-crossover.md)_  <!-- fp:3285846755321e74 -->
+<!-- triaged 2026-08-03: interframe-crossover — Status: PLANNED, actively in progress (its
+     curated [T4] Open bullet tracks the work); verification intentionally unrun. Not a missed
+     step. -->
 <!-- triaged 2026-08-03: not a deferral — the plan is PLANNED, not executed. Its Verification section is the spec for work that has not run yet, and the curated Open item above tracks doing it. fp:e7f32215206709ed -->
 <!-- END auto-captured-deferrals -->
