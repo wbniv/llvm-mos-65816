@@ -56,8 +56,16 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   slow to ship. The open question is whether a **per-frame chooser** (emit a delta packet or an
   intraframe packet, whichever is smaller) is worth building — which needs a *fast* intraframe
   path, so the real work is a throughput budget for one, not the chooser itself. Data already in
-  hand: both corpora packed both ways, ratios recorded per clip in the benchmark doc. (T4: design
-  question with unknown headroom — needs its own plan before any code.)
+  hand: both corpora packed both ways, ratios recorded per clip in the benchmark doc.
+  **Plan written 2026-08-03** — [interframe-crossover](docs/plans/2026-08-03-interframe-crossover.md):
+  the key reframing is that size and time trade in OPPOSITE directions (a keyframe is often the
+  smaller packet on hard content but costs 1.12 VBlanks vs ~1.0), so "pick the smaller per frame"
+  is wrong — it is minimize-bytes-subject-to-holding-cadence, a scheduling problem. P0 measures the
+  crossover PER FRAME (the recorded numbers are whole-corpus aggregates that hide the
+  distribution); P0b gets a second frame-rate point free from the in-flight `[T3]` true-60 work;
+  P1 builds the cadence model; P2 decides and records the answer either way — "not worth it, here
+  is the number" is a good outcome. No new codec: SVX2's own keyframes are the intraframe path, and
+  they already decode fast enough. (T4: P0 is dispatchable now; P2 is the design call.)
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
   (2026-08-01); only the player-package release is left, and it is USER-GATED.**
   <!-- agent:a5850a8d3df7af344 -->
@@ -1727,4 +1735,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      ambiguously-padded rejection (5 new TestNegativeFixtures cases). fp:a7d670bfc9b8f6d4
      fp:633d71862b454a38 fp:984f9ef55eda44a3 fp:aa51f3c1c9cffc38 fp:662c5e80d93b1529 -->
 - [ ] **(triage)** Scope (c) was **analysis only** at the time; superseded 2026-08-03 — a 59.94 fps master (the Apollo 11 press-site reel) was already on disk. See the scope-(c) section. — _from [2026-08-01-svx2-60fps-ring-refill.md](docs/plans/2026-08-01-svx2-60fps-ring-refill.md)_  <!-- fp:f00bdab37db1c64a -->
+- [verify] **2026-08-03-interframe-crossover** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-03-interframe-crossover.md](docs/plans/2026-08-03-interframe-crossover.md)_  <!-- fp:3285846755321e74 -->
 <!-- END auto-captured-deferrals -->
