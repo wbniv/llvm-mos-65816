@@ -1737,5 +1737,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      fp:633d71862b454a38 fp:984f9ef55eda44a3 fp:aa51f3c1c9cffc38 fp:662c5e80d93b1529 -->
 - [ ] **(triage)** Scope (c) was **analysis only** at the time; superseded 2026-08-03 — a 59.94 fps master (the Apollo 11 press-site reel) was already on disk. See the scope-(c) section. — _from [2026-08-01-svx2-60fps-ring-refill.md](docs/plans/2026-08-01-svx2-60fps-ring-refill.md)_  <!-- fp:f00bdab37db1c64a -->
 - [verify] **2026-08-03-interframe-crossover** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-03-interframe-crossover.md](docs/plans/2026-08-03-interframe-crossover.md)_  <!-- fp:3285846755321e74 -->
-- [verify] **2026-08-03-snes-fps-gauge-sweep-and-shared-component** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-03-snes-fps-gauge-sweep-and-shared-component.md](docs/plans/2026-08-03-snes-fps-gauge-sweep-and-shared-component.md)_  <!-- fp:e7f32215206709ed -->
+<!-- triaged 2026-08-03: not a deferral — the plan is PLANNED, not executed. Its Verification section is the spec for work that has not run yet, and the curated Open item above tracks doing it. fp:e7f32215206709ed -->
 <!-- END auto-captured-deferrals -->
