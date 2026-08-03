@@ -911,6 +911,34 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `dev/test-release.sh` + `dev/release-report.py` + `task release-test`.
   [plan](docs/plans/2026-06-25-test-published-snes-compiler.md).
 
+- [T2] **`dev/jgxcheck` timeline captures are nondeterministic by default — make determinism
+  explicit.** Found by the 121-badges verification: `jgxcheck.cpp:394` leaves
+  `configuration.entropy` at bsnes-jg's default *Low*, which `Random::seed()`s from `clock()` —
+  the same frame rendered fully black on one run and 85% non-black on the next; all 121 timeline
+  captures had to be redone with `JGX_ENTROPY=0`. Fix: default single-capture/timeline runs to
+  entropy None (or require the caller to pass it explicitly), WITHOUT breaking the deliberate
+  ×6-entropy-boot fingerprint gates (canary/seamdemo) that want Low. Document in agent-handoff.
+  (T2: bounded tool change, two known call patterns.)
+- [T3] **Convert the seven Mode-7 demo `main()`s off the re-opened boot force-blank.** The
+  121-badges verification measured the symptom: 24 pure-black frames (~400 ms) between title exit
+  and first compute frame (gate 11 FAIL) — the boot force-blank window re-opening that
+  `docs/agent-handoff.md` §"Never force-blank outside boot" already lists as unconverted for the
+  seven Mode-7 demo mains. Related observation from the same run: `mandel-oop` leaves some PPU
+  state unset during frames 52–262 (title/loading window is entropy-sensitive; READY frame is
+  not). Cross-cutting but mechanical once the shared pattern is settled; gate 11 re-passes when
+  done. (T3: settled pattern in the handoff doc, multi-file execution.)
+- [T3] **Reconcile the Mode-7 gallery website layer with current reality (121 gates 17/20/22/23).**
+  Three decisions + one build: (a) the plan's "exactly nine badges" is structurally stale —
+  `cdaa6f4`/`ad87374` legitimately added two Mode 7 demos; build the plan's own promised
+  audit-derived check (compare the `displayMode: 7` slug set against a committed expected list)
+  and retire fixed counts. (b) Deployed ROMs' sha differs from a fresh build (toolchain/snesgfx
+  codegen drift; 121's timeline proof shows behavioural identity) — set the republish policy:
+  republish on drift vs record accepted-divergence. (c) ROM/preview cache-busting was never
+  implemented on either site (live HTML references bare filenames) — site-repo work, tracked here
+  as a pointer. (d) A real browser smoke test remains unexecuted (core-level proxy recorded).
+  See the 121 verification record for evidence. (T3: the decisions are settled by the plan's own
+  acceptance criteria; execution spans this repo + both site repos.)
+
 ### Verification backlog (triaged out of Inbox 2026-08-03)
 
 _The runnable survivors of the 18 auto-captured `[verify]` flags (T0-classified; the other 13 were
