@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/e275733) | feat(snes): retime the Apollo cartridge to true 59.94 fps in place |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/8374a21) | docs(apollo): note the true-60 master shelf another session staged in assets/snes/video/ |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/c8287bd) | docs: the Apollo master is 59.94 fps — correct the 'no true-60 master' claim, plan the in-place fix |
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/70ad999) | feat(snes): recut the Apollo cartridge to a shot that actually moves |
@@ -9,6 +10,11 @@
 | [2026-08-02](https://github.com/wbniv/llvm-mos-65816/commit/8828247) | plan+todo: Apollo 11 daylight video cartridge — turn the hard-content stressor into a ROM (wip T3) |
 
 <!--history-meta v1
+e275733	author	Will Norris
+e275733	added	172
+e275733	deleted	0
+e275733	files	1
+e275733	body	The master was 59.9401 fps all along (ffprobe r_frame_rate=220999/3687) and\nevery corpus built from it discarded half the frames. Same slug, same page,\nsame ROM identity -- the 30 fps stream is replaced, not duplicated.\n\nCorpus re-derived from the same interval and crop at 29.97 fps sampling and\npresented one frame per VBlank, so the 2x playback speed of the v2 recut is\npreserved exactly and only the temporal resolution doubles: 20.02 s of ascent\nin 10.01 s, 600 frames. Dropping the 2x was measured and rejected -- it cuts\non-screen travel 26% and drops consecutive-frame motion to 1.62, back toward\nthe 0.93 that made the v1 tracking shot unwatchable.\n\nCadence at the 1-VBlank operating point: 600 presented per 600 VBlanks with\nZERO deadline slips on slow ROM AND FastROM. Slow ROM clears 60 fps on the\ncodec's hardest realistic input, consistent with the post-merge 674/600\nheadroom; FastROM is a margin lever, not a prerequisite.\n\nStream 2,141,080 B -- only 1.2% under a naive doubling -- which rules out the\n2 MiB image and lands on 4 MiB Fast HiROM, 33 of 63 banks. No ExHiROM needed.\nK=120 stands (5,765 B across an 8x sweep).\n\nSecond point for the LZSS-vs-SVX2 crossover, measured on this corpus: halving\nthe temporal gap recovers only 0.91 ratio points (14.31 -> 13.40), and a\nreal-time control at 1/59.94 s recovers 4.18. The residual between frames here\nis Floyd-Steinberg dither noise, which is decorrelated regardless of frame\nspacing, so the crossover is not reachable by frame rate.\n\ntools/snes-video-rgb24-convert.sh needed no new flag -- --fps already forwards\nany ffmpeg rate expression; its usage now documents the NTSC fractions and the\nfractional --duration that make an exact 600-frame cut reproducible.\n\nGate green in full, including the negative control and the VBlank-180\nblack-screen guard. ROM sha256 bf62a299...ecdbe.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 8374a21	author	Will Norris
 8374a21	added	1
 8374a21	deleted	0

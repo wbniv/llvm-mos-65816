@@ -591,3 +591,34 @@ interval nearly free here. The codec decision is untouched: LZSS is still ~27× 
 - **`APOLLO_REEL_GATE_FRAMES` raised 6,000 → 9,000.** The self-test build now Fletcher-checks 601
   frames instead of 301, roughly doubling the boot validation pass on the slow build. This is a gate
   budget, not a shipped artefact.
+
+### 7. Published over the same slug — evidence
+
+Verified the CI-only way (per the `site-builds-are-ci-only` memory): the deploy-run conclusion plus
+live fetches, never a host build.
+
+```
+$ gh run list --workflow deploy.yml --limit 2
+completed  success  feat(snes): republish the Apollo cartridge at true 59.94 fps  Deploy site  v1.0.363  push  30819885405  2m39s  2026-08-03T13:51:20Z
+completed  success  feat(snes): recut Apollo to a shot that actually moves        Deploy site  v1.0.362  push  30819526870  2m45s  2026-08-03T13:46:39Z
+
+$ curl -fsSL https://biohack.net/play/roms/apollo-daylight.sfc | sha256sum
+bf62a2992546f87f8ec4d46de1c14a30bdfdd5a553f0e114dfb1beea961ecdbe
+$ sha256sum build/apollo-daylight.sfc
+bf62a2992546f87f8ec4d46de1c14a30bdfdd5a553f0e114dfb1beea961ecdbe
+MATCH — the served ROM is the gate-verified binary (4,194,304 B)
+
+page   /snes/apollo-daylight/  HTTP 200   <title>Apollo 11 Daylight Launch — bioHACK•NET</title>
+manifest roms: 120   (collection entries: 120 — the count guard's two halves moved together)
+selfcheck: {"off":"0x2C","len":4,"want":"0x00000000","frames":2000}
+```
+
+Same slug, same page, same URL: **[https://biohack.net/snes/apollo-daylight/](https://biohack.net/snes/apollo-daylight/)**.
+No second ROM was created. The WRAM oracle did not move (`$002C`), so only the selfcheck *label*
+changed; the manifest and the content JSON were committed together.
+
+Page prose rewritten off the new measurements — it described 2× at 30 fps and a 2 MiB image — and
+gained a section on the frame-rate experiment, since "we doubled the frame rate and the delta codec
+barely noticed" is the most interesting thing this rebuild produced.
+
+Commits: `e275733` (llvm-mos-65816), `73aec47` + tag `v1.0.363` (biohack.net).
