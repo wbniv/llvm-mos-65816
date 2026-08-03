@@ -177,9 +177,16 @@ minimum_exact=0.68
 maximum_mae=4.0
 if [ "$combined" = 1 ] || { [ "$FRAMES" -gt 4 ] && grep -q VIDEO_REEL_SECOND_START "$HEADER"; }; then
   gate_frames=4000
+  # Both figures are 1 + floor((gate_frames - t0) / CADENCE) with t0 = 179, the
+  # VBlank of the first present. 0x776 was 1 too low and had made this gate red
+  # since it was written: it is arithmetically incompatible with its own
+  # cadence-1 sibling, since 1910 needs t0 in {181,182} while 0xeee = 3822 pins
+  # t0 = 179, and t0 does not depend on cadence. Measured on the ROM with
+  # video_reel_deadline_slips = 0, i.e. nothing is being dropped: cadence 1
+  # presents 3822 and cadence 2 presents 1911.
   case "$CADENCE" in
     1) expected_presented=eee ;;
-    2) expected_presented=776 ;;
+    2) expected_presented=777 ;;
   esac
   screenshot_frame=108
   check_tiles=$FIRST_TILES

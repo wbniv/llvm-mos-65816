@@ -234,3 +234,47 @@ frame too many (ROM wrong) needs someone who owns that dashboard change; silentl
 worker's expectation constant to make a red gate green is precisely the wrong move. Filed as its own
 TODO item. This run used the script's existing `VIDEO_REEL_EXPECTED_PRESENTED` override rather than
 editing the file.
+
+### Blocker resolved (2026-08-03): the constant was wrong, and it was never right
+
+Diagnosed and fixed. **The ROM is correct; `expected_presented=776` was one too low from the day it
+was written**, so this gate has been red since `d6030cf` rather than being broken by a later change.
+
+Two hypotheses were tested and the first one — mine — was wrong:
+
+**Rejected: "`06ffdf3 fix(snes): keep video DMA inside VBlank` eliminated a deadline slip."** That
+commit moved the dashboard call from after the deadline wait to before it, which looked like exactly
+the sort of thing that would recover a dropped frame. Built the reel at `06ffdf3^` and at `06ffdf3`
+against the identical stream and measured both:
+
+```
+--- pre06ffdf3                          --- at06ffdf3
+    video_reel_presented_total = 1911       video_reel_presented_total = 1911
+    video_reel_deadline_slips  = 0          video_reel_deadline_slips  = 0
+```
+
+Identical. `snes-video-reel.c` is not the variable, and there was never a slip to recover.
+
+**Accepted: the two constants are mutually inconsistent, and the cadence-1 one is right.** With
+`video_reel_deadline_slips = 0` — nothing is being dropped — the count is pure arithmetic:
+
+```
+presented = 1 + floor((gate_frames - t0) / CADENCE)      t0 = VBlank of the first present
+
+  t0=179   cadence1=3822 (0xeee)   cadence2=1911 (0x777)   <- gate's cadence-1 constant
+  t0=181   cadence1=3820 (0xeec)   cadence2=1910 (0x776)   <- gate's cadence-2 constant
+```
+
+`t0` cannot depend on cadence — it is the title path. The gate's own cadence-1 constant `0xeee`
+**passes on measurement**, pinning `t0 = 179`; at `t0 = 179` cadence 2 must be 1911. For `0x776` to
+be right, `t0` would have to be 181 or 182, which would make `0xeee` wrong. Both constants were
+introduced in the same hunk of `d6030cf`, so this is a derivation slip in the sibling value, not
+drift.
+
+Fixed `776` → `777` with the derivation recorded in the script. `dev/snes-video-reel.sh` now passes
+**with no override**: composite health, cadence (`got=0x0777`), the new gauge step, both dashboard
+cuts, fidelity (`exact=47.9% mae=10.3`) and the transition (`exact=78.3% mae=2.6`).
+
+Worth carrying: the gate had been red for a day and the failure was *arithmetically self-evident from
+the gate's own other constant*. A cadence expectation written as a bare hex literal cannot be checked
+against its sibling by eye; the derivation is now a comment next to both.

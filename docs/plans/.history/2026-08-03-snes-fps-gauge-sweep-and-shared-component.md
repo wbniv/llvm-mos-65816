@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/8eca83a) | refactor(snes): one shared FPS gauge, and gate the number it displays |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/9ab0eb7) | docs(plan): FPS gauge sweep + extract it to one shared component |
 
 <!--history-meta v1
+8eca83a	author	Will Norris
+8eca83a	added	101
+8eca83a	deleted	0
+8eca83a	files	1
+8eca83a	body	Implements docs/plans/2026-08-03-snes-fps-gauge-sweep-and-shared-component.md.\n\nThe sweep found the class of bug rather than the instance. Only two of the nine\nfps-mentioning ROMs draw a gauge, and snes-video-reel.c's was correct only by\naccident: it read the presented counter one frame before the present it was\ncounting, AND sampled the VBlank counter one frame early, so the two off-by-ones\ncancelled. apollo-reel.c was copied from it, moved the call after the deadline\nwait for a good and unrelated reason, and the cancellation silently broke — the\npublished cartridge displayed 59.1 once and then 60.1 forever.\n\nSo the arithmetic and the ordering contract now live once, in video_fps.h:\nsample AFTER the present, always, with the reason at the call site. The reel\nmoves to the explicit ordering even though its output was already right, because\nthe compensating pair is what made the bug invisible. Counters are passed in\nrather than read from globals — the two ROMs deliberately do not share symbols.\n\nUnits are frames per 600 VBlanks, one decimal: deliberately the same measurement\nthe gates' cadence tables publish, so the screen and the docs cannot disagree.\nThe 32-bit intermediate and the 999 clamp are new — a transport that pauses can\nleave a window long enough to overflow dp * 600 past dp = 109.\n\nSecond finding, and the reason this reached a live page: no gate anywhere looked\nat the displayed number. fps_tenths was exported by the reel and read by nothing.\nBoth scripts now assert it twice — just past the first sample window, where the\n59.1 off-by-one appears as 590, and at the end, where a wrong scale constant\nlives.\n\nVerified before/after on identical builds: reel gauge byte-identical at five\nsample points, Apollo at six, and a cadence-2 build reads 30.0 which proves the\nunits are cadence-derived. Apollo gate PASS in full; -verify clean on both.\n\nAlso files a pre-existing red gate: dev/snes-video-reel.sh fails its cadence\nexpectation (got 0x777 want 0x776) on pristine main, reproduced byte-identically\nwith the refactor reverted, so it is not this change. Left for whoever owns the\ndashboard commit that moved it rather than bumped to make it green.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 9ab0eb7	author	Will Norris
 9ab0eb7	added	135
 9ab0eb7	deleted	0
