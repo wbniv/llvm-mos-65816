@@ -111,6 +111,191 @@ The LoROM cartridge is complete only when all of the following pass:
 6. the ROM header and checksum are valid and the ROM boots from a clean emulator state;
 7. the exact verified ROM is the file published in the gallery.
 
+## Verification record — 2026-08-03, against `main` @ `1feca62`
+
+The seven gates above are stated as outcomes, not as commands, so each step below names the
+command chosen to produce its evidence. The gate text itself is reproduced verbatim and
+unreordered. Toolchain used as-built (`build/llvm-mos-install/bin/mos-clang`, `build/jgxcheck`);
+no rebuild.
+
+**Preliminary — the LoROM first cartridge no longer builds on `main`.** Gates 1–6 speak of "the
+LoROM cartridge". Reproducing that configuration is the first thing attempted, and it fails:
+
+```
+$ VIDEO_REEL_FRAMES=4 VIDEO_REEL_FIRST_FRAMES=0 dev/snes-video-reel.sh
+frames=4 packets=2877 seek=0 loop=828 padding=0 total=3705 max=897
+/home/will/llvm-mos-65816/examples/snes/snes-video-reel.c:287:20: error: use of undeclared identifier 'VIDEO_REEL_HIROM_BASE_BANK'
+  287 |   return (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16));
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+```
+
+`tools/snes-video-reel-assets.py` emits `VIDEO_REEL_HIROM_BASE_BANK` only on the `--packed-far`
+(>4-frame) path, while `snes-video-reel.c:287` references it unconditionally. Suspected commit:
+`bd344a1` "snes: ship complete 300-frame SVX2 reel" (the `-S` history for that symbol is
+`bd344a1` → `21179d7` → `d6030cf`). **FAIL.** Gates 1–6 below are therefore run against the
+plan's *delivered* configuration — the full two-video 900-frame Fast HiROM cartridge of the
+"Full two-video continuation" implementation record, which is what the checked-in asset header
+(`VIDEO_REEL_FRAME_COUNT 900u`, `VIDEO_REEL_SECOND_START 600u`) and the default
+`dev/snes-video-reel.sh` invocation now describe.
+
+### 1. every generated packet round-trips on the host;
+
+Command: `dev/snes-video-reel.sh` (asset generator leg — `tools/snes-video-reel-assets.py`
+host-decodes and CRC-checks every packet it emits), plus the host codec unit suite.
+
+```
+$ dev/snes-video-reel.sh
+frames=900 packets=2314741 seek=82651 loop=3750 padding=0 total=2401142 max=3812
+packed 2401142 stream bytes at file $010000; ROM=4194304 bytes
+```
+
+```
+$ python3 -m pytest tests/test_snes_video_codec.py -q
+........................                                                 [100%]
+24 passed in 1.74s
+```
+
+**PASS** — generation is non-fatal (the generator aborts on any host round-trip mismatch) and the
+24-test host codec suite is green.
+
+### 2. every embedded frame passes target-side decoded CRC validation;
+
+Command: the composite-health gate inside `dev/snes-video-reel.sh` —
+`build/jgxcheck <rom> <db> 0x207 4 00000000 4000`. `video_reel_composite_health` becomes zero
+only after boot validation and two loops with no result, CRC, or deadline failure.
+
+```
+SMOKE: PASS off=0x207 len=4 got=0x00000000 (ran 4000 frames, bsnes-jg)
+```
+
+**PASS** — zero CRC failures across the boot validation pass and 4,000 VBlanks.
+
+### 3. the first visible frame matches the host raster and palette;
+
+Command: the screenshot rendezvous + `tools/snes-video-screenshot-check.py` legs of
+`dev/snes-video-reel.sh` (bsnes-jg framebuffer PNG compared against the host-quantized tiles and
+the shipping palette, with a dashboard-ink assertion).
+
+```
+jgxcheck: JGX_POLL matched at frame 395 of 4000 budgeted
+jgxcheck: wrote /home/will/llvm-mos-65816/build/svx2-video-reel.png (256x224 from native 512x240, yoff=0)
+DASHBOARD: PASS ink_pixels=495
+FIDELITY: PASS frame=108 exact=47.9248% mae=10.3196
+jgxcheck: JGX_POLL matched at frame 1579 of 3000 budgeted
+jgxcheck: wrote /home/will/llvm-mos-65816/build/svx2-video-reel-transition.png (256x224 from native 512x240, yoff=0)
+DASHBOARD: PASS ink_pixels=524
+FIDELITY: PASS frame=100 exact=78.3040% mae=2.6257
+```
+
+**PASS** — with one recorded drift: the gate now rendezvouses on stream frame 108 (and 100 across
+the real-video transition) rather than frame 0, because the animated title card added by
+`21179d7` / `d6030cf` precedes playback. The plan's own recorded figure (90.3163% exact /
+2.0916 MAE) belonged to the retired 4-frame LoROM cartridge and is not comparable.
+
+### 4. at least two full playback loops preserve order and keyframe reset behavior;
+
+Command: `dev/snes-video-reel.sh` runs the whole gate for 4,000 VBlanks at cadence 2 — 1,911
+presentations over a 900-frame reel, i.e. two complete loops plus the keyframe reset between
+them. `video_reel_loop_gate` is folded into the composite-health word asserted in step 2, and
+the two dashboard cut rendezvous prove segment ordering inside each loop.
+
+```
+jgxcheck: JGX_POLL matched at frame 799 of 4000 budgeted
+jgxcheck: wrote /home/will/llvm-mos-65816/build/svx2-video-reel-cut-one.png (256x224 from native 512x240, yoff=0)
+jgxcheck: JGX_POLL matched at frame 1399 of 4000 budgeted
+jgxcheck: wrote /home/will/llvm-mos-65816/build/svx2-video-reel-cut-two.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x2D len=2 got=0x02BC (ran 3000 frames, bsnes-jg)
+SMOKE: PASS off=0x207 len=4 got=0x00000000 (ran 4000 frames, bsnes-jg)
+```
+
+**PASS.**
+
+### 5. the measured presentation count matches the selected VBlank cadence with zero slips;
+
+Command: the cadence gate and the displayed-FPS gauge assertions inside `dev/snes-video-reel.sh`
+(`video_reel_presented_total` == `0x777` at VBlank 4,000; `video_fps_tenths` == 300 at VBlank 400
+and 4,000). `video_reel_deadline_slips` is folded into the composite-health word of step 2.
+
+```
+displayed FPS gauge: 30.0 at VBlank 400 and 4000
+SMOKE: PASS off=0x2F len=2 got=0x0777 (ran 4000 frames, bsnes-jg)
+```
+
+**PASS** — 1,911 exact presentations, zero deadline slips. Recorded drift: the plan's "716 exact
+presentations in 2,400 VBlanks" no longer applies; the window is now 4,000 VBlanks and the
+expected count was corrected by `b1afb9c` "fix(snes): reel cadence expectation was 1 too low, and
+never right".
+
+### 6. the ROM header and checksum are valid and the ROM boots from a clean emulator state;
+
+Command: `python3 tools/snes-checksum.py --hirom --fast --inspect build/svx2-video-reel.sfc`
+(header/checksum), with the clean-boot half covered by every `jgxcheck` run above starting from
+power-on.
+
+```
+$ python3 tools/snes-checksum.py --hirom --fast --inspect build/svx2-video-reel.sfc
+build/svx2-video-reel.sfc
+mapping           : hirom (fast ROM), map mode $31
+file length       : 4194304 bytes (0x400000, 32 Mbit / 4 MiB)
+physical devices  : 32Mbit @ $000000
+logical (mirrored): 0x400000 (4 MiB) -> ROM-size byte $0C
+header at file    : $00FFB0
+canonical windows :
+    $C0-$FF:0000-FFFF  <- file $000000-$3FFFFF
+addressing holes  : none
+title             : 'LLVM-MOS SNES        '
+map mode byte     : $31
+cartridge type    : $00
+ROM-size byte     : $0C
+RAM-size byte     : $00  (no save RAM)
+region byte       : $01  (bsnes-jg videoRegion: NTSC)
+reset vector      : $00:8000 -> file $008000 (first opcode $78)
+native vectors    : COP=$0000 BRK=$835D ABT=$0000 NMI=$8037 IRQ=$835D
+emu vectors       : COP=$0000 ABT=$0000 NMI=$8037 RES=$8000 IRQ=$835D
+checksum stored   : $9BB2   complement $644D
+checksum recomputed: $9BB2 (mirrored image) / $9BB2 (multiplier formula)
+bsnes-jg heuristic: detects hirom  lorom=0  hirom=14  exlorom=0  exhirom=0
+
+PASS: header, size, decomposition, vectors and checksum all agree.
+```
+
+**PASS.**
+
+### 7. the exact verified ROM is the file published in the gallery.
+
+Command: hash the ROM this gate just built, and hash the file currently served by the gallery.
+
+```
+$ ls -l build/svx2-video-reel.sfc; sha256sum build/svx2-video-reel.sfc
+-rw-rw-r-- 1 will will 4194304 Aug  3 17:18 build/svx2-video-reel.sfc
+f741e49a384c20d2cedbe1d7413b5303a0ede7cf28d01293f7a91037eb3ab7d2  build/svx2-video-reel.sfc
+```
+
+```
+$ curl -fsSL https://biohack.net/play/roms/svx2-fastrom-video.sfc -o /tmp/svx2-published.sfc
+$ echo "size=$(stat -c %s /tmp/svx2-published.sfc)"; sha256sum /tmp/svx2-published.sfc
+size=8388608
+c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2  /tmp/svx2-published.sfc
+```
+
+```
+$ grep -rn '825e3848917c669481c6da1eac6212d857aa1c399d6a1c2ffba8d264d0708c99' . | grep -v '^./.git'
+./docs/plans/2026-07-31-svx2-animated-video-cartridge.md:146:- ROM SHA-256 `825e3848917c669481c6da1eac6212d857aa1c399d6a1c2ffba8d264d0708c99`;
+```
+
+**FAIL.** Three distinct images, none matching: this plan's recorded 32 KiB LoROM ROM
+`825e3848…` (release `v1.0.317`) survives nowhere but this document; the gate above builds a
+4 MiB Fast HiROM `f741e49a…`; and the gallery now serves an 8 MiB ExHiROM `c3d7cd9e…` at
+`v1.0.360`, which belongs to the 59.94 fps successor and is gated separately by
+`dev/svx2-emulator-validation.sh`. Suspected commits: `21179d7` "feat(snes): prove SVX2 60 fps
+pipeline" and the ExHiROM seam work that followed it. Not adjusted — the gate as written cannot
+pass against this plan's artifact, and deciding which ROM this plan should now own is a design
+call, not a verification one.
+
+**Verdict: 6/7 PASS, 1 FAIL (gate 7), plus a failed preliminary (the LoROM configuration no
+longer compiles).**
+
 ## Upstream compiler follow-up
 
 Keep the compiler correction distinct from the demo publication. Before submitting upstream:
