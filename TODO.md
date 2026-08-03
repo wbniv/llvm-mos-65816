@@ -31,15 +31,29 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
-- [T3] **Round 7 demo battery (#119–#138) — twenty new defect-hunting ROMs.** Targets chosen by
+- [T3] **Round 7 demo battery (#119–#138, now nineteen) — new defect-hunting ROMs.** Targets chosen by
   the scoreboard's yield pattern: combiner-formed opcodes (`G_ABDS/U`, s64 ctpop/clz/ctz/abs),
-  the **declared-`unsupported` s32→4×s8 unmerge** (guaranteed finding either way), first-ever
-  interrupt-CC / inline-asm / mixed-per-function-width mode-state demos, far-pointer third pass,
+  first-ever interrupt-CC / inline-asm / mixed-per-function-width mode-state demos, far-pointer third pass,
   >256 B frames, volatile/atomic discipline, float↔s64 libcalls, s64 limb-seam shifts. First
-  picks: #122 unmerge32, #123 nmitally, #126 mixedwidth, #125 asmisland, #119 absdiff,
-  #131 farspill. Per-demo plans + `/snes-demo` per item.
+  picks (re-ranked 2026-08-03): #123 nmitally, #126 mixedwidth, #125 asmisland, #119 absdiff,
+  #131 farspill. **#122 unmerge32 WITHDRAWN** — its "declared-`unsupported` s32→4×s8 unmerge"
+  premise was already false when the round was written (rule landed `cbc31da`, gated by
+  `dev/run.sh a16unmerge` since 2026-07-19); investigated, not built, nothing committed.
+  Per-demo plans + `/snes-demo` per item.
   See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md). (T3: each demo is settled-plan
   implementation; the round's selection/design was done inline.)
+- [ ] **Does `G_ADD`/`G_SUB` miss 16-bit lanes under `+mos-a16`?** Measured while withdrawing #122:
+  `MOSLegalizerInfo` gives add/sub `.legalFor({S8}).widenScalarToNextMultipleOf(0,8).custom()` with
+  **no `maxScalar`**, so an s32 add narrows to **4×s8 `G_UADDE` lanes even under a16** — verified
+  identical MIR with and without the feature. Only the bitwise ops get s16 lanes
+  (`MaxBitwise = STI.hasAccum16() ? S16 : S8`). This may be a deliberate carry-chain decision (the
+  8-bit `ADC` chain is how the carry threads, and a 16-bit lane changes the seam) or a missed
+  16-bit opportunity worth real bytes across every a16 program. **Not established either way** —
+  needs the measure-don't-assume treatment on a throwaway worktree, and per project lesson 2 any
+  change must be gated so a misclassification can only miss a win, never regress. See the #122
+  withdrawal in [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md).
+  *Unranked: the ranking hook denies a tier marker from anyone but Fable. Suggested tier 4 —
+  design + backend change in the legalizer's hottest path, where a wrong turn is expensive.*
 - [ ] **`dev/snes-video-reel.sh` cadence gate is RED on `main` — stale expectation or one frame too many?** It fails `got=0x0777 want=0x0776` (1,911 presented vs 1,910 expected). Proven pre-existing, not caused by the FPS-gauge refactor: reverting `snes-video-reel.c` to pristine and re-running reproduces the failure **byte-identically**. `expected_presented=776` was last set in `d6030cf` (restore cut-aware video dashboard); the reel was last changed in `81364d7` (publish native 60fps ExHiROM reel) — one of the two moved presentation by a frame. Deciding whether the constant is stale or the ROM presents one frame too many needs whoever owns that dashboard change; bumping the constant to turn a red gate green would be the wrong move. Workaround meanwhile: `VIDEO_REEL_EXPECTED_PRESENTED=777`. *Unranked: the ranking hook denies a tier marker from anyone but Fable. Suggested tier 2 — bounded, but needs a judgment call about whose change it was.*
 - [T4] **Interframe coding stops paying on hard content — measure the crossover, decide whether a
   per-frame codec chooser is worth building.** Found by the Apollo recut (2026-08-02): on that

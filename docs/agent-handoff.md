@@ -284,7 +284,14 @@ Under `vendor/llvm-mos/llvm/lib/Target/MOS/`:
   scalars under a16 narrow to s16 (not s8), so s32 is 2×s16** — new wide merge/unmerge shapes need rules:
   the direct **4×s8→s32 `G_MERGE_VALUES`** is custom-legalized (`legalizeMergeS32FromBytes`) into the legal
   2-level form (`merge→s16 ×2, then →s32`) because `selectMergeValues` only takes a 2-source merge. The
-  symmetric s32→4×s8 unmerge is still `unsupported` (no seed hit it yet). *Gotcha:* a whole-module frozen
+  symmetric **s32→4×s8 unmerge** is custom-legalized the same way (`legalizeUnmergeS32ToBytes`, landed
+  `cbc31da`, refined `2bfe4f3`) and is one of the hottest custom rules in the backend — an instrumented
+  sweep of the 112 corpus slices measured **385 fires across 52 slices** (sources: `G_MERGE_VALUES` 208,
+  `G_SEXT` 145, `G_ZEXT` 32). It forms only when a narrower value is **extended to s32, run through
+  arithmetic, then split into bytes** — never from an already-32-bit source, since the artifact combiner
+  folds unmerge-of-load/constant/merge first. Regression-gated hermetically by `dev/run.sh a16unmerge`.
+  *(This line previously read "still `unsupported` (no seed hit it yet)" — stale since `cbc31da`; that
+  stale text is what mis-justified Round 7's #122, withdrawn 2026-08-03.)* *Gotcha:* a whole-module frozen
   `.ll` is a poor regression fixture for these — it over-triggers by compiling runtime fns (`__adddf3`, s64)
   with `+mos-a16`, which the real link doesn't; use the deterministic Csmith seed as the gate instead.
 - `MOSInstructionSelector.cpp` — selection: `select*`, the `m_CmpNZ*` / `CmpNZ*_match` matchers, operand-fold

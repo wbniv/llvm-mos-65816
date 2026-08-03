@@ -26,11 +26,18 @@ targeting function:
    see through.
 4. **Legal-but-wrong MIR shapes are invisible to gates** (defects 3, 6) — so Round 7 pairs
    every machine-level demo with a **disasm gate**, not just the value differential.
-5. **Known gap, zero demos:** `MOSLegalizerInfo` marks the direct **s32→4×s8
+5. ~~**Known gap, zero demos:** `MOSLegalizerInfo` marks the direct **s32→4×s8
    `G_UNMERGE_VALUES` as `unsupported`** — "no seed hit it yet" (agent-handoff, backend-nav
-   section). A demo that forms it is a *guaranteed* finding: either the abort reproduces (gap
-   confirmed, rule gets written) or the shape silently legalizes another way (the comment is
-   stale and gets fixed).
+   section). A demo that forms it is a *guaranteed* finding.~~ **WITHDRAWN 2026-08-03 — the
+   premise was already false when this plan was written.** `MOSLegalizerInfo.cpp:188` reads
+   `.legalFor({{S16,S32},{S32,S64}}).customFor({{S8,S32},{S16,S64}})`; `{S8,S32}` dispatches to
+   `legalizeUnmergeS32ToBytes`, which *is* the symmetric 2-level rule this item proposed writing.
+   It landed in [`cbc31da`](https://github.com/wbniv/llvm-mos-65816/commit/cbc31da) (#320 Inc 3c),
+   refined by [`2bfe4f3`](https://github.com/wbniv/llvm-mos-65816/commit/2bfe4f3), and is
+   regression-gated hermetically by `dev/run.sh a16unmerge` (`examples/65816/a16unmerge.ll`,
+   frozen Csmith seed-11 IR) since 2026-07-19 — all of it predating this plan. Far from
+   untouched, it is one of the hottest custom rules in the backend: an instrumented sweep of all
+   112 corpus slices measured **385 fires across 52 slices**. See the withdrawal of **#122** below.
 6. Rounds 5–6 (value-level arithmetic corners) came back green — the value-level libcall space
    is near-exhausted. Round 7 therefore tilts **away from arithmetic novelty and toward ABI,
    memory-model, mode-state, and pointer-provenance novelty**.
@@ -75,14 +82,40 @@ targeting function:
      plus the negate-carry chain across 4 limbs. *Shows:* a rectified waveform. *Differential:*
      exact s64 results folded to CRC, including the `INT64_MIN` edge left *out* (UB) and
      `INT64_MIN+1` kept in.
-122. **Checksum Byte-Serializer (`unmerge32`).** ⭐ Forms the **direct s32→4×s8
-     `G_UNMERGE_VALUES`** the legalizer marks `unsupported`: compute a 32-bit checksum, then
-     store its four bytes through independent per-byte extracts shaped so the a16 pipeline (s32 =
-     2×s16) still requests the 4-way byte unmerge (mirror the shape `legalizeMergeS32FromBytes`
-     handles on the merge side; iterate on `-print-after=legalizer` until the node forms).
-     Either outcome is a deliverable: reproduce-the-abort → write the symmetric 2-level rule; or
-     the node can't form → correct the stale `unsupported`/comment with the measured reason.
-     *Shows:* checksum bytes as colour bars. *Differential:* CRC over the serialized bytes.
+122. ~~**Checksum Byte-Serializer (`unmerge32`).** ⭐ Forms the **direct s32→4×s8
+     `G_UNMERGE_VALUES`** the legalizer marks `unsupported`.~~ **WITHDRAWN 2026-08-03 — not
+     built.** Investigated instead of implemented, because the gap it targeted was closed and
+     regression-tested months before this plan was authored (details in point 5 above). There was
+     no abort to reproduce, no rule to write, and no stale comment in `vendor/` to correct — the
+     stale text was *this plan entry*. Nothing was committed and the compiler is byte-identical
+     to `main`.
+
+     **Kept from the investigation — the measured trigger.** Instrumenting
+     `legalizeUnmergeS32ToBytes` shows all 385 fires are `ndefs=4`, sourced from
+     `G_MERGE_VALUES` (208), `G_SEXT` (145), `G_ZEXT` (32). The node forms when a **narrower
+     value is sign/zero-extended to s32, passes through arithmetic, then is split into bytes** —
+     never from an already-32-bit source, because the artifact combiner folds
+     unmerge-of-load/constant/merge first (28 probe shapes across six optimization levels —
+     four independent byte stores, `memcpy`/union punning, `__builtin_bswap32`, popcount/clz,
+     a CRC-32 loop, `__mulsi3`/`__udivsi3`, float and s64 forms — fired **zero** times).
+     Minimal shape that does fire, correctly `hasAccum16`-gated:
+
+     ```c
+     int32_t x = (int32_t)src16 * 2654435761u;   /* G_SEXT s16->s32, then arithmetic */
+     uint32_t h = (uint32_t)x ^ ((uint32_t)x >> 15);
+     s0=(uint8_t)h; s1=(uint8_t)(h>>8); s2=(uint8_t)(h>>16); s3=(uint8_t)(h>>24);
+     ```
+
+     *Caveat on the 385 count:* it comes from `errs()` instrumentation on a build since reverted.
+     Reproducible by re-applying the two-line probe; not re-verifiable against the current binary.
+
+     **Spun out as a follow-up:** the same sweep measured that `G_ADD`/`G_SUB` is
+     `.legalFor({S8}).widenScalarToNextMultipleOf(0,8).custom()` with **no `maxScalar`**, so an
+     s32 add narrows to **4×s8 `G_UADDE` lanes even under `+mos-a16`** (identical MIR with and
+     without the feature); only the bitwise ops get s16 lanes, via
+     `MaxBitwise = STI.hasAccum16() ? S16 : S8`. Whether that is a deliberate carry-chain
+     decision or a missed 16-bit opportunity is **not** established — it is now its own TODO
+     item, not a demo.
 
 ### Cluster B — mode state meets code the passes can't see through
 
@@ -187,18 +220,25 @@ targeting function:
 
 ## First picks (highest expected yield per unit effort)
 
-1. **#122 `unmerge32`** — a *declared* gap; the only demo in seven rounds with a guaranteed
-   finding on either outcome.
-2. **#123 `nmitally`** — the interrupt CC has literally never executed; prologue width/Imag
+*Re-ranked 2026-08-03 after #122 was withdrawn (see above); the list below is the live order.*
+
+1. **#123 `nmitally`** — the interrupt CC has literally never executed; prologue width/Imag
    save-restore is a large, wholly untested surface.
-3. **#126 `mixedwidth`** — per-function features is the kind of boundary nobody designed for;
+2. **#126 `mixedwidth`** — per-function features is the kind of boundary nobody designed for;
    even "diagnosed as unsupported" is worth having on the record.
-4. **#125 `asmisland`** — inline asm × `rep/sep` lattice, plus it institutionalizes the
+3. **#125 `asmisland`** — inline asm × `rep/sep` lattice, plus it institutionalizes the
    2026-08-02 immediate-sizing trap as a gated check.
-5. **#119 `absdiff`** — the cheapest possible replay of the exact mechanism that produced
+4. **#119 `absdiff`** — the cheapest possible replay of the exact mechanism that produced
    defect 17.
-6. **#131 `farspill`** — history says far-pointer pressure pays; `0018`'s standing assert makes
+5. **#131 `farspill`** — history says far-pointer pressure pays; `0018`'s standing assert makes
    any regression loud.
+6. ~~**#122 `unmerge32`** — a *declared* gap; the only demo in seven rounds with a guaranteed
+   finding on either outcome.~~ **Withdrawn — the gap was already closed and gated.**
+
+**Lesson for future rounds:** #122's justification was taken from a comment in `agent-handoff.md`'s
+backend-nav section rather than from the legalizer source, and the comment had gone stale. A
+"known gap" claim is only worth a ⭐ if it is re-checked against `vendor/` **at selection time** —
+one `grep` would have caught this before the round was written.
 
 ## The bar (unchanged)
 
