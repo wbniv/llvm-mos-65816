@@ -1999,4 +1999,11 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      curated [T4] Open bullet tracks the work); verification intentionally unrun. Not a missed
      step. -->
 <!-- triaged 2026-08-03: not a deferral — the plan is PLANNED, not executed. Its Verification section is the spec for work that has not run yet, and the curated Open item above tracks doing it. fp:e7f32215206709ed -->
+<!-- triaged 2026-08-04: not a deferral — the audit heuristic mis-captured two lines out of the
+     MachineVerifier error transcript in the nmitally plan's "Follow-up: vacuous
+     -verify-machineinstrs sweep" section (a fenced ``` code block quoting the compiler's own
+     "- function: main" / "- instruction: ..." diagnostic format, not a plan bullet). The actual
+     finding — blossom.sh/mandel-oop.sh trip the known a16-rc-undef-ra-pure-virtual false-positive
+     and need T3/T4 XFAIL-wiring — is already tracked in the curated [wip T2] vacuous-verify-sweep
+     Open item's Progress note above. Nothing open here. fp:b0fbb26e5bab0a02 fp:26fe362b8541987b -->
 <!-- END auto-captured-deferrals -->

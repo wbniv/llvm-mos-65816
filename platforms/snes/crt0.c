@@ -52,11 +52,25 @@ asm(".section .init.50,\"axR\",@progbits\n"
     "  lda #$8f\n"               // A = $8F (bit 7 = force-blank, brightness 0)
     "  sta $2100\n");            // INIDISP: force blank, brightness 0
 
-// Default interrupt handlers — weak so a program can override `nmi` / `irq`.
+// Default interrupt handlers — weak so a program can override any of them.
+//
+// `brk` and `cop` are the two SYNCHRONOUS (software) 65816 interrupts. In native mode they have
+// their own vectors ($FFE6 BRK, $FFE4 COP), distinct from IRQ ($FFEE). Until 2026-08-04 this
+// platform wired BRK to the shared `irq` symbol (so a BRK was indistinguishable from a hardware
+// IRQ) and COP to the literal address $0000 — a native-mode `cop` therefore jumped into low WRAM
+// and executed data as code. Both now have their own weak `rti` stub and their own vector slot,
+// so a program can override either with a real `__attribute__((interrupt))` C handler exactly the
+// way it already can for `nmi` / `irq`. See docs/plans/2026-08-04-140-snes-brkcop.md.
 asm(".text\n"
     ".weak irq\n"
     "irq:\n"
     "  rti\n"
     ".weak nmi\n"
     "nmi:\n"
+    "  rti\n"
+    ".weak brk\n"
+    "brk:\n"
+    "  rti\n"
+    ".weak cop\n"
+    "cop:\n"
     "  rti\n");

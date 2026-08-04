@@ -58,7 +58,7 @@ SECTIONS {
    * mode, but pointed at the stub handlers for safety. */
   .snes_vectors_native 0xFFE0 : {
     SHORT(0x0000) SHORT(0x0000)   /* $FFE0,$FFE2 reserved   */
-    SHORT(0x0000) SHORT(irq)      /* $FFE4 COP,  $FFE6 BRK  */
+    SHORT(cop)    SHORT(brk)      /* $FFE4 COP,  $FFE6 BRK  */
     SHORT(0x0000) SHORT(nmi)      /* $FFE8 ABORT,$FFEA NMI  */
     SHORT(0x0000) SHORT(irq)      /* $FFEC -,    $FFEE IRQ  */
   } >romhdr
@@ -66,7 +66,7 @@ SECTIONS {
   /* Emulation-mode interrupt vectors ($FFF0-$FFFF). RESET is the boot entry. */
   .snes_vectors_emu 0xFFF0 : {
     SHORT(0x0000) SHORT(0x0000)   /* $FFF0,$FFF2 reserved   */
-    SHORT(0x0000) SHORT(0x0000)   /* $FFF4 COP,  $FFF6 -    */
+    SHORT(cop)    SHORT(0x0000)   /* $FFF4 COP,  $FFF6 -    */
     SHORT(0x0000) SHORT(nmi)      /* $FFF8 ABORT,$FFFA NMI  */
     SHORT(_start) SHORT(irq)      /* $FFFC RESET,$FFFE IRQ  */
   } >romhdr

@@ -89,10 +89,10 @@ SECTIONS {
 
   .snes_header 0x00FFB0 : { KEEP(*(.snes_header)) } >romhdr
   .snes_vectors_native 0x00FFE0 : {
-    SHORT(0) SHORT(0) SHORT(0) SHORT(irq) SHORT(0) SHORT(nmi) SHORT(0) SHORT(irq)
+    SHORT(0) SHORT(0) SHORT(cop) SHORT(brk) SHORT(0) SHORT(nmi) SHORT(0) SHORT(irq)
   } >romhdr
   .snes_vectors_emu 0x00FFF0 : {
-    SHORT(0) SHORT(0) SHORT(0) SHORT(0) SHORT(0) SHORT(nmi) SHORT(_start) SHORT(irq)
+    SHORT(0) SHORT(0) SHORT(cop) SHORT(0) SHORT(0) SHORT(nmi) SHORT(_start) SHORT(irq)
   } >romhdr
 }
 
