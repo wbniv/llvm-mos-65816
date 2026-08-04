@@ -879,6 +879,20 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   found and fixed an llvm-mos 65816 `MVN` operand-encoding defect (bank order in the MC
   instruction format) — fix + opcode regression already carried as
   `patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch`. Remaining is submission polish
+- [T5] **COP-only upstream complement — draft branch needs reduction against PR #586 before the
+  post.** History: this session implemented BRK+COP together on `mos-65816-cop-brk-signature`
+  (`61c07100970c`, local in `~/llvm-mos`, never pushed; MC suite 39/40, lone failure proven
+  pre-existing; `FeatureW65816`-gated COP — `$02` is `NXT` on the 65EL02). Meanwhile the
+  [split-ownership plan](docs/plans/2026-08-04-split-brk-cop-patch-ownership.md) posted the **BRK
+  half separately** as [PR #586](https://github.com/llvm-mos/llvm-mos/pull/586) (fork carry
+  `0024`) and fork-carries COP in `0002`; the `llvm-mc` Motorola-default side-finding is likewise
+  already posted as [PR #587](https://github.com/llvm-mos/llvm-mos/pull/587) (`0025`). **Residual
+  (T5, user-triggered post):** reduce `61c07100970c` to the COP-only complement (drop the
+  now-duplicate `BRK_Immediate` hunk + BRK test lines, cite #586) or re-cut atop #586's branch,
+  then post — the status doc tracks it under *Future / blocked* ("MC-layer `cop` mnemonic").
+  Also riding here: the BRK/COP *disassembly*-length follow-up (offered in the draft PR body,
+  deliberately unbundled). [Draft body + research](docs/upstream-cop-brk-signature-pr.md) ·
+  [plan](docs/plans/2026-08-04-mos-brk-cop-signature-byte-assembler.md).
   (the five steps from the [svx2 plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)
   §Upstream compiler follow-up): reduce to the MC opcode test, confirm syntax + encoded byte
   order against WDC docs and llvm-mos asm conventions, run the focused MC test + relevant suite,
@@ -2017,7 +2031,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** Publishing to biohack.net / indri.studio (user-gated follow-up). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:4b71ee8c13a90d5b -->
 - [ ] **(triage)** MAME leg (SKIP-by-design without the SPC700 IPL). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:bc642b4b5ab8d2bf -->
 - [ ] **(triage)** H-mode (per-scanline) IRQ. At ~262 IRQs/frame the C ISR prologue alone exceeds a scanline, so — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:8974b954bfca2a54 -->
-- [ ] **(triage)** Carrying the fix as a fork patch for the #140 demo (the `.byte` workaround stands until upstream — _from [2026-08-04-mos-brk-cop-signature-byte-assembler.md](docs/plans/2026-08-04-mos-brk-cop-signature-byte-assembler.md)_  <!-- fp:83367950e9cfe689 -->
-- [ ] **(triage)** Changing BRK/COP **disassembly** length (see above). — _from [2026-08-04-mos-brk-cop-signature-byte-assembler.md](docs/plans/2026-08-04-mos-brk-cop-signature-byte-assembler.md)_  <!-- fp:01475cfa243ee69b -->
-- [ ] **(triage)** `wdm`'s mandatory operand — already matches ca65; untouched. — _from [2026-08-04-mos-brk-cop-signature-byte-assembler.md](docs/plans/2026-08-04-mos-brk-cop-signature-byte-assembler.md)_  <!-- fp:5e1ee717afda4e94 -->
+<!-- triaged 2026-08-04: two COP/BRK-plan Out-of-scope bullets.
+     • BRK/COP disassembly-length change -> rides the curated [T5] "COP-only upstream complement"
+       bullet (Upstream / Contribution) as a named follow-up; not a separate item.
+     • wdm's mandatory operand -> recorded non-finding (already matches ca65, untouched);
+       non-work. -->
 <!-- END auto-captured-deferrals -->

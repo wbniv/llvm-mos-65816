@@ -1,6 +1,13 @@
 # [MOS] Add the COP mnemonic and accept a BRK/COP signature byte
 
 <!-- [DRAFT — PR body for llvm-mos/llvm-mos; strip the H1 and this comment when posting]
+     ⚠ SUPERSEDED IN PART (2026-08-04, later the same day): the split-ownership plan
+     (docs/plans/2026-08-04-split-brk-cop-patch-ownership.md) posted the BRK half separately as
+     PR #586 (wbniv:mos-brk-signature-operand, fork carry 0024) and the Motorola-default footnote
+     below as PR #587 (0025); COP is fork-carried in 0002. Before posting THIS draft, reduce the
+     branch to the COP-only complement (drop the BRK_Immediate hunk + BRK test lines, cite #586)
+     or re-cut atop #586, and trim the body accordingly — the BRK and llvm-mc sections then become
+     references, not content. Tracked by the [T5] "COP-only upstream complement" TODO bullet.
      Status: DRAFTED 2026-08-04, NOT POSTED, BRANCH NOT PUSHED (posting is user-triggered).
      Branch: mos-65816-cop-brk-signature, cut from upstream main 1f334fef02b5, one commit
      61c07100970c, living locally in ~/llvm-mos. Verified in ~/llvm-mos/build-pr (MOS-only,
