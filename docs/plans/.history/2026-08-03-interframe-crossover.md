@@ -1,8 +1,20 @@
 | Date | Change |
 |------|--------|
+| [2026-08-04](https://github.com/wbniv/llvm-mos-65816/commit/5fc1e42) | measure(crossover): P0/P0b/P1 — the crossover is a dither artifact, not a codec gap |
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/47ce3d2) | plan(crossover): P0b answered — the crossover is dither-bound, not frame-rate-bound |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/2825aab) | plan: where interframe coding stops paying — measure the crossover before building anything |
 
 <!--history-meta v1
+5fc1e42	author	Will Norris
+5fc1e42	added	301
+5fc1e42	deleted	1
+5fc1e42	files	1
+5fc1e42	body	Executes the measurement phases of docs/plans/2026-08-03-interframe-crossover.md\nand records the results in the plan per the house verification format.\n\nNew tool: tools/snes-video-crossover.py — per-frame size(delta) vs\nsize(keyframe) for an SVX2 tile corpus, plus the constrained chooser of P1\n(minimise bytes subject to holding cadence) and a free same-count best-placement\nvariant. It establishes rather than assumes that per-frame costs are\nindependent: SVX2 is lossless, so the decoded previous frame is identical\nwhichever packet kind was emitted, which makes the chooser a top-m selection\nrather than a dynamic program.\n\nP0 — on hard content 96.16% of frames (576/599) want a keyframe, sustained\nacross runs of up to 265 frames on a shot with no cuts. The distribution is\nas favourable as it could be, so P0's "small and concentrated" closing\ncondition does not fire.\n\nP1 — but the 60 fps keyframe budget is 0.84% of frames (keyframe 600/537 =\n1.117 VBlanks occupies a 2-VBlank slot; fps = 60/(1+phi)), and the shipped\nK=120 seek grid already spends all of it. Realisable chooser saving on the\nhardest corpus: 430 B of 2,099,896 B = 0.02%. Even all-keyframe at 30.59 fps\nrecovers only 2.89%, against LZSS's 10.11-point lead.\n\nP0b — the dither experiment the phase called for is the actual answer. On\nbyte-identical footage, Bayer moves SVX2 from 78.12% to 68.06% of raw\n(270,314 B, 10.06 points, ~630x the affordable chooser) at zero cadence cost,\nlevel with the best size any codec reaches here, for 0.24 dB PSNR.\n\nModel calibration passes both recorded anchors before use (keyframe 1.12\nVBlanks; K=120 -> 59.50 fps). Reconciliation is byte-exact on the SHA-matched\nArtemis corpus (K=60 = 766,569 B); the Apollo corpora needed a re-derivation\nfrom the vendored excerpt because their masters are not vendored, landing\nwithin 0.08 points on every variant — recorded plainly, not papered over.\n\nP2 stays open: a recommendation (do not build the chooser; make dither a\nper-corpus encoder choice) is on file, the decision is not.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+47ce3d2	author	Will Norris
+47ce3d2	added	21
+47ce3d2	deleted	3
+47ce3d2	files	1
+47ce3d2	body	The Apollo true-60 work supplied the second frame-rate point for free.\nHalving the temporal gap recovers only 0.91 ratio points (LZSS ahead\n14.31 -> 13.40); even a real-time control only reaches 10.13. The\nhypothesis was true and nearly irrelevant.\n\nThe reason redirects the whole item: the inter-frame residual is\nFloyd-Steinberg dither noise, decorrelated regardless of frame spacing, so\nno achievable frame rate escapes it. That makes 'how much of each delta is\ndither' the real P0 question, and suggests a cheap prior experiment -- repack\nwith an ordered/Bayer dither, which is frame-stable -- for which the recorded\nArtemis Bayer row (SVX2's largest win anywhere, 19.38 pts) is already\nevidence.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 2825aab	author	Will Norris
 2825aab	added	89
 2825aab	deleted	0

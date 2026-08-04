@@ -405,3 +405,16 @@ shipped Apollo corpus during the next encode rather than on this reconstruction.
 If P2 nonetheless wants a chooser, the honest framing is that it is a **30 fps feature**: at a 30 fps
 presentation every frame owns a 2-VBlank slot, both packet kinds fit, φ ≤ 100%, and the full 2.89% is
 available. At 60 fps there is no budget to spend.
+
+## P2 decision (2026-08-04)
+
+**Don't build the chooser.** The numbers force it: at 60 fps the cadence budget (φ ≤ 0.8403%) is
+already fully spent by the `K=120` seek grid, leaving a realisable chooser saving of 430 B on a
+2.1 MB corpus (0.02%); even the all-keyframe ceiling (2.89% at 30.59 fps) is dwarfed by what
+dithering buys for free. The chooser is recorded as a 30 fps-only feature with no current customer.
+
+**Adopt the dither lever instead:** per-corpus `--dither bayer` on measured grain (not a blanket
+switch — it costs 2.49 dB on the smooth night leg). Follow-up tracked in `TODO.md`: confirm the
+10.06-point win on the actual shipped Apollo corpus at the next encode, then record the selection
+threshold. Decision made at the orchestrator tier on the strength of the P0/P1 evidence above;
+reopen only if a 30 fps presentation ever becomes a shipping target.

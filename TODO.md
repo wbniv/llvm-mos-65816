@@ -137,38 +137,15 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   Published first on [biohack.net](https://biohack.net/snes/bankwalk/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bankwalk/); next is #129
   `farptrcmp`. [plan](docs/plans/2026-08-04-128-snes-bankwalk.md).
-- [wip T4] **Does `G_ADD`/`G_SUB` miss 16-bit lanes under `+mos-a16`?** <!-- agent:aea74d64b728e41ad --> Measured while withdrawing #122:
-  `MOSLegalizerInfo` gives add/sub `.legalFor({S8}).widenScalarToNextMultipleOf(0,8).custom()` with
-  **no `maxScalar`**, so an s32 add narrows to **4×s8 `G_UADDE` lanes even under a16** — verified
-  identical MIR with and without the feature. Only the bitwise ops get s16 lanes
-  (`MaxBitwise = STI.hasAccum16() ? S16 : S8`). This may be a deliberate carry-chain decision (the
-  8-bit `ADC` chain is how the carry threads, and a 16-bit lane changes the seam) or a missed
-  16-bit opportunity worth real bytes across every a16 program. **Not established either way** —
-  needs the measure-don't-assume treatment on a throwaway worktree, and per project lesson 2 any
-  change must be gated so a misclassification can only miss a win, never regress. See the #122
-  withdrawal in [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md).
-  *Unranked: the ranking hook denies a tier marker from anyone but Fable. Suggested tier 4 —
-  design + backend change in the legalizer's hottest path, where a wrong turn is expensive.*
-- [wip T4] **Interframe coding stops paying on hard content — measure the crossover, decide whether a <!-- agent:a72ac3a239a961ff0 -->
-  per-frame codec chooser is worth building.** Found by the Apollo recut (2026-08-02): on that
-  content intraframe **LZSS beats interframe SVX2 by 14.31 points** (877,809 vs 1,070,154 B), up
-  from 2.67 points on the first, near-static cut. The direction is intuitive — once consecutive
-  frames stop resembling each other, between-frame coding earns less than coding each frame fresh
-  — but the *size* of the gap says the crossover is a real operating region, not a curiosity.
-  The shipped decision is unaffected and safe: it is speed-anchored, and LZSS decodes ~27× too
-  slow to ship. The open question is whether a **per-frame chooser** (emit a delta packet or an
-  intraframe packet, whichever is smaller) is worth building — which needs a *fast* intraframe
-  path, so the real work is a throughput budget for one, not the chooser itself. Data already in
-  hand: both corpora packed both ways, ratios recorded per clip in the benchmark doc.
-  **Plan written 2026-08-03** — [interframe-crossover](docs/plans/2026-08-03-interframe-crossover.md):
-  the key reframing is that size and time trade in OPPOSITE directions (a keyframe is often the
-  smaller packet on hard content but costs 1.12 VBlanks vs ~1.0), so "pick the smaller per frame"
-  is wrong — it is minimize-bytes-subject-to-holding-cadence, a scheduling problem. P0 measures the
-  crossover PER FRAME (the recorded numbers are whole-corpus aggregates that hide the
-  distribution); P0b gets a second frame-rate point free from the in-flight `[T3]` true-60 work;
-  P1 builds the cadence model; P2 decides and records the answer either way — "not worth it, here
-  is the number" is a good outcome. No new codec: SVX2's own keyframes are the intraframe path, and
-  they already decode fast enough. (T4: P0 is dispatchable now; P2 is the design call.)
+- [T2] **Per-corpus `--dither bayer` — confirm the 10-point win on the shipped Apollo corpus at
+  the next encode.** The crossover investigation's actual payoff: Bayer moves hard-content SVX2
+  from 78.12% to 68.06% of raw (270,314 B, ~630× the affordable chooser saving) at zero cadence
+  cost and no decoder change — but it costs 2.49 dB on the smooth night leg, so it is a per-corpus
+  flag on measured grain, never a blanket switch (the existing `--dither` argument is the
+  mechanism). The 10.06-pt number was measured on a re-derived corpus (reconciles within 0.08 pts
+  on every variant); the confirming run is `--dither bayer` on the actual shipped Apollo corpus at
+  the next encode, then record the grain-threshold selection rule.
+  [P2 decision](docs/plans/2026-08-03-interframe-crossover.md).
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
   (2026-08-01); only the player-package release is left, and it is USER-GATED.**
   <!-- agent:a5850a8d3df7af344 -->
@@ -1152,6 +1129,13 @@ revisit) rather than active work._
 
 ## Parked
 
+- **Coherent a16 16-bit lane-model widening (option A from the G_ADD/G_SUB lanes verdict)** — the
+  1.48% prize (20 corpus slices improve, best −929 B) is real but unreachable by changing `G_ADD`
+  alone: with `G_LOAD`/`G_STORE`/`G_PHI`/shifts/`G_SELECT` still byte-lane, a 16-bit add is a
+  marshalling island and nets **+281 B corpus-wide**. Requires widening the whole lane model
+  together — roadmap-sized. First diagnostic on reopen: the undefined-physreg verifier failures at
+  the s16 carry seam (`pcooker_sim`, `rdiff_sim`).
+  [investigation](docs/investigations/2026-08-04-g-add-sub-s16-lanes.md).
 - **HDMA backdrop gradient for the trimerge page** — visual-polish idea deferred from the
   [99b trimerge visual fix](docs/plans/2026-07-27-99b-trimerge-visual-fix.md) because snesgfx has
   no HDMA-gradient support yet; revisit if/when the library grows one (the blossom HUD's HDMA
@@ -1167,6 +1151,8 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-04 — [gaddsub-lanes] Verdict (b): s16 add lanes LOSE (+281 B corpus; marshalling dominates) — byte chain deliberate, now documented. See [investigation](docs/investigations/2026-08-04-g-add-sub-s16-lanes.md).
+- [x] 2026-08-04 — [interframe-crossover] P0–P2 done: chooser can't hold 60 fps (φ budget spent by K=120); decided don't-build; dither is the lever. See [plan](docs/plans/2026-08-03-interframe-crossover.md).
 - [x] 2026-08-04 — [cutlabels-verify] All 8 steps PASS (host metadata rejects; ordered 0/1/2/0 latch; cut captures label-correct on the *same* presentation; six transport replays, 0 slips; loop-time reset fires only on the sequential loop; 3,822/3,822 at cadence 1; 9,177-field endurance; labels ROM-resident, absent from site/player). Reproduced on the stable 900-frame HiROM reel — the 1,800-frame 59.94 fps cartridge has no asset recipe in-tree. See [plan](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md).
 - [x] 2026-08-03 — [snes-video-reel] Reel cadence gate GREEN again — the constant was wrong, and had never been right. `expected_presented=776` was 1 too low from the hunk that introduced it (`d6030cf`), so the gate was red for a day, not broken by a later change. My first hypothesis was **wrong and disproved by measurement**: `06ffdf3` (keep video DMA inside VBlank) looked like it recovered a dropped frame, but builds at `06ffdf3^` and `06ffdf3` against an identical stream both give presented=1911 slips=0 — `snes-video-reel.c` is not the variable and there was never a slip. Real cause: with slips=0 the count is pure arithmetic, `1 + floor((4000 - t0)/CADENCE)`, and `t0` cannot depend on cadence. The gate's own cadence-1 constant `0xeee` PASSES, pinning t0=179, at which cadence-2 must be 1911; 1910 would need t0∈{181,182} and would falsify `0xeee`. The two siblings were mutually inconsistent. Fixed 776→777 with the derivation written next to both, so the next bare hex literal can be checked against its sibling by eye. Gate now passes with NO override: composite health, cadence, the new FPS-gauge step, both dashboard cuts, fidelity 47.9%/mae 10.3, transition 78.3%/mae 2.6. See [plan](docs/plans/2026-08-03-snes-fps-gauge-sweep-and-shared-component.md).
 - [x] 2026-08-03 — [snes-fps-gauge] FPS gauge extracted to `examples/snes/video_fps.h` and **gated for the first time**. Sweep first: only 2 of 9 fps-mentioning ROMs draw a gauge, and the reel's was **correct only by accident** — it sampled one VBlank early AND read the presented counter one frame early, two off-by-ones cancelling; Apollo inherited the pair, legitimately moved the call after the deadline wait, and shipped 59.1-then-60.1 to a live page. Contract is now explicit ("sample AFTER the present"), units are frames-per-600-VBlanks so the HUD and the gates' cadence tables cannot disagree, and both gate scripts assert the DISPLAYED number twice — past the first window (catches the 59.1 off-by-one) and at the end (catches the 60.1 scale). Verified before/after on identical builds: reel gauge byte-identical at 5 sample points, Apollo at 6; a cadence-2 build reads 30.0, proving the units are cadence-derived. Apollo gate PASS in full; `-verify` clean on both. **Found a pre-existing red gate on the reel** (see Open) — proven not mine by a pristine-revert control. See [plan](docs/plans/2026-08-03-snes-fps-gauge-sweep-and-shared-component.md).
