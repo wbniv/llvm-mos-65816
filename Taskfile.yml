@@ -243,6 +243,28 @@ tasks:
     cmds:
       - dev/run.sh pi
 
+  nmitally:
+    desc: "#123: VBlank Interrupt Tally — the battery's first __attribute__((interrupt)) handler. An NMI ISR advances 16/32-bit counters behind an arm/service/clear frame fence while the main loop runs +mos-a16 arithmetic. Runs the MANDATORY ISR disasm gate (tools/nmitally-isr-gate.py: entry width re-establishment, full-width A/X/Y save, Imag save/restore) plus corpus_result (0xBCE6) == host on bsnes-jg default/a16/xy16 (a16 3x byte-identical) + MAME. Leaves build/nmitally-{default,a16,xy16}.sfc + build/nmitally-{jg,mame}.png."
+    cmds:
+      - dev/run.sh nmitally
+
+  a16isr:
+    desc: "Minimal disasm-only regression gate for the 65816 interrupt-prologue width defect found by #123 (examples/65816/a16isr.c — four lines of C). No emulator, no timing."
+    cmds:
+      - dev/run.sh a16isr
+
+  nmitally-play:
+    desc: "PLAY the #123 VBlank Interrupt Tally demo in a MAME window (build first with: task nmitally)."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/nmitally.sfc ]; then
+          echo "==> build/nmitally.sfc missing — building (dev/run.sh nmitally)…"
+          dev/run.sh nmitally
+        fi
+      - task: mandel-mame
+        vars: { ROM: nmitally }
+
   bf-vm:
     desc: "#38: Brainfuck threaded-code VM — computed goto (goto *handlers[op] → indirect jmp). Runs Hello World; assert corpus_result (bf_vm_gate_crc 0x9954) == host on MAME + bsnes-jg + disasm gate (indirect-jmp + rep/sep, control-flow only, no __mul/__udiv). Leaves build/bf-vm.sfc + build/bf-vm-{mame,jg}.png."
     cmds:

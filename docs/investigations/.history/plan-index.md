@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/29a92f6) | docs(60fps+todo): truncstair F2/F3 done — correct this document's own deferral verdict |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/fab41e7) | docs(plan-index): #128 row + tail creation-order fix (300 plans, coverage complete) |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/f369e6c) | docs(todo+plan-index): triage the #128 inbox deferral; index the plan |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/e1e5068) | docs(plan-index): #99c row (299 plans, coverage stays complete) |
@@ -217,6 +218,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+29a92f6	author	Will Norris
+29a92f6	added	3
+29a92f6	deleted	0
+29a92f6	files	1
+29a92f6	body	Promotes both truncstair items to Done (bb460a4) and records the finding that\ngeneralises beyond this demo.\n\nThe sweep had deferred F2 three times on a stated blocker -- a 32-column canvas,\n8 KB shadow, bank-$7E DMA. That verdict was wrong: it treated a CANVAS-WIDTH\nproblem as the ring's prerequisite, when the ring only ever needed the TILEMAP to\nrepeat. _canvas_init writes a static tilemap that never changes per frame, so the\nring is a one-time map change. The correction is called out in the document\nrather than quietly patched, since the cost of the error was three deferrals.\n\nNew method lesson 5: a row-major dirty RANGE makes vertical and horizontal rings\nstructurally different. A vertical ring stages a ROW (16 adjacent tiles, 256 B --\ndrains in one v-blank, so #99c and mvscrl paint every frame); a horizontal ring\nstages a COLUMN (16 tiles strided one row apart, ~240 tiles of range), so the\nqueue never empties and the HDMA pointer poke loses the budget. Lowering\nCANVAS_FLUSH_TILES moved the stalls rather than removing them, which is what\ndisproved the "flush too large" diagnosis. F2's cost is therefore not uniform\nacross demos, and candidacy should ask which AXIS a demo scrolls.\n\nAlso notes the third failure-path tool defect of the day (scroll-ring-check.py\ncrashed instead of reporting a stall), matching lessons 3 and 4.\n\nplan-index: adds the three unindexed plans (gallery per-image selfcheck,\nBLANKSCAN quiescence, truncstair F2/F3).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 fab41e7	author	Will Norris
 fab41e7	added	1
 fab41e7	deleted	1

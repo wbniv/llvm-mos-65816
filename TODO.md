@@ -993,7 +993,14 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   owns and mark the LoROM implementation-record figures historical. (T4: plan-level ownership
   decision + cross-session file — `snes-video-reel.c` has in-flight edits from another worker.)
 - [verify T3] **lzss-gallery-navigation-and-auto-advance-chevron** — implemented, live, chevron
-  input re-fixed `3b8a559`; verify against current main.
+  input re-fixed `3b8a559`; verify against current main. **2026-08-04 run recorded: 14/15 PASS.**
+  Steps 1–14 green (ROM nav + auto-advance chevron + wrap, 120 ms touch pulse and all four
+  cancellation surfaces, identical `touchNav` rects, full gallery gate incl. the 700k-frame visual
+  corpus, live ROM SHA-256 `a5e59d79…` matching on both sites). **Step 15 FAIL**: the
+  indri.studio embed never starts its emulator (canvas frozen, `max |luma - baseline| = 0.00` in
+  every condition *including* the no-input control), so live navigation cannot be exercised there
+  — suspected page-template vs pinned-player drift (`v0.1.135` template, `v0.1.133` player pin).
+  biohack.net passes all four input surfaces. Needs a T4 owner for the indri embed.
   [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)
 - [verify T3] **svx2-cut-aware-dashboard-labels** — implemented + wired into the shipping
   59.94 fps build; status claims target-verified but the steps were never recorded.
