@@ -1007,6 +1007,16 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   [plan](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md)
 
 
+- [T2] **indri.studio embedded player never starts the ROM — canvas bit-frozen at the poster.**
+  Found by nav-chevron verification step 15 (14/15 PASS otherwise; biohack.net passes all four
+  input surfaces with the same ROM): on indri, player script + core load, nothing errors, but
+  `#status` never reaches `running <rom>.sfc`, so `playUrl()` never fires. Lead: page-template vs
+  pinned-player drift — `v0.1.135` (the [dual-site drift audit](docs/investigations/2026-08-03-dual-rom-site-drift-audit.md)'s
+  own remediation `2b78747`) regenerated the template from biohack's newer bootstrap while indri's
+  player stays pinned at `v0.1.133`. Fix: repin/republish indri's player (or re-sync the
+  template), then re-run nav-chevron step 15 to close its lone FAIL. Live user-facing breakage on
+  every indri SNES page — worth doing soon. (T2: bounded site-repo fix, diagnosis already made;
+  the audit doc records the machinery.)
 ## Watch
 
 _Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
