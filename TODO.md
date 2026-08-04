@@ -797,6 +797,19 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   from them inherits it. The fix, already applied in `dev/nmitally.sh`: an explicit `-fno-lto -c`
   verify compile per feature mode plus an `llvm-objdump -h` real-object check proving the output
   isn't bitcode. Sweep all demo gate scripts + the template.
+  **Progress 2026-08-04:** swept all `dev/*.sh` + the `/snes-demo` template; **21/23 genuine
+  offenders fixed** (`dev/a16absidx.sh`, `a16indiry.sh`, `a16regpress.sh`, `blossom-grid.sh`,
+  `buddha-grid.sh`, `far_arith.sh`, `far_call.sh`, `far_cast.sh`, `far_fnptr.sh`, `far_indir.sh`,
+  `far_indir_tail.sh`, `far_memops.sh`, `far_near_call.sh`, `far_sizeof.sh`, `far_store.sh`,
+  `invaders.sh`, `mandel-far.sh`, `measure-far-cc.sh`, `packed24.sh`, `packed24_table.sh`,
+  `buddha.sh`) + `.claude/skills/snes-demo/SKILL.md` §6 template; red/green proven (bitcode
+  correctly rejected by `objdump -h`, real object correctly accepted). **2 ESCALATED, left
+  vacuous:** `dev/blossom.sh` and `dev/mandel-oop.sh` — a real `-fno-lto -c` verify leg trips the
+  **already-known** `a16-rc-undef-ra-pure-virtual` MachineVerifier false-positive (same signature
+  as the `mandel-double`/`gouraud` Done entries; differential-proven correct, not a miscompile).
+  Landing the fix there needs XFAIL-aware wiring into the `tools/a16_fuzz.py` `KNOWN_ISSUES`
+  registry (`dev/known-issues.sh`'s mechanism) that a bounded per-script edit shouldn't improvise
+  — needs T3/T4 design work, tracked as a follow-up in the plan.
   [plan](docs/plans/2026-08-03-123-snes-nmitally.md).
 - [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
   The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the

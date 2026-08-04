@@ -41,6 +41,14 @@ OFF="0x$VMA"
 ADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$VMA )))
 echo "==> built build/mandel-oop.sfc (+mos-a16, -verify clean); corpus_result @ WRAM $OFF"
 
+# NOT FIXED: the vacuous-verify pattern (link above claims -mllvm -verify-machineinstrs but
+# --config's default LTO never runs it) still applies here. An explicit -fno-lto -c verify
+# compile was tried and trips the ALREADY-KNOWN `a16-rc-undef-ra-pure-virtual` MachineVerifier
+# false-positive (KNOWN_ISSUES in tools/a16_fuzz.py; see TODO.md's mandel-double/gouraud
+# entries for prior witnesses; fix plan docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
+# Wiring a real verify leg here needs XFAIL-awareness this script doesn't have — left vacuous
+# rather than landing a leg that hard-crashes the gate on a pre-existing, differential-proven-
+# correct issue. See docs/plans/2026-08-03-123-snes-nmitally.md follow-up.
 rc=0
 
 # 2. bsnes-jg — dump framebuffer + assert corpus_result.

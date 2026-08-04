@@ -43,7 +43,9 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 
 rc=0
 echo "==> disasm gate: the far->near TAIL call folds to a long jmp to __call_near_from_far (TailJML \$5C), not jsl+rtl"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
+"$TOOL/llvm-objdump" -h "$OBJ" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 DIS="$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$OBJ")"
 # Isolate far_caller's block (its only call — the tail `return near_helper(x)`).
 CALLER="$(printf '%s\n' "$DIS" | awk '

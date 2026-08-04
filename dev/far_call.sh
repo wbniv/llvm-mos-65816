@@ -38,7 +38,9 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 
 rc=0
 echo "==> disasm gate: the call site is JSL (far call) and the far leaf returns with RTL"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
+"$TOOL/llvm-objdump" -h "$OBJ" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 DIS="$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$OBJ")"
 printf '%s\n' "$DIS" | grep -iE '\b(jsl|rtl)\b' || true
 printf '%s\n' "$DIS" | grep -qiE '\bjsl\b' && echo "  PASS: far call site -> JSL (\$22)" || { echo "  FAIL: no JSL (far call) emitted"; rc=1; }

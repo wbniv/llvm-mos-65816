@@ -36,7 +36,9 @@ WANT=0x74   # 50*0x5A + sum(0..63) = 6516 & 0xFF
 rc=0
 echo "==> disasm gate: far memops route to the FAR runtime (__memset_far/__memcpy_far), not the near one"
 OBJ="$BUILD/far_memops.o"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
+"$TOOL/llvm-objdump" -h "$OBJ" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 DIS="$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$OBJ")"
 if printf '%s\n' "$DIS" | grep -qE '__memset_far' && printf '%s\n' "$DIS" | grep -qE '__memcpy_far'; then
   echo "  PASS: calls __memset_far and __memcpy_far"

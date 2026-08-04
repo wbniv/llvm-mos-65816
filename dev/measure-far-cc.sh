@@ -52,7 +52,9 @@ for v in "${ORDER[@]}"; do
     -Xclang -target-feature -Xclang "$flag" -Os -mllvm -verify-machineinstrs \
     -Wl,-Map="$map" -o "$rom" "$BENCH"
   "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" \
-    -Xclang -target-feature -Xclang "$flag" -Os -c -o "$obj" "$CENSUS"
+    -Xclang -target-feature -Xclang "$flag" -Os -mllvm -verify-machineinstrs -c -o "$obj" "$CENSUS"
+  "$TOOL/llvm-objdump" -h "$obj" >/dev/null 2>&1 \
+    || { echo "  $v: FAIL — -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
   BYTES[$v]="$(text_bytes "$obj")"
 
   read -r cv _ < <(_emu_map_lookup "$map" corpus_result) || true

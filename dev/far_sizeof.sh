@@ -44,7 +44,9 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 
 rc=0
 echo "==> disasm gate: the stored far pointer is dereferenced indirect-long (A7 = lda [dp])"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
+"$TOOL/llvm-objdump" -h "$OBJ" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 DIS="$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$OBJ")"
 printf '%s\n' "$DIS" | grep -iE '^\s*[0-9a-f]+:\s*a7 ' || true
 printf '%s\n' "$DIS" | grep -qiE '^\s*[0-9a-f]+:\s*a7 ' && echo "  PASS: stored far pointer deref -> LDA IndirectLong (A7)" || { echo "  FAIL: no A7 (indirect-long) load of the stored far pointer"; rc=1; }

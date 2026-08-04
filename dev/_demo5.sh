@@ -23,10 +23,22 @@ build_variant() {  # name flags...
 }
 
 echo "== -verify-machineinstrs =="
+# -fno-lto is REQUIRED: --config defaults to LTO, under which -c stops after emitting LLVM IR
+# bitcode -- codegen (and therefore -verify-machineinstrs) never runs, yet the driver still
+# exits 0. Without it this "verify" step silently passes on every input (found battery-wide;
+# see tools/a16_fuzz.py verify_machineinstrs()/VerifyVacuousError for the same fix + rationale).
 for feat in +mos-a16 +mos-xy16; do
-  if "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 -Xclang -target-feature -Xclang $feat -Os \
+  if "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 -fno-lto -Xclang -target-feature -Xclang $feat -Os \
        -mllvm -verify-machineinstrs -c "$ROOT/examples/snes/corpus/${SLUG}_sim.c" \
        -I"$ROOT/examples" -o "$BUILD/${SLUG}_verify.o" 2>"$BUILD/${SLUG}_verify.log"; then
+    # rc=0 is NOT proof the verifier ran -- assert the output is a real object, not bitcode
+    # (raw magic 'BC\xc0\xde' or the bitcode-wrapper magic), or this gate can never fail.
+    magic=$(head -c4 "$BUILD/${SLUG}_verify.o" | od -An -tx1 | tr -d ' \n')
+    if [ "$magic" = "4243c0de" ] || [ "$magic" = "dec0170b" ]; then
+      echo "  $feat: VACUOUS-VERIFY-GATE-BROKEN — emitted object is LLVM IR bitcode, not a" \
+           "target object (codegen never ran); -fno-lto is missing or ineffective"
+      exit 1
+    fi
     echo "  $feat: verify OK"
   else
     echo "  $feat: verify FAILED"; cat "$BUILD/${SLUG}_verify.log"; exit 1

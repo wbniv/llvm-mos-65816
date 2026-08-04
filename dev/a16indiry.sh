@@ -37,7 +37,9 @@ printf '    %-12s %6s bytes\n' a16indiry.sfc "$(stat -c%s "$ROM")"
 
 rc=0
 echo "==> disasm gate: native 16-bit lda (zp),y (B1) under rep/sep — no iny+byte-pair"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
+"$TOOL/llvm-objdump" -h "$OBJ" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
 printf '%s\n' "$DIS" | grep -iE '^\s*[0-9a-f]+:\s*(c2 20|e2 20|b1|91|88|c8)\b' | head -20
 nrep=$(printf '%s\n' "$DIS"  | grep -ciE '^\s*[0-9a-f]+:\s*c2 20\b' || true)

@@ -49,7 +49,9 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM"
 
 rc=0
 echo "==> disasm gate: call site is JSL __call_indir_far; 24-bit target carries a bank reloc; far_leaf RTLs"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
+"$TOOL/llvm-objdump" -h "$OBJ" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 DIS="$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$OBJ")"
 printf '%s\n' "$DIS" | grep -iE '\bjsl\b|__call_indir_far|ADDR24_BANK|mos24bank|\brtl\b' || true
 if printf '%s\n' "$DIS" | grep -iqE '\bjsl\b' && printf '%s\n' "$DIS" | grep -q '__call_indir_far'; then

@@ -50,3 +50,49 @@ Both sites serve visual republish ROM SHA-256
 `a2e40ea72618641eed1804846f5cd6f0032a33a6dbcf655f737b176cead21283`.
 Visual republish commits/releases: biohack.net `6f05515` / `v1.0.368`, indri.studio `061b749` /
 `v0.1.138`.
+
+## Follow-up: vacuous `-verify-machineinstrs` sweep (2026-08-04)
+
+This demo's gate script comments (the `-fno-lto -c` + `llvm-objdump -h` block added above) named
+`dev/_demo5.sh` and the `/snes-demo` skill template as sibling offenders — under the platform
+config's default LTO, `mos-clang --config … -c` (or an unqualified `--config … -o rom.sfc`) emits
+LLVM IR bitcode / never forwards `-mllvm` to the LTO backend, so `-mllvm -verify-machineinstrs` on
+those invocations verifies nothing (a silent, always-PASS gate). TODO item tracked this as a
+sweep-and-fix across all `dev/*.sh`.
+
+**Swept 2026-08-04 — 21/23 offenders fixed, 2 escalated.** Every `dev/*.sh` and the
+`.claude/skills/snes-demo/SKILL.md` §6 disasm-probe template were audited (grep for
+`-verify-machineinstrs` invocations, classify each by whether it shares a compile with `--config`
+without `-fno-lto`/`--target=mos`). 23 genuine offenders found (most already had a *separate*
+non-LTO `--target=mos -c` disasm-gate compile the flag could ride on; four — `blossom.sh`,
+`buddha.sh`, `invaders.sh`, `mandel-oop.sh` — needed a brand-new nmitally-style verify block).
+Fix landed and verified clean (host-run `-fno-lto`/`--target=mos` compile + `llvm-objdump -h`
+real-object check) for 21 scripts. Red proof: the OLD `--config … -c` pattern (no `-fno-lto`) was
+reproduced on `a16absidx.c` — `mos-clang` exits 0 but emits `LLVM IR bitcode` (magic `42 43 c0
+de`), and `llvm-objdump -h` correctly **rejects** it (`error: … not recognized as a valid object
+file`), proving the check has teeth. Green proof: the fixed `--target=mos -mllvm
+-verify-machineinstrs -c` pattern emits a real `elf32-mos` object and `llvm-objdump -h` accepts it.
+
+**ESCALATED — left vacuous:** `dev/blossom.sh` and `dev/mandel-oop.sh`. A real `-fno-lto -c`
+verify leg on `examples/snes/blossom.c` and `examples/snes/mandel-oop.c` (both `+mos-a16`, `-Os`)
+trips:
+
+```
+*** Bad machine code: Using an undefined physical register ***
+- function:    main
+- instruction: renamable $x = COPY renamable $rc2
+fatal error: error in backend: Found 1 machine code errors.
+```
+
+This is **not a new defect** — it is another witness of the already-tracked
+`a16-rc-undef-ra-pure-virtual` MachineVerifier false-positive (`tools/a16_fuzz.py`
+`KNOWN_ISSUES`; prior witnesses on `mandel-double` and `gouraud`, both differential-proven correct
+per TODO.md's Done entries; open root-cause plan:
+[2026-06-29 rc-undef fix](2026-06-29-a16-rc-undef-ra-machineverifier-fix.md)). The other 4 far-grid/
+Mode-7 demos in the same family (`buddha.sh`, `invaders.sh`) verified clean, so this is
+codegen-shape-specific, not universal to the family. Landing a real verify leg on these two
+scripts without XFAIL-awareness would turn an always-green (vacuous) gate into an always-crashing
+one on a pre-existing, accepted issue — worse than leaving it vacuous. Wiring the demo-level gate
+scripts into the `tools/a16_fuzz.py` `KNOWN_ISSUES` / `dev/known-issues.sh` XFAIL mechanism (today
+that registry only covers corpus-slice fuzzing, not whole-ROM demo gates) is a design decision
+outside a bounded per-script edit — **ESCALATE to T3/T4**.

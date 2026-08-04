@@ -48,7 +48,9 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM" >/dev/null
 
 rc=0
 echo "==> 3) disasm gate: far RMW lowers to indirect-long (a7 = lda [dp], 87 = sta [dp]) + native 16-bit"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
+"$TOOL/llvm-objdump" -h "$OBJ" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 DIS="$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ")"
 NA7=$(echo "$DIS" | grep -ciE '^[[:space:]]*[0-9a-f]+:[[:space:]]*a7 ' || true)
 N87=$(echo "$DIS" | grep -ciE '^[[:space:]]*[0-9a-f]+:[[:space:]]*87 ' || true)

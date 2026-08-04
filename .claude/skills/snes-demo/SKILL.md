@@ -492,11 +492,20 @@ echo "==> built build/<slug>.sfc; corpus_result @ WRAM $OFF"
 
 rc=0
 
-# §3. Disasm probe — edit these for your demo's codegen corners
+# §3. Disasm probe — edit these for your demo's codegen corners.
+# -mllvm -verify-machineinstrs is REAL here (non-vacuous): this is a --target=mos direct
+# compile, which never routes through the platform config's default LTO, so codegen
+# genuinely runs. (Do NOT rely on a `--config ... -c` invocation for verify — under LTO
+# that only emits LLVM IR bitcode and the flag never reaches the LTO backend, a silent
+# always-PASS vacuous gate found battery-wide; see dev/nmitally.sh.) The objdump -h check
+# below is belt-and-suspenders proof the emitted file is a real object, not bitcode.
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 \
   -Xclang -target-feature -Xclang +mos-a16 -Os \
+  -mllvm -verify-machineinstrs \
   -c "$ROOT/examples/snes/corpus/<slug>_sim.c" \
   -I"$ROOT/examples" -o "$BUILD/<slug>_sim.o" 2>/dev/null
+"$TOOL/llvm-objdump" -h "$BUILD/<slug>_sim.o" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 dis=$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$BUILD/<slug>_sim.o" 2>/dev/null || true)
 div=$(printf '%s\n' "$dis" | grep -c '__udivmodsi4' || true)   # edit as needed
 mul=$(printf '%s\n' "$dis" | grep -cE '__mulsi3|__umulsi3' || true)
@@ -760,5 +769,6 @@ Full-screen tilemap re-upload (32×28 × 2 = 1 792 bytes) does NOT fit one V-bla
   `build/<slug>-jg.png` shows the demo running (this is the title card + web preview).
 - **After the title card:** `docs/plans/screenshots/<slug>.png` exists, the plan's `<img>`
   resolves under `task md`, and the *same* file is the `/snes-rom-page --preview`.
-- **After publication:** headless screenshot of `http://localhost:8799/<slug>/` shows the ROM
+- **After publication:** headless screenshot of the local preview
+  ([http://localhost:8799/](http://localhost:8799/) + the demo's slug path) shows the ROM
   running (not a blank page or "ROM failed to load").

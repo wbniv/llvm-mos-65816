@@ -43,10 +43,14 @@ echo "==> compile+link PACKED table -> $(basename "$ROM")  (--config mos-snes-fa
 "$TOOL/mos-clang" --config "$INSTALL/bin/mos-snes-far.cfg" -mcpu=mosw65816 "${A16[@]}" -Os \
   -mllvm -verify-machineinstrs -Wl,-Map="$MAP" -o "$ROM" "$SRC"
 python3 "$ROOT/tools/snes-checksum.py" "$ROM"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
 
 echo "==> compile AS_Far baseline (-DUSE_FAR) for the storage delta"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -DUSE_FAR -c -o "$OBJ_FAR" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -DUSE_FAR -mllvm -verify-machineinstrs -c -o "$OBJ_FAR" "$SRC"
+for o in "$OBJ" "$OBJ_FAR"; do
+  "$TOOL/llvm-objdump" -h "$o" >/dev/null 2>&1 \
+    || { echo "FAIL: -verify-machineinstrs emitted no real object for $(basename "$o") (vacuous verify)"; exit 1; }
+done
 
 rc=0
 PSZ=$(tblsz "$OBJ"); FSZ=$(tblsz "$OBJ_FAR")

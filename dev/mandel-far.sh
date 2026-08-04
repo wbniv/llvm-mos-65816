@@ -38,7 +38,9 @@ python3 "$ROOT/tools/snes-checksum.py" "$ROM" >/dev/null
 
 rc=0
 echo "==> disasm gate: the far store into high WRAM is indirect-long (87 = sta [dp])"
-"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$OBJ" "$SRC"
+"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -mllvm -verify-machineinstrs -c -o "$OBJ" "$SRC"
+"$TOOL/llvm-objdump" -h "$OBJ" >/dev/null 2>&1 \
+  || { echo "FAIL: -verify-machineinstrs emitted no real object (vacuous verify)"; exit 1; }
 # grep -c (not -q): -q exits on first match and closes the pipe, which SIGPIPEs
 # llvm-objdump → under `set -o pipefail` the pipeline reports failure even on a match.
 N87=$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$OBJ" | grep -ciE '^[[:space:]]*[0-9a-f]+:[[:space:]]*87 ' || true)

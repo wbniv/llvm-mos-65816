@@ -52,6 +52,20 @@ VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$BUILD/invaders.map"); OFF="0x
 ADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$VMA )))
 echo "==> built default + a16; corpus_result @ WRAM $OFF"
 
+# -verify-machineinstrs must run where codegen runs. Under the config's default LTO,
+# build_rom's link above does not forward -mllvm to the LTO backend, so the flag on it
+# verifies NOTHING (the wt/321-nmitally vacuous-verify finding). Verify on an explicit
+# -fno-lto object per mode and prove the output is a real object, not bitcode.
+echo "==> -verify-machineinstrs (-fno-lto, so codegen actually runs)"
+for vmode in default a16; do
+  vfeat=(); [ "$vmode" = a16 ] && vfeat=(-Xclang -target-feature -Xclang +mos-a16)
+  "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 "${vfeat[@]}" -Os \
+    -fno-lto -mllvm -verify-machineinstrs -c "$SRC" -o "$BUILD/invaders-verify.o"
+  "$TOOL/llvm-objdump" -h "$BUILD/invaders-verify.o" >/dev/null 2>&1 \
+    || { echo "FAIL: $vmode verify emitted no real object (vacuous verify)"; exit 1; }
+  echo "    PASS: $vmode verify clean (real object emitted)"
+done
+
 # Emulator frames to let the attract sim reach the latch point. The game runs ~1 sim step per loop
 # iteration, but a frame's render+update can span up to ~2 v-blanks. The complete title fly-in,
 # hold, fall, and fade run before the simulation starts, so budget those intro frames as margin.

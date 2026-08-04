@@ -53,6 +53,17 @@ CV=$(awk '$NF=="corpus_result"{print $1; exit}' "$MAP")
 ADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$CV )))
 echo "==> built $(basename "$ROM") (+mos-a16); corpus_result @ \$$CV"
 
+# -verify-machineinstrs must run where codegen runs. Under the config's default LTO, the
+# link above does not forward -mllvm to the LTO backend, so the flag on it verifies
+# NOTHING (the wt/321-nmitally vacuous-verify finding). Verify on an explicit -fno-lto
+# object and prove the output is a real object, not bitcode.
+echo "==> -verify-machineinstrs (-fno-lto, so codegen actually runs)"
+"$TOOL/mos-clang" --config "$INSTALL/bin/mos-snes.cfg" -mcpu=mosw65816 "${A16[@]}" -Os \
+  -fno-lto -mllvm -verify-machineinstrs -c "$SRC" -o "$BUILD/buddha-verify.o"
+"$TOOL/llvm-objdump" -h "$BUILD/buddha-verify.o" >/dev/null 2>&1 \
+  || { echo "FAIL: +mos-a16 verify emitted no real object (vacuous verify)"; exit 1; }
+echo "    PASS: +mos-a16 verify clean (real object emitted)"
+
 rc=0
 
 # 3. bsnes-jg: grid gate + framebuffer dump (build a plain jgxcheck from current source).
