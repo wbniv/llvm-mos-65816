@@ -2014,4 +2014,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • publishing -> the standard user-gated /snes-rom-page flow (never tracked as open work);
      • ABORT $FFE8/$FFF8 = $0000 -> documented non-work (pin not connected on SNES; decision in the plan);
      • assembler cop / brk #imm -> queued in docs/upstream-contribution-status.md "Future / blocked". -->
+- [ ] **(triage)** Publishing to biohack.net / indri.studio (user-gated follow-up). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:4b71ee8c13a90d5b -->
+- [ ] **(triage)** MAME leg (SKIP-by-design without the SPC700 IPL). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:bc642b4b5ab8d2bf -->
+- [ ] **(triage)** H-mode (per-scanline) IRQ. At ~262 IRQs/frame the C ISR prologue alone exceeds a scanline, so — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:8974b954bfca2a54 -->
 <!-- END auto-captured-deferrals -->

@@ -193,10 +193,20 @@ def main(argv):
             continue
         nxt = insns[i + 1][1] if i + 1 < len(insns) else ""
         a = re.match(r"adc\s+#\$([0-9a-f]+)", nxt)
-        if a:
-            delta = int(a.group(1), 16)
-            sp_adj += delta if m.group(1) == "__rc0" else delta << 8
-            sp_note.append("%s%+d" % (m.group(1), delta))
+        if not a:
+            continue
+        # The addition only counts as a soft-stack-pointer ADJUSTMENT if the result is written
+        # BACK to the same __rc register. `lda __rc0; adc #$19; sta __rc2` is an ADDRESS
+        # computation — a pointer to a frame slot — and counting it as an adjustment reported a
+        # phantom imbalance on #139's `irq`, whose handler holds a frame-resident local (the
+        # volatile TIMEUP acknowledge). Checking the destination is strictly tightening: a real
+        # carve/restore always stores back to __rc0/__rc1.
+        back = insns[i + 2][1] if i + 2 < len(insns) else ""
+        if not re.match(r"sta\b", back) or ("<%s>" % m.group(1)) not in back:
+            continue
+        delta = int(a.group(1), 16)
+        sp_adj += delta if m.group(1) == "__rc0" else delta << 8
+        sp_note.append("%s%+d" % (m.group(1), delta))
     sp_balanced = (sp_adj & 0xFFFF) == 0
     if sp_balanced:
         print("    PASS  C0 soft-stack ptr: __rc0/__rc1 adjustments balance to 0 (%s)"
