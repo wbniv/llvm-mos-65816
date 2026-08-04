@@ -1,7 +1,14 @@
 # Where interframe coding stops paying — measure the crossover, then decide
 
-**Date:** 2026-08-03 · **Status:** PLANNED
+**Date:** 2026-08-03 · **Status:** P0 / P0b / P1 MEASURED 2026-08-04 — P2 open
 **Item:** TODO `[T4]` · **Visible surface:** none until a decision is taken — no mockups.
+
+**Measurement tool:** [`tools/snes-video-crossover.py`](../../tools/snes-video-crossover.py).
+**Headline:** on hard content **96.16%** of frames want a keyframe — but the cadence budget at
+60 fps is **0.84%** of frames, and the shipped `K=120` policy already spends all of it, so a chooser
+can buy **430 B on 2.1 MB (0.02%)**. Switching that same footage from Floyd to **Bayer** dither buys
+**270,314 B (10.06 points)** at zero cadence cost. See [Results](#results-2026-08-04) and the
+[recommendation](#recommendation-p2-input--the-decision-itself-stays-open).
 
 ## The observation
 
@@ -46,6 +53,11 @@ scheduling problem (how many 2-VBlank slots can a 600-VBlank window absorb), not
 
 ## Phases
 
+> **Status 2026-08-04:** P0 ✅, P0b ✅ (extended with the dither experiment it called for), P1 ✅ —
+> all measured, results in [Results (2026-08-04)](#results-2026-08-04). P2 remains open; a
+> [recommendation](#recommendation-p2-input--the-decision-itself-stays-open) is on file, the decision
+> is not. P3 is unstarted and, on the recommendation, should not start.
+
 **P0 — measure the crossover per frame, not per corpus.** Everything above is a whole-corpus
 aggregate, which hides the distribution. For each frame of each corpus, record `size(delta)` and
 `size(keyframe)`; the encoder computes both already or can be made to. Deliver: the fraction of
@@ -88,6 +100,154 @@ good outcome and cheaper than discovering it in an implementation.
 already handles both packet kinds, so this should be small. Re-gate byte-correctness and cadence on
 every corpus, not just the one that motivated it.
 
+## Results (2026-08-04)
+
+Measured with [`tools/snes-video-crossover.py`](../../tools/snes-video-crossover.py), which reports,
+for every frame of a tile corpus, `size(delta)` and `size(keyframe)` including the 2-byte container
+prefix, then evaluates the constrained chooser of P1.
+
+### The structural finding that makes the analysis tractable
+
+**Per-frame packet costs are independent of every other frame's choice.** SVX2 is lossless, so the
+decoded previous frame equals the source previous frame whichever packet kind was emitted for it;
+frame *i*'s delta is coded against the same bytes either way. The tool establishes this rather than
+assuming it — it decodes *both* packet kinds for every frame and checks each against the source.
+
+Consequence: "minimise bytes subject to a keyframe budget" is a **top-*m* selection**, not a dynamic
+program over reconstruction state. Take every forced keyframe, then spend the remaining budget on the
+frames with the largest `delta − key`. This is worth recording because it removes the main
+implementation risk a chooser would otherwise carry.
+
+### Corpus availability — what could and could not be re-derived
+
+| corpus | status |
+|---|---|
+| Artemis I night launch, Floyd, 300 f | **on disk, SHA-matched** — `build/real-video-floyd.tiles`, `2a42494…d154b`, matches the benchmark doc |
+| Apollo v2 recut (30 fps) and v3 (59.94 fps) | **gone.** Both need 20 s of the 2.37 GB Apollo master, which is deliberately not vendored; the vendored `apollo11-daylight-5994p.mp4` excerpt is only 10.01 s |
+| Apollo **real-time control**, 600 f | **re-derived** from the vendored excerpt. The excerpt is a re-encode, so the RGB24 SHA does not match (`0db7a75b…` vs recorded `cb0bc845…`) — but every codec aggregate lands within **0.08 points** of the record (table below), so the per-frame distribution derived from it is trustworthy |
+| Artemis Bayer, 300 f | **not reproducible** — the Artemis source `mp4` is not vendored and no RGB24 survived |
+
+Aggregate reconciliation for the re-derived real-time control corpus, against the numbers recorded in
+[`real-video-codec-benchmark.md`](2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md):
+
+| variant | recorded | re-derived | drift |
+|---|---:|---:|---:|
+| raw blocks | 2,737,200 (101.83%) | 2,737,200 (101.83%) | 0 |
+| scanline PackBits | 2,035,958 (75.74%) | 2,035,913 (75.74%) | −45 B |
+| gallery LZSS | 1,826,062 (67.93%) | 1,828,138 (68.01%) | +0.08 pt |
+| xor-PackBits K=120 | 2,095,363 (77.95%) | 2,097,086 (78.02%) | +0.07 pt |
+| full SVC1 K=120 | 2,094,365 (77.92%) | 2,095,930 (77.97%) | +0.05 pt |
+| **SVX2 K=120** | **2,098,219 (78.06%)** | **2,099,896 (78.12%)** | **+0.06 pt** |
+
+The recorded LZSS-ahead figure for this point is 10.13 pts; the re-derivation gives 10.11 pts.
+
+### P0 — the per-frame crossover distribution
+
+| corpus | frames | keyframe smaller than delta | mean `delta − key` | total saving available |
+|---|---:|---:|---:|---:|
+| **Apollo real-time control, Floyd** (hard) | 600 | **576 / 599 = 96.16%** | **+101.5 B** | 61,170 B (2.28% of raw) |
+| Artemis apollo mixed reel (shipped, 1200 f) | 1200 | 238 / 1199 = 19.85% | −97.7 B | 31,447 B (0.58%) |
+| Artemis I night launch, Floyd (easy) | 300 | 15 / 299 = 5.02% | −144.8 B | 618 B (0.05%) |
+| Artemis 59.94 real camera (`real-5994`) | 600 | 4 / 599 = 0.67% | −758.6 B | 291 B (0.01%) |
+| **Apollo real-time control, BAYER** (same footage) | 600 | **2 / 599 = 0.33%** | **−527.9 B** | 72 B (0.00%) |
+| XRISM native 60 (CG) | 1800 | 2 / 1799 = 0.11% | −216.5 B | 719 B (0.01%) |
+
+**P0's stated closing condition does not fire.** The plan said: *"If that fraction is small and
+concentrated (e.g. only at shot cuts), a chooser is not worth building and this closes with a
+recorded answer."* On hard content the fraction is neither small nor concentrated — 96.16% of frames,
+in **19 runs with a longest run of 265 consecutive frames**, on a shot that contains no cuts at all.
+It is a *sustained regime*, not an event. The top 1% of frames carry only 2.2% of the total saving.
+
+So the chooser is not killed by P0. It is killed by P1.
+
+### P0b — the second frame-rate point, and the dither experiment it redirected to
+
+The three-frame-rate table above the fold stands as recorded; nothing here overwrites it. What this
+run adds is the experiment that table pointed at: **re-pack the identical footage with an ordered
+(Bayer) dither**, which is deterministic and frame-stable, and see whether SVX2's advantage returns.
+
+Same 600 frames, same crop, same sampling, `K=120` — only the dither differs:
+
+| dither | gallery LZSS (intraframe, ~2.2 fps decode) | SVX2 (interframe, 60 fps decode) | winner | PSNR |
+|---|---:|---:|---|---:|
+| Floyd–Steinberg | 1,828,138 (68.01%) | 2,099,896 (78.12%) | LZSS by 10.11 pts | 31.66 dB |
+| **Bayer 8 × 8** | 1,932,623 (71.90%) | **1,829,582 (68.06%)** | **SVX2 by 3.84 pts** | 31.42 dB |
+
+**The crossover is a property of the dither, and it is fully reversible.** Bayer moves SVX2 from
+78.12% to 68.06% of raw — **270,314 B, 10.06 points** — on byte-identical footage, and simultaneously
+makes LZSS *worse* (68.01% → 71.90%), because a fixed threshold matrix holds background pixel indices
+stable between frames while error diffusion re-randomises them. The keyframe-favouring frame fraction
+collapses from 96.16% to 0.33%.
+
+Note where that lands: **SVX2 + Bayer (68.06%) matches the best size any codec reached on this
+footage** — LZSS + Floyd's 68.01% — while decoding ~27× faster and needing no code change at all.
+The quality cost measured on this corpus is **0.24 dB** (31.66 → 31.42); the benchmark doc records
+0.06 dB on the uncropped v1 interval, against 2.49 dB on the smooth night leg. Real film grain
+already looks like dither noise, so on exactly the content where the crossover appears, Bayer is
+close to free.
+
+### P1 — the cadence model
+
+Model, calibrated against the two recorded operating points before use. Costs in VBlanks per packet:
+keyframe `600/537 = 1.117` (staged specialization, Option C), delta `600/674 = 0.890` slow ROM and
+`600/754 = 0.796` FastROM (hardest stream slice). The shipped schedule decodes one packet per
+interval and does not split a decode across intervals, so a packet costing more than one VBlank
+consumes **two slots** and anything under one consumes **one**. With `φ` the keyframe fraction:
+
+```math
+\text{effective fps} = 60 \cdot \frac{N}{2m + (N-m)} = \frac{60}{1 + \varphi}
+```
+
+**Maximum keyframe fraction, by the rate you insist on holding:**
+
+| hold at least | φ ≤ | i.e. one keyframe per |
+|---|---:|---:|
+| exact 60 fps | **0%** | never |
+| 59.94 fps (NTSC nominal) | 0.1001% | 999 frames |
+| **59.50 fps (what `K=120` ships)** | **0.8403%** | **119 frames** |
+| 59.00 fps | 1.6949% | 59 frames |
+| 58.00 fps | 3.4483% | 29 frames |
+| 55.00 fps | 9.0909% | 11 frames |
+| 30.00 fps | 100% | every frame |
+
+**The shipped `K=120` policy already spends the entire 60 fps keyframe budget.** At 59.50 fps the
+budget is one keyframe per 119 frames, and `K=120` emits one per 120. A chooser at 60 fps therefore
+has **no keyframes to spend** — every keyframe it adds beyond the seek grid comes straight off the
+frame rate. At 30 fps the picture inverts completely: each frame owns a 2-VBlank slot, both packet
+kinds fit inside one (1.117 ≤ 2, 0.890 ≤ 2), and φ ≤ 100% — the chooser is entirely unconstrained.
+
+**What the chooser actually buys, on the hardest corpus** (Apollo real-time control, Floyd, 600 f;
+baseline `K=120` = 2,099,896 B):
+
+| budget φ | keyframes | bytes | saving vs `K=120` | effective fps |
+|---:|---:|---:|---:|---:|
+| 0% | 0 | 2,100,315 | −419 B | 59.90 |
+| **0.833% (the 59.50 fps budget)** | **4** | **2,099,466** | **430 B (0.02%)** | **59.60** |
+| 1% | 6 | 2,098,956 | 940 B (0.04%) | 59.41 |
+| 5% | 30 | 2,093,824 | 6,072 B (0.29%) | 57.14 |
+| 10% | 60 | 2,088,419 | 11,477 B (0.55%) | 54.55 |
+| 100% (all-intraframe) | 600 | 2,039,145 | 60,751 B (2.89%) | 30.59 |
+
+Read the last row carefully: **even spending every frame as a keyframe — halving the frame rate —
+recovers only 2.89% of bytes**, against the 10.11 points LZSS is ahead by. SVX2's keyframes are a
+PackBits coder over the whole frame; they are not a competitive intraframe coder, so the "the chooser
+might need no new codec at all" hope in the plan body does not survive contact with the numbers.
+
+### P1b — the free chooser, measured because it costs no cadence at all
+
+One variant genuinely costs nothing in VBlanks: keep the **same keyframe count** as fixed-`K`, but
+place each window's keyframe on the frame where a keyframe helps most, instead of on the grid. Same
+φ, same fps, same decoder; the price is that the seek gap becomes variable rather than exactly `K`.
+
+| corpus | `K` | fixed-`K` bytes | best-placement bytes | saving | worst seek gap |
+|---|---:|---:|---:|---:|---:|
+| Apollo real-time control, Floyd | 120 | 2,099,896 | 2,099,391 | 505 B (0.02%) | 205 frames |
+| Apollo real-time control, Bayer | 120 | 1,829,582 | 1,828,101 | 1,481 B (0.08%) | 198 frames |
+| Artemis night launch, Floyd | 60 | 766,569 | 765,807 | 762 B (0.10%) | 98 frames |
+| Artemis apollo mixed reel (shipped) | 120 | 3,235,506 | 3,230,938 | 4,568 B (0.14%) | 200 frames |
+
+At most 0.14%, in exchange for a seek gap that nearly doubles. Not worth the transport risk.
+
 ## Explicit non-goals
 
 - Not reopening the codec choice. LZSS stays a comparison baseline.
@@ -98,10 +258,150 @@ every corpus, not just the one that motivated it.
 
 ## Verification
 
+Run 2026-08-04 on `throwaway/interframe-crossover`.
+
 1. P0 emits a per-frame table for every corpus/dither already recorded; totals reconcile to the
    aggregate byte counts in the benchmark doc (a re-derivation that disagrees with the recorded
    totals is a bug in the measurement, not a finding).
+
+    ```
+    $ PYTHONPATH=tools python3 tools/snes-video-crossover.py \
+          build/real-video-floyd.tiles --label "Artemis I night launch, Floyd (300 f)"
+    == Artemis I night launch, Floyd (300 f) ==
+    corpus          /home/will/llvm-mos-65816/build/real-video-floyd.tiles
+    sha256          2a4249437c3253c87c1ad9b0dfb4da31c19e6cc497fea51ac603cba6548d154b
+    frames          300   raw 1,344,000 B
+
+    -- P0: per-frame crossover (frames 1..N-1; frame 0 is forced key) --
+    keyframe smaller than delta       15 / 299 = 5.02%
+    delta   - key   mean              -144.8 B
+    delta   - key   median            -127.0 B
+    delta   - key   p05               -345.0 B
+    delta   - key   p25               -194.0 B
+    delta   - key   p75                -64.0 B
+    delta   - key   p95                  6.0 B
+    delta   - key   min / max         -1,493 / 161 B
+    total available saving               618 B (0.05% of raw)
+      concentrated? top 1% of frames (2) carry 37.9% of it
+      contiguity: 12 runs of keyframe-favouring frames, longest 3, mean 1.2
+
+    -- reconciliation: fixed-K totals (must match the benchmark doc) --
+    K=15      768,739 B  (57.20% of raw)  keyframes   20  effective 56.25 fps
+    K=30      767,263 B  (57.09% of raw)  keyframes   10  effective 58.06 fps
+    K=60      766,569 B  (57.04% of raw)  keyframes    5  effective 59.02 fps
+    K=120     766,314 B  (57.02% of raw)  keyframes    3  effective 59.41 fps
+    ```
+
+    **PASS, partially.** `K=60 → 766,569 B (57.04%)` is byte-exact against the benchmark doc's
+    recorded `svx2-replacement-copy ki=60 packed=766569 (57.04%)`, on a corpus whose SHA-256 also
+    matches the record. That is a clean reconciliation and it validates the tool.
+
+    It is **not** "every corpus/dither already recorded", and the shortfall is a provenance fact
+    rather than a measurement bug: the Apollo v2/v3 tile corpora and the Artemis Bayer corpus are
+    gone and cannot be rebuilt, because both need source masters that are deliberately not vendored
+    (the Apollo master is 2.37 GB). The vendored 10.01 s Apollo excerpt is a re-encode, so the
+    **real-time control** corpus re-derives to within 0.08 points on every variant but not
+    byte-exactly — see the reconciliation table in [Results](#results-2026-08-04). Recorded plainly
+    rather than papered over.
+
 2. P0b's 59.94 fps point is recorded beside the 30 fps one, not replacing it.
+
+    **PASS.** The three-frame-rate table (1/15 s, 1/30 s, 1/59.94 s) in the P0b phase section is
+    untouched; the 2026-08-04 work adds the Bayer dither experiment *below* it as a new subsection,
+    and the [Results](#results-2026-08-04) section states explicitly that nothing above is
+    overwritten.
+
 3. P1's cadence model reproduces the two known operating points (K=120 → 59.50 fps effective;
    keyframe = 1.12 VBlanks) before being trusted for a prediction.
+
+    ```
+    -- P1 model calibration against the two recorded operating points --
+    keyframe cost   600/537 = 1.1173 VBlanks  (recorded 1.12)  slots=2
+    delta slow ROM  600/674 = 0.8902 VBlanks  (674/600)      slots=1
+    delta FastROM   600/754 = 0.7958 VBlanks  (754/600)      slots=1
+
+    check 1: the K policy must reproduce the recorded K=120 -> 59.50 fps
+      K=15   phi= 6.667%  effective 56.25 fps
+      K=30   phi= 3.333%  effective 58.06 fps
+      K=60   phi= 1.667%  effective 59.02 fps
+      K=120  phi= 0.833%  effective 59.50 fps
+      K=240  phi= 0.417%  effective 59.75 fps
+
+    check 2: maximum keyframe fraction phi that holds a floor;  fps = 60/(1+phi)
+      hold >= 60.00 fps exact 60             phi <=   0.0000%   = 1 keyframe per inf frames
+      hold >= 59.94 fps NTSC 59.94           phi <=   0.1001%   = 1 keyframe per 999.0 frames
+      hold >= 59.50 fps shipped K=120 floor  phi <=   0.8403%   = 1 keyframe per 119.0 frames
+      hold >= 59.00 fps                      phi <=   1.6949%   = 1 keyframe per 59.0 frames
+      hold >= 58.00 fps                      phi <=   3.4483%   = 1 keyframe per 29.0 frames
+      hold >= 55.00 fps                      phi <=   9.0909%   = 1 keyframe per 11.0 frames
+      hold >= 30.00 fps 30 fps slot          phi <= 100.0000%   = 1 keyframe per 1.0 frames
+
+    check 3: at a 30 fps presentation each frame owns a 2-VBlank slot
+      keyframe 1.117 <= 2 fits;  delta 0.890 <= 2 fits  => phi <= 100%, unconstrained
+    ```
+
+    **PASS.** Both anchors reproduce: the keyframe cost derives to 1.1173 VBlanks from the recorded
+    `537 per 600 VBlanks`, matching the recorded 1.12; and `K=120 → 59.50 fps` falls out of the model
+    without fitting. Only then is the φ table used for prediction.
+
 4. P2's decision is written down with the numbers that drove it, whichever way it goes.
+
+    **OPEN — deliberately.** P2 is a decision, not a measurement, and it is not this run's to take.
+    The numbers that should drive it are assembled in [Results](#results-2026-08-04) and the
+    recommendation below.
+
+### Reproducing this run
+
+```
+git worktree add -b throwaway/interframe-crossover ../llvm-mos-65816-crossover main
+tools/snes-video-rgb24-convert.sh --start 0 --duration 10.01 --fps 60000/1001 \
+    --crop 'iw/2:ih/2:iw/4:ih/3' \
+    assets/snes/video/apollo11-daylight-5994p.mp4 build/apollo-rt-control.rgb
+for d in floyd bayer; do
+  PYTHONPATH=tools python3 tools/snes-video-pack.py --rgb24 --dither $d \
+      --keyframe-interval 120 --tiles-output build/apollo-rt-$d.tiles \
+      --palette-output build/apollo-rt-$d.pal build/apollo-rt-control.rgb build/apollo-rt-$d.bin
+  PYTHONPATH=tools python3 tools/snes-video-crossover.py build/apollo-rt-$d.tiles --label "apollo-$d"
+done
+```
+
+Intermediate `.rgb`/`.tiles` are large and stay out of git; only the tool and this record are kept.
+
+## RECOMMENDATION (P2 input — the decision itself stays open)
+
+**Do not build the per-frame codec chooser. Instead, make the dither a per-corpus encoder choice and
+select Bayer for grain-rich content.**
+
+The chooser fails on arithmetic, not on principle, and it fails for a different reason than P0
+anticipated. P0 expected to find the keyframe-favouring frames rare and clustered at shot cuts; they
+are neither — on hard content **96.16%** of frames prefer a keyframe, sustained across runs of up to
+265 frames on a shot with no cuts. The distribution is as favourable as it could possibly be. What
+kills the chooser is P1: at 60 fps the entire keyframe budget is **0.84% of frames**, the shipped
+`K=120` seek grid already consumes all of it, and so the chooser's realisable saving on the hardest
+corpus is **430 B out of 2,099,896 B — 0.02%**. Even the unconstrained limit, every frame emitted as
+a keyframe at 30.59 fps, recovers only **2.89%**, because SVX2's keyframes are whole-frame PackBits
+and are simply not a competitive intraframe coder. The plan's hope that "the chooser might need no
+new codec at all" is the thing the measurement refutes.
+
+Against that, the dither experiment the plan itself proposed as a cheap prior turns out to be the
+whole answer. On byte-identical footage, Bayer takes SVX2 from 78.12% to **68.06%** of raw —
+**270,314 B, 10.06 points, roughly 630× what the affordable chooser can buy** — at zero cadence cost,
+zero decoder change, zero encoder complexity, and no seek-granularity regression. It lands SVX2 level
+with the best size *any* measured codec achieves on this footage (LZSS + Floyd at 68.01%) while
+decoding ~27× faster, which retires the LZSS-beats-SVX2 inversion outright rather than narrowing it.
+The cost is **0.24 dB** PSNR on this corpus (0.06 dB on the v1 interval) — because real film grain
+already resembles dither noise, so error diffusion buys almost nothing on exactly the content where
+the crossover appears. That trade is not close.
+
+Two caveats the decision should weigh, both pointing at scope rather than direction. First, Bayer is
+*not* a global default: on the smooth night-launch leg it costs 2.49 dB, which is a real visible
+price, so this should be a per-corpus encoder flag chosen on measured grain, not a blanket switch —
+the existing `--dither` argument already provides the mechanism, so the "build" here is a selection
+rule plus a recorded threshold, not a feature. Second, the Bayer number was measured on a *re-derived*
+corpus; it reconciles to within 0.08 points on every variant, which is ample for a 10-point effect,
+but if the decision turns on it, the confirming step is to re-run `--dither bayer` on the actual
+shipped Apollo corpus during the next encode rather than on this reconstruction.
+
+If P2 nonetheless wants a chooser, the honest framing is that it is a **30 fps feature**: at a 30 fps
+presentation every frame owns a 2-VBlank slot, both packet kinds fit, φ ≤ 100%, and the full 2.89% is
+available. At 60 fps there is no budget to spend.
