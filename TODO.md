@@ -927,7 +927,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   state unset during frames 52–262 (title/loading window is entropy-sensitive; READY frame is
   not). Cross-cutting but mechanical once the shared pattern is settled; gate 11 re-passes when
   done. (T3: settled pattern in the handoff doc, multi-file execution.)
-- [T3] **Reconcile the Mode-7 gallery website layer with current reality (121 gates 17/20/22/23).**
+- [T3] **Reconcile the Mode-7 gallery website layer with current reality (121 gates 17/20/22/23 +
+  123 gates 2/4/10 — resolve ONCE for both plans).** The 123-filter verification (`9dfd872`)
+  confirmed the same 11-not-9 drift from the filter side and added the smoking gun: the plan's
+  build-time data-contract assertion and `tests/snes-mode7-filter.test.mjs` were never
+  implemented in either site repo (`git ls-files | grep -i mode7` empty on both) — the exact
+  guard that would have made `cdaa6f4` fail its own build instead of drifting silently. Decisions:
+  re-baseline the committed expected set to 11 (or rule the two later demos out of contract) AND
+  land the build-time assertion + test in both site repos together; provision Playwright in the
+  sites' CI for a real browser smoke test or formally retire that requirement (jsdom-driving the
+  shipped filter script — 123's method — is the strongest browserless evidence and is recorded).
   Three decisions + one build: (a) the plan's "exactly nine badges" is structurally stale —
   `cdaa6f4`/`ad87374` legitimately added two Mode 7 demos; build the plan's own promised
   audit-derived check (compare the `displayMode: 7` slug set against a committed expected list)
