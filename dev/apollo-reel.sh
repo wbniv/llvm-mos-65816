@@ -271,17 +271,24 @@ printf '  displayed string: %s\n' \
 [ "$fps_rc" = 0 ] || rc=1
 
 echo
-echo "==> 4a) -verify-machineinstrs clean"
+echo "==> 4a) -verify-machineinstrs clean (-fno-lto, so codegen actually runs)"
+# --config defaults to LTO, under which -c stops after emitting LLVM IR bitcode -- codegen
+# (and therefore -verify-machineinstrs) never runs, yet the driver still exits 0. Without
+# -fno-lto this "verify" step silently passes on every input (the wt/321-nmitally vacuous-
+# verify finding; see dev/nmitally.sh). The objdump -h check below is belt-and-suspenders
+# proof the emitted file is a real object, not bitcode.
 vlog="$BUILD/apollo-reel.vlog"
 if "$CC" --config "$CONFIG" -mcpu=mosw65816 \
      -Xclang -target-feature -Xclang +mos-a16 -Os -DSVC_USE_ASM \
      -DAPOLLO_REEL_VBLANKS_PER_FRAME="$CADENCE" -DAPOLLO_REEL_FASTROM \
-     -I"$BUILD" -I"$ROOT/examples/snes" -mllvm -verify-machineinstrs \
+     -I"$BUILD" -I"$ROOT/examples/snes" -fno-lto -mllvm -verify-machineinstrs \
      -c -o "$BUILD/apollo-reel.o" "$ROOT/examples/snes/apollo-reel.c" 2>"$vlog"; then
   if grep -qiE 'error|Bad machine' "$vlog"; then
     echo "  FAIL: verifier complaints"; grep -iE 'error|Bad machine' "$vlog" | head -5; rc=1
+  elif ! "$(dirname "$CC")/llvm-objdump" -h "$BUILD/apollo-reel.o" >/dev/null 2>&1; then
+    echo "  FAIL: -verify-machineinstrs emitted no real object (vacuous verify; -fno-lto missing/ineffective)"; rc=1
   else
-    echo "  PASS: no verifier complaints"
+    echo "  PASS: no verifier complaints (real object emitted)"
   fi
 else
   echo "  FAIL: compile failed"; head -20 "$vlog"; rc=1
