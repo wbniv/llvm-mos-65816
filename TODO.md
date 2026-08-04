@@ -1096,7 +1096,11 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   (b) Gate 7 has no truthful reading: the plan's `825e3848…` 32 KiB LoROM exists nowhere in the
   tree; the gallery serves the 8 MiB ExHiROM 59.94 fps successor (`c3d7cd9e…`, `v1.0.360`),
   gated by `dev/svx2-emulator-validation.sh` under a different plan. Decide which ROM this plan
-  owns and mark the LoROM implementation-record figures historical. (T4: plan-level ownership
+  owns and mark the LoROM implementation-record figures historical. (c) Added by the
+  cut-aware-labels verification (`53a008f`): the 1,800-frame 59.94 fps cartridge (cuts 600/1200)
+  has **no asset recipe in the tree** — `dev/snes-video-reel.sh:52-54` derives its cut starts but
+  nothing generates its 1,800 frames of tiles; its gates reproduce only on the stable 900-frame
+  reel. Same restore-or-retire decision. (T4: plan-level ownership
   decision + cross-session file — `snes-video-reel.c` has in-flight edits from another worker.)
 - [verify T3] **lzss-gallery-navigation-and-auto-advance-chevron** — implemented, live, chevron
   input re-fixed `3b8a559`; verify against current main. **2026-08-04 run recorded: 14/15 PASS.**
