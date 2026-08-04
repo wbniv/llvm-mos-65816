@@ -955,7 +955,17 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   behaviourally identical; no browser smoke test run; no ROM/preview cache-busting exists.
   [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)
 - [verify T3] **123-mode7-gallery-filter** — same commit/state as 121; run after it (shared
-  surface). [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md)
+  surface). Run 2026-08-03 (`c5e645d`): **7/10 steps PASS**, 3 FAIL, two causes. Filter behaviour
+  itself is clean on both sites — `?mode=7` init, clear, Escape-to-clear + refocus,
+  `aria-live="polite"` count, `hidden`-attribute cards, biohack's 7/12 empty-shelf hide with every
+  visible row reset to `scrollLeft 0`, indri's `Fractals + Mode 7` = exactly 6 and the exact
+  `No Mode 7 demos in this category.` empty state — and both galleries resolve an **identical**
+  Mode 7 set. **3 FAIL:** steps 2 and 4 expect nine, observed 11 (same `cdaa6f4`/`ad87374` cause as
+  121; the plan's Data-contract build-time assertion and `tests/snes-mode7-filter.test.mjs` were
+  **never implemented on either site**, which is why the drift was silent); step 10 unexecuted — no
+  browser automation installed (no Playwright; jsdom has no layout), which also leaves step 8's
+  arrow-overflow sub-case untested. See the plan's verification record.
+  [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md)
 - [verify T3] **svx2-animated-video-cartridge — BLOCKED on the [T4] decision below.** Run
   2026-08-03 (`f536d25`): gates 1–6 PASS against the delivered 900-frame HiROM reel (24 pytest,
   zero CRC failures over 4,000 VBlanks, fidelity + dashboard PASS, 1,911 presentations, checksum
