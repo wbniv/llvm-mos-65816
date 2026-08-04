@@ -26,6 +26,20 @@ for mode in default a16 xy16; do
   python3 "$ROOT/tools/snes-checksum.py" "$BUILD/nmitally-$mode.sfc" >/dev/null
 done
 
+# -verify-machineinstrs must run where codegen runs. Under the config's default LTO, `-c` emits
+# bitcode (no codegen) and the link does not forward -mllvm to the LTO backend, so the flag on the
+# build commands above verifies NOTHING — the wt/321-nmitally vacuous-verify finding. Verify on an
+# explicit -fno-lto object and prove the output is a real object, not bitcode.
+echo "==> -verify-machineinstrs (-fno-lto, so codegen actually runs)"
+for vmode in a16 xy16; do
+  vfeat=("${A16[@]}"); [ "$vmode" = xy16 ] && vfeat=("${XY16[@]}")
+  "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 "${vfeat[@]}" -Os \
+    -fno-lto -mllvm -verify-machineinstrs -c "$SRC" -o "$BUILD/nmitally-verify.o"
+  "$TOOL/llvm-objdump" -h "$BUILD/nmitally-verify.o" >/dev/null 2>&1 \
+    || { echo "FAIL: $vmode verify emitted no real object (vacuous verify)"; exit 1; }
+  echo "    PASS: $vmode verify clean (real object emitted)"
+done
+
 # ISR structural gate — on the linked a16 ELF (the shipped artifact, post-LTO), and order-aware:
 # the pre-fix ISR also *contained* cld/pha/rep/sep/pla/rti, so a presence-only grep passes buggy
 # codegen. The property the envelope establishes is ordering — full-width saves before the M8/X8
@@ -33,8 +47,9 @@ done
 echo "==> ISR structural gate (linked a16 ELF)"
 ELF="$BUILD/nmitally-a16.sfc.elf"
 [ -f "$ELF" ] || { echo "FATAL: $ELF absent (link should emit it beside the .sfc)"; exit 1; }
-isr=$("$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$ELF" \
-  | awk -F'\t' '/<nmi>:/{p=1;next} p&&/^[[:space:]]*$/{exit} p&&NF>=2{sub(/[[:space:]]+;.*$/,"",$3); print (NF>=3&&$3!="")?$2" "$3:$2}')
+"$TOOL/llvm-objdump" -d --mcpu=mosw65816 "$ELF" > "$BUILD/nmitally-nmi.dis"
+isr=$(awk -F'\t' '/<nmi>:/{p=1;next} p&&/^[[:space:]]*$/{exit} p&&NF>=2{sub(/[[:space:]]+;.*$/,"",$3); print (NF>=3&&$3!="")?$2" "$3:$2}' \
+  "$BUILD/nmitally-nmi.dis")
 head5=$(printf '%s\n' "$isr" | head -5 | paste -sd,)
 tail5=$(printf '%s\n' "$isr" | tail -5 | paste -sd,)
 [ "$head5" = 'rep #$30,pha,phx,phy,sep #$30' ] || \
@@ -43,6 +58,8 @@ tail5=$(printf '%s\n' "$isr" | tail -5 | paste -sd,)
   { echo "FAIL: nmi epilogue is not the width-safe envelope: [$tail5]"; exit 1; }
 printf '%s\n' "$isr" | grep -qx cld || { echo "FAIL: nmi lacks cld"; exit 1; }
 echo "    PASS: rep #\$30 full-width save/restore envelope brackets the ISR body; cld present"
+# Deeper semantic audit (shape / width / Imag+soft-stack save-restore) on the same disasm.
+python3 "$ROOT/tools/nmitally-isr-gate.py" "$BUILD/nmitally-nmi.dis" || exit 1
 
 JGX="$BUILD/jgxcheck"
 [ -x "$JGX" ] || { echo "FATAL: build/jgxcheck absent"; exit 1; }
