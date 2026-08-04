@@ -17,6 +17,12 @@ The code is **correct** at runtime (the copy is dead — `$x` is overwritten bef
 any use), so this is a latent verifier-only defect, but it blocks
 `-verify-machineinstrs` builds.
 
+> **Update 2026-08-02.** A second witness has the same root cause but the surviving
+> read is **not** dead — it feeds a store. It is still code-correct (the compiler
+> itself declared the lane a don't-care), so the verifier-only characterisation
+> holds, but "the copy is dead" is *not* the invariant that makes it safe. See
+> [Second manifestation](#second-manifestation-2026-08-02-the-undef-lane-feeds-a-store-not-a-dead-read).
+
 ## Root cause
 
 A 16-bit value (here a `__mulsi3` argument) is built with the standard
@@ -98,6 +104,10 @@ compiled `-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm
 MAME + bsnes-jg). Tracked downstream as
 `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]`.
 
+A third witness, `examples/snes/seqvm.c` (`draw_frame`), reproduces the same cause with a
+*live* consumer — see [Second manifestation](#second-manifestation-2026-08-02-the-undef-lane-feeds-a-store-not-a-dead-read)
+for its command line and output.
+
 ## Relationship to the coalescer fix
 
 This is a **distinct second cause** of the same verifier message; the
@@ -144,3 +154,39 @@ Notes that may help whoever fixes this:
 - Still code-correct: the compiler itself declared the lane a don't-care, and the demo's
   differential gate passes (`dev/run.sh seqvm` → `0xE8C5`). The store simply writes a
   don't-care byte to a stack slot whose high half is never read.
+
+### Misdiagnosis, recorded deliberately
+
+The first pass at this witness read the **post-RA** MIR only, saw `killed renamable $rc3`
+at 480B followed by a read of `$rc3` at 736B, and concluded **"premature kill flag →
+potential miscompile"**. That framing is **withdrawn**. The kill at 480B is correct: it
+ends the live range of a vreg whose use genuinely finishes there, and the read at 736B
+belongs to a *different* vreg — one whose high lane is undefined by construction — that
+RA happened to assign the same physical register. Only the **virtual-register** MIR
+(`-mllvm -print-after=…` before the rewriter, the 480B→712B→716B→736B chain above)
+distinguishes the two.
+
+The practical consequence for whoever fixes this: **do not diagnose this message from
+post-RA MIR**. The physical form is genuinely ambiguous between "kill flag placed too
+early" (a real miscompile) and "undef lane lost its flag" (verifier noise), and the two
+call for opposite fixes.
+
+### Reproduction (second manifestation)
+
+`examples/snes/seqvm.c`, function `draw_frame`, in the downstream llvm-mos-65816 fork:
+
+```console
+$ mos-clang --config mos-snes.cfg -mcpu=mosw65816 \
+    -Xclang -target-feature -Xclang +mos-a16 \
+    -Os -fno-lto -mllvm -verify-machineinstrs -c examples/snes/seqvm.c
+*** Bad machine code: Using an undefined physical register ***
+- basic block: %bb.2  [192B;760B)
+- instruction: 736B   renamable $x = COPY killed renamable $rc3
+*** Bad machine code: Using an undefined physical register ***
+- basic block: %bb.5  [1024B;1600B)
+- instruction: 1480B  renamable $x = COPY killed renamable $rc5
+fatal error: error in backend: Found 2 machine code errors.
+```
+
+Two errors at `-Os` (and at `-O1`/`-O2`); **clean at `-O0` and `-Oz`**. Re-confirmed
+byte-for-byte on 2026-08-04 against the current fork toolchain.
