@@ -2017,4 +2017,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** Publishing to biohack.net / indri.studio (user-gated follow-up). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:4b71ee8c13a90d5b -->
 - [ ] **(triage)** MAME leg (SKIP-by-design without the SPC700 IPL). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:bc642b4b5ab8d2bf -->
 - [ ] **(triage)** H-mode (per-scanline) IRQ. At ~262 IRQs/frame the C ISR prologue alone exceeds a scanline, so — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:8974b954bfca2a54 -->
+- [ ] **(triage)** Carrying the fix as a fork patch for the #140 demo (the `.byte` workaround stands until upstream — _from [2026-08-04-mos-brk-cop-signature-byte-assembler.md](docs/plans/2026-08-04-mos-brk-cop-signature-byte-assembler.md)_  <!-- fp:83367950e9cfe689 -->
+- [ ] **(triage)** Changing BRK/COP **disassembly** length (see above). — _from [2026-08-04-mos-brk-cop-signature-byte-assembler.md](docs/plans/2026-08-04-mos-brk-cop-signature-byte-assembler.md)_  <!-- fp:01475cfa243ee69b -->
+- [ ] **(triage)** `wdm`'s mandatory operand — already matches ca65; untouched. — _from [2026-08-04-mos-brk-cop-signature-byte-assembler.md](docs/plans/2026-08-04-mos-brk-cop-signature-byte-assembler.md)_  <!-- fp:5e1ee717afda4e94 -->
 <!-- END auto-captured-deferrals -->
