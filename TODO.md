@@ -37,11 +37,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   before establishing M/X, so an interrupt inherits the mainline width and even the first push has
   variable size; later saves/restores cannot balance reliably. `-verify-machineinstrs` is clean.
   The ROM gate stays intentionally RED; fix the backend interrupt entry contract, not the demo with
-  an assembly wrapper.**~~ **FIXED:** `MOSInsertREPSEP` now adds a full-width A/X/Y outer save
+  an assembly wrapper.**~~ **FIXED in holistic patch `0002`:** `MOSFrameLowering` now adds a full-width A/X/Y outer save
   envelope, establishes M8/X8 for the C body, restores in M16/X16, then lets RTI restore stacked P.
-  Host/default/a16/xy16 all `0xDA3B`; a16 3× deterministic. See
+  Host/default/a16/xy16 all `0xDA3B`; a16 3× deterministic; playable explanation at
+  [https://biohack.net/snes/nmitally/](https://biohack.net/snes/nmitally/). See
   [report](docs/investigations/2026-08-03-65816-interrupt-width-prologue.md).
-- [T3] **Round 7 demo battery (#119–#138, now nineteen) — new defect-hunting ROMs.** Targets chosen by
+- [T3] **Round 7 demo battery (#119–#141, now twenty-two) — new defect-hunting ROMs.** Targets chosen by
   the scoreboard's yield pattern: combiner-formed opcodes (`G_ABDS/U`, s64 ctpop/clz/ctz/abs),
   first-ever interrupt-CC / inline-asm / mixed-per-function-width mode-state demos, far-pointer third pass,
   >256 B frames, volatile/atomic discipline, float↔s64 libcalls, s64 limb-seam shifts. First
@@ -50,8 +51,78 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   premise was already false when the round was written (rule landed `cbc31da`, gated by
   `dev/run.sh a16unmerge` since 2026-07-19); investigated, not built, nothing committed.
   Per-demo plans + `/snes-demo` per item.
+  **Addendum 2026-08-04 (#139–#141, from the #123 sibling-gap audit — ask the interrupt-entry
+  contract completely):** #139 `irqgate` (first IRQ-vector C handler + envelope reentrancy when NMI
+  preempts the IRQ handler), #140 `brkcop` (BRK/COP software vectors — the audit already found
+  `platforms/snes/link.ld` wires **COP to `$0000`**, a real platform defect: a native `cop`
+  executes WRAM as code; BRK indistinguishably shares `irq`), #141 `dpbank` (D/DBR interrupt-entry
+  contract: the envelope saves neither — force the extend-or-document decision). **#140 jumps the
+  queue** — it starts from a known defect, not just a question.
   See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md). (T3: each demo is settled-plan
   implementation; the round's selection/design was done inline.)
+  **#126 `mixedwidth` DONE 2026-08-03 — clean positive:** per-function target attributes are supported;
+  `mw_native` carries `+mos-a16` and real `rep #$20`/`sep #$20` brackets, while `mw_byte` explicitly
+  carries `-mos-a16,-mos-xy16` and stays transition-free. Host/default/a16/xy16 all `0x83B7` with
+  `-verify-machineinstrs`. Published on both
+  [biohack.net](https://biohack.net/snes/mixedwidth/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/mixedwidth/). No compiler defect;
+  next ranked probe is #125 `asmisland`.
+  [plan](docs/plans/2026-08-03-126-snes-mixedwidth.md).
+  **#125 `asmisland` DONE + PUBLISHED 2026-08-03 — clean positive:** inline asm saves/restores P, explicitly
+  encodes A8/A16 immediates, clobbers A/flags/memory, and leaves native C values live across the
+  island. Raw-byte and post-`plp` M16 gates pass; host/default/a16/xy16 all `0x260B`. No compiler
+  defect. Published on both [biohack.net](https://biohack.net/snes/asmisland/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/asmisland/); next ranked probe is
+  #119 `absdiff`. [plan](docs/plans/2026-08-03-125-snes-asmisland.md).
+  **#119 `absdiff` DONE + PUBLISHED 2026-08-03 — clean positive:** u8, s16, and u32 forms of
+  `a > b ? a - b : b - a` all select and verify; host/default/a16/xy16 agree at `0x3482`.
+  Three synchronized motion-difference bands are computed by the tested kernels. Published on
+  [biohack.net](https://biohack.net/snes/absdiff/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/absdiff/); next ranked probe is
+  #131 `farspill`. [plan](docs/plans/2026-08-03-119-snes-absdiff.md).
+  **#131 `farspill` DONE + PUBLISHED 2026-08-03 — clean positive:** ten non-rematerializable far
+  pointers live across a clobbering multiply force seven four-byte `Imag32` spill slots, expanding
+  to 28 stores and 28 reloads. All `LDImm` destinations remain hardware GPRs; host/a16/xy16 agree
+  at `0x7F3B` on MAME and bsnes-jg. Published on
+  [biohack.net](https://biohack.net/snes/farspill/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/farspill/); next probe is
+  #120 `bitboard64`. [plan](docs/plans/2026-08-03-131-snes-farspill.md).
+  **#120 `bitboard64` DONE + PUBLISHED 2026-08-03 — runnable positive + two backend findings:**
+  ctpop/cttz/ctlz i64 form and lower inline; helper-isolated host/default/a16/xy16 agree at `0xC074`
+  on MAME and bsnes-jg. Bring-up found (1) variable `1ULL << uint8_t` cannot legalize
+  `G_ANYEXT s8->s64`, and (2) all three inline expansions in one pressured caller leave four
+  undefined `__rc` uses under the non-LTO machine verifier. Published on
+  [biohack.net](https://biohack.net/snes/bitboard64/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bitboard64/); promote #138
+  `shift64seam` next because finding 1 gives it a confirmed RED trigger.
+  [plan](docs/plans/2026-08-03-120-snes-bitboard64.md).
+  **#138 `shift64seam` DONE + PUBLISHED 2026-08-03 — runnable positive + retained backend defect:**
+  explicitly widened variable counts drive shl/lshr/ashr i64 through every 16- and 32-bit seam;
+  host/default/a16/xy16 agree at `0x2007` on MAME and bsnes-jg. The natural `uint8_t` count still
+  fails legalization at `G_ANYEXT s8->s64`, with a minimized repro retained. Published on
+  [biohack.net](https://biohack.net/snes/shift64seam/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/shift64seam/); next ranked probe is
+  #121 `llabs64`. [plan](docs/plans/2026-08-03-138-snes-shift64seam.md).
+  **#121 `llabs64` DONE + PUBLISHED 2026-08-03 — clean positive:** `llabs()` and the signed
+  `x < 0 ? -x : x` i64 idiom pass the non-LTO machine verifier across values through every
+  16-bit limb, including `INT64_MIN+1`; host/default/a16/xy16 agree at `0x8490` on MAME and
+  bsnes-jg. Published as the first card in both newest-first catalogs on
+  [biohack.net](https://biohack.net/snes/llabs64/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/llabs64/); next ranked probe is
+  #124 `isrbracket`. [plan](docs/plans/2026-08-03-121-snes-llabs64.md).
+  **#124 `isrbracket` DONE + PUBLISHED 2026-08-03 — clean positive after the #123 fix:** a
+  1,024-NMI run repeatedly interrupts paired native-width arithmetic tunnels; the ISR envelope
+  and mainline bracket are disassembly-gated. Host/default/a16/xy16 agree at `0x1014` on MAME,
+  and all modes pass three repeated bsnes-jg runs. Published first in both catalogs on
+  [biohack.net](https://biohack.net/snes/isrbracket/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/isrbracket/); next ranked probe is
+  #127 `modethread`. [plan](docs/plans/2026-08-03-124-snes-isrbracket.md).
+  **#127 `modethread` DONE + PUBLISHED 2026-08-04 — clean positive:** labels-as-values dispatch
+  crosses alternating A8/A16 handlers; indirect jump and width brackets are disassembly-gated,
+  and host/default/a16/xy16 agree at `0x0489` on MAME and bsnes-jg. Published first on
+  [biohack.net](https://biohack.net/snes/modethread/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/modethread/); next is #128
+  `bankwalk`. [plan](docs/plans/2026-08-04-127-snes-modethread.md).
 - [T4] **Does `G_ADD`/`G_SUB` miss 16-bit lanes under `+mos-a16`?** Measured while withdrawing #122:
   `MOSLegalizerInfo` gives add/sub `.legalFor({S8}).widenScalarToNextMultipleOf(0,8).custom()` with
   **no `maxScalar`**, so an s32 add narrows to **4×s8 `G_UADDE` lanes even under a16** — verified
@@ -411,7 +482,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
   [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
   [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
-- [x] **#321 stage 1 — full xy16 mode + ABI** (DONE — Layers 1–5 + legalizer + CC verified/formalized; HW-stack ABI follow-on is upstream-gated.) (after Increment 1): ~~X/Y permanently 16-bit~~
+- [x] **#321 native-width implementation — full xy16 mode + ABI** (DONE — Layers 1–5 + legalizer + CC verified/formalized; HW-stack ABI follow-on is upstream-gated.) (after Increment 1): ~~X/Y permanently 16-bit~~
   ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
   ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
   — Layers 1–5 committed to `wt/321-xy16`: feature flag + Xc16/Yc16 regs + pseudos + parallel
@@ -426,6 +497,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   **Remaining follow-ons: hardware-stack ABI + calling convention** (gated on the CC decision). (Native-mode
   crt0 needed no change for in-function xy16; its lone gap — explicit DBR=0 — is the dedicated item below.)
   [xy16 plan](docs/plans/2026-06-17-321-xy16-index-register-mode.md) · [handoff](docs/plans/2026-06-18-321-xy16-implementation-handoff.md).
+  **Upstream disposition (2026-08-03):** holistic `0002` remains local; there is no #321 PR. A future
+  user-triggered submission is one draft PR for the complete implementation, reorganized as a
+  reviewable commit series. [PR blueprint](docs/321-upstream-native-width-pr.md).
 - [x] **#321 calling-convention — frame decision RESOLVED (phased) 2026-06-18; remaining work deferred/gated.**
   [CC decision analysis](docs/investigations/65816-calling-convention-decision.md) ·
   [decision record](docs/plans/2026-06-18-321-cc-frame-phased-decision.md). The "one decision" decomposes
@@ -715,6 +789,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `wireframe`), and the run still exits looking like it merely stopped. Collect failures, keep going,
   and fail at the end with an explicit list, so one fat demo can never again mask dozens of others.
   [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
+- [wip T2] **Vacuous `-verify-machineinstrs` in demo gate scripts — sweep and fix.** <!-- agent:aa21def05ab7faee3 --> Under the config's
+  default LTO, `mos-clang --config … -c` emits bitcode (codegen never runs) and the link does not
+  forward `-mllvm` to the LTO backend, so `-mllvm -verify-machineinstrs` on those invocations
+  verifies NOTHING — a vacuous PASS. Found on `wt/321-nmitally` (its script comments name
+  `dev/_demo5.sh` and the `/snes-demo` skill template as offenders); any Round-7 `dev/*.sh` copied
+  from them inherits it. The fix, already applied in `dev/nmitally.sh`: an explicit `-fno-lto -c`
+  verify compile per feature mode plus an `llvm-objdump -h` real-object check proving the output
+  isn't bitcode. Sweep all demo gate scripts + the template.
+  [plan](docs/plans/2026-08-03-123-snes-nmitally.md).
 - [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
   The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
   `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
@@ -937,6 +1020,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   land the build-time assertion + test in both site repos together; provision Playwright in the
   sites' CI for a real browser smoke test or formally retire that requirement (jsdom-driving the
   shipped filter script — 123's method — is the strongest browserless evidence and is recorded).
+- [T2] **indri.studio embedded player never starts the ROM — canvas bit-frozen at the poster.**
+  Found by nav-chevron verification step 15 (14/15 PASS otherwise; biohack.net passes all four
+  input surfaces with the same ROM): on indri, player script + core load, nothing errors, but
+  `#status` never reaches `running <rom>.sfc`, so `playUrl()` never fires. Lead: page-template vs
+  pinned-player drift — `v0.1.135` (the [dual-site drift audit](docs/investigations/2026-08-03-dual-rom-site-drift-audit.md)'s
+  own remediation `2b78747`) regenerated the template from biohack's newer bootstrap while indri's
+  player stays pinned at `v0.1.133`. Fix: repin/republish indri's player (or re-sync the
+  template), then re-run nav-chevron step 15 to close its lone FAIL. Live user-facing breakage on
+  every indri SNES page — worth doing soon. (T2: bounded site-repo fix, diagnosis already made;
+  the audit doc records the machinery.)
   Three decisions + one build: (a) the plan's "exactly nine badges" is structurally stale —
   `cdaa6f4`/`ad87374` legitimately added two Mode 7 demos; build the plan's own promised
   audit-derived check (compare the `displayMode: 7` slug set against a committed expected list)
@@ -1007,16 +1100,6 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   [plan](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md)
 
 
-- [T2] **indri.studio embedded player never starts the ROM — canvas bit-frozen at the poster.**
-  Found by nav-chevron verification step 15 (14/15 PASS otherwise; biohack.net passes all four
-  input surfaces with the same ROM): on indri, player script + core load, nothing errors, but
-  `#status` never reaches `running <rom>.sfc`, so `playUrl()` never fires. Lead: page-template vs
-  pinned-player drift — `v0.1.135` (the [dual-site drift audit](docs/investigations/2026-08-03-dual-rom-site-drift-audit.md)'s
-  own remediation `2b78747`) regenerated the template from biohack's newer bootstrap while indri's
-  player stays pinned at `v0.1.133`. Fix: repin/republish indri's player (or re-sync the
-  template), then re-run nav-chevron step 15 to close its lone FAIL. Live user-facing breakage on
-  every indri SNES page — worth doing soon. (T2: bounded site-repo fix, diagnosis already made;
-  the audit doc records the machinery.)
 ## Watch
 
 _Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
@@ -1546,7 +1629,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • "Port the DMA/VRAM helpers to 16-bit codegen" -> a Phase-2 (16-bit native target) deferral documented
        in the plan's own Out-of-scope, gated behind the same #415 reconciliation + the broader #321 effort.
      Nothing open here. -->
-<!-- triaged 2026-06-17: pre-implementation plan — verification steps require the implementation to exist first; tracked as the #321 stage-1 xy16 TODO item (Open) → fp:b24d6be9c36ef6e5 -->
+<!-- triaged 2026-06-17, status reconciled 2026-08-03: pre-implementation verification was tracked by
+     the #321 native-width xy16 item, now completed locally in holistic 0002. → fp:b24d6be9c36ef6e5 -->
 <!-- triaged 2026-06-18: both are "Out of scope" NON-GOALS from the seed-42 fix plan (clarifying the A/X
      return convention and the +mos-a16 EQ fold are UNCHANGED) — not deferred work. The fix is complete +
      verified (a16 50/50, corpus 7/7, fuzz 50/50). fp:27bd502017f767b4 fp:5d3100a79ceeab83 -->
@@ -1602,8 +1686,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        (8961afb XHigh + 4d8a2bd X-governed transfers); fresh fuzz 50 1 / 50 56 = 50/50 and fuzz 500 = 492/500,
        0 mismatch / 0 hangs. The only residual is the $p-spill COMPILE crash (8 xfails) — the curated
        "#321 $p-spill register-scavenger crash" item (TODO above), NOT a hang. (See Done.)
-     • "hardware-stack ABI + calling convention" -> now the explicit remaining follow-on IN that same stage-1
-       item (just reconciled), and gated on the curated "#321 calling-convention" item. Already covered.
+     • "hardware-stack ABI + calling convention" -> dispositioned by the completed native-width item and
+       the curated "#321 calling-convention" decision. Already covered.
      • "standalone (zp),Y16 STORE gate" -> deliberate scope marker: the load path is the higher-value read; the
        symmetric store pseudo (STIndirYIdx16) is exercised by the fuzzer's xy16 track. Nothing open.
      fp:1fcc2870d2445ea7 fp:9b195ad521b9ffae fp:8e99366f38c84605 -->
