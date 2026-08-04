@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-08-04](https://github.com/wbniv/llvm-mos-65816/commit/bef2a66) | todo: close the two T4 measurements — lanes verdict (b), crossover P2 decided |
 | [2026-08-04](https://github.com/wbniv/llvm-mos-65816/commit/5fc1e42) | measure(crossover): P0/P0b/P1 — the crossover is a dither artifact, not a codec gap |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/47ce3d2) | plan(crossover): P0b answered — the crossover is dither-bound, not frame-rate-bound |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/2825aab) | plan: where interframe coding stops paying — measure the crossover before building anything |
 
 <!--history-meta v1
+bef2a66	author	Will Norris
+bef2a66	added	13
+bef2a66	deleted	0
+bef2a66	files	1
+bef2a66	body	- G_ADD/G_SUB s16 lanes: verdict (b) recorded — the byte carry chain stays\n  (+281 B corpus-wide loss from s16 lanes; marshalling dominates because the\n  surrounding lane model is byte-resident). Item -> Done; option (A), the\n  coherent whole-lane-model widening, parked with the reopen diagnostic.\n  Worktree throwaway/g-add-sub-s16-lanes torn down (12G); durable artifacts\n  cherry-picked to main as 23ff259.\n- Interframe crossover: P2 decision recorded in the plan — don't build the\n  chooser (cadence budget already spent by the K=120 seek grid; 0.02% ceiling);\n  the real lever is per-corpus Bayer dither. Item -> Done; new [T2] follow-up\n  to confirm the 10-point win on the shipped Apollo corpus at the next encode.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5fc1e42	author	Will Norris
 5fc1e42	added	301
 5fc1e42	deleted	1

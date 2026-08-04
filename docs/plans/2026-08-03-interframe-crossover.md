@@ -1,6 +1,8 @@
 # Where interframe coding stops paying — measure the crossover, then decide
 
-**Date:** 2026-08-03 · **Status:** P0 / P0b / P1 MEASURED 2026-08-04 — P2 open
+**Date:** 2026-08-03 · **Status:** P0 / P0b / P1 MEASURED 2026-08-04, P2 DECIDED 2026-08-04 —
+confirming run on the shipped Apollo corpus done 2026-08-04 (direction confirms, magnitude short of
+the P0b prediction; see [P2 confirming run](#confirming-run-2026-08-04-does-the-win-hold-on-the-shipped-corpus))
 **Item:** TODO `[T4]` · **Visible surface:** none until a decision is taken — no mockups.
 
 **Measurement tool:** [`tools/snes-video-crossover.py`](../../tools/snes-video-crossover.py).
@@ -258,7 +260,10 @@ At most 0.14%, in exchange for a seek gap that nearly doubles. Not worth the tra
 
 ## Verification
 
-Run 2026-08-04 on `throwaway/interframe-crossover`.
+Steps 1-4 run 2026-08-04 on `throwaway/interframe-crossover`. Step 5 (the confirming run) ran
+2026-08-04 directly on `main`, using the shared `build/` toolchain read-only (no rebuild) — it is
+measurement against the actual shipped corpus artifact, not a spike, so it belongs where the corpus
+identity (`dev/apollo-reel.sh`'s `RGB_SHA`) is checked in.
 
 1. P0 emits a per-frame table for every corpus/dither already recorded; totals reconcile to the
    aggregate byte counts in the benchmark doc (a re-derivation that disagrees with the recorded
@@ -346,9 +351,92 @@ Run 2026-08-04 on `throwaway/interframe-crossover`.
 
 4. P2's decision is written down with the numbers that drove it, whichever way it goes.
 
-    **OPEN — deliberately.** P2 is a decision, not a measurement, and it is not this run's to take.
-    The numbers that should drive it are assembled in [Results](#results-2026-08-04) and the
-    recommendation below.
+    **PASS.** The decision is recorded in [P2 decision](#p2-decision-2026-08-04) below: don't build
+    the chooser, adopt `--dither bayer` as a per-corpus flag. The confirming run required by that
+    decision is step 5.
+
+5. **Confirming run (2026-08-04): `--dither bayer` on the actual shipped Apollo corpus**, not the
+   reconstruction P0b used. `dev/apollo-reel.sh` (as of `bc66ad5`) hardcodes the shipped corpus's
+   `RGB_SHA` — a byte-identical match to a scratchpad copy is the strongest available proof this is
+   the real thing, since the master `.mp4` (`assets/snes/video/apollo11-daylight-5994p.mp4`) is
+   vendored but the intermediate `.rgb`/`.tiles` are not.
+
+    ```
+    $ sha256sum apollo-daylight.rgb
+    aa29061311e022e8bafb0e013c09da5ea11d4c9114df4732f9b1452157573cad
+    $ grep RGB_SHA dev/apollo-reel.sh
+    RGB_SHA=${APOLLO_REEL_RGB_SHA:-aa29061311e022e8bafb0e013c09da5ea11d4c9114df4732f9b1452157573cad}
+    ```
+
+    **PASS.** SHA-256 match — this is the corpus `dev/apollo-reel.sh` actually bakes into the
+    published ROM.
+
+    Re-packed with `tools/snes-video-pack.py --rgb24 --dither floyd --keyframe-interval 120`
+    (`apollo-reel.sh`'s own `KEYFRAME=120` default) as a recipe check before touching Bayer at all:
+
+    ```
+    $ sha256sum apollo-v3/apollo-daylight-floyd.tiles apollo-confirm/apollo-daylight-floyd.tiles
+    08c24756b982fec8703d5959cf8b6af06e8981beef1a6bdc55edd20c1675ce10  apollo-v3/apollo-daylight-floyd.tiles
+    08c24756b982fec8703d5959cf8b6af06e8981beef1a6bdc55edd20c1675ce10  apollo-confirm/apollo-daylight-floyd.tiles
+    $ sha256sum apollo-v3/apollo-daylight-floyd.pal apollo-confirm/apollo-daylight-floyd.pal
+    9d03a6d40db385e782bda34f5beddd95420e76c7293c2e9e236d905e422e27a0  apollo-v3/apollo-daylight-floyd.pal
+    9d03a6d40db385e782bda34f5beddd95420e76c7293c2e9e236d905e422e27a0  apollo-confirm/apollo-daylight-floyd.pal
+    ```
+
+    **PASS.** Byte-identical quantized tiles and palette against the shipped v3 artifact — the
+    recipe (`--dither floyd --keyframe-interval 120`) exactly reproduces what shipped, so running
+    the same recipe with `--dither bayer` on this RGB is a true apples-to-apples confirming
+    measurement, not a fresh reconstruction. (The `.svx2` bytes differ, because `apollo-reel.sh`
+    packs the final stream through `snes-video-reel-assets.py --packed-far
+    --dashboard-palette-fixup`, not `snes-video-pack.py` directly — irrelevant here since
+    `snes-video-crossover.py` operates on `.tiles`, not the packed-far container.)
+
+    `tools/snes-video-crossover.py --fixed-k 120` on both dithers of the shipped corpus:
+
+    ```
+    == Apollo SHIPPED v3 corpus, floyd ==
+    frames          600   raw 2,688,000 B
+    keyframe smaller than delta      596 / 599 = 99.50%
+    K=120   2,121,044 B  (78.91% of raw)  keyframes    5  effective 59.50 fps
+
+    == Apollo SHIPPED v3 corpus, bayer ==
+    frames          600   raw 2,688,000 B
+    keyframe smaller than delta       15 / 599 =  2.50%
+    K=120   1,946,651 B  (72.42% of raw)  keyframes    5  effective 59.50 fps
+    ```
+
+    Quality cost, measured directly (standalone PSNR check against the source RGB24, same
+    BGR555→RGB gamma-corrected palette math as `tools/snes-video-screenshot-check.py`, all 600
+    frames, no resampling):
+
+    ```
+    floyd: frames=600 mse=92.2473  psnr=28.48 dB
+    bayer: frames=600 mse=103.1680 psnr=28.00 dB
+    ```
+
+    **PARTIAL — direction confirms, magnitude does not.** Bayer still wins substantially on the
+    shipped corpus: **78.91% → 72.42% of raw, a 6.49-point / 174,393 B saving**, at a **0.48 dB**
+    PSNR cost — small next to the smooth night-launch leg's recorded 2.49 dB, and the
+    keyframe-favouring pathology still collapses (99.50% → 2.50% of frames, matching the P0b
+    mechanism exactly). But the P0b prediction was **10.06 points / 270,314 B** (78.12% → 68.06%)
+    at 0.24 dB — this run recovers only **~65% of the predicted point-gap** (6.49 of 10.06) and
+    **~65% of the predicted bytes** (174,393 of 270,314), while the PSNR cost is about **double**
+    the prediction (0.48 vs 0.24 dB). The two corpora are not the same footage: P0b's
+    "real-time control" corpus is `--start 0 --duration 10.01 --fps 60000/1001` (true 1:1 60 fps
+    sampling, no speed change); the shipped v3 corpus is `--start 3410 --duration 20.02
+    --fps 30000/1001` (the 2× playback recut, 30 fps sampling of a different 20 s interval). Per
+    this run's constraints, that gap is recorded as a finding, not tuned away — no parameter was
+    adjusted to chase the predicted number. **No change to the P2 decision below**: Bayer is still
+    a clear net win on this hard-content corpus (6.49 pts for 0.48 dB is a good trade), just a
+    smaller one than the reconstruction suggested, which matters for calibrating expectations on
+    *other* corpora, not for this one's decision.
+
+    Not measured: the smooth-leg PSNR cost was **not re-derived** here — the Artemis I night-launch
+    source `.mp4` is not vendored and no RGB24 copy survives (established in
+    [Corpus availability](#corpus-availability--what-could-and-could-not-be-re-derived) above), so
+    there is no corpus to re-run it on. The 2.49 dB figure this run cites is the one already on
+    file in
+    [`real-video-codec-benchmark.md`](2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md#L80-81).
 
 ### Reproducing this run
 
@@ -366,6 +454,29 @@ done
 ```
 
 Intermediate `.rgb`/`.tiles` are large and stay out of git; only the tool and this record are kept.
+
+### Reproducing the confirming run (step 5, shipped corpus)
+
+```
+# RGB corpus per dev/apollo-reel.sh's own recipe (its header comment + $RGB_SHA):
+tools/snes-video-rgb24-convert.sh --start 3410 --duration 20.02 --fps 30000/1001 \
+    --crop 'iw/2:ih/2:iw/4:ih/3' \
+    assets/snes/video/apollo11-daylight-5994p.mp4 apollo-daylight.rgb
+sha256sum apollo-daylight.rgb   # must be aa29061311e022e8bafb0e013c09da5ea11d4c9114df4732f9b1452157573cad
+
+for d in floyd bayer; do
+  PYTHONPATH=tools python3 tools/snes-video-pack.py --rgb24 --dither $d \
+      --keyframe-interval 120 --tiles-output apollo-daylight-$d.tiles \
+      --palette-output apollo-daylight-$d.pal apollo-daylight.rgb apollo-daylight-$d.svx2
+  PYTHONPATH=tools python3 tools/snes-video-crossover.py apollo-daylight-$d.tiles \
+      --label "apollo-$d" --fixed-k 120
+  python3 tools/snes-video-psnr-check.py apollo-daylight.rgb \
+      apollo-daylight-$d.tiles apollo-daylight-$d.pal
+done
+```
+
+Same tool, same `--keyframe-interval 120`, only the corpus changes (the shipped v3 recut instead of
+the P0b reconstruction) — this is what makes the two runs comparable.
 
 ## RECOMMENDATION (P2 input — the decision itself stays open)
 
@@ -418,3 +529,57 @@ switch — it costs 2.49 dB on the smooth night leg). Follow-up tracked in `TODO
 10.06-point win on the actual shipped Apollo corpus at the next encode, then record the selection
 threshold. Decision made at the orchestrator tier on the strength of the P0/P1 evidence above;
 reopen only if a 30 fps presentation ever becomes a shipping target.
+
+## Confirming run (2026-08-04): does the win hold on the shipped corpus?
+
+Full measurement and raw output is [Verification step 5](#verification); summary here for anyone
+reading only the decision:
+
+| corpus | dither | SVX2 K=120 | % of raw | PSNR | keyframe-favouring frames |
+|---|---|---:|---:|---:|---:|
+| P0b reconstruction (predicted) | Floyd | 2,099,896 B | 78.12% | 31.66 dB | 96.16% |
+| P0b reconstruction (predicted) | Bayer | 1,829,582 B | 68.06% | 31.42 dB | 0.33% |
+| **shipped v3 corpus (measured)** | Floyd | 2,121,044 B | 78.91% | 28.48 dB | 99.50% |
+| **shipped v3 corpus (measured)** | Bayer | 1,946,651 B | 72.42% | 28.00 dB | 2.50% |
+
+**Direction confirms; magnitude does not — recorded as-is, not tuned.** The shipped corpus is a
+different clip (2× recut, different interval — see step 5) from the P0b reconstruction, and it
+gives a **6.49-point / 174,393 B** win at **0.48 dB** cost, against a predicted **10.06-point /
+270,314 B** win at **0.24 dB**. Bayer is still unambiguously worth it here (roughly 65% of the
+predicted saving, at roughly double the predicted quality cost, still 5× cheaper than the smooth
+leg's 2.49 dB) — but anyone budgeting bytes off the P0b number for *other* corpora should expect
+figures in this range, not the reconstruction's, since the reconstruction and the shipped clip
+are not the same footage.
+
+### Selection rule: when to flip `--dither bayer` per corpus
+
+No global grain metric was built (out of scope for a measurement-only confirming run) — the rule
+is procedural, using tools already in the repo, and both anchor points now come from *measured*
+runs rather than one measured and one predicted:
+
+1. **Encode the candidate corpus both ways** — `tools/snes-video-pack.py --rgb24 --dither floyd`
+   and `--dither bayer`, same `--keyframe-interval` as the ship config — and diff the `.svx2` sizes.
+   A same-footage A/B is cheap (two encodes) and removes any need to eyeball "how grainy does this
+   look."
+2. **Check the PSNR cost** with [`tools/snes-video-psnr-check.py`](../../tools/snes-video-psnr-check.py)
+   (new in this run — palette-aware, decodes the tiles+palette pair back to RGB with the same gamma
+   math `snes-video-screenshot-check.py` uses and diffs it against the source RGB24; no tool
+   previously existed to reproduce the PSNR figures this plan already cited). Three recorded
+   operating points bound the decision:
+   - **≤0.5 dB cost** (Apollo hard content, real film grain: 0.24–0.48 dB measured) → **flip to
+     Bayer**. The size win (6.5–10 points here) dominates a quality cost this small; SVX2's
+     interframe delta was fighting dither noise, not signal, and Bayer removes the noise.
+   - **≥2 dB cost** (Artemis smooth night launch: 2.49 dB) → **stay Floyd**. The size win exists
+     there too (recorded in the [top table](#the-observation): 57.04% → 33.49%, huge) but the
+     visible banding on already-smooth, already-denoised footage is a real quality regression, not
+     a rounding error — Floyd's error diffusion is doing real work on genuinely smooth gradients.
+   - **Between 0.5 and 2 dB**: no corpus has landed here yet. Treat it as a size-vs-quality judgment
+     call at publish time, not an automatic flip, until a corpus in that band is measured.
+3. **The underlying signal, if a cheaper proxy is ever wanted**: Bayer's win tracks the
+   keyframe-favouring-frame fraction collapsing (Floyd 96–99.5% → Bayer 0.3–2.5% on Apollo; no
+   equivalent measurement survives for Artemis, corpus gone). That fraction is a byproduct of
+   `tools/snes-video-crossover.py`'s P0 output, already computed in step 1 above, so it is not an
+   extra measurement — just a number to read off a report already being generated. A high fraction
+   under Floyd (footage where interframe deltas are mostly fighting dither noise rather than real
+   motion) is what makes Bayer worth trying at all; smooth footage with a low Floyd fraction has
+   little to gain and more to lose.
