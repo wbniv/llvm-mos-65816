@@ -8,6 +8,14 @@ section when implementation starts; per-demo plans follow the usual
 **No mockups:** this is a test-selection plan; each demo's visual gets mocked in its own per-demo
 plan, per the established Round 1–6 practice.
 
+**Natural-source publication invariant:** a demo intended to exercise a compiler construct must
+retain that construct in the target source. Replacing it with precomputed offsets, assembly, or
+another semantic workaround is not a passing demo. Contracted demos produce a pass receipt only
+after their natural source compiles and all differential/emulator gates pass; publication verifies
+that receipt against the exact ROM, source, and contract SHA-256 values. `farptrcmp` is the first
+contracted demo and specifically requires a far-pointer array, far-pointer comparison, and
+far-pointer subtraction. A compiler crash is a retained finding, not permission to bypass the test.
+
 ## Where the next bugs are (what the scoreboard actually says)
 
 The [defect scoreboard](../investigations/2026-08-02-compiler-defects-found-by-demos.md) (17
@@ -196,7 +204,9 @@ platform defect, not just a question), then #139, then #141.
      discipline from C, MMIO ack from a C handler, envelope reentrancy. *Disasm gate:*
      `tools/nmitally-isr-gate.py --symbol irq` (reusable as-is) + exact-envelope head/tail on
      both handlers. *Differential:* CRC over both tallies at fenced stop counts.
-140. **Software Vectors (`brkcop`).** BRK and COP — the synchronous software interrupts. Today a
+140. **Software Vectors (`brkcop`).** **DONE 2026-08-04 — clean positive + platform fix,
+     `0xA34C` (`304f3c3`); assembler gap (no `cop` mnemonic, operand-less `brk`) queued
+     upstream. [Per-demo record](2026-08-04-140-snes-brkcop.md).** BRK and COP — the synchronous software interrupts. Today a
      native-mode `cop` jumps to `$0000` and executes WRAM as code (silent corruption, found by
      this audit, worse than a crash); `brk` lands in the shared `irq` handler with no way to
      distinguish. The demo splits the vectors: separate weak `brk`/`cop` C-handler symbols in
@@ -222,10 +232,12 @@ platform defect, not just a question), then #139, then #141.
 
 ### Cluster C — far pointers, third pass (the richest vein: defects 1, 6, 13)
 
-128. **Bank-Boundary Walker (`bankwalk`).** A far array deliberately placed to straddle a 64K
+128. **Bank-Boundary Walker (`bankwalk`).** **DONE + PUBLISHED 2026-08-04 — clean positive,
+     `0x4ED7`.** A far array deliberately placed to straddle a 64K
      bank boundary, walked by pointer increment and by indexed offset across the seam — the
      24-bit `G_PTR_ADD` carry into the bank byte, both directions (`p++` and `p += big`).
      *Differential:* CRC over values read across the seam; host oracle models flat memory.
+     Host/a16/xy16 agree on MAME and bsnes-jg. [Per-demo record](2026-08-04-128-snes-bankwalk.md).
 129. **Pointer-Order Shuffle (`farptrcmp`).** Sorts/deduplicates an array *of far pointers* by
      pointer value and takes ptrdiffs between elements in different banks — `G_ICMP` on
      `addrspace(1)` (24-bit compare, three limbs) and 24-bit subtraction, neither ever formed.

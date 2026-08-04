@@ -42,7 +42,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   Host/default/a16/xy16 all `0xDA3B`; a16 3× deterministic; playable explanation at
   [https://biohack.net/snes/nmitally/](https://biohack.net/snes/nmitally/). See
   [report](docs/investigations/2026-08-03-65816-interrupt-width-prologue.md).
-- [T3] **Round 7 demo battery (#119–#141, now twenty-two) — new defect-hunting ROMs.** Targets chosen by
+- [wip T3] **Round 7 demo battery (#119–#141, now twenty-two) — new defect-hunting ROMs.** Targets chosen by <!-- agent:a790d7fb6ae22424b -->
   the scoreboard's yield pattern: combiner-formed opcodes (`G_ABDS/U`, s64 ctpop/clz/ctz/abs),
   first-ever interrupt-CC / inline-asm / mixed-per-function-width mode-state demos, far-pointer third pass,
   >256 B frames, volatile/atomic discipline, float↔s64 libcalls, s64 limb-seam shifts. First
@@ -58,6 +58,15 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   executes WRAM as code; BRK indistinguishably shares `irq`), #141 `dpbank` (D/DBR interrupt-entry
   contract: the envelope saves neither — force the extend-or-document decision). **#140 jumps the
   queue** — it starts from a known defect, not just a question.
+  **#140 `brkcop` DONE 2026-08-04 — clean positive + platform fix landed (`304f3c3`):** all five
+  SNES platforms wired COP to `$0000` (a native `cop` executed WRAM as code); split onto weak
+  `brk`/`cop` C-handler stubs in the shared crt0 + per-platform vector slots. The envelope holds on
+  the software-entry path: both handlers pass the order gate and `nmitally-isr-gate.py`; the vector
+  gate proves no native slot reads `$0000`; host/default/a16/xy16 all `0xA34C`, a16 3×
+  deterministic. New assembler gap queued upstream (no `cop` mnemonic, `brk` takes no signature
+  operand — `.byte` workaround; see
+  [upstream status](docs/upstream-contribution-status.md)). Publishing user-gated; next ranked
+  probe is #139 `irqgate`. [plan](docs/plans/2026-08-04-140-snes-brkcop.md).
   See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md). (T3: each demo is settled-plan
   implementation; the round's selection/design was done inline.)
   **#126 `mixedwidth` DONE 2026-08-03 — clean positive:** per-function target attributes are supported;
@@ -123,7 +132,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [biohack.net](https://biohack.net/snes/modethread/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/modethread/); next is #128
   `bankwalk`. [plan](docs/plans/2026-08-04-127-snes-modethread.md).
-- [T4] **Does `G_ADD`/`G_SUB` miss 16-bit lanes under `+mos-a16`?** Measured while withdrawing #122:
+  **#128 `bankwalk` DONE + PUBLISHED 2026-08-04 — clean positive:** forward, indexed, and reverse
+  far-pointer walks cross C1:FFFF/C2:0000; host/a16/xy16 agree at `0x4ED7` on MAME and bsnes-jg.
+  Published first on [biohack.net](https://biohack.net/snes/bankwalk/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bankwalk/); next is #129
+  `farptrcmp`. [plan](docs/plans/2026-08-04-128-snes-bankwalk.md).
+- [wip T4] **Does `G_ADD`/`G_SUB` miss 16-bit lanes under `+mos-a16`?** <!-- agent:aea74d64b728e41ad --> Measured while withdrawing #122:
   `MOSLegalizerInfo` gives add/sub `.legalFor({S8}).widenScalarToNextMultipleOf(0,8).custom()` with
   **no `maxScalar`**, so an s32 add narrows to **4×s8 `G_UADDE` lanes even under a16** — verified
   identical MIR with and without the feature. Only the bitwise ops get s16 lanes
@@ -135,7 +149,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   withdrawal in [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md).
   *Unranked: the ranking hook denies a tier marker from anyone but Fable. Suggested tier 4 —
   design + backend change in the legalizer's hottest path, where a wrong turn is expensive.*
-- [T4] **Interframe coding stops paying on hard content — measure the crossover, decide whether a
+- [wip T4] **Interframe coding stops paying on hard content — measure the crossover, decide whether a <!-- agent:a72ac3a239a961ff0 -->
   per-frame codec chooser is worth building.** Found by the Apollo recut (2026-08-02): on that
   content intraframe **LZSS beats interframe SVX2 by 14.31 points** (877,809 vs 1,070,154 B), up
   from 2.67 points on the first, near-static cut. The direction is intuitive — once consecutive
@@ -2010,4 +2024,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      finding — blossom.sh/mandel-oop.sh trip the known a16-rc-undef-ra-pure-virtual false-positive
      and need T3/T4 XFAIL-wiring — is already tracked in the curated [wip T2] vacuous-verify-sweep
      Open item's Progress note above. Nothing open here. fp:b0fbb26e5bab0a02 fp:26fe362b8541987b -->
+<!-- triaged 2026-08-04: all three #140 brkcop deferrals routed —
+     • publishing -> the standard user-gated /snes-rom-page flow (never tracked as open work);
+     • ABORT $FFE8/$FFF8 = $0000 -> documented non-work (pin not connected on SNES; decision in the plan);
+     • assembler cop / brk #imm -> queued in docs/upstream-contribution-status.md "Future / blocked". -->
 <!-- END auto-captured-deferrals -->

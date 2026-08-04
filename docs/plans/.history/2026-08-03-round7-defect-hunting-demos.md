@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-08-04](https://github.com/wbniv/llvm-mos-65816/commit/ca401a8) | plan(round7): addendum #139–#141 — ask the interrupt-entry contract completely |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/5485c41) | docs(round7): withdraw #122 — its "declared gap" was closed months earlier |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/44ca95e) | plan(demos): Round 7 (#119-#138) — twenty defect-hunting ROMs targeting unseen bug classes |
 
 <!--history-meta v1
+ca401a8	author	Will Norris
+ca401a8	added	143
+ca401a8	deleted	18
+ca401a8	files	1
+ca401a8	body	The #123 sibling-gap audit, turned into demos. Grounded findings driving the\naddendum: the ISR envelope is attribute-scoped (isISR && hasW65816) so it should\ncover every vector, but only NMI has ever fired; platforms/snes/link.ld wires BRK\nto the shared irq symbol and COP to $0000 — a native cop executes WRAM as code\ntoday, a real platform defect found by the audit; crt0 states DBR:=0 explicitly\nbut D=0 only implicitly, and the envelope saves neither.\n\n- #139 irqgate — first IRQ-vector C handler; envelope reentrancy when NMI\n  preempts the IRQ handler mid-envelope; reuses nmitally-isr-gate.py --symbol.\n- #140 brkcop — split BRK/COP onto their own weak C-handler symbols (platform\n  fix included), signature-byte skip asserted; jumps the queue (known defect).\n- #141 dpbank — D/DBR windows under NMI; forces the extend-envelope-or-document\n  decision, like #123 did for M/X.\n\nTODO battery item updated to #119–#141 (twenty-two); also folds in the battery\nagents' accumulated DONE status records (#119/120/121/124/125/126/127/131/138 +\nnmitally FIXED refinement) that were riding uncommitted on the shared tree, plus\nthe [T2] vacuous-verify sweep item added earlier today.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 5485c41	author	Will Norris
 5485c41	added	59
 5485c41	deleted	19

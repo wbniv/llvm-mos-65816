@@ -1,6 +1,20 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-07-31 (**critique-improvements pass — all four open PRs improved and
+**Last updated:** 2026-08-03 (**#321 upstream disposition clarified: `0002` remains local.** There is
+no existing #321 pull request; #321 is the upstream issue. The four open PRs (#577, #578, #579,
+#584) are narrower independent changes and must not absorb the holistic native-width patch. A future
+submission should describe the complete opt-in native-width implementation—not a "first stage"—and
+rework `0002` into a reviewable commit series under one draft PR. Posting remains user-triggered;
+wald3n.com remains pending until that PR has a real URL. **Implementation update:** the
+#321 native-width series gained its asynchronous-boundary contract.
+Round 7 #123 `nmitally` exposed that a 65816 C ISR inherited an unknown M/X state yet its prologue
+assumed M8/X8. The fix is now folded into holistic patch `0002`: `MOSFrameLowering` saves full A/X/Y
+under `rep #$30`, establishes M8/X8 for the generated body, restores under M16/X16, and lets `RTI`
+restore stacked P. LLVM test + runtime host/default/a16/xy16 `0xDA3B` green; runnable explanation:
+[https://biohack.net/snes/nmitally/](https://biohack.net/snes/nmitally/). This is **local #321-series content, not a standalone PR**; posting
+notes: [PR blueprint](321-upstream-native-width-pr.md) ·
+[interrupt addition](321-upstream-interrupt-width.md). Previously 2026-07-31
+(**critique-improvements pass — all four open PRs improved and
 updated in place** (plan:
 [2026-07-31-upstream-pr-critique-improvements](plans/2026-07-31-upstream-pr-critique-improvements.md);
 validation: a one-off MOS-only upstream build `~/llvm-mos/build-pr`, lit green per branch before
@@ -431,6 +445,13 @@ rationale + verification, for the PR narrative).
 
 ## Future / blocked (not yet postable — do **not** count these as pending)
 
+- **MC-layer `cop` mnemonic + `brk #imm` signature operand (assembler gap, found by demo #140,
+  2026-08-04).** Stock llvm-mos MC has no `cop` instruction at all and accepts only bare `brk` (no
+  signature byte), so both 65816 software-interrupt traps must be hand-assembled as
+  `.byte $02,$imm` / `.byte $00,$imm`, and `llvm-objdump --mcpu=mosw65816` decodes `$02` as
+  `<unknown>`. Unrelated to `+mos-a16` — a small standalone MC PR candidate (65816 instruction defs
+  + asm/disasm tests). Evidence and working `.byte` workaround:
+  [#140 plan](plans/2026-08-04-140-snes-brkcop.md). Not drafted yet.
 - **#320 five-address-space model + PR.** The real far-pointer codegen PR (asiekierka's 32-bit-default /
   packed 24-bit / zero-bank / abs-16 layout). Blocked on maintainer **ABI blessing** — gated behind posting
   the #320 design note above. Not drafted as a PR yet. **The fork-side implementation body is now large and
