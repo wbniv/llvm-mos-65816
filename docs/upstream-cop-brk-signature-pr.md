@@ -8,6 +8,18 @@
      branch to the COP-only complement (drop the BRK_Immediate hunk + BRK test lines, cite #586)
      or re-cut atop #586, and trim the body accordingly — the BRK and llvm-mc sections then become
      references, not content. Tracked by the [T5] "COP-only upstream complement" TODO bullet.
+     ⚠ DESIGN DIVERGENCE (review, 2026-08-04): the live fork carry in 0002 implements COP with a
+     DIFFERENT design than this draft — mandatory signature operand (no bare 1-byte `cop`),
+     decoder-visible (`$02` disassembles as a 2-byte `cop #imm`), InstUnconditionalBranch — vs this
+     draft's optional-operand / isAsmParserOnly / 1-byte-decode. Resolve optional-vs-mandatory
+     BEFORE reducing the branch; the two artifacts currently contradict each other.
+     Review corrections (2026-08-04): the "Predicate" section's claim that tests pin the 65EL02
+     rejection is wrong — asm-errors.s runs only at -mcpu=mos6502, so NO lit test guards the
+     FeatureW65816-vs-shared-predicate choice (a refactor to the shared predicate would pass the
+     whole suite); add a 65el02 negative RUN line in the COP-only PR. Also fold in the coverage
+     PR #586 dropped from this branch's brk-cop-signature.s: bare-form pins, expression operand,
+     $7f boundary, second-CPU RUN line. The "Origin" section's ".byte workaround" wording is stale
+     — the demo now uses natural mnemonics.
      Status: DRAFTED 2026-08-04, NOT POSTED, BRANCH NOT PUSHED (posting is user-triggered).
      Branch: mos-65816-cop-brk-signature, cut from upstream main 1f334fef02b5, one commit
      61c07100970c, living locally in ~/llvm-mos. Verified in ~/llvm-mos/build-pr (MOS-only,
