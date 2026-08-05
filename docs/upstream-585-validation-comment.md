@@ -8,10 +8,13 @@
 > **Exact command to post, once approved:**
 >
 > ```bash
-> sed -n '/<!-- COMMENT BODY BELOW -->/,$p' docs/upstream-585-validation-comment.md \
->   | tail -n +2 > /tmp/585-comment.md
+> awk 'f{print} /^<!-- COMMENT BODY BELOW -->$/{f=1}' \
+>   docs/upstream-585-validation-comment.md > /tmp/585-comment.md
 > gh pr comment 585 -R llvm-mos/llvm-mos --body-file /tmp/585-comment.md
 > ```
+>
+> (The `^…$` anchors matter — this banner quotes the marker too, but as a blockquoted `> ` line, so only
+> the real marker matches.)
 >
 > Full evidence and method: [`investigations/2026-08-05-585-gashre-validation.md`](investigations/2026-08-05-585-gashre-validation.md).
 > Validated against PR head `4fb170fd9d357e453c5f3bc9421caa70b8bbb337`; **re-run before posting if the PR is
