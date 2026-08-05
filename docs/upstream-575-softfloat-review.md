@@ -9,7 +9,14 @@
      the references below come from a local diff dump and may be offset.
      Strategic note: a rigorous review of a third-party PR is the strongest available
      engagement move for our 11-PR queue (demonstrates the review capacity we're requesting;
-     reciprocity tends to follow). -->
+     reciprocity tends to follow).
+     UPDATE 2026-08-05: both addsf3 bugs now have a VERIFIED FIX (see the final section) —
+     million-case re-fuzz 0 mismatches, both original failure-seed replays now clean, real
+     clang-23 compile at -O0..-O3/-Os (712 B, +37 B; still 77% below generic addsf3), both
+     patched regions hand-verified in disassembly. HONEST CAVEAT: no mos-sim hardware-level
+     execution run (sysroot layout friction in this checkout) — evidence is model+compile+
+    disasm, stated as such. Posting options (user choice): one combined review+fix comment,
+     or review comment + GitHub suggested-changes patch. -->
 
 **Method.** For each of the four new routines: hand-traced the 6502 assembly
 instruction-by-instruction, transcribed it into an independent bit-exact Python model, and
@@ -121,3 +128,112 @@ subnormal bug is wrong roughly a third of the time for an ordinary subtraction p
 Recommend: flag the two `addsf3.c` bugs as blocking, and ask for the missing `subsf3` test
 to land in-tree — ideally as a fuzz-based regression test, since fixed vectors demonstrably
 missed both bugs.
+
+
+## Verified fix (2026-08-05, ours — offered to the author)
+
+Both bugs fixed and verified: (1) the normalize loop special-cases `exp==1` — relabel to
+`exp=0` with **no shift** (subnormals share the smallest normal's scale); (2) the subtract
+path, on nonzero `B_STK`, ripple-decrements `[A_M3:A_M2:A_M1:A_M0]` by one unit and
+force-sets sticky (true difference = computed − f, f∈(0,1) unit → represent as
+(computed−1) + positive inexact remainder). The ripple can never underflow an all-zero
+tuple: post-alignment `B_M3` bit 7 is provably 0 while `A_M3` bit 7 is 1 (proof in the
+patch comment; 2M-case targeted search found zero counterexamples).
+
+Verification: independent IEEE-754 re-derivation before coding; model re-fuzz 1M pairs → 0
+mismatches; exact replay of the original failing seeds (8,267/26,594 subnormal and 63/300k
+sticky) → 0; compiled with the fork's real `clang-23 -target mos` at every opt level —
+clean, byte-identical 712 B `.text` (675→712, +37 B; the PR's size win stands); both
+patched regions hand-verified in the disassembly (labels, branch targets, the
+`dec` ripple chain, the `cmp #1/beq` check). NOT run: `mos-sim` execution (sysroot layout
+friction) — flagged rather than claimed.
+
+```diff
+--- a/compiler-rt/lib/builtins/mos/addsf3.c
++++ b/compiler-rt/lib/builtins/mos/addsf3.c
+@@ -598,12 +598,44 @@
+         "lda " A_M1 "\n" "sbc " B_M1 "\n" "sta " A_M1 "\n"
+         "lda " A_M2 "\n" "sbc " B_M2 "\n" "sta " A_M2 "\n"
+         "lda " A_M3 "\n" "sbc " B_M3 "\n" "sta " A_M3 "\n"
+-        // Merge b's sticky into a's sticky.
++        // FIX: a nonzero B_STK here means b's true value is slightly
++        // LARGER than the truncated value we just subtracted (its low
++        // bits were dropped during alignment), so the difference we
++        // just computed is slightly TOO LARGE -- by a strictly-positive
++        // amount less than one unit of A_M0's LSB.  This is the
++        // opposite correction from the same-sign ADD path above (where
++        // a nonzero B_STK correctly biases the round UP): here it must
++        // bias the round DOWN.  Implement that by borrowing one full
++        // unit out of the [A_M3:A_M2:A_M1:A_M0] tuple (ripple decrement)
++        // and then marking sticky unconditionally -- the leftover
++        // fractional amount (strictly between 0 and 1 unit) is never
++        // exactly representable, so any later round decision must treat
++        // this position as inexact. (The ripple decrement can never
++        // underflow an all-zero tuple: whenever B_STK can be nonzero, an
++        // alignment shift occurred, and a logical right-shift always
++        // zero-fills its vacated top bit, so B_M3's bit 7 is provably 0
++        // post-shift while A_M3's bit 7 is provably 1 here [exp != 0],
++        // so the tuple this subtract produces can never be exactly zero
++        // when B_STK is set.)
+         "lda " B_STK "\n"
+-        "beq 9f\n"
++        "beq .L__addsf3_sub_stk_done\n"
++        "dec " A_M0 "\n"
++        "lda " A_M0 "\n"
++        "cmp #$ff\n"
++        "bne .L__addsf3_sub_stk_set\n"
++        "dec " A_M1 "\n"
++        "lda " A_M1 "\n"
++        "cmp #$ff\n"
++        "bne .L__addsf3_sub_stk_set\n"
++        "dec " A_M2 "\n"
++        "lda " A_M2 "\n"
++        "cmp #$ff\n"
++        "bne .L__addsf3_sub_stk_set\n"
++        "dec " A_M3 "\n"
++        ".L__addsf3_sub_stk_set:\n"
+         "lda #1\n"
+         "sta " A_STK "\n"
+-        "9:\n"
++        ".L__addsf3_sub_stk_done:\n"
+
+         // Exact cancellation (whole tuple + sticky all zero) -> +0.
+         // Per IEEE 754, "correctly-rounded x - x" returns +0 for any
+@@ -679,6 +711,24 @@
+         "bmi .L__addsf3_norm_done\n"
+         "lda " A_EXP "\n"
+         "beq .L__addsf3_norm_done\n"                  // subnormal -- stop
++        // FIX: exp==1 is the transition into subnormal representation,
++        // not one more normal-to-normal renormalization step.  Normal
++        // exponents E and E-1 (both >=1) share a "shift mantissa left 1,
++        // decrement exp" invariant that preserves value; that invariant
++        // does NOT extend to E=1 -> E=0, because IEEE 754 subnormals
++        // (biased exp field 0) reuse the SAME reference scale as the
++        // smallest normal (biased exp field 1) -- they just drop the
++        // implicit leading 1.  So at exp==1 with bit 7 still clear, the
++        // CURRENT (unshifted) mantissa is already the correct subnormal
++        // encoding: relabel exp to 0 and stop, without shifting.
++        // Shifting here as if crossing a normal exponent boundary
++        // silently doubles the result. (A same-shape check already
++        // exists a few lines below, in the OVERSHOOT CORRECTION block,
++        // for the opposite boundary condition -- bit 7 becoming set
++        // exactly as exp reaches 0 -- but that fix is one-directional
++        // and does not cover this case.)
++        "cmp #1\n"
++        "beq .L__addsf3_norm_to_subnormal\n"
+         "lda " A_STK "\n"
+         "lsr a\n"                            // C <- stk bit 0
+         "rol " A_M0 "\n"                     // shift with sticky into new m0[0]
+@@ -690,6 +740,11 @@
+         "dec " A_EXP "\n"
+         "jmp .L__addsf3_norm_bit_loop\n"
+
++        ".L__addsf3_norm_to_subnormal:\n"
++        "lda #0\n"
++        "sta " A_EXP "\n"
++        "jmp .L__addsf3_norm_done\n"
++
+         ".L__addsf3_norm_done:\n"
+         // ================================================================
+         // NORMALIZE OVERSHOOT CORRECTION (subtract path only).
+```
