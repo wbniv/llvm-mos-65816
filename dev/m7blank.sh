@@ -86,10 +86,18 @@ if [ "$#" -gt 0 ]; then DEMOS=("$@"); else mapfile -t DEMOS < <(default_demos); 
 # else may live in the window (snesgfx/m7title.h, THE HANDOFF CONTRACT).
 budget_for() {
   case "$1" in
+    # apollo-reel measures under a synthetic stand-in corpus (build_wide_demo() generates one —
+    # the real footage lives outside the repo), so this is the HiROM DMA setup + first packed-far
+    # frame's codec dispatch, same shape as snes-video-reel below.
+    apollo-reel)     echo 6 ;;   # 5 measured
     avalanche)      echo 2 ;;
     blossom)        echo 5 ;;   # 4 measured: vram_clear_all + hud_begin's BG3/HDMA setup + CGRAM DMA
     buddha)         echo 3 ;;   # 2 measured: vram_clear_all's two 32 KB DMAs + CGRAM DMA
     julia)          echo 2 ;;
+    # 253 measured: on-SNES LZSS decompression of the gallery's first work before any panel is
+    # drawn — decode dominates, not DMA setup. By far the widest window of the twelve; a
+    # regression here is likely a codec change, not a handoff-contract one.
+    lzss-gallery)   echo 254 ;;
     mandel-display) echo 2 ;;
     mandel-double)  echo 2 ;;
     mandel-float)   echo 2 ;;
@@ -99,6 +107,12 @@ budget_for() {
     # far loads + the queue copy). That is the Display first-frame path, not the splash contract —
     # tracked separately. Budgeted at the measured value so a splash-side regression still trips.
     mandel-oop)     echo 12 ;;
+    # 20 measured: the ExHiROM 6 MiB bytecode-VM cartridge's act-1 dispatch setup before its
+    # title clears — the generated seamdemo-data.h layout plus the VM's own init, not DMA.
+    seamdemo)       echo 21 ;;
+    # snes-video-reel measures against the checked-in assets/snes/video/svx2-full-reel.bin
+    # corpus (real asset, real build) — the HiROM DMA setup + first packed-far frame decode.
+    snes-video-reel) echo 5 ;;   # 4 measured
     *)              echo 2 ;;   # a new splash demo must land at the floor
   esac
 }
@@ -110,6 +124,86 @@ budget_for() {
 
 SCAN_DIR="$BUILD/m7blank"
 mkdir -p "$SCAN_DIR"
+
+# Four demos are not a single self-contained examples/snes/<demo>.c: they need a
+# generated asset header, extra source files, and/or a post-link pack/fill step, so
+# the generic single-file build below can never reach them. Each case reproduces the
+# REAL recipe its own dev/<demo>.sh gate uses (same sources, same cfg, same pack
+# tool) — except apollo-reel, whose footage corpus lives outside the repo entirely
+# (dev/apollo-reel.sh defaults to an out-of-tree /tmp path). The force-blank window
+# is a function of CODE SHAPE (DMA setup + first-frame dispatch order), not pixel
+# content, so a tiny deterministic synthetic corpus in the same shape the real baker
+# expects (4480-byte tile-major frames, 448-byte BGR555 palette) reproduces the real
+# code path without vendoring footage into the repo or reaching into /tmp.
+build_wide_demo() { # <demo> <extra-cflags> -> writes $BUILD/$demo.sfc + $BUILD/$demo.map
+  local demo=$1 extra=$2
+  case "$demo" in
+    snes-video-reel)
+      local stream="$ROOT/assets/snes/video/svx2-full-reel.bin"
+      [ -f "$stream" ] || { echo "missing checked-in $stream" >&2; return 1; }
+      "$TOOL/mos-clang" --config "$BUILD/install/bin/mos-snes-hirom.cfg" -mcpu=mosw65816 \
+        -Xclang -target-feature -Xclang +mos-a16 -Os -DSVC_USE_ASM $extra \
+        -I"$ROOT/examples/snes" \
+        -Wl,-Map="$BUILD/$demo.map" -o "$BUILD/$demo.sfc" \
+        "$ROOT/examples/snes/snes-video-reel.c" \
+        "$ROOT/examples/snes/snes-video-reel-fast.s" \
+        "$ROOT/examples/snes/snes-video-codec.c" \
+        "$ROOT/examples/snes/snes-video-dma.c" \
+        "$ROOT/examples/snes/snes-video-codec-fast.s" || return 1
+      python3 "$ROOT/tools/snes-video-pack-hirom.py" "$BUILD/$demo.sfc" "$stream" >/dev/null || return 1
+      python3 "$ROOT/tools/snes-checksum.py" --hirom "$BUILD/$demo.sfc" >/dev/null
+      ;;
+    apollo-reel)
+      local stubdir="$SCAN_DIR/apollo-reel-stub"
+      mkdir -p "$stubdir"
+      python3 - "$stubdir" <<'PY'
+import struct, sys
+from pathlib import Path
+out = Path(sys.argv[1])
+FRAMES = 8   # small and deterministic: only the code path is being measured
+with open(out / "stub.tiles", "wb") as f:
+    for i in range(FRAMES):
+        f.write(bytes((i * 37 + j) & 0xFF for j in range(4480)))
+with open(out / "stub.pal", "wb") as f:
+    for i in range(224):
+        f.write(struct.pack("<H", (i * 3) & 0x7FFF))
+PY
+      python3 "$ROOT/tools/snes-video-reel-assets.py" --frames 8 --packed-far --keyframe-interval 4 \
+        --frame-checks --dashboard-palette-fixup \
+        --palette-output "$stubdir/eff.pal" --stream-output "$stubdir/stream.bin" \
+        "$stubdir/stub.tiles" "$stubdir/stub.pal" "$stubdir/apollo-reel-assets.h" >/dev/null || return 1
+      "$TOOL/mos-clang" --config "$BUILD/install/bin/mos-snes-hirom.cfg" -mcpu=mosw65816 \
+        -Xclang -target-feature -Xclang +mos-a16 -Os -DSVC_USE_ASM \
+        -DAPOLLO_REEL_VBLANKS_PER_FRAME=2 $extra \
+        -I"$stubdir" -I"$ROOT/examples/snes" \
+        -Wl,-Map="$BUILD/$demo.map" -o "$BUILD/$demo.sfc" \
+        "$ROOT/examples/snes/apollo-reel.c" \
+        "$ROOT/examples/snes/apollo-reel-fast.s" \
+        "$ROOT/examples/snes/snes-video-codec.c" \
+        "$ROOT/examples/snes/snes-video-dma.c" \
+        "$ROOT/examples/snes/snes-video-codec-fast.s" || return 1
+      python3 "$ROOT/tools/snes-video-pack-hirom.py" "$BUILD/$demo.sfc" "$stubdir/stream.bin" >/dev/null || return 1
+      python3 "$ROOT/tools/snes-checksum.py" --hirom "$BUILD/$demo.sfc" >/dev/null
+      ;;
+    seamdemo)
+      local gen="$SCAN_DIR/seamdemo-gen" cfg="$BUILD/install/bin/mos-snes-cart-seamdemo.cfg"
+      mkdir -p "$gen"
+      [ -f "$cfg" ] || python3 "$ROOT/tools/snes-cartcanary.py" emit-platform \
+        --mapping exhirom --size 6M --name snes-cart-seamdemo --install "$BUILD/install" >/dev/null || return 1
+      python3 "$ROOT/tools/snes-seamdemo-gen.py" emit-header \
+        --mapping exhirom --size 6M --out "$gen/seamdemo-data.h" >/dev/null || return 1
+      "$TOOL/mos-clang" --config "$cfg" -mcpu=mosw65816 \
+        -Xclang -target-feature -Xclang +mos-a16 -Os $extra \
+        -I"$gen" -I"$ROOT/examples/snes" \
+        -Wl,-Map="$BUILD/$demo.map" -o "$BUILD/$demo.sfc" \
+        "$ROOT/examples/snes/seamdemo.c" || return 1
+      python3 "$ROOT/tools/snes-seamdemo-gen.py" fill --mapping exhirom --size 6M \
+        --rom "$BUILD/$demo.sfc" --report "$gen/fill.json" >/dev/null || return 1
+      python3 "$ROOT/tools/snes-checksum.py" --mapping exhirom "$BUILD/$demo.sfc" >/dev/null
+      ;;
+    *) return 1 ;;
+  esac
+}
 
 printf '%-18s %8s %8s %8s %s\n' demo first last frames note
 printf -- '---------------------------------------------------------------\n'
@@ -126,20 +220,31 @@ for demo in "${DEMOS[@]}"; do
   cfg="$CFG"
   case "$demo" in
     mandel-double) extra="-Oz" ;;   # .far_rodata overflows the 32 KiB LoROM at -Os
+    lzss-gallery)  cfg="$BUILD/install/bin/mos-snes-gallery.cfg" ;;
   esac
   # A demo that opts into the far platform needs its linker config, or .far_rodata overflows.
   grep -q 'snes-far-platform' "$src" && [ -f "$BUILD/install/bin/mos-snes-far.cfg" ] \
     && cfg="$BUILD/install/bin/mos-snes-far.cfg"
   [ "$PROBE" = 1 ] && extra="$extra -DM7BLANK_PROBE"
-  if ! "$TOOL/mos-clang" --config "$cfg" -mcpu=mosw65816 \
-        -Xclang -target-feature -Xclang +mos-a16 -Os $extra \
-        ${M7BLANK_CFLAGS:-} \
-        -Wl,-Map="$BUILD/$demo.map" -o "$BUILD/$demo.sfc" "$src" \
-        > "$SCAN_DIR/$demo.buildlog" 2>&1; then
-    printf '%-18s %8s %8s %8s %s\n' "$demo" - - - "BUILD FAILED (see $SCAN_DIR/$demo.buildlog)"
-    continue
-  fi
-  python3 "$ROOT/tools/snes-checksum.py" "$BUILD/$demo.sfc" >/dev/null
+  case "$demo" in
+    apollo-reel|snes-video-reel|seamdemo)
+      if ! build_wide_demo "$demo" "$extra" > "$SCAN_DIR/$demo.buildlog" 2>&1; then
+        printf '%-18s %8s %8s %8s %s\n' "$demo" - - - "BUILD FAILED (see $SCAN_DIR/$demo.buildlog)"
+        continue
+      fi
+      ;;
+    *)
+      if ! "$TOOL/mos-clang" --config "$cfg" -mcpu=mosw65816 \
+            -Xclang -target-feature -Xclang +mos-a16 -Os $extra \
+            ${M7BLANK_CFLAGS:-} \
+            -Wl,-Map="$BUILD/$demo.map" -o "$BUILD/$demo.sfc" "$src" \
+            > "$SCAN_DIR/$demo.buildlog" 2>&1; then
+        printf '%-18s %8s %8s %8s %s\n' "$demo" - - - "BUILD FAILED (see $SCAN_DIR/$demo.buildlog)"
+        continue
+      fi
+      python3 "$ROOT/tools/snes-checksum.py" "$BUILD/$demo.sfc" >/dev/null
+      ;;
+  esac
 
   # corpus_result is only used to satisfy jgxcheck's argument list; the SMOKE verdict is ignored.
   VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$BUILD/$demo.map" || true)

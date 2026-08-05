@@ -128,7 +128,7 @@ after the splash turns the gate red.
 | `mandel-oop` | `mandel_layer_init()` moves inside the bracket; the loading-texture build moves out of `reserve()`'s blank window | 11 → target ≤ 4 |
 | `julia` | `julia_gate_crc()` moves from *before* the splash to inside the bracket — removes ~2 s of **boot** black, window already at the floor | 1 → 1 |
 | `avalanche` | none — already at the floor | 1 → 1 |
-| `apollo-reel`, `lzss-gallery`, `snes-video-reel`, `seamdemo` | none — already `begin`/`end`; not measurable here (generated assets / non-LoROM cfg) | — |
+| `apollo-reel`, `lzss-gallery`, `snes-video-reel`, `seamdemo` | none — already `begin`/`end`; not directly at issue here, but see the coverage fix below | apollo-reel 5, lzss-gallery 253, seamdemo 20, snes-video-reel 4 (measured, not tightened) |
 
 Note: `mandel-double` is a splash demo the audit finds but it does not link at `-Os` in this
 harness (`.far_rodata` overflow); `dev/m7blank.sh` uses its gate's `-Oz`.
@@ -343,6 +343,17 @@ comments predicted.
 - The 6-frame `build_step()` residual inside snesgfx's first `display_frame()` — own TODO item.
 - `snesgfx/splash.h` and `splash16` in `title_layer.h` still re-open the window (the remaining half
   of the `agent-handoff.md` "Still to convert" list); not Mode 7 demos, not measured here.
-- `apollo-reel`, `lzss-gallery`, `seamdemo`, `snes-video-reel` already use `begin`/`end` but cannot
+- ~~`apollo-reel`, `lzss-gallery`, `seamdemo`, `snes-video-reel` already use `begin`/`end` but cannot
   be measured by `dev/m7blank.sh` — they need generated asset headers or corpora that live outside
-  the repo. They are discovered and reported as `BUILD FAILED` rather than silently skipped.
+  the repo. They are discovered and reported as `BUILD FAILED` rather than silently skipped.~~ FIXED:
+  `dev/m7blank.sh`'s `build_wide_demo()` now reproduces each demo's real multi-file build recipe —
+  `lzss-gallery` just needed the `mos-snes-gallery.cfg` its own gate uses (checked-in assets
+  compile as-is); `snes-video-reel` builds against the checked-in
+  `assets/snes/video/svx2-full-reel.bin` corpus (real asset, real measurement); `seamdemo`'s ExHiROM
+  6 MiB layout + payload generation is pure Python (`tools/snes-seamdemo-gen.py`), no external
+  corpus needed. Only `apollo-reel`'s footage genuinely lives outside the repo (`dev/apollo-reel.sh`
+  defaults to a `/tmp` corpus) — since the force-blank window is a function of code shape (DMA
+  setup + first-frame codec dispatch), not pixel content, `build_wide_demo()` generates a tiny
+  deterministic synthetic corpus in the real baker's expected shape instead of vendoring footage.
+  All twelve demos are now measured, no `BUILD FAILED` / SKIP list. See the `[T2]` TODO item this
+  closed.
