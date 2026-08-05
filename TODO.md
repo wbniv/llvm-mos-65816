@@ -240,11 +240,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   probably fine, but "probably" is not a measurement and the gate reports them as `BUILD FAILED`
   rather than green. Wire their asset generation (or a stub corpus) so the gate covers all twelve.
   (T2: harness plumbing per demo, no design question.)
-- [T1] **Drop the two stale `nmitally.c` entries from the `snes-display-quality` baseline.** They
-  predate `c9e0f12` (the header replacement) and match no current source; the m7blank session
-  hand-inserted its own two entries rather than run `--update-baseline`, which would have silently
-  dropped these foreign ones. Verify staleness, remove, re-run the quality gate, diff the baseline
-  (expect exactly −2). (T1: known cause, mechanical removal + gate re-run.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -1237,6 +1232,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-05 — [dq-baseline-stale-pair] Two pre-c9e0f12 nmitally.c baseline entries dropped with no-match evidence; SNESDQ PASS 254→252 (`9bc0c50`).
 - [x] 2026-08-05 — [m7-splash-forceblank] Mode 7 splash handoff contract: post-title force-blank 720 → 22 frames across 8 demos, floor measured at 1; `dev/m7blank.sh --gate` guards it. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
 - [x] 2026-08-05 — [0019-posted] Branch-range diagnostics POSTED as [#591](https://github.com/llvm-mos/llvm-mos/pull/591) (companion to open #549, same applyFixup hunk, ours yields on conflict; mint+verify by the 0019 session, post user-triggered). See [body](docs/upstream-branch-range-diagnostic-pr.md).
 - [x] 2026-08-05 — [corpus-slice-repairs] nmitally 240-tick oracle restored (lost by c9e0f12) + nbody_sim resurrected (deleted by 9369ced); corpus-a16 **62/62** first-ever full green (`608b84b`).
