@@ -219,8 +219,8 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   and the repro re-verified against the current toolchain (2 errors at `-Os`, clean
   `-O0`/`-Oz`); status-doc row 13 updated, issue **NOT POSTED** (filing is user-triggered).
   (T3: **residual = decide whether to attempt the toolchain-wide fix** — nothing else open.)
-- [T4] **Mode 7 splash force-blank floor — the shared `m7splash_end()`/`display_init()` handoff
-  holds the screen black across all seven Mode 7 demos.** Escalated out of the 121 re-verify
+- [wip T4] **Mode 7 splash force-blank floor — the shared `m7splash_end()`/`display_init()` handoff
+  holds the screen black across all seven Mode 7 demos.** <!-- agent:a960894c0a0a3418c --> Escalated out of the 121 re-verify
   (2026-08-05): after the `_mandel_reserve()` far-readback fix halved mandel-oop's post-title
   black window (24 → 11 frames, `1a9d9b8`), the residual 11 frames is a shared floor, not
   demo-local — `mandel-display` uses the same `m7splash()` , goes black at the same f=239, and
@@ -906,7 +906,11 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   maintainer engagement) shows life; producer-normalization decoupling DONE (`0027`). `0011`/`0015`
   still user judgment), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
-- [T2] **Mint + verify + ready the `0019` branch-range-diagnostic PR (post WITH/AFTER #549).**
+- [T5] **Post the `0019` branch-range-diagnostic PR (WITH/AFTER #549 — still OPEN 2026-08-05).**
+  MINT + VERIFY DONE 2026-08-05: `mos-branch-range-diagnostic` @ `4195df6e3b56` (tip-clean apply,
+  binary-hash-proven red/green, MC 40/40 + CodeGen 78/1-UNSUPPORTED exit 0 under the tool-complete
+  rule, anchored extraction verified, no trailer; fork docs `85cc887`). Residual is the
+  user-triggered post, sequenced with #549 (same `applyFixup` hunk; ours yields on conflict).
   Out-of-range `PCRel8`/`PCRel16` branch fixups assemble silently (offset truncated); `0019`
   adds post-correction range checks + source-located errors + `branch-range-errors.s`. Touches
   the SAME `applyFixup` hunk as open upstream
@@ -1116,9 +1120,12 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   closed by the #123 contract work (derived from the registry + committed ledger + parity digest).
   **4 FAIL:** #11 residual 11 frames of post-title black — **ESCALATED**, the rest lives in the
   shared `m7splash_end()`/`display_init()` force-blank handoff across all seven Mode 7 demos
-  (`mandel-display` holds black 72 frames at the same seam); #20 deployed ROMs ≠ fresh build; #23 no
-  ROM/preview cache-busting; #22 browser smoke test. Residual = deploy-gated (#20, #23) +
-  BLOCKED-no-harness (#22) + the #11 escalation; nothing was published.
+  (`mandel-display` holds black 72 frames at the same seam); ~~#20 deployed ROMs ≠ fresh build~~
+  **CLOSED 2026-08-05 — republished** (`dev/publish-snes-rom-both-sites.sh --publish`, fresh ROM
+  `59a76c6f…` live on both sites, both CI deploys `success` — which was also the first green CI run
+  of the Mode 7 contract tests); #23 no ROM/preview cache-busting — now live-relevant: returning
+  visitors may cache the old ROM until expiry; #22 browser smoke test. Residual = #23 + 
+  BLOCKED-no-harness (#22) + the #11 escalation (its own [T4] item).
   [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)
 - [verify T3] **123-mode7-gallery-filter** — re-run 2026-08-04: **9/10 steps PASS** (was 7/10).
   Both 08-03 causes closed. The plan's Data-contract build-time assertion and
