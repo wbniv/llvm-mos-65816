@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # dev/borrowlad.sh — render Borrow-Ladder Odometer (#110 stress-test, Round 6 Cluster E).
-# Re-stresses patch 0012 (LDCImm-set): a 128-bit descending odometer built from chained 16-bit
-# subtracts-with-borrow whose carry-in is a set/clear i1 (SEC / LDCImm 1) before the SBC chain, borrows
-# rippling across eight limbs. The a16/xy16 legs are load-bearing (0012 accum-gated).
+# A 128-bit descending odometer built from chained 16-bit subtracts-with-borrow, with borrows
+# rippling across eight limbs. The a16/xy16 legs exercise native-width SBC code generation.
 # Drive: dev/run.sh borrowlad. Outputs build/borrowlad-{jg,mame}.png.
 set -euo pipefail
 case "${1-}" in -h|--help)
@@ -35,9 +34,9 @@ echo "==> built build/borrowlad.sfc (+mos-a16); corpus_result @ WRAM $OFF"
 
 rc=0
 
-# 3. Disasm gate (a16): the 128-bit borrow chain lowers to a run of `sbc` preceded by a `sec` — the
-#    set-i1 carry-in (LDCImm 1 / SEC) 0012 materializes — under a16 rep/sep pressure.
-echo "==> disasm gate (a16: sec + sbc borrow chain — the LDCImm-set carry-in; rep/sep)"
+# 3. Disasm gate (a16): the 128-bit borrow chain lowers to a run of `sbc` preceded by `sec`, under
+#    a16 rep/sep pressure. This is a native-width codegen gate, not the baseline LDCImm regression.
+echo "==> disasm gate (a16: sec + sbc borrow chain; rep/sep)"
 "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os \
   -c "$ROOT/examples/snes/corpus/borrowlad_sim.c" -I"$ROOT/examples" -o "$BUILD/borrowlad_sim.o" 2>/dev/null
 dis=$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$BUILD/borrowlad_sim.o" 2>/dev/null || true)

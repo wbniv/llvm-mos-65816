@@ -18,12 +18,33 @@ index c236b9d322b5..a421f7d433f0 100644
 -    }
 +    // The operand is an i1 carry value: 0 -> CLC, set -> SEC. A 'set' i1 can
 +    // reach MC as -1 (sign-extended, the .td pattern's form) or as 1 (a plain
-+    // i1 'true', e.g. the carry-in materialized for a 16-bit SBC), so treat any
-+    // nonzero value as SEC rather than asserting a single encoding — the latter
-+    // is an UNREACHABLE under asserts and silently mislowers under NDEBUG.
++    // i1 'true'), so treat any nonzero value as SEC rather than asserting a
++    // single encoding — the latter is an UNREACHABLE under asserts and
++    // undefined behavior under NDEBUG.
 +    OutMI.setOpcode(MI->getOperand(1).getImm() == 0 ? MOS::CLC_Implied
 +                                                    : MOS::SEC_Implied);
 +    return;
    }
    case MOS::INWImag:
    case MOS::DEWImag: {
+diff --git a/llvm/test/CodeGen/MOS/asm-printer.mir b/llvm/test/CodeGen/MOS/asm-printer.mir
+index 70fb0e6d5a53..621f14f3c462 100644
+--- a/llvm/test/CodeGen/MOS/asm-printer.mir
++++ b/llvm/test/CodeGen/MOS/asm-printer.mir
+@@ -435,6 +435,16 @@ body: |
+     ; CHECK-NEXT: rts
+ ...
+ ---
++name: sec_implied_true
++# CHECK-LABEL: sec_implied_true
++body: |
++  bb.0.entry:
++    $c = LDCImm 1
++    ; CHECK: sec{{$}}
++    RTS
++    ; CHECK-NEXT: rts
++...
++---
+ name: dea_implied
+ # CHECK-LABEL: dea_implied
+ body: |

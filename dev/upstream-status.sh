@@ -14,7 +14,12 @@ command -v gh >/dev/null 2>&1 || { echo "error: gh CLI not found (https://cli.gi
 REPO=llvm-mos/llvm-mos
 
 # Bug-fix PRs that carry a fork patch: PR# -> the patch to drop once it merges.
-declare -A PATCH=( [562]=0003-late-opt-txy-dead-flag [563]=0008-mos-dp-arg-cc )
+declare -A PATCH=(
+  [562]=0003-late-opt-txy-dead-flag
+  [563]=0008-mos-dp-arg-cc
+  [586]=0024-mos-brk-signature-operand
+  [587]=0025-llvm-mc-preserve-motorola-default
+)
 
 echo "== upstream bug-fix PRs (on merge: drop the patch + bump the vendor pin) =="
 for pr in "${!PATCH[@]}"; do

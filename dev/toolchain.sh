@@ -74,6 +74,8 @@ if [ ! -d "$SRC/.git" ]; then
   }
   apply_patch 0001-320-far-addrspace
   apply_patch 0002-321-accum16
+  apply_patch 0018-320-imag32-spill
+  apply_patch 0019-mos-branch-range-diagnostic
   apply_patch 0020-mos-65816-block-move-bank-order
   apply_patch 0021-mos-zp-alloc-deterministic
   # generic-LLVM + clang half only; the MOS-dir half is already inside 0002
@@ -91,6 +93,12 @@ if [ ! -d "$SRC/.git" ]; then
   # was silently dropped by the asm printer). Reproduces on pristine upstream.
   # Also baked into dev/regen-patch.sh's baseline. Drop on upstream merge.
   apply_patch 0022-mos-late-opt-cmpzero-lowering
+  # Far-pointer-order demo finding: select legal truncations whose source bank
+  # is Imag8 (s8->s1) or Imag32 (s32->s16 under +mos-a16).
+  apply_patch 0023-mos-trunc-selection-regclasses
+  # Baseline MOS assembler: BRK carries its architectural signature byte.
+  apply_patch 0024-mos-brk-signature-operand
+  apply_patch 0025-llvm-mc-preserve-motorola-default
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

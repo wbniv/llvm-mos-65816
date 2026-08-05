@@ -2,7 +2,7 @@
 //
 // Round 6 (harden-the-fixes), Cluster E. Re-stresses patch 0012 (`LDCImm`-set): the backend lowers a
 // **set i1 carry** (the carry-in that must be SET — `SEC` — before the first `SBC` of a subtract
-// chain) via a materialized `LDCImm 1`. A wide multi-precision subtractor built from chained 16-bit
+// chain). A wide multi-precision subtractor built from chained 16-bit
 // subtracts-with-borrow is exactly that shape: the borrow ripples limb to limb, and every limb's
 // subtract consumes a carry-in that is a set/clear i1. This runs a 128-bit descending odometer that
 // ticks DOWN (through zero, wrapping) by subtracting a decrement each step, borrows rippling across

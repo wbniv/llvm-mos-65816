@@ -59,16 +59,15 @@ void cop(void) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Trap sites. The MOS assembler has no `cop` mnemonic and no signature operand for `brk`, so both
-// trap instructions are emitted as explicit bytes — which also pins the signature byte exactly:
-//   .byte $00,$42  =  brk #$42        .byte $02,$5A  =  cop #$5A
+// Trap sites. These natural mnemonics deliberately make the ROM an integration gate for the
+// assembler's architectural two-byte BRK/COP signature operands.
 // The assembler tracks rep/sep, so the poison-guard `lda #imm` assembles to the width the CPU will
 // actually be in when RTI returns (3 bytes at M=0, 2 bytes at M=1).
 // ---------------------------------------------------------------------------------------------
 static void brk_fire16(void) {
     __asm__ volatile("php\n"
                      "rep #$30\n"          // M=0, X=0: the fault site is native-width
-                     ".byte $00,$42\n"     // brk #$42
+                     "brk #$42\n"
                      "lda #$5aa5\n"        // POISON GUARD (a9 a5 5a) — RTI must resume here
                      "sta brkcop_sent16\n"
                      "plp\n" ::: "a", "cc", "memory");
@@ -77,7 +76,7 @@ static void brk_fire16(void) {
 static void brk_fire8(void) {
     __asm__ volatile("php\n"
                      "sep #$30\n"          // M=1, X=1: the ordinary 8-bit context
-                     ".byte $00,$42\n"     // brk #$42
+                     "brk #$42\n"
                      "lda #$b7\n"          // POISON GUARD (a9 b7)
                      "sta brkcop_sent8\n"
                      "plp\n" ::: "a", "cc", "memory");
@@ -86,7 +85,7 @@ static void brk_fire8(void) {
 static void cop_fire16(void) {
     __asm__ volatile("php\n"
                      "rep #$30\n"
-                     ".byte $02,$5a\n"     // cop #$5A
+                     "cop #$5a\n"
                      "lda #$a55a\n"        // POISON GUARD (a9 5a a5)
                      "sta brkcop_sent16\n"
                      "plp\n" ::: "a", "cc", "memory");
@@ -95,7 +94,7 @@ static void cop_fire16(void) {
 static void cop_fire8(void) {
     __asm__ volatile("php\n"
                      "sep #$30\n"
-                     ".byte $02,$5a\n"     // cop #$5A
+                     "cop #$5a\n"
                      "lda #$4d\n"          // POISON GUARD (a9 4d)
                      "sta brkcop_sent8\n"
                      "plp\n" ::: "a", "cc", "memory");

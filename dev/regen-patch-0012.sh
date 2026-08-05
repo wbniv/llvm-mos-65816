@@ -5,11 +5,10 @@
 # What 0012 is: an UPSTREAM MC-lowering robustness fix (pristine llvm-mos, not #321 feature code).
 # MOSMCInstLower lowered `LDCImm` (Cc, i1imm) only for immediate 0 (CLC) and -1 (SEC), asserting
 # `llvm_unreachable("Unexpected LDCImm immediate.")` otherwise. But a *set* i1 carry can reach MC as
-# 1 (a plain i1 'true') — e.g. the carry-in materialized for a 16-bit SBC — so a plain +mos-a16
-# 16-bit subtract aborts an asserts build at that unreachable (and, under NDEBUG, silently mislowers
-# the `default` arm — it happens to emit SEC, so the differential stayed green). Fix: lower the
+# 1 (a plain i1 'true') — so baseline MOS MIR can abort an asserts build at that unreachable (and,
+# under NDEBUG, enters undefined behavior that happens to emit SEC). Fix: lower the
 # operand as the boolean it is — `imm == 0 ? CLC : SEC` (any nonzero -> SEC). One line, emits the
-# same SEC, removes the NDEBUG-UB. Touches only MOSMCInstLower.cpp.
+# same SEC, removes the NDEBUG-UB. The regression is a plain `mos65c02` case in asm-printer.mir.
 #
 # Surfaced while fixing the register-scavenger crash (patch 0011): once the scavenger no longer
 # crashed, examples/65816/a16scavnz.c compiled *past* it and reached this MC unreachable on the

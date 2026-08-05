@@ -16,14 +16,10 @@
 #      the mirror+diff below would wrongly absorb that edit into 0002;
 #
 #   ⚠ STALE BASELINE (2026-07-31): 0018-320-imag32-spill and
-#     0019-mos-branch-range-diagnostic are applied AFTER 0002 by dev/toolchain.sh
-#     and are NOT baked into the baseline here, but they DO touch
-#     llvm/lib/Target/MOS (MOSInstrInfo.cpp / MCTargetDesc/MOSAsmBackend.cpp).
-#     Running this script as-is therefore ABSORBS them into 0002, after which
-#     toolchain.sh's `apply_patch 0018` fails on a fresh clone. Bake them into
-#     the baseline (the P3 pattern) before the next regen. Verified 2026-07-31:
-#     `git apply --check 0018` succeeds on pristine+0001+0002, i.e. 0002 does not
-#     contain it today.
+#     0019-mos-branch-range-diagnostic were historically omitted here. They
+#     depend on the existing 0002 and therefore cannot be baked into a pristine
+#     baseline. The current method mirrors live, then reverse-applies every
+#     standalone patch in reverse stack order before deriving the new 0002.
 #   3. mirror the live llvm/lib/Target/MOS dir over the worktree (all 0002 files
 #      live there) with rsync --delete;
 #   4. `git diff --cached` against the baseline -> 0002 (0003's MOSLateOptimization.cpp
@@ -50,13 +46,20 @@ MOSREL="llvm/lib/Target/MOS"
 # Standalone upstream-bound patches that live INSIDE $MOSREL and are therefore
 # absorbed into 0002 by the mirror+diff below unless they are in the baseline.
 # Each is optional (dropped once it merges upstream and the vendor pin is bumped).
-# NOTE: 0018/0019/0020 are deliberately absent — they are other workers' in-flight
-# patches; add them here when their owners fold them in. Until then, do not run
-# this script while they are un-landed (see the stale-baseline hazard note in
-# docs/plans/2026-08-01-gallery-nonreproducible-build.md).
-BASELINE_MOSDIR=(
+STANDALONE_MOSDIR=(
+  "$PATCHES/0018-320-imag32-spill.patch"
+  "$PATCHES/0019-mos-branch-range-diagnostic.patch"
+  "$PATCHES/0020-mos-65816-block-move-bank-order.patch"
   "$PATCHES/0021-mos-zp-alloc-deterministic.patch"
   "$PATCHES/0022-mos-late-opt-cmpzero-lowering.patch"
+  "$PATCHES/0023-mos-trunc-selection-regclasses.patch"
+  "$PATCHES/0024-mos-brk-signature-operand.patch"
+  "$PATCHES/0025-llvm-mc-preserve-motorola-default.patch"
+)
+TESTRELS=(
+  "llvm/test/CodeGen/MOS/interrupt-width-65816.ll"
+  "llvm/test/MC/MOS/all-65816-opcodes.s"
+  "llvm/test/MC/MOS/motorola-integers-default.s"
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
@@ -79,18 +82,32 @@ echo "==> [gen] worktree @ pristine + commit 0001 (+0003) as baseline"
 git -C "$VENDOR" worktree add --detach "$WT_GEN" "$PRISTINE" >/dev/null
 git -C "$WT_GEN" apply "$P1"
 [ -f "$P3" ] && { echo "    baking 0003 into baseline so it drops out of 0002"; git -C "$WT_GEN" apply "$P3"; }
-for p in "${BASELINE_MOSDIR[@]}"; do
-  [ -f "$p" ] || continue
-  echo "    baking $(basename "$p") into baseline so it drops out of 0002"
-  git -C "$WT_GEN" apply "$p"
-done
 git -C "$WT_GEN" add -A
 git "${GIT_ID[@]}" -C "$WT_GEN" commit -q -m "0001(+0003) baseline"
 
 echo "==> [gen] mirror live $MOSREL over the baseline, diff -> 0002"
 rsync -a --delete "$VENDOR/$MOSREL/" "$WT_GEN/$MOSREL/"
+for rel in "${TESTRELS[@]}"; do
+  cp "$VENDOR/$rel" "$WT_GEN/$rel"
+done
+# The live mirror contains the post-0002 standalone patches. Remove them from
+# the generation tree in reverse application order so the regenerated 0002
+# remains the holistic +mos-a16 body and toolchain.sh can still apply each
+# standalone artifact afterward.
+for ((i=${#STANDALONE_MOSDIR[@]}-1; i>=0; i--)); do
+  p="${STANDALONE_MOSDIR[$i]}"
+  [ -f "$p" ] || continue
+  echo "    reversing $(basename "$p") out of the 0002 generation tree"
+  includes=(--include="$MOSREL/*")
+  for rel in "${TESTRELS[@]}"; do includes+=(--include="$rel"); done
+  git -C "$WT_GEN" apply --reverse "${includes[@]}" "$p"
+done
 git -C "$WT_GEN" add -A
 git -C "$WT_GEN" diff --cached > "$P2"
+# Empty context lines are conventionally emitted as a single space. Strip that
+# marker so the patch artifact itself also passes the parent repo's whitespace
+# check; git apply accepts the unmarked empty context lines.
+sed -i 's/^ $//' "$P2"
 echo "    wrote $P2 ($(wc -l < "$P2") lines, $(grep -c '^diff --git' "$P2") files)"
 
 echo "==> [verify] apply 0001 + new 0002 (+0003) to a fresh pristine worktree"
@@ -98,13 +115,16 @@ git -C "$VENDOR" worktree add --detach "$WT_VFY" "$PRISTINE" >/dev/null
 git -C "$WT_VFY" apply "$P1"
 git -C "$WT_VFY" apply "$P2"
 [ -f "$P3" ] && git -C "$WT_VFY" apply "$P3"   # 0003 restores MOSLateOptimization.cpp to the live (fixed) state
-for p in "${BASELINE_MOSDIR[@]}"; do          # ditto for the other in-baseline MOS-dir patches
+for p in "${STANDALONE_MOSDIR[@]}"; do
   [ -f "$p" ] && git -C "$WT_VFY" apply "$p"
 done
 
 echo "==> [verify] diff -rq reapplied MOS dir vs live vendor MOS dir"
 if diff -rq "$WT_VFY/$MOSREL" "$VENDOR/$MOSREL"; then
-  echo "RESULT: PASS — 0002 round-trips (reapplied MOS dir == live vendor)"
+  for rel in "${TESTRELS[@]}"; do
+    diff -q "$WT_VFY/$rel" "$VENDOR/$rel"
+  done
+  echo "RESULT: PASS — 0002 round-trips (MOS dir + focused tests == live vendor)"
 else
   echo "RESULT: FAIL — round-trip mismatch (see diff above)"; exit 1
 fi

@@ -41,6 +41,31 @@ esac
 [ "$(stat -c %s "$ROM")" -gt 0 ] || { echo "FATAL: ROM is empty: $ROM" >&2; exit 1; }
 if [ -n "$PREVIEW" ]; then [ -f "$PREVIEW" ] || { echo "FATAL: preview not found: $PREVIEW" >&2; exit 1; }; fi
 
+SOURCE_SHA=$(sha256sum "$ROM" | cut -d' ' -f1)
+CONTRACT="$ROOT/dev/natural-rom-contracts/$SLUG.contract"
+if [ -f "$CONTRACT" ]; then
+  RECEIPT="$ROOT/build/$SLUG.natural-pass"
+  [ -f "$RECEIPT" ] || {
+    echo "FATAL: $SLUG is a natural-source demo but has no pass receipt: $RECEIPT" >&2
+    exit 1
+  }
+  source_rel=$(awk -F= '$1 == "source" { print substr($0, index($0, "=") + 1); exit }' "$CONTRACT")
+  evidence=$(awk -F= '$1 == "evidence" { print substr($0, index($0, "=") + 1); exit }' "$CONTRACT")
+  [ -f "$ROOT/$source_rel" ] || { echo "FATAL: contracted source not found: $source_rel" >&2; exit 1; }
+  receipt_value() { awk -F= -v key="$1" '$1 == key { print substr($0, index($0, "=") + 1); exit }' "$RECEIPT"; }
+  [ "$(receipt_value slug)" = "$SLUG" ] &&
+  [ "$(receipt_value status)" = NATURAL_PASS ] &&
+  [ "$(receipt_value rom_sha256)" = "$SOURCE_SHA" ] &&
+  [ "$(receipt_value source)" = "$source_rel" ] &&
+  [ "$(receipt_value source_sha256)" = "$(sha256sum "$ROOT/$source_rel" | cut -d' ' -f1)" ] &&
+  [ "$(receipt_value contract_sha256)" = "$(sha256sum "$CONTRACT" | cut -d' ' -f1)" ] &&
+  [ "$(receipt_value evidence)" = "$evidence" ] || {
+    echo "FATAL: stale or invalid natural-source pass receipt for $SLUG" >&2
+    exit 1
+  }
+  echo "NATURAL CONTRACT: PASS — $evidence"
+fi
+
 BIO_ROM="$BIOHACK/public/play/roms/$SLUG.sfc"
 BIO_PREVIEW="$BIOHACK/public/play/preview/$SLUG.png"
 BIO_MANIFEST="$BIOHACK/public/play/roms/manifest.json"
@@ -78,7 +103,6 @@ fi
 for file in "$BIO_ROM" "$BIO_PREVIEW" "$INDRI_ROM" "$INDRI_PREVIEW"; do
   [ -f "$file" ] || { echo "FATAL: missing paired publication artifact: $file" >&2; exit 1; }
 done
-SOURCE_SHA=$(sha256sum "$ROM" | cut -d' ' -f1)
 for file in "$BIO_ROM" "$INDRI_ROM"; do
   have=$(sha256sum "$file" | cut -d' ' -f1)
   [ "$have" = "$SOURCE_SHA" ] || { echo "FATAL: $file SHA-256 $have != $SOURCE_SHA" >&2; exit 1; }

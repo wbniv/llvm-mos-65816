@@ -1,0 +1,2 @@
+source=examples/65816/farptrcmp.h
+evidence=far-pointer-array+far-pointer-icmp+far-pointer-ptrdiff

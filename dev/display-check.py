@@ -14,7 +14,10 @@ demos in two days shipped with a passing gate and a broken display:
 
 `dev/verify-web-roms.sh` could not catch either, for two structural reasons this tool fixes:
   1. its BLANKSCAN looks for force-blank BLEED (a one-frame black band at the top of the picture),
-     not for a wholly black or dead screen; and
+     not for a wholly black or dead screen -- and since 2026-07-30 it additionally requires the
+     spike to sit on a quiescent baseline, so it is silent while a demo wipes or rebuilds its
+     picture (docs/plans/2026-07-30-blankscan-quiescence-gate.md). Neither restriction overlaps
+     what this tool checks, so the two are complementary rather than redundant; and
   2. it runs each ROM at the manifest's `frames`, which is chosen so `corpus_result` is ready --
      and that is typically still DURING the title. Checking there inspects the title card, not the
      demo. So we deliberately sample well PAST that frame.

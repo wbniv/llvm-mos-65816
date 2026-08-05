@@ -1,12 +1,11 @@
 // Borrow-Ladder Odometer — #110 of the compiler stress-test battery (Round 6, Cluster E).
-// Re-stresses patch 0012 (LDCImm-set): a 128-bit descending odometer built from chained 16-bit
-// subtracts-with-borrow whose carry-in is a set/clear i1 (SEC / LDCImm 1) before the SBC chain.
-// Borrows ripple limb to limb as the number ticks down through zero. The a16/xy16 legs are
-// load-bearing (0012 accum-gated); default 8-bit is the contrast. Builds all three (5-way bar).
+// A 128-bit descending odometer built from chained 16-bit subtracts-with-borrow. Borrows ripple
+// limb to limb as the number ticks down through zero. The a16/xy16 legs exercise native-width SBC
+// code generation; default 8-bit is the differential oracle. Builds all three (5-way bar).
 //
 // Visual: the 128 bits of the odometer drawn as a bit-grid (bright = 1); each frame it subtracts the
 // decrement, so bits flip and borrows ripple across the field. A dropped/duplicated borrow (a wrong
-// set-i1 carry) would corrupt the countdown AND diverge the CRC.
+// initial carry or borrow propagation would corrupt the countdown AND diverge the CRC.
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256
 #include "snesgfx/display.h"

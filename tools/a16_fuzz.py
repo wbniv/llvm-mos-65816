@@ -788,6 +788,39 @@ class CompileError(Exception):
     pass
 
 
+class VerifyDriverError(Exception):
+    """Raised by verify_machineinstrs() when the compile failed before the verifier ever ran —
+    e.g. a missing header ("file not found"). This is a harness/config problem, NOT a compiler
+    crash, and must never be reported as [CRASH]: see docs/plans (multibase.h stdlib.h false
+    positive) for the incident that motivated this split."""
+    pass
+
+
+class VerifyVacuousError(Exception):
+    """Raised when -verify-machineinstrs exited 0 but the emitted "object" is actually LLVM IR
+    bitcode, not a real target object — meaning codegen never ran and the verifier checked
+    NOTHING while still reporting success. `mos-clang --config ... -c` defaults to LTO (it
+    stops after emitting bitcode); every config-mode verify call MUST pass -fno-lto to force
+    real codegen, and this is the loud assertion that it actually did. A silent pass here is
+    the same class of bug as misreporting a driver error as [CRASH]: a gate that cannot fail."""
+    pass
+
+
+BITCODE_MAGICS = (b"BC\xc0\xde", b"\xde\xc0\x17\x0b")  # raw bitcode; bitcode-wrapper (LE)
+
+
+def _emitted_object_is_bitcode(obj):
+    """True if `obj` is LLVM IR bitcode rather than a real (ELF-ish) target object — i.e.
+    -fno-lto was missing/ineffective and codegen (and therefore -verify-machineinstrs) never
+    actually ran."""
+    try:
+        with open(obj, "rb") as f:
+            head = f.read(4)
+    except OSError:
+        return False  # no file at all is a separate (already-handled) failure mode
+    return head in BITCODE_MAGICS
+
+
 def _run(cmd, timeout=120, retries=2):
     """Run a fast, deterministic toolchain command (compile / verify / objdump / checksum).
 
@@ -829,17 +862,49 @@ def compile_rom(src, rom, mapf, flags, cflags=()):
         raise CompileError("checksum rc=%d\n%s" % (c.returncode, c.stderr))
 
 
-def verify_machineinstrs(src, obj, flags=None, cflags=()):
+def verify_machineinstrs(src, obj, flags=None, cflags=(), config=None):
     """Compile with -verify-machineinstrs. `flags` defaults to A16. Returns (ok, log).
     `cflags` (default empty) threads extra front-end args through unchanged for callers
-    that need an adapter header; the builtin path omits it. NOTE: this uses `--target=mos`
-    (no `--config`), so a TU that #includes libc headers (e.g. Csmith's <math.h>) can't be
-    verified here — the Csmith path skips this step (evaluate(..., verify=False)) and relies
-    on the `--config` link in compile_rom as its crash gate instead."""
+    that need an adapter header; the builtin path omits it.
+
+    `config` (default None) selects the driver mode:
+      * None            -> bare `--target=mos` (no `--config`), the original behaviour. A TU
+                           that #includes libc headers (e.g. Csmith's <math.h>) can't be
+                           verified this way — the Csmith path skips this step entirely
+                           (evaluate(..., verify=False)) and relies on the `--config` link in
+                           compile_rom as its crash gate instead.
+      * a cfg path      -> `--config <path>` instead of `--target=mos`, so the SDK's include
+                           search paths (mos-platform/snes/include) are wired up and a TU that
+                           #includes real libc headers (<stdlib.h>, ...) verifies for real. The
+                           corpus/`cmd_check` caller passes `build/install/bin/mos-snes.cfg`
+                           here — see docs/investigations (multibase.h `<stdlib.h>` false
+                           [CRASH]: config-free verify couldn't find the header, and any
+                           nonzero exit was being classified as a compiler crash).
+                           Config mode ALSO adds `-fno-lto`: `--config` defaults to LTO, under
+                           which `-c` stops after emitting LLVM IR bitcode — codegen (and so
+                           the verifier) never runs, yet the driver still exits 0. Without
+                           -fno-lto this "verify" would silently pass on every input, a much
+                           worse defect than the one this function exists to fix. See
+                           VerifyVacuousError below — the emitted object is checked, not just
+                           trusted.
+
+    A driver failure that never reached the verifier — e.g. "file not found" for a missing
+    header — raises VerifyDriverError instead of returning ok=False. That keeps a harness/
+    config problem from ever being misreported as [CRASH]: callers must catch it and surface
+    a distinct SKIP/ERROR, not fold it into the crash-detector's return value.
+
+    A "successful" (rc=0) compile whose output is LLVM IR bitcode, not a real object — i.e.
+    -fno-lto didn't take and codegen never ran — raises VerifyVacuousError. A verify call that
+    can silently no-op and still report success is worse than the crash it is meant to catch."""
     if flags is None:
         flags = A16
-    cmd = [str(TOOL / "mos-clang"), "--target=mos", "-mcpu=mosw65816", *flags, *cflags,
-           "-Os", "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
+    if config is not None:
+        cmd = [str(TOOL / "mos-clang"), "--config", str(config), "-mcpu=mosw65816", "-fno-lto",
+               *flags, *cflags,
+               "-Os", "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
+    else:
+        cmd = [str(TOOL / "mos-clang"), "--target=mos", "-mcpu=mosw65816", *flags, *cflags,
+               "-Os", "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
     try:
         p = _run(cmd)
     except subprocess.TimeoutExpired as e:
@@ -849,6 +914,21 @@ def verify_machineinstrs(src, obj, flags=None, cflags=()):
         return (False, "compile TIMEOUT >%ss across retries — possible backend infinite loop"
                 % e.timeout)
     log = p.stdout + p.stderr
+    # A missing-header / bad--I frontend failure never reaches the verifier at all — clang's
+    # own diagnostic for it is a stable "fatal error: '<header>' file not found", distinct from
+    # every crash signature below (a verifier rejection, an ICE stack dump, a segfault). Catch
+    # it FIRST so it can never fall through to the generic nonzero-exit "bad" classification
+    # and get misreported as [CRASH] (the multibase.h incident this split fixes).
+    missing_hdr = re.search(r"^.*fatal error: '[^']+' file not found.*$", log, re.MULTILINE)
+    if p.returncode != 0 and missing_hdr:
+        raise VerifyDriverError("missing header — %s" % missing_hdr.group(0).strip())
+    # rc=0 is NOT proof the verifier ran: under --config (LTO by default) a bare "successful"
+    # compile can stop after emitting bitcode, before codegen. Assert loudly rather than trust
+    # a silent no-op pass (the vacuous-gate class of bug — see VerifyVacuousError).
+    if p.returncode == 0 and _emitted_object_is_bitcode(obj):
+        raise VerifyVacuousError(
+            "rc=0 but %s is LLVM IR bitcode, not a target object — codegen (and "
+            "-verify-machineinstrs) never ran; -fno-lto is missing or ineffective" % obj)
     # A verifier rejection / ICE / segfault all set a nonzero exit; "Bad machine code"
     # is belt-and-suspenders. (Don't match a bare "ERROR" substring — benign diagnostics
     # contain it and would flag false crashes.)
@@ -1087,22 +1167,29 @@ def triage(seed, csrc, reason, extra=None):
         pass
 
 
-def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True):
+def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verify_config=None):
     """The shared safety net: verify-machineinstrs (a16) + compile default/a16 + run
     both on MAME (+ a16 on bsnes-jg) + assert every value agrees.
 
-    src       path to a .c whose `volatile unsigned short corpus_result` is the result.
-    expected  int reference value (host-computed / baked), or None to use the trusted
-              DEFAULT build's result as the reference (pure default==a16 differential).
-    on_triage callback(reason:str, extra:dict) — persist artifacts on failure.
-    cflags    extra front-end args threaded to verify + every compile (default empty →
-              every existing caller unchanged); the Csmith runner passes its adapter
-              `-include csmith_snes.h -I vendor/csmith/include` here.
-    verify    run the -verify-machineinstrs crash gate (default True). The Csmith path
-              passes verify=False: its TUs #include <math.h>, which the verify command's
-              bare `--target=mos` (no `--config`) can't find — so the `--config` LTO link
-              in compile_rom is the crash gate there (it already aborts on a backend ICE,
-              caught below as a CompileError and run through classify_known).
+    src           path to a .c whose `volatile unsigned short corpus_result` is the result.
+    expected      int reference value (host-computed / baked), or None to use the trusted
+                  DEFAULT build's result as the reference (pure default==a16 differential).
+    on_triage     callback(reason:str, extra:dict) — persist artifacts on failure.
+    cflags        extra front-end args threaded to verify + every compile (default empty →
+                  every existing caller unchanged); the Csmith runner passes its adapter
+                  `-include csmith_snes.h -I vendor/csmith/include` here.
+    verify        run the -verify-machineinstrs crash gate (default True). The Csmith path
+                  passes verify=False: its TUs #include <math.h>, which the verify command's
+                  bare `--target=mos` (no `--config`) can't find even with `verify_config` set
+                  (Csmith's adapter header lives outside the SDK's search path too) — so the
+                  `--config` LTO link in compile_rom is the crash gate there (it already
+                  aborts on a backend ICE, caught below as a CompileError and run through
+                  classify_known).
+    verify_config forwarded to verify_machineinstrs() as `config` (default None -> bare
+                  `--target=mos`, unchanged for the plain-fuzz caller). The corpus/`cmd_check`
+                  caller passes the SNES SDK cfg so a TU that #includes real libc headers
+                  (e.g. multibase.h's <stdlib.h>) verifies for real instead of hitting
+                  "file not found" — which, pre-fix, was misreported as [CRASH].
     Returns (status, message, ref_value). status in {PASS,FAIL,CRASH,ERROR,XFAIL}.
     """
     WORK.mkdir(parents=True, exist_ok=True)
@@ -1114,7 +1201,20 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True):
     #    only if neither leg has a new crash does a known issue on either leg yield XFAIL. See
     #    docs/plans/2026-06-21-321-xy16-verify-both-legs-hardening.md.
     if verify:
-        ok_a, vlog_a = verify_machineinstrs(src, WORK / "chk.vo", flags=A16, cflags=cflags)
+        try:
+            ok_a, vlog_a = verify_machineinstrs(src, WORK / "chk.vo", flags=A16, cflags=cflags,
+                                                 config=verify_config)
+        except VerifyDriverError as e:
+            # The compile never reached the verifier (e.g. a missing header) — a harness/config
+            # problem, not a compiler crash. Surface distinctly; never fold into [CRASH].
+            on_triage("verify-machineinstrs / driver error (+mos-a16)", {"error": str(e)})
+            return "ERROR", "verify-machineinstrs (+mos-a16) driver error: %s" % e, None
+        except VerifyVacuousError as e:
+            # The verifier never ran at all (LTO bitcode, not an object) yet the compile
+            # exited 0 — a broken gate, unrelated to the program under test. Must be LOUD:
+            # never silently counted as PASS.
+            on_triage("verify-machineinstrs / VACUOUS (+mos-a16, gate never ran)", {"error": str(e)})
+            return "ERROR", "VACUOUS-VERIFY-GATE-BROKEN (+mos-a16): %s" % e, None
         kid_a = None if ok_a else classify_known(vlog_a)
         if not ok_a and not kid_a:
             # New, unclassified +mos-a16 crash — hard fail now; the xy16 leg can't change this.
@@ -1123,7 +1223,15 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True):
         # #321 xy16: always verify under +mos-xy16 too — EVEN when the a16 leg is a known issue — so a
         # NEW xy16-only crash (e.g. an X-lattice regression) on a known-a16 program is never hidden by
         # the a16 XFAIL. (xy16 catches X-lattice regressions; that's the population most likely to hit one.)
-        ok_xy, vlog_xy = verify_machineinstrs(src, WORK / "chk_xy.vo", flags=XY16, cflags=cflags)
+        try:
+            ok_xy, vlog_xy = verify_machineinstrs(src, WORK / "chk_xy.vo", flags=XY16, cflags=cflags,
+                                                   config=verify_config)
+        except VerifyDriverError as e:
+            on_triage("verify-machineinstrs / driver error (+mos-xy16)", {"error": str(e)})
+            return "ERROR", "verify-machineinstrs (+mos-xy16) driver error: %s" % e, None
+        except VerifyVacuousError as e:
+            on_triage("verify-machineinstrs / VACUOUS (+mos-xy16, gate never ran)", {"error": str(e)})
+            return "ERROR", "VACUOUS-VERIFY-GATE-BROKEN (+mos-xy16): %s" % e, None
         kid_xy = None if ok_xy else classify_known(vlog_xy)
         if not ok_xy and not kid_xy:
             # New, unclassified +mos-xy16 crash — hard fail even if the a16 leg was a known XFAIL.
@@ -1254,7 +1362,14 @@ def cmd_known_issues(args):
             drift.append((rel, kid, "repro source missing"))
             continue
         for tag, flags in legs:
-            ok, vlog = verify_machineinstrs(src, WORK / "ki.vo", flags=flags)
+            try:
+                ok, vlog = verify_machineinstrs(src, WORK / "ki.vo", flags=flags)
+            except VerifyDriverError as e:
+                # A repro TU that can't even be compiled (e.g. a missing header) is drift on
+                # its own terms — not a crash, but not a silent skip either.
+                print("  %-30s %-9s  DRIFT — driver error: %s" % (rel, tag, e))
+                drift.append((rel, kid, "driver error under %s: %s" % (tag, e)))
+                continue
             if ok:
                 print("  %-30s %-9s  XPASS — verifies CLEAN (issue [%s] no longer reproduces)"
                       % (rel, tag, kid))
@@ -1306,7 +1421,8 @@ def cmd_check(args):
           % (name,
              ("expected 0x%04X" % expected) if expected is not None else "default build as reference",
              "yes" if want_bsnes else "no"))
-    status, msg, ref = evaluate(src, expected, want_bsnes, lambda r, e: triage_file(name, src, r, e))
+    status, msg, ref = evaluate(src, expected, want_bsnes, lambda r, e: triage_file(name, src, r, e),
+                                 verify_config=CFG)
     print("  [%s] %s  %s" % (status, name, msg))
     if status == "PASS":
         print("RESULT: PASS — %s: default == +mos-a16%s on both emulators" % (
@@ -1315,6 +1431,9 @@ def cmd_check(args):
     if status == "XFAIL":
         print("RESULT: PASS (known issue) — %s: %s" % (name, msg))
         return 0
+    if status == "ERROR":
+        print("RESULT: FAIL (harness error, not a compiler crash) — %s (triage in %s)" % (msg, TRIAGE))
+        return 1
     print("RESULT: FAIL — %s (triage in %s)" % (msg, TRIAGE))
     return 1
 
