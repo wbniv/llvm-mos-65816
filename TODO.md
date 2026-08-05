@@ -228,13 +228,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   splash contract, so deliberately out of scope there and budgeted at the measured value
   (`dev/m7blank.sh` `mandel-oop) echo 12`) so a splash-side regression still trips. Tighten the
   budget when this lands. (Re-ranked T3→T4 by the coordinator: the reporting agent itself flagged the force-blank-into-active flicker regression class (`1dd9317`) in a shared path every Display demo pays — where the INIDISP write belongs vs `build_step` is a design call with a wide wrong-turn cost.)
-- [wip T2] **`dev/m7blank.sh` cannot measure four splash demos.** <!-- agent:a6c0fe5a8fb7483ef --> `apollo-reel`, `lzss-gallery`,
-  `seamdemo`, `snes-video-reel` are discovered by the `grep -l m7splash` sweep but fail to build in
-  the harness — they need generated asset headers or corpora that live outside the repo
-  (`/tmp/...`), and `apollo-reel` wants the HiROM cfg. They already use `begin`/`end` so they are
-  probably fine, but "probably" is not a measurement and the gate reports them as `BUILD FAILED`
-  rather than green. Wire their asset generation (or a stub corpus) so the gate covers all twelve.
-  (T2: harness plumbing per demo, no design question.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -1227,6 +1220,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-05 — [m7blank-coverage] All twelve splash demos measured (`2dc7647`): lzss-gallery cfg fix, video-reel real corpus, seamdemo pure-Python gen, apollo-reel shape-faithful stub; 12-demo gate PASS, original eight byte-identical.
 - [x] 2026-08-05 — [splash-dead-code] "Finish the conversion" premise false — splash.h/splash16 had ZERO consumers (superseded b6ef256/8ac159f); surface deleted, docs de-staled. See [plan](docs/plans/2026-08-05-splash16-forceblank-conversion.md).
 - [x] 2026-08-05 — [dq-baseline-stale-pair] Two pre-c9e0f12 nmitally.c baseline entries dropped with no-match evidence; SNESDQ PASS 254→252 (`9bc0c50`).
 - [x] 2026-08-05 — [m7-splash-forceblank] Mode 7 splash handoff contract: post-title force-blank 720 → 22 frames across 8 demos, floor measured at 1; `dev/m7blank.sh --gate` guards it. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
