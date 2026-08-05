@@ -4,6 +4,13 @@
 installed in both site player copies; JavaScript syntax, byte-identical controller parity, and both
 Astro production builds pass. Physical-phone rotation smoke testing and deployment remain.
 
+**Verification run (2026-08-04):** implementation-record checks (syntax, byte parity, whitespace,
+CI-green builds) re-confirmed against current main — now sourced from one canonical
+`@wbniv/bsnes-jg-player` package rather than two hand-copied files. Two Verification-section gaps
+found: the automated layout test / video-frame diagnostic described under "Automated layout test"
+was never built (**FAIL**), and the manual device matrix requires physical hardware not available
+here (**BLOCKED**). See per-step results inline below. TODO item left open at `[verify T2]`.
+
 Mockups: [responsive fullscreen fit](2026-07-26-120-snes-player-fullscreen-orientation-fit/fullscreen-orientation-mockups.html)
 
 ## Goal
@@ -238,6 +245,54 @@ canvas bounds on entry and after both rotation directions. Verify the rules
 remain outside the canvas content box and that disabling the query flag
 produces no diagnostic element or style.
 
+**Result (run 2026-08-04, current main across `bsnes-jg-wasm`, `biohack.net`, `indri.studio`): FAIL.**
+No committed test artifact exists for this step — there is no unit test for the fit calculation, no
+browser test with a mocked Fullscreen API, and no `video-frame` diagnostic at all.
+
+```
+$ grep -rn "video-frame\|videoFrame" bsnes-jg-wasm/web/app.js biohack.net/public/play/app.js \
+    indri.studio/public/apps/llvm-mos-65816/play/app.js
+(no matches, exit 1)
+
+$ find bsnes-jg-wasm -iname "*.test.*" -o -iname "*.spec.*" \
+    -not -path "*/node_modules/*" -not -path "*/emsdk/*"
+(no matches)
+
+$ grep -n "URLSearchParams" bsnes-jg-wasm/web/app.js
+198:  if (new URLSearchParams(location.search).get("verify") === "1" ...   # unrelated fidelity self-check
+603:  var bootRom = new URLSearchParams(location.search).get("rom") ...    # unrelated ROM selector
+```
+
+The core fit *formula* itself (`fitFullscreenCanvas()` in the `BEGIN/END SHARED FULLSCREEN
+CONTROLLER` block, currently `bsnes-jg-wasm/web/app.js:449`) does implement `scale =
+min(availW/8, availH/7)` per the layout contract, and byte-identically in all three installed
+copies (see Implementation-record checks below). An ad-hoc, uncommitted Node reproduction of that
+formula against this table's five cases confirms the *invariants* the plan asks for
+(`canvasWidth <= usableWidth`, `canvasHeight <= usableHeight`, aspect error ≤ 1 px, rotate-twice
+stable) all hold — the implementation additionally subtracts a deliberate 2px safe margin per axis
+(commented "Leave one CSS pixel on every edge... instead of letting a limiting edge crop"), which is
+why the exact pixel figures in the table below aren't hit literally (they're the same 2-3px more
+conservative on each edge):
+
+```
+844x390: got 443x388  (plan expects 445x390 (height-limited))
+  invariants: w<=W true, h<=H true, aspect-err(px) 0.0011
+390x844: got 388x339  (plan expects 390x341 (width-limited))
+  invariants: w<=W true, h<=H true, aspect-err(px) 0.0017
+393x852 minus 59 top + 34 bottom safe-area: got 391x342  (plan expects 393x343 inside 759px safe height)
+  invariants: w<=W true, h<=H true, aspect-err(px) 0.0004
+320x320: got 318x278  (plan expects 320x280)
+  invariants: w<=W true, h<=H true, aspect-err(px) 0.0010
+240x180: got 203x178  (plan expects 205x180)
+  invariants: w<=W true, h<=H true, aspect-err(px) 0.0024
+rotate-twice stable: true
+```
+
+This is evidence the underlying math is sound, not a substitute for the specified deliverable — no
+persisted test exercises this code, and the `video-frame=1` diagnostic described in "Test-only video
+extent frame" was never built in any of the three repos. **FAIL: automated layout test and
+video-frame diagnostic not implemented.**
+
 ### Manual device matrix
 
 Test a live ROM that draws on the first and last visible scanlines:
@@ -251,6 +306,54 @@ Test a live ROM that draws on the first and last visible scanlines:
 
 At every stop, the top and bottom SNES scanlines must be visible, the picture must remain 8:7, and
 the ROM must continue from the same frame.
+
+**Result (run 2026-08-04): BLOCKED.** No physical iPhone/Android devices, browser device farm, or
+notched-viewport hardware are available in this environment — this step requires hands-on rotation
+testing that a terminal-only agent cannot perform. Left un-run rather than faked.
+
+### Implementation-record checks re-verified against current main
+
+The following claims from "Implementation record" above were independently re-run rather than taken
+on faith, since the record predates this verification pass:
+
+```
+$ node --check biohack.net/public/play/app.js && echo OK
+OK
+$ node --check indri.studio/public/apps/llvm-mos-65816/play/app.js && echo OK
+OK
+$ node --check bsnes-jg-wasm/web/app.js && echo OK
+OK
+$ node --check bsnes-jg-wasm/dist/engine/app.js && echo OK
+OK
+
+$ sha256sum <extracted BEGIN/END SHARED FULLSCREEN CONTROLLER block from each file>
+6148806fe7f5d2eb9ae1d7921c090bcf2bc3ce14b60f2407cd68ed904d24693e  bsnes-jg-wasm/web/app.js
+6148806fe7f5d2eb9ae1d7921c090bcf2bc3ce14b60f2407cd68ed904d24693e  bsnes-jg-wasm/dist/engine/app.js
+6148806fe7f5d2eb9ae1d7921c090bcf2bc3ce14b60f2407cd68ed904d24693e  biohack.net/public/play/app.js
+6148806fe7f5d2eb9ae1d7921c090bcf2bc3ce14b60f2407cd68ed904d24693e  indri.studio/public/apps/llvm-mos-65816/play/app.js
+(all four identical — parity holds, now sourced from one canonical package,
+ @wbniv/bsnes-jg-player, rather than four independently-maintained copies)
+
+$ cd biohack.net && git diff --check -- public/play/app.js; echo exit=$?
+exit=0
+$ cd indri.studio && git diff --check -- public/apps/llvm-mos-65816/play/app.js; echo exit=$?
+exit=0
+```
+
+Both site builds — per this project's CI-only build rule, verified via `gh run list`, not a host
+build:
+
+```
+$ cd biohack.net && gh run list --limit 5
+completed  success  ...  Deploy site  v1.0.382  push  2026-08-04T14:19:44Z   (latest, post-dates the player commits)
+$ cd indri.studio && gh run list --limit 5
+completed  success  ...  Deploy       v0.1.151  push  2026-08-04T14:19:48Z   (latest, post-dates the player commits)
+```
+
+Note: the plan's own "Rollout" step 1 hoped-for outcome ("Prefer promoting the player asset to one
+canonical source plus a checked sync command") has since happened — the fullscreen controller now
+lives once in `bsnes-jg-wasm/web/app.js` and is vendored into both sites via
+`bsnes-jg-player sync`, superseding the original two-repo-copy-paste implementation record above.
 
 ## Acceptance criteria
 

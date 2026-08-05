@@ -1133,9 +1133,11 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   — suspected page-template vs pinned-player drift (`v0.1.135` template, `v0.1.133` player pin).
   biohack.net passes all four input surfaces. Needs a T4 owner for the indri embed.
   [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)
-- [verify T2] **120-snes-player-fullscreen-orientation-fit** — plan landed with a Verification
-  section but no PASS ever recorded (surfaced by the 2026-08-04 doc consolidation, which first
-  tracked the plan file); run + record the steps against current main.
+- [verify T2] **120-snes-player-fullscreen-orientation-fit** — verification run 2026-08-04: implementation-record
+  checks (syntax, byte parity, whitespace, CI-green builds) PASS on current main, but the plan's
+  automated layout test / video-frame diagnostic was never built (FAIL) and the manual device matrix
+  needs physical hardware not available here (BLOCKED). See the plan's Verification section for
+  per-step evidence; re-run once a test harness and device access exist.
   [plan](docs/plans/2026-07-26-120-snes-player-fullscreen-orientation-fit.md)
 
 ## Watch
