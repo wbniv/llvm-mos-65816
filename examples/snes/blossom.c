@@ -186,17 +186,25 @@ int main(void) {
   // force-blank + self-clears its VRAM. The grid-hash corpus_result is deterministic (timing-
   // independent), and the controller differential asserts the ROM's CRC against a replay of the
   // ROM's OWN pad log, so the splash's frame shift doesn't change the asserted result.
-  m7splash("HOPALONG ATTR", "BLOSSOM", 90);
+  blossom_t v;
+  m7splash_begin("HOPALONG ATTR", "BLOSSOM");
+
+  // WRAM-only boot work runs behind the live title (snesgfx/m7title.h's handoff contract): the
+  // 128x128 grid clear plus the palette build used to sit in the post-title force-blank window.
+  // No PPU port is touched here, so it is legal while the splash owns the screen.
+  blossom_reset(&v);
+  grid_clear(grid);
+  orbit.x = 0; orbit.y = 0;
+  build_palette(v.pal);                   // fills pal[] in WRAM; stage_palette/dma_cgram below transfer
+
+  m7splash_end(90);                       // hold + 360 spin-out; returns force-blanked
+
+  // From here to m7_show() it is PPU registers and DMA only — the whole force-blank window.
   vram_clear_all();                       // wipe random power-on VRAM before anything can be displayed
   m7_begin();
   m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, M7_TILEMAP_WORDS);
   m7_tilemap_identity(TILES, TILES);
   m7_set_center(64, 64);                  // pivot the Mode 7 transform around the image centre
-
-  blossom_t v; blossom_reset(&v);
-  grid_clear(grid);
-  orbit.x = 0; orbit.y = 0;
-  build_palette(v.pal);
   m7_set_matrix(v.zoom, 0x0000, 0x0000, v.zoom);
   m7_set_scroll((uint16_t)PLOT_HBIAS, (uint16_t)PLOT_VBIAS);   // centre the attractor in the plot box
   hud_begin();                            // BG3 text bars + HDMA screen-split (Mode 7 plot box)

@@ -140,13 +140,17 @@ static void spin_frame(uint8_t k) {
 int main(void) {
   snes_ppu_reset_blank();                       // force-blank + zero PPU control regs
 
-  // Differential proof first: fold the 4-keyframe 6x6 gate (low WRAM, far-pointer-free) into
-  // corpus_result. Stable from boot (~frame 90), long before any snapshot deadline. == oracle 0x3490.
-  corpus_result = julia_gate_crc();
-
   // Title splash (Mode 7 has no spare BG): ~1.5 s, then it restores force-blank and self-clears its
   // VRAM so the Mode 7 setup below starts clean.
-  m7splash("Z^2 + C", "JULIA SET", 90);
+  m7splash_begin("Z^2 + C", "JULIA SET");
+
+  // Differential proof: fold the 4-keyframe 6x6 gate (low WRAM, far-pointer-free) into
+  // corpus_result. == oracle 0x3490. WRAM only, so it runs behind the live title (snesgfx/m7title.h's
+  // handoff contract) — it used to run BEFORE the splash, i.e. as ~70 frames of boot black with
+  // nothing on screen at all. Still stable long before any snapshot deadline.
+  corpus_result = julia_gate_crc();
+
+  m7splash_end(90);                             // hold + 360 spin-out; returns force-blanked
 
   // One-time Mode 7 setup (force-blanked): enter Mode 7, clear the 128x128 tilemap, lay the 8x7
   // identity, load the palette, frame the 64x56 image at 4x (a=d=0x0040 -> fills 256x224).

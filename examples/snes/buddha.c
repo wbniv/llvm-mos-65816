@@ -138,7 +138,18 @@ int main(void) {
   snes_ppu_reset_blank();
   // Title splash (~1.5 s), then it restores force-blank + self-clears its VRAM. The grid-hash
   // corpus_result is deterministic (timing-independent), so the splash's frame shift can't change it.
-  m7splash("ORBIT DENSITY", "BUDDHABROT", 90);
+  m7splash_begin("ORBIT DENSITY", "BUDDHABROT");
+
+  // WRAM-only boot work runs behind the live title (snesgfx/m7title.h's handoff contract): the
+  // 128x128 far grid clear is 16 K writes and used to be most of this demo's post-title force-blank
+  // window. No PPU port is touched here, so it is legal while the splash owns the screen.
+  grid_clear(grid);                       // WRAM is not zeroed at boot (bsnes randomises)
+  bud_rng_init(&rng, BUD_SEED);
+  build_palette();                        // stages cgbuf in WRAM; dma_cgram() below does the transfer
+
+  m7splash_end(90);                       // hold + 360 spin-out; returns force-blanked
+
+  // From here to m7_show() it is PPU registers and DMA only — the whole force-blank window.
   vram_clear_all();                       // wipe random power-on VRAM before anything is displayed
   m7_begin();
   m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, M7_TILEMAP_WORDS);
@@ -147,9 +158,6 @@ int main(void) {
   m7_set_matrix(MAG, 0x0000, 0x0000, MAG);
   m7_set_scroll((uint16_t)PLOT_HBIAS, (uint16_t)PLOT_VBIAS);   // centre the 128 grid in the screen
 
-  grid_clear(grid);                       // WRAM is not zeroed at boot (bsnes randomises)
-  bud_rng_init(&rng, BUD_SEED);
-  build_palette();
   dma_cgram();                            // load CGRAM before display (no garbage-colour first frame)
   m7_show();                              // release force-blank; the cloud blooms in live below
   REG_NMITIMEN = NMITIMEN_NMI;            // VBlank NMI -> snes_wait_vblank pacing

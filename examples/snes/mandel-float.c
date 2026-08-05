@@ -177,11 +177,20 @@ int main(void) {
   // Brand FIRST so the boot isn't a blank screen: the soft-float gate below grinds ~9 s (every op a
   // libcall), so show "SOFT-FLOAT MANDELBROT" up front — the ensuing compute reads as "working", not
   // "broken".
-  m7splash("SOFT-FLOAT", "MANDELBROT", 150);
+  //
+  // The grind runs INSIDE the splash bracket (see snesgfx/m7title.h's handoff contract). It used to
+  // sit after a plain m7splash(...,150), i.e. after the title had already spun out and re-asserted
+  // force-blank — so the branding was followed by 350 black frames (5.8 s) of exactly the "broken"
+  // look the comment above set out to avoid. begin / grind / end(0) is what the comment always meant.
+  m7splash_begin("SOFT-FLOAT", "MANDELBROT");
 
   // Differential proof: fold the 2-window 6x6 gate + bit-exact orbit witness (low WRAM, far-pointer-
   // free) into corpus_result. Slow (soft-float) but stable well before any snapshot deadline.
+  // WRAM only — no PPU port is touched, so it is legal behind the live title.
   corpus_result = mf_gate_crc();
+
+  // The grind held the title far longer than the old 150-frame hold, so no extra hold is needed.
+  m7splash_end(0);
 
   // One-time Mode 7 setup (force-blanked): enter Mode 7, clear the tilemap, lay the 8x7 identity,
   // load the palette, frame the 64x56 image at 4x.

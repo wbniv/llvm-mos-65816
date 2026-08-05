@@ -23,6 +23,37 @@
  *   m7splash_begin(line0, line1)  — zoom-in; returns at rest with screen visible.
  *   m7splash_end(hold_frames)     — hold + spin-out; returns with force-blank active.
  *   m7splash(line0, line1, hold)  — convenience: begin + end with no code between.
+ *                                   ONLY for a demo with no boot work. See the contract below.
+ *
+ * ===========================================================================================
+ * THE HANDOFF CONTRACT — where a demo's boot work goes
+ * ===========================================================================================
+ *
+ * m7splash_end() returns with REG_INIDISP = $80. Every frame from there until the caller
+ * releases the blank is a black panel the viewer reads as a stall. So:
+ *
+ *   1. COMPUTE goes BETWEEN begin() and end(), behind the title the viewer is looking at.
+ *      Anything that touches only WRAM is legal there — gate hashes, grid clears, palette
+ *      staging, the first image's escape-time fill. The title sits static (no shimmer) while
+ *      it runs, which is what lzss-gallery has shipped since it started decoding its first
+ *      work inside the bracket and calling m7splash_end(0).
+ *
+ *   2. Between end() and the blank release, ONLY PPU register writes and DMA. That is the
+ *      whole legitimate blank window — the Mode 7 / CGRAM mode switch that genuinely cannot
+ *      happen with the screen on. Measured, it is ONE frame.
+ *
+ *   3. PROGRESSIVE REVEAL goes AFTER the release, in v-blank — never under a re-held blank.
+ *      (The house rule in docs/agent-handoff.md, "Never force-blank outside boot".)
+ *
+ * Note what is NOT the problem: display_init()'s snes_ppu_reset_blank() does not "re-open"
+ * the window — end() left it open and the re-assert costs zero frames. The blackness is
+ * purely the wall-clock of whatever executes inside it. Before this contract was written
+ * down, the seven measurable Mode 7 demos spent 505 frames there between them; mandel-float
+ * ground 5.8 s of soft-float in the dark directly against its own source comment.
+ *
+ * Enforced by dev/m7blank.sh --gate (per-demo budgets, entropy-pinned, one emulator run per
+ * demo). dev/m7blank.sh --probe measures the force-blank window alone, with a demo's
+ * deliberately-black art excluded.
  *
  * Header-only (static inline). Needs <snes.h>, ../font8.h, ../sincos.h, mode7.h. */
 #ifndef SNESGFX_M7TITLE_H

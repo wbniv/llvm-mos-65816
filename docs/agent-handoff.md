@@ -189,8 +189,26 @@ wipe/fade/scene change is now missed. Suppressions print their window spread, ne
 `JGX_BLANKSCAN_SELFTEST=1 build/jgxcheck` (no ROM needed) pins the discrimination on synthetic
 series. See [the plan](plans/2026-07-30-blankscan-quiescence-gate.md).
 
-Still to convert (they re-open the window): `snesgfx/m7title.h`, `snesgfx/splash.h`, `splash16` in
-`title_layer.h`, and the seven Mode-7 demo `main()`s.
+Still to convert: `snesgfx/splash.h` and `splash16` in `title_layer.h`.
+
+**`snesgfx/m7title.h` + the Mode 7 demo `main()`s — converted 2026-08-05.** The old wording here said
+they "re-open the window". They do not: `m7splash_end()` returns with `INIDISP = $80` still asserted
+and a following `display_init()` re-asserts an *already-open* window at zero frame cost. The black
+panel was purely the **wall-clock of the work executed inside the window** — measured at **720 frames
+across eight demos**, worst `mandel-float` at 350 (5.8 s of soft-float ground in the dark, directly
+against its own source comment) and `mandel-double` at 215. The fix is the **handoff contract** now
+written at the top of `snesgfx/m7title.h`: compute goes *between* `m7splash_begin()` and
+`m7splash_end()` behind the visible title; only PPU registers and DMA may sit between `end()` and the
+blank release; progressive reveal goes after the release, in v-blank. Total is now **22 frames**, and
+the floor — the Mode 7/CGRAM mode switch that genuinely needs blanking — measures **1 frame**.
+
+**Gate: `dev/m7blank.sh --gate`** — entropy-pinned `JGX_FRAMESCAN` timeline per demo, reconstructing
+every frame from the change events, checked against a committed per-demo force-blank budget (exit 4
+when over). `--probe` builds with `-DM7BLANK_PROBE` so `m7_show()` / `display_frame()` paint CGRAM[0]
+white at the release: without it a picture scan cannot separate "still blanked" from "released onto
+black art", and several demos bloom onto a deliberately black backdrop (`buddha`'s "no hits"). The
+demo set is derived from `grep -l m7splash`, not hardcoded — the "seven" above was already stale at
+twelve. See [the plan](plans/2026-08-05-mode7-splash-forceblank-floor.md).
 
 ### Title-card tooling (host-side, not `dev/run.sh` targets)
 

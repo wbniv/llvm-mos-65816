@@ -113,14 +113,21 @@ static void build_coarse_row(uint8_t trow, const uint8_t *coarse, uint8_t cw, ui
       }
 }
 
-// A whole coarse pass: compute the cw*ch grid, then reveal it tile-row by tile-row in vblank.
-static void coarse_pass(uint8_t cw, uint8_t ch, uint8_t shx, uint8_t shy, uint8_t in_vblank) {
-  mandel_fill(scratch, cw, ch, DN);
+// Reveal the coarse grid already sitting in `scratch`, tile-row by tile-row in vblank.
+// Split out of coarse_pass so the COMPUTE half can run behind the live title splash while only the
+// upload half needs the post-title window (snesgfx/m7title.h's handoff contract).
+static void coarse_reveal(uint8_t cw, uint8_t shx, uint8_t shy, uint8_t in_vblank) {
   for (uint8_t trow = 0; trow < TILES_H; trow++) {
     build_coarse_row(trow, scratch, cw, shx, shy);
     if (in_vblank) wait_vblank_fresh();
     dma_chr_to((uint16_t)trow * ROW_BYTES, chrbuf, ROW_BYTES);
   }
+}
+
+// A whole coarse pass: compute the cw*ch grid, then reveal it tile-row by tile-row in vblank.
+static void coarse_pass(uint8_t cw, uint8_t ch, uint8_t shx, uint8_t shy, uint8_t in_vblank) {
+  mandel_fill(scratch, cw, ch, DN);
+  coarse_reveal(cw, shx, shy, in_vblank);
 }
 
 int main(void) {
@@ -130,11 +137,20 @@ int main(void) {
   // restores force-blank and self-clears its VRAM so the Mode 7 setup below starts clean. The huge
   // gate frame budget (jgxcheck 5800 / MAME 120 s) absorbs the added frames; corpus_result is the
   // image CRC, stable long after settle.
-  m7splash("ESCAPE TIME", "MANDELBROT", 90);
+  m7splash_begin("ESCAPE TIME", "MANDELBROT");
+
+  // The 8x7 coarse field is computed HERE, behind the title the viewer is looking at, not after it.
+  // mandel_fill touches WRAM only (no PPU port), so it is legal while the splash owns the screen.
+  // It used to run inside the post-title force-blank window as part of coarse_pass(8,7,...), and it
+  // was 58 of that window's 72 black frames.
+  mandel_fill(scratch, 8, 7, DN);
+
+  m7splash_end(90);                              // hold + 360 spin-out; returns force-blanked
 
   // One-time Mode 7 setup (force-blanked): enter Mode 7, clear the 128x128 tilemap and lay the 8x7
   // identity, load the palette, frame the image at 4x (a=d=0x0040 -> 64x56 fills 256x224, top-left
-  // aligned: center 0, scroll 0).
+  // aligned: center 0, scroll 0). Register writes and DMA ONLY — this is the whole of the blank
+  // window now, and it measures 1 frame.
   m7_begin();
   m7_tilemap_clear(0x00, (uint16_t)(uintptr_t)&m7_zero, M7_TILEMAP_WORDS);
   m7_tilemap_identity(TILES_W, TILES_H);
@@ -143,11 +159,12 @@ int main(void) {
   m7_set_center(0, 0);
   m7_set_scroll(0, 0);
 
-  // First image: the 8x7 coarse field, uploaded while still force-blanked (boot is black, not a
-  // flash), then released. From here on every refresh lands in vblank, so the screen never blanks.
-  coarse_pass(8, 7, 3, 3, 0);
-  m7_show();
+  m7_show();                                     // release: CGRAM[0] backdrop, no black, no flash
   REG_NMITIMEN = NMITIMEN_NMI;                   // enable vblank NMI (crt0's weak `rti` handler is safe)
+
+  // First image: reveal the field computed behind the title, in vblank like every later pass — the
+  // upload used to sit under force-blank purely because the compute did.
+  coarse_reveal(8, 3, 3, 1);
 
   // Finer previews, revealed in vblank (no force-blank, no flash).
   coarse_pass(16, 14, 2, 2, 1);
