@@ -219,7 +219,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   and the repro re-verified against the current toolchain (2 errors at `-Os`, clean
   `-O0`/`-Oz`); status-doc row 13 updated, issue **NOT POSTED** (filing is user-triggered).
   (T3: **residual = decide whether to attempt the toolchain-wide fix** — nothing else open.)
-- [T4] **`snesgfx` Display: 6 frames of force-blank inside the FIRST `display_frame()`.** Localised
+- [wip T4] **`snesgfx` Display: 6 frames of force-blank inside the FIRST `display_frame()`.** <!-- agent:a960894c0a0a3418c --> Localised
   while closing the Mode 7 splash floor. `mandel-oop`'s post-title window is 11 frames, but only 4
   are the splash handoff (title exit + `display_init` + `_mandel_reserve`); bisecting `_mandel_emit`
   puts 6 of the remaining 7 in `build_step()`'s far-memory work — 2 in the 512-far-store row
@@ -228,12 +228,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   splash contract, so deliberately out of scope there and budgeted at the measured value
   (`dev/m7blank.sh` `mandel-oop) echo 12`) so a splash-side regression still trips. Tighten the
   budget when this lands. (Re-ranked T3→T4 by the coordinator: the reporting agent itself flagged the force-blank-into-active flicker regression class (`1dd9317`) in a shared path every Display demo pays — where the INIDISP write belongs vs `build_step` is a design call with a wide wrong-turn cost.)
-- [T3] **Finish the force-blank conversion: `snesgfx/splash.h` + `splash16` in `title_layer.h`.** The
+- [wip T3] **Finish the force-blank conversion: `snesgfx/splash.h` + `splash16` in `title_layer.h`.** <!-- agent:ae3c4687c61bf349d --> The
   remaining half of [agent-handoff](docs/agent-handoff.md)'s "Still to convert" list, now that
   `m7title.h` and the Mode 7 demo `main()`s are done
   ([plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md)). Same contract, same instrument —
   `dev/m7blank.sh --probe` measures any demo, not just Mode 7 ones. (Re-ranked T2→T3 by the coordinator: the contract is settled but lands across every `splash.h`/`splash16` consumer's `main()` plus per-demo gate re-runs — multi-file against a settled pattern is T3's definition.)
-- [T2] **`dev/m7blank.sh` cannot measure four splash demos.** `apollo-reel`, `lzss-gallery`,
+- [wip T2] **`dev/m7blank.sh` cannot measure four splash demos.** <!-- agent:a6c0fe5a8fb7483ef --> `apollo-reel`, `lzss-gallery`,
   `seamdemo`, `snes-video-reel` are discovered by the `grep -l m7splash` sweep but fail to build in
   the harness — they need generated asset headers or corpora that live outside the repo
   (`/tmp/...`), and `apollo-reel` wants the HiROM cfg. They already use `begin`/`end` so they are
