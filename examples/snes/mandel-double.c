@@ -215,11 +215,18 @@ int main(void) {
   // Brand FIRST so the boot isn't a blank screen: the soft-float gate below grinds for several seconds
   // (every op a 64-bit libcall), so show "DOUBLE-PRECISION MANDELBROT" up front — the ensuing compute
   // reads as "working", not "broken".
-  m7splash("DOUBLE-FLOAT", "MANDELBROT", 150);
+  // The grind runs INSIDE the splash bracket (snesgfx/m7title.h's handoff contract). It used to sit
+  // after a plain m7splash(...,150), i.e. after the title had spun out and re-asserted force-blank —
+  // 215 black frames (3.6 s) of exactly the "broken" look the comment above set out to avoid.
+  m7splash_begin("DOUBLE-FLOAT", "MANDELBROT");
 
   // Differential proof: fold the double + float escape buffers + bit-exact double orbit witness + the
-  // conversion witness (all low WRAM, far-pointer-free) into corpus_result.
+  // conversion witness (all low WRAM, far-pointer-free) into corpus_result. WRAM only — no PPU port
+  // is touched, so it is legal behind the live title.
   corpus_result = md_gate_crc();
+
+  // The grind held the title far longer than the old 150-frame hold, so no extra hold is needed.
+  m7splash_end(0);
 
   // The display always frames the WHOLE SET (MD_WIN[0]) — see the precision-cliff note at the top of this
   // file. compute_coarse_row derives both the double and the float coordinates from that constant window.

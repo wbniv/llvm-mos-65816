@@ -84,6 +84,10 @@ fi
 # no SHOT: line, and the gate reports a misleading FAIL rather than an honest SKIP. Guard for it exactly
 # as dev/cpu6502.sh does. NB this only skips when the IPL is genuinely ABSENT — with the IPL present a
 # real MAME disagreement still fails the gate.
+# -seconds_to_run must OUTLAST dev/mandel-double.lua's SHOT_AT (2200 periodic ticks ~ 36.7 emulated
+# seconds at 60 Hz). It was 18, so MAME exited before the callback ever fired: no SHOT line, scored
+# as a FAIL. Pre-existing and unrelated to any ROM change — reproduced on pristine sources while
+# closing the Mode 7 splash force-blank floor (2026-08-05). Same fix as dev/mandel-float.sh.
 if [ ! -f "$ROOT/dev/roms/s_smp/spc700.rom" ]; then
   echo "    SKIP MAME (no SPC700 IPL at dev/roms/s_smp/spc700.rom — gitignored Nintendo content; supply out-of-band)"
 elif command -v xvfb-run >/dev/null 2>&1; then
@@ -92,7 +96,7 @@ elif command -v xvfb-run >/dev/null 2>&1; then
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \
     xvfb-run -a mame snes -cart "$BUILD/mandel-double.sfc" -rompath "$ROOT/dev/roms" \
       -autoboot_script "$ROOT/dev/mandel-double.lua" -skip_gameinfo \
-      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 18 \
+      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 45 \
       -cfg_directory /tmp -nvram_directory /tmp 2>/dev/null | grep -m1 '^SHOT:' || true)"
   echo "    $line"
   if [ -f "$SNAP/snes/0000.png" ]; then mv "$SNAP/snes/0000.png" "$BUILD/mandel-double-mame.png"; fi

@@ -1081,6 +1081,13 @@
       "text": "REG_VMAIN = VMAIN_INC_HIGH_1; REG_VMADD = word; REG_VMDATAL = tile;"
     },
     {
+      "id": "7483b97821392bb4a570",
+      "kind": "ppu-write",
+      "path": "examples/snes/mode7.h",
+      "line": 67,
+      "text": "REG_CGADD = 0; REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;"
+    },
+    {
       "id": "d864e3ac0f8bb7d0305e",
       "kind": "ppu-write",
       "path": "examples/snes/multibase.c",
@@ -1324,6 +1331,13 @@
       "path": "examples/snes/snesgfx/display.h",
       "line": 57,
       "text": "through REG_VMDATA, which is only legal while the boot force-blank is still up; the first"
+    },
+    {
+      "id": "73002c6655c8c408e4e5",
+      "kind": "ppu-write",
+      "path": "examples/snes/snesgfx/display.h",
+      "line": 103,
+      "text": "if (!d->shown) { REG_CGADD = 0; REG_CGDATA = 0xFFu; REG_CGDATA = 0x7Fu; }"
     },
     {
       "id": "ddaac4a5082e3b034d43",

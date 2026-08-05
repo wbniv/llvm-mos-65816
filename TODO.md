@@ -219,14 +219,28 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   and the repro re-verified against the current toolchain (2 errors at `-Os`, clean
   `-O0`/`-Oz`); status-doc row 13 updated, issue **NOT POSTED** (filing is user-triggered).
   (T3: **residual = decide whether to attempt the toolchain-wide fix** — nothing else open.)
-- [T4] **Mode 7 splash force-blank floor — the shared `m7splash_end()`/`display_init()` handoff
-  holds the screen black across all seven Mode 7 demos.** Escalated out of the 121 re-verify
-  (2026-08-05): after the `_mandel_reserve()` far-readback fix halved mandel-oop's post-title
-  black window (24 → 11 frames, `1a9d9b8`), the residual 11 frames is a shared floor, not
-  demo-local — `mandel-display` uses the same `m7splash()` , goes black at the same f=239, and
-  holds **72 frames**. Cross-cutting change to the splash/display-init contract for seven
-  `main()`s; the deviation is already logged in [agent-handoff](docs/agent-handoff.md). (T4:
-  design + implementation across a shared contract; a wrong turn regresses every Mode 7 demo.)
+- [T3] **`snesgfx` Display: 6 frames of force-blank inside the FIRST `display_frame()`.** Localised
+  while closing the Mode 7 splash floor. `mandel-oop`'s post-title window is 11 frames, but only 4
+  are the splash handoff (title exit + `display_init` + `_mandel_reserve`); bisecting `_mandel_emit`
+  puts 6 of the remaining 7 in `build_step()`'s far-memory work — 2 in the 512-far-store row
+  expansion, 4 in `build_chr_row()`'s far loads plus the queue copy — all executed before the first
+  `display_frame()` writes `REG_INIDISP`. Every `Display` demo pays it, not just Mode 7. Not the
+  splash contract, so deliberately out of scope there and budgeted at the measured value
+  (`dev/m7blank.sh` `mandel-oop) echo 12`) so a splash-side regression still trips. Tighten the
+  budget when this lands. (T3: bounded, one subsystem, measurement method already built.)
+- [T2] **Finish the force-blank conversion: `snesgfx/splash.h` + `splash16` in `title_layer.h`.** The
+  remaining half of [agent-handoff](docs/agent-handoff.md)'s "Still to convert" list, now that
+  `m7title.h` and the Mode 7 demo `main()`s are done
+  ([plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md)). Same contract, same instrument —
+  `dev/m7blank.sh --probe` measures any demo, not just Mode 7 ones. (T2: the contract and the
+  measurement already exist; this is applying them to two more headers.)
+- [T2] **`dev/m7blank.sh` cannot measure four splash demos.** `apollo-reel`, `lzss-gallery`,
+  `seamdemo`, `snes-video-reel` are discovered by the `grep -l m7splash` sweep but fail to build in
+  the harness — they need generated asset headers or corpora that live outside the repo
+  (`/tmp/...`), and `apollo-reel` wants the HiROM cfg. They already use `begin`/`end` so they are
+  probably fine, but "probably" is not a measurement and the gate reports them as `BUILD FAILED`
+  rather than green. Wire their asset generation (or a stub corpus) so the gate covers all twelve.
+  (T2: harness plumbing per demo, no design question.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -1217,6 +1231,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-05 — [m7-splash-forceblank] Mode 7 splash handoff contract: post-title force-blank 720 → 22 frames across 8 demos, floor measured at 1; `dev/m7blank.sh --gate` guards it. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
 - [x] 2026-08-05 — [corpus-slice-repairs] nmitally 240-tick oracle restored (lost by c9e0f12) + nbody_sim resurrected (deleted by 9369ced); corpus-a16 **62/62** first-ever full green (`608b84b`).
 - [x] 2026-08-05 — [motorola-default-verify] Plan verification run + recorded, all steps PASS (PR #587 branch). See [plan](docs/plans/2026-08-04-llvm-mc-motorola-default.md).
 - [x] 2026-08-04 — [cop-mnemonic] COP PR POSTED as [#588](https://github.com/llvm-mos/llvm-mos/pull/588) (mandatory signature, decoder-visible 2-byte decode, W65816-gated; reduction+design per the [draft banner](docs/upstream-cop-brk-signature-pr.md); links pre-flighted, a16/xy16 claim de-forked).
@@ -2108,4 +2123,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        curated bullet tracks the ready-to-file upstream issue, in-fork fix explicitly rejected.
      • the two [verify] captures (fp:19d580e4f8f9d469, fp:ad9f5336b3eb87c3) — PROMOTED to the
        verification backlog above ## Watch as [verify T2] / [verify T1]. -->
+<!-- triaged 2026-08-05: all three mode7-splash-forceblank deferrals are covered by curated M2
+     items added in the same commit.
+     - fp:0bf704293cb24048 (build_step residual) -> the [T3] `snesgfx` Display first-frame item.
+     - fp:0bcb5b4ecf571ae0 (splash.h / splash16)  -> the [T2] finish-the-conversion item.
+     - fp:52f8d7d6f905eaea (four unmeasurable demos) -> the [T2] m7blank coverage item. -->
 <!-- END auto-captured-deferrals -->

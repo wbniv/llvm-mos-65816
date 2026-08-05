@@ -55,7 +55,19 @@ static inline void m7_begin(void) {
 }
 
 // Release force-blank — show the picture.
-static inline void m7_show(void) { REG_INIDISP = INIDISP_ON; }
+//
+// M7BLANK_PROBE (measurement builds only, never shipped): paint CGRAM[0] white at the moment the
+// blank is released. Most Mode 7 demos deliberately use a BLACK backdrop (buddha's "no hits ->
+// black", the cloud blooming in on it), so a picture-level scan cannot tell "still force-blanked"
+// from "released, but the art is still black". With the probe on, everything after the release is
+// white, so the all-black run measured by dev/m7blank.sh is EXACTLY the force-blank window — the
+// thing this handoff contract is about. Compiled out by default; costs a shipped ROM nothing.
+static inline void m7_show(void) {
+#ifdef M7BLANK_PROBE
+  REG_CGADD = 0; REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;
+#endif
+  REG_INIDISP = INIDISP_ON;
+}
 
 // Mode 7 transform setters. Matrix elements are 8.8 signed; centre/scroll are write-twice
 // latched ports (low byte then high byte).

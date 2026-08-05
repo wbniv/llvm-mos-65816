@@ -96,6 +96,12 @@ static inline void display_frame(Display *d) {
      btgt == bright (the default) this is a no-op and the screen is simply full-on. */
   if (d->bright < d->btgt)      d->bright++;
   else if (d->bright > d->btgt) d->bright--;
+#ifdef M7BLANK_PROBE
+  /* Measurement builds only (dev/m7blank.sh --probe) — see mode7.h's m7_show(). Paint CGRAM[0]
+     white on the frame that releases the boot force-blank, so a picture scan can separate "still
+     blanked" from "released onto black art". Compiled out by default. */
+  if (!d->shown) { REG_CGADD = 0; REG_CGDATA = 0xFFu; REG_CGDATA = 0x7Fu; }
+#endif
   REG_INIDISP = (uint8_t)(d->bright & 0x0Fu); /* force-blank bit can never escape this API     */
   d->shown = 1;
 }

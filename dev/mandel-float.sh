@@ -75,13 +75,19 @@ else
 fi
 
 # 5. MAME under Xvfb — snapshot the real PPU output + assert.
+# -seconds_to_run must OUTLAST dev/mandel-float.lua's SHOT_AT (2200 periodic ticks ~ 36.7 emulated
+# seconds at 60 Hz). It was 18, so MAME exited before the callback ever fired: no SHOT line, and the
+# `case "$line"` below scored the silence as a FAIL. Pre-existing and unrelated to any ROM change —
+# reproduced on pristine sources while closing the Mode 7 splash force-blank floor (2026-08-05).
+# Raised rather than lowering SHOT_AT: frame 2200 is the whole-set render 3d66b05 deliberately picked
+# as the published title card.
 if command -v xvfb-run >/dev/null 2>&1; then
   echo "==> MAME (under Xvfb): snapshot + assert (build/mandel-float-mame.png)"
   SNAP="$BUILD/.mandel-float-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
   line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \
     xvfb-run -a mame snes -cart "$BUILD/mandel-float.sfc" -rompath "$ROOT/dev/roms" \
       -autoboot_script "$ROOT/dev/mandel-float.lua" -skip_gameinfo \
-      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 18 \
+      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 45 \
       -cfg_directory /tmp -nvram_directory /tmp 2>/dev/null | grep -m1 '^SHOT:' || true)"
   echo "    $line"
   if [ -f "$SNAP/snes/0000.png" ]; then mv "$SNAP/snes/0000.png" "$BUILD/mandel-float-mame.png"; fi
