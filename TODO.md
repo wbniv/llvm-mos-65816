@@ -1137,11 +1137,6 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   section but no PASS ever recorded (surfaced by the 2026-08-04 doc consolidation, which first
   tracked the plan file); run + record the steps against current main.
   [plan](docs/plans/2026-07-26-120-snes-player-fullscreen-orientation-fit.md)
-- [verify T1] **llvm-mc-motorola-default** — the fix is posted ([PR #587](https://github.com/llvm-mos/llvm-mos/pull/587))
-  with a passing focused regression, but the plan's own Verification steps were never run +
-  recorded; run them (focused lit test + bare-`llvm-mc` `$ea` encode) and paste output.
-  [plan](docs/plans/2026-08-04-llvm-mc-motorola-default.md)
-
 
 ## Watch
 
@@ -1189,6 +1184,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-05 — [motorola-default-verify] Plan verification run + recorded, all steps PASS (PR #587 branch). See [plan](docs/plans/2026-08-04-llvm-mc-motorola-default.md).
 - [x] 2026-08-04 — [cop-mnemonic] COP PR POSTED as [#588](https://github.com/llvm-mos/llvm-mos/pull/588) (mandatory signature, decoder-visible 2-byte decode, W65816-gated; reduction+design per the [draft banner](docs/upstream-cop-brk-signature-pr.md); links pre-flighted, a16/xy16 claim de-forked).
 - [x] 2026-08-04 — [round7-battery] Round 7 complete, 22/22 ROMs; #141 dpbank forced the ISR D/DBR envelope EXTEND (`0026`). See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md).
 - [x] 2026-08-04 — [dither-bayer] Confirmed on shipped Apollo corpus: 6.49 pts (78.91→72.42%) at 0.48 dB; rule ≤0.5 dB→Bayer, ≥2 dB→Floyd. See [plan](docs/plans/2026-08-03-interframe-crossover.md).
