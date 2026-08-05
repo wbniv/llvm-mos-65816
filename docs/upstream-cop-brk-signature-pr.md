@@ -25,8 +25,7 @@
      3ac109760642, living locally in ~/llvm-mos. Verified in ~/llvm-mos/build-pr (MOS-only,
      Release+asserts): TableGen/build clean (no decoder conflict -- $02 has exactly one
      decoder-visible def per predicate), all new/changed tests proven red-before/green-after, MC
-     suite 39/40, the single failure (addr-asciz.s) proven pre-existing by stashing the change and
-     re-running on pristine upstream.
+     suite fully green (40/40) once llvm-readelf is built. [CORRECTED 2026-08-04: the earlier '5 pre-existing failures on pristine tip' / '39/40 lone failure' claims were exit-127 tool-missing artifacts of the minimal build-pr tool set (opt, llvm-readelf absent); with the tools built the suites are fully green — CodeGen 79 pass + getchar-regression.ll upstream-disabled (UNSUPPORTED: target), 0 failures; MC 39/39 (+ the branch's own new tests). Rule: build the tools the suite RUNs before quoting numbers; exit-127 in a lit log is an environment defect.]
      PRE-FLIGHT resolved 2026-08-04: the user pushed this repo's main, and the "(source)" link
      verified HTTP 200 before posting. Both links live.
      Post commands (as executed):
@@ -124,8 +123,11 @@ at all.
 
 Red/green: all four new/changed tests were confirmed to fail without the `COP_Immediate` definition
 (reverted via `git stash`) and pass with it. The `llvm/test/MC/MOS/` suite is otherwise unchanged --
-39/40, with the single failure (`addr-asciz.s`) confirmed pre-existing by stashing this patch and
-re-running against pristine `main`.
+and fully green (40/40).
+
+*Correction (same day, mirrored from the live PR):* an earlier revision reported 39/40 with
+`addr-asciz.s` as a "pre-existing failure" — an exit-127 artifact of the reporter's minimal build
+lacking `llvm-readelf`; with the tool present the test passes on both trees.
 
 ## Real-world origin
 

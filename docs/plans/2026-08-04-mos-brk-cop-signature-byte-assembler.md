@@ -169,6 +169,9 @@ Implemented as commit `61c07100970c` on branch `mos-65816-cop-brk-signature` (cu
     Total Discovered Tests: 40
       Failed: 1 (2.50%)      <- MC/MOS/addr-asciz.s
     ```
+    [CORRECTED 2026-08-04, post-record: the 'single failure' was an exit-127 artifact — the
+    minimal build lacked llvm-readelf, which addr-asciz.s RUNs; with it built the MC suite is
+    fully green. 'Proven pre-existing' was vacuous (pristine also ran without the tool).]
     The single failure was proven **pre-existing**: `git stash` + rebuild + re-run on pristine
     upstream fails identically (`Failed: 1 (100.00%)` for that test alone). **PASS**
 

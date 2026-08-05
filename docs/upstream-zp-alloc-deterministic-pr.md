@@ -4,9 +4,18 @@
      Branch: mos-zp-alloc-deterministic @ 1c3deb021a53, local in ~/llvm-mos, cut from upstream tip
      1f334fef02b5 (patch 0021 applied clean; commit parent verified = tip). Verified in
      ~/llvm-mos/build-pr: RED = zp-alloc-deterministic.ll FAILS without the fix on the same tree;
-     GREEN = passes, stable across 5 repeat runs; full CodeGen/MOS = 80 tests with the same 5
-     failures as the known pre-existing pristine-tip set (proven during the 0022 prep) — no new
-     failures.
+     GREEN = passes, stable across 5 repeat runs; full CodeGen/MOS = 80 tests, 79 pass +
+     getchar-regression.ll skipped by its own in-tree `UNSUPPORTED: target={{.*}}` (upstream
+     FIXME, disabled for everyone), 0 failures; MC suite 39/39.
+     CORRECTION 2026-08-04 (user caught it pre-publish): the earlier "5 failures, pre-existing
+     on pristine tip" claim was FALSE — all 5 were exit-127 tool-missing artifacts of the
+     minimal build-pr tool set (opt for the nonreentrant/indvar/indexiv/leaf tests;
+     llvm-readelf for MC's addr-asciz). "Pre-existing on pristine tip" was vacuously true
+     because pristine tip lacked the same binaries. Upstream was never failing. METHODOLOGY
+     RULE for future preps: before quoting suite numbers, build the tools the suite RUNs
+     (at minimum: llc llvm-mc llvm-objdump llvm-readelf opt FileCheck not count split-file),
+     and treat any exit-127 / 'command not found' in a lit log as an environment defect, never
+     as a test failure.
      Post commands (user-triggered):
        git -C ~/llvm-mos push origin mos-zp-alloc-deterministic
        gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-zp-alloc-deterministic --base main \
@@ -178,8 +187,10 @@ from identical sources:
 | after | **1** — `a4e00f3bfc7491aa7cc129008e7b6cd8933bb117ea90d3361e5363b94903427e`, 20/20 |
 
 **Regressions** — `llvm/test/CodeGen/MOS/` on the PR branch (upstream tip `1f334fef02b5` +
-this change): 80 tests, 5 failures — the same five that fail on pristine tip on this machine
-(independently confirmed while preparing an unrelated change). No new failures.
+this change): 80 tests — **79 pass, 0 failures**; the one remaining test
+(`getchar-regression.ll`) is skipped for everyone by its own in-tree
+`UNSUPPORTED: target={{.*}}` directive (FIXME: re-enable after the new register allocator).
+`llvm/test/MC/MOS/` likewise fully green (39/39).
 
 ## Real-world sighting
 

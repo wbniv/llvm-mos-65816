@@ -1,13 +1,13 @@
 # [MOS] `mos-late-opt`: don't skip `CmpZero` lowering after the block's first fold
 
-<!-- NOT POSTED. MINTED + VERIFIED ON TIP 2026-08-04; posting is user-triggered.
+<!-- ✅ POSTED 2026-08-04 as https://github.com/llvm-mos/llvm-mos/pull/589.
      Body below minus the H1 and this comment is the as-posted text.
-     Branch: mos-late-opt-cmpzero-lowering @ f8cfe68b4b5e, local in ~/llvm-mos, cut from upstream
+     Branch: mos-late-opt-cmpzero-lowering @ 8c8d28b0c35a (cherry-pick repair of f8cfe68b after a
+     shared-clone branch-switch race; pushed), cut from upstream
      tip 1f334fef02b5 (patch 0022 applied clean). Verified in ~/llvm-mos/build-pr:
      RED = late-opt-cmpzero-after-fold.mir FAILS without the fix on the same tree;
-     GREEN = passes with it; full CodeGen/MOS suite 80 tests, the 5 failures
-     (indexiv, indvar-simplify-20230930, leaf-20231021, nonreentrant-nointerrupts, nonreentrant)
-     reproduce identically WITHOUT the fix — pre-existing on pristine tip, not 0022's.
+     GREEN = passes with it; full CodeGen/MOS suite: 79 pass, 0 failures
+     (getchar-regression.ll is upstream-disabled via its own UNSUPPORTED directive). [CORRECTED 2026-08-04: the earlier '5 pre-existing failures on pristine tip' / '39/40 lone failure' claims were exit-127 tool-missing artifacts of the minimal build-pr tool set (opt, llvm-readelf absent); with the tools built the suites are fully green — CodeGen 79 pass + getchar-regression.ll upstream-disabled (UNSUPPORTED: target), 0 failures; MC 39/39 (+ the branch's own new tests). Rule: build the tools the suite RUNs before quoting numbers; exit-127 in a lit log is an environment defect.]
      Post commands (user-triggered):
        git -C ~/llvm-mos push origin mos-late-opt-cmpzero-lowering
        gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-late-opt-cmpzero-lowering --base main \
