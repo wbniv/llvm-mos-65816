@@ -3,7 +3,12 @@
 **Date:** 2026-08-05
 **Item:** TODO `[T3] Finish the force-blank conversion: snesgfx/splash.h + splash16 in title_layer.h`
 **Predecessor:** [Mode 7 splash force-blank floor](2026-08-05-mode7-splash-forceblank-floor.md) (the settled contract)
-**Status:** **BLOCKED on a keep-or-delete decision.** No code change proposed; no conversion is possible.
+**Status:** **DONE — option (A), deleted.** No conversion was possible; the dead surface was removed instead.
+
+> **Coordinator decision (2026-08-05): (A) delete.** Rationale recorded: it is our own demo-library
+> surface (not upstream-shipped), it has zero consumers, it was superseded twice (`b6ef256`, `8ac159f`),
+> the zero-ROM-byte impact is provable without a rebuild, and leaving the dead surface in place keeps
+> regenerating stale work items. Execution record at the bottom of this file.
 
 ---
 
@@ -91,6 +96,75 @@ example surface, not an implementation detail:
 Recommendation: **(A)**, with the `agent-handoff.md:192` line rewritten either way. Not taken
 unilaterally — deleting a shipped SDK example header is a surface decision, and the baseline rows
 belong to another agent's in-flight work.
+
+## Execution record — option (A), 2026-08-05
+
+The T1 baseline cleanup (`9bc0c50`) had landed and `dev/snes-display-quality-baseline.json` was clean,
+so the baseline rows were free to edit. Every file below was confirmed clean before editing.
+
+| File | Change |
+|---|---|
+| `examples/snes/snesgfx/splash.h` | **Deleted** (`git rm`) — 77 lines, `splash_show` + `_splash_line`. |
+| `examples/snes/snesgfx/title_layer.h:503` | `splash16()` definition removed; replaced by a tombstone comment pointing at `m7splash_*` and this plan. |
+| `dev/title-charset.sh:9,74` | `splash16` dropped from the call-site scanning regex and its doc comment. |
+| `dev/snes-display-quality-baseline.json` | **12** rows removed, not 11 — the 11 `splash.h` rows *plus* one that the first pass missed: `b5eacd22175169f73a1a`, the `force-blank` row for `title_layer.h:511` (`REG_INIDISP = 0x80`), which lived **inside** the deleted `splash16` body. Findings 252 → 240. |
+| `docs/agent-handoff.md` | The stale "Still to convert" line rewritten to record the resolution, citing both superseding commits. |
+
+**The 12th row is the one lesson here.** The deletion set derived from grep was one row short, because a
+baseline entry keyed on `title_layer.h` was describing a line inside the block being deleted. The gate
+does *not* fail on an unmatched baseline row, so it would have passed silently with the stale row left
+behind — exactly the drift `9bc0c50` had just finished cleaning. It was caught only by the reviewed-site
+count dropping by 12 when 11 was expected. **Reconcile the count, not just the exit status.**
+
+## Verification of the deletion
+
+1. Zero remaining references (source, scripts, baseline).
+
+    ```
+    $ git grep -n -e 'splash_show' -e 'splash16' -e 'snesgfx/splash\.h' -- . ':!docs/' ':!*.patch' ':!TODO.md'
+    examples/snes/snesgfx/title_layer.h:503:/* NOTE: splash16() — the standalone Mode-7 drop-in that wrapped title_begin/title_end and
+    examples/snes/snesgfx/title_layer.h:508: * docs/plans/2026-08-05-splash16-forceblank-conversion.md. */
+    ```
+
+    **PASS** — the only two hits are the tombstone comment's own prose. No definition, no call, no
+    include, no baseline row, no scanner alternative.
+
+2. `dev/title-charset.sh` still passes with the regex alternative removed.
+
+    ```
+    $ bash dev/title-charset.sh
+    checked 124 title call sites across 138 demo sources
+    PASS  every title character has a glyph
+    exit=0
+    ```
+
+    **PASS** — 124 call sites, unchanged (the removed alternative was matching nothing).
+
+3. SNESDQ display-quality gate, baseline 12 rows lighter.
+
+    ```
+    $ python3 dev/snes-display-quality.py
+    SNESDQ: PASS (240 reviewed sensitive access sites; display order and upload budgets valid)
+    ```
+
+    **PASS** — 240 reviewed sites against 240 baseline findings, an exact reconciliation (252 − 12).
+
+4. Canary demo gate proving hashes unmoved — `1d-ca` (a `title_begin16` consumer, so it includes the
+   edited `title_layer.h`).
+
+    ```
+    $ dev/run.sh 1d-ca
+    ==> host oracle: 1-D CA gate hash = 0xAB2C
+    ==> disasm gate (ca_step: shift/bool ops, no mul/div, no rep/sep in hot path)
+        PASS  shifts=7  bools=10  bad_mul=0  bad_div=0  (pure shift+bool, no helpers)
+    SMOKE: PASS off=0x5A3 len=2 got=0xAB2C (ran 400 frames, bsnes-jg)
+        SHOT: PASS corpus=0xAB2C (snapshot at frame 400)
+    RESULT: PASS — Rule 90/110 CA rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xAB2C host == +mos-a16
+    exit=0
+    ```
+
+    **PASS** — `0xAB2C` on host, bsnes-jg and MAME. Deleting an uncalled `static inline` emits no code,
+    as predicted.
 
 ## Mockups
 

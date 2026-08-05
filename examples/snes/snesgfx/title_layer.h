@@ -500,15 +500,11 @@ static inline void title_end(Display *d, TitleLayer *t, uint16_t frames) {
   display_fade_to(d, INIDISP_ON);    /* fade back up showing demo content */
 }
 
-/* splash16 — standalone title splash (no pre-existing display; leaves screen in force-blank).
- * Drop-in for Mode-7 demos that don't use the display system for their main render.
- * Recommended: pass TITLE_HOLD_FRAMES (120) for consistent timing. */
-static inline void splash16(const char *line0, const char *line1, uint16_t frames) {
-  Display _d; display_init(&_d);
-  static TitleLayer _t;
-  title_begin(&_d, &_t, line0, line1);
-  title_end(&_d, &_t, frames);
-  REG_INIDISP = 0x80;   /* re-enter force-blank for Mode 7 / VRAM setup */
-}
+/* NOTE: splash16() — the standalone Mode-7 drop-in that wrapped title_begin/title_end and
+ * re-entered force-blank — was DELETED 2026-08-05. Its last call sites went away in 8ac159f
+ * ("align title effects with display modes"), which moved the Mode 7 demos onto
+ * snesgfx/m7title.h's m7splash_begin()/m7splash_end(). Use those; the force-blank handoff
+ * contract lives at the top of that header. See
+ * docs/plans/2026-08-05-splash16-forceblank-conversion.md. */
 
 #endif /* SNESGFX_TITLE_LAYER_H */

@@ -1438,83 +1438,6 @@
       "text": "REG_INIDISP = 0x80u;"
     },
     {
-      "id": "f22fb5e5ff629e4f60ee",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 34,
-      "text": "snes_vram_addr((uint16_t)(SPLASH_MAP_WORD + row * SPLASH_COLS + col));"
-    },
-    {
-      "id": "b99fb172bbb0c0f0697b",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 39,
-      "text": "REG_VMDATA = tile;"
-    },
-    {
-      "id": "3fa43b6672aba734810b",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 51,
-      "text": "REG_CGDATA = 0x00; REG_CGDATA = 0x00;"
-    },
-    {
-      "id": "bf846fba4cc7d07120c3",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 52,
-      "text": "REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;"
-    },
-    {
-      "id": "30e974b10d11ec37c6d5",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 55,
-      "text": "snes_vram_addr(SPLASH_CHR_WORD);"
-    },
-    {
-      "id": "4d51df524981bf882dd9",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 56,
-      "text": "for (uint16_t i = 0; i < (uint16_t)FONT8_N * 8u; i++) REG_VMDATA = FONT8[i];"
-    },
-    {
-      "id": "1efdc2b1f9338ff33c04",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 59,
-      "text": "snes_vram_addr(SPLASH_MAP_WORD);"
-    },
-    {
-      "id": "2f001aa51c68d3289dcd",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 60,
-      "text": "for (uint16_t i = 0; i < (uint16_t)(SPLASH_COLS * 32u); i++) REG_VMDATA = 0u;"
-    },
-    {
-      "id": "583c7b4ca5c8051910b3",
-      "kind": "force-blank",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 70,
-      "text": "REG_INIDISP = 0x80;"
-    },
-    {
-      "id": "d47670dc88b0aee0339d",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 72,
-      "text": "snes_vram_addr(0x0000);"
-    },
-    {
-      "id": "12e7186dd7f62e5fbfb2",
-      "kind": "ppu-write",
-      "path": "examples/snes/snesgfx/splash.h",
-      "line": 73,
-      "text": "for (uint16_t i = 0; i < SPLASH_CLEAR_WORDS; i++) REG_VMDATA = 0u;"
-    },
-    {
       "id": "ba07e0f128d936d55b68",
       "kind": "ppu-write",
       "path": "examples/snes/snesgfx/text_layer.h",
@@ -1632,13 +1555,6 @@
       "path": "examples/snes/snesgfx/title_layer.h",
       "line": 350,
       "text": "REG_VMDATA = (uint16_t)((uint16_t)(TITLE_PAL << 10) | tile);"
-    },
-    {
-      "id": "b5eacd22175169f73a1a",
-      "kind": "force-blank",
-      "path": "examples/snes/snesgfx/title_layer.h",
-      "line": 511,
-      "text": "REG_INIDISP = 0x80; /* re-enter force-blank for Mode 7 / VRAM setup */"
     },
     {
       "id": "ec671609bff50ea14588",

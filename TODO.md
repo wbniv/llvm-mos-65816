@@ -228,11 +228,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   splash contract, so deliberately out of scope there and budgeted at the measured value
   (`dev/m7blank.sh` `mandel-oop) echo 12`) so a splash-side regression still trips. Tighten the
   budget when this lands. (Re-ranked T3→T4 by the coordinator: the reporting agent itself flagged the force-blank-into-active flicker regression class (`1dd9317`) in a shared path every Display demo pays — where the INIDISP write belongs vs `build_step` is a design call with a wide wrong-turn cost.)
-- [wip T3] **Finish the force-blank conversion: `snesgfx/splash.h` + `splash16` in `title_layer.h`.** <!-- agent:ae3c4687c61bf349d --> The
-  remaining half of [agent-handoff](docs/agent-handoff.md)'s "Still to convert" list, now that
-  `m7title.h` and the Mode 7 demo `main()`s are done
-  ([plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md)). Same contract, same instrument —
-  `dev/m7blank.sh --probe` measures any demo, not just Mode 7 ones. (Re-ranked T2→T3 by the coordinator: the contract is settled but lands across every `splash.h`/`splash16` consumer's `main()` plus per-demo gate re-runs — multi-file against a settled pattern is T3's definition.)
 - [wip T2] **`dev/m7blank.sh` cannot measure four splash demos.** <!-- agent:a6c0fe5a8fb7483ef --> `apollo-reel`, `lzss-gallery`,
   `seamdemo`, `snes-video-reel` are discovered by the `grep -l m7splash` sweep but fail to build in
   the harness — they need generated asset headers or corpora that live outside the repo
@@ -1232,6 +1227,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-05 — [splash-dead-code] "Finish the conversion" premise false — splash.h/splash16 had ZERO consumers (superseded b6ef256/8ac159f); surface deleted, docs de-staled. See [plan](docs/plans/2026-08-05-splash16-forceblank-conversion.md).
 - [x] 2026-08-05 — [dq-baseline-stale-pair] Two pre-c9e0f12 nmitally.c baseline entries dropped with no-match evidence; SNESDQ PASS 254→252 (`9bc0c50`).
 - [x] 2026-08-05 — [m7-splash-forceblank] Mode 7 splash handoff contract: post-title force-blank 720 → 22 frames across 8 demos, floor measured at 1; `dev/m7blank.sh --gate` guards it. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
 - [x] 2026-08-05 — [0019-posted] Branch-range diagnostics POSTED as [#591](https://github.com/llvm-mos/llvm-mos/pull/591) (companion to open #549, same applyFixup hunk, ours yields on conflict; mint+verify by the 0019 session, post user-triggered). See [body](docs/upstream-branch-range-diagnostic-pr.md).

@@ -189,7 +189,14 @@ wipe/fade/scene change is now missed. Suppressions print their window spread, ne
 `JGX_BLANKSCAN_SELFTEST=1 build/jgxcheck` (no ROM needed) pins the discrimination on synthetic
 series. See [the plan](plans/2026-07-30-blankscan-quiescence-gate.md).
 
-Still to convert: `snesgfx/splash.h` and `splash16` in `title_layer.h`.
+**The conversion list is now closed (2026-08-05).** The live half — `snesgfx/m7title.h` and the Mode 7
+demo `main()`s — was converted to the handoff contract below. The other half never needed converting:
+`snesgfx/splash.h` (`splash_show`) and `splash16` in `title_layer.h` had **zero consumers**, having been
+superseded twice over — `splash_show`'s call sites were replaced by the BG2 `TitleLayer` in `b6ef256`,
+and `splash16`'s by `m7splash_begin`/`m7splash_end` in `8ac159f` ("align title effects with display
+modes"). Neither helper was itself contract-violating; the frames the contract recovers live in *caller*
+code, and there were no callers. Both surfaces were **deleted** rather than converted, so nothing regenerates
+the item. See [the close-out](plans/2026-08-05-splash16-forceblank-conversion.md).
 
 **`snesgfx/m7title.h` + the Mode 7 demo `main()`s — converted 2026-08-05.** The old wording here said
 they "re-open the window". They do not: `m7splash_end()` returns with `INIDISP = $80` still asserted

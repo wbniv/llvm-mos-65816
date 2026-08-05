@@ -6,7 +6,7 @@
 # "Z^2 + C" lost its caret, and five more lost lowercase letters — none of it visible except by
 # looking at a screenshot of the title card, which nothing gates on.
 #
-# This scans every title_begin/title_begin16/splash16/m7splash call site in examples/snes/*.c and
+# This scans every title_begin/title_begin16/m7splash call site in examples/snes/*.c and
 # checks each string against the glyphs that are actually non-blank in the GENERATED font headers
 # (line0 → font8.h, line1 → font16.h). Reading the headers rather than a hardcoded list means the
 # gate stays honest as glyphs are added or removed.
@@ -71,7 +71,7 @@ if show_blank:
     print(f"font16  0x20..0x{0x20+n16-1:02X}: {len(blank16):2d} empty slots: {chars(blank16)}")
     print()
 
-CALL = re.compile(r'\b(?:title_begin16|title_begin|splash16|m7splash)\s*\(([^;]*?)\)\s*;', re.S)
+CALL = re.compile(r'\b(?:title_begin16|title_begin|m7splash)\s*\(([^;]*?)\)\s*;', re.S)
 STR  = re.compile(r'"((?:[^"\\]|\\.)*)"')
 
 bad, sites = [], 0
