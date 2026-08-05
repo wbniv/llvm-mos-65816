@@ -154,6 +154,76 @@ misreported as a regression.
 5. `python3 dev/snes-display-quality.py` — order invariant + budgets valid, no new findings.
 6. `snesgfx/display.h` is byte-identical to `main` (Option F reverted; nothing shared changed).
 
+### Verification run — 2026-08-05, `wt/321-dispfirst`
+
+**1. `dev/bootblank.sh --firstframe`, all 117 measurable Display demos, Option F applied.**
+```
+FAIL: 6 demo(s) have a nondeterministic first visible frame — a layer is showing
+      VRAM that no reserve() wrote.
+  burning-ship  doom-fire  hdr-bloom  mandel-oop  multibase  rdiff
+```
+Baseline re-check of the `mandel-oop` entry (3 runs, unmodified `display.h`):
+```
+mandel-oop  f=51  NONDETERMINISTIC first visible frame
+mandel-oop  f=51  NONDETERMINISTIC first visible frame
+mandel-oop  f=51  NONDETERMINISTIC first visible frame
+```
+**PASS as a decision procedure — and the design it was testing FAILED.** Five real regressions
+(`mandel-oop` is pre-existing, see §5). Option F reverted; Option J landed instead.
+
+**2. `dev/m7blank.sh --probe mandel-oop`**
+```
+before  mandel-oop   239   249   11
+after   mandel-oop   239   243    5
+```
+**PASS** — the dispatched target (4-frame splash handoff + the release frame).
+
+**3. `dev/m7blank.sh --gate`, full splash set, `mandel-oop` budget 12 → 6**
+```
+demo               measured   budget  verdict
+apollo-reel               5        6  ok
+avalanche                 1        2  ok
+blossom                   4        5  ok
+buddha                    2        3  ok
+julia                     1        2  ok
+lzss-gallery            253      254  ok
+mandel-display            1        2  ok
+mandel-double             1        2  ok
+mandel-float              1        2  ok
+mandel-oop                5        6  ok
+seamdemo                 20       21  ok
+snes-video-reel           4        5  ok
+
+PASS: every demo is within its post-title force-blank budget.
+GATE EXIT=0
+```
+**PASS.**
+
+**4. `dev/run.sh mandel-oop`**
+```
+SMOKE: PASS off=0x896 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+    SHOT: PASS corpus=0x204F (snapshot at frame 5800)
+    indirect JMP count in .text: 0
+    indirect dispatch call sites (jmp-ind + jsr-ind + jsr __call_indir): 1
+RESULT: PASS — mandel-oop OOP gate GREEN; corpus_result==0x204F on host == +mos-a16@bsnes-jg
+```
+**PASS** — corpus unchanged on host, bsnes-jg and MAME; virtual-dispatch gate still exactly 1.
+
+**5. `python3 dev/snes-display-quality.py`**
+```
+SNESDQ: PASS (240 reviewed sensitive access sites; display order and upload budgets valid)
+```
+**PASS** — no new sensitive-access findings, `display_frame` order invariant intact.
+
+**6. `snesgfx/display.h` byte-identical to `main`**
+```
+$ git diff main -- examples/snes/snesgfx/display.h | wc -l
+0
+```
+**PASS** — nothing shared changed; the blast radius of what landed is one demo.
+
+### Result: 6 / 6 PASS. The design under test was rejected by step 1, on evidence.
+
 ## 5. Results — 2026-08-05, `wt/321-dispfirst`
 
 ### The design hits the target

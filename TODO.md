@@ -2127,5 +2127,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      the dead surface was deleted rather than converted, so nothing regenerates it. The note above
      is left as written; this line just keeps its pointer from dangling.
      See docs/plans/2026-08-05-splash16-forceblank-conversion.md. -->
-- [verify] **2026-08-05-display-first-frame-forceblank** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-05-display-first-frame-forceblank.md](docs/plans/2026-08-05-display-first-frame-forceblank.md)_  <!-- fp:3d96a1cd97548340 -->
+<!-- triaged 2026-08-05: fp:3d96a1cd97548340 — the verification section now records all six
+     steps with raw output and a 6/6 PASS line (same commit). The capture fired because the
+     first commit landed the plan before the results were written back. -->
 <!-- END auto-captured-deferrals -->
