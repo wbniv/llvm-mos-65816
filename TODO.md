@@ -219,7 +219,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   and the repro re-verified against the current toolchain (2 errors at `-Os`, clean
   `-O0`/`-Oz`); status-doc row 13 updated, issue **NOT POSTED** (filing is user-triggered).
   (T3: **residual = decide whether to attempt the toolchain-wide fix** — nothing else open.)
-- [T3] **`snesgfx` Display: 6 frames of force-blank inside the FIRST `display_frame()`.** Localised
+- [T4] **`snesgfx` Display: 6 frames of force-blank inside the FIRST `display_frame()`.** Localised
   while closing the Mode 7 splash floor. `mandel-oop`'s post-title window is 11 frames, but only 4
   are the splash handoff (title exit + `display_init` + `_mandel_reserve`); bisecting `_mandel_emit`
   puts 6 of the remaining 7 in `build_step()`'s far-memory work — 2 in the 512-far-store row
@@ -227,13 +227,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   `display_frame()` writes `REG_INIDISP`. Every `Display` demo pays it, not just Mode 7. Not the
   splash contract, so deliberately out of scope there and budgeted at the measured value
   (`dev/m7blank.sh` `mandel-oop) echo 12`) so a splash-side regression still trips. Tighten the
-  budget when this lands. (T3: bounded, one subsystem, measurement method already built.)
-- [T2] **Finish the force-blank conversion: `snesgfx/splash.h` + `splash16` in `title_layer.h`.** The
+  budget when this lands. (Re-ranked T3→T4 by the coordinator: the reporting agent itself flagged the force-blank-into-active flicker regression class (`1dd9317`) in a shared path every Display demo pays — where the INIDISP write belongs vs `build_step` is a design call with a wide wrong-turn cost.)
+- [T3] **Finish the force-blank conversion: `snesgfx/splash.h` + `splash16` in `title_layer.h`.** The
   remaining half of [agent-handoff](docs/agent-handoff.md)'s "Still to convert" list, now that
   `m7title.h` and the Mode 7 demo `main()`s are done
   ([plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md)). Same contract, same instrument —
-  `dev/m7blank.sh --probe` measures any demo, not just Mode 7 ones. (T2: the contract and the
-  measurement already exist; this is applying them to two more headers.)
+  `dev/m7blank.sh --probe` measures any demo, not just Mode 7 ones. (Re-ranked T2→T3 by the coordinator: the contract is settled but lands across every `splash.h`/`splash16` consumer's `main()` plus per-demo gate re-runs — multi-file against a settled pattern is T3's definition.)
 - [T2] **`dev/m7blank.sh` cannot measure four splash demos.** `apollo-reel`, `lzss-gallery`,
   `seamdemo`, `snes-video-reel` are discovered by the `grep -l m7splash` sweep but fail to build in
   the harness — they need generated asset headers or corpora that live outside the repo
@@ -241,6 +240,11 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   probably fine, but "probably" is not a measurement and the gate reports them as `BUILD FAILED`
   rather than green. Wire their asset generation (or a stub corpus) so the gate covers all twelve.
   (T2: harness plumbing per demo, no design question.)
+- [T1] **Drop the two stale `nmitally.c` entries from the `snes-display-quality` baseline.** They
+  predate `c9e0f12` (the header replacement) and match no current source; the m7blank session
+  hand-inserted its own two entries rather than run `--update-baseline`, which would have silently
+  dropped these foreign ones. Verify staleness, remove, re-run the quality gate, diff the baseline
+  (expect exactly −2). (T1: known cause, mechanical removal + gate re-run.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
