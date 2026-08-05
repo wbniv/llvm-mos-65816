@@ -906,19 +906,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   maintainer engagement) shows life; producer-normalization decoupling DONE (`0027`). `0011`/`0015`
   still user judgment), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
-- [T5] **Post the `0019` branch-range-diagnostic PR (WITH/AFTER #549 — still OPEN 2026-08-05).**
-  MINT + VERIFY DONE 2026-08-05: `mos-branch-range-diagnostic` @ `4195df6e3b56` (tip-clean apply,
-  binary-hash-proven red/green, MC 40/40 + CodeGen 78/1-UNSUPPORTED exit 0 under the tool-complete
-  rule, anchored extraction verified, no trailer; fork docs `85cc887`). Residual is the
-  user-triggered post, sequenced with #549 (same `applyFixup` hunk; ours yields on conflict).
-  Out-of-range `PCRel8`/`PCRel16` branch fixups assemble silently (offset truncated); `0019`
-  adds post-correction range checks + source-located errors + `branch-range-errors.s`. Touches
-  the SAME `applyFixup` hunk as open upstream
-  [PR #549](https://github.com/llvm-mos/llvm-mos/pull/549) (complementary — theirs fixes the
-  per-CPU correction constant) so coordinate timing and rebase over whichever lands first.
-  Steps: mint off tip, red/green the test, tool-complete suite run (methodology rule), finalize
-  [the body draft](docs/upstream-branch-range-diagnostic-pr.md); posting user-triggered.
-  Status-doc row 20. (T2: patch + draft exist; bounded mint/verify recipe.)
 - [T2] **65816 `BRL` branch relaxation — extend #550's gate to `HasW65816` (BLOCKED on
   #549/#550 merging).** Upstream [PR #550](https://github.com/llvm-mos/llvm-mos/pull/550) widens
   `isBranchOffsetInRange` on 65CE02+ so MC relaxation promotes branches to 16-bit instead of
@@ -1224,6 +1211,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-05 — [0019-posted] Branch-range diagnostics POSTED as [#591](https://github.com/llvm-mos/llvm-mos/pull/591) (companion to open #549, same applyFixup hunk, ours yields on conflict; mint+verify by the 0019 session, post user-triggered). See [body](docs/upstream-branch-range-diagnostic-pr.md).
 - [x] 2026-08-05 — [corpus-slice-repairs] nmitally 240-tick oracle restored (lost by c9e0f12) + nbody_sim resurrected (deleted by 9369ced); corpus-a16 **62/62** first-ever full green (`608b84b`).
 - [x] 2026-08-05 — [motorola-default-verify] Plan verification run + recorded, all steps PASS (PR #587 branch). See [plan](docs/plans/2026-08-04-llvm-mc-motorola-default.md).
 - [x] 2026-08-04 — [cop-mnemonic] COP PR POSTED as [#588](https://github.com/llvm-mos/llvm-mos/pull/588) (mandatory signature, decoder-visible 2-byte decode, W65816-gated; reduction+design per the [draft banner](docs/upstream-cop-brk-signature-pr.md); links pre-flighted, a16/xy16 claim de-forked).

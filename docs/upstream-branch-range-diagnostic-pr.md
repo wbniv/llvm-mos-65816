@@ -49,7 +49,10 @@ error: 8-bit branch target out of range
 error: 16-bit branch target out of range
 ```
 
-`llvm/test/MC/MOS/branch-range-errors.s` pins both messages.
+`llvm/test/MC/MOS/branch-range-errors.s` pins both messages; it is red without the change (the
+offset truncates silently, so no diagnostic is emitted) and green with it. The suites are
+otherwise unchanged: `llvm/test/MC/MOS/` 40/40, `llvm/test/CodeGen/MOS/` 78 pass + 1
+upstream-disabled, 0 failures.
 
 ## Relation to #549
 
