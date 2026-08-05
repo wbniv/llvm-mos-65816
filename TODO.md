@@ -219,15 +219,15 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   and the repro re-verified against the current toolchain (2 errors at `-Os`, clean
   `-O0`/`-Oz`); status-doc row 13 updated, issue **NOT POSTED** (filing is user-triggered).
   (T3: **residual = decide whether to attempt the toolchain-wide fix** — nothing else open.)
-- [wip T4] **`snesgfx` Display: 6 frames of force-blank inside the FIRST `display_frame()`.** <!-- agent:a960894c0a0a3418c --> Localised
-  while closing the Mode 7 splash floor. `mandel-oop`'s post-title window is 11 frames, but only 4
-  are the splash handoff (title exit + `display_init` + `_mandel_reserve`); bisecting `_mandel_emit`
-  puts 6 of the remaining 7 in `build_step()`'s far-memory work — 2 in the 512-far-store row
-  expansion, 4 in `build_chr_row()`'s far loads plus the queue copy — all executed before the first
-  `display_frame()` writes `REG_INIDISP`. Every `Display` demo pays it, not just Mode 7. Not the
-  splash contract, so deliberately out of scope there and budgeted at the measured value
-  (`dev/m7blank.sh` `mandel-oop) echo 12`) so a splash-side regression still trips. Tighten the
-  budget when this lands. (Re-ranked T3→T4 by the coordinator: the reporting agent itself flagged the force-blank-into-active flicker regression class (`1dd9317`) in a shared path every Display demo pays — where the INIDISP write belongs vs `build_step` is a design call with a wide wrong-turn cost.)
+- [T3] **Per-drawable "first frame is complete" opt-in for `snesgfx` Display.** The safe shape of the
+  rejected blanket fix ([plan](docs/plans/2026-08-05-display-first-frame-forceblank.md)): a `Drawable`
+  flag a `reserve()` sets to assert "I painted everything my first visible frame shows", with
+  `display_frame()` taking the early blank release only when **every** drawable in the scene asserts
+  it. Safe by default (no demo regresses), and drawables adopt it as their palettes move out of the
+  UploadQueue. Worth ~1 frame on most demos and more on any demo with an expensive first `emit()`, so
+  do it for the invariant, not the frames. Blocked on nothing; measure with `dev/bootblank.sh
+  --firstframe`, which is the gate that proved the blanket version unsafe.
+  (T3: design is written down in the plan; execution is one header plus per-drawable adoption.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -1220,6 +1220,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-05 — [display-first-frame] mandel-oop post-title force-blank 11 → 5 (budget 12 → 6); the blanket `display_frame()` fix was MEASURED UNSAFE (119/122 demos palette from the first emit) and rejected. See [plan](docs/plans/2026-08-05-display-first-frame-forceblank.md).
 - [x] 2026-08-05 — [m7blank-coverage] All twelve splash demos measured (`2dc7647`): lzss-gallery cfg fix, video-reel real corpus, seamdemo pure-Python gen, apollo-reel shape-faithful stub; 12-demo gate PASS, original eight byte-identical.
 - [x] 2026-08-05 — [splash-dead-code] "Finish the conversion" premise false — splash.h/splash16 had ZERO consumers (superseded b6ef256/8ac159f); surface deleted, docs de-staled. See [plan](docs/plans/2026-08-05-splash16-forceblank-conversion.md).
 - [x] 2026-08-05 — [dq-baseline-stale-pair] Two pre-c9e0f12 nmitally.c baseline entries dropped with no-match evidence; SNESDQ PASS 254→252 (`9bc0c50`).
@@ -2126,4 +2127,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      the dead surface was deleted rather than converted, so nothing regenerates it. The note above
      is left as written; this line just keeps its pointer from dangling.
      See docs/plans/2026-08-05-splash16-forceblank-conversion.md. -->
+- [verify] **2026-08-05-display-first-frame-forceblank** — Verification section present but no PASS recorded — run + record the steps. _from [2026-08-05-display-first-frame-forceblank.md](docs/plans/2026-08-05-display-first-frame-forceblank.md)_  <!-- fp:3d96a1cd97548340 -->
 <!-- END auto-captured-deferrals -->

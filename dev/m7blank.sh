@@ -101,12 +101,14 @@ budget_for() {
     mandel-display) echo 2 ;;
     mandel-double)  echo 2 ;;
     mandel-float)   echo 2 ;;
-    # 11 measured, and only 4 of it is the handoff (splash exit + display_init + _mandel_reserve).
-    # The other 7 are inside snesgfx's FIRST display_frame(): bisecting _mandel_emit shows 6 of them
-    # are build_step()'s far-memory work (2 in the 512-far-store row expansion, 4 in build_chr_row's
-    # far loads + the queue copy). That is the Display first-frame path, not the splash contract —
-    # tracked separately. Budgeted at the measured value so a splash-side regression still trips.
-    mandel-oop)     echo 12 ;;
+    # 5 measured: the 4-frame handoff (splash exit + display_init + _mandel_reserve) plus the
+    # release frame. Was 12 — the extra 7 were build_step()'s far-memory work running inside the
+    # FIRST display_frame(), which releases the blank only AFTER scene_emit(). _mandel_emit now
+    # skips its first build_step (reserve() already painted the loading checker and loaded CGRAM),
+    # so that compute runs with the screen ON. See
+    # docs/plans/2026-08-05-display-first-frame-forceblank.md — including the measured reason the
+    # same skip inside display_frame(), which would fix all 122 Display demos at once, is NOT safe.
+    mandel-oop)     echo 6 ;;
     # 20 measured: the ExHiROM 6 MiB bytecode-VM cartridge's act-1 dispatch setup before its
     # title clears — the generated seamdemo-data.h layout plus the VM's own init, not DMA.
     seamdemo)       echo 21 ;;
