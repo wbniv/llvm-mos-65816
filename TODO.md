@@ -1082,25 +1082,31 @@ planned/gated/superseded/stale — dispositions recorded as comments in the Inbo
 `[verify]` items: run the linked plan's numbered verification steps, paste raw output + PASS/FAIL
 into the plan, then promote to Done. **Serialize the runs — they share the hot build tree.**_
 
-- [wip T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — implemented locally 07-26 <!-- agent:ab17421f7d32b194f -->
-  (`bdbf516`), still-live mode7-gallery features. Run 2026-08-03 (`631ffe9`): **18/23 gates PASS**
-  — all 7 ROM gates green (host `0x204F`, bsnes-jg + MAME, 3× byte-identical capture,
-  `-verify` clean, 1 indirect dispatch), 8/9 startup-timeline gates green. **5 FAIL:** 24 black
-  frames (f 239–262) between title exit and loading field; 11 badges not 9 (`cdaa6f4`/`ad87374`
-  added two later Mode 7 demos); deployed ROMs (`0dd52e6`) ≠ fresh build (`849a6a9`) though
-  behaviourally identical; no browser smoke test run; no ROM/preview cache-busting exists.
+- [verify T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — re-run 2026-08-04:
+  **19/23 gates PASS** (was 18/23 on 08-03). All 7 ROM gates green with `0x204F` unchanged on host,
+  bsnes-jg and MAME; `.text` shrank 6,331 → 6,274 B. **Startup black window diagnosed and roughly
+  halved, 24 → 11 frames:** the cause was not handoff sequencing but `_mandel_reserve()` painting the
+  loading field *through* the far framebuffer and reading all 3,584 bytes back — a round-trip Part 4
+  already forbade; it now generates the checker straight into the tiled chr buffer. Badge count
+  closed by the #123 contract work (derived from the registry + committed ledger + parity digest).
+  **4 FAIL:** #11 residual 11 frames of post-title black — **ESCALATED**, the rest lives in the
+  shared `m7splash_end()`/`display_init()` force-blank handoff across all seven Mode 7 demos
+  (`mandel-display` holds black 72 frames at the same seam); #20 deployed ROMs ≠ fresh build; #23 no
+  ROM/preview cache-busting; #22 browser smoke test. Residual = deploy-gated (#20, #23) +
+  BLOCKED-no-harness (#22) + the #11 escalation; nothing was published.
   [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)
-- [wip T3] **123-mode7-gallery-filter** — same commit/state as 121; run after it (shared <!-- agent:ab17421f7d32b194f -->
-  surface). Run 2026-08-03 (`c5e645d`): **7/10 steps PASS**, 3 FAIL, two causes. Filter behaviour
-  itself is clean on both sites — `?mode=7` init, clear, Escape-to-clear + refocus,
-  `aria-live="polite"` count, `hidden`-attribute cards, biohack's 7/12 empty-shelf hide with every
-  visible row reset to `scrollLeft 0`, indri's `Fractals + Mode 7` = exactly 6 and the exact
-  `No Mode 7 demos in this category.` empty state — and both galleries resolve an **identical**
-  Mode 7 set. **3 FAIL:** steps 2 and 4 expect nine, observed 11 (same `cdaa6f4`/`ad87374` cause as
-  121; the plan's Data-contract build-time assertion and `tests/snes-mode7-filter.test.mjs` were
-  **never implemented on either site**, which is why the drift was silent); step 10 unexecuted — no
-  browser automation installed (no Playwright; jsdom has no layout), which also leaves step 8's
-  arrow-overflow sub-case untested. See the plan's verification record.
+- [verify T3] **123-mode7-gallery-filter** — re-run 2026-08-04: **9/10 steps PASS** (was 7/10).
+  Both 08-03 causes closed. The plan's Data-contract build-time assertion and
+  `tests/snes-mode7-filter.test.mjs` — never implemented, which is why 9 → 11 drifted silently — now
+  exist on **both** sites: a byte-identical `src/data/mode7-contract.mjs` (committed ledger +
+  `MODE7_PARITY_DIGEST` cross-site token), called from each gallery's frontmatter so drift fails the
+  Astro build, plus `pnpm test` (11/11 green on each) wired into both `deploy.yml`s ahead of the
+  build. The count is **derived** from each demo registry, never hardcoded. The plan's stale "nine"
+  is annotated, not rewritten, by an "Amendment — 2026-08-04" recording `cdaa6f4`/`ad87374` as
+  legitimate additions. **1 FAIL:** step 10 (narrow-width + reduced-motion render) —
+  BLOCKED-no-harness, no browser automation in either repo and none may be introduced; it still
+  carries step 8's arrow-overflow sub-case. Residual = that plus the deploy-gated note on step 1
+  (the new assertion/tests/CI step first run in CI on the next user-triggered `v*` tag).
   [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md)
 - [verify T3] **svx2-animated-video-cartridge — BLOCKED on the [T4] decision below.** Run
   2026-08-03 (`f536d25`): gates 1–6 PASS against the delivered 900-frame HiROM reel (24 pytest,

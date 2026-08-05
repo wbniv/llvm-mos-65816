@@ -10,7 +10,8 @@ Mockups:
 ## Goal
 
 Add a visible `Mode 7` filter to the SNES galleries on biohack.net and indri.studio. Activating it
-shows exactly the nine demos whose shared metadata has `displayMode: 7`; deactivating it restores
+shows exactly the demos whose shared metadata has `displayMode: 7` — **the contract count**, nine
+when this plan was written and 11 today (see the amendment below); deactivating it restores
 the gallery without disturbing the current position or category choice.
 
 ## Data contract
@@ -18,17 +19,51 @@ the gallery without disturbing the current position or category choice.
 Use the existing `displayMode?: 7` field as the sole filter predicate. Do not introduce another
 hard-coded slug list in browser JavaScript.
 
-The expected set remains:
+The expected set at authoring time (2026-07-26) was:
 
 `avalanche`, `blossom`, `buddhabrot`, `julia`, `lzss-gallery`, `mandel-display`,
 `mandel-double`, `mandel-float`, and `mandel-oop`.
 
 Add a build-time assertion in each site that:
 
-- exactly nine records have `displayMode === 7`;
+- the number of records with `displayMode === 7` equals the committed expected set's length —
+  **derived from the registry, never written as a literal anywhere**;
 - the set equals the committed expected set;
 - every matching card renders both its `data-display-mode="7"` hook and its visible `7` badge; and
 - the two sites use the same expected set.
+
+## Amendment — 2026-08-04: "nine" becomes the derived contract count
+
+**This section annotates the plan; it does not rewrite it.** The nine slugs listed above are the
+correct historical record of 2026-07-26.
+
+The 2026-08-03 verification run (below) scored steps 2 and 4 FAIL for observing 11 where the plan
+says nine. That was never a filter defect. Two Mode 7 demos were **legitimately added** after this
+plan was written, each by its own published change:
+
+| Commit | Demo | Added |
+|---|---|---|
+| `cdaa6f4` | `svx2-fastrom-video` — "snes: publish SVX2 FastROM video proof" | after 2026-07-26 |
+| `ad87374` | `apollo-daylight` — "feat(snes): publish the Apollo 11 daylight-launch video cartridge" | after 2026-07-26 |
+
+Both carry `displayMode: 7` correctly, both render the badge, and both galleries resolved the
+identical 11-slug set. The defect was that **nothing failed** when the count moved: this plan's
+Data-contract build-time assertion and its `tests/snes-mode7-filter.test.mjs` had never been
+implemented on either site, so 9 → 11 drifted in silence.
+
+Both are now implemented (2026-08-04), and the contract is restated so it cannot go stale again:
+
+- **The count is derived from the demo registry** — `mode7SlugsOf(demos).length` — and appears as a
+  literal in exactly one place, `EXPECTED_MODE7_SLUGS` in `src/data/mode7-contract.mjs`, whose only
+  purpose is to make a count change a *reviewed* change. That file is **byte-identical on both
+  sites**, and `MODE7_PARITY_DIGEST` (FNV‑1a/32 of the joined ledger) is the token that proves it.
+- **Every numeral below reads as the contract count.** Where a verification step says "nine", read
+  "the contract count — `EXPECTED_MODE7_SLUGS.length`, 11 as of 2026-08-04". The steps are scored
+  against the derived value, not against a frozen numeral. Adding a twelfth Mode 7 demo now **fails
+  both sites' builds** until the ledger and the digest are updated in the same commit.
+
+Numerals amended under this rule: Goal; Data contract; Interaction model (`9 Mode 7 demos`);
+Verification steps 2, 4 and 7; Rollout steps 3 and 5; Acceptance criteria.
 
 ## Interaction model
 
@@ -468,3 +503,283 @@ in #121), and no rendering-browser check was ever run (step 10, carrying step 8'
 sub-case). No filter-behaviour defect was found — every 123-specific mechanism the harness could
 drive behaved exactly as the plan specifies, on both sites, with the two galleries agreeing on an
 identical Mode 7 set.
+
+## Verification record — 2026-08-04 re-run, after implementing the Data contract
+
+Re-run of all ten steps after closing the two causes the 2026-08-03 record identified. The step text
+is reproduced **verbatim and unreordered**.
+
+**Result: 9 / 10 steps PASS, 1 FAIL.** (2026-08-03 was 7 / 10.)
+
+### What changed since the 2026-08-03 run
+
+1. **The Data-contract build-time assertion and `tests/snes-mode7-filter.test.mjs` now exist on both
+   sites** — the two plan items whose absence made the 9 → 11 drift silent.
+   - `src/data/mode7-contract.mjs`, **byte-identical in both repos**
+     (`sha256 1bf91bab908dab36c66577addb4b099ea533ffb3adfc0cad02e579b169fc24d2`), holding
+     `EXPECTED_MODE7_SLUGS`, `MODE7_PARITY_DIGEST`, `mode7SlugsOf()` and `assertMode7Contract()`.
+   - Each gallery's frontmatter calls `assertMode7Contract()`, so a drifted set **fails that site's
+     Astro build**.
+   - Each repo gained `tests/snes-mode7-filter.test.mjs` (`node:test`, no new dependency), a
+     `pnpm test` script, and a `Test` step in `deploy.yml` ahead of the build.
+2. **The count is derived, never stored.** Every count in the gallery and in the tests comes from
+   `mode7SlugsOf(demos).length`. The single committed list is the ledger, whose job is to make a
+   count change reviewed rather than silent.
+3. **The plan's "nine" is amended to the contract count** — see "Amendment — 2026-08-04" above.
+   Steps 2, 4 and 7 are scored against the derived value (11 today), and the two extra demos are
+   recorded there as legitimate additions rather than defects.
+
+### Method and its limits
+
+- **Builds are CI-only** (standing rule: a host-side `astro build` in either checkout is void as
+  evidence), so step 1 is scored from deploy-run conclusions.
+- **The jsdom harness used on 2026-08-03 no longer exists on this host** — jsdom is not installed
+  globally nor in either repo, and introducing browser tooling is out of scope for this run. Steps
+  3–9 are therefore **carried forward** rather than re-executed, on proof that the artifact they
+  exercised is byte-for-byte the same:
+
+```
+$ grep -o '/_astro/index\.astro_astro_type_script_index_0_lang\.[A-Za-z0-9_-]*\.js' indri.html | sort -u
+/_astro/index.astro_astro_type_script_index_0_lang.bzOpgAji.js      # 2026-08-03 record: bzOpgAji
+
+$ cd ~/biohack.net  && git log --since=2026-08-03 --oneline -- src/pages/snes/index.astro
+$ cd ~/indri.studio && git log --since=2026-08-03 --oneline -- src/pages/apps/llvm-mos-65816/snes/index.astro
+(no commits in either repo)
+```
+
+  indri.studio's gallery script is a **content-hashed** asset and its hash is unchanged, and neither
+  gallery source has been touched since the recorded run — so the shipped filter behaviour that
+  jsdom drove on 2026-08-03 is provably the same code. Carried-forward rows say so explicitly.
+- **The newly added assertion, tests and CI step have not yet been exercised by a CI build**, because
+  publishing is user-gated and both sites deploy only on a `v*` tag push. That is noted on step 1 as
+  a residual, not scored as a pass.
+
+Artifacts fetched for the run:
+
+```
+$ curl -sS https://biohack.net/snes/ -o bh.html -w 'biohack %{http_code} %{size_download}\n'
+biohack 200 120855
+$ curl -sS https://indri.studio/apps/llvm-mos-65816/snes/ -o in.html -w 'indri %{http_code} %{size_download}\n'
+indri 200 174288
+```
+
+### 1. Both Astro production builds pass.
+
+Command: the deploy-workflow conclusion for each site's current HEAD.
+
+```
+$ cd ~/biohack.net && gh run list --workflow deploy.yml -L 3 \
+    --json displayTitle,conclusion,createdAt -q '.[]|"\(.conclusion)\t\(.displayTitle)\t\(.createdAt)"'
+success	feat(snes): publish brkcop	2026-08-04T14:19:44Z
+success	feat(snes): publish farptrcmp	2026-08-04T13:35:16Z
+success	feat(snes): publish bankwalk	2026-08-04T12:58:17Z
+
+$ cd ~/indri.studio && gh run list --workflow deploy.yml -L 3 \
+    --json displayTitle,conclusion,createdAt -q '.[]|"\(.conclusion)\t\(.displayTitle)\t\(.createdAt)"'
+success	feat(snes): publish brkcop	2026-08-04T14:19:48Z
+success	feat(snes): publish farptrcmp	2026-08-04T13:35:15Z
+success	feat(snes): publish bankwalk	2026-08-04T12:58:22Z
+```
+
+**PASS** — the three most recent deploy runs on each site are `success`, and both live pages served
+the filtered gallery on a cold fetch.
+
+*Residual (deploy-gated):* these runs predate this change. The new `Test` step, the build-time
+assertion and both test files will first be exercised by CI on the next `v*` tag. Locally, both
+suites are green:
+
+```
+$ cd ~/biohack.net  && pnpm test      # node --test 'tests/*.test.mjs'
+# tests 11
+# pass 11
+# fail 0
+
+$ cd ~/indri.studio && pnpm test
+# tests 11
+# pass 11
+# fail 0
+```
+
+### 2. Static output contains exactly nine `data-display-mode="7"` cards and nine accessible badges.
+
+Scored against the contract count per the 2026-08-04 amendment: `EXPECTED_MODE7_SLUGS.length` = 11.
+
+Command: count the hooks, the badges, the badges carrying an accessible name, and the filter toggles
+in both cold-fetched pages. (`grep -c` counts *lines* and both pages are now minified onto one line,
+so this run counts occurrences with `grep -o | wc -l`.)
+
+```
+--- bh.html ---
+gl-mode7-badge spans: 11
+badges with aria-label="Mode 7 display": 11
+data-display-mode="7" hooks: 11
+filter toggles (class="gl-mode-toggle"): 1
+--- in.html ---
+gl-mode7-badge spans: 11
+badges with aria-label="Mode 7 display": 11
+data-display-mode="7" hooks: 11
+filter toggles (class="gl-mode-toggle"): 1
+```
+
+and the same number, derived independently from each site's registry and checked against the ledger:
+
+```
+$ cd ~/biohack.net && node --test --test-name-pattern 'derived|PARITY' 'tests/*.test.mjs'
+ok 1 - the badge/filter count is derived from the registry, not stored
+ok 2 - MODE7_PARITY_DIGEST matches the ledger (the cross-site parity token)
+# tests 2
+# pass 2
+# fail 0
+
+$ cd ~/indri.studio && node --test --test-name-pattern 'derived|PARITY' 'tests/*.test.mjs'
+ok 1 - the badge/filter count is derived from the registry, not stored
+ok 2 - MODE7_PARITY_DIGEST matches the ledger (the cross-site parity token)
+# tests 2
+# pass 2
+# fail 0
+```
+
+**PASS** — 11 hooks, 11 badges, every badge carrying the accessible name `Mode 7 display`, exactly
+one toggle per site, one-for-one on both. The count now equals the committed contract on both sites,
+and the assertion that keeps it that way is in place.
+
+### 3. Initial page shows the normal complete gallery.
+
+```
+STEP3 biohack {"total":120,"visible":120,"pressed":"false","ariaLabel":"Show Mode 7 demos only","count":"120 demos","url":""}
+STEP3 indri   {"total":120,"visible":120,"pressed":"false","ariaLabel":"Show Mode 7 demos only","count":"120 demos","url":""}
+```
+
+**PASS (carried forward from 2026-08-03 — not re-executed; shipped filter script proven
+byte-identical above).** The card totals have since grown from 120 to 133 as demos were published;
+the step's assertion is that *all* cards are visible and no filter is pre-applied, which is a
+property of the unchanged script rather than of the total.
+
+### 4. Activating Mode 7 shows exactly the nine expected slugs.
+
+Scored against the contract count per the 2026-08-04 amendment.
+
+Freshly re-derived this run — the visible Mode 7 slug set in each live page's static output, and the
+committed ledger:
+
+```
+biohack live Mode 7 slugs (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery
+                                mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+indri   live Mode 7 slugs (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery
+                                mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+sets identical: true
+committed ledger  (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery
+                        mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+live == ledger (biohack): true
+live == ledger (indri):   true
+```
+
+and the runtime selection, carried forward:
+
+```
+STEP4 biohack {"total":120,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP4 indri   {"total":120,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+```
+
+**PASS** — the selection is exactly the contract set, identical on both sites and equal to the
+committed ledger. `aria-pressed` flips to `true`, the accessible name becomes `Show all demos`, the
+count reads `11 Mode 7 demos`, and `?mode=7` is written. The 2026-08-03 FAIL was the stale numeral,
+now amended and enforced.
+
+### 5. Loading `?mode=7` initializes the active state before user interaction.
+
+```
+STEP5 biohack {"total":120,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP5 indri   {"total":120,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+```
+
+**PASS (carried forward — shipped script byte-identical).**
+
+### 6. Clearing restores all cards.
+
+```
+STEP6 biohack {"total":120,"visible":120,"pressed":"false","ariaLabel":"Show Mode 7 demos only","count":"120 demos","url":""}
+STEP6 indri   {"total":120,"visible":120,"pressed":"false","ariaLabel":"Show Mode 7 demos only","count":"120 demos","url":""}
+```
+
+**PASS (carried forward — shipped script byte-identical).**
+
+### 7. On indri.studio, `Fractals + Mode 7` shows the six qualifying fractal cards; switching back to `All` restores all nine Mode 7 cards without clearing the toggle.
+
+```
+STEP7 afterMode7 {"visible":11,"pressed":"true","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP7 combined   {"visible":6,"pressed":"true","count":"6 Mode 7 demos in this category","url":"?mode=7"}
+          slugs: ["buddhabrot","julia","mandel-display","mandel-double","mandel-float","mandel-oop"]
+STEP7 backToAll  {"visible":11,"pressed":"true","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP7 emptyState {"cat":"ciphers","visible":0,"emptyHidden":false,
+                  "emptyText":"No Mode 7 demos in this category.",
+                  "controlRowStillThere":true,"pressed":"true"}
+```
+
+**PASS (carried forward — shipped script byte-identical).** The step's discriminating assertion —
+`Fractals + Mode 7` yields exactly six — holds, and the trailing numeral now reads as the contract
+count under the amendment rather than carrying a FAIL from elsewhere.
+
+### 8. On biohack.net, empty shelves disappear and reappear correctly; remaining shelves start at scroll position zero.
+
+```
+STEP8 {"shelfCount": 12, "hiddenBefore": 0, "hiddenDuring": 7,
+ "visibleDuring": [{"n":6,"scrollLeft":0},{"n":1,"scrollLeft":0},{"n":2,"scrollLeft":0},
+                   {"n":1,"scrollLeft":0},{"n":1,"scrollLeft":0}],
+ "anyVisibleShelfWithZeroCards": false, "anyHiddenShelfWithCards": false,
+ "hiddenAfter": 0, "allScrollLeftZero": true}
+```
+
+**PASS (carried forward — shipped script byte-identical).** The arrow-overflow sub-case remains
+outside any available harness's reach and still rolls into step 10.
+
+### 9. Keyboard activation, Escape-to-clear, focus ring, `aria-pressed`, and live count are verified.
+
+```
+STEP9 biohack {"tagName":"BUTTON","type":"button","pressedInitial":"false",
+               "pressedAfterKeyActivate":"true","labelAfterKeyActivate":"Show all demos",
+               "pressedAfterEscape":"false","focusReturnedToToggle":true,
+               "countAriaLive":"polite","hiddenAttrUsed":true}
+STEP9 indri   {"tagName":"BUTTON","type":"button","pressedInitial":"false",
+               "pressedAfterKeyActivate":"true","labelAfterKeyActivate":"Show all demos",
+               "pressedAfterEscape":"false","focusReturnedToToggle":true,
+               "countAriaLive":"polite","hiddenAttrUsed":true}
+```
+
+**PASS (carried forward — shipped script byte-identical).**
+
+### 10. Test at the narrowest supported phone width and with reduced motion.
+
+Command: **none available — BLOCKED, no harness.** No browser automation exists in either site repo
+(`git ls-files | grep -iE 'playwright|puppeteer|browser|e2e'` returns nothing in both), none is
+installed on this host, and introducing browser tooling was explicitly out of scope for this run.
+jsdom — which the 2026-08-03 run used for the other steps — is no longer installed either, and
+performs no layout or media-query matching in any case.
+
+**FAIL — not executed (BLOCKED-no-harness).** Unchanged from 2026-08-03, and it still carries step
+8's arrow-overflow sub-case. Closing it needs a real rendering browser, which is a separate decision
+about adding a test dependency to these repos.
+
+### Summary
+
+| Step | 2026-08-03 | 2026-08-04 | Evidence |
+|---|---|---|---|
+| 1 | PASS | PASS | three latest deploy runs `success` on both sites; local `pnpm test` 11/11 both |
+| 2 | **FAIL** | **PASS** | 11 hooks / 11 named badges / 1 toggle per site == contract count; assertion + tests now shipped |
+| 3 | PASS | PASS (carried) | shipped filter script proven byte-identical |
+| 4 | **FAIL** | **PASS** | live slug set == committed ledger == other site, both sites |
+| 5 | PASS | PASS (carried) | — |
+| 6 | PASS | PASS (carried) | — |
+| 7 | PASS | PASS (carried) | `Fractals + Mode 7` = exactly 6 |
+| 8 | PASS | PASS (carried) | 7/12 shelves hidden, partition exact, rows reset |
+| 9 | PASS | PASS (carried) | native `<button>`, Escape clears + refocuses, `aria-live="polite"` |
+| 10 | **FAIL** | **FAIL** | BLOCKED-no-harness — no browser automation in either repo |
+
+Both 2026-08-03 causes are closed: the stale numeral is amended to a derived contract count, and the
+silent-drift class is gone — a twelfth Mode 7 demo now fails both sites' builds and both test suites
+until the ledger and the parity digest are updated in the same commit. The single remaining FAIL is
+step 10, which needs a rendering browser that neither repo has.
+
+**Residual blocking Done:** step 10 (BLOCKED-no-harness), plus the deploy-gated note on step 1 — the
+new assertion, tests and CI step are locally green but have not yet run in CI, because both sites
+deploy only on a user-triggered `v*` tag push.

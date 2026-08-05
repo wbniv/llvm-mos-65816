@@ -190,13 +190,29 @@ static void _mandel_reserve(Drawable *d, VramAlloc *va) {
   m7_set_scroll((uint16_t)(int16_t)(-(128 - DW / 2)), (uint16_t)(int16_t)(-(112 - DH / 2)));
 
   // A high-contrast checker is visible and moving on the first post-title frame.
-  for (uint8_t y = 0; y < DH; y++)
-    for (uint8_t x = 0; x < DW; x++)
-      fb[(uint16_t)y * DW + x] = (uint8_t)(1u + (((x >> 3) ^ (y >> 3)) & 7u));
-
-  // Upload full 64×56 grid to Mode 7 VRAM in tiled order (7 tile-rows × 512 bytes).
+  //
+  // Generated straight into the tiled chr staging buffer. The old form painted the checker across
+  // the 64×56 far framebuffer and then read every byte back through build_chr_row() — ~3,584 far
+  // stores plus ~3,584 far loads, all under force-blank, which is precisely the 24-frame black
+  // window measured between title exit and the loading field (plan #121 startup gate 11, f 239–262).
+  // Part 4 of that plan requires reserve() to "install a small deterministic loading texture" and
+  // forbids it from computing the full 64×56 grid or uploading all seven final tile rows from it;
+  // the round-trip was the violation.
+  //
+  // The pattern is unchanged. `1u + (((x >> 3) ^ (y >> 3)) & 7u)` is constant over an 8×8 tile
+  // (x >> 3 == tcol, y >> 3 == trow), so each tile is one solid colour and the whole texture is
+  // 8 tiles × 64 identical bytes per tile-row.
+  //
+  // Nothing else needs the prefill: every fb byte is written by build_step() before it is read.
+  // build_chr_row() only ever runs on a tile-row whose eight source rows have just been written,
+  // and even the first (COARSE) pass expands to all 56 rows, so crc_fb_oop() still CRCs a fully
+  // written buffer and the 0x204F oracle is untouched. The far buffer keeps being exercised on
+  // every build_step().
   for (uint8_t trow = 0; trow < TILES_H; trow++) {
-    build_chr_row(ml, trow);
+    for (uint8_t tcol = 0; tcol < TILES_W; tcol++) {
+      uint8_t v = (uint8_t)(1u + (((uint8_t)(tcol ^ trow)) & 7u));
+      __builtin_memset(&ml->chrbuf[(uint16_t)tcol * 64u], v, 64u);
+    }
     dma_chr_row((uint16_t)trow * ROW_BYTES, ml->chrbuf, ROW_BYTES);
   }
 
