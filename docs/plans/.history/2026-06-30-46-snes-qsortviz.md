@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b092a00) | docs: deepen #46 G_SCMP bug write-up + mark Round-3 battery complete |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3c2c7a5) | #46 qsort Sort Visualizer SNES demo — caught + FIXED a real backend crash (G_SCMP) |
 
 <!--history-meta v1
+b092a00	author	Will Norris
+b092a00	added	39
+b092a00	deleted	0
+b092a00	files	1
+b092a00	body	- #46 qsortviz plan: add "Root-cause mechanism (three layers)" — clang canonicalizes\n  (x>y)-(x<y) to the newer llvm.scmp intrinsic (IR shown) -> generic G_SCMP opcode ->\n  MOSLegalizerInfo had no rule -> report_fatal_error. Why the one-line .lower() fix is\n  correct + minimal (routes to LegalizerHelper::lowerThreewayCompare; sits next to the\n  identical G_SMIN/SMAX/UMIN/UMAX handling).\n- Battery ideas tracker: Round 3 (#33-#52) banner flipped to COMPLETE (18/20 built;\n  #34/#35 non-buildable library/toolchain gaps), with the G_SCMP find called out.\n- Completion-status report: headline now Rounds 1-3; added the Round-3 coverage table\n  (18 shipped demos + the 2 non-buildable rows), the G_SCMP bug in "Bugs found",\n  corpus slice count 38->53, and a Round-4-needs-idea-list note.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 3c2c7a5	author	Will Norris
 3c2c7a5	added	135
 3c2c7a5	deleted	0

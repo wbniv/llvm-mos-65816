@@ -25,7 +25,8 @@
 #define HUD_BOT_ROW 25
 #define VIS_N       32u              // bars shown (4 px wide each -> 128 px)
 #define BARW        4u
-#define EPOCH_FRAMES 80u             // frames per shuffle/sort step
+#define EPOCH_FRAMES 80u             // idle frames between shuffle/sort epochs
+#define SWAP_HOLD_FRAMES 2u          // keep each observed qsort mutation visible
 
 static const uint16_t bg3_pal[4] = {
   SNES_RGB(1, 2, 6), SNES_RGB(30, 12, 8), SNES_RGB(30, 26, 6), SNES_RGB(10, 28, 18),
@@ -63,21 +64,63 @@ static void draw_bars(App *a) {
   }
 }
 
+// libc qsort deliberately exposes only its comparator, not a swap hook. For the visual pass, the
+// comparator wrappers sample the REAL array at each callback. A mutation made by qsort after one
+// comparison is therefore visible on the next comparison; the final mutation is drawn when qsort
+// returns. The differential gate continues to use the untouched comparators in qsortviz.h.
+static App *sort_anim_app;
+static int16_t sort_anim_last[VIS_N];
+
+static void sort_anim_snapshot(App *a) {
+  for (uint8_t i = 0; i < VIS_N; i++) sort_anim_last[i] = a->bar[i];
+}
+
+static void sort_anim_tick(void) {
+  App *a = sort_anim_app;
+  if (!a) return;
+  uint8_t changed = 0u;
+  for (uint8_t i = 0; i < VIS_N; i++)
+    if (sort_anim_last[i] != a->bar[i]) { changed = 1u; break; }
+  if (!changed) return;
+  sort_anim_snapshot(a);
+  draw_bars(a);
+  for (uint8_t f = 0; f < SWAP_HOLD_FRAMES; f++) display_frame(&a->screen);
+}
+
+static int qs_anim_cmp_asc(const void *x, const void *y) {
+  sort_anim_tick();
+  return qs_cmp_asc(x, y);
+}
+
+static int qs_anim_cmp_parity(const void *x, const void *y) {
+  sort_anim_tick();
+  return qs_cmp_parity(x, y);
+}
+
+static int qs_anim_cmp_desc(const void *x, const void *y) {
+  sort_anim_tick();
+  return qs_cmp_desc(x, y);
+}
+
 // Advance one epoch: even epochs reshuffle, odd epochs qsort by the next rotating comparator.
 static void step_epoch(App *a) {
-  static const qs_cmp_fn cmps[3] = { qs_cmp_asc, qs_cmp_parity, qs_cmp_desc };
+  static const qs_cmp_fn cmps[3] = { qs_anim_cmp_asc, qs_anim_cmp_parity, qs_anim_cmp_desc };
   static const char *names[3] = { "QSORT ASCENDING", "QSORT EVENS FIRST", "QSORT DESCENDING" };
   a->epoch++;
   if (a->epoch & 1u) {
     uint8_t ci = (uint8_t)((a->epoch >> 1) % 3u);
-    qsort(a->bar, VIS_N, sizeof a->bar[0], cmps[ci]);   // library calls back into our comparator
     text_clear_bar(&a->text, 0);
     text_puts(&a->text, 0, 1, names[ci]);
+    sort_anim_snapshot(a);
+    sort_anim_app = a;
+    qsort(a->bar, VIS_N, sizeof a->bar[0], cmps[ci]);   // library calls back into our comparator
+    sort_anim_app = 0;
   } else {
     qs_fill(a->bar, VIS_N, (uint16_t)(0x1000u + a->epoch));
     text_clear_bar(&a->text, 0);
     text_puts(&a->text, 0, 1, "SHUFFLE");
   }
+  // Also presents qsort's last mutation, which can occur after its final comparator callback.
   draw_bars(a);
 }
 

@@ -5,6 +5,13 @@
 **Status:** DONE — **caught a real compiler bug, fixed it in the backend**, then shipped a clean 5-way
 positive on the fixed toolchain. Demo **#46** of the **compiler stress-test demo battery**.
 
+**Animation update (2026-08-05):** the visible sort no longer jumps directly from shuffled to sorted.
+libc `qsort` has no swap callback, so visual-only comparator wrappers sample the real 32-element backing
+array on every comparison. Each mutation completed by `qsort` is detected on the following callback,
+rendered from actual array memory, and held for two frames; the final mutation is rendered immediately
+after `qsort` returns. The host/target CRC gate still calls the original comparators directly, so the
+compiler regression contract and expected `0x8EA5` remain unchanged.
+
 ## Headline: the bug this demo caught
 
 The comparator idiom `return (x > y) - (x < y);` — the standard C three-way ("spaceship") compare used by
