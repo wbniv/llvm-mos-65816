@@ -1,0 +1,23 @@
+diff --git a/llvm/test/MC/MOS/motorola-integers-default.s b/llvm/test/MC/MOS/motorola-integers-default.s
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/MC/MOS/motorola-integers-default.s
+@@ -0,0 +1,5 @@
++; RUN: llvm-mc -triple mos -show-encoding < %s | FileCheck %s
++; RUN: llvm-mc -triple mos -show-encoding -motorola-integers=false < %s | FileCheck %s --check-prefix=DISABLED
++
++	lda #$ea ; CHECK: encoding: [0xa9,0xea]
++; DISABLED: encoding: [0xa9,A]
+diff --git a/llvm/tools/llvm-mc/llvm-mc.cpp b/llvm/tools/llvm-mc/llvm-mc.cpp
+--- a/llvm/tools/llvm-mc/llvm-mc.cpp
++++ b/llvm/tools/llvm-mc/llvm-mc.cpp
+@@ -371,7 +371,8 @@ static int AssembleInput(const char *ProgName, const Target *TheTarget,
+   Parser->getLexer().setLexMasmIntegers(LexMasmIntegers);
+   Parser->getLexer().setLexMasmHexFloats(LexMasmHexFloats);
+-  Parser->getLexer().setLexMotorolaIntegers(LexMotorolaIntegers);
++  if (LexMotorolaIntegers.getNumOccurrences())
++    Parser->getLexer().setLexMotorolaIntegers(LexMotorolaIntegers);
+ 
+   int Res = Parser->Run(NoInitialTextSection);
+ 
+   return Res;
