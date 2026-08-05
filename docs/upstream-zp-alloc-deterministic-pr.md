@@ -1,7 +1,7 @@
 # [MOS] Make zero page allocation deterministic (pointer-hash iteration order decided the winners)
 
 <!-- MINTED + VERIFIED ON TIP 2026-08-04 — READY TO POST (posting is user-triggered).
-     Branch: mos-zp-alloc-deterministic @ 1c3deb021a53, local in ~/llvm-mos, cut from upstream tip
+     Branch: mos-zp-alloc-deterministic @ cc9f0d027813 (comment-only amend of 1c3deb0: test-comment tallies harmonized to the recorded 20-run data; code identical), local in ~/llvm-mos, cut from upstream tip
      1f334fef02b5 (patch 0021 applied clean; commit parent verified = tip). Verified in
      ~/llvm-mos/build-pr: RED = zp-alloc-deterministic.ll FAILS without the fix on the same tree;
      GREEN = passes, stable across 5 repeat runs; full CodeGen/MOS = 80 tests, 79 pass +
@@ -30,8 +30,8 @@
      Original draft note follows.
      DRAFT 2026-08-01 (posting is user-triggered; branch not yet minted at that time).
      Provenance: the lzss-gallery non-reproducible-build investigation,
-     docs/plans/2026-08-01-gallery-nonreproducible-build.md (throwaway branch
-     throwaway/gallery-repro-bisect, worktree /home/will/llvm-mos-65816-gallery-repro).
+     the discarded throwaway investigation worktree (branch
+     throwaway/gallery-repro-bisect, worktree, discarded per policy — the durable record is this body's Reproduction/Verification sections + status row 17).
      Fork patch: patches/llvm-mos/0021-mos-zp-alloc-deterministic.patch.
      Verified 2026-07-31 on a rebuilt toolchain — see the Verification section below; the
      earlier "do not post until verified" block is cleared.
