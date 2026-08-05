@@ -219,6 +219,14 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   and the repro re-verified against the current toolchain (2 errors at `-Os`, clean
   `-O0`/`-Oz`); status-doc row 13 updated, issue **NOT POSTED** (filing is user-triggered).
   (T3: **residual = decide whether to attempt the toolchain-wide fix** — nothing else open.)
+- [T4] **Mode 7 splash force-blank floor — the shared `m7splash_end()`/`display_init()` handoff
+  holds the screen black across all seven Mode 7 demos.** Escalated out of the 121 re-verify
+  (2026-08-05): after the `_mandel_reserve()` far-readback fix halved mandel-oop's post-title
+  black window (24 → 11 frames, `1a9d9b8`), the residual 11 frames is a shared floor, not
+  demo-local — `mandel-display` uses the same `m7splash()` , goes black at the same f=239, and
+  holds **72 frames**. Cross-cutting change to the splash/display-init contract for seven
+  `main()`s; the deviation is already logged in [agent-handoff](docs/agent-handoff.md). (T4:
+  design + implementation across a shared contract; a wrong turn regresses every Mode 7 demo.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
