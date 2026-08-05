@@ -19,8 +19,10 @@ same shape to the rest of the queue.
 > **Update 2026-07-26 (later, campaign continuation):** upstream tip moved `8be054612` →
 > **`8b616af94`** — exactly one new commit, `feat(lld/ELF): support garbage collection of
 > .debug_frame sections (#567)`, touching only `lld/ELF/*` + two lld tests (no `llvm/` or MOS-backend
-> files). Re-verified in a shared-object scratch clone at the new tip: **all five Wave-1/3 artifacts
-> (`0010`/`0011`/`0012`/`0015`/`0016`) still `git apply --check` CLEAN**; the `0016` branch
+> files). Re-verified in a shared-object scratch clone at the new tip: **all five then-candidate
+> artifacts (`0010`/`0011`/`0012`/`0015`/`0016`) still `git apply --check` CLEAN**; `0012` was
+> subsequently **retired from upstream submission on 2026-08-05** because it has no current producer.
+> The `0016` branch
 > (`e54ef471d546`, MOSLegalizerInfo.cpp + new test only) has no file overlap with #567, so the PR
 > merges clean as-is, and the RED-proof claim ("reproduced on `8be054612`") remains accurate — #567
 > is lld-only, so `llc` behavior at the new tip is identical. #567 modifies
@@ -43,7 +45,7 @@ same shape to the rest of the queue.
 |---|---|---|
 | `0010-coalesce-rotate-ac` | ✅ | |
 | `0011-mos-scavenger-live-p-save` | ✅ | |
-| `0012-mos-ldcimm-set-lowering` | ✅ | |
+| `0012-mos-ldcimm-set-lowering` | ✅ | **RETIRED 2026-08-05 — retained as fork/history only; not a submission artifact** |
 | `0015-321-coalesce-rc-undef` | ✅ | |
 | `0016-mos-scmp-ucmp-legalize` | ✅ | |
 | `0017-321-a16-s64-unmerge-anyext-legalize` | ❌ (irrelevant) | **Not a submission artifact at all** — it completes OUR OWN a16 legalizer glue, so it dissolves into the #321 series (already folded into `0002`); upstream only ever sees the finished feature. File kept as provenance. Same principle covers `0009`, `0014`, the zp-alloc Imag32 fix, and the xy16 REP/SEP fix (which always lived inside `0002`): **fixes to fork features fold into the feature patch — no introduce-then-fix sequences upstream.** |
@@ -90,11 +92,10 @@ notes that open the ABI conversation, then the big series that depends on it.
 ### Wave 3 — a16-reachable crash fixes (user judgment wanted)
 
 `0011` (scavenger live-`$p`) and `0015` (coalesce-rc-undef guard) are latent stock bugs whose current
-trigger paths go through the fork's `+mos-a16`/`+mos-xy16`. `0012` is instead a baseline MOS MC-lowering
-contract, now covered directly by a `mos65c02` MIR test. All three are small, self-contained changes.
-**Decision for the
-user:** post them in this wave with that framing (recommended — they are maintainer-friendly and shrink
-the eventual #321 series), or hold them to ride the #321 series itself.
+trigger paths go through the fork's `+mos-a16`/`+mos-xy16`. Both require producer/reachability review
+before submission. Former candidate `0012` is **retired and must not be posted**: upstream has no
+current `LDCImm 1` producer, downstream patch `0027` removed the fork's producer, and its direct MIR
+test manufactured an otherwise unreachable state.
 
 ### Wave 4 — design notes (open the ABI conversation)
 
@@ -140,7 +141,6 @@ For each artifact, at posting time and **only after user go-ahead**:
    | `0016` scmp/ucmp | [qsortviz](https://biohack.net/snes/qsortviz/) (finder) · [spaceship](https://biohack.net/snes/spaceship/) · [ucmprank](https://biohack.net/snes/ucmprank/) · [trimerge](https://biohack.net/snes/trimerge/) · [keycmp64](https://biohack.net/snes/keycmp64/) |
    | `0010` coalesce-rotate-Ac | [crcwall](https://biohack.net/snes/crcwall/) · [lfsr2](https://biohack.net/snes/lfsr2/) · [bitweave](https://biohack.net/snes/bitweave/) · [uarteye](https://biohack.net/snes/uarteye/) (Cluster D; default-8-bit leg load-bearing) |
    | `0011` scavenger live-`$p` | [pcooker](https://biohack.net/snes/pcooker/) (#109 re-stress) |
-   | `0012` LDCImm set | baseline `mos65c02` `asm-printer.mir` regression; no ROM claimed |
    | `0015` coalesce-rc-undef | [newton](https://biohack.net/snes/newton/) (validated `0x4D8B`) |
    | `0017` s64 (un)merge | [dhmix](https://biohack.net/snes/dhmix/) (finder) · [mulov64](https://biohack.net/snes/mulov64/) · [oddmask](https://biohack.net/snes/oddmask/) · [modexp256](https://biohack.net/snes/modexp256/) |
 

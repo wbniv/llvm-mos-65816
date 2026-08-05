@@ -14,8 +14,8 @@
      yields and rebases onto #549's landed form. If #549 merges, rebase
      mos-branch-range-diagnostic onto it and re-verify before pushing further.
 
-     ⏳ PENDING PUSH: a second, NOT-YET-PUSHED commit `b47ed3ee08e2` sits on top of the posted
-     `4195df6e3b56` on the local branch (~/llvm-mos) — it does NOT amend the posted commit, so
+     ✅ PUSHED 2026-08-05: the second commit `b47ed3ee08e2` now sits on top of the posted
+     `4195df6e3b56` on PR #591. It did NOT amend the posted commit, so
      the PR's existing history is untouched. It hardens `0019` with a #549-class regression net
      (postmortem: `long-branches-65ce02.s`'s own CHECK values were golden output copied from the
      very buggy correction constant #549 fixes, and this branch's own `branch-range-errors.s`
@@ -45,8 +45,8 @@
      failed, exit 0; `llvm/test/CodeGen/MOS/` unchanged, 79 total — 78 passed, 1 pre-existing
      `UNSUPPORTED` (`getchar-regression.ll`), 0 failed, exit 0.
 
-     Draft PR comment for #591, to post alongside pushing `b47ed3ee08e2` (short, describes the
-     added net):
+     ✅ POSTED to #591 on 2026-08-05:
+     https://github.com/llvm-mos/llvm-mos/pull/591#issuecomment-5189214169
        "Added a regression net for the #549 class of bug this PR's range check would otherwise
        miss: boundary-exact legal/illegal pairs at the PCRel8/PCRel16 edges, and a byte-exact
        resolved-fixup matrix across mos6502/mosw65816/mos65ce02, all hand-derived from the
@@ -55,8 +55,7 @@
        correction constant — they'll flip to passing (and lose the `XFAIL`) once this rebases onto
        #549, which is a nice joint proof that the two PRs compose correctly."
 
-     Push commands (still user-triggered):
-       git -C ~/llvm-mos push origin mos-branch-range-diagnostic
+     The branch and explanatory comment are both published.
 -->
 
 ## Summary

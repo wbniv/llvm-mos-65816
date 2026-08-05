@@ -1,9 +1,11 @@
-<!-- STATUS (internal; strip before posting): ON HOLD (user decision 2026-08-04); body READY.
-     Post as a PAIR with 0011 (scavenger live-$p, Wave 3) once the open upstream queue shows
-     maintainer engagement — see status-doc row 10 for the rationale and the producer-normalization
-     decoupling item (fork a16 SBC carry-in -> -1 in 0002).
+<!-- RETIRED — DO NOT POST (user decision 2026-08-05).
+     No current upstream producer emits LDCImm 1, and downstream patch 0027 canonicalizes the
+     former a16 producer to LDCImm -1. The direct MIR test manufactures an otherwise unreachable
+     state, while accepting every nonzero immediate would weaken the existing invariant check.
+     Retained only as investigation and red/green evidence; it is not a PR body or queue item.
      Local branch mos-ldcimm-set-lowering at 60d9d7d25262, based on c798c31416f7.
-     Fork carry: patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch. -->
+     Fork carry: patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch.
+     Assertions-enabled red/green proof completed 2026-08-05. -->
 
 # [MOS] Lower `LDCImm` set-carry from any nonzero i1, not only `-1`
 
@@ -70,16 +72,18 @@ the backend already applies to this operand elsewhere.
 `mos65c02`: `0` lowers to `clc`, while both `-1` and `1` lower to `sec`. The new `1` case aborts before
 the fix and passes afterward.
 
+This was also verified with a fresh `LLVM_ENABLE_ASSERTIONS=ON` build from the pristine parent and
+then the patched branch, using the same standalone MIR input in both runs:
+
+- Before: exit 134 at `MOSMCInstLower.cpp`, `Unexpected LDCImm immediate.`
+- After: exit 0 and assembly containing `sec`.
+- Focused patched-tree lit test: `CodeGen/MOS/asm-printer.mir` passes (1/1).
+
 ## Origin
 
-Surfaced by downstream work: our 16-bit-accumulator (65816) development selects the carry-in of a
-16-bit `SBC` chain as a plain `1`, which flows through `LDImm1` to `LDCImm` and aborted every
-asserts build at this `llvm_unreachable`. We have not identified an in-tree producer that emits
-`LDCImm 1` today — the in-tree patterns and flag-destination selects consistently use `-1` — so
-for upstream this is a hardening fix: it aligns the MC lowering with the operand's `i1imm`
-semantics and removes release-mode UB, and it unblocks any out-of-tree or future producer that
-spells *true* as `1`. The fixed lowering is exercised end-to-end by our gallery of playable SNES
-demo ROMs built with this toolchain ([biohack.net/snes](https://biohack.net/snes/)) — no single ROM
-targets this fix; every 16-bit subtract chain in the gallery runs through it, and each ROM passes a
-host-vs-emulator differential in default and 16-bit configurations. The regression test itself is
-pure baseline `mos65c02` MIR and does not depend on that downstream work.
+Found while auditing a crash caused by a plain `1` reaching this generic MC-lowering path. We have
+not identified an in-tree producer that emits `LDCImm 1` today — the in-tree patterns and
+flag-destination selects consistently use `-1` — so this is a hardening fix: it aligns MC lowering
+with the operand's `i1imm` semantics, removes release-mode UB, and supports any future or
+out-of-tree producer that spells *true* as `1`. The reproducer and regression test are baseline
+`mos65c02` MIR; no 65816 feature, demo ROM, or downstream patch is involved.

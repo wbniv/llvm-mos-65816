@@ -919,19 +919,18 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   Wave-ordered sequencing + per-item mechanics in
   [docs/plans/2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md):
   **Wave 2 next** — issues
-  (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0012`/`0015` — `0012` **decided
-  2026-08-04: HOLD**, post paired with `0011` once the open queue (#577–#587, currently zero
-  maintainer engagement) shows life; producer-normalization decoupling DONE (`0027`). `0011`/`0015`
-  still user judgment), **Wave 4** design notes (#320 ABI → far-CC →
+  (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0015`, both still
+  requiring producer/reachability judgment). Former candidate `0012` was **RETIRED 2026-08-05 — DO
+  NOT POST**: no upstream producer exists and `0027` removed the downstream producer. **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
-- [T5] **Push + comment the #591 hardening (matrix DONE 2026-08-05).** Incremental commit
+- [x] ~~**Push the #591 hardening (DONE 2026-08-05).** Incremental commit
   `b47ed3ee08e2` on `mos-branch-range-diagnostic`: hand-derived byte-exact fixup matrix (8 rows,
   tool-verified after derivation), boundary-exact range pairs at all four edges, and the
   `XFAIL`-gated 65CE02 PCRel16 file whose XPASS after the #549 rebase is the designed drop-the-XFAIL
-  signal. Suites exit 0 (MC 43+1 XFAIL, CodeGen 78+1 UNSUPPORTED). Residual = user-triggered:
-  push the commit to the live [#591](https://github.com/llvm-mos/llvm-mos/pull/591) branch and post
-  the drafted 3-sentence comment (both in the [body banner](docs/upstream-branch-range-diagnostic-pr.md),
-  fork docs `13eb902`).
+  signal. Suites exit 0 (MC 43+1 XFAIL, CodeGen 78+1 UNSUPPORTED). Pushed to live
+  [#591](https://github.com/llvm-mos/llvm-mos/pull/591); GitHub head confirmed at `b47ed3ee08e2`, with
+  macOS/Linux/Windows checks triggered. The explanatory comment was subsequently
+  [posted](https://github.com/llvm-mos/llvm-mos/pull/591#issuecomment-5189214169).~~ ✓
 - [T2] **65816 `BRL` branch relaxation — extend #550's gate to `HasW65816` (BLOCKED on
   #549/#550 merging).** Upstream [PR #550](https://github.com/llvm-mos/llvm-mos/pull/550) widens
   `isBranchOffsetInRange` on 65CE02+ so MC relaxation promotes branches to 16-bit instead of
@@ -968,21 +967,17 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
   `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
   [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
-- [T3] **Post the register-scavenger live-`$p` fix PR (`0011`) + the `LDCImm` set-lowering fix PR (`0012`)**
-  (user-triggered). The scavenger N/Z crash is now **FIXED** (was an issue-with-no-fix): route a live `$p`
+- [T3] **Evaluate the register-scavenger live-`$p` fix PR (`0011`)** (user-triggered). The scavenger
+  N/Z crash is now **FIXED** (was an issue-with-no-fix): route a live `$p`
   hard-stack-neutrally through a dead index reg into `RC17` for the unbalanced case + drop the stale
-  `assertNZDeadAt`. Fixing it surfaced a second pristine-upstream bug (`LDCImm 1` → `MCInstLower` unreachable),
-  fixed as `0012`. Mint branches off `c798c31416f7`; exact `gh pr create` in
-  [upstream-contribution-status](docs/upstream-contribution-status.md) (item 4) · bodies
-  [scavenger](docs/upstream-scavenger-live-p-pr.md) + [LDCImm](docs/upstream-ldcimm-set-lowering-pr.md) ·
+  `assertNZDeadAt`. Mint from current upstream only after confirming a defensible producer path; the
+  remaining `gh pr create` recipe is in
+  [upstream-contribution-status](docs/upstream-contribution-status.md) (item 4) · body
+  [scavenger](docs/upstream-scavenger-live-p-pr.md) ·
   [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
-  **HOLD (user decision 2026-08-04):** post the pair only once the open queue (#577–#587,
-  currently zero maintainer engagement) shows life — `0012` standalone is declinable ("the
-  unreachable encodes an invariant"), paired with `0011` it is self-evident. `0012`'s body was
-  review-revised the same day (leads with the in-tree `!!Val` inconsistency + honest downstream
-  Origin + gallery link — status row 10). **Decoupling DONE 2026-08-04** (`357fe37`, standalone
-  patch `0027`): the fork's a16 selector now emits the sign-extended `-1`, so no fork build depends
-  on upstream's `0012` verdict — `0012` is optional pure hardening.
+  **`0012` RETIRED — DO NOT POST (user decision 2026-08-05):** the direct MIR test manufactured
+  `LDCImm 1`; no current upstream producer emits it, and `0027` (`357fe37`) corrected the former
+  downstream a16 producer to canonical `-1`. Its patch and draft remain historical evidence only.
 - [wip T2] **DP-pointer-argument calling-convention crash — reported + FIXED upstream** — ✅ **issue
   [#561](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22) + fix [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563)
   (2026-06-23, `Fixes #561` → auto-closes on merge).** Passing an `addrspace(1)` (8-bit direct-page) pointer
