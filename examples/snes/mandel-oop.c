@@ -56,6 +56,7 @@ typedef struct {
   Drawable  base;               // MUST be first (upcast discipline)
   uint16_t  pal[DN + 1];        // base BGR555 palette cached for cycling
   uint16_t  pal_rot[(DN + 1)];  // rotated palette staging (enqueued each emit)
+  uint8_t   first_emit_done;    // 1 after the first emit() — see _mandel_emit's first-frame note
   uint8_t   pshift;             // current colour rotation offset (0..DN-1)
   uint8_t   pcount;             // frames since last pshift advance
   uint8_t   angle;              // spin angle (wraps 0..255)
@@ -226,6 +227,24 @@ static void _mandel_reserve(Drawable *d, VramAlloc *va) {
 static void _mandel_emit(Drawable *d, UploadQueue *q) {
   MandelLayer *ml = (MandelLayer *)d;
 
+  // The FIRST emit does no compute. display_frame() releases the boot force-blank at its END,
+  // after scene_emit(), so whatever this function does on call 1 runs with the screen still OFF.
+  // build_step() is expensive here — 8 escape-time cells, a 512-far-store row expansion, and
+  // build_chr_row()'s 512 far loads — and it held the post-title window at 11 black frames when
+  // only 4 of those are the splash handoff (docs/plans/2026-08-05-display-first-frame-forceblank.md).
+  // Skipping it once costs nothing visible: _mandel_reserve() already painted the loading checker
+  // AND loaded CGRAM directly, so frame 1 is a complete picture; refinement simply starts on frame 2,
+  // now with the screen ON. 11 -> 5 black frames.
+  //
+  // Deliberately demo-local. The same skip inside display_frame() would fix every Display demo at
+  // once, but 119 of the 122 deliver their palette via upq_push_cgram() from the FIRST emit (the
+  // `if (!pal_sent)` idiom), so a release-only first frame renders them with power-on CGRAM — six
+  // demos were measured going nondeterministic that way. See the plan's §3 rejected alternatives.
+  if (!ml->first_emit_done) {
+    ml->first_emit_done = 1;
+    return;
+  }
+
   build_step(ml, q);
 
   // Advance colour cycle: rotate by 1 every 6 frames (same cadence as mandel-display.c).
@@ -270,6 +289,7 @@ static void mandel_layer_init(MandelLayer *ml) {
   ml->base.tm_bits = TM_BG1;    // Display sets REG_TM via its shadow — never touch TM directly
   ml->pshift = 0; ml->pcount = 0;
   ml->angle  = 0; ml->t      = 0;
+  ml->first_emit_done = 0;
 }
 
 // ---------------------------------------------------------------------------
