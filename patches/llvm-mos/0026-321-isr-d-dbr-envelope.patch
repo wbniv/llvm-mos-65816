@@ -1,0 +1,98 @@
+#321 dpbank (#141): 65816 interrupt envelope — save/re-establish/restore D and DBR
+
+A native-mode 65816 interrupt entry forces PBR=0 and sets I, but inherits D
+(direct-page base) and DBR (data bank) from the interrupted code, which may
+legally have moved either via inline asm. Compiled code is D-relative on every
+imaginary-register access (including the soft-stack pointer __rc0/1) and
+DBR-relative on every absolute access, so an ISR entered inside a moved-D or
+moved-DBR window corrupted state or hung (measured: examples/snes/dpbank.c on
+the pre-fix toolchain hangs in the first DBR window and trashes the decoy in
+the D windows). Extend the isISR && hasW65816 envelope: prologue saves D/DBR
+and re-establishes the C ABI state (pea 0/pld for D=0; phk/plb for DBR=0 off
+the hardware-forced PBR); epilogue restores in reverse before RTI. All added
+instructions are M/X-width-independent.
+
+STANDALONE INCREMENTAL PATCH (applies on top of 0002): minted while
+0002-321-accum16.patch carried another in-flight change in the shared working
+tree; fold into the next clean 0002 regen and drop this file.
+
+--- a/llvm/lib/Target/MOS/MOSFrameLowering.cpp	2026-08-04 18:06:53.384232670 -0600
++++ b/llvm/lib/Target/MOS/MOSFrameLowering.cpp	2026-08-04 18:06:53.351942816 -0600
+@@ -290,6 +290,15 @@
+   // Save the complete physical registers at deterministic 16-bit widths, then
+   // establish the ordinary C ABI state. RTI will restore the hardware-stacked
+   // P (and therefore the interrupted M/X state) after the matching epilogue.
++  //
++  // Interrupt entry also inherits D and DBR unchanged, and user code (inline
++  // asm) may legally have moved either. Compiled code is D-relative on every
++  // imaginary-register access (including the soft-stack pointer) and
++  // DBR-relative on every absolute access, so both are saved and the C ABI
++  // state (D=0, DBR=0) re-established before any of that runs. All six added
++  // instructions are M/X-width-independent. `pea 0; pld` zeroes D without
++  // touching a register; `phk; plb` derives DBR=0 from PBR, which the
++  // interrupt entry hardware forces to 0.
+   if (isISR(MF) && MF.getSubtarget<MOSSubtarget>().hasW65816()) {
+     const TargetInstrInfo &TII = *MF.getSubtarget().getInstrInfo();
+     auto Entry = MBB.begin();
+@@ -298,6 +307,12 @@
+     BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHA_Implied));
+     BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHX_Implied));
+     BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHY_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHB_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHD_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PEA_Absolute)).addImm(0);
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PLD_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHK_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PLB_Implied));
+     BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::SEP_Immediate))
+         .addImm(0x30);
+   }
+@@ -368,6 +383,9 @@
+     const TargetInstrInfo &TII = *MF.getSubtarget().getInstrInfo();
+     auto Ret = MBB.getFirstTerminator();
+     BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::REP_Immediate)).addImm(0x30);
++    // Reverse of the prologue's push order: D and DBR were pushed last.
++    BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLD_Implied));
++    BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLB_Implied));
+     BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLY_Implied));
+     BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLX_Implied));
+     BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLA_Implied));
+--- a/llvm/test/CodeGen/MOS/interrupt-width-65816.ll	2026-08-04 18:06:53.384710517 -0600
++++ b/llvm/test/CodeGen/MOS/interrupt-width-65816.ll	2026-08-04 18:06:53.354933358 -0600
+@@ -1,10 +1,13 @@
+ ; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 < %s | FileCheck %s
+ 
+-; A 65816 interrupt inherits M/X from the interrupted instruction. Save full
+-; A/X/Y in a known 16-bit mode before establishing the C ABI's M8/X8 state;
+-; restore them in 16-bit mode before RTI, which restores the stacked P.
+-; Runnable end-to-end reproducer and explanation:
+-; https://biohack.net/snes/nmitally/
++; A 65816 interrupt inherits M/X from the interrupted instruction, and D and
++; DBR from the interrupted code (which may legally have moved them via inline
++; asm). Save full A/X/Y in a known 16-bit mode, save D and DBR, and establish
++; the complete C ABI state (M8/X8, D=0, DBR=0 — the latter derived from the
++; hardware-forced PBR=0 via phk/plb) before any compiled code runs; restore
++; everything in reverse before RTI, which restores the stacked P.
++; Runnable end-to-end reproducers and explanation:
++; https://biohack.net/snes/nmitally/ (M/X) and the #141 dpbank demo (D/DBR).
+ 
+ define void @isr() "interrupt" {
+ ; CHECK-LABEL: isr:
+@@ -12,9 +15,17 @@
+ ; CHECK-NEXT:  pha
+ ; CHECK-NEXT:  phx
+ ; CHECK-NEXT:  phy
++; CHECK-NEXT:  phb
++; CHECK-NEXT:  phd
++; CHECK-NEXT:  pea 0
++; CHECK-NEXT:  pld
++; CHECK-NEXT:  phk
++; CHECK-NEXT:  plb
+ ; CHECK-NEXT:  sep #48
+ ; CHECK:       cld
+ ; CHECK:       rep #48
++; CHECK-NEXT:  pld
++; CHECK-NEXT:  plb
+ ; CHECK-NEXT:  ply
+ ; CHECK-NEXT:  plx
+ ; CHECK-NEXT:  pla

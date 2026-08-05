@@ -68,12 +68,12 @@ for sym in nmi irq; do
   isr=$(awk -F'\t' -v s="<$sym>:" '$0 ~ s {p=1;next} p&&/^[[:space:]]*$/{exit} p&&NF>=2{sub(/[[:space:]]+;.*$/,"",$3); print (NF>=3&&$3!="")?$2" "$3:$2}' \
     "$BUILD/irqgate-a16.dis")
   [ -n "$isr" ] || { echo "FAIL: no disassembly for handler '$sym'"; exit 1; }
-  head5=$(printf '%s\n' "$isr" | head -5 | paste -sd,)
-  tail5=$(printf '%s\n' "$isr" | tail -5 | paste -sd,)
-  [ "$head5" = 'rep #$30,pha,phx,phy,sep #$30' ] || \
-    { echo "FAIL: $sym prologue is not the width-safe envelope: [$head5]"; exit 1; }
-  [ "$tail5" = 'rep #$30,ply,plx,pla,rti' ] || \
-    { echo "FAIL: $sym epilogue is not the width-safe envelope: [$tail5]"; exit 1; }
+  head11=$(printf '%s\n' "$isr" | head -11 | paste -sd,)
+  tail7=$(printf '%s\n' "$isr" | tail -7 | paste -sd,)
+  [ "$head11" = 'rep #$30,pha,phx,phy,phb,phd,pea $0,pld,phk,plb,sep #$30' ] || \
+    { echo "FAIL: $sym prologue is not the width-safe envelope: [$head11]"; exit 1; }
+  [ "$tail7" = 'rep #$30,pld,plb,ply,plx,pla,rti' ] || \
+    { echo "FAIL: $sym epilogue is not the width-safe envelope: [$tail7]"; exit 1; }
   echo "    PASS: $sym brackets its body with the rep #\$30 full-width save/restore envelope"
 done
 # Deeper semantic audit (shape / width / Imag + soft-stack save-restore) on the same disasm.
