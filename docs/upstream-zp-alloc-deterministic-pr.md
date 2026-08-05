@@ -1,6 +1,21 @@
 # [MOS] Make zero page allocation deterministic (pointer-hash iteration order decided the winners)
 
-<!-- DRAFT 2026-08-01 — READY TO POST (posting is user-triggered; branch not yet minted).
+<!-- MINTED + VERIFIED ON TIP 2026-08-04 — READY TO POST (posting is user-triggered).
+     Branch: mos-zp-alloc-deterministic @ 1c3deb021a53, local in ~/llvm-mos, cut from upstream tip
+     1f334fef02b5 (patch 0021 applied clean; commit parent verified = tip). Verified in
+     ~/llvm-mos/build-pr: RED = zp-alloc-deterministic.ll FAILS without the fix on the same tree;
+     GREEN = passes, stable across 5 repeat runs; full CodeGen/MOS = 80 tests with the same 5
+     failures as the known pre-existing pristine-tip set (proven during the 0022 prep) — no new
+     failures.
+     Post commands (user-triggered):
+       git -C ~/llvm-mos push origin mos-zp-alloc-deterministic
+       gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-zp-alloc-deterministic --base main \
+         --title "[MOS] Make zero page allocation deterministic (pointer-hash iteration order decided the winners)" \
+         --body-file <(sed '2,/^-->$/d; 1d' docs/upstream-zp-alloc-deterministic-pr.md)
+     After posting: flip status row 17 and refresh wald3n.com (task open-source:refresh +
+     task publish) — note wald3n also still needs the #589 refresh.
+     Original draft note follows.
+     DRAFT 2026-08-01 (posting is user-triggered; branch not yet minted at that time).
      Provenance: the lzss-gallery non-reproducible-build investigation,
      docs/plans/2026-08-01-gallery-nonreproducible-build.md (throwaway branch
      throwaway/gallery-repro-bisect, worktree /home/will/llvm-mos-65816-gallery-repro).
