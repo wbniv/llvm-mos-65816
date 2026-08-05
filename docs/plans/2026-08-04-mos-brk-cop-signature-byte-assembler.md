@@ -1,8 +1,31 @@
 # MOS assembler: `cop` mnemonic + optional BRK/COP signature byte
 
-**Date:** 2026-08-04 · **Status:** ✅ IMPLEMENTED + VERIFIED; PR drafted, **not posted, branch not
-pushed** · **Item:** TODO `[T2]` · **Owner:** this session (T5 for the upstream-PR half; posting is
-user-triggered and **explicitly out of scope — do not post**)
+**Date:** 2026-08-04 · **Status:** ⚠️ SUPERSEDED same-day (implementation verified; packaging
+overtaken by the split) · **Item:** TODO `[T5]` "COP-only upstream complement" · **Owner:** this
+session (posting is user-triggered and **explicitly out of scope — do not post**)
+
+> **Superseded 2026-08-04** by the
+> [split-ownership plan](2026-08-04-split-brk-cop-patch-ownership.md): the BRK half was posted
+> separately as [PR #586](https://github.com/llvm-mos/llvm-mos/pull/586) (fork patch `0024`), the
+> Motorola side-finding as [PR #587](https://github.com/llvm-mos/llvm-mos/pull/587) (`0025`), and
+> COP is fork-carried in `0002` with a **different design than this plan chose**: mandatory
+> signature operand (no bare 1-byte `cop`), decoder-visible (`$02` disassembles as a 2-byte
+> `cop #imm`), `InstUnconditionalBranch` — vs this plan's optional-operand / `isAsmParserOnly` /
+> 1-byte-decode. **Decided 2026-08-04 (T5): MANDATORY wins** — bare `cop` is a footgun (the
+> hardware always consumes the signature slot, so a 1-byte `cop` eats the next opcode; WDC
+> requires the operand), the BRK 1-byte-decode compat argument doesn't apply to 65816-only `$02`
+> (decoder-visible 2-byte `cop #imm` disassembly is a free improvement), the optional-BRK /
+> mandatory-COP asymmetry is WDC's own and matches the `wdm` precedent, and strict→loose is the
+> reversible direction. This plan's COP design section is therefore historical; the COP-only PR
+> follows the `0002` shape (full spec in the
+> [draft's banner](../upstream-cop-brk-signature-pr.md)).
+>
+> **Review corrections (2026-08-04):** Verification step 4's "pinned by a test" overstates —
+> the 65EL02 `cop` rejection was verified manually only (`asm-errors.s` runs at `-mcpu=mos6502`),
+> so no lit test guards `FeatureW65816` vs the shared predicate; add a 65el02 RUN line in the
+> COP-only PR. The round-trip disassembly check (Tests item 4) was done manually, not landed as a
+> lit test, and the promised `brk #$ea` line in `all-65816-opcodes.s` was not added (covered by
+> `brk-cop-signature.s` instead).
 
 **Visible surface:** none — assembler/MC layer and a lit test. No mockups.
 
@@ -188,8 +211,10 @@ touches, so it is not COP-specific. Root cause:
 - Consequence: **35 of 39** MOS MC tests pass `-motorola-integers` explicitly to compensate. The
   real toolchain is unaffected — `mos-clang --target=mos -mcpu=mosw65816 -c` assembles
   `wdm #$5a` → `42 5a` with no flags.
-- Standard fix: honour the flag only when given (`LexMotorolaIntegers.getNumOccurrences()`).
-  Mentioned as an offer at the foot of the PR body; queued as its own item rather than bundled.
+- Standard fix: honour the flag only when given (`LexMotorolaIntegers.getNumOccurrences()`). It is
+  posted independently as [llvm-mos PR #587](https://github.com/llvm-mos/llvm-mos/pull/587), with
+  its own [plan](2026-08-04-llvm-mc-motorola-default.md) and fork patch
+  `patches/llvm-mos/0025-llvm-mc-preserve-motorola-default.patch`.
 
 ## Upstream packaging (prepare only — DO NOT POST)
 

@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/28144b9) | docs(plan-index): record the #123 nmitally commit SHA |
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/5b80b02) | feat(snes): #123 nmitally — the interrupt CC's first run finds a 65816 width bug |
 | [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/29a92f6) | docs(60fps+todo): truncstair F2/F3 done — correct this document's own deferral verdict |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/fab41e7) | docs(plan-index): #128 row + tail creation-order fix (300 plans, coverage complete) |
 | [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/f369e6c) | docs(todo+plan-index): triage the #128 inbox deferral; index the plan |
@@ -218,6 +220,16 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+28144b9	author	Will Norris
+28144b9	added	1
+28144b9	deleted	1
+28144b9	files	1
+28144b9	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+5b80b02	author	Will Norris
+5b80b02	added	1
+5b80b02	deleted	0
+5b80b02	files	1
+5b80b02	body	The battery's first __attribute__((interrupt)) handler. An NMI ISR advances\n16/32-bit counters behind an arm/service/clear frame fence while the main loop\nruns +mos-a16 arithmetic; the CRC folds 240 fenced ticks and the host oracle is\nfed the same N.\n\nFOUND A REAL COMPILER DEFECT — the 65816 interrupt prologue/epilogue is not\nwidth-aware. Two obligations, both unmet:\n\n  B1 no entry re-establishment. Native-mode interrupt entry pushes PB/PC/P, sets\n     I, clears D — and leaves M/X as found. The prologue's `pha` and its 1-byte\n     immediates were sized assuming M=1, so preempting a `rep #$20` region\n     desynchronises the instruction stream.\n  B2 A/X/Y saved at the ABI width. An 8-bit `pha` cannot preserve a 16-bit A,\n     and the handler's own `rep #$20; lda` destroys the high byte (B) — silent\n     corruption of the interrupted routine.\n\nMeasured, on the SAME source:\n  default 8-bit   host == 0xBCE6 on bsnes-jg AND MAME       (the control: works)\n  +mos-a16        black screen, corpus_result never seals, 3/3\n  +mos-xy16       likewise; MAME agrees (0x0034 on the a16 build)\n  -verify-machineinstrs clean under both features, on the ISR-bearing TU\n  corpus slice (same arithmetic, no interrupts) 5-way PASS 0xBCE6\n\nLegal MIR, wrong machine code — the Cluster-B class value gates miss. The demo\nis NOT reshaped to make the gate green; it stays red until the backend is fixed,\nso it is deliberately NOT published.\n\nAlso lands:\n- tools/nmitally-isr-gate.py, the mandatory ISR disasm gate (A shape / B1 entry\n  width / B2 save width / C0 soft-stack-pointer balance / C Imag save-restore),\n  derived from the real disassembly.\n- examples/65816/a16isr.c + dev/a16isr.sh — a four-line minimal repro with a\n  disasm-only, emulator-free standing gate for the eventual fix.\n- SECONDARY FINDING: `mos-clang --config … -c` defaults to LTO and emits bitcode,\n  so `-mllvm -verify-machineinstrs` silently verifies NOTHING. dev/_demo5.sh and\n  the /snes-demo template are both affected. dev/nmitally.sh now passes -fno-lto\n  and asserts a real object was emitted so the leg cannot go vacuous again.\n\nFix belongs in MOSFrameLowering::spill/restoreCalleeSavedRegisters (REP #$30 ->\nPHA/PHX/PHY -> SEP #$30 after the CLD, mirrored on the way out) plus\nMOSInsertREPSEP's "entry block is 8-bit by ABI" pin. Not applied here — this\nworktree's toolchain is hardlinked and cannot rebuild.\n\nPlan: docs/plans/2026-08-03-123-snes-nmitally.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 29a92f6	author	Will Norris
 29a92f6	added	3
 29a92f6	deleted	0

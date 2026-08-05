@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/81263cd) | #321 P0 fuzz re-run VERIFIED: fix two +mos-xy16 compiler bugs, close soft-stack coverage gap |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/bf5271f) | #321 soft-stack P2: hermetic .ll crash-regression for the soft-stack Ac16 spill |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/e0f160a) | #321 soft-stack plan: mark P1 DONE in the Status line (was P1/P2/P3 OPEN) |
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0b855e0) | #321 soft-stack P1: document the expandLDSTStk >=16-bit spill contract (latent xy16 tripwire) |
@@ -8,6 +9,11 @@
 | [2026-06-16](https://github.com/wbniv/llvm-mos-65816/commit/7c0fe56) | #321 native s16: load consumed only as bytes stays byte-wise (EQ-as-value prologue fix) |
 
 <!--history-meta v1
+81263cd	author	Will Norris
+81263cd	added	48
+81263cd	deleted	15
+81263cd	files	1
+81263cd	body	Re-ran `fuzz 50 1` + `fuzz 50 56` on a quiet box (2026-06-18). The re-run exposed two\npre-existing +mos-xy16 bugs that had to be fixed before the passes could be collected:\n\n1. `selectXY16` (MOSInstructionSelector.cpp): `MRI.getRegClassOrNull(IdxReg)` returns null for\n   generic s16 vregs not yet class-constrained at GIS selection time (bottom-up). The\n   `RC->hasSuperClassEq(Imag16RegClass)` check silently failed → no LDXImag16/LDYImag16\n   inserted → constrainSelectedInstRegOperands later constrained to Xc16/Yc16 → Imag16 conflict\n   → COPY Xc16←Imag16 → copyPhysRegImpl hit unreachable. Fix: extend condition to also handle\n   `!RC && MRI.getType(IdxReg) == LLT::scalar(16)` at all four IDX16 sites.\n\n2. `copyPhysRegImpl` (MOSInstrInfo.cpp): missing cases for Xc16↔Imag16 and Yc16↔Imag16 COPY.\n   These fell through to the Anyi1 branch, hit llvm_unreachable, and in NDEBUG builds produced\n   `SelectImm $a16` UB. Fix: add four new else-if cases (LDXImag16/STXImag16/LDYImag16/STYImag16).\n\nAfter both fixes: fuzz 50 seeds 1-50 → 15/50 PASS, 35 mismatch (all xy16@MAME=0x0000 hang bugs,\na16@MAME==host for all 50), 0 new-crash. Seeds 56-105 same pattern. +mos-a16 correct for all 100.\nSoft-stack sta ($0),y confirmed in seed-2 f0 (eight Ac16 soft-stack spills across recursive call).\n\nAlso update dev/xy16spillr.sh step-2 guard: with selectXY16 fix the compiler now generates\nLDXImag16+LDAbsXIdx16 instead of a soft-stack Ac16 spill for this program. Old guard was stale;\nnew guard checks that the Increment 1e indexed path fires (no Imag16→Xc16 COPY crash). All five\nsteps PASS including both emulators (corpus_result==0x3457).\n\nPlan steps 3-4 marked PASS with raw output pasted. TODO updated: P0 VERIFIED, xy16 hang bug noted.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 bf5271f	author	Will Norris
 bf5271f	added	16
 bf5271f	deleted	3

@@ -1,5 +1,28 @@
 | Date | Change |
 |------|--------|
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/8915348) | feat(snes/borrowlad): #110 Borrow-Ladder Odometer (Round 6, Cluster E, harden 0012) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/bb58a0a) | feat(snes/pcooker): #109 Pressure-Cooker Fixed-Point Evaluator (Round 6, Cluster E, harden 0011) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/8b93bc3) | feat(snes/uarteye): #108 Bit-Banged UART Eye (Round 6, Cluster D final, harden 0010) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/303a25c) | feat(snes/bitweave): #107 Serial Bit-Reversal Weave (Round 6, Cluster D, harden 0010) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/bf6ba8c) | feat(snes/lfsr2): #106 Dual-LFSR Scrambler (Round 6, Cluster D, harden 0010) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/fc8ea58) | feat(snes/modexp256): #104 256-bit Modular Exponentiation (Round 6, Cluster C final, harden 0017) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/ac8cb1d) | feat(snes/oddmask): #103 Odd-Width Mask Sculptor (Round 6, Cluster C, harden 0017) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/00b98f1) | feat(snes/keycmp64): #100 64-bit Multi-Key Record Sort (Round 6, Cluster B final, harden 0016) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/3148b89) | feat(snes/trimerge): #99 Three-Way Merge Diff (Round 6, Cluster B, harden 0016) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/b69d3d1) | feat(snes/ucmprank): #98 Unsigned Rank Percentile Field (Round 6, Cluster B, harden 0016) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/3864d44) | feat(snes/ropeedit): #96 Gap-Buffer Rope Editor (Round 6, Cluster A final, harden 0002) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/f1c6ac5) | feat(snes/permscat): #95 Gather-Scatter Permutation (Round 6, Cluster A, harden 0002) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/3d0691e) | feat(snes/rotslab): #94 In-Place Block Rotate (Round 6, Cluster A, harden 0002) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/419830d) | feat(snes/crcwall): #105 Bit-Serial CRC Wall (Round 6, harden-the-fixes) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/f9ce73a) | feat(snes/spaceship): #97 Width-Sweep Sort Gallery (Round 6, harden-the-fixes) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/b7e8281) | feat(snes/ovmove): #93 Overlap-Move Mosaic (Round 6, harden-the-fixes) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/aacc8fa) | docs(demo-ideas): Round 6 Cluster G — harden the setjmp.S fix (#116–118) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/c0a35bf) | feat(snes/mulov64): #101 64-bit Multiply-Overflow (Round 6, harden-the-fixes) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/04a8495) | fix(snes): #35 65816-aware setjmp.S — longjmp was broken in native mode |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/812f7ca) | docs(ideas): draft Round 6 (#93-#115) — harden the fixes we already found |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0e45bd2) | docs(demo-ideas): add consolidated "bugs surfaced by the battery" table |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/46e5f17) | docs(demo-ideas): strike #81-92 as shipped; mark Round 5 COMPLETE + record #83 finding |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5ca866d) | feat(snes/mvscrl): #79 Memmove Scroll Slabs (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0ccecd9) | feat(snes/sbitfld): #78 Signed-Bitfield Terrain Sculptor (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/26c2e18) | feat(snes/satcast): #77 Saturating-Cast Kaleidoscope (Round 5, compiler stress-test) |
 | [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1f15000) | feat(snes/rotkal): #74 Rotate-Register Kaleidoscope (Round 5, compiler stress-test) |
@@ -81,6 +104,121 @@
 | [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/f9559f4) | docs(investigations): 20 compiler stress-test demo ideas (algorithm + visual) |
 
 <!--history-meta v1
+8915348	author	Will Norris
+8915348	added	2
+8915348	deleted	2
+8915348	files	1
+8915348	body	Re-stresses patch 0012 (LDCImm-set): a 128-bit descending odometer (8x16-bit\nlimbs) built from chained 16-bit subtracts-with-borrow whose carry-in is a\nset/clear i1 (SEC / LDCImm 1) before the SBC chain, borrows rippling limb to\nlimb as the number ticks down through zero. The a16/xy16 legs are load-bearing\n(0012 accum-gated).\n\nClean positive, fix holds: sbc=4 preceded by sec=1 (the set-i1 carry-in that\n0012 materializes), rep/sep=14; host==default==+mos-a16==+mos-xy16==0x1BE3 on\nMAME+bsnes-jg, -verify clean x3. Renders a 128-bit binary counter ticking down.\n\nPublished: https://biohack.net/snes/borrowlad/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+bb58a0a	author	Will Norris
+bb58a0a	added	2
+bb58a0a	deleted	2
+bb58a0a	files	1
+bb58a0a	body	Re-stresses patch 0011 (scavenger-$p): a giant straight-line int32 fixed-point\nexpression per pixel (a dozen simultaneously-live temps) whose compare's N/Z is\nconsumed in the final select AFTER several __mulsi3/__divsi3 calls — forcing the\ncompare result live across the call-clobber under maximal 16-bit-accumulator\npressure. The a16/xy16 legs are load-bearing (0011 accum-gated).\n\nClean positive, fix holds: __mulsi3=6, __divsi3=4, rep/sep=38 (the compare's\nN/Z survives all of them); host==default==+mos-a16==+mos-xy16==0xEE6D on\nMAME+bsnes-jg, -verify clean x3. Renders a circular level-set implicit surface.\n\nTiming: heavy per-pixel eval + gate + title dwell run past frame 500, so both\nemulator legs read at frame 1500 (corpus_result set at startup, so the assert\nholds — preview timing only).\n\nPublished: https://biohack.net/snes/pcooker/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+8b93bc3	author	Will Norris
+8b93bc3	added	130
+8b93bc3	deleted	2
+8b93bc3	files	1
+8b93bc3	body	Re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit register-coalescer\nmiscompile) via a software-UART framing loop: a byte framed (start+8data+stop)\nand shifted OUT of a carry-rotated TX register + INTO a carry-rotated RX\nregister (two loop-carried shift registers, framing loop). A correct TX->RX\nround-trip recovers the byte (identity, verified all 256 bytes) → the gate folds\nroundtrip(b)^b as a self-check witness. The DEFAULT-8-bit leg is load-bearing.\n\nClean positive, fix holds: default-8bit compiles clean asl/rol/lsr/ror=19;\nhost==default==+mos-a16==+mos-xy16==0x3F09 on MAME+bsnes-jg, -verify clean x3\n(incl. default). Renders a clean oscilloscope eye diagram. Completes Cluster D\n(0010 guarded across bit-serial CRCs #105, dual LFSR #106, serial bit-reversal\n#107, UART framing #108).\n\nPublished: https://biohack.net/snes/uarteye/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+303a25c	author	Will Norris
+303a25c	added	2
+303a25c	deleted	2
+303a25c	files	1
+303a25c	body	Re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit register-coalescer\nmiscompile) via a serial rotate-out/rotate-in carry loop bit-reversal\n(rev=(rev<<1)|(v&1); v>>=1), loop-carried through the back edge — an 8-bit and a\n16-bit reversal interleaved so two loop-carried rev registers are live at once.\nDeliberate contrast to #54 bitshuffle's __builtin_bitreverse mask-swap cascade\n(no loop). The DEFAULT-8-bit leg is load-bearing (0010 not accum-gated).\n\nClean positive, fix holds: bit-reversal is an involution — the gate folds\nrev(rev(v))^v as a self-check witness (0 when correct); rev8(0x01)=0x80,\nrev8(0xB8)=0x1D verified. default-8bit compiles clean asl/rol/lsr/ror=20;\nhost==default==+mos-a16==+mos-xy16==0x0E03 on MAME+bsnes-jg, -verify clean x3\n(incl. default).\n\nPublished: https://biohack.net/snes/bitweave/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+bf6ba8c	author	Will Norris
+bf6ba8c	added	2
+bf6ba8c	deleted	2
+bf6ba8c	files	1
+bf6ba8c	body	Re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit register-coalescer\nmiscompile) with TWO dissimilar loop-carried shift registers live at once: a\nmaximal-length Galois LFSR (shift + tap-XOR gated by the shifted-out bit) and a\nFibonacci LFSR (XOR-of-taps fed into the top bit), plus a 16-bit Galois,\nstepped simultaneously so their registers + feedbacks are all live (extra\ncoalescer pressure). The DEFAULT-8-bit leg is load-bearing (0010 not\naccum-gated).\n\nClean positive, fix holds: both 8-bit LFSRs verified maximal-length (period\n255); default-8bit compiles clean with asl/rol/lsr/ror=15;\nhost==default==+mos-a16==+mos-xy16==0x6AA3 on MAME+bsnes-jg, -verify clean x3\n(incl. default).\n\nPublished: https://biohack.net/snes/lfsr2/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+fc8ea58	author	Will Norris
+fc8ea58	added	2
+fc8ea58	deleted	2
+fc8ea58	files	1
+fc8ea58	body	Re-stresses patch 0017's s64 (un)merge glue (#61 dhmix) as a high-volume\nregression guard: dhmix's 64-bit Diffie-Hellman modexp at 256-bit, built from\nuint32[8] limbs + uint64 multiply-accumulate. No s128/s256 node on a 16-bit\ntarget — this re-runs the green s64 path hundreds of times under register\npressure. Modulus 2^256-189 (pseudo-Mersenne fold reduction); the DH identity\nA^b==B^a (folded with an s1^s2 mismatch witness) catches any s64-lane-split\nmiscompile. Cross-checked vs Python: g^7 mod (2^256-189) is bit-exact.\n\nClean positive, fix holds: __muldi3 (s64 glue)=2, rep/sep=54,\nhost==default==+mos-a16==+mos-xy16==0x31D4, -verify clean x2. Completes\nCluster C (0017 guarded across s64 mulh/mulo #101, odd-width extend #103,\nvolume #104).\n\nTiming note: the 256-bit modexp settles between frames 500-1500 on target, so\nboth emulator legs read at frame 1500 (got=0x0000 at frame 500 was harness\ntiming, not a miscompile; GATE_N=1 keeps it as short as one DH exchange).\n\nPublished: https://biohack.net/snes/modexp256/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+ac8cb1d	author	Will Norris
+ac8cb1d	added	2
+ac8cb1d	deleted	2
+ac8cb1d	files	1
+ac8cb1d	body	Re-stresses the odd-width extend + s64 (un)merge legalization of patch 0017\n(#61 dhmix, which crashed a16/xy16 on G_ANYEXT s24 + G_UNMERGE_VALUES s64).\nForms s20/s24/s28 intermediates via an i32-sourced narrow-mask+op -> G_ZEXT\nsN->s64 (an odd source width with no s16-lane decomposition) threaded through\nan s64 __muldi3.\n\nClean positive, fix holds: probe G_ZEXT s20/s24/s28->s64=3, __muldi3=1,\nhost==default==+mos-a16==+mos-xy16==0x1FD9, -verify clean x2 (the modes dhmix\ncrashed).\n\nMEASURED correction to the aspirational spec: widths >32 (s40/s48) are\nUNREACHABLE (a u64 & mask stays s64 with known-bits, no odd type) — odd widths\nform only from i32-sourced (<=32) narrow-mask+op+zext. Extend is G_ZEXT not\nG_ANYEXT (the exact dhmix opcode no longer reproduces on the post-0017\ntoolchain), routing through the same odd-source-width legalization. A volatile\nseed + noinline are required or the pure-function gate constant-folds away.\n\nPublished: https://biohack.net/snes/oddmask/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+00b98f1	author	Will Norris
+00b98f1	added	2
+00b98f1	deleted	2
+00b98f1	files	1
+00b98f1	body	Re-stresses patch 0016 (#46) at the extreme width with a CHAINED comparator:\nlibc qsort of records keyed by a primary int64 spaceship, tie-broken by a\nsecond int64 spaceship -> G_SCMP s64 twice per call, with a data-dependent\nshort-circuit (tie-break runs only on primary-key ties). k1 is drawn from a\nsmall range so ties are frequent (38 tie pairs / 24 records), genuinely\nexercising the second s64 three-way compare.\n\nClean positive, fix holds: IR probe scmp.i64=3 (chained s64),\nhost==default==+mos-a16==+mos-xy16==0xB8AD on MAME+bsnes-jg, -verify clean x2.\nCompletes Cluster B — 0016's lowerThreewayCompare holds across signed sort\n(#97), unsigned rank (#98), control-flow branch (#99), chained-s64 (#100).\n\nPublished: https://biohack.net/snes/keycmp64/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3148b89	author	Will Norris
+3148b89	added	2
+3148b89	deleted	2
+3148b89	files	1
+3148b89	body	Re-stresses patch 0016 (#46) with the three-way-compare result used AS CONTROL\nFLOW, not a qsort return compared to 0: a 2-input merge branches on the sign of\n(a>b)-(a<b) — advance-left / emit-both / advance-right — at s32 and s64, via\nnoinline comparators that keep G_SCMP alive as a branch selector. The display\ncolours each output cell by the branch that emitted it, so the -1/0/+1 merge\ndecisions braid on screen.\n\nClean positive, fix holds: IR probe llvm.scmp=4 incl. scmp.i64=2,\nhost==default==+mos-a16==+mos-xy16==0xCCCC on MAME+bsnes-jg, -verify clean x2.\n\nPublished: https://biohack.net/snes/trimerge/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+b69d3d1	author	Will Norris
+b69d3d1	added	2
+b69d3d1	deleted	2
+b69d3d1	files	1
+b69d3d1	body	Re-stresses the UNSIGNED half of patch 0016 (#46 qsortviz) — the G_UCMP path\nthat signed #46/#97 never emitted. qsort with unsigned spaceship comparators\n(a>b)-(a<b) at uint16/uint32/uint64 forces llvm.ucmp at u16/u32/u64 (->\nlowerThreewayCompare). Unsigned ordering diverges from signed at the high bit,\nso a lowering that reused the signed compare would sort wrong and diverge.\n\nClean positive, fix holds: IR probe llvm.ucmp=6 incl. ucmp.i64=2, signed\nscmp=0 (no leak), host==default==+mos-a16==+mos-xy16==0x4CDD on MAME+bsnes-jg,\n-verify clean x2.\n\nPublished: https://biohack.net/snes/ucmprank/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3864d44	author	Will Norris
+3864d44	added	2
+3864d44	deleted	2
+3864d44	files	1
+3864d44	body	Re-stresses patch 0002 (MOSInsertREPSEP::placeIntraBlock, the #23 +mos-xy16\nin-place-memmove index-width fix) + #79 (both directions) AT SCALE, as a real\ndata-structure primitive: a 576-byte gap buffer whose cursor moves memmove text\nacross the gap (both directions, >256 bytes -> 16-bit offset), driven by a\nscripted type/delete/jump edit stream. Completes Cluster A — patch 0002 is now\nguarded across the memmove-libcall (#93), ZP-indirect (#94), indexed-store\nabs,X (#95), and editor-at-scale (#96) forms.\n\nClean positive, fix holds: memmove-refs=2, a16 rep/sep=54, xy16 compiles clean,\nhost==default==+mos-a16==+mos-xy16==0x2361 on MAME+bsnes-jg, -verify clean x2.\n\nPublished: https://biohack.net/snes/ropeedit/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+f1c6ac5	author	Will Norris
+f1c6ac5	added	2
+f1c6ac5	deleted	2
+f1c6ac5	files	1
+f1c6ac5	body	Re-stresses patch 0002 (MOSInsertREPSEP::placeIntraBlock, the #23 +mos-xy16\nindex-width fix) at its hardest: a bijective scatter dst[perm[i]]=src[i] over a\n576-entry (>512) grid with TWO 16-bit indices live at once — the loop counter i\nand the DATA-DEPENDENT scatter index pi=perm[i] (can't strength-reduce to a\nstride). Under +mos-xy16 this emits 'sta abs,X' with a 16-bit index (3x) — the\nLITERAL #23 addressing shape that #94 rotslab did NOT produce (rotslab's pointer\nreversal lowered to ZP-indirect). Cluster A now covers 0002 across the memmove\nlibcall (#93), indirect (#94), and indexed-store (#95) forms.\n\nClean positive, fix holds: a16 rep/sep=41, xy16 compiles clean,\nhost==default==+mos-a16==+mos-xy16==0x0C2C on MAME+bsnes-jg, -verify clean x2.\n\nPublished: https://biohack.net/snes/permscat/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+3d0691e	author	Will Norris
+3d0691e	added	2
+3d0691e	deleted	2
+3d0691e	files	1
+3d0691e	body	Re-stresses patch 0002 (MOSInsertREPSEP::placeIntraBlock, the #23 +mos-xy16\nindex-width fix) from a different angle than #93 ovmove: a hand-written\nthree-reversal rotate (rev[0,k)·rev[k,n)·rev[0,n)) of a 384-entry uint16_t\nbuffer, NO memmove libcall. The reversal's 16-bit buf[lo]<->buf[hi] swaps lower\nto ZP-indirect access bracketed by rep #$20/sep #$20 width transitions (the\nplaceIntraBlock domain) — so both addressing angles onto 0002 are now guarded.\n\nClean positive, fix holds: rep/sep=48, xy16 compiles clean,\nhost==default==+mos-a16==+mos-xy16==0xB93A on MAME+bsnes-jg, -verify clean x2.\nMeasured aside: the runtime k%=n folds away (k<=34<384) — correct optimization,\nnot this demo's corner; disasm probe asserts the real path (width brackets).\n\nPublished: https://biohack.net/snes/rotslab/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+419830d	author	Will Norris
+419830d	added	4
+419830d	deleted	4
+419830d	files	1
+419830d	body	Round 6 Cluster-D — re-stresses patch 0010 (coalesce-rotate-Ac, a\nDEFAULT-8-bit coalescer miscompile: a rotate-referenced loop-carried CRC\nbyte coalesced into the A-only Ac class, read stale by the back-edge ROL).\nThree interleaved bit-serial CRC shift registers (CRC-8/16/32) under\nregister pressure = the shape that found 0010, tripled. The DEFAULT-8-bit\nleg is load-bearing (0010 is not accum-gated; invisible to a16/xy16 gates).\n\nCLEAN POSITIVE — fix holds: default-8bit compiles clean, asl/rol/lsr/ror=13;\nhost==default==+mos-a16==+mos-xy16==0x8E47 on MAME+bsnes-jg, -verify clean.\nPermanent default-8-bit regression guard for 0010.\n\nPublished: https://biohack.net/snes/crcwall/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+f9ce73a	author	Will Norris
+f9ce73a	added	4
+f9ce73a	deleted	4
+f9ce73a	files	1
+f9ce73a	body	Round 6 Cluster-B — re-stresses patch 0016 (#46 G_SCMP three-way compare,\n.lower() -> lowerThreewayCompare). qsorts int8/int16/int32/int64 arrays\nwith spaceship comparators (a>b)-(a<b), forcing G_SCMP at the distinct\nwidths s16/s32/s64. The s32 and s64 legs are widths qsortviz (s16) never\nreached; a 64-bit icmp+select three-way compare had never been lowered.\nUses qsort callbacks so the scmp genuinely survives (a direct compare\nfolds it back to a plain a>b) — confirmed by an -emit-llvm probe.\n\nCLEAN POSITIVE — fix holds: IR probe llvm.scmp=8 incl. scmp.i64=2;\nhost==default==+mos-a16==+mos-xy16==0xF20F on MAME+bsnes-jg, -verify\nclean. Permanent regression guard for 0016 at s32/s64.\n\nPublished: https://biohack.net/snes/spaceship/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+b7e8281	author	Will Norris
+b7e8281	added	5
+b7e8281	deleted	4
+b7e8281	files	1
+b7e8281	body	Round 6 Cluster-A first-picks intersection — re-stresses TWO fixed bugs:\n(1) #23 / patch 0002 MOSInsertREPSEP::placeIntraBlock (the +mos-xy16\nin-place-memmove REP/SEP index-width silent miscompile) and (2) #79's\nboth-direction G_MEMMOVE overlap. Escalated to a 16x24=384-byte buffer\n(>256) so every memmove indexes with a 16-bit X — the exact width-flag\nboundary the #23 bug lived at — with four overlapping memmoves per step\n(descending pair odd, ascending pair even), repeated, under +mos-xy16.\n\nCLEAN POSITIVE — the fix holds: memmove-refs=4 (both dirs), xy16 compiles\nclean, host==default==+mos-a16==+mos-xy16==0xA990 on MAME+bsnes-jg,\n-verify clean in both 16-bit modes. Now a permanent regression guard for\n0002 (and #79). Fast gate → preview at frame 500.\n\nPublished: https://biohack.net/snes/ovmove/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+aacc8fa	author	Will Norris
+aacc8fa	added	51
+aacc8fa	deleted	4
+aacc8fa	files	1
+aacc8fa	body	Round 6 (harden-the-fixes) had no coverage for the setjmp/longjmp bug: it\nmaps clusters onto codegen patches (0002/0016/0017/0010/0011…), and #35 was\n(a) a runtime/library fix, not a codegen patch, and (b) still BLOCKED when\nRound 6 was drafted 2026-07-01. Now that platforms/snes/setjmp.S has landed\n(2026-07-02), by Round 6's own "re-stress every bug we found and fixed"\ncharter it is a gap.\n\nAdd Cluster G (#116–118) + a fix-regression coverage-map row + a first-pick\nentry, and bump the round range to #93–#118:\n- #116 backtrack — idea #35 realized (now unblocked): recursive solver that\n  longjmps to the last choice point, unwinding many jsr frames per jump →\n  exercises the page-1 S reconstruct + CSR/soft-SP restore the one-frame\n  corpus/setjmp_sim.c guard never touches. The flagship.\n- #117 csrjmp — all 14 __rc18..31 CSRs live across the setjmp/longjmp\n  round-trip; an off-by-one in the renumbered restore offsets corrupts one.\n- #118 retryjmp — re-entering one setjmp site from varying call depths with a\n  deep soft stack (the setjmp-as-exceptions idiom).\n\n5-way bar (setjmp must be correct default AND +mos-a16 AND +mos-xy16). All\nguards beyond the minimal corpus/setjmp_sim.c differential.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+c0a35bf	author	Will Norris
+c0a35bf	added	5
+c0a35bf	deleted	4
+c0a35bf	files	1
+c0a35bf	body	Round 6 Cluster-C first pick — the sharp probe from the 2026-07-02\ncoverage check. Forces the ONE untested s64 legalizer path:\n__builtin_mul_overflow on uint64_t/int64_t -> G_UMULO/G_SMULO at s64\n(.lower()) -> G_UMULH/G_SMULH at s64 (.lower()), which must compose the\n128-bit product from s32 __mulsi3 pieces + s64 __muldi3 glue WITHOUT\nwidening to s128 (G_MUL is clampScalar(0,S8,S32) to avoid infinite\nregress). No prior demo forms an s64 mulh/mulo (#76 was s16/s32, #56\ns32 mulh, #22 __muldi3 low-64-only).\n\nCLEAN POSITIVE — no compiler bug: disasm confirms the s32-composed s64\nmulh (__muldi3=14, __mulsi3=20); host==default==+mos-a16==+mos-xy16==\n0x3A69 on MAME+bsnes-jg, -verify clean. The one untested s64 path is\ncorrect and now permanently regression-guarded.\n\nAlso fixed a demo-side (not compiler) display-timing issue: the s64 gate\nis the heaviest compute in the battery, so the title holds ~300 frames\nand the frame-500 preview caught it pre-scatter; render at frame 1500.\n\nPublished: https://biohack.net/snes/mulov64/\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+04a8495	author	Will Norris
+04a8495	added	2
+04a8495	deleted	2
+04a8495	files	1
+04a8495	body	The SDK's common mos-platform/common/c/setjmp.S is 6502-only: longjmp\nrestores the hard stack pointer with `tax; txs`, which on the 65816 in\nnative mode (SNES crt0 enters it via XCE) transfers all 16 bits of X.\nWith the codegen-default 8-bit index width X's high byte is 0, so S drops\ninto page 0 and the following rts reads the return address from the wrong\npage and jumps to garbage — longjmp never returns. Fails in default-8-bit\nAND +mos-a16 (pre-existing upstream, not the #321 fork). Surfaced scoping\nstress-demo #35.\n\nFix: a 65816-aware platforms/snes/setjmp.S, built -mcpu=mosw65816 and added\nto snes-c ahead of add_platform_library's POST-BUILD append of common-c, so\nit precedes common's 6502 setjmp.S.obj in libc.a and the linker resolves\nsetjmp/longjmp from it (verified: archive members 1 vs 9; snes-far/snes-hirom\ninherit via PARENT snes). longjmp reconstructs the page-1 16-bit S = $01xx\n(ora #$0100; tcs) instead of the broken txs, and reads/writes the return\naddress stack-relative (1,s/2,s) rather than at a hardcoded $0101/$0102.\nNo jmp_buf ABI change: the SNES hardware stack is page-1 by crt0 contract\n(S=$01FF, 256-byte stack), so only the low byte of S is saved and the high\nbyte reconstructed. snes-c also links common-asminc for `.include imag.inc`.\n\nThe common setjmp.S is a 6502 build (__mosw65816__ undefined there) merged\ninto every libc.a, so an #ifdef in common would never fire for the SNES —\nhence the platform override. This lands upstream with the SNES-platform PR\n(llvm-mos-sdk#415), which has no 65816 setjmp.S today.\n\nRegression guard examples/snes/corpus/setjmp_sim.c (corpus_result 0x2007,\nnot the pre-longjmp sentinel 0x1111); the setjmp/longjmp/jmp_buf decls are\nmirrored inline from <setjmp.h> (codegen-identical) so the --config-less\nverify-machineinstrs gate — which has no -isystem for platform libc headers\n— does not spuriously fail. Verified host == default@MAME == +mos-a16@MAME\n== +mos-xy16@MAME == +mos-a16@bsnes-jg = 0x2007.\n\nPlan: docs/plans/2026-07-02-35-setjmp-longjmp-65816-fix.md\nInvestigation: docs/investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+812f7ca	author	Will Norris
+812f7ca	added	251
+812f7ca	deleted	31
+812f7ca	files	1
+812f7ca	body	Pivot from breadth to depth: Round 5's twenty new corners found zero new\nbugs, so Round 6 re-stresses every already-fixed bug (0002 xy16 memmove/\nindex-width, 0016 G_SCMP, 0017 s64 (un)merge, 0010 rotate-into-Ac, the\n0011/0012/0015/0009 a16 flag-liveness cluster, + an optional 3-way far\ncluster 0001/0013/0014), escalating each past where its finding-demo\nvalidated it. Each demo doubles as a permanent regression guard.\n\nIncludes a coverage check of the live MOSLegalizerInfo.cpp vs the five\nshipped s64 demos: the s64 (un)merge glue + arithmetic are already broadly\ngreen, so widening to 128/256-bit is a volume guard, NOT a novel probe —\nthe one genuinely untested s64 path is G_UMULH/G_SMULH + G_UMULO/G_SMULO\n.lower() (threading the S32-mul-clamp). Cluster C re-scoped accordingly;\nmulov64 is the sharp pick, modexp256/oddmask relabeled as guards.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+0e45bd2	author	Will Norris
+0e45bd2	added	19
+0e45bd2	deleted	0
+0e45bd2	files	1
+0e45bd2	body	Records the 4 demos across #1-#92 that caught a real compiler/toolchain bug\n(#23 xy16 in-place-memmove miscompile, #46 qsortviz G_SCMP crash / patch 0016,\n#61 dhmix s64 G_UNMERGE_VALUES crash / patch 0017, #35 broken longjmp runtime\ngap) with fix + status, and notes Round 5 found none. Excludes the demo-side\nOOB scares (#75, #83) explicitly.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+46e5f17	author	Will Norris
+46e5f17	added	43
+46e5f17	deleted	29
+46e5f17	files	1
+46e5f17	body	Round-5 battery close-out in its live tracker: strike all twelve #81-#92 entries\n(with /snes/<slug>/ links + plan links) and the #79/#91 first-picks. Rewrite the\nRound-5 intro note DRAFTED->COMPLETE — all 20 corners green, no compiler bug; the\n#83 truncstair scare was a demo-side OOB write (draw_band row-16 canvas overflow),\nfirst misdiagnosed as a MOSZeroPageAlloc miscompile then refuted+fixed. Notes the\ntwo engineering fixes (dev/_demo5.sh -lm; __clang__-guarded saturating builtins).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+5ca866d	author	Will Norris
+5ca866d	added	2
+5ca866d	deleted	2
+5ca866d	files	1
+5ca866d	body	G_MEMMOVE both-paths via __builtin_memmove (avoids <string.h> in corpus env):\n- memmove(upper+1, upper, 7×16): dst>src overlapping → Descending=true (:3145-3152)\n- memmove(lower, lower+1, 7×16): dst<src overlapping → Ascending\nSDK memmove: mos-platform/common/c/mem.c:15. First overlapping-memmove demo.\n\nCRC: additive rotate-shift fold h=rotl1(h)+v+step*53 (XOR-based folds cancel to 0\nfor period-4 byte data; additive accumulates 24/step non-zero).\nGate: memmove-refs=2, rep/sep=15; 5-way green 0x72A7.\nNo compiler bug — both G_MEMMOVE paths lower correctly.\nPublished: https://biohack.net/snes/mvscrl/ (biohack.net v1.0.209).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 0ccecd9	author	Will Norris
 0ccecd9	added	3
 0ccecd9	deleted	2

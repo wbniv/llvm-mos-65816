@@ -1,4 +1,4 @@
-# #110 — SNES Borrow-Ladder Odometer (`borrowlad`): set-i1 carry / LDCImm-set (patch 0012)
+# #110 — SNES Borrow-Ladder Odometer (`borrowlad`): native-width borrow chains
 
 <p align="center"><img src="screenshots/borrowlad.png" width="512" alt="Borrow-Ladder Odometer demo running on the SNES (bsnes-jg render)"></p>
 
@@ -9,13 +9,15 @@ Cluster E). Clean positive — `host == default == +mos-a16 == +mos-xy16 == 0x1B
 
 ## Context
 
-Cluster E hardens the **a16/xy16 flag-liveness & register-pressure** cluster. This demo targets **`0012`**
-(`LDCImm`-set): the backend lowers a **set i1 carry** — the carry-in that must be SET (`SEC`) before the
-first `SBC` of a subtract chain — via a materialized `LDCImm 1`. A wide multi-precision subtractor built
-from chained 16-bit subtracts-with-borrow is exactly that shape: the borrow ripples limb to limb, and
-every limb's subtract consumes a carry-in that is a set/clear i1. A **128-bit descending odometer** ticks
-DOWN (through zero, wrapping) by subtracting a decrement each step, borrows rippling across eight 16-bit
-limbs. The a16/xy16 legs are load-bearing (0012 is accum-gated); default 8-bit is the contrast.
+Cluster E hardens the **a16/xy16 flag-liveness and register-pressure** cluster. This demo exercises a
+wide multi-precision subtractor built from chained 16-bit subtracts-with-borrow: the borrow ripples limb
+to limb, and every limb consumes the preceding borrow. A **128-bit descending odometer** ticks down
+through zero by subtracting a decrement each step. The a16/xy16 legs exercise native-width SBC codegen;
+default 8-bit is the differential oracle.
+
+This ROM previously claimed to be the regression for patch `0012`. That was too broad: the ROM's
+`LDCImm 1` path is produced by the in-flight A16 selector. The backend defect itself is baseline MOS and
+is now tested directly with `LDCImm 1` in the ordinary `mos65c02` asm-printer MIR test.
 
 ## Algorithm
 
@@ -28,8 +30,7 @@ bl_sub(a, b):                                    # a -= b, 16-bit borrow chain (
         borrow = (t < 0) ? 1 : 0                   # borrow-out (a set i1)
 ```
 
-- The initial carry-in (SET, no borrow) materializes as `SEC` / `LDCImm 1` before the SBC chain — the
-  0012 shape (measured: `sbc=4`, `sec=1`).
+- The initial carry-in is `SEC` (no borrow) before the SBC chain (measured: `sbc=4`, `sec=1`).
 - Multi-precision subtraction is exact → bit-exact differential; a dropped/duplicated borrow diverges the CRC.
 
 Codegen corner (a16): `sec` (the set-i1 carry-in), `sbc` chain, `rep/sep=14`.
@@ -54,7 +55,7 @@ borrows ripple. `BitmapCanvas` (BG3 2bpp) + `TextLayer` + `TitleLayer` ("BORROWL
 ## Differential gate
 
 - `corpus_result = borrowlad_gate_crc()`, GATE_N=160, `EXPECT = 0x1BE3`.
-- **5-way bar** — a16/xy16 load-bearing (0012 accum-gated); no far pointers.
+- **5-way bar** — a16/xy16 exercise native-width subtraction; no far pointers.
 - Disasm probe (a16): `sbc ≥ 1` (=4), `sec ≥ 1` (=1), `rep/sep ≥ 1` (=14).
 
 ## Verification results
@@ -77,4 +78,4 @@ borrows ripple. `BitmapCanvas` (BG3 2bpp) + `TextLayer` + `TitleLayer` ("BORROWL
 
 `/snes-rom-page --rom build/borrowlad.sfc --slug borrowlad --site ~/SRC/biohack.net
 --title "Borrow-Ladder Odometer" --preview build/borrowlad-jg.png
---selfcheck "0x6a 2 0x1BE3 500 borrowlad"` (a16 build — the load-bearing leg for 0012).
+--selfcheck "0x6a 2 0x1BE3 500 borrowlad"` (a16 build).

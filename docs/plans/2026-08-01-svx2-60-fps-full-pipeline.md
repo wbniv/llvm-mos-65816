@@ -50,6 +50,9 @@ Repeating each 30 fps source frame twice is a useful scheduler test, but it is n
 **Implementation/profile record:**
 [`2026-08-01-svx2-60-fps-pipeline-profile.md`](../investigations/2026-08-01-svx2-60-fps-pipeline-profile.md)
 
+**Dashboard continuation:**
+[`2026-08-01-svx2-cut-aware-dashboard-labels.md`](2026-08-01-svx2-cut-aware-dashboard-labels.md)
+
 ## Frame budget
 
 At NTSC cadence the complete path has about 16.68 ms per frame. The design target is no more than

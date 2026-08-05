@@ -1,6 +1,9 @@
-<!-- STATUS (internal; strip before posting): drafted 2026-06-26. PR body for the LDCImm set-lowering
-     robustness fix (fork patch 0012). Posting is user-triggered. Branch to mint:
-     wbniv:mos-ldcimm-set-lowering off pristine c798c31416f7. -->
+<!-- STATUS (internal; strip before posting): ON HOLD (user decision 2026-08-04); body READY.
+     Post as a PAIR with 0011 (scavenger live-$p, Wave 3) once the open upstream queue shows
+     maintainer engagement — see status-doc row 10 for the rationale and the producer-normalization
+     decoupling item (fork a16 SBC carry-in -> -1 in 0002).
+     Local branch mos-ldcimm-set-lowering at 60d9d7d25262, based on c798c31416f7.
+     Fork carry: patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch. -->
 
 # [MOS] Lower `LDCImm` set-carry from any nonzero i1, not only `-1`
 
@@ -18,23 +21,32 @@ case MOS::LDCImm:
   }
 ```
 
-A *set* i1 carry, however, can reach MC as **`1`** (a plain i1 `true`) rather than `-1` — for instance the
-carry-in materialized for a **16-bit `SBC`**, whose `CarryInit` is selected as `1` and flows through
-`LDImm1`/`LDCImm`. The `default` arm is then `llvm_unreachable`: an asserts build **aborts**
-(`Unexpected LDCImm immediate.`), and a release build (NDEBUG) executes the `__builtin_unreachable()` as
-undefined behavior — it happens to emit `SEC`, so the result is usually correct, but only by luck.
+The operand is an `i1imm`, so a *set* carry has two legitimate spellings: sign-extended **`-1`**
+(the form the `.td` patterns use) and plain **`1`** (i1 `true`). The backend itself is split on
+which form is canonical — `expandLDImm1` normalizes this very value with `!!Val` (yielding `1`)
+when the destination is a GPR, but passes it through untouched when the destination is the carry —
+yet the MC lowering accepts only `-1`. When a `1` arrives, the `default` arm is
+`llvm_unreachable`: an asserts build **aborts** (`Unexpected LDCImm immediate.`), and a release
+build (NDEBUG) executes the `__builtin_unreachable()` as undefined behavior (observed to fall
+through and emit `SEC` — the correct output, but only by luck).
 
 ## Reproduction
 
-Any 16-bit subtract under `+mos-a16` reproduces it on an `LLVM_ENABLE_ASSERTIONS=On` build:
+The regression is a baseline `mos65c02` MIR input placed beside the existing `LDCImm 0` and
+`LDCImm -1` asm-printer cases:
 
-```c
-volatile unsigned short a = 0xDC13, b = 0x1234, out;
-int main(void) { out = (unsigned short)((unsigned)a - b); for (;;) {} }
+```yaml
+name: sec_implied_true
+body: |
+  bb.0.entry:
+    $c = LDCImm 1
+    ; CHECK: sec{{$}}
+    RTS
+    ; CHECK-NEXT: rts
 ```
 
-`mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c sub16.c` aborts at
-the `llvm_unreachable` pre-fix and compiles clean post-fix.
+With the pre-fix `MOSMCInstLower`, ordinary `llc -mtriple=mos -mcpu=mos65c02` aborts at the
+`llvm_unreachable`. With the fix it prints `sec`.
 
 ## Fix
 
@@ -47,11 +59,27 @@ case MOS::LDCImm:
   return;
 ```
 
-One line; emits the same `SEC`, so it is byte-identical on everything that previously lowered via the
-NDEBUG `default` arm, and it removes both the asserts abort and the release UB.
+One line; it removes both the asserts abort and release UB without changing established `0`/`-1`
+lowering. Accepting *any* nonzero value — rather than keeping an assert for values outside
+`{-1, 0, 1}` — is deliberate: `i1imm` semantics make nonzero *true*, exactly the `!!Val` treatment
+the backend already applies to this operand elsewhere.
 
 ## Test
 
-A `mos`/`mos6502` `llc` `.mir` test that lowers `$c = LDCImm 1` to `sec` (and `LDCImm 0` to `clc`) can be
-added. Validated end-to-end via a `+mos-a16` differential corpus + fuzzer (no output change; previously
-crashing asserts builds now compile clean).
+`llvm/test/CodeGen/MOS/asm-printer.mir` now covers all three relevant encodings under baseline
+`mos65c02`: `0` lowers to `clc`, while both `-1` and `1` lower to `sec`. The new `1` case aborts before
+the fix and passes afterward.
+
+## Origin
+
+Surfaced by downstream work: our 16-bit-accumulator (65816) development selects the carry-in of a
+16-bit `SBC` chain as a plain `1`, which flows through `LDImm1` to `LDCImm` and aborted every
+asserts build at this `llvm_unreachable`. We have not identified an in-tree producer that emits
+`LDCImm 1` today — the in-tree patterns and flag-destination selects consistently use `-1` — so
+for upstream this is a hardening fix: it aligns the MC lowering with the operand's `i1imm`
+semantics and removes release-mode UB, and it unblocks any out-of-tree or future producer that
+spells *true* as `1`. The fixed lowering is exercised end-to-end by our gallery of playable SNES
+demo ROMs built with this toolchain ([biohack.net/snes](https://biohack.net/snes/)) — no single ROM
+targets this fix; every 16-bit subtract chain in the gallery runs through it, and each ROM passes a
+host-vs-emulator differential in default and 16-bit configurations. The regression test itself is
+pure baseline `mos65c02` MIR and does not depend on that downstream work.

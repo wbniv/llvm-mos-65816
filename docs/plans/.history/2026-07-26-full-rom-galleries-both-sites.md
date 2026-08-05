@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9bddc38) | docs(plan): record the post-launch stale-ROM-after-nav fix (2 rounds) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/54d8bf3) | docs(plan+todo): full ROM galleries on both sites — done, verified live |
 
 <!--history-meta v1
+9bddc38	author	Will Norris
+9bddc38	added	66
+9bddc38	deleted	0
+9bddc38	files	1
+9bddc38	body	Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 54d8bf3	author	Will Norris
 54d8bf3	added	496
 54d8bf3	deleted	0

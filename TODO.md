@@ -42,7 +42,9 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   Host/default/a16/xy16 all `0xDA3B`; a16 3× deterministic; playable explanation at
   [https://biohack.net/snes/nmitally/](https://biohack.net/snes/nmitally/). See
   [report](docs/investigations/2026-08-03-65816-interrupt-width-prologue.md).
-- [wip T3] **Round 7 demo battery (#119–#141, now twenty-two) — new defect-hunting ROMs.** Targets chosen by <!-- agent:a790d7fb6ae22424b -->
+- [x] **Round 7 demo battery (#119–#141, twenty-two) — COMPLETE 2026-08-04, 22/22 shipped.** Final
+  entry #141 `dpbank` forced the ISR-envelope EXTEND (D/DBR save + normalize; standalone patch
+  `0026` until the `0002` fold). New defect-hunting ROMs; targets chosen by
   the scoreboard's yield pattern: combiner-formed opcodes (`G_ABDS/U`, s64 ctpop/clz/ctz/abs),
   first-ever interrupt-CC / inline-asm / mixed-per-function-width mode-state demos, far-pointer third pass,
   >256 B frames, volatile/atomic discipline, float↔s64 libcalls, s64 limb-seam shifts. First
@@ -63,12 +65,34 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   `brk`/`cop` C-handler stubs in the shared crt0 + per-platform vector slots. The envelope holds on
   the software-entry path: both handlers pass the order gate and `nmitally-isr-gate.py`; the vector
   gate proves no native slot reads `$0000`; host/default/a16/xy16 all `0xA34C`, a16 3×
-  deterministic. New assembler gap queued upstream (no `cop` mnemonic, `brk` takes no signature
-  operand — `.byte` workaround; see
-  [upstream status](docs/upstream-contribution-status.md)). Publishing user-gated; next ranked
+  deterministic. BRK signature syntax is posted as
+  [PR #586](https://github.com/llvm-mos/llvm-mos/pull/586); COP remains a separate assembler gap.
+  Retire fork patch `0024-mos-brk-signature-operand` when #586 merges, and retire
+  `0025-llvm-mc-preserve-motorola-default` when
+  [PR #587](https://github.com/llvm-mos/llvm-mos/pull/587) merges.
+  The ROM now uses natural mnemonics and is published on both sites. See
+  [upstream status](docs/upstream-contribution-status.md). Next ranked
   probe is #139 `irqgate`. [plan](docs/plans/2026-08-04-140-snes-brkcop.md).
   See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md). (T3: each demo is settled-plan
   implementation; the round's selection/design was done inline.)
+  **#139 `irqgate` DONE 2026-08-04 (`3b7eb85`) — clean positive:** first C handler on the timer IRQ
+  vector, nested under NMI; nesting asserted in the differential (`nest_hits` 96/96 folded into the
+  hash); host/default/a16/xy16 all `0x24F6`, a16 3× deterministic. Demo-design fault measured out —
+  the C ISR prologue costs ~5 scanlines, so the handler *rendezvouses* with the NMI (bounded spin)
+  instead of tuning `VTIME`; `nmitally-isr-gate.py` C0 false-positive fixed (frame-slot pointer
+  matched as a stack adjust; fix requires same-`__rc` store-back). H-mode per-scanline IRQ REJECTED:
+  at ~262 IRQs/frame the prologue alone exceeds a scanline → livelock (recorded so it isn't
+  re-proposed). [plan](docs/plans/2026-08-04-139-snes-irqgate.md).
+  **#141 `dpbank` DONE 2026-08-04 (`8f9a928`) — EXTEND, decided by measurement; closes the round:**
+  both failure modes captured live on the pre-fix toolchain (a `DBR=$7F` window HANGs — handler
+  stores land in bank $7F; a `D=&decoy` window CORRUPTS — `__rc`/soft-stack traffic runs through
+  the decoy), both reachable from legal code → the 65816 ISR envelope now saves D/DBR and
+  normalizes (`pea 0`/`pld`, `phk`/`plb`), +12 B/+33 cyc per ISR, `interrupt-width-65816.ll`
+  extended. host==default==a16==xy16 `0x4D5F` with 20 D- + 20 B-window landings folded in; siblings
+  re-validated unchanged (`0xDA3B`/`0x24F6`/`0xA34C`). ZP-promotion gotcha recorded: the compiler
+  promotes small globals to zero page, silently making "absolute" accesses D-relative — demos with
+  addressing-mode claims pin globals via `section(".bss.dpbank")`. `llc` is NOT in the distribution
+  install set (explicit `--target llc` after rebuilds). [plan](docs/plans/2026-08-04-141-snes-dpbank.md).
   **#126 `mixedwidth` DONE 2026-08-03 — clean positive:** per-function target attributes are supported;
   `mw_native` carries `+mos-a16` and real `rep #$20`/`sep #$20` brackets, while `mw_byte` explicitly
   carries `-mos-a16,-mos-xy16` and stays transition-free. Host/default/a16/xy16 all `0x83B7` with
@@ -137,15 +161,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   Published first on [biohack.net](https://biohack.net/snes/bankwalk/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bankwalk/); next is #129
   `farptrcmp`. [plan](docs/plans/2026-08-04-128-snes-bankwalk.md).
-- [T2] **Per-corpus `--dither bayer` — confirm the 10-point win on the shipped Apollo corpus at
-  the next encode.** The crossover investigation's actual payoff: Bayer moves hard-content SVX2
-  from 78.12% to 68.06% of raw (270,314 B, ~630× the affordable chooser saving) at zero cadence
-  cost and no decoder change — but it costs 2.49 dB on the smooth night leg, so it is a per-corpus
-  flag on measured grain, never a blanket switch (the existing `--dither` argument is the
-  mechanism). The 10.06-pt number was measured on a re-derived corpus (reconciles within 0.08 pts
-  on every variant); the confirming run is `--dither bayer` on the actual shipped Apollo corpus at
-  the next encode, then record the grain-threshold selection rule.
-  [P2 decision](docs/plans/2026-08-03-interframe-crossover.md).
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
   (2026-08-01); only the player-package release is left, and it is USER-GATED.**
   <!-- agent:a5850a8d3df7af344 -->
@@ -177,8 +192,10 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 - [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
   absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
   `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
-- [T3] **Backend: `rc-undef` cause #2 (item 13) — SECOND MANIFESTATION found + MISDIAGNOSIS
-  corrected (2026-08-02).** The `seqvm.c draw_frame` trip is NOT a premature kill flag (that
+- [T5] **Backend: `rc-undef` cause #2 (item 13) — SECOND MANIFESTATION found + MISDIAGNOSIS
+  corrected (2026-08-02).** (Re-ranked T3→T5 2026-08-04: the evidence is folded into the item-13
+  issue body (`412fe4e`, repro re-verified — same 2 errors, slots 736B/1480B now recorded); the
+  residual is the decide-whether-to-attempt-the-toolchain-wide-fix judgment — user-consulted.) The `seqvm.c draw_frame` trip is NOT a premature kill flag (that
   was the initial read of the physical MIR, filed as T4). Vreg-level MIR settles it: the value
   is built with the `undef %N.sublo:imag16 = COPY …` idiom, so its HIGH lane is undefined **by
   construction** — `480B undef %371.sublo = COPY %91.subhi` → `712B undef %375.sublo = COPY
@@ -196,8 +213,12 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   rather than patched. Repro: `mos-clang --config mos-snes.cfg -mcpu=mosw65816 -Xclang
   -target-feature -Xclang +mos-a16 -Os -fno-lto -mllvm -verify-machineinstrs -c
   examples/snes/seqvm.c` (2 errors: `$rc3` bb.2, `$rc5` bb.5; clean at `-O0`/`-Oz`).
-  (T3: analysis complete and recorded; remaining work is folding this evidence into the
-  item-13 upstream issue and, separately, deciding whether to attempt the toolchain-wide fix.)
+  ~~Folded into the item-13 issue body 2026-08-04~~ — [issue
+  body](docs/upstream-rc-undef-ra-pure-virtual-issue.md) now carries the vreg chain, the
+  store-consumer delta, the withdrawn misdiagnosis, the ruled-out `-enable-subreg-liveness`,
+  and the repro re-verified against the current toolchain (2 errors at `-Os`, clean
+  `-O0`/`-Oz`); status-doc row 13 updated, issue **NOT POSTED** (filing is user-triggered).
+  (T3: **residual = decide whether to attempt the toolchain-wide fix** — nothing else open.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -365,7 +386,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [compare-operand-fold plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md) ·
   [full-native materialize plan](docs/plans/2026-06-18-321-native-s16-eq-as-value-full-native-materialize.md) ·
   [Option B rol-tail proof](docs/plans/2026-06-18-prove-option-b-rol-tail-materialization-for-native.md).
-- [x] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** (P0/P1/P2 all DONE 2026-06-17/18; P3 is a user-triggered upstream issue — see Upstream.) The F3 `Ac16`
+- [x] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** (P0/P1/P2 all DONE 2026-06-17/18.) The F3 `Ac16`
   spill fix landed on **both** stacks, but the soft-stack half was found only by a hand-written recursive
   reproducer — the **fuzzer never reaches it**: `gen_funcs` emits only leaf functions (`expr(pure=True)`
   excludes the `call` leaf), so the call graph is acyclic → `MOSNonReentrant` marks every function
@@ -384,10 +405,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `dev/a16spillir.sh`: an `llc` gate (verify-clean + `STStk/LDStk $a16` present), drift-immune companion
   to `a16spillr.c`; test-only, no vendor change
   ([P2 plan](docs/plans/2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)).
-  P3 (optional, upstream, not #321): `__attribute__((reentrant))` can't force the soft
-  stack — ~~file an issue~~ **issue DRAFTED + source-verified
-  ([docs/321-upstream-reentrant-soft-stack-issue.md](docs/321-upstream-reentrant-soft-stack-issue.md));
-  filing is user-triggered**. [plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
+  Independent finding: `__attribute__((reentrant))` can't force the soft stack. It is not part of #321;
+  its **source-verified issue body is ready to file** at
+  [docs/upstream-reentrant-soft-stack-issue.md](docs/upstream-reentrant-soft-stack-issue.md), with filing
+  user-triggered. [coverage plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
 - [x] **#321 native s16 — agreed optimization order (after load-fold).** (DONE — every slice shipped or measured-WON'T-DO; (7) HW-stack ABI is upstream-gated.) ~~(2) 16-bit compares/branches~~
   (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
   `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
@@ -592,7 +613,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   - [x] ~~**#107 bitweave** (Round 6, Cluster D) — Serial Bit-Reversal Weave: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) via a serial **rotate-out/rotate-in carry loop** bit-reversal (`rev=(rev<<1)|(v&1); v>>=1`), loop-carried through the back edge — an 8-bit + a 16-bit reversal interleaved (two rev regs live). NO `__builtin_bitreverse` (the #54 bitshuffle contrast). DEFAULT-8-bit leg load-bearing. **Clean positive, fix holds:** bit-reversal is an INVOLUTION, gate folds `rev(rev(v))^v` self-check witness; default-8bit compiles clean `asl/rol/lsr/ror=20`, `host==default==+mos-a16==+mos-xy16==0x0E03`, `-verify` clean ×3 (incl. default).~~ ✓ [/snes/bitweave/](https://biohack.net/snes/bitweave/) ([plan](docs/plans/2026-07-02-107-snes-bitweave.md))
   - [x] ~~**#108 uarteye** (Round 6, Cluster D, FINAL) — Bit-Banged UART Eye: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) via a software-UART framing loop — a byte framed (start+8data+stop) and shifted OUT of a carry-rotated TX register + INTO a carry-rotated RX register (two loop-carried shift registers). TX→RX round-trip is the identity (verified all 256 bytes) → gate folds `roundtrip(b)^b` self-check witness. DEFAULT-8-bit leg load-bearing. **Clean positive, fix holds:** default-8bit compiles clean `asl/rol/lsr/ror=19`, `host==default==+mos-a16==+mos-xy16==0x3F09`, `-verify` clean ×3 (incl. default). Renders a clean oscilloscope eye. **Completes Cluster D** — 0010 guarded across bit-serial CRCs (#105), dual LFSR (#106), serial bit-reversal (#107), UART framing (#108).~~ ✓ [/snes/uarteye/](https://biohack.net/snes/uarteye/) ([plan](docs/plans/2026-07-02-108-snes-uarteye.md))
   - [x] ~~**#109 pcooker** (Round 6, Cluster E) — Pressure-Cooker Fixed-Point Evaluator: re-stresses patch 0011 (scavenger-$p) — a giant straight-line int32 fixed-point expression per pixel (a dozen live temps) whose compare's N/Z is consumed in the final select AFTER several __mulsi3/__divsi3 calls, forcing the compare live across the call-clobber. a16/xy16 legs load-bearing (0011 accum-gated). **Clean positive, fix holds:** `__mulsi3=6`, `__divsi3=4`, `rep/sep=38`, `host==default==+mos-a16==+mos-xy16==0xEE6D`, `-verify` clean ×3. Renders a circular level-set implicit surface. (Heavy eval → both legs read frame 1500; corpus set at startup, preview timing only.)~~ ✓ [/snes/pcooker/](https://biohack.net/snes/pcooker/) ([plan](docs/plans/2026-07-02-109-snes-pcooker.md))
-  - [x] ~~**#110 borrowlad** (Round 6, Cluster E) — Borrow-Ladder Odometer: re-stresses patch 0012 (LDCImm-set) — a 128-bit descending odometer (8×16-bit limbs) from chained 16-bit subtracts-with-borrow whose carry-in is a set/clear i1 (`SEC` / `LDCImm 1`) before the SBC chain, borrows rippling. a16/xy16 legs load-bearing. **Clean positive, fix holds:** `sbc=4`, `sec=1` (the set-i1 carry-in), `rep/sep=14`, `host==default==+mos-a16==+mos-xy16==0x1BE3`, `-verify` clean ×3. Renders a 128-bit binary counter ticking down.~~ ✓ [/snes/borrowlad/](https://biohack.net/snes/borrowlad/) ([plan](docs/plans/2026-07-02-110-snes-borrowlad.md))
+  - [x] ~~**#110 borrowlad** (Round 6, Cluster E) — Borrow-Ladder Odometer: a 128-bit descending odometer (8×16-bit limbs) from chained subtracts-with-borrow, with borrows rippling across limbs. This is an a16/xy16 native-width subtraction demo, not the regression for baseline patch 0012; that fix now has a direct `mos65c02` MIR test. **Clean positive:** `sbc=4`, `sec=1`, `rep/sep=14`, `host==default==+mos-a16==+mos-xy16==0x1BE3`, `-verify` clean ×3. Renders a 128-bit binary counter ticking down.~~ ✓ [/snes/borrowlad/](https://biohack.net/snes/borrowlad/) ([plan](docs/plans/2026-07-02-110-snes-borrowlad.md))
   - [x] ~~**#97 spaceship** (Round 6, Cluster B) — Width-Sweep Sort Gallery: re-stresses patch 0016 (#46 G_SCMP three-way compare → lowerThreewayCompare) at s16/s32/s64 via qsort callbacks returning (a>b)-(a<b) at int8/16/32/64 keys (s32+s64 are widths qsortviz never reached; qsort keeps the scmp from folding away). **Clean positive, fix holds:** IR probe `llvm.scmp=8` incl. `scmp.i64=2`, `host==default==+mos-a16==+mos-xy16==0xF20F`, `-verify` clean.~~ ✓ [/snes/spaceship/](https://biohack.net/snes/spaceship/) ([plan](docs/plans/2026-07-02-97-snes-spaceship.md))
   - [x] ~~**#93 ovmove** (Round 6, Cluster A, first-picks intersection) — Overlap-Move Mosaic: re-stresses the #23/patch-0002 +mos-xy16 in-place-memmove REP/SEP index-width fix + #79's both-direction G_MEMMOVE, escalated to a 384-byte (>256) buffer so the SDK memmove indexes with a 16-bit X (four overlapping memmoves/step, ascending+descending). **Clean positive, fix holds:** `memmove-refs=4`, `host==default==+mos-a16==+mos-xy16==0xA990`, `-verify` clean.~~ ✓ [/snes/ovmove/](https://biohack.net/snes/ovmove/) ([plan](docs/plans/2026-07-02-93-snes-ovmove.md))
   - [x] ~~**#94 rotslab** (Round 6, Cluster A) — In-Place Block Rotate: re-stresses patch 0002 (`MOSInsertREPSEP::placeIntraBlock`, the #23 +mos-xy16 index-width fix) from a DIFFERENT angle than #93 — a hand-written three-reversal rotate (`rev[0,k)·rev[k,n)·rev[0,n)`) of a 384-entry `uint16_t` buffer, NO memmove libcall. The reversal's 16-bit `buf[lo]↔buf[hi]` swaps lower to ZP-indirect access bracketed by `rep #$20`/`sep #$20` width transitions (the placeIntraBlock path). **Clean positive, fix holds:** `rep/sep=48`, xy16 compiles clean, `host==default==+mos-a16==+mos-xy16==0xB93A`, `-verify` clean ×2. Measured aside: runtime `k%=n` folds away (`k≤34<384`) — correct opt, not the corner.~~ ✓ [/snes/rotslab/](https://biohack.net/snes/rotslab/) ([plan](docs/plans/2026-07-02-94-snes-rotslab.md))
@@ -872,15 +893,23 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   Wave-ordered sequencing + per-item mechanics in
   [docs/plans/2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md):
   **Wave 2 next** — issues
-  (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0012`/`0015` — user
-  judgment: post with honest framing vs hold for #321), **Wave 4** design notes (#320 ABI → far-CC →
+  (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0012`/`0015` — `0012` **decided
+  2026-08-04: HOLD**, post paired with `0011` once the open queue (#577–#587, currently zero
+  maintainer engagement) shows life; producer-normalization decoupling DONE (`0027`). `0011`/`0015`
+  still user judgment), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
-- [T2] **Upstream the `MVN`/`MVP` block-move bank-order MC fix (`0020`).** The svx2 video work
-  found and fixed an llvm-mos 65816 `MVN` operand-encoding defect (bank order in the MC
-  instruction format) — fix + opcode regression already carried as
-  `patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch`. Remaining is submission polish
-- [T5] **COP-only upstream complement — draft branch needs reduction against PR #586 before the
-  post.** History: this session implemented BRK+COP together on `mos-65816-cop-brk-signature`
+- [T5] **Post the COP-only PR — REDUCTION DONE 2026-08-04, ready to post (user-triggered).**
+  Branch `mos-65816-cop-mnemonic` @ `3ac109760642` in `~/llvm-mos` (cut from upstream main,
+  independent of #586 — cites it; NOT pushed); body rewritten COP-only (`44d0274`) with
+  self-stripping post commands in the [draft's banner](docs/upstream-cop-brk-signature-pr.md).
+  Red/green proven per test; MC suite 39/40 (`addr-asciz.s` pre-existing, stash-proven); the new
+  `cop-signature.s` `mos65el02` RUN line is the load-bearing predicate guard. **Design DECIDED
+  2026-08-04 (T5 call, re-ranked T5→T2 — the decision was the T5 part):
+  MANDATORY operand, the fork's `0002` shape** — single `Inst16<"cop", Opcode<0x02>, Immediate>,
+  InstUnconditionalBranch` under `HasW65816`, decoder-visible (faithful 2-byte `cop #imm`
+  disassembly; the BRK 1-byte compat argument doesn't apply to 65816-only `$02`), bare `cop`
+  rejected (WDC requires the operand; a 1-byte `cop` eats the next opcode). Full reduction spec in
+  the [draft's banner](docs/upstream-cop-brk-signature-pr.md). Posting stays user-triggered. History: this session implemented BRK+COP together on `mos-65816-cop-brk-signature`
   (`61c07100970c`, local in `~/llvm-mos`, never pushed; MC suite 39/40, lone failure proven
   pre-existing; `FeatureW65816`-gated COP — `$02` is `NXT` on the 65EL02). Meanwhile the
   [split-ownership plan](docs/plans/2026-08-04-split-brk-cop-patch-ownership.md) posted the **BRK
@@ -890,9 +919,21 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   (T5, user-triggered post):** reduce `61c07100970c` to the COP-only complement (drop the
   now-duplicate `BRK_Immediate` hunk + BRK test lines, cite #586) or re-cut atop #586's branch,
   then post — the status doc tracks it under *Future / blocked* ("MC-layer `cop` mnemonic").
+  **Review additions (2026-08-04), fold into the reduction:** (1) the fork's `0002` COP design
+  **diverges from the draft** — mandatory operand, decoder-visible (`$02` decodes as 2-byte
+  `cop #imm`), `InstUnconditionalBranch` — vs the draft's optional-operand / `isAsmParserOnly` /
+  1-byte decode; resolve optional-vs-mandatory first, the two artifacts contradict each other.
+  (2) Add a `mos65el02` negative RUN line — `asm-errors.s` runs only at `-mcpu=mos6502`, so no lit
+  test currently guards `FeatureW65816` vs the shared predicate. (3) Carry the split-dropped
+  `brk-cop-signature.s` coverage (bare-form pins, expression operand, `$7f` boundary, second-CPU
+  RUN line).
   Also riding here: the BRK/COP *disassembly*-length follow-up (offered in the draft PR body,
   deliberately unbundled). [Draft body + research](docs/upstream-cop-brk-signature-pr.md) ·
   [plan](docs/plans/2026-08-04-mos-brk-cop-signature-byte-assembler.md).
+- [T2] **Upstream the `MVN`/`MVP` block-move bank-order MC fix (`0020`).** The svx2 video work
+  found and fixed an llvm-mos 65816 `MVN` operand-encoding defect (bank order in the MC
+  instruction format) — fix + opcode regression already carried as
+  `patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch`. Remaining is submission polish
   (the five steps from the [svx2 plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)
   §Upstream compiler follow-up): reduce to the MC opcode test, confirm syntax + encoded byte
   order against WDC docs and llvm-mos asm conventions, run the focused MC test + relevant suite,
@@ -925,6 +966,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 4) · bodies
   [scavenger](docs/upstream-scavenger-live-p-pr.md) + [LDCImm](docs/upstream-ldcimm-set-lowering-pr.md) ·
   [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
+  **HOLD (user decision 2026-08-04):** post the pair only once the open queue (#577–#587,
+  currently zero maintainer engagement) shows life — `0012` standalone is declinable ("the
+  unreachable encodes an invariant"), paired with `0011` it is self-evident. `0012`'s body was
+  review-revised the same day (leads with the in-tree `!!Val` inconsistency + honest downstream
+  Origin + gallery link — status row 10). **Decoupling DONE 2026-08-04** (`357fe37`, standalone
+  patch `0027`): the fork's a16 selector now emits the sign-extended `-1`, so no fork build depends
+  on upstream's `0012` verdict — `0012` is optional pure hardening.
 - [wip T2] **DP-pointer-argument calling-convention crash — reported + FIXED upstream** — ✅ **issue
   [#561](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22) + fix [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563)
   (2026-06-23, `Fixes #561` → auto-closes on merge).** Passing an `addrspace(1)` (8-bit direct-page) pointer
@@ -1165,6 +1213,9 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-04 — [round7-battery] Round 7 complete, 22/22 ROMs; #141 dpbank forced the ISR D/DBR envelope EXTEND (`0026`). See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md).
+- [x] 2026-08-04 — [dither-bayer] Confirmed on shipped Apollo corpus: 6.49 pts (78.91→72.42%) at 0.48 dB; rule ≤0.5 dB→Bayer, ≥2 dB→Floyd. See [plan](docs/plans/2026-08-03-interframe-crossover.md).
+- [x] 2026-08-04 — [sbc-carry-normalize] a16 G_SUB carry-in 1→−1 (`357fe37`, patch `0027`); LDCImm 1 gone, `0012` now optional hardening. See [status row 10](docs/upstream-contribution-status.md).
 - [x] 2026-08-04 — [gaddsub-lanes] Verdict (b): s16 add lanes LOSE (+281 B corpus; marshalling dominates) — byte chain deliberate, now documented. See [investigation](docs/investigations/2026-08-04-g-add-sub-s16-lanes.md).
 - [x] 2026-08-04 — [interframe-crossover] P0–P2 done: chooser can't hold 60 fps (φ budget spent by K=120); decided don't-build; dither is the lever. See [plan](docs/plans/2026-08-03-interframe-crossover.md).
 - [x] 2026-08-04 — [cutlabels-verify] All 8 steps PASS (host metadata rejects; ordered 0/1/2/0 latch; cut captures label-correct on the *same* presentation; six transport replays, 0 slips; loop-time reset fires only on the sequential loop; 3,822/3,822 at cadence 1; 9,177-field endurance; labels ROM-resident, absent from site/player). Reproduced on the stable 900-frame HiROM reel — the 1,800-frame 59.94 fps cartridge has no asset recipe in-tree. See [plan](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md).
@@ -2031,9 +2082,14 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** Publishing to biohack.net / indri.studio (user-gated follow-up). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:4b71ee8c13a90d5b -->
 - [ ] **(triage)** MAME leg (SKIP-by-design without the SPC700 IPL). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:bc642b4b5ab8d2bf -->
 - [ ] **(triage)** H-mode (per-scanline) IRQ. At ~262 IRQs/frame the C ISR prologue alone exceeds a scanline, so — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:8974b954bfca2a54 -->
+- [ ] Retire `0024-mos-brk-signature-operand.patch` and bump the vendor pin when [llvm-mos PR #586](https://github.com/llvm-mos/llvm-mos/pull/586) merges. COP remains separately carried in `0002`. <!-- fp:83367950e9cfe689 -->
 <!-- triaged 2026-08-04: two COP/BRK-plan Out-of-scope bullets.
      • BRK/COP disassembly-length change -> rides the curated [T5] "COP-only upstream complement"
        bullet (Upstream / Contribution) as a named follow-up; not a separate item.
      • wdm's mandatory operand -> recorded non-finding (already matches ca65, untouched);
        non-work. -->
+- [ ] **(triage)** Publishing to biohack.net / indri.studio (user-gated follow-up). — _from [2026-08-04-141-snes-dpbank.md](docs/plans/2026-08-04-141-snes-dpbank.md)_  <!-- fp:f6c1864ba5ae0447 -->
+- [ ] **(triage)** MAME leg (SKIP-by-design without the SPC700 IPL). — _from [2026-08-04-141-snes-dpbank.md](docs/plans/2026-08-04-141-snes-dpbank.md)_  <!-- fp:f83c9b7c63ac345f -->
+- [ ] **(triage)** The `docs/upstream-contribution-status.md` pointer for the envelope extension: that file — _from [2026-08-04-141-snes-dpbank.md](docs/plans/2026-08-04-141-snes-dpbank.md)_  <!-- fp:a39e5add49045fa2 -->
+- [ ] **(triage)** COP/BRK/IRQ vectors re-exercised under D/DBR windows: the envelope is shared code emitted per — _from [2026-08-04-141-snes-dpbank.md](docs/plans/2026-08-04-141-snes-dpbank.md)_  <!-- fp:02591359511db2d6 -->
 <!-- END auto-captured-deferrals -->

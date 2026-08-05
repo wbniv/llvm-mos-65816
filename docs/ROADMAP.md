@@ -92,14 +92,17 @@ real far-pointer codegen and becomes the regression baseline for M2.
 
 ### M2 — the optimizing payoff
 
-Add **[#321](https://github.com/llvm-mos/llvm-mos/issues/321) stage 1** — 16-bit accumulator:
-model X/Y/C as 16-bit and A as 8-bit; insert `REP`/`SEP` at a late codegen stage from the register
-widths each instruction needs. X/Y stay 16-bit (xy16). Build on the
+Add the opt-in native-width implementation tracked by
+**[#321](https://github.com/llvm-mos/llvm-mos/issues/321)**: model X/Y/C as 16-bit and A as 8-bit;
+insert `REP`/`SEP` at a late codegen stage from the widths each instruction needs; track M/X across
+control flow and ABI boundaries; and preserve unknown M/X state across interrupt entry. Build on the
 [jackoalan REP/SEP POC](https://github.com/jackoalan/llvm-mos/commit/ec070a70ba8d8b3d3a9da24b4216435f9575f6bb).
-Then: hardware-stack ABI (16-bit SP + stack-relative addressing) and the calling convention.
+The implemented feature surface is `+mos-a16` plus `+mos-xy16`; it remains local in holistic patch
+`0002`, with no upstream PR yet. See the [upstream PR blueprint](321-upstream-native-width-pr.md).
 
-**Later / out of initial scope:** #321 stage 2 (xy8/xy16 switching — asiekierka: "may well be a
-pipe dream with our current resources").
+**Later / out of current scope:** allocating mixed XY8/XY16 values and switching widths as an
+optimization beyond the opt-in `+mos-xy16` mode (asiekierka originally described this as a possible
+second stage).
 
 ## Calling-convention decision — frame RESOLVED (phased) 2026-06-18
 

@@ -74,7 +74,8 @@ notes that open the ABI conversation, then the big series that depends on it.
 
 ### Wave 2 — issues (no code, low friction)
 
-4. **`reentrant` can't force the soft stack** — [`docs/321-upstream-reentrant-soft-stack-issue.md`](../321-upstream-reentrant-soft-stack-issue.md).
+4. **`reentrant` can't force the soft stack** — independent of #321; issue body ready at
+   [`docs/upstream-reentrant-soft-stack-issue.md`](../upstream-reentrant-soft-stack-issue.md).
 5. **rc-undef-ra-pure-virtual verifier reject** (generic sub-register-undef liveness; deliberately an
    issue, not a blind patch) — [`docs/upstream-rc-undef-ra-pure-virtual-issue.md`](../upstream-rc-undef-ra-pure-virtual-issue.md).
 
@@ -88,10 +89,10 @@ notes that open the ABI conversation, then the big series that depends on it.
 
 ### Wave 3 — a16-reachable crash fixes (user judgment wanted)
 
-`0011` (scavenger live-`$p`), `0012` (`LDCImm` set lowering), `0015` (coalesce-rc-undef guard) are
-**latent stock bugs** whose only current trigger path goes through the fork's `+mos-a16`/`+mos-xy16` —
-i.e. honest framing is "hardening for a crash reachable via in-flight 65816 work". All three apply
-clean to tip and are small, self-contained, obviously-safe changes with lit tests. **Decision for the
+`0011` (scavenger live-`$p`) and `0015` (coalesce-rc-undef guard) are latent stock bugs whose current
+trigger paths go through the fork's `+mos-a16`/`+mos-xy16`. `0012` is instead a baseline MOS MC-lowering
+contract, now covered directly by a `mos65c02` MIR test. All three are small, self-contained changes.
+**Decision for the
 user:** post them in this wave with that framing (recommended — they are maintainer-friendly and shrink
 the eventual #321 series), or hold them to ride the #321 series itself.
 
@@ -139,7 +140,7 @@ For each artifact, at posting time and **only after user go-ahead**:
    | `0016` scmp/ucmp | [qsortviz](https://biohack.net/snes/qsortviz/) (finder) · [spaceship](https://biohack.net/snes/spaceship/) · [ucmprank](https://biohack.net/snes/ucmprank/) · [trimerge](https://biohack.net/snes/trimerge/) · [keycmp64](https://biohack.net/snes/keycmp64/) |
    | `0010` coalesce-rotate-Ac | [crcwall](https://biohack.net/snes/crcwall/) · [lfsr2](https://biohack.net/snes/lfsr2/) · [bitweave](https://biohack.net/snes/bitweave/) · [uarteye](https://biohack.net/snes/uarteye/) (Cluster D; default-8-bit leg load-bearing) |
    | `0011` scavenger live-`$p` | [pcooker](https://biohack.net/snes/pcooker/) (#109 re-stress) |
-   | `0012` LDCImm set | [borrowlad](https://biohack.net/snes/borrowlad/) (#110 re-stress) |
+   | `0012` LDCImm set | baseline `mos65c02` `asm-printer.mir` regression; no ROM claimed |
    | `0015` coalesce-rc-undef | [newton](https://biohack.net/snes/newton/) (validated `0x4D8B`) |
    | `0017` s64 (un)merge | [dhmix](https://biohack.net/snes/dhmix/) (finder) · [mulov64](https://biohack.net/snes/mulov64/) · [oddmask](https://biohack.net/snes/oddmask/) · [modexp256](https://biohack.net/snes/modexp256/) |
 

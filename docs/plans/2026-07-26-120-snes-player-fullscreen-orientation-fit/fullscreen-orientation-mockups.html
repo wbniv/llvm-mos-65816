@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SNES fullscreen orientation fit mockups</title>
+<style>
+  :root { color-scheme: dark; --ink:#edf3ee; --muted:#91a29a; --edge:#31443b; --ok:#54d98c; --bad:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:32px; background:#0a0f0c; color:var(--ink); font:14px/1.5 ui-monospace,monospace; }
+  header { max-width:1080px; margin:0 auto 28px; }
+  h1 { margin:0 0 8px; font:700 clamp(24px,4vw,42px)/1.05 system-ui,sans-serif; letter-spacing:-.03em; }
+  p { color:var(--muted); max-width:75ch; }
+  .legend { display:flex; gap:18px; flex-wrap:wrap; margin-top:16px; }
+  .legend span::before { content:""; display:inline-block; width:10px; height:10px; margin-right:7px; }
+  .safe::before { background:#183a2a; } .frame::before { background:#2563a9; } .bar::before { background:#000; border:1px solid #333; }
+  main { max-width:1080px; margin:auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+  article { padding:18px; border:1px solid var(--edge); border-radius:14px; background:#101713; }
+  h2 { margin:0 0 12px; font:650 16px system-ui,sans-serif; }
+  .device { position:relative; margin:auto; border:7px solid #526158; border-radius:22px; background:#000; overflow:hidden; box-shadow:0 16px 50px #0008; }
+  .landscape { width:min(100%,500px); aspect-ratio:844/390; }
+  .portrait { width:min(72%,270px); aspect-ratio:390/844; }
+  .stage { position:absolute; inset:0; display:grid; place-items:center; background:#000; }
+  .snes { position:relative; width:min(100%,calc(100% * 8 / 7)); max-height:100%; aspect-ratio:8/7;
+          background:linear-gradient(#071729 0 19%,#111d3a 19% 73%,#17331f 73%); overflow:hidden; }
+  .landscape .snes { height:100%; width:auto; }
+  .stars { position:absolute; inset:0; background-image:radial-gradient(#fff 1px,transparent 1px); background-size:31px 27px; opacity:.35; }
+  .hud { position:absolute; inset:4% 5% auto; display:flex; justify-content:space-between; color:#fff; font-size:clamp(5px,1.1vw,11px); }
+  .aliens { position:absolute; left:20%; right:20%; top:29%; display:grid; grid-template-columns:repeat(7,1fr); gap:8%; }
+  .aliens i { display:block; aspect-ratio:1.3; background:#61e6a2; clip-path:polygon(15% 0,85% 0,100% 40%,85% 80%,65% 65%,50% 100%,35% 65%,15% 80%,0 40%); }
+  .ship { position:absolute; width:12%; height:4%; left:44%; bottom:6%; background:#fff; }
+  .scan { position:absolute; left:0; right:0; height:2px; background:#f8df63; }
+  .scan.top { top:0; } .scan.bottom { bottom:0; }
+  .extent-frame { box-shadow:0 -2px #42f5e6,0 2px #42f5e6,-1px 0 #42f5e688,1px 0 #42f5e688; }
+  .note { margin:12px 0 0; font-size:12px; color:var(--muted); }
+  .pass { color:var(--ok); } .fail { color:var(--bad); }
+  .notch { position:absolute; z-index:3; top:0; left:50%; translate:-50% 0; width:38%; height:24px; background:#526158; border-radius:0 0 14px 14px; }
+  .safe-box { position:absolute; inset:32px 8px 22px; outline:1px dashed #54d98c99; display:grid; place-items:center; }
+  .safe-box .snes { width:100%; height:auto; }
+  .wrong .snes { width:100%; height:100%; aspect-ratio:auto; transform:scaleY(1.48); }
+  .wrong::before,.wrong::after { content:"CLIPPED"; position:absolute; z-index:4; left:0; right:0; height:34px;
+    display:grid; place-items:center; background:#ff334488; color:white; font-weight:bold; }
+  .wrong::before { top:0; } .wrong::after { bottom:0; }
+  code { color:#b9d6c8; }
+  @media (max-width:720px) { body{padding:18px} main{grid-template-columns:1fr} .portrait{width:min(76%,270px)} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Fullscreen without cropping</h1>
+  <p>The SNES frame always remains 8:7 and wholly inside the usable fullscreen rectangle.
+     Rotation changes which dimension limits the fit; black letterboxing is expected.</p>
+  <div class="legend"><span class="safe">safe viewport</span><span class="frame">256×224 frame</span><span class="bar">letterbox</span></div>
+</header>
+<main>
+  <article>
+    <h2><span class="pass">✓</span> Landscape — height limited</h2>
+    <div class="device landscape"><div class="stage">
+      <div class="snes"><div class="stars"></div><div class="scan top"></div><div class="scan bottom"></div>
+        <div class="hud"><b>SCORE 01230</b><b>LIVES 3</b></div><div class="aliens"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="ship"></div>
+      </div>
+    </div></div>
+    <p class="note"><code>scale = viewportHeight / 224</code>. Side bars absorb the extra width.</p>
+  </article>
+  <article>
+    <h2><span class="pass">✓</span> Portrait — width limited</h2>
+    <div class="device portrait"><div class="stage">
+      <div class="snes"><div class="stars"></div><div class="scan top"></div><div class="scan bottom"></div>
+        <div class="hud"><b>SCORE 01230</b><b>LIVES 3</b></div><div class="aliens"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="ship"></div>
+      </div>
+    </div></div>
+    <p class="note"><code>scale = viewportWidth / 256</code>. Both yellow edge scanlines remain visible.</p>
+  </article>
+  <article>
+    <h2><span class="pass">✓</span> Portrait with safe areas</h2>
+    <div class="device portrait"><div class="notch"></div><div class="stage"><div class="safe-box">
+      <div class="snes"><div class="stars"></div><div class="scan top"></div><div class="scan bottom"></div>
+        <div class="hud"><b>SCORE 01230</b><b>LIVES 3</b></div><div class="aliens"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="ship"></div>
+      </div>
+    </div></div></div>
+    <p class="note">The dashed rectangle excludes notch and home-indicator insets before fitting.</p>
+  </article>
+  <article>
+    <h2><span class="pass">✓</span> Test flag — exact video extents</h2>
+    <div class="device portrait"><div class="stage">
+      <div class="snes extent-frame"><div class="stars"></div>
+        <div class="hud"><b>SCORE 01230</b><b>LIVES 3</b></div><div class="aliens"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="ship"></div>
+      </div>
+    </div></div>
+    <p class="note"><code>?video-frame=1</code> draws cyan rules outside the canvas. Top and bottom are strongest; no SNES pixels are covered.</p>
+  </article>
+  <article>
+    <h2><span class="fail">✕</span> Old portrait behavior</h2>
+    <div class="device portrait"><div class="stage wrong">
+      <div class="snes"><div class="stars"></div><div class="scan top"></div><div class="scan bottom"></div>
+        <div class="hud"><b>SCORE 01230</b><b>LIVES 3</b></div><div class="aliens"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="ship"></div>
+      </div>
+    </div></div>
+    <p class="note"><code>height:100%</code> survives rotation while width becomes limiting, clipping both ends.</p>
+  </article>
+</main>
+</body>
+</html>

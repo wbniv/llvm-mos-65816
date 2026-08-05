@@ -27,7 +27,7 @@
 
 ## Project (inherited from ~)
 
-- [Home/SRC layout post-reformat](home_src_layout.md) — Projects moved ~/SRC/<name> → ~/<name> post-reformat; projects.json + hook-runner still assume ~/SRC (hook-runner patched via symlink)
+- [Flat homedir layout](home_src_layout.md) — ~/SRC is gone; every project lives at ~/<name>, shared docs at ~/CLAUDE.md + ~/docs/ — never recreate an SRC compat path
 - [Laptop comparison investigation](laptop-comparison-investigation.md) — 32GB eBay laptop compare; deliverable done in docs/investigations; open TODO = send #7 pick link (phone/Trello/email all blocked)
 
 ## Feedback (inherited from ~)

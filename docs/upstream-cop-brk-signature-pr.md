@@ -18,20 +18,18 @@
      shape, validated by the #140 brkcop demo gates. Full ruling history: git blame ceead8d on this
      file, and docs/plans/2026-08-04-split-brk-cop-patch-ownership.md.
 
-     Status: DRAFTED 2026-08-04, NOT POSTED, BRANCH NOT PUSHED (posting is user-triggered).
+     Status: ✅ POSTED 2026-08-04 as https://github.com/llvm-mos/llvm-mos/pull/588 (user-triggered
+     "publish the PR"; branch pushed + PR created same session; body below is the as-posted text,
+     including the de-forked a16/xy16 soak-coverage wording, cb87da8).
      Branch: mos-65816-cop-mnemonic, cut from upstream main 1f334fef02b5, one commit
      3ac109760642, living locally in ~/llvm-mos. Verified in ~/llvm-mos/build-pr (MOS-only,
      Release+asserts): TableGen/build clean (no decoder conflict -- $02 has exactly one
      decoder-visible def per predicate), all new/changed tests proven red-before/green-after, MC
      suite 39/40, the single failure (addr-asciz.s) proven pre-existing by stashing the change and
      re-running on pristine upstream.
-     PRE-FLIGHT (checked 2026-08-04): the body's "(source)" link
-     https://github.com/wbniv/llvm-mos-65816/blob/main/examples/snes/brkcop.c currently 404s —
-     brkcop.c exists only in LOCAL main (commit 304f3c3; local is 39 commits ahead of origin).
-     Before posting, either push this repo's main (coordinate first — hot shared tree, push is
-     user-gated) or re-verify the link; do not post with the dead link. The demo page link
-     (biohack.net/snes/brkcop/) is live (HTTP 200).
-     Post commands (user-triggered):
+     PRE-FLIGHT resolved 2026-08-04: the user pushed this repo's main, and the "(source)" link
+     verified HTTP 200 before posting. Both links live.
+     Post commands (as executed):
        git -C ~/llvm-mos push origin mos-65816-cop-mnemonic
        gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-65816-cop-mnemonic --base main \
          --title "[MOS] Add the COP mnemonic with a mandatory signature operand" \

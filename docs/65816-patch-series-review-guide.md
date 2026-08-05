@@ -77,7 +77,7 @@ source change.
 | Patch | Issue · M | LOC | What it does | Risk |
 |-------|-----------|----:|--------------|------|
 | **0001** far‑addrspace | #320 · M1 | 1471 | `addrspace(2)` far pointers: 32-bit ptr holding a 24-bit address; far load/store/deref/cast/arith (`lda long`), far calls (`JSL`/`RTL`), far function pointers, the clang `__far` surface | **High** — new address space, clang + backend |
-| **0002** accum16 | #321 · M2 | 4478 | The 16-bit accumulator: `+mos-a16` feature, the `MOSInsertREPSEP` mode-tracking pass, native s16 ALU / compares / shifts / load-store / chains, A16-threading, plus `+mos-xy16` 16-bit index regs | **High** — the core contribution |
+| **0002** native widths | #321 · M2 | 6154 | Complete opt-in native-width implementation: `+mos-a16`, `+mos-xy16`, native ALU/compare/shift/load-store forms, cross-block `MOSInsertREPSEP` M/X tracking, ABI boundaries, and deterministic full-register ISR preservation | **High** — the core contribution; local, no PR yet |
 | **0003** txy‑dead‑flag | [upstream](#appendix-d--upstream-bug-fixes--status) | 71 | One-line peephole fix: reusing a dead `LDImm` as `TXY`/`TYX` must clear the source's dead flag | **Trivial** — bug fix + MIR test |
 | **0004** far‑cc | #320 · M1 | 509 | Far-pointer **calling convention**: pass/return `addrspace(2)` in one `Imag32` ZP reg (winner of a 4-variant bake-off) | Medium |
 | **0005** far‑value‑legalize | #320 · M1 | 24 | One legalizer hunk: a far pointer held *as a value* (not just an access ptr) is a legal load/store value type. Split out because it is `+mos-a16`-context-entangled | Trivial |
@@ -87,12 +87,12 @@ source change.
 | **0009** a16‑pressure‑incdec | #321 · M2 | 48 | Fixes a `+mos-a16 -O1/-Os` regalloc deadlock on real code (`globals.c`): lower a small-constant i8 add/sub (`\|amt\|≤2`) to a relocatable `G_INC`/`G_DEC` chain instead of A-pinned `ADCImm`, so a strength-reduced byte index can't pin the singleton `{A}` across a 16-bit-accumulator transit. DEFAULT byte-identical | Low |
 | **0010** coalesce‑rotate‑Ac | [upstream](#appendix-d--upstream-bug-fixes--status) | 40 | Default-8bit register-**coalescer** correctness fix: refuse to coalesce two shift/rotate-referenced values into the A-only `Ac` class — pinning the loop-carried CRC-high byte to `A` stranded it in `Y` while the back-edge `ROL` read a stale `A`, a silent miscompile (both verifiers clean). Surfaced by the M2 zoom demo's differential | **Trivial** — bug fix + MIR test |
 | **0011** scavenger‑live‑`$p` | [upstream](#appendix-d--upstream-bug-fixes--status) | 210 | Register-**scavenger** correctness fix: preserve a live `$p` across an *unbalanced* stack range (a `+mos-a16` 16-bit compare keeps N/Z live across a frame-carry spill; `$p` has no GPR home → illegal `$p is not a GPR`). Route `$p` hard-stack-neutrally through a dead index reg into `RC17`; drop the stale `assertNZDeadAt`. DEFAULT byte-identical (only a16 pressure triggers it) | Low — bug fix + a16 gate |
-| **0012** ldcimm‑set‑lower | [upstream](#appendix-d--upstream-bug-fixes--status) | 29 | MC-lowering fix: `MOSMCInstLower` asserted a single `LDCImm` set encoding (`-1`), but a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` (asserts) / silent NDEBUG-UB. Lower any nonzero i1 as `SEC`. DEFAULT byte-identical, differential-neutral | **Trivial** — bug fix |
+| **0012** ldcimm‑set‑lower | [upstream](#appendix-d--upstream-bug-fixes--status) | 2 files | Baseline MC-lowering fix: `MOSMCInstLower` asserted a single `LDCImm` set encoding (`-1`), although its i1 immediate can be plain `1`. Lower any nonzero i1 as `SEC`; ordinary `mos65c02` MIR regression | **Trivial** — bug fix |
 
 Five patches (`0003`, `0008`, `0010`, `0011`, `0012`) are pure **upstream bug fixes** surfaced by this work and
 are independently postable; they are included so the stack applies clean. `0003`/`0008`/`0010` reproduce on the
-default 8-bit path; `0011`/`0012` are pristine-upstream defects that only the `+mos-a16` feature's longer flag
-live ranges actually trigger (so DEFAULT 8-bit codegen is byte-identical with them applied).
+default 8-bit path; `0011` currently needs the `+mos-a16` feature's longer flag live ranges to trigger.
+`0012` is a baseline MC-lowering contract with a direct `mos65c02` MIR regression.
 
 ### 1.2 The one invariant that makes this reviewable
 
@@ -176,11 +176,11 @@ property — [§3.2](#32-0002--321-16-bit-accumulator-m2), [§4](#4-cross-cuttin
 
 Solid arrow = real dependency (semantic, or shared-file context that must apply in order); dotted `surfaced` =
 this work *exposed* a pre-existing upstream bug but doesn't depend on the fix. The numeric order is the
-`git am` order. `0007`/`0008` stack at the top of the #320 column but are semantically standalone; `0009`,
-`0011`, `0012` sit in the **#321 column** because each is triggered **only by `+mos-a16`/`+mos-xy16`**
-(default 8-bit byte-identical): `0009` is an a16 selector fix layered on `0002`, and `0011` (register-scavenger
-live-`$p`) → `0012` (`LDCImm` MC lowering, exposed by fixing `0011`) are upstream defects only the 16-bit
-accumulator's longer flag live ranges reach. `0010` is the lone bug-fix **outside** both columns: a
+`git am` order. `0007`/`0008` stack at the top of the #320 column but are semantically standalone.
+`0009` is an a16 selector fix layered on `0002`; `0011` sits in the **#321 column** because its current
+trigger needs `+mos-a16`/`+mos-xy16`. `0012` was exposed after fixing `0011`, but is a baseline MOS
+MC-lowering contract proved directly by ordinary `mos65c02` MIR. `0010` is the lone bug-fix **outside**
+both columns: a
 **default-8bit** coalescer miscompile that changes ships-today codegen (no feature flag) — the M2 demo merely
 caught it.
 
@@ -202,7 +202,7 @@ flowchart TD
         P3["0003 TXY dead-flag (upstream fix)"]
         P9["0009 a16-pressure incdec<br/>de-pin i8 counter from A"]
         P11["0011 scavenger-live-$p<br/>route $p through RC17<br/>(upstream fix, a16-only)"]
-        P12["0012 LDCImm set-lower<br/>MC lowering<br/>(upstream fix, a16-only)"]
+        P12["0012 LDCImm set-lower<br/>baseline MC lowering<br/>(upstream fix)"]
     end
 
     P10["0010 coalesce-rotate-Ac<br/>default-8bit coalescer (upstream fix)"]
@@ -338,9 +338,16 @@ fork hacks<sup>[[C21]](#c21-far-value-residuals)</sup>.
 
 ### 3.2 `0002` — #321 16-bit accumulator (M2)
 
-This is the core contribution and the largest patch — the full diff is
+This is the core contribution and the largest patch. It remains local: upstream #321 is an issue,
+not an existing PR, and none of the current focused PRs (#577/#578/#579/#584) carries this work.
+When submitted, it should be described as the complete opt-in native-width implementation and
+reorganized into a reviewable commit series under one draft PR, not framed as a "first stage."
+The aggregate patch is also **not the eventual PR diff**: shared MOS files currently include #320
+far/packed-pointer and far-CC hunks, so upstream extraction must be hunk-level from a fresh base.
+See the [canonical PR blueprint and extraction audit](321-upstream-native-width-pr.md).
+The full diff is
 [`patches/llvm-mos/0002-321-accum16.patch`](https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0002-321-accum16.patch)
-(23 files across the MOS backend). It is best understood as: (1) a feature gate, (2) a mode-tracking pass,
+(34 backend/test files at the current revision). It is best understood as: (1) a feature gate, (2) a mode-tracking pass,
 (3) a coalescer-safe residency model, (4) a per-op native-s16 surface built increment by increment behind
 that model, (5) the same machinery extended to 16-bit index registers (`+mos-xy16`).
 
@@ -1146,7 +1153,7 @@ planned: [submission campaign](plans/2026-07-26-upstream-submission-campaign.md)
 | `0008` | the calling convention gives an 8-bit `addrspace(1)` direct-page pointer **argument** a 16-bit register → illegal size-mismatched `COPY` | yes (plain `mos6502`) | [#561](https://github.com/llvm-mos/llvm-mos/issues/561) → [PR&nbsp;#563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`) | **MERGED** (`8be054612`, #561 auto-closed) | ✅ done — `0008` dropped 2026-07-25 | `dp-pointer-arg.ll` |
 | `0010` | the register coalescer merges two rotate-referenced values into the A-only `Ac` class → strands a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (silent miscompile; both `-verify-machineinstrs`/`-verify-coalescing` clean) | yes (default-8bit `mosw65816`; standalone `llc`) | [PR draft](upstream-coalesce-rotate-ac-pr.md) (`wbniv:mos-coalesce-rotate-ac` to mint) | **DRAFTED · not posted** | drop `0010` + bump vendor pin | `coalesce-rotate-ac.mir` |
 | `0011` | `saveScavengerRegister` assumed N/Z dead + a live `$p` only balanced-saveable, but `+mos-a16` keeps a compare/ALU flag live across a frame-vreg spill in an unbalanced range → illegal `$p is not a GPR` + undefined-`$p` `PH $p` | yes (assert exposed by `+mos-a16`) | [PR draft](upstream-scavenger-live-p-pr.md) (`wbniv:mos-scavenger-live-p-save` to mint) | **DRAFTED · not posted** | drop `0011` + bump vendor pin | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
-| `0012` | `MOSMCInstLower` lowered `LDCImm` only for `0`/`-1`; a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG) | yes (`+mos-a16` 16-bit subtract; asserts build) | [PR draft](upstream-ldcimm-set-lowering-pr.md) (`wbniv:mos-ldcimm-set-lowering` to mint) | **DRAFTED · not posted** | drop `0012` + bump vendor pin | `a16scavnz` / a16 sub |
+| `0012` | `MOSMCInstLower` lowered `LDCImm` only for `0`/`-1`, although the i1 immediate can be plain `1` → `llvm_unreachable` on asserts / UB under NDEBUG | yes (baseline `mos65c02` `asm-printer.mir`; asserts build) | [PR draft](upstream-ldcimm-set-lowering-pr.md) (`wbniv:mos-ldcimm-set-lowering` to mint) | **DRAFTED · not posted** | drop `0012` + bump vendor pin | direct MIR test; no ROM claimed |
 
 Status enum: **POSTED·open** (live PR/issue) · **DRAFTED** (written; posting is user-triggered) · **MERGED**
 (then dropped from the stack) · **DEFERRED** (filed, not fixed). The **"repro on stock?"** column is what makes

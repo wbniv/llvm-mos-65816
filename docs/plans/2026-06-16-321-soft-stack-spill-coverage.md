@@ -114,11 +114,12 @@ differential check but depends on the front end + optimizer continuing to (a) ke
 hermetic crash-regression immune to front-end/optimizer drift. Complements, does not replace, the C
 test. (Same rationale the F3 plan used to keep both a compile-gate and the fuzzer value-check.)
 
-### P3 — Upstream note: `reentrant` cannot force the soft stack (optional, low priority, not #321) — **DRAFTED 2026-06-17**
+### Independent finding — `reentrant` cannot force the soft stack — **ISSUE READY**
 
 **Issue draft written + verified against the current vendor source (all four pivot points quoted from real
-code): [`docs/321-upstream-reentrant-soft-stack-issue.md`](../321-upstream-reentrant-soft-stack-issue.md).
-Filing is user-triggered; no fork patch (issue only).** The forward note (now superseded by that draft):
+code): [`docs/upstream-reentrant-soft-stack-issue.md`](../upstream-reentrant-soft-stack-issue.md).
+This is not a #321 deliverable; it merely surfaced during this coverage work. Filing is user-triggered;
+no fork patch (issue only).** The forward note (now superseded by that draft):
 
 Record the finding for upstream llvm-mos: `__attribute__((reentrant))` emits no IR marker
 (`CodeGenModule.cpp:2988` only suppresses the `-fnonreentrant` global default) and `MOSNonReentrant`
@@ -216,7 +217,8 @@ Steps 5–6 below are P1/P2 and are not yet started. The original spec follows v
 
 - The actual `xy16` 16-bit-index spill implementation — gated on the `xy16` increment (P1 only lays the
   tripwire).
-- Fixing the upstream `reentrant` attribute in-fork — P3 is a documented note / upstream issue, not a
+- Fixing the upstream `reentrant` attribute in-fork — the independent finding is a documented upstream
+  issue, not a
   fork patch.
 - Interrupt-reachability and `optnone`/`-O0` as alternative soft-stack triggers — recursion is the one
   the fuzzer can generate cleanly; the others add boilerplate or change codegen wholesale.

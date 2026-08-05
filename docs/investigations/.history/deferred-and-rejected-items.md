@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/de658f0) | docs: finish the stale-deferral sweep — propagate Phase-3 closure + fixed crashes |
 | [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/5bea574) | docs: sync living refs with patch 0009 (globals.c +mos-a16 RA crash FIXED) |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/f9a33d6) | #321 docs: reflect c-torture Phases 0+1 across the index docs |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/cfef277) | #321 docs: correct stale "corpus is 8-bit" claim on the scavenger XFAIL |
@@ -8,6 +9,11 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+de658f0	author	Will Norris
+de658f0	added	3
+de658f0	deleted	3
+de658f0	files	1
+de658f0	body	Completes the sweep started in 42ae119, propagating the 2026-06-26 state to the\nsecondary docs that still said "deferred"/"still XFAIL":\n\n  - ROADMAP.md: the "RA-level Ac16 residency stays deferred" + "one deferred core\n    (≡ pr15296 ZP-overflow)" framing -> CLOSED net-negative; pr15296 resolved; no\n    +mos-a16 register-pressure XFAILs remain\n  - deferred-and-rejected-items.md: Phase-3 row DEFERRED -> CLOSED (net-negative);\n    globals/pr15296 row "sibling still XFAIL" -> RESOLVED (stale); scavenger row\n    XFAIL/"deferral stands" -> FIXED (0011/0012, positive gate 0x22A6)\n  - plan-index.md: A16-threading "Phase 3 deferred" + the trigger-check summary ->\n    note trigger (b) fired and the spike measured residency net-negative (CLOSED)\n  - frameabi-census.sh: stale "xfail: regalloc-out-of-registers" defensive label\n    (fixed in 0009) -> "unexpected"\n\nCorrections only, no behavior change. Matches the already-updated TODO Watch,\nimplementation-status.md, README.md, a16scavnz.c header, and the spike+verdict doc.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011tDRoGK3T4gSGAHGBXk88B
 5bea574	author	Will Norris
 5bea574	added	3
 5bea574	deleted	3

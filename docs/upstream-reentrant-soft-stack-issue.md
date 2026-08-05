@@ -1,10 +1,4 @@
-# Upstream issue draft — `__attribute__((reentrant))` cannot force the soft (reentrant) stack
-
-> **Status: NOT filed.** Draft of an upstream llvm-mos *issue* (a design question / latent footgun, **not** a
-> miscompile for ordinary C). Per the soft-stack plan this is filed as an **issue only — no fork patch is
-> carried** (the safe behaviour for ordinary code is already correct). Surfaced while building #321
-> soft-stack fuzzer coverage, but **independent of #321**.
-> See [soft-stack plan §P3](plans/2026-06-16-321-soft-stack-spill-coverage.md).
+# `__attribute__((reentrant))` cannot force the soft (reentrant) stack
 
 | | |
 |---|---|
@@ -13,7 +7,6 @@
 | **Components** | `clang/lib/CodeGen/CodeGenModule.cpp`, `llvm/lib/Target/MOS/MOSNonReentrant.cpp`, `llvm/lib/Target/MOS/MOSFrameLowering.cpp` |
 | **Verified against** | current vendor tree (rolling `main`) — cited by symbol/quote since line numbers drift |
 | **Fork patch** | **none, intentionally** — issue only |
-| **File it** | `gh issue create --repo llvm-mos/llvm-mos --title "<title below>" --body-file <this file, status block stripped>` |
 
 ---
 
@@ -136,5 +129,5 @@ submitted patch.
 
 Found while building differential-fuzzer coverage of the WDC 65816 16-bit-accumulator (`+mos-a16`)
 soft-stack spill path. We needed the fuzzer to land generated functions on the soft stack; `reentrant`
-could not do it, so we used genuine recursion as the trigger instead — which is what surfaced this.
-Recording it upstream so it is not re-discovered from scratch.
+could not do it, so we used genuine recursion as the trigger instead. This issue is independent of that
+native-width work; it is recorded separately so the attribute behaviour is not rediscovered from scratch.

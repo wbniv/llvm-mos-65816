@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/5994dab) | upstream(wave-1): COMPLETE — 0010 posted as PR #578, DWARF step-6 as PR #579 |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/efe7ef4) | upstream(0010): staged — red/green proven, mos-coalesce-rotate-ac minted locally |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/ff79af7) | upstream(0016): POSTED — G_SCMP/G_UCMP legalization live as issue #576 + PR #577 |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/3b105d6) | docs(upstream): DWARF branch cherry-picks clean onto 8b616af94 — Wave 1 item 3 unblocked |
@@ -11,6 +12,11 @@
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/9596038) | docs(upstream): submission campaign plan + status refresh — NOTHING posted |
 
 <!--history-meta v1
+5994dab	author	Will Norris
+5994dab	added	13
+5994dab	deleted	4
+5994dab	files	1
+5994dab	body	User-triggered ('finish wave 1; post items 2 and 3'): pushed\nmos-coalesce-rotate-ac (18244924b3d3) and opened PR #578 (body = drafted doc\nminus H1/preamble, four live-demo links); assembled the DWARF PR body from\nthe drafted companion note (status/metadata/Title/Posting stripped, test-half\nlead added) and opened PR #579 from mos-dwarf-65816-test-docs (0ae9415).\nWave 1 now fully live: issue #576 + PRs #577/#578/#579, all OPEN per\ndev/upstream-status.sh. Status doc rows, campaign plan checklist, TODO\ncampaign item, and both body-doc preambles flipped to posted. Next: Wave 2\nissues (reentrant, rc-undef-ra, sdk setjmp) — user-triggered.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 efe7ef4	author	Will Norris
 efe7ef4	added	13
 efe7ef4	deleted	0
