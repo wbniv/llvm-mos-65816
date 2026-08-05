@@ -11,8 +11,7 @@
 volatile uint16_t corpus_result;
 
 int main(void) {
-    uint32_t wide;
-    corpus_result = nmitally_model((uint16_t)NMITALLY_FRAMES, &wide);
+    corpus_result = nmitally_gate_crc();
     for (;;) __asm__ volatile("wai");
     return 0;
 }
