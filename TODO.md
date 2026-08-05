@@ -906,18 +906,14 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   maintainer engagement) shows life; producer-normalization decoupling DONE (`0027`). `0011`/`0015`
   still user judgment), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
-- [wip T2] **Harden the posted #591 with a datasheet-derived branch-fixup matrix + boundary-exact
-  range edges (the #549-class net).** <!-- agent:aa3b9ba046227f218 --> The #549 postmortem:
-  upstream's `long-branches-65ce02.s` pinned golden output copied from the buggy implementation
-  (`93 40 01`, off by one vs the datasheet's `0x0141`); our `branch-range-errors.s` isn't
-  boundary-exact (128 filler discriminates nothing); the execution differential is blind (no
-  65CE02 leg, and shipped ROMs contain zero `brl`). Adding to the
-  [#591](https://github.com/llvm-mos/llvm-mos/pull/591) branch as an incremental commit:
-  (1) boundary-exact range pairs (last legal displacement assembles with pinned bytes, one further
-  errors); (2) a hand-derived byte-exact matrix (CPU × PCRel8/PCRel16 × direction, datasheet
-  arithmetic in comments, objdump-resolved). 65CE02 PCRel16 rows carry the CORRECT values, gated
-  to activate on the #549 rebase. Push + PR comment = user-triggered. (T2: bounded test authoring
-  against settled semantics.)
+- [T5] **Push + comment the #591 hardening (matrix DONE 2026-08-05).** Incremental commit
+  `b47ed3ee08e2` on `mos-branch-range-diagnostic`: hand-derived byte-exact fixup matrix (8 rows,
+  tool-verified after derivation), boundary-exact range pairs at all four edges, and the
+  `XFAIL`-gated 65CE02 PCRel16 file whose XPASS after the #549 rebase is the designed drop-the-XFAIL
+  signal. Suites exit 0 (MC 43+1 XFAIL, CodeGen 78+1 UNSUPPORTED). Residual = user-triggered:
+  push the commit to the live [#591](https://github.com/llvm-mos/llvm-mos/pull/591) branch and post
+  the drafted 3-sentence comment (both in the [body banner](docs/upstream-branch-range-diagnostic-pr.md),
+  fork docs `13eb902`).
 - [T2] **65816 `BRL` branch relaxation — extend #550's gate to `HasW65816` (BLOCKED on
   #549/#550 merging).** Upstream [PR #550](https://github.com/llvm-mos/llvm-mos/pull/550) widens
   `isBranchOffsetInRange` on 65CE02+ so MC relaxation promotes branches to 16-bit instead of
