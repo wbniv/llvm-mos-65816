@@ -906,6 +906,23 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   maintainer engagement) shows life; producer-normalization decoupling DONE (`0027`). `0011`/`0015`
   still user judgment), **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
+- [T2] **Mint + verify + ready the `0019` branch-range-diagnostic PR (post WITH/AFTER #549).**
+  Out-of-range `PCRel8`/`PCRel16` branch fixups assemble silently (offset truncated); `0019`
+  adds post-correction range checks + source-located errors + `branch-range-errors.s`. Touches
+  the SAME `applyFixup` hunk as open upstream
+  [PR #549](https://github.com/llvm-mos/llvm-mos/pull/549) (complementary — theirs fixes the
+  per-CPU correction constant) so coordinate timing and rebase over whichever lands first.
+  Steps: mint off tip, red/green the test, tool-complete suite run (methodology rule), finalize
+  [the body draft](docs/upstream-branch-range-diagnostic-pr.md); posting user-triggered.
+  Status-doc row 20. (T2: patch + draft exist; bounded mint/verify recipe.)
+- [T2] **65816 `BRL` branch relaxation — extend #550's gate to `HasW65816` (BLOCKED on
+  #549/#550 merging).** Upstream [PR #550](https://github.com/llvm-mos/llvm-mos/pull/550) widens
+  `isBranchOffsetInRange` on 65CE02+ so MC relaxation promotes branches to 16-bit instead of
+  `JMP` trampolines (19→0 trampolines, 3 B/1+ cyc each, in their test). The 65816 has `BRL` and
+  the identical win — every SNES ROM shrinks. Do the `HasW65816` leg + tests + a trampoline-count
+  measurement on our corpus once #549+#550 land; meanwhile optionally a supportive comment on
+  #550 offering it (user-triggered). Status-doc row 21. (T2: design decided by #550's precedent;
+  bounded once unblocked.)
 - [T2] **Upstream the `MVN`/`MVP` block-move bank-order MC fix (`0020`).** The svx2 video work
   found and fixed an llvm-mos 65816 `MVN` operand-encoding defect (bank order in the MC
   instruction format) — fix + opcode regression already carried as
