@@ -2127,4 +2127,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      - fp:0bf704293cb24048 (build_step residual) -> the [T3] `snesgfx` Display first-frame item.
      - fp:0bcb5b4ecf571ae0 (splash.h / splash16)  -> the [T2] finish-the-conversion item.
      - fp:52f8d7d6f905eaea (four unmeasurable demos) -> the [T2] m7blank coverage item. -->
+<!-- resolved 2026-08-05: fp:0bcb5b4ecf571ae0's item is CLOSED and no longer exists above — the
+     premise was false (splash.h/splash16 had zero consumers, superseded by b6ef256/8ac159f) and
+     the dead surface was deleted rather than converted, so nothing regenerates it. The note above
+     is left as written; this line just keeps its pointer from dangling.
+     See docs/plans/2026-08-05-splash16-forceblank-conversion.md. -->
 <!-- END auto-captured-deferrals -->
