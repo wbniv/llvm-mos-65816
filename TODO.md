@@ -227,7 +227,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   UploadQueue. Worth ~1 frame on most demos and more on any demo with an expensive first `emit()`, so
   do it for the invariant, not the frames. Blocked on nothing; measure with `dev/bootblank.sh
   --firstframe`, which is the gate that proved the blanket version unsafe.
-  (T3: design is written down in the plan; execution is one header plus per-drawable adoption.)
+  (T3: design is written down in the plan; execution is one header plus per-drawable adoption. Rank CONFIRMED T3 by the coordinator 2026-08-05: the dangerous judgment was spent at T4 and is recorded; the `--firstframe` gate fences the remaining risk.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
