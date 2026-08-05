@@ -25,6 +25,12 @@
      decoder-visible def per predicate), all new/changed tests proven red-before/green-after, MC
      suite 39/40, the single failure (addr-asciz.s) proven pre-existing by stashing the change and
      re-running on pristine upstream.
+     PRE-FLIGHT (checked 2026-08-04): the body's "(source)" link
+     https://github.com/wbniv/llvm-mos-65816/blob/main/examples/snes/brkcop.c currently 404s —
+     brkcop.c exists only in LOCAL main (commit 304f3c3; local is 39 commits ahead of origin).
+     Before posting, either push this repo's main (coordinate first — hot shared tree, push is
+     user-gated) or re-verify the link; do not post with the dead link. The demo page link
+     (biohack.net/snes/brkcop/) is live (HTTP 200).
      Post commands (user-triggered):
        git -C ~/llvm-mos push origin mos-65816-cop-mnemonic
        gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-65816-cop-mnemonic --base main \
@@ -134,4 +140,6 @@ it now uses `cop #$5a` directly. BRK's half of the same demo motivated #586, pos
 BRK is baseline-MOS and COP is W65816-only.
 
 The published ROM passes its emulator differential, interrupt-envelope, signature-return, and
-hardware-vector gates in default, a16, and xy16 configurations.
+hardware-vector gates — both with the stock 8-bit-register code generation and in our 65816
+development fork's opt-in 16-bit-accumulator/index modes (fork-only features, mentioned here only
+as extra soak coverage; nothing in this PR depends on them).
