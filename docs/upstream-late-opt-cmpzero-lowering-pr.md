@@ -99,10 +99,13 @@ asserts both the fold and the lowering, plus `CHECK-NOT: CmpZero`. It fails befo
 
 ## Notes on exposure
 
-Found by inspection during an unrelated `mos-late-opt` investigation, not by a miscompile in
-the wild. Measured incidence in the reporter's tree: across 140 source files × 4
-configurations (17,403 basic blocks, `-O1/-O2/-Os`, with and without a 16-bit-accumulator
-target feature) the maximum number of `CmpZero` pseudos in any single block is **1**, so the
-precondition never occurred there. The mechanism is nonetheless reachable by construction,
-and the failure mode is silent, so it seems worth fixing rather than waiting for a shape that
-triggers it.
+Found by inspection during an unrelated `mos-late-opt` investigation (the same pass read that
+produced [#584](https://github.com/llvm-mos/llvm-mos/pull/584)), not by a miscompile in the
+wild. Measured incidence in the reporter's tree: across 140 source files × 4 configurations
+(17,403 basic blocks, `-O1/-O2/-Os`, with and without a 16-bit-accumulator target feature) the
+maximum number of `CmpZero` pseudos in any single block is **1**, so the precondition never
+occurred there. The scan methodology and raw numbers are recorded in the
+[investigation write-up](https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-08-02-lowercmpzeros-sticky-changed.md)
+(`-print-before=mos-late-opt` over the corpus). The mechanism is nonetheless reachable by
+construction, and the failure mode is silent, so it seems worth fixing rather than waiting for
+a shape that triggers it.
