@@ -6,7 +6,8 @@
 > `4fb170fd9d357e453c5f3bc9421caa70b8bbb337`. The PR remains open with no comments or reviews;
 > macOS, Ubuntu, and Windows CI are green. Re-check the head before posting.
 >
-> Full evidence: [`investigations/2026-08-05-585-gashre-validation.md`](investigations/2026-08-05-585-gashre-validation.md).
+> Full evidence: [`investigations/2026-08-05-585-gashre-validation.md`](investigations/2026-08-05-585-gashre-validation.md);
+> 65CE02 execution recipe: [`howto-testing-65ce02-code.md`](howto-testing-65ce02-code.md).
 >
 > **Exact command to post, once approved:**
 >
@@ -101,6 +102,15 @@ I applied the arm locally and rebuilt. The C reducers return byte-for-byte to th
 `mos6502`, `mos65c02`, and `mosw65816`, while the 65CE02 improvements remain. In a 10,780-object comparison,
 all non-65CE02 differences disappeared after the fix; all 16 changed 65CE02 objects retained their wins
 (−529 bytes total). A paired emulator differential and the CodeGen/MOS failing set were unchanged.
+
+I also executed the new path rather than only inspecting it. A kernel covering every arithmetic-right-shift
+shape I could think of — all widths and shift amounts, both signs, the multi-byte carry chain,
+store-folded/dead-result shapes, and signed bitfield read-back — folds into one 16-bit checksum, built
+bare-metal for `-mcpu=mos65ce02` and run on xemu's Commodore 65 target. Host oracle, pre-#585, #585, and
+#585-plus-the-arm all return `0xE0E8`. The #585 builds contain 15 native `asr` instructions against 0 at
+baseline, so they genuinely exercised the new selection rather than falling back and passing for the wrong
+reason; #585 also takes 100 bytes off that kernel. `mos45gs02` I checked at codegen level only — running a
+45GS02 build on a 4510 would not be sound.
 
 One small measurement note: I reproduced seven of the eight rows in the PR description exactly. For
 `int32_t x = x >> 1`, I measure 22 → 12 bytes (−10), rather than 20 → 12 (−8), on stock llvm-mos at the

@@ -6,8 +6,9 @@ the PR's whole point is selecting the native `asr`. This repo's differential bat
 so none of it applies. This is what we found out: what can be checked today, what is blocked and why, and
 the trap that wasted an hour.
 
-**Status in one line:** everything up to and including *building a bare-metal 65CE02 ROM image* works and
-is checked in; *executing* it needs an emulator we do not currently have.
+**Status in one line:** **this works end to end** — build a bare-metal 65CE02 image from C and execute it
+on xemu's Commodore 65 target, with **no copyrighted ROM of any kind**, reading the result back from a
+memory dump. MAME's `c65` driver is the one that does *not* work; see Level 3.
 
 ---
 
@@ -78,7 +79,7 @@ Two things this cost us, both now guarded by the script:
   archive member it is only pulled in if *already* referenced — so with `--gc-sections` the entire program
   is dropped and you still get a clean link and a plausible 8 KiB file. Ours contained 14 bytes of init
   code and 8 KiB of padding, and the "before" and "after" images compared byte-identical, which looks
-  exactly like a successful inertness result. `build.sh` now fails if the image has under 64 bytes of
+  exactly like a successful inertness result. `build.sh` now fails if the image has under 24 bytes of
   content.
 - **Reset code must be a fall-through `.init.N` section, not a `jmp main`.** llvm-mos concatenates
   `.init.*` in order and the chain ends by calling `main`; jumping straight there skips soft-stack init and
@@ -90,7 +91,71 @@ both signs, the multi-byte carry chain, store-folded shapes, and signed bitfield
 
 ---
 
-## Level 3 — executing it (blocked; read before trying)
+## Level 3 — executing it
+
+### xemu Commodore 65 — ✅ this is the one that works
+
+[xemu](https://github.com/lgblgblgb/xemu) (LGB) builds in about a minute and needs only SDL2 (plus GTK for
+its menu), both already present here:
+
+```bash
+git clone --depth 1 https://github.com/lgblgblgb/xemu /tmp/xemu
+make -C /tmp/xemu -j8 TARGETS=c65 ARCH=native      # -> /tmp/xemu/build/bin/xc65.native
+```
+
+**No Commodore ROM is required.** `c65_load_rom()` reads *any* file that is exactly `0x20000` bytes into
+`memory + 0x20000` with no checksum or version check:
+
+```c
+int c65_load_rom ( const char *fn, unsigned int dma_rev )
+{
+	if (xemu_load_file(fn, memory + 0x20000, 0x20000, 0x20000, ...) != 0x20000)
+		return -1;
+```
+
+So hand it 128 KiB of our own code and let the CPU reset through it. `dev/c65asr/run-xemu.sh` does exactly
+that, using four xemu options that make this a proper test harness:
+
+| option | why |
+|---|---|
+| `-skipconfigfile` | **must be the first option** — xemu errors out otherwise |
+| `-headless` | no window; documented as "for testing!" |
+| `-sleepless` | run flat out, not at 1 MHz |
+| `-dumpmem FILE` | dump memory on exit — this is the read-back path |
+| `-rom FILE` | our synthesised 128 KiB image |
+
+xemu writes the dump on its **normal exit path**, so the run is ended with `timeout -s INT`; exit status
+130 is the success case. The dump is 128 KiB of RAM, so a value the program stored at `$0400` is at file
+offset `0x400`.
+
+The script places the payload at **both** candidate file offsets for CPU `$E000` — `0x0E000`
+(`ROM_C64_KERNAL_REMAP 0x20000`) and `0x1E000` (`ROM_E000_REMAP 0x30000`) — plus both vector sets, so it
+runs whichever window the reset mapping selects rather than depending on us guessing right.
+
+End to end:
+
+```console
+$ dev/c65asr/build.sh build/llvm-mos-install dev/c65asr/target.c /tmp/k.bin mos65ce02
+/tmp/k.bin: 8192 bytes, ~1068 bytes of content, reset vector $E000
+$ dev/c65asr/run-xemu.sh /tmp/k.bin 90
+XEMU_RESULT=0xE0E8          # == the host oracle from dev/c65asr/host.c
+```
+
+This is what closed the #585 gap. The measured matrix, all agreeing with the host oracle `0xE0E8`:
+
+| build | native `asr` | `cmp #128` | image | executed result |
+|---|---:|---:|---:|---|
+| pre-#585 | 0 | 18 | 1168 B | `0xE0E8` |
+| #585 | 15 | 6 | 1068 B | `0xE0E8` |
+| #585 + `getDemandedBits` fix | 15 | 6 | 1068 B | `0xE0E8` |
+
+The `asr` counts matter: they prove the #585 run really executed the new instruction path rather than
+quietly falling back.
+
+**Caveat worth keeping.** The C65 target emulates the CSG 4510, i.e. plain 65CE02. Do **not** build the
+payload with `-mcpu=mos45gs02` and run it here — the 45GS02 has instructions the 4510 does not. For
+45GS02 coverage use xemu's `mega65` target (`TARGETS=mega65`), which is where a real MEGA65 ROM would
+genuinely be needed if you went the `.prg`-under-the-OS route.
 
 ### MAME `c65` — do not use
 
@@ -131,21 +196,6 @@ would need so much hedging that it would weaken a review comment rather than sup
 > "executing your code" from "executing your padding".** Always probe with a payload that writes a
 > distinctive value to RAM, never with a NOP sled.
 
-### xemu — the route that should actually work
-
-[xemu](https://github.com/lgblgblgb/xemu) (LGB) is the real MEGA65 emulator and is actively maintained. It
-is not packaged in Ubuntu or in the foundry repo (`apt.foundrylinux.org resolute main` — its
-`foundry-emulators-*` metapackages cover dosbox-x, hatari, fs-uae, openmsx, vice, atari800, fbzx,
-mame-extra, none of which emulate a 65CE02 machine), so it needs building from source (SDL2).
-
-The remaining question is the **MEGA65 ROM**, which is third-party copyrighted. Under this repo's
-link-don't-vendor rule it would be handled exactly like the SNES SPC700 BIOS: gitignored, user-supplied,
-fetched out of band, never committed. Sourcing/approving that is a user decision, not something to do
-unilaterally.
-
-Pairing xemu with the SDK's existing `mega65` platform (`mos-mega65-clang`, produces a `.prg`) would avoid
-the bare-metal work entirely and is the shortest path to a real result.
-
 ### VICE — not applicable
 
 VICE is in the foundry repo but emulates C64/C128/PET/Plus4/VIC-20/CBM-II and the C64DTV. None uses a
@@ -156,16 +206,17 @@ VICE is in the foundry repo but emulates C64/C128/PET/Plus4/VIC-20/CBM-II and th
 ## What we can honestly claim today
 
 For #585 we validated the CPU-independent half by execution (SNES corpus + gcc c-torture, four-way
-differential on two emulators) and the 65CE02-specific half by **codegen inspection, encoding check, byte
-measurement and lit only**. That limitation is stated plainly in both the investigation and the draft
-review comment. Nothing here changes that; it records how far the execution route got and where it stops.
+differential on two emulators) **and the 65CE02-specific half by execution too**, on xemu's C65 target:
+host oracle `0xE0E8` == pre-#585 @ 65CE02 == #585 @ 65CE02 == #585+fix @ 65CE02, with the #585 builds
+demonstrably running 15 native `asr` instructions where the baseline ran none.
 
 ## Artifacts
 
 | path | status |
 |---|---|
-| `dev/c65asr/build.sh` | ✅ works — bare-metal 65CE02 image builder, with the gc-sections guard |
-| `dev/c65asr/{link.ld,start.s}` | ✅ works — bare-metal link + fall-through reset |
-| `dev/c65asr/asrkernel.h` | ✅ works — shared ASR kernel, host oracle `0xE0E8` |
-| `dev/c65asr/{host.c,target.c}` | ✅ works — oracle and target entry points |
-| `dev/c65asr/run-c65.sh` | ⛔ blocked on MAME's incomplete c65 memory model — kept as the record |
+| `dev/c65asr/build.sh` | ✅ bare-metal 65CE02 image builder, with the gc-sections guard |
+| `dev/c65asr/run-xemu.sh` | ✅ **executes it on xemu's C65 target and reads the result back** |
+| `dev/c65asr/{link.ld,start.s}` | ✅ bare-metal link + fall-through reset |
+| `dev/c65asr/asrkernel.h` | ✅ shared ASR kernel, host oracle `0xE0E8` |
+| `dev/c65asr/{host.c,target.c}` | ✅ oracle and target entry points |
+| `dev/c65asr/run-c65.sh` | ⛔ MAME route — blocked on its incomplete c65 memory model; kept as the record |

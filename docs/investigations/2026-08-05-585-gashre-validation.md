@@ -336,14 +336,8 @@ part of the PR is **unverified here**, not failed.
 
 ## 7. What was not covered
 
-- **65CE02 execution.** The native `ASR` path was validated by codegen inspection, opcode-encoding check
-  (`$43`), byte measurement and lit — **not** by execution. An execution route was attempted and is
-  documented in [`howto-testing-65ce02-code.md`](../howto-testing-65ce02-code.md): building a bare-metal
-  65CE02 image works (`dev/c65asr/build.sh`, host oracle `0xE0E8`), but MAME's `c65` driver does not map
-  the `$E000` ROM window (its own TODO: *"rom8 / roma / rome all causes bootstrap issues if hooked up"*)
-  and is flagged `preliminary`, so nothing executes. The viable route is xemu + the SDK's `mega65`
-  platform, which needs xemu built from source and a user-supplied MEGA65 ROM. Nothing here proves the
-  emitted `asr` is runtime-correct.
+- ~~**65CE02 execution.**~~ **CLOSED — see §10.** The native `ASR` path is now validated by execution on
+  xemu's Commodore 65 target, not only by inspection.
 - **Csmith.** `vendor/csmith` is not present in `main` and would need building from source; skipped for
   budget, as the plan permitted. The 1288 c-torture rows in the sweep give comparable breadth at
   compile level.
@@ -363,7 +357,40 @@ invariant that `$carry_in` is the source sign bit — while `matchShiftUnusedCar
 operand to 0. We could not construct an observable divergence (both paths need bit 7 already proven dead)
 and are raising it as a robustness question only.
 
-## 9. Artifacts
+## 9. 65CE02 execution (added after the initial pass)
+
+The original write-up recorded "no 65CE02 emulator" as the main gap. That was wrong, and the correction is
+worth stating plainly: **no copyrighted ROM of any kind is needed.** xemu's C65 target loads *any* exactly
+0x20000-byte file as its system ROM with no checksum or version check, so we hand it 128 KiB of our own
+code and let the 4510 reset through it. Full recipe and pitfalls:
+[`howto-testing-65ce02-code.md`](../howto-testing-65ce02-code.md).
+
+`dev/c65asr/asrkernel.h` folds every arithmetic-right-shift shape — all widths, all shift amounts, both
+signs, the multi-byte carry chain, store-folded/dead-result shapes, and signed bitfield read-back — into one
+16-bit checksum, shared verbatim between the host oracle and the target. Built with `dev/c65asr/build.sh`,
+run with `dev/c65asr/run-xemu.sh`:
+
+| build | native `asr` | `cmp #128` | image | executed result |
+|---|---:|---:|---:|---|
+| host oracle (`gcc -O2`) | — | — | — | **`0xE0E8`** |
+| pre-#585 @ `mos65ce02` | 0 | 18 | 1168 B | **`0xE0E8`** |
+| #585 @ `mos65ce02` | 15 | 6 | 1068 B | **`0xE0E8`** |
+| #585 + `getDemandedBits` fix | 15 | 6 | 1068 B | **`0xE0E8`** |
+
+Four-way agreement. The `asr` counts are the important control: the #585 rows really did execute the new
+native-`ASR` path (15 instances, against 0 at baseline) rather than silently falling back to `cmp #128; ror`
+and passing for the wrong reason. #585 also takes 100 bytes off this kernel on 65CE02.
+
+**Scope of the claim.** This is the plain 65CE02 (CSG 4510). `mos45gs02` remains execution-unvalidated —
+running a 45GS02 build on the C65 target would be unsound, since the 45GS02 has instructions the 4510 lacks;
+that needs xemu's `mega65` target.
+
+MAME's `c65` driver was tried first and does **not** work — it deliberately does not hook up the `$E000`
+ROM window (*"rom8 / roma / rome all causes bootstrap issues if hooked up"*) and is flagged `preliminary`.
+Its NOP-sled probe also produced a convincing false positive; both are documented in the HOWTO so the next
+person does not repeat them.
+
+## 10. Artifacts
 
 | path | what |
 |---|---|
@@ -372,3 +399,6 @@ and are raising it as a robustness question only.
 | `…/dev/asr-bytetable-585.sh` | byte-table reproduction harness |
 | `…/build/sweep585/{base,base-ce02,post,postfix}.tsv` | raw sweep hashes |
 | `…/build/llvm-mos-install-{BASE585,585ONLY}` | the two comparison toolchains |
+| `dev/c65asr/{build.sh,run-xemu.sh}` | bare-metal 65CE02 image builder + xemu C65 execution harness |
+| `dev/c65asr/asrkernel.h` | the shared ASR kernel (host oracle `0xE0E8`) |
+| `/tmp/xemu` (rebuildable in ~1 min) | `make -C /tmp/xemu TARGETS=c65 ARCH=native` |

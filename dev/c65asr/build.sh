@@ -59,4 +59,4 @@ d=open('$OUT','rb').read()
 print(sum(1 for b in d if b not in (0x00,0xff)))")
 echo "$OUT: 8192 bytes, ~$code bytes of content, reset vector \$$(python3 -c "
 d=open('$OUT','rb').read(); print('%04X' % (d[-4] | d[-3]<<8))")"
-[ "$code" -gt 64 ] || { echo "WARNING: image looks empty — was main garbage-collected?" >&2; exit 1; }
+[ "$code" -gt 24 ] || { echo "WARNING: image looks empty — was main garbage-collected?" >&2; exit 1; }

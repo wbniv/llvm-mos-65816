@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-08-05](https://github.com/wbniv/llvm-mos-65816/commit/22b83c3) | docs: HOWTO for testing 65CE02/45GS02 code + bare-metal image builder |
 | [2026-08-05](https://github.com/wbniv/llvm-mos-65816/commit/cba7271) | docs(upstream): #585 third-party validation — G_ASHRE misses a getDemandedBits arm |
 
 <!--history-meta v1
+22b83c3	author	Will Norris
+22b83c3	added	8
+22b83c3	deleted	2
+22b83c3	files	1
+22b83c3	body	Follow-up to the #585 validation, which could not execute 65CE02 code and so\nvalidated the native-ASR half by inspection only. This records how far an\nexecution route gets and exactly where it stops.\n\nWorks and is checked in:\n- dev/c65asr/build.sh links C built for -mcpu=mos65ce02 into a raw 8 KiB image\n  covering CPU $E000-$FFFF, vectors in the last six bytes. No SDK platform\n  needed; link.ld is modelled on the `eater` bare-metal platform.\n- dev/c65asr/asrkernel.h is a shared arithmetic-right-shift kernel (every width\n  and shift amount, both signs, the multi-byte carry chain, store-folded shapes,\n  signed bitfield read-back) folded to one checksum. Host oracle 0xE0E8.\n- Opcode encoding confirmed: `asr` accumulator assembles to $43.\n\nBlocked:\n- MAME's c65 driver instantiates the right CPU and will boot a synthesised\n  128 KiB image (so no Commodore ROM and no licensing issue), but it does not\n  map the $E000 ROM window -- its own TODO says "rom8 / roma / rome all causes\n  bootstrap issues if hooked up" -- so the reset vector never comes from our\n  image. Driver is also flagged preliminary. run-c65.sh is kept, banner-marked.\n- xemu + the SDK's existing mega65 platform is the viable route; needs xemu\n  built from source and a user-supplied MEGA65 ROM (link-don't-vendor, handled\n  like the SPC700 BIOS). That is a user decision.\n\nTwo traps documented because both cost real time:\n- An all-$EA image gives a convincing false positive: the vector fetch returns\n  $EAEA (the fill byte) and the CPU runs the NOP field, which looks exactly\n  like your code executing. Probe with a payload that writes to RAM.\n- crt0.o must be linked as an object, not -lcrt0: its .call_main section is what\n  references main, so as an archive member under --gc-sections the whole program\n  is dropped, leaving a clean link and a plausible 8 KiB file whose before/after\n  images compare byte-identical. build.sh now fails on a near-empty image.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 cba7271	author	Will Norris
 cba7271	added	368
 cba7271	deleted	0
