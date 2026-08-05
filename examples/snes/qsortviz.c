@@ -26,6 +26,7 @@
 #define VIS_N       32u              // bars shown (4 px wide each -> 128 px)
 #define BARW        4u
 #define EPOCH_FRAMES 80u             // idle frames between shuffle/sort epochs
+#define MUTATIONS_PER_FRAME 6u       // show the latest real array after each batch of mutations
 
 static const uint16_t bg3_pal[4] = {
   SNES_RGB(1, 2, 6), SNES_RGB(30, 12, 8), SNES_RGB(30, 26, 6), SNES_RGB(10, 28, 18),
@@ -69,19 +70,49 @@ static void draw_bars(App *a) {
 // returns. The differential gate continues to use the untouched comparators in qsortviz.h.
 static App *sort_anim_app;
 static int16_t sort_anim_last[VIS_N];
+static uint8_t sort_anim_pending;
+
+#ifdef QSORTVIZ_PACING_PROBE
+typedef struct {
+  uint16_t callbacks;
+  uint16_t mutations;
+  uint16_t intermediate_frames;
+  uint8_t max_batch;
+  uint8_t final_frames;
+} QsortvizPacingProbe;
+
+volatile QsortvizPacingProbe qsortviz_pacing_probe;
+#endif
 
 static void sort_anim_snapshot(App *a) {
   for (uint8_t i = 0; i < VIS_N; i++) sort_anim_last[i] = a->bar[i];
 }
 
+static uint8_t sort_anim_changed(App *a) {
+  for (uint8_t i = 0; i < VIS_N; i++)
+    if (sort_anim_last[i] != a->bar[i]) return 1u;
+  return 0u;
+}
+
 static void sort_anim_tick(void) {
   App *a = sort_anim_app;
-  if (!a) return;
-  uint8_t changed = 0u;
-  for (uint8_t i = 0; i < VIS_N; i++)
-    if (sort_anim_last[i] != a->bar[i]) { changed = 1u; break; }
-  if (!changed) return;
+#ifdef QSORTVIZ_PACING_PROBE
+  qsortviz_pacing_probe.callbacks++;
+#endif
+  if (!a || !sort_anim_changed(a)) return;
+
   sort_anim_snapshot(a);
+#ifdef QSORTVIZ_PACING_PROBE
+  qsortviz_pacing_probe.mutations++;
+#endif
+  if (++sort_anim_pending < MUTATIONS_PER_FRAME) return;
+
+#ifdef QSORTVIZ_PACING_PROBE
+  qsortviz_pacing_probe.intermediate_frames++;
+  if (sort_anim_pending > qsortviz_pacing_probe.max_batch)
+    qsortviz_pacing_probe.max_batch = sort_anim_pending;
+#endif
+  sort_anim_pending = 0u;
   draw_bars(a);
   display_frame(&a->screen);
 }
@@ -111,9 +142,20 @@ static void step_epoch(App *a) {
     text_clear_bar(&a->text, 0);
     text_puts(&a->text, 0, 1, names[ci]);
     sort_anim_snapshot(a);
+    sort_anim_pending = 0u;
+#ifdef QSORTVIZ_PACING_PROBE
+    qsortviz_pacing_probe.callbacks = 0u;
+    qsortviz_pacing_probe.mutations = 0u;
+    qsortviz_pacing_probe.intermediate_frames = 0u;
+    qsortviz_pacing_probe.max_batch = 0u;
+    qsortviz_pacing_probe.final_frames = 0u;
+#endif
     sort_anim_app = a;
     qsort(a->bar, VIS_N, sizeof a->bar[0], cmps[ci]);   // library calls back into our comparator
     sort_anim_app = 0;
+#ifdef QSORTVIZ_PACING_PROBE
+    qsortviz_pacing_probe.final_frames = 1u;
+#endif
   } else {
     qs_fill(a->bar, VIS_N, (uint16_t)(0x1000u + a->epoch));
     text_clear_bar(&a->text, 0);

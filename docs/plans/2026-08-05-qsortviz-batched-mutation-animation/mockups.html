@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>qsortviz batched mutation animation mockups</title>
+<style>
+  :root { color-scheme: dark; --ink:#ff6d3a; --gold:#ffe12b; --green:#48ec9a; --red:#ff5448; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#101318; color:#e7edf5; font:15px/1.45 system-ui,sans-serif; }
+  main { max-width:1180px; margin:auto; padding:32px 22px 56px; }
+  h1 { margin:0 0 8px; font-size:28px; }
+  .lede { color:#aeb8c7; max-width:850px; margin:0 0 28px; }
+  .screens { display:grid; grid-template-columns:repeat(4,minmax(220px,1fr)); gap:18px; }
+  .card { background:#191e26; border:1px solid #303947; border-radius:12px; padding:14px; }
+  .label { display:flex; justify-content:space-between; margin-bottom:10px; font-weight:700; }
+  .label span:last-child { color:#8fa0b6; font-weight:500; }
+  .snes { aspect-ratio:256/224; background:#000; image-rendering:pixelated; padding:8px 8px 7px; display:flex; flex-direction:column; box-shadow:0 0 0 1px #000; }
+  .hud { color:var(--ink); font:7px/1 monospace; letter-spacing:1px; height:15px; white-space:nowrap; }
+  .plot { flex:1; display:flex; gap:1px; align-items:end; padding:7px 20px 0; }
+  .bar { flex:1; min-width:2px; background:var(--green); }
+  .bar:nth-child(3n+1) { background:var(--red); }
+  .bar:nth-child(3n+2) { background:var(--gold); }
+  .foot { color:var(--ink); font:6px/1 monospace; letter-spacing:.7px; height:10px; white-space:nowrap; }
+  .caption { color:#aeb8c7; margin:10px 2px 0; font-size:13px; }
+  .timeline { margin-top:28px; background:#191e26; border:1px solid #303947; border-radius:12px; padding:20px; }
+  .track { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; margin:18px 0 8px; }
+  .tick { height:46px; border-radius:5px; background:#29313e; display:grid; place-items:center; font:12px monospace; color:#8997aa; }
+  .tick.show { background:#174f3b; color:#8fffc5; border:1px solid #39c486; }
+  .tick.final { background:#684b12; color:#ffe59a; border:1px solid #d5a733; }
+  .legend { display:flex; gap:20px; flex-wrap:wrap; color:#aeb8c7; font-size:13px; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; background:#29313e; }
+  .dot.show { background:#39c486; } .dot.final { background:#d5a733; }
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
+  .meter { height:13px; background:#29313e; border-radius:9px; overflow:hidden; margin-top:9px; }
+  .meter i { display:block; height:100%; background:#ff7043; }
+  .good i { background:#48ec9a; }
+  @media (max-width:900px) { .screens { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px) { .screens,.compare { grid-template-columns:1fr; } }
+</style>
+</head>
+<body><main>
+  <h1>qsortviz · batched real-state animation</h1>
+  <p class="lede">Storyboard for presenting the newest actual array state after each batch of six observed libc qsort mutations. Annotations live outside the SNES screen; the cartridge HUD stays unchanged.</p>
+  <section class="screens" id="screens"></section>
+  <section class="timeline">
+    <h2>One presentation frame per six real mutations</h2>
+    <div class="track">
+      <div class="tick">1</div><div class="tick">2</div><div class="tick">3</div><div class="tick">4</div><div class="tick">5</div><div class="tick show">6<br>SHOW</div><div class="tick">7</div><div class="tick final">RETURN<br>FINAL</div>
+    </div>
+    <div class="legend"><span><i class="dot"></i>mutation observed, qsort continues</span><span><i class="dot show"></i>latest real array presented</span><span><i class="dot final"></i>final state always presented</span></div>
+    <div class="compare">
+      <div class="card"><strong>Current: single-step</strong><div class="meter"><i style="width:100%"></i></div><p class="caption">Every mutation blocks for VBlank. Accurate, but reads as slow motion.</p></div>
+      <div class="card"><strong>Planned: batched</strong><div class="meter good"><i style="width:17%"></i></div><p class="caption">Same real states, about one-sixth as many blocking presentations.</p></div>
+    </div>
+  </section>
+</main>
+<script>
+const frames = [
+  ['Shuffle','before qsort',[24,75,38,91,53,15,84,31,67,45,96,20,59,80,35,70,27,88,48,12,63,40,93,57]],
+  ['Early batch','after mutation 6',[24,38,53,75,15,31,84,45,67,91,20,59,80,35,70,27,88,48,12,63,40,93,57,96]],
+  ['Late batch','latest real state',[12,15,20,24,27,31,35,38,40,45,48,53,57,59,63,67,70,75,84,80,88,91,93,96]],
+  ['Complete','qsort returned',[12,15,20,24,27,31,35,38,40,45,48,53,57,59,63,67,70,75,80,84,88,91,93,96]]
+];
+const root=document.querySelector('#screens');
+for (const [name,note,bars] of frames) {
+  const card=document.createElement('article'); card.className='card';
+  card.innerHTML=`<div class="label"><span>${name}</span><span>${note}</span></div><div class="snes"><div class="hud">QSORT ASCENDING</div><div class="plot"></div><div class="foot">LIBC QSORT  FN-PTR COMPARATOR CB</div></div><p class="caption">${name==='Complete'?'Exact array returned by libc qsort.':'Displayed bars are a snapshot of the live backing array.'}</p>`;
+  const plot=card.querySelector('.plot');
+  for (const h of bars) { const b=document.createElement('i'); b.className='bar'; b.style.height=h+'%'; plot.appendChild(b); }
+  root.appendChild(card);
+}
+</script>
+</body></html>

@@ -180,3 +180,11 @@ a general, latent `G_SCMP`/`G_UCMP` legalization gap that crashed the backend on
 idiom. Fixed with a one-line `.lower()` in `MOSLegalizerInfo` (`0016`), rebuilt, and the demo now passes
 the full 5-way differential (`host == default == +mos-a16 == +mos-xy16 == 0x8EA5`), `-verify` clean. The
 fix is queued for upstream llvm-mos.
+
+## Animation pacing update — 2026-08-05
+
+The visual comparator wrappers now observe every real mutation but present the newest live array only
+after each batch of six mutations. This preserves libc `qsort` as the sole producer of every displayed
+state while removing the artificial one-video-frame stall after every mutation. The final returned
+array is still drawn unconditionally. Both emulator gates and the full differential remain green at
+`0x8EA5`; see the [implementation plan and storyboard](2026-08-05-qsortviz-batched-mutation-animation.md).
