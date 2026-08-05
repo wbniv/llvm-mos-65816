@@ -1,6 +1,6 @@
 # Review: llvm-mos PR #575 — hand-tuned single-precision softfloat for MOS 6502
 
-<!-- DRAFT REVIEW (internal; posting is user-triggered — NOT POSTED).
+<!-- POSTED 2026-08-05 as https://github.com/llvm-mos/llvm-mos/pull/575#pullrequestreview-4865539082 (CHANGES_REQUESTED, summary + 2 inline suggestions; line anchors verified vs PR head 12d4a1b..c77).
      Target: https://github.com/llvm-mos/llvm-mos/pull/575 (third-party PR, 2,646 lines,
      4 hand-written 6502 FP routines). Produced 2026-08-05 by the review agent (independent
      bit-exact Python models per routine, fuzzed vs numpy float32 as IEEE-754 ground truth;
