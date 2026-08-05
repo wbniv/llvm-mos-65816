@@ -8,11 +8,20 @@
      branch to the COP-only complement (drop the BRK_Immediate hunk + BRK test lines, cite #586)
      or re-cut atop #586, and trim the body accordingly — the BRK and llvm-mc sections then become
      references, not content. Tracked by the [T5] "COP-only upstream complement" TODO bullet.
-     ⚠ DESIGN DIVERGENCE (review, 2026-08-04): the live fork carry in 0002 implements COP with a
-     DIFFERENT design than this draft — mandatory signature operand (no bare 1-byte `cop`),
-     decoder-visible (`$02` disassembles as a 2-byte `cop #imm`), InstUnconditionalBranch — vs this
-     draft's optional-operand / isAsmParserOnly / 1-byte-decode. Resolve optional-vs-mandatory
-     BEFORE reducing the branch; the two artifacts currently contradict each other.
+     ✔ DESIGN DECIDED (2026-08-04, T5 call): MANDATORY operand — the fork's 0002 design is blessed
+     for the COP-only PR; this draft's optional-operand / isAsmParserOnly / 1-byte-decode COP is
+     RETIRED. Rationale: (1) bare `cop` is a footgun — hardware always consumes the signature slot,
+     so a 1-byte `cop` silently eats the next opcode; WDC's own syntax requires the operand for COP;
+     (2) the BRK 1-byte-decode compat argument does NOT apply to COP ($02 is 65816-only, currently
+     `<unknown>`), so decoder-visible `cop #imm` gives faithful 2-byte disassembly at zero cost —
+     the draft's disassembly apology section becomes an improvement; (3) the optional-BRK(#586) /
+     mandatory-COP asymmetry is WDC's own, and matches the `wdm` mandatory precedent; (4) strict →
+     loose is the reversible direction; (5) the fork ships exactly this shape, validated by the
+     #140 brkcop demo gates. Reduction spec: single `Inst16<"cop", Opcode<0x02>, Immediate>,
+     InstUnconditionalBranch` under HasW65816; tests = `cop #$ea` in all-65816-opcodes.s, bare
+     `cop` REJECTED (too-few-operands) + `cop #90` on mos6502 in asm-errors.s, the 65el02 negative
+     RUN line, expression + $7f coverage, and a POSITIVE round-trip disasm test pinning
+     `02 5a -> cop #$5a`.
      Review corrections (2026-08-04): the "Predicate" section's claim that tests pin the 65EL02
      rejection is wrong — asm-errors.s runs only at -mcpu=mos6502, so NO lit test guards the
      FeatureW65816-vs-shared-predicate choice (a refactor to the shared predicate would pass the
