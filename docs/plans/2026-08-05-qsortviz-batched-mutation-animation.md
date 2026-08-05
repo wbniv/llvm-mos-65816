@@ -1,6 +1,6 @@
 # qsortviz — batch real qsort mutations into each displayed frame
 
-**Status:** implemented and emulator-verified; publication in progress. **Target:** [biohack.net/snes/qsortviz](https://biohack.net/snes/qsortviz/).
+**Status:** implemented, emulator-verified, and published. **Target:** [biohack.net/snes/qsortviz](https://biohack.net/snes/qsortviz/).
 
 **Mockups:** [open the animation pacing and state storyboard](2026-08-05-qsortviz-batched-mutation-animation/mockups.html).
 
@@ -183,3 +183,6 @@ the published ROM. This replaces subjective “still slow” tuning with exact c
   `-verify-machineinstrs` clean for A16 and XY16.
 - The bsnes-jg frame-440 capture shows an in-progress ascending pass, confirming the batched animation
   exposes intermediate memory states rather than jumping directly to the result.
+- Published ROM SHA-256: `6262bd3ebb71fdcc34522c7bb65380847ac02fae9db4083b4ce835d08f262c13`.
+  The exact hash was verified from both live CDNs after deployment (biohack.net tag `v1.0.386`,
+  indri.studio tag `v0.1.153`).
