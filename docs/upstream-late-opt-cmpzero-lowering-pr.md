@@ -1,14 +1,20 @@
 # [MOS] `mos-late-opt`: don't skip `CmpZero` lowering after the block's first fold
 
-<!-- NOT POSTED. Ready-to-post artifact; posting is user-triggered.
+<!-- NOT POSTED. MINTED + VERIFIED ON TIP 2026-08-04; posting is user-triggered.
      Body below minus the H1 and this comment is the as-posted text.
-     Mint from the current upstream tip:
-       git -C vendor/llvm-mos checkout -b mos-late-opt-cmpzero-lowering <tip>
-       (apply patches/llvm-mos/0022-mos-late-opt-cmpzero-lowering.patch, commit, push)
+     Branch: mos-late-opt-cmpzero-lowering @ f8cfe68b4b5e, local in ~/llvm-mos, cut from upstream
+     tip 1f334fef02b5 (patch 0022 applied clean). Verified in ~/llvm-mos/build-pr:
+     RED = late-opt-cmpzero-after-fold.mir FAILS without the fix on the same tree;
+     GREEN = passes with it; full CodeGen/MOS suite 80 tests, the 5 failures
+     (indexiv, indvar-simplify-20230930, leaf-20231021, nonreentrant-nointerrupts, nonreentrant)
+     reproduce identically WITHOUT the fix — pre-existing on pristine tip, not 0022's.
+     Post commands (user-triggered):
+       git -C ~/llvm-mos push origin mos-late-opt-cmpzero-lowering
        gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-late-opt-cmpzero-lowering --base main \
          --title "[MOS] mos-late-opt: don't skip CmpZero lowering after the block's first fold" \
          --body-file <(sed '2,/^-->$/d; 1d' docs/upstream-late-opt-cmpzero-lowering-pr.md)
-     After posting: flip the status-doc row and refresh wald3n.com's contributions snapshot.
+     After posting: flip the status-doc row and refresh wald3n.com's contributions snapshot
+     (task open-source:refresh + task publish in ~/wald3n.com).
 -->
 
 ## Summary
