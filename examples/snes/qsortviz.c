@@ -26,7 +26,6 @@
 #define VIS_N       32u              // bars shown (4 px wide each -> 128 px)
 #define BARW        4u
 #define EPOCH_FRAMES 80u             // idle frames between shuffle/sort epochs
-#define SWAP_HOLD_FRAMES 2u          // keep each observed qsort mutation visible
 
 static const uint16_t bg3_pal[4] = {
   SNES_RGB(1, 2, 6), SNES_RGB(30, 12, 8), SNES_RGB(30, 26, 6), SNES_RGB(10, 28, 18),
@@ -84,7 +83,7 @@ static void sort_anim_tick(void) {
   if (!changed) return;
   sort_anim_snapshot(a);
   draw_bars(a);
-  for (uint8_t f = 0; f < SWAP_HOLD_FRAMES; f++) display_frame(&a->screen);
+  display_frame(&a->screen);
 }
 
 static int qs_anim_cmp_asc(const void *x, const void *y) {

@@ -1,9 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-08-05](https://github.com/wbniv/llvm-mos-65816/commit/b3f9c0c) | snes: animate qsortviz from live array mutations |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b092a00) | docs: deepen #46 G_SCMP bug write-up + mark Round-3 battery complete |
 | [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3c2c7a5) | #46 qsort Sort Visualizer SNES demo — caught + FIXED a real backend crash (G_SCMP) |
 
 <!--history-meta v1
+b3f9c0c	author	Will Norris
+b3f9c0c	added	7
+b3f9c0c	deleted	0
+b3f9c0c	files	1
 b092a00	author	Will Norris
 b092a00	added	39
 b092a00	deleted	0

@@ -7,9 +7,10 @@ positive on the fixed toolchain. Demo **#46** of the **compiler stress-test demo
 
 **Animation update (2026-08-05):** the visible sort no longer jumps directly from shuffled to sorted.
 libc `qsort` has no swap callback, so visual-only comparator wrappers sample the real 32-element backing
-array on every comparison. Each mutation completed by `qsort` is detected on the following callback,
-rendered from actual array memory, and held for two frames; the final mutation is rendered immediately
-after `qsort` returns. The host/target CRC gate still calls the original comparators directly, so the
+array on every comparison. Each mutation completed by `qsort` is detected on the following callback and
+presented for exactly one frame, with no added hold delay; the final mutation is rendered immediately after
+`qsort` returns. Every displayed state comes from actual array memory. The host/target CRC gate still calls
+the original comparators, so the
 compiler regression contract and expected `0x8EA5` remain unchanged.
 
 ## Headline: the bug this demo caught
