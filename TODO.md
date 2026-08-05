@@ -1082,7 +1082,7 @@ planned/gated/superseded/stale — dispositions recorded as comments in the Inbo
 `[verify]` items: run the linked plan's numbered verification steps, paste raw output + PASS/FAIL
 into the plan, then promote to Done. **Serialize the runs — they share the hot build tree.**_
 
-- [verify T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — implemented locally 07-26
+- [wip T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — implemented locally 07-26 <!-- agent:ab17421f7d32b194f -->
   (`bdbf516`), still-live mode7-gallery features. Run 2026-08-03 (`631ffe9`): **18/23 gates PASS**
   — all 7 ROM gates green (host `0x204F`, bsnes-jg + MAME, 3× byte-identical capture,
   `-verify` clean, 1 indirect dispatch), 8/9 startup-timeline gates green. **5 FAIL:** 24 black
@@ -1090,7 +1090,7 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   added two later Mode 7 demos); deployed ROMs (`0dd52e6`) ≠ fresh build (`849a6a9`) though
   behaviourally identical; no browser smoke test run; no ROM/preview cache-busting exists.
   [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)
-- [verify T3] **123-mode7-gallery-filter** — same commit/state as 121; run after it (shared
+- [wip T3] **123-mode7-gallery-filter** — same commit/state as 121; run after it (shared <!-- agent:ab17421f7d32b194f -->
   surface). Run 2026-08-03 (`c5e645d`): **7/10 steps PASS**, 3 FAIL, two causes. Filter behaviour
   itself is clean on both sites — `?mode=7` init, clear, Escape-to-clear + refocus,
   `aria-live="polite"` count, `hidden`-attribute cards, biohack's 7/12 empty-shelf hide with every
@@ -1186,6 +1186,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-08-05 — [corpus-slice-repairs] nmitally 240-tick oracle restored (lost by c9e0f12) + nbody_sim resurrected (deleted by 9369ced); corpus-a16 **62/62** first-ever full green (`608b84b`).
 - [x] 2026-08-05 — [motorola-default-verify] Plan verification run + recorded, all steps PASS (PR #587 branch). See [plan](docs/plans/2026-08-04-llvm-mc-motorola-default.md).
 - [x] 2026-08-04 — [cop-mnemonic] COP PR POSTED as [#588](https://github.com/llvm-mos/llvm-mos/pull/588) (mandatory signature, decoder-visible 2-byte decode, W65816-gated; reduction+design per the [draft banner](docs/upstream-cop-brk-signature-pr.md); links pre-flighted, a16/xy16 claim de-forked).
 - [x] 2026-08-04 — [round7-battery] Round 7 complete, 22/22 ROMs; #141 dpbank forced the ISR D/DBR envelope EXTEND (`0026`). See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md).
