@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-08-05](https://github.com/wbniv/llvm-mos-65816/commit/cba7271) | docs(upstream): #585 third-party validation — G_ASHRE misses a getDemandedBits arm |
+
+<!--history-meta v1
+cba7271	author	Will Norris
+cba7271	added	368
+cba7271	deleted	0
+cba7271	files	1
+cba7271	body	Validated mlund's open llvm-mos PR #585 ([65CE02] Legalize arithmetic right\nshifts) against this fork's differential battery, on a throwaway worktree\n(throwaway/585-validation) with #585 applied on top of the fork patch stack.\n\nFinding: MOSCombinerImpl::getDemandedBits has arms for G_LSHRE and G_SHLE but\nnone for the new G_ASHRE, so a G_ASHRE user falls to default:/all-ones and\ndemanded-bits propagation stops dead at every arithmetic right shift. That\ndefeats matchShiftUnusedCarryIn -- which #585 itself extends to G_ASHRE -- so\nthe sign carry-in is never elided and a 1-byte lsr stays a 3-byte cmp #128; ror\non EVERY non-65CE02 CPU. Size only, not a miscompile (over-approximating\ndemanded bits is the safe direction). A 3-line reducer grows 47->51 B on\nmos6502; a signed-bitfield kernel grows 132->169 B (+28%). A one-arm fix\nrestores byte-identical output and keeps all 16 65CE02 wins. The mechanism is\nfork-independent: our fork does not touch getDemandedBits.\n\nOther results, all paired against a pre-#585 baseline from the same tree:\n- applies with ZERO conflicts (offsets only, max +593 in the selector)\n- sweep: 10,780 (file, combo) pairs over 1540 TUs x 7 target/feature combos --\n  1 unexpected diff before the fix, 0 after; 65ce02/45gs02 change in exactly 16\n  places, -529 B total\n- corpus: 42/63 both legs, IDENTICAL PASS SETS\n- c-torture --sample 40: 40 PASS / 0 FAIL both legs, identical per-test status\n- lit CodeGen/MOS: identical failing set across base/#585/#585+fix (7, all\n  pre-existing fork divergences); asr-65ce02.ll and combiner.mir pass;\n  legalizer.mir unverifiable (already fails at baseline)\n- 7 of 8 rows of the PR's byte table reproduce exactly; int32_t>>1 understates\n  its own win (-10, not -8), confirmed against stock unpatched llvm-mos\n\nDraft review comment is queued and NOT posted; posting stays user-triggered.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+-->

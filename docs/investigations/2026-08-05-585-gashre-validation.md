@@ -336,8 +336,14 @@ part of the PR is **unverified here**, not failed.
 
 ## 7. What was not covered
 
-- **65CE02 execution.** No emulator; the native `ASR` path was validated by codegen inspection and lit only.
-  Nothing here proves the emitted `asr` is runtime-correct.
+- **65CE02 execution.** The native `ASR` path was validated by codegen inspection, opcode-encoding check
+  (`$43`), byte measurement and lit — **not** by execution. An execution route was attempted and is
+  documented in [`howto-testing-65ce02-code.md`](../howto-testing-65ce02-code.md): building a bare-metal
+  65CE02 image works (`dev/c65asr/build.sh`, host oracle `0xE0E8`), but MAME's `c65` driver does not map
+  the `$E000` ROM window (its own TODO: *"rom8 / roma / rome all causes bootstrap issues if hooked up"*)
+  and is flagged `preliminary`, so nothing executes. The viable route is xemu + the SDK's `mega65`
+  platform, which needs xemu built from source and a user-supplied MEGA65 ROM. Nothing here proves the
+  emitted `asr` is runtime-correct.
 - **Csmith.** `vendor/csmith` is not present in `main` and would need building from source; skipped for
   budget, as the plan permitted. The 1288 c-torture rows in the sweep give comparable breadth at
   compile level.
