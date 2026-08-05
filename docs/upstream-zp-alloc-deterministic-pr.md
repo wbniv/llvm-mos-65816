@@ -12,6 +12,10 @@
        gh pr create --repo llvm-mos/llvm-mos --head wbniv:mos-zp-alloc-deterministic --base main \
          --title "[MOS] Make zero page allocation deterministic (pointer-hash iteration order decided the winners)" \
          --body-file <(sed '2,/^-->$/d; 1d' docs/upstream-zp-alloc-deterministic-pr.md)
+     (sed note: the range needs the terminator ALONE on its line — '^-->$' — which also keeps
+     this command from matching itself; a bare /-->/ range stops at this very line and leaks
+     the rest of the banner into the posted body. Verify the extraction is non-empty and
+     starts at "## Summary" before posting.)
      After posting: flip status row 17 and refresh wald3n.com (task open-source:refresh +
      task publish) — note wald3n also still needs the #589 refresh.
      Original draft note follows.
@@ -21,7 +25,8 @@
      throwaway/gallery-repro-bisect, worktree /home/will/llvm-mos-65816-gallery-repro).
      Fork patch: patches/llvm-mos/0021-mos-zp-alloc-deterministic.patch.
      Verified 2026-07-31 on a rebuilt toolchain — see the Verification section below; the
-     earlier "do not post until verified" block is cleared. -->
+     earlier "do not post until verified" block is cleared.
+-->
 
 ## Summary
 
@@ -161,18 +166,20 @@ tallying the winning set:
 `g0 g1 g2 g3` is the declaration order, which is what `MapVector` predicts: the candidate
 list now follows the MachineInstr walk.
 
-**The lit test** — `zp-alloc-deterministic.ll`: **0 pass / 20 fail** before, **passes** after.
+**The lit test** — `zp-alloc-deterministic.ll`: fails in all 20 repeat runs before the fix,
+**passes** (stable across repeats) after.
 
 **Whole-program** — a 1 MiB SNES ROM (single TU, full LTO, `-mlto-zp=224`) linked 20 times
 from identical sources:
 
 | | distinct images in 20 links |
 |---|---|
-| before | **2**, split ~18/12 over 30 links |
+| before (30-link measurement) | **2**, split ~18/12 |
 | after | **1** — `a4e00f3bfc7491aa7cc129008e7b6cd8933bb117ea90d3361e5363b94903427e`, 20/20 |
 
-**Regressions** — `llvm/test/CodeGen/MOS/`: 81 tests, 7 failures, exactly the pre-existing
-set that fails on this fork before the change. No new failures.
+**Regressions** — `llvm/test/CodeGen/MOS/` on the PR branch (upstream tip `1f334fef02b5` +
+this change): 80 tests, 5 failures — the same five that fail on pristine tip on this machine
+(independently confirmed while preparing an unrelated change). No new failures.
 
 ## Real-world sighting
 
