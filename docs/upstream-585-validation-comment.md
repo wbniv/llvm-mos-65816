@@ -109,8 +109,7 @@ store-folded/dead-result shapes, and signed bitfield read-back — folds into on
 bare-metal for `-mcpu=mos65ce02` and run on xemu's Commodore 65 target. Host oracle, pre-#585, #585, and
 #585-plus-the-arm all return `0xE0E8`. The #585 builds contain 15 native `asr` instructions against 0 at
 baseline, so they genuinely exercised the new selection rather than falling back and passing for the wrong
-reason; #585 also takes 100 bytes off that kernel. `mos45gs02` I checked at codegen level only — running a
-45GS02 build on a 4510 would not be sound.
+reason; #585 also takes 100 bytes off that kernel.
 
 One small measurement note: I reproduced seven of the eight rows in the PR description exactly. For
 `int32_t x = x >> 1`, I measure 22 → 12 bytes (−10), rather than 20 → 12 (−8), on stock llvm-mos at the

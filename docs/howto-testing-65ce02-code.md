@@ -152,10 +152,10 @@ This is what closed the #585 gap. The measured matrix, all agreeing with the hos
 The `asr` counts matter: they prove the #585 run really executed the new instruction path rather than
 quietly falling back.
 
-**Caveat worth keeping.** The C65 target emulates the CSG 4510, i.e. plain 65CE02. Do **not** build the
-payload with `-mcpu=mos45gs02` and run it here — the 45GS02 has instructions the 4510 does not. For
-45GS02 coverage use xemu's `mega65` target (`TARGETS=mega65`), which is where a real MEGA65 ROM would
-genuinely be needed if you went the `.prg`-under-the-OS route.
+**One footgun:** build the payload with `-mcpu=mos65ce02`, not `mos45gs02`. This target is a CSG 4510, and
+a 45GS02 build may use instructions it does not have. (That is a harness constraint, not a coverage gap —
+anything gated on `has65CE02()` behaves the same on both.) Use xemu's `mega65` target if you ever
+specifically need 45GS02.
 
 ### MAME `c65` — do not use
 
@@ -196,10 +196,22 @@ would need so much hedging that it would weaken a review comment rather than sup
 > "executing your code" from "executing your padding".** Always probe with a payload that writes a
 > distinctive value to RAM, never with a NOP sled.
 
-### VICE — not applicable
+### VICE — related, but not a 65CE02 execution target
 
-VICE is in the foundry repo but emulates C64/C128/PET/Plus4/VIC-20/CBM-II and the C64DTV. None uses a
-65CE02.
+VICE is in the foundry repo and its machines are certainly *close enough* to exercise instructions and
+compiler fallbacks shared with the 6502 family. It emulates C64/C128/PET/Plus4/VIC-20/CBM-II and the
+C64DTV, however, and none of those machines uses a 65CE02. The C64DTV adds its own extensions to a
+6510-like CPU; those extensions are not the 65CE02 instruction set.
+
+That distinction is decisive for #585. Its native path emits the 65CE02 accumulator `asr`, encoded as
+`$43`. A VICE CPU does not decode `$43` as that instruction: depending on the selected core, the byte is
+an unsupported or undocumented NMOS-family opcode with different operands and semantics. Executing the
+image in VICE would therefore test different code, not merely the same code with different timing.
+
+VICE remains useful for the **non-65CE02 fallback** (`cmp #128; ror`) and other shared 6502 behavior. It
+cannot validate the native `$43 = asr` selection, nor other 65CE02 facilities such as the `Z` register,
+relocatable base page, added addressing modes, or 16-bit relative branches. For the native half of this
+test, xemu's C65 target is appropriate because its CSG 4510 incorporates the 65CE02 core.
 
 ---
 

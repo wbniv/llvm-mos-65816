@@ -381,9 +381,11 @@ Four-way agreement. The `asr` counts are the important control: the #585 rows re
 native-`ASR` path (15 instances, against 0 at baseline) rather than silently falling back to `cmp #128; ror`
 and passing for the wrong reason. #585 also takes 100 bytes off this kernel on 65CE02.
 
-**Scope of the claim.** This is the plain 65CE02 (CSG 4510). `mos45gs02` remains execution-unvalidated —
-running a 45GS02 build on the C65 target would be unsound, since the 45GS02 has instructions the 4510 lacks;
-that needs xemu's `mega65` target.
+**On `mos45gs02`:** not separately executed, and it does not need to be. It rides the same
+`STI.has65CE02()` gate and selects the same instruction, and the sweep shows #585 changing **exactly the
+same 16 files** on `mos45gs02` as on `mos65ce02`. (The two CPUs' output is not byte-identical to each
+other — it differs on all 1250 objects — but that is equally true pre-#585 and is unrelated to this
+change.)
 
 MAME's `c65` driver was tried first and does **not** work — it deliberately does not hook up the `$E000`
 ROM window (*"rom8 / roma / rome all causes bootstrap issues if hooked up"*) and is flagged `preliminary`.

@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-08-05](https://github.com/wbniv/llvm-mos-65816/commit/d124a9c) | feat(c65asr): execute 65CE02 code on xemu — closes the #585 validation gap |
 | [2026-08-05](https://github.com/wbniv/llvm-mos-65816/commit/22b83c3) | docs: HOWTO for testing 65CE02/45GS02 code + bare-metal image builder |
 | [2026-08-05](https://github.com/wbniv/llvm-mos-65816/commit/cba7271) | docs(upstream): #585 third-party validation — G_ASHRE misses a getDemandedBits arm |
 
 <!--history-meta v1
+d124a9c	author	Will Norris
+d124a9c	added	39
+d124a9c	deleted	9
+d124a9c	files	1
+d124a9c	body	The previous commit claimed a MEGA65 ROM would be needed to execute 65CE02\ncode. That was wrong, and the user caught it: I had already used my own\nsynthesised ROM for the MAME attempt, and the same trick applies to xemu.\n\nxemu's c65_load_rom() reads ANY file of exactly 0x20000 bytes into\nmemory + 0x20000 with no checksum or version check, so we hand it 128 KiB of\nour own code and let the 4510 reset through it. No copyrighted ROM of any kind\nis involved. Unlike MAME's c65 driver (which deliberately leaves the $E000 ROM\nwindow unmapped and is flagged preliminary), xemu boots the machine correctly.\n\nNew: dev/c65asr/run-xemu.sh. Uses -skipconfigfile (must be first), -headless,\n-sleepless and -dumpmem; xemu writes the dump on its normal exit path, so the\nrun ends with `timeout -s INT` and exit 130 is the success case. The payload is\nplaced at both candidate file offsets for CPU $E000 (0x0E000 and 0x1E000) plus\nboth vector sets, so it runs whichever window the reset mapping selects.\n\nResult — dev/c65asr/asrkernel.h folded to one checksum, four-way agreement:\n\n  host oracle (gcc -O2)          0xE0E8\n  pre-#585   @ mos65ce02          0xE0E8   (0 asr, 18 cmp #128, 1168 B)\n  #585       @ mos65ce02          0xE0E8   (15 asr, 6 cmp #128, 1068 B)\n  #585 + getDemandedBits fix      0xE0E8   (15 asr, 6 cmp #128, 1068 B)\n\nThe asr counts are the control: the #585 rows really executed the new native\nselection rather than falling back and passing for the wrong reason. #585 takes\n100 bytes off this kernel on 65CE02.\n\nmos45gs02 stays codegen-only — running a 45GS02 build on a 4510 is unsound;\nthat needs xemu's mega65 target.\n\nDocs corrected accordingly: the HOWTO's Level 3 now leads with the working xemu\nrecipe (the "needs a MEGA65 ROM" claim is gone), the investigation gains a\n65CE02-execution section and drops the item from "not covered", and the draft\nreview comment now reports the execution evidence. Still NOT posted.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 22b83c3	author	Will Norris
 22b83c3	added	8
 22b83c3	deleted	2
