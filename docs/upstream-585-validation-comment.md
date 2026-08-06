@@ -20,11 +20,17 @@
 >   22 → 12 bytes (−10) where the PR description says 20 → 12 (−8), confirmed against stock unpatched
 >   llvm-mos — it simply was not raised upstream. It remains recorded in the investigation, §4.
 >
+> **Edited after posting** (live comment last updated 2026-08-06T00:58:07Z): a closing paragraph was
+> added noting that reproduction needs no C65 ROM — xemu's C65 target loads any 128 KiB file as its
+> system ROM without validating it — and linking upstream xemu plus the prebuilt `x-emulators`
+> package on apt.foundrylinux.org. The body below includes it.
+>
 > Do not re-post this file.
 
 ---
 
 <!-- COMMENT BODY BELOW -->
+
 
 Hi @mlund — I tested #585 against a downstream MOS corpus. The 65CE02 code-size win is real, but I found
 one non-65CE02 pessimization caused by an incomplete `G_LSHRE` → `G_ASHRE` migration in demanded-bits
@@ -116,5 +122,11 @@ read-back. Its host oracle produces checksum `0xE0E8`; bare-metal builds made wi
 #585, and #585 plus the proposed demanded-bits arm all produce the same checksum on xemu's Commodore 65
 target. The #585 builds contain 15 native `asr` instructions, compared with none in the baseline, and reduce
 the kernel from 1168 to 1068 bytes.
+
+Reproducing that needs no C65 ROM image, which may be worth knowing: xemu's C65 target loads any
+128 KiB file as its system ROM without validating it, so the harness just supplies its own.
+[xemu](https://github.com/lgblgblgb/xemu) builds in about a minute from source; a prebuilt
+`x-emulators` package is also on [apt.foundrylinux.org](https://apt.foundrylinux.org/) if that is
+easier.
 
 The reducer, focused MIR regression, and proposed patch are included above.
