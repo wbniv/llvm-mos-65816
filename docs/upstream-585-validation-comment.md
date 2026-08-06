@@ -1,21 +1,26 @@
-# DRAFT review comment — llvm-mos PR #585 (`[65CE02] Legalize arithmetic right shifts`)
+# Review comment — llvm-mos PR #585 (`[65CE02] Legalize arithmetic right shifts`)
 
-> ## ⛔ DO NOT POST — user approval required
+> ## ✅ POSTED 2026-08-05 — no further action
 >
-> Reviewed 2026-08-05 against unchanged PR head
-> `4fb170fd9d357e453c5f3bc9421caa70b8bbb337`. The PR remains open with no comments or reviews;
-> macOS, Ubuntu, and Windows CI are green. Re-check the head before posting.
+> Live at
+> [llvm-mos/llvm-mos#585 (comment)](https://github.com/llvm-mos/llvm-mos/pull/585#issuecomment-5198287883),
+> posted against PR head `4fb170fd9d357e453c5f3bc9421caa70b8bbb337`. The body below is what was
+> actually sent, verified byte-for-byte against the posted comment.
 >
 > Full evidence: [`investigations/2026-08-05-585-gashre-validation.md`](investigations/2026-08-05-585-gashre-validation.md);
 > 65CE02 execution recipe: [`howto-testing-65ce02-code.md`](howto-testing-65ce02-code.md).
 >
-> **Exact command to post, once approved:**
+> **Edited before posting** (differences from the reviewed draft, recorded so the file stays an honest
+> record):
 >
-> ```bash
-> awk 'f{print} /^<!-- COMMENT BODY BELOW -->$/{f=1}' \
->   docs/upstream-585-validation-comment.md > /tmp/585-comment.md
-> gh pr comment 585 -R llvm-mos/llvm-mos --body-file /tmp/585-comment.md
-> ```
+> * The 65CE02 execution paragraph was rewritten to link the
+>   [test kernel and xemu harness](https://github.com/wbniv/llvm-mos-65816/tree/d124a9c3190bd5232112062c114a84b9348fba55/dev/c65asr)
+>   rather than describe them inline.
+> * The `int32_t x = x >> 1` measurement note was **dropped**. That finding still stands — we measure
+>   22 → 12 bytes (−10) where the PR description says 20 → 12 (−8), confirmed against stock unpatched
+>   llvm-mos — it simply was not raised upstream. It remains recorded in the investigation, §4.
+>
+> Do not re-post this file.
 
 ---
 
@@ -103,16 +108,13 @@ I applied the arm locally and rebuilt. The C reducers return byte-for-byte to th
 all non-65CE02 differences disappeared after the fix; all 16 changed 65CE02 objects retained their wins
 (−529 bytes total). A paired emulator differential and the CodeGen/MOS failing set were unchanged.
 
-I also executed the new path rather than only inspecting it. A kernel covering every arithmetic-right-shift
-shape I could think of — all widths and shift amounts, both signs, the multi-byte carry chain,
-store-folded/dead-result shapes, and signed bitfield read-back — folds into one 16-bit checksum, built
-bare-metal for `-mcpu=mos65ce02` and run on xemu's Commodore 65 target. Host oracle, pre-#585, #585, and
-#585-plus-the-arm all return `0xE0E8`. The #585 builds contain 15 native `asr` instructions against 0 at
-baseline, so they genuinely exercised the new selection rather than falling back and passing for the wrong
-reason; #585 also takes 100 bytes off that kernel.
-
-One small measurement note: I reproduced seven of the eight rows in the PR description exactly. For
-`int32_t x = x >> 1`, I measure 22 → 12 bytes (−10), rather than 20 → 12 (−8), on stock llvm-mos at the
-PR's merge-base-equivalent MOS backend. That appears to make the improvement slightly larger than stated.
+I also executed the new path rather than only inspecting it. The
+[test kernel and xemu harness](https://github.com/wbniv/llvm-mos-65816/tree/d124a9c3190bd5232112062c114a84b9348fba55/dev/c65asr)
+are available in my downstream repository. The kernel covers all integer widths and shift amounts, positive
+and negative inputs, multi-byte carry chains, store-folded and dead-result forms, and signed-bitfield
+read-back. Its host oracle produces checksum `0xE0E8`; bare-metal builds made with the pre-#585 compiler,
+#585, and #585 plus the proposed demanded-bits arm all produce the same checksum on xemu's Commodore 65
+target. The #585 builds contain 15 native `asr` instructions, compared with none in the baseline, and reduce
+the kernel from 1168 to 1068 bytes.
 
 The reducer, focused MIR regression, and proposed patch are included above.
