@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-06](https://github.com/wbniv/llvm-mos-65816/commit/5b1d632) | fix(dev): require real xy16inplace emulator results |
 | [2026-08-04](https://github.com/wbniv/llvm-mos-65816/commit/7d33fe8) | docs: consolidate orphaned doc-state from completed sessions + today's bookkeeping |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/28144b9) | docs(plan-index): record the #123 nmitally commit SHA |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/5b80b02) | feat(snes): #123 nmitally — the interrupt CC's first run finds a 65816 width bug |
@@ -221,6 +222,10 @@
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+5b1d632	author	Will Norris
+5b1d632	added	5
+5b1d632	deleted	0
+5b1d632	files	1
 7d33fe8	author	Will Norris
 7d33fe8	added	1
 7d33fe8	deleted	1

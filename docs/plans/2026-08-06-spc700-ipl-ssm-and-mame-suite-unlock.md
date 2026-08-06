@@ -116,7 +116,7 @@ dev/run.sh cartsize-canary
 
 dev/run.sh corpus
   RESULT: 40/63 passed
-  21 runnable long cases read 0x0000 at the fixed 600-tick MAME deadline;
+  21 runnable long cases read 0x0000 at the shared default 60-tick MAME deadline;
   nbody_sim and nmitally_sim were absent because this runner does not build them
 
 dev/run.sh corpus-a16
@@ -142,3 +142,7 @@ including the 21 default-run timeouts and both initially absent ROMs, passes in 
 gate at its 1000-tick settle. Track raising or making the default runner's deadline per-test separately;
 do not weaken the completed 62/62 differential result. The `xy16inplace` classification defect is fixed
 and recorded in [`2026-08-06-xy16inplace-jgx-classification.md`](2026-08-06-xy16inplace-jgx-classification.md).
+
+**Follow-up resolved the limitation:** the plain runner now rebuilds all manifest rows and uses the same
+1000-tick default; its acceptance run passes 63/63, with the paired differential still 62/62. See
+[`2026-08-06-corpus-mame-settle-and-build-freshness.md`](2026-08-06-corpus-mame-settle-and-build-freshness.md).

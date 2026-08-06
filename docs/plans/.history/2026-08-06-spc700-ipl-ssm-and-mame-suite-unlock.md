@@ -1,8 +1,13 @@
 | Date | Change |
 |------|--------|
+| [2026-08-06](https://github.com/wbniv/llvm-mos-65816/commit/5b1d632) | fix(dev): require real xy16inplace emulator results |
 | [2026-08-06](https://github.com/wbniv/llvm-mos-65816/commit/925b513) | feat(dev): provision SPC700 IPL from SSM |
 
 <!--history-meta v1
+5b1d632	author	Will Norris
+5b1d632	added	58
+5b1d632	deleted	1
+5b1d632	files	1
 925b513	author	Will Norris
 925b513	added	87
 925b513	deleted	0

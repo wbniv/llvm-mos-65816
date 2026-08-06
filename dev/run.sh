@@ -420,6 +420,7 @@ docker run --rm \
   -e HOME=/work/build \
   ${SMOKE_WANT:+-e SMOKE_WANT} \
   ${SMOKE_SETTLE:+-e SMOKE_SETTLE} \
+  ${SMOKE_SECONDS:+-e SMOKE_SECONDS} \
   ${SNES_ROMPATH:+-e SNES_ROMPATH} \
   ${MOS_TOOLCHAIN:+-e MOS_TOOLCHAIN} \
   ${BUILD_JOBS:+-e BUILD_JOBS} \
