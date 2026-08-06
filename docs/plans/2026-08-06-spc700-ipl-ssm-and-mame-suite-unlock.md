@@ -1,6 +1,6 @@
 # SPC700 IPL — SSM provisioning + full MAME-leg suite unlock
 
-**Date:** 2026-08-06 · **Status:** IN PROGRESS · **Item:** TODO `[T2]` · **Owner:** this session
+**Date:** 2026-08-06 · **Status:** COMPLETE WITH FOLLOW-UP · **Item:** TODO `[T2]` · **Owner:** this session
 
 **Supersedes the open question in** [`docs/plans/2026-08-03-spc700-ipl-ssm-provisioning.md`](2026-08-03-spc700-ipl-ssm-provisioning.md)
 (that plan's Option A/B/C decision). **User decision, 2026-08-06: Option B — SSM, retrievable.**
@@ -85,3 +85,60 @@ vocabulary (`docs/plans/2026-08-03-spc700-ipl-ssm-provisioning.md`'s own payoff 
 9. `dev/run.sh corpus` / `corpus-a16` / `torture` — MAME leg PASS where previously SKIP, results
    match the recorded bsnes-jg CRCs (no new divergence).
 10. `dev/run.sh xcheck-suite` unchanged (proves no regression in the bsnes-jg-only path).
+
+## Results (2026-08-06)
+
+### Provisioning controls
+
+```text
+local check:       PASS  64 B, sha1 97e352553e94242ae823547cd853eecda55c20f0
+SSM round-trip:    PASS  SecureString version 1, decoded sha1 matches
+63-byte seed:      PASS  refused before AWS write
+wrong-sha1 seed:   PASS  refused before AWS write
+cold fetch:        PASS  restored byte-identically from SSM
+cache hit:         PASS  succeeded with a deliberately nonexistent AWS profile (no AWS call)
+corrupt remote:    PASS  63-byte SSM control refused; existing sentinel unchanged
+remote restore:    PASS  decoded sha1 returned to 97e352553e94242ae823547cd853eecda55c20f0
+```
+
+The configured machine has only the `invest-terraform` profile, not the scripts' intended
+`65816-terraform` default. The live parameter and all network controls were therefore verified with the
+documented `SPC700_AWS_PROFILE=invest-terraform` stopgap. This is a local credential-configuration gap,
+not an IPL or fetch-path failure; the per-project profile still needs installing on a fresh operator box.
+
+### Emulator suites
+
+```text
+dev/run.sh cartsize-canary
+  PASS: 14/14 configurations; structure + -verify + MAME + bsnes-jg assertions;
+        one picture across all six entropy boots for every configuration
+  RESULT: PASS — both emulators agree
+
+dev/run.sh corpus
+  RESULT: 40/63 passed
+  21 runnable long cases read 0x0000 at the fixed 600-tick MAME deadline;
+  nbody_sim and nmitally_sim were absent because this runner does not build them
+
+dev/run.sh corpus-a16
+  RESULT: 62/62 passed, 0 xfail
+  default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg (settle=1000)
+
+dev/run.sh torture
+  fetched checksum-pinned GCC 14.2 execute corpus (1862 files)
+  RESULT: 30 PASS, 0 FAIL, 0 SKIP, 0 XFAIL
+
+dev/run.sh xcheck-suite (before harness fix)
+  RESULT: 51/52 PASS, 1 false jg-SKIP (xy16inplace)
+dev/run.sh xcheck-suite (after harness fix)
+  RESULT: PASS — 52/52 bsnes-jg value tests agree
+
+dev/run.sh fuzz --gen csmith 1 1
+  pinned Csmith 0cdc710315cfee9035e22ef4363ca479270d1934
+  RESULT: 1/1 PASS, all configurations agree at 0x95A2
+```
+
+The default corpus result is a harness limitation, not a measured codegen divergence: every runnable row,
+including the 21 default-run timeouts and both initially absent ROMs, passes in the broader `corpus-a16`
+gate at its 1000-tick settle. Track raising or making the default runner's deadline per-test separately;
+do not weaken the completed 62/62 differential result. The `xy16inplace` classification defect is fixed
+and recorded in [`2026-08-06-xy16inplace-jgx-classification.md`](2026-08-06-xy16inplace-jgx-classification.md).

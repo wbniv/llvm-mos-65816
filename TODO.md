@@ -189,9 +189,17 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
   site, so it is one mechanical step once (2) ships. Spec + all evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
-- [T2] **MAME leg for the cartsize canaries — blocked on the SPC700 IPL** (`dev/roms/s_smp/spc700.rom`
-  absent on this machine; gate falls back to `JG_ONLY`). User supplies the IPL; then re-run
-  `dev/run.sh cartsize-canary` for the MAME column. (T2: one gate re-run once unblocked.)
+- [x] ~~**MAME leg for the cartsize canaries — blocked on the SPC700 IPL.**~~ **UNBLOCKED + PASS
+  2026-08-06:** the checksum-gated IPL is retrievable from SSM; all 14 cartsize configurations pass
+  structure, `-verify-machineinstrs`, MAME, bsnes-jg, and six-boot entropy independence. The wider unlocked
+  suite is also green at `corpus-a16` 62/62, c-torture 30/30, and `xcheck-suite` 52/52. The plain
+  `corpus` runner remains 40/63 because its 600-tick MAME deadline expires on 21 long cases and it does not
+  build two generated ROMs; the 1000-tick `corpus-a16` gate proves all 23 pass. [plan](docs/plans/2026-08-06-spc700-ipl-ssm-and-mame-suite-unlock.md).
+- [T2] **Default `dev/run.sh corpus` MAME deadline/build freshness.** With the IPL available, 21 long cases
+  read `0x0000` at the runner's fixed 600-tick deadline and `nbody_sim`/`nmitally_sim` are absent unless a
+  broader build ran first (`40/63`). All 23 pass in `corpus-a16` at settle=1000 (`62/62`), so this is a
+  harness-policy gap, not a codegen divergence. Make settle per-test or raise it with a measured runtime
+  bound, and make required generated ROMs explicit. (T2: bounded harness change + paired rerun.)
 - [T5] **Backend: `rc-undef` cause #2 (item 13) — SECOND MANIFESTATION found + MISDIAGNOSIS
   corrected (2026-08-02).** (Re-ranked T3→T5 2026-08-04: the evidence is folded into the item-13
   issue body (`412fe4e`, repro re-verified — same 2 errors, slots 736B/1480B now recorded); the

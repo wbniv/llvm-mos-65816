@@ -43,3 +43,12 @@ GitHub Actions may retain `SNES_SPC700_ROM_B64` as a deployment copy, but GitHub
 secrets are write-only: they can be consumed by CI but cannot be retrieved as a
 backup. SSM is the source of truth because an authorized project principal can
 read it back, verify it, and provision a clean machine.
+
+## Verified behavior
+
+On 2026-08-06 the SSM value round-tripped to the expected SHA-1; cold fetch, cache hit, invalid seed,
+corrupt remote, atomic non-overwrite, and restore controls all passed. With the fetched IPL, the complete
+14-configuration cartsize matrix passed MAME and bsnes-jg, the width-mode corpus passed 62/62 on both
+emulators, and a 30-test c-torture slice passed all configurations. Full raw summaries and the default
+corpus runner's shorter-deadline limitation are recorded in
+[`docs/plans/2026-08-06-spc700-ipl-ssm-and-mame-suite-unlock.md`](plans/2026-08-06-spc700-ipl-ssm-and-mame-suite-unlock.md).
