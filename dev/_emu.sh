@@ -45,10 +45,17 @@ require_bios() {
   # never committed — see .gitignore). Without it MAME aborts before our assert with
   # "Required files are missing". Exit 2 lets callers tell "missing BIOS prereq" from
   # a 1 = "ran but produced the wrong bytes".
-  if [ ! -f "$bios" ]; then
+  if [ -x "$_EMU_ROOT/dev/fetch-spc700.sh" ] &&
+     ! SNES_ROMPATH="$ROMPATH" "$_EMU_ROOT/dev/fetch-spc700.sh" --check >/dev/null 2>&1; then
+    # Normally dev/run.sh fetches on the host before starting this container. Keep
+    # the shared gate self-healing too for direct/container callers that provide AWS.
+    SNES_ROMPATH="$ROMPATH" "$_EMU_ROOT/dev/fetch-spc700.sh" || true
+  fi
+  if [ ! -f "$bios" ] ||
+     ! SNES_ROMPATH="$ROMPATH" "$_EMU_ROOT/dev/fetch-spc700.sh" --check >/dev/null 2>&1; then
     echo "MISSING SNES BIOS: $bios"
     echo "  MAME's snes driver needs the SPC700 IPL ROM (sha1 97e352553e94242ae823547cd853eecda55c20f0)."
-    echo "  Supply it out-of-band (gitignored): mkdir -p $ROMPATH/s_smp && cp <your>/spc700.rom $ROMPATH/s_smp/"
+    echo "  Fetch it on the host with dev/fetch-spc700.sh, or supply it out-of-band."
     echo "  Override the location with SNES_ROMPATH=<dir>."
     return 2
   fi

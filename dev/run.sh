@@ -397,6 +397,14 @@ if [ "$TARGET" = "cross-toolchain" ] || [ "$TARGET" = "cross-selftest" ]; then
   docker build -t llvm-mos-65816-dev -f "$HERE/Dockerfile" "$HERE" >/dev/null
 fi
 
+# AWS credentials deliberately stay on the host. For scripts using the shared
+# MAME BIOS gate, materialize the IPL before Docker mounts the repository.
+target_script="$HERE/$TARGET.sh"
+if [ "${JG_ONLY:-}" != 1 ] && [ -f "$target_script" ] &&
+   grep -Eq '(^|[^[:alnum:]_])require_bios([^[:alnum:]_]|$)' "$target_script"; then
+  "$HERE/fetch-spc700.sh"
+fi
+
 docker build -t "$IMAGE" -f "$HERE/$DEV_DOCKERFILE" "$HERE" >/dev/null
 mkdir -p "$ROOT/build"
 # Forward the optional knobs into the container when set (name-only -e reads the

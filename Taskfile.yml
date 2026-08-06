@@ -32,6 +32,23 @@ tasks:
         sudo apt-get update -qq
         sudo apt-get install -y "${need[@]}"
 
+  spc700:
+    desc: "Fetch and verify the gitignored SPC700 IPL from AWS SSM"
+    cmds:
+      - dev/fetch-spc700.sh
+
+  spc700:check:
+    desc: "Verify the local SPC700 IPL without contacting AWS"
+    cmds:
+      - dev/fetch-spc700.sh --check
+
+  spc700:seed:
+    desc: "Validate and seed the SPC700 IPL into AWS SSM (ROM=path; add -- --force to replace)"
+    requires:
+      vars: [ROM]
+    cmds:
+      - dev/seed-spc700.sh {{.CLI_ARGS}} "{{.ROM}}"
+
   # --- Dev image / build pipeline (thin wrappers over dev/run.sh) ---
 
   build:
