@@ -1173,8 +1173,8 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
 
 - **Upstream #585 (`G_ASHRE` ASR legalization, mlund)** — lands in `0002`'s core files
   (legalizer/combiner/GISel tds): reconcile on the next vendor rebase; consider re-expressing the
-  fork's a16 s16 `cmp #$8000; ror` ASHR through `G_ASHRE` post-merge. Validation pass in flight
-  (status row 22). [PR](https://github.com/llvm-mos/llvm-mos/pull/585)
+  fork's a16 s16 `cmp #$8000; ror` ASHR through `G_ASHRE` post-merge. Validation complete and
+  review comment posted (status row 22). [PR](https://github.com/llvm-mos/llvm-mos/pull/585)
 
 _Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
 revisit) rather than active work._
