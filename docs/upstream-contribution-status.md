@@ -1,6 +1,11 @@
 # Upstream contribution status — what's drafted and pending to post
 
-**Last updated:** 2026-08-04 (**BRK signature operand PR #586 and `llvm-mc` Motorola-default PR
+**Last updated:** 2026-08-28 (**PR #577 maintainer review addressed:** rebased onto current upstream
+`main` at `e1686c59f0bd`, removed the redundant `.lower()` commentary, reduced the lit-test preamble
+to input provenance and test intent, and force-pushed the verified single commit `62dd8731dccb`.
+The focused `llc -verify-machineinstrs | FileCheck` pipeline passes; response posted in
+[the upstream thread](https://github.com/llvm-mos/llvm-mos/pull/577#issuecomment-5457537890).**
+Previously 2026-08-04 (**BRK signature operand PR #586 and `llvm-mc` Motorola-default PR
 #587 posted.** **#321 upstream disposition clarified: `0002` remains local.** There is no existing
 #321 pull request; #321 is the upstream issue. The other open PRs (#577, #578, #579, #584, #586,
 #587) are narrower independent changes and must not absorb the holistic native-width patch. A future
@@ -20,7 +25,8 @@ updated in place** (plan:
 [2026-07-31-upstream-pr-critique-improvements](plans/2026-07-31-upstream-pr-critique-improvements.md);
 validation: a one-off MOS-only upstream build `~/llvm-mos/build-pr`, lit green per branch before
 each push; none of the PRs had review activity, so 577/578 were amended in place).
-[#577](https://github.com/llvm-mos/llvm-mos/pull/577) @ `67020e21c32c` — test strengthened
+[#577](https://github.com/llvm-mos/llvm-mos/pull/577) @ `62dd8731dccb` — rebased and maintainer
+review addressed 2026-08-28; test strengthened
 (per-function `CHECK-NOT: jsr` pins inline expansion at every width + new s32-result case).
 [#578](https://github.com/llvm-mos/llvm-mos/pull/578) @ `edc9bbd23b71` — new
 `coalesce-rotate-ac-no-pessimize.ll` (shift chains keep tight form, byte-identical to unguarded
@@ -190,7 +196,7 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 - **✅ POSTED (campaign Wave 1, item 1, 2026-07-26):** `0016` G_SCMP/G_UCMP — issue
   [**#576**](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
   [**#577**](https://github.com/llvm-mos/llvm-mos/pull/577) (`wbniv:mos-scmp-ucmp-legalize` @
-  `67020e21c32c` — amended 2026-07-31, critique pass: `CHECK-NOT: jsr` + s32-result case; fix +
+  `62dd8731dccb` — rebased and review-addressed 2026-08-28; `CHECK-NOT: jsr` + s32-result case; fix +
   `scmp-ucmp.ll`, `Fixes #576`, live-demo links in body).
 - **✅ POSTED (campaign Wave 1, items 2+3, 2026-07-26): Wave 1 COMPLETE** —
   `0010` coalesce-rotate-Ac = [**PR #578**](https://github.com/llvm-mos/llvm-mos/pull/578)

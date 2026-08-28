@@ -2,7 +2,8 @@
 #
 # Status: POSTED 2026-07-26 as [PR #577](https://github.com/llvm-mos/llvm-mos/pull/577) ("Fixes #576"
 # substituted for the #NNN placeholder below; body below is otherwise the as-posted text;
-# test paragraph updated 2026-07-31, critique-improvements pass).
+# test paragraph updated 2026-07-31, critique-improvements pass; maintainer review addressed
+# 2026-08-28 and rebased commit pushed as 62dd8731dccb).
 # Branch: wbniv:mos-scmp-ucmp-legalize
 # (cut from main tip 8be054612; carries the one-line fix + llvm/test/CodeGen/MOS/scmp-ucmp.ll).
 # Post command (after the issue is opened and `gh auth login`):

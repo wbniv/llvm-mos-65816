@@ -901,8 +901,9 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 - [wip T5] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — 🏁 WAVE 1
   COMPLETE 2026-07-26).** ✅ **All three Wave-1 items live upstream:** `0016` G_SCMP/G_UCMP = issue
   [#576](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
-  [#577](https://github.com/llvm-mos/llvm-mos/pull/577) (`wbniv:mos-scmp-ucmp-legalize`, fix + lit
-  test, `Fixes #576`); `0010` coalesce-rotate-Ac = PR
+  [#577](https://github.com/llvm-mos/llvm-mos/pull/577) (`wbniv:mos-scmp-ucmp-legalize` @
+  `62dd8731dccb`, maintainer review addressed 2026-08-28, fix + lit test, `Fixes #576`); `0010`
+  coalesce-rotate-Ac = PR
   [#578](https://github.com/llvm-mos/llvm-mos/pull/578) (`wbniv:mos-coalesce-rotate-ac`,
   red/green-proven, four live-demo links); DWARF step-6 = PR
   [#579](https://github.com/llvm-mos/llvm-mos/pull/579) (`wbniv:mos-dwarf-65816-test-docs`).
