@@ -163,7 +163,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   `farptrcmp`. [plan](docs/plans/2026-08-04-128-snes-bankwalk.md).
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
   (2026-08-01); only the player-package release is left, and it is USER-GATED.**
-  <!-- agent:a5850a8d3df7af344 -->
   Mechanism (c): the ROM already verifies each work as it displays it, so it publishes a 5-byte
   `gallery_shown{z,work,ok,state}` record (state = publication barrier) and the player polls it in
   a new `mode: "live-record"`, comparing `z` against a host-generated 62-entry oracle table — the
@@ -818,7 +817,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `wireframe`), and the run still exits looking like it merely stopped. Collect failures, keep going,
   and fail at the end with an explicit list, so one fat demo can never again mask dozens of others.
   [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
-- [wip T2] **Vacuous `-verify-machineinstrs` in demo gate scripts — sweep and fix.** <!-- agent:aa21def05ab7faee3 --> Under the config's
+- [wip T2] **Vacuous `-verify-machineinstrs` in demo gate scripts — sweep and fix.** Under the config's
   default LTO, `mos-clang --config … -c` emits bitcode (codegen never runs) and the link does not
   forward `-mllvm` to the LTO backend, so `-mllvm -verify-machineinstrs` on those invocations
   verifies NOTHING — a vacuous PASS. Found on `wt/321-nmitally` (its script comments name
