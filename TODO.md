@@ -304,7 +304,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
-- [T3] **Un-work-around `maze.h`'s two-pass split** now that the legalizer indexed-addr domination
+- [wip T3] **Un-work-around `maze.h`'s two-pass split** <!-- agent:ad97843e984297da1 --> now that the legalizer indexed-addr domination
   fix is live (`fb528d8`). `examples/65816/maze.h` splits the fold-while-walk loop into
   `maze_path_build` + `maze_fold_path` purely to dodge the old `-verify` abort; the single
   fold-while-walk loop should now compile `-verify`-clean (the `legalindexdom` gate proves the shape).
