@@ -1,0 +1,1 @@
+[MOS] Accept an optional BRK signature operand

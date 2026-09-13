@@ -1,0 +1,1 @@
+[MOS] Add the COP mnemonic with a mandatory signature operand

@@ -1,0 +1,172 @@
+diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
+index 533e1017b566..50432465870e 100644
+--- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp
++++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
+@@ -254,6 +254,14 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &MF) {
+     }
+   }
+ 
++  // Copy forwarding can change the register live around a loop. Propagate
++  // live-ins to a fixed point before using them to erase dead copies.
++  SmallVector<MachineBasicBlock *> Blocks;
++  for (MachineBasicBlock *MBB : post_order(&MF))
++    if (!MBB->isEntryBlock())
++      Blocks.push_back(MBB);
++  fullyRecomputeLiveIns(Blocks);
++
+   for (MachineBasicBlock *MBB : post_order(&MF)) {
+     LivePhysRegs LPR(TRI);
+ 
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index 8512e0d28e12..baf6de604cb7 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -647,21 +647,6 @@ bool MOSRegisterInfo::shouldCoalesce(
+     const TargetRegisterClass *NewRC, LiveIntervals &LIS) const {
+   const auto &MRI = MI->getMF()->getRegInfo();
+ 
+-  // Don't coalesce two shift/rotate-referenced values together into the A-only Ac
+-  // class. The accumulator is the only register ASL/LSR/ROL/ROR can operate on, so
+-  // an Ac value is pinned to A for its whole live range. When such a value is also
+-  // loop-carried across an inner conditional whose other arm needs A (e.g. an
+-  // inlined CRC16 bit loop: the bit-test reloads the pre-rotate byte into A, while
+-  // the rotated value must survive to the next iteration), pinning it to A-only
+-  // leaves the allocator no register to evict it to on the skip path — it strands
+-  // the live value in Y while the back-edge rotate reads a stale A, miscompiling
+-  // silently (the machine verifier does not catch it). Keeping the copy live lets
+-  // the value occupy the broader AImag8/AY class and spill/transfer as needed.
+-  if (NewRC == &MOS::AcRegClass &&
+-      referencedByShiftRotate(MI->getOperand(0).getReg(), MRI) &&
+-      referencedByShiftRotate(MI->getOperand(1).getReg(), MRI))
+-    return false;
+-
+   // Don't coalesce Imag8 and AImag8 registers together when used by shifts or
+   // rotates.  This may cause expensive ASL zp's to be used when ASL A would
+   // have sufficed. It's better to do arithmetic in A and then copy it out.
+diff --git a/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll b/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll
+deleted file mode 100644
+index 6b4f20948380..000000000000
+--- a/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll
++++ /dev/null
+@@ -1,33 +0,0 @@
+-; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s
+-;
+-; Cost side of the shouldCoalesce Ac guard (see coalesce-rotate-ac.mir): the
+-; guard refuses to coalesce two shift/rotate-referenced values into the A-only
+-; Ac class even in straight-line code, so pin that the common multi-shift
+-; shapes keep their tight form — the COPY the guard preserves is allocated to
+-; A and folds away, with no transfer or extra zero-page traffic between the
+-; shift ops.
+-
+-target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+-target triple = "mos"
+-
+-define i8 @shl2_u8(i8 %x) {
+-; CHECK-LABEL: shl2_u8:
+-; CHECK:      asl
+-; CHECK-NEXT: asl
+-; CHECK-NEXT: rts
+-  %r = shl i8 %x, 2
+-  ret i8 %r
+-}
+-
+-define i16 @shl2_u16(i16 %x) {
+-; CHECK-LABEL: shl2_u16:
+-; CHECK:      stx [[HI:.*]]
+-; CHECK-NEXT: asl
+-; CHECK-NEXT: rol [[HI]]
+-; CHECK-NEXT: asl
+-; CHECK-NEXT: rol [[HI]]
+-; CHECK-NEXT: ldx [[HI]]
+-; CHECK-NEXT: rts
+-  %r = shl i16 %x, 2
+-  ret i16 %r
+-}
+diff --git a/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir b/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir
+deleted file mode 100644
+index 8cf76e4884a9..000000000000
+--- a/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir
++++ /dev/null
+@@ -1,25 +0,0 @@
+-# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=register-coalescer %s -o - | FileCheck %s
+-
+-# A value used by a rotate (ROL) is pinned to the accumulator (the Ac class), the
+-# only register the rotate can read/write. Coalescing two such values together
+-# into Ac removes the COPY that lets the live value vacate A when the other arm of
+-# an enclosing conditional needs A (e.g. an inlined CRC16 bit loop). That strands
+-# the value and the back-edge rotate reads a stale A -> a silent miscompile. The
+-# coalescer must keep the COPY (MOSRegisterInfo::shouldCoalesce).
+----
+-name: dont_coalesce_rotate_into_ac
+-tracksRegLiveness: true
+-body: |
+-  bb.0:
+-    liveins: $a, $c
+-    ; CHECK: [[ROL:%[0-9]+]]:ac, {{[^=]*}} = ROL %0
+-    ; CHECK-NEXT: %{{[0-9]+}}:ac = COPY [[ROL]]
+-    ; CHECK-NEXT: {{%[0-9]+}}:ac, {{.*}} = ROL
+-    %0:ac = COPY $a
+-    %1:cc = COPY $c
+-    %2:ac, %3:cc = ROL %0, %1
+-    %4:ac = COPY %2
+-    %5:ac, %6:cc = ROL %4, %3
+-    $a = COPY %5
+-    RTS implicit $a
+-...
+diff --git a/llvm/test/CodeGen/MOS/copy-opt-loop.mir b/llvm/test/CodeGen/MOS/copy-opt-loop.mir
+new file mode 100644
+index 000000000000..84071e1e02bd
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/copy-opt-loop.mir
+@@ -0,0 +1,51 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=COPY
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=LOWER
++
++# Forwarding the loop header's A = COPY Y makes A live across the latch.
++# The sign test must not clobber A after its new value is copied to Y.
++---
++name: copy_forward_loop
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $a, $x, $rc28
++    $y = COPY $a
++    BRA %bb.1
++
++  bb.1:
++    liveins: $x, $y, $rc28
++    ; COPY-LABEL: bb.1:
++    ; COPY: liveins: {{.*}}$a{{.*}}
++    ; COPY: $rc2 = COPY $a
++    ; COPY: $a, dead $c = ROL
++    ; LOWER-LABEL: bb.1:
++    ; LOWER: $a, dead $c = ROL
++    ; LOWER-NOT: $a = LDImag8 $rc2
++    ; LOWER: BR %bb.3
++    $a = COPY $y
++    $rc2 = COPY $y
++    $rc28, $c = ASL $rc28
++    $a, dead $c = ROL $a, $c
++    $y = COPY $a
++    CmpBrZero %bb.3, undef $n, 0, $rc2, implicit-def $c
++
++  bb.2:
++    liveins: $x, $y, $rc28
++    $a = COPY $rc28
++    $a = EORImm $a, 33
++    $rc28 = COPY $a
++    $a = COPY $y
++    $a = EORImm $a, 16
++    $y = COPY $a
++
++  bb.3:
++    liveins: $x, $y, $rc28
++    ; COPY-LABEL: bb.3:
++    ; COPY: liveins: {{.*}}$a{{.*}}
++    $x = DEC $x
++    CmpBrZero %bb.1, undef $z, 0, $x, implicit-def dead $c
++
++  bb.4:
++    liveins: $y, $rc28
++    RTS implicit $y, implicit $rc28
++...

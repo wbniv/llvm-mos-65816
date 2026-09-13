@@ -1,0 +1,57 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td
+index a71519559a50..779261d14bb5 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.td
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.td
+@@ -785,6 +785,10 @@ def TDC_Implied : InstLowB<"tdc", 0b0111>;
+ def TSC_Implied : InstLowB<"tsc", 0b0011>;
+ 
+ def WDM_Immediate : Inst16<"wdm", Opcode<0x42>, Immediate>;
++
++// Unlike BRK, WDC's own assembly syntax requires this operand, so it is
++// mandatory here rather than optional.
++def COP_Immediate : Inst16<"cop", Opcode<0x02>, Immediate>, InstUnconditionalBranch;
+ }
+ 
+ } // Predicates = [HasW65816]
+diff --git a/llvm/test/MC/MOS/all-65816-opcodes.s b/llvm/test/MC/MOS/all-65816-opcodes.s
+index cc766817ec26..5d1e64b1037d 100644
+--- a/llvm/test/MC/MOS/all-65816-opcodes.s
++++ b/llvm/test/MC/MOS/all-65816-opcodes.s
+@@ -105,3 +105,5 @@
+ 	xce                             ; CHECK: encoding: [0xfb]
+ 
+ 	wdm #$ea                        ; CHECK: encoding: [0x42,0xea]
++
++	cop #$ea                        ; CHECK: encoding: [0x02,0xea]
+diff --git a/llvm/test/MC/MOS/asm-errors.s b/llvm/test/MC/MOS/asm-errors.s
+index 123290f3b8cc..e8769c6c48f3 100644
+--- a/llvm/test/MC/MOS/asm-errors.s
++++ b/llvm/test/MC/MOS/asm-errors.s
+@@ -24,3 +24,10 @@ rep #$30
+ 
+ ; CHECK: [[#@LINE+1]]:1: error: instruction requires: FeatureW65816Or65EL02
+ sep #$30
++
++; CHECK: [[#@LINE+1]]:1: error: instruction requires: FeatureW65816
++cop #90
++
++; COP requires a signature operand.
++; CHECK: [[#@LINE+1]]:1: error: invalid instruction
++cop
+diff --git a/llvm/test/MC/MOS/cop-signature.s b/llvm/test/MC/MOS/cop-signature.s
+new file mode 100644
+index 000000000000..a9b0d5146aee
+--- /dev/null
++++ b/llvm/test/MC/MOS/cop-signature.s
+@@ -0,0 +1,11 @@
++; RUN: llvm-mc -triple mos -mcpu=mosw65816 -motorola-integers --filetype=obj -o=%t.obj %s
++; RUN: llvm-objdump -d --mcpu=mosw65816 %t.obj | FileCheck %s
++
++; cop's signature operand accepts arbitrary expressions, not just literal
++; immediates.
++sig = $5a
++	cop #sig                        ; CHECK: 02 5a cop #$5a
++
++; WDC reserves $80-$ff for internal use and recommends confining user
++; signature bytes to $00-$7f; $7f is the top of that range.
++	cop #$7f                        ; CHECK: 02 7f cop #$7f

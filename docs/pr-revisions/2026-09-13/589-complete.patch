@@ -1,0 +1,114 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
+index 21910cfeab37..8519606edde4 100644
+--- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
++++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
+@@ -123,6 +123,7 @@ def LDZ : MOSPseudo {
+ }
+ 
+ def CmpZero : MOSPseudo {
++  let isTerminator = true;
+   dag InOperandList = (ins Anyi8:$val);
+   let Defs = [C];
+   let isCompare = true;
+diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+index fbedd8d46b95..aaac642c76f5 100644
+--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
++++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+@@ -88,24 +88,26 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &MBB) const {
+   const auto &STI = MBB.getParent()->getSubtarget<MOSSubtarget>();
+   const auto *TRI = MRI.getTargetRegisterInfo();
+   bool Changed = false;
+-  for (MachineInstr &MI : make_early_inc_range(mbb_reverse(MBB))) {
++  for (MachineInstr &MI : make_early_inc_range(mbb_reverse(MBB.terminators()))) {
+     if (MI.getOpcode() != MOS::CmpZero)
+       continue;
+ 
+     if (MI.allDefsAreDead()) {
+       MI.eraseFromParent();
++      Changed = true;
+       continue;
+     }
+ 
+     Register Val = MI.getOperand(0).getReg();
+ 
++    bool Folded = false;
+     for (auto &J : mbb_reverse(MBB.begin(), MI)) {
+       if (J.isDebugInstr())
+         continue;
+       if (J.isCall() || J.isInlineAsm())
+         break;
+       if (definesNZ(J, Val, STI)) {
+-        Changed = true;
++        Folded = true;
+         J.addOperand(MachineOperand::CreateReg(MOS::NZ, /*isDef=*/true,
+                                                /*isImp=*/true));
+         MI.eraseFromParent();
+@@ -135,8 +137,10 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &MBB) const {
+       if (ClobbersNZ)
+         break;
+     }
+-    if (Changed)
++    if (Folded) {
++      Changed = true;
+       continue;
++    }
+ 
+     Changed = true;
+     lowerCmpZero(MI);
+diff --git a/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir
+new file mode 100644
+index 000000000000..0f0b5bab40e4
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir
+@@ -0,0 +1,16 @@
++# RUN: not --crash llc -mtriple=mos -run-pass=machineverifier -o /dev/null %s 2>&1 | FileCheck %s
++
++# CmpZero must stay with the terminators that consume its flags.
++# CHECK: Bad machine code: Non-terminator instruction after the first terminator
++# CHECK: $a = T_A $x
++# CHECK: First terminator was: CmpZero
++
++---
++name: cmpzero_before_nonterminator
++body: |
++  bb.0.entry:
++    liveins: $x
++    CmpZero $x, implicit-def $n, implicit-def $c
++    $a = T_A $x
++    RTS implicit $n
++...
+diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir
+new file mode 100644
+index 000000000000..8d1cc608741a
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir
+@@ -0,0 +1,29 @@
++# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s
++
++# Adjacent CmpZero terminators can be folded and lowered independently.
++---
++name: cmpzero_after_fold
++body: |
++  bb.0.entry:
++    liveins: $a, $x
++    ; CHECK-LABEL: name: cmpzero_after_fold
++    ; CHECK: $a = T_A $x, implicit-def $nz
++    ; CHECK-NEXT: dead $x = TA $a, implicit-def $nz
++    ; CHECK-NEXT: RTS implicit $n
++    $a = T_A $x
++    CmpZero $x, implicit-def $n, implicit-def $c
++    CmpZero $a, implicit-def $n, implicit-def $c
++    RTS implicit $n
++...
++---
++name: cmpzero_dead
++body: |
++  bb.0.entry:
++    liveins: $x
++    ; CHECK-LABEL: name: cmpzero_dead
++    ; CHECK: liveins: $x
++    ; CHECK-NEXT: {{  $}}
++    ; CHECK-NEXT: RTS
++    CmpZero $x, implicit-def dead $n, implicit-def dead $c
++    RTS
++...

@@ -1,0 +1,150 @@
+From 9aead7afaa4a13f4e7151e2b62adbc0b6937a018 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Sun, 13 Sep 2026 12:35:45 +0700
+Subject: [PATCH] [MOS] Mark CmpZero as a terminator and constrain lowering
+
+---
+ llvm/lib/Target/MOS/MOSInstrPseudos.td        |  1 +
+ llvm/lib/Target/MOS/MOSLateOptimization.cpp   |  7 +----
+ .../MOS/cmpzero-terminator-invalid.mir        | 16 ++++++++++
+ .../MOS/late-opt-cmpzero-after-fold.mir       | 31 -------------------
+ llvm/test/CodeGen/MOS/late-opt-cmpzero.mir    | 29 +++++++++++++++++
+ 5 files changed, 47 insertions(+), 37 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir
+ delete mode 100644 llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir
+ create mode 100644 llvm/test/CodeGen/MOS/late-opt-cmpzero.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
+index 21910cfeab37..8519606edde4 100644
+--- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
++++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
+@@ -123,6 +123,7 @@ def LDZ : MOSPseudo {
+ }
+ 
+ def CmpZero : MOSPseudo {
++  let isTerminator = true;
+   dag InOperandList = (ins Anyi8:$val);
+   let Defs = [C];
+   let isCompare = true;
+diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+index ac180f0542f9..aaac642c76f5 100644
+--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
++++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+@@ -88,7 +88,7 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &MBB) const {
+   const auto &STI = MBB.getParent()->getSubtarget<MOSSubtarget>();
+   const auto *TRI = MRI.getTargetRegisterInfo();
+   bool Changed = false;
+-  for (MachineInstr &MI : make_early_inc_range(mbb_reverse(MBB))) {
++  for (MachineInstr &MI : make_early_inc_range(mbb_reverse(MBB.terminators()))) {
+     if (MI.getOpcode() != MOS::CmpZero)
+       continue;
+ 
+@@ -100,11 +100,6 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &MBB) const {
+ 
+     Register Val = MI.getOperand(0).getReg();
+ 
+-    // Per-CmpZero, NOT loop-carried: whether THIS pseudo was folded into an
+-    // earlier NZ producer. Sharing `Changed` here made every CmpZero after the
+-    // block's first fold skip its lowering too, and nothing downstream lowers
+-    // the pseudo -- it reached the asm printer and was emitted as nothing,
+-    // silently dropping the flag test.
+     bool Folded = false;
+     for (auto &J : mbb_reverse(MBB.begin(), MI)) {
+       if (J.isDebugInstr())
+diff --git a/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir
+new file mode 100644
+index 000000000000..0f0b5bab40e4
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir
+@@ -0,0 +1,16 @@
++# RUN: not --crash llc -mtriple=mos -run-pass=machineverifier -o /dev/null %s 2>&1 | FileCheck %s
++
++# CmpZero must stay with the terminators that consume its flags.
++# CHECK: Bad machine code: Non-terminator instruction after the first terminator
++# CHECK: $a = T_A $x
++# CHECK: First terminator was: CmpZero
++
++---
++name: cmpzero_before_nonterminator
++body: |
++  bb.0.entry:
++    liveins: $x
++    CmpZero $x, implicit-def $n, implicit-def $c
++    $a = T_A $x
++    RTS implicit $n
++...
+diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir
+deleted file mode 100644
+index 351e6c041821..000000000000
+--- a/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir
++++ /dev/null
+@@ -1,31 +0,0 @@
+-# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s
+-
+-# lowerCmpZeros walks the block in reverse and either folds each CmpZero into an
+-# earlier NZ producer or lowers it to a real flag-setting instruction. The
+-# fold-success flag used to be the function's loop-carried `Changed`
+-# accumulator, so once any CmpZero in the block folded, every CmpZero processed
+-# afterwards took the "already changed" early-continue and was never lowered.
+-# Nothing downstream lowers the pseudo: it reached the asm printer, which emits
+-# nothing for it, silently dropping the flag test. -verify-machineinstrs does
+-# not catch it, because a surviving CmpZero is legal MIR.
+-#
+-# Reverse iteration processes the second CmpZero first (it folds into the T_A);
+-# the first one cannot fold -- nothing precedes it -- so it must be lowered.
+-
+----
+-name: cmpzero_after_fold
+-body: |
+-  bb.0.entry:
+-    liveins: $a, $x
+-    ; CHECK-LABEL: name: cmpzero_after_fold
+-    ; CHECK: liveins: $a, $x
+-    ; CHECK-NEXT: {{  $}}
+-    ; CHECK-NEXT: dead $a = T_A $x, implicit-def $nz
+-    ; CHECK-NEXT: $a = T_A $x, implicit-def $nz
+-    ; CHECK-NEXT: RTS implicit $n
+-    ; CHECK-NOT: CmpZero
+-    CmpZero $x, implicit-def $n, implicit-def $c
+-    $a = T_A $x
+-    CmpZero $a, implicit-def $n, implicit-def $c
+-    RTS implicit $n
+-...
+diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir
+new file mode 100644
+index 000000000000..8d1cc608741a
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir
+@@ -0,0 +1,29 @@
++# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s
++
++# Adjacent CmpZero terminators can be folded and lowered independently.
++---
++name: cmpzero_after_fold
++body: |
++  bb.0.entry:
++    liveins: $a, $x
++    ; CHECK-LABEL: name: cmpzero_after_fold
++    ; CHECK: $a = T_A $x, implicit-def $nz
++    ; CHECK-NEXT: dead $x = TA $a, implicit-def $nz
++    ; CHECK-NEXT: RTS implicit $n
++    $a = T_A $x
++    CmpZero $x, implicit-def $n, implicit-def $c
++    CmpZero $a, implicit-def $n, implicit-def $c
++    RTS implicit $n
++...
++---
++name: cmpzero_dead
++body: |
++  bb.0.entry:
++    liveins: $x
++    ; CHECK-LABEL: name: cmpzero_dead
++    ; CHECK: liveins: $x
++    ; CHECK-NEXT: {{  $}}
++    ; CHECK-NEXT: RTS
++    CmpZero $x, implicit-def dead $n, implicit-def dead $c
++    RTS
++...
+-- 
+2.53.0
+

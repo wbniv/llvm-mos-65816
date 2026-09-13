@@ -1,0 +1,2 @@
+SMOKE: PASS off=0x0 len=1 got=0x00 (ran 200 frames, bsnes-jg)
+ZOOM: FAIL frames=64 nonzero=64 swaps=3 host=0x7F81 rom=0xC57C

@@ -1,0 +1,44 @@
+{
+  "578": {
+    "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/578",
+    "remote_branch": "mos-coalesce-rotate-ac",
+    "submitted_head": "edc9bbd23b718e03d5901f5c114885cfb1d8b277",
+    "proposed_head": "c4fd3dfa74e7de1b5121cfa613d205e0492e41ab",
+    "publication": "awaiting Will approval"
+  },
+  "584": {
+    "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/584",
+    "remote_branch": "mos-late-opt-nongpr-ldimm",
+    "submitted_head": "3ce98fed82deef4bfb8ac81be8751a340bba59d2",
+    "proposed_head": "2d60650cfce2832ef928d4b50425b94e2bb83e97",
+    "publication": "awaiting Will approval"
+  },
+  "586": {
+    "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/586",
+    "remote_branch": "mos-brk-signature-operand",
+    "submitted_head": "064d33fc43ca992893984978d88d7550a382c0c2",
+    "proposed_head": "a2f81a87b01c9fb396f52aafdc15c1d6b4a71975",
+    "publication": "awaiting Will approval"
+  },
+  "588": {
+    "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/588",
+    "remote_branch": "mos-65816-cop-mnemonic",
+    "submitted_head": "3ac109760642259e8bf76f0f3a84ef2c15da3406",
+    "proposed_head": "fb1b4ba325a8536bb51e35758447750f02e5fad1",
+    "publication": "awaiting Will approval"
+  },
+  "589": {
+    "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/589",
+    "remote_branch": "mos-late-opt-cmpzero-lowering",
+    "submitted_head": "8c8d28b0c35a79142e456f75dc821b17a76c4cf1",
+    "proposed_head": "9aead7afaa4a13f4e7151e2b62adbc0b6937a018",
+    "publication": "awaiting Will approval"
+  },
+  "590": {
+    "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/590",
+    "remote_branch": "mos-zp-alloc-deterministic",
+    "submitted_head": "cc9f0d027813c94398d5aff0c5a718cb2fa64e95",
+    "proposed_head": "5e83a0784918f977beb3300337b6703ea497895f",
+    "publication": "awaiting Will approval"
+  }
+}

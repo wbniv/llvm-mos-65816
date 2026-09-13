@@ -1,0 +1,47 @@
+Virtual Register Rewriter (virtregrewriter) ***:
+11008B	bb.71 (%ir-block.181):
+	; predecessors: %bb.70, %bb.73
+	  successors: %bb.103(0x50000000), %bb.72(0x30000000); %bb.103(62.50%), %bb.72(37.50%)
+	  liveins: $x, $y, $rc20, $rc21, $rc28
+11016B	  renamable $a = COPY killed renamable $y
+11024B	  renamable $rc2 = COPY renamable $a
+11088B	  renamable $rc28, renamable $c = ASL killed renamable $rc28(tied-def 0)
+11152B	  renamable $a, dead renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+11160B	  renamable $y = COPY killed renamable $a
+11184B	  CmpBrZero %bb.72, undef $n, 1, killed renamable $rc2, implicit-def $c
+
+11200B	bb.103:
+	; predecessors: %bb.71
+	  successors: %bb.73(0x80000000); %bb.73(100.00%)
+
+Optimize copies for MOS (mos-copy-opt) ***:
+bb.71 (%ir-block.181):
+; predecessors: %bb.70, %bb.73
+  successors: %bb.73(0x50000000), %bb.72(0x30000000); %bb.73(62.50%), %bb.72(37.50%)
+  liveins: $rc21, $rc28, $rc20, $a, $x
+  renamable $rc2 = COPY $a
+  renamable $rc28, renamable $c = ASL killed renamable $rc28(tied-def 0)
+  renamable $a, dead renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $y = COPY killed renamable $a
+  CmpBrZero %bb.73, undef $n, 0, killed renamable $rc2, implicit-def dead $c
+
+bb.72 (%ir-block.185):
+; predecessors: %bb.71
+  successors: %bb.73(0x80000000); %bb.73(100.00%)
+  liveins: $rc21, $x, $rc20, $y, $rc28
+
+MOS Late Optimizations (mos-late-opt) ***:
+bb.71 (%ir-block.181):
+; predecessors: %bb.70, %bb.73
+  successors: %bb.73(0x50000000), %bb.72(0x30000000); %bb.73(62.50%), %bb.72(37.50%)
+  liveins: $rc21, $rc28, $rc20, $a, $x
+  $rc2 = STImag8 $a
+  renamable $rc28, renamable $c = ASL killed renamable $rc28(tied-def 0)
+  renamable $a, dead renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  $y = TA $a
+  dead $a = LDImag8 $rc2, implicit-def $nz
+  BR %bb.73, killed $n, 0
+
+bb.72 (%ir-block.185):
+; predecessors: %bb.71
+  successors: %bb.73(0x80000000); %bb.73(100.00%)
