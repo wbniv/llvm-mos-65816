@@ -4,7 +4,7 @@ A single post-order liveness update visits the latch before the header and can l
 
 Propagate live-ins to a fixed point with `fullyRecomputeLiveIns` before dead-copy cleanup. The per-block live-in recompute inside the cleanup loop stays: it is what lets a copy in a predecessor become dead in the same pass after a successor's dead copy is erased. Keep the entry block's ABI live-ins intact. Remove the original shouldCoalesce workaround; ordinary rotate coalescing remains enabled.
 
-The reduced MIR regression checks that A is live through the latch and that the copy-optimization/pseudo-expansion/late-optimization pipeline does not overwrite it. Both checks fail without the fix. A second test pins the cross-block dead-copy chain so the per-block recompute cannot be dropped by accident.
+The reduced MIR regression checks that A is live through the latch and that the copy-optimization/pseudo-expansion/late-optimization pipeline does not overwrite it. Both checks fail without the fix. A second test pins two- and three-block dead-copy chains so the per-block recompute cannot be dropped by accident. The three-block case also checks final assembly for the absence of leftover register transfers.
 
 This replaces the original PR's diagnosis: register allocation emits the required restore correctly. The failure occurs later when copy forwarding changes the loop's liveness and the update does not propagate around the back edge. The defect is confined to the target-specific MOSCopyOpt pass; no generic LLVM change is involved.
 

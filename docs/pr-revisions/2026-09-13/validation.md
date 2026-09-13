@@ -32,7 +32,7 @@ These are this reconstruction's measured values; they are not the older June rep
 
 | PR | Submitted head | Proposed head |
 | --- | --- | --- |
-| #578 | `edc9bbd23b71` | `3c04e895e167` (was `c4fd3dfa74e7` before the review follow-up; `019af10c7378` briefly, reverted) |
+| #578 | `edc9bbd23b71` | `b4749221bf37` (was `c4fd3dfa74e7` before the review follow-up; `019af10c7378` briefly, reverted) |
 | #584 | `3ce98fed82de` | `7f4c37de6219` (was `2d60650cfce2` before the review follow-up) |
 | #586 | `064d33fc43ca` | `a2f81a87b01c` |
 | #588 | `3ac109760642` | `fb1b4ba325a8` |
@@ -64,3 +64,9 @@ The #578 and #584 follow-up commits were amended in place; the other four branch
 `index.html` is a rendered snapshot of the original submission and predates these edits.
 
 The submitted remote branches were read but never updated. `heads.json` records their full hashes for checking before any later approved push. Local compiler worktrees are under `/tmp/llvm-mos-review*`; the mail-formatted `*-commits.patch` files preserve the follow-up commits in this review directory.
+
+## Three-block regression follow-up (2026-09-14)
+
+Extended `copy-opt-chain.mir` with a three-block chain whose intervening register clobbers prevent copy forwarding from bypassing it. MIR checks require all three copies to disappear. An additional assembly check requires only `lda #5`, `ldx #6`, and `rts`, with no intervening or trailing instructions.
+
+Local compiler commit `b4749221bf3735ad1c83d80c103054f745f8c8cd` adds only this test extension to `3c04e895e167`. Focused lit validation: `copy-opt-chain.mir`, `copy-opt-loop.mir`, and `copy-opt.mir` all pass (3/3), including machine verification and the final-assembly check. The full-suite and runtime results above predate this test-only extension. The saved #578 patches and proposed head include it; publication remains pending Will’s review.

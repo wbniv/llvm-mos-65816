@@ -1,7 +1,7 @@
 From 3c04e895e16787b828c148c1dbe12a648e45f4f9 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Sun, 13 Sep 2026 12:52:56 +0700
-Subject: [PATCH] [MOS] Fix loop liveness after copy forwarding instead of
+Subject: [PATCH 1/2] [MOS] Fix loop liveness after copy forwarding instead of
  blocking coalescing
 
 ---
@@ -223,6 +223,80 @@ index 000000000000..9ea07c90b002
 +  bb.4:
 +    liveins: $y, $rc28
 +    RTS implicit $y, implicit $rc28
++...
+-- 
+2.53.0
+
+
+From b4749221bf3735ad1c83d80c103054f745f8c8cd Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 14 Sep 2026 03:01:22 +0700
+Subject: [PATCH 2/2] [MOS] Test cascading dead-copy removal across three
+ blocks
+
+---
+ llvm/test/CodeGen/MOS/copy-opt-chain.mir | 47 ++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+
+diff --git a/llvm/test/CodeGen/MOS/copy-opt-chain.mir b/llvm/test/CodeGen/MOS/copy-opt-chain.mir
+index 0b41241b84c5..e213610cd4ba 100644
+--- a/llvm/test/CodeGen/MOS/copy-opt-chain.mir
++++ b/llvm/test/CodeGen/MOS/copy-opt-chain.mir
+@@ -1,4 +1,5 @@
+ # RUN: llc -mtriple=mos -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mos6502 -start-before=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=ASM
+ 
+ # A dead copy in a successor can make a copy in its predecessor dead as well.
+ # Both must go in one run: the successor is cleaned first (post-order) and its
+@@ -26,3 +27,49 @@ body: |
+     $y = COPY $x
+     RTS implicit $a
+ ...
++
++# Propagate dead-copy removal through two predecessors. Clobbering each source
++# prevents forwarding from bypassing the chain. Check the final assembly too:
++# dead-copy chains must not leave register transfers behind.
++---
++name: dead_copy_chain_three_blocks
++tracksRegLiveness: true
++body: |
++  ; CHECK-LABEL: name: dead_copy_chain_three_blocks
++  ; CHECK: bb.0:
++  ; CHECK-NOT: COPY
++  ; CHECK: $a = LDImm 5
++  ; CHECK-NOT: COPY
++  ; CHECK: bb.1:
++  ; CHECK-NOT: COPY
++  ; CHECK: $x = LDImm 6
++  ; CHECK-NOT: COPY
++  ; CHECK: bb.2:
++  ; CHECK-NOT: COPY
++  ; CHECK: RTS
++  ; CHECK-NOT: COPY
++  ; ASM-LABEL: dead_copy_chain_three_blocks:
++  ; ASM-NOT: {{^[ \t]+[a-z]}}
++  ; ASM: lda #5
++  ; ASM-NOT: {{^[ \t]+[a-z]}}
++  ; ASM: ldx #6
++  ; ASM-NOT: {{^[ \t]+[a-z]}}
++  ; ASM: rts
++  ; ASM-NOT: {{^[ \t]+[a-z]}}
++  bb.0:
++    liveins: $a
++    $x = COPY $a
++    $a = LDImm 5
++    BRA %bb.1
++
++  bb.1:
++    liveins: $a, $x
++    $y = COPY $x
++    $x = LDImm 6
++    BRA %bb.2
++
++  bb.2:
++    liveins: $a, $x, $y
++    $rc3 = COPY $y
++    RTS implicit $a, implicit $x
 +...
 -- 
 2.53.0
