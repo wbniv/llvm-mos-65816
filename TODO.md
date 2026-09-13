@@ -199,7 +199,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   a 20-second MAME backstop, and forwards `SMOKE_SECONDS` through `dev/run.sh`. Negative control at 60
   ticks: 42/63 (all ROMs present, the same 21 late kernels fail); acceptance: plain corpus 63/63; paired
   `corpus-a16` 62/62, 0 xfail. [plan](docs/plans/2026-08-06-corpus-mame-settle-and-build-freshness.md).
-- [T3] **Per-drawable "first frame is complete" opt-in for `snesgfx` Display.** The safe shape of the
+- [wip T3] **Per-drawable "first frame is complete" opt-in for `snesgfx` Display.** <!-- agent:a7ce05a978d59d3ef --> The safe shape of the
   rejected blanket fix ([plan](docs/plans/2026-08-05-display-first-frame-forceblank.md)): a `Drawable`
   flag a `reserve()` sets to assert "I painted everything my first visible frame shows", with
   `display_frame()` taking the early blank release only when **every** drawable in the scene asserts
