@@ -4,4 +4,4 @@ Keep each pseudo's fold decision separate from the pass's change accumulator, an
 
 The original PR's reproducer placed a normal instruction after CmpZero. That placement violates the intended invariant; this revision encodes and tests the invariant explicitly.
 
-Validation: all 80 enabled MOS CodeGen tests pass across the full run and focused rerun after correcting one new test expectation; 1 upstream-disabled test.
+Validation: MOS CodeGen suite 80 pass, 1 unsupported (Linux, assertions enabled).

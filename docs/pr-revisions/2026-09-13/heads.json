@@ -3,14 +3,14 @@
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/578",
     "remote_branch": "mos-coalesce-rotate-ac",
     "submitted_head": "edc9bbd23b718e03d5901f5c114885cfb1d8b277",
-    "proposed_head": "c4fd3dfa74e7de1b5121cfa613d205e0492e41ab",
+    "proposed_head": "019af10c73780c676032fc0ad471f3310b2a0391",
     "publication": "awaiting Will approval"
   },
   "584": {
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/584",
     "remote_branch": "mos-late-opt-nongpr-ldimm",
     "submitted_head": "3ce98fed82deef4bfb8ac81be8751a340bba59d2",
-    "proposed_head": "2d60650cfce2832ef928d4b50425b94e2bb83e97",
+    "proposed_head": "7f4c37de62191eb6abdaf60c2bc1ccc079bb485b",
     "publication": "awaiting Will approval"
   },
   "586": {

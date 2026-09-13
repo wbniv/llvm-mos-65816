@@ -14,3 +14,5 @@
 The complete diffs are relative to each PR's merge base with upstream `main`. The `*-commits.patch` files preserve the local follow-up commits and can be applied with `git am` on the corresponding submitted head. The compiler checkouts are isolated under `/tmp/llvm-mos-review*`; this directory preserves the changes beyond those temporary checkouts.
 
 The intended publication, after Will approves, is to update the six existing PR branches and their descriptions. No replacement PRs are needed.
+
+**Review:** [review.md](review.md) records the independent review of these revisions and the follow-up edits it produced (the #578 and #584 heads were amended; see the [validation record](validation.md) for the re-run results). `index.html` is a rendered snapshot of the original submission and predates those edits.

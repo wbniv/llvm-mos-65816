@@ -1,11 +1,13 @@
 diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
-index 533e1017b566..50432465870e 100644
+index 533e1017b566..0c8916f27fb7 100644
 --- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp
 +++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
-@@ -254,6 +254,14 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &MF) {
+@@ -254,9 +254,15 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &MF) {
      }
    }
  
+-  for (MachineBasicBlock *MBB : post_order(&MF)) {
+-    LivePhysRegs LPR(TRI);
 +  // Copy forwarding can change the register live around a loop. Propagate
 +  // live-ins to a fixed point before using them to erase dead copies.
 +  SmallVector<MachineBasicBlock *> Blocks;
@@ -13,9 +15,29 @@ index 533e1017b566..50432465870e 100644
 +    if (!MBB->isEntryBlock())
 +      Blocks.push_back(MBB);
 +  fullyRecomputeLiveIns(Blocks);
+ 
++  for (MachineBasicBlock *MBB : post_order(&MF)) {
+     recomputeLivenessFlags(*MBB);
+     for (MachineInstr &MI : make_early_inc_range(*MBB)) {
+       if (MI.isCopy() && MI.getOperand(0).isDead()) {
+@@ -264,13 +270,12 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &MF) {
+         MI.eraseFromParent();
+       }
+     }
+-
+-    if (!MBB->isEntryBlock()) {
+-      recomputeLivenessFlags(*MBB);
+-      MBB->clearLiveIns();
+-      computeAndAddLiveIns(LPR, *MBB);
+-    }
+   }
 +
-   for (MachineBasicBlock *MBB : post_order(&MF)) {
-     LivePhysRegs LPR(TRI);
++  // Erasing copies removes uses; bring live-ins and flags back into line.
++  fullyRecomputeLiveIns(Blocks);
++  for (MachineBasicBlock &MBB : MF)
++    recomputeLivenessFlags(MBB);
+   return true;
+ }
  
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 index 8512e0d28e12..baf6de604cb7 100644
@@ -115,10 +137,10 @@ index 8cf76e4884a9..000000000000
 -...
 diff --git a/llvm/test/CodeGen/MOS/copy-opt-loop.mir b/llvm/test/CodeGen/MOS/copy-opt-loop.mir
 new file mode 100644
-index 000000000000..84071e1e02bd
+index 000000000000..9ea07c90b002
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/copy-opt-loop.mir
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,52 @@
 +# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=COPY
 +# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=LOWER
 +
@@ -158,6 +180,7 @@ index 000000000000..84071e1e02bd
 +    $a = COPY $y
 +    $a = EORImm $a, 16
 +    $y = COPY $a
++    BRA %bb.3
 +
 +  bb.3:
 +    liveins: $x, $y, $rc28
@@ -170,3 +193,25 @@ index 000000000000..84071e1e02bd
 +    liveins: $y, $rc28
 +    RTS implicit $y, implicit $rc28
 +...
+diff --git a/llvm/test/CodeGen/MOS/copy-opt.mir b/llvm/test/CodeGen/MOS/copy-opt.mir
+index 9e8dc8eac104..9860820a954d 100644
+--- a/llvm/test/CodeGen/MOS/copy-opt.mir
++++ b/llvm/test/CodeGen/MOS/copy-opt.mir
+@@ -295,7 +295,7 @@ body: |
+   ; CHECK-NEXT: {{  $}}
+   ; CHECK-NEXT: bb.2:
+   ; CHECK-NEXT:   successors: %bb.3(0x80000000)
+-  ; CHECK-NEXT:   liveins: $y, $a
++  ; CHECK-NEXT:   liveins: $a, $y
+   ; CHECK-NEXT: {{  $}}
+   ; CHECK-NEXT:   $x = COPY killed $a
+   ; CHECK-NEXT:   $a = COPY killed $y
+@@ -373,7 +373,7 @@ body: |
+   ; CHECK-NEXT: {{  $}}
+   ; CHECK-NEXT: bb.1:
+   ; CHECK-NEXT:   successors: %bb.1(0x40000000), %bb.2(0x40000000)
+-  ; CHECK-NEXT:   liveins: $rc2, $a, $y
++  ; CHECK-NEXT:   liveins: $a, $y, $rc2
+   ; CHECK-NEXT: {{  $}}
+   ; CHECK-NEXT:   $x = COPY killed $y
+   ; CHECK-NEXT:   $y = COPY $rc2
