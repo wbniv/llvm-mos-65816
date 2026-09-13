@@ -304,7 +304,8 @@ static uint16_t maze_fold_walls(maze_t *m, uint16_t h) {
 // Reconstruct the shortest path goal→start into heap[] (free after solve, so no extra bss) by
 // walking came[]; returns the cell count. Bounded by MAZE_N so a broken/looping chain can't hang.
 // noinline: its own small frame keeps register pressure down (the xy16-regalloc family runs out
-// of registers if this folds into its caller). Reused by the on-console demo to light the path.
+// of registers if this folds into its caller). Used by the on-console demo (examples/snes/maze.c)
+// to light the solved path; the gate's CRC walks came[] itself (see maze_fold_path below).
 __attribute__((noinline))
 static uint16_t maze_path_build(maze_t *m) {
     uint16_t cell = maze_idx(MAZE_GX, MAZE_GY);
@@ -321,16 +322,29 @@ static uint16_t maze_path_build(maze_t *m) {
     return n;
 }
 
-// Fold the shortest path (sensitive to any A* or heap-ordering miscompile). Reconstruct, then
-// fold the flat array — two simple passes, never fold-while-walking (the combined load-at-top /
-// step-at-bottom loop makes GISel hoist a merge past its use, "defs don't dominate all uses").
+// Fold the shortest path (sensitive to any A* or heap-ordering miscompile) by walking came[]
+// goal->start and folding each cell as we go. INVARIANT: same bound and same start-termination as
+// maze_path_build(), so the folded sequence equals that walk's cell order and the gate CRC is a
+// property of the path alone.
+//
+// Keep this as ONE fold-while-walk loop, not two passes. The load-at-top / step-at-bottom shape with
+// an early-break diamond, where came[cell] is consumed both as a folded value and as the index into
+// the signed int8_t MAZE_DX/MAZE_DY tables, is a deliberate -verify-machineinstrs stressor for the
+// legalizer's indexed-addressing use-replacement; examples/65816/legalindexdom.c +
+// dev/legalindexdom.sh gate that shape in all three modes. A -verify failure here is a compiler
+// defect to fix, not a reason to re-split the loop.
 __attribute__((noinline))
 static uint16_t maze_fold_path(maze_t *m, uint16_t h) {
     if (m->path_len == 0xFFFFu) return h;
-    uint16_t n = maze_path_build(m);
-    for (uint16_t i = 0; i < n; i++) {
-        uint16_t c = m->heap[i];
-        h = maze_fold(h, (uint16_t)((c << 2) | m->came[c]));
+    uint16_t cell = maze_idx(MAZE_GX, MAZE_GY);
+    uint16_t start = maze_idx(0u, 0u);
+    for (uint16_t step = 0; step <= MAZE_N; step++) {
+        h = maze_fold(h, (uint16_t)((cell << 2) | m->came[cell]));
+        if (cell == start) break;
+        uint8_t d = m->came[cell];                                // direction we came FROM
+        uint8_t nx = (uint8_t)((cell & MAZE_WMASK) + MAZE_DX[d]);
+        uint8_t ny = (uint8_t)((cell >> MAZE_WSH) + MAZE_DY[d]);
+        cell = maze_idx(nx, ny);
     }
     return h;
 }

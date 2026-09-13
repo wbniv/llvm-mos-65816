@@ -304,12 +304,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 ### M2 — Optimizing Payoff
 
-- [wip T3] **Un-work-around `maze.h`'s two-pass split** <!-- agent:ad97843e984297da1 --> now that the legalizer indexed-addr domination
-  fix is live (`fb528d8`). `examples/65816/maze.h` splits the fold-while-walk loop into
-  `maze_path_build` + `maze_fold_path` purely to dodge the old `-verify` abort; the single
-  fold-while-walk loop should now compile `-verify`-clean (the `legalindexdom` gate proves the shape).
-  Re-fold, re-gate (maze `0x0749` must hold or be re-baselined), per the "stress the compiler, never
-  work around it" directive. Low priority (the demo is correct either way).
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
   "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
   on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`
@@ -1193,6 +1187,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [maze-refold] `maze_fold_path` folds while walking `came[]` again (two-pass work-around removed); `-verify` clean ×3, CRC `0x0749` held. See [plan](docs/plans/2026-09-14-maze-refold.md).
 - [x] 2026-07-26 — [build-loop-continue] `dev/build.sh` example loop continue-on-error + end-of-run failure list (`8a73e6a`); item closed 2026-09-14 on finding it already shipped. See [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
 - [x] 2026-09-14 — [a16-newton-step-rc-undef] Superseded: cause #1 FIXED 2026-06-30 (`f1af264`, shouldCoalesce), cause #2 DECIDED 2026-09-13 (upstream issue, ready to post). See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
 - [x] 2026-09-13 — [rc-undef-cause2] DECIDED: no downstream fix, escalate upstream; issue body gains a pre-RA/SplitKit analysis (suspect: LiveIntervals subrange liveness across an undef partial def), repro re-verified (2 errors), READY TO POST. See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).

@@ -39,8 +39,11 @@
  * NOT a demonstrated miscompile: with -verify OFF the emitted ROM is correct (the rewritten use still
  * reads the right value on the executed path); the MIR just violates SSA domination, aborting -verify
  * builds (exit 70). In the maze demo this shape was first worked around by splitting the loop into two
- * passes (examples/65816/maze.h maze_path_build + maze_fold_path) — revisit once the fix is live, per
- * the project's "stress the compiler, never work around it" directive.
+ * passes (examples/65816/maze.h maze_path_build + maze_fold_path).
+ *
+ * That split is gone: maze_fold_path() is a single fold-while-walk loop again (see maze.h). This file
+ * remains the standing minimal regression gate for the shape — dev/legalindexdom.sh must stay -verify
+ * clean in default, +mos-a16 and +mos-xy16.
  */
 #include <stdint.h>
 static const int8_t DX[4] = { 0, 1, 0, -1 };   /* genuine indexed table; constant-foldable away if all-equal */
