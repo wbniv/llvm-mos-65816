@@ -773,12 +773,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [T1] **Make `dev/build.sh`'s example loop continue-on-error + report a summary.** Split out from the
-  `mandel-double` fix below (now done). The loop is a plain `for` under `set -e`, so ONE unbuildable
-  demo aborts the rest — `mandel-double` silently cost the 56 examples after it (`mandel-float`…
-  `wireframe`), and the run still exits looking like it merely stopped. Collect failures, keep going,
-  and fail at the end with an explicit list, so one fat demo can never again mask dozens of others.
-  [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
 - [wip T2] **Vacuous `-verify-machineinstrs` in demo gate scripts — sweep and fix.** Under the config's
   default LTO, `mos-clang --config … -c` emits bitcode (codegen never runs) and the link does not
   forward `-mllvm` to the LTO backend, so `-mllvm -verify-machineinstrs` on those invocations
@@ -1199,6 +1193,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-07-26 — [build-loop-continue] `dev/build.sh` example loop continue-on-error + end-of-run failure list (`8a73e6a`); item closed 2026-09-14 on finding it already shipped. See [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
 - [x] 2026-09-14 — [a16-newton-step-rc-undef] Superseded: cause #1 FIXED 2026-06-30 (`f1af264`, shouldCoalesce), cause #2 DECIDED 2026-09-13 (upstream issue, ready to post). See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
 - [x] 2026-09-13 — [rc-undef-cause2] DECIDED: no downstream fix, escalate upstream; issue body gains a pre-RA/SplitKit analysis (suspect: LiveIntervals subrange liveness across an undef partial def), repro re-verified (2 errors), READY TO POST. See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
 - [x] 2026-08-05 — [display-first-frame] mandel-oop post-title force-blank 11 → 5 (budget 12 → 6); the blanket `display_frame()` fix was MEASURED UNSAFE (119/122 demos palette from the first emit) and rejected. See [plan](docs/plans/2026-08-05-display-first-frame-forceblank.md).
