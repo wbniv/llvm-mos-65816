@@ -4,7 +4,7 @@ Validated locally on Linux with a Release LLVM build, assertions enabled, and th
 
 | PR | Result |
 | --- | --- |
-| #578 | CodeGen/MOS: **79 pass**, 1 upstream-disabled test. New regression fails without the fix and passes with it. Reconstructed SNES demo changes from CRC mismatch to host/bsnes agreement. |
+| #578 | CodeGen/MOS at `b4749221bf37`: **80 pass**, 1 upstream-disabled test. New regression fails without the fix and passes with it. Reconstructed SNES demo changes from CRC mismatch to host/bsnes agreement. |
 | #584 | CodeGen/MOS: **79 pass**, 1 upstream-disabled test, including SPC700 non-GPR LDImm and GPR-folding coverage. |
 | #586 | MC/MOS: **40 pass**, including the new BRK disassembly and round-trip checks. |
 | #588 | MC/MOS: **40 pass**, including revised COP and assembler-error checks. |
@@ -61,7 +61,7 @@ The #578 and #584 follow-up commits were amended in place; the other four branch
 - Bodies: #578 states the defect is confined to the target pass, #586 cites ca65 prior art, #589's
   validation line no longer narrates test-writing history.
 
-`index.html` is a rendered snapshot of the original submission and predates these edits.
+`index.html` is generated from the current bundle by `render.py`, including current proposed heads, descriptions, diffs, and this validation record.
 
 The submitted remote branches were read but never updated. `heads.json` records their full hashes for checking before any later approved push. Local compiler worktrees are under `/tmp/llvm-mos-review*`; the mail-formatted `*-commits.patch` files preserve the follow-up commits in this review directory.
 
@@ -69,4 +69,12 @@ The submitted remote branches were read but never updated. `heads.json` records 
 
 Extended `copy-opt-chain.mir` with a three-block chain whose intervening register clobbers prevent copy forwarding from bypassing it. MIR checks require all three copies to disappear. An additional assembly check requires only `lda #5`, `ldx #6`, and `rts`, with no intervening or trailing instructions.
 
-Local compiler commit `b4749221bf3735ad1c83d80c103054f745f8c8cd` adds only this test extension to `3c04e895e167`. Focused lit validation: `copy-opt-chain.mir`, `copy-opt-loop.mir`, and `copy-opt.mir` all pass (3/3), including machine verification and the final-assembly check. The full-suite and runtime results above predate this test-only extension. The saved #578 patches and proposed head include it; publication remains pending Will’s review.
+Local compiler commit `b4749221bf3735ad1c83d80c103054f745f8c8cd` adds only this test extension to `3c04e895e167`. Focused lit validation: `copy-opt-chain.mir`, `copy-opt-loop.mir`, and `copy-opt.mir` all pass (3/3), including machine verification and the final-assembly check. The runtime results above predate this test-only extension; the full suite was subsequently rerun at this head as recorded below. The saved #578 patches and proposed head include it; publication remains pending Will’s review.
+
+## Publication-head verification (2026-09-14)
+
+- [x] Fast-forwarded `review-578` in `/tmp/llvm-mos-review-578` to `b4749221bf3735ad1c83d80c103054f745f8c8cd`, matching `heads.json` and the saved commit patches.
+- [x] Ran the full CodeGen/MOS lit suite from the checkout at that head using `/tmp/llvm-mos-review-build/bin/llvm-lit`: **80 pass, 1 unsupported**, including the three-block MIR and assembly checks. [Current lit results](578-tests.json). The compiler source is unchanged from the rebuilt `3c04e895e167` head; the extension changes only a test.
+- [x] Regenerated `index.html` from the current bundle and refreshed `SHA256SUMS` with the included `render.py`.
+
+No additional corpus or emulator run was performed for this test-only extension. No upstream branches or descriptions were posted. The proposed commits descend from the recorded submitted heads, so publication can use a normal fast-forward push if those remote heads are still unchanged.

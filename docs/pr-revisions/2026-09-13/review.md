@@ -216,8 +216,8 @@ evidence and andymccall's independent confirmation are both cited.
 - Bodies are consistent and in the reviewer's preferred register. Keep the trailing
   "Validation:" lines; they are short.
 - The branches were merge-tree-checked against upstream `main` but the merge results were not
-  built. Acceptable for a PR-branch force-push; CI builds the merge.
-- Publication order: force-push the six branches (recorded heads in `heads.json` must still
+  built. Acceptable for a PR-branch update; CI builds the merge.
+- Publication order: fast-forward the six branches (recorded heads in `heads.json` must still
   match the remotes at push time), then `gh pr edit` titles and bodies. #578's branch name
   `mos-coalesce-rotate-ac` no longer describes its content; harmless for a PR branch. The
   `/tmp/llvm-mos-review*` checkouts hold the amended heads on the `review-*` branches; the
@@ -233,6 +233,5 @@ evidence and andymccall's independent confirmation are both cited.
 Every recommendation in this review is either applied (struck through above, re-validated in
 [validation.md](validation.md)), withdrawn with the counterexample recorded (the #578 liveness
 collapse), or tracked as a ranked TODO item gated on publication. Nothing is left open for the
-reviewer. `index.html` is Codex's rendered snapshot of the original submission; it has no
-generator in this repo and still shows the pre-review revisions, so it needs regenerating by its
-author or removing before the bundle is treated as final.
+reviewer. `index.html` has been regenerated from the current bundle using the included `render.py`.
+The renderer also refreshes `SHA256SUMS`; its `--check` option detects stale generated artifacts.

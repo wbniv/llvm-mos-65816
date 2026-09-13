@@ -1,11 +1,1284 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Upstream PR revisions — review</title><style>
-body{font:16px/1.6 system-ui,sans-serif;max-width:1120px;margin:40px auto;padding:0 24px;background:#f6f8fa;color:#1f2328}h1,h2,h3{line-height:1.3}a{color:#0969da}nav{display:flex;gap:20px;flex-wrap:wrap;margin:24px 0}.notice{padding:16px 20px;background:#fff8c5;border:1px solid #d4a72c;border-radius:8px}article,section{background:white;padding:24px;margin:24px 0;border:1px solid #d0d7de;border-radius:10px}summary{cursor:pointer;font-weight:600;padding:12px 0}pre{font:13px/1.6 ui-monospace,monospace;overflow:auto;background:#f6f8fa;padding:16px;border-radius:6px}code{font-family:ui-monospace,monospace;background:#eef1f4;border-radius:3px;padding:1px 3px}.add{background:#dafbe1;display:block}.del{background:#ffebe9;display:block}.line{display:block} .body{max-width:850px}small{color:#57606a}section pre{white-space:pre-wrap}html{scroll-behavior:smooth}</style><h1>Upstream PR revisions</h1><p>13 September 2026 · Code changes, proposed PR descriptions, and validation.</p><div class="notice"><strong>Upstream revisions await approval.</strong> This review bundle preserves the proposed changes. No upstream PR branches or descriptions have been updated.</div><nav><a href="#pr578">#578</a><a href="#pr584">#584</a><a href="#pr586">#586</a><a href="#pr588">#588</a><a href="#pr589">#589</a><a href="#pr590">#590</a><a href="#validation">Validation</a></nav><article id="pr578"><h2>#578 — [MOS] Recompute loop liveness after copy forwarding</h2><p><a href="https://github.com/llvm-mos/llvm-mos/pull/578" target="_blank" rel="noopener">Existing upstream PR ↗</a></p><h3>Proposed description</h3><div class="body"><p>MOSCopyOpt can forward a loop-header <code>A = COPY Y</code> through reaching <code>Y = COPY A</code> definitions and remove the restore. This changes the register that must remain live around the back edge from Y to A.</p><p>A single post-order liveness update visits the latch before the header and can leave A absent from the latch&#x27;s live-ins. Later CmpZero lowering then treats A as scratch and overwrites the loop-carried value. In the CRC reproducer this makes the next rotate consume the old accumulator value.</p><p>Propagate live-ins to a fixed point with <code>fullyRecomputeLiveIns</code> before dead-copy cleanup. Keep the entry block&#x27;s ABI live-ins intact. Remove the original shouldCoalesce workaround; ordinary rotate coalescing remains enabled.</p><p>The reduced MIR regression checks that A is live through the latch and that the copy-optimization/pseudo-expansion/late-optimization pipeline does not overwrite it. Both checks fail without the fix.</p><p>This replaces the original PR&#x27;s diagnosis: register allocation emits the required restore correctly. The failure occurs later when copy forwarding changes the loop&#x27;s liveness and the update does not propagate around the back edge.</p><p>Validation: MOS CodeGen suite 79 pass, 1 unsupported. Both regression assertions fail without the fix. The reconstructed SNES demo changes from host/ROM CRC mismatch (0x7F81 / 0xC57C) to agreement at 0x7F81 in bsnes.</p></div><details><summary>Changes since the submitted PR</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span><span class="line">index 533e1017b566..50432465870e 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span><span class="line">@@ -254,6 +254,14 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &amp;MF) {</span><span class="line">     }</span><span class="line">   }</span><span class="line"> </span><span class="add">+  // Copy forwarding can change the register live around a loop. Propagate</span><span class="add">+  // live-ins to a fixed point before using them to erase dead copies.</span><span class="add">+  SmallVector&lt;MachineBasicBlock *&gt; Blocks;</span><span class="add">+  for (MachineBasicBlock *MBB : post_order(&amp;MF))</span><span class="add">+    if (!MBB-&gt;isEntryBlock())</span><span class="add">+      Blocks.push_back(MBB);</span><span class="add">+  fullyRecomputeLiveIns(Blocks);</span><span class="add">+</span><span class="line">   for (MachineBasicBlock *MBB : post_order(&amp;MF)) {</span><span class="line">     LivePhysRegs LPR(TRI);</span><span class="line"> </span><span class="line">diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp</span><span class="line">index 8512e0d28e12..baf6de604cb7 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp</span><span class="line">@@ -647,21 +647,6 @@ bool MOSRegisterInfo::shouldCoalesce(</span><span class="line">     const TargetRegisterClass *NewRC, LiveIntervals &amp;LIS) const {</span><span class="line">   const auto &amp;MRI = MI-&gt;getMF()-&gt;getRegInfo();</span><span class="line"> </span><span class="del">-  // Don&#x27;t coalesce two shift/rotate-referenced values together into the A-only Ac</span><span class="del">-  // class. The accumulator is the only register ASL/LSR/ROL/ROR can operate on, so</span><span class="del">-  // an Ac value is pinned to A for its whole live range. When such a value is also</span><span class="del">-  // loop-carried across an inner conditional whose other arm needs A (e.g. an</span><span class="del">-  // inlined CRC16 bit loop: the bit-test reloads the pre-rotate byte into A, while</span><span class="del">-  // the rotated value must survive to the next iteration), pinning it to A-only</span><span class="del">-  // leaves the allocator no register to evict it to on the skip path — it strands</span><span class="del">-  // the live value in Y while the back-edge rotate reads a stale A, miscompiling</span><span class="del">-  // silently (the machine verifier does not catch it). Keeping the copy live lets</span><span class="del">-  // the value occupy the broader AImag8/AY class and spill/transfer as needed.</span><span class="del">-  if (NewRC == &amp;MOS::AcRegClass &amp;&amp;</span><span class="del">-      referencedByShiftRotate(MI-&gt;getOperand(0).getReg(), MRI) &amp;&amp;</span><span class="del">-      referencedByShiftRotate(MI-&gt;getOperand(1).getReg(), MRI))</span><span class="del">-    return false;</span><span class="del">-</span><span class="line">   // Don&#x27;t coalesce Imag8 and AImag8 registers together when used by shifts or</span><span class="line">   // rotates.  This may cause expensive ASL zp&#x27;s to be used when ASL A would</span><span class="line">   // have sufficed. It&#x27;s better to do arithmetic in A and then copy it out.</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll b/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll</span><span class="line">deleted file mode 100644</span><span class="line">index 6b4f20948380..000000000000</span><span class="del">--- a/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll</span><span class="add">+++ /dev/null</span><span class="line">@@ -1,33 +0,0 @@</span><span class="del">-; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs &lt; %s | FileCheck %s</span><span class="del">-;</span><span class="del">-; Cost side of the shouldCoalesce Ac guard (see coalesce-rotate-ac.mir): the</span><span class="del">-; guard refuses to coalesce two shift/rotate-referenced values into the A-only</span><span class="del">-; Ac class even in straight-line code, so pin that the common multi-shift</span><span class="del">-; shapes keep their tight form — the COPY the guard preserves is allocated to</span><span class="del">-; A and folds away, with no transfer or extra zero-page traffic between the</span><span class="del">-; shift ops.</span><span class="del">-</span><span class="del">-target datalayout = &quot;e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8&quot;</span><span class="del">-target triple = &quot;mos&quot;</span><span class="del">-</span><span class="del">-define i8 @shl2_u8(i8 %x) {</span><span class="del">-; CHECK-LABEL: shl2_u8:</span><span class="del">-; CHECK:      asl</span><span class="del">-; CHECK-NEXT: asl</span><span class="del">-; CHECK-NEXT: rts</span><span class="del">-  %r = shl i8 %x, 2</span><span class="del">-  ret i8 %r</span><span class="del">-}</span><span class="del">-</span><span class="del">-define i16 @shl2_u16(i16 %x) {</span><span class="del">-; CHECK-LABEL: shl2_u16:</span><span class="del">-; CHECK:      stx [[HI:.*]]</span><span class="del">-; CHECK-NEXT: asl</span><span class="del">-; CHECK-NEXT: rol [[HI]]</span><span class="del">-; CHECK-NEXT: asl</span><span class="del">-; CHECK-NEXT: rol [[HI]]</span><span class="del">-; CHECK-NEXT: ldx [[HI]]</span><span class="del">-; CHECK-NEXT: rts</span><span class="del">-  %r = shl i16 %x, 2</span><span class="del">-  ret i16 %r</span><span class="del">-}</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir b/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir</span><span class="line">deleted file mode 100644</span><span class="line">index 8cf76e4884a9..000000000000</span><span class="del">--- a/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir</span><span class="add">+++ /dev/null</span><span class="line">@@ -1,25 +0,0 @@</span><span class="del">-# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=register-coalescer %s -o - | FileCheck %s</span><span class="del">-</span><span class="del">-# A value used by a rotate (ROL) is pinned to the accumulator (the Ac class), the</span><span class="del">-# only register the rotate can read/write. Coalescing two such values together</span><span class="del">-# into Ac removes the COPY that lets the live value vacate A when the other arm of</span><span class="del">-# an enclosing conditional needs A (e.g. an inlined CRC16 bit loop). That strands</span><span class="del">-# the value and the back-edge rotate reads a stale A -&gt; a silent miscompile. The</span><span class="del">-# coalescer must keep the COPY (MOSRegisterInfo::shouldCoalesce).</span><span class="del">----</span><span class="del">-name: dont_coalesce_rotate_into_ac</span><span class="del">-tracksRegLiveness: true</span><span class="del">-body: |</span><span class="del">-  bb.0:</span><span class="del">-    liveins: $a, $c</span><span class="del">-    ; CHECK: [[ROL:%[0-9]+]]:ac, {{[^=]*}} = ROL %0</span><span class="del">-    ; CHECK-NEXT: %{{[0-9]+}}:ac = COPY [[ROL]]</span><span class="del">-    ; CHECK-NEXT: {{%[0-9]+}}:ac, {{.*}} = ROL</span><span class="del">-    %0:ac = COPY $a</span><span class="del">-    %1:cc = COPY $c</span><span class="del">-    %2:ac, %3:cc = ROL %0, %1</span><span class="del">-    %4:ac = COPY %2</span><span class="del">-    %5:ac, %6:cc = ROL %4, %3</span><span class="del">-    $a = COPY %5</span><span class="del">-    RTS implicit $a</span><span class="del">-...</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/copy-opt-loop.mir b/llvm/test/CodeGen/MOS/copy-opt-loop.mir</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..84071e1e02bd</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/CodeGen/MOS/copy-opt-loop.mir</span><span class="line">@@ -0,0 +1,51 @@</span><span class="add">+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=COPY</span><span class="add">+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=LOWER</span><span class="add">+</span><span class="add">+# Forwarding the loop header&#x27;s A = COPY Y makes A live across the latch.</span><span class="add">+# The sign test must not clobber A after its new value is copied to Y.</span><span class="add">+---</span><span class="add">+name: copy_forward_loop</span><span class="add">+tracksRegLiveness: true</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    liveins: $a, $x, $rc28</span><span class="add">+    $y = COPY $a</span><span class="add">+    BRA %bb.1</span><span class="add">+</span><span class="add">+  bb.1:</span><span class="add">+    liveins: $x, $y, $rc28</span><span class="add">+    ; COPY-LABEL: bb.1:</span><span class="add">+    ; COPY: liveins: {{.*}}$a{{.*}}</span><span class="add">+    ; COPY: $rc2 = COPY $a</span><span class="add">+    ; COPY: $a, dead $c = ROL</span><span class="add">+    ; LOWER-LABEL: bb.1:</span><span class="add">+    ; LOWER: $a, dead $c = ROL</span><span class="add">+    ; LOWER-NOT: $a = LDImag8 $rc2</span><span class="add">+    ; LOWER: BR %bb.3</span><span class="add">+    $a = COPY $y</span><span class="add">+    $rc2 = COPY $y</span><span class="add">+    $rc28, $c = ASL $rc28</span><span class="add">+    $a, dead $c = ROL $a, $c</span><span class="add">+    $y = COPY $a</span><span class="add">+    CmpBrZero %bb.3, undef $n, 0, $rc2, implicit-def $c</span><span class="add">+</span><span class="add">+  bb.2:</span><span class="add">+    liveins: $x, $y, $rc28</span><span class="add">+    $a = COPY $rc28</span><span class="add">+    $a = EORImm $a, 33</span><span class="add">+    $rc28 = COPY $a</span><span class="add">+    $a = COPY $y</span><span class="add">+    $a = EORImm $a, 16</span><span class="add">+    $y = COPY $a</span><span class="add">+</span><span class="add">+  bb.3:</span><span class="add">+    liveins: $x, $y, $rc28</span><span class="add">+    ; COPY-LABEL: bb.3:</span><span class="add">+    ; COPY: liveins: {{.*}}$a{{.*}}</span><span class="add">+    $x = DEC $x</span><span class="add">+    CmpBrZero %bb.1, undef $z, 0, $x, implicit-def dead $c</span><span class="add">+</span><span class="add">+  bb.4:</span><span class="add">+    liveins: $y, $rc28</span><span class="add">+    RTS implicit $y, implicit $rc28</span><span class="add">+...</span></pre></details><details><summary>Complete proposed PR diff</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span><span class="line">index 533e1017b566..50432465870e 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span><span class="line">@@ -254,6 +254,14 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &amp;MF) {</span><span class="line">     }</span><span class="line">   }</span><span class="line"> </span><span class="add">+  // Copy forwarding can change the register live around a loop. Propagate</span><span class="add">+  // live-ins to a fixed point before using them to erase dead copies.</span><span class="add">+  SmallVector&lt;MachineBasicBlock *&gt; Blocks;</span><span class="add">+  for (MachineBasicBlock *MBB : post_order(&amp;MF))</span><span class="add">+    if (!MBB-&gt;isEntryBlock())</span><span class="add">+      Blocks.push_back(MBB);</span><span class="add">+  fullyRecomputeLiveIns(Blocks);</span><span class="add">+</span><span class="line">   for (MachineBasicBlock *MBB : post_order(&amp;MF)) {</span><span class="line">     LivePhysRegs LPR(TRI);</span><span class="line"> </span><span class="line">diff --git a/llvm/test/CodeGen/MOS/copy-opt-loop.mir b/llvm/test/CodeGen/MOS/copy-opt-loop.mir</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..84071e1e02bd</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/CodeGen/MOS/copy-opt-loop.mir</span><span class="line">@@ -0,0 +1,51 @@</span><span class="add">+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=COPY</span><span class="add">+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=LOWER</span><span class="add">+</span><span class="add">+# Forwarding the loop header&#x27;s A = COPY Y makes A live across the latch.</span><span class="add">+# The sign test must not clobber A after its new value is copied to Y.</span><span class="add">+---</span><span class="add">+name: copy_forward_loop</span><span class="add">+tracksRegLiveness: true</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    liveins: $a, $x, $rc28</span><span class="add">+    $y = COPY $a</span><span class="add">+    BRA %bb.1</span><span class="add">+</span><span class="add">+  bb.1:</span><span class="add">+    liveins: $x, $y, $rc28</span><span class="add">+    ; COPY-LABEL: bb.1:</span><span class="add">+    ; COPY: liveins: {{.*}}$a{{.*}}</span><span class="add">+    ; COPY: $rc2 = COPY $a</span><span class="add">+    ; COPY: $a, dead $c = ROL</span><span class="add">+    ; LOWER-LABEL: bb.1:</span><span class="add">+    ; LOWER: $a, dead $c = ROL</span><span class="add">+    ; LOWER-NOT: $a = LDImag8 $rc2</span><span class="add">+    ; LOWER: BR %bb.3</span><span class="add">+    $a = COPY $y</span><span class="add">+    $rc2 = COPY $y</span><span class="add">+    $rc28, $c = ASL $rc28</span><span class="add">+    $a, dead $c = ROL $a, $c</span><span class="add">+    $y = COPY $a</span><span class="add">+    CmpBrZero %bb.3, undef $n, 0, $rc2, implicit-def $c</span><span class="add">+</span><span class="add">+  bb.2:</span><span class="add">+    liveins: $x, $y, $rc28</span><span class="add">+    $a = COPY $rc28</span><span class="add">+    $a = EORImm $a, 33</span><span class="add">+    $rc28 = COPY $a</span><span class="add">+    $a = COPY $y</span><span class="add">+    $a = EORImm $a, 16</span><span class="add">+    $y = COPY $a</span><span class="add">+</span><span class="add">+  bb.3:</span><span class="add">+    liveins: $x, $y, $rc28</span><span class="add">+    ; COPY-LABEL: bb.3:</span><span class="add">+    ; COPY: liveins: {{.*}}$a{{.*}}</span><span class="add">+    $x = DEC $x</span><span class="add">+    CmpBrZero %bb.1, undef $z, 0, $x, implicit-def dead $c</span><span class="add">+</span><span class="add">+  bb.4:</span><span class="add">+    liveins: $y, $rc28</span><span class="add">+    RTS implicit $y, implicit $rc28</span><span class="add">+...</span></pre></details></article><article id="pr584"><h2>#584 — [MOS] Fix non-GPR immediate loads in mos-late-opt</h2><p><a href="https://github.com/llvm-mos/llvm-mos/pull/584" target="_blank" rel="noopener">Existing upstream PR ↗</a></p><h3>Proposed description</h3><div class="body"><p>On SPC700, LDImm accepts imaginary-register destinations to represent <code>mov dp, #imm</code>. <code>combineLdImm</code> tracks only A/X/Y; processing an imaginary destination through that path dereferences a null tracking pointer.</p><p>Restrict immediate-load folding to GPR destinations in the existing filtering condition. Other instructions use the existing register-invalidation path. The sibling TA handler keeps its original behavior.</p><p>The SPC700 MIR regression covers an imaginary-register immediate load and confirms that it does not interfere with folding an adjacent GPR load to TAX.</p><p>Validation: MOS CodeGen suite 79 pass, 1 unsupported (Linux, assertions enabled).</p></div><details><summary>Changes since the submitted PR</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="line">index ffd9eb497ecd..e0d7c965694f 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="line">@@ -279,22 +279,15 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &amp;MBB) const {</span><span class="line">         Load = &amp;LoadY;</span><span class="line">         break;</span><span class="line">       }</span><span class="del">-      // TA&#x27;s destination class is XY-only today, so Load is always set here.</span><span class="del">-      // The guard is defensive: this function is where an &quot;impossible&quot;</span><span class="del">-      // destination already appeared once (LDImm below, widened to Anyi8 on</span><span class="del">-      // SPC700), so don&#x27;t trust the switch to be exhaustive. An unhandled</span><span class="del">-      // destination falls through to the generic invalidation.</span><span class="del">-      if (Load) {</span><span class="del">-        // Copy A value to X or Y.</span><span class="del">-        Load-&gt;MI = &amp;MI;</span><span class="del">-        Load-&gt;Val = LoadA.Val;</span><span class="del">-        continue;</span><span class="del">-      }</span><span class="add">+      // Copy A value to X or Y.</span><span class="add">+      Load-&gt;MI = &amp;MI;</span><span class="add">+      Load-&gt;Val = LoadA.Val;</span><span class="add">+      continue;</span><span class="line">     }</span><span class="line"> </span><span class="del">-    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm()) {</span><span class="del">-      // If a register is overwritten with an instruction other than</span><span class="del">-      // an immediate load, mark register value as unknown.</span><span class="add">+    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm() ||</span><span class="add">+        !MOS::GPRRegClass.contains(MI.getOperand(0).getReg())) {</span><span class="add">+      // Mark overwritten register values as unknown.</span><span class="line">       if (MI.modifiesRegister(MOS::A, TRI))</span><span class="line">         LoadA.MI = nullptr;</span><span class="line">       if (MI.modifiesRegister(MOS::X, TRI))</span><span class="line">@@ -307,24 +300,6 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &amp;MBB) const {</span><span class="line">     // Process LD_ #.</span><span class="line">     Register Dst = MI.getOperand(0).getReg();</span><span class="line"> </span><span class="del">-    // LDImm&#x27;s destination is not always a GPR. MOSInstrInfo::getRegClass</span><span class="del">-    // widens it to Anyi8 on SPC700, where `$rcN = LDImm imm` is how</span><span class="del">-    // `mov dp, #imm` is modelled. Only A, X and Y take part in the rewrites</span><span class="del">-    // below; an imaginary destination writes none of them, so there is</span><span class="del">-    // nothing to rewrite. Invalidate any tracked GPR the instruction does</span><span class="del">-    // modify so a future widening of LDImm&#x27;s destination class cannot turn</span><span class="del">-    // this skip into a stale-value rewrite (no such destination exists</span><span class="del">-    // today; these checks are expected to do nothing).</span><span class="del">-    if (!MOS::GPRRegClass.contains(Dst)) {</span><span class="del">-      if (MI.modifiesRegister(MOS::A, TRI))</span><span class="del">-        LoadA.MI = nullptr;</span><span class="del">-      if (MI.modifiesRegister(MOS::X, TRI))</span><span class="del">-        LoadX.MI = nullptr;</span><span class="del">-      if (MI.modifiesRegister(MOS::Y, TRI))</span><span class="del">-        LoadY.MI = nullptr;</span><span class="del">-      continue;</span><span class="del">-    }</span><span class="del">-</span><span class="line">     int64_t Val = MI.getOperand(1).getImm();</span><span class="line"> </span><span class="line">     // Try to replace with T__.</span></pre></details><details><summary>Complete proposed PR diff</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="line">index fbedd8d46b95..e0d7c965694f 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="line">@@ -285,9 +285,9 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &amp;MBB) const {</span><span class="line">       continue;</span><span class="line">     }</span><span class="line"> </span><span class="del">-    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm()) {</span><span class="del">-      // If a register is overwritten with an instruction other than</span><span class="del">-      // an immediate load, mark register value as unknown.</span><span class="add">+    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm() ||</span><span class="add">+        !MOS::GPRRegClass.contains(MI.getOperand(0).getReg())) {</span><span class="add">+      // Mark overwritten register values as unknown.</span><span class="line">       if (MI.modifiesRegister(MOS::A, TRI))</span><span class="line">         LoadA.MI = nullptr;</span><span class="line">       if (MI.modifiesRegister(MOS::X, TRI))</span><span class="line">@@ -299,6 +299,7 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &amp;MBB) const {</span><span class="line"> </span><span class="line">     // Process LD_ #.</span><span class="line">     Register Dst = MI.getOperand(0).getReg();</span><span class="add">+</span><span class="line">     int64_t Val = MI.getOperand(1).getImm();</span><span class="line"> </span><span class="line">     // Try to replace with T__.</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-spc700.mir b/llvm/test/CodeGen/MOS/late-opt-spc700.mir</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..39065bf219a8</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/CodeGen/MOS/late-opt-spc700.mir</span><span class="line">@@ -0,0 +1,37 @@</span><span class="add">+# NOTE: Assertions have been autogenerated by utils/update_mir_test_checks.py UTC_ARGS: --version 6</span><span class="add">+# RUN: llc -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span><span class="add">+</span><span class="add">+# On SPC700, MOSInstrInfo::getRegClass widens LDImm&#x27;s destination register class</span><span class="add">+# to Anyi8, so `$rcN = LDImm imm` (`mov dp, #imm`) is legal, verifier-clean MIR.</span><span class="add">+# combineLdImm switched the destination over {A, X, Y} only and then</span><span class="add">+# unconditionally stored through the resulting ImmLoad *, which is null for any</span><span class="add">+# other destination -- a null-pointer store, i.e. a hard crash.</span><span class="add">+#</span><span class="add">+# The primary assertion is &quot;no crash + machine verification succeeds&quot;; the CHECK</span><span class="add">+# lines additionally pin that an imaginary destination is transparent to the</span><span class="add">+# A/X/Y value tracking, since it clobbers none of them.</span><span class="add">+</span><span class="add">+---</span><span class="add">+name: ldimm_imag8_only</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    ; CHECK-LABEL: name: ldimm_imag8_only</span><span class="add">+    ; CHECK: $rc2 = LDImm 42</span><span class="add">+    ; CHECK-NEXT: RTS implicit $rc2</span><span class="add">+    $rc2 = LDImm 42</span><span class="add">+    RTS implicit $rc2</span><span class="add">+...</span><span class="add">+---</span><span class="add">+name: ldimm_imag8_between_gprs</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    ; CHECK-LABEL: name: ldimm_imag8_between_gprs</span><span class="add">+    ; CHECK: $a = LDImm 7</span><span class="add">+    ; CHECK-NEXT: $rc2 = LDImm 7</span><span class="add">+    ; CHECK-NEXT: $x = TA $a</span><span class="add">+    ; CHECK-NEXT: RTS implicit $a, implicit $x, implicit $rc2</span><span class="add">+    $a = LDImm 7</span><span class="add">+    $rc2 = LDImm 7</span><span class="add">+    $x = LDImm 7</span><span class="add">+    RTS implicit $a, implicit $x, implicit $rc2</span><span class="add">+...</span></pre></details></article><article id="pr586"><h2>#586 — [MOS] Accept an optional BRK signature operand</h2><p><a href="https://github.com/llvm-mos/llvm-mos/pull/586" target="_blank" rel="noopener">Existing upstream PR ↗</a></p><h3>Proposed description</h3><div class="body"><p>Accept <code>brk #imm</code> as assembler syntax for the BRK opcode followed by a signature byte. Bare <code>brk</code> continues to emit one byte.</p><p>The signature form is assembler-only. Disassembly always decodes BRK as an operandless, one-byte instruction and treats the following byte independently.</p><p>Tests cover encoding, object disassembly on MOS6502 and W65816, and disassemble/reassemble round trips. The signature byte in the round-trip test is the NOP opcode, so consuming it as part of BRK would fail the test.</p><p>Validation: all 40 MOS MC tests pass (Linux, assertions enabled).</p></div><details><summary>Changes since the submitted PR</summary><pre><span class="line">diff --git a/llvm/test/MC/MOS/brk-signature.s b/llvm/test/MC/MOS/brk-signature.s</span><span class="line">index 622a26be8a88..ca2df38bd64c 100644</span><span class="del">--- a/llvm/test/MC/MOS/brk-signature.s</span><span class="add">+++ b/llvm/test/MC/MOS/brk-signature.s</span><span class="line">@@ -1,4 +1,22 @@</span><span class="del">-; RUN: llvm-mc -triple mos -show-encoding &lt; %s | FileCheck %s</span><span class="add">+; RUN: llvm-mc -triple mos -show-encoding &lt; %s | FileCheck %s --check-prefix=ENC</span><span class="add">+; RUN: llvm-mc -triple mos -filetype=obj &lt; %s | llvm-objdump -d - | FileCheck %s --check-prefix=DIS</span><span class="add">+; RUN: llvm-mc -triple mos -mcpu=mosw65816 -filetype=obj &lt; %s | llvm-objdump -d --mcpu=mosw65816 - | FileCheck %s --check-prefix=DIS</span><span class="add">+; RUN: echo &quot;0x00 0xea&quot; | llvm-mc -triple mos -disassemble | llvm-mc -triple mos -show-encoding | FileCheck %s --check-prefix=ROUNDTRIP</span><span class="add">+; RUN: echo &quot;0x00 0xea&quot; | llvm-mc -triple mos -mcpu=mosw65816 -disassemble | llvm-mc -triple mos -mcpu=mosw65816 -show-encoding | FileCheck %s --check-prefix=ROUNDTRIP</span><span class="line"> </span><span class="del">-	brk     ; CHECK: encoding: [0x00]</span><span class="del">-	brk #66 ; CHECK: encoding: [0x00,0x42]</span><span class="add">+; The signature is assembler syntax only: disassembly consumes one byte for</span><span class="add">+; BRK and decodes the following byte as a separate instruction.</span><span class="add">+</span><span class="add">+; ENC: encoding: [0x00]</span><span class="add">+; DIS: 00 brk</span><span class="add">+brk</span><span class="add">+; ENC: encoding: [0x00,0xea]</span><span class="add">+; DIS-NEXT: 00 brk</span><span class="add">+; DIS-NEXT: ea nop</span><span class="add">+brk #234</span><span class="add">+; ENC: encoding: [0xea]</span><span class="add">+; DIS-NEXT: ea nop</span><span class="add">+nop</span><span class="add">+</span><span class="add">+; ROUNDTRIP: brk {{.*}}encoding: [0x00]</span><span class="add">+; ROUNDTRIP-NEXT: nop {{.*}}encoding: [0xea]</span></pre></details><details><summary>Complete proposed PR diff</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="line">index a71519559a50..b9d37cefc69d 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="line">@@ -192,6 +192,10 @@ def BEQ_Relative : ConditionalBranch&lt;&quot;beq&quot;, 0b11, 0b1&gt;;</span><span class="line"> /// 8A  9A  AA  BA  CA  EA</span><span class="line"> </span><span class="line"> def BRK_Implied: InstLow0&lt;&quot;brk&quot;, 0b0000&gt;, InstUnconditionalBranch;</span><span class="add">+def BRK_Immediate: Inst16&lt;&quot;brk&quot;, Opcode&lt;0x00&gt;, Immediate&gt;,</span><span class="add">+    InstUnconditionalBranch {</span><span class="add">+  let isAsmParserOnly = true;</span><span class="add">+}</span><span class="line"> /// JSR is the only instruction that does not follow the current pattern.</span><span class="line"> def JSR_Absolute: Inst24&lt;&quot;jsr&quot;, Opcode&lt;0x20&gt;, Absolute&gt;, InstCall;</span><span class="line"> def RTI_Implied: InstLow0&lt;&quot;rti&quot;, 0b0100&gt;, InstReturn;</span><span class="line">diff --git a/llvm/test/MC/MOS/brk-signature.s b/llvm/test/MC/MOS/brk-signature.s</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..ca2df38bd64c</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/MC/MOS/brk-signature.s</span><span class="line">@@ -0,0 +1,22 @@</span><span class="add">+; RUN: llvm-mc -triple mos -show-encoding &lt; %s | FileCheck %s --check-prefix=ENC</span><span class="add">+; RUN: llvm-mc -triple mos -filetype=obj &lt; %s | llvm-objdump -d - | FileCheck %s --check-prefix=DIS</span><span class="add">+; RUN: llvm-mc -triple mos -mcpu=mosw65816 -filetype=obj &lt; %s | llvm-objdump -d --mcpu=mosw65816 - | FileCheck %s --check-prefix=DIS</span><span class="add">+; RUN: echo &quot;0x00 0xea&quot; | llvm-mc -triple mos -disassemble | llvm-mc -triple mos -show-encoding | FileCheck %s --check-prefix=ROUNDTRIP</span><span class="add">+; RUN: echo &quot;0x00 0xea&quot; | llvm-mc -triple mos -mcpu=mosw65816 -disassemble | llvm-mc -triple mos -mcpu=mosw65816 -show-encoding | FileCheck %s --check-prefix=ROUNDTRIP</span><span class="add">+</span><span class="add">+; The signature is assembler syntax only: disassembly consumes one byte for</span><span class="add">+; BRK and decodes the following byte as a separate instruction.</span><span class="add">+</span><span class="add">+; ENC: encoding: [0x00]</span><span class="add">+; DIS: 00 brk</span><span class="add">+brk</span><span class="add">+; ENC: encoding: [0x00,0xea]</span><span class="add">+; DIS-NEXT: 00 brk</span><span class="add">+; DIS-NEXT: ea nop</span><span class="add">+brk #234</span><span class="add">+; ENC: encoding: [0xea]</span><span class="add">+; DIS-NEXT: ea nop</span><span class="add">+nop</span><span class="add">+</span><span class="add">+; ROUNDTRIP: brk {{.*}}encoding: [0x00]</span><span class="add">+; ROUNDTRIP-NEXT: nop {{.*}}encoding: [0xea]</span></pre></details></article><article id="pr588"><h2>#588 — [MOS] Add the COP mnemonic with a mandatory signature operand</h2><p><a href="https://github.com/llvm-mos/llvm-mos/pull/588" target="_blank" rel="noopener">Existing upstream PR ↗</a></p><h3>Proposed description</h3><div class="body"><p>Add the W65816 COP instruction with a mandatory signature operand, following WDC assembly syntax. COP encodes as opcode $02 followed by the signature byte and disassembles as a two-byte instruction.</p><p>Tests cover expression and literal operands, instruction encoding and disassembly, rejection on an unsupported CPU, and rejection of a missing operand. Comments describe the operand requirement without repeating instruction semantics.</p><p>Validation: all 40 MOS MC tests pass (Linux, assertions enabled).</p></div><details><summary>Changes since the submitted PR</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="line">index 86e977f62679..779261d14bb5 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="line">@@ -786,12 +786,8 @@ def TSC_Implied : InstLowB&lt;&quot;tsc&quot;, 0b0011&gt;;</span><span class="line"> </span><span class="line"> def WDM_Immediate : Inst16&lt;&quot;wdm&quot;, Opcode&lt;0x42&gt;, Immediate&gt;;</span><span class="line"> </span><span class="del">-/// COP invokes the co-processor software interrupt. Like BRK, it advances the</span><span class="del">-/// PC by two, so the byte following the opcode is a &quot;signature&quot; the handler</span><span class="del">-/// can read via the pushed return address; the hardware makes no direct use</span><span class="del">-/// of it. Unlike BRK, WDC&#x27;s own assembly syntax requires this operand, so it</span><span class="del">-/// is mandatory here rather than optional. W65816-only: on the 65EL02,</span><span class="del">-/// opcode $02 is NXT (a different instruction), not COP.</span><span class="add">+// Unlike BRK, WDC&#x27;s own assembly syntax requires this operand, so it is</span><span class="add">+// mandatory here rather than optional.</span><span class="line"> def COP_Immediate : Inst16&lt;&quot;cop&quot;, Opcode&lt;0x02&gt;, Immediate&gt;, InstUnconditionalBranch;</span><span class="line"> }</span><span class="line"> </span><span class="line">diff --git a/llvm/test/MC/MOS/asm-errors.s b/llvm/test/MC/MOS/asm-errors.s</span><span class="line">index 6723fc00cc11..e8769c6c48f3 100644</span><span class="del">--- a/llvm/test/MC/MOS/asm-errors.s</span><span class="add">+++ b/llvm/test/MC/MOS/asm-errors.s</span><span class="line">@@ -28,7 +28,6 @@ sep #$30</span><span class="line"> ; CHECK: [[#@LINE+1]]:1: error: instruction requires: FeatureW65816</span><span class="line"> cop #90</span><span class="line"> </span><span class="del">-; cop has no zero-operand form at all outside FeatureW65816, so a bare</span><span class="del">-; mnemonic with no matching variant is simply unrecognized here.</span><span class="add">+; COP requires a signature operand.</span><span class="line"> ; CHECK: [[#@LINE+1]]:1: error: invalid instruction</span><span class="line"> cop</span><span class="line">diff --git a/llvm/test/MC/MOS/cop-signature.s b/llvm/test/MC/MOS/cop-signature.s</span><span class="line">index c29eee66a53d..a9b0d5146aee 100644</span><span class="del">--- a/llvm/test/MC/MOS/cop-signature.s</span><span class="add">+++ b/llvm/test/MC/MOS/cop-signature.s</span><span class="line">@@ -1,22 +1,11 @@</span><span class="line"> ; RUN: llvm-mc -triple mos -mcpu=mosw65816 -motorola-integers --filetype=obj -o=%t.obj %s</span><span class="line"> ; RUN: llvm-objdump -d --mcpu=mosw65816 %t.obj | FileCheck %s</span><span class="line"> </span><span class="del">-; RUN: not llvm-mc -triple mos -mcpu=mos65el02 -motorola-integers %s 2&gt;&amp;1 | FileCheck --check-prefix=EL02 %s</span><span class="del">-</span><span class="del">-; COP is W65816-only: opcode $02 is NXT on the 65EL02 (a different</span><span class="del">-; instruction that happens to share the encoding), so every `cop` below must</span><span class="del">-; be rejected there even though it assembles cleanly under mosw65816. No</span><span class="del">-; existing test pinned this -- asm-errors.s only runs at -mcpu=mos6502, so a</span><span class="del">-; refactor onto the shared FeatureW65816Or65EL02 predicate used by COP&#x27;s</span><span class="del">-; neighbours would otherwise pass the whole suite.</span><span class="del">-</span><span class="line"> ; cop&#x27;s signature operand accepts arbitrary expressions, not just literal</span><span class="line"> ; immediates.</span><span class="line"> sig = $5a</span><span class="del">-; EL02: [[#@LINE+1]]:2: error: instruction requires: FeatureW65816</span><span class="line"> 	cop #sig                        ; CHECK: 02 5a cop #$5a</span><span class="line"> </span><span class="line"> ; WDC reserves $80-$ff for internal use and recommends confining user</span><span class="line"> ; signature bytes to $00-$7f; $7f is the top of that range.</span><span class="del">-; EL02: [[#@LINE+1]]:2: error: instruction requires: FeatureW65816</span><span class="line"> 	cop #$7f                        ; CHECK: 02 7f cop #$7f</span></pre></details><details><summary>Complete proposed PR diff</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="line">index a71519559a50..779261d14bb5 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrInfo.td</span><span class="line">@@ -785,6 +785,10 @@ def TDC_Implied : InstLowB&lt;&quot;tdc&quot;, 0b0111&gt;;</span><span class="line"> def TSC_Implied : InstLowB&lt;&quot;tsc&quot;, 0b0011&gt;;</span><span class="line"> </span><span class="line"> def WDM_Immediate : Inst16&lt;&quot;wdm&quot;, Opcode&lt;0x42&gt;, Immediate&gt;;</span><span class="add">+</span><span class="add">+// Unlike BRK, WDC&#x27;s own assembly syntax requires this operand, so it is</span><span class="add">+// mandatory here rather than optional.</span><span class="add">+def COP_Immediate : Inst16&lt;&quot;cop&quot;, Opcode&lt;0x02&gt;, Immediate&gt;, InstUnconditionalBranch;</span><span class="line"> }</span><span class="line"> </span><span class="line"> } // Predicates = [HasW65816]</span><span class="line">diff --git a/llvm/test/MC/MOS/all-65816-opcodes.s b/llvm/test/MC/MOS/all-65816-opcodes.s</span><span class="line">index cc766817ec26..5d1e64b1037d 100644</span><span class="del">--- a/llvm/test/MC/MOS/all-65816-opcodes.s</span><span class="add">+++ b/llvm/test/MC/MOS/all-65816-opcodes.s</span><span class="line">@@ -105,3 +105,5 @@</span><span class="line"> 	xce                             ; CHECK: encoding: [0xfb]</span><span class="line"> </span><span class="line"> 	wdm #$ea                        ; CHECK: encoding: [0x42,0xea]</span><span class="add">+</span><span class="add">+	cop #$ea                        ; CHECK: encoding: [0x02,0xea]</span><span class="line">diff --git a/llvm/test/MC/MOS/asm-errors.s b/llvm/test/MC/MOS/asm-errors.s</span><span class="line">index 123290f3b8cc..e8769c6c48f3 100644</span><span class="del">--- a/llvm/test/MC/MOS/asm-errors.s</span><span class="add">+++ b/llvm/test/MC/MOS/asm-errors.s</span><span class="line">@@ -24,3 +24,10 @@ rep #$30</span><span class="line"> </span><span class="line"> ; CHECK: [[#@LINE+1]]:1: error: instruction requires: FeatureW65816Or65EL02</span><span class="line"> sep #$30</span><span class="add">+</span><span class="add">+; CHECK: [[#@LINE+1]]:1: error: instruction requires: FeatureW65816</span><span class="add">+cop #90</span><span class="add">+</span><span class="add">+; COP requires a signature operand.</span><span class="add">+; CHECK: [[#@LINE+1]]:1: error: invalid instruction</span><span class="add">+cop</span><span class="line">diff --git a/llvm/test/MC/MOS/cop-signature.s b/llvm/test/MC/MOS/cop-signature.s</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..a9b0d5146aee</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/MC/MOS/cop-signature.s</span><span class="line">@@ -0,0 +1,11 @@</span><span class="add">+; RUN: llvm-mc -triple mos -mcpu=mosw65816 -motorola-integers --filetype=obj -o=%t.obj %s</span><span class="add">+; RUN: llvm-objdump -d --mcpu=mosw65816 %t.obj | FileCheck %s</span><span class="add">+</span><span class="add">+; cop&#x27;s signature operand accepts arbitrary expressions, not just literal</span><span class="add">+; immediates.</span><span class="add">+sig = $5a</span><span class="add">+	cop #sig                        ; CHECK: 02 5a cop #$5a</span><span class="add">+</span><span class="add">+; WDC reserves $80-$ff for internal use and recommends confining user</span><span class="add">+; signature bytes to $00-$7f; $7f is the top of that range.</span><span class="add">+	cop #$7f                        ; CHECK: 02 7f cop #$7f</span></pre></details></article><article id="pr589"><h2>#589 — [MOS] Mark CmpZero as a terminator</h2><p><a href="https://github.com/llvm-mos/llvm-mos/pull/589" target="_blank" rel="noopener">Existing upstream PR ↗</a></p><h3>Proposed description</h3><div class="body"><p>Mark CmpZero as a terminator so the machine verifier rejects ordinary instructions placed after it. Restrict <code>lowerCmpZeros</code> to the block&#x27;s terminator range.</p><p>Keep each pseudo&#x27;s fold decision separate from the pass&#x27;s change accumulator, and report a change when deleting a dead comparison. Tests cover the rejected non-terminator placement, adjacent comparisons that require independent folding/lowering, and removal of a dead comparison. Existing late-optimization tests cover the ordinary single-comparison paths.</p><p>The original PR&#x27;s reproducer placed a normal instruction after CmpZero. That placement violates the intended invariant; this revision encodes and tests the invariant explicitly.</p><p>Validation: all 80 enabled MOS CodeGen tests pass across the full run and focused rerun after correcting one new test expectation; 1 upstream-disabled test.</p></div><details><summary>Changes since the submitted PR</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td</span><span class="line">index 21910cfeab37..8519606edde4 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSInstrPseudos.td</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td</span><span class="line">@@ -123,6 +123,7 @@ def LDZ : MOSPseudo {</span><span class="line"> }</span><span class="line"> </span><span class="line"> def CmpZero : MOSPseudo {</span><span class="add">+  let isTerminator = true;</span><span class="line">   dag InOperandList = (ins Anyi8:$val);</span><span class="line">   let Defs = [C];</span><span class="line">   let isCompare = true;</span><span class="line">diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="line">index ac180f0542f9..aaac642c76f5 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="line">@@ -88,7 +88,7 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &amp;MBB) const {</span><span class="line">   const auto &amp;STI = MBB.getParent()-&gt;getSubtarget&lt;MOSSubtarget&gt;();</span><span class="line">   const auto *TRI = MRI.getTargetRegisterInfo();</span><span class="line">   bool Changed = false;</span><span class="del">-  for (MachineInstr &amp;MI : make_early_inc_range(mbb_reverse(MBB))) {</span><span class="add">+  for (MachineInstr &amp;MI : make_early_inc_range(mbb_reverse(MBB.terminators()))) {</span><span class="line">     if (MI.getOpcode() != MOS::CmpZero)</span><span class="line">       continue;</span><span class="line"> </span><span class="line">@@ -100,11 +100,6 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &amp;MBB) const {</span><span class="line"> </span><span class="line">     Register Val = MI.getOperand(0).getReg();</span><span class="line"> </span><span class="del">-    // Per-CmpZero, NOT loop-carried: whether THIS pseudo was folded into an</span><span class="del">-    // earlier NZ producer. Sharing `Changed` here made every CmpZero after the</span><span class="del">-    // block&#x27;s first fold skip its lowering too, and nothing downstream lowers</span><span class="del">-    // the pseudo -- it reached the asm printer and was emitted as nothing,</span><span class="del">-    // silently dropping the flag test.</span><span class="line">     bool Folded = false;</span><span class="line">     for (auto &amp;J : mbb_reverse(MBB.begin(), MI)) {</span><span class="line">       if (J.isDebugInstr())</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..0f0b5bab40e4</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir</span><span class="line">@@ -0,0 +1,16 @@</span><span class="add">+# RUN: not --crash llc -mtriple=mos -run-pass=machineverifier -o /dev/null %s 2&gt;&amp;1 | FileCheck %s</span><span class="add">+</span><span class="add">+# CmpZero must stay with the terminators that consume its flags.</span><span class="add">+# CHECK: Bad machine code: Non-terminator instruction after the first terminator</span><span class="add">+# CHECK: $a = T_A $x</span><span class="add">+# CHECK: First terminator was: CmpZero</span><span class="add">+</span><span class="add">+---</span><span class="add">+name: cmpzero_before_nonterminator</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    liveins: $x</span><span class="add">+    CmpZero $x, implicit-def $n, implicit-def $c</span><span class="add">+    $a = T_A $x</span><span class="add">+    RTS implicit $n</span><span class="add">+...</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir</span><span class="line">deleted file mode 100644</span><span class="line">index 351e6c041821..000000000000</span><span class="del">--- a/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir</span><span class="add">+++ /dev/null</span><span class="line">@@ -1,31 +0,0 @@</span><span class="del">-# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span><span class="del">-</span><span class="del">-# lowerCmpZeros walks the block in reverse and either folds each CmpZero into an</span><span class="del">-# earlier NZ producer or lowers it to a real flag-setting instruction. The</span><span class="del">-# fold-success flag used to be the function&#x27;s loop-carried `Changed`</span><span class="del">-# accumulator, so once any CmpZero in the block folded, every CmpZero processed</span><span class="del">-# afterwards took the &quot;already changed&quot; early-continue and was never lowered.</span><span class="del">-# Nothing downstream lowers the pseudo: it reached the asm printer, which emits</span><span class="del">-# nothing for it, silently dropping the flag test. -verify-machineinstrs does</span><span class="del">-# not catch it, because a surviving CmpZero is legal MIR.</span><span class="del">-#</span><span class="del">-# Reverse iteration processes the second CmpZero first (it folds into the T_A);</span><span class="del">-# the first one cannot fold -- nothing precedes it -- so it must be lowered.</span><span class="del">-</span><span class="del">----</span><span class="del">-name: cmpzero_after_fold</span><span class="del">-body: |</span><span class="del">-  bb.0.entry:</span><span class="del">-    liveins: $a, $x</span><span class="del">-    ; CHECK-LABEL: name: cmpzero_after_fold</span><span class="del">-    ; CHECK: liveins: $a, $x</span><span class="del">-    ; CHECK-NEXT: {{  $}}</span><span class="del">-    ; CHECK-NEXT: dead $a = T_A $x, implicit-def $nz</span><span class="del">-    ; CHECK-NEXT: $a = T_A $x, implicit-def $nz</span><span class="del">-    ; CHECK-NEXT: RTS implicit $n</span><span class="del">-    ; CHECK-NOT: CmpZero</span><span class="del">-    CmpZero $x, implicit-def $n, implicit-def $c</span><span class="del">-    $a = T_A $x</span><span class="del">-    CmpZero $a, implicit-def $n, implicit-def $c</span><span class="del">-    RTS implicit $n</span><span class="del">-...</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..8d1cc608741a</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir</span><span class="line">@@ -0,0 +1,29 @@</span><span class="add">+# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span><span class="add">+</span><span class="add">+# Adjacent CmpZero terminators can be folded and lowered independently.</span><span class="add">+---</span><span class="add">+name: cmpzero_after_fold</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    liveins: $a, $x</span><span class="add">+    ; CHECK-LABEL: name: cmpzero_after_fold</span><span class="add">+    ; CHECK: $a = T_A $x, implicit-def $nz</span><span class="add">+    ; CHECK-NEXT: dead $x = TA $a, implicit-def $nz</span><span class="add">+    ; CHECK-NEXT: RTS implicit $n</span><span class="add">+    $a = T_A $x</span><span class="add">+    CmpZero $x, implicit-def $n, implicit-def $c</span><span class="add">+    CmpZero $a, implicit-def $n, implicit-def $c</span><span class="add">+    RTS implicit $n</span><span class="add">+...</span><span class="add">+---</span><span class="add">+name: cmpzero_dead</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    liveins: $x</span><span class="add">+    ; CHECK-LABEL: name: cmpzero_dead</span><span class="add">+    ; CHECK: liveins: $x</span><span class="add">+    ; CHECK-NEXT: {{  $}}</span><span class="add">+    ; CHECK-NEXT: RTS</span><span class="add">+    CmpZero $x, implicit-def dead $n, implicit-def dead $c</span><span class="add">+    RTS</span><span class="add">+...</span></pre></details><details><summary>Complete proposed PR diff</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td</span><span class="line">index 21910cfeab37..8519606edde4 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSInstrPseudos.td</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td</span><span class="line">@@ -123,6 +123,7 @@ def LDZ : MOSPseudo {</span><span class="line"> }</span><span class="line"> </span><span class="line"> def CmpZero : MOSPseudo {</span><span class="add">+  let isTerminator = true;</span><span class="line">   dag InOperandList = (ins Anyi8:$val);</span><span class="line">   let Defs = [C];</span><span class="line">   let isCompare = true;</span><span class="line">diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="line">index fbedd8d46b95..aaac642c76f5 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span><span class="line">@@ -88,24 +88,26 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &amp;MBB) const {</span><span class="line">   const auto &amp;STI = MBB.getParent()-&gt;getSubtarget&lt;MOSSubtarget&gt;();</span><span class="line">   const auto *TRI = MRI.getTargetRegisterInfo();</span><span class="line">   bool Changed = false;</span><span class="del">-  for (MachineInstr &amp;MI : make_early_inc_range(mbb_reverse(MBB))) {</span><span class="add">+  for (MachineInstr &amp;MI : make_early_inc_range(mbb_reverse(MBB.terminators()))) {</span><span class="line">     if (MI.getOpcode() != MOS::CmpZero)</span><span class="line">       continue;</span><span class="line"> </span><span class="line">     if (MI.allDefsAreDead()) {</span><span class="line">       MI.eraseFromParent();</span><span class="add">+      Changed = true;</span><span class="line">       continue;</span><span class="line">     }</span><span class="line"> </span><span class="line">     Register Val = MI.getOperand(0).getReg();</span><span class="line"> </span><span class="add">+    bool Folded = false;</span><span class="line">     for (auto &amp;J : mbb_reverse(MBB.begin(), MI)) {</span><span class="line">       if (J.isDebugInstr())</span><span class="line">         continue;</span><span class="line">       if (J.isCall() || J.isInlineAsm())</span><span class="line">         break;</span><span class="line">       if (definesNZ(J, Val, STI)) {</span><span class="del">-        Changed = true;</span><span class="add">+        Folded = true;</span><span class="line">         J.addOperand(MachineOperand::CreateReg(MOS::NZ, /*isDef=*/true,</span><span class="line">                                                /*isImp=*/true));</span><span class="line">         MI.eraseFromParent();</span><span class="line">@@ -135,8 +137,10 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &amp;MBB) const {</span><span class="line">       if (ClobbersNZ)</span><span class="line">         break;</span><span class="line">     }</span><span class="del">-    if (Changed)</span><span class="add">+    if (Folded) {</span><span class="add">+      Changed = true;</span><span class="line">       continue;</span><span class="add">+    }</span><span class="line"> </span><span class="line">     Changed = true;</span><span class="line">     lowerCmpZero(MI);</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..0f0b5bab40e4</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir</span><span class="line">@@ -0,0 +1,16 @@</span><span class="add">+# RUN: not --crash llc -mtriple=mos -run-pass=machineverifier -o /dev/null %s 2&gt;&amp;1 | FileCheck %s</span><span class="add">+</span><span class="add">+# CmpZero must stay with the terminators that consume its flags.</span><span class="add">+# CHECK: Bad machine code: Non-terminator instruction after the first terminator</span><span class="add">+# CHECK: $a = T_A $x</span><span class="add">+# CHECK: First terminator was: CmpZero</span><span class="add">+</span><span class="add">+---</span><span class="add">+name: cmpzero_before_nonterminator</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    liveins: $x</span><span class="add">+    CmpZero $x, implicit-def $n, implicit-def $c</span><span class="add">+    $a = T_A $x</span><span class="add">+    RTS implicit $n</span><span class="add">+...</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..8d1cc608741a</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir</span><span class="line">@@ -0,0 +1,29 @@</span><span class="add">+# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span><span class="add">+</span><span class="add">+# Adjacent CmpZero terminators can be folded and lowered independently.</span><span class="add">+---</span><span class="add">+name: cmpzero_after_fold</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    liveins: $a, $x</span><span class="add">+    ; CHECK-LABEL: name: cmpzero_after_fold</span><span class="add">+    ; CHECK: $a = T_A $x, implicit-def $nz</span><span class="add">+    ; CHECK-NEXT: dead $x = TA $a, implicit-def $nz</span><span class="add">+    ; CHECK-NEXT: RTS implicit $n</span><span class="add">+    $a = T_A $x</span><span class="add">+    CmpZero $x, implicit-def $n, implicit-def $c</span><span class="add">+    CmpZero $a, implicit-def $n, implicit-def $c</span><span class="add">+    RTS implicit $n</span><span class="add">+...</span><span class="add">+---</span><span class="add">+name: cmpzero_dead</span><span class="add">+body: |</span><span class="add">+  bb.0.entry:</span><span class="add">+    liveins: $x</span><span class="add">+    ; CHECK-LABEL: name: cmpzero_dead</span><span class="add">+    ; CHECK: liveins: $x</span><span class="add">+    ; CHECK-NEXT: {{  $}}</span><span class="add">+    ; CHECK-NEXT: RTS</span><span class="add">+    CmpZero $x, implicit-def dead $n, implicit-def dead $c</span><span class="add">+    RTS</span><span class="add">+...</span></pre></details></article><article id="pr590"><h2>#590 — [MOS] Make zero page allocation deterministic</h2><p><a href="https://github.com/llvm-mos/llvm-mos/pull/590" target="_blank" rel="noopener">Existing upstream PR ↗</a></p><h3>Proposed description</h3><div class="body"><p>Zero-page allocation can choose different globals for identical inputs when candidate scores tie. Pointer-ordered iteration also affects entry-point ordering and floating-point accumulation of candidate benefits.</p><p>Use insertion-ordered containers at the three relevant iteration sites. Document the determinism requirement without promising a particular iteration order.</p><p>The regression gives eight equally beneficial globals four bytes of zero page and checks a consistent allocation. Independent downstream testing in this thread also confirms reproducible full-LTO binaries with the change.</p><p>Validation: MOS CodeGen suite 79 pass, 1 unsupported; 20 separate llc runs produce byte-identical assembly.</p></div><details><summary>Changes since the submitted PR</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span><span class="line">index dbbdc95d921b..8675ea1f6a3c 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span><span class="line">@@ -416,10 +416,7 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &amp;M) {</span><span class="line">   LLVM_DEBUG(CG.dump());</span><span class="line"> </span><span class="line">   std::vector&lt;SCC&gt; SCCs;</span><span class="del">-  // SmallSetVector, not SmallSet: past its inline capacity SmallSet degrades to</span><span class="del">-  // std::set, which orders const CallGraphNode * by pointer VALUE. SCC::Callees</span><span class="del">-  // seeds the EntryGraph list, and entry graphs are served ZP round-robin, so an</span><span class="del">-  // address-ordered callee list makes the assignment differ between runs.</span><span class="add">+  // Note: iteration order must be deterministic.</span><span class="line">   std::vector&lt;SmallSetVector&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span><span class="line">   DenseMap&lt;const CallGraphNode *, size_t&gt; SCCIdx;</span><span class="line">   std::vector&lt;std::unique_ptr&lt;Candidate&gt;&gt; Candidates;</span><span class="line">@@ -488,13 +485,7 @@ void MOSZeroPageAlloc::collectCandidates(</span><span class="line">   auto &amp;BFI =</span><span class="line">       getAnalysis&lt;BlockFrequencyInfoWrapperPass&gt;(MF.getFunction()).getBFI();</span><span class="line"> </span><span class="del">-  // MapVector, not DenseMap: the iteration below turns this into the candidate</span><span class="del">-  // list, and the only ordering applied later is a stable_sort on benefit -- so</span><span class="del">-  // equal-benefit candidates keep this order. A DenseMap keyed by</span><span class="del">-  // GlobalVariable * iterates in pointer-hash order, i.e. by heap address, so</span><span class="del">-  // ties were broken differently on every process execution and the zero page&#x27;s</span><span class="del">-  // last free byte went to a different global each build. MapVector keeps the</span><span class="del">-  // deterministic MachineInstr walk order below.</span><span class="add">+  // Note: iteration order must be deterministic.</span><span class="line">   MapVector&lt;GlobalVariable *, float&gt; GlobalBenefit;</span><span class="line">   for (MachineBasicBlock &amp;MBB : MF) {</span><span class="line">     for (MachineInstr &amp;MI : MBB) {</span><span class="line">@@ -714,10 +705,7 @@ std::vector&lt;EntryGraph&gt; MOSZeroPageAlloc::buildEntryGraphs(Module &amp;M,</span><span class="line"> </span><span class="line">       // Find all calls within the SCC and propagate entry frequencies across</span><span class="line">       // the edges.</span><span class="del">-      // MapVector, not DenseMap: the iteration below accumulates these into</span><span class="del">-      // EntryFreqs with float +=, which is not associative, so a pointer-hash</span><span class="del">-      // iteration order perturbed every derived benefit in its last ULP and</span><span class="del">-      // broke near-ties as well as exact ones.</span><span class="add">+      // Note: iteration order must be deterministic.</span><span class="line">       MapVector&lt;const Function *, float&gt; CalleeFreqs;</span><span class="line">       for (Function *F : Component-&gt;Funcs) {</span><span class="line">         LLVM_DEBUG(dbgs() &lt;&lt; &quot;    &quot; &lt;&lt; F-&gt;getName() &lt;&lt; &quot;\n&quot;);</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span><span class="line">index b9459424912b..7d049487bc7d 100644</span><span class="del">--- a/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span><span class="add">+++ b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span><span class="line">@@ -5,16 +5,8 @@</span><span class="line"> ; Every one of these globals is stored exactly once from the same basic block,</span><span class="line"> ; so MOSZeroPageAlloc computes the identical benefit (2 * 1.0 / 1) for all eight</span><span class="line"> ; and only four of them fit in the zero page. The winners are therefore decided</span><span class="del">-; entirely by the order in which candidates were collected, which must be the</span><span class="del">-; MachineInstr walk order -- i.e. module order, g0 through g3.</span><span class="del">-;</span><span class="del">-; Before the fix, collectCandidates() accumulated benefits in a</span><span class="del">-; DenseMap&lt;GlobalVariable *, float&gt; and iterated it to build the candidate list;</span><span class="del">-; that iterates in pointer-hash order, i.e. by heap address, and the subsequent</span><span class="del">-; stable_sort on benefit leaves ties in exactly that order. The winning set then</span><span class="del">-; differed on every process execution: twenty runs of this file produced six</span><span class="del">-; distinct winning sets, none of them the module-order set below (this test&#x27;s</span><span class="del">-; expectations failed all twenty pre-fix runs).</span><span class="add">+; entirely by the order in which candidates were collected, which must be</span><span class="add">+; deterministic.</span><span class="line"> </span><span class="line"> target triple = &quot;mos&quot;</span><span class="line"> </span></pre></details><details><summary>Complete proposed PR diff</summary><pre><span class="line">diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span><span class="line">index 2fb9967160e5..8675ea1f6a3c 100644</span><span class="del">--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span><span class="add">+++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span><span class="line">@@ -20,8 +20,10 @@</span><span class="line"> #include &quot;MOSMachineFunctionInfo.h&quot;</span><span class="line"> #include &quot;MOSRegisterInfo.h&quot;</span><span class="line"> #include &quot;MOSSubtarget.h&quot;</span><span class="add">+#include &quot;llvm/ADT/MapVector.h&quot;</span><span class="line"> #include &quot;llvm/ADT/PostOrderIterator.h&quot;</span><span class="line"> #include &quot;llvm/ADT/SCCIterator.h&quot;</span><span class="add">+#include &quot;llvm/ADT/SetVector.h&quot;</span><span class="line"> #include &quot;llvm/Analysis/BasicAliasAnalysis.h&quot;</span><span class="line"> #include &quot;llvm/Analysis/BlockFrequencyInfo.h&quot;</span><span class="line"> #include &quot;llvm/Analysis/CallGraph.h&quot;</span><span class="line">@@ -414,7 +416,8 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &amp;M) {</span><span class="line">   LLVM_DEBUG(CG.dump());</span><span class="line"> </span><span class="line">   std::vector&lt;SCC&gt; SCCs;</span><span class="del">-  std::vector&lt;SmallSet&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span><span class="add">+  // Note: iteration order must be deterministic.</span><span class="add">+  std::vector&lt;SmallSetVector&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span><span class="line">   DenseMap&lt;const CallGraphNode *, size_t&gt; SCCIdx;</span><span class="line">   std::vector&lt;std::unique_ptr&lt;Candidate&gt;&gt; Candidates;</span><span class="line">   DenseMap&lt;GlobalVariable *, Candidate *&gt; GVCandidates;</span><span class="line">@@ -482,7 +485,8 @@ void MOSZeroPageAlloc::collectCandidates(</span><span class="line">   auto &amp;BFI =</span><span class="line">       getAnalysis&lt;BlockFrequencyInfoWrapperPass&gt;(MF.getFunction()).getBFI();</span><span class="line"> </span><span class="del">-  DenseMap&lt;GlobalVariable *, float&gt; GlobalBenefit;</span><span class="add">+  // Note: iteration order must be deterministic.</span><span class="add">+  MapVector&lt;GlobalVariable *, float&gt; GlobalBenefit;</span><span class="line">   for (MachineBasicBlock &amp;MBB : MF) {</span><span class="line">     for (MachineInstr &amp;MI : MBB) {</span><span class="line">       for (const MachineOperand &amp;MO : MI.operands()) {</span><span class="line">@@ -701,7 +705,8 @@ std::vector&lt;EntryGraph&gt; MOSZeroPageAlloc::buildEntryGraphs(Module &amp;M,</span><span class="line"> </span><span class="line">       // Find all calls within the SCC and propagate entry frequencies across</span><span class="line">       // the edges.</span><span class="del">-      DenseMap&lt;const Function *, float&gt; CalleeFreqs;</span><span class="add">+      // Note: iteration order must be deterministic.</span><span class="add">+      MapVector&lt;const Function *, float&gt; CalleeFreqs;</span><span class="line">       for (Function *F : Component-&gt;Funcs) {</span><span class="line">         LLVM_DEBUG(dbgs() &lt;&lt; &quot;    &quot; &lt;&lt; F-&gt;getName() &lt;&lt; &quot;\n&quot;);</span><span class="line">         MachineFunction *MF = MMI-&gt;getMachineFunction(*F);</span><span class="line">diff --git a/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span><span class="line">new file mode 100644</span><span class="line">index 000000000000..7d049487bc7d</span><span class="del">--- /dev/null</span><span class="add">+++ b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span><span class="line">@@ -0,0 +1,51 @@</span><span class="add">+; RUN: llc -mtriple=mos -zp-avail=4 -verify-machineinstrs &lt; %s | FileCheck %s</span><span class="add">+</span><span class="add">+; Zero page allocation must be deterministic.</span><span class="add">+;</span><span class="add">+; Every one of these globals is stored exactly once from the same basic block,</span><span class="add">+; so MOSZeroPageAlloc computes the identical benefit (2 * 1.0 / 1) for all eight</span><span class="add">+; and only four of them fit in the zero page. The winners are therefore decided</span><span class="add">+; entirely by the order in which candidates were collected, which must be</span><span class="add">+; deterministic.</span><span class="add">+</span><span class="add">+target triple = &quot;mos&quot;</span><span class="add">+</span><span class="add">+@g0 = global i8 undef, align 1</span><span class="add">+@g1 = global i8 undef, align 1</span><span class="add">+@g2 = global i8 undef, align 1</span><span class="add">+@g3 = global i8 undef, align 1</span><span class="add">+@g4 = global i8 undef, align 1</span><span class="add">+@g5 = global i8 undef, align 1</span><span class="add">+@g6 = global i8 undef, align 1</span><span class="add">+@g7 = global i8 undef, align 1</span><span class="add">+</span><span class="add">+; The first four globals collected win the zero page and are addressed with</span><span class="add">+; mos8(); the rest keep absolute addressing.</span><span class="add">+</span><span class="add">+; CHECK-LABEL: main:</span><span class="add">+; CHECK:      stx mos8(g0)</span><span class="add">+; CHECK:      stx mos8(g1)</span><span class="add">+; CHECK:      stx mos8(g2)</span><span class="add">+; CHECK:      stx mos8(g3)</span><span class="add">+; CHECK:      stx g4</span><span class="add">+; CHECK:      stx g5</span><span class="add">+; CHECK:      stx g6</span><span class="add">+; CHECK:      stx g7</span><span class="add">+</span><span class="add">+; CHECK:      .type g0,@object</span><span class="add">+; CHECK-NEXT: .section .zp.noinit</span><span class="add">+; CHECK:      .type g4,@object</span><span class="add">+; CHECK-NEXT: .section .noinit</span><span class="add">+</span><span class="add">+define void @main() {</span><span class="add">+entry:</span><span class="add">+  store volatile i8 1, ptr @g0, align 1</span><span class="add">+  store volatile i8 2, ptr @g1, align 1</span><span class="add">+  store volatile i8 3, ptr @g2, align 1</span><span class="add">+  store volatile i8 4, ptr @g3, align 1</span><span class="add">+  store volatile i8 5, ptr @g4, align 1</span><span class="add">+  store volatile i8 6, ptr @g5, align 1</span><span class="add">+  store volatile i8 7, ptr @g6, align 1</span><span class="add">+  store volatile i8 8, ptr @g7, align 1</span><span class="add">+  ret void</span><span class="add">+}</span></pre></details></article><section id="validation"><h2>Validation record</h2><pre># Validation of the proposed revisions
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Upstream PR revisions — review</title>
+<style>
+body{font:16px/1.6 system-ui,sans-serif;max-width:1120px;margin:40px auto;padding:0 24px;background:#f6f8fa;color:#1f2328}
+h1,h2,h3{line-height:1.3}a{color:#0969da}nav{display:flex;gap:20px;flex-wrap:wrap;margin:24px 0}
+.notice{padding:16px 20px;background:#fff8c5;border:1px solid #d4a72c;border-radius:8px}
+article,section{background:white;padding:24px;margin:24px 0;border:1px solid #d0d7de;border-radius:10px}
+summary{cursor:pointer;font-weight:600;padding:12px 0}
+pre{font:13px/1.6 ui-monospace,monospace;overflow:auto;background:#f6f8fa;padding:16px;border-radius:6px}
+code{font-family:ui-monospace,monospace;overflow-wrap:anywhere}pre.record{white-space:pre-wrap;overflow-wrap:anywhere}
+.add{background:#dafbe1}.del{background:#ffebe9}.diff span{display:inline-block;min-width:100%}
+html{scroll-behavior:smooth}
+</style></head><body><h1>Upstream PR revisions</h1>
+<p>Generated from the current saved bundle. Source files: <a href="heads.json">heads</a>,
+<a href="README.md">README</a>, <a href="review.md">review</a>.</p>
+<div class="notice"><strong>Upstream revisions await approval.</strong>
+No upstream PR branches or descriptions have been updated.</div>
+<nav><a href="#pr578">#578</a><a href="#pr584">#584</a><a href="#pr586">#586</a><a href="#pr588">#588</a><a href="#pr589">#589</a><a href="#pr590">#590</a><a href="#validation">Validation</a></nav>
+<article id="pr578"><h2>#578 — [MOS] Recompute loop liveness after copy forwarding</h2>
+<p><a href="https://github.com/llvm-mos/llvm-mos/pull/578">Existing upstream PR</a></p>
+<p>Proposed head: <code>b4749221bf3735ad1c83d80c103054f745f8c8cd</code><br>
+Submitted head: <code>edc9bbd23b718e03d5901f5c114885cfb1d8b277</code></p>
+<h3>Proposed description</h3>
+<p>MOSCopyOpt can forward a loop-header <code>A = COPY Y</code> through reaching <code>Y = COPY A</code> definitions and remove the restore. This changes the register that must remain live around the back edge from Y to A.</p>
+<p>A single post-order liveness update visits the latch before the header and can leave A absent from the latch&#x27;s live-ins. Later CmpZero lowering then treats A as scratch and overwrites the loop-carried value. In the CRC reproducer this makes the next rotate consume the old accumulator value.</p>
+<p>Propagate live-ins to a fixed point with <code>fullyRecomputeLiveIns</code> before dead-copy cleanup. The per-block live-in recompute inside the cleanup loop stays: it is what lets a copy in a predecessor become dead in the same pass after a successor&#x27;s dead copy is erased. Keep the entry block&#x27;s ABI live-ins intact. Remove the original shouldCoalesce workaround; ordinary rotate coalescing remains enabled.</p>
+<p>The reduced MIR regression checks that A is live through the latch and that the copy-optimization/pseudo-expansion/late-optimization pipeline does not overwrite it. Both checks fail without the fix. A second test pins two- and three-block dead-copy chains so the per-block recompute cannot be dropped by accident. The three-block case also checks final assembly for the absence of leftover register transfers.</p>
+<p>This replaces the original PR&#x27;s diagnosis: register allocation emits the required restore correctly. The failure occurs later when copy forwarding changes the loop&#x27;s liveness and the update does not propagate around the back edge. The defect is confined to the target-specific MOSCopyOpt pass; no generic LLVM change is involved.</p>
+<p>Validation: MOS CodeGen suite at <code>b4749221bf37</code>: 80 pass, 1 unsupported. Both regression assertions fail without the fix. The reconstructed SNES demo changes from host/ROM CRC mismatch (0x7F81 / 0xC57C) to agreement at 0x7F81 in bsnes.</p>
+<p><a href="578-body.md">Description source</a> · <a href="578-commits.patch">Commit patches</a></p>
+<details><summary>Changes since the submitted PR</summary>
+<p><a href="578-review-changes.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span>
+<span class="line">index 533e1017b566..50432465870e 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span>
+<span class="line">@@ -254,6 +254,14 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &amp;MF) {</span>
+<span class="line">     }</span>
+<span class="line">   }</span>
+<span class="line"> </span>
+<span class="add">+  // Copy forwarding can change the register live around a loop. Propagate</span>
+<span class="add">+  // live-ins to a fixed point before using them to erase dead copies.</span>
+<span class="add">+  SmallVector&lt;MachineBasicBlock *&gt; Blocks;</span>
+<span class="add">+  for (MachineBasicBlock *MBB : post_order(&amp;MF))</span>
+<span class="add">+    if (!MBB-&gt;isEntryBlock())</span>
+<span class="add">+      Blocks.push_back(MBB);</span>
+<span class="add">+  fullyRecomputeLiveIns(Blocks);</span>
+<span class="add">+</span>
+<span class="line">   for (MachineBasicBlock *MBB : post_order(&amp;MF)) {</span>
+<span class="line">     LivePhysRegs LPR(TRI);</span>
+<span class="line"> </span>
+<span class="line">diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp</span>
+<span class="line">index 8512e0d28e12..baf6de604cb7 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp</span>
+<span class="line">@@ -647,21 +647,6 @@ bool MOSRegisterInfo::shouldCoalesce(</span>
+<span class="line">     const TargetRegisterClass *NewRC, LiveIntervals &amp;LIS) const {</span>
+<span class="line">   const auto &amp;MRI = MI-&gt;getMF()-&gt;getRegInfo();</span>
+<span class="line"> </span>
+<span class="del">-  // Don&#x27;t coalesce two shift/rotate-referenced values together into the A-only Ac</span>
+<span class="del">-  // class. The accumulator is the only register ASL/LSR/ROL/ROR can operate on, so</span>
+<span class="del">-  // an Ac value is pinned to A for its whole live range. When such a value is also</span>
+<span class="del">-  // loop-carried across an inner conditional whose other arm needs A (e.g. an</span>
+<span class="del">-  // inlined CRC16 bit loop: the bit-test reloads the pre-rotate byte into A, while</span>
+<span class="del">-  // the rotated value must survive to the next iteration), pinning it to A-only</span>
+<span class="del">-  // leaves the allocator no register to evict it to on the skip path — it strands</span>
+<span class="del">-  // the live value in Y while the back-edge rotate reads a stale A, miscompiling</span>
+<span class="del">-  // silently (the machine verifier does not catch it). Keeping the copy live lets</span>
+<span class="del">-  // the value occupy the broader AImag8/AY class and spill/transfer as needed.</span>
+<span class="del">-  if (NewRC == &amp;MOS::AcRegClass &amp;&amp;</span>
+<span class="del">-      referencedByShiftRotate(MI-&gt;getOperand(0).getReg(), MRI) &amp;&amp;</span>
+<span class="del">-      referencedByShiftRotate(MI-&gt;getOperand(1).getReg(), MRI))</span>
+<span class="del">-    return false;</span>
+<span class="del">-</span>
+<span class="line">   // Don&#x27;t coalesce Imag8 and AImag8 registers together when used by shifts or</span>
+<span class="line">   // rotates.  This may cause expensive ASL zp&#x27;s to be used when ASL A would</span>
+<span class="line">   // have sufficed. It&#x27;s better to do arithmetic in A and then copy it out.</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll b/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll</span>
+<span class="line">deleted file mode 100644</span>
+<span class="line">index 6b4f20948380..000000000000</span>
+<span class="del">--- a/llvm/test/CodeGen/MOS/coalesce-rotate-ac-no-pessimize.ll</span>
+<span class="add">+++ /dev/null</span>
+<span class="line">@@ -1,33 +0,0 @@</span>
+<span class="del">-; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs &lt; %s | FileCheck %s</span>
+<span class="del">-;</span>
+<span class="del">-; Cost side of the shouldCoalesce Ac guard (see coalesce-rotate-ac.mir): the</span>
+<span class="del">-; guard refuses to coalesce two shift/rotate-referenced values into the A-only</span>
+<span class="del">-; Ac class even in straight-line code, so pin that the common multi-shift</span>
+<span class="del">-; shapes keep their tight form — the COPY the guard preserves is allocated to</span>
+<span class="del">-; A and folds away, with no transfer or extra zero-page traffic between the</span>
+<span class="del">-; shift ops.</span>
+<span class="del">-</span>
+<span class="del">-target datalayout = &quot;e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8&quot;</span>
+<span class="del">-target triple = &quot;mos&quot;</span>
+<span class="del">-</span>
+<span class="del">-define i8 @shl2_u8(i8 %x) {</span>
+<span class="del">-; CHECK-LABEL: shl2_u8:</span>
+<span class="del">-; CHECK:      asl</span>
+<span class="del">-; CHECK-NEXT: asl</span>
+<span class="del">-; CHECK-NEXT: rts</span>
+<span class="del">-  %r = shl i8 %x, 2</span>
+<span class="del">-  ret i8 %r</span>
+<span class="del">-}</span>
+<span class="del">-</span>
+<span class="del">-define i16 @shl2_u16(i16 %x) {</span>
+<span class="del">-; CHECK-LABEL: shl2_u16:</span>
+<span class="del">-; CHECK:      stx [[HI:.*]]</span>
+<span class="del">-; CHECK-NEXT: asl</span>
+<span class="del">-; CHECK-NEXT: rol [[HI]]</span>
+<span class="del">-; CHECK-NEXT: asl</span>
+<span class="del">-; CHECK-NEXT: rol [[HI]]</span>
+<span class="del">-; CHECK-NEXT: ldx [[HI]]</span>
+<span class="del">-; CHECK-NEXT: rts</span>
+<span class="del">-  %r = shl i16 %x, 2</span>
+<span class="del">-  ret i16 %r</span>
+<span class="del">-}</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir b/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir</span>
+<span class="line">deleted file mode 100644</span>
+<span class="line">index 8cf76e4884a9..000000000000</span>
+<span class="del">--- a/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir</span>
+<span class="add">+++ /dev/null</span>
+<span class="line">@@ -1,25 +0,0 @@</span>
+<span class="del">-# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=register-coalescer %s -o - | FileCheck %s</span>
+<span class="del">-</span>
+<span class="del">-# A value used by a rotate (ROL) is pinned to the accumulator (the Ac class), the</span>
+<span class="del">-# only register the rotate can read/write. Coalescing two such values together</span>
+<span class="del">-# into Ac removes the COPY that lets the live value vacate A when the other arm of</span>
+<span class="del">-# an enclosing conditional needs A (e.g. an inlined CRC16 bit loop). That strands</span>
+<span class="del">-# the value and the back-edge rotate reads a stale A -&gt; a silent miscompile. The</span>
+<span class="del">-# coalescer must keep the COPY (MOSRegisterInfo::shouldCoalesce).</span>
+<span class="del">----</span>
+<span class="del">-name: dont_coalesce_rotate_into_ac</span>
+<span class="del">-tracksRegLiveness: true</span>
+<span class="del">-body: |</span>
+<span class="del">-  bb.0:</span>
+<span class="del">-    liveins: $a, $c</span>
+<span class="del">-    ; CHECK: [[ROL:%[0-9]+]]:ac, {{[^=]*}} = ROL %0</span>
+<span class="del">-    ; CHECK-NEXT: %{{[0-9]+}}:ac = COPY [[ROL]]</span>
+<span class="del">-    ; CHECK-NEXT: {{%[0-9]+}}:ac, {{.*}} = ROL</span>
+<span class="del">-    %0:ac = COPY $a</span>
+<span class="del">-    %1:cc = COPY $c</span>
+<span class="del">-    %2:ac, %3:cc = ROL %0, %1</span>
+<span class="del">-    %4:ac = COPY %2</span>
+<span class="del">-    %5:ac, %6:cc = ROL %4, %3</span>
+<span class="del">-    $a = COPY %5</span>
+<span class="del">-    RTS implicit $a</span>
+<span class="del">-...</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/copy-opt-chain.mir b/llvm/test/CodeGen/MOS/copy-opt-chain.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..e213610cd4ba</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/copy-opt-chain.mir</span>
+<span class="line">@@ -0,0 +1,75 @@</span>
+<span class="add">+# RUN: llc -mtriple=mos -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s</span>
+<span class="add">+# RUN: llc -mtriple=mos -mcpu=mos6502 -start-before=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=ASM</span>
+<span class="add">+</span>
+<span class="add">+# A dead copy in a successor can make a copy in its predecessor dead as well.</span>
+<span class="add">+# Both must go in one run: the successor is cleaned first (post-order) and its</span>
+<span class="add">+# live-ins shrink before the predecessor&#x27;s dead flags are computed. Forwarding</span>
+<span class="add">+# cannot remove the chain on its own because $a is clobbered in between.</span>
+<span class="add">+---</span>
+<span class="add">+name: dead_copy_chain</span>
+<span class="add">+tracksRegLiveness: true</span>
+<span class="add">+body: |</span>
+<span class="add">+  ; CHECK-LABEL: name: dead_copy_chain</span>
+<span class="add">+  ; CHECK: bb.0.entry:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: $a = LDImm 5</span>
+<span class="add">+  ; CHECK: bb.1:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: RTS</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $a</span>
+<span class="add">+    $x = COPY $a</span>
+<span class="add">+    $a = LDImm 5</span>
+<span class="add">+    BRA %bb.1</span>
+<span class="add">+</span>
+<span class="add">+  bb.1:</span>
+<span class="add">+    liveins: $a, $x</span>
+<span class="add">+    $y = COPY $x</span>
+<span class="add">+    RTS implicit $a</span>
+<span class="add">+...</span>
+<span class="add">+</span>
+<span class="add">+# Propagate dead-copy removal through two predecessors. Clobbering each source</span>
+<span class="add">+# prevents forwarding from bypassing the chain. Check the final assembly too:</span>
+<span class="add">+# dead-copy chains must not leave register transfers behind.</span>
+<span class="add">+---</span>
+<span class="add">+name: dead_copy_chain_three_blocks</span>
+<span class="add">+tracksRegLiveness: true</span>
+<span class="add">+body: |</span>
+<span class="add">+  ; CHECK-LABEL: name: dead_copy_chain_three_blocks</span>
+<span class="add">+  ; CHECK: bb.0:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: $a = LDImm 5</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: bb.1:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: $x = LDImm 6</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: bb.2:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: RTS</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; ASM-LABEL: dead_copy_chain_three_blocks:</span>
+<span class="add">+  ; ASM-NOT: {{^[ \t]+[a-z]}}</span>
+<span class="add">+  ; ASM: lda #5</span>
+<span class="add">+  ; ASM-NOT: {{^[ \t]+[a-z]}}</span>
+<span class="add">+  ; ASM: ldx #6</span>
+<span class="add">+  ; ASM-NOT: {{^[ \t]+[a-z]}}</span>
+<span class="add">+  ; ASM: rts</span>
+<span class="add">+  ; ASM-NOT: {{^[ \t]+[a-z]}}</span>
+<span class="add">+  bb.0:</span>
+<span class="add">+    liveins: $a</span>
+<span class="add">+    $x = COPY $a</span>
+<span class="add">+    $a = LDImm 5</span>
+<span class="add">+    BRA %bb.1</span>
+<span class="add">+</span>
+<span class="add">+  bb.1:</span>
+<span class="add">+    liveins: $a, $x</span>
+<span class="add">+    $y = COPY $x</span>
+<span class="add">+    $x = LDImm 6</span>
+<span class="add">+    BRA %bb.2</span>
+<span class="add">+</span>
+<span class="add">+  bb.2:</span>
+<span class="add">+    liveins: $a, $x, $y</span>
+<span class="add">+    $rc3 = COPY $y</span>
+<span class="add">+    RTS implicit $a, implicit $x</span>
+<span class="add">+...</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/copy-opt-loop.mir b/llvm/test/CodeGen/MOS/copy-opt-loop.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..9ea07c90b002</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/copy-opt-loop.mir</span>
+<span class="line">@@ -0,0 +1,52 @@</span>
+<span class="add">+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=COPY</span>
+<span class="add">+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=LOWER</span>
+<span class="add">+</span>
+<span class="add">+# Forwarding the loop header&#x27;s A = COPY Y makes A live across the latch.</span>
+<span class="add">+# The sign test must not clobber A after its new value is copied to Y.</span>
+<span class="add">+---</span>
+<span class="add">+name: copy_forward_loop</span>
+<span class="add">+tracksRegLiveness: true</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $a, $x, $rc28</span>
+<span class="add">+    $y = COPY $a</span>
+<span class="add">+    BRA %bb.1</span>
+<span class="add">+</span>
+<span class="add">+  bb.1:</span>
+<span class="add">+    liveins: $x, $y, $rc28</span>
+<span class="add">+    ; COPY-LABEL: bb.1:</span>
+<span class="add">+    ; COPY: liveins: {{.*}}$a{{.*}}</span>
+<span class="add">+    ; COPY: $rc2 = COPY $a</span>
+<span class="add">+    ; COPY: $a, dead $c = ROL</span>
+<span class="add">+    ; LOWER-LABEL: bb.1:</span>
+<span class="add">+    ; LOWER: $a, dead $c = ROL</span>
+<span class="add">+    ; LOWER-NOT: $a = LDImag8 $rc2</span>
+<span class="add">+    ; LOWER: BR %bb.3</span>
+<span class="add">+    $a = COPY $y</span>
+<span class="add">+    $rc2 = COPY $y</span>
+<span class="add">+    $rc28, $c = ASL $rc28</span>
+<span class="add">+    $a, dead $c = ROL $a, $c</span>
+<span class="add">+    $y = COPY $a</span>
+<span class="add">+    CmpBrZero %bb.3, undef $n, 0, $rc2, implicit-def $c</span>
+<span class="add">+</span>
+<span class="add">+  bb.2:</span>
+<span class="add">+    liveins: $x, $y, $rc28</span>
+<span class="add">+    $a = COPY $rc28</span>
+<span class="add">+    $a = EORImm $a, 33</span>
+<span class="add">+    $rc28 = COPY $a</span>
+<span class="add">+    $a = COPY $y</span>
+<span class="add">+    $a = EORImm $a, 16</span>
+<span class="add">+    $y = COPY $a</span>
+<span class="add">+    BRA %bb.3</span>
+<span class="add">+</span>
+<span class="add">+  bb.3:</span>
+<span class="add">+    liveins: $x, $y, $rc28</span>
+<span class="add">+    ; COPY-LABEL: bb.3:</span>
+<span class="add">+    ; COPY: liveins: {{.*}}$a{{.*}}</span>
+<span class="add">+    $x = DEC $x</span>
+<span class="add">+    CmpBrZero %bb.1, undef $z, 0, $x, implicit-def dead $c</span>
+<span class="add">+</span>
+<span class="add">+  bb.4:</span>
+<span class="add">+    liveins: $y, $rc28</span>
+<span class="add">+    RTS implicit $y, implicit $rc28</span>
+<span class="add">+...</span></pre>
+</details>
+<details><summary>Complete proposed diff</summary>
+<p><a href="578-complete.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span>
+<span class="line">index 533e1017b566..50432465870e 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp</span>
+<span class="line">@@ -254,6 +254,14 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &amp;MF) {</span>
+<span class="line">     }</span>
+<span class="line">   }</span>
+<span class="line"> </span>
+<span class="add">+  // Copy forwarding can change the register live around a loop. Propagate</span>
+<span class="add">+  // live-ins to a fixed point before using them to erase dead copies.</span>
+<span class="add">+  SmallVector&lt;MachineBasicBlock *&gt; Blocks;</span>
+<span class="add">+  for (MachineBasicBlock *MBB : post_order(&amp;MF))</span>
+<span class="add">+    if (!MBB-&gt;isEntryBlock())</span>
+<span class="add">+      Blocks.push_back(MBB);</span>
+<span class="add">+  fullyRecomputeLiveIns(Blocks);</span>
+<span class="add">+</span>
+<span class="line">   for (MachineBasicBlock *MBB : post_order(&amp;MF)) {</span>
+<span class="line">     LivePhysRegs LPR(TRI);</span>
+<span class="line"> </span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/copy-opt-chain.mir b/llvm/test/CodeGen/MOS/copy-opt-chain.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..e213610cd4ba</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/copy-opt-chain.mir</span>
+<span class="line">@@ -0,0 +1,75 @@</span>
+<span class="add">+# RUN: llc -mtriple=mos -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s</span>
+<span class="add">+# RUN: llc -mtriple=mos -mcpu=mos6502 -start-before=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=ASM</span>
+<span class="add">+</span>
+<span class="add">+# A dead copy in a successor can make a copy in its predecessor dead as well.</span>
+<span class="add">+# Both must go in one run: the successor is cleaned first (post-order) and its</span>
+<span class="add">+# live-ins shrink before the predecessor&#x27;s dead flags are computed. Forwarding</span>
+<span class="add">+# cannot remove the chain on its own because $a is clobbered in between.</span>
+<span class="add">+---</span>
+<span class="add">+name: dead_copy_chain</span>
+<span class="add">+tracksRegLiveness: true</span>
+<span class="add">+body: |</span>
+<span class="add">+  ; CHECK-LABEL: name: dead_copy_chain</span>
+<span class="add">+  ; CHECK: bb.0.entry:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: $a = LDImm 5</span>
+<span class="add">+  ; CHECK: bb.1:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: RTS</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $a</span>
+<span class="add">+    $x = COPY $a</span>
+<span class="add">+    $a = LDImm 5</span>
+<span class="add">+    BRA %bb.1</span>
+<span class="add">+</span>
+<span class="add">+  bb.1:</span>
+<span class="add">+    liveins: $a, $x</span>
+<span class="add">+    $y = COPY $x</span>
+<span class="add">+    RTS implicit $a</span>
+<span class="add">+...</span>
+<span class="add">+</span>
+<span class="add">+# Propagate dead-copy removal through two predecessors. Clobbering each source</span>
+<span class="add">+# prevents forwarding from bypassing the chain. Check the final assembly too:</span>
+<span class="add">+# dead-copy chains must not leave register transfers behind.</span>
+<span class="add">+---</span>
+<span class="add">+name: dead_copy_chain_three_blocks</span>
+<span class="add">+tracksRegLiveness: true</span>
+<span class="add">+body: |</span>
+<span class="add">+  ; CHECK-LABEL: name: dead_copy_chain_three_blocks</span>
+<span class="add">+  ; CHECK: bb.0:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: $a = LDImm 5</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: bb.1:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: $x = LDImm 6</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: bb.2:</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; CHECK: RTS</span>
+<span class="add">+  ; CHECK-NOT: COPY</span>
+<span class="add">+  ; ASM-LABEL: dead_copy_chain_three_blocks:</span>
+<span class="add">+  ; ASM-NOT: {{^[ \t]+[a-z]}}</span>
+<span class="add">+  ; ASM: lda #5</span>
+<span class="add">+  ; ASM-NOT: {{^[ \t]+[a-z]}}</span>
+<span class="add">+  ; ASM: ldx #6</span>
+<span class="add">+  ; ASM-NOT: {{^[ \t]+[a-z]}}</span>
+<span class="add">+  ; ASM: rts</span>
+<span class="add">+  ; ASM-NOT: {{^[ \t]+[a-z]}}</span>
+<span class="add">+  bb.0:</span>
+<span class="add">+    liveins: $a</span>
+<span class="add">+    $x = COPY $a</span>
+<span class="add">+    $a = LDImm 5</span>
+<span class="add">+    BRA %bb.1</span>
+<span class="add">+</span>
+<span class="add">+  bb.1:</span>
+<span class="add">+    liveins: $a, $x</span>
+<span class="add">+    $y = COPY $x</span>
+<span class="add">+    $x = LDImm 6</span>
+<span class="add">+    BRA %bb.2</span>
+<span class="add">+</span>
+<span class="add">+  bb.2:</span>
+<span class="add">+    liveins: $a, $x, $y</span>
+<span class="add">+    $rc3 = COPY $y</span>
+<span class="add">+    RTS implicit $a, implicit $x</span>
+<span class="add">+...</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/copy-opt-loop.mir b/llvm/test/CodeGen/MOS/copy-opt-loop.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..9ea07c90b002</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/copy-opt-loop.mir</span>
+<span class="line">@@ -0,0 +1,52 @@</span>
+<span class="add">+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=COPY</span>
+<span class="add">+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=LOWER</span>
+<span class="add">+</span>
+<span class="add">+# Forwarding the loop header&#x27;s A = COPY Y makes A live across the latch.</span>
+<span class="add">+# The sign test must not clobber A after its new value is copied to Y.</span>
+<span class="add">+---</span>
+<span class="add">+name: copy_forward_loop</span>
+<span class="add">+tracksRegLiveness: true</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $a, $x, $rc28</span>
+<span class="add">+    $y = COPY $a</span>
+<span class="add">+    BRA %bb.1</span>
+<span class="add">+</span>
+<span class="add">+  bb.1:</span>
+<span class="add">+    liveins: $x, $y, $rc28</span>
+<span class="add">+    ; COPY-LABEL: bb.1:</span>
+<span class="add">+    ; COPY: liveins: {{.*}}$a{{.*}}</span>
+<span class="add">+    ; COPY: $rc2 = COPY $a</span>
+<span class="add">+    ; COPY: $a, dead $c = ROL</span>
+<span class="add">+    ; LOWER-LABEL: bb.1:</span>
+<span class="add">+    ; LOWER: $a, dead $c = ROL</span>
+<span class="add">+    ; LOWER-NOT: $a = LDImag8 $rc2</span>
+<span class="add">+    ; LOWER: BR %bb.3</span>
+<span class="add">+    $a = COPY $y</span>
+<span class="add">+    $rc2 = COPY $y</span>
+<span class="add">+    $rc28, $c = ASL $rc28</span>
+<span class="add">+    $a, dead $c = ROL $a, $c</span>
+<span class="add">+    $y = COPY $a</span>
+<span class="add">+    CmpBrZero %bb.3, undef $n, 0, $rc2, implicit-def $c</span>
+<span class="add">+</span>
+<span class="add">+  bb.2:</span>
+<span class="add">+    liveins: $x, $y, $rc28</span>
+<span class="add">+    $a = COPY $rc28</span>
+<span class="add">+    $a = EORImm $a, 33</span>
+<span class="add">+    $rc28 = COPY $a</span>
+<span class="add">+    $a = COPY $y</span>
+<span class="add">+    $a = EORImm $a, 16</span>
+<span class="add">+    $y = COPY $a</span>
+<span class="add">+    BRA %bb.3</span>
+<span class="add">+</span>
+<span class="add">+  bb.3:</span>
+<span class="add">+    liveins: $x, $y, $rc28</span>
+<span class="add">+    ; COPY-LABEL: bb.3:</span>
+<span class="add">+    ; COPY: liveins: {{.*}}$a{{.*}}</span>
+<span class="add">+    $x = DEC $x</span>
+<span class="add">+    CmpBrZero %bb.1, undef $z, 0, $x, implicit-def dead $c</span>
+<span class="add">+</span>
+<span class="add">+  bb.4:</span>
+<span class="add">+    liveins: $y, $rc28</span>
+<span class="add">+    RTS implicit $y, implicit $rc28</span>
+<span class="add">+...</span></pre>
+</details>
+</article>
+<article id="pr584"><h2>#584 — [MOS] Fix non-GPR immediate loads in mos-late-opt</h2>
+<p><a href="https://github.com/llvm-mos/llvm-mos/pull/584">Existing upstream PR</a></p>
+<p>Proposed head: <code>7f4c37de62191eb6abdaf60c2bc1ccc079bb485b</code><br>
+Submitted head: <code>3ce98fed82deef4bfb8ac81be8751a340bba59d2</code></p>
+<h3>Proposed description</h3>
+<p>On SPC700, LDImm accepts imaginary-register destinations to represent <code>mov dp, #imm</code>. <code>combineLdImm</code> tracks only A/X/Y; processing an imaginary destination through that path dereferences a null tracking pointer.</p>
+<p>Restrict immediate-load folding to GPR destinations in the existing filtering condition. Other instructions use the existing register-invalidation path. The sibling TA handler keeps its original behavior.</p>
+<p>The SPC700 MIR regression covers an imaginary-register immediate load and confirms that it does not interfere with folding an adjacent GPR load to TAX.</p>
+<p>Validation: MOS CodeGen suite 79 pass, 1 unsupported (Linux, assertions enabled).</p>
+<p><a href="584-body.md">Description source</a> · <a href="584-commits.patch">Commit patches</a></p>
+<details><summary>Changes since the submitted PR</summary>
+<p><a href="584-review-changes.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="line">index ffd9eb497ecd..47a04ffce101 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="line">@@ -279,22 +279,15 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &amp;MBB) const {</span>
+<span class="line">         Load = &amp;LoadY;</span>
+<span class="line">         break;</span>
+<span class="line">       }</span>
+<span class="del">-      // TA&#x27;s destination class is XY-only today, so Load is always set here.</span>
+<span class="del">-      // The guard is defensive: this function is where an &quot;impossible&quot;</span>
+<span class="del">-      // destination already appeared once (LDImm below, widened to Anyi8 on</span>
+<span class="del">-      // SPC700), so don&#x27;t trust the switch to be exhaustive. An unhandled</span>
+<span class="del">-      // destination falls through to the generic invalidation.</span>
+<span class="del">-      if (Load) {</span>
+<span class="del">-        // Copy A value to X or Y.</span>
+<span class="del">-        Load-&gt;MI = &amp;MI;</span>
+<span class="del">-        Load-&gt;Val = LoadA.Val;</span>
+<span class="del">-        continue;</span>
+<span class="del">-      }</span>
+<span class="add">+      // Copy A value to X or Y.</span>
+<span class="add">+      Load-&gt;MI = &amp;MI;</span>
+<span class="add">+      Load-&gt;Val = LoadA.Val;</span>
+<span class="add">+      continue;</span>
+<span class="line">     }</span>
+<span class="line"> </span>
+<span class="del">-    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm()) {</span>
+<span class="del">-      // If a register is overwritten with an instruction other than</span>
+<span class="del">-      // an immediate load, mark register value as unknown.</span>
+<span class="add">+    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm() ||</span>
+<span class="add">+        !MOS::GPRRegClass.contains(MI.getOperand(0).getReg())) {</span>
+<span class="add">+      // Mark overwritten register values as unknown.</span>
+<span class="line">       if (MI.modifiesRegister(MOS::A, TRI))</span>
+<span class="line">         LoadA.MI = nullptr;</span>
+<span class="line">       if (MI.modifiesRegister(MOS::X, TRI))</span>
+<span class="line">@@ -306,25 +299,6 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &amp;MBB) const {</span>
+<span class="line"> </span>
+<span class="line">     // Process LD_ #.</span>
+<span class="line">     Register Dst = MI.getOperand(0).getReg();</span>
+<span class="del">-</span>
+<span class="del">-    // LDImm&#x27;s destination is not always a GPR. MOSInstrInfo::getRegClass</span>
+<span class="del">-    // widens it to Anyi8 on SPC700, where `$rcN = LDImm imm` is how</span>
+<span class="del">-    // `mov dp, #imm` is modelled. Only A, X and Y take part in the rewrites</span>
+<span class="del">-    // below; an imaginary destination writes none of them, so there is</span>
+<span class="del">-    // nothing to rewrite. Invalidate any tracked GPR the instruction does</span>
+<span class="del">-    // modify so a future widening of LDImm&#x27;s destination class cannot turn</span>
+<span class="del">-    // this skip into a stale-value rewrite (no such destination exists</span>
+<span class="del">-    // today; these checks are expected to do nothing).</span>
+<span class="del">-    if (!MOS::GPRRegClass.contains(Dst)) {</span>
+<span class="del">-      if (MI.modifiesRegister(MOS::A, TRI))</span>
+<span class="del">-        LoadA.MI = nullptr;</span>
+<span class="del">-      if (MI.modifiesRegister(MOS::X, TRI))</span>
+<span class="del">-        LoadX.MI = nullptr;</span>
+<span class="del">-      if (MI.modifiesRegister(MOS::Y, TRI))</span>
+<span class="del">-        LoadY.MI = nullptr;</span>
+<span class="del">-      continue;</span>
+<span class="del">-    }</span>
+<span class="del">-</span>
+<span class="line">     int64_t Val = MI.getOperand(1).getImm();</span>
+<span class="line"> </span>
+<span class="line">     // Try to replace with T__.</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-spc700.mir b/llvm/test/CodeGen/MOS/late-opt-spc700.mir</span>
+<span class="line">index 39065bf219a8..fbf44581f299 100644</span>
+<span class="del">--- a/llvm/test/CodeGen/MOS/late-opt-spc700.mir</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/late-opt-spc700.mir</span>
+<span class="line">@@ -1,15 +1,7 @@</span>
+<span class="del">-# NOTE: Assertions have been autogenerated by utils/update_mir_test_checks.py UTC_ARGS: --version 6</span>
+<span class="line"> # RUN: llc -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span>
+<span class="line"> </span>
+<span class="del">-# On SPC700, MOSInstrInfo::getRegClass widens LDImm&#x27;s destination register class</span>
+<span class="del">-# to Anyi8, so `$rcN = LDImm imm` (`mov dp, #imm`) is legal, verifier-clean MIR.</span>
+<span class="del">-# combineLdImm switched the destination over {A, X, Y} only and then</span>
+<span class="del">-# unconditionally stored through the resulting ImmLoad *, which is null for any</span>
+<span class="del">-# other destination -- a null-pointer store, i.e. a hard crash.</span>
+<span class="del">-#</span>
+<span class="del">-# The primary assertion is &quot;no crash + machine verification succeeds&quot;; the CHECK</span>
+<span class="del">-# lines additionally pin that an imaginary destination is transparent to the</span>
+<span class="del">-# A/X/Y value tracking, since it clobbers none of them.</span>
+<span class="add">+# SPC700 widens LDImm&#x27;s destination to Anyi8 (`mov dp, #imm`). combineLdImm must</span>
+<span class="add">+# skip non-GPR destinations without disturbing its A/X/Y value tracking.</span>
+<span class="line"> </span>
+<span class="line"> ---</span>
+<span class="line"> name: ldimm_imag8_only</span></pre>
+</details>
+<details><summary>Complete proposed diff</summary>
+<p><a href="584-complete.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="line">index fbedd8d46b95..47a04ffce101 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="line">@@ -285,9 +285,9 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &amp;MBB) const {</span>
+<span class="line">       continue;</span>
+<span class="line">     }</span>
+<span class="line"> </span>
+<span class="del">-    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm()) {</span>
+<span class="del">-      // If a register is overwritten with an instruction other than</span>
+<span class="del">-      // an immediate load, mark register value as unknown.</span>
+<span class="add">+    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm() ||</span>
+<span class="add">+        !MOS::GPRRegClass.contains(MI.getOperand(0).getReg())) {</span>
+<span class="add">+      // Mark overwritten register values as unknown.</span>
+<span class="line">       if (MI.modifiesRegister(MOS::A, TRI))</span>
+<span class="line">         LoadA.MI = nullptr;</span>
+<span class="line">       if (MI.modifiesRegister(MOS::X, TRI))</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-spc700.mir b/llvm/test/CodeGen/MOS/late-opt-spc700.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..fbf44581f299</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/late-opt-spc700.mir</span>
+<span class="line">@@ -0,0 +1,29 @@</span>
+<span class="add">+# RUN: llc -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span>
+<span class="add">+</span>
+<span class="add">+# SPC700 widens LDImm&#x27;s destination to Anyi8 (`mov dp, #imm`). combineLdImm must</span>
+<span class="add">+# skip non-GPR destinations without disturbing its A/X/Y value tracking.</span>
+<span class="add">+</span>
+<span class="add">+---</span>
+<span class="add">+name: ldimm_imag8_only</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    ; CHECK-LABEL: name: ldimm_imag8_only</span>
+<span class="add">+    ; CHECK: $rc2 = LDImm 42</span>
+<span class="add">+    ; CHECK-NEXT: RTS implicit $rc2</span>
+<span class="add">+    $rc2 = LDImm 42</span>
+<span class="add">+    RTS implicit $rc2</span>
+<span class="add">+...</span>
+<span class="add">+---</span>
+<span class="add">+name: ldimm_imag8_between_gprs</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    ; CHECK-LABEL: name: ldimm_imag8_between_gprs</span>
+<span class="add">+    ; CHECK: $a = LDImm 7</span>
+<span class="add">+    ; CHECK-NEXT: $rc2 = LDImm 7</span>
+<span class="add">+    ; CHECK-NEXT: $x = TA $a</span>
+<span class="add">+    ; CHECK-NEXT: RTS implicit $a, implicit $x, implicit $rc2</span>
+<span class="add">+    $a = LDImm 7</span>
+<span class="add">+    $rc2 = LDImm 7</span>
+<span class="add">+    $x = LDImm 7</span>
+<span class="add">+    RTS implicit $a, implicit $x, implicit $rc2</span>
+<span class="add">+...</span></pre>
+</details>
+</article>
+<article id="pr586"><h2>#586 — [MOS] Accept an optional BRK signature operand</h2>
+<p><a href="https://github.com/llvm-mos/llvm-mos/pull/586">Existing upstream PR</a></p>
+<p>Proposed head: <code>a2f81a87b01c9fb396f52aafdc15c1d6b4a71975</code><br>
+Submitted head: <code>064d33fc43ca992893984978d88d7550a382c0c2</code></p>
+<h3>Proposed description</h3>
+<p>Accept <code>brk #imm</code> as assembler syntax for the BRK opcode followed by a signature byte. Bare <code>brk</code> continues to emit one byte.</p>
+<p>The signature form is assembler-only. Disassembly always decodes BRK as an operandless, one-byte instruction and treats the following byte independently.</p>
+<p>Prior art: ca65 documents an optional BRK signature byte (<code>brk</code>, <code>brk $34</code>, <code>brk #$34</code>) and emits one byte when it is omitted ([ca65 manual, section 4](https://cc65.github.io/doc/ca65.html#ss4.1)). This change accepts only the <code>#imm</code> spelling.</p>
+<p>Tests cover encoding, object disassembly on MOS6502 and W65816, and disassemble/reassemble round trips. The signature byte in the round-trip test is the NOP opcode, so consuming it as part of BRK would fail the test.</p>
+<p>Validation: all 40 MOS MC tests pass (Linux, assertions enabled).</p>
+<p><a href="586-body.md">Description source</a> · <a href="586-commits.patch">Commit patches</a></p>
+<details><summary>Changes since the submitted PR</summary>
+<p><a href="586-review-changes.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/test/MC/MOS/brk-signature.s b/llvm/test/MC/MOS/brk-signature.s</span>
+<span class="line">index 622a26be8a88..ca2df38bd64c 100644</span>
+<span class="del">--- a/llvm/test/MC/MOS/brk-signature.s</span>
+<span class="add">+++ b/llvm/test/MC/MOS/brk-signature.s</span>
+<span class="line">@@ -1,4 +1,22 @@</span>
+<span class="del">-; RUN: llvm-mc -triple mos -show-encoding &lt; %s | FileCheck %s</span>
+<span class="add">+; RUN: llvm-mc -triple mos -show-encoding &lt; %s | FileCheck %s --check-prefix=ENC</span>
+<span class="add">+; RUN: llvm-mc -triple mos -filetype=obj &lt; %s | llvm-objdump -d - | FileCheck %s --check-prefix=DIS</span>
+<span class="add">+; RUN: llvm-mc -triple mos -mcpu=mosw65816 -filetype=obj &lt; %s | llvm-objdump -d --mcpu=mosw65816 - | FileCheck %s --check-prefix=DIS</span>
+<span class="add">+; RUN: echo &quot;0x00 0xea&quot; | llvm-mc -triple mos -disassemble | llvm-mc -triple mos -show-encoding | FileCheck %s --check-prefix=ROUNDTRIP</span>
+<span class="add">+; RUN: echo &quot;0x00 0xea&quot; | llvm-mc -triple mos -mcpu=mosw65816 -disassemble | llvm-mc -triple mos -mcpu=mosw65816 -show-encoding | FileCheck %s --check-prefix=ROUNDTRIP</span>
+<span class="line"> </span>
+<span class="del">-	brk     ; CHECK: encoding: [0x00]</span>
+<span class="del">-	brk #66 ; CHECK: encoding: [0x00,0x42]</span>
+<span class="add">+; The signature is assembler syntax only: disassembly consumes one byte for</span>
+<span class="add">+; BRK and decodes the following byte as a separate instruction.</span>
+<span class="add">+</span>
+<span class="add">+; ENC: encoding: [0x00]</span>
+<span class="add">+; DIS: 00 brk</span>
+<span class="add">+brk</span>
+<span class="add">+; ENC: encoding: [0x00,0xea]</span>
+<span class="add">+; DIS-NEXT: 00 brk</span>
+<span class="add">+; DIS-NEXT: ea nop</span>
+<span class="add">+brk #234</span>
+<span class="add">+; ENC: encoding: [0xea]</span>
+<span class="add">+; DIS-NEXT: ea nop</span>
+<span class="add">+nop</span>
+<span class="add">+</span>
+<span class="add">+; ROUNDTRIP: brk {{.*}}encoding: [0x00]</span>
+<span class="add">+; ROUNDTRIP-NEXT: nop {{.*}}encoding: [0xea]</span></pre>
+</details>
+<details><summary>Complete proposed diff</summary>
+<p><a href="586-complete.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="line">index a71519559a50..b9d37cefc69d 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="line">@@ -192,6 +192,10 @@ def BEQ_Relative : ConditionalBranch&lt;&quot;beq&quot;, 0b11, 0b1&gt;;</span>
+<span class="line"> /// 8A  9A  AA  BA  CA  EA</span>
+<span class="line"> </span>
+<span class="line"> def BRK_Implied: InstLow0&lt;&quot;brk&quot;, 0b0000&gt;, InstUnconditionalBranch;</span>
+<span class="add">+def BRK_Immediate: Inst16&lt;&quot;brk&quot;, Opcode&lt;0x00&gt;, Immediate&gt;,</span>
+<span class="add">+    InstUnconditionalBranch {</span>
+<span class="add">+  let isAsmParserOnly = true;</span>
+<span class="add">+}</span>
+<span class="line"> /// JSR is the only instruction that does not follow the current pattern.</span>
+<span class="line"> def JSR_Absolute: Inst24&lt;&quot;jsr&quot;, Opcode&lt;0x20&gt;, Absolute&gt;, InstCall;</span>
+<span class="line"> def RTI_Implied: InstLow0&lt;&quot;rti&quot;, 0b0100&gt;, InstReturn;</span>
+<span class="line">diff --git a/llvm/test/MC/MOS/brk-signature.s b/llvm/test/MC/MOS/brk-signature.s</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..ca2df38bd64c</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/MC/MOS/brk-signature.s</span>
+<span class="line">@@ -0,0 +1,22 @@</span>
+<span class="add">+; RUN: llvm-mc -triple mos -show-encoding &lt; %s | FileCheck %s --check-prefix=ENC</span>
+<span class="add">+; RUN: llvm-mc -triple mos -filetype=obj &lt; %s | llvm-objdump -d - | FileCheck %s --check-prefix=DIS</span>
+<span class="add">+; RUN: llvm-mc -triple mos -mcpu=mosw65816 -filetype=obj &lt; %s | llvm-objdump -d --mcpu=mosw65816 - | FileCheck %s --check-prefix=DIS</span>
+<span class="add">+; RUN: echo &quot;0x00 0xea&quot; | llvm-mc -triple mos -disassemble | llvm-mc -triple mos -show-encoding | FileCheck %s --check-prefix=ROUNDTRIP</span>
+<span class="add">+; RUN: echo &quot;0x00 0xea&quot; | llvm-mc -triple mos -mcpu=mosw65816 -disassemble | llvm-mc -triple mos -mcpu=mosw65816 -show-encoding | FileCheck %s --check-prefix=ROUNDTRIP</span>
+<span class="add">+</span>
+<span class="add">+; The signature is assembler syntax only: disassembly consumes one byte for</span>
+<span class="add">+; BRK and decodes the following byte as a separate instruction.</span>
+<span class="add">+</span>
+<span class="add">+; ENC: encoding: [0x00]</span>
+<span class="add">+; DIS: 00 brk</span>
+<span class="add">+brk</span>
+<span class="add">+; ENC: encoding: [0x00,0xea]</span>
+<span class="add">+; DIS-NEXT: 00 brk</span>
+<span class="add">+; DIS-NEXT: ea nop</span>
+<span class="add">+brk #234</span>
+<span class="add">+; ENC: encoding: [0xea]</span>
+<span class="add">+; DIS-NEXT: ea nop</span>
+<span class="add">+nop</span>
+<span class="add">+</span>
+<span class="add">+; ROUNDTRIP: brk {{.*}}encoding: [0x00]</span>
+<span class="add">+; ROUNDTRIP-NEXT: nop {{.*}}encoding: [0xea]</span></pre>
+</details>
+</article>
+<article id="pr588"><h2>#588 — [MOS] Add the COP mnemonic with a mandatory signature operand</h2>
+<p><a href="https://github.com/llvm-mos/llvm-mos/pull/588">Existing upstream PR</a></p>
+<p>Proposed head: <code>fb1b4ba325a8536bb51e35758447750f02e5fad1</code><br>
+Submitted head: <code>3ac109760642259e8bf76f0f3a84ef2c15da3406</code></p>
+<h3>Proposed description</h3>
+<p>Add the W65816 COP instruction with a mandatory signature operand, following WDC assembly syntax. COP encodes as opcode $02 followed by the signature byte and disassembles as a two-byte instruction.</p>
+<p>Tests cover expression and literal operands, instruction encoding and disassembly, rejection on an unsupported CPU, and rejection of a missing operand. Comments describe the operand requirement without repeating instruction semantics.</p>
+<p>Validation: all 40 MOS MC tests pass (Linux, assertions enabled).</p>
+<p><a href="588-body.md">Description source</a> · <a href="588-commits.patch">Commit patches</a></p>
+<details><summary>Changes since the submitted PR</summary>
+<p><a href="588-review-changes.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="line">index 86e977f62679..779261d14bb5 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="line">@@ -786,12 +786,8 @@ def TSC_Implied : InstLowB&lt;&quot;tsc&quot;, 0b0011&gt;;</span>
+<span class="line"> </span>
+<span class="line"> def WDM_Immediate : Inst16&lt;&quot;wdm&quot;, Opcode&lt;0x42&gt;, Immediate&gt;;</span>
+<span class="line"> </span>
+<span class="del">-/// COP invokes the co-processor software interrupt. Like BRK, it advances the</span>
+<span class="del">-/// PC by two, so the byte following the opcode is a &quot;signature&quot; the handler</span>
+<span class="del">-/// can read via the pushed return address; the hardware makes no direct use</span>
+<span class="del">-/// of it. Unlike BRK, WDC&#x27;s own assembly syntax requires this operand, so it</span>
+<span class="del">-/// is mandatory here rather than optional. W65816-only: on the 65EL02,</span>
+<span class="del">-/// opcode $02 is NXT (a different instruction), not COP.</span>
+<span class="add">+// Unlike BRK, WDC&#x27;s own assembly syntax requires this operand, so it is</span>
+<span class="add">+// mandatory here rather than optional.</span>
+<span class="line"> def COP_Immediate : Inst16&lt;&quot;cop&quot;, Opcode&lt;0x02&gt;, Immediate&gt;, InstUnconditionalBranch;</span>
+<span class="line"> }</span>
+<span class="line"> </span>
+<span class="line">diff --git a/llvm/test/MC/MOS/asm-errors.s b/llvm/test/MC/MOS/asm-errors.s</span>
+<span class="line">index 6723fc00cc11..e8769c6c48f3 100644</span>
+<span class="del">--- a/llvm/test/MC/MOS/asm-errors.s</span>
+<span class="add">+++ b/llvm/test/MC/MOS/asm-errors.s</span>
+<span class="line">@@ -28,7 +28,6 @@ sep #$30</span>
+<span class="line"> ; CHECK: [[#@LINE+1]]:1: error: instruction requires: FeatureW65816</span>
+<span class="line"> cop #90</span>
+<span class="line"> </span>
+<span class="del">-; cop has no zero-operand form at all outside FeatureW65816, so a bare</span>
+<span class="del">-; mnemonic with no matching variant is simply unrecognized here.</span>
+<span class="add">+; COP requires a signature operand.</span>
+<span class="line"> ; CHECK: [[#@LINE+1]]:1: error: invalid instruction</span>
+<span class="line"> cop</span>
+<span class="line">diff --git a/llvm/test/MC/MOS/cop-signature.s b/llvm/test/MC/MOS/cop-signature.s</span>
+<span class="line">index c29eee66a53d..a9b0d5146aee 100644</span>
+<span class="del">--- a/llvm/test/MC/MOS/cop-signature.s</span>
+<span class="add">+++ b/llvm/test/MC/MOS/cop-signature.s</span>
+<span class="line">@@ -1,22 +1,11 @@</span>
+<span class="line"> ; RUN: llvm-mc -triple mos -mcpu=mosw65816 -motorola-integers --filetype=obj -o=%t.obj %s</span>
+<span class="line"> ; RUN: llvm-objdump -d --mcpu=mosw65816 %t.obj | FileCheck %s</span>
+<span class="line"> </span>
+<span class="del">-; RUN: not llvm-mc -triple mos -mcpu=mos65el02 -motorola-integers %s 2&gt;&amp;1 | FileCheck --check-prefix=EL02 %s</span>
+<span class="del">-</span>
+<span class="del">-; COP is W65816-only: opcode $02 is NXT on the 65EL02 (a different</span>
+<span class="del">-; instruction that happens to share the encoding), so every `cop` below must</span>
+<span class="del">-; be rejected there even though it assembles cleanly under mosw65816. No</span>
+<span class="del">-; existing test pinned this -- asm-errors.s only runs at -mcpu=mos6502, so a</span>
+<span class="del">-; refactor onto the shared FeatureW65816Or65EL02 predicate used by COP&#x27;s</span>
+<span class="del">-; neighbours would otherwise pass the whole suite.</span>
+<span class="del">-</span>
+<span class="line"> ; cop&#x27;s signature operand accepts arbitrary expressions, not just literal</span>
+<span class="line"> ; immediates.</span>
+<span class="line"> sig = $5a</span>
+<span class="del">-; EL02: [[#@LINE+1]]:2: error: instruction requires: FeatureW65816</span>
+<span class="line"> 	cop #sig                        ; CHECK: 02 5a cop #$5a</span>
+<span class="line"> </span>
+<span class="line"> ; WDC reserves $80-$ff for internal use and recommends confining user</span>
+<span class="line"> ; signature bytes to $00-$7f; $7f is the top of that range.</span>
+<span class="del">-; EL02: [[#@LINE+1]]:2: error: instruction requires: FeatureW65816</span>
+<span class="line"> 	cop #$7f                        ; CHECK: 02 7f cop #$7f</span></pre>
+</details>
+<details><summary>Complete proposed diff</summary>
+<p><a href="588-complete.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="line">index a71519559a50..779261d14bb5 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrInfo.td</span>
+<span class="line">@@ -785,6 +785,10 @@ def TDC_Implied : InstLowB&lt;&quot;tdc&quot;, 0b0111&gt;;</span>
+<span class="line"> def TSC_Implied : InstLowB&lt;&quot;tsc&quot;, 0b0011&gt;;</span>
+<span class="line"> </span>
+<span class="line"> def WDM_Immediate : Inst16&lt;&quot;wdm&quot;, Opcode&lt;0x42&gt;, Immediate&gt;;</span>
+<span class="add">+</span>
+<span class="add">+// Unlike BRK, WDC&#x27;s own assembly syntax requires this operand, so it is</span>
+<span class="add">+// mandatory here rather than optional.</span>
+<span class="add">+def COP_Immediate : Inst16&lt;&quot;cop&quot;, Opcode&lt;0x02&gt;, Immediate&gt;, InstUnconditionalBranch;</span>
+<span class="line"> }</span>
+<span class="line"> </span>
+<span class="line"> } // Predicates = [HasW65816]</span>
+<span class="line">diff --git a/llvm/test/MC/MOS/all-65816-opcodes.s b/llvm/test/MC/MOS/all-65816-opcodes.s</span>
+<span class="line">index cc766817ec26..5d1e64b1037d 100644</span>
+<span class="del">--- a/llvm/test/MC/MOS/all-65816-opcodes.s</span>
+<span class="add">+++ b/llvm/test/MC/MOS/all-65816-opcodes.s</span>
+<span class="line">@@ -105,3 +105,5 @@</span>
+<span class="line"> 	xce                             ; CHECK: encoding: [0xfb]</span>
+<span class="line"> </span>
+<span class="line"> 	wdm #$ea                        ; CHECK: encoding: [0x42,0xea]</span>
+<span class="add">+</span>
+<span class="add">+	cop #$ea                        ; CHECK: encoding: [0x02,0xea]</span>
+<span class="line">diff --git a/llvm/test/MC/MOS/asm-errors.s b/llvm/test/MC/MOS/asm-errors.s</span>
+<span class="line">index 123290f3b8cc..e8769c6c48f3 100644</span>
+<span class="del">--- a/llvm/test/MC/MOS/asm-errors.s</span>
+<span class="add">+++ b/llvm/test/MC/MOS/asm-errors.s</span>
+<span class="line">@@ -24,3 +24,10 @@ rep #$30</span>
+<span class="line"> </span>
+<span class="line"> ; CHECK: [[#@LINE+1]]:1: error: instruction requires: FeatureW65816Or65EL02</span>
+<span class="line"> sep #$30</span>
+<span class="add">+</span>
+<span class="add">+; CHECK: [[#@LINE+1]]:1: error: instruction requires: FeatureW65816</span>
+<span class="add">+cop #90</span>
+<span class="add">+</span>
+<span class="add">+; COP requires a signature operand.</span>
+<span class="add">+; CHECK: [[#@LINE+1]]:1: error: invalid instruction</span>
+<span class="add">+cop</span>
+<span class="line">diff --git a/llvm/test/MC/MOS/cop-signature.s b/llvm/test/MC/MOS/cop-signature.s</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..a9b0d5146aee</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/MC/MOS/cop-signature.s</span>
+<span class="line">@@ -0,0 +1,11 @@</span>
+<span class="add">+; RUN: llvm-mc -triple mos -mcpu=mosw65816 -motorola-integers --filetype=obj -o=%t.obj %s</span>
+<span class="add">+; RUN: llvm-objdump -d --mcpu=mosw65816 %t.obj | FileCheck %s</span>
+<span class="add">+</span>
+<span class="add">+; cop&#x27;s signature operand accepts arbitrary expressions, not just literal</span>
+<span class="add">+; immediates.</span>
+<span class="add">+sig = $5a</span>
+<span class="add">+	cop #sig                        ; CHECK: 02 5a cop #$5a</span>
+<span class="add">+</span>
+<span class="add">+; WDC reserves $80-$ff for internal use and recommends confining user</span>
+<span class="add">+; signature bytes to $00-$7f; $7f is the top of that range.</span>
+<span class="add">+	cop #$7f                        ; CHECK: 02 7f cop #$7f</span></pre>
+</details>
+</article>
+<article id="pr589"><h2>#589 — [MOS] Mark CmpZero as a terminator</h2>
+<p><a href="https://github.com/llvm-mos/llvm-mos/pull/589">Existing upstream PR</a></p>
+<p>Proposed head: <code>9aead7afaa4a13f4e7151e2b62adbc0b6937a018</code><br>
+Submitted head: <code>8c8d28b0c35a79142e456f75dc821b17a76c4cf1</code></p>
+<h3>Proposed description</h3>
+<p>Mark CmpZero as a terminator so the machine verifier rejects ordinary instructions placed after it. Restrict <code>lowerCmpZeros</code> to the block&#x27;s terminator range.</p>
+<p>Keep each pseudo&#x27;s fold decision separate from the pass&#x27;s change accumulator, and report a change when deleting a dead comparison. Tests cover the rejected non-terminator placement, adjacent comparisons that require independent folding/lowering, and removal of a dead comparison. Existing late-optimization tests cover the ordinary single-comparison paths.</p>
+<p>The original PR&#x27;s reproducer placed a normal instruction after CmpZero. That placement violates the intended invariant; this revision encodes and tests the invariant explicitly.</p>
+<p>Validation: MOS CodeGen suite 80 pass, 1 unsupported (Linux, assertions enabled).</p>
+<p><a href="589-body.md">Description source</a> · <a href="589-commits.patch">Commit patches</a></p>
+<details><summary>Changes since the submitted PR</summary>
+<p><a href="589-review-changes.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td</span>
+<span class="line">index 21910cfeab37..8519606edde4 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSInstrPseudos.td</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td</span>
+<span class="line">@@ -123,6 +123,7 @@ def LDZ : MOSPseudo {</span>
+<span class="line"> }</span>
+<span class="line"> </span>
+<span class="line"> def CmpZero : MOSPseudo {</span>
+<span class="add">+  let isTerminator = true;</span>
+<span class="line">   dag InOperandList = (ins Anyi8:$val);</span>
+<span class="line">   let Defs = [C];</span>
+<span class="line">   let isCompare = true;</span>
+<span class="line">diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="line">index ac180f0542f9..aaac642c76f5 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="line">@@ -88,7 +88,7 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &amp;MBB) const {</span>
+<span class="line">   const auto &amp;STI = MBB.getParent()-&gt;getSubtarget&lt;MOSSubtarget&gt;();</span>
+<span class="line">   const auto *TRI = MRI.getTargetRegisterInfo();</span>
+<span class="line">   bool Changed = false;</span>
+<span class="del">-  for (MachineInstr &amp;MI : make_early_inc_range(mbb_reverse(MBB))) {</span>
+<span class="add">+  for (MachineInstr &amp;MI : make_early_inc_range(mbb_reverse(MBB.terminators()))) {</span>
+<span class="line">     if (MI.getOpcode() != MOS::CmpZero)</span>
+<span class="line">       continue;</span>
+<span class="line"> </span>
+<span class="line">@@ -100,11 +100,6 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &amp;MBB) const {</span>
+<span class="line"> </span>
+<span class="line">     Register Val = MI.getOperand(0).getReg();</span>
+<span class="line"> </span>
+<span class="del">-    // Per-CmpZero, NOT loop-carried: whether THIS pseudo was folded into an</span>
+<span class="del">-    // earlier NZ producer. Sharing `Changed` here made every CmpZero after the</span>
+<span class="del">-    // block&#x27;s first fold skip its lowering too, and nothing downstream lowers</span>
+<span class="del">-    // the pseudo -- it reached the asm printer and was emitted as nothing,</span>
+<span class="del">-    // silently dropping the flag test.</span>
+<span class="line">     bool Folded = false;</span>
+<span class="line">     for (auto &amp;J : mbb_reverse(MBB.begin(), MI)) {</span>
+<span class="line">       if (J.isDebugInstr())</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..0f0b5bab40e4</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir</span>
+<span class="line">@@ -0,0 +1,16 @@</span>
+<span class="add">+# RUN: not --crash llc -mtriple=mos -run-pass=machineverifier -o /dev/null %s 2&gt;&amp;1 | FileCheck %s</span>
+<span class="add">+</span>
+<span class="add">+# CmpZero must stay with the terminators that consume its flags.</span>
+<span class="add">+# CHECK: Bad machine code: Non-terminator instruction after the first terminator</span>
+<span class="add">+# CHECK: $a = T_A $x</span>
+<span class="add">+# CHECK: First terminator was: CmpZero</span>
+<span class="add">+</span>
+<span class="add">+---</span>
+<span class="add">+name: cmpzero_before_nonterminator</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $x</span>
+<span class="add">+    CmpZero $x, implicit-def $n, implicit-def $c</span>
+<span class="add">+    $a = T_A $x</span>
+<span class="add">+    RTS implicit $n</span>
+<span class="add">+...</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir</span>
+<span class="line">deleted file mode 100644</span>
+<span class="line">index 351e6c041821..000000000000</span>
+<span class="del">--- a/llvm/test/CodeGen/MOS/late-opt-cmpzero-after-fold.mir</span>
+<span class="add">+++ /dev/null</span>
+<span class="line">@@ -1,31 +0,0 @@</span>
+<span class="del">-# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span>
+<span class="del">-</span>
+<span class="del">-# lowerCmpZeros walks the block in reverse and either folds each CmpZero into an</span>
+<span class="del">-# earlier NZ producer or lowers it to a real flag-setting instruction. The</span>
+<span class="del">-# fold-success flag used to be the function&#x27;s loop-carried `Changed`</span>
+<span class="del">-# accumulator, so once any CmpZero in the block folded, every CmpZero processed</span>
+<span class="del">-# afterwards took the &quot;already changed&quot; early-continue and was never lowered.</span>
+<span class="del">-# Nothing downstream lowers the pseudo: it reached the asm printer, which emits</span>
+<span class="del">-# nothing for it, silently dropping the flag test. -verify-machineinstrs does</span>
+<span class="del">-# not catch it, because a surviving CmpZero is legal MIR.</span>
+<span class="del">-#</span>
+<span class="del">-# Reverse iteration processes the second CmpZero first (it folds into the T_A);</span>
+<span class="del">-# the first one cannot fold -- nothing precedes it -- so it must be lowered.</span>
+<span class="del">-</span>
+<span class="del">----</span>
+<span class="del">-name: cmpzero_after_fold</span>
+<span class="del">-body: |</span>
+<span class="del">-  bb.0.entry:</span>
+<span class="del">-    liveins: $a, $x</span>
+<span class="del">-    ; CHECK-LABEL: name: cmpzero_after_fold</span>
+<span class="del">-    ; CHECK: liveins: $a, $x</span>
+<span class="del">-    ; CHECK-NEXT: {{  $}}</span>
+<span class="del">-    ; CHECK-NEXT: dead $a = T_A $x, implicit-def $nz</span>
+<span class="del">-    ; CHECK-NEXT: $a = T_A $x, implicit-def $nz</span>
+<span class="del">-    ; CHECK-NEXT: RTS implicit $n</span>
+<span class="del">-    ; CHECK-NOT: CmpZero</span>
+<span class="del">-    CmpZero $x, implicit-def $n, implicit-def $c</span>
+<span class="del">-    $a = T_A $x</span>
+<span class="del">-    CmpZero $a, implicit-def $n, implicit-def $c</span>
+<span class="del">-    RTS implicit $n</span>
+<span class="del">-...</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..8d1cc608741a</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir</span>
+<span class="line">@@ -0,0 +1,29 @@</span>
+<span class="add">+# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span>
+<span class="add">+</span>
+<span class="add">+# Adjacent CmpZero terminators can be folded and lowered independently.</span>
+<span class="add">+---</span>
+<span class="add">+name: cmpzero_after_fold</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $a, $x</span>
+<span class="add">+    ; CHECK-LABEL: name: cmpzero_after_fold</span>
+<span class="add">+    ; CHECK: $a = T_A $x, implicit-def $nz</span>
+<span class="add">+    ; CHECK-NEXT: dead $x = TA $a, implicit-def $nz</span>
+<span class="add">+    ; CHECK-NEXT: RTS implicit $n</span>
+<span class="add">+    $a = T_A $x</span>
+<span class="add">+    CmpZero $x, implicit-def $n, implicit-def $c</span>
+<span class="add">+    CmpZero $a, implicit-def $n, implicit-def $c</span>
+<span class="add">+    RTS implicit $n</span>
+<span class="add">+...</span>
+<span class="add">+---</span>
+<span class="add">+name: cmpzero_dead</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $x</span>
+<span class="add">+    ; CHECK-LABEL: name: cmpzero_dead</span>
+<span class="add">+    ; CHECK: liveins: $x</span>
+<span class="add">+    ; CHECK-NEXT: {{  $}}</span>
+<span class="add">+    ; CHECK-NEXT: RTS</span>
+<span class="add">+    CmpZero $x, implicit-def dead $n, implicit-def dead $c</span>
+<span class="add">+    RTS</span>
+<span class="add">+...</span></pre>
+</details>
+<details><summary>Complete proposed diff</summary>
+<p><a href="589-complete.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td</span>
+<span class="line">index 21910cfeab37..8519606edde4 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSInstrPseudos.td</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td</span>
+<span class="line">@@ -123,6 +123,7 @@ def LDZ : MOSPseudo {</span>
+<span class="line"> }</span>
+<span class="line"> </span>
+<span class="line"> def CmpZero : MOSPseudo {</span>
+<span class="add">+  let isTerminator = true;</span>
+<span class="line">   dag InOperandList = (ins Anyi8:$val);</span>
+<span class="line">   let Defs = [C];</span>
+<span class="line">   let isCompare = true;</span>
+<span class="line">diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="line">index fbedd8d46b95..aaac642c76f5 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp</span>
+<span class="line">@@ -88,24 +88,26 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &amp;MBB) const {</span>
+<span class="line">   const auto &amp;STI = MBB.getParent()-&gt;getSubtarget&lt;MOSSubtarget&gt;();</span>
+<span class="line">   const auto *TRI = MRI.getTargetRegisterInfo();</span>
+<span class="line">   bool Changed = false;</span>
+<span class="del">-  for (MachineInstr &amp;MI : make_early_inc_range(mbb_reverse(MBB))) {</span>
+<span class="add">+  for (MachineInstr &amp;MI : make_early_inc_range(mbb_reverse(MBB.terminators()))) {</span>
+<span class="line">     if (MI.getOpcode() != MOS::CmpZero)</span>
+<span class="line">       continue;</span>
+<span class="line"> </span>
+<span class="line">     if (MI.allDefsAreDead()) {</span>
+<span class="line">       MI.eraseFromParent();</span>
+<span class="add">+      Changed = true;</span>
+<span class="line">       continue;</span>
+<span class="line">     }</span>
+<span class="line"> </span>
+<span class="line">     Register Val = MI.getOperand(0).getReg();</span>
+<span class="line"> </span>
+<span class="add">+    bool Folded = false;</span>
+<span class="line">     for (auto &amp;J : mbb_reverse(MBB.begin(), MI)) {</span>
+<span class="line">       if (J.isDebugInstr())</span>
+<span class="line">         continue;</span>
+<span class="line">       if (J.isCall() || J.isInlineAsm())</span>
+<span class="line">         break;</span>
+<span class="line">       if (definesNZ(J, Val, STI)) {</span>
+<span class="del">-        Changed = true;</span>
+<span class="add">+        Folded = true;</span>
+<span class="line">         J.addOperand(MachineOperand::CreateReg(MOS::NZ, /*isDef=*/true,</span>
+<span class="line">                                                /*isImp=*/true));</span>
+<span class="line">         MI.eraseFromParent();</span>
+<span class="line">@@ -135,8 +137,10 @@ bool MOSLateOptimization::lowerCmpZeros(MachineBasicBlock &amp;MBB) const {</span>
+<span class="line">       if (ClobbersNZ)</span>
+<span class="line">         break;</span>
+<span class="line">     }</span>
+<span class="del">-    if (Changed)</span>
+<span class="add">+    if (Folded) {</span>
+<span class="add">+      Changed = true;</span>
+<span class="line">       continue;</span>
+<span class="add">+    }</span>
+<span class="line"> </span>
+<span class="line">     Changed = true;</span>
+<span class="line">     lowerCmpZero(MI);</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..0f0b5bab40e4</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir</span>
+<span class="line">@@ -0,0 +1,16 @@</span>
+<span class="add">+# RUN: not --crash llc -mtriple=mos -run-pass=machineverifier -o /dev/null %s 2&gt;&amp;1 | FileCheck %s</span>
+<span class="add">+</span>
+<span class="add">+# CmpZero must stay with the terminators that consume its flags.</span>
+<span class="add">+# CHECK: Bad machine code: Non-terminator instruction after the first terminator</span>
+<span class="add">+# CHECK: $a = T_A $x</span>
+<span class="add">+# CHECK: First terminator was: CmpZero</span>
+<span class="add">+</span>
+<span class="add">+---</span>
+<span class="add">+name: cmpzero_before_nonterminator</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $x</span>
+<span class="add">+    CmpZero $x, implicit-def $n, implicit-def $c</span>
+<span class="add">+    $a = T_A $x</span>
+<span class="add">+    RTS implicit $n</span>
+<span class="add">+...</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..8d1cc608741a</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/late-opt-cmpzero.mir</span>
+<span class="line">@@ -0,0 +1,29 @@</span>
+<span class="add">+# RUN: llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s</span>
+<span class="add">+</span>
+<span class="add">+# Adjacent CmpZero terminators can be folded and lowered independently.</span>
+<span class="add">+---</span>
+<span class="add">+name: cmpzero_after_fold</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $a, $x</span>
+<span class="add">+    ; CHECK-LABEL: name: cmpzero_after_fold</span>
+<span class="add">+    ; CHECK: $a = T_A $x, implicit-def $nz</span>
+<span class="add">+    ; CHECK-NEXT: dead $x = TA $a, implicit-def $nz</span>
+<span class="add">+    ; CHECK-NEXT: RTS implicit $n</span>
+<span class="add">+    $a = T_A $x</span>
+<span class="add">+    CmpZero $x, implicit-def $n, implicit-def $c</span>
+<span class="add">+    CmpZero $a, implicit-def $n, implicit-def $c</span>
+<span class="add">+    RTS implicit $n</span>
+<span class="add">+...</span>
+<span class="add">+---</span>
+<span class="add">+name: cmpzero_dead</span>
+<span class="add">+body: |</span>
+<span class="add">+  bb.0.entry:</span>
+<span class="add">+    liveins: $x</span>
+<span class="add">+    ; CHECK-LABEL: name: cmpzero_dead</span>
+<span class="add">+    ; CHECK: liveins: $x</span>
+<span class="add">+    ; CHECK-NEXT: {{  $}}</span>
+<span class="add">+    ; CHECK-NEXT: RTS</span>
+<span class="add">+    CmpZero $x, implicit-def dead $n, implicit-def dead $c</span>
+<span class="add">+    RTS</span>
+<span class="add">+...</span></pre>
+</details>
+</article>
+<article id="pr590"><h2>#590 — [MOS] Make zero page allocation deterministic</h2>
+<p><a href="https://github.com/llvm-mos/llvm-mos/pull/590">Existing upstream PR</a></p>
+<p>Proposed head: <code>5e83a0784918f977beb3300337b6703ea497895f</code><br>
+Submitted head: <code>cc9f0d027813c94398d5aff0c5a718cb2fa64e95</code></p>
+<h3>Proposed description</h3>
+<p>Zero-page allocation can choose different globals for identical inputs when candidate scores tie. Pointer-ordered iteration also affects entry-point ordering and floating-point accumulation of candidate benefits.</p>
+<p>Use insertion-ordered containers at the three relevant iteration sites. Document the determinism requirement without promising a particular iteration order.</p>
+<p>The regression gives eight equally beneficial globals four bytes of zero page and checks a consistent allocation. Independent downstream testing in this thread also confirms reproducible full-LTO binaries with the change.</p>
+<p>Validation: MOS CodeGen suite 79 pass, 1 unsupported; 20 separate llc runs produce byte-identical assembly.</p>
+<p><a href="590-body.md">Description source</a> · <a href="590-commits.patch">Commit patches</a></p>
+<details><summary>Changes since the submitted PR</summary>
+<p><a href="590-review-changes.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
+<span class="line">index dbbdc95d921b..8675ea1f6a3c 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
+<span class="line">@@ -416,10 +416,7 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &amp;M) {</span>
+<span class="line">   LLVM_DEBUG(CG.dump());</span>
+<span class="line"> </span>
+<span class="line">   std::vector&lt;SCC&gt; SCCs;</span>
+<span class="del">-  // SmallSetVector, not SmallSet: past its inline capacity SmallSet degrades to</span>
+<span class="del">-  // std::set, which orders const CallGraphNode * by pointer VALUE. SCC::Callees</span>
+<span class="del">-  // seeds the EntryGraph list, and entry graphs are served ZP round-robin, so an</span>
+<span class="del">-  // address-ordered callee list makes the assignment differ between runs.</span>
+<span class="add">+  // Note: iteration order must be deterministic.</span>
+<span class="line">   std::vector&lt;SmallSetVector&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span>
+<span class="line">   DenseMap&lt;const CallGraphNode *, size_t&gt; SCCIdx;</span>
+<span class="line">   std::vector&lt;std::unique_ptr&lt;Candidate&gt;&gt; Candidates;</span>
+<span class="line">@@ -488,13 +485,7 @@ void MOSZeroPageAlloc::collectCandidates(</span>
+<span class="line">   auto &amp;BFI =</span>
+<span class="line">       getAnalysis&lt;BlockFrequencyInfoWrapperPass&gt;(MF.getFunction()).getBFI();</span>
+<span class="line"> </span>
+<span class="del">-  // MapVector, not DenseMap: the iteration below turns this into the candidate</span>
+<span class="del">-  // list, and the only ordering applied later is a stable_sort on benefit -- so</span>
+<span class="del">-  // equal-benefit candidates keep this order. A DenseMap keyed by</span>
+<span class="del">-  // GlobalVariable * iterates in pointer-hash order, i.e. by heap address, so</span>
+<span class="del">-  // ties were broken differently on every process execution and the zero page&#x27;s</span>
+<span class="del">-  // last free byte went to a different global each build. MapVector keeps the</span>
+<span class="del">-  // deterministic MachineInstr walk order below.</span>
+<span class="add">+  // Note: iteration order must be deterministic.</span>
+<span class="line">   MapVector&lt;GlobalVariable *, float&gt; GlobalBenefit;</span>
+<span class="line">   for (MachineBasicBlock &amp;MBB : MF) {</span>
+<span class="line">     for (MachineInstr &amp;MI : MBB) {</span>
+<span class="line">@@ -714,10 +705,7 @@ std::vector&lt;EntryGraph&gt; MOSZeroPageAlloc::buildEntryGraphs(Module &amp;M,</span>
+<span class="line"> </span>
+<span class="line">       // Find all calls within the SCC and propagate entry frequencies across</span>
+<span class="line">       // the edges.</span>
+<span class="del">-      // MapVector, not DenseMap: the iteration below accumulates these into</span>
+<span class="del">-      // EntryFreqs with float +=, which is not associative, so a pointer-hash</span>
+<span class="del">-      // iteration order perturbed every derived benefit in its last ULP and</span>
+<span class="del">-      // broke near-ties as well as exact ones.</span>
+<span class="add">+      // Note: iteration order must be deterministic.</span>
+<span class="line">       MapVector&lt;const Function *, float&gt; CalleeFreqs;</span>
+<span class="line">       for (Function *F : Component-&gt;Funcs) {</span>
+<span class="line">         LLVM_DEBUG(dbgs() &lt;&lt; &quot;    &quot; &lt;&lt; F-&gt;getName() &lt;&lt; &quot;\n&quot;);</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span>
+<span class="line">index b9459424912b..7d049487bc7d 100644</span>
+<span class="del">--- a/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span>
+<span class="line">@@ -5,16 +5,8 @@</span>
+<span class="line"> ; Every one of these globals is stored exactly once from the same basic block,</span>
+<span class="line"> ; so MOSZeroPageAlloc computes the identical benefit (2 * 1.0 / 1) for all eight</span>
+<span class="line"> ; and only four of them fit in the zero page. The winners are therefore decided</span>
+<span class="del">-; entirely by the order in which candidates were collected, which must be the</span>
+<span class="del">-; MachineInstr walk order -- i.e. module order, g0 through g3.</span>
+<span class="del">-;</span>
+<span class="del">-; Before the fix, collectCandidates() accumulated benefits in a</span>
+<span class="del">-; DenseMap&lt;GlobalVariable *, float&gt; and iterated it to build the candidate list;</span>
+<span class="del">-; that iterates in pointer-hash order, i.e. by heap address, and the subsequent</span>
+<span class="del">-; stable_sort on benefit leaves ties in exactly that order. The winning set then</span>
+<span class="del">-; differed on every process execution: twenty runs of this file produced six</span>
+<span class="del">-; distinct winning sets, none of them the module-order set below (this test&#x27;s</span>
+<span class="del">-; expectations failed all twenty pre-fix runs).</span>
+<span class="add">+; entirely by the order in which candidates were collected, which must be</span>
+<span class="add">+; deterministic.</span>
+<span class="line"> </span>
+<span class="line"> target triple = &quot;mos&quot;</span>
+<span class="line"> </span></pre>
+</details>
+<details><summary>Complete proposed diff</summary>
+<p><a href="590-complete.patch">Download diff</a></p>
+<pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
+<span class="line">index 2fb9967160e5..8675ea1f6a3c 100644</span>
+<span class="del">--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
+<span class="add">+++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
+<span class="line">@@ -20,8 +20,10 @@</span>
+<span class="line"> #include &quot;MOSMachineFunctionInfo.h&quot;</span>
+<span class="line"> #include &quot;MOSRegisterInfo.h&quot;</span>
+<span class="line"> #include &quot;MOSSubtarget.h&quot;</span>
+<span class="add">+#include &quot;llvm/ADT/MapVector.h&quot;</span>
+<span class="line"> #include &quot;llvm/ADT/PostOrderIterator.h&quot;</span>
+<span class="line"> #include &quot;llvm/ADT/SCCIterator.h&quot;</span>
+<span class="add">+#include &quot;llvm/ADT/SetVector.h&quot;</span>
+<span class="line"> #include &quot;llvm/Analysis/BasicAliasAnalysis.h&quot;</span>
+<span class="line"> #include &quot;llvm/Analysis/BlockFrequencyInfo.h&quot;</span>
+<span class="line"> #include &quot;llvm/Analysis/CallGraph.h&quot;</span>
+<span class="line">@@ -414,7 +416,8 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &amp;M) {</span>
+<span class="line">   LLVM_DEBUG(CG.dump());</span>
+<span class="line"> </span>
+<span class="line">   std::vector&lt;SCC&gt; SCCs;</span>
+<span class="del">-  std::vector&lt;SmallSet&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span>
+<span class="add">+  // Note: iteration order must be deterministic.</span>
+<span class="add">+  std::vector&lt;SmallSetVector&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span>
+<span class="line">   DenseMap&lt;const CallGraphNode *, size_t&gt; SCCIdx;</span>
+<span class="line">   std::vector&lt;std::unique_ptr&lt;Candidate&gt;&gt; Candidates;</span>
+<span class="line">   DenseMap&lt;GlobalVariable *, Candidate *&gt; GVCandidates;</span>
+<span class="line">@@ -482,7 +485,8 @@ void MOSZeroPageAlloc::collectCandidates(</span>
+<span class="line">   auto &amp;BFI =</span>
+<span class="line">       getAnalysis&lt;BlockFrequencyInfoWrapperPass&gt;(MF.getFunction()).getBFI();</span>
+<span class="line"> </span>
+<span class="del">-  DenseMap&lt;GlobalVariable *, float&gt; GlobalBenefit;</span>
+<span class="add">+  // Note: iteration order must be deterministic.</span>
+<span class="add">+  MapVector&lt;GlobalVariable *, float&gt; GlobalBenefit;</span>
+<span class="line">   for (MachineBasicBlock &amp;MBB : MF) {</span>
+<span class="line">     for (MachineInstr &amp;MI : MBB) {</span>
+<span class="line">       for (const MachineOperand &amp;MO : MI.operands()) {</span>
+<span class="line">@@ -701,7 +705,8 @@ std::vector&lt;EntryGraph&gt; MOSZeroPageAlloc::buildEntryGraphs(Module &amp;M,</span>
+<span class="line"> </span>
+<span class="line">       // Find all calls within the SCC and propagate entry frequencies across</span>
+<span class="line">       // the edges.</span>
+<span class="del">-      DenseMap&lt;const Function *, float&gt; CalleeFreqs;</span>
+<span class="add">+      // Note: iteration order must be deterministic.</span>
+<span class="add">+      MapVector&lt;const Function *, float&gt; CalleeFreqs;</span>
+<span class="line">       for (Function *F : Component-&gt;Funcs) {</span>
+<span class="line">         LLVM_DEBUG(dbgs() &lt;&lt; &quot;    &quot; &lt;&lt; F-&gt;getName() &lt;&lt; &quot;\n&quot;);</span>
+<span class="line">         MachineFunction *MF = MMI-&gt;getMachineFunction(*F);</span>
+<span class="line">diff --git a/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span>
+<span class="line">new file mode 100644</span>
+<span class="line">index 000000000000..7d049487bc7d</span>
+<span class="del">--- /dev/null</span>
+<span class="add">+++ b/llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll</span>
+<span class="line">@@ -0,0 +1,51 @@</span>
+<span class="add">+; RUN: llc -mtriple=mos -zp-avail=4 -verify-machineinstrs &lt; %s | FileCheck %s</span>
+<span class="add">+</span>
+<span class="add">+; Zero page allocation must be deterministic.</span>
+<span class="add">+;</span>
+<span class="add">+; Every one of these globals is stored exactly once from the same basic block,</span>
+<span class="add">+; so MOSZeroPageAlloc computes the identical benefit (2 * 1.0 / 1) for all eight</span>
+<span class="add">+; and only four of them fit in the zero page. The winners are therefore decided</span>
+<span class="add">+; entirely by the order in which candidates were collected, which must be</span>
+<span class="add">+; deterministic.</span>
+<span class="add">+</span>
+<span class="add">+target triple = &quot;mos&quot;</span>
+<span class="add">+</span>
+<span class="add">+@g0 = global i8 undef, align 1</span>
+<span class="add">+@g1 = global i8 undef, align 1</span>
+<span class="add">+@g2 = global i8 undef, align 1</span>
+<span class="add">+@g3 = global i8 undef, align 1</span>
+<span class="add">+@g4 = global i8 undef, align 1</span>
+<span class="add">+@g5 = global i8 undef, align 1</span>
+<span class="add">+@g6 = global i8 undef, align 1</span>
+<span class="add">+@g7 = global i8 undef, align 1</span>
+<span class="add">+</span>
+<span class="add">+; The first four globals collected win the zero page and are addressed with</span>
+<span class="add">+; mos8(); the rest keep absolute addressing.</span>
+<span class="add">+</span>
+<span class="add">+; CHECK-LABEL: main:</span>
+<span class="add">+; CHECK:      stx mos8(g0)</span>
+<span class="add">+; CHECK:      stx mos8(g1)</span>
+<span class="add">+; CHECK:      stx mos8(g2)</span>
+<span class="add">+; CHECK:      stx mos8(g3)</span>
+<span class="add">+; CHECK:      stx g4</span>
+<span class="add">+; CHECK:      stx g5</span>
+<span class="add">+; CHECK:      stx g6</span>
+<span class="add">+; CHECK:      stx g7</span>
+<span class="add">+</span>
+<span class="add">+; CHECK:      .type g0,@object</span>
+<span class="add">+; CHECK-NEXT: .section .zp.noinit</span>
+<span class="add">+; CHECK:      .type g4,@object</span>
+<span class="add">+; CHECK-NEXT: .section .noinit</span>
+<span class="add">+</span>
+<span class="add">+define void @main() {</span>
+<span class="add">+entry:</span>
+<span class="add">+  store volatile i8 1, ptr @g0, align 1</span>
+<span class="add">+  store volatile i8 2, ptr @g1, align 1</span>
+<span class="add">+  store volatile i8 3, ptr @g2, align 1</span>
+<span class="add">+  store volatile i8 4, ptr @g3, align 1</span>
+<span class="add">+  store volatile i8 5, ptr @g4, align 1</span>
+<span class="add">+  store volatile i8 6, ptr @g5, align 1</span>
+<span class="add">+  store volatile i8 7, ptr @g6, align 1</span>
+<span class="add">+  store volatile i8 8, ptr @g7, align 1</span>
+<span class="add">+  ret void</span>
+<span class="add">+}</span></pre>
+</details>
+</article>
+<section id="validation"><h2>Validation record</h2>
+<p><a href="validation.md">Validation source</a></p><pre class="record">
+# Validation of the proposed revisions
 
 Validated locally on Linux with a Release LLVM build, assertions enabled, and the MOS target. Each branch was built on its existing PR base. No GitHub CI run was triggered, because nothing was pushed. All six proposed branches merge cleanly with upstream `main` at `1d4ea13ca0ac` (checked with `git merge-tree`); the merge results were not separately built.
 
 | PR | Result |
 | --- | --- |
-| #578 | CodeGen/MOS: **79 pass**, 1 upstream-disabled test. New regression fails without the fix and passes with it. Reconstructed SNES demo changes from CRC mismatch to host/bsnes agreement. |
+| #578 | CodeGen/MOS at `b4749221bf37`: **80 pass**, 1 upstream-disabled test. New regression fails without the fix and passes with it. Reconstructed SNES demo changes from CRC mismatch to host/bsnes agreement. |
 | #584 | CodeGen/MOS: **79 pass**, 1 upstream-disabled test, including SPC700 non-GPR LDImm and GPR-folding coverage. |
 | #586 | MC/MOS: **40 pass**, including the new BRK disassembly and round-trip checks. |
 | #588 | MC/MOS: **40 pass**, including revised COP and assembler-error checks. |
@@ -33,12 +1306,51 @@ These are this reconstruction&#x27;s measured values; they are not the older Jun
 
 | PR | Submitted head | Proposed head |
 | --- | --- | --- |
-| #578 | `edc9bbd23b71` | `c4fd3dfa74e7` |
-| #584 | `3ce98fed82de` | `2d60650cfce2` |
+| #578 | `edc9bbd23b71` | `b4749221bf37` (was `c4fd3dfa74e7` before the review follow-up; `019af10c7378` briefly, reverted) |
+| #584 | `3ce98fed82de` | `7f4c37de6219` (was `2d60650cfce2` before the review follow-up) |
 | #586 | `064d33fc43ca` | `a2f81a87b01c` |
 | #588 | `3ac109760642` | `fb1b4ba325a8` |
 | #589 | `8c8d28b0c35a` | `9aead7afaa4a` |
 | #590 | `cc9f0d027813` | `5e83a0784918` |
 
+## Review follow-up (2026‑09‑13, after [review.md](review.md))
+
+The #578 and #584 follow-up commits were amended in place; the other four branches are unchanged.
+
+- **#578** compiler code is **unchanged from Codex&#x27;s `c4fd3dfa74e7`**. A first follow-up (`019af10c7378`)
+  collapsed the per-block live-in recompute into one `fullyRecomputeLiveIns` after the erase loop; Codex
+  questioned it with a cross-block case and the counterexample holds: with a dead `$y = COPY $x` in a
+  successor and `$x = COPY $a` in the predecessor (forwarding blocked by a clobber of `$a`), the collapsed
+  form left `dead $x = COPY killed $a` behind, because the predecessor&#x27;s dead flags were computed against
+  the successor&#x27;s stale live-ins. The per-block recompute is same-pass propagation, not tightening. It was
+  reverted (2026‑09‑14) and the case added as `copy-opt-chain.mir`, which passes on Codex&#x27;s form. Test-only
+  delta vs Codex: that new test plus an explicit `BRA %bb.3` in `copy-opt-loop.mir`. Re-validated on a
+  rebuilt llc: chain test and both `copy-opt-loop.mir` prefixes pass; CodeGen/MOS **80 pass**, 1
+  unsupported; all **176** `-O2` corpus outputs from `examples/65816/*.c` (IR from the fork&#x27;s clang, two
+  feature variants each) are **byte-identical** to the `c4fd3dfa74e7` build, as expected for a test-only
+  change. Codex&#x27;s bsnes runtime result therefore stands unchanged.
+- **#584** whitespace-only in `MOSLateOptimization.cpp` (a stray blank line removed) and the test
+  header shortened; the autogenerated-checks NOTE is dropped. CodeGen/MOS **79 pass**, 1 unsupported on
+  a rebuilt llc.
+- Bodies: #578 states the defect is confined to the target pass, #586 cites ca65 prior art, #589&#x27;s
+  validation line no longer narrates test-writing history.
+
+`index.html` is generated from the current bundle by `render.py`, including current proposed heads, descriptions, diffs, and this validation record.
+
 The submitted remote branches were read but never updated. `heads.json` records their full hashes for checking before any later approved push. Local compiler worktrees are under `/tmp/llvm-mos-review*`; the mail-formatted `*-commits.patch` files preserve the follow-up commits in this review directory.
-</pre></section></html>
+
+## Three-block regression follow-up (2026-09-14)
+
+Extended `copy-opt-chain.mir` with a three-block chain whose intervening register clobbers prevent copy forwarding from bypassing it. MIR checks require all three copies to disappear. An additional assembly check requires only `lda #5`, `ldx #6`, and `rts`, with no intervening or trailing instructions.
+
+Local compiler commit `b4749221bf3735ad1c83d80c103054f745f8c8cd` adds only this test extension to `3c04e895e167`. Focused lit validation: `copy-opt-chain.mir`, `copy-opt-loop.mir`, and `copy-opt.mir` all pass (3/3), including machine verification and the final-assembly check. The runtime results above predate this test-only extension; the full suite was subsequently rerun at this head as recorded below. The saved #578 patches and proposed head include it; publication remains pending Will’s review.
+
+## Publication-head verification (2026-09-14)
+
+- [x] Fast-forwarded `review-578` in `/tmp/llvm-mos-review-578` to `b4749221bf3735ad1c83d80c103054f745f8c8cd`, matching `heads.json` and the saved commit patches.
+- [x] Ran the full CodeGen/MOS lit suite from the checkout at that head using `/tmp/llvm-mos-review-build/bin/llvm-lit`: **80 pass, 1 unsupported**, including the three-block MIR and assembly checks. [Current lit results](578-tests.json). The compiler source is unchanged from the rebuilt `3c04e895e167` head; the extension changes only a test.
+- [x] Regenerated `index.html` from the current bundle and refreshed `SHA256SUMS` with the included `render.py`.
+
+No additional corpus or emulator run was performed for this test-only extension. No upstream branches or descriptions were posted. The proposed commits descend from the recorded submitted heads, so publication can use a normal fast-forward push if those remote heads are still unchanged.
+
+</pre></section></body></html>

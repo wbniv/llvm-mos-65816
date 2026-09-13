@@ -1,324 +1,496 @@
 {
+  "__version__": [
+    23,
+    0,
+    0
+  ],
+  "elapsed": 0.7801070213317871,
   "tests": [
     {
+      "code": "PASS",
+      "elapsed": 0.3016774654388428,
       "name": "LLVM :: CodeGen/MOS/legalizer.mir",
-      "result": "PASS"
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer.mir\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/jump-table-limit.ll",
-      "result": "PASS"
-    },
-    {
+      "code": "PASS",
+      "elapsed": 0.2768409252166748,
       "name": "LLVM :: CodeGen/MOS/instruction-selector.mir",
-      "result": "PASS"
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector.mir -check-prefixes=6502\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector.mir -check-prefixes=6502\n# RUN: at line 3\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector.mir -check-prefixes=65C02\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector.mir -check-prefixes=65C02\n\n--\n"
     },
     {
+      "code": "PASS",
+      "elapsed": 0.2433023452758789,
+      "name": "LLVM :: CodeGen/MOS/jump-table-limit.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -disable-block-placement < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/jump-table-limit.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/jump-table-limit.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -disable-block-placement\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/jump-table-limit.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.1674349308013916,
       "name": "LLVM :: CodeGen/MOS/shift-rotate.ll",
-      "result": "PASS"
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/shift-rotate.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/shift-rotate.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/shift-rotate.ll\n\n--\n"
     },
     {
+      "code": "PASS",
+      "elapsed": 0.15348410606384277,
       "name": "LLVM :: CodeGen/MOS/inc-dec-65ce02.ll",
-      "result": "PASS"
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos65ce02 -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65ce02.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65ce02.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos65ce02 -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65ce02.ll\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos45gs02 -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65ce02.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65ce02.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos45gs02 -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65ce02.ll\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/char-stats-norecurse.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/zp-alloc.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/char-stats.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/prologepilog-ir.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/instruction-selector-ir.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/asm-printer.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/legalizer-ir.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/integer-compare.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/inc-dec-6502x.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/hello-world.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/store-zero.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/zeropage.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/print-int.ll",
-      "result": "PASS"
-    },
-    {
+      "code": "PASS",
+      "elapsed": 0.08823084831237793,
       "name": "LLVM :: CodeGen/MOS/static-stack.ll",
-      "result": "PASS"
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc --align-large-globals=0 -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/static-stack.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/static-stack.ll --match-full-lines\n# executed command: /tmp/llvm-mos-review-build/bin/llc --align-large-globals=0 -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/static-stack.ll --match-full-lines\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/inc-dec.ll",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.08681893348693848,
+      "name": "LLVM :: CodeGen/MOS/inc-dec-6502x.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos6502x -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-6502x.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-6502x.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos6502x -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-6502x.ll\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/combiner.mir",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.13053011894226074,
+      "name": "LLVM :: CodeGen/MOS/char-stats-norecurse.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats-norecurse.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats-norecurse.ll -check-prefix=NMOS\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats-norecurse.ll -check-prefix=NMOS\n# RUN: at line 3\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats-norecurse.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats-norecurse.ll -check-prefix=CMOS\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats-norecurse.ll -check-prefix=CMOS\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/no-csr.ll",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.12682175636291504,
+      "name": "LLVM :: CodeGen/MOS/char-stats.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats.ll -check-prefix=NMOS\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats.ll -check-prefix=NMOS\n# RUN: at line 3\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats.ll -check-prefix=CMOS\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/char-stats.ll -check-prefix=CMOS\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/branch-relaxation-bra.mir",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.07304716110229492,
+      "name": "LLVM :: CodeGen/MOS/store-zero.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/store-zero.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/store-zero.ll -check-prefixes=CHECK,6502\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/store-zero.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/store-zero.ll -check-prefixes=CHECK,6502\n# RUN: at line 3\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/store-zero.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/store-zero.ll -check-prefixes=CHECK,65C02\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/store-zero.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/store-zero.ll -check-prefixes=CHECK,65C02\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/inc-dec-65c02.ll",
-      "result": "PASS"
-    },
-    {
+      "code": "PASS",
+      "elapsed": 0.05026698112487793,
       "name": "LLVM :: CodeGen/MOS/add-sub.ll",
-      "result": "PASS"
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/add-sub.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/add-sub.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/add-sub.ll\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/immediate-remat.ll",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.0729210376739502,
+      "name": "LLVM :: CodeGen/MOS/integer-compare.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/integer-compare.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/integer-compare.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/integer-compare.ll\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/asm-printer-spc700.mir",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.051282405853271484,
+      "name": "LLVM :: CodeGen/MOS/zp-alloc.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O2 --filetype=asm -zp-avail=224 < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zp-alloc.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zp-alloc.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O2 --filetype=asm -zp-avail=224\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zp-alloc.ll\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/whole-program-zp.ll",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.05008864402770996,
+      "name": "LLVM :: CodeGen/MOS/prologepilog-ir.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=prologepilog -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog-ir.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog-ir.mir -check-prefixes=6502\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=prologepilog -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog-ir.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog-ir.mir -check-prefixes=6502\n# RUN: at line 3\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=prologepilog -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog-ir.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog-ir.mir -check-prefixes=65C02\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=prologepilog -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog-ir.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog-ir.mir -check-prefixes=65C02\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/late-opt.mir",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.050863027572631836,
+      "name": "LLVM :: CodeGen/MOS/inc-dec-65c02.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65c02.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65c02.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec-65c02.ll\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/internalize.mir",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.06212949752807617,
+      "name": "LLVM :: CodeGen/MOS/hello-world.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/hello-world.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/hello-world.ll -check-prefix=NMOS\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/hello-world.ll -check-prefix=NMOS\n# RUN: at line 3\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/hello-world.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/hello-world.ll -check-prefix=CMOS\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/hello-world.ll -check-prefix=CMOS\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/prologepilog.mir",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.05042886734008789,
+      "name": "LLVM :: CodeGen/MOS/copy-opt-chain.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-copy-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-chain.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-chain.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-copy-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-chain.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-chain.mir\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos6502 -start-before=mos-copy-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-chain.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-chain.mir --check-prefix=ASM\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos6502 -start-before=mos-copy-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-chain.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-chain.mir --check-prefix=ASM\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/indexiv.ll",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.05735421180725098,
+      "name": "LLVM :: CodeGen/MOS/inc-dec.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inc-dec.ll\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/copy-phys-reg.mir",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.05421710014343262,
+      "name": "LLVM :: CodeGen/MOS/combiner.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-combiner -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/combiner.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/combiner.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-combiner -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/combiner.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/combiner.mir\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll",
-      "result": "PASS"
+      "code": "PASS",
+      "elapsed": 0.034044742584228516,
+      "name": "LLVM :: CodeGen/MOS/no-csr.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O2 < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/no-csr.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/no-csr.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O2\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/no-csr.ll\n\n--\n"
     },
     {
-      "name": "LLVM :: CodeGen/MOS/light-spill.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/scavenger.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/instruction-selector-ir-spc700.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/legalizer-huc6280.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/postrapseudos.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/shift-rotate-chain.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/zp-alloc-preexisting.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/cmp-select.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/callee-saved-regs.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/copy-phys-reg-huc6280.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/postrapseudos-huc6280.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/lower-select.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/coalesce-remat.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/trivial.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/insert-copies.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/dp-pointer-arg.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/instruction-selector-ir-65c02.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/call-lowering-stack.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/finalize-isel.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/regalloc.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/instruction-selector-spc700.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/ret-global-addr.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/call-lowering.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/legalizer-65c02.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/copy-phys-reg-spc700.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/copy-opt.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/inlineasm-constraint.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/inline-asm-zp-csr.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/leaf-20231021.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/asm-printer-huc6280.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/call-lowering-spc700.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/asm-printer-ir.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/postrapseudos-spc700.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/copy-phys-reg-65816.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/instruction-selector-65dtv02.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/scavenger-65c02.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/branch-relaxation.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/nonreentrant.ll",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/late-opt-65c02.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/commute.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/copy-phys-reg-65c02.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/branch-relaxation-inline-asm.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/late-opt-65816.mir",
-      "result": "PASS"
-    },
-    {
-      "name": "LLVM :: CodeGen/MOS/getchar-regression.ll",
-      "result": "UNSUPPORTED"
-    },
-    {
+      "code": "PASS",
+      "elapsed": 0.04493141174316406,
       "name": "LLVM :: CodeGen/MOS/copy-opt-loop.mir",
-      "result": "PASS"
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-loop.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-loop.mir --check-prefix=COPY\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-loop.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-loop.mir --check-prefix=COPY\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-loop.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-loop.mir --check-prefix=LOWER\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-loop.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt-loop.mir --check-prefix=LOWER\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03723740577697754,
+      "name": "LLVM :: CodeGen/MOS/postrapseudos.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.06141042709350586,
+      "name": "LLVM :: CodeGen/MOS/print-int.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/print-int.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/print-int.ll -check-prefix=NMOS\n# executed command: /tmp/llvm-mos-review-build/bin/llc\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/print-int.ll -check-prefix=NMOS\n# RUN: at line 3\n/tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02 < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/print-int.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/print-int.ll -check-prefix=CMOS\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mcpu=mos65c02\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/print-int.ll -check-prefix=CMOS\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.0315089225769043,
+      "name": "LLVM :: CodeGen/MOS/callee-saved-regs.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O3 < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/callee-saved-regs.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/callee-saved-regs.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O3\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/callee-saved-regs.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.01993250846862793,
+      "name": "LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/opt -passes=mos-nonreentrant,verify -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll\n# executed command: /tmp/llvm-mos-review-build/bin/opt -passes=mos-nonreentrant,verify -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.033696651458740234,
+      "name": "LLVM :: CodeGen/MOS/asm-printer-huc6280.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=moshuc6280 -start-after=machine-opt-remark-emitter -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-huc6280.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-huc6280.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=moshuc6280 -start-after=machine-opt-remark-emitter -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-huc6280.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-huc6280.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.05208587646484375,
+      "name": "LLVM :: CodeGen/MOS/branch-relaxation-bra.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=branch-relaxation -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-bra.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-bra.mir -check-prefixes=65C02\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=branch-relaxation -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-bra.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-bra.mir -check-prefixes=65C02\n# RUN: at line 3\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65dtv02 -run-pass=branch-relaxation -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-bra.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-bra.mir -check-prefixes=65DTV02\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65dtv02 -run-pass=branch-relaxation -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-bra.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-bra.mir -check-prefixes=65DTV02\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03731822967529297,
+      "name": "LLVM :: CodeGen/MOS/shift-rotate-chain.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-shift-rotate-chain -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/shift-rotate-chain.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/shift-rotate-chain.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-shift-rotate-chain -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/shift-rotate-chain.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/shift-rotate-chain.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.06817364692687988,
+      "name": "LLVM :: CodeGen/MOS/immediate-remat.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/immediate-remat.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/immediate-remat.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/immediate-remat.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.033045053482055664,
+      "name": "LLVM :: CodeGen/MOS/cmp-select.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/cmp-select.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/cmp-select.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/cmp-select.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03310394287109375,
+      "name": "LLVM :: CodeGen/MOS/legalizer-huc6280.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=moshuc6280 -run-pass=legalizer -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-huc6280.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-huc6280.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=moshuc6280 -run-pass=legalizer -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-huc6280.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-huc6280.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.06756949424743652,
+      "name": "LLVM :: CodeGen/MOS/light-spill.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/light-spill.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/light-spill.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/light-spill.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.045972585678100586,
+      "name": "LLVM :: CodeGen/MOS/whole-program-zp.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O2 --filetype=asm -zp-avail=1 < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/whole-program-zp.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/whole-program-zp.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O2 --filetype=asm -zp-avail=1\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/whole-program-zp.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03441619873046875,
+      "name": "LLVM :: CodeGen/MOS/instruction-selector-ir.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03744649887084961,
+      "name": "LLVM :: CodeGen/MOS/legalizer-ir.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-ir.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-ir.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-ir.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-ir.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.029543161392211914,
+      "name": "LLVM :: CodeGen/MOS/copy-opt.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-copy-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-copy-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-opt.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.030587196350097656,
+      "name": "LLVM :: CodeGen/MOS/zp-alloc-preexisting.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O2 --filetype=asm -zp-avail=224 < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zp-alloc-preexisting.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zp-alloc-preexisting.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O2 --filetype=asm -zp-avail=224\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zp-alloc-preexisting.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.025435447692871094,
+      "name": "LLVM :: CodeGen/MOS/asm-printer.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -start-after=machine-opt-remark-emitter -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -start-after=machine-opt-remark-emitter -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03038311004638672,
+      "name": "LLVM :: CodeGen/MOS/insert-copies.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-insert-copies -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/insert-copies.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/insert-copies.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-insert-copies -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/insert-copies.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/insert-copies.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02829742431640625,
+      "name": "LLVM :: CodeGen/MOS/call-lowering.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -run-pass=irtranslator -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -run-pass=irtranslator -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.029504060745239258,
+      "name": "LLVM :: CodeGen/MOS/dp-pointer-arg.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/dp-pointer-arg.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/dp-pointer-arg.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/dp-pointer-arg.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02431511878967285,
+      "name": "LLVM :: CodeGen/MOS/branch-relaxation-inline-asm.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=branch-relaxation -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-inline-asm.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-inline-asm.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=branch-relaxation -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-inline-asm.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation-inline-asm.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03395843505859375,
+      "name": "LLVM :: CodeGen/MOS/coalesce-remat.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/coalesce-remat.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/coalesce-remat.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/coalesce-remat.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/coalesce-remat.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03299856185913086,
+      "name": "LLVM :: CodeGen/MOS/asm-printer-spc700.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -start-after=machine-opt-remark-emitter -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-spc700.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -start-after=machine-opt-remark-emitter -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-spc700.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03640913963317871,
+      "name": "LLVM :: CodeGen/MOS/zeropage.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zeropage.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zeropage.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/zeropage.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02190375328063965,
+      "name": "LLVM :: CodeGen/MOS/scavenger-65c02.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=scavenger-test -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/scavenger-65c02.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/scavenger-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=scavenger-test -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/scavenger-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/scavenger-65c02.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.030438661575317383,
+      "name": "LLVM :: CodeGen/MOS/inlineasm-constraint.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -run-pass=irtranslator -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inlineasm-constraint.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inlineasm-constraint.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -run-pass=irtranslator -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inlineasm-constraint.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inlineasm-constraint.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.030280590057373047,
+      "name": "LLVM :: CodeGen/MOS/copy-phys-reg-spc700.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-spc700.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-spc700.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.030395030975341797,
+      "name": "LLVM :: CodeGen/MOS/lower-select.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-lower-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/lower-select.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/lower-select.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-lower-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/lower-select.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/lower-select.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02936244010925293,
+      "name": "LLVM :: CodeGen/MOS/late-opt-65816.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-late-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt-65816.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt-65816.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-late-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt-65816.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt-65816.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.024407625198364258,
+      "name": "LLVM :: CodeGen/MOS/legalizer-65c02.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=legalizer -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-65c02.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=legalizer -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/legalizer-65c02.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02935314178466797,
+      "name": "LLVM :: CodeGen/MOS/late-opt.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-late-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03573775291442871,
+      "name": "LLVM :: CodeGen/MOS/instruction-selector-ir-spc700.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir-spc700.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir-spc700.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.035611867904663086,
+      "name": "LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/opt -passes=indvars -verify-each -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll\n# executed command: /tmp/llvm-mos-review-build/bin/opt -passes=indvars -verify-each -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.03020501136779785,
+      "name": "LLVM :: CodeGen/MOS/ret-global-addr.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/ret-global-addr.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/ret-global-addr.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/ret-global-addr.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/ret-global-addr.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.028710603713989258,
+      "name": "LLVM :: CodeGen/MOS/instruction-selector-ir-65c02.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir-65c02.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-ir-65c02.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.029211997985839844,
+      "name": "LLVM :: CodeGen/MOS/copy-phys-reg.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.026308059692382812,
+      "name": "LLVM :: CodeGen/MOS/scavenger.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=scavenger-test -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/scavenger.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/scavenger.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=scavenger-test -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/scavenger.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/scavenger.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02781534194946289,
+      "name": "LLVM :: CodeGen/MOS/inline-asm-zp-csr.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -O2 -zp-avail=224 -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -O2 -zp-avail=224 -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.031725406646728516,
+      "name": "LLVM :: CodeGen/MOS/finalize-isel.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=finalize-isel -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/finalize-isel.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/finalize-isel.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=finalize-isel -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/finalize-isel.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/finalize-isel.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.027689218521118164,
+      "name": "LLVM :: CodeGen/MOS/trivial.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O0 --filetype=asm < /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/trivial.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/trivial.ll\n# executed command: /tmp/llvm-mos-review-build/bin/llc -verify-machineinstrs -O0 --filetype=asm\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/trivial.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02814006805419922,
+      "name": "LLVM :: CodeGen/MOS/call-lowering-spc700.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -run-pass=irtranslator -mcpu=mosspc700 -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering-spc700.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -run-pass=irtranslator -mcpu=mosspc700 -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering-spc700.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.023732900619506836,
+      "name": "LLVM :: CodeGen/MOS/leaf-20231021.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/opt -O2 -verify-each -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/leaf-20231021.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/leaf-20231021.ll\n# executed command: /tmp/llvm-mos-review-build/bin/opt -O2 -verify-each -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/leaf-20231021.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/leaf-20231021.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.04219317436218262,
+      "name": "LLVM :: CodeGen/MOS/prologepilog.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=prologepilog -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=prologepilog -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/prologepilog.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.022095203399658203,
+      "name": "LLVM :: CodeGen/MOS/postrapseudos-spc700.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos-spc700.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos-spc700.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02968287467956543,
+      "name": "LLVM :: CodeGen/MOS/nonreentrant.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/opt -passes=mos-nonreentrant,verify -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/nonreentrant.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/nonreentrant.ll\n# executed command: /tmp/llvm-mos-review-build/bin/opt -passes=mos-nonreentrant,verify -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/nonreentrant.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/nonreentrant.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02322983741760254,
+      "name": "LLVM :: CodeGen/MOS/indexiv.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/opt -passes=mos-indexiv -verify-each -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/indexiv.ll | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/indexiv.ll\n# executed command: /tmp/llvm-mos-review-build/bin/opt -passes=mos-indexiv -verify-each -S /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/indexiv.ll\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/indexiv.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.034276485443115234,
+      "name": "LLVM :: CodeGen/MOS/instruction-selector-65dtv02.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65dtv02 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-65dtv02.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-65dtv02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65dtv02 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-65dtv02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-65dtv02.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.031525373458862305,
+      "name": "LLVM :: CodeGen/MOS/asm-printer-ir.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -start-after=machine-opt-remark-emitter -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-ir.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-ir.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -start-after=machine-opt-remark-emitter -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-ir.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/asm-printer-ir.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.030844449996948242,
+      "name": "LLVM :: CodeGen/MOS/copy-phys-reg-huc6280.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=moshuc6280 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-huc6280.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-huc6280.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=moshuc6280 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-huc6280.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-huc6280.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.022572755813598633,
+      "name": "LLVM :: CodeGen/MOS/postrapseudos-huc6280.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=moshuc6280 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos-huc6280.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos-huc6280.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=moshuc6280 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos-huc6280.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/postrapseudos-huc6280.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.027998924255371094,
+      "name": "LLVM :: CodeGen/MOS/late-opt-65c02.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=mos-late-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt-65c02.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=mos-late-opt -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/late-opt-65c02.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.036803245544433594,
+      "name": "LLVM :: CodeGen/MOS/commute.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=twoaddressinstruction -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/commute.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/commute.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=twoaddressinstruction -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/commute.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/commute.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.024926424026489258,
+      "name": "LLVM :: CodeGen/MOS/internalize.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-internalize -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/internalize.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/internalize.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=mos-internalize -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/internalize.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/internalize.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02888035774230957,
+      "name": "LLVM :: CodeGen/MOS/copy-phys-reg-65816.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-65816.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-65816.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-65816.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-65816.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.020862102508544922,
+      "name": "LLVM :: CodeGen/MOS/regalloc.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=greedy -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/regalloc.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/regalloc.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=greedy -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/regalloc.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/regalloc.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.031534671783447266,
+      "name": "LLVM :: CodeGen/MOS/copy-phys-reg-65c02.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-65c02.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mos65c02 -run-pass=postrapseudos -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-65c02.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/copy-phys-reg-65c02.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.025730609893798828,
+      "name": "LLVM :: CodeGen/MOS/instruction-selector-spc700.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-spc700.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -mcpu=mosspc700 -run-pass=instruction-select -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-spc700.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/instruction-selector-spc700.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.020958900451660156,
+      "name": "LLVM :: CodeGen/MOS/call-lowering-stack.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 1\n/tmp/llvm-mos-review-build/bin/llc -run-pass=irtranslator -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering-stack.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering-stack.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -run-pass=irtranslator -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering-stack.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/call-lowering-stack.mir\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.02442002296447754,
+      "name": "LLVM :: CodeGen/MOS/branch-relaxation.mir",
+      "output": "Exit Code: 0\n\nCommand Output (stdout):\n--\n# RUN: at line 2\n/tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=branch-relaxation -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation.mir | /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation.mir\n# executed command: /tmp/llvm-mos-review-build/bin/llc -mtriple=mos -run-pass=branch-relaxation -verify-machineinstrs -o - /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation.mir\n# executed command: /tmp/llvm-mos-review-build/bin/FileCheck /tmp/llvm-mos-review/llvm/test/CodeGen/MOS/branch-relaxation.mir\n\n--\n"
+    },
+    {
+      "code": "UNSUPPORTED",
+      "elapsed": 0.0023403167724609375,
+      "name": "LLVM :: CodeGen/MOS/getchar-regression.ll",
+      "output": "Test does not support the following features and/or targets: target={{.*}}"
     }
   ]
 }

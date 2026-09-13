@@ -15,4 +15,4 @@ The complete diffs are relative to each PR's merge base with upstream `main`. Th
 
 The intended publication, after Will approves, is to update the six existing PR branches and their descriptions. No replacement PRs are needed.
 
-**Review:** [review.md](review.md) records the independent review of these revisions and the follow-up edits it produced (the #578 and #584 heads were amended; see the [validation record](validation.md) for the re-run results). `index.html` is a rendered snapshot of the original submission and predates those edits.
+**Review:** [review.md](review.md) records the independent review of these revisions and the follow-up edits it produced (the #578 and #584 heads were amended; see the [validation record](validation.md) for the re-run results). `index.html` is generated from the current bundle, including the proposed heads in `heads.json`. Run `python3 docs/pr-revisions/2026-09-13/render.py` from the repository root after editing bundle sources; this also refreshes `SHA256SUMS`. Use `--check` to verify that both generated files are current.
