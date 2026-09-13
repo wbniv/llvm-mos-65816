@@ -37,7 +37,7 @@ These are this reconstruction's measured values; they are not the older June rep
 | #586 | `064d33fc43ca` | `a2f81a87b01c` |
 | #588 | `3ac109760642` | `fb1b4ba325a8` |
 | #589 | `8c8d28b0c35a` | `9aead7afaa4a` |
-| #590 | `cc9f0d027813` | `5e83a0784918` |
+| #590 | `cc9f0d027813` | `532900273ba9` |
 
 ## Review follow-up (2026‑09‑13, after [review.md](review.md))
 
@@ -82,3 +82,9 @@ No additional corpus or emulator run was performed for this test-only extension.
 ## PR #590 publication (2026-09-14)
 
 Published only #590 with Will’s approval: fast-forwarded `mos-zp-alloc-deterministic` from `cc9f0d027813` to `5e83a0784918` and applied the saved title and description. Verified the GitHub head and opened the PR in Chrome. Initial CI status: Windows and Ubuntu running, macOS queued. The other five revisions remain unpublished and each requires separate approval.
+
+### #590 comment follow-up
+
+Published `8f2db7c737d7fb4224015d4cf8ea2e7bf2fe5047` with Will’s approval: one comment above `SCCCallees` names all three containers requiring deterministic iteration; duplicate notes above `GlobalBenefit` and `CalleeFreqs` are removed. The diff changes comments only and passes whitespace checks. The recorded suite and determinism runs predate this comment-only follow-up; they were not rerun.
+
+Refined the same comment in published head `532900273ba95cda6b832de005d2034e031c4eaf` to explain that allocation tie-breaking and floating-point accumulation can change zero-page placement for identical inputs. This follow-up also changes only comments.

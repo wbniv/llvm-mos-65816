@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
-index 2fb9967160e5..8675ea1f6a3c 100644
+index 2fb9967160e5..3651cf6413b2 100644
 --- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
 +++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
 @@ -20,8 +20,10 @@
@@ -13,32 +13,32 @@ index 2fb9967160e5..8675ea1f6a3c 100644
  #include "llvm/Analysis/BasicAliasAnalysis.h"
  #include "llvm/Analysis/BlockFrequencyInfo.h"
  #include "llvm/Analysis/CallGraph.h"
-@@ -414,7 +416,8 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &M) {
+@@ -414,7 +416,10 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &M) {
    LLVM_DEBUG(CG.dump());
  
    std::vector<SCC> SCCs;
 -  std::vector<SmallSet<const CallGraphNode *, 4>> SCCCallees;
-+  // Note: iteration order must be deterministic.
++  // Keep SCCCallees, GlobalBenefit, and CalleeFreqs iteration deterministic:
++  // it affects allocation tie-breaking and floating-point accumulation, which
++  // can otherwise change zero-page placement for identical inputs.
 +  std::vector<SmallSetVector<const CallGraphNode *, 4>> SCCCallees;
    DenseMap<const CallGraphNode *, size_t> SCCIdx;
    std::vector<std::unique_ptr<Candidate>> Candidates;
    DenseMap<GlobalVariable *, Candidate *> GVCandidates;
-@@ -482,7 +485,8 @@ void MOSZeroPageAlloc::collectCandidates(
+@@ -482,7 +487,7 @@ void MOSZeroPageAlloc::collectCandidates(
    auto &BFI =
        getAnalysis<BlockFrequencyInfoWrapperPass>(MF.getFunction()).getBFI();
  
 -  DenseMap<GlobalVariable *, float> GlobalBenefit;
-+  // Note: iteration order must be deterministic.
 +  MapVector<GlobalVariable *, float> GlobalBenefit;
    for (MachineBasicBlock &MBB : MF) {
      for (MachineInstr &MI : MBB) {
        for (const MachineOperand &MO : MI.operands()) {
-@@ -701,7 +705,8 @@ std::vector<EntryGraph> MOSZeroPageAlloc::buildEntryGraphs(Module &M,
+@@ -701,7 +706,7 @@ std::vector<EntryGraph> MOSZeroPageAlloc::buildEntryGraphs(Module &M,
  
        // Find all calls within the SCC and propagate entry frequencies across
        // the edges.
 -      DenseMap<const Function *, float> CalleeFreqs;
-+      // Note: iteration order must be deterministic.
 +      MapVector<const Function *, float> CalleeFreqs;
        for (Function *F : Component->Funcs) {
          LLVM_DEBUG(dbgs() << "    " << F->getName() << "\n");

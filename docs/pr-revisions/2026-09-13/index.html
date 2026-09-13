@@ -1093,7 +1093,7 @@ Submitted head: <code>8c8d28b0c35a79142e456f75dc821b17a76c4cf1</code></p>
 <article id="pr590"><h2>#590 — [MOS] Make zero page allocation deterministic</h2>
 <p><a href="https://github.com/llvm-mos/llvm-mos/pull/590">Existing upstream PR</a></p>
 <p>Status: published with Will approval on 2026-09-14</p>
-<p>Proposed head: <code>5e83a0784918f977beb3300337b6703ea497895f</code><br>
+<p>Proposed head: <code>532900273ba95cda6b832de005d2034e031c4eaf</code><br>
 Submitted head: <code>cc9f0d027813c94398d5aff0c5a718cb2fa64e95</code></p>
 <h3>Proposed description</h3>
 <p>Zero-page allocation can choose different globals for identical inputs when candidate scores tie. Pointer-ordered iteration also affects entry-point ordering and floating-point accumulation of candidate benefits.</p>
@@ -1104,10 +1104,10 @@ Submitted head: <code>cc9f0d027813c94398d5aff0c5a718cb2fa64e95</code></p>
 <details><summary>Changes since the submitted PR</summary>
 <p><a href="590-review-changes.patch">Download diff</a></p>
 <pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
-<span class="line">index dbbdc95d921b..8675ea1f6a3c 100644</span>
+<span class="line">index dbbdc95d921b..3651cf6413b2 100644</span>
 <span class="del">--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
 <span class="add">+++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
-<span class="line">@@ -416,10 +416,7 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &amp;M) {</span>
+<span class="line">@@ -416,10 +416,9 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &amp;M) {</span>
 <span class="line">   LLVM_DEBUG(CG.dump());</span>
 <span class="line"> </span>
 <span class="line">   std::vector&lt;SCC&gt; SCCs;</span>
@@ -1115,11 +1115,13 @@ Submitted head: <code>cc9f0d027813c94398d5aff0c5a718cb2fa64e95</code></p>
 <span class="del">-  // std::set, which orders const CallGraphNode * by pointer VALUE. SCC::Callees</span>
 <span class="del">-  // seeds the EntryGraph list, and entry graphs are served ZP round-robin, so an</span>
 <span class="del">-  // address-ordered callee list makes the assignment differ between runs.</span>
-<span class="add">+  // Note: iteration order must be deterministic.</span>
+<span class="add">+  // Keep SCCCallees, GlobalBenefit, and CalleeFreqs iteration deterministic:</span>
+<span class="add">+  // it affects allocation tie-breaking and floating-point accumulation, which</span>
+<span class="add">+  // can otherwise change zero-page placement for identical inputs.</span>
 <span class="line">   std::vector&lt;SmallSetVector&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span>
 <span class="line">   DenseMap&lt;const CallGraphNode *, size_t&gt; SCCIdx;</span>
 <span class="line">   std::vector&lt;std::unique_ptr&lt;Candidate&gt;&gt; Candidates;</span>
-<span class="line">@@ -488,13 +485,7 @@ void MOSZeroPageAlloc::collectCandidates(</span>
+<span class="line">@@ -488,13 +487,6 @@ void MOSZeroPageAlloc::collectCandidates(</span>
 <span class="line">   auto &amp;BFI =</span>
 <span class="line">       getAnalysis&lt;BlockFrequencyInfoWrapperPass&gt;(MF.getFunction()).getBFI();</span>
 <span class="line"> </span>
@@ -1130,11 +1132,10 @@ Submitted head: <code>cc9f0d027813c94398d5aff0c5a718cb2fa64e95</code></p>
 <span class="del">-  // ties were broken differently on every process execution and the zero page&#x27;s</span>
 <span class="del">-  // last free byte went to a different global each build. MapVector keeps the</span>
 <span class="del">-  // deterministic MachineInstr walk order below.</span>
-<span class="add">+  // Note: iteration order must be deterministic.</span>
 <span class="line">   MapVector&lt;GlobalVariable *, float&gt; GlobalBenefit;</span>
 <span class="line">   for (MachineBasicBlock &amp;MBB : MF) {</span>
 <span class="line">     for (MachineInstr &amp;MI : MBB) {</span>
-<span class="line">@@ -714,10 +705,7 @@ std::vector&lt;EntryGraph&gt; MOSZeroPageAlloc::buildEntryGraphs(Module &amp;M,</span>
+<span class="line">@@ -714,10 +706,6 @@ std::vector&lt;EntryGraph&gt; MOSZeroPageAlloc::buildEntryGraphs(Module &amp;M,</span>
 <span class="line"> </span>
 <span class="line">       // Find all calls within the SCC and propagate entry frequencies across</span>
 <span class="line">       // the edges.</span>
@@ -1142,7 +1143,6 @@ Submitted head: <code>cc9f0d027813c94398d5aff0c5a718cb2fa64e95</code></p>
 <span class="del">-      // EntryFreqs with float +=, which is not associative, so a pointer-hash</span>
 <span class="del">-      // iteration order perturbed every derived benefit in its last ULP and</span>
 <span class="del">-      // broke near-ties as well as exact ones.</span>
-<span class="add">+      // Note: iteration order must be deterministic.</span>
 <span class="line">       MapVector&lt;const Function *, float&gt; CalleeFreqs;</span>
 <span class="line">       for (Function *F : Component-&gt;Funcs) {</span>
 <span class="line">         LLVM_DEBUG(dbgs() &lt;&lt; &quot;    &quot; &lt;&lt; F-&gt;getName() &lt;&lt; &quot;\n&quot;);</span>
@@ -1173,7 +1173,7 @@ Submitted head: <code>cc9f0d027813c94398d5aff0c5a718cb2fa64e95</code></p>
 <details><summary>Complete proposed diff</summary>
 <p><a href="590-complete.patch">Download diff</a></p>
 <pre class=diff><span class="line">diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
-<span class="line">index 2fb9967160e5..8675ea1f6a3c 100644</span>
+<span class="line">index 2fb9967160e5..3651cf6413b2 100644</span>
 <span class="del">--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
 <span class="add">+++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp</span>
 <span class="line">@@ -20,8 +20,10 @@</span>
@@ -1187,32 +1187,32 @@ Submitted head: <code>cc9f0d027813c94398d5aff0c5a718cb2fa64e95</code></p>
 <span class="line"> #include &quot;llvm/Analysis/BasicAliasAnalysis.h&quot;</span>
 <span class="line"> #include &quot;llvm/Analysis/BlockFrequencyInfo.h&quot;</span>
 <span class="line"> #include &quot;llvm/Analysis/CallGraph.h&quot;</span>
-<span class="line">@@ -414,7 +416,8 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &amp;M) {</span>
+<span class="line">@@ -414,7 +416,10 @@ SCCGraph MOSZeroPageAlloc::buildSCCGraph(Module &amp;M) {</span>
 <span class="line">   LLVM_DEBUG(CG.dump());</span>
 <span class="line"> </span>
 <span class="line">   std::vector&lt;SCC&gt; SCCs;</span>
 <span class="del">-  std::vector&lt;SmallSet&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span>
-<span class="add">+  // Note: iteration order must be deterministic.</span>
+<span class="add">+  // Keep SCCCallees, GlobalBenefit, and CalleeFreqs iteration deterministic:</span>
+<span class="add">+  // it affects allocation tie-breaking and floating-point accumulation, which</span>
+<span class="add">+  // can otherwise change zero-page placement for identical inputs.</span>
 <span class="add">+  std::vector&lt;SmallSetVector&lt;const CallGraphNode *, 4&gt;&gt; SCCCallees;</span>
 <span class="line">   DenseMap&lt;const CallGraphNode *, size_t&gt; SCCIdx;</span>
 <span class="line">   std::vector&lt;std::unique_ptr&lt;Candidate&gt;&gt; Candidates;</span>
 <span class="line">   DenseMap&lt;GlobalVariable *, Candidate *&gt; GVCandidates;</span>
-<span class="line">@@ -482,7 +485,8 @@ void MOSZeroPageAlloc::collectCandidates(</span>
+<span class="line">@@ -482,7 +487,7 @@ void MOSZeroPageAlloc::collectCandidates(</span>
 <span class="line">   auto &amp;BFI =</span>
 <span class="line">       getAnalysis&lt;BlockFrequencyInfoWrapperPass&gt;(MF.getFunction()).getBFI();</span>
 <span class="line"> </span>
 <span class="del">-  DenseMap&lt;GlobalVariable *, float&gt; GlobalBenefit;</span>
-<span class="add">+  // Note: iteration order must be deterministic.</span>
 <span class="add">+  MapVector&lt;GlobalVariable *, float&gt; GlobalBenefit;</span>
 <span class="line">   for (MachineBasicBlock &amp;MBB : MF) {</span>
 <span class="line">     for (MachineInstr &amp;MI : MBB) {</span>
 <span class="line">       for (const MachineOperand &amp;MO : MI.operands()) {</span>
-<span class="line">@@ -701,7 +705,8 @@ std::vector&lt;EntryGraph&gt; MOSZeroPageAlloc::buildEntryGraphs(Module &amp;M,</span>
+<span class="line">@@ -701,7 +706,7 @@ std::vector&lt;EntryGraph&gt; MOSZeroPageAlloc::buildEntryGraphs(Module &amp;M,</span>
 <span class="line"> </span>
 <span class="line">       // Find all calls within the SCC and propagate entry frequencies across</span>
 <span class="line">       // the edges.</span>
 <span class="del">-      DenseMap&lt;const Function *, float&gt; CalleeFreqs;</span>
-<span class="add">+      // Note: iteration order must be deterministic.</span>
 <span class="add">+      MapVector&lt;const Function *, float&gt; CalleeFreqs;</span>
 <span class="line">       for (Function *F : Component-&gt;Funcs) {</span>
 <span class="line">         LLVM_DEBUG(dbgs() &lt;&lt; &quot;    &quot; &lt;&lt; F-&gt;getName() &lt;&lt; &quot;\n&quot;);</span>
@@ -1317,7 +1317,7 @@ These are this reconstruction&#x27;s measured values; they are not the older Jun
 | #586 | `064d33fc43ca` | `a2f81a87b01c` |
 | #588 | `3ac109760642` | `fb1b4ba325a8` |
 | #589 | `8c8d28b0c35a` | `9aead7afaa4a` |
-| #590 | `cc9f0d027813` | `5e83a0784918` |
+| #590 | `cc9f0d027813` | `532900273ba9` |
 
 ## Review follow-up (2026‑09‑13, after [review.md](review.md))
 
@@ -1362,5 +1362,11 @@ No additional corpus or emulator run was performed for this test-only extension.
 ## PR #590 publication (2026-09-14)
 
 Published only #590 with Will’s approval: fast-forwarded `mos-zp-alloc-deterministic` from `cc9f0d027813` to `5e83a0784918` and applied the saved title and description. Verified the GitHub head and opened the PR in Chrome. Initial CI status: Windows and Ubuntu running, macOS queued. The other five revisions remain unpublished and each requires separate approval.
+
+### #590 comment follow-up
+
+Published `8f2db7c737d7fb4224015d4cf8ea2e7bf2fe5047` with Will’s approval: one comment above `SCCCallees` names all three containers requiring deterministic iteration; duplicate notes above `GlobalBenefit` and `CalleeFreqs` are removed. The diff changes comments only and passes whitespace checks. The recorded suite and determinism runs predate this comment-only follow-up; they were not rerun.
+
+Refined the same comment in published head `532900273ba95cda6b832de005d2034e031c4eaf` to explain that allocation tie-breaking and floating-point accumulation can change zero-page placement for identical inputs. This follow-up also changes only comments.
 
 </pre></section></body></html>

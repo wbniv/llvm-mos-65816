@@ -38,7 +38,7 @@
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/590",
     "remote_branch": "mos-zp-alloc-deterministic",
     "submitted_head": "cc9f0d027813c94398d5aff0c5a718cb2fa64e95",
-    "proposed_head": "5e83a0784918f977beb3300337b6703ea497895f",
+    "proposed_head": "532900273ba95cda6b832de005d2034e031c4eaf",
     "publication": "published with Will approval on 2026-09-14"
   }
 }
