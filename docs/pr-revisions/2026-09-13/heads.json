@@ -18,7 +18,7 @@
     "remote_branch": "mos-brk-signature-operand",
     "submitted_head": "064d33fc43ca992893984978d88d7550a382c0c2",
     "proposed_head": "a2f81a87b01c9fb396f52aafdc15c1d6b4a71975",
-    "publication": "awaiting Will approval"
+    "publication": "published with Will approval on 2026-09-14"
   },
   "588": {
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/588",
