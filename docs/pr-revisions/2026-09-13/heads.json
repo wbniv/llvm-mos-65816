@@ -32,7 +32,7 @@
     "remote_branch": "mos-late-opt-cmpzero-lowering",
     "submitted_head": "8c8d28b0c35a79142e456f75dc821b17a76c4cf1",
     "proposed_head": "9aead7afaa4a13f4e7151e2b62adbc0b6937a018",
-    "publication": "awaiting Will approval"
+    "publication": "published with Will approval on 2026-09-14"
   },
   "590": {
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/590",
