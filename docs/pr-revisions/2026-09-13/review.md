@@ -166,7 +166,8 @@ Downstream consequences to schedule after publication: fork patch `0010-coalesce
 ships the now-withdrawn guard and the fork's `MOSCopyOpt` still has the real bug; the drafted RA
 companion issue (`docs/upstream-coalesce-rotate-ac-ra-issue.md`, status row 16) is obsolete and
 should be retired rather than posted; the body mirror `docs/upstream-coalesce-rotate-ac-pr.md`
-and the status rows need re-syncing.
+and the status rows need re-syncing. (Tracked: `TODO.md` → Upstream / Contribution → "Fork-patch
+follow-ups for the 2026‑09‑13 PR revisions", `[T3]`, gated on publication.)
 
 ## #584 — approve (nits applied)
 
@@ -235,7 +236,8 @@ matching the original last compare.
 ~~Body nit: "all 80 enabled MOS CodeGen tests pass across the full run and focused rerun after
 correcting one new test expectation" narrates local test-writing history. Replace with
 "Validation: MOS CodeGen suite 80 pass, 1 unsupported."~~ (Done.) Fork patch `0022` carries the
-original sticky-`Changed` form and should move to the terminator form when this lands.
+original sticky-`Changed` form and should move to the terminator form when this lands (tracked in
+the same `[T3]` TODO item as the #578 fork follow-up).
 
 ## #590 — approve
 
@@ -258,4 +260,11 @@ evidence and andymccall's independent confirmation are both cited.
 - After publication, in the same commit: update `docs/upstream-contribution-status.md` rows 9,
   15, 16, 17, 18, 18a, 18b, the six `docs/upstream-*-pr.md` mirrors, and plan the fork-patch
   follow-ups (`0010` → copy-opt fix, `0022` → terminator form; `0003`/`0021`/`0024` are
-  comment-only deltas).
+  comment-only deltas). (Tracked as the `[T3]` "Fork-patch follow-ups" item in `TODO.md`,
+  commit `92fadc4`.)
+
+## Disposition
+
+Every recommendation in this review is either applied (struck through above, re-validated in
+[validation.md](validation.md)) or tracked as a ranked TODO item gated on publication. Nothing is
+left open for the reviewer.
