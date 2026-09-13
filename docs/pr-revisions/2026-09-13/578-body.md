@@ -8,4 +8,4 @@ The reduced MIR regression checks that A is live through the latch and that the 
 
 This replaces the original PR's diagnosis: register allocation emits the required restore correctly. The failure occurs later when copy forwarding changes the loop's liveness and the update does not propagate around the back edge. The defect is confined to the target-specific MOSCopyOpt pass; no generic LLVM change is involved.
 
-Validation: MOS CodeGen suite at `b4749221bf37`: 80 pass, 1 unsupported. Both regression assertions fail without the fix. The reconstructed SNES demo changes from host/ROM CRC mismatch (0x7F81 / 0xC57C) to agreement at 0x7F81 in bsnes.
+Validation: MOS CodeGen suite at `b4749221bf37`: 80 pass, 1 unsupported. Both regression assertions fail without the fix. The reconstructed SNES demo changes from host/ROM CRC mismatch (0x7F81 / 0xC57C) to agreement at 0x7F81 in bsnes. Compile-time cost of the fixed-point recompute, measured as retired instructions over a 176-file corpus at -O2: +0.8% overall, +2.4% on the worst loop-dense kernel; on-CPU time unchanged.

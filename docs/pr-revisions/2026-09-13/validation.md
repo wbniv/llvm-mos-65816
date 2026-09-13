@@ -79,6 +79,17 @@ Local compiler commit `b4749221bf3735ad1c83d80c103054f745f8c8cd` adds only this 
 
 No additional corpus or emulator run was performed for this test-only extension. No upstream branches or descriptions were posted. The proposed commits descend from the recorded submitted heads, so publication can use a normal fast-forward push if those remote heads are still unchanged.
 
+### Pre-publish review of `b4749221bf37` (2026‑09‑14, Claude)
+
+Independent re-verification on a fresh rebuild of `llc` at the publication head, in the shared review tree:
+
+- **Green:** `copy-opt-chain.mir` (two-block MIR, three-block MIR, three-block ASM) and `copy-opt-loop.mir` (both prefixes) pass; full CodeGen/MOS suite **80 pass, 1 unsupported**.
+- **Red, done properly this time:** `MOSCopyOpt.cpp` reverted to the submitted head `edc9bbd23b71` and `llc` rebuilt.
+  `copy-opt-loop.mir` **fails on both prefixes** without the fix (the `bb.3` live-in `$a` is absent; the bad `dead $a = LDImag8 $rc2` reload is emitted). That is the regression test for the #578 defect.
+  `copy-opt-chain.mir` **passes on the pre-fix compiler too**, on all three checks. This is correct and expected, not a gap: the chain tests guard the per-block `computeAndAddLiveIns` inside the cleanup loop against being removed (the refactor that was tried and reverted on 2026‑09‑14), and the pre-fix code already contained that recompute. They are a structural guard, not a red/green proof of the fix. The PR body's wording ("pins ... so the per-block recompute cannot be dropped by accident") already describes them that way; the body's "both checks fail without the fix" sentence refers only to the loop test, which is accurate.
+- Live PR thread re-read: no comments since mysterymath's 2026‑08‑22 "papering over a bug elsewhere" objection, which the rediagnosis in the revised body answers directly. Remote branch head unchanged at `edc9bbd23b71`.
+- **Compile-time cost of the fixed-point recompute: not measurable in practice.** Two `llc` binaries differing only in the `MOSCopyOpt.cpp` hunk, 176 corpus files at `-O2`, retired user-space instructions via `perf stat` (read inside a `--privileged` container; chosen over wall/CPU time because the host was at load average ~18 from a concurrent investigation). Corpus-wide **+0.79 %** instructions, per-file median **+0.17 %**, worst **+2.4 %** (`k_trig16`, a loop-dense kernel; +2 ms on-CPU at N=10); on-CPU time ratio 0.9989. Method and raw numbers: [plan](../../plans/2026-09-14-578-liveness-compile-time-cost.md).
+
 ## PR #590 publication (2026-09-14)
 
 Published only #590 with Will’s approval: fast-forwarded `mos-zp-alloc-deterministic` from `cc9f0d027813` to `5e83a0784918` and applied the saved title and description. Verified the GitHub head and opened the PR in Chrome. Initial CI status: Windows and Ubuntu running, macOS queued. The other five revisions remain unpublished and each requires separate approval.
