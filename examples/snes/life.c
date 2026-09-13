@@ -90,6 +90,16 @@ static void _life_reserve(Drawable *d, VramAlloc *va) {
         }
 
     l->base.tm_bits = TM_BG3;
+
+    /* First-frame opt-in (snesgfx/drawable.h). Everything this layer's first visible frame shows
+       was painted above under force-blank: BG3's registers, CGRAM entries 0..3 written DIRECTLY
+       (entry 0 = LIFE_DEAD, so the backdrop is ours too), all LIFE_NTILES+1 chr tiles zeroed, and
+       the complete 32x32 tilemap with everything outside the box on the zeroed blank tile. Frame 1
+       is therefore the all-dead grid; _life_emit() only streams live cells in from frame 2 on.
+       NOTE: this demo also adds a TitleLayer, which does NOT assert (its emit owns CGRAM[0] — see
+       docs/plans/2026-09-14-display-first-frame-optin.md 2e), so the scene-wide AND is 0 today and
+       display_frame() behaves exactly as before. This assertion is the enabling half. */
+    l->base.first_frame_complete = 1;
 }
 
 static void _life_emit(Drawable *d, UploadQueue *q) {

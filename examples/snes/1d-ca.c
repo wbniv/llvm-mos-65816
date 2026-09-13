@@ -80,6 +80,17 @@ static void _cad_reserve(Drawable *d, VramAlloc *va) {
             REG_VMDATA = (uint16_t)(r * 32u + c);
 
     d->tm_bits = TM_BG3;
+
+    // First-frame opt-in (snesgfx/drawable.h). Everything this layer's first visible frame shows
+    // was painted above under force-blank: BG3's registers and both scroll latches, ALL 1024 chr
+    // tiles zeroed (dead cells everywhere), the complete 32x32 identity tilemap, and CGRAM entries
+    // 0..3 of palette 0 written DIRECTLY — entry 0 included, so even the backdrop is ours.
+    // _cad_emit() adds nothing frame 1 needs: the scroll it queues is the 0 already latched here,
+    // and the tile-row DMA and the palette push are both behind dirty flags that start clear.
+    // NOTE: this demo also adds a TitleLayer, which does NOT assert (its emit owns CGRAM[0] — see
+    // docs/plans/2026-09-14-display-first-frame-optin.md 2e), so the scene-wide AND is 0 today and
+    // display_frame() behaves exactly as before. This assertion is the enabling half.
+    d->first_frame_complete = 1;
 }
 
 static void _cad_emit(Drawable *d, UploadQueue *q) {

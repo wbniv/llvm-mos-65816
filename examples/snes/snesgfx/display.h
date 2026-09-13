@@ -6,7 +6,11 @@
  *     This is the ONLY force-blank in snesgfx — the console powers on blanked, drawables do their
  *     bulk VRAM setup inside that window, and the first display_frame() releases it. It is never
  *     re-asserted: blanking mid-run to widen the DMA window blanks the top of the picture if the
- *     transfer overruns v-blank, which is a visible flicker. Clear the screen instead;
+ *     transfer overruns v-blank, which is a visible flicker. Clear the screen instead.
+ *     The release sits at the END of display_frame(), behind scene_emit(), so an expensive first
+ *     emit() grinds with the screen still off. A scene in which EVERY drawable asserts
+ *     Drawable.first_frame_complete opts out of that: its first display_frame() skips scene_emit()
+ *     and is release-only. See `ff_all` below and drawable.h's contract;
  *   - the access window: the queue flushes (DMA) only inside the v-blank display_frame waits for,
  *     and only up to UPQ_VBLANK_BUDGET bytes of it.
  * The client constructs a Display, hands it drawables, and calls display_frame() — no bare
@@ -28,6 +32,8 @@ typedef struct {
   uint8_t     tm;      /* TM ($212C) shadow — TM is WRITE-ONLY, so we never read-modify-write it */
   uint8_t     shown;   /* boot force-blank released yet? (set by the first display_frame) */
   uint8_t     late_add;/* 1 = a display_add arrived after `shown` — see display_add()      */
+  uint8_t     ff_all;  /* 1 = EVERY added drawable asserted first_frame_complete (AND, in    */
+                       /* display_add). Gates the early blank release in display_frame().    */
   uint8_t     bright;  /* current INIDISP master brightness 0..15 (the post-flush value)          */
   uint8_t     btgt;    /* brightness target — display_frame ramps `bright` one step toward it      */
 } Display;
@@ -43,6 +49,7 @@ static inline void display_init(Display *d) {
   d->tm = 0;
   d->shown = 0;
   d->late_add = 0;
+  d->ff_all = 1;                            /* AND identity — display_add narrows it, never widens */
   d->bright = INIDISP_ON;                   /* default full brightness — the ramp is a no-op    */
   d->btgt   = INIDISP_ON;                   /* until a fade is requested (display_fade_to)        */
   REG_BGMODE   = BGMODE_1;                  /* BG1/BG2 4bpp, BG3 2bpp */
@@ -58,11 +65,21 @@ static inline void display_init(Display *d) {
    display_frame() releases it and it is never re-asserted, so a later display_add would write
    VRAM during active display and silently corrupt it. `late_add` records the violation rather
    than letting it pass unnoticed — all current demos call app_init (display_init + every
-   display_add, no frames) before title_begin, which is the shape that keeps this true. */
+   display_add, no frames) before title_begin, which is the shape that keeps this true.
+
+   This is also where the first-frame opt-in is tallied. drawable_reserve() has just run, so
+   `layer`'s first_frame_complete now holds that drawable's own answer; AND it into `ff_all`.
+   Computing it HERE rather than in display_frame() is deliberate: display_add runs once per
+   drawable for the life of the program, display_frame runs every frame — re-walking the Scene each
+   frame to recompute an answer that cannot change would put a loop in the per-frame path to serve
+   a one-shot decision. The AND is monotonic (0 absorbs), so a later display_add can only ever
+   revoke the early release, never grant it; in particular a `late_add` — which by definition
+   arrives after the blank is already released — cannot retroactively enable anything. */
 static inline void display_add(Display *d, Drawable *layer) {
   if (d->shown) d->late_add = 1;
   scene_add(&d->scene, layer);
   drawable_reserve(layer, &d->va);
+  d->ff_all = (uint8_t)(d->ff_all & layer->first_frame_complete);
   d->tm = (uint8_t)(d->tm | layer->tm_bits);
   REG_TM = d->tm;
 }
@@ -77,18 +94,40 @@ static inline void display_hide_layer(Display *d, Drawable *layer) {
 }
 
 /* One frame: build the queue, then flush it inside a FRESH v-blank.
-   NO force-blank. This used to bracket the flush in force-blank so an over-long DMA could not be
-   rejected — but a force-blank released after v-blank has already ended blanks the top scanlines
-   of the picture, which the viewer sees as a flicker at the top of the screen. The queue now
-   stays inside the window on its own (UPQ_VBLANK_BUDGET), so nothing needs blanking.
+   NO force-blank around the flush: a force-blank released after v-blank has already ended blanks
+   the top scanlines of the picture, which the viewer sees as a flicker at the top of the screen.
+   The queue instead stays inside the window on its own — upq_flush() spends at most
+   UPQ_VBLANK_BUDGET bytes and defers the rest to the next frame — so nothing needs blanking, and
+   the flush cannot overrun into active display.
    scene_emit() runs BEFORE snes_wait_vblank so it does not eat into the ~38-scanline v-blank
    window: it only touches WRAM (no PPU ports) so it is safe at any scanline.
    The RDNMI clear sits AFTER scene_emit deliberately — emit can be slow enough to span a
    v-blank, and consuming that stale flag would let the flush start in ACTIVE DISPLAY, which
    without force-blank means dropped/corrupt VRAM writes. Clearing here costs at most one frame
-   of latency and guarantees the flush begins at the top of a real v-blank. */
+   of latency and guarantees the flush begins at the top of a real v-blank.
+
+   THE FIRST-FRAME OPT-IN. The blank release is the last statement here, so on the FIRST call every
+   cycle scene_emit() spends is a cycle the screen stays off — even though display_add()'s contract
+   already had reserve() paint that frame's content inside the boot window. `ff_all` is 1 only when
+   every drawable in the scene asserted Drawable.first_frame_complete, i.e. every one of them
+   promises its first visible frame needs nothing from the queue. In that case the first call is
+   release-only — sync to a clean v-blank, flush an empty queue, drop the blank — and the
+   application's first emit() runs on the next call with the screen ON. Otherwise (the default,
+   and every scene holding even one non-asserting drawable) emit runs first, exactly as before.
+
+   Why a GUARD on the emit and not a reorder. dev/snes-display-quality.py enforces the four-token
+   order below — emit, then wait-for-v-blank, then flush, then the masked brightness write — which
+   is the encoded 1dd9317 lesson (a force-blank released after v-blank had already ended blanked
+   the top scanlines). Wrapping the emit in an `if` leaves all four tokens present and in order;
+   hoisting the release above the emit would not, and rewriting the guard that protects that exact
+   regression class is the wrong move. The gate adds no brightness/INIDISP write and removes none:
+   there is still exactly one, in the same place, with the same mask that makes the force-blank bit
+   unrepresentable. On the skipped frame it also strictly REDUCES the work done before the release
+   — the queue flushed is empty, the least possible DMA, so it cannot overrun the window. */
 static inline void display_frame(Display *d) {
-  scene_emit(&d->scene, &d->q);             /* build upload queue (WRAM only — any scanline) */
+  /* Release-only first frame iff the whole scene opted in — see the opt-in note above. */
+  if (d->shown || !d->ff_all)
+    scene_emit(&d->scene, &d->q);           /* build upload queue (WRAM only — any scanline) */
   (void)REG_RDNMI;                          /* discard any v-blank that elapsed during emit   */
   snes_wait_vblank();                       /* block until the next v-blank actually begins   */
   upq_flush(&d->q);                         /* DMA, budgeted to fit the window                */
