@@ -3,7 +3,7 @@
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/578",
     "remote_branch": "mos-coalesce-rotate-ac",
     "submitted_head": "edc9bbd23b718e03d5901f5c114885cfb1d8b277",
-    "proposed_head": "019af10c73780c676032fc0ad471f3310b2a0391",
+    "proposed_head": "3c04e895e16787b828c148c1dbe12a648e45f4f9",
     "publication": "awaiting Will approval"
   },
   "584": {
