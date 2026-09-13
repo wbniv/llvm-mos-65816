@@ -199,16 +199,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   a 20-second MAME backstop, and forwards `SMOKE_SECONDS` through `dev/run.sh`. Negative control at 60
   ticks: 42/63 (all ROMs present, the same 21 late kernels fail); acceptance: plain corpus 63/63; paired
   `corpus-a16` 62/62, 0 xfail. [plan](docs/plans/2026-08-06-corpus-mame-settle-and-build-freshness.md).
-- [wip T3] **Per-drawable "first frame is complete" opt-in for `snesgfx` Display.** <!-- agent:a7ce05a978d59d3ef --> The safe shape of the
-  rejected blanket fix ([plan](docs/plans/2026-08-05-display-first-frame-forceblank.md)): a `Drawable`
-  flag a `reserve()` sets to assert "I painted everything my first visible frame shows", with
-  `display_frame()` taking the early blank release only when **every** drawable in the scene asserts
-  it. Safe by default (no demo regresses), and drawables adopt it as their palettes move out of the
-  UploadQueue. Worth ~1 frame on most demos and more on any demo with an expensive first `emit()`, so
-  do it for the invariant, not the frames. Blocked on nothing; measure with `dev/bootblank.sh
-  --firstframe`, which is the gate that proved the blanket version unsafe.
-  Implementation [plan](docs/plans/2026-09-14-display-first-frame-optin.md).
-  (T3: design is written down in the plan; execution is one header plus per-drawable adoption. Rank CONFIRMED T3 by the coordinator 2026-08-05: the dangerous judgment was spent at T4 and is recorded; the `--firstframe` gate fences the remaining risk.)
 - [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
@@ -1188,6 +1178,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [display-first-frame-optin] Per-drawable first-frame opt-in shipped (compile-time `SNESGFX_FIRST_FRAME_OPTIN` gate, mandel-oop/life/1d-ca adopt it); non-adopters byte-identical. See [plan](docs/plans/2026-09-14-display-first-frame-optin.md).
 - ✅ 2026-09-14 — [maze-refold] `maze_fold_path` folds while walking `came[]` again (two-pass work-around removed); `-verify` clean ×3, CRC `0x0749` held. See [plan](docs/plans/2026-09-14-maze-refold.md).
 - [x] 2026-07-26 — [build-loop-continue] `dev/build.sh` example loop continue-on-error + end-of-run failure list (`8a73e6a`); item closed 2026-09-14 on finding it already shipped. See [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
 - [x] 2026-09-14 — [a16-newton-step-rc-undef] Superseded: cause #1 FIXED 2026-06-30 (`f1af264`, shouldCoalesce), cause #2 DECIDED 2026-09-13 (upstream issue, ready to post). See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
