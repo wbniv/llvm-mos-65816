@@ -445,17 +445,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
   [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
   [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
-- [T4] **#321 `a16-newton-step-rc-undef` MachineVerifier false-positive — investigate root cause.**
-  `+mos-a16 -Os` compilation of `newton_step()` (6 simultaneous `int16_t×int16_t→int32_t` temps) triggers
-  "Bad machine code: Using an undefined physical register" from `-verify-machineinstrs` for a COPY of ZP-pair
-  `$rc3` into `$x`. The code **runs correctly** (5-way differential PASS on real hardware and both emulators);
-  the verifier reports a use-before-def for a physreg that the register allocator materialized via a
-  COPY without a visible def point. Hypothesis: RA ZP-pair allocation loses track of def points for
-  COPY-materialized physreg copies under high-pressure (>6 simultaneous `Imag16` temps). Currently tracked
-  as `KNOWN_ISSUES["a16-newton-step-rc-undef"]` in `tools/a16_fuzz.py` + newton_sim XFAIL.
-  **Investigation entry point:** cvise-reduce `examples/snes/corpus/newton_sim.c` to the minimal
-  `-verify-machineinstrs` crash, then find the RA def-tracking gap. Fix if clean (→ drop XFAIL, promote
-  newton_sim to positive gate). Opened: 2026-06-27.
 - [x] **#321 16-bit ALU chain extensions** (DONE — add/bitwise chains shipped; SUB moot; multi-value pressure characterized + DEFER confirmed with data.) (extends Inc 1c, which fused add-chains only). Done:
   ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
   `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
@@ -1210,6 +1199,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-09-14 — [a16-newton-step-rc-undef] Superseded: cause #1 FIXED 2026-06-30 (`f1af264`, shouldCoalesce), cause #2 DECIDED 2026-09-13 (upstream issue, ready to post). See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
 - [x] 2026-09-13 — [rc-undef-cause2] DECIDED: no downstream fix, escalate upstream; issue body gains a pre-RA/SplitKit analysis (suspect: LiveIntervals subrange liveness across an undef partial def), repro re-verified (2 errors), READY TO POST. See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
 - [x] 2026-08-05 — [display-first-frame] mandel-oop post-title force-blank 11 → 5 (budget 12 → 6); the blanket `display_frame()` fix was MEASURED UNSAFE (119/122 demos palette from the first emit) and rejected. See [plan](docs/plans/2026-08-05-display-first-frame-forceblank.md).
 - [x] 2026-08-05 — [m7blank-coverage] All twelve splash demos measured (`2dc7647`): lzss-gallery cfg fix, video-reel real corpus, seamdemo pure-Python gen, apollo-reel shape-faithful stub; 12-demo gate PASS, original eight byte-identical.
