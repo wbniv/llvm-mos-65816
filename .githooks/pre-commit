@@ -13,12 +13,10 @@ if [[ -n "$shared_hooks" ]]; then
     fi
 fi
 
-# --staged: judge what this commit will contain (staged blobs + HEAD), never the
-# dirty worktree. On this shared checkout the old whole-tree scan meant one
-# concurrent worker's unstaged file blocked everyone's commits, so the
-# SNESDQ_SKIP escape hatch it shipped with was used in 40 of 100 commits --
-# a gate bypassed that often is not a gate. The hatch is gone; if this fails,
-# the finding is in YOUR commit. Register a reviewed site with
+python3 "$repo_root/dev/check-comment-history.py"
+
+# --staged: judge the staged blobs and HEAD, not concurrent unstaged work.
+# Register a reviewed display access site with
 # `dev/snes-display-quality.py --update-baseline` (and review the diff).
 # CI keeps the whole-tree scan, where the tree really is the commit.
 exec "$repo_root/dev/snes-display-quality.py" --staged
