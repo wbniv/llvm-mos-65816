@@ -189,4 +189,36 @@ fatal error: error in backend: Found 2 machine code errors.
 ```
 
 Two errors at `-Os` (and at `-O1`/`-O2`); **clean at `-O0` and `-Oz`**. Re-confirmed
-byte-for-byte on 2026-08-04 against the current fork toolchain.
+byte-for-byte on 2026-08-04 and again on 2026-09-13 against the current fork toolchain.
+
+---
+
+## Update 2026-09-13: the copy that loses the lane is RA-inserted, and SplitKit is not the culprit
+
+Pre-RA (`-print-before=greedy`), the value is a single original vreg with this shape:
+
+```
+bb.2:  480B  undef %207.sublo:imag16 = COPY %91.subhi:imag16        ; subhi undef here
+       720B  CmpBrZeroMultiByte %bb.4, 1, %207.sublo:imag16, ...     ; branch: bb.4 skips 784B
+bb.3:  784B  %207.subhi:imag16 = COPY %18.subhi:imag16               ; subhi defined on this path only
+...   3472B  CmpBrImag16 %bb.12, undef $z, 1, %32:imag16, %207:imag16 ; full 16-bit use, both paths merge
+      4144B  CmpBrImag8 %bb.4, undef $z, 1, %320:gpr, %207.sublo:imag16
+```
+
+There is no full-pair copy of `%207` before register allocation, and the highest pre-RA vreg is
+`%327`, so `%371`, `%375`, `%376` and `%378` are all created by greedy. `SplitEditor::defFromParent`
+copies only the lanes of the *original* interval's subranges that are live at the split point
+(`SplitKit.cpp`, `LaneMask |= S.LaneMask` for `S.liveAt(UseIdx)`), and it did narrow the 712B copy to
+`sublo`. The full-pair copy four slots later at 716B therefore means LiveIntervals reported
+`%207.subhi` live at 716B, on a path where the only reaching definition of that lane is the
+`undef` partial def at 480B. The earlier read-side tracer saw the same thing from the other end (the
+subrange value reaching the read is a PHI-def).
+
+So the rewriter and SplitKit both behave correctly for the liveness they are handed; the suspect
+is how the `subhi` subrange is extended across the `undef`-flagged partial def when the 784B value
+and the undef path merge before the full use at 3472B (`LiveRangeCalc::findReachingDefs` /
+`updateSSA` with the `Undefs` slots from `computeSubRangeUndefs`). A fix at that layer would make
+the 716B copy narrow to `sublo`, leave `%376.subhi` with no subrange, and let the rewriter's
+existing `readsUndefSubreg` mark the 736B read `undef`. Downstream we have not attempted this:
+it is generic sub-register liveness, and the failure mode of getting it wrong is a silent
+miscompile rather than a verifier message.

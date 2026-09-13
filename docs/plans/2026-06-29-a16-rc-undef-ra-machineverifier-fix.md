@@ -1,8 +1,14 @@
 # `a16-*-rc-undef` — fix the `$x = COPY $rcN` "undefined physical register" MachineVerifier failure
 
 **Status:** CAUSE #1 FIXED + SHIPPED (2026-06-30, commit `f1af264`; newton demo rebuilt + deployed to
-[biohack.net/snes/newton/](https://biohack.net/snes/newton/), tag `v1.0.146`). **CAUSE #2 — IN PROGRESS**
-(RA-interference fix, `throwaway/rc-undef-fix` worktree). The single `rc-undef` symptom turned out to be
+[biohack.net/snes/newton/](https://biohack.net/snes/newton/), tag `v1.0.146`). **CAUSE #2 — DECIDED
+2026‑09‑13: no downstream fix; escalate upstream.** The `[T5]` residual ("attempt the toolchain-wide fix or
+not") was resolved against attempting it: every witness is code-correct, three read-side attempts below all
+failed on the same loop-merge, and a fresh pre-RA/SplitKit analysis (recorded in the
+[issue body](../upstream-rc-undef-ra-pure-virtual-issue.md), "Update 2026‑09‑13") moves the suspect layer
+into LiveIntervals' sub-register liveness across an `undef` partial def, where a wrong downstream patch is a
+silent miscompile. The issue is ready to post (user-triggered); XFAILs stay. (Earlier status: IN PROGRESS on
+the `throwaway/rc-undef-fix` worktree, since torn down.) The single `rc-undef` symptom turned out to be
 **two distinct defects** sharing the same MachineVerifier error. Both were proven with an **asserts
 toolchain** (`build/llvm-mos-asserts`, `-debug-only=regalloc` join traces) on a lifted minimal repro
 (`examples/65816/rcundef.c` = `newton_step`).

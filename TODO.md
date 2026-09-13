@@ -199,33 +199,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   a 20-second MAME backstop, and forwards `SMOKE_SECONDS` through `dev/run.sh`. Negative control at 60
   ticks: 42/63 (all ROMs present, the same 21 late kernels fail); acceptance: plain corpus 63/63; paired
   `corpus-a16` 62/62, 0 xfail. [plan](docs/plans/2026-08-06-corpus-mame-settle-and-build-freshness.md).
-- [T5] **Backend: `rc-undef` cause #2 (item 13) — SECOND MANIFESTATION found + MISDIAGNOSIS
-  corrected (2026-08-02).** (Re-ranked T3→T5 2026-08-04: the evidence is folded into the item-13
-  issue body (`412fe4e`, repro re-verified — same 2 errors, slots 736B/1480B now recorded); the
-  residual is the decide-whether-to-attempt-the-toolchain-wide-fix judgment — user-consulted.) The `seqvm.c draw_frame` trip is NOT a premature kill flag (that
-  was the initial read of the physical MIR, filed as T4). Vreg-level MIR settles it: the value
-  is built with the `undef %N.sublo:imag16 = COPY …` idiom, so its HIGH lane is undefined **by
-  construction** — `480B undef %371.sublo = COPY %91.subhi` → `712B undef %375.sublo = COPY
-  %371.sublo` → `716B %376 = COPY %375` → `736B %378 = COPY %376.subhi` reads a lane nothing
-  ever defined. The `$rc3` kill at 480B is legitimate (that vreg's use really ends there); the
-  later physical `$rc3` read is a *different* vreg's undef lane that RA put in the same
-  register, and the `undef` flag is lost when the pair COPY's high-lane copy is elided during
-  rewriting. **So: same family as status-doc item 13** (rc-undef-ra-pure-virtual), but a new
-  consequence — item 13's read is DEAD, this one FEEDS A STORE (`STAbs %378, %stack.2+1`).
-  **Code-correct** (the compiler itself declared the lane a don't-care, and `dev/run.sh seqvm`
-  passes `0xE8C5`), so verifier-noise, not miscompile — the T4 "miscompile potential" framing
-  is withdrawn. Ruled out: sub-register liveness (`-mllvm -enable-subreg-liveness` leaves both
-  errors). Fix direction unchanged from item 13: propagate `undef` onto the physreg read (or
-  materialize the lane) — toolchain-wide, needs the full regression sweep, hence still filed
-  rather than patched. Repro: `mos-clang --config mos-snes.cfg -mcpu=mosw65816 -Xclang
-  -target-feature -Xclang +mos-a16 -Os -fno-lto -mllvm -verify-machineinstrs -c
-  examples/snes/seqvm.c` (2 errors: `$rc3` bb.2, `$rc5` bb.5; clean at `-O0`/`-Oz`).
-  ~~Folded into the item-13 issue body 2026-08-04~~ — [issue
-  body](docs/upstream-rc-undef-ra-pure-virtual-issue.md) now carries the vreg chain, the
-  store-consumer delta, the withdrawn misdiagnosis, the ruled-out `-enable-subreg-liveness`,
-  and the repro re-verified against the current toolchain (2 errors at `-Os`, clean
-  `-O0`/`-Oz`); status-doc row 13 updated, issue **NOT POSTED** (filing is user-triggered).
-  (T3: **residual = decide whether to attempt the toolchain-wide fix** — nothing else open.)
 - [T3] **Per-drawable "first frame is complete" opt-in for `snesgfx` Display.** The safe shape of the
   rejected blanket fix ([plan](docs/plans/2026-08-05-display-first-frame-forceblank.md)): a `Drawable`
   flag a `reserve()` sets to assert "I painted everything my first visible frame shows", with
@@ -1237,6 +1210,7 @@ revisit) rather than active work._
 
 
 ## Done
+- [x] 2026-09-13 — [rc-undef-cause2] DECIDED: no downstream fix, escalate upstream; issue body gains a pre-RA/SplitKit analysis (suspect: LiveIntervals subrange liveness across an undef partial def), repro re-verified (2 errors), READY TO POST. See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
 - [x] 2026-08-05 — [display-first-frame] mandel-oop post-title force-blank 11 → 5 (budget 12 → 6); the blanket `display_frame()` fix was MEASURED UNSAFE (119/122 demos palette from the first emit) and rejected. See [plan](docs/plans/2026-08-05-display-first-frame-forceblank.md).
 - [x] 2026-08-05 — [m7blank-coverage] All twelve splash demos measured (`2dc7647`): lzss-gallery cfg fix, video-reel real corpus, seamdemo pure-Python gen, apollo-reel shape-faithful stub; 12-demo gate PASS, original eight byte-identical.
 - [x] 2026-08-05 — [splash-dead-code] "Finish the conversion" premise false — splash.h/splash16 had ZERO consumers (superseded b6ef256/8ac159f); surface deleted, docs de-staled. See [plan](docs/plans/2026-08-05-splash16-forceblank-conversion.md).
