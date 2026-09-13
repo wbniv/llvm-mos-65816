@@ -11,6 +11,13 @@
 //
 // No far pointers → all state in bank-0 WRAM → 5-way differential bar.
 // See docs/plans/2026-06-27-6-snes-rule90-110-1d-ca.md.
+/* Opt in to the snesgfx per-drawable first-frame release BEFORE any snesgfx header: every drawable
+   in this demo's scene asserts Drawable.first_frame_complete, so display_frame() skips the first
+   scene_emit() and the screen comes up showing reserve()'s content. Must precede the includes --
+   the macro controls whether the field and the gate exist at all.
+   See docs/plans/2026-09-14-display-first-frame-optin.md. */
+#define SNESGFX_FIRST_FRAME_OPTIN 1
+
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/drawable.h"

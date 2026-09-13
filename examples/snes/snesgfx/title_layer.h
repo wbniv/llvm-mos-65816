@@ -304,6 +304,16 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
   REG_BG2SC   = SNES_BGSC(TITLE_MAP_WORD, 0);
   REG_BG12NBA = (uint8_t)(((TITLE_CHR_WORD >> 12) & 0x0Fu) << 4);
 
+#if SNESGFX_FIRST_FRAME_OPTIN
+  /* The backdrop. CGRAM[0] is what the title's own blank tilemap shows everywhere, and _title_emit
+     owns it (it pushes `t->back`, which title_begin starts at 0) — so without this write the first
+     visible frame would read power-on CGRAM and reserve() could not honestly assert
+     first_frame_complete below. Writing it black here matches emit's first value exactly, so the
+     picture is unchanged; only its determinism improves. Under the opt-in macro only, so a demo
+     that has not opted in keeps a byte-identical ROM. */
+  REG_CGADD  = 0u;
+  REG_CGDATA = 0x00; REG_CGDATA = 0x00;
+#endif
   REG_CGADD  = (uint8_t)(TITLE_PAL * 16u);
   REG_CGDATA = 0x00; REG_CGDATA = 0x00;   /* colour 0 = black (transparent on BG)       */
   REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;   /* colour 1 = white ink (BGR555 0x7FFF, animated) */
@@ -372,6 +382,15 @@ static void _title_reserve(Drawable *d, VramAlloc *va) {
   hscrolldb_arm(TITLE_HDMA_CHAN_HOFS, HSCROLL_BG2HOFS, &t->hscroll);
 
   t->base.tm_bits = TM_BG2;
+
+#if SNESGFX_FIRST_FRAME_OPTIN
+  /* First-frame opt-in (drawable.h). Everything this layer's first visible frame shows was painted
+     above under force-blank: BG2's registers, the complete chr set (both fonts), the whole tilemap
+     cleared to transparent plus both text lines, palette 7 entries 0..2, CGRAM[0] (just above), and
+     buffer 0 of each HDMA double-buffer with both channels armed on it. _title_emit() only advances
+     the animation from frame 2 on. */
+  d->first_frame_complete = 1;
+#endif
 }
 
 /* ── emit ─────────────────────────────────────────────────────────────────────────────────────── */

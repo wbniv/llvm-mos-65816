@@ -5,7 +5,7 @@ TODO entry: `[wip T3] Per-drawable "first frame is complete" opt-in for snesgfx 
 Direct successor to [`2026‑08‑05-display-first-frame-forceblank.md`](2026-08-05-display-first-frame-forceblank.md),
 which built and **rejected** the blanket form of this change (Option F: make the first
 `display_frame()` release‑only for every demo) and closed with the recommendation this plan
-implements verbatim:
+implements:
 
 > the shape that would work is a per-drawable opt-in — a `Drawable` flag a `reserve()` sets to
 > assert "I painted everything my first frame shows", with `display_frame` taking the early release
@@ -32,21 +32,73 @@ CGRAM — random at bsnes-jg's default entropy, i.e. a visible one-frame garbage
 
 Moving those palettes out of the queue is a change to the `reserve()`/`emit()` split snesgfx
 deliberately chose, across 119 demos. That is the **escalation boundary** and this work does not
-cross it. Instead the optimisation becomes opt-in, per drawable, and defaults off.
+cross it. Instead the optimisation becomes opt-in, twice over — per drawable and per demo — and
+defaults off in both.
 
 ## 2. Design
 
-### 2a. `drawable.h` — the flag and its default
+### 2a. `SNESGFX_FIRST_FRAME_OPTIN` — the compile-time gate, and why it is mandatory
+
+The first cut of this change was **runtime-only**: the field, the AND and the guard compiled into
+every `Display` demo unconditionally, with correctness carried entirely by the per-drawable flag.
+It was behaviourally invisible — 117/117 demos identical in boot-window length and in first-frame
+determinism — and it was still the wrong shape. Totalled from the two trees' link maps across the
+121 demos that produce one:
+
+```
+net .text:  +4,823 bytes
+median:     +39 per demo
+117 of 121 grow; only 4 shrink
+  (mandel-oop -44 from the deleted latch, modexp256 -35, cordic -34, hdr-bloom -4)
+largest:    montorbit +118, life +97, qsortviz +84
+```
+
+Against that, the gate fired on **one** demo — `mandel-oop`, which already had its five frames from
+a demo-local latch. The runtime-only shape therefore charged ~40 bytes to ~117 demos to buy nothing
+yet, which is exactly the pattern `CLAUDE.md` lesson 3 forbids: *a blanket change that regresses
+common shapes to win a sub-case is wrong; gate it.* Lesson 3's other half — that a few bytes matter
+here because the toolchain multiplies them across every program built — cuts both ways: it is
+precisely why spending them for nothing is not a rounding error.
+
+So the feature is **opt-in at compile time as well as per drawable**. A demo that wants it defines
+
+```c
+#define SNESGFX_FIRST_FRAME_OPTIN 1   /* BEFORE any snesgfx header */
+```
+
+and `drawable.h` defaults it to 0 for everyone else. Every line the feature adds — the `Drawable`
+field and its clearing in `drawable_reserve`, `Display.ff_all` and its initialisation, the AND in
+`display_add`, the guard in `display_frame`, and `title_layer.h`'s backdrop write — sits inside
+`#if SNESGFX_FIRST_FRAME_OPTIN`, so a non-adopting demo preprocesses to the code it compiled before
+the feature existed. That is **checked with `cmp` on the emitted ROM**, not asserted: §5 step 2.
+
+Two consequences worth stating:
+
+- **A false assertion is a compile error, not a silent no-op.** A `reserve()` that assigns
+  `first_frame_complete` in a translation unit that did not define the macro fails to build,
+  because the field is not there. That is the right failure — the claim is meaningless without the
+  machinery that reads it, and a silently ignored assertion would be worse than a diagnostic.
+- **The four-token order the quality checker enforces survives both configurations.** The guard is
+  an `#if`-wrapped `if (...)` sitting *above* a single unconditional
+  `scene_emit(&d->scene, &d->q);`, so all four tokens appear once each and in order in the raw file
+  — which is what `dev/snes-display-quality.py` scans — and with the macro off the preprocessor
+  leaves the bare call exactly as it always was.
+
+### 2b. `drawable.h` — the flag and its default
 
 ```c
 struct Drawable {
   const DrawableVT *vt;
   uint8_t tm_bits;
-  uint8_t first_frame_complete;   /* the opt-in */
+#if SNESGFX_FIRST_FRAME_OPTIN
+  uint8_t first_frame_complete;
+#endif
 };
 
 static inline void drawable_reserve(Drawable *d, VramAlloc *va) {
+#if SNESGFX_FIRST_FRAME_OPTIN
   d->first_frame_complete = 0;    /* opt-in is OFF unless this reserve() asserts it */
+#endif
   d->vt->reserve(d, va);
 }
 ```
@@ -63,7 +115,7 @@ immediately before dispatch makes the default independent of storage class and i
 (static, automatic, designated initialiser, `memset`, ad-hoc): no drawable can opt in by accident,
 only by an explicit store in its own `reserve()`.
 
-### 2b. `display.h` — where the AND is computed, and why
+### 2c. `display.h` — where the AND is computed, and why
 
 `Display` gains `uint8_t ff_all`, initialised to **1** (the AND identity) in `display_init()` and
 narrowed in `display_add()`, right after `drawable_reserve()` has run:
@@ -79,12 +131,14 @@ one-shot decision. The AND is monotonic (0 absorbs), so a later `display_add` ca
 the early release, never grant it — the safe direction — and in particular a `late_add` (one that
 by definition arrives after the blank is already released) cannot retroactively enable anything.
 
-### 2c. The gate — a guard, never a reorder
+### 2d. The gate — a guard, never a reorder
 
 ```c
 static inline void display_frame(Display *d) {
+#if SNESGFX_FIRST_FRAME_OPTIN
   if (d->shown || !d->ff_all)
-    scene_emit(&d->scene, &d->q);
+#endif
+  scene_emit(&d->scene, &d->q);
   (void)REG_RDNMI;
   snes_wait_vblank();
   upq_flush(&d->q);
@@ -110,10 +164,10 @@ cannot overrun the window).
 > **Comment-text gotcha, found the hard way.** `snes-display-quality.py` matches the four tokens
 > with `display.find(token)` over the **raw file**, comments included. A comment that quotes
 > `snes_wait_vblank();` or `REG_INIDISP = (uint8_t)(d->bright & 0x0Fu);` *above* `display_frame`
-> puts those tokens out of order and fails the gate. The new comment block therefore describes the
+> puts those tokens out of order and fails the gate. The comment blocks therefore describe the
 > order in prose instead of quoting the calls.
 
-### 2d. Which drawables adopt it
+### 2e. Which drawables adopt it
 
 Qualification was read out of the code, not guessed: a drawable qualifies only if its `reserve()`
 writes **the layer registers, the whole tilemap it can show, the chr those entries index, and the
@@ -125,129 +179,163 @@ that touch CGRAM at all, and two of those turned out not to qualify:
 | `MandelLayer` (`mandel-oop.c`) | yes — `load_palette_cgram()` | Mode 7 map cleared + identity, chr rows DMA'd | **adopts** |
 | `CaDisplay` (`1d-ca.c`) | yes — CGRAM 0..3 incl. backdrop | full 32×32 identity map, all 1024 chr tiles zeroed | **adopts** |
 | `LifeGrid` (`life.c`) | yes — CGRAM 0..3 incl. backdrop | full 32×32 map, chr zeroed | **adopts** |
+| `TitleLayer` (`snesgfx/title_layer.h`) | palette 7 entries 0..2 — **plus CGRAM[0] under the macro** | yes | **adopts (macro-gated)** |
 | `BfHud` (`bf-vm.c`) | **no** (the word only appears in a comment) | yes | no — blank tile indexes power-on CGRAM[0] |
 | `TextGrid` (`cpu6502.c`) | yes, CGRAM 0..15 | **no** — the tilemap arrives from `_tg_emit`'s DMA | no |
-| `TitleLayer` (`snesgfx/title_layer.h`) | palette 7 entries 0..2 only | yes | **left out — see §2e** |
 | everything else (`BitmapCanvas`, `TextLayer`, `SpriteSet`, 14 demo-local) | no | — | no |
+
+**`TitleLayer` needed two lines to qualify, and gets them under the macro.** `_title_reserve` is
+otherwise complete — full chr, full tilemap, both text lines, HDMA buffers armed — but the CGRAM it
+writes is palette 7 entries 0..2 (`TITLE_PAL == 7`), while its `emit()` writes
+`upq_push_cgram(q, 0u, &t->back, ...)`: **CGRAM[0], the global backdrop**, which its own blank
+tilemap shows everywhere. Writing CGRAM[0] black in `reserve()` makes the claim true; it matches the
+value `title_begin()` starts `t->back` at, so the picture is unchanged and only its determinism
+improves. Because it sits under `#if SNESGFX_FIRST_FRAME_OPTIN`, the ~120 demos that include
+`title_layer.h` without opting in are byte-for-byte untouched — which is the whole reason this
+could be bundled here rather than deferred.
+
+That in turn is what lets `1d-ca` and `life` fire the gate at all: their scenes are
+`{demo drawable, TitleLayer}`, so both halves of the AND had to assert.
 
 `mandel-oop` also **loses its demo-local workaround.** `_mandel_emit` carried an Option J
 `first_emit_done` latch that skipped the first `build_step()`. With the shared gate that latch is
 not merely redundant, it is *wrong*: the gate skips the first `emit()` entirely, so the latch would
 not be consumed until frame 2 and would swallow frame 2's compute as well — costing back the frame
-the gate just won. It is removed, and its comment block is replaced by a pointer to the shared
+the gate just won. It is removed, and its comment block replaced by a pointer to the shared
 mechanism that superseded it.
 
-### 2e. Why `TitleLayer` is left out (and what would qualify it)
+### 2f. What the macro costs the adopters
 
-`_title_reserve` is otherwise complete — full chr, full tilemap, both text lines, HDMA buffers
-armed — but the CGRAM it writes is **palette 7 entries 0..2** (`TITLE_PAL == 7`). Its `emit()`
-writes `upq_push_cgram(q, 0u, &t->back, ...)`: **CGRAM[0], the global backdrop**, which its own
-blank tilemap shows everywhere. So `reserve()` does not paint everything the first visible frame
-shows, and by the letter of the contract it must not assert.
-
-In practice `title_begin()` sets `d->bright = 0` before the first `display_frame()`, so that frame
-is black regardless of CGRAM — but that is a `Display` fact, not a drawable-level one, and the flag
-is a claim about the drawable. Two lines in `_title_reserve` writing CGRAM[0] black would make the
-claim true and unlock the gate for `1d-ca` and `life` (~1 frame each). That touches a header ~120
-demos include, for 2 frames, so it is recorded as a follow-up rather than bundled here. §5 step 6
-measures it on a scratch build so the follow-up starts with evidence rather than a hypothesis.
-
-Consequence to be explicit about: **the gate does not fire for `1d-ca` or `life` today**, because
-their scenes also hold a `TitleLayer`. Their flags are true statements that currently only
-contribute to an AND that another drawable clears — which is exactly the intended "safe by
-default" behaviour, and the enabling half of the follow-up.
-
-### 2f. Known cost: the ROM is not byte-identical for non-adopting demos
-
-The gate is a runtime test, so its code is compiled into **every** `Display` demo. Behaviour for a
-scene with any non-asserting drawable is identical, but the bytes are not. This is measured and
-reported in §5 step 4 rather than claimed away; behavioural safety is instead evidenced by steps 2
-and 3 (`--firstframe` determinism unchanged; boot force-blank frame counts unchanged for every
-non-adopting demo).
+Only the three adopting demos pay anything, and the numbers are in §5 step 2: `mandel-oop`
+**−44 bytes** (the deleted latch more than pays for the gate), `1d-ca` **+71**, `life` **+97**.
+Everyone else is byte-identical. `life` buys one frame with its 97 bytes; `1d-ca` buys zero frames
+(its first `_cad_emit` is a queued scroll write and two already-clear dirty flags, well under a
+frame) and buys the invariant only — recorded plainly here so the coordinator can drop `1d-ca` if
+the invariant is not judged worth 71 bytes in that one demo.
 
 ## 3. Files
 
-- `examples/snes/snesgfx/drawable.h` — `first_frame_complete` field, the contract comment,
-  `drawable_reserve()` clears it before dispatch.
+- `examples/snes/snesgfx/drawable.h` — the `SNESGFX_FIRST_FRAME_OPTIN` default, the
+  `first_frame_complete` field, the contract comment, `drawable_reserve()` clearing it before
+  dispatch. All macro-gated.
 - `examples/snes/snesgfx/display.h` — `ff_all` field, init to 1, AND in `display_add`, the
-  `if (d->shown || !d->ff_all)` guard in `display_frame`, header + `display_frame` comments.
-- `examples/snes/mandel-oop.c` — assert in `_mandel_reserve`; remove the Option J
+  `if (d->shown || !d->ff_all)` guard in `display_frame`, header + `display_frame` comments. All
+  macro-gated.
+- `examples/snes/snesgfx/title_layer.h` — macro-gated CGRAM[0] backdrop write + assertion in
+  `_title_reserve`.
+- `examples/snes/mandel-oop.c` — define the macro; assert in `_mandel_reserve`; remove the Option J
   `first_emit_done` latch from `_mandel_emit` and the struct.
-- `examples/snes/1d-ca.c` — assert in `_cad_reserve`.
-- `examples/snes/life.c` — assert in `_life_reserve`.
-- `docs/plans/2026-09-14-display-first-frame-optin.md` (this file), `TODO.md`.
+- `examples/snes/1d-ca.c`, `examples/snes/life.c` — define the macro; assert in `_cad_reserve` /
+  `_life_reserve`.
+- `dev/snes-display-quality-baseline.json` — one new reviewed direct-PPU site (the backdrop write).
+- `docs/plans/2026-09-14-display-first-frame-optin.md` (this file), `docs/agent-handoff.md`,
+  `TODO.md`.
 
 ## 4. Verification steps
 
 Run from the worktree `/home/will/llvm-mos-65816-dispoptin` (branch `wt/display-first-frame-optin`),
-which shares `main`'s prebuilt toolchain by hardlink per
-[`howto-feature-worktree.md`](../howto-feature-worktree.md).
+with a second detached worktree `/home/will/llvm-mos-65816-dispoptin-base` at the same `main` tip
+`22f18cb` supplying the "before" half. Both share `main`'s prebuilt toolchain by hardlink per
+[`howto-feature-worktree.md`](../howto-feature-worktree.md), so before and after use the same
+compiler, the same harness and the same commit, and the two sweeps run concurrently.
 
-1. `python3 dev/snes-display-quality.py` — the `display_frame` order invariant and the upload
-   budgets still hold, no new sensitive-access findings. Plus whatever `task --list` wraps it in.
-2. `dev/bootblank.sh --firstframe` over all `Display` demos, **before and after**: every demo that
-   did not adopt must be unchanged, every adopting demo must have a byte-identical first visible
-   frame across the two default-entropy runs, and there must be **zero new** nondeterministic
-   demos (`mandel-oop`'s splash-window entry is a documented pre-existing instrument artifact).
-3. `dev/bootblank.sh` boot force-blank frame counts, before and after: unchanged for every
-   non-adopting demo; `-1` or better for the adopters.
-4. ROM identity: build every `Display` demo before and after, `sha256` table, and report exactly
-   which demos changed (see §2f — this step records the real answer, it does not assume one).
-5. `dev/run.sh mandel-oop` — the adopting demo's own differential/fidelity gate: corpus `0x204F`,
-   exactly 1 indirect dispatch.
-6. Scratch measurement for the §2e follow-up (not landed): with `_title_reserve` additionally
-   writing CGRAM[0] black and asserting the flag, `dev/bootblank.sh --firstframe 1d-ca life` must
-   stay deterministic and `dev/bootblank.sh 1d-ca life` must drop a frame — evidence that
-   `CaDisplay`/`LifeGrid`'s assertions are sound and that the follow-up is worth doing. Reverted
-   before commit.
+1. `python3 dev/snes-display-quality.py` (and `task snes-display-quality`) — the `display_frame`
+   order invariant and the upload budgets still hold in both macro configurations; any new
+   direct-PPU site is reviewed and registered, with the baseline diff shown by id, not by line.
+2. **ROM byte identity.** Build every `Display` demo in both trees and `cmp` the `.sfc` files (not
+   just sizes): every demo that does not define `SNESGFX_FIRST_FRAME_OPTIN` must be byte-identical.
+   List the adopters' `.text` deltas.
+3. `dev/bootblank.sh --firstframe` over all `Display` demos, before and after: **zero new**
+   nondeterministic demos, adopters deterministic.
+4. `dev/bootblank.sh` boot force-blank frame counts before and after (unchanged for every
+   non-adopter; adopters' gains), plus `dev/m7blank.sh --probe mandel-oop` — which must stay
+   `239..243 = 5` **with the Option J latch deleted** — and `dev/m7blank.sh --gate` for the whole
+   splash set.
+5. `dev/run.sh mandel-oop`, `dev/run.sh life`, `dev/run.sh 1d-ca` — each adopter through its own
+   differential gate.
 
 ## 5. Verification run — 2026-09-14, `wt/display-first-frame-optin`
 
-Both sides measured on **two hardlink worktrees off the same `main` tip `22f18cb`** — the feature
-tree `/home/will/llvm-mos-65816-dispoptin` and a detached baseline tree
-`/home/will/llvm-mos-65816-dispoptin-base` — so "before" and "after" are the same toolchain, the
-same harness and the same commit, and the two sweeps run concurrently. `dev/bootblank.sh` was
-sharded three ways per tree over its own positional demo list (no script change); the bsnes-jg leg
-is deterministic and load-insensitive, so sharding cannot move a verdict.
-
-**1. `python3 dev/snes-display-quality.py` (and the Taskfile wrapper `task snes-display-quality`).**
+**1. `python3 dev/snes-display-quality.py` / `task snes-display-quality`.**
 ```
 $ python3 dev/snes-display-quality.py
-SNESDQ: PASS (240 reviewed sensitive access sites; display order and upload budgets valid)
+SNESDQ: PASS (241 reviewed sensitive access sites; display order and upload budgets valid)
 
 $ task snes-display-quality
 task: [snes-display-quality] dev/snes-display-quality.py
-SNESDQ: PASS (240 reviewed sensitive access sites; display order and upload budgets valid)
+SNESDQ: PASS (241 reviewed sensitive access sites; display order and upload budgets valid)
 ```
-**PASS** — the four-token `display_frame` order survives the guard, same 240 sites, no new
-findings. (First attempt FAILED: the new comment block quoted the literal tokens above the code,
-and the checker's `find()` is over the raw file. Comment reworded to prose; see 2c.)
+The backdrop write is a genuinely new direct-PPU site and the checker caught it
+(`FAIL - examples/snes/snesgfx/title_layer.h:315: new ppu-write`). Registered with
+`--update-baseline`, then the baseline diffed **by finding id** rather than by line, because the
+`line` field of every site below an inserted line churns cosmetically:
+```
+counts: 223 -> 224
+ADDED:
+   examples/snes/snesgfx/title_layer.h 315 | REG_CGDATA = 0x00; REG_CGDATA = 0x00;
+REMOVED:
+```
+**PASS** — exactly one new reviewed site, nothing dropped, order invariant intact. (An earlier
+attempt also FAILED on the order check because the new comment block quoted the literal tokens
+above the code; comment reworded to prose — see 2d.)
 
-**2. `dev/bootblank.sh --firstframe`, all 117 measurable Display demos, before and after.**
+**2. ROM byte identity — the result the rework was for.**
 ```
-BEFORE nondeterministic: 4  ['mandel-oop', 'multibase', 'mvscrl', 'qsortviz']
-AFTER  nondeterministic: 4  ['mandel-oop', 'multibase', 'mvscrl', 'qsortviz']
-NEW (regressions): []
-FIXED: []
+buildable demos: 117   pre-existing non-linkers: ['bankwalk','farptrcmp','farspill','invaders','seamdemo']
+BYTE-IDENTICAL (cmp of the .sfc): 114
+CHANGED: 3 ['1d-ca', 'life', 'mandel-oop']
 ```
-**PASS** — byte-identical verdict sets. **Zero new** nondeterministic demos; the four that flag do
-so on the **unmodified baseline too**, so none is a regression (`mandel-oop`'s is the instrument
-artifact documented in the 2026‑08‑05 plan: its sampled frame lands inside the `m7splash`
-animation). Every non-adopting demo keeps a byte-identical first visible frame across two
-default-entropy runs, and so does `mandel-oop` — whose first frame is now genuinely the
-release-only one.
+Extending the comparison to the 121 demos that emit a link map — the four extra ones write a map
+and then fail to link, before and after alike — using the path-normalised map as the artifact:
+```
+common demos with a link map: 121
+IDENTICAL (path-normalised link map): 118
+CHANGED: 3 ['1d-ca', 'life', 'mandel-oop']
+```
+**PASS — 118/118 non-adopters identical, and the only three that move are the three that define
+the macro.** Adopter `.text`:
+```
+mandel-oop   .text  6419 ->  6375  (-44)
+1d-ca        .text  8332 ->  8403  (+71)
+life         .text  9210 ->  9307  (+97)
+```
+Net across the whole tree is **+124 bytes in three demos**, against the runtime-only cut's
+**+4,823 across 117**.
 
-**3. `dev/bootblank.sh` boot force-blank frame counts, before and after (117 demos, `FRAMES=300`).**
+**3. `dev/bootblank.sh --firstframe`, all 117 measurable Display demos, before and after.**
 ```
+FF BEFORE nondet: ['mandel-oop', 'multibase', 'mvscrl', 'qsortviz']
+FF AFTER  nondet: ['multibase']
+NEW: []   FIXED: ['mandel-oop', 'mvscrl', 'qsortviz']
+```
+**PASS on the claim that matters — zero new nondeterministic demos.**
+
+The three that flipped to `ok` are **not** presented as fixes. `mvscrl` and `qsortviz` have
+**byte-identical ROMs** (step 2), so nothing about them changed and their flip can only be the
+instrument: `--firstframe` compares two random draws, so a stochastic demo coincides some fraction
+of the time. That is the caveat the 2026‑08‑05 plan already recorded ("sound for non-splash demos,
+stochastic for splash demos; a stricter version would use more than two runs"), now demonstrated on
+two demos whose ROMs provably did not move. `mandel-oop`'s flip is plausibly real — its first frame
+genuinely is the release-only one now — but it sits in the same run as two known-spurious flips, so
+it is reported as indistinguishable from instrument noise rather than claimed.
+
+**4. Boot force-blank frame counts.**
+```
+$ dev/bootblank.sh        # 117 demos, FRAMES=300, before vs after
 demo                 before    after    delta
-(0 of 117 demos changed)
+(0 of 117 changed)
 total boot force-blank frames: 2598 -> 2598
 ```
-**PASS** for the safety half: not one non-adopting demo moved by a single frame.
-
-`mandel-oop` is absent from that delta by construction — its black window is the **post-title** one,
-which `dev/bootblank.sh` does not measure (2026‑08‑05 plan 2). Measured with the right instrument,
-on both trees:
+`life`'s window is longer than the default scan, so it reads 300 (capped) on both sides there.
+Re-measured wide enough to see it, alongside the other title-scene adopter:
+```
+$ FRAMES=500 dev/bootblank.sh 1d-ca life
+--- baseline tree ---                --- feature tree ---
+1d-ca                    12          1d-ca                    12
+life                    362          life                    361
+```
+`mandel-oop` is absent from the delta by construction — its black window is the **post-title** one,
+which `dev/bootblank.sh` does not measure (2026‑08‑05 plan §2):
 ```
 ### BEFORE (baseline tree)            ### AFTER (feature tree)
 demo          first  last  frames     demo          first  last  frames
@@ -272,99 +360,56 @@ snes-video-reel           4        5  ok
 PASS: every demo is within its post-title force-blank budget.
 GATE EXIT=0
 ```
-**PASS, and this is the load-bearing result of the whole change.** `mandel-oop` holds 5 frames
+**PASS, and the `mandel-oop` row is the load-bearing result of the whole change.** It holds 5 frames
 *while its demo-local Option J latch is deleted*. The latch was the only thing keeping it at 5; had
 the shared gate not fired, removing it would have put the demo straight back to 11. 5 → 5 with the
-latch gone is therefore positive proof the scene-wide AND resolved to 1 and the first
-`scene_emit()` was skipped. The mechanism has replaced the workaround at identical cost, which is
-the invariant this item was for — not new frames.
+latch gone is positive proof the scene-wide AND resolved to 1 and the first `scene_emit()` was
+skipped. `life`'s 362 → 361 is the same proof for a two-drawable scene that needed `TitleLayer` to
+assert. `1d-ca` fires too — same code path, same AND — but gains 0 frames (2f).
 
-**4. ROM identity for non-adopting demos — the one thing that did NOT hold as specified.**
+**5. Per-adopter differential gates.**
 ```
-buildable: 117   unbuildable (pre-existing, 5): bankwalk farptrcmp farspill invaders seamdemo
-byte-identical: 0
-changed: 117
-```
-Baseline hashes were produced twice, once by reverting the headers in the feature tree and once by
-building the separate baseline worktree; the two tables are identical, so the comparison is sound
-and the result is real.
-
-**Expected, and explained in 2f: this cannot hold.** The gate is a runtime test compiled into every
-`Display` demo, so every ROM's bytes shift. What matters is the size of it and whether behaviour
-moved. `.text` from the link maps:
-```
-demo            .text b  .text a   delta
-newton            11226    11246     +20
-doom-fire          8058     8064      +6
-boids             12948    12968     +20
-spigot            13944    14005     +61
-life               9210     9293     +83     <- adopter (assertion + comment)
-1d-ca              8332     8389     +57     <- adopter
-mandel-oop         6419     6375     -44     <- adopter (latch deleted)
-burning-ship       8800     8848     +48
-rdiff             10624    10655     +31
-hdr-bloom          8669     8665      -4
-```
-Tens of bytes, both signs (the negatives are codegen shifting, not code removed). **Behavioural**
-safety — which is what "safe by default" actually claims — is carried by steps 2 and 3 instead, and
-they are stronger evidence than a hash would have been: 117/117 demos identical in first-visible-frame
-determinism *and* identical to the frame in boot force-blank length.
-
-Recorded as a **deviation from the dispatched spec**, not as a pass.
-
-**5. `dev/run.sh mandel-oop` — the adopter's own differential gate.**
-```
-==> built build/mandel-oop.sfc (+mos-a16, -verify clean); corpus_result @ WRAM 0x897
+$ dev/run.sh mandel-oop
 SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
-==> MAME (under Xvfb): assert corpus_result
     SHOT: PASS corpus=0x204F (snapshot at frame 5800)
-    indirect JMP count in .text: 0
     indirect dispatch call sites (jmp-ind + jsr-ind + jsr __call_indir): 1
 RESULT: PASS — mandel-oop OOP gate GREEN; corpus_result==0x204F on host == +mos-a16@bsnes-jg
-```
-**PASS** — `0x204F` on host == `+mos-a16`@bsnes-jg == `+mos-a16`@MAME, `-verify-machineinstrs`
-clean, and the OOP dispatch gate still exactly 1 indirect call site. Deleting the latch changed
-nothing the oracle can see.
 
-**6. Scratch probe for the `TitleLayer` follow-up (2e) — applied, measured, reverted.**
+$ dev/run.sh life
+SMOKE: PASS off=0x1387 len=2 got=0xDDF1 (ran 500 frames, bsnes-jg)
+    SHOT: PASS corpus=0xDDF1 (snapshot at frame 400)
+RESULT: PASS — Conway's Life rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xDDF1 host == +mos-a16
 
-With `_title_reserve` additionally writing CGRAM[0] black and asserting the flag (so `1d-ca` and
-`life` reach a scene-wide AND of 1):
+$ dev/run.sh 1d-ca
+SMOKE: PASS off=0x5A6 len=2 got=0xAB2C (ran 400 frames, bsnes-jg)
+    SHOT: PASS corpus=0xAB2C (snapshot at frame 400)
+RESULT: PASS — Rule 90/110 CA rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xAB2C host == +mos-a16
 ```
-$ dev/bootblank.sh --firstframe 1d-ca life          # probe tree
-1d-ca                  f=13  ok (fe3ca7395583965d)
-life                  f=301  ok (fe3ca7395583965d)
-PASS: every first visible frame is byte-identical across two default-entropy runs.
-```
-```
-$ FRAMES=500 dev/bootblank.sh 1d-ca life
---- baseline tree ---                --- probe tree ---
-1d-ca                    12          1d-ca                    12
-life                    362          life                    361
-```
-**PASS** — and it says two useful things. `CaDisplay`'s and `LifeGrid`'s assertions are **sound**:
-with the gate actually firing, both demos' first visible frames stay deterministic at default
-entropy, which is precisely the test that killed the blanket version. And the follow-up is worth
-about **one frame on `life`, zero on `1d-ca`** — `1d-ca`'s first `_cad_emit` is a queued scroll
-write plus two clear dirty flags, far under a frame, so the release lands in the same frame either
-way. `git diff` confirms `title_layer.h` is byte-identical to `HEAD`; nothing from this probe is
-committed.
+**PASS** — all three adopters green on host == `+mos-a16`@bsnes-jg == `+mos-a16`@MAME against their
+committed oracles, and `mandel-oop`'s OOP dispatch gate is still exactly 1 indirect call site.
+Deleting the latch and skipping one emit changed nothing any oracle can see.
 
-### Result: 5 / 6 PASS, 1 deviation (step 4, ROM identity — see 2f, cannot hold for a runtime gate)
+### Result: 5 / 5 PASS
 
 ### What landed, and what did not
 
-Landed: the flag, the scene-wide AND, the guard, and three adopters — `MandelLayer`, `CaDisplay`,
-`LifeGrid`. `mandel-oop` is the only one whose scene-wide AND resolves to 1 today, and it traded a
-demo-local latch for the shared mechanism at identical cost.
+Landed: the compile-time macro, the per-drawable flag, the scene-wide AND, the guard, and four
+adopting drawables — `MandelLayer`, `CaDisplay`, `LifeGrid`, `TitleLayer` (macro-gated) — across
+three adopting demos. `mandel-oop` traded a demo-local latch for the shared mechanism and came out
+44 bytes lighter; `life` bought a frame for 97 bytes; `1d-ca` bought the invariant for 71 bytes and
+no frames. Every other demo in the tree is byte-identical.
 
 Not landed, deliberately:
 
-- **`TitleLayer`.** Its `reserve()` does not write CGRAM[0], which its own `emit()` owns — 2e. Two
-  lines would qualify it and would unlock `life` (−1 frame) and `1d-ca` (−0); step 6 measured both.
-  It touches a header ~120 demos include, so it is a follow-up with evidence attached, not a
-  bundled extra.
 - **`BfHud` (`bf-vm`), `TextGrid` (`cpu6502`)**, and the other 14 demo-local drawables plus
-  `BitmapCanvas` / `TextLayer` / `SpriteSet`: they genuinely do not qualify (2d). Making them
-  qualify means moving palettes out of the UploadQueue, which is the escalation boundary.
-- **ROM-level byte identity for non-adopters** (step 4) — not achievable with a runtime gate.
+  `BitmapCanvas` / `TextLayer` / `SpriteSet`: they genuinely do not qualify (2e). Making them
+  qualify means moving palettes out of the UploadQueue, which is the escalation boundary this work
+  was dispatched with.
+- A stricter `--firstframe`. Step 3 showed two byte-identical demos flipping verdict between runs,
+  which is the documented two-draw stochasticity. Raising the draw count would turn the instrument
+  into a real gate rather than a strong smoke test. Out of scope here; noted for whoever ranks it.
+
+### History
+
+The first implementation of this plan (commit `59ca122`) was runtime-only and is superseded by the
+macro-gated form above; 2a records why, with the measurements that decided it.

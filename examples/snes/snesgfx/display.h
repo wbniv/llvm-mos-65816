@@ -32,8 +32,10 @@ typedef struct {
   uint8_t     tm;      /* TM ($212C) shadow — TM is WRITE-ONLY, so we never read-modify-write it */
   uint8_t     shown;   /* boot force-blank released yet? (set by the first display_frame) */
   uint8_t     late_add;/* 1 = a display_add arrived after `shown` — see display_add()      */
+#if SNESGFX_FIRST_FRAME_OPTIN
   uint8_t     ff_all;  /* 1 = EVERY added drawable asserted first_frame_complete (AND, in    */
                        /* display_add). Gates the early blank release in display_frame().    */
+#endif
   uint8_t     bright;  /* current INIDISP master brightness 0..15 (the post-flush value)          */
   uint8_t     btgt;    /* brightness target — display_frame ramps `bright` one step toward it      */
 } Display;
@@ -49,7 +51,9 @@ static inline void display_init(Display *d) {
   d->tm = 0;
   d->shown = 0;
   d->late_add = 0;
+#if SNESGFX_FIRST_FRAME_OPTIN
   d->ff_all = 1;                            /* AND identity — display_add narrows it, never widens */
+#endif
   d->bright = INIDISP_ON;                   /* default full brightness — the ramp is a no-op    */
   d->btgt   = INIDISP_ON;                   /* until a fade is requested (display_fade_to)        */
   REG_BGMODE   = BGMODE_1;                  /* BG1/BG2 4bpp, BG3 2bpp */
@@ -79,7 +83,9 @@ static inline void display_add(Display *d, Drawable *layer) {
   if (d->shown) d->late_add = 1;
   scene_add(&d->scene, layer);
   drawable_reserve(layer, &d->va);
+#if SNESGFX_FIRST_FRAME_OPTIN
   d->ff_all = (uint8_t)(d->ff_all & layer->first_frame_complete);
+#endif
   d->tm = (uint8_t)(d->tm | layer->tm_bits);
   REG_TM = d->tm;
 }
@@ -125,9 +131,12 @@ static inline void display_hide_layer(Display *d, Drawable *layer) {
    unrepresentable. On the skipped frame it also strictly REDUCES the work done before the release
    — the queue flushed is empty, the least possible DMA, so it cannot overrun the window. */
 static inline void display_frame(Display *d) {
-  /* Release-only first frame iff the whole scene opted in — see the opt-in note above. */
+#if SNESGFX_FIRST_FRAME_OPTIN
+  /* Release-only first frame iff the whole scene opted in — see the opt-in note above. Preprocessed
+     away without the macro, leaving the bare call below exactly as it has always been. */
   if (d->shown || !d->ff_all)
-    scene_emit(&d->scene, &d->q);           /* build upload queue (WRAM only — any scanline) */
+#endif
+  scene_emit(&d->scene, &d->q);             /* build upload queue (WRAM only — any scanline) */
   (void)REG_RDNMI;                          /* discard any v-blank that elapsed during emit   */
   snes_wait_vblank();                       /* block until the next v-blank actually begins   */
   upq_flush(&d->q);                         /* DMA, budgeted to fit the window                */

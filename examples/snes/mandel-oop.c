@@ -9,6 +9,13 @@
 //
 // Gate: corpus_result == 0x204F on host == a16@bsnes-jg (+ MAME if SPC700 IPL present).
 // See docs/plans/2026-06-30-snesgfx-mandel-oop-verification.md.
+/* Opt in to the snesgfx per-drawable first-frame release BEFORE any snesgfx header: every drawable
+   in this demo's scene asserts Drawable.first_frame_complete, so display_frame() skips the first
+   scene_emit() and the screen comes up showing reserve()'s content. Must precede the includes --
+   the macro controls whether the field and the gate exist at all.
+   See docs/plans/2026-09-14-display-first-frame-optin.md. */
+#define SNESGFX_FIRST_FRAME_OPTIN 1
+
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/m7title.h"

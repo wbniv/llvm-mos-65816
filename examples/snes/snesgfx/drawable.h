@@ -14,6 +14,25 @@
 #include "vram.h"
 #include "upload.h"
 
+/* SNESGFX_FIRST_FRAME_OPTIN — the compile-time half of the first-frame opt-in.
+ *
+ * A demo that wants the early blank release defines this to 1 BEFORE including any snesgfx header
+ * (see examples/snes/mandel-oop.c). Undefined, EVERY line the feature adds — this header's
+ * Drawable field and the clear in drawable_reserve, display.h's `ff_all` field / its
+ * initialisation / the AND in display_add / the guard in display_frame, and title_layer.h's
+ * backdrop write — preprocesses away, so a non-adopting demo compiles the code it compiled before
+ * the feature existed and its ROM is byte-for-byte unchanged.
+ *
+ * That is not tidiness, it is the cost argument. Measured on the runtime-only first cut of this
+ * change: net +4,823 bytes of .text across the 121 measurable Display demos, median +39 each,
+ * 117 of 121 growing — paid by every demo to serve the one scene whose drawables all assert.
+ * The repo's standing rule is that a blanket change which regresses common shapes to win a
+ * sub-case is wrong and must be gated; this macro is that gate. See
+ * docs/plans/2026-09-14-display-first-frame-optin.md 2f. */
+#ifndef SNESGFX_FIRST_FRAME_OPTIN
+#define SNESGFX_FIRST_FRAME_OPTIN 0
+#endif
+
 typedef struct Drawable Drawable;
 
 typedef struct {
@@ -25,7 +44,9 @@ struct Drawable {
   const DrawableVT *vt;   /* base object: vtable pointer FIRST */
   uint8_t tm_bits;        /* main-screen enable bit(s) for this layer (TM_OBJ/TM_BG1/...) — */
                           /* OR'd into Display's TM shadow (TM $212C is WRITE-ONLY: never |=). */
+#if SNESGFX_FIRST_FRAME_OPTIN
   uint8_t first_frame_complete;  /* the "first frame is complete" OPT-IN — see below.         */
+#endif
 };
 
 /* first_frame_complete — a per-drawable assertion written by reserve(), read by Display.
@@ -50,9 +71,16 @@ struct Drawable {
  *
  * Default 0 is guaranteed for every construction path (static, automatic, designated initialiser,
  * memset, ad-hoc demo-local init) because drawable_reserve() clears it immediately before
- * dispatching; a reserve() that wants the opt-in sets it to 1 as its last act. */
+ * dispatching; a reserve() that wants the opt-in sets it to 1 as its last act.
+ *
+ * The field and the clear exist ONLY under SNESGFX_FIRST_FRAME_OPTIN. A reserve() that assigns it
+ * therefore fails to compile in a translation unit that did not opt in — which is the right
+ * failure: the assertion is meaningless without the machinery that reads it, and a silent no-op
+ * would be worse than a diagnostic. */
 static inline void drawable_reserve(Drawable *d, VramAlloc *va) {
+#if SNESGFX_FIRST_FRAME_OPTIN
   d->first_frame_complete = 0;    /* opt-in is OFF unless this reserve() asserts it */
+#endif
   d->vt->reserve(d, va);
 }
 static inline void drawable_emit   (Drawable *d, UploadQueue *q) { d->vt->emit(d, q); }

@@ -17,6 +17,13 @@
  *
  * corpus_result = life_gate_crc() (64×48 grid, 32 gens), set once at startup.
  * See docs/plans/2026-06-28-5-snes-life.md                                                        */
+/* Opt in to the snesgfx per-drawable first-frame release BEFORE any snesgfx header: every drawable
+   in this demo's scene asserts Drawable.first_frame_complete, so display_frame() skips the first
+   scene_emit() and the screen comes up showing reserve()'s content. Must precede the includes --
+   the macro controls whether the field and the gate exist at all.
+   See docs/plans/2026-09-14-display-first-frame-optin.md. */
+#define SNESGFX_FIRST_FRAME_OPTIN 1
+
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/drawable.h"
