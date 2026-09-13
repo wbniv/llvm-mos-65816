@@ -88,3 +88,7 @@ Published only #590 with Will’s approval: fast-forwarded `mos-zp-alloc-determi
 Published `8f2db7c737d7fb4224015d4cf8ea2e7bf2fe5047` with Will’s approval: one comment above `SCCCallees` names all three containers requiring deterministic iteration; duplicate notes above `GlobalBenefit` and `CalleeFreqs` are removed. The diff changes comments only and passes whitespace checks. The recorded suite and determinism runs predate this comment-only follow-up; they were not rerun.
 
 Refined the same comment in published head `532900273ba95cda6b832de005d2034e031c4eaf` to explain that allocation tie-breaking and floating-point accumulation can change zero-page placement for identical inputs. This follow-up also changes only comments.
+
+## PR #584 publication (2026-09-14)
+
+Published only #584 with Will’s approval: fast-forwarded `mos-late-opt-nongpr-ldimm` from `3ce98fed82de` to `7f4c37de6219` and applied the saved title and description. Verified the GitHub head and opened the PR in Chrome. Initial CI status: Ubuntu, Windows, and macOS running. PRs #588, #586, #589, and #578 remain unpublished and each requires separate approval.

@@ -11,7 +11,7 @@
     "remote_branch": "mos-late-opt-nongpr-ldimm",
     "submitted_head": "3ce98fed82deef4bfb8ac81be8751a340bba59d2",
     "proposed_head": "7f4c37de62191eb6abdaf60c2bc1ccc079bb485b",
-    "publication": "awaiting Will approval"
+    "publication": "published with Will approval on 2026-09-14"
   },
   "586": {
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/586",
