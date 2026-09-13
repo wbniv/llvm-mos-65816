@@ -92,3 +92,7 @@ Refined the same comment in published head `532900273ba95cda6b832de005d2034e031c
 ## PR #584 publication (2026-09-14)
 
 Published only #584 with Will’s approval: fast-forwarded `mos-late-opt-nongpr-ldimm` from `3ce98fed82de` to `7f4c37de6219` and applied the saved title and description. Verified the GitHub head and opened the PR in Chrome. Initial CI status: Ubuntu, Windows, and macOS running. PRs #588, #586, #589, and #578 remain unpublished and each requires separate approval.
+
+## PR #588 publication (2026-09-14)
+
+Published #588 with Will’s approval: fast-forwarded `mos-65816-cop-mnemonic` from `3ac109760642` to `fb1b4ba325a8` and applied the saved title and description. Verified the GitHub head and opened the PR in Chrome. Initial CI status: Ubuntu and Windows running, macOS queued. PRs #586, #589, and #578 remain unpublished and each requires separate approval.

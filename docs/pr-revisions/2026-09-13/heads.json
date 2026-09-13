@@ -25,7 +25,7 @@
     "remote_branch": "mos-65816-cop-mnemonic",
     "submitted_head": "3ac109760642259e8bf76f0f3a84ef2c15da3406",
     "proposed_head": "fb1b4ba325a8536bb51e35758447750f02e5fad1",
-    "publication": "awaiting Will approval"
+    "publication": "published with Will approval on 2026-09-14"
   },
   "589": {
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/589",
