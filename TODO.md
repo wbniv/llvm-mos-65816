@@ -2101,4 +2101,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-08-05: fp:3d96a1cd97548340 — the verification section now records all six
      steps with raw output and a 6/6 PASS line (same commit). The capture fired because the
      first commit landed the plan before the results were written back. -->
+- [verify] **2026-09-14-eliminate-build-nondeterminism** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-14-eliminate-build-nondeterminism.md](docs/plans/2026-09-14-eliminate-build-nondeterminism.md)_  <!-- fp:0aea4446da7b676a -->
 <!-- END auto-captured-deferrals -->
