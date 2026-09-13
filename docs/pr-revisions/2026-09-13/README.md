@@ -1,6 +1,6 @@
 # Upstream PR revisions for Will's review
 
-**Upstream revisions await approval. No upstream PR branches or descriptions have been updated.** Will requested review before publication on 2026-09-13. Each row links both the incremental review changes and the complete proposed PR diff, plus the proposed description. **All local checks pass.** See the [validation record](validation.md) for suite counts, the #578 before/after runtime result, commit hashes, and test scope.
+**Upstream revisions await approval. PR #590 has been published with approval; the other five revisions await separate approval. See `heads.json` for publication status.** Will requested review before publication on 2026-09-13. Each row links both the incremental review changes and the complete proposed PR diff, plus the proposed description. **All local checks pass.** See the [validation record](validation.md) for suite counts, the #578 before/after runtime result, commit hashes, and test scope.
 
 | PR | Revision | Code changes | Proposed text |
 | --- | --- | --- | --- |

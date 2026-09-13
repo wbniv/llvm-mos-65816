@@ -78,3 +78,7 @@ Local compiler commit `b4749221bf3735ad1c83d80c103054f745f8c8cd` adds only this 
 - [x] Regenerated `index.html` from the current bundle and refreshed `SHA256SUMS` with the included `render.py`.
 
 No additional corpus or emulator run was performed for this test-only extension. No upstream branches or descriptions were posted. The proposed commits descend from the recorded submitted heads, so publication can use a normal fast-forward push if those remote heads are still unchanged.
+
+## PR #590 publication (2026-09-14)
+
+Published only #590 with Will’s approval: fast-forwarded `mos-zp-alloc-deterministic` from `cc9f0d027813` to `5e83a0784918` and applied the saved title and description. Verified the GitHub head and opened the PR in Chrome. Initial CI status: Windows and Ubuntu running, macOS queued. The other five revisions remain unpublished and each requires separate approval.

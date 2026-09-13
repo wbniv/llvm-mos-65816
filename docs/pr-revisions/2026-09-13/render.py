@@ -54,14 +54,15 @@ html{scroll-behavior:smooth}
 </style></head><body><h1>Upstream PR revisions</h1>
 <p>Generated from the current saved bundle. Source files: <a href="heads.json">heads</a>,
 <a href="README.md">README</a>, <a href="review.md">review</a>.</p>
-<div class="notice"><strong>Upstream revisions await approval.</strong>
-No upstream PR branches or descriptions have been updated.</div>''']
+<div class="notice"><strong>Publication proceeds one PR at a time with Will’s approval.</strong>
+Each PR’s publication status is shown below.</div>''']
     parts.append('<nav>' + ''.join(f'<a href="#pr{pr}">#{pr}</a>' for pr in heads)
                  + '<a href="#validation">Validation</a></nav>')
     for pr, entry in heads.items():
         parts.extend([
             f'<article id="pr{pr}"><h2>#{pr} — {html.escape(read(pr + "-title.txt").strip())}</h2>',
             f'<p><a href="{html.escape(entry["upstream_pr"], quote=True)}">Existing upstream PR</a></p>',
+            f'<p>Status: {html.escape(entry["publication"])}</p>',
             f'<p>Proposed head: <code>{html.escape(entry["proposed_head"])}</code><br>',
             f'Submitted head: <code>{html.escape(entry["submitted_head"])}</code></p>',
             '<h3>Proposed description</h3>', description(read(pr + '-body.md')),

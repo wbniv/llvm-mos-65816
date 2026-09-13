@@ -1,9 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/30785b9) | docs: regenerate PR review page and validate publication head |
 | [2026-09-13](https://github.com/wbniv/llvm-mos-65816/commit/156803e) | docs(pr-revisions): review the 2026-09-13 upstream revisions and apply follow-ups |
 | [2026-09-13](https://github.com/wbniv/llvm-mos-65816/commit/6861a45) | docs: preserve validated upstream PR revisions for review |
 
 <!--history-meta v1
+30785b9	author	Will Norris
+30785b9	added	1
+30785b9	deleted	1
+30785b9	files	1
 156803e	author	Will Norris
 156803e	added	2
 156803e	deleted	0
