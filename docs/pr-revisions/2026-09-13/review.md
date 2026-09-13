@@ -30,11 +30,13 @@ Only #578 and #584 changed in code; #586, #588, #589 and #590 are byte-identical
 
 | PR | Codex head | Amended head |
 | --- | --- | --- |
-| #578 | `c4fd3dfa74e7` | `3c04e895e167` (tests only; compiler code identical) |
+| #578 | `c4fd3dfa74e7` | `b4749221bf37` (tests only; compiler code identical) |
 | #584 | `2d60650cfce2` | `7f4c37de6219` |
 
-**#578** (`git diff c4fd3dfa74e7 3c04e895e167`): no compiler change. `copy-opt-loop.mir` gains an
-explicit `BRA %bb.3` in `bb.2`, and a new `copy-opt-chain.mir` pins the cross-block dead-copy chain:
+**#578** (`git diff c4fd3dfa74e7 b4749221bf37`): no compiler change. `copy-opt-loop.mir` gains an
+explicit `BRA %bb.3` in `bb.2`, and a new `copy-opt-chain.mir` pins the cross-block dead-copy chain
+(my two-block case at `3c04e895e167`, extended by Codex at `b4749221bf37` with a three-block chain
+and a final-assembly check that only `lda #5`, `ldx #6`, `rts` remain):
 
 ```
 bb.0.entry:  $x = COPY $a ; $a = LDImm 5 ; BRA %bb.1
@@ -45,9 +47,10 @@ Both copies must be erased in one run. An intermediate head (`019af10c7378`) had
 per-block live-in recompute into one `fullyRecomputeLiveIns` after the erase loop; on this case it
 left `dead $x = COPY killed $a` behind, because bb.0's dead flags were computed against bb.1's stale
 live-ins. That is the same-pass propagation the per-block recompute provides, so the collapse was
-reverted and the case kept as a test. Validation of the final head: chain test passes, both
+reverted and the case kept as a test. Validation at `3c04e895e167`: chain test passes, both
 `copy-opt-loop.mir` prefixes pass, CodeGen/MOS 80 pass / 1 unsupported, and all 176 `-O2` corpus
-outputs are byte-identical to Codex's `c4fd3dfa74e7` build.
+outputs are byte-identical to Codex's `c4fd3dfa74e7` build. Codex re-ran the full CodeGen/MOS
+suite at the final `b4749221bf37`: 80 pass / 1 unsupported.
 
 **#584** (`git diff 2d60650cfce2 7f4c37de6219`):
 
