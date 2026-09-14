@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/24f334f) | 121 verify: gate 22 on indri closed live (23/23); title-window entropy sensitivity recorded + deferred |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/6176753) | docs(121/123): reconcile the Mode 7 gallery website gates with reality; re-verify both plans |
 | [2026-08-04](https://github.com/wbniv/llvm-mos-65816/commit/1a9d9b8) | fix(121/123): halve the mandel-oop startup black window; land the Mode 7 data contract |
 | [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/ab6a541) | docs(mode7-gallery): record 121-badges plan verification (18/23 PASS) |
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/bdbf516) | feat: add Mode 7 gallery UX and progressive Mandelbrot |
 
 <!--history-meta v1
+24f334f	author	Will Norris
+24f334f	added	89
+24f334f	deleted	5
+24f334f	files	1
+24f334f	body	Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011AP736JtwzSGYH4bmxDWTa
 6176753	author	Will Norris
 6176753	added	548
 6176753	deleted	0

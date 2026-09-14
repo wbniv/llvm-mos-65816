@@ -509,16 +509,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~ *(2026‑07‑26 refresh: now 13 headers / 113 demos; the "0 indirect JMPs / LTO devirtualized" claim was a measurement artifact — 1 `__call_indir` call survives; mandel-display has since diverged so +338 B is historical. Corrected in `docs/oop-in-c.md` §4–§5 + new §8 static-vs-virtual benchmark.)*
 - [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
-- [wip T4] **mandel-oop title window is entropy-sensitive (blank/partial title at power-on).** <!-- agent:a5b2580f5199b5fb2 --> Found closing 121 gate 22
-  (2026‑09‑15): with bsnes-jg's default Low power-on entropy (what the web player uses) the fading title glyphs in
-  frames ~52–262 render fully, partially, or not at all run to run — for both the pre- and post-republish ROM — while
-  every post-title frame is entropy-independent (`JGX_ENTROPY=0`: 4 colours / 96.4 % non-black at frame 100 every run;
-  `=1`: 0 %, 3 %, 61 % …). Root cause unknown: some PPU/CGRAM/OAM state the title layer relies on is left to power-on
-  randomness. Find it with the entropy-sweep robustness gate (`JGX_ENTROPY=1` vs `0` picture diff at frames 60/100/200),
-  initialise it in `snesgfx` (likely shared by every `title_layer.h`/`m7title.h` adopter — sweep the battery), republish
-  mandel-oop (user-gated). User-visible on both sites. (T4: unknown root cause in shared boot/PPU state; wrong fix = a
-  regression across 100+ demos. Hold until the startup-garbage agent lands — same files.) Evidence: 121 plan, gate 22
-  record 2026‑09‑15.
 - [T3] **Compiler stress-test demo battery — algorithm+visual SNES demos**
   ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
@@ -1001,6 +991,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-15 — [mandel-oop-title-entropy] Root cause: power-on-random CGWSEL $2130 clip-to-black; m7splash_begin now resets the PPU block itself. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - ✅ 2026-09-15 — [lzss-gallery-navigation-and-auto-advance-chevron] 14/15 PASS: step 12 corpus `0x9512` + byte-identical relink, step 15 live 5/5 on both sites. Step 14 is toolchain-drift ROM divergence, accepted per the gallery republish policy, not a nav defect. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
 - ✅ 2026-09-15 — [snes-startup-garbage-title-screens] Newton garbage fixed; titles on all 11 demos (last deferral, factorial, wired gate-neutral); verify 5/5. See [plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - ✅ 2026-09-15 — [task-package-gate-hygiene] All 11 battery aborts fixed: 8 demos build via source-declared markers, 3 companion TUs excluded by an enforced contract. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md).
@@ -1937,4 +1928,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      package gate hygiene fixed (2026-09-15)" section. Already recorded in Done. Nothing open. -->
 - [ ] **(triage)** **rdiff's title card dominates both gate captures, and the Gray-Scott field never becomes — _from [2026-06-28-snes-demo-startup-garbage-and-title-screens.md](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)_  <!-- fp:086d8820767bc6fc -->
 - [ ] **(triage)** **Newton's gate capture frames are earlier than its fill.** Both drivers snapshot while the basin — _from [2026-06-28-snes-demo-startup-garbage-and-title-screens.md](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)_  <!-- fp:d0b4dbafe655b800 -->
+- [ ] **(triage)** `snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title, in video playback: — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:2fa4f51ae43816fd -->
+- [ ] **(triage)** `dev/title-entropy.sh` is not wired into any gate runner yet. Every `m7title.h` / `title_layer.h` — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:588a35b403879067 -->
 <!-- END auto-captured-deferrals -->

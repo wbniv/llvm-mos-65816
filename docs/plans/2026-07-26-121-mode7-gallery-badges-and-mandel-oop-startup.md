@@ -1778,7 +1778,7 @@ Executed as amended: host Chrome over DevTools, `node dev/m7web/smoke22.mjs <sit
 sampled at emulated frame numbers (one SNES frame per `requestAnimationFrame`; headless rAF ran at
 ~11 Hz, so wall-clock is meaningless and is shown only for scale).
 
-**biohack.net** — `https://biohack.net/snes/mandel-oop/`, cold profile:
+**biohack.net** — [https://biohack.net/snes/mandel-oop/](https://biohack.net/snes/mandel-oop/), cold profile:
 
 ```
 status: "running mandel-oop.sfc · 256×224"  (+6867 ms after navigation)
@@ -1809,7 +1809,7 @@ that then animates (f=262 differs), coarse preview by f=276..301, refinement thr
 the ready state still changing at f=3001. The browser timeline lines up with the `jgxcheck` table
 frame for frame.
 
-**indri.studio** — `https://indri.studio/apps/llvm-mos-65816/snes/mandel-oop/`:
+**indri.studio** — [https://indri.studio/apps/llvm-mos-65816/snes/mandel-oop/](https://indri.studio/apps/llvm-mos-65816/snes/mandel-oop/):
 
 ```
 status: ""  (+39988 ms after navigation)
@@ -1958,11 +1958,321 @@ state — the observation the 2026‑08 run made ("frames 52–262 are entropy-s
 which was dropped when the boot-force-blank item closed as a duplicate. It is user-visible (a viewer
 can get a blank title) and pre-dates the republish; the post-title frames are entropy-independent.
 
+## Title-window entropy root cause (2026‑09‑15)
+
+**Root cause: CGWSEL `$2130` bits 7–6 — the main-screen colour-window "clip to black" region — left at
+power-on random, because `m7splash_begin()` runs BEFORE `display_init()`, i.e. before the boot path's only
+`snes_ppu_reset_blank()`.**
+
+### 1. The boot path, traced
+
+`platforms/snes/crt0.c` writes exactly two registers: `NMITIMEN` `$4200` = 0 and `INIDISP` `$2100` = `$8F`.
+Everything else in the PPU control block `$2101`–`$2133` is left at power-on state. The only thing that ever
+zeroes that block is `snes_ppu_reset_blank()` (`platforms/snes/snes_ppu.h:338`), and the only boot-path
+caller is `display_init()` (`examples/snes/snesgfx/display.h:47`).
+
+That split is the whole bug:
+
+| path | order | state on entry |
+|---|---|---|
+| `snesgfx/title_layer.h` (BG2 title) | `display_init()` → `display_add()` → `title_begin()` | already zeroed — **correct** |
+| `snesgfx/m7title.h` (Mode‑7 splash) | `m7splash_begin()` → … → `display_init()` | **power-on random** |
+
+`m7splash_begin()` writes only the registers it uses — BGMODE, `M7SEL`, the Mode‑7 matrix/centre/scroll,
+TM, CGRAM 0..2 — so every other control register kept whatever the power-on left. In bsnes‑jg at its own
+default Low entropy that is literally `random()` per register (`vendor/bsnes-jg/src/ppu.cpp`, `power()` at
+lines 1336–1740). This is also exactly why the post-title frames were entropy-independent: by then
+`display_init()` had run.
+
+### 2. Reproduction (before the fix)
+
+`build/mandel-oop.sfc` rebuilt from `main`, `sha256 83c1f0a02f7b…`, byte-identical to the tree's
+prebuilt ROM. Picture statistics are non-black %, distinct colours and an MD5 of the decoded RGB pixels.
+
+`JGX_ENTROPY=0`, 3 runs × 3 frames — fully deterministic, as documented:
+
+```
+ent=0 frame=  60 run= 0 nonblack= 96.43% colours=  4 hash=3eba9802
+ent=0 frame=  60 run= 1 nonblack= 96.43% colours=  4 hash=3eba9802
+ent=0 frame=  60 run= 2 nonblack= 96.43% colours=  4 hash=3eba9802
+ent=0 frame= 100 run= 0 nonblack= 96.43% colours=  4 hash=31cb510a
+ent=0 frame= 100 run= 1 nonblack= 96.43% colours=  4 hash=31cb510a
+ent=0 frame= 100 run= 2 nonblack= 96.43% colours=  4 hash=31cb510a
+ent=0 frame= 200 run= 0 nonblack= 96.43% colours=  4 hash=c69f9162
+ent=0 frame= 200 run= 1 nonblack= 96.43% colours=  4 hash=c69f9162
+ent=0 frame= 200 run= 2 nonblack= 96.43% colours=  4 hash=c69f9162
+```
+
+`JGX_ENTROPY=1` (the web player's setting), 8 runs × 4 frames — fully rendered, partial, and entirely
+black, run to run, at every frame in the title window:
+
+```
+ent=1 frame=  60 run= 0 nonblack= 71.94% colours=  4 hash=6259b618
+ent=1 frame=  60 run= 1 nonblack= 96.05% colours=  4 hash=00fcb315
+ent=1 frame=  60 run= 2 nonblack=  0.00% colours=  1 hash=72389e9e
+ent=1 frame=  60 run= 3 nonblack=  0.00% colours=  1 hash=72389e9e
+ent=1 frame=  60 run= 4 nonblack= 96.43% colours=  3 hash=a9cd4c42
+ent=1 frame=  60 run= 5 nonblack= 96.05% colours=  4 hash=aaddc65e
+ent=1 frame=  60 run= 6 nonblack= 66.29% colours=  2 hash=bc551653
+ent=1 frame=  60 run= 7 nonblack=  0.00% colours=  1 hash=72389e9e
+ent=1 frame= 100 run= 0 nonblack= 34.28% colours=  2 hash=0f14f737
+ent=1 frame= 100 run= 1 nonblack= 63.66% colours=  3 hash=47b42d0b
+ent=1 frame= 100 run= 2 nonblack= 96.05% colours=  4 hash=9cb02583
+ent=1 frame= 100 run= 3 nonblack= 34.46% colours=  5 hash=803871a6
+ent=1 frame= 100 run= 4 nonblack=  0.00% colours=  1 hash=72389e9e
+ent=1 frame= 100 run= 5 nonblack= 96.05% colours=  2 hash=fd9259af
+ent=1 frame= 100 run= 6 nonblack= 95.58% colours=  5 hash=39686e4a
+ent=1 frame= 100 run= 7 nonblack=  0.00% colours=  1 hash=72389e9e
+ent=1 frame= 120 run= 0 nonblack=  0.00% colours=  1 hash=72389e9e
+ent=1 frame= 120 run= 1 nonblack= 92.98% colours=  3 hash=40a25a33
+ent=1 frame= 120 run= 2 nonblack=  7.39% colours=  3 hash=87fd028b
+ent=1 frame= 120 run= 3 nonblack= 96.05% colours=  5 hash=ee0888b6
+ent=1 frame= 120 run= 4 nonblack=  1.45% colours=  6 hash=4c11b621
+ent=1 frame= 120 run= 5 nonblack=  0.00% colours=  1 hash=72389e9e
+ent=1 frame= 120 run= 6 nonblack= 76.23% colours=  5 hash=fe7ac81c
+ent=1 frame= 120 run= 7 nonblack= 95.91% colours=  5 hash=15fc1dd3
+ent=1 frame= 200 run= 0 nonblack= 86.78% colours=  2 hash=b243440a
+ent=1 frame= 200 run= 1 nonblack= 22.22% colours=  2 hash=c5f64392
+ent=1 frame= 200 run= 2 nonblack= 88.21% colours=  4 hash=9ed2ec4a
+ent=1 frame= 200 run= 3 nonblack= 96.43% colours=  4 hash=c69f9162
+ent=1 frame= 200 run= 4 nonblack=  0.00% colours=  1 hash=72389e9e
+ent=1 frame= 200 run= 5 nonblack= 96.43% colours=  4 hash=ad968287
+ent=1 frame= 200 run= 6 nonblack= 66.29% colours=  4 hash=2db356d7
+ent=1 frame= 200 run= 7 nonblack=  9.42% colours=  4 hash=5c25ff85
+```
+
+### 3. Bisect — which register
+
+A temporary bitmask probe (`M7T_ENTROPY_PROBE`, default 0 → byte-identical ROM, removed once the answer
+was in) zeroed one candidate group at the top of `m7splash_begin()`. Each row is 8 `JGX_ENTROPY=1` runs at
+frame 100:
+
+| probe | registers zeroed | blank / partial runs | picture stable? |
+|---|---|---|---|
+| `0x000` | none (shipping ROM) | 4 of 8 at ≤ 63 % non-black, 2 of them 0 % | no |
+| `0x001` | windows `$2123`–`$212A`, `$212E`, `$212F` | 3 of 8 at 0 % | no |
+| `0x002` | **CGWSEL `$2130`** | **0 of 8 — every run ≥ 96.05 % with glyphs** | colour/hash still vary |
+| `0x004` | CGADSUB `$2131` | 5 of 8 at 0 % | no |
+| `0x008` | COLDATA `$2132` | 3 of 8 at 0 % | no |
+| `0x00E` | `$2130`+`$2131`+`$2132` | 0 of 8 | colour/hash still vary |
+| `0x01E` | + SETINI `$2133` | 0 of 8 | non-black pinned at 96.43 %, colours vary |
+| `0x03E` | + MOSAIC `$2106` | 0 of 8 | two outcomes only (2 vs 4 colours) |
+| `0x03F` | + windows | 0 of 8 | **8/8 identical, and identical to `JGX_ENTROPY=0`** |
+| `0x100` | `snes_ppu_reset_blank()` | 0 of 8 | **8/8 identical to `JGX_ENTROPY=0`** |
+
+**CGWSEL `$2130` alone removes every blank and every partial title** — it is the register that produced
+the user-visible defect. The rest (CGADSUB/COLDATA, SETINI, MOSAIC, the window registers) each add a
+smaller colour corruption on top, so the complete answer is "the whole control block", not one register.
+
+### 4. Mechanism
+
+`vendor/bsnes-jg/src/ppu.cpp`:
+
+```
+1737:  io.col.aboveMask = random() & 3;
+1679:  output.above.colorEnable = array[io.col.aboveMask];
+1860:  math.above.colorEnable = ppu.window.output.above.colorEnable;
+1861:  if(!math.below.colorEnable) return math.above.colorEnable ? math.above.color : (uint16_t)0;
+```
+
+`io.col.aboveMask` is CGWSEL bits 7–6, the main-screen "clip colours to black" region. At power-on it is a
+random 0..3:
+
+* **3 = clip ALWAYS** → line 1861 returns 0 for every pixel → a pure black screen (the `0.00 %` /
+  `colours=1` rows above, all hashing `72389e9e`);
+* **1 / 2 = clip inside / outside the colour window**, whose `oneLeft`/`oneRight` bounds are themselves
+  `random()` (`ppu.cpp:1740`) → vertical black bands across the glyphs (the 7 %–88 % rows);
+* **0 = never clip** → the correct picture.
+
+That is precisely the three-way "fully / partially / not at all" symptom in the gate 22 record, and it
+needs no window enable to be set, which is why zeroing the window registers alone (`0x001`) did not help.
+
+### 5. The fix
+
+`examples/snes/snesgfx/m7title.h:190` — `m7splash_begin()` opens with `snes_ppu_reset_blank()`, taking
+ownership of the whole `$2101`–`$2133` block from power-on instead of inheriting it. The call also asserts
+force-blank, so it replaces the bare `REG_INIDISP = 0x80u` that stood there.
+
+Scoped deliberately to the Mode‑7 splash's own boot path:
+
+* **rejected — zero the block in `crt0`**: it would change all 255 example ROMs to fix a defect that lives
+  in one facility, and duplicate what `display_init()` already does one call later.
+* **rejected — zero it in `title_layer.h` too**: `title_begin()` always runs after `display_init()`, so
+  that block is already zeroed there; adding a second reset would grow every BG-title ROM for nothing.
+  Verified empirically — the gate already passes on an unmodified `title_layer.h` adopter, whose ROM this
+  change does not touch:
+
+  ```
+  ==> title-entropy: qsortviz.sfc — 8 entropy-1 runs per frame vs the entropy-0 reference
+    frame   60: PASS  8/8 entropy-1 runs == entropy-0 3bd43a3d25b9
+    frame  100: PASS  8/8 entropy-1 runs == entropy-0 cc5d00b6a083
+    frame  200: PASS  8/8 entropy-1 runs == entropy-0 fcf83fd510c7
+  TITLE-ENTROPY: PASS
+  ```
+* `examples/snes/lzss-gallery.c:1240` already carried a hand-placed `snes_ppu_reset_blank()` immediately
+  before its `m7splash_begin()` — independent confirmation of the placement. Left in place; it is now
+  redundant but harmless, and it is not this change's file.
+
+Regression guard: **`dev/title-entropy.sh`** — renders each frame once at `JGX_ENTROPY=0` and N times at
+`JGX_ENTROPY=1` and requires every entropy‑1 picture to hash identically to the entropy‑0 one.
+
+### 6. After the fix
+
+`dev/title-entropy.sh` on the unfixed ROM (`83c1f0a02f7b…`), 8 runs/frame:
+
+```
+==> title-entropy: mandel-oop.sfc — 8 entropy-1 runs per frame vs the entropy-0 reference
+  frame   60: FAIL  8/8 entropy-1 runs differ from entropy-0 50577ab3f102
+  frame  100: FAIL  8/8 entropy-1 runs differ from entropy-0 b9ebedccedbd
+  frame  120: FAIL  8/8 entropy-1 runs differ from entropy-0 cb46602ac7d9
+  frame  200: FAIL  8/8 entropy-1 runs differ from entropy-0 0da9cca684e4
+TITLE-ENTROPY: FAIL
+exit=1
+```
+
+Same gate on the fixed ROM (`2b92f51e316c…`), 20 runs/frame:
+
+```
+==> title-entropy: fixed2.sfc — 20 entropy-1 runs per frame vs the entropy-0 reference
+  frame   60: PASS  20/20 entropy-1 runs == entropy-0 50577ab3f102
+  frame  100: PASS  20/20 entropy-1 runs == entropy-0 b9ebedccedbd
+  frame  120: PASS  20/20 entropy-1 runs == entropy-0 cb46602ac7d9
+  frame  200: PASS  20/20 entropy-1 runs == entropy-0 0da9cca684e4
+TITLE-ENTROPY: PASS
+exit=0
+```
+
+Note the four entropy‑0 reference hashes are **the same before and after the fix**
+(`50577ab3f102` / `b9ebedccedbd` / `cb46602ac7d9` / `0da9cca684e4`): the title card's picture is unchanged,
+only its determinism improved. What the deterministic gates saw is exactly what every power-on now shows.
+
+### 7. Why only mandel-oop showed it — the per-call-site contract
+
+The precondition was already known; it just lived in each caller instead of in the facility. First
+`snes_ppu_reset_blank()` inside `main()` vs. the first `m7splash*` call, for all 11 adopters:
+
+```
+avalanche          reset@154    m7splash@156
+blossom            reset@185    m7splash@191
+buddha             reset@138    m7splash@141
+mandel-display     reset@134    m7splash@140
+mandel-double      reset@213    m7splash@219
+mandel-float       reset@175    m7splash@182
+lzss-gallery       reset@1219   m7splash@1231
+mandel-oop         reset@307    m7splash@306     <-- AFTER the splash
+snes-video-reel    reset@NONE   m7splash@594
+apollo-reel        reset@NONE   m7splash@317
+julia              reset@141    m7splash@145
+```
+
+Eight of eleven happened to get it right. mandel-oop's `main()` is written to a deliberate rule — "zero
+bare `REG_*`/`snes_*` calls; only Display API" (`examples/snes/mandel-oop.c:300`) — so its only reset is
+the one inside `display_init()`, which runs *after* the splash. The demo obeying its own design principle
+is what exposed the facility's missing precondition, which is the argument for fixing it in `m7title.h`
+rather than by adding a bare call to mandel-oop.
+
+Confirmation that the eight callers that already reset are behaviourally unchanged (julia, 8 runs/frame,
+before and after the fix — identical reference hashes, PASS both ways):
+
+```
+### julia BEFORE
+  frame   60: PASS  8/8 entropy-1 runs == entropy-0 196fad028753
+  frame  100: PASS  8/8 entropy-1 runs == entropy-0 563b7c66b45b
+  frame  200: PASS  8/8 entropy-1 runs == entropy-0 b3a46f8af5af
+TITLE-ENTROPY: PASS
+### julia AFTER
+  frame   60: PASS  8/8 entropy-1 runs == entropy-0 196fad028753
+  frame  100: PASS  8/8 entropy-1 runs == entropy-0 563b7c66b45b
+  frame  200: PASS  8/8 entropy-1 runs == entropy-0 b3a46f8af5af
+TITLE-ENTROPY: PASS
+```
+
+The two `reset@NONE` demos, `snes-video-reel` and `apollo-reel`, now pass at frame 60 (the title window)
+and still fail at 100/200. That residual is **pre-existing and outside the title**: the same gate on the
+pre-fix `snes-video-reel` ROM (`813257827bf0643f`) already failed there, with frame 60 passing:
+
+```
+### snes-video-reel BEFORE                    ### snes-video-reel AFTER
+  frame   60: PASS  8/8 == 0 ffa7948accce       frame   60: PASS  8/8 == 0 ffa7948accce
+  frame  100: FAIL  1/8 differ  fe3ca7395583    frame  100: FAIL  2/8 differ  fe3ca7395583
+  frame  200: FAIL  3/8 differ  fe3ca7395583    frame  200: FAIL  3/8 differ  fe3ca7395583
+```
+
+Both frames sample the video playback after `m7splash_end(30u)` + `setup_display()`, not the title. Carried
+to **Deferred** below rather than chased here.
+
+### 8. Battery re-verification
+
+| gate | command | result |
+|---|---|---|
+| example battery | `dev/run.sh build` | `==> built 255 program(s)` / `not programs, excluded by contract (3)` / 0 failed, `EXIT=0` |
+| corpus (default 8‑bit) | `dev/run.sh corpus` | `==> corpus: 63/63 passed`, `EXIT=0` |
+| corpus differential | `dev/run.sh corpus-a16` | `==> corpus-a16: 62/62 passed, 0 xfail`, `EXIT=0` |
+
+`dev/run.sh corpus` tail:
+
+```
+  setjmp_sim PASS  corpus_result=0x2007  setjmp/longjmp non-local return on the 65816 native 16-bit stack (regression guard for the 6502-only common setjmp.S; #35)
+  nmitally_sim PASS  corpus_result=0xBCE6  #123 VBlank Interrupt Tally arithmetic gate (ORACLE form, no interrupts): 240 fenced ticks of xorshift16 + 16-bit multiply-add + 16x16->32 __mulsi3 accumulate, folded 4 rotations/tick; the interrupt-CC half is asserted separately by dev/nmitally.sh
+==> corpus: 63/63 passed
+EXIT=0
+```
+
+`dev/run.sh corpus-a16` tail:
+
+```
+  setjmp_sim PASS   corpus_result=0x2007  setjmp/longjmp non-local return on the 65816 native 16-bit stack (regression guard for the 6502-only common setjmp.S; #35)
+  nmitally_sim PASS   corpus_result=0xBCE6  #123 VBlank Interrupt Tally arithmetic gate (ORACLE form, no interrupts): 240 fenced ticks of xorshift16 + 16-bit multiply-add + 16x16->32 __mulsi3 accumulate, folded 4 rotations/tick; the interrupt-CC half is asserted separately by dev/nmitally.sh
+==> corpus-a16: 62/62 passed, 0 xfail
+EXIT=0
+```
+
+All three match the pre-change baseline exactly (255 / 3 / 0, 63/63, 62/62), so nothing in the battery
+regressed.
+
+### 9. ROM bytes that changed
+
+Every `m7title.h` adopter gains the inlined reset, so its ROM changes. `title_layer.h` adopters are
+untouched — the header is not modified — and the rest of the battery is unaffected. Host-built from the
+same toolchain, at `HEAD` vs. the working tree (`sha256`, first 16 hex):
+
+| demo | before | after |
+|---|---|---|
+| avalanche | `9cd9c2f47deebeea` | `5706940a2ffd4506` |
+| blossom | `6ced3fd817365539` | `22f0cd67a2d2f5a7` |
+| buddha | `3567005ee44b391a` | `52d789f96db64b9e` |
+| julia | `7798d4a91a072829` | `bf4434beb2f65d2b` |
+| mandel-display | `42d51e242e1267fc` | `d41a6ecf886ea1d0` |
+| mandel-double | `d41d2619c23cc5ef` | `441fb4af512533be` |
+| mandel-float | `040450129b2401cf` | `262cfd37c6e1d60c` |
+| **mandel-oop** | `83c1f0a02f7b54dd` | `2b92f51e316c46d7` |
+| lzss-gallery | `c90ea33a0bc8518e` | `257c35d414a96d19` |
+| snes-video-reel | `813257827bf0643f` | `1268fbdfea68a48f` |
+| apollo-reel | (not rebuilt at HEAD — asset prep) | `dev/run.sh build` output |
+
+mandel-oop's full new digest is
+`2b92f51e316c46d780f64bdb58780aa6d98ff1a3843fee62c35fd61f32e72577`, and its corpus assertion is unchanged
+(`corpus_result` `0x204F`, carried by the 63/63 corpus run above).
+
+**Republishing is user-gated and NOT done here.** The live ROM on both sites is still
+`140c7b742f65…`; the sites carry these demos' ROMs and would need a republish to pick the fix up. Nothing
+in `~/biohack.net` or `~/indri.studio` was touched.
+
 ## Deferred
 
-- mandel-oop's title window (frames ~52–262) is entropy-sensitive: with bsnes-jg's default Low power-on
-  entropy (what the web player uses) the fading title glyphs render fully, partially, or not at all, run to
-  run, for both the pre- and post-republish ROM (gate 22 record, 2026‑09‑15). The READY frame and every
-  post-title frame are entropy-independent. Likely an uninitialised PPU/CGRAM/OAM register the title
-  layer relies on; find it with the entropy-sweep robustness gate (`JGX_ENTROPY=1` vs `0` picture diff
-  at frames 60/100/200) and initialise it. User-visible on both sites. Needs a Fable rank.
+- `snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title, in video playback:
+  `dev/title-entropy.sh` passes at frame 60 (the title window) and fails at 100 and 200 on both the
+  pre-fix and post-fix ROM (reel: 1/8 and 3/8 entropy‑1 runs differ before, 2/8 and 3/8 after, same
+  entropy‑0 reference `fe3ca7395583` at both frames; apollo: 8/8 differ at 200). Both frames sample the
+  loop after `m7splash_end(30u)` + `setup_display()`, so this is a second, independent uninitialised-state
+  defect in the reels' own display setup, not the `m7title.h` one closed above. These two are also the
+  only adopters with no `snes_ppu_reset_blank()` anywhere in `main()`. Same method applies: bisect the
+  register groups with a temporary probe at the top of `setup_display()`.
+- `dev/title-entropy.sh` is not wired into any gate runner yet. Every `m7title.h` / `title_layer.h`
+  adopter is a candidate for the same class of defect, and the deterministic `JGX_ENTROPY=0` gates that
+  guard the battery today cannot see any of it. Wiring it — as a `dev/run.sh` target, or as a leg of
+  `dev/verify-web-roms.sh` over the published set — would turn this from a one-off investigation into a
+  standing guard. It costs one entropy‑0 render plus N entropy‑1 renders per frame per ROM, so the
+  published set at 3 frames × 8 runs is the realistic budget rather than all 255 examples.
+
+

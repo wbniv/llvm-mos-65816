@@ -1,8 +1,11 @@
 /* snesgfx/m7title.h — Mode 7 zoom-in + 360° spin-out title splash.
  *
- * Standalone: call BEFORE display_init(). Switches to Mode 7 for the animation, then
- * returns with force-blank active. A subsequent display_init() wipes all Mode 7 state and
- * the BGMODE_1 drawables re-upload their content normally.
+ * Standalone: call BEFORE display_init(). m7splash_begin() opens with snes_ppu_reset_blank(), so it
+ * owns the whole PPU control block from power-on rather than inheriting whatever $2101..$2133 held
+ * (see THE POWER-ON CONTRACT on m7splash_begin — that reset is what keeps the title card identical
+ * on every power-on). It switches to Mode 7 for the animation, then returns with force-blank active.
+ * A subsequent display_init() wipes all Mode 7 state and the BGMODE_1 drawables re-upload their
+ * content normally.
  *
  * VRAM layout (Mode 7 shares tilemap LOW bytes and char-data HIGH bytes in the same words):
  *   Tiles 0..63   — FONT8 glyphs 0..63, 8bpp, ink palette index 1 (bright title).
@@ -187,7 +190,25 @@ static inline void m7splash_begin(const char *line0, const char *line1) {
     REG_NMITIMEN = 0u;             /* NMI OFF during the bulk VRAM/CGRAM upload: the char-data write is a
                                       long non-atomic loop, and an NMI mid-transfer can disturb VMADD/the
                                       sequence and leave corrupt tiles → intermittent title bands. */
-    REG_INIDISP  = 0x80u;          /* force-blank while we write VRAM / CGRAM */
+
+    /* THE POWER-ON CONTRACT — this call is load-bearing, do not drop it.
+       This splash is the FIRST thing a Mode 7 demo shows: it runs before display_init(), which owns
+       the boot path's other snes_ppu_reset_blank(). crt0 writes only NMITIMEN and INIDISP, so on
+       entry every remaining PPU control register ($2101..$2133) still holds power-on state — on real
+       silicon indeterminate, and in bsnes-jg literally `random()` per register at the emulator's own
+       default Low entropy, which is the setting the web player runs. This function writes only the
+       registers it uses (Mode 7 matrix, M7SEL, BGMODE, TM, CGRAM 0..2); without this reset everything
+       else keeps whatever the power-on left, and a random value there makes the title card come out
+       fully rendered, partially rendered or entirely black from one power-on to the next. The
+       decisive register is CGWSEL
+       $2130 bits 7-6, the main-screen colour-window "clip to black" region: value 3 clips ALWAYS (a
+       pure black screen, 0 % non-black), values 1/2 clip inside/outside a colour window whose bounds
+       are themselves random (vertical black bands across the glyphs). SETINI, MOSAIC and the window
+       registers each add a smaller corruption on top. Zeroing the whole block is what makes the
+       picture a function of the ROM alone. The call also asserts force-blank, which is what lets the
+       VRAM/CGRAM writes below run at all. Gate: dev/title-entropy.sh (every JGX_ENTROPY=1 run must
+       hash identically to the JGX_ENTROPY=0 render). */
+    snes_ppu_reset_blank();        /* force-blank + zero $2101..$2133 (skips the data ports) */
 
     /* Tilemap: clear all LOW bytes to tile 0 (space = transparent/black). */
     m7_tilemap_clear(0u, (uint16_t)(uintptr_t)&_m7t_zero, M7_TILEMAP_WORDS);
