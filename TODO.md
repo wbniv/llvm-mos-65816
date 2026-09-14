@@ -994,27 +994,6 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   gate 22 on indri.studio — the player never requests the ROM — owned by the `indri.studio embedded player` item; re-run
   gate 22 there once that lands, then promote to Done. mandel-oop republished to biohack.net (`v1.0.586`); indri republish
   rides with the player fix. Raw output under every step in the plan's 2026-09-14 record.
-- [verify T3] **svx2-animated-video-cartridge — BLOCKED on the [T4] decision below.** Run
-  2026-08-03 (`f536d25`): gates 1–6 PASS against the delivered 900-frame HiROM reel (24 pytest,
-  zero CRC failures over 4,000 VBlanks, fidelity + dashboard PASS, 1,911 presentations, checksum
-  clean); preliminary + gate 7 FAIL — the plan's original artifacts are invalidated by successor
-  work (next bullet). Re-run/close once the anchors are re-pointed.
-  [plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)
-- [wip T4] **svx2 plan anchors invalidated by successor work <!-- agent:a52a8fd7e2b61542a --> — restore-or-retire decision (svx2
-  owner).** Found by the verification run above. (a) The plan's 4-frame LoROM "first cartridge"
-  is **uncompilable on `main`**: `examples/snes/snes-video-reel.c:287` references
-  `VIDEO_REEL_HIROM_BASE_BANK` unconditionally, but `tools/snes-video-reel-assets.py:231` emits
-  it only on the `--packed-far` (>4-frame) path — suspected commit `bd344a1`. Either restore the
-  small-reel path (a one-line `#ifndef` default would do) or formally retire it in the plan.
-  (b) Gate 7 has no truthful reading: the plan's `825e3848…` 32 KiB LoROM exists nowhere in the
-  tree; the gallery serves the 8 MiB ExHiROM 59.94 fps successor (`c3d7cd9e…`, `v1.0.360`),
-  gated by `dev/svx2-emulator-validation.sh` under a different plan. Decide which ROM this plan
-  owns and mark the LoROM implementation-record figures historical. (c) Added by the
-  cut-aware-labels verification (`53a008f`): the 1,800-frame 59.94 fps cartridge (cuts 600/1200)
-  has **no asset recipe in the tree** — `dev/snes-video-reel.sh:52-54` derives its cut starts but
-  nothing generates its 1,800 frames of tiles; its gates reproduce only on the stable 900-frame
-  reel. Same restore-or-retire decision. (T4: plan-level ownership
-  decision + cross-session file — `snes-video-reel.c` has in-flight edits from another worker.)
 - [wip T3] **lzss-gallery-navigation-and-auto-advance-chevron** <!-- agent:a421a3a5024424582 --> — implemented, live, chevron
   input re-fixed `3b8a559`; verify against current main. **2026-08-04 run recorded: 14/15 PASS.**
   Steps 1–14 green (ROM nav + auto-advance chevron + wrap, 120 ms touch pulse and all four
@@ -1083,6 +1062,8 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [svx2-anchors] Anchor (a) restored (real culprit `d6030cf`; `#ifdef VIDEO_REEL_PACKED_FAR` guard + tracked LoROM-fixture recipe `tools/snes-video-reel-extract.py`, `dev/snes-video-lorom-fixture.sh`); gate 7 and anchor (c) retired; cadence gate now measures t0 in-run; `dev/svx2-emulator-validation.sh` split into record/asset/code contracts with honest drift classification. See [plan](docs/plans/2026-09-14-svx2-anchors-decision.md).
+- ✅ 2026-09-14 — [svx2-animated-video-cartridge-verify] Unblocked and run on the restored LoROM fixture: gates 1–6 PASS, gate 7 retired; `pytest` 25/25. Artemis reel `v1.0.360` is behind two player-source commits (`8eca83a`, `ff35036`) → republish is the policy action (not yet staged). See [plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md).
 - ✅ 2026-09-14 — [fork-patch-followups] `0010`→#578 copy-opt fix (guard dropped, now a standalone patch after `0002`), `0022`→#589 terminator form, `0003`/`0024`/`0021` re-synced to the published/merged forms, RA companion draft retired, six PR mirrors re-synced; stack applies from pristine, lit 8/8 (+red), corpus 63/63, a16 62/62, loopfold `0xF56C`. `0021` retires at the next vendor-pin bump (procedure in plan). See [plan](docs/plans/2026-09-14-fork-patch-followups.md).
 - ✅ 2026-09-14 — [m7-gallery-web-reconcile] All 8 drifted website gates were measurement errors, not site bugs; plans 123 (10/10) and 121 (22/23) re-verified with a reproducible Chrome-DevTools harness (`dev/m7web/`); mandel-oop republished to biohack.net `v1.0.586`. See [plan](docs/plans/2026-09-14-m7-gallery-web-reconcile.md).
 - ✅ 2026-09-14 — [123-mode7-gallery-filter-verify] 10/10 PASS incl. the narrow/reduced-motion step (320 px, `--force-prefers-reduced-motion`). See [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md).
