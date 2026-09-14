@@ -949,14 +949,6 @@ planned/gated/superseded/stale — dispositions recorded as comments in the Inbo
 `[verify]` items: run the linked plan's numbered verification steps, paste raw output + PASS/FAIL
 into the plan, then promote to Done. **Serialize the runs — they share the hot build tree.**_
 
-- [wip T3] **lzss-gallery-navigation-and-auto-advance-chevron** <!-- agent:a421a3a5024424582 --> — implemented, live, chevron
-  input re-fixed `3b8a559`. **2026‑09‑14/15 re-run: 14/15 recorded, step 12 still running.** Steps 1–11, 13, 15
-  PASS — step 15 now live on indri `v0.1.156` (5/5 conditions, numbers identical to biohack) after the
-  indri player fix. Step 12 (700k-frame corpus SMOKE + relink) is in flight on the agent. Step 14 is an
-  honest FAIL on its literal text (live ROM `a5e59d79…` ≠ fresh link `6e825994…`) but the drift is
-  toolchain-only with frame-identical behaviour, which the gallery reconciliation's republish policy
-  (row 2) scores as accepted divergence — re-word the step to that policy when step 12 lands, then
-  promote to Done. Harnesses kept: `dev/m7web/nav15.mjs`, `dev/m7web/touchnav-test.js`.
 
 ## Watch
 
@@ -1009,6 +1001,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-15 — [lzss-gallery-navigation-and-auto-advance-chevron] 14/15 PASS: step 12 corpus `0x9512` + byte-identical relink, step 15 live 5/5 on both sites. Step 14 is toolchain-drift ROM divergence, accepted per the gallery republish policy, not a nav defect. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
 - ✅ 2026-09-15 — [snes-startup-garbage-title-screens] Newton garbage fixed; titles on all 11 demos (last deferral, factorial, wired gate-neutral); verify 5/5. See [plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - ✅ 2026-09-15 — [task-package-gate-hygiene] All 11 battery aborts fixed: 8 demos build via source-declared markers, 3 companion TUs excluded by an enforced contract. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md).
 - ✅ 2026-09-15 — [121-mode7-gallery-badges-and-mandel-oop-startup-verify] 23/23: gate 22 on indri closed live once the player fix deployed (post-title frames hash-identical to biohack); title-window entropy sensitivity found and deferred. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
