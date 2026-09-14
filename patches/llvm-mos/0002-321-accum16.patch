@@ -4020,7 +4020,7 @@ index d13429a713db..0e357b030d97 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 6356fa58723c..4cb73ef9ff43 100644
+index 6356fa58723c..b92b73a9be29 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,6 +25,7 @@
@@ -5141,7 +5141,7 @@ index 6356fa58723c..4cb73ef9ff43 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
-@@ -1913,7 +2741,56 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -1913,7 +2741,75 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                .countMaxActiveBits() <= 8) {
          if (Index)
            return false;
@@ -5182,11 +5182,30 @@ index 6356fa58723c..4cb73ef9ff43 100644
 +
 +        // Replace every use of NewOffset with Explicit16, except the G_TRUNC
 +        // we just created (which still needs to read the original s16 value).
++        //
++        // Each rewrite is bracketed by the legalizer's observer, exactly as the
++        // generic register-replacement helpers do. The users can be CSE-able
++        // (G_TRUNC, G_PTR_ADD, G_ADD ...) and GISelCSEInfo keys its FoldingSet
++        // on the operand profile, which includes the parent MBB pointer: an
++        // in-place operand change without changingInstr/changedInstr leaves a
++        // stale node whose bucket is the OLD profile's hash, so a later lookup
++        // for the NEW form (`G_TRUNC Explicit16` from selectIndirectAddressing's
++        // buildZExtOrTrunc when this mode is then rejected) hits or misses
++        // depending on whether the two hashes collide modulo the bucket count —
++        // i.e. on heap layout. That is a non-reproducible build (the `sec`
++        // placement flip in `_title_blank`, ~0.5 % of builds). The notification
++        // also queues the users for re-legalization, which is the contract for
++        // any operand change.
 +        MachineInstr *TruncMI = MRI.getVRegDef(Lo);
 +        for (MachineOperand &MO :
-+             llvm::make_early_inc_range(MRI.use_operands(NewOffset)))
-+          if (MO.getParent() != TruncMI)
-+            MO.setReg(Explicit16);
++             llvm::make_early_inc_range(MRI.use_operands(NewOffset))) {
++          MachineInstr &UseMI = *MO.getParent();
++          if (&UseMI == TruncMI)
++            continue;
++          Helper.Observer.changingInstr(UseMI);
++          MO.setReg(Explicit16);
++          Helper.Observer.changedInstr(UseMI);
++        }
 +
 +        Builder.setInsertPt(SavedMBB, SavedInsertPt);
 +        Index = Lo;
@@ -5199,7 +5218,7 @@ index 6356fa58723c..4cb73ef9ff43 100644
          continue;
        }
      }
-@@ -1996,6 +2873,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -1996,6 +2892,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
                     .countMaxActiveBits() <= 8) {
        Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
        Addr = Base;
@@ -5211,7 +5230,7 @@ index 6356fa58723c..4cb73ef9ff43 100644
      }
    }
 
-@@ -2020,6 +2902,106 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -2020,6 +2921,106 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
    return true;
  }
 
@@ -5318,7 +5337,7 @@ index 6356fa58723c..4cb73ef9ff43 100644
  bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
                                       MachineRegisterInfo &MRI, MachineInstr &MI,
                                       LostDebugLocObserver &LocObserver) const {
-@@ -2065,6 +3047,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+@@ -2065,6 +3066,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
      return true;
    }
 
@@ -6176,6 +6195,49 @@ index 000000000000..17a137a5e255
 +; CHECK-NEXT:  rti
 +  ret void
 +}
+diff --git a/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
+new file mode 100644
+index 000000000000..13d1aa2e1475
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
+@@ -0,0 +1,37 @@
++# REQUIRES: asserts
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer,mos-combiner -verify-machineinstrs -o - %s | FileCheck %s
++#
++# tryAbsoluteIndexedAddressing rewrites every use of an 8-active-bit s16 offset
++# to an explicitly zero-extended s16 (G_TRUNC + G_CONSTANT 0 + G_MERGE_VALUES)
++# and then hands the store to selectIndirectAddressing. The users it rewrites in
++# place can be CSE-able; each rewrite must go through the legalizer's observer
++# so that GISelCSEInfo re-profiles them. The G_ADD below is legal under +mos-a16
++# and is legalized before the store (bottom-up), so it survives to the end of the
++# legalizer with its rewritten operand. Without the observer notification its
++# CSE node keeps the profile of the original operand and the post-legalizer
++# mos-combiner's CSEInfo::verify() asserts ("CSEInfo is not consistent") — in the
++# full pipeline that stale node makes a later G_TRUNC lookup hit or miss with the
++# heap layout, i.e. a non-reproducible build (the `sec` placement flip in the
++# SNES title-card demos' _title_blank).
++---
++name: indexed_offset_rewrite_notifies_observer
++body: |
++  bb.0:
++    liveins: $rs0, $rs2, $rs4, $rc0
++    ; CHECK-LABEL: name: indexed_offset_rewrite_notifies_observer
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = G_TRUNC {{%[0-9]+}}(s16)
++    ; CHECK-NEXT: [[MERGE:%[0-9]+]]:_(s16) = G_MERGE_VALUES [[LO]](s8), {{%[0-9]+}}(s8)
++    ; CHECK-NEXT: G_STORE_INDIR_IDX {{%[0-9]+}}(s8), {{%[0-9]+}}(p0), [[LO]] :: (store (s8))
++    ; CHECK-NEXT: G_ADD [[MERGE]], {{%[0-9]+}}
++    %0:_(p0) = COPY $rs0
++    %1:_(s16) = COPY $rs2
++    %2:_(s16) = COPY $rs4
++    %3:_(s8) = COPY $rc0
++    %4:_(s16) = G_CONSTANT i16 255
++    %5:_(s16) = G_AND %1, %4
++    %6:_(p0) = G_PTR_ADD %0, %5
++    G_STORE %3(s8), %6(p0) :: (store (s8))
++    %7:_(s16) = G_ADD %5, %2
++    $rs0 = COPY %7(s16)
++    RTS implicit $rs0
++...
 diff --git a/llvm/test/MC/MOS/all-65816-opcodes.s b/llvm/test/MC/MOS/all-65816-opcodes.s
 index cc766817ec26..270c169d16f0 100644
 --- a/llvm/test/MC/MOS/all-65816-opcodes.s

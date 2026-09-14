@@ -60,6 +60,7 @@ STANDALONE_MOSDIR=(
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/interrupt-width-65816.ll"
+  "llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir"
   "llvm/test/MC/MOS/all-65816-opcodes.s"
   "llvm/test/MC/MOS/motorola-integers-default.s"
 )
