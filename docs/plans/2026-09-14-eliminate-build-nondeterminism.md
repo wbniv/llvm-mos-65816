@@ -543,4 +543,6 @@ heuristic change. Verify:
   `20260914-f9711be` package predates the fix and still carries the ~0.5 % `sec` flip — the next release
   picks it up. A full 138-demo gate sweep on the fixed toolchain remains open (corpus, corpus-a16 and the
   four demos whose `main` changed beyond the `sec` permutation were gated; see Phase 1 result).
-- Both throwaway worktrees (`bnd-phase0`, `bnd-phase1`) are disposable now that the fix is on `main`.
+- Both worktrees torn down 2026‑09‑15 via `dev/worktree-teardown.sh` (`bnd-phase0` 730 M, `bnd-phase1` 13 G reclaimed).
+- Re-verified on `main`'s rebuilt toolchain: `dev/measure-build-determinism.sh --n 200 --arms quiet --demos "dither newton msquares"`
+  → `DISTINCT 1` for all three (600 builds, 607 s); `dev/run.sh corpus` 63/63 PASS, `corpus-a16` 62/62 PASS (0 xfail).

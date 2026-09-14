@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/13be682) | todo: close eliminate-build-nondeterminism (7899355 landed; plan carries the landing record) |
 | [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/7899355) | fix(legalizer): notify the observer when rewriting indexed-offset uses (build determinism) |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/f2ba409) | docs(nondeterminism): Phase 0 merged; retarget Phase 1 at sec placement, not ZP allocation |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/3d4c67a) | Phase 0: reproduce build nondeterminism in all load arms; pin it to sec placement in _title_blank |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/5f72591) | docs: plan to investigate a single unreproduced build-nondeterminism sighting |
 
 <!--history-meta v1
+13be682	author	Will Norris
+13be682	added	12
+13be682	deleted	0
+13be682	files	1
+13be682	body	Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011AP736JtwzSGYH4bmxDWTa
 7899355	author	Will Norris
 7899355	added	251
 7899355	deleted	8
