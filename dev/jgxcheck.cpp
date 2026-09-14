@@ -376,22 +376,33 @@ int main(int argc, char **argv) {
   Bsnes::setAudioSpec({48000.0, (48000 / 60) << 1, 0, inbuf, nullptr, &audioFrame});
   Bsnes::setVideoSpec({vbuf, nullptr, &videoFrame});
 
-  // JGX_ENTROPY — power-on randomness. 0 = None, 1 = Low (bsnes-jg's default), 2 = High.
+  // JGX_ENTROPY — power-on randomness. 0 = None, 1 = Low (bsnes-jg's own default), 2 = High.
+  // jgxcheck's own default (JGX_ENTROPY unset) is None — see below.
   //
   // This is NOT a cosmetic knob. System::power() calls random.entropy(configuration.entropy), and
-  // Random::seed() seeds from clock() — so at the default (Low) EVERY RUN OF THE SAME ROM POWERS ON
-  // WITH DIFFERENT STATE: WRAM (cpu.cpp), and, decisively for anything that looks at the picture,
-  // PPU registers the ROM never wrote — per-BG tiledata/screen address, tile size, the BG and OBJ
+  // Random::seed() seeds from clock() — so at Low or High EVERY RUN OF THE SAME ROM POWERS ON WITH
+  // DIFFERENT STATE: WRAM (cpu.cpp), and, decisively for anything that looks at the picture, PPU
+  // registers the ROM never wrote — per-BG tiledata/screen address, tile size, the BG and OBJ
   // *enable* bits, window enables, interlace (ppu.cpp power()). A ROM that leaves any of that
   // unset renders a DIFFERENT PICTURE run to run while its computed WRAM result stays perfectly
   // deterministic. That is a real ROM defect (incomplete PPU init), but it is invisible to a WRAM
   // assert and it makes any screenshot gate irreproducible, so the two have to be separated:
-  //   * a picture gate sets JGX_ENTROPY=0 and gets a reproducible reference frame;
-  //   * a robustness gate sweeps 1/2 and asserts the picture is the SAME as the entropy=0 one,
-  //     which is what proves the ROM initialises everything it depends on. Real hardware powers on
-  //     with arbitrary state, and the site's WASM player is this same core at its default entropy.
+  //   * a picture gate wants a reproducible reference frame — the default (None) unless overridden;
+  //   * a robustness gate passes JGX_ENTROPY=1 or 2 and asserts the picture is the SAME as the
+  //     entropy=0 one, which is what proves the ROM initialises everything it depends on. Real
+  //     hardware powers on with arbitrary state, and the site's WASM player is this same core at
+  //     its own default (Low) — a robustness gate is what proves that default is safe to ship.
+  //
+  // Default flip (2026-09): a single-capture/timeline run with no JGX_ENTROPY set can't be compared
+  // against anything, so it is a picture gate by construction and gets None rather than inheriting
+  // bsnes-jg's own clock()-seeded Low. The 121-badges verification hit this: every one of its 121
+  // timeline captures was nondeterministic run to run until redone with JGX_ENTROPY=0 by hand. Any
+  // call site that already passes a literal JGX_ENTROPY value (the entropy-sweep/robustness gates)
+  // is unaffected — only the callers that never touched the variable change behaviour, from
+  // accidental clock()-seeded PPU state to a deterministic None boot.
   // Not on the public Bsnes API, hence the settings.hpp include.
-  if (const char *e = getenv("JGX_ENTROPY")) SuperFamicom::configuration.entropy = (unsigned)atoi(e);
+  SuperFamicom::configuration.entropy =
+      getenv("JGX_ENTROPY") ? (unsigned)atoi(getenv("JGX_ENTROPY")) : 0;
 
   if (!Bsnes::load()) { printf("SMOKE: FAIL (bsnes-jg load failed)\n"); return 1; }
   Bsnes::power();

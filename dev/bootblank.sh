@@ -31,9 +31,11 @@ case "${1-}" in
   --firstframe)
     # SAFETY GATE for the release-only first display_frame(). That frame shows reserve()'s output
     # only -- emit() has not run yet -- so a layer that paints solely from emit() would display
-    # whatever VRAM held before. bsnes-jg randomises power-on VRAM at its DEFAULT entropy, so such
-    # a frame is nondeterministic run to run, while a correct one is byte-identical. Capture each
-    # demo's first visible frame twice at default entropy and compare. Exit 5 on any mismatch.
+    # whatever VRAM held before. bsnes-jg randomises power-on VRAM at entropy Low (JGX_ENTROPY=1,
+    # its own real default), so such a frame is nondeterministic run to run, while a correct one is
+    # byte-identical. Capture each demo's first visible frame twice under explicit JGX_ENTROPY=1
+    # and compare -- jgxcheck's own default is now None (deterministic), so this gate overrides it
+    # on purpose. Exit 5 on any mismatch.
     FIRSTFRAME=1; shift ;;
 esac
 
@@ -112,8 +114,13 @@ PY
     python3 "$ROOT/tools/snes-checksum.py" "$SCAN_DIR/$demo-ff.sfc" >/dev/null
     h=""; mismatch=0
     for run in 1 2; do
-      # NO JGX_ENTROPY: bsnes-jg's default entropy randomises power-on VRAM/CGRAM/OAM.
-      "$JGX" "$SCAN_DIR/$demo-ff.sfc" "$DB" 0x0 2 0x0000 "$R" "$SCAN_DIR/$demo-ff$run.png" \
+      # Explicit JGX_ENTROPY=1 (Low, bsnes-jg's own default): jgxcheck itself now defaults to
+      # None for determinism (see dev/jgxcheck.cpp), but THIS gate exists specifically to exercise
+      # bsnes-jg's power-on randomisation of VRAM/CGRAM/OAM — it captures the first visible frame
+      # twice under live entropy and asserts the two draws agree, which is what proves the demo
+      # doesn't depend on uninitialised state. Without this override the gate would compare two
+      # identical deterministic boots and pass vacuously.
+      JGX_ENTROPY=1 "$JGX" "$SCAN_DIR/$demo-ff.sfc" "$DB" 0x0 2 0x0000 "$R" "$SCAN_DIR/$demo-ff$run.png" \
         >/dev/null 2>&1 || true
       s=$(sha256sum "$SCAN_DIR/$demo-ff$run.png" 2>/dev/null | cut -c1-16 || echo MISSING)
       [ -z "$h" ] && h="$s" || { [ "$h" = "$s" ] || mismatch=1; }
