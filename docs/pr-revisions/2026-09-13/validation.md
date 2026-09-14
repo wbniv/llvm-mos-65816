@@ -107,3 +107,7 @@ Published only #584 with Will’s approval: fast-forwarded `mos-late-opt-nongpr-
 ## PR #588 publication (2026-09-14)
 
 Published #588 with Will’s approval: fast-forwarded `mos-65816-cop-mnemonic` from `3ac109760642` to `fb1b4ba325a8` and applied the saved title and description. Verified the GitHub head and opened the PR in Chrome. Initial CI status: Ubuntu and Windows running, macOS queued. PRs #586, #589, and #578 remain unpublished and each requires separate approval.
+
+## PR #578 publication (2026-09-14)
+
+Published with Will's approval after the pre-publish review above: remote head verified unchanged at `edc9bbd23b71` immediately before the push; fast-forwarded `mos-coalesce-rotate-ac` to `b4749221bf37`; title and body set via REST PATCH (`gh pr edit` is unreliable against this repo, see #586) and verified byte-identical to `578-title.txt` / `578-body.md`. This was the last of the six; all bundle branches are now live.

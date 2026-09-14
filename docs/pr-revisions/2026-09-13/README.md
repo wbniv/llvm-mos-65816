@@ -1,6 +1,6 @@
 # Upstream PR revisions for Will's review
 
-**PRs #590, #584, and #588 have been published with approval; the other three revisions await separate approval. See `heads.json` for publication status.** Will requested review before publication on 2026-09-13. Each row links both the incremental review changes and the complete proposed PR diff, plus the proposed description. **All local checks pass.** See the [validation record](validation.md) for suite counts, the #578 before/after runtime result, commit hashes, and test scope.
+**All six revisions are published with Will's approval (2026‑09‑14); #590 has since been merged upstream as `742d554bf080`. See `heads.json` for per-PR status.** Will requested review before publication on 2026-09-13. Each row links both the incremental review changes and the complete proposed PR diff, plus the proposed description. **All local checks pass.** See the [validation record](validation.md) for suite counts, the #578 before/after runtime result, commit hashes, and test scope.
 
 | PR | Revision | Code changes | Proposed text |
 | --- | --- | --- | --- |

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/9ed23b5) | docs: record approved publication of PR 588 |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/b47b006) | docs: record approved publication of PR 584 |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/2fb7be7) | docs: record approved publication of PR 590 |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/30785b9) | docs: regenerate PR review page and validate publication head |
@@ -7,6 +8,10 @@
 | [2026-09-13](https://github.com/wbniv/llvm-mos-65816/commit/6861a45) | docs: preserve validated upstream PR revisions for review |
 
 <!--history-meta v1
+9ed23b5	author	Will Norris
+9ed23b5	added	1
+9ed23b5	deleted	1
+9ed23b5	files	1
 b47b006	author	Will Norris
 b47b006	added	1
 b47b006	deleted	1

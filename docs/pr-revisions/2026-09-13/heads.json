@@ -4,7 +4,7 @@
     "remote_branch": "mos-coalesce-rotate-ac",
     "submitted_head": "edc9bbd23b718e03d5901f5c114885cfb1d8b277",
     "proposed_head": "b4749221bf3735ad1c83d80c103054f745f8c8cd",
-    "publication": "awaiting Will approval"
+    "publication": "published with Will approval on 2026-09-14"
   },
   "584": {
     "upstream_pr": "https://github.com/llvm-mos/llvm-mos/pull/584",
