@@ -961,15 +961,20 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 
 
 - [wip T2] **indri.studio embedded player never starts the ROM <!-- agent:a421a3a5024424582 --> — canvas bit-frozen at the poster.**
-  Found by nav-chevron verification step 15 (14/15 PASS otherwise; biohack.net passes all four
-  input surfaces with the same ROM): on indri, player script + core load, nothing errors, but
-  `#status` never reaches `running <rom>.sfc`, so `playUrl()` never fires. Lead: page-template vs
-  pinned-player drift — `v0.1.135` (the [dual-site drift audit](docs/investigations/2026-08-03-dual-rom-site-drift-audit.md)'s
-  own remediation `2b78747`) regenerated the template from biohack's newer bootstrap while indri's
-  player stays pinned at `v0.1.133`. Fix: repin/republish indri's player (or re-sync the
-  template), then re-run nav-chevron step 15 to close its lone FAIL. Live user-facing breakage on
-  every indri SNES page — worth doing soon. (T2: bounded site-repo fix, diagnosis already made;
-  the audit doc records the machinery.)
+  Found by nav-chevron verification step 15 (biohack.net passes all four input surfaces with the
+  same ROM). **Root cause (2026-09-14): the pinned player build itself, not template drift.**
+  indri's `pnpm-lock.yaml` pinned `@wbniv/bsnes-jg-player` to bsnes-jg-wasm `642d3c9` (`app.js`
+  `100f4b51…`), where `clearTouchNav()` is closure-scoped inside the pointer-handler setup but
+  called from `stopLoop()` at player scope — `playUrl()` → `stopLoop()` threw `ReferenceError` on
+  every boot, the `.catch` blanked `#status`, the async `showProvenance()` overwrote the error
+  banner (hence "nothing errors"), and the `.sfc` was never fetched. The page template and
+  `Base.astro` boot are fine. **No package release needed**: the fix (`3ddddb5`, on `npm-package`
+  tip `1ec048f` = biohack's `fdb8b71e…`) only had to be re-resolved. **Fixed, awaiting deploy:**
+  indri.studio branch `fix/snes-player-resync-clearTouchNav` @ `6cb870e` (`pnpm update
+  @wbniv/bsnes-jg-player` + `pnpm run sync-engine`; CI drift gate passes; step 15 passes on the
+  live page with the committed player pre-deploy). Ship: push branch, merge, `task publish
+  TAG=v0.1.155`; then re-run step 15's indri leg live to close. Evidence: the plan's 2026-09-14
+  record + [drift audit](docs/investigations/2026-08-03-dual-rom-site-drift-audit.md) Finding 3.
   Three decisions + one build: (a) the plan's "exactly nine badges" is structurally stale —
   `cdaa6f4`/`ad87374` legitimately added two Mode 7 demos; build the plan's own promised
   audit-derived check (compare the `displayMode: 7` slug set against a committed expected list)
