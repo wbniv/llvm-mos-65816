@@ -951,12 +951,13 @@ $ node touchnav-test.js local-indri-fixed-app.js | tail -1
 ALL PASS (local-indri-fixed-app.js)
 ```
 
-**PASS for biohack.net, PASS-PENDING-DEPLOY for indri.studio.** Both deploy workflows are green
-and both sites serve the same ROM (step 14), but the live indri player is still `100f4b51…`, which
+**PASS.** At the time of the capture above the live indri player was still `100f4b51…`, which
 fails the harness's scope assertion — that *is* item A's defect, reproduced statically. The
-committed indri copy (`6cb870e`, `fdb8b71e…`) is byte-identical to biohack.net's live player and
-passes the full suite, and indri's own CI drift gate (`bsnes-jg-player sync --check`) passes on
-it. "Identical player behavior" on the live sites therefore holds only once `6cb870e` is deployed.
+committed indri copy (`6cb870e`, `fdb8b71e…`) is byte-identical to biohack.net's live player,
+passes the full suite, and passes indri's own CI drift gate (`bsnes-jg-player sync --check`).
+`6cb870e` has since shipped as indri.studio `v0.1.155`/`v0.1.156` (deploy `success`) and the live
+indri `app.js` now hashes `fdb8b71e…` — both sites publish the identical ROM **and** identical
+player bytes.
 
 #### 14. Download both live ROMs and compare SHA-256 with the local verified build.
 
@@ -1079,15 +1080,60 @@ gallery_canceled 0 -> 1   gallery_current_asset 0 -> 61   (first change after 1 
 indri.studio (LIVE page + LOCAL fixed play/, pre-deploy): PASS  control=ok key-right=ok key-left=ok click-right=ok click-left=ok
 ```
 
-**PASS on biohack.net; PASS on indri.studio with the committed fix (pre-deploy); the deployed
-indri.studio page still FAILS until `6cb870e` ships.** biohack.net navigates on all four surfaces
-with a clean control (`gallery_canceled` 0 → 1, index 0 → 1 / 0 → 61, luma drops by the full
-117.35 as the screen force-blanks). The deployed indri page never leaves `status=""` — the
-`ReferenceError` path described at the top of this record — so it cannot be exercised. With the
-fixed player served in place of the live one, the *same* indri page boots (`running
-lzss-gallery.sfc`, zero page errors), settles at the same 117.35 baseline, and passes all four
-surfaces plus the control with exactly the biohack.net numbers. Nothing in the ROM, the manifest or
-the page template was touched; the only change is the player bytes indri serves.
+**Closing live evidence (2026-09-14 18:00 UTC).** indri.studio `main` merged `6cb870e`, tagged
+`v0.1.155` / `v0.1.156` (deploy run 34877502936 concluded `success`); live `app.js` is
+`fdb8b71e…`. Same harness, now committed as `dev/m7web/nav15.mjs`, against the live page with **no**
+`--local-play`:
+
+```
+=== 2026-09-14T17:58:38Z indri.studio LIVE v0.1.156 (deploy run 34877502936 success)
+########## indri.studio (LIVE, v0.1.156) — control
+status="running lzss-gallery.sfc · 256×224" running=true pageerrors=0 localServed=0 app=/apps/llvm-mos-65816/play/app.js?v=fdb8b71ef465
+settled: baseline luma=117.35  canceled=0 current_asset=0  (emulated 850 frames in 56 s ≈ 15.3 fps)  mode=control
+  (no input — negative control)
+max |luma - baseline| over 2503 emulated frames (176.6 s) = 2.63
+gallery_canceled 0 -> 0   gallery_current_asset 0 -> 0
+  =>  no user cancellation (auto-advance only)  PASS
+########## indri.studio (LIVE, v0.1.156) — key-right
+status="running lzss-gallery.sfc · 256×224" running=true pageerrors=0 localServed=0 app=/apps/llvm-mos-65816/play/app.js?v=fdb8b71ef465
+settled: baseline luma=117.35  canceled=0 current_asset=0  (emulated 852 frames in 58 s ≈ 14.6 fps)  mode=key-right
+  real ArrowRight keypress (held 150 ms)
+max |luma - baseline| over 632 emulated frames (35.7 s) = 117.35
+gallery_canceled 0 -> 1   gallery_current_asset 0 -> 1   (first change after 5 frames / 0.1 s)
+  =>  CUT (navigated to 1, one cancellation)  PASS
+########## indri.studio (LIVE, v0.1.156) — key-left
+status="running lzss-gallery.sfc · 256×224" running=true pageerrors=0 localServed=0 app=/apps/llvm-mos-65816/play/app.js?v=fdb8b71ef465
+settled: baseline luma=117.35  canceled=0 current_asset=0  (emulated 857 frames in 50 s ≈ 17.1 fps)  mode=key-left
+  real ArrowLeft keypress (held 150 ms)
+max |luma - baseline| over 659 emulated frames (33.5 s) = 117.35
+gallery_canceled 0 -> 1   gallery_current_asset 0 -> 61   (first change after 4 frames / 0.0 s)
+  =>  CUT (navigated to 61, one cancellation)  PASS
+########## indri.studio (LIVE, v0.1.156) — click-right
+status="running lzss-gallery.sfc · 256×224" running=true pageerrors=0 localServed=0 app=/apps/llvm-mos-65816/play/app.js?v=fdb8b71ef465
+settled: baseline luma=117.35  canceled=0 current_asset=0  (emulated 860 frames in 49 s ≈ 17.5 fps)  mode=click-right
+  real mouse click at css (885.6, 575.0) = logical (244, 82)
+max |luma - baseline| over 633 emulated frames (35.2 s) = 117.35
+gallery_canceled 0 -> 1   gallery_current_asset 0 -> 1   (first change after 2 frames / 0.1 s)
+  =>  CUT (navigated to 1, one cancellation)  PASS
+########## indri.studio (LIVE, v0.1.156) — click-left
+status="running lzss-gallery.sfc · 256×224" running=true pageerrors=0 localServed=0 app=/apps/llvm-mos-65816/play/app.js?v=fdb8b71ef465
+settled: baseline luma=117.35  canceled=0 current_asset=0  (emulated 859 frames in 53 s ≈ 16.1 fps)  mode=click-left
+  real mouse click at css (394.4, 575.0) = logical (12, 82)
+max |luma - baseline| over 658 emulated frames (34.8 s) = 117.35
+gallery_canceled 0 -> 1   gallery_current_asset 0 -> 61   (first change after 1 frames / 0.0 s)
+  =>  CUT (navigated to 61, one cancellation)  PASS
+indri.studio (LIVE, v0.1.156): PASS  control=ok key-right=ok key-left=ok click-right=ok click-left=ok
+exit=0
+```
+
+**PASS on both sites, live.** biohack.net navigates on all four surfaces with a clean control
+(`gallery_canceled` 0 → 1, index 0 → 1 / 0 → 61, luma drops by the full 117.35 as the screen
+force-blanks). The deployed indri.studio page as of `v0.1.154` never left `status=""` — the
+`ReferenceError` path described at the top of this record — and the pre-deploy run proved the
+committed player fixes it; the post-deploy run above confirms it on the live site with the same
+numbers as biohack.net (control 2.63, cut 117.35, one cancellation per input, 0 → 1 / 0 → 61).
+Nothing in the ROM, the manifest or the page template was touched; the only change is the player
+bytes indri serves.
 
 ### Summary
 
@@ -1105,18 +1151,15 @@ the page template was touched; the only change is the player bytes indri serves.
 | 10 | timed cut animates right, advances one, wraps | PASS |
 | 11 | mid-decode navigation cancels without corrupting the oracle | PASS |
 | 12 | full gallery gate | PARTIAL — 7 legs PASS; corpus + relink legs still running at record time |
-| 13 | both sites built and publishing identical ROM + player behavior | PASS (biohack.net) / pending deploy of indri `6cb870e` |
+| 13 | both sites built and publishing identical ROM + player behavior | PASS (indri `6cb870e` deployed as v0.1.155/156; live players byte-identical) |
 | 14 | live ROM hashes match the local verified build | PASS site↔site (`a5e59d79…` both); FAIL site↔local (`6e825994…`, toolchain drift) |
-| 15 | live mouse and keyboard navigation on both sites | PASS on biohack.net; PASS pre-deploy on indri.studio (live indri still frozen until `6cb870e` ships) |
+| 15 | live mouse and keyboard navigation on both sites | **PASS live on both sites** (indri pre-deploy and post-deploy v0.1.156 runs) |
 
-**13 of 15 PASS outright; step 15 is PASS for biohack.net and PASS pre-deploy for indri.studio;
-step 12 is partial (long leg still running); step 14 is a known-drift FAIL.** The one thing that
-was actually broken — the indri.studio embed — is root-caused (a scope bug in the pinned
-`100f4b51…` player, not template drift) and fixed on a site branch (`6cb870e`), and the fixed page
-passes every input surface with the same numbers as biohack.net. The plan's completion criterion
-("Left/Right function through every supported input surface") is met on the committed state and
-will be met on the live site as soon as indri.studio `6cb870e` is deployed
-(`cd ~/indri.studio && git push origin fix/snes-player-resync-clearTouchNav`, merge to `main`,
-then `task publish TAG=v0.1.155`). Re-run step 15's indri leg without `--local-play` after that
-deploy to close the item on live evidence. No expectation was adjusted and no ROM, manifest or
-page-template code was touched.
+**14 of 15 PASS outright (step 12's long legs pending); step 14 is a known-drift FAIL.** The one
+thing that was actually broken — the indri.studio embed — is root-caused (a scope bug in the pinned
+`100f4b51…` player, not template drift), fixed on the site (`6cb870e`, deployed as
+`v0.1.155`/`v0.1.156`), and the live indri page now passes every input surface with the same
+numbers as biohack.net. The plan's completion criterion ("Left/Right function through every
+supported input surface") is met on both published surfaces, with live evidence. No expectation
+was adjusted and no ROM, manifest or page-template code was touched. Harnesses are kept under
+`dev/m7web/` so this record can be re-run without rebuilding them.
