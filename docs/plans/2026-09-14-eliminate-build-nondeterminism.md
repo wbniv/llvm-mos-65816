@@ -532,3 +532,15 @@ heuristic change. Verify:
    (`/home/will/llvm-mos-65816-bnd-phase0`) was **retained** until Phase 1 started because its
    untracked `.bnd-capture2/` holds the captured reference/alternate ROM pairs that Phase 1 step 1
    starts from (regenerating them costs ~200 builds per demo at the 0.5 % rate).
+
+## Landing record (2026‑09‑15)
+
+- `wt/build-nondeterminism-phase1` commit `8cedb22` cherry-picked onto `main` as `7899355`; the fix hunk and
+  the MIR test applied to `main`'s live `vendor/` tree by hand (the worktree's vendor predates the 2026‑09‑14
+  fork-patch followups, so the tree itself was not moved), then `dev/regen-patch.sh` regenerated `0002`
+  byte-identical to the cherry-picked patch — patch and vendor agree.
+- `main`'s toolchain rebuilt with the fix (`dev/run.sh toolchain`); the released
+  `20260914-f9711be` package predates the fix and still carries the ~0.5 % `sec` flip — the next release
+  picks it up. A full 138-demo gate sweep on the fixed toolchain remains open (corpus, corpus-a16 and the
+  four demos whose `main` changed beyond the `sec` permutation were gated; see Phase 1 result).
+- Both throwaway worktrees (`bnd-phase0`, `bnd-phase1`) are disposable now that the fix is on `main`.
