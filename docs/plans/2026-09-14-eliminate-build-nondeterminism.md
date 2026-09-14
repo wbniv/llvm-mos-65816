@@ -50,24 +50,20 @@ dependent bug that only shows up under load"** — it is consistent with both. T
 hypothesis now (raised by the user), not confirmed, and Phase 0 below is written to test it
 directly rather than assume a compiler-internal cause.
 
-Explanations, in order of plausibility given the above:
+Explanations as they stood before Phase 0, in the order they were then ranked — with the
+outcome:
 
-1. **Hot-tree / contention-dependent.** Something in the build (a temp-file path, a
-   timing/`clock()`-seeded value, a race on a shared build artifact) behaves differently under
-   concurrent load than in isolation. This is untested, not ruled out, and the most parsimonious
-   fit for "happened once, during heavy concurrent session activity; never again in 68 quiet
-   retries."
-2. **A rare, genuinely nondeterministic tie** in a container the #590-equivalent fix
-   (`patches/llvm-mos/0021-mos-zp-alloc-deterministic.patch`, confirmed applied and rebuilt into
-   this toolchain — `MOSZeroPageAlloc.cpp` already has `GlobalBenefit`/`CalleeFreqs` as
-   `MapVector` and `SCCCallees` as `SmallSetVector`) does not cover, with a flip rate too low for
-   20 quiet ASLR-on runs to catch reliably. Weaker fit than (1) since it doesn't explain why the
-   one sighting coincided with heavy concurrent load.
-3. **An artifact of my own test harness** that I have not identified (both `-I` asymmetry and
-   ASLR were ruled out, but not exhaustively).
-
-I am not confident enough in any of these to propose a fix. Per the project's own rule, an
-anomaly needs a concrete, reproducible cause before it is acted on.
+1. ~~**Hot-tree / contention-dependent.**~~ **Ruled out by Phase 0**: the flip occurs at the same
+   ~0.5 % rate in the quiet arm as under Docker or generic load. The coincidence with heavy
+   session activity was just that; the 68 quiet negatives were undersampled (P(miss) ≈ 0.7),
+   not evidence of a load trigger.
+2. **A rare, genuinely nondeterministic tie** — **confirmed in shape, but not where predicted.**
+   The #590-equivalent fix (`0021`, confirmed applied and built) is intact and `MOSZeroPageAlloc`
+   output is byte-identical across variants. The tie is in the placement of `sec` relative to
+   carry-independent neighbours inside `_title_blank`; see the Phase 0 result and the retargeted
+   Phase 1.
+3. ~~**An artifact of my own test harness.**~~ Ruled out: the committed reproducer flips with the
+   same single alternate hash per demo across three independent runs and two harness variants.
 
 ## Plan
 
@@ -167,34 +163,48 @@ Wall-clock note: run 1's generic arm reports 13728 s because the laptop suspende
 (journal: `Operation 'suspend' finished` at 10:19:55 local); its last live checkpoint was
 1510 s at 80/100. The suspend did not change any hash.
 
-### Phase 1 — pin the mechanism (only if Phase 0 reproduces)
+### Phase 1 — pin the mechanism (retargeted 2026‑09‑14 after Phase 0)
 
-**If the loaded arm alone flipped:** the mechanism is concurrency-dependent, not the compiler's
-own iteration order. Look at: temp-file naming under `mos-clang`/`ld.lld` (predictable names that
-could collide across simultaneous invocations — check with `strace -f -e trace=open,openat`
-during a loaded-arm run for any temp path shared across processes); whether the specific demos
-that flip are the ones invoking Docker-backed tooling concurrently (points at I/O/page-cache
-pressure corrupting a read, or a cgroup-throttling-induced timeout somewhere treated as success);
-and whether disabling whichever load source reproduced it (Docker vs. generic `stress-ng`) narrows
-it to one specific contended resource.
+Phase 0 settled the branch: the quiet arm flips, the load branch is not taken, and the original
+suspect (`MOSZeroPageAlloc.cpp`) is exonerated by the bytes — ZP addresses are identical across
+variants; only the position of `sec` relative to carry-independent neighbours changes. The
+untaken load branch (temp-file races, cgroup throttling, `strace` of concurrent invocations) is
+dropped from this plan.
 
-**If the quiet arm also flipped:** follow the #590 investigation's own precedent
-(`docs/upstream-zp-alloc-deterministic-pr.md`, `docs/plans/2026-08-01-...` style): build with
-assertions (`dev/run.sh asserts-build`), reduce to the smallest demo/function that still flips,
-and use `-mllvm -print-after=<suspect-pass>` across several flipping runs to diff the actual data
-structure whose iteration order changed. Candidate suspects, roughly in the order the #590
-precedent suggests checking:
+**Target: whatever orders a carry-set (`sec`) against independent instructions in
+`_title_blank`.** Do not guess the pass; find it mechanically, in this order:
 
-- A fourth pointer-keyed container in `MOSZeroPageAlloc.cpp` beyond the three the #590-equivalent
-  patch already fixed (`SCCCallees`, `GlobalBenefit`, `CalleeFreqs`) — grep for any remaining
-  `DenseMap<... *, ...>` or `SmallPtrSet`/`SmallSet` (which degrades to a pointer-ordered
-  `std::set` past its inline capacity — the exact `0021` lesson) in that file and its callees.
-- A different pass entirely with the same symptom shape — register allocation tie-breaking,
-  machine block placement, or `ld.lld`'s own symbol/section ordering when resolving weak symbols
-  across the C runtime archive (crt0, `compiler-rt`) the SDK links against. Rule this in/out by
-  checking whether disabling zero-page allocation (`-mllvm -zp-avail=0`) still reproduces the
-  flip once Phase 0 has a working repro — if it still flips with ZP allocation off, the cause is
-  elsewhere.
+1. **IR pipeline or codegen?** `_title_blank` is LTO-inlined into every title-card demo, so the
+   flip could originate in the LTO IR pipeline (instruction order in the merged module) or in
+   codegen. Split it: build `dither` once with `-Wl,--save-temps` (or the fork's equivalent) to
+   capture the post-LTO, pre-codegen bitcode, then run `llc` on that fixed `.bc` ~200 times with
+   `dev/measure-build-determinism.sh`-style hashing. If `llc` alone flips → codegen (step 2). If
+   it never flips → the divergence is upstream of `llc`: re-run the full driver ~200 times with
+   `--save-temps` and `diff` the saved `.bc`/`.ll` of a flipping build against the reference to
+   find the first differing IR, which names the IR pass.
+2. **First divergent pass.** With the flip localised to `llc`, run ~200 `llc` invocations on the
+   fixed `.bc` with `-mllvm -print-after-all` (assertions build, `dev/run.sh asserts-build`, so
+   `-debug-only` is available for step 3), keep only the runs whose ROM hash is the alternate, and
+   `diff` their pass-by-pass dumps against a reference run. The **earliest pass whose output
+   differs** is the site. Given the shape (`sec` reordered past `tax`/`lda #imm`), the likely
+   candidates are the pre-RA `machine-scheduler` (a tie between two ready SUnits broken by
+   something pointer-derived), the MOS carry-set materialisation (`LDCImm`/`SetC`-style lowering —
+   see `docs/upstream-ldcimm-set-lowering-pr.md` for the fork's prior work on that path), or a
+   GISel combiner producing the instructions in use-list order that itself came from a
+   pointer-keyed container. The dump diff decides; don't pre-commit.
+3. **The container.** In the named pass, find the iteration or comparison whose result depends
+   on pointer value or allocation order (`DenseMap`/`DenseSet`/`SmallPtrSet` keyed by
+   `MachineInstr *`/`SUnit *`/`Value *`, a `std::sort` with a non-total comparator, or a
+   `SmallSet` past its inline capacity — the `0021` lesson). Confirm with `-debug-only=<pass>` on
+   a flipping vs reference run that the recorded decision differs there and only there.
+
+Cheap sanity checks that cost nothing and remove doubt: `-mllvm -zp-avail=0` still flips (ZP
+allocation truly uninvolved); the flip reproduces on `newton` and `msquares` from the same
+`_title_blank` bytes (it is one bug, not three).
+
+**Suggested dispatch tier: T4** — unknown root cause in a compiler pass, where a wrong turn (fixing
+a symptom in the wrong pass) is expensive. Compiler-changing worktree (own `vendor/` + warm
+`build/`), since steps 2–3 need an assertions build. Ranking itself is the orchestrator's call.
 
 ### Phase 2 — fix and verify (only after Phase 1 pins a mechanism)
 
@@ -274,5 +284,8 @@ heuristic change. Verify:
    showing the actual order difference.
 4. If fixed (Phase 2): reproducer 1/1 for every previously-flipping demo; corpus/verify results
    pasted per the steps above.
-5. If never reproduced after Phase 0: this plan closed as WON'T-FIX-UNCONFIRMED, with the 68 (now
-   68 + Phase-0's N) negative trials recorded as the evidence for closing it.
+5. ~~If never reproduced after Phase 0: this plan closed as WON'T-FIX-UNCONFIRMED.~~ Not
+   applicable — reproduced (step 1). Phase 1 is next; Phase 0's throwaway worktree
+   (`/home/will/llvm-mos-65816-bnd-phase0`) is **retained** until Phase 1 starts because its
+   untracked `.bnd-capture2/` holds the captured reference/alternate ROM pairs that Phase 1 step 1
+   starts from (regenerating them costs ~200 builds per demo at the 0.5 % rate).
