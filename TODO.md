@@ -161,8 +161,9 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   Published first on [biohack.net](https://biohack.net/snes/bankwalk/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bankwalk/); next is #129
   `farptrcmp`. [plan](docs/plans/2026-08-04-128-snes-bankwalk.md).
-- [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
-  (2026-08-01); only the player-package release is left, and it is USER-GATED.** <!-- agent:a75fe291bce60124b -->
+- [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main (2026-08-01);
+  player `1.1.0` PREPARED + BROWSER-VERIFIED 2026-09-15; only the outward publish is left, and it is
+  USER-GATED.** <!-- agent:a75fe291bce60124b -->
   Mechanism (c): the ROM already verifies each work as it displays it, so it publishes a 5-byte
   `gallery_shown{z,work,ok,state}` record (state = publication barrier) and the player polls it in
   a new `mode: "live-record"`, comparing `z` against a host-generated 62-entry oracle table — the
@@ -177,17 +178,24 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   `oracle[work]` at a non-zero index for the first time.
   **~~(1) merge~~ DONE.** **~~reproducible build~~ PASS** on the 0021 toolchain — the precondition
   for `sync-manifest-offsets.py` to be trusted.
-  Remaining: **(2)** the `@wbniv/bsnes-jg-player` `live-record` release — an implementation
-  matching the contract exists in `~/bsnes-jg-wasm` and is synced byte-identically into
-  `~/biohack.net/public/play/app.js`, but **neither is committed**, `ENGINE_VERSION` still stamps
-  the previous `app.js`, and nothing is published (**user-gated**);
-  **(3)** browser badge states — blocked on (2); the headless replay covers PASS and MISMATCH, and
-  a **pre-existing** defect was found meanwhile: `badge()` assigns `className = "badge " + cls`,
-  which drops the `rp-badge` class the markup carries, so **no** badge CSS has ever applied on any
-  demo page (the `warn` class this needs is only half the gap);
-  **(5)** gallery republish + manifest flip to `live-record` — verified end-to-end on a fixture
-  site, so it is one mechanical step once (2) ships. Spec + all evidence in the
-  [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
+  **~~(2) player release~~ PREPARED 2026-09-15 — committed locally in three repos, nothing pushed.**
+  `@wbniv/bsnes-jg-player` `1.1.0` on `~/bsnes-jg-wasm` `npm-package`: `live-record` staged into
+  `dist/`, the badge fix, `.rp-badge.warn`, and a `stage-dist.sh` that filters the demo manifest to
+  the ROMs it bundles. Engine synced + `.rp-badge.warn` committed on `~/biohack.net` and
+  `~/indri.studio`. **~~(3) browser badge states~~ FIXED + VERIFIED.** The pre-existing defect was
+  `className = "badge " + cls` dropping the markup's base class; writing `"rp-badge "` instead would
+  only have moved the breakage, since the package ships two markup shapes with different base
+  classes — so `badge()` now swaps the state class via `classList` and touches nothing else. All four
+  states (`running`/`pass`/`fail`/`warn`) assert both classes **and** the computed pill colour in
+  headless Chromium against the real engine, ROM and site stylesheet; the package's CI gained the
+  `rp-badge`-shaped case that would have caught it.
+  **Left, and all of it outward-facing (USER-GATED):** `git push origin npm-package` — which *is* the
+  release, since both sites depend on `github:wbniv/bsnes-jg-wasm#npm-package` — then
+  `pnpm update @wbniv/bsnes-jg-player` per site, optional `npm publish`, then **(5)** the gallery
+  republish + `mode: "live-record"` manifest flip, then a deploy tag. Until the push lands, both
+  sites' CI `sync --check` fails on 1.1.0-vs-1.0.0; that is the drift gate working. Spec, raw
+  evidence and the exact sequence in the
+  [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md) (*Status (2026-09-15)*).
 - [x] ~~**MAME leg for the cartsize canaries — blocked on the SPC700 IPL.**~~ **UNBLOCKED + PASS
   2026-08-06:** the checksum-gated IPL is retrievable from SSM; all 14 cartsize configurations pass
   structure, `-verify-machineinstrs`, MAME, bsnes-jg, and six-boot entropy independence. The wider unlocked
@@ -1930,4 +1938,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** **Newton's gate capture frames are earlier than its fill.** Both drivers snapshot while the basin — _from [2026-06-28-snes-demo-startup-garbage-and-title-screens.md](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)_  <!-- fp:d0b4dbafe655b800 -->
 - [ ] **(triage)** `snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title, in video playback: — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:2fa4f51ae43816fd -->
 - [ ] **(triage)** `dev/title-entropy.sh` is not wired into any gate runner yet. Every `m7title.h` / `title_layer.h` — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:588a35b403879067 -->
+- [ ] **(triage)** **The gallery ROM is deliberately not in the npm demo bundle.** The uncommitted staging carried an — _from [2026-07-28-gallery-per-image-selfcheck.md](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)_  <!-- fp:3c70dd32f80933b5 -->
+- [ ] **(triage)** **The retarget rows remain unexercised** (`running` "following your navigation", `fail` "navigation — _from [2026-07-28-gallery-per-image-selfcheck.md](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)_  <!-- fp:4857ea6f5fc8b33a -->
 <!-- END auto-captured-deferrals -->

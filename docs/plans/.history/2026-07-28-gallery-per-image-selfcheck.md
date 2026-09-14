@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/80ed296) | docs(gallery): the ROM republish is decoupled from the player release, and verified |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/b0b8e0d) | docs(gallery)+todo: badge-state matrix; the badge has never been styled |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/de4cd34) | docs(gallery)+dev: confirm the 24000-frame budget over all 62 works |
 | [2026-07-31](https://github.com/wbniv/llvm-mos-65816/commit/78889c7) | feat(gallery): publish the DISPLAYED work's verdict — ROM + offline half of the per-image button |
@@ -11,6 +12,11 @@
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/66d59c9) | docs(gallery): root-cause notes for the work-0 repack divergence; #137 step 6 is FAIL |
 
 <!--history-meta v1
+80ed296	author	Will Norris
+80ed296	added	19
+80ed296	deleted	1
+80ed296	files	1
+80ed296	body	Replaying the LIVE manifest entry verbatim (symbol gallery_last_z, want 0x3BC9, frames 12000)\nagainst the newly built record-carrying ROM passes. So the new ROM can be shipped at any time\nwithout touching the manifest and without the button changing behaviour for any visitor -- it\njust puts gallery_shown on the site and makes sync-manifest-offsets.py's byte-identity guard\nsatisfiable, leaving the `mode` flip as the only step that waits on the player package.\n\nThe same replay against the currently shipped ROM also still passes, so the merge regressed\nnothing on the legacy scalar path.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 b0b8e0d	author	Will Norris
 b0b8e0d	added	69
 b0b8e0d	deleted	0

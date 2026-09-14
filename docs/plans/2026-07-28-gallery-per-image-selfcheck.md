@@ -472,6 +472,8 @@ lzss-gallery` must pass before the deploy.
    `GALLERY_BENCH_ONLY` decode gate (`0x5CF0` all-pass / `0xA50F` any-failure) landed with the fix.
 6. **Player package** — implement `mode: "live-record"` in `@wbniv/bsnes-jg-player` per *The player
    / manifest contract*, release, resync the sites. **ESCALATED — not landable from this repo.**
+   ~~implement~~ **done**; ~~resync~~ **done locally** (2026‑09‑15, `1.1.0`, *Status (2026-09-15)*).
+   **Release is the one remaining act and it is outward-facing: USER-GATED.**
 
 > **The `"symbol"` field is mandatory here, not decorative.** `dev/sync-manifest-offsets.py`
 > rewrites every selfcheck's `off` to the freshly rebuilt ROM's link address, and it used to
@@ -883,14 +885,19 @@ verify-web-roms: 0 passed, 1 failed, 0 missing
 | `pass` **✓ FIDELITY** | **YES** | fixture replay above, real ROM, real oracle table |
 | `fail` **✗ MISMATCH** | **YES** | one-byte oracle corruption (step 8) and the synthetic record above |
 | `fail` **✗ FAILED** (`ok≠1`) | **decision YES, ROM-side no** | the branch fires with the right message; producing `ok=0` from the ROM needs a deliberately broken build — the pre-fix ROM was exactly that and read `gallery_last_ok = 0` (*Findings 2026‑07‑28*) |
-| `warn` **⏱ still verifying** | **condition YES, badge NO** | budget exhaustion reproduces headlessly, but the gate renders it **FAIL**, not `warn`. Correct for a gate (a check that could not confirm must not pass); the indeterminate rendering is browser-only |
-| `running` "verifying…" / "verifying *T*… n/N" | **NO** | transient per-chunk state; `jgxcheck` polls internally and never surfaces it |
+| `warn` **⏱ still verifying** | **condition YES, badge NO** → **YES 2026‑09‑15** | budget exhaustion reproduces headlessly, but the gate renders it **FAIL**, not `warn`. Correct for a gate (a check that could not confirm must not pass); the indeterminate rendering is browser-only. *Now exercised in a real browser — `Status (2026-09-15)`* |
+| `running` "verifying…" / "verifying *T*… n/N" | **NO** → **YES 2026‑09‑15** | transient per-chunk state; `jgxcheck` polls internally and never surfaces it. *A `MutationObserver` on the badge captures it without polling — `Status (2026-09-15)`* |
 | `running` "following your navigation to *T*" | **NO** | needs live pad/keyboard input into a running machine mid-check |
 | `fail` "navigation kept restarting the check" | **NO** | needs two navigations inside one check |
 
 **PARTIAL — and the blocker is not the ROM.** Everything the ROM and the manifest owe the button
 is verified. The four unexercised rows are all *player-runtime* behaviour, and they need the
 package release (step 6), which is user-gated.
+
+> **RESOLVED 2026‑09‑15 — see *Status (2026-09-15)*.** `badge()` swaps the state class with
+> `classList` instead of assigning `className`, so the base class the markup carries survives; the
+> four rows marked **NO**/**badge NO** above are now exercised in a real browser against the real
+> packaged engine, with the computed pill colour asserted. The finding as originally written:
 
 > **Found while doing this: the badge has never been styled.** `SnesPlayer.astro` renders
 > `<span id="checkresult" class="rp-badge">` and biohack.net styles `.rp-badge.pass` /
@@ -1128,3 +1135,165 @@ quiescence guard adopted `5587462`.)*
   byte-identity guard satisfiable, leaving the `mode` flip as the only step that waits on the
   player. (The same replay against the *currently shipped* ROM also still passes, so the merge
   regressed nothing.)
+
+## Status (2026-09-15) — player `1.1.0` prepared and browser-verified; publication USER-GATED
+
+Everything in step 6 that can be done without an outward-facing action is done, committed **locally
+only**, and verified in a real browser. Nothing is pushed, published, tagged or deployed.
+
+### The badge fix — what it actually is
+
+The *Still open* callout named the symptom (`className = "badge " + cls` replaces `rp-badge`) and
+proposed writing `"rp-badge "` instead. That proposal is wrong in one direction the callout did not
+see: the package ships **two** markup shapes with **different** base classes — `rp-badge` in
+`astro/SnesPlayer.astro` and `embed/snippet.html`, plain `badge` in the package's own demo page —
+and any embedder may supply a third. Hardcoding either literal only moves the breakage.
+
+So the fix does not write a base class at all. It **swaps the state class and leaves everything else
+alone**, which is correct for every base class including ones this package has never seen:
+
+```js
+function badgeState(cls) {
+  if (!checkEl) return;
+  checkEl.classList.remove("running", "pass", "fail", "warn");
+  if (cls) checkEl.classList.add(cls);
+}
+```
+
+Every write to `checkEl.className` is gone — the two `playUrl`/`playFile` resets and the three
+legacy-scalar assignments included. *Sequencing* says the legacy `else` branch "must stay
+byte-for-byte what it is today"; that constraint was about not changing legacy **behaviour** when
+adding `mode`, and it is honoured — but the legacy path had the same defect, so it is fixed too, and
+that is deliberate rather than incidental.
+
+### Browser verification — real engine, real ROM, real site stylesheet
+
+Headless Chromium (Playwright) serving the packaged `dist/engine/app.js` under
+`astro/SnesPlayer.astro`'s markup and `biohack.net/src/styles/snes-page.css`. A `MutationObserver` on
+`#checkresult` records every class transition, so the transient `running` state cannot be missed by
+polling — which is what made that row unexercisable before. Each case asserts the base class, the
+state class, *and* `getComputedStyle().backgroundColor`, because a class that is present but
+unmatched by CSS is the bug being fixed and a class-string assertion alone would not have caught it.
+
+**Before** — the same harness, same ROM, same markup, against the *released* `1.0.0` engine
+(`dist/engine/app.js` at `~/bsnes-jg-wasm` HEAD) and biohack.net's `HEAD` stylesheet. The base class
+is destroyed on the very first reset, before the check even starts, and the PASS pill's background
+stays fully transparent — the defect, reproduced:
+
+```
+=== BEFORE (released app.js 1.0.0) / scalar  (rom=mandel-display, 216.4s) ===
+  transition  class="rp-badge"  bg=rgba(0, 0, 0, 0)  text=""
+  transition  class="badge"  bg=rgba(0, 0, 0, 0)  text=""
+  transition  class="badge running"  bg=rgba(0, 0, 0, 0)  text=""
+  transition  class="badge pass"  bg=rgba(0, 0, 0, 0)  text="✓ FIDELITY 0x204F == gate (gate jgxcheck CRC (corpus_result @ WRAM $0200"
+  [FAIL] base class survives every transition
+  [PASS] terminal state class is "pass"
+  [PASS] no stray state class alongside it
+  [PASS] a "running" state was observed first
+  [FAIL] computed background == rgb(84, 217, 140) (site CSS applied)
+  [PASS] no page errors
+
+BEFORE (released app.js 1.0.0): 2 CHECK(S) FAILED
+```
+
+Note the third and fourth transitions: the state class is correct all along. Only the *base* class
+is missing, which is why the defect survived every text-based check ever run against this button —
+`grep 'badge pass'` matches that line perfectly.
+
+**After** — the fixed engine, `.rp-badge.warn` added to the stylesheet:
+
+```
+=== AFTER (app.js 1.1.0 + .rp-badge.warn) / scalar  (rom=mandel-display, 215.2s) ===
+  transition  class="rp-badge"  bg=rgba(0, 0, 0, 0)  text=""
+  transition  class="rp-badge running"  bg=rgba(0, 0, 0, 0)  text=""
+  transition  class="rp-badge pass"  bg=rgb(84, 217, 140)  text="✓ FIDELITY 0x204F == gate (gate jgxcheck CRC (corpus_result @ WRAM $0200"
+  [PASS] base class survives every transition
+  [PASS] terminal state class is "pass"
+  [PASS] no stray state class alongside it
+  [PASS] a "running" state was observed first
+  [PASS] computed background == rgb(84, 217, 140) (site CSS applied)
+  [PASS] no page errors
+
+=== AFTER (app.js 1.1.0 + .rp-badge.warn) / warn  (rom=lzss-gallery, 20.6s) ===
+  transition  class="rp-badge"  bg=rgba(0, 0, 0, 0)  text=""
+  transition  class="rp-badge running"  bg=rgba(0, 0, 0, 0)  text="verifying… 120/400"
+  transition  class="rp-badge warn"  bg=rgb(255, 209, 102)  text="⏱ still verifying … — not finished within 400 frames"
+  [PASS] base class survives every transition
+  [PASS] terminal state class is "warn"
+  [PASS] no stray state class alongside it
+  [PASS] a "running" state was observed first
+  [PASS] computed background == rgb(255, 209, 102) (site CSS applied)
+  [PASS] no page errors
+
+=== AFTER (app.js 1.1.0 + .rp-badge.warn) / fail  (rom=lzss-gallery, 366.8s) ===
+  transition  class="rp-badge"  bg=rgba(0, 0, 0, 0)  text=""
+  transition  class="rp-badge running"  bg=rgba(0, 0, 0, 0)  text="verifying… 120/24000"
+  transition  class="rp-badge fail"  bg=rgb(255, 107, 107)  text="✗ MISMATCH Under the Wave off Kanagawa got 15305 want 15304"
+  [PASS] base class survives every transition
+  [PASS] terminal state class is "fail"
+  [PASS] no stray state class alongside it
+  [PASS] a "running" state was observed first
+  [PASS] computed background == rgb(255, 107, 107) (site CSS applied)
+  [PASS] no page errors
+
+=== AFTER (app.js 1.1.0 + .rp-badge.warn) / pass  (rom=lzss-gallery, 379.5s) ===
+  transition  class="rp-badge"  bg=rgba(0, 0, 0, 0)  text=""
+  transition  class="rp-badge running"  bg=rgba(0, 0, 0, 0)  text="verifying… 120/24000"
+  transition  class="rp-badge pass"  bg=rgb(84, 217, 140)  text="✓ FIDELITY Under the Wave off Kanagawa — repacked on-SNES to 15305 B == "
+  [PASS] base class survives every transition
+  [PASS] terminal state class is "pass"
+  [PASS] no stray state class alongside it
+  [PASS] a "running" state was observed first
+  [PASS] computed background == rgb(84, 217, 140) (site CSS applied)
+  [PASS] no page errors
+
+AFTER (app.js 1.1.0 + .rp-badge.warn): ALL CHECKS PASS
+```
+
+`fail` is the one-byte oracle corruption (`oracle[work] - 1`) and reproduces the exact MISMATCH
+wording with both byte counts named; `warn` is the manifest's `frames` truncated to 400, below the
+~320-frame pre-display pipeline; `pass` is the unmodified manifest reaching `state == ready` at
+15 305 B, matching `report.json[0].compressed_bytes` for `great-wave`. The `scalar` case is
+`mandel-display` through the untouched legacy power-on path, proving that branch still lands its
+`0x204F` CRC with the base class intact.
+
+### The regression guard
+
+The package's own CI greps the rendered DOM for `badge pass` — and **could never have caught this
+bug**, because the page it serves (`web/index.html`) carries base class `badge`, exactly what a
+hardcoded `className = "badge " + cls` writes anyway. `.github/workflows/ci.yml` now runs the same
+fidelity check a third time against a harness whose badge span is rewritten to `class="rp-badge"`
+and asserts `id="checkresult" class="rp-badge pass"` — the base class and the state class together,
+on the markup shape the sites actually use. That is the case that fails on the pre-fix engine.
+
+### What is committed, and what is not
+
+| repo | branch | state |
+|---|---|---|
+| `~/bsnes-jg-wasm` | `npm-package` | `1.1.0` committed — **not pushed, not published, not tagged** |
+| `~/biohack.net` | `master` | engine synced + `.rp-badge.warn` committed — **not pushed, not deployed** |
+| `~/indri.studio` | `main` | engine synced + `.rp-badge.warn` committed — **not pushed, not deployed** |
+
+**The release is a branch push, not an `npm publish`.** Both sites depend on
+`"@wbniv/bsnes-jg-player": "github:wbniv/bsnes-jg-wasm#npm-package"`, so pushing that branch *is*
+the release for them; the registry publish only matters for outside consumers. Until the push lands,
+both sites' deploy CI (`npx bsnes-jg-player sync --check`) sees `1.1.0` on disk against `1.0.0` in
+`node_modules` and **fails** — that is the drift gate doing its job, not a defect, and it is why
+these commits must not be deployed before the push.
+
+User-gated sequence, in order: push `npm-package` → `pnpm update @wbniv/bsnes-jg-player` on each site
+→ (optional) `npm publish` → gallery republish + `mode: "live-record"` manifest flip → tag to deploy.
+
+### Follow-up
+
+- **The gallery ROM is deliberately not in the npm demo bundle.** The uncommitted staging carried an
+  `lzss-gallery` entry in `dist/demo/roms/manifest.json` whose `.sfc` was never staged beside it, so
+  `sync --demo` would have seeded a picker button that 404s. Shipping the ROM instead would grow the
+  published tarball from 1.9 MB to ~2.9 MB (+50 %) for a demo asset. The manifest keeps only the
+  `live-record` **schema documentation** in `_comment`, and `scripts/stage-dist.sh` now filters the
+  demo manifest to the ROMs it actually stages (`DEMO_ROMS`) so the two can no longer disagree.
+  Flipping this is a one-line `DEMO_ROMS` edit if the package should demo `live-record` out of the box
+  — a publishing-size decision, left to the user.
+- **The retarget rows remain unexercised** (`running` "following your navigation", `fail` "navigation
+  kept restarting the check"). They need live pad input into a running machine mid-check, which this
+  harness does not drive; tracked in `~/bsnes-jg-wasm/TODO.md`.
