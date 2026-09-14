@@ -261,19 +261,72 @@ $ ls -l --time-style=+%F build/llvm-mos-install/bin/clang-23
 The 5,802,443‑byte packed video stream is byte-identical to the published ROM — the asset pipeline
 reproduces exactly — and every one of the 37,598 differing bytes is in the 64 KiB FastROM code window
 or its ExHiROM mirror. The installed compiler post-dates the release (`clang-23` built 2026‑08‑05;
-six `patches/llvm-mos/` commits since 2026‑08‑03), so `dev/svx2-emulator-validation.sh`'s `cmp` can only
-pass on the exact toolchain that built `v1.0.360`. That gate belongs to
-[`2026-08-02-svx2-artemis-2x-apollo-60p-reel.md`](2026-08-02-svx2-artemis-2x-apollo-60p-reel.md) and is
-left as-is here; the decision it needs (pin/record the release toolchain, or split the gate into
-"stream byte-identical + code functionally gated", or re-publish from the current toolchain) is a
-product call — escalated in the report. For *this* plan the finding confirms the retirement of gate 7:
-"published == gated" cannot be re-derived by any plan without that decision.
+six `patches/llvm-mos/` commits since 2026‑08‑03), so the whole-ROM `cmp` could only pass on the exact
+toolchain that built `v1.0.360`. Escalated; **resolved the same day** by applying the Mode 7 gallery
+reconciliation's policy ([`2026-09-14-m7-gallery-web-reconcile.md`](2026-09-14-m7-gallery-web-reconcile.md),
+row 2): the gate was split into (1) deployed == publication record, (2) packed stream regions
+byte-identical, (3) the functional gates, with the code-window divergence *classified* by whether any commit
+after the publication commit touches the ROM's compile inputs. The decomposition (publication-commit sources
+rebuilt with today's toolchain) showed the drift is **mixed** — toolchain (`S0 ≠ P`, 19,712 code bytes)
+*and* source (`S0 ≠ S1`, 17,183 code bytes, from `8eca83a` and `ff35036`) — so the reshaped gate reports
+`DIVERGENCE (demo-source drift)` rather than the toolchain-only line; that finding and the re-run's raw
+output are recorded in the artemis‑2x‑apollo plan's "Verification record — 2026‑09‑14". For *this* plan the
+finding confirms the retirement of gate 7: "published == gated" is the successor's contract, scored by its
+own policy.
+
+### 5b. Re-run after the split: `dev/svx2-emulator-validation.sh` (expect exit 0)
+
+```
+$ dev/svx2-emulator-validation.sh
+/tmp/svx2-emulator-validation/svx2-fastrom-video-v1.0.360-c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2.sfc.download: OK
+1. deployed ROM == publication record (v1.0.360, c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2): PASS
+==> 1,200-frame mixed reel: Artemis source frames at 2x, Apollo source frames at 59.94p
+==> shared 222-colour content palette; entries 0/1 reserved for HUD
+  PASS: 1200 quantized frames; 1200 unique; adjacent holds=[]
+frames=1200 packets=3232607 seek=58207 loop=3757 padding=2507872 total=3294571 max=3852
+mirrored FastROM code at file $000000-$00FFFF; packed 5802443 stream bytes at $010000-$3FFFFF then $410000; ROM=8388608 bytes
+displayed FPS gauge: 60.0 at VBlank 400 and 3000
+DASHBOARD: PASS ink_pixels=453
+FIDELITY: PASS frame=115 exact=49.4751% mae=10.8723
+SMOKE: PASS off=0x206 len=4 got=0x00000000 (ran 3000 frames, bsnes-jg)
+SMOKE: PASS off=0x30 len=2 got=0x0B06 (ran 3000 frames, bsnes-jg)
+ROM=/home/will/llvm-mos-65816-svx2-anchors/build/svx2-video-reel.sfc
+  PASS: ExHiROM cut offsets 0x3ef147, 0x3f0000, 0x3f0f0c
+==> exact ExHiROM cut frames
+SMOKE: PASS off=0x2E len=2 got=0x0257 (ran 1600 frames, bsnes-jg)
+DASHBOARD: PASS ink_pixels=459
+FIDELITY: PASS frame=599 exact=41.3432% mae=19.5811
+SMOKE: PASS off=0x2E len=2 got=0x0258 (ran 1600 frames, bsnes-jg)
+DASHBOARD: PASS ink_pixels=450
+FIDELITY: PASS frame=600 exact=60.2946% mae=8.8276
+==> deterministic transport and bidirectional seam crossings
+SMOKE: PASS off=0x204 len=1 got=0x04 (ran 376 frames, bsnes-jg)
+SMOKE: PASS off=0x26 len=1 got=0x00 (ran 376 frames, bsnes-jg)
+SMOKE: PASS off=0x2E len=2 got=0x027D (ran 775 frames, bsnes-jg)
+SMOKE: PASS off=0x2E len=2 got=0x0239 (ran 825 frames, bsnes-jg)
+==> 9,000 exact presentations after the 178-field title
+SMOKE: PASS off=0x30 len=2 got=0x2327 (ran 9177 frames, bsnes-jg)
+SMOKE: PASS off=0x202 len=2 got=0x0000 (ran 9177 frames, bsnes-jg)
+SMOKE: PASS off=0x206 len=4 got=0x00000000 (ran 9177 frames, bsnes-jg)
+ROM=/home/will/llvm-mos-65816-svx2-anchors/build/svx2-video-reel.sfc
+3. functional gates (dev/snes-video-artemis-apollo.sh): PASS
+2. asset contract: packed stream regions byte-identical to the deployed ROM: PASS
+rebuilt ROM SHA-256: 17c2cf03e630ddf509dbdc56bd860b91853a1628ee9a712f202f65d769434cd1
+DIVERGENCE (demo-source drift): published c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2 vs built 17c2cf03e630ddf509dbdc56bd860b91853a1628ee9a712f202f65d769434cd1; stream identical; code differs (18797 bytes in $000000-$00FFFF); commits after f61472a touching the compile inputs:
+    09fb433 svx2: restore the LoROM fixture, retire stale plan anchors, measure t0 in the cadence gate
+    ff35036 fix(321): Mode 7 splash handoff contract — post-title force-blank 720 -> 22 frames
+    8eca83a refactor(snes): one shared FPS gauge, and gate the number it displays
+RESULT: PASS — public v1.0.360 matches its publication record; rebuild passes every functional gate; policy row 2(a): the divergence is demo-source drift, whose action is a user-triggered republish (refresh the publication record when it lands)
+exit=0
+```
 
 ## Result
 
-Steps 1–4 **PASS**; step 5 **FAIL** for a reason outside this change (toolchain drift vs the published
-release), documented above. The `[verify T3] svx2-animated-video-cartridge` item is unblocked: the parent
-plan's gates 1–6 PASS on the restored LoROM fixture and gate 7 is retired.
+Steps 1–4 **PASS**; step 5 recorded the pre-split FAIL and its cause; step 5b **PASS** under the reshaped
+gate (deployed == record, streams identical, functional gates green, divergence classified as demo-source
+drift — policy action is a user-triggered republish, not done here). The `[verify T3]
+svx2-animated-video-cartridge` item is unblocked: the parent plan's gates 1–6 PASS on the restored LoROM
+fixture and gate 7 is retired.
 
 ## Residual risk
 

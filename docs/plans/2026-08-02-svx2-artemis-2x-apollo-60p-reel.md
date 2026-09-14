@@ -108,6 +108,98 @@ forward seek, and reverse seek all exercise the region-A/file-`$410000` seam on 
   a measured false positive caused by a stable four-row change in naturally black Artemis source
   imagery; the ordinary threshold remains unchanged for every other ROM.
 
+## Verification record — 2026‑09‑14: `dev/svx2-emulator-validation.sh` reshaped (`wt/svx2-anchors`)
+
+**Why the gate changed.** The script compared the whole rebuilt 8 MiB image byte-for-byte to the published
+`c3d7cd9e…`. That comparison includes compiler output, so it can only pass on the exact toolchain that built
+`v1.0.360`; today's `main` (`clang-23` built 2026‑08‑05, six `patches/llvm-mos/` commits since 2026‑08‑03)
+fails it while every functional gate passes. The reshaped gate follows the policy set by the Mode 7 gallery
+reconciliation ([`2026-09-14-m7-gallery-web-reconcile.md`](2026-09-14-m7-gallery-web-reconcile.md), decision
+row 2): *the gate compares against the last publication record; a rebuild that differs is scored by why —
+demo-source drift → republish, toolchain-only drift → accepted divergence.* Three checks now, none of them a
+whole-ROM `cmp`:
+
+1. the deployed ROM matches the SHA-256 in **Published result** above;
+2. **asset contract** — the rebuild's packed stream regions (file `$010000–$3FFFFF` and `$410000–`) are
+   byte-identical to the deployed ROM;
+3. **code contract** — the rebuild passes every functional gate of `dev/snes-video-artemis-apollo.sh`
+   (`0x0B06` presentations in 3,000, seam offsets, transport replays, `0x2327` in 9,177 with zero slips,
+   composite health zero).
+
+The rebuilt whole-ROM SHA-256 is still printed. When it differs from the record the script classifies the
+code-window divergence: it asks the preprocessor (`-MM`) for the ROM's tracked compile inputs and runs
+`git log f61472a..HEAD -- <inputs>`; no commits → `ACCEPTED DIVERGENCE (toolchain drift)`, otherwise
+`DIVERGENCE (demo-source drift)` naming the commits, with the policy's action (a user-triggered republish)
+stated. Both exit 0 — the pass/fail of the gate is checks 1–3, as in the reconciliation's row 2, where the
+republish is a separate staged step.
+
+**Decomposition measured before reshaping** (publication commit's sources rebuilt with today's toolchain,
+same header + stream; scratch A/B, not a tracked script):
+
+```
+S0 (f61472a sources, today's toolchain): ecfa53f8f4943cc4
+S1 (HEAD sources,    today's toolchain): 17c2cf03e630ddf5
+P  (published v1.0.360):                 c3d7cd9e76d840f7
+S0 vs P : code=19712 streamA=0 mirror=19716 streamB=0
+S0 vs S1: code=17183 streamA=0 mirror=17187 streamB=0
+S1 vs P : code=18797 streamA=0 mirror=18801 streamB=0
+```
+
+`S0 ≠ P` → toolchain drift is real. `S0 ≠ S1` → source drift is also real: of the commits after `f61472a`,
+`8eca83a` (shared FPS gauge; `snes-video-reel.c`, `video_fps.h`) and `ff35036` (Mode 7 splash contract) touch
+this ROM's actual compile inputs; `304f3c3` and the `snesgfx` first-frame commits do not; `09fb433` touches
+`snes-video-reel.c` but is byte-neutral for this build (A/B identical `17c2cf03…`). So on 2026‑09‑14 the
+divergence is **mixed**, and the policy row's (a) applies: the published ROM predates two source changes to
+its player. Neither is a behavioural change on this reel by the gates' own measure (t0 = 178 unchanged, gauge
+60.0, all cadence/seam/transport gates green), but the record is stale until a republish refreshes it — that
+republish is user-triggered and was not done here.
+
+**Raw output, 2026‑09‑14 run** (`wt/svx2-anchors`, toolchain as-built, no rebuild):
+
+```
+$ dev/svx2-emulator-validation.sh
+/tmp/svx2-emulator-validation/svx2-fastrom-video-v1.0.360-c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2.sfc.download: OK
+1. deployed ROM == publication record (v1.0.360, c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2): PASS
+==> 1,200-frame mixed reel: Artemis source frames at 2x, Apollo source frames at 59.94p
+==> shared 222-colour content palette; entries 0/1 reserved for HUD
+  PASS: 1200 quantized frames; 1200 unique; adjacent holds=[]
+frames=1200 packets=3232607 seek=58207 loop=3757 padding=2507872 total=3294571 max=3852
+mirrored FastROM code at file $000000-$00FFFF; packed 5802443 stream bytes at $010000-$3FFFFF then $410000; ROM=8388608 bytes
+displayed FPS gauge: 60.0 at VBlank 400 and 3000
+DASHBOARD: PASS ink_pixels=453
+FIDELITY: PASS frame=115 exact=49.4751% mae=10.8723
+SMOKE: PASS off=0x206 len=4 got=0x00000000 (ran 3000 frames, bsnes-jg)
+SMOKE: PASS off=0x30 len=2 got=0x0B06 (ran 3000 frames, bsnes-jg)
+ROM=/home/will/llvm-mos-65816-svx2-anchors/build/svx2-video-reel.sfc
+  PASS: ExHiROM cut offsets 0x3ef147, 0x3f0000, 0x3f0f0c
+==> exact ExHiROM cut frames
+SMOKE: PASS off=0x2E len=2 got=0x0257 (ran 1600 frames, bsnes-jg)
+DASHBOARD: PASS ink_pixels=459
+FIDELITY: PASS frame=599 exact=41.3432% mae=19.5811
+SMOKE: PASS off=0x2E len=2 got=0x0258 (ran 1600 frames, bsnes-jg)
+DASHBOARD: PASS ink_pixels=450
+FIDELITY: PASS frame=600 exact=60.2946% mae=8.8276
+==> deterministic transport and bidirectional seam crossings
+SMOKE: PASS off=0x204 len=1 got=0x04 (ran 376 frames, bsnes-jg)
+SMOKE: PASS off=0x26 len=1 got=0x00 (ran 376 frames, bsnes-jg)
+SMOKE: PASS off=0x2E len=2 got=0x027D (ran 775 frames, bsnes-jg)
+SMOKE: PASS off=0x2E len=2 got=0x0239 (ran 825 frames, bsnes-jg)
+==> 9,000 exact presentations after the 178-field title
+SMOKE: PASS off=0x30 len=2 got=0x2327 (ran 9177 frames, bsnes-jg)
+SMOKE: PASS off=0x202 len=2 got=0x0000 (ran 9177 frames, bsnes-jg)
+SMOKE: PASS off=0x206 len=4 got=0x00000000 (ran 9177 frames, bsnes-jg)
+ROM=/home/will/llvm-mos-65816-svx2-anchors/build/svx2-video-reel.sfc
+3. functional gates (dev/snes-video-artemis-apollo.sh): PASS
+2. asset contract: packed stream regions byte-identical to the deployed ROM: PASS
+rebuilt ROM SHA-256: 17c2cf03e630ddf509dbdc56bd860b91853a1628ee9a712f202f65d769434cd1
+DIVERGENCE (demo-source drift): published c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2 vs built 17c2cf03e630ddf509dbdc56bd860b91853a1628ee9a712f202f65d769434cd1; stream identical; code differs (18797 bytes in $000000-$00FFFF); commits after f61472a touching the compile inputs:
+    09fb433 svx2: restore the LoROM fixture, retire stale plan anchors, measure t0 in the cadence gate
+    ff35036 fix(321): Mode 7 splash handoff contract — post-title force-blank 720 -> 22 frames
+    8eca83a refactor(snes): one shared FPS gauge, and gate the number it displays
+RESULT: PASS — public v1.0.360 matches its publication record; rebuild passes every functional gate; policy row 2(a): the divergence is demo-source drift, whose action is a user-triggered republish (refresh the publication record when it lands)
+exit=0
+```
+
 ## Acceptance
 
 The reel is accepted when it restores the launch/return spectacle, preserves genuine ~59.94 motion

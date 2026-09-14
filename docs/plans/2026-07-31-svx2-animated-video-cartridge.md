@@ -442,9 +442,10 @@ PASS: header, size, decomposition, vectors and checksum all agree.
 
 **RETIRED** for this plan (see the gate list and the decision doc, anchor (b)). The successor's
 `dev/svx2-emulator-validation.sh` is the owner of "published == gated"; its result on this date is
-recorded in the decision doc's verification, step 5 — all emulator gates PASS, but the rebuilt image's
-code window differs from the published `v1.0.360` (toolchain drift since the release; the packed video
-stream is byte-identical). That finding belongs to the successor plan.
+recorded in the decision doc's verification, steps 5/5b — all emulator gates PASS; the rebuilt image's
+code window differs from the published `v1.0.360` (the packed video stream is byte-identical), and the
+successor's gate now classifies that divergence per the reconciliation policy instead of failing on it.
+That finding belongs to the successor plan.
 
 **Verdict: gates 1–6 PASS on the restored LoROM fixture; gate 7 retired; preliminary PASS.**
 
