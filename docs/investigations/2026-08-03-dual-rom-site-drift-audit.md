@@ -139,6 +139,18 @@ In particular, touch-navigation timer state and cleanup moved to player scope af
 chevron implementation. Publishing different bytes under the same `1.0.0` label defeats package
 versioning and makes cache/provenance diagnosis ambiguous.
 
+**Resolved 2026-09-14 — this drift was a live outage, not a labelling nit.** The `100f4b5122e4…`
+`app.js` indri served (bsnes-jg-wasm `642d3c9`) defines `clearTouchNav()` inside the canvas
+pointer-handler closure but calls it from `stopLoop()` at player scope; `playUrl()` → `stopLoop()`
+threw `ReferenceError: clearTouchNav is not defined` on every boot, the boot `.catch` blanked
+`#status`, the async `showProvenance()` overwrote the error banner, and the ROM was never fetched —
+**every indri.studio SNES page sat frozen on its poster** from `v0.1.133` (2026-08-02) until the fix
+deployed. biohack's `fdb8b71e…` (package `3ddddb5` + `1ec048f`, the `npm-package` tip) is the
+corrected build. Fix: indri.studio `6cb870e` (`pnpm update @wbniv/bsnes-jg-player` → lock pin
+`1ec048f`, `pnpm run sync-engine`); the four assets and `ENGINE_VERSION` are now byte-identical to
+biohack.net's. Evidence and the pre-deploy verification are in the nav-chevron plan's 2026-09-14
+record ([`docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md`](../plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)).
+
 ## Finding 4 — preview drift
 
 Two previews differ among otherwise common releases:

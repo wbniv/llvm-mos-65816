@@ -243,6 +243,40 @@ can see, so both get their own check:
   the regression class is a line's *wrapped* tilemap copy bleeding into the other line's HDMA band
   (both lines arriving from both edges), and it is only visible mid-slide.
 
+### Verifying a published web player page headlessly (Playwright) — the gotchas
+
+Both sites run the ROM in `@wbniv/bsnes-jg-player` (`app.js` + a bsnes-jg WASM core). When a plan
+step says "test live navigation on the published page", drive it with the cached Playwright
+(`~/.npm/_npx/*/node_modules/playwright`, Chromium headless) and read the **ROM's own state**, not
+just pixels. Learned the hard way on the nav-chevron plan (2026-08-04 → 2026-09-14 records):
+
+- **Read WRAM through the player.** `window.__bjg` is the Emscripten module; `__bjg._bjg_wram()`
+  + `__bjg.HEAPU8` is the same MainRAM pointer the fidelity self-check uses. Symbol offsets come
+  from `build/<rom>.map` (`gallery_canceled` `0x3f`, `gallery_current_asset` `0x472`, …). A mean-luma
+  "did the screen cut" heuristic is fine as secondary evidence but cannot tell *why* nothing moved.
+- **`page.keyboard.press()` is down+up within ~1 ms** — the ROM latches the pad once per NMI, so on a
+  loaded host (the headless core ran at 8–12 fps at load ≈ 24) the press is simply never sampled.
+  Hold it: `keyboard.down` → 150 ms → `keyboard.up`. Chevron clicks are safe because the player
+  itself holds the synthetic bit for a 120 ms pulse.
+- **Count emulated frames, not wall-clock.** Wrap `__bjg._bjg_set_input` (called once per core
+  frame) to count; budget the observation in frames (the console gate's press@1000 → index@2503 is
+  the reference) or the run silently under-observes on a slow host.
+- **Settle past the title card.** The gallery shows `PACK UNPACK LZSS GALLERY` (mean luma ≈ 22) for
+  the first ~10 000 frames and ignores navigation there; wait for a held artwork (luma > 40, stable)
+  before injecting input, or every condition reads "no cut".
+- **"No errors" is not evidence the ROM started.** The player's boot `.catch` writes its error into
+  `#banner`, and the async `showProvenance()` then **overwrites** it — so check `#status` reaches
+  `running <rom>.sfc` and that the `.sfc` was actually requested. The indri.studio freeze
+  (player `100f4b51…`: `clearTouchNav` closure-scoped, called from `stopLoop()` → `ReferenceError`
+  on every boot) hid behind exactly that.
+- **Compare the two sites' `ENGINE_VERSION` first.** Same package `1.0.0` label, different bytes:
+  the sync CLI stamps per-file sha256s, and a site whose `pnpm-lock.yaml` pins an older
+  `github:wbniv/bsnes-jg-wasm#npm-package` tarball commit is one `pnpm update @wbniv/bsnes-jg-player
+  && pnpm run sync-engine` away from the fix — no package release needed if `origin/npm-package`
+  already carries it.
+- Keep the harness scripts in the scratchpad *and* paste them into the plan record; the 2026-08-04
+  harnesses were lost and had to be rebuilt for the re-run.
+
 ## The correctness gate + micro-test pattern
 
 The bar is the **differential**: host-computed == default(non-`+mos-a16`)@MAME == `+mos-a16`@MAME ==
