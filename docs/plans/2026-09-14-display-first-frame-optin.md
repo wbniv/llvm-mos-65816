@@ -412,4 +412,9 @@ Not landed, deliberately:
 ### History
 
 The first implementation of this plan (commit `59ca122`) was runtime-only and is superseded by the
-macro-gated form above; 2a records why, with the measurements that decided it.
+macro-gated form above; 2a records why, with the measurements that decided it. That first pass also
+left `TitleLayer` **out** (its section was titled "Why TitleLayer is left out (and what would
+qualify it)"): `_title_emit` owned CGRAM[0], so `reserve()` could not honestly assert the contract,
+and the two-line fix would have touched ~120 non-adopting demos. The macro made that fix free for
+non-adopters, so the rework (`73e7fe2`) qualified `TitleLayer` — which is what lets `1d-ca` and
+`life` fire the gate. 2e above is the current state.
