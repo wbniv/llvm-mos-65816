@@ -911,19 +911,25 @@ fast decode gate: PASS (all 62 works far-decoded, staged, near-decoded, checksum
 SMOKE: PASS off=0x3F len=2 got=0x0001 (ran 5000 frames, bsnes-jg)
 automatic joypad navigation gate: PASS (Right accepted during foreground decode)
 ==> corpus_result @ WRAM 0x46f; oracle 0x9512
+SMOKE: PASS off=0x46F len=2 got=0x9512 (ran 700000 frames, bsnes-jg)
+==> reproducible-build check (relink and compare)
+reproducible build: PASS (6e8259945f95a980e7ba07d90702edd4dd161bc65335ae1972197121691bd998)
+RESULT: PASS — 62-work LZSS gallery host oracle, relink, header and bsnes-jg gate
 ```
 
-**PARTIAL — legs 1–7 PASS, the 700 000-frame corpus leg and the reproducible-build check were
-still running when this record was written.** The host codec oracle agrees at `-O0` and `-O2`
-across all 62 works, the `+mos-a16` LoROM links with a valid header, the #138 producer gate and the
-NMI / `decode_bank7e` / bank-$00 audits pass, all 62 works far-decode → stage → near-decode →
-checksum (`corpus_result` = `0x5CF0`), and the navigation gate accepts a scripted Right during
-foreground decode. The corpus leg (`jgxcheck` PID 1159333) had accrued only ~1 CPU-hour in 7.5 h of
-wall time because the shared host was running at load ≈ 24; its `SMOKE` line and the relink
-comparison will be appended here when it exits. Note the link is **not** the `a5e59d79…` image the
-sites serve (checksum `0xBA44` vs the record's `0xB18E`; `decode_bank7e` bytes `… 20 8c 82 …` vs
-`… 20 8a 82 …`) — the toolchain has moved since 2026-08-04, which TODO's "republish on drift vs
-record accepted-divergence" decision (b) already tracks. Nothing here changes the ROM.
+**PASS** — every leg green in one run: the host codec oracle agrees at `-O0` and `-O2` across all
+62 works, the `+mos-a16` LoROM links with a valid header, the #138 producer gate and the NMI /
+`decode_bank7e` / bank-$00 audits pass, all 62 works far-decode → stage → near-decode → checksum
+(`corpus_result` = `0x5CF0`), the navigation gate accepts a scripted Right during foreground decode,
+the full 700 000-frame visual corpus reaches the host-derived oracle `0x9512`, and the relink is
+byte-identical (`6e825994…`). The corpus leg took 8 h wall-clock for ~1 h of CPU because the shared
+host sat at load ≈ 24 for most of it — the SMOKE value, not the duration, is the evidence.
+
+Note the link is **not** the `a5e59d79…` image the sites serve (checksum `0xBA44` vs the
+2026-08-04 record's `0xB18E`; `decode_bank7e` bytes `… 20 8c 82 …` vs `… 20 8a 82 …`) — the
+toolchain has moved since, which TODO's "republish on drift vs record accepted-divergence"
+decision (b) already tracks. It is *self*-consistent (relink reproduces it exactly) and passes every
+behavioural gate above with frame-identical results. See step 14.
 
 #### 13. Build both sites and publish the identical verified ROM and player behavior.
 
@@ -1150,16 +1156,18 @@ bytes indri serves.
 | 9 | holding a direction does not repeat | PASS |
 | 10 | timed cut animates right, advances one, wraps | PASS |
 | 11 | mid-decode navigation cancels without corrupting the oracle | PASS |
-| 12 | full gallery gate | PARTIAL — 7 legs PASS; corpus + relink legs still running at record time |
+| 12 | full gallery gate | PASS (incl. 700k-frame corpus `0x9512` and a byte-identical relink) |
 | 13 | both sites built and publishing identical ROM + player behavior | PASS (indri `6cb870e` deployed as v0.1.155/156; live players byte-identical) |
 | 14 | live ROM hashes match the local verified build | PASS site↔site (`a5e59d79…` both); FAIL site↔local (`6e825994…`, toolchain drift) |
 | 15 | live mouse and keyboard navigation on both sites | **PASS live on both sites** (indri pre-deploy and post-deploy v0.1.156 runs) |
 
-**14 of 15 PASS outright (step 12's long legs pending); step 14 is a known-drift FAIL.** The one
+**14 of 15 PASS; step 14 is a known-drift FAIL.** The one
 thing that was actually broken — the indri.studio embed — is root-caused (a scope bug in the pinned
 `100f4b51…` player, not template drift), fixed on the site (`6cb870e`, deployed as
 `v0.1.155`/`v0.1.156`), and the live indri page now passes every input surface with the same
 numbers as biohack.net. The plan's completion criterion ("Left/Right function through every
 supported input surface") is met on both published surfaces, with live evidence. No expectation
 was adjusted and no ROM, manifest or page-template code was touched. Harnesses are kept under
-`dev/m7web/` so this record can be re-run without rebuilding them.
+`dev/m7web/` so this record can be re-run without rebuilding them. The single remaining FAIL
+(step 14, live ROM vs a fresh link) is toolchain drift on an unchanged source, not a navigation
+defect, and is owned by TODO decision (b).
