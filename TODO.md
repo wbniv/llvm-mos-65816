@@ -506,7 +506,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   un-landed (a)/(b) `0002` spike; tear down only when told; (2) post the prepared #321 CC design note
   (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
   [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
-- [T2] **#3 SNES Blossom on-screen interactive port — CORE + HUD DONE, verified, landed on `main`; only optional polish left.**
+- [wip T2] **#3 SNES Blossom on-screen interactive port <!-- agent:a418a0e0b249b67eb --> — CORE + HUD DONE, verified, landed on `main`; only optional polish left.**
   **Landed** (`task blossom` / `dev/run.sh blossom`, RESULT PASS): the Hopalong attractor renders + blooms
   live on the SNES via Mode 7 (`examples/snes/blossom.c`) — far read-modify-write accumulation into a
   128×128 hit grid (`$7E2000`), revealed band-by-band (far grid → near `chrbuf` → VRAM DMA), hue-wheel
@@ -838,7 +838,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
 — keep it in sync (drafted → ready-to-post → posted) with the items in this section._
 
-- [T3] **Fork-patch follow-ups for the 2026‑09‑13 PR revisions** ([bundle](docs/pr-revisions/2026-09-13/README.md) ·
+- [wip T3] **Fork-patch follow-ups for the 2026‑09‑13 PR revisions** <!-- agent:a917313a3863307f4 --> ([bundle](docs/pr-revisions/2026-09-13/README.md) ·
   [review](docs/pr-revisions/2026-09-13/review.md)). After the six revised branches publish: `0010-coalesce-rotate-ac`
   → replace the withdrawn `shouldCoalesce` guard with the #578 `MOSCopyOpt` liveness fix (the fork's copy-opt still has
   the real bug); `0022-mos-late-opt-cmpzero-lowering` → the #589 terminator form (`isTerminator` on `CmpZero`, scan
@@ -990,7 +990,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   functional self-test needs a real Mac) — out of interim scope, likely retired by upstream CI. Whole
   capability retires when `0001–0009` land upstream. [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
-- [T3] **Clean-room test of the *published* SNES compiler — wired into the publish gate** — in a throwaway
+- [wip T3] **Clean-room test of the *published* SNES compiler <!-- agent:a7940ac367fea5a29 --> — wired into the publish gate** — in a throwaway
   Docker container with NO dev toolchain, acquire the published compiler and compile a **sound-free**
   reference Mandelbrot (`examples/snes/mandel-display.c`, 64×56 N=15, CRC `0x204F` — now the far/16-bit
   tester, so **`+mos-a16`-only**; secondary `examples/65816/k_mandel.c` `0x820B`, default-8bit + `+mos-a16`),
@@ -1007,7 +1007,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `dev/test-release.sh` + `dev/release-report.py` + `task release-test`.
   [plan](docs/plans/2026-06-25-test-published-snes-compiler.md).
 
-- [T2] **`dev/jgxcheck` timeline captures are nondeterministic by default — make determinism
+- [wip T2] **`dev/jgxcheck` timeline captures are nondeterministic by default <!-- agent:a490bfb291809d151 --> — make determinism
   explicit.** Found by the 121-badges verification: `jgxcheck.cpp:394` leaves
   `configuration.entropy` at bsnes-jg's default *Low*, which `Random::seed()`s from `clock()` —
   the same frame rendered fully black on one run and 85% non-black on the next; all 121 timeline
@@ -1015,7 +1015,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   entropy None (or require the caller to pass it explicitly), WITHOUT breaking the deliberate
   ×6-entropy-boot fingerprint gates (canary/seamdemo) that want Low. Document in agent-handoff.
   (T2: bounded tool change, two known call patterns.)
-- [T3] **Convert the seven Mode-7 demo `main()`s off the re-opened boot force-blank.** The
+- [wip T3] **Convert the seven Mode-7 demo `main()`s off the re-opened boot force-blank <!-- agent:a951f1786a0e68247 -->.** The
   121-badges verification measured the symptom: 24 pure-black frames (~400 ms) between title exit
   and first compute frame (gate 11 FAIL) — the boot force-blank window re-opening that
   `docs/agent-handoff.md` §"Never force-blank outside boot" already lists as unconverted for the
@@ -1023,7 +1023,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   state unset during frames 52–262 (title/loading window is entropy-sensitive; READY frame is
   not). Cross-cutting but mechanical once the shared pattern is settled; gate 11 re-passes when
   done. (T3: settled pattern in the handoff doc, multi-file execution.)
-- [T3] **Reconcile the Mode-7 gallery website layer with current reality (121 gates 17/20/22/23 +
+- [wip T3] **Reconcile the Mode-7 gallery website layer with current reality <!-- agent:af6d05150eadb7776 --> (121 gates 17/20/22/23 +
   123 gates 2/4/10 — resolve ONCE for both plans).** The 123-filter verification (`9dfd872`)
   confirmed the same 11-not-9 drift from the filter side and added the smoking gun: the plan's
   build-time data-contract assertion and `tests/snes-mode7-filter.test.mjs` were never
@@ -1033,7 +1033,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   land the build-time assertion + test in both site repos together; provision Playwright in the
   sites' CI for a real browser smoke test or formally retire that requirement (jsdom-driving the
   shipped filter script — 123's method — is the strongest browserless evidence and is recorded).
-- [T2] **indri.studio embedded player never starts the ROM — canvas bit-frozen at the poster.**
+- [wip T2] **indri.studio embedded player never starts the ROM <!-- agent:a421a3a5024424582 --> — canvas bit-frozen at the poster.**
   Found by nav-chevron verification step 15 (14/15 PASS otherwise; biohack.net passes all four
   input surfaces with the same ROM): on indri, player script + core load, nothing errors, but
   `#status` never reaches `running <rom>.sfc`, so `playUrl()` never fires. Lead: page-template vs
@@ -1096,7 +1096,7 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   clean); preliminary + gate 7 FAIL — the plan's original artifacts are invalidated by successor
   work (next bullet). Re-run/close once the anchors are re-pointed.
   [plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)
-- [T4] **svx2 plan anchors invalidated by successor work — restore-or-retire decision (svx2
+- [wip T4] **svx2 plan anchors invalidated by successor work <!-- agent:a52a8fd7e2b61542a --> — restore-or-retire decision (svx2
   owner).** Found by the verification run above. (a) The plan's 4-frame LoROM "first cartridge"
   is **uncompilable on `main`**: `examples/snes/snes-video-reel.c:287` references
   `VIDEO_REEL_HIROM_BASE_BANK` unconditionally, but `tools/snes-video-reel-assets.py:231` emits
@@ -1111,7 +1111,7 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   nothing generates its 1,800 frames of tiles; its gates reproduce only on the stable 900-frame
   reel. Same restore-or-retire decision. (T4: plan-level ownership
   decision + cross-session file — `snes-video-reel.c` has in-flight edits from another worker.)
-- [verify T3] **lzss-gallery-navigation-and-auto-advance-chevron** — implemented, live, chevron
+- [wip T3] **lzss-gallery-navigation-and-auto-advance-chevron** <!-- agent:a421a3a5024424582 --> — implemented, live, chevron
   input re-fixed `3b8a559`; verify against current main. **2026-08-04 run recorded: 14/15 PASS.**
   Steps 1–14 green (ROM nav + auto-advance chevron + wrap, 120 ms touch pulse and all four
   cancellation surfaces, identical `touchNav` rects, full gallery gate incl. the 700k-frame visual
