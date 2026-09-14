@@ -1,52 +1,155 @@
---- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-+++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -763,6 +763,21 @@
-     const TargetRegisterClass *NewRC, LiveIntervals &LIS) const {
-   const auto &MRI = MI->getMF()->getRegInfo();
- 
-+  // Don't coalesce two shift/rotate-referenced values together into the A-only Ac
-+  // class. The accumulator is the only register ASL/LSR/ROL/ROR can operate on, so
-+  // an Ac value is pinned to A for its whole live range. When such a value is also
-+  // loop-carried across an inner conditional whose other arm needs A (e.g. an
-+  // inlined CRC16 bit loop: the bit-test reloads the pre-rotate byte into A, while
-+  // the rotated value must survive to the next iteration), pinning it to A-only
-+  // leaves the allocator no register to evict it to on the skip path — it strands
-+  // the live value in Y while the back-edge rotate reads a stale A, miscompiling
-+  // silently (the machine verifier does not catch it). Keeping the copy live lets
-+  // the value occupy the broader AImag8/AY class and spill/transfer as needed.
-+  if (NewRC == &MOS::AcRegClass &&
-+      referencedByShiftRotate(MI->getOperand(0).getReg(), MRI) &&
-+      referencedByShiftRotate(MI->getOperand(1).getReg(), MRI))
-+    return false;
+diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
+--- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp
++++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
+@@ -254,6 +254,14 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &MF) {
+     }
+   }
+
++  // Copy forwarding can change the register live around a loop. Propagate
++  // live-ins to a fixed point before using them to erase dead copies.
++  SmallVector<MachineBasicBlock *> Blocks;
++  for (MachineBasicBlock *MBB : post_order(&MF))
++    if (!MBB->isEntryBlock())
++      Blocks.push_back(MBB);
++  fullyRecomputeLiveIns(Blocks);
 +
-   // Don't coalesce Imag8 and AImag8 registers together when used by shifts or
-   // rotates.  This may cause expensive ASL zp's to be used when ASL A would
-   // have sufficed. It's better to do arithmetic in A and then copy it out.
+   for (MachineBasicBlock *MBB : post_order(&MF)) {
+     LivePhysRegs LPR(TRI);
+
+diff --git a/llvm/test/CodeGen/MOS/copy-opt-chain.mir b/llvm/test/CodeGen/MOS/copy-opt-chain.mir
+new file mode 100644
 --- /dev/null
-+++ b/llvm/test/CodeGen/MOS/coalesce-rotate-ac.mir
-@@ -0,0 +1,25 @@
-+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=register-coalescer %s -o - | FileCheck %s
++++ b/llvm/test/CodeGen/MOS/copy-opt-chain.mir
+@@ -0,0 +1,75 @@
++# RUN: llc -mtriple=mos -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mos6502 -start-before=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=ASM
 +
-+# A value used by a rotate (ROL) is pinned to the accumulator (the Ac class), the
-+# only register the rotate can read/write. Coalescing two such values together
-+# into Ac removes the COPY that lets the live value vacate A when the other arm of
-+# an enclosing conditional needs A (e.g. an inlined CRC16 bit loop). That strands
-+# the value and the back-edge rotate reads a stale A -> a silent miscompile. The
-+# coalescer must keep the COPY (MOSRegisterInfo::shouldCoalesce).
++# A dead copy in a successor can make a copy in its predecessor dead as well.
++# Both must go in one run: the successor is cleaned first (post-order) and its
++# live-ins shrink before the predecessor's dead flags are computed. Forwarding
++# cannot remove the chain on its own because $a is clobbered in between.
 +---
-+name: dont_coalesce_rotate_into_ac
++name: dead_copy_chain
 +tracksRegLiveness: true
 +body: |
-+  bb.0:
-+    liveins: $a, $c
-+    ; CHECK: [[ROL:%[0-9]+]]:ac, {{[^=]*}} = ROL %0
-+    ; CHECK-NEXT: %{{[0-9]+}}:ac = COPY [[ROL]]
-+    ; CHECK-NEXT: {{%[0-9]+}}:ac, {{.*}} = ROL
-+    %0:ac = COPY $a
-+    %1:cc = COPY $c
-+    %2:ac, %3:cc = ROL %0, %1
-+    %4:ac = COPY %2
-+    %5:ac, %6:cc = ROL %4, %3
-+    $a = COPY %5
++  ; CHECK-LABEL: name: dead_copy_chain
++  ; CHECK: bb.0.entry:
++  ; CHECK-NOT: COPY
++  ; CHECK: $a = LDImm 5
++  ; CHECK: bb.1:
++  ; CHECK-NOT: COPY
++  ; CHECK: RTS
++  bb.0.entry:
++    liveins: $a
++    $x = COPY $a
++    $a = LDImm 5
++    BRA %bb.1
++
++  bb.1:
++    liveins: $a, $x
++    $y = COPY $x
 +    RTS implicit $a
++...
++
++# Propagate dead-copy removal through two predecessors. Clobbering each source
++# prevents forwarding from bypassing the chain. Check the final assembly too:
++# dead-copy chains must not leave register transfers behind.
++---
++name: dead_copy_chain_three_blocks
++tracksRegLiveness: true
++body: |
++  ; CHECK-LABEL: name: dead_copy_chain_three_blocks
++  ; CHECK: bb.0:
++  ; CHECK-NOT: COPY
++  ; CHECK: $a = LDImm 5
++  ; CHECK-NOT: COPY
++  ; CHECK: bb.1:
++  ; CHECK-NOT: COPY
++  ; CHECK: $x = LDImm 6
++  ; CHECK-NOT: COPY
++  ; CHECK: bb.2:
++  ; CHECK-NOT: COPY
++  ; CHECK: RTS
++  ; CHECK-NOT: COPY
++  ; ASM-LABEL: dead_copy_chain_three_blocks:
++  ; ASM-NOT: {{^[ \t]+[a-z]}}
++  ; ASM: lda #5
++  ; ASM-NOT: {{^[ \t]+[a-z]}}
++  ; ASM: ldx #6
++  ; ASM-NOT: {{^[ \t]+[a-z]}}
++  ; ASM: rts
++  ; ASM-NOT: {{^[ \t]+[a-z]}}
++  bb.0:
++    liveins: $a
++    $x = COPY $a
++    $a = LDImm 5
++    BRA %bb.1
++
++  bb.1:
++    liveins: $a, $x
++    $y = COPY $x
++    $x = LDImm 6
++    BRA %bb.2
++
++  bb.2:
++    liveins: $a, $x, $y
++    $rc3 = COPY $y
++    RTS implicit $a, implicit $x
++...
+diff --git a/llvm/test/CodeGen/MOS/copy-opt-loop.mir b/llvm/test/CodeGen/MOS/copy-opt-loop.mir
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/copy-opt-loop.mir
+@@ -0,0 +1,52 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=COPY
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=mos-copy-opt,postrapseudos,mos-late-opt -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=LOWER
++
++# Forwarding the loop header's A = COPY Y makes A live across the latch.
++# The sign test must not clobber A after its new value is copied to Y.
++---
++name: copy_forward_loop
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $a, $x, $rc28
++    $y = COPY $a
++    BRA %bb.1
++
++  bb.1:
++    liveins: $x, $y, $rc28
++    ; COPY-LABEL: bb.1:
++    ; COPY: liveins: {{.*}}$a{{.*}}
++    ; COPY: $rc2 = COPY $a
++    ; COPY: $a, dead $c = ROL
++    ; LOWER-LABEL: bb.1:
++    ; LOWER: $a, dead $c = ROL
++    ; LOWER-NOT: $a = LDImag8 $rc2
++    ; LOWER: BR %bb.3
++    $a = COPY $y
++    $rc2 = COPY $y
++    $rc28, $c = ASL $rc28
++    $a, dead $c = ROL $a, $c
++    $y = COPY $a
++    CmpBrZero %bb.3, undef $n, 0, $rc2, implicit-def $c
++
++  bb.2:
++    liveins: $x, $y, $rc28
++    $a = COPY $rc28
++    $a = EORImm $a, 33
++    $rc28 = COPY $a
++    $a = COPY $y
++    $a = EORImm $a, 16
++    $y = COPY $a
++    BRA %bb.3
++
++  bb.3:
++    liveins: $x, $y, $rc28
++    ; COPY-LABEL: bb.3:
++    ; COPY: liveins: {{.*}}$a{{.*}}
++    $x = DEC $x
++    CmpBrZero %bb.1, undef $z, 0, $x, implicit-def dead $c
++
++  bb.4:
++    liveins: $y, $rc28
++    RTS implicit $y, implicit $rc28
 +...

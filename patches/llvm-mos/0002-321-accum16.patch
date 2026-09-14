@@ -3888,7 +3888,7 @@ index 9712a96e9e44..29c502c74a45 100644
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
 diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-index 6f68b3d97d8c..dffaf4a763d1 100644
+index d13429a713db..0e357b030d97 100644
 --- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 +++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 @@ -50,6 +50,7 @@ public:
@@ -3907,7 +3907,7 @@ index 6f68b3d97d8c..dffaf4a763d1 100644
      Changed |= tailJMP(MBB);
    }
    return Changed;
-@@ -419,6 +421,111 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
+@@ -400,6 +402,111 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
    return Changed;
  }
 
@@ -5430,7 +5430,7 @@ index 868f6c71270a..b62986d09ab4 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 8e9b57fc9669..23e75b581b98 100644
+index 8e9b57fc9669..3a69ec2d2e5a 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -20,8 +20,10 @@
@@ -5821,7 +5821,7 @@ index 8e9b57fc9669..23e75b581b98 100644
    assert(Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc));
 
    Register A = Loc;
-@@ -656,12 +877,77 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
+@@ -656,12 +877,62 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
    return true;
  }
 
@@ -5880,21 +5880,6 @@ index 8e9b57fc9669..23e75b581b98 100644
 +        copiedFromClobberedPhysImag(MI->getOperand(1).getReg(), MRI, LIS))
 +      return false;
 +  }
-+
-+  // Don't coalesce two shift/rotate-referenced values together into the A-only Ac
-+  // class. The accumulator is the only register ASL/LSR/ROL/ROR can operate on, so
-+  // an Ac value is pinned to A for its whole live range. When such a value is also
-+  // loop-carried across an inner conditional whose other arm needs A (e.g. an
-+  // inlined CRC16 bit loop: the bit-test reloads the pre-rotate byte into A, while
-+  // the rotated value must survive to the next iteration), pinning it to A-only
-+  // leaves the allocator no register to evict it to on the skip path — it strands
-+  // the live value in Y while the back-edge rotate reads a stale A, miscompiling
-+  // silently (the machine verifier does not catch it). Keeping the copy live lets
-+  // the value occupy the broader AImag8/AY class and spill/transfer as needed.
-+  if (NewRC == &MOS::AcRegClass &&
-+      referencedByShiftRotate(MI->getOperand(0).getReg(), MRI) &&
-+      referencedByShiftRotate(MI->getOperand(1).getReg(), MRI))
-+    return false;
 +
    // Don't coalesce Imag8 and AImag8 registers together when used by shifts or
    // rotates.  This may cause expensive ASL zp's to be used when ASL A would

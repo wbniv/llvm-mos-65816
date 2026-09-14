@@ -46,7 +46,9 @@ MOSREL="llvm/lib/Target/MOS"
 # Standalone upstream-bound patches that live INSIDE $MOSREL and are therefore
 # absorbed into 0002 by the mirror+diff below unless they are in the baseline.
 # Each is optional (dropped once it merges upstream and the vendor pin is bumped).
+# Order = dev/toolchain.sh apply order (reverse-applied back to front below).
 STANDALONE_MOSDIR=(
+  "$PATCHES/0010-coalesce-rotate-ac.patch"
   "$PATCHES/0018-320-imag32-spill.patch"
   "$PATCHES/0019-mos-branch-range-diagnostic.patch"
   "$PATCHES/0020-mos-65816-block-move-bank-order.patch"

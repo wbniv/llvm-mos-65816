@@ -63,7 +63,7 @@ Survey facts that shaped the plan:
   Evidence: V4.
 - ~~**I4** Draft the companion issue (RA-level: `Ac`-pinned loop-carried value mis-allocation),
   queue ready-to-post, do NOT post.~~ **Done** —
-  [upstream-coalesce-rotate-ac-ra-issue.md](../upstream-coalesce-rotate-ac-ra-issue.md) (analysis,
+  `upstream-coalesce-rotate-ac-ra-issue.md` (withdrawn + deleted 2026‑09‑14 — premise disproved by #578's rediagnosis; analysis,
   reachability argument, three candidate directions, exact `gh issue create` command); status-doc
   row 16, gated on a maintainer response to #578.
 
