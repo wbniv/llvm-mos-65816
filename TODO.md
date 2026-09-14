@@ -536,6 +536,16 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   k≈0.062) + full-grid noise seeding → real Turing spots/worms. Grid 32×24 (RAM fit). New gate hash 0x5555
   (was 0x8484); `expected.tsv` + manifest updated. Differential host==default==a16==xy16==0x5555 on bsnes-jg,
   disasm `__mulsi3=6`. [plan §Update 2026-06-28](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md). Re-published.
+- [T4] **mandel-oop title window is entropy-sensitive (blank/partial title at power-on).** Found closing 121 gate 22
+  (2026‑09‑15): with bsnes-jg's default Low power-on entropy (what the web player uses) the fading title glyphs in
+  frames ~52–262 render fully, partially, or not at all run to run — for both the pre- and post-republish ROM — while
+  every post-title frame is entropy-independent (`JGX_ENTROPY=0`: 4 colours / 96.4 % non-black at frame 100 every run;
+  `=1`: 0 %, 3 %, 61 % …). Root cause unknown: some PPU/CGRAM/OAM state the title layer relies on is left to power-on
+  randomness. Find it with the entropy-sweep robustness gate (`JGX_ENTROPY=1` vs `0` picture diff at frames 60/100/200),
+  initialise it in `snesgfx` (likely shared by every `title_layer.h`/`m7title.h` adopter — sweep the battery), republish
+  mandel-oop (user-gated). User-visible on both sites. (T4: unknown root cause in shared boot/PPU state; wrong fix = a
+  regression across 100+ demos. Hold until the startup-garbage agent lands — same files.) Evidence: 121 plan, gate 22
+  record 2026‑09‑15.
 - [T3] **Compiler stress-test demo battery — algorithm+visual SNES demos**
   ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
@@ -938,6 +948,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   uncomment the two trigger lines in the `on:` block.
 
 ### Distribution / Packaging
+
+- [T3] **`task package` is not the one-command release path — `dev/build.sh`'s example loop aborts on 11 pre-existing
+  demo build failures.** The 2026‑09‑14 release had to be cut with `dev/package-release.sh` directly (its own gates —
+  warning-free self-test + clean-room bsnes — still enforced). Three classes, each needing its own treatment: 3 far-pointer
+  demos that only build with their far mode flag (build them with it), 5 demos whose generated asset headers are
+  missing (run the generator as a `deps:` step, or gate them on the asset), 3 no-`main` harness TUs (exclude by contract,
+  listed). Do NOT blanket-exclude: a hidden compile failure behind the release gate is exactly the class of defect the
+  battery exists to catch. Acceptance: `task package` runs end-to-end on `main` with zero skipped demos that are not on
+  the explicit no-main list. (T3: what is settled — the 11 are enumerated in the cleanroom plan's Deferred bullet;
+  execution spans `dev/build.sh`, the Taskfile and the asset generators.)
 
 - [T4] **#321 Cross-platform toolchain builds — interim `linux-arm64` + `windows-x86_64` (keep `linux-x86_64`),
   cross-compiled from the existing Linux x86-64 Docker** (no mac/Win CI runners; scope locked 2026-06-25).
@@ -1953,6 +1973,4 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-08-05: fp:3d96a1cd97548340 — the verification section now records all six
      steps with raw output and a 6/6 PASS line (same commit). The capture fired because the
      first commit landed the plan before the results were written back. -->
-- [ ] **(triage)** Gate hygiene: `task package` (via `dev/build.sh`'s example loop) aborts on 11 pre-existing example build — _from [2026-09-14-cleanroom-published-compiler.md](docs/plans/2026-09-14-cleanroom-published-compiler.md)_  <!-- fp:6f9e2f34609f4285 -->
-- [ ] **(triage)** mandel-oop's title window (frames ~52–262) is entropy-sensitive: with bsnes-jg's default Low power-on — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:5305a896a6763489 -->
 <!-- END auto-captured-deferrals -->
