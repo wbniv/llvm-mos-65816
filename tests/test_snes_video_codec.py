@@ -250,3 +250,53 @@ def test_reel_assets_can_pin_a_frame_to_exhirom_region_b(tmp_path):
     offsets = [int(value) for value in re.findall(r"(\d+)ul", offsets_body)]
     assert offsets[1] == 0x3f0000
     assert len(stream.read_bytes()) > 0x3f0000
+
+
+def test_reel_extract_inverts_packed_far_generator(tmp_path):
+    """tools/snes-video-reel-extract.py recovers the exact tiles + palette a
+    --packed-far reel was generated from, decoding through delta chains from
+    the nearest keyframe (frame 0) — the in-tree recipe for the LoROM fixture
+    of 2026-07-31-svx2-animated-video-cartridge.md."""
+    root = Path(__file__).parents[1]
+    rng = random.Random(0x5E16)
+    frames = [bytes(rng.randrange(2, 256) for _ in range(FRAME_SIZE))]
+    for _ in range(7):  # deltas that mostly copy, so the chain is exercised
+        previous = bytearray(frames[-1])
+        for _ in range(64):
+            previous[rng.randrange(FRAME_SIZE)] = rng.randrange(2, 256)
+        frames.append(bytes(previous))
+    tiles = tmp_path / "frames.tiles"
+    palette = tmp_path / "palette.bin"
+    header = tmp_path / "assets.h"
+    stream = tmp_path / "stream.bin"
+    tiles.write_bytes(b"".join(frames))
+    palette.write_bytes(bytes((0, 0, 0xff, 0x7f)) + bytes(rng.randrange(256) for _ in range(444)))
+    generate = subprocess.run(
+        [sys.executable, str(root / "tools/snes-video-reel-assets.py"), "--frames", "8",
+         "--packed-far", "--stream-output", str(stream), str(tiles), str(palette), str(header)],
+        text=True, capture_output=True)
+    assert generate.returncode == 0, generate.stderr
+
+    out_tiles = tmp_path / "out.tiles"
+    out_palette = tmp_path / "out.pal"
+    extract = subprocess.run(
+        [sys.executable, str(root / "tools/snes-video-reel-extract.py"), str(header), str(stream),
+         "--start", "3", "--frames", "4", "--tiles-output", str(out_tiles),
+         "--palette-output", str(out_palette)],
+        text=True, capture_output=True)
+    assert extract.returncode == 0, extract.stderr
+    assert "decoded from keyframe 0" in extract.stdout
+    assert out_tiles.read_bytes() == b"".join(frames[3:7])
+    assert out_palette.read_bytes() == palette.read_bytes()
+
+    # A header/stream pair that disagree must be a hard error, never garbage tiles.
+    corrupt = bytearray(stream.read_bytes())
+    corrupt[20] ^= 0x55
+    (tmp_path / "corrupt.bin").write_bytes(corrupt)
+    bad = subprocess.run(
+        [sys.executable, str(root / "tools/snes-video-reel-extract.py"), str(header),
+         str(tmp_path / "corrupt.bin"), "--start", "3", "--frames", "1",
+         "--tiles-output", str(tmp_path / "bad.tiles")],
+        text=True, capture_output=True)
+    assert bad.returncode != 0
+    assert not (tmp_path / "bad.tiles").exists()

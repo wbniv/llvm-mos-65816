@@ -113,9 +113,19 @@ and visible frame in the same presentation interval.
 
 The stable 900-frame HiROM reel passed the codec health gate, exact cadence gate, full-loop ordered
 segment latch, both cut rendezvous gates, and screenshot fidelity checks. Captures at settled frames
-310 and 610 visibly read `NASA SVS / RETURN` and `PRESS-SITE CAMERA`. The 1,800-frame 59.94 fps
+310 and 610 visibly read `NASA SVS / RETURN` and `PRESS-SITE CAMERA`. ~~The 1,800-frame 59.94 fps
 ExHiROM build receives starts 0/600/1200 automatically; its separate pre-existing nondeterministic
-low-WRAM corruption remains a blocker for calling that larger cartridge publishable.
+low-WRAM corruption remains a blocker for calling that larger cartridge publishable.~~
+
+**Retired 2026‑09‑14** (decision: [`2026-09-14-svx2-anchors-decision.md`](2026-09-14-svx2-anchors-decision.md),
+anchor (c)). The 1,800‑frame cadence‑1 *Artemis* cartridge (`FIRST_FRAMES=1200 FRAMES=600`, auto-labelled by
+`dev/snes-video-reel.sh:51-54`) was an unpublished intermediate: its input tiles were `/tmp` intermediates with
+no recipe in the tree, the real-camera master is not vendored, and it was superseded by two published ExHiROM
+cartridges that both have complete recipes and exercise the same cut-label property at cuts 600/1200 —
+`dev/snes-video-native60.sh` (1,800 XRISM frames, `v1.0.356`) and `dev/snes-video-artemis-apollo.sh`
+(1,200 frames, `v1.0.360`). This plan's gates stand as reproduced on the 900‑frame HiROM reel (8/8 below); the
+1,800‑frame Artemis configuration is no longer an anchor of this plan and will not be regenerated. The
+`dev/snes-video-reel.sh:51-54` auto-label branch is left in place as the record of that configuration's labels.
 
 The dashboard clock now resets on the true sequential last-frame→frame-0 transition. The player
 detects that transition before overwriting the previous frame index, clears the

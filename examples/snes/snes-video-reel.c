@@ -274,6 +274,11 @@ static uint16_t crc16(const uint8_t *data, uint16_t bytes) {
   return crc;
 }
 
+#ifdef VIDEO_REEL_PACKED_FAR
+/* Only a --packed-far reel has a bank-spanning stream (and therefore a
+   VIDEO_REEL_HIROM_BASE_BANK); the small LoROM fixture stages from the
+   reel_packets[] table in bank $80 and never calls this. Every caller below
+   is already inside a PACKED_FAR / SEEK_COUNT / LOOP_DELTA block. */
 static uint8_t reel_stream_bank(uint32_t offset) {
 #ifdef VIDEO_REEL_EXHIROM
   /* File bank $C0 is a FastROM mirror of the linked $40 boot/code window.
@@ -286,6 +291,7 @@ static uint8_t reel_stream_bank(uint32_t offset) {
 #endif
   return (uint8_t)(VIDEO_REEL_HIROM_BASE_BANK + (uint8_t)(offset >> 16));
 }
+#endif
 
 static uint8_t stage_frame(uint16_t frame) {
   SvcSnesDmaContext context = {3u, 1u};

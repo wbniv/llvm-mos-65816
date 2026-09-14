@@ -153,23 +153,41 @@ if [ "$PROFILE" = 1 ]; then
   fi
 fi
 case "$CADENCE" in
-  3) default_presented=109 ;;
-  2) default_presented=18d ;;
-  1) default_presented=319 ;;
+  1|2|3) ;;
   *) echo "FATAL: VIDEO_REEL_VBLANKS_PER_FRAME must be 1, 2, or 3"; exit 1 ;;
 esac
-expected_presented=$default_presented
+# Cadence gate model. With video_reel_deadline_slips == 0 (asserted through the
+# composite-health word below) the presentation count is pure arithmetic in t0,
+# the VBlank of the first present: 1 + floor((gate_frames - t0) / CADENCE), and
+# t0 does not depend on cadence. t0 is a property of the boot path (title +
+# validation decodes) AND of the compiler's codegen for it, so the gate MEASURES
+# t0 in this run (JGX_POLL on presented_total == 1) and derives the expectation,
+# instead of hardcoding per-cadence literals: b1afb9c found the 900-frame literal
+# wrong from the day it was written, and the 4-frame LoROM literals 0x319/0x18d/
+# 0x109 (t0 = 408 when 4e93daa wrote them) had drifted to t0 = 404 by 2026-09-14
+# with zero slips at all three cadences (0x31d/0x18f/0x10a measured == predicted).
+# t0_reference still guards the boot path itself: a real regression there
+# (validation re-enabled, title stuck) moves t0 by hundreds of VBlanks, while
+# codegen drift moves it by a handful, so the reference is asserted only to
+# within +-T0_TOLERANCE. VIDEO_REEL_EXPECTED_PRESENTED remains an explicit
+# override that bypasses the measurement (dev/snes-video-artemis-apollo.sh).
+T0_TOLERANCE=${VIDEO_REEL_T0_TOLERANCE:-16}
+t0_reference=404   # 4-frame LoROM fixture: measured 2026-09-14, cadences 1/2/3
 gate_frames=1200
 screenshot_frame=0
 if [ "$FRAMES" -gt 4 ]; then
   gate_frames=2400
-  expected_presented=2cc
+  # Back-derived from the retired literal 0x2cc (716 at cadence 2): the single-
+  # corpus HiROM path with exhaustive boot-time validation. No in-tree recipe
+  # reaches this branch since 6c03717 moved validation out of the boot path;
+  # unverified.
+  t0_reference=970
   screenshot_frame=115
 fi
 if [ "$CADENCE" -eq 1 ] && [ "$FRAMES" -ge 1800 ]; then
   # Animated title plus two complete 1,800-frame loops.
   gate_frames=4000
-  expected_presented=eef
+  t0_reference=178   # back-derived from the retired literal 0xeef (3823)
 fi
 check_tiles=$TILES
 check_palette=$PALETTE
@@ -177,17 +195,9 @@ minimum_exact=0.68
 maximum_mae=4.0
 if [ "$combined" = 1 ] || { [ "$FRAMES" -gt 4 ] && grep -q VIDEO_REEL_SECOND_START "$HEADER"; }; then
   gate_frames=4000
-  # Both figures are 1 + floor((gate_frames - t0) / CADENCE) with t0 = 179, the
-  # VBlank of the first present. 0x776 was 1 too low and had made this gate red
-  # since it was written: it is arithmetically incompatible with its own
-  # cadence-1 sibling, since 1910 needs t0 in {181,182} while 0xeee = 3822 pins
-  # t0 = 179, and t0 does not depend on cadence. Measured on the ROM with
-  # video_reel_deadline_slips = 0, i.e. nothing is being dropped: cadence 1
-  # presents 3822 and cadence 2 presents 1911.
-  case "$CADENCE" in
-    1) expected_presented=eee ;;
-    2) expected_presented=777 ;;
-  esac
+  # Measured by b1afb9c with video_reel_deadline_slips = 0: cadence 1 presents
+  # 3822 (0xeee) and cadence 2 presents 1911 (0x777), both pinning t0 = 179.
+  t0_reference=179
   screenshot_frame=108
   check_tiles=$FIRST_TILES
   check_palette=$FIRST_PALETTE
@@ -196,7 +206,7 @@ if [ "$combined" = 1 ] || { [ "$FRAMES" -gt 4 ] && grep -q VIDEO_REEL_SECOND_STA
 fi
 minimum_exact=${VIDEO_REEL_MINIMUM_EXACT:-$minimum_exact}
 maximum_mae=${VIDEO_REEL_MAXIMUM_MAE:-$maximum_mae}
-expected_presented=${VIDEO_REEL_EXPECTED_PRESENTED:-$expected_presented}
+expected_presented=${VIDEO_REEL_EXPECTED_PRESENTED:-}
 [ "$GATE_FRAMES_OVERRIDE" -gt 0 ] && gate_frames=$GATE_FRAMES_OVERRIDE
 # This explicit oracle replaces the old accidental adjacency of three globals.
 # It becomes zero only after two loops with no result, CRC, or deadline failure.
@@ -216,6 +226,18 @@ if [ "$PROFILE" = 1 ]; then
   echo "ROM=$ROM"
   exit 0
 fi
+if [ -z "$expected_presented" ]; then
+  # jgxcheck reports the poll match on stderr and the SMOKE verdict on stdout.
+  t0_line=$(JGX_POLL=1 $BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$presented_off" 2 1 "$gate_frames" 2>&1 || true)
+  t0=$(printf '%s\n' "$t0_line" | sed -n 's/.*matched at frame \([0-9]*\) of.*/\1/p')
+  [ -n "$t0" ] || { echo "FAIL: cadence gate: first present never observed: $t0_line"; exit 1; }
+  if [ "$t0" -lt $((t0_reference - T0_TOLERANCE)) ] || [ "$t0" -gt $((t0_reference + T0_TOLERANCE)) ]; then
+    echo "FAIL: cadence gate: first present at VBlank $t0, reference $t0_reference +-$T0_TOLERANCE (boot path changed)"
+    exit 1
+  fi
+  expected_presented=$(printf '%x' $((1 + (gate_frames - t0) / CADENCE)))
+  echo "cadence gate: first present at VBlank $t0 (reference $t0_reference); expecting 0x$expected_presented presentations in $gate_frames"
+fi
 presented_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" "$presented_off" 2 "$expected_presented" "$gate_frames" || true)
 case "$presented_line" in *"PASS"*) ;; *) echo "FAIL: cadence gate: $presented_line"; exit 1;; esac
 # The DISPLAYED rate, which no gate looked at until the Apollo cartridge shipped
@@ -225,7 +247,13 @@ case "$presented_line" in *"PASS"*) ;; *) echo "FAIL: cadence gate: $presented_l
 if [ -n "$fps_tenths_vma" ]; then
   fps_tenths_off=$(printf '%x' "$((16#$fps_tenths_vma))")
   fps_want=$(printf '%x' "$((600 / CADENCE))")
-  for fps_budget in 400 "$gate_frames"; do
+  # The first window closes VIDEO_FPS_WINDOW_VBLANKS (60) after the first
+  # present, so "just past it" is relative to the measured t0 -- a fixed 400
+  # read the third window on the 900-frame path (t0 = 179) and read 00.0 on the
+  # LoROM fixture (t0 = 404). Only the EXPECTED_PRESENTED override, which skips
+  # the t0 measurement, keeps the historical fixed probe.
+  fps_early=$(( ${t0:-332} + 60 + 8 ))
+  for fps_budget in "$fps_early" "$gate_frames"; do
     fps_line=$($BUILD/jgxcheck "$ROM" "$ROOT/vendor/bsnes-jg/Database" \
       "$fps_tenths_off" 2 "$fps_want" "$fps_budget" || true)
     case "$fps_line" in
@@ -233,7 +261,7 @@ if [ -n "$fps_tenths_vma" ]; then
       *) echo "FAIL: displayed FPS gauge at VBlank $fps_budget: $fps_line"; exit 1;;
     esac
   done
-  echo "displayed FPS gauge: $((600 / CADENCE / 10)).$((600 / CADENCE % 10)) at VBlank 400 and $gate_frames"
+  echo "displayed FPS gauge: $((600 / CADENCE / 10)).$((600 / CADENCE % 10)) at VBlank $fps_early and $gate_frames"
 else
   echo "FATAL: video_fps_tenths missing from $MAP"; exit 1
 fi
