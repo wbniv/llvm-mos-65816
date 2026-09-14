@@ -969,14 +969,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   capability retires when `0001–0009` land upstream. [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
 
-- [wip T2] **`dev/jgxcheck` timeline captures are nondeterministic by default <!-- agent:a490bfb291809d151 --> — make determinism
-  explicit.** Found by the 121-badges verification: `jgxcheck.cpp:394` leaves
-  `configuration.entropy` at bsnes-jg's default *Low*, which `Random::seed()`s from `clock()` —
-  the same frame rendered fully black on one run and 85% non-black on the next; all 121 timeline
-  captures had to be redone with `JGX_ENTROPY=0`. Fix: default single-capture/timeline runs to
-  entropy None (or require the caller to pass it explicitly), WITHOUT breaking the deliberate
-  ×6-entropy-boot fingerprint gates (canary/seamdemo) that want Low. Document in agent-handoff.
-  (T2: bounded tool change, two known call patterns.)
 - [wip T3] **Reconcile the Mode-7 gallery website layer with current reality <!-- agent:af6d05150eadb7776 --> (121 gates 17/20/22/23 +
   123 gates 2/4/10 — resolve ONCE for both plans).** The 123-filter verification (`9dfd872`)
   confirmed the same 11-not-9 drift from the filter side and added the smoking gun: the plan's
@@ -1133,6 +1125,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [jgxcheck-determinism] `jgxcheck` defaults bsnes-jg entropy to None when `JGX_ENTROPY` is unset (`85beec9`); `bootblank.sh --firstframe` pins `JGX_ENTROPY=1` to keep its two-draw test; captures byte-identical 8/8, corpus 63/63 unchanged. See [plan](docs/plans/2026-09-14-jgxcheck-determinism.md).
 - ✅ 2026-09-14 — [cleanroom-published-compiler] Already built 2026-06-25 (`dev/test-release.sh`, `task release-test`, gate in `package-release.sh`); re-run live against apt+tarball: codegen PASS (k_mandel `0x820B` ×4) but the **published package `c49f395` is stale** — its sysroot lacks `snes_cpu.h` so current `examples/snes/` won't compile; two rig defects fixed (header closure, FAIL-path report). New release is a user call. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md).
 - ✅ 2026-09-14 — [blossom-polish] Optional polish closed: (a) 256² supersample proven bit-identical to the 128² render (0/16384 mismatches, not worth 4× WRAM); (c) far-pointer fragility re-tested and confirmed fixed on MAME+bsnes, source comment corrected (ROM byte-identical, gates unchanged). (b) HW multiplier lives in shared `hopalong.h` (6 consumers) — needs its own ranked item if wanted. See [plan](docs/plans/2026-09-14-blossom-polish.md).
 - ✅ 2026-09-14 — [m7-off-boot-forceblank] Closed as a stale duplicate of [m7-splash-forceblank] (2026-08-05): the "re-opened blank" premise was measured false, all 12 splash demos are within budget (`dev/m7blank.sh --gate` PASS today, mandel-oop at the 5-frame target). Gate 11's 0-frame wording routed to the plan-121 reconciliation. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
