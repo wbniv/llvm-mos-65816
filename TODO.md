@@ -509,33 +509,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~ *(2026‑07‑26 refresh: now 13 headers / 113 demos; the "0 indirect JMPs / LTO devirtualized" claim was a measurement artifact — 1 `__call_indir` call survives; mandel-display has since diverged so +338 B is historical. Corrected in `docs/oop-in-c.md` §4–§5 + new §8 static-vs-virtual benchmark.)*
 - [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
-- [wip T3] **SNES demos — startup garbage fix + title screens** <!-- agent:a16fe45574cc23458 --> ([plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)).
-  User-reported: Newton "starts off with garbage" + "takes too long to show anything". **Part A (garbage) root-caused
-  + fixed in source:** commit `ac9c0b2` regressed Newton's tilemap palette field to `root<<12` (selects uninitialised
-  CGRAM palettes 4–5 = garbage); reverted to `root<<10` (palette field is bits 10-12, per `hud.h:46`). Battery audit:
-  garbage is Newton-only; also fixed `factorial.c` HUD palette (`1<<13` priority-bit → `2<<10`, the CGRAM-8 palette).
-  **Part B (title screens) — facility + 10 demos done, VERIFIED on bsnes-jg:** shared `snesgfx/title_layer.h`
-  (BG2 4bpp static overlay, font promoted to 4bpp, palette 7, written in force-blank, no DMA) + `display_hide_layer()`
-  / `display_hold()` in `display.h` + `snesgfx/splash.h` (BGMODE_1 BG3 splash for Mode-7 demos, self-clears VRAM).
-  Wired into newton, spirograph, n-body, double-pendulum, spigot, 1d-ca (`TITLE_CHR_WORD=0x6000` override), rdiff,
-  invaders (in-loop overlay), + Mode-7 mandel-display & blossom (splash); `display_hold(110)` ~2 s on fast-`gate_crc`
-  demos — all gate-neutral. Drive-by: fixed `n-body.c`'s pre-existing broken include (`nbody.h`→`n-body.h`).
-  **VERIFIED on bsnes-jg:** newton basins garbage-free (R/G/B); all 10 titles render (incl. 1d-ca override = no VRAM
-  collision); differential intact — newton 0x4D8B, spirograph 0x32D4, invaders 0x9D57, mandel 0x204F, blossom grid
-  0x9047 + controller replay PASS, all == host. MAME leg pending (needs SPC700 BIOS in `dev/roms/`). **Deferred:**
-  factorial title (worker conflict on `_fact_emit`); hello excluded
-  (smoke-test solid-green contract). **RE-PUBLISHED to biohack.net (v1.0.105):** all 10 changed ROMs rebuilt + live
-  (checksums verified against the served `.sfc`); manifest selfcheck `off` regenerated where the title code shifted
-  `corpus_result` (newton 0x908→0x90f, spirograph 0x137a→0x1381, n-body→0x1501, dpend→0x12e1, spigot→0x1698,
-  1d-ca→0x51b, space-invaders 0x25→0x2c; rdiff/blossom/factorial unchanged). 3d-wireframe untouched (no source here).
-  NOTE: the Deploy-site workflow shows red on a **pre-existing informational Lighthouse threshold gate** (claude/cv/home
-  A11y/BP < 95) that runs AFTER the wrangler deploy — the Cloudflare Pages deploy step itself ✓ passed.
-  **FOLLOW-UP — rdiff Gray-Scott 16-bit rework (2026-06-28):** user reported rdiff "not working" — the 8-bit
-  (scale 256, Du≈0.40) field **floods** (no patterns), green gate notwithstanding (gate checks codegen, not
-  visual). Reworked `examples/65816/rdiff.h` to 16-bit fixed-point (scale 4096; Du=0.16/Dv=0.08, F≈0.0366,
-  k≈0.062) + full-grid noise seeding → real Turing spots/worms. Grid 32×24 (RAM fit). New gate hash 0x5555
-  (was 0x8484); `expected.tsv` + manifest updated. Differential host==default==a16==xy16==0x5555 on bsnes-jg,
-  disasm `__mulsi3=6`. [plan §Update 2026-06-28](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md). Re-published.
 - [T4] **mandel-oop title window is entropy-sensitive (blank/partial title at power-on).** Found closing 121 gate 22
   (2026‑09‑15): with bsnes-jg's default Low power-on entropy (what the web player uses) the fading title glyphs in
   frames ~52–262 render fully, partially, or not at all run to run — for both the pre- and post-republish ROM — while
@@ -1036,6 +1009,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-15 — [snes-startup-garbage-title-screens] Newton garbage fixed; titles on all 11 demos (last deferral, factorial, wired gate-neutral); verify 5/5. See [plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - ✅ 2026-09-15 — [task-package-gate-hygiene] All 11 battery aborts fixed: 8 demos build via source-declared markers, 3 companion TUs excluded by an enforced contract. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md).
 - ✅ 2026-09-15 — [121-mode7-gallery-badges-and-mandel-oop-startup-verify] 23/23: gate 22 on indri closed live once the player fix deployed (post-title frames hash-identical to biohack); title-window entropy sensitivity found and deferred. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - ✅ 2026-09-15 — [indri-player-frozen-poster] Real cause was the pinned `@wbniv/bsnes-jg-player` build (`clearTouchNav` scope `ReferenceError` on boot), not template drift; re-resolved in indri `6cb870e`, deployed `v0.1.155`; live step 15 5/5 on `v0.1.156`. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
@@ -1968,4 +1942,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      commit that CLOSED it — all 11 battery aborts are fixed (8 demos build, 3 companion TUs
      excluded by an enforced contract) and the evidence lives in that plan's "Follow-up — task
      package gate hygiene fixed (2026-09-15)" section. Already recorded in Done. Nothing open. -->
+- [ ] **(triage)** **rdiff's title card dominates both gate captures, and the Gray-Scott field never becomes — _from [2026-06-28-snes-demo-startup-garbage-and-title-screens.md](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)_  <!-- fp:086d8820767bc6fc -->
+- [ ] **(triage)** **Newton's gate capture frames are earlier than its fill.** Both drivers snapshot while the basin — _from [2026-06-28-snes-demo-startup-garbage-and-title-screens.md](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)_  <!-- fp:d0b4dbafe655b800 -->
 <!-- END auto-captured-deferrals -->
