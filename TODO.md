@@ -966,12 +966,6 @@ planned/gated/superseded/stale — dispositions recorded as comments in the Inbo
 `[verify]` items: run the linked plan's numbered verification steps, paste raw output + PASS/FAIL
 into the plan, then promote to Done. **Serialize the runs — they share the hot build tree.**_
 
-- [verify T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — re-run 2026-09-14: **22/23 PASS** (was 19/23);
-  gates 17/20/23 re-baselined by the [reconciliation](docs/plans/2026-09-14-m7-gallery-web-reconcile.md) (site was right,
-  measurements were wrong), gate 11 re-baselined to the m7blank budget (mandel-oop 5/6, floor 1), gate 21 PASS. Sole FAIL:
-  gate 22 on indri.studio — the player never requests the ROM — owned by the `indri.studio embedded player` item; re-run
-  gate 22 there once that lands, then promote to Done. mandel-oop republished to biohack.net (`v1.0.586`); indri republish
-  rides with the player fix. Raw output under every step in the plan's 2026-09-14 record.
 - [wip T3] **lzss-gallery-navigation-and-auto-advance-chevron** <!-- agent:a421a3a5024424582 --> — implemented, live, chevron
   input re-fixed `3b8a559`. **2026‑09‑14/15 re-run: 14/15 recorded, step 12 still running.** Steps 1–11, 13, 15
   PASS — step 15 now live on indri `v0.1.156` (5/5 conditions, numbers identical to biohack) after the
@@ -1032,6 +1026,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-15 — [121-mode7-gallery-badges-and-mandel-oop-startup-verify] 23/23: gate 22 on indri closed live once the player fix deployed (post-title frames hash-identical to biohack); title-window entropy sensitivity found and deferred. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - ✅ 2026-09-15 — [indri-player-frozen-poster] Real cause was the pinned `@wbniv/bsnes-jg-player` build (`clearTouchNav` scope `ReferenceError` on boot), not template drift; re-resolved in indri `6cb870e`, deployed `v0.1.155`; live step 15 5/5 on `v0.1.156`. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
 - ✅ 2026-09-15 — [eliminate-build-nondeterminism] Root cause pinned + fixed: `tryAbsoluteIndexedAddressing` rewrote uses without the GISel observer, leaving a stale CSE node whose hit/miss followed heap layout (`sec` flip, ~0.5 %/build). Fix in `0002` + MIR test (`7899355`); 900 builds DISTINCT 1, corpus 63/63 + a16 62/62. See [plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md).
 - ✅ 2026-09-14 — [svx2-anchors] Anchor (a) restored (real culprit `d6030cf`; `#ifdef VIDEO_REEL_PACKED_FAR` guard + tracked LoROM-fixture recipe `tools/snes-video-reel-extract.py`, `dev/snes-video-lorom-fixture.sh`); gate 7 and anchor (c) retired; cadence gate now measures t0 in-run; `dev/svx2-emulator-validation.sh` split into record/asset/code contracts with honest drift classification. See [plan](docs/plans/2026-09-14-svx2-anchors-decision.md).
@@ -1959,4 +1954,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      steps with raw output and a 6/6 PASS line (same commit). The capture fired because the
      first commit landed the plan before the results were written back. -->
 - [ ] **(triage)** Gate hygiene: `task package` (via `dev/build.sh`'s example loop) aborts on 11 pre-existing example build — _from [2026-09-14-cleanroom-published-compiler.md](docs/plans/2026-09-14-cleanroom-published-compiler.md)_  <!-- fp:6f9e2f34609f4285 -->
+- [ ] **(triage)** mandel-oop's title window (frames ~52–262) is entropy-sensitive: with bsnes-jg's default Low power-on — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:5305a896a6763489 -->
 <!-- END auto-captured-deferrals -->

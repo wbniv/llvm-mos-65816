@@ -1876,9 +1876,93 @@ measured the wrong thing.
 |---|---|---|---|
 | ROM gates (1–7) | 7 / 0 | **7 / 0** | — |
 | Startup/timeline gates (8–16) | 8 / 1 | **9 / 0** | — (#11 amended to the m7blank budget: 5 ≤ 6) |
-| Website gates (17–23) | 4 / 3 | **6 / 1** | #22 on indri only (tracked `[wip T2]` player defect) |
-| **Total** | **19 / 4** | **22 / 1** | |
+| Website gates (17–23) | 4 / 3 | **6 / 1** → **7 / 0** (2026‑09‑15) | #22 on indri closed 2026‑09‑15 (record below) |
+| **Total** | **19 / 4** | **22 / 1** → **23 / 0** | |
 
-**Residual:** #22 on indri.studio, blocked on the `[wip T2]` indri player item (not this plan's); and
-the staged `mandel-oop` republish awaits a user-triggered push + `v*` tag on both sites (#20's policy
-says republish; nothing was pushed).
+**Residual (2026‑09‑15):** none for this plan — #22 on indri closed once the indri player fix
+(`v0.1.155`) deployed; the `mandel-oop` republish landed on both sites (biohack `v1.0.586`, indri
+`v0.1.156`, ROM `140c7b74…`). The title-window entropy sensitivity found while closing #22 is recorded
+under Deferred.
+
+### Gate 22 on indri.studio — closed 2026‑09‑15 (player fix `v0.1.155` deployed, republished ROM `140c7b74…`)
+
+#### 22. Browser smoke test sees title → loading animation → progressive image → ready animation.
+
+`node dev/m7web/smoke22.mjs indri <out>` against the live site (cold profile), then the same on biohack
+for a same-ROM/same-player comparison (both serve `mandel-oop.sfc` `140c7b742f65`, `app.js` `fdb8b71ef465`,
+core `54e19fd849b8`/`e74dbd3d7160`):
+
+```
+     60       60        100        1      256      256  f2a8fdc5          -      7.0
+    120      120        100        1      256      256  9eb61dc5    changed     11.8
+    200      200        100        1      256      256  bf88fdc5    changed     17.5
+    239      239          0        1        0        0  62aa1dc5    changed     20.9
+    241      242        100        8      256      256  920d3425    changed     21.2
+    246      248        100        8      256      256  920d3425       same     21.5
+    250      250        100        8      256      256  da2268df    changed     21.6
+    255      255        100        8      256      256  da2268df       same     22.0
+    260      261        100        8      256      256  f5d05e05    changed     22.4
+    275      275       96.7       10      256      256  4c24864b    changed     23.5
+    300      301       88.7       10      256      256  057f6add    changed     25.2
+    450      450      88.38       11      256      256  47379605    changed     35.8
+   1200     1201      90.28       13      256      251  a50eb20b    changed     86.8
+   1500     1500      90.79       14      256      250  d904e224    changed    107.1
+   3000     3000      92.19       14      252      256  a424170a    changed    201.5
+
+final status: running mandel-oop.sfc · 256×224
+player asset requests (gate 23 runtime proof — every one carries the content hash):
+  https://indri.studio/apps/llvm-mos-65816/play/app.js?v=fdb8b71ef465
+  https://indri.studio/apps/llvm-mos-65816/play/cores/bsnes_jg.js?v=54e19fd849b8
+  https://indri.studio/apps/llvm-mos-65816/play/roms/manifest.json?v=e2a89ad2934e
+  https://indri.studio/apps/llvm-mos-65816/play/preview/mandel-oop.png?v=36f2fcdd3292
+  https://indri.studio/apps/llvm-mos-65816/play/cores/bsnes_jg.wasm?v=e74dbd3d7160
+  https://indri.studio/apps/llvm-mos-65816/play/cores/PROVENANCE.json?v=5927ba6e4126
+  https://indri.studio/apps/llvm-mos-65816/play/roms/mandel-oop.sfc?v=140c7b742f65
+
+biohack.net, same run parameters:
+
+
+ target  sampled  nonblack%  colours  row0_nb  rowL_nb  hash      diff_prev   wall(s)
+     60       61      99.61        4      255      255  e890a7f6          -      4.7
+    120      121      99.61        4      255      255  44c2aae5    changed      7.1
+    200      201      99.61        4      255      255  1a0dc860    changed     10.3
+    239      240          0        1        0        0  62aa1dc5    changed     13.6
+    241      242        100        8      256      256  920d3425    changed     13.7
+    246      248        100        8      256      256  920d3425       same     14.1
+    250      251        100        8      256      256  da2268df    changed     14.3
+    255      256        100        8      256      256  da2268df       same     14.7
+    260      262        100        8      256      256  f5d05e05    changed     15.1
+    275      276       96.7       10      256      256  4c24864b    changed     15.6
+    300      301       88.7       10      256      256  057f6add    changed     16.6
+    450      451      88.38       11      256      256  47379605    changed     23.0
+   1200     1201      90.28       13      256      251  a50eb20b    changed     54.1
+   1500     1501      90.79       14      256      250  d904e224    changed     66.9
+   3000     3001      92.19       14      252      256  a424170a    changed    131.4
+
+```
+
+**PASS** — the indri player now fetches and runs the ROM (the `#22` defect), and from the post-title
+force-blank onward every sampled frame hashes identically on the two sites (`62aa1dc5` at 239,
+`920d3425` at 241, `da2268df` at 250, `f5d05e05` at 260, `4c24864b` at 275, `057f6add` at 300,
+`47379605` at 450, `a50eb20b` at 1200, `d904e224` at 1500, `a424170a` at 3000): loading animation →
+progressive image → ready.
+
+**Finding (not a regression, recorded for triage):** the title window (frames 60–200) differed — biohack
+showed the fading title glyphs (4 colours, 99.61 % non-black) while indri showed a uniform navy field with
+no text (1 colour, 100 % non-black). Same ROM, same player. Reproduced locally with `jgxcheck`: at
+`JGX_ENTROPY=0` both the previous (`59a76c6f…`) and the republished (`140c7b74…`) ROM render the title
+identically every run (4 colours, 96.4 % non-black at frame 100); at `JGX_ENTROPY=1` (bsnes-jg's own
+default, which the web core uses) the same frame varies run to run for BOTH ROMs (old: 0 %, 3.0 %, 61.0 %
+non-black; new: 12.1 %, 0 %, 24.9 %). So the mandel-oop title window depends on power-on PPU/RAM
+state — the observation the 2026‑08 run made ("frames 52–262 are entropy-sensitive; READY is not") and
+which was dropped when the boot-force-blank item closed as a duplicate. It is user-visible (a viewer
+can get a blank title) and pre-dates the republish; the post-title frames are entropy-independent.
+
+## Deferred
+
+- mandel-oop's title window (frames ~52–262) is entropy-sensitive: with bsnes-jg's default Low power-on
+  entropy (what the web player uses) the fading title glyphs render fully, partially, or not at all, run to
+  run, for both the pre- and post-republish ROM (gate 22 record, 2026‑09‑15). The READY frame and every
+  post-title frame are entropy-independent. Likely an uninitialised PPU/CGRAM/OAM register the title
+  layer relies on; find it with the entropy-sweep robustness gate (`JGX_ENTROPY=1` vs `0` picture diff
+  at frames 60/100/200) and initialise it. User-visible on both sites. Needs a Fable rank.
