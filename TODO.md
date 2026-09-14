@@ -1938,6 +1938,12 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 - [ ] **(triage)** **Newton's gate capture frames are earlier than its fill.** Both drivers snapshot while the basin — _from [2026-06-28-snes-demo-startup-garbage-and-title-screens.md](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)_  <!-- fp:d0b4dbafe655b800 -->
 - [ ] **(triage)** `snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title, in video playback: — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:2fa4f51ae43816fd -->
 - [ ] **(triage)** `dev/title-entropy.sh` is not wired into any gate runner yet. Every `m7title.h` / `title_layer.h` — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:588a35b403879067 -->
-- [ ] **(triage)** **The gallery ROM is deliberately not in the npm demo bundle.** The uncommitted staging carried an — _from [2026-07-28-gallery-per-image-selfcheck.md](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)_  <!-- fp:3c70dd32f80933b5 -->
-- [ ] **(triage)** **The retarget rows remain unexercised** (`running` "following your navigation", `fail` "navigation — _from [2026-07-28-gallery-per-image-selfcheck.md](docs/plans/2026-07-28-gallery-per-image-selfcheck.md)_  <!-- fp:4857ea6f5fc8b33a -->
+<!-- triaged 2026-09-15: both selfcheck-plan follow-ups are non-work for THIS repo.
+     • "gallery ROM not in the npm demo bundle" is not a deferral — it is a recorded decision with
+       its rationale (a +50% npm tarball for a demo asset) and a one-line `DEMO_ROMS` flip if the
+       user wants it. It belongs to ~/bsnes-jg-wasm's packaging, not to any llvm-mos-65816 item.
+     • "retarget rows remain unexercised" is already a curated item in ~/bsnes-jg-wasm/TODO.md
+       ("Re-verify the retarget-once stop case"), and it is player-runtime behaviour — this repo
+       owns the ROM and the gate, neither of which can drive live pad input mid-check.
+     Both are covered by the curated M2 bullet "Per-image Verify fidelity button". Nothing open. -->
 <!-- END auto-captured-deferrals -->
