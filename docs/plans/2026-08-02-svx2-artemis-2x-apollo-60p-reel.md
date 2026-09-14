@@ -108,6 +108,19 @@ forward seek, and reverse seek all exercise the region-A/file-`$410000` seam on 
   a measured false positive caused by a stable four-row change in naturally black Artemis source
   imagery; the ordinary threshold remains unchanged for every other ROM.
 
+### Republished 2026‑09‑14 (demo-source drift, policy row 2(a))
+
+- Built from `f9711be` with the released toolchain `20260914-f9711be`; the two player-source commits after
+  the first publication (`8eca83a` shared FPS gauge, `ff35036` Mode 7 splash contract) are now in the shipped
+  code. Packed stream regions byte-identical to `v1.0.360`; every functional gate PASS (`0x0B06`/3,000,
+  seam offsets, transport, `0x2327` in 9,177 frames, 0 slips).
+- ROM SHA-256: `d71382c8fec7320eed6b2f75f6f6a4a1a1158c5604de66bfd7e43debf0b52525`.
+- biohack.net: ROM commit `a1df7ca` (`v1.0.587` build **failed** the technical-page gate because the content
+  record still carried `c3d7cd9e…`), record fix `b40652b`, release `v1.0.588`.
+- indri.studio: `99167d9`, release `v0.1.156`, deploy passed; live
+  `apps/llvm-mos-65816/play/roms/svx2-fastrom-video.sfc` hashes `d71382c8…`.
+- `dev/svx2-emulator-validation.sh` now pins this record (`RELEASE`/`SHA`/`PUBLISHED_COMMIT`).
+
 ## Verification record — 2026‑09‑14: `dev/svx2-emulator-validation.sh` reshaped (`wt/svx2-anchors`)
 
 **Why the gate changed.** The script compared the whole rebuilt 8 MiB image byte-for-byte to the published

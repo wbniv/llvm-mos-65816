@@ -289,3 +289,26 @@ Run from the worktree (`cd /home/will/llvm-mos-65816-cleanroom`). Each step: pas
 | tarball (live) | k_mandel | default‑8bit, `+mos-a16` | PASS `0x820B` × 2 |
 | apt (live) | k_mandel | default‑8bit, `+mos-a16` | PASS `0x820B` × 2 |
 | local (gate) | — | — | not run: no `dist/` tarball; building one is a shared‑tree toolchain rebuild (see above) |
+
+## Follow-through — new release cut 2026‑09‑14 (user-approved)
+
+The stale-package finding above was acted on the same day: `dev/package-release.sh` built
+`dist/llvm-mos-65816-20260914-f9711be-linux-x86_64.tar.xz` from the verified `vendor/` tree
+(`8be0546` + the published patch stack), sha256
+`76a38f3dfc0edaa72708a065620ae6522531c044acf1a241d5285a71e6064966`, warning-free self-test and the
+clean-room bsnes gate (`METHOD=local`) both PASS (`mandel-oop` `0x204F`; report beside the tarball in
+`dist/`). Handoff to apt CI was the GitHub pre-release
+[`toolchain-20260914-f9711be`](https://github.com/wbniv/indri.studio/releases/tag/toolchain-20260914-f9711be)
+on `wbniv/indri.studio` (`apt/packages/llvm-mos-65816/build.sh` pins `VERSION`/`EXPECTED_SHA`, `publish.yml`
+`TOOLCHAIN_RELEASE`), tagged `apt-v0.1.9`; the apt run (`34877015510`) passed and
+[apt.indri.studio](https://apt.indri.studio) now serves `llvm-mos-65816 0.0.0+git20260914.f9711be`. The
+`mandel-display` compile FAIL in the Outcome table is therefore closed for the live package: its sysroot
+carries today's `snes_cpu.h`. Re-run `METHOD=apt` / `METHOD=tarball` to record that on the rig.
+
+## Deferred
+
+- Gate hygiene: `task package` (via `dev/build.sh`'s example loop) aborts on 11 pre-existing example build
+  failures unrelated to the release — 3 far-pointer demos in default mode, 5 demos with missing generated
+  asset headers, 3 no-main harness TUs — so the release had to be cut with `dev/package-release.sh` directly
+  (its own gates still enforced). Either fix or exclude those 11 in `dev/build.sh` so `task package` is the
+  one-command path again. Needs a Fable rank.

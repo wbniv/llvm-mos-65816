@@ -27,9 +27,9 @@ esac
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 URL=https://biohack.net/play/roms/svx2-fastrom-video.sfc
-RELEASE=v1.0.360
-SHA=c3d7cd9e76d840f77d98aed96806ee2fb5268409a5ca6bcd81f9b1dc1bceefa2
-PUBLISHED_COMMIT=f61472a   # "Toolchain implementation" of the publication record
+RELEASE=v1.0.588
+SHA=d71382c8fec7320eed6b2f75f6f6a4a1a1158c5604de66bfd7e43debf0b52525
+PUBLISHED_COMMIT=f9711be   # llvm-mos-65816 commit the republished ROM was built from (toolchain 20260914-f9711be)
 OUT=${TMPDIR:-/tmp}/svx2-emulator-validation
 PUBLIC_ROM="$OUT/svx2-fastrom-video-$RELEASE-$SHA.sfc"
 BUILT_ROM="$ROOT/build/svx2-video-reel.sfc"
