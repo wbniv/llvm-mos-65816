@@ -65,6 +65,16 @@ Both are now implemented (2026-08-04), and the contract is restated so it cannot
 Numerals amended under this rule: Goal; Data contract; Interaction model (`9 Mode 7 demos`);
 Verification steps 2, 4 and 7; Rollout steps 3 and 5; Acceptance criteria.
 
+**Addendum — 2026‑09‑14 (method for step 10, and steps 3–9).** Decided with plan 121 in
+[2026‑09‑14 m7-gallery-web-reconcile](2026-09-14-m7-gallery-web-reconcile.md). Step 10 ("narrowest
+supported phone width and reduced motion") is a verification *step*, not a CI dependency, so it needs
+no Playwright in either site repo: it is executed with host Chrome driven over the DevTools protocol
+by `dev/m7web/filter123.mjs` (this repo) at 320×640 with mobile metrics, and again with
+`--force-prefers-reduced-motion`. The same driver executes steps 3–9 against the live pages with real
+layout, which also closes step 8's arrow-overflow sub-case (the nav's `hidden` state is compared to the
+row's actual `scrollWidth > clientWidth`). Steps 2 and 4 are unchanged: scored against the contract
+count, re-verified live.
+
 ## Interaction model
 
 Render a real `<button type="button" aria-pressed="false">` labeled `Mode 7`, with the existing
@@ -783,3 +793,215 @@ step 10, which needs a rendering browser that neither repo has.
 **Residual blocking Done:** step 10 (BLOCKED-no-harness), plus the deploy-gated note on step 1 — the
 new assertion, tests and CI step are locally green but have not yet run in CI, because both sites
 deploy only on a user-triggered `v*` tag push.
+
+## Verification record — 2026-09-14 re-run, against `main` @ `294bc8c`
+
+Re-run of all ten steps under the 2026‑09‑14 reconciliation
+([plan](2026-09-14-m7-gallery-web-reconcile.md)). Step text is reproduced **verbatim and unreordered**.
+
+**Result: 10 / 10 steps PASS.** (2026‑08‑04 was 9 / 10.)
+
+### Method
+
+- Builds stay CI-only; step 1 is scored from deploy-run conclusions plus the local `pnpm test` suites.
+- Steps 2 and 4's static half: `dev/m7web/webgates.sh` (cold `curl` of both live galleries).
+- Steps 3–10: **real headless Chrome 152 on this host**, driven over the DevTools protocol by
+  `dev/m7web/filter123.mjs` — a cold profile per launch, 1280×900 for steps 3–9, then 320×640 with
+  mobile metrics for step 10, and once more with `--force-prefers-reduced-motion`. Nothing was added
+  to either site repo. `STEPn` lines below are the driver's output, verbatim.
+- biohack's `total` is 141 `.cat-card` elements for 133 demos because the "Newest" shelf re-lists
+  eight cards; the count control reports unique demos (`data-total="133"`). Not a filter property.
+
+### 1. Both Astro production builds pass.
+
+```
+$ cd ~/biohack.net && gh run list --workflow deploy.yml -L 3 \
+    --json displayTitle,conclusion,createdAt -q '.[]|"\(.conclusion)\t\(.displayTitle)\t\(.createdAt)"'
+success	Deploy site	2026-09-13T06:17:02Z
+success	Deploy site	2026-09-13T05:43:52Z
+success	Deploy site	2026-09-12T06:42:42Z
+
+$ cd ~/indri.studio && gh run list --workflow deploy.yml -L 3 \
+    --json displayTitle,conclusion,createdAt -q '.[]|"\(.conclusion)\t\(.displayTitle)\t\(.createdAt)"'
+success	feat: add Shared Electron project page	2026-08-30T21:54:43Z
+success	feat(snes): publish qsortviz	2026-08-05T09:01:46Z
+success	feat(snes): publish mandel-oop	2026-08-05T05:18:39Z
+
+$ cd ~/biohack.net  && pnpm test
+# tests 48
+# pass 47
+# fail 0
+(the one non-pass is `# SKIP` — a calendar guard unrelated to SNES)
+
+$ cd ~/indri.studio && pnpm test
+# tests 11
+# pass 11
+# fail 0
+```
+
+**PASS** — the three latest deploy runs on each site are `success`, and — closing the 2026‑08‑04
+residual — the Data-contract assertion and `Test` step have now run in CI: indri's
+`feat(snes): publish mandel-oop` (2026‑08‑05) and every biohack deploy since carry them.
+
+### 2. Static output contains exactly nine `data-display-mode="7"` cards and nine accessible badges.
+
+Scored against the contract count per the 2026‑08‑04 amendment: `EXPECTED_MODE7_SLUGS.length` = 11.
+
+```
+$ bash dev/m7web/webgates.sh
+## fetch
+biohack 200 120877
+indri 200 174244
+biohack mandel-oop 200 8643
+indri mandel-oop 200 69660
+
+## gate 17 / step 2 — counts (grep -o | wc -l; the pages are minified onto one line)
+--- bh.html ---
+gl-mode7-badge spans: 11
+badges with aria-label="Mode 7 display": 11
+data-display-mode="7" hooks: 11
+filter toggles (class="gl-mode-toggle"): 1
+--- in.html ---
+gl-mode7-badge spans: 11
+badges with aria-label="Mode 7 display": 11
+data-display-mode="7" hooks: 11
+filter toggles (class="gl-mode-toggle"): 1
+```
+
+**PASS** — 11 hooks, 11 badges with the accessible name, exactly one toggle per site, one-for-one.
+
+### 3. Initial page shows the normal complete gallery.
+
+```
+STEP3 biohack {"total":141,"visible":141,"pressed":"false","ariaLabel":"Show Mode 7 demos only","count":"133 demos","url":""}
+STEP3 indri {"total":133,"visible":133,"pressed":"false","ariaLabel":"Show Mode 7 demos only","count":"133 demos","url":""}
+```
+
+**PASS** (re-executed in a real browser this time) — every card visible, toggle not pressed, no
+`?mode` in the URL.
+
+### 4. Activating Mode 7 shows exactly the nine expected slugs.
+
+Scored against the contract count per the 2026‑08‑04 amendment.
+
+```
+STEP4 biohack {"total":141,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP4 biohack slugs: ["apollo-daylight","avalanche","blossom","buddhabrot","julia","lzss-gallery","mandel-display","mandel-double","mandel-float","mandel-oop","svx2-fastrom-video"]
+STEP4 indri {"total":133,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP4 indri slugs: ["apollo-daylight","avalanche","blossom","buddhabrot","julia","lzss-gallery","mandel-display","mandel-double","mandel-float","mandel-oop","svx2-fastrom-video"]
+```
+
+and the same set derived from the static output and the committed ledger:
+
+```
+## gate 18 / step 4 — live slug sets vs the committed ledger
+biohack live Mode 7 slugs (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+indri   live Mode 7 slugs (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+sets identical: True
+committed ledger biohack (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+committed ledger indri   (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+ledgers identical: True
+live == ledger (biohack): True
+live == ledger (indri):   True
+contract file parity:
+1bf91bab908dab36c66577addb4b099ea533ffb3adfc0cad02e579b169fc24d2  /home/will/biohack.net/src/data/mode7-contract.mjs
+1bf91bab908dab36c66577addb4b099ea533ffb3adfc0cad02e579b169fc24d2  /home/will/indri.studio/src/data/mode7-contract.mjs
+```
+
+**PASS** — the selection is exactly the 11-slug contract set, identical on both sites and equal to the
+ledger; `aria-pressed` flips, the accessible name becomes `Show all demos`, the count reads
+`11 Mode 7 demos`, `?mode=7` is written.
+
+### 5. Loading `?mode=7` initializes the active state before user interaction.
+
+```
+STEP5 biohack {"total":141,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP5 indri {"total":133,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+```
+
+**PASS** — cold navigation to `?mode=7`, no interaction.
+
+### 6. Clearing restores all cards.
+
+```
+STEP6 biohack {"total":141,"visible":141,"pressed":"false","ariaLabel":"Show Mode 7 demos only","count":"133 demos","url":""}
+STEP6 indri {"total":133,"visible":133,"pressed":"false","ariaLabel":"Show Mode 7 demos only","count":"133 demos","url":""}
+```
+
+**PASS.**
+
+### 7. On indri.studio, `Fractals + Mode 7` shows the six qualifying fractal cards; switching back to `All` restores all nine Mode 7 cards without clearing the toggle.
+
+```
+STEP7 afterMode7 {"total":133,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP7 combined   {"total":133,"visible":6,"pressed":"true","ariaLabel":"Show all demos","count":"6 Mode 7 demos in this category","url":"?mode=7"}
+STEP7 combined   slugs: ["buddhabrot","julia","mandel-display","mandel-double","mandel-float","mandel-oop"]
+STEP7 backToAll  {"total":133,"visible":11,"pressed":"true","ariaLabel":"Show all demos","count":"11 Mode 7 demos","url":"?mode=7"}
+STEP7 emptyState {"cat":"ciphers","visible":0,"emptyHidden":false,"emptyText":"No Mode 7 demos in this category.","emptyDisplayed":true,"controlRowStillThere":true,"pressed":"true","count":"0 Mode 7 demos in this category"}
+```
+
+**PASS** — six fractal cards under the combined filter, all 11 back under `All` with the toggle still
+pressed, and the empty state renders (not `hidden`, `display` not `none`) with the control row intact.
+
+### 8. On biohack.net, empty shelves disappear and reappear correctly; remaining shelves start at scroll position zero.
+
+```
+STEP8 during {"shelfCount":13,"hiddenDuring":8,"visibleDuring":[{"id":"cat-fractals","n":6,"scrollLeft":0,"overflow":true,"navHidden":false},{"id":"cat-algorithms","n":1,"scrollLeft":0,"overflow":false,"navHidden":true},{"id":"cat-video","n":2,"scrollLeft":0,"overflow":false,"navHidden":true},{"id":"cat-bignums","n":1,"scrollLeft":0,"overflow":false,"navHidden":true},{"id":"cat-classics","n":1,"scrollLeft":0,"overflow":false,"navHidden":true}],"anyVisibleShelfWithZeroCards":false,"anyHiddenShelfWithCards":false,"allScrollLeftZero":true,"arrowNavConsistent":true}
+STEP8 after  {"hiddenAfter":0}
+```
+
+**PASS** — 8 of 13 shelves hide, no visible shelf is empty and no hidden shelf has cards, every
+remaining row is at `scrollLeft` 0, and — the sub-case that rolled into step 10 since 2026‑08‑03 — the
+arrow nav is hidden exactly on the rows that do not overflow (`arrowNavConsistent: true`; only
+`cat-fractals` overflows at 1280 px and only it shows arrows). All shelves return after clearing.
+
+### 9. Keyboard activation, Escape-to-clear, focus ring, `aria-pressed`, and live count are verified.
+
+```
+STEP9 biohack {"tabsToReach":3,"focused":true,"focusVisible":true,"outline":"solid 2px rgb(194, 65, 12)","outlineOffset":"3px","tagName":"BUTTON","type":"button","pressedInitial":"false","pressedAfterKeyActivate":"true","labelAfterKeyActivate":"Show all demos","visible":11,"hiddenAttrUsed":true,"count":"11 Mode 7 demos","pressedAfterEscape":"false","focusReturnedToToggle":true,"countAriaLive":"polite","url":""}
+STEP9 indri {"tabsToReach":15,"focused":true,"focusVisible":true,"outline":"solid 2px rgb(184, 239, 0)","outlineOffset":"3px","tagName":"BUTTON","type":"button","pressedInitial":"false","pressedAfterKeyActivate":"true","labelAfterKeyActivate":"Show all demos","visible":11,"hiddenAttrUsed":true,"count":"11 Mode 7 demos","pressedAfterEscape":"false","focusReturnedToToggle":true,"countAriaLive":"polite","url":""}
+```
+
+**PASS** — native `<button type="button">`, reached by Tab, `:focus-visible` with the site's 2 px
+outline (`--accent` / `--color-primary-container`) at 3 px offset, Enter toggles `aria-pressed` and
+the label, hidden cards use the `hidden` attribute, Escape clears and returns focus to the toggle,
+the count is `aria-live="polite"`.
+
+### 10. Test at the narrowest supported phone width and with reduced motion.
+
+320×640, mobile metrics; then the same with `prefers-reduced-motion: reduce` forced:
+
+```
+STEP10 biohack motion-ok       {"viewport":"320x640","reducedMotion":false,"toggle":{"w":121,"h":44,"minHeightOK":true,"touch44OK":true},"countBelowToggle":false,"countOnSameLine":true,"countOverflowsRight":false,"pageHorizontalOverflow":false,"filterApplied":11,"pressed":"true","count":"11 Mode 7 demos","visibleShelves":5,"arrowNavConsistent":true,"allScrollLeftZero":true,"toggleGeomUnchangedByActivation":true}
+STEP10 biohack reduced-motion {"viewport":"320x640","reducedMotion":true,"toggle":{"w":121,"h":44,"minHeightOK":true,"touch44OK":true},"countBelowToggle":false,"countOnSameLine":true,"countOverflowsRight":false,"pageHorizontalOverflow":false,"filterApplied":11,"pressed":"true","count":"11 Mode 7 demos","visibleShelves":5,"arrowNavConsistent":true,"allScrollLeftZero":true,"toggleGeomUnchangedByActivation":true}
+STEP10 indri motion-ok       {"viewport":"320x640","reducedMotion":false,"toggle":{"w":121,"h":44,"minHeightOK":true,"touch44OK":true},"countBelowToggle":false,"countOnSameLine":true,"countOverflowsRight":false,"pageHorizontalOverflow":false,"filterApplied":11,"pressed":"true","count":"11 Mode 7 demos","toggleGeomUnchangedByActivation":true}
+STEP10 indri reduced-motion {"viewport":"320x640","reducedMotion":true,"toggle":{"w":121,"h":44,"minHeightOK":true,"touch44OK":true},"countBelowToggle":false,"countOnSameLine":true,"countOverflowsRight":false,"pageHorizontalOverflow":false,"filterApplied":11,"pressed":"true","count":"11 Mode 7 demos","toggleGeomUnchangedByActivation":true}
+```
+
+Screenshots (the control row after activation, 320 px):
+<img src="2026-07-26-123-mode7-gallery-filter/verify-2026-09-14/biohack-320-mode7.png" width="320">
+<img src="2026-07-26-123-mode7-gallery-filter/verify-2026-09-14/indri-320-mode7.png" width="320">
+
+**PASS** — at 320 px the toggle is 121×44 (≥ 40 px tall, ≥ 44×44 touch target), the count stays on the
+same line without overflowing the viewport and without shrinking the control, the page has no
+horizontal overflow, the filter applies (11 visible), biohack's remaining shelves sit at scroll 0
+with the arrow nav consistent with real overflow; under reduced motion `matchMedia` reports `reduce`
+and every one of those facts is unchanged.
+
+### Summary
+
+| Step | 2026‑08‑04 | 2026‑09‑14 | Evidence |
+|---|---|---|---|
+| 1 | PASS | PASS | latest deploy runs `success` on both sites; contract tests have run in CI since 08‑05; local suites green |
+| 2 | PASS | PASS | 11 hooks / 11 named badges / 1 toggle per site == contract count |
+| 3 | PASS (carried) | **PASS (executed)** | real browser, all cards visible |
+| 4 | PASS | PASS | live selection == static set == ledger == other site |
+| 5 | PASS (carried) | **PASS (executed)** | cold `?mode=7` |
+| 6 | PASS (carried) | **PASS (executed)** | — |
+| 7 | PASS (carried) | **PASS (executed)** | `Fractals + Mode 7` = exactly 6; empty state shown |
+| 8 | PASS (carried) | **PASS (executed)** | 8/13 shelves hidden, rows reset, arrow nav == real overflow |
+| 9 | PASS (carried) | **PASS (executed)** | Tab/Enter/Escape, `:focus-visible` outline, `aria-live` |
+| 10 | **FAIL** (no harness) | **PASS** | 320 px + reduced motion in host Chrome |
+
+**Nothing residual.** The 2026‑08‑04 "carried forward" rows are now executed, step 10 is executed,
+and the deploy-gated note on step 1 is closed by the CI runs since 2026‑08‑05.

@@ -451,6 +451,44 @@ the first and last image rows eventually become non-loading pixels.
   top-left badge. Both Astro production builds pass.
 - MAME remains skipped because the external SPC700 IPL is not installed.
 
+## Amendment — 2026-09-14: five gates re-baselined to what the sites and the splash actually do
+
+**This section annotates the plan; it does not rewrite it.** Decided once for this plan and
+[#123](2026-07-26-123-mode7-gallery-filter.md) in
+[2026‑09‑14 m7-gallery-web-reconcile](2026-09-14-m7-gallery-web-reconcile.md), whose decision table
+names the commit behind each change. Every verification record from 2026‑09‑14 on scores these gates
+as amended:
+
+- **Gate 17 — "Exactly nine `7` badges"** reads as *the contract count*, `EXPECTED_MODE7_SLUGS.length`
+  (11 as of 2026‑08‑04), exactly as #123's "Amendment — 2026‑08‑04" states; `cdaa6f4` and `ad87374`
+  added two Mode 7 demos legitimately and `1a9d9b8` made the count a reviewed, ledgered value. The
+  same reading applies to the "nine" in the Verification matrix, Rollout step 4 and the first
+  Acceptance criterion.
+- **Gate 11 — "first post-title frame — non-black animated loading field"** reads as *post-title
+  black frames ≤ the committed `dev/m7blank.sh` budget for the demo* (`mandel-oop`: measured 5,
+  budget 6). Zero is physically unattainable: the
+  [2026‑08‑05 floor measurement](2026-08-05-mode7-splash-forceblank-floor.md) shows the Mode 7 /
+  CGRAM mode switch cannot happen with the screen on (floor = 1 frame), and the remaining frames are
+  the splash's own fade-to-black tail. The demo-local cause was removed by `13ebe3e` (11 → 5) and the
+  shared mechanism is the merged first-frame opt-in (`e2f3cd0`, `b6ab8b5`). Evidence for the gate is
+  `FRAMES=700 dev/m7blank.sh --gate`.
+- **Gate 20 — "Both deployed ROMs match the verified build SHA-256"** compares the deployed bytes to
+  the SHA **recorded by the plan's most recent publication record**, never to an arbitrary rebuild.
+  When a rebuild of `main` differs, the *reason* decides: **demo-source drift** (the demo's `.c` or
+  the `snesgfx` headers it includes changed after the published build) → republish; **toolchain-only
+  drift** (same sources, different bytes) → accepted divergence, recorded together with the
+  differential result. "Never update the offset from a map unless the built ROM is byte-identical to
+  the ROM copied into the site" (Website copy and preview updates) still governs the manifest.
+- **Gate 22 — browser smoke test** is a verification *step*, not a CI dependency: it is executed with
+  host Chrome driven over the DevTools protocol by `dev/m7web/smoke22.mjs`, which samples the player
+  canvas at emulated frame numbers. Neither site repo gains browser tooling.
+- **Gate 23 — cache-busted ROM and preview URLs** is met by design on both sites since 2026‑07‑26/27
+  (indri `2208cb0`/`c7988ac`, biohack `3aeb92d`): the built HTML carries a content-hash map and
+  `app.js`'s `bust()` appends `?v=<sha>` to every player asset request. The check is (i) the map's
+  ROM and preview entries equal the checked-in assets' SHA-256 prefixes and (ii) the browser's requests
+  carry them — not a literal `…sfc?v=` string in the HTML, which this design never emits and which the
+  2026‑08‑03/04 records wrongly grepped for.
+
 ## Verification record — 2026-08-03, against `main` @ `631ffe9`
 
 The plan's Verification matrix states **outcomes**, not commands, so each step below names the
@@ -1334,3 +1372,513 @@ was out of scope here.
 - **#20, #23** — deploy-gated. Both need a `mandel-oop` republish and/or a site change plus a
   user-triggered `v*` tag. Nothing was published.
 - **#22** — BLOCKED-no-harness. Needs a rendering browser neither repo has.
+
+## Verification record — 2026-09-14 re-run, against `main` @ `294bc8c`
+
+Re-run of all 23 gates under the 2026‑09‑14 amendment above
+([reconciliation plan](2026-09-14-m7-gallery-web-reconcile.md)). Gate text is reproduced **verbatim
+and unreordered**; amended gates say so where they are scored. Worktree `wt/m7-gallery-web-reconcile`
+(hardlinked toolchain, no rebuild).
+
+**Result: 22 / 23 gates PASS, 1 FAIL** (#22 on indri.studio only — a defect already tracked, see
+below). 2026‑08‑04 was 19 / 23.
+
+Fresh build SHA‑256 of this run: `140c7b742f6570ece863e59d33e9ea2774b8d1bca7e84621e77379764dac8f91`,
+`corpus_result @ WRAM 0x897` (the deployed 2026‑08‑05 ROM `59a76c6f…` latches at `0x895`). Every
+timeline capture pins `JGX_ENTROPY=0`. Browser gates ran in host Google Chrome 152 (`--headless=new`)
+over the DevTools protocol — `dev/m7web/` in this repo; nothing was added to either site repo.
+
+### ROM gates
+
+#### 1. Host oracle still returns `0x204F`.
+
+```
+$ cc -O2 -I examples/65816 -I tools tools/mandel-render.c -o build/m7web/rom/mandel-render
+$ build/m7web/rom/mandel-render build/m7web/rom/mandel-host.png 64 56 15
+wrote /tmp/claude-1000/-home-will-llvm-mos-65816/9b118724-3e10-42be-a852-f285cb02869a/scratchpad/rom/mandel-host.png  (64x56 N=15)  full-grid CRC16=0x204F
+```
+
+**PASS.**
+
+#### 2. `dev/run.sh mandel-oop` passes `+mos-a16` on bsnes-jg.
+
+```
+$ dev/run.sh mandel-oop
+sync-platform: refreshed 13 file(s) into /work/build/install/mos-platform
+==> mandel-oop: OOP Mandelbrot (snesgfx Display + MandelLayer); expected CRC 0x204F
+==> built build/mandel-oop.sfc (+mos-a16, -verify clean); corpus_result @ WRAM 0x897
+==> bsnes-jg: render + framebuffer dump (build/mandel-oop-jg.png) + assert
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+==> MAME (under Xvfb): assert corpus_result
+    SHOT: PASS corpus=0x204F (snapshot at frame 5800)
+
+==> disasm: indirect dispatch count (virtual dispatch gate)
+    indirect JMP count in .text: 0
+    indirect dispatch call sites (jmp-ind + jsr-ind + jsr __call_indir): 1
+
+==> size delta: mandel-oop vs mandel-display (from .map files)
+    mandel-oop  .text: 6285 bytes
+    mandel-display .text: 4594 bytes
+    ROM sizes: mandel-oop=32768 mandel-display=32768
+
+RESULT: PASS — mandel-oop OOP gate GREEN; corpus_result==0x204F on host == +mos-a16@bsnes-jg
+```
+
+**PASS** — `.text` 6,274 → 6,285 B (+11) against 2026‑08‑04, the cost of the first-frame opt-in
+(`e2f3cd0`/`b6ab8b5`) net of the Option‑J latch it replaced; `corpus_result` moved `0x895 → 0x897`.
+
+#### 3. MAME passes when the external SPC700 IPL is available.
+
+```
+==> MAME (under Xvfb): assert corpus_result
+    SHOT: PASS corpus=0x204F (snapshot at frame 5800)
+```
+
+**PASS.**
+
+#### 4. Three final captures are byte-identical.
+
+```
+$ for i in 1 2 3; do build/jgxcheck build/mandel-oop.sfc vendor/bsnes-jg/Database \
+    0x897 2 0x204F 5800 build/m7web/rom/cap$i.png; done
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+ad35b524bd83dab7f911d105db2f8e1b0a50aad194c85b897eb4b2e567c83c1e  cap1.png
+ad35b524bd83dab7f911d105db2f8e1b0a50aad194c85b897eb4b2e567c83c1e  cap2.png
+ad35b524bd83dab7f911d105db2f8e1b0a50aad194c85b897eb4b2e567c83c1e  cap3.png
+```
+
+**PASS** — byte-identical at bsnes-jg's default entropy.
+
+#### 5. `-verify-machineinstrs` passes.
+
+```
+==> built build/mandel-oop.sfc (+mos-a16, -verify clean); corpus_result @ WRAM 0x897
+```
+
+**PASS** (with the standing caveat recorded in `dev/mandel-oop.sh`: the `--config` LTO link makes the
+`-verify-machineinstrs` leg vacuous; unchanged since 2026‑08‑03).
+
+#### 6. No-bare-functions audit passes.
+
+```
+$ awk '/^int main/,0' examples/snes/mandel-oop.c
+int main(void) {
+  static Display    screen;
+  static MandelLayer layer;
+
+  m7splash("OOP DRAWABLE", "MANDELBROT", 90);
+  display_init(&screen);         // boot bracket: snes_ppu_reset_blank() + NMI + BGMODE_1
+  mandel_layer_init(&layer);
+  display_add(&screen, (Drawable *)&layer);
+  // reserve() painted the animated loading field; refinement begins on the first visible frame.
+  for (;;)
+    display_frame(&screen);    // scene_emit → _mandel_emit (1 virtual call/frame) → upq_flush
+}
+```
+
+**PASS** — `main()` still carries zero bare `REG_*` / `snes_*` / DMA calls; every hardware touch is
+behind `m7splash`, `display_*` and the drawable.
+
+#### 7. Indirect-call count remains within the intended coarse OOP design.
+
+```
+==> disasm: indirect dispatch count (virtual dispatch gate)
+    indirect JMP count in .text: 0
+    indirect dispatch call sites (jmp-ind + jsr-ind + jsr __call_indir): 1
+```
+
+**PASS.**
+
+### Startup/timeline gates
+
+Method as on 2026‑08‑04: one entropy-pinned `JGX_FRAMESCAN` run for the whole timeline, plus
+entropy-pinned browser-crop (`JGX_YOFF=8`) captures at the same frames as that record
+(`bash dev/m7web/romgates.sh 0x897`).
+
+```
+$ JGX_ENTROPY=0 JGX_FRAMESCAN=1 JGX_FRAMESCAN_MAX=9000 build/jgxcheck \
+    build/mandel-oop.sfc vendor/bsnes-jg/Database 0x897 2 0x204F 5800
+change events: 579
+FRAMESCAN: 579 change(s) in 5800 frames; first=1 last=5800; held 0 frame(s) to the end; final hash=2F71084B dom=#5EC69C pct=30
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+all-black intervals (dominant colour #000000 at >=99%): [(1, 50), (239, 243)]
+change events, f=170..340: [170, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 244, 251, 261, 276, 296, 311, 323, 331, 338]
+max gap between change events after the loading field appears: 127 frames (from f=3700)
+
+ frame nonblack%  colours  row0_nb  row223_nb  diff_prev%
+    60   100.00%        3      256        256           -
+   120   100.00%        3      256        256      100.00
+   200   100.00%        3      256        256      100.00
+   239     0.00%        1        0          0      100.00
+   245   100.00%        8      256        256      100.00
+   250   100.00%        8      256        256        0.00
+   255   100.00%        8      256        256       67.31
+   260   100.00%        8      256        256        0.00
+   275   100.00%        8      256        256       36.74
+   300    88.70%       10      256        256       30.73
+   450    88.38%       11      256        256       86.21
+  1200    90.28%       13      256        251       94.42
+  3000    92.19%       14      252        256       96.80
+  5800    90.96%       15      256        256       99.62
+```
+
+#### 8. title zoom-in — readable title pixels, changing scale
+
+```
+    60   100.00%        3      256        256           -
+   120   100.00%        3      256        256      100.00
+```
+
+**PASS** — 3 colours at f=60 and f=120 with 100 % of the crop non-black and a 100 % pixel change
+between them: the title is on screen and its scale is changing (change events every frame from f=176).
+
+#### 9. title hold — `OOP DRAWABLE` / `MANDELBROT` at rest
+
+```
+   200   100.00%        3      256        256      100.00
+```
+
+**PASS** — same 3-colour title picture; the 2026‑08‑04 capture of this frame is unchanged in content.
+
+#### 10. title exit — rotating/shrinking title, not gameplay
+
+```
+change events, f=170..340: … 236, 237, 238, 239, 244, 251, …
+   239     0.00%        1        0          0      100.00
+```
+
+**PASS** — a change event on every frame through f=239 (the spin-out), then the blank; no gameplay
+pixels before the field appears.
+
+#### 11. first post-title frame — non-black animated loading field
+
+Scored as amended 2026‑09‑14: post-title black frames ≤ the committed `dev/m7blank.sh` budget.
+
+```
+$ FRAMES=700 dev/m7blank.sh --gate
+gate: force-blank frames vs committed budget
+demo               measured   budget  verdict
+apollo-reel               5        6  ok
+avalanche                 1        2  ok
+blossom                   4        5  ok
+buddha                    2        3  ok
+julia                     1        2  ok
+lzss-gallery            153      254  ok
+mandel-display            1        2  ok
+mandel-double             1        2  ok
+mandel-float              1        2  ok
+mandel-oop                5        6  ok
+seamdemo                 20       21  ok
+snes-video-reel           4        5  ok
+
+PASS: every demo is within its post-title force-blank budget.
+
+all-black intervals (framescan, this build): [(1, 50), (239, 243)]   # 5 post-title frames
+   239     0.00%        1        0          0      100.00
+   245   100.00%        8      256        256      100.00
+   250   100.00%        8      256        256        0.00
+```
+
+**PASS** — `mandel-oop` measured **5** against budget **6** (floor 1, per the
+[2026‑08‑05 floor measurement](2026-08-05-mode7-splash-forceblank-floor.md)); the framescan agrees
+(`239..243`, was `239..249` on 2026‑08‑04 and `239..262` on 2026‑08‑03). The first visible frame after
+the blank (f=244) is the 8-colour loading field — 100 % non-black at f=245.
+
+#### 12. early compute — loading motion plus partial coarse preview
+
+```
+change events after the blank: 244, 251, 261, 276, 296, 311, 323, 331, 338, …
+   255   100.00%        8      256        256       67.31
+   275   100.00%        8      256        256       36.74
+   300    88.70%       10      256        256       30.73
+```
+
+**PASS** — the field keeps moving (67.31 % of pixels change between f=250 and f=255, 36.74 % between
+f=260 and f=275) and the first coarse preview lands at f=296 (colours 8 → 10 by f=300; the non-black
+share drops to 88.7 % as set-interior pixels arrive). Compared with 2026‑08‑04 the field arrives six
+frames earlier (f=244 vs 250) and the first preview about twenty frames later (f=296 vs ~275): the
+first-frame opt-in gates the first `scene_emit` on a complete reserve() frame, so the loading field
+is shown sooner and the first coarse pass is not rushed onto the screen.
+
+#### 13. refinement — monotonically increasing fractal detail
+
+```
+   450    88.38%       11      256        256       86.21
+  1200    90.28%       13      256        251       94.42
+  3000    92.19%       14      252        256       96.80
+```
+
+**PASS** — distinct colours 11 → 13 → 14, each frame a large change from the previous sample.
+
+#### 14. ready — complete Mandelbrot, continuous spin/zoom/palette cycle
+
+```
+  5800    90.96%       15      256        256       99.62
+FRAMESCAN: 579 change(s) in 5800 frames; first=1 last=5800; held 0 frame(s) to the end
+max gap between change events after the loading field appears: 127 frames (from f=3700)
+```
+
+**PASS** — the picture never settles (the last change is the last frame) and the final capture is the
+same 15-colour ready state as 2026‑08‑04.
+
+#### 15. Add a simple frame-difference assertion during loading: at least two captures before the first preview must differ, proving that the feedback is genuinely animated.
+
+```
+   245   100.00%        8      256        256      100.00
+   250   100.00%        8      256        256        0.00
+   255   100.00%        8      256        256       67.31
+   275   100.00%        8      256        256       36.74
+```
+
+**PASS** — before the first coarse preview (f=296) the loading captures differ: f=250 → f=255 by
+67.31 % and f=260 → f=275 by 36.74 %.
+
+#### 16. Add a coverage assertion that the first and last image rows eventually become non-loading pixels.
+
+```
+   245   100.00%        8      256        256      100.00
+  1200    90.28%       13      256        251       94.42
+  5800    90.96%       15      256        256       99.62
+```
+
+**PASS** — rows 0 and 223 are fully populated from the field on and remain non-loading pixels through
+the ready state (the 251/252 dips at f=1200/3000 are set-interior black, not loading texture, as on
+2026‑08‑04).
+
+### Website gates
+
+#### 17. Exactly nine `7` badges on each gallery.
+
+Scored as amended: the contract count, `EXPECTED_MODE7_SLUGS.length` = 11.
+
+```
+$ bash dev/m7web/webgates.sh
+## fetch
+biohack 200 120877
+indri 200 174244
+biohack mandel-oop 200 8643
+indri mandel-oop 200 69660
+
+## gate 17 / step 2 — counts (grep -o | wc -l; the pages are minified onto one line)
+--- bh.html ---
+gl-mode7-badge spans: 11
+badges with aria-label="Mode 7 display": 11
+data-display-mode="7" hooks: 11
+filter toggles (class="gl-mode-toggle"): 1
+--- in.html ---
+gl-mode7-badge spans: 11
+badges with aria-label="Mode 7 display": 11
+data-display-mode="7" hooks: 11
+filter toggles (class="gl-mode-toggle"): 1
+```
+
+**PASS** — 11 = 11 = 11 on both galleries, hooks and badges one-for-one, one toggle each.
+
+#### 18. Badge slug sets match between sites.
+
+```
+## gate 18 / step 4 — live slug sets vs the committed ledger
+biohack live Mode 7 slugs (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+indri   live Mode 7 slugs (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+sets identical: True
+committed ledger biohack (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+committed ledger indri   (11): apollo-daylight avalanche blossom buddhabrot julia lzss-gallery mandel-display mandel-double mandel-float mandel-oop svx2-fastrom-video
+ledgers identical: True
+live == ledger (biohack): True
+live == ledger (indri):   True
+contract file parity:
+1bf91bab908dab36c66577addb4b099ea533ffb3adfc0cad02e579b169fc24d2  /home/will/biohack.net/src/data/mode7-contract.mjs
+1bf91bab908dab36c66577addb4b099ea533ffb3adfc0cad02e579b169fc24d2  /home/will/indri.studio/src/data/mode7-contract.mjs
+```
+
+**PASS** — identical 11-slug sets, both equal to the byte-identical committed ledger.
+
+#### 19. Both Astro builds pass.
+
+```
+$ cd ~/biohack.net && gh run list --workflow deploy.yml -L 3 \
+    --json displayTitle,conclusion,createdAt -q '.[]|"\(.conclusion)\t\(.displayTitle)\t\(.createdAt)"'
+success	Deploy site	2026-09-13T06:17:02Z
+success	Deploy site	2026-09-13T05:43:52Z
+success	Deploy site	2026-09-12T06:42:42Z
+
+$ cd ~/indri.studio && gh run list --workflow deploy.yml -L 3 \
+    --json displayTitle,conclusion,createdAt -q '.[]|"\(.conclusion)\t\(.displayTitle)\t\(.createdAt)"'
+success	feat: add Shared Electron project page	2026-08-30T21:54:43Z
+success	feat(snes): publish qsortviz	2026-08-05T09:01:46Z
+success	feat(snes): publish mandel-oop	2026-08-05T05:18:39Z
+
+$ cd ~/biohack.net  && pnpm test    # tests 48 / pass 47 / fail 0 (1 SKIP, a calendar guard)
+$ cd ~/indri.studio && pnpm test    # tests 11 / pass 11 / fail 0
+```
+
+**PASS** — and the 2026‑08‑04 "deploy-gated" residual is closed: the contract tests have run in CI on
+every deploy since 2026‑08‑05.
+
+#### 20. Both deployed `mandel-oop` ROMs match the verified build SHA-256.
+
+Scored as amended: deployed bytes vs the SHA of the most recent publication record (`59a76c6f…`,
+published 2026‑08‑05), then the drift classification for today's rebuild.
+
+```
+## gate 20 — deployed mandel-oop ROM SHA-256 (checked-in copies, then the live bytes)
+59a76c6f84a171b01d366d56b134af469f3cf2c597c8bc1679e88981a847872e  /home/will/biohack.net/public/play/roms/mandel-oop.sfc
+59a76c6f84a171b01d366d56b134af469f3cf2c597c8bc1679e88981a847872e  /home/will/indri.studio/public/apps/llvm-mos-65816/play/roms/mandel-oop.sfc
+59a76c6f84a171b01d366d56b134af469f3cf2c597c8bc1679e88981a847872e    https://biohack.net/play/roms/mandel-oop.sfc
+59a76c6f84a171b01d366d56b134af469f3cf2c597c8bc1679e88981a847872e    https://indri.studio/apps/llvm-mos-65816/play/roms/mandel-oop.sfc
+
+$ sha256sum build/mandel-oop.sfc        # fresh build of main @ 294bc8c
+140c7b742f6570ece863e59d33e9ea2774b8d1bca7e84621e77379764dac8f91  build/mandel-oop.sfc
+$ git log --format='%h %ad %s' --date=short --since=2026-08-05 -- examples/snes/mandel-oop.c \
+    examples/snes/snesgfx/display.h examples/snes/snesgfx/drawable.h examples/snes/snesgfx/title_layer.h examples/snes/snesgfx/m7title.h
+b6ab8b5 2026-09-14 fix(snesgfx): gate the first-frame opt-in behind SNESGFX_FIRST_FRAME_OPTIN
+e2f3cd0 2026-09-14 feat(snesgfx): per-drawable "first frame is complete" opt-in for Display
+13ebe3e 2026-08-05 fix(321): mandel-oop post-title force-blank 11 -> 5; blanket Display fix measured unsafe
+34aba36 2026-08-05 refactor(snesgfx): delete the dead splash surface — splash.h + splash16()
+```
+
+**PASS** — both sites serve exactly the last published, verified ROM. The rebuild differs because the
+demo's sources changed after that publish (**demo-source drift** → republish): the republish is
+**staged and verified, not pushed** — `snes/mandel-oop-republish` in each site repo
+(biohack `e7f7d09`, indri `bc7d7cc`) carries the fresh ROM, `selfcheck.off = 0x897`, and (indri) the
+registry field; the preview is unchanged because the ready state is unchanged.
+
+```
+$ build/jgxcheck /home/will/biohack.net-m7rec/public/play/roms/mandel-oop.sfc vendor/bsnes-jg/Database 0x897 2 0x204F 5800
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+$ build/jgxcheck /home/will/indri.studio-m7rec/public/apps/llvm-mos-65816/play/roms/mandel-oop.sfc vendor/bsnes-jg/Database 0x897 2 0x204F 5800
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+
+```
+
+#### 21. Both manifests verify `0x204F` at their declared offset/frame.
+
+```
+## gate 21 — manifest entries
+biohack {"id": "mandel-oop", "title": "Mode 7 Mandelbrot (OOP)", "selfcheck": {"off": "0x895", "len": 2, "want": "0x204F", "frames": 5800, "label": "gate jgxcheck CRC (corpus_result @ WRAM $0895)"}}
+indri {"id": "mandel-oop", "title": "Mode 7 Mandelbrot (OOP)", "selfcheck": {"off": "0x895", "len": 2, "want": "0x204F", "frames": 5800, "label": "gate jgxcheck CRC (corpus_result @ WRAM $0895)"}}
+
+SMOKE: PASS off=0x895 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+SMOKE: PASS off=0x895 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+
+## fresh build offset vs manifest offset
+corpus_result @ WRAM 0x897
+exit=0
+```
+
+**PASS** — the deployed ROMs latch `0x204F` at their declared `0x895`; the staged ROMs latch it at the
+`0x897` their staged manifests declare (above). Neither manifest was updated from a map: each carries
+the offset of the exact bytes beside it.
+
+#### 22. Browser smoke test sees title → loading animation → progressive image → ready animation.
+
+Executed as amended: host Chrome over DevTools, `node dev/m7web/smoke22.mjs <site> <out>`, canvas
+sampled at emulated frame numbers (one SNES frame per `requestAnimationFrame`; headless rAF ran at
+~11 Hz, so wall-clock is meaningless and is shown only for scale).
+
+**biohack.net** — `https://biohack.net/snes/mandel-oop/`, cold profile:
+
+```
+status: "running mandel-oop.sfc · 256×224"  (+6867 ms after navigation)
+
+ target  sampled  nonblack%  colours  row0_nb  rowL_nb  hash      diff_prev   wall(s)
+     60       61      99.61        7      255      255  e2e27d05          -     10.1
+    120      120      99.61        5      255      255  641a91b5    changed     16.6
+    200      201      99.61        7      255      255  97204825    changed     24.3
+    239      240          0        1        0        0  62aa1dc5    changed     29.0
+    241      242          0        1        0        0  62aa1dc5       same     29.1
+    246      248        100        8      256      256  da2268df    changed     29.8
+    250      251        100        8      256      256  da2268df       same     30.0
+    255      256        100        8      256      256  da2268df       same     30.4
+    260      262        100        8      256      256  f5d05e05    changed     30.8
+    275      276       96.7       10      256      256  4c24864b    changed     31.7
+    300      301       88.7       10      256      256  057f6add    changed     33.2
+    450      451      88.38       11      256      256  47379605    changed     48.5
+   1200     1201      90.28       13      256      251  a50eb20b    changed    140.0
+   1500     1501      90.79       14      256      250  d904e224    changed    170.4
+   3000     3001      92.19       14      252      256  a424170a    changed    372.6
+```
+
+<img src="2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup/verify-2026-09-14/biohack-f0200-title-hold.png" width="256"> <img src="2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup/verify-2026-09-14/biohack-f0255-loading.png" width="256"> <img src="2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup/verify-2026-09-14/biohack-f0300-coarse.png" width="256"> <img src="2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup/verify-2026-09-14/biohack-f1200-refined.png" width="256"> <img src="2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup/verify-2026-09-14/biohack-f3000-ready.png" width="256">
+
+**PASS on biohack.net** — title (f=61..201, hash changing with the zoom), a short black at f=240..242
+(the deployed 08‑05 ROM; entropy not pinned in the browser), the 8-colour loading field at f=248..256
+that then animates (f=262 differs), coarse preview by f=276..301, refinement through f=451..1501, and
+the ready state still changing at f=3001. The browser timeline lines up with the `jgxcheck` table
+frame for frame.
+
+**indri.studio** — `https://indri.studio/apps/llvm-mos-65816/snes/mandel-oop/`:
+
+```
+status: ""  (+39988 ms after navigation)
+FAIL: player never reached running
+exit=1
+
+(probe: app.js, manifest.json, preview, bsnes_jg.js/.wasm and PROVENANCE.json all load 200 with
+ ?v=<sha>; #status is blank; roms/mandel-oop.sfc is never requested; window.__bjg is set)
+```
+
+**FAIL on indri.studio — the player never starts the ROM.** This is exactly the live breakage already
+tracked as `[wip T2] indri.studio embedded player never starts the ROM — canvas bit-frozen at the
+poster` (player pinned at `v0.1.133` vs the regenerated template), owned by its own agent. Not a
+Mode 7 / gallery-layer defect and not attempted here; this gate re-runs on indri once that item lands.
+
+#### 23. Cache-busted ROM and preview URLs change in the built HTML.
+
+Scored as amended: (i) the built HTML's content-hash map carries the ROM and preview and matches the
+checked-in assets; (ii) the browser's requests carry `?v=<sha>`.
+
+```
+## gate 23 — content-hash cache-bust map in the built per-demo HTML
+--- bh-demo.html ---
+  bust['roms/mandel-oop.sfc'] = 59a76c6f84a1
+  bust['preview/mandel-oop.png'] = 36f2fcdd3292
+  bust['roms/manifest.json'] = c8a28a93792b
+  bust['app.js'] = fdb8b71ef465
+--- in-demo.html ---
+  bust['roms/mandel-oop.sfc'] = 59a76c6f84a1
+  bust['preview/mandel-oop.png'] = 36f2fcdd3292
+  bust['roms/manifest.json'] = 849291757bfe
+  bust['app.js'] = 100f4b5122e4
+12-hex SHA-256 prefixes of the checked-in assets (what a republish changes):
+  59a76c6f84a1  /home/will/biohack.net/public/play/roms/mandel-oop.sfc
+  36f2fcdd3292  /home/will/biohack.net/public/play/preview/mandel-oop.png
+  59a76c6f84a1  /home/will/indri.studio/public/apps/llvm-mos-65816/play/roms/mandel-oop.sfc
+  36f2fcdd3292  /home/will/indri.studio/public/apps/llvm-mos-65816/play/preview/mandel-oop.png
+runtime consumer (biohack app.js bust()):
+24:  function bust(path) {
+26:    return BASE + path + (b && b[path] ? "?v=" + b[path] : "");
+188:    return fetch(bust("roms/" + id + ".sfc"))
+350:    img.src = bust("preview/" + id + ".png");
+
+biohack.net — requests observed by the browser during gate 22:
+  https://biohack.net/play/app.js?v=fdb8b71ef465
+  https://biohack.net/play/cores/bsnes_jg.js?v=54e19fd849b8
+  https://biohack.net/play/roms/manifest.json?v=c8a28a93792b
+  https://biohack.net/play/preview/mandel-oop.png?v=36f2fcdd3292
+  https://biohack.net/play/cores/bsnes_jg.wasm?v=e74dbd3d7160
+  https://biohack.net/play/cores/PROVENANCE.json?v=5927ba6e4126
+  https://biohack.net/play/roms/mandel-oop.sfc?v=59a76c6f84a1
+```
+
+**PASS** — both pages embed `roms/mandel-oop.sfc → 59a76c6f84a1` and `preview/mandel-oop.png →
+36f2fcdd3292` (the checked-in assets' prefixes), and every player asset request on biohack carries its
+hash; indri's six observed requests do too (the ROM request is the one the #22 defect never issues).
+The staged republish changes the map to `140c7b742f65`, which is what invalidates the cached copy.
+This has been the case since biohack `3aeb92d` / indri `2208cb0`+`c7988ac`; the 2026‑08‑03/04 FAILs
+measured the wrong thing.
+
+### Summary
+
+| Subsection | 2026‑08‑04 | 2026‑09‑14 | FAILs |
+|---|---|---|---|
+| ROM gates (1–7) | 7 / 0 | **7 / 0** | — |
+| Startup/timeline gates (8–16) | 8 / 1 | **9 / 0** | — (#11 amended to the m7blank budget: 5 ≤ 6) |
+| Website gates (17–23) | 4 / 3 | **6 / 1** | #22 on indri only (tracked `[wip T2]` player defect) |
+| **Total** | **19 / 4** | **22 / 1** | |
+
+**Residual:** #22 on indri.studio, blocked on the `[wip T2]` indri player item (not this plan's); and
+the staged `mandel-oop` republish awaits a user-triggered push + `v*` tag on both sites (#20's policy
+says republish; nothing was pushed).
