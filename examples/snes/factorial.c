@@ -17,6 +17,8 @@
 #include "snesgfx/drawable.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/vram.h"
+#include "snesgfx/title_layer.h"   // BG2 overlay: default chr 0x1000 / map 0x5000 are clear of BG3's
+                                   // 0x0000..0x0A00 (chr + font) and 0x4000..0x4400 (tilemap)
 #include "font8.h"
 #include "../65816/factorial.h"
 
@@ -204,8 +206,14 @@ int main(void) {
     static App a;
     app_init(&a);
 
+    // Title overlay (BG2), added after the demo layer; held during the gate CRC, then torn down
+    // before the digits stream. Gate-neutral (no DMA; corpus_result is the pre-loop hash).
+    static TitleLayer title;
+    title_begin16(&a.screen, &title, "BIGNUM FACTORIAL", "N! DIGITS");
+
     // Gate CRC uses its own static bignum_state; does not affect a.bn.
     corpus_result = factorial_gate_crc();
+    title_end(&a.screen, &title, 110);                            // ~2 s title (gate hash is fast here)
 
     // delay: count-down between advances. Starts at 2 to let the initial
     // CGRAM+rows 0-13 DMA settle; thereafter 1 drain frame lets rows 16-27
