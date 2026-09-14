@@ -1964,5 +1964,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-08-05: fp:3d96a1cd97548340 — the verification section now records all six
      steps with raw output and a 6/6 PASS line (same commit). The capture fired because the
      first commit landed the plan before the results were written back. -->
-- [ ] **(triage)** ~~Gate hygiene: `task package` (via `dev/build.sh`'s example loop) aborts on 11 pre-existing example build — _from [2026-09-14-cleanroom-published-compiler.md](docs/plans/2026-09-14-cleanroom-published-compiler.md)_  <!-- fp:326d16160e82ca09 -->
+<!-- triaged 2026-09-15: the capture fired on the struck-through Deferred bullet in the same
+     commit that CLOSED it — all 11 battery aborts are fixed (8 demos build, 3 companion TUs
+     excluded by an enforced contract) and the evidence lives in that plan's "Follow-up — task
+     package gate hygiene fixed (2026-09-15)" section. Already recorded in Done. Nothing open. -->
 <!-- END auto-captured-deferrals -->
