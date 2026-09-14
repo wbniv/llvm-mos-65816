@@ -307,8 +307,180 @@ carries today's `snes_cpu.h`. Re-run `METHOD=apt` / `METHOD=tarball` to record t
 
 ## Deferred
 
-- Gate hygiene: `task package` (via `dev/build.sh`'s example loop) aborts on 11 pre-existing example build
+- ~~Gate hygiene: `task package` (via `dev/build.sh`'s example loop) aborts on 11 pre-existing example build
   failures unrelated to the release — 3 far-pointer demos in default mode, 5 demos with missing generated
   asset headers, 3 no-main harness TUs — so the release had to be cut with `dev/package-release.sh` directly
   (its own gates still enforced). Either fix or exclude those 11 in `dev/build.sh` so `task package` is the
-  one-command path again. Needs a Fable rank.
+  one-command path again. Needs a Fable rank.~~ **Closed 2026‑09‑15** — see the follow-up section below:
+  8 of the 11 now build in the battery, the other 3 are companion translation units excluded by a
+  self-declared, enforced contract. <!-- triaged 2026-09-15: fixed, not deferred -->
+
+## Follow-up — task package gate hygiene fixed (2026-09-15)
+
+`task package` is the one-command release path again. The 11 aborts were reproduced exactly, then closed
+class by class; no gate was weakened (the warning-free self-test and the clean-room bsnes-jg check are
+untouched, and every behavioural demo gate — `dev/apollo-reel.sh`, `dev/seamdemo.sh`,
+`dev/cartsize-canary.sh`, `dev/snes-video-codec-bench.sh`, `dev/bankwalk.sh`, … — still owns its own
+assertions against its own recorded corpus).
+
+### The 11, as actually classified
+
+The Deferred bullet's characterization holds for 10 of the 11. One correction: `snes-video-reel` was
+counted under "missing generated asset header", but its header
+(`examples/snes/snes-video-reel-assets.h`) is checked in — it failed because the battery never put
+`examples/snes` on the include path and the demo is a five-TU program, not a single file.
+
+| # | Demo | Failure | Class |
+|---|---|---|---|
+| 1 | `bankwalk` | `unable to legalize … G_MERGE_VALUES` | far-pointer, needs `+mos-a16` |
+| 2 | `farptrcmp` | `unable to legalize … G_MERGE_VALUES` | far-pointer, needs `+mos-a16` |
+| 3 | `farspill` | `unable to legalize … G_MERGE_VALUES` | far-pointer, needs `+mos-a16` |
+| 4 | `apollo-reel` | `'apollo-reel-assets.h' file not found` | generated asset header |
+| 5 | `cartsize-canary` | `'cartsize-canary-data.h' file not found` | generated asset header |
+| 6 | `seamdemo` | `'seamdemo-data.h' file not found` | generated asset header |
+| 7 | `snes-video-codec-bench` | `'snes-video-bench-assets.h' file not found` | generated asset header |
+| 8 | `snes-video-reel` | `not found with <angled> include` | **include path + multi-TU** (not a missing header) |
+| 9 | `snes-video-codec` | `undefined symbol: main` | companion TU |
+| 10 | `snes-video-dma` | `undefined symbol: main` | companion TU |
+| 11 | `snes-video-stream` | `undefined symbol: main` | companion TU |
+
+### What changed
+
+The battery keeps this repo's marker-in-the-source discipline — a demo that needs more than
+`mos-clang --config mos-snes.cfg -Os -o rom.sfc src.c` declares it in its own source, so every build path
+sees the same contract and `dev/build.sh` carries no per-demo table to drift. The two existing boolean
+markers (`mos-a16-only`, `snes-far-platform`) are joined by a small keyed grammar, documented in
+`dev/build.sh`:
+
+| Marker | Effect |
+|---|---|
+| `// battery-config: NAME` | link with `$INSTALL/bin/mos-NAME.cfg` |
+| `// battery-prep: COMMAND` | run before the build (`$ROOT`, `$BUILD`, `$INSTALL`, `$GEN` exported); repeatable |
+| `// battery-link: FILES` | extra translation units / objects |
+| `// battery-cflags: FLAGS` | extra compiler flags |
+| `// battery-checksum: ARGS` | extra `tools/snes-checksum.py` args |
+| `// battery-not-a-program: WHY` | companion TU — excluded by contract, and the claim is **enforced** |
+
+Per class:
+
+- **(a) far-pointer demos (3)** — built with the flags they actually need instead of in default 8-bit
+  mode: `mos-a16-only` plus, for `bankwalk`/`farptrcmp`, `battery-config: snes-hirom`, a
+  `battery-prep:` that emits their `bankwalk-table.s` via `tools/gen-bankwalk-asm.py`, and
+  `battery-checksum: --hirom`. `farspill` takes `snes-far-platform`.
+- **(b) generated asset headers (4) + include path (1)** — the generator runs as a declared dependency
+  in the battery, so the header exists before the demo compiles. `seamdemo` and `cartsize-canary` emit
+  their bespoke linker platform and descriptor header from `tools/snes-cartcanary.py` /
+  `tools/snes-seamdemo-gen.py`. `apollo-reel` and `snes-video-codec-bench` need a video tile corpus,
+  and the recorded real-camera corpus is not in the repository, so the battery bakes a deterministic
+  synthetic one — new `tools/gen-battery-video-corpus.py` + `dev/gen-battery-video-corpus.sh`, pure
+  stdlib, no ffmpeg, no source video, identical on every machine. That is a *compile-and-link* corpus
+  only; codec fidelity is still judged by each demo's own script against the recorded corpus.
+  `snes-video-reel` gets `-I examples/snes` (now added for every demo) plus its four companion TUs.
+- **(c) no-`main` harness TUs (3)** — excluded by an explicit, named, reasoned contract declared in each
+  file, not a silent skip, and the battery prints them: `snes-video-codec` and `snes-video-dma` are
+  companion TUs of `snes-video-reel` / `apollo-reel` / `snes-video-codec-bench`; `snes-video-stream` is a
+  companion TU of `snes-video-codec-bench`. The exclusion has teeth — a TU claiming
+  `battery-not-a-program` that nonetheless defines `main()` is a contract error and fails the battery, so
+  the list cannot rot into a blanket skip.
+
+### Before — the 11 aborts, reproduced
+
+`dev/build.sh`'s example loop as it stood, run against the existing `build/install` SDK:
+
+```
+    apollo-reel          BUILD FAILED
+    bankwalk             BUILD FAILED
+    cartsize-canary      BUILD FAILED
+    farptrcmp            BUILD FAILED
+    farspill             BUILD FAILED
+    seamdemo             BUILD FAILED
+    snes-video-codec-bench BUILD FAILED
+    snes-video-codec     BUILD FAILED
+    snes-video-dma       BUILD FAILED
+    snes-video-reel      BUILD FAILED
+    snes-video-stream    BUILD FAILED
+==> built 247 program(s)
+==> FAILED (11): apollo-reel bankwalk cartsize-canary farptrcmp farspill seamdemo snes-video-codec-bench snes-video-codec snes-video-dma snes-video-reel snes-video-stream
+```
+
+### After — the same loop, same SDK
+
+```
+    apollo-reel             524288 bytes
+    bankwalk                524288 bytes
+    cartsize-canary         524288 bytes
+    farptrcmp               524288 bytes
+    farspill                 65536 bytes
+    seamdemo               6291456 bytes
+    snes-video-codec-bench   32768 bytes
+    snes-video-codec       not a program — companion TU of snes-video-reel / apollo-reel / snes-video-codec-bench
+    snes-video-dma         not a program — companion TU of snes-video-reel / apollo-reel / snes-video-codec-bench
+    snes-video-reel          32768 bytes
+    snes-video-stream      not a program — companion TU of snes-video-codec-bench
+==> built 255 program(s)
+==> not programs, excluded by contract (3): snes-video-codec snes-video-dma snes-video-stream
+```
+
+247 → 255 programs built, 0 failures, and the only three skips are named with their reason.
+
+### Acceptance — `task package` end to end
+
+`task package` on `main`, one command, start to finish — `release-builtins` → `release-sdk` (clean SDK
+rebuild) → `dev/package-release.sh`, both release gates enforced. The battery inside it:
+
+```
+==> build + checksum every SNES program (examples/snes/**/*.c)
+…
+==> built 255 program(s)
+==> not programs, excluded by contract (3): snes-video-codec snes-video-dma snes-video-stream
+```
+
+No `BUILD FAILED`, no `PREP FAILED`, no `CONTRACT ERROR` line anywhere in the run. Gate 1, the
+warning-free self-test:
+
+```
+==> self-test: warning-free compile of a SNES ROM from the relocated prefix
+    OK  32768 bytes — no warnings
+```
+
+Gate 2, the clean-room bsnes-jg check (`task release-test METHOD=local`, run from inside `task package`):
+
+```
+==> clean-room check (the dev build must be invisible)
+  OK — only the published compiler is reachable
+
+==> host oracle (independent CRC over the same grid)
+  grid 64x56, N=15 (scraped from the program)
+  host reference: CRC16=0x204F  (/out/mandel-host.png)
+
+==> result table  (METHOD=local  PROGRAM=mandel-display  oracle=0x204F)
+  build          got        expect   verdict
+  -----          ---        ------   -------
+  +mos-a16       0x204F     0x204F   PASS
+
+RESULT: PASS — the published compiler builds a correct, bootable ROM (METHOD=local)
+```
+
+And the packaging result:
+
+```
+==> done  (linux-x86_64 — self-test passed)
+    tree:    …/dist/llvm-mos-65816-20260914-5027331-dirty-linux-x86_64  (228M)
+    archive: …/dist/llvm-mos-65816-20260914-5027331-dirty-linux-x86_64.tar.xz  (42M)
+    sha256:  ce3125634cf6b7c29544b4e44d831594f4d48d993df4694840fc935afe5b1bad
+EXIT=0
+```
+
+**PASS.** The `-dirty` stamp is the working tree carrying this change; the tarball is a verification
+artifact, not a publish candidate. Acceptance met: `task package` runs end to end with zero unexplained
+skips — every demo either builds or is on the explicit, enforced no-`main` list.
+
+### Deviation from the brief
+
+The brief asked for the asset generator to be wired as a `deps:` entry in `Taskfile.yml`. It is wired in
+`dev/build.sh` via `battery-prep:` instead, for a mechanical reason: the battery runs **inside the dev
+container** (`dev/run.sh` → `/work`), where a host-side Taskfile `deps:` step cannot reach the build. The
+source-declared form is also strictly stronger — the dependency travels with the demo, so *every* build
+path honours it, not only `task package`. `Taskfile.yml` is unchanged.
+
+

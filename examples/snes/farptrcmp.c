@@ -1,3 +1,9 @@
+// Build contract for dev/build.sh's example battery (grammar: dev/build.sh).
+// mos-a16-only: 24-bit far pointers are legalized only with the 16-bit accumulator.
+// battery-config: snes-hirom
+// battery-prep: python3 tools/gen-bankwalk-asm.py "$GEN/bankwalk-table.s"
+// battery-link: $GEN/bankwalk-table.s
+// battery-checksum: --hirom
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256
 #include "snesgfx/display.h"

@@ -1,3 +1,4 @@
+// battery-not-a-program: companion TU of snes-video-reel / apollo-reel / snes-video-codec-bench
 #include "snes-video-codec.h"
 
 enum {

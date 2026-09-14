@@ -71,11 +71,60 @@ case "$a16probe" in
   *) A16_OK=1 ;;
 esac
 OBJCOPY="$MOS_TOOLCHAIN/bin/llvm-objcopy"
+
+# ---------------------------------------------------------------------------
+# Per-demo build contract — declared IN THE SOURCE, never in a table here.
+#
+# A demo that needs more than `mos-clang --config mos-snes.cfg -Os -o rom.sfc src.c`
+# says so itself, in a `//` comment, so EVERY build path sees the same contract and
+# this script stays free of a per-demo table that silently drifts out of date. Grep
+# for a key to find every demo that uses it.
+#
+#   // battery-config: NAME      link with $INSTALL/bin/mos-NAME.cfg
+#                                (the older boolean `snes-far-platform` /
+#                                `snes-gallery-platform` markers still work)
+#   // battery-prep: COMMAND     run before the build, from $ROOT, with $ROOT,
+#                                $BUILD, $INSTALL and $GEN exported. Generates
+#                                platforms, asset headers, sidecar asm. Repeatable:
+#                                every matching line runs, in source order.
+#   // battery-link: FILES       extra translation units / objects to link. A bare
+#                                name resolves under examples/snes; $GEN/... works.
+#   // battery-cflags: FLAGS     extra compiler flags (-D...).
+#   // battery-checksum: ARGS    extra args for tools/snes-checksum.py (e.g. --hirom).
+#   // battery-not-a-program: WHY  this TU has no main() — it is a companion TU
+#                                linked into another demo. Never built standalone.
+#                                Enforced: a TU claiming this MUST NOT define main.
+#
+# Anything not carrying a marker builds with the plain default, exactly as before.
+# ---------------------------------------------------------------------------
+marker() { # <key> <file> — every value for <key>, one per line
+  sed -n "s@^[[:space:]]*//[[:space:]]*$1:[[:space:]]*@@p" "$2"
+}
+
+GENROOT="$BUILD/battery"
 count=0
 failed=()
+excluded=()
 for src in "$ROOT"/examples/snes/**/*.c; do
   name="$(basename "$src" .c)"
   rom="$BUILD/$name.sfc"
+
+  # Companion TUs are excluded by an explicit, self-declared, reasoned contract —
+  # never by a silent skip, and never by a name list in this script. The claim is
+  # checked: a TU that declares itself not-a-program yet defines main() is a
+  # contract error and fails the battery.
+  notprog="$(marker battery-not-a-program "$src" | head -1)"
+  if [ -n "$notprog" ]; then
+    if grep -qE '^[[:space:]]*[A-Za-z_][A-Za-z0-9_ *]*\bmain[[:space:]]*\(' "$src"; then
+      printf '    %-22s CONTRACT ERROR (battery-not-a-program, yet defines main)\n' "$name"
+      failed+=("$name")
+      continue
+    fi
+    printf '    %-22s not a program — %s\n' "$name" "$notprog"
+    excluded+=("$name")
+    continue
+  fi
+
   # Far-pointer examples (address_space(2) high-WRAM buffers, e.g. mandel-display.c) self-declare a
   # `mos-a16-only` marker; they REQUIRE +mos-a16 (default-8bit can't legalize a `p2` G_PTR_ADD).
   # The grep survives the far type being spelled via a macro (M7_FAR). Skip if unsupported.
@@ -93,14 +142,47 @@ for src in "$ROOT"/examples/snes/**/*.c; do
   cfg="$INSTALL/bin/mos-snes.cfg"
   if grep -q 'snes-far-platform' "$src"; then cfg="$INSTALL/bin/mos-snes-far.cfg"; fi
   if grep -q 'snes-gallery-platform' "$src"; then cfg="$INSTALL/bin/mos-snes-gallery.cfg"; fi
+  cfgname="$(marker battery-config "$src" | head -1)"
+  [ -z "$cfgname" ] || cfg="$INSTALL/bin/mos-$cfgname.cfg"
+
+  ok=1
+  # Generated inputs (linker platforms, asset headers, sidecar asm) land here, one
+  # directory per demo, and are on the include path below.
+  GEN="$GENROOT/$name"
+  mkdir -p "$GEN"
+  : >"$GEN/prep.log"
+  while IFS= read -r prep; do
+    [ -n "$prep" ] || continue
+    if ! ( cd "$ROOT" && ROOT="$ROOT" BUILD="$BUILD" INSTALL="$INSTALL" GEN="$GEN" \
+             eval "$prep" >>"$GEN/prep.log" 2>&1 ); then
+      printf '    %-22s PREP FAILED: %s\n' "$name" "$prep"
+      tail -5 "$GEN/prep.log" || true
+      ok=0
+      break
+    fi
+  done < <(marker battery-prep "$src")
+
+  extra_tus=()
+  while IFS= read -r linkline; do
+    [ -n "$linkline" ] || continue
+    for f in $(eval echo "$linkline"); do
+      case "$f" in
+        /*) extra_tus+=("$f") ;;
+        *)  extra_tus+=("$ROOT/examples/snes/$f") ;;
+      esac
+    done
+  done < <(marker battery-link "$src")
+
+  read -r -a extra_cflags <<<"$(marker battery-cflags "$src" | tr '\n' ' ')" || true
+  read -r -a checksum_args <<<"$(marker battery-checksum "$src" | tr '\n' ' ')" || true
   # Sidecar binary assets: objcopy committed examples/snes/<name>.{pic,pal,map,chr,bin} into
   # bank-$00 .rodata objects and link them (Option B — raw gfx4snes output, no compiled C arrays;
   # symbols _binary_<name>_<ext>_start/_end/_size). Run from the asset dir so symbol names are clean.
   # Continue-on-error: one unbuildable demo must not abort the loop and silently skip
   # every demo that sorts after it. Each stage is guarded; a failure records $name in
   # $failed and moves on to the next demo instead of letting `set -e` kill the script.
-  ok=1
   assets=()
+  [ "$ok" = 1 ] || { printf '    %-22s BUILD FAILED\n' "$name"; failed+=("$name"); continue; }
   for ext in pic pal map chr bin; do
     a="$ROOT/examples/snes/$name.$ext"
     [ -e "$a" ] || continue
@@ -113,22 +195,26 @@ for src in "$ROOT"/examples/snes/**/*.c; do
     fi
     assets+=("$o")
   done
-  if [ "$ok" = 1 ] && ! "$MOS_CLANG" --config "$cfg" "${a16[@]}" \
-      -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src" "${assets[@]}"; then
+  if [ "$ok" = 1 ] && ! "$MOS_CLANG" --config "$cfg" "${a16[@]}" "${extra_cflags[@]}" \
+      -I "$GEN" -I "$ROOT/examples/snes" \
+      -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src" "${extra_tus[@]}" "${assets[@]}"; then
     ok=0
   fi
-  if [ "$ok" = 1 ] && ! python3 "$ROOT/tools/snes-checksum.py" "$rom"; then
+  if [ "$ok" = 1 ] && ! python3 "$ROOT/tools/snes-checksum.py" "${checksum_args[@]}" "$rom"; then
     ok=0
   fi
   if [ "$ok" = 0 ]; then
-    printf '    %-14s BUILD FAILED\n' "$name"
+    printf '    %-22s BUILD FAILED\n' "$name"
     failed+=("$name")
     continue
   fi
-  printf '    %-14s %6s bytes\n' "$name" "$(stat -c%s "$rom")"
+  printf '    %-22s %7s bytes\n' "$name" "$(stat -c%s "$rom")"
   count=$((count + 1))
 done
 echo "==> built $count program(s)"
+if [ "${#excluded[@]}" -gt 0 ]; then
+  echo "==> not programs, excluded by contract (${#excluded[@]}): ${excluded[*]}"
+fi
 if [ "${#failed[@]}" -gt 0 ]; then
   echo "==> FAILED (${#failed[@]}): ${failed[*]}"
   exit 1

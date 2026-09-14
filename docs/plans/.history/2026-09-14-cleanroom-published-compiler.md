@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/b6380b8) | docs: record the 20260914-f9711be release and the artemis reel republish |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/a76fb8b) | fix(release-test): ship the fixture's full header closure; report on FAIL too |
 
 <!--history-meta v1
+b6380b8	author	Will Norris
+b6380b8	added	23
+b6380b8	deleted	0
+b6380b8	files	1
+b6380b8	body	- svx2-emulator-validation.sh pins the new publication record (v1.0.588,\n  d71382c8…, built from f9711be).\n- artemis plan: republish record incl. the v1.0.587 content-record miss.\n- cleanroom plan: release follow-through (apt 0.0.0+git20260914.f9711be) and\n  a Deferred bullet for the task-package example-loop gate hygiene.\n\nCo-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011AP736JtwzSGYH4bmxDWTa
 a76fb8b	author	Will Norris
 a76fb8b	added	291
 a76fb8b	deleted	0

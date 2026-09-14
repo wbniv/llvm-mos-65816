@@ -1,3 +1,4 @@
+// battery-not-a-program: companion TU of snes-video-codec-bench
 #include "snes-video-stream.h"
 
 uint8_t svc_segment_cursor_init(SvcSegmentCursor *cursor,

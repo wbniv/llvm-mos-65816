@@ -949,16 +949,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 
 ### Distribution / Packaging
 
-- [wip T3] **`task package` is not the one-command release path — `dev/build.sh`'s example loop aborts on 11 pre-existing
-  demo build failures.** <!-- agent:a37025a45a9757fc9 --> The 2026‑09‑14 release had to be cut with `dev/package-release.sh` directly (its own gates —
-  warning-free self-test + clean-room bsnes — still enforced). Three classes, each needing its own treatment: 3 far-pointer
-  demos that only build with their far mode flag (build them with it), 5 demos whose generated asset headers are
-  missing (run the generator as a `deps:` step, or gate them on the asset), 3 no-`main` harness TUs (exclude by contract,
-  listed). Do NOT blanket-exclude: a hidden compile failure behind the release gate is exactly the class of defect the
-  battery exists to catch. Acceptance: `task package` runs end-to-end on `main` with zero skipped demos that are not on
-  the explicit no-main list. (T3: what is settled — the 11 are enumerated in the cleanroom plan's Deferred bullet;
-  execution spans `dev/build.sh`, the Taskfile and the asset generators.)
-
 - [T4] **#321 Cross-platform toolchain builds — interim `linux-arm64` + `windows-x86_64` (keep `linux-x86_64`),
   cross-compiled from the existing Linux x86-64 Docker** (no mac/Win CI runners; scope locked 2026-06-25).
   Until #321 merges/fixes upstream, upstream CI emits no binary carrying these patches, so arm64-Linux /
@@ -1046,6 +1036,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-15 — [task-package-gate-hygiene] All 11 battery aborts fixed: 8 demos build via source-declared markers, 3 companion TUs excluded by an enforced contract. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md).
 - ✅ 2026-09-15 — [121-mode7-gallery-badges-and-mandel-oop-startup-verify] 23/23: gate 22 on indri closed live once the player fix deployed (post-title frames hash-identical to biohack); title-window entropy sensitivity found and deferred. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - ✅ 2026-09-15 — [indri-player-frozen-poster] Real cause was the pinned `@wbniv/bsnes-jg-player` build (`clearTouchNav` scope `ReferenceError` on boot), not template drift; re-resolved in indri `6cb870e`, deployed `v0.1.155`; live step 15 5/5 on `v0.1.156`. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
 - ✅ 2026-09-15 — [eliminate-build-nondeterminism] Root cause pinned + fixed: `tryAbsoluteIndexedAddressing` rewrote uses without the GISel observer, leaving a stale CSE node whose hit/miss followed heap layout (`sec` flip, ~0.5 %/build). Fix in `0002` + MIR test (`7899355`); 900 builds DISTINCT 1, corpus 63/63 + a16 62/62. See [plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md).
@@ -1973,4 +1964,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-08-05: fp:3d96a1cd97548340 — the verification section now records all six
      steps with raw output and a 6/6 PASS line (same commit). The capture fired because the
      first commit landed the plan before the results were written back. -->
+- [ ] **(triage)** ~~Gate hygiene: `task package` (via `dev/build.sh`'s example loop) aborts on 11 pre-existing example build — _from [2026-09-14-cleanroom-published-compiler.md](docs/plans/2026-09-14-cleanroom-published-compiler.md)_  <!-- fp:326d16160e82ca09 -->
 <!-- END auto-captured-deferrals -->

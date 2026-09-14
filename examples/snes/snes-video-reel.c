@@ -1,3 +1,7 @@
+// Build contract for dev/build.sh's example battery (grammar: dev/build.sh).
+// mos-a16-only: the SVX2 decoder addresses the stream with 24-bit far pointers.
+// battery-cflags: -DSVC_USE_ASM
+// battery-link: snes-video-reel-fast.s snes-video-codec.c snes-video-dma.c snes-video-codec-fast.s
 #include <snes.h>
 #include <stdint.h>
 

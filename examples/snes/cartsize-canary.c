@@ -1,3 +1,11 @@
+// Build contract for dev/build.sh's example battery (grammar: dev/build.sh). The
+// behavioural gate is dev/cartsize-canary.sh, which sweeps the full mapping x size x
+// speed matrix; the battery links one point of it to keep the program compiling.
+// mos-a16-only: the canary walks the cartridge with 24-bit far pointers.
+// battery-config: snes-cart-battery-lorom512k
+// battery-prep: python3 tools/snes-cartcanary.py emit-platform --mapping lorom --size 512K --speed slow --name snes-cart-battery-lorom512k --install "$INSTALL"
+// battery-prep: python3 tools/snes-cartcanary.py emit-header --mapping lorom --size 512K --speed slow --out "$GEN/cartsize-canary-data.h" --label "battery lorom 512K slow"
+// battery-checksum: --mapping lorom --speed slow
 // cartsize-canary.c — the cartridge-size test ROM.
 //
 // One program, three cartridges: HiROM 4 MiB, ExHiROM 6 MiB, ExHiROM 8 MiB. It

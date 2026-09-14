@@ -1,3 +1,6 @@
+// Build contract for dev/build.sh's example battery (grammar: dev/build.sh).
+// mos-a16-only: the Imag32 far-pointer spills this exercises need the 16-bit accumulator.
+// snes-far-platform: the .far_rodata table lives in bank $01.
 // Far-Spill Stress — #131 of the compiler stress-test battery (Round 7).
 #include <snes.h>
 #define CANVAS_FLUSH_TILES 256

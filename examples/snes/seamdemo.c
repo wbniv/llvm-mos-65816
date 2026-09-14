@@ -1,3 +1,11 @@
+// Build contract for dev/build.sh's example battery (grammar: dev/build.sh). The
+// behavioural gate is dev/seamdemo.sh; the battery links the same ExHiROM 6 MiB
+// cartridge to keep the program compiling.
+// mos-a16-only: the VM's 24-bit file PC needs the 16-bit accumulator.
+// battery-config: snes-cart-seamdemo
+// battery-prep: python3 tools/snes-cartcanary.py emit-platform --mapping exhirom --size 6M --name snes-cart-seamdemo --install "$INSTALL"
+// battery-prep: python3 tools/snes-seamdemo-gen.py emit-header --mapping exhirom --size 6M --out "$GEN/seamdemo-data.h"
+// battery-checksum: --mapping exhirom
 // seamdemo.c — Act 1 of the ExHiROM three-act boundary synthesis cartridge.
 //
 // "The cartridge is the program." A 16-opcode bytecode VM executes a stream that

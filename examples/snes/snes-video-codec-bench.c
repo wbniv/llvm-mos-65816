@@ -1,3 +1,12 @@
+// Build contract for dev/build.sh's example battery (grammar: dev/build.sh). The
+// benchmark numbers come from dev/snes-video-codec-bench.sh against the recorded
+// real-camera tile corpus; the battery bakes the synthetic corpus from
+// dev/gen-battery-video-corpus.sh so the program keeps compiling and linking.
+// mos-a16-only: the codec addresses its stream with 24-bit far pointers.
+// battery-cflags: -DVIDEO_BENCH_CASE=0
+// battery-prep: bash dev/gen-battery-video-corpus.sh
+// battery-prep: python3 tools/snes-video-bench-assets.py "$BUILD/battery/corpus.tiles" "$GEN/snes-video-bench-assets.h"
+// battery-link: snes-video-codec.c snes-video-stream.c snes-video-dma.c snes-video-codec-bench-fast.s snes-video-codec-fast.s
 #include <snes.h>
 #include <stdint.h>
 #include "../65816/lzss.h"
