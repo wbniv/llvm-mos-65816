@@ -84,9 +84,13 @@ mkdir -p "$OUTDIR"
 # Root in-container (apt install + /opt writes); the inner script chowns /out back.
 # tee the container's (uncoloured, non-TTY) output to the compile-log artifact — it
 # carries each build's exact mos-snes-clang command + compiler output. PIPESTATUS[0]
-# preserves docker's exit code through the tee.
+# preserves docker's exit code through the tee. INVARIANT: a failing container must
+# still reach the report step below, so the pipeline sits in a `set +e` bracket —
+# under `pipefail` a non-zero container makes the whole pipeline non-zero and `set -e`
+# would otherwise exit here with no HTML report and no artifact trailer.
 LOG="$OUTDIR/release-test-$METHOD.log"
 echo "==> running clean-room test (transcript -> $LOG)"
+set +e
 docker run --rm \
   -e METHOD="$METHOD" -e PROGRAM="$PROGRAM" -e A16="$A16" \
   ${FRAMES:+-e FRAMES="$FRAMES"} \
@@ -95,6 +99,7 @@ docker run --rm \
   -v "$OUTDIR":/out \
   "$IMAGE" 2>&1 | tee "$LOG"
 rc=${PIPESTATUS[0]}
+set -e
 
 # --- render the self-contained HTML report (§D of the plan) -----------------
 # Filename carries a UTC run-timestamp so repeated runs accumulate as history
