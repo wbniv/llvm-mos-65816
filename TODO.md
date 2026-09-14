@@ -506,28 +506,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   un-landed (a)/(b) `0002` spike; tear down only when told; (2) post the prepared #321 CC design note
   (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
   [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
-- [wip T2] **#3 SNES Blossom on-screen interactive port <!-- agent:a418a0e0b249b67eb --> — CORE + HUD DONE, verified, landed on `main`; only optional polish left.**
-  **Landed** (`task blossom` / `dev/run.sh blossom`, RESULT PASS): the Hopalong attractor renders + blooms
-  live on the SNES via Mode 7 (`examples/snes/blossom.c`) — far read-modify-write accumulation into a
-  128×128 hit grid (`$7E2000`), revealed band-by-band (far grid → near `chrbuf` → VRAM DMA), hue-wheel
-  CGRAM palette cycling, and joypad pan/zoom/preset/colour (`examples/snes/blossom.h`, the `view.h`-analog
-  state machine). Two differential channels pass: grid hash `host == +mos-a16` on **MAME + bsnes-jg**
-  (`0x9047`) and the controller state-math `host == ROM` (bsnes-jg, `dev/jgxcheck.cpp -DJGX_BLOSSOM`).
-  Shared math in `examples/65816/hopalong.h`; screenshots `build/blossom-{jg,mame}.png`; live play
-  `task blossom-play`. Also **published as a playable in-browser page** (indri.studio/blossom +
-  biohack.net/blossom via the `snes-rom-page` skill) with a user manual (`docs/blossom-manual.md`).
-  **Remaining = optional only:** (a) a literal **64 KB / 256×256 supersampled grid in bank `$7F`** for
-  anti-aliasing (used 16 KB — the far path is identical, just smaller); (b) the **hw multiplier**
-  (`$4202/$4203→$4216`) for the hot `b*x` to speed the ~10 s bloom; (c) re-test the 2nd far-pointer
-  fragility (a far→far whole-image / far constant-fill in a multi-far TU derailed at runtime under
-  `+mos-a16`; worked around with band/near-staging) — **likely now resolved by the far-memops fix
-  (`0013`/`0014`)** that landed on `main` since; confirm and drop the workaround if so.
-  [plan](docs/plans/2026-06-24-3-snes-blossom-on-screen-interactive-hopalong-attr.md).
-  - [x] ~~**On-screen field/value HUD + plot-box reframe (split-screen).**~~ **DONE** — carves the screen
-    with an **HDMA mode-split** (`BGMODE`+`TM` streamed per-scanline) into a **Mode 7 plot box** with
-    **tiled BG3 value/control bars** top & bottom (live `a/b/c`/zoom/palette fields + the control legend).
-    Reusable `examples/snes/{hud,font8}.h` — the repo's first HDMA + BG-text; gates unaffected (`0x9047`
-    grid / `blossom_crc`). [plan](docs/plans/2026-06-26-blossom-split-screen-hud-mode-7-plot-box-tiled-bg3.md).
 - [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~ *(2026‑07‑26 refresh: now 13 headers / 113 demos; the "0 indirect JMPs / LTO devirtualized" claim was a measurement artifact — 1 `__call_indir` call survives; mandel-display has since diverged so +338 B is historical. Corrected in `docs/oop-in-c.md` §4–§5 + new §8 static-vs-virtual benchmark.)*
 - [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
@@ -1171,6 +1149,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [blossom-polish] Optional polish closed: (a) 256² supersample proven bit-identical to the 128² render (0/16384 mismatches, not worth 4× WRAM); (c) far-pointer fragility re-tested and confirmed fixed on MAME+bsnes, source comment corrected (ROM byte-identical, gates unchanged). (b) HW multiplier lives in shared `hopalong.h` (6 consumers) — needs its own ranked item if wanted. See [plan](docs/plans/2026-09-14-blossom-polish.md).
 - ✅ 2026-09-14 — [m7-off-boot-forceblank] Closed as a stale duplicate of [m7-splash-forceblank] (2026-08-05): the "re-opened blank" premise was measured false, all 12 splash demos are within budget (`dev/m7blank.sh --gate` PASS today, mandel-oop at the 5-frame target). Gate 11's 0-frame wording routed to the plan-121 reconciliation. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
 - ✅ 2026-09-14 — [display-first-frame-optin] Per-drawable first-frame opt-in shipped (compile-time `SNESGFX_FIRST_FRAME_OPTIN` gate, mandel-oop/life/1d-ca adopt it); non-adopters byte-identical. See [plan](docs/plans/2026-09-14-display-first-frame-optin.md).
 - ✅ 2026-09-14 — [maze-refold] `maze_fold_path` folds while walking `came[]` again (two-pass work-around removed); `-verify` clean ×3, CRC `0x0749` held. See [plan](docs/plans/2026-09-14-maze-refold.md).
