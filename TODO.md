@@ -842,7 +842,8 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [review](docs/pr-revisions/2026-09-13/review.md)). After the six revised branches publish: `0010-coalesce-rotate-ac`
   → replace the withdrawn `shouldCoalesce` guard with the #578 `MOSCopyOpt` liveness fix (the fork's copy-opt still has
   the real bug); `0022-mos-late-opt-cmpzero-lowering` → the #589 terminator form (`isTerminator` on `CmpZero`, scan
-  `terminators()`); `0003`/`0021`/`0024` are comment-only deltas. Retire the obsolete RA companion draft
+  `terminators()`); `0003`/`0024` are comment-only deltas; **`0021` is now RETIRABLE — #590 MERGED
+  upstream 2026‑09‑14 as `742d554bf080`**, so drop the patch and bump the vendor pin past it. Retire the obsolete RA companion draft
   `docs/upstream-coalesce-rotate-ac-ra-issue.md` (status row 16), re-sync the six `docs/upstream-*-pr.md` mirrors and
   status rows 9/15/16/17/18/18a/18b. Rebuild toolchain, corpus + a16 gates, `-verify-machineinstrs`. _T3: settled
   design (the revised PRs are the spec), multi-file vendor+patch+docs work with a toolchain rebuild._
