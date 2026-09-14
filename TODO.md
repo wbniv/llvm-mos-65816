@@ -968,22 +968,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   functional self-test needs a real Mac) — out of interim scope, likely retired by upstream CI. Whole
   capability retires when `0001–0009` land upstream. [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
-- [wip T3] **Clean-room test of the *published* SNES compiler <!-- agent:a7940ac367fea5a29 --> — wired into the publish gate** — in a throwaway
-  Docker container with NO dev toolchain, acquire the published compiler and compile a **sound-free**
-  reference Mandelbrot (`examples/snes/mandel-display.c`, 64×56 N=15, CRC `0x204F` — now the far/16-bit
-  tester, so **`+mos-a16`-only**; secondary `examples/65816/k_mandel.c` `0x820B`, default-8bit + `+mos-a16`),
-  then verify on **bsnes-jg** (embedded SPC700 IPL → no BIOS, no sound)
-  against the host oracle (`mandel-render`). Every run emits three artifacts
-  to `build/release-test/`: a **compile log** (`release-test-<method>.log`, timestamped, shows the exact
-  `mos-snes-clang` command + output), the **SNES Mandelbrot screenshot(s)** (`mandel-<build>.png`, bsnes-jg
-  framebuffer), and a nicely-formatted self-contained **HTML release report** (`release-report-<stamp>.html`:
-  embeds the log + screenshots, plus config, release-package details, and a names+sizes table of the bundled
-  `.md`/`.pdf` docs). **Policy: always test on release** (the mandatory `METHOD=local` gate in
-  `dev/package-release.sh`, so *every* `task package` is clean-room-verified + reported before upload); **no
-  periodic/scheduled CI smoke** — `apt`/`tarball` methods are manual post-deploy confirmations. Rig image
-  `dev/Dockerfile.release-test` (pinned bsnes-jg + jgxcheck + oracle + fixtures, no toolchain) +
-  `dev/test-release.sh` + `dev/release-report.py` + `task release-test`.
-  [plan](docs/plans/2026-06-25-test-published-snes-compiler.md).
 
 - [wip T2] **`dev/jgxcheck` timeline captures are nondeterministic by default <!-- agent:a490bfb291809d151 --> — make determinism
   explicit.** Found by the 121-badges verification: `jgxcheck.cpp:394` leaves
@@ -1149,6 +1133,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [cleanroom-published-compiler] Already built 2026-06-25 (`dev/test-release.sh`, `task release-test`, gate in `package-release.sh`); re-run live against apt+tarball: codegen PASS (k_mandel `0x820B` ×4) but the **published package `c49f395` is stale** — its sysroot lacks `snes_cpu.h` so current `examples/snes/` won't compile; two rig defects fixed (header closure, FAIL-path report). New release is a user call. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md).
 - ✅ 2026-09-14 — [blossom-polish] Optional polish closed: (a) 256² supersample proven bit-identical to the 128² render (0/16384 mismatches, not worth 4× WRAM); (c) far-pointer fragility re-tested and confirmed fixed on MAME+bsnes, source comment corrected (ROM byte-identical, gates unchanged). (b) HW multiplier lives in shared `hopalong.h` (6 consumers) — needs its own ranked item if wanted. See [plan](docs/plans/2026-09-14-blossom-polish.md).
 - ✅ 2026-09-14 — [m7-off-boot-forceblank] Closed as a stale duplicate of [m7-splash-forceblank] (2026-08-05): the "re-opened blank" premise was measured false, all 12 splash demos are within budget (`dev/m7blank.sh --gate` PASS today, mandel-oop at the 5-frame target). Gate 11's 0-frame wording routed to the plan-121 reconciliation. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
 - ✅ 2026-09-14 — [display-first-frame-optin] Per-drawable first-frame opt-in shipped (compile-time `SNESGFX_FIRST_FRAME_OPTIN` gate, mandel-oop/life/1d-ca adopt it); non-adopters byte-identical. See [plan](docs/plans/2026-09-14-display-first-frame-optin.md).
