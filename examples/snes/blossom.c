@@ -7,9 +7,10 @@
 // read-modify-write path (Stage 1) and displayed via Mode 7: the hit count IS the 8bpp pixel (a CGRAM
 // index), revealed one tile-row per frame (build_band far-loads a band of the grid into a NEAR buffer
 // in tiled order, dma_chr_to DMAs it to VRAM char bytes — one far pointer live per helper, the
-// grid_hash idiom that sidesteps the +mos-a16 far-pointer pressure that a far->far whole-image build
-// hits). The orbit state persists across frames so the cloud BLOOMS progressively; the 256-entry CGRAM
-// palette is rotated every frame for the "wallpaper for the mind" shimmer.
+// grid_hash idiom) so the far-read + tiled-reorder cost amortizes across TILES frames instead of
+// stalling one frame on the whole image. The orbit state persists across frames so the cloud BLOOMS
+// progressively; the 256-entry CGRAM palette is rotated every frame for the "wallpaper for the mind"
+// shimmer.
 //
 // Two differential channels (both built default + +mos-a16, host == target):
 //   * grid:  a DETERMINISTIC boot accumulation of K_GATE classic points -> corpus_result == the host
