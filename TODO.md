@@ -816,15 +816,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
 — keep it in sync (drafted → ready-to-post → posted) with the items in this section._
 
-- [wip T3] **Fork-patch follow-ups for the 2026‑09‑13 PR revisions** <!-- agent:a917313a3863307f4 --> ([bundle](docs/pr-revisions/2026-09-13/README.md) ·
-  [review](docs/pr-revisions/2026-09-13/review.md)). After the six revised branches publish: `0010-coalesce-rotate-ac`
-  → replace the withdrawn `shouldCoalesce` guard with the #578 `MOSCopyOpt` liveness fix (the fork's copy-opt still has
-  the real bug); `0022-mos-late-opt-cmpzero-lowering` → the #589 terminator form (`isTerminator` on `CmpZero`, scan
-  `terminators()`); `0003`/`0024` are comment-only deltas; **`0021` is now RETIRABLE — #590 MERGED
-  upstream 2026‑09‑14 as `742d554bf080`**, so drop the patch and bump the vendor pin past it. Retire the obsolete RA companion draft
-  `docs/upstream-coalesce-rotate-ac-ra-issue.md` (status row 16), re-sync the six `docs/upstream-*-pr.md` mirrors and
-  status rows 9/15/16/17/18/18a/18b. Rebuild toolchain, corpus + a16 gates, `-verify-machineinstrs`. _T3: settled
-  design (the revised PRs are the spec), multi-file vendor+patch+docs work with a toolchain rebuild._
 
 - [wip T5] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — 🏁 WAVE 1
   COMPLETE 2026-07-26).** ✅ **All three Wave-1 items live upstream:** `0016` G_SCMP/G_UCMP = issue
@@ -1092,6 +1083,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [fork-patch-followups] `0010`→#578 copy-opt fix (guard dropped, now a standalone patch after `0002`), `0022`→#589 terminator form, `0003`/`0024`/`0021` re-synced to the published/merged forms, RA companion draft retired, six PR mirrors re-synced; stack applies from pristine, lit 8/8 (+red), corpus 63/63, a16 62/62, loopfold `0xF56C`. `0021` retires at the next vendor-pin bump (procedure in plan). See [plan](docs/plans/2026-09-14-fork-patch-followups.md).
 - ✅ 2026-09-14 — [m7-gallery-web-reconcile] All 8 drifted website gates were measurement errors, not site bugs; plans 123 (10/10) and 121 (22/23) re-verified with a reproducible Chrome-DevTools harness (`dev/m7web/`); mandel-oop republished to biohack.net `v1.0.586`. See [plan](docs/plans/2026-09-14-m7-gallery-web-reconcile.md).
 - ✅ 2026-09-14 — [123-mode7-gallery-filter-verify] 10/10 PASS incl. the narrow/reduced-motion step (320 px, `--force-prefers-reduced-motion`). See [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md).
 - ✅ 2026-09-14 — [jgxcheck-determinism] `jgxcheck` defaults bsnes-jg entropy to None when `JGX_ENTROPY` is unset (`85beec9`); `bootblank.sh --firstframe` pins `JGX_ENTROPY=1` to keep its two-draw test; captures byte-identical 8/8, corpus 63/63 unchanged. See [plan](docs/plans/2026-09-14-jgxcheck-determinism.md).
