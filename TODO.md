@@ -162,7 +162,7 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bankwalk/); next is #129
   `farptrcmp`. [plan](docs/plans/2026-08-04-128-snes-bankwalk.md).
 - [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main
-  (2026-08-01); only the player-package release is left, and it is USER-GATED.**
+  (2026-08-01); only the player-package release is left, and it is USER-GATED.** <!-- agent:a75fe291bce60124b -->
   Mechanism (c): the ROM already verifies each work as it displays it, so it publishes a 5-byte
   `gallery_shown{z,work,ok,state}` record (state = publication barrier) and the player polls it in
   a new `mode: "live-record"`, comparing `z` against a host-generated 62-entry oracle table — the
