@@ -1015,14 +1015,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   entropy None (or require the caller to pass it explicitly), WITHOUT breaking the deliberate
   ×6-entropy-boot fingerprint gates (canary/seamdemo) that want Low. Document in agent-handoff.
   (T2: bounded tool change, two known call patterns.)
-- [wip T3] **Convert the seven Mode-7 demo `main()`s off the re-opened boot force-blank <!-- agent:a951f1786a0e68247 -->.** The
-  121-badges verification measured the symptom: 24 pure-black frames (~400 ms) between title exit
-  and first compute frame (gate 11 FAIL) — the boot force-blank window re-opening that
-  `docs/agent-handoff.md` §"Never force-blank outside boot" already lists as unconverted for the
-  seven Mode-7 demo mains. Related observation from the same run: `mandel-oop` leaves some PPU
-  state unset during frames 52–262 (title/loading window is entropy-sensitive; READY frame is
-  not). Cross-cutting but mechanical once the shared pattern is settled; gate 11 re-passes when
-  done. (T3: settled pattern in the handoff doc, multi-file execution.)
 - [wip T3] **Reconcile the Mode-7 gallery website layer with current reality <!-- agent:af6d05150eadb7776 --> (121 gates 17/20/22/23 +
   123 gates 2/4/10 — resolve ONCE for both plans).** The 123-filter verification (`9dfd872`)
   confirmed the same 11-not-9 drift from the filter side and added the smoking gun: the plan's
@@ -1179,6 +1171,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [m7-off-boot-forceblank] Closed as a stale duplicate of [m7-splash-forceblank] (2026-08-05): the "re-opened blank" premise was measured false, all 12 splash demos are within budget (`dev/m7blank.sh --gate` PASS today, mandel-oop at the 5-frame target). Gate 11's 0-frame wording routed to the plan-121 reconciliation. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
 - ✅ 2026-09-14 — [display-first-frame-optin] Per-drawable first-frame opt-in shipped (compile-time `SNESGFX_FIRST_FRAME_OPTIN` gate, mandel-oop/life/1d-ca adopt it); non-adopters byte-identical. See [plan](docs/plans/2026-09-14-display-first-frame-optin.md).
 - ✅ 2026-09-14 — [maze-refold] `maze_fold_path` folds while walking `came[]` again (two-pass work-around removed); `-verify` clean ×3, CRC `0x0749` held. See [plan](docs/plans/2026-09-14-maze-refold.md).
 - [x] 2026-07-26 — [build-loop-continue] `dev/build.sh` example loop continue-on-error + end-of-run failure list (`8a73e6a`); item closed 2026-09-14 on finding it already shipped. See [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
