@@ -949,8 +949,8 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
 
 ### Distribution / Packaging
 
-- [T3] **`task package` is not the one-command release path — `dev/build.sh`'s example loop aborts on 11 pre-existing
-  demo build failures.** The 2026‑09‑14 release had to be cut with `dev/package-release.sh` directly (its own gates —
+- [wip T3] **`task package` is not the one-command release path — `dev/build.sh`'s example loop aborts on 11 pre-existing
+  demo build failures.** <!-- agent:a37025a45a9757fc9 --> The 2026‑09‑14 release had to be cut with `dev/package-release.sh` directly (its own gates —
   warning-free self-test + clean-room bsnes — still enforced). Three classes, each needing its own treatment: 3 far-pointer
   demos that only build with their far mode flag (build them with it), 5 demos whose generated asset headers are
   missing (run the generator as a `deps:` step, or gate them on the asset), 3 no-`main` harness TUs (exclude by contract,
