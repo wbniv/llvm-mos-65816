@@ -959,33 +959,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   functional self-test needs a real Mac) — out of interim scope, likely retired by upstream CI. Whole
   capability retires when `0001–0009` land upstream. [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
-
-- [wip T2] **indri.studio embedded player never starts the ROM <!-- agent:a421a3a5024424582 --> — canvas bit-frozen at the poster.**
-  Found by nav-chevron verification step 15 (biohack.net passes all four input surfaces with the
-  same ROM). **Root cause (2026-09-14): the pinned player build itself, not template drift.**
-  indri's `pnpm-lock.yaml` pinned `@wbniv/bsnes-jg-player` to bsnes-jg-wasm `642d3c9` (`app.js`
-  `100f4b51…`), where `clearTouchNav()` is closure-scoped inside the pointer-handler setup but
-  called from `stopLoop()` at player scope — `playUrl()` → `stopLoop()` threw `ReferenceError` on
-  every boot, the `.catch` blanked `#status`, the async `showProvenance()` overwrote the error
-  banner (hence "nothing errors"), and the `.sfc` was never fetched. The page template and
-  `Base.astro` boot are fine. **No package release needed**: the fix (`3ddddb5`, on `npm-package`
-  tip `1ec048f` = biohack's `fdb8b71e…`) only had to be re-resolved. **Fixed, awaiting deploy:**
-  indri.studio branch `fix/snes-player-resync-clearTouchNav` @ `6cb870e` (`pnpm update
-  @wbniv/bsnes-jg-player` + `pnpm run sync-engine`; CI drift gate passes; step 15 passes on the
-  live page with the committed player pre-deploy). Ship: push branch, merge, `task publish
-  TAG=v0.1.155`; then re-run step 15's indri leg live to close. Evidence: the plan's 2026-09-14
-  record + [drift audit](docs/investigations/2026-08-03-dual-rom-site-drift-audit.md) Finding 3.
-  Three decisions + one build: (a) the plan's "exactly nine badges" is structurally stale —
-  `cdaa6f4`/`ad87374` legitimately added two Mode 7 demos; build the plan's own promised
-  audit-derived check (compare the `displayMode: 7` slug set against a committed expected list)
-  and retire fixed counts. (b) Deployed ROMs' sha differs from a fresh build (toolchain/snesgfx
-  codegen drift; 121's timeline proof shows behavioural identity) — set the republish policy:
-  republish on drift vs record accepted-divergence. (c) ROM/preview cache-busting was never
-  implemented on either site (live HTML references bare filenames) — site-repo work, tracked here
-  as a pointer. (d) A real browser smoke test remains unexecuted (core-level proxy recorded).
-  See the 121 verification record for evidence. (T3: the decisions are settled by the plan's own
-  acceptance criteria; execution spans this repo + both site repos.)
-
 ### Verification backlog (triaged out of Inbox 2026-08-03)
 
 _The runnable survivors of the 18 auto-captured `[verify]` flags (T0-classified; the other 13 were
@@ -1000,21 +973,13 @@ into the plan, then promote to Done. **Serialize the runs — they share the hot
   gate 22 there once that lands, then promote to Done. mandel-oop republished to biohack.net (`v1.0.586`); indri republish
   rides with the player fix. Raw output under every step in the plan's 2026-09-14 record.
 - [wip T3] **lzss-gallery-navigation-and-auto-advance-chevron** <!-- agent:a421a3a5024424582 --> — implemented, live, chevron
-  input re-fixed `3b8a559`; verify against current main. **2026-08-04 run recorded: 14/15 PASS.**
-  Steps 1–14 green (ROM nav + auto-advance chevron + wrap, 120 ms touch pulse and all four
-  cancellation surfaces, identical `touchNav` rects, full gallery gate incl. the 700k-frame visual
-  corpus, live ROM SHA-256 `a5e59d79…` matching on both sites). **Step 15 FAIL**: the
-  indri.studio embed never starts its emulator (canvas frozen, `max |luma - baseline| = 0.00` in
-  every condition *including* the no-input control), so live navigation cannot be exercised there
-  — suspected page-template vs pinned-player drift (`v0.1.135` template, `v0.1.133` player pin).
-  biohack.net passes all four input surfaces. Needs a T4 owner for the indri embed.
-  [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md)
-- [verify T2] **120-snes-player-fullscreen-orientation-fit** — verification run 2026-08-04: implementation-record
-  checks (syntax, byte parity, whitespace, CI-green builds) PASS on current main, but the plan's
-  automated layout test / video-frame diagnostic was never built (FAIL) and the manual device matrix
-  needs physical hardware not available here (BLOCKED). See the plan's Verification section for
-  per-step evidence; re-run once a test harness and device access exist.
-  [plan](docs/plans/2026-07-26-120-snes-player-fullscreen-orientation-fit.md)
+  input re-fixed `3b8a559`. **2026‑09‑14/15 re-run: 14/15 recorded, step 12 still running.** Steps 1–11, 13, 15
+  PASS — step 15 now live on indri `v0.1.156` (5/5 conditions, numbers identical to biohack) after the
+  indri player fix. Step 12 (700k-frame corpus SMOKE + relink) is in flight on the agent. Step 14 is an
+  honest FAIL on its literal text (live ROM `a5e59d79…` ≠ fresh link `6e825994…`) but the drift is
+  toolchain-only with frame-identical behaviour, which the gallery reconciliation's republish policy
+  (row 2) scores as accepted divergence — re-word the step to that policy when step 12 lands, then
+  promote to Done. Harnesses kept: `dev/m7web/nav15.mjs`, `dev/m7web/touchnav-test.js`.
 
 ## Watch
 
@@ -1067,6 +1032,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-15 — [indri-player-frozen-poster] Real cause was the pinned `@wbniv/bsnes-jg-player` build (`clearTouchNav` scope `ReferenceError` on boot), not template drift; re-resolved in indri `6cb870e`, deployed `v0.1.155`; live step 15 5/5 on `v0.1.156`. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
 - ✅ 2026-09-15 — [eliminate-build-nondeterminism] Root cause pinned + fixed: `tryAbsoluteIndexedAddressing` rewrote uses without the GISel observer, leaving a stale CSE node whose hit/miss followed heap layout (`sec` flip, ~0.5 %/build). Fix in `0002` + MIR test (`7899355`); 900 builds DISTINCT 1, corpus 63/63 + a16 62/62. See [plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md).
 - ✅ 2026-09-14 — [svx2-anchors] Anchor (a) restored (real culprit `d6030cf`; `#ifdef VIDEO_REEL_PACKED_FAR` guard + tracked LoROM-fixture recipe `tools/snes-video-reel-extract.py`, `dev/snes-video-lorom-fixture.sh`); gate 7 and anchor (c) retired; cadence gate now measures t0 in-run; `dev/svx2-emulator-validation.sh` split into record/asset/code contracts with honest drift classification. See [plan](docs/plans/2026-09-14-svx2-anchors-decision.md).
 - ✅ 2026-09-14 — [svx2-animated-video-cartridge-verify] Unblocked and run on the restored LoROM fixture: gates 1–6 PASS, gate 7 retired; `pytest` 25/25. Artemis reel `v1.0.360` is behind two player-source commits (`8eca83a`, `ff35036`) → republish is the policy action (not yet staged). See [plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md).
