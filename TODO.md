@@ -969,16 +969,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   capability retires when `0001–0009` land upstream. [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
 
-- [wip T3] **Reconcile the Mode-7 gallery website layer with current reality <!-- agent:af6d05150eadb7776 --> (121 gates 17/20/22/23 +
-  123 gates 2/4/10 — resolve ONCE for both plans).** The 123-filter verification (`9dfd872`)
-  confirmed the same 11-not-9 drift from the filter side and added the smoking gun: the plan's
-  build-time data-contract assertion and `tests/snes-mode7-filter.test.mjs` were never
-  implemented in either site repo (`git ls-files | grep -i mode7` empty on both) — the exact
-  guard that would have made `cdaa6f4` fail its own build instead of drifting silently. Decisions:
-  re-baseline the committed expected set to 11 (or rule the two later demos out of contract) AND
-  land the build-time assertion + test in both site repos together; provision Playwright in the
-  sites' CI for a real browser smoke test or formally retire that requirement (jsdom-driving the
-  shipped filter script — 123's method — is the strongest browserless evidence and is recorded).
 - [wip T2] **indri.studio embedded player never starts the ROM <!-- agent:a421a3a5024424582 --> — canvas bit-frozen at the poster.**
   Found by nav-chevron verification step 15 (14/15 PASS otherwise; biohack.net passes all four
   input surfaces with the same ROM): on indri, player script + core load, nothing errors, but
@@ -1007,35 +997,12 @@ planned/gated/superseded/stale — dispositions recorded as comments in the Inbo
 `[verify]` items: run the linked plan's numbered verification steps, paste raw output + PASS/FAIL
 into the plan, then promote to Done. **Serialize the runs — they share the hot build tree.**_
 
-- [verify T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — re-run 2026-08-04:
-  **19/23 gates PASS** (was 18/23 on 08-03). All 7 ROM gates green with `0x204F` unchanged on host,
-  bsnes-jg and MAME; `.text` shrank 6,331 → 6,274 B. **Startup black window diagnosed and roughly
-  halved, 24 → 11 frames:** the cause was not handoff sequencing but `_mandel_reserve()` painting the
-  loading field *through* the far framebuffer and reading all 3,584 bytes back — a round-trip Part 4
-  already forbade; it now generates the checker straight into the tiled chr buffer. Badge count
-  closed by the #123 contract work (derived from the registry + committed ledger + parity digest).
-  **4 FAIL:** #11 residual 11 frames of post-title black — **ESCALATED**, the rest lives in the
-  shared `m7splash_end()`/`display_init()` force-blank handoff across all seven Mode 7 demos
-  (`mandel-display` holds black 72 frames at the same seam); ~~#20 deployed ROMs ≠ fresh build~~
-  **CLOSED 2026-08-05 — republished** (`dev/publish-snes-rom-both-sites.sh --publish`, fresh ROM
-  `59a76c6f…` live on both sites, both CI deploys `success` — which was also the first green CI run
-  of the Mode 7 contract tests); #23 no ROM/preview cache-busting — now live-relevant: returning
-  visitors may cache the old ROM until expiry; #22 browser smoke test. Residual = #23 + 
-  BLOCKED-no-harness (#22) + the #11 escalation (its own [T4] item).
-  [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)
-- [verify T3] **123-mode7-gallery-filter** — re-run 2026-08-04: **9/10 steps PASS** (was 7/10).
-  Both 08-03 causes closed. The plan's Data-contract build-time assertion and
-  `tests/snes-mode7-filter.test.mjs` — never implemented, which is why 9 → 11 drifted silently — now
-  exist on **both** sites: a byte-identical `src/data/mode7-contract.mjs` (committed ledger +
-  `MODE7_PARITY_DIGEST` cross-site token), called from each gallery's frontmatter so drift fails the
-  Astro build, plus `pnpm test` (11/11 green on each) wired into both `deploy.yml`s ahead of the
-  build. The count is **derived** from each demo registry, never hardcoded. The plan's stale "nine"
-  is annotated, not rewritten, by an "Amendment — 2026-08-04" recording `cdaa6f4`/`ad87374` as
-  legitimate additions. **1 FAIL:** step 10 (narrow-width + reduced-motion render) —
-  BLOCKED-no-harness, no browser automation in either repo and none may be introduced; it still
-  carries step 8's arrow-overflow sub-case. Residual = that plus the deploy-gated note on step 1
-  (the new assertion/tests/CI step first run in CI on the next user-triggered `v*` tag).
-  [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md)
+- [verify T3] **121-mode7-gallery-badges-and-mandel-oop-startup** — re-run 2026-09-14: **22/23 PASS** (was 19/23);
+  gates 17/20/23 re-baselined by the [reconciliation](docs/plans/2026-09-14-m7-gallery-web-reconcile.md) (site was right,
+  measurements were wrong), gate 11 re-baselined to the m7blank budget (mandel-oop 5/6, floor 1), gate 21 PASS. Sole FAIL:
+  gate 22 on indri.studio — the player never requests the ROM — owned by the `indri.studio embedded player` item; re-run
+  gate 22 there once that lands, then promote to Done. mandel-oop republished to biohack.net (`v1.0.586`); indri republish
+  rides with the player fix. Raw output under every step in the plan's 2026-09-14 record.
 - [verify T3] **svx2-animated-video-cartridge — BLOCKED on the [T4] decision below.** Run
   2026-08-03 (`f536d25`): gates 1–6 PASS against the delivered 900-frame HiROM reel (24 pytest,
   zero CRC failures over 4,000 VBlanks, fidelity + dashboard PASS, 1,911 presentations, checksum
@@ -1125,6 +1092,8 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-14 — [m7-gallery-web-reconcile] All 8 drifted website gates were measurement errors, not site bugs; plans 123 (10/10) and 121 (22/23) re-verified with a reproducible Chrome-DevTools harness (`dev/m7web/`); mandel-oop republished to biohack.net `v1.0.586`. See [plan](docs/plans/2026-09-14-m7-gallery-web-reconcile.md).
+- ✅ 2026-09-14 — [123-mode7-gallery-filter-verify] 10/10 PASS incl. the narrow/reduced-motion step (320 px, `--force-prefers-reduced-motion`). See [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md).
 - ✅ 2026-09-14 — [jgxcheck-determinism] `jgxcheck` defaults bsnes-jg entropy to None when `JGX_ENTROPY` is unset (`85beec9`); `bootblank.sh --firstframe` pins `JGX_ENTROPY=1` to keep its two-draw test; captures byte-identical 8/8, corpus 63/63 unchanged. See [plan](docs/plans/2026-09-14-jgxcheck-determinism.md).
 - ✅ 2026-09-14 — [cleanroom-published-compiler] Already built 2026-06-25 (`dev/test-release.sh`, `task release-test`, gate in `package-release.sh`); re-run live against apt+tarball: codegen PASS (k_mandel `0x820B` ×4) but the **published package `c49f395` is stale** — its sysroot lacks `snes_cpu.h` so current `examples/snes/` won't compile; two rig defects fixed (header closure, FAIL-path report). New release is a user call. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md).
 - ✅ 2026-09-14 — [blossom-polish] Optional polish closed: (a) 256² supersample proven bit-identical to the 128² render (0/16384 mismatches, not worth 4× WRAM); (c) far-pointer fragility re-tested and confirmed fixed on MAME+bsnes, source comment corrected (ROM byte-identical, gates unchanged). (b) HW multiplier lives in shared `hopalong.h` (6 consumers) — needs its own ranked item if wanted. See [plan](docs/plans/2026-09-14-blossom-polish.md).
