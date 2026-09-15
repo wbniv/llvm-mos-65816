@@ -6,12 +6,10 @@
    several jsr frames at once from a varying depth. corpus/setjmp_sim.c covers the minimum
    (one frame, one jump); this covers the multi-frame unwind that a page-1-S-reconstruct or
    soft-SP/CSR-restore defect would corrupt.
-   NOT YET IN expected.tsv — deliberately. It is blocked on an OPEN runtime defect this slice
-   found on its first run: longjmp's page-1 hard-stack reconstruction never executes, so every
-   longjmp leaves S in page 0 and any return out of the setjmp frame rts-es into the zero page.
-   Root cause + minimal repro + evidence:
-   docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md
-   Add the manifest row (host oracle 0x7336, tools/backtrack-sim.c) when that lands.
+   Host oracle: tools/backtrack-sim.c (gate CRC 0x7336).
+   This slice is what found the page-1 reconstruction defect recorded in
+   docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md, and it is the
+   standing guard against its return.
    See docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md. */
 #include "../../65816/backtrack.h"
 

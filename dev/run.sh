@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -344,6 +344,20 @@ Targets:
              emulator leg with JG_ONLY=1 (MAME skipped), serial + nice. Deterministic
              → needs no quiet box and no SPC700 BIOS. Optional PREFIX arg filters
              (e.g. `xcheck-suite xy16`). Needs `xcheck` run first (builds build/jgxcheck).
+  backtrack  #116 Round 6 Cluster G: the Backtracking Solver — 8-queens with a setjmp choice
+             point per recursion level, whose every dead end longjmps straight to the deepest
+             still-viable ancestor so one jump discards a VARYING number of jsr frames (the
+             flagship guard for the 65816-native platforms/snes/setjmp.S fix, bug #35). Asserts
+             corpus_result (backtrack_gate_crc 0x7336) == host on MAME + bsnes-jg + a structure
+             gate, and screenshots both (build/backtrack-{mame,jg}.png). The full 5-way
+             differential is the corpus slice: dev/run.sh corpus-a16 (backtrack_sim).
+  csrjmp     #117 Round 6 Cluster G: the Callee-Saved Restore Curve — 14 coefficient bytes (the
+             width of jmp_buf's csrs[14] = __rc18..__rc31) held in locals across a setjmp while a
+             noinline worker occupies and rewrites every callee-saved slot and then longjmps past
+             the epilogue that would restore them, so an off-by-one in longjmp's restore offsets
+             corrupts exactly one coefficient. Asserts corpus_result (csrjmp_gate_crc 0xADD8) ==
+             host on MAME + bsnes-jg + a structure gate, screenshots both
+             (build/csrjmp-{mame,jg}.png). 5-way differential: corpus-a16 (csrjmp_sim).
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for

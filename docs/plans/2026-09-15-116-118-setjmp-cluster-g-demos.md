@@ -1,19 +1,34 @@
 # Round 6 Cluster G (#116–#118) — hardening the 65816-native `setjmp.S` fix
 
-> **STATUS 2026‑09‑15: UNBLOCKED — the cluster did its job on its first run, and the defect it
-> found is now fixed.** #116 `backtrack` immediately surfaced an **OPEN, high-severity runtime
-> defect**: `longjmp`'s page‑1 hard-stack reconstruction never executed, because the assembler
-> sizes a plain immediate by its value, not by the `rep #$20` mode it follows — so `and #$00ff`
-> encoded as an 8-bit operand while the CPU, already in 16-bit mode, read 2 bytes for it at
-> runtime, consuming the next instruction's opcode. Root cause, byte-level proof, the fix (one line,
-> the existing `mos16()` immediate-width modifier), and the post-fix verification are recorded in
-> [`docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md`](../investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md#resolution-2026-09-15).
-> Fixed in `platforms/snes/setjmp.S`; SDK rebuilt; `#116 backtrack`'s corpus slice now PASSes its
-> `0x7336` gate on all three modes (default-8bit, `+mos-a16`, `+mos-xy16`) at bsnes-jg, matching the
-> host oracle exactly. Per the battery's own rule — *demos exist to find compiler bugs* — the demo
-> was left un-gated until the real defect was fixed, never weakened to ship around it. Remaining:
-> wire #116's `expected.tsv` row + `dev/backtrack.sh` driver + its visual/title-screen half, and
-> build #117 `csrjmp` / #118 `retryjmp`.
+> **STATUS 2026‑09‑15: #116 and #117 COMPLETE and gated; #118 STOPPED on a second, unrelated
+> defect it found.** The cluster has now caught two real bugs.
+>
+> 1. **#116 `backtrack`** surfaced a high-severity runtime defect on its very first run:
+>    `longjmp`'s page‑1 hard-stack reconstruction never executed, because the assembler sizes a
+>    plain immediate by its value, not by the `rep #$20` mode it follows — so `and #$00ff` encoded
+>    as an 8-bit operand while the CPU, already in 16-bit mode, read 2 bytes for it at runtime,
+>    consuming the next instruction's opcode. **FIXED** in `platforms/snes/setjmp.S` (one line, the
+>    existing `mos16()` immediate-width modifier):
+>    [investigation](../investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md#resolution-2026-09-15).
+>    #116 is now fully shipped — `expected.tsv` row, `dev/backtrack.sh` driver, visual ROM with a
+>    title card, `Taskfile.yml` + `dev/run.sh` wiring. Gate `0x7336`.
+> 2. **#117 `csrjmp`** is fully shipped the same way. Gate `0xADD8`. The CSR restore is correct:
+>    all 14 coefficients survive, all three modes, both emulators.
+> 3. **#118 `retryjmp`** found a **second, still-OPEN defect — a real `+mos-xy16` MISCOMPILE**
+>    (not a verifier-only complaint): the frame-index address materialization for a spill slot
+>    takes the live `Imag16` pair holding the value about to be stored, so a 16-bit indexed store
+>    writes the index expression instead of the value. Default and `+mos-a16` are correct; `xy16`
+>    gives `0x82D4` against the host's `0x3388`. Root cause, assembly, reduction and the reason
+>    the existing `KNOWN_ISSUES` text-match would wrongly classify it as the benign
+>    `a16-rc-undef-ra-pure-virtual` XFAIL:
+>    [investigation](../investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md).
+>    **#118 is committed UN-GATED** — logic header + host oracle + corpus slice only, no
+>    `expected.tsv` row, no `dev/retryjmp.sh`, no visual ROM. **ESCALATED**: the fix is a backend
+>    register-scavenger / frame-index-elimination change plus a full toolchain rebuild and
+>    regression sweep.
+>
+> Per the battery's own rule — *demos exist to find compiler bugs* — neither demo was ever
+> weakened to ship around the defect it found.
 
 
 Three SNES stress-test demos that escalate past `corpus/setjmp_sim.c` (one frame, one jump, no
@@ -105,7 +120,12 @@ Per demo `<d>` ∈ {`backtrack`, `csrjmp`, `retryjmp`}:
 - `examples/snes/corpus/<d>_sim.c` + a row in `examples/snes/corpus/expected.tsv`
 - `tools/<d>-sim.c` — host oracle
 - `dev/<d>.sh` + `dev/<d>.lua` — driver + MAME assert
+- `dev/run.sh` — usage line + target description
 - `Taskfile.yml` — `task <d>` / `task <d>-play`
+
+`#118 retryjmp` ships only the first, third (as the repro, not a ROM) and fifth of those — the
+`expected.tsv` row, the driver, the `dev/run.sh`/`Taskfile.yml` wiring and the visual ROM are all
+withheld while the `+mos-xy16` miscompile it found is open.
 
 ## Verification
 
@@ -225,10 +245,138 @@ until `build/fuzz-work` was deleted — a stale or partially-written `.sfc`/`.ma
 survived on disk and kept getting read. See the "Concurrent `dev/run.sh` invocations" note added to
 `docs/agent-handoff.md`.
 
-### Results (2026‑09‑15) — BLOCKED at step 1, unblocked by the fix above
+### Results (2026‑09‑15, second pass) — #116 and #117 GREEN, #118 STOPPED on a new defect
 
-**Step 1 — `dev/run.sh backtrack`: NOT RUN.** There is no `dev/backtrack.sh`: the demo's gate would
-have to assert a value the runtime cannot currently produce, and weakening it is forbidden. The
+Steps are the seven numbered above, in order, with raw output.
+
+**1. `dev/run.sh backtrack`**
+
+```
+==> host oracle: backtrack gate hash = 0x7336
+==> built build/backtrack.sfc (+mos-a16); corpus_result @ WRAM 0x13e7
+==> structure gate (setjmp + longjmp calls present, bt_descend is a real jsr frame)
+    PASS  setjmp=2  longjmp=3  bt_descend refs=72  (choice points + backjumps present)
+==> bsnes-jg: render + assert (build/backtrack-jg.png, frame 600)
+SMOKE: PASS off=0x13E7 len=2 got=0x7336 (ran 600 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/backtrack-mame.png)
+    SHOT: PASS corpus=0x7336 (snapshot at frame 600)
+
+RESULT: PASS — Backtracking Solver on SNES; MAME + bsnes-jg + corpus hash 0x7336 host == +mos-a16
+```
+
+**PASS.** MAME really ran — the SPC700 IPL is present on this host, so neither emulator leg SKIPped.
+
+**2. `dev/run.sh csrjmp`**
+
+```
+==> host oracle: csrjmp gate hash = 0xADD8
+==> built build/csrjmp.sfc (+mos-a16); corpus_result @ WRAM 0x13e7
+==> structure gate (setjmp + longjmp present, __rc2x callee-saved block occupied, __mulsi3)
+    PASS  setjmp=1  longjmp=1  __rc20..31 refs=315  __mulsi3=6
+==> bsnes-jg: render + assert (build/csrjmp-jg.png, frame 600)
+SMOKE: PASS off=0x13E7 len=2 got=0xADD8 (ran 600 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/csrjmp-mame.png)
+    SHOT: PASS corpus=0xADD8 (snapshot at frame 600)
+
+RESULT: PASS — Callee-Saved Restore Curve on SNES; MAME + bsnes-jg + corpus hash 0xADD8 host == +mos-a16
+```
+
+**PASS.** The MIR confirms the shape under test: 12 of the 14 coefficients are held in
+`__rc20..__rc31` across the `setjmp`, the other two on the soft stack, and `cj_worker` rewrites all
+of them before jumping. Every one comes back intact.
+
+**3. `dev/run.sh retryjmp`: NOT RUN — the demo is STOPPED.** There is no `dev/retryjmp.sh`, by
+design: the slice found a real `+mos-xy16` miscompile and the gate must not be weakened to ship
+around it. The evidence, produced directly.
+
+Host oracle (`tools/retryjmp-sim.c`, `cc -O2 -Wall -Wextra`):
+
+```
+retryjmp attempts=24 wins=8 calls=117
+  attempt  0 code=  2 deepest=1 result=0x46B9
+  attempt  1 code=  4 deepest=3 result=0x4A64
+  attempt  2 code=  0 deepest=4 result=0x1298
+  ...
+  attempt 23 code=  0 deepest=9 result=0x8E8F
+retryjmp gate_crc = 0x3388
+```
+
+`-verify-machineinstrs`:
+
+```
+default  exit=0
+a16      exit=0
+xy16     exit=1   *** Bad machine code: Using an undefined physical register *** (2 errors)
+```
+
+Target, bsnes-jg, `corpus/retryjmp_sim.c` linked with `--config mos-snes.cfg`:
+
+```
+default  SMOKE: PASS off=0x20 len=2 got=0x3388 (ran 600 frames, bsnes-jg)
+a16      SMOKE: PASS off=0x20 len=2 got=0x3388 (ran 600 frames, bsnes-jg)
+xy16     SMOKE: FAIL off=0x20 len=2 got=0x82D4 want=0x3388
+```
+
+Stable at 400/1200/2400 frames. Root cause, the wrong assembly, the reduction and the ruling-out
+of `setjmp.S`: [the investigation](../investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md).
+**ESCALATED** — a backend fix, out of scope here.
+
+**4. `dev/run.sh corpus`**
+
+```
+  backtrack_sim PASS  corpus_result=0x7336  #116 setjmp/longjmp multi-frame unwind gate …
+  csrjmp_sim PASS  corpus_result=0xADD8  #117 setjmp/longjmp callee-saved-restore gate …
+  setjmp_sim PASS  corpus_result=0x2007  setjmp/longjmp non-local return on the 65816 native 16-bit stack …
+==> corpus: 65/65 passed
+```
+
+**PASS.** 63 → 65 (the two new rows). `setjmp_sim` unchanged at `0x2007`.
+
+**5. `dev/run.sh corpus-a16`** (`build/fuzz-work` + `build/fuzz-triage` wiped first; run strictly
+serially — no second `corpus`/`corpus-a16` invocation anywhere on the box)
+
+```
+  setjmp_sim PASS   corpus_result=0x2007  setjmp/longjmp non-local return on the 65816 native 16-bit stack …
+  backtrack_sim PASS   corpus_result=0x7336  #116 setjmp/longjmp multi-frame unwind gate …
+  csrjmp_sim PASS   corpus_result=0xADD8  #117 setjmp/longjmp callee-saved-restore gate …
+==> corpus-a16: 64/64 passed, 0 xfail
+```
+
+**PASS.** 62 → 64 (the two new rows), 0 xfail, `setjmp_sim` unchanged at `0x2007`. Every row is
+`host == default == +mos-a16 == +mos-xy16` on MAME + bsnes-jg.
+
+**6. `dev/run.sh build`** (full example battery)
+
+```
+==> built 260 program(s)
+==> not programs, excluded by contract (3): snes-video-codec snes-video-dma snes-video-stream
+```
+
+**PASS.** 256 → 260: `examples/snes/backtrack.c`, `examples/snes/csrjmp.c`,
+`examples/snes/corpus/csrjmp_sim.c`, `examples/snes/corpus/retryjmp_sim.c`. No errors, no failures.
+
+**7. `dev/title-charset.sh`**
+
+```
+checked 127 title call sites across 140 demo sources
+PASS  every title character has a glyph
+```
+
+**PASS** — covers the two new title cards (`8-QUEENS BACKJUMP` / `BACKTRACK` and
+`CALLEE-SAVED RESTORE` / `CSRJMP`).
+
+**Extra — `-verify-machineinstrs` on both new corpus slices, all three modes** (exit status, not
+piped):
+
+```
+backtrack default exit=0     csrjmp default exit=0
+backtrack a16     exit=0     csrjmp a16     exit=0
+backtrack xy16    exit=0     csrjmp xy16    exit=0
+```
+
+#### First-pass record (2026‑09‑15, before the `setjmp.S` fix)
+
+Kept because it is what found the `#35` defect. `dev/run.sh backtrack` did not exist yet; the
 equivalent evidence, produced directly:
 
 Host oracle (`tools/backtrack-sim.c`, `cc -O2 -Wall -Wextra`):
@@ -268,24 +416,22 @@ SMOKE: FAIL off=0x20 len=2 got=0x1111 want=0xF00D
 and to the byte-level cause in `platforms/snes/setjmp.S:170‑173`. Full write-up:
 [the investigation](../investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md).
 
-**Steps 2, 3 — `csrjmp`, `retryjmp`: NOT STARTED.** Both are `setjmp`/`longjmp` demos and would fail
-identically; building them now would produce two more un-gateable ROMs and no new information.
-
-**Steps 4, 5 — `corpus`, `corpus-a16`: not affected by this change.** Both iterate
-`examples/snes/corpus/expected.tsv`, and this change adds no manifest row (see step 1 for why).
-The corpus content they execute is byte-identical to before.
-
-**Step 6 — `dev/run.sh build`:** run; result recorded in the commit message / hand-off.
-
-**Step 7 — `dev/title-charset.sh`: not applicable.** No demo ROM with a title card ships here.
+At that point `csrjmp` and `retryjmp` were not started — both are `setjmp`/`longjmp` demos and
+would have failed identically, producing two more un-gateable ROMs and no new information.
 
 ## Deferred
 
-- #117 `csrjmp` and #118 `retryjmp` — designed above, not implemented. Blocked on the `longjmp`
-  defect; pick them up in the same pass that lands the fix, since they are its natural guards.
-- `dev/backtrack.sh` + `dev/backtrack.lua` + the `expected.tsv` row + the `Taskfile.yml` entries for
-  #116 — all deliberately withheld until `backtrack_gate_crc()` can reach `0x7336` on target.
-- The visual half of #116 (`examples/snes/backtrack.c`: trace replay on an 8×8 board with the
-  snap-back animation) is specified above but not written — it would be an ungateable ROM today.
-- `corpus/setjmp_sim.c` is not a sufficient guard for this bug class. Whatever fixes the runtime
-  should also add a guard that *returns* from the `setjmp` frame.
+- The `+mos-xy16` spill-address/live-`Imag16` miscompile `#118` found is OPEN and needs a backend
+  fix (register scavenger / frame-index elimination) plus a full toolchain rebuild and regression
+  sweep — out of the scope of the demo pass that found it.
+  [investigation](../investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md)
+- `#118 retryjmp`'s remaining half — the `expected.tsv` row (`0x3388`), `dev/retryjmp.{sh,lua}`,
+  the visual ROM (progress bar + depth gauge), the `dev/run.sh` and `Taskfile.yml` wiring — is
+  withheld until that fix lands, then wired exactly as `#116`/`#117` are.
+- `tools/a16_fuzz.py`'s `KNOWN_ISSUES` classifies any log containing
+  `"Using an undefined physical register"` as the benign, verifier-only
+  `a16-rc-undef-ra-pure-virtual` XFAIL. The `#118` miscompile emits that exact string *and* a
+  wrong answer, so the classifier needs a discriminator stronger than the message text.
+- `corpus/setjmp_sim.c` is not a sufficient guard for the `#35` bug class on its own — it never
+  *returns* from its `setjmp` frame. `#116 backtrack` now covers that; a dedicated minimal guard
+  that only returns out of a `setjmp` frame would still be cheaper to run.

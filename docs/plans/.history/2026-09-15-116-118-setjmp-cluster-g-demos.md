@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/c4fb0b8) | fix(snes): setjmp.S — longjmp's page-1 stack reconstruction never executed (#35 still live) |
 | [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/d46b756) | Cluster G #116 backtrack: surface an open longjmp page-1 defect |
 
 <!--history-meta v1
+c4fb0b8	author	Will Norris
+c4fb0b8	added	123
+c4fb0b8	deleted	12
+c4fb0b8	files	1
+c4fb0b8	body	Round 6 Cluster G's #116 backtrack demo immediately surfaced a real defect: the\n64-bit-mode 'and #$00ff' issued right after 'rep #$20' assembles as an 8-bit\nimmediate (the assembler sizes by value, not by the M width the rep just set),\nso at runtime the CPU reads 2 bytes for it anyway, consuming the following\nora's opcode byte. longjmp's hard-stack pointer reconstruction (page-1 S =\n$01xx) never actually happens as a result, so any program that returns\nnormally out of the function that called setjmp reads its return address from\nthe zero page instead. corpus/setjmp_sim.c never returns from its setjmp\nframe, so it never caught this.\n\nFixed with the assembler's existing mos16() immediate-width modifier, which\nforces the correct 16-bit encoding regardless of the operand's value:\n\n  rep #$20\n  and #mos16($00ff)\n  ora #$0100\n  tcs\n\nVerified: the minimal repro (sjreturn_min.c) now returns corpus_result ==\n0xF00D (was 0x1111); #116 backtrack's corpus slice passes its 0x7336 gate on\ndefault-8bit, +mos-a16, and +mos-xy16, matching the host oracle exactly;\ncorpus 63/63 and corpus-a16 62/62 unaffected (setjmp_sim unchanged at 0x2007).\n\nAlso documents a real harness gotcha found chasing a false regression while\nverifying this: tools/a16_fuzz.py compiles every demo to fixed scratch\nfilenames under build/fuzz-work, shared across all demos and across separate\ndocker containers via the host-mounted build/ dir, so concurrent corpus-a16\nruns corrupt each other's results, and the corruption persists across later\nnon-concurrent re-runs until build/fuzz-work is deleted.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011AP736JtwzSGYH4bmxDWTa
 d46b756	author	Will Norris
 d46b756	added	180
 d46b756	deleted	0

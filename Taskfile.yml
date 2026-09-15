@@ -775,6 +775,40 @@ tasks:
       - task: mandel-mame
         vars: { ROM: borrowlad }
 
+  backtrack:
+    desc: "#116 (Round 6, harden-the-fixes, Cluster G): Backtracking Solver — the FLAGSHIP guard for the 65816-native platforms/snes/setjmp.S fix (bug #35). 8-queens with one setjmp choice point per recursion level; every dead end longjmps straight to the deepest still-viable ancestor, so a single jump discards a VARYING number of jsr frames (page-1 S reconstruct x soft-SP restore x __rc18..__rc31 CSR restore). Trace replay on an 8x8 board: queens drop in, abandoned rows flash red and snap back. Assert corpus_result (backtrack_gate_crc 0x7336) == host on MAME + bsnes-jg + structure gate (setjmp>=1, longjmp>=2, bt_descend a real jsr frame). Leaves build/backtrack.sfc + build/backtrack-{mame,jg}.png."
+    cmds:
+      - dev/run.sh backtrack
+
+  backtrack-play:
+    desc: "PLAY the Backtracking Solver demo in MAME (builds first if needed). Queens drop in row by row and snap back on each backjump."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/backtrack.sfc ]; then
+          echo "==> build/backtrack.sfc missing -- building (dev/run.sh backtrack)..."
+          dev/run.sh backtrack
+        fi
+      - task: mandel-mame
+        vars: { ROM: backtrack }
+
+  csrjmp:
+    desc: "#117 (Round 6, harden-the-fixes, Cluster G): Callee-Saved Restore Curve — the CSR-restore-offset guard for the 65816-native platforms/snes/setjmp.S fix (bug #35). 14 coefficient bytes, the exact width of jmp_buf csrs[14] (__rc18..__rc31), held in locals across a setjmp while a noinline worker occupies and rewrites every callee-saved slot then longjmps past the epilogue that would restore them; an off-by-one in the restore offsets corrupts exactly one coefficient. Six harmonograph curves drawn from the restored vectors. Assert corpus_result (csrjmp_gate_crc 0xADD8) == host on MAME + bsnes-jg + structure gate (setjmp/longjmp present, __rc20..31 occupied, __mulsi3>=1). Leaves build/csrjmp.sfc + build/csrjmp-{mame,jg}.png."
+    cmds:
+      - dev/run.sh csrjmp
+
+  csrjmp-play:
+    desc: "PLAY the Callee-Saved Restore Curve demo in MAME (builds first if needed). Six harmonographs drawn from the post-longjmp coefficient vectors."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/csrjmp.sfc ]; then
+          echo "==> build/csrjmp.sfc missing -- building (dev/run.sh csrjmp)..."
+          dev/run.sh csrjmp
+        fi
+      - task: mandel-mame
+        vars: { ROM: csrjmp }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:
