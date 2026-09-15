@@ -486,7 +486,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~ *(2026‑07‑26 refresh: now 13 headers / 113 demos; the "0 indirect JMPs / LTO devirtualized" claim was a measurement artifact — 1 `__call_indir` call survives; mandel-display has since diverged so +338 B is historical. Corrected in `docs/oop-in-c.md` §4–§5 + new §8 static-vs-virtual benchmark.)*
 - [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
-- [T3] **Compiler stress-test demo battery — algorithm+visual SNES demos**
+- [wip T3] **Compiler stress-test demo battery — algorithm+visual SNES demos** <!-- agent:a767d7ae980f56248 -->
   ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. Each hits a
@@ -568,11 +568,11 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
       **fails to link** on an undefined `__putchar` until the program supplies the hook.
       `corpus_result = 0x2C2D`.
     - Publishing stays **out of scope**, as for Cluster A and Round 6 Cluster G.
-  - Remaining: **#151–#160** are boundary and width escalations of paths that already have one shipped
-    demo (the 127/128/129 jump-table edge, the 32/33/40-bit by-value ABI edge, nested VLAs,
-    sparse-switch compare trees, `va_arg` width sweep, recursive `sret`). Same shape as Clusters A and
-    B — a settled-plan multi-file build against an existing, proven pattern — so they suit the same
-    dispatch tier the parent item already carries, in one or two clusters.
+  - **Cluster C (`#151`–`#155`) dispatched 2026-09-16** — the first half of the boundary/width
+    escalations (nested VLAs, the 127/128/129 jump-table edge, sparse-switch compare trees, the
+    32/33/40-bit by-value ABI edge, the add/sub/mul overflow-builtin matrix at 16/32/64 bits).
+    Remaining: **#156–#160** (`va_arg` width sweep, recursive `sret`, indirect-call arity fan,
+    extending-load sign matrix, address-space cast ladder) — same shape, a future cluster.
   **2026‑09‑15: Cluster G has caught two real bugs.** `#116 backtrack` found that `longjmp`'s page‑1
   hard-stack reconstruction never executed (the assembler sized a `rep #$20`-mode immediate by value, not
   by mode, so the CPU read past it into the next opcode at runtime) — FIXED in `platforms/snes/setjmp.S`
