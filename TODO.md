@@ -529,12 +529,50 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     un-entered paths lowers correctly: `host == default == +mos-a16 == +mos-xy16` on MAME **and**
     bsnes-jg, `-verify-machineinstrs` clean in all three modes, and each demo's structure gate
     confirms the intended shape actually reached the ROM rather than folding into an already-covered
-    one. **Cluster B (`#146`–`#150`) dispatched 2026-09-16** — fresh paths of lower measured risk
-    (float↔double `__extendsfdf2`/`__truncdfsf2`, `bsearch`, `memcmp`/`strcmp`, packed-struct
-    misaligned members, `G_TRAP` inertness). Remaining: **#151–#160** are
-    boundary and width escalations of paths that already have one shipped demo (the 127/128/129
-    jump-table edge, the 32/33/40-bit by-value ABI edge, nested VLAs, sparse-switch compare trees,
-    `va_arg` width sweep, recursive `sret`).
+    one.
+  - **Cluster B (`#146`–`#150`) — BUILT + gated 2026‑09‑16**
+    ([plan](docs/plans/2026-09-16-round8-cluster-b-conversion-comparison-layout.md)). Conversion,
+    comparison and layout paths with no demo. All five ship green on the full bar and
+    **no compiler bug was found** — but **two of the five came back measured-negative**, and the
+    negatives are the more valuable half of the cluster.
+    - **#146 `dblbridge`** — the float↔double promotion pair (`__extendsfdf2` / `__truncdfsf2`,
+      `MOSLegalizerInfo.cpp:375`/`:376`), which **zero** slices across #1–#141 link. The same chaotic
+      map iterated two ways over identical binary32 state — lane A wholly at `float`, lane B promoted
+      to `double` for the step and demoted back each iteration — so the lanes differ only in *where*
+      the rounding happens and the step at which they separate is the measured output. Correctly
+      rounded IEEE only, no libm; the CRC folds raw `uint32_t` bit patterns.
+      `corpus_result = 0xF829`.
+    - **#147 `bsearchviz`** — `bsearch`, a callback ABI the battery has never linked and one
+      structurally unlike `qsort`'s: the comparator drives an interval bisection and the call returns
+      a `void*` **into** the array or `NULL`, which the caller must difference back into an index — a
+      wrong conversion yields a plausible in-range index, never a crash. `corpus_result = 0x7FF5`.
+    - **#148 `strcmprace`** — `memcmp`/`strcmp`/`strncmp`, zero uses tree-wide. The CRC folds the
+      **sign** of every comparison (never the magnitude, which C leaves implementation-defined).
+      **Measured negative:** MOS never inline-expands `memcmp` at any constant size, including the
+      `== 0` form other targets specialise — `enableMemCmpExpansion` is not overridden — so the
+      "second lowering" the ideas doc predicted does not exist. `corpus_result = 0xF0BA`.
+    - **#149 `packrec`** — **measured negative, demo reframed.** `__attribute__((packed))` is a
+      **layout no-op on MOS**: every scalar already has ABI alignment 1, so an unpacked struct has no
+      padding to remove (`sizeof` and every `offsetof` agree between the packed and plain twins; on
+      the x86‑64 host the same pair is 12 vs 10 bytes, so the no-op is target-specific). Joins
+      `G_PTRMASK`/`G_FREEZE` as not-constructible-as-a-distinct-lowering. The demo still ships as the
+      tree's **only regression guard for the padding-free-layout invariant**, which zero demos across
+      #1–#141 assert and on which every binary-format parse built with this toolchain silently
+      depends. `corpus_result = 0x4676`.
+    - **#150 `trapguard`** — `G_TRAP` `.custom()` on the impossible arm of a dense state machine,
+      formed pre-legalizer and emitted as `jsr abort` in all three modes. Honest framing kept: a trap
+      terminates, so it can never be *taken* in a gate run — this is a **presence-and-inertness**
+      probe, weaker than #142–#145, and the gate says so in its own output. Two platform findings
+      fell out: `__builtin_unreachable` alone emits **nothing** (only `__builtin_trap` forms
+      `G_TRAP`), and `abort` → `raise` → stdio means the first `__builtin_trap` in any SNES program
+      **fails to link** on an undefined `__putchar` until the program supplies the hook.
+      `corpus_result = 0x2C2D`.
+    - Publishing stays **out of scope**, as for Cluster A and Round 6 Cluster G.
+  - Remaining: **#151–#160** are boundary and width escalations of paths that already have one shipped
+    demo (the 127/128/129 jump-table edge, the 32/33/40-bit by-value ABI edge, nested VLAs,
+    sparse-switch compare trees, `va_arg` width sweep, recursive `sret`). Same shape as Clusters A and
+    B — a settled-plan multi-file build against an existing, proven pattern — so they suit the same
+    dispatch tier the parent item already carries, in one or two clusters.
   **2026‑09‑15: Cluster G has caught two real bugs.** `#116 backtrack` found that `longjmp`'s page‑1
   hard-stack reconstruction never executed (the assembler sized a `rep #$20`-mode immediate by value, not
   by mode, so the CPU read past it into the next opcode at runtime) — FIXED in `platforms/snes/setjmp.S`

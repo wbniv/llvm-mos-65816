@@ -894,6 +894,91 @@ tasks:
       - task: mandel-mame
         vars: { ROM: bigbyval }
 
+  dblbridge:
+    desc: "#146 (Round 8, the un-entered backend paths, Cluster B): Precision Bridge — the G_FPEXT S32->S64 / G_FPTRUNC S64->S32 guard (MOSLegalizerInfo.cpp:375 / :376, both .libcallFor -> __extendsfdf2 / __truncdfsf2). The same chaotic map (r = 125/32, exact in binary32) is iterated two ways over identical binary32 state: lane A wholly at float, lane B PROMOTED to double for the step and DEMOTED back each iteration — so the two lanes differ ONLY in where the rounding happens, and the step at which they separate is a first-class measured output. ZERO corpus slices across demos #1-#141 link either conversion symbol; #57 mandel-double runs a double escape loop AND a float twin but never converts between them (only __floatunsidf, integer->double). Correctly-rounded IEEE only (+ - * and the two conversions), no libm, nothing implementation-defined; the CRC folds raw uint32 bit patterns and the host oracle is compiled -ffp-contract=off. Assert corpus_result (dblbridge_gate_crc 0xF829) == host on MAME + bsnes-jg + structure gate (both conversion symbols plus double arithmetic referenced in all three modes; the lanes provably agree first and then separate). Leaves build/dblbridge.sfc + build/dblbridge-{mame,jg}.png."
+    cmds:
+      - dev/run.sh dblbridge
+
+  dblbridge-play:
+    desc: "PLAY the Precision Bridge demo in MAME (builds first if needed). Two orbit traces of the same chaotic map — one pure float, one round-tripped through double each step — starting together and separating, with the divergence step marked."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/dblbridge.sfc ]; then
+          echo "==> build/dblbridge.sfc missing -- building (dev/run.sh dblbridge)..."
+          dev/run.sh dblbridge
+        fi
+      - task: mandel-mame
+        vars: { ROM: dblbridge }
+
+  bsearchviz:
+    desc: "#147 (Round 8, the un-entered backend paths, Cluster B): Bisection Oracle — libc `bsearch`, a callback ABI this battery has never linked and one structurally UNLIKE qsort's. qsort's comparator drives a SWAP and the call permutes in place; bsearch's drives an INTERVAL BISECTION and the call returns a void* INTO the array (or NULL), which the caller must difference against the base to recover an index — a wrong conversion produces a plausible in-range index, not a crash. `bsearch` is used ZERO times tree-wide across demos #1-#141; qsort (15x) is the only comparator-callback libc linked. A 64-key sorted field is probed with 48 fixed queries containing both hits and deliberate misses, so the NULL arm is taken too. Assert corpus_result (bsearchviz_gate_crc 0x7FF5) == host on MAME + bsnes-jg + structure gate (jsr bsearch present and the comparator taken by address in all three modes; both result arms live; every recovered index re-derives from the key table). The probe trace is deliberately NOT folded into the CRC — C does not specify how bsearch bisects. Leaves build/bsearchviz.sfc + build/bsearchviz-{mame,jg}.png."
+    cmds:
+      - dev/run.sh bsearchviz
+
+  bsearchviz-play:
+    desc: "PLAY the Bisection Oracle demo in MAME (builds first if needed). A sorted 8x8 key field with each query's probe sequence lighting up as the bisection narrows, hits landing on a cell and misses drawn as the NULL bar."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/bsearchviz.sfc ]; then
+          echo "==> build/bsearchviz.sfc missing -- building (dev/run.sh bsearchviz)..."
+          dev/run.sh bsearchviz
+        fi
+      - task: mandel-mame
+        vars: { ROM: bsearchviz }
+
+  strcmprace:
+    desc: "#148 (Round 8, the un-entered backend paths, Cluster B): Lexicographic Race — memcmp / strcmp / strncmp, three libc comparison functions used ZERO times tree-wide across demos #1-#141 (#66 editdist compares characters by hand, #46 qsortviz compares numbers). 24 fixed-width string lanes with deliberate shared prefixes and one byte-for-byte duplicate are merged under a real lexicographic order by strcmp, then every adjacent pair is re-compared by a 3-byte-bounded strncmp and a full-width memcmp that runs past each terminator into deterministic filler — so all three produce all three signs and genuinely disagree. The CRC folds the SIGN of every comparison normalised to -1/0/+1, never the magnitude, which C leaves implementation-defined. MEASURED NEGATIVE, recorded rather than hidden: MOS never inline-expands memcmp at any constant size, including the `== 0` form other targets specialise, so this covers three never-linked libcalls and not a second lowering. Assert corpus_result (strcmprace_gate_crc 0xF0BA) == host on MAME + bsnes-jg + structure gate (all three symbols referenced in all three modes; all 9 (function, sign) cells fired). Leaves build/strcmprace.sfc + build/strcmprace-{mame,jg}.png."
+    cmds:
+      - dev/run.sh strcmprace
+
+  strcmprace-play:
+    desc: "PLAY the Lexicographic Race demo in MAME (builds first if needed). String lanes redrawn in the order strcmp sorted them, with the byte column at which each comparison resolved marked and the filler past each terminator shaded separately."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/strcmprace.sfc ]; then
+          echo "==> build/strcmprace.sfc missing -- building (dev/run.sh strcmprace)..."
+          dev/run.sh strcmprace
+        fi
+      - task: mandel-mame
+        vars: { ROM: strcmprace }
+
+  packrec:
+    desc: "#149 (Round 8, the un-entered backend paths, Cluster B): Unaligned Record Reader — REFRAMED after measurement, and the reframing is the point. The ideas doc proposed __attribute__((packed)) as a distinct LOWERING (a decomposed multi-byte access at an odd offset). It is not one on MOS: every scalar already has ABI alignment 1, so an unpacked struct has NO PADDING TO REMOVE and `packed` is a layout no-op — sizeof and every offsetof agree between the packed and plain twins, and an ordinary uint32_t global is already emitted as `align 1`. That is Round 8's second negative result, recorded so a later round does not re-derive it. What this demo guards instead is the padding-free-layout INVARIANT itself, which no demo across #1-#141 asserts and on which every binary-format parse built with this toolchain silently depends: a packed telemetry stream with two coprime odd record strides (7 and 10 bytes) selected by a tag byte, parsed through a computed record pointer, with the layout pinned by a _Static_assert block. Assert corpus_result (packrec_gate_crc 0x4676) == host on MAME + bsnes-jg + structure gate (the layout assertions compile in all three modes, the parse is not const-folded, both shapes occur and wide members land at odd offsets). Leaves build/packrec.sfc + build/packrec-{mame,jg}.png."
+    cmds:
+      - dev/run.sh packrec
+
+  packrec-play:
+    desc: "PLAY the Unaligned Record Reader demo in MAME (builds first if needed). The raw byte stream as a ruler, each parsed record outlined and each field painted across exactly the bytes it occupies, so the odd strides and odd field offsets read as geometry."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/packrec.sfc ]; then
+          echo "==> build/packrec.sfc missing -- building (dev/run.sh packrec)..."
+          dev/run.sh packrec
+        fi
+      - task: mandel-mame
+        vars: { ROM: packrec }
+
+  trapguard:
+    desc: "#150 (Round 8, the un-entered backend paths, Cluster B): Unreachable Sentinel — G_TRAP `.custom()` (MOSLegalizerInfo.cpp:448; legalizeTrap creates an RTLIB::ABORT libcall, so it reaches the ROM as `jsr abort`). __builtin_trap / __builtin_unreachable are used ZERO times across demos #1-#141, and __builtin_unreachable alone emits NOTHING at all — only __builtin_trap forms G_TRAP, which is itself a measured detail worth recording. A dense (state, event) machine enumerates 20 legal pairs as case labels and leaves 4 impossible ones to `default: __builtin_trap()`; the generator consults a per-state legality mask so an impossible pair never occurs, but tg_step is noinline and parameterised so the compiler cannot prove the default dead. Also measured: `abort` drags in `raise` and thus `__putchar`, which platforms/snes does not define — so the FIRST __builtin_trap in any SNES program is a link error until the program supplies the hook. HONEST FRAMING: a trap terminates, so it can never be TAKEN in a gate run — this is a PRESENCE-AND-INERTNESS probe, weaker than #142-#145, and the gate output says so. Assert corpus_result (trapguard_gate_crc 0x2C2D) == host on MAME + bsnes-jg + structure gate (G_TRAP formed pre-legalizer and jsr abort emitted, in all three modes; every legal pair fired and no impossible one did). Leaves build/trapguard.sfc + build/trapguard-{mame,jg}.png."
+    cmds:
+      - dev/run.sh trapguard
+
+  trapguard-play:
+    desc: "PLAY the Unreachable Sentinel demo in MAME (builds first if needed). Six states around a ring with the legal transitions lighting as the machine takes them and the four guarded-impossible edges drawn dim and never lit — the arms behind the trap."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/trapguard.sfc ]; then
+          echo "==> build/trapguard.sfc missing -- building (dev/run.sh trapguard)..."
+          dev/run.sh trapguard
+        fi
+      - task: mandel-mame
+        vars: { ROM: trapguard }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -406,6 +406,61 @@ Targets:
              arguments with their call-site copies present in all three modes, and zero
              caller-visible by-value violations), screenshots both
              (build/bigbyval-{mame,jg}.png). 5-way differential: corpus-a16 (bigbyval_sim).
+  dblbridge  #146 Round 8 Cluster B: the Precision Bridge — the same chaotic map iterated two
+             ways over identical binary32 state: lane A wholly at float, lane B PROMOTED to
+             double for the step (__extendsfdf2) and DEMOTED back (__truncdfsf2) each
+             iteration, so the lanes differ only in where the rounding happens and the step at
+             which they separate is the measured output. ZERO corpus slices across #1-#141
+             link either conversion symbol (#57 mandel-double forms only __floatunsidf).
+             Correctly-rounded IEEE only, no libm. Asserts corpus_result (dblbridge_gate_crc
+             0xF829) == host on MAME + bsnes-jg + a structure gate (both conversion symbols
+             plus double arithmetic referenced in all three modes, and the lanes provably
+             agree first then separate), screenshots both
+             (build/dblbridge-{mame,jg}.png). 5-way differential: corpus-a16 (dblbridge_sim).
+  bsearchviz #147 Round 8 Cluster B: the Bisection Oracle — libc `bsearch`, whose callback ABI
+             is structurally unlike qsort's: the three-way comparator drives an INTERVAL
+             BISECTION and the call returns a void* INTO the array (or NULL), which the caller
+             must difference back into an index. A wrong conversion yields a plausible
+             in-range index, not a crash. `bsearch` is used ZERO times across #1-#141.
+             Asserts corpus_result (bsearchviz_gate_crc 0x7FF5) == host on MAME + bsnes-jg +
+             a structure gate (jsr bsearch present and the comparator taken by address in all
+             three modes; both result arms live; every recovered index re-derives from the key
+             table), screenshots both
+             (build/bsearchviz-{mame,jg}.png). 5-way differential: corpus-a16 (bsearchviz_sim).
+  strcmprace #148 Round 8 Cluster B: the Lexicographic Race — memcmp/strcmp/strncmp, three libc
+             comparison functions used ZERO times tree-wide across #1-#141. String lanes
+             merged under a real lexicographic order, then re-compared by a short-bounded
+             strncmp and a full-width memcmp that runs past each terminator into deterministic
+             filler, so the three genuinely disagree. The CRC folds the SIGN of every
+             comparison (never the magnitude, which C leaves implementation-defined). Measured
+             negative: MOS never inline-expands memcmp at any constant size. Asserts
+             corpus_result (strcmprace_gate_crc 0xF0BA) == host on MAME + bsnes-jg + a
+             structure gate (all three symbols referenced in all three modes, and all 9
+             (function, sign) cells fired), screenshots both
+             (build/strcmprace-{mame,jg}.png). 5-way differential: corpus-a16 (strcmprace_sim).
+  packrec    #149 Round 8 Cluster B: the Unaligned Record Reader — a packed telemetry stream
+             with two coprime odd record strides (7 and 10 bytes) parsed through a computed
+             pointer. REFRAMED honestly: on MOS every scalar already has ABI alignment 1, so
+             an unpacked struct has no padding to remove and __attribute__((packed)) is a
+             LAYOUT NO-OP — Round 8's second negative result, NOT a distinct lowering. What
+             this guards is the padding-free-layout INVARIANT, which no demo across #1-#141
+             asserts and on which every binary-format parse built with this toolchain silently
+             depends. Asserts corpus_result (packrec_gate_crc 0x4676) == host on MAME +
+             bsnes-jg + a structure gate (the header's _Static_assert layout block compiles in
+             all three modes, the parse is not const-folded, both shapes occur and wide members
+             land at odd offsets), screenshots both
+             (build/packrec-{mame,jg}.png). 5-way differential: corpus-a16 (packrec_sim).
+  trapguard  #150 Round 8 Cluster B: the Unreachable Sentinel — G_TRAP `.custom()`
+             (MOSLegalizerInfo.cpp:448; legalizeTrap emits RTLIB::ABORT, landing as `jsr
+             abort`) on the impossible arm of a dense (state, event) machine: 20 legal pairs
+             as case labels, 4 impossible ones behind `default: __builtin_trap()`, with the
+             generator masking them out while tg_step stays noinline so the compiler cannot
+             prove the default dead. HONEST FRAMING: a trap terminates, so it can never be
+             TAKEN in a gate run — this is a PRESENCE-AND-INERTNESS probe, weaker than
+             #142-#145. Asserts corpus_result (trapguard_gate_crc 0x2C2D) == host on MAME +
+             bsnes-jg + a structure gate (G_TRAP formed and jsr abort emitted in all three
+             modes; every legal pair fired and no impossible one did), screenshots both
+             (build/trapguard-{mame,jg}.png). 5-way differential: corpus-a16 (trapguard_sim).
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for

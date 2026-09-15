@@ -1601,6 +1601,93 @@ demo has ever executed, ordered by sharpness rather than by how pretty the pictu
 - **#144 `borrowov`** — the one overflow-builtin family never used, whose flag sense is the *inverse* of
   the one that is.
 
-Deferred to later Round 8 clusters: #146–#150 (fresh paths, lower measured risk), #151–#160 (boundary and
-width escalations of paths that already have one shipped demo).
+Deferred to later Round 8 clusters: ~~#146–#150 (fresh paths, lower measured risk)~~ **— BUILT + gated as
+Cluster B, see below**; #151–#160 (boundary and width escalations of paths that already have one shipped
+demo).
+
+## Cluster B (#146–#150) — BUILT + gated 2026‑09‑16, and two of the five came back negative
+
+Built and gated by [the Cluster B plan](../plans/2026-09-16-round8-cluster-b-conversion-comparison-layout.md).
+All five ship green — `host == default == +mos-a16 == +mos-xy16` on MAME **and** bsnes-jg,
+`-verify-machineinstrs` clean in all three modes — and **no compiler bug was found**. What Cluster B did
+turn up is two **measured negatives** that contradict this section's own predictions, recorded here so a
+later round does not re-derive them.
+
+| Demo | Gate CRC | Corner, as it turned out |
+|---|---|---|
+| **#146 `dblbridge`** | `0xF829` | **As predicted.** `__extendsfdf2` + `__truncdfsf2` both referenced in all three modes. The two lanes agree for 1–4 steps then separate, so the round trip is a live precision instrument, not a pair of dead libcalls. |
+| **#147 `bsearchviz`** | `0x7FF5` | **As predicted.** `jsr bsearch` with the comparator taken by address; 34 hits, 14 misses (so the `NULL` arm is live), every recovered index re-derives from the key table. |
+| **#148 `strcmprace`** | `0xF0BA` | **Half negative.** All three libcalls land as predicted (zero prior uses tree-wide), but the *inline small-`memcmp` expansion* half does **not exist on MOS** — see below. |
+| **#149 `packrec`** | `0x4676` | **Negative, reframed.** `__attribute__((packed))` is a **layout no-op** on MOS — see below. The demo ships as a layout-invariant regression guard instead. |
+| **#150 `trapguard`** | `0x2C2D` | **As predicted, with the honest framing kept.** `G_TRAP = 1` pre-legalizer and `jsr abort` emitted, in all three modes. Presence-and-inertness only; the trap is never taken. |
+
+### Negative result: MOS never inline-expands `memcmp`
+
+This section predicted clang's inline small-`memcmp` expansion as a second, distinct lowering next to the
+libcall. Measured, at three sizes including the equality-only form other targets specialise:
+
+```
+memcmp(a,b,2)        -> jsr memcmp
+memcmp(a,b,4) == 0   -> jsr memcmp
+memcmp(a,b,8)        -> jsr memcmp
+```
+
+`TargetTransformInfo::enableMemCmpExpansion` is not overridden for this target, so there is no second
+lowering to enter. #148 therefore covers three never-linked libcalls and their three-way sign contract,
+and its structure gate asserts only that.
+
+### Negative result: `__attribute__((packed))` is a layout no-op on MOS
+
+This section predicted a packed wide member at an odd offset would decompose into a multi-byte access
+distinct from an aligned one. It cannot, and the reason is structural — **every scalar on MOS already has
+ABI alignment 1**, so an unpacked struct has no padding to remove:
+
+```c
+struct P { uint8_t t; uint16_t w; uint32_t d; uint8_t e; };              /* unpacked */
+struct __attribute__((packed)) Q { /* same members */ };                 /* packed   */
+_Static_assert(sizeof(struct P) == sizeof(struct Q), "");                /* PASSES   */
+_Static_assert(__builtin_offsetof(struct P, w) == 1, "");                /* PASSES   */
+_Static_assert(_Alignof(uint32_t) == 1, "");                             /* PASSES   */
+```
+
+(On the x86‑64 host the same two structs are 12 and 10 bytes, so `packed` is doing real work there — the
+no-op is specific to this target.) The IR agrees from the other side: an ordinary `uint32_t` global is
+emitted as `@g = global i32 align 1`, so the `load i32 … align 1` a packed member produces is
+indistinguishable from any other load. This joins `G_PTRMASK` / `G_FREEZE` / `G_FFREXP` /
+`G_FCANONICALIZE` as a corner that is **not constructible as a distinct lowering from plain C on MOS**.
+
+#149 still ships, with a narrower and honest purpose: it is the tree's **only regression guard for the
+padding-free-layout invariant**, which zero demos across #1–#141 assert and on which every binary-format
+parse written with this toolchain silently depends. If a backend change ever raised `_Alignof(uint16_t)`
+or `_Alignof(uint32_t)` to 2, every record stride and member offset would shift and every such parse
+would start reading the wrong bytes with no diagnostic. The header's `_Static_assert` block pins it.
+
+### Platform finding: the first `__builtin_trap` in a SNES program does not link
+
+`G_TRAP` legalizes to an `abort` libcall, `abort` calls `raise`, and the default `SIGABRT` handler reaches
+stdio:
+
+```
+ld.lld: error: undefined symbol: __putchar
+>>> referenced by ld-temp.o
+>>>               build/trapguard_sim.sfc.lto.o:(raise)
+```
+
+`__putchar` is the SDK's per-platform character hook (declared in `common/include/stdio.h`, never defined
+for `snes`, which has no console). So a program that merely *contains* an untaken trap must supply it.
+That is not a workaround — it is the cost of `G_TRAP` on this platform, and it is why nothing across
+#1–#141 could have linked one by accident. Also measured: `__builtin_unreachable()` alone emits **nothing**
+and cannot form `G_TRAP` at all, so a demo written around it would have compiled cleanly and covered zero.
+
+### ROM-size finding: a two-precision demo does not fit the plain LoROM near window
+
+#146 links the double soft-float library **and** the float twin, because running both precisions side by
+side is the whole point. Measured: 5,299 bytes over the 32 KB near window `$8000-$FFAF` on the plain `snes`
+platform. It takes the contract #57 `mandel-double` already established — `snes-far-platform` +
+`TITLE_FONT16_FAR` + `mos-a16-only`, ROM becomes 64 KB — plus two local trims (a const seed table instead
+of `__floatunsisf`, and an integer sign test instead of `__ltsf2`/`__gtsf2` in the plot scaler). The
+differential is unaffected: the 5-way gate is the HAL-free corpus slice, which links no HAL, needs no far
+pointers, and is compiled and asserted in all three modes.
+
+Still deferred: **#151–#160**, the boundary and width escalations.
 
