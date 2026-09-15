@@ -486,7 +486,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~ *(2026‑07‑26 refresh: now 13 headers / 113 demos; the "0 indirect JMPs / LTO devirtualized" claim was a measurement artifact — 1 `__call_indir` call survives; mandel-display has since diverged so +338 B is historical. Corrected in `docs/oop-in-c.md` §4–§5 + new §8 static-vs-virtual benchmark.)*
 - [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
 - [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
-- [T3] **Compiler stress-test demo battery — algorithm+visual SNES demos**
+- [wip T3] **Compiler stress-test demo battery — algorithm+visual SNES demos** <!-- agent:ace158078d55a8471 -->
   ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
   host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. Each hits a
@@ -529,9 +529,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     un-entered paths lowers correctly: `host == default == +mos-a16 == +mos-xy16` on MAME **and**
     bsnes-jg, `-verify-machineinstrs` clean in all three modes, and each demo's structure gate
     confirms the intended shape actually reached the ROM rather than folding into an already-covered
-    one. Remaining Round 8 work (later clusters, dispatched separately): **#146–#150** are fresh paths
-    of lower measured risk (float↔double `__extendsfdf2`/`__truncdfsf2`, `bsearch`,
-    `memcmp`/`strcmp`, packed-struct misaligned members, `G_TRAP` inertness); **#151–#160** are
+    one. **Cluster B (`#146`–`#150`) dispatched 2026-09-16** — fresh paths of lower measured risk
+    (float↔double `__extendsfdf2`/`__truncdfsf2`, `bsearch`, `memcmp`/`strcmp`, packed-struct
+    misaligned members, `G_TRAP` inertness). Remaining: **#151–#160** are
     boundary and width escalations of paths that already have one shipped demo (the 127/128/129
     jump-table edge, the 32/33/40-bit by-value ABI edge, nested VLAs, sparse-switch compare trees,
     `va_arg` width sweep, recursive `sret`).
