@@ -1999,7 +1999,12 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      lands it, not to a separate backlog row. The [verify] capture is correct-but-moot: the plan's
      verification section records the BLOCKED evidence rather than a PASS, deliberately — the gate
      is not weakened to manufacture one. Nothing separately open. -->
-- [ ] **(triage)** **`npm publish` to the public registry.** Only matters for outside consumers; neither site — _from [2026-09-15-fix-snes-engine-ci-drift.md](docs/plans/2026-09-15-fix-snes-engine-ci-drift.md)_  <!-- fp:4b2c2602955f70bd -->
-- [ ] **(triage)** **Gallery republish + `mode: "live-record"` manifest flip** (item (5) in — _from [2026-09-15-fix-snes-engine-ci-drift.md](docs/plans/2026-09-15-fix-snes-engine-ci-drift.md)_  <!-- fp:002c032fe52b1175 -->
-- [ ] **(triage)** **`bsnes-jg-wasm`'s own unexercised retarget rows** (`running`/`fail` navigation states) — — _from [2026-09-15-fix-snes-engine-ci-drift.md](docs/plans/2026-09-15-fix-snes-engine-ci-drift.md)_  <!-- fp:ef0c98899d683853 -->
+<!-- triaged 2026-09-15: all three already tracked elsewhere, nothing open here.
+     • npm registry `publish` — a deliberate skip (git-dependency release was sufficient for both
+       consumer sites; registry only matters for outside consumers, none exist yet).
+     • gallery republish + `mode: "live-record"` manifest flip — already the curated M2 sub-item
+       "(5)" inside the "Compiler stress-test demo battery" entry above, gated on its own ROM
+       republish sequencing.
+     • `bsnes-jg-wasm` retarget rows — already tracked in that repo's own TODO.md per the
+       [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md) Follow-up section. -->
 <!-- END auto-captured-deferrals -->
