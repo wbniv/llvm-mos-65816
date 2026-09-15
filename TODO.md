@@ -189,12 +189,16 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   states (`running`/`pass`/`fail`/`warn`) assert both classes **and** the computed pill colour in
   headless Chromium against the real engine, ROM and site stylesheet; the package's CI gained the
   `rp-badge`-shaped case that would have caught it.
-  **Left, and all of it outward-facing (USER-GATED):** `git push origin npm-package` — which *is* the
-  release, since both sites depend on `github:wbniv/bsnes-jg-wasm#npm-package` — then
-  `pnpm update @wbniv/bsnes-jg-player` per site, optional `npm publish`, then **(5)** the gallery
-  republish + `mode: "live-record"` manifest flip, then a deploy tag. Until the push lands, both
-  sites' CI `sync --check` fails on 1.1.0-vs-1.0.0; that is the drift gate working. Spec, raw
-  evidence and the exact sequence in the
+  **RELEASED + DEPLOYED 2026-09-15 (user-triggered):** `npm-package` pushed (`1ec048f..f1557ce`),
+  both sites' lockfiles repinned to `1.1.0` (`pnpm update @wbniv/bsnes-jg-player`), `sync --check`
+  verified clean locally on each, then tagged/pushed (biohack.net `v1.0.590`, indri.studio
+  `v0.1.157`). **Both deploy CI runs concluded `success`**
+  ([biohack.net](https://github.com/wbniv/biohack.net/actions/runs/34926081782) ·
+  [indri.studio](https://github.com/wbniv/indri.studio/actions/runs/34926111906)), and both live
+  sites confirmed serving engine `1.1.0` (`ENGINE_VERSION` endpoint, matching SHA256s across both).
+  Registry `npm publish` and **(5)** the gallery republish + `mode: "live-record"` manifest flip
+  remain out of scope (separate, bigger rollout — not needed to clear the drift gate).
+  [plan](docs/plans/2026-09-15-fix-snes-engine-ci-drift.md); spec + original evidence in the
   [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md) (*Status (2026-09-15)*).
 - [x] ~~**MAME leg for the cartsize canaries — blocked on the SPC700 IPL.**~~ **UNBLOCKED + PASS
   2026-08-06:** the checksum-gated IPL is retrievable from SSM; all 14 cartsize configurations pass
@@ -523,30 +527,48 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. Each hits a
   distinct codegen corner.
   **Status (2026-07-02): Rounds 1–5 (#1–#92) all shipped + live; Round 6 (harden-the-fixes, #93–#118) DRAFTED, in progress.**
-  **2026‑09‑15: Cluster G's `#116 backtrack` immediately found a real bug — `longjmp`'s page‑1 hard-stack
-  reconstruction never executed (the assembler sized a `rep #$20`-mode immediate by value, not by mode, so
-  the CPU read past it into the next opcode at runtime) — FIXED in `platforms/snes/setjmp.S` (one line, the
-  existing `mos16()` immediate-width modifier) and verified: `corpus` 63/63, `corpus-a16` 62/62 (both
-  unaffected), `#116`'s own gate now PASSes `0x7336` on all three modes at bsnes-jg. Root cause + fix:
+  **2026‑09‑15: Cluster G has caught two real bugs.** `#116 backtrack` found that `longjmp`'s page‑1
+  hard-stack reconstruction never executed (the assembler sized a `rep #$20`-mode immediate by value, not
+  by mode, so the CPU read past it into the next opcode at runtime) — FIXED in `platforms/snes/setjmp.S`
+  (one line, the existing `mos16()` immediate-width modifier):
   [investigation](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md#resolution-2026-09-15).
-  Remaining for this cluster: wire `#116`'s `expected.tsv` row + `dev/backtrack.sh` driver + its
-  visual/title-screen half, and build `#117 csrjmp` / `#118 retryjmp`, now unblocked.
+  `#118 retryjmp` then found an OPEN `+mos-xy16` **miscompile** — a spill-slot address materialization
+  takes the live `Imag16` pair holding the value it is about to store:
+  [investigation](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md).
   Round 6 **Cluster G (#116–118)** added 2026-07-02 to harden the new `platforms/snes/setjmp.S` fix (#35 longjmp,
   runtime/library — not a codegen patch): #116 `backtrack` (deep multi-frame longjmp unwind, the unblocked #35
   backtracking solver — the flagship), #117 `csrjmp` (all 14 `__rc18..31` CSRs live across the jump), #118
   `retryjmp` (re-entrant setjmp site, varying depth + deep soft stack). Beyond the `corpus/setjmp_sim.c` guard.
-  **Cluster G result (2026-09-15) — the cluster fired on its first run; #116 is BLOCKED on an OPEN runtime defect it found.**
-  #116 `backtrack` BUILT (8-queens, per-row `setjmp` choice points, dead ends `longjmp` to the deepest still-viable
-  ancestor = multi-frame unwind from a varying depth) — host oracle `0x7336`, `-verify-machineinstrs` clean in default +
-  `+mos-a16` + `+mos-xy16` — but `got=0x0000` on all three target legs. Bisected to a 12-line repro with no N-Queens in
-  it: **`longjmp`'s page-1 hard-stack reconstruction never executes**, so every `longjmp` leaves `S` in page 0 and any
-  `rts` out of the `setjmp` frame reads its return address from the zero page — **bug #35 is still live**, invisible to
-  `corpus/setjmp_sim.c` because that guard never returns from its `setjmp` frame. Cause: `platforms/snes/setjmp.S:170-173`
-  — the assembler sizes an immediate by magnitude, not by the `rep`-set `M` width, so `and #$00ff` encodes 8-bit (`29 ff`)
-  and the CPU (M=0) eats the `ora #$0100` opcode byte as its operand; the `ora` never runs and the leftover `00 01` is a
-  `BRK`. Gate deliberately NOT weakened: #116 is committed un-gated (no `expected.tsv` row, no `dev/backtrack.sh`), and
-  #117/#118 are not started — both fail for the same reason. Fixing the runtime is separate, higher-tier work.
-  ([defect](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md) ·
+  **Cluster G result (2026-09-15) — #116 and #117 BUILT + gated, not yet published; #118 STOPPED on a second,
+  unrelated OPEN defect it found.** Publishing is out of scope — no visual demo here is shipped to any site.
+  - **#116 `backtrack` — BUILT + gated, not yet published.** 8-queens, one `setjmp` choice point per recursion
+    level, every dead end `longjmp`ing straight to the deepest still-viable ancestor = a multi-frame unwind from a
+    varying depth. `corpus_result = 0x7336`, `host == default == +mos-a16 == +mos-xy16` on MAME **and** bsnes-jg
+    (MAME actually ran — the SPC700 IPL is present, no SKIP), `-verify-machineinstrs` clean in all three modes.
+    Full set shipped: `expected.tsv` row, `dev/backtrack.{sh,lua}`, the visual ROM `examples/snes/backtrack.c`
+    (trace replay on an 8×8 board with a title card — queens drop in, abandoned rows flash red and snap back),
+    `dev/run.sh` + `Taskfile.yml` wiring. It is the demo that found and now guards the `setjmp.S` page-1 defect.
+  - **#117 `csrjmp` — BUILT + gated, not yet published.** 14 coefficient bytes (the exact width of `jmp_buf`'s
+    `csrs[14]` = `__rc18..__rc31`) held in locals across a `setjmp` while a `noinline` worker occupies and
+    rewrites every callee-saved slot and then `longjmp`s past the epilogue that would restore them; only
+    `longjmp`'s own `csrs[]` restore can recover them. `corpus_result = 0xADD8`, same five-way agreement on both
+    emulators (MAME ran), `-verify` clean in all three modes. Codegen confirms the shape — 12 of the 14 land in
+    `__rc20..__rc31`, the rest on the soft stack. Full set shipped, same as #116. **Verdict: the restore offsets
+    are correct.**
+  - **#118 `retryjmp` — STOPPED, committed UN-GATED.** One `setjmp` site re-entered 24 times, each attempt
+    jumping back from a different depth with six 16-bit locals live across every recursive call. Host oracle
+    `0x3388`; default and `+mos-a16` agree on target; **`+mos-xy16` gives `0x82D4` — a real MISCOMPILE**, not a
+    verifier-only complaint. The frame-index address materialization for a spill slot takes the live `Imag16`
+    pair (`__rc2`/`__rc3`) that holds the value about to be stored, so `rj_result[]` receives the index
+    expression instead. `setjmp.S` is RULED OUT (the call site is in 8-bit index mode; #116/#117 both pass xy16
+    with far more longjmp traffic). `-O0` clean, `-O1`/`-Os`/`-Oz`/`-O2` fail. Gate deliberately NOT weakened:
+    the logic header, host oracle and corpus slice are committed as the reproduction, with **no** `expected.tsv`
+    row, **no** `dev/retryjmp.sh` and **no** visual ROM. Also flagged: `tools/a16_fuzz.py`'s `KNOWN_ISSUES`
+    matches the literal string `"Using an undefined physical register"`, so this miscompile would be recorded as
+    the benign `a16-rc-undef-ra-pure-virtual` XFAIL — the message text is not a safe discriminator.
+    **ESCALATED** — the fix is backend (register scavenger / frame-index elimination) plus a full rebuild.
+  ([#35 defect](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md) ·
+  [xy16 defect](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md) ·
   [plan](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md))
   - [T4] **#102 cpu6502** — 6502/65C02 CPU Disassembler + Simulator (a genuinely NEW showcase demo, not a hardening re-stress). Simulates a pure 6502/65C02 (8-bit A/X/Y, 16-bit PC) running the 6502-assembly equivalent of `hello.c` (green color reg + sentinel 0x42, then a loop exercising every ALU gate). On-screen: a scrolling **Waldo 16×16** disassembly listing (highlighted current instruction) + 8 schematic ALU gate symbols (AND/OR/XOR as classic shapes; ADD/SUB/SHL/SHR/CMP blocks) — the gate for the just-executed instruction lights yellow; live register + flag strip. Codegen stressed: **256-entry `switch` → jump table** (`jmp_table=4`), uint16_t PC arithmetic, uint8_t flag bit-ops. **Gate-green, clean positive:** `host==default==+mos-a16==+mos-xy16==0xAC8A` on MAME + bsnes-jg (pixel-identical render), `-verify` clean, `rep/sep=97`. ~~**Publish to biohack.net pending** (`/snes-rom-page`).~~ **ALREADY PUBLISHED — stale note, corrected 2026-07-26.** Live at ✓ [/snes/cpu6502/](https://biohack.net/snes/cpu6502/) (HTTP 200; shipped by biohack.net `aff09db` / tag `v1.0.254`, the full-screen-layout redesign — the page, ROM, preview and a manifest selfcheck `off=0xADD len=2 want=0xAC8A frames=1000` were all already in place). **Re-verified on the rebased toolchain (2026-07-26):** rebuilt ROM is **byte-identical** to both the site-repo copy and the live-served ROM (`sha256 c0df7cfd195ba8bb…`), and re-passes the gate on bsnes-jg (`SMOKE: PASS off=0xADD got=0xAC8A`, 1000 frames) with the render correct (`0019 CMP` highlighted + CMP gate lit). ([plan](docs/plans/2026-07-02-102-snes-cpu6502.md) · [rebase](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md))
   - [T3] **Compiler-bug videos via the cpu6502 demo.** The cpu6502 simulator is a natural vehicle for showing compiler miscompiles visually — a wrong gate sequence or corrupted register value is immediately on-screen. Produce short MAME/bsnes-jg clips illustrating each known battery-caught bug (wrong output → fixed output). Depends on #102 shipping.
@@ -1977,4 +1999,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      lands it, not to a separate backlog row. The [verify] capture is correct-but-moot: the plan's
      verification section records the BLOCKED evidence rather than a PASS, deliberately — the gate
      is not weakened to manufacture one. Nothing separately open. -->
+- [ ] **(triage)** **`npm publish` to the public registry.** Only matters for outside consumers; neither site — _from [2026-09-15-fix-snes-engine-ci-drift.md](docs/plans/2026-09-15-fix-snes-engine-ci-drift.md)_  <!-- fp:4b2c2602955f70bd -->
+- [ ] **(triage)** **Gallery republish + `mode: "live-record"` manifest flip** (item (5) in — _from [2026-09-15-fix-snes-engine-ci-drift.md](docs/plans/2026-09-15-fix-snes-engine-ci-drift.md)_  <!-- fp:002c032fe52b1175 -->
+- [ ] **(triage)** **`bsnes-jg-wasm`'s own unexercised retarget rows** (`running`/`fail` navigation states) — — _from [2026-09-15-fix-snes-engine-ci-drift.md](docs/plans/2026-09-15-fix-snes-engine-ci-drift.md)_  <!-- fp:ef0c98899d683853 -->
 <!-- END auto-captured-deferrals -->
