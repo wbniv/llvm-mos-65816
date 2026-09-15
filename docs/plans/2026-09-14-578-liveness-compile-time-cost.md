@@ -72,7 +72,9 @@ the function count/loop shape noted.
 | File | Purpose |
 |---|---|
 | this plan | method + results |
-| `dev/bench-578-liveness.sh` (throwaway, scratchpad) | the harness; promoted to `dev/` only if the result is surprising enough to warrant re-running later |
+| [`bench-578-liveness.sh`](2026-09-14-578-liveness-compile-time-cost/bench-578-liveness.sh) | the harness (runs inside the privileged container) |
+| [`analyze.py`](2026-09-14-578-liveness-compile-time-cost/analyze.py) | summarizes `results.csv` into the tables in §Results |
+| [`results.csv`](2026-09-14-578-liveness-compile-time-cost/results.csv) | raw data: 1453 rows, one per (file × binary × rep) |
 | `docs/pr-revisions/2026-09-13/validation.md` | one paragraph with the headline numbers, so the bundle's evidence is complete before publish |
 | `docs/pr-revisions/2026-09-13/578-body.md` | one sentence on compile-time cost in the Validation line, if and only if the number is worth a maintainer's attention either way |
 
@@ -149,6 +151,8 @@ loop-dense trig kernel, at +2.4 % instructions and +2 ms on-CPU.
 ### Step 5 — recorded
 
 `validation.md` gained the headline paragraph; `578-body.md`'s Validation line gained one
-sentence. Bundle checksums regenerated. Harness kept in the session scratchpad
-(`bench/bench-578-liveness.sh`, `bench/analyze.py`, `bench/results.csv`) — not promoted to
-`dev/`, since the result needs no re-running.
+sentence. Bundle checksums regenerated. Harness + raw data preserved in this plan's bundle
+directory (see §Files) rather than `dev/` — the result needs no re-running, but the underlying
+measurement stays reproducible/auditable rather than living only in a session scratchpad. The two
+built `llc` binaries themselves were not committed (large, and trivially rebuildable from the two
+named commits/hunks in §Method).
