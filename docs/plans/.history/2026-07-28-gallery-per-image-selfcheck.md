@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-16](https://github.com/wbniv/llvm-mos-65816/commit/1cad7d7) | plan/todo: gallery per-image selfcheck — step 4 landed, button is live |
 | [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/cad7d2e) | plan/TODO: player 1.1.0 prepared and browser-verified; publish stays user-gated |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/80ed296) | docs(gallery): the ROM republish is decoupled from the player release, and verified |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/b0b8e0d) | docs(gallery)+todo: badge-state matrix; the badge has never been styled |
@@ -13,6 +14,11 @@
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/66d59c9) | docs(gallery): root-cause notes for the work-0 repack divergence; #137 step 6 is FAIL |
 
 <!--history-meta v1
+1cad7d7	author	Will Norris
+1cad7d7	added	115
+1cad7d7	deleted	5
+1cad7d7	files	1
+1cad7d7	body	The last step of the 2026-07-28 plan. The gallery ROM is republished and its\nmanifest selfcheck is flipped from the interim legacy-scalar form to the full\n`mode: "live-record"` schema, both in ~/biohack.net commit 5e419b7 (one commit\nby necessity, not tidiness: sync-manifest-offsets.py will not trust the map\nunless the built ROM is byte-identical to the shipped one).\n\nVerification steps 3 and 4 were "NOT RUN — blocked on the republish"; they now\ncarry real output. verify-web-roms.sh --only lzss-gallery replays live-record\nexactly as the browser does and passes at work 0, 15305 B == host oracle, with\nthe force-blank scan clean on the same run.\n\nRecorded honestly rather than glossed:\n\n- -verify-machineinstrs is NOT clean for this demo. It trips the documented\n  a16-rc-undef signature in upload_chevron_pose ($rc4:$rc5 with no reaching def\n  for the high half), already tracked and dispatched as c01b667. Pre-existing,\n  not a regression from this republish, and never asserted by dev/lzss-gallery.sh.\n  Nothing was weakened to get a green line; the line is simply not green.\n\n- The 700000-frame leg's 11h26m wall clock was the host being SUSPENDED for\n  8h41m across four suspends, not emulator slowness. Actual compute ~2h45m.\n  My first guess ("CPU contention") was wrong and journalctl settles it; the\n  plan now says so and warns that `ps etime` mismeasures this on a resumed\n  machine (it reported 8h14m, which is neither figure).\n\nCo-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011AP736JtwzSGYH4bmxDWTa
 cad7d2e	author	Will Norris
 cad7d2e	added	171
 cad7d2e	deleted	2

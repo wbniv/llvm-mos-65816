@@ -534,10 +534,30 @@ ALL PASS — safe to publish
 
 4. Live check after deploy: both sites serve the new manifest and the button passes in-page.
 
-**PASS (manifest leg), NOT VISUALLY CONFIRMED (badge leg)** — see *Status (2026-09-15) — step 4
-landed* below for the deployed-manifest evidence and the exact gap. (Scope correction, unchanged:
-only biohack.net has a `public/play/roms/manifest.json`; `~/indri.studio/public/play/` has no
-`roms/` directory at all, so there is nothing to republish there.)
+**PASS** (2026‑09‑15, biohack.net `v1.0.592`). Deployed manifest, read back off the live site:
+
+```
+mode  : live-record
+symbol: gallery_shown off: 0x477
+record: {'z': [0, 2], 'work': 2, 'ok': 3, 'state': 4} ready: 2
+frames: 24000 poll: 120
+oracle: 62 entries, first 5 [15305, 14463, 14986, 15234, 15709]
+titles: 62 entries, first 'Under the Wave off Kanagawa'
+label : displayed artwork repacked on-SNES == host oracle
+```
+
+The shipped ROM read back off the CDN is byte-identical to the gated build:
+
+```
+$ curl -s https://biohack.net/play/roms/lzss-gallery.sfc | sha256sum
+8a17693dbdefc3466b2d62d7d094da1e5df756ef2aa4c60031c0e824b01837dd  -
+```
+
+And the button itself, in a real browser on the real page — see below.
+
+(Scope correction, unchanged: only biohack.net has a `public/play/roms/manifest.json`;
+`~/indri.studio/public/play/` has no `roms/` directory at all, so there is nothing to republish
+there.)
 
 ### Added 2026‑07‑31 — the works 0–3 repack differential (the gate this plan was blocked on)
 
@@ -1370,6 +1390,57 @@ the committed manifest against `HEAD`: 133 entries before and after, same ids in
 **exactly one entry changed — `lzss-gallery`**. The remaining textual churn is the script's
 canonical `json.dumps(indent=2)` re-indent of a handful of entries that had been written on one
 line.
+
+### The badge, on the live site, in a real browser
+
+Deploy: tag `v1.0.592`, run
+[35018649924](https://github.com/wbniv/biohack.net/actions/runs/35018649924), conclusion
+**`success`** (the one `deploy` job succeeded; the only non-success steps are five *skipped*
+Lighthouse steps). Note the run does carry two `failure` annotations — `Task 'lighthouse' failed` —
+but that step is `continue-on-error: true` and **the identical failure is present on the two
+preceding green runs** (`34927184798`, `34926081782`), so it is pre-existing and unrelated to this
+change. It is called out here because `gh run watch … | tail` reports `0` from the *pipe*, not from
+the watch: always read `conclusion` and the per-step conclusions explicitly.
+
+Headless Chrome driven over CDP against
+[https://biohack.net/snes/lzss-gallery/?verify=1](https://biohack.net/snes/lzss-gallery/?verify=1),
+polling the real DOM (`dev`-side helper, not committed — see the note below):
+
+```
+  [    0.1s] class='(absent)'  text=''
+  [    2.4s] class='rp-badge'  text=''
+  [    9.2s] class='rp-badge running'  text='verifying… 120/24000'
+  [   38.6s] class='rp-badge running'  text='verifying Under the Wave off Kanagawa… 840/24000'
+  …
+  [  394.8s] class='rp-badge running'  text='verifying Under the Wave off Kanagawa… 9120/24000'
+  [  401.5s] class='rp-badge pass'  text='✓ FIDELITY Under the Wave off Kanagawa — repacked on-SNES to 15305 B == host oracle'
+
+terminal class : 'rp-badge pass'
+terminal text  : '✓ FIDELITY Under the Wave off Kanagawa — repacked on-SNES to 15305 B == host oracle'
+elapsed        : 401.5s
+base class kept: True
+RESULT: PASS — badge reached a pass state
+```
+
+Four things this confirms that the headless ROM gate cannot:
+
+1. **The pass string is exactly the contract's** — `✓ FIDELITY <title> — repacked on-SNES to <z> B
+   == host oracle`, with `z = 15305` resolved through `oracle[work]` client-side.
+2. **The `state == 0` window behaves as specified.** The first chunks badge a bare `verifying…`
+   with **no title**; the title only appears from 840 frames on. That is the publication barrier
+   doing its job — the player is correctly ignoring `work` while `state` is `NONE`, rather than
+   printing `work 0`'s title speculatively.
+3. **The base class survives every transition** (`rp-badge` present in all of them), which is the
+   `1.1.0` `classList` fix holding on the shape the sites actually ship.
+4. **`?verify=1` degenerates to work 0 deterministically**, as designed — frame 0 start, no
+   navigation, ready at ~9 100 frames against a 24 000 budget (2.6× margin, consistent with the
+   corpus-wide worst case of 10 879 recorded earlier).
+
+> **Method note — do not use `--virtual-time-budget --dump-dom` for this page.** It was tried first
+> and is the wrong instrument: the player verifies in `setTimeout(chunk, 0)` steps that are
+> CPU-bound WASM, so virtual time barely advances and the dump either hangs (observed: killed at
+> 240 s having produced nothing) or fires at an arbitrary mid-run moment. Poll the live DOM over
+> CDP instead — `websockets` is already available on this host, and the whole harness is ~90 lines.
 
 ### `-verify-machineinstrs` — NOT clean, and it is a pre-existing known issue
 
