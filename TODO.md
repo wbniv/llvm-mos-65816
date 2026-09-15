@@ -1959,9 +1959,14 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        ("Re-verify the retarget-once stop case"), and it is player-runtime behaviour — this repo
        owns the ROM and the gate, neither of which can drive live pad input mid-check.
      Both are covered by the curated M2 bullet "Per-image Verify fidelity button". Nothing open. -->
-- [ ] **(triage)** #117 `csrjmp` and #118 `retryjmp` — designed above, not implemented. Blocked on the `longjmp` — _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:ee7d649108b1b08f -->
-- [ ] **(triage)** `dev/backtrack.sh` + `dev/backtrack.lua` + the `expected.tsv` row + the `Taskfile.yml` entries for — _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:d33b5114c18cb172 -->
-- [ ] **(triage)** The visual half of #116 (`examples/snes/backtrack.c`: trace replay on an 8×8 board with the — _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:67dc7a98390e102e -->
-- [ ] **(triage)** `corpus/setjmp_sim.c` is not a sufficient guard for this bug class. Whatever fixes the runtime — _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:b71a8a89d0c2ab01 -->
-- [verify] **2026-09-15-116-118-setjmp-cluster-g-demos** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:722dbda1832ce59b -->
+<!-- triaged 2026-09-15: all five Cluster-G captures are the SAME blocker, already stated in full
+     in the curated M2 battery item ("Cluster G result (2026-09-15)") and in the plan's own
+     BLOCKED banner. #117 csrjmp / #118 retryjmp, dev/backtrack.sh + the expected.tsv row +
+     Taskfile entries, the examples/snes/backtrack.c visual half, and "corpus/setjmp_sim.c is not
+     a sufficient guard for this class" all wait on one open defect:
+     docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md (longjmp leaves S
+     in page 0; bug #35 still live). They are the fix's natural guards, so they belong to whoever
+     lands it, not to a separate backlog row. The [verify] capture is correct-but-moot: the plan's
+     verification section records the BLOCKED evidence rather than a PASS, deliberately — the gate
+     is not weakened to manufacture one. Nothing separately open. -->
 <!-- END auto-captured-deferrals -->
