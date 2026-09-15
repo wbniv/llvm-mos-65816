@@ -1417,3 +1417,190 @@ Sharpest at re-breaking an incompletely-generalized fix (highest bug-yield), or 
   the realization of the long-blocked idea #35: a recursive backtracking `longjmp` unwinds many frames per
   jump, exercising the page-1 S reconstruct + CSR/soft-SP restore that the one-frame `corpus/setjmp_sim.c`
   guard never stresses. Highest-value because the fix is days old and a runtime/library defect is silent.
+
+# Round 8 (#142–#160) — the un-entered backend paths: branches the compiler HAS that no demo takes
+
+Rounds 1–5 (#1–#92) hunted **new** codegen corners; Round 6 (#93–#118) re-stressed every bug we had
+already **fixed**; Round 7 (#119–#141) was a targeted defect-hunting audit. All three are complete, and
+between them they exhausted the question Rounds 2–5 were built around — *"which generic opcode has no
+demo?"*. Every opcode a plain C program can form now has one.
+
+Round 8 asks a **narrower and sharper** question: *which **branch** of an already-exercised rule has never
+fired?* That is a different search space, and it is where the remaining bugs actually live. A legalizer
+handler containing `if (STI.hasJMPIdxIndir() && Table.MBBs.size() <= 128)` has **two** implementations;
+141 demos have taken exactly one of them and the other has never been compiled in this project. An ABI
+classifier that routes both returns *and* arguments through `getNaturalAlignIndirect` has been validated on
+returns only. A `.custom()` rule whose one C-level trigger const-folds in every existing demo is, in
+practice, dead code with a test-suite that believes it is covered.
+
+**Every corner below was MEASURED in this tree, not inferred.** The audit compiled all 100+
+`examples/snes/corpus/*.c` with `-S` (counting emitted libcalls and jump-table forms) and with
+`-mllvm -print-before=legalizer` (counting generic opcodes actually formed), then cross-referenced
+`vendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp` and
+`vendor/llvm-mos/clang/lib/CodeGen/Targets/MOS.cpp`. Where a corner turned out **not to be constructible
+from plain C**, that is recorded as a negative result rather than proposed as a demo — see the last row.
+
+Same bar as every prior round: a shared host+target logic header, a differential CRC
+(`host == default == +mos-a16 == +mos-xy16` on MAME + bsnes-jg), `-verify-machineinstrs` clean, a `snesgfx`
+render, the picture *is* the proof. Every corner is integer-exact (or correctly-rounded IEEE) by
+construction. Full audit method + commands: [plan](../plans/2026-09-16-round8-unentered-backend-paths.md).
+
+## Untested-corner coverage map (the point of Round 8)
+
+| Un-entered path | Backend site | Measured evidence no demo #1–#141 enters it | Demo |
+|---|---|---|---|
+| **Split lo/hi jump table** — the `else` arm of `legalizeBrJt`: two `G_LOAD_ABS_IDX` over separate low-byte and high-byte tables (the high one under a distinct `MO_HI_JT` relocation flavour) reassembled into a pointer for `G_BRINDIRECT`. Taken only when a switch has **>128** successors | `MOSLegalizerInfo.cpp:443` `G_BRJT .customIf`; handler `legalizeBrJt` ≈3311; the `Table.MBBs.size() <= 128` test ≈3334 | Exactly **5** corpus slices form a jump table at all (`bf_vm_sim`, `cordic_sim`, `duff_sim`, `perlin_sim`, `turtle-vm_sim`) and **all five** take the `jmp (.LJTI0_0,x)` `JMPIdxIndir` arm — VM dispatches of 8–16 cases and a Duff's device of 8, every one comfortably inside 128. A synthesized 200-case switch takes the other arm (`lda .LJTI0_0,x` + a 512-byte table), verify-clean in all three modes: the arm is reachable, correct-looking, and **has never been compiled by this project's test suite** | 142 |
+| **`G_DYN_STACKALLOC`** — a *genuinely* runtime-sized VLA: the soft stack pointer adjusted by a value the compiler cannot fold | `MOSLegalizerInfo.cpp:456` `.custom()` | **Zero** corpus slices form `G_DYN_STACKALLOC`. #68 `polyfill` has a VLA (`int16_t xs[nv]`) but `nv` const-folds at its one call site, so it forms only `G_STACKSAVE`/`G_STACKRESTORE` over a *fixed*-size alloca. The save/restore pair is covered; the dynamic **allocation** — the one part that touches `__rc0`/`__rc1` with a computed delta — is not | 143 |
+| **`G_USUBO` / `G_SSUBO`** — subtract-with-overflow, custom-lowered separately from the add forms | `MOSLegalizerInfo.cpp:296` (rule), `:2031`/`:2034` (custom cases) | `__builtin_sub_overflow` appears **0** times tree-wide. `__builtin_add_overflow` appears 7× (#44 `hdr-bloom`) and `__builtin_mul_overflow` 14× (#76 `smulorbit`, #101 `mulov64`). A borrow is the *inverse sense* of the carry the add form tests, and the signed-subtract overflow predicate is not the signed-add one | 144 |
+| **Large record passed BY VALUE as an ARGUMENT** — `getNaturalAlignIndirect(…, ByVal=false)` for any aggregate over 32 bits | `clang/lib/CodeGen/Targets/MOS.cpp:64` `classifyArgumentType`, the `getTypeSize(Ty) > 32` test at `:71` | #91 `matcascade` validated the **return** half of the same helper (`classifyReturnType`, `MOS.cpp:89`). #26 `boids` and #60 pass 32-bit records — exactly *at* the threshold, so they take `getDirect`. **No demo passes a >32-bit record by value.** `ByVal=false` is the sharp part: the callee gets a pointer to the *caller's* object, so a callee that mutates its own by-value parameter needs a copy first, and a missing copy corrupts the caller silently, with no crash and nothing wrong in the callee's own result | 145 |
+| **`G_FPEXT` S32→S64 / `G_FPTRUNC` S64→S32** — `__extendsfdf2` / `__truncdfsf2` | `MOSLegalizerInfo.cpp:375` / `:376` `.libcallFor` | **Zero** corpus slices link either symbol. #57 `mandel-double` uses `double` throughout but only ever forms `__floatunsidf` (integer→double). Nothing in the battery *promotes a float to a double* or *demotes one back* — the two conversions with the most mantissa-rounding surface of any in the SDK | 146 |
+| **`memcmp` / `strcmp` / `strncmp` / `bsearch`** | SDK/compiler-rt + clang's inline small-`memcmp` expansion | **Zero** uses tree-wide. `strlen` (1×) and `qsort` (15×) are the only string/search libc the battery touches. `bsearch` is a genuinely *different* callback ABI from `qsort` — it returns a `void*` **into** the array instead of permuting it, so the comparator's result drives an interval bisection rather than a swap decision | 147–148 |
+| **`__attribute__((packed))` misaligned wide member** | load/store decomposition | **Zero** packed structs tree-wide. #52 `disbits` covers *bitfields* crossing byte boundaries (shift+mask over a `uint32_t`); nothing covers a naturally-typed `uint16_t`/`uint32_t` member sitting at an **odd byte offset**, which is a different lowering — a decomposed multi-byte access, not a mask | 149 |
+| **`G_TRAP` `.custom()`** | `MOSLegalizerInfo.cpp:448` | Zero `__builtin_trap` / `__builtin_unreachable` uses. Differential-awkward (a trap terminates, so it cannot be *taken* in a gate run) but testable as an **untaken** path whose mere presence must not perturb surrounding codegen | 150 |
+| **`G_PTRMASK` (`:279`), `G_FREEZE` (`:460`), `G_FFREXP` (`:366` — "*will fail if encountered*"), `G_FCANONICALIZE` (`:373`)** | — | Un-entered, and **measured NOT constructible from plain C**: `__builtin_align_down`/`align_up` const-fold rather than forming `G_PTRMASK`; `G_FREEZE` is an optimizer artifact with no source spelling; `G_FFREXP` needs `frexpf`, which the SDK does not ship (the same link gap #83 `truncstair` documented for `floorf`/`ceilf`/`truncf`). **Recorded as the round's negative result so a future round does not re-derive it — not proposed as demos.** | — |
+
+## The nineteen (each enters a branch the first 141 never take)
+
+### Control flow the legalizer has two implementations of
+
+142. **256-Opcode Decoder (`jt256`).** *Stresses:* the `else` arm of `legalizeBrJt` — a **256-case**
+    switch (a 65816 instruction decoder: every opcode `$00`–`$FF` gets its own `case` yielding that
+    opcode's addressing mode, operand length and cycle count) blows past the `Table.MBBs.size() <= 128`
+    test, so `JMP (abs,X)` is unusable and the legalizer must instead build **two** parallel byte tables,
+    index each with `G_LOAD_ABS_IDX`, reassemble a 16-bit pointer and `G_BRINDIRECT` through it, with the
+    high table under a distinct `MO_HI_JT` relocation. Unlike #42 `bf-vm` / #51 `turtle-vm` / #37 `cpu6502`
+    (8–16-case dispatches, all on the `jmp (.LJTI,x)` arm). *Shows:* a live disassembly of a real byte
+    stream scrolling past, each instruction coloured by decoded addressing mode, with the opcode-space
+    map (16×16) lighting up as each opcode is first reached. *Verified present:* the arm fires on a
+    synthesized 200-case switch (`lda .LJTI0_0,x`, 512-byte table), `-verify` clean in all three modes.
+    *Differential:* integer-exact — CRC folds the (mode, length, cycles) triple of every decoded byte plus
+    the reconstructed instruction boundaries; a wrong table entry is a wrong disassembly, visible and
+    CRC-divergent. **← the sharpest Round-8 probe.**
+
+143. **Run-Length Scanline Decoder (`vlastack`).** *Stresses:* `G_DYN_STACKALLOC` — a VLA whose length
+    comes from the compressed data, so the soft stack pointer is adjusted by a value the optimizer cannot
+    fold, inside a loop that re-does it per row (with `G_STACKSAVE`/`G_STACKRESTORE` bracketing a genuinely
+    *variable* allocation, not #68 `polyfill`'s const-folded one). *Shows:* an image decompressing row by
+    row, with a live gauge of each row's scratch-allocation size and the soft-stack high-water mark.
+    *Differential:* integer-exact — CRC folds the decoded image plus the per-row allocation sizes.
+
+144. **Reservoir Ladder (`borrowov`).** *Stresses:* `G_USUBO`/`G_SSUBO` via `__builtin_sub_overflow` on
+    `uint16_t` (borrow-out) **and** `int16_t`/`int32_t` (signed overflow) in one ROM — the one
+    overflow-builtin family the battery has never used. Unlike #44 `hdr-bloom` (`add_overflow`, a carry
+    test) and #76/#101 (`mul_overflow`). *Shows:* a cascade of reservoirs draining into each other; every
+    transfer is a checked subtract, and a detected underflow is a first-class event — the transfer is
+    rejected and the level visibly bounces. *Differential:* the **outcome** (accept/reject counts, final
+    level vector) is folded, never a raw undefined value.
+
+145. **Affine Stage Pipeline (`bigbyval`).** *Stresses:* the `> 32`-bit by-value **argument** path
+    (`getNaturalAlignIndirect(ByVal=false)`) — a `Mat3` of nine `int16_t` (144 bits) passed by value
+    through a chain of stages, each of which **mutates its own parameter** before returning a derived
+    record, after which the caller re-reads its original. Unlike #91 `matcascade` (the sret **return**
+    half of the same helper) and #26 `boids` (32-bit records, `getDirect`). *Shows:* a wireframe object
+    pushed through a visible stack of named transform stages, with each stage's matrix drawn as a 3×3
+    grid. *Differential:* CRC folds every stage output **and** the caller's post-call re-read of its own
+    original — the second term is what catches a missing `ByVal` copy, which is otherwise silent.
+
+### Conversion, comparison and layout paths with no demo
+
+146. **Precision Bridge (`dblbridge`).** *Stresses:* `G_FPEXT` S32→S64 and `G_FPTRUNC` S64→S32
+    (`__extendsfdf2`/`__truncdfsf2`) — the float↔double *promotion* pair, zero corpus slices of which link
+    either symbol today. Unlike #57 `mandel-double` (double arithmetic, but only `__floatunsidf` in). The
+    point is the round-trip as a **precision instrument**: iterate a chaotic map at `float`, again at
+    `double`, and demote the double result back to `float` each step, so the demo renders the divergence
+    between the two precisions. *Shows:* two orbit traces separating, with the first-divergence step
+    called out. *Differential:* correctly-rounded IEEE only, never a libm transcendental; the CRC folds
+    the demoted `float` bit patterns, which are exactly specified.
+
+147. **Bisection Oracle (`bsearchviz`).** *Stresses:* `bsearch` — a callback ABI the battery has never
+    linked, structurally unlike `qsort`'s: the comparator's three-way result drives an **interval
+    bisection** and the call returns a `void*` *into* the array (or null), so the result is a pointer the
+    caller must convert back to an index. *Shows:* a sorted field with the probe sequence lighting up as
+    each lookup bisects, and misses drawn distinctly from hits. *Differential:* CRC folds every found
+    index (and the miss sentinel) over a fixed query set; a wrong pointer→index conversion diverges it.
+
+148. **Lexicographic Race (`strcmprace`).** *Stresses:* `memcmp`/`strcmp`/`strncmp` — zero uses tree-wide,
+    and clang's **inline small-`memcmp` expansion** is a distinct lowering from a libcall (a fixed-length
+    byte-compare chain with early exit). Contrast #66 `editdist` (hand-written character comparison) and
+    #46 `qsortviz` (numeric comparators). *Shows:* string lanes sorting/merging under a real lexicographic
+    order, with the byte position at which each comparison resolved highlighted. *Differential:* CRC folds
+    the **sign** of every comparison (not the magnitude, which is implementation-defined) plus the final
+    ordering.
+
+149. **Unaligned Record Reader (`packrec`).** *Stresses:* `__attribute__((packed))` — a naturally-typed
+    `uint16_t`/`uint32_t` member at an **odd byte offset**, which decomposes into a multi-byte access
+    rather than the shift-and-mask #52 `disbits` produces for bitfields. Zero packed structs exist in the
+    tree. *Shows:* a packed binary record stream parsed live, each field drawn at its true bit offset in a
+    byte-ruler view. *Differential:* integer-exact; CRC folds every parsed field.
+
+150. **Unreachable Sentinel (`trapguard`).** *Stresses:* `G_TRAP` `.custom()` as an **untaken** path —
+    `__builtin_trap`/`__builtin_unreachable` on the impossible arm of a dense state machine, where the
+    interesting question is not that the trap works but that its *presence* does not perturb the
+    surrounding block's codegen or flag liveness. Honest framing: the trap can never be taken in a gate
+    run, so this is a **presence-and-inertness** probe, weaker than 142–145. *Shows:* a state machine
+    whose guarded-impossible transitions are drawn as greyed edges. *Differential:* CRC folds the reachable
+    state trace; the structure gate asserts the trap instruction is present in the ROM.
+
+### Escalations of paths that are covered, but only at one width or one shape
+
+151. **Nested VLA Pyramid (`vlanest`).** *Stresses:* two VLAs live in **nested** scopes with independent
+    runtime lengths, so a `G_STACKSAVE`/`G_STACKRESTORE` pair brackets another such pair and the soft-SP
+    unwind must nest correctly — the depth axis #143 does not touch.
+
+152. **Jump-Table Boundary Sweep (`jtedge`).** *Stresses:* switches at **127, 128 and 129** successors in
+    one ROM, so both `legalizeBrJt` arms and the exact `<= 128` boundary are compiled side by side.
+    Boundary-off-by-one is the classic failure of a size-gated lowering, and no existing test sits anywhere
+    near the edge.
+
+153. **Sparse Switch Ladder (`jtsparse`).** *Stresses:* a switch whose cases are **sparse** (0, 100, 1000,
+    …) so the optimizer chooses a *binary-search compare tree* rather than a jump table — the third
+    switch-lowering strategy, distinct from both `legalizeBrJt` arms, and never deliberately forced.
+
+154. **By-Value Boundary Trio (`byvaledge`).** *Stresses:* records of exactly **32, 33 and 40 bits** passed
+    by value in one ROM, straddling the `getTypeSize(Ty) > 32` classifier test so `getDirect` and
+    `getNaturalAlignIndirect` are compiled adjacently. Same boundary logic as #152, on the ABI side.
+
+155. **Overflow Family Matrix (`ovmatrix`).** *Stresses:* all three overflow builtins (add/sub/mul) at all
+    three widths (16/32/64) in one kernel, so the **signed** and **unsigned** forms of each sit next to
+    each other under register pressure — the interaction #44/#76/#101/#144 each test in isolation.
+
+156. **Varargs Width Sweep (`vawidth`).** *Stresses:* `G_VAARG` at 8/16/32/64-bit and pointer arguments in
+    one call — #63 `vaprintf` covers varargs, but at a narrow set of widths; the s64 and pointer `va_arg`
+    slots are the untested ones.
+
+157. **Recursive sret Chain (`sretrec`).** *Stresses:* a >32-bit record returned from a **recursive**
+    function, so the hidden sret slot is re-allocated per frame on the soft stack and the caller's result
+    slot is itself a callee's argument — #91 `matcascade`'s chained returns were non-recursive.
+
+158. **Indirect Call Arity Fan (`arityfan`).** *Stresses:* a table of function pointers with **differing
+    signatures** called through correctly-typed casts, so the indirect-call argument marshalling differs
+    per entry — the battery's function-pointer demos all use one uniform signature.
+
+159. **Extending-Load Sign Matrix (`extload`).** *Stresses:* `G_SEXTLOAD`/`G_ZEXTLOAD` `.custom()` (`:420`)
+    deliberately at every source/destination width pair, including the `G_ZEXTLOAD → G_MERGE_VALUES(lo,
+    0)` fold the legalizer comments call out at `:2462`, which no demo forms on purpose.
+
+160. **Address-Space Cast Ladder (`ascast`).** *Stresses:* `G_ADDRSPACE_CAST` (`:152`) — near→far pointer
+    widening as an explicit, repeated operation rather than an incidental one. **3-way bar** (far), like
+    Round 6's Cluster F.
+
+## Round 8 first picks
+
+The first cluster (built and gated by [the Round 8 plan](../plans/2026-09-16-round8-unentered-backend-paths.md)) is
+**#142–#145** — the four paths where the measured evidence is strongest that the compiler has code no
+demo has ever executed, ordered by sharpness rather than by how pretty the picture is:
+
+- **#142 `jt256`** — the single sharpest probe: an entire `else` arm of `legalizeBrJt`, plus its own
+  `MO_HI_JT` relocation flavour, that this project has **never compiled**. Every one of the five jump
+  tables in the tree takes the other arm.
+- **#145 `bigbyval`** — the most *dangerous* shape: `ByVal=false` means a missing callee copy corrupts the
+  **caller's** object with no crash, nothing wrong in the callee's own return value, and no verifier
+  complaint. Silent-wrong is the bug class this battery exists for.
+- **#143 `vlastack`** — a `.custom()` legalizer rule that the one demo which *looks* like it covers the
+  path (#68 `polyfill`) const-folds away from, so the coverage is currently illusory.
+- **#144 `borrowov`** — the one overflow-builtin family never used, whose flag sense is the *inverse* of
+  the one that is.
+
+Deferred to later Round 8 clusters: #146–#150 (fresh paths, lower measured risk), #151–#160 (boundary and
+width escalations of paths that already have one shipped demo).
+

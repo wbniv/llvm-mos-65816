@@ -494,6 +494,47 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   **Status (2026-07-02): Rounds 1–5 (#1–#92) all shipped + live; Round 6 (harden-the-fixes, #93–#118) DRAFTED, in progress.**
   **Rounds 6 and 7 (#93–#141) both now COMPLETE.** Dispatched 2026-09-15 to draft and start Round 8
   (`#142+`) — a fresh untested-corner coverage audit plus a first cluster of new demos.
+  **Round 8 (#142–#160) DRAFTED 2026‑09‑16; Cluster A (#142–#145) BUILT + gated.**
+  [Round 8 section](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md) ·
+  [plan](docs/plans/2026-09-16-round8-unentered-backend-paths.md). The round's angle is new and
+  narrower than Rounds 2–5's: not *"which opcode has no demo?"* (exhausted — every opcode plain C
+  forms now has one) but ***"which branch of an already-exercised rule has never fired?"*** A
+  legalizer handler gated on `Table.MBBs.size() <= 128` has two implementations and 141 demos took
+  one of them; an ABI classifier routing both returns *and* arguments through
+  `getNaturalAlignIndirect` was validated on returns only. Every corner was **measured** — the audit
+  compiled all 100+ corpus slices with `-S` and `-print-before=legalizer` and counted what actually
+  formed — and the corners that turned out **not constructible from plain C** (`G_PTRMASK`,
+  `G_FREEZE`, `G_FFREXP`, `G_FCANONICALIZE`) are recorded as the round's negative result rather than
+  proposed as demos. **Publishing stays out of scope**, as for Cluster G.
+  - **#142 `jt256` — BUILT + gated.** ISA-256, a bytecode machine whose **256-way** opcode dispatch is
+    double `legalizeBrJt`'s limit, so the `JMP (abs,X)` arm is structurally unreachable and the
+    **split low/high byte-table + `G_BRINDIRECT`** arm (its own `MO_HI_JT` relocation) must fire.
+    All five jump tables across #1–#141 (`bf_vm`, `cordic`, `duff`, `perlin`, `turtle-vm`) take the
+    other arm, so this is the first program in the project to compile it. `corpus_result = 0xB8CC`.
+  - **#143 `vlastack` — BUILT + gated.** An RLE scanline decoder whose per-row scratch array is a VLA
+    sized from the compressed stream, in the loop body — the first `G_DYN_STACKALLOC` in the tree.
+    #68 `polyfill`'s VLA const-folds to a fixed alloca, so the existing coverage of this path was
+    **illusory**: `G_STACKSAVE`/`G_STACKRESTORE` only. `corpus_result = 0xD77B`.
+  - **#144 `borrowov` — BUILT + gated.** A reservoir cascade where every transfer is a checked
+    subtract — `__builtin_sub_overflow` at `uint16` (borrow out), `int16` and `int32` (signed,
+    opposite-sign operands: the pairing an *add* can never overflow on). That builtin appears **zero**
+    times across #1–#141; only the add (#44) and mul (#76/#101) forms. `corpus_result = 0x81FB`.
+  - **#145 `bigbyval` — BUILT + gated.** A 144-bit record passed **by value as an argument**, which
+    `classifyArgumentType` sends indirect with **`ByVal=false`** — the callee gets a pointer to
+    caller-owned storage, so by-value semantics rest entirely on a call-site copy. Each stage mutates
+    its own parameter and the driver re-reads its original: a missing copy corrupts the *caller*, with
+    no crash, a correct callee result and a clean verifier. #91 `matcascade` covered only the **return**
+    half of the same helper. `corpus_result = 0xBD6B`.
+  - **Cluster A verdict: four clean positives — no compiler bug found.** Every one of the four
+    un-entered paths lowers correctly: `host == default == +mos-a16 == +mos-xy16` on MAME **and**
+    bsnes-jg, `-verify-machineinstrs` clean in all three modes, and each demo's structure gate
+    confirms the intended shape actually reached the ROM rather than folding into an already-covered
+    one. Remaining Round 8 work (later clusters, dispatched separately): **#146–#150** are fresh paths
+    of lower measured risk (float↔double `__extendsfdf2`/`__truncdfsf2`, `bsearch`,
+    `memcmp`/`strcmp`, packed-struct misaligned members, `G_TRAP` inertness); **#151–#160** are
+    boundary and width escalations of paths that already have one shipped demo (the 127/128/129
+    jump-table edge, the 32/33/40-bit by-value ABI edge, nested VLAs, sparse-switch compare trees,
+    `va_arg` width sweep, recursive `sret`).
   **2026‑09‑15: Cluster G has caught two real bugs.** `#116 backtrack` found that `longjmp`'s page‑1
   hard-stack reconstruction never executed (the assembler sized a `rep #$20`-mode immediate by value, not
   by mode, so the CPU read past it into the next opcode at runtime) — FIXED in `platforms/snes/setjmp.S`

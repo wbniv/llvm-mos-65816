@@ -826,6 +826,74 @@ tasks:
       - task: mandel-mame
         vars: { ROM: retryjmp }
 
+  jt256:
+    desc: "#142 (Round 8, the un-entered backend paths, Cluster A): ISA-256 Bytecode Machine — the >128-successor jump-table guard. legalizeBrJt (MOSLegalizerInfo.cpp:443, handler ~3311) picks between `JMP (abs,X)` and a SPLIT low-byte/high-byte table pair (the high one under its own MO_HI_JT relocation) fed into G_BRINDIRECT, on `Table.MBBs.size() <= 128`. All five jump tables across demos #1-#141 are 8-16-case VM dispatches and take the first arm; ISA-256's 256-way dispatch is structurally over the limit, so this is the first program in the project to compile the second. The executed program draws a phase portrait, with the 16x16 opcode-space map lighting each handler as it is first entered. Assert corpus_result (jt256_gate_crc 0xB8CC) == host on MAME + bsnes-jg + structure gate (>=2 jump-table loads, ZERO jmp (abs,X), >=512 table entries, 256/256 handlers entered) in all three modes. Leaves build/jt256.sfc + build/jt256-{mame,jg}.png."
+    cmds:
+      - dev/run.sh jt256
+
+  jt256-play:
+    desc: "PLAY the ISA-256 Bytecode Machine demo in MAME (builds first if needed). A 256-way dispatch drawing its own phase portrait, with a live opcode-coverage map."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/jt256.sfc ]; then
+          echo "==> build/jt256.sfc missing -- building (dev/run.sh jt256)..."
+          dev/run.sh jt256
+        fi
+      - task: mandel-mame
+        vars: { ROM: jt256 }
+
+  vlastack:
+    desc: "#143 (Round 8, the un-entered backend paths, Cluster A): Run-Length Scanline Decoder — the G_DYN_STACKALLOC guard (MOSLegalizerInfo.cpp:456, `.custom()`). Each row's scratch array is a VLA sized by the run count read out of the compressed stream and declared in the loop body, so the soft stack pointer is adjusted and restored once per row with a different delta. Zero demos #1-#141 form G_DYN_STACKALLOC: #68 polyfill's VLA const-folds to a fixed alloca, covering only the G_STACKSAVE/G_STACKRESTORE pair. The image decompresses row by row with a bar gauge showing each row's allocation size. Assert corpus_result (vlastack_gate_crc 0x5DF6) == host on MAME + bsnes-jg + structure gate (all three opcodes formed in all three modes, soft-SP written >=2x, allocation sizes genuinely vary). Leaves build/vlastack.sfc + build/vlastack-{mame,jg}.png."
+    cmds:
+      - dev/run.sh vlastack
+
+  vlastack-play:
+    desc: "PLAY the Run-Length Scanline Decoder demo in MAME (builds first if needed). An image decompressing row by row, each row through a differently-sized runtime VLA."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/vlastack.sfc ]; then
+          echo "==> build/vlastack.sfc missing -- building (dev/run.sh vlastack)..."
+          dev/run.sh vlastack
+        fi
+      - task: mandel-mame
+        vars: { ROM: vlastack }
+
+  borrowov:
+    desc: "#144 (Round 8, the un-entered backend paths, Cluster A): Reservoir Ladder — the G_USUBO/G_SSUBO guard (MOSLegalizerInfo.cpp:296; custom cases :2031/:2034). Every transfer in a reservoir cascade is a checked subtract via __builtin_sub_overflow at uint16 (a BORROW out, the inverse sense of the add form's carry), int16 and int32 (signed, where OPPOSITE-sign operands are what can overflow — exactly backwards from add), with a detected underflow rejecting the transfer and bouncing the level. __builtin_sub_overflow appears ZERO times across demos #1-#141; only the add (#44 hdr-bloom) and mul (#76 smulorbit, #101 mulov64) forms. Assert corpus_result (borrowov_gate_crc 0x81FB) == host on MAME + bsnes-jg + structure gate (G_USUBO and G_SSUBO both formed in all three modes, and every width actually rejected at run time so both arms of each predicate are live). Leaves build/borrowov.sfc + build/borrowov-{mame,jg}.png."
+    cmds:
+      - dev/run.sh borrowov
+
+  borrowov-play:
+    desc: "PLAY the Reservoir Ladder demo in MAME (builds first if needed). Twelve reservoirs draining through checked subtracts; rejected underflows flash red."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/borrowov.sfc ]; then
+          echo "==> build/borrowov.sfc missing -- building (dev/run.sh borrowov)..."
+          dev/run.sh borrowov
+        fi
+      - task: mandel-mame
+        vars: { ROM: borrowov }
+
+  bigbyval:
+    desc: "#145 (Round 8, the un-entered backend paths, Cluster A): Affine Stage Pipeline — the >32-bit BY-VALUE ARGUMENT guard. MOSABIInfo::classifyArgumentType (clang/lib/CodeGen/Targets/MOS.cpp:64) routes any aggregate over 32 bits to getNaturalAlignIndirect(..., ByVal=false) at :71, so the callee receives a POINTER to caller-owned storage and C's by-value semantics hold only because the front end copies into a call-site temporary. A 144-bit BvMat and a 64-bit BvVert travel through six stages that each MUTATE their own parameter, and the driver re-reads its own original after every call — a missing copy corrupts the CALLER, with no crash, a still-correct callee result and no verifier complaint. #91 matcascade validated only the RETURN half of the same helper. Assert corpus_result (bigbyval_gate_crc 0xBD6B) == host on MAME + bsnes-jg + structure gate (both records >32 bits, indirect pointer arguments with their call-site copies present in all three modes, zero caller-visible by-value violations). Leaves build/bigbyval.sfc + build/bigbyval-{mame,jg}.png."
+    cmds:
+      - dev/run.sh bigbyval
+
+  bigbyval-play:
+    desc: "PLAY the Affine Stage Pipeline demo in MAME (builds first if needed). A 144-bit matrix pushed by value through six mutating stages, with the caller's own copy re-read each time."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/bigbyval.sfc ]; then
+          echo "==> build/bigbyval.sfc missing -- building (dev/run.sh bigbyval)..."
+          dev/run.sh bigbyval
+        fi
+      - task: mandel-mame
+        vars: { ROM: bigbyval }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:

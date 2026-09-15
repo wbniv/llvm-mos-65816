@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -368,6 +368,44 @@ Targets:
              on MAME + bsnes-jg + a structure gate + the +mos-xy16 -verify regression gate for
              the A16-clobber miscompile this demo found, screenshots both
              (build/retryjmp-{mame,jg}.png). 5-way differential: corpus-a16 (retryjmp_sim).
+  jt256      #142 Round 8 Cluster A: the ISA-256 Bytecode Machine — a 256-way opcode dispatch,
+             double legalizeBrJt's `Table.MBBs.size() <= 128` limit, so the `JMP (abs,X)` arm is
+             structurally unreachable and the SPLIT low-byte/high-byte table + G_BRINDIRECT arm
+             (with its own MO_HI_JT relocation) must fire. All five jump tables across demos
+             #1-#141 take the other arm, so this is the first program in the project to compile
+             it. Asserts corpus_result (jt256_gate_crc 0xB8CC) == host on MAME + bsnes-jg + a
+             structure gate (>=2 jump-table loads, ZERO jmp (abs,X), >=512 table entries, all
+             256 handlers entered) in all three modes, screenshots both
+             (build/jt256-{mame,jg}.png). 5-way differential: corpus-a16 (jt256_sim).
+  vlastack   #143 Round 8 Cluster A: the Run-Length Scanline Decoder — each row's scratch array
+             is a VLA sized by the run count read out of the compressed stream, declared in the
+             loop body, so the soft SP is adjusted and restored once per row with a different
+             delta (G_DYN_STACKALLOC, MOSLegalizerInfo.cpp:456). Zero demos #1-#141 form it —
+             #68 polyfill's VLA const-folds to a fixed alloca. Asserts corpus_result
+             (vlastack_gate_crc 0x5DF6) == host on MAME + bsnes-jg + a structure gate
+             (G_DYN_STACKALLOC/G_STACKSAVE/G_STACKRESTORE all formed, soft-SP written >=2x, and
+             the allocation sizes genuinely vary), screenshots both
+             (build/vlastack-{mame,jg}.png). 5-way differential: corpus-a16 (vlastack_sim).
+  borrowov   #144 Round 8 Cluster A: the Reservoir Ladder — every transfer in a cascade is a
+             checked subtract via __builtin_sub_overflow at uint16 (borrow out), int16 and
+             int32 (signed, opposite-sign operands), with a detected underflow rejecting the
+             transfer. __builtin_sub_overflow appears ZERO times across demos #1-#141; only the
+             add (#44) and mul (#76/#101) forms. Asserts corpus_result (borrowov_gate_crc
+             0x81FB) == host on MAME + bsnes-jg + a structure gate (G_USUBO and G_SSUBO both
+             formed in all three modes, and every width actually rejected at run time so both
+             arms of each predicate are live), screenshots both
+             (build/borrowov-{mame,jg}.png). 5-way differential: corpus-a16 (borrowov_sim).
+  bigbyval   #145 Round 8 Cluster A: the Affine Stage Pipeline — a 144-bit record passed BY
+             VALUE as an ARGUMENT, which classifyArgumentType (clang Targets/MOS.cpp:64) sends
+             indirect with ByVal=false at :71, so the callee gets a pointer to caller-owned
+             storage and C's by-value semantics rest entirely on a call-site copy. Every stage
+             MUTATES its own parameter and the driver re-reads its original afterwards — a
+             missing copy corrupts the CALLER silently. #91 matcascade covered only the RETURN
+             half of the same helper. Asserts corpus_result (bigbyval_gate_crc 0xBD6B) == host
+             on MAME + bsnes-jg + a structure gate (both records >32 bits, indirect pointer
+             arguments with their call-site copies present in all three modes, and zero
+             caller-visible by-value violations), screenshots both
+             (build/bigbyval-{mame,jg}.png). 5-way differential: corpus-a16 (bigbyval_sim).
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for
