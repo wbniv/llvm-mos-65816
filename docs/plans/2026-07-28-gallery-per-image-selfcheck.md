@@ -519,14 +519,25 @@ correctness assertion rather than a liveness ping: a broken codec moves the numb
 
 3. `dev/verify-web-roms.sh --only lzss-gallery` passes.
 
-**NOT RUN — blocked on the republish.** The shipped `~/biohack.net/public/play/roms/lzss-gallery.sfc`
-is still the pre-fix ROM, so this check would assert the new value against the old binary. It runs
-once the gallery ROM is rebuilt and published.
+```
+  lzss-gallery     PASS  (24000 frames, Under the Wave off Kanagawa: repacked on-SNES to 15305 B == host oracle)
+
+verify-web-roms: 1 passed, 0 failed, 0 missing
+ALL PASS — safe to publish
+```
+
+**PASS** (2026‑09‑15). This is the live-record path end to end: `jgxcheck` polled the record at
+`0x477` under `JGX_POLL` until `state == 2` (`GALLERY_SHOWN_VERIFIED`), then the post-check read the
+5-byte record out of that same run's WRAM dump and asserted `ok == 1 && z == oracle[work]` — `work 0`,
+`z = 15305`, matching `report.json[0].compressed_bytes` for `great-wave`. The force-blank bleed scan
+(`JGX_BLANKSCAN`, default 4 rows) passed on the same run, so nothing was relaxed to get here.
 
 4. Live check after deploy: both sites serve the new manifest and the button passes in-page.
 
-**NOT RUN — blocked on the republish.** (Scope correction: only biohack.net has a
-`public/play/roms/manifest.json`; indri.studio has none.)
+**PASS (manifest leg), NOT VISUALLY CONFIRMED (badge leg)** — see *Status (2026-09-15) — step 4
+landed* below for the deployed-manifest evidence and the exact gap. (Scope correction, unchanged:
+only biohack.net has a `public/play/roms/manifest.json`; `~/indri.studio/public/play/` has no
+`roms/` directory at all, so there is nothing to republish there.)
 
 ### Added 2026‑07‑31 — the works 0–3 repack differential (the gate this plan was blocked on)
 
@@ -1283,6 +1294,105 @@ these commits must not be deployed before the push.
 
 User-gated sequence, in order: push `npm-package` → `pnpm update @wbniv/bsnes-jg-player` on each site
 → (optional) `npm publish` → gallery republish + `mode: "live-record"` manifest flip → tag to deploy.
+
+## Status (2026-09-15) — step 4 landed: the gallery is republished and the manifest is on `live-record`
+
+The last step of the plan. `~/biohack.net` commit `5e419b7` carries the rebuilt ROM **and** the
+flipped manifest entry in one commit, which is mandatory rather than tidy: `off` is
+`gallery_shown`'s link address, and `dev/sync-manifest-offsets.py` refuses to trust
+`build/lzss-gallery.map` unless `build/lzss-gallery.sfc` is byte-identical to the shipped ROM.
+
+`indri.studio` is **not** in scope and now confirmed by inspection, not by assumption:
+`~/indri.studio/public/play/` has no `roms/` directory at all, so there is no ROM and no manifest
+to republish there.
+
+### The ROM that shipped
+
+`dev/run.sh lzss-gallery`, full gate, current toolchain (which had moved — `faaabec` xy16 and the
+0018/0021 patches all post-date the last full run, so this was a real re-proof, not ceremony):
+
+```
+==> producer gate: no non-GPR LDImm destinations (#138)
+  PASS: all 1044 LDImm destinations are GPRs
+NMI opcode audit: PASS (long conditional and 16-bit immediate are explicit)
+decode_bank7e ABI audit: PASS (A-safe PEA/PLB; 08 8b f4 7e 7e ab ab 20 8c 82 ab 28 60)
+bank $00 asset gate: PASS (FONT16=$15:EF29, FONT8=$07:FB54; 5836 B before header)
+==> fast decode gate (GALLERY_BENCH_ONLY, all 62 works)
+SMOKE: PASS off=0x24 len=2 got=0x5CF0 (ran 30000 frames, bsnes-jg)
+fast decode gate: PASS (all 62 works far-decoded, staged, near-decoded, checksummed)
+SMOKE: PASS off=0x3F len=2 got=0x0001 (ran 5000 frames, bsnes-jg)
+automatic joypad navigation gate: PASS (Right accepted during foreground decode)
+==> corpus_result @ WRAM 0x46f; oracle 0x9512
+SMOKE: PASS off=0x46F len=2 got=0x9512 (ran 700000 frames, bsnes-jg)
+==> reproducible-build check (relink and compare)
+reproducible build: PASS (8a17693dbdefc3466b2d62d7d094da1e5df756ef2aa4c60031c0e824b01837dd)
+RESULT: PASS — 62-work LZSS gallery host oracle, relink, header and bsnes-jg gate
+```
+
+That `8a17693d…` is the sha of the file now in `public/play/roms/lzss-gallery.sfc`.
+
+> **Wall-clock note, so the next person sizes this leg correctly.** The 700 000-frame visual leg
+> spanned 11 h 26 m of real wall clock (jgxcheck started 2026‑09‑15T08:46:02Z, gate ended ~20:12 Z)
+> against ~2 h 08 m projected from the bench leg's measured ~91 fps. The cause is **not** emulator
+> slowness and **not** CPU contention — the host was **suspended**, four times, for 8 h 41 m in
+> total (`journalctl -u systemd-suspend.service`; the last one ran 19:10 → 03:08 local overnight).
+> Actual compute was therefore ≈ 2 h 45 m, which is the projection plus the expected margin for the
+> visual ROM rendering and repacking where the bench ROM only decodes.
+>
+> Two things to carry forward. **Budget ~2¾ h of compute for this leg.** And **do not use `ps
+> etime` to measure it on a machine that may have slept** — it reported 8 h 14 m here, which is
+> neither the wall clock (11 h 26 m) nor the compute time (2 h 45 m), because the suspend accounting
+> depends on which clock source `ps` used. Take the start and end timestamps from the log and
+> subtract the suspend intervals from the journal.
+
+### The manifest entry
+
+`dev/sync-manifest-offsets.py` resolved `off` from the freshly built map and materialised both
+tables from the host report — nothing here was hand-written:
+
+```
+  lzss-gallery     gallery_shown      off 0x0 -> 0x477
+  lzss-gallery     oracle             table 0 -> 62 entries (regenerated)
+  lzss-gallery     titles             table 0 -> 62 entries (regenerated)
+
+1 offset(s) changed, 1 unchanged, 2 table(s) regenerated, 131 without a map
+wrote /home/will/biohack.net/public/play/roms/manifest.json
+```
+
+`0x477` is exactly the address this plan predicted for `gallery_shown`. The seeded `off` was
+`"0x0"` deliberately — a fail-closed placeholder, so a resync that silently did not happen would
+make the button read WRAM at 0 and fail loudly rather than pass on a stale address.
+
+The `131 without a map` line and the script's non-zero exit are **expected** for a single-demo
+republish: only `lzss-gallery` was rebuilt, so every other demo fails the byte-identity check and
+keeps its existing `off` untouched. That is the fail-safe working, not an error. Semantic diff of
+the committed manifest against `HEAD`: 133 entries before and after, same ids in the same order,
+**exactly one entry changed — `lzss-gallery`**. The remaining textual churn is the script's
+canonical `json.dumps(indent=2)` re-indent of a handful of entries that had been written on one
+line.
+
+### `-verify-machineinstrs` — NOT clean, and it is a pre-existing known issue
+
+Reported rather than glossed, because the task asked for it. An LTO link with
+`-Wl,-mllvm,-verify-machineinstrs`:
+
+```
+*** Bad machine code: Using an undefined physical register ***
+- function:    upload_chevron_pose
+- basic block: %bb.0
+- instruction: 40B  renamable $y = COPY killed renamable $rc5
+- operand 1:   killed renamable $rc5
+LLVM ERROR: Found 1 machine code errors.
+```
+
+This is the documented **`a16-rc-undef`** signature — the Imag16 pair `$rc4:$rc5` where only the
+low half gets a reaching def from `COPY $a` — already tracked, and dispatched the same day as
+`c01b667` (`a16-rc-undef-ra-pure-virtual` drift investigation). It is **not** a regression from
+this republish and **not** introduced by it: `dev/lzss-gallery.sh` has never asserted `-verify`,
+and `dev/rebuild-web-roms.sh:55` records in terms that some demos ride this known issue with
+correct ROM codegen regardless. The behavioural bar — the 5-way differential — is met by the gate
+output above. Nothing was weakened to get a green result; this line is simply not green and should
+not be claimed as such.
 
 ### Follow-up
 

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/cad7d2e) | plan/TODO: player 1.1.0 prepared and browser-verified; publish stays user-gated |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/80ed296) | docs(gallery): the ROM republish is decoupled from the player release, and verified |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/b0b8e0d) | docs(gallery)+todo: badge-state matrix; the badge has never been styled |
 | [2026-08-01](https://github.com/wbniv/llvm-mos-65816/commit/de4cd34) | docs(gallery)+dev: confirm the 24000-frame budget over all 62 works |
@@ -12,6 +13,11 @@
 | [2026-07-28](https://github.com/wbniv/llvm-mos-65816/commit/66d59c9) | docs(gallery): root-cause notes for the work-0 repack divergence; #137 step 6 is FAIL |
 
 <!--history-meta v1
+cad7d2e	author	Will Norris
+cad7d2e	added	171
+cad7d2e	deleted	2
+cad7d2e	files	1
+cad7d2e	body	Records the state of the per-image "Verify fidelity" button's remaining half. No code in this repo\nchanges — the ROM and tooling merged at 78889c7 + de4cd34; this is the player-side record.\n\nThe badge defect this plan found is fixed, and not the way the plan proposed. The callout says the\nfix is `badge()` writing `rp-badge`. That would only have moved the breakage: the package ships two\nmarkup shapes with different base classes (`rp-badge` in SnesPlayer.astro and embed/snippet.html,\nplain `badge` in its own demo page), and an embedder may supply a third. `badge()` instead swaps the\nstate class with classList and touches nothing else, so any base class survives.\n\nAll four badge states now have browser evidence against the real packaged engine, the real ROM and\nbiohack.net's real stylesheet, asserting the base class, the state class *and* the computed pill\ncolour — a class-string assertion alone cannot see this bug, which is exactly why it survived every\ncheck ever run against the button. Two rows of the exercisability table move from NO to YES\n(`running`, via a MutationObserver that does not race the transient state; `warn`, via a truncated\nframe budget). The before/after pair is in the plan: the released 1.0.0 engine turns `rp-badge` into\n`badge` on the first reset and renders the PASS pill at rgba(0, 0, 0, 0).\n\nCommitted locally in three repos, nothing pushed: bsnes-jg-wasm `npm-package` f1557ce,\nbiohack.net a09b30f, indri.studio 1eed322.\n\nWhat remains is entirely outward-facing and stays USER-GATED: pushing `npm-package` (which *is* the\nrelease, since both sites depend on github:wbniv/bsnes-jg-wasm#npm-package), `pnpm update` per site,\noptional `npm publish`, the gallery republish plus the `mode: "live-record"` manifest flip, and a\ndeploy tag. Until the push, both sites' CI `sync --check` fails on 1.1.0-vs-1.0.0 by design.\n\nTwo follow-ups recorded in the plan rather than as TODO items: the gallery ROM is deliberately kept\nout of the npm demo bundle (a +50% tarball decision, one-line flip), and the two retarget badge rows\nstill need live pad input mid-check.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011AP736JtwzSGYH4bmxDWTa
 80ed296	author	Will Norris
 80ed296	added	19
 80ed296	deleted	1

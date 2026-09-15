@@ -161,46 +161,6 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   Published first on [biohack.net](https://biohack.net/snes/bankwalk/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bankwalk/); next is #129
   `farptrcmp`. [plan](docs/plans/2026-08-04-128-snes-bankwalk.md).
-- [wip T4] **Per-image "Verify fidelity" button — ROM + tooling half MERGED to main (2026-08-01);
-  player `1.1.0` RELEASED + DEPLOYED 2026-09-15 (both sites live, verified). Only step (5), the
-  gallery republish + `mode: "live-record"` manifest flip, remains — dispatched 2026-09-15.**
-  <!-- agent:aebbcb28d0cc19d57 -->
-  Mechanism (c): the ROM already verifies each work as it displays it, so it publishes a 5-byte
-  `gallery_shown{z,work,ok,state}` record (state = publication barrier) and the player polls it in
-  a new `mode: "live-record"`, comparing `z` against a host-generated 62-entry oracle table — the
-  ROM never grades its own homework. Landed on `main` as `78889c7` + `de4cd34` (`--ff-only`, was
-  `feature/verify-fidelity-button`): the record, `JGX_POLL`, the live-record replay in
-  `verify-web-roms.sh`, oracle/titles generation in `sync-manifest-offsets.py`, and
-  `dev/measure-repack-budget.py`.
-  **~~(4) 24000-frame budget~~ CONFIRMED corpus-wide** — worst case is frame 10879 of 24000
-  (2.21× margin), computed by re-simulating `compress_far` on the host (all 62 stream sizes
-  reproduce `report.json` exactly) and bounded per-class so it holds for any non-negative cost
-  model; validated on the target at k=22 (10617) and k=8 (10253), which also exercised
-  `oracle[work]` at a non-zero index for the first time.
-  **~~(1) merge~~ DONE.** **~~reproducible build~~ PASS** on the 0021 toolchain — the precondition
-  for `sync-manifest-offsets.py` to be trusted.
-  **~~(2) player release~~ PREPARED 2026-09-15 — committed locally in three repos, nothing pushed.**
-  `@wbniv/bsnes-jg-player` `1.1.0` on `~/bsnes-jg-wasm` `npm-package`: `live-record` staged into
-  `dist/`, the badge fix, `.rp-badge.warn`, and a `stage-dist.sh` that filters the demo manifest to
-  the ROMs it bundles. Engine synced + `.rp-badge.warn` committed on `~/biohack.net` and
-  `~/indri.studio`. **~~(3) browser badge states~~ FIXED + VERIFIED.** The pre-existing defect was
-  `className = "badge " + cls` dropping the markup's base class; writing `"rp-badge "` instead would
-  only have moved the breakage, since the package ships two markup shapes with different base
-  classes — so `badge()` now swaps the state class via `classList` and touches nothing else. All four
-  states (`running`/`pass`/`fail`/`warn`) assert both classes **and** the computed pill colour in
-  headless Chromium against the real engine, ROM and site stylesheet; the package's CI gained the
-  `rp-badge`-shaped case that would have caught it.
-  **RELEASED + DEPLOYED 2026-09-15 (user-triggered):** `npm-package` pushed (`1ec048f..f1557ce`),
-  both sites' lockfiles repinned to `1.1.0` (`pnpm update @wbniv/bsnes-jg-player`), `sync --check`
-  verified clean locally on each, then tagged/pushed (biohack.net `v1.0.590`, indri.studio
-  `v0.1.157`). **Both deploy CI runs concluded `success`**
-  ([biohack.net](https://github.com/wbniv/biohack.net/actions/runs/34926081782) ·
-  [indri.studio](https://github.com/wbniv/indri.studio/actions/runs/34926111906)), and both live
-  sites confirmed serving engine `1.1.0` (`ENGINE_VERSION` endpoint, matching SHA256s across both).
-  Registry `npm publish` and **(5)** the gallery republish + `mode: "live-record"` manifest flip
-  remain out of scope (separate, bigger rollout — not needed to clear the drift gate).
-  [plan](docs/plans/2026-09-15-fix-snes-engine-ci-drift.md); spec + original evidence in the
-  [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md) (*Status (2026-09-15)*).
 - [x] ~~**MAME leg for the cartsize canaries — blocked on the SPC700 IPL.**~~ **UNBLOCKED + PASS
   2026-08-06:** the checksum-gated IPL is retrievable from SSM; all 14 cartsize configurations pass
   structure, `-verify-machineinstrs`, MAME, bsnes-jg, and six-boot entropy independence. The wider unlocked
@@ -1069,6 +1029,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-15 — [gallery-per-image-selfcheck] Verify-fidelity button shipped: gallery ROM republished + manifest flipped to `mode: "live-record"` (biohack.net `5e419b7`). See [plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
 - ✅ 2026-09-15 — [mandel-oop-title-entropy] Root cause: power-on-random CGWSEL $2130 clip-to-black; m7splash_begin now resets the PPU block itself. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - ✅ 2026-09-15 — [lzss-gallery-navigation-and-auto-advance-chevron] 14/15 PASS: step 12 corpus `0x9512` + byte-identical relink, step 15 live 5/5 on both sites. Step 14 is toolchain-drift ROM divergence, accepted per the gallery republish policy, not a nav defect. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
 - ✅ 2026-09-15 — [snes-startup-garbage-title-screens] Newton garbage fixed; titles on all 11 demos (last deferral, factorial, wired gate-neutral); verify 5/5. See [plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
