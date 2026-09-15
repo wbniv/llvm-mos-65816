@@ -2007,8 +2007,14 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        republish sequencing.
      • `bsnes-jg-wasm` retarget rows — already tracked in that repo's own TODO.md per the
        [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md) Follow-up section. -->
-- [ ] **(triage)** The `+mos-xy16` spill-address/live-`Imag16` miscompile `#118` found is OPEN and needs a backend — _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:c857c0b86834c399 -->
-- [ ] **(triage)** `#118 retryjmp`'s remaining half — the `expected.tsv` row (`0x3388`), `dev/retryjmp.{sh,lua}`, — _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:3fde7c9c31842f97 -->
-- [ ] **(triage)** `tools/a16_fuzz.py`'s `KNOWN_ISSUES` classifies any log containing — _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:4f704a2ea3ae4872 -->
-- [ ] **(triage)** `corpus/setjmp_sim.c` is not a sufficient guard for the `#35` bug class on its own — it never — _from [2026-09-15-116-118-setjmp-cluster-g-demos.md](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)_  <!-- fp:30fc9627d957badc -->
+<!-- triaged 2026-09-15: all four are already carried by the curated "Cluster G result (2026-09-15)"
+     paragraph inside the M2 "Compiler stress-test demo battery" item above, nothing separately open.
+     - the +mos-xy16 spill-address/live-Imag16 miscompile -> named there as the OPEN defect #118 found,
+       with its own investigation doc, and ESCALATED (backend work, higher tier).
+     - #118's withheld half (expected.tsv row 0x3388, dev/retryjmp.{sh,lua}, the visual ROM) -> stated
+       there as deliberately un-gated until that fix lands.
+     - the a16_fuzz.py KNOWN_ISSUES message-text discriminator -> stated there as a flagged consequence
+       of the same defect; it is fixed alongside it, not separately.
+     - "corpus/setjmp_sim.c is not a sufficient guard on its own" -> #116 backtrack now covers the
+       return-out-of-a-setjmp-frame case and is in expected.tsv, so the gap is closed. -->
 <!-- END auto-captured-deferrals -->
