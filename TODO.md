@@ -577,6 +577,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     (the operands must all be imaginary registers), **and** a known-issue verify failure no longer
     short-circuits the 4-way value check — a mismatch is a `FAIL` whatever the verify log said.
     ([plan](docs/plans/2026-09-15-fix-xy16-spill-reload-clobbers-store-value.md))
+    **Open, dispatched (T4, 2026-09-15):** the fix's own agent flagged that the pre-existing
+    `a16-rc-undef-ra-pure-virtual` KNOWN_ISSUES entry's repros have drifted (`lsystem_sim.c -Os` and
+    `newton_sim.c -Os` now verify clean; only `newton_sim.c -O1` still reproduces) — deliberately
+    left untouched since retiring it wrongly would discard a real hazard's regression guard.
+    Dispatched to diagnose why and make the retire-vs-tighten call.
+    <!-- agent:a88d3cf98160f056b -->
   ([#35 defect](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md) ·
   [xy16 defect](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md) ·
   [plan](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md))
