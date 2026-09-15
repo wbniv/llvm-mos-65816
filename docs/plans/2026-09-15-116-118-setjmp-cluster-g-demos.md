@@ -1,16 +1,19 @@
 # Round 6 Cluster G (#116–#118) — hardening the 65816-native `setjmp.S` fix
 
-> **STATUS 2026‑09‑15: BLOCKED — the cluster did its job on its first run.** #116 `backtrack` is
-> written and host-verified (`0x7336`), and it immediately surfaced an **OPEN, high-severity
-> runtime defect**: `longjmp`'s page‑1 hard-stack reconstruction **never executes**, so every
-> `longjmp` leaves `S` in page 0 and any return out of the `setjmp` frame `rts`-es into the zero
-> page — i.e. **bug #35 is still live**, hidden from `corpus/setjmp_sim.c` because that guard never
-> returns from its `setjmp` frame. Root cause, byte-level proof and a 12‑line repro:
-> [`docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md`](../investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md).
-> Per the battery's own rule — *demos exist to find compiler bugs* — the gate is **not weakened**
-> to let a demo ship. #116 is committed un-gated (no `expected.tsv` row, no `dev/backtrack.sh`);
-> #117 `csrjmp` and #118 `retryjmp` are **not started**, because both fail for the same reason.
-> Fixing the runtime is separate, higher-tier work.
+> **STATUS 2026‑09‑15: UNBLOCKED — the cluster did its job on its first run, and the defect it
+> found is now fixed.** #116 `backtrack` immediately surfaced an **OPEN, high-severity runtime
+> defect**: `longjmp`'s page‑1 hard-stack reconstruction never executed, because the assembler
+> sizes a plain immediate by its value, not by the `rep #$20` mode it follows — so `and #$00ff`
+> encoded as an 8-bit operand while the CPU, already in 16-bit mode, read 2 bytes for it at
+> runtime, consuming the next instruction's opcode. Root cause, byte-level proof, the fix (one line,
+> the existing `mos16()` immediate-width modifier), and the post-fix verification are recorded in
+> [`docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md`](../investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md#resolution-2026-09-15).
+> Fixed in `platforms/snes/setjmp.S`; SDK rebuilt; `#116 backtrack`'s corpus slice now PASSes its
+> `0x7336` gate on all three modes (default-8bit, `+mos-a16`, `+mos-xy16`) at bsnes-jg, matching the
+> host oracle exactly. Per the battery's own rule — *demos exist to find compiler bugs* — the demo
+> was left un-gated until the real defect was fixed, never weakened to ship around it. Remaining:
+> wire #116's `expected.tsv` row + `dev/backtrack.sh` driver + its visual/title-screen half, and
+> build #117 `csrjmp` / #118 `retryjmp`.
 
 
 Three SNES stress-test demos that escalate past `corpus/setjmp_sim.c` (one frame, one jump, no
@@ -114,7 +117,115 @@ Per demo `<d>` ∈ {`backtrack`, `csrjmp`, `retryjmp`}:
 6. `dev/run.sh build` (full example battery)
 7. `dev/title-charset.sh`
 
-### Results (2026‑09‑15) — BLOCKED at step 1
+### Fix verification (2026‑09‑15, after the investigation's Resolution)
+
+`platforms/snes/setjmp.S` fixed (`and #$00ff` → `and #mos16($00ff)`), SDK rebuilt
+(`dev/run.sh build`, `EXIT=0`, `256 built / 3 excluded by contract / 0 failed`).
+
+`sjreturn_min.c`, rebuilt and re-gated:
+```
+SMOKE: PASS off=0x20 len=2 got=0xF00D (ran 300 frames, bsnes-jg)
+```
+
+`corpus/setjmp_sim.c`'s existing 5-way guard — unaffected by the fix, still PASS at `0x2007`
+(carried by the `corpus`/`corpus-a16` re-run below).
+
+`#116 backtrack`'s corpus slice, rebuilt and re-gated, all three modes, bsnes-jg, 300 frames,
+matching the host oracle's `gate_crc = 0x7336` above exactly:
+```
+default corpus_result@0x200 -> SMOKE: PASS off=0x200 len=2 got=0x7336
+a16     corpus_result@0x200 -> SMOKE: PASS off=0x200 len=2 got=0x7336
+xy16    corpus_result@0x200 -> SMOKE: PASS off=0x200 len=2 got=0x7336
+```
+
+`dev/run.sh corpus` re-run on the fixed toolchain: `63/63 passed` (unchanged).
+
+`dev/run.sh corpus-a16` re-run on the fixed toolchain (`build/fuzz-work` wiped first — see the
+gotcha below): `62/62 passed, 0 xfail`, `setjmp_sim` unchanged at `0x2007`:
+
+```
+==> corpus-a16: expected.tsv  (default == +mos-a16 == +mos-xy16, MAME + bsnes-jg; settle=1000)
+  arith      PASS   corpus_result=0xA9E9  8/16/32-bit integer ALU
+  control    PASS   corpus_result=0x1DFB  loops / if / switch
+  arrays     PASS   corpus_result=0x03E1  arrays + .rodata lookup table
+  structs    PASS   corpus_result=0x0340  struct layout + pointer deref
+  funcs      PASS   corpus_result=0x011E  calls + recursion (soft stack)
+  globals    PASS   corpus_result=0xAB55  crt0 .data copy + .bss clear
+  invaders_sim PASS   corpus_result=0x9D57  Space Invaders deterministic attract sim, 600 frames (shared invaders_logic.h)
+  spiro_sim  PASS   corpus_result=0x32D4  spirograph (R,r,d) hypo/epi/rose/lissajous curve-point hash, 32 pts x 4 modes (shared spiro.h)
+  spiro_ctrl_sim PASS   corpus_result=0x6A26  spirograph interactive controller + HUD-format math over a scripted pad sequence (shared spirograph.h)
+  pi_sim     PASS   corpus_result=0x7711  π spigot (PI_GATE_DIGITS=1, PI_ELEMS=676, a[0]=0) + MC (PI_GATE_THROWS=256) gate CRC (shared pi_spigot.h)
+  ca1d_sim   PASS   corpus_result=0xAB2C  1-D CA: 32 Rule-90 + 32 Rule-110 gens from single-cell seed; CRC-16 of all output rows (shared ca1d.h)
+  rdiff_sim  PASS   corpus_result=0x5555  Gray-Scott cumulative gate_crc (16-bit fixed-point, scale 4096; GS_GATE_W=8, GS_GATE_H=8, GS_GATE_STEPS=8; DU=655/DV=328/F=150/K=254)
+  nbody_sim  PASS   corpus_result=0xCC65  N-body (N=3, GRAV_K=64, GRAV_SOFT=16, DT_SHIFT=4) Symplectic Euler, 32 steps, rotate-XOR CRC
+  factorial_sim PASS   corpus_result=0x772F  Bignum factorial 50! in base-10000 uint16 array; carry-mul + __mulsi3 + __udivmodsi4 (shared factorial.h)
+  newton_sim PASS   corpus_result=0x4D8B  Newton's-method fractal z³−1, 8×8 grid in [−1.2,1.2]², 20-iter cap; complex division + multiply (shared newton.h)
+  cordic_sim PASS   corpus_result=0x4D41  CORDIC rotator full-circle sweep (GATE_N=96): rotation cordic16_sincos + vectoring cordic16_atan2, shift-add only → zero mul/div libcalls (shared cordic.h)
+  maze_sim   PASS   corpus_result=0x0749  Maze recursive-division generate + A* indexed-heap solve (16x15) gate CRC: walls + path + heap counters (shared maze.h)
+  doom-fire_sim PASS   corpus_result=0x3C59  Doom-fire heat field: 16x16 grid, 30 steps; per-cell xorshift16 PRNG + flat-index array sweep (multiply-free), rotate-XOR CRC of full grid each step (shared doom-fire.h)
+  life_sim   PASS   corpus_result=0xDDF1  Conway's Game of Life B3/S23: Gosper gun on 64x48 bitpacked grid, 32 gens; SWAR bit-parallel neighbour sums (and/eor/ora + asl/lsr, multiply-free), CRC-16 of all output rows (shared life.h)
+  epicycles_sim PASS   corpus_result=0x4F6C  Fourier epicycles: sum of 8 rotating vectors (DFT of a star) traces the outline; 4 __mulsi3/harmonic + 32-bit accumulate, no divide (shared epicycles.h)
+  julia_sim  PASS   corpus_result=0x3490  Julia set z^2+c escape-time: 4 keyframe c's (0.7885*e^itheta orbit, 90 deg steps) over a 6x6 grid, maxiter 8; 3 __mulsi3/iter Q5.10 complex multiply (shared julia.h)
+  harmonograph_sim PASS   corpus_result=0x0EBB  Lissajous/harmonograph: 4 damped pendulums (2/axis, detuned), 256 samples preset 0; 8 __mulsi3/sample (sin·env amplitude + env·decay envelope), sin LUT, rotate-XOR hash, no divide (shared harmonograph.h)
+  raycaster_sim PASS   corpus_result=0xB200  Raycaster maze DDA grid-cast: 64-column fan from a fixed camera, 16x16 map; 3 __udivsi3/column (deltaDist reciprocals + screen_h/dist), Q8.8 fixed-point + sin LUT (shared raycaster.h)
+  burning-ship_sim PASS   corpus_result=0x6F2D  Burning Ship fractal (|Re|,|Im| fold): 16x16 window over the ship, maxiter 24; 3 __mulsi3/iter (zx2,zy2,|zx*zy|) Q12 + 2 abs folds, escape-time hash, no divide (shared burning_ship.h)
+  mandel-float_sim PASS   corpus_result=0x4169  Soft-float Mandelbrot escape-time (IEEE-754 single precision): 2 zoom windows on a 6x6 grid (maxiter 12) + 24-step bit-exact orbit witness; every op is a soft-float libcall (__mulsf3/__addsf3/__subsf3/__divsf3/__gtsf2/__floatsisf), bit-for-bit host==target (shared mandel-float.h)
+  avalanche_sim PASS   corpus_result=0x27EA  64-bit Avalanche: 256 chained splitmix64 (2 __muldi3 + shifts incl. >>32 + variable 1ULL<<i) folded with 64-bit xor/add and a runtime __udivdi3 into a CRC16; exercises the 64-bit integer libcall family bit-exact host==target (shared avalanche.h)
+  boids_sim  PASS   corpus_result=0xA8AB  Boids struct-by-value steering: 8-bird flock, 12 steps; vec2 take/return-by-value kernel (v2_add/v2_sub/v2_scale + separation/alignment/cohesion, noinline) exercises the aggregate-return ABI; __mulsi3 + __divsi3 fixed-point, far-pointer-free, rotate-XOR CRC of pos/vel (shared boids.h)
+  turtle-vm_sim PASS   corpus_result=0x4007  Bytecode-VM turtle dispatch: stack-machine interpreter (dense switch -> JMP (abs,X) jump table + function-pointer ALU opcode table via __call_indir) runs a 180-step turtle program, rotate-XOR CRC of the path; near fnptrs + bank-0 data, far-pointer-free; exercises indirect/computed control flow bit-exact host==target (shared turtle_vm.h)
+  lsystem_sim PASS   corpus_result=0x8073  L-system string rewriting: axiom rewritten 6 generations IN PLACE in a grown char buffer (memmove tail-shift + memcpy production + strlen), then a turtle interprets it with a [ ]/ bracket push-pop stack into a fractal plant, rotate-XOR CRC of the path; bank-0 buffers, far-pointer-free; exercises string libcalls + save/restore stack bit-exact host==target (shared lsystem.h)
+  truchet_sim PASS   corpus_result=0xB3E6  Truchet packed-bitfield maze: 16x14 grid of uint16 bitfield cells (orient/style/hue/phase/mark/energy), 24 wave steps, folds EXTRACTED field values; exercises bitfield insert/extract codegen (and/ora/shift, no libcalls), bit-exact host==target (shared truchet.h)
+  wire3d_sim PASS   corpus_result=0xE737  3-D wireframe projected-vertex gate: 3x3 rotation matrix (Q8.8, __mulsi3) + per-vertex perspective divide (__divsi3) of each of 30 verts (tetra/cube/octa/icosa) projected once across 4 fixed non-trivial orientations; rotate-XOR hash of (sx,sy); near, far-pointer-free; sized for the 60-frame corpus settle window; matrix-mul + divide hot path bit-exact host==target (shared wire3d.h)
+  wire3d_ctrl_sim PASS   corpus_result=0xE3CD  3-D wireframe interactive controller + HUD-format math over a scripted pad sequence: solid/palette/trail edge controls + spin-rate/dolly level controls + auto-spin angle wrap + decimal HUD format; CRC16-CCITT; bit-exact host==target (shared wireframe.h)
+  fn_plot_sim PASS   corpus_result=0x2EBE  fn-plot recursive-descent parser + soft-float evaluator: 64 x-samples of x*x-0.5 in [-2,2), CRC of IEEE float bit-patterns; exercises fn_eval_expr→fn_eval_term→fn_eval_factor recursion + __mulsf3/__subsf3/__addsf3/__divsf3/__fixsfsi; bit-exact host==target (shared fn_plot.h)
+  cardioid_sim PASS   corpus_result=0x523B  Cardioid times-table modulo gate: k*(i+65536) % N for k=2..8 x i=0..199, rotate-XOR CRC of j; exercises __mulsi3 (genuinely 32-bit product via +65536 offset) + __umodsi3, bit-exact host==target (shared cardioid.h)
+  tea_sim    PASS   corpus_result=0xDF0E  TEA cipher gate: 8 plaintexts x 32 rounds with fixed 128-bit key; fold v[0]^v[1] via rotate-XOR; exercises 32-bit <<4/>>5 constant shifts + 32-bit add/XOR chains, multiply-free; rep/sep=22 under +mos-a16; inline ASL+ROL expansion (no __ashlsi3 at -Os); bit-exact host==target (shared tea.h)
+  hilbert_sim PASS   corpus_result=0x5999  Hilbert order-4 d2xy+xy2d round-trip gate: all 256 points, fold rt+(rt<<2)+x+(y<<8); variable-count 32-bit shifts __ashlsi3(rx,k)+__lshrsi3(x,k) (k=0..3 loop var); rep/sep=23, __mulsi3=0; bit-exact host==target (shared hilbert.h)
+  fft_sim    PASS   corpus_result=0x6D7A  32-point DIT FFT gate: sawtooth signal, 5 stages × 16 butterflies × 4× __mulsi3 (butterfly twiddle complex multiply); bit-reversal permutation; rep/sep=63; bit-exact host==target (shared fft.h)
+  vaprintf_sim PASS   corpus_result=0xE1F3  Variadic va_arg gate: 4× mini_sprintf calls, 9× va_arg(unsigned int/int); formats '123+456', '-7/3', 'beef cafe', '999 -1 abcd'; folds output chars; bit-exact host==target (shared vaprintf.h)
+  bhut_sim   PASS   corpus_result=0xEF0B  Barnes-Hut quadtree N-body gate: 8 particles, 6 steps; recursive bh_insert/bh_force walk pooled-node tree via runtime child[] indices (pointer-chasing) + gravity kernel __mulsi3(5)/__divsi3(4); rep/sep=160, bh_force self-recursion; bit-exact host==target (shared bhut.h)
+  mandel-double_sim PASS   corpus_result=0x0EDF  Double-precision soft-float Mandelbrot: a 5x5 double escape buffer + a 5x5 float twin (whole-set window, maxiter 6) + a 12-step bit-exact double orbit witness (raw 64-bit |z|^2 bits) + a double<->float conversion witness; exercises the 64-bit soft-float library (__muldf3/__adddf3/__subdf3/__gtdf2/__floatsidf) plus __truncdfsf2/__extendsfdf2, bit-exact host==target (shared mandel-double.h)
+  bitcensus_sim PASS   corpus_result=0x9516  Bit-population intrinsic family gate: popcount/clz/ctz/parity of coords; the ll builtins inline-lower to SWAR (G_CTPOP/CTLZ/CTTZ .lower @308), __*di2 helpers never called; bit-exact host==target (shared bitcensus.h)
+  bitshuffle_sim PASS   corpus_result=0x2A4A  bswap/bit-reverse intrinsic gate: __builtin_bswap32 + __builtin_bitreverse (G_BITREVERSE .lower @186), bit-reversal permutation (an involution); both inline-lower; bit-exact host==target (shared bitshuffle.h)
+  gf256_sim  PASS   corpus_result=0xC028  GF(2^8) carryless-multiply gate: log/antilog tables + XOR (gf_mul), no adc carry chain, 0 mul/div libcalls; cross-checked vs a slow bit-by-bit carryless multiply; bit-exact host==target (shared gf256.h)
+  rotozoom_sim PASS   corpus_result=0x391B  widening multiply-high gate: (coord*scale)>>16 via G_SMULH .lower @300 degrading to __muldi3/__mulsi3 on the soft-multiply target; Q16.16 affine sampler; bit-exact host==target (shared rotozoom.h)
+  medfilt_sim PASS   corpus_result=0x87FE  branchless min/max/abs network gate: 19-comparator median-of-9 via G_UMIN/UMAX .lower @272 + G_ABS @281; cross-checked vs insertion-sort median; bit-exact host==target (shared medfilt.h)
+  domcol_sim PASS   corpus_result=0xF3FD  NaN/unordered float-compare gate: (z^2-1)/(z^2+c) domain colouring, isnan(x)=(x!=x)->__unordsf2, folds the COLOUR INDEX not NaN bits, a guaranteed pole per iter; one-op-per-statement soft-float; bit-exact host==target (shared domcol.h)
+  cosmzoom_sim PASS   corpus_result=0x502F  64-bit int<->float conversion gate: uint64 scale -> float (__floatundisf) round-trip (__fixunssfdi) + signed __floatdisf/__fixsfdi; scale<10^18; correctly-rounded, bit-exact host==target (shared cosmzoom.h)
+  multibase_sim PASS   corpus_result=0x371A  div_t/lldiv_t struct-return-by-value gate: div()/lldiv() aggregate-return ABI over the custom G_SDIVREM @229; DEC/DOZ/HEX/SEX split; bit-exact host==target (shared multibase.h)
+  dhmix_sim  PASS   corpus_result=0x69AA  64-bit modular-exponentiation gate: __umoddi3 as the hot op in square-and-multiply (Diffie-Hellman); the slice that caught the s64 unmerge/anyext legalizer crash (fixed, patch 0017); bit-exact host==target (shared dhmix.h)
+  percol_sim PASS   corpus_result=0x025B  union-find path-compression gate: disjoint-set find walks parent ptrs to root then re-points the whole path flat; bond percolation; bit-exact host==target (shared percol.h)
+  fenwick_sim PASS   corpus_result=0x3454  Fenwick/BIT i&-i low-bit-isolation gate: update i+=i&-i, query i-=i&-i (width-safe (uint16)(i&(uint16)(0u-i))); prefix sums; bit-exact host==target (shared fenwick.h)
+  radix_sim  PASS   corpus_result=0x123E  non-comparison sort gate: LSD radix base-16 histogram+prefix-sum+stable-scatter, zero data compares, 0 mul/div libcalls; cross-checks sorted+permutation; bit-exact host==target (shared radix.h)
+  hull_sim   PASS   corpus_result=0x84E3  convex-hull orientation gate: gift-wrap picks vertices from the sign of the int32 cross product (cast int16 diffs -> __mulsi3); cross-checks hull validity; bit-exact host==target (shared hull.h)
+  editdist_sim PASS   corpus_result=0xFB59  2-D DP table gate: Levenshtein D[i][j]=min(sub,del,ins) doubly-indexed table + backtrack (min-of-3 cmp); cross-checks symmetry edit(A,B)==edit(B,A); bit-exact host==target (shared editdist.h)
+  huffman_sim PASS   corpus_result=0xE8E4  Huffman bit-stream decode gate: MSB-first bit reader + pointer-linked tree descent (HF_KID0/KID1/SYM); cross-checks decode==original; bit-exact host==target (shared huffman.h)
+  perlin_sim PASS   corpus_result=0xA72D  Perlin gradient-noise gate: Fisher-Yates permutation + inline Hermite fade 6t^5-15t^4+10t^3 (Q0.8, __mulsi3-heavy) + 4-way gradient dot + lerp; bit-exact host==target (shared perlin.h)
+  gouraud_sim PASS   corpus_result=0xC5E9  barycentric edge-function raster gate: 3 int32 cross-product edge fns (__mulsi3) + per-pixel barycentric divide (__divsi3); trips the a16/xy16 -verify rc-undef XFAIL (code bit-exact correct); host==target (shared gouraud.h)
+  dither_sim PASS   corpus_result=0x80C4  Floyd-Steinberg signed error-diffusion gate: two-row error buffer, residual split (e*k)>>4 arithmetic shift, quantiser 3 compares + 4-level LUT, no division; bit-exact host==target (shared dither.h)
+  msquares_sim PASS   corpus_result=0x86A7  marching-squares gate: 4-bit corner-sign case -> 16-entry MS_SEG edge LUT + edge-crossing interpolation divide (__divsi3); trips the a16/xy16 -verify rc-undef XFAIL (code correct); host==target (shared msquares.h)
+  grid3d_sim PASS   corpus_result=0xFCDE  multi-dimensional array indexing gate: true uint8 grid[6][6][6] accessed grid[z][y][x] (compiler emits z*36+y*6+x), Moore-26 3-D life CA; bit-exact host==target (shared grid3d.h)
+  setjmp_sim PASS   corpus_result=0x2007  setjmp/longjmp non-local return on the 65816 native 16-bit stack (regression guard for the 6502-only common setjmp.S; #35)
+  nmitally_sim PASS   corpus_result=0xBCE6  #123 VBlank Interrupt Tally arithmetic gate (ORACLE form, no interrupts): 240 fenced ticks of xorshift16 + 16-bit multiply-add + 16x16->32 __mulsi3 accumulate, folded 4 rotations/tick; the interrupt-CC half is asserted separately by dev/nmitally.sh
+==> corpus-a16: 62/62 passed, 0 xfail
+```
+
+### Gotcha found along the way: `tools/a16_fuzz.py`'s shared scratch files
+
+While chasing this re-run, `dev/run.sh corpus-a16` was accidentally run twice concurrently earlier
+(this run and a leftover background verification another agent had left running). Every failure
+that produced showed the same fingerprint: one demo's reported `+mos-xy16@MAME` or `+mos-a16@bsnes`
+hash was some OTHER demo's *correct expected* hash — e.g. `life_sim`'s wrong value was exactly
+`perlin_sim`'s `0xA72D`. Cause: `tools/a16_fuzz.py`'s `evaluate()` compiles every single demo to the
+same fixed filenames — `build/fuzz-work/chk_default.sfc` / `chk_a16.sfc` / `chk_xy16.sfc` — not one
+per demo name, and `build/` is host-mounted into every `dev/run.sh` container (`-v "$ROOT":/work`
+in `dev/run.sh`), so two concurrent `corpus-a16` runs (even in separate containers) race on the same
+physical files on the host. Worse: the corruption **persisted across later, non-concurrent re-runs**
+until `build/fuzz-work` was deleted — a stale or partially-written `.sfc`/`.map` pair from the race
+survived on disk and kept getting read. See the "Concurrent `dev/run.sh` invocations" note added to
+`docs/agent-handoff.md`.
+
+### Results (2026‑09‑15) — BLOCKED at step 1, unblocked by the fix above
 
 **Step 1 — `dev/run.sh backtrack`: NOT RUN.** There is no `dev/backtrack.sh`: the demo's gate would
 have to assert a value the runtime cannot currently produce, and weakening it is forbidden. The

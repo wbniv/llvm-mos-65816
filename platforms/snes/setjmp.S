@@ -164,11 +164,16 @@ longjmp:
   lda (__rc2),y
   sta __rc1
 
-  ; Restore hard stack pointer (offset 2): reconstruct the page-1 16-bit S = $01xx
+  ; Restore hard stack pointer (offset 2): reconstruct the page-1 16-bit S = $01xx.
+  ; The `and` immediate is forced to its 16-bit form with mos16(): the assembler sizes
+  ; a plain immediate by the VALUE's magnitude, not by the M width `rep #$20` just set,
+  ; so a bare `#$00ff` encodes as the 8-bit AND (2 bytes) even though the CPU is now in
+  ; 16-bit accumulator mode and fetches a 2-byte operand for it at runtime — the extra
+  ; byte it reads is the following `ora` opcode, corrupting every instruction after it.
   ldy #2
   lda (__rc2),y
   rep #$20
-  and #$00ff
+  and #mos16($00ff)
   ora #$0100
   tcs
   sep #$20

@@ -99,21 +99,45 @@ That is precisely the escalation Cluster G was written to perform, and #116 hit 
 - Not a codegen bug. The compiler output for the repro is correct; the defect is in hand-written
   runtime assembly plus the assembler's immediate-width policy.
 
-## What a fix has to decide (not decided here)
+## Resolution (2026-09-15)
 
-1. **Force the 16‑bit immediate at the `and`.** Some explicit encoding form is needed — the source
-   as written cannot express "16‑bit immediate whose value happens to fit in 8 bits".
-2. **Or avoid the wide immediate entirely** — e.g. build `$01xx` without a 16‑bit `and`
-   (`xba`-based, or `lda` the byte, `xba`, `lda #$01`, `xba`, `tcs`), which sidesteps the encoder
-   question altogether and is arguably the more robust shape for hand-written 65816 asm here.
-3. Whether the assembler should track `rep`/`sep` (or reject an ambiguous immediate) is a separate,
-   larger question and probably an upstream conversation.
-4. The fix needs a guard that **returns** from the `setjmp` frame — `corpus/setjmp_sim.c` as it
-   stands cannot catch this class. `sjreturn_min.c` is that guard in minimal form; #116 `backtrack`
-   is the full one.
+The source CAN express "16-bit immediate whose value happens to fit in 8 bits": the MOS assembler
+already has a modifier for exactly this, `mos16(...)` (`MOSMCExpr::VK_IMM16`,
+`MOS/MCTargetDesc/MOSModifierNames.cpp:18`), which forces the 16-bit-sized encoding regardless of
+the operand's value. Confirmed with a standalone probe before touching `setjmp.S`:
+
+```
+$ printf 'rep #$20\nand #$00ff\nora #$0100\ntcs\n' | mos-clang -x assembler-with-cpp -target mos -mcpu=mosw65816 -c -o /tmp/a.o -
+$ llvm-objdump -d --triple=mos /tmp/a.o
+   0: c2 20         rep  #$20
+   2: 29 ff         and  #$ff      <- 2 bytes: the bug
+   4: 09 00 01      ora  #$100
+   7: 1b            tcs
+
+$ printf 'rep #$20\nand #mos16($00ff)\nora #$0100\ntcs\n' | mos-clang -x assembler-with-cpp -target mos -mcpu=mosw65816 -c -o /tmp/b.o -
+$ llvm-objdump -d --triple=mos /tmp/b.o
+   0: c2 20         rep  #$20
+   2: 29 ff 00      and  #mos16($ff)   <- 3 bytes: correct
+   5: 09 00 01      ora  #$100
+   8: 1b            tcs
+```
+
+Fix: wrap the immediate, `and #mos16($00ff)`, in `platforms/snes/setjmp.S`. One line, no behavior
+change to anything except the encoding of that one operand. Question 3 (whether the assembler
+should track `rep`/`sep` state itself) stays open as a separate, larger question — not needed for
+this fix and not pursued here.
+
+**Verified**, rebuilt SDK: `sjreturn_min.c`'s `corpus_result` is now `0xF00D` (was `0x1111`) at
+300 frames on bsnes-jg. `corpus/setjmp_sim.c`'s existing 5-way guard (`0x2007`) still PASSes — the
+fix doesn't disturb the one-frame case it already covered. `#116 backtrack`
+(`examples/snes/corpus/backtrack_sim.c`) now PASSes its `0x7336` gate at default-8bit, `+mos-a16`,
+and `+mos-xy16`, all matching the host oracle exactly (raw output in the plan's verification
+record).
 
 ## Unblocks
 
 [`docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md`](../plans/2026-09-15-116-118-setjmp-cluster-g-demos.md)
-— #116 `backtrack` is written and host-verified (`0x7336`) but cannot be gated; #117 `csrjmp` and
-#118 `retryjmp` are not started, because both would fail for the same reason.
+— #116 `backtrack`'s corpus slice is now gate-PASS on all three modes. Remaining: wire #116's
+`expected.tsv` row + `dev/backtrack.sh` driver + the visual/title-screen half
+(`examples/snes/backtrack.c`), and build #117 `csrjmp` / #118 `retryjmp`, now that the runtime bug
+they'd have hit identically is fixed.

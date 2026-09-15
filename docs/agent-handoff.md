@@ -81,6 +81,19 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
   MIR/lit work) must refresh it explicitly:
   `docker run --rm -v $ROOT:/work --user $(id -u):$(id -g) -e HOME=/work/build llvm-mos-65816-dev
   cmake --build /work/build/llvm-mos --target llc --parallel 8`.
+- **Never run two `dev/run.sh corpus-a16` (or `corpus`) invocations concurrently — even in separate
+  containers.** `tools/a16_fuzz.py`'s `evaluate()` compiles EVERY demo to the same fixed filenames
+  (`build/fuzz-work/chk_default.sfc` / `chk_a16.sfc` / `chk_xy16.sfc`, plus their `.map`s), never one
+  per demo name, and `build/` is host-mounted into every container (`-v "$ROOT":/work` in
+  `dev/run.sh`), so two concurrent runs race on the same physical files on the host. The failure
+  signature is unmistakable once you know it: a demo's reported hash for one leg (often
+  `+mos-xy16@MAME` or `+mos-a16@bsnes`) is exactly some OTHER demo's *correct* expected hash — e.g.
+  `life_sim` reporting `perlin_sim`'s `0xA72D` — because one process's fresh compile got read by the
+  other's emulator run. **The corruption also survives non-concurrent re-runs**: a stale/partially-
+  written `.sfc`/`.map` pair from the race stays on disk and keeps getting read until you delete it.
+  Fix: `rm -rf build/fuzz-work build/fuzz-triage` before trusting a "still failing" `corpus-a16`
+  result that doesn't look like a real codegen regression. Found 2026‑09‑15 chasing a false alarm
+  after a `setjmp.S` fix (`docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md`).
 - **Compile + MIR-verify on the host** (no container needed; `mos-clang` is the built compiler):
   ```
   build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 \

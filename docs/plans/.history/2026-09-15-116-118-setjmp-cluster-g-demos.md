@@ -1,0 +1,11 @@
+| Date | Change |
+|------|--------|
+| [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/d46b756) | Cluster G #116 backtrack: surface an open longjmp page-1 defect |
+
+<!--history-meta v1
+d46b756	author	Will Norris
+d46b756	added	180
+d46b756	deleted	0
+d46b756	files	1
+d46b756	body	The Round 6 Cluster G escalation (harden the 65816-native\nplatforms/snes/setjmp.S fix, bug #35) fires on its first target run.\n\n#116 backtrack: an 8-queens search where every recursion level owns a\nsetjmp choice point and every dead end longjmps straight to the deepest\nstill-viable ancestor, discarding (d - k) jsr frames in one jump from a\ndepth that varies per backtrack. The gate CRC folds the eight solution\ngrids, the solved flags, visits/backtracks, the summed unwind depth, the\nevent count and the recorded event trace, so a botched unwind corrupts\nthe counters and the board together. Host oracle 0x7336;\n-verify-machineinstrs clean under default, +mos-a16 and +mos-xy16.\n\nOn target it reads 0x0000 in all three modes. That bisects to a 12-line\nrepro with no N-Queens in it: longjmp's page-1 hard-stack reconstruction\nnever executes, so every longjmp leaves S in page 0 and any rts out of\nthe setjmp frame reads its return address from the zero page. Bug #35 is\nstill live; corpus/setjmp_sim.c misses it because that guard never\nreturns from its setjmp frame.\n\nCause, at the byte level: the assembler sizes an immediate by magnitude\nrather than by the rep-established M width, so setjmp.S's `and #$00ff`\nencodes 8-bit (29 ff) while `ora #$0100` encodes 16-bit (09 00 01). With\nM=0 the CPU takes `ff 09` as the AND's 16-bit operand, the ora never\nruns, and the leftover `00 01` executes as BRK.\n\nThe gate stays at full strength: #116 lands un-gated (no expected.tsv\nrow, no dev/backtrack.sh, no demo ROM), and #117 csrjmp / #118 retryjmp\nstay unstarted, since both fail for the same reason. Fixing the runtime\nis separate work.\n\nVerification: dev/run.sh build -> 256 built + 3 excluded by contract,\nexit 0 (+1 over baseline, the new corpus slice). todo-lint 0 errors.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_011AP736JtwzSGYH4bmxDWTa
+-->
