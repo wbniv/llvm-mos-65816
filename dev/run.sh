@@ -87,12 +87,14 @@ Targets:
              +mos-a16-only; grid hash host == +mos-a16 on bsnes-jg + MAME + a framebuffer screenshot
              from both (build/buddha-{jg,mame}.png). examples/snes/buddha.c
   known-issues XPASS guard: assert each tools/a16_fuzz.py KNOWN_ISSUE_REPROS repro
-             STILL crashes -verify-machineinstrs under both +mos-a16 and +mos-xy16 with its
-             expected signature; fails loudly the moment one verifies clean -> drop the entry
-             + promote to a positive gate. Currently VACUOUS — KNOWN_ISSUE_REPROS is empty (all
-             tracked crashes FIXED: a16regpress->0009, a16scavnz->0011/0012, both positive gates;
-             KNOWN_ISSUES emptied by the pr15296 stale-XFAIL resolution). Re-arms automatically when
-             a new XFAIL is added. Toolchain-only (no SDK/emulator/secret).
+             STILL crashes -verify-machineinstrs under both +mos-a16 and +mos-xy16, at that
+             row's own -O level, with its expected signature; fails loudly the moment one
+             verifies clean. An XPASS means EITHER the defect is fixed (drop the entry +
+             promote to a positive gate) OR the repro drifted while the defect is untouched
+             (keep the entry, re-point the row) — the guard prints how to tell which.
+             Currently armed with 2 rows, both for the open RA cause-#2 XFAIL
+             a16-rc-undef-ra-pure-virtual: rcundef2.c @ -Os and newton_sim.c @ -O1.
+             Toolchain-only (no SDK/emulator/secret).
   dwarf      ROADMAP step 6 compiler-side gate: a `-g` build emits verifiable DWARF
              AND ld.lld writes the <output>.elf debug companion — assert (shapes,
              not addrs): companion present, --verify clean, addr_size 0x04,

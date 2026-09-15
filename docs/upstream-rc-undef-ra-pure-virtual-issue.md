@@ -97,16 +97,26 @@ patch on the rewriter's read side.
 
 ## Reproduction (downstream llvm-mos-65816 fork)
 
-`examples/snes/corpus/lsystem_sim.c` (function `main`) and
-`examples/snes/corpus/newton_sim.c` (function `newton_gate_crc`, `-O1` only),
-compiled `-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm
--verify-machineinstrs`. Both run correctly (lsystem `0x79C3`, newton `0x4D8B` on
-MAME + bsnes-jg). Tracked downstream as
+All compiled `-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -mllvm
+-verify-machineinstrs`, and all run correctly (the fork's 4-way host/MAME/bsnes-jg
+differential is green on every one). Tracked downstream as
 `KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]`.
 
-A third witness, `examples/snes/seqvm.c` (`draw_frame`), reproduces the same cause with a
-*live* consumer — see [Second manifestation](#second-manifestation-2026-08-02-the-undef-lane-feeds-a-store-not-a-dead-read)
-for its command line and output.
+| witness | function | reproduces at | notes |
+|---|---|---|---|
+| `examples/snes/seqvm.c` | `draw_frame` | `-O1`/`-O2`/`-Os`, `+mos-a16` and `+mos-xy16` | 2 errors, `$rc3` + `$rc5`; the undef lane feeds a **store**, not a dead read — see [Second manifestation](#second-manifestation-2026-08-02-the-undef-lane-feeds-a-store-not-a-dead-read) for the exact command line and output. Needs `--config mos-snes.cfg`. Clean at `-Oz` under `+mos-a16`. |
+| `examples/65816/rcundef2.c` | `main` | `-O1`…`-Os`, both features | `$rc11`; self-contained (`--target=mos`, no SDK headers), which is why it is the fork's XPASS-guard repro. |
+| `examples/snes/corpus/newton_sim.c` | `newton_gate_crc` | `-O1` **only** | 3 errors, `$rc2`/`$rc4`/`$rc5`. Clean at `-Os` since the fork's coalescer fix for the *other* cause. |
+| `examples/snes/corpus/trimerge_sim.c` | `main` | `-O1`/`-Os`, `+mos-xy16` only | `$x16 = LDXImag16 killed renamable $rs1` ×3 — the Imag16-**pair** form of the same cause. |
+
+> **Note on an earlier repro.** Revisions of this report before 2026‑09‑15 named
+> `examples/snes/corpus/lsystem_sim.c` (`main`, `$rc11`) as the primary witness. That file
+> verifies **clean** today, but **not because anything was fixed**: an unrelated downstream
+> commit (2026‑08‑01) rewrote its idle loop from `for (;;) {}` to
+> `for (;;) __asm__ volatile("wai")`, which reshapes `main` enough that the vulnerable live
+> range is no longer formed. Feeding the *previous* revision of that file to the *current*
+> compiler still reproduces `$rc11` at `-O1`/`-O2`/`-O3`/`-Os` on both features. The reduced,
+> loop-free `rcundef2.c` above preserves that exact shape.
 
 ## Relationship to the coalescer fix
 

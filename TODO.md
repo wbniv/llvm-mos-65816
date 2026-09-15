@@ -577,12 +577,22 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     (the operands must all be imaginary registers), **and** a known-issue verify failure no longer
     short-circuits the 4-way value check — a mismatch is a `FAIL` whatever the verify log said.
     ([plan](docs/plans/2026-09-15-fix-xy16-spill-reload-clobbers-store-value.md))
-    **Open, dispatched (T4, 2026-09-15):** the fix's own agent flagged that the pre-existing
-    `a16-rc-undef-ra-pure-virtual` KNOWN_ISSUES entry's repros have drifted (`lsystem_sim.c -Os` and
-    `newton_sim.c -Os` now verify clean; only `newton_sim.c -O1` still reproduces) — deliberately
-    left untouched since retiring it wrongly would discard a real hazard's regression guard.
-    Dispatched to diagnose why and make the retire-vs-tighten call.
-    <!-- agent:a88d3cf98160f056b -->
+    **Follow-up RESOLVED 2026-09-15 — repro drift diagnosed, XFAIL kept, guard re-armed.** The fix's
+    own agent flagged that the pre-existing `a16-rc-undef-ra-pure-virtual` KNOWN_ISSUES entry's
+    repros had drifted. **Verdict: NOT a fix — do not retire.** Counterfactual settles it: the
+    **pre-`903de3e` `lsystem_sim.c`** still reproduces `main`/`$rc11` on **today's** compiler at
+    ‑O1/‑O2/‑O3/‑Os on both legs, so no compiler change relieved anything — `903de3e` (2026‑08‑01
+    idle-loop `wai` hygiene sweep, 214 files) reshaped `main`'s live ranges out from under the
+    witness. `newton_sim.c -Os` was never drift at all: it has been clean since the cause‑#1 fix
+    `f1af264`, exactly as that commit's own comment states. Cause #2 is live in the shipping battery
+    today (`trimerge_sim.c` `main` `$rs1`, `+mos-xy16` ‑O1/‑Os, plus #33/#69/#71/#123). The real
+    defect was the guard's bookkeeping: `f1af264` retired `a16-newton-step-rc-undef` but left its
+    `KNOWN_ISSUE_REPROS` row, so the guard has been red since 2026‑06‑30 printing an impossible
+    ACTION — invisible because `smoke.yml` last ran 2026‑06‑19. Fixed: new durable repro
+    `examples/65816/rcundef2.c` (compiler test-suite dir, no idle loop to sweep), rows now carry an
+    explicit ‑O level (`rcundef2.c` @ ‑Os + `newton_sim.c` @ ‑O1, both legs), a row naming a retired
+    kid is now itself DRIFT, and the XPASS ACTION now makes you prove *fixed* vs *repro drifted*.
+    `known-issues` 4/4 green. ([plan](docs/plans/2026-09-15-a16-rc-undef-pure-virtual-drift.md))
   ([#35 defect](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md) ·
   [xy16 defect](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md) ·
   [plan](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md))

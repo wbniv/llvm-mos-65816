@@ -862,8 +862,13 @@ def compile_rom(src, rom, mapf, flags, cflags=()):
         raise CompileError("checksum rc=%d\n%s" % (c.returncode, c.stderr))
 
 
-def verify_machineinstrs(src, obj, flags=None, cflags=(), config=None):
+def verify_machineinstrs(src, obj, flags=None, cflags=(), config=None, opt="-Os"):
     """Compile with -verify-machineinstrs. `flags` defaults to A16. Returns (ok, log).
+
+    `opt` (default "-Os", the level the whole battery builds at) selects the optimisation
+    level. Only the known-issues XPASS guard passes anything else: some XFAILs are
+    level-sensitive (a16-rc-undef-ra-pure-virtual reproduces in newton_sim.c at -O1 but not
+    at -Os), and a guard pinned to a single level silently loses them.
     `cflags` (default empty) threads extra front-end args through unchanged for callers
     that need an adapter header; the builtin path omits it.
 
@@ -901,10 +906,10 @@ def verify_machineinstrs(src, obj, flags=None, cflags=(), config=None):
     if config is not None:
         cmd = [str(TOOL / "mos-clang"), "--config", str(config), "-mcpu=mosw65816", "-fno-lto",
                *flags, *cflags,
-               "-Os", "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
+               opt, "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
     else:
         cmd = [str(TOOL / "mos-clang"), "--target=mos", "-mcpu=mosw65816", *flags, *cflags,
-               "-Os", "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
+               opt, "-mllvm", "-verify-machineinstrs", "-c", "-o", str(obj), str(src)]
     try:
         p = _run(cmd)
     except subprocess.TimeoutExpired as e:
@@ -1103,14 +1108,32 @@ KNOWN_ISSUES = [
     # a16-rc-undef-ra-pure-virtual — the SECOND, distinct root cause (CAUSE #2) of the same
     # "Using an undefined physical register" symptom, NOT fixed by the cause-#1 coalescer guard. The
     # register ALLOCATOR binds a PURE-VIRTUAL Imag16 value — one with no `$rcN` copy anywhere in its
-    # def/use chain during coalescing — to a call-clobbered `$rc` pair it is live across. Witnesses:
-    # lsystem_sim.c `main` (all opt levels, $rc11) and newton_sim.c `newton_gate_crc` at -O1 only. With
+    # def/use chain during coalescing — to a call-clobbered `$rc` pair it is live across. With
     # no copy-hint signal, MOSRegisterInfo::shouldCoalesce cannot target it; the only coalescer rule
     # that masks it perturbs 22-25/34 corpus programs (forbidden blanket change). The genuine fix is
     # RA-interference-level (greedy RA / LiveRegMatrix must treat the call's regmask clobber of the
     # imaginary pair as interference). The code runs CORRECTLY (lsystem differential 0x79C3, both emus);
-    # this is a latent-hazard verify XFAIL pending the RA fix. Repro: examples/snes/corpus/lsystem_sim.c
-    # at -Os. See docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md (Cause #2).
+    # this is a latent-hazard verify XFAIL pending the RA fix.
+    # See docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md (Cause #2).
+    #
+    # WITNESSES (re-surveyed 2026-09-15 — the hazard is UNCHANGED and live; only the repro set moved):
+    #   * examples/65816/rcundef2.c `main` $rc11  — the guard's repro, -O1..-Os, BOTH legs.
+    #   * examples/snes/corpus/newton_sim.c `newton_gate_crc` $rc2/$rc4/$rc5 — -O1 only, BOTH legs.
+    #   * examples/snes/seqvm.c `draw_frame` $rc3/$rc5 — the "second manifestation" (the undef lane
+    #     feeds a STORE, not a dead read) that the upstream issue body leads with; -O1/-O2/-Os, BOTH
+    #     legs. Not a KNOWN_ISSUE_REPROS row because it #includes SDK headers and so needs
+    #     --config mos-snes.cfg, which would cost this guard its "toolchain-only, no SDK" property
+    #     (it runs in CI *before* dev/run.sh build).
+    #   * examples/snes/corpus/trimerge_sim.c `main` $rs1 (`$x16 = LDXImag16 $rs1`) — the live
+    #     battery-level witness: +mos-xy16 at -O1 AND -Os. Not a KNOWN_ISSUE_REPROS row only
+    #     because it is clean under +mos-a16 and rows must fail on both legs (see b78a2d5).
+    #   * demo slices #33 mandel-double, #69 gouraud, #71 msquares, #123 nmitally (see TODO.md).
+    # The original primary witness, lsystem_sim.c `main`, stopped reproducing on 2026-08-01 — NOT
+    # from a compiler fix but from commit 903de3e, an idle-loop hygiene sweep that rewrote its
+    # `for (;;) {}` to `for (;;) __asm__ volatile("wai")`, reshaping `main`. The pre-903de3e source
+    # still reproduces byte-for-byte on today's compiler. That is why the guard's repro now lives in
+    # examples/65816/ (compiler test-suite, no idle loop to sweep) rather than in a runnable demo
+    # slice. See docs/plans/2026-09-15-a16-rc-undef-pure-virtual-drift.md.
     #
     # DISCRIMINATOR. The bare string "Using an undefined physical register" is NOT a safe
     # signature for this entry on its own: a genuine +mos-xy16 MISCOMPILE emits the identical
@@ -1166,19 +1189,32 @@ def classify_known(log):
     return None
 
 
-# Deterministic repros for the deferred KNOWN_ISSUES defects, each paired with the kid it must
-# classify as. The `known-issues` XPASS guard (cmd_known_issues) asserts every one STILL crashes
-# -verify-machineinstrs under BOTH +mos-a16 and +mos-xy16 with this exact signature. When an
-# upstream/RA fix lands, the repro verifies CLEAN and the guard FAILS loudly — so the now-stale
-# KNOWN_ISSUES entry gets dropped (else it would silently mask a future regression of the same
-# signature) and the repro promoted to a positive differential gate. Maintain in lockstep with
-# KNOWN_ISSUES: dropping an entry there means dropping its row here too.
+# Deterministic repros for the deferred KNOWN_ISSUES defects: (source, kid, opt). Each names the
+# kid it must classify as AND the optimisation level at which it reproduces. The `known-issues`
+# XPASS guard (cmd_known_issues) asserts every one STILL crashes -verify-machineinstrs under BOTH
+# +mos-a16 and +mos-xy16 with this exact signature. When an upstream/RA fix lands, the repro
+# verifies CLEAN and the guard FAILS loudly — so the now-stale KNOWN_ISSUES entry gets dropped
+# (else it would silently mask a future regression of the same signature) and the repro promoted
+# to a positive differential gate.
+#
+# INVARIANT, both directions: this table and KNOWN_ISSUES move together. Dropping an entry there
+# means dropping its rows here, and every `kid` here MUST name a live KNOWN_ISSUES entry — a row
+# naming a retired kid can never be satisfied (classify_known cannot return it) and the guard
+# reports it as DRIFT.
+#
+# INVARIANT: each row states the -O level at which its repro reproduces. This XFAIL is
+# level-sensitive — newton_sim.c fires at -O1 and is clean at -Os — so a row is only meaningful
+# with its level, and the guard echoes that level so a level shift is visible rather than silent.
 # (a16-zp-pressure-overflow is intentionally absent: its repro is a gitignored c-torture file and
 # a LINK error, not a verify crash — so it can't be a verify-only guard row.)
 KNOWN_ISSUE_REPROS = [
-    # a16-newton-step-rc-undef: $rcN COPY to $x in newton_step under +mos-a16/+mos-xy16.
-    # Crashes verify-machineinstrs but runs correctly (gate: dev/run.sh newton → PASS 0x4D8B).
-    ("examples/snes/corpus/newton_sim.c", "a16-newton-step-rc-undef"),
+    # Primary, durable repro: a pure-virtual Imag16 ($rc11) bound across a clobbering call in
+    # `main`. Lives in the compiler test-suite dir and carries NO idle loop, so no demo-hygiene
+    # sweep can reshape it the way 903de3e reshaped lsystem_sim.c. See the WITNESSES note above.
+    ("examples/65816/rcundef2.c", "a16-rc-undef-ra-pure-virtual", "-Os"),
+    # Second independent witness, different function (`newton_gate_crc`, $rc2/$rc4/$rc5), still in
+    # tree. -O1 ONLY: at -Os the cause-#1 coalescer fix (f1af264) makes this TU verify clean.
+    ("examples/snes/corpus/newton_sim.c", "a16-rc-undef-ra-pure-virtual", "-O1"),
 ]
 
 
@@ -1397,45 +1433,57 @@ def triage_file(name, src_path, reason, extra=None):
 
 def cmd_known_issues(args):
     """XPASS guard: assert every KNOWN_ISSUE_REPROS file STILL crashes -verify-machineinstrs under
-    BOTH +mos-a16 and +mos-xy16 with its expected signature. Fails loudly the moment one verifies
-    clean (the deferred bug got fixed) so the stale KNOWN_ISSUES entry is dropped + the repro
-    promoted to a positive gate. Pure host verify — no container/SDK/emulator/secret needed."""
+    BOTH +mos-a16 and +mos-xy16, at the row's own optimisation level, with its expected signature.
+    Fails loudly the moment one verifies clean (the deferred bug got fixed) so the stale
+    KNOWN_ISSUES entry is dropped + the repro promoted to a positive gate. Pure host verify — no
+    container/SDK/emulator/secret needed.
+
+    A row naming a kid that is no longer in KNOWN_ISSUES is itself DRIFT and is reported as such:
+    classify_known() can never return that kid, so without this check the row degenerates into a
+    guard that can only ever report an impossible ACTION (see the KNOWN_ISSUE_REPROS note)."""
     WORK.mkdir(parents=True, exist_ok=True)
     legs = [("+mos-a16", A16), ("+mos-xy16", XY16)]
     total = len(KNOWN_ISSUE_REPROS) * len(legs)
     reproduces = 0
     fixed, drift = [], []
+    known_kids = {k for k, _ in KNOWN_ISSUES}
     print("==> known-issues XPASS guard: each KNOWN_ISSUES repro must still crash verify "
-          "(+mos-a16 AND +mos-xy16)")
-    for rel, kid in KNOWN_ISSUE_REPROS:
+          "(+mos-a16 AND +mos-xy16, at the row's own -O level)")
+    for rel, kid, opt in KNOWN_ISSUE_REPROS:
         src = ROOT / rel
+        if kid not in known_kids:
+            print("  %-30s %-4s       DRIFT — kid [%s] is not in KNOWN_ISSUES (retired entry left "
+                  "a stale row)" % (rel, opt, kid))
+            drift.append((rel, kid, "kid [%s] no longer exists in KNOWN_ISSUES — delete this row "
+                                    "or re-point it at a live entry" % kid))
+            continue
         if not src.exists():
-            print("  %-30s  MISSING SOURCE (%s)" % (rel, src))
+            print("  %-30s %-4s       MISSING SOURCE (%s)" % (rel, opt, src))
             drift.append((rel, kid, "repro source missing"))
             continue
         for tag, flags in legs:
             try:
-                ok, vlog = verify_machineinstrs(src, WORK / "ki.vo", flags=flags)
+                ok, vlog = verify_machineinstrs(src, WORK / "ki.vo", flags=flags, opt=opt)
             except VerifyDriverError as e:
                 # A repro TU that can't even be compiled (e.g. a missing header) is drift on
                 # its own terms — not a crash, but not a silent skip either.
-                print("  %-30s %-9s  DRIFT — driver error: %s" % (rel, tag, e))
-                drift.append((rel, kid, "driver error under %s: %s" % (tag, e)))
+                print("  %-30s %-4s %-9s  DRIFT — driver error: %s" % (rel, opt, tag, e))
+                drift.append((rel, kid, "driver error under %s %s: %s" % (tag, opt, e)))
                 continue
             if ok:
-                print("  %-30s %-9s  XPASS — verifies CLEAN (issue [%s] no longer reproduces)"
-                      % (rel, tag, kid))
-                fixed.append((rel, kid, tag))
+                print("  %-30s %-4s %-9s  XPASS — verifies CLEAN (issue [%s] no longer reproduces)"
+                      % (rel, opt, tag, kid))
+                fixed.append((rel, kid, "%s %s" % (tag, opt)))
             else:
                 got = classify_known(vlog)
                 if got == kid:
-                    print("  %-30s %-9s  xfail [%s] (still reproduces)" % (rel, tag, kid))
+                    print("  %-30s %-4s %-9s  xfail [%s] (still reproduces)" % (rel, opt, tag, kid))
                     reproduces += 1
                 else:
-                    print("  %-30s %-9s  DRIFT — crashes but signature=%s, expected [%s]"
-                          % (rel, tag, ("[%s]" % got) if got else "unclassified", kid))
-                    drift.append((rel, kid, "signature %s != [%s] under %s"
-                                  % (("[%s]" % got) if got else "unclassified", kid, tag)))
+                    print("  %-30s %-4s %-9s  DRIFT — crashes but signature=%s, expected [%s]"
+                          % (rel, opt, tag, ("[%s]" % got) if got else "unclassified", kid))
+                    drift.append((rel, kid, "signature %s != [%s] under %s %s"
+                                  % (("[%s]" % got) if got else "unclassified", kid, tag, opt)))
     print()
     if fixed:
         print("XPASS: %d known-issue repro/leg(s) NO LONGER REPRODUCE — the deferred bug looks FIXED:"
@@ -1444,9 +1492,16 @@ def cmd_known_issues(args):
             print("  - %s verifies clean under %s" % (rel, tag))
         # de-dup the kids needing action
         for kid in sorted({k for _, k, _ in fixed}):
-            print("ACTION: drop KNOWN_ISSUES['%s'] (and its KNOWN_ISSUE_REPROS row) in tools/a16_fuzz.py,"
+            print("ACTION for [%s] — prove WHICH of these two it is before touching anything:" % kid)
+            print("        (a) the defect is genuinely FIXED -> drop KNOWN_ISSUES['%s'] and its"
                   % kid)
-            print("        then promote the repro to a POSITIVE gate (host==default==+mos-a16==+mos-xy16).")
+            print("            KNOWN_ISSUE_REPROS row(s) in tools/a16_fuzz.py, then promote the repro")
+            print("            to a POSITIVE gate (host==default==+mos-a16==+mos-xy16).")
+            print("        (b) the REPRO drifted while the defect is untouched -> KEEP the entry and")
+            print("            re-point the row at a witness that still fires. The test: feed the")
+            print("            PREVIOUS revision of the repro source to TODAY's compiler. Still")
+            print("            crashes => (b). (This is exactly what happened to lsystem_sim.c on")
+            print("            2026-08-01; see docs/plans/2026-09-15-a16-rc-undef-pure-virtual-drift.md.)")
     if drift:
         print("DRIFT: %d known-issue repro(s) changed signature/availability — investigate before trusting"
               " the XFAIL:" % len(drift))
