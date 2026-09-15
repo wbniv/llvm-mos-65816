@@ -212,8 +212,12 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   No fork fix. Evidence: `dev/measure-far-ptr-value-state.sh`.
   [plan §Re-evaluation](docs/plans/2026-06-21-320-five-address-space-model.md) ·
   [F2 hand-off](docs/plans/2026-06-21-320-far-calls-followups.md).
-- [T4] **#320 five-address-space model — Phase 0+3 DONE; new spaces (AS3 packed-24, AS4 zero-bank) DEFERRED
-  (premature, not nulls).** asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/
+- [x] ~~**#320 five-address-space model — COMPLETE, all 5 spaces measured (2026-06-22).**~~ AS3
+  packed-24 **BUILT + productionized** (`0006`, static-init reloc fixed); AS4 zero-bank **measured
+  and CLOSED as a deliberate null** (bit-identical to a near pointer, dominated by the near +
+  lazy-cast incumbent on every axis) — not a gap, a decided non-goal.
+
+  asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/
   `3`=packed-24/`4`=zero-bank); we ship 3 additive (`0`=near-default/`1`=DP/`2`=32-bit far). **Two hard
   constraints:** (C1) one MOS datalayout shared with the 6502 ⇒ `0`=far-default is **architecturally
   foreclosed** (would break every 6502 pointer); "far by default" can only be a clang memory-model flag.
