@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -358,6 +358,14 @@ Targets:
              corrupts exactly one coefficient. Asserts corpus_result (csrjmp_gate_crc 0xADD8) ==
              host on MAME + bsnes-jg + a structure gate, screenshots both
              (build/csrjmp-{mame,jg}.png). 5-way differential: corpus-a16 (csrjmp_sim).
+  retryjmp   #118 Round 6 Cluster G: the Retry-On-Fault Ladder — ONE setjmp site re-armed and
+             re-entered 24 times, each attempt jumping back from a different call depth over a
+             different soft-stack high-water mark (noinline recursive rj_work with six 16-bit
+             locals live across the recursive call), so state that leaks across re-entries drifts
+             the whole outcome sequence. Asserts corpus_result (retryjmp_gate_crc 0x3388) == host
+             on MAME + bsnes-jg + a structure gate + the +mos-xy16 -verify regression gate for
+             the A16-clobber miscompile this demo found, screenshots both
+             (build/retryjmp-{mame,jg}.png). 5-way differential: corpus-a16 (retryjmp_sim).
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for

@@ -532,15 +532,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   by mode, so the CPU read past it into the next opcode at runtime) — FIXED in `platforms/snes/setjmp.S`
   (one line, the existing `mos16()` immediate-width modifier):
   [investigation](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md#resolution-2026-09-15).
-  `#118 retryjmp` then found an OPEN `+mos-xy16` **miscompile** — a spill-slot address materialization
-  takes the live `Imag16` pair holding the value it is about to store:
-  [investigation](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md).
+  `#118 retryjmp` then found a `+mos-xy16` **miscompile** — an X16/Y16 soft-stack spill is staged
+  through the accumulator (`txa; sta (ptr)` / `lda (ptr); tax` — a 16-bit index register has no
+  `(zp)`-indirect form) and the `LDStk`/`STStk` pseudo never declares that clobber, so register
+  allocation left the live 16-bit value in `A16` across its own index reload — **FIXED 2026‑09‑15**
+  in `MOSRegisterInfo::expandLDSTStk` (patch `0002`):
+  [investigation](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md#resolution-2026-09-15).
   Round 6 **Cluster G (#116–118)** added 2026-07-02 to harden the new `platforms/snes/setjmp.S` fix (#35 longjmp,
   runtime/library — not a codegen patch): #116 `backtrack` (deep multi-frame longjmp unwind, the unblocked #35
   backtracking solver — the flagship), #117 `csrjmp` (all 14 `__rc18..31` CSRs live across the jump), #118
   `retryjmp` (re-entrant setjmp site, varying depth + deep soft stack). Beyond the `corpus/setjmp_sim.c` guard.
-  **Cluster G result (2026-09-15) — #116 and #117 BUILT + gated, not yet published; #118 STOPPED on a second,
-  unrelated OPEN defect it found.** Publishing is out of scope — no visual demo here is shipped to any site.
+  **Cluster G result (2026-09-15) — all three BUILT + gated, not yet published. Both defects it found are
+  FIXED.** Publishing is out of scope — no visual demo here is shipped to any site.
   - **#116 `backtrack` — BUILT + gated, not yet published.** 8-queens, one `setjmp` choice point per recursion
     level, every dead end `longjmp`ing straight to the deepest still-viable ancestor = a multi-frame unwind from a
     varying depth. `corpus_result = 0x7336`, `host == default == +mos-a16 == +mos-xy16` on MAME **and** bsnes-jg
@@ -555,26 +558,28 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
     emulators (MAME ran), `-verify` clean in all three modes. Codegen confirms the shape — 12 of the 14 land in
     `__rc20..__rc31`, the rest on the soft stack. Full set shipped, same as #116. **Verdict: the restore offsets
     are correct.**
-  - **#118 `retryjmp` — STOPPED, committed UN-GATED.** One `setjmp` site re-entered 24 times, each attempt
-    jumping back from a different depth with six 16-bit locals live across every recursive call. Host oracle
-    `0x3388`; default and `+mos-a16` agree on target; **`+mos-xy16` gives `0x82D4` — a real MISCOMPILE**, not a
-    verifier-only complaint. The frame-index address materialization for a spill slot takes the live `Imag16`
-    pair (`__rc2`/`__rc3`) that holds the value about to be stored, so `rj_result[]` receives the index
-    expression instead. `setjmp.S` is RULED OUT (the call site is in 8-bit index mode; #116/#117 both pass xy16
-    with far more longjmp traffic). `-O0` clean, `-O1`/`-Os`/`-Oz`/`-O2` fail. Gate deliberately NOT weakened:
-    the logic header, host oracle and corpus slice are committed as the reproduction, with **no** `expected.tsv`
-    row, **no** `dev/retryjmp.sh` and **no** visual ROM. Also flagged: `tools/a16_fuzz.py`'s `KNOWN_ISSUES`
-    matches the literal string `"Using an undefined physical register"`, so this miscompile would be recorded as
-    the benign `a16-rc-undef-ra-pure-virtual` XFAIL — the message text is not a safe discriminator.
-    **ESCALATED** — the fix is backend (register scavenger / frame-index elimination) plus a full rebuild.
+  - **#118 `retryjmp` — BUILT + gated, not yet published; the defect it found is FIXED.** One `setjmp`
+    site re-entered 24 times, each attempt jumping back from a different depth with six 16-bit locals
+    live across every recursive call. `corpus_result = 0x3388`, `host == default == +mos-a16 ==
+    +mos-xy16` on both emulators, `-verify-machineinstrs` clean in all three modes. Full set shipped,
+    same as #116/#117 — plus a `+mos-xy16 -verify` regression gate at `-O1`/`-Os`/`-Oz`/`-O2` inside
+    `dev/retryjmp.sh`, the exact legs that failed. **The defect:** a 16-bit index register has no
+    `(zp)`-indirect load/store on the 65816, so an X16/Y16 soft-stack spill must be staged through the
+    accumulator — and neither `LDStk` nor `STStk` carries an `A16` operand, so the allocator was never
+    told and left the value bound for `rj_result[]` in `A16` across the spill's own index reload
+    (`0x82D4` vs the host's `0x3388`). The investigation's provisional "frame-index elimination takes a
+    live `Imag16` pair" reading was **wrong** — `$rs1` is genuinely dead there and is the pseudo's own
+    `@earlyclobber` scratch; the verifier's complaint was two clobbers downstream. Fixed by bracketing
+    the staging with new `PHA16`/`PLA16` pseudos when the accumulator is live across the spill;
+    measured blast radius is **2 brackets across all 117 corpus slices, both in `retryjmp_sim.c`**.
+    Also closed the discriminator hole it exposed: `tools/a16_fuzz.py` no longer classifies any
+    *"Using an undefined physical register"* log as the benign `a16-rc-undef-ra-pure-virtual` XFAIL
+    (the operands must all be imaginary registers), **and** a known-issue verify failure no longer
+    short-circuits the 4-way value check — a mismatch is a `FAIL` whatever the verify log said.
+    ([plan](docs/plans/2026-09-15-fix-xy16-spill-reload-clobbers-store-value.md))
   ([#35 defect](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md) ·
   [xy16 defect](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md) ·
   [plan](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md))
-  - **Fix in progress (dispatched T4, 2026-09-15).** Scope: design + implement the backend fix
-    (register scavenger / frame-index elimination live-range handling), then complete `#118` (its
-    `expected.tsv` row, `dev/retryjmp.sh`, visual ROM) following `#116`/`#117`'s pattern, plus
-    tighten `tools/a16_fuzz.py`'s `KNOWN_ISSUES` string-match so this defect's signature can't hide
-    behind the benign `a16-rc-undef-ra-pure-virtual` XFAIL again. <!-- agent:a3e576735fb8116b3 -->
   - [T4] **#102 cpu6502** — 6502/65C02 CPU Disassembler + Simulator (a genuinely NEW showcase demo, not a hardening re-stress). Simulates a pure 6502/65C02 (8-bit A/X/Y, 16-bit PC) running the 6502-assembly equivalent of `hello.c` (green color reg + sentinel 0x42, then a loop exercising every ALU gate). On-screen: a scrolling **Waldo 16×16** disassembly listing (highlighted current instruction) + 8 schematic ALU gate symbols (AND/OR/XOR as classic shapes; ADD/SUB/SHL/SHR/CMP blocks) — the gate for the just-executed instruction lights yellow; live register + flag strip. Codegen stressed: **256-entry `switch` → jump table** (`jmp_table=4`), uint16_t PC arithmetic, uint8_t flag bit-ops. **Gate-green, clean positive:** `host==default==+mos-a16==+mos-xy16==0xAC8A` on MAME + bsnes-jg (pixel-identical render), `-verify` clean, `rep/sep=97`. ~~**Publish to biohack.net pending** (`/snes-rom-page`).~~ **ALREADY PUBLISHED — stale note, corrected 2026-07-26.** Live at ✓ [/snes/cpu6502/](https://biohack.net/snes/cpu6502/) (HTTP 200; shipped by biohack.net `aff09db` / tag `v1.0.254`, the full-screen-layout redesign — the page, ROM, preview and a manifest selfcheck `off=0xADD len=2 want=0xAC8A frames=1000` were all already in place). **Re-verified on the rebased toolchain (2026-07-26):** rebuilt ROM is **byte-identical** to both the site-repo copy and the live-served ROM (`sha256 c0df7cfd195ba8bb…`), and re-passes the gate on bsnes-jg (`SMOKE: PASS off=0xADD got=0xAC8A`, 1000 frames) with the render correct (`0019 CMP` highlighted + CMP gate lit). ([plan](docs/plans/2026-07-02-102-snes-cpu6502.md) · [rebase](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md))
   - [T3] **Compiler-bug videos via the cpu6502 demo.** The cpu6502 simulator is a natural vehicle for showing compiler miscompiles visually — a wrong gate sequence or corrupted register value is immediately on-screen. Produce short MAME/bsnes-jg clips illustrating each known battery-caught bug (wrong output → fixed output). Depends on #102 shipping.
   - [T3] **#128 lzss-gallery — transparent gravity-chevron navigation + continuous-bracket repack tracker.** Replace the black-badge Prev/Next arrows with transparent beveled 3D chevrons (5 hand-authored poses × dedicated Left/Right tile sets) driven by signed 8.8 ballistic physics in the NMI (takeoff `velocity = -0x00C0`, gravity `+0x0010`, ~24-frame bounce), glow derived from arc state instead of frame parity; replace the box/five-dot compression tracker with capped continuous brackets + one clock-latched traveling packet, rebuilt atomically in the OAM shadow. Also fixes a pre-existing reserved-palette slot bug (CGRAM 132=0 today, so the destination outline/diamond render **black**, not accent — audit in the plan). Gate: 26-work / generated oracle `0x3D44` unchanged. [plan](docs/plans/2026-07-27-128-lzss-gallery-gravity-chevrons.md)
@@ -1508,6 +1513,18 @@ revisit) rather than active work._
 _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
 
 <!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
+<!-- triaged 2026-09-15: all three captured deferrals from
+     2026-09-15-fix-xy16-spill-reload-clobbers-store-value.md are non-work.
+     • "Publishing #118 (or #116/#117) to biohack.net" -> the curated M2 Cluster G block
+       already states all three are "BUILT + gated, not yet published" and that publishing
+       is user-triggered and out of scope for the battery. Nothing separately open.
+     • "The suboptimal spill itself" (retryjmp_gate_crc spills X16 and reloads it one
+       instruction later) -> a register-allocation QUALITY observation, not a correctness
+       item; deliberately left alone by the fix and not worth its own backlog entry.
+     • "Upstreaming" -> LDStk/STStk staging through A16 is fork-only (+mos-xy16), so there
+       is no stock-llvm-mos defect to report and nothing to queue in
+       docs/upstream-contribution-status.md.
+     Nothing open here. -->
 <!-- triaged 2026-06-16: both Tier-1 "out of scope" bullets are non-work — the
      fault-injection mode is explicitly "not needed" (the seed corpus is the volume),
      and "Backend fixes: minimize → root-cause → fix" is the PROCESS that was followed

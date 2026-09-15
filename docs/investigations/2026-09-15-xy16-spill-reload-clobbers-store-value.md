@@ -1,11 +1,18 @@
-# `+mos-xy16`: a spill-slot address materialization clobbers the live value it is about to store
+# `+mos-xy16`: an X16/Y16 soft-stack spill clobbers the live accumulator it is staged through
 
-> **STATUS 2026‑09‑15: OPEN — real `+mos-xy16` MISCOMPILE, not a verifier-only complaint.**
+> **STATUS 2026‑09‑15: RESOLVED.** Fixed the same day —
+> [§ Resolution](#resolution-2026-09-15). The title and the "Root cause" section below record
+> the *provisional* diagnosis this investigation reached; it was **wrong in its mechanism** and
+> the resolution section corrects it. Kept verbatim rather than rewritten, because the wrong
+> turn is the instructive part: the instruction the verifier points at was two clobbers
+> downstream of the actual defect.
+>
 > Found by **#118 `retryjmp`** (Round 6 Cluster G) on its first run. Default‑8‑bit and
-> `+mos-a16` are correct; `+mos-xy16` writes the wrong value into a global `uint16_t` array.
-> `#118` is therefore **STOPPED and un-gated** — no `expected.tsv` row, no `dev/retryjmp.sh`,
-> no visual ROM — per the battery's rule that a demo is never weakened to ship around a defect
-> it found. `#116 backtrack` and `#117 csrjmp` are unaffected and shipped.
+> `+mos-a16` were correct; `+mos-xy16` wrote the wrong value into a global `uint16_t` array.
+> `#118` was **STOPPED and un-gated** while it was open — no `expected.tsv` row, no
+> `dev/retryjmp.sh`, no visual ROM — per the battery's rule that a demo is never weakened to
+> ship around a defect it found. All three are now shipped and gated.
+> `#116 backtrack` and `#117 csrjmp` were never affected.
 
 ## Symptom
 
@@ -153,12 +160,141 @@ verifier-only XFAIL whose entry states the code is bit-exact correct. This defec
 exact string **and** a wrong answer. A slice carrying it would be recorded as a known-issue XFAIL
 rather than a miscompile, so the message text alone is not a safe discriminator.
 
+**Closed 2026‑09‑15, two ways** (`tools/a16_fuzz.py`):
+
+1. The `a16-rc-undef-ra-pure-virtual` predicate now requires **every** undefined operand the
+   verifier names to be an *imaginary* register (`$rcN`/`$rsN`/`$rlN`) — cause #2 is by
+   construction about an `Imag16` value bound across a call's regmask. One real-register operand
+   (`$a16`, exactly this defect) disqualifies the whole log.
+2. More importantly, `evaluate()` **no longer short-circuits on a known-issue verify failure**.
+   The program is still built and run 4-way, and a value disagreement is a `FAIL` regardless of
+   which XFAIL the verify log matched. Every `KNOWN_ISSUES` entry asserts "the code is still
+   bit-exact correct"; that claim is what makes an XFAIL safe, so it is now *checked* rather than
+   assumed.
+
 ## Status
 
-- `#118 retryjmp` is **STOPPED**: the logic header, the host oracle and the corpus slice are in
-  the tree as the repro, deliberately **without** an `expected.tsv` row, a `dev/retryjmp.sh`
-  driver, or a visual ROM. Add all of those once the defect is fixed — the host oracle is
-  `0x3388`.
+- ~~`#118 retryjmp` is **STOPPED**~~ — **shipped 2026‑09‑15 with the fix.** The
+  `expected.tsv` row (`0x3388`), `dev/retryjmp.{sh,lua}` and the visual ROM
+  `examples/snes/retryjmp.c` all landed; `dev/retryjmp.sh` additionally carries the
+  `+mos-xy16 -verify-machineinstrs` regression gate at `-O1`/`-Os`/`-Oz`/`-O2`, the exact legs
+  that failed here.
 - Needs a backend change (register scavenger / frame-index elimination live-range handling) plus
   a full toolchain rebuild and regression sweep. **ESCALATED — out of scope for the demo pass
   that found it.**
+
+---
+
+## Resolution (2026-09-15)
+
+**The provisional root cause above is wrong, and the correction matters.** `$rs1` is *not* taken
+while live. Read the pre-PEI MIR again:
+
+```
+  renamable $x16 = LDXImag16 killed renamable $rs2
+  dead early-clobber renamable $rs2 = STStk killed renamable $x16, %stack.0, 0
+  renamable $a16 = LDAImag16 killed renamable $rs1          ; <- $rs1 DIES here
+  renamable $x16, dead early-clobber renamable $rs1 = LDStk %stack.0, 0
+  STAbsXIdx16 killed renamable $a16, @rj_result, killed renamable $x16
+```
+
+`LDAImag16 killed renamable $rs1` reads the pair out one instruction before the elimination
+point, so `$rs1` is genuinely dead there; and the pair the address lands in is the `LDStk`
+pseudo's own `@earlyclobber $scratch` operand (`MOSInstrPseudos.td:229`), legitimately assigned
+by register allocation. Nothing about that is a bug.
+
+**The actual defect is one register up: the value is in `A16`, and the `LDStk` destroys `A16`
+without ever telling the allocator.**
+
+A 16-bit index register has no `(zp)`-indirect load or store on the 65816, so an X16/Y16
+soft-stack spill has to be **staged through the accumulator**:
+`MOSRegisterInfo::expandLDSTStk` emits `txa; sta (ptr)` outbound and `lda (ptr); tax` inbound.
+Neither `LDStk` nor `STStk` carries an `A16` operand, so that clobber is invisible to register
+allocation — which parked the value bound for `rj_result[i]` in `A16` across the spill. The
+reload overwrote `A16` with the spilled index and `sta rj_result,x` stored the index expression.
+
+The two clobbers the "wrong code" section blames are both downstream of that:
+
+- The address materialization (`clc; lda __rc0; adc #4; sta __rc2`) *is* clobbering `$a`, but
+  that path is already handled: `expandAddrLostk` routes through a virtual `AcRegClass` register
+  that the post-RA scavenger saves and restores whenever `$a` is live
+  (`MOSRegisterInfo::saveScavengerRegister`, the `MOS::A` arm). It reads as an unguarded clobber
+  here only because the `LDAIndir16` below it fully redefines `A16`, so backward liveness
+  correctly reports `A16` dead at the scavenge point — the accumulator's value had already been
+  written off.
+- The verifier's *Using an undefined physical register* on `STAbsXIdx16` is the last symptom in
+  the chain: `TAX16` kills `$a16`, and the store then re-reads it.
+
+Same family as fork patch `0011`, as guessed, but the opposite mechanism: `0011` is about the
+*scavenger's* handling of a live `$p`; this is an expansion clobber the allocator was never told
+about.
+
+### The fix
+
+`MOSRegisterInfo::expandLDSTStk` becomes a thin wrapper around the existing body
+(`expandLDSTStkImpl`). When the register being spilled is `Xc16`/`Yc16` **and** the accumulator
+is live across the pseudo, the wrapper brackets the whole expansion with a 16-bit push/pull:
+
+- **`PHA16` / `PLA16`** — new pseudos in `MOSInstrLogical.td`, `PseudoInstExpansion` of
+  `PHA_Implied`/`PLA_Implied` with `MLow = 1`, so `MOSInsertREPSEP` runs them inside a `rep #$20`
+  and `pha`/`pla` move both bytes. They are not selectable; the expansion is their only emitter.
+- **`accumulatorLiveAcross()`** — built on the `computeLiveBefore()` helper patch `0011` already
+  added to this file. `LDStk`/`STStk` name no accumulator operand, so liveness before the pseudo
+  equals liveness after it. `LivePhysRegs::available()` is alias-aware, so a live 8-bit `$a`
+  answers "live" too — deliberately: `lda (zp); tax` destroys `$a` just as thoroughly, which
+  makes this a *generalization*, not a narrowing to the reported shape.
+- The save must precede the pointer materialization (which scavenges `$a`) and the restore must
+  follow the whole sequence, which is why the bracket lives in the wrapper rather than in the
+  `Xc16`/`Yc16` arms. `pushPullBalanced()` counts the new pair so the scavenger's hard-stack
+  balance test stays exact.
+
+**Rejected: declaring the clobber on the pseudo** (`implicit-def dead $a16`, or `Defs=[A16]` in
+TableGen). These pseudos are created by the *spiller*, during register allocation and after live
+intervals are built, so a physical-register def added there is not reflected in the regunit live
+ranges the allocator checks interference against — unreliable, which is the worst property a
+miscompile fix can have. It is also unsatisfiable by recolouring (`Ac16` has exactly one member,
+so only a spill could satisfy it), and a blanket `Defs=[A16]` would make *every* soft-stack spill
+on *every* MOS target clobber the accumulator, since `A16` aliases `A`.
+
+Erring is one-sided by construction: a spurious "live" costs one `pha`/`pla` pair (2 B, 7 cycles)
+and is always semantically harmless; a missed "live" is a miscompile. The estimate can only err
+toward "live" — the scan runs during PEI's forward walk, so any `LDStk`/`STStk` *below* the
+current one is still an unexpanded pseudo naming no accumulator, and can therefore only fail to
+report a *kill* of `A16`, never invent a *use*.
+
+### Emitted code
+
+```asm
+	rep	#32
+	txa
+	sta	(__rc4)                         ; 2-byte Folded Spill
+	lda	__rc2                           ; A16 = rj_acc — THE VALUE
+	pha                                     ; <- PHA16, inside the same rep run
+	clc
+	sep	#32
+	lda	__rc0 ; adc #4 ; sta __rc2      ; address materialization (clobbers $a)
+	lda	__rc1 ; adc #0 ; sta __rc3
+	rep	#32
+	lda	(__rc2)                         ; 2-byte Folded Reload — A16 = the index
+	tax
+	pla                                     ; <- PLA16, the value is back
+	sta	rj_result,x                     ; stores the VALUE
+	sep	#32
+```
+
+`MOSInsertREPSEP` folded both halves into the *existing* `rep #$20` runs, so the fix costs
+exactly two bytes here and no extra mode switches.
+
+### Blast radius
+
+Measured, not asserted: across all 117 corpus slices compiled `+mos-xy16 -Os`, the gate fires
+**twice in total, both in `retryjmp_sim.c`** (counted at the MIR level with
+`-mllvm -print-after=prologepilog | grep PHA16`). Every other program is unchanged — the wrapper
+emits nothing when the accumulator is dead, and the expansion body is untouched. The default and
+`+mos-a16` paths cannot reach the bracket at all: it is guarded on `Xc16`/`Yc16`, register
+classes that exist only under `+mos-xy16`.
+
+### Verification
+
+`docs/plans/2026-09-15-fix-xy16-spill-reload-clobbers-store-value.md` carries the numbered
+verification record with raw output.

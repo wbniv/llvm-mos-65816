@@ -1111,9 +1111,52 @@ KNOWN_ISSUES = [
     # imaginary pair as interference). The code runs CORRECTLY (lsystem differential 0x79C3, both emus);
     # this is a latent-hazard verify XFAIL pending the RA fix. Repro: examples/snes/corpus/lsystem_sim.c
     # at -Os. See docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md (Cause #2).
-    ("a16-rc-undef-ra-pure-virtual",
-     lambda log: "Using an undefined physical register" in log),
+    #
+    # DISCRIMINATOR. The bare string "Using an undefined physical register" is NOT a safe
+    # signature for this entry on its own: a genuine +mos-xy16 MISCOMPILE emits the identical
+    # string (#118 retryjmp — an X16/Y16 soft-stack spill staged through A16 without telling
+    # the allocator; docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md),
+    # and matching on the text alone files such a slice as this benign XFAIL. Two rules keep
+    # a real defect from hiding here:
+    #   1. the predicate below, which requires EVERY undefined operand the verifier names to
+    #      be an IMAGINARY register ($rcN/$rsN/$rlN) — cause #2 is by construction about an
+    #      Imag16 value bound across a call's regmask. A real register ($a16/$a/$x16/$p/…)
+    #      is a different defect and must hard-FAIL.
+    #   2. evaluate(), which no longer short-circuits on a known-issue verify failure: the
+    #      program is still built and run 4-way, and a value disagreement is a FAIL no matter
+    #      which XFAIL the verify log matched. This entry's own claim is "the code runs
+    #      CORRECTLY" — so check it rather than assume it.
+    ("a16-rc-undef-ra-pure-virtual", lambda log: _is_rc_undef_pure_virtual(log)),
 ]
+
+# `- operand 3:   killed renamable $rc5` / `- operand 0:   killed renamable $a16`
+_VERIFY_OPERAND_RE = re.compile(r"^-\s*operand\s+\d+:\s+(.*)$", re.M)
+# An imaginary zero-page register: $rc12 (byte), $rs6 (pair), $rl1 (quad).
+_IMAG_REG_RE = re.compile(r"\$r[csl]\d+\b")
+_UNDEF_PHYSREG_HDR = "Using an undefined physical register"
+
+
+def _is_rc_undef_pure_virtual(log):
+    """True only when EVERY 'undefined physical register' the verifier reported names an
+    imaginary ($rcN/$rsN/$rlN) operand — the cause-#2 signature. One real-register operand
+    (e.g. $a16, the #118 retryjmp miscompile) disqualifies the whole log, so a new defect
+    can never hide behind this XFAIL."""
+    if _UNDEF_PHYSREG_HDR not in log:
+        return False
+    # Split into per-error blocks; only the undefined-physreg ones are ours to judge.
+    blocks = log.split("*** Bad machine code: ")
+    saw = False
+    for b in blocks[1:]:
+        if not b.startswith(_UNDEF_PHYSREG_HDR):
+            continue
+        operands = _VERIFY_OPERAND_RE.findall(b)
+        if not operands:
+            return False  # unparseable block — refuse to classify it as benign
+        for op in operands:
+            if not _IMAG_REG_RE.search(op):
+                return False
+        saw = True
+    return saw
 
 
 def classify_known(log):
@@ -1194,6 +1237,7 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verif
     """
     WORK.mkdir(parents=True, exist_ok=True)
     SCRATCH.mkdir(parents=True, exist_ok=True)
+    known_kid = None  # set when a verify leg matched KNOWN_ISSUES; still value-checked below
 
     # 1) crash detector: -verify-machineinstrs under +mos-a16 AND +mos-xy16 (xy16 implies a16).
     #    Run BOTH legs (unless a16 is itself a NEW crash) so a known a16 issue can never MASK a
@@ -1240,9 +1284,13 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verif
         # No NEW crash on either leg. If either leg hit a known, already-diagnosed defect → XFAIL
         # (regalloc-out-of-registers, scavenger-p-not-gpr, …). Both legs of a pressure defect produce
         # the same kid in practice; report the a16 one when set, else the xy16 one.
-        kid = kid_a or kid_xy
-        if kid:
-            return "XFAIL", "known issue [%s]" % kid, None
+        known_kid = kid_a or kid_xy
+        # Deliberately NOT an early return. Every KNOWN_ISSUES entry asserts the affected code
+        # is still bit-exact correct; that claim is what makes an XFAIL safe, and it has to be
+        # *checked*. #118 retryjmp produced a known-issue verify signature together with a wrong
+        # answer (0x82D4 vs the host's 0x3388), and an early return here would have filed it as
+        # a benign XFAIL. So fall through, build and run the program 4-way as usual, and only
+        # downgrade a clean run to XFAIL at the bottom — a mismatch stays a FAIL.
 
     # 2) compile default, +mos-a16, and +mos-xy16 ROMs
     try:
@@ -1300,6 +1348,10 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verif
         return "FAIL", "mismatch: " + ", ".join(
             "%s=%s" % (k, ("0x%04X" % vals[k] if isinstance(vals[k], int) else vals[k])) for k in vals), ref
     tag = "0x%04X" % ref if isinstance(ref, int) else str(ref)
+    if known_kid:
+        # Verify rejected it with an already-diagnosed signature, but every leg agrees with the
+        # reference — the XFAIL's "code is correct" claim holds for this program. Report XFAIL.
+        return "XFAIL", "known issue [%s]; values agree (%s)" % (known_kid, tag), ref
     return "PASS", "%s (all agree)" % tag, ref
 
 

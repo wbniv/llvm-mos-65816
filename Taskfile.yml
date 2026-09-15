@@ -809,6 +809,23 @@ tasks:
       - task: mandel-mame
         vars: { ROM: csrjmp }
 
+  retryjmp:
+    desc: "#118 (Round 6, harden-the-fixes, Cluster G): Retry-On-Fault Ladder — the RE-ENTRY guard for the 65816-native platforms/snes/setjmp.S fix (bug #35). ONE setjmp site re-armed and re-entered 24 times, each attempt jumping back from a different call depth over a different soft-stack high-water mark (noinline recursive rj_work with six 16-bit locals live across the recursive call), so state that leaks across re-entries drifts the whole outcome sequence rather than corrupting one value. A ladder of 24 attempt columns: clean attempts settle green at their depth, faulted ones flash red and snap back to the baseline. Also the regression guard for the +mos-xy16 A16-clobber miscompile this demo found (fixed 2026-09-15). Assert corpus_result (retryjmp_gate_crc 0x3388) == host on MAME + bsnes-jg + structure gate + +mos-xy16 -verify-machineinstrs clean at -O1/-Os/-Oz/-O2. Leaves build/retryjmp.sfc + build/retryjmp-{mame,jg}.png."
+    cmds:
+      - dev/run.sh retryjmp
+
+  retryjmp-play:
+    desc: "PLAY the Retry-On-Fault Ladder demo in MAME (builds first if needed). 24 re-entries of one setjmp site, drawn as a ladder of attempt columns."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/retryjmp.sfc ]; then
+          echo "==> build/retryjmp.sfc missing -- building (dev/run.sh retryjmp)..."
+          dev/run.sh retryjmp
+        fi
+      - task: mandel-mame
+        vars: { ROM: retryjmp }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:
