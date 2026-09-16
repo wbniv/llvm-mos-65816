@@ -979,6 +979,91 @@ tasks:
       - task: mandel-mame
         vars: { ROM: trapguard }
 
+  vlanest:
+    desc: "#151 (Round 8, the un-entered backend paths, Cluster C): Nested VLA Pyramid — the DEPTH axis of G_DYN_STACKALLOC (MOSLegalizerInfo.cpp:456 .custom()). Two VLAs live in NESTED block scopes with independent runtime lengths, so one G_STACKSAVE/G_STACKRESTORE bracket encloses another and the soft SP must unwind in the right order; the inner length is derived from the OUTER allocation's contents, so the inner size depends on data living in the enclosing allocation. #143 vlastack covers ONE bracket at ONE depth. MEASURED FIRST, and it determined the source shape: a function-scope VLA plus an inner-block VLA gives 2 G_DYN_STACKALLOC but only 1 save/restore, and so does an explicit outer block entered once — the outer restore coincides with the return and is elided. Only re-entering BOTH scopes per loop iteration keeps the outer bracket alive as a bracket (2/2/2). An overshooting unwind is silent — no crash, no verifier complaint, the inner result still right — so the demo keeps a shadow of the outer VLA and re-reads it after every inner block closes plus once more per row. Assert corpus_result (vlanest_gate_crc 0x153B) == host on MAME + bsnes-jg + structure gate (G_DYN_STACKALLOC=2, G_STACKSAVE=2, G_STACKRESTORE=2 in all three modes; >=3 distinct lengths at each level; zero outer re-read failures). Leaves build/vlanest.sfc + build/vlanest-{mame,jg}.png."
+    cmds:
+      - dev/run.sh vlanest
+
+  vlanest-play:
+    desc: "PLAY the Nested VLA Pyramid demo in MAME (builds first if needed). Each row is one outer allocation drawn cell by cell, and each cell's height is that element's inner allocation length — the irregular skyline is the two-level allocation profile itself."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/vlanest.sfc ]; then
+          echo "==> build/vlanest.sfc missing -- building (dev/run.sh vlanest)..."
+          dev/run.sh vlanest
+        fi
+      - task: mandel-mame
+        vars: { ROM: vlanest }
+
+  jtedge:
+    desc: "#152 (Round 8, the un-entered backend paths, Cluster C): Jump-Table Boundary Sweep — the EXACT `Table.MBBs.size() <= 128` test in legalizeBrJt (MOSLegalizerInfo.cpp:3334), compiled from both sides in one ROM. Three noinline dispatchers over the same sixteen handler families at 127, 128 and 129 distinct successors; every arm carries its own case value as the immediate so no two arms merge and the emitted table has exactly one entry per case. All three are fed the SAME opcode stream, restricted to 0..126 so every opcode is in range for all three, over three independent copies of the same VM state: a boundary off-by-one that mis-indexed either arm by one slot lands in a neighbouring handler and moves exactly one of the three. #142 jt256 sits at 256 — deep past the boundary, never at it. MEASURED RESULT, and it is a negative for the bug this demo was built to find: the boundary is EXACT and INCLUSIVE at 128 (126/127/128 emit `jmp (.LJTI,x)`; 129/130 emit `ldy .LJTI,x` + `lda .LJTI+256,x` + `jmp (__rc)`), so there is no off-by-one. It is still the only test in the tree that pins the constant, and it records that the split arm's high table is addressed at a fixed +256 from the low one whatever the real entry count — a full 512-byte table at 129 entries. Assert corpus_result (jtedge_gate_crc 0xC199) == host on MAME + bsnes-jg + structure gate (which arm each of the three took, plus each table's entry count, in all three modes; zero disagreements, zero default-arm hits). Leaves build/jtedge.sfc + build/jtedge-{mame,jg}.png."
+    cmds:
+      - dev/run.sh jtedge
+
+  jtedge-play:
+    desc: "PLAY the Jump-Table Boundary Sweep demo in MAME (builds first if needed). Three phase portraits of the same VM state — 127, 128 and 129 successors — drawn on top of each other in three colours; because all three lowerings must be indistinguishable, the correct picture is a SINGLE stroke."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/jtedge.sfc ]; then
+          echo "==> build/jtedge.sfc missing -- building (dev/run.sh jtedge)..."
+          dev/run.sh jtedge
+        fi
+      - task: mandel-mame
+        vars: { ROM: jtedge }
+
+  jtsparse:
+    desc: "#153 (Round 8, the un-entered backend paths, Cluster C): Sparse Switch Ladder — the THIRD switch-lowering strategy, which no demo across #1-#152 forces deliberately. #142 jt256 and #152 jtedge both live downstream of the optimizer having already decided to build a table; when the case values are too sparse to tabulate the switch never reaches legalizeBrJt at all and becomes a BINARY-SEARCH COMPARE TREE. Measured before building: sixteen keys spread over 0..55555 emit ZERO `.LJTI` references and a signed-comparison narrowing tree, -verify clean. Two noinline dispatchers carry the SAME sixteen handler bodies — js_dense at indices 0..15 (jump table, strategy 1) and js_sparse at the sparse keys (compare tree, strategy 3) — and every logical operation runs through BOTH over independent copies of the same VM state, so the two strategies are differentially checked against each other inside one program. Both are also fed deliberate non-keys, so both default arms are live: a compare tree's default is the fall-out of the whole search, structurally unlike a jump table's range check. Assert corpus_result (jtsparse_gate_crc 0xA131) == host on MAME + bsnes-jg + structure gate (js_sparse has ZERO .LJTI and >=8 comparison instructions, js_dense emits `jmp (.LJTI,x)`, in all three modes; zero disagreements, equal non-zero miss counts). Leaves build/jtsparse.sfc + build/jtsparse-{mame,jg}.png."
+    cmds:
+      - dev/run.sh jtsparse
+
+  jtsparse-play:
+    desc: "PLAY the Sparse Switch Ladder demo in MAME (builds first if needed). The sixteen sparse keys drawn as a ladder of bars whose irregular gaps are what force the compare tree, with the dense and sparse dispatchers' phase portraits overlaid beside it — one stroke if the two strategies agree."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/jtsparse.sfc ]; then
+          echo "==> build/jtsparse.sfc missing -- building (dev/run.sh jtsparse)..."
+          dev/run.sh jtsparse
+        fi
+      - task: mandel-mame
+        vars: { ROM: jtsparse }
+
+  byvaledge:
+    desc: "#154 (Round 8, the un-entered backend paths, Cluster C): By-Value Boundary Trio — clang's `getTypeSize(Ty) > 32` by-value classifier (Targets/MOS.cpp, classifyArgumentType) compiled from BOTH sides adjacently, over records that differ by a single byte of size. A 4-byte record goes ABIArgInfo::getDirect (scalars in registers); a 5-byte record goes getNaturalAlignIndirect with ByVal=false, so the callee receives a pointer to the CALLER's object and by-value semantics rest entirely on a call-site copy — a missing copy does not crash, does not fail the verifier, and leaves the callee's own result correct while silently mutating the caller's original. So every stage MUTATES ITS OWN PARAMETER and the driver re-reads its original after each call. #145 bigbyval is 144 bits (far past the threshold); #26 boids is 32 bits (at it, with no indirect sibling in the same ROM). MEASURED CORRECTION to the brief: there is NO 33-bit size class on MOS — getTypeSize is in BITS and a record is always whole bytes, so a record declaring 33 bits of bitfield is sizeof 5 (40 bits) and takes the indirect path; the real boundary is sizeof 4 vs sizeof 5, and the 33-bit record ships anyway because it is what demonstrates the collapse. THIS DEMO FOUND AN OPEN COMPILER DEFECT: a libcall between a byte member and a word member of the same pointed-to record hard-errors the register allocator ('ran out of registers', -O1 and above, reproduced on PRISTINE upstream llc at -mcpu=mos6502) — see docs/investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md; the multiply was moved out of the 5-byte stage (it is not the corner) and the gate was NOT weakened. Assert corpus_result (byvaledge_gate_crc 0x4FAB) == host on MAME + bsnes-jg + structure gate (the 4-byte stage takes scalars and no pointer, both 5-byte stages take `ptr ... dead_on_return`, in all three modes; zero caller-visible by-value violations). Leaves build/byvaledge.sfc + build/byvaledge-{mame,jg}.png."
+    cmds:
+      - dev/run.sh byvaledge
+
+  byvaledge-play:
+    desc: "PLAY the By-Value Boundary Trio demo in MAME (builds first if needed). Three lanes, one per record shape, each with its stage outputs plotted above and the caller's re-read of its own original drawn beneath as a steady baseline — the baseline staying flat IS the by-value contract holding."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/byvaledge.sfc ]; then
+          echo "==> build/byvaledge.sfc missing -- building (dev/run.sh byvaledge)..."
+          dev/run.sh byvaledge
+        fi
+      - task: mandel-mame
+        vars: { ROM: byvaledge }
+
+  ovmatrix:
+    desc: "#155 (Round 8, the un-entered backend paths, Cluster C): Overflow Family Matrix — all six overflow opcodes (G_UADDO/G_SADDO at :296, G_USUBO/G_SSUBO at :2031/:2034, G_UMULO/G_SMULO) at all three widths in ONE noinline kernel: {add, sub, mul} x {16, 32, 64} x {unsigned, signed} = 18 cells, every operand from runtime state and every result live across the others, so the signed and unsigned forms of each family — which differ in flag SENSE, not just operand type — are selected and register-allocated next to each other under real pressure. #44 hdr-bloom (add), #76/#101 (mul, 16/32 and 64) and #144 borrowov (sub) each test one family, at one or two widths, in a loop of its own; none of them tests the interaction. MEASURED, and it changed the design: a first probe with ONE CONSTANT OPERAND per builtin formed only G_UADDO=2 G_SADDO=2 G_UMULO=2 G_SMULO=2 G_USUBO=1 G_SSUBO=0 — constant folding erases cells outright and G_SSUBO, the family #144 exists for, vanished entirely, so a demo written with literal operands would have compiled cleanly and covered less than it claimed. Both operands are therefore runtime, and the gate asserts every one of the 18 cells fired BOTH outcomes. __builtin_*_overflow is fully defined (infinite precision then wrapped into the result type), so host and target agree bit-for-bit at every width with nothing implementation-defined. Assert corpus_result (ovmatrix_gate_crc 0xD4D0) == host on MAME + bsnes-jg + structure gate (>=3 of each of the six opcodes in all three modes; 18/18 two-sided cells). Leaves build/ovmatrix.sfc + build/ovmatrix-{mame,jg}.png."
+    cmds:
+      - dev/run.sh ovmatrix
+
+  ovmatrix-play:
+    desc: "PLAY the Overflow Family Matrix demo in MAME (builds first if needed). The matrix itself: eighteen cells, three families down and three widths across with unsigned and signed side by side, each a two-tone bar split at that cell's overflow-to-clean ratio — a solid bar would be the degenerate one-sided coverage the gate refuses."
+    cmds:
+      - |
+        set -euo pipefail
+        if [ ! -f build/ovmatrix.sfc ]; then
+          echo "==> build/ovmatrix.sfc missing -- building (dev/run.sh ovmatrix)..."
+          dev/run.sh ovmatrix
+        fi
+      - task: mandel-mame
+        vars: { ROM: ovmatrix }
+
   mulov64:
     desc: "#101 (Round 6, harden-the-fixes, Cluster C): 64-bit Multiply-Overflow / Multiply-High — G_UMULO/G_SMULO at s64 (lowerMulo) -> G_UMULH/G_SMULH at s64 (.lower()), the one untested s64 legalizer path (threads the S32-mul-clamp, no S128 widening). No prior demo forms an s64 mulh/mulo. Orbit-scatter with 64-bit-overflow teleport sparks. Assert corpus_result (mulov64_gate_crc 0x3A69) == host on MAME + bsnes-jg + disasm gate (__muldi3>=1, __mulsi3>=1, rep/sep>=1). Leaves build/mulov64.sfc + build/mulov64-{mame,jg}.png."
     cmds:

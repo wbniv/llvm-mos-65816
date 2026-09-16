@@ -1689,5 +1689,91 @@ of `__floatunsisf`, and an integer sign test instead of `__ltsf2`/`__gtsf2` in t
 differential is unaffected: the 5-way gate is the HAL-free corpus slice, which links no HAL, needs no far
 pointers, and is compiled and asserted in all three modes.
 
-Still deferred: **#151–#160**, the boundary and width escalations.
+Deferred to a later cluster: ~~**#151–#160**, the boundary and width escalations~~ **— #151–#155 BUILT +
+gated as Cluster C, see below; #156–#160 remain.**
+
+## Cluster C (#151–#155) — BUILT + gated 2026‑09‑16, and it found a REAL COMPILER BUG
+
+Built and gated by
+[the Cluster C plan](../plans/2026-09-16-round8-cluster-c-boundary-and-width-escalations.md). All five ship
+green — `host == default == +mos-a16 == +mos-xy16` on MAME **and** bsnes-jg, `-verify-machineinstrs` clean
+in all three modes — and, unlike Clusters A and B, this one **found a compiler defect**.
+
+| Demo | Gate CRC | Corner, as it turned out |
+|---|---|---|
+| **#151 `vlanest`** | `0x153B` | **As predicted.** Two nested `G_STACKSAVE`/`G_STACKRESTORE` brackets over two `G_DYN_STACKALLOC`s, in all three modes. The nesting is source-shape-sensitive — see below. |
+| **#152 `jtedge`** | `0xC199` | **Positive with a negative attached.** Both arms and the boundary compiled side by side; the boundary is **exact and inclusive at 128, no off-by-one**. |
+| **#153 `jtsparse`** | `0xA131` | **As predicted.** `js_sparse` emits **zero** `.LJTI` and a compare tree; `js_dense` emits `jmp (.LJTI,x)`; the two agree over 384 steps with 76 default-arm hits each. |
+| **#154 `byvaledge`** | `0x4FAB` | **Found the bug** (below), and corrected the size-class claim: there is no 33-bit size class. |
+| **#155 `ovmatrix`** | `0xD4D0` | **As predicted.** All six generic opcodes ×3 widths in all three modes; 18/18 cells fired both outcomes. |
+
+### The bug: `ran out of registers` on mixed-width accesses through one pointer across a call
+
+Found by **#154** on its first compile. Twelve lines of C — one `uint16_t *`, one call, three stores of
+which one is byte-width — make the register allocator hard-**error** at `-O1` and above. It is **not** a
+`+mos-a16`/`+mos-xy16`/65816 defect and **not** a fork regression: it reproduces on **pristine upstream
+`llc`** with the **pristine MOS datalayout** at `-mcpu=mos6502`. Full write-up, ingredient table and
+minimal repro:
+[`2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md`](2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md).
+`#154` ships **gated** — the offending libcall was moved out of the 5-byte stage, which is not the corner
+under test; nothing about the ABI check was relaxed.
+
+### Measured: the `<= 128` jump-table boundary is exact
+
+Five probe dispatchers in one TU, `-Os`, `-verify` clean:
+
+```
+126 successors -> jmp (.LJTI1_0,x)                                    JMPIdxIndir
+127 successors -> jmp (.LJTI2_0,x)                                    JMPIdxIndir
+128 successors -> jmp (.LJTI3_0,x)                                    JMPIdxIndir
+129 successors -> ldy .LJTI4_0,x + lda .LJTI4_0+256,x + jmp (__rc2)   split lo/hi (MO_HI_JT)
+130 successors -> ldy .LJTI5_0,x + lda .LJTI5_0+256,x + jmp (__rc2)   split lo/hi (MO_HI_JT)
+```
+
+Boundary-off-by-one is the classic failure of a size-gated lowering, and it is not present here. Recorded
+so a later round does not re-derive it. A second measured detail: the split arm's **high table is addressed
+at a fixed `+256`** from the low one whatever the real entry count, so a 129-entry switch pays for a full
+512-byte table.
+
+### Negative result: there is no 33-bit by-value size class on MOS
+
+This section proposed records of "32, 33 and 40 bits" straddling `getTypeSize(Ty) > 32`. That is **two**
+size classes, not three: `getTypeSize` is in **bits**, and on MOS every scalar has ABI alignment 1, so a
+record's size is always a whole number of bytes × 8. A record declaring 33 bits of bitfield has
+`sizeof == 5`, hence `getTypeSize == 40`, and takes the indirect path:
+
+```
+define dso_local i16 @f32(i16 %0, i16 %1)              ; 4 bytes  -> getDirect
+define dso_local i16 @f33(ptr ... dead_on_return %0)   ; 33 declared bits -> sizeof 5 -> indirect
+define dso_local i16 @f40(ptr ... dead_on_return %0)   ; 5 bytes  -> indirect
+```
+
+The real boundary is `sizeof 4` vs `sizeof 5`. #154 keeps the 33-bit record anyway, because it is what
+*demonstrates* the collapse and is itself a shape nothing in the tree passes by value.
+
+### Measured: nested VLA brackets only survive one source shape
+
+`G_DYN_STACKALLOC` is #143's corner; the depth axis is #151's. Measured, the obvious nestings do **not**
+produce two brackets:
+
+| source shape | `G_DYN_STACKALLOC` | `G_STACKSAVE` | `G_STACKRESTORE` |
+|---|---|---|---|
+| function-scope VLA + inner-block VLA | 2 | 1 | 1 |
+| explicit outer block + nested block, entered once | 2 | 1 | 1 |
+| **both blocks inside a driving loop** | **2** | **2** | **2** |
+
+The first two collapse because the outer block's restore coincides with the function's return and is
+elided. Only re-entering both scopes per loop iteration keeps the outer bracket alive as a bracket.
+
+### Measured: a constant operand erases an overflow-builtin cell
+
+A #155 design probe with **one constant operand** per builtin formed
+`G_UADDO=2 G_SADDO=2 G_UMULO=2 G_SMULO=2 G_USUBO=1 G_SSUBO=0` — folding erases cells outright, and
+`G_SSUBO`, the family #144 exists for, **vanished entirely**. A demo written with literal operands would
+have compiled cleanly and covered less than it claimed. #155 drives both operands from runtime state and
+its gate asserts every one of the 18 cells fired both outcomes; with that, all six opcodes appear three
+times each (one per width) in all three modes.
+
+Still deferred: **#156–#160** — `va_arg` width sweep, recursive `sret`, indirect-call arity fan,
+extending-load sign matrix, address-space cast ladder.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|vlanest|jtedge|jtsparse|byvaledge|ovmatrix|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -461,6 +461,61 @@ Targets:
              bsnes-jg + a structure gate (G_TRAP formed and jsr abort emitted in all three
              modes; every legal pair fired and no impossible one did), screenshots both
              (build/trapguard-{mame,jg}.png). 5-way differential: corpus-a16 (trapguard_sim).
+  vlanest    #151 Round 8 Cluster C: the Nested VLA Pyramid — TWO nested G_STACKSAVE/
+             G_STACKRESTORE brackets around two G_DYN_STACKALLOCs with independent runtime
+             lengths, the depth axis #143 vlastack does not touch. The inner length is derived
+             from the OUTER allocation's contents, and the outer array is re-read after every
+             inner block closes, because an overshooting unwind corrupts it silently. Measured:
+             the nesting only survives when both VLA scopes are re-entered per loop iteration —
+             the obvious shapes collapse to ONE bracket. Asserts corpus_result
+             (vlanest_gate_crc 0x153B) == host on MAME + bsnes-jg + a structure gate
+             (G_DYN_STACKALLOC=2, G_STACKSAVE=2, G_STACKRESTORE=2 in all three modes; several
+             distinct lengths at both levels; zero outer re-read failures), screenshots both
+             (build/vlanest-{mame,jg}.png). 5-way differential: corpus-a16 (vlanest_sim).
+  jtedge     #152 Round 8 Cluster C: the Jump-Table Boundary Sweep — three dispatchers at 127,
+             128 and 129 successors over the same sixteen handler families, so both arms of
+             legalizeBrJt and the exact `Table.MBBs.size() <= 128` test
+             (MOSLegalizerInfo.cpp:3334) are compiled side by side. All three are fed the same
+             0..126 opcode stream over independent VM copies and must agree. MEASURED: the
+             boundary is exact and inclusive at 128 — no off-by-one — and the split arm's high
+             table sits at a fixed +256 whatever the entry count. #142 jt256 is at 256, deep
+             past it. Asserts corpus_result (jtedge_gate_crc 0xC199) == host on MAME + bsnes-jg
+             + a structure gate (127/128 emit `jmp (.LJTI,x)`, 129 emits the split lo/hi +
+             MO_HI_JT form, in all three modes; zero disagreements, zero default-arm hits),
+             screenshots both (build/jtedge-{mame,jg}.png). 5-way: corpus-a16 (jtedge_sim).
+  jtsparse   #153 Round 8 Cluster C: the Sparse Switch Ladder — the THIRD switch-lowering
+             strategy. Case values too sparse to tabulate never reach legalizeBrJt at all; the
+             switch becomes a binary-search compare tree, distinct from both jump-table arms and
+             never deliberately forced before. Two dispatchers carry the SAME sixteen handler
+             bodies — dense 0..15 (jump table) and sparse 0..55555 (compare tree) — over
+             independent VM copies, so strategy 3 is differentially checked against strategy 1
+             in one program, with both default arms exercised. Asserts corpus_result
+             (jtsparse_gate_crc 0xA131) == host on MAME + bsnes-jg + a structure gate
+             (js_sparse has ZERO .LJTI and >=8 compares, js_dense emits `jmp (.LJTI,x)`, all
+             three modes; zero disagreements, equal non-zero miss counts), screenshots both
+             (build/jtsparse-{mame,jg}.png). 5-way: corpus-a16 (jtsparse_sim).
+  byvaledge  #154 Round 8 Cluster C: the By-Value Boundary Trio — clang's `getTypeSize(Ty) > 32`
+             by-value classifier compiled from BOTH sides in one program: a 4-byte record goes
+             getDirect, a 5-byte record goes getNaturalAlignIndirect(ByVal=false) so the callee
+             holds a pointer to the CALLER's object. Every stage mutates its own parameter and
+             the driver re-reads its original. MEASURED CORRECTION: there is no 33-bit size
+             class — getTypeSize is in BITS and a MOS record is whole bytes, so a
+             33-bit-declared bitfield record is sizeof 5 and goes indirect. FOUND AN OPEN
+             COMPILER DEFECT (upstream regalloc; see docs/investigations/2026-09-16-mos-regalloc
+             -out-of-registers-mixed-width-pointer-plus-call.md). Asserts corpus_result
+             (byvaledge_gate_crc 0x4FAB) == host on MAME + bsnes-jg + a structure gate (the
+             4-byte stage takes scalars and no pointer, both 5-byte stages take
+             `ptr dead_on_return`, all three modes; zero caller-visible by-value violations),
+             screenshots both (build/byvaledge-{mame,jg}.png). 5-way: corpus-a16 (byvaledge_sim).
+  ovmatrix   #155 Round 8 Cluster C: the Overflow Family Matrix — all six overflow opcodes
+             (G_UADDO/G_SADDO, G_USUBO/G_SSUBO, G_UMULO/G_SMULO) at all three widths in ONE
+             noinline kernel, 18 cells, every operand from runtime state and every result live
+             across the others. #44, #76, #101 and #144 each test one family in isolation.
+             MEASURED: a probe with one CONSTANT operand folded cells away and lost G_SSUBO
+             entirely, so the gate also asserts every cell fired BOTH outcomes. Asserts
+             corpus_result (ovmatrix_gate_crc 0xD4D0) == host on MAME + bsnes-jg + a structure
+             gate (>=3 of each of the six opcodes in all three modes; 18/18 two-sided cells),
+             screenshots both (build/ovmatrix-{mame,jg}.png). 5-way: corpus-a16 (ovmatrix_sim).
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for

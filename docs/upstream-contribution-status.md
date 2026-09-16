@@ -457,6 +457,19 @@ rationale + verification, for the PR narrative).
 
 ## Future / blocked (not yet postable — do **not** count these as pending)
 
+- **Register allocator: `ran out of registers` on mixed-width accesses through one pointer across a
+  call (found by demo #154 `byvaledge`, 2026‑09‑16).** An **issue**, not a PR — no fix is drafted and
+  none was attempted. Twelve lines of C (one `uint16_t *`, one call, three stores of which one is
+  byte-width) hard-**error** the allocator at `-O1` and above; clean at `-O0`. **Reproduced on
+  pristine upstream `llc` with the pristine MOS datalayout at `-mcpu=mos6502`**, so it is neither a
+  fork regression nor `+mos-a16`/`+mos-xy16`/65816-specific — a `.ll` repro is in the investigation.
+  **Blocked on:** a root-cause pass (`-debug-only=regalloc`, the last-chance-recolor failure) so the
+  issue says more than "it errors" — prior art is fork patch `0009`, which fixed a *different*
+  out-of-registers deadlock (`+mos-a16`-gated, A-pinned i8 loop counter) and does not cover this.
+  Write-up:
+  [`investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md`](investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md) ·
+  [Cluster C plan](plans/2026-09-16-round8-cluster-c-boundary-and-width-escalations.md).
+
 - ~~**MC-layer `cop` mnemonic (assembler gap, found by demo #140, 2026-08-04).**~~ ✅ **POSTED
   2026-08-04** as [**PR #588**](https://github.com/llvm-mos/llvm-mos/pull/588)
   (`wbniv:mos-65816-cop-mnemonic` @ `3ac10976`, cut from `1f334fef`): `cop` with a **mandatory**

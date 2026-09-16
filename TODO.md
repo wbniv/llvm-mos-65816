@@ -568,11 +568,66 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
       **fails to link** on an undefined `__putchar` until the program supplies the hook.
       `corpus_result = 0x2C2D`.
     - Publishing stays **out of scope**, as for Cluster A and Round 6 Cluster G.
-  - **Cluster C (`#151`–`#155`) dispatched 2026-09-16** — the first half of the boundary/width
-    escalations (nested VLAs, the 127/128/129 jump-table edge, sparse-switch compare trees, the
-    32/33/40-bit by-value ABI edge, the add/sub/mul overflow-builtin matrix at 16/32/64 bits).
-    Remaining: **#156–#160** (`va_arg` width sweep, recursive `sret`, indirect-call arity fan,
-    extending-load sign matrix, address-space cast ladder) — same shape, a future cluster.
+  - **Cluster C (`#151`–`#155`) — BUILT + gated 2026‑09‑16, and it FOUND A REAL COMPILER BUG**
+    ([plan](docs/plans/2026-09-16-round8-cluster-c-boundary-and-width-escalations.md)). The
+    boundary and width escalations of paths that already have one shipped demo. All five ship
+    green on the full bar — `host == default == +mos-a16 == +mos-xy16` on MAME **and** bsnes-jg,
+    `-verify-machineinstrs` clean in all three modes, each with a structure gate proving the
+    intended shape reached the ROM.
+    - **The bug — `ran out of registers during register allocation`, found by #154 on its first
+      compile.** Twelve lines of C — one `uint16_t *`, one call, three stores of which one is
+      byte-width — hard-**error** the register allocator at `-O1` and above. **Not** a
+      `+mos-a16`/`+mos-xy16`/65816 defect and **not** a fork regression: it reproduces on
+      **pristine upstream `llc`** with the **pristine MOS datalayout** at `-mcpu=mos6502`, and
+      is clean at `-O0`. The necessary combination, measured one ingredient at a time, is a call
+      plus mixed-width (i8 *and* i16) traffic through the same pointer plus three or more
+      stores; word-only traffic of the same volume is fine. No fix attempted — needs separate
+      dispatch at a tier that can work in the register allocator, and it is an upstream bug
+      report once confirmed.
+      [investigation](docs/investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md).
+    - **#151 `vlanest`** — the DEPTH axis of `G_DYN_STACKALLOC`: two VLAs in nested block scopes
+      with independent runtime lengths, the inner length derived from the OUTER allocation's
+      contents, so one save/restore bracket encloses another. An overshooting unwind is silent,
+      so the demo re-reads the outer array after every inner block closes. Measured, and it
+      determined the source shape: a function-scope VLA plus an inner-block VLA gives 2
+      `G_DYN_STACKALLOC` but only **1** save/restore, and so does an explicit outer block entered
+      once — only re-entering both scopes per loop iteration keeps the outer bracket alive (2/2/2).
+      `corpus_result = 0x153B`.
+    - **#152 `jtedge`** — 127, 128 and 129 successors in one ROM, so both `legalizeBrJt` arms and
+      the exact `Table.MBBs.size() <= 128` test are compiled side by side and fed the same
+      in-range opcode stream over three VM copies. **Measured negative for the bug it was built
+      to find: the boundary is exact and inclusive at 128, no off-by-one** (126/127/128 emit
+      `jmp (.LJTI,x)`; 129/130 emit `ldy .LJTI,x` + `lda .LJTI+256,x` + `jmp (__rc)`). It is
+      still the only test in the tree that pins the constant, and it records that the split arm's
+      high table sits at a fixed `+256` whatever the entry count — a full 512-byte table at 129
+      entries. `corpus_result = 0xC199`.
+    - **#153 `jtsparse`** — the THIRD switch-lowering strategy, which no demo across #1–#152
+      forces deliberately: sparse case values never reach `legalizeBrJt` at all and become a
+      binary-search compare tree. The same sixteen handler bodies run through a dense dispatcher
+      (jump table) and a sparse one (compare tree) over independent VM copies, so strategy 3 is
+      differentially checked against strategy 1 in one program, both default arms live.
+      `corpus_result = 0xA131`.
+    - **#154 `byvaledge`** — clang's `getTypeSize(Ty) > 32` by-value classifier compiled from
+      both sides over records differing by one byte, with every stage mutating its own parameter
+      and the caller re-reading its original (the only detector for a missing `ByVal=false`
+      call-site copy). **Measured correction: there is no 33-bit size class on MOS** —
+      `getTypeSize` is in bits and a record is always whole bytes, so a 33-bit-declared bitfield
+      record is `sizeof 5` (40 bits) and goes indirect; the real boundary is `sizeof 4` vs
+      `sizeof 5`. `corpus_result = 0x4FAB`.
+    - **#155 `ovmatrix`** — all six overflow opcodes at all three widths in one noinline kernel,
+      18 cells, every operand from runtime state. **Measured, and it changed the design:** a probe
+      with one CONSTANT operand formed `G_UADDO=2 G_SADDO=2 G_UMULO=2 G_SMULO=2 G_USUBO=1
+      G_SSUBO=0` — folding erases cells and `G_SSUBO`, the family #144 exists for, vanished
+      entirely. Both operands are runtime and the gate asserts every cell fired **both** outcomes;
+      with that, all six opcodes appear 3× each in all three modes. `corpus_result = 0xD4D0`.
+    - Publishing stays **out of scope**, as for Clusters A and B and Round 6 Cluster G.
+    - Remaining: **#156–#160** (`va_arg` width sweep, recursive `sret`, indirect-call arity fan,
+      extending-load sign matrix, address-space cast ladder) — same shape, a future cluster. The
+      regalloc defect above wants its own dispatch, at a higher tier than a demo cluster: a
+      root-cause pass (`-debug-only=regalloc`) first, then a fix, then an upstream issue. It is
+      queued under *Future / blocked* in
+      [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md) — **not**
+      postable yet, and not to be counted as pending.
   **2026‑09‑15: Cluster G has caught two real bugs.** `#116 backtrack` found that `longjmp`'s page‑1
   hard-stack reconstruction never executed (the assembler sized a `rep #$20`-mode immediate by value, not
   by mode, so the CPU read past it into the next opcode at runtime) — FIXED in `platforms/snes/setjmp.S`
