@@ -1,0 +1,289 @@
+{
+  "method": "Alternating binary order; one warm-up round discarded; child user+system CPU seconds summed over the same 24 IR inputs. Timing is not an instruction-count benchmark.",
+  "inputs": [
+    "rcundef2.a16",
+    "rcundef2.xy16",
+    "newton_sim.a16",
+    "newton_sim.xy16",
+    "trimerge_sim.a16",
+    "trimerge_sim.xy16",
+    "pi_sim.a16",
+    "pi_sim.xy16",
+    "maze_sim.a16",
+    "maze_sim.xy16",
+    "bitshuffle_sim.a16",
+    "bitshuffle_sim.xy16",
+    "factorial_sim.a16",
+    "factorial_sim.xy16",
+    "adpcm_sim.a16",
+    "adpcm_sim.xy16",
+    "strcmprace_sim.a16",
+    "strcmprace_sim.xy16",
+    "arith.a16",
+    "arith.xy16",
+    "arrays.a16",
+    "arrays.xy16",
+    "invaders_sim.a16",
+    "invaders_sim.xy16"
+  ],
+  "full_codegen_with_concurrent_build": {
+    "inputs": 24,
+    "rows": [
+      {
+        "rep": 0,
+        "binary": "bool",
+        "cpu_seconds": 1.6613989999999998,
+        "wall_seconds": 1.7489550359969144
+      },
+      {
+        "rep": 0,
+        "binary": "local",
+        "cpu_seconds": 1.659281,
+        "wall_seconds": 1.6828646499998285
+      },
+      {
+        "rep": 1,
+        "binary": "local",
+        "cpu_seconds": 1.7413450000000004,
+        "wall_seconds": 1.810003582999343
+      },
+      {
+        "rep": 1,
+        "binary": "bool",
+        "cpu_seconds": 1.6714249999999993,
+        "wall_seconds": 1.7955346109993116
+      },
+      {
+        "rep": 2,
+        "binary": "bool",
+        "cpu_seconds": 1.6933009999999997,
+        "wall_seconds": 1.7625250199998845
+      },
+      {
+        "rep": 2,
+        "binary": "local",
+        "cpu_seconds": 1.7798340000000006,
+        "wall_seconds": 1.8437824530010403
+      },
+      {
+        "rep": 3,
+        "binary": "local",
+        "cpu_seconds": 1.6036549999999998,
+        "wall_seconds": 1.8834262200034573
+      },
+      {
+        "rep": 3,
+        "binary": "bool",
+        "cpu_seconds": 1.6291860000000002,
+        "wall_seconds": 1.76408110400007
+      },
+      {
+        "rep": 4,
+        "binary": "bool",
+        "cpu_seconds": 1.6698779999999975,
+        "wall_seconds": 1.87724619599976
+      },
+      {
+        "rep": 4,
+        "binary": "local",
+        "cpu_seconds": 1.6786620000000019,
+        "wall_seconds": 1.7439381790027255
+      },
+      {
+        "rep": 5,
+        "binary": "local",
+        "cpu_seconds": 1.6891060000000002,
+        "wall_seconds": 1.7453548250014137
+      },
+      {
+        "rep": 5,
+        "binary": "bool",
+        "cpu_seconds": 1.660153000000001,
+        "wall_seconds": 1.7350932660010585
+      },
+      {
+        "rep": 6,
+        "binary": "bool",
+        "cpu_seconds": 1.6420019999999984,
+        "wall_seconds": 1.692790437999065
+      },
+      {
+        "rep": 6,
+        "binary": "local",
+        "cpu_seconds": 1.6902970000000006,
+        "wall_seconds": 1.7732418740015419
+      },
+      {
+        "rep": 7,
+        "binary": "local",
+        "cpu_seconds": 1.6765880000000033,
+        "wall_seconds": 1.7267789359975723
+      },
+      {
+        "rep": 7,
+        "binary": "bool",
+        "cpu_seconds": 1.608511999999998,
+        "wall_seconds": 1.7046923559973948
+      }
+    ],
+    "median_cpu_seconds": {
+      "bool": 1.660153000000001,
+      "local": 1.6891060000000002
+    },
+    "median_cpu_change_percent": 1.743995884716587
+  },
+  "through_rewriter_with_build_paused": {
+    "inputs": 24,
+    "rows": [
+      {
+        "rep": 0,
+        "binary": "bool",
+        "cpu_seconds": 1.0576269999999999,
+        "wall_seconds": 1.0813250430001062
+      },
+      {
+        "rep": 0,
+        "binary": "local",
+        "cpu_seconds": 0.9868270000000001,
+        "wall_seconds": 1.005149103999429
+      },
+      {
+        "rep": 1,
+        "binary": "local",
+        "cpu_seconds": 1.033639,
+        "wall_seconds": 1.0458727209988865
+      },
+      {
+        "rep": 1,
+        "binary": "bool",
+        "cpu_seconds": 0.9340879999999999,
+        "wall_seconds": 0.9461952159981593
+      },
+      {
+        "rep": 2,
+        "binary": "bool",
+        "cpu_seconds": 1.1404449999999997,
+        "wall_seconds": 1.1663551530000404
+      },
+      {
+        "rep": 2,
+        "binary": "local",
+        "cpu_seconds": 1.0850690000000003,
+        "wall_seconds": 1.1169030269993527
+      },
+      {
+        "rep": 3,
+        "binary": "local",
+        "cpu_seconds": 1.0804840000000004,
+        "wall_seconds": 1.097157291998883
+      },
+      {
+        "rep": 3,
+        "binary": "bool",
+        "cpu_seconds": 0.9791289999999988,
+        "wall_seconds": 0.9916045489990211
+      },
+      {
+        "rep": 4,
+        "binary": "bool",
+        "cpu_seconds": 1.0049730000000008,
+        "wall_seconds": 1.0285002090022317
+      },
+      {
+        "rep": 4,
+        "binary": "local",
+        "cpu_seconds": 1.0253570000000005,
+        "wall_seconds": 1.0642536129998916
+      },
+      {
+        "rep": 5,
+        "binary": "local",
+        "cpu_seconds": 1.0602430000000005,
+        "wall_seconds": 1.0795380269992165
+      },
+      {
+        "rep": 5,
+        "binary": "bool",
+        "cpu_seconds": 1.0152759999999998,
+        "wall_seconds": 1.0517724530000123
+      },
+      {
+        "rep": 6,
+        "binary": "bool",
+        "cpu_seconds": 1.1060189999999994,
+        "wall_seconds": 1.1357417569997779
+      },
+      {
+        "rep": 6,
+        "binary": "local",
+        "cpu_seconds": 0.9827999999999992,
+        "wall_seconds": 1.0030432839994319
+      },
+      {
+        "rep": 7,
+        "binary": "local",
+        "cpu_seconds": 1.095073000000001,
+        "wall_seconds": 1.1248363640006573
+      },
+      {
+        "rep": 7,
+        "binary": "bool",
+        "cpu_seconds": 1.1236930000000003,
+        "wall_seconds": 1.167296477000491
+      },
+      {
+        "rep": 8,
+        "binary": "bool",
+        "cpu_seconds": 0.9783499999999994,
+        "wall_seconds": 1.004356828998425
+      },
+      {
+        "rep": 8,
+        "binary": "local",
+        "cpu_seconds": 1.1546680000000005,
+        "wall_seconds": 1.187301579000632
+      },
+      {
+        "rep": 9,
+        "binary": "local",
+        "cpu_seconds": 1.0312839999999994,
+        "wall_seconds": 1.0485842440029955
+      },
+      {
+        "rep": 9,
+        "binary": "bool",
+        "cpu_seconds": 1.0876609999999998,
+        "wall_seconds": 1.1095109149973723
+      },
+      {
+        "rep": 10,
+        "binary": "bool",
+        "cpu_seconds": 1.084543000000001,
+        "wall_seconds": 1.105390686996543
+      },
+      {
+        "rep": 10,
+        "binary": "local",
+        "cpu_seconds": 1.019801000000002,
+        "wall_seconds": 1.045866862998082
+      },
+      {
+        "rep": 11,
+        "binary": "local",
+        "cpu_seconds": 1.089465999999999,
+        "wall_seconds": 1.117451860998699
+      },
+      {
+        "rep": 11,
+        "binary": "bool",
+        "cpu_seconds": 1.1078709999999985,
+        "wall_seconds": 1.163293748999422
+      }
+    ],
+    "median_cpu_seconds": {
+      "bool": 1.084543000000001,
+      "local": 1.0602430000000005
+    },
+    "median_cpu_change_percent": -2.240575062491801
+  }
+}

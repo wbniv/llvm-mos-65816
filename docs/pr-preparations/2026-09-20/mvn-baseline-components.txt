@@ -1,0 +1,163 @@
+/src/llvm/test/MC/MOS/65816-block-move-bank-order.s:15:8: error: ENC: expected string not found in input
+; ENC: encoding: [0x54,0x00,0x7f]
+       ^
+<stdin>:1:1: note: scanning from here
+ mvn #127,#0 ; encoding: [0x54,0x7f,0x00]
+^
+<stdin>:3:16: note: possible intended match here
+ mvn #0,#255 ; encoding: [0x54,0x00,0xff]
+               ^
+
+Input file: <stdin>
+Check file: /src/llvm/test/MC/MOS/65816-block-move-bank-order.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1:  mvn #127,#0 ; encoding: [0x54,0x7f,0x00] 
+check:15'0    {                                            search range start (exclusive)
+check:15'1                                                 error: no match found in search range
+            2:  mvp #18,#52 ; encoding: [0x44,0x12,0x34] 
+            3:  mvn #0,#255 ; encoding: [0x54,0x00,0xff] 
+check:15'2                    ?                            possible intended match
+            4:  mvp #255,#0 ; encoding: [0x44,0xff,0x00] 
+            5:  
+check:15'3      } search range end (exclusive)
+>>>>>>
+ENC=1
+/src/llvm/test/MC/MOS/65816-block-move-bank-order.s:16:8: error: DIS: expected string not found in input
+; DIS: 54 00 7f {{.*}}mvn #$7f,#$0
+       ^
+<stdin>:1:1: note: scanning from here
+
+^
+<stdin>:7:5: note: possible intended match here
+ 0: 54 7f 00 mvn #$7f,#$0
+    ^
+
+Input file: <stdin>
+Check file: /src/llvm/test/MC/MOS/65816-block-move-bank-order.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1:  
+check:16'0    {   search range start (exclusive)
+check:16'1        error: no match found in search range
+            2: /build/mvn-components/constants.o: file format elf32-mos 
+            3:  
+            4: Disassembly of section .text: 
+            5:  
+            6: 00000000 <.text>: 
+            7:  0: 54 7f 00 mvn #$7f,#$0 
+check:16'2         ?                       possible intended match
+            8:  3: 44 12 34 mvp #$12,#$34 
+            9:  6: 54 00 ff mvn #$0,#$ff 
+           10:  9: 44 ff 00 mvp #$ff,#$0 
+check:16'3                               } search range end (exclusive)
+>>>>>>
+DIS=1
+/src/llvm/test/MC/MOS/65816-block-move-bank-order.s:31:14: error: FIXUP-DAG: expected string not found in input
+; FIXUP-DAG: offset: 2, value: source, kind: Imm8
+             ^
+<stdin>:1:5: note: scanning from here
+ mvn #source,#destination ; encoding: [0x54,A,B]
+    ^
+<stdin>:2:14: note: possible intended match here
+ ; fixup A - offset: 1, value: source, kind: Imm8
+             ^
+
+Input file: <stdin>
+Check file: /src/llvm/test/MC/MOS/65816-block-move-bank-order.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+          1:  mvn #source,#destination ; encoding: [0x54,A,B] 
+dag:31'0        {                                               search range start (exclusive)
+dag:31'1                                                        error: no match found in search range
+          2:  ; fixup A - offset: 1, value: source, kind: Imm8 
+dag:31'2                  ?                                      possible intended match
+          3:  ; fixup B - offset: 2, value: destination, kind: Imm8 
+          4:  mvp #source,#destination ; encoding: [0x44,A,B] 
+          5:  ; fixup A - offset: 1, value: source, kind: Imm8 
+          6:  ; fixup B - offset: 2, value: destination, kind: Imm8 
+          7:  
+dag:31'3      } search range end (exclusive)
+>>>>>>
+FIXUP=1
+/src/llvm/test/MC/MOS/65816-block-move-bank-order.s:37:14: error: RELOC-DAG: expected string not found in input
+; RELOC-DAG: 0x2 R_MOS_IMM8 source
+             ^
+<stdin>:1:1: note: scanning from here
+
+^
+<stdin>:9:2: note: possible intended match here
+ 0x1 R_MOS_IMM8 source 0x0
+ ^
+
+Input file: <stdin>
+Check file: /src/llvm/test/MC/MOS/65816-block-move-bank-order.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+          1:  
+dag:37'0    {   search range start (exclusive)
+dag:37'1        error: no match found in search range
+          2: File: /build/mvn-components/symbols.o 
+          3: Format: elf32-mos 
+          4: Arch: mos 
+          5: AddressSize: 32bit 
+          6: LoadName: <Not found> 
+          7: Relocations [ 
+          8:  Section (3) .rela.text { 
+          9:  0x1 R_MOS_IMM8 source 0x0 
+dag:37'2      ?                           possible intended match
+         10:  0x2 R_MOS_IMM8 destination 0x0 
+         11:  0x4 R_MOS_IMM8 source 0x0 
+         12:  0x5 R_MOS_IMM8 destination 0x0 
+         13:  } 
+         14: ] 
+dag:37'3       } search range end (exclusive)
+>>>>>>
+RELOC=1
+/src/llvm/test/MC/MOS/65816-block-move-bank-order.s:48:13: error: RESOLVED: expected string not found in input
+; RESOLVED: 54341244 3412
+            ^
+<stdin>:1:1: note: scanning from here
+
+^
+<stdin>:8:5: note: possible intended match here
+ 0000 54123444 1234 T.4D.4
+    ^
+
+Input file: <stdin>
+Check file: /src/llvm/test/MC/MOS/65816-block-move-bank-order.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1:  
+check:48'0    {   search range start (exclusive)
+check:48'1        error: no match found in search range
+            2: /build/mvn-components/resolved.o: file format elf32-mos 
+            3: Contents of section .strtab: 
+            4:  0000 002e7465 78740064 65737469 6e617469 ..text.destinati 
+            5:  0010 6f6e0073 6f757263 65002e73 74727461 on.source..strta 
+            6:  0020 62002e73 796d7461 6200 b..symtab. 
+            7: Contents of section .text: 
+            8:  0000 54123444 1234 T.4D.4 
+check:48'2         ?                        possible intended match
+            9: Contents of section .symtab: 
+           10:  0000 00000000 00000000 00000000 00000000 ................ 
+           11:  0010 07000000 34000000 00000000 0000f1ff ....4........... 
+           12:  0020 13000000 12000000 00000000 0000f1ff ................ 
+check:48'3                                                                } search range end (exclusive)
+>>>>>>
+RESOLVED=1

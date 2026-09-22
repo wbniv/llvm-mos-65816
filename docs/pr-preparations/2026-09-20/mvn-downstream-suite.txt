@@ -1,0 +1,197 @@
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-as in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-link in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-sim in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml2obj in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find verify-uselistorder in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find opt in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/llvm-mos/bin
+-- Testing: 43 tests, 8 workers --
+PASS: LLVM :: MC/MOS/all-6502-opcodes.s (1 of 43)
+PASS: LLVM :: MC/MOS/all-65816-opcodes.s (2 of 43)
+PASS: LLVM :: MC/MOS/addr-asciz.s (3 of 43)
+PASS: LLVM :: MC/MOS/motorola-integers-default.s (4 of 43)
+PASS: LLVM :: MC/MOS/all-4510-opcodes.s (5 of 43)
+PASS: LLVM :: MC/MOS/all-45gs02-opcodes.s (6 of 43)
+PASS: LLVM :: MC/MOS/all-65816-aliases.s (7 of 43)
+PASS: LLVM :: MC/MOS/all-65c02-opcodes.s (8 of 43)
+PASS: LLVM :: MC/MOS/all-6502x-opcodes.s (9 of 43)
+PASS: LLVM :: MC/MOS/all-65ce02-opcodes.s (10 of 43)
+PASS: LLVM :: MC/MOS/all-65dtv02-opcodes.s (11 of 43)
+PASS: LLVM :: MC/MOS/all-65el02-opcodes.s (12 of 43)
+PASS: LLVM :: MC/MOS/all-r65c02-opcodes.s (13 of 43)
+PASS: LLVM :: MC/MOS/all-huc6280-opcodes.s (14 of 43)
+PASS: LLVM :: MC/MOS/all-spc700-aliases.s (15 of 43)
+PASS: LLVM :: MC/MOS/align-nop.s (16 of 43)
+FAIL: LLVM :: MC/MOS/addressing-modes-65816.s (17 of 43)
+******************** TEST 'LLVM :: MC/MOS/addressing-modes-65816.s' FAILED ********************
+Exit Code: 1
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/llvm-mos/bin/llvm-mc -triple mos -mcpu=mosw65816 -motorola-integers --filetype=obj -o=/work/build/llvm-mos/test/MC/MOS/Output/addressing-modes-65816.s.tmp.obj /work/vendor/llvm-mos/llvm/test/MC/MOS/addressing-modes-65816.s
+# executed command: /work/build/llvm-mos/bin/llvm-mc -triple mos -mcpu=mosw65816 -motorola-integers --filetype=obj -o=/work/build/llvm-mos/test/MC/MOS/Output/addressing-modes-65816.s.tmp.obj /work/vendor/llvm-mos/llvm/test/MC/MOS/addressing-modes-65816.s
+# RUN: at line 2
+/work/build/llvm-mos/bin/llvm-objdump --all-headers --print-imm-hex -D /work/build/llvm-mos/test/MC/MOS/Output/addressing-modes-65816.s.tmp.obj | /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/MC/MOS/addressing-modes-65816.s
+# executed command: /work/build/llvm-mos/bin/llvm-objdump --all-headers --print-imm-hex -D /work/build/llvm-mos/test/MC/MOS/Output/addressing-modes-65816.s.tmp.obj
+# executed command: /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/MC/MOS/addressing-modes-65816.s
+# .---command stderr------------
+# | /work/vendor/llvm-mos/llvm/test/MC/MOS/addressing-modes-65816.s:70:22: error: CHECK: expected string not found in input
+# |  lda addr24 ; CHECK: af 00 00 00
+# |                      ^
+# | <stdin>:113:38: note: scanning from here
+# |  0003032d: R_MOS_ADDR24 .text+0x30303
+# |                                      ^
+# | <stdin>:176:9: note: possible intended match here
+# |  30375: bf 00 00 00 lda $0,x ; 0x0 <.text>
+# |         ^
+# | 
+# | Input file: <stdin>
+# | Check file: /work/vendor/llvm-mos/llvm/test/MC/MOS/addressing-modes-65816.s
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |             .
+# |             .
+# |             .
+# |           108:  30324: af 00 00 00 lda $0 ; 0x0 <.text> 
+# |           109:  00030325: R_MOS_ADDR24 .text+0x1 
+# |           110:  30328: af 00 00 00 lda $0 ; 0x0 <.text> 
+# |           111:  00030329: R_MOS_ADDR24 .text+0x202 
+# |           112:  3032c: af 00 00 00 lda $0 ; 0x0 <.text> 
+# |           113:  0003032d: R_MOS_ADDR24 .text+0x30303 
+# | check:70'0                                          X error: no match found
+# |           114:  30330: ad 00 00 lda $0 ; 0x0 <.text> 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           115:  00030331: R_MOS_ADDR16 .text+0x30303 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           116:  30333: a5 00 lda $0 ; 0x0 <.text> 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           117:  00030334: R_MOS_ADDR8 .text+0x1 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           118:  30335: a5 00 lda $0 ; 0x0 <.text> 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |             .
+# |             .
+# |             .
+# |           171:  0003036d: R_MOS_ADDR16 .text+0x1 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           172:  3036f: b9 00 00 lda $0,y ; 0x0 <.text> 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           173:  00030370: R_MOS_ADDR16 .text+0x202 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           174:  30372: b9 00 00 lda $0,y ; 0x0 <.text> 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           175:  00030373: R_MOS_ADDR16 .text+0x30303 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           176:  30375: bf 00 00 00 lda $0,x ; 0x0 <.text> 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# | check:70'1             ?                                   possible intended match
+# |           177:  00030376: R_MOS_ADDR24 .text+0x1 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           178:  30379: bf 00 00 00 lda $0,x ; 0x0 <.text> 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           179:  0003037a: R_MOS_ADDR24 .text+0x202 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           180:  3037d: bf 00 00 00 lda $0,x ; 0x0 <.text> 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |           181:  0003037e: R_MOS_ADDR24 .text+0x30303 
+# | check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# |             .
+# |             .
+# |             .
+# | >>>>>>
+# `-----------------------------
+# error: command failed with exit status: 1
+
+--
+
+********************
+PASS: LLVM :: MC/MOS/65816-block-move-bank-order.s (18 of 43)
+PASS: LLVM :: MC/MOS/asm-errors.s (19 of 43)
+PASS: LLVM :: MC/MOS/all-w65c02-opcodes.s (20 of 43)
+PASS: LLVM :: MC/MOS/brk-signature.s (21 of 43)
+PASS: LLVM :: MC/MOS/branch-range-errors.s (22 of 43)
+PASS: LLVM :: MC/MOS/all-spc700-opcodes.s (23 of 43)
+PASS: LLVM :: MC/MOS/do-init-stack.s (24 of 43)
+PASS: LLVM :: MC/MOS/do-zero-bss.s (25 of 43)
+PASS: LLVM :: MC/MOS/do-copy-data.s (26 of 43)
+PASS: LLVM :: MC/MOS/do-fini-array.s (27 of 43)
+PASS: LLVM :: MC/MOS/do-init-array.s (28 of 43)
+PASS: LLVM :: MC/MOS/inst-lda.s (29 of 43)
+PASS: LLVM :: MC/MOS/long-branches-65816.s (30 of 43)
+PASS: LLVM :: MC/MOS/long-branches-65ce02.s (31 of 43)
+PASS: LLVM :: MC/MOS/ophis-hello-world.s (32 of 43)
+PASS: LLVM :: MC/MOS/modifiers-spc700.s (33 of 43)
+PASS: LLVM :: MC/MOS/modifiers-65816.s (34 of 43)
+PASS: LLVM :: MC/MOS/modifiers.s (35 of 43)
+PASS: LLVM :: MC/MOS/trivial.s (36 of 43)
+PASS: LLVM :: MC/MOS/uppercase-registers.s (37 of 43)
+PASS: LLVM :: MC/MOS/pc-rel-reloc.s (38 of 43)
+PASS: LLVM :: MC/MOS/zeropage.s (39 of 43)
+PASS: LLVM :: MC/MOS/zp-regression.s (40 of 43)
+PASS: LLVM :: MC/MOS/zeropage-huc6280.s (41 of 43)
+PASS: LLVM :: MC/MOS/eflags.s (42 of 43)
+PASS: LLVM :: MC/MOS/eflags-ir.ll (43 of 43)
+********************
+Failed Tests (1):
+  LLVM :: MC/MOS/addressing-modes-65816.s
+
+
+Testing Time: 0.63s
+
+Total Discovered Tests: 43
+  Passed: 42 (97.67%)
+  Failed:  1 (2.33%)

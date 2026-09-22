@@ -1,0 +1,73 @@
+diff --git a/llvm/lib/CodeGen/VirtRegMap.cpp b/llvm/lib/CodeGen/VirtRegMap.cpp
+index 92a5996c733e..faae6e3a419f 100644
+--- a/llvm/lib/CodeGen/VirtRegMap.cpp
++++ b/llvm/lib/CodeGen/VirtRegMap.cpp
+@@ -230,3 +230,3 @@ class VirtRegRewriter {
+   void addLiveInsForSubRanges(const LiveInterval &LI, MCRegister PhysReg) const;
+-  void handleIdentityCopy(MachineInstr &MI);
++  void handleIdentityCopy(MachineInstr &MI, bool HasUndefLanes);
+   void expandCopyBundle(MachineInstr &MI) const;
+@@ -491,3 +491,3 @@ bool VirtRegRewriter::readsUndefSubreg(const MachineInstr &MI,
+ 
+-void VirtRegRewriter::handleIdentityCopy(MachineInstr &MI) {
++void VirtRegRewriter::handleIdentityCopy(MachineInstr &MI, bool HasUndefLanes) {
+   if (!MI.isIdentityCopy())
+@@ -512,3 +512,3 @@ void VirtRegRewriter::handleIdentityCopy(MachineInstr &MI) {
+   // instruction to maintain this information.
+-  if (MI.getOperand(1).isUndef() || MI.getNumOperands() > 2) {
++  if (HasUndefLanes || MI.getOperand(1).isUndef() || MI.getNumOperands() > 2) {
+     MI.setDesc(TII->get(TargetOpcode::KILL));
+@@ -663,2 +663,22 @@ void VirtRegRewriter::rewrite() {
+     for (MachineInstr &MI : llvm::make_early_inc_range(MBBI->instrs())) {
++      // A full COPY defines its destination even where the source has no live
++      // lane. An identity COPY must retain that definition as a KILL so later
++      // uses of those destination lanes have a physical register definition.
++      bool CopyHasUndefLanes = false;
++      if (MI.isCopy()) {
++        const MachineOperand &Src = MI.getOperand(1);
++        if (Src.getReg().isVirtual() && LIS && LIS->hasInterval(Src.getReg())) {
++          const LiveInterval &LI = LIS->getInterval(Src.getReg());
++          if (LI.hasSubRanges()) {
++            LaneBitmask UndefLanes =
++                Src.getSubReg() ? TRI->getSubRegIndexLaneMask(Src.getSubReg())
++                                : MRI->getMaxLaneMaskForVReg(Src.getReg());
++            SlotIndex Idx = LIS->getInstructionIndex(MI);
++            for (const LiveInterval::SubRange &SR : LI.subranges())
++              if (SR.liveAt(Idx))
++                UndefLanes &= ~SR.LaneMask;
++            CopyHasUndefLanes = UndefLanes.any();
++          }
++        }
++      }
+       for (MachineOperand &MO : MI.operands()) {
+@@ -772,3 +792,3 @@ void VirtRegRewriter::rewrite() {
+       // We can remove identity copies right now.
+-      handleIdentityCopy(MI);
++      handleIdentityCopy(MI, CopyHasUndefLanes);
+     }
+diff --git a/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir b/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir
+new file mode 100644
+index 000000000000..fd15dc2cf89e
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir
+@@ -0,0 +1,20 @@
++# RUN: llc -mtriple=mos -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
++
++---
++name:            undef_lane_identity_copy
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    ; CHECK-LABEL: name: undef_lane_identity_copy
++    ; CHECK: renamable $rc2 = COPY killed renamable $x
++    ; CHECK-NEXT: renamable $rs1 = KILL renamable $rs1
++    ; CHECK: renamable $x = COPY killed renamable $rc3
++    %0:gpr = LDImm 1
++    undef %1.sublo:imag16 = COPY %0
++    %2:imag16 = COPY %1
++    %3:gpr = COPY %2.sublo
++    STAbs %3, 0
++    %4:gpr = COPY %2.subhi
++    STAbs %4, 1
++    RTS
++...

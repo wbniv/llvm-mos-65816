@@ -1,0 +1,46 @@
+Test project /tmp/sdk-longjmp-build/test/sim/build
+      Start  1: setjmp-O0-0
+ 1/20 Test  #1: setjmp-O0-0 ......................   Passed    0.00 sec
+      Start  2: setjmp-O0-1
+ 2/20 Test  #2: setjmp-O0-1 ......................   Passed    0.00 sec
+      Start  3: setjmp-O0-7
+ 3/20 Test  #3: setjmp-O0-7 ......................   Passed    0.00 sec
+      Start  4: setjmp-O0-256
+ 4/20 Test  #4: setjmp-O0-256 ....................   Passed    0.00 sec
+      Start  5: setjmp-O0--1
+ 5/20 Test  #5: setjmp-O0--1 .....................   Passed    0.01 sec
+      Start  6: setjmp-O1-0
+ 6/20 Test  #6: setjmp-O1-0 ......................   Passed    0.00 sec
+      Start  7: setjmp-O1-1
+ 7/20 Test  #7: setjmp-O1-1 ......................   Passed    0.00 sec
+      Start  8: setjmp-O1-7
+ 8/20 Test  #8: setjmp-O1-7 ......................   Passed    0.00 sec
+      Start  9: setjmp-O1-256
+ 9/20 Test  #9: setjmp-O1-256 ....................   Passed    0.01 sec
+      Start 10: setjmp-O1--1
+10/20 Test #10: setjmp-O1--1 .....................   Passed    0.00 sec
+      Start 11: setjmp-O2-0
+11/20 Test #11: setjmp-O2-0 ......................   Passed    0.01 sec
+      Start 12: setjmp-O2-1
+12/20 Test #12: setjmp-O2-1 ......................   Passed    0.00 sec
+      Start 13: setjmp-O2-7
+13/20 Test #13: setjmp-O2-7 ......................   Passed    0.00 sec
+      Start 14: setjmp-O2-256
+14/20 Test #14: setjmp-O2-256 ....................   Passed    0.00 sec
+      Start 15: setjmp-O2--1
+15/20 Test #15: setjmp-O2--1 .....................   Passed    0.00 sec
+      Start 16: setjmp-Os-0
+16/20 Test #16: setjmp-Os-0 ......................   Passed    0.00 sec
+      Start 17: setjmp-Os-1
+17/20 Test #17: setjmp-Os-1 ......................   Passed    0.00 sec
+      Start 18: setjmp-Os-7
+18/20 Test #18: setjmp-Os-7 ......................   Passed    0.00 sec
+      Start 19: setjmp-Os-256
+19/20 Test #19: setjmp-Os-256 ....................   Passed    0.00 sec
+      Start 20: setjmp-Os--1
+20/20 Test #20: setjmp-Os--1 .....................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Total Test time (real) =   0.10 sec
+[8/8] Completed 'test-sim'

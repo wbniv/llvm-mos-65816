@@ -1,0 +1,13 @@
+Frontend: existing local MOS clang, -O1 -fnonreentrant -S -emit-llvm.
+Backend: fresh opt at upstream 742d554bf080, assertions enabled, -passes=mos-nonreentrant,verify.
+
+Before MOSNonReentrant:
+define dso_local i16 @force_frame(i16 noundef %0) local_unnamed_addr #0 {
+define dso_local i16 @ordinary_frame(i16 noundef %0) local_unnamed_addr #2 {
+attributes #0 = { nofree noinline norecurse nounwind memory(inaccessiblemem: readwrite) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mos6502" }
+attributes #2 = { nofree noinline norecurse nounwind memory(inaccessiblemem: readwrite) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mos6502" }
+
+After MOSNonReentrant:
+define dso_local i16 @force_frame(i16 noundef %0) local_unnamed_addr #0 {
+define dso_local i16 @ordinary_frame(i16 noundef %0) local_unnamed_addr #0 {
+attributes #0 = { nofree noinline norecurse nounwind memory(inaccessiblemem: readwrite) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mos6502" }

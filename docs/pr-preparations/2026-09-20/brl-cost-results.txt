@@ -1,0 +1,169 @@
+
+File: /tmp/brl-cost-final/bra.o
+Format: elf32-mos
+Arch: mos
+AddressSize: 32bit
+LoadName: <Not found>
+Sections [
+  Section {
+    Index: 0
+    Name:  (0)
+    Type: SHT_NULL (0x0)
+    Flags [ (0x0)
+    ]
+    Address: 0x0
+    Offset: 0x0
+    Size: 0
+    Link: 0
+    Info: 0
+    AddressAlignment: 0
+    EntrySize: 0
+  }
+  Section {
+    Index: 1
+    Name: .strtab (14)
+    Type: SHT_STRTAB (0x3)
+    Flags [ (0x0)
+    ]
+    Address: 0x0
+    Offset: 0xD8
+    Size: 30
+    Link: 0
+    Info: 0
+    AddressAlignment: 1
+    EntrySize: 0
+  }
+  Section {
+    Index: 2
+    Name: .text (1)
+    Type: SHT_PROGBITS (0x1)
+    Flags [ (0x6)
+      SHF_ALLOC (0x2)
+      SHF_EXECINSTR (0x4)
+    ]
+    Address: 0x0
+    Offset: 0x34
+    Size: 132
+    Link: 0
+    Info: 0
+    AddressAlignment: 1
+    EntrySize: 0
+  }
+  Section {
+    Index: 3
+    Name: .symtab (22)
+    Type: SHT_SYMTAB (0x2)
+    Flags [ (0x0)
+    ]
+    Address: 0x0
+    Offset: 0xB8
+    Size: 32
+    Link: 1
+    Info: 2
+    AddressAlignment: 4
+    EntrySize: 16
+  }
+]
+
+/tmp/brl-cost-final/bra.o:	file format elf32-mos
+
+Disassembly of section .text:
+
+00000000 <.text>:
+       0: 82 80 00     	brl	$83 <target>
+		...
+
+00000083 <target>:
+      83: 60           	rts
+
+File: /tmp/brl-cost-final/jmp.o
+Format: elf32-mos
+Arch: mos
+AddressSize: 32bit
+LoadName: <Not found>
+Sections [
+  Section {
+    Index: 0
+    Name:  (0)
+    Type: SHT_NULL (0x0)
+    Flags [ (0x0)
+    ]
+    Address: 0x0
+    Offset: 0x0
+    Size: 0
+    Link: 0
+    Info: 0
+    AddressAlignment: 0
+    EntrySize: 0
+  }
+  Section {
+    Index: 1
+    Name: .strtab (19)
+    Type: SHT_STRTAB (0x3)
+    Flags [ (0x0)
+    ]
+    Address: 0x0
+    Offset: 0xF4
+    Size: 35
+    Link: 0
+    Info: 0
+    AddressAlignment: 1
+    EntrySize: 0
+  }
+  Section {
+    Index: 2
+    Name: .text (6)
+    Type: SHT_PROGBITS (0x1)
+    Flags [ (0x6)
+      SHF_ALLOC (0x2)
+      SHF_EXECINSTR (0x4)
+    ]
+    Address: 0x0
+    Offset: 0x34
+    Size: 132
+    Link: 0
+    Info: 0
+    AddressAlignment: 1
+    EntrySize: 0
+  }
+  Section {
+    Index: 3
+    Name: .rela.text (1)
+    Type: SHT_RELA (0x4)
+    Flags [ (0x40)
+      SHF_INFO_LINK (0x40)
+    ]
+    Address: 0x0
+    Offset: 0xE8
+    Size: 12
+    Link: 4
+    Info: 2
+    AddressAlignment: 4
+    EntrySize: 12
+  }
+  Section {
+    Index: 4
+    Name: .symtab (27)
+    Type: SHT_SYMTAB (0x2)
+    Flags [ (0x0)
+    ]
+    Address: 0x0
+    Offset: 0xB8
+    Size: 48
+    Link: 1
+    Info: 3
+    AddressAlignment: 4
+    EntrySize: 16
+  }
+]
+
+/tmp/brl-cost-final/jmp.o:	file format elf32-mos
+
+Disassembly of section .text:
+
+00000000 <.text>:
+       0: 4c 00 00     	jmp	$0 <.text>
+		...
+
+00000083 <target>:
+      83: 60           	rts

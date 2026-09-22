@@ -1,0 +1,1 @@
+[MOS] Encode MVN/MVP bank operands in destination-source byte order

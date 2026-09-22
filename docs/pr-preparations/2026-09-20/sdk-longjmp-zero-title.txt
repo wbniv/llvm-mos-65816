@@ -1,0 +1,1 @@
+[common] Make longjmp(env, 0) return one from setjmp

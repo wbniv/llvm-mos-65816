@@ -1,0 +1,107 @@
+diff --git a/mos-platform/common/c/setjmp.S b/mos-platform/common/c/setjmp.S
+index ecf9809..6227430 100644
+--- a/mos-platform/common/c/setjmp.S
++++ b/mos-platform/common/c/setjmp.S
+@@ -147,8 +147,14 @@ longjmp:
+   lda (__rc2),y
+   sta $101,x
+ 
+-  ; Restore return value
++  ; Return the supplied value, mapping zero to one as required by longjmp.
++  ; POSIX.1-2024, RETURN VALUE (aligned with ISO C):
++  ; https://pubs.opengroup.org/onlinepubs/9799919799/functions/longjmp.html
+   lda __rc16
+   ldx __rc17
+-
++  bne 1f
++  cmp #0
++  bne 1f
++  lda #1
++1:
+   rts
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+index 2c12e61..6d93f12 100644
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -14,6 +14,7 @@ function(add_test_target target)
+       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+       -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+       -DLLVM_MOS=${llvm_mos}
++      -DMOS_SIM_COMMAND=$<TARGET_FILE:mos-sim>
+       -DMESEN_COMMAND=${MESEN_COMMAND}
+       -DEMUTEST_COMMAND=${EMUTEST_COMMAND}
+       -DLIBRETRO_STELLA_CORE=${LIBRETRO_STELLA_CORE}
+@@ -44,3 +45,6 @@ add_test_target(atari2600-4k)
+ add_test_target(atari2600-3e)
+ add_test_target(atari8-dos)
+ add_test_target(atari8-cart-std)
++
++add_test_target(sim)
++add_dependencies(test-sim mos-sim)
+diff --git a/test/README.md b/test/README.md
+index 9d5d63a..90b6687 100644
+--- a/test/README.md
++++ b/test/README.md
+@@ -22,3 +22,16 @@ How to report results from a test case:
+ * Call `test_set_result(bool)` with a pass/fail value, and then go into a busy loop or video display loop, or
+ * Exit from `main()` with a status code -- zero for success, non-zero for failure, or
+ * Set the `EMUTEST_FB_CRC_PASS` variable to the CRC of a known good video frame (you can find these in the test log files.)
++
++## Simulator tests
++
++`cmake --build <build-dir> --target test-sim` builds the SDK and `mos-sim`, then
++builds and runs the CTest tests in `test/sim`. Tests return zero for success and
++nonzero for failure. These tests require no Libretro core.
++
++When changing SDK libraries in an existing build, clean the test executables first:
++`cmake --build <build-dir>/test/sim/build --target clean`. The platform configuration
++selects libraries implicitly, so the test build does not track their archive timestamps.
++
++The setjmp tests cover zero normalization and preservation of nonzero 16-bit
++values at four optimization levels.
+diff --git a/test/sim/CMakeLists.txt b/test/sim/CMakeLists.txt
+new file mode 100644
+index 0000000..c95af34
+--- /dev/null
++++ b/test/sim/CMakeLists.txt
+@@ -0,0 +1,16 @@
++cmake_minimum_required(VERSION 3.18)
++
++project(test-sim LANGUAGES C)
++
++include(CTest)
++
++foreach(opt IN ITEMS O0 O1 O2 Os)
++  foreach(value IN ITEMS 0 1 7 256 -1)
++    set(name setjmp-${opt}-${value})
++    add_executable(${name} setjmp.c)
++    target_compile_options(${name} PRIVATE -${opt})
++    target_compile_definitions(${name} PRIVATE JUMP_VALUE=${value})
++    add_test(NAME ${name} COMMAND ${MOS_SIM_COMMAND} $<TARGET_FILE:${name}>)
++    set_tests_properties(${name} PROPERTIES TIMEOUT 10)
++  endforeach()
++endforeach()
+diff --git a/test/sim/setjmp.c b/test/sim/setjmp.c
+new file mode 100644
+index 0000000..3ba437c
+--- /dev/null
++++ b/test/sim/setjmp.c
+@@ -0,0 +1,18 @@
++#include <setjmp.h>
++
++#define EXPECTED_VALUE (JUMP_VALUE == 0 ? 1 : JUMP_VALUE)
++
++static jmp_buf env;
++static volatile unsigned char jumped;
++
++// Zero must become one; every nonzero 16-bit return value must be preserved.
++// Static state distinguishes the initial return from the non-local return.
++int main(void) {
++  if (setjmp(env) == EXPECTED_VALUE)
++    return jumped ? 0 : 44;
++  if (jumped)
++    return 42;
++  jumped = 1;
++  longjmp(env, JUMP_VALUE);
++  return 43;
++}

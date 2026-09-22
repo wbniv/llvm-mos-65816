@@ -1,6 +1,78 @@
-# [MOS] `-verify-machineinstrs` rejects a dead read of an `undef` `Imag16` sub-lane after register allocation ("Using an undefined physical register")
+# [MOS] Undefined Imag16 lane rejected after register allocation
 
-## Summary
+
+## Current assessment — provenance clarified 2026-09-22
+
+**Fix and upstream regression are ready for review.** An eight-instruction MIR test
+reproduces on the September 21 upstream revision `742d554bf080` using the stock
+MOS target and only `greedy,virtregrewriter`.
+
+**Origin:** the failure occurred in naturally compiled downstream C, including
+the [L-System Plant](https://biohack.net/snes/lsystem/) kernel preserved by
+`rcundef2.c` and the [Newton Fractal](https://biohack.net/snes/newton/) kernel in
+`newton_sim.c`, under our downstream-only `+mos-a16` / `+mos-xy16` features.
+The demo pages identify the applications; the saved compiler inputs and logs
+provide the failure evidence. The eight-instruction test is a
+deliberately constructed MIR model of the observed mechanism. It does not need
+those features, an SDK, or the C frontend to trigger the stock-upstream rewriter.
+We have not established an ordinary stock-upstream C compilation that generates
+the same pattern. Reproducing the contract failure at MIR level does not by itself
+establish that frontend reachability.
+
+The failure occurs when a full virtual-register `COPY` reads a value with an undef
+lane and register allocation assigns its source and destination to the same physical
+register. `VirtRegRewriter` removes that identity copy. The removal also discards the
+copy's definition of the destination's undef lane, so a later physical read of that
+lane has no reaching definition and MachineVerifier rejects it.
+
+The fix detects lanes without a live source subrange before rewriting.
+`rewriteInstruction` owns both operand rewriting and identity-copy cleanup,
+keeping that lane information local. If the copy becomes an identity copy, the
+helper retains it as a `KILL`, matching the handling for an explicitly undef
+source. The `KILL` preserves the physical liveness definition and emits no machine
+code. September 21 validation: current-upstream MOS CodeGen 85 pass / one
+unsupported; downstream verifier gate 34/34; 24 corpus inputs have identical MIR
+and assembly to the boolean-parameter implementation.
+[Validation and patch artifacts](pr-preparations/2026-09-21/0028-validation.md).
+
+The generic patch and lit test are carried in
+`patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy.patch`. The
+downstream REP/SEP pass had a separate verifier failure in `trimerge_sim.c`: its X16
+restore cloned a source kill flag. That pass now clears kill information on the
+original writer and cloned reload and has an independent MIR regression.
+
+[Upstream issue #48](https://github.com/llvm-mos/llvm-mos/issues/48) records related
+partial-register spill-liveness history, resolved in 2021 by changing legalization.
+It is useful prior art, not an established duplicate. The latest witness includes a
+store, so the report must not be titled or summarized as exclusively a dead read.
+
+See the [pending-work chart](upstream-pending-work.md) for readiness and dependencies.
+The sections below preserve the investigation sequence and its revisions.
+
+## Minimal upstream reproducer
+
+This is the constructed test case, not the full compiler-generated MIR from the
+downstream program or a claimed unchanged output of automated reduction. The
+[validation record's provenance section](pr-preparations/2026-09-21/0028-validation.md#reproducer-provenance)
+identifies the saved C-generated MIR, failure log, and reduction artifacts.
+
+```mir
+bb.0:
+  %0:gpr = LDImm 1
+  undef %1.sublo:imag16 = COPY %0
+  %2:imag16 = COPY %1
+  %3:gpr = COPY %2.sublo
+  STAbs %3, 0
+  %4:gpr = COPY %2.subhi
+  STAbs %4, 1
+  RTS
+```
+
+Before the fix, `%1` and `%2` both allocate to `$rs1`; the identity copy disappears,
+and the `$rc3` read fails verification. After the fix, rewriting retains
+`$rs1 = KILL $rs1` between the low-lane definition and the two extracts.
+
+## Historical investigation
 
 Under `+mos-a16`/`+mos-xy16` at `-O1`/`-Os`, a high-register-pressure function can
 emit a **dead** `$x = COPY $rcN` whose `$rcN` is the **high byte of an `Imag16`
@@ -23,7 +95,7 @@ any use), so this is a latent verifier-only defect, but it blocks
 > holds, but "the copy is dead" is *not* the invariant that makes it safe. See
 > [Second manifestation](#second-manifestation-2026-08-02-the-undef-lane-feeds-a-store-not-a-dead-read).
 
-## Root cause
+## Superseded diagnosis: lane propagation
 
 A 16-bit value (here a `__mulsi3` argument) is built with the standard
 sub-register idiom where one lane is defined and the sibling lane is `undef`:
@@ -61,7 +133,7 @@ not because the coalescer is at fault, but because without coalescing the dead
 extracts stay separate vregs that the dead-MI pass then removes. With coalescing,
 the dead pair-extract survives RA as a physical read of the undef lane.
 
-## Why the rewriter's existing undef-marking misses it
+## Why the earlier rewriter diagnosis appeared plausible
 
 The target enables sub-register liveness (`enableSubRegLiveness() == true`,
 `Imag16` has disjunct `sublo`/`subhi`), and `VirtRegRewriter` already marks undef
@@ -72,7 +144,7 @@ It misses this case because a **live-range-split full-pair `COPY`** (`%1759 = CO
 `subhi` lane mask at the read and returns `false`. The split/copy-insertion does not
 carry the lane's `undef`-ness through the inserted COPY.
 
-## Candidate fixes (maintainer's call — touches generic RA / sub-register liveness)
+## Superseded candidate fixes
 
 1. **Carry `undef` through the split/spill COPY.** In SplitKit / InlineSpiller,
    when copying a value whose lane is `undef`, mark that lane `undef` on the
@@ -99,8 +171,7 @@ patch on the rewriter's read side.
 
 All compiled `-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -mllvm
 -verify-machineinstrs`, and all run correctly (the fork's 4-way host/MAME/bsnes-jg
-differential is green on every one). Tracked downstream as
-`KNOWN_ISSUES["a16-rc-undef-ra-pure-virtual"]`.
+differential was green on every one). They are now positive verifier regressions.
 
 | witness | function | reproduces at | notes |
 |---|---|---|---|

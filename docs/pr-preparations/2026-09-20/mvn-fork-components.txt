@@ -1,0 +1,128 @@
+ENC=0
+DIS=0
+/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-20/65816-block-move-bank-order.s:31:14: error: FIXUP-DAG: expected string not found in input
+; FIXUP-DAG: offset: 2, value: source, kind: Imm8
+             ^
+<stdin>:1:5: note: scanning from here
+ mvn #source,#destination ; encoding: [0x54,A,B]
+    ^
+<stdin>:2:14: note: possible intended match here
+ ; fixup A - offset: 1, value: source, kind: Imm8
+             ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/docs/pr-preparations/2026-09-20/65816-block-move-bank-order.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+          1:  mvn #source,#destination ; encoding: [0x54,A,B] 
+dag:31'0         X~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ error: no match found
+          2:  ; fixup A - offset: 1, value: source, kind: Imm8 
+dag:31'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+dag:31'1                  ?                                     possible intended match
+          3:  ; fixup B - offset: 2, value: destination, kind: Imm8 
+dag:31'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          4:  mvp #source,#destination ; encoding: [0x44,A,B] 
+dag:31'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          5:  ; fixup A - offset: 1, value: source, kind: Imm8 
+dag:31'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          6:  ; fixup B - offset: 2, value: destination, kind: Imm8 
+dag:31'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          7:  
+dag:31'0     ~
+>>>>>>
+FIXUP=1
+/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-20/65816-block-move-bank-order.s:37:14: error: RELOC-DAG: expected string not found in input
+; RELOC-DAG: 0x2 R_MOS_IMM8 source
+             ^
+<stdin>:1:1: note: scanning from here
+
+^
+<stdin>:9:2: note: possible intended match here
+ 0x1 R_MOS_IMM8 source 0x0
+ ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/docs/pr-preparations/2026-09-20/65816-block-move-bank-order.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+          1:  
+dag:37'0     X error: no match found
+          2: File: /tmp/mvn-fork-components/symbols.o 
+dag:37'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          3: Format: elf32-mos 
+dag:37'0     ~~~~~~~~~~~~~~~~~~
+          4: Arch: mos 
+dag:37'0     ~~~~~~~~~~
+          5: AddressSize: 32bit 
+dag:37'0     ~~~~~~~~~~~~~~~~~~~
+          6: LoadName: <Not found> 
+dag:37'0     ~~~~~~~~~~~~~~~~~~~~~~
+          7: Relocations [ 
+dag:37'0     ~~~~~~~~~~~~~~
+          8:  Section (3) .rela.text { 
+dag:37'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+          9:  0x1 R_MOS_IMM8 source 0x0 
+dag:37'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+dag:37'1      ?                          possible intended match
+         10:  0x2 R_MOS_IMM8 destination 0x0 
+dag:37'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         11:  0x4 R_MOS_IMM8 source 0x0 
+dag:37'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         12:  0x5 R_MOS_IMM8 destination 0x0 
+dag:37'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         13:  } 
+dag:37'0     ~~~
+         14: ] 
+dag:37'0     ~~
+>>>>>>
+RELOC=1
+/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-20/65816-block-move-bank-order.s:48:13: error: RESOLVED: expected string not found in input
+; RESOLVED: 54341244 3412
+            ^
+<stdin>:1:1: note: scanning from here
+
+^
+<stdin>:8:5: note: possible intended match here
+ 0000 54123444 1234 T.4D.4
+    ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/docs/pr-preparations/2026-09-20/65816-block-move-bank-order.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1:  
+check:48'0     X error: no match found
+            2: /tmp/mvn-fork-components/resolved.o: file format elf32-mos 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            3: Contents of section .strtab: 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            4:  0000 002e7465 78740064 65737469 6e617469 ..text.destinati 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            5:  0010 6f6e0073 6f757263 65002e73 74727461 on.source..strta 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            6:  0020 62002e73 796d7461 6200 b..symtab. 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            7: Contents of section .text: 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            8:  0000 54123444 1234 T.4D.4 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+check:48'1         ?                       possible intended match
+            9: Contents of section .symtab: 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           10:  0000 00000000 00000000 00000000 00000000 ................ 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           11:  0010 07000000 34000000 00000000 0000f1ff ....4........... 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           12:  0020 13000000 12000000 00000000 0000f1ff ................ 
+check:48'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>>>
+RESOLVED=1

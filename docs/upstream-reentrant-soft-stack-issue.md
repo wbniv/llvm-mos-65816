@@ -1,133 +1,75 @@
-# `__attribute__((reentrant))` cannot force the soft (reentrant) stack
+# Reentrant attribute: opt-out or a forced reentrant frame?
 
-| | |
-|---|---|
-| **Project** | [`llvm-mos/llvm-mos`](https://github.com/llvm-mos/llvm-mos) (clang front end + LLVM MOS backend) |
-| **Kind** | latent footgun / design question — not a miscompile for ordinary (single-activation) C |
-| **Components** | `clang/lib/CodeGen/CodeGenModule.cpp`, `llvm/lib/Target/MOS/MOSNonReentrant.cpp`, `llvm/lib/Target/MOS/MOSFrameLowering.cpp` |
-| **Verified against** | current vendor tree (rolling `main`) — cited by symbol/quote since line numbers drift |
-| **Fork patch** | **none, intentionally** — issue only |
+**Assessment updated 2026-09-22. Not posted; no fix proposed until the contract is agreed.**
+Target: `llvm-mos/llvm-mos` (clang attribute lowering and MOSNonReentrant).
 
----
+## Proposed issue title
 
-## Title
+`[MOS] Clarify whether __attribute__((reentrant)) must prevent inferred nonreentrant allocation`
 
-```
-[MOS] __attribute__((reentrant)) is a no-op for non-recursive functions — cannot force the soft stack
-```
+## Confirmed behavior
 
-## Summary
+The attribute cancels the `-fnonreentrant` default in clang. It does not emit a
+positive `reentrant` IR attribute. Later, `MOSNonReentrant` can add `nonreentrant`
+when it proves the function does not recurse and does not classify it as interrupt
+reachable. Thus the attribute does not force a soft-stack frame for an otherwise
+provably non-reentrant function.
 
-clang accepts `__attribute__((reentrant))` and it correctly opts a function **out of** the `-fnonreentrant`
-global default. But it **cannot force an individual, otherwise-non-recursive function onto the reentrant
-(soft) stack**: the MOS `nonreentrant` pass re-derives the `nonreentrant` attribute from `norecurse` and
-re-stamps the function regardless of the source attribute. A user who marks a function `reentrant` because
-they know it can re-enter through a path the IR call graph cannot see — an inline-asm-installed ISR, a
-hand-rolled coroutine / manual stack switch, or `longjmp` re-entry — silently gets a **static** frame, which
-the second activation clobbers. No diagnostic; runtime data corruption.
+Current upstream source confirms both steps:
 
-## Mechanism
+- [CodeGenModule.cpp](https://github.com/llvm-mos/llvm-mos/blob/742d554bf08042b8df93d791c335260fadd16643/clang/lib/CodeGen/CodeGenModule.cpp):
+  `ReentrantAttr` suppresses `AssumeNonReentrant`; there is no positive marker.
+- [MOSNonReentrant.cpp](https://github.com/llvm-mos/llvm-mos/blob/742d554bf08042b8df93d791c335260fadd16643/llvm/lib/Target/MOS/MOSNonReentrant.cpp):
+  the final loop adds `nonreentrant` to `doesNotRecurse()` functions outside its
+  reentrant set.
+- [Attr.td](https://github.com/llvm-mos/llvm-mos/blob/742d554bf08042b8df93d791c335260fadd16643/clang/include/clang/Basic/Attr.td):
+  the attribute is explicitly classified `Undocumented`.
 
-Walk a non-recursive function `f` marked `__attribute__((reentrant))` through the pipeline:
+[Original issue #248](https://github.com/llvm-mos/llvm-mos/issues/248) motivated a
+per-function opt-out from a translation-unit assumption. That history supports
+asking about intent before declaring the present behavior a compiler defect.
 
-**1. clang — `reentrant` emits no positive IR marker, it only suppresses the default.**
-`CodeGenModule.cpp`, the `nonreentrant` lowering:
+## Small reproducer
 
-```cpp
-if (D->hasAttr<NonReentrantAttr>() ||
-    (CodeGenOpts.AssumeNonReentrant && !D->hasAttr<ReentrantAttr>()))
-  B.addAttribute("nonreentrant");
-```
+[reentrant.c](investigations/repro/upstream-issues-2026-09-20/reentrant.c) has two
+otherwise-identical functions with volatile local arrays, one annotated reentrant.
 
-`ReentrantAttr` appears only as `!D->hasAttr<ReentrantAttr>()`, gating the `-fnonreentrant`
-(`AssumeNonReentrant`) default. After clang, `f` has **no** `nonreentrant` IR attribute — and no positive
-`reentrant` marker either. So far it looks like `f` will get a soft frame.
-
-**2. LLVM infers `norecurse`.** `f` is provably non-recursive, so `f->doesNotRecurse()` becomes true (via
-the standard FunctionAttrs inference, and reaffirmed by this pass's own bottom-up SCC walk / `callsSelf`).
-
-**3. `MOSNonReentrant` re-stamps `nonreentrant`.** `MOSNonReentrantImpl::run()`, the final loop:
-
-```cpp
-// Make all norecurse functions that were not determined to be reentrant as
-// nonreentrant.
-for (Function &F : M.functions())
-  if (F.doesNotRecurse() && !Reentrant.contains(CG[&F]))
-    F.addFnAttr("nonreentrant");
+```sh
+mos-clang --target=mos -mcpu=mos6502 -O1 -fnonreentrant \
+  -S -emit-llvm reentrant.c -o reentrant.ll
+opt -passes=mos-nonreentrant,verify -S reentrant.ll -o reentrant-after.ll
 ```
 
-The `Reentrant` set is seeded **only** from interrupt reachability, `interrupt-norecurse`/`main`, and
-libcalls (earlier in the same `run()`), **never** from a source-level `reentrant` attribute. So `f`
-(norecurse, not in `Reentrant`) has `nonreentrant` **re-added** here.
+The September 22 experiment uses the
+[saved unpatched upstream Clang and opt](upstream-reference-build.md), both built
+at `742d554bf080`. Clang emits `norecurse` on both functions; only the unannotated
+function initially has `nonreentrant`. Running the pass adds `nonreentrant` to
+the annotated function too; both functions then share the same attribute set.
+No IR editing or downstream frontend is needed for this result. The reference
+build has assertions disabled; the `verify` pass checks the resulting IR.
+The emitted IR is saved in `build/upstream-ready-2026-09-22/reentrant.ll` and
+`reentrant-after.ll`.
 
-**4. Frame lowering picks the static frame.** `MOSFrameLowering::usesStaticStack`:
+## What this does and does not establish
 
-```cpp
-bool MOSFrameLowering::usesStaticStack(const MachineFunction &MF) const {
-  return MF.getSubtarget<MOSSubtarget>().staticStack() &&
-         !MF.getFunction().hasOptNone() &&
-         MF.getFunction().hasFnAttribute("nonreentrant");
-}
-```
+This proves the attribute is not a force-soft-stack switch. It does **not** prove
+miscompilation of an ordinary C program, or that compiler-visible interrupts are
+mishandled. The pass explicitly models interrupt reachability and conservatively
+handles possible recursive calls.
 
-`f` now has `nonreentrant`, so it gets a **static** frame. The `reentrant` attribute had no effect.
+A custom interrupt/coroutine mechanism invisible to that analysis is a motivating
+use case for asking about a stronger contract, not a demonstrated supported-program
+reproducer. Standard `longjmp` unwinds activations; it is not evidence of simultaneous
+re-entry into the same active frame. No runtime-corruption claim is made here.
 
-## Why it matters — and why it is *not* a miscompile for ordinary C
+## Question and possible follow-up
 
-For ordinary C this is **safe**: a provably single-activation (`norecurse`) function is fine with a static
-frame even when labelled `reentrant`, because the static frame is never live twice. The footgun is for
-functions that genuinely re-enter through a mechanism LLVM's call-graph analysis cannot observe, so it still
-proves `norecurse`:
+Is the intended contract only to opt out of `-fnonreentrant`, allowing later proof
+of non-reentrancy? If so, document that meaning and how users should describe custom
+re-entry. If it must prohibit static allocation, preserve a positive marker and
+respect it through analysis/frame selection, with frontend and backend tests.
 
-- an **interrupt handler installed via inline asm** (no `interrupt` attribute / IR edge),
-- a **hand-rolled coroutine or manual stack switch**,
-- **`longjmp` back into a frame** that is still notionally active.
-
-The user reaches for `__attribute__((reentrant))` to request a reentrant frame for exactly these cases, the
-attribute is silently a no-op, and the static frame is clobbered on re-entry — runtime corruption with no
-diagnostic.
-
-The other soft-stack triggers all work today: genuine recursion and mutual recursion defeat `norecurse`,
-`interrupt` reachability seeds `Reentrant`, and `-O0`/`optnone` fails the `!hasOptNone()` guard. `reentrant`
-is the one documented-looking lever that does **not**.
-
-## Question for maintainers
-
-Is this intended — i.e. is `reentrant` meant purely as "opt out of `-fnonreentrant`", with "force a soft
-frame on an otherwise-`norecurse` function" simply unsupported? Or should `reentrant` force the reentrant
-stack? If the front-end attribute is accepted, the silent no-op is at least a documentation gap; at most a
-small backend fix.
-
-## Sketch of a fix (only if `reentrant` should force the soft stack)
-
-Localized, two parts:
-
-1. **clang** — emit a positive IR marker for the attribute (near the `nonreentrant` lowering in
-   `CodeGenModule.cpp`):
-
-   ```cpp
-   if (D->hasAttr<ReentrantAttr>())
-     B.addAttribute("reentrant");
-   ```
-
-2. **`MOSNonReentrant`** — seed `Reentrant` from it, so the re-stamp loop skips such functions. Near the top
-   of `MOSNonReentrantImpl::run()`:
-
-   ```cpp
-   for (Function &F : M.functions())
-     if (F.hasFnAttribute("reentrant"))
-       Reentrant.insert(CG[&F]);
-   ```
-
-   (Equivalently, add `&& !F.hasFnAttribute("reentrant")` to the final stamping condition.)
-
-Marking a single-activation function `reentrant` then merely costs a soft frame it does not strictly need —
-the safe direction (never the reverse, which would clobber). This is a sketch for discussion, not a
-submitted patch.
-
-## Provenance
-
-Found while building differential-fuzzer coverage of the WDC 65816 16-bit-accumulator (`+mos-a16`)
-soft-stack spill path. We needed the fuzzer to land generated functions on the soft stack; `reentrant`
-could not do it, so we used genuine recursion as the trigger instead. This issue is independent of that
-native-width work; it is recorded separately so the attribute behaviour is not rediscovered from scratch.
+The behavior of callees and zero-page allocation also needs agreement. Merely
+skipping the final stamping condition may not supply the entire requested contract.
+This is why the next artifact is a semantics report; a fix PR or documentation PR
+can follow the answer.

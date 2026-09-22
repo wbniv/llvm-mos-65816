@@ -1,0 +1,205 @@
+{
+  "date": "2026-09-22",
+  "upstream_revision": "742d554bf08042b8df93d791c335260fadd16643",
+  "compiler": "saved unpatched upstream Clang 24.0.0git",
+  "target": "--target=mos -mcpu=mos6502",
+  "input_sha256": {
+    "mixed-width-call.c": "495f7cc46a28f50a8d31474695b8daf57cb9a6ea20b86281f0795a7524ad581e",
+    "newton-step.c": "7198b96dd405fbafa8ac6636d9a454c2b9bf5b47970dac80ee1a9e0665565bcd"
+  },
+  "results": [
+    {
+      "input": "mixed-width-call",
+      "opt": "-O0",
+      "verify": false,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-O0",
+      "verify": true,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-O1",
+      "verify": false,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-O1",
+      "verify": true,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-O2",
+      "verify": false,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-O2",
+      "verify": true,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-O3",
+      "verify": false,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-O3",
+      "verify": true,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-Os",
+      "verify": false,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-Os",
+      "verify": true,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-Oz",
+      "verify": false,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "mixed-width-call",
+      "opt": "-Oz",
+      "verify": true,
+      "exit": 1,
+      "diagnostics": [
+        "error: <unknown>:0:0: ran out of registers during register allocation in function 'stage'"
+      ]
+    },
+    {
+      "input": "newton-original",
+      "opt": "-O0",
+      "verify": false,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-O0",
+      "verify": true,
+      "exit": 1,
+      "diagnostics": [
+        "# After Post-RA pseudo instruction expansion pass",
+        "*** Bad machine code: Using an undefined physical register ***",
+        "- instruction: $rc6 = STImag8 $y",
+        "fatal error: error in backend: Found 1 machine code errors."
+      ]
+    },
+    {
+      "input": "newton-original",
+      "opt": "-O1",
+      "verify": false,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-O1",
+      "verify": true,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-O2",
+      "verify": false,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-O2",
+      "verify": true,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-O3",
+      "verify": false,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-O3",
+      "verify": true,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-Os",
+      "verify": false,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-Os",
+      "verify": true,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-Oz",
+      "verify": false,
+      "exit": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "newton-original",
+      "opt": "-Oz",
+      "verify": true,
+      "exit": 0,
+      "diagnostics": []
+    }
+  ]
+}
