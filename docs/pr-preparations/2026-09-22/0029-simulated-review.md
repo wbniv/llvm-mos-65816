@@ -1,20 +1,79 @@
 # Patch 0029 — simulated upstream review
 
-Local review of the proposed contribution; this is not maintainer feedback.
+Local AI-assisted review of the proposed contribution; this is not maintainer feedback.
 Scope: the standalone patch against llvm-mos
 `742d554bf08042b8df93d791c335260fadd16643`, using stock `mos6502`.
 
 - [x] Review the complete rescheduling function and register-overlap helper.
-- [x] Check that the C reproducer reaches the failure without downstream features.
+- [x] Check that the C reproducer reaches the failure on `mos6502`.
 - [x] Review failing and legal MIR cases, including an intervening constrained operand.
 - [x] Exercise both LiveVariables and LiveIntervals with the saved baseline and candidate.
 - [x] Add the LiveIntervals invocation to the submitted regression and rerun both tests.
-- [x] Link the published originating demo and state the validation scope.
+- [x] State the validation scope.
 - [x] Run focused X86, ARM, and AArch64 regressions with assertions enabled.
+- [x] Review the final patch, regression assertions, and proposed PR description.
 
 No blocking correctness finding was identified for the reported failure. The
 C++ guard is unchanged by this review. One test-coverage improvement was applied:
 the MIR regression now checks both available liveness-analysis paths.
+
+## Final submission review — September 22
+
+No actionable defect was found in the final submission bundle. No additional
+source or regression changes were needed. The reviewed patch SHA-256 is
+`1b0aee741ed2a9e8b7a1d433e5ae314d19613c581992111ed50be2feca8b4905`.
+
+> **Superseded on 2026‑09‑22 by the [independent review](0029-claude-review.md).**
+> That review kept the predicate but refined the guard so reserved class
+> members no longer count as available, and reworded its comment. The revised
+> patch is `c2c962311fc40a43d570f141ef0ba6240b317952456bea17c56c1f90066ced88`;
+> its full-suite validation is recorded there. The results below describe the
+> earlier hash.
+The patch and all three resulting files match the cross-target validation
+manifest. The recorded results contain 231 passing cross-target tests and two
+passing bundled MOS tests; the PR description accurately limits those claims.
+
+The source review checked the complete move legality scan, its callers, and
+register-class access. This pass runs after instruction selection, where virtual
+registers have register classes. The scan skips debug instructions and pseudo
+probes, rather than target pseudo instructions generally. The guard covers both
+virtual uses and definitions, includes intervening instructions, ignores dead
+physical definitions, and uses the existing alias-aware overlap helper.
+
+A fresh check ran each MIR case separately with the saved unpatched compiler,
+the assertion-enabled candidate, and the candidate with rescheduling disabled.
+The following results hold for both LiveVariables and LiveIntervals:
+
+| Ordering check | Unpatched | Candidate | Rescheduling disabled |
+| --- | --- | --- | --- |
+| Accumulator argument remains after arithmetic | Expected failure | Pass | Pass |
+| Legal X argument hoists before arithmetic | Pass | Pass | Expected failure |
+| Y argument remains after the intervening indexed store | Expected failure | Pass | Pass |
+
+All six compiler invocations passed MachineVerifier. All 18 individual ordering
+checks produced the expected result. In particular, the legal-X check rejects
+disabling the optimization wholesale. This supplements the earlier full-codegen
+and cross-target runs; those unchanged suites were not rerun for this review.
+Commands, MIR output, FileCheck diagnostics, and hash verification are saved in
+`build/0029-final-review/`, with the summary in `results.json`.
+
+The remaining submission work is to check applicability against current
+upstream, prepare the standalone branch, and publish the PR. This review used
+the pinned revision above and did not contact maintainers or submit a PR.
+
+## AI attribution
+
+Checked the [AI tool policy in llvm-mos's current tree](https://github.com/llvm-mos/llvm-mos/blob/main/llvm/docs/AIToolPolicy.md)
+on September 22. It expects disclosure of substantial tool-generated content in
+the PR description or commit message and gives `Assisted-by` as an example.
+The PR draft and preview now attribute OpenAI Codex's assistance with diagnosis,
+implementation, tests, validation, and PR drafting.
+The session metadata records Codex CLI `0.155.1`, model `gpt-6-astra`, and
+reasoning effort `xhigh`; the attribution includes these exact values.
+
+The policy also requires the contributor to read and review generated code and
+text before requesting project review. The automated review recorded here does
+not establish that human review has been completed.
 
 ## Correctness and scope
 
@@ -52,8 +111,7 @@ remain outside the available evidence.
 The changed MIR test and full-codegen IR test both pass under llvm-lit after
 adding the new invocation. Existing broader evidence remains 131 passing MOS
 CodeGen/MC tests and one unsupported test. The isolated C-to-object matrix checks
-all six optimization levels with and without MachineVerifier. Supplemental
-simulator evidence is documented separately because it uses the local SDK.
+all six optimization levels with and without MachineVerifier.
 
 The additional focused run passes 169 X86, 29 ARM, and 33 AArch64 tests with no
 failures or skips, including all nine tests requiring assertions. Both bundled
@@ -63,7 +121,7 @@ for the exact selection and build scope.
 
 The MIR examples are intentionally constructed to isolate the transformation;
 the separate C/IR reproducer establishes ordinary frontend reachability on the
-stock target. Neither requires `+mos-a16` or `+mos-xy16`.
+`mos6502`.
 
 ## Review artifacts
 
@@ -71,6 +129,6 @@ stock target. Neither requires `+mos-a16` or `+mos-xy16`.
 - [Proposed PR description](../../upstream-twoaddr-physreg-reschedule-pr.md)
 - [Exact patch](../../../patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch)
 - [Validation record](0029-validation.md)
-- [Originating demo](https://biohack.net/snes/byvaledge/)
+- [Independent review and full-suite validation](0029-claude-review.md)
 
 The patch is prepared locally and has not been submitted.

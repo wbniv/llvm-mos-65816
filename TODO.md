@@ -981,11 +981,20 @@ contract of native mode, while independent fixes continue in parallel.
   integrated SDK CTest cases against freshly built current libraries/simulator; ready
   and posted; awaiting maintainer review/CI. No SNES
   dependency. [Patch and evidence](docs/upstream-pending-work.md#research-notes-and-evidence).
-- [ ] **Register-exhaustion fix 0029:** implementation and validation are complete;
-  review the final [submission bundle](docs/upstream-twoaddr-physreg-reschedule-pr.md)
-  and publish the standalone PR. No #320/#321 dependency.
+- [T5] **Register-exhaustion fix 0029:** implementation, validation, final review and
+  an [independent review](docs/pr-preparations/2026-09-22/0029-claude-review.md) are
+  complete; the guard was refined (reserved class members no longer count as
+  available) and the complete X86/ARM/AArch64/MOS suites pass on the revised patch.
+  Upstream main is identical to the pinned base. Remaining: prepare the standalone
+  branch and publish the [PR](docs/upstream-twoaddr-physreg-reschedule-pr.md)
+  (user-triggered). No #320/#321 dependency.
 - [ ] **Reentrant contract:** the report needs a semantics answer before selecting
   a fix or documentation change. [Readiness](docs/upstream-pending-work.md#what-issue-means-here).
+- [ ] **Physical-copy liveness fix 0030:** implementation and validation are
+  complete. Review the [submission](docs/upstream-copy-phys-reg-liveness-pr.md),
+  check current upstream applicability, prepare the branch, and publish.
+  [Evidence](docs/pr-preparations/2026-09-22/0030-validation.md): five focused cases
+  and MOS CodeGen pass; original-input assembly is unchanged at six levels.
 - [ ] **Undef-lane fix 0028:** validated, with publication held until #320/#321 are
   ready to open. Choose the implementation and revalidate the exact submission;
   [the pending-work chart](docs/upstream-pending-work.md) records the hold and evidence.

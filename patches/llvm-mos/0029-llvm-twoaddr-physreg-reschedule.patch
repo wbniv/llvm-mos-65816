@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp b/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
-index 20f209358639..8af7f1f2308f 100644
+index 20f209358639..03bd7a420d93 100644
 --- a/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
 +++ b/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
 @@ -28,6 +28,7 @@
@@ -10,16 +10,18 @@ index 20f209358639..8af7f1f2308f 100644
  #include "llvm/ADT/SmallPtrSet.h"
  #include "llvm/ADT/SmallVector.h"
  #include "llvm/ADT/Statistic.h"
-@@ -1218,6 +1219,14 @@ bool TwoAddressInstructionImpl::rescheduleKillAboveMI(
+@@ -1218,6 +1219,16 @@ bool TwoAddressInstructionImpl::rescheduleKillAboveMI(
        Register MOReg = MO.getReg();
        if (!MOReg)
          continue;
-+      // Extending a physical definition across a constrained virtual register
-+      // must leave at least one register available for that operand. Spilling
-+      // cannot help when every member of its class overlaps a live definition.
++      // Extending a physical definition across an instruction with a
++      // constrained virtual operand must leave that operand at least one
++      // allocatable register. Spilling cannot help when every unreserved
++      // member of its class overlaps a live definition.
 +      if (MOReg.isVirtual() && !LiveDefs.empty() &&
 +          llvm::all_of(*MRI->getRegClass(MOReg), [&](MCPhysReg PhysReg) {
-+            return regOverlapsSet(LiveDefs, PhysReg);
++            return MRI->isReserved(PhysReg) ||
++                   regOverlapsSet(LiveDefs, PhysReg);
 +          }))
 +        return false;
        if (MO.isUse()) {

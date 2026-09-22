@@ -523,13 +523,24 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   [PR draft](upstream-twoaddr-physreg-reschedule-pr.md) uses a plain 6502 reproducer;
   [validation](pr-preparations/2026-09-22/0029-validation.md) records the isolated
   MOS suite, runtime checks, and 231 passing focused X86/ARM/AArch64 regressions
-  with assertions enabled. Unposted.
+  with assertions enabled. The [final simulated review](pr-preparations/2026-09-22/0029-simulated-review.md#final-submission-review--september-22)
+  found no actionable defect. An [independent review](pr-preparations/2026-09-22/0029-claude-review.md)
+  then refined the guard (reserved class members are not counted as available)
+  and ran the complete X86, ARM, AArch64 and MOS suites on the revised patch with
+  assertions: no codegen failures. Upstream `main` is identical to the pinned base,
+  so applicability is settled. Standalone branch preparation and posting remain.
+  Unposted.
 
-- **Newton post-RA expansion — report prepared September 22.**
-  The [issue draft](upstream-newton-6502-postra-issue.md) records a separate
-  stock-6502 C failure at `-O0 -verify-machineinstrs`. It reads undefined `$y` in
-  `STImag8` after post-RA expansion. Normal compilation succeeds; 0028 does not
-  fix it. No runtime-miscompile claim or compiler fix is included.
+- **Newton post-RA expansion — fix prepared September 22.**
+  [Patch 0030](../patches/llvm-mos/0030-mos-copy-phys-reg-liveness.patch) clears
+  stale kill flags when `getRegWithVal` extends a physical value's live range.
+  The [PR draft](upstream-copy-phys-reg-liveness-pr.md) supersedes the
+  [issue draft](upstream-newton-6502-postra-issue.md).
+  [Validation](pr-preparations/2026-09-22/0030-validation.md): five focused MIR
+  cases pass; MOS CodeGen has 84 passes and one unsupported with assertions
+  enabled. The original C-derived input verifies at all six optimization levels,
+  with byte-identical assembly relative to the baseline. No runtime-miscompile
+  claim is made. Final submission review remains; unposted.
 
 - ~~**MC-layer `cop` mnemonic (assembler gap, found by demo #140, 2026-08-04).**~~ ✅ **POSTED
   2026-08-04** as [**PR #588**](https://github.com/llvm-mos/llvm-mos/pull/588)

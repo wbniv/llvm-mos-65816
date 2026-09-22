@@ -7,6 +7,13 @@ allocation, and copy coalescing. It uses llvm-mos
 applied. The patch SHA-256 is
 `1b0aee741ed2a9e8b7a1d433e5ae314d19613c581992111ed50be2feca8b4905`.
 
+> **Superseded:** the patch was refined after this run (reserved class members
+> are no longer counted as available). The revised hash is
+> `c2c962311fc40a43d570f141ef0ba6240b317952456bea17c56c1f90066ced88` and the
+> complete X86, ARM, AArch64 and MOS suites for it are recorded in the
+> [independent review](0029-claude-review.md). The selection results below are
+> for the earlier hash.
+
 - [x] Select existing tests and save their paths and source hashes.
 - [x] Build the patched compiler with assertions enabled.
 - [x] Run the selected regressions and investigate any failures.

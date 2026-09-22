@@ -1,7 +1,8 @@
 # Pending upstream work and dependencies
 
 **PR status last verified 2026-09-21; patch 0028 revalidated September 21;
-patch 0029 validated on MOS and a focused X86/ARM/AArch64 selection September 22.
+patch 0029 validated on MOS and the complete X86/ARM/AArch64 CodeGen suites September 22.
+Patch 0030's copy-liveness fix also passes the MOS CodeGen suite September 22.
 Other implementation readiness follows the dated validation records and local
 drafts.** This is the actionable view of the
 [contribution tracker](upstream-contribution-status.md). Status describes the work,
@@ -24,22 +25,37 @@ reproduction checks; keep candidate patches in separate builds.
    in that focused run. The [coverage inventory](pr-preparations/2026-09-22/0029-cross-target-validation.md#backend-coverage-at-the-pinned-revision)
    lists the 22 remaining untested backends.
 2. [Newton `-O0` post-RA verifier failure](upstream-newton-6502-postra-issue.md):
-   separate stock-6502 C failure; normal compilation succeeds, and no runtime
-   miscompile is claimed.
+   [fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), with patch 0030.
+   Copy expansion reuses Y without clearing an earlier kill. The fix passes
+   five focused MIR cases and 84 MOS CodeGen tests, with one unsupported.
+   The original input verifies at all six optimization levels, with identical
+   assembly before and after the fix. [Validation](pr-preparations/2026-09-22/0030-validation.md).
 3. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
    semantics question, now verified with the stock upstream frontend and `opt`.
 
 These are unposted contributions and do not require #320/#321. The register
-exhaustion fix is implemented and validated. Diagnosis and implementation remain
-work for the Newton failure; the attribute report needs agreement on semantics
-before selecting a change.
+exhaustion and physical-copy liveness fixes are implemented and validated. The
+attribute report needs agreement on semantics before selecting a change.
 
 Patch 0029 submission status:
 
 - [x] Reproduce the failure with stock `mos6502` C and validate the standalone fix.
 - [x] Complete the simulated review, including both liveness-analysis paths.
 - [x] Run focused X86/ARM/AArch64 regressions with assertions enabled.
-- [ ] Review the final submission bundle and publish the standalone fix PR.
+- [x] Review the final submission bundle; [no actionable defect found](pr-preparations/2026-09-22/0029-simulated-review.md#final-submission-review--september-22).
+- [x] Independent review: guard refined for reserved class members, comment reworded,
+  complete X86/ARM/AArch64/MOS suites pass on the revised patch; [record](pr-preparations/2026-09-22/0029-claude-review.md).
+- [x] Current upstream applicability: llvm-mos `main` is identical to the pinned base (`gh api …/compare`).
+- [ ] Check current upstream applicability and prepare the standalone branch.
+- [ ] Publish the standalone fix PR.
+
+Patch 0030 submission status:
+
+- [x] Reproduce the C failure and isolate copy expansion's stale kill flag.
+- [x] Implement the fix and test register reuse, aliases, and clobber handling.
+- [x] Pass the MOS CodeGen suite and compare original-input assembly at six levels.
+- [ ] Review the final submission and check current upstream applicability.
+- [ ] Prepare the standalone branch and publish the fix PR.
 
 **Prepared but held: patch `0028`, the `VirtRegRewriter` undef-lane fix.**
 The stock-upstream reproducer, fix, regression, and
@@ -69,8 +85,8 @@ failure with the stock upstream frontend and backend.
 | SNES SDK contribution around #415 | Baseline checkout and [file inventory](415-snes-reconciliation-inventory.md) prepared; resolve provenance/review requirements, implement and validate the reconciled native platform and runtime |
 | 65816 simulator discussion | Separate [discussion draft](pr-preparations/2026-09-20/65816-simulator-discussion-body.md) prepared; unposted |
 | Reentrant attribute semantics | Report drafted; agree the intended contract before selecting a fix or documentation change |
-| Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; MOS suite and 231 focused X86/ARM/AArch64 tests pass; final submission review and publication remain |
-| Newton `-O0` post-RA expansion | [Issue body prepared](upstream-newton-6502-postra-issue.md); stock Clang C reproduction; unaffected by 0028; no fix yet |
+| Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass; final and independent reviews complete; current-upstream applicability, branch preparation, and publication remain |
+| Newton `-O0` post-RA expansion | [Fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), patch 0030; five focused cases and MOS CodeGen pass; final review, current-upstream applicability, branch preparation, and publication remain |
 | Scavenger live-P (`0011`) | Establish a valid upstream producer, reduce the test, rebase, and validate |
 | Call-clobbered coalescing guard (`0015`) | Revalidate diagnosis and upstream reachability; prefer a root-cause fix |
 | Trunc-selection fallback (`0023`) | Establish a real upstream producer for the independent Imag8-to-i1 portion; retain fork-specific content with its feature series |
@@ -88,16 +104,19 @@ for the complete CI table. Job failure causes were not re-audited September 21.
 
 ## Recommended order
 
-1. Review the final patch 0029 submission and publish its prepared standalone PR.
-   The fix and focused validation are complete; it has no #320/#321 dependency.
-2. Prepare the #320/#321 presentation before publishing `0028`; retain both fix
+1. Prepare the standalone branch for patch 0029 and publish its PR. The fix,
+   full-suite validation, final review and independent review are complete, and
+   upstream `main` is identical to the pinned base; it has no #320/#321 dependency.
+2. Review the patch 0030 submission, check current upstream applicability, and
+   prepare its independent fix PR.
+3. Prepare the #320/#321 presentation before publishing `0028`; retain both fix
    implementations for the submission decision.
-3. Follow review/CI of the six posted compiler fixes and SDK #450; request re-review
+4. Follow review/CI of the six posted compiler fixes and SDK #450; request re-review
    of the published #589 revision when following up with maintainers.
-4. In parallel, make **SNES platform reconciliation with SDK #415** the platform
+5. In parallel, make **SNES platform reconciliation with SDK #415** the platform
    priority. Prepare a coherent contribution including the runtime requirements of
    whichever CPU mode it enables.
-5. Prepare the #320/#321 compiler feature series and investigate the remaining
+6. Prepare the #320/#321 compiler feature series and investigate the remaining
    allocator/scavenger reports independently of the SDK platform's merge timing.
 
 ## SNES — separate platform track
@@ -146,7 +165,8 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | Undef register-lane verifier failure | Constructed stock-MOS MIR reproducer; generic fix and regression validated | **Held until #320/#321 are ready to open** | Choose smaller fix or refactor; revalidate exact submission before publication | No technical SDK dependency; publication timing tied to feature presentation |
 | Scavenger live-P (`0011`) | Downstream fix/draft exists | **Not ready to post** | Establish a valid upstream producer, reduce test, rebase and validate | No SDK dependency; otherwise include with native compiler feature |
 | Call-clobbered coalescing guard (`0015`) | Downstream workaround/draft exists | **Not ready to post** | Revalidate diagnosis and stock-upstream reachability; prefer root-cause fix | No SDK dependency; currently triggered by fork features |
-| Mixed-width pointer across call: RA exhausts registers | Patch 0029, MOS suite, and 231 focused X86/ARM/AArch64 regressions validated | **Fix PR prepared, unposted** | Review final submission bundle and publish | No |
+| Mixed-width pointer across call: RA exhausts registers | Patch 0029 validated, final and independent reviews complete; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
+| Post-RA physical-copy reuse: stale Y kill | Patch 0030 validated; five focused cases and MOS CodeGen pass; original assembly unchanged at six levels | **Fix PR prepared, unposted** | Review final submission, check current upstream applicability, prepare branch, and publish | No |
 | #320 far-address-space series (`0001` and related content) | Substantial downstream implementation exists | **Series not posted** | Agree ABI, extract coherent compiler commits and validate standalone | No; SDK integration follows agreed compiler/runtime ABI |
 | #321 native-width series (`0002` and related content) | Substantial downstream implementation exists | **Series not posted** | Extract native-only commits from mixed aggregate, document ABI/interrupt contract, validate and post one complete draft PR | No; native runtime required to execute examples |
 | `0023` trunc-selection fallback | Downstream patch exists; includes fork-specific content | **Unassessed standalone candidate** | Prove a real upstream producer for the Imag8→i1 half; keep Imag32/a16 half with its feature | No; not ready for a standalone PR |
@@ -175,7 +195,7 @@ flowchart TD
     UNDEF[Undef-lane fix 0028 validated] --> HOLD[Wait until 320 and 321 are ready to open]
     HOLD --> FINAL[Choose implementation and review submission]
     FINAL --> UNDEFPR[Publish fix PR] --> MERGED
-    RA[Register-exhaustion fix 0029] --> RAT[Validated: MOS suite and 231 focused tests]
+    RA[Register-exhaustion fix 0029] --> RAT[Validated: MOS suite and complete X86/ARM/AArch64 suites]
     RAT --> RAREVIEW[Review final plain-6502 submission]
     RAREVIEW --> RAPR[Publish independent fix PR] --> MERGED
   end
