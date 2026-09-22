@@ -46,29 +46,39 @@ inserted into CmpBr instructions"* was true for the patterns of the day but is n
 
 ## Reproduction
 
-A recursive function holding several 16-bit values live across the self-call (register pressure → frame-vreg
-scavenging) together with a 16-bit compare that keeps N/Z live across that point. Crashes at `-O1`/`-Os`;
-compiles clean at `-O0`. Most readily with `+mos-a16`, but the defect is in the generic scavenger path.
+Stock `mos6502`, `-O0`, no downstream features. `strlen-4.c` from the gcc C torture suite
+(`gcc.c-torture/execute/strlen-4.c`) fails on the pinned upstream:
 
-```c
-volatile unsigned short in_u0 = 0xDC13, in_u1 = 0x6128, in_u2 = 0x8E60, in_idx = 0xC204;
-volatile short in_s0 = 0x6ADC;
-volatile unsigned short out;
-__attribute__((noinline)) static unsigned short f0(unsigned short p0, unsigned short p1) {
-  if (p0 == 0) return in_u1;
-  unsigned short v0 = (unsigned short)((unsigned)in_u1 + p1);
-  unsigned short v1 = (unsigned short)((unsigned)in_u0 - p0);
-  unsigned short v2 = (unsigned short)((unsigned)in_s0 + 0xB06Cu);
-  unsigned short v4 = (unsigned short)((unsigned)in_u2 + 0xB9FDu);
-  unsigned short v5 = (unsigned short)((unsigned)in_idx ^ ((unsigned short)((unsigned)in_u2) >= p1));
-  unsigned short r = f0((unsigned short)(p0 - 1u), (unsigned short)((short)in_u0 != (short)in_u2));
-  return (unsigned short)((((((v0 | r) | v1) + v5) ^ v2) + v4));
-}
-int main(void) { out = f0(2, 0xCDD5u); for (;;) {} }
+```sh
+clang --target=mos -mcpu=mos6502 -O0 -mllvm -verify-machineinstrs -c strlen-4.c
+# *** Bad machine code: Using an undefined physical register ***   (After Prologue/Epilogue Insertion)
+# - function:    test_array_ptr
+# - instruction: PH $p
 ```
 
-`mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm
--verify-machineinstrs -c repro.c` crashes pre-fix and compiles clean post-fix.
+An assertion-enabled build aborts earlier in the same pass at `assertNZDeadAt`. A 65-line reduction of
+that file (its `test_array_ptr` with the string table and the other functions emptied) still fails the
+same way; it is the source of the new regression test. The mechanism at `-O0`: the fast register
+allocator reloads a spilled pointer between the `sec` that seeds a 16-bit subtraction and the `sbc` that
+consumes it,
+
+```text
+renamable $c = LDImm1 -1                                            ; sec
+renamable $a = LDImm 0
+renamable $rs1, dead early-clobber renamable $rs2 = LDStk %stack.6, 0   ; reload from a frame slot past offset 255
+renamable $a, renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a, renamable $rs1, killed renamable $y, killed renamable $c
+```
+
+so the frame-index expansion of that reload (an `AddrLostk`/`AddrHistk` carry chain once the frame is
+larger than 255 bytes) must scavenge a carry register while `$c` is live, and `$p` has to be preserved
+around it. That range is balanced, so the existing `PHP … PLP` path is taken; at another scavenge in the
+same block the preceding `ADCImag8` has dead-flagged `$c` and `$v`, so nothing of `$p` is available and
+the `PHP` reads an undefined `$p`. With the fix, that push is `PH undef $p` and the pushes where `$c` is
+available stay `PH $p`.
+
+The original 16-bit reproducer (recursive function with several 16-bit values live across the self-call,
+`-Os` with `+mos-a16`) still reproduces the unbalanced-range half on the downstream tree; it needs
+downstream features and is kept in the project's records rather than here.
 
 ## Fix
 
@@ -108,6 +118,13 @@ int main(void) { out = f0(2, 0xCDD5u); for (;;) {} }
   flagging a genuinely live `$p` would let a flag def move or die, so `scavenger-p-undef.mir` asserts the
   plain `PH $p` in the case where `$c` *is* available as well as the `PH undef $p` where it is not.
 
+- **Only consult liveness when the function tracks it.** Both helpers read block live-ins, which asserts
+  unless the function has accurate liveness (`getProperties().hasTracksLiveness()`); MIR tests without
+  `tracksRegLiveness`, such as the existing `scavenger.mir`, reach `saveScavengerRegister` for `$p`. In that
+  case the `PHP` is left unflagged (the verifier does not check physical-register liveness there, and an
+  unflagged use can never miscompile) and no index register is reported dead, so `$p` is saved on the
+  balanced hard-stack path exactly as before.
+
 - **Drop `assertNZDeadAt`.** Its premise (N/Z dead at every scavenge point) is exactly the false invariant
   above. Under longer flag live ranges N/Z can be live across A/Y saves too; the A/Y restore (`LD`/`PL`)
   transiently clobbers physical N/Z, but the architected value is preserved by the scavenger's own
@@ -116,13 +133,38 @@ int main(void) { out = f0(2, 0xCDD5u); for (;;) {} }
 - **Widen `canSaveScavengerRegister(MOS::P)`** to report saveable when balanced *or* (`hasGPRStackRegs` and a
   dead index register exists at both ends), matching the new capability.
 
-Default 8-bit codegen is unaffected — the new P-arm only runs when a live `$p` must be preserved across an
-unbalanced range, which only longer-flag-live-range pressure (`+mos-a16`/`+mos-xy16`) produces.
+Stock 8-bit codegen reaches the balanced half of this at `-O0`: the fast register allocator reloads a
+spilled pointer between the `sec` that seeds a 16-bit subtraction and the `sbc` that consumes it, so the
+frame-index expansion of that reload has to scavenge a carry while `$c` is live, and the resulting `PHP`
+can read a `$p` with no available value (see the reproduction below). The unbalanced arm needs
+`PHX`/`PHY` and so only runs on 65C02-class targets; on an NMOS 6502 an unbalanced live-`$p` range now
+reports a fatal error instead of emitting the illegal `STImag8 $p` (which a release build would have
+assembled as garbage). No such range appears anywhere in the corpus below.
 
 ## Test
 
-`-verify-machineinstrs` is clean on the repro under both `+mos-a16` and `+mos-xy16`, on Release and on a
-`LLVM_ENABLE_ASSERTIONS=On` build (the `assertNZDeadAt` no longer aborts). A four-way differential
-(host-computed == default-8bit == `+mos-a16` == `+mos-xy16`, on two independent SNES emulators) agrees on the
-program's result, and a broad `+mos-a16`/`+mos-xy16` differential corpus + fuzzer shows no regression and no
-new verifier failures. (A `mos`/`mos6502` `llc` MIR test can be distilled from the pre-PEI MIR on request.)
+`llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll`: the `strlen-4.c` reproducer reduced with
+`llvm-reduce` to one `-O0` function on stock `mos6502`, run with
+`-stop-after=prolog-epilog -verify-machineinstrs`. It pins both directions of the `undef` predicate: the
+push where nothing of `$p` is available must be `PH undef $p` (the verifier rejects it otherwise), and the
+push where `$c` is live must remain a plain `PH $p` (an over-eager `undef` would let that flag definition
+move or die). Before the fix it fails the verifier; an assertion-enabled build aborts in `assertNZDeadAt`.
+
+Validation on the pinned base `742d554bf08042b8df93d791c335260fadd16643` (identical to `main` at the
+time of writing), assertions enabled, comparing the backend without and with this change:
+
+- gcc `c-torture/execute` (1,390 of 1,656 files compile with the pinned Clang) at `-O0`, `-O2` and `-Os`
+  with MachineVerifier, 4,170 comparisons: exactly one outcome changes, `strlen-4.c` at `-O0` compiles;
+  no compilation newly fails, and all 4,090 pairs that succeed on both sides produce identical assembly.
+  The fatal error added for an unbalanced live-`$p` range without index-register stack operations is not
+  reached anywhere in the corpus.
+- The complete MOS CodeGen and MC suites pass with the new test.
+
+On the downstream tree the original `+mos-a16` reproducer and MIR test still exercise the unbalanced
+arm (`PHP; PL<idx>; ST<idx> RC17` / `LD<idx> RC17; PH<idx>; PLP`), and a four-way emulator differential
+(host == default == `+mos-a16` == `+mos-xy16` on MAME and bsnes-jg) agrees on the program results; that
+evidence needs downstream features and is not part of this submission.
+
+Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`, `high`
+reasoning effort) for the stock-6502 reachability analysis, the reduced reproducer and regression
+test, the corpus differential, and the PR text revision.

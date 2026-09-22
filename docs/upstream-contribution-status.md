@@ -290,7 +290,7 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
   [live compiler product page](https://indri.studio/apps/llvm-mos-65816/#upstream-contributions);
   website deployment and live entry verified September 20.
 - The rotate-Ac RA companion was withdrawn September 14 after #578's root cause was identified.
-- Possible standalone PRs `0011`/`0015` still require upstream producer/reachability review.
+- `0011` now has a stock-`mos6502` `-O0` upstream producer (gcc torture `strlen-4.c`; [record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md)) and an upstream-runnable test; ready to post. `0015` still requires upstream producer/reachability review.
   `0012` is retired and must not be posted.
 - Design notes and the #320/#321 feature series retain their existing ABI/review prerequisites.
   Posting new items remains user-triggered; retain fork branches under the standing policy.
@@ -366,8 +366,12 @@ llvm-mos-sdk-side change carried in our platform.
 
 ### 4 — register-scavenger live-`$p` fix (a **PR** now — was an issue)
 
-**FIXED 2026-06-26** (supersedes the issue-only draft). The `0011` fix remains a possible upstream
-submission:
+**FIXED 2026-06-26** (supersedes the issue-only draft). **Reachable on stock upstream (2026-09-22):**
+gcc torture `strlen-4.c` at `-O0`, `mos6502`, fails the verifier on pristine `742d554bf080` (`PH $p`
+undefined; `assertNZDeadAt` on an assertion build) and 0011 fixes it with no other change across the
+4,170-comparison c-torture differential; see the
+[reachability record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md). The `0011` fix is
+ready to post:
 
 - **`0011-mos-scavenger-live-p-save.patch`** — `MOSRegisterInfo::saveScavengerRegister` assumed N/Z dead at
   every scavenge point and that a live `$p` only needs preserving across a *balanced* range; both break under

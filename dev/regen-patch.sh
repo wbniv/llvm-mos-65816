@@ -61,6 +61,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0031-mos-copy-phys-reg-reuse-dst.patch"
 )
 TESTRELS=(
+  "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
   "llvm/test/CodeGen/MOS/interrupt-width-65816.ll"
   "llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir"
   "llvm/test/MC/MOS/all-65816-opcodes.s"

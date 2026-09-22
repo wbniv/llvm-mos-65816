@@ -1080,11 +1080,12 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
   `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
   [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
-- [T3] **Evaluate the register-scavenger live-`$p` fix PR (`0011`)** (user-triggered). The scavenger
-  N/Z crash is now **FIXED** (was an issue-with-no-fix): route a live `$p`
-  hard-stack-neutrally through a dead index reg into `RC17` for the unbalanced case + drop the stale
-  `assertNZDeadAt`. Mint from current upstream only after confirming a defensible producer path; the
-  remaining `gh pr create` recipe is in
+- [T5] **Post the register-scavenger live-`$p` fix PR (`0011`)** (user-triggered). The upstream
+  producer is established: gcc torture `strlen-4.c` at `-O0` on stock `mos6502` fails on pristine
+  upstream and is fixed by 0011 alone, with no other change across the 4,170-comparison corpus
+  ([record](docs/pr-preparations/2026-09-22/0011-stock-6502-reachability.md)); the `+mos-a16`-only
+  MIR test is replaced by one that runs upstream. The
+  `gh pr create` recipe is in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 4) · body
   [scavenger](docs/upstream-scavenger-live-p-pr.md) ·
   [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
