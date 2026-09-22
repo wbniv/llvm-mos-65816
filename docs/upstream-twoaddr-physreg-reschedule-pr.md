@@ -68,6 +68,6 @@ Other backends and compile-time benchmarks were not tested.
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`,
 `xhigh` reasoning effort) for diagnosis, implementation, tests, validation,
 and PR drafting.
-Assisted-by: Claude Code using Claude Fable 5.1 (`claude-fable-5-1`, `high`
+Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`, `high`
 reasoning effort) for the independent review, the reserved-register
 refinement, and the full-suite validation.
