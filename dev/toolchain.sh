@@ -111,6 +111,8 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0030-mos-copy-phys-reg-liveness
   # Copy expansion may reuse the destination of an earlier copy (stacked on 0030).
   apply_patch 0031-mos-copy-phys-reg-reuse-dst
+  # Symbols that match register spellings need quotes in generated assembly.
+  apply_patch 0032-mos-quote-register-named-symbols-vendor
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

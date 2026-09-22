@@ -1007,6 +1007,15 @@ contract of native mode, while independent fixes continue in parallel.
   integration records 79/79 passes separately.
   Remaining: publish the [PR](docs/upstream-copy-phys-reg-reuse-dst-pr.md) after
   0030 lands (user-triggered).
+- [T5] **Register-named assembly symbols 0032:** reduced, fixed, and installed
+  locally. Standalone MOS CodeGen 84 pass / one unsupported; MC 48 pass.
+  All 61 recorded assembly failures now assemble with direct objects unchanged.
+  Covers 6502/65816 and silent `asl "a"` misassembly.
+  [PR draft](docs/upstream-register-named-symbols-pr.md) ·
+  [Validation](docs/pr-preparations/2026-09-23/0032-validation.md).
+  [Independently reviewed](docs/pr-preparations/2026-09-23/0032-claude-review.md): full-corpus
+  round trip clean, applies to current upstream. Remaining: branch and publication
+  (user-triggered).
 - [T4] **Undef-lane fix 0028:** validated, with publication held until #320/#321 are
   ready to open. Choose the implementation and revalidate the exact submission;
   [the pending-work chart](docs/upstream-pending-work.md) records the hold and evidence.
@@ -1080,6 +1089,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
   `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
   [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
+- [T4] **Asm printer and object emitter disagree on zero-page-indexed symbol operands.** On
+  pristine upstream, `rs1[i]` with `rs1` in `.zp.bss` is emitted directly as `lda abs,x`
+  (`0xBD`, `R_MOS_ADDR16`) but printed as `lda mos8(rs1),x`, which reassembles as `lda zp,x`
+  (`0xB5`, `R_MOS_ADDR8`): `llc -S | llvm-mc` differs from `llc -filetype=obj` by a byte per
+  such access, and the two encodings differ semantically at the page edge (`zp,x` wraps). Found
+  while reviewing patch 0032 (which is unrelated: same mismatch with non-register names and
+  pre-0032 tools; probe in `build/0030-claude-review/`, review record in
+  `docs/pr-preparations/2026-09-23/0032-claude-review.md`). Decide which side is right, fix
+  the other, add a print/reassemble round-trip test. Reason for T4: root cause spans the
+  printer's `mos8()` selection and MC fixup/relaxation, and the answer changes codegen.
 - [T5] **Post the register-scavenger live-`$p` fix PR (`0011`)** (user-triggered). The upstream
   producer is established: gcc torture `strlen-4.c` at `-O0` on stock `mos6502` fails on pristine
   upstream and is fixed by 0011 alone, with no other change across the 4,170-comparison corpus

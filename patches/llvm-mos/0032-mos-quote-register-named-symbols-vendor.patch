@@ -1,0 +1,233 @@
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.h
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.h
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.h
+@@ -13,6 +13,7 @@
+ #ifndef LLVM_MOS_ASM_INFO_H
+ #define LLVM_MOS_ASM_INFO_H
+ 
++#include "llvm/ADT/StringSet.h"
+ #include "llvm/MC/MCAsmInfoELF.h"
+ 
+ namespace llvm {
+@@ -21,8 +22,13 @@
+ 
+ /// Specifies the format of MOS assembly files.
+ class MOSMCAsmInfo : public MCAsmInfoELF {
++  // Register spellings are case insensitive in assembly operands.
++  StringSet<> ReservedNames;
++
+ public:
+   explicit MOSMCAsmInfo(const Triple &TT, const MCTargetOptions &Options);
++
++  bool isValidUnquotedName(StringRef Name) const override;
+ 
+   unsigned getMaxInstLength(const MCSubtargetInfo *STI) const override;
+ };
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.cpp
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.cpp
+@@ -12,6 +12,7 @@
+ 
+ #include "MOSMCAsmInfo.h"
+ #include "MCTargetDesc/MOSMCExpr.h"
++#include "MOSInstPrinter.h"
+ #include "MOSMCTargetDesc.h"
+ 
+ #include "llvm/MC/MCSubtargetInfo.h"
+@@ -50,6 +51,26 @@
+   SupportsDebugInformation = true;
+ 
+   initializeAtSpecifiers(AtSpecifiers);
++
++  // Symbol names that also denote registers need quotes in operand position.
++  // The parser recognizes both prefixed names and their unprefixed aliases.
++  const auto ReserveName = [&](StringRef Name) {
++    ReservedNames.insert(Name.lower());
++  };
++  for (unsigned Reg = 1; Reg < MOS::NUM_TARGET_REGS; ++Reg) {
++    StringRef Name = MOSInstPrinter::getRegisterName(Reg);
++    ReserveName(Name);
++    if (Name.consume_front("llvm_mos_"))
++      ReserveName(Name);
++  }
++  // These operand tokens do not have matching names in the register table.
++  for (StringRef Name : {"sp", "r", "rp", "ya", "psw"})
++    ReserveName(Name);
++}
++
++bool MOSMCAsmInfo::isValidUnquotedName(StringRef Name) const {
++  return MCAsmInfoELF::isValidUnquotedName(Name) &&
++         !ReservedNames.contains(Name.lower());
+ }
+ 
+ unsigned MOSMCAsmInfo::getMaxInstLength(const MCSubtargetInfo *STI) const {
+diff --git a/llvm/test/CodeGen/MOS/asm-printer-ir.mir b/llvm/test/CodeGen/MOS/asm-printer-ir.mir
+index 912bd025676f..6ee1061d65ce 100644
+--- a/llvm/test/CodeGen/MOS/asm-printer-ir.mir
++++ b/llvm/test/CodeGen/MOS/asm-printer-ir.mir
+@@ -11,15 +11,15 @@ name: zero_page_offsets
+ body: |
+   bb.0.entry:
+     $a = LDAAbsIdx @z, $y
+-    ; CHECK: lda mos8(z),y
++    ; CHECK: lda mos8("z"),y
+     $a = LDAAbsIdx @z + 1, $y
+-    ; CHECK-NEXT: lda mos8(z+1),y
++    ; CHECK-NEXT: lda mos8("z"+1),y
+     $a = LDAAbsIdx @z - 1, $y
+-    ; CHECK-NEXT: lda mos8(z-1),y
++    ; CHECK-NEXT: lda mos8("z"-1),y
+     $a = LDAAbsIdx @z - 128, $y
+-    ; CHECK-NEXT: lda mos8(z-128),y
++    ; CHECK-NEXT: lda mos8("z"-128),y
+     $a = LDAAbsIdx @z - 129, $y
+-    ; CHECK-NEXT: lda z-129,y
++    ; CHECK-NEXT: lda "z"-129,y
+     RTS
+     ; CHECK-NEXT: rts
+ ...
+diff --git a/llvm/test/MC/MOS/register-named-symbols.s b/llvm/test/MC/MOS/register-named-symbols.s
+new file mode 100644
+index 000000000000..c8cea6df14d7
+--- /dev/null
++++ b/llvm/test/MC/MOS/register-named-symbols.s
+@@ -0,0 +1,66 @@
++; RUN: llvm-mc -triple=mos -mcpu=mos6502 -show-encoding %s -o %t.s
++; RUN: FileCheck %s < %t.s
++; RUN: llvm-mc -triple=mos -mcpu=mos6502 -filetype=obj %s -o %t.direct.o
++; RUN: llvm-mc -triple=mos -mcpu=mos6502 -filetype=obj %t.s -o %t.roundtrip.o
++; RUN: cmp %t.direct.o %t.roundtrip.o
++; RUN: llvm-mc -triple=mos -mcpu=mosw65816 -show-encoding %s -o %t.65816.s
++; RUN: FileCheck %s < %t.65816.s
++; RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %s -o %t.65816.direct.o
++; RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %t.65816.s -o %t.65816.roundtrip.o
++; RUN: cmp %t.65816.direct.o %t.65816.roundtrip.o
++
++; Quotes distinguish memory symbols from register operands. Both instructions
++; must retain their addressing mode when printed and assembled again.
++asl a
++; CHECK: asl ; encoding: [0x0a]
++asl "a"
++; CHECK: asl "a" ; encoding: [0x06,A]
++lda "s"
++; CHECK: lda "s"
++lda "x"+1
++; CHECK: lda "x"+1
++lda "y",x
++; CHECK: lda "y",x
++lda ("s"),y
++; CHECK: lda ("s"),y
++
++; Register recognition is case insensitive, including prefixed and imaginary
++; names. The symbol's spelling and addend must survive printing unchanged.
++lda "A"
++; CHECK: lda "A"
++lda "X"
++; CHECK: lda "X"
++lda "LlVm_MoS_x"
++; CHECK: lda "LlVm_MoS_x"
++lda "rc0"
++; CHECK: lda "rc0"
++lda "RS1"+2
++; CHECK: lda "RS1"+2
++lda "llvm_mos_rc255"
++; CHECK: lda "llvm_mos_rc255"
++
++; The parser also recognizes register tokens used by other MOS CPUs.
++lda "z"
++; CHECK: lda "z"
++lda "sp"
++; CHECK: lda "sp"
++lda "r"
++; CHECK: lda "r"
++lda "rp"
++; CHECK: lda "rp"
++lda "ya"
++; CHECK: lda "ya"
++lda "c"
++; CHECK: lda "c"
++lda "PSW"
++; CHECK: lda "PSW"
++
++; Ordinary identifiers stay unquoted, and quoted definitions denote the same
++; symbols as their uses and as unquoted references in directives.
++lda value
++; CHECK: lda value
++"s":
++; CHECK: "s":
++.byte 0
++.word s
++; CHECK: .short "s"
+diff --git a/llvm/test/MC/MOS/register-named-symbols-65816.s b/llvm/test/MC/MOS/register-named-symbols-65816.s
+new file mode 100644
+index 000000000000..f66f21bf8118
+--- /dev/null
++++ b/llvm/test/MC/MOS/register-named-symbols-65816.s
+@@ -0,0 +1,15 @@
++; RUN: llvm-mc -triple=mos -mcpu=mosw65816 -show-encoding %s -o %t.s
++; RUN: FileCheck %s < %t.s
++; RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %s -o %t.direct.o
++; RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %t.s -o %t.roundtrip.o
++; RUN: cmp %t.direct.o %t.roundtrip.o
++
++; A stack-relative symbol operand needs quotes while the stack register token
++; remains unquoted. Parenthesized and long-indirect operands retain the same
++; symbol identity and addressing mode through printing and reassembly.
++lda "s",s
++; CHECK: lda "s",s ; encoding: [0xa3,A]
++lda ("s",s),y
++; CHECK: lda ("s",s),y ; encoding: [0xb3,A]
++lda ["x"],y
++; CHECK: lda ["x"],y ; encoding: [0xb7,A]
+diff --git a/llvm/test/CodeGen/MOS/register-named-globals.ll b/llvm/test/CodeGen/MOS/register-named-globals.ll
+new file mode 100644
+index 000000000000..700d8bf0fbb5
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/register-named-globals.ll
+@@ -0,0 +1,46 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs %s -o %t.s
++; RUN: FileCheck %s < %t.s
++; RUN: llvm-mc -triple=mos -mcpu=mos6502 -filetype=obj %t.s -o %t.o
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs -filetype=obj %s -o %t.direct.o
++; RUN: cmp %t.direct.o %t.o
++
++; Global names that match registers need quotes in both operands and labels.
++@s = global i8 0
++@x = global i8 0
++@y = global i8 0
++@a = global i8 0
++
++define i8 @read_x() {
++; CHECK-LABEL: read_x:
++; CHECK: lda "x"
++  %v = load i8, ptr @x
++  ret i8 %v
++}
++
++define i8 @read_y() {
++; CHECK-LABEL: read_y:
++; CHECK: lda "y"
++  %v = load i8, ptr @y
++  ret i8 %v
++}
++
++define i8 @read_s() {
++; CHECK-LABEL: read_s:
++; CHECK: lda "s"
++  %v = load i8, ptr @s
++  ret i8 %v
++}
++
++define void @shift_a() {
++; CHECK-LABEL: shift_a:
++; CHECK: asl "a"
++  %v = load i8, ptr @a
++  %shift = shl i8 %v, 1
++  store i8 %shift, ptr @a
++  ret void
++}
++
++; CHECK: "s":
++; CHECK: "x":
++; CHECK: "y":
++; CHECK: "a":

@@ -6,6 +6,8 @@ Patch 0030's copy-liveness fix passes the MOS CodeGen suite, local compiler
 integration checks, and an independent review with a c-torture differential
 September 22; its follow-up, patch 0031 (copy-destination reuse), has also passed
 independent review, with 85 MOS CodeGen passes, one unsupported, and 46 MC passes.
+Patch 0032's symbol-quoting fix was validated September 23: 84 CodeGen passes,
+one unsupported, 48 MC passes, and all 61 recorded assembly failures repaired.
 Other implementation readiness follows the dated validation records and local
 drafts.** This is the actionable view of the
 [contribution tracker](upstream-contribution-status.md). Status describes the work,
@@ -16,7 +18,7 @@ reproduction checks; keep candidate patches in separate builds.
 
 ## What remains to post
 
-**Feature-independent submissions prepared September 22:**
+**Feature-independent submissions prepared September 22–23:**
 
 1. [Mixed-width pointer/call register exhaustion](upstream-mixed-width-call-regalloc-issue.md):
    [fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), with patch 0029
@@ -37,7 +39,14 @@ reproduction checks; keep candidate patches in separate builds.
    with 24 integration compilations passing.
    [Validation](pr-preparations/2026-09-22/0030-validation.md) ·
    [PR preview](pr-preparations/2026-09-22/0030-pr-preview.html).
-3. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
+3. [Register-named assembly symbols](upstream-register-named-symbols-pr.md):
+   patch 0032 preserves quotes around symbols such as `s`, `x`, `y`, and `a`.
+   It fixes both rejected assembly and a silent memory-to-accumulator opcode
+   change. [Validation](pr-preparations/2026-09-23/0032-validation.md): standalone
+   MOS suites pass; all 61 recorded corpus failures now assemble with unchanged
+   direct objects. The compatible local patch is installed. Independent review,
+   current-upstream applicability, branch preparation, and publication remain.
+4. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
    semantics question, now verified with the stock upstream frontend and `opt`.
 
 These are unposted contributions and do not require #320/#321. The register
@@ -106,6 +115,7 @@ failure with the stock upstream frontend and backend.
 | Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass; final and independent reviews complete; current-upstream applicability, branch preparation, and publication remain |
 | Newton `-O0` post-RA expansion | [Fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), patch 0030; six focused cases and MOS CodeGen/MC pass; review audited and attribution complete; check upstream applicability, prepare branch, and publish |
 | Physical-copy destination reuse | [Fix PR reviewed](pr-preparations/2026-09-22/0031-review-audit.md), patch 0031 on top of 0030; five regression cases, six extra probes, and MOS suites pass; prepare its submission after 0030 |
+| Register-named assembly symbols (`0032`) | [Fix PR prepared](upstream-register-named-symbols-pr.md); standalone suites pass and all 61 recorded assembly failures are repaired; compatible local patch installed; independent review and submission remain |
 | Scavenger live-P (`0011`) | Producer established (gcc torture `strlen-4.c`, stock `mos6502` `-O0`); test replaced by an upstream-runnable one; validated; post |
 | Call-clobbered coalescing guard (`0015`) | Revalidate diagnosis and upstream reachability; prefer a root-cause fix |
 | Trunc-selection fallback (`0023`) | Establish a real upstream producer for the independent Imag8-to-i1 portion; retain fork-specific content with its feature series |

@@ -33,6 +33,15 @@ Patch 0031's [independent review](pr-preparations/2026-09-22/0031-review-audit.m
 is also complete: no correctness defect found; 85 MOS CodeGen tests and 46 MC
 tests pass, with one unsupported. The size comparison confirms a net 2,530-byte
 reduction over 374 changed pairs that assemble, including six small increases.
+**September 23:** those 61 excluded assembly failures are now reduced and fixed
+by [patch 0032](../patches/llvm-mos/0032-mos-quote-register-named-symbols.patch).
+Register-named symbols retain their quotes, covering both rejected operands
+and silent `asl "a"` misassembly. Standalone validation reports 84 CodeGen
+passes, one unsupported, and 48 MC passes; all 61 corpus cases now assemble,
+with direct objects unchanged. The compatible local compiler is installed.
+[PR draft](upstream-register-named-symbols-pr.md) ·
+[Validation and local API compatibility](pr-preparations/2026-09-23/0032-validation.md).
+Independent review and publication remain.
 These are local results, not a
 refresh of the GitHub snapshot below.
 
