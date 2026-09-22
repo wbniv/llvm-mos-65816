@@ -102,10 +102,10 @@ int main(void) {
     display_add(&a.screen, (Drawable *)&a.text);
     upq_push_cgram(&a.screen.q, 0, bg3_pal, 0x00u, (uint8_t)sizeof bg3_pal);
     a.t = (uint16_t)0u;
-    text_puts(&a.text, 0, 1, "BYVALEDGE  32 VS 40 BIT");
+    text_puts(&a.text, 0, 1, "BY-VALUE  32 VS 40 BIT");
 
     static TitleLayer title;
-    title_begin16(&a.screen, &title, "BY VALUE BOUNDARY", "BYVALEDGE");
+    title_begin16(&a.screen, &title, "BY-VALUE", "BOUNDARY TRIO");
     corpus_result = byvaledge_gate_crc();    // expected 0x4FAB
     title_end(&a.screen, &title, 90);
 
