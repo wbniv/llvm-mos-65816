@@ -65,9 +65,9 @@ to <code>main</code> at the time of writing), with only this patch applied:</p>
 <p>Other backends and compile-time benchmarks were not tested.</p>
 <p>Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (<code>gpt-6-astra</code>,
 <code>xhigh</code> reasoning effort) for diagnosis, implementation, tests, validation,
-and PR drafting.<br>Assisted-by: Claude Code using Claude Fable 5.1 (<code>claude-fable-5-1</code>) for the
-independent review, the reserved-register refinement, and the full-suite
-validation.</p></div></article>
+and PR drafting.<br>Assisted-by: Claude Code using Claude Fable 5.1 (<code>claude-fable-5-1</code>,
+<code>high</code> reasoning effort) for the independent review, the
+reserved-register refinement, and the full-suite validation.</p></div></article>
 <aside><section><h3>Patch</h3><p>3 files · <span class="green">+120</span> · <span class="red">−0</span></p><p>9 added C++ lines; remaining additions are regression tests.</p><a href="../../../patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch">Exact patch</a></section>
 <section><h3>Reproducer</h3><p>Plain <code>mos6502</code></p><p>Fails above <code>-O0</code> without the fix</p><a href="../../investigations/repro/upstream-issues-2026-09-22/mixed-width-call.c">Standalone C input</a></section>
 <section><h3>Local checks</h3><p class="checks">131 pass · 1 unsupported</p><p>MOS CodeGen + MC</p><p>Both liveness-analysis paths checked</p><p class="checks">11,459 CodeGen tests pass</p><p>Complete X86 · ARM · AArch64 suites</p><p>Assertions enabled; 23 expected failures, 0 failures</p><p>Both new MOS tests also pass with assertions</p></section></aside></div>
