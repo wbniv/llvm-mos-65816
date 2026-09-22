@@ -70,6 +70,11 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
 ## Build / compile / disasm / test — the exact commands
 
 - **Rebuild the toolchain after a `vendor/` edit** (Docker container; incremental): `dev/run.sh toolchain`.
+- **Ad-hoc commands in the dev container go through `dev/container.sh -- CMD`** (extra mounts with
+  `-v HOST:CONTAINER`). It runs as the host user like `dev/run.sh` does; a bare `docker run` without
+  `--user` runs as root and leaves root-owned files under `build/`, which breaks the next host-side
+  build or install with `Operation not permitted`. `dev/run.sh` now repairs such files before building
+  (`dev/container.sh --fix-owner` does it on demand).
   **Do not** start a second concurrent toolchain build (it clobbers `build/llvm-mos`). **GOTCHA:**
   `build/llvm-mos-install/bin/clang` is a symlink with a *stale mtime*; the real binary is **`clang-23`**.
   Confirm a rebuild took by checking `clang-23`'s mtime advanced (or `nm` it for a new symbol) — a stale

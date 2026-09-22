@@ -586,6 +586,14 @@ mkdir -p "$ROOT/build"
 # does not — ld.lld warns per archive member, which buries the real output. The mismatch is
 # harmless (the libs use no far pointers); everything else (incl. genuine errors) passes through.
 # stdout (the SMOKE/VIEW/RESULT lines) is untouched. docker's exit status is preserved.
+# Preflight: a container run without --user (anything but this script or
+# dev/container.sh) leaves root-owned files under build/, and the build below
+# then dies with "unable to open output file ... Operation not permitted".
+# Repair them first, in the container (it has root), and say so.
+if [ -n "$(find "$ROOT/build" -user root -print -quit 2>/dev/null)" ]; then
+  echo "==> build/ has root-owned files (a container run without --user); repairing"
+  "$HERE/container.sh" --fix-owner
+fi
 docker run --rm \
   -v "$ROOT":/work \
   --user "$(id -u):$(id -g)" \
