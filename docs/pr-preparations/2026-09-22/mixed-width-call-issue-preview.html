@@ -1,0 +1,101 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Upstream issue preview — 6502 register exhaustion</title><style>*{box-sizing:border-box}body{margin:0;background:#f6f8fa;color:#1f2328;font:18px/1.6 system-ui,sans-serif}header{background:#24292f;color:white;padding:20px max(24px,calc((100vw - 1080px)/2));font-weight:600}main{max-width:1080px;margin:28px auto;padding:0 24px 60px}.notice{padding:18px 22px;background:#fff8c5;border:1px solid #d4a72c;border-radius:8px;margin-bottom:24px}.meta{font-size:16px;color:#59636e}article{background:white;border:1px solid #d1d9e0;border-radius:9px;padding:26px 34px}h1{font-size:30px;line-height:1.25}h2{font-size:23px;border-bottom:1px solid #d1d9e0;padding-bottom:8px;margin-top:32px}a{color:#0969da}pre{padding:20px;background:#f6f8fa;overflow:auto;border-radius:6px;line-height:1.5}code{font-size:16px}table{border-collapse:collapse;width:100%;font-size:16px}td,th{border:1px solid #d1d9e0;padding:10px;text-align:left}th{background:#f6f8fa}nav{display:flex;gap:22px;flex-wrap:wrap;margin:18px 0}footer{margin-top:22px;font-size:16px}</style></head><body><header>llvm-mos / llvm-mos · local issue preview</header><main><div class="notice"><strong>Archived bug report · not posted · fix 0029 prepared.</strong><br>Verified against the saved, unpatched upstream compiler on September 22, 2026. See the <a href="../../upstream-twoaddr-physreg-reschedule-pr.md">plain-6502 fix PR draft</a>.</div><nav><a href="../../upstream-mixed-width-call-regalloc-issue.md">Markdown source</a><a href="../../investigations/repro/upstream-issues-2026-09-22/mixed-width-call.c">C reproducer</a><a href="../../upstream-reference-build.md">Reference compiler</a></nav><article><h1>[MOS] Register allocation fails for mixed byte/word updates across a call on mos6502</h1>
+<p><strong>Local status, September 22:</strong> diagnosed and fixed by
+<a href="../../../patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch">patch 0029</a>.
+The <a href="../../upstream-twoaddr-physreg-reschedule-pr.md">fix PR draft</a> supersedes this
+unposted issue draft. The baseline reproduction below remains valid.</p>
+<p>The patched compiler passes the six-level C compilation matrix, and the MOS
+CodeGen/MC suites report 131 pass / one unsupported. A separate build with
+assertions enabled passes 231 focused X86/ARM/AArch64 regressions and both new
+MOS tests, with no failures or skips. See the
+<a href="0029-validation.md">validation record</a> and
+<a href="0029-cross-target-validation.md#backend-coverage-at-the-pinned-revision">backend coverage</a>.
+The fix PR remains prepared locally and unposted.</p>
+<p>Compiling the following C function for plain <code>mos6502</code> fails with <code>ran out of
+registers during register allocation</code> at <code>-O1</code>, <code>-O2</code>, <code>-O3</code>, <code>-Os</code>, and <code>-Oz</code>.
+<code>-O0</code> succeeds. The failure does not require MachineVerifier, inline assembly,
+target feature flags, or downstream compiler patches.</p>
+<p>This was encountered while compiling the C torture test behind the
+<a href="https://biohack.net/snes/byvaledge/">By-Value Boundary Trio SNES demo</a>
+(<a href="../../../examples/snes/byvaledge.c">local source</a>). Its original five-byte record-update stage included a
+multiply lowered to a library call. The standalone reproducer below expresses
+the failing shape with an external function call and ordinary pointer accesses.
+The demo currently uses a source workaround that moves the problematic call out
+of that update sequence.</p>
+<h2>Reproducer</h2>
+<p>Save as <code>mixed-width-call.c</code>:</p>
+<pre><code class="language-c">#include &lt;stdint.h&gt;
+
+extern uint16_t ext(uint16_t, uint16_t);
+
+__attribute__((noinline))
+void stage(uint16_t *p, uint16_t k) {
+    uint16_t a = (uint16_t)(p[0] + k);
+    uint16_t b = (uint16_t)(p[1] ^ a);
+    uint8_t c = (uint8_t)(((uint8_t *)p)[4] + (uint8_t)b);
+    p[0] = (uint16_t)(ext(a, 13849u) + b);
+    p[1] = (uint16_t)(b - (uint16_t)c);
+    ((uint8_t *)p)[4] = (uint8_t)((a &gt;&gt; 8) ^ c);
+}
+</code></pre>
+<pre><code class="language-sh">clang --target=mos -mcpu=mos6502 -Os -c mixed-width-call.c -o mixed-width-call.o
+</code></pre>
+<p>Observed result, exit status 1:</p>
+<pre><code class="language-text">error: &lt;unknown&gt;:0:0: ran out of registers during register allocation in function 'stage'
+1 error generated.
+</code></pre>
+<p>Expected: successful compilation. <code>p</code> can point to an array of at least three
+<code>uint16_t</code> objects; the byte access uses its character representation. The
+declaration of <code>ext</code> is sufficient for this compile-only reproducer.</p>
+<h2>Tested upstream revision</h2>
+<p>Reproduced September 22, 2026, with Clang and the backend built from unmodified
+<a href="https://github.com/llvm-mos/llvm-mos/commit/742d554bf08042b8df93d791c335260fadd16643"><code>742d554bf08042b8df93d791c335260fadd16643</code></a>,
+which was also upstream <code>main</code> when checked that day. This is a complete C-to-object
+compilation with the stock frontend; no intermediate IR or MIR was edited.</p>
+<p>The compiler reports Clang <code>24.0.0git</code>. It is a Release build with compiler
+assertions disabled and the MOS target enabled.</p>
+<table>
+<thead>
+<tr>
+<th>Optimization</th>
+<th>Normal compilation</th>
+<th>With <code>-mllvm -verify-machineinstrs</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-O0</code></td>
+<td>Pass</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>-O1</code></td>
+<td>Register-exhaustion error</td>
+<td>Same error</td>
+</tr>
+<tr>
+<td><code>-O2</code></td>
+<td>Register-exhaustion error</td>
+<td>Same error</td>
+</tr>
+<tr>
+<td><code>-O3</code></td>
+<td>Register-exhaustion error</td>
+<td>Same error</td>
+</tr>
+<tr>
+<td><code>-Os</code></td>
+<td>Register-exhaustion error</td>
+<td>Same error</td>
+</tr>
+<tr>
+<td><code>-Oz</code></td>
+<td>Register-exhaustion error</td>
+<td>Same error</td>
+</tr>
+</tbody>
+</table>
+<p>The two-address pass hoists the physical accumulator argument copy across
+arithmetic whose operands can only use that accumulator. Patch 0029 rejects
+that rescheduling when a crossed virtual register's entire class overlaps the
+moved instruction's live physical definitions. The report establishes a hard
+compilation failure; it does not claim a runtime miscompile or global minimality.</p></article><footer><strong>Published demo:</strong> <a href="https://biohack.net/snes/byvaledge/">Play By-Value Boundary Trio</a>. <a href="../../../examples/snes/byvaledge.c">Local demo source</a>.</footer></main></body></html>

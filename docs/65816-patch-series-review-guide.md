@@ -70,8 +70,9 @@ purpose). Per-step depth lives in the linked `docs/plans/YYYY-MM-DD-*.md` files.
 
 ### 1.1 The patch stack at a glance
 
-Twelve patches, applied bottom-up (`git am 0001..0012`); the files are under [`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos) (full
-name in each step of [§3](#3-the-narrative-each-step-with-need--patch--proof)). LOC is patch size, not net
+The original twelve-patch series is summarized below in application order. The files are under
+[`patches/llvm-mos/`](https://github.com/wbniv/llvm-mos-65816/tree/main/patches/llvm-mos), with full names
+in each step of [§3](#3-the-narrative-each-step-with-need--patch--proof). LOC is patch size, not net
 source change.
 
 | Patch | Issue · M | LOC | What it does | Risk |
@@ -93,6 +94,15 @@ Four patches (`0003`, `0008`, `0010`, `0011`) are **upstream bug-fix candidates*
 `0003`/`0008`/`0010` reproduce on the default 8-bit path; `0011` currently needs the `+mos-a16`
 feature's longer flag live ranges to trigger. `0012` remains in the historical fork stack but was
 retired from upstream submission on 2026-08-05 because it has no current producer.
+
+**Later independent fix, September 22:** [patch 0029](../patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch)
+adds a shared CodeGen guard against hoisting a physical definition across virtual
+operands whose entire register class overlaps it. A plain-6502 C reproducer and
+IR/MIR tests support the [standalone PR draft](upstream-twoaddr-physreg-reschedule-pr.md);
+it has no #320/#321 dependency. [Validation](pr-preparations/2026-09-22/0029-validation.md)
+includes the MOS suites and 231 focused X86/ARM/AArch64 tests with assertions.
+The twelve-patch narrative above describes the original series, not the complete
+current patch inventory.
 
 ### 1.2 The one invariant that makes this reviewable
 
@@ -1130,33 +1140,41 @@ prebuilt binary. MAME + bsnes-jg already give a two-emulator cross-check; parked
 
 ## Appendix D — Upstream bug fixes & status
 
-Four of the twelve patches are **upstream bug-fix candidates** — defects in stock llvm-mos that this work
-surfaced and fixed. They are separate from the #320/#321 feature contribution. Former fifth candidate
+Four patches in the original twelve-patch series are **upstream bug-fix candidates** — defects in
+stock llvm-mos that this work surfaced and fixed. They are separate from the #320/#321 feature
+contribution. Former fifth candidate
 `0012` was retired on 2026-08-05: it has no current producer and must not be posted. The scavenger crash
 was previously filed as an issue-with-no-fix; `0011` now contains a possible fix PR. The
 exhaustive accounting — every PR/issue/design-note, the exact `gh` post commands, and the live snapshot — is
 the single source of truth in [`upstream-contribution-status.md`](upstream-contribution-status.md); this is
 the reviewer's slice of it.
 
-**Last verified: 2026-07-26** — **#562 and #563 are MERGED** (upstream commits `9142aebae` / `8be054612`;
-#561 auto-closed), so `0003`/`0008` are **dropped from the fork stack** — the "on merge" column below has
-been executed for both. `0010`/`0011` (and `0015`/`0016`, added since) were later drafted; `0012` is
-**retired, not merely unposted**. All artifacts were verified `git apply --check`-clean against tip
-`8be054612`, but applicability does not make `0012` a submission candidate. The posting sequence is
-planned: [submission campaign](plans/2026-07-26-upstream-submission-campaign.md). Refresh:
-[`dev/upstream-status.sh`](https://github.com/wbniv/llvm-mos-65816/blob/main/dev/upstream-status.sh)
-(or `gh pr list --repo llvm-mos/llvm-mos --author wbniv --state all`).
+**Last verified: 2026-09-20** — **7 merged compiler PRs, 6 open**. Merged: #562, #563, #577,
+#579, #587, #590, #591. Open: #578, #584, #586, #588, #589, #604; #604 is newly posted,
+and #589 still carries a change request. See the [current PR snapshot](upstream-contribution-status.md#current-pr-progress)
+for heads, merge dates, review status, and CI results. `0003`/`0008` are already retired;
+other patch retirement requires checking the vendor revision. The table below is a selected
+patch-level view, not the complete PR inventory.
+
+**Local validation update, September 22:** patch 0029 is prepared and unposted.
+Its focused X86/ARM/AArch64 run passes 231 tests with assertions enabled, and both
+new MOS regressions pass in that configuration. See the
+[coverage inventory](pr-preparations/2026-09-22/0029-cross-target-validation.md#backend-coverage-at-the-pinned-revision)
+for the 22 untested backends and full-suite limits. This updates local readiness;
+the dated public-PR snapshot above has not been refreshed here.
 
 | Patch | Upstream defect | Repro on stock? | Upstream | Status | On merge | Test |
 |-------|-----------------|-----------------|----------|--------|----------|------|
 | `0003` | `mos-late-opt` reuses a dead `LDImm` as `TXY`/`TYX` without clearing the dead flag → verifier reject (`Using an undefined physical register`) | yes (`mosw65816`) | [PR&nbsp;#562](https://github.com/llvm-mos/llvm-mos/pull/562) | **MERGED** (`9142aebae`) | ✅ done — `0003` dropped 2026-07-25 | `late-opt-65816.mir` |
 | `0008` | the calling convention gives an 8-bit `addrspace(1)` direct-page pointer **argument** a 16-bit register → illegal size-mismatched `COPY` | yes (plain `mos6502`) | [#561](https://github.com/llvm-mos/llvm-mos/issues/561) → [PR&nbsp;#563](https://github.com/llvm-mos/llvm-mos/pull/563) (`Fixes #561`) | **MERGED** (`8be054612`, #561 auto-closed) | ✅ done — `0008` dropped 2026-07-25 | `dp-pointer-arg.ll` |
-| `0010` | the register coalescer merges two rotate-referenced values into the A-only `Ac` class → strands a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (silent miscompile; both `-verify-machineinstrs`/`-verify-coalescing` clean) | yes (default-8bit `mosw65816`; standalone `llc`) | [PR draft](upstream-coalesce-rotate-ac-pr.md) (`wbniv:mos-coalesce-rotate-ac` to mint) | **DRAFTED · not posted** | drop `0010` + bump vendor pin | `coalesce-rotate-ac.mir` |
+| `0010` | MOSCopyOpt copy forwarding changes loop liveness; a single recompute can omit A from latch live-ins, allowing a scratch clobber | yes (default-8bit `mosw65816`; standalone MIR) | [PR #578](https://github.com/llvm-mos/llvm-mos/pull/578) | **POSTED · open**, root-cause revision published September 14 | drop `0010` after vendor revision includes fix | `copy-opt-loop.mir`, `copy-opt-chain.mir` |
 | `0011` | `saveScavengerRegister` assumed N/Z dead + a live `$p` only balanced-saveable, but `+mos-a16` keeps a compare/ALU flag live across a frame-vreg spill in an unbalanced range → illegal `$p is not a GPR` + undefined-`$p` `PH $p` | yes (assert exposed by `+mos-a16`) | [PR draft](upstream-scavenger-live-p-pr.md) (`wbniv:mos-scavenger-live-p-save` to mint) | **DRAFTED · not posted** | drop `0011` + bump vendor pin | `a16scavnz`<sup>[[C19]](#c19-upstream-register-scavenger-nz-crash)</sup> |
+| `0020` | MVN/MVP bank bytes and symbolic fixup offsets reversed | yes (`mosw65816`) | [PR #604](https://github.com/llvm-mos/llvm-mos/pull/604) | **POSTED · open** | retire after vendor pin includes the merged fix | five targeted checks; upstream suites 130 pass / one unsupported |
+| `0029` | Two-address rescheduling extends a physical argument definition across virtual operands with no non-overlapping register available | yes (plain `mos6502` C to object) | [PR draft](upstream-twoaddr-physreg-reschedule-pr.md) | **DRAFTED · validated · not posted** | retire after vendor pin includes the merged fix | MOS suites 131 pass / one unsupported; 231 focused X86/ARM/AArch64 tests and both new MOS tests pass with assertions |
 | `0012` | Proposed tolerance for noncanonical `LDCImm 1`; no current upstream producer, and `0027` removed the former downstream producer | no real producer (direct MIR manufactured it) | [retired investigation](upstream-ldcimm-set-lowering-pr.md) | **RETIRED · DO NOT POST** | keep only as fork/history provenance | assertions red/green retained as evidence |
 
 Status enum: **POSTED·open** (live PR/issue) · **DRAFTED** (written; posting is user-triggered) · **MERGED**
-(then dropped from the stack) · **RETIRED** (must not be posted) · **DEFERRED** (filed, not fixed). The **"repro on stock?"** column is what makes
+(drop from the stack once the vendor revision contains the fix) · **RETIRED** (must not be posted) · **DEFERRED** (filed, not fixed). The **"repro on stock?"** column is what makes
 these separable from the feature work — each reproduces on a pristine upstream build, so they are genuine
 upstream defects, not artifacts of #320/#321. The feature patches (`0001`/`0002`/`0004`–`0007`/`0009`) are
 **not** listed here: they are the contribution proper, gated on maintainer ABI blessing (status:

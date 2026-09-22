@@ -1,5 +1,27 @@
 # MOS: "ran out of registers" on mixed-width accesses through one pointer across a call
 
+**Fix completed September 22:**
+[patch 0029](../../patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch)
+guards physical-register-definition hoisting in the two-address pass. That pass
+moved the call argument into `$a` before arithmetic that also required `$a`.
+The isolated upstream build passes the original C input at every tested
+optimization level. See the [PR draft](../upstream-twoaddr-physreg-reschedule-pr.md)
+and [validation record](../pr-preparations/2026-09-22/0029-validation.md).
+MOS CodeGen/MC passes 131 tests with one unsupported. A separate assertion-enabled
+build passes all 231 focused X86/ARM/AArch64 tests and both bundled MOS tests,
+with no skips; [coverage and remaining backends](../pr-preparations/2026-09-22/0029-cross-target-validation.md#backend-coverage-at-the-pinned-revision)
+are recorded separately. Final submission review and publication remain.
+The earlier reports and hypotheses below are retained as investigation history;
+their open/no-fix status is superseded by this update.
+
+**Baseline reproduction, September 22 (before the fix):** confirmed with the saved, unpatched upstream Clang at
+`742d554bf080`, through complete C-to-object compilation. All of `-O1`, `-O2`,
+`-O3`, `-Os`, and `-Oz` fail, with or without MachineVerifier; `-O0` passes.
+The [upstream issue draft](../upstream-mixed-width-call-regalloc-issue.md) and
+[browser preview](../pr-preparations/2026-09-22/mixed-width-call-issue-preview.html)
+were prepared at that stage. The older backend-only evidence below
+is retained as the investigation history; it is no longer the only upstream proof.
+
 > **STATUS 2026‑09‑16: OPEN.** Found by **#154 `byvaledge`** (Round 8 Cluster C) on its first
 > compile. This is **not** a `+mos-a16` / `+mos-xy16` / 65816 defect and **not** a regression in
 > this fork: it reproduces on **pristine upstream `llvm-mos` `llc`**, with the **pristine MOS

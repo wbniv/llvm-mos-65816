@@ -581,9 +581,17 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
       **pristine upstream `llc`** with the **pristine MOS datalayout** at `-mcpu=mos6502`, and
       is clean at `-O0`. The necessary combination, measured one ingredient at a time, is a call
       plus mixed-width (i8 *and* i16) traffic through the same pointer plus three or more
-      stores; word-only traffic of the same volume is fine. No fix attempted — needs separate
-      dispatch at a tier that can work in the register allocator, and it is an upstream bug
-      report once confirmed.
+      stores; word-only traffic of the same volume is fine. **Fixed locally September 22
+      by patch 0029:** the two-address pass must not hoist a physical argument definition
+      across virtual operands that require that register. The
+      [PR draft](docs/upstream-twoaddr-physreg-reschedule-pr.md) and
+      [validation](docs/pr-preparations/2026-09-22/0029-validation.md) are prepared.
+      MOS CodeGen/MC: **131 pass / one unsupported**. The separate assertion-enabled
+      build passes **231 focused tests** (X86 169, ARM 29, AArch64 33), with no
+      failures or skips; both bundled MOS tests also pass. The
+      [coverage inventory](docs/pr-preparations/2026-09-22/0029-cross-target-validation.md#backend-coverage-at-the-pinned-revision)
+      records the remaining 22 backends. Final submission review and publication
+      remain; the fix does not depend on #320/#321.
       [investigation](docs/investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md).
     - **#151 `vlanest`** — the DEPTH axis of `G_DYN_STACKALLOC`: two VLAs in nested block scopes
       with independent runtime lengths, the inner length derived from the OUTER allocation's
@@ -964,6 +972,31 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   [full-vendoring plan](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md).
 ### Upstream / Contribution
 
+**Work/dependency view:** [pending-work chart and flowchart](docs/upstream-pending-work.md).
+SNES is a separate platform track: prioritize reconciling #415, including the runtime
+contract of native mode, while independent fixes continue in parallel.
+
+- [wip T2] **Common SDK longjmp zero return — posted as [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450):** independent 6502 bug reproduced
+  2026-09-20 against current upstream assembly. Candidate normalization passes 20/20
+  integrated SDK CTest cases against freshly built current libraries/simulator; ready
+  and posted; awaiting maintainer review/CI. No SNES
+  dependency. [Patch and evidence](docs/upstream-pending-work.md#research-notes-and-evidence).
+- [ ] **Register-exhaustion fix 0029:** implementation and validation are complete;
+  review the final [submission bundle](docs/upstream-twoaddr-physreg-reschedule-pr.md)
+  and publish the standalone PR. No #320/#321 dependency.
+- [ ] **Reentrant contract:** the report needs a semantics answer before selecting
+  a fix or documentation change. [Readiness](docs/upstream-pending-work.md#what-issue-means-here).
+- [ ] **Undef-lane fix 0028:** validated, with publication held until #320/#321 are
+  ready to open. Choose the implementation and revalidate the exact submission;
+  [the pending-work chart](docs/upstream-pending-work.md) records the hold and evidence.
+
+**Earlier progress snapshot, 2026-09-20, before #604 was posted:** 7 merged PRs (#562, #563, #577, #579, #587, #590,
+#591); 5 open (#578, #584, #586, #588, #589). Published revisions await review;
+#589 still has a change request. Windows CI is blocked by upstream's missing Actions update
+for the Node 20 → Node 24 migration (Will, 2026-09-20). The #588 Ubuntu log confirms
+cancellation during compilation before tests ran; it needs a completed run. See the
+[current PR snapshot](docs/upstream-contribution-status.md#current-pr-progress).
+
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
 — keep it in sync (drafted → ready-to-post → posted) with the items in this section._
 
@@ -977,11 +1010,12 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [#578](https://github.com/llvm-mos/llvm-mos/pull/578) (`wbniv:mos-coalesce-rotate-ac`,
   red/green-proven, four live-demo links); DWARF step-6 = PR
   [#579](https://github.com/llvm-mos/llvm-mos/pull/579) (`wbniv:mos-dwarf-65816-test-docs`).
-  Momentum: **2 PRs already merged** (#562, #563 — our first two, landed essentially as submitted).
+  Momentum: **7 PRs merged** as of 2026-09-20; #577 and #579 from Wave 1 are merged,
+  while #578 remains open with the MOSCopyOpt loop-liveness fix.
   Wave-ordered sequencing + per-item mechanics in
   [docs/plans/2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md):
-  **Wave 2 next** — issues
-  (reentrant, rc-undef-ra, sdk setjmp), **Wave 3** a16-reachable fixes (`0011`/`0015`, both still
+  **Report/fix tracks** — reentrant semantics, rc-undef diagnosis and SDK native-setjmp
+  platform integration (see the current dependency chart), **Wave 3** a16-reachable fixes (`0011`/`0015`, both still
   requiring producer/reachability judgment). Former candidate `0012` was **RETIRED 2026-08-05 — DO
   NOT POST**: no upstream producer exists and `0027` removed the downstream producer. **Wave 4** design notes (#320 ABI → far-CC →
   frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
@@ -993,35 +1027,31 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [#591](https://github.com/llvm-mos/llvm-mos/pull/591); GitHub head confirmed at `b47ed3ee08e2`, with
   macOS/Linux/Windows checks triggered. The explanatory comment was subsequently
   [posted](https://github.com/llvm-mos/llvm-mos/pull/591#issuecomment-5189214169).~~ ✓
-- [T2] **65816 `BRL` branch relaxation — extend #550's gate to `HasW65816` (BLOCKED on
-  #549/#550 merging).** Upstream [PR #550](https://github.com/llvm-mos/llvm-mos/pull/550) widens
-  `isBranchOffsetInRange` on 65CE02+ so MC relaxation promotes branches to 16-bit instead of
-  `JMP` trampolines (19→0 trampolines, 3 B/1+ cyc each, in their test). The 65816 has `BRL` and
-  the identical win — every SNES ROM shrinks. Do the `HasW65816` leg + tests + a trampoline-count
-  measurement on our corpus once #549+#550 land; meanwhile optionally a supportive comment on
-  #550 offering it (user-triggered). Status-doc row 21. (T2: design decided by #550's precedent;
-  bounded once unblocked.)
-- [T2] **Upstream the `MVN`/`MVP` block-move bank-order MC fix (`0020`).** The svx2 video work
-  found and fixed an llvm-mos 65816 `MVN` operand-encoding defect (bank order in the MC
-  instruction format) — fix + opcode regression already carried as
-  `patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch`. Remaining is submission polish
-  (the five steps from the [svx2 plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md)
-  §Upstream compiler follow-up): reduce to the MC opcode test, confirm syntax + encoded byte
-  order against WDC docs and llvm-mos asm conventions, run the focused MC test + relevant suite,
-  mint a minimal branch/PR (TableGen fix + regression only), and frame the animated ROM as the
-  real-world reproducer without coupling to this repo's assets. Draft only — posting stays
-  user-triggered; queue in [upstream-contribution-status.md](docs/upstream-contribution-status.md)
-  row 17. (T2: fix exists and is validated; remaining is bounded reduce/verify/mint work.)
-  Re-verified 2026-07-26 (post-move): upstream tip `8b616af94` (lld-only #567 on top of our base);
-  `0010/0011/0012/0015/0016` all `apply --check` clean against it. **Every outward action (branch
-  push, PR, issue) is individually user-triggered.**
-- [T4] **Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR).** Build ON @Phillip-May's
-  stalled-but-working SDK scaffolding, don't replace it: reuse his `snesxc` register lib + multi-bank
-  linker (with credit); contribute on top our native-mode crt0 (unlocks 16-bit codegen) + the
-  dual-emulator CI bench his PR lacks; keep the backend codegen (#320/#321) entirely separate (it
-  lands in `llvm-mos`, targets any `-mcpu=mosw65816` platform). Strategy + the tier-1/tier-2
-  positioning note for engaging @asiekierka on #321 are drafted in
-  [415-snes-target-reconciliation](docs/415-snes-target-reconciliation.md). User-triggered (posting).
+- [x] **65816 BRL follow-up evaluated 2026-09-20 — optimization premise rejected.**
+  #549/#550 have merged, but 65816 conditional branches cannot relax to a long form.
+  For unconditional BRA, BRL replaces a three-byte absolute JMP with another three-byte
+  instruction and costs one extra cycle. No PR proposed; the blanket ROM-size claim is
+  withdrawn. [Assessment](docs/pr-preparations/2026-09-20/brl-assessment.md).
+- [wip T2] **MVN/MVP bank-order fix — posted as [compiler PR #604](https://github.com/llvm-mos/llvm-mos/pull/604).** Prepared commit
+  `ae3108c31890` against upstream `742d554bf080` fixes immediate bytes and symbolic
+  relocation offsets; both corrections and the full regression are now in downstream `0020`.
+  All five targeted checks pass; MOS MC/CodeGen suites pass 130 tests with one
+  unsupported. [Review bundle](docs/pr-preparations/2026-09-20/README.md).
+  Keep this PR focused on the encoding correction and regression results; simulator
+  setup/conventions are a separate discussion, with no merge dependency.
+  [PR mockup](docs/pr-preparations/2026-09-20/mvn-mvp-pr-preview.html).
+  Published head `ae3108c31890` and description verified; awaiting review/CI. [Downstream validation](docs/pr-preparations/2026-09-20/mvn-downstream-validation.md).
+- [ ] **Separate 65816 simulator discussion:** prepared [draft](docs/pr-preparations/2026-09-20/65816-simulator-discussion-body.md)
+  covers prior discussions, runner selection, CI setup and result conventions.
+  Review/post independently of MVN/MVP; no execution harness implemented yet.
+- [T4] **Reconcile with llvm-mos-sdk#415.** Updated [plan](docs/415-snes-target-reconciliation.md)
+  from the live review on 2026-09-20. Next: isolated baseline + file-level inventory,
+  addressing SDK-style startup, interrupt handlers, vector provenance, CPU config
+  and example wiring. Extract basic platform work from fork-only far runtime.
+  Agree the maintainer's proper-65816-support merge prerequisites and CPU/stack ABI;
+  include native setjmp restoration and #450 zero normalization in the same coherent
+  runtime. Simulator infrastructure remains a separate discussion. No reconciled
+  branch, new runtime validation, upstream comment or platform submission yet.
 - [wip T3] **Upstream the F4 `mos-late-opt` TXY/TYX dead-flag fix** — ✅ **PR
   [#562](https://github.com/llvm-mos/llvm-mos/pull/562) opened 2026-06-22.** Upstream llvm-mos bug
   (`MOSLateOptimization.cpp`); **breaking commit = `dbce7ad1e9cd2`** ("Support emitting TXY/TYX on
@@ -1703,7 +1733,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-06-17: both SNES-415 plan deferrals already covered (this plan was routed in from
      ~/.claude/plans by a housekeeping pass; its Out-of-scope/follow-ups travel with the now-tracked plan).
      • "Upstreaming: cut the llvm-mos-sdk PR from platforms/snes-8bit/" -> the curated Open bullet
-       "Reconcile with llvm-mos-sdk#415 (the existing SNES target draft PR)" + the Upstream queue entry in
+       "Reconcile with llvm-mos-sdk#415 (the existing open SNES target PR)" + the Upstream queue entry in
        docs/upstream-contribution-status.md (#415 reconciliation, user-triggered posting). Already tracked.
      • "Port the DMA/VRAM helpers to 16-bit codegen" -> a Phase-2 (16-bit native target) deferral documented
        in the plan's own Out-of-scope, gated behind the same #415 reconciliation + the broader #321 effort.

@@ -9,7 +9,12 @@ point — does it still hold at the edge, at the other width, and when two of th
 five (#152, #154) sit **exactly on a size-gated classifier's boundary constant**, which is the
 classic place for an off-by-one in a lowering that has otherwise been correct for 141 demos.
 
-Scope note, matching Clusters A and B: **build + gate only. Publishing is out of scope.**
+Original September 16 scope, matching Clusters A and B: **build + gate only**.
+All five demos were subsequently published September 22; see the
+[publication audit](../investigations/2026-09-22-snes-demo-publication-audit.md).
+The register-exhaustion defect found by #154 now has a validated standalone fix,
+[patch 0029](../upstream-twoaddr-physreg-reschedule-pr.md). The measurements and
+logs below retain the original build-stage evidence.
 
 ---
 
@@ -282,9 +287,15 @@ lines of C with one pointer, one call, and three stores of which one is byte-wid
 **pristine upstream `llc`** with the **pristine MOS datalayout** at `-mcpu=mos6502`, `-O1` and above;
 clean at `-O0`. Write-up, ingredient table, and minimal repro:
 [`docs/investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md`](../investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md).
-No backend fix attempted — that needs separate dispatch. `#154` ships **gated**: the offending
+No backend fix was attempted during this September 16 demo pass. `#154` ships **gated**: the offending
 libcall was moved out of the 5-byte stage (it is not the corner under test), and nothing about the
 `ByVal=false` check, the caller re-read, or the `-verify` requirement was relaxed.
+
+**September 22 follow-up:** patch 0029 fixes the two-address rescheduling
+constraint. The MOS suites pass 131 tests with one unsupported; a separate
+assertion-enabled build passes 231 focused X86/ARM/AArch64 tests and both new MOS
+regressions, with no skips. [Validation and coverage](../pr-preparations/2026-09-22/0029-validation.md).
+Final submission review and publication remain.
 
 ### 1. `dev/run.sh corpus`
 
@@ -504,8 +515,8 @@ CRC at the moment of capture, so the picture and the number come from the same f
 
 ### Deviations from the plan
 
-- **#154 `byvaledge` lost a multiply from its 5-byte stage**, because that shape hits an **open
-  upstream register-allocation defect** the demo itself found. The libcall is not the corner under
+- **#154 `byvaledge` lost a multiply from its 5-byte stage**, because that shape hit the
+  **upstream register-allocation defect** the demo itself found. The libcall is not the corner under
   test — the ABI form of the parameter is — so the stage derives its result with shift/add/xor
   instead and the demo ships gated. The gate was not weakened in any other respect, and the defect is
   written up rather than worked around silently.
