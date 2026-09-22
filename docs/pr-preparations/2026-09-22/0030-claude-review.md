@@ -120,3 +120,40 @@ standalone 0030-only binary (Codex's rerun; my own MC run used the stacked
 ## Recommendation
 
 Post 0030 as is (with the sixth case). Post 0031 after it, referencing it.
+
+## Codex's audit of 0031, reviewed
+
+Codex [audited patch 0031](0031-review-audit.md) against the frozen 0030-only
+binary. Its four factual corrections all check out against the artifacts and
+are adopted:
+
+| Codex's correction | Verified how | Verdict |
+|---|---|---|
+| My "84 CodeGen pass" came from the run *before* I regenerated `copy-phys-reg.mir`'s checks; that JSON holds one CodeGen failure | recounted `lit-mos-0031.json`: 84 PASS, 1 FAIL (CodeGen), 46 FAIL (MC, tools) | right; the fresh run is 85 + 46 |
+| "368 shrink" was wrong: 352 shrink, 16 equal, 6 grow | recounted `sizes.json` | right |
+| "no function executes more instructions" overclaims a static count | wording | right; now "static emitted count" |
+| "3–6 lines shorter" counted both diff sides; it is one load removed at `-O1`, two above | `diff` of the saved `.s`: 2/1, 4/2, 4/2 removed/added | right |
+
+Its scope call, moving the MAME/bsnes-jg result out of the upstream text into
+the integration record because that run exercises the whole local patch stack,
+is defensible and kept. Its six extra probes (alias clobbers on either side, a
+call's register mask, sub-register kill clearing, repeated destination reuse,
+an unrelated dead `NZ` definition preserved) are good adversarial coverage; the
+call-mask probe was spot-checked and behaves as recorded on both binaries.
+
+Three things it left incomplete, closed here:
+
+- Its own description of the 61 unassemblable pairs ("globals named `s`, `x`
+  and `y`") is still short: the assembler rejects globals named `a`, `c`, `s`,
+  `x` or `y` and case variants. Corrected in its record, the validation record
+  and the draft.
+- It dropped the upstream-applicability note from the draft. Restored: the
+  base is identical to `main`, and 0030 then 0031 apply cleanly on the newer
+  `~/llvm-mos` tree as well.
+- It tested `mos6502` only. The reuse path is shared by 65C02 and 65816 for
+  `Imag8` copies (the 65C02 `PHX/PLY` and SPC700 `MOVImag8` paths bypass it),
+  so the corpus differential was rerun at `-O2` for `mos65c02` and
+  `mosw65816`; see the 0031 validation record.
+- Its regenerated preview had drifted from the draft; the preview is rebuilt
+  from the draft with `dev/pr-preview.py` and Codex's aside.
+

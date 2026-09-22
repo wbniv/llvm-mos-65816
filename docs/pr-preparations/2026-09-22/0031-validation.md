@@ -8,6 +8,7 @@ always looked clobbered.
 
 Patch: [0031-mos-copy-phys-reg-reuse-dst.patch](../../../patches/llvm-mos/0031-mos-copy-phys-reg-reuse-dst.patch).
 Proposed submission: [PR draft](../../upstream-copy-phys-reg-reuse-dst-pr.md).
+Independent audit: [review findings and fresh evidence](0031-review-audit.md).
 
 - [x] Confirm the branch is unreachable on the pinned upstream (`$a = T_A $x; …; $y = COPY $x` emits a second `T_A`).
 - [x] Fix the ordering, clear a `dead` flag on the establishing copy, add a regression test.
@@ -16,6 +17,9 @@ Proposed submission: [PR draft](../../upstream-copy-phys-reg-reuse-dst-pr.md).
 - [x] Corpus differential 0030 → 0030+0031 (verifier, assembly, `.text` size).
 - [x] MOS CodeGen and MC suites on the stacked candidate.
 - [x] Project toolchain rebuilt with 0030+0031 and the MAME + bsnes-jg corpus gate run.
+- [x] Independently review 0031 against the saved 0030-only baseline; verify
+  exact patch application, all focused cases, additional clobber probes, suite
+  results, saved assembly hashes, and size measurements.
 - [ ] Publish, after 0030.
 
 ## Change
@@ -26,8 +30,9 @@ then, if the instruction was a copy, checked whether that copy's destination
 holds the value. A copy's own definition of its destination was therefore
 already in the clobber map when the copy was checked, and
 `Src == Val && RC.contains(Dst) && !Clobbered[Dst]` could never be true. The
-first branch (`Dst == Val`, reuse `Src`) was unaffected, which is why the
-existing `copy-phys-reg.mir` cases and the 0030 cases all pass either way.
+first branch (`Dst == Val`, reuse `Src`) remains available, and all six 0030
+cases pass either way. The existing destination-reuse case in
+`copy-phys-reg.mir` requires the expectation update described below.
 
 The fix records a copy's definitions only after inspecting it. `ReuseReg`, which
 0030 added to clear stale kill flags, additionally clears a `dead` flag on the
@@ -59,12 +64,13 @@ byte.
 | New `copy-phys-reg-reuse-dst.mir` (5 cases) | pristine: FAIL (no reuse) · 0030-only: FAIL (no reuse) · 0030+0031: PASS, verifier clean |
 | 0030's `copy-phys-reg-liveness.mir` (6 cases) | pristine: verifier error · 0030-only: PASS · 0030+0031: PASS |
 | Existing `copy-phys-reg.mir` | one function's checks updated; PASS on 0030+0031 |
-| MOS CodeGen suite, assertions | 84 pass, 1 unsupported (includes both new tests) |
+| MOS CodeGen suite, assertions | 85 pass, 1 unsupported (fresh audit includes both new tests and the updated existing test) |
 | MOS MC suite, assertions | 46 pass (with `llvm-mc`, `llvm-objdump`, `llvm-readobj` built for the run) |
-| gcc `c-torture/execute`, 1,390 files (of 1,656) × `-O0/-O2/-Os`, 0030-only → 0030+0031, `-verify-machineinstrs` | 4,170 comparisons: 0 new failures; 3,655 identical, 435 differ, 80 fail the same way on both |
-| `.text` bytes over the 374 differing pairs that assemble (61 skipped: a C global named `s` clashes with the `S` register in the assembler, on both sides) | 1,364,382 → 1,361,852, −2,530 bytes; 6 pairs grow by 1–4 bytes, 368 shrink |
-| instruction count over all 435 differing pairs | −1,824 instructions, none grow |
-| `newton-step.c` (0030's reproducer), six levels | verifier clean; assembly identical at `-O0`, 3–6 lines shorter at `-O1…-Oz` (`ldx zp; stx zp` → `sta zp`) |
+| gcc `c-torture/execute`, 1,390 files (of 1,656) × `-O0/-O2/-Os`, 0030-only → 0030+0031, `-verify-machineinstrs` | 4,170 comparisons: 3,655 successful pairs identical, 435 differ, 80 fail on both sides; no new failures or successes |
+| `.text` bytes over the 374 differing pairs that assemble (61 pairs rejected on both sides, excluded) | 1,364,382 → 1,361,852, −2,530 bytes; 352 shrink, 16 equal, 6 grow by 1–4 bytes |
+| Same corpus at `-O2` for `mos65c02` and `mosw65816` (the `Imag8` reuse path is shared; 65C02's `PHX/PLY` and SPC700's `MOVImag8` copy paths bypass it) | each: 1,390 comparisons, 0 new failures, 1,323 identical, 41 differ, 26 fail on both |
+| Static emitted instruction count over all 435 differing pairs | −1,824 instructions; no file-level increase; not an execution-count measurement |
+| `newton-step.c` (0030's reproducer), six levels | verifier clean; assembly identical at `-O0`; one load removed at `-O1`, two at `-O2/-O3/-Os/-Oz` (`ldx zp; stx zp` → `sta zp`) |
 | Project toolchain + MAME/bsnes-jg corpus gate (`dev/run.sh corpus-a16`) | 79 of 79 programs pass (host == default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg), 0 fail, 0 xfail |
 
 The typical change is the intended one: after `$y = LDImag8 $rcN`, a later
@@ -73,8 +79,32 @@ after `$a = T_A $x` an X-to-Y copy becomes a single `TA`. The six pairs that
 grow do so because the reused register's live range is now honestly longer, so
 the scavenger hands a later temporary a different register (X instead of Y);
 in `920506-1.c` a value that was previously derived in place by `dex` is then
-materialised by `ldx #0`, one byte longer. None of those six executes more
-instructions than before.
+materialised by `ldx #0`, one byte longer. None of those six has a higher
+static emitted instruction count. Runtime instruction counts and cycles were
+not measured.
+
+The independent audit reconstructed the MOS tests from the pinned revision,
+applied exactly 0030 then 0031, and reran CodeGen and MC with a frozen copy of
+the candidate binary. The earlier `lit-mos-0031.json` contains one CodeGen
+failure against the old expectation plus 46 MC tool failures; it does not
+support a clean combined suite claim. The new audit's clean result is
+`build/0031-review-audit/lit-0031.json`. Its six additional MIR probes cover
+source and destination alias clobbers, a call register mask, subregister kill
+clearing, repeated destination reuse, and preserving an unrelated dead NZ
+definition.
+
+The corpus audit rehashed all 4,090 successful assembly pairs and reassembled
+all 435 differing pairs. It replayed nine pairs from C, covering all six size
+increases and the largest size reduction at each optimization level; all
+outputs match the saved hashes. It also reran the original reproducer at six
+levels. The full C-to-assembly corpus was not rerun. The 61 assembler failures are
+register-name collisions: C globals named `a`, `c`, `s`, `x` or `y` (and case
+variants) that the MOS assembler reads as register operands; all fail on both
+sides.
+
+The completed emulator log exercises the local compiler and patch stack. It
+is useful integration evidence but is not an isolated upstream runtime
+comparison of 0030 against 0030+0031, so it is not claimed in the upstream PR.
 
 Artifacts under `build/0030-claude-review/`: `diff2.py` / `diff2-results.json`
 (per-file verdicts and assembly hashes), `diff2/` (both assemblies of every

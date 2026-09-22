@@ -1000,7 +1000,11 @@ contract of native mode, while independent fixes continue in parallel.
   `getRegWithVal` was dead code (clobber map updated before the copy was checked);
   fixed, with a new MIR test and one upstream test's checks regenerated.
   [Evidence](docs/pr-preparations/2026-09-22/0031-validation.md): no new failures,
-  `.text` −2,530 bytes over the c-torture corpus, MAME + bsnes-jg corpus gate.
+  `.text` −2,530 bytes over 374 changed corpus pairs that assemble (six grow),
+  MOS CodeGen 85 pass / one unsupported, MC 46 pass. The
+  [independent review](docs/pr-preparations/2026-09-22/0031-review-audit.md) found
+  no correctness defect and corrected the submission evidence; local emulator
+  integration records 79/79 passes separately.
   Remaining: publish the [PR](docs/upstream-copy-phys-reg-reuse-dst-pr.md) after
   0030 lands (user-triggered).
 - [T4] **Undef-lane fix 0028:** validated, with publication held until #320/#321 are

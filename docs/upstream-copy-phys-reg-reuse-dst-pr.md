@@ -40,30 +40,41 @@ establishing definition, and two controls (clobbered destination, redefined
 source) that must keep the fallback.
 
 Validated against llvm-mos `742d554bf08042b8df93d791c335260fadd16643` (identical
-to `main` at the time of writing), with the preceding fix and this change
-applied and assertions enabled:
+to `main` at the time of writing; both changes also apply cleanly on a tree
+carrying newer LLVM merges), comparing the preceding liveness fix alone with
+this change on top, with assertions enabled in both backends:
 
-- MOS CodeGen: 84 pass, one existing unsupported test, including the new test
+- MOS CodeGen: 85 pass, one existing unsupported test, including the new test
   and the updated `copy-phys-reg.mir`. MOS MC: 46 pass.
-- The new MIR cases fail their output checks without this change (the fallback
-  reload is emitted) and pass with it; the two controls pass either way.
-- gcc `c-torture/execute` (1,390 of its 1,656 files compile with the pinned
-  Clang) at `-O0`,
-  `-O2` and `-Os` with MachineVerifier, comparing the backend with only the
-  preceding fix against this change on top: no new failures; 3,655
-  compilations are identical and 435 differ. Over the 374 differing pairs that
-  assemble, `.text` shrinks by 2,530 bytes (1,364,382 → 1,361,852); six pairs
-  grow by one to four bytes because the reused register's longer live range
-  changes a later scavenger choice, and no function executes more instructions.
+- All five MIR cases pass verification with either backend. The three reuse
+  cases fail their output checks without this change and pass with it; the two
+  clobber controls pass either way. All six preceding liveness cases still pass.
+  Additional review probes cover alias clobbers, a call's register mask,
+  subregister kills, repeated reuse, and an unrelated dead definition.
+- Of 1,656 gcc `c-torture/execute` files attempted, 1,390 compile to IR at each
+  of `-O0`, `-O2` and `-Os`. Across 4,170 backend comparisons with
+  MachineVerifier, 3,655 successful pairs are identical, 435 differ, and 80
+  fail on both sides. No compilation newly fails or newly succeeds.
+- Reassembling the 374 differing pairs accepted by the assembler gives a net
+  `.text` reduction of 2,530 bytes (1,364,382 → 1,361,852): 352 pairs shrink,
+  16 retain their size, and six grow by one to four bytes. The other 61 pairs
+  fail to assemble on both sides and are excluded from this size measurement.
+  The six increases involve a changed scavenger choice; a later `inx` or `dex`
+  becomes an immediate load. Across all 435 changed pairs, the static emitted
+  instruction count falls by 1,824, with no file-level increase. This is not
+  an execution-time or cycle-count measurement. The same comparison at `-O2`
+  for `mos65c02` and `mosw65816` shows no new failures either (1,323 identical,
+  41 differing, 26 failing on both sides, for each).
   The typical change is `ldx __rcN; stx __rcM` becoming `sty __rcM`, or a
   `T_A`/`TA` pair becoming a single `TA`.
 - The `-O0` reproducer from the preceding fix still verifies at all six levels;
-  its assembly is unchanged at `-O0` and three to six lines shorter above it.
-- The project's SNES corpus gate (each program's result compared across the host
-  oracle, the default 8-bit build, `+mos-a16` and `+mos-xy16`, on MAME and
-  bsnes-jg) with this change in the toolchain: 79 of 79 programs pass (host == default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg), 0 fail, 0 xfail.
-
+  its assembly is unchanged at `-O0`, with one redundant load removed at `-O1`
+  and two removed at `-O2`, `-O3`, `-Os` and `-Oz`.
 
 Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`, `high`
 reasoning effort) for the diagnosis, implementation, tests, validation, and PR
 drafting, while reviewing the preceding change.
+
+Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`,
+`xhigh` reasoning effort) for independent review, validation, and corrections
+to the submission evidence.
