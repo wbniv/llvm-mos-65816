@@ -107,6 +107,10 @@ if [ ! -d "$SRC/.git" ]; then
   # Baseline MOS assembler: BRK carries its architectural signature byte.
   apply_patch 0024-mos-brk-signature-operand
   apply_patch 0025-llvm-mc-preserve-motorola-default
+  # Reused physical values stay live through copy expansion's added uses.
+  apply_patch 0030-mos-copy-phys-reg-liveness
+  # Copy expansion may reuse the destination of an earlier copy (stacked on 0030).
+  apply_patch 0031-mos-copy-phys-reg-reuse-dst
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

@@ -1,15 +1,14 @@
 # [MOS] Post-RA expansion produces an undefined Y read at -O0 on mos6502
 
+**Superseded by [patch 0030 and its PR draft](upstream-copy-phys-reg-liveness-pr.md).**
+The failure is a stale kill flag when copy expansion reuses a physical value.
+See the [diagnosis and validation](pr-preparations/2026-09-22/0030-validation.md).
+The report below records the unpatched behavior.
+
 Compiling the C function below with `--target=mos -mcpu=mos6502 -O0
 -mllvm -verify-machineinstrs` fails after post-RA pseudo instruction expansion.
 It succeeds without MachineVerifier, and with MachineVerifier at `-O1`, `-O2`,
 `-O3`, `-Os`, and `-Oz`.
-
-The function is the Newton-step calculation from a C torture test packaged as
-the [Newton Fractal SNES demo](https://biohack.net/snes/newton/). This reproduction
-uses ordinary 6502 compilation with no native-width feature flags, inline
-assembly, or downstream compiler patches. The function body is retained from
-the standalone demo-derived compiler input; it is not a constructed MIR test.
 
 ## Reproducer
 
@@ -63,7 +62,7 @@ Observed diagnostic:
 fatal error: error in backend: Found 1 machine code errors.
 ```
 
-## Validation and limits
+## Baseline validation and limits
 
 Reproduced September 22, 2026, with Clang and the backend built from unmodified
 [`742d554bf08042b8df93d791c335260fadd16643`](https://github.com/llvm-mos/llvm-mos/commit/742d554bf08042b8df93d791c335260fadd16643),
@@ -77,6 +76,6 @@ no intermediate IR or MIR edits are needed.
 | `-O0` | Pass | Undefined `$y` after post-RA expansion |
 | `-O1`, `-O2`, `-O3`, `-Os`, `-Oz` | Pass | Pass |
 
-The failure stage and instruction above are observations, not a root-cause
-diagnosis. No compiler fix or runtime-miscompile claim is included. The input
-is not claimed to be minimal.
+The original C input is not minimal. The fix's separate MIR regression isolates
+the copy-reuse mechanism. No runtime-miscompilation claim is made: the repaired
+backend produces identical assembly for this input at all six optimization levels.

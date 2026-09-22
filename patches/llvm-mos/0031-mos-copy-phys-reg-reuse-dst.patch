@@ -1,0 +1,176 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index bb835d3..853df21 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+@@ -763,7 +763,9 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
+   const TargetRegisterInfo *TRI = Builder.getMRI()->getTargetRegisterInfo();
+ 
+   const auto ReuseReg = [&](MachineInstr &Copy, Register Reg) {
+-    // Reusing this value extends its live range to the insertion point.
++    // Reusing this value extends its live range to the insertion point. The
++    // establishing copy may have defined Reg as dead.
++    Copy.clearRegisterDeads(Reg);
+     for (MachineInstr &MI : make_range(MachineBasicBlock::iterator(Copy),
+                                       Builder.getInsertPt()))
+       MI.clearRegisterKills(Reg, TRI);
+@@ -777,27 +779,29 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
+   for (MachineInstr &MI :
+        make_range(MachineBasicBlock::reverse_iterator(Builder.getInsertPt()),
+                   Builder.getMBB().rend())) {
+-    for (Register R : RC)
+-      if (MI.modifiesRegister(R, TRI))
+-        Clobbered[R] = true;
+-
+     // At this point, all previous copies will already have been lowered.
+-    if (!isTargetCopy(MI)) {
+-      if (MI.modifiesRegister(Val, TRI))
+-        goto none;
+-      continue;
+-    }
+-
+-    Register Dst = MI.getOperand(0).getReg();
+-    Register Src = MI.getOperand(1).getReg();
++    if (isTargetCopy(MI)) {
++      Register Dst = MI.getOperand(0).getReg();
++      Register Src = MI.getOperand(1).getReg();
+ 
+-    if (Dst == Val) {
+-      if (RC.contains(Src) && !Clobbered[Src])
+-        return ReuseReg(MI, Src);
+-      break;
++      if (Dst == Val) {
++        if (RC.contains(Src) && !Clobbered[Src])
++          return ReuseReg(MI, Src);
++        break;
++      }
++      // Dst received Val's value here and is reusable unless one of the
++      // instructions already visited (i.e. after this copy) clobbered it. This
++      // copy's own definition of Dst is recorded only after the check below,
++      // otherwise Dst would always appear clobbered.
++      if (Src == Val && RC.contains(Dst) && !Clobbered[Dst])
++        return ReuseReg(MI, Dst);
+     }
+-    if (Src == Val && RC.contains(Dst) && !Clobbered[Dst])
+-      return ReuseReg(MI, Dst);
++    if (MI.modifiesRegister(Val, TRI))
++      goto none;
++
++    for (Register R : RC)
++      if (MI.modifiesRegister(R, TRI))
++        Clobbered[R] = true;
+   }
+ 
+ none:
+diff --git a/llvm/test/CodeGen/MOS/copy-phys-reg-reuse-dst.mir b/llvm/test/CodeGen/MOS/copy-phys-reg-reuse-dst.mir
+new file mode 100644
+index 000000000000..e92037a53df8
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/copy-phys-reg-reuse-dst.mir
+@@ -0,0 +1,93 @@
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=postrapseudos -verify-machineinstrs -o - %s | FileCheck %s
++
++# The destination of an earlier copy still holds the value: X was copied into
++# A, so an X-to-Y copy can be a single TA from A instead of another T_A.
++---
++name: reuse_copy_destination_accumulator
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $x
++    ; CHECK-LABEL: name: reuse_copy_destination_accumulator
++    ; CHECK: $a = T_A $x
++    ; CHECK-NEXT: STAbs $a, 1234
++    ; CHECK-NEXT: $y = TA $a
++    ; CHECK-NEXT: RTS implicit $y, implicit $a
++    $a = COPY $x
++    STAbs $a, 1234
++    $y = COPY $x
++    RTS implicit $y, implicit $a
++...
++
++# The establishing copy defined A as dead. Reusing A clears that flag.
++---
++name: reuse_dead_copy_destination
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $x
++    ; CHECK-LABEL: name: reuse_dead_copy_destination
++    ; CHECK: $a = T_A $x
++    ; CHECK-NEXT: $y = TA $a
++    ; CHECK-NEXT: RTS implicit $y
++    dead $a = T_A $x
++    $y = COPY $x
++    RTS implicit $y
++...
++
++# Y was loaded from the imaginary register and then killed by the indexed
++# load. The second copy stores Y directly and the stale kill is cleared.
++---
++name: reuse_copy_destination_imag
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rc4, $rs1
++    ; CHECK-LABEL: name: reuse_copy_destination_imag
++    ; CHECK: $y = LDImag8 $rc4
++    ; CHECK-NEXT: $a = LDIndirIdx killed $rs1, $y
++    ; CHECK-NEXT: $rc6 = STImag8 $y
++    ; CHECK-NEXT: RTS implicit $rc6, implicit $a
++    $y = COPY $rc4
++    $a = LDIndirIdx killed $rs1, killed $y
++    $rc6 = COPY $rc4
++    RTS implicit $rc6, implicit $a
++...
++
++# A redefined destination no longer holds the value and is not reused.
++---
++name: clobbered_copy_destination
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $x
++    ; CHECK-LABEL: name: clobbered_copy_destination
++    ; CHECK: $a = T_A $x
++    ; CHECK-NEXT: $a = LDImm 5
++    ; CHECK-NEXT: [[TMP:%[0-9]+]]:ac = T_A $x
++    ; CHECK-NEXT: $y = TA [[TMP]]
++    ; CHECK-NEXT: RTS implicit $y, implicit $a
++    $a = COPY $x
++    $a = LDImm 5
++    $y = COPY $x
++    RTS implicit $y, implicit $a
++...
++
++# A redefined source value cannot be taken from the earlier copy either.
++---
++name: redefined_copy_source
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $x
++    ; CHECK-LABEL: name: redefined_copy_source
++    ; CHECK: $a = T_A $x
++    ; CHECK-NEXT: $x = LDImm 5
++    ; CHECK-NEXT: [[TMP:%[0-9]+]]:ac = T_A $x
++    ; CHECK-NEXT: $y = TA [[TMP]]
++    ; CHECK-NEXT: RTS implicit $y, implicit $a
++    $a = COPY $x
++    $x = LDImm 5
++    $y = COPY $x
++    RTS implicit $y, implicit $a
++...
+diff --git a/llvm/test/CodeGen/MOS/copy-phys-reg.mir b/llvm/test/CodeGen/MOS/copy-phys-reg.mir
+index 9de851df125c..5f236e155670 100644
+--- a/llvm/test/CodeGen/MOS/copy-phys-reg.mir
++++ b/llvm/test/CodeGen/MOS/copy-phys-reg.mir
+@@ -135,8 +135,7 @@ body: |
+     ; CHECK: liveins: $x, $rc0
+     ; CHECK-NEXT: {{  $}}
+     ; CHECK-NEXT: $x = LDImag8 $rc0
+-    ; CHECK-NEXT: [[LDImag8_:%[0-9]+]]:gpr = LDImag8 $rc0
+-    ; CHECK-NEXT: $rc1 = STImag8 [[LDImag8_]]
++    ; CHECK-NEXT: $rc1 = STImag8 $x
+     $x = COPY $rc0
+     $rc1 = COPY $rc0
+ ...

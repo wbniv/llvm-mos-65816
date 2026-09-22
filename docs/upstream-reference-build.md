@@ -82,3 +82,21 @@ not a Clang/SDK installation. See the [validation record](pr-preparations/2026-0
 and [cross-target commands and coverage](pr-preparations/2026-09-22/0029-cross-target-validation.md)
 before choosing a compiler for a follow-up check. These are patch 0029 results;
 they do not validate patch 0028 on other backends.
+
+## Patch 0030 candidate build
+
+`build/newton-postra-src` contains the same pinned revision plus only the
+physical-copy liveness fix. `build/newton-postra-build` reuses a separate copy of
+the assertion-enabled build's objects; the generic two-address source/object is
+restored to pristine upstream. Neither 0028 nor 0029 is applied to this candidate.
+
+Its configuration retains `/work/build/register-exhaustion-src` and
+`/work/build/0029-cross-target-build` as the source and build paths. Mount the
+0030 source and build at those paths when building or running lit; do not point
+this build at the 0029 source. The saved unpatched reference remains unchanged.
+
+The [0030 validation record](pr-preparations/2026-09-22/0030-validation.md)
+documents five focused MIR cases, 84 passing MOS CodeGen tests and one
+unsupported, and six levels of C-derived object emission with identical assembly.
+The unchanged frontend is the saved upstream Clang; the candidate provides
+patched `llc` and `opt`. Non-MOS backends were not tested for 0030.

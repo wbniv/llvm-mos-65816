@@ -1,0 +1,156 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index a7eacc0d6b0e..bb835d372ce9 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+@@ -762,6 +762,14 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
+ 
+   const TargetRegisterInfo *TRI = Builder.getMRI()->getTargetRegisterInfo();
+ 
++  const auto ReuseReg = [&](MachineInstr &Copy, Register Reg) {
++    // Reusing this value extends its live range to the insertion point.
++    for (MachineInstr &MI : make_range(MachineBasicBlock::iterator(Copy),
++                                      Builder.getInsertPt()))
++      MI.clearRegisterKills(Reg, TRI);
++    return Reg;
++  };
++
+   // Whether the register still holds the value it does at the Builder
+   // instruction.
+   DenseMap<Register, bool> Clobbered;
+@@ -785,11 +793,11 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
+ 
+     if (Dst == Val) {
+       if (RC.contains(Src) && !Clobbered[Src])
+-        return Src;
++        return ReuseReg(MI, Src);
+       break;
+     }
+     if (Src == Val && RC.contains(Dst) && !Clobbered[Dst])
+-      return Dst;
++      return ReuseReg(MI, Dst);
+   }
+ 
+ none:
+diff --git a/llvm/test/CodeGen/MOS/copy-phys-reg-liveness.mir b/llvm/test/CodeGen/MOS/copy-phys-reg-liveness.mir
+new file mode 100644
+index 000000000000..60722fb81796
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/copy-phys-reg-liveness.mir
+@@ -0,0 +1,117 @@
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=postrapseudos -verify-machineinstrs -o - %s | FileCheck %s
++
++# Reusing Y for the second store extends its live range across the indexed load.
++# The pointer's kill remains valid because that value has no additional use.
++---
++name: reuse_gpr_after_kill
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $y, $rs1
++    ; CHECK-LABEL: name: reuse_gpr_after_kill
++    ; CHECK: $rc4 = STImag8 $y
++    ; CHECK-NEXT: $a = LDIndirIdx killed $rs1, $y
++    ; CHECK-NEXT: $rc6 = STImag8 $y
++    ; CHECK-NEXT: RTS implicit $rc6
++    $rc4 = COPY $y
++    $a = LDIndirIdx killed $rs1, killed $y
++    $rc6 = COPY $rc4
++    RTS implicit $rc6
++...
++
++# An X-to-Y copy can reuse the value in A when A still holds X's value.
++---
++name: reuse_accumulator_after_kill
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $a
++    ; CHECK-LABEL: name: reuse_accumulator_after_kill
++    ; CHECK: $x = TA $a
++    ; CHECK-NEXT: STAbs $a, 1234
++    ; CHECK-NEXT: $y = TA $a
++    ; CHECK-NEXT: RTS implicit $y
++    $x = COPY $a
++    STAbs killed $a, 1234
++    $y = COPY $x
++    RTS implicit $y
++...
++
++# Reusing a register also clears overlapping subregister kill flags.
++---
++name: reuse_gpr_after_subregister_kill
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $y
++    ; CHECK-LABEL: name: reuse_gpr_after_subregister_kill
++    ; CHECK: $rc4 = STImag8 $y
++    ; CHECK-NEXT: KILL $ylsb
++    ; CHECK-NEXT: $rc6 = STImag8 $y
++    ; CHECK-NEXT: RTS implicit $rc6
++    $rc4 = COPY $y
++    KILL killed $ylsb
++    $rc6 = COPY $rc4
++    RTS implicit $rc6
++...
++
++# The copy establishing the reusable value is part of the extended live range.
++---
++name: reuse_gpr_killed_by_copy
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $y
++    ; CHECK-LABEL: name: reuse_gpr_killed_by_copy
++    ; CHECK: $rc4 = STImag8 $y
++    ; CHECK-NEXT: $rc6 = STImag8 $y
++    ; CHECK-NEXT: RTS implicit $rc6
++    $rc4 = STImag8 killed $y
++    $rc6 = COPY $rc4
++    RTS implicit $rc6
++...
++
++# A redefined register cannot supply its previous value. Its earlier kill
++# remains valid, and the copy must load the value from the imaginary register.
++---
++name: clobbered_gpr_value
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $y, $rs1
++    ; CHECK-LABEL: name: clobbered_gpr_value
++    ; CHECK: $rc4 = STImag8 $y
++    ; CHECK-NEXT: $a = LDIndirIdx killed $rs1, killed $y
++    ; CHECK-NEXT: $y = LDImm 7
++    ; CHECK-NEXT: [[TMP:%[0-9]+]]:gpr = LDImag8 $rc4
++    ; CHECK-NEXT: $rc6 = STImag8 [[TMP]]
++    ; CHECK-NEXT: RTS implicit $rc6, implicit $y
++    $rc4 = COPY $y
++    $a = LDIndirIdx killed $rs1, killed $y
++    $y = LDImm 7
++    $rc6 = COPY $rc4
++    RTS implicit $rc6, implicit $y
++...
++
++# Repeated reuse: the second reuse extends the live range across the first
++# reused use as well, and both stores read Y.
++---
++name: reuse_gpr_twice
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $y, $rs1
++    ; CHECK-LABEL: name: reuse_gpr_twice
++    ; CHECK: $rc4 = STImag8 $y
++    ; CHECK-NEXT: $a = LDIndirIdx killed $rs1, $y
++    ; CHECK-NEXT: $rc6 = STImag8 $y
++    ; CHECK-NEXT: STAbs killed $a, 1234
++    ; CHECK-NEXT: $rc7 = STImag8 $y
++    ; CHECK-NEXT: RTS implicit $rc6, implicit $rc7
++    $rc4 = COPY $y
++    $a = LDIndirIdx killed $rs1, killed $y
++    $rc6 = COPY $rc4
++    STAbs killed $a, 1234
++    $rc7 = COPY $rc4
++    RTS implicit $rc6, implicit $rc7
++...

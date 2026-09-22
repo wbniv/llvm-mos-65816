@@ -57,6 +57,8 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0023-mos-trunc-selection-regclasses.patch"
   "$PATCHES/0024-mos-brk-signature-operand.patch"
   "$PATCHES/0025-llvm-mc-preserve-motorola-default.patch"
+  "$PATCHES/0030-mos-copy-phys-reg-liveness.patch"
+  "$PATCHES/0031-mos-copy-phys-reg-reuse-dst.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/interrupt-width-65816.ll"

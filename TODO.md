@@ -988,14 +988,22 @@ contract of native mode, while independent fixes continue in parallel.
   Upstream main is identical to the pinned base. Remaining: prepare the standalone
   branch and publish the [PR](docs/upstream-twoaddr-physreg-reschedule-pr.md)
   (user-triggered). No #320/#321 dependency.
-- [ ] **Reentrant contract:** the report needs a semantics answer before selecting
+- [T4] **Reentrant contract:** the report needs a semantics answer before selecting
   a fix or documentation change. [Readiness](docs/upstream-pending-work.md#what-issue-means-here).
-- [ ] **Physical-copy liveness fix 0030:** implementation and validation are
-  complete. Review the [submission](docs/upstream-copy-phys-reg-liveness-pr.md),
-  check current upstream applicability, prepare the branch, and publish.
-  [Evidence](docs/pr-preparations/2026-09-22/0030-validation.md): five focused cases
-  and MOS CodeGen pass; original-input assembly is unchanged at six levels.
-- [ ] **Undef-lane fix 0028:** validated, with publication held until #320/#321 are
+- [T5] **Physical-copy liveness fix 0030:** implemented, validated, and
+  [independently reviewed](docs/pr-preparations/2026-09-22/0030-claude-review.md)
+  (sixth MIR case added; c-torture corpus: 20 verifier failures repaired, 4,070
+  assemblies identical; MOS CodeGen 84 + MC 46 pass). Upstream `main` is identical
+  to the pinned base. Remaining: prepare the branch and publish the
+  [PR](docs/upstream-copy-phys-reg-liveness-pr.md) (user-triggered).
+- [T5] **Copy-destination reuse 0031 (stacked on 0030):** the second reuse path in
+  `getRegWithVal` was dead code (clobber map updated before the copy was checked);
+  fixed, with a new MIR test and one upstream test's checks regenerated.
+  [Evidence](docs/pr-preparations/2026-09-22/0031-validation.md): no new failures,
+  `.text` −2,530 bytes over the c-torture corpus, MAME + bsnes-jg corpus gate.
+  Remaining: publish the [PR](docs/upstream-copy-phys-reg-reuse-dst-pr.md) after
+  0030 lands (user-triggered).
+- [T4] **Undef-lane fix 0028:** validated, with publication held until #320/#321 are
   ready to open. Choose the implementation and revalidate the exact submission;
   [the pending-work chart](docs/upstream-pending-work.md) records the hold and evidence.
 
@@ -1050,7 +1058,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   setup/conventions are a separate discussion, with no merge dependency.
   [PR mockup](docs/pr-preparations/2026-09-20/mvn-mvp-pr-preview.html).
   Published head `ae3108c31890` and description verified; awaiting review/CI. [Downstream validation](docs/pr-preparations/2026-09-20/mvn-downstream-validation.md).
-- [ ] **Separate 65816 simulator discussion:** prepared [draft](docs/pr-preparations/2026-09-20/65816-simulator-discussion-body.md)
+- [T5] **Separate 65816 simulator discussion:** prepared [draft](docs/pr-preparations/2026-09-20/65816-simulator-discussion-body.md)
   covers prior discussions, runner selection, CI setup and result conventions.
   Review/post independently of MVN/MVP; no execution harness implemented yet.
 - [T4] **Reconcile with llvm-mos-sdk#415.** Updated [plan](docs/415-snes-target-reconciliation.md)

@@ -2,7 +2,9 @@
 
 **PR status last verified 2026-09-21; patch 0028 revalidated September 21;
 patch 0029 validated on MOS and the complete X86/ARM/AArch64 CodeGen suites September 22.
-Patch 0030's copy-liveness fix also passes the MOS CodeGen suite September 22.
+Patch 0030's copy-liveness fix passes the MOS CodeGen suite, local compiler
+integration checks, and an independent review with a c-torture differential
+September 22; its follow-up, patch 0031 (copy-destination reuse), is prepared.
 Other implementation readiness follows the dated validation records and local
 drafts.** This is the actionable view of the
 [contribution tracker](upstream-contribution-status.md). Status describes the work,
@@ -27,9 +29,13 @@ reproduction checks; keep candidate patches in separate builds.
 2. [Newton `-O0` post-RA verifier failure](upstream-newton-6502-postra-issue.md):
    [fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), with patch 0030.
    Copy expansion reuses Y without clearing an earlier kill. The fix passes
-   five focused MIR cases and 84 MOS CodeGen tests, with one unsupported.
+   six focused MIR cases and 84 MOS CodeGen tests, with one unsupported;
+   all 46 MOS MC tests pass in the standalone audit.
    The original input verifies at all six optimization levels, with identical
-   assembly before and after the fix. [Validation](pr-preparations/2026-09-22/0030-validation.md).
+   assembly before and after the fix. The local compiler is rebuilt and installed,
+   with 24 integration compilations passing.
+   [Validation](pr-preparations/2026-09-22/0030-validation.md) ·
+   [PR preview](pr-preparations/2026-09-22/0030-pr-preview.html).
 3. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
    semantics question, now verified with the stock upstream frontend and `opt`.
 
@@ -54,7 +60,18 @@ Patch 0030 submission status:
 - [x] Reproduce the C failure and isolate copy expansion's stale kill flag.
 - [x] Implement the fix and test register reuse, aliases, and clobber handling.
 - [x] Pass the MOS CodeGen suite and compare original-input assembly at six levels.
-- [ ] Review the final submission and check current upstream applicability.
+- [x] Rebuild and install the local compiler; pass 24 integration compilations
+  and all five MIR cases.
+- [x] Independent review: sixth MIR case, c-torture differential (20 repaired, 4,070 identical), upstream `main` identical to the pinned base; [record](pr-preparations/2026-09-22/0030-claude-review.md).
+- [x] Audit the independent review: correct corpus accounting and confirm six
+  cases plus both MOS suites with the saved 0030-only binary;
+  [record](pr-preparations/2026-09-22/0030-review-audit.md).
+- [x] Prepare the [browser preview](pr-preparations/2026-09-22/0030-pr-preview.html)
+  with the exact patch and AI attribution, including tool version, model, and effort.
+- [x] Review the 0030 code and corrected validation claims.
+- [x] Claude's updated attribution records CLI `2.1.278`, model
+  `claude-fable-5-1`, and `high` reasoning effort.
+- [ ] Recheck current upstream applicability when preparing the branch.
 - [ ] Prepare the standalone branch and publish the fix PR.
 
 **Prepared but held: patch `0028`, the `VirtRegRewriter` undef-lane fix.**
@@ -86,7 +103,7 @@ failure with the stock upstream frontend and backend.
 | 65816 simulator discussion | Separate [discussion draft](pr-preparations/2026-09-20/65816-simulator-discussion-body.md) prepared; unposted |
 | Reentrant attribute semantics | Report drafted; agree the intended contract before selecting a fix or documentation change |
 | Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass; final and independent reviews complete; current-upstream applicability, branch preparation, and publication remain |
-| Newton `-O0` post-RA expansion | [Fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), patch 0030; five focused cases and MOS CodeGen pass; final review, current-upstream applicability, branch preparation, and publication remain |
+| Newton `-O0` post-RA expansion | [Fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), patch 0030; six focused cases and MOS CodeGen/MC pass; review audited and attribution complete; check upstream applicability, prepare branch, and publish |
 | Scavenger live-P (`0011`) | Establish a valid upstream producer, reduce the test, rebase, and validate |
 | Call-clobbered coalescing guard (`0015`) | Revalidate diagnosis and upstream reachability; prefer a root-cause fix |
 | Trunc-selection fallback (`0023`) | Establish a real upstream producer for the independent Imag8-to-i1 portion; retain fork-specific content with its feature series |
@@ -107,8 +124,9 @@ for the complete CI table. Job failure causes were not re-audited September 21.
 1. Prepare the standalone branch for patch 0029 and publish its PR. The fix,
    full-suite validation, final review and independent review are complete, and
    upstream `main` is identical to the pinned base; it has no #320/#321 dependency.
-2. Review the patch 0030 submission, check current upstream applicability, and
-   prepare its independent fix PR.
+2. Check upstream applicability, prepare the branch, and publish
+   [patch 0030](pr-preparations/2026-09-22/0030-pr-preview.html), whose code and
+   evidence have been reviewed. Review patch 0031 separately afterward.
 3. Prepare the #320/#321 presentation before publishing `0028`; retain both fix
    implementations for the submission decision.
 4. Follow review/CI of the six posted compiler fixes and SDK #450; request re-review
@@ -166,7 +184,7 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | Scavenger live-P (`0011`) | Downstream fix/draft exists | **Not ready to post** | Establish a valid upstream producer, reduce test, rebase and validate | No SDK dependency; otherwise include with native compiler feature |
 | Call-clobbered coalescing guard (`0015`) | Downstream workaround/draft exists | **Not ready to post** | Revalidate diagnosis and stock-upstream reachability; prefer root-cause fix | No SDK dependency; currently triggered by fork features |
 | Mixed-width pointer across call: RA exhausts registers | Patch 0029 validated, final and independent reviews complete; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
-| Post-RA physical-copy reuse: stale Y kill | Patch 0030 validated; five focused cases and MOS CodeGen pass; original assembly unchanged at six levels | **Fix PR prepared, unposted** | Review final submission, check current upstream applicability, prepare branch, and publish | No |
+| Post-RA physical-copy reuse: stale Y kill | Patch 0030 validated and review audited; six focused cases and MOS CodeGen/MC pass; original assembly unchanged at six levels | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
 | #320 far-address-space series (`0001` and related content) | Substantial downstream implementation exists | **Series not posted** | Agree ABI, extract coherent compiler commits and validate standalone | No; SDK integration follows agreed compiler/runtime ABI |
 | #321 native-width series (`0002` and related content) | Substantial downstream implementation exists | **Series not posted** | Extract native-only commits from mixed aggregate, document ABI/interrupt contract, validate and post one complete draft PR | No; native runtime required to execute examples |
 | `0023` trunc-selection fallback | Downstream patch exists; includes fork-specific content | **Unassessed standalone candidate** | Prove a real upstream producer for the Imag8→i1 half; keep Imag32/a16 half with its feature | No; not ready for a standalone PR |
@@ -198,6 +216,10 @@ flowchart TD
     RA[Register-exhaustion fix 0029] --> RAT[Validated: MOS suite and complete X86/ARM/AArch64 suites]
     RAT --> RAREVIEW[Review final plain-6502 submission]
     RAREVIEW --> RAPR[Publish independent fix PR] --> MERGED
+    COPY[Physical-copy liveness fix 0030] --> COPYT[Validated: six MIR cases, MOS suites, c-torture differential]
+    COPYT --> REUSE[Patch 0031: copy-destination reuse, stacked]
+    COPYT --> COPYREVIEW[Review submission and check current upstream applicability]
+    COPYREVIEW --> COPYPR[Prepare branch and publish independent fix PR] --> MERGED
   end
   subgraph SNES[SNES platform — separate track]
     EXIST[Existing SDK PR 415 + our platform] --> RECON[Reconcile baseline target and CPU mode]
