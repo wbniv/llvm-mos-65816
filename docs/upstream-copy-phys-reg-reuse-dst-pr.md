@@ -61,7 +61,7 @@ applied and assertions enabled:
   its assembly is unchanged at `-O0` and three to six lines shorter above it.
 - The project's SNES corpus gate (each program's result compared across the host
   oracle, the default 8-bit build, `+mos-a16` and `+mos-xy16`, on MAME and
-  bsnes-jg) with this change in the toolchain: 70 of 80 programs pass (host == default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg), 0 fail; run still in progress at commit time, final figure to follow.
+  bsnes-jg) with this change in the toolchain: 79 of 79 programs pass (host == default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg), 0 fail, 0 xfail.
 
 
 Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`, `high`

@@ -65,7 +65,7 @@ byte.
 | `.text` bytes over the 374 differing pairs that assemble (61 skipped: a C global named `s` clashes with the `S` register in the assembler, on both sides) | 1,364,382 → 1,361,852, −2,530 bytes; 6 pairs grow by 1–4 bytes, 368 shrink |
 | instruction count over all 435 differing pairs | −1,824 instructions, none grow |
 | `newton-step.c` (0030's reproducer), six levels | verifier clean; assembly identical at `-O0`, 3–6 lines shorter at `-O1…-Oz` (`ldx zp; stx zp` → `sta zp`) |
-| Project toolchain + MAME/bsnes-jg corpus gate (`dev/run.sh corpus-a16`) | 70 of 80 programs pass (host == default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg), 0 fail; run still in progress at commit time, final figure to follow |
+| Project toolchain + MAME/bsnes-jg corpus gate (`dev/run.sh corpus-a16`) | 79 of 79 programs pass (host == default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg), 0 fail, 0 xfail |
 
 The typical change is the intended one: after `$y = LDImag8 $rcN`, a later
 `$rcM = COPY $rcN` becomes `sty __rcM` instead of `ldx __rcN; stx __rcM`, and
