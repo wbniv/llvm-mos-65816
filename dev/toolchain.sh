@@ -86,6 +86,9 @@ if [ ! -d "$SRC/.git" ]; then
   # generic-LLVM + clang half only; the MOS-dir half is already inside 0002
   apply_patch 0006-320-packed24 \
     --include='clang/*' --include='llvm/include/*' --include='llvm/lib/CodeGen/*'
+  # Keep call-argument registers available to constrained virtual operands
+  # when the two-address pass considers moving a physical-register definition.
+  apply_patch 0029-llvm-twoaddr-physreg-reschedule
   # Upstream-bound standalone fix, carried until it merges — the same slot and
   # lifecycle as the retired 0003-late-opt-txy-dead-flag (-> PR #562). Applies
   # after 0002 because both touch MOSLateOptimization.cpp, and it is BAKED INTO
