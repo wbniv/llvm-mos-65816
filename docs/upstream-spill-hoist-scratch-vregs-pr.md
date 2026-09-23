@@ -57,7 +57,7 @@ Validated on llvm-mos `742d554bf08042b8df93d791c335260fadd16643` (identical to
 - Downstream, the project's SNES corpus (each program's result compared across
   the host oracle, the default build and two accumulator-width modes on MAME
   and bsnes-jg) with the toolchain rebuilt without the driver flag:
-  76 of 79 programs pass, 0 fail; run still in progress at commit time, final figure to follow.
+  79 of 79 programs pass (host == default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg), 0 fail, 0 xfail.
 
 
 

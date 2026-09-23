@@ -8,7 +8,7 @@ in Machine Copy Propagation.
 - [x] Root cause: greedy's `hoistAllSpills` runs after allocation and re-emits spills via `storeRegToStackSlot`; MOS's soft-stack `STStk` mints a scratch `Imag16` vreg that is then never assigned. `-disable-spill-hoist` makes all ten cases compile; the driver passes that flag on every compile.
 - [x] Fix: generic guard in `hoistAllSpills` (refuse a group whose re-emitted spill introduces vregs); remove the driver's blanket flag.
 - [x] Reduced regression test: `llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll` (49-line function from `950714-1.c` via `llvm-reduce`; two RUN lines, hoisting on and off).
-- [x] Suites (MOS 135/1/0; X86/ARM/AArch64 clean), corpus differential hoisting-with-guard vs hoisting-disabled, project toolchain rebuilt; emulator gate in progress at commit time.
+- [x] Suites (MOS 135/1/0; X86/ARM/AArch64 clean), corpus differential hoisting-with-guard vs hoisting-disabled, project toolchain rebuilt; emulator gate 79/79.
 - [x] Commit. Publish (user-triggered).
 
 ## Why `clang` never showed it
@@ -35,7 +35,7 @@ is the last binary without it and `llc-hoist-fix` the first with it.
 | MOS CodeGen + MC, assertions | 135 pass, 1 unsupported, 0 fail |
 | c-torture, 1,390 × `-O0/-O2/-Os`, fixed `llc` with hoisting vs the same `llc` with `-disable-spill-hoist` | 0 new failures either way; 16 compilations differ; `.text` −4,510 bytes over those 16, none grow |
 | X86 + ARM + AArch64 CodeGen suites (generic change) | 11,459 tests: 11,361 pass, 23 expectedly fail, 0 fail (75 first-pass failures were unbuilt helper tools in that build directory: split-file, llvm-dwarfdump, llvm-as, llvm-profdata, llvm-nm, llvm-cgdata, llvm-lto2; all 75 pass once built) |
-| Project toolchain (vendor: guard + driver flag removed) + MAME/bsnes-jg corpus gate | 76 of 79 programs pass, 0 fail; run still in progress at commit time, final figure to follow |
+| Project toolchain (vendor: guard + driver flag removed) + MAME/bsnes-jg corpus gate | 79 of 79 programs pass (host == default == +mos-a16 == +mos-xy16 on MAME and bsnes-jg), 0 fail, 0 xfail |
 
 The reduction predicate required both "old compiler asserts `Remaining virtual
 register`" and "new compiler verifies clean", so the test pins the mechanism,
