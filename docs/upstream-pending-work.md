@@ -74,14 +74,19 @@ Of 4,170 backend compilations of the 1,390 files the pinned Clang accepts
 repairs 18 (12 files). What remains, by class, with the assessment behind the
 rank in `TODO.md`:
 
-| Compilations | Class | Assessment |
-|---:|---|---|
-| 18 | `G_PREFETCH` never legalized (`__builtin_prefetch`) | a hint; dropping it is legal; tiny fix, real reach (portable code uses the builtin) |
-| 10 | `asm("" : "+g"(x))`: "unable to translate instruction: call" | the `g` constraint is unsupported in GlobalISel inline-asm lowering; a common barrier idiom |
-| 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | unsupported builtins; a feature (read the hard stack) or a clean diagnostic |
-| 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` on a 16-bit value in `20030222-1.c`) | shape-specific (a simple `int` case compiles); needs the exact reduction |
-| 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | vector extensions; scalarization missing |
-| 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
+| Order | Tier | Compilations | Class | Assessment |
+|---:|---|---:|---|---|
+| 1 | T2 | 18 | `G_PREFETCH` never legalized (`__builtin_prefetch`) | a hint; dropping it is legal; one legalizer rule plus a test; real reach (portable code uses the builtin) |
+| 2 | T3 | 10 | `asm("" : "+g"(x))`: "unable to translate instruction: call" | the `g` constraint is unsupported in GlobalISel inline-asm lowering; a common optimization-barrier idiom; choose the layer (MOS hook or generic lowering) |
+| 3 | T3 | 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | implement (return address from the hard stack, frame address from `__rc0`) or emit a clean diagnostic |
+| 4 | T4 | 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` on a 16-bit value in `20030222-1.c`) | shape-specific (a simple `int` case compiles); reduce first; a wrong turn miscompiles inline asm |
+| 5 | T3 | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | vector extensions; scalarization rules |
+| — | — | 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
+
+Recommended order: the prefetch no-op first (smallest, clearly correct, immediately
+upstreamable), then the `g` constraint, which unblocks a very common idiom. The
+`[T4]` printer/object disagreement on zero-page-indexed symbol operands (found in
+the 0032 review, not in this corpus) sits alongside item 4 in priority.
 
 Not in the corpus but found alongside: the asm printer and object emitter
 disagree on zero-page-indexed symbol operands (`[T4]` in `TODO.md`).
