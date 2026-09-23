@@ -3,8 +3,9 @@
 **GitHub status last verified:** 2026-09-23, live `gh pr view` / `gh issue view` of every PR and
 issue referenced in this document. Scope: PRs/issues authored by `wbniv` in `llvm-mos/llvm-mos`,
 plus authored PRs in `llvm-mos/llvm-mos-sdk`.
-**13 compiler PRs: 7 merged (#549, #562, #563, #577, #579, #587, #590, #591), 6 open (#578, #584,
-#585, #586, #588, #589, #604), #575 closed unmerged. Both authored issues (#561 and #576) are closed.**
+**13 compiler PRs: 7 merged (#562, #563, #577, #579, #587, #590, #591), 6 open (#578, #584, #586,
+#588, #589, #604). Both authored issues (#561 and #576) are closed.** (#549, #575 and #585 are other
+authors' PRs and were listed here by mistake until 2026‑09‑24; verified with `gh pr view`.)
 **SDK: one authored PR, #450, open.** No state change since the September 21 snapshot.
 
 **Prepared submissions (posting is user-triggered; review evidence is linked below):**
