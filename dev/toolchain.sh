@@ -98,6 +98,12 @@ if [ ! -d "$SRC/.git" ]; then
   # GlobalISel inline asm: store indirect register outputs ("=*r", what clang
   # emits for "+g") through their pointer (generic lowering + MOS/AArch64 tests).
   apply_patch 0037-llvm-gisel-inline-asm-indirect-output
+  # InlineSpiller::coalesceStackAccess must not erase a stack access that carries
+  # extra virtual defs (MOS's reload hook mints an Imag16 scratch pointer): the
+  # orphaned vreg keeps its assignment in the interference matrix over a SlotIndex
+  # with no instruction, and the next region split faults in enterIntvAfter. Same
+  # family as 0033, opposite end of the spiller (generic LLVM + MOS test).
+  apply_patch 0040-llvm-inline-spiller-coalesce-scratch-vregs
   # Upstream-bound standalone fix, carried until it merges — the same slot and
   # lifecycle as the retired 0003-late-opt-txy-dead-flag (-> PR #562). Applies
   # after 0002 because both touch MOSLateOptimization.cpp, and it is BAKED INTO

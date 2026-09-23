@@ -1124,15 +1124,20 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [PR draft](docs/upstream-return-frame-address-pr.md) ·
   [validation](docs/pr-preparations/2026-09-23/0038-validation.md). Aimed at llvm-mos.
   Remaining: publish (user-triggered).
-- [T4] **Greedy RA segfault in `SplitEditor::enterIntvAfter` on `ashrdi-1.c` (`constant_shift`), `mosw65816 -Os`, project toolchain only.**
-  Found 2026‑09‑23 when the c-torture host filter was re-run for 0038: `ashrdi-1` dropped out of
-  scope with "PLEASE submit a bug report" (region split → `splitRegOutBlock` → `enterIntvAfter`).
-  The same IR compiles clean at `-O0`/`-O2` through the upstream-shape assertion `llc` both with and
-  without 0038 (`build/0030-claude-review/llc-final`, `llc-0038`), so it lives in the vendor state
-  (0002 or the in-progress `MOSRegisterInfo.cpp` liveness edits); 0038 touches nothing before
-  register allocation in a function without the builtins. Not proven by a vendor rebuild without
-  0038 (20 min of toolchain churn; do it first if in doubt). Reason for T4: unknown root cause in
-  generic RA splitting driven by MOS register-class shape.
+- [T4] **Greedy RA segfault in `SplitEditor::enterIntvAfter` on `ashrdi-1.c` (patch 0040).**
+  MOS's reload hook mints an `Imag16` scratch pointer as an extra virtual def, which
+  `getVDefInterval` gives a live interval and the allocator assigns like any other register;
+  `InlineSpiller::coalesceStackAccess` then erased that reload as a redundant slot access,
+  orphaning the scratch register — its assignment stayed in the interference matrix over a
+  `SlotIndex` with no instruction, and the next region split read it back as "last interference"
+  and dereferenced null. Not `+mos-a16`-specific and not 65816-specific: `mos65c02` reproduces
+  once the case is reduced; 0002 is only the pressure that reaches the sequence. Fix = decline to
+  coalesce an access carrying virtual defs other than the spilled register — the coalescing
+  counterpart to 0033's hoisting guard. c-torture differential 1,364 byte-identical, 1 repaired,
+  1 changed (+1 byte), 0 broken. [Plan](docs/plans/2026-09-24-ashrdi1-greedy-ra-segfault.md) ·
+  [PR draft](docs/upstream-inline-spiller-coalesce-scratch-vregs-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-24/0040-validation.md). Aimed at llvm-mos.
+  Remaining: publish (user-triggered).
 - [T2] **SPC700 `-O2` crashes on any immediate load into an imaginary register.**
   `MOSLateOptimization::combineLdImm` leaves `Load` null when `LDImm`'s destination is not
   A/X/Y (SPC700 allows `LDImm` to imaginary registers, `MOSInstrInfo.cpp` "On SPC700, LDImm can
@@ -2308,4 +2313,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        of the same defect; it is fixed alongside it, not separately.
      - "corpus/setjmp_sim.c is not a sufficient guard on its own" -> #116 backtrack now covers the
        return-out-of-a-setjmp-frame case and is in expected.tsv, so the gap is closed. -->
+- [verify] **2026-09-24-ashrdi1-greedy-ra-segfault** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-24-ashrdi1-greedy-ra-segfault.md](docs/plans/2026-09-24-ashrdi1-greedy-ra-segfault.md)_  <!-- fp:c386372f7a7437ab -->
 <!-- END auto-captured-deferrals -->
