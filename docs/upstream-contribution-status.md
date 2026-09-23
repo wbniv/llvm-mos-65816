@@ -41,7 +41,11 @@ passes, one unsupported, and 48 MC passes; all 61 corpus cases now assemble,
 with direct objects unchanged. The compatible local compiler is installed.
 [PR draft](upstream-register-named-symbols-pr.md) ·
 [Validation and local API compatibility](pr-preparations/2026-09-23/0032-validation.md).
-Independent review and publication remain.
+The [independent review audit](pr-preparations/2026-09-23/0032-review-audit.md)
+confirms the code and corrects the full-corpus baseline: 821 assembler failures
+fall to zero across 4,091 emitted files; 79 backend failures are excluded.
+All 113 object differences were independently replayed and confirmed to be
+symbol-table ordering only. Branch preparation and publication remain.
 These are local results, not a
 refresh of the GitHub snapshot below.
 
@@ -585,6 +589,16 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   [audit](pr-preparations/2026-09-22/0030-review-audit.md) confirms the code and
   standalone suites and corrects the corpus accounting. Claude's attribution
   now includes CLI `2.1.278`; branch preparation and publication remain; unposted.
+
+- **Spill hoisting versus scratch virtual registers — fix prepared September 23.**
+  [Patch 0033](../patches/llvm-mos/0033-llvm-spill-hoist-no-new-vregs.patch): greedy's
+  post-allocation spill hoisting re-emits spills through the target hook, and MOS's soft-stack
+  `STStk` mints a scratch `Imag16` vreg that is never assigned (`Remaining virtual register` with
+  assertions; a Machine Copy Propagation segfault in release builds, 9 c-torture files at `-O2`).
+  `mos-clang` has masked it with a blanket `-mllvm -disable-spill-hoist`. The fix makes
+  `hoistAllSpills` refuse a group whose re-emitted spill introduces virtual registers and drops the
+  driver flag. [PR draft](upstream-spill-hoist-scratch-vregs-pr.md) ·
+  [validation](pr-preparations/2026-09-23/0033-validation.md). Unposted.
 
 - **Copy-destination reuse — follow-up reviewed September 22.**
   [Patch 0031](../patches/llvm-mos/0031-mos-copy-phys-reg-reuse-dst.patch),

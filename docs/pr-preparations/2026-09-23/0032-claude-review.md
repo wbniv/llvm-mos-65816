@@ -15,6 +15,19 @@ covered and ran the print/assemble round trip over the whole corpus rather than
 the 61 files: all clean. One pre-existing defect surfaced next to the patch and
 is filed separately.
 
+**Codex audit, September 23:** the implementation verdict is confirmed; the
+submission evidence needed corrections. The full baseline has 821 assembly
+failures (61 was the earlier subset), and the zero-page example below uses
+`R_MOS_ADDR8` in both objects. The [audit record](0032-review-audit.md) documents
+independent recounts, all 113 nonidentical-object replays, CPU-specific probe
+regeneration, and the corrected limits of the claims. No patch changes.
+Verified by Claude afterwards: reassembling all 4,091 saved pre-0032
+assemblies with the pre-0032 assembler gives 821 failures; both objects of the
+zero-page probe carry `R_MOS_ADDR8` for the indexed access; the saved probe IR
+pins `"target-cpu"="mos6502"`, so the earlier "65816" probe run was not one; and
+the reduced zero-page input reproduces on the pristine tools for both CPUs
+(`0xBD` direct, `0xB5` reassembled). All four corrections stand.
+
 ## What I verified myself
 
 | Claim | How | Result |
@@ -35,25 +48,31 @@ reassembled with the 0032 `llvm-mc`, compared with `llc -filetype=obj`.
 
 | | |
 |---|---|
-| assembler failures | **0** (61 among the previously compared pairs before 0032, all register-name collisions) |
-| compilations whose text changed with 0032 | 1,078, quoting only |
+| assembler failures | **0**; the audit measured **821** on the full baseline (61 belonged to the earlier subset) |
+| compilations whose text changed with 0032 | 1,078, symbol quoting and comment alignment only |
 | reassembled object identical to the direct object | 3,978 |
 | reassembled object differs | 113, all **symbol-table order only**: every non-symbol-table section's bytes, every relocation (by offset, type, symbol name, addend) and the sorted symbol set are identical |
 
-So the patch makes every generated assembly file in the corpus reassemble, and
-changes nothing in any object. The 113 are the same benign `.symtab` ordering
-Codex saw in two of the 61.
+All 4,091 generated assembly files reassemble to objects equivalent to direct
+output. The 79 backend failures remain outside that result. The 113 differences
+are the same benign `.symtab` ordering Codex saw in two of the 61. This sweep
+did not use `-verify-machineinstrs`; it complements the separate verifier runs.
 
 ## Pre-existing defect found next to it (not 0032's)
 
 For `rs1[i]` with `rs1` in `.zp.bss`, the direct object encodes `lda abs,x`
-(`0xBD`, `R_MOS_ADDR16`) but the printer emits `lda mos8("rs1"),x`, which
+(`0xBD`, `R_MOS_ADDR8`) but the printer emits `lda mos8("rs1"),x`, which
 reassembles as `lda zp,x` (`0xB5`, `R_MOS_ADDR8`): one byte shorter and, at the
 page edge, semantically different (`zp,x` wraps). Same result with
 non-register names and with the pristine `llc` and pristine integrated
 assembler, so it is an upstream printer-versus-object-emitter disagreement
 about zero-page-indexed symbol operands. Filed as a `[T4]` TODO item; it does
 not appear in the torture corpus (no zero-page globals there).
+The different page-wrap rules do not by themselves establish a valid-C runtime
+miscompile for an array wholly allocated in zero page. The demonstrated defect
+is the object/assembly disagreement; the intended addressing contract still
+needs investigation. A [reduced non-register-name input](../../investigations/repro/upstream-issues-2026-09-23/zero-page-indexed-symbol.c)
+now preserves the finding outside the temporary scratchpad.
 
 ## Notes on the draft
 
@@ -65,3 +84,7 @@ Artifacts under `build/0030-claude-review/`: `roundtrip.py`,
 every compilation), `llc-0032`, `llvm-mc-0032`, `llc-before-0032`,
 `llvm-mc-before-0032`, `lit-0032.json`; probes in the session scratchpad
 (`probe.c`, `probe2.c`, `probe2c.c` and their outputs).
+
+Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1
+(`claude-fable-5-1`, `high` reasoning effort) for the independent review.
+The corrections labeled as the Codex audit are attributed in the linked audit.

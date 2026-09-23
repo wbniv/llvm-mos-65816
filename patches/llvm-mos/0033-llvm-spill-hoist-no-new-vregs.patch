@@ -1,0 +1,144 @@
+diff --git a/clang/lib/Driver/ToolChains/CommonArgs.cpp b/clang/lib/Driver/ToolChains/CommonArgs.cpp
+index 3d210db669db..5a4c27045518 100644
+--- a/clang/lib/Driver/ToolChains/CommonArgs.cpp
++++ b/clang/lib/Driver/ToolChains/CommonArgs.cpp
+@@ -2731,16 +2731,6 @@ void tools::addMOSCodeGenArgs(llvm::opt::ArgStringList &CmdArgs) {
+   CmdArgs.push_back("-mllvm");
+   CmdArgs.push_back("-align-large-globals=false");
+ 
+-  // Spill hoisting can turn a spill that requires no additional virtual
+-  // register (say of a GPR), into a spill that does (say of an Imag8). This
+-  // would be fine if spill hoisting didn't occur at the absolute very end of
+-  // register allocation, leaving no chance to assign the register. Global spill
+-  // hoisting doesn't seem like an absolutely essential optimization for now.
+-  // When we revisit, we can notify MOSInstrInfo that it's not allowed to
+-  // generate vregs here, then use the register scavenger.
+-  CmdArgs.push_back("-mllvm");
+-  CmdArgs.push_back("-disable-spill-hoist");
+-
+   // Loop strength reduction gives up too easily, but loop quality is absolutely
+   // essential on the 6502. There's far less code to compile, so we can be
+   // pickier.
+diff --git a/llvm/lib/CodeGen/InlineSpiller.cpp b/llvm/lib/CodeGen/InlineSpiller.cpp
+index 82309cf8ef64..ccc6ef2c067c 100644
+--- a/llvm/lib/CodeGen/InlineSpiller.cpp
++++ b/llvm/lib/CodeGen/InlineSpiller.cpp
+@@ -1868,6 +1868,8 @@ void HoistSpillHelper::hoistAllSpills() {
+                                      StackIntvl.getValNumInfo(0));
+ 
+     // Insert hoisted spills.
++    SmallVector<MachineInstr *, 8> Inserted;
++    bool HookMadeVRegs = false;
+     for (auto const &Insert : SpillsToIns) {
+       MachineBasicBlock *BB = Insert.first;
+       Register LiveReg = Insert.second;
+@@ -1875,11 +1877,40 @@ void HoistSpillHelper::hoistAllSpills() {
+       MachineInstrSpan MIS(MII, BB);
+       TII.storeRegToStackSlot(*BB, MII, LiveReg, false, Slot,
+                               MRI.getRegClass(LiveReg), Register());
++      for (MachineInstr &MI : make_range(MIS.begin(), MII)) {
++        Inserted.push_back(&MI);
++        // A target's spill hook may need scratch registers and express them
++        // as new virtual registers (a frame-address pointer, for example).
++        // Register allocation is over by the time spills are hoisted, so such
++        // registers would never be assigned.
++        for (const MachineOperand &MO : MI.operands())
++          if (MO.isReg() && MO.getReg().isVirtual() && MO.getReg() != LiveReg)
++            HookMadeVRegs = true;
++      }
++      if (HookMadeVRegs)
++        break;
+       LIS.InsertMachineInstrRangeInMaps(MIS.begin(), MII);
+       for (const MachineInstr &MI : make_range(MIS.begin(), MII))
+         getVDefInterval(MI, LIS);
+       ++NumSpills;
+     }
++    if (HookMadeVRegs) {
++      // Undo this group: drop the hoisted spills and keep the originals.
++      LLVM_DEBUG(dbgs() << "Not hoisting: the spill hook introduced virtual "
++                           "registers that can no longer be allocated\n");
++      for (MachineInstr *MI : Inserted) {
++        if (!LIS.isNotInMIMap(*MI)) {
++          for (const MachineOperand &MO : MI->operands())
++            if (MO.isReg() && MO.isDef() && MO.getReg().isVirtual() &&
++                LIS.hasInterval(MO.getReg()))
++              LIS.removeInterval(MO.getReg());
++          LIS.RemoveMachineInstrFromMaps(*MI);
++          --NumSpills;
++        }
++        MI->eraseFromParent();
++      }
++      continue;
++    }
+ 
+     // Remove redundant spills or change them to dead instructions.
+     NumSpills -= SpillsToRm.size();
+diff --git a/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll b/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll
+new file mode 100644
+index 000000000000..144c2d260e2d
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll
+@@ -0,0 +1,63 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -disable-spill-hoist < %s | FileCheck %s
++
++; Reduced with llvm-reduce from gcc.c-torture/execute/950714-1.c. The function
++; is not marked nonreentrant, so its spills use the soft stack: STStk pseudos
++; whose frame address is a scratch Imag16 virtual register that frame-index
++; elimination materialises later. Greedy's global spill hoisting runs after the
++; allocation queue has drained and re-emits the merged spills through
++; storeRegToStackSlot, so each hoisted spill would mint a scratch register
++; nothing allocates. The hoister must keep the original spills in that case.
++;
++; CHECK-LABEL: main:
++; CHECK: rts
++
++; ModuleID = '<bc file>'
++target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++target triple = "mos"
++
++define i16 @main(ptr %array, ptr %0, ptr %1, i16 %2, ptr %3, ptr %4, ptr %array1, i16 %5, i16 %6, i16 %7, i16 %8, i16 %9, i16 %10) {
++  %12 = load i16, ptr %array, align 1
++  br label %13
++
++13:                                               ; preds = %28, %11
++  %14 = phi i16 [ 0, %11 ], [ %29, %28 ]
++  %15 = icmp eq i16 %5, %14
++  br i1 %15, label %31, label %16
++
++16:                                               ; preds = %13
++  %17 = icmp eq i16 %6, 0
++  br i1 %17, label %31, label %18
++
++18:                                               ; preds = %16
++  %19 = icmp eq i16 %2, %7
++  br i1 %19, label %31, label %20
++
++20:                                               ; preds = %18
++  %21 = icmp eq i16 %12, %14
++  br i1 %21, label %31, label %22
++
++22:                                               ; preds = %20
++  %23 = icmp eq i16 %7, %14
++  br i1 %23, label %31, label %24
++
++24:                                               ; preds = %22
++  %25 = icmp eq i16 %8, %14
++  %26 = icmp eq i16 %9, %14
++  %or.cond = select i1 %25, i1 false, i1 %26
++  %27 = icmp eq i16 %10, %14
++  %or.cond1 = select i1 %or.cond, i1 false, i1 %27
++  br i1 %or.cond1, label %31, label %28
++
++28:                                               ; preds = %24
++  %29 = add i16 %14, 1
++  %30 = icmp eq i16 %29, 0
++  br i1 false, label %32, label %13
++
++31:                                               ; preds = %24, %22, %20, %18, %16, %13
++  ret i16 0
++
++32:                                               ; preds = %28
++  tail call void null()
++  unreachable
++}

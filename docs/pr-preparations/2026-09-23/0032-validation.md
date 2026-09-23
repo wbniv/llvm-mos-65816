@@ -1,7 +1,11 @@
 # Patch 0032: register-named symbols in generated assembly
 
 Validated September 23, 2026. The standalone fix is prepared and the local
-compiler is rebuilt and installed. Independent review: [0032-claude-review.md](0032-claude-review.md) (ready to post). Publication remains.
+compiler is rebuilt and installed. The [independent review](0032-claude-review.md)
+and its [audit](0032-review-audit.md) confirm the implementation; the audit
+corrects the full-corpus baseline to 821 assembly failures repaired among 4,091
+emitted files, with 79 backend failures excluded. Branch preparation and
+publication remain.
 
 - Upstream patch: [0032-mos-quote-register-named-symbols.patch](../../../patches/llvm-mos/0032-mos-quote-register-named-symbols.patch).
 - [Proposed PR description](../../upstream-register-named-symbols-pr.md).

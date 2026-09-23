@@ -89,6 +89,9 @@ if [ ! -d "$SRC/.git" ]; then
   # Keep call-argument registers available to constrained virtual operands
   # when the two-address pass considers moving a physical-register definition.
   apply_patch 0029-llvm-twoaddr-physreg-reschedule
+  # Spill hoisting must not mint scratch vregs after allocation; also drops
+  # the driver's blanket -disable-spill-hoist (generic LLVM + clang driver + test).
+  apply_patch 0033-llvm-spill-hoist-no-new-vregs
   # Upstream-bound standalone fix, carried until it merges — the same slot and
   # lifecycle as the retired 0003-late-opt-txy-dead-flag (-> PR #562). Applies
   # after 0002 because both touch MOSLateOptimization.cpp, and it is BAKED INTO

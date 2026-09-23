@@ -44,8 +44,11 @@ reproduction checks; keep candidate patches in separate builds.
    It fixes both rejected assembly and a silent memory-to-accumulator opcode
    change. [Validation](pr-preparations/2026-09-23/0032-validation.md): standalone
    MOS suites pass; all 61 recorded corpus failures now assemble with unchanged
-   direct objects. The compatible local patch is installed. Independent review,
-   current-upstream applicability, branch preparation, and publication remain.
+   direct objects. The compatible local patch is installed. The
+   [independent review audit](pr-preparations/2026-09-23/0032-review-audit.md)
+   confirms the implementation and measures 821 assembler failures repaired
+   across the full set of 4,091 emitted files (79 backend failures excluded).
+   Current-upstream applicability, branch preparation, and publication remain.
 4. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
    semantics question, now verified with the stock upstream frontend and `opt`.
 
@@ -115,7 +118,8 @@ failure with the stock upstream frontend and backend.
 | Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass; final and independent reviews complete; current-upstream applicability, branch preparation, and publication remain |
 | Newton `-O0` post-RA expansion | [Fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), patch 0030; six focused cases and MOS CodeGen/MC pass; review audited and attribution complete; check upstream applicability, prepare branch, and publish |
 | Physical-copy destination reuse | [Fix PR reviewed](pr-preparations/2026-09-22/0031-review-audit.md), patch 0031 on top of 0030; five regression cases, six extra probes, and MOS suites pass; prepare its submission after 0030 |
-| Register-named assembly symbols (`0032`) | [Fix PR prepared](upstream-register-named-symbols-pr.md); standalone suites pass and all 61 recorded assembly failures are repaired; compatible local patch installed; independent review and submission remain |
+| Spill-hoisting scratch vregs (`0033`) | [Fix PR prepared](upstream-spill-hoist-scratch-vregs-pr.md): generic `hoistAllSpills` guard + driver flag removal; release-build crash on 9 c-torture files at `-O2`; [validation](pr-preparations/2026-09-23/0033-validation.md) | **Fix PR prepared, unposted** | Publish | No SDK dependency |
+| Register-named assembly symbols (`0032`) | [Review audited](pr-preparations/2026-09-23/0032-review-audit.md); no code defect found; standalone suites pass; full-corpus assembler failures fall from 821 to zero across 4,091 emitted files; compatible local patch installed; check current upstream, prepare branch, and publish |
 | Scavenger live-P (`0011`) | Producer established (gcc torture `strlen-4.c`, stock `mos6502` `-O0`); test replaced by an upstream-runnable one; validated; post |
 | Call-clobbered coalescing guard (`0015`) | Revalidate diagnosis and upstream reachability; prefer a root-cause fix |
 | Trunc-selection fallback (`0023`) | Establish a real upstream producer for the independent Imag8-to-i1 portion; retain fork-specific content with its feature series |

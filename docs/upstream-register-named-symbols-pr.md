@@ -42,15 +42,21 @@ Validation against llvm-mos `742d554bf08042b8df93d791c335260fadd16643`:
   objects, 59 match direct output byte for byte; the other two differ only in
   the ordering of unreferenced runtime symbols in the symbol table.
 
-- The whole gcc `c-torture/execute` corpus (1,390 files at `-O0`, `-O2` and
-  `-Os`), printed with `llc -S` and reassembled with `llvm-mc`: no assembler
-  failures (61 before this change), 1,078 compilations change only by quoting,
-  and every reassembled object matches the direct object in all section
-  contents, relocations and symbols; 113 differ only in symbol-table order.
+- A separate check of the gcc `c-torture/execute` corpus, with the same
+  copy-expansion and scavenger fixes on both sides: 1,390 files produce IR at
+  each of `-O0`, `-O2`, and `-Os`. Of 4,170 backend compilations, 79 fail before
+  producing assembly; all 4,091 successful outputs reassemble. The assembler
+  failure count falls from 821 to zero. The 1,078 changed assemblies differ
+  only in symbol quoting and comment alignment. Reassembled objects match
+  direct output byte for byte in 3,978 cases; the other 113 differ only in
+  symbol-table ordering, with all other section bytes, relocation records,
+  and symbol values identical. This full sweep uses ordinary backend runs;
+  the verifier coverage is the standalone suites and reduced cases above.
 
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`,
 `xhigh` reasoning effort) for diagnosis, implementation, tests, validation,
 and PR drafting.
+
 Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`, `high`
 reasoning effort) for the independent review, the call/branch, case and
 address-modifier probes, and the full-corpus round trip.
