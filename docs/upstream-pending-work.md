@@ -103,16 +103,16 @@ rank in `TODO.md`:
 | 1 | done | 18 | `G_PREFETCH` never legalized, plus Clang emitting `i16` prefetch operands on 16-bit-`int` targets | **fixed 2026-09-23**: [0034](upstream-prefetch-legalize-pr.md) (MOS) and [0035](upstream-clang-prefetch-int16-pr.md) (Clang, for llvm/llvm-project); [validation](pr-preparations/2026-09-23/0034-0035-validation.md) |
 | 2 | done | 10 | `asm("" : "+g"(x))`: "unable to translate instruction: call" | **fixed 2026-09-23**: generic `InlineAsmLowering` never stored indirect register outputs (`"=*imr,0"`) through their pointer; [0037](upstream-gisel-inline-asm-indirect-output-pr.md) (for llvm/llvm-project); [validation](pr-preparations/2026-09-23/0037-validation.md) |
 | 3 | done | 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | **fixed 2026-09-23**: frame address = incoming soft stack pointer (fixed frame object), return address read from the hard stack by a late-expanded pseudo with a CFG dataflow for the depth; [0038](upstream-return-frame-address-pr.md); [validation](pr-preparations/2026-09-23/0038-validation.md) |
-| 4 | T4 | 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` on a 16-bit value in `20030222-1.c`) | shape-specific (a simple `int` case compiles); reduce first; a wrong turn miscompiles inline asm |
+| 4 | done | 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` in `20030222-1.c`, `pr52286.c`) | **fixed 2026-09-24**: generic `InlineAsmLowering` assumed every register operand fits in one register — MOS needs four for a `long`, and the tied form asserted while the plain input and the output were rejected outright. All three now split/merge least significant piece first, as SelectionDAG's `RegsForValue` does; [0041](upstream-gisel-inline-asm-multi-register-pr.md) (for llvm/llvm-project); [validation](pr-preparations/2026-09-24/0041-validation.md) |
 | 5 | T3 | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | vector extensions; scalarization rules |
 | — | — | 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
 
-Recommended order: the prefetch fixes, the `g` constraint and the return/frame
-address (orders 1 to 3) are done; next is order 4. The zero-page-global opcode disagreement
+Recommended order: orders 1 to 4 are done; next is order 5, the only remaining
+codegen class. The zero-page-global opcode disagreement
 found in the 0032 review is fixed by 0036. Its numeric-address controls exposed
 a separate `[T4]` parser defect: `mos16(constant)` can select a zero-page opcode,
 even silently truncating `4660` to `0x34`. That finding needs a width-matching
-fix and sits alongside item 4 in priority.
+fix and now outranks the remaining codegen class.
 [Diagnosis and reproducer](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect).
 
 These are unposted contributions and do not require #320/#321. The register

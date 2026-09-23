@@ -17,7 +17,6 @@
 20021120-1.c	region-overflow	ld.lld: error: section '.text' will not fit in region 'rom': overflowed by 20631 bytes
 20021120-3.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 20030209-1.c	compile-error	vendor/c-torture/execute/20030209-1.c:6:10: error: array is too large (100 elements)
-20030222-1.c	link-other	PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
 20030501-1.c	compile-error	vendor/c-torture/execute/20030501-1.c:11:7: error: function definition is not allowed here
 20031211-2.c	compile-error	vendor/c-torture/execute/20031211-2.c:13:3: error: call to undeclared function 'foo'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-dec
 20040223-1.c	compile-error	vendor/c-torture/execute/20040223-1.c:10:5: error: call to undeclared function '__torture_abort'; ISO C99 and later do not support implicit function declarations [-Wimplicit-
@@ -327,7 +326,6 @@ pr51447.c	compile-error	vendor/c-torture/execute/pr51447.c:22:7: error: function
 pr51581-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr51581-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr51933.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
-pr52286.c	link-other	PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
 pr52760.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 pr52979-1.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 pr52979-2.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)

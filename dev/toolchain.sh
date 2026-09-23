@@ -104,6 +104,13 @@ if [ ! -d "$SRC/.git" ]; then
   # with no instruction, and the next region split faults in enterIntvAfter. Same
   # family as 0033, opposite end of the spiller (generic LLVM + MOS test).
   apply_patch 0040-llvm-inline-spiller-coalesce-scratch-vregs
+  # GlobalISel inline asm: register operands that need more than one register
+  # (anything wider than an int on MOS, since "r" is Imag8 outside i16). The
+  # tied form asserted and the plain input/output forms were rejected; all three
+  # now split/merge least significant piece first, as SelectionDAG's
+  # RegsForValue does. Stacks on 0037 (same file). Generic LLVM + MOS/AArch64
+  # tests, so no dev/regen-patch.sh entry.
+  apply_patch 0041-llvm-gisel-inline-asm-multi-register
   # Upstream-bound standalone fix, carried until it merges — the same slot and
   # lifecycle as the retired 0003-late-opt-txy-dead-flag (-> PR #562). Applies
   # after 0002 because both touch MOSLateOptimization.cpp, and it is BAKED INTO

@@ -22,7 +22,10 @@ authors' PRs and were listed here by mistake until 2026‑09‑24; verified with
 [0040](upstream-inline-spiller-coalesce-scratch-vregs-pr.md) `coalesceStackAccess` must not erase a
 stack access carrying scratch vregs — the coalescing counterpart to 0033's hoisting guard, found as
 the `ashrdi-1` greedy-RA segfault
-([validation](pr-preparations/2026-09-24/0040-validation.md)).
+([validation](pr-preparations/2026-09-24/0040-validation.md)) ·
+[0041](upstream-gisel-inline-asm-multi-register-pr.md) GlobalISel inline-asm register operands that
+need more than one register (for llvm/llvm-project)
+([validation](pr-preparations/2026-09-24/0041-validation.md)).
 
 **Prepared, independent review audited:** [0036](upstream-zero-page-indexed-globals-pr.md)
 zero-page indexed globals. Direct and reassembled objects now agree; standalone

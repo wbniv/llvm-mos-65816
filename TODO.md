@@ -1153,10 +1153,20 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [main run 34793262107](https://github.com/llvm-mos/llvm-mos/actions/runs/34793262107) (2026‑09‑14),
   so not caused by [PR #604](https://github.com/llvm-mos/llvm-mos/pull/604) — the reply if a
   maintainer queries that PR's red check. Worth an upstream issue; posting is user-triggered.
-- [T4] **GlobalISel inline asm asserts on a multi-register tied operand** (`20030222-1.c`:
-  `asm("" : "=r"(i) : "0"(x))`; 6 compilations). A plain `int` case compiles, so the failing shape is
-  specific; reduce it first. Reason for T4: the fix is in generic `InlineAsmLowering` and a wrong
-  turn miscompiles inline asm.
+- [T4] **Multi-register register operands in GlobalISel inline asm (patch 0041).** Generic
+  `InlineAsmLowering` assumed every register operand occupies exactly one register. MOS maps `"r"`
+  to `Imag8` for everything but `i16`, so a `long` needs four: the tied form
+  (`asm("" : "=r"(i) : "0"(x))`) asserted `NumOpRegs == 1`, and the plain input and the output were
+  rejected outright — so relaxing the assertion alone would not have compiled either torture file.
+  All three now split/merge least significant piece first, as SelectionDAG's `RegsForValue` does,
+  and every shape still unsupported takes a soft bail instead of an assert. Reproduces on AArch64
+  (`i128` with `"r"`) at plain `-O0`; two upstream AArch64 tests that encoded the limitation are
+  updated. 6 c-torture compilations repaired (`20030222-1`, `pr52286`), corpus otherwise
+  byte-identical. Aimed at `llvm/llvm-project`.
+  [Plan](docs/plans/2026-09-24-gisel-tied-inline-asm.md) ·
+  [PR draft](docs/upstream-gisel-inline-asm-multi-register-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-24/0041-validation.md).
+  Remaining: publish (user-triggered).
 - [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
   compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
