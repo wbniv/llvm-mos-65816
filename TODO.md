@@ -2313,5 +2313,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        of the same defect; it is fixed alongside it, not separately.
      - "corpus/setjmp_sim.c is not a sufficient guard on its own" -> #116 backtrack now covers the
        return-out-of-a-setjmp-frame case and is in expected.tsv, so the gap is closed. -->
-- [verify] **2026-09-24-ashrdi1-greedy-ra-segfault** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-24-ashrdi1-greedy-ra-segfault.md](docs/plans/2026-09-24-ashrdi1-greedy-ra-segfault.md)_  <!-- fp:c386372f7a7437ab -->
+<!-- triaged 2026-09-24: the plan now carries the eight numbered verification steps with raw
+     output and PASS under "## Verification" (it had only linked the validation record, which is
+     what the audit flagged). All eight pass; the curated M2 item for patch 0040 records the
+     same numbers, so nothing is separately open. -->
 <!-- END auto-captured-deferrals -->

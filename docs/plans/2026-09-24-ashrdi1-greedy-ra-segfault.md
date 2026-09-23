@@ -299,4 +299,115 @@ and is outside this change; nothing in the validation provoked it.)
 
 ## Verification
 
-See [`docs/pr-preparations/2026-09-24/0040-validation.md`](../pr-preparations/2026-09-24/0040-validation.md).
+Full record, including build hashes and residual risk:
+[`docs/pr-preparations/2026-09-24/0040-validation.md`](../pr-preparations/2026-09-24/0040-validation.md).
+
+### 1. The reduced test fails before and passes after, on the same assertion `llc`
+
+```text
+llc-before-0040 mos65c02  rc=134
+llc-before-0040 mosw65816 rc=134
+llc-0040        mos65c02  rc=0
+llc-0040        mosw65816 rc=0
+```
+
+and the pre-fix failure is the expected assertion, not an unrelated one:
+
+```text
+llc: .../llvm/lib/CodeGen/SplitKit.cpp:746: SlotIndex llvm::SplitEditor::enterIntvAfter(SlotIndex):
+     Assertion `MI && "enterIntvAfter called with invalid index"' failed.
+2. Running pass 'Greedy Register Allocator' on function '@constant_shift'
+```
+
+**PASS**
+
+### 2. `ashrdi-1.c` through the project toolchain, all 16 configurations, verifier on
+
+`mos-clang --target=mos -mcpu=$cpu $O -w [+mos-a16] -mllvm -verify-machineinstrs -c ashrdi-1.c`
+
+```text
+mosw65816 -O0 def rc=0    mosw65816 -O0 a16 rc=0    mos6502  -O0 rc=0    mos65c02 -O0 rc=0
+mosw65816 -O1 def rc=0    mosw65816 -O1 a16 rc=0    mos6502  -O1 rc=0    mos65c02 -O1 rc=0
+mosw65816 -O2 def rc=0    mosw65816 -O2 a16 rc=0    mos6502  -O2 rc=0    mos65c02 -O2 rc=0
+mosw65816 -Os def rc=0    mosw65816 -Os a16 rc=0    mos6502  -Os rc=0    mos65c02 -Os rc=0
+```
+
+`mosw65816 -Os def` was the segfault. **PASS (16/16)**
+
+### 3. c-torture codegen differential, before vs after
+
+```text
+== totals ==
+   1364 SAME
+    266 FE-FAIL
+     24 BOTH-FAIL
+      1 REPAIRED      (ashrdi-1, rb=134 -> ra=0)
+      1 CHANGED       (960215-1)
+```
+
+`960215-1` is a stack-slot permutation; assembled `.text` 2,541 → 2,542 bytes (+1):
+
+```text
+   text	   data	    bss	    dec	    hex	filename
+   2541	     32	     48	   2621	    a3d	/tmp/960215-b.o
+   2542	     32	     48	   2622	    a3e	/tmp/960215-a.o
+```
+
+0 newly broken. **PASS**
+
+### 4. `dev/run.sh corpus-a16`
+
+```text
+==> corpus-a16: 79/79 passed, 0 xfail
+```
+
+**PASS**
+
+### 5. `tools/torture_filter.py` brings `ashrdi-1.c` back into scope
+
+Every changed line in both files:
+
+```text
+=== inscope.tsv ===
++ashrdi-1.c
+=== unsupported.tsv ===
+-ashrdi-1.c	link-other	PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ ...
+=== counts ===
+inscope   before=1298 after=1299
+unsupport before=486  after=485
+```
+
+One line per file and nothing else, so there is no other change to explain. **PASS**
+
+### 6. `dev/run.sh torture --tests ashrdi-1.c` on both emulators
+
+```text
+==> torture-run: 1 test(s), -Os, explicit, default==+mos-a16==+mos-xy16 (MAME + bsnes-jg)
+     ashrdi-1.c             PASS  all variants PASS (0x600D)
+==> torture-run: 1 PASS, 0 FAIL, 0 SKIP, 0 XFAIL (of 1)
+```
+
+**PASS**
+
+### 7. MOS CodeGen + MC lit suites
+
+```text
+before: Total Discovered Tests: 152   Failed: 13 (8.55%)
+after:  Total Discovered Tests: 152   Failed:  9 (5.92%)
+```
+
+The four repaired are the new test plus `inline-asm-indirect-output.ll`,
+`return-address-spc700.ll` and `return-frame-address.ll` — the latter three only failed because
+`build/llvm-mos/bin/llc` was stale (2026‑09‑23 07:37; `dev/run.sh toolchain` builds and installs
+the clang targets, not `llc`). The remaining 9 fail identically before and after and are the known
+vendor-vs-upstream CHECK divergences. **PASS (no new failure)**
+
+### 8. Patch applies in the toolchain's order, and order-independently
+
+```text
+0033 OK (4 markers)
+0040 APPLIES CLEANLY ON TOP OF 0033
+order-independent: OK
+```
+
+**PASS**
