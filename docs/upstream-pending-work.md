@@ -64,7 +64,13 @@ reproduction checks; keep candidate patches in separate builds.
    blanket `-disable-spill-hoist`; release-build segfault on 9 c-torture files.
    MOS, X86, ARM and AArch64 suites clean; emulator gate 79/79.
    [Validation](pr-preparations/2026-09-23/0033-validation.md).
-7. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
+7. [`__builtin_prefetch`](upstream-prefetch-legalize-pr.md): patch 0034 drops
+   `G_PREFETCH` (the backend aborted on any prefetch); companion
+   [Clang fix 0035](upstream-clang-prefetch-int16-pr.md) emits the intrinsic's
+   rw/locality operands as `i32` on 16-bit-`int` targets (MOS, MSP430, AVR),
+   aimed at llvm/llvm-project. Six torture files fixed.
+   [Validation](pr-preparations/2026-09-23/0034-0035-validation.md).
+8. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
    semantics question, now verified with the stock upstream frontend and `opt`.
 
 ## Backend failure triage (gcc c-torture, 2026-09-23)
@@ -76,15 +82,14 @@ rank in `TODO.md`:
 
 | Order | Tier | Compilations | Class | Assessment |
 |---:|---|---:|---|---|
-| 1 | T2 | 18 | `G_PREFETCH` never legalized (`__builtin_prefetch`) | a hint; dropping it is legal; one legalizer rule plus a test; real reach (portable code uses the builtin) |
+| 1 | done | 18 | `G_PREFETCH` never legalized, plus Clang emitting `i16` prefetch operands on 16-bit-`int` targets | **fixed 2026-09-23**: [0034](upstream-prefetch-legalize-pr.md) (MOS) and [0035](upstream-clang-prefetch-int16-pr.md) (Clang, for llvm/llvm-project); [validation](pr-preparations/2026-09-23/0034-0035-validation.md) |
 | 2 | T3 | 10 | `asm("" : "+g"(x))`: "unable to translate instruction: call" | the `g` constraint is unsupported in GlobalISel inline-asm lowering; a common optimization-barrier idiom; choose the layer (MOS hook or generic lowering) |
 | 3 | T3 | 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | implement (return address from the hard stack, frame address from `__rc0`) or emit a clean diagnostic |
 | 4 | T4 | 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` on a 16-bit value in `20030222-1.c`) | shape-specific (a simple `int` case compiles); reduce first; a wrong turn miscompiles inline asm |
 | 5 | T3 | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | vector extensions; scalarization rules |
 | — | — | 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
 
-Recommended order: the prefetch no-op first (smallest, clearly correct, immediately
-upstreamable), then the `g` constraint, which unblocks a very common idiom. The
+Recommended order: the prefetch fixes are done; next is the `g` constraint, which unblocks a very common idiom. The
 `[T4]` printer/object disagreement on zero-page-indexed symbol operands (found in
 the 0032 review, not in this corpus) sits alongside item 4 in priority.
 

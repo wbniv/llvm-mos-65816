@@ -1,0 +1,56 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 5769520d6f93..082c719358b3 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -407,6 +407,9 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+ 
+   getActionDefinitionsBuilder(G_TRAP).custom();
+ 
++  // A prefetch is a hint; the 6502 has nothing to hint, so it is dropped.
++  getActionDefinitionsBuilder(G_PREFETCH).custom();
++
+   // Variadic Arguments
+ 
+   getActionDefinitionsBuilder({G_VASTART, G_VAARG}).custom();
+@@ -599,6 +602,9 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+     return legalizeBrJt(Helper, MRI, MI);
+   case G_TRAP:
+     return legalizeTrap(Helper, MRI, MI);
++  case G_PREFETCH:
++    MI.eraseFromParent();
++    return true;
+ 
+   // Variadic Arguments
+   case G_VAARG:
+diff --git a/llvm/test/CodeGen/MOS/prefetch.ll b/llvm/test/CodeGen/MOS/prefetch.ll
+new file mode 100644
+index 000000000000..a480dacb77b0
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/prefetch.ll
+@@ -0,0 +1,26 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s
++
++; __builtin_prefetch lowers to llvm.prefetch; the 6502 has no prefetch, so the
++; hint is dropped and the function is empty.
++
++define void @hint_read(ptr %p) {
++; CHECK-LABEL: hint_read:
++; CHECK-NEXT: ; %bb.0:
++; CHECK-NEXT: rts
++  call void @llvm.prefetch.p0(ptr %p, i32 0, i32 3, i32 1)
++  ret void
++}
++
++define void @hint_write_all_localities(ptr %p) {
++; CHECK-LABEL: hint_write_all_localities:
++; CHECK-NEXT: ; %bb.0:
++; CHECK-NEXT: rts
++  call void @llvm.prefetch.p0(ptr %p, i32 1, i32 0, i32 1)
++  call void @llvm.prefetch.p0(ptr %p, i32 1, i32 1, i32 1)
++  call void @llvm.prefetch.p0(ptr %p, i32 1, i32 2, i32 1)
++  call void @llvm.prefetch.p0(ptr %p, i32 1, i32 3, i32 1)
++  ret void
++}
++
++declare void @llvm.prefetch.p0(ptr, i32 immarg, i32 immarg, i32 immarg)

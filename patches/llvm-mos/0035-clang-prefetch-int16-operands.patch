@@ -1,0 +1,39 @@
+diff --git a/clang/lib/CodeGen/CGBuiltin.cpp b/clang/lib/CodeGen/CGBuiltin.cpp
+index a8355be41330..6434041ad451 100644
+--- a/clang/lib/CodeGen/CGBuiltin.cpp
++++ b/clang/lib/CodeGen/CGBuiltin.cpp
+@@ -4102,6 +4102,11 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
+     Locality = (E->getNumArgs() > 2)
+                    ? EmitScalarOrConstFoldImmArg(ICEArguments, 2, E)
+                    : llvm::ConstantInt::get(Int32Ty, 3);
++    // The arguments are C 'int' expressions, but the intrinsic takes i32; on
++    // targets where int is narrower (16-bit int) the emitted call would
++    // otherwise have an incompatible signature.
++    RW = Builder.CreateIntCast(RW, Int32Ty, /*isSigned=*/false);
++    Locality = Builder.CreateIntCast(Locality, Int32Ty, /*isSigned=*/false);
+     Value *Data = llvm::ConstantInt::get(Int32Ty, 1);
+     Function *F = CGM.getIntrinsic(Intrinsic::prefetch, Address->getType());
+     Builder.CreateCall(F, {Address, RW, Locality, Data});
+diff --git a/clang/test/CodeGen/builtin-prefetch-int16.c b/clang/test/CodeGen/builtin-prefetch-int16.c
+new file mode 100644
+index 000000000000..6df7ce71a2ab
+--- /dev/null
++++ b/clang/test/CodeGen/builtin-prefetch-int16.c
+@@ -0,0 +1,17 @@
++// The rw and locality operands of __builtin_prefetch are C 'int' expressions,
++// but llvm.prefetch takes i32. On targets whose int is 16 bits the call must
++// still be emitted with i32 operands.
++// RUN: %clang_cc1 -triple msp430 -emit-llvm -o - %s | FileCheck %s
++// RUN: %clang_cc1 -triple x86_64-linux-gnu -emit-llvm -o - %s | FileCheck %s
++
++void explicit_args(char *p) {
++  // CHECK-LABEL: @explicit_args
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 1, i32 2, i32 1)
++  __builtin_prefetch(p, 1, 2);
++}
++
++void default_args(char *p) {
++  // CHECK-LABEL: @default_args
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 0, i32 3, i32 1)
++  __builtin_prefetch(p);
++}

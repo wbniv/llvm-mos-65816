@@ -13,7 +13,9 @@ plus authored PRs in `llvm-mos/llvm-mos-sdk`.
 [0031](upstream-copy-phys-reg-reuse-dst-pr.md) copy-destination reuse on top of it ·
 [0011](upstream-scavenger-live-p-pr.md) scavenger live-`$p` (stock-6502 producer found 2026-09-22) ·
 [0032](upstream-register-named-symbols-pr.md) register-named symbols ·
-[0033](upstream-spill-hoist-scratch-vregs-pr.md) spill hoisting (generic LLVM + driver flag removal).
+[0033](upstream-spill-hoist-scratch-vregs-pr.md) spill hoisting (generic LLVM + driver flag removal) ·
+[0034](upstream-prefetch-legalize-pr.md) drop `G_PREFETCH` ·
+[0035](upstream-clang-prefetch-int16-pr.md) clang prefetch operands as `i32` (for llvm/llvm-project).
 
 **Pending work, SNES dependencies and issue readiness:**
 [chart and flowchart](upstream-pending-work.md). This view supersedes historical

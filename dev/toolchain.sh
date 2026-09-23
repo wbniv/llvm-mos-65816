@@ -92,6 +92,9 @@ if [ ! -d "$SRC/.git" ]; then
   # Spill hoisting must not mint scratch vregs after allocation; also drops
   # the driver's blanket -disable-spill-hoist (generic LLVM + clang driver + test).
   apply_patch 0033-llvm-spill-hoist-no-new-vregs
+  # __builtin_prefetch: clang emits the rw/locality operands as i32 on
+  # 16-bit-int targets (generic clang fix, aimed at llvm/llvm-project).
+  apply_patch 0035-clang-prefetch-int16-operands
   # Upstream-bound standalone fix, carried until it merges — the same slot and
   # lifecycle as the retired 0003-late-opt-txy-dead-flag (-> PR #562). Applies
   # after 0002 because both touch MOSLateOptimization.cpp, and it is BAKED INTO
@@ -116,6 +119,8 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0031-mos-copy-phys-reg-reuse-dst
   # Symbols that match register spellings need quotes in generated assembly.
   apply_patch 0032-mos-quote-register-named-symbols-vendor
+  # G_PREFETCH is legalized by dropping it (a hint the 6502 cannot use).
+  apply_patch 0034-mos-legalize-prefetch
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

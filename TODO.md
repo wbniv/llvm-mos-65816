@@ -1091,9 +1091,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
   `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
   [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
-- [T2] **Legalize `G_PREFETCH` as a no-op.** `__builtin_prefetch` aborts the backend
-  (`unable to legalize instruction: G_PREFETCH`, 18 c-torture compilations); a prefetch is a hint,
-  so lowering it to nothing is correct. Reason for T2: one legalizer rule plus a test.
+- [T5] **`__builtin_prefetch`: patches 0034 (MOS: drop `G_PREFETCH`) and 0035 (clang: emit the
+  rw/locality operands as `i32` on 16-bit-`int` targets; aimed at llvm/llvm-project).** Fixed and
+  validated 2026-09-23: all six `builtin-prefetch-*.c` torture files compile at three levels with the
+  verifier; tests discriminate on both sides. [PR draft 0034](docs/upstream-prefetch-legalize-pr.md) ·
+  [PR draft 0035](docs/upstream-clang-prefetch-int16-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0034-0035-validation.md). Remaining: publish
+  (user-triggered; 0035 to llvm/llvm-project).
 - [T3] **Support the `g` inline-asm constraint in GlobalISel.** `asm("" : "+g"(x))`, the common
   optimization-barrier idiom, fails with "unable to translate instruction: call" (10 c-torture
   compilations: `pr65053-1/2`, `pr65956`, `pr88904`). Decide whether MOS maps `g` to a register

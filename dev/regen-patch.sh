@@ -60,6 +60,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0030-mos-copy-phys-reg-liveness.patch"
   "$PATCHES/0031-mos-copy-phys-reg-reuse-dst.patch"
   "$PATCHES/0032-mos-quote-register-named-symbols-vendor.patch"
+  "$PATCHES/0034-mos-legalize-prefetch.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
