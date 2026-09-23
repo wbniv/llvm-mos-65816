@@ -1,0 +1,625 @@
+diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
+index 584cc0c4c8cd..b2d91c3a3d56 100644
+--- a/llvm/lib/Target/MOS/CMakeLists.txt
++++ b/llvm/lib/Target/MOS/CMakeLists.txt
+@@ -37,6 +37,7 @@ add_llvm_target(MOSCodeGen
+   MOSInternalize.cpp
+   MOSLateOptimization.cpp
+   MOSLegalizerInfo.cpp
++  MOSLowerReturnAddress.cpp
+   MOSLowerSelect.cpp
+   MOSMCInstLower.cpp
+   MOSMachineScheduler.cpp
+diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
+index 66964b1fe0a0..7654df1345be 100644
+--- a/llvm/lib/Target/MOS/MOS.h
++++ b/llvm/lib/Target/MOS/MOS.h
+@@ -25,6 +25,7 @@ void initializeMOSIndexIVPass(PassRegistry &);
+ void initializeMOSInsertCopiesPass(PassRegistry &);
+ void initializeMOSInternalizePass(PassRegistry &);
+ void initializeMOSLateOptimizationPass(PassRegistry &);
++void initializeMOSLowerReturnAddressPass(PassRegistry &);
+ void initializeMOSLowerSelectPass(PassRegistry &);
+ void initializeMOSNonReentrantPass(PassRegistry &);
+ void initializeMOSPostRAScavengingPass(PassRegistry &);
+diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
+index 70e8bb0d45b3..23b706c2d58e 100644
+--- a/llvm/lib/Target/MOS/MOSInstrGISel.td
++++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
+@@ -41,6 +41,18 @@ def G_BRCOND_IMM : MOSGenericInstruction {
+   let isTerminator = true;
+ }
+
++// One byte of the address the current function returns to, as JSR/JSL left it
++// on the hard stack: byte 0 is the low byte, byte 1 the high byte. Everything
++// pushed on the hard stack since entry sits above that word, so the read stays
++// where it is (hasSideEffects) and MOSLowerReturnAddress expands the selected
++// pseudo once the instruction stream is final and the depth is known.
++def G_RETURN_ADDRESS_BYTE : MOSGenericInstruction {
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins i8imm:$byte);
++  let hasSideEffects = true;
++  let mayLoad = true;
++}
++
+ // Generalized 8-bit subtraction and comparison operation. Subsumes SBC, CMP,
+ // CPX, and CPY. Depending on the outputs and inputs are used, this will select
+ // to one or more of these instructions.
+diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
+index 21910cfeab37..14e033c2449c 100644
+--- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
++++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
+@@ -59,6 +59,23 @@ def LDAbsIdx : MOSPseudo {
+   let mayLoad = true;
+ }
+
++// The selected forms of G_RETURN_ADDRESS_BYTE, expanded by
++// MOSLowerReturnAddress once the hard-stack depth at the entry block is final.
++// The 6502 family reads the stack through TSX and an absolute indexed load in
++// page 1, so the pseudo owns a scratch X; the 65816 reads it with a
++// stack-relative load and needs no index register.
++let hasSideEffects = true, mayLoad = true in {
++  def ReturnAddressByte : MOSPseudo {
++    dag OutOperandList = (outs Ac:$dst, Xc:$scratch);
++    dag InOperandList = (ins i8imm:$byte);
++  }
++  def ReturnAddressByteSR : MOSPseudo {
++    let Predicates = [HasW65816];
++    dag OutOperandList = (outs Ac:$dst);
++    dag InOperandList = (ins i8imm:$byte);
++  }
++}
++
+ // Loads a boolean value into C, V, ALSB, XLSB, or YLSB.
+ def LDImm1 : MOSPseudo {
+   dag OutOperandList = (outs CV_GPR_LSB:$dst);
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+index d4936aabfadd..6ae473b6f871 100644
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -86,6 +86,7 @@ private:
+   bool selectFrameIndex(MachineInstr &MI);
+   std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
+   bool selectAddr(MachineInstr &MI);
++  bool selectReturnAddressByte(MachineInstr &MI);
+   std::pair<Register, Register> selectAddrLoHi(MachineInstr &MI);
+   bool selectStore(MachineInstr &MI);
+   bool selectRMW(MachineInstr &MI);
+@@ -218,6 +219,8 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+     return selectSbc(MI);
+   case MOS::G_FRAME_INDEX:
+     return selectFrameIndex(MI);
++  case MOS::G_RETURN_ADDRESS_BYTE:
++    return selectReturnAddressByte(MI);
+   case MOS::G_BLOCK_ADDR:
+   case MOS::G_CONSTANT:
+   case MOS::G_GLOBAL_VALUE:
+@@ -1253,6 +1256,25 @@ bool MOSInstructionSelector::selectFrameIndex(MachineInstr &MI) {
+   return true;
+ }
+
++bool MOSInstructionSelector::selectReturnAddressByte(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++  Register Dst = MI.getOperand(0).getReg();
++  int64_t Byte = MI.getOperand(1).getImm();
++
++  MachineInstrBuilder Instr;
++  if (STI.hasW65816()) {
++    Instr = Builder.buildInstr(MOS::ReturnAddressByteSR, {Dst}, {}).addImm(Byte);
++  } else {
++    Register Scratch = MRI.createVirtualRegister(&MOS::XcRegClass);
++    Instr =
++        Builder.buildInstr(MOS::ReturnAddressByte, {Dst, Scratch}, {}).addImm(Byte);
++  }
++  constrainSelectedInstRegOperands(*Instr, TII, TRI, RBI);
++  MI.eraseFromParent();
++  return true;
++}
++
+ std::pair<Register, Register>
+ MOSInstructionSelector::selectFrameIndexLoHi(MachineInstr &MI) {
+   const MachineFunction &MF = *MI.getMF();
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 082c719358b3..91a78cb6d1e1 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -436,6 +436,9 @@ bool MOSLegalizerInfo::legalizeIntrinsic(LegalizerHelper &Helper,
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+   const MachineRegisterInfo &MRI = *Builder.getMRI();
+   switch (cast<GIntrinsic>(MI).getIntrinsicID()) {
++  case Intrinsic::returnaddress:
++  case Intrinsic::frameaddress:
++    return legalizeReturnOrFrameAddress(Helper, MI);
+   case Intrinsic::vacopy: {
+     MachinePointerInfo MPO;
+     auto Tmp =
+@@ -2357,6 +2360,63 @@ bool MOSLegalizerInfo::legalizeBrJt(LegalizerHelper &Helper,
+   return true;
+ }
+
++// __builtin_frame_address(0) is the incoming soft stack pointer: the address
++// just above this function's soft-stack frame, where its stack arguments begin.
++// A fixed object at offset zero names exactly that address, so the existing
++// frame-index lowering produces it and no frame pointer is needed.
++//
++// __builtin_return_address(0) is the word JSR/JSL pushed on the hard stack plus
++// one: both push the address of their own last byte, and RTS/RTL add one on the
++// way back. SPC700 CALL pushes the return address itself. How deep that word
++// sits below the stack pointer at the point of the read is not known until
++// frame lowering and register scavenging are done, so the read stays where it
++// is as a pseudo and MOSLowerReturnAddress expands it last, once every push is
++// in place.
++//
++// Neither stack carries a frame chain, so levels above zero are zero, which is
++// what SelectionDAG's generic expansion of these nodes returns. An interrupt
++// handler has no C return address (the interrupted PC sits below P, and the
++// 65816 handler prologue pushes more), so it returns zero as well.
++bool MOSLegalizerInfo::legalizeReturnOrFrameAddress(LegalizerHelper &Helper,
++                                                    MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  MachineFunction &MF = *MI.getMF();
++  MachineFrameInfo &MFI = MF.getFrameInfo();
++  const MOSSubtarget &STI = MF.getSubtarget<MOSSubtarget>();
++  Register Dst = MI.getOperand(0).getReg();
++  bool IsReturnAddress =
++      cast<GIntrinsic>(MI).getIntrinsicID() == Intrinsic::returnaddress;
++  int64_t Level = MI.getOperand(2).getImm();
++  LLT P = LLT::pointer(0, 16);
++  LLT S8 = LLT::scalar(8);
++  LLT S16 = LLT::scalar(16);
++
++  if (Level != 0 || (IsReturnAddress && STI.getFrameLowering()->isISR(MF))) {
++    Builder.buildConstant(Dst, 0);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  if (!IsReturnAddress) {
++    int FI = MFI.CreateFixedObject(1, 0, /*IsImmutable=*/true);
++    Builder.buildFrameIndex(Dst, FI);
++    MI.eraseFromParent();
++    return true;
++  }
++
++  MFI.setReturnAddressIsTaken(true);
++  auto Lo = Builder.buildInstr(MOS::G_RETURN_ADDRESS_BYTE, {S8}, {}).addImm(0);
++  auto Hi = Builder.buildInstr(MOS::G_RETURN_ADDRESS_BYTE, {S8}, {}).addImm(1);
++  auto Pushed = Builder.buildIntToPtr(
++      P, Builder.buildMergeLikeInstr(S16, {Lo.getReg(0), Hi.getReg(0)}));
++  if (STI.hasSPC700())
++    Builder.buildCopy(Dst, Pushed);
++  else
++    Builder.buildPtrAdd(Dst, Pushed, Builder.buildConstant(S16, 1));
++  MI.eraseFromParent();
++  return true;
++}
++
+ bool MOSLegalizerInfo::legalizeTrap(LegalizerHelper &Helper,
+                                     MachineRegisterInfo &MRI,
+                                     MachineInstr &MI) const {
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+index 6c1f0987d982..10e6edb0c850 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -108,6 +108,9 @@ private:
+   bool legalizeTrap(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                     MachineInstr &MI) const;
+
++  bool legalizeReturnOrFrameAddress(LegalizerHelper &Helper,
++                                    MachineInstr &MI) const;
++
+   // Variadic Arguments
+   bool legalizeVAArg(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                      MachineInstr &MI) const;
+diff --git a/llvm/lib/Target/MOS/MOSLowerReturnAddress.cpp b/llvm/lib/Target/MOS/MOSLowerReturnAddress.cpp
+new file mode 100644
+index 000000000000..1e765145cc0b
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSLowerReturnAddress.cpp
+@@ -0,0 +1,193 @@
++//===-- MOSLowerReturnAddress.cpp - Expand return-address reads -----------===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// Expands ReturnAddressByte and ReturnAddressByteSR, the selected forms of
++// __builtin_return_address(0).
++//
++// The word JSR left on the hard stack sits below everything pushed since the
++// function was entered: callee-saved registers, a scavenger PHA/PLA bracket
++// around a frame-index expansion, a PHP. None of that exists before frame
++// lowering and register scavenging, so this pass runs after both. It computes
++// the hard-stack depth at the start of every block by forward dataflow over the
++// CFG (every path into a block must agree, as it must for RTS to work at all),
++// adds the pushes that precede each read within its block, and expands the read
++// with that depth:
++//
++//   6502 family:  tsx ; lda $0100+1+depth+byte,x   (8-bit S, stack in page 1;
++//                 SPC700 through its TSX and LDA abs,X equivalents)
++//   65816:        lda 1+depth+byte,s               (16-bit S, stack anywhere
++//                 in bank 0; stack-relative addressing covers it directly)
++//
++//===----------------------------------------------------------------------===//
++
++#include "MOSLowerReturnAddress.h"
++
++#include "MCTargetDesc/MOSMCTargetDesc.h"
++#include "MOS.h"
++#include "MOSInstrInfo.h"
++#include "MOSSubtarget.h"
++#include "llvm/ADT/DenseMap.h"
++#include "llvm/ADT/PostOrderIterator.h"
++#include "llvm/CodeGen/MachineFrameInfo.h"
++#include "llvm/CodeGen/MachineFunctionPass.h"
++#include "llvm/CodeGen/MachineInstrBuilder.h"
++#include "llvm/Support/ErrorHandling.h"
++
++#define DEBUG_TYPE "mos-lower-return-address"
++
++using namespace llvm;
++
++namespace {
++
++class MOSLowerReturnAddress : public MachineFunctionPass {
++public:
++  static char ID;
++
++  MOSLowerReturnAddress() : MachineFunctionPass(ID) {}
++
++  bool runOnMachineFunction(MachineFunction &MF) override;
++
++  StringRef getPassName() const override { return "MOS Lower Return Address"; }
++
++  void getAnalysisUsage(AnalysisUsage &AU) const override {
++    AU.setPreservesCFG();
++    MachineFunctionPass::getAnalysisUsage(AU);
++  }
++};
++
++} // namespace
++
++static bool isReturnAddressByte(const MachineInstr &MI) {
++  return MI.getOpcode() == MOS::ReturnAddressByte ||
++         MI.getOpcode() == MOS::ReturnAddressByteSR;
++}
++
++// The net number of bytes MI leaves on the hard stack. A call is balanced by
++// its callee. PHA/PHX/PHY and their pulls move one byte: MOSInsertREPSEP
++// narrows the register before any of them on the 65816.
++static int hardStackPushBytes(const MachineInstr &MI) {
++  switch (MI.getOpcode()) {
++  case MOS::PH:
++  case MOS::PHA_Implied:
++  case MOS::PHX_Implied:
++  case MOS::PHY_Implied:
++  case MOS::PHP_Implied:
++  case MOS::PHB_Implied:
++  case MOS::PHK_Implied:
++    return 1;
++  case MOS::PHD_Implied:
++  case MOS::PEA_Absolute:
++  case MOS::PEI_Indirect:
++  case MOS::PER_Relative:
++    return 2;
++  case MOS::PL:
++  case MOS::PLA_Implied:
++  case MOS::PLX_Implied:
++  case MOS::PLY_Implied:
++  case MOS::PLP_Implied:
++  case MOS::PLB_Implied:
++    return -1;
++  case MOS::PLD_Implied:
++    return -2;
++  default:
++    return 0;
++  }
++}
++
++static int hardStackPushBytes(const MachineBasicBlock &MBB) {
++  int Bytes = 0;
++  for (const MachineInstr &MI : MBB)
++    Bytes += hardStackPushBytes(MI);
++  return Bytes;
++}
++
++// The hard-stack depth relative to function entry at the start of each
++// reachable block.
++static DenseMap<const MachineBasicBlock *, int>
++computeEntryDepths(MachineFunction &MF) {
++  DenseMap<const MachineBasicBlock *, int> Depth;
++  Depth[&MF.front()] = 0;
++  ReversePostOrderTraversal<MachineFunction *> RPOT(&MF);
++  bool Changed = true;
++  while (Changed) {
++    Changed = false;
++    for (const MachineBasicBlock *MBB : RPOT) {
++      auto It = Depth.find(MBB);
++      if (It == Depth.end())
++        continue;
++      int Out = It->second + hardStackPushBytes(*MBB);
++      for (const MachineBasicBlock *Succ : MBB->successors()) {
++        auto SuccIt = Depth.find(Succ);
++        if (SuccIt == Depth.end()) {
++          Depth[Succ] = Out;
++          Changed = true;
++        } else if (SuccIt->second != Out) {
++          report_fatal_error("hard stack depth differs between paths into " +
++                             Twine(Succ->getFullName()));
++        }
++      }
++    }
++  }
++  return Depth;
++}
++
++static void expandReturnAddressByte(MachineInstr &MI, int Depth) {
++  MachineBasicBlock &MBB = *MI.getParent();
++  const MOSSubtarget &STI = MBB.getParent()->getSubtarget<MOSSubtarget>();
++  const TargetInstrInfo &TII = *STI.getInstrInfo();
++  const DebugLoc &DL = MI.getDebugLoc();
++  Register Dst = MI.getOperand(0).getReg();
++  int64_t Byte = MI.getOperand(MI.getNumExplicitDefs()).getImm();
++  // JSR left the word just above the stack pointer: byte 0 at S+1, byte 1 at
++  // S+2, both displaced by what was pushed since.
++  int64_t Offset = 1 + Depth + Byte;
++
++  if (MI.getOpcode() == MOS::ReturnAddressByteSR) {
++    BuildMI(MBB, MI, DL, TII.get(MOS::LDA_StackRelative))
++        .addImm(Offset)
++        .addReg(Dst, RegState::ImplicitDefine);
++  } else {
++    Register Scratch = MI.getOperand(1).getReg();
++    BuildMI(MBB, MI, DL, TII.get(MOS::TSX_Implied))
++        .addReg(Scratch, RegState::ImplicitDefine);
++    BuildMI(MBB, MI, DL, TII.get(MOS::LDAAbsIdx), Dst)
++        .addImm(0x100 + Offset)
++        .addReg(Scratch);
++  }
++  MI.eraseFromParent();
++}
++
++bool MOSLowerReturnAddress::runOnMachineFunction(MachineFunction &MF) {
++  if (!MF.getFrameInfo().isReturnAddressTaken())
++    return false;
++
++  DenseMap<const MachineBasicBlock *, int> EntryDepth = computeEntryDepths(MF);
++  bool Changed = false;
++  for (MachineBasicBlock &MBB : MF) {
++    // An unreachable block never runs; any depth serves it.
++    int Depth = EntryDepth.lookup(&MBB);
++    for (MachineInstr &MI : make_early_inc_range(MBB)) {
++      if (isReturnAddressByte(MI)) {
++        expandReturnAddressByte(MI, Depth);
++        Changed = true;
++      } else {
++        Depth += hardStackPushBytes(MI);
++      }
++    }
++  }
++  return Changed;
++}
++
++char MOSLowerReturnAddress::ID = 0;
++
++INITIALIZE_PASS(MOSLowerReturnAddress, DEBUG_TYPE, "MOS Lower Return Address",
++                false, false)
++
++MachineFunctionPass *llvm::createMOSLowerReturnAddressPass() {
++  return new MOSLowerReturnAddress;
++}
+diff --git a/llvm/lib/Target/MOS/MOSLowerReturnAddress.h b/llvm/lib/Target/MOS/MOSLowerReturnAddress.h
+new file mode 100644
+index 000000000000..6af09c0e0300
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSLowerReturnAddress.h
+@@ -0,0 +1,25 @@
++//===-- MOSLowerReturnAddress.h - Expand return-address reads ----*- C++ -*-===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// This file declares the pass that expands the hard-stack reads behind
++// __builtin_return_address(0).
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIB_TARGET_MOS_MOSLOWERRETURNADDRESS_H
++#define LLVM_LIB_TARGET_MOS_MOSLOWERRETURNADDRESS_H
++
++#include "llvm/CodeGen/MachineFunctionPass.h"
++
++namespace llvm {
++
++MachineFunctionPass *createMOSLowerReturnAddressPass();
++
++} // namespace llvm
++
++#endif // not LLVM_LIB_TARGET_MOS_MOSLOWERRETURNADDRESS_H
+diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+index aae795c4877b..da4f693cab5c 100644
+--- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
++++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+@@ -40,6 +40,7 @@
+ #include "MOSInsertCopies.h"
+ #include "MOSInternalize.h"
+ #include "MOSLateOptimization.h"
++#include "MOSLowerReturnAddress.h"
+ #include "MOSLowerSelect.h"
+ #include "MOSMachineFunctionInfo.h"
+ #include "MOSMachineScheduler.h"
+@@ -64,6 +65,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeMOSInsertCopiesPass(PR);
+   initializeMOSInternalizePass(PR);
+   initializeMOSLateOptimizationPass(PR);
++  initializeMOSLowerReturnAddressPass(PR);
+   initializeMOSLowerSelectPass(PR);
+   initializeMOSNonReentrantPass(PR);
+   initializeMOSPostRAScavengingPass(PR);
+@@ -314,6 +316,8 @@ void MOSPassConfig::addPreSched2() {
+
+   // This is currently mandatory, since it lowers CMPTermZ.
+   addPass(createMOSLateOptimizationPass());
++  // Every hard-stack push is in place now; expand the return-address reads.
++  addPass(createMOSLowerReturnAddressPass());
+   if (getOptLevel() != CodeGenOptLevel::None)
+     addPass(createMOSStaticStackAllocPass());
+ }
+diff --git a/llvm/test/CodeGen/MOS/return-address-spc700.ll b/llvm/test/CodeGen/MOS/return-address-spc700.ll
+new file mode 100644
+index 000000000000..05ca8162bf86
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/return-address-spc700.ll
+@@ -0,0 +1,37 @@
++; RUN: llc -mtriple=mos -mcpu=mosspc700 -O2 -verify-machineinstrs < %s | FileCheck %s
++
++; SPC700 CALL pushes the return address itself, so the word read from the hard
++; stack is used as it is; the stack pointer transfer and the indexed load are the
++; SPC700 forms of tsx and lda abs,x. (Kept apart from return-frame-address.ll:
++; no pointer constants here, which SPC700 cannot yet compile at -O2.)
++
++declare void @keep(i8)
++
++define ptr @return_address() {
++; CHECK-LABEL: return_address:
++; CHECK:       mov x,s
++; CHECK-NEXT:  mov a,257+x
++; CHECK:       mov a,258+x
++; CHECK-NOT:   inc
++; CHECK-NOT:   adc
++; CHECK:       ret
++  %r = call ptr @llvm.returnaddress(i32 0)
++  ret ptr %r
++}
++
++; A value live across a call is kept in a callee-saved register, which the
++; prologue pushes on the hard stack; the read is displaced by that push.
++define ptr @return_address_after_push(i8 %v) {
++; CHECK-LABEL: return_address_after_push:
++; CHECK:       push x
++; CHECK:       mov x,s
++; CHECK-NEXT:  mov a,258+x
++; CHECK:       mov a,259+x
++; CHECK:       pop x
++  call void @keep(i8 %v)
++  call void @keep(i8 %v)
++  %r = call ptr @llvm.returnaddress(i32 0)
++  ret ptr %r
++}
++
++declare ptr @llvm.returnaddress(i32 immarg)
+diff --git a/llvm/test/CodeGen/MOS/return-frame-address.ll b/llvm/test/CodeGen/MOS/return-frame-address.ll
+new file mode 100644
+index 000000000000..14020c4538aa
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/return-frame-address.ll
+@@ -0,0 +1,103 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,M6502
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,M6502
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,W65816
++
++; __builtin_return_address(0) is the word JSR pushed on the hard stack (the
++; address of its own last byte) plus one. __builtin_frame_address(0) is the
++; incoming soft stack pointer. Neither stack has a frame chain, so any other
++; level is zero. (SPC700: return-address-spc700.ll.)
++
++declare void @sink(ptr)
++declare void @keep(i8)
++
++; The word sits just above the stack pointer at entry: S+1 and S+2.
++define ptr @return_address() {
++; CHECK-LABEL: return_address:
++; M6502:       tsx
++; M6502-NEXT:  lda 257,x
++; M6502:       lda 258,x
++; W65816:      lda 1,s
++; W65816:      lda 2,s
++; CHECK:       inc __rc2
++; CHECK:       inc __rc3
++; CHECK:       rts
++  %r = call ptr @llvm.returnaddress(i32 0)
++  ret ptr %r
++}
++
++; A value live across a call is kept in a callee-saved register, which the
++; prologue pushes on the hard stack; the read is displaced by that push.
++define ptr @return_address_after_push(i8 %v) {
++; CHECK-LABEL: return_address_after_push:
++; CHECK:       {{ph[axy]}}
++; M6502:       tsx
++; M6502-NEXT:  lda 258,x
++; M6502:       lda 259,x
++; W65816:      lda 2,s
++; W65816:      lda 3,s
++; CHECK:       {{pl[axy]}}
++  call void @sink(ptr null)
++  call void @keep(i8 %v)
++  %r = call ptr @llvm.returnaddress(i32 0)
++  ret ptr %r
++}
++
++define ptr @return_address_level_1() {
++; CHECK-LABEL: return_address_level_1:
++; CHECK-NOT:   tsx
++; CHECK-NOT:   ,s
++; CHECK:       #0
++; CHECK:       rts
++  %r = call ptr @llvm.returnaddress(i32 1)
++  ret ptr %r
++}
++
++; An interrupt handler has no C return address.
++@slot = global ptr null
++
++define void @isr() "interrupt" {
++; CHECK-LABEL: isr:
++; CHECK-NOT:   tsx
++; CHECK-NOT:   ,s
++; CHECK:       rti
++  %r = call ptr @llvm.returnaddress(i32 0)
++  store ptr %r, ptr @slot
++  ret void
++}
++
++; No frame: the frame address is the stack pointer itself.
++define ptr @frame_address() {
++; CHECK-LABEL: frame_address:
++; CHECK:       {{ld[ax]}} __rc0
++; CHECK-NEXT:  {{st[ax]}} __rc2
++; CHECK-NEXT:  {{ld[ax]}} __rc1
++; CHECK-NEXT:  {{st[ax]}} __rc3
++; CHECK:       rts
++  %f = call ptr @llvm.frameaddress(i32 0)
++  ret ptr %f
++}
++
++; With a 16-byte frame the frame address is the stack pointer plus 16, the
++; value it had on entry.
++define ptr @frame_address_with_frame() {
++; CHECK-LABEL: frame_address_with_frame:
++; CHECK:       lda __rc0
++; CHECK:       adc #16
++; CHECK:       rts
++  %a = alloca [16 x i8]
++  call void @sink(ptr %a)
++  %f = call ptr @llvm.frameaddress(i32 0)
++  ret ptr %f
++}
++
++define ptr @frame_address_level_1() {
++; CHECK-LABEL: frame_address_level_1:
++; CHECK-NOT:   __rc0
++; CHECK:       #0
++; CHECK:       rts
++  %f = call ptr @llvm.frameaddress(i32 1)
++  ret ptr %f
++}
++
++declare ptr @llvm.returnaddress(i32 immarg)
++declare ptr @llvm.frameaddress(i32 immarg)

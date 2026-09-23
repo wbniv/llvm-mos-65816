@@ -62,6 +62,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0032-mos-quote-register-named-symbols-vendor.patch"
   "$PATCHES/0034-mos-legalize-prefetch.patch"
   "$PATCHES/0036-mos-zero-page-indexed-globals.patch"
+  "$PATCHES/0038-mos-return-frame-address.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
@@ -109,7 +110,10 @@ for ((i=${#STANDALONE_MOSDIR[@]}-1; i>=0; i--)); do
   echo "    reversing $(basename "$p") out of the 0002 generation tree"
   includes=(--include="$MOSREL/*")
   for rel in "${TESTRELS[@]}"; do includes+=(--include="$rel"); done
-  git -C "$WT_GEN" apply --reverse "${includes[@]}" "$p"
+  # 0038 is applied with -C1 by toolchain.sh (its registration hunks neighbour
+  # 0002's REP/SEP lines), so it reverses with the same reduced context.
+  ctx=(); case "$p" in *0038-*) ctx=(-C1);; esac
+  git -C "$WT_GEN" apply --reverse "${ctx[@]}" "${includes[@]}" "$p"
 done
 git -C "$WT_GEN" add -A
 git -C "$WT_GEN" diff --cached > "$P2"
@@ -125,7 +129,8 @@ git -C "$WT_VFY" apply "$P1"
 git -C "$WT_VFY" apply "$P2"
 [ -f "$P3" ] && git -C "$WT_VFY" apply "$P3"   # 0003 restores MOSLateOptimization.cpp to the live (fixed) state
 for p in "${STANDALONE_MOSDIR[@]}"; do
-  [ -f "$p" ] && git -C "$WT_VFY" apply "$p"
+  ctx=(); case "$p" in *0038-*) ctx=(-C1);; esac   # see the reverse loop above
+  [ -f "$p" ] && git -C "$WT_VFY" apply "${ctx[@]}" "$p"
 done
 
 echo "==> [verify] diff -rq reapplied MOS dir vs live vendor MOS dir"

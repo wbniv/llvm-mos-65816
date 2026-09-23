@@ -1,7 +1,8 @@
 # Pending upstream work and dependencies
 
 **Local preparation updated 2026-09-23.** Patch 0036's zero-page indexed-global
-fix is implemented, validated, and installed; independent review remains.
+fix is implemented, validated, installed, and independently reviewed; the
+review audit is complete. Patch 0037 also has a completed independent audit.
 Patches 0034 and 0035 address separate backend and frontend prefetch defects.
 The new `mos16(constant)` parser-width defect is diagnosed but not fixed.
 Earlier patches retain their dated validation and review records below.
@@ -77,7 +78,8 @@ reproduction checks; keep candidate patches in separate builds.
    0036 makes opcode selection recognize zero-page sections and checks the address
    operand for indexed stores. Standalone suites: 132 pass / one unsupported;
    27 C round-trip mismatches repaired, 18 ordinary-section controls unchanged.
-   Installed locally; independent review and submission preparation remain.
+   Installed locally; [review audit complete](pr-preparations/2026-09-23/0036-review-audit.md).
+   Submission preparation remains.
    [Validation](pr-preparations/2026-09-23/0036-validation.md).
 9. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
    semantics question, now verified with the stock upstream frontend and `opt`.
@@ -85,7 +87,9 @@ reproduction checks; keep candidate patches in separate builds.
     patch 0037, generic `InlineAsmLowering` stores `"=*r"` register defs (Clang's
     `+g`) through their pointer; 10 c-torture compilations repaired, corpus
     otherwise identical; AArch64 GlobalISel test included. For llvm/llvm-project.
-    [Validation](pr-preparations/2026-09-23/0037-validation.md). Unreviewed.
+    [Validation](pr-preparations/2026-09-23/0037-validation.md) ·
+    [audit](pr-preparations/2026-09-23/0037-review-audit.md): no implementation defect;
+    915 standalone suite passes, one unsupported. Submission variant prepared.
 
 ## Backend failure triage (gcc c-torture, 2026-09-23)
 
@@ -98,13 +102,13 @@ rank in `TODO.md`:
 |---:|---|---:|---|---|
 | 1 | done | 18 | `G_PREFETCH` never legalized, plus Clang emitting `i16` prefetch operands on 16-bit-`int` targets | **fixed 2026-09-23**: [0034](upstream-prefetch-legalize-pr.md) (MOS) and [0035](upstream-clang-prefetch-int16-pr.md) (Clang, for llvm/llvm-project); [validation](pr-preparations/2026-09-23/0034-0035-validation.md) |
 | 2 | done | 10 | `asm("" : "+g"(x))`: "unable to translate instruction: call" | **fixed 2026-09-23**: generic `InlineAsmLowering` never stored indirect register outputs (`"=*imr,0"`) through their pointer; [0037](upstream-gisel-inline-asm-indirect-output-pr.md) (for llvm/llvm-project); [validation](pr-preparations/2026-09-23/0037-validation.md) |
-| 3 | T3 | 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | implement (return address from the hard stack, frame address from `__rc0`) or emit a clean diagnostic |
+| 3 | done | 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | **fixed 2026-09-23**: frame address = incoming soft stack pointer (fixed frame object), return address read from the hard stack by a late-expanded pseudo with a CFG dataflow for the depth; [0038](upstream-return-frame-address-pr.md); [validation](pr-preparations/2026-09-23/0038-validation.md) |
 | 4 | T4 | 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` on a 16-bit value in `20030222-1.c`) | shape-specific (a simple `int` case compiles); reduce first; a wrong turn miscompiles inline asm |
 | 5 | T3 | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | vector extensions; scalarization rules |
 | — | — | 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
 
-Recommended order: the prefetch fixes and the `g` constraint are done; next
-is return/frame address (order 3). The zero-page-global opcode disagreement
+Recommended order: the prefetch fixes, the `g` constraint and the return/frame
+address (orders 1 to 3) are done; next is order 4. The zero-page-global opcode disagreement
 found in the 0032 review is fixed by 0036. Its numeric-address controls exposed
 a separate `[T4]` parser defect: `mos16(constant)` can select a zero-page opcode,
 even silently truncating `4660` to `0x34`. That finding needs a width-matching
@@ -158,7 +162,7 @@ Patch 0036 submission status:
   [PR draft](upstream-zero-page-indexed-globals-pr.md), and
   [validation record](pr-preparations/2026-09-23/0036-validation.md), with AI
   tool version, model, and reasoning effort in the attribution.
-- [ ] Complete independent review.
+- [x] Complete independent review and [audit](pr-preparations/2026-09-23/0036-review-audit.md).
 - [ ] Check current upstream applicability and prepare the standalone branch.
 - [ ] Publish the fix PR when requested.
 
@@ -197,8 +201,8 @@ failure with the stock upstream frontend and backend.
 | Register-named assembly symbols (`0032`) | [Review audited](pr-preparations/2026-09-23/0032-review-audit.md); no code defect found; standalone suites pass; full-corpus assembler failures fall from 821 to zero across 4,091 emitted files; compatible local patch installed; check current upstream, prepare branch, and publish |
 | MOS prefetch legalization (`0034`) | [Audit complete](pr-preparations/2026-09-23/0034-review-audit.md), no code defect found; 130 standalone suite passes and 28 all-CPU legalization checks; prepare submission to llvm-mos |
 | Clang prefetch operand types (`0035`) | [Casts confirmed](pr-preparations/2026-09-23/0035-review-audit.md), including wider options on x86-64; committed test now covers `long`/`long long`/two-argument forms; submit to llvm/llvm-project |
-| GlobalISel indirect inline-asm outputs (`0037`) | [Fix prepared](upstream-gisel-inline-asm-indirect-output-pr.md): `"=*r"` defs stored through their pointer; 10 c-torture compilations repaired, MOS and AArch64 tests; [validation](pr-preparations/2026-09-23/0037-validation.md); independent review and submission to llvm/llvm-project remain |
-| Zero-page indexed globals (`0036`) | [Fix prepared](upstream-zero-page-indexed-globals-pr.md), standalone suites and C round trips pass, installed locally; independent review and submission preparation remain |
+| GlobalISel indirect inline-asm outputs (`0037`) | [Fix prepared](upstream-gisel-inline-asm-indirect-output-pr.md): `"=*r"` defs stored through their pointer; 10 c-torture compilations repaired, MOS and AArch64 tests; [validation](pr-preparations/2026-09-23/0037-validation.md); [review complete](pr-preparations/2026-09-23/0037-review-audit.md); check and validate the extracted llvm/llvm-project submission against current upstream |
+| Zero-page indexed globals (`0036`) | [Fix prepared](upstream-zero-page-indexed-globals-pr.md), standalone suites and C round trips pass, installed locally; [review audited](pr-preparations/2026-09-23/0036-review-audit.md); submission preparation remains |
 | Explicit constant address width | `mos16(constant)` can select an 8-bit address encoding and truncate it; [reduced and diagnosed](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect), parser fix pending |
 | Scavenger live-P (`0011`) | Producer established (gcc torture `strlen-4.c`, stock `mos6502` `-O0`); test replaced by an upstream-runnable one; validated; post |
 | Call-clobbered coalescing guard (`0015`) | Revalidate diagnosis and upstream reachability; prefer a root-cause fix |
@@ -236,6 +240,14 @@ for the complete CI table. Job failure causes were not re-audited September 21.
    allocator/scavenger reports independently of the SDK platform's merge timing.
 
 ## SNES — separate platform track
+
+**Submission scope clarified by Will, September 23:** published SNES ROM demos
+are welcome as supporting evidence in independent compiler-fix PRs; link the
+actual demo pages. This is distinct from submitting SNES code or configs.
+Those submissions must follow the compiler/ABI and platform dependencies below.
+For example, 0036 cites [By-Value Boundary Trio](https://biohack.net/snes/byvaledge/)
+and [Newton's Fractal](https://biohack.net/snes/newton/) as integration coverage;
+the standalone regression tests establish the fix itself.
 
 **Upload/review next; do not wait for it to merge before posting independent fixes.**
 There is already an upstream [SNES target PR #415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415).
@@ -288,8 +300,8 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | Spill-hoisting scratch vregs (`0033`) | Crash fix confirmed; rollback accounting corrected and revalidated | **Fix PR prepared, unposted** | Prepare branch and publish | No |
 | MOS prefetch legalization (`0034`) | Standalone suites and all-CPU legalization checks pass; no code defect found | **Audited, unposted** | Prepare submission to llvm-mos | No |
 | Clang prefetch operand types (`0035`) | Casts fix narrower and wider integer options; committed test covers both | **Fix PR prepared, unposted** | Submit to llvm/llvm-project | No |
-| GlobalISel indirect inline-asm outputs (`0037`) | Indirect register defs stored through their pointer; 10 compilations repaired, corpus otherwise identical | **Fix PR prepared, unposted, unreviewed** | Independent review; submit to llvm/llvm-project | No |
-| Zero-page indexed globals (`0036`) | Compact opcodes selected consistently; 132 suite passes and 45 upstream C round trips | **Validated, awaiting independent review** | Review, check upstream applicability, prepare branch | No |
+| GlobalISel indirect inline-asm outputs (`0037`) | Indirect register defs stored through their pointer; 10 compilations repaired, corpus otherwise identical | **Audited, unposted** | Check and validate extracted submission against current llvm/llvm-project | No |
+| Zero-page indexed globals (`0036`) | Compact opcodes selected consistently; 132 suite passes and 45 upstream C round trips | **Review audited, unposted** | Check upstream applicability, prepare branch | No |
 | Explicit constant address width | `mos16(constant)` truncation reduced and diagnosed; no fix yet | **Investigation recorded** | Fix parser width matching and test affected addressing forms | No |
 | #320 far-address-space series (`0001` and related content) | Substantial downstream implementation exists | **Series not posted** | Agree ABI, extract coherent compiler commits and validate standalone | No; SDK integration follows agreed compiler/runtime ABI |
 | #321 native-width series (`0002` and related content) | Substantial downstream implementation exists | **Series not posted** | Extract native-only commits from mixed aggregate, document ABI/interrupt contract, validate and post one complete draft PR | No; native runtime required to execute examples |
@@ -327,8 +339,8 @@ flowchart TD
     HOIST[Spill-hoist guard 0033: audited, accounting revised and revalidated] --> HOISTPR[Publish fix PR, drops driver flag] --> MERGED
     PREFETCH[Prefetch fixes validated: MOS 0034 and Clang 0035] --> PREFETCHMOS[Submit 0034 to llvm-mos] --> MERGED
     PREFETCH --> PREFETCHCLANG[Submit 0035 to llvm/llvm-project] --> MERGED
-    ASMG[GlobalISel indirect asm outputs 0037: MOS and AArch64 tests, corpus differential] --> ASMGREVIEW[Independent review] --> ASMGPR[Submit to llvm/llvm-project] --> MERGED
-    ZPIDX[Zero-page indexed globals 0036: suites and round trips pass] --> ZPREVIEW[Independent review and submission preparation] --> ZPPR[Publish fix PR] --> MERGED
+    ASMG[GlobalISel indirect asm outputs 0037: MOS and AArch64 tests, corpus differential] --> ASMGREVIEW[Audit complete; validate extracted upstream submission] --> ASMGPR[Submit to llvm/llvm-project] --> MERGED
+    ZPIDX[Zero-page indexed globals 0036: suites and round trips pass] --> ZPREVIEW[Review audited; submission preparation] --> ZPPR[Publish fix PR] --> MERGED
     TRIAGE[Remaining c-torture failures: return/frame address, tied asm operand, float vectors] --> NEXTFIX[Next fixes, ranked in TODO]
   end
   subgraph SNES[SNES platform — separate track]

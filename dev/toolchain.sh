@@ -126,6 +126,11 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0034-mos-legalize-prefetch
   # Indexed opcodes use the same zero-page classification as their operands.
   apply_patch 0036-mos-zero-page-indexed-globals
+  # __builtin_return_address(0) / __builtin_frame_address(0): legalized (hard-
+  # stack read expanded by MOSLowerReturnAddress; fixed frame object at offset 0).
+  # Generated against pristine upstream; four of its registration hunks sit next
+  # to 0002's REP/SEP lines, hence the reduced context (-C1). Same in regen-patch.sh.
+  apply_patch 0038-mos-return-frame-address -C1
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

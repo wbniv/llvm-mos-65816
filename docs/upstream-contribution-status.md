@@ -16,9 +16,10 @@ plus authored PRs in `llvm-mos/llvm-mos-sdk`.
 [0033](upstream-spill-hoist-scratch-vregs-pr.md) spill hoisting (generic LLVM + driver flag removal) ·
 [0034](upstream-prefetch-legalize-pr.md) drop `G_PREFETCH` ·
 [0035](upstream-clang-prefetch-int16-pr.md) clang prefetch operands as `i32` (for llvm/llvm-project) ·
-[0037](upstream-gisel-inline-asm-indirect-output-pr.md) GlobalISel indirect inline-asm outputs, the `+g` idiom (for llvm/llvm-project).
+[0037](upstream-gisel-inline-asm-indirect-output-pr.md) GlobalISel indirect inline-asm outputs, the `+g` idiom (for llvm/llvm-project) ·
+[0038](upstream-return-frame-address-pr.md) `llvm.returnaddress` / `llvm.frameaddress` legalized.
 
-**Prepared, awaiting independent review:** [0036](upstream-zero-page-indexed-globals-pr.md)
+**Prepared, independent review audited:** [0036](upstream-zero-page-indexed-globals-pr.md)
 zero-page indexed globals. Direct and reassembled objects now agree; standalone
 MOS suites pass (132 / one unsupported), and the local compiler is rebuilt and
 installed. [Validation](pr-preparations/2026-09-23/0036-validation.md).
@@ -28,16 +29,18 @@ installed. [Validation](pr-preparations/2026-09-23/0036-validation.md).
 queue labels when judging what can be posted next.
 
 **Local preparation updated September 23:** independent reviews and audits are recorded
-for 0011 and 0029–0035. The [0033 audit](pr-preparations/2026-09-23/0033-review-audit.md)
+for 0011 and 0029–0037, including the 0033/0035 revision follow-ups. The [0033 audit](pr-preparations/2026-09-23/0033-review-audit.md)
 found a rollback-statistic defect, corrected and revalidated the same day
 ([response](pr-preparations/2026-09-23/0033-validation.md)); its provenance
 finding was a container mount alias. The [0034 audit](pr-preparations/2026-09-23/0034-review-audit.md)
 finds no implementation defect. The [0035 audit](pr-preparations/2026-09-23/0035-review-audit.md)
 established that wider options also break x86-64; the test now covers `long`,
 `long long` and the two-argument form. Patch 0037 (indirect register outputs in
-GlobalISel inline asm) is prepared and validated, unreviewed.
+GlobalISel inline asm) has a [completed audit](pr-preparations/2026-09-23/0037-review-audit.md):
+915 standalone suite passes, one unsupported; the generic/AArch64 submission
+variant is prepared, with current llvm/llvm-project applicability still to check.
 Patch 0036 is validated against the pinned upstream base, with 45 upstream and
-36 local C round trips passing, and awaits independent review. Its numeric
+36 local C round trips passing; [Claude's review is audited](pr-preparations/2026-09-23/0036-review-audit.md). Its numeric
 controls exposed a separate `mos16(constant)` truncation defect; that parser
 fix remains pending. Review, corpus, and emulator coverage are specific to each
 patch's record. See the [pending-work tracker](upstream-pending-work.md) for
@@ -593,7 +596,8 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   The local compiler is installed, with three regressions and 36 width-mode
   compilations passing. [PR draft](upstream-zero-page-indexed-globals-pr.md) ·
   [validation](pr-preparations/2026-09-23/0036-validation.md).
-  Independent review and submission preparation remain; unposted. A separate
+  [Review audit complete](pr-preparations/2026-09-23/0036-review-audit.md);
+  submission preparation remains; unposted. A separate
   `mos16(constant)` parser-width defect is reduced and tracked in `TODO.md`.
 
 - **Prefetch — two fixes prepared September 23.**
@@ -613,6 +617,18 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   other 11. 0035 revised accordingly: wider-argument and two-argument cases in
   the committed test, comments corrected. Both ready to post.
 
+- **`__builtin_return_address` / `__builtin_frame_address` — fix prepared September 23.**
+  [Patch 0038](../patches/llvm-mos/0038-mos-return-frame-address.patch): neither intrinsic was
+  legalized on MOS (15 c-torture compilations). The frame address is the incoming soft stack
+  pointer, a fixed frame object at offset 0 through the existing frame-index lowering; the return
+  address is the word `JSR` pushed plus one, read from the hard stack by an in-place pseudo that the
+  new `MOSLowerReturnAddress` pass expands last, with the depth from a forward dataflow over the
+  CFG (`tsx ; lda $0101+d,x`, 65816 `lda 1+d,s`, SPC700 without the `+1`). Levels above 0 and
+  interrupt handlers return 0. Aimed at `llvm-mos`. [PR draft](upstream-return-frame-address-pr.md) ·
+  [validation](pr-preparations/2026-09-23/0038-validation.md). Unreviewed; unposted. Found on the
+  way: SPC700 `-O2` crashes on any immediate load into an imaginary register (pre-existing,
+  tracked in `TODO.md`).
+
 - **GlobalISel indirect inline-asm outputs — fix prepared September 23.**
   [Patch 0037](../patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output.patch):
   Clang lowers `asm("" : "+g"(x))` to `"=*imr,0"`; generic `InlineAsmLowering` picked the
@@ -621,7 +637,10 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   `INLINEASM`, as SelectionDAG does. 10 c-torture compilations repaired, corpus otherwise
   identical; reproduces on AArch64 GlobalISel too. Aimed at `llvm/llvm-project`.
   [PR draft](upstream-gisel-inline-asm-indirect-output-pr.md) ·
-  [validation](pr-preparations/2026-09-23/0037-validation.md). Unposted, unreviewed.
+  [validation](pr-preparations/2026-09-23/0037-validation.md).
+  [Independent audit complete](pr-preparations/2026-09-23/0037-review-audit.md); unposted.
+  The generic/AArch64 submission variant needs current llvm/llvm-project
+  applicability and validation before posting.
 
 - **Spill hoisting versus scratch virtual registers — fix prepared September 23.**
   [Patch 0033](../patches/llvm-mos/0033-llvm-spill-hoist-no-new-vregs.patch): greedy's

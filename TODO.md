@@ -1114,10 +1114,33 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [PR draft](docs/upstream-gisel-inline-asm-indirect-output-pr.md) ·
   [validation](docs/pr-preparations/2026-09-23/0037-validation.md). Aimed at llvm/llvm-project.
   Remaining: publish (user-triggered).
-- [T3] **`__builtin_return_address` / `__builtin_frame_address` are unlegalized** (15 c-torture
-  compilations). Either implement (return address from the hard stack; frame address from `__rc0`)
-  or emit a clean diagnostic instead of a backend abort. Reason for T3: small, but the semantics
-  under the soft stack need deciding.
+- [T5] **`__builtin_return_address` / `__builtin_frame_address` on MOS (patch 0038).** Both
+  intrinsics were unlegalized (15 c-torture compilations). Frame address = the incoming soft stack
+  pointer (fixed frame object at offset 0, no frame pointer forced); return address = the word
+  `JSR` pushed plus one, read from the hard stack by an in-place pseudo that the new
+  `MOSLowerReturnAddress` pass expands last with the depth from a forward dataflow over the CFG
+  (`tsx ; lda $0101+d,x`; 65816 `lda 1+d,s`; SPC700 without the `+1`); levels above 0 and
+  interrupt handlers return 0. [Plan](docs/plans/2026-09-23-return-frame-address.md) ·
+  [PR draft](docs/upstream-return-frame-address-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0038-validation.md). Aimed at llvm-mos.
+  Remaining: publish (user-triggered).
+- [T4] **Greedy RA segfault in `SplitEditor::enterIntvAfter` on `ashrdi-1.c` (`constant_shift`), `mosw65816 -Os`, project toolchain only.**
+  Found 2026‑09‑23 when the c-torture host filter was re-run for 0038: `ashrdi-1` dropped out of
+  scope with "PLEASE submit a bug report" (region split → `splitRegOutBlock` → `enterIntvAfter`).
+  The same IR compiles clean at `-O0`/`-O2` through the upstream-shape assertion `llc` both with and
+  without 0038 (`build/0030-claude-review/llc-final`, `llc-0038`), so it lives in the vendor state
+  (0002 or the in-progress `MOSRegisterInfo.cpp` liveness edits); 0038 touches nothing before
+  register allocation in a function without the builtins. Not proven by a vendor rebuild without
+  0038 (20 min of toolchain churn; do it first if in doubt). Reason for T4: unknown root cause in
+  generic RA splitting driven by MOS register-class shape.
+- [T2] **SPC700 `-O2` crashes on any immediate load into an imaginary register.**
+  `MOSLateOptimization::combineLdImm` leaves `Load` null when `LDImm`'s destination is not
+  A/X/Y (SPC700 allows `LDImm` to imaginary registers, `MOSInstrInfo.cpp` "On SPC700, LDImm can
+  be used for imaginary registers") and then dereferences it (`Load->MI = &MI`). Reproduces on
+  the unpatched `llc` with `-mcpu=mosspc700 -O2` on a function returning `ptr null`
+  (found 2026‑09‑23 while writing the 0038 SPC700 test, which avoids the shape). Fix: skip the
+  bookkeeping for non-A/X/Y destinations; add an SPC700 lit test. Reason for T2: one function, the
+  null path is identified.
 - [T4] **GlobalISel inline asm asserts on a multi-register tied operand** (`20030222-1.c`:
   `asm("" : "=r"(i) : "0"(x))`; 6 compilations). A plain `int` case compiles, so the failing shape is
   specific; reduce it first. Reason for T4: the fix is in generic `InlineAsmLowering` and a wrong

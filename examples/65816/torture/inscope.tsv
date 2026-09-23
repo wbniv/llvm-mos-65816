@@ -89,6 +89,7 @@
 20010116-1.c
 20010118-1.c
 20010119-1.c
+20010122-1.c
 20010123-1.c
 20010129-1.c
 20010206-1.c
@@ -185,7 +186,6 @@
 20021118-2.c
 20021118-3.c
 20021119-1.c
-20021120-1.c
 20021120-2.c
 20021127-1.c
 20021204-1.c
@@ -235,6 +235,7 @@
 20031003-1.c
 20031010-1.c
 20031011-1.c
+20031012-1.c
 20031020-1.c
 20031201-1.c
 20031204-1.c
@@ -622,7 +623,6 @@ arith-1.c
 arith-rand-ll.c
 arith-rand.c
 ashldi-1.c
-ashrdi-1.c
 bf-layout-1.c
 bf-pack-1.c
 bf-sign-1.c
@@ -638,6 +638,12 @@ bitfld-9.c
 bitfld-signed1-1.c
 builtin-bitops-1.c
 builtin-constant.c
+builtin-prefetch-1.c
+builtin-prefetch-2.c
+builtin-prefetch-3.c
+builtin-prefetch-4.c
+builtin-prefetch-5.c
+builtin-prefetch-6.c
 builtin-types-compatible-p.c
 call-trap-1.c
 cbrt.c
@@ -674,6 +680,7 @@ ffs-1.c
 ffs-2.c
 float-floor.c
 floatunsisf-1.c
+frame-address.c
 func-ptr-1.c
 gofast.c
 ieee/20000320-1.c
@@ -817,6 +824,7 @@ pr16790-1.c
 pr17078-1.c
 pr17133.c
 pr17252.c
+pr17377.c
 pr19005.c
 pr19449.c
 pr19515.c

@@ -86,6 +86,17 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
   MIR/lit work) must refresh it explicitly:
   `docker run --rm -v $ROOT:/work --user $(id -u):$(id -g) -e HOME=/work/build llvm-mos-65816-dev
   cmake --build /work/build/llvm-mos --target llc --parallel 8`.
+- **The upstream-shape validation build (`build/newton-postra-build`, assertions on) is a copy of
+  `build/0029-cross-target-build`** and is driven in the container with its source mounted at the
+  cached path: `dev/container.sh -v "$PWD/build/newton-postra-src:/work/build/register-exhaustion-src"
+  -- cmake --build /work/build/newton-postra-build --target llc --parallel 8`. Its generated files
+  were rewritten 2026‑09‑23 to name their own directory (the copy still said
+  `0029-cross-target-build`, so the first `CMakeLists.txt` change made ninja regenerate into the
+  *other* directory and loop on "manifest 'build.ninja' still dirty"); if a source-list change ever
+  needs a reconfigure again, run `cmake -S /work/build/register-exhaustion-src/llvm -B
+  /work/build/newton-postra-build` explicitly inside the container first. Lit there:
+  `/work/build/newton-postra-build/bin/llvm-lit -s /work/build/newton-postra-build/test/CodeGen/MOS
+  /work/build/newton-postra-build/test/MC/MOS` (the site config carries container paths).
 - **Never run two `dev/run.sh corpus-a16` (or `corpus`) invocations concurrently — even in separate
   containers.** `tools/a16_fuzz.py`'s `evaluate()` compiles EVERY demo to the same fixed filenames
   (`build/fuzz-work/chk_default.sfc` / `chk_a16.sfc` / `chk_xy16.sfc`, plus their `.map`s), never one
