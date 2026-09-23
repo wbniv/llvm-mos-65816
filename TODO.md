@@ -1092,19 +1092,28 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
   [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
 - [T5] **`__builtin_prefetch`: patches 0034 (MOS: drop `G_PREFETCH`) and 0035 (clang: emit the
-  rw/locality operands as `i32` on 16-bit-`int` targets; aimed at llvm/llvm-project).** Fixed and
+  rw/locality operands as `i32` regardless of C expression width; aimed at llvm/llvm-project).** Fixed and
   validated 2026-09-23: all six `builtin-prefetch-*.c` torture files compile at three levels with the
   verifier; tests discriminate on both sides. [PR draft 0034](docs/upstream-prefetch-legalize-pr.md) ·
   [PR draft 0035](docs/upstream-clang-prefetch-int16-pr.md) ·
-  [validation](docs/pr-preparations/2026-09-23/0034-0035-validation.md). Remaining: publish
-  (user-triggered; 0034 to llvm-mos, 0035 to llvm/llvm-project). The 0035 frontend
-  bug affects explicit arguments such as `__builtin_prefetch(p, 1, 2)`; omitted
-  arguments already have the correct type. Regression coverage: MSP430 and x86-64.
-- [T3] **Support the `g` inline-asm constraint in GlobalISel.** `asm("" : "+g"(x))`, the common
-  optimization-barrier idiom, fails with "unable to translate instruction: call" (10 c-torture
-  compilations: `pr65053-1/2`, `pr65956`, `pr88904`). Decide whether MOS maps `g` to a register
-  class or generic `InlineAsmLowering` grows the constraint; add a test. Reason for T3: bounded,
-  but the right layer (target hook versus generic lowering) has to be chosen.
+  [validation](docs/pr-preparations/2026-09-23/0034-0035-validation.md).
+  [0034 audit](docs/pr-preparations/2026-09-23/0034-review-audit.md): no code defect;
+  130 standalone suite passes, one unsupported; 28 all-CPU legalization checks pass.
+  [0035 audit](docs/pr-preparations/2026-09-23/0035-review-audit.md): casts confirmed,
+  including `1L`/`2L` on x86-64; 32 frontend cases pass, repairing 21 verifier failures.
+  0035 revised 2026-09-23 per the audit: test covers the two-argument, `long` and `long long`
+  forms (pinned Clang now fails on both triples, fixed passes), comments corrected, old `FIXME`
+  removed. Remaining: publish (user-triggered; 0034 to llvm-mos, 0035 to llvm/llvm-project).
+- [T5] **Indirect register outputs in GlobalISel inline asm (patch 0037; the `g` constraint).**
+  `asm("" : "+g"(x))` is lowered by Clang to `"=*imr,0"`; `InlineAsmLowering` picked the register
+  alternative but never stored the def back through the pointer and rejected the call
+  ("unable to translate instruction: call"; 10 c-torture compilations: `pr65053-1/2`, `pr65956`,
+  `pr88904`; also AArch64 with `-global-isel-abort=1`). Fix in generic `InlineAsmLowering`: keep
+  indirect outputs out of the result accounting and `G_STORE` each def through its pointer, as
+  SelectionDAG does. Tests on MOS and AArch64; corpus differential 10 repaired / 0 changed.
+  [PR draft](docs/upstream-gisel-inline-asm-indirect-output-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0037-validation.md). Aimed at llvm/llvm-project.
+  Remaining: publish (user-triggered).
 - [T3] **`__builtin_return_address` / `__builtin_frame_address` are unlegalized** (15 c-torture
   compilations). Either implement (return address from the hard stack; frame address from `__rc0`)
   or emit a clean diagnostic instead of a backend abort. Reason for T3: small, but the semantics
@@ -1123,7 +1132,12 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   does nothing for `llc`/other frontends). Fix: generic guard in the hoister (refuse a group whose
   re-emitted spill introduces vregs) plus removal of the driver flag.
   [PR draft](docs/upstream-spill-hoist-scratch-vregs-pr.md) ·
-  [validation](docs/pr-preparations/2026-09-23/0033-validation.md). Remaining: publish (user-triggered).
+  [validation](docs/pr-preparations/2026-09-23/0033-validation.md).
+  [Audit](docs/pr-preparations/2026-09-23/0033-review-audit.md) confirmed the crash fix and found
+  the rollback statistic decremented per instruction; revised 2026-09-23 (per-group `NumHoisted`,
+  added to `NumSpills` only when the group is kept) and revalidated. The audit's provenance
+  finding was a container mount alias, not an unpatched compiler (see the validation record).
+  Remaining: publish (user-triggered).
 - [T5] **Zero-page indexed globals: patch 0036 prepared and installed.** The compact
   form is intended under the existing whole-object zero-page contract. Classify explicit
   zero-page sections when selecting indexed opcodes, and inspect the address operand of

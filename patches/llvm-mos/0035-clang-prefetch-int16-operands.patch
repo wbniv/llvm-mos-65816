@@ -1,14 +1,19 @@
 diff --git a/clang/lib/CodeGen/CGBuiltin.cpp b/clang/lib/CodeGen/CGBuiltin.cpp
-index a8355be41330..6434041ad451 100644
+index a8355be41330..6fc00da7d4f6 100644
 --- a/clang/lib/CodeGen/CGBuiltin.cpp
 +++ b/clang/lib/CodeGen/CGBuiltin.cpp
-@@ -4102,6 +4102,11 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
+@@ -4096,12 +4096,15 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
+   case Builtin::BI__builtin_prefetch: {
+     Value *Locality, *RW, *Address = EmitScalarExpr(E->getArg(0));
+     unsigned ICEArguments = (1 << 1) | (1 << 2);
+-    // FIXME: Technically these constants should of type 'int', yes?
+     RW = (E->getNumArgs() > 1) ? EmitScalarOrConstFoldImmArg(ICEArguments, 1, E)
+                                : llvm::ConstantInt::get(Int32Ty, 0);
      Locality = (E->getNumArgs() > 2)
                     ? EmitScalarOrConstFoldImmArg(ICEArguments, 2, E)
                     : llvm::ConstantInt::get(Int32Ty, 3);
-+    // The arguments are C 'int' expressions, but the intrinsic takes i32; on
-+    // targets where int is narrower (16-bit int) the emitted call would
-+    // otherwise have an incompatible signature.
++    // The rw and locality arguments keep the type of the promoted C expression
++    // (16-bit int, long, long long, ...), but the intrinsic takes i32.
 +    RW = Builder.CreateIntCast(RW, Int32Ty, /*isSigned=*/false);
 +    Locality = Builder.CreateIntCast(Locality, Int32Ty, /*isSigned=*/false);
      Value *Data = llvm::ConstantInt::get(Int32Ty, 1);
@@ -16,13 +21,14 @@ index a8355be41330..6434041ad451 100644
      Builder.CreateCall(F, {Address, RW, Locality, Data});
 diff --git a/clang/test/CodeGen/builtin-prefetch-int16.c b/clang/test/CodeGen/builtin-prefetch-int16.c
 new file mode 100644
-index 000000000000..6df7ce71a2ab
+index 000000000000..ae47329efe58
 --- /dev/null
 +++ b/clang/test/CodeGen/builtin-prefetch-int16.c
-@@ -0,0 +1,17 @@
-+// The rw and locality operands of __builtin_prefetch are C 'int' expressions,
-+// but llvm.prefetch takes i32. On targets whose int is 16 bits the call must
-+// still be emitted with i32 operands.
+@@ -0,0 +1,36 @@
++// The rw and locality operands of __builtin_prefetch keep the type of the
++// promoted C expression, but llvm.prefetch takes i32. The call must be emitted
++// with i32 operands whether the expression is narrower (16-bit int) or wider
++// (long, long long) than that.
 +// RUN: %clang_cc1 -triple msp430 -emit-llvm -o - %s | FileCheck %s
 +// RUN: %clang_cc1 -triple x86_64-linux-gnu -emit-llvm -o - %s | FileCheck %s
 +
@@ -36,4 +42,22 @@ index 000000000000..6df7ce71a2ab
 +  // CHECK-LABEL: @default_args
 +  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 0, i32 3, i32 1)
 +  __builtin_prefetch(p);
++}
++
++void rw_only(char *p) {
++  // CHECK-LABEL: @rw_only
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 1, i32 3, i32 1)
++  __builtin_prefetch(p, 1);
++}
++
++void long_args(char *p) {
++  // CHECK-LABEL: @long_args
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 1, i32 2, i32 1)
++  __builtin_prefetch(p, 1L, 2L);
++}
++
++void long_long_args(char *p) {
++  // CHECK-LABEL: @long_long_args
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 0, i32 1, i32 1)
++  __builtin_prefetch(p, 0LL, 1LL);
 +}

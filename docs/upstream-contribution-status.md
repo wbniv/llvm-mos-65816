@@ -15,7 +15,8 @@ plus authored PRs in `llvm-mos/llvm-mos-sdk`.
 [0032](upstream-register-named-symbols-pr.md) register-named symbols ·
 [0033](upstream-spill-hoist-scratch-vregs-pr.md) spill hoisting (generic LLVM + driver flag removal) ·
 [0034](upstream-prefetch-legalize-pr.md) drop `G_PREFETCH` ·
-[0035](upstream-clang-prefetch-int16-pr.md) clang prefetch operands as `i32` (for llvm/llvm-project).
+[0035](upstream-clang-prefetch-int16-pr.md) clang prefetch operands as `i32` (for llvm/llvm-project) ·
+[0037](upstream-gisel-inline-asm-indirect-output-pr.md) GlobalISel indirect inline-asm outputs, the `+g` idiom (for llvm/llvm-project).
 
 **Prepared, awaiting independent review:** [0036](upstream-zero-page-indexed-globals-pr.md)
 zero-page indexed globals. Direct and reassembled objects now agree; standalone
@@ -27,10 +28,14 @@ installed. [Validation](pr-preparations/2026-09-23/0036-validation.md).
 queue labels when judging what can be posted next.
 
 **Local preparation updated September 23:** independent reviews and audits are recorded
-for 0011 and 0029–0033. The newer prefetch pair, 0034/0035, has its own
-[validation record](pr-preparations/2026-09-23/0034-0035-validation.md): 0034
-discards unsupported prefetch hints in MOS; 0035 fixes generic Clang's explicit
-prefetch arguments on 16-bit-`int` targets and is intended for `llvm/llvm-project`.
+for 0011 and 0029–0035. The [0033 audit](pr-preparations/2026-09-23/0033-review-audit.md)
+found a rollback-statistic defect, corrected and revalidated the same day
+([response](pr-preparations/2026-09-23/0033-validation.md)); its provenance
+finding was a container mount alias. The [0034 audit](pr-preparations/2026-09-23/0034-review-audit.md)
+finds no implementation defect. The [0035 audit](pr-preparations/2026-09-23/0035-review-audit.md)
+established that wider options also break x86-64; the test now covers `long`,
+`long long` and the two-argument form. Patch 0037 (indirect register outputs in
+GlobalISel inline asm) is prepared and validated, unreviewed.
 Patch 0036 is validated against the pinned upstream base, with 45 upstream and
 36 local C round trips passing, and awaits independent review. Its numeric
 controls exposed a separate `mos16(constant)` truncation defect; that parser
@@ -594,13 +599,29 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
 - **Prefetch — two fixes prepared September 23.**
   [Patch 0034](upstream-prefetch-legalize-pr.md) makes the MOS backend discard
   `G_PREFETCH`, a hint unsupported by its hardware. [Patch 0035](upstream-clang-prefetch-int16-pr.md)
-  corrects generic Clang: `__builtin_prefetch(p, 1, 2)` must emit `i32`
-  read/write and locality operands even when C `int` is 16 bits. The default
-  argument form already uses `i32`. The frontend regression runs on MSP430
-  with x86-64 as a control; the pair passes all 18 MOS C-torture compilations.
+  corrects generic Clang: explicit read/write and locality operands must use
+  `i32` regardless of their promoted C types. This repairs ordinary literals on
+  16-bit-`int` targets and wider arguments such as `1L`/`2L` on x86-64. Omitted
+  arguments already use `i32`. The pair passes all 18 MOS C-torture compilations.
   Both are installed locally and unposted. Submission destinations differ:
   `llvm-mos/llvm-mos` for 0034 and `llvm/llvm-project` for 0035.
   [Validation](pr-preparations/2026-09-23/0034-0035-validation.md).
+  Independent audits: [0034](pr-preparations/2026-09-23/0034-review-audit.md)
+  has 130 standalone suite passes and 28 all-CPU legalization checks;
+  [0035](pr-preparations/2026-09-23/0035-review-audit.md) passes 32 frontend
+  cases, repairing 21 verifier failures and retaining identical IR for the
+  other 11. 0035 revised accordingly: wider-argument and two-argument cases in
+  the committed test, comments corrected. Both ready to post.
+
+- **GlobalISel indirect inline-asm outputs — fix prepared September 23.**
+  [Patch 0037](../patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output.patch):
+  Clang lowers `asm("" : "+g"(x))` to `"=*imr,0"`; generic `InlineAsmLowering` picked the
+  register alternative for the indirect output but never stored it through the pointer and
+  rejected the call. The fix stores each indirect register def through its pointer after the
+  `INLINEASM`, as SelectionDAG does. 10 c-torture compilations repaired, corpus otherwise
+  identical; reproduces on AArch64 GlobalISel too. Aimed at `llvm/llvm-project`.
+  [PR draft](upstream-gisel-inline-asm-indirect-output-pr.md) ·
+  [validation](pr-preparations/2026-09-23/0037-validation.md). Unposted, unreviewed.
 
 - **Spill hoisting versus scratch virtual registers — fix prepared September 23.**
   [Patch 0033](../patches/llvm-mos/0033-llvm-spill-hoist-no-new-vregs.patch): greedy's
@@ -610,7 +631,12 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   `mos-clang` has masked it with a blanket `-mllvm -disable-spill-hoist`. The fix makes
   `hoistAllSpills` refuse a group whose re-emitted spill introduces virtual registers and drops the
   driver flag. [PR draft](upstream-spill-hoist-scratch-vregs-pr.md) ·
-  [validation](pr-preparations/2026-09-23/0033-validation.md). Unposted.
+  [validation](pr-preparations/2026-09-23/0033-validation.md).
+  [Independent audit](pr-preparations/2026-09-23/0033-review-audit.md): the
+  standalone guard clears all 18 original virtual-register failures; 16 finish
+  and two expose the independent scavenger assertion. Its rollback-statistic
+  finding is fixed and revalidated; its provenance finding was a container
+  mount alias (the run used the guarded build). Ready to post.
 
 - **Copy-destination reuse — follow-up reviewed September 22.**
   [Patch 0031](../patches/llvm-mos/0031-mos-copy-phys-reg-reuse-dst.patch),

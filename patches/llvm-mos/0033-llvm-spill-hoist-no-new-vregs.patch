@@ -20,19 +20,20 @@ index 3d210db669db..5a4c27045518 100644
    // essential on the 6502. There's far less code to compile, so we can be
    // pickier.
 diff --git a/llvm/lib/CodeGen/InlineSpiller.cpp b/llvm/lib/CodeGen/InlineSpiller.cpp
-index 82309cf8ef64..ccc6ef2c067c 100644
+index 82309cf8ef64..30997d809bb7 100644
 --- a/llvm/lib/CodeGen/InlineSpiller.cpp
 +++ b/llvm/lib/CodeGen/InlineSpiller.cpp
-@@ -1868,6 +1868,8 @@ void HoistSpillHelper::hoistAllSpills() {
+@@ -1868,6 +1868,9 @@ void HoistSpillHelper::hoistAllSpills() {
                                       StackIntvl.getValNumInfo(0));
  
      // Insert hoisted spills.
 +    SmallVector<MachineInstr *, 8> Inserted;
 +    bool HookMadeVRegs = false;
++    unsigned NumHoisted = 0;
      for (auto const &Insert : SpillsToIns) {
        MachineBasicBlock *BB = Insert.first;
        Register LiveReg = Insert.second;
-@@ -1875,11 +1877,40 @@ void HoistSpillHelper::hoistAllSpills() {
+@@ -1875,11 +1878,40 @@ void HoistSpillHelper::hoistAllSpills() {
        MachineInstrSpan MIS(MII, BB);
        TII.storeRegToStackSlot(*BB, MII, LiveReg, false, Slot,
                                MRI.getRegClass(LiveReg), Register());
@@ -51,8 +52,9 @@ index 82309cf8ef64..ccc6ef2c067c 100644
        LIS.InsertMachineInstrRangeInMaps(MIS.begin(), MII);
        for (const MachineInstr &MI : make_range(MIS.begin(), MII))
          getVDefInterval(MI, LIS);
-       ++NumSpills;
-     }
+-      ++NumSpills;
++      ++NumHoisted;
++    }
 +    if (HookMadeVRegs) {
 +      // Undo this group: drop the hoisted spills and keep the originals.
 +      LLVM_DEBUG(dbgs() << "Not hoisting: the spill hook introduced virtual "
@@ -64,12 +66,12 @@ index 82309cf8ef64..ccc6ef2c067c 100644
 +                LIS.hasInterval(MO.getReg()))
 +              LIS.removeInterval(MO.getReg());
 +          LIS.RemoveMachineInstrFromMaps(*MI);
-+          --NumSpills;
 +        }
 +        MI->eraseFromParent();
 +      }
 +      continue;
-+    }
+     }
++    NumSpills += NumHoisted;
  
      // Remove redundant spills or change them to dead instructions.
      NumSpills -= SpillsToRm.size();

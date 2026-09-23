@@ -95,6 +95,9 @@ if [ ! -d "$SRC/.git" ]; then
   # __builtin_prefetch: clang emits the rw/locality operands as i32 on
   # 16-bit-int targets (generic clang fix, aimed at llvm/llvm-project).
   apply_patch 0035-clang-prefetch-int16-operands
+  # GlobalISel inline asm: store indirect register outputs ("=*r", what clang
+  # emits for "+g") through their pointer (generic lowering + MOS/AArch64 tests).
+  apply_patch 0037-llvm-gisel-inline-asm-indirect-output
   # Upstream-bound standalone fix, carried until it merges — the same slot and
   # lifecycle as the retired 0003-late-opt-txy-dead-flag (-> PR #562). Applies
   # after 0002 because both touch MOSLateOptimization.cpp, and it is BAKED INTO
