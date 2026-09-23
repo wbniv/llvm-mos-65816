@@ -1,17 +1,14 @@
 # Pending upstream work and dependencies
 
-**PR status last verified 2026-09-21; patch 0028 revalidated September 21;
-patch 0029 validated on MOS and the complete X86/ARM/AArch64 CodeGen suites September 22.
-Patch 0030's copy-liveness fix passes the MOS CodeGen suite, local compiler
-integration checks, and an independent review with a c-torture differential
-September 22; its follow-up, patch 0031 (copy-destination reuse), has also passed
-independent review, with 85 MOS CodeGen passes, one unsupported, and 46 MC passes.
-Patch 0032's symbol-quoting fix was validated September 23: 84 CodeGen passes,
-one unsupported, 48 MC passes, and all 61 recorded assembly failures repaired.
-Other implementation readiness follows the dated validation records and local
-drafts.** This is the actionable view of the
-[contribution tracker](upstream-contribution-status.md). Status describes the work,
-not whether its GitHub container is called an issue or a pull request.
+**Local preparation updated 2026-09-23.** Patch 0036's zero-page indexed-global
+fix is implemented, validated, and installed; independent review remains.
+Patches 0034 and 0035 address separate backend and frontend prefetch defects.
+The new `mos16(constant)` parser-width defect is diagnosed but not fixed.
+Earlier patches retain their dated validation and review records below.
+The [contribution tracker](upstream-contribution-status.md#current-pr-progress)
+holds the September 23 GitHub snapshot; this local-readiness update does not
+reverify remote PR or CI state. Status describes the work, not whether its
+GitHub container is called an issue or a pull request.
 
 Use the [saved unpatched upstream reference](upstream-reference-build.md) for new
 reproduction checks; keep candidate patches in separate builds.
@@ -68,9 +65,18 @@ reproduction checks; keep candidate patches in separate builds.
    `G_PREFETCH` (the backend aborted on any prefetch); companion
    [Clang fix 0035](upstream-clang-prefetch-int16-pr.md) emits the intrinsic's
    rw/locality operands as `i32` on 16-bit-`int` targets (MOS, MSP430, AVR),
-   aimed at llvm/llvm-project. Six torture files fixed.
+   aimed at llvm/llvm-project. Explicit arguments currently become `i16` and
+   fail the IR verifier; omitted arguments already use `i32`. The frontend
+   regression covers MSP430 and an x86-64 control. Together the patches fix
+   six MOS torture files at three optimization levels.
    [Validation](pr-preparations/2026-09-23/0034-0035-validation.md).
-8. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
+8. [Zero-page indexed globals](upstream-zero-page-indexed-globals-pr.md): patch
+   0036 makes opcode selection recognize zero-page sections and checks the address
+   operand for indexed stores. Standalone suites: 132 pass / one unsupported;
+   27 C round-trip mismatches repaired, 18 ordinary-section controls unchanged.
+   Installed locally; independent review and submission preparation remain.
+   [Validation](pr-preparations/2026-09-23/0036-validation.md).
+9. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
    semantics question, now verified with the stock upstream frontend and `opt`.
 
 ## Backend failure triage (gcc c-torture, 2026-09-23)
@@ -89,12 +95,13 @@ rank in `TODO.md`:
 | 5 | T3 | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | vector extensions; scalarization rules |
 | — | — | 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
 
-Recommended order: the prefetch fixes are done; next is the `g` constraint, which unblocks a very common idiom. The
-`[T4]` printer/object disagreement on zero-page-indexed symbol operands (found in
-the 0032 review, not in this corpus) sits alongside item 4 in priority.
-
-Not in the corpus but found alongside: the asm printer and object emitter
-disagree on zero-page-indexed symbol operands (`[T4]` in `TODO.md`).
+Recommended order: the prefetch fixes are done; next is the `g` constraint,
+which unblocks a very common idiom. The zero-page-global opcode disagreement
+found in the 0032 review is fixed by 0036. Its numeric-address controls exposed
+a separate `[T4]` parser defect: `mos16(constant)` can select a zero-page opcode,
+even silently truncating `4660` to `0x34`. That finding needs a width-matching
+fix and sits alongside item 4 in priority.
+[Diagnosis and reproducer](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect).
 
 These are unposted contributions and do not require #320/#321. The register
 exhaustion and physical-copy liveness fixes are implemented and validated. The
@@ -131,6 +138,22 @@ Patch 0030 submission status:
 - [x] Current upstream applicability: llvm-mos `main` identical to the pinned base (2026-09-22); both 0030 and 0031 also apply on the newer local clone.
 - [ ] Prepare the standalone branch and publish the fix PR.
 
+Patch 0036 submission status:
+
+- [x] Establish the whole-object zero-page contract and select the compact form.
+- [x] Fix section classification and the indexed-store address operand.
+- [x] Verify all three regressions fail the object comparison on pristine upstream
+  and pass with 0036 alone; MOS suites: 132 pass, one unsupported.
+- [x] Compare 45 upstream C cases: 27 mismatches repaired, 18 ordinary-section
+  controls unchanged; rebuild/install locally and pass 36 width-mode cases.
+- [x] Prepare the [patch](../patches/llvm-mos/0036-mos-zero-page-indexed-globals.patch),
+  [PR draft](upstream-zero-page-indexed-globals-pr.md), and
+  [validation record](pr-preparations/2026-09-23/0036-validation.md), with AI
+  tool version, model, and reasoning effort in the attribution.
+- [ ] Complete independent review.
+- [ ] Check current upstream applicability and prepare the standalone branch.
+- [ ] Publish the fix PR when requested.
+
 **Prepared but held: patch `0028`, the `VirtRegRewriter` undef-lane fix.**
 The stock-upstream reproducer, fix, regression, and
 [PR description](upstream-virtregrewriter-undef-lane-identity-copy-pr.md) are prepared.
@@ -162,8 +185,12 @@ failure with the stock upstream frontend and backend.
 | Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass; final and independent reviews complete; current-upstream applicability, branch preparation, and publication remain |
 | Newton `-O0` post-RA expansion | [Fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), patch 0030; six focused cases and MOS CodeGen/MC pass; review audited and attribution complete; check upstream applicability, prepare branch, and publish |
 | Physical-copy destination reuse | [Fix PR reviewed](pr-preparations/2026-09-22/0031-review-audit.md), patch 0031 on top of 0030; five regression cases, six extra probes, and MOS suites pass; prepare its submission after 0030 |
-| Spill-hoisting scratch vregs (`0033`) | [Fix PR prepared](upstream-spill-hoist-scratch-vregs-pr.md): generic `hoistAllSpills` guard + driver flag removal; release-build crash on 9 c-torture files at `-O2`; [validation](pr-preparations/2026-09-23/0033-validation.md) | **Fix PR prepared, unposted** | Publish | No SDK dependency |
+| Spill-hoisting scratch vregs (`0033`) | [Fix PR prepared](upstream-spill-hoist-scratch-vregs-pr.md): generic `hoistAllSpills` guard + driver flag removal; release-build crash on 9 c-torture files at `-O2`; [validation](pr-preparations/2026-09-23/0033-validation.md); unposted |
 | Register-named assembly symbols (`0032`) | [Review audited](pr-preparations/2026-09-23/0032-review-audit.md); no code defect found; standalone suites pass; full-corpus assembler failures fall from 821 to zero across 4,091 emitted files; compatible local patch installed; check current upstream, prepare branch, and publish |
+| MOS prefetch legalization (`0034`) | [Fix prepared](upstream-prefetch-legalize-pr.md), drops `G_PREFETCH`; validated and installed; submit to llvm-mos |
+| Clang prefetch operand types (`0035`) | [Fix prepared](upstream-clang-prefetch-int16-pr.md), emits explicit rw/locality arguments as `i32` on 16-bit-`int` targets; MSP430/x86-64 regression and combined MOS checks pass; submit to llvm/llvm-project |
+| Zero-page indexed globals (`0036`) | [Fix prepared](upstream-zero-page-indexed-globals-pr.md), standalone suites and C round trips pass, installed locally; independent review and submission preparation remain |
+| Explicit constant address width | `mos16(constant)` can select an 8-bit address encoding and truncate it; [reduced and diagnosed](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect), parser fix pending |
 | Scavenger live-P (`0011`) | Producer established (gcc torture `strlen-4.c`, stock `mos6502` `-O0`); test replaced by an upstream-runnable one; validated; post |
 | Call-clobbered coalescing guard (`0015`) | Revalidate diagnosis and upstream reachability; prefer a root-cause fix |
 | Trunc-selection fallback (`0023`) | Establish a real upstream producer for the independent Imag8-to-i1 portion; retain fork-specific content with its feature series |
@@ -248,6 +275,12 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | Mixed-width pointer across call: RA exhausts registers | Patch 0029 validated, final and independent reviews complete; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
 | Post-RA physical-copy reuse: stale Y kill | Patch 0030 validated and review audited; six focused cases and MOS CodeGen/MC pass; original assembly unchanged at six levels | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
 | Physical-copy destination reuse | Patch 0031 independently reviewed against 0030 alone; MOS CodeGen 85 pass / one unsupported, MC 46 pass; net size saving with six small increases | **Fix PR prepared, unposted; depends on 0030** | Prepare submission after 0030 | No |
+| Register-named assembly symbols (`0032`) | Fix validated and review audited; full-corpus assembly failures repaired | **Fix PR prepared, unposted** | Prepare branch and publish | No |
+| Spill-hoisting scratch vregs (`0033`) | Generic hoister guard and driver-flag removal validated | **Fix PR prepared, unposted** | Prepare submission | No |
+| MOS prefetch legalization (`0034`) | Drop unsupported `G_PREFETCH`; standalone regression and combined C checks pass | **Fix PR prepared, unposted** | Submit to llvm-mos | No |
+| Clang prefetch operand types (`0035`) | Explicit rw/locality operands use `i32`; MSP430 regression and x86-64 control pass | **Fix PR prepared, unposted** | Submit to llvm/llvm-project | No |
+| Zero-page indexed globals (`0036`) | Compact opcodes selected consistently; 132 suite passes and 45 upstream C round trips | **Validated, awaiting independent review** | Review, check upstream applicability, prepare branch | No |
+| Explicit constant address width | `mos16(constant)` truncation reduced and diagnosed; no fix yet | **Investigation recorded** | Fix parser width matching and test affected addressing forms | No |
 | #320 far-address-space series (`0001` and related content) | Substantial downstream implementation exists | **Series not posted** | Agree ABI, extract coherent compiler commits and validate standalone | No; SDK integration follows agreed compiler/runtime ABI |
 | #321 native-width series (`0002` and related content) | Substantial downstream implementation exists | **Series not posted** | Extract native-only commits from mixed aggregate, document ABI/interrupt contract, validate and post one complete draft PR | No; native runtime required to execute examples |
 | `0023` trunc-selection fallback | Downstream patch exists; includes fork-specific content | **Unassessed standalone candidate** | Prove a real upstream producer for the Imag8→i1 half; keep Imag32/a16 half with its feature | No; not ready for a standalone PR |
@@ -282,7 +315,10 @@ flowchart TD
     SCAV[Scavenger live-P fix 0011: stock-6502 producer, upstream-runnable test] --> SCAVPR[Publish fix PR] --> MERGED
     SYM[Register-named symbols 0032: reviewed and audited, full-corpus round trip] --> SYMPR[Publish fix PR] --> MERGED
     HOIST[Spill-hoist guard 0033: MOS/X86/ARM/AArch64 suites, emulator gate] --> HOISTPR[Publish fix PR, drops driver flag] --> MERGED
-    TRIAGE[c-torture backend triage: prefetch, g constraint, return/frame address, tied asm operand, float vectors] --> NEXTFIX[Next fixes, ranked in TODO]
+    PREFETCH[Prefetch fixes validated: MOS 0034 and Clang 0035] --> PREFETCHMOS[Submit 0034 to llvm-mos] --> MERGED
+    PREFETCH --> PREFETCHCLANG[Submit 0035 to llvm/llvm-project] --> MERGED
+    ZPIDX[Zero-page indexed globals 0036: suites and round trips pass] --> ZPREVIEW[Independent review and submission preparation] --> ZPPR[Publish fix PR] --> MERGED
+    TRIAGE[Remaining c-torture failures: g constraint, return/frame address, tied asm operand, float vectors] --> NEXTFIX[Next fixes, ranked in TODO]
   end
   subgraph SNES[SNES platform — separate track]
     EXIST[Existing SDK PR 415 + our platform] --> RECON[Reconcile baseline target and CPU mode]
@@ -303,6 +339,7 @@ flowchart TD
     CONTRACT[Reentrant contract question] --> DECIDE[Agree semantics] --> FIX[Develop and test fix or documentation]
     GUARDS[Coalescing / trunc candidates: 0015, 0023] --> REPRO[Establish valid stock-upstream reproducers]
     REPRO --> FIX
+    ADDRWIDTH[Explicit constant address width: reduced and diagnosed] --> FIX
     FIX --> REPORTPR[Post fix PR; link issue if one exists] --> REPORTMERGE[Review and merge]
   end
 ```

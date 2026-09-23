@@ -7,7 +7,7 @@ plus authored PRs in `llvm-mos/llvm-mos-sdk`.
 #585, #586, #588, #589, #604), #575 closed unmerged. Both authored issues (#561 and #576) are closed.**
 **SDK: one authored PR, #450, open.** No state change since the September 21 snapshot.
 
-**Ready to post (all user-triggered, each with a reviewed draft, patch, and validation record):**
+**Prepared submissions (posting is user-triggered; review evidence is linked below):**
 [0029](upstream-twoaddr-physreg-reschedule-pr.md) register exhaustion ·
 [0030](upstream-copy-phys-reg-liveness-pr.md) copy liveness, then
 [0031](upstream-copy-phys-reg-reuse-dst-pr.md) copy-destination reuse on top of it ·
@@ -17,17 +17,26 @@ plus authored PRs in `llvm-mos/llvm-mos-sdk`.
 [0034](upstream-prefetch-legalize-pr.md) drop `G_PREFETCH` ·
 [0035](upstream-clang-prefetch-int16-pr.md) clang prefetch operands as `i32` (for llvm/llvm-project).
 
+**Prepared, awaiting independent review:** [0036](upstream-zero-page-indexed-globals-pr.md)
+zero-page indexed globals. Direct and reassembled objects now agree; standalone
+MOS suites pass (132 / one unsupported), and the local compiler is rebuilt and
+installed. [Validation](pr-preparations/2026-09-23/0036-validation.md).
+
 **Pending work, SNES dependencies and issue readiness:**
 [chart and flowchart](upstream-pending-work.md). This view supersedes historical
 queue labels when judging what can be posted next.
 
-**Local preparation updated September 23:** six feature-independent fixes are prepared and
-independently reviewed (each by Claude and then audited by Codex, or the reverse); the roster above
-links their drafts. Every one has a stock-`mos6502` reproducer, a patch that applies to current
-upstream, suites run on an assertion build, and a corpus differential; the two that change generated
-code (0031, 0033) also pass the MAME + bsnes-jg gate. The remaining backend failures found in the
-same corpus are triaged and ranked in [`TODO.md`](../TODO.md) (see
-[pending work](upstream-pending-work.md#backend-failure-triage-gcc-c-torture-2026-09-23)).
+**Local preparation updated September 23:** independent reviews and audits are recorded
+for 0011 and 0029–0033. The newer prefetch pair, 0034/0035, has its own
+[validation record](pr-preparations/2026-09-23/0034-0035-validation.md): 0034
+discards unsupported prefetch hints in MOS; 0035 fixes generic Clang's explicit
+prefetch arguments on 16-bit-`int` targets and is intended for `llvm/llvm-project`.
+Patch 0036 is validated against the pinned upstream base, with 45 upstream and
+36 local C round trips passing, and awaits independent review. Its numeric
+controls exposed a separate `mos16(constant)` truncation defect; that parser
+fix remains pending. Review, corpus, and emulator coverage are specific to each
+patch's record. See the [pending-work tracker](upstream-pending-work.md) for
+submission steps and the remaining defects.
 
 ## Current PR progress
 
@@ -569,6 +578,29 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   [audit](pr-preparations/2026-09-22/0030-review-audit.md) confirms the code and
   standalone suites and corrects the corpus accounting. Claude's attribution
   now includes CLI `2.1.278`; branch preparation and publication remain; unposted.
+
+- **Zero-page indexed globals — fix prepared September 23.**
+  [Patch 0036](../patches/llvm-mos/0036-mos-zero-page-indexed-globals.patch)
+  recognizes zero-page sections during indexed-opcode selection and checks the
+  address operand of indexed stores. The existing whole-object contract permits
+  the compact form. Standalone MOS suites pass; all 27 C-case object mismatches
+  are repaired and all 18 ordinary-section controls retain identical objects.
+  The local compiler is installed, with three regressions and 36 width-mode
+  compilations passing. [PR draft](upstream-zero-page-indexed-globals-pr.md) ·
+  [validation](pr-preparations/2026-09-23/0036-validation.md).
+  Independent review and submission preparation remain; unposted. A separate
+  `mos16(constant)` parser-width defect is reduced and tracked in `TODO.md`.
+
+- **Prefetch — two fixes prepared September 23.**
+  [Patch 0034](upstream-prefetch-legalize-pr.md) makes the MOS backend discard
+  `G_PREFETCH`, a hint unsupported by its hardware. [Patch 0035](upstream-clang-prefetch-int16-pr.md)
+  corrects generic Clang: `__builtin_prefetch(p, 1, 2)` must emit `i32`
+  read/write and locality operands even when C `int` is 16 bits. The default
+  argument form already uses `i32`. The frontend regression runs on MSP430
+  with x86-64 as a control; the pair passes all 18 MOS C-torture compilations.
+  Both are installed locally and unposted. Submission destinations differ:
+  `llvm-mos/llvm-mos` for 0034 and `llvm/llvm-project` for 0035.
+  [Validation](pr-preparations/2026-09-23/0034-0035-validation.md).
 
 - **Spill hoisting versus scratch virtual registers — fix prepared September 23.**
   [Patch 0033](../patches/llvm-mos/0033-llvm-spill-hoist-no-new-vregs.patch): greedy's

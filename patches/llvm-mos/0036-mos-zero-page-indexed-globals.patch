@@ -1,0 +1,212 @@
+diff --git a/llvm/lib/Target/MOS/MOSMCInstLower.cpp b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+index 75fc2ea7bded..b0badcb4d5ea 100644
+--- a/llvm/lib/Target/MOS/MOSMCInstLower.cpp
++++ b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+@@ -39,10 +39,12 @@ static bool canUseZeroPageIdx(const MachineOperand &MO) {
+   if (!MO.isGlobal())
+     return false;
+ 
+-  // Global values in the zero page must end before the zero page, which means
+-  // that pointers based on them can never overflow it.
+-  return MO.getGlobal()->getAliaseeObject()->getAddressSpace() ==
+-         MOS::AS_ZeroPage;
++  // Zero-page globals must fit wholly in zero page, so valid accesses based
++  // on them cannot overflow it. This applies to both the address space and
++  // explicit zero-page sections.
++  const auto *GV = MO.getGlobal()->getAliaseeObject();
++  return GV->getAddressSpace() == MOS::AS_ZeroPage ||
++         MOS::isZeroPageSectionName(GV->getSection());
+ }
+ 
+ // Instructions with indexed addressing must have zero page-matching bases
+@@ -651,7 +653,7 @@ void MOSMCInstLower::lower(const MachineInstr *MI, MCInst &OutMI) {
+   case MOS::STZpIdx:
+   case MOS::STAbsIdx: {
+     bool MustZP = MI->getOpcode() == MOS::STZpIdx;
+-    bool ZP = MustZP || canUseZeroPageIdx(MI->getOperand(0));
++    bool ZP = MustZP || canUseZeroPageIdx(MI->getOperand(1));
+     switch (MI->getOperand(2).getReg()) {
+     default:
+       llvm_unreachable("Unexpected register.");
+diff --git a/llvm/test/CodeGen/MOS/zero-page-indexed-stz.mir b/llvm/test/CodeGen/MOS/zero-page-indexed-stz.mir
+new file mode 100644
+index 000000000000..2c36ff58845a
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/zero-page-indexed-stz.mir
+@@ -0,0 +1,22 @@
++# RUN: llc -mtriple=mos -mcpu=mos65c02 -start-after=machine-opt-remark-emitter -verify-machineinstrs %s -o %t.s
++# RUN: llvm-mc -triple=mos -mcpu=mos65c02 -filetype=obj %t.s -o %t.asm.o
++# RUN: llc -mtriple=mos -mcpu=mos65c02 -start-after=machine-opt-remark-emitter -verify-machineinstrs -filetype=obj %s -o %t.direct.o
++# RUN: cmp %t.direct.o %t.asm.o
++# RUN: llvm-objdump -dr %t.direct.o | FileCheck %s
++
++# STZ uses the same zero-page eligibility rule as other indexed stores.
++--- |
++  @samples = global [16 x i8] zeroinitializer, section ".zp.bss"
++  define void @store_zero() { ret void }
++...
++---
++name: store_zero
++body: |
++  bb.0:
++    ; CHECK-LABEL: <store_zero>:
++    STZIdx @samples, $x
++    ; CHECK: 74 00
++    STZIdx 4660, $x
++    ; CHECK: 9e 34 12
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/zero-page-indexed.ll b/llvm/test/CodeGen/MOS/zero-page-indexed.ll
+new file mode 100644
+index 000000000000..782931356866
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/zero-page-indexed.ll
+@@ -0,0 +1,32 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs %s -o %t.s
++; RUN: FileCheck %s < %t.s
++; RUN: llvm-mc -triple=mos -mcpu=mos6502 -filetype=obj %t.s -o %t.asm.o
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs -filetype=obj %s -o %t.direct.o
++; RUN: cmp %t.direct.o %t.asm.o
++; RUN: llvm-objdump -dr %t.direct.o | FileCheck %s --check-prefix=OBJ
++
++; A section-placed array fits wholly in zero page. In-bounds accesses may use
++; zero-page indexing even though its pointers have the default address space.
++@samples = global [16 x i8] zeroinitializer, section ".zp.bss"
++
++define i8 @read_sample(i8 %index) {
++; CHECK-LABEL: read_sample:
++; CHECK: lda mos8(samples),x
++; OBJ-LABEL: <read_sample>:
++; OBJ: b5 00
++  %offset = zext i8 %index to i16
++  %address = getelementptr inbounds [16 x i8], ptr @samples, i16 0, i16 %offset
++  %value = load i8, ptr %address
++  ret i8 %value
++}
++
++define void @write_sample(i8 %value, i8 %index) {
++; CHECK-LABEL: write_sample:
++; CHECK: sta mos8(samples),x
++; OBJ-LABEL: <write_sample>:
++; OBJ: 95 00
++  %offset = zext i8 %index to i16
++  %address = getelementptr inbounds [16 x i8], ptr @samples, i16 0, i16 %offset
++  store i8 %value, ptr %address
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/zero-page-indexed.mir b/llvm/test/CodeGen/MOS/zero-page-indexed.mir
+new file mode 100644
+index 000000000000..c5fabb453b2b
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/zero-page-indexed.mir
+@@ -0,0 +1,110 @@
++# RUN: llc -mtriple=mos -mcpu=mos6502 -start-after=machine-opt-remark-emitter -verify-machineinstrs %s -o %t.s
++# RUN: FileCheck %s < %t.s
++# RUN: llvm-mc -triple=mos -mcpu=mos6502 -filetype=obj %t.s -o %t.asm.o
++# RUN: llc -mtriple=mos -mcpu=mos6502 -start-after=machine-opt-remark-emitter -verify-machineinstrs -filetype=obj %s -o %t.direct.o
++# RUN: cmp %t.direct.o %t.asm.o
++# RUN: llvm-objdump -dr %t.direct.o | FileCheck %s --check-prefix=OBJ
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-after=machine-opt-remark-emitter -verify-machineinstrs %s -o %t.65816.s
++# RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %t.65816.s -o %t.65816.asm.o
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-after=machine-opt-remark-emitter -verify-machineinstrs -filetype=obj %s -o %t.65816.direct.o
++# RUN: cmp %t.65816.direct.o %t.65816.asm.o
++
++# Section-placed globals obey the same whole-object zero-page contract as
++# address-space-1 globals. Each indexed operation must select its compact
++# encoding when the CPU provides one, in both output paths.
++--- |
++  @samples = global [16 x i8] zeroinitializer, section ".zp.bss"
++  @near_data = global [16 x i8] zeroinitializer, section ".zeropage.data"
++  @direct_data = global [16 x i8] zeroinitializer, section ".directpage"
++  @as1_data = addrspace(1) global [16 x i8] zeroinitializer
++  @alias_data = alias [16 x i8], ptr @samples
++  @ordinary = global [16 x i8] zeroinitializer
++  @similar_name = global [16 x i8] zeroinitializer, section ".zprefix"
++
++  define void @indexed_operations() { ret void }
++  define void @zero_page_kinds() { ret void }
++  define void @absolute_controls() { ret void }
++...
++---
++name: indexed_operations
++body: |
++  bb.0:
++    ; CHECK-LABEL: indexed_operations:
++    ; OBJ-LABEL: <indexed_operations>:
++    $a = LDAAbsIdx @samples, $x
++    ; CHECK: lda mos8(samples),x
++    ; OBJ: b5 00
++    $y = LDYIdx @samples, $x
++    ; OBJ: b4 00
++    $x = LDXIdx @samples, $y
++    ; OBJ: b6 00
++    STAbsIdx $a, @samples, $x
++    ; CHECK: sta mos8(samples),x
++    ; OBJ: 95 00
++    $a, $c, $v = ADCAbsIdx $a, @samples, $x, $c
++    ; OBJ: 75 00
++    $a, $c, $v = SBCAbsIdx $a, @samples, $x, $c
++    ; OBJ: f5 00
++    $a = ANDAbsIdx $a, @samples, $x
++    ; OBJ: 35 00
++    $a = EORAbsIdx $a, @samples, $x
++    ; OBJ: 55 00
++    $a = ORAAbsIdx $a, @samples, $x
++    ; OBJ: 15 00
++    $c = CMPAbsIdx $a, @samples, $x
++    ; OBJ: d5 00
++    $c = ASLIdx @samples, $x
++    ; OBJ: 16 00
++    $c = LSRIdx @samples, $x
++    ; OBJ: 56 00
++    $c = ROLIdx @samples, $x, $c
++    ; OBJ: 36 00
++    $c = RORIdx @samples, $x, $c
++    ; OBJ: 76 00
++    INCIdx @samples, $x
++    ; OBJ: f6 00
++    DECIdx @samples, $x
++    ; OBJ: d6 00
++    RTS
++...
++---
++name: zero_page_kinds
++body: |
++  bb.0:
++    ; OBJ-LABEL: <zero_page_kinds>:
++    $a = LDAAbsIdx @near_data, $x
++    ; OBJ: b5 00
++    $a = LDAAbsIdx @direct_data, $x
++    ; OBJ: b5 00
++    $a = LDAAbsIdx @alias_data, $x
++    ; OBJ: b5 00
++    $a = LDAAbsIdx @as1_data, $x
++    ; OBJ: b5 00
++    STAbsIdx $a, @as1_data, $x
++    ; OBJ: 95 00
++    $a = LDAAbsIdx @samples + 1, $x
++    ; OBJ: b5 00
++    $a = LDAAbsIdx @samples - 1, $x
++    ; OBJ: b5 00
++    RTS
++...
++---
++name: absolute_controls
++body: |
++  bb.0:
++    ; CHECK-LABEL: absolute_controls:
++    ; OBJ-LABEL: <absolute_controls>:
++    $a = LDAAbsIdx @ordinary, $x
++    ; OBJ: bd 00 00
++    $a = LDAAbsIdx @similar_name, $x
++    ; OBJ: bd 00 00
++    $a = LDAAbsIdx 4660, $x
++    ; CHECK: lda 4660,x
++    ; OBJ: bd 34 12
++    ; Accumulator loads/stores have no zero-page,Y form on these CPUs.
++    $a = LDAAbsIdx @samples, $y
++    ; OBJ: b9 00 00
++    STAbsIdx $a, @samples, $y
++    ; OBJ: 99 00 00
++    RTS
++...

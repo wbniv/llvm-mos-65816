@@ -121,6 +121,8 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0032-mos-quote-register-named-symbols-vendor
   # G_PREFETCH is legalized by dropping it (a hint the 6502 cannot use).
   apply_patch 0034-mos-legalize-prefetch
+  # Indexed opcodes use the same zero-page classification as their operands.
+  apply_patch 0036-mos-zero-page-indexed-globals
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 

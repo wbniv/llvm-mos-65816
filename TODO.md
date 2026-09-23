@@ -1097,7 +1097,9 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   verifier; tests discriminate on both sides. [PR draft 0034](docs/upstream-prefetch-legalize-pr.md) ·
   [PR draft 0035](docs/upstream-clang-prefetch-int16-pr.md) ·
   [validation](docs/pr-preparations/2026-09-23/0034-0035-validation.md). Remaining: publish
-  (user-triggered; 0035 to llvm/llvm-project).
+  (user-triggered; 0034 to llvm-mos, 0035 to llvm/llvm-project). The 0035 frontend
+  bug affects explicit arguments such as `__builtin_prefetch(p, 1, 2)`; omitted
+  arguments already have the correct type. Regression coverage: MSP430 and x86-64.
 - [T3] **Support the `g` inline-asm constraint in GlobalISel.** `asm("" : "+g"(x))`, the common
   optimization-barrier idiom, fails with "unable to translate instruction: call" (10 c-torture
   compilations: `pr65053-1/2`, `pr65956`, `pr88904`). Decide whether MOS maps `g` to a register
@@ -1122,17 +1124,24 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   re-emitted spill introduces vregs) plus removal of the driver flag.
   [PR draft](docs/upstream-spill-hoist-scratch-vregs-pr.md) ·
   [validation](docs/pr-preparations/2026-09-23/0033-validation.md). Remaining: publish (user-triggered).
-- [T4] **Asm printer and object emitter disagree on zero-page-indexed symbol operands.** On
-  pristine upstream, `rs1[i]` with `rs1` in `.zp.bss` is emitted directly as `lda abs,x`
-  (`0xBD`, `R_MOS_ADDR8`) but printed as `lda mos8(rs1),x`, which reassembles as `lda zp,x`
-  (`0xB5`, `R_MOS_ADDR8`): `llc -S | llvm-mc` differs from `llc -filetype=obj` by a byte per
-  such access. The encodings have different page-wrap rules; a valid-C runtime
-  counterexample has not been established. Found
-  while reviewing patch 0032 (which is unrelated: same mismatch with non-register names and
-  pre-0032 tools; [reduced input](docs/investigations/repro/upstream-issues-2026-09-23/zero-page-indexed-symbol.c),
-  [audit](docs/pr-preparations/2026-09-23/0032-review-audit.md)). Decide which side is right, fix
-  the other, add a print/reassemble round-trip test. Reason for T4: root cause spans the
-  printer's `mos8()` selection and MC fixup/relaxation, and the answer changes codegen.
+- [T5] **Zero-page indexed globals: patch 0036 prepared and installed.** The compact
+  form is intended under the existing whole-object zero-page contract. Classify explicit
+  zero-page sections when selecting indexed opcodes, and inspect the address operand of
+  indexed stores. Direct emission and print/reassembly now agree: 27 C-case mismatches
+  repaired; 18 ordinary-section controls unchanged; standalone suites 132 pass / one
+  unsupported; 36 local width-mode compilations verify and round-trip cleanly.
+  [PR draft](docs/upstream-zero-page-indexed-globals-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0036-validation.md).
+  [Independently reviewed](docs/pr-preparations/2026-09-23/0036-claude-review.md); ready to post. Remaining: publication (user-triggered).
+- [T4] **Explicit `mos16(constant)` can select a zero-page opcode and truncate the address.**
+  Pristine `llvm-mc` emits `B5 F0` for `lda mos16(240),x` and `B5 34` for
+  `lda mos16(4660),x`, instead of absolute,X encodings `BD F0 00` / `BD 34 12`.
+  `MOSOperand::isImmInRange` tests a positive modified constant against the modifier's
+  width without checking the candidate operand's narrower range. This also defeats
+  `wrapAbsoluteIdxBase` for small integer bases. Separate from 0036's global classification;
+  fix the parser's width matching and add constant/addressing-mode regressions.
+  [Reproducer](docs/investigations/repro/upstream-issues-2026-09-23/explicit-address-width.s) ·
+  [diagnosis](docs/pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect).
 - [T5] **Post the register-scavenger live-`$p` fix PR (`0011`)** (user-triggered). The upstream
   producer is established: gcc torture `strlen-4.c` at `-O0` on stock `mos6502` fails on pristine
   upstream and is fixed by 0011 alone, with no other change across the 4,170-comparison corpus
