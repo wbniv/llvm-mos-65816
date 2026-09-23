@@ -154,7 +154,6 @@ alias-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 alias-3.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 alias-access-path-1.c	undefined-symbol	ld.lld: error: undefined symbol: __putchar
 align-nest.c	compile-error	vendor/c-torture/execute/align-nest.c:12:9: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
-ashrdi-1.c	link-other	PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
 bcp-1.c	undefined-symbol	ld.lld: error: undefined symbol: bad2 (+3 more)
 bitfld-4.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)
 bitfld-6.c	dg-require-unsupported	requires int32plus (16-bit-int target cannot satisfy)

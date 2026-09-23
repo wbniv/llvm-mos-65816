@@ -1,0 +1,149 @@
+diff --git a/llvm/lib/CodeGen/InlineSpiller.cpp b/llvm/lib/CodeGen/InlineSpiller.cpp
+index f9ea5bf..71b4ac3 100644
+--- a/llvm/lib/CodeGen/InlineSpiller.cpp
++++ b/llvm/lib/CodeGen/InlineSpiller.cpp
+@@ -881,6 +881,20 @@ bool InlineSpiller::coalesceStackAccess(MachineInstr *MI, Register Reg) {
+   if (InstrReg != Reg || FI != StackSlot)
+     return false;
+ 
++  // A target's spill hook may need scratch registers and express them as extra
++  // virtual defs on the spill or reload it builds; getVDefInterval() above gives
++  // those registers live intervals, and the allocator assigns them like any
++  // other. Erasing the instruction would orphan such a register: its only def
++  // is gone, but its assignment stays in the allocator's interference matrix as
++  // a segment over a SlotIndex that no longer has an instruction. A later live
++  // range split then reads that index back as "last interference" and asserts
++  // (`enterIntvAfter called with invalid index`) or, without assertions,
++  // dereferences null. Keep the redundant access instead -- it is correct, just
++  // not free -- and let the normal spillAroundUses path rewrite it.
++  for (const MachineOperand &MO : MI->all_defs())
++    if (MO.getReg().isVirtual() && MO.getReg() != Reg)
++      return false;
++
+   if (!IsLoad)
+     HSpiller.rmFromMergeableSpills(*MI, StackSlot);
+ 
+diff --git a/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll b/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll
+new file mode 100644
+index 0000000..cec6883
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll
+@@ -0,0 +1,118 @@
++; RUN: llc -O2 -mtriple=mos -mcpu=mos65c02 -verify-machineinstrs %s -o - | FileCheck %s
++; RUN: llc -O2 -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs %s -o - | FileCheck %s
++
++; A 64-bit variable shift behind a jump table. Under 65c02/65816 register
++; pressure the greedy allocator reaches this sequence inside one inline-spill
++; session:
++;
++;   1. a split inserts  %910 = COPY %911
++;   2. spilling %911 folds that COPY into  %910, early-clobber %981:imag16 = LDStk
++;      -- MOS's reload hook needs a 16-bit scratch pointer and expresses it as an
++;      extra virtual def, which getVDefInterval() gives a live interval
++;   3. %981 is allocated to $rs5 (= $rc10:$rc11)
++;   4. spilling %910 next reaches InlineSpiller::coalesceStackAccess(), which
++;      wants to erase that same LDStk
++;
++; Erasing it orphaned %981: its assignment stayed in the interference matrix over
++; a SlotIndex with no instruction, and the next region split read that index back
++; as "last interference" and hit
++;   SplitKit.cpp: Assertion `MI && "enterIntvAfter called with invalid index"'
++; (a null dereference in a no-assertions build). coalesceStackAccess now declines
++; to erase an access that carries extra virtual defs.
++
++
++declare void @abort()
++
++define fastcc i64 @constant_shift(i64 %0, i16 %1) {
++  switch i16 %1, label %16 [
++    i16 0, label %17
++    i16 1, label %common.ret1
++    i16 2, label %3
++    i16 3, label %3
++    i16 4, label %common.ret1
++    i16 5, label %3
++    i16 6, label %3
++    i16 7, label %common.ret1
++    i16 8, label %3
++    i16 9, label %3
++    i16 10, label %3
++    i16 11, label %4
++    i16 12, label %6
++    i16 13, label %common.ret1
++    i16 14, label %common.ret1
++    i16 15, label %3
++    i16 16, label %8
++    i16 17, label %common.ret1
++    i16 18, label %common.ret1
++    i16 19, label %10
++    i16 20, label %common.ret1
++    i16 21, label %common.ret1
++    i16 22, label %3
++    i16 23, label %12
++    i16 24, label %14
++    i16 25, label %common.ret1
++    i16 26, label %3
++    i16 27, label %3
++    i16 28, label %3
++    i16 29, label %common.ret1
++    i16 30, label %3
++    i16 31, label %3
++    i16 32, label %3
++    i16 33, label %common.ret1
++    i16 34, label %common.ret1
++    i16 35, label %common.ret1
++    i16 36, label %common.ret1
++    i16 37, label %common.ret1
++    i16 38, label %common.ret1
++    i16 39, label %common.ret1
++    i16 40, label %common.ret1
++    i16 41, label %common.ret1
++    i16 42, label %3
++    i16 43, label %common.ret1
++    i16 44, label %common.ret1
++    i16 45, label %common.ret1
++    i16 46, label %3
++    i16 47, label %3
++  ]
++
++common.ret1:                                      ; preds = %17, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2
++  %common.ret1.op = phi i64 [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ %18, %17 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ]
++  ret i64 %common.ret1.op
++
++3:                                                ; preds = %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2
++  br label %17
++
++4:                                                ; preds = %2
++  %5 = ashr i64 %0, 11
++  br label %17
++
++6:                                                ; preds = %2
++  %7 = ashr i64 %0, 12
++  br label %17
++
++8:                                                ; preds = %2
++  %9 = ashr i64 %0, 16
++  br label %17
++
++10:                                               ; preds = %2
++  %11 = ashr i64 %0, 19
++  br label %17
++
++12:                                               ; preds = %2
++  %13 = ashr i64 %0, 23
++  br label %17
++
++14:                                               ; preds = %2
++  %15 = ashr i64 %0, 24
++  br label %17
++
++16:                                               ; preds = %2
++  tail call void @abort()
++  unreachable
++
++17:                                               ; preds = %14, %12, %10, %8, %6, %4, %3, %2
++  %18 = phi i64 [ %5, %4 ], [ %11, %10 ], [ 0, %3 ], [ %13, %12 ], [ %0, %2 ], [ %9, %8 ], [ %15, %14 ], [ %7, %6 ]
++  br label %common.ret1
++}
++
++; CHECK-LABEL: constant_shift:

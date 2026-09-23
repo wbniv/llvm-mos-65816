@@ -17,7 +17,11 @@ plus authored PRs in `llvm-mos/llvm-mos-sdk`.
 [0034](upstream-prefetch-legalize-pr.md) drop `G_PREFETCH` ·
 [0035](upstream-clang-prefetch-int16-pr.md) clang prefetch operands as `i32` (for llvm/llvm-project) ·
 [0037](upstream-gisel-inline-asm-indirect-output-pr.md) GlobalISel indirect inline-asm outputs, the `+g` idiom (for llvm/llvm-project) ·
-[0038](upstream-return-frame-address-pr.md) `llvm.returnaddress` / `llvm.frameaddress` legalized.
+[0038](upstream-return-frame-address-pr.md) `llvm.returnaddress` / `llvm.frameaddress` legalized ·
+[0040](upstream-inline-spiller-coalesce-scratch-vregs-pr.md) `coalesceStackAccess` must not erase a
+stack access carrying scratch vregs — the coalescing counterpart to 0033's hoisting guard, found as
+the `ashrdi-1` greedy-RA segfault
+([validation](pr-preparations/2026-09-24/0040-validation.md)).
 
 **Prepared, independent review audited:** [0036](upstream-zero-page-indexed-globals-pr.md)
 zero-page indexed globals. Direct and reassembled objects now agree; standalone

@@ -623,6 +623,7 @@ arith-1.c
 arith-rand-ll.c
 arith-rand.c
 ashldi-1.c
+ashrdi-1.c
 bf-layout-1.c
 bf-pack-1.c
 bf-sign-1.c
