@@ -625,9 +625,9 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   new `MOSLowerReturnAddress` pass expands last, with the depth from a forward dataflow over the
   CFG (`tsx ; lda $0101+d,x`, 65816 `lda 1+d,s`, SPC700 without the `+1`). Levels above 0 and
   interrupt handlers return 0. Aimed at `llvm-mos`. [PR draft](upstream-return-frame-address-pr.md) ·
-  [validation](pr-preparations/2026-09-23/0038-validation.md). Unreviewed; unposted. Found on the
-  way: SPC700 `-O2` crashes on any immediate load into an imaginary register (pre-existing,
-  tracked in `TODO.md`).
+  [validation](pr-preparations/2026-09-23/0038-validation.md). Unreviewed; unposted. (The SPC700
+  `-O2` crash seen during its validation is patch 0003's defect, open PR #584, absent from the
+  isolated validation stack only; the project toolchain has the fix.)
 
 - **GlobalISel indirect inline-asm outputs — fix prepared September 23.**
   [Patch 0037](../patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output.patch):

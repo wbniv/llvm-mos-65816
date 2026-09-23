@@ -58,11 +58,7 @@ Tests: `llvm/test/CodeGen/MOS/return-frame-address.ll` (mos6502 at `-O0` and
 `-O2`, mosw65816 at `-O2`, MachineVerifier on: plain read, read displaced by a
 callee-saved push, level 1, interrupt handler, frame address with and without a
 frame, frame address level 1) and `llvm/test/CodeGen/MOS/return-address-spc700.ll`
-(the SPC700 forms and the missing `+1`; kept apart because SPC700 cannot yet
-compile pointer constants at `-O2`, a pre-existing null dereference in
-`MOSLateOptimization::combineLdImm` when an immediate load targets an imaginary
-register, reproducible on the unpatched `llc` with a function that has no
-builtin at all).
+(the SPC700 forms and the missing `+1`).
 
 Validated on llvm-mos `742d554bf08042b8df93d791c335260fadd16643` (`llc`,
 assertions enabled):

@@ -473,7 +473,7 @@ index aae795c4877b..da4f693cab5c 100644
  }
 diff --git a/llvm/test/CodeGen/MOS/return-address-spc700.ll b/llvm/test/CodeGen/MOS/return-address-spc700.ll
 new file mode 100644
-index 000000000000..05ca8162bf86
+index 000000000000..b15ebdfd8c1c
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/return-address-spc700.ll
 @@ -0,0 +1,37 @@
@@ -481,8 +481,8 @@ index 000000000000..05ca8162bf86
 +
 +; SPC700 CALL pushes the return address itself, so the word read from the hard
 +; stack is used as it is; the stack pointer transfer and the indexed load are the
-+; SPC700 forms of tsx and lda abs,x. (Kept apart from return-frame-address.ll:
-+; no pointer constants here, which SPC700 cannot yet compile at -O2.)
++; SPC700 forms of tsx and lda abs,x. (Kept apart from return-frame-address.ll so
++; the SPC700 spellings are checked on their own.)
 +
 +declare void @keep(i8)
 +

@@ -1133,14 +1133,10 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   register allocation in a function without the builtins. Not proven by a vendor rebuild without
   0038 (20 min of toolchain churn; do it first if in doubt). Reason for T4: unknown root cause in
   generic RA splitting driven by MOS register-class shape.
-- [T2] **SPC700 `-O2` crashes on any immediate load into an imaginary register.**
-  `MOSLateOptimization::combineLdImm` leaves `Load` null when `LDImm`'s destination is not
-  A/X/Y (SPC700 allows `LDImm` to imaginary registers, `MOSInstrInfo.cpp` "On SPC700, LDImm can
-  be used for imaginary registers") and then dereferences it (`Load->MI = &MI`). Reproduces on
-  the unpatched `llc` with `-mcpu=mosspc700 -O2` on a function returning `ptr null`
-  (found 2026‑09‑23 while writing the 0038 SPC700 test, which avoids the shape). Fix: skip the
-  bookkeeping for non-A/X/Y destinations; add an SPC700 lit test. Reason for T2: one function, the
-  null path is identified.
+<!-- triaged 2026-09-24: the "SPC700 -O2 crashes on any immediate load into an imaginary
+     register" item added with 0038 was a re-discovery of patch 0003 (open upstream PR #584,
+     Done 2026-08-01 below). It only reproduced on the isolated 0038 validation stack, which
+     omits 0003; the project toolchain has the fix. Nothing to do. -->
 - [T4] **GlobalISel inline asm asserts on a multi-register tied operand** (`20030222-1.c`:
   `asm("" : "=r"(i) : "0"(x))`; 6 compilations). A plain `int` case compiles, so the failing shape is
   specific; reduce it first. Reason for T4: the fix is in generic `InlineAsmLowering` and a wrong
