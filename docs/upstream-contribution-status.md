@@ -19,42 +19,13 @@ plus authored PRs in `llvm-mos/llvm-mos-sdk`.
 [chart and flowchart](upstream-pending-work.md). This view supersedes historical
 queue labels when judging what can be posted next.
 
-**Local preparation updated September 22:** patch 0030's physical-copy liveness
-fix is implemented, validated, and integrated into the local compiler. Its
-[PR preview](pr-preparations/2026-09-22/0030-pr-preview.html) contains the proposed
-description and exact patch. Six focused MIR cases and 84 MOS CodeGen tests
-pass (one unsupported), as do all 46 MOS MC tests; the original input verifies at six optimization levels
-with unchanged assembly. Local integration also passes 24 compiler checks.
-An [independent review](pr-preparations/2026-09-22/0030-claude-review.md)
-added a sixth MIR case and a c-torture differential (1,390 accepted files;
-20 verifier failures repaired, all 4,070 successful assembly pairs identical).
-The [0030 review audit](pr-preparations/2026-09-22/0030-review-audit.md) corrects
-the corpus counts and confirms the six cases and both MOS suites with the
-0030-only binary. The independent review also found a dead reuse
-path next to the fix, now [patch 0031](pr-preparations/2026-09-22/0031-validation.md)
-stacked on 0030 with its own [PR draft](upstream-copy-phys-reg-reuse-dst-pr.md).
-Upstream `main` was reported identical to the pinned base in the independent
-review. Claude's attribution now records CLI `2.1.278`, model `claude-fable-5-1`,
-and `high` reasoning effort. Branch preparation and publication remain.
-Patch 0031's [independent review](pr-preparations/2026-09-22/0031-review-audit.md)
-is also complete: no correctness defect found; 85 MOS CodeGen tests and 46 MC
-tests pass, with one unsupported. The size comparison confirms a net 2,530-byte
-reduction over 374 changed pairs that assemble, including six small increases.
-**September 23:** those 61 excluded assembly failures are now reduced and fixed
-by [patch 0032](../patches/llvm-mos/0032-mos-quote-register-named-symbols.patch).
-Register-named symbols retain their quotes, covering both rejected operands
-and silent `asl "a"` misassembly. Standalone validation reports 84 CodeGen
-passes, one unsupported, and 48 MC passes; all 61 corpus cases now assemble,
-with direct objects unchanged. The compatible local compiler is installed.
-[PR draft](upstream-register-named-symbols-pr.md) ·
-[Validation and local API compatibility](pr-preparations/2026-09-23/0032-validation.md).
-The [independent review audit](pr-preparations/2026-09-23/0032-review-audit.md)
-confirms the code and corrects the full-corpus baseline: 821 assembler failures
-fall to zero across 4,091 emitted files; 79 backend failures are excluded.
-All 113 object differences were independently replayed and confirmed to be
-symbol-table ordering only. Branch preparation and publication remain.
-These are local results, not a
-refresh of the GitHub snapshot below.
+**Local preparation updated September 23:** six feature-independent fixes are prepared and
+independently reviewed (each by Claude and then audited by Codex, or the reverse); the roster above
+links their drafts. Every one has a stock-`mos6502` reproducer, a patch that applies to current
+upstream, suites run on an assertion build, and a corpus differential; the two that change generated
+code (0031, 0033) also pass the MAME + bsnes-jg gate. The remaining backend failures found in the
+same corpus are triaged and ranked in [`TODO.md`](../TODO.md) (see
+[pending work](upstream-pending-work.md#backend-failure-triage-gcc-c-torture-2026-09-23)).
 
 ## Current PR progress
 

@@ -118,7 +118,7 @@ Patch 0030 submission status:
 - [x] Review the 0030 code and corrected validation claims.
 - [x] Claude's updated attribution records CLI `2.1.278`, model
   `claude-fable-5-1`, and `high` reasoning effort.
-- [ ] Recheck current upstream applicability when preparing the branch.
+- [x] Current upstream applicability: llvm-mos `main` identical to the pinned base (2026-09-22); both 0030 and 0031 also apply on the newer local clone.
 - [ ] Prepare the standalone branch and publish the fix PR.
 
 **Prepared but held: patch `0028`, the `VirtRegRewriter` undef-lane fix.**
@@ -266,14 +266,13 @@ flowchart TD
     UNDEF[Undef-lane fix 0028 validated] --> HOLD[Wait until 320 and 321 are ready to open]
     HOLD --> FINAL[Choose implementation and review submission]
     FINAL --> UNDEFPR[Publish fix PR] --> MERGED
-    RA[Register-exhaustion fix 0029] --> RAT[Validated: MOS suite and complete X86/ARM/AArch64 suites]
-    RAT --> RAREVIEW[Review final plain-6502 submission]
-    RAREVIEW --> RAPR[Publish independent fix PR] --> MERGED
-    COPY[Physical-copy liveness fix 0030] --> COPYT[Validated: six MIR cases, MOS suites, c-torture differential]
-    COPYT --> REUSE[Patch 0031: destination reuse, reviewed and validated]
-    REUSE --> REUSEPR[Prepare submission after 0030] --> MERGED
-    COPYT --> COPYREVIEW[Review submission and check current upstream applicability]
-    COPYREVIEW --> COPYPR[Prepare branch and publish independent fix PR] --> MERGED
+    RA[Register-exhaustion fix 0029: reviewed, full suites] --> RAPR[Publish fix PR] --> MERGED
+    COPY[Physical-copy liveness fix 0030: reviewed and audited] --> COPYPR[Publish fix PR] --> MERGED
+    COPYPR --> REUSEPR[Publish 0031 destination reuse on top of 0030] --> MERGED
+    SCAV[Scavenger live-P fix 0011: stock-6502 producer, upstream-runnable test] --> SCAVPR[Publish fix PR] --> MERGED
+    SYM[Register-named symbols 0032: reviewed and audited, full-corpus round trip] --> SYMPR[Publish fix PR] --> MERGED
+    HOIST[Spill-hoist guard 0033: MOS/X86/ARM/AArch64 suites, emulator gate] --> HOISTPR[Publish fix PR, drops driver flag] --> MERGED
+    TRIAGE[c-torture backend triage: prefetch, g constraint, return/frame address, tied asm operand, float vectors] --> NEXTFIX[Next fixes, ranked in TODO]
   end
   subgraph SNES[SNES platform — separate track]
     EXIST[Existing SDK PR 415 + our platform] --> RECON[Reconcile baseline target and CPU mode]
@@ -292,7 +291,7 @@ flowchart TD
   end
   subgraph Reports[Reports needing decisions or development]
     CONTRACT[Reentrant contract question] --> DECIDE[Agree semantics] --> FIX[Develop and test fix or documentation]
-    GUARDS[Scavenger / coalescing / trunc candidates] --> REPRO[Establish valid stock-upstream reproducers]
+    GUARDS[Coalescing / trunc candidates: 0015, 0023] --> REPRO[Establish valid stock-upstream reproducers]
     REPRO --> FIX
     FIX --> REPORTPR[Post fix PR; link issue if one exists] --> REPORTMERGE[Review and merge]
   end
