@@ -1091,6 +1091,24 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
   `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
   [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
+- [T2] **Legalize `G_PREFETCH` as a no-op.** `__builtin_prefetch` aborts the backend
+  (`unable to legalize instruction: G_PREFETCH`, 18 c-torture compilations); a prefetch is a hint,
+  so lowering it to nothing is correct. Reason for T2: one legalizer rule plus a test.
+- [T3] **Support the `g` inline-asm constraint in GlobalISel.** `asm("" : "+g"(x))`, the common
+  optimization-barrier idiom, fails with "unable to translate instruction: call" (10 c-torture
+  compilations: `pr65053-1/2`, `pr65956`, `pr88904`). Decide whether MOS maps `g` to a register
+  class or generic `InlineAsmLowering` grows the constraint; add a test. Reason for T3: bounded,
+  but the right layer (target hook versus generic lowering) has to be chosen.
+- [T3] **`__builtin_return_address` / `__builtin_frame_address` are unlegalized** (15 c-torture
+  compilations). Either implement (return address from the hard stack; frame address from `__rc0`)
+  or emit a clean diagnostic instead of a backend abort. Reason for T3: small, but the semantics
+  under the soft stack need deciding.
+- [T4] **GlobalISel inline asm asserts on a multi-register tied operand** (`20030222-1.c`:
+  `asm("" : "=r"(i) : "0"(x))`; 6 compilations). A plain `int` case compiles, so the failing shape is
+  specific; reduce it first. Reason for T4: the fix is in generic `InlineAsmLowering` and a wrong
+  turn miscompiles inline asm.
+- [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
+  compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
   `hoistAllSpills` re-emits spills through `storeRegToStackSlot`; MOS's soft-stack `STStk` mints a scratch
   `Imag16` vreg that is never assigned: `Remaining virtual register` on assertion builds, a segfault in

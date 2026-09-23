@@ -48,9 +48,43 @@ reproduction checks; keep candidate patches in separate builds.
    [independent review audit](pr-preparations/2026-09-23/0032-review-audit.md)
    confirms the implementation and measures 821 assembler failures repaired
    across the full set of 4,091 emitted files (79 backend failures excluded).
-   Current-upstream applicability, branch preparation, and publication remain.
-4. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
+   Applies to current upstream; branch preparation and publication remain.
+4. [Scavenger live-`$p`](upstream-scavenger-live-p-pr.md): patch 0011, held since
+   June for lack of a stock producer; gcc torture `strlen-4.c` at `-O0` on
+   `mos6502` is one. Upstream-runnable test added, a liveness-tracking guard
+   fixed the regression the existing `scavenger.mir` exposed on assertion builds.
+   [Record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md).
+5. [Copy-destination reuse](upstream-copy-phys-reg-reuse-dst-pr.md): patch 0031,
+   on top of 0030 (second PR on its branch, or second commit). The second reuse
+   path in `getRegWithVal` was dead code; `.text` −2,530 bytes over 374 changed
+   corpus pairs. [Validation](pr-preparations/2026-09-22/0031-validation.md) ·
+   [audit](pr-preparations/2026-09-22/0031-review-audit.md).
+6. [Spill hoisting versus scratch vregs](upstream-spill-hoist-scratch-vregs-pr.md):
+   patch 0033, generic `hoistAllSpills` guard plus removal of the driver's
+   blanket `-disable-spill-hoist`; release-build segfault on 9 c-torture files.
+   MOS, X86, ARM and AArch64 suites clean; emulator gate 79/79.
+   [Validation](pr-preparations/2026-09-23/0033-validation.md).
+7. [Reentrant-attribute contract](upstream-reentrant-soft-stack-issue.md):
    semantics question, now verified with the stock upstream frontend and `opt`.
+
+## Backend failure triage (gcc c-torture, 2026-09-23)
+
+Of 4,170 backend compilations of the 1,390 files the pinned Clang accepts
+(`-O0`, `-O2`, `-Os`, IR through `llc`), 79 failed on every build. Patch 0033
+repairs 18 (12 files). What remains, by class, with the assessment behind the
+rank in `TODO.md`:
+
+| Compilations | Class | Assessment |
+|---:|---|---|
+| 18 | `G_PREFETCH` never legalized (`__builtin_prefetch`) | a hint; dropping it is legal; tiny fix, real reach (portable code uses the builtin) |
+| 10 | `asm("" : "+g"(x))`: "unable to translate instruction: call" | the `g` constraint is unsupported in GlobalISel inline-asm lowering; a common barrier idiom |
+| 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | unsupported builtins; a feature (read the hard stack) or a clean diagnostic |
+| 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` on a 16-bit value in `20030222-1.c`) | shape-specific (a simple `int` case compiles); needs the exact reduction |
+| 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | vector extensions; scalarization missing |
+| 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
+
+Not in the corpus but found alongside: the asm printer and object emitter
+disagree on zero-page-indexed symbol operands (`[T4]` in `TODO.md`).
 
 These are unposted contributions and do not require #320/#321. The register
 exhaustion and physical-copy liveness fixes are implemented and validated. The

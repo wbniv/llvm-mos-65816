@@ -1,12 +1,19 @@
 # Upstream contribution status — PR progress and submission queue
 
-**GitHub status last verified:** 2026-09-21, live GitHub queries (`gh pr list`, `gh pr view`, and
-`gh issue list`). Scope: PRs/issues authored by `wbniv` in `llvm-mos/llvm-mos`,
+**GitHub status last verified:** 2026-09-23, live `gh pr view` / `gh issue view` of every PR and
+issue referenced in this document. Scope: PRs/issues authored by `wbniv` in `llvm-mos/llvm-mos`,
 plus authored PRs in `llvm-mos/llvm-mos-sdk`.
-**13 compiler PRs: 7 merged, 6 open, none closed unmerged. Both authored issues (#561 and #576) are closed.**
-**SDK: one authored PR, #450, open.** No new merges or reviews since the September 20
-snapshot. All seven open PRs report no merge conflicts; this does not mean their
-review or CI requirements are satisfied.
+**13 compiler PRs: 7 merged (#549, #562, #563, #577, #579, #587, #590, #591), 6 open (#578, #584,
+#585, #586, #588, #589, #604), #575 closed unmerged. Both authored issues (#561 and #576) are closed.**
+**SDK: one authored PR, #450, open.** No state change since the September 21 snapshot.
+
+**Ready to post (all user-triggered, each with a reviewed draft, patch, and validation record):**
+[0029](upstream-twoaddr-physreg-reschedule-pr.md) register exhaustion ·
+[0030](upstream-copy-phys-reg-liveness-pr.md) copy liveness, then
+[0031](upstream-copy-phys-reg-reuse-dst-pr.md) copy-destination reuse on top of it ·
+[0011](upstream-scavenger-live-p-pr.md) scavenger live-`$p` (stock-6502 producer found 2026-09-22) ·
+[0032](upstream-register-named-symbols-pr.md) register-named symbols ·
+[0033](upstream-spill-hoist-scratch-vregs-pr.md) spill hoisting (generic LLVM + driver flag removal).
 
 **Pending work, SNES dependencies and issue readiness:**
 [chart and flowchart](upstream-pending-work.md). This view supersedes historical
