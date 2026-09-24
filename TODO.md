@@ -276,12 +276,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   24-bit-specific; found incidentally by the 2026-09-24 #320 audit. Needs a textual form plus a
   `-show-encoding` RUN line; upstream-postable. Reason for T2: one MCExpr printer case + a test.
   [audit §1](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#1-assembler--parser--mostly-done-one-real-gap-already-tracked).
-- [T3] **Far/packed-24 codegen has zero lit coverage.** Every far/packed-24 correctness claim rests on
-  emulator ROMs (`dev/run.sh far*`/`packed24*`); no `addrspace(2)`/`addrspace(3)` test exists anywhere
-  in `llvm/test`. Add fork-local `CodeGen/MOS/far-*.ll` pinning `af`/`8f`/`a7`/`87`/`$5C` selection, the
-  `p2↔s32` and `p3↔3×s8` legalizer bridges and the `G_PHI(p2)` legalisation — the emulator gates already
-  define the expected shapes. Reason for T3: multi-file against a settled design, no open question.
-  [audit §5](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#5-testing-coverage--the-weakest-layer-as-a-category-of-its-own).
 - [T3] **`[dp],Y` (`b7`/`97`) indirect-long-indexed is never selected — MEASURE first.** A far pointer
   plus a runtime index always materialises a 32-bit pointer add then `lda [dp]`; `farindex.c`, a
   *dedicated* far-array-subscript fixture, emits 34× `lda [dp]` and zero `lda [dp],y`. Also unselected:
@@ -1402,6 +1396,12 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [far-lit-coverage] Far/packed-24 codegen had zero lit coverage; added four fork-local
+  tests (`CodeGen/MOS/far-addressing.ll`, `far-call.ll`, `far-legalizer-bridges.ll`, `far-phi.ll`, patch
+  `0048`) pinning `$af`/`$8f`/`$a7`/`$87` selection, `$22`/`$6b`/`$5c` far call/return/tail, the
+  `p2↔s32` and `p3↔3×s8` legalizer bridges and the `G_PHI(p2)` legalisation. `dev/run.sh lit`: 163
+  discovered (was 159), 157 pass, the same 4 known-failing baseline.
+  See [audit §5](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#5-testing-coverage--the-weakest-layer-as-a-category-of-its-own).
 - ✅ 2026-09-24 — [roundtrip-gate] Wired `dev/probe-far-roundtrip.sh` into `dev/run.sh roundtrip` (all 3
   modes, `--all` 117-fixture default; `--far-only` opts into the fast far/packed24 subset) — confirmed
   the 0-divergent baseline and the FAIL/exit-code path. See

@@ -288,7 +288,7 @@ and the 3-byte packed form is right. **Done.**
 |---|---|
 | assembler modifier widths | **strong, new** — `dev/probe-modifier-width.sh` (12,045 probes) + 3 lit tests (`MC/MOS/modifier-width*.s`) |
 | assembler addressing modes | `MC/MOS/addressing-modes-65816.s` — comprehensive, but **currently failing** on the one active `addr24` bare-symbol line and carrying 3 more `; TODO:` gaps |
-| far/packed-24 **codegen** | **zero lit coverage** |
+| far/packed-24 **codegen** | ~~**zero lit coverage**~~ → 4 fork-local lit tests (`CodeGen/MOS/far-addressing.ll`, `far-call.ll`, `far-legalizer-bridges.ll`, `far-phi.ll`; patch `0048`) — see item 1 below |
 | far runtime behaviour | ~17 dedicated emulator ROMs (`dev/run.sh far*`, `packed24*`, `farindex`, `mandel-far`, `blossom-grid`, `buddha-grid`) |
 | far in **CI** | only `xcheck` (boots `hello` + `far-run` + `far-bank1`) and `corpus-a16` |
 | round-trip (`-S` → reassemble) | **none existed** before this audit |
@@ -303,6 +303,37 @@ and the 3-byte packed form is right. **Done.**
    `upstream-contribution-status.md:260-262`), but that is an argument against *posting*
    such a test, not against having one in the fork, where the four existing CodeGen/MOS
    failures already show fork-local tests are normal.
+
+   ~~**CLOSED 2026‑09‑24**~~ — four fork-local tests added as patch
+   `0048-mos-far-codegen-lit-tests.patch` (test-only; registered in `dev/toolchain.sh`,
+   deliberately outside `dev/regen-patch.sh`'s `STANDALONE_MOSDIR`/`TESTRELS` lists since
+   neither the MOS-dir mirror nor the focused-test copy reaches
+   `llvm/test/CodeGen/MOS/far-*.ll`, so `0002` can neither absorb nor drop them):
+
+   | test | pins |
+   |---|---|
+   | `far-addressing.ll` | `$af`/`$8f` absolute-long for an `addrspace(2)` global (`isFarSymbol`/`selectAddr`), `$a7`/`$87` direct-indirect-long for a runtime far pointer, and the negative case — an AS0 global merely *placed* in `.far_*` keeps a near address. A second `-filetype=obj` + `llvm-objdump` RUN line pins the opcode **byte** (`lda mos24(x)` and `lda x` print alike but encode `$af` vs `$ad`). |
+   | `far-call.ll` | `$22` JSL into a `.far_text` callee, `$6b` RTL out of it, the `$5c` `TailJML` far-tail fold; a default-target (6502) RUN line asserts none of the three appear. |
+   | `far-legalizer-bridges.ll` | the `p2↔s32` and `p3↔3×s8` bridges on **post-legalizer MIR**, so the merge/unmerge shape is pinned before later passes fold it — including that a packed (`p3`) access is three bytes, never four. |
+   | `far-phi.ll` | the `0014` `G_PHI(p2)` custom legalisation — a far pointer on a loop back-edge is `ptrtoint`'d in the preheader, carried as four `s8` phis, `inttoptr`'d back in the header. |
+
+   Verification — `dev/run.sh lit` (worktree `throwaway/far-codegen-lit`, real-copied
+   `build/llvm-mos`, `llc` sha256 `78c4df6b…`):
+
+   ```
+   Failed Tests (4):
+     LLVM :: CodeGen/MOS/legalizer.mir
+     LLVM :: CodeGen/MOS/scavenger-p-undef-6502.ll
+     LLVM :: CodeGen/MOS/shift-rotate.ll
+     LLVM :: MC/MOS/addressing-modes-65816.s
+
+   Total Discovered Tests: 163
+     Unsupported:   2 (1.23%)
+     Passed     : 157 (96.32%)
+     Failed     :   4 (2.45%)
+   ```
+
+   **PASS** — 163 discovered (was 159), the same four known-failing baseline, no new failures.
 2. **~15 of the ~17 far gates are manual.** CI runs two far ROMs. `far_indir`, `far_store`,
    `far_call`, `far_tail`, `far_fnptr`, `far_indir_tail`, `farindex`, `far_loop`,
    `far_memops`, `packed24`, `packed24_table` and the far demo gates are invoked by hand. A
@@ -451,7 +482,7 @@ orchestrator). Ranking, severity and priority are the orchestrator's call.
 | 4 | **`TODO.md:1222` is stale** — the DP-arg CC item still says `[wip T2] … Awaiting upstream review`; #561 is CLOSED and #563 MERGED (2026‑07‑13, `8be054612`), patch `0008` retired. | docs | **T0/T1** | Two-line edit; `upstream-contribution-status.md` already has the correct text to copy. Absorb into any adjacent TODO pass. |
 | 5 | **`MOSFixupKinds.cpp` `Infos[]` has 14 initialisers for 15 kinds** — add the `AddrAsciz` row. Currently benign (`TargetSize == 0` means "never relax", which is right for a data directive) but `Info.Name` is `nullptr` and the next kind appended inherits the bug. | hygiene | **T1** | One-line fix with an obvious correct value; pristine-upstream defect, so it is a clean standalone upstream artifact. |
 | 6 | **`llvm-mc -show-encoding` crashes on a symbolic `.mos_addr_asciz`** (`LLVM ERROR: Don't know how to emit this value.`). `MC/MOS/addr-asciz.s` only covers `--filetype=obj`. | robustness | **T2** | Not 24-bit-related; needs a textual form for `VK_ADDR_ASCIZ` plus a `-show-encoding` RUN line. Upstream-postable. |
-| 7 | **Far/packed-24 codegen has zero lit coverage** — add fork-local `CodeGen/MOS/far-*.ll` pinning `af`/`8f`/`a7`/`87`/`$5C` selection, the `p2↔s32` and `p3↔3×s8` bridges, and the `G_PHI(p2)` legalisation. | coverage | **T3** | Multi-file, against a settled design; the emulator gates already define the expected shapes. Keeps the fork's four known lit failures from growing to five. |
+| 7 | ~~**Far/packed-24 codegen has zero lit coverage**~~ — **done 2026‑09‑24**, patch `0048` (see §5 item 1) — add fork-local `CodeGen/MOS/far-*.ll` pinning `af`/`8f`/`a7`/`87`/`$5C` selection, the `p2↔s32` and `p3↔3×s8` bridges, and the `G_PHI(p2)` legalisation. | coverage | **T3** | Multi-file, against a settled design; the emulator gates already define the expected shapes. Keeps the fork's four known lit failures from growing to five. |
 | 8 | **`[dp],Y` (`b7`/`97`) is never selected** — a far pointer plus a runtime index always materialises a 32-bit pointer add followed by `lda [dp]`, even in `farindex.c`. Also `sta long,X` (`9f`) and the long-form `cmp`/`eor`/`ora`/`and`/`adc`/`sbc`. | missed optimisation | **T4** (measure first) | Governing lesson 2 applies exactly: a native long form is **not** automatically smaller, and the win depends on operand residency and schedule. This should start as a measurement (does `[dp],Y` beat add + `[dp]` in realistic 16-bit-ambient context?) and only become an implementation if the number says so. Anything built must be gated so a misclassification can only miss a win. |
 | 9 | **Bare-symbol operand width in the assembler** (`isa<MCSymbolRefExpr>` always matches the narrowest candidate). | correctness | — | **Already tracked**; do not add a duplicate. Folds into the existing `[T3] Vendor MOS lit suite has four failing tests` item. Note in that item that fixing #2 above removes the practical need for it. |
 

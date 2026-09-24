@@ -1,0 +1,345 @@
+diff --git a/llvm/test/CodeGen/MOS/far-addressing.ll b/llvm/test/CodeGen/MOS/far-addressing.ll
+new file mode 100644
+index 0000000..1029714
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-addressing.ll
+@@ -0,0 +1,90 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
++; RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
++
++; #320 far addressing — the four data opcodes of the AS_Far (addrspace 2) model.
++; The emulator ROM gates (dev/run.sh far_indir / far_store / far-bank1 ...) cover
++; the runtime behaviour; this test pins the SELECTED OPCODE, which they cannot.
++; These are the shapes MOSInstructionSelector::selectAddr / selectGeneric produce:
++;
++;   * a LINK-TIME far address (an addrspace(2) global -- isFarSymbol) is an
++;     absolute-long operand:         lda long / sta long  ($af / $8f)
++;   * a RUNTIME far address (inttoptr of a 32-bit value, held in an Imag32 zero-page
++;     quad) is direct-indirect-long: lda [dp] / sta [dp]  ($a7 / $87)
++;
++; The second RUN line disassembles the object so the opcode BYTE is pinned, not
++; just the mnemonic -- `lda mos24(x)` and `lda x` print similarly but are $af vs $ad.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++@fardata = addrspace(2) global i8 0
++@farbuf = addrspace(2) global i8 0
++
++; A far global's address is a link-time 24-bit constant: absolute long, $af.
++define i8 @far_load_abs() {
++; CHECK-LABEL: far_load_abs:
++; CHECK: lda mos24(fardata)
++; CHECK: rts
++; OBJ-LABEL: <far_load_abs>:
++; OBJ: af {{[0-9a-f]+ [0-9a-f]+ [0-9a-f]+}} {{.*}}lda
++  %v = load i8, ptr addrspace(2) @fardata
++  ret i8 %v
++}
++
++; ... and the store half, $8f.
++define void @far_store_abs(i8 %v) {
++; CHECK-LABEL: far_store_abs:
++; CHECK: sta mos24(farbuf)
++; CHECK: rts
++; OBJ-LABEL: <far_store_abs>:
++; OBJ: 8f {{[0-9a-f]+ [0-9a-f]+ [0-9a-f]+}} {{.*}}sta
++  store i8 %v, ptr addrspace(2) @farbuf
++  ret void
++}
++
++; A runtime far pointer (inttoptr i32) lands in an Imag32 zero-page quad and is
++; dereferenced with direct-indirect-long, $a7. This is the far_indir.c shape.
++define i8 @far_load_indir(i32 %a) {
++; CHECK-LABEL: far_load_indir:
++; CHECK: lda [__rc{{[0-9]+}}]
++; CHECK: rts
++; OBJ-LABEL: <far_load_indir>:
++; OBJ: a7 {{[0-9a-f]+}} {{.*}}lda [
++  %p = inttoptr i32 %a to ptr addrspace(2)
++  %v = load i8, ptr addrspace(2) %p
++  ret i8 %v
++}
++
++; ... and the store half, $87. This is the far_store.c shape.
++define void @far_store_indir(i32 %a, i8 %v) {
++; CHECK-LABEL: far_store_indir:
++; CHECK: sta [__rc{{[0-9]+}}]
++; CHECK: rts
++; OBJ-LABEL: <far_store_indir>:
++; OBJ: 87 {{[0-9a-f]+}} {{.*}}sta [
++  %p = inttoptr i32 %a to ptr addrspace(2)
++  store i8 %v, ptr addrspace(2) %p
++  ret void
++}
++
++; A plain (AS0) global merely PLACED in a .far_* section keeps its NEAR 16-bit
++; address -- isFarSymbol restricts the section test to FUNCTIONS on purpose, so
++; taking &it must not over-trigger 24-bit materialization into a 16-bit context
++; (selectAddrLoHi/buildFarAddrWords require a 24-bit destination). Codegen must
++; emit a BARE symbol operand here, not mos24(...); dev/run.sh far_indir is the
++; matching runtime gate.
++;
++; Asm-only: what the ASSEMBLER then does with a bare unresolved symbol operand on
++; W65816 is a separate, already-tracked MC-layer question (the failing `addr24`
++; bare-symbol line in MC/MOS/addressing-modes-65816.s), so this case deliberately
++; carries no OBJ check -- it pins the codegen decision, not the encoding choice.
++@near_in_far_section = global i8 -87, section ".far_data"
++
++define i8 @near_symbol_in_far_section() {
++; CHECK-LABEL: near_symbol_in_far_section:
++; CHECK: lda near_in_far_section
++; CHECK-NOT: mos24(near_in_far_section)
++; CHECK: rts
++  %v = load volatile i8, ptr @near_in_far_section
++  ret i8 %v
++}
+diff --git a/llvm/test/CodeGen/MOS/far-call.ll b/llvm/test/CodeGen/MOS/far-call.ll
+new file mode 100644
+index 0000000..85635e5
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-call.ll
+@@ -0,0 +1,67 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
++; RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
++; RUN: llc -mtriple=mos -verify-machineinstrs < %s | FileCheck %s --check-prefix=NEAR
++
++; #320 far calls -- the cross-BANK half of the far model (MOSCallLowering::lowerCall
++; / lowerReturn, MOSLateOptimization::tailJMP). A function the linker places in
++; another 64 KB bank is marked by its .far_* section:
++;
++;   * a direct call to it is JSL ($22, pushes a 3-byte PBR:PC return) so the
++;     program bank follows;                              -- far_call.c
++;   * it returns with RTL ($6b, pops those 3 bytes);     -- far_call.c
++;   * a far block tail `JSL <far target>; RTL` folds to TailJML, which encodes as
++;     the long jump $5c -- the callee's own RTL then pops the ORIGINAL caller's
++;     return, tail-call style.                           -- far_tail.c
++;
++; All three are W65816-only: the NEAR prefix checks that the default (6502) target
++; is untouched -- no $22/$6b/$5c, just the ordinary near call/return shapes.
++;
++; The OBJ checks live together here because the disassembly is emitted per SECTION
++; (.text before .far_text), not in source order.
++;
++; OBJ-LABEL: <near_calls_far>:
++; OBJ: 22 {{[0-9a-f]+ [0-9a-f]+ [0-9a-f]+}} {{.*}}jsl
++; OBJ-LABEL: <far_leaf>:
++; OBJ: 6b {{.*}}rtl
++; OBJ-LABEL: <far_tails_far>:
++; OBJ: 5c {{[0-9a-f]+ [0-9a-f]+ [0-9a-f]+}} {{.*}}jmp
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++; The far callee: placed in .far_text, so it must return with RTL, not RTS.
++define i8 @far_leaf(i8 %x) noinline section ".far_text" {
++; CHECK-LABEL: far_leaf:
++; CHECK: rtl
++; CHECK-NOT: rts
++; NEAR-LABEL: far_leaf:
++; NEAR: rts
++  %r = xor i8 %x, 90
++  ret i8 %r
++}
++
++; A near caller reaching a far callee goes long: JSL ($22). (It is a plain call,
++; not a tail call -- the near tail-call fold must not swallow a far callee.)
++define i8 @near_calls_far(i8 %x) {
++; CHECK-LABEL: near_calls_far:
++; CHECK: jsl mos24(far_leaf)
++; CHECK: rts
++  %r = call i8 @far_leaf(i8 %x)
++  ret i8 %r
++}
++
++; A far function tail-calling a far function: the `JSL far_leaf; RTL` tail folds
++; to TailJML -- printed as a long `jmp`, encoded $5c.
++define i8 @far_tails_far(i8 %x) section ".far_text" {
++; CHECK-LABEL: far_tails_far:
++; CHECK: jmp mos24(far_leaf)
++; CHECK-NOT: rtl
++;
++; On the default 6502 target there is no banking at all: neither the long call,
++; the long return, nor the long jump may appear anywhere in the module.
++; NEAR-NOT: jsl
++; NEAR-NOT: rtl
++; NEAR-NOT: mos24(
++  %r = tail call i8 @far_leaf(i8 %x)
++  ret i8 %r
++}
+diff --git a/llvm/test/CodeGen/MOS/far-legalizer-bridges.ll b/llvm/test/CodeGen/MOS/far-legalizer-bridges.ll
+new file mode 100644
+index 0000000..4b13581
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-legalizer-bridges.ll
+@@ -0,0 +1,92 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -stop-after=legalizer -o - < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
++
++; #320/#321 far-pointer legalizer BRIDGES (MOSLegalizerInfo.cpp). Neither far
++; pointer type is a legal register type, so every far value crosses into and out
++; of byte-sized pieces through one of two bridges:
++;
++;   p2 (AS_Far, datalayout p2:32:8) <-> s32
++;     A 32-bit far pointer is ptrtoint'd to s32, which the standard narrowScalar
++;     path splits into 2x s16 -> 4x s8, and inttoptr'd back. Used by
++;     legalizePtrAdd, the far load/store paths and legalizePhi alike.
++;
++;   p3 (AS_FarPacked, datalayout p3:24:8) <-> 3x s8
++;     The PACKED 3-byte STORAGE form of a far pointer. It is memory-only: there is
++;     no 24-bit scalar (no MVT::i24), so a p3 is built/destructured purely as three
++;     bytes, and the addrspacecast to/from p2 zero-extends/drops the unused pad
++;     byte. THREE bytes, never four -- a four-byte access would read or clobber a
++;     neighbouring table entry (this is the packed24_table.c shape).
++;
++; Checking post-legalizer MIR (rather than final asm) is the point: it pins the
++; merge/unmerge shape the bridges produce, which later passes then fold away.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++; A packed (p3) far pointer in far storage. p3:24:8 -> exactly 3 bytes.
++@slot = addrspace(2) global ptr addrspace(3) null
++
++; p3 -> p2: load the 3 stored bytes, merge them with a ZERO pad byte into the
++; s32, then inttoptr to p2 and dereference. Exactly three loads -- not four.
++define i8 @packed_to_far_deref() {
++; CHECK-LABEL: name: packed_to_far_deref
++; CHECK: %[[B0:[0-9]+]]:_(s8) = G_LOAD_FAR_ABS @slot ::
++; CHECK: %[[B1:[0-9]+]]:_(s8) = G_LOAD_FAR_ABS @slot + 1 ::
++; CHECK: %[[B2:[0-9]+]]:_(s8) = G_LOAD_FAR_ABS @slot + 2 ::
++; CHECK-NOT: G_LOAD_FAR_ABS @slot + 3
++; CHECK: %[[Z:[0-9]+]]:_(s8) = G_CONSTANT i8 0
++; CHECK: %[[LO:[0-9]+]]:_(s16) = G_MERGE_VALUES %[[B0]](s8), %[[B1]](s8)
++; CHECK: %[[HI:[0-9]+]]:_(s16) = G_MERGE_VALUES %[[B2]](s8), %[[Z]](s8)
++; CHECK: %[[I:[0-9]+]]:_(s32) = G_MERGE_VALUES %[[LO]](s16), %[[HI]](s16)
++; CHECK: %[[P:[0-9]+]]:_(p2) = G_INTTOPTR %[[I]](s32)
++; CHECK: G_LOAD_FAR_INDIR %[[P]](p2)
++  %packed = load ptr addrspace(3), ptr addrspace(2) @slot
++  %far = addrspacecast ptr addrspace(3) %packed to ptr addrspace(2)
++  %v = load i8, ptr addrspace(2) %far
++  ret i8 %v
++}
++
++; p2 -> p3: ptrtoint to s32, unmerge to bytes, keep the low THREE and store them.
++; The pad byte is dropped, so the store must not touch @slot + 3.
++define void @far_to_packed_store(i32 %a) {
++; CHECK-LABEL: name: far_to_packed_store
++; CHECK: %[[P:[0-9]+]]:_(p2) = G_INTTOPTR
++; CHECK: %[[I:[0-9]+]]:_(s32) = G_PTRTOINT %[[P]](p2)
++; CHECK: %[[LO:[0-9]+]]:_(s16), %[[HI:[0-9]+]]:_(s16) = G_UNMERGE_VALUES %[[I]](s32)
++; CHECK: %[[B0:[0-9]+]]:_(s8), %[[B1:[0-9]+]]:_(s8) = G_UNMERGE_VALUES %[[LO]](s16)
++; CHECK: %[[B2:[0-9]+]]:_(s8), %{{[0-9]+}}:_(s8) = G_UNMERGE_VALUES %[[HI]](s16)
++; CHECK: G_STORE_FAR_ABS %[[B0]](s8), @slot ::
++; CHECK: G_STORE_FAR_ABS %[[B1]](s8), @slot + 1 ::
++; CHECK: G_STORE_FAR_ABS %[[B2]](s8), @slot + 2 ::
++; CHECK-NOT: G_STORE_FAR_ABS {{.*}}@slot + 3
++;
++; ASM-LABEL: far_to_packed_store:
++; ASM: sta mos24(slot)
++; ASM: sta mos24(slot+1)
++; ASM: sta mos24(slot+2)
++; ASM-NOT: mos24(slot+3)
++; ASM: rts
++  %far = inttoptr i32 %a to ptr addrspace(2)
++  %packed = addrspacecast ptr addrspace(2) %far to ptr addrspace(3)
++  store ptr addrspace(3) %packed, ptr addrspace(2) @slot
++  ret void
++}
++
++; The p2 <-> s32 bridge on a LINK-TIME far address: taking &far_global as an
++; integer materialises the segment word plus the bank byte and a zero pad byte
++; (buildFarAddrWords), i.e. the same 24-bits-in-32 representation.
++@far_global = addrspace(2) global i8 0
++
++define i32 @far_addr_to_int() {
++; ASM-LABEL: far_addr_to_int:
++; ASM-DAG: lda #mos24segmentlo(far_global)
++; ASM-DAG: ldx #mos24segmenthi(far_global)
++; ASM-DAG: ldy #mos24bank(far_global)
++; ASM: rts
++; CHECK-LABEL: name: far_addr_to_int
++  %i = ptrtoint ptr addrspace(2) @far_global to i32
++  ret i32 %i
++}
++
++; The packed slot itself occupies exactly three bytes (p3:24:8).
++; ASM: slot:
++; ASM: .size slot, 3
+diff --git a/llvm/test/CodeGen/MOS/far-phi.ll b/llvm/test/CodeGen/MOS/far-phi.ll
+new file mode 100644
+index 0000000..db204a9
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-phi.ll
+@@ -0,0 +1,72 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -stop-after=legalizer -o - < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
++
++; #321: G_PHI is legal only for {s1, s8, p0, p1}, so a far pointer (p2) carried
++; across a loop back-edge -- a far-pointer induction variable -- forms a
++; G_PHI(p2) that no scalar/widen action covers. It must therefore be custom-
++; legalised; without that, legalization of this function fails outright
++; ("unable to legalize instruction: G_PHI (p2)").
++;
++; MOSLegalizerInfo::legalizePhi custom-legalises it through the SAME p2 <-> s32
++; bridge that legalizePtrAdd and the far load/store paths use: each incoming
++; value is ptrtoint'd at the end of its predecessor block, the phi itself is
++; retyped to s32 (which the standard narrowScalar-of-G_PHI path then splits into
++; four s8 phis), and the result is inttoptr'd back to p2 immediately after the
++; block's phis. The post-legalizer signature below is that bridge.
++;
++; The stride is loaded volatile each iteration so the loop cannot be strength-
++; reduced into a near offset induction variable, which is what keeps the far
++; pointer itself on the back-edge.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++@stride = global i32 0
++
++define i8 @far_ptr_induction(i32 %a, i16 %n) {
++; CHECK-LABEL: name: far_ptr_induction
++;
++; Preheader: the incoming far pointer is ptrtoint'd and unmerged to the four
++; bytes that feed the phis.
++; CHECK: bb.{{[0-9]+}}.entry:
++; CHECK: %[[P0:[0-9]+]]:_(p2) = G_INTTOPTR
++; CHECK: %[[I0:[0-9]+]]:_(s32) = G_PTRTOINT %[[P0]](p2)
++; CHECK: %[[W0:[0-9]+]]:_(s16), %[[W1:[0-9]+]]:_(s16) = G_UNMERGE_VALUES %[[I0]](s32)
++; CHECK: %[[A0:[0-9]+]]:_(s8), %[[A1:[0-9]+]]:_(s8) = G_UNMERGE_VALUES %[[W0]](s16)
++; CHECK: %[[A2:[0-9]+]]:_(s8), %[[A3:[0-9]+]]:_(s8) = G_UNMERGE_VALUES %[[W1]](s16)
++;
++; Loop header: four s8 phis -- NOT a p2 phi -- re-merged and inttoptr'd back to
++; p2 for the dereference.
++; CHECK: bb.{{[0-9]+}}.loop:
++; CHECK-NOT: (p2) = G_PHI
++; CHECK: %[[Q0:[0-9]+]]:_(s8) = G_PHI %[[A0]](s8), %bb.{{[0-9]+}},
++; CHECK: %[[Q1:[0-9]+]]:_(s8) = G_PHI %[[A1]](s8), %bb.{{[0-9]+}},
++; CHECK: %[[Q2:[0-9]+]]:_(s8) = G_PHI %[[A2]](s8), %bb.{{[0-9]+}},
++; CHECK: %[[Q3:[0-9]+]]:_(s8) = G_PHI %[[A3]](s8), %bb.{{[0-9]+}},
++; CHECK: %[[V0:[0-9]+]]:_(s16) = G_MERGE_VALUES %[[Q0]](s8), %[[Q1]](s8)
++; CHECK: %[[V1:[0-9]+]]:_(s16) = G_MERGE_VALUES %[[Q2]](s8), %[[Q3]](s8)
++; CHECK: %[[J:[0-9]+]]:_(s32) = G_MERGE_VALUES %[[V0]](s16), %[[V1]](s16)
++; CHECK: %[[P:[0-9]+]]:_(p2) = G_INTTOPTR %[[J]](s32)
++; CHECK: G_LOAD_FAR_INDIR %[[P]](p2)
++;
++; And it reaches a real indirect-long dereference in the emitted loop.
++; ASM-LABEL: far_ptr_induction:
++; ASM: lda [__rc{{[0-9]+}}]
++entry:
++  %p0 = inttoptr i32 %a to ptr addrspace(2)
++  br label %loop
++
++loop:
++  %p = phi ptr addrspace(2) [ %p0, %entry ], [ %pn, %loop ]
++  %i = phi i16 [ 0, %entry ], [ %in, %loop ]
++  %acc = phi i8 [ 0, %entry ], [ %accn, %loop ]
++  %v = load i8, ptr addrspace(2) %p
++  %accn = add i8 %acc, %v
++  %s = load volatile i32, ptr @stride
++  %pn = getelementptr inbounds i8, ptr addrspace(2) %p, i32 %s
++  %in = add i16 %i, 1
++  %c = icmp ult i16 %in, %n
++  br i1 %c, label %loop, label %exit
++
++exit:
++  ret i8 %accn
++}

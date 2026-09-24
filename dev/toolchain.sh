@@ -225,6 +225,16 @@ if [ ! -d "$SRC/.git" ]; then
   # "same order as the header" contract was silently violated. Pristine-
   # upstream one-liner; standalone so it stays reviewable apart from 0002.
   apply_patch 0046-mos-fixupkinds-addrasciz-row
+  # Fork-local lit coverage for the #320/#321 far + packed-24 codegen model:
+  # far-addressing.ll ($af/$8f absolute-long, $a7/$87 direct-indirect-long),
+  # far-call.ll ($22 JSL / $6b RTL / $5c TailJML), far-legalizer-bridges.ll
+  # (p2<->s32 and p3<->3x s8) and far-phi.ll (the 0014 G_PHI(p2) custom
+  # legalisation). TEST-ONLY — it touches no compiler source, so it is NOT in
+  # regen-patch.sh's STANDALONE_MOSDIR/TESTRELS lists: neither the MOS-dir
+  # mirror nor the focused-test copy reaches llvm/test/CodeGen/MOS/far-*.ll,
+  # so 0002 can neither absorb nor drop it. Downstream-only — AS2 is not
+  # upstream-standalone-testable until the far ABI is blessed.
+  apply_patch 0048-mos-far-codegen-lit-tests
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and
