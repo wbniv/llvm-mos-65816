@@ -932,11 +932,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   runs slow (likely per-hw-frame waits inside the logical-frame loop), fix, and re-capture. Reason for
   T2: one demo + one script, clear symptom; judgment about how, not what. Promoted from Inbox 2026-09-24.
   [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
-- [T1] **Newton's gate captures snapshot before the basin fill** (~1 tile row deep; complete by frame
-  6000). Demo is correct; `build/newton-{jg,mame}.png` are just weak evidence. Raise `dev/newton.sh`'s
-  jgxcheck frame count and MAME `-seconds_to_run` so the published screenshot shows the finished fractal.
-  Reason for T1: two constants. Promoted from Inbox 2026-09-24.
-  [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
   The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
   `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
@@ -1391,6 +1386,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [newton-basin-capture] Raised `dev/newton.sh`'s bsnes-jg frame count and MAME `SHOT_AT`/`-seconds_to_run` from 500/12s to 6500/114s so both published screenshots show the completed basin fill (98.3% non-black vs 3.1% before); gate hash unchanged (`0x4D8B`, PASS). See [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - ✅ 2026-09-24 — [dpy-indexed-measure] Measured `[dp],Y` (`b7`/`97`): **GO** — 36→19 B / 50→28 cy single access, 68→10 B loop body; 0 genuine `b7`/`97`/`9f` in 487 SNES ROMs. See [investigation](docs/investigations/2026-09-24-dpy-indexed-measurement.md).
 - ✅ 2026-09-24 — [far-lit-coverage] Far/packed-24 codegen had zero lit coverage; added four fork-local
   tests (`CodeGen/MOS/far-addressing.ll`, `far-call.ll`, `far-legalizer-bridges.ll`, `far-phi.ll`, patch

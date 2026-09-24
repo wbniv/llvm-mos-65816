@@ -53,6 +53,9 @@ else
 fi
 
 # §4. bsnes-jg — build the harness if needed, then dump framebuffer + assert.
+# Basin fill is ~1 tile row deep at the old 500-frame capture; complete and garbage-free by
+# frame 6000 (docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md §Deferred).
+# Capture at 6500 for margin.
 JGX="$BUILD/jgxcheck"
 if [ ! -x "$JGX" ]; then
   ARCHIVE="$(find "$VENDOR/objs" -name '*.a' 2>/dev/null | head -1 || true)"
@@ -65,7 +68,7 @@ if [ ! -x "$JGX" ]; then
 fi
 if [ -x "$JGX" ] && [ -d "$VENDOR/Database" ]; then
   echo "==> bsnes-jg: render + framebuffer dump (build/newton-jg.png) + assert"
-  "$JGX" "$BUILD/newton.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 500 \
+  "$JGX" "$BUILD/newton.sfc" "$VENDOR/Database" "$OFF" 2 "$EXPECT" 6500 \
     "$BUILD/newton-jg.png" || rc=1
 else
   echo "    SKIP bsnes-jg (harness/core absent — run: dev/run.sh xcheck once)"
@@ -77,10 +80,14 @@ if [ ! -f "$ROOT/dev/roms/s_smp/spc700.rom" ]; then
 elif command -v xvfb-run >/dev/null 2>&1; then
   echo "==> MAME (under Xvfb): snapshot + assert (build/newton-mame.png)"
   SNAP="$BUILD/.newton-snap"; rm -rf "$SNAP"; mkdir -p "$SNAP"
-  line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" \
+  # dev/newton.lua's SHOT_AT (default 500) is what actually picks the snapshot frame;
+  # -seconds_to_run is just MAME's wall-clock safety cutoff, so both must move together.
+  # 6500 frames @ 60 fps + ~5s margin for MAME boot/IPL overhead (same convention as
+  # 1d-ca.sh/avalanche.sh/backtrack.sh/bigbyval.sh: frames/60 + N).
+  line="$(SHOT_ADDR="$ADDR" SHOT_WANT="$EXPECT" SHOT_AT=6500 \
     xvfb-run -a mame snes -cart "$BUILD/newton.sfc" -rompath "$ROOT/dev/roms" \
       -autoboot_script "$ROOT/dev/newton.lua" -skip_gameinfo \
-      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 12 \
+      -snapshot_directory "$SNAP" -sound none -nothrottle -seconds_to_run 114 \
       -cfg_directory /tmp -nvram_directory /tmp 2>/dev/null | grep -m1 '^SHOT:' || true)"
   echo "    $line"
   if [ -f "$SNAP/snes/0000.png" ]; then mv "$SNAP/snes/0000.png" "$BUILD/newton-mame.png"; fi
