@@ -66,6 +66,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0038-mos-return-frame-address.patch"
   "$PATCHES/0042-mos-scavenger-p-undef-a16-test.patch"
   "$PATCHES/0043-mos-inline-asm-physreg-width.patch"
+  "$PATCHES/0044-mos-asm-print-long-address.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
@@ -77,6 +78,7 @@ TESTRELS=(
   "llvm/test/MC/MOS/modifier-width.s"                  # created by 0039; cp'd in so 0039 reverses cleanly
   "llvm/test/MC/MOS/modifier-width-65816.s"            # created by 0039
   "llvm/test/MC/MOS/modifier-width-errors.s"           # created by 0039
+  "llvm/test/MC/MOS/long-address-roundtrip-65816.s"    # created by 0044
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }

@@ -316,7 +316,29 @@ fails on the pre-fix `llvm-mc`. `MC/MOS/addressing-modes-65816.s` produces byte-
 
 ### Steps 4–5 — `dev/run.sh corpus` / `corpus-a16`
 
-**NOT RUN.** See §7.
+**RUN 2026-09-24 (corpus finished 15:18, corpus-a16 17:56)**, once `build/llvm-mos-install` was finally rebuilt (`dev/run.sh toolchain`,
+rc=0, `clang-23` mtime 10:44 → 15:04 and `llvm-mc` 2552536 → 2553008 B, so the installed toolchain now
+carries `0039` — until then only the lit-tool `llvm-mc` did). That rebuild also carried the adjacent
+`0044` printer fix, so these two runs discharge both plans' emulator legs.
+
+Step 4 — `dev/run.sh corpus`:
+
+```
+    ok  SPC700 IPL present and verified (sha1 97e352553e94242ae823547cd853eecda55c20f0, 64 B)
+  ...
+==> corpus: 80/80 passed
+CORPUS rc=0
+```
+
+Step 5 — `dev/run.sh corpus-a16` (host == default == `+mos-a16` == `+mos-xy16`, MAME + bsnes-jg):
+
+```
+==> corpus-a16: 79/79 passed, 0 xfail
+CORPUSA16 rc=0
+```
+
+**PASS** — identical to the last pre-`0039` run of the same gate (79/79, 0 xfail, 12:31 the same day),
+which is the expected result: the change is parser-only and the `-c` path never parses assembly.
 
 ### Step 6 — `0002` regeneration
 
@@ -343,12 +365,11 @@ Its only difference from the working-tree `0002` is the other workstream's uncom
 
 ## 7. Not done
 
-- **Steps 4–5, the emulator differential (`dev/run.sh corpus`, `corpus-a16`).** They need
-  `build/llvm-mos-install` rebuilt and reinstalled, and the box was occupied for the whole
-  of this task by a `dev/run.sh corpus-a16` run belonging to the dispatching session —
-  MAME needs a quiet box, and reinstalling the toolchain underneath a running gate would
-  corrupt it. The change is assembler-parser-only: the `-c` path never parses assembly, so
-  these gates reach it only through inline `asm`.
+- ~~**Steps 4–5, the emulator differential (`dev/run.sh corpus`, `corpus-a16`).**~~ **DONE
+  2026-09-24** — see §6. They had been deferred because `build/llvm-mos-install` still
+  predated this patch and the box was occupied by another session's `corpus-a16` run; the
+  toolchain rebuild that landed `0044` carried `0039` with it and both gates were then run
+  on a quiet box. 80/80 and 79/79, 0 xfail.
 - **A validation-tree (`742d554`, assertions on) build with this patch alone**, which the
   other upstream-bound PR records quote. Both existing 742d554 source trees
   (`build/0029-cross-target-src`, `build/newton-postra-src`) carry another workstream's

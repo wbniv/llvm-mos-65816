@@ -270,20 +270,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [T4] **AsmPrinter does not mark long (24-bit) addresses — far load/store and `$5C` tail jumps print
-  identically to their 16-bit siblings.** `lda far_src`/`sta corpus_result`/`jmp far_pick` carry no
-  `mos24(...)` on the way out, so `-save-temps` (a plain first-party flag, no hand-written asm) silently
-  retargets far accesses to the DBR and far tail calls to the **wrong ROM bank** — reachable wrong code,
-  not cosmetic. `0039` already makes the parser honour `mos24(sym)`/`jmp mos24(sym)` on the way in; this
-  is the missing printer half. `$5C` additionally has no mnemonic of its own (`JMP_AbsoluteLong` is
-  spelled `"jmp"` at `MOSInstrInfo.td:769`, and `jml` isn't accepted for the absolute-long form), so
-  the fix also decides whether to add a `jml` alias. **This item owns the design decision for both
-  printer gaps** (wrap every wide operand in its modifier vs. `.a16`/`.a8`-style mode directives vs.
-  parser M-state tracking); the a16-immediate item below implements under whatever shape is chosen
-  here. Kept separate because this half is stock-65816 and upstream-postable, the other is fork-only.
-  Reason for T4: the narrow fix is easy, the shape has real blast radius on hand-written `asm`, assembly
-  size and upstream acceptability.
-  [audit §6](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#6-disassembly--round-trip--the-genuine-functional-gap).
 - [T4] **AsmPrinter does not mark 16-bit immediates under `+mos-a16` — worse than the long-address gap
   above.** A 16-bit immediate ≤ 255 prints as a bare `#N` and reassembles to 2 bytes instead of 3; under
   M=0 (`+mos-a16`'s whole point) that **desyncs the instruction stream** — the next opcode's first byte is
@@ -1295,26 +1281,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [Independently reviewed](docs/pr-preparations/2026-09-23/0036-claude-review.md) and
   [review audited](docs/pr-preparations/2026-09-23/0036-review-audit.md). No code revision
   requested. Remaining: submission preparation and publication (user-triggered).
-- [verify T4] **Explicit `mos16(constant)` can select a zero-page opcode and truncate the address.**
-  Pristine `llvm-mc` emits `B5 F0` for `lda mos16(240),x` and `B5 34` for
-  `lda mos16(4660),x`, instead of absolute,X encodings `BD F0 00` / `BD 34 12`.
-  `MOSOperand::isImmInRange` tests a positive modified constant against the modifier's
-  width without checking the candidate operand's narrower range. This also defeats
-  `wrapAbsoluteIdxBase` for small integer bases. Separate from 0036's global classification;
-  fix the parser's width matching and add constant/addressing-mode regressions.
-  **Fixed** as [`0039`](patches/llvm-mos/0039-mos-asm-modifier-width.patch): the width
-  relation the symbolic exit always applied now guards the constant exit too (strictly a
-  narrowing — 12,045 probes, 0 became smaller, 0 refused-then-accepted), subsuming the old
-  `Imm16` special case; `mos24($123456)` truncating to `a5 56` was the same defect one width
-  out. Three new `MC/MOS/modifier-width*.s` tests, each failing pre-fix.
-  [plan + recorded verification](docs/plans/2026-09-24-mos16-constant-truncation.md) ·
-  [validation](docs/pr-preparations/2026-09-24/0039-validation.md) ·
-  [PR draft](docs/upstream-asm-modifier-width-pr.md).
-  **Remaining:** plan steps 4–5 (`dev/run.sh corpus` / `corpus-a16`) need the toolchain
-  reinstalled and a quiet box; a `742d554` assertions build with this patch alone; then
-  publish (user-triggered).
-  [Reproducer](docs/investigations/repro/upstream-issues-2026-09-23/explicit-address-width.s) ·
-  [diagnosis](docs/pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect).
 - [T5] **Post the register-scavenger live-`$p` fix PR (`0011`)** (user-triggered). The upstream
   producer is established: gcc torture `strlen-4.c` at `-O0` on stock `mos6502` fails on pristine
   upstream and is fixed by 0011 alone, with no other change across the 4,170-comparison corpus
@@ -1444,6 +1410,16 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [asmprinter-long-address] 24-bit operands now print an explicit `mos24(...)` width, so far
+  load/store and the `$5C` long jump survive a `-S`-then-reassemble round trip instead of silently collapsing to
+  their DBR-relative / bank-local 16-bit siblings (patch `0044`, printer-side; `0039` was the parser half). No
+  `jml` mnemonic needed — the modifier disambiguates `$5C`. Far fixtures 4 → 0 divergent (default 8-bit).
+  See [plan](docs/plans/2026-09-24-asmprinter-long-address.md).
+- ✅ 2026-09-24 — [mos16-constant-truncation] An explicit width modifier on a constant no longer matches a
+  narrower operand (`lda mos16(240),x` selected `zp,X`; `mos24($123456)` truncated to a byte) — patch `0039`,
+  verification completed on the rebuilt toolchain (lit: the four known failures only; corpus 80/80; corpus-a16
+  79/79, 0 xfail). PR draft queued in [upstream status](docs/upstream-contribution-status.md); posting is
+  user-triggered. See [plan](docs/plans/2026-09-24-mos16-constant-truncation.md).
 - ✅ 2026-09-24 — [inline-asm-physreg-width] MOS inline-asm constraints `a`/`x`/`y`/`R`/`d` now reject an
   operand wider than their 8-bit register instead of truncating it (patch `0043`, AVR precedent).
   See [plan](docs/plans/2026-09-24-inline-asm-num-registers.md).
@@ -2462,4 +2438,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        of the same defect; it is fixed alongside it, not separately.
      - "corpus/setjmp_sim.c is not a sufficient guard on its own" -> #116 backtrack now covers the
        return-out-of-a-setjmp-frame case and is in expected.tsv, so the gap is closed. -->
+- [ ] **(triage)** **The upstream PR draft for `0044`.** The patch is upstream-clean (stock 65816; it touches no `+mos-a16` code and its lit test needs no fork patch), but the PR body / `docs/pr-preparations/` validation record is a separate task, exactly as `0043`'s was. Ranking is the orchestrator's call, so this plan does not write a `TODO.md` item for it. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:aae009e400ac4fcc -->
+- [ ] **(triage)** **The 16-bit-immediate sibling.** `farindex.c` and `farspill-probe.c` still diverge under `+mos-a16` (§7 step 4). That is the `[T4] AsmPrinter does not mark 16-bit immediates under +mos-a16` item; §3 states the shape it should reuse. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:241ef2353cc4be3b -->
+- [ ] **(triage)** **Promoting the probe to a gate.** `dev/probe-far-roundtrip.sh` is still run by hand. With the long-address class fixed, its `-Os` (default 8-bit) run is now **0 divergent**, so the `[T2]` gate item can record a clean baseline for that mode and an expected-failure set of exactly two fixtures for `+mos-a16` until the sibling item lands. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:02868b700bef2e10 -->
+- [ ] **(triage)** **`jml` for `$5C`.** Deliberately deferred, §2. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:83894ab00026f1cb -->
 <!-- END auto-captured-deferrals -->

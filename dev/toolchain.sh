@@ -203,6 +203,13 @@ if [ ! -d "$SRC/.git" ]; then
   # defect independent of +mos-a16, so it stays a standalone artifact applied
   # after 0002 and reverse-applied out of every 0002 regeneration.
   apply_patch 0043-mos-inline-asm-physreg-width
+  # A 24-bit address operand prints an explicit mos24() width whenever the bare
+  # text could be re-parsed narrower, so far loads/stores and the $5C long jump
+  # survive a -S/reassemble round trip instead of silently collapsing to their
+  # DBR-relative / bank-local 16-bit siblings. Stock-65816 printer defect (the
+  # parser half is 0039), so it stays a standalone artifact applied after 0002
+  # and reverse-applied out of every 0002 regeneration.
+  apply_patch 0044-mos-asm-print-long-address
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and
