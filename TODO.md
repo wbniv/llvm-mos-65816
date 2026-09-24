@@ -270,7 +270,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [T4] **AsmPrinter does not mark 16-bit immediates under `+mos-a16` — worse than the long-address gap
+- [wip T4] <!-- agent:a40ebadf2d32b1054 --> **AsmPrinter does not mark 16-bit immediates under `+mos-a16` — worse than the long-address gap
   above.** A 16-bit immediate ≤ 255 prints as a bare `#N` and reassembles to 2 bytes instead of 3; under
   M=0 (`+mos-a16`'s whole point) that **desyncs the instruction stream** — the next opcode's first byte is
   consumed as the immediate's high byte. Reachable the same way (`-save-temps`). Measured: 36/112
@@ -1232,6 +1232,14 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   its VT) — but has no PR body, no validation record against the pinned base, and no
   `docs/upstream-contribution-status.md` entry. Also owes a live `dev/regen-patch.sh` round trip (blocked
   at fix time by another worker's dirty `0002`). Reason for T2: the 0033/0036 docs are the template;
+  no design. Posting stays user-triggered.
+- [T2] **Draft the `0044` upstream PR** (AsmPrinter prints an explicit `mos24()` on 24-bit address
+  operands so `-S`/`-save-temps` output re-assembles to the same bytes; landed `5ea5006c`,
+  [plan](docs/plans/2026-09-24-asmprinter-long-address.md)). Upstream-clean — stock 65816, no `+mos-a16`
+  code, its lit test needs no fork patch — but has no PR body, no `docs/pr-preparations/` validation record
+  against the pinned base, and no `docs/upstream-contribution-status.md` entry. Pair it with `0043`'s draft
+  (same template, same session); cite `MC/MOS/long-address-roundtrip-65816.s` as the failing-before test and
+  the `af f0 00 00 → a5 f0` one-shot as the motivating bytes. Reason for T2: 0033/0036 docs are the template;
   no design. Posting stays user-triggered.
 - [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 154 tests, 148 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
@@ -2449,5 +2457,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        disambiguates the encoding), not work. Do not re-open.
      The remaining bullet (the 0044 upstream PR draft) is genuine open work with no curated
      owner and is left here for ranking — it mirrors the 0043 PR-draft item. -->
-- [ ] **(triage)** **The upstream PR draft for `0044`.** The patch is upstream-clean (stock 65816; it touches no `+mos-a16` code and its lit test needs no fork patch), but the PR body / `docs/pr-preparations/` validation record is a separate task, exactly as `0043`'s was. Ranking is the orchestrator's call, so this plan does not write a `TODO.md` item for it. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:aae009e400ac4fcc -->
+<!-- triaged 2026-09-24: the 0044 upstream PR draft is genuine open work — PROMOTED to the
+     Upstream / Contribution section as a [T2] item beside its 0043 twin. fp:aae009e400ac4fcc -->
 <!-- END auto-captured-deferrals -->
