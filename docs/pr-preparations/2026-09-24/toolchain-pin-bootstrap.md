@@ -161,3 +161,218 @@ currently false for anything past patch 10 of 25.
 | A clean bootstrap produces a working `clang-23`/`lld` | ❌ no — never reached (blocked by the above) |
 | Installed `clang-23` matches the shared build's `clang-23` (sha256) | not applicable — no artifact was produced |
 | Corpus/torture `-S` assembly equivalence at `-Os` for `mos6502` and `mosw65816+mos-a16` | not applicable — no compiler was produced |
+
+---
+
+# Part 2 — the fix: `-vendor` twins, and a clean bootstrap that passes (2026‑09‑24)
+
+**TODO item:** "`dev/toolchain.sh` cannot bootstrap from the pin: the upstream-bound patch files do not
+apply at `8be0546`" (`[wip T3]`), opened by Part 1's escalation.
+
+**Verdict: YES — `dev/run.sh toolchain` now bootstraps a working `clang-23` from a `vendor/`-less tree at the
+pin.** All 26 patches apply, the build completes, and the resulting compiler produces byte-identical
+assembly to the shared build on 540 of 540 comparable compilations.
+
+Worked in the pre-existing worktree `/home/will/llvm-mos-65816-pin-bootstrap` (branch
+`wt/321-pin-bootstrap`), whose own `vendor/` and `build/` are disposable. The shared main tree's
+`vendor/llvm-mos` was read as the oracle and never modified.
+
+## 4. Variants added
+
+Three `-vendor` twins, each generated with `git diff` from a tree at the pin (so plain `git apply` takes
+them) and run through `sed -i 's/^ $//'` so the artifact passes the parent repo's whitespace check. The
+upstream-form files were **not** touched — they remain the posting artifacts.
+
+| Variant | Lines | Why the upstream form fails at the pin |
+|---|---:|---|
+| `0035-clang-prefetch-int16-operands-vendor.patch` | 62 | Upstream form targets `742d554`, where Clang's `Builtin::BI__builtin_prefetch` case has been refactored to `ICEArguments` / `EmitScalarOrConstFoldImmArg`. The pin still has the older `EmitScalarExpr` body (case at line 3959, not 4096). The twin carries the same two `Builder.CreateIntCast(…, Int32Ty, /*isSigned=*/false)` lines and the same `FIXME` removal on the pin's shape, plus the new `clang/test/CodeGen/builtin-prefetch-int16.c` verbatim. |
+| `0037-llvm-gisel-inline-asm-indirect-output-vendor.patch` | 194 | Six of the upstream form's seven `InlineAsmLowering.cpp` hunks apply at the pin; hunk 2 does not, because at `742d554` `GISelAsmOperandInfo` already carries a `RegClass` member that the pin lacks, so the `IndirectTy` insertion's trailing context is absent. The twin inserts `IndirectTy` after `SmallVector<Register, 1> Regs;` — the same place, the pin's context. The two new test files are carried verbatim. |
+| `0041-llvm-gisel-inline-asm-multi-register-vendor.patch` | 479 | Stacks on `0037` in the same file, so it inherits the offset shift; additionally its `llvm/test/CodeGen/AArch64/GlobalISel/arm64-fallback.ll` hunk **deletes** the `inline_asm_multi_reg_input` fallback case, which does not exist at the pin (it was added upstream after `8be0546`). The twin drops that file entirely and keeps the other four (`InlineAsmLowering.cpp`, the two new tests, and the `build-pair-isel.ll` update). |
+
+**How the two `InlineAsmLowering.cpp` patches were split.** Both `0037` and `0041` edit that one file, so the
+shared vendor's integrated diff had to be cut in two. Method: apply the upstream `0037` to a pin-state copy
+with `git apply --reject` (six hunks land, one rejects), hand-place the one rejected hunk, and call the
+result the `pin + 0037` intermediate; then `0037-vendor` = diff(pin → intermediate) and `0041-vendor` =
+diff(intermediate → shared vendor). The hunk structure of each twin matches its upstream form one-for-one
+(seven `.cpp` hunks for `0037`, seven for `0041`), which is the check that the cut fell on the right line.
+Reverse-applying the upstream `0041` out of the shared file was tried first and **does not work** — its
+context also comes from `742d554` — which is why the forward-then-subtract method was used.
+
+`llvm/lib/CodeGen/InlineSpiller.cpp` carries `0033` and `0040`; neither needed a twin, so no split was
+required there.
+
+## 5. `dev/toolchain.sh` / `dev/regen-patch.sh`
+
+`dev/toolchain.sh`:
+
+- `apply_patch 0035-…` → `0035-…-vendor`, `0037-…` → `0037-…-vendor`, `0041-…` → `0041-…-vendor`, each with
+  a one-line comment saying the upstream form targets the `742d554` validation tree and naming the specific
+  upstream change that breaks it at the pin.
+- `0038-mos-return-frame-address` keeps its `-C1`: it still applies only with the reduced context.
+- **Deviation, flagged:** `apply_patch 0028-llvm-virtregrewriter-undef-lane-identity-copy` was **added**
+  between `0006` and `0029`. It was missing from the committed script but is unambiguously part of the
+  stack — the shared `vendor/` has `llvm/lib/CodeGen/VirtRegMap.cpp` modified and both of `0028`'s test
+  files present, and without the line the bootstrap cannot reproduce that file. The same line exists as an
+  uncommitted in-flight edit in the main working copy from another worker, so this commit duplicates it
+  (identical text, same position).
+
+`dev/regen-patch.sh`: **no change needed.** `STANDALONE_MOSDIR` only lists patches inside
+`llvm/lib/Target/MOS`, and none of the three twins is a MOS-dir patch — `0034`, `0036` and `0038`, the
+MOS-dir patches in the tail of the stack, all applied in their upstream form. `0032` already lists its
+`-vendor` form, as before.
+
+`dev/regen-patch.sh` was nevertheless run in the worktree, and **it cannot run against a clean-bootstrap
+`vendor/`** — a pre-existing gap, not caused by this change:
+
+```
+==> pristine vendor HEAD: 8be054612
+==> [gen] worktree @ pristine + commit 0001 (+0003) as baseline
+    baking 0003 into baseline so it drops out of 0002
+==> [gen] mirror live llvm/lib/Target/MOS over the baseline, diff -> 0002
+cp: cannot stat '/home/will/llvm-mos-65816-pin-bootstrap/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef.mir': No such file or directory
+rc=1
+```
+
+Its `TESTRELS` list names `llvm/test/CodeGen/MOS/scavenger-p-undef.mir` and
+`llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir`, and **no patch in `dev/toolchain.sh`'s list creates
+either file** — they exist only in the shared, hand-augmented `vendor/` (see the attribution table below).
+So `dev/regen-patch.sh` is today usable only against that shared tree, never against a reproducible one.
+`patches/llvm-mos/0002-321-accum16.patch` was restored from `HEAD` immediately after the run
+(`git checkout HEAD -- patches/llvm-mos/0002-321-accum16.patch`) and is **not** part of this commit.
+
+## 6. The clean bootstrap run
+
+`$WT/vendor/llvm-mos`, `$WT/build/llvm-mos` and `$WT/build/llvm-mos-install` were deleted (`build/.ccache`
+kept — a 949 MB hardlink of the shared cache); no other toolchain build was running (`docker ps -q` empty,
+no `ninja`/`cmake --build` process). Then `BUILD_JOBS=6 dev/run.sh toolchain` from the worktree, logged to
+`build/bootstrap2.log`.
+
+- **Exit status:** `rc=0`.
+- **Wall clock:** 198 s (`start_epoch=1790219128` → `end_epoch=1790219326`); the script's own report is
+  `==> done in 3m 12s`. The warm ccache is what makes a 3507-step ninja build finish in three minutes —
+  this is a genuine cold configure + full build of all 3507 targets, not an incremental no-op.
+- **Pin:** `git -C $WT/vendor/llvm-mos rev-parse HEAD` → `8be0546128a55e78c63ca571d466aa72a782cd36`
+  — equals `LLVM_MOS_PIN`.
+- **Version banner:** `clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)`, `Target: mos-unknown-unknown`.
+
+### Per-patch yes/no (26 patches, `dev/toolchain.sh` order)
+
+Every `applying patch` line succeeded — the script's `set -euo pipefail` means reaching the next line is the
+proof, and it reached `==> trim distribution`:
+
+| # | Patch | Applied? |
+|---|---|---|
+| 1 | `0001-320-far-addrspace` | ✅ |
+| 2 | `0002-321-accum16` | ✅ |
+| 3 | `0010-coalesce-rotate-ac` | ✅ |
+| 4 | `0018-320-imag32-spill` | ✅ |
+| 5 | `0019-mos-branch-range-diagnostic` | ✅ |
+| 6 | `0020-mos-65816-block-move-bank-order` | ✅ |
+| 7 | `0021-mos-zp-alloc-deterministic` | ✅ |
+| 8 | `0006-320-packed24` (path-filtered) | ✅ |
+| 9 | `0028-llvm-virtregrewriter-undef-lane-identity-copy` | ✅ **(new line)** |
+| 10 | `0029-llvm-twoaddr-physreg-reschedule` | ✅ |
+| 11 | `0033-llvm-spill-hoist-no-new-vregs` | ✅ |
+| 12 | `0035-clang-prefetch-int16-operands-vendor` | ✅ **(twin)** |
+| 13 | `0037-llvm-gisel-inline-asm-indirect-output-vendor` | ✅ **(twin)** |
+| 14 | `0040-llvm-inline-spiller-coalesce-scratch-vregs` | ✅ |
+| 15 | `0041-llvm-gisel-inline-asm-multi-register-vendor` | ✅ **(twin)** |
+| 16 | `0003-late-opt-nongpr-ldimm-dest` | ✅ |
+| 17 | `0022-mos-late-opt-cmpzero-lowering` | ✅ |
+| 18 | `0023-mos-trunc-selection-regclasses` | ✅ |
+| 19 | `0024-mos-brk-signature-operand` | ✅ |
+| 20 | `0025-llvm-mc-preserve-motorola-default` | ✅ |
+| 21 | `0030-mos-copy-phys-reg-liveness` | ✅ |
+| 22 | `0031-mos-copy-phys-reg-reuse-dst` | ✅ |
+| 23 | `0032-mos-quote-register-named-symbols-vendor` | ✅ |
+| 24 | `0034-mos-legalize-prefetch` | ✅ |
+| 25 | `0036-mos-zero-page-indexed-globals` | ✅ |
+| 26 | `0038-mos-return-frame-address` (`-C1`) | ✅ |
+
+## 7. Tree diff vs the shared `vendor/` — every difference attributed
+
+```
+$ diff -rq --exclude=.git --exclude=__pycache__ $WT/vendor/llvm-mos/clang $MAIN/vendor/llvm-mos/clang
+(no output)
+$ diff -rq --exclude=.git --exclude=__pycache__ $WT/vendor/llvm-mos/llvm  $MAIN/vendor/llvm-mos/llvm
+Files …/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp and … differ
+Files …/llvm/lib/Target/MOS/MOSInstrFormats.td and … differ
+Files …/llvm/lib/Target/MOS/MOSRegisterInfo.cpp and … differ
+Files …/llvm/test/CodeGen/MOS/asm-printer.mir and … differ
+Only in …/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS: insert-rep-sep-cloned-kills.mir
+Only in …/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS: scavenger-p-undef-6502.ll
+Only in …/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS: scavenger-p-undef.mir
+Files …/llvm/test/MC/MOS/65816-block-move-bank-order.s and … differ
+```
+
+`clang/` is **identical file for file.** The eight `llvm/` differences:
+
+| File | Attribution | Affects codegen? |
+|---|---|---|
+| `llvm/lib/Target/MOS/MOSRegisterInfo.cpp` | The other worker's in-progress edits — exactly the two `if (!MF.getProperties().hasTracksLiveness()) return …` guards, nothing else. The expected difference. | Only under `!tracksRegLiveness`, i.e. MIR tests |
+| `llvm/lib/Target/MOS/MOSInsertREPSEP.cpp` | Comment re-wrapping to 80 columns, present in the main tree's **uncommitted** `0002-321-accum16.patch` (flagged `M` in git status) but not in the committed one. Verified by grepping the re-wrapped line in the working-copy patch file. | No (comments only) |
+| `llvm/lib/Target/MOS/MOSInstrFormats.td`, `llvm/test/MC/MOS/65816-block-move-bank-order.s` | The main tree's **uncommitted** revision of `0020-mos-65816-block-move-bank-order.patch`: it swaps `InOperandList` to `(ins imm8at2:$sourceBank, imm8:$destinationBank)` and replaces the 4-line MC test with a 48-line `split-file` one. The committed `0020` this bootstrap applied has neither hunk. | Potentially (MVN/MVP operand slots) — but no difference appeared in the equivalence sweep below |
+| `llvm/test/CodeGen/MOS/asm-printer.mir` | The `sec_implied_true` case added by `0012-mos-ldcimm-set-lowering.patch` — the **retired** LDCImm experiment, not in `dev/toolchain.sh`'s list. Hand-applied in the shared tree. | No (test only) |
+| `llvm/test/CodeGen/MOS/scavenger-p-undef.mir`, `…/scavenger-p-undef-6502.ll` | Created by `0011-mos-scavenger-live-p-save.patch` — a drafted, unposted PR that `dev/toolchain.sh` does not apply (its MOS-dir code lives inside `0002`, but its test files are outside the mirror and not in `dev/regen-patch.sh`'s `TESTRELS` output). Hand-applied in the shared tree. | No (test only) |
+| `llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir` | Created only by the main tree's **uncommitted** `0002` revision. | No (test only) |
+
+So: one expected difference (the `MOSRegisterInfo.cpp` liveness guards), three traceable to other workers'
+**uncommitted** patch-file revisions in the shared tree (`0002`, `0020`), and three stray test files
+hand-applied into the shared `vendor/` from patches that are not in the apply list at all (`0011`, retired
+`0012`). Nothing unattributed; nothing that indicates a wrong `-vendor` twin.
+
+## 8. Artifact comparison
+
+```
+3573ec78e4e1cd0a33cf875dcfc12ff00ed3d6f493f2d06c3ad18ba240f9eeb6  $WT/build/llvm-mos-install/bin/clang-23
+52878fcc35f4d5e39d030730cd089c1a579ce4f49f36685b5678ab14f724b76f  $MAIN/build/llvm-mos-install/bin/clang-23
+```
+
+**Not equal, and not expected to be.** The shared build was made from a source tree that differs in the
+eight files above (two of them compiled sources), in a different build directory, at a different time; LLVM
+is not bit-reproducible across those. Byte equality was never the right test — assembly equivalence is.
+
+## 9. Assembly equivalence
+
+Both compilers, same flags, `-S -Os --target=mos -isystem build/install/mos-platform/common/include -w`,
+over all 137 `examples/snes/corpus/*.c` and the first 200 in-scope entries of
+`examples/65816/torture/inscope.tsv` (sources from `vendor/c-torture/execute/`), in two configurations.
+
+| Config | Group | n | compiled both | **identical** | different | failed one side | failed both |
+|---|---|---:|---:|---:|---:|---:|---:|
+| `-mcpu=mos6502` | corpus | 137 | 3 | **3** | 0 | 0 | 134 |
+| `-mcpu=mos6502` | torture | 200 | 200 | **200** | 0 | 0 | 0 |
+| `-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16` | corpus | 137 | 137 | **137** | 0 | 0 | 0 |
+| `-mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16` | torture | 200 | 200 | **200** | 0 | 0 | 0 |
+
+**540 comparable compilations, 540 byte-identical, 0 different, 0 one-sided failures.** There is no
+representative diff to show, because there is no diff.
+
+The 134 corpus files that fail under `-mcpu=mos6502` fail on **both** sides with the same diagnostic — they
+contain 65816-only inline asm, e.g. `examples/snes/corpus/arith.c:30:29`:
+
+```
+error: invalid instruction, any one of the following would fix this:
+   30 |   for (;;) __asm__ volatile("wai");
+```
+
+The `MOSRegisterInfo.cpp` in-progress edits therefore explain nothing here — they had no observable effect
+on any of the 540 comparisons (consistent with both guards firing only when a function does not track
+physical-register liveness, which no C compilation produces). The uncommitted `0020` operand-order revision
+likewise produced no visible difference: nothing in the corpus or the first 200 torture tests selects
+`MVN`/`MVP`.
+
+## 10. Bottom line (Part 2)
+
+| Claim | Verdict |
+|---|---|
+| Fresh `vendor/` fetches and checks out exactly the pinned SHA | ✅ yes |
+| The tracked patch stack applies cleanly on top of that SHA | ✅ **yes — all 26, with three `-vendor` twins** |
+| A clean bootstrap produces a working `clang-23`/`lld` | ✅ yes (`rc=0`, 198 s with a warm ccache) |
+| Installed `clang-23` matches the shared build's `clang-23` (sha256) | ❌ no — expected: the two source trees differ in eight files and LLVM is not bit-reproducible |
+| Corpus/torture `-S` assembly equivalence at `-Os` for `mos6502` and `mosw65816+mos-a16` | ✅ **540/540 identical** |
+| Every tree difference vs the shared `vendor/` attributed | ✅ yes — 1 expected, 4 from other workers' uncommitted patch revisions, 3 stray hand-applied test files |
+
+**Still untested:** the shallow-fetch fallback branch (GitHub again served the pinned SHA directly), and
+`dev/regen-patch.sh`'s round-trip, which cannot run against a reproducible `vendor/` at all (§5) — that is a
+separate defect worth its own item.

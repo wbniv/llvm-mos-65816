@@ -1171,19 +1171,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
   test. Reason for T3: one target hook pair, but the intended semantics need settling.
-- [wip T3] **`dev/toolchain.sh` cannot bootstrap from the pin: the upstream-bound patch files do not apply at `8be0546`.** <!-- agent:ae0287243056425f7 -->
-  The clean-bootstrap proof ([record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md)) fetched
-  the pin and applied 10 of 25 patches, then `0035-clang-prefetch-int16-operands` failed: it (like 0033,
-  0037, 0040, 0041 and the other upstream-bound patches) was generated against the newer validation tree
-  `742d554`, whose Clang uses `EmitScalarOrConstFoldImmArg`, while the shared `vendor/` at the pin carries
-  a hand-adapted hunk on the older `EmitScalarExpr` shape. The remaining 14 patches were never tried. Fix
-  per the existing `0032 …-vendor.patch` precedent: for every registered patch that does not apply at the
-  pin, add a `-vendor` variant generated from the shared vendor's actual integrated diff (the oracle: after
-  the full stack a fresh tree must equal the shared vendor minus the uncommitted `MOSRegisterInfo.cpp`
-  liveness edits), point `dev/toolchain.sh` at the variants (upstream forms stay as posting artifacts),
-  then finish the proof: full build, `clang-23` sha256 and assembly equivalence on `corpus/` + 200 torture
-  files. Reason for T3: multi-file, but the design is settled (pin stays at 0002's base; the pin bump is
-  the separate [rebase plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md)).
 - [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 153 tests, 147 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
   `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
@@ -1365,6 +1352,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [toolchain-bootstrap-variants] `dev/toolchain.sh` bootstraps from the pin again: `-vendor` twins added for `0035`/`0037`/`0041` (+ the missing `0028` line), all 26 patches apply to a fresh `8be0546` checkout, `clang-23` built and assembly-equivalent to the shared build. See [record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md).
 - ✅ 2026-09-24 — [toolchain-pin-bootstrap] Proved end to end: fetch+checkout hits the pin exactly, but the tracked patch stack does NOT apply cleanly — `0035-clang-prefetch-int16-operands` fails at patch 11/25, no artifact was produced. See [record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md).
 - ✅ 2026-09-24 — [toolchain-llc] `dev/toolchain.sh` now rebuilds `llc`/`opt`/`llvm-mc`/`llvm-objdump`/`llvm-readobj`/`FileCheck`/`not` (the set the MOS lit RUN lines actually invoke) right after `install-distribution`; new `dev/run.sh lit [PATHS...]` refreshes them then runs `llvm-lit -s`. 153 MOS tests: 147 pass, 2 unsupported, 4 pre-existing fails (unrelated to this fix).
 - ✅ 2026-09-24 — [torture-filter-sanitize] `_first()` now sanitizes before the 200-char cap; regenerated `unsupported.tsv` (14 rows, all `compile-error`, longer/complete diagnostics, no row moved bucket); added `tests/test_torture_filter.py`.

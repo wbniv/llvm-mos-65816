@@ -104,6 +104,23 @@ includes the MOS suites and 231 focused X86/ARM/AArch64 tests with assertions.
 The twelve-patch narrative above describes the original series, not the complete
 current patch inventory.
 
+**Two bases, two artifacts — the `-vendor` twin rule.** An upstream-bound patch is generated and validated
+against the **validation tree** (currently `742d554`), because that is the base a reviewer on
+`llvm-mos`/`llvm-project` will apply it to; the fork's own `vendor/` checkout sits at the older
+**`LLVM_MOS_PIN`** (`8be0546`). When a patch's context lines depend on upstream work that landed between the
+pin and the validation tree, the upstream form simply does not apply at the pin. The rule is therefore:
+**the upstream-form patch file is never edited to make it apply** — it is the posting artifact — and a
+`NNNN-<same-slug>-vendor.patch` twin is added beside it, generated with `git diff` from a tree at the pin,
+carrying the same change in the pin's shape. `dev/toolchain.sh` applies the twin where one exists (with a
+one-line comment naming the base the upstream form targets), and `dev/regen-patch.sh`'s `STANDALONE_MOSDIR`
+lists whichever form is actually applied for a MOS-dir patch. `0032-mos-quote-register-named-symbols` was
+the first case; `0035`, `0037` and `0041` joined it on 2026‑09‑24. **The clean bootstrap is the check**: a
+`vendor/`-less `dev/run.sh toolchain` run applies the whole stack to a fresh checkout at the pin, so a
+missing twin surfaces as a `git apply` rejection rather than as a compiler only one machine can build. Run
+it whenever a patch is added or regenerated — the failure mode it catches is otherwise silent, because the
+shared `vendor/` already holds a hand-adapted copy of the hunk and everyday work never notices. Evidence:
+[`docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md`](pr-preparations/2026-09-24/toolchain-pin-bootstrap.md).
+
 ### 1.2 The one invariant that makes this reviewable
 
 > **The #320/#321 feature contribution is opt-in (`+mos-a16` / `+mos-xy16` / `addrspace(2)`) and gated so it
