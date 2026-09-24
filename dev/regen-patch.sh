@@ -73,6 +73,7 @@ STANDALONE_MOSDIR=(
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
+  "llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir"
   "llvm/test/CodeGen/MOS/interrupt-width-65816.ll"
   "llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir"
   "llvm/test/MC/MOS/all-65816-opcodes.s"
@@ -83,6 +84,7 @@ TESTRELS=(
   "llvm/test/MC/MOS/modifier-width-errors.s"           # created by 0039
   "llvm/test/MC/MOS/long-address-roundtrip-65816.s"    # created by 0044
   "llvm/test/CodeGen/MOS/a16-immediate-width.ll"       # created by 0045
+  "llvm/test/CodeGen/MOS/far-indir-indexed.ll"         # #321 Ph2 inc 1: [dp],y (b7/97) selection + its negative gate cases
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
