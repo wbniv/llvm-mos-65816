@@ -61,6 +61,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0031-mos-copy-phys-reg-reuse-dst.patch"
   "$PATCHES/0032-mos-quote-register-named-symbols-vendor.patch"
   "$PATCHES/0034-mos-legalize-prefetch.patch"
+  "$PATCHES/0039-mos-asm-modifier-width.patch"
   "$PATCHES/0036-mos-zero-page-indexed-globals.patch"
   "$PATCHES/0038-mos-return-frame-address.patch"
   "$PATCHES/0042-mos-scavenger-p-undef-a16-test.patch"
@@ -71,6 +72,9 @@ TESTRELS=(
   "llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir"
   "llvm/test/MC/MOS/all-65816-opcodes.s"
   "llvm/test/MC/MOS/motorola-integers-default.s"
+  "llvm/test/MC/MOS/modifier-width.s"                  # created by 0039; cp'd in so 0039 reverses cleanly
+  "llvm/test/MC/MOS/modifier-width-65816.s"            # created by 0039
+  "llvm/test/MC/MOS/modifier-width-errors.s"           # created by 0039
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }

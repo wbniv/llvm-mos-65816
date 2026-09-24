@@ -1187,13 +1187,24 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [Independently reviewed](docs/pr-preparations/2026-09-23/0036-claude-review.md) and
   [review audited](docs/pr-preparations/2026-09-23/0036-review-audit.md). No code revision
   requested. Remaining: submission preparation and publication (user-triggered).
-- [T4] **Explicit `mos16(constant)` can select a zero-page opcode and truncate the address.**
+- [verify T4] **Explicit `mos16(constant)` can select a zero-page opcode and truncate the address.**
   Pristine `llvm-mc` emits `B5 F0` for `lda mos16(240),x` and `B5 34` for
   `lda mos16(4660),x`, instead of absolute,X encodings `BD F0 00` / `BD 34 12`.
   `MOSOperand::isImmInRange` tests a positive modified constant against the modifier's
   width without checking the candidate operand's narrower range. This also defeats
   `wrapAbsoluteIdxBase` for small integer bases. Separate from 0036's global classification;
   fix the parser's width matching and add constant/addressing-mode regressions.
+  **Fixed** as [`0039`](patches/llvm-mos/0039-mos-asm-modifier-width.patch): the width
+  relation the symbolic exit always applied now guards the constant exit too (strictly a
+  narrowing — 12,045 probes, 0 became smaller, 0 refused-then-accepted), subsuming the old
+  `Imm16` special case; `mos24($123456)` truncating to `a5 56` was the same defect one width
+  out. Three new `MC/MOS/modifier-width*.s` tests, each failing pre-fix.
+  [plan + recorded verification](docs/plans/2026-09-24-mos16-constant-truncation.md) ·
+  [validation](docs/pr-preparations/2026-09-24/0039-validation.md) ·
+  [PR draft](docs/upstream-asm-modifier-width-pr.md).
+  **Remaining:** plan steps 4–5 (`dev/run.sh corpus` / `corpus-a16`) need the toolchain
+  reinstalled and a quiet box; a `742d554` assertions build with this patch alone; then
+  publish (user-triggered).
   [Reproducer](docs/investigations/repro/upstream-issues-2026-09-23/explicit-address-width.s) ·
   [diagnosis](docs/pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect).
 - [T5] **Post the register-scavenger live-`$p` fix PR (`0011`)** (user-triggered). The upstream

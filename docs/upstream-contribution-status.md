@@ -32,6 +32,23 @@ zero-page indexed globals. Direct and reassembled objects now agree; standalone
 MOS suites pass (132 / one unsupported), and the local compiler is rebuilt and
 installed. [Validation](pr-preparations/2026-09-23/0036-validation.md).
 
+**Prepared, not yet reviewed:** [0039](upstream-asm-modifier-width-pr.md) — an explicit
+width modifier on a constant operand (`mos16(240)`, `mos24($123456)`) no longer selects a
+narrower addressing mode with the address truncated to fit, which had made
+`MOSMCInstLower::wrapAbsoluteIdxBase` a no-op and made the `-S`-then-assemble path emit
+`zero page,X` where direct emission emits `absolute,X`. Strictly a narrowing, measured over
+12,045 probes; three new `MC/MOS` tests; MOS suites 151 pass / 2 unsupported / the 4
+pre-existing failures. [Validation](pr-preparations/2026-09-24/0039-validation.md).
+Remaining before posting: the emulator differential and a `742d554` assertions build.
+**Post command** (after `gh auth`, from a branch off pristine upstream carrying
+`patches/llvm-mos/0039-mos-asm-modifier-width.patch`):
+
+```
+gh pr create --repo llvm-mos/llvm-mos \
+  --title "[MOS] Honour an explicit width modifier on a constant operand" \
+  --body-file docs/upstream-asm-modifier-width-pr.md
+```
+
 **Pending work, SNES dependencies and issue readiness:**
 [chart and flowchart](upstream-pending-work.md). This view supersedes historical
 queue labels when judging what can be posted next.
@@ -50,7 +67,7 @@ variant is prepared, with current llvm/llvm-project applicability still to check
 Patch 0036 is validated against the pinned upstream base, with 45 upstream and
 36 local C round trips passing; [Claude's review is audited](pr-preparations/2026-09-23/0036-review-audit.md). Its numeric
 controls exposed a separate `mos16(constant)` truncation defect; that parser
-fix remains pending. Review, corpus, and emulator coverage are specific to each
+fix is now prepared as [0039](upstream-asm-modifier-width-pr.md). Review, corpus, and emulator coverage are specific to each
 patch's record. See the [pending-work tracker](upstream-pending-work.md) for
 submission steps and the remaining defects.
 
@@ -605,8 +622,9 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   compilations passing. [PR draft](upstream-zero-page-indexed-globals-pr.md) ·
   [validation](pr-preparations/2026-09-23/0036-validation.md).
   [Review audit complete](pr-preparations/2026-09-23/0036-review-audit.md);
-  submission preparation remains; unposted. A separate
-  `mos16(constant)` parser-width defect is reduced and tracked in `TODO.md`.
+  submission preparation remains; unposted. The separate
+  `mos16(constant)` parser-width defect it exposed is fixed by
+  [patch 0039](upstream-asm-modifier-width-pr.md).
 
 - **Prefetch — two fixes prepared September 23.**
   [Patch 0034](upstream-prefetch-legalize-pr.md) makes the MOS backend discard

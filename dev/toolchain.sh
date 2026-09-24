@@ -185,6 +185,12 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0032-mos-quote-register-named-symbols-vendor
   # G_PREFETCH is legalized by dropping it (a hint the 6502 cannot use).
   apply_patch 0034-mos-legalize-prefetch
+  # An explicit width modifier (mos16(), mos24(), ...) on a constant no longer
+  # matches a narrower operand: mos16(240) selected zero page,X and mos24() was
+  # truncated to a byte, defeating MOSMCInstLower::wrapAbsoluteIdxBase. Stock-
+  # llvm-mos assembler defect, so it stays a standalone artifact applied after
+  # 0002 and reverse-applied out of every 0002 regeneration.
+  apply_patch 0039-mos-asm-modifier-width
   # Indexed opcodes use the same zero-page classification as their operands.
   apply_patch 0036-mos-zero-page-indexed-globals
   # __builtin_return_address(0) / __builtin_frame_address(0): legalized (hard-

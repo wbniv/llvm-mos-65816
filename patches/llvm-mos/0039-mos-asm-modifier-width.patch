@@ -1,0 +1,188 @@
+diff --git a/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp b/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
+index 198865959a00..8fd6ff4e439c 100644
+--- a/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
++++ b/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
+@@ -127,22 +127,28 @@ public:
+
+     // MOS-specific modifier: check if result fits in range
+     if (const auto *ME = dyn_cast<MOSMCExpr>(Imm)) {
+-      const MOS::Fixups FixupKind = ME->getFixupKind();
+-
+-      // Imm16 modifier requires 16-bit range
+-      if (FixupKind == MOS::Imm16 && High < 0xFFFF)
+-        return false;
+-
+       const MCFixupKindInfo &Info =
+-          MOSFixupKinds::getFixupKindInfo(FixupKind, nullptr);
+-      int64_t MaxValue = (1LL << Info.TargetSize) - 1;
++          MOSFixupKinds::getFixupKindInfo(ME->getFixupKind(), nullptr);
++      const int64_t MaxValue = (1LL << Info.TargetSize) - 1;
++
++      // A modifier states the operand width the programmer asked for, so that
++      // width has to fit the candidate operand's width. This holds whether or
++      // not the value is known now: mos16(240) must not fill a zero page
++      // operand just because 240 happens to fit in a byte, since zero page
++      // indexed wraps inside page zero while absolute indexed carries. This
++      // also covers Imm16 (#mos16()), whose MaxValue of 0xFFFF fits only a
++      // 16-bit immediate.
++      if (MaxValue > High)
++        return false;
+
+-      // Try to evaluate constant now
++      // Try to evaluate constant now. MOSMCExpr::evaluateAsConstant has
++      // already masked the value to the modifier's width, so this only rejects
++      // a value below the candidate's floor.
+       int64_t Value;
+       if (ME->evaluateAsConstant(Value) && Value > 0)
+-        return Value <= MaxValue;
++        return Value >= Low && Value <= MaxValue;
+
+-      return MaxValue <= High;
++      return true;
+     }
+
+     // Symbol reference: defer to linker
+diff --git a/llvm/test/MC/MOS/modifier-width-65816.s b/llvm/test/MC/MOS/modifier-width-65816.s
+new file mode 100644
+index 000000000000..cf897ca11612
+--- /dev/null
++++ b/llvm/test/MC/MOS/modifier-width-65816.s
+@@ -0,0 +1,40 @@
++; RUN: llvm-mc -triple mos -mcpu=mosw65816 -show-encoding < %s | FileCheck %s
++
++; 65816 counterpart of modifier-width.s: with absolute long available there are
++; three operand widths to confuse, not two, so a 24-bit modifier on a small
++; constant must reach absolute long and a 16-bit one must stop at absolute.
++
++; mos24() selects absolute long whatever the value.
++
++    lda mos24(1193046)          ; CHECK: encoding: [0xaf,0x56,0x34,0x12]
++    lda mos24(1193046),x        ; CHECK: encoding: [0xbf,0x56,0x34,0x12]
++    lda mos24(240)              ; CHECK: encoding: [0xaf,0xf0,0x00,0x00]
++    lda mos24(240),x            ; CHECK: encoding: [0xbf,0xf0,0x00,0x00]
++    sta mos24(1193046),x        ; CHECK: encoding: [0x9f,0x56,0x34,0x12]
++    jmp mos24(1193046)          ; CHECK: encoding: [0x5c,0x56,0x34,0x12]
++
++; mos16() stops at absolute, and does not widen to long either.
++
++    lda mos16(240),x            ; CHECK: encoding: [0xbd,0xf0,0x00]
++    lda mos16(4660),x           ; CHECK: encoding: [0xbd,0x34,0x12]
++    jmp mos16(240)              ; CHECK: encoding: [0x4c,0xf0,0x00]
++    lda mos24segment(1193046)   ; CHECK: encoding: [0xad,0x56,0x34]
++
++; mos13() is 13 bits wide, so it is too wide for direct page and lands on
++; absolute -- the same rule, at the SPC700 modifier's width.
++
++    lda mos13(16)               ; CHECK: encoding: [0xad,0x10,0x00]
++
++; mos8() still reaches the direct page forms, including the long indirect ones
++; whose base operand is direct page only.
++
++    lda mos8(16)                ; CHECK: encoding: [0xa5,0x10]
++    lda [mos8(16)],y            ; CHECK: encoding: [0xb7,0x10]
++    lda (mos8(16),x)            ; CHECK: encoding: [0xa1,0x10]
++
++; An unmodified constant still picks its width from its value.
++
++    lda 16                      ; CHECK: encoding: [0xa5,0x10]
++    lda 4660                    ; CHECK: encoding: [0xad,0x34,0x12]
++    lda 1193046                 ; CHECK: encoding: [0xaf,0x56,0x34,0x12]
++    lda 1193046,x               ; CHECK: encoding: [0xbf,0x56,0x34,0x12]
+diff --git a/llvm/test/MC/MOS/modifier-width-errors.s b/llvm/test/MC/MOS/modifier-width-errors.s
+new file mode 100644
+index 000000000000..c82ddb89acaa
+--- /dev/null
++++ b/llvm/test/MC/MOS/modifier-width-errors.s
+@@ -0,0 +1,32 @@
++; RUN: not llvm-mc -triple mos -mcpu=mos6502 %s 2>&1 | FileCheck %s
++
++; The other half of modifier-width.s: when a modifier is wider than every
++; candidate operand the mnemonic has, the instruction is refused rather than
++; narrowed. Narrowing would truncate the address to fit and change what the
++; instruction reads -- `lda mos24($123456)` as `a5 56` is a direct page load
++; from $56, not a long load from $123456.
++
++; A 24-bit address needs 65816 long addressing, which the 6502 does not have.
++; CHECK: [[#@LINE+3]]:1: error: invalid instruction, any one of the following would fix this:
++; CHECK: [[#@LINE+2]]:5: note: operand must be an 8-bit address
++; CHECK: [[#@LINE+1]]:5: note: operand must be a 16-bit address
++lda mos24($123456)
++
++; CHECK: [[#@LINE+1]]:1: error: invalid instruction, any one of the following would fix this:
++lda mos24($f0),x
++
++; CHECK: [[#@LINE+1]]:1: error: invalid instruction, any one of the following would fix this:
++jmp mos24($123456)
++
++; The base of a zero page indirect mode is a zero page address, so no wider
++; modifier can fill it.
++; CHECK: [[#@LINE+1]]:6: error: operand must be an 8-bit address
++lda (mos16($f0)),y
++
++; CHECK: [[#@LINE+1]]:6: error: operand must be an 8-bit address
++lda (mos16($f0),x)
++
++; The immediate-context spelling obeys the same rule: a 16-bit modifier does
++; not fit an 8-bit immediate.
++; CHECK: [[#@LINE+1]]:1: error: invalid instruction, any one of the following would fix this:
++lda #mos16(5)
+diff --git a/llvm/test/MC/MOS/modifier-width.s b/llvm/test/MC/MOS/modifier-width.s
+new file mode 100644
+index 000000000000..393e241e862b
+--- /dev/null
++++ b/llvm/test/MC/MOS/modifier-width.s
+@@ -0,0 +1,54 @@
++; RUN: llvm-mc -triple mos -mcpu=mos6502 -show-encoding < %s | FileCheck %s
++
++; An explicit width modifier states the operand width the programmer asked for,
++; so it must never be narrowed to a smaller addressing mode -- not even when the
++; value would fit in one. zero page,X computes (base + X) & 0xFF and wraps
++; inside page zero; absolute,X carries into the high byte, so the two are not
++; interchangeable. MOSMCInstLower::wrapAbsoluteIdxBase emits exactly the
++; mos16(<small constant>) form below to force the absolute encoding, which only
++; works if the assembler honours the modifier's width.
++
++; A 16-bit modifier on a constant selects absolute, never zero page.
++
++    lda mos16(240)              ; CHECK: encoding: [0xad,0xf0,0x00]
++    lda mos16(240),x            ; CHECK: encoding: [0xbd,0xf0,0x00]
++    lda mos16(0),x              ; CHECK: encoding: [0xbd,0x00,0x00]
++    lda mos16(4660),x           ; CHECK: encoding: [0xbd,0x34,0x12]
++    lda mos16(65535),x          ; CHECK: encoding: [0xbd,0xff,0xff]
++    lda mos16(-1),x             ; CHECK: encoding: [0xbd,0xff,0xff]
++    sta mos16(16),x             ; CHECK: encoding: [0x9d,0x10,0x00]
++    sta mos16(16),y             ; CHECK: encoding: [0x99,0x10,0x00]
++    ldx mos16(16),y             ; CHECK: encoding: [0xbe,0x10,0x00]
++    cmp mos16(16)               ; CHECK: encoding: [0xcd,0x10,0x00]
++
++; A symbol assigned an absolute value is a constant too, and takes the same
++; path.
++
++val = 240
++    lda mos16(val),x            ; CHECK: encoding: [0xbd,0xf0,0x00]
++
++; mos24segment() is also 16 bits wide, so it behaves like mos16(). The same
++; holds for a symbolic operand: see modifiers.s, lda mos24segment(addr8) -> ad.
++
++    lda mos24segment(1193046)   ; CHECK: encoding: [0xad,0x56,0x34]
++    lda mos24segment(1193046),x ; CHECK: encoding: [0xbd,0x56,0x34]
++
++; The narrowing is width-driven, not value-driven: an 8-bit modifier still
++; picks zero page, whatever the value it masks.
++
++    lda mos8(240)               ; CHECK: encoding: [0xa5,0xf0]
++    lda mos8(240),x             ; CHECK: encoding: [0xb5,0xf0]
++    lda mos8(4660)              ; CHECK: encoding: [0xa5,0x34]
++    lda (mos8(240)),y           ; CHECK: encoding: [0xb1,0xf0]
++    lda (mos8(240),x)           ; CHECK: encoding: [0xa1,0xf0]
++    lda #mos8(4660)             ; CHECK: encoding: [0xa9,0x34]
++    lda mos16lo(4660)           ; CHECK: encoding: [0xa5,0x34]
++    lda mos16hi(4660)           ; CHECK: encoding: [0xa5,0x12]
++    lda mos24bank(1193046)      ; CHECK: encoding: [0xa5,0x12]
++
++; An unmodified constant is unaffected: it still picks the narrowest mode that
++; holds its value.
++
++    lda 240                     ; CHECK: encoding: [0xa5,0xf0]
++    lda 240,x                   ; CHECK: encoding: [0xb5,0xf0]
++    lda 4660,x                  ; CHECK: encoding: [0xbd,0x34,0x12]
