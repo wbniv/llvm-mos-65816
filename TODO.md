@@ -1142,12 +1142,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
      register" item added with 0038 was a re-discovery of patch 0003 (open upstream PR #584,
      Done 2026-08-01 below). It only reproduced on the isolated 0038 validation stack, which
      omits 0003; the project toolchain has the fix. Nothing to do. -->
-- [T2] **`dev/run.sh toolchain` leaves `build/llvm-mos/bin/llc` stale.** It builds and installs the
-  clang distribution targets only, so a green toolchain rebuild can leave `llc` (and any lit run on
-  it) months behind — it produced a false 13-vs-9 lit reading during the 0040 work and the same
-  trap is recorded in `docs/agent-handoff.md` (2026‑07‑31). Fix: add `llc` (and `llvm-lit`'s other
-  tool deps) to the build targets in `dev/toolchain.sh`, or add a `dev/run.sh lit` target that
-  rebuilds first. Reason for T2: one script, the target list is known.
 - [T5] **Upstream Windows CI red on `llvm-mos/main`: `CodeGen/AMDGPU/si-pre-allocate-wwm-regs-preserve-rci.mir`**
   (an MSVC comma-space CHECK mismatch), proven pre-existing on
   [main run 34793262107](https://github.com/llvm-mos/llvm-mos/actions/runs/34793262107) (2026‑09‑14),
@@ -1364,6 +1358,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [toolchain-llc] `dev/toolchain.sh` now rebuilds `llc`/`opt`/`llvm-mc`/`llvm-objdump`/`llvm-readobj`/`FileCheck`/`not` (the set the MOS lit RUN lines actually invoke) right after `install-distribution`; new `dev/run.sh lit [PATHS...]` refreshes them then runs `llvm-lit -s`. 153 MOS tests: 147 pass, 2 unsupported, 4 pre-existing fails (unrelated to this fix).
 - ✅ 2026-09-15 — [gallery-per-image-selfcheck] Verify-fidelity button shipped: gallery ROM republished + manifest flipped to `mode: "live-record"` (biohack.net `5e419b7`). See [plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
 - ✅ 2026-09-15 — [mandel-oop-title-entropy] Root cause: power-on-random CGWSEL $2130 clip-to-black; m7splash_begin now resets the PPU block itself. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - ✅ 2026-09-15 — [lzss-gallery-navigation-and-auto-advance-chevron] 14/15 PASS: step 12 corpus `0x9512` + byte-identical relink, step 15 live 5/5 on both sites. Step 14 is toolchain-drift ROM divergence, accepted per the gallery republish policy, not a nav defect. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).

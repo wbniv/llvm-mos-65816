@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|vlanest|jtedge|jtsparse|byvaledge|ovmatrix|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|lit|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|vlanest|jtedge|jtsparse|byvaledge|ovmatrix|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -102,7 +102,14 @@ Targets:
              maps the source (needs `toolchain` + `build`). drmon-side: drdevtools
              `task test-dap`.
   toolchain  build llvm-mos (clang/lld) FROM SOURCE -> build/llvm-mos-install
-             (for M1 codegen; long first build — see dev/toolchain.sh)
+             (for M1 codegen; long first build — see dev/toolchain.sh). Also
+             refreshes the lit tool set (llc/opt/llvm-mc/llvm-objdump/
+             llvm-readobj/FileCheck/not) in build/llvm-mos, so a green rebuild
+             never leaves `lit` reading a stale llc (see `lit` below).
+  lit        refresh that same lit tool set in build/llvm-mos, then run
+             build/llvm-mos/bin/llvm-lit -s against llvm/test/CodeGen/MOS +
+             llvm/test/MC/MOS, or the given PATHS (under /work). Needs
+             `toolchain` first. See dev/lit.sh / docs/agent-handoff.md.
   cross-toolchain  cross-build the clang/lld/llvm-* HOST tools for a NON-native host
              (linux-arm64 | windows-x86_64 | macos-arm64) from this x86-64 Linux
              container -> build/llvm-mos-install-<profile>. Runs in the cross image
