@@ -225,6 +225,16 @@ if [ ! -d "$SRC/.git" ]; then
   # "same order as the header" contract was silently violated. Pristine-
   # upstream one-liner; standalone so it stays reviewable apart from 0002.
   apply_patch 0046-mos-fixupkinds-addrasciz-row
+  # `llvm-mc -show-encoding` (any non --filetype=obj run) crashed on a
+  # symbolic `.mos_addr_asciz` operand: MCStreamer::emitValue's generic
+  # fallback can't print a not-yet-resolved value at a non-power-of-two
+  # width ("Don't know how to emit this value."), VK_ADDR_ASCIZ had no
+  # textual modifier spelling, and evaluateAsInt64's VK_ADDR_ASCIZ case was
+  # llvm_unreachable (UB, not a trap, in this no-asserts build). Applied
+  # after 0039 since it touches the same file's parseDirectiveAddrAsciz.
+  # Pristine-upstream, general MC-layer gap (not 24-bit-specific); standalone
+  # so it stays reviewable apart from 0002.
+  apply_patch 0047-mos-mc-addr-asciz-symbolic-crash
   # Fork-local lit coverage for the #320/#321 far + packed-24 codegen model:
   # far-addressing.ll ($af/$8f absolute-long, $a7/$87 direct-indirect-long),
   # far-call.ll ($22 JSL / $6b RTL / $5c TailJML), far-legalizer-bridges.ll
