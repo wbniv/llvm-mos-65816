@@ -270,14 +270,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [T2] **Promote `dev/probe-far-roundtrip.sh` to a committed round-trip gate** (`dev/run.sh roundtrip`)
-  over the 65816 corpus in all three modes — compile `-c` vs `-S`+`llvm-mc`, diff `.text` — so the two
-  AsmPrinter gaps (Done: [asmprinter-long-address], [asmprinter-a16-immediate]) can never regress silently
-  again. No round-trip gate existed before the 2026-09-24 #320 audit that wrote the script. **The baseline
-  is now clean**: `0045` added a `--all` flag (whole 117-fixture corpus, not just the far set) and all three
-  modes are 0 divergent, so no expected-failure set is needed — this is wiring plus a decision about what a
-  gate run may cost (`--all` is ~3× the far-set default). Reason for T2: the script exists and works.
-  [audit §6.4](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#64-nothing-tests-this).
 - [wip T2] <!-- agent:a997e50cfdce30851 --> **`llvm-mc -show-encoding` crashes on a symbolic `.mos_addr_asciz`** (`LLVM ERROR: Don't know how
   to emit this value.` — `VK_ADDR_ASCIZ` has no textual form and `evaluateAsInt64` is
   `llvm_unreachable`). `MC/MOS/addr-asciz.s` only exercises `--filetype=obj`, so nothing catches it. Not
@@ -1410,6 +1402,10 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [roundtrip-gate] Wired `dev/probe-far-roundtrip.sh` into `dev/run.sh roundtrip` (all 3
+  modes, `--all` 117-fixture default; `--far-only` opts into the fast far/packed24 subset) — confirmed
+  the 0-divergent baseline and the FAIL/exit-code path. See
+  [audit §6.4](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#64-nothing-tests-this).
 - ✅ 2026-09-24 — [fixupkinds-addrasciz-row] `MOSFixupKinds.cpp`'s `Infos[]` had 14 initialisers for 15
   fixup kinds; added the missing `AddrAsciz` row (`TargetSize=0`, deliberately — never relax, correct
   for this variable-width data directive) so the table matches its own "same order as the header"
