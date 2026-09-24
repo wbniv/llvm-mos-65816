@@ -909,7 +909,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [wip T2] <!-- agent:ac42f66260ff4c60c --> **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
+- [T2] **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
   independent uninitialised-state defect in the reels' own `setup_display()`, not the closed `m7title.h`
   one): `dev/title-entropy.sh` passes at frame 60 and fails at 100/200 on both pre- and post-fix ROMs
   (reel 2/8–3/8 entropy-1 runs differ; apollo 8/8 at 200). Both are the only adopters with no
@@ -917,6 +917,23 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   probe at the top of `setup_display()`, then reset the offending block. Reason for T2: two demos, a
   proven bisection recipe, no design. Promoted from Inbox 2026-09-24.
   [plan §follow-ups](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
+  **ESCALATED 2026-09-25 — the T2 recipe is empirically falsified, this is not a missing-reset bug.**
+  Reproduced both failures exactly (byte-identical hashes to the plan's record) via standalone
+  `dev/build.sh` battery-recipe builds. Applying the precedent fix (`snes_ppu_reset_blank()` at the top
+  of `setup_display()`, the pattern that closed `mandel-oop`) had **zero effect** — byte-identical output
+  hash before/after. Root-cause ruled out by tracing `vendor/bsnes-jg/src/random.cpp`: `JGX_ENTROPY`
+  randomizes WRAM/VRAM/CGRAM, not the `$2101-2133` register block `snes_ppu_reset_blank()` resets, and it
+  deliberately skips VRAM/CGRAM/OAM data ports — so a register reset structurally cannot touch what's
+  actually randomized. Visual evidence from two different, non-generic symptoms: apollo loses its entire
+  BG3 HUD text layer (points at the `video_hud_arm()` HDMA channel-1/2 mechanism, not register state);
+  reel shows a single vertical dark-blue seam in the Mode-7 area (a wrap/scroll artifact). Suggested next
+  step: trace `REG_BGMODE`/`REG_TM`/HDMA channel 1-2 state directly in bsnes-jg across an entropy-0 vs
+  entropy-1 apollo run. Also worth checking independently: `apollo`'s `reel_palette[448]` only populates
+  CGRAM entries 0-223 of 256 — entries 224-255 stay at whatever (randomized) CGRAM already held, a
+  possible second, unrelated contributor. Reproducible standalone battery-build scripts left in the
+  escalating agent's scratchpad (not committed — described in its handback, not re-derived here).
+  **Needs a T3/T4 re-rank** (a Fable session — this session couldn't write one); T2's "no design" premise
+  no longer holds.
 - [T2] **`rdiff`'s title card dominates both gate captures and the Gray-Scott field is never
   visible.** Measured 2026-09-15 on `main` (gate PASS, `corpus_result=0x5555`, so invisible to the
   differential): frames 500/2000/2600/3500 all show the title; frame 6000 is entirely black — title torn
