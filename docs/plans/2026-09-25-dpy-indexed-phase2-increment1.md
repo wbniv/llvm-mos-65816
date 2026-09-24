@@ -164,6 +164,15 @@ on; §5 step 7 is the differential evidence for it.
    reduction from §2.
 9. `dev/run.sh fuzz 50 1` — the differential fuzzer, which guards the **default** (non-`+mos-a16`)
    build too.
+10. **New gate `dev/run.sh farbank`** for §3.3, the one hardware-semantics claim the change rests
+    on. `farindex` cannot test it: its `tbl` is `uint16_t` based at `$C10000`, so an element read
+    is always 2-byte aligned and can never straddle `$xxFFFF`. `examples/65816/farbank.c` reads
+    that same generated table through a **byte** pointer as an unaligned 32-bit value at two
+    offsets whose four bytes straddle a bank boundary, so `Y ∈ {1,2,3}` — the whole folded window
+    — is exercised in one access and `Y = 2,3` are the carry into the bank byte. The offsets are
+    chosen so a wrap-inside-the-bank defect **cannot alias** into the right answer (the `$C1`/`$C2`
+    bank-base *low* bytes are both `0x00` under the value contract, which is why the read is four
+    bytes wide and not two): golden `0x00010000`, a wrapping `[dp],Y` folds to `0x80000001`.
 
 ## 5a. Verification results (2026‑09‑25)
 
@@ -238,7 +247,19 @@ host == +mos-a16 (both emulators)
 
 **PASS** (the "7/7" in older docs predates the corpus growing to 80 slices.)
 
-**6. `dev/run.sh corpus-a16`** — see the report; run after step 5 on the same worktree.
+**6. `dev/run.sh corpus-a16`**
+
+```
+==> corpus-a16: 79/79 passed, 0 xfail
+```
+
+**PASS**. (First attempt printed the same `79/79 passed, 0 xfail` but the *wrapper* then died with
+`dev/run.sh: line 647: e: command not found`, exit 127 — because `dev/run.sh` was edited **while
+that invocation was in flight** to register the new `farbank` target, and bash reads a script
+incrementally, so it resumed at a shifted byte offset after the hour-long `docker run` returned.
+The gate's own verdict came from an untouched `dev/corpus-a16.sh` inside the container and was
+valid, but the exit code was not, so it was re-run clean with no concurrent edits. **Lesson: never
+edit `dev/run.sh` while a `dev/run.sh` invocation is running.**)
 
 **7. `dev/run.sh roundtrip`**
 
@@ -311,7 +332,59 @@ Narrowing the gate cannot address it — no local, compile-time-visible predicat
 "the scheduler will interleave two carry chains", and a fires-only-when-there-are-fewer-than-three
 heuristic would be arbitrary and unmaintainable.
 
+**8a. Default-build isolation** (agent-handoff "Gating discipline — the fuzzer guards the DEFAULT
+build too"). Every `examples/65816/*.c` recompiled `-c -Os` with **no** `+mos-a16`, old vs new
+compiler, `cmp`'d byte for byte:
+
+```
+default 8-bit mode: identical=93 differs=0 skipped=19
+```
+
+**PASS** — the change cannot reach the default path: the new legalizer arm sits inside
+`selectAddressingMode`'s `case 32:` (a 32-bit far pointer), which only exists under `+mos-a16`,
+and both new pseudos are `Predicates = [HasW65816]`.
+
 **9. `dev/run.sh fuzz 50 1`** — see the report.
+
+**10. `dev/run.sh farbank`** — the new bank-crossing gate.
+
+```
+==> 1) +mos-a16 -verify clean + the [dp],y fold fired
+  PASS: tbl accessed via 24-bit far address (R_MOS_ADDR24_BANK tbl)
+  PASS: far load (lda [dp], a7) present — displacement 0 stays unindexed
+  PASS: 6 indexed far loads (lda [dp],y, b7) — 2 probes x Y=1,2,3 folded
+==> 2) host oracle reproduces the golden (0x00010000)
+  PASS: host oracle corpus_result=0x00010000 == golden 0x00010000
+==> 4) MAME: host == +mos-a16 (corpus_result == 0x00010000)
+SMOKE: PASS addr=0x7E0208 len=4 got=0x00010000 (ran 120 ticks)
+==> 5) bsnes-jg: +mos-a16 corpus_result == 0x00010000 (independent confirmation)
+  SMOKE: PASS off=0x208 len=4 got=0x00010000 (ran 240 frames, bsnes-jg)
+
+RESULT: PASS — unaligned 32-bit far reads straddling banks $C1/$C2 and $C2/$C3 via lda [dp],y
+fold to 0x00010000, host == +mos-a16 (both emulators)
+```
+
+**PASS** — §3.3's hardware claim is now differential evidence, not a datasheet citation: `[dp],Y`
+carries into the bank byte, on both emulators, at `Y = 2` and `Y = 3`. A wrapping `[dp],Y` would
+have folded to `0x80000001`.
+
+## 5b. Residual risk
+
+- **Only the constant-displacement slice is covered.** The runtime-index case the investigation's
+  §4 blit shape needs is untouched — measured unchanged (86 B before and after). That is
+  increment 2, not a gap in this one.
+- **The scheduler cliff is characterised but not fixed.** The mechanism is demonstrated
+  (`-enable-misched=false` recovers −79/−86 B) but the fix is in `MOSMachineScheduler`'s
+  carry-pressure model, a different subsystem. Until then, a function with three or more far
+  multi-byte accesses is a few bytes larger than before.
+- **`kMaxFarIndirIdxDisp = 3` is a measurement boundary, not a correctness one.** Nothing about
+  4..255 is unsafe — `Y` is 8-bit under `X=1` either way — the cap just keeps this increment to
+  the slice Phase 1 measured. Widening it is a one-line change plus its own measurement, and
+  `far_load_indir_idx4` in the lit test pins the current boundary so the widening is visible.
+- **The `0002` regeneration was run against two of another worker's *uncommitted* patches**
+  (`0020`, `0033`), because the committed versions no longer reverse out of the shared `vendor/`
+  tree. That is the same baseline `main`'s own dirty `0002` was generated on, so the result is
+  consistent — but if their `0020`/`0033` changes are abandoned, `0002` will need a re-regen.
 
 ## 6. Landing
 
