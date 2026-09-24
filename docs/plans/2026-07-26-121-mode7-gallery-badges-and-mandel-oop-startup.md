@@ -2268,11 +2268,10 @@ in `~/biohack.net` or `~/indri.studio` was touched.
   defect in the reels' own display setup, not the `m7title.h` one closed above. These two are also the
   only adopters with no `snes_ppu_reset_blank()` anywhere in `main()`. Same method applies: bisect the
   register groups with a temporary probe at the top of `setup_display()`.
-- `dev/title-entropy.sh` is not wired into any gate runner yet. Every `m7title.h` / `title_layer.h`
-  adopter is a candidate for the same class of defect, and the deterministic `JGX_ENTROPY=0` gates that
-  guard the battery today cannot see any of it. Wiring it — as a `dev/run.sh` target, or as a leg of
-  `dev/verify-web-roms.sh` over the published set — would turn this from a one-off investigation into a
-  standing guard. It costs one entropy‑0 render plus N entropy‑1 renders per frame per ROM, so the
-  published set at 3 frames × 8 runs is the realistic budget rather than all 255 examples.
+- ~~`dev/title-entropy.sh` is not wired into any gate runner yet.~~ Wired 2026-09-24 as an opt-in
+  `--title-entropy` leg of `dev/verify-web-roms.sh` (over the published manifest set, 3 frames × 8 runs,
+  opt-in rather than default because the sweep costs tens of seconds/ROM across 100+ published demos).
+  Verified it PASSes on a freshly-rebuilt fixed `mandel-oop.sfc` and correctly FAILs on the still-open
+  `snes-video-reel`/`apollo-reel` post-title defect. See [TODO.md](../../TODO.md) Done.
 
 

@@ -23,27 +23,42 @@
 #   dev/verify-web-roms.sh                 # verify ~/biohack.net
 #   dev/verify-web-roms.sh --site DIR
 #   dev/verify-web-roms.sh --only huffman,maze
+#
+# --title-entropy adds a second, OPT-IN leg: dev/title-entropy.sh (see that script's header) over
+# the same published ROM set, at the budget decided in
+# docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md §follow-ups — "the
+# published set at 3 frames × 8 runs" (one entropy-0 render + 8 entropy-1 renders per frame, not
+# all 255 examples). It is opt-in, not part of the default run, because at ~1-3 s/render it costs
+# tens of seconds PER ROM (published set is 100+ demos) — too slow to fold into the fast pre-publish
+# smoke+blankscan pass every rebuild runs. Run it as its own standing guard, or narrowed with
+# --only, when auditing for the uninitialised-PPU-state class of defect that closed
+# [mandel-oop-title-entropy] (2026-09-15).
 set -euo pipefail
 
 case "${1-}" in -h|--help)
   cat <<'USAGE'
-Usage: dev/verify-web-roms.sh [--site DIR] [--only slug[,slug...]]
+Usage: dev/verify-web-roms.sh [--site DIR] [--only slug[,slug...]] [--title-entropy]
 
 Replays every ROM in <site>/public/play/roms against its manifest.json self-check in bsnes-jg and
 scans each for force-blank bleed. Exits 1 if any demo mismatches or shows a black-band spike.
 
-  --site DIR   site checkout (default: ~/biohack.net)
-  --only LIST  comma-separated slugs instead of the whole manifest
+  --site DIR       site checkout (default: ~/biohack.net)
+  --only LIST      comma-separated slugs instead of the whole manifest
+  --title-entropy  also run dev/title-entropy.sh over the same ROM set (3 frames × 8 runs each —
+                   see the header comment). OFF by default: slow (100+ ROMs), run explicitly or
+                   with --only to scope it down.
 USAGE
   exit 0;; esac
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SITE="$HOME/biohack.net"
 ONLY=""
+TITLE_ENTROPY=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --site) SITE="$2"; shift 2;;
     --only) ONLY="$2"; shift 2;;
+    --title-entropy) TITLE_ENTROPY=1; shift;;
     *) echo "unknown arg: $1" >&2; exit 2;;
   esac
 done
@@ -160,6 +175,41 @@ done <<< "$ROWS"
 
 echo
 echo "verify-web-roms: $pass passed, $fail failed, $missing missing"
-if [ "$fail" -ne 0 ]; then echo "FAILED:$failed"; exit 1; fi
-if [ "$missing" -ne 0 ]; then echo "some ROMs missing from $SITE"; exit 1; fi
+overall=0
+if [ "$fail" -ne 0 ]; then echo "FAILED:$failed"; overall=1; fi
+if [ "$missing" -ne 0 ]; then echo "some ROMs missing from $SITE"; overall=1; fi
+
+if [ "$TITLE_ENTROPY" -eq 1 ]; then
+  TE="$ROOT/dev/title-entropy.sh"
+  [ -x "$TE" ] || { echo "FATAL: no title-entropy script at $TE"; exit 1; }
+  # Budget decided in docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md
+  # §follow-ups: one entropy-0 render + 8 entropy-1 renders per frame, at the 3 frames the
+  # mandel-oop/reel investigation already established as meaningful — 60 sits inside the title
+  # window, 100/200 sample after it (where the still-open reel/apollo post-title defect shows up).
+  TE_FRAMES="60,100,200"
+  TE_RUNS=8
+  echo
+  echo "==> title-entropy sweep: $TE_RUNS entropy-1 runs/frame at frames $TE_FRAMES, published set"
+  te_pass=0; te_fail=0; te_missing=0; te_failed=""
+  while IFS=$'\t' read -r id _; do
+    [ -n "$id" ] || continue
+    rom="$SITE/public/play/roms/$id.sfc"
+    if [ ! -f "$rom" ]; then
+      printf '  %-16s MISSING %s\n' "$id" "$rom"; te_missing=$((te_missing+1)); continue
+    fi
+    out=$(JGX="$JGX" JGX_DB="$DB" "$TE" "$rom" --runs "$TE_RUNS" --frames "$TE_FRAMES" 2>&1) || {
+      printf '  %-16s FAIL  title-entropy\n' "$id"
+      printf '%s\n' "$out" | sed 's/^/                     /'
+      te_fail=$((te_fail+1)); te_failed="$te_failed $id"; continue
+    }
+    printf '  %-16s PASS  title-entropy (3 frames x %s runs)\n' "$id" "$TE_RUNS"
+    te_pass=$((te_pass+1))
+  done <<< "$ROWS"
+  echo
+  echo "title-entropy: $te_pass passed, $te_fail failed, $te_missing missing"
+  if [ "$te_fail" -ne 0 ]; then echo "TITLE-ENTROPY FAILED:$te_failed"; overall=1; fi
+  if [ "$te_missing" -ne 0 ]; then echo "title-entropy: some ROMs missing from $SITE"; overall=1; fi
+fi
+
+if [ "$overall" -ne 0 ]; then exit 1; fi
 echo "ALL PASS — safe to publish"

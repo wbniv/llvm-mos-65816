@@ -907,14 +907,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [T2] **`dev/title-entropy.sh` is not wired into any gate runner.** Every `m7title.h`/`title_layer.h`
-  adopter is a candidate for the uninitialised-PPU-state class of defect that closed
-  [mandel-oop-title-entropy] (2026-09-15), and the deterministic `JGX_ENTROPY=0` gates that guard the
-  battery today cannot see any of it. Wire it as a `dev/run.sh` target or a leg of
-  `dev/verify-web-roms.sh` over the **published** set at 3 frames × 8 runs (the plan's stated budget — one
-  entropy-0 render + N entropy-1 renders per frame per ROM, not all 255 examples). Reason for T2: the
-  script exists and the budget/shape is decided; it is wiring. Promoted from Inbox 2026-09-24.
-  [plan §follow-ups](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - [T2] **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
   independent uninitialised-state defect in the reels' own `setup_display()`, not the closed `m7title.h`
   one): `dev/title-entropy.sh` passes at frame 60 and fails at 100/200 on both pre- and post-fix ROMs
@@ -1386,6 +1378,9 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [title-entropy-gate-wiring] Wired `dev/title-entropy.sh` as an opt-in `--title-entropy`
+  leg of `dev/verify-web-roms.sh` over the published manifest set, 3 frames × 8 runs. See
+  [plan §follow-ups](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - ✅ 2026-09-24 — [newton-basin-capture] Raised `dev/newton.sh`'s bsnes-jg frame count and MAME `SHOT_AT`/`-seconds_to_run` from 500/12s to 6500/114s so both published screenshots show the completed basin fill (98.3% non-black vs 3.1% before); gate hash unchanged (`0x4D8B`, PASS). See [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - ✅ 2026-09-24 — [dpy-indexed-measure] Measured `[dp],Y` (`b7`/`97`): **GO** — 36→19 B / 50→28 cy single access, 68→10 B loop body; 0 genuine `b7`/`97`/`9f` in 487 SNES ROMs. See [investigation](docs/investigations/2026-09-24-dpy-indexed-measurement.md).
 - ✅ 2026-09-24 — [far-lit-coverage] Far/packed-24 codegen had zero lit coverage; added four fork-local
