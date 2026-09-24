@@ -120,6 +120,9 @@ if [ ! -d "$SRC/.git" ]; then
   # generic-LLVM + clang half only; the MOS-dir half is already inside 0002
   apply_patch 0006-320-packed24 \
     --include='clang/*' --include='llvm/include/*' --include='llvm/lib/CodeGen/*'
+  # Preserve undef lanes when an allocated virtual COPY becomes a physical
+  # identity copy; the generic rewriter keeps the definition as a KILL.
+  apply_patch 0028-llvm-virtregrewriter-undef-lane-identity-copy
   # Keep call-argument registers available to constrained virtual operands
   # when the two-address pass considers moving a physical-register definition.
   apply_patch 0029-llvm-twoaddr-physreg-reschedule
@@ -128,10 +131,14 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0033-llvm-spill-hoist-no-new-vregs
   # __builtin_prefetch: clang emits the rw/locality operands as i32 on
   # 16-bit-int targets (generic clang fix, aimed at llvm/llvm-project).
-  apply_patch 0035-clang-prefetch-int16-operands
+  # -vendor twin: the upstream form targets the 742d554 validation tree (Clang's
+  # EmitScalarOrConstFoldImmArg/ICEArguments shape); the pin still has EmitScalarExpr.
+  apply_patch 0035-clang-prefetch-int16-operands-vendor
   # GlobalISel inline asm: store indirect register outputs ("=*r", what clang
   # emits for "+g") through their pointer (generic lowering + MOS/AArch64 tests).
-  apply_patch 0037-llvm-gisel-inline-asm-indirect-output
+  # -vendor twin: the upstream form targets the 742d554 validation tree (whose
+  # GISelAsmOperandInfo already carries the RegClass member); the pin does not.
+  apply_patch 0037-llvm-gisel-inline-asm-indirect-output-vendor
   # InlineSpiller::coalesceStackAccess must not erase a stack access that carries
   # extra virtual defs (MOS's reload hook mints an Imag16 scratch pointer): the
   # orphaned vreg keeps its assignment in the interference matrix over a SlotIndex
@@ -144,7 +151,9 @@ if [ ! -d "$SRC/.git" ]; then
   # now split/merge least significant piece first, as SelectionDAG's
   # RegsForValue does. Stacks on 0037 (same file). Generic LLVM + MOS/AArch64
   # tests, so no dev/regen-patch.sh entry.
-  apply_patch 0041-llvm-gisel-inline-asm-multi-register
+  # -vendor twin: the upstream form targets the 742d554 validation tree (it also
+  # deletes an arm64-fallback.ll case that does not exist at the pin).
+  apply_patch 0041-llvm-gisel-inline-asm-multi-register-vendor
   # Upstream-bound standalone fix, carried until it merges — the same slot and
   # lifecycle as the retired 0003-late-opt-txy-dead-flag (-> PR #562). Applies
   # after 0002 because both touch MOSLateOptimization.cpp, and it is BAKED INTO

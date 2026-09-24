@@ -1,0 +1,62 @@
+diff --git a/clang/lib/CodeGen/CGBuiltin.cpp b/clang/lib/CodeGen/CGBuiltin.cpp
+index 98e43bf45..f315507a4 100644
+--- a/clang/lib/CodeGen/CGBuiltin.cpp
++++ b/clang/lib/CodeGen/CGBuiltin.cpp
+@@ -3959,11 +3959,14 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
+   }
+   case Builtin::BI__builtin_prefetch: {
+     Value *Locality, *RW, *Address = EmitScalarExpr(E->getArg(0));
+-    // FIXME: Technically these constants should of type 'int', yes?
+     RW = (E->getNumArgs() > 1) ? EmitScalarExpr(E->getArg(1)) :
+       llvm::ConstantInt::get(Int32Ty, 0);
+     Locality = (E->getNumArgs() > 2) ? EmitScalarExpr(E->getArg(2)) :
+       llvm::ConstantInt::get(Int32Ty, 3);
++    // The rw and locality arguments keep the type of the promoted C expression
++    // (16-bit int, long, long long, ...), but the intrinsic takes i32.
++    RW = Builder.CreateIntCast(RW, Int32Ty, /*isSigned=*/false);
++    Locality = Builder.CreateIntCast(Locality, Int32Ty, /*isSigned=*/false);
+     Value *Data = llvm::ConstantInt::get(Int32Ty, 1);
+     Function *F = CGM.getIntrinsic(Intrinsic::prefetch, Address->getType());
+     Builder.CreateCall(F, {Address, RW, Locality, Data});
+diff --git a/clang/test/CodeGen/builtin-prefetch-int16.c b/clang/test/CodeGen/builtin-prefetch-int16.c
+new file mode 100644
+index 000000000..ae47329ef
+--- /dev/null
++++ b/clang/test/CodeGen/builtin-prefetch-int16.c
+@@ -0,0 +1,36 @@
++// The rw and locality operands of __builtin_prefetch keep the type of the
++// promoted C expression, but llvm.prefetch takes i32. The call must be emitted
++// with i32 operands whether the expression is narrower (16-bit int) or wider
++// (long, long long) than that.
++// RUN: %clang_cc1 -triple msp430 -emit-llvm -o - %s | FileCheck %s
++// RUN: %clang_cc1 -triple x86_64-linux-gnu -emit-llvm -o - %s | FileCheck %s
++
++void explicit_args(char *p) {
++  // CHECK-LABEL: @explicit_args
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 1, i32 2, i32 1)
++  __builtin_prefetch(p, 1, 2);
++}
++
++void default_args(char *p) {
++  // CHECK-LABEL: @default_args
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 0, i32 3, i32 1)
++  __builtin_prefetch(p);
++}
++
++void rw_only(char *p) {
++  // CHECK-LABEL: @rw_only
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 1, i32 3, i32 1)
++  __builtin_prefetch(p, 1);
++}
++
++void long_args(char *p) {
++  // CHECK-LABEL: @long_args
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 1, i32 2, i32 1)
++  __builtin_prefetch(p, 1L, 2L);
++}
++
++void long_long_args(char *p) {
++  // CHECK-LABEL: @long_long_args
++  // CHECK: call void @llvm.prefetch.p0(ptr %{{.*}}, i32 0, i32 1, i32 1)
++  __builtin_prefetch(p, 0LL, 1LL);
++}
