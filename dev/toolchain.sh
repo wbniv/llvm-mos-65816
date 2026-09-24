@@ -17,6 +17,9 @@ set -euo pipefail
 usage() {
   echo "Usage: dev/run.sh toolchain   # build llvm-mos clang/lld from source -> build/llvm-mos-install"
   echo "Env: BUILD_JOBS (compile parallelism, default 6 — lower if the 14 GiB host swaps)"
+  echo "     LLVM_MOS_PIN (upstream SHA a FRESH vendor/ is checked out at; an existing"
+  echo "                   vendor/ is never reset, only warned about when it has drifted)"
+  echo "     LLVM_MOS_URL (upstream remote, default github.com/llvm-mos/llvm-mos.git)"
   exit 0
 }
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
@@ -26,15 +29,44 @@ SRC="$ROOT/vendor/llvm-mos"
 BUILDDIR="$ROOT/build/llvm-mos"
 INSTALL="$ROOT/build/llvm-mos-install"
 JOBS="${BUILD_JOBS:-6}"
+# The upstream commit a fresh bootstrap checks out. PINNED, not `main`: the tracked
+# patch stack is generated against exactly one base, so cloning whatever `main` happens
+# to be that day silently produces a different compiler (or fails to apply at all) —
+# the opposite of "a clean build reproduces our compiler".
+#
+# Why this SHA: `dev/regen-patch.sh` derives its baseline from `git -C vendor rev-parse
+# HEAD`, so `0002-321-accum16.patch` is BY CONSTRUCTION a diff against whatever the live
+# vendor/ checkout is — currently 8be0546 ("[MOS] Pass addrspace(1) … in an 8-bit
+# register", #563). That makes 8be0546 the only base 0002 is known to apply to.
+# `build/upstream-reference/742d554…` is a NEWER reference some per-patch validation used
+# (and the live vendor/ clone is shallow, so it cannot even reach it). Moving this pin is
+# therefore not a one-liner: regenerate 0002 against the new base, then re-verify every
+# standalone patch applies. See docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md.
+LLVM_MOS_PIN="${LLVM_MOS_PIN:-8be0546128a55e78c63ca571d466aa72a782cd36}"
+LLVM_MOS_URL="${LLVM_MOS_URL:-https://github.com/llvm-mos/llvm-mos.git}"
 export CCACHE_DIR="$ROOT/build/.ccache"
 # /opt/llvm-mos/bin (the mos CROSS toolchain) is first on the image PATH and shadows
 # host tools — a bare clang/llvm-ar/assembler there targets mos, not x86-64. Put host
 # /usr/bin first for this host build so every tool (incl. the .S assembler) is native.
 export PATH="/usr/bin:$PATH"
 
-echo "==> clone llvm-mos (shallow main) into vendor/ (gitignored)"
+echo "==> fetch llvm-mos @ ${LLVM_MOS_PIN:0:12} into vendor/ (gitignored, shallow, pinned)"
 if [ ! -d "$SRC/.git" ]; then
-  git clone --depth 1 https://github.com/llvm-mos/llvm-mos.git "$SRC"
+  # Fetch the pinned commit directly rather than cloning a branch tip. GitHub serves
+  # arbitrary SHAs (uploadpack.allowAnySHA1InWant), so one shallow fetch is enough; if a
+  # mirror refuses that, fall back to a full fetch and check the SHA out from history.
+  git init -q "$SRC"
+  git -C "$SRC" remote add origin "$LLVM_MOS_URL" 2>/dev/null || \
+    git -C "$SRC" remote set-url origin "$LLVM_MOS_URL"
+  if ! git -C "$SRC" fetch -q --depth 1 origin "$LLVM_MOS_PIN"; then
+    echo "    shallow fetch of the pinned SHA was refused; falling back to a full fetch"
+    git -C "$SRC" fetch -q origin
+  fi
+  git -C "$SRC" checkout -q --detach "$LLVM_MOS_PIN"
+  # Fail loudly rather than silently building a different compiler.
+  got="$(git -C "$SRC" rev-parse HEAD)"
+  [ "$got" = "$LLVM_MOS_PIN" ] || {
+    echo "FATAL: vendor/ checked out $got, expected $LLVM_MOS_PIN" >&2; exit 1; }
   # Apply our tracked backend patches to the fresh clone. These are the eventual
   # upstream PR diffs, kept in-repo so a clean build reproduces our compiler.
   #
@@ -146,6 +178,16 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0038-mos-return-frame-address -C1
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
+# An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and
+# carries in-progress work). Say so loudly when it has drifted off the pin, so a build that
+# is not reproducible from the patch stack is at least not a silent one.
+vendor_head="$(git -C "$SRC" rev-parse HEAD 2>/dev/null || echo '?')"
+if [ "$vendor_head" != "$LLVM_MOS_PIN" ]; then
+  echo "    WARNING: vendor/ is at ${vendor_head:0:12}, not the pin ${LLVM_MOS_PIN:0:12}."
+  echo "             This build is NOT reproducible from patches/llvm-mos/ alone. Either move"
+  echo "             LLVM_MOS_PIN (and regenerate 0002 against the new base), or rebuild from a"
+  echo "             fresh vendor/ checkout."
+fi
 
 # Trim the upstream MOS distribution to just clang + lld + the mos builtins. The
 # stock cache also builds clang-tools-extra (clangd, clang-tidy, include-fixer, …) —
