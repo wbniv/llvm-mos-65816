@@ -270,17 +270,18 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [T3] **`[dp],Y` (`b7`/`97`) indirect-long-indexed is never selected — MEASURE first.** A far pointer
-  plus a runtime index always materialises a 32-bit pointer add then `lda [dp]`; `farindex.c`, a
-  *dedicated* far-array-subscript fixture, emits 34× `lda [dp]` and zero `lda [dp],y`. Also unselected:
-  `sta long,X` (`9f`) and the long-form `cmp`/`eor`/`ora`/`and`/`adc`/`sbc`. Governing lesson 2 applies
-  exactly — a native long form is not automatically smaller, and the win depends on operand residency
-  and schedule. Phase 1 (this rank, T3, throwaway worktree): build the `[dp],Y` shape by hand for
-  `farindex.c`-class access in realistic 16-bit-ambient context and diff bytes/cycles against add+`[dp]`;
-  record GO/NO-GO. Phase 2 only on GO, re-ranked **T4**: select it behind a conservative gate that can
-  only miss a win. Unknown per the audit: whether `b7`/`97` fire on `examples/snes/`/SDK code (census
-  covered `examples/65816/*.c` only) — check that first, it may change the answer.
-  [audit §2](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#2-codegen--instruction-selection--done-for-correctness-measured-gaps-in-coverage).
+- [ ] **Phase 2 — select `[dp],Y` (`b7`/`97`) behind a conservative gate.** Phase 1 measured **GO**
+  ([investigation](docs/investigations/2026-09-24-dpy-indexed-measurement.md)): folding the index is
+  −47 % bytes / −44 % cycles on a single 8‑bit‑indexed far access, and 68 → 10 loop‑body bytes
+  (~5.6× cycles) on a realistic 64‑iteration far→WRAM blit; with the add hoisted on *both* sides the
+  addressing mode alone still wins −50 % bytes / −31 % cycles. The add is never amortised today, and
+  where a far pointer *is* reused the reuse mechanism is a 14–26 byte `inc`/`bne` carry chain that
+  `iny` strictly dominates — so folding cannot lose reuse. Gate per the investigation §6: Y's width is
+  governed by **X** not M (8‑bit under `+mos-a16`, 16‑bit only under `+mos-xy16`); gate on the *scaled*
+  byte offset, unsigned; require Y free or already index‑resident; a misclassification must only ever
+  miss a win. Recommended first increment is the zero‑proof `Y ∈ {0,1,2,3}` sub‑case (multi‑byte access
+  off an existing far pointer), which needs no range analysis at all. **Not** covered by the GO verdict:
+  `9f` (`sta long,X`) and the long‑form arithmetic — they need their own measurement.
 ### M2 — Optimizing Payoff
 
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
@@ -1390,6 +1391,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [dpy-indexed-measure] Measured `[dp],Y` (`b7`/`97`): **GO** — 36→19 B / 50→28 cy single access, 68→10 B loop body; 0 genuine `b7`/`97`/`9f` in 487 SNES ROMs. See [investigation](docs/investigations/2026-09-24-dpy-indexed-measurement.md).
 - ✅ 2026-09-24 — [far-lit-coverage] Far/packed-24 codegen had zero lit coverage; added four fork-local
   tests (`CodeGen/MOS/far-addressing.ll`, `far-call.ll`, `far-legalizer-bridges.ll`, `far-phi.ll`, patch
   `0048`) pinning `$af`/`$8f`/`$a7`/`$87` selection, `$22`/`$6b`/`$5c` far call/return/tail, the
