@@ -2438,8 +2438,16 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        of the same defect; it is fixed alongside it, not separately.
      - "corpus/setjmp_sim.c is not a sufficient guard on its own" -> #116 backtrack now covers the
        return-out-of-a-setjmp-frame case and is in expected.tsv, so the gap is closed. -->
+<!-- triaged 2026-09-24: three of the four 0044 captures are covered or non-work.
+     • "The 16-bit-immediate sibling" -> the curated M2 item "[T4] AsmPrinter does not mark
+       16-bit immediates under +mos-a16" already owns it; the 0044 plan §3 just records the
+       shape it should reuse. Nothing separately open.
+     • "Promoting the probe to a gate" -> the curated M2 item "[T2] Promote
+       dev/probe-far-roundtrip.sh to a committed round-trip gate" already owns it; 0044 only
+       changes the baseline it should record (0 divergent default-8bit, 2 fixtures a16).
+     • "jml for $5C" -> a deliberate NON-GOAL recorded in the 0044 plan §2 (mos24() already
+       disambiguates the encoding), not work. Do not re-open.
+     The remaining bullet (the 0044 upstream PR draft) is genuine open work with no curated
+     owner and is left here for ranking — it mirrors the 0043 PR-draft item. -->
 - [ ] **(triage)** **The upstream PR draft for `0044`.** The patch is upstream-clean (stock 65816; it touches no `+mos-a16` code and its lit test needs no fork patch), but the PR body / `docs/pr-preparations/` validation record is a separate task, exactly as `0043`'s was. Ranking is the orchestrator's call, so this plan does not write a `TODO.md` item for it. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:aae009e400ac4fcc -->
-- [ ] **(triage)** **The 16-bit-immediate sibling.** `farindex.c` and `farspill-probe.c` still diverge under `+mos-a16` (§7 step 4). That is the `[T4] AsmPrinter does not mark 16-bit immediates under +mos-a16` item; §3 states the shape it should reuse. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:241ef2353cc4be3b -->
-- [ ] **(triage)** **Promoting the probe to a gate.** `dev/probe-far-roundtrip.sh` is still run by hand. With the long-address class fixed, its `-Os` (default 8-bit) run is now **0 divergent**, so the `[T2]` gate item can record a clean baseline for that mode and an expected-failure set of exactly two fixtures for `+mos-a16` until the sibling item lands. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:02868b700bef2e10 -->
-- [ ] **(triage)** **`jml` for `$5C`.** Deliberately deferred, §2. — _from [2026-09-24-asmprinter-long-address.md](docs/plans/2026-09-24-asmprinter-long-address.md)_  <!-- fp:83894ab00026f1cb -->
 <!-- END auto-captured-deferrals -->
