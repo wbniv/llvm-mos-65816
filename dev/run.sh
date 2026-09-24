@@ -95,6 +95,18 @@ Targets:
              Currently armed with 2 rows, both for the open RA cause-#2 XFAIL
              a16-rc-undef-ra-pure-virtual: rcundef2.c @ -Os and newton_sim.c @ -O1.
              Toolchain-only (no SDK/emulator/secret).
+  roundtrip  round-trip REGRESSION gate (dev/roundtrip.sh, wrapping dev/probe-far-
+             roundtrip.sh): compile every examples/65816/*.c fixture `-c` (reference)
+             and `-S`+llvm-mc (round trip) with the SAME clang, diff the .text bytes —
+             a divergence is a printer/parser asymmetry (the class patches 0044/0045
+             fixed). Runs all three modes (default 8-bit, +mos-a16, +mos-a16
+             +mos-xy16) over the FULL 117-fixture corpus by default (`--far-only` opts
+             into the fast far/packed24-only subset for quick iteration — the audit
+             that motivated this gate found that subset alone missed 30 of 32
+             divergent fixtures). Host-side, compile-only: no container, no emulator,
+             no SDK platform needed (needs `toolchain` first, runs directly — not
+             dispatched through Docker like the targets below).
+             See docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#64-nothing-tests-this.
   dwarf      ROADMAP step 6 compiler-side gate: a `-g` build emits verifiable DWARF
              AND ld.lld writes the <output>.elf debug companion — assert (shapes,
              not addrs): companion present, --verify clean, addr_size 0x04,
@@ -538,6 +550,12 @@ fi
 # not an in-container target — run it directly and stop.
 if [ "$TARGET" = "repro" ]; then
   exec "$HERE/repro.sh" "${@:2}"
+fi
+
+# `roundtrip` is host-side, compile-only (dev/probe-far-roundtrip.sh: no container, no
+# emulator, no SDK platform needed) — run it directly like `repro`, not through Docker.
+if [ "$TARGET" = "roundtrip" ]; then
+  exec "$HERE/roundtrip.sh" "${@:2}"
 fi
 
 # `fuzz` dispatches by generator (--gen, default csmith). The Csmith generator and its

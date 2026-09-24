@@ -118,6 +118,15 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
     -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -c FILE.c -o /tmp/x.o
   ```
   Use the `-Xclang -target-feature -Xclang +mos-a16` form (the driver rejects `-mattr`). Clean exit = OK.
+- **Round-trip regression gate (no container needed):** `dev/run.sh roundtrip` — for every
+  `examples/65816/*.c` fixture, compiles `-c` (reference) and `-S`+`llvm-mc` (round trip) with the
+  same clang and diffs the `.text` bytes, in all three modes (default 8-bit, `+mos-a16`, `+mos-a16
+  +mos-xy16`); a divergence is a printer/parser asymmetry (the class patches 0044/0045 fixed — see
+  [`investigations/2026-09-24-mos24-far-addressing-completeness-audit.md`](investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#64-nothing-tests-this)).
+  `--far-only` narrows to the fast far/packed24 subset for quick iteration (that subset alone missed
+  30 of 32 divergent fixtures in the last real regression this gate caught — never use it as the
+  release check). Wraps `dev/probe-far-roundtrip.sh` (`dev/roundtrip.sh`). Needs `toolchain` first;
+  runs directly on the host like `repro`/`fuzz`, not dispatched through Docker.
 - **Disasm / size:** `build/llvm-mos-install/bin/llvm-objdump -d --mcpu=mosw65816 /tmp/x.o`;
   `… --section-headers /tmp/x.o` → per-function `.text.<name>` byte size. In an unlinked `.o`, zero-page
   operands all print as `$0` (relocation placeholders) — for symbolic operand names compile to assembly
