@@ -1171,7 +1171,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
   test. Reason for T3: one target hook pair, but the intended semantics need settling.
-- [wip T3] **`dev/toolchain.sh` cannot bootstrap from the pin: the upstream-bound patch files do not apply at `8be0546`.** <!-- agent:PENDING -->
+- [wip T3] **`dev/toolchain.sh` cannot bootstrap from the pin: the upstream-bound patch files do not apply at `8be0546`.** <!-- agent:ae0287243056425f7 -->
   The clean-bootstrap proof ([record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md)) fetched
   the pin and applied 10 of 25 patches, then `0035-clang-prefetch-int16-operands` failed: it (like 0033,
   0037, 0040, 0041 and the other upstream-bound patches) was generated against the newer validation tree
