@@ -2473,4 +2473,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-09-24: the fixupkinds-addrasciz-row verify stub is resolved — all three
      verification steps now carry raw output + PASS in the plan file, and the item is already
      in ## Done ([fixupkinds-addrasciz-row]). Not work. fp:255b0081c55a9e47 -->
+<!-- triaged 2026-09-24: already tracked by the curated Open item "snes-video-reel and
+     apollo-reel are entropy-sensitive AFTER the title" (Test Bench / CI, wip T2). Not new
+     work. fp:bd244e96fd5c633a -->
+<!-- triaged 2026-09-24: already closed — see Done [title-entropy-gate-wiring]. Not work.
+     fp:26cd0e82ac7f98dd -->
 <!-- END auto-captured-deferrals -->
