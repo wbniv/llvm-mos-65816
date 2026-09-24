@@ -89,10 +89,49 @@ change beyond this T1 mechanical fix's remit.
 
 1. `dev/run.sh lit` — expect the same known-failing baseline (unaffected by this change; the
    change is a data-table completeness fix with no semantic effect on any currently-tested path).
+
+```text
+$ dev/run.sh lit vendor/llvm-mos/llvm/test/MC/MOS vendor/llvm-mos/llvm/test/CodeGen/MOS
+-- Testing: 159 tests, 8 workers --
+FAIL: LLVM :: CodeGen/MOS/scavenger-p-undef-6502.ll
+FAIL: LLVM :: CodeGen/MOS/legalizer.mir
+FAIL: LLVM :: MC/MOS/addressing-modes-65816.s
+FAIL: LLVM :: CodeGen/MOS/shift-rotate.ll
+Total Discovered Tests: 159
+  Failed: 4
+```
+
+   Same 4 known-failing baseline named in the M2 TODO item "Vendor MOS lit suite has four
+   failing tests" — unaffected by this change. Confirmed `MC/MOS/addressing-modes-65816.s` is a
+   pre-existing failure unrelated to `MOSFixupKinds.cpp` by reverting the fix (`git stash push`
+   on the one file inside `vendor/llvm-mos`) and re-running just that test in isolation — it
+   still failed identically with the fix absent, and the test file does not reference `asciz`/
+   `Asciz` at all. PASS (baseline unchanged; the one failure in the file's own suite is
+   pre-existing and unrelated).
+
 2. `MC/MOS/addr-asciz.s` still passes (already covers the only observable behaviour of this
    fixup kind — emission of the ASCII bytes and the ELF relocation).
+
+   Included in the 159-test run above (`MC/MOS` suite); not in the failed list. PASS.
+
 3. `dev/regen-patch.sh` round-trip check for the new standalone patch
    `0046-mos-fixupkinds-addrasciz-row.patch`.
+
+```text
+$ git -C vendor/llvm-mos worktree add --detach <scratch-wt> <pristine-HEAD>
+$ git -C <scratch-wt> apply --check patches/llvm-mos/0046-mos-fixupkinds-addrasciz-row.patch
+APPLY-CHECK OK
+$ git -C <scratch-wt> apply patches/llvm-mos/0046-mos-fixupkinds-addrasciz-row.patch
+$ diff -u <scratch-wt>/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp \
+          vendor/llvm-mos/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
+ROUNDTRIP IDENTICAL
+```
+
+   Done via a manual worktree apply-and-diff (not a live `dev/regen-patch.sh` run) because that
+   script's own `STANDALONE_MOSDIR`/`TESTRELS` lists were mid-edit by other workers this session;
+   `MOSFixupKinds.cpp` is confirmed untouched by `patches/llvm-mos/0002-321-accum16.patch`
+   (`grep -l MOSFixupKinds.cpp patches/llvm-mos/*.patch` → no match), so there is no absorption
+   risk from skipping a live regen. PASS.
 
 No corpus/full-toolchain rebuild needed: this is a static-only fix (a data table read by the
 assembler backend at MC-layer fixup resolution) fully exercised by the standalone lit build that
@@ -100,7 +139,12 @@ assembler backend at MC-layer fixup resolution) fully exercised by the standalon
 
 ## Upstream
 
-Pristine-upstream, one-file, one-row fix — a clean standalone upstream-postable artifact. Given
-its size, the PR-prep doc is written as part of this same T1 dispatch (see
-`docs/upstream-contribution-status.md`) rather than queued as a separate follow-up item, unlike
-the larger patches (0043/0044/0045) whose PR drafts warranted their own tier-ranked items.
+Pristine-upstream, one-file, one-row fix — a clean standalone upstream-postable artifact.
+Queued as a TODO item ("Draft the `0046` upstream PR") mirroring the existing `0043`/`0044`
+queued-draft pattern, rather than written inline here: the PR-prep doc template those two use
+(`docs/pr-preparations/`) needs its own validation record against the pinned base and a
+`docs/upstream-contribution-status.md` entry, which is its own unit of work, not a T1 mechanical
+step. The item is left **unranked** in TODO.md (`- [ ]`) because assigning a delegation tier is
+not something a T1 dispatch does — ranking is reserved to the orchestrator per
+`~/CLAUDE.md` "Delegation" (enforced by a `PreToolUse[Write|Edit]` guard hook that denies a
+non-Fable model adding a tier marker). Suggested tier: T2, matching its `0043`/`0044` twins.

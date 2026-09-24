@@ -2482,5 +2482,7 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      owner and is left here for ranking — it mirrors the 0043 PR-draft item. -->
 <!-- triaged 2026-09-24: the 0044 upstream PR draft is genuine open work — PROMOTED to the
      Upstream / Contribution section as a [T2] item beside its 0043 twin. fp:aae009e400ac4fcc -->
-- [verify] **2026-09-24-fixupkinds-addrasciz-row** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-24-fixupkinds-addrasciz-row.md](docs/plans/2026-09-24-fixupkinds-addrasciz-row.md)_  <!-- fp:255b0081c55a9e47 -->
+<!-- triaged 2026-09-24: the fixupkinds-addrasciz-row verify stub is resolved — all three
+     verification steps now carry raw output + PASS in the plan file, and the item is already
+     in ## Done ([fixupkinds-addrasciz-row]). Not work. fp:255b0081c55a9e47 -->
 <!-- END auto-captured-deferrals -->
