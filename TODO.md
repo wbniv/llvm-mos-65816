@@ -278,7 +278,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   modes are 0 divergent, so no expected-failure set is needed — this is wiring plus a decision about what a
   gate run may cost (`--all` is ~3× the far-set default). Reason for T2: the script exists and works.
   [audit §6.4](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#64-nothing-tests-this).
-- [T2] **`llvm-mc -show-encoding` crashes on a symbolic `.mos_addr_asciz`** (`LLVM ERROR: Don't know how
+- [wip T2] <!-- agent:a997e50cfdce30851 --> **`llvm-mc -show-encoding` crashes on a symbolic `.mos_addr_asciz`** (`LLVM ERROR: Don't know how
   to emit this value.` — `VK_ADDR_ASCIZ` has no textual form and `evaluateAsInt64` is
   `llvm_unreachable`). `MC/MOS/addr-asciz.s` only exercises `--filetype=obj`, so nothing catches it. Not
   24-bit-specific; found incidentally by the 2026-09-24 #320 audit. Needs a textual form plus a
@@ -1226,13 +1226,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   (same template, same session); cite `MC/MOS/long-address-roundtrip-65816.s` as the failing-before test and
   the `af f0 00 00 → a5 f0` one-shot as the motivating bytes. Reason for T2: 0033/0036 docs are the template;
   no design. Posting stays user-triggered.
-- [ ] **Draft the `0046` upstream PR** (`MOSFixupKinds.cpp` `Infos[]` missing-row fix; landed, patch `0046`,
+- [T2] **Draft the `0046` upstream PR** (`MOSFixupKinds.cpp` `Infos[]` missing-row fix; landed, patch `0046`,
   [plan](docs/plans/2026-09-24-fixupkinds-addrasciz-row.md)). Pristine-upstream, one file, one row — as clean
   as `0043`/`0044` — but has no PR body, no `docs/pr-preparations/` validation record against the pinned base,
   and no `docs/upstream-contribution-status.md` entry. Pair it with `0043`/`0044`'s drafts (same template);
   the whole "before" state is `Info.Name == nullptr` for `MOS::AddrAsciz`, confirmable with a one-line debug
-  print or gdb break in `getFixupKindInfo`. Unranked (a T1 dispatch cannot assign a tier) — suggest T2 to
-  match its `0043`/`0044` twins (same size, same template). Posting stays user-triggered.
+  print or gdb break in `getFixupKindInfo`. Reason for T2: matches its `0043`/`0044` twins (same size, same
+  template); no design. Posting stays user-triggered.
 - [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 154 tests, 148 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
   `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
