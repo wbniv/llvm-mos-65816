@@ -41,14 +41,25 @@ OFF="0x$VMA"
 ADDR=$(printf '0x%X' $(( 0x7E0000 + 0x$VMA )))
 echo "==> built build/mandel-oop.sfc (+mos-a16, -verify clean); corpus_result @ WRAM $OFF"
 
-# NOT FIXED: the vacuous-verify pattern (link above claims -mllvm -verify-machineinstrs but
-# --config's default LTO never runs it) still applies here. An explicit -fno-lto -c verify
-# compile was tried and trips the ALREADY-KNOWN `a16-rc-undef-ra-pure-virtual` MachineVerifier
-# false-positive (KNOWN_ISSUES in tools/a16_fuzz.py; see TODO.md's mandel-double/gouraud
-# entries for prior witnesses; fix plan docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
-# Wiring a real verify leg here needs XFAIL-awareness this script doesn't have — left vacuous
-# rather than landing a leg that hard-crashes the gate on a pre-existing, differential-proven-
-# correct issue. See docs/plans/2026-08-03-123-snes-nmitally.md follow-up.
+# -verify-machineinstrs must run where codegen runs. Under the config's default LTO, the
+# link above does not forward -mllvm to the LTO backend, so the flag on it verifies
+# NOTHING (the wt/321-nmitally vacuous-verify finding). Verify on an explicit -fno-lto
+# object and prove the output is a real object, not bitcode. SNESGFX_CFLAGS is threaded
+# through so the verify leg compiles the same shape the ROM link does.
+#
+# Expectation: clean, with no XFAIL awareness. In particular "Using an undefined physical
+# register" here is a hard FAIL — patch 0028-llvm-virtregrewriter-undef-lane-identity-copy
+# (applied by dev/toolchain.sh) is what keeps it clean.
+echo "==> -verify-machineinstrs (-fno-lto, so codegen actually runs)"
+"$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 \
+  -Xclang -target-feature -Xclang +mos-a16 -Os \
+  -fno-lto -mllvm -verify-machineinstrs \
+  ${SNESGFX_CFLAGS:-} \
+  -c "$SRC" -o "$BUILD/mandel-oop-verify.o"
+"$TOOL/llvm-objdump" -h "$BUILD/mandel-oop-verify.o" >/dev/null 2>&1 \
+  || { echo "FAIL: +mos-a16 verify emitted no real object (vacuous verify)"; exit 1; }
+echo "    PASS: +mos-a16 verify clean (real object emitted)"
+
 rc=0
 
 # 2. bsnes-jg — dump framebuffer + assert corpus_result.

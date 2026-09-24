@@ -96,3 +96,104 @@ one on a pre-existing, accepted issue — worse than leaving it vacuous. Wiring 
 scripts into the `tools/a16_fuzz.py` `KNOWN_ISSUES` / `dev/known-issues.sh` XFAIL mechanism (today
 that registry only covers corpus-slice fuzzing, not whole-ROM demo gates) is a design decision
 outside a bounded per-script edit — **ESCALATE to T3/T4**.
+
+### RESOLVED 2026‑09‑24 — the blocker was fixed upstream; no XFAIL wiring was needed
+
+The escalation above assumed the only way forward was to teach the demo gate scripts about
+`tools/a16_fuzz.py`'s `KNOWN_ISSUES` XFAIL registry. That turned out to be the wrong shape,
+because the **underlying defect got fixed instead**.
+
+`a16-rc-undef-ra-pure-virtual` (cause #2 of *"Using an undefined physical register"*) is fixed by
+**`patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy.patch`** —
+`VirtRegRewriter` was dropping an identity `COPY` that carried the only definition of an undef
+lane; the fix retains it as a `KILL`. The patch is applied by `dev/toolchain.sh` (line 130) and is
+in the current build. Write‑up: [`docs/upstream-rc-undef-ra-pure-virtual-issue.md`](../upstream-rc-undef-ra-pure-virtual-issue.md).
+
+With that patch in the toolchain, the exact `-fno-lto -c` verify leg that was rejected in
+2026‑08‑04 now **verifies clean** on both sources. So both scripts get the plain 21‑script
+pattern — an explicit `-fno-lto -c` verify compile plus an `llvm-objdump -h` real‑object check —
+and **no XFAIL awareness at all**. A recurrence of the signature hard‑FAILs, which is the point.
+
+No mockup section: this change has no visible surface (two shell gate scripts).
+
+**Note for whoever lands the XFAIL retirement.** At `HEAD` the `KNOWN_ISSUES` entry and both of its
+`KNOWN_ISSUE_REPROS` rows are still present, so the `known-issues` XPASS guard is **currently red at
+`HEAD`** — see verification step 3 below. An **uncommitted** working‑tree change to
+`tools/a16_fuzz.py` and `dev/rcundef.sh` (mtimes 2026‑09‑20 10:05/10:06, another worker's) already
+retires the entry and converts `dev/rcundef.sh` into a positive verifier gate. That retirement is
+that worker's to land; this change deliberately does not touch either file.
+
+#### Verification
+
+1. Real verify leg is clean on both sources (`+mos-a16 -Os -fno-lto -c`), and the LTO path it
+   replaces really does emit bitcode (red/green proof).
+2. `dev/run.sh mandel-oop` and `dev/run.sh blossom` — full gates, including the new verify leg.
+3. `dev/run.sh known-issues` — the XPASS guard must not regress.
+
+##### 1. Real verify leg is clean on both sources; the LTO path really does emit bitcode
+
+```
+$ dev/container.sh -- ... mos-clang --config mos-snes.cfg -mcpu=mosw65816 +mos-a16 -Os \
+    -fno-lto -mllvm -verify-machineinstrs -c <src> -o <obj>;  llvm-objdump -h <obj>
+=== blossom rc=0
+   real object: YES
+   Bad machine code count: 0
+=== mandeloop rc=0
+   real object: YES
+   Bad machine code count: 0
+
+(red leg — same compile WITHOUT -fno-lto)
+LTO-compile rc=0
+objdump -h: REJECTED (bitcode, as expected)
+```
+
+**PASS** — the leg is genuinely non-vacuous and verifies clean.
+
+##### 2. `dev/run.sh mandel-oop` and `dev/run.sh blossom`
+
+```
+==> built build/mandel-oop.sfc (+mos-a16, -verify clean); corpus_result @ WRAM 0x897
+==> -verify-machineinstrs (-fno-lto, so codegen actually runs)
+    PASS: +mos-a16 verify clean (real object emitted)
+==> bsnes-jg: render + framebuffer dump (build/mandel-oop-jg.png) + assert
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+==> MAME (under Xvfb): assert corpus_result
+    SHOT: PASS corpus=0x204F (snapshot at frame 5800)
+RESULT: PASS — mandel-oop OOP gate GREEN; corpus_result==0x204F on host == +mos-a16@bsnes-jg
+```
+
+```
+==> built blossom.sfc (+mos-a16); corpus@$54 blossom_crc@$56 pad_log@$200
+==> -verify-machineinstrs (-fno-lto, so codegen actually runs)
+    PASS: +mos-a16 verify clean (real object emitted)
+==> bsnes-jg: grid gate (corpus == 0x9047) + state replay (BLOSSOM) + framebuffer dump
+    SMOKE: PASS off=0x54 len=2 got=0x9047 (ran 1500 frames, bsnes-jg)
+    BLOSSOM: PASS frames=64 nonzero=64 blossom_crc=0xEC5A (host replay == ROM, bsnes-jg)
+==> MAME (under Xvfb): snapshot + grid gate (build/blossom-mame.png)
+    SHOT: PASS corpus=0x9047 (snapshot at frame 1500)
+RESULT: PASS — interactive Hopalong attractor on SNES; grid hash 0x9047 host == +mos-a16 (MAME + bsnes-jg); state-math host == ROM (bsnes-jg)
+```
+
+**PASS** — both gates GREEN end to end (`rc=0`), both emulator legs included.
+
+##### 3. `dev/run.sh known-issues` — XPASS guard not regressed
+
+```
+==> known-issues XPASS guard: each KNOWN_ISSUES repro must still crash verify (+mos-a16 AND +mos-xy16, at the row's own -O level)
+
+RESULT: PASS — 0/0 known-issue legs still reproduce (XFAIL regression guard intact)
+rc=0
+```
+
+**PASS** — but note this ran against the working tree, where the other worker's uncommitted
+retirement has already emptied both tables (hence `0/0`). Against `HEAD`'s two rows the guard is
+**red**, which is the correct XPASS signal that the defect is fixed:
+
+```
+rcundef2.c     -Os  mos-a16   rc=0  bad-machine-code=0
+rcundef2.c     -Os  mos-xy16  rc=0  bad-machine-code=0
+newton_sim.c   -O1  mos-a16   rc=0  bad-machine-code=0
+newton_sim.c   -O1  mos-xy16  rc=0  bad-machine-code=0
+```
+
+Retiring those rows is the other worker's in-flight change, not this one's.

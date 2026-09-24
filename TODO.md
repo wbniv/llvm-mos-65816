@@ -895,28 +895,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [wip T2] **Vacuous `-verify-machineinstrs` in demo gate scripts — sweep and fix.** Under the config's
-  default LTO, `mos-clang --config … -c` emits bitcode (codegen never runs) and the link does not
-  forward `-mllvm` to the LTO backend, so `-mllvm -verify-machineinstrs` on those invocations
-  verifies NOTHING — a vacuous PASS. Found on `wt/321-nmitally` (its script comments name
-  `dev/_demo5.sh` and the `/snes-demo` skill template as offenders); any Round-7 `dev/*.sh` copied
-  from them inherits it. The fix, already applied in `dev/nmitally.sh`: an explicit `-fno-lto -c`
-  verify compile per feature mode plus an `llvm-objdump -h` real-object check proving the output
-  isn't bitcode. Sweep all demo gate scripts + the template.
-  **Progress 2026-08-04:** swept all `dev/*.sh` + the `/snes-demo` template; **21/23 genuine
-  offenders fixed** (`dev/a16absidx.sh`, `a16indiry.sh`, `a16regpress.sh`, `blossom-grid.sh`,
-  `buddha-grid.sh`, `far_arith.sh`, `far_call.sh`, `far_cast.sh`, `far_fnptr.sh`, `far_indir.sh`,
-  `far_indir_tail.sh`, `far_memops.sh`, `far_near_call.sh`, `far_sizeof.sh`, `far_store.sh`,
-  `invaders.sh`, `mandel-far.sh`, `measure-far-cc.sh`, `packed24.sh`, `packed24_table.sh`,
-  `buddha.sh`) + `.claude/skills/snes-demo/SKILL.md` §6 template; red/green proven (bitcode
-  correctly rejected by `objdump -h`, real object correctly accepted). **2 ESCALATED, left
-  vacuous:** `dev/blossom.sh` and `dev/mandel-oop.sh` — a real `-fno-lto -c` verify leg trips the
-  **already-known** `a16-rc-undef-ra-pure-virtual` MachineVerifier false-positive (same signature
-  as the `mandel-double`/`gouraud` Done entries; differential-proven correct, not a miscompile).
-  Landing the fix there needs XFAIL-aware wiring into the `tools/a16_fuzz.py` `KNOWN_ISSUES`
-  registry (`dev/known-issues.sh`'s mechanism) that a bounded per-script edit shouldn't improvise
-  — needs T3/T4 design work, tracked as a follow-up in the plan.
-  [plan](docs/plans/2026-08-03-123-snes-nmitally.md).
 - [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
   The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
   `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
@@ -1359,6 +1337,9 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [vacuous-verify-sweep] Last 2 of 23 demo gate scripts (`blossom.sh`, `mandel-oop.sh`) got the real
+  `-fno-lto -c` verify leg. The `a16-rc-undef-ra-pure-virtual` blocker is fixed by patch `0028`, so no XFAIL wiring was
+  needed; both gates GREEN (MAME + bsnes-jg). See [plan](docs/plans/2026-08-03-123-snes-nmitally.md).
 - ✅ 2026-09-24 — [scavenger-p-undef-capture] Corrected an over-broad finding (only one of the two
   named `.mir` files was actually orphaned — `insert-rep-sep-cloned-kills.mir` was already inside
   `0002`) and captured the real one, `scavenger-p-undef.mir` (a downstream-only `+mos-a16` regression
