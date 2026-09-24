@@ -1177,6 +1177,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
   test. Reason for T3: one target hook pair, but the intended semantics need settling.
+- [T2] **`tools/torture_filter.py` truncates the diagnostic before it strips the checkout path**, so
+  the committed manifest's third column depends on the absolute `FUZZ_ROOT`: `_first()` cuts the raw
+  line at 200 characters and `sanitize()` removes the root afterwards, leaving `200 − len(root)`
+  characters (regenerating from a 104-character root shortened 136 `unsupported.tsv` rows to
+  exactly 95 characters; the committed rows span 97–174). Sanitize first, then truncate, and
+  regenerate the manifests once from the canonical root. Reason for T2: one function, the order
+  is the fix (found in the 0041 work).
 - [T3] **`dev/toolchain.sh` clones llvm-mos `main` unpinned** while `vendor/` sits at `8be0546`
   (2026‑07‑13) and the validation stack at `742d554`; a fresh bootstrap gets whatever `main` is that
   day, against the reproducibility rule, and every patch must keep applying to a moving base. Pin
