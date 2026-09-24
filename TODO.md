@@ -1147,7 +1147,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   off the end of the 3-register `GPR` class when asked for 4; generic `InlineAsmLowering`, identical
   before and after 0041). Emit a clean diagnostic instead. Reason for T2: small and self-contained
   once the wording is chosen (found in the 0041 work).
-- [T3] **`MOSTargetLowering::getNumRegistersForInlineAsm` disagrees with `getRegForInlineAsmConstraint`
+- [wip T3] <!-- agent:a72e86f51e00fec65 --> **`MOSTargetLowering::getNumRegistersForInlineAsm` disagrees with `getRegForInlineAsmConstraint`
   for non-`"r"` classes**: `"a"(int)` yields one 8-bit `GPR` for a 16-bit value, so the value is
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
@@ -1158,6 +1158,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   (a disassembly-byte CHECK mismatch)). Each is either CHECK drift from the a16 patch stack or a real
   defect; decide per test, fix or re-baseline with a reason, and get the suite to 0 fail so the lit
   target is a usable gate. Reason for T3: four independent judgements, no design.
+  **`addressing-modes-65816.s` root-caused 2026-09-24** (found while fixing `0039`, deliberately left
+  out of that fix's scope): `lda addr24 ; CHECK: af 00 00 00` assembles to `ad 00 00` because
+  `MOSOperand::isImmInRange`'s `isa<MCSymbolRefExpr>` exit returns `true` unconditionally, regardless of
+  the candidate operand's width — a bare unresolved symbol (here `.text + 0x30303`, section-relative, so
+  genuinely unknown at parse time) always matches the narrowest candidate instead of the widest.
+  Different from `0039`'s bug (a *known* constant's value was ignored; here the value truly isn't known
+  yet), and fixing it needs a parse-time notion of a symbol's addressing width — a design question, not
+  width arithmetic. Verified `0039` neither fixes nor worsens it (byte-identical failure output
+  before/after). [diagnosis §2.3](docs/plans/2026-09-24-mos16-constant-truncation.md#23-scope-boundary--what-this-does-not-fix) ·
+  [validation](docs/pr-preparations/2026-09-24/0039-validation.md).
 - [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
   compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
