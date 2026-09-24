@@ -217,6 +217,14 @@ if [ ! -d "$SRC/.git" ]; then
   # Immediate16 MCInst holding a plain small immediate — so it has no upstream
   # target; it is standalone only to keep it reviewable apart from 0002.
   apply_patch 0045-mos-asm-print-a16-immediate
+  # MOSFixupKinds.cpp's Infos[] had 14 initialisers for 15 fixup kinds -- the
+  # AddrAsciz row was missing, so a lookup for it silently read the array's
+  # value-initialised tail ({nullptr, 0, 0, 0}) instead of a real entry.
+  # Harmless today (TargetSize == 0 already means "never relax", which is
+  # correct for this variable-width data directive), but the table's own
+  # "same order as the header" contract was silently violated. Pristine-
+  # upstream one-liner; standalone so it stays reviewable apart from 0002.
+  apply_patch 0046-mos-fixupkinds-addrasciz-row
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and

@@ -68,6 +68,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0043-mos-inline-asm-physreg-width.patch"
   "$PATCHES/0044-mos-asm-print-long-address.patch"
   "$PATCHES/0045-mos-asm-print-a16-immediate.patch"   # a16 immediate width; downstream-only
+  "$PATCHES/0046-mos-fixupkinds-addrasciz-row.patch"  # AddrAsciz Infos[] row; pristine-upstream
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only

@@ -1,0 +1,19 @@
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
+index cebbb7be1c0e..a62474bdb343 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
+@@ -37,7 +37,13 @@ MOSFixupKinds::getFixupKindInfo(const MOS::Fixups Kind,
+        0},                  // The high byte of the segment of a 24-bit addr
+       {"Addr13", 0, 13, 0}, // A 13-bit address.
+       {"PCRel8", 0, 8, 0},
+-      {"PCRel16", 0, 16, 0}};
++      {"PCRel16", 0, 16, 0},
++      {"AddrAsciz", 0, 0,
++       0}, // Address encoded as a variable-width decimal ASCII string; the
++           // width is supplied per-call-site (emitMosAddrAsciz), so this
++           // fixup has no fixed TargetSize and must never be relaxed (see
++           // fixupNeedsRelaxationAdvanced's Info.TargetSize > N check).
++  };
+   if (Kind < static_cast<MOS::Fixups>(FirstTargetFixupKind)) {
+     assert(Alternative &&
+            "Alternative MOS backend expected, but none was given!");
