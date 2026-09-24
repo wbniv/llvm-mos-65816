@@ -1153,7 +1153,7 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [main run 34793262107](https://github.com/llvm-mos/llvm-mos/actions/runs/34793262107) (2026‑09‑14),
   so not caused by [PR #604](https://github.com/llvm-mos/llvm-mos/pull/604) — the reply if a
   maintainer queries that PR's red check. Worth an upstream issue; posting is user-triggered.
-- [T4] **Multi-register register operands in GlobalISel inline asm (patch 0041).** Generic
+- [T5] **Multi-register register operands in GlobalISel inline asm (patch 0041).** Generic
   `InlineAsmLowering` assumed every register operand occupies exactly one register. MOS maps `"r"`
   to `Imag8` for everything but `i16`, so a `long` needs four: the tied form
   (`asm("" : "=r"(i) : "0"(x))`) asserted `NumOpRegs == 1`, and the plain input and the output were
@@ -1167,6 +1167,21 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [PR draft](docs/upstream-gisel-inline-asm-multi-register-pr.md) ·
   [validation](docs/pr-preparations/2026-09-24/0041-validation.md).
   Remaining: publish (user-triggered).
+- [T2] **Physreg-constrained inline-asm operand wider than its register class asserts `Ran out of
+  registers to allocate!`** (`asm("" : "=a"(long))` on MOS: `getRegistersForValue`'s physreg walk runs
+  off the end of the 3-register `GPR` class when asked for 4; generic `InlineAsmLowering`, identical
+  before and after 0041). Emit a clean diagnostic instead. Reason for T2: small and self-contained
+  once the wording is chosen (found in the 0041 work).
+- [T3] **`MOSTargetLowering::getNumRegistersForInlineAsm` disagrees with `getRegForInlineAsmConstraint`
+  for non-`"r"` classes**: `"a"(int)` yields one 8-bit `GPR` for a 16-bit value, so the value is
+  silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
+  inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
+  test. Reason for T3: one target hook pair, but the intended semantics need settling.
+- [T3] **`dev/toolchain.sh` clones llvm-mos `main` unpinned** while `vendor/` sits at `8be0546`
+  (2026‑07‑13) and the validation stack at `742d554`; a fresh bootstrap gets whatever `main` is that
+  day, against the reproducibility rule, and every patch must keep applying to a moving base. Pin
+  the clone to a recorded commit (and document how to bump it). Reason for T3: script change with
+  one decision to record (which pin), found in the 0041 work.
 - [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
   compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
