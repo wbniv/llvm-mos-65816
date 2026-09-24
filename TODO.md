@@ -270,6 +270,66 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
+- [T4] **AsmPrinter does not mark long (24-bit) addresses — far load/store and `$5C` tail jumps print
+  identically to their 16-bit siblings.** `lda far_src`/`sta corpus_result`/`jmp far_pick` carry no
+  `mos24(...)` on the way out, so `-save-temps` (a plain first-party flag, no hand-written asm) silently
+  retargets far accesses to the DBR and far tail calls to the **wrong ROM bank** — reachable wrong code,
+  not cosmetic. `0039` already makes the parser honour `mos24(sym)`/`jmp mos24(sym)` on the way in; this
+  is the missing printer half. `$5C` additionally has no mnemonic of its own (`JMP_AbsoluteLong` is
+  spelled `"jmp"` at `MOSInstrInfo.td:769`, and `jml` isn't accepted for the absolute-long form), so
+  the fix also decides whether to add a `jml` alias. **This item owns the design decision for both
+  printer gaps** (wrap every wide operand in its modifier vs. `.a16`/`.a8`-style mode directives vs.
+  parser M-state tracking); the a16-immediate item below implements under whatever shape is chosen
+  here. Kept separate because this half is stock-65816 and upstream-postable, the other is fork-only.
+  Reason for T4: the narrow fix is easy, the shape has real blast radius on hand-written `asm`, assembly
+  size and upstream acceptability.
+  [audit §6](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#6-disassembly--round-trip--the-genuine-functional-gap).
+- [T4] **AsmPrinter does not mark 16-bit immediates under `+mos-a16` — worse than the long-address gap
+  above.** A 16-bit immediate ≤ 255 prints as a bare `#N` and reassembles to 2 bytes instead of 3; under
+  M=0 (`+mos-a16`'s whole point) that **desyncs the instruction stream** — the next opcode's first byte is
+  consumed as the immediate's high byte. Reachable the same way (`-save-temps`). Measured: 36/112
+  `examples/65816/*.c` fixtures diverge on round-trip (97 lost `imm16` lines); values ≥ 256 are safe by
+  accident, which is why it went unnoticed. `llvm-mc` already handles `#mos16(27)` → `49 1b 00` on both
+  binaries, so this is purely printer-side. Follows the shape decided by the long-address item above;
+  fork-only (`+mos-a16` is downstream), so a separate patch. Reason for T4: same design blast radius;
+  if the shape is already settled by the time this is picked up, re-rank to T3.
+  [audit §6.3](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#63-the-second-instance--16-bit-immediates-under-mos-a16).
+- [T2] **Promote `dev/probe-far-roundtrip.sh` to a committed round-trip gate** (`dev/run.sh roundtrip`)
+  over the 65816 corpus in all three modes — compile `-c` vs `-S`+`llvm-mc`, diff `.text` — so the two
+  AsmPrinter gaps above can never regress silently again. No round-trip gate existed before the
+  2026-09-24 #320 audit that wrote the script. Either land after the two gaps (clean baseline) or now with
+  the current 36 divergences recorded as a known set that must shrink, never grow. Reason for T2: the
+  script exists and works; wiring + an expected-set file is bounded.
+  [audit §6.4](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#64-nothing-tests-this).
+- [T1] **`MOSFixupKinds.cpp` `Infos[]` has 14 initialisers for 15 fixup kinds — add the `AddrAsciz`
+  row.** Harmless today (`TargetSize == 0` = never relax, correct for a data directive; `MC/MOS/addr-asciz.s`
+  passes) but `Info.Name` is `nullptr` and the table's own "same order as `MOSFixupKinds.h`" contract is
+  silently violated — the next appended kind inherits the bug. Pristine-upstream one-liner; clean
+  standalone upstream artifact (queue it in `docs/upstream-contribution-status.md`).
+  [audit §1](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#1-assembler--parser--mostly-done-one-real-gap-already-tracked).
+- [T2] **`llvm-mc -show-encoding` crashes on a symbolic `.mos_addr_asciz`** (`LLVM ERROR: Don't know how
+  to emit this value.` — `VK_ADDR_ASCIZ` has no textual form and `evaluateAsInt64` is
+  `llvm_unreachable`). `MC/MOS/addr-asciz.s` only exercises `--filetype=obj`, so nothing catches it. Not
+  24-bit-specific; found incidentally by the 2026-09-24 #320 audit. Needs a textual form plus a
+  `-show-encoding` RUN line; upstream-postable. Reason for T2: one MCExpr printer case + a test.
+  [audit §1](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#1-assembler--parser--mostly-done-one-real-gap-already-tracked).
+- [T3] **Far/packed-24 codegen has zero lit coverage.** Every far/packed-24 correctness claim rests on
+  emulator ROMs (`dev/run.sh far*`/`packed24*`); no `addrspace(2)`/`addrspace(3)` test exists anywhere
+  in `llvm/test`. Add fork-local `CodeGen/MOS/far-*.ll` pinning `af`/`8f`/`a7`/`87`/`$5C` selection, the
+  `p2↔s32` and `p3↔3×s8` legalizer bridges and the `G_PHI(p2)` legalisation — the emulator gates already
+  define the expected shapes. Reason for T3: multi-file against a settled design, no open question.
+  [audit §5](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#5-testing-coverage--the-weakest-layer-as-a-category-of-its-own).
+- [T3] **`[dp],Y` (`b7`/`97`) indirect-long-indexed is never selected — MEASURE first.** A far pointer
+  plus a runtime index always materialises a 32-bit pointer add then `lda [dp]`; `farindex.c`, a
+  *dedicated* far-array-subscript fixture, emits 34× `lda [dp]` and zero `lda [dp],y`. Also unselected:
+  `sta long,X` (`9f`) and the long-form `cmp`/`eor`/`ora`/`and`/`adc`/`sbc`. Governing lesson 2 applies
+  exactly — a native long form is not automatically smaller, and the win depends on operand residency
+  and schedule. Phase 1 (this rank, T3, throwaway worktree): build the `[dp],Y` shape by hand for
+  `farindex.c`-class access in realistic 16-bit-ambient context and diff bytes/cycles against add+`[dp]`;
+  record GO/NO-GO. Phase 2 only on GO, re-ranked **T4**: select it behind a conservative gate that can
+  only miss a win. Unknown per the audit: whether `b7`/`97` fire on `examples/snes/`/SDK code (census
+  covered `examples/65816/*.c` only) — check that first, it may change the answer.
+  [audit §2](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#2-codegen--instruction-selection--done-for-correctness-measured-gaps-in-coverage).
 ### M2 — Optimizing Payoff
 
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
@@ -895,6 +955,36 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
+- [T2] **`dev/title-entropy.sh` is not wired into any gate runner.** Every `m7title.h`/`title_layer.h`
+  adopter is a candidate for the uninitialised-PPU-state class of defect that closed
+  [mandel-oop-title-entropy] (2026-09-15), and the deterministic `JGX_ENTROPY=0` gates that guard the
+  battery today cannot see any of it. Wire it as a `dev/run.sh` target or a leg of
+  `dev/verify-web-roms.sh` over the **published** set at 3 frames × 8 runs (the plan's stated budget — one
+  entropy-0 render + N entropy-1 renders per frame per ROM, not all 255 examples). Reason for T2: the
+  script exists and the budget/shape is decided; it is wiring. Promoted from Inbox 2026-09-24.
+  [plan §follow-ups](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
+- [T2] **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
+  independent uninitialised-state defect in the reels' own `setup_display()`, not the closed `m7title.h`
+  one): `dev/title-entropy.sh` passes at frame 60 and fails at 100/200 on both pre- and post-fix ROMs
+  (reel 2/8–3/8 entropy-1 runs differ; apollo 8/8 at 200). Both are the only adopters with no
+  `snes_ppu_reset_blank()` in `main()`. Method is known: bisect the register groups with a temporary
+  probe at the top of `setup_display()`, then reset the offending block. Reason for T2: two demos, a
+  proven bisection recipe, no design. Promoted from Inbox 2026-09-24.
+  [plan §follow-ups](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
+- [T2] **`rdiff`'s title card dominates both gate captures and the Gray-Scott field is never
+  visible.** Measured 2026-09-15 on `main` (gate PASS, `corpus_result=0x5555`, so invisible to the
+  differential): frames 500/2000/2600/3500 all show the title; frame 6000 is entirely black — title torn
+  down, no Turing pattern ever drawn. The ~220 logical `title_begin`/`title_end` frames are stretching
+  across thousands of hardware frames. Demo-side visual defect, not a compiler bug; `dev/rdiff.sh`'s
+  "2000 frames yields a developed, screen-filling card" comment is false. Find why the title loop
+  runs slow (likely per-hw-frame waits inside the logical-frame loop), fix, and re-capture. Reason for
+  T2: one demo + one script, clear symptom; judgment about how, not what. Promoted from Inbox 2026-09-24.
+  [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
+- [T1] **Newton's gate captures snapshot before the basin fill** (~1 tile row deep; complete by frame
+  6000). Demo is correct; `build/newton-{jg,mame}.png` are just weak evidence. Raise `dev/newton.sh`'s
+  jgxcheck frame count and MAME `-seconds_to_run` so the published screenshot shows the finished fractal.
+  Reason for T1: two constants. Promoted from Inbox 2026-09-24.
+  [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
   The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
   `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
@@ -2280,10 +2370,15 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      • publishing -> the standard user-gated /snes-rom-page flow (never tracked as open work);
      • ABORT $FFE8/$FFF8 = $0000 -> documented non-work (pin not connected on SNES; decision in the plan);
      • assembler cop / brk #imm -> queued in docs/upstream-contribution-status.md "Future / blocked". -->
-- [ ] **(triage)** Publishing to biohack.net / indri.studio (user-gated follow-up). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:4b71ee8c13a90d5b -->
-- [ ] **(triage)** MAME leg (SKIP-by-design without the SPC700 IPL). — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:bc642b4b5ab8d2bf -->
-- [ ] **(triage)** H-mode (per-scanline) IRQ. At ~262 IRQs/frame the C ISR prologue alone exceeds a scanline, so — _from [2026-08-04-139-snes-irqgate.md](docs/plans/2026-08-04-139-snes-irqgate.md)_  <!-- fp:8974b954bfca2a54 -->
-- [ ] Retire `0024-mos-brk-signature-operand.patch` and bump the vendor pin when [llvm-mos PR #586](https://github.com/llvm-mos/llvm-mos/pull/586) merges. COP remains separately carried in `0002`. <!-- fp:83367950e9cfe689 -->
+<!-- triaged 2026-09-24: all four #139 irqgate captures are non-work or already curated —
+     • publishing -> the standard user-gated /snes-rom-page flow (never tracked as open work);
+     • MAME leg SKIP without the SPC700 IPL -> by design (the IPL is a write-only CI secret; present
+       on this box since 2026-08-06), not a deferral;
+     • H-mode per-scanline IRQ -> already REJECTED and recorded in the curated #139 block above
+       ("livelock … recorded so it isn't re-proposed");
+     • retire 0024 when PR #586 merges -> already carried verbatim in the curated #140 brkcop block
+       (PR #586 still OPEN as of today — it stays a watch there, not an open item here).
+     fp:4b71ee8c13a90d5b fp:bc642b4b5ab8d2bf fp:8974b954bfca2a54 fp:83367950e9cfe689 -->
 <!-- triaged 2026-08-04: two COP/BRK-plan Out-of-scope bullets.
      • BRK/COP disassembly-length change -> rides the curated [T5] "COP-only upstream complement"
        bullet (Upstream / Contribution) as a named follow-up; not a separate item.
@@ -2319,10 +2414,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      commit that CLOSED it — all 11 battery aborts are fixed (8 demos build, 3 companion TUs
      excluded by an enforced contract) and the evidence lives in that plan's "Follow-up — task
      package gate hygiene fixed (2026-09-15)" section. Already recorded in Done. Nothing open. -->
-- [ ] **(triage)** **rdiff's title card dominates both gate captures, and the Gray-Scott field never becomes — _from [2026-06-28-snes-demo-startup-garbage-and-title-screens.md](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)_  <!-- fp:086d8820767bc6fc -->
-- [ ] **(triage)** **Newton's gate capture frames are earlier than its fill.** Both drivers snapshot while the basin — _from [2026-06-28-snes-demo-startup-garbage-and-title-screens.md](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md)_  <!-- fp:d0b4dbafe655b800 -->
-- [ ] **(triage)** `snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title, in video playback: — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:2fa4f51ae43816fd -->
-- [ ] **(triage)** `dev/title-entropy.sh` is not wired into any gate runner yet. Every `m7title.h` / `title_layer.h` — _from [2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md)_  <!-- fp:588a35b403879067 -->
+<!-- triaged 2026-09-24: all four are genuine open work with no curated owner — PROMOTED to
+     "### Test Bench / CI" as ranked items (rdiff title-card T2, newton capture timing T1,
+     reel/apollo post-title entropy T2, title-entropy.sh gate wiring T2).
+     fp:086d8820767bc6fc fp:d0b4dbafe655b800 fp:2fa4f51ae43816fd fp:588a35b403879067 -->
 <!-- triaged 2026-09-15: both selfcheck-plan follow-ups are non-work for THIS repo.
      • "gallery ROM not in the npm demo bundle" is not a deferral — it is a recorded decision with
        its rationale (a +50% npm tarball for a demo asset) and a one-line `DEMO_ROMS` flip if the
